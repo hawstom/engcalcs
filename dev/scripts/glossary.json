@@ -3304,6 +3304,32 @@
                 "zh": "自由软件"
             },
             "source": "fsf-published-translations"
+        },
+        "count (tally)": {
+            "term": "count (tally)",
+            "symbol": "",
+            "context": "To add something to a running total. Used throughout the Task 286 consent banner (consent_body, consent_current_granted, consent_current_denied) and the privacy notice, where the whole ask is whether a visitor may be counted once rather than once per visit. The distinction the word carries here is VISITORS vs VISITS: a visitor is a person tallied once; a visit is a single page load. Use whatever ordinary verb your language uses for tallying or totalling; there is nothing technical about it, and the risk is entirely in the wrong sense being chosen.",
+            "avoid": [
+                "the sense of MATTERING or being valued — \"your visit counts\", \"make it count\". This is a live English idiom and the most likely wrong reading; it turns a request for permission into a compliment",
+                "the sense of RELYING on somebody — \"count on me\"",
+                "the accounting or financial sense — an account, a balance, a reckoning of money",
+                "the noble title — count, as in a European rank. A real trap in Romance and Slavic languages, where the tallying verb and the title can share a root",
+                "rendering it as MEASURE or TRACK, both of which imply more than we do. We add one to a total; we do not measure or follow anybody"
+            ],
+            "translations": {},
+            "translation_notes": "Created 2026-08-12 for the ROADMAP Task 286 consent banner, as the glossary half of a Wave 0 finding (dev/english-friction/251-lpn-26lang.json, key 'count'). Translations are deliberately EMPTY: this concept has an ordinary, settled verb in every language, we have no shipped values to attest, and inventing 26 of them would be exactly the judging-other-people's-terminology that CLAUDE.md forbids. The sprint fills them, and the mandatory glossary write-back records what each language actually chose. What the entry carries in the meantime is the part an agent cannot derive — which of the English senses is meant, and which four are traps."
+        },
+        "cookie (browser storage)": {
+            "term": "cookie (browser storage)",
+            "symbol": "",
+            "context": "A small piece of information a website stores in a visitor's browser. Appears as the label consent_settings_link (\"Cookie settings\") — the control that reopens the consent choice — and throughout privacy.php. NOTE THE LABEL'S JOB: it must be the phrase a visitor or a regulator LOOKS FOR, so the conventional term in your language beats a more descriptive one. Most languages simply keep the English word 'cookie', and where that is the convention it is the right answer.",
+            "avoid": [
+                "the food — a biscuit, a sweet baked good. This is the literal meaning of the English word and the failure mode to expect, especially where the computing sense has not been borrowed",
+                "coining a descriptive phrase where your language already borrows 'cookie'. A visitor hunting for cookie settings will not recognise an invented term",
+                "widening it to all browser storage. The privacy notice distinguishes cookies from localStorage and IndexedDB deliberately, because they are listed as separate rows"
+            ],
+            "translations": {},
+            "translation_notes": "Created 2026-08-12 alongside 'count (tally)', from the same Wave 0 pass. Empty translations for the same reason, with one extra: this is the term where deferring to the culture matters most, because the label's whole value is being the findable, conventional one. See CLAUDE.md, 'defer to cultural standard' — we are not the judges of terminology."
         }
     }
 }

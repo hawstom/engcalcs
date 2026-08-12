@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 840,
-        "delta_key_count": 273,
+        "expected_key_count": 850,
+        "delta_key_count": 283,
         "exempt_key_count": 11,
         "exempt_keys": [
             "calc_units_us",
@@ -20,7 +20,10 @@
         "out_of_scope_key_count": 4,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
         "active_prefixes": [
-            "lpn"
+            "consent",
+            "lpn",
+            "privacy",
+            "terms"
         ],
         "requested_prefix": null,
         "notes": "Translate only keys in keys_to_translate; preserve HTML, units, and symbols.",
@@ -29,9 +32,28 @@
         "syn_notes": "Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- head (H): 水头\n    DO NOT render as: a lazy anatomical calque that is NOT the language's natural hydraulic term — but an anatomically-derived word that IS the dominant local standard is correct (English 'head' is itself the body-part word repurposed); defer to the cultural standard, do not 'fix' a natural term for containing a body-part morpheme; pressure (head is a length\/energy-per-weight, not a pressure); source\/origin of a stream\n- head loss (h_L): 水头损失\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction loss (h_f): 沿程水头损失\n- minor loss (h_m): 局部水头损失\n- pressure (p): 压力\n    DO NOT render as: the HEAD term (a height of water column) — pressure here is what a gauge reads; atmospheric or meteorological pressure senses; a stress or material-strength sense; figurative 'pressure' (urgency, coercion)\n- elevation (z): 高程\n    DO NOT render as: the HEAD term — an elevation is a position above a datum, not an energy; a generic 'tall\/high' adjective where the language has a surveying term; altitude in the aviation or geographic sense where a levelled survey term exists\n- demand: 需水量\n    DO NOT render as: economic or market demand; a legal demand\/claim; a request in the everyday sense\n- static head (H): 静态供水水头\n    DO NOT render as: electrostatic \/ static electricity; 'stationary\/motionless' in a non-hydraulic sense\n- maximum allowable head (H): 最大允许管道压力\n    DO NOT render as: the operating \/ computed head (this is a fixed design limit, not the pressure the network actually develops)\n- supply head (H): 供水水头\n    DO NOT render as: an economic 'supply'; confusing supply (source) head with the delivered\/residual head at a demand point\n- supply curve: [needs translation sprint]\n    DO NOT render as: an economic supply curve; a demand curve\n- looped network: 环状管网\n    DO NOT render as: a control-flow \/ programming loop; a physical loop, knot, or coil\n- branched network: 分支管网\n    DO NOT render as: a literal botanical 'tree' where the language has a proper network\/graph term; a looped or meshed network (branched means no loops)\n- pipe line: 管线\n    DO NOT render as: a queue or line of people; a rope, cord, or cable; a line of text; a purely geometric line\/segment\n- pressure rating: 最大允许管道压力\n    DO NOT render as: a stress or material strength rather than a water pressure; blood-pressure or tyre-pressure senses; a general word for strong or high\n- pressure reduction: 减压\n    DO NOT render as: naming a specific device (break pressure tank, BPT, pressure-reducing valve) as if the tool recommends one; depressurizing in the sense of emptying or draining the pipe\n- energy grade line (EGL): 能量坡度线\n- Manning roughness (n): 曼宁糙率系数\n- friction factor (f): 摩擦系数\n- draw (a diagram): [needs translation sprint]\n    DO NOT render as: draw water (abstract, pump, or take water from a source) -- the wrong sense here, and PLAUSIBLE in a hydraulics context, which is what makes it dangerous; pull, drag, or haul; draw as in a lottery or a tie\/stalemate; withdraw money\n- junction: [needs translation sprint]\n    DO NOT render as: a road junction, crossroads, or intersection; a physical pipe fitting (tee, cross, elbow) -- a junction here is a point in the model, not a part you buy; a railway junction; an electrical junction box\n- reservoir: [needs translation sprint]\n    DO NOT render as: a tank whose level changes over time -- lpn_ explicitly does NOT model tanks (see lpn_notes_2_def), and calling this one would promise time-varying behaviour that does not exist; a natural lake specifically, where the language has a general storage\/supply term; a reserve or reservation in the non-physical sense\n- node: [needs translation sprint]\n    DO NOT render as: a computing\/server node (a transliterated loanword where the language has a real graph or network-diagram term); a knot, lump, or swelling (the anatomical\/botanical sense of the Latin root); a node in the wave-physics sense (a point of zero amplitude)\n- link: [needs translation sprint]\n    DO NOT render as: a hyperlink or web link -- the dominant modern sense of the English word, and the wrong one here; a chain link (the physical object); a connection in the social or logistical sense\n- vertex: [needs translation sprint]\n    DO NOT render as: a mathematical vertex of a polygon or a parabola apex, where the language has a plainer word for a bend or corner point in a drawn line; a peak or summit; a vertex in the anatomical sense (crown of the head)\n- background image: [needs translation sprint]\n    DO NOT render as: a backdrop in the theatrical\/stage sense (the English source word was CHANGED to \"background image\" in Task 193 precisely to remove this transliteration lure); a wallpaper or decorative background; an online\/satellite map layer -- this is a plain image file the user already has\n- pump curve: [needs translation sprint]\n    DO NOT render as: a curve in the geometric\/road sense; a pump characteristic confused with an efficiency or power curve -- this one is head against flow\n- project (saved network): [needs translation sprint]\n    DO NOT render as: an engineering project or job in the contractual sense (a scheme, a works, a contract) -- this is a saved document; a projection (optical or cartographic); to project or forecast\n- scenario: [needs translation sprint]\n    DO NOT render as: a scene or setting in the dramatic\/film sense; a scenario in the \"worst case story\" narrative sense, where the language has a modelling or variant-case term; a copy or duplicate of the network -- a scenario is a set of differences, not a second network\n- zoom to extents: [needs translation sprint]\n    DO NOT render as: a general \"adjust\/change the zoom\" — this is the trap. es \"Ajustar zoom\" and pt \"Zoom para ajustar\" both shipped meaning ADJUST THE ZOOM, which describes the zoom slider, not this button. A verb meaning adjust\/regulate\/set is wrong unless the label also says WHAT is fitted; zoom in \/ zoom out \/ a zoom level or percentage — this command has no direction and no amount; a transliterated \"zoom\" loanword standing alone, where the language has a real word for showing the whole drawing; the photographic or camera sense of zoom (a lens movement)\n- default (setting): 默认\n    DO NOT render as: the financial sense — failure to pay a debt, defaulting on a loan. This is the dominant everyday sense of the English word in many languages and the single most dangerous confusion here; the legal sense — failure to appear or to act, a default judgment; a bare \"reset\" or \"restore\" with the default concept dropped entirely. ro shipped calc_defaults as just \"Reseteaza\" (Reset) while its own calc_defaults_confirm used \"valorile implicite\" correctly — the button must say WHAT is restored; a word meaning normal\/usual\/ordinary where the language has a real settings term. sw shipped \"maadili ya kawaida\" (normal values) instead of \"chaguo-msingi\"; \"kawaida\" describes what is typical, not what the software ships with; the sports sense — winning or losing by default, by forfeit\n- upstream: 上游\n- downstream: 下游"
+        "consent": "Use these preferred technical term translations when relevant:\n- count (tally): [needs translation sprint]\n    DO NOT render as: the sense of MATTERING or being valued — \"your visit counts\", \"make it count\". This is a live English idiom and the most likely wrong reading; it turns a request for permission into a compliment; the sense of RELYING on somebody — \"count on me\"; the accounting or financial sense — an account, a balance, a reckoning of money; the noble title — count, as in a European rank. A real trap in Romance and Slavic languages, where the tallying verb and the title can share a root; rendering it as MEASURE or TRACK, both of which imply more than we do. We add one to a total; we do not measure or follow anybody\n- cookie (browser storage): [needs translation sprint]\n    DO NOT render as: the food — a biscuit, a sweet baked good. This is the literal meaning of the English word and the failure mode to expect, especially where the computing sense has not been borrowed; coining a descriptive phrase where your language already borrows 'cookie'. A visitor hunting for cookie settings will not recognise an invented term; widening it to all browser storage. The privacy notice distinguishes cookies from localStorage and IndexedDB deliberately, because they are listed as separate rows",
+        "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): 流量\n- velocity (v): 流速\n- head (H): 水头\n    DO NOT render as: a lazy anatomical calque that is NOT the language's natural hydraulic term — but an anatomically-derived word that IS the dominant local standard is correct (English 'head' is itself the body-part word repurposed); defer to the cultural standard, do not 'fix' a natural term for containing a body-part morpheme; pressure (head is a length\/energy-per-weight, not a pressure); source\/origin of a stream\n- head loss (h_L): 水头损失\n    DO NOT render as: pressure loss \/ pressure drop (use the head-loss term, not the pressure term); a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction loss (h_f): 沿程水头损失\n- minor loss (h_m): 局部水头损失\n- pressure (p): 压力\n    DO NOT render as: the HEAD term (a height of water column) — pressure here is what a gauge reads; atmospheric or meteorological pressure senses; a stress or material-strength sense; figurative 'pressure' (urgency, coercion)\n- elevation (z): 高程\n    DO NOT render as: the HEAD term — an elevation is a position above a datum, not an energy; a generic 'tall\/high' adjective where the language has a surveying term; altitude in the aviation or geographic sense where a levelled survey term exists\n- demand: 需水量\n    DO NOT render as: economic or market demand; a legal demand\/claim; a request in the everyday sense\n- static head (H): 静态供水水头\n    DO NOT render as: electrostatic \/ static electricity; 'stationary\/motionless' in a non-hydraulic sense\n- maximum allowable head (H): 最大允许管道压力\n    DO NOT render as: the operating \/ computed head (this is a fixed design limit, not the pressure the network actually develops)\n- supply head (H): 供水水头\n    DO NOT render as: an economic 'supply'; confusing supply (source) head with the delivered\/residual head at a demand point\n- supply curve: [needs translation sprint]\n    DO NOT render as: an economic supply curve; a demand curve\n- looped network: 环状管网\n    DO NOT render as: a control-flow \/ programming loop; a physical loop, knot, or coil\n- branched network: 分支管网\n    DO NOT render as: a literal botanical 'tree' where the language has a proper network\/graph term; a looped or meshed network (branched means no loops)\n- pipe line: 管线\n    DO NOT render as: a queue or line of people; a rope, cord, or cable; a line of text; a purely geometric line\/segment\n- pressure rating: 最大允许管道压力\n    DO NOT render as: a stress or material strength rather than a water pressure; blood-pressure or tyre-pressure senses; a general word for strong or high\n- pressure reduction: 减压\n    DO NOT render as: naming a specific device (break pressure tank, BPT, pressure-reducing valve) as if the tool recommends one; depressurizing in the sense of emptying or draining the pipe\n- energy grade line (EGL): 能量坡度线\n- Manning roughness (n): 曼宁糙率系数\n- friction factor (f): 摩擦系数\n- draw (a diagram): [needs translation sprint]\n    DO NOT render as: draw water (abstract, pump, or take water from a source) -- the wrong sense here, and PLAUSIBLE in a hydraulics context, which is what makes it dangerous; pull, drag, or haul; draw as in a lottery or a tie\/stalemate; withdraw money\n- junction: [needs translation sprint]\n    DO NOT render as: a road junction, crossroads, or intersection; a physical pipe fitting (tee, cross, elbow) -- a junction here is a point in the model, not a part you buy; a railway junction; an electrical junction box\n- reservoir: [needs translation sprint]\n    DO NOT render as: a tank whose level changes over time -- lpn_ explicitly does NOT model tanks (see lpn_notes_2_def), and calling this one would promise time-varying behaviour that does not exist; a natural lake specifically, where the language has a general storage\/supply term; a reserve or reservation in the non-physical sense\n- node: [needs translation sprint]\n    DO NOT render as: a computing\/server node (a transliterated loanword where the language has a real graph or network-diagram term); a knot, lump, or swelling (the anatomical\/botanical sense of the Latin root); a node in the wave-physics sense (a point of zero amplitude)\n- link: [needs translation sprint]\n    DO NOT render as: a hyperlink or web link -- the dominant modern sense of the English word, and the wrong one here; a chain link (the physical object); a connection in the social or logistical sense\n- vertex: [needs translation sprint]\n    DO NOT render as: a mathematical vertex of a polygon or a parabola apex, where the language has a plainer word for a bend or corner point in a drawn line; a peak or summit; a vertex in the anatomical sense (crown of the head)\n- background image: [needs translation sprint]\n    DO NOT render as: a backdrop in the theatrical\/stage sense (the English source word was CHANGED to \"background image\" in Task 193 precisely to remove this transliteration lure); a wallpaper or decorative background; an online\/satellite map layer -- this is a plain image file the user already has\n- pump curve: [needs translation sprint]\n    DO NOT render as: a curve in the geometric\/road sense; a pump characteristic confused with an efficiency or power curve -- this one is head against flow\n- project (saved network): [needs translation sprint]\n    DO NOT render as: an engineering project or job in the contractual sense (a scheme, a works, a contract) -- this is a saved document; a projection (optical or cartographic); to project or forecast\n- scenario: [needs translation sprint]\n    DO NOT render as: a scene or setting in the dramatic\/film sense; a scenario in the \"worst case story\" narrative sense, where the language has a modelling or variant-case term; a copy or duplicate of the network -- a scenario is a set of differences, not a second network\n- zoom to extents: [needs translation sprint]\n    DO NOT render as: a general \"adjust\/change the zoom\" — this is the trap. es \"Ajustar zoom\" and pt \"Zoom para ajustar\" both shipped meaning ADJUST THE ZOOM, which describes the zoom slider, not this button. A verb meaning adjust\/regulate\/set is wrong unless the label also says WHAT is fitted; zoom in \/ zoom out \/ a zoom level or percentage — this command has no direction and no amount; a transliterated \"zoom\" loanword standing alone, where the language has a real word for showing the whole drawing; the photographic or camera sense of zoom (a lens movement)\n- default (setting): 默认\n    DO NOT render as: the financial sense — failure to pay a debt, defaulting on a loan. This is the dominant everyday sense of the English word in many languages and the single most dangerous confusion here; the legal sense — failure to appear or to act, a default judgment; a bare \"reset\" or \"restore\" with the default concept dropped entirely. ro shipped calc_defaults as just \"Reseteaza\" (Reset) while its own calc_defaults_confirm used \"valorile implicite\" correctly — the button must say WHAT is restored; a word meaning normal\/usual\/ordinary where the language has a real settings term. sw shipped \"maadili ya kawaida\" (normal values) instead of \"chaguo-msingi\"; \"kawaida\" describes what is typical, not what the software ships with; the sports sense — winning or losing by default, by forfeit\n- upstream: 上游\n- downstream: 下游",
+        "privacy": "Use these preferred technical term translations when relevant:\n- cookie (browser storage): [needs translation sprint]\n    DO NOT render as: the food — a biscuit, a sweet baked good. This is the literal meaning of the English word and the failure mode to expect, especially where the computing sense has not been borrowed; coining a descriptive phrase where your language already borrows 'cookie'. A visitor hunting for cookie settings will not recognise an invented term; widening it to all browser storage. The privacy notice distinguishes cookies from localStorage and IndexedDB deliberately, because they are listed as separate rows",
+        "terms": "Use these preferred technical term translations when relevant:\n- cookie (browser storage): [needs translation sprint]\n    DO NOT render as: the food — a biscuit, a sweet baked good. This is the literal meaning of the English word and the failure mode to expect, especially where the computing sense has not been borrowed; coining a descriptive phrase where your language already borrows 'cookie'. A visitor hunting for cookie settings will not recognise an invented term; widening it to all browser storage. The privacy notice distinguishes cookies from localStorage and IndexedDB deliberately, because they are listed as separate rows"
     },
     "glossary_terms_by_prefix": {
+        "consent": [
+            {
+                "term": "count (tally)",
+                "symbol": "",
+                "context": "To add something to a running total. Used throughout the Task 286 consent banner (consent_body, consent_current_granted, consent_current_denied) and the privacy notice, where the whole ask is whether a visitor may be counted once rather than once per visit. The distinction the word carries here is VISITORS vs VISITS: a visitor is a person tallied once; a visit is a single page load. Use whatever ordinary verb your language uses for tallying or totalling; there is nothing technical about it, and the risk is entirely in the wrong sense being chosen.",
+                "translation_notes": "Created 2026-08-12 for the ROADMAP Task 286 consent banner, as the glossary half of a Wave 0 finding (dev\/english-friction\/251-lpn-26lang.json, key 'count'). Translations are deliberately EMPTY: this concept has an ordinary, settled verb in every language, we have no shipped values to attest, and inventing 26 of them would be exactly the judging-other-people's-terminology that CLAUDE.md forbids. The sprint fills them, and the mandatory glossary write-back records what each language actually chose. What the entry carries in the meantime is the part an agent cannot derive — which of the English senses is meant, and which four are traps.",
+                "preferred_translation": ""
+            },
+            {
+                "term": "cookie (browser storage)",
+                "symbol": "",
+                "context": "A small piece of information a website stores in a visitor's browser. Appears as the label consent_settings_link (\"Cookie settings\") — the control that reopens the consent choice — and throughout privacy.php. NOTE THE LABEL'S JOB: it must be the phrase a visitor or a regulator LOOKS FOR, so the conventional term in your language beats a more descriptive one. Most languages simply keep the English word 'cookie', and where that is the convention it is the right answer.",
+                "translation_notes": "Created 2026-08-12 alongside 'count (tally)', from the same Wave 0 pass. Empty translations for the same reason, with one extra: this is the term where deferring to the culture matters most, because the label's whole value is being the findable, conventional one. See CLAUDE.md, 'defer to cultural standard' — we are not the judges of terminology.",
+                "preferred_translation": ""
+            }
+        ],
         "lpn": [
             {
                 "term": "flow",
@@ -278,9 +300,37 @@
                 "translation_notes": "Never software \"downgrade\". ar: downstream = المصب \/ أسفل المجرى (a file used المنبعية = source-side, wrong).",
                 "preferred_translation": "下游"
             }
+        ],
+        "privacy": [
+            {
+                "term": "cookie (browser storage)",
+                "symbol": "",
+                "context": "A small piece of information a website stores in a visitor's browser. Appears as the label consent_settings_link (\"Cookie settings\") — the control that reopens the consent choice — and throughout privacy.php. NOTE THE LABEL'S JOB: it must be the phrase a visitor or a regulator LOOKS FOR, so the conventional term in your language beats a more descriptive one. Most languages simply keep the English word 'cookie', and where that is the convention it is the right answer.",
+                "translation_notes": "Created 2026-08-12 alongside 'count (tally)', from the same Wave 0 pass. Empty translations for the same reason, with one extra: this is the term where deferring to the culture matters most, because the label's whole value is being the findable, conventional one. See CLAUDE.md, 'defer to cultural standard' — we are not the judges of terminology.",
+                "preferred_translation": ""
+            }
+        ],
+        "terms": [
+            {
+                "term": "cookie (browser storage)",
+                "symbol": "",
+                "context": "A small piece of information a website stores in a visitor's browser. Appears as the label consent_settings_link (\"Cookie settings\") — the control that reopens the consent choice — and throughout privacy.php. NOTE THE LABEL'S JOB: it must be the phrase a visitor or a regulator LOOKS FOR, so the conventional term in your language beats a more descriptive one. Most languages simply keep the English word 'cookie', and where that is the convention it is the right answer.",
+                "translation_notes": "Created 2026-08-12 alongside 'count (tally)', from the same Wave 0 pass. Empty translations for the same reason, with one extra: this is the term where deferring to the culture matters most, because the label's whole value is being the findable, conventional one. See CLAUDE.md, 'defer to cultural standard' — we are not the judges of terminology.",
+                "preferred_translation": ""
+            }
         ]
     },
     "keys_to_translate": {
+        "consent_heading": "Visitors and visits",
+        "consent_body": "May we store a little information in this browser, so that we can tell visitors apart from visits when we count? It is used for counting only, and it gives permission for nothing else.",
+        "consent_accept": "Allow this",
+        "consent_decline": "Refuse this",
+        "consent_current_granted": "You allowed this. We count you as one visitor rather than as one visit each time.",
+        "consent_current_denied": "You refused this. We store nothing in this browser for our counts.",
+        "consent_region_label": "Your choice about being counted",
+        "consent_settings_link": "Cookie settings",
+        "privacy_link": "Privacy notice",
+        "terms_link": "Terms of use",
         "lpn_title_units": "{units} Units",
         "lpn_tool_select": "Select",
         "lpn_tool_add_junction": "Junction",
@@ -296,7 +346,7 @@
         "lpn_field_head": "Head",
         "lpn_field_head_tip": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation.",
         "lpn_close": "Close",
-        "lpn_empty_hint": "To start, use the toolbar to add a background image or a reservoir, or to start a New project from examples.",
+        "lpn_empty_hint": "Start by adding a background image or a reservoir from the toolbar, or open File, New project to begin from an example.",
         "lpn_tool_undo": "Undo",
         "lpn_confirm_example": "This adds the example to the network you already have. Continue?",
         "lpn_field_diameter": "Diameter",
@@ -316,7 +366,7 @@
         "lpn_result_headloss": "Head loss",
         "lpn_settings_restore_tip": "Resets this project's settings only. Your drawing and your other projects are not changed. To save your favorite settings for reuse, save a project file with nothing but settings in it.",
         "lpn_reset_all_tip": "Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.",
-        "lpn_v2_restore_prompt": "This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? For your evaluation, these are some diameters that will be converted. Before and after values are shown:",
+        "lpn_v2_restore_prompt": "This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? So that you can judge, here are some diameters that would be converted, with their values before and after:",
         "lpn_v2_restore_yes": "Convert",
         "lpn_v2_restore_never": "No. Never ask again.",
         "lpn_v2_restore_no": "Close so that I can check the current units first",
@@ -345,7 +395,7 @@
         "lpn_file_revert": "Revert",
         "lpn_file_close": "Close",
         "lpn_file_recent": "Recent files",
-        "lpn_recent_tip": "Open {file} again, without looking for it.",
+        "lpn_recent_tip": "Open {file} again without having to find it on your computer.",
         "lpn_recent_denied": "Permission to open that file was not given, so it was not opened.",
         "lpn_recent_gone": "Could not open {file}. It may have been moved, renamed, or deleted, so it was taken off the recent list.",
         "lpn_tab_new": "New project",
@@ -359,15 +409,15 @@
         "lpn_import_no_room": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again.",
         "lpn_dialog_ok": "OK",
         "lpn_file_import_inp": "Import EPANET file…",
-        "lpn_file_import_inp_tip": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and add it to this browser as a new project. This page cannot write an EPANET file back, so use Save as to keep your work.",
+        "lpn_file_import_inp_tip": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work.",
         "lpn_inp_bad_file": "That file could not be read as an EPANET network file.",
-        "lpn_net_bad_file": "This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
+        "lpn_net_bad_file": "This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use the File, Export, Network command there to save it as an .inp file, then import that.",
         "lpn_inp_report_heading": "Imported {file}",
         "lpn_inp_report_counts": "{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.",
         "lpn_inp_report_clean": "Everything in the file came across. Nothing was left out.",
         "lpn_inp_report_lead": "This page does not hold everything EPANET does. Here is what changed on the way in:",
         "lpn_inp_drop_headloss": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.",
-        "lpn_inp_drop_tanks": "Storage tanks were left out. This page has reservoirs, which hold one fixed water level, and a tank is not one.",
+        "lpn_inp_drop_tanks": "Storage tanks were left out. This page has reservoirs, which hold one fixed water level. A storage tank does not hold a fixed level, so it is not a reservoir.",
         "lpn_inp_drop_tank_links": "These pipes were left out because they connect to a tank that was left out.",
         "lpn_inp_drop_tcv": "These throttle control valves came in as very short pipes carrying the same local loss. The water behaves the same way; the element is not the same.",
         "lpn_inp_drop_valve": "These valves control pressure or flow, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is controlling it any more.",
@@ -375,14 +425,14 @@
         "lpn_inp_drop_demands": "These junctions had more than one demand. The demands were added together into the single demand this page holds.",
         "lpn_inp_drop_patterns": "Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.",
         "lpn_inp_drop_emitters": "These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.",
-        "lpn_inp_drop_curve_long": "This pump curve had more than three points. Its lowest, middle and highest points were kept, which is the most this page can fit a curve to.",
+        "lpn_inp_drop_curve_long": "This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.",
         "lpn_inp_drop_curve_missing": "This pump names a curve that is not in the file. It came in with no curve, so it adds no head.",
         "lpn_inp_drop_pump_other": "This pump is described by power, by speed, or by a schedule, rather than by a curve. It came in with no curve, so it adds no head.",
-        "lpn_inp_drop_setting": "These links carry a setting this page cannot hold. They came in open.",
-        "lpn_inp_drop_controls": "Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file, and stays there.",
-        "lpn_inp_drop_eps": "This file runs over a period of time. This page solves one moment, so only the starting conditions came in.",
+        "lpn_inp_drop_setting": "These pipes, pumps and valves carry a setting this page cannot hold. They came in open.",
+        "lpn_inp_drop_controls": "Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file, and does not change.",
+        "lpn_inp_drop_eps": "This file describes a simulation that runs over a period of time. This page solves one moment, so only the starting conditions came in.",
         "lpn_inp_drop_quality": "Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.",
-        "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with Map, Backdrop.",
+        "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.",
         "lpn_inp_drop_dangling": "These pipes name a junction that is not in the file, so they were left out.",
         "lpn_inp_drop_units": "The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before you use the answers.",
         "lpn_status_imported": "Opened {name} from a file, and added it to this browser as a new project.",
@@ -454,7 +504,7 @@
         "lpn_notes_5_term": "Pump curve",
         "lpn_notes_5_def": "A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer's curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.",
         "lpn_notes_4_term": "Planned additions",
-        "lpn_notes_4_def": "Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Reading and writing EPANET .inp files. Comments and suggestions are always welcome (see the feedback link above).",
+        "lpn_notes_4_def": "Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Writing EPANET .inp files, so that a project can go back out to EPANET. Comments and suggestions are always welcome (see the feedback link above).",
         "lpn_notes_epanet_term": "Hazen-Williams constants match EPANET",
         "lpn_notes_epanet_def": "In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.",
         "lpn_id_invalid": "Enter an ID with no spaces and no quotation marks.",
@@ -496,7 +546,7 @@
         "lpn_labels_decimals_tip": "Decimal places shown for this label",
         "lpn_labels_mark_extrema": "Mark highest and lowest values",
         "lpn_field_id": "ID",
-        "lpn_backdrop_menu": "Background image...",
+        "lpn_backdrop_menu": "Background image…",
         "lpn_backdrop_add": "Add image",
         "lpn_backdrop_scale": "Set image scale",
         "lpn_backdrop_position": "Move image",
@@ -513,7 +563,7 @@
         "lpn_backdrop_coords_prompt": "Type the X,Y that point should move to",
         "lpn_backdrop_continue": "Continue",
         "lpn_tool_settings": "Settings",
-        "lpn_settings_scope_note": "Saved with this project.",
+        "lpn_settings_scope_note": "These settings are saved in this project.",
         "lpn_settings_id_prefixes": "ID prefixes",
         "lpn_settings_defaults": "Starting values",
         "lpn_settings_defaults_note": "Used for elements you create from now on. Existing elements are not changed.",
@@ -556,6 +606,16 @@
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "keys": {
+        "consent_heading": "Visitors and visits",
+        "consent_body": "May we store a little information in this browser, so that we can tell visitors apart from visits when we count? It is used for counting only, and it gives permission for nothing else.",
+        "consent_accept": "Allow this",
+        "consent_decline": "Refuse this",
+        "consent_current_granted": "You allowed this. We count you as one visitor rather than as one visit each time.",
+        "consent_current_denied": "You refused this. We store nothing in this browser for our counts.",
+        "consent_region_label": "Your choice about being counted",
+        "consent_settings_link": "Cookie settings",
+        "privacy_link": "Privacy notice",
+        "terms_link": "Terms of use",
         "lpn_title_units": "{units} Units",
         "lpn_tool_select": "Select",
         "lpn_tool_add_junction": "Junction",
@@ -571,7 +631,7 @@
         "lpn_field_head": "Head",
         "lpn_field_head_tip": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation.",
         "lpn_close": "Close",
-        "lpn_empty_hint": "To start, use the toolbar to add a background image or a reservoir, or to start a New project from examples.",
+        "lpn_empty_hint": "Start by adding a background image or a reservoir from the toolbar, or open File, New project to begin from an example.",
         "lpn_tool_undo": "Undo",
         "lpn_confirm_example": "This adds the example to the network you already have. Continue?",
         "lpn_field_diameter": "Diameter",
@@ -591,7 +651,7 @@
         "lpn_result_headloss": "Head loss",
         "lpn_settings_restore_tip": "Resets this project's settings only. Your drawing and your other projects are not changed. To save your favorite settings for reuse, save a project file with nothing but settings in it.",
         "lpn_reset_all_tip": "Deletes every project, every background image, every setting, and your unit choices, then reloads the page exactly as a first-time visitor sees it. This is the only reset that clears everything.",
-        "lpn_v2_restore_prompt": "This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? For your evaluation, these are some diameters that will be converted. Before and after values are shown:",
+        "lpn_v2_restore_prompt": "This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? So that you can judge, here are some diameters that would be converted, with their values before and after:",
         "lpn_v2_restore_yes": "Convert",
         "lpn_v2_restore_never": "No. Never ask again.",
         "lpn_v2_restore_no": "Close so that I can check the current units first",
@@ -620,7 +680,7 @@
         "lpn_file_revert": "Revert",
         "lpn_file_close": "Close",
         "lpn_file_recent": "Recent files",
-        "lpn_recent_tip": "Open {file} again, without looking for it.",
+        "lpn_recent_tip": "Open {file} again without having to find it on your computer.",
         "lpn_recent_denied": "Permission to open that file was not given, so it was not opened.",
         "lpn_recent_gone": "Could not open {file}. It may have been moved, renamed, or deleted, so it was taken off the recent list.",
         "lpn_tab_new": "New project",
@@ -634,15 +694,15 @@
         "lpn_import_no_room": "There is not enough browser storage left to add this project. Delete a project you no longer need and try again.",
         "lpn_dialog_ok": "OK",
         "lpn_file_import_inp": "Import EPANET file…",
-        "lpn_file_import_inp_tip": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and add it to this browser as a new project. This page cannot write an EPANET file back, so use Save as to keep your work.",
+        "lpn_file_import_inp_tip": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work.",
         "lpn_inp_bad_file": "That file could not be read as an EPANET network file.",
-        "lpn_net_bad_file": "This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use File, Export, Network to save it as an .inp file, then import that.",
+        "lpn_net_bad_file": "This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use the File, Export, Network command there to save it as an .inp file, then import that.",
         "lpn_inp_report_heading": "Imported {file}",
         "lpn_inp_report_counts": "{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.",
         "lpn_inp_report_clean": "Everything in the file came across. Nothing was left out.",
         "lpn_inp_report_lead": "This page does not hold everything EPANET does. Here is what changed on the way in:",
         "lpn_inp_drop_headloss": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.",
-        "lpn_inp_drop_tanks": "Storage tanks were left out. This page has reservoirs, which hold one fixed water level, and a tank is not one.",
+        "lpn_inp_drop_tanks": "Storage tanks were left out. This page has reservoirs, which hold one fixed water level. A storage tank does not hold a fixed level, so it is not a reservoir.",
         "lpn_inp_drop_tank_links": "These pipes were left out because they connect to a tank that was left out.",
         "lpn_inp_drop_tcv": "These throttle control valves came in as very short pipes carrying the same local loss. The water behaves the same way; the element is not the same.",
         "lpn_inp_drop_valve": "These valves control pressure or flow, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is controlling it any more.",
@@ -650,14 +710,14 @@
         "lpn_inp_drop_demands": "These junctions had more than one demand. The demands were added together into the single demand this page holds.",
         "lpn_inp_drop_patterns": "Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.",
         "lpn_inp_drop_emitters": "These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.",
-        "lpn_inp_drop_curve_long": "This pump curve had more than three points. Its lowest, middle and highest points were kept, which is the most this page can fit a curve to.",
+        "lpn_inp_drop_curve_long": "This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.",
         "lpn_inp_drop_curve_missing": "This pump names a curve that is not in the file. It came in with no curve, so it adds no head.",
         "lpn_inp_drop_pump_other": "This pump is described by power, by speed, or by a schedule, rather than by a curve. It came in with no curve, so it adds no head.",
-        "lpn_inp_drop_setting": "These links carry a setting this page cannot hold. They came in open.",
-        "lpn_inp_drop_controls": "Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file, and stays there.",
-        "lpn_inp_drop_eps": "This file runs over a period of time. This page solves one moment, so only the starting conditions came in.",
+        "lpn_inp_drop_setting": "These pipes, pumps and valves carry a setting this page cannot hold. They came in open.",
+        "lpn_inp_drop_controls": "Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file, and does not change.",
+        "lpn_inp_drop_eps": "This file describes a simulation that runs over a period of time. This page solves one moment, so only the starting conditions came in.",
         "lpn_inp_drop_quality": "Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.",
-        "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with Map, Backdrop.",
+        "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.",
         "lpn_inp_drop_dangling": "These pipes name a junction that is not in the file, so they were left out.",
         "lpn_inp_drop_units": "The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before you use the answers.",
         "lpn_status_imported": "Opened {name} from a file, and added it to this browser as a new project.",
@@ -729,7 +789,7 @@
         "lpn_notes_5_term": "Pump curve",
         "lpn_notes_5_def": "A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer's curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.",
         "lpn_notes_4_term": "Planned additions",
-        "lpn_notes_4_def": "Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Reading and writing EPANET .inp files. Comments and suggestions are always welcome (see the feedback link above).",
+        "lpn_notes_4_def": "Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Writing EPANET .inp files, so that a project can go back out to EPANET. Comments and suggestions are always welcome (see the feedback link above).",
         "lpn_notes_epanet_term": "Hazen-Williams constants match EPANET",
         "lpn_notes_epanet_def": "In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.",
         "lpn_id_invalid": "Enter an ID with no spaces and no quotation marks.",
@@ -771,7 +831,7 @@
         "lpn_labels_decimals_tip": "Decimal places shown for this label",
         "lpn_labels_mark_extrema": "Mark highest and lowest values",
         "lpn_field_id": "ID",
-        "lpn_backdrop_menu": "Background image...",
+        "lpn_backdrop_menu": "Background image…",
         "lpn_backdrop_add": "Add image",
         "lpn_backdrop_scale": "Set image scale",
         "lpn_backdrop_position": "Move image",
@@ -788,7 +848,7 @@
         "lpn_backdrop_coords_prompt": "Type the X,Y that point should move to",
         "lpn_backdrop_continue": "Continue",
         "lpn_tool_settings": "Settings",
-        "lpn_settings_scope_note": "Saved with this project.",
+        "lpn_settings_scope_note": "These settings are saved in this project.",
         "lpn_settings_id_prefixes": "ID prefixes",
         "lpn_settings_defaults": "Starting values",
         "lpn_settings_defaults_note": "Used for elements you create from now on. Existing elements are not changed.",
@@ -831,6 +891,166 @@
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
     "key_context": {
+        "consent_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "可打印副标题",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "免费在线工程计算器",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
+        "consent_body": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "可打印副标题",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "免费在线工程计算器",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
+        "consent_accept": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "可打印副标题",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "免费在线工程计算器",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
+        "consent_decline": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "可打印副标题",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "免费在线工程计算器",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
+        "consent_current_granted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "可打印副标题",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "免费在线工程计算器",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
+        "consent_current_denied": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "可打印副标题",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "免费在线工程计算器",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
+        "consent_region_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "可打印副标题",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "免费在线工程计算器",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
+        "consent_settings_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "可打印副标题",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "免费在线工程计算器",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
+        "privacy_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "可打印副标题",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "免费在线工程计算器",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
+        "terms_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "template_printable_subtitle",
+                    "value": "可打印副标题",
+                    "english": "Printable Subtitle"
+                },
+                "next_translated": {
+                    "key": "index_title",
+                    "value": "免费在线工程计算器",
+                    "english": "Free Online Engineering Calculators"
+                }
+            }
+        },
         "lpn_title_units": {
             "reason": "missing",
             "current_value": null,

@@ -575,6 +575,13 @@ function prefixToTermNames(): array
         // term, including its 'avoid' guards, would never have reached a translation agent.
         'menu' => ['libre software'],
         'about' => ['libre software'],
+        // Suite chrome again, and the same silent-fallback trap: the Task 286 consent banner owns
+        // 'count', whose wrong senses (mattering, relying, the noble title) would each turn a
+        // request for permission into something else, and 'cookie', where the food is the literal
+        // meaning of the English word. Without an entry here both fall back to flow/velocity/slope.
+        'consent' => ['count (tally)', 'cookie (browser storage)'],
+        'privacy' => ['cookie (browser storage)'],
+        'terms' => ['cookie (browser storage)'],
         'lpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'looped network', 'branched network', 'pipe line', 'pressure rating',

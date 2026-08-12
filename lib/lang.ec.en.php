@@ -129,12 +129,12 @@ $ec_lang_syn['template_printable_subtitle']='';
 // prose, and they are translated into all 26 languages for one reason: consent that the visitor
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
-$ec_lang['consent_heading']='May we count your visit?';
-$ec_lang['consent_body']='We count how many people open each calculator, and in which language, so we know what to work on next. To count you once instead of once per visit, we need to keep a small note in your browser. We share nothing with anyone else, and the calculators work the same either way.';
-$ec_lang['consent_accept']='Yes, count me';
-$ec_lang['consent_decline']='No, do not count me';
-$ec_lang['consent_current_granted']='You said yes. We count you once instead of once per visit.';
-$ec_lang['consent_current_denied']='You said no. We keep nothing in your browser for counting.';
+$ec_lang['consent_heading']='Visitors and visits';
+$ec_lang['consent_body']='May we store a little information in this browser, so that we can tell visitors apart from visits when we count? It is used for counting only, and it gives permission for nothing else.';
+$ec_lang['consent_accept']='Allow this';
+$ec_lang['consent_decline']='Refuse this';
+$ec_lang['consent_current_granted']='You allowed this. We count you as one visitor rather than as one visit each time.';
+$ec_lang['consent_current_denied']='You refused this. We store nothing in this browser for our counts.';
 $ec_lang['consent_region_label']='Your choice about being counted';
 $ec_lang['consent_settings_link']='Cookie settings';
 $ec_lang['privacy_link']='Privacy notice';
@@ -1139,7 +1139,7 @@ $ec_lang['lpn_field_head']='Head';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation.';
 $ec_lang['lpn_close']='Close';
-$ec_lang['lpn_empty_hint']='To start, use the toolbar to add a background image or a reservoir, or to start a New project from examples.';
+$ec_lang['lpn_empty_hint']='Start by adding a background image or a reservoir from the toolbar, or open File, New project to begin from an example.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
@@ -1176,7 +1176,7 @@ $ec_lang['lpn_reset_all_tip']='Deletes every project, every background image, ev
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? For your evaluation, these are some diameters that will be converted. Before and after values are shown:';
+$ec_lang['lpn_v2_restore_prompt']='This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? So that you can judge, here are some diameters that would be converted, with their values before and after:';
 $ec_lang['lpn_v2_restore_yes']='Convert';
 $ec_lang['lpn_v2_restore_never']='No. Never ask again.';
 $ec_lang['lpn_v2_restore_no']='Close so that I can check the current units first';
@@ -1237,7 +1237,7 @@ $ec_lang['lpn_file_close']='Close';
 // Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
 // it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Recent files';
-$ec_lang['lpn_recent_tip']='Open {file} again, without looking for it.';
+$ec_lang['lpn_recent_tip']='Open {file} again without having to find it on your computer.';
 $ec_lang['lpn_recent_denied']='Permission to open that file was not given, so it was not opened.';
 $ec_lang['lpn_recent_gone']='Could not open {file}. It may have been moved, renamed, or deleted, so it was taken off the recent list.';
 // The tab strip. These are titles on small controls, so each has to stand alone with no sentence
@@ -1261,18 +1261,18 @@ $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add 
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_inp']='Import EPANET file…';
-$ec_lang['lpn_file_import_inp_tip']='Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and add it to this browser as a new project. This page cannot write an EPANET file back, so use Save as to keep your work.';
+$ec_lang['lpn_file_import_inp_tip']='Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work.';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
 // the way out named here always works, so keep the instruction in the message rather than leaving
 // the reader to guess.
-$ec_lang['lpn_net_bad_file']='This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use File, Export, Network to save it as an .inp file, then import that.';
+$ec_lang['lpn_net_bad_file']='This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use the File, Export, Network command there to save it as an .inp file, then import that.';
 $ec_lang['lpn_inp_report_heading']='Imported {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.';
 $ec_lang['lpn_inp_report_clean']='Everything in the file came across. Nothing was left out.';
 $ec_lang['lpn_inp_report_lead']='This page does not hold everything EPANET does. Here is what changed on the way in:';
 $ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
-$ec_lang['lpn_inp_drop_tanks']='Storage tanks were left out. This page has reservoirs, which hold one fixed water level, and a tank is not one.';
+$ec_lang['lpn_inp_drop_tanks']='Storage tanks were left out. This page has reservoirs, which hold one fixed water level. A storage tank does not hold a fixed level, so it is not a reservoir.';
 $ec_lang['lpn_inp_drop_tank_links']='These pipes were left out because they connect to a tank that was left out.';
 $ec_lang['lpn_inp_drop_tcv']='These throttle control valves came in as very short pipes carrying the same local loss. The water behaves the same way; the element is not the same.';
 $ec_lang['lpn_inp_drop_valve']='These valves control pressure or flow, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is controlling it any more.';
@@ -1280,14 +1280,14 @@ $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one directi
 $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
 $ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
 $ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
-$ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, which is the most this page can fit a curve to.';
+$ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
 $ec_lang['lpn_inp_drop_curve_missing']='This pump names a curve that is not in the file. It came in with no curve, so it adds no head.';
 $ec_lang['lpn_inp_drop_pump_other']='This pump is described by power, by speed, or by a schedule, rather than by a curve. It came in with no curve, so it adds no head.';
-$ec_lang['lpn_inp_drop_setting']='These links carry a setting this page cannot hold. They came in open.';
-$ec_lang['lpn_inp_drop_controls']='Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file, and stays there.';
-$ec_lang['lpn_inp_drop_eps']='This file runs over a period of time. This page solves one moment, so only the starting conditions came in.';
+$ec_lang['lpn_inp_drop_setting']='These pipes, pumps and valves carry a setting this page cannot hold. They came in open.';
+$ec_lang['lpn_inp_drop_controls']='Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file, and does not change.';
+$ec_lang['lpn_inp_drop_eps']='This file describes a simulation that runs over a period of time. This page solves one moment, so only the starting conditions came in.';
 $ec_lang['lpn_inp_drop_quality']='Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.';
-$ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with Map, Backdrop.';
+$ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
 $ec_lang['lpn_inp_drop_dangling']='These pipes name a junction that is not in the file, so they were left out.';
 $ec_lang['lpn_inp_drop_units']='The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before you use the answers.';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
@@ -1459,7 +1459,7 @@ $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in t
 $ec_lang['lpn_notes_5_term']='Pump curve';
 $ec_lang['lpn_notes_5_def']='A pump follows H = H₀ − aQ^b, where H is the head the pump adds and Q is the flow through it. Enter one, two, or three points from the manufacturer\'s curve. Three points — the head at zero flow, the normal working point, and the point of highest flow — fit H₀, a and b directly, and follow a published curve most closely. Two points fit a parabola (b = 2) with its peak at zero flow. One point uses a common rule: the head at zero flow is 1.33 × the head you enter, and the highest flow is 2 × the flow you enter, which again gives b = 2. A pump with no points entered adds no head at all. The curve is not cut off where the head reaches zero, so asking a pump for more flow than its curve can deliver gives a negative head. The fix is a bigger pump or a smaller demand, not a different curve fit.';
 $ec_lang['lpn_notes_4_term']='Planned additions';
-$ec_lang['lpn_notes_4_def']='Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Reading and writing EPANET .inp files. Comments and suggestions are always welcome (see the feedback link above).';
+$ec_lang['lpn_notes_4_def']='Scenarios, so that one project can hold several sets of demands. Tables of node and pipe results. Writing EPANET .inp files, so that a project can go back out to EPANET. Comments and suggestions are always welcome (see the feedback link above).';
 $ec_lang['lpn_notes_epanet_term']='Hazen-Williams constants match EPANET';
 $ec_lang['lpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
@@ -1523,7 +1523,7 @@ $ec_lang['lpn_labels_heading_link']='Link labels';
 $ec_lang['lpn_labels_decimals_tip']='Decimal places shown for this label';
 $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
 $ec_lang['lpn_field_id']='ID';
-$ec_lang['lpn_backdrop_menu']='Background image...';
+$ec_lang['lpn_backdrop_menu']='Background image…';
 $ec_lang['lpn_backdrop_add']='Add image';
 // "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
 // under the toolbar select's own "Background image..." heading and read as orphans in the Insert
@@ -1544,7 +1544,7 @@ $ec_lang['lpn_backdrop_target_coords']='Coordinates you type';
 $ec_lang['lpn_backdrop_coords_prompt']='Type the X,Y that point should move to';
 $ec_lang['lpn_backdrop_continue']='Continue';
 $ec_lang['lpn_tool_settings']='Settings';
-$ec_lang['lpn_settings_scope_note']='Saved with this project.';
+$ec_lang['lpn_settings_scope_note']='These settings are saved in this project.';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 $ec_lang['lpn_settings_defaults']='Starting values';
 $ec_lang['lpn_settings_defaults_note']='Used for elements you create from now on. Existing elements are not changed.';
