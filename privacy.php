@@ -120,16 +120,6 @@ its last activity.</p>
 		<td>No &mdash; its only job is to honour your answer, including a no</td>
 	</tr>
 	<tr>
-		<td><code>ec_nolog</code></td>
-		<td>A maintenance control, not part of the site&rsquo;s normal use: it stops a browser being
-		counted at all, and we set it on the browsers we test the site with so our own work does not
-		show up in the figures. It is only ever set by opening a page with <code>?ec_nolog=1</code>
-		on the end of the address, so you will not have it unless you did that deliberately
-		(<code>?ec_nolog=0</code> undoes it)</td>
-		<td>10 years</td>
-		<td>No &mdash; same reason: it exists only to honour a choice that was made</td>
-	</tr>
-	<tr>
 		<td><code>ec_blang</code></td>
 		<td>The single digit <code>1</code>, meaning we have already recorded which language your browser asks for, so we do not record it again</td>
 		<td>1 year</td>

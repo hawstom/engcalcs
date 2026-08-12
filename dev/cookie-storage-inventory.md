@@ -57,7 +57,7 @@ languages, is not a plausible candidate for "we do not target the EU."
 | `<PageName>` (e.g. `Manning-Pipe-Flow`) | `EngCalcs.createCookie`, `js/Cookies.lib.js` | **1 year** (was 36,000 days until Task 286) | Remembers the numbers the visitor typed and the units they chose, per calculator page | **Exempt** — user-input storage, written only after they typed |
 | `ec_language` | `lib/Language.lib.php` | 1 year, HttpOnly | The language the visitor explicitly chose from the language menu | **Exempt** — a preference the visitor set deliberately |
 | `ec_consent` | `lib/Consent.lib.php` (JS) or `consent.php` (no-JS) | 1 year, readable by JS | The consent record: `<state>.<unix-ts>.<policy-version>` | **Exempt** — it exists solely to honour the answer given |
-| `ec_nolog` | `lib/config.inc.php` | 10 years | **Author/tester tool, not a visitor-facing control** (Tom, 2026-08-12: *"It's not in the UI. It was only for me to set"*). Stops a browser being counted at all, and is NOT redundant with `ec_consent`: refusing consent still writes an undeduplicated 'visit' row, while this writes nothing anywhere — verified 2026-08-12 against all five log writers. Disclosed in `privacy.php` because it is real device storage, but **described rather than recommended**: advertising it as the better opt-out would invite visitors out of the one count that survives a refusal | **Exempt** — it only honours a choice |
+| `ec_nolog` | `lib/config.inc.php` | 10 years | **Author/tester tool. NOT in the UI and NOT in `privacy.php`** (Tom, 2026-08-12: *"Why disclose it if it's not in the UI?"*). Stops a browser being counted at all, and is NOT redundant with `ec_consent`: refusing consent still writes an undeduplicated 'visit' row, while this writes nothing anywhere — verified 2026-08-12 against all five log writers. **It goes into `privacy.php` the day it gets a UI control**, because then the site would be offering it | **Exempt** — it only honours a choice |
 | `ec_blang` | `lib/Language.lib.php` | 1 year, HttpOnly | **Analytics only.** The literal value `1`, meaning the browser-language row has been written. Was the language tag until Task 288; every use site is `isset()`, so the value was written and never once read | **Requires consent.** Not written otherwise, deleted on withdrawal |
 | `ec_seen` | `ecMarkSeen()`, `lib/config.inc.php` | Session cookie, HttpOnly | **Analytics only.** One base-32 digit per page, five bits: language view, human view, calculation, title, subtitle. Plus one reserved `_v` entry for the visit's single demand row. **No identifier of any kind** | **Requires consent.** Not written otherwise, deleted on withdrawal |
 | ~~`PHPSESSID`~~ | — | — | **GONE as of Task 288.** It was a 32-hex unique identifier plus a server-side session file, and everything it held was "have we already counted this" — which needs no identifier to answer | — |
@@ -130,6 +130,28 @@ Reading section 1's test against sections 2–4, in the order a reviewer would:
 - **`contact.php` and `lpn-lock.php` are a separate question from cookies entirely**, and there is
   **no privacy notice on this site at all**. GDPR Art 13 wants one wherever personal data is
   collected, and a contact form collects a name and an email address.
+
+### Why `ec_nolog` is not in the privacy notice
+
+It was, briefly, and removing it is the right call. The section is headed **"What we store on your
+device"** — a claim about what the SITE does to a visitor. `ec_nolog` is not that: it cannot be
+reached from any link, button or menu, and the only way to acquire it is to type `?ec_nolog=1` onto
+an address yourself, at which point you already know exactly what it is.
+
+Two arguments were made for keeping it and both fail on inspection. *"The table claims to be the
+full list"* — answered by narrowing what the table claims, which is the better fix, since the
+heading already scopes it to what we store. *"Disclosure is owed for anything on a device"* —
+disclosure is owed for what we do to the reader, and for a reader who has never typed that
+parameter we do nothing.
+
+The real cost of keeping it was the one that decided it: **the mention IS the advertisement**,
+however neutrally worded, and a paragraph explaining how to switch it on recruits visitors out of
+the anonymous page-load count — the one number that survives a refusal, and the entire reason the
+visits bucket exists. Half-promoting it was worse than either honest option.
+
+It stays fully documented here, in the developer record, and it goes back into the notice the day
+it acquires a UI control — because at that point the site is offering it rather than merely
+answering to it.
 
 ## 6. What shipped, 2026-08-12 (Task 286 phase 1)
 
