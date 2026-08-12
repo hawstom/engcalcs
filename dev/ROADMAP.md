@@ -42,6 +42,20 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   (`pointAlongLink`, `linkPoints`, `linkGeomLength`). Each becomes harness-testable without a
   browser. `php dev/scripts/size_budget_check.php` tracks the shape.
 
+- 15|294|[H] **Decide the 7 remaining dead language keys, one each.** `menu_main_list`,
+  `menu_main_language`, `mi_d50in`, `mpf_spreadheet_notice` (key name is misspelled too),
+  `wi_save_and_calculate`, `or_shape`, `contact_title` — rendered by nothing, 27 translated strings
+  apiece. Each is either lost content to restore (as Task 290's six Rock Chute notes turned out to
+  be) or debt to delete; only Tom can say which. Recorded so far only inside closed Task 290, where
+  nothing re-scans it.
+
+- 15|295| **`Compare-Languages.php` fatals when visited without `?lang1=&lang2=`.** Line 5 passes
+  undefined `$_GET` keys straight to `compare_langs()`, which ends in
+  `require('lib/lang.ec..php')` — an uncaught Error, so a bare visit is a 500 (and leaks the
+  absolute server path wherever `display_errors` is on; the app never sets it either way). Excluded
+  from the sitemap and there is no `robots.txt`, so it stays reachable. Default both params to `en`
+  and a second language, or return early with a picker.
+
 - 55|233| **Manning-Irregular opens in metric on English pages, and greets everyone with a warning.
   One root cause, found 2026-08-08.** `js/manning-irregular.js:184` seeds a hard-coded cookie:
   `'i:,i:,i:1,s:1,i:0.001,s:1,s:1,...'`. Each `s:<n>` sets a select **by its conversion factor**,
