@@ -79,6 +79,7 @@ disagreement is an import bug rather than a cut feature.
 [LABELS]
 ;X-Coord  Y-Coord  Label
  100      420      "Import test network"
+ 100      400      "A considerably longer second line of title block"
  300      380      "Source" R2
 
 [END]

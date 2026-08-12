@@ -3033,6 +3033,41 @@ var EngCalcs = EngCalcs || {};
 		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
 	}
 
+	// ---- EPANET anchors a map label at its UPPER-LEFT CORNER; this page anchors at the CENTRE ----
+	//
+	// Not a detail, and not a guess. EPANET 2.2's own [LABELS] documentation says "the coordinates
+	// refer to the upper left corner of the label", and Tom's own files show it: the two lines of
+	// Estrellas' title block are 31 and 25 characters long and their stored X values differ by 0.98
+	// map units. Centre-anchored, two strings six characters apart would sit ~85 units apart at that
+	// drawing's scale. Left-anchored, they share an edge -- which is what a title block IS.
+	//
+	// So an imported label has to move by half its own width, and that means it can only be done
+	// once the label has been RENDERED and measured (buildLabelEls() reads getBBox().width). Hence
+	// this runs after importProject() rather than inside docFromInp().
+	//
+	// The Y term goes the other way from what the word "upper" suggests: `doc` in memory is Y-DOWN
+	// (SVG's frame), so the top of the text is at a SMALLER y and the centre is half a line further
+	// on. Getting the sign wrong here moves every label one line up instead of down -- visible, but
+	// only if you have the original open beside it.
+	function reanchorImportedLabels() {
+		doc.labels.forEach(function (lb) {
+			var le = labelEls[lb.id];
+			if (!le) { return; }
+			lb.x += le.width / 2;
+			// The same visual box height positionMaskRect() is given, so the label's mask and its
+			// centring agree about how tall a line is. effectiveFontSize() is always a WORLD size --
+			// it divides by the zoom in 'screen' mode -- so this is the right frame for lb.y.
+			lb.y += effectiveFontSize(lb.sizeMult) * 1.2 / 2;
+			updateLabelGeometry(lb.id);
+		});
+		if (!doc.labels.length) { return; }
+		// The nudge is part of the document, so it has to reach storage before the baseline below
+		// calls this project saved -- otherwise a reload would quietly restore the un-nudged labels
+		// from a project the tab strip swears is clean.
+		saveToStorage();
+		zoomExtent();
+	}
+
 	function importInpFromFile(file) {
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) {
@@ -3046,6 +3081,8 @@ var EngCalcs = EngCalcs || {};
 			var name = String(file.name).replace(/\.inp$/i, '') || String(file.name);
 			var id = importProject(docFromInp(parsed, name));
 			if (!id) { return; }   // importProject already reported the storage failure
+			// AFTER the document is on screen, because this needs the labels MEASURED.
+			reanchorImportedLabels();
 			// Arrives SAVED, for the same reason an uploaded project does: a file the user just
 			// handed us off their own disk is not unsaved work. It earns its asterisk on the first
 			// edit, and it can only ever go out as one of our own files, via Save as.

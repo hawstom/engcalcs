@@ -35,12 +35,40 @@ global.FileReader = function () {
 };
 global.alert = global.window.alert = function (m) { lastAlert = m; };
 
+// TEXT MEASUREMENT THAT TRACKS THE TEXT, for this harness only.
+//
+// The shared stub returns a constant getBBox().width, which is fine for every other harness and
+// useless for this one: EPANET anchors a label at its upper-left corner and this page anchors at
+// the centre, so an import moves each label by HALF ITS OWN WIDTH. With every string the same
+// width, the test that two differently-sized labels come out sharing a left edge could only ever
+// agree with itself.
+//
+// Patched here rather than in lpn-dom-stub.js deliberately. A width that varies changes the
+// example network's measured callout offsets, and example-network-harness.js asserts those against
+// numbers taken at the constant width -- so widening the stub for everyone would break a passing
+// harness in order to test this one. 0.55 em per character is a fair mean for Arial; only the fact
+// that a longer string measures wider actually matters here.
+const createNS = global.document.createElementNS;
+global.document.createElementNS = function (ns, tag) {
+	const el = createNS(ns, tag);
+	if (tag === 'text') {
+		el.getBBox = function () {
+			const fs = parseFloat(String(this._styleAttr || '').replace(/^[\s\S]*font-size:\s*/, '')) ||
+				parseFloat(this.style.fontSize) || 10;
+			return { x: 0, y: 0, width: (this.textContent || '').length * 0.55 * fs, height: fs * 1.2 };
+		};
+	}
+	return el;
+};
+
 const L = loadLoopedNetwork(
 	"\t\timportInp: importInpFromFile, getDoc: function () { return doc; },\n" +
 	"\t\treadUnitSelections: readUnitSelections,\n" +
 	"\t\tgetProject: function () { return project; }, nextId: function () { return nextId; },\n" +
 	"\t\tindexEntry: indexEntry, openId: function () { return library.openId; },\n" +
 	"\t\tassembleModel: assembleModel,\n" +
+	"\t\tlabelWidth: function (id) { return labelEls[id].width; },\n" +
+	"\t\tlineHeight: function () { return effectiveFontSize(1) * 1.2; },\n" +
 	// init() never runs (that is the point of the injection), so the SVG layer variables it would
 	// have built are undefined. Same one-time setup example-network-harness.js does.
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -159,15 +187,36 @@ importText(usInp, 'import-cases.inp');
 	ok('link vertices survive', links.find(l => l.id === 'P5').verts.length === 2);
 
 	const labels = doc.labels;
-	ok('map labels come in', labels.length === 2, labels.length);
-	// An anchored label stores an OFFSET from its node; EPANET stores the absolute point.
+	ok('map labels come in', labels.length === 3, labels.length);
+
+	// ---- EPANET anchors at the UPPER-LEFT corner; this page anchors at the CENTRE ----
+	// The fixture stacks two title-block lines of very different lengths at the SAME x, which is
+	// what a left-aligned block looks like -- and is exactly the evidence in Tom's own files that
+	// settled this (Estrellas' two lines are 31 and 25 characters and their stored x values differ
+	// by 0.98 map units, where centring would put them ~85 apart).
+	const t1 = labels.find(l => l.text === 'Import test network');
+	const t2 = labels.find(l => l.text.indexOf('considerably longer') >= 0);
+	const w1 = L.labelWidth(t1.id), w2 = L.labelWidth(t2.id);
+	ok('the longer line really does measure wider -- otherwise the next check is vacuous',
+		w2 > w1 * 1.5, w1.toFixed(1) + ' vs ' + w2.toFixed(1));
+	ok('two lines stored at one x come out sharing a LEFT EDGE, not a centre',
+		Math.abs((t1.x - w1 / 2) - (t2.x - w2 / 2)) < 1e-9,
+		'left edges ' + (t1.x - w1 / 2).toFixed(2) + ' and ' + (t2.x - w2 / 2).toFixed(2));
+	ok('...and their centres are therefore NOT equal', Math.abs(t1.x - t2.x) > 1,
+		t1.x.toFixed(2) + ' vs ' + t2.x.toFixed(2));
+	// Y is the other way round from what "upper" suggests: the document is Y-up, memory is Y-down,
+	// so the centre of a label sits half a line FURTHER DOWN in memory than its top edge.
+	ok('the label centre drops half a line below the top-left corner EPANET stored',
+		Math.abs(t1.y - (-420 + L.lineHeight() / 2)) < 1e-9,
+		t1.y.toFixed(2) + ' vs ' + (-420 + L.lineHeight() / 2).toFixed(2));
+
+	// An anchored label stores an OFFSET from its node; EPANET stores the absolute point. The
+	// re-anchoring above applies to the offset, since it moves the label and not the node.
 	const anchored = labels.find(l => l.anchorNode === 'R2');
-	// The offset is +20 rather than -20, and that is the Cartesian boundary working: the FILE and
-	// the document are Y-up (v4), memory is Y-down (SVG's own frame), and applySaved() flips on the
-	// way in. A label 20 below its node in EPANET is 20 further down the screen here.
 	ok('an anchored label becomes an offset from its node, not a position',
-		!!anchored && anchored.x === 0 && anchored.y === 20,
-		anchored ? anchored.x + ',' + anchored.y : 'missing');
+		!!anchored && Math.abs(anchored.x - L.labelWidth(anchored.id) / 2) < 1e-9 &&
+		Math.abs(anchored.y - (20 + L.lineHeight() / 2)) < 1e-9,
+		anchored ? anchored.x.toFixed(2) + ',' + anchored.y.toFixed(2) : 'missing');
 
 	// nextId has to clear every id the file brought or the next junction drawn would be J1 again.
 	ok('nextId clears the ids the file brought', L.nextId().J === 7 && L.nextId().R === 3,
