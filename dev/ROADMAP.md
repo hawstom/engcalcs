@@ -1471,7 +1471,28 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     scope it until something is written.
   - **[H] Tom decides the menu shape before this is built.**
 
-- 35|251| **Promote `lpn` to a core calculator — DECLARED 2026-08-11, SPRINT NOT RUN.** Tom,
+- 35|251| **Promote `lpn` to a core calculator — SPRINT PART-RUN 2026-08-12: 3 of 26 landed.**
+  - **STATE, so the resume is one command.** Launched 2026-08-12 with Tom's go-ahead, 26 Sonnet
+    agents, 6,522 keys. **es (61), pt (61) and fr (47) landed and are committed** (`6f26329`) —
+    verified independently, not on the agents' word: `php -l`, `lang_syntax_validate` clean, and a
+    per-key check that every key is present exactly once, single-quoted, entity-free, tag-free,
+    with every `{placeholder}` matching English. **The other 23 died on an account session limit**,
+    nearly all before writing; `git status` confirmed only three files touched. Romanian is the
+    cautionary one — its last message claimed all 286 keys were ready, and its file was untouched.
+    Trust the file, never the self-report.
+  - **TO RESUME:** regenerate payloads, `--check` for FRESH, then relaunch the 23 remaining
+    (am ar bg bn cs de fa he hi hr id it km my ps ro ru sr sw tr uk ur zh) with the same brief.
+    **Concurrency caps at 20 agents**, so it is two batches, not one.
+  - **Settle Task 293's retitle BEFORE relaunching** — see that task. The three `lpn_` identity
+    strings are already translated in all 26 languages and are therefore NOT in the delta; changing
+    the English after this sprint means a separate 26-language resync, while folding it in now is
+    three extra keys on a 286-key job.
+  - **`lpn_dialog_ok` is legitimately identical to English** in fr and pt ("OK"). Exempt-list
+    candidate at sprint close, not a gap.
+  - **Key order is deliberately unnormalized** until the sprint closes; run
+    `lang_key_order_normalizer.php` once at the end, not per language.
+
+  Tom, 2026-08-09: *"If we care about lpn and its 26-language offering, then we must irrationally add
   2026-08-09: *"If we care about lpn and its 26-language offering, then we must irrationally add
   lpn to the top tier... But maybe we block this behind other tasks."* He is right that it is
   irrational on current evidence and right to hesitate.
@@ -1559,6 +1580,37 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     **either promote lpn, or stop citing 26 languages when positioning lpn specifically** — the
     suite-wide claim stays true, the page-level one does not. Fix the claim now; decide the
     promotion on the beacon.
+
+- 45|293| **The word "water" appears nowhere in `lpn_`'s name, title or description. OPEN — Tom's
+  call, and it gates the rest of Task 251's sprint.** Tom, 2026-08-12: *"We have water nowhere in
+  our titles or description. I think this is bad... I want to deliver what people are really
+  searching for."* He is right on the fact. The three identity strings are:
+  - `lpn_main_menu` = "Looped Pipe Network (Map Interface)"
+  - `lpn_main_title` = "Free Online Looped Pipe Network Calculator with Map Interface"
+  - `lpn_main_desc` = "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
+
+  Not one contains "water", "distribution", or "supply". Somebody searching *water distribution
+  network software* — which is what this page IS — cannot find it.
+  - **SEO IS THE RIGHT TEST FOR THESE PARTICULAR STRINGS, and CLAUDE.md already says so.** The
+    identity rule ("match the authoritative published source's terminology") exists for calculators
+    named after a paper — Manning, Robinson. `lpn_` is named after no paper, so the rule's own
+    rationale applies instead: the menu entry and title are *what a returning user searches for and
+    bookmarks*. That is a search-behaviour criterion, and Tom is invoking it correctly. The
+    Simple-English rule still governs `lpn_main_desc`, which is explanatory.
+  - **THE SEQUENCING IS THE EXPENSIVE PART, AND IT INVERTS THE OBVIOUS ANSWER.** Tom wondered
+    whether this should wait until after the sprint. It should not, and the reason is measurable:
+    these three keys were translated into all 26 languages by the 146.06 identity-floor pass, so
+    they are **already translated and NOT in the 251 delta**. Retitling later means a separate
+    26-language resync of 78 strings. Retitling before the 23 remaining agents relaunch adds three
+    keys to a 286-key job they are already doing. **Same work, one pass instead of two** — and the
+    sprint is already paused on a session limit, so the window is free.
+  - **DO NOT put "WaterCAD", "WaterGEMS" or "Bentley" in a title or meta description.** Those are
+    live trademarks of a direct competitor, and the reputational and legal downside of trading on
+    them dwarfs the traffic. "Reads EPANET `.inp` files" is different and is fair game: EPANET is
+    public-domain EPA software, and Task 196 made the claim literally true. Say what we do, not
+    whose customers we want.
+  - **Needs Tom's wording decision before anything ships** — naming is his call, and he said his
+    clarity is not perfect. Two drafts were put to him 2026-08-12; neither is adopted yet.
 
 - 20|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
   Task 243 shipped the engine and the toggle; none of this is built. The engine makes each of
