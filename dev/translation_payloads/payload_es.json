@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 850,
-        "delta_key_count": 57,
+        "expected_key_count": 854,
+        "delta_key_count": 61,
         "exempt_key_count": 21,
         "exempt_keys": [
             "calc_units_us",
@@ -396,6 +396,10 @@
         "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.",
         "lpn_inp_drop_dangling": "These pipes name a junction that is not in the file, so they were left out.",
         "lpn_inp_drop_units": "The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before you use the answers.",
+        "lpn_settings_browser_scope_note": "Saved in this calculator, for every project.",
+        "lpn_settings_this_calculator": "This calculator",
+        "lpn_settings_show_titles": "Show page titles",
+        "lpn_settings_show_titles_tip": "Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.",
         "lpn_settings_computation": "Computation",
         "lpn_settings_engine_epanet": "Solve with the EPANET engine",
         "lpn_settings_engine_epanet_tip": "Runs the original EPANET engine from the US EPA, here in your browser. The built-in solver gives the same answers and is faster, so leave this off unless you need EPANET itself.",
@@ -455,6 +459,10 @@
         "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.",
         "lpn_inp_drop_dangling": "These pipes name a junction that is not in the file, so they were left out.",
         "lpn_inp_drop_units": "The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before you use the answers.",
+        "lpn_settings_browser_scope_note": "Saved in this calculator, for every project.",
+        "lpn_settings_this_calculator": "This calculator",
+        "lpn_settings_show_titles": "Show page titles",
+        "lpn_settings_show_titles_tip": "Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.",
         "lpn_settings_computation": "Computation",
         "lpn_settings_engine_epanet": "Solve with the EPANET engine",
         "lpn_settings_engine_epanet_tip": "Runs the original EPANET engine from the US EPA, here in your browser. The built-in solver gives the same answers and is faster, so leave this off unless you need EPANET itself.",
@@ -1276,6 +1284,70 @@
                     "key": "lpn_status_imported",
                     "value": "Se abrió {name} desde un archivo y se agregó a este navegador como un nuevo proyecto.",
                     "english": "Opened {name} from a file, and added it to this browser as a new project."
+                }
+            }
+        },
+        "lpn_settings_browser_scope_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_scope_note",
+                    "value": "Se guarda con este proyecto.",
+                    "english": "These settings are saved in this project."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "Prefijos de ID",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_settings_this_calculator": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_scope_note",
+                    "value": "Se guarda con este proyecto.",
+                    "english": "These settings are saved in this project."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "Prefijos de ID",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_settings_show_titles": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_scope_note",
+                    "value": "Se guarda con este proyecto.",
+                    "english": "These settings are saved in this project."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "Prefijos de ID",
+                    "english": "ID prefixes"
+                }
+            }
+        },
+        "lpn_settings_show_titles_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_scope_note",
+                    "value": "Se guarda con este proyecto.",
+                    "english": "These settings are saved in this project."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_id_prefixes",
+                    "value": "Prefijos de ID",
+                    "english": "ID prefixes"
                 }
             }
         },

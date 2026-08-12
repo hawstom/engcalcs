@@ -4,6 +4,21 @@ $html_title = $ec_lang['lpn_main_title'];
 $html_desc = $ec_lang['lpn_main_desc'];
 echoHeader("EngCalcs", $html_title, "");
 ?>
+<script>
+// ROADMAP Task 289. Applied HERE, inline and immediately after the heading is parsed, rather than
+// from js/looped-network.js at DOMContentLoaded: the preference is paint-critical, and reading it
+// later means a visitor who turned the titles off still sees them flash on every load. Five lines
+// in the page beats a flash on the page this setting exists to give more room to.
+(function () {
+	try {
+		if (localStorage.getItem('lpn_show_titles') !== '0') { return; }
+		['ec-page-title', 'ec-page-welcome'].forEach(function (id) {
+			var el = document.getElementById(id);
+			if (el) { el.style.display = 'none'; }
+		});
+	} catch (e) { /* storage blocked -- titles simply stay visible, which is the safe direction */ }
+}());
+</script>
 <h2><?=$ec_lang['lpn_main_desc']?></h2>
 
 <?php
@@ -494,6 +509,10 @@ EngCalcs.pageConfig = {
       // stays in lib/lang.ec.en.php so restoring the control is one line here and one there. ?>
 
 	lpn_settings_computation: <?=json_encode($ec_lang['lpn_settings_computation'])?>,
+	lpn_settings_this_calculator: <?=json_encode($ec_lang['lpn_settings_this_calculator'])?>,
+	lpn_settings_browser_scope_note: <?=json_encode($ec_lang['lpn_settings_browser_scope_note'])?>,
+	lpn_settings_show_titles: <?=json_encode($ec_lang['lpn_settings_show_titles'])?>,
+	lpn_settings_show_titles_tip: <?=json_encode($ec_lang['lpn_settings_show_titles_tip'])?>,
 	lpn_settings_tolerance: <?=json_encode($ec_lang['lpn_settings_tolerance'])?>,
 	lpn_settings_tolerance_tip: <?=json_encode($ec_lang['lpn_settings_tolerance_tip'])?>,
 	lpn_settings_engine_epanet: <?=json_encode($ec_lang['lpn_settings_engine_epanet'])?>,

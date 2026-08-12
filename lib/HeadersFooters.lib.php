@@ -110,8 +110,11 @@ if (substr($type, 0, 8) === "EngCalcs") {
 echoEngCalcsMenu($html_title, $show_name_field, $calc_name);
 endif;
 ?>
-<h1 class="d-print-none"><?=$html_title?></h1>
-<p class="d-print-none ec-welcome"><?=$ec_lang['template_welcome']?></p>
+<?php // The ids are what ROADMAP Task 289's "Show page titles" toggle hides on Looped-Network.
+      // Given here rather than found by tag name so the toggle cannot start hiding some other
+      // page's first heading if this markup ever moves. Harmless everywhere else. ?>
+<h1 id="ec-page-title" class="d-print-none"><?=$html_title?></h1>
+<p id="ec-page-welcome" class="d-print-none ec-welcome"><?=$ec_lang['template_welcome']?></p>
 <script>EngCalcs.pageTitle = <?=json_encode($html_title)?>;
 <?php // The single source of icon geometry, shared with PHP's ecIcon() (Task 231). JS-built
       // chrome builds its <svg> from these same strings; a path redrawn in JS would be a

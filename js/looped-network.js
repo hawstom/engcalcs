@@ -722,7 +722,7 @@ var EngCalcs = EngCalcs || {};
 			// Open/closed state of the settings panel's collapsible sections, persisted so a user
 			// who lives in Default inputs is not re-opening it every session. Default inputs starts
 			// OPEN because it is the mode-switching section above; the other two are set-once.
-			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, computation: false, files: false },
+			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, computation: false, files: false, thisCalculator: false },
 			// Map units -- the same units the drawing is in, so this number scales with the map and
 			// means 20 ft or 20 m according to the Length/Map declaration (Tom, 2026-08-09: map
 			// coordinates "follow length and elevation"; it is a size on the drawing, not a font
@@ -6883,6 +6883,36 @@ var EngCalcs = EngCalcs || {};
 	// cannot collapse -- a heading that behaves unlike every other heading in the panel misrepresents
 	// the affordance. The old "Solver" heading is gone with them: km was never a solver setting (it
 	// is a default input) and tolerance was the only genuine one.
+	// ---- Page-title visibility (ROADMAP Task 289) ----
+	// THE FIRST SETTING ON THIS PAGE THAT IS NOT PART OF THE PROJECT, and the reason it is not:
+	// Task 263 made everything here project-scoped because a bare number is meaningless without
+	// the units it was typed in -- "imagine opening a 400 diameter pipe into an inch browser!"
+	// That reasoning does not reach this one. Whether the heading above the drawing is showing is
+	// not data about the network; it is about the window the person is sitting in front of, and
+	// carrying it inside a project file would mean a colleague opening your work inherits your
+	// screen preference. So it lives in localStorage, per browser, and serializeProject() must
+	// never learn about it.
+	//
+	// Tom, 2026-08-12, on the label: *"I say 'Saved in this calculator' even though it is
+	// literally in the browser; it affects only this calculator."* Right -- the user-facing
+	// distinction that matters is project vs everywhere-else, not localStorage vs a file.
+	var PAGE_TITLES_KEY = 'lpn_show_titles';
+	function pageTitlesShown() {
+		try { return localStorage.getItem(PAGE_TITLES_KEY) !== '0'; } catch (e) { return true; }
+	}
+	function applyPageTitles(show) {
+		['ec-page-title', 'ec-page-welcome'].forEach(function (id) {
+			var el = document.getElementById(id);
+			// Not display:none -- these are already d-print-none, and hiding them for the screen
+			// must not change what a print does.
+			if (el) { el.style.display = show ? '' : 'none'; }
+		});
+	}
+	function setPageTitlesShown(show) {
+		try { localStorage.setItem(PAGE_TITLES_KEY, show ? '1' : '0'); } catch (e) {}
+		applyPageTitles(show);
+	}
+
 	function rebuildSettingsFields() {
 		var pc = EngCalcs.pageConfig || {}, fields = document.getElementById('lpn_settings_fields');
 		// The units block is server-rendered ONCE (echoUnitSelect keeps each select's unit family and
@@ -7236,6 +7266,19 @@ var EngCalcs = EngCalcs || {};
 		// close enough -- and "solver" is jargon for the internals, while what the user is choosing
 		// is the arithmetic they get.
 		var compBody = section('computation', pc.lpn_settings_computation || 'Computation');
+		// ---- browser-scoped group (Task 289) ----
+		// Created HERE, before `tail`, purely for DOM order: section() appends to `fields` as it is
+		// called, and the actions in `tail` must stay last. Its rows are filled in further down.
+		// A group of its own, with its own scope note, because the note at the top of this panel
+		// ("These settings are saved in this project") would otherwise be lying about the control
+		// directly beneath it -- which is exactly the ambiguity Tom spotted before it was built.
+		var browserBody = section('thisCalculator', pc.lpn_settings_this_calculator || 'This calculator');
+		note(browserBody, pc.lpn_settings_browser_scope_note || 'Saved in this calculator, for every project.');
+		var titlesInput = document.createElement('input');
+		titlesInput.type = 'checkbox';
+		titlesInput.checked = pageTitlesShown();
+		titlesInput.addEventListener('change', function () { setPageTitlesShown(titlesInput.checked); });
+		row(browserBody, pc.lpn_settings_show_titles || 'Show page titles', titlesInput, pc.lpn_settings_show_titles_tip);
 		// The panel's foot: ACTIONS only, no settings. Headingless on purpose -- a heading over
 		// buttons that cannot collapse would behave unlike every other heading in this panel.
 		var tail = document.createElement('div');

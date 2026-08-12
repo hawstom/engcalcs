@@ -1149,26 +1149,28 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the `$ec_sessionAgeMs` gate. Moderate, self-contained, fully covered by the two-bucket logging
     already in place. **Do it BEFORE the Task 251 sprint if at all** — it changes `consent_body`,
     which is one of the ten keys riding that sprint.
-
-- 20|289| **The page title block eats real estate, and on lpn it hurts.** Tom, 2026-08-12: *"our
-  standard titles... really don't seem like much in most cases. But for lpn they do."* Right, and
-  lpn is the one page that is an application rather than a form — a canvas wants the window.
-  - **His own three ideas, and his own verdict on them.** (1) Move the Printable version button to
-    the top and rebrand it "Minimal version". (2) Make lpn's normal page a landing page linking to
-    the real thing — *"this is kind of rude. It's what epanet-js does, and I don't like it."*
-    **Idea 2 is rejected by its author; do not resurrect it.** (3) What he would actually do: a
-    control above the lpn menus — "Maximize app" / "Hide titles above" — *"or maybe that's just in
-    Settings as 'Show page titles [checked]'."*
-  - **Settings checkbox is the shape to build**, on his own reasoning and on this project's: lpn
-    already keeps every preference in the project document (Task 263), so a checkbox there costs no
-    new persistence mechanism, whereas a floating "Maximize" button costs new chrome on a page whose
-    problem is too much chrome.
-  - **THE TIMING IS THE WHOLE POINT AND IT IS NOW.** This adds one or two UI strings. The Task 251
-    sprint is HELD and has not launched, so those strings can ride it for nothing — exactly the
-    argument that put the Task 286 consent keys in it. After the sprint they cost a second one.
-  - Weigh idea 1 separately: "Minimal version" as a rename of Printable version is a small, suite-
-    wide change with its own translation cost, and it solves a different problem (printing) than
-    the one raised here (screen real estate on one page).
+  - **THE WORDING THAT DECIDES THE DESIGN, Tom 2026-08-12: "a single digit per page".** That is
+    exactly right and it is what makes the sentence true — the bitfield IS one digit per page,
+    saying whether this page has been counted yet. It also concedes the honest limit in the right
+    direction: **one bit can only ever say "seen before"**, which would buy distinct-browsers-ever
+    and destroy every per-page and per-session number the funnel is built from. A digit per page
+    keeps all of them, still with no identifier and nothing that can single anybody out.
+  - **THREE ANSWERS, not two, and the machinery is already there.** Tom: *"[Refuse] [Accept this]
+    [Accept all], where 'Accept all' means we never ask them again, just as 'Refuse' does."* Read
+    against his earlier draft (*"[Accept this storage only]"*), the middle answer is **scope-limited
+    consent**: yes to this purpose, ask me again if you ever add another. That maps straight onto
+    `EC_CONSENT_VERSION`, which `ec_consent` already carries as its third field:
+    - `0` refused — never re-ask.
+    - `1` accepted THIS version — re-ask when `EC_CONSENT_VERSION` is bumped, i.e. when the ask
+      itself materially changes.
+    - `2` accepted every version — never re-ask.
+    So bumping the policy version becomes the one mechanism that re-asks the people who wanted to be
+    re-asked, and nobody else. **Do not read the middle answer as "ask me again next visit"** — that
+    would nag the people who already said yes, which is the one direction that makes a consent flow
+    worse rather than safer.
+  - **Style all three buttons identically**, for the same reason the two are styled identically now.
+    Two accepts against one refuse errs safe rather than dark-patterned, but only while all three
+    are the same size, weight and colour.
 
 - 20|285| **We do not know what devices anybody uses this on, and several decisions have quietly
   assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."* He
@@ -2116,6 +2118,37 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|289|[DONE 2026-08-12] **"Show page titles" — the first setting on lpn that is not part of the
+  project.** Tom: *"our standard titles... really don't seem like much in most cases. But for lpn
+  they do."* Right: lpn is the one page that is an application rather than a form, and a canvas
+  wants the window.
+  - **His own landing-page idea is rejected by its author** — *"this is kind of rude. It's what
+    epanet-js does, and I don't like it."* Do not resurrect it. Built instead as the settings
+    checkbox he preferred.
+  - **WHY IT IS NOT PROJECT-SCOPED, which is the durable part.** Task 263 made everything on this
+    page project-scoped because a bare number is meaningless without its units — *"imagine opening a
+    400 diameter pipe into an inch browser!"* **That reasoning does not reach this setting.** Whether
+    a heading is showing is not data about the network; it is about the window the person is sitting
+    in front of, and putting it in the project file would make a colleague inherit your screen
+    preference along with your pipes. So it is `localStorage`, per browser, and
+    `serializeProject()` must never learn about it.
+  - **Its own group with its own scope note, because the panel's top note would otherwise lie about
+    the control beneath it.** Tom spotted that before it was built, and named the group himself:
+    *"I say 'Saved in this calculator' even though it is literally in the browser; it affects only
+    this calculator."* Right — the distinction a user cares about is project vs everywhere-else, not
+    localStorage vs a file. Section "This calculator", at the foot of the panel, above the actions.
+  - **Applied by five inline lines in `Looped-Network.php`, not from `looped-network.js`.** The
+    preference is paint-critical: read it at DOMContentLoaded and somebody who turned the titles off
+    watches them flash on every load, on the page the setting exists to give room to.
+  - `id="ec-page-title"` / `id="ec-page-welcome"` added in `lib/HeadersFooters.lib.php` so the
+    toggle targets those two elements by name rather than by being the first `h1` it finds.
+  - **The Settings box now has two scopes, which was the real question underneath.** Project-scoped
+    at the top, browser-scoped at the bottom. That is the pattern for anything user-level added
+    later; do not put a user-level control back under the project note.
+  - Not done, and separable: idea 1, renaming "Printable version" to "Minimal version" and moving it
+    up. Suite-wide, its own translation cost, and it solves printing rather than screen room.
+
 
 - 0|287|[DONE 2026-08-12] **Serve Bootstrap from this site instead of jsDelivr — the last third
   party is gone.** Found while writing `privacy.php`, which could not honestly claim "no third
