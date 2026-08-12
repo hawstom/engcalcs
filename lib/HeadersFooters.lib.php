@@ -126,6 +126,12 @@ function echoFooter($type) {
 if (function_exists('engcalcsParentMenu')) engcalcsParentMenu();
 ?>
 <hr />
+<?php
+// ROADMAP Task 286. Both go in every footer on every page: the links because a privacy notice
+// nobody can find is not notice, and the banner because "Cookie settings" has to have something
+// to reopen wherever the visitor happens to be standing.
+if (function_exists('echoConsentFooterLinks')) echoConsentFooterLinks();
+?>
 <?php if (DEBUG_MODE === TRUE) : ?>
 	<p>
 		<a href="http://validator.w3.org/check/referer">
@@ -151,6 +157,7 @@ if (function_exists('engcalcsParentMenu')) engcalcsParentMenu();
 	</p>
 <?php endif; ?>
 </div>
+<?php if (function_exists('echoConsentBanner')) echoConsentBanner(); ?>
 <script>
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/engcalcs/sw.js', { scope: '/engcalcs/' });

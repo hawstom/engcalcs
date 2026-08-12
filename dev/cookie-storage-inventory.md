@@ -10,7 +10,13 @@ clears the legal bar is a judgement for someone qualified; **what** each item is
 exists**, is a fact, and that is what this file pins down.
 
 Re-run the inventory after touching any of: `lib/config.inc.php`, `lib/Language.lib.php`,
-`js/Cookies.lib.js`, `lib/Calculators.lib.php`, `js/looped-network.js`, or any `log-*.php`.
+`lib/Consent.lib.php`, `js/Cookies.lib.js`, `lib/Calculators.lib.php`, `js/looped-network.js`, or
+any `log-*.php`.
+
+> **UPDATED 2026-08-12: Task 286 phase 1 has SHIPPED, and sections 2, 3, 5 and 6 below now describe
+> the state after it.** Each row of the tables says whether it needs consent. The original §6 —
+> "the outcome worth aiming at: no banner" — was overruled by Tom on 2026-08-11 and is preserved
+> below as the argument that lost, because the reasoning that beat it is worth keeping too.
 
 ---
 
@@ -46,11 +52,19 @@ languages, is not a plausible candidate for "we do not target the EU."
 
 | Name | Set by | Lifetime | Purpose | Set on user's own action? |
 |---|---|---|---|---|
-| `<PageName>` (e.g. `Manning-Pipe-Flow`) | `EngCalcs.createCookie`, `js/Cookies.lib.js` | **36,000 days (~98 years)** | Remembers the numbers the visitor typed and the units they chose, per calculator page | Yes — written after they use the calculator |
-| `ec_language` | `lib/Language.lib.php` | 1 year, HttpOnly | The language the visitor explicitly chose from the language menu | Yes |
-| `ec_blang` | `lib/Language.lib.php` | 1 year, HttpOnly | **Analytics only.** Records the raw `Accept-Language` header so it is logged **once per browser** rather than once per visit | **No** |
-| `ec_nolog` | `lib/config.inc.php` | 10 years | Marks a browser as opted out of every usage log | Yes — only ever set by visiting `?ec_nolog=1` |
-| `PHPSESSID` | `session_start()` in `lib/base.inc.php`, `log-calc-event.php`, `log-human-view.php`, `log-title-event.php` | Session | **Two purposes at once** — carries `$_SESSION['CLANGUAGE']` (the language override, service-related) *and* `$_SESSION['CLANG_LOGGED']` plus the per-session log gates (analytics) | Mixed |
+| Name | Set by | Lifetime | Purpose | Consent |
+|---|---|---|---|---|
+| `<PageName>` (e.g. `Manning-Pipe-Flow`) | `EngCalcs.createCookie`, `js/Cookies.lib.js` | **1 year** (was 36,000 days until Task 286) | Remembers the numbers the visitor typed and the units they chose, per calculator page | **Exempt** — user-input storage, written only after they typed |
+| `ec_language` | `lib/Language.lib.php` | 1 year, HttpOnly | The language the visitor explicitly chose from the language menu | **Exempt** — a preference the visitor set deliberately |
+| `ec_consent` | `lib/Consent.lib.php` (JS) or `consent.php` (no-JS) | 1 year, readable by JS | The consent record: `<state>.<unix-ts>.<policy-version>` | **Exempt** — it exists solely to honour the answer given |
+| `ec_nolog` | `lib/config.inc.php` | 10 years | Marks a browser as opted out of every usage log | **Exempt** — same reasoning; it only honours a choice |
+| `ec_blang` | `lib/Language.lib.php` | 1 year, HttpOnly | **Analytics only.** Records the raw `Accept-Language` header so it is logged **once per browser** rather than once per visit | **Requires consent.** Not written otherwise, and deleted on withdrawal |
+| `PHPSESSID` | `ecSessionStart()`, called from `lib/base.inc.php` and the three `log-*.php` | Session | **Analytics only, now that its other job has moved out.** De-duplicates the usage logs per session | **Requires consent.** No session is started otherwise, and it is deleted on withdrawal |
+
+`PHPSESSID` used to be the hard case: it carried `$_SESSION['CLANGUAGE']` (service) *and* the log
+gates (analytics), and under a per-purpose test the analytics half tainted the whole cookie. Task
+286 did not resolve that by argument — it moved the language job onto `ec_language`, which the
+visitor sets deliberately, leaving the session with one purpose and one honest answer.
 
 ## 3. Browser storage
 
@@ -59,6 +73,11 @@ languages, is not a plausible candidate for "we do not target the EU."
 | `lpn_index` | `js/looped-network.js` | The project list: id, name, last-updated, file link state |
 | `lpn_project_<id>` | same | One whole project — the network the user drew, its settings, and any backdrop image as a data URI |
 | `lpn_document` | same | Legacy single-document key, migrated on read |
+
+All three are **exempt** — they hold the document the user made in order to give it back to them.
+The one piece of client-side storage that is NOT exempt is the offline beacon queue in IndexedDB
+(`engcalcs-offline-queue`, `js/Calculators.lib.js`): it is analytics, so it is written only with
+consent and emptied by `EngCalcs.flushQueue()` on withdrawal.
 
 **No third-party storage anywhere.** No analytics vendor, no tag manager, no ad network, no CDN
 fonts, no embedded maps. Everything above is first-party, and `js/vendor/epanet-js.js` is served
@@ -106,7 +125,62 @@ Reading section 1's test against sections 2–4, in the order a reviewer would:
   **no privacy notice on this site at all**. GDPR Art 13 wants one wherever personal data is
   collected, and a contact form collects a name and an email address.
 
-## 6. The outcome worth aiming at: no banner
+## 6. What shipped, 2026-08-12 (Task 286 phase 1)
+
+Read section 5 first: it is the diagnosis, and every item below is a treatment for one line of it.
+
+1. **Sessions are lazy.** `lib/base.inc.php` no longer calls `session_start()` at the top of every
+   page load. `ecSessionStart()` (`lib/config.inc.php`) starts one only for a visitor who has said
+   yes, and every caller — the bootstrap and all three `log-*.php` — is written to work without
+   one. **This was the real work of the phase, not the banner.** A banner cannot fix a cookie that
+   is already written by the time it renders.
+2. **The language override moved off the session** and onto the `ec_language` cookie, which is
+   exempt on its own footing. That is what un-mixed `PHPSESSID`'s two purposes; see section 2.
+3. **`ec_blang` is written only with consent**, and deleted on withdrawal.
+4. **The page-input cookie is one year**, down from 36,000 days. Hygiene, and independent of
+   consent — nobody had to be asked anything for that number to be wrong.
+5. **A consent banner** (`lib/Consent.lib.php`), on every page, meeting the §4 constraints of
+   `privacy-and-terms-draft.md`: opt-in before the storage, two identically styled buttons so
+   refusing is exactly as easy as accepting, no pre-ticked anything, no cookie wall, a permanent
+   footer control that reopens the choice, and a stored consent record. It works with JavaScript
+   off, via `consent.php` — a banner that needs JS to answer makes refusal impossible for the
+   people who cannot use it.
+6. **Withdrawal actually removes things.** `ecForgetAnalyticsStorage()` destroys the session and
+   expires `ec_blang` server-side; `EngCalcs.flushQueue()` empties the IndexedDB beacon queue.
+
+### The one design question Tom asked, and its answer
+
+*"If a user opts out of being logged as a returner, do we report them in a separate bucket... I
+don't think that we want to completely ignore them."*
+
+We do not. Consent governs **storage**, and storage is what de-duplication needs — not counting.
+A server-side row carrying no IP, no session id and no identifier of any kind needs no cookie to
+be lawful and no cookie to be useful. So there are two buckets, reported side by side by
+`log/lang-log-stats.sh` and **never added together**:
+
+- **visitors** — consented, de-duplicated per session. Today's numbers, unchanged.
+- **visits** — everybody else, one row per page load, nothing stored. Marked by a trailing `visit`
+  column, and by `source=anon` in the language log.
+
+Adding them would quietly turn every count into a mixture of people and page loads and every
+percentage into a number with no meaning — a page whose non-consenting visitors reload a lot would
+simply look more popular. Keeping them apart costs one column and one report section.
+
+### Still open
+
+- The privacy notice and terms pages themselves (drafts in `dev/privacy-and-terms-draft.md`,
+  waiting on the human decisions listed in its section 1).
+- Translating the banner's ten `consent_*`/`privacy_link`/`terms_link` keys into the other 26
+  languages. They exist in English and are timed to ride the Task 251 sprint.
+
+---
+
+## 7. The argument that lost: aiming at no banner
+
+Kept because Tom's reasoning for overruling it is better than the argument itself, and because
+anyone reopening this question should read the round that already happened. See ROADMAP Task 286.
+
+### (original section 6, as written 2026-08-11)
 
 A consent banner on a free calculator whose entire pitch is "open the page and get an answer" is a
 real cost, and it is paid by every visitor on every page. **The better target is to need no banner

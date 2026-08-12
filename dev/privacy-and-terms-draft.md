@@ -46,12 +46,12 @@ Sources: [GDPR.eu privacy notice guide](https://gdpr.eu/privacy-notice/) ·
 
 Placeholders below are written as `[LIKE THIS]`. None of them is a detail.
 
-| # | Decision | Note |
+| # | Decision | Note | TGH Response
 |---|---|---|
-| 1 | **`[CONTROLLER LEGAL NAME]` and `[POSTAL ADDRESS]`** | GDPR Art 13(1)(a) requires identity and contact details. A sole trader's own name and address is normal and acceptable. There is no way to comply anonymously. |
-| 2 | **`[PRIVACY CONTACT EMAIL]`** | Tom's personal Gmail is the address the repo knows. Publishing it on a privacy page invites everything a published address invites — consider a dedicated alias. |
-| 3 | **Which SITE does this cover?** | The cookies are set with `path=/`, so they cover **all of hawsedc.com**, not just `/engcalcs`. `hawsedc.com` also serves `peakfact.php` and `sewslope.php` and has no privacy page. **Recommendation: one notice at the hawsedc.com level, linked from engcalcs** — matching the standing rule against duplicating parent-site content, and matching where the cookies actually apply. |
-| 4 | **`[GOVERNING LAW]` for the Terms** | Arizona/US is the natural answer. Note that a governing-law clause does not remove EU consumer-protection rights from EU visitors; it decides other things. |
+| 1 | **`Thomas Gail Haws` and `859 N LAFAYETTE, MESA AZ 85201, USA`** | GDPR Art 13(1)(a) requires identity and contact details. A sole trader's own name and address is normal and acceptable. There is no way to comply anonymously. | Replaced all in this file. Backquotes remain to be removed.
+| 2 | **`support@hawsedc.com`** | Tom's personal Gmail is the address the repo knows. Publishing it on a privacy page invites everything a published address invites — consider a dedicated alias. | Replaced all in this file. Backquotes remain to be removed.
+| 3 | **Which SITE does this cover?** | The cookies are set with `path=/`, so they cover **all of hawsedc.com**, not just `/engcalcs`. `hawsedc.com` also serves `peakfact.php` and `sewslope.php` and has no privacy page. **Recommendation: one notice at the hawsedc.com level, linked from engcalcs** — matching the standing rule against duplicating parent-site content, and matching where the cookies actually apply. | hawsedc.com
+| 4 | **`Arizona/US` for the Terms** | Arizona/US is the natural answer. Note that a governing-law clause does not remove EU consumer-protection rights from EU visitors; it decides other things. |
 | 5 | **Whether a lawyer reads the liability clause** | §3.4 is the clause that matters if a design ever goes wrong. Everything else here is disclosure; that one is risk allocation. |
 
 ---
@@ -63,12 +63,12 @@ Placeholders below are written as `[LIKE THIS]`. None of them is a detail.
 
 ### Who we are
 
-`[CONTROLLER LEGAL NAME]` publishes hawsedc.com, including the EngCalcs engineering calculators at
+`Thomas Gail Haws` publishes hawsedc.com, including the EngCalcs engineering calculators at
 hawsedc.com/engcalcs. We decide what data this site collects and why, which makes us the "data
 controller" under the GDPR.
 
-Write to us about anything on this page at `[PRIVACY CONTACT EMAIL]`, or
-`[POSTAL ADDRESS]`.
+Write to us about anything on this page at `support@hawsedc.com`, or
+`859 N LAFAYETTE, MESA AZ 85201, USA`.
 
 ### The short version
 
@@ -128,7 +128,7 @@ no analytics service, and no advertising partner.
 
 ### Where it goes
 
-Our server is in the `[SERVER COUNTRY — United States?]`. If you are in the European Economic Area,
+Our server is in the `United States`. If you are in the European Economic Area,
 that means the little we collect is transferred outside it. We rely on `[TRANSFER BASIS — see note]`.
 
 > **Reviewer note.** This is the one place a US-hosted site cannot hand-wave. The realistic options
@@ -171,7 +171,7 @@ If we change this notice we will change the date below. `[Last updated: DATE]`
 
 ### 3.1 What this is
 
-EngCalcs is a set of free engineering calculators published by `[CONTROLLER LEGAL NAME]`. Using them
+EngCalcs is a set of free engineering calculators published by `Thomas Gail Haws`. Using them
 means accepting these terms.
 
 ### 3.2 The software is free, in both senses
@@ -202,7 +202,7 @@ professional service, and using it creates no engineer–client relationship of 
 This site is provided "as is", without warranty of any kind, express or implied, including any
 warranty of accuracy, fitness for a particular purpose, or uninterrupted availability.
 
-To the fullest extent the law allows, `[CONTROLLER LEGAL NAME]` is not liable for any loss, damage,
+To the fullest extent the law allows, `Thomas Gail Haws` is not liable for any loss, damage,
 cost or claim arising from your use of this site or of any result it produces — including design
 errors, construction cost, delay, or professional liability. Where liability cannot lawfully be
 excluded, it is limited to `[AMOUNT — commonly the greater of the fees paid (zero here) or a nominal sum]`.
@@ -223,7 +223,7 @@ to harm others. We may withdraw access from anyone who does.
 ### 3.7 Changes, and the governing law
 
 We may update these terms; the date below says when we last did. These terms are governed by the law
-of `[GOVERNING LAW]`. If you are a consumer in the EEA or the UK, this does not deprive you of the
+of `Arizona/US`. If you are a consumer in the EEA or the UK, this does not deprive you of the
 protection of your own country's mandatory consumer law.
 
 `[Last updated: DATE]`

@@ -125,6 +125,20 @@ $ec_lang['template_printable_title']='Printable Title';
 $ec_lang_syn['template_printable_title']='';
 $ec_lang['template_printable_subtitle']='Printable Subtitle';
 $ec_lang_syn['template_printable_subtitle']='';
+// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
+// prose, and they are translated into all 26 languages for one reason: consent that the visitor
+// cannot read is not consent. The long-form privacy notice and terms are a separate question --
+// English-authoritative, and translated by a human later if at all.
+$ec_lang['consent_heading']='May we count your visit?';
+$ec_lang['consent_body']='We count how many people open each calculator, and in which language, so we know what to work on next. To count you once instead of once per visit, we need to keep a small note in your browser. We share nothing with anyone else, and the calculators work the same either way.';
+$ec_lang['consent_accept']='Yes, count me';
+$ec_lang['consent_decline']='No, do not count me';
+$ec_lang['consent_current_granted']='You said yes. We count you once instead of once per visit.';
+$ec_lang['consent_current_denied']='You said no. We keep nothing in your browser for counting.';
+$ec_lang['consent_region_label']='Your choice about being counted';
+$ec_lang['consent_settings_link']='Cookie settings';
+$ec_lang['privacy_link']='Privacy notice';
+$ec_lang['terms_link']='Terms of use';
 $ec_lang['index_title']='Free Online Engineering Calculators';
 $ec_lang_syn['index_title']='';
 $ec_lang['index_meta_desc_plain']='Free hydraulic engineering calculators for pipes, channels, weirs and irrigation. They run in your browser, work offline, and are available in 27 languages.';

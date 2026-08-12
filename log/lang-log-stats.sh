@@ -27,6 +27,9 @@
 #                  would just double-count the session's already-counted language); the funnel
 #                  section at the bottom deliberately includes it, since that's what makes "reach"
 #                  comparable to "human" there.
+#                  'anon' = a page load by somebody who has not consented to being counted once
+#                  rather than every time (ROADMAP Task 286) -- undeduplicated by necessity, kept
+#                  out of every section above and reported in the visits section of its own.
 #      SUB-LANGUAGE NOTE: browser entries may contain subtags (es-MX, zh-TW, pt-BR, en-US, etc.).
 #      get/cookie entries are always plain 2-letter codes. Most sections aggregate subtags to
 #      their primary code (es-MX → es) so all sources are comparable; the raw browser breakdown
@@ -92,14 +95,69 @@ SEND_LOG="$(dirname "$0")/engcalcs-contact-send.log"
 # they mean to show this to another person. Reported in its own section below.
 TITLE_LOG="$(dirname "$0")/engcalcs-title.log"
 
-if [ ! -f "$LOG" ]; then
-    echo "Log file not found: $LOG"
+# ---- TWO BUCKETS, AND THEY ARE NEVER ADDED TOGETHER (ROADMAP Task 286) ----
+#
+# Since the consent banner shipped, every one of these logs carries two kinds of row:
+#
+#   visitors  Rows written for somebody who agreed to being counted once rather than every time.
+#             A session cookie makes de-duplication possible, so one person visiting a page four
+#             times is one row. These are the numbers this report has always shown, unchanged, and
+#             they are the only ones a RATIO may be computed from.
+#   visits    Rows written for everybody else -- refused, or has not answered yet. Nothing is
+#             stored on their device, so there is nothing to de-duplicate against: one row per
+#             page load. Marked by a trailing "visit" column, and by source=anon in the language
+#             log.
+#
+# Tom, 2026-08-11, on what to do with the second group: *"do we report them in a separate bucket...
+# I don't think that we want to completely ignore them."* Right on both halves, and the two halves
+# are the whole design. Ignoring them would throw away real people. Adding them to the visitors
+# would silently turn every de-duplicated count into a mixture of people and page loads, and every
+# percentage below into a number with no meaning at all -- a page whose non-consenting visitors
+# reload a lot would simply look more popular.
+#
+# So: every section below reads the VISITORS bucket only, by way of a filtered copy, and the visits
+# bucket gets one section of its own. If you add a section, it reads $LOG/$VIEW_LOG/$USAGE_LOG/
+# $TITLE_LOG like every other section and is filtered for free. Reach for a $RAW_ or $VISITS_ path
+# only when you specifically mean the other bucket.
+RAW_LOG="$LOG"
+RAW_VIEW_LOG="$VIEW_LOG"
+RAW_USAGE_LOG="$USAGE_LOG"
+RAW_TITLE_LOG="$TITLE_LOG"
+
+if [ ! -f "$RAW_LOG" ]; then
+    echo "Log file not found: $RAW_LOG"
     echo "(No page access has been recorded yet.)"
     exit 1
 fi
 
-TOTAL=$(wc -l < "$LOG")
-FIRST_DATE=$(head -1 "$LOG" | awk -F'\t' '{print $1}')
+EC_BUCKET_TMP=$(mktemp -d)
+trap 'rm -rf "$EC_BUCKET_TMP"' EXIT INT TERM
+
+# $1 = log path, $2 = 1-based index of the trailing bucket column in THAT log. A row shorter than
+# that column is a visitor row -- which is correct twice over: it is what every row written before
+# this task was, and it is what a deduplicated row still is today, since the marker is emitted only
+# for the visits bucket precisely so the existing history stays byte-identical.
+ec_split_bucket() {
+    [ -f "$1" ] || return 0
+    awk -F'\t' -v c="$2" '$c != "visit"' "$1" > "$EC_BUCKET_TMP/$(basename "$1")"
+    awk -F'\t' -v c="$2" '$c == "visit"' "$1" > "$EC_BUCKET_TMP/visits-$(basename "$1")"
+}
+ec_split_bucket "$RAW_LOG" 5
+ec_split_bucket "$RAW_VIEW_LOG" 5
+ec_split_bucket "$RAW_USAGE_LOG" 5
+ec_split_bucket "$RAW_TITLE_LOG" 6   # the title log carries 'title'/'subtitle' in column 5
+
+LOG="$EC_BUCKET_TMP/$(basename "$RAW_LOG")"
+[ -f "$RAW_VIEW_LOG" ]  && VIEW_LOG="$EC_BUCKET_TMP/$(basename "$RAW_VIEW_LOG")"
+[ -f "$RAW_USAGE_LOG" ] && USAGE_LOG="$EC_BUCKET_TMP/$(basename "$RAW_USAGE_LOG")"
+[ -f "$RAW_TITLE_LOG" ] && TITLE_LOG="$EC_BUCKET_TMP/$(basename "$RAW_TITLE_LOG")"
+VISITS_LOG="$EC_BUCKET_TMP/visits-$(basename "$RAW_LOG")"
+VISITS_VIEW_LOG="$EC_BUCKET_TMP/visits-$(basename "$RAW_VIEW_LOG")"
+VISITS_USAGE_LOG="$EC_BUCKET_TMP/visits-$(basename "$RAW_USAGE_LOG")"
+
+# Counted from the raw file: "total log entries" means what it says, both buckets.
+TOTAL=$(wc -l < "$RAW_LOG")
+FIRST_DATE=$(head -1 "$RAW_LOG" | awk -F'\t' '{print $1}')
 # Printed at the END of the report (Tom, 2026-08-03: the report is long, and the coverage dates
 # belong at the bottom, not the top). A function, not a trailing block, because the script exits
 # early when there is no usage log yet -- and the footer has to print on that path too.
@@ -114,25 +172,25 @@ print_footer() {
     echo "    conversion rate as real."
     echo ""
     printf "    %-34s %12s  %s\n" "log" "entries" "first entry"
-    printf "    %-34s %12s  %s\n" "$(basename "$LOG")" "$TOTAL" "$FIRST_DATE"
-    if [ -f "$VIEW_LOG" ]; then
-        printf "    %-34s %12s  %s\n" "$(basename "$VIEW_LOG")" "$(wc -l < "$VIEW_LOG")" "$(head -1 "$VIEW_LOG" | awk -F'\t' '{print $1}')"
+    printf "    %-34s %12s  %s\n" "$(basename "$RAW_LOG")" "$TOTAL" "$FIRST_DATE"
+    if [ -f "$RAW_VIEW_LOG" ]; then
+        printf "    %-34s %12s  %s\n" "$(basename "$RAW_VIEW_LOG")" "$(wc -l < "$RAW_VIEW_LOG")" "$(head -1 "$RAW_VIEW_LOG" | awk -F'\t' '{print $1}')"
     fi
-    if [ -f "$USAGE_LOG" ]; then
-        printf "    %-34s %12s  %s\n" "$(basename "$USAGE_LOG")" "$(wc -l < "$USAGE_LOG")" "$(head -1 "$USAGE_LOG" | awk -F'\t' '{print $1}')"
+    if [ -f "$RAW_USAGE_LOG" ]; then
+        printf "    %-34s %12s  %s\n" "$(basename "$RAW_USAGE_LOG")" "$(wc -l < "$RAW_USAGE_LOG")" "$(head -1 "$RAW_USAGE_LOG" | awk -F'\t' '{print $1}')"
     fi
     if [ -f "$SEND_LOG" ]; then
         printf "    %-34s %12s  %s\n" "$(basename "$SEND_LOG")" "$(wc -l < "$SEND_LOG")" "$(head -1 "$SEND_LOG" | awk -F'\t' '{print $1}')"
     fi
-    if [ -f "$TITLE_LOG" ]; then
-        printf "    %-34s %12s  %s\n" "$(basename "$TITLE_LOG")" "$(wc -l < "$TITLE_LOG")" "$(head -1 "$TITLE_LOG" | awk -F'\t' '{print $1}')"
+    if [ -f "$RAW_TITLE_LOG" ]; then
+        printf "    %-34s %12s  %s\n" "$(basename "$RAW_TITLE_LOG")" "$(wc -l < "$RAW_TITLE_LOG")" "$(head -1 "$RAW_TITLE_LOG" | awk -F'\t' '{print $1}')"
     fi
     echo ""
 }
 
 echo "========================================="
 echo " EngCalcs language selection log stats"
-echo " $LOG"
+echo " $RAW_LOG"
 echo " $TOTAL total log entries"
 echo " (coverage dates are in the footer at the end of this report)"
 echo "========================================="
@@ -173,12 +231,57 @@ echo ""
 echo "--- Most recent 10 entries ---"
 tail -10 "$LOG"
 
+echo ""
+echo "========================================="
+echo " Visits by people we may not count twice (ROADMAP Task 286)"
+echo "========================================="
+echo "    Everybody above agreed to being counted once instead of once per visit. This section is"
+echo "    everybody else -- refused, or has not answered the banner yet. Nothing is stored on their"
+echo "    device, so nothing distinguishes their second page load from their first."
+echo ""
+echo "    READ THESE AS PAGE LOADS, NOT PEOPLE, and never add them to a number above. A count of"
+echo "    events and a count of visitors are different units; the consent rate below is the only"
+echo "    honest bridge between them, and even that is a rate of ROWS, not of humans."
+echo ""
+EC_VISITS=$(wc -l < "$VISITS_LOG")
+EC_VISITORS=$(wc -l < "$LOG")
+printf "    %-34s %12s\n" "deduplicated visitor rows" "$EC_VISITORS"
+printf "    %-34s %12s\n" "undeduplicated visit rows" "$EC_VISITS"
+if [ "$TOTAL" -gt 0 ]; then
+    printf "    %-34s %11s%%\n" "share of rows that consented" "$(awk -v v="$EC_VISITORS" -v t="$TOTAL" 'BEGIN{printf "%.1f", 100*v/t}')"
+fi
+echo ""
+echo "    Both counts only start from the day the banner shipped -- every row logged before then is"
+echo "    a visitor row by definition, so the consent share is understated until the old rows age"
+echo "    out of the window you care about. Check the coverage dates in the footer before reading it."
+if [ "$EC_VISITS" -gt 0 ]; then
+    echo ""
+    echo "--- Visits by page ---"
+    awk -F'\t' '{print $4}' "$VISITS_LOG" | sort | uniq -c | sort -rn
+    echo ""
+    echo "--- Visits by browser first-preference, aggregated ---"
+    awk -F'\t' '{split($2,a,"-"); print a[1]}' "$VISITS_LOG" | sort | uniq -c | sort -rn
+    echo ""
+    echo "--- Visits per day ---"
+    awk -F'\t' '{print substr($1,1,10)}' "$VISITS_LOG" | sort | uniq -c
+fi
+if [ -s "$VISITS_VIEW_LOG" ]; then
+    echo ""
+    echo "--- Confirmed-human page loads by page (visits bucket) ---"
+    awk -F'\t' '{print $2}' "$VISITS_VIEW_LOG" | sort | uniq -c | sort -rn
+fi
+if [ -s "$VISITS_USAGE_LOG" ]; then
+    echo ""
+    echo "--- Confirmed calculations by page (visits bucket) ---"
+    awk -F'\t' '{print $2}' "$VISITS_USAGE_LOG" | sort | uniq -c | sort -rn
+fi
+
 if [ -f "$VIEW_LOG" ]; then
     VIEW_TOTAL=$(wc -l < "$VIEW_LOG")
     echo ""
     echo "========================================="
     echo " EngCalcs confirmed-human page-view stats (\"window shopping\")"
-    echo " $VIEW_LOG"
+    echo " $RAW_VIEW_LOG"
     echo " $VIEW_TOTAL total confirmed-human page-view entries"
     echo "========================================="
 
@@ -302,7 +405,7 @@ USAGE_TOTAL=$(wc -l < "$USAGE_LOG")
 echo ""
 echo "========================================="
 echo " EngCalcs confirmed-human calculator-usage stats"
-echo " $USAGE_LOG"
+echo " $RAW_USAGE_LOG"
 echo " $USAGE_TOTAL total confirmed-human usage entries"
 echo "========================================="
 

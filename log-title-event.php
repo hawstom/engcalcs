@@ -16,8 +16,10 @@
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
  */
-session_start();
 require_once __DIR__ . '/lib/config.inc.php';
+// Task 286: the session is analytics storage, so it starts only for a visitor who agreed to it.
+// Everybody else is still counted -- see the 'visit' bucket in ecLogBucketSuffix().
+ecSessionStart();
 
 header('Content-Type: text/plain');
 
@@ -64,9 +66,14 @@ if (isset($_POST['offline_ts'])) {
 // Deduped per (session, page, field) rather than per (session, page): the two fields are two
 // different findings, and someone who adds a subtitle after a title must be able to show up as
 // both. Editing the same field repeatedly still counts once.
+// Task 286: with no session there is nothing to dedupe against, so the event goes undeduplicated
+// to the 'visit' bucket rather than being dropped.
 $dedupKey = $page . '|' . $field;
-if (empty($_SESSION['TITLE_LOGGED'][$dedupKey])) {
-    $_SESSION['TITLE_LOGGED'][$dedupKey] = true;
+$alreadyLogged = ecSessionActive() && !empty($_SESSION['TITLE_LOGGED'][$dedupKey]);
+if (!$alreadyLogged) {
+    if (ecSessionActive()) {
+        $_SESSION['TITLE_LOGGED'][$dedupKey] = true;
+    }
 
     $browserLang = '';
     if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
@@ -77,7 +84,7 @@ if (empty($_SESSION['TITLE_LOGGED'][$dedupKey])) {
     if (!is_dir($dir)) {
         @mkdir($dir, 0750, true);
     }
-    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\t" . $field . "\n";
+    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\t" . $field . ecLogBucketSuffix() . "\n";
     @file_put_contents(TITLE_LOG, $line, FILE_APPEND | LOCK_EX);
 }
 

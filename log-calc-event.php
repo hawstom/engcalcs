@@ -11,8 +11,10 @@
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
  */
-session_start();
 require_once __DIR__ . '/lib/config.inc.php';
+// Task 286: the session is analytics storage, so it starts only for a visitor who agreed to it.
+// Everybody else is still counted -- see the 'visit' bucket in ecLogBucketSuffix().
+ecSessionStart();
 
 header('Content-Type: text/plain');
 
@@ -46,8 +48,14 @@ if (isset($_POST['offline_ts'])) {
     }
 }
 
-if (empty($_SESSION['CALC_USAGE_LOGGED'][$page])) {
-    $_SESSION['CALC_USAGE_LOGGED'][$page] = true;
+// With a session, dedupe per (session, page) exactly as before. Without one there is nothing to
+// dedupe against and nothing may be stored to make one, so the event is written to the 'visit'
+// bucket instead of being thrown away.
+$alreadyLogged = ecSessionActive() && !empty($_SESSION['CALC_USAGE_LOGGED'][$page]);
+if (!$alreadyLogged) {
+    if (ecSessionActive()) {
+        $_SESSION['CALC_USAGE_LOGGED'][$page] = true;
+    }
 
     $browserLang = '';
     if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
@@ -58,7 +66,7 @@ if (empty($_SESSION['CALC_USAGE_LOGGED'][$page])) {
     if (!is_dir($dir)) {
         @mkdir($dir, 0750, true);
     }
-    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\n";
+    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . ecLogBucketSuffix() . "\n";
     @file_put_contents(CALC_USAGE_LOG, $line, FILE_APPEND | LOCK_EX);
 }
 

@@ -26,17 +26,29 @@
  * LICENSE: GNU GPL v3 or later
  *
  */
-// Start the session here and here only.
-session_start();
+// Load the config.  It's in this directory.
+// It comes FIRST now, because whether a session may be started at all is a question only the
+// consent helpers in it can answer (ROADMAP Task 286).
+require_once('config.inc.php');
+
+// Start the session here and here only -- and only for a visitor who has agreed to being counted
+// once rather than every time. Until Task 286 this was an unconditional session_start() ABOVE the
+// config require, which wrote PHPSESSID on every page load before anybody had been asked anything.
+// The session's other job -- remembering a chosen language -- moved to the ec_language cookie,
+// which the visitor sets deliberately and which is exempt on its own footing.
+ecSessionStart();
 // First request of this session: mark when it started, so pages can tell how long
 // this visitor has been around (used by the confirmed-human page-view log, which
-// gates on session age rather than this single page's age).
-if (empty($_SESSION['SESSION_START'])) {
-    $_SESSION['SESSION_START'] = time();
+// gates on session age rather than this single page's age). With no session there is nothing to
+// remember, so age reads 0 and the beacon simply waits out its full 10s on every page -- a
+// slightly stricter human test, never a looser one.
+$ec_sessionAgeMs = 0;
+if (ecSessionActive()) {
+    if (empty($_SESSION['SESSION_START'])) {
+        $_SESSION['SESSION_START'] = time();
+    }
+    $ec_sessionAgeMs = (time() - $_SESSION['SESSION_START']) * 1000;
 }
-$ec_sessionAgeMs = (time() - $_SESSION['SESSION_START']) * 1000;
-// Load the config.  It's in this directory.
-require_once('config.inc.php');
 
 // Load the language settings.
 // They are needed for determining the session language in Session.lib.php below.
@@ -53,6 +65,10 @@ require_once('lang.ec.'.$clanguage.'.php');
 
 // Load the one icon set (Task 231). Must precede HeadersFooters/Menus: both call ecIcon().
 require_once('Icons.lib.php');
+
+// Load the consent banner (ROADMAP Task 286). Must precede HeadersFooters: echoFooter() calls
+// both of its functions.
+require_once('Consent.lib.php');
 
 // Load the headers and footers
 require_once('HeadersFooters.lib.php');

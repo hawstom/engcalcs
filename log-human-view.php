@@ -13,8 +13,10 @@
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
  */
-session_start();
 require_once __DIR__ . '/lib/config.inc.php';
+// Task 286: the session is analytics storage, so it starts only for a visitor who agreed to it.
+// Everybody else is still counted -- see the 'visit' bucket in ecLogBucketSuffix().
+ecSessionStart();
 
 header('Content-Type: text/plain');
 
@@ -58,9 +60,17 @@ if (isset($_POST['offline_ts'])) {
 // fails closed on any request where the session data isn't present (expired, GC'd, cookie
 // not attached) by silently treating "unknown" as "session just started" and rejecting —
 // which can drop every legitimate view with no trace. Not worth re-litigating server-side.
+//
+// Task 286: with no session -- a visitor who has not agreed to being counted once rather than
+// every time -- there is nothing to dedupe against, so the view goes to the 'visit' bucket
+// undeduplicated. That is the honest shape of the number, and it is a far better answer than
+// dropping those visitors entirely.
 $dedupKey = $page . '|' . $lang;
-if (empty($_SESSION['HUMAN_VIEW_LOGGED'][$dedupKey])) {
-    $_SESSION['HUMAN_VIEW_LOGGED'][$dedupKey] = true;
+$alreadyLogged = ecSessionActive() && !empty($_SESSION['HUMAN_VIEW_LOGGED'][$dedupKey]);
+if (!$alreadyLogged) {
+    if (ecSessionActive()) {
+        $_SESSION['HUMAN_VIEW_LOGGED'][$dedupKey] = true;
+    }
 
     $browserLang = '';
     if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
@@ -71,7 +81,7 @@ if (empty($_SESSION['HUMAN_VIEW_LOGGED'][$dedupKey])) {
     if (!is_dir($dir)) {
         @mkdir($dir, 0750, true);
     }
-    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . "\n";
+    $line = $eventTime . "\t" . $page . "\t" . $lang . "\t" . $browserLang . ecLogBucketSuffix() . "\n";
     @file_put_contents(HUMAN_VIEW_LOG, $line, FILE_APPEND | LOCK_EX);
 }
 

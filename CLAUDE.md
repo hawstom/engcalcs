@@ -716,6 +716,35 @@ the factor to display it, divide to store it.
 
 Full design record and per-field rationale: `dev/unit-families.md`.
 
+## What may be stored on a visitor's device (ROADMAP Task 286, shipped 2026-08-12)
+
+Full inventory and reasoning: `dev/cookie-storage-inventory.md`. The rules a change has to respect:
+
+- **Never call `session_start()`.** Call `ecSessionStart()` (`lib/config.inc.php`), which starts one
+  only for a visitor who consented, and **write the caller to work when it returns false** — that
+  is the normal case, not the error case. `lib/base.inc.php` used to start a session at the top of
+  every page load, which wrote `PHPSESSID` before anybody had been asked anything; a banner cannot
+  fix that from the outside, which is why this rule is absolute rather than a preference.
+- **The session is analytics ONLY.** It exists to de-duplicate the usage logs. Do not put a
+  service-related value in it — that is what made `PHPSESSID` a mixed-purpose cookie and therefore
+  unlawful under a per-purpose test. A visitor preference belongs in its own cookie that the
+  visitor set deliberately (`ec_language` is the worked example).
+- **New storage needs the exemption test, per purpose:** is it *strictly necessary for a service
+  the visitor explicitly requested*? User-input storage (what they typed), an explicit preference,
+  the consent record and the log opt-out all pass. Anything whose job is to make a **statistic**
+  better fails, whatever technology it uses — `localStorage`, `sessionStorage` and IndexedDB are in
+  scope exactly as cookies are. Gate a failing item on `ecAnalyticsConsented()` server-side or
+  `EngCalcs.analyticsConsented()` client-side, and make withdrawal delete it.
+- **A new log writer must call `ecLogBucketSuffix()`** and append it to the line. Consented rows
+  are deduplicated and unmarked; everyone else's are marked `visit`, undeduplicated, and reported
+  in their own section of `log/lang-log-stats.sh`. **Never sum the two buckets** — one counts
+  people and the other counts page loads.
+- **Never restyle one consent button to stand out.** `.ec-consent-btn` styles both answers
+  identically on purpose; a coloured Accept beside a grey Reject is the dark pattern this design
+  exists to avoid.
+- **Cookie lifetimes are defensible out loud.** One year is the house default. The page-input
+  cookie sat at 36,000 days (~98 years) until this task.
+
 ## Environment / Config
 
 `lib/config.inc.php` reads `APP_ENV` from the environment:

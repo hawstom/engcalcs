@@ -9,12 +9,26 @@ var EngCalcs = EngCalcs || {};
 // Irregular (v2: "n"/"is_bank" columns reordered).
 EngCalcs.cookieFormatVersion = 1;
 
+// Reads the consent record written by the banner (lib/Consent.lib.php). Analytics STORAGE --
+// the session cookie server-side, the offline beacon queue in IndexedDB client-side -- is
+// allowed only on an explicit yes. Everything this file itself writes is exempt and needs no
+// consent: a cookie holding the numbers the visitor typed, written only after they typed them.
+EngCalcs.analyticsConsented = function () {
+	"use strict";
+	var match = /(?:^|;\s*)ec_consent=([^;]*)/.exec(document.cookie);
+	return !!match && decodeURIComponent(match[1]).charAt(0) === '1';
+};
+
 EngCalcs.createCookie = function () {
 	"use strict";
 	var
 		date,
 		expires,
-		days = 36000;
+		// One year, matching ec_language. This was 36,000 days (~98 years) until ROADMAP Task 286
+		// -- indefensible as "strictly necessary" whatever the purpose, and poor hygiene whatever
+		// the law says. A visitor who has not opened a calculator in a year does not need the
+		// numbers they typed then, and nobody will notice the difference.
+		days = 365;
 	date = new Date();
 	date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
 	expires = "; expires=" + date.toGMTString();

@@ -1020,6 +1020,38 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   outlaws. That's my guess."* Half of that is answerable from the code, and it is:
   **`dev/cookie-storage-inventory.md`** — every cookie, every `localStorage` key, every server log,
   what each is for, and which ones fail the test. Read it before scoping anything here.
+  - **PHASE 1 SHIPPED 2026-08-12. The inventory's new §6 is the record; this block keeps only what
+    a future reader needs that the code does not say.**
+    - **Lazy sessions were the work, not the banner.** `lib/base.inc.php` had `session_start()` at
+      the top of every page load, ABOVE the config require — so `PHPSESSID` was written before
+      anything could have asked anything, and no banner could have fixed that from the outside.
+      `ecSessionStart()` now starts one only on an explicit yes, and every caller is written to
+      work without one.
+    - **`PHPSESSID`'s mixed purpose was resolved by MOVING a job, not by arguing about it.** Its
+      service-related half (remembering a chosen language) went to the `ec_language` cookie, which
+      the visitor sets deliberately and which is exempt on its own footing. That left the session
+      with one purpose and one honest answer. Worth remembering as a shape: when a per-purpose test
+      taints something, separating the purposes beats defending the mixture.
+    - **The banner works with JavaScript off** (`consent.php`). Not a nicety: "as easy to refuse as
+      to accept" cannot be met by a control that does not work, and a JS-only banner leaves a no-JS
+      visitor unable to consent AND unable to refuse.
+    - **Both answer buttons are styled by one CSS rule on purpose.** A coloured Accept beside a
+      grey Reject is the specific pattern being fined. Never give one of them its own rule.
+    - **Tom's question about opted-out humans is answered, and the answer is two buckets.** *"do we
+      report them in a separate bucket... I don't think that we want to completely ignore them."*
+      Consent governs STORAGE, and storage is what de-duplication needs — not counting. A row with
+      no IP, no session id and no identifier needs no cookie to be lawful or useful. So
+      `log/lang-log-stats.sh` now reports **visitors** (consented, deduplicated — every existing
+      section, unchanged) and **visits** (everybody else, one row per page load, its own section),
+      and never sums them. Summing would turn every count into a mixture of people and page loads
+      and every percentage into a number with no meaning.
+    - **The bucket marker is a TRAILING column emitted only for `visit` rows**, so the entire
+      pre-existing log history stays byte-identical and every awk field index keeps its meaning.
+      Absence of the marker means a deduplicated row, which is what every old row is.
+    - **Still open on this task:** the privacy and terms pages themselves (blocked on the human
+      decisions in `dev/privacy-and-terms-draft.md` §1), and translating the ten new
+      `consent_*`/`privacy_link`/`terms_link` keys — which exist in English precisely so they ride
+      the Task 251 sprint rather than paying for one of their own.
   - **What triggers it is ePrivacy Article 5(3), not GDPR**, and its test is *strictly necessary for
     a service the user explicitly requested* — applied **per purpose**, and to `localStorage` as
     much as to cookies. Consent under it means opt-IN, before the storage; the existing `ec_nolog`

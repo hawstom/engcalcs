@@ -124,8 +124,14 @@ EngCalcs._openQueueDB = function () {
 	});
 };
 
+// ROADMAP Task 286: the queue is analytics storage on the visitor's device, so it is written only
+// for a visitor who agreed to it. Refusing costs the offline retry, not the count -- a live beacon
+// still reaches the server, where it lands undeduplicated in the 'visit' bucket.
 EngCalcs._queueBeacon = function (url, params) {
 	'use strict';
+	if (typeof this.analyticsConsented === 'function' && !this.analyticsConsented()) {
+		return Promise.resolve();
+	}
 	return this._openQueueDB().then(function (db) {
 		return new Promise(function (resolve, reject) {
 			var tx = db.transaction(EngCalcs._QUEUE_STORE, 'readwrite');
@@ -209,6 +215,17 @@ EngCalcs.flushQueue = function () {
 	'use strict';
 	if (!window.fetch) return;
 	var self = this;
+	// Task 286: withdrawing consent has to actually remove what consent was covering, or "you can
+	// withdraw at any time" is a sentence rather than a mechanism. Anything queued while the
+	// visitor was consenting is deleted here rather than delivered.
+	if (typeof this.analyticsConsented === 'function' && !this.analyticsConsented()) {
+		this._openQueueDB().then(function (db) {
+			return self._readQueue(db).then(function (records) {
+				records.forEach(function (record) { self._deleteQueueRecord(db, record.id); });
+			});
+		}).catch(function () {});
+		return;
+	}
 	this._openQueueDB().then(function (db) {
 		return self._readQueue(db).then(function (records) {
 			return Promise.all(records.map(function (record) {
