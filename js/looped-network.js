@@ -722,7 +722,7 @@ var EngCalcs = EngCalcs || {};
 			// Open/closed state of the settings panel's collapsible sections, persisted so a user
 			// who lives in Default inputs is not re-opening it every session. Default inputs starts
 			// OPEN because it is the mode-switching section above; the other two are set-once.
-			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, computation: false, files: false, thisCalculator: false },
+			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, computation: false, files: false },
 			// Map units -- the same units the drawing is in, so this number scales with the map and
 			// means 20 ft or 20 m according to the Length/Map declaration (Tom, 2026-08-09: map
 			// coordinates "follow length and elevation"; it is a size on the drawing, not a font
@@ -6935,6 +6935,17 @@ var EngCalcs = EngCalcs || {};
 			p.textContent = text;
 			target.appendChild(p);
 		}
+		// A group heading with no collapse. Task 289: the two scope markers ("Project settings",
+		// "Calculator settings") are labels over what follows, not sections in their own right --
+		// they have no body to hide, and a disclosure triangle on something that cannot disclose
+		// would be a lie about the control. Same weight and spacing as a section head so the panel
+		// reads as one hierarchy.
+		function groupHeading(titleText) {
+			var h = document.createElement('div');
+			h.style.cssText = 'margin-top:8px;font-weight:bold';
+			h.textContent = titleText;
+			fields.appendChild(h);
+		}
 		function section(key, titleText) {
 			var head = document.createElement('button'), body = document.createElement('div');
 			// A real <button>, not a styled <div>: keyboard focus and Enter/Space activation come
@@ -7001,7 +7012,7 @@ var EngCalcs = EngCalcs || {};
 		// "there are no browser units, only project units"), and nothing said so on screen.
 		// The one thing not carried is the map viewport: zoom and pan re-fit on load. That is not
 		// a setting and is not in this panel, so it does not qualify the claim.
-		note(fields, pc.lpn_settings_scope_note || 'Saved with this project.');
+		groupHeading(pc.lpn_settings_scope_note || 'Project settings');
 		// ---- 1. ID prefixes ----
 		var idBody = section('idPrefixes', pc.lpn_settings_id_prefixes || 'ID prefixes');
 		// Reuses the existing Add-tool labels (Junction/Reservoir/Pipe/Pump) per CLAUDE.md's
@@ -7266,19 +7277,22 @@ var EngCalcs = EngCalcs || {};
 		// close enough -- and "solver" is jargon for the internals, while what the user is choosing
 		// is the arithmetic they get.
 		var compBody = section('computation', pc.lpn_settings_computation || 'Computation');
-		// ---- browser-scoped group (Task 289) ----
-		// Created HERE, before `tail`, purely for DOM order: section() appends to `fields` as it is
-		// called, and the actions in `tail` must stay last. Its rows are filled in further down.
-		// A group of its own, with its own scope note, because the note at the top of this panel
-		// ("These settings are saved in this project") would otherwise be lying about the control
-		// directly beneath it -- which is exactly the ambiguity Tom spotted before it was built.
-		var browserBody = section('thisCalculator', pc.lpn_settings_this_calculator || 'This calculator');
-		note(browserBody, pc.lpn_settings_browser_scope_note || 'Saved in this calculator, for every project.');
+		// ---- Calculator settings (Task 289) ----
+		// Built HERE, before `tail`, purely for DOM order: headings and sections append to `fields`
+		// as they are called, and the actions in `tail` must stay last.
+		//
+		// TWO WORDS, NOT A SENTENCE, and no collapsible wrapper (Tom, 2026-08-12, correcting the
+		// first build). Scope is carried by two parallel headings -- "Project settings" above,
+		// "Calculator settings" here -- which say the same thing the prose notes said in a quarter
+		// of the space and let the reader compare them at a glance. The old wording buried the
+		// contrast in two sentences that had to be read to be told apart, and wrapped a single
+		// checkbox in a section that could collapse to hide one row.
+		groupHeading(pc.lpn_settings_scope_calculator || 'Calculator settings');
 		var titlesInput = document.createElement('input');
 		titlesInput.type = 'checkbox';
 		titlesInput.checked = pageTitlesShown();
 		titlesInput.addEventListener('change', function () { setPageTitlesShown(titlesInput.checked); });
-		row(browserBody, pc.lpn_settings_show_titles || 'Show page titles', titlesInput, pc.lpn_settings_show_titles_tip);
+		row(fields, pc.lpn_settings_show_titles || 'Show page titles', titlesInput, pc.lpn_settings_show_titles_tip);
 		// The panel's foot: ACTIONS only, no settings. Headingless on purpose -- a heading over
 		// buttons that cannot collapse would behave unlike every other heading in this panel.
 		var tail = document.createElement('div');

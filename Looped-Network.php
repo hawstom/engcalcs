@@ -509,8 +509,7 @@ EngCalcs.pageConfig = {
       // stays in lib/lang.ec.en.php so restoring the control is one line here and one there. ?>
 
 	lpn_settings_computation: <?=json_encode($ec_lang['lpn_settings_computation'])?>,
-	lpn_settings_this_calculator: <?=json_encode($ec_lang['lpn_settings_this_calculator'])?>,
-	lpn_settings_browser_scope_note: <?=json_encode($ec_lang['lpn_settings_browser_scope_note'])?>,
+	lpn_settings_scope_calculator: <?=json_encode($ec_lang['lpn_settings_scope_calculator'])?>,
 	lpn_settings_show_titles: <?=json_encode($ec_lang['lpn_settings_show_titles'])?>,
 	lpn_settings_show_titles_tip: <?=json_encode($ec_lang['lpn_settings_show_titles_tip'])?>,
 	lpn_settings_tolerance: <?=json_encode($ec_lang['lpn_settings_tolerance'])?>,

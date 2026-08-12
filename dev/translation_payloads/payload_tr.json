@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "tr",
-        "expected_key_count": 854,
-        "delta_key_count": 61,
+        "expected_key_count": 853,
+        "delta_key_count": 60,
         "exempt_key_count": 17,
         "exempt_keys": [
             "calc_units_us",
@@ -392,8 +392,7 @@
         "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.",
         "lpn_inp_drop_dangling": "These pipes name a junction that is not in the file, so they were left out.",
         "lpn_inp_drop_units": "The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before you use the answers.",
-        "lpn_settings_browser_scope_note": "Saved in this calculator, for every project.",
-        "lpn_settings_this_calculator": "This calculator",
+        "lpn_settings_scope_calculator": "Calculator settings",
         "lpn_settings_show_titles": "Show page titles",
         "lpn_settings_show_titles_tip": "Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.",
         "lpn_settings_computation": "Computation",
@@ -455,8 +454,7 @@
         "lpn_inp_drop_backdrop": "This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.",
         "lpn_inp_drop_dangling": "These pipes name a junction that is not in the file, so they were left out.",
         "lpn_inp_drop_units": "The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before you use the answers.",
-        "lpn_settings_browser_scope_note": "Saved in this calculator, for every project.",
-        "lpn_settings_this_calculator": "This calculator",
+        "lpn_settings_scope_calculator": "Calculator settings",
         "lpn_settings_show_titles": "Show page titles",
         "lpn_settings_show_titles_tip": "Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.",
         "lpn_settings_computation": "Computation",
@@ -1283,30 +1281,14 @@
                 }
             }
         },
-        "lpn_settings_browser_scope_note": {
+        "lpn_settings_scope_calculator": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
                     "key": "lpn_settings_scope_note",
                     "value": "Bu projeyle birlikte kaydedilir.",
-                    "english": "These settings are saved in this project."
-                },
-                "next_translated": {
-                    "key": "lpn_settings_id_prefixes",
-                    "value": "Kimlik önekleri",
-                    "english": "ID prefixes"
-                }
-            }
-        },
-        "lpn_settings_this_calculator": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_settings_scope_note",
-                    "value": "Bu projeyle birlikte kaydedilir.",
-                    "english": "These settings are saved in this project."
+                    "english": "Project settings"
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1322,7 +1304,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_scope_note",
                     "value": "Bu projeyle birlikte kaydedilir.",
-                    "english": "These settings are saved in this project."
+                    "english": "Project settings"
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",
@@ -1338,7 +1320,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_scope_note",
                     "value": "Bu projeyle birlikte kaydedilir.",
-                    "english": "These settings are saved in this project."
+                    "english": "Project settings"
                 },
                 "next_translated": {
                     "key": "lpn_settings_id_prefixes",

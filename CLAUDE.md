@@ -310,6 +310,41 @@ They compose — a string may take an English fix *and* an intent. Worked: "Map 
 had two valid parses, so the English was fixed (→ "Map appearance"); "Zoom to fit" reads fine to an
 English user, so the English stayed and an intent carries the synonyms.
 
+### May a `_syn` entry be a fragment? Yes — and which shape depends on what is wrong (Tom, 2026-08-12)
+
+Tom asked whether `_syn` entries must carry the whole string plus synonyms, or may be fragmentary
+for efficiency. **Fragments are correct and already the norm** — the word-bank shape above
+(`Text, Label, Temporary Text…`) is a fragment. One test decides which shape a label needs:
+
+| What is unclear | Shape | Why |
+|---|---|---|
+| A **word** — one term is ambiguous, jargon, or a polysemy trap | **Fragment.** A word bank of alternates for that word alone. | The translator can already parse the sentence; they are stuck on one slot. Repeating the rest is noise they must read past. |
+| The **structure** — the words are individually plain but relate to each other in more than one way | **Whole string, rephrased.** | Alternates for one word cannot fix a parse. "Map display and sizes" needed the entire phrase respelled, because nothing was wrong with any single word in it. |
+
+So: *fragment when the trouble is a word; whole string when the trouble is the shape of the
+sentence.* Both still obey the substitution test — every phrase offered must be able to stand in
+the slot it replaces.
+
+### `gloss:` pointers vs repeated synonyms (Tom, 2026-08-12)
+
+**Prefer the pointer when nothing but the concept is left.** Tom: *"Gloss ref seems more efficient
+in the long run."* It is: one entry to maintain instead of the same gloss copied into four labels,
+and `glossary.json` can carry an `avoid` list that an inline parenthetical cannot.
+
+**The test, applied after trimming:** does this entry still carry a wording a translator cannot get
+from the glossary? If yes, keep both — the pointer *accompanies* the synonyms. If the entry was
+only `X (Y)` where Y is the concept gloss, the pointer is strictly better and the entry becomes the
+pointer alone. This is narrower than the retired Task 132 exception, which licensed trimming
+"wherever it duplicated a glossary concept" and took label-specific synonyms with it.
+
+**A pointer buys efficiency with a DEPENDENCY, so it is gated by a check.** A glossary term reaches
+an agent only if the key's prefix is wired in `prefixToTermNames()` — the trap that silently blinded
+`lpn` and `bpn` for months. An inline synonym always arrives; a pointer arrives only if three things
+line up. **Run `php dev/scripts/gloss_ref_check.php` (exit 0 required) before any sprint.** It
+verifies every `gloss:` names a real term AND that the term is wired to that key's prefix. Its first
+run found three pointers that had been delivering nothing: `mi_d50in`, `mtc_sgrock`, and
+`ip_notes_1_def` pointing at a `bisection` entry that did not exist.
+
 **Positive guidance beats negative guidance.** Tom, 2026-08-08: *"we do ourselves a disservice by
 relying on 'Avoid' instead of providing the correct intent."* An `avoid` list tells a translator
 which ditch to miss, not where the road is; a synonym set lets them just translate. Reach for
@@ -524,6 +559,9 @@ When translating a new calculator's keys into all 26 non-English languages, **sp
    propose a rewrite."** Falsification, not review. Findings go to
    `dev/english-friction/<sprint>.json`; route each one with the English/intent/glossary rule above.
    **`php dev/scripts/friction_check.php --sprint=<id>` must exit 0 before the sprint launches.**
+0b. **`php dev/scripts/gloss_ref_check.php` must exit 0.** Every `gloss:` pointer resolves to a
+   real glossary term that is actually wired to its key's prefix. A pointer that does not resolve is
+   worse than no pointer — the synonyms it replaced are gone and nothing took their place.
 1. Regenerate payloads so the delta count reflects the *current* lang files: `wsl -e php /var/www/cnm/public_html/hawsedc/engcalcs/dev/scripts/generate_translation_payloads.php`. This is the orchestrating AI's job, never the user's — the user must never have to remember to call for it. **Enforcement:** the launcher MUST run `generate_translation_payloads.php --check` immediately before spawning agents; it prints `FRESH`/`STALE` and exits non-zero if any payload is older than its inputs (English source, that lang file, glossary, the exempt-key list, the coverage declaration, or the generator itself). A non-zero exit is a hard stop — regenerate, then re-check — so a sprint can never launch on a stale delta.
 2. Verify `glossary.json` has `preferred_translation` populated for the calculator prefix's key terms, especially for anchor languages (es, fr, ru, ar). Check `translation_notes` for WMO-verified terms and terms with `$ec_lang_syn` framing requirements.
 3. State the delta count and which calculators are affected before asking for authorization. **Delta zero now means zero** (Task 161): keys that are *correctly* byte-identical to English — symbols, eponyms, brand names, per-language cognates — are listed in `dev/scripts/translation_exempt_keys.json` and are not counted, so you no longer hand-classify a residue before proposing. They *are* still reported when missing or blank. `generate_translation_payloads.php`, `lang_parity_check.php`, `translation_completion_matrix.php` and `lang_syntax_validate.php` all read that one list via `dev/scripts/exempt_keys.inc.php`, so a disagreement between those four counts is a bug, not a nuance. **Add a key there only when identical-to-English is permanently correct** — never to quiet a number you don't want to fix.

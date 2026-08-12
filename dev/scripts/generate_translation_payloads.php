@@ -39,6 +39,7 @@ const TARGET_LANGS = [
 ];
 
 require_once __DIR__ . '/exempt_keys.inc.php';
+require_once __DIR__ . '/prefix_terms.inc.php';
 require_once __DIR__ . '/coverage.inc.php';
 
 main($argv);
@@ -256,6 +257,10 @@ function runFreshnessCheck(array $opts): int
         // The coverage declaration changes what counts as delta just as surely as the
         // exempt list does, so editing it must make every payload stale.
         EC_COVERAGE_PATH, __DIR__ . '/coverage.inc.php',
+        // The prefix->terms map decides which glossary entries reach an agent at all, so editing
+        // it changes every payload's content. It lives in its own include as of 2026-08-12 and
+        // therefore has to be named here -- __FILE__ alone stopped covering it that day.
+        __DIR__ . '/prefix_terms.inc.php',
         __FILE__,
     ];
     $commonNewest = 0;
@@ -541,63 +546,8 @@ function termIndexByName(array $terms): array
     return $index;
 }
 
-function prefixToTermNames(): array
-{
-    return [
-        'dw' => ['flow', 'velocity', 'head loss', 'friction factor', 'slope', 'laminar', 'transitional', 'turbulent'],
-        'hw' => ['flow', 'velocity', 'head loss', 'slope'],
-        'mpf' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope', 'shear stress', 'head', 'velocity head'],
-        'mphl' => ['flow', 'velocity', 'head loss', 'friction loss', 'minor loss', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope'],
-        'mtc' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope'],
-        'mi' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope', 'irregular channel'],
-        'wfs' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
-        'wfi' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
-        'ws' => ['flow', 'weir', 'head', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
-        'wi' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient', 'irregular channel'],
-        'or' => ['flow', 'orifice', 'discharge coefficient', 'head', 'headwater elevation', 'tailwater elevation', 'crown'],
-        'odt' => ['orifice', 'discharge coefficient', 'headwater elevation', 'tailwater elevation', 'crown'],
-        'irr' => ['flow', 'weir', 'orifice', 'seepage', 'conveyance efficiency', 'check structure'],
-        'ds' => ['flow', 'application rate', 'distribution uniformity', 'emitter'],
-        'cs' => ['flow', 'conveyance efficiency', 'seepage'],
-        'mhp' => ['flow', 'penstock', 'gross head', 'net head', 'plant efficiency', 'head loss', 'run-of-river', 'headworks', 'junction loss', 'minor loss'],
-        'pd' => ['flow', 'penstock', 'gross head', 'net head', 'head loss', 'friction factor'],
-        'rc' => ['flow', 'velocity', 'riprap', 'slope', 'rock chute', 'chute', 'unit discharge', 'median rock size', 'gradation', 'porosity', 'specific gravity', 'ponding', 'outlet apron', 'weir head', 'upstream', 'downstream', 'reach'],
-        'rrc' => ['flow', 'velocity', 'riprap', 'slope', 'rock chute', 'chute', 'unit discharge', 'median rock size', 'gradation', 'porosity', 'specific gravity', 'ponding', 'outlet apron', 'weir head', 'upstream', 'downstream', 'reach'],
-        // lpn/bpn were missing here until 2026-08-08, so both silently fell back to the
-        // three default terms and the network-concept entries seeded in Task 193 — every one
-        // of them carrying an 'avoid' array — never reached a translation agent.
-        // Suite chrome, not a calculator -- but it owns the Restore-defaults button, so it needs
-        // the concept too. Without an entry here it silently falls back to the default three.
-        'calc' => ['default (setting)', 'flow', 'velocity', 'slope'],
-        // 'menu' and 'about' were missing here until 2026-08-09 (Task 244), the same silent
-        // fallback that bit lpn/bpn above: both own the 'libre software' concept -- the navbar
-        // item and the About page license section -- and without an entry here the glossary
-        // term, including its 'avoid' guards, would never have reached a translation agent.
-        'menu' => ['libre software'],
-        'about' => ['libre software'],
-        // Suite chrome again, and the same silent-fallback trap: the Task 286 consent banner owns
-        // 'count', whose wrong senses (mattering, relying, the noble title) would each turn a
-        // request for permission into something else, and 'cookie', where the food is the literal
-        // meaning of the English word. Without an entry here both fall back to flow/velocity/slope.
-        'consent' => ['count (tally)', 'cookie (browser storage)', 'log (record)'],
-        'privacy' => ['cookie (browser storage)', 'log (record)'],
-        'terms' => ['cookie (browser storage)'],
-        'lpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
-            'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
-            'supply curve', 'looped network', 'branched network', 'pipe line', 'pressure rating',
-            'pressure reduction', 'energy grade line', 'Manning roughness', 'friction factor',
-            'draw (a diagram)', 'junction', 'reservoir', 'node', 'link', 'vertex',
-            'background image', 'pump curve', 'project (saved network)', 'scenario',
-            'zoom to extents', 'default (setting)', 'upstream', 'downstream'],
-        'bpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
-            'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
-            'supply curve', 'branched network', 'branch', 'pipe line', 'pressure rating',
-            'pressure reduction', 'energy grade line', 'Manning roughness', 'friction factor',
-            'junction', 'reservoir', 'node', 'link', 'default (setting)', 'upstream', 'downstream'],
-        'ip' => ['flow', 'velocity', 'head loss', 'emitter', 'distribution uniformity', 'low-quarter distribution uniformity', 'application rate', 'lateral', 'mainline', 'reach', 'velocity head', 'friction loss', 'minor loss', 'energy grade line', 'upstream', 'downstream'],
-    ];
-}
-
+// prefixToTermNames() lives in prefix_terms.inc.php, required at the top of this file, so
+// gloss_ref_check.php can read the same map instead of keeping a copy that could drift.
 function buildPrefixGlossary(array $activePrefixes, array $termIndex, array $prefixMap): array
 {
     $prefixGlossary = [];

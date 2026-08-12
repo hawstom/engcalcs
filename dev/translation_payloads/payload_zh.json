@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 854,
-        "delta_key_count": 287,
+        "expected_key_count": 853,
+        "delta_key_count": 286,
         "exempt_key_count": 11,
         "exempt_keys": [
             "calc_units_us",
@@ -577,9 +577,8 @@
         "lpn_backdrop_coords_prompt": "Type the X,Y that point should move to",
         "lpn_backdrop_continue": "Continue",
         "lpn_tool_settings": "Settings",
-        "lpn_settings_scope_note": "These settings are saved in this project.",
-        "lpn_settings_browser_scope_note": "Saved in this calculator, for every project.",
-        "lpn_settings_this_calculator": "This calculator",
+        "lpn_settings_scope_note": "Project settings",
+        "lpn_settings_scope_calculator": "Calculator settings",
         "lpn_settings_show_titles": "Show page titles",
         "lpn_settings_show_titles_tip": "Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.",
         "lpn_settings_id_prefixes": "ID prefixes",
@@ -866,9 +865,8 @@
         "lpn_backdrop_coords_prompt": "Type the X,Y that point should move to",
         "lpn_backdrop_continue": "Continue",
         "lpn_tool_settings": "Settings",
-        "lpn_settings_scope_note": "These settings are saved in this project.",
-        "lpn_settings_browser_scope_note": "Saved in this calculator, for every project.",
-        "lpn_settings_this_calculator": "This calculator",
+        "lpn_settings_scope_note": "Project settings",
+        "lpn_settings_scope_calculator": "Calculator settings",
         "lpn_settings_show_titles": "Show page titles",
         "lpn_settings_show_titles_tip": "Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.",
         "lpn_settings_id_prefixes": "ID prefixes",
@@ -3869,19 +3867,7 @@
                 "next_translated": null
             }
         },
-        "lpn_settings_browser_scope_note": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_main_desc",
-                    "value": "在地图上绘制的环状管网的压力与流量",
-                    "english": "Pressure and Flow in a Looped Pipe Network You Draw on a Map"
-                },
-                "next_translated": null
-            }
-        },
-        "lpn_settings_this_calculator": {
+        "lpn_settings_scope_calculator": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

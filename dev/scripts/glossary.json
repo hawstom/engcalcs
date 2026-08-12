@@ -3344,6 +3344,19 @@
             ],
             "translations": {},
             "translation_notes": "Created 2026-08-12 at Tom's suggestion: *\"There must be a better way to help translate 'logging' (recording) than to repeat that synonym in several _syn keys. Isn't that what our glossary is for?\"* Exactly right, and this entry is the answer — the CONCEPT gloss belongs here once, not repeated in four labels. Note the boundary, which is easy to get wrong in the other direction: this replaces the repeated '(recording)' gloss, and NOT a label's own alternate wordings. See CLAUDE.md's routing rule and the retirement of the Task 132 trimming exception — the left-of-pipe is the payload, and a glossary pointer accompanies the synonyms rather than deleting them.\n\nTranslations empty on purpose, as with 'count (tally)' and 'cookie (browser storage)': every language has a settled ordinary verb for this, we have nothing attested, and inventing 26 would be judging other people's terminology. The sprint fills them via the mandatory write-back."
+        },
+        "bisection": {
+            "term": "bisection",
+            "symbol": "",
+            "context": "A numerical root-finding method: guess a value, see whether the answer comes out too high or too low, halve the remaining interval, and repeat until it converges. Named in ip_notes_1_def, describing how the Irrigation Pressure calculator adjusts its guessed far-end pressure until the computed supply pressure matches the entered one. Use whatever your language calls the METHOD in numerical analysis; every language that teaches engineering has one.",
+            "avoid": [
+                "the geometric sense — cutting a line, an angle or a shape into two equal parts. This is the everyday meaning of the word and the failure mode to expect",
+                "the biological sense — a cell or organism dividing in two",
+                "rendering it as simply 'halving' or 'dividing in two', which names the step and loses the fact that it is an iterative solving method converging on an answer",
+                "borrowing the English word where a settled numerical-analysis term exists"
+            ],
+            "translations": {},
+            "translation_notes": "Created 2026-08-12. Found by dev/scripts/gloss_ref_check.php on its very first run: ip_notes_1_def had carried `gloss: bisection` since it was written, pointing at a term that did not exist, so that pointer had been delivering nothing to every ip_ translation agent. Exactly the silent failure the check was built for, and a good argument for the check.\n\nTranslations empty on purpose, like the other concepts seeded this way — the sprint fills them and the mandatory write-back records what each language chose."
         }
     }
 }
