@@ -76,7 +76,7 @@ function solverControlHtml($onclick, $units = 'flow_channel')
     $family = is_string($units) ? $units : '';
     $units = ecUnitOptions($units);
     $html = "\n" . '<span class="ec-solverline d-print-none">'
-        . '<button type="button" onclick="' . $onclick . '">' . $ec_lang['mpf_solve_button'] . '</button> '
+        . '<button type="button" onclick="' . $onclick . '">' . $ec_lang['mpf_solve_btn'] . '</button> '
         . $ec_lang['mpf_solve_for_flow'] . ' '
         . '<input class="input" type="number" step="any" id="solver_q" value="1.0" />'
         . ' <select id="solver_qu" data-family="' . htmlspecialchars($family) . '" onchange="EngCalcs.submitForm()">';

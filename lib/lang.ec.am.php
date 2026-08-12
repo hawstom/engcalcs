@@ -175,7 +175,7 @@ $ec_lang['mpf_note_1']='<dl><dt>ይህ <em>ወሰን የሌለው</em> ቧንቧ
 $ec_lang['mpf_sewer_ref']='<dl><dt>የፍሳሽ ማስወገጃ (sanitary sewer) እየነደፉ ነው?</dt><dd>ከ4 እስከ 96 ኢንች (ከ100 እስከ 2400 ሚሜ) ቧንቧ ጋር በ m/m፣ mm/m እና በመቶኛ የተሰጠውን <a target="_blank" href="/sewslope.php">አነስተኛ የፍሳሽ ማስወገጃ ቁልቁለት ሰንጠረዦችን</a>፣ እና የ<a target="_blank" href="/peakfact.php">እጅግ ዝቅተኛ ፍሰቶች ጫፍ ምክንያቶች</a> ጥናትን ይመልከቱ። ሁለቱም በእንግሊዝኛ ብቻ የቀረቡ ማጣቀሻ ሰነዶች ናቸው።</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='አዎንታዊ ዒላማ Q ያስገቡ።';
 $ec_lang['mpf_solver_no_solution']='ውጤት የለም፦ Q ከቧንቧው አቅም ይበልጣል y/d0 = 93.8% ላይ (Qmax = {qmax} በተመረጡት አሃዶች)።';
-$ec_lang['mpf_solve_button']='ፍታ';
+$ec_lang['mpf_solve_btn']='ፍታ';
 $ec_lang['mpf_solve_for_flow']='ለፍሰት, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning የቧንቧ ሄድ ኪሳራ';

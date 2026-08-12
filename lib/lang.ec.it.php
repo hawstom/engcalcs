@@ -174,7 +174,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Questa è la portata e la profondità all\'inter
 $ec_lang['mpf_sewer_ref']='<dl><dt>Stai progettando una fognatura nera?</dt><dd>Consulta le <a target="_blank" href="/sewslope.php">tabelle delle pendenze minime delle fognature</a> per tubazioni da 4 a 96 pollici (100 a 2400 mm), espresse in m/m, mm/m e percentuale, e lo studio sui <a target="_blank" href="/peakfact.php">fattori di punta per portate molto basse</a>. Entrambi sono documenti di riferimento solo in inglese.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Inserire un valore positivo per Q.';
 $ec_lang['mpf_solver_no_solution']='Nessuna soluzione: Q supera la capacità della tubazione a y/d0 = 93.8% (Qmax = {qmax} nelle unità selezionate).';
-$ec_lang['mpf_solve_button']='Calcola';
+$ec_lang['mpf_solve_btn']='Calcola';
 $ec_lang['mpf_solve_for_flow']='per portata, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Perdita di carico in tubazione Manning';

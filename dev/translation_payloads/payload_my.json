@@ -581,7 +581,7 @@
         "lpn_backdrop_coords_prompt": "Type the X,Y that point should move to",
         "lpn_backdrop_continue": "Continue",
         "lpn_tool_settings": "Settings",
-        "lpn_settings_scope_note": "Project settings",
+        "lpn_settings_scope_project": "Project settings",
         "lpn_settings_scope_calculator": "Calculator settings",
         "lpn_settings_show_titles": "Show page titles",
         "lpn_settings_show_titles_tip": "Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.",
@@ -869,7 +869,7 @@
         "lpn_backdrop_coords_prompt": "Type the X,Y that point should move to",
         "lpn_backdrop_continue": "Continue",
         "lpn_tool_settings": "Settings",
-        "lpn_settings_scope_note": "Project settings",
+        "lpn_settings_scope_project": "Project settings",
         "lpn_settings_scope_calculator": "Calculator settings",
         "lpn_settings_show_titles": "Show page titles",
         "lpn_settings_show_titles_tip": "Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.",
@@ -3859,7 +3859,7 @@
                 "next_translated": null
             }
         },
-        "lpn_settings_scope_note": {
+        "lpn_settings_scope_project": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

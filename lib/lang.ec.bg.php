@@ -175,7 +175,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Това е водното количество 
 $ec_lang['mpf_sewer_ref']='<dl><dt>Проектирате битова канализация?</dt><dd>Вижте таблиците за <a target="_blank" href="/sewslope.php">минимален наклон на канализационни тръби</a> за тръби от 4 до 96 инча (100 до 2400 мм), дадени в м/м, мм/м и проценти, както и изследването за <a target="_blank" href="/peakfact.php">коефициенти на върхово натоварване при много малки водни количества</a>. И двете са справочни документи само на английски език.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Въведете положителна целева стойност на Q.';
 $ec_lang['mpf_solver_no_solution']='Няма решение: Q надвишава капацитета на тръбата при y/d0 = 93.8% (Qmax = {qmax} в избраните мерни единици).';
-$ec_lang['mpf_solve_button']='Изчисли';
+$ec_lang['mpf_solve_btn']='Изчисли';
 $ec_lang['mpf_solve_for_flow']='за водно количество, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Загуба на напор в тръбопровод по Манинг';

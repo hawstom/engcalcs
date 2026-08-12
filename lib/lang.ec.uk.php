@@ -175,7 +175,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Це витрата і глибина всере
 $ec_lang['mpf_sewer_ref']='<dl><dt>Проєктуєте побутову каналізацію?</dt><dd>Дивіться <a target="_blank" href="/sewslope.php">таблиці мінімального ухилу каналізаційної труби</a> для труб від 4 до 96 дюймів (від 100 до 2400 мм) у м/м, мм/м і відсотках, а також дослідження <a target="_blank" href="/peakfact.php">коефіцієнтів пікового навантаження для дуже малих витрат</a>. Обидва документи є довідковими і доступні лише англійською мовою.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Введіть додатне цільове значення Q.';
 $ec_lang['mpf_solver_no_solution']='Рішення відсутнє: Q перевищує пропускну здатність труби при y/d0 = 93.8% (Qmax = {qmax} у вибраних одиницях).';
-$ec_lang['mpf_solve_button']='Розрахувати';
+$ec_lang['mpf_solve_btn']='Розрахувати';
 $ec_lang['mpf_solve_for_flow']='для витрати, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning — Втрати напору в трубі';

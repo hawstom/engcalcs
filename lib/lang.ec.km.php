@@ -175,7 +175,7 @@ $ec_lang['mpf_note_1']='<dl><dt>នេះជាការហូរ និងជ�
 $ec_lang['mpf_sewer_ref']='<dl><dt>តើអ្នកកំពុងរចនាបំពង់លូទឹកកខ្វក់ (sanitary sewer)?</dt><dd>សូមមើល <a target="_blank" href="/sewslope.php">តារាងជម្រាលអប្បបរមាបំពង់លូ</a> សម្រាប់បំពង់ទំហំ 4 ដល់ 96 អ៊ិន្ឈ៍ (100 ដល់ 2400 mm) ដែលបានផ្ដល់ជា m/m, mm/m និងភាគរយ ព្រមទាំង <a target="_blank" href="/peakfact.php">ការសិក្សាអំពីមេគុណកំពូល (peaking factors) សម្រាប់លំហូរទាបខ្លាំង</a>។ ឯកសារយោងទាំងពីរនេះមានតែជាភាសាអង់គ្លេសប៉ុណ្ណោះ។</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='សូមបញ្ចូល Q គោលដៅជាចំនួនវិជ្ជមាន។';
 $ec_lang['mpf_solver_no_solution']='គ្មានដំណោះស្រាយ៖ Q លើសសមត្ថភាពបំពង់នៅ y/d0 = 93.8% (Qmax = {qmax} គិតជាឯកតាដែលបានជ្រើសរើស)។';
-$ec_lang['mpf_solve_button']='ដោះស្រាយ';
+$ec_lang['mpf_solve_btn']='ដោះស្រាយ';
 $ec_lang['mpf_solve_for_flow']='សម្រាប់លំហូរ, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning ការបាត់បង់ទំនាប់ក្នុងបំពង់';

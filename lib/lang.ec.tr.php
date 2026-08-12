@@ -177,7 +177,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Bu, <em>sonsuz uzunluktaki</em> bir borunun içi
 $ec_lang['mpf_sewer_ref']='<dl><dt>Atıksu kanalizasyon hattı mı tasarlıyorsunuz?</dt><dd>4 ila 96 inç (100 ila 2400 mm) arası borular için m/m, mm/m ve yüzde cinsinden verilen <a target="_blank" href="/sewslope.php">minimum kanalizasyon eğim tablolarına</a> ve çok düşük debiler için <a target="_blank" href="/peakfact.php">tepe debi faktörleri</a> çalışmasına bakın. Her ikisi de yalnızca İngilizce referans belgeleridir.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Pozitif bir hedef Q girin.';
 $ec_lang['mpf_solver_no_solution']='Çözüm yok: Q, y/d0 = %93,8\'de boru kapasitesini aşıyor (Qmax = {qmax}, seçilen birimlerde).';
-$ec_lang['mpf_solve_button']='Hesapla';
+$ec_lang['mpf_solve_btn']='Hesapla';
 $ec_lang['mpf_solve_for_flow']='debi için, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Boru Yük Kaybı';
@@ -739,7 +739,7 @@ $ec_lang['lpn_backdrop_target_coords']='Yazılan koordinatlar';
 $ec_lang['lpn_backdrop_coords_prompt']='O noktanın taşınacağı X,Y\'yi yazın';
 $ec_lang['lpn_backdrop_continue']='Devam et';
 $ec_lang['lpn_tool_settings']='Ayarlar';
-$ec_lang['lpn_settings_scope_note']='Bu projeyle birlikte kaydedilir.';
+$ec_lang['lpn_settings_scope_project']='Bu projeyle birlikte kaydedilir.';
 $ec_lang['lpn_settings_id_prefixes']='Kimlik önekleri';
 $ec_lang['lpn_settings_defaults']='Başlangıç değerleri';
 $ec_lang['lpn_settings_defaults_note']='Bundan sonra oluşturacağınız öğeler için kullanılır. Mevcut öğeler değişmez.';

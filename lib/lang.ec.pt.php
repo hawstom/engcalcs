@@ -177,7 +177,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Este é o escoamento e a profundidade no interio
 $ec_lang['mpf_sewer_ref']='<dl><dt>Projetando um esgoto sanitário?</dt><dd>Veja as <a target="_blank" href="/sewslope.php">tabelas de declividade mínima de esgoto</a> para tubulações de 4 a 96 polegadas (100 a 2400 mm), dadas em m/m, mm/m e porcentagem, e o estudo de <a target="_blank" href="/peakfact.php">fatores de pico para vazões muito baixas</a>. Ambos são documentos de referência somente em inglês.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Informe um Q alvo positivo.';
 $ec_lang['mpf_solver_no_solution']='Sem solução: Q excede a capacidade da tubulação em y/d0 = 93.8% (Qmax = {qmax} nas unidades selecionadas).';
-$ec_lang['mpf_solve_button']='Calcular';
+$ec_lang['mpf_solve_btn']='Calcular';
 $ec_lang['mpf_solve_for_flow']='para vazão, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Perda de carga em tubulação por Manning';
@@ -739,7 +739,7 @@ $ec_lang['lpn_backdrop_target_coords']='Coordenadas digitadas';
 $ec_lang['lpn_backdrop_coords_prompt']='Digite o X,Y para onde esse ponto deve ir';
 $ec_lang['lpn_backdrop_continue']='Continuar';
 $ec_lang['lpn_tool_settings']='Configurações';
-$ec_lang['lpn_settings_scope_note']='Salvo com este projeto.';
+$ec_lang['lpn_settings_scope_project']='Salvo com este projeto.';
 $ec_lang['lpn_settings_id_prefixes']='Prefixos de ID';
 $ec_lang['lpn_settings_defaults']='Valores iniciais';
 $ec_lang['lpn_settings_defaults_note']='Usadas para os elementos que você criar a partir de agora. Os elementos existentes não são alterados.';

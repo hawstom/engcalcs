@@ -685,6 +685,31 @@ Update via `php dev/scripts/update_quality_score.php <lang> <quality>`, never by
 file. When a language's tier changes (new native review lands, a category-level audit completes),
 update the score in the same session as the finding, not as a deferred follow-up.
 
+## Renaming a language key, and finding key debt (Tom, 2026-08-12)
+
+Tom does not review code directly and has said he will not. So key debt has to be found by a tool
+and paid by a command, not by anybody reading diffs.
+
+- **Never rename a key by hand.** `php dev/scripts/rename_lang_key.php old new --apply` does all 27
+  language files, `$ec_lang_syn`, every page and JS call site, the drift manifest, the exempt list
+  and the coverage declaration in one pass. Dry run by default. It refuses if the new name already
+  exists — a rename must never quietly merge two keys.
+  **Why this matters more than it sounds:** a hand rename is ~40 edits and every miss fails
+  SILENTLY — a missed lang file leaves an orphan, a missed call site renders an empty string, a
+  missed manifest entry makes the drift detector report a removal and an addition for one unchanged
+  string. That expense is what made leaving a bad name the rational choice, and it is why bad names
+  accumulated. It does **not** rewrite `dev/english-friction/*.json`, which is a dated record of
+  what was decided at the time; it reports those hits instead.
+- **`php dev/scripts/key_hygiene_check.php`** reports keys rendered by nothing (each costs 27
+  translated strings, forever) and suffix names that drifted from their siblings. Advisory, exits 0;
+  `--strict` to fail. Run it when a calculator's strings change substantially.
+- **A key rendered by nothing is not automatically debt.** It may be parked for a returning feature
+  (`lpn_settings_emitter_exponent`, Task 191) or it may be content a page lost (`rc_notes_*`, Task
+  290). Decide per key; never bulk-delete.
+- **Name new keys parallel to their siblings.** `lpn_settings_scope_project` /
+  `lpn_settings_scope_calculator`, not `..._scope_note` / `..._scope_calculator`. Non-parallel names
+  cost every future reader a lookup, which is Tom's own objection and a correct one.
+
 ## Unit Sets
 
 A field declares a **named unit family**, never an inline array (ROADMAP Task 162):

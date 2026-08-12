@@ -1286,7 +1286,7 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_scope_note",
+                    "key": "lpn_settings_scope_project",
                     "value": "Bu projeyle birlikte kaydedilir.",
                     "english": "Project settings"
                 },
@@ -1302,7 +1302,7 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_scope_note",
+                    "key": "lpn_settings_scope_project",
                     "value": "Bu projeyle birlikte kaydedilir.",
                     "english": "Project settings"
                 },
@@ -1318,7 +1318,7 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_settings_scope_note",
+                    "key": "lpn_settings_scope_project",
                     "value": "Bu projeyle birlikte kaydedilir.",
                     "english": "Project settings"
                 },

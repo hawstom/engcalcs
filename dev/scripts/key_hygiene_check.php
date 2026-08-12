@@ -1,0 +1,151 @@
+<?php
+/**
+ * Reports language-key debt that nothing else can see: keys nothing renders, and suffix names
+ * that have drifted away from the convention their own siblings follow.
+ *
+ * Copyright 2009 Thomas Gail Haws
+ * Licensed under GNU GPL v3.0 or later
+ *
+ * WHY THIS EXISTS. Tom, 2026-08-12: *"I have not been reviewing code directly, and I am not going
+ * to review code directly, but I don't want to be building a maintenance debt due to neglected
+ * review and refactoring. What can you offer me?"*
+ *
+ * This is half the offer; `rename_lang_key.php` is the other half. The two are a pair on purpose:
+ * this one FINDS the debt without anybody reading code, and that one makes PAYING it one command.
+ * Neither alone would have helped — the reason bad names survived was never that nobody noticed
+ * one, it was that fixing it meant a forty-edit sweep across 27 language files with every miss
+ * failing silently, so leaving it was the rational choice.
+ *
+ * ADVISORY BY DEFAULT (always exits 0). Both findings are judgement calls at the margin, and a
+ * check that blocks on a judgement call gets muted. `--strict` exits 1, for anyone who wants it in
+ * a gate.
+ *
+ * Usage:
+ *   php dev/scripts/key_hygiene_check.php
+ *   php dev/scripts/key_hygiene_check.php --strict
+ */
+const HYGIENE_LANG_FILE = __DIR__ . '/../../lib/lang.ec.en.php';
+
+$strict = in_array('--strict', $argv, true);
+
+$ec_lang = [];
+$ec_lang_syn = [];
+include HYGIENE_LANG_FILE;
+$keys = array_keys($ec_lang);
+
+$root = dirname(__DIR__, 2);
+$code = '';
+foreach (array_merge(glob($root . '/*.php'), glob($root . '/lib/*.php'), glob($root . '/js/*.js')) as $f) {
+    if (strpos($f, 'lang.ec.') !== false) continue;   // a lang file defining a key is not a use of it
+    $code .= "\n" . file_get_contents($f);
+}
+
+// ---------------------------------------------------------------------------------------------
+// 1. Keys nothing renders
+// ---------------------------------------------------------------------------------------------
+// A key can be used without its full name ever appearing: lib/Calculators.lib.php builds unit
+// labels as $ec_lang['u_' . $unit]. Any prefix assembled that way marks its whole family live,
+// because there is no way to tell from here which members the runtime will ask for. Detected
+// rather than hard-coded, so a second dynamic family cannot quietly produce 40 false positives.
+preg_match_all('/\[\s*[\'"]([a-z0-9_]+_)[\'"]\s*\./i', $code, $m);
+$dynamicPrefixes = array_values(array_unique($m[1]));
+
+$dead = [];
+foreach ($keys as $k) {
+    foreach ($dynamicPrefixes as $d) {
+        if (strpos($k, $d) === 0) continue 2;
+    }
+    if (!preg_match('/(?<![A-Za-z0-9_])' . preg_quote($k, '/') . '(?![A-Za-z0-9_])/', $code)) {
+        $dead[] = $k;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// 2. Suffix vocabulary that has drifted
+// ---------------------------------------------------------------------------------------------
+// Only groups where every member means the SAME thing, so a minority spelling is a stray rather
+// than a distinction.
+//
+// DELIBERATELY EXCLUDED, and this is the interesting part: heading/head/title. `_head` is the
+// hydraulic quantity in most of its 7 uses (lpn_field_head, mpf_head...), not a shortened
+// "heading" — flagging it would be a tool confidently renaming physics into typography. When a
+// group cannot be judged from the name alone, it does not belong in an automated check.
+// confirm/prompt is excluded for the same reason: a confirm asks yes-or-no, a prompt asks for a
+// value, and they are genuinely two things.
+//
+// TIGHTENED IMMEDIATELY AFTER THE FIRST RUN, which is the useful part of the story: the first
+// version flagged six keys and four were wrong. `_tip` is not a spelling preference in this suite,
+// it NAMES A DELIVERY MECHANISM -- an .ec-help/.ec-tip tooltip shipped through pageConfig, which
+// popup-tips-harness.js asserts on by that suffix. `lpn_empty_hint` is empty-state text painted on
+// the canvas; renaming it to `_tip` would be a tool confidently making a false claim about the UI.
+// And `contact_message` is the message the visitor writes, a noun, not a note to them.
+//
+// So the rule for adding a group here: every member must mean the same thing in EVERY key that
+// carries it. If judging that needs the value or the call site, it is not an automatable group.
+// Left to a human on purpose: tip/help/hint (points_data_help may well be a real stray),
+// heading/head/title (`_head` is usually hydraulic head), confirm/prompt (yes-or-no vs asking for
+// a value). Under-reporting beats a check people learn to ignore.
+$synonymGroups = [
+    ['btn', 'button'],
+    ['note', 'notice'],
+    ['desc', 'description'],
+    ['label', 'lbl'],
+];
+
+$strays = [];
+foreach ($synonymGroups as $group) {
+    $counts = [];
+    $members = [];
+    foreach ($group as $word) {
+        $hits = array_values(array_filter($keys, function ($k) use ($word) {
+            return (bool) preg_match('/(^|_)' . $word . '$/', $k);
+        }));
+        if ($hits) { $counts[$word] = count($hits); $members[$word] = $hits; }
+    }
+    if (count($counts) < 2) continue;
+    arsort($counts);
+    $dominant = array_key_first($counts);
+    foreach ($counts as $word => $n) {
+        if ($word === $dominant) continue;
+        foreach ($members[$word] as $k) {
+            $strays[] = [$k, $word, $dominant, $counts[$dominant]];
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------
+// Report
+// ---------------------------------------------------------------------------------------------
+printf("Language-key hygiene — %d English keys\n\n", count($keys));
+
+printf("1. RENDERED BY NOTHING: %d\n", count($dead));
+if ($dead) {
+    echo "   Each of these is maintained in 27 language files and displayed on no page. Deleting one\n";
+    echo "   retires 27 strings; keeping it means every future sprint translates it again.\n";
+    echo "   CHECK BEFORE DELETING: a key held deliberately for a feature that is coming back is a\n";
+    echo "   real thing here (lpn_settings_emitter_exponent is kept on purpose for Task 191).\n\n";
+    foreach ($dead as $k) { echo "   $k\n"; }
+}
+echo "\n";
+
+printf("2. SUFFIX DRIFT: %d key(s) spell a suffix differently from their siblings\n", count($strays));
+if ($strays) {
+    echo "   Not cosmetic. A reader guessing a key name guesses the common form, so a stray is a key\n";
+    echo "   that is hard to find and easy to duplicate by accident.\n";
+    echo "   Fix with: php dev/scripts/rename_lang_key.php <old> <new> --apply\n";
+    echo "   Only unambiguous groups are checked -- see the comment on \$synonymGroups for the ones\n";
+    echo "   deliberately left to a human, and why an automated rename would be wrong for them.\n\n";
+    foreach ($strays as [$k, $word, $dominant, $dn]) {
+        printf("   %-40s _%s  ->  _%s   (the suite uses _%s %d times)\n", $k, $word, $dominant, $dominant, $dn);
+    }
+}
+echo "\n";
+
+if (!$dead && !$strays) {
+    echo "Nothing to report.\n";
+    exit(0);
+}
+echo "Advisory: this check does not fail a build. Both findings are judgement calls at the margin,\n";
+echo "and a check that blocks on a judgement call is a check that gets muted. Pass --strict to\n";
+echo "exit non-zero.\n";
+exit($strict ? 1 : 0);

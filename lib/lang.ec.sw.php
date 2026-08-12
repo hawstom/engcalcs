@@ -175,7 +175,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Huu ni mtiririko na kina ndani ya bomba la <em>u
 $ec_lang['mpf_sewer_ref']='<dl><dt>Unabuni mfereji wa maji taka?</dt><dd>Angalia <a target="_blank" href="/sewslope.php">majedwali ya mteremko wa chini kabisa wa mfereji wa maji taka</a> kwa bomba la inchi 4 hadi 96 (mm 100 hadi 2400), yaliyotolewa katika m/m, mm/m na asilimia, na utafiti wa <a target="_blank" href="/peakfact.php">vigezo vya kilele kwa mtiririko mdogo sana</a>. Nyaraka zote mbili ni za marejeleo kwa Kiingereza pekee.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Weka Q lengwa chanya.';
 $ec_lang['mpf_solver_no_solution']='Hakuna suluhisho: Q inazidi uwezo wa bomba katika y/d0 = 93.8% (Qmax = {qmax} katika vitengo vilivyochaguliwa).';
-$ec_lang['mpf_solve_button']='Suluhisha';
+$ec_lang['mpf_solve_btn']='Suluhisha';
 $ec_lang['mpf_solve_for_flow']='kwa mtiririko, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Upotevu wa Kimo cha Bomba la Manning';

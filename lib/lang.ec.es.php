@@ -177,7 +177,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Este es el caudal (y la profundidad) dentro de u
 $ec_lang['mpf_sewer_ref']='<dl><dt>¿Está diseñando un alcantarillado sanitario?</dt><dd>Vea las <a target="_blank" href="/sewslope.php">tablas de pendiente mínima de alcantarillado</a> para tuberías de 4 a 96 pulgadas (100 a 2400 mm), expresadas en m/m, mm/m y porcentaje, y el estudio de <a target="_blank" href="/peakfact.php">factores pico para caudales muy bajos</a>. Ambos son documentos de referencia solo en inglés.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Ingrese un Q objetivo positivo.';
 $ec_lang['mpf_solver_no_solution']='Sin solución: Q excede la capacidad de la tubería en y/d0 = 93.8% (Qmax = {qmax} en las unidades seleccionadas).';
-$ec_lang['mpf_solve_button']='Calcular';
+$ec_lang['mpf_solve_btn']='Calcular';
 $ec_lang['mpf_solve_for_flow']='para caudal, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Pérdida de carga en tubería según Manning';
@@ -739,7 +739,7 @@ $ec_lang['lpn_backdrop_target_coords']='Coordenadas que usted escribe';
 $ec_lang['lpn_backdrop_coords_prompt']='Escriba las coordenadas X,Y a las que debe moverse ese punto';
 $ec_lang['lpn_backdrop_continue']='Continuar';
 $ec_lang['lpn_tool_settings']='Configuración';
-$ec_lang['lpn_settings_scope_note']='Se guarda con este proyecto.';
+$ec_lang['lpn_settings_scope_project']='Se guarda con este proyecto.';
 $ec_lang['lpn_settings_id_prefixes']='Prefijos de ID';
 $ec_lang['lpn_settings_defaults']='Valores iniciales';
 $ec_lang['lpn_settings_defaults_note']='Se usan para los elementos que cree de ahora en adelante. Los elementos existentes no cambian.';

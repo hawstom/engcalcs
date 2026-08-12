@@ -174,7 +174,7 @@ $ec_lang['mpf_note_1']='<dl><dt>এটি একটি <em>অসীম দী�
 $ec_lang['mpf_sewer_ref']='<dl><dt>স্যানিটারি স্যুয়ার ডিজাইন করছেন?</dt><dd>৪ থেকে ৯৬ ইঞ্চি (১০০ থেকে ২৪০০ মিমি) পাইপের জন্য <a target="_blank" href="/sewslope.php">ন্যূনতম স্যুয়ার ঢাল সারণী</a> দেখুন, যা m/m, mm/m এবং শতাংশে দেওয়া আছে, এবং <a target="_blank" href="/peakfact.php">অতি নিম্ন প্রবাহের পিকিং ফ্যাক্টর</a> সংক্রান্ত গবেষণাটি দেখুন। উভয়ই শুধুমাত্র ইংরেজি ভাষার তথ্যসূত্র নথি।</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='একটি ধনাত্মক লক্ষ্য Q প্রবেশ করান।';
 $ec_lang['mpf_solver_no_solution']='কোনো সমাধান নেই: y/d0 = 93.8%-এ Q পাইপের ধারণক্ষমতা অতিক্রম করে (Qmax = {qmax} নির্বাচিত এককে)।';
-$ec_lang['mpf_solve_button']='সমাধান করুন';
+$ec_lang['mpf_solve_btn']='সমাধান করুন';
 $ec_lang['mpf_solve_for_flow']='প্রবাহের জন্য, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='ম্যানিং পাইপ হেড লস';

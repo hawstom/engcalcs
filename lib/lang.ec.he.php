@@ -175,7 +175,7 @@ $ec_lang['mpf_note_1']='<dl><dt>זהו הזרימה והעומק בתוך צינ
 $ec_lang['mpf_sewer_ref']='<dl><dt>מתכננים ביוב סניטרי?</dt><dd>ראה את <a target="_blank" href="/sewslope.php">טבלאות השיפוע המינימלי לביוב</a> עבור צינורות בקוטר 4 עד 96 אינץ׳ (100 עד 2400 מ״מ), נתונות במ׳/מ׳, מ״מ/מ׳ ובאחוזים, ואת מחקר <a target="_blank" href="/peakfact.php">מקדמי השיא לספיקות נמוכות מאוד</a>. שני המסמכים הם מסמכי עזר באנגלית בלבד.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='הזן ערך Q יעד חיובי.';
 $ec_lang['mpf_solver_no_solution']='אין פתרון: Q עולה על קיבולת הצינור ב-y/d0 = 93.8% (Qmax = {qmax} ביחידות הנבחרות).';
-$ec_lang['mpf_solve_button']='חשב';
+$ec_lang['mpf_solve_btn']='חשב';
 $ec_lang['mpf_solve_for_flow']='עבור ספיקה, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='אובדן לחץ בצינור — Manning';

@@ -1124,6 +1124,39 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Not legal advice and not from a lawyer.** The inventory is what an adviser would ask for
     first, which is why it exists; the verdict is not ours to give.
 
+- 40|290| **18 language keys are rendered by nothing, and six of them look like a page lost its
+  content.** Found 2026-08-12 by the new `dev/scripts/key_hygiene_check.php`, which is the first
+  thing here that could see them at all.
+  - **The cluster is the interesting part: `rc_notes_1/2/3/5/6/7_term` and `_def`.**
+    `Rock-Chute.php` renders exactly ONE note — number 4 — and the other six pairs are defined,
+    translated, and displayed nowhere. That does not read like keys nobody deleted; it reads like a
+    notes list that was written and then lost from the page. **Decide which it is before deleting
+    anything** — if the content was meant to ship, this is a missing-content bug and the keys are
+    the evidence, not the debt.
+  - The rest: `menu_main_list`, `menu_main_language`, `mi_d50in` (whose own syn note already says
+    "not used"), `mpf_spreadheet_notice` (also carrying a typo in the key name), `wi_save_and_calculate`,
+    `or_shape`, `contact_title`.
+  - **What each one costs:** it is maintained in 27 language files and shown on no page, so every
+    future sprint pays to translate it again. Deleting one retires 27 strings.
+  - **Do not bulk-delete.** A key parked on purpose for a returning feature is a real pattern here —
+    `lpn_settings_emitter_exponent` is kept deliberately for Task 191, and the check says so in its
+    own output. This wants one human decision per key, and `rename_lang_key.php` makes the ones
+    that stay cheap to fix.
+
+- 25|291| **Suffix vocabulary the hygiene check cannot judge, and a human should.** Three synonym
+  groups are deliberately excluded from `key_hygiene_check.php` because deciding them needs the
+  value or the call site, not the name:
+  - **tip / help / hint.** `_tip` is not a spelling preference in this suite — it names a delivery
+    mechanism (an `.ec-help`/`.ec-tip` tooltip through `pageConfig`, asserted on by
+    `popup-tips-harness.js`). `lpn_empty_hint` is canvas empty-state text and is right as it is.
+    `points_data_help` may be a genuine stray; somebody should look.
+  - **heading / head / title.** `_head` is usually hydraulic head. An automated rename here would
+    turn physics into typography.
+  - **confirm / prompt.** A confirm asks yes-or-no; a prompt asks for a value. Probably already
+    correct, and worth confirming once rather than re-deriving every time somebody notices.
+  - Low priority on purpose. This is the residue after the automatable part was automated, and the
+    honest reason it is not automated is that a check that cries wolf gets muted.
+
 - 35|288| **Ask for less, by storing less: replace the session identifier with a few bits.** Tom,
   2026-08-12, proposing banner wording: *"May we store a single 1 or 0 in this browser, so that we
   don't count its repeated visits?"* **That sentence is not true today, and the interesting response

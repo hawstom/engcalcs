@@ -177,7 +177,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Il s\'agit du débit (et de la profondeur) à l\
 $ec_lang['mpf_sewer_ref']='<dl><dt>Vous concevez un égout sanitaire ?</dt><dd>Consultez les <a target="_blank" href="/sewslope.php">tableaux de pente minimale d\'égout</a> pour les conduites de 4 à 96 pouces (100 à 2400 mm), donnés en m/m, mm/m et pourcentage, ainsi que l\'étude sur les <a target="_blank" href="/peakfact.php">facteurs de pointe pour les très faibles débits</a>. Ces deux documents de référence sont uniquement en anglais.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Entrez un Q cible positif.';
 $ec_lang['mpf_solver_no_solution']='Aucune solution : Q dépasse la capacité de la conduite à y/d0 = 93.8% (Qmax = {qmax} dans les unités sélectionnées).';
-$ec_lang['mpf_solve_button']='Calculer';
+$ec_lang['mpf_solve_btn']='Calculer';
 $ec_lang['mpf_solve_for_flow']='pour débit, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Perte de charge Manning en conduite';
@@ -988,7 +988,7 @@ $ec_lang['lpn_backdrop_target_coords']='Coordonnées saisies';
 $ec_lang['lpn_backdrop_coords_prompt']='Saisissez les X,Y vers lesquels ce point doit se déplacer';
 $ec_lang['lpn_backdrop_continue']='Continuer';
 $ec_lang['lpn_tool_settings']='Paramètres';
-$ec_lang['lpn_settings_scope_note']='Enregistré avec ce projet.';
+$ec_lang['lpn_settings_scope_project']='Enregistré avec ce projet.';
 $ec_lang['lpn_settings_id_prefixes']='Préfixes d\'identifiant';
 $ec_lang['lpn_settings_defaults']='Valeurs initiales';
 $ec_lang['lpn_settings_defaults_note']='Utilisées pour les éléments que vous créez à partir de maintenant. Les éléments existants ne sont pas modifiés.';

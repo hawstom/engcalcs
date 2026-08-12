@@ -174,7 +174,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Toto je průtok a hloubka uvnitř <em>nekonečn�
 $ec_lang['mpf_sewer_ref']='<dl><dt>Navrhujete splaškovou kanalizaci?</dt><dd>Viz <a target="_blank" href="/sewslope.php">tabulky minimálního sklonu kanalizace</a> pro potrubí o průměru 4 až 96 palců (100 až 2400 mm), uvedené v m/m, mm/m a procentech, a studii <a target="_blank" href="/peakfact.php">špičkových součinitelů pro velmi nízké průtoky</a>. Oba dokumenty jsou k dispozici pouze v angličtině.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Zadejte kladnou cílovou hodnotu Q.';
 $ec_lang['mpf_solver_no_solution']='Žádné řešení: Q překračuje kapacitu potrubí při y/d0 = 93.8% (Qmax = {qmax} ve zvolených jednotkách).';
-$ec_lang['mpf_solve_button']='Vypočítat';
+$ec_lang['mpf_solve_btn']='Vypočítat';
 $ec_lang['mpf_solve_for_flow']='pro průtok, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Ztráta tlakové výšky v potrubí Manning';

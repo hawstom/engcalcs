@@ -173,7 +173,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Ovo je protok i dubina unutar <em>beskonačno du
 $ec_lang['mpf_sewer_ref']='<dl><dt>Projektirate sanitarnu kanalizaciju?</dt><dd>Pogledajte <a target="_blank" href="/sewslope.php">tablice minimalnog nagiba kanalizacije</a> za cijevi od 4 do 96 inča (100 do 2400 mm), izražene u m/m, mm/m i postotku, te studiju <a target="_blank" href="/peakfact.php">faktora vršnog opterećenja za vrlo male protoke</a>. Oba dokumenta dostupna su samo na engleskom jeziku.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Unesite pozitivan ciljani Q.';
 $ec_lang['mpf_solver_no_solution']='Nema rješenja: Q premašuje kapacitet cijevi pri y/d0 = 93.8% (Qmax = {qmax} u odabranim jedinicama).';
-$ec_lang['mpf_solve_button']='Izračunaj';
+$ec_lang['mpf_solve_btn']='Izračunaj';
 $ec_lang['mpf_solve_for_flow']='za protok, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning gubitak tlačne visine u cijevi';

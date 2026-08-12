@@ -174,7 +174,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Dies ist der Durchfluss und die Tiefe innerhalb 
 $ec_lang['mpf_sewer_ref']='<dl><dt>Planen Sie einen Schmutzwasserkanal?</dt><dd>Siehe die <a target="_blank" href="/sewslope.php">Tabellen für das Mindestgefälle von Abwasserkanälen</a> für Rohre von 4 bis 96 Zoll (100 bis 2400 mm), angegeben in m/m, mm/m und Prozent, sowie die Studie <a target="_blank" href="/peakfact.php">Spitzenfaktoren für sehr geringe Durchflüsse</a>. Beide sind Referenzdokumente ausschließlich in englischer Sprache.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Geben Sie ein positives Ziel-Q ein.';
 $ec_lang['mpf_solver_no_solution']='Keine Lösung: Q übersteigt die Rohrkapazität bei y/d0 = 93.8% (Qmax = {qmax} in den gewählten Einheiten).';
-$ec_lang['mpf_solve_button']='Berechnen';
+$ec_lang['mpf_solve_btn']='Berechnen';
 $ec_lang['mpf_solve_for_flow']='für Durchfluss, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Rohrverlusthöhe Manning';

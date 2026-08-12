@@ -173,7 +173,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Acesta este debitul și adâncimea în interioru
 $ec_lang['mpf_sewer_ref']='<dl><dt>Proiectați o rețea de canalizare menajeră?</dt><dd>Consultați <a target="_blank" href="/sewslope.php">tabelele cu pantele minime ale canalizării</a> pentru conducte de la 4 la 96 inci (100 până la 2400 mm), date în m/m, mm/m și procente, și studiul <a target="_blank" href="/peakfact.php">factorilor de vârf pentru debite foarte mici</a>. Ambele sunt documente de referință disponibile doar în limba engleză.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Introduceți un Q țintă pozitiv.';
 $ec_lang['mpf_solver_no_solution']='Fără soluție: Q depășește capacitatea conductei la y/d0 = 93.8% (Qmax = {qmax} în unitățile selectate).';
-$ec_lang['mpf_solve_button']='Calculează';
+$ec_lang['mpf_solve_btn']='Calculează';
 $ec_lang['mpf_solve_for_flow']='pentru debit, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Pierdere de Sarcină Conductă';

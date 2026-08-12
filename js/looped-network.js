@@ -7012,7 +7012,7 @@ var EngCalcs = EngCalcs || {};
 		// "there are no browser units, only project units"), and nothing said so on screen.
 		// The one thing not carried is the map viewport: zoom and pan re-fit on load. That is not
 		// a setting and is not in this panel, so it does not qualify the claim.
-		groupHeading(pc.lpn_settings_scope_note || 'Project settings');
+		groupHeading(pc.lpn_settings_scope_project || 'Project settings');
 		// ---- 1. ID prefixes ----
 		var idBody = section('idPrefixes', pc.lpn_settings_id_prefixes || 'ID prefixes');
 		// Reuses the existing Add-tool labels (Junction/Reservoir/Pipe/Pump) per CLAUDE.md's

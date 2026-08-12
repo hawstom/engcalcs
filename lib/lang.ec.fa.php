@@ -175,7 +175,7 @@ $ec_lang['mpf_note_1']='<dl><dt>این جریان و عمق داخل یک لول
 $ec_lang['mpf_sewer_ref']='<dl><dt>در حال طراحی فاضلاب بهداشتی هستید؟</dt><dd>جداول <a target="_blank" href="/sewslope.php">حداقل شیب فاضلاب</a> برای لوله‌های ۴ تا ۹۶ اینچ (۱۰۰ تا ۲۴۰۰ میلی‌متر)، ارائه‌شده به‌صورت متر بر متر، میلی‌متر بر متر و درصد، و مطالعه <a target="_blank" href="/peakfact.php">ضرایب اوج برای جریان‌های بسیار کم</a> را ببینید. هر دو سند مرجع فقط به زبان انگلیسی هستند.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='یک Q هدف مثبت وارد کنید.';
 $ec_lang['mpf_solver_no_solution']='راه‌حلی وجود ندارد: Q از ظرفیت لوله در y/d0 = 93.8% بیشتر است (Qmax = {qmax} در واحدهای انتخابی).';
-$ec_lang['mpf_solve_button']='محاسبه';
+$ec_lang['mpf_solve_btn']='محاسبه';
 $ec_lang['mpf_solve_for_flow']='برای دبی، Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='افت هد لوله Manning';

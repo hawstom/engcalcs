@@ -175,7 +175,7 @@ $ec_lang['mpf_note_1']='<dl><dt>یہ ایک <em>لامحدود لمبے</em> پ�
 $ec_lang['mpf_sewer_ref']='<dl><dt>سینیٹری سیور ڈیزائن کر رہے ہیں؟</dt><dd>4 سے 96 انچ (100 سے 2400 ملی میٹر) پائپ کے لیے <a target="_blank" href="/sewslope.php">کم از کم سیور ڈھلوان جدولیں</a> دیکھیں، جو m/m، mm/m اور فیصد میں دی گئی ہیں، اور بہت کم بہاؤ کے لیے <a target="_blank" href="/peakfact.php">عروج عوامل</a> کا مطالعہ دیکھیں۔ دونوں صرف انگریزی میں حوالہ جاتی دستاویزات ہیں۔</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='براہ کرم مثبت ہدف Q درج کریں۔';
 $ec_lang['mpf_solver_no_solution']='کوئی حل نہیں: y/d0 = 93.8% پر Q پائپ کی گنجائش سے تجاوز کر جاتا ہے (منتخب اکائیوں میں Qmax = {qmax})۔';
-$ec_lang['mpf_solve_button']='حل کریں';
+$ec_lang['mpf_solve_btn']='حل کریں';
 $ec_lang['mpf_solve_for_flow']='بہاؤ کے لیے، Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='مانینگ پائپ دباؤ نقصان';

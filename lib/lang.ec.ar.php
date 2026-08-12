@@ -175,7 +175,7 @@ $ec_lang['mpf_note_1']='<dl><dt>هذا هو الجريان والعمق داخل
 $ec_lang['mpf_sewer_ref']='<dl><dt>هل تُصمِّم شبكة صرف صحي؟</dt><dd>راجع <a target="_blank" href="/sewslope.php">جداول الحد الأدنى لانحدار مجاري الصرف الصحي</a> لأنابيب من 4 إلى 96 إنش (100 إلى 2400 مم)، معطاة بوحدات م/م ومم/م والنسبة المئوية، ودراسة <a target="_blank" href="/peakfact.php">معاملات الذروة للتدفقات المنخفضة جداً</a>. كلا المرجعين متاحان باللغة الإنجليزية فقط.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='أدخل قيمة موجبة لـ Q المستهدف.';
 $ec_lang['mpf_solver_no_solution']='لا يوجد حل: تتجاوز Q سعة الأنبوب عند y/d0 = 93.8% (Qmax = {qmax} بالوحدات المختارة).';
-$ec_lang['mpf_solve_button']='احسب';
+$ec_lang['mpf_solve_btn']='احسب';
 $ec_lang['mpf_solve_for_flow']='للتدفق، Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='فاقد الضغط في الأنابيب — مانينغ';

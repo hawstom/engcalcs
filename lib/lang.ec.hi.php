@@ -175,7 +175,7 @@ $ec_lang['mpf_note_1']='<dl><dt>यह एक <em>अनंत लंबे</em>
 $ec_lang['mpf_sewer_ref']='<dl><dt>क्या आप स्वच्छता सीवर डिज़ाइन कर रहे हैं?</dt><dd>4 से 96 इंच (100 से 2400 मिमी) पाइप के लिए <a target="_blank" href="/sewslope.php">न्यूनतम सीवर ढाल तालिकाएँ</a> देखें, जो m/m, mm/m और प्रतिशत में दी गई हैं, और बहुत कम प्रवाह के लिए <a target="_blank" href="/peakfact.php">पीक कारक</a> अध्ययन देखें। दोनों केवल अंग्रेज़ी में संदर्भ दस्तावेज़ हैं।</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='एक धनात्मक लक्ष्य Q दर्ज करें।';
 $ec_lang['mpf_solver_no_solution']='कोई हल नहीं: y/d0 = 93.8% पर Q पाइप की क्षमता से अधिक है (चयनित इकाइयों में Qmax = {qmax})।';
-$ec_lang['mpf_solve_button']='हल करें';
+$ec_lang['mpf_solve_btn']='हल करें';
 $ec_lang['mpf_solve_for_flow']='प्रवाह के लिए, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='मैनिंग पाइप शीर्ष हानि';

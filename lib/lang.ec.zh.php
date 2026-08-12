@@ -174,7 +174,7 @@ $ec_lang['mpf_note_1']='<dl><dt>这是<em>无限长</em>管道内部的流量和
 $ec_lang['mpf_sewer_ref']='<dl><dt>正在设计生活污水管道？</dt><dd>请参阅 <a target="_blank" href="/sewslope.php">最小污水管道坡度表</a>（适用于4至96英寸（100至2400毫米）管道，以m/m、mm/m和百分比给出），以及 <a target="_blank" href="/peakfact.php">极低流量高峰系数</a>研究报告。两者均仅提供英文版本。</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='请输入正值目标流量 Q。';
 $ec_lang['mpf_solver_no_solution']='无解：在 y/d0 = 93.8% 处，Q 已超过管道通流能力（所选单位下 Qmax = {qmax}）。';
-$ec_lang['mpf_solve_button']='求解';
+$ec_lang['mpf_solve_btn']='求解';
 $ec_lang['mpf_solve_for_flow']='对于流量，Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='曼宁管道水头损失';

@@ -174,7 +174,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Ini adalah debit dan kedalaman di dalam pipa yan
 $ec_lang['mpf_sewer_ref']='<dl><dt>Sedang merancang saluran air limbah?</dt><dd>Lihat <a target="_blank" href="/sewslope.php">tabel kemiringan minimum saluran limbah</a> untuk pipa 4 hingga 96 inci (100 hingga 2400 mm), dinyatakan dalam m/m, mm/m, dan persen, serta studi <a target="_blank" href="/peakfact.php">faktor puncak untuk debit sangat rendah</a>. Keduanya adalah dokumen referensi dalam bahasa Inggris saja.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Masukkan Q target yang positif.';
 $ec_lang['mpf_solver_no_solution']='Tidak ada solusi: Q melebihi kapasitas pipa pada y/d0 = 93.8% (Qmax = {qmax} dalam satuan yang dipilih).';
-$ec_lang['mpf_solve_button']='Hitung';
+$ec_lang['mpf_solve_btn']='Hitung';
 $ec_lang['mpf_solve_for_flow']='untuk debit, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Kehilangan Tinggi Tekan Pipa Manning';

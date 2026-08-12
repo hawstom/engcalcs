@@ -173,7 +173,7 @@ $ec_lang['mpf_note_1']='<dl><dt>Ово је проток и дубина уну�
 $ec_lang['mpf_sewer_ref']='<dl><dt>Пројектујете санитарну канализацију?</dt><dd>Погледајте <a target="_blank" href="/sewslope.php">табеле минималних падова канализације</a> за цеви од 4 до 96 инча (100 до 2400 mm), дате у m/m, mm/m и процентима, и студију <a target="_blank" href="/peakfact.php">фактора врха за веома мале протоке</a>. Оба су референтна документа само на енглеском језику.</dd></dl>';
 $ec_lang['mpf_solver_enter_positive_q']='Унесите позитиван циљани Q.';
 $ec_lang['mpf_solver_no_solution']='Нема решења: Q премашује капацитет цеви при y/d0 = 93.8% (Qmax = {qmax} у изабраним јединицама).';
-$ec_lang['mpf_solve_button']='Израчунај';
+$ec_lang['mpf_solve_btn']='Израчунај';
 $ec_lang['mpf_solve_for_flow']='за проток, Q =';
 // Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Губитак напора у цевима по Manningу';
