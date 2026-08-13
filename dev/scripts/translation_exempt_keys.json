@@ -241,7 +241,8 @@
         "fr",
         "pt",
         "it",
-        "de"
+        "de",
+        "id"
       ],
       "reason": "OK -- the dialog confirm button. Scoped to the four languages whose Task 251 agents independently kept it, 2026-08-13. Widen only on the same evidence, never by assumption: the sibling lpn_field_auto entry shows how easily a plausible-looking cognate list overreaches."
     },
@@ -271,9 +272,24 @@
     "lpn_tool_add_reservoir": {
       "category": "cognate",
       "languages": [
-        "de"
+        "de",
+        "id"
       ],
-      "reason": "Reservoir -- the German water-engineering term is the same word, and the de agent chose it deliberately in Task 251 while picking Hochbehaelter for the variable-level tank lpn_ does not model, so the documented pair stays distinct."
+      "reason": "Reservoir -- the German water-engineering term is the same word, and the de agent chose it deliberately in Task 251 while picking Hochbehaelter for the variable-level tank lpn_ does not model, so the documented pair stays distinct. Indonesian likewise borrows 'reservoir' as its standard civil-engineering word (KBBI); its Task 251 agent confirmed it against bpn_h_supply_tip already in the file."
+    },
+    "lpn_menu_edit": {
+      "category": "cognate",
+      "languages": [
+        "id"
+      ],
+      "reason": "Edit -- 'edit' is an absorbed Indonesian verb (KBBI, cf. mengedit) and the ordinary menu label. Kept where the sibling lpn_tool_file was changed to Berkas, because 'file' has a settled native alternative in Indonesian localization and 'edit' does not. Flag for native review."
+    },
+    "lpn_field_diameter": {
+      "category": "cognate",
+      "languages": [
+        "id"
+      ],
+      "reason": "Diameter -- the same word in Indonesian (KBBI). Scoped to id; other languages inflect or spell it differently."
     }
   }
 }
