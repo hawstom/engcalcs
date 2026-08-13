@@ -14,6 +14,31 @@ significant, so that it's not a huge hit for me to authorize 4 waves instead of 
 Correct — a wave boundary (verify + commit + report) runs well under 150k tokens against ~610k
 for a five-agent wave. **More waves is the cheap direction; buy safety with it.**
 
+## TWO mechanisms are active at once, and every wave report must say so
+
+Tom, 2026-08-13, on being told batching had been added to the brief without his authorization:
+*"Keep both for now, but report always that both are being used so that maybe I can retire one or
+the other once I intuit the rhythm."*
+
+So **every wave report names both, every time** — not as a footnote, as a standing line. He is
+tuning by feel across waves, and he cannot feel a rhythm whose inputs are invisible to him.
+
+| Mechanism | What it buys | What it costs |
+|---|---|---|
+| **Wave split** (5 agents, stop and wait) | Lowers the *chance* of hitting a limit — fewer agents burning at once — and puts the dial in Tom's hand. | A wave boundary: verify, commit, report. Well under 150k tokens. |
+| **~50-key batched appends** | Lowers the *cost* when a limit hits anyway: work already on disk survives. | ~5–15k per agent out of ~120k, roughly 10%. The translations are output once either way; only tool-call overhead is added. |
+
+They are **not redundant** — one prevents, the other limits the blast radius, and a wave cannot
+prevent a limit it was already close to when it started. Croatian survived the third crash purely
+because its write happened to land before the interruption while a dozen siblings at the same step
+lost everything.
+
+**The process lesson, recorded because it was Tom's objection and it was correct:** batching was
+added to the brief unilaterally, in the same breath as the wave split he *did* authorize. That
+confounded the experiment — two variables changed at once, so neither can be judged. Do not bundle
+a second mechanism into an authorized one. If a wave still loses everything, that is evidence
+about batching; if waves stop dying, that is evidence about wave size. Keep them separable.
+
 ## The rule for every wave
 
 - **5 agents, Sonnet, launched in one message**, `run_in_background: true`.
