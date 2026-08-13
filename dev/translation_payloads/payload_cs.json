@@ -2,8 +2,8 @@
     "meta": {
         "language": "cs",
         "expected_key_count": 854,
-        "delta_key_count": 3,
-        "exempt_key_count": 17,
+        "delta_key_count": 1,
+        "exempt_key_count": 19,
         "exempt_keys": [
             "calc_units_us",
             "calc_units_si",
@@ -19,6 +19,8 @@
             "bpn_method_dw",
             "bpn_method_manning",
             "bpn_id",
+            "lpn_tool_add_text",
+            "lpn_new_text",
             "lpn_field_x",
             "lpn_field_y",
             "lpn_field_id"
@@ -287,48 +289,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_tool_add_text": "Text",
-        "lpn_new_text": "Text",
         "lpn_dialog_ok": "OK"
     },
     "keys": {
-        "lpn_tool_add_text": "Text",
-        "lpn_new_text": "Text",
         "lpn_dialog_ok": "OK"
     },
     "key_context": {
-        "lpn_tool_add_text": {
-            "reason": "equal_to_english",
-            "current_value": "Text",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_add_pump",
-                    "value": "Čerpadlo",
-                    "english": "Pump"
-                },
-                "next_translated": {
-                    "key": "lpn_tool_delete",
-                    "value": "Smazat",
-                    "english": "Delete"
-                }
-            }
-        },
-        "lpn_new_text": {
-            "reason": "equal_to_english",
-            "current_value": "Text",
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_zoom_extent",
-                    "value": "Zobrazit vše",
-                    "english": "Zoom to fit"
-                },
-                "next_translated": {
-                    "key": "lpn_field_elev",
-                    "value": "Nadmořská výška",
-                    "english": "Elevation"
-                }
-            }
-        },
         "lpn_dialog_ok": {
             "reason": "equal_to_english",
             "current_value": "OK",
@@ -346,7 +312,5 @@
             }
         }
     },
-    "key_syn": {
-        "lpn_new_text": "Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words"
-    }
+    "key_syn": []
 }
