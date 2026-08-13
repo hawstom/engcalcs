@@ -52,21 +52,36 @@ about batching; if waves stop dying, that is evidence about wave size. Keep them
 
 ## Waves
 
-| Wave | Languages | Keys |
-|------|-----------|------|
-| **1 of 4** | am, ar, bg, bn, cs | 1,445 |
-| **2 of 4** | de, hi, id, km, my | 1,445 |
-| **3 of 4** | ps, ro, ru, sw, uk | 1,445 |
-| **4 of 4** | ur, zh + fr, pt (identity-only remainders) | 584 |
+| Wave | Languages | Keys | Outcome |
+|------|-----------|------|---------|
+| **1 of 4** | am, ar, bg, bn, cs | 1,445 | Done. |
+| **2 of 4** | de, hi, id, km, my | 1,445 | de, hi, id done. **km and my died on a session limit at 100 of 289 each.** |
+| **3 of 4** | ps, ro, ru, sw, uk | 1,445 | Awaiting authorization. |
+| **4 of 4** | km, my (189 each) + ur, zh + cs, fr, pt | 963 | Awaiting authorization. |
 
-Wave 4 is deliberately the cheap one — the three Romance remainders are 1–3 keys each, left over
-from the Task 296 retitle.
+Wave 4 absorbs the two half-finished wave-2 languages and stays the cheap wave: `cs`/`fr`/`pt` owe
+1–3 identity keys each, left over from the Task 296 retitle.
 
-## Done before this plan (9 languages, verified and pushed)
+## What wave 2 proved about the two throttles
 
-es, fr\*, pt\*, fa, he, tr, sr, it, hr — 9 of 26.
-\* fr and pt still owe the three Task 296 identity keys, listed in wave 4. Italian is complete.
+**The wave split did not prevent the limit** — five agents was still enough to hit it. **The
+batched appends bounded the damage for the first time:** Khmer and Burmese each had exactly 100
+keys on disk when they died, so 200 keys of finished translation survived an interruption that,
+in all three previous crashes, would have thrown everything away. Their relaunch costs 189 keys
+each instead of 289.
 
-**9 for 9 on the consent-button trap**: every language so far rendered the two Accept answers
+That is the first clean evidence separating the two mechanisms, and it points the same way the
+cost model does: the batching is cheap insurance that works, while wave size buys probability, not
+protection. If Tom wants to retire one, the batching is the one that has now demonstrably paid.
+
+## Landed so far (17 of 26 complete)
+
+Before this plan: es, fr\*, pt\*, fa, he, tr, sr, it, hr.
+Wave 1: am, ar, bg, bn, cs\*. Wave 2: de, hi, id.
+Partial: km (100/289), my (100/289).
+\* fr and pt still owe three Task 296 identity keys each, cs owes one; all listed in wave 4.
+
+**17 for 17 on the consent-button trap** (de *Diesmal/Immer*, hi *अभी/हमेशा*, id *kali ini/Selalu*
+joining the previous fourteen): every completed language has rendered the two Accept answers
 *temporally* (this ask vs. never ask again) rather than as the conventional "accept all
 categories". That is the guidance in `$ec_lang_syn` working exactly as intended.
