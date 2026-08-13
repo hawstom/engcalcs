@@ -272,6 +272,30 @@
       "readings": [],
       "disposition": "intent",
       "resolution": "CLOSED BY TOM 2026-08-12. He had already answered the original complaint himself in 470a7ec/b20693d, hand-authoring all three entries so they match the current labels; the escalation text above was stale by the time it was read.\n\nThe ruling covers a SECOND defect found while verifying that, which the original entry had not seen. ecConsentState() in lib/config.inc.php makes the two yeses TEMPORAL: '1' consents to this version of the ask and is re-asked if the ask materially changes, '2' consents to all later versions and is never asked again. But on a consent banner 'Accept all' carries an overwhelming conventional meaning -- all cookie CATEGORIES -- so the button has two plausible readings, and 26 agents would each guess with the convention pushing them toward the wrong one.\n\nBy CLAUDE.md's routing rule a two-way parse for an English reader is normally an English fix, and that was the recommendation. Tom ruled otherwise: keep the English, sharpen the synonyms. Recorded as his call, not an oversight -- 'Accept this' / 'Accept all' is the button pair users already recognize, and the parallel two-word shape is worth keeping on three side-by-side buttons that compete for width. The temporal distinction is carried to translators through $ec_lang_syn instead, which is the channel for exactly this case: the English serves its own audience and only the translator is left guessing.\n\nShipped, with Tom's in-conversation approval of the proposed wording:\n  consent_accept     -> 'Accept (allow) this ask (this request, this question)'\n  consent_accept_all -> 'Accept (allow) this and any later ask; do not ask (question) me again'\nBoth pass the substitution test. consent_body, consent_current_granted and consent_region_label were checked against their current labels and need no change."
+    },
+    {
+      "key": "lpn_field_head",
+      "source": "translator",
+      "lang": "cs",
+      "complaint": "The glossary's Czech preferred_translation 'tlakova vyska' (pressure head) reads oddly on lpn_field_head, which is a RESERVOIR's water-surface level where no pipe pressure exists yet. Applied it for glossary consistency, but plain 'Hladina' (water level) might be equally or more defensible here.",
+      "readings": [
+        "Tlakova vyska -- glossary-consistent root-concept term",
+        "Hladina -- plain water-level term, reads more naturally for a reservoir-only field"
+      ],
+      "disposition": "glossary",
+      "resolution": "REAL AND WELL-FOUNDED, and it is a distinction the English already makes but the glossary does not. lpn_field_head is a reservoir's water surface -- elevation head -- while lpn_result_head is total/piezometric head at a node. English disambiguates both in their tips ('measured as a height, not as a pressure'), so an English reader is served and no English fix is owed. What was missing is a Czech note in glossary.json saying the one term is not equally apt at both call sites. Recorded there rather than rewritten in lang.ec.cs.php: the tip carries the disambiguation, the agent applied the term consistently and deliberately, and choosing between two defensible Czech terms is a native-speaker call this project defers to the cultural standard on. Flagged for any future cs native review."
+    },
+    {
+      "key": "lpn_lock_break",
+      "source": "translator",
+      "lang": "cs",
+      "complaint": "$ec_lang_syn offers many alternates (break / unlock / take over / claim / override) with no indication of REGISTER -- whether this is a short button label or a longer explanatory phrase matching a dialog body. The English is a plausible idiom but ambiguous on formality and length.",
+      "readings": [
+        "short imperative button label",
+        "longer explanatory phrase matching the dialog body's tone"
+      ],
+      "disposition": "refer-to-human",
+      "resolution": "AWAITING TOM. The fact is settled -- js/looped-network.js:4039 renders it as `label:` on a button, so the answer is 'short label' -- but delivering that answer means adding a commentary tag to lpn_lock_break's $ec_lang_syn entry, and $ec_lang_syn is human-authored and off-limits to AI without in-conversation permission. It also needs a new token in the CLAUDE.md tag vocabulary, which today has `layout: column heading | unit token | nav item` and no button. Proposed to Tom 2026-08-13; nothing written pending his ruling. Note this complaint generalizes: every lpn_ button label has the same missing-register problem, so a `layout: button` token would pay off well beyond this one key."
     }
   ]
 }
