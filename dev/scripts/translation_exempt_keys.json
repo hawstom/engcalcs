@@ -240,9 +240,10 @@
       "languages": [
         "fr",
         "pt",
-        "it"
+        "it",
+        "de"
       ],
-      "reason": "OK -- the dialog confirm button. Scoped to the three languages whose Task 251 agents independently kept it, 2026-08-13. Widen only on the same evidence, never by assumption: the sibling lpn_field_auto entry shows how easily a plausible-looking cognate list overreaches."
+      "reason": "OK -- the dialog confirm button. Scoped to the four languages whose Task 251 agents independently kept it, 2026-08-13. Widen only on the same evidence, never by assumption: the sibling lpn_field_auto entry shows how easily a plausible-looking cognate list overreaches."
     },
     "lpn_tool_file": {
       "category": "abbreviation",
@@ -250,6 +251,29 @@
         "it"
       ],
       "reason": "File -- the File menu label. Scoped to Italian, whose Task 251 agent chose it deliberately and where it is the standard menu label. Add a language only on the same evidence."
+    },
+    "lpn_tool_add_text": {
+      "category": "cognate",
+      "languages": [
+        "cs",
+        "de"
+      ],
+      "reason": "Text -- the text-tool button. 'Text' is the ordinary word in Czech and German; their Task 251 agents chose it deliberately, 2026-08-13."
+    },
+    "lpn_new_text": {
+      "category": "cognate",
+      "languages": [
+        "cs",
+        "de"
+      ],
+      "reason": "Text -- the default contents of a newly placed text label. Same word and same evidence as lpn_tool_add_text."
+    },
+    "lpn_tool_add_reservoir": {
+      "category": "cognate",
+      "languages": [
+        "de"
+      ],
+      "reason": "Reservoir -- the German water-engineering term is the same word, and the de agent chose it deliberately in Task 251 while picking Hochbehaelter for the variable-level tank lpn_ does not model, so the documented pair stays distinct."
     }
   }
 }
