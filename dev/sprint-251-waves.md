@@ -32,15 +32,15 @@ for a five-agent wave. **More waves is the cheap direction; buy safety with it.*
 | **1 of 4** | am, ar, bg, bn, cs | 1,445 |
 | **2 of 4** | de, hi, id, km, my | 1,445 |
 | **3 of 4** | ps, ro, ru, sw, uk | 1,445 |
-| **4 of 4** | ur, zh + fr, it, pt (identity-only remainders) | 585 |
+| **4 of 4** | ur, zh + fr, pt (identity-only remainders) | 584 |
 
 Wave 4 is deliberately the cheap one — the three Romance remainders are 1–3 keys each, left over
 from the Task 296 retitle.
 
 ## Done before this plan (9 languages, verified and pushed)
 
-es, fr\*, pt\*, fa, he, tr, sr, it\*, hr — 9 of 26.
-\* fr, it and pt still owe the handful of identity keys listed in wave 4.
+es, fr\*, pt\*, fa, he, tr, sr, it, hr — 9 of 26.
+\* fr and pt still owe the three Task 296 identity keys, listed in wave 4. Italian is complete.
 
 **9 for 9 on the consent-button trap**: every language so far rendered the two Accept answers
 *temporally* (this ask vs. never ask again) rather than as the conventional "accept all

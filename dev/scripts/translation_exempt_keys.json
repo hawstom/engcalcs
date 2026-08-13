@@ -152,9 +152,10 @@
       "category": "cognate",
       "languages": [
         "es",
-        "fr"
+        "fr",
+        "it"
       ],
-      "reason": "'Auto' is the ordinary short form in Spanish and French software UI, and this is a narrow toggle label where the English is deliberately short. Not global: pt Automatico, tr Otomatik. Confirmed by the es and fr agents in the Task 146.06 sprint, 2026-08-08."
+      "reason": "'Auto' is the ordinary short form in Spanish, French and Italian software UI, and this is a narrow toggle label where the English is deliberately short. Not global: pt Automatico, tr Otomatik. Confirmed by the es and fr agents in the Task 146.06 sprint, 2026-08-08, and by the it agent in the Task 251 sprint, 2026-08-13."
     },
     "lpn_ago_minutes": {
       "category": "cognate",
@@ -239,25 +240,16 @@
       "languages": [
         "fr",
         "pt",
-        "it",
-        "es",
-        "de",
-        "hr",
-        "ro",
-        "cs",
-        "id",
-        "sw"
+        "it"
       ],
-      "reason": "OK -- the dialog confirm button. Scoped, not '*': the fr, pt and it agents independently kept it in the Task 251 sprint and it is the standard button label in these languages. Non-Latin-script languages are deliberately NOT listed; they should translate it."
+      "reason": "OK -- the dialog confirm button. Scoped to the three languages whose Task 251 agents independently kept it, 2026-08-13. Widen only on the same evidence, never by assumption: the sibling lpn_field_auto entry shows how easily a plausible-looking cognate list overreaches."
     },
     "lpn_tool_file": {
       "category": "abbreviation",
       "languages": [
-        "it",
-        "ro",
-        "id"
+        "it"
       ],
-      "reason": "File -- the File menu label. Scoped: the Italian agent chose it deliberately in Task 251 and it is the standard menu label in Italian. Add a language here only on the same evidence."
+      "reason": "File -- the File menu label. Scoped to Italian, whose Task 251 agent chose it deliberately and where it is the standard menu label. Add a language only on the same evidence."
     }
   }
 }
