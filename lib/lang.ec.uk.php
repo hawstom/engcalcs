@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='Підзаголовок для дру�
 $ec_lang['consent_body']='Чи можемо ми зберігати одну цифру для кожної сторінки в сховищі цього профілю браузера, щоб не реєструвати його відвідування щоразу заново?';
 $ec_lang['consent_accept']='Прийняти цей запит';
 $ec_lang['consent_accept_all']='Приймати завжди';
-$ec_lang['consent_decline']='Відхилити';
+$ec_lang['consent_decline']='Відхиляти завжди';
 $ec_lang['consent_current_granted']='Ви дозволили це. Ми обмежуємо реєстрацію відвідувань для цього профілю браузера.';
 $ec_lang['consent_current_denied']='Ви відхилили це. Ми нічого не зберігаємо, щоб обмежити реєстрацію відвідувань для цього профілю браузера.';
 $ec_lang['consent_region_label']='Ваш вибір щодо обмеження реєстрації відвідувань.';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='Вигляд';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Налаштування';
+$ec_lang['lpn_menu_help']='Довідка';
+$ec_lang['lpn_help_walkthroughs']='Покрокові посібники';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,14 @@ $ec_lang['lpn_labels_decimals_tip']='Кількість десяткових з�
 $ec_lang['lpn_labels_mark_extrema']='Позначати найвищі й найнижчі значення';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Фонове зображення…';
-$ec_lang['lpn_backdrop_add']='Додати зображення';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='Задати масштаб зображення';
-$ec_lang['lpn_backdrop_position']='Перемістити зображення';
-$ec_lang['lpn_backdrop_remove']='Видалити зображення';
+$ec_lang['lpn_backdrop_add']='Додати';
+$ec_lang['lpn_backdrop_scale']='Масштабувати клацанням';
+$ec_lang['lpn_backdrop_scale_entry']='За world-файлом або розміром пікселя на карті';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Введіть розмір одного пікселя на карті або вставте повний вміст world-файлу для цього зображення';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Введіть одне число — розмір одного пікселя на карті, або вставте всі шість рядків world-файлу.';
+$ec_lang['lpn_backdrop_wld_bad']='Цей world-файл повертає, віддзеркалює або нерівномірно розтягує зображення. Карта може лише переміщувати зображення й змінювати його розмір однаково в обох напрямках, тому файл не було використано.';
+$ec_lang['lpn_backdrop_position']='Перемістити';
+$ec_lang['lpn_backdrop_remove']='Видалити';
 $ec_lang['lpn_backdrop_remove_confirm']='Видалити фонове зображення?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Клацніть на двох точках фонового зображення, наприклад на кінцях лінійного масштабу. Потім введіть справжню відстань між ними.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Справжня відстань між двома точками';
