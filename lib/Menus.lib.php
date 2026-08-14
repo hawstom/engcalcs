@@ -153,24 +153,13 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<a class="dropdown-item" href="About.php"><?=$ec_lang['about_main_menu']?></a>
 					<a class="dropdown-item" href="Install.php"><?=$ec_lang['install_main_menu']?></a>
 					<a class="dropdown-item" href="contact.php"><?=$ec_lang['contact_main_menu']?></a>
-					<?php // Tom's walkthroughs (2026-08-13). A new TAB rather than a navigation: the one
-					      // page most likely to send somebody looking for a guide is Looped-Network.php,
-					      // and leaving it mid-drawing to read one is the wrong trade. The label carries
-					      // NO language flag, though the post is English: Tom, 2026-08-13, "I am inclined
-					      // to take my chances with automatic browser translators and not flag it as
-					      // English." A permanent "(in English)" in all 27 navbars costs more, and costs
-					      // it constantly, than the occasional reader who meets an untranslated page.
-					      //
-					      // NO TIP, deliberately (Tom, 2026-08-13: "Why a tip? Isn't 'Walkthroughs' good
-					      // enough?"). It is. The tip said "Step-by-step guides to the calculators, on
-					      // Tom Haws's blog" -- the first half restates the label and the second is
-					      // off-site trivia. It was also a bare <a title>, which no tip selector in
-					      // js/Calculators.lib.js matches, so touch users never saw it; the fix would
-					      // have been to add a ? glyph to a nav dropdown and then translate the text 26
-					      // times. Deleting it was cheaper than either. No sibling in this menu has a
-					      // tip. ?>
-					<a class="dropdown-item" href="https://tomsthird.blogspot.com/2026/08/hawsedc-free-unlimited-online-looped.html"
-						target="_blank" rel="noopener"><?=$ec_lang['menu_walkthroughs']?></a>
+					<?php // Walkthroughs USED TO BE HERE and was moved into the Looped Network page's own
+					      // Help menu on 2026-08-13 (Tom: "the walkthrough is a little incongruous").
+					      // The post covers that one calculator, so among these suite-wide items the
+					      // plural promised guides to all of them; and this was the only entry here that
+					      // left the site. It also carried a tip that no touch user could ever see -- a
+					      // bare <a title>, which matches no selector in js/Calculators.lib.js. Do not
+					      // re-add it: see lpn_menu_help / lpn_help_walkthroughs. ?>
 				</div>
 			</li>
 		</ul>

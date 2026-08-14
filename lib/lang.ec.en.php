@@ -115,12 +115,6 @@ $ec_lang['menu_main_language']='Language';
 $ec_lang_syn['menu_main_language']='';
 $ec_lang['menu_more']='More';
 $ec_lang_syn['menu_more']='';
-// Tom's own step-by-step guides, which live on his blog rather than on this site. The post is in
-// English and the label does NOT say so (Tom, 2026-08-13): "I am inclined to take my chances with
-// automatic browser translators and not flag it as English." Browser translation is good enough on
-// a blog page, and a permanent "(in English)" on every language's navbar was a bigger, more
-// visible cost than the occasional reader who meets it untranslated.
-$ec_lang['menu_walkthroughs']='Walkthroughs';
 $ec_lang['menu_libre']='Libre Software';
 $ec_lang_syn['menu_libre']='Lock-free Software, Unlocked Software, Unchained Software, FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share. | layout: nav item; gloss: libre software; avoid: free of charge (gratis); transliterating "libre" as a brand name';
 $ec_lang['template_welcome']='Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target="_blank" href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too.';
@@ -1212,6 +1206,22 @@ $ec_lang['lpn_menu_view']='View';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Settings';
+// Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
+// incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
+// could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
+// the plural read as "guides to the calculators" and overstated it; here it needs no qualifier.
+// And every other menu-bar item acts on the project, while this one leaves the site -- unremarkable
+// as a row inside Help, out of place as a sixth document verb.
+$ec_lang['lpn_menu_help']='Help';
+// PLURAL is literally true and is not aspirational (Tom, 2026-08-13): the single post contains
+// three use-case walkthroughs of this calculator. So the row links straight to the post; no blog
+// label page is needed to make the plural honest.
+//
+// The post is in English and the label does NOT say so (Tom, 2026-08-13): "I am inclined to take my
+// chances with automatic browser translators and not flag it as English." Browser translation is
+// good enough on a blog page, and a permanent "(in English)" cost more, constantly, than the
+// occasional reader who meets it untranslated.
+$ec_lang['lpn_help_walkthroughs']='Walkthroughs';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still

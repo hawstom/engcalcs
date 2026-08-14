@@ -178,6 +178,20 @@ $ec_icons = array(
 	'globe'      => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a13 13 0 0 1 0 18a13 13 0 0 1 0-18z"/>',
 	'check'      => '<path d="M4.5 12.5l5.5 5.5L20 6.5"/>',
 
+	// A LIFE PRESERVER, not a question mark, for the lpn Help menu (Tom, 2026-08-13). The obvious
+	// choice would have been "?" in a circle -- and it is the wrong one HERE, because this suite
+	// already spends "?" on something else: every .ec-tip tooltip glyph on every page is a "?", so a
+	// "?" on the menu bar would read as "this control has a tooltip" rather than "help lives here".
+	// A life ring collides with nothing in the set and is the standard help mark besides.
+	//
+	// Two concentric circles plus four spokes on the diagonals, so it stays readable at 16px where a
+	// drawn-in rope texture would silt up. Stroked outline in currentColor like the rest of the set.
+	// The spokes start on r=4 and end on r=9, both at 45 degrees. That is not arbitrary: with
+	// stroke-width 2 the rings occupy r=3..5 and r=8..10, and a round cap adds 1 unit at each end,
+	// so each spoke lands exactly flush with the inner edge of one ring and the outer edge of the
+	// other. It reads as one welded object instead of four lines with hairline gaps.
+	'help'       => '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>'
+	              . '<path d="M14.8 9.2l3.6-3.6M9.2 9.2l-3.6-3.6M9.2 14.8l-3.6 3.6M14.8 14.8l3.6 3.6"/>',
 	// The ONE brand mark in this set, and the one exception to "stroked outline, currentColor".
 	// GitHub's Octocat is a filled silhouette; redrawing it as strokes would make it unrecognizable,
 	// and recognition is the entire job here -- the mark is what tells a passing engineer that the

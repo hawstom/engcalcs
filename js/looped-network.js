@@ -5405,6 +5405,28 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'devtest', label: '[dev] Draw large test network', fn: drawTestGrid }
 		]));
 	}
+	// The walkthroughs live on Tom's blog, not on this site, so this row is the one menu action in
+	// the whole bar that leaves the page -- which is exactly why it is in Help and not a sixth
+	// menu-bar button beside File/Edit/Insert/View/Settings, all of which act on the project.
+	//
+	// A NEW TAB, never a navigation: somebody reaching for a guide is mid-drawing, and taking the
+	// map away to show them how to draw it is the wrong trade. noopener because the blog is not ours
+	// to trust with a window handle.
+	//
+	// Plural is literal -- the one post contains three use-case walkthroughs -- so it links straight
+	// there rather than to a blog label page (Tom, 2026-08-13).
+	var LPN_WALKTHROUGHS_URL = 'https://tomsthird.blogspot.com/2026/08/hawsedc-free-unlimited-online-looped.html';
+	function openHelpMenu(anchor) {
+		var pc = EngCalcs.pageConfig || {};
+		openMenu(anchor, [
+			{
+				icon: 'help',
+				label: pc.lpn_help_walkthroughs || 'Walkthroughs',
+				fn: function () { window.open(LPN_WALKTHROUGHS_URL, '_blank', 'noopener'); }
+			}
+		]);
+	}
+
 	function openViewMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
@@ -5433,7 +5455,11 @@ var EngCalcs = EngCalcs || {};
 			// the Menu". Identical label, identical element, both places -- which is the rule the old
 			// arrangement broke by making the toolbar button open the panel and the menu open a list
 			// whose first row was also called Settings.
-			{ id: 'lpn_menu_settings', icon: 'settings', label: pc.lpn_menu_settings || 'Settings', open: function (a) { toggleSettingsPopup({ currentTarget: a }); } }
+			{ id: 'lpn_menu_settings', icon: 'settings', label: pc.lpn_menu_settings || 'Settings', open: function (a) { toggleSettingsPopup({ currentTarget: a }); } },
+			// Last, where a Help menu goes everywhere else. One row today (Walkthroughs); it is also
+			// the home for the things that currently have none -- EPANET solver notes, keyboard
+			// shortcuts, "report a problem".
+			{ id: 'lpn_menu_help', icon: 'help', label: pc.lpn_menu_help || 'Help', open: openHelpMenu }
 		].forEach(function (m) {
 			var b = document.createElement('button');
 			b.type = 'button';
