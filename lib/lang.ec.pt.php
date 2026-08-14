@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='Segmento';
 $ec_lang['mi_groupRegion']='Região';
 $ec_lang['mi_station']='Est.';
 $ec_lang['mi_elevation']='Alt.';
-$ec_lang['mi_d50in']='Tamanho<br />mediano<br />de rocha<br />de revestimento';
 $ec_lang['mi_n']='n<br />do seg-<br />mento';
 $ec_lang['mi_is_bank']='Div. de<br />regiões<br />R<sub>h</sub>, Q<br />(Margem)';
 $ec_lang['mi_tau']='Cisalh. de<br />fundo, τ';

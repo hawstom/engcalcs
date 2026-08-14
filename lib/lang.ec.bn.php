@@ -146,7 +146,6 @@ $ec_lang['mi_groupSegment']='সেগমেন্ট';
 $ec_lang['mi_groupRegion']='অঞ্চল';
 $ec_lang['mi_station']='স্টা';
 $ec_lang['mi_elevation']='উচ্চতা';
-$ec_lang['mi_d50in']='আস্তরণ<br />পাথরের<br />মধ্যক<br />আকার';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />অঞ্চল<br />সীমানা<br />(তীর)';
 $ec_lang['mi_tau']='তলদেশ<br />কৃন্তন<br />τ';

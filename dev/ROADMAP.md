@@ -1344,23 +1344,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
 
-- 5|299|[H] **A wrong `layout:` tag misled four translators — drop it.**
-  `$ec_lang_syn['lpn_backdrop_scale_entry']` carries `layout: nav item`, which stands for "competing
-  for width with every sibling; prefer the shortest synonym". That was true of a `<select>` and has
-  been false since Task 276 made the control a menu BUTTON, which is as wide as its own label and
-  nothing else. The row label now sets no width at all.
-  - **The cost was measurable, which is why this is worth a task rather than a note.** In the Task
-    297 sprint, bg, pt, uk and zh each flagged the string as too long for the tag and offered a
-    compressed version; pt went further and proposed shortening the ENGLISH source so every language
-    would get a shorter label. All four were reasoning correctly from a constraint that no longer
-    exists. A wrong tag is worse than a missing one: it is confidently obeyed.
-  - **[H] Needs Tom's permission** — `$ec_lang_syn` is human-authored and there are no standing
-    carve-outs. One-line edit once he says so.
-  - **While in there, audit the other `layout:` tags against what the controls now are.** This one
-    went stale because a widget changed under it, and nothing connects a tag to the widget it
-    describes. If more than one or two are wrong, the real answer is a check, per CLAUDE.md's own
-    rule that a rule a machine enforces is worth ten a human must remember.
-
 - 30|298| **Rebrand the navbar's "More" as "Help" and move it beside the Language picker.** Tom,
   2026-08-13: About, Install and Contact sit under it "just fine" as Help, and Walkthroughs now
   joins them. Two edits in `lib/Menus.lib.php` — the `menu_more` value, and moving the `<li>` into
@@ -2000,6 +1983,43 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|299| **[DONE 2026-08-13] A wrong `layout:` tag misled four translators, and now a check catches
+  the class.** The tag on `$ec_lang_syn['lpn_backdrop_scale_entry']` said `nav item` — "competing
+  for width with every sibling; prefer the shortest synonym" — describing a `<select>` that Task 276
+  had already replaced with a menu button. In the Task 297 sprint bg, pt, uk and zh each compressed
+  the label, and pt proposed shortening the English so all 26 would inherit the cut. **All four were
+  reasoning correctly from a constraint that had been false for weeks.** Tag dropped.
+  - **The hand audit of the other 22 tags found a second one**: `lpn_help_walkthroughs` is a row in
+    the Help pull-down, not a bar item, and carried the same wrong tag. Finding a second instance
+    while already looking for the first is the whole argument for a check over a careful read.
+  - **A third defect was mine, from this sprint:** `lpn_backdrop_scale_entry_prompt` had
+    `layout: <a whole sentence>`. CLAUDE.md says tokens are defined once in its table and prose does
+    not go in the data. Now `runtime: units appended`, a defined token.
+  - **`dev/scripts/layout_tag_check.php`, blocking, in `check_all.sh` (now 14 checks).** Verifies
+    the value is in the vocabulary, a `column heading` really is inside a `<th>`, a `unit token` is
+    named `u_*`, and a `nav item` is not merely a pull-down row. Free-form prose commentary is left
+    alone — human-authored and legal.
+  - **THE MUTATION TEST IS WHY THIS ENTRY IS WORTH READING.** The check passed on the clean tree and
+    caught three of four planted defects — but silently passed a re-introduction of *the exact
+    defect it was written for*. Cause: `Looped-Network.php`'s pageConfig bridge names every `lpn_`
+    key, and the check read any PHP mention as proof of a real navbar render, exempting all of them.
+    A green check that cannot fail on its own founding bug is worse than no check, and **only
+    deliberately breaking it found that.** Two earlier self-inflicted bugs died the same way: a
+    `REPO_ROOT` of `dev/scripts/../..` contains the substring `/dev/`, so the tooling filter
+    excluded the entire repository (16 false findings), and `explode(';')` shattered `avoid:` prose
+    that legitimately contains semicolons (8 phantom tags). **Plant the bug before believing the
+    check** — see also the lpn harness suite, built on the same principle.
+  - `ecLangSynRawValues()` added to `dev/scripts/lang_parse.inc.php` rather than kept private, so it
+    inherits the possessive quantifiers that file documents at length — `$ec_lang_syn` holds the
+    same multi-byte scripts that once silently truncated a parse to two thirds of a file.
+  - **`mi_d50in` deleted from all 27 files.** The audit surfaced it as tagged `column heading` while
+    being rendered by nothing, and its own `_syn` commentary already said `not used`. Tom ruled on
+    sight: *"mi should no longer have any d50 keys."* Removed from the 27 lang files and from
+    `english_string_hashes.json`. **The glossary's `median rock size` research note is KEPT** — it
+    is a dated record of a 2026-07-13 cross-language pass that also covers `rc_D50`, which still
+    ships, so deleting it would throw away research still in use. The `mi` wiring in
+    `prefix_terms.inc.php` also stays: `mi_notes_2` still discusses rock lining.
 
 - 0|297| **[DONE 2026-08-13] ONE sprint cleared the whole standing translation backlog.** 26
   Sonnet agents, one per language, all launched at once. Final size 364 strings, not the 442

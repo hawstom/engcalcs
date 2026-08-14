@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='खंड';
 $ec_lang['mi_groupRegion']='क्षेत्र';
 $ec_lang['mi_station']='चेनेज';
 $ec_lang['mi_elevation']='ऊँचाई';
-$ec_lang['mi_d50in']='अस्तर मध्यिका चट्टान आकार';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q क्षेत्र सीमा (तट)';
 $ec_lang['mi_tau']='तल अपरूपण τ';

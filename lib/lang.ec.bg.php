@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='Сегмент';
 $ec_lang['mi_groupRegion']='Регион';
 $ec_lang['mi_station']='Ст.';
 $ec_lang['mi_elevation']='Кота';
-$ec_lang['mi_d50in']='Облицовка<br />медианен<br />размер<br />камъни';
 $ec_lang['mi_n']='n<br />за сег-<br />мент';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />граница<br />регион<br />(Бряг)';
 $ec_lang['mi_tau']='Дъно<br />срязв.<br />τ';

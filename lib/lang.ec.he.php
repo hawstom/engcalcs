@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='קטע';
 $ec_lang['mi_groupRegion']='אזור';
 $ec_lang['mi_station']='פיקטה';
 $ec_lang['mi_elevation']='גובה';
-$ec_lang['mi_d50in']='גודל<br />חציוני<br />של סלעי<br />החיפוי';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />גבול<br />בין אזורים<br />(גדה)';
 $ec_lang['mi_tau']='מאמץ<br />גזירה<br />תחתון<br />τ';

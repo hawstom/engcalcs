@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='Ділянка';
 $ec_lang['mi_groupRegion']='Зона';
 $ec_lang['mi_station']='Пікет';
 $ec_lang['mi_elevation']='Відмітка';
-$ec_lang['mi_d50in']='Медіанний<br />розмір<br />каменю<br />облицювання';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />межа<br />зони<br />(Берег)';
 $ec_lang['mi_tau']='Дон.<br />дотич.<br />τ';

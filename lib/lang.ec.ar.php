@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='قطعة';
 $ec_lang['mi_groupRegion']='منطقة';
 $ec_lang['mi_station']='مسافة';
 $ec_lang['mi_elevation']='منسوب';
-$ec_lang['mi_d50in']='حجم<br />صخور<br />التبطين<br />الوسيط';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='حد منطقة R<sub>h</sub>، Q (ضفة)';
 $ec_lang['mi_tau']='إجهاد القص القاعي τ';

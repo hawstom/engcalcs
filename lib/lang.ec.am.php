@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='ክፍል';
 $ec_lang['mi_groupRegion']='ክልል';
 $ec_lang['mi_station']='ርቀት ነጥብ';
 $ec_lang['mi_elevation']='ከፍታ';
-$ec_lang['mi_d50in']='የሽፋን<br />መካከለኛ<br />ድንጋይ<br />መጠን';
 $ec_lang['mi_n']='n<br />ለክፍል';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />የክልል<br />ወሰን<br />(ዳርቻ)';
 $ec_lang['mi_tau']='የታች<br />ሸርፍ<br />ጭንቀት<br />τ';

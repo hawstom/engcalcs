@@ -146,7 +146,6 @@ $ec_lang['mi_groupSegment']='Úsek';
 $ec_lang['mi_groupRegion']='Oblast';
 $ec_lang['mi_station']='Sta.';
 $ec_lang['mi_elevation']='Kóta';
-$ec_lang['mi_d50in']='Mediánová<br />velikost<br />kamene<br />opevnění';
 $ec_lang['mi_n']='n<br />seg-<br />mentu';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />hranice<br />oblasti<br />(Břeh)';
 $ec_lang['mi_tau']='Tečné<br />nap. dna<br />τ';

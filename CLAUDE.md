@@ -437,11 +437,12 @@ A string with **no pipe** is entirely intent (all existing clean strings stay va
 |-----|-------|-------------------------------|
 | `layout` | `column heading` | Renders as a header in a very narrow fixed-width results-table column; keep the term as short as the language allows. |
 | `layout` | `unit token` | Renders inside a narrow units selector (dropdown); keep the token as short as the language allows. |
-| `layout` | `nav item` | Renders as a top-level item in the site navigation bar, competing for width with every sibling item; keep it as short as the language allows, and prefer the shortest synonym offered rather than the most explanatory one. |
+| `layout` | `nav item` | Renders as a top-level item in a HORIZONTAL BAR — the site navigation bar, or the `lpn_` menu bar — competing for width with every sibling item; keep it as short as the language allows, and prefer the shortest synonym offered rather than the most explanatory one. **A row inside a pull-down is NOT a nav item**: a pop-up menu sizes to its own widest row and competes with nothing, so tagging one tells 26 translators to compress a label that has room. `layout_tag_check.php` fails the build on that. |
 | `layout` | `button` | Renders as a button label competing for width with its siblings in a row or dialog; keep it as short as the language allows and imperative in mood. |
 | `avoid` | `<wrong sense>` | This label must NOT be read or translated in the named sense (e.g. `avoid: temporal "sporadic"`). |
 | `symbol` | *(flag, no value)* | This label contains a variable symbol; keep every letter and subscript in it exactly as in English in every language, including RTL. Subscripted names (e.g. `q<sub>avg,field</sub>`) are symbols, not words to translate. The specific subscript is read from the label itself, so it need not be repeated in the note. |
 | `gloss` | `<term>` | Defer to `glossary.json` term `<term>` for full disambiguation; do not restate it inline. |
+| `runtime` | `units appended` | The page concatenates a unit label onto this string at render time; do not name a unit inside the text, and leave room for one to follow. |
 
 Tags may be **flags** (no `:value`, e.g. `symbol`) or `tag: value`. Combine multiple with `; ` (e.g. `symbol; avoid: anatomical "head"`).
 
@@ -455,7 +456,22 @@ n`/`Составной n`/`Композ. n` for Composite n). Don't re-flag a `l
 as an English-reform grievance on the strength of it merely looking terse — check whether wave-1
 translators actually struggled with it first.
 
-Add new `layout` tokens or tags here (defined once) rather than expanding prose in the data. Example:
+**A WRONG TAG IS WORSE THAN A MISSING ONE, and `php dev/scripts/layout_tag_check.php` (blocking,
+in `check_all.sh`) now enforces that.** A tag is an instruction a translator obeys without being
+able to see whether it is still true. `lpn_backdrop_scale_entry` carried `layout: nav item`
+describing a `<select>` that Task 276 had already replaced with a menu button — and in the Task 297
+sprint four agents (bg, pt, uk, zh) dutifully compressed the label, one proposing we shorten the
+English so every language would inherit the cut. All four reasoned correctly from a constraint that
+had been false for weeks. **The tag describes a WIDGET and nothing else in the repo connects the
+two**, so it goes stale silently whenever the widget changes; auditing the other 22 tags by hand
+then turned up `lpn_help_walkthroughs` carrying the same wrong tag, which is the argument for the
+check rather than for reading more carefully. It verifies the value is in the vocabulary, that a
+`column heading` really is inside a `<th>`, that a `unit token` is named `u_*`, and that a
+`nav item` is not merely a pull-down row. Free-form prose commentary is left alone — it is
+human-authored and legal, just less parsimonious than a tag.
+
+Add new `layout` tokens or tags here (defined once) rather than expanding prose in the data — the
+check reads its vocabulary from this table, so an undefined token fails the build. Example:
 ```php
 $ec_lang_syn['mi_is_bank']='Boundary (divider, edge, break, or bank as in HEC-RAS) between adjacent regions of differing flow, hydraulic radius, and composite n. | layout: column heading';
 ```
@@ -709,8 +725,8 @@ office."* There are three tiers and they have very different prices. Knowing whi
 belongs to IS the budgeting decision.
 
 **Tier 1 — automated, seconds, free. `sh dev/scripts/check_all.sh` before every commit.**
-Thirteen checks: PHP and JS syntax, HTML balance on every page, the pageConfig PHP→JS bridge, tip
-markup via the helpers, language rules A–D, gloss pointers, the coverage declaration, payload
+Fourteen checks: PHP and JS syntax, HTML balance on every page, the pageConfig PHP→JS bridge, tip
+markup via the helpers, language rules A–D, gloss pointers, layout tags, the coverage declaration, payload
 freshness, the 12 lpn harnesses, plus three advisory ones (key hygiene, size budget, English
 drift). Blocking failures exit 1. **This list used to live only in prose and in whoever remembered
 it** — a check nobody runs is indistinguishable from a check that does not exist, which is the same

@@ -146,7 +146,6 @@ $ec_lang['mi_groupSegment']='Segment';
 $ec_lang['mi_groupRegion']='Bereich';
 $ec_lang['mi_station']='Sta.';
 $ec_lang['mi_elevation']='Höhe';
-$ec_lang['mi_d50in']='Mediane<br />Korn-<br />größe<br />Deckwerk';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />Bereich-<br />grenze<br />(Ufer)';
 $ec_lang['mi_tau']='Sohl-<br />schub-<br />spg. τ';

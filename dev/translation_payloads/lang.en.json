@@ -133,7 +133,6 @@
         "mi_groupRegion": "Region",
         "mi_station": "Sta",
         "mi_elevation": "Elevation",
-        "mi_d50in": "Median rock size of lining",
         "mi_n": "n",
         "mi_is_bank": "R<sub>h<\/sub>, Q region boundary (Bank)",
         "mi_tau": "Bottom shear τ",
@@ -861,7 +860,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 859,
+    "count": 858,
     "active_prefixes": [
         "about",
         "bpn",

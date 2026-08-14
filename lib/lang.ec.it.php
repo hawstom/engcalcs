@@ -146,7 +146,6 @@ $ec_lang['mi_groupSegment']='Segmento';
 $ec_lang['mi_groupRegion']='Regione';
 $ec_lang['mi_station']='Prog.';
 $ec_lang['mi_elevation']='Quota';
-$ec_lang['mi_d50in']='Diam.<br />mediano<br />rivestim.';
 $ec_lang['mi_n']='n<br />del seg-<br />mento';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />confine<br />regione<br />(Sponda)';
 $ec_lang['mi_tau']='Tensione<br />tang.<br />di fondo<br />τ';

@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='ផ្នែក';
 $ec_lang['mi_groupRegion']='តំបន់';
 $ec_lang['mi_station']='ស្ថា';
 $ec_lang['mi_elevation']='កម្ពស់';
-$ec_lang['mi_d50in']='ទំហំថ្មមធ្យម<br />ស្រទាប់ការពារ';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />ព្រំដែន<br />តំបន់<br />(ច្រាំង)';
 $ec_lang['mi_tau']='ភាពកិន<br />បាត<br />τ';

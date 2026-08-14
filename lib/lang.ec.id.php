@@ -146,7 +146,6 @@ $ec_lang['mi_groupSegment']='Segmen';
 $ec_lang['mi_groupRegion']='Zona';
 $ec_lang['mi_station']='STA';
 $ec_lang['mi_elevation']='Elev';
-$ec_lang['mi_d50in']='Ukuran<br />median<br />batu<br />pelapis';
 $ec_lang['mi_n']='n<br />untuk<br />seg-<br />men';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />batas<br />zona<br />(Tebing)';
 $ec_lang['mi_tau']='Tegangan<br />geser<br />dasar<br />τ';

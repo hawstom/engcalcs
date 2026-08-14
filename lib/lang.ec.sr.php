@@ -145,7 +145,6 @@ $ec_lang['mi_groupSegment']='Сегмент';
 $ec_lang['mi_groupRegion']='Регија';
 $ec_lang['mi_station']='Ст.';
 $ec_lang['mi_elevation']='Кота';
-$ec_lang['mi_d50in']='Медијана<br />величина<br />камена<br />облоге';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />граница<br />регије<br />(Обала)';
 $ec_lang['mi_tau']='Смицајни<br />напон<br />дна τ';

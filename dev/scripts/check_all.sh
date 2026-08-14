@@ -71,6 +71,7 @@ run_check "tip markup via helpers"       blocking php dev/scripts/tip_markup_che
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php
 run_check "gloss pointers resolve"       blocking php dev/scripts/gloss_ref_check.php
+run_check "layout tags match widgets" blocking php dev/scripts/layout_tag_check.php
 run_check "coverage declaration"         blocking php dev/scripts/coverage_selftest.php
 run_check "payload freshness"            blocking php dev/scripts/generate_translation_payloads.php --check
 

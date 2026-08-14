@@ -755,7 +755,6 @@
         "mhp_vel_ok_short": "9ce3bd4224c8c1780db56b4125ecf3f24bf748b7",
         "mhp_vel_ok_tip": "ac846a6ab211a98d567a08ef80d061c5fdba0cc4",
         "mi_a": "6dcd4ce23d88e2ee9568ba546c007c63d9131c1b",
-        "mi_d50in": "f368f514822bd81249f5fdfec9087f2fea98f9a2",
         "mi_elevation": "a514da1094ce1bd6b9267e8a0e3df8736da457a5",
         "mi_fr617": "aa77f314fab0bd632acfb6279e7fb2c447dd50eb",
         "mi_groupPoint": "f79a28423ed1ae0232efb54ad41227d0955084f3",
@@ -3253,10 +3252,6 @@
         },
         "mi_a": {
             "words": 1,
-            "ends_sentence": false
-        },
-        "mi_d50in": {
-            "words": 5,
             "ends_sentence": false
         },
         "mi_elevation": {

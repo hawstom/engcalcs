@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='Sehemu';
 $ec_lang['mi_groupRegion']='Eneo';
 $ec_lang['mi_station']='Stn';
 $ec_lang['mi_elevation']='Mwinuko';
-$ec_lang['mi_d50in']='Ukubwa<br />wastani wa<br />jiwe la<br />kifuniko';
 $ec_lang['mi_n']='n kwa<br />sehemu';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />mpaka wa<br />eneo<br />(Ukingo)';
 $ec_lang['mi_tau']='Msongo<br />wa chini<br />τ';

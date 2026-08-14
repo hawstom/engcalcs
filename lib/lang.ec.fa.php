@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='بخش';
 $ec_lang['mi_groupRegion']='ناحیه';
 $ec_lang['mi_station']='ایستگاه';
 $ec_lang['mi_elevation']='تراز';
-$ec_lang['mi_d50in']='اندازه میانه سنگ پوشش';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q مرز ناحیه (کناره)';
 $ec_lang['mi_tau']='برش کف τ';

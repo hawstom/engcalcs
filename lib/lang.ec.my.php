@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='အပိုင်း';
 $ec_lang['mi_groupRegion']='ဇုန်';
 $ec_lang['mi_station']='အကွာမှတ်';
 $ec_lang['mi_elevation']='အမြင့်';
-$ec_lang['mi_d50in']='အကာအရံ<br />ကျောက်တုံး<br />အလယ်အလတ်<br />အရွယ်';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />ဇုန်<br />နယ်နိမိတ်<br />(ကမ်း)';
 $ec_lang['mi_tau']='အောက်ခြေ<br />ညှပ်ဖိအား<br />τ';

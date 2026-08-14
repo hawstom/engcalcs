@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='Bölüm';
 $ec_lang['mi_groupRegion']='Bölge';
 $ec_lang['mi_station']='İst.';
 $ec_lang['mi_elevation']='Kot';
-$ec_lang['mi_d50in']='Kaplama<br />ortanca<br />taş<br />boyutu';
 $ec_lang['mi_n']='n<br />böl.';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />bölge<br />sınırı<br />(Kıyı)';
 $ec_lang['mi_tau']='Taban<br />kaym.<br />τ';

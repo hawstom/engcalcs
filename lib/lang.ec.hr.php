@@ -145,7 +145,6 @@ $ec_lang['mi_groupSegment']='Segment';
 $ec_lang['mi_groupRegion']='Područje';
 $ec_lang['mi_station']='Stacionaža';
 $ec_lang['mi_elevation']='Kota';
-$ec_lang['mi_d50in']='Medijalna<br />veličina<br />kamena<br />obloge';
 $ec_lang['mi_n']='n<br />za seg-<br />ment';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />granica<br />područja<br />(Obala)';
 $ec_lang['mi_tau']='Posmično<br />naprezanje<br />dna τ';

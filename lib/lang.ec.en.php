@@ -275,8 +275,6 @@ $ec_lang['mi_station']='Sta';
 $ec_lang_syn['mi_station']='Station (chainage, distance along the alignment) of this point — "Distance" is an acceptable alias where the surveying sense of "station" has no natural short word | layout: column heading; avoid: transit-stop "bus/train station" sense (found in he/hi/ur/ps/my/am, corrected 2026-07-08)';
 $ec_lang['mi_elevation']='Elevation';
 $ec_lang_syn['mi_elevation']='| layout: column heading; symbol';
-$ec_lang['mi_d50in']='Median rock size of lining';
-$ec_lang_syn['mi_d50in']='| gloss: median rock size; not used; layout: column heading';
 $ec_lang['mi_n']='n';
 $ec_lang_syn['mi_n']='';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q region boundary (Bank)';
@@ -1223,7 +1221,7 @@ $ec_lang_syn['lpn_menu_help']='Help, Guidance, Assistance, Support, or Informati
 // good enough on a blog page, and a permanent "(in English)" cost more, constantly, than the
 // occasional reader who meets it untranslated.
 $ec_lang['lpn_help_walkthroughs']='Walkthroughs';
-$ec_lang_syn['lpn_help_walkthroughs']='Walkthroughs, Guided tours, Step-by-step guides, Worked examples, or Tutorials | layout: nav item';
+$ec_lang_syn['lpn_help_walkthroughs']='Walkthroughs, Guided tours, Step-by-step guides, Worked examples, or Tutorials';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1575,9 +1573,9 @@ $ec_lang['lpn_backdrop_add']='Add';
 // behind lpn_backdrop_scale_entry. Do not re-add an ask.
 $ec_lang['lpn_backdrop_scale']='Scale by picking';
 $ec_lang['lpn_backdrop_scale_entry']='Scale by world file or by the size of one pixel on the map';
-$ec_lang_syn['lpn_backdrop_scale_entry']='World (Map Coordinates or Georeference) File for the image | gloss: world file; layout: nav item';
+$ec_lang_syn['lpn_backdrop_scale_entry']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Enter the size of one pixel on the map, or paste the complete contents of the world file for the image';
-$ec_lang_syn['lpn_backdrop_scale_entry_prompt']='World (Map Coordinates or Georeference) File for the image | gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text';
+$ec_lang_syn['lpn_backdrop_scale_entry_prompt']='World (Map Coordinates or Georeference) File for the image | gloss: world file; runtime: units appended';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Type one number for the size of one pixel on the map, or paste all six lines of a world file.';
 $ec_lang_syn['lpn_backdrop_scale_entry_bad']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
 $ec_lang['lpn_backdrop_wld_bad']='This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.';

@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='حصہ';
 $ec_lang['mi_groupRegion']='علاقہ';
 $ec_lang['mi_station']='چینج';
 $ec_lang['mi_elevation']='بلندی';
-$ec_lang['mi_d50in']='تہ بندی کے<br />پتھر کا<br />وسیط حجم';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>، Q<br />علاقے کی حد<br />(کنارہ)';
 $ec_lang['mi_tau']='تہ کی<br />برش τ';

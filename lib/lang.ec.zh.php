@@ -146,7 +146,6 @@ $ec_lang['mi_groupSegment']='分段';
 $ec_lang['mi_groupRegion']='分区';
 $ec_lang['mi_station']='桩号';
 $ec_lang['mi_elevation']='高程';
-$ec_lang['mi_d50in']='护坡石材中值粒径';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>、Q 分区边界（岸坡）';
 $ec_lang['mi_tau']='底部切应力 τ';

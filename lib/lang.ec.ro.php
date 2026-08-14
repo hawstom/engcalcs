@@ -145,7 +145,6 @@ $ec_lang['mi_groupSegment']='Segment';
 $ec_lang['mi_groupRegion']='Regiune';
 $ec_lang['mi_station']='Sta.';
 $ec_lang['mi_elevation']='Cotă';
-$ec_lang['mi_d50in']='Dimensiune<br />mediană<br />rocă<br />placare';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />limita<br />regiunii<br />(Mal)';
 $ec_lang['mi_tau']='Efort<br />tangenț.<br />τ';

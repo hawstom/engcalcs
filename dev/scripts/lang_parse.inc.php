@@ -139,3 +139,26 @@ function ecUnescapeDoubleQuoted(string $raw): string
         '\\t'  => "\t",
     ]);
 }
+
+/**
+ * key => raw $ec_lang_syn value, escapes intact.
+ *
+ * Lives here rather than in the one caller so it cannot drift from ecParseLangAssignments(), and so
+ * it inherits that function's possessive quantifiers — the syn array holds the same multi-byte
+ * scripts and the same paragraph lengths, so the JIT-stack failure documented above is reachable
+ * here too. Added 2026-08-13 for dev/scripts/layout_tag_check.php (ROADMAP Task 299).
+ */
+function ecLangSynRawValues(string $content): array
+{
+    $pattern = '/\$ec_lang_syn\[\'([^\']++)\'\]\s*=\s*(?:\'((?:[^\'\\\\]++|\\\\.)*+)\'|"((?:[^"\\\\]++|\\\\.)*+)");/m';
+    $ok = preg_match_all($pattern, $content, $m, PREG_SET_ORDER | PREG_UNMATCHED_AS_NULL);
+    if ($ok === false) {
+        // Never return a silently truncated parse — that is the exact defect documented above.
+        throw new RuntimeException('ecLangSynRawValues: preg_match_all failed (' . preg_last_error_msg() . ')');
+    }
+    $out = [];
+    foreach ($m as $set) {
+        $out[$set[1]] = $set[2] ?? $set[3] ?? '';
+    }
+    return $out;
+}

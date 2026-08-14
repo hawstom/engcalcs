@@ -146,7 +146,6 @@ $ec_lang['mi_groupSegment']='Сегмент';
 $ec_lang['mi_groupRegion']='Зона';
 $ec_lang['mi_station']='Пикет';
 $ec_lang['mi_elevation']='Отм.';
-$ec_lang['mi_d50in']='Медианный<br />размер<br />камня<br />крепления';
 $ec_lang['mi_n']='n<br />сег-<br />мента';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />граница<br />зоны<br />(Берег)';
 $ec_lang['mi_tau']='Дон. кас.<br />напр. τ';

@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='برخه';
 $ec_lang['mi_groupRegion']='سیمه';
 $ec_lang['mi_station']='واټن';
 $ec_lang['mi_elevation']='لوړوالی';
-$ec_lang['mi_d50in']='د پوښ<br />منځنۍ<br />کاڼو<br />اندازه';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />د سیمې<br />حد<br />(غاړه)';
 $ec_lang['mi_tau']='لاندینۍ<br />برش<br />τ';

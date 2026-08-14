@@ -147,7 +147,6 @@ $ec_lang['mi_groupSegment']='Segment';
 $ec_lang['mi_groupRegion']='Région';
 $ec_lang['mi_station']='Sta.';
 $ec_lang['mi_elevation']='Cote';
-$ec_lang['mi_d50in']='Granul.<br />médiane<br />revêtement<br />rocheux';
 $ec_lang['mi_n']='n';
 $ec_lang['mi_is_bank']='R<sub>h</sub>, Q<br />limite de<br />région<br />(Berge)';
 $ec_lang['mi_tau']='Cisaill.<br />fond<br />τ';
