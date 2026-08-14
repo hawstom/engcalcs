@@ -50,6 +50,42 @@ about batching; if waves stop dying, that is evidence about wave size. Keep them
   and had in fact written all 289 keys; a dozen others reported progress and had written nothing.
 - Then commit, push, report, and **stop**.
 
+## Handing this off to a cold session
+
+**A wave boundary is a safe seam; mid-wave is not.** Everything a fresh session needs is on disk:
+this file, `dev/translation-agent-brief.md`, the friction JSON, the glossary, the exempt list, and
+the payload deltas (which already reflect partial work — km and my read 189, not 289). What does
+NOT survive a `/clear` is the **in-flight agent reports**, which arrive as notifications to the
+session that launched them and carry the terminology judgements that must be written back to the
+glossary. So: clear between waves, never while agents are running.
+
+`/clear` is close to neutral on session limits, which is the thing actually worth managing. It
+lowers the orchestrator's per-turn context cost, but the orchestrator is not where the money goes —
+a five-agent wave is ~610k tokens against well under 150k for the whole wave boundary. Clear for
+hygiene, not as a limit strategy.
+
+### The defect checklist — run these by hand every wave, the tools do not catch them
+
+Four defect classes have now shipped past agents who explicitly claimed the file was clean. The
+disk check is not optional and neither is this list:
+
+1. **`lpn_field_auto` — the "Auto" false friend.** German *Auto* is a car; Romanian *auto* is
+   automotive. Both shipped, both had to be fixed by hand, and the ro agent had just declared it
+   left "no false cognate standing". Ask of every language: is *Auto* a real word here, and does it
+   mean something else? Keep it only with evidence (es/fr/it/sw), and scope the exemption.
+2. **`consent_accept` vs `consent_accept_all` — the amount/time trap.** These differ in TIME
+   (this ask vs. never ask again), never in amount. Pashto wrote *accept all* — one miss in 22.
+   Read the pair in every language and confirm the second one says *always*, not *everything*.
+3. **Latin script stranded in a non-Latin file.** Hindi shipped a bare Latin "Auto" in Devanagari;
+   Serbian had correctly written Аутоматски. EPANET, `ID`, symbols (Q, v, H, D, h_f) and unit
+   tokens are the deliberate exceptions.
+4. **A half-translated sibling set.** Indonesian shipped File/Edit in English beside Sisipkan/
+   Tampilan/Pengaturan. Read menu and toolbar sets as a group, not key by key.
+
+Then: exempt anything genuinely identical-to-English **with per-language scoping and a stated
+reason**, never globally to quiet a warning; and write terminology back to `glossary.json`
+**harvested from the shipped strings**, not from the agent's prose about what it did.
+
 ## Waves
 
 | Wave | Languages | Keys | Outcome |
