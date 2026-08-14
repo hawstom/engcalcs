@@ -117,23 +117,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **OPEN — add the suggestion-box instruction to the standard agent prompt template**, so it is
     not re-typed per sprint and cannot be forgotten.
 
-- 25|240| **`lpn_project_copy_suffix` carries a load-bearing leading space.**
-  `" (copy)"` is concatenated straight onto a project name (`js/looped-network.js:2831`, `:4161`), so
-  the leading space is functional — and leading whitespace is exactly what a careful translator or a
-  translation tool strips. **Fix:** move the space to the call site so the translatable string is
-  `(copy)` and cannot be silently broken.
-  - **The `lpn_ago_*` half of this task was WITHDRAWN 2026-08-08 — the finding was wrong.** The Wave 0
-    agent claimed the fragments were spliced into `"{x} ago"` and that Spanish therefore could not
-    render them. **Tom caught it:** *"Spanish can say 'hace {minutes} minutos' while English says
-    '{minutes} ago'. The concept is good. Did you misunderstand and build it wrong?"* No — it was
-    built right. `"ago"` lives in the **host** sentence, never in the fragment: en
-    `the last edit was {x} ago` / es `la última edición fue hace {x}`, with the fragment supplying
-    only `{n} minutos`. Composed, Spanish reads *"la última edición fue hace 5 minutos"*, and has
-    been shipping correctly all along.
-  - **Kept as a record, not deleted**, because a withdrawn finding is data about the *pass*: an
-    adversarial reviewer over-calls, and the orchestrator relaying it without checking the composed
-    output is the failure mode to watch. The general caution still stands — a run-time sentence
-    fragment IS a latent i18n defect — but this particular instance is a correct implementation.
 
 - 30|234| **Canal Seepage must prove its worth or go (Tom, 2026-08-08: "in my crosshairs").** After
   Task 232 removed `Irrigation.php`, `cs_` is the remaining page Tom is not proud of — his standing
@@ -1272,12 +1255,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   vendoring. Do NOT start until someone asks for one — Task 243's own conclusion was that the
   toggle is the cheap 90% of the value and these are the expensive 10%.
 
-- 15|249| **Translate the 5 `lpn_` engine keys — now into all 26, not the core four.**
-  `lpn_settings_engine_epanet`, its tip, `lpn_engine_loading`, `_failed`, `_manning_note`. English
-  shipped 2026-08-09. **Rewritten 2026-08-11:** this used to say "es/pt/fr/tr only, because `lpn_`
-  is not a core calculator", which stopped being true the moment Task 251's declaration landed.
-  There is nothing left to schedule separately — these five are now five of the ~273 keys per
-  language that `lpn_`'s promotion owes, and they go with that sprint.
 
 - 40|244| **Standardize the distinguishing term, and put it in the navbar next to the language menu.**
   Tom, 2026-08-09, on epanet-js labelling itself "Open Source" while shipping FSL. `About.php` is
@@ -1833,6 +1810,56 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|249| **[DONE 2026-08-12, closed 2026-08-13] Translate the 5 `lpn_` engine keys — now into
+  all 26, not the core four.**
+
+  **Verified closed 2026-08-13:** `lpn_settings_engine_epanet`, `lpn_engine_loading`, `_failed` and
+  `_manning_note` are translated in all 26 languages — spot-checked in `zh`, `sw` and `am`, i.e. one
+  core-adjacent and two 0.65-tier languages. This task correctly predicted its own closure: it said
+  the five keys would ride along with `lpn_`'s promotion to a core calculator rather than being
+  scheduled separately, and that is exactly what happened in the Task 297 sprint. `lang_parity_check`
+  now reports 0 missing and 0 equal-to-english suite-wide. Nothing was left to do.
+
+  Original entry follows.
+
+  **Translate the 5 `lpn_` engine keys — now into all 26, not the core four.**
+  `lpn_settings_engine_epanet`, its tip, `lpn_engine_loading`, `_failed`, `_manning_note`. English
+  shipped 2026-08-09. **Rewritten 2026-08-11:** this used to say "es/pt/fr/tr only, because `lpn_`
+  is not a core calculator", which stopped being true the moment Task 251's declaration landed.
+  There is nothing left to schedule separately — these five are now five of the ~273 keys per
+  language that `lpn_`'s promotion owes, and they go with that sprint.
+
+- 0|240| **[DONE, closed 2026-08-13] `lpn_project_copy_suffix` carries a load-bearing leading
+  space.**
+
+  **Verified closed 2026-08-13:** the English key is now `'(copy)'` with no leading space
+  (`lib/lang.ec.en.php:1239`), and both call sites concatenate the separator themselves
+  (`js/looped-network.js:3873`, `:5515` — `... + ' ' + (pc.lpn_project_copy_suffix || '(copy)')`),
+  which is exactly the fix this task prescribed. **All 27 language files were re-checked for a
+  surviving leading space and none has one** — worth stating, because the failure mode this task
+  named (a translator or tool silently stripping leading whitespace) would otherwise reappear one
+  language at a time rather than all at once.
+
+  Original entry follows.
+
+  **`lpn_project_copy_suffix` carries a load-bearing leading space.**
+  `" (copy)"` is concatenated straight onto a project name (`js/looped-network.js:2831`, `:4161`), so
+  the leading space is functional — and leading whitespace is exactly what a careful translator or a
+  translation tool strips. **Fix:** move the space to the call site so the translatable string is
+  `(copy)` and cannot be silently broken.
+  - **The `lpn_ago_*` half of this task was WITHDRAWN 2026-08-08 — the finding was wrong.** The Wave 0
+    agent claimed the fragments were spliced into `"{x} ago"` and that Spanish therefore could not
+    render them. **Tom caught it:** *"Spanish can say 'hace {minutes} minutos' while English says
+    '{minutes} ago'. The concept is good. Did you misunderstand and build it wrong?"* No — it was
+    built right. `"ago"` lives in the **host** sentence, never in the fragment: en
+    `the last edit was {x} ago` / es `la última edición fue hace {x}`, with the fragment supplying
+    only `{n} minutos`. Composed, Spanish reads *"la última edición fue hace 5 minutos"*, and has
+    been shipping correctly all along.
+  - **Kept as a record, not deleted**, because a withdrawn finding is data about the *pass*: an
+    adversarial reviewer over-calls, and the orchestrator relaying it without checking the composed
+    output is the failure mode to watch. The general caution still stands — a run-time sentence
+    fragment IS a latent i18n defect — but this particular instance is a correct implementation.
 
 - 0|146| **[DONE 2026-08-13] Looped pipe network calculator with a map interface — new page `lpn_`.
   Scoped with Tom 2026-07-28; was "Looped-network (Hardy Cross) solving", extracted from Task 137 on
