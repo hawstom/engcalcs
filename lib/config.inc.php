@@ -123,12 +123,13 @@ define('TITLE_LOG', dirname(__DIR__) . '/log/engcalcs-title.log');
 //             language and the per-family defaults of Task 162. Read it to REORDER options by
 //             measured frequency, not to delete them: an unused option in a dropdown costs a user
 //             nothing, a missing one costs them the calculator.
-//   repeat    detail = 'return', logged when this browser has calculated on this page before. The
+//   repeat    detail = 'return', logged when this browser has already left WORK on this page. The
 //             strongest value signal the suite does not otherwise collect — a calculator a working
 //             engineer comes back to is worth more than a hundred one-off visits. STORES NOTHING
-//             NEW: it reads the page's own input cookie, which is exempt storage that already
-//             exists, rather than a page list that would have made the consent banner's wording
-//             false. Reading it for analytics is still an analytics access, so the row is gated on
+//             NEW: it reads the page's own input cookie -- or, on Looped-Network, a saved project
+//             DOCUMENT -- which is exempt storage that already exists, rather than a page list that
+//             would have made the consent banner's wording false. Not the lpn project INDEX: a
+//             first visit writes one before any edit, so it would count reopening as using. Reading it for analytics is still an analytics access, so the row is gated on
 //             consent and is absent for everybody else. There is no 'new' row: a first visit is
 //             already a human-view row, and writing both would double every page's view count for
 //             consenters only. See dev/cookie-storage-inventory.md.

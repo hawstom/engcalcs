@@ -420,8 +420,37 @@ document.addEventListener('change', function (e) {
 // would double every page's count for consenters only -- exactly the mixture the two-bucket rule
 // exists to prevent.
 //
-// Known undercount, stated rather than hidden: Looped-Network keeps its work in localStorage
-// projects rather than an input cookie, so a returning map user is invisible here.
+// Looped-Network keeps its work in localStorage rather than an input cookie, so it needs its own
+// probe (added 2026-08-14, Tom: the map page is exactly where the shopper/user split matters most).
+// Same principle, better evidence: a SAVED PROJECT DOCUMENT proves this browser drew a network here.
+//
+// The document, NOT `lpn_index`. A brand-new visitor gets an index entry the moment init() runs --
+// the blank project it opens on is registered immediately -- but "a brand-new project has no
+// document until its first edit" (js/looped-network.js), and adoptOrphans() drops an index entry
+// whose document is missing. So `lpn_index` would have marked every second page load a return and
+// counted reopening the page as using it, which is the very distinction this is being built to
+// draw. A `lpn_project_<id>` key exists only if somebody edited something.
+//
+// `lpn_document` is the pre-library single-document key, checked too: a long-standing user whose
+// storage has not been migrated yet still drew that network.
+EngCalcs._priorWorkKeyPrefixes = { 'Looped-Network': ['lpn_project_', 'lpn_document'] };
+EngCalcs._hasPriorLocalWork = function (page) {
+	'use strict';
+	var prefixes = this._priorWorkKeyPrefixes[page];
+	if (!prefixes) return false;
+	try {
+		for (var i = 0; i < window.localStorage.length; i++) {
+			var key = window.localStorage.key(i);
+			for (var j = 0; j < prefixes.length; j++) {
+				if (key && key.indexOf(prefixes[j]) === 0) return true;
+			}
+		}
+	} catch (err) {
+		// Private mode or storage disabled. Nobody is counted as returning, which understates the
+		// number rather than inventing one.
+	}
+	return false;
+};
 EngCalcs.maybeLogRepeatVisit = function () {
 	'use strict';
 	var page = this.cookieName || '';
@@ -429,8 +458,11 @@ EngCalcs.maybeLogRepeatVisit = function () {
 	if (typeof this.analyticsConsented === 'function' && !this.analyticsConsented()) return;
 	// Read at DOMContentLoaded, which is before any page's own restore-and-recalculate runs (this
 	// file is loaded from echoHTMLHead, so its handler is registered first) and well before
-	// createCookie() could write this load's own cookie and make every visit look like a return.
-	if (new RegExp('(?:^|;\\s*)' + page.replace(/[^A-Za-z0-9_-]/g, '') + '=').test(document.cookie)) {
+	// createCookie() -- or looped-network.js's own init(), which registers on DOMContentLoaded too
+	// -- could write this load's own state and make every visit look like a return.
+	var returning = new RegExp('(?:^|;\\s*)' + page.replace(/[^A-Za-z0-9_-]/g, '') + '=').test(document.cookie)
+		|| this._hasPriorLocalWork(page);
+	if (returning) {
 		this.logSignal('repeat', 'return');
 	}
 };

@@ -76,10 +76,11 @@
 #        outbound  a reference link out of /engcalcs/ was clicked; detail = host + path.
 #        touch     they changed some input on the page; detail = 'input'.
 #        units     a unit was chosen; detail = 'preset:us' | 'preset:si' | '<family>:<unit>'.
-#        repeat    detail = 'return' — this browser had this page's input cookie already, i.e. it
-#                  calculated here within the last year. Stores nothing new; reads exempt storage.
-#                  CONSENTING VISITORS ONLY (an analytics READ still needs consent), so the
-#                  denominator for any repeat rate is the consented rows, never all of them.
+#        repeat    detail = 'return' — this browser had already left work behind on this page: its
+#                  input cookie on a calculator, a saved project document on Looped-Network. Means
+#                  USED, not opened. Stores nothing new; reads exempt storage. CONSENTING VISITORS
+#                  ONLY (an analytics READ still needs consent), so the denominator for any repeat
+#                  rate is the consented rows, never all of them.
 #        lpn       detail = 'first:<example|element|backdrop|import>' or 'diag:<code>'.
 #      DEDUPED PER PAGE LOAD, IN THE PAGE'S OWN MEMORY — not per visit like the logs above, whose
 #      ec_seen digit is full at five bits (the consent banner promises "a single digit per page").
@@ -514,17 +515,20 @@ echo "========== Returning users (Task 200) =========="
 echo "    A calculator a working engineer comes back to is worth more than a hundred one-off"
 echo "    visits, and nothing else in this report can tell those two apart."
 echo ""
-echo "    A row means: this browser had this page's input cookie already, i.e. it CALCULATED here"
-echo "    within the last year. That cookie is exempt storage that exists anyway, which is why this"
-echo "    measurement stores nothing new — see dev/cookie-storage-inventory.md for why that mattered"
-echo "    enough to design around."
+echo "    A row means this browser had already left WORK behind on this page — its input cookie on a"
+echo "    calculator, a saved project document on Looped-Network. Both are exempt storage that exists"
+echo "    anyway, which is why this measurement stores nothing new; see dev/cookie-storage-inventory.md"
+echo "    for why that mattered enough to design around."
 echo ""
-echo "    TWO UNDERCOUNTS, both structural, neither a defect to fix:"
-echo "      - CONSENTING VISITORS ONLY. Reading that cookie for an analytics purpose is still an"
-echo "        analytics access, so the row is not written otherwise. Treat this as a sample, never"
-echo "        as a total, and never divide it by a count that includes the visits bucket."
-echo "      - LOOPED-NETWORK IS INVISIBLE HERE. Its work lives in localStorage projects, not an"
-echo "        input cookie, so a returning map user leaves no trace in this table."
+echo "    IT MEANS USED, NOT OPENED, and on the map page that distinction is the whole point: a"
+echo "    Looped-Network row requires a SAVED PROJECT DOCUMENT, which exists only after a real edit."
+echo "    The project index will not do — a first visit writes one before the visitor touches"
+echo "    anything, so probing it would have counted reopening the page as using it."
+echo ""
+echo "    ONE UNDERCOUNT, structural, not a defect to fix: CONSENTING VISITORS ONLY. Reading that"
+echo "    storage for an analytics purpose is still an analytics access, so the row is not written"
+echo "    otherwise. Treat this as a sample, never as a total, and never divide it by a count that"
+echo "    includes the visits bucket."
 echo ""
 awk -F'\t' '$5 == "repeat" {print $2}' "$RAW_SIGNAL_LOG" | sort | uniq -c | sort -rn
 echo ""

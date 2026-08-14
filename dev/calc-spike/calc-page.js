@@ -209,6 +209,12 @@ function loadCalculator(pageName, opts) {
 		EngCalcs: EngCalcs,
 		form: form,
 		scripts: loaded,
+		// The page's browser globals, for the few tests that are about what a SCRIPT does with the
+		// browser rather than what pageCalculator does with the form -- cookies, localStorage, the
+		// beacons. Exposed rather than re-stubbed in each harness so those tests run against the
+		// real js/Calculators.lib.js in the real load order, not against a copy of a function.
+		document: documentStub,
+		sandbox: sandbox,
 
 		/** The unit-conversion factor currently selected for a field (display per SI). */
 		factor(name) {

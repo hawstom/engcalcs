@@ -91,13 +91,21 @@ repeatedly."* A page-name list is not a digit, and its purpose is the opposite o
 would have meant rewriting the banner, retranslating it into 26 languages, and bumping
 `EC_CONSENT_VERSION` to re-ask everybody — for a diagnostic.
 
-So it reads the page's **own input cookie** instead, which is exempt storage that already exists:
-present at load ⇒ this browser calculated here before, within the last year. Better signal, no new
+So it reads storage the visitor's own work already put there: the page's **input cookie** on a
+calculator, and on Looped-Network a **saved project document** (`lpn_project_<id>`, or the legacy
+`lpn_document`). Present at load ⇒ this browser has used this page before. Better signal, no new
 storage, no banner change. Reading exempt storage for an analytics purpose is still an analytics
 access, so the *log row* is gated on `analyticsConsented()` even though the *storage* needs no
-consent — which is also why the repeat-visit table in `log/lang-log-stats.sh` is a sample of
-consenting visitors and never a total. **Looped-Network is invisible to it** (its work lives in the
-`lpn_` localStorage keys, not an input cookie); the report says so rather than rounding it off.
+consent — which is why the repeat-visit table in `log/lang-log-stats.sh` is a sample of consenting
+visitors and never a total.
+
+**On the map page, probe the DOCUMENT and never the index.** `lpn_index` is the tempting key and it
+is wrong: init() registers the blank project a first-time visitor opens on, so the index exists
+before any edit. Probing it would have marked every second page load a return and counted
+*reopening* the page as *using* it — collapsing the exact shopper/user distinction the signal was
+built to draw, silently, as a plausible number nobody could falsify from the report. A
+`lpn_project_<id>` key is written only on a real edit. `dev/calc-spike/repeat-visit-harness.js`
+asserts this and fails if the probe is widened to `lpn_`.
 
 **The general rule this is a worked example of: when a new measurement seems to need new storage,
 check whether something exempt already answers the question.** The expensive part of storing

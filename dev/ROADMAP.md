@@ -1737,9 +1737,26 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     because an analytics READ is an analytics access. **Generalise it:** when a new measurement
     seems to need new storage, check whether something exempt already answers the question — the
     cost of storing something is never the bytes, it is the sentence in the banner it makes false.
-  - **Stated undercounts, in the report rather than in a comment:** Looped-Network is invisible to
-    the repeat signal (its work lives in `lpn_` localStorage, not an input cookie), and the map's
-    "did nothing" figure is a residual, so it also absorbs anyone who left before the page loaded.
+  - **Looped-Network got its own probe the same day** (Tom: the map page is exactly where the
+    shopper/user split matters most). Same principle, better evidence — a **saved project document**
+    proves this browser drew a network. **Not `lpn_index`:** `init()` registers the blank project a
+    first-time visitor opens on, so the index exists before any edit, and probing it would have
+    counted *reopening* the page as *using* it. That defect would have been a plausible number
+    nobody could falsify from the report, so `dev/calc-spike/repeat-visit-harness.js` (12 checks,
+    mutation-tested) now fails if the probe is ever widened to `lpn_`.
+  - **This retired a reset experiment before it was run.** Tom proposed deleting the logs to see
+    whether lpn's shoppers/users re-ramped. Two things argued against it: the counts are **visits,
+    not people** (`ec_seen` is a session cookie, so a returning visitor is already counted again),
+    so a ramp confounds returning users with steady inbound shopping; and the `lpn_index` probe
+    answers the question directly and permanently. Logs archived with a date suffix rather than
+    deleted, so the baseline survives either way.
+  - **Stated undercount, in the report rather than in a comment:** the map's "did nothing" figure is
+    a residual, so it also absorbs anyone who left before the page finished loading.
+  - **Verification status: fixtures only.** Every section was checked against hand-built fixture
+    logs (populated and empty paths both), and the endpoint's sanitisation was checked end to end.
+    **None of it has been run against production data** — nothing had been collected when it
+    shipped. First real read should re-check the coverage dates in the footer before drawing any
+    conclusion, since these counts start months after the view counts do.
   - **The two reading rules from the original block still stand and are unchanged:** there is a bot
     floor around 900, so `%human of reach` is a signal-to-noise ratio and not a conversion rate for
     any page but MPF and Manning-Trap; and below roughly 40 humans `%used` is noise, so a page with
