@@ -6014,7 +6014,7 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'labels', label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } }
 		]);
 	}
-	// openSettingsMenu() is GONE (Task 241). Its three rows now live where they belong: Settings
+	// openSettingsMenu() is GONE (Tom, 2026-08-08). Its three rows now live where they belong: Settings
 	// and Units are sections of the panel, and Clear calculator is the button at its foot --
 	// which it already was, so the menu row was the duplicate, not the button.
 	function buildMenuBar() {
@@ -6026,7 +6026,7 @@ var EngCalcs = EngCalcs || {};
 			{ id: 'lpn_menu_edit', icon: 'edit', label: pc.lpn_menu_edit || 'Edit', open: openEditMenu },
 			{ id: 'lpn_menu_insert', icon: 'insert', label: pc.lpn_menu_insert || 'Insert', open: openInsertMenu },
 			{ id: 'lpn_menu_view', icon: 'view', label: pc.lpn_menu_view || 'View', open: openViewMenu },
-			// Settings is the one menu-bar item that opens a PANEL, not a pull-down (Task 241, Tom
+			// Settings is the one menu-bar item that opens a PANEL, not a pull-down (Tom,
 			// 2026-08-08): "there be a duplicated identical Settings that lives on the Toolbar and in
 			// the Menu". Identical label, identical element, both places -- which is the rule the old
 			// arrangement broke by making the toolbar button open the panel and the menu open a list
@@ -8120,7 +8120,7 @@ var EngCalcs = EngCalcs || {};
 		// and the how-long-before-a-colleague-may-take-over threshold), so the range was protecting a
 		// coupling rather than the user. Splitting those apart removed the setting instead of widening
 		// it, which is the better answer to the question he actually asked.
-		// ---- units (Task 241, Tom 2026-08-08) ----
+		// ---- units (Tom, 2026-08-08) ----
 		// Last section before the panel's foot, because a unit system is set once and then left
 		// alone -- it belongs with the settings, but not above the ones people actually revisit.
 		if (unitsBlock) {

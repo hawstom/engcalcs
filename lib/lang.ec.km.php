@@ -1099,7 +1099,7 @@ $ec_lang['lpn_confirm_restore_defaults']='កំណត់ការកំណត�
 $ec_lang['lpn_settings_wipe_btn']='លុបអ្វីៗទាំងអស់នៅលើទំព័រនេះ';
 $ec_lang['lpn_confirm_wipe']='លុបអ្វីៗទាំងអស់ដែលបានរក្សាទុកសម្រាប់ទំព័រនេះ — គម្រោងគ្រប់មួយ រូបភាពផ្ទៃខាងក្រោយគ្រប់មួយ ការកំណត់ទាំងអស់ និងជម្រើសខ្នាតវាស់របស់អ្នក — រួចផ្ទុកទំព័រឡើងវិញដូចអ្នកចូលមើលថ្មីម្នាក់នឹងឃើញមែនទេ? សកម្មភាពនេះមិនអាចត្រឡប់វិញបានទេ។';
 
-// Task 316: storage tanks, control valves, and scenarios (Khmer)
+// Sprint 316: storage tanks, control valves, and scenarios (Khmer)
 $ec_lang['lpn_tool_add_tank']='ធុងទឹក';
 $ec_lang['lpn_tool_add_valve']='វ៉ាល់';
 $ec_lang['lpn_tank_elev_tip']='កម្ពស់បាតធុងទឹក។ ជម្រៅទឹកក្នុងធុងវាស់ឡើងលើពីទីនេះ។';

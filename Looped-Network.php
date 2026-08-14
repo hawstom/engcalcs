@@ -49,7 +49,7 @@ echoHeader("EngCalcs", $html_title, "");
 	      // flex-wrap lets the two pieces re-flow onto separate lines on a narrow screen without any
 	      // extra markup -- the wrap-first-as-a-table/div behavior Tom asked for falls out of
 	      // flex-wrap for free. ?>
-	<?php // The units block is a SECTION OF THE SETTINGS PANEL (Task 241, Tom 2026-08-08). It lived
+	<?php // The units block is a SECTION OF THE SETTINGS PANEL (Tom, 2026-08-08). It lived
 	      // in a popover of its own from Task 211 until then, which cost Tom himself two failed
 	      // attempts to find it three days after he chose the location -- "I can't see them at all".
 	      // It is rendered here, hidden, and MOVED into the panel by rebuildSettingsFields(); the

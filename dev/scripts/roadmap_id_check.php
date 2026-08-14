@@ -138,6 +138,47 @@ if ($unclosed) {
     $failed = true;
 }
 
+// ---------------------------------------------------------------------------------------------
+// THIRD CHECK: does every "Task <n>" cited from CODE resolve to a real block?
+//
+// A task ID is a permanent handle, and the whole value of citing one from a comment is that a
+// reader can go and find out WHY. A citation that resolves to nothing spends the reader's trust
+// and gives nothing back -- worse than no citation, because they go looking.
+//
+// Found 2026-08-14, during the Task 320 archive move: `Task 241` is cited FOUR times from live
+// code (js/looped-network.js three times, Looped-Network.php once) and has never existed as a
+// roadmap block. The comments describe real work -- the settings-panel restructure of 2026-08-08 --
+// so the number was almost certainly a SPRINT id, and sprint ids and roadmap ids look identical
+// in a comment while living in different namespaces. That is an easy mistake to repeat, which is
+// why it is now a check instead of a paragraph.
+//
+// CODE ONLY, deliberately. Prose in dev/*.md cites freely and sometimes speculatively, and the
+// archive quotes old prose verbatim; policing that would be noise. A comment in a shipped file is
+// a different promise.
+$citeFiles = array_merge(
+    glob(__DIR__ . '/../../js/*.js'),
+    glob(__DIR__ . '/../../lib/*.php'),
+    glob(__DIR__ . '/../../*.php')
+);
+$dangling = array();
+foreach ($citeFiles as $f) {
+    $src = file_get_contents($f);
+    if (!preg_match_all('/\bTask (\d+(?:\.\d+)?)\b/', $src, $m)) { continue; }
+    foreach (array_unique($m[1]) as $cited) {
+        if (isset($seen[$cited])) { continue; }
+        $dangling[] = substr($f, strlen(__DIR__ . '/../../')) . '  ->  Task ' . $cited;
+    }
+}
+if (!empty($dangling)) {
+    echo "\nCITED FROM CODE BUT NOT A ROADMAP TASK (" . count($dangling) . "):\n\n";
+    foreach (array_unique($dangling) as $d) { echo "    $d\n"; }
+    echo "\nA comment that cites a task number is a promise the reader can go and find out why.\n";
+    echo "Either the block exists under a different ID, or the number is a SPRINT id rather than a\n";
+    echo "task id (they look identical in a comment and live in different namespaces), or the task\n";
+    echo "was never written down. Fix the comment or write the block.\n";
+    $failed = true;
+}
+
 if (!empty($failed)) {
     exit(1);
 }

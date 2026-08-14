@@ -509,15 +509,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   `ecBrowserLangTag()` in `lib/config.inc.php` (`[a-z0-9-]`, ~35 chars), called from all five: kills
   the duplication and the defect together.
 
-- 50|320| **`dev/ROADMAP.md` has re-bloated past its own stated limits.** Its LENGTH DISCIPLINE
-  section (Tom, 2026-08-05) sets a 1–3 line default and a ~15 line cap, and records 5,634 lines as
-  the problem. It is now **7,000** — 59 open tasks in ~2,160 lines, plus **251 completed tasks in
-  4,838 lines** sitting in the same file while `dev/roadmap-closed-archive.md` already exists for
-  exactly that. Moving `## Completed` into the archive drops the file ~70% with zero information
-  loss. **This file is loaded to answer almost any question about the project, so every line is paid
-  for repeatedly, forever** — which is Tom's own stated reason and makes this the cheapest large win
-  available.
-
 - 20|321| **`formmail.php` reads five `$_POST` keys with no `isset()`.** `name`, `email`, `subject`,
   `message`, `more_message`. Under PHP 8 a bare POST emits *Undefined array key* warnings, and with
   `display_errors` on anywhere they land in the response body. The header-injection guards on
@@ -2227,6 +2218,15 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|320| **[DONE 2026-08-14] Moved `## Completed` into the archive: ROADMAP 7,067 -> 3,325 lines
+  (-53%).** 143 blocks moved, 108 already-short ones left, 251 IDs before and after, every moved
+  block verified present in `dev/roadmap-closed-archive.md` byte-for-byte. Two deploy facts found
+  buried in closed blocks were promoted to CLAUDE.md rather than archived — the `AllowOverride
+  Options` grant whose absence 500s the whole suite on a host move, and the untracked `sitemap.xml`.
+  A third finding became a check: `Task 241` was cited four times from live code and had never
+  existed, so `roadmap_id_check.php` now fails on a code comment citing a task that does not resolve.
+
 
 - 0|216| **[DONE 2026-08-14] Outbound reference-link clicks are logged, with the visitor's
   language.** `outbound` rows in the new `SIGNAL_LOG`, reported by destination, served language and
