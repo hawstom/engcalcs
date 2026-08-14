@@ -377,6 +377,10 @@ EngCalcs.pageConfig = {
 	lpn_menu_settings: <?=json_encode($ec_lang['lpn_menu_settings'])?>,
 	lpn_menu_help: <?=json_encode($ec_lang['lpn_menu_help'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
+	<?php // Reused verbatim from the suite navbar, not re-keyed: same words, same two pages, already
+	      // translated in all 27 languages. See the concept-level label reuse rule in CLAUDE.md. ?>
+	about_main_menu: <?=json_encode($ec_lang['about_main_menu'])?>,
+	contact_main_menu: <?=json_encode($ec_lang['contact_main_menu'])?>,
 	lpn_edit_delete_network: <?=json_encode($ec_lang['lpn_edit_delete_network'])?>,
 	lpn_confirm_delete_network: <?=json_encode($ec_lang['lpn_confirm_delete_network'])?>,
 	lpn_view_units: <?=json_encode($ec_lang['lpn_view_units'])?>,

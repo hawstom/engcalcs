@@ -178,6 +178,15 @@ $ec_icons = array(
 	'globe'      => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a13 13 0 0 1 0 18a13 13 0 0 1 0-18z"/>',
 	'check'      => '<path d="M4.5 12.5l5.5 5.5L20 6.5"/>',
 
+	// The other two rows of the lpn Help menu. Drawn rather than left blank: openMenu() reserves an
+	// icon column so a bare row would still align, but one iconed row beside two empty ones in a
+	// three-row menu reads as unfinished.
+	//
+	// 'info' is a stroked i-in-a-circle. It shares the outer circle with 'help' above, which is
+	// acceptable only because they never compete: they sit two rows apart in the same short menu,
+	// where position disambiguates them, and the label is right there.
+	'info'       => '<circle cx="12" cy="12" r="9"/><path d="M12 11.2v5.4"/><path d="M12 7.6v.4"/>',
+	'mail'       => '<path d="M3 6h18v12H3z"/><path d="M3.6 6.6l8.4 5.9 8.4-5.9"/>',
 	// A LIFE PRESERVER, not a question mark, for the lpn Help menu (Tom, 2026-08-13). The obvious
 	// choice would have been "?" in a circle -- and it is the wrong one HERE, because this suite
 	// already spends "?" on something else: every .ec-tip tooltip glyph on every page is a "?", so a

@@ -5416,14 +5416,25 @@ var EngCalcs = EngCalcs || {};
 	// Plural is literal -- the one post contains three use-case walkthroughs -- so it links straight
 	// there rather than to a blog label page (Tom, 2026-08-13).
 	var LPN_WALKTHROUGHS_URL = 'https://tomsthird.blogspot.com/2026/08/hawsedc-free-unlimited-online-looped.html';
+	// About and Contact are DELIBERATE REPEATS of the suite's own More menu (Tom, 2026-08-13: "We can
+	// repeat About and Contact in this new Help menu"). Duplication is the right call because the two
+	// menus serve different moments: the navbar is for somebody choosing a calculator, this is for
+	// somebody already inside one who wants to know who wrote it or how to complain. Both reuse the
+	// existing keys, so they cost no new translation and cannot drift from the navbar's wording.
+	//
+	// EVERY row here opens a NEW TAB, including the two internal pages, and that is not stylistic:
+	// the beforeunload guard in init() prompts whenever a file project is dirty, so navigating this
+	// tab to About.php would meet a browser "Leave site?" dialog mid-edit. The rule for this menu is
+	// that it never takes your map away.
 	function openHelpMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
+		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
 		openMenu(anchor, [
-			{
-				icon: 'help',
-				label: pc.lpn_help_walkthroughs || 'Walkthroughs',
-				fn: function () { window.open(LPN_WALKTHROUGHS_URL, '_blank', 'noopener'); }
-			}
+			{ icon: 'help', label: pc.lpn_help_walkthroughs || 'Walkthroughs', fn: ext(LPN_WALKTHROUGHS_URL) },
+			{ separator: true },
+			{ icon: 'mail', label: pc.contact_main_menu || 'Contact', fn: ext('contact.php') },
+			// About last, where every other Help menu in the world puts it.
+			{ icon: 'info', label: pc.about_main_menu || 'About', fn: ext('About.php') }
 		]);
 	}
 
