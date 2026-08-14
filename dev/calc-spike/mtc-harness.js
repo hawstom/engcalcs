@@ -196,8 +196,9 @@ r.section('regression: every radio combination is self-consistent');
 // exactly ONE pass -- because the rock switch's default branch set iterate_p = false, killing the
 // roughness iteration along with its own. `v` is computed near the top of a pass from the
 // PREVIOUS pass's n, so the page showed the new n in the roughness box and a velocity, Q, Froude
-// number and shear stress computed from the n the user had typed: 24% high for Strickler, 28% for
-// P&I, 82% for B/B on the page's own default channel. Combinations with a rock radio ALSO on were
+// number and set of rock sizes computed from the n the user had typed: 24% high for Strickler,
+// 28% for P&I, over 100% for B/B on the page's own default channel. (The shear stress was fine --
+// tau = R S involves no n.) Combinations with a rock radio ALSO on were
 // correct, because the rock loop kept iterating and n converged as a side effect -- which is
 // exactly why this survived: three of every four combinations were right.
 //

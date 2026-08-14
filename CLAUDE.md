@@ -783,8 +783,8 @@ and opens on a passing design — plus worked examples for the two core calculat
 **IT PAID FOR ITSELF THE SAME DAY (Task 294).** Within an hour of `mtc-harness.js` existing it
 found two defects in Manning Trap Channel, a core calculator: the reported velocity was computed
 from the *previous* iteration's n whenever a roughness radio was on and no rock radio was — 24%
-high for Strickler, 28% for P&I, **82% for B/B** — and the safety factor was being applied to a
-d50 the user had typed. Both lived in one loop-exit condition, and **three of every four radio
+high for Strickler, 28% for P&I, **over 100% for B/B** (the page showed Q = 34.6 cfs for a channel
+that carries 17.0) — and the safety factor was being applied to a d50 the user had typed. Both lived in one loop-exit condition, and **three of every four radio
 combinations were correct**, which is why years of hand-checking never caught either. The lesson
 worth carrying: **a coupled iteration's failure mode is a plausible number, and the invariant that
 catches it is usually "is the output consistent with the input the page is showing?"** — here,

@@ -1759,12 +1759,17 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   (Task 292) within an hour of the harness existing, while checking a question Tom asked about the
   P&I range check: *"The check may be working wrong."* It was, and something worse was behind it.
   - **DEFECT 1 — the reported velocity was computed from the WRONG n. 24% high for Strickler, 28%
-    for P&I, 82% for B/B.** Pick a roughness method and leave the rock size typed, and the loop ran
+    for P&I, over 100% for B/B (82% at the 6 in default it was first measured on — the size of the
+    error scales with how far the chosen n sits from the typed one).** Pick a roughness method and leave the rock size typed, and the loop ran
     exactly ONE pass: the rock switch's `default` branch set `iterate_p = false`, killing the
     roughness iteration along with its own. `v` is computed near the top of a pass from the
     PREVIOUS pass's n, and n is updated near the bottom — so the page put the new n in the
-    roughness box and reported a velocity, Q, Froude number and shear stress computed from the n
-    the user had typed. **Every combination with a rock radio ALSO on was correct**, because the
+    roughness box and reported a velocity, Q, Froude number and set of rock sizes computed from
+    the n the user had typed. On the default channel with B/B selected that is **Q = 34.6 cfs shown
+    against 17.0 cfs actual — real capacity 51% below what the page said**, while the rock sizes
+    erred the other way (oversized ~4×, being driven by V²): wasteful rather than unsafe. The
+    shear stress was never affected — τ = R·S involves no n. **Every combination with a rock radio
+    ALSO on was correct**, because the
     rock loop kept iterating and n converged as a side effect. Three of every four combinations
     were right, which is exactly why this survived years of use: a hand check that happened to have
     a rock method selected would have shown nothing wrong.
