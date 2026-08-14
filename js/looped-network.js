@@ -1684,7 +1684,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) {
 			var w = parseWorldFile(ev.target.result);
-			if (!w) { alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the pixel size, or paste all six lines of a world file.'); return; }
+			if (!w) { alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of a pixel, or paste all six lines of a world file.'); return; }
 			if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file turns, mirrors or unevenly stretches the picture. The map can only move and resize it evenly, so the file was not used.'); return; }
 			applyWorldFile(w);
 		};
@@ -1759,7 +1759,7 @@ var EngCalcs = EngCalcs || {};
 		openDialog(function (body) {
 			var p = document.createElement('p');
 			p.style.margin = '0 0 8px';
-			p.textContent = (pc.lpn_backdrop_scale_entry_prompt || 'Enter pixel size or paste the complete contents of the World File for the image')
+			p.textContent = (pc.lpn_backdrop_scale_entry_prompt || 'Enter the size of a pixel or paste the complete contents of the World File for the image')
 				+ ' (' + unitLabel('lpn_u_length') + ')';
 			body.appendChild(p);
 			// A textarea, not a number input: a pasted world file is six lines, and a control that
@@ -1787,7 +1787,7 @@ var EngCalcs = EngCalcs || {};
 				return;
 			}
 		}
-		alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the pixel size, or paste all six lines of a world file.');
+		alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of a pixel, or paste all six lines of a world file.');
 	}
 	// A sidecar cannot be auto-detected in ANY browser: a file picker returns the files the user
 	// picked and nothing about their folder, and the only API that enumerates siblings

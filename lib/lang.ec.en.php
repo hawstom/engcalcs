@@ -1540,10 +1540,14 @@ $ec_lang['lpn_backdrop_add']='Add image';
 // Two ways to set the same number, so both say which one they are (Task 276). Picking is the coarse
 // step and typing is the correction -- Tom, 2026-08-10: "mouse (and hand!!!) picking is never
 // precise."
+// "The size of a pixel", never the compound "pixel size" (Tom, 2026-08-13). Two reasons at once:
+// the readers here are civil engineers rather than graphic artists, so the compound is not the
+// term of art it would be in an imaging tool -- and a translator gets "size of pixel" out of it
+// anyway, so spelling it out costs the English nothing and hands them the phrase already unpacked.
 $ec_lang['lpn_backdrop_scale']='Set image scale by picking';
 $ec_lang['lpn_backdrop_scale_entry']='Set image scale by typing';
-$ec_lang['lpn_backdrop_scale_entry_prompt']='Enter pixel size or paste the complete contents of the World File for the image';
-$ec_lang['lpn_backdrop_scale_entry_bad']='Type one number for the pixel size, or paste all six lines of a world file.';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Enter the size of a pixel or paste the complete contents of the World File for the image';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Type one number for the size of a pixel, or paste all six lines of a world file.';
 $ec_lang['lpn_backdrop_wld_ask']='Choose a World File for automatic scale and location?';
 $ec_lang['lpn_backdrop_wld_none']='No world file found. Scale and move using the menu.';
 $ec_lang['lpn_backdrop_wld_choose']='Choose World File';

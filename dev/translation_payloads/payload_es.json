@@ -292,8 +292,8 @@
     },
     "keys_to_translate": {
         "lpn_backdrop_scale_entry": "Set image scale by typing",
-        "lpn_backdrop_scale_entry_prompt": "Enter pixel size or paste the complete contents of the World File for the image",
-        "lpn_backdrop_scale_entry_bad": "Type one number for the pixel size, or paste all six lines of a world file.",
+        "lpn_backdrop_scale_entry_prompt": "Enter the size of a pixel or paste the complete contents of the World File for the image",
+        "lpn_backdrop_scale_entry_bad": "Type one number for the size of a pixel, or paste all six lines of a world file.",
         "lpn_backdrop_wld_ask": "Choose a World File for automatic scale and location?",
         "lpn_backdrop_wld_none": "No world file found. Scale and move using the menu.",
         "lpn_backdrop_wld_choose": "Choose World File",
@@ -301,8 +301,8 @@
     },
     "keys": {
         "lpn_backdrop_scale_entry": "Set image scale by typing",
-        "lpn_backdrop_scale_entry_prompt": "Enter pixel size or paste the complete contents of the World File for the image",
-        "lpn_backdrop_scale_entry_bad": "Type one number for the pixel size, or paste all six lines of a world file.",
+        "lpn_backdrop_scale_entry_prompt": "Enter the size of a pixel or paste the complete contents of the World File for the image",
+        "lpn_backdrop_scale_entry_bad": "Type one number for the size of a pixel, or paste all six lines of a world file.",
         "lpn_backdrop_wld_ask": "Choose a World File for automatic scale and location?",
         "lpn_backdrop_wld_none": "No world file found. Scale and move using the menu.",
         "lpn_backdrop_wld_choose": "Choose World File",
