@@ -285,12 +285,27 @@
 		return { inp: inp, warnings: warnings };
 	};
 
-	// Cached module promise -- the 678 KB import happens at most once per page.
+	// Cached module promise -- the 664 KB import happens at most once per page.
+	//
+	// A FAILURE IS NOT CACHED, and that is the whole point of the catch below. Until 2026-08-14 this
+	// stored the promise unconditionally, so a single failed import -- being offline for one moment,
+	// a blocked request, a flaky connection -- was remembered FOREVER: every later call got the same
+	// rejected promise back, and EPANET stayed dead for the rest of the page's life even after the
+	// network returned. Nothing surfaced it, because the visible symptom is identical to "this
+	// network cannot be solved here", which is a message we legitimately print.
+	//
+	// It became urgent when the warm-up landed (warmEpanetEngine() in js/looped-network.js): warming
+	// the engine the moment a user picks an active valve makes the FIRST attempt happen much earlier
+	// and in worse conditions than a solve did, so caching that failure would have been a permanent
+	// penalty for being briefly offline at the wrong second.
 	var enginePromise = null;
 
 	EngCalcs.lpnEpanetLoad = function (url) {
 		if (enginePromise === null) {
-			enginePromise = import(url || '/engcalcs/js/vendor/epanet-js.js');
+			enginePromise = import(url || '/engcalcs/js/vendor/epanet-js.js').catch(function (err) {
+				enginePromise = null;   // let the next caller try again
+				throw err;
+			});
 		}
 		return enginePromise;
 	};

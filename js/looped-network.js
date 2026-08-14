@@ -3157,6 +3157,9 @@ var EngCalcs = EngCalcs || {};
 		// the roughness unit selector's visibility -- otherwise a Darcy-Weisbach project opened
 		// after a Hazen-Williams one shows a roughness length with no unit named anywhere.
 		applyMethodUI();
+		// A project or an .inp may ARRIVE holding a PRV/PSV/FCV, with the user never having picked a
+		// type -- the case a warm-up hooked only to the type selector would miss entirely.
+		warmEpanetIfNeeded();
 		zoomExtent();
 		scheduleSolve();
 		renderTabs();
@@ -8246,6 +8249,9 @@ var EngCalcs = EngCalcs || {};
 		engInput.checked = (settings.engine === 'epanet');
 		engInput.addEventListener('change', function () {
 			settings.engine = engInput.checked ? 'epanet' : 'native';
+			// Fetch it now rather than on the next solve: the user just asked for this engine, so
+			// this is the moment to spend the 664 KB and the moment they will understand the wait.
+			if (settings.engine === 'epanet') { warmEpanetEngine(); }
 			scheduleSolve();
 		});
 		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET engine', engInput, pc.lpn_settings_engine_epanet_tip);
@@ -8903,6 +8909,11 @@ var EngCalcs = EngCalcs || {};
 			if (v === vt) { return; }
 			saveUndoSnapshot();
 			l.valveType = v;
+			// The moment an active type is chosen is the moment the 664 KB engine becomes necessary,
+			// and the moment the user is most likely to still be online. See warmEpanetEngine().
+			if (EngCalcs.lpnValveIsNative && !EngCalcs.lpnValveIsNative({ type: 'valve', valveType: v })) {
+				warmEpanetEngine();
+			}
 			// RE-SEEDED, NOT CARRIED ACROSS. The old number was a pressure, a flow or a loss
 			// coefficient, and none of the three means anything as one of the other two -- 60 psi
 			// read as a loss coefficient of 60 is a valve nobody built. The tip on the setting
@@ -9632,6 +9643,58 @@ var EngCalcs = EngCalcs || {};
 	// Set by runSolve() when a network was routed to EPANET by its own contents rather than by the
 	// user's choice; read by applySolveResult(), which owns the status bar after a successful solve.
 	var valveRouteNote = '';
+
+	// ---- Warming the EPANET engine (Tom, 2026-08-14) ----
+	//
+	// js/vendor/epanet-js.js is 664 KB and is deliberately NOT precached by the service worker: it
+	// loads only for a visitor who actually needs it, because precaching it would multiply the
+	// install cost for exactly the low-bandwidth audience this suite exists for (ROADMAP Task 318).
+	// The cost of that decision was a real gap -- offline, a network holding a PRV, PSV or FCV could
+	// not be solved at all unless the engine happened to have been fetched at some earlier point.
+	//
+	// Tom's framing is what turned this from a copy problem into a fetch-timing one: *"Can we disable
+	// those elements unless the EPANET engine is on or alert and turn it on or some other gatekeeping
+	// late-loading?"* The engine only ever needs downloading ONCE. So fetch it at the first moment a
+	// network can only be solved by it -- when the user picks an active valve type, or turns the
+	// engine on -- because they are necessarily online then, having just loaded the page. After that
+	// one fetch the browser and the service worker both hold it, and the network solves offline for
+	// good.
+	//
+	// IT IS NOT A GATE, and that is deliberate. A user who is offline right now may still build a
+	// PRV: refusing would block them from DESIGNING a network they intend to solve later, which is
+	// ordinary work. What changes is WHEN they are told -- at the moment they choose the type, while
+	// they can still act on it, instead of after a solve quietly refuses.
+	//
+	// Waiting for the debounced solve to trigger the load would mostly work and is not enough: the
+	// gap between choosing a valve type and the solve firing is exactly where a phone drops its
+	// connection, and the solve's own failure message arrives after the user has moved on.
+	var epanetWarmState = 'cold';   // cold | warming | ready | unavailable
+	function warmEpanetEngine() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!EngCalcs.lpnEpanetLoad) { return; }
+		// 'unavailable' is retried on purpose -- the engine load no longer caches a failure
+		// (js/lpn-epanet.js), so a user who was offline a moment ago gets another attempt the next
+		// time they touch a valve, which is the moment they care.
+		if (epanetWarmState === 'warming' || epanetWarmState === 'ready') { return; }
+		epanetWarmState = 'warming';
+		setNotice(pc.lpn_engine_fetching || 'Getting the EPANET solver, so this valve can be worked out now and offline later.');
+		EngCalcs.lpnEpanetLoad().then(function () {
+			epanetWarmState = 'ready';
+			setNotice(pc.lpn_engine_ready || 'The EPANET solver is on this device now. Valves that open and close on their own will work offline.');
+		}, function () {
+			epanetWarmState = 'unavailable';
+			setNotice(pc.lpn_engine_unavailable || 'Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.');
+		});
+	}
+	// Warm if the document ALREADY holds a valve only EPANET can solve -- opening a saved project or
+	// importing an .inp, where the user never picked a type at all. assembleModel() is the one place
+	// that knows the current scenario's real link list, so ask it rather than re-deriving.
+	function warmEpanetIfNeeded() {
+		if (!EngCalcs.lpnEpanetOnlyValves) { return; }
+		try {
+			if (EngCalcs.lpnEpanetOnlyValves(assembleModel()).length > 0) { warmEpanetEngine(); }
+		} catch (e) { /* a half-built document is not a reason to shout */ }
+	}
 
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};

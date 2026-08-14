@@ -1536,6 +1536,16 @@ $ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir:';
 // BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
 // this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
 // looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
+// ---- Warming the EPANET solver (Tom, 2026-08-14) ----
+// The 664 KB solver is fetched the moment a network first needs it -- when an active valve type is
+// chosen, when the solver is switched on, or when a project arrives already holding one -- because
+// that is the moment the user is still online. These three say what is happening in plain terms,
+// and the point of all three is the SECOND half of each sentence: the fetch happens once and then
+// the network works offline. A message that only said "downloading" would explain the wait without
+// explaining why it is worth it.
+$ec_lang['lpn_engine_fetching']='Getting the EPANET solver, so this valve can be worked out now and offline later.';
+$ec_lang['lpn_engine_ready']='The EPANET solver is on this device now. Valves that open and close on their own will work offline.';
+$ec_lang['lpn_engine_unavailable']='Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.';
 $ec_lang['lpn_diag_valve_needs_epanet']='These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for values that are impossible in real life, such as a diameter of zero.';
