@@ -72,7 +72,13 @@ function prefixToTermNames(): array
             // keys, and its 'world' is a coordinate space, not the planet -- a false friend nothing
             // else would have guarded against.
             'background image', 'world file', 'pump curve', 'project (saved network)', 'scenario',
-            'zoom to extents', 'default (setting)', 'upstream', 'downstream'],
+            'zoom to extents', 'default (setting)', 'upstream', 'downstream',
+            // Added 2026-08-14 (Task 248 Wave 0). 'tank' and 'valve' are new ELEMENT TYPES, and
+            // 'tank' is the sharper of the two: every language already has a reservoir word, and
+            // reusing it for the tank makes two toolbar buttons indistinguishable. 'valve setting'
+            // guards the one field whose physical quantity changes with the valve type, and
+            // 'override (scenario value)' carries the eigenvalue trap behind "Own values".
+            'tank', 'valve', 'valve setting', 'override (scenario value)', 'solver'],
         'bpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'branched network', 'branch', 'pipe line', 'pressure rating',

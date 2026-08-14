@@ -1,0 +1,651 @@
+{
+  "sprint": "316-tanks-valves-scenarios",
+  "description": "Adversarial Wave 0 over the 60 new English strings from ROADMAP Task 248 (tanks, valves) and Task 184 (scenarios), run 2026-08-14 before the 26-language sprint. Falsification, not review: every string was asked 'list every plausible reading', not 'is this good'. 47 strings filed, 13 passed clean. 30 English rewrites made; 7 routed to $ec_lang_syn as proposed diffs for Tom (AI may not write that array); 7 routed to glossary.json, where four new terms were seeded (tank, valve, valve setting, override (scenario value)) and the reservoir entry's avoid-list was repaired -- it still asserted that lpn_ does not model tanks, which Task 248 made false the same day. The single highest-value finding is the cluster of five keys that reintroduced 'EPANET engine' after sprint 252 had purged that word suite-wide in favour of 'solver', with a glossary avoid-list built specifically to keep 26 languages off the motor/engine sense.",
+  "entries": [
+    {
+      "key": "lpn_engine_valve_route",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "TWO defects in one nine-word string, and both are regressions. (1) 'EPANET engine' -- sprint 252 changed this word to 'solver' across the whole suite because 20+ languages were rendering it with their word for a MOTOR, on a page that also models pumps, which have real motors. glossary.json's 'solver' entry carries an avoid-list built for exactly that, and five of this sprint's new strings walked back past it. (2) The string's only verb is 'Worked out', with no subject: a translator sees a bare past participle whose English senses include exercised, resolved, and turned out well.",
+      "readings": [
+        "computed by the EPANET solver (intended)",
+        "computed by an EPANET motor/engine",
+        "exercised with / resolved with / it turned out well with"
+      ],
+      "disposition": "english",
+      "resolution": "English rewritten: 'Worked out with the EPANET engine, because these valves open and close on their own:' -> 'Solved with the EPANET solver, because these valves open and close on their own:'. 'solver' is the suite's settled term (lpn_settings_engine_epanet, lpn_engine_loading, lpn_engine_failed all already say it) and is a wired glossary term with 26 attested translations."
+    },
+    {
+      "key": "lpn_diag_valve_needs_epanet",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Same 'engine' regression, twice in one string, plus 'can work them out' as the verb for solving.",
+      "readings": [
+        "only the EPANET solver can compute them (intended)",
+        "only the EPANET motor/engine can compute them",
+        "only EPANET can figure out what they are for"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:'."
+    },
+    {
+      "key": "lpn_inp_drop_valve_active",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Three problems. 'They came in whole' -- 'whole' is doing the work of 'with nothing lost' and can equally be read as 'as a single unit'. 'works them out with the EPANET engine' -- the engine/solver regression again. 'which it turns on by itself' -- 'it' has two candidate referents in the same sentence (the page, or the EPANET engine turning itself on).",
+      "readings": [
+        "nothing about them was lost on import; the page solves them with EPANET, which the page enables automatically (intended)",
+        "they were imported as one combined element",
+        "the EPANET engine switches itself on"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'These valves control pressure or flow, and they open and close on their own as the water changes. Nothing about them was lost on the way in, and this page solves them with the EPANET solver, turning that solver on by itself for this network.'"
+    },
+    {
+      "key": "lpn_notes_2_def",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "NOT one of the sprint's 60 keys, but found by the same sweep and fixed because it was already flagged CHANGED by detect_english_drift.php, so it is going to a resync anyway. It carried the same 'worked out with the EPANET engine' regression.",
+      "readings": [
+        "solved by the EPANET solver (intended)",
+        "solved by an EPANET motor/engine"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten in place: '...are worked out with the EPANET engine, which this page turns on by itself when your network holds one.' -> '...are solved with the EPANET solver, which this page turns on by itself when your network holds one.' Already in the CHANGED list, so no new resync obligation is created; flagged to the orchestrator so it is not baselined without a retranslation."
+    },
+    {
+      "key": "lpn_field_tank_level",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "THE HEADLINE TANK DEFECT. This field is a DEPTH measured up from the tank floor (EPANET's InitLvl), but 'Water level' in ordinary English -- and in every other place this page uses the word -- means the ELEVATION of the water surface on the site datum. The popup shows Elevation, Water level, Lowest water level, Highest water level and Head one under the other, all in the same elevation unit, so nothing on screen tells the reader which of the five are datum elevations and which are depths. A translator has no chance: most languages have distinct words for depth and for water-surface level, and picking the level word here silently produces a tank whose numbers are wrong by the bottom elevation.",
+      "readings": [
+        "depth of water standing in the tank, measured up from its floor (intended)",
+        "elevation of the water surface, on the same datum as the Elevation field above it"
+      ],
+      "disposition": "english",
+      "resolution": "English rewritten 'Water level' -> 'Water depth'. The tip already said 'Depth of water standing in the tank', so the label was the half that was wrong. Glossary 'tank' entry seeded with the same warning for translators."
+    },
+    {
+      "key": "lpn_field_tank_minlevel",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Same depth/elevation ambiguity as lpn_field_tank_level, plus a second one: 'Lowest water level' can be read as an operating constraint the user is imposing (do not draw below this) or as the level at which the tank is defined to be empty.",
+      "readings": [
+        "the depth at which the tank counts as empty (intended)",
+        "the lowest water surface ELEVATION the tank reaches",
+        "a minimum the operator must not go below"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten 'Lowest water level' -> 'Lowest water depth'. The second reading is left to the tip, which already says 'Depth of water at which the tank is treated as empty' -- that is a definition, not a rule, and it reads correctly."
+    },
+    {
+      "key": "lpn_field_tank_maxlevel",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Same depth/elevation ambiguity as its two siblings.",
+      "readings": [
+        "the depth at which the tank is full (intended)",
+        "the highest water surface ELEVATION the tank reaches"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten 'Highest water level' -> 'Highest water depth'."
+    },
+    {
+      "key": "lpn_field_tank_level_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'The water surface is the tank bottom level plus this depth.' -- 'the tank bottom level' uses 'level' for a datum ELEVATION in the same sentence in which 'this depth' is a depth, and one line after a label that called a depth a 'level'. Three senses of 'level' inside one field group.",
+      "readings": [
+        "water surface elevation = tank bottom elevation + this depth (intended)",
+        "water surface = the tank's bottom-level reading + this depth (two depths added)"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: '...The water surface is the tank bottom elevation plus this depth.' The word 'level' now never names a datum elevation anywhere in the tank popup."
+    },
+    {
+      "key": "lpn_tank_elev_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Level of the tank bottom' is the datum elevation of the tank floor, but it is the tip on the field LABELLED 'Elevation', and it uses the same word ('level') that three sibling fields use for depths. Nothing but domain knowledge tells a translator which of the two it is.",
+      "readings": [
+        "elevation of the tank floor on the site datum (intended)",
+        "a water level measured at the tank bottom"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten 'Level of the tank bottom.' -> 'Elevation of the tank bottom.' -- which also matches the field's own label, lpn_field_elev."
+    },
+    {
+      "key": "lpn_tank_head_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "The worst of the level/depth collisions: 'Water surface level in the tank: the tank bottom level plus the water level.' uses 'level' three times for three different quantities -- an elevation, an elevation, and a depth. Plus 'the level the network is solved against', where 'solved against' is an idiom with no literal parse.",
+      "readings": [
+        "water surface elevation = bottom elevation + water depth; this is the head the solver uses (intended)",
+        "three levels of the same kind added or compared",
+        "the network is solved in opposition to / checked against this level"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'Water surface elevation in the tank: the tank bottom elevation plus the water depth. This is the level the solver uses for the tank.'"
+    },
+    {
+      "key": "lpn_field_tank_diameter_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Width of the tank across.' -- 'across' has no object and reads as an unfinished sentence; an English reader re-reads it. 'Read it in the same units as elevation' -- 'read' can be an instruction to the user (interpret it this way) or a statement about the field (it is displayed in these units); it is actually the second, and the user cannot change it.",
+      "readings": [
+        "the tank's diameter, shown in the elevation unit (intended)",
+        "width measured across something unnamed",
+        "an instruction telling the user to convert the number themselves"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'Width of the tank from side to side. It is in the same units as elevation, not in the pipe diameter units. It sets how much water a given depth holds.'"
+    },
+    {
+      "key": "lpn_inp_drop_tank_curve",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'round tanks of the stated width' -- stated by whom, and where? Nothing in the message or on screen states a width. It is in fact the diameter written in the imported file (js/lpn-inp.js reads [TANKS] column 6). And 'The water level is the level the file gives' repeats 'level' for one quantity while the reader has just been told about shapes.",
+      "readings": [
+        "round tanks whose diameter comes from the file (intended)",
+        "round tanks of some width stated elsewhere in this report",
+        "round tanks of a width the page chose"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'These tanks are not straight-sided: the file gives their shape as a curve. They came in as round tanks, each with the diameter written in the file. The water surface is still the one the file sets, so the answers match; only the shape is simplified.' Verified against js/lpn-inp.js: the diameter is column 6 of [TANKS], in the file's length unit."
+    },
+    {
+      "key": "lpn_field_tank_diameter",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Filed only to record that it was checked against the unit trap the parent brief named. 'Tank diameter' has one reading. The trap -- that it is read in the elevation unit, not the pipe-diameter unit -- is a units-configuration fact, not an ambiguity in the words, and the tip states it.",
+      "readings": [
+        "the diameter of the tank (intended)"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Not a defect. Single reading. The elevation-unit fact is carried by lpn_field_tank_diameter_tip (rewritten this pass) and by the new glossary 'tank' entry, both of which reach the translator."
+    },
+    {
+      "key": "lpn_tool_add_tank",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "A one-word toolbar button, sitting directly beside 'Reservoir'. In a great many languages the natural word for 'tank' IS the reservoir word -- es deposito/embalse, fr reservoir, ro rezervor, ru rezervuar -- so a translator working key by key can easily give the two buttons the same word and make them indistinguishable. Independently, 'tank' alone can be military, aquarium, or fuel.",
+      "readings": [
+        "a water storage vessel whose level rises and falls (intended)",
+        "the same thing the Reservoir button already is",
+        "a military tank",
+        "a fuel tank / gas cylinder",
+        "a fish tank"
+      ],
+      "disposition": "glossary",
+      "resolution": "New glossary.json term 'tank' seeded (v1.30) with an avoid-list whose FIRST item is the reservoir collision, plus the military/aquarium/fuel senses and a transliteration guard. Wired into prefixToTermNames()['lpn']. The 'reservoir' entry's own avoid-list was ALSO repaired in the same edit: it still said 'lpn_ explicitly does NOT model tanks', which Task 248 falsified today, and it would have taught 26 agents the opposite of the truth. It now names the pairing and points at the tank entry, carrying forward the tank words es/pt/fr/ro already coined in sprints 146.06 and 251."
+    },
+    {
+      "key": "lpn_tool_add_valve",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "A one-word toolbar button with three live senses outside hydraulics, one of which (British 'valve' = electron tube) is in technical register, and one of which (tap/faucet) is the everyday word a non-specialist translator will reach for first.",
+      "readings": [
+        "a pipeline valve, a link between two nodes (intended)",
+        "a tap or faucet",
+        "a heart valve",
+        "a vacuum tube"
+      ],
+      "disposition": "glossary",
+      "resolution": "New glossary.json term 'valve' seeded (v1.30) with those senses in the avoid-list, the LINK-not-node framing, and a note that the four type labels are elliptical in English so a language may need to supply the noun. Wired into prefixToTermNames()['lpn']."
+    },
+    {
+      "key": "lpn_valve_type_tcv",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Throttle (TCV)' is elliptical -- the noun 'valve' is left out because the dropdown above is labelled 'Valve type' -- and 'throttle' on its own is, in most languages, first a car accelerator. A translator seeing this key alone gets an adjective with no head noun and a strong automotive pull.",
+      "readings": [
+        "throttle control valve, a valve holding a fixed head loss (intended)",
+        "a throttle / accelerator",
+        "the verb 'to throttle' (strangle, restrict)"
+      ],
+      "disposition": "intent",
+      "resolution": "English KEPT -- an English reader in the Valve type dropdown does not stumble, and the parenthesised TCV is the international abbreviation an engineer already knows, so by the routing rule this is a $ec_lang_syn case. Glossary 'valve' + 'valve setting' seeded for the concept. PROPOSED $ec_lang_syn ENTRY, for Tom to approve (AI must not write this array):\n+ $ec_lang_syn['lpn_valve_type_tcv']='Throttle valve (TCV), Throttling valve, Fixed-loss valve | gloss: valve';"
+    },
+    {
+      "key": "lpn_valve_type_prv",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Same ellipsis: 'Pressure reducing (PRV)' is a bare participial modifier with the head noun removed. Many languages cannot leave a modifier stranded like that and must supply a noun; the translator has to work out which noun.",
+      "readings": [
+        "pressure reducing valve (intended)",
+        "an act or process of reducing pressure",
+        "a pressure-reducing setting"
+      ],
+      "disposition": "intent",
+      "resolution": "English KEPT (established abbreviation and dropdown context). PROPOSED $ec_lang_syn ENTRY for Tom:\n+ $ec_lang_syn['lpn_valve_type_prv']='Pressure reducing valve (PRV), Pressure-lowering valve | gloss: valve';"
+    },
+    {
+      "key": "lpn_valve_type_psv",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Same ellipsis, and 'sustaining' is the rarest of the four English words -- it is not in the basic vocabulary a low-resource-language agent can lean on, and 'sustain' collides with the sustainability sense in several languages.",
+      "readings": [
+        "pressure sustaining valve -- holds the UPSTREAM pressure at or above a value (intended)",
+        "a valve that sustains (supports) pressure generally",
+        "a sustainable/environmental sense of 'sustaining'"
+      ],
+      "disposition": "intent",
+      "resolution": "English KEPT (established abbreviation and dropdown context). PROPOSED $ec_lang_syn ENTRY for Tom:\n+ $ec_lang_syn['lpn_valve_type_psv']='Pressure sustaining valve (PSV), Pressure-holding valve, Pressure-maintaining valve | gloss: valve';"
+    },
+    {
+      "key": "lpn_valve_type_fcv",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Same ellipsis. 'Flow control' also reads as a general category (flow control in the software sense, or flow regulation as a discipline) rather than as the name of one device.",
+      "readings": [
+        "flow control valve -- caps the flow at a set value (intended)",
+        "flow control as a general activity",
+        "a control that adjusts flow continuously"
+      ],
+      "disposition": "intent",
+      "resolution": "English KEPT (established abbreviation and dropdown context). PROPOSED $ec_lang_syn ENTRY for Tom:\n+ $ec_lang_syn['lpn_valve_type_fcv']='Flow control valve (FCV), Flow-limiting valve, Maximum-flow valve | gloss: valve';"
+    },
+    {
+      "key": "lpn_field_valve_type",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Checked against the parent brief's question. 'Valve type' has one reading.",
+      "readings": [
+        "which kind of valve this is (intended)"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Not a defect. Single reading, and the glossary 'valve' term now reaches this prefix."
+    },
+    {
+      "key": "lpn_field_valve_type_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'The other three hold a pressure or a flow, and open, close, or hold as the water changes.' -- 'hold' appears twice in one sentence in TWO DIFFERENT SENSES: first 'maintain a setpoint', then 'stay at a partly-open position' (EPANET's ACTIVE state). An English reader stumbles on that, which by the routing rule makes it an English defect rather than a translator's problem. 'A throttle valve holds a fixed loss' uses the first sense again, and 'hold' also carries a plain physical sense (grip, contain) that survives translation badly.",
+      "readings": [
+        "they maintain a pressure or flow, and they open, close or sit partly open (intended)",
+        "they maintain a pressure or flow, and they open, close, or maintain (maintain what?)",
+        "they physically contain a pressure or a flow"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient.' -- 'keeps' for the setpoint sense, 'partly close' for the position sense, so no word does two jobs."
+    },
+    {
+      "key": "lpn_field_valve_setting_pressure",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "The parent brief's question: can a translator tell which quantity this is from the string alone? For the quantity, yes -- 'Pressure setting' names a pressure. What they CANNOT tell is that this is one of three mutually exclusive labels for a single field, so the three must stay parallel with each other in the target language, and that 'setting' here means a duty point the valve maintains, not an option in a preferences panel.",
+      "readings": [
+        "the pressure this valve is set to maintain (intended)",
+        "a preference/configuration item concerning pressure",
+        "the act of setting a pressure"
+      ],
+      "disposition": "glossary",
+      "resolution": "New glossary.json term 'valve setting' seeded (v1.30): states that the setting is a different physical quantity per type, that the three labels are alternatives for one field and must read parallel, and that the settings/preferences and installation senses are wrong. Wired into prefixToTermNames()['lpn']. English kept -- it is correct and parallel for its own audience."
+    },
+    {
+      "key": "lpn_field_valve_setting_flow",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "As above. 'Flow setting' names the quantity clearly; what is invisible is that it is a CAP (the most water allowed through), not a target the valve drives towards from below.",
+      "readings": [
+        "the maximum flow the valve allows (intended)",
+        "the flow the valve always delivers",
+        "a preferences item concerning flow"
+      ],
+      "disposition": "glossary",
+      "resolution": "Covered by the new 'valve setting' glossary term. The cap behaviour is also stated in the tip, which was rewritten this pass (see lpn_field_valve_setting_flow_tip). English kept."
+    },
+    {
+      "key": "lpn_field_valve_setting_loss",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Loss coefficient' is the third label for the same field, and it is the one that breaks the parallel with 'Pressure setting' / 'Flow setting' -- nothing in it says 'setting'. Worse for a translator: lpn_field_km in the same popup family is 'Minor (local) loss coefficient, k', which is the SAME KIND of number, so the two keys look like a duplicate pair with no way to tell whether they should get the same words. Verified in js/looped-network.js: they never appear together, because EPANET gives a throttle valve no minor-loss column, so there is no on-screen collision -- only a translator-facing one.",
+      "readings": [
+        "the throttle valve's setting, a multiple of the velocity head (intended)",
+        "the same quantity as the pipe's minor loss coefficient k",
+        "a general head-loss coefficient for the valve body"
+      ],
+      "disposition": "glossary",
+      "resolution": "English KEPT -- an English reader on a TCV popup does not stumble (the tip explains it fully), so by the routing rule this is not an English case. The new 'valve setting' glossary term carries the whole distinction: the three labels are alternatives for one field, the third is the same kind of number as k but a separate field that never appears beside it, and the coefficient never takes units."
+    },
+    {
+      "key": "lpn_field_valve_setting_pressure_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "HIGH. 'keeps the pressure just after it' / 'just before it' encodes UPSTREAM and DOWNSTREAM in the words 'before' and 'after', which in most languages are primarily TEMPORAL. A translator who reads them temporally produces 'the pressure just after the valve acts' -- which is wrong in a way that reads perfectly well and reverses PRV and PSV. The suite already has upstream/downstream as wired glossary terms with attested translations, and this string went around them.",
+      "readings": [
+        "on the downstream / upstream side of the valve (intended)",
+        "at a moment shortly after / shortly before the valve operates",
+        "earlier / later in the list of results"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'The pressure the valve keeps. A pressure reducing valve keeps the pressure on its downstream side at or below this value. A pressure sustaining valve keeps the pressure on its upstream side at or above this value.' Both 'upstream' and 'downstream' are existing glossary terms already wired to the lpn prefix, so the concept now arrives guarded. Also changed 'holds' to 'keeps' for consistency with the type tip."
+    },
+    {
+      "key": "lpn_field_valve_setting_flow_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Below this the valve is fully open and does nothing.' -- 'below this' has no stated subject. Below what quantity? The flow that WOULD pass if the valve were not there. And 'does nothing' can be read as 'the valve is inoperative/broken'.",
+      "readings": [
+        "when the flow that wants to pass is less than the setting, the valve is fully open and adds no loss (intended)",
+        "when the pressure is below this",
+        "the valve is inoperative"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'The most water the valve lets through. When less water than this wants to pass, the valve stands fully open and adds no loss.'"
+    },
+    {
+      "key": "lpn_field_valve_setting_loss_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'How much head the throttle valve takes out' -- 'takes out' is a phrasal verb with several everyday senses (removes, extracts, escorts out, obtains) and only the first is meant.",
+      "readings": [
+        "how much head the valve removes (intended)",
+        "how much head the valve extracts and keeps",
+        "obtains / takes out (as in takes out a loan)"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: 'takes out' -> 'removes'. Rest of the string unchanged; it was already precise about the multiple-of-velocity-head convention and the 0 case."
+    },
+    {
+      "key": "lpn_field_valve_diameter_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Three pronouns, three different referents, in twenty-four words: 'It is used to work out the speed of the water through it, so the loss depends on it.' -- first 'it' is the width, second 'it' is the valve, third 'it' is the width again. Languages with gender agreement must commit to a referent for each and cannot recover them from the English.",
+      "readings": [
+        "the water speed is computed from this width, and the loss follows from the speed (intended)",
+        "the width is used to compute the speed of the water through the width (an orifice)",
+        "the loss depends on the speed"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'Width of the opening through the valve. The speed of the water through the valve is computed from this width, and the loss follows from that speed.' -- every pronoun replaced by its noun."
+    },
+    {
+      "key": "lpn_field_valve_km_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Extra loss' -- extra to WHAT is never said, and it matters: for a PRV/PSV/FCV this is the only loss coefficient on the valve, so 'extra' is misleading unless the reader already knows it is additional to whatever the setting itself costs. Separately, 'Use 0 to leave it out' -- 'leave it out' can be read as 'omit the value' (leave the box empty), which is the opposite of typing 0.",
+      "readings": [
+        "loss from the valve body, additional to what the setting removes; type 0 to ignore it (intended)",
+        "extra loss beyond some normal amount",
+        "leave the field blank"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'Loss from the valve body while the valve stands fully open, on top of anything the valve setting removes. It is counted as a multiple of the velocity head. Use 0 to ignore it.'"
+    },
+    {
+      "key": "lpn_diag_valve_on_fixed_head",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'there is nothing left for the valve to hold' -- 'hold' again in the maintain-a-setpoint sense, which is the one sense a translator is least likely to reach. And 'Put a short pipe between them:' -- 'them' is ambiguous between (a) the valve and the reservoir/tank, and (b) the reservoir and the tank, both of which are named in the sentence.",
+      "readings": [
+        "nothing left for the valve to control; put a pipe between the valve and the fixed-head node (intended)",
+        "nothing left for the valve to physically contain",
+        "put a pipe between the reservoir and the tank"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to '...so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:'"
+    },
+    {
+      "key": "lpn_field_closed",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "A one-word checkbox on a pipe, and 'closed' is a live polysemy INSIDE this very discipline: a 'closed conduit' is a full, pressurised pipe as opposed to an open channel. A hydraulics translator is more likely to meet that sense than the shut-valve sense, and every pipe on this page is a closed conduit, so the wrong reading is not obviously wrong.",
+      "readings": [
+        "shut, so no water passes (intended)",
+        "a closed conduit -- flowing full and under pressure, as opposed to an open channel",
+        "a closed loop"
+      ],
+      "disposition": "intent",
+      "resolution": "English KEPT -- 'Closed' is EPANET's own status word, an English reader in the pipe popup does not stumble, and the tip already says 'Shut this pipe so no water can pass through it.' By the routing rule that makes it a $ec_lang_syn case. PROPOSED ENTRY for Tom to approve (AI must not write this array):\n+ $ec_lang_syn['lpn_field_closed']='Shut, Shut off, Blocked off, No flow through it | avoid: \"closed conduit\" (a full, pressurised pipe as opposed to an open channel)';"
+    },
+    {
+      "key": "lpn_scenario_base",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "The parent brief's suspect, confirmed. 'Base' is one of the most polysemous nouns in English and it appears ALONE, as a proper name, in a dropdown and interpolated into two other strings. A translator has nothing to disambiguate it: foundation, chemical base, baseball base, military base, base amount, and the intended sense (the canonical design the alternatives are measured from) are all reachable from four letters.",
+      "readings": [
+        "the canonical design that scenarios are laid over (intended)",
+        "a foundation or plinth",
+        "a chemical base (alkali)",
+        "a military base",
+        "a base amount / minimum"
+      ],
+      "disposition": "intent",
+      "resolution": "English KEPT and this is a deliberate call, not an omission: to an English user, 'Base' sitting in a scenario dropdown beside 'Scenario 2' does not stumble, and it is the term scenario managers in InfoWater/WaterGEMS use. By the routing rule that puts the fix in $ec_lang_syn, not in the English. If Tom would rather change the English, 'Base case' is the alternative that survives the same test and still fits 'Base case: {value}'. PROPOSED ENTRY for Tom to approve:\n+ $ec_lang_syn['lpn_scenario_base']='Base case, Baseline, Original design, The design the scenarios are compared with | gloss: scenario; avoid: a chemical base; a foundation; a military base; a base amount';"
+    },
+    {
+      "key": "lpn_scenario_base_value",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Base: {value}' is where the polysemy is WORST, because here 'Base' appears in a field popup with no scenario dropdown beside it to frame it -- a reader sees the word next to a number, which is exactly the reading that invites 'base amount' or 'baseline quantity'. The placeholder also forces the word order: a language that would naturally say 'value in the base case' has to keep the label first.",
+      "readings": [
+        "the value this property has in the Base scenario (intended)",
+        "a base/minimum amount of the quantity",
+        "the value's baseline or reference figure"
+      ],
+      "disposition": "intent",
+      "resolution": "English KEPT for the same reason as lpn_scenario_base -- the two must agree, since this string quotes the scenario's own name. PROPOSED ENTRY for Tom to approve:\n+ $ec_lang_syn['lpn_scenario_base_value']='Base case: {value}, Baseline: {value}, In the base design: {value} | gloss: scenario';"
+    },
+    {
+      "key": "lpn_scenario_overrides",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "THE VERDICT THE BRIEF ASKED FOR, and it turns on something neither 'Own values' nor 'Local values' was being judged against. 'Own values' has no possessor -- whose own? -- so a translator must supply one, and the natural literal rendering is the disaster: es 'valores propios', pt 'valores proprios', de 'Eigenwerte' all mean EIGENVALUES to every engineer who reads them. That is a false friend of exactly the shape Tom caught by reading the Spanish last time, and it is invisible in English. 'Local values' is separately disqualified: this suite's standard term for h_m is 'Minor (local) loss', so 'local' is already taken on the same page. 'Scen. values' abbreviates a word the reader may not have met yet.",
+      "readings": [
+        "the count of values this scenario sets for itself instead of inheriting from Base (intended)",
+        "eigenvalues (the literal rendering in es/pt/de/it)",
+        "values that the user owns",
+        "a list of the values rather than a count"
+      ],
+      "disposition": "glossary",
+      "resolution": "VERDICT: 'Own values' SURVIVES as English. It is short enough for the 11px status strip, it reads correctly followed by a count, and no English reader mis-parses it -- so by the routing rule the English is not the thing to change, and Tom's approval stands. What it needs is a guard, and the eigenvalue collision is a concept-level problem that recurs across lpn_scenario_override and lpn_scenario_override_tip, so it goes to the glossary rather than to one label. New glossary.json term 'override (scenario value)' seeded (v1.30) whose FIRST avoid item is the eigenvalue trap, naming the three languages it bites and the safe paraphrases ('values of its own', 'values set in this scenario'); it also records that 'local' is unavailable because of Minor (local) loss. Wired into prefixToTermNames()['lpn']. If Tom wants a $ec_lang_syn entry on top, the proposal is:\n+ $ec_lang_syn['lpn_scenario_overrides']='Own values, Values set here, Values changed in this scenario, Values of its own | gloss: override (scenario value)';"
+    },
+    {
+      "key": "lpn_scenario_override",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Only in this scenario' is a bare prepositional phrase used as a checkbox label -- it states a scope without naming what is scoped. It can be read as a restriction on the action being performed, as a filter, or as a statement about the value.",
+      "readings": [
+        "this value belongs to this scenario alone (intended)",
+        "this control works only while you are in this scenario",
+        "show only this scenario"
+      ],
+      "disposition": "glossary",
+      "resolution": "English KEPT -- the tip immediately beneath it says 'Checked means this value belongs to this scenario alone', so the reader is served, and the concept is the same one lpn_scenario_overrides needs. Covered by the new 'override (scenario value)' glossary term, which names this key explicitly as the control that creates an override."
+    },
+    {
+      "key": "lpn_scenario_override_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Ticked means...' / 'Clear the tick...' -- 'tick' for a checkmark is British and is the only occurrence of the word anywhere in the 27 language files; its dominant sense elsewhere is the parasite, and its US equivalent is 'check'. A low-resource-language agent meeting 'Clear the tick' has to guess. The sibling key lpn_field_active_tip says 'Clear this', so the file is not even self-consistent.",
+      "readings": [
+        "checked / clear the checkbox (intended)",
+        "the parasitic insect",
+        "a tick as in a moment of time, or a clock tick"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'Checked means this value belongs to this scenario alone, even when it is the same number as Base. Clear the box to use the Base value again.' 'the box' names the widget, which is what a translator needs."
+    },
+    {
+      "key": "lpn_scenario_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Which set of values the drawing is showing and solving right now.' -- a drawing does not solve; the page does. The coordination makes 'the drawing' the subject of both verbs, which is false for the second. And 'Which set...' opens as an indirect question with no main clause, so it reads as a fragment.",
+      "readings": [
+        "the set of values now displayed and now being solved (intended)",
+        "the drawing performs the solving",
+        "a question being asked of the user"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.'"
+    },
+    {
+      "key": "lpn_scenario_delete_confirm",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'the {n} values it holds of its own' -- 'holds of its own' is not ordinary English; an English reader re-reads it, and it recurs in four strings in this feature (push_tip, push_confirm, push_none, delete_confirm), each phrased slightly differently, so a translator gets four near-variants of one idea and no way to know they are the same idea.",
+      "readings": [
+        "the values that belong to this scenario alone (intended)",
+        "the values it currently has, of any origin",
+        "values it holds on its own behalf / independently"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'Delete the scenario {name}, and the {n} values that belong to it alone? The drawing itself is not changed.' The same phrase now appears in lpn_scenario_push_tip and lpn_scenario_push_confirm, so the family says one thing one way."
+    },
+    {
+      "key": "lpn_scenario_push_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Same 'Values those scenarios hold of their own' construction as delete_confirm, in a different shape.",
+      "readings": [
+        "values that belong to those scenarios alone (intended)",
+        "values those scenarios currently hold",
+        "values they hold independently / on their own authority"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: '...Values that belong to those scenarios alone are thrown away.' Now identical in wording to lpn_scenario_push_confirm and parallel with lpn_scenario_delete_confirm."
+    },
+    {
+      "key": "lpn_scenario_push_confirm",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Same construction again.",
+      "readings": [
+        "values that belong to those scenarios alone (intended)",
+        "values those scenarios currently hold"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten: '...Values that belong to those scenarios alone are thrown away. You can undo this.'"
+    },
+    {
+      "key": "lpn_scenario_push_scenarios",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Scenarios:' is followed at runtime by a COUNT, but the line directly above it in the same dialog is 'Properties: length, diameter' -- a LIST. Two adjacent labels with identical shape and different payloads, and nothing in the string says which this one is.",
+      "readings": [
+        "how many scenarios are affected (intended)",
+        "which scenarios are affected, by name",
+        "a heading introducing a scenario section"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten 'Scenarios:' -> 'Scenarios affected:'. Cheap, and it makes the count reading the natural one without asking a translator to know the runtime shape."
+    },
+    {
+      "key": "lpn_scenario_push_values",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "Same count-versus-list ambiguity as its sibling: 'Values thrown away:' is followed by a number, not by the values.",
+      "readings": [
+        "how many values will be thrown away (intended)",
+        "a list of the values that will be thrown away"
+      ],
+      "disposition": "intent",
+      "resolution": "English KEPT -- unlike its sibling, 'thrown away' already marks it as naming a consequence, and after the sibling became 'Scenarios affected:' the two read as a matched pair of consequence counts. The residual ambiguity also has near-zero translation consequence: nearly every language renders a count label and a list label with the same words. PROPOSED $ec_lang_syn ENTRY for Tom, if he wants the runtime shape stated:\n+ $ec_lang_syn['lpn_scenario_push_values']='Values thrown away, Values discarded, Values lost | a count follows this label, not a list of values';"
+    },
+    {
+      "key": "lpn_scenario_push_none",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'so nothing would change' is the whole reassurance, and the conditional 'would' leaves it open whether the action has been performed and had no effect, or has been declined. The code comment beside it says this distinction is the reason the string exists ('nothing to push and pushed nothing look identical afterwards'), but the string does not carry it.",
+      "readings": [
+        "the action is being declined because it would have no effect (intended)",
+        "the action ran and changed nothing",
+        "nothing would change if you proceeded -- proceed anyway?"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.' The added sentence is the reassurance the code comment says was intended, stated rather than implied."
+    },
+    {
+      "key": "lpn_delete_drops_overrides",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Deleting this' -- 'this' has no noun. A translator into any language with grammatical gender must choose an agreement for a referent that is never named (it can be a node, a pipe, a pump, a valve or a text label), and a bare demonstrative pronoun is not available as a subject in several of the target languages.",
+      "readings": [
+        "deleting this element (intended)",
+        "deleting this scenario",
+        "deleting this value"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'Deleting this element also throws away {n} values that your scenarios hold for it. Continue?' 'Element' is the page's own cover term for nodes, links and labels and is already used in lpn_field_active_tip."
+    },
+    {
+      "key": "lpn_push_base_only",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'This changes the drawing itself' -- same bare 'This', and here it is worse because the sentence is about an ACTION the user just attempted, not about an object on screen, so a translator can reasonably read 'This' as referring to the scenario, the drawing, or the current state.",
+      "readings": [
+        "the action you just attempted changes the drawing itself (intended)",
+        "this scenario changes the drawing",
+        "this setting changes the drawing"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.'"
+    },
+    {
+      "key": "lpn_field_active",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "The parent brief's suspect, and the answer is that it reads as a PLACE, not a state. 'In this network' is a bare prepositional phrase; as a checkbox label English speakers parse it as an elided predicate ('[this element is] in this network'), but that elision is an English convenience. Every one of its sibling checkboxes is an adjective or a participle -- 'Closed', 'Auto' -- so this is the odd one out even within its own page. A translator will render a locative adjunct, which in most languages cannot stand alone as a label and will read as a heading or a filter.",
+      "readings": [
+        "this element is part of this network (intended)",
+        "a scope heading: 'in this network, ...'",
+        "a filter: show things in this network",
+        "a location: somewhere inside this network"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten 'In this network' -> 'Part of this network'. 'Part of' supplies the predicate the English was eliding, so the phrase can no longer be parsed as a place or a heading, and it stays short enough for the popup. lpn_scenario_deactivated was rewritten in the same pass to match its vocabulary (see that entry)."
+    },
+    {
+      "key": "lpn_field_active_tip",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Clear this to leave the element...' -- 'Clear this' names no widget, and 'clear' next to a delete-capable UI reads as 'remove this'. Given the tip's whole point is that the element is NOT removed, that is the worst available misreading.",
+      "readings": [
+        "untick the checkbox (intended)",
+        "delete or erase this element",
+        "clear this field's value"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to 'Clear this box to leave the element on the drawing but out of the network: it is drawn grey and the solver ignores it. In a scenario this is how a proposed pipe is switched on and off.' Matches the 'Clear the box' wording now used in lpn_scenario_override_tip."
+    },
+    {
+      "key": "lpn_scenario_deactivated",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'{id} is switched off in {scenario}' describes the state that the checkbox lpn_field_active controls, but uses completely different vocabulary from it ('switched off' vs 'In this network'). A user cannot connect the notice to the control, and a translator handling the two keys separately has no signal that they are the same concept. 'Switched off' also implies a power state, which nothing here has.",
+      "readings": [
+        "this element is not part of the network in that scenario (intended)",
+        "this element is powered down (a pump reading is plausible here)",
+        "this element has been disabled by the program"
+      ],
+      "disposition": "english",
+      "resolution": "Rewritten to '{id} is out of the network in {scenario}. It is still in the drawing, and in your other scenarios.' -- the exact complement of the checkbox's new 'Part of this network', so the notice and the control now name one concept."
+    },
+    {
+      "key": "lpn_scenario_push_btn",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Apply Base values to all scenarios' promises more than it does: only the properties whose LABELS are currently switched on are pushed. An English reader takes 'Base values' as all of them.",
+      "readings": [
+        "push the Base values of the currently labelled properties to every scenario (intended)",
+        "push every Base value to every scenario",
+        "make Base adopt the scenarios' values"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Not changed, on precedent: the sibling control lpn_settings_push_btn ('Apply starting values to all elements') has the identical shape and puts its scope caveat in a separate note (lpn_settings_push_note), and this button's caveat is in lpn_scenario_push_tip plus the confirm dialog, which names the properties before anything is committed. Changing one of the pair without the other would be worse than leaving both. The direction reading is unambiguous in English ('apply X to Y')."
+    },
+    {
+      "key": "lpn_scenario_prompt_name",
+      "source": "wave0",
+      "lang": null,
+      "complaint": "'Name for this scenario' can be parsed with 'Name' as an imperative verb ('name [something] for this scenario') as well as the intended noun.",
+      "readings": [
+        "the name to give this scenario (intended)",
+        "an instruction: name something for this scenario"
+      ],
+      "disposition": "dismissed",
+      "resolution": "Not a defect worth an edit. The verb reading needs an object that is not present, so it collapses on a second's reading, and the string is a window.prompt label where the noun reading is the only one that fits the widget. Recorded so a translator who hesitated here can see it was considered."
+    }
+  ]
+}

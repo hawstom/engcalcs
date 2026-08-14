@@ -1,6 +1,6 @@
 {
     "meta": {
-        "version": "1.29",
+        "version": "1.30",
         "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
         "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
         "language_codes": [
@@ -2804,11 +2804,11 @@
             "symbol": "",
             "context": "In lpn_, a fixed-head boundary: a node whose water level is KNOWN and does not change during the solve. It supplies or receives whatever flow the network needs. Physically it may be a reservoir, a treated-water storage, a well head, or simply a connection to a larger system at a known pressure.",
             "avoid": [
-                "a tank whose level changes over time -- lpn_ explicitly does NOT model tanks (see lpn_notes_2_def), and calling this one would promise time-varying behaviour that does not exist",
+                "a TANK -- a vessel whose water level rises and falls as it fills and empties. Since ROADMAP Task 248 (2026-08-14) lpn_ models BOTH, as two separate node types, so the two must have two different words in every language. A reservoir's level is fixed and never runs down; a tank's does.",
                 "a natural lake specifically, where the language has a general storage/supply term",
                 "a reserve or reservation in the non-physical sense"
             ],
-            "translation_notes": "The user-facing meaning is \"the place the network gets its head from\", broader than a dam reservoir. Where a language distinguishes a storage basin from a supply point, prefer the term an engineer would use for a fixed supply level. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): the fixed-head node type. Note the paired trap: English also says \"Tanks\" in lpn_notes_2_def for the thing lpn_ deliberately does NOT model, so each language kept a SECOND, distinct word for that — es depósitos, pt tanques, fr réservoirs à niveau variable — rather than reusing the reservoir word and implying time-varying behaviour. Task 251 wave 2 (2026-08-13), harvested from what the de/hi/id agents actually shipped: de distinguishes Entnahmeknoten (a demand junction) from the bare graph Knoten and uses Reservoir as the settled water-engineering loanword; id borrows reservoir likewise (KBBI) while translating the graph terms natively (simpul / penghubung). hi KEPT जंक्शन / नोड / लिंक as transliterations -- a deliberate judgement, not laziness: the hi agent argued these are the dominant forms among Indian engineers, who work in English-medium practice, and the file already carries native words where native words are actually used (जलाशय for reservoir, पाइप for pipe). Consistent with the low-resource register finding: the local tongue is field register, the engineering register is English-inflected. Flag for native review before promoting hi above 0.65. Task 251 wave 3 (2026-08-13), harvested from shipped strings. NOTE THE COLLAPSE: ru and uk both render junction AND node with the same word (узел / вузол), because that is genuinely the standard term in Russian and Ukrainian water-supply practice (SP/SNiP register) -- so the EPANET distinction between the graph supertype and the demand-bearing junction is not carried lexically in these two languages, and a future agent should not try to force it apart. ps and sw do keep them distinct (نقطه vs جنکشن; kifundo vs muunganiko). sw is UNATTESTED: its agent reported no established Swahili standard exists for any of node/junction/link/vertex and coined a self-consistent set, deliberately avoiding makutano (a road crossing) for junction. Treat sw here as a proposal, not a standard, and flag it for the term-centric sweep alongside hi. ro (wave 3) keeps all four apart -- nod / Joncțiune / legătură -- and deliberately refuses the loanword link, which Romanians use for a hyperlink; it also pairs Rezervor (the fixed-head boundary lpn_ models) against bazin de acumulare (the variable-level tank it does not), which is the cleanest rendering of that paired trap in any language so far. | [2026-08-13] Sprint 251 wave 4: harvested from the shipped km/my/ur/zh strings, not from agent prose.",
+            "translation_notes": "The user-facing meaning is \"the place the network gets its head from\", broader than a dam reservoir. Where a language distinguishes a storage basin from a supply point, prefer the term an engineer would use for a fixed supply level. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): the fixed-head node type. Note the paired trap: English also says \"Tanks\" in lpn_notes_2_def for the thing lpn_ deliberately does NOT model, so each language kept a SECOND, distinct word for that — es depósitos, pt tanques, fr réservoirs à niveau variable — rather than reusing the reservoir word and implying time-varying behaviour. Task 251 wave 2 (2026-08-13), harvested from what the de/hi/id agents actually shipped: de distinguishes Entnahmeknoten (a demand junction) from the bare graph Knoten and uses Reservoir as the settled water-engineering loanword; id borrows reservoir likewise (KBBI) while translating the graph terms natively (simpul / penghubung). hi KEPT जंक्शन / नोड / लिंक as transliterations -- a deliberate judgement, not laziness: the hi agent argued these are the dominant forms among Indian engineers, who work in English-medium practice, and the file already carries native words where native words are actually used (जलाशय for reservoir, पाइप for pipe). Consistent with the low-resource register finding: the local tongue is field register, the engineering register is English-inflected. Flag for native review before promoting hi above 0.65. Task 251 wave 3 (2026-08-13), harvested from shipped strings. NOTE THE COLLAPSE: ru and uk both render junction AND node with the same word (узел / вузол), because that is genuinely the standard term in Russian and Ukrainian water-supply practice (SP/SNiP register) -- so the EPANET distinction between the graph supertype and the demand-bearing junction is not carried lexically in these two languages, and a future agent should not try to force it apart. ps and sw do keep them distinct (نقطه vs جنکشن; kifundo vs muunganiko). sw is UNATTESTED: its agent reported no established Swahili standard exists for any of node/junction/link/vertex and coined a self-consistent set, deliberately avoiding makutano (a road crossing) for junction. Treat sw here as a proposal, not a standard, and flag it for the term-centric sweep alongside hi. ro (wave 3) keeps all four apart -- nod / Joncțiune / legătură -- and deliberately refuses the loanword link, which Romanians use for a hyperlink; it also pairs Rezervor (the fixed-head boundary lpn_ models) against bazin de acumulare (the variable-level tank it does not), which is the cleanest rendering of that paired trap in any language so far. | [2026-08-13] Sprint 251 wave 4: harvested from the shipped km/my/ur/zh strings, not from agent prose. | [2026-08-14, Task 248 Wave 0] A TANK IS NOW A REAL ELEMENT ON THIS PAGE, so the old note that lpn_ \"deliberately does NOT model\" one is retired. The paired trap is unchanged but now live on screen: whatever word a language used for the tank it could not have (es depositos, pt tanques, fr reservoirs a niveau variable, ro bazin de acumulare) is the word the Tank tool should now carry, and the reservoir word must stay reserved for the fixed-level supply point. See the tank entry.",
             "translations": {
                 "am": "",
                 "ar": "",
@@ -3441,6 +3441,170 @@
                 "zh": "配准文件"
             },
             "source": "ESRI world file specification; seeded for Task 297"
+        },
+        "90": {
+            "term": "tank",
+            "symbol": "",
+            "context": "In lpn_, a storage node whose water level RISES AND FALLS as it fills and empties: a service reservoir, a standpipe, a clearwell, a farm storage. It is the sibling of a reservoir, which holds a level that never moves. Toolbar label lpn_tool_add_tank; the \"T\" ID prefix. A steady-state solve cannot tell the two apart at any one instant, which is exactly why the two need different names on screen -- the difference is in what happens NEXT.",
+            "avoid": [
+                "the word this file already uses for RESERVOIR. The page offers both tools side by side in the same toolbar, and a language that renders them with one word makes the two tools indistinguishable.",
+                "a military tank, a tracked vehicle",
+                "a fish tank or an aquarium",
+                "a fuel tank or a gas cylinder, where the language has a separate word for a WATER vessel",
+                "a transliteration of English \"tank\" where the language has a real word for a water storage vessel that engineers already use"
+            ],
+            "translation_notes": "Seeded 2026-08-14 (ROADMAP Task 248) for the tanks/valves/scenarios sprint. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet -- EXCEPT that several languages already coined the word during sprint 146.06 and 251, for the tank lpn_ did not yet have (see the reservoir entry): es depositos, pt tanques, fr reservoirs a niveau variable, ro bazin de acumulare. Prefer continuity with those where they exist. Fill the rest from the sprint output per CLAUDE.md's mandatory glossary write-back. THE THREE LEVEL FIELDS ARE DEPTHS measured up from the tank floor, not elevations on the site datum, and the English labels say \"depth\" for exactly that reason (Wave 0, 2026-08-14) -- do not translate them with the word your language uses for a water-surface ELEVATION.",
+            "translations": {
+                "am": "",
+                "ar": "",
+                "bg": "",
+                "bn": "",
+                "cs": "",
+                "de": "",
+                "es": "",
+                "fa": "",
+                "fr": "",
+                "he": "",
+                "hi": "",
+                "hr": "",
+                "id": "",
+                "it": "",
+                "km": "",
+                "my": "",
+                "ps": "",
+                "pt": "",
+                "ro": "",
+                "ru": "",
+                "sr": "",
+                "sw": "",
+                "tr": "",
+                "uk": "",
+                "ur": "",
+                "zh": ""
+            },
+            "source": "seeded for Task 248, 2026-08-14"
+        },
+        "91": {
+            "term": "valve",
+            "symbol": "",
+            "context": "In lpn_, a LINK -- it sits in the line between two nodes, like a pipe or a pump, not on a node. Five kinds are offered by what they do: a throttle valve (TCV) holding a fixed loss, a pressure reducing valve (PRV), a pressure sustaining valve (PSV) and a flow control valve (FCV). The last three open, close, or partly close by themselves as the water changes.",
+            "avoid": [
+                "a heart valve or any anatomical valve",
+                "a vacuum tube / electron tube (British English \"valve\")",
+                "a tap or faucet -- the fitting a person opens by hand at a sink, where the language distinguishes that from a pipeline valve",
+                "a transliteration of English \"valve\" where the language has an established pipeline term"
+            ],
+            "translation_notes": "Seeded 2026-08-14 (ROADMAP Task 248 phase 2). Use the word a water engineer would use on a distribution main, not the domestic tap word and not the anatomical one. THE FOUR TYPE LABELS ARE ELLIPTICAL IN ENGLISH -- \"Pressure reducing (PRV)\" with the noun \"valve\" left out, because they sit in a dropdown already labelled \"Valve type\". Supply the noun if your language needs it; the parenthesised letters are the international abbreviation and stay as written, in every script and in RTL. Translations deliberately empty; fill from the sprint output.",
+            "translations": {
+                "am": "",
+                "ar": "",
+                "bg": "",
+                "bn": "",
+                "cs": "",
+                "de": "",
+                "es": "",
+                "fa": "",
+                "fr": "",
+                "he": "",
+                "hi": "",
+                "hr": "",
+                "id": "",
+                "it": "",
+                "km": "",
+                "my": "",
+                "ps": "",
+                "pt": "",
+                "ro": "",
+                "ru": "",
+                "sr": "",
+                "sw": "",
+                "tr": "",
+                "uk": "",
+                "ur": "",
+                "zh": ""
+            },
+            "source": "seeded for Task 248, 2026-08-14"
+        },
+        "92": {
+            "term": "valve setting",
+            "symbol": "",
+            "context": "The one number that tells a valve what to do -- and it is A DIFFERENT PHYSICAL QUANTITY FOR EACH TYPE: a PRESSURE for a PRV or PSV, a FLOW for an FCV, and a dimensionless minor-loss coefficient for a TCV. The page therefore shows three different labels in the same slot (lpn_field_valve_setting_pressure / _flow / _loss) rather than one vague \"Setting\".",
+            "avoid": [
+                "a settings/preferences sense -- this is not an option a user configures in a panel, it is the duty point the valve maintains",
+                "a placement or installation sense (\"setting\" a valve into a line)",
+                "giving the TCV coefficient any units: it is a bare multiple of the velocity head"
+            ],
+            "translation_notes": "Seeded 2026-08-14 (ROADMAP Task 248 phase 2). The three labels are alternatives for ONE field, so keep them recognisably parallel with each other in your language, the way \"Pressure setting\" and \"Flow setting\" are parallel in English. Note that the third one, the throttle valve's loss coefficient, is the SAME KIND OF NUMBER as the pipe minor-loss coefficient k (lpn_field_km) but is a separate field and never appears beside it: a throttle valve is given no minor-loss box, because EPANET ignores one there. Translations deliberately empty; fill from the sprint output.",
+            "translations": {
+                "am": "",
+                "ar": "",
+                "bg": "",
+                "bn": "",
+                "cs": "",
+                "de": "",
+                "es": "",
+                "fa": "",
+                "fr": "",
+                "he": "",
+                "hi": "",
+                "hr": "",
+                "id": "",
+                "it": "",
+                "km": "",
+                "my": "",
+                "ps": "",
+                "pt": "",
+                "ro": "",
+                "ru": "",
+                "sr": "",
+                "sw": "",
+                "tr": "",
+                "uk": "",
+                "ur": "",
+                "zh": ""
+            },
+            "source": "seeded for Task 248, 2026-08-14"
+        },
+        "93": {
+            "term": "override (scenario value)",
+            "symbol": "",
+            "context": "A property value that belongs to ONE scenario alone and stands in place of the Base value while that scenario is active. A scenario is nothing but a collection of these laid over the shared drawing. The status strip counts them and calls them \"Own values\" (lpn_scenario_overrides); the per-field checkbox that creates one is \"Only in this scenario\" (lpn_scenario_override).",
+            "avoid": [
+                "the mathematical eigenvalue sense. This is the live trap: a literal \"own values\" renders as es \"valores propios\" / pt \"valores proprios\" / de \"Eigenwerte\", which every engineer reads as EIGENVALUES. Say \"values of its own\" / \"values set in this scenario\", never the eigen- word.",
+                "an override in the authority or veto sense (overruling a person or a permission)",
+                "a manual override switch on a machine",
+                "a copy or a duplicate -- an override is a single differing value, not a second network"
+            ],
+            "translation_notes": "Seeded 2026-08-14 (ROADMAP Task 248 / Task 184) after Wave 0 found the eigenvalue collision in the English label \"Own values\". The concept a translator wants is the one scenario managers in InfoWater/WaterGEMS use: a value CHANGED IN THIS CASE ONLY. It must read naturally in a very narrow status strip beside the units readout, followed by a count (\"Own values: 3\"). Note the suite ALREADY uses \"local\" as a technical term -- \"Minor (local) loss\" -- so a rendering built on the word \"local\" collides with an established meaning on the same page and should be avoided. Translations deliberately empty; fill from the sprint output.",
+            "translations": {
+                "am": "",
+                "ar": "",
+                "bg": "",
+                "bn": "",
+                "cs": "",
+                "de": "",
+                "es": "",
+                "fa": "",
+                "fr": "",
+                "he": "",
+                "hi": "",
+                "hr": "",
+                "id": "",
+                "it": "",
+                "km": "",
+                "my": "",
+                "ps": "",
+                "pt": "",
+                "ro": "",
+                "ru": "",
+                "sr": "",
+                "sw": "",
+                "tr": "",
+                "uk": "",
+                "ur": "",
+                "zh": ""
+            },
+            "source": "seeded for Task 248 Wave 0, 2026-08-14"
         }
     }
 }
