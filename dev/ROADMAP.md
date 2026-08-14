@@ -1978,7 +1978,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   `dev/lpn-spike/backdrop-scale-harness.js` §12 asserts it structurally — the defect is in the order
   two listeners see one event, which the extract-a-function harnesses cannot reproduce.
 
-- 0|296| **[DONE 2026-08-14] Two errors in Manning Trap Channel's Maynord riprap column, one of
+- 0|311| **[DONE 2026-08-14] Two errors in Manning Trap Channel's Maynord riprap column, one of
   them ~4x in the unsafe direction.** Surfaced by `/code-review high js/Manning.lib.js` (the first
   Tier 2 review this calculator has had), then checked against the primary source: Witheridge,
   *Background to Rock Sizing Equations* (Catchments & Creeks), which Tom read and transcribed.
@@ -2018,7 +2018,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     got substantially BIGGER (the safety-relevant fix); away from a bend it got SMALLER by 1.65x at
     the default sg (removing conservatism that was never intended); Searcy and Isbash are unchanged.
 
-- 0|300| **[DONE 2026-08-14] A new background image landed at the world origin, not on the model.**
+- 0|312| **[DONE 2026-08-14] A new background image landed at the world origin, not on the model.**
   `initialBackdropPlacement()` (was `initialBackdropSize`) now centres the image on `bbox()` as well
   as sizing it to that extent. Tom: *"I added a background image to an existing model, and I cannot
   find the image."* Sizing alone was a fit in one dimension: a network at state-plane coordinates put
@@ -2038,7 +2038,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   away and an undecodable file now explains itself** — omitting a format costs a click, not a dead
   end. Covered by `dev/lpn-spike/backdrop-scale-harness.js` §10–11.
 
-- 0|298| **[DONE 2026-08-14] The extrema badge was not part of the label's footprint.** Tom: *"The
+- 0|309| **[DONE 2026-08-14] The extrema badge was not part of the label's footprint.** Tom: *"The
   extrema glyph is not accounted for in the leader attachment. So it can overhang a steeply vertical
   leader when label is dragged left."* `measureDecorRight()`/`labelBoxWidth()` in
   `js/looped-network.js`; the leader, collision boxes, mask rect and `bbox()` all read the wider
@@ -2085,7 +2085,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     point inside the pass limit. Mutation-tested — re-freezing `n_strickler` turns exactly those
     three red.
 
-- 0|294| **[DONE 2026-08-14] Two real defects in Manning Trap Channel, both in `mtc_iterate`'s
+- 0|308| **[DONE 2026-08-14] Two real defects in Manning Trap Channel, both in `mtc_iterate`'s
   loop-exit condition, both invisible from the page.** Found by `dev/calc-spike/mtc-harness.js`
   (Task 292) within an hour of the harness existing, while checking a question Tom asked about the
   P&I range check: *"The check may be working wrong."* It was, and something worse was behind it.
@@ -2188,7 +2188,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     harness renders everything twice. `EC_DEFAULT_UNIT_SET` derives from the language, and clicking
     SI afterwards reinterprets rather than converts — `units('si')` turns an 18 in pipe into an
     18 mm pipe, correctly, and uselessly as a defaults test.
-  - **AND IT IMMEDIATELY EARNED ITS KEEP — see Task 294, two real defects in Manning Trap Channel
+  - **AND IT IMMEDIATELY EARNED ITS KEEP — see Task 308, two real defects in Manning Trap Channel
     found within an hour of the harness existing, one of them a 24–82% velocity error.** That is
     the argument for extending worked examples to a third calculator, not for stopping here.
   - **What is left, stated rather than rounded off:** 17 calculators are checked for RUNNING, not
@@ -2907,7 +2907,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   Verified by `dev/lpn-spike/backdrop-scale-harness.js` (32 assertions, including the half-pixel
   centre-vs-corner offset and the Cartesian-to-Y-down flip). Translation debt: Task 297.
 
-- 0|295| **[DONE 2026-08-13] `Compare-Languages.php` no longer fatals on a bare visit.** Unknown or
+- 0|310| **[DONE 2026-08-13] `Compare-Languages.php` no longer fatals on a bare visit.** Unknown or
   missing `lang1`/`lang2` now render a two-select picker instead of reaching
   `require('lib/lang.ec..php')`. Also dropped the unconditional `echo "$langDir"` that printed the
   absolute server path on every comparison.

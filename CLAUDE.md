@@ -730,9 +730,9 @@ office."* There are three tiers and they have very different prices. Knowing whi
 belongs to IS the budgeting decision.
 
 **Tier 1 — automated, seconds, free. `sh dev/scripts/check_all.sh` before every commit.**
-Fifteen checks: PHP and JS syntax, HTML balance on every page, the pageConfig PHP→JS bridge, tip
+Sixteen checks: PHP and JS syntax, HTML balance on every page, the pageConfig PHP→JS bridge, tip
 markup via the helpers, language rules A–D, gloss pointers, layout tags, the coverage declaration, payload
-freshness, the lpn harnesses, the calculator harnesses (both counts derived from the glob, never
+freshness, **roadmap ID uniqueness**, the lpn harnesses, the calculator harnesses (both counts derived from the glob, never
 typed — the lpn one read "12" while 15 were actually running), plus three advisory ones (key
 hygiene, size budget, English drift). Blocking failures exit 1. **This list used to live only in prose and in whoever remembered
 it** — a check nobody runs is indistinguishable from a check that does not exist, which is the same
@@ -780,7 +780,7 @@ and opens on a passing design — plus worked examples for the two core calculat
   Weir-Flow-Irregular) run, but the results inside their dynamic rows do not: building the rows
   needs a richer DOM than `calc-page.js` has. The smoke harness names them as it goes.
 
-**IT PAID FOR ITSELF THE SAME DAY (Task 294).** Within an hour of `mtc-harness.js` existing it
+**IT PAID FOR ITSELF THE SAME DAY (Task 308).** Within an hour of `mtc-harness.js` existing it
 found two defects in Manning Trap Channel, a core calculator: the reported velocity was computed
 from the *previous* iteration's n whenever a roughness radio was on and no rock radio was, and the
 safety factor was being applied to a d50 the user had typed. Both lived in one loop-exit condition, and **three of every four radio
@@ -861,6 +861,32 @@ the harness defines, so a harness can pass while the real call site is broken.
   `<script>` tags in `Looped-Network.php`, `dev/lpn-spike/lpn-dom-stub.js`, and any harness that
   eval's `looped-network.js` itself. Use **indirect** eval — `(0, eval)(src)` — in those harnesses;
   a direct eval hoists its own `var EngCalcs` and starts a second, empty one.
+
+## Claiming a ROADMAP task ID (2026-08-14)
+
+An ID is a **permanent handle** — prose across `dev/ROADMAP.md`, this file and `dev/*.md` cites
+tasks by number, so two tasks sharing one makes every such reference ambiguous.
+
+**Never allocate an ID by reading only your own copy of `dev/ROADMAP.md`.** That is how all six
+collisions happened: another session had already claimed the number in a second worktree, an
+unmerged branch, or a commit not yet pulled, and the first session could not see it. Instead:
+
+```sh
+git fetch origin
+git show origin/master:dev/ROADMAP.md | grep -oE '^- [0-9]+\|[0-9.]+\|'   # what origin already holds
+php dev/scripts/roadmap_id_check.php --verbose                            # next free ID locally
+```
+
+`roadmap_id_check.php` is **blocking, in `check_all.sh`, and has no exemption list**. When it
+fails, renumber the **newer** task — preferring a closed one — and grep `Task <id>` across
+`dev/*.md` and `CLAUDE.md` to move its references with it. In practice one member of a colliding
+pair usually has zero references, and that is the cheap one to move.
+
+**Do not add an exemption list.** Tom, 2026-08-14: *"I don't agree with grandfathering
+duplicates."* A first draft of the check grandfathered three pairs on the theory that fixing them
+was expensive; each turned out to have a zero-reference member, and one of them was hiding a live
+reference to a *third* meaning of the same ID. Same principle as the translation exempt list:
+never to quiet a number you don't want to fix.
 
 ## Renaming a language key, and finding key debt (Tom, 2026-08-12)
 
