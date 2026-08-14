@@ -1193,6 +1193,38 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     never places content under them. That does not survive a pan, which is why this still exists.
 
 
+- 70|313| **The native solver is NOT faster than EPANET, and the per-solve gap is our own `.inp`
+  round trip.** Tom, 2026-08-14: *"We've proceeded telling ourselves that our engine is faster than
+  the EPANET engine. But I haven't seen evidence of this in my browser tests."* There was none.
+  `dev/lpn-spike/engine-bench.js` now measures both — the first time the EPANET side has ever been
+  timed rather than inferred from "async, and 678 KB".
+
+  | network | native | EPANET solve | EPANET open() | verdict |
+  |---|---|---|---|---|
+  | 21 nodes | 0.43 ms | **0.05 ms** | 1.18 ms | engine ~9x faster than ours |
+  | 201 nodes | 36.3 ms | **0.78 ms** | 1.68 ms | engine ~46x faster than ours |
+
+  - **The C engine beats a JavaScript dense Cholesky at every size**, and the gap widens because
+    ours is O(n³) while EPANET is sparse. In hindsight this was never going to go the other way.
+  - **`lpnSolveEpanet()` builds a whole `.inp` and hands EPANET a fresh `Project` to PARSE on every
+    solve** — 1.2 ms of a 1.25 ms round trip, on a page that re-solves on every keystroke. THE FIX:
+    open the Project once and push value edits through the toolkit's setters
+    (`setNodeValue`/`setLinkValue`), reopening only on a TOPOLOGY change (add/delete an element).
+    Value edits are the common case — typing in a box — and topology edits are discrete clicks, so
+    the split falls naturally out of how the editor already works. That lands EPANET at ~0.05 ms per
+    solve, an order of magnitude under the native path.
+  - **The only real remaining cost of EPANET is the one-time 663 KB module load** (236 KB gzipped,
+    ~33 ms to import and instantiate in Node). That is a genuine cost on a slow connection, and it
+    is the whole of the case for keeping a native solver — a bandwidth argument, not a speed one.
+    **Do not write it up as a speed argument again.** The two comments that did (`lpn-epanet.js`'s
+    header and `defaultSettings()`) are corrected.
+  - **This reframes Task 248's valve phase.** Active pressure controls (PRV/PSV/FCV) were the one
+    part of that task worth writing numerics for, and they are free in an engine we already ship
+    and that is faster than the one we would be extending. Build them on EPANET.
+  - Measured in Node, not a browser: WASM instantiation, the fetch and the JIT all differ there, and
+    the fetch is what a user actually waits for. The per-solve numbers are representative; the load
+    number is a floor.
+
 - 60|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
   Task 243 shipped the engine and the toggle. The engine makes each of these a mapping-and-UI job
   rather than a numerical one, which is the entire reason it was worth vendoring.

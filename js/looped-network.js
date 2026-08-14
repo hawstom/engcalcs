@@ -691,13 +691,20 @@ var EngCalcs = EngCalcs || {};
 			emitterExponent: 0.5,
 			tolerance: 1e-9, // matches js/lpn-solver.js's own default relative-flow-change tol -- see runSolve()
 			// 'native' (js/lpn-solver.js) or 'epanet' (the real EPANET engine as WASM,
-			// js/lpn-epanet.js). NATIVE IS THE DEFAULT AND SHOULD STAY THAT WAY: it is
-			// synchronous and takes 0.4 ms at this page's 10-20 node target, where the EPANET
-			// path costs a 678 KB lazy import and an async round trip on a page that re-solves
-			// on every keystroke. The toggle exists because "does it run the actual EPANET
-			// engine?" is a yes/no gate for some agencies (ROADMAP Tasks 222, 243), not because
-			// the native solver needs help -- the two agree to 1e-5..1e-3 m of head
+			// js/lpn-epanet.js). The two agree to 1e-5..1e-3 m of head
 			// (dev/lpn-spike/validate_epanet.js).
+			//
+			// NATIVE IS THE DEFAULT, BUT NOT BECAUSE IT IS FASTER -- it is not. This comment used
+			// to assert that it was, on the strength of a measured 0.4 ms native solve and an
+			// UNMEASURED assumption about the other side. dev/lpn-spike/engine-bench.js measured
+			// it on 2026-08-14: EPANET's own solve is ~0.05 ms at this page's target and ~0.78 ms
+			// at 201 nodes, where ours is 0.43 ms and 36 ms. EPANET wins at every size, by more as
+			// the network grows.
+			//
+			// The real and only cost of EPANET is the ONE-TIME 663 KB module load, which is a
+			// genuine cost on a slow connection and is why the default has not moved yet. See
+			// ROADMAP Task 313 -- the per-solve gap that remains is our own .inp round trip, not
+			// the engine.
 			engine: 'native',
 			// Default input values for NEWLY created elements (Tom, 2026-07-30). Generalizes what
 			// used to be a lone `kmDefault`: the workflow Tom described is "mostly 8-inch, 0 demand,

@@ -9,10 +9,30 @@
 // .inp interop that we would otherwise hand-write. Task 248 walked through that door: TANKS
 // shipped 2026-08-14 and are written into [TANKS] below.
 //
-// It stays OFF by default because the costs are real and land on our differentiator: the
-// engine module is 678 KB (236 KB gzipped) and loading it is async, against a native solve
-// that is synchronous and takes 0.4 ms at the 21-node target. So we lazy-import it only when
-// the user asks, and the offline PWA bundle never carries it unless it has been used.
+// IT IS OFF BY DEFAULT, AND THE STATED REASON FOR THAT WAS WRONG. This paragraph used to read
+// "the native solve is synchronous and takes 0.4 ms at the 21-node target" against an EPANET
+// path that "is async and 678 KB", and concluded that native is faster. Half of that was
+// measured and half was inferred. Tom, 2026-08-14: "We've proceeded telling ourselves that our
+// engine is faster than the EPANET engine. But I haven't seen evidence of this in my browser
+// tests." He was right. dev/lpn-spike/engine-bench.js now measures both, and the finding is the
+// reverse of the claim:
+//
+//   21 nodes    native 0.43 ms    EPANET's actual SOLVE 0.05 ms     -- EPANET ~9x faster
+//   201 nodes   native 36.3 ms    EPANET's actual SOLVE 0.78 ms     -- EPANET ~46x faster
+//
+// The C engine beats a JavaScript dense Cholesky, which in hindsight was never going to go the
+// other way, and it degrades gracefully where ours is O(n^3).
+//
+// WHAT IS ACTUALLY SLOW ON THIS PATH IS THIS FILE, not the engine. lpnSolveEpanet() below builds
+// a whole .inp and hands EPANET a fresh Project to PARSE on every single solve -- 1.2 ms of the
+// 1.25 ms round trip, on a page that re-solves on every keystroke. That is our integration, not
+// EPANET, and ROADMAP Task 313 is about keeping the Project open and pushing values through the
+// toolkit's setters instead.
+//
+// So the honest remaining cost of choosing EPANET is the ONE-TIME module load: 663 KB to fetch
+// (236 KB gzipped) and ~33 ms to import and instantiate in Node. That is a real cost for the
+// offline/low-bandwidth case this suite cares about, and it is the whole of the case for keeping
+// a native solver at all. It is not a speed argument, and must not be written up as one again.
 //
 // LICENSING. js/vendor/epanet-js.js is epanet-js 0.9.0, MIT, (c) Luke Butler, wrapping
 // OWA-EPANET (also MIT). MIT is GPL-3-compatible, so this suite stays GPL v3+. The full
