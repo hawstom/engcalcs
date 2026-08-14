@@ -1348,9 +1348,43 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   Task 243 shipped the engine and the toggle. The engine makes each of these a mapping-and-UI job
   rather than a numerical one, which is the entire reason it was worth vendoring.
 
+  **PHASE 2, VALVES: DONE 2026-08-14.** Five EPANET valve types, and the phase turned on a
+  decision that Task 313 had made the day before rather than on any numerics of our own.
+  - **TCV works in BOTH engines and cost no numerics.** A throttle valve is a minor loss on a
+    zero-length link, which `js/lpn-solver.js` already computed for every pipe. `EngCalcs.lpnLinkK`
+    is the one place that says a TCV's loss is its SETTING and not its `k` — EPANET ignores the
+    [VALVES] minor-loss column for a TCV, measured 2026-08-11, so the page offers no `k` box on one.
+  - **PRV / PSV / FCV solve through EPANET ONLY, and that is a measurement, not a shortfall.**
+    Their status is re-decided inside the iteration; writing that a second time would have been
+    slower code (Task 313: EPANET 0.05 ms against our 0.43 ms at 21 nodes) for a solved problem.
+  - **A network holding one is ROUTED to EPANET automatically, and the status bar says so.** The
+    stored `engine` setting is NOT rewritten — the setting is a preference, the routing is a fact
+    about this network, so deleting the valve puts the page straight back on the chosen engine.
+    Silent routing was the alternative and was rejected: a user who ticked "built-in solver" and
+    got a different one has been lied to.
+  - **Offline, the native engine refuses BY NAME.** `valve-needs-epanet` carries the valve ids into
+    `lpn_diag_valve_needs_epanet`, which is the whole reason this page writes its own diagnostics
+    instead of surfacing EPANET's numbered errors. A second diagnostic, `valve-on-fixed-head`,
+    catches EPANET's own placement rule (input error 219) for BOTH engines, because it is a fact
+    about the drawing rather than about who solves it.
+  - **PBV and GPV are still substituted with a reported open pipe.** A GPV's behaviour is a
+    head-loss CURVE and a PBV's a fixed pressure drop, and this page has no element for either.
+    Offering a GPV in the type list with nowhere to enter its curve would be a control that does
+    nothing.
+  - **THE SETTING IS THE TRAP, and it is narrower and sharper than the tank diameter was.** A
+    valve's setting is a PRESSURE (PRV/PSV), a FLOW (FCV) or a bare LOSS COEFFICIENT (TCV) — three
+    quantities in one column — while its DIAMETER follows the PIPE convention (millimetres), the
+    opposite of the tank diameter three sections earlier in the same file. `valve-harness.js` was
+    mutation-tested against four deliberate breaks and **corrected its own premise**: the diameter
+    turns out to be visible to `validate_epanet.js` after all (a TCV's loss is k V²/2g, so velocity
+    carries it), but an ACTIVE valve's setting is invisible to every engine comparison there can
+    be — those types never reach the comparison, because the native solver refuses them by design.
+  - `lpn_notes_2_def` no longer says control valves are unmodelled; it says which engine works them
+    out. 20 English keys are new or edited and need a translation sprint.
+
   **PHASE 1, TANKS: DONE 2026-08-14.** A third node type, in both engines, in the `.inp` reader and
-  writer, on the map, in the popup and in the settings. Phases 2 (valves) and 3 (extended-period)
-  are still open, so the gate on Tasks 306/307 has NOT cleared.
+  writer, on the map, in the popup and in the settings. Phase 3 (extended-period) is still open, so
+  the gate on Tasks 306/307 has NOT cleared.
   - **A tank is a fixed head at its water surface, and that is not a simplification** — it is what
     EPANET solves at t = 0 of an extended-period run, before it integrates any level forward.
     `EngCalcs.lpnIsFixedHead` is the one place the equivalence with a reservoir is declared; the

@@ -197,20 +197,92 @@ EngCalcs.lpnIsFixedHead = function (node) {
 	return node.type === 'reservoir' || node.type === 'tank';
 };
 
+// ---------------------------------------------------------------------------
+// VALVES (ROADMAP Task 248 phase 2, 2026-08-14)
+// ---------------------------------------------------------------------------
+//
+// A valve is a LINK with zero length. EPANET has five types and they split cleanly in two, along
+// a line this file cares about more than any other:
+//
+//   TCV  -- a THROTTLE. Its setting is a minor-loss coefficient, so the whole element is
+//           k V^2 / 2g on a link with no friction. That is arithmetic this solver already does
+//           for every pipe's minor loss, so a TCV needs NO new numerics and solves natively.
+//   PRV / PSV / FCV / PBV / GPV -- ACTIVE CONTROLS. Each one is a valve that CHANGES STATE during
+//           the solve: a PRV is fully open while the downstream pressure is below its setting,
+//           active (holding that pressure) once it is reached, and shut if flow reverses. Which
+//           of the three it is depends on the pressures and flows being solved for, so the
+//           status has to be re-decided inside the iteration and the whole system re-formed when
+//           it changes. That is real numerics, not a coefficient.
+//
+// WE DO NOT WRITE THOSE NUMERICS, AND THAT IS A MEASUREMENT, NOT A SHRUG (ROADMAP Task 313,
+// 2026-08-14). This page ships a real EPANET engine that already implements status switching, and
+// dev/lpn-spike/engine-bench.js measured it at 0.05 ms against this file's 0.43 ms on the same
+// 21-node network -- EPANET is ~9x faster here and ~46x faster at 201 nodes. Writing a second,
+// slower implementation of a solved problem is the trade this project spent a day disproving.
+//
+// So an active valve routes the SOLVE to EPANET (see runSolve() in js/looped-network.js), and if
+// EPANET is unreachable -- offline, blocked module -- this file refuses with a diagnostic that
+// NAMES THE VALVES. That is the whole reason the diagnostics on this page are ours and not
+// EPANET's numeric error codes: "valve V3 needs the EPANET engine" beats "error 110".
+EngCalcs.lpnValveTypes = ['PRV', 'PSV', 'FCV', 'TCV', 'GPV'];
+
+// The one place the native/EPANET-only line is drawn. A link that is not a valve is native.
+EngCalcs.lpnValveIsNative = function (link) {
+	return link.type !== 'valve' || (link.valveType || 'TCV').toUpperCase() === 'TCV';
+};
+
+// Ids of every valve in the model that only the EPANET engine can solve. Exported because the UI
+// needs the same answer BEFORE it picks an engine, and two copies of this rule would drift.
+EngCalcs.lpnEpanetOnlyValves = function (model) {
+	var out = [], i;
+	for (i = 0; i < model.links.length; i++) {
+		if (!EngCalcs.lpnValveIsNative(model.links[i])) { out.push(model.links[i].id); }
+	}
+	return out;
+};
+
+// The minor-loss coefficient a link actually contributes, stated ONCE because it is read in two
+// places (the iteration and the report) and they must not diverge.
+//
+// A TCV'S LOSS IS ITS SETTING AND NOTHING ELSE, and that is EPANET's behaviour rather than a
+// simplification of it -- measured in js/vendor/epanet-js.js on 2026-08-11 and recorded in
+// js/lpn-inp.js: a TCV with setting 16 and minor loss 0 gives 8.00 ft, setting 12 with minor loss
+// 3 gives 6.00 ft (= 12/16 of it), and setting 0 with minor loss 16 gives exactly zero. EPANET
+// IGNORES the [VALVES] minor-loss column for a TCV. Adding the two -- the obvious reading of the
+// column heading -- put 10.6 m of phantom head into the first real model that had one. This page
+// therefore never offers a separate minor loss on a TCV: one number, both engines, same answer.
+EngCalcs.lpnLinkK = function (link) {
+	if (link.type === 'valve' && (link.valveType || 'TCV').toUpperCase() === 'TCV') {
+		return link.setting || 0;
+	}
+	return link.k || 0;
+};
+
 // Structural checks, run BEFORE the solve, never by watching it fail.
 //
 // Each returns a distinct machine-readable code so the UI can say something
 // specific and highlight the offending elements. The dominant real-world error is
 // 'unreachable': a pipe drawn near a junction but not snapped to it.
-EngCalcs.lpnDiagnose = function (model) {
+//
+// `options.engine` NAMES THE ENGINE THE CALLER IS ABOUT TO USE, and it is opt-in on purpose
+// (Task 248 phase 2). Everything below is engine-independent except one check -- an active valve
+// is a perfectly valid network that this file alone cannot solve -- so that check fires only when
+// the caller has said 'native'. A caller that names no engine is asking "is this network sound?",
+// which is what the UI asks before it has chosen, and gets the engine-independent answer. The
+// alternative, defaulting to 'native', would make EngCalcs.lpnSolveEpanet refuse a network it is
+// perfectly able to solve.
+EngCalcs.lpnDiagnose = function (model, options) {
 	'use strict';
-	var fixed = [],
+	var opts = options || {},
+		fixed = [],
 		byId = {},
 		adj = {},
 		issues = [],
 		seen = {},
 		queue = [],
 		unreachable = [],
+		badlyPlacedValves = [],
+		epanetOnlyValves,
 		i,
 		id,
 		link,
@@ -221,6 +293,32 @@ EngCalcs.lpnDiagnose = function (model) {
 		byId[node.id] = node;
 		adj[node.id] = [];
 		if (EngCalcs.lpnIsFixedHead(node)) { fixed.push(node.id); }
+	}
+
+	// AN ACTIVE VALVE MAY NOT SIT DIRECTLY ON A RESERVOIR OR A TANK. This is EPANET's own rule
+	// (input error 219), and it exists because a PRV/PSV/FCV controls the pressure or flow at a
+	// node whose head is already fixed by the vessel -- two boundary conditions on one node, so
+	// there is nothing left for the valve to control. Checked for BOTH engines, because it is a
+	// fact about the drawing rather than about who solves it, and because EPANET would otherwise
+	// report it as a number with no element attached. Put a short pipe between them.
+	for (i = 0; i < model.links.length; i++) {
+		link = model.links[i];
+		if (link.type !== 'valve' || EngCalcs.lpnValveIsNative(link)) { continue; }
+		if ((byId[link.from] && EngCalcs.lpnIsFixedHead(byId[link.from])) ||
+			(byId[link.to] && EngCalcs.lpnIsFixedHead(byId[link.to]))) {
+			badlyPlacedValves.push(link.id);
+		}
+	}
+	if (badlyPlacedValves.length > 0) {
+		issues.push({ code: 'valve-on-fixed-head', ids: badlyPlacedValves });
+	}
+
+	// The one engine-dependent check -- see the note on `options` above.
+	if (opts.engine === 'native') {
+		epanetOnlyValves = EngCalcs.lpnEpanetOnlyValves(model);
+		if (epanetOnlyValves.length > 0) {
+			issues.push({ code: 'valve-needs-epanet', ids: epanetOnlyValves });
+		}
 	}
 
 	if (fixed.length === 0) {
@@ -303,7 +401,9 @@ EngCalcs.lpnSolve = function (model, options) {
 		i,
 		k;
 
-	issues = EngCalcs.lpnDiagnose(model);
+	// 'native' names THIS file, so lpnDiagnose adds the one check that is about this engine's
+	// limits rather than about the network: an active valve it cannot switch. See its comment.
+	issues = EngCalcs.lpnDiagnose(model, { engine: 'native' });
 	if (issues.length > 0) {
 		return { ok: false, issues: issues, converged: false, iterations: 0 };
 	}
@@ -391,9 +491,14 @@ EngCalcs.lpnSolve = function (model, options) {
 					link.f = EngCalcs.lpnDwFriction(Math.max(aq, qMin), link.diameter, link.roughness, visc);
 				}
 				res = EngCalcs.lpnResistance(link, method, visc);
-				var m = link.k > 0
-					? link.k / (2 * g * Math.pow(Math.PI * link.diameter * link.diameter / 4, 2))
-					: 0;
+				// A VALVE ARRIVES HERE, and needs no branch of its own: lpnResistance returns
+				// r = 0 for a zero-length link, so the friction term vanishes and what is left is
+				// exactly the minor loss -- which is what a throttle valve IS. lpnLinkK() is the
+				// one place that reads a TCV's loss out of its setting rather than out of k.
+				var km = EngCalcs.lpnLinkK(link),
+					m = km > 0
+						? km / (2 * g * Math.pow(Math.PI * link.diameter * link.diameter / 4, 2))
+						: 0;
 
 				h = res.r * Math.pow(aq, res.n - 1) * q + m * aq * q;
 				p = res.n * res.r * Math.pow(aq, res.n - 1) + 2 * m * aq;
@@ -529,6 +634,7 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		res,
 		aq,
 		m,
+		kEff,
 		g = EngCalcs.lpnG;
 
 	for (i = 0; i < model.nodes.length; i++) {
@@ -576,8 +682,11 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 				link.f = EngCalcs.lpnDwFriction(Math.max(aq, EngCalcs.lpnQMin), link.diameter, link.roughness, visc);
 			}
 			res = EngCalcs.lpnResistance(link, method, visc);
-			m = link.k > 0
-				? link.k / (2 * g * Math.pow(Math.PI * link.diameter * link.diameter / 4, 2))
+			// lpnLinkK(), not link.k -- the same rule the iteration used above, so the reported
+			// head loss on a throttle valve is the one the solve actually developed.
+			kEff = EngCalcs.lpnLinkK(link);
+			m = kEff > 0
+				? kEff / (2 * g * Math.pow(Math.PI * link.diameter * link.diameter / 4, 2))
 				: 0;
 			headlosses[link.id] = res.r * Math.pow(aq, res.n - 1) * Q[k] + m * aq * Q[k];
 		}

@@ -4,8 +4,8 @@
 // real EPANET engine can solve what this page has drawn. This is the missing half, and it is much
 // the harder one -- writing only has to express what we model, while reading has to survive
 // everything EPANET can express, including the elements this calculator deliberately does not
-// have (dev/looped-network-calculator-scope.md's "Cut, not deferred" list: control valves,
-// patterns, water quality, extended-period simulation -- tanks left that list in Task 248).
+// have (dev/looped-network-calculator-scope.md's "Cut, not deferred" list: patterns, water
+// quality, extended-period simulation -- tanks and valves both left that list in Task 248).
 //
 // THE ONE RULE THAT DECIDES EVERY CASE BELOW: never drop anything silently. The ROADMAP framed the
 // choice as "reject a file that uses a cut feature, or import the supported subset and report
@@ -153,7 +153,7 @@
 			lenSI = us ? FT : 1,            // file length unit -> m
 			diaSI = us ? IN : MM,           // file pipe-diameter unit -> m
 			headSI = us ? FT : 1,           // file elevation/head unit -> m
-			pressSI = us ? PSI_M : 1,       // file PRESSURE unit -> m of water (emitters only)
+			pressSI = us ? PSI_M : 1,       // file PRESSURE unit -> m of water (emitters, PRV/PSV)
 			qSI = fu.toSI;
 
 		// The page computes Hazen-Williams and has no control for anything else yet (ROADMAP Task
@@ -345,52 +345,88 @@
 
 		// Valves. Every type is cut, but they are NOT all equally lossy to drop, and the difference
 		// matters enough to say separately:
-		//   - a TCV is a pure minor loss, so it becomes a short pipe carrying that loss coefficient
-		//     -- the same hydraulics, expressed with the element this page does have;
-		//   - every other type (PRV/PSV/PBV/FCV/GPV) imposes a CONTROL, not a loss, and there is no
-		//     honest substitute, so it becomes an open pipe and is reported as a real loss of
-		//     behaviour.
-		// Both keep the network connected, which is what lets the rest of the model be checked at
-		// all. Silently swallowing either would be the failure this module is built to avoid.
+		// VALVES ARE IMPORTED AS VALVES (ROADMAP Task 248 phase 2, 2026-08-14). Until then every
+		// type was substituted with a pipe: a TCV became a short pipe carrying the same loss, and
+		// a PRV/PSV/FCV became an open pipe with the control simply gone. The first was exact and
+		// the second was a real loss of behaviour, both reported. Now four of the five types are
+		// real elements, and the split that remains is about WHICH ENGINE, not about what we can
+		// hold:
+		//   - TCV        a throttle: a minor loss on a zero-length link, so it solves in either
+		//                engine (EngCalcs.lpnLinkK).
+		//   - PRV/PSV/FCV  active controls whose open/active/closed state comes out of the solve.
+		//                Imported in full and solved by the EPANET engine, to which the page routes
+		//                automatically. Reported anyway -- a file that arrives needing a different
+		//                engine has changed for the reader, even though nothing was lost.
+		//   - PBV/GPV    still substituted with an open pipe. A GPV's whole behaviour lives in a
+		//                head-loss CURVE and a PBV's in a fixed pressure drop; this page has no
+		//                element for either, and inventing one from a curve id we do not store
+		//                would be the silent-substitution failure this module exists to avoid.
+		//
+		// SETTING UNITS DIFFER BY TYPE and are fixed by the file's own flow-unit keyword, exactly
+		// as on the writing side (js/lpn-epanet.js): a PRV/PSV setting is a PRESSURE (psi in a US
+		// file, metres of water in an SI one), an FCV setting is a FLOW, a TCV setting is
+		// dimensionless. Reading a psi as a metre is a factor of 1.42 and the network still solves.
+		// One valve setting, in the file's units, to SI. Written as a function rather than inline
+		// because a [STATUS] line can override a valve's setting too, and the two call sites must
+		// convert identically.
+		function valveSettingSI(type, value) {
+			if (type === 'PRV' || type === 'PSV' || type === 'PBV') { return value * pressSI; }
+			if (type === 'FCV') { return value * qSI; }
+			return value;   // TCV is dimensionless; GPV's "setting" is a curve id we do not read.
+		}
+
 		rows = rawSections.VALVES || [];
-		var tcvIds = [], otherValveIds = [];
+		var tcvIds = [], activeValveIds = [], unsupportedValveIds = [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			if (!r[0]) { continue; }
 			var vtype = (r[4] || '').toUpperCase(),
 				vdia = num(r[3]) * diaSI,
 				setting = num(r[5]),
-				vloss = num(r[6]);
-			if (vtype === 'TCV') { tcvIds.push(r[0]); } else { otherValveIds.push(r[0]); }
-			var vlink = {
-				id: r[0], type: 'pipe', from: r[1], to: r[2],
-				// LENGTH ZERO, and that is exact rather than approximate: a valve has no length in
-				// EPANET, and EngCalcs.lpnResistance returns r = 0 for a zero-length link while the
-				// minor-loss term (k V^2 / 2g) is computed from k and diameter alone. So a TCV
-				// becomes precisely the pure local loss it always was, with no friction smuggled in
-				// by giving it a plausible-looking length.
+				vloss = num(r[6]),
+				vlink;
+			// LENGTH ZERO on every one of these, and that is exact rather than approximate: a valve
+			// has no length in EPANET, and EngCalcs.lpnResistance returns r = 0 for a zero-length
+			// link while the minor-loss term (k V^2 / 2g) is computed from k and diameter alone. So
+			// no friction is ever smuggled in by giving a valve a plausible-looking length.
+			// A valve with no diameter of its own would divide by zero in that same term, so it
+			// falls back to a sensible main rather than breaking the solve.
+			var vcommon = {
+				id: r[0], from: r[1], to: r[2],
 				length: 0,
-				// A valve with no diameter of its own would divide by zero in that same minor-loss
-				// term, so it falls back to a sensible main rather than breaking the solve.
 				diameter: vdia || (us ? 8 * IN : 0.2),
 				roughness: 150,
-				// A TCV's loss is its SETTING ALONE. The [VALVES] minor-loss column is IGNORED for
-				// it, which is the opposite of what the section's own column heading suggests and
-				// was measured rather than assumed (js/vendor/epanet-js.js, 2026-08-11: setting 16
-				// with loss 0 gives 8.00 ft, setting 12 with loss 3 gives 6.00 ft = 12/16 of it,
-				// and setting 0 with loss 16 gives exactly zero). Adding the two -- the obvious
-				// reading -- put 10.6 m of phantom head into the first real model that had one.
-				// Every other valve type imposes a CONTROL rather than a loss, and that control is
-				// what we cannot keep; its minor-loss column is the coefficient EPANET applies when
-				// such a valve sits fully open, so that is what the substitute pipe carries.
-				k: vtype === 'TCV' ? setting : vloss,
 				status: (r[7] || '').toUpperCase() === 'CLOSED' ? 'closed' : 'open',
 				verts: []
 			};
+			if (vtype === 'PBV' || vtype === 'GPV') {
+				unsupportedValveIds.push(r[0]);
+				// The minor-loss column is the coefficient EPANET applies while such a valve sits
+				// fully open, so that is what the substitute pipe carries. The control is not
+				// substituted for; it is reported gone.
+				vlink = Object.assign({}, vcommon, { type: 'pipe', k: vloss });
+			} else {
+				if (vtype === 'TCV') { tcvIds.push(r[0]); } else { activeValveIds.push(r[0]); }
+				vlink = Object.assign({}, vcommon, {
+					type: 'valve',
+					valveType: vtype || 'TCV',
+					setting: valveSettingSI(vtype, setting),
+					// A TCV's loss is its SETTING ALONE. The [VALVES] minor-loss column is IGNORED
+					// for it, which is the opposite of what the section's own column heading
+					// suggests and was measured rather than assumed (js/vendor/epanet-js.js,
+					// 2026-08-11: setting 16 with loss 0 gives 8.00 ft, setting 12 with loss 3
+					// gives 6.00 ft = 12/16 of it, and setting 0 with loss 16 gives exactly zero).
+					// Adding the two -- the obvious reading -- put 10.6 m of phantom head into the
+					// first real model that had one. So a TCV's k is stored as zero and never read;
+					// EngCalcs.lpnLinkK is the one place that rule lives.
+					k: vtype === 'TCV' ? 0 : vloss
+				});
+			}
 			links.push(vlink); linkIndex[vlink.id] = vlink;
 		}
-		if (tcvIds.length) { drop('valve-tcv-as-pipe', tcvIds); }
-		if (otherValveIds.length) { drop('valve-dropped', otherValveIds); }
+		if (tcvIds.length) { drop('valve-tcv', tcvIds); }
+		if (activeValveIds.length) { drop('valve-active', activeValveIds); }
+		if (unsupportedValveIds.length) { drop('valve-dropped', unsupportedValveIds); }
 
 		// ---- [STATUS] overrides ----
 		rows = rawSections.STATUS || [];
@@ -401,6 +437,15 @@
 			var sv = (r[1] || '').toUpperCase();
 			if (sv === 'CLOSED') { sl.status = 'closed'; }
 			else if (sv === 'OPEN') { sl.status = 'open'; }
+			else if (sl.type === 'valve' && r[1] !== '' && isFinite(+r[1])) {
+				// A NUMBER here is a SETTING, not a status, and for a valve that is a value this
+				// page can now hold -- so it is applied rather than reported as a loss (Task 248
+				// phase 2). It is in the same units the [VALVES] row's own setting column was, so
+				// it goes through the same converter. For a PUMP a number is a speed multiplier,
+				// which this page has no element for, so that case still falls through to the
+				// report below.
+				sl.setting = valveSettingSI((sl.valveType || '').toUpperCase(), +r[1]);
+			}
 			else { drop('link-setting', [r[0]], r[1]); }
 		}
 

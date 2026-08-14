@@ -61,6 +61,16 @@ function toSolverModel(parsed) {
 			diameter: l.diameter, roughness: l.roughness,
 			length: (l.length || 0) * lenSI, status: l.status, k: l.k || 0
 		};
+		if (l.type === 'valve') {
+			// A VALVE'S SETTING IS PART OF THE MODEL, and forgetting it here is silent: the solver
+			// reads a throttle valve's loss out of its setting (EngCalcs.lpnLinkK), so a valve
+			// arriving with no setting develops NO head loss and the network merrily solves as if
+			// the valve were not there. Caught 2026-08-14 the first time a TCV imported as a valve
+			// rather than as a pipe -- 3.2 cm of head and a 0.28 L/s flow error, small enough to
+			// look like tolerance.
+			out.valveType = l.valveType;
+			out.setting = l.setting;
+		}
 		if (l.type === 'pump') {
 			const fit = (l.curvePoints && l.curvePoints.length)
 				? EngCalcs.lpnPumpFromCurve(l.curvePoints)

@@ -134,6 +134,27 @@ $ec_icons = array(
 	// draws both the toolbar button and the map symbol, and the map's backdrop patch traces the
 	// identical outline, so a change here needs the matching `d` in buildNodeEls() changed with it.
 	'tank'       => '<path d="M5 11h14v9H5z" fill="currentColor" stroke="none" opacity=".18"/><path d="M5 6q7-3.5 14 0v14H5z"/><path d="M5 11h14"/>',
+	// A VALVE (ROADMAP Task 248 phase 2, 2026-08-14). The BOWTIE, and there was never a second
+	// candidate: it is what every P&ID, every hydraulic schematic and EPANET itself draw, so this
+	// is the one icon in the set that a water engineer already knows before arriving. Two solid
+	// triangles meeting point-to-point at the centre of the line, with a stem and handwheel on top.
+	//
+	// Three things it has to survive, all of which drove the geometry rather than decorating it:
+	//   1. IT SITS ON A LINE, not on a page. A valve is a LINK, like the pump, so this mark is
+	//      drawn ON the pipe and rotated along it (positionPumpSymbol() in js/looped-network.js).
+	//      That is why the bowtie is horizontal and centred: rotated to any angle it still reads,
+	//      where an upright symbol would only read on a horizontal run.
+	//   2. GREYSCALE. Against the pump it is angular where the pump is round, and against a pipe
+	//      it has area where a pipe is a stroke. Neither cue is colour, which is the same test the
+	//      tank above had to pass.
+	//   3. THE WAIST MUST NOT CLOSE UP AT 14px. The two triangles meet exactly at x=12 with a
+	//      2-unit stroke, so the pinch reads as a pinch rather than blurring into one hexagon.
+	//      Widening the triangles to touch a fuller box was tried and lost the waist.
+	// The stem is short and the wheel is a plain bar -- a circular handwheel at this size adds a
+	// second round shape to an icon whose whole job is to not be the pump.
+	// Same shared-path rule as the reservoir and the tank: this ONE string draws the toolbar
+	// button and the map symbol both.
+	'valve'      => '<path d="M4 5v14l8-7z" fill="currentColor" stroke="none" opacity=".18"/><path d="M20 5v14l-8-7z" fill="currentColor" stroke="none" opacity=".18"/><path d="M4 5v14l8-7z"/><path d="M20 5v14l-8-7z"/><path d="M12 12V7"/><path d="M8 4h8"/>',
 	// Casing plus a discharge tail leaving it on the top tangent — the tangency is what makes this
 	// read as a pump rather than as a magnifier.
 	//

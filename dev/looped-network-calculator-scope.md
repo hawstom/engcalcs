@@ -88,10 +88,28 @@ with a new reason, not an appeal to completeness.
   every tank **and every link touching one**, so a municipal model arrived missing whole branches.
   EPA's own Net1, Net2 and Net3 all have tanks.
 - **Water quality**, in every form (age, trace, chlorine decay, multi-species).
-- **Active pressure controls — PRV / PSV / FCV.** Their open/active/closed status depends on the
-  flow and pressure being solved for, which is a whole extra layer of logic. A *fixed* minor-loss
-  valve (a k-value on a pipe) is fine and is in scope. This matches the same exclusion `bpn_` made,
-  for the same reason.
+- ~~**Active pressure controls — PRV / PSV / FCV.**~~ **REOPENED AND SHIPPED, 2026-08-14 (ROADMAP
+  Task 248 phase 2)** — the second entry ever to leave this list, and it left it in a way the
+  original entry did not anticipate. The reason for the cut still stands word for word: *their
+  open/active/closed status depends on the flow and pressure being solved for, which is a whole
+  extra layer of logic.* **We did not write that logic.** ROADMAP Task 313 measured the two engines
+  the day before and found EPANET ~9x faster than our own solver at the 21-node target and ~46x at
+  201 nodes, so writing a second implementation of status switching would have been slower code for
+  a problem the engine we already ship has solved. So:
+  - **PRV, PSV and FCV are real elements, and the EPANET engine solves them.** A network holding one
+    is routed to EPANET automatically and the status bar says so, without rewriting the user's own
+    engine preference — the setting is a preference, the routing is a fact about this network.
+    `js/lpn-solver.js` refuses such a network BY NAME (`valve-needs-epanet`) if the engine cannot be
+    reached, which is the offline case and the only one a user meets.
+  - **TCV works in both engines and needed no numerics at all.** A throttle valve is a minor loss on
+    a zero-length link, which is arithmetic the solver already did for every pipe. So the old
+    sentence — *a fixed minor-loss valve (a k-value on a pipe) is fine and is in scope* — was
+    already describing a TCV; all that changed is that it is now an element with a name and a
+    symbol instead of a pipe pretending.
+  - **PBV and GPV stay cut.** A GPV's behaviour is a head-loss CURVE and a PBV's is a fixed pressure
+    drop; this page has no element for either, and an imported one still arrives as a reported open
+    pipe. That is the same exclusion, for the same reason, narrowed to the two types it still fits.
+  - `bpn_` is unaffected and still makes the original exclusion.
 - **Demand patterns and energy cost.**
 - **Sparse linear algebra** — CSR storage, conjugate gradient, fill-reducing orderings, cached
   symbolic factorization. Cut *because of* the 10–20 node target; see below.
@@ -722,8 +740,11 @@ moved to Phase 1 — see the note above.)*
 > own instruction (*"I think it is wise now for us to stress-test our paradigms by trying to import
 > an EPANET file"*), and **File > Import EPANET file (.inp) ships** — `js/lpn-inp.js`, ROADMAP Task
 > 196. Two things did NOT change and are worth keeping straight. The cut list below is untouched:
-> tanks, control valves, patterns, quality and extended-period simulation are still absent, and an
-> import that meets one reports it rather than pretending. And import is not persistence: an `.inp`
+>
+> **SUPERSEDED AGAIN, 2026-08-14, for tanks and valves** — both left the cut list in Task 248 and
+> both now import as themselves. What is still absent is patterns, water quality, extended-period
+> simulation, PBV and GPV valves, and an import that meets one still reports it rather than
+> pretending. And import is not persistence: an `.inp`
 > lands as an ordinary browser project, Task 146.08's library is still where projects live, and
 > nothing writes an `.inp` back yet (that is Task 281).
 

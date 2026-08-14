@@ -215,6 +215,12 @@ html[lang="zh"] .ec-welcome {
    a distinction the shape already carries, and colour is the budget this map is saving for
    CONDITION -- see the note above. */
 .lpn-link-symbol-pump { color: #a52; }
+/* A VALVE takes the PIPE's own colour, not a hue of its own (Task 248 phase 2). It is a fitting
+   in the line rather than a separate kind of thing, and its SHAPE -- an angular bowtie against
+   the pump's circle -- already tells it apart in greyscale, which is the test this map's symbols
+   are held to. Colour on this map is being saved for CONDITION; spending one here on a
+   distinction the shape already carries would be spending it twice. */
+.lpn-link-symbol-valve { color: #557; }
 /* Opaque patch behind a symbol's own linework (prependSymbolBackdrop() in looped-network.js) so a
    pipe running under a reservoir's open tank or a pump's unfilled casing doesn't show through --
    the icon's own paths are untouched, this only paints underneath them. */
@@ -228,6 +234,8 @@ html[lang="zh"] .ec-welcome {
    is deliberately NOT thickened with it; see .lpn-arrow below. */
 .lpn-link { stroke: #557; stroke-width: calc(0.7 * var(--lpn-sym, 1)); cursor: pointer; }
 .lpn-link-pump { stroke: #a52; }
+/* No .lpn-link-valve rule: a valve's polyline is a pipe-coloured line by design -- see
+   .lpn-link-symbol-valve above. */
 /* A CLOSED link (ROADMAP Task 146.07). Dashed, because a closed pipe carries no water and would
    otherwise be indistinguishable from an open one -- an invisible cause for a network that will
    not solve, or that solves to a surprising answer. The dash lengths are in WORLD units and scale

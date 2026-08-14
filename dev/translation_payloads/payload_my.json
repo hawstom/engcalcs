@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 873,
-        "delta_key_count": 16,
+        "expected_key_count": 893,
+        "delta_key_count": 36,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -296,6 +296,7 @@
     },
     "keys_to_translate": {
         "lpn_tool_add_tank": "Tank",
+        "lpn_tool_add_valve": "Valve",
         "lpn_tank_elev_tip": "Level of the tank bottom. Water depths in the tank are measured up from here.",
         "lpn_field_tank_level": "Water level",
         "lpn_field_tank_level_tip": "Depth of water standing in the tank, measured up from the tank bottom. The water surface is the tank bottom level plus this depth.",
@@ -307,13 +308,33 @@
         "lpn_field_tank_diameter_tip": "Width of the tank across. Read it in the same units as elevation, not in the pipe diameter units. It sets how much water a given depth holds.",
         "lpn_tank_head_tip": "Water surface level in the tank: the tank bottom level plus the water level. This is the level the network is solved against.",
         "lpn_inp_drop_tank_curve": "These tanks are not straight-sided: the file gives their shape as a curve. They came in as round tanks of the stated width. The water level is the level the file gives, so the answers match; only the shape is simplified.",
+        "lpn_inp_drop_valve_active": "These valves control pressure or flow, and they open and close on their own as the water changes. They came in whole, and this page works them out with the EPANET engine, which it turns on by itself for this network.",
+        "lpn_diag_valve_needs_epanet": "These valves open and close on their own, and only the EPANET engine can work them out. The EPANET engine could not be loaded, so these results are missing:",
+        "lpn_diag_valve_on_fixed_head": "These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to hold. Put a short pipe between them:",
+        "lpn_field_valve_type": "Valve type",
+        "lpn_field_valve_type_tip": "What the valve does. A throttle valve holds a fixed loss. The other three hold a pressure or a flow, and open, close, or hold as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient.",
+        "lpn_valve_type_tcv": "Throttle (TCV)",
+        "lpn_valve_type_prv": "Pressure reducing (PRV)",
+        "lpn_valve_type_psv": "Pressure sustaining (PSV)",
+        "lpn_valve_type_fcv": "Flow control (FCV)",
+        "lpn_field_valve_setting_pressure": "Pressure setting",
+        "lpn_field_valve_setting_pressure_tip": "The pressure the valve holds. A pressure reducing valve keeps the pressure just after it at or below this value. A pressure sustaining valve keeps the pressure just before it at or above this value.",
+        "lpn_field_valve_setting_flow": "Flow setting",
+        "lpn_field_valve_setting_flow_tip": "The most water the valve lets through. Below this the valve is fully open and does nothing.",
+        "lpn_field_valve_setting_loss": "Loss coefficient",
+        "lpn_field_valve_setting_loss_tip": "How much head the throttle valve takes out, counted as a multiple of the velocity head. Use 0 for a valve standing fully open. This one number is the whole of a throttle valve's loss.",
+        "lpn_field_valve_diameter_tip": "Width of the opening through the valve. It is used to work out the speed of the water through it, so the loss depends on it.",
+        "lpn_field_valve_km_tip": "Extra loss from the valve body while the valve stands fully open, counted as a multiple of the velocity head. Use 0 to leave it out.",
         "lpn_mode_add_tank": "Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move elements and labels.",
+        "lpn_mode_add_valve": "Mode: Add Valve. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.",
         "lpn_method_switch_confirm": "Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?",
         "lpn_field_closed": "Closed",
-        "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+        "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.",
+        "lpn_engine_valve_route": "Worked out with the EPANET engine, because these valves open and close on their own:"
     },
     "keys": {
         "lpn_tool_add_tank": "Tank",
+        "lpn_tool_add_valve": "Valve",
         "lpn_tank_elev_tip": "Level of the tank bottom. Water depths in the tank are measured up from here.",
         "lpn_field_tank_level": "Water level",
         "lpn_field_tank_level_tip": "Depth of water standing in the tank, measured up from the tank bottom. The water surface is the tank bottom level plus this depth.",
@@ -325,10 +346,29 @@
         "lpn_field_tank_diameter_tip": "Width of the tank across. Read it in the same units as elevation, not in the pipe diameter units. It sets how much water a given depth holds.",
         "lpn_tank_head_tip": "Water surface level in the tank: the tank bottom level plus the water level. This is the level the network is solved against.",
         "lpn_inp_drop_tank_curve": "These tanks are not straight-sided: the file gives their shape as a curve. They came in as round tanks of the stated width. The water level is the level the file gives, so the answers match; only the shape is simplified.",
+        "lpn_inp_drop_valve_active": "These valves control pressure or flow, and they open and close on their own as the water changes. They came in whole, and this page works them out with the EPANET engine, which it turns on by itself for this network.",
+        "lpn_diag_valve_needs_epanet": "These valves open and close on their own, and only the EPANET engine can work them out. The EPANET engine could not be loaded, so these results are missing:",
+        "lpn_diag_valve_on_fixed_head": "These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to hold. Put a short pipe between them:",
+        "lpn_field_valve_type": "Valve type",
+        "lpn_field_valve_type_tip": "What the valve does. A throttle valve holds a fixed loss. The other three hold a pressure or a flow, and open, close, or hold as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient.",
+        "lpn_valve_type_tcv": "Throttle (TCV)",
+        "lpn_valve_type_prv": "Pressure reducing (PRV)",
+        "lpn_valve_type_psv": "Pressure sustaining (PSV)",
+        "lpn_valve_type_fcv": "Flow control (FCV)",
+        "lpn_field_valve_setting_pressure": "Pressure setting",
+        "lpn_field_valve_setting_pressure_tip": "The pressure the valve holds. A pressure reducing valve keeps the pressure just after it at or below this value. A pressure sustaining valve keeps the pressure just before it at or above this value.",
+        "lpn_field_valve_setting_flow": "Flow setting",
+        "lpn_field_valve_setting_flow_tip": "The most water the valve lets through. Below this the valve is fully open and does nothing.",
+        "lpn_field_valve_setting_loss": "Loss coefficient",
+        "lpn_field_valve_setting_loss_tip": "How much head the throttle valve takes out, counted as a multiple of the velocity head. Use 0 for a valve standing fully open. This one number is the whole of a throttle valve's loss.",
+        "lpn_field_valve_diameter_tip": "Width of the opening through the valve. It is used to work out the speed of the water through it, so the loss depends on it.",
+        "lpn_field_valve_km_tip": "Extra loss from the valve body while the valve stands fully open, counted as a multiple of the velocity head. Use 0 to leave it out.",
         "lpn_mode_add_tank": "Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move elements and labels.",
+        "lpn_mode_add_valve": "Mode: Add Valve. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.",
         "lpn_method_switch_confirm": "Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?",
         "lpn_field_closed": "Closed",
-        "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+        "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.",
+        "lpn_engine_valve_route": "Worked out with the EPANET engine, because these valves open and close on their own:"
     },
     "key_context": {
         "lpn_tool_add_tank": {
@@ -344,6 +384,22 @@
                     "key": "lpn_tool_add_pipe",
                     "value": "ပိုက်လိုင်း",
                     "english": "Pipe"
+                }
+            }
+        },
+        "lpn_tool_add_valve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_pump",
+                    "value": "ရေတင်စက်",
+                    "english": "Pump"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_add_text",
+                    "value": "စာသား",
+                    "english": "Text"
                 }
             }
         },
@@ -519,7 +575,279 @@
                 "next_translated": {
                     "key": "lpn_inp_drop_tcv",
                     "value": "ဤစီးဆင်းမှုထိန်းချုပ် ဗားလ်များကို တူညီသော ဒေသဆိုင်ရာ ဆုံးရှုံးမှုကို ဆောင်ကြဉ်းသည့် အလွန်တိုသော ပိုက်လိုင်းများအဖြစ် တင်သွင်းခဲ့ပါသည်။ ရေ၏အပြုအမူသည် တူညီသော်လည်း၊ အစိတ်အပိုင်းမှာ မတူညီပါ။",
-                    "english": "These throttle control valves came in as very short pipes carrying the same local loss. The water behaves the same way; the element is not the same."
+                    "english": "These throttle valves came in as throttle valves, holding the same loss the file gives them. Either solver can work them out."
+                }
+            }
+        },
+        "lpn_inp_drop_valve_active": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_tcv",
+                    "value": "ဤစီးဆင်းမှုထိန်းချုပ် ဗားလ်များကို တူညီသော ဒေသဆိုင်ရာ ဆုံးရှုံးမှုကို ဆောင်ကြဉ်းသည့် အလွန်တိုသော ပိုက်လိုင်းများအဖြစ် တင်သွင်းခဲ့ပါသည်။ ရေ၏အပြုအမူသည် တူညီသော်လည်း၊ အစိတ်အပိုင်းမှာ မတူညီပါ။",
+                    "english": "These throttle valves came in as throttle valves, holding the same loss the file gives them. Either solver can work them out."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_valve",
+                    "value": "ဤဗားလ်များသည် ဖိအား (သို့) ရေစီးနှုန်းကို ထိန်းချုပ်ပြီး ဤစာမျက်နှာတွင် ထိုသို့သော အစိတ်အပိုင်း မရှိပါ။ ၎င်းတို့ကို ဖွင့်ထားသော ပိုက်လိုင်းများအဖြစ် တင်သွင်းခဲ့သောကြောင့် ကွန်ရက်သည် ဆက်လက်ချိတ်ဆက်လျက်ရှိသော်လည်း၊ ၎င်းကို ထိန်းချုပ်နေသော အရာ မရှိတော့ပါ။",
+                    "english": "These valves are described by a curve or by a fixed pressure drop, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is holding pressure or flow there any more."
+                }
+            }
+        },
+        "lpn_diag_valve_needs_epanet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_unreachable",
+                    "value": "ဤနေရာများသည် ရေကန်တစ်ခုသို့ သွားရန် လမ်းကြောင်းမရှိပါ -",
+                    "english": "These nodes have no path to a reservoir:"
+                },
+                "next_translated": {
+                    "key": "lpn_diag_not_converged",
+                    "value": "အဖြေ မတွေ့ရှိခဲ့ပါ။ အချင်းသုည ကဲ့သို့ လက်တွေ့ဘဝတွင် မဖြစ်နိုင်သော တန်ဖိုးများကို စစ်ဆေးပါ။",
+                    "english": "No solution was found. Check for values that are impossible in real life, such as a diameter of zero."
+                }
+            }
+        },
+        "lpn_diag_valve_on_fixed_head": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_unreachable",
+                    "value": "ဤနေရာများသည် ရေကန်တစ်ခုသို့ သွားရန် လမ်းကြောင်းမရှိပါ -",
+                    "english": "These nodes have no path to a reservoir:"
+                },
+                "next_translated": {
+                    "key": "lpn_diag_not_converged",
+                    "value": "အဖြေ မတွေ့ရှိခဲ့ပါ။ အချင်းသုည ကဲ့သို့ လက်တွေ့ဘဝတွင် မဖြစ်နိုင်သော တန်ဖိုးများကို စစ်ဆေးပါ။",
+                    "english": "No solution was found. Check for values that are impossible in real life, such as a diameter of zero."
+                }
+            }
+        },
+        "lpn_field_valve_type": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_field_valve_type_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_valve_type_tcv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_valve_type_prv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_valve_type_psv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_valve_type_fcv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_field_valve_setting_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_field_valve_setting_pressure_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_field_valve_setting_flow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_field_valve_setting_flow_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_field_valve_setting_loss": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_field_valve_setting_loss_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_field_valve_diameter_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
+                }
+            }
+        },
+        "lpn_field_valve_km_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_length_tip",
+                    "value": "ပိုက်လိုင်း၏ အလျား။ အလိုအလျောက် ဖွင့်ထားလျှင် အလျားကို သင်ရေးဆွဲထားသည့်အတိုင်း တိုင်းတာသည်။ ရေးဆွဲထားသည်နှင့် ကွာခြားသော အလျားကို ရိုက်ထည့်လိုပါက အလိုအလျောက် ကို ပိတ်ပါ။",
+                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                },
+                "next_translated": {
+                    "key": "lpn_field_km",
+                    "value": "ဒေသဆိုင်ရာ ဆုံးရှုံးမှု ကိန်း၊ k",
+                    "english": "Minor (local) loss coefficient, k"
                 }
             }
         },
@@ -536,6 +864,22 @@
                     "key": "lpn_mode_add_pipe",
                     "value": "မုဒ် - ပိုက်လိုင်း ထည့်ရန်။ နေရာတစ်ခုနှင့် ကျန်နေရာတစ်ခုကို ချိတ်ဆက်ရန် ၎င်းတို့ကို အသီးသီး နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းလဲရန် (သို့) ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။",
                     "english": "Mode: Add Pipe. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels."
+                }
+            }
+        },
+        "lpn_mode_add_valve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_add_pump",
+                    "value": "မုဒ် - ရေတင်စက် ထည့်ရန်။ နေရာတစ်ခုနှင့် ကျန်နေရာတစ်ခုကို ချိတ်ဆက်ရန် ၎င်းတို့ကို အသီးသီး နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းလဲရန် (သို့) ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။",
+                    "english": "Mode: Add Pump. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels."
+                },
+                "next_translated": {
+                    "key": "lpn_mode_add_text",
+                    "value": "မုဒ် - စာသား ထည့်ရန်။ စာသား အညွှန်းတစ်ခု ထားရန် မြေပုံကို နှိပ်ပါ။ စာသားကို နေရာတစ်ခုနှင့် တွဲချိတ်ရန် ထိုနေရာအနီးတွင် နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းလဲရန် (သို့) ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။",
+                    "english": "Mode: Add Text. Click the map to place a text label. Click near a node to attach the text to that node. Switch to Select mode to change or move elements and labels."
                 }
             }
         },
@@ -584,6 +928,22 @@
                     "key": "lpn_field_text_size",
                     "value": "အရွယ်အစား အဆများကိန်း",
                     "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_engine_valve_route": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_failed",
+                    "value": "EPANET ဖြေရှင်းစက်ကို ဖွင့်၍မရခဲ့ပါ။ ယင်းအစား တွဲထားသော ဖြေရှင်းစက်ကို ပြသနေပါသည်။",
+                    "english": "The EPANET solver could not be loaded. Showing the built-in solver instead."
+                },
+                "next_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "မှတ်ချက် - Manning ကြမ်းတမ်းမှုဖြင့် EPANET သည် တွဲထားသော ဖြေရှင်းစက်ထက် ဖိမြင့်ဆင့်ဆုံးရှုံးမှုကို ခန့်မှန်းခြေ 0.6% နည်းစွာ တွက်ချက်ပါသည်။",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
                 }
             }
         }

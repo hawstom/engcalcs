@@ -175,13 +175,16 @@ importText(usInp, 'import-cases.inp');
 	ok('...and is given NO head, so it goes on following that elevation',
 		r2._head === undefined, JSON.stringify(r2._head));
 
-	// The TCV. Its whole loss is the SETTING (12); the [VALVES] minor-loss column is ignored by
-	// EPANET itself, which is measured in js/lpn-inp.js and is not what the column heading implies.
+	// The TCV. It used to arrive as a zero-length PIPE carrying the same loss -- exact hydraulics
+	// under the wrong element name -- and since Task 248 phase 2 it arrives as a valve. Its whole
+	// loss is still the SETTING (12); the [VALVES] minor-loss column is ignored by EPANET itself,
+	// which is measured in js/lpn-inp.js and is not what the column heading implies.
 	const v1 = links.find(l => l.id === 'V1');
-	ok('a throttle valve becomes a pipe of zero length, so it adds friction to nothing',
-		v1.type === 'pipe' && v1._length === 0, v1.type + ', L=' + v1._length);
-	ok('...carrying the valve setting as its local loss, and NOT the ignored minor-loss column',
-		v1._k === 12, 'k=' + v1._k);
+	ok('a throttle valve arrives as a VALVE, of zero length, so it adds friction to nothing',
+		v1.type === 'valve' && v1._length === 0, v1.type + ', L=' + v1._length);
+	ok('...of the type the file named', v1.valveType === 'TCV', v1.valveType);
+	ok('...carrying the valve setting, and NOT the ignored minor-loss column',
+		v1._setting === 12 && v1._k === 0, 'setting=' + v1._setting + ' k=' + v1._k);
 
 	const pu = links.find(l => l.id === 'PU1');
 	ok('the pump curve is stored in the units on the strip, like every other input',
@@ -268,13 +271,13 @@ console.log('\n--- the report ---');
 {
 	const t = dialogText();
 	ok('the report names the file', t.indexOf('import-cases.inp') >= 0);
-	ok('it says the throttle valves became pipes, and names them',
-		t.indexOf('throttle control valves') >= 0 && t.indexOf('V1') >= 0);
+	ok('it says the throttle valves came in whole, and names them',
+		t.indexOf('throttle valves') >= 0 && t.indexOf('V1') >= 0);
 	ok('it says the demand categories were added together, and names the junction',
 		t.indexOf('more than one demand') >= 0 && t.indexOf('J3') >= 0);
 	ok('it says the emitter is being solved but cannot be edited',
 		t.indexOf('sprinkler or leak coefficient') >= 0 && t.indexOf('J6') >= 0);
-	ok('no sentence is left as a bare code name', t.indexOf('valve-tcv-as-pipe') < 0);
+	ok('no sentence is left as a bare code name', t.indexOf('valve-tcv') < 0);
 }
 
 // ---------------------------------------------------------------------------

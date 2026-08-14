@@ -73,6 +73,7 @@ async function run() {
 		cases.emitterCase,
 		cases.closedLinkCase,
 		cases.tankCase,
+		cases.valveTcvCase,
 		cases.zeroDemandCase,
 	].filter(Boolean);
 
