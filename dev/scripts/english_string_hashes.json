@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-08-09",
-    "count": 862,
+    "count": 919,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -203,6 +203,69 @@
                 "lpn_field_closed",
                 "lpn_field_closed_tip",
                 "lpn_method_switch_confirm"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_delete_drops_overrides",
+                "lpn_diag_valve_needs_epanet",
+                "lpn_diag_valve_on_fixed_head",
+                "lpn_engine_valve_route",
+                "lpn_field_active",
+                "lpn_field_active_tip",
+                "lpn_field_tank_diameter",
+                "lpn_field_tank_diameter_tip",
+                "lpn_field_tank_level",
+                "lpn_field_tank_level_tip",
+                "lpn_field_tank_maxlevel",
+                "lpn_field_tank_maxlevel_tip",
+                "lpn_field_tank_minlevel",
+                "lpn_field_tank_minlevel_tip",
+                "lpn_field_valve_diameter_tip",
+                "lpn_field_valve_km_tip",
+                "lpn_field_valve_setting_flow",
+                "lpn_field_valve_setting_flow_tip",
+                "lpn_field_valve_setting_loss",
+                "lpn_field_valve_setting_loss_tip",
+                "lpn_field_valve_setting_pressure",
+                "lpn_field_valve_setting_pressure_tip",
+                "lpn_field_valve_type",
+                "lpn_field_valve_type_tip",
+                "lpn_inp_drop_tank_curve",
+                "lpn_inp_drop_valve_active",
+                "lpn_mode_add_tank",
+                "lpn_mode_add_valve",
+                "lpn_push_base_only",
+                "lpn_scenario_base",
+                "lpn_scenario_base_value",
+                "lpn_scenario_deactivated",
+                "lpn_scenario_delete",
+                "lpn_scenario_delete_confirm",
+                "lpn_scenario_label",
+                "lpn_scenario_new",
+                "lpn_scenario_new_name",
+                "lpn_scenario_override",
+                "lpn_scenario_override_tip",
+                "lpn_scenario_overrides",
+                "lpn_scenario_prompt_name",
+                "lpn_scenario_push_btn",
+                "lpn_scenario_push_confirm",
+                "lpn_scenario_push_none",
+                "lpn_scenario_push_scenarios",
+                "lpn_scenario_push_tip",
+                "lpn_scenario_push_values",
+                "lpn_scenario_rename",
+                "lpn_scenario_tip",
+                "lpn_tank_elev_tip",
+                "lpn_tank_head_tip",
+                "lpn_tool_add_tank",
+                "lpn_tool_add_valve",
+                "lpn_valve_type_fcv",
+                "lpn_valve_type_prv",
+                "lpn_valve_type_psv",
+                "lpn_valve_type_tcv"
             ],
             "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         }
@@ -477,17 +540,23 @@
         "lpn_confirm_example": "a37dfb08ed3bcb4faae1781660bedfdd43f2465a",
         "lpn_confirm_restore_defaults": "e55654deccb6f0c5322ce0cf2f2e95dbd5c71437",
         "lpn_confirm_wipe": "511136c29dd93e3d7162c898874d15083153d59f",
+        "lpn_delete_drops_overrides": "fd7bc476eff55d809c96e1f1c13650ce1c9ed7d4",
         "lpn_demand_tip": "49412527839a82f8d80d81a0d7c70a12a716ecdc",
         "lpn_diag_dangling_link": "3e707f064fe4a646d36fefce9ca038ef743be5f6",
         "lpn_diag_no_fixed_head": "f07f4428fbda17512daed4aefc6d72e6efdb6d11",
         "lpn_diag_not_converged": "8a0e0e6c781b06efcfbc5ce272c62b62d2f7f87d",
         "lpn_diag_unreachable": "1cdaa4fbda79821a8ae138af20d55dd0d6ea969f",
+        "lpn_diag_valve_needs_epanet": "06a186f7715796b95c7305b142cc47c31c3d5407",
+        "lpn_diag_valve_on_fixed_head": "eb866ad71e25b073c8fa4c2192da833a2e7cd08c",
         "lpn_dialog_ok": "9ce3bd4224c8c1780db56b4125ecf3f24bf748b7",
         "lpn_edit_delete_network": "54a5ed21b23a4160bde2d86b22750824c8ee6b16",
         "lpn_empty_hint": "07332b6b347465c2e5cf43be7115d3d206231c56",
         "lpn_engine_failed": "80527f0a7cecad6338ab900c58c906eee6236d93",
         "lpn_engine_loading": "a95a376c68c16cf3eb5079ad02b19405532cd3ed",
         "lpn_engine_manning_note": "f592588a42fae119b629699fe84bcaf7e8881e51",
+        "lpn_engine_valve_route": "0eaec8ad66a6d0538a830900d95a2df73087c055",
+        "lpn_field_active": "555a79af92f33876efcf38d145ca406e4073623c",
+        "lpn_field_active_tip": "d5ed9a6c1ab566d62739be653fb340e37ead8a3c",
         "lpn_field_auto": "c614ba7c453cdcd4d21b20e8286c6266c891e0c6",
         "lpn_field_closed": "88d86b7721d587644e9c4cf33a084202cb3b0ff0",
         "lpn_field_closed_tip": "8ea56358bac56c15ec1a0572174984f26b1fe200",
@@ -504,7 +573,25 @@
         "lpn_field_length_tip": "3fd95ad3cbe56cf1d67a5e8755fe076fe29b43fe",
         "lpn_field_roughness": "739872ac999742e4fd6353b653f29608ebfd0710",
         "lpn_field_roughness_tip": "34bec4e3502504270f9ba4907991a30817d0cb95",
+        "lpn_field_tank_diameter": "d7b3a67283171012d47bb726872af8e9473eb526",
+        "lpn_field_tank_diameter_tip": "536bce1cb77496c9542af6ab1a752b3e5510b30b",
+        "lpn_field_tank_level": "253f95edfff1b86f5f02965c476067cdd288f666",
+        "lpn_field_tank_level_tip": "0804de34dda376ef8938e90b804a84eb58587369",
+        "lpn_field_tank_maxlevel": "04f06923c124d2d5b93933902114a1413c710727",
+        "lpn_field_tank_maxlevel_tip": "17971d844c29967d1bc42c305c751367b13db91d",
+        "lpn_field_tank_minlevel": "7e30393bbef8d151358200e8ea684a3624a9e0b0",
+        "lpn_field_tank_minlevel_tip": "bc6cd434993be72249b8c1d1f0497f116afd0b7c",
         "lpn_field_text_size": "67697a2b9cab2b87b00bba516f257d4351e75dba",
+        "lpn_field_valve_diameter_tip": "4029e8c70156f52f01cdfcbdee1946643c6e53da",
+        "lpn_field_valve_km_tip": "bc6223cc343a19a5a286258c853df3c3cb0a6096",
+        "lpn_field_valve_setting_flow": "acdee2c6c98d4db08fd7bdcb446e32311c1e8973",
+        "lpn_field_valve_setting_flow_tip": "e53165886d5cc288105d77cecffd1d9cd50bf0ec",
+        "lpn_field_valve_setting_loss": "4dda469c0f9f04cf4f16708fd194f5a87395fab9",
+        "lpn_field_valve_setting_loss_tip": "f136dbf244dd483cdd50d685f8dafe85c37e07ec",
+        "lpn_field_valve_setting_pressure": "22d08d11372dc6c2d3dcdaac505b4c6e1509ae6d",
+        "lpn_field_valve_setting_pressure_tip": "110a5b2028f5cee29b4ce80c17f2e429a1156f42",
+        "lpn_field_valve_type": "83f6f906aa5ec1ed9a453fbc2a8e076c5bbe0002",
+        "lpn_field_valve_type_tip": "09b2faddcef7af307acb689c2776fc77b9c70231",
         "lpn_field_x": "c032adc1ff629c9b66f22749ad667e6beadf144b",
         "lpn_field_y": "23eb4d3f4155395a74e9d534f97ff4c1908f5aac",
         "lpn_file_changed_elsewhere": "b28191a691cef7b9b535a1d1e40a40966522a88e",
@@ -554,11 +641,13 @@
         "lpn_inp_drop_pump_other": "9ae4a33dc9693072e607a8697645900d73f2821d",
         "lpn_inp_drop_quality": "818ea06fbda03f7c835cf8c6b9aa37463e24e368",
         "lpn_inp_drop_setting": "fd1ae50cac0307d3a4620c8ec88ad91084a39d6d",
+        "lpn_inp_drop_tank_curve": "cca9bf5223c4e9c65a90e49d604fdd1a6cc0e278",
         "lpn_inp_drop_tank_links": "103bae1c4010b131765f171ccddd17f1023b011f",
         "lpn_inp_drop_tanks": "56235c82e76759c10b8b28cad30e9b2e1b30b804",
         "lpn_inp_drop_tcv": "26853ed1c160ade71fbf590ae769468fa4387354",
         "lpn_inp_drop_units": "55c690f08835dee3b2dae331d5eef82089b13c32",
         "lpn_inp_drop_valve": "a133c045bbf94ced5479d910c255d8140e65d55c",
+        "lpn_inp_drop_valve_active": "4418c2a222c53784b5a7b35ddc7a7aef5582cfed",
         "lpn_inp_report_clean": "84abd1231b503db79d2f28ef6f451e3373ce1bf0",
         "lpn_inp_report_counts": "19b6c77de071f8ceff7fbb4107fd557f61f16fe3",
         "lpn_inp_report_heading": "997509d5dea07c7e08c021ecd446ce4c80515e8c",
@@ -598,7 +687,9 @@
         "lpn_mode_add_pipe": "b0c507a90cb8ac61a5f37b35641f7051dc2b3566",
         "lpn_mode_add_pump": "e26d5c560b24459a83aef7539494d756585f110c",
         "lpn_mode_add_reservoir": "6190cfa59f468565f135ff2f07eba9c9d65c0470",
+        "lpn_mode_add_tank": "5704f6f7eb5a9f713d0168638ee98a7f0f69d263",
         "lpn_mode_add_text": "601e632ff92e50ae2241de1e0612d310a8a6d976",
+        "lpn_mode_add_valve": "782b1a67c2d675cb2c30905a904a855908c369da",
         "lpn_mode_delete": "4a09e68ab03ef268f609a792c3e8f95adc12e205",
         "lpn_mode_select": "70c17f33358920ac4b1b46048d22f477ffd20f54",
         "lpn_net_bad_file": "e8efd822c75e111af12d170f300b643b1c75daf7",
@@ -631,6 +722,7 @@
         "lpn_pump_point1": "ea8753123a843aa83db9fbacc92e547768cf6222",
         "lpn_pump_point2": "dc549b620a627f0e54be298af49d255508613fd3",
         "lpn_pump_point3": "7ec8137864e885999498ff7270ae561fb059e714",
+        "lpn_push_base_only": "799b53da4ce1ca7bc4f89c34eb3f1371cfae69a6",
         "lpn_push_confirm": "40365401c5ee9faa7bb1555aca7e2234fe3b6e49",
         "lpn_push_elements": "affd85585aaa05156085b6b36922a0074ce00a8c",
         "lpn_push_no_change": "689f4cfc508207bb07a4e150b8bc9d2ed3ae2b67",
@@ -653,6 +745,26 @@
         "lpn_saveas_overwrites_newer": "af7978ad8540755e839d36461af0fcb4e1532b4e",
         "lpn_saveas_overwrites_project": "5b617ca583782738f2bfd0b8ab6a752defdd46ab",
         "lpn_saveas_same_file": "304ca763bd1a84a61a60dff7eb9921ff571e9953",
+        "lpn_scenario_base": "077fe9c54ed5ed26fa547f4ded3ef9a9bb066d65",
+        "lpn_scenario_base_value": "680ca310953a1305e1e2783a83b14cb1b42e2d67",
+        "lpn_scenario_deactivated": "8736e9dec3cfb5583591c8b9d175e092332d3277",
+        "lpn_scenario_delete": "92f18604ed3875b89df8b049319e29504e03e6d5",
+        "lpn_scenario_delete_confirm": "8d2e748cfa713feabec0575452893bd60cc99b68",
+        "lpn_scenario_label": "569aae5b47e464b83049959de67717fbf2ff4407",
+        "lpn_scenario_new": "8c7cb9a76fb6edea4aea3207534aa9893497a61f",
+        "lpn_scenario_new_name": "9c11646da10f3a7f45bbcdaa3f46a8e12e9a494c",
+        "lpn_scenario_override": "19b0757669b4aee49c5f59cb4033828e161eec74",
+        "lpn_scenario_override_tip": "f98cbd26a8c0e964bb21725cfaf9d2e91f2ce485",
+        "lpn_scenario_overrides": "c6628eba51b07d84f690d97d4b47d9b3a3d6efaf",
+        "lpn_scenario_prompt_name": "f05ee5e127dbbf90ad0cde70708c2f2d84110677",
+        "lpn_scenario_push_btn": "a6395ef6908a852924ef3e6a960cee547c57bc90",
+        "lpn_scenario_push_confirm": "bdd7582969bccda963f993a4c147fa48e3f0af5b",
+        "lpn_scenario_push_none": "682a26cd8f707ec750f02bf3d2016addad1b519d",
+        "lpn_scenario_push_scenarios": "5ca15c8902528111bf621c9f3108f8afd0c6b39f",
+        "lpn_scenario_push_tip": "ab5d865029bbef9fb316bdd2d774a920c391aa21",
+        "lpn_scenario_push_values": "b87a685ec7317ac921bc50323d85494102ddf03e",
+        "lpn_scenario_rename": "7e5528377133d56e10d2add5502a3879d1b3715e",
+        "lpn_scenario_tip": "a1b3cc93de198afb68169fa9e3a5b118ae034fd5",
         "lpn_settings_backdrop_opacity": "ae0b083283f290f299d0c96969e0f7b53d4aa536",
         "lpn_settings_computation": "cd260770f98f9ac256c0d151419fd05e77f6fc69",
         "lpn_settings_defaults": "77403a7b5092aad6e52d47ff9b28dc162b459922",
@@ -706,6 +818,8 @@
         "lpn_tab_move_right": "3a43e56f34dece6eb3d79dee1eff7b2f87db6040",
         "lpn_tab_new": "e5bcbe241fab3ba265fd7c73f973cd93072e27d9",
         "lpn_tab_unsaved": "b3c7270ccae3543a687dce9dd7f731425c01ba63",
+        "lpn_tank_elev_tip": "42a7e83306be0b782aef40102ccfdd737b078951",
+        "lpn_tank_head_tip": "bb7ad4f13aead947290660eccfba2671c8a07cea",
         "lpn_tip_labels_draggable": "92f776113028066fb944d2830ea89966bc053369",
         "lpn_tip_select": "37d09593a45674d7bdda9dc4756e16452007fccb",
         "lpn_title_units": "75f0b482bd12a3548ccf34447815426657c142dd",
@@ -713,7 +827,9 @@
         "lpn_tool_add_pipe": "00dae071c082bb73eaed17b4bb3429280e110e8c",
         "lpn_tool_add_pump": "e8bd8201473a0e0c20662af1aadbccb008935117",
         "lpn_tool_add_reservoir": "f19a9f3c642c3432a0ae8f11048615265ce9d630",
+        "lpn_tool_add_tank": "0ba4d1aee6f233efc1f3b78141b4af7d08b86c3c",
         "lpn_tool_add_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
+        "lpn_tool_add_valve": "986d2de2ea6df1a0d235545dd8de4dfa8c2d9ae3",
         "lpn_tool_delete": "f6fdbe48dc54dd86f63097a03bd24094dedd713a",
         "lpn_tool_file": "2c3cafa4db3f3e1e51b3dff4303502dbe42b7a89",
         "lpn_tool_labels": "2228985493d9e43e461c7be5525529248735ad9c",
@@ -730,6 +846,10 @@
         "lpn_v2_restore_never": "f3e5ca94b1f392f437b6fc85bf3f03c306c23e5d",
         "lpn_v2_restore_no": "1f7f368c6d34c41f570dfe461879617ad1c695af",
         "lpn_v2_restore_yes": "3f15ce79532d7a88716daffe2b5fa5245abe9c20",
+        "lpn_valve_type_fcv": "e8ca23aea1cbf483af5f3aea3ad4d9cc33a1c127",
+        "lpn_valve_type_prv": "8f089fd3ae2ebf394efd9873e1c273850576f826",
+        "lpn_valve_type_psv": "ab5689d41a171a4274fffdbb12d3cddcd901c05b",
+        "lpn_valve_type_tcv": "f9a5006688d1421dd1b5ba5ff5ca8050d79085dc",
         "lpn_view_units": "12748281e0f02357f2a2f65c1c6a7d01ee122506",
         "menu_brand": "bf8b00231568173bfc88835a77624be526d4dd96",
         "menu_libre": "38f2a5b458b1b859bea3099c904d3eab6c585532",
@@ -2144,6 +2264,10 @@
             "words": 34,
             "ends_sentence": true
         },
+        "lpn_delete_drops_overrides": {
+            "words": 15,
+            "ends_sentence": true
+        },
         "lpn_demand_tip": {
             "words": 20,
             "ends_sentence": true
@@ -2164,6 +2288,14 @@
             "words": 8,
             "ends_sentence": true
         },
+        "lpn_diag_valve_needs_epanet": {
+            "words": 28,
+            "ends_sentence": true
+        },
+        "lpn_diag_valve_on_fixed_head": {
+            "words": 40,
+            "ends_sentence": true
+        },
         "lpn_dialog_ok": {
             "words": 1,
             "ends_sentence": false
@@ -2182,6 +2314,18 @@
         },
         "lpn_engine_manning_note": {
             "words": 15,
+            "ends_sentence": true
+        },
+        "lpn_engine_valve_route": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "lpn_field_active": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_field_active_tip": {
+            "words": 38,
             "ends_sentence": true
         },
         "lpn_field_auto": {
@@ -2248,9 +2392,81 @@
             "words": 25,
             "ends_sentence": true
         },
+        "lpn_field_tank_diameter": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_field_tank_diameter_tip": {
+            "words": 31,
+            "ends_sentence": true
+        },
+        "lpn_field_tank_level": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_field_tank_level_tip": {
+            "words": 24,
+            "ends_sentence": true
+        },
+        "lpn_field_tank_maxlevel": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_field_tank_maxlevel_tip": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "lpn_field_tank_minlevel": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_field_tank_minlevel_tip": {
+            "words": 17,
+            "ends_sentence": true
+        },
         "lpn_field_text_size": {
             "words": 2,
             "ends_sentence": false
+        },
+        "lpn_field_valve_diameter_tip": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "lpn_field_valve_km_tip": {
+            "words": 34,
+            "ends_sentence": true
+        },
+        "lpn_field_valve_setting_flow": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_field_valve_setting_flow_tip": {
+            "words": 24,
+            "ends_sentence": true
+        },
+        "lpn_field_valve_setting_loss": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_field_valve_setting_loss_tip": {
+            "words": 34,
+            "ends_sentence": true
+        },
+        "lpn_field_valve_setting_pressure": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_field_valve_setting_pressure_tip": {
+            "words": 37,
+            "ends_sentence": true
+        },
+        "lpn_field_valve_type": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_field_valve_type_tip": {
+            "words": 57,
+            "ends_sentence": true
         },
         "lpn_field_x": {
             "words": 1,
@@ -2444,6 +2660,10 @@
             "words": 16,
             "ends_sentence": true
         },
+        "lpn_inp_drop_tank_curve": {
+            "words": 46,
+            "ends_sentence": true
+        },
         "lpn_inp_drop_tank_links": {
             "words": 15,
             "ends_sentence": true
@@ -2462,6 +2682,10 @@
         },
         "lpn_inp_drop_valve": {
             "words": 33,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_valve_active": {
+            "words": 45,
             "ends_sentence": true
         },
         "lpn_inp_report_clean": {
@@ -2608,8 +2832,16 @@
             "words": 21,
             "ends_sentence": true
         },
+        "lpn_mode_add_tank": {
+            "words": 21,
+            "ends_sentence": true
+        },
         "lpn_mode_add_text": {
             "words": 33,
+            "ends_sentence": true
+        },
+        "lpn_mode_add_valve": {
+            "words": 23,
             "ends_sentence": true
         },
         "lpn_mode_delete": {
@@ -2736,6 +2968,10 @@
             "words": 3,
             "ends_sentence": false
         },
+        "lpn_push_base_only": {
+            "words": 20,
+            "ends_sentence": true
+        },
         "lpn_push_confirm": {
             "words": 23,
             "ends_sentence": true
@@ -2822,6 +3058,86 @@
         },
         "lpn_saveas_same_file": {
             "words": 23,
+            "ends_sentence": true
+        },
+        "lpn_scenario_base": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_scenario_base_value": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_scenario_deactivated": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_scenario_delete": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_scenario_delete_confirm": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_scenario_label": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_scenario_new": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_scenario_new_name": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_scenario_override": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_scenario_override_tip": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "lpn_scenario_overrides": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_scenario_prompt_name": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_scenario_push_btn": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_scenario_push_confirm": {
+            "words": 24,
+            "ends_sentence": true
+        },
+        "lpn_scenario_push_none": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_scenario_push_scenarios": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "lpn_scenario_push_tip": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "lpn_scenario_push_values": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "lpn_scenario_rename": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_scenario_tip": {
+            "words": 26,
             "ends_sentence": true
         },
         "lpn_settings_backdrop_opacity": {
@@ -3032,6 +3348,14 @@
             "words": 5,
             "ends_sentence": false
         },
+        "lpn_tank_elev_tip": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "lpn_tank_head_tip": {
+            "words": 24,
+            "ends_sentence": true
+        },
         "lpn_tip_labels_draggable": {
             "words": 19,
             "ends_sentence": true
@@ -3060,7 +3384,15 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_tool_add_tank": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_tool_add_text": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_add_valve": {
             "words": 1,
             "ends_sentence": false
         },
@@ -3126,6 +3458,22 @@
         },
         "lpn_v2_restore_yes": {
             "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_valve_type_fcv": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_valve_type_prv": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_valve_type_psv": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_valve_type_tcv": {
+            "words": 2,
             "ends_sentence": false
         },
         "lpn_view_units": {
