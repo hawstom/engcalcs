@@ -1,0 +1,53 @@
+{
+    "sprint": "252-solver-resync",
+    "entries": [
+        {
+            "key": "lpn_settings_engine_epanet_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Runs the original EPANET solver\" -- \"original\" reads two ways: the authentic/actual EPANET program, or the FIRST VERSION of it as opposed to a later one. A translator with no other context is as likely to pick the version reading, which would be false.",
+            "readings": [
+                "EPANET's own, authentic solver (intended)",
+                "the first/earliest version of the EPANET solver (false)"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to \"Runs EPANET's own solver from the US EPA\". Possessive states authenticity without the version ambiguity, and it contrasts cleanly with \"the built-in solver\" in the next sentence."
+        },
+        {
+            "key": "lpn_main_title",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "English source changed from \"EPANET Engine\" to \"EPANET Solver\" (Tom, 2026-08-13). Romance languages had rendered \"engine\" as motor/moteur/motore -- correct for software, but this calculator models PUMPS, where a motor is a physical component, so the software sense collides with a hydraulic one on the same page.",
+            "readings": [
+                "a software solver/computation core (intended)",
+                "a physical motor, as on a pump (the collision)"
+            ],
+            "disposition": "english",
+            "resolution": "All five 'engine' keys changed to 'solver' in English, which also matches the page's own long-standing 'built-in solver' wording. Russian had already avoided the trap independently with расчётным ядром (computational core), and Portuguese had split against itself (Motor EPANET in the title, mecanismo do EPANET in the setting) -- both signs the English word was the problem. Resynced across 26 languages as sprint 252."
+        },
+        {
+            "key": "lpn_settings_engine_epanet_tip",
+            "source": "translator",
+            "lang": "ru",
+            "complaint": "The English uses two different phrasings for the same concept (\"EPANET's own solver\" vs \"the built-in solver\"), which invites drifting onto two different nouns in Russian even though both must read as the same kind of thing for the contrast to work.",
+            "readings": [
+                "one noun for both, qualifier carries the difference (chosen)",
+                "two nouns, mirroring the English word variation"
+            ],
+            "disposition": "glossary",
+            "resolution": "Valid and important -- the agent found the general rule from one string. The English variation is possessive-vs-adjective ('EPANET's own' / 'the built-in'), not two different nouns; both are 'solver'. But the risk it names is real and was realised in 20+ languages BEFORE this sprint, which is exactly how the defect got in. Answered in the new glossary term 'solver': use ONE noun for both and let the qualifier carry the difference. The ru agent also found its own file had drifted onto решатель vs ядро and standardized, fixing a gender agreement as a consequence. No English change: the variation reads naturally to an English reader and carries the intended emphasis."
+        },
+        {
+            "key": "lpn_main_title",
+            "source": "translator",
+            "lang": "id",
+            "complaint": "The pre-existing Indonesian used a different word (mesin) for the identical concept than the built-in-solver string (penyelesai) already used, so the resync was not only an English-follows edit but also fixed a same-page terminology inconsistency predating this sprint.",
+            "readings": [
+                "treat as a terminology bug and fix now (chosen)",
+                "leave mesin, since only the English of lpn_main_title literally changed"
+            ],
+            "disposition": "glossary",
+            "resolution": "Chose correctly, and the observation generalises further than the agent could see from inside one language: the SAME split existed in more than twenty files (sr језгро/решавач, cs jádro/řešič, hi इंजन/सॉल्वर, tr motor/çözücü, ro motorul/rezolvitorul, and so on). That is the signature of an English-source defect reproduced faithfully by good translators, not of 20 independent mistakes -- and it is the strongest evidence for Tom's decision to change the English word rather than guard it. Recorded in the 'solver' glossary entry."
+        }
+    ]
+}

@@ -2091,3 +2091,43 @@ network is the one *with* loops, that the map/drawing sense survived, that "prev
 early release rather than a document preview, and that flow/pressure match the glossary's existing
 per-language terms. Drift manifest **not** re-baselined — nothing here changed an English string
 that already had translations.
+
+## Sprint 252 — "EPANET engine" became "EPANET solver" (2026-08-13, all 26 languages)
+
+**First sprint launched under the retired wave split.** 26 agents at once, 5 keys each, 130
+strings. No session limit, no losses. Batching was declared but irrelevant at this size — each
+agent writes once — so this run says nothing new about either throttle; it only shows that an
+all-at-once launch is fine for a small sprint.
+
+**Why it ran.** Tom asked "Engine/motor?" of Portuguese. Romance languages render "engine" as
+motor/moteur/motore, which is correct for software — but `lpn_` models PUMPS, which have physical
+motors, so the software sense collided with a hydraulic component on the same page. Tom chose to
+change the English rather than guard the translations: one edit reaching 26 languages, and it
+matches the page's own long-standing "built-in solver" wording.
+
+**The finding that justified the decision, and it is the durable lesson.** More than twenty
+languages were ALREADY internally inconsistent: each used a correct solver word for the *built-in*
+solver and a motor word for EPANET's — **in the same sentence**. sr `језгро`/`решавач`, cs
+`výpočetní jádro`/`řešič`, id `mesin`/`penyelesai`, hi `इंजन`/`सॉल्वर`, tr `motor`/`çözücü`, ro
+`motorul`/`rezolvitorul`, es `motor`/`solucionador`, and so on. Twenty translators do not
+independently make the same mistake; that pattern is an English-source defect being faithfully
+reproduced. Every agent, given the choice, resolved toward the solver word its own file already
+had. Russian had avoided the trap from the start (`расчётное ядро`) and Chinese noted that `引擎`
+unambiguously means a physical engine, so neither had a trade-off to make.
+
+Two agents (ru, id) filed friction entries that both, independently, identified the general rule
+from inside a single language. Both are answered in the new `solver` glossary term: **use one noun
+for both solvers and let the qualifier carry the difference.**
+
+**QA performed:** php lint on all 27 files; `lang_syntax_validate.php` full suite (no findings);
+per-key disk verification of all 26 languages (5/5 present, no duplicates, EPANET intact, no
+entities, no tags); motor-residue scan over *values* — the first version of that scan was wrong and
+matched the key *names*, four of which contain "engine", which is why it reported residue in
+Chinese and Arabic; glossary write-back harvested from the shipped `lpn_engine_loading` strings and
+verified present in them (bg/ru/uk appear in inflected case, which is correct, not a mismatch);
+`friction_check.php` PASS.
+
+**Drift manifest fully closed for the first time: 0 CHANGED, 0 NEW, 0 REMOVED.** Getting there
+needed three new verbs on `detect_english_drift.php` (`--baseline-new`, `--record-shapes`,
+`--drop-removed`) plus a refusal on the blanket `--update`. Before this, a sprint could not record
+its own output, so every sprint-translated key sat permanently invisible to the tripwire.

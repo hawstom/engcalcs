@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-08-09",
-    "count": 851,
+    "count": 854,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -83,6 +83,43 @@
                 "terms_link"
             ],
             "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED. Held back as still-stale: lpn_main_title, lpn_settings_engine_epanet, lpn_settings_engine_epanet_tip, lpn_engine_loading, lpn_engine_failed"
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_tool_example"
+            ],
+            "reason": "[--drop-removed] key retired from lang.ec.en.php; forgotten from the manifest so it stops being reported as drift"
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_backdrop_menu",
+                "lpn_empty_hint",
+                "lpn_file_new",
+                "lpn_main_desc",
+                "lpn_main_menu",
+                "lpn_notes_4_def",
+                "lpn_settings_restore_tip"
+            ],
+            "reason": "Resynced by sprint 251, which translated the whole lpn_ set in all 26 languages AFTER these English edits landed (the wave-0 friction fixes and the Task 296 retitle both preceded wave 1). Verified by reading de/es/ru against current English. lpn_main_title deliberately NOT included: its English changed today (engine -> solver) and its translations are genuinely stale."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_main_title"
+            ],
+            "reason": "Resynced by sprint 252 in all 26 languages (engine -> solver)."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_engine_failed",
+                "lpn_engine_loading",
+                "lpn_settings_engine_epanet",
+                "lpn_settings_engine_epanet_tip"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         }
     ],
     "hashes": {
@@ -329,7 +366,7 @@
         "lpn_backdrop_add": "5375634e24c9546cbfc6f564d68908236dee6cc7",
         "lpn_backdrop_continue": "2e02623966f9391facf6eaefc8b079ed5b630bee",
         "lpn_backdrop_coords_prompt": "37915e511dc4d903a117be2a3bf169f6397ec425",
-        "lpn_backdrop_menu": "2baf062c5655ed0c3b5d7b438826d9b5d7f811aa",
+        "lpn_backdrop_menu": "e796ad9a8e64e35a6ba906b3a5483eef5775fb11",
         "lpn_backdrop_position": "a97c8332aa7fd0f58ad981ffb2d1ccf093d87072",
         "lpn_backdrop_position_prompt1": "48951b5874c051c3fbb1d1e65747b206e4ecddbb",
         "lpn_backdrop_position_prompt2": "85e9e19b06c69c72537cbc74221f52b2ecd146b5",
@@ -358,7 +395,9 @@
         "lpn_diag_unreachable": "1cdaa4fbda79821a8ae138af20d55dd0d6ea969f",
         "lpn_dialog_ok": "9ce3bd4224c8c1780db56b4125ecf3f24bf748b7",
         "lpn_edit_delete_network": "54a5ed21b23a4160bde2d86b22750824c8ee6b16",
-        "lpn_empty_hint": "2ac83eebbbd393db37faa0a1d475810c760a0e50",
+        "lpn_empty_hint": "07332b6b347465c2e5cf43be7115d3d206231c56",
+        "lpn_engine_failed": "80527f0a7cecad6338ab900c58c906eee6236d93",
+        "lpn_engine_loading": "a95a376c68c16cf3eb5079ad02b19405532cd3ed",
         "lpn_engine_manning_note": "f592588a42fae119b629699fe84bcaf7e8881e51",
         "lpn_field_auto": "c614ba7c453cdcd4d21b20e8286c6266c891e0c6",
         "lpn_field_diameter": "8314fd7f3668393803a7ab4d1434731a5b296c40",
@@ -382,7 +421,7 @@
         "lpn_file_import_inp": "422aa12aac66e90544516fbace883e795deba9fd",
         "lpn_file_import_inp_tip": "c623a26c5f2ddcf490bb0d8a09b6ac49df0c8b8f",
         "lpn_file_needs_reopen": "21ae110d61e50bb7a2a02b67937d9dfa7603f601",
-        "lpn_file_new": "e5bcbe241fab3ba265fd7c73f973cd93072e27d9",
+        "lpn_file_new": "36594ec2cf9be53b76e6372fb8b164f532838e35",
         "lpn_file_open": "22b676fbcf6ed2eb3339ff94db2f46c8b584fc76",
         "lpn_file_recent": "95c6a85a61ec3f4fefa80882adb555d78ef45199",
         "lpn_file_reconnect": "16374fbf6ef5ee8c9c7886a2881682be7227a4b2",
@@ -454,9 +493,9 @@
         "lpn_lock_somebody": "8115c76d478a7e1ce12fc42adb46d854c630f845",
         "lpn_lock_storage_error": "64519904dbfd736c855b326cf65ddf997a049f73",
         "lpn_lock_unavailable": "1cb5c80f4e0232db1b6a3a5fc0ec2ff61f3483c2",
-        "lpn_main_desc": "5ce9dd750114eb226b8d73c6b7e784870a280129",
-        "lpn_main_menu": "ea31803594322ae592e645818df0c55af1ec2898",
-        "lpn_main_title": "ee5eff888fc089f132c1aa1abf84792890397682",
+        "lpn_main_desc": "1a72ad16d1e8a4b1d740ec5f51317354db6a695f",
+        "lpn_main_menu": "19e15729a6d4e367d574cdb2c598b11c8d6a5e05",
+        "lpn_main_title": "240a7028b367c659717c984b8588c008043744fc",
         "lpn_menu_edit": "5301648dcf6b53cefc9ed52999aaa92d4603cae0",
         "lpn_menu_insert": "95802daab3a23990338179f72248350c1434cf39",
         "lpn_menu_settings": "c7f73bb54d928922c3838bb789ee9fb8a5b1eb37",
@@ -481,7 +520,7 @@
         "lpn_notes_2_term": "20cecc9c899cf61a3401106b5611f95adce3ad89",
         "lpn_notes_3_def": "92c38e93fc98e6246163b279aedaeaff02ff8ab7",
         "lpn_notes_3_term": "c6bf37fe1cd4249e4de2da6de2a9ba4ee14b45e3",
-        "lpn_notes_4_def": "367398c5d4cabeb9449d15dfe384ccee34ad46fa",
+        "lpn_notes_4_def": "1328e130d1e614e4ef009228ad7f7a14d6ae6b0b",
         "lpn_notes_4_term": "6a00f88bd6833072433c1bbd8efdc75001419336",
         "lpn_notes_5_def": "d6b7637a83301bce037c8862c7a7ea13abd0dfd9",
         "lpn_notes_5_term": "04433f7fe8fbf41ae2e5d2354f718f4330e9c5ac",
@@ -525,6 +564,8 @@
         "lpn_settings_defaults": "77403a7b5092aad6e52d47ff9b28dc162b459922",
         "lpn_settings_defaults_note": "990606b34087faf589658448074aa7621295f825",
         "lpn_settings_emitter_exponent": "1d8660383db35f7b4b2754b1f2451fddc60c0a03",
+        "lpn_settings_engine_epanet": "518a1af690a64303884cc20e84489abd5ef44ce3",
+        "lpn_settings_engine_epanet_tip": "e7d198d611297e57e2528169e188e8b949d843a3",
         "lpn_settings_id_prefixes": "2d1b802116e8a45191c6a614df0e16eddff87671",
         "lpn_settings_legend_bottom_left": "1a7ce96fd00912d9386ea02f98f0b8b8e3f7b530",
         "lpn_settings_legend_bottom_right": "c2fc57681a0fac785dae0742b58ab9cae369ce38",
@@ -538,7 +579,7 @@
         "lpn_settings_map_height_tip": "d445f7f5d0c615e13f228181822cce73569c1ade",
         "lpn_settings_push_btn": "9e7e67a26fdccd90f3ffa64b26f56d540a79e7af",
         "lpn_settings_push_note": "d3754624671985db69287dabd915782065100ae0",
-        "lpn_settings_restore_tip": "bed80101899be9074fc0a7d09a97cd87101e678b",
+        "lpn_settings_restore_tip": "723cebec7f1a48471ff9b324d75ed21e6a2aa7ec",
         "lpn_settings_scope_calculator": "00dfef22ecb2664741976fcf9fcd2bf6ff5c6167",
         "lpn_settings_scope_project": "95590645e1aac6068a614f2f94ed6e4a7b9f3192",
         "lpn_settings_show_titles": "35992d6f38a21a851fe018bde1467dc3a8a875ad",
@@ -580,7 +621,6 @@
         "lpn_tool_add_reservoir": "f19a9f3c642c3432a0ae8f11048615265ce9d630",
         "lpn_tool_add_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
         "lpn_tool_delete": "f6fdbe48dc54dd86f63097a03bd24094dedd713a",
-        "lpn_tool_example": "62c27debfe5d31e3490f5b287ad69d7b127a03ad",
         "lpn_tool_file": "2c3cafa4db3f3e1e51b3dff4303502dbe42b7a89",
         "lpn_tool_labels": "2228985493d9e43e461c7be5525529248735ad9c",
         "lpn_tool_select": "8598222918d3c6e513d63060cf55e2971ded729a",
@@ -2023,6 +2063,14 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_engine_failed": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_engine_loading": {
+            "words": 4,
+            "ends_sentence": false
+        },
         "lpn_engine_manning_note": {
             "words": 15,
             "ends_sentence": true
@@ -2666,6 +2714,14 @@
         "lpn_settings_emitter_exponent": {
             "words": 2,
             "ends_sentence": false
+        },
+        "lpn_settings_engine_epanet": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_settings_engine_epanet_tip": {
+            "words": 31,
+            "ends_sentence": true
         },
         "lpn_settings_id_prefixes": {
             "words": 2,

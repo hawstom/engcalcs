@@ -3361,6 +3361,45 @@
             ],
             "translations": [],
             "translation_notes": "Created 2026-08-12. Found by dev/scripts/gloss_ref_check.php on its very first run: ip_notes_1_def had carried `gloss: bisection` since it was written, pointing at a term that did not exist, so that pointer had been delivering nothing to every ip_ translation agent. Exactly the silent failure the check was built for, and a good argument for the check.\n\nTranslations empty on purpose, like the other concepts seeded this way — the sprint fills them and the mandatory write-back records what each language chose."
+        },
+        "89": {
+            "term": "solver",
+            "avoid": [
+                "the word for a physical MOTOR or ENGINE (es/pt motor, fr moteur, it motore, de Motor, ro motor, id mesin, sw injini, zh 引擎, ar محرك, he מנוע, fa موتور, uk рушій). This calculator models PUMPS, which have real motors, so the software sense collides with a hydraulic component on the same page. This is the specific defect sprint 252 existed to repair.",
+                "a transliteration of English \"engine\" (ur انجن, bn ইঞ্জিন, my အင်ဂျင်, hi इंजन) -- same collision, plus it is a loanword where a real term exists.",
+                "reusing the word your file already uses for CALCULATOR (sw kikokotoo, am ማስያ, km ម៉ាស៊ីនគណនា). The page names both a calculator and a solver, and they are different things."
+            ],
+            "context": "The part of a program that computes the answer. In lpn_ there are TWO of them and the UI contrasts them in one sentence: EPANET's own solver, and this suite's built-in solver. Both must be recognisable as the same KIND of thing and distinguishable from each other, so use one noun for both and let the qualifier (EPANET vs built-in) carry the difference.",
+            "translation_notes": "[2026-08-13, sprint 252] English was \"engine\" until Tom changed it to \"solver\" suite-wide. The evidence that the ENGLISH was the defect, not the translations: 20+ languages were already internally inconsistent, using a correct solver word for the BUILT-IN solver and a motor word for EPANET's -- in the same sentence. sr језгро vs решавач; cs výpočetní jádro vs řešič; id mesin vs penyelesai; hi इंजन vs सॉल्वर; tr motor vs çözücü; ro motorul vs rezolvitorul. Every agent independently resolved it toward the solver word it already had. Russian had avoided the trap from the start (расчётное ядро) and Chinese noted 引擎 unambiguously means a physical engine, so there was no trade-off to make there. Values below are harvested from the shipped lpn_engine_loading strings and verified present in them (bg/ru/uk appear in inflected case).",
+            "translations": {
+                "am": "ፈታች",
+                "ar": "حلّال",
+                "bg": "решаващ модул",
+                "bn": "সমাধানকারী",
+                "cs": "řešič",
+                "de": "Löser",
+                "es": "solucionador",
+                "fa": "حل‌کننده",
+                "fr": "solveur",
+                "he": "פותר",
+                "hi": "सॉल्वर",
+                "hr": "rješavač",
+                "id": "penyelesai",
+                "it": "risolutore",
+                "km": "ឧបករណ៍ដោះស្រាយ",
+                "my": "ဖြေရှင်းစက်",
+                "ps": "حل کوونکی",
+                "pt": "solucionador",
+                "ro": "rezolvitor",
+                "ru": "расчётное ядро",
+                "sr": "решавач",
+                "sw": "kitatuzi",
+                "tr": "çözücü",
+                "uk": "розв'язувач",
+                "ur": "حل کار",
+                "zh": "求解器"
+            },
+            "source": "sprint-252 translation agents, harvested from shipped strings"
         }
     }
 }

@@ -395,6 +395,43 @@ if ($mode === '--baseline-new') {
     exit(0);
 }
 
+// --drop-removed : forget manifest entries for keys that no longer exist in English.
+// A retired key is not drift and there is nothing to resync, but it sat in the REMOVED list
+// forever because the only command that could clear it was the blanket --update -- now refused
+// while any real drift is open. So a permanent false positive was wedged behind a correct refusal,
+// and a report with standing noise in it is one people stop reading. Touches no live key's hash.
+if ($mode === '--drop-removed') {
+    if (!$manifest) {
+        fwrite(STDERR, "No manifest yet. Run --update first.\n");
+        exit(2);
+    }
+    $d = diff($current, $manifest);
+    if (!$d['removed']) {
+        echo "Nothing to drop: no REMOVED keys.\n";
+        exit(0);
+    }
+    $shapes = load_shapes();
+    foreach ($d['removed'] as $k) {
+        unset($manifest[$k], $shapes[$k]);
+    }
+    $notes = load_notes();
+    $notes[] = [
+        'date' => date('Y-m-d'),
+        'keys' => $d['removed'],
+        'reason' => '[--drop-removed] key retired from lang.ec.en.php; forgotten from the manifest so '
+            . 'it stops being reported as drift',
+    ];
+    $syncDate = json_decode(file_get_contents(MANIFEST), true)['updated'] ?? '';
+    write_manifest($manifest, $notes, $syncDate, $shapes);
+    echo "Dropped " . count($d['removed']) . " retired key(s) from the manifest:\n";
+    foreach ($d['removed'] as $k) {
+        echo "  - $k\n";
+    }
+    echo "Their translations, if any language still carries them, are untouched — check with\n";
+    echo "php dev/scripts/key_hygiene_check.php, which is what decides debt vs. lost content.\n";
+    exit(0);
+}
+
 // --record-shapes : back-fill the shape fingerprints WITHOUT re-baselining any hash.
 // Safe by construction: it records shapes only for keys whose hash already matches the manifest,
 // so what it writes is genuinely "the shape as of the last sync". A CHANGED key is skipped --
