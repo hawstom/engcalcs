@@ -391,12 +391,22 @@ if ($bad) {
     printf("  %-34s %s\n", 'static asset under /engcalcs/', $staticOk ? 'answers' : 'DOES NOT ANSWER');
     printf("  %-34s %s\n", 'sw.php (no lib/base.inc.php)', $swOk ? 'answers' : 'DOES NOT ANSWER');
     if ($staticOk && $swOk) {
-        echo "\n  PHP is healthy and the web server is serving files. Every failure above is a page\n";
-        echo "  that loads lib/base.inc.php, so the fatal is inside THAT include chain -- and the\n";
-        echo "  overwhelmingly likely cause is a PARTIAL UPLOAD of lib/. Two halves of one commit\n";
-        echo "  landing separately is enough: a caller shipped without the function it calls fatals\n";
-        echo "  every page while leaving static files and sw.php answering normally.\n";
-        echo "  Re-upload lib/ in full, then run this again.\n";
+        echo "\n  The web server is serving files and PHP runs. Every failure above is a page that\n";
+        echo "  loads lib/base.inc.php, so the fault is inside THAT include chain. sw.php is the one\n";
+        echo "  php file in the suite that does not load it, which is why it answers.\n\n";
+        echo "  TWO CAUSES SHARE THIS EXACT SIGNATURE. Check them in this order:\n\n";
+        echo "  1. THE PHP VERSION IS TOO OLD. lib/base.inc.php and everything it pulls in use `??`,\n";
+        echo "     the null-coalescing operator, which is PHP 7.0+. On PHP 5.x that is a PARSE error:\n";
+        echo "     a fatal with NO OUTPUT, which is why the 500 body is empty. sw.php and\n";
+        echo "     lib/ServiceWorker.lib.php happen to contain no `??` at all, so they parse and\n";
+        echo "     answer -- which is what makes the split look like a code bug when it is a server\n";
+        echo "     setting. Found on dev.hawsedc.com 2026-08-14: a new cPanel subdomain had been given\n";
+        echo "     an old PHP by default. Fix in MultiPHP Manager; no code change.\n";
+        echo "     THE CONTROL THAT PROVES IT: fetch the same page from production. Identical code\n";
+        echo "     answering 200 there and 500 here means the difference is the server, not the code.\n\n";
+        echo "  2. A PARTIAL UPLOAD of lib/. Two halves of one commit landing separately is enough --\n";
+        echo "     a caller shipped without the function it calls fatals every page while leaving\n";
+        echo "     static files and sw.php answering normally.\n";
     } elseif (!$staticOk) {
         echo "\n  Even a static file will not serve. That is the web server, not this suite --\n";
         echo "  check .htaccess first: `Options -Indexes` needs an `AllowOverride Options` grant, and\n";
