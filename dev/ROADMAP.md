@@ -394,8 +394,82 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   size, each independently settable — and explicitly deferred it: "that's a lot… maybe later we
   give more fine-grained control and right now just a two-dimensional control." Build it when
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
-- 40|184| **Project/scenario model for saved networks: DELTA model — one save, canonical Base,
-  scenarios are collections of overrides (originated during Task 146).** Raised by Tom, 2026-07-30, thinking ahead to Task 146.08 (multiple named saved
+- 75|315| **The saved filename is gratuitously long. Shorten it; decide about a generation-1
+  extension separately.** `projectFileName()` produces `Elm Street-lpn-hawsedc-engcalcs.json` — a
+  30-character suffix on every file. Tom, 2026-08-14: *"we got carried away with a long ugly
+  filename just because we didn't have a nice extension… I am less ashamed to live with two or
+  three legacy file extensions than the gratuitously long file names."*
+
+  - **These are two decisions, not one, and conflating them is what produced the long name.** The
+    suffix got long *because* an extension decision was deferred; deferring it again is fine, but
+    the filename should not keep paying for it. Shorten now (`-lpn.json` is Tom's own suggestion);
+    choose an extension when the format has stopped moving.
+  - **Three call sites, and they must move together**: `projectFileName()` (~3006), the strip in
+    `projectNameFromFileName()` (~3930), and `saveAs()`'s `suggestedName` (~4034). The strip is the
+    one that matters — **a file already saved with the long suffix must still open with its name
+    intact**, so the old suffix has to keep being recognised after the generator stops producing it.
+    A missed strip does not fail; it silently names the project `Elm Street-lpn-hawsedc-engcalcs`.
+  - Tom's own candidate extensions: `wnj` (water network js), `lwj` (librewater js), alongside
+    possible project names LibreWaterNet / waternet. Research is out with a subagent — collision
+    check, what comparable tools ship in 2026, and whether `name.lpn.json` is a good idea or a dated
+    one. **An extension is a public commitment that is expensive to walk back**, and the format is
+    moving this week (scenarios, valves), so the honest answer may be "not yet, and here is the
+    trigger".
+  - Depends on Task 184 only for merge order — it is the same save/load region of
+    `js/looped-network.js`.
+
+- 80|314| **An EXAMPLES LIBRARY, on the HEC-RAS model: a pane of many examples, not a menu of two.**
+  Tom, 2026-08-14: *"I envision a stunning array of examples that fills a screen with mere titles or
+  brief descriptions and could span pages or sub-categories of large thumbnails… Therefore it is
+  some sort of an Examples library or pane. And you probably get there using File Open Examples."*
+
+  **THIS IS A RE-ARCHITECTURE, NOT A THIRD EXAMPLE.** Today an example is a JS FUNCTION —
+  `drawExampleNetwork(system)` builds Basic US or Basic SI by executing ~290 lines of drawing code,
+  reached from File > New project > From examples. That shape cannot scale to a screen full of
+  them: every example would be more code, none could carry a description or a thumbnail, and none
+  could be authored by anyone who is not editing `js/looped-network.js`. **An example must become a
+  FILE** — an ordinary saved project in an examples folder, with metadata beside it.
+
+  - **Metadata: Description primarily, Thumbnail(s) possibly** (Tom's own ranking). A description is
+    what makes a wall of titles browsable; a thumbnail is what makes it *stunning*, and is the more
+    expensive half — decide whether it is generated at build time from the project itself (right, no
+    drift) or committed as an image (wrong, goes stale the moment the example is edited).
+  - **"They were your copies because you downloaded and installed them."** Tom is naming the thing
+    HEC-RAS got right without ever saying it: opening an example gives you a document you own and
+    may save, and nobody had to explain that. Ours are served rather than installed, so **opening an
+    example must produce an unsaved project the user can Save As**, never a read-only view of a file
+    on our server, and never something that writes back.
+  - **File > Open > Examples**, per Tom, NOT File > New. The current placement under New was right
+    when there were two; a library is a thing you browse and open.
+  - **Three to start**: Basic SI, Basic US, and *Elm Street Center US design loop fire flow plus max
+    day snapshot*. **That third one is a scenario document** — design loop, fire flow, and max day
+    are three scenarios of one network — which is why this task sits behind Task 184 and why it is
+    the example that proves scenarios are real. It is also the first example drawn from an actual
+    project rather than invented.
+  - **The examples folder is a web-served directory, so it needs an index**: the pane cannot list a
+    directory it cannot read. A generated manifest (title, description, units, thumbnail, file) is
+    the obvious answer, and it must be generated from the files by a script in `dev/scripts/`, never
+    hand-maintained — a hand-kept index and a folder of files drift, and the drift is silent.
+  - **Sub-categories and paging are explicitly in Tom's picture** but are not needed at three. Build
+    the pane so they can arrive without a rewrite; do not build them yet.
+  - **Every example commits to a unit system and does not adapt to yours** — this decision already
+    exists (Task 264, `newProjectFromExample`) and carries over unchanged. Say the units in the
+    description.
+  - Blocked on Task 184 for the Elm Street example only; the pane and the two basic examples could
+    ship first. Prefer shipping all three together — a library whose one interesting entry is
+    missing makes the wrong first impression.
+
+- 95|184| **Project/scenario model for saved networks: DELTA model — one save, canonical Base,
+  scenarios are collections of overrides (originated during Task 146).**
+
+  **RAISED 40 → 95 ON 2026-08-14, AND IT IS NOW THE TOP OF THE LIST.** Tom: *"I have got distracted,
+  and a real customer, my colleague with a real project willing to use lpn, could use scenarios
+  nearly immediately. I erred in pushing LibreEPANET.org at the expense of scenarios. We need to
+  push scenarios forward."* **A named user with a live project outranks a positioning exercise**, and
+  that is the whole of the reasoning — it does not need re-deriving next time the two compete. Task
+  248's remaining phases and Tasks 306/307 drop behind this accordingly.
+
+  Raised by Tom, 2026-07-30, thinking ahead to Task 146.08 (multiple named saved
   networks): "I am wondering whether the concept of project.scenario buys us anything… if multiple
   saves were grouped as scenarios under a project, we could conceivably, for any element, 'Push to
   project' to sync across scenarios. We could even get fine-grained with checkboxes in popups."
@@ -1193,7 +1267,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     never places content under them. That does not survive a pan, which is why this still exists.
 
 
-- 60|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
+- 35|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
   Task 243 shipped the engine and the toggle. The engine makes each of these a mapping-and-UI job
   rather than a numerical one, which is the entire reason it was worth vendoring.
 
@@ -1227,6 +1301,13 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   Task 296 relied on when it refused *"web clone of EPANET"*, so they are the whole of the honesty
   case for the name. **Nothing else is missing** — there is no node-count limit and the gate must
   never be described as one (`dev/positioning.md` §6).
+
+  **THEN LOWERED 60 → 35 THE SAME DAY, and the reversal is the instructive part.** Tom: *"I have got
+  distracted… I erred in pushing LibreEPANET.org at the expense of scenarios."* The gate is still a
+  gate — nothing about the honesty case changed — but **a gate on a launch nobody is waiting for is
+  not urgent work.** Phase 1 (tanks) shipped; phases 2 and 3 continue behind Task 184. Read this
+  pair of moves together the next time a positioning task and a user-facing one compete: the ruling
+  that survived contact was the one with a named user behind it.
 
   Two things this does NOT mean:
   - **It is not a doubt about our right to the name.** Tom, 2026-08-14: *"we have no less technical
