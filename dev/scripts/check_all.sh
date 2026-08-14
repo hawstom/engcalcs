@@ -84,8 +84,9 @@ run_check "payload freshness"            blocking php dev/scripts/generate_trans
 
 # --- The roadmap's own integrity ---------------------------------------------------------------
 # A task ID is a permanent handle that prose cites by number; a duplicate makes every such
-# reference ambiguous, and nothing else would say so.
-run_check "roadmap ids unique"           blocking php dev/scripts/roadmap_id_check.php
+# reference ambiguous. And priority 0 is the file's only signal for "closed", so a blocked task
+# parked at 0, or a done one never moved under `## Completed`, both read as finished from outside.
+run_check "roadmap ids and closure"      blocking php dev/scripts/roadmap_id_check.php
 
 # --- lpn solver and editor --------------------------------------------------------------------
 # Count derived, not typed: the label said "(12)" while 15 scripts were running, because

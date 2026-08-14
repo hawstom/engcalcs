@@ -732,7 +732,7 @@ belongs to IS the budgeting decision.
 **Tier 1 — automated, seconds, free. `sh dev/scripts/check_all.sh` before every commit.**
 Sixteen checks: PHP and JS syntax, HTML balance on every page, the pageConfig PHP→JS bridge, tip
 markup via the helpers, language rules A–D, gloss pointers, layout tags, the coverage declaration, payload
-freshness, **roadmap ID uniqueness**, the lpn harnesses, the calculator harnesses (both counts derived from the glob, never
+freshness, **roadmap ID uniqueness and closure** (priority 0 iff under `## Completed`), the lpn harnesses, the calculator harnesses (both counts derived from the glob, never
 typed — the lpn one read "12" while 15 were actually running), plus three advisory ones (key
 hygiene, size budget, English drift). Blocking failures exit 1. **This list used to live only in prose and in whoever remembered
 it** — a check nobody runs is indistinguishable from a check that does not exist, which is the same

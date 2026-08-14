@@ -2,7 +2,7 @@
 
 This is a prioritized, bulleted roadmap for the EngCalcs hydraulic calculator suite.
 
-The format of each task is: `Priority|ID|status Description`. Priority: 0 means "Completed" and 100 means top priority; ties (same priority for multiple tasks) are okay; any whole number 0-100 can be used; priority is mutable and gets reused across tasks, and always drops to 0 on completion. ID is a permanent, ordinal task number — never reused, never changed, unrelated to priority — used whenever a task needs to be referenced by number (in another task's text, in a commit message, in `dev/` docs). Refer to a task in prose as "Task N". A task that is one of several concrete sub-items under a single parent task may instead use a dotted ID, `parent.nn` (e.g. `146.01`) — introduced 2026-07-29 for Task 146's backlog — but it is still a full `Priority|ID|status` bullet like any other task, just grouped under its parent by ID rather than living inside the parent's prose.
+The format of each task is: `Priority|ID|status Description`. Priority: 0 means "Completed" — and *only* that, so a blocked or parked task keeps a real priority, however low, and a task set to 0 moves under `## Completed` in the same edit (`php dev/scripts/roadmap_id_check.php` enforces both directions). 100 means top priority; ties (same priority for multiple tasks) are okay; any whole number 0-100 can be used; priority is mutable and gets reused across tasks, and always drops to 0 on completion. ID is a permanent, ordinal task number — never reused, never changed, unrelated to priority — used whenever a task needs to be referenced by number (in another task's text, in a commit message, in `dev/` docs). Refer to a task in prose as "Task N". A task that is one of several concrete sub-items under a single parent task may instead use a dotted ID, `parent.nn` (e.g. `146.01`) — introduced 2026-07-29 for Task 146's backlog — but it is still a full `Priority|ID|status` bullet like any other task, just grouped under its parent by ID rather than living inside the parent's prose.
 
 Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Copilot, `[H]` = Human decision needed, `[CC→CP]` / `[CP→CC]` = split task (first actor works, then updates tag to the next plain tag when handing off). Untagged = actor-agnostic. See `cross-platform-planning.md` §2.2.2 for the full tag lifecycle.
 
@@ -747,34 +747,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Risk to respect:** every drawing gesture on this page is a one-finger touch, so this reworks
     the layer they all sit on. Not a tweak. If it lands, keep the height cap anyway — it costs
     nothing and is the belt to this braces.
-- 0|195| **[DONE 2026-08-03 — both phases shipped] Export/import a `lpn_` project as a file.**
-  Phase 1 one-shot JSON download/import; Phase 2 live `FileSystemFileHandle` with a server lock
-  broker (`lpn-lock.php`). Phase 2's UI was then superseded by Task 211's tab-and-File-menu rebuild.
-  Design narrative archived in `dev/roadmap-closed-archive.md`.
-  **Browser verification is NOT part of this task — it is Task 220.**
-
-- 0|212| **[DONE 2026-08-05] Persisted file handles — a reload no longer drops the file.**
-  Handles are kept in IndexedDB (structured-cloneable; localStorage cannot hold them). On boot
-  `queryPermission()` decides: **granted** reconnects silently, **prompt** is held pending and the
-  banner becomes a one-click *Reconnect to this file* — no picker, no hunting — and **denied** or a
-  missing API is dropped. A handle whose project has been closed is dropped rather than restored.
-  Verified by `dev/lpn-spike/handle-restore-harness.js` (26 checks, mutation-tested) rather than by
-  adding six boxes to Tom's punch list.
-  - **A banner is not "nothing"** (Tom, 2026-08-05, on the first cut: "I should get nothing, or a
-    prompt for single-click permission to reconnect"). A grant does not vanish on reload, it goes
-    **dormant**: `queryPermission()` says `prompt`, but `requestPermission()` revives it showing the
-    user *nothing* — provided it has a live user activation. Boot has none, which is why it must not
-    ask. So the **first pointerdown or keydown** on the page is spent on it instead
-    (`armPendingReconnect()`), once per project. Ordinary case: the banner is gone before it is read.
-    Where the grant really is gone the browser puts its own one-click bubble up, which is the honest
-    version of the question and what Tom asked for.
-  - `lpn_file_needs_reopen` said "a browser does not stay connected to a file after the page is
-    reloaded" — no longer true, and the sentence Tom hit. It now says the connection to *that file*
-    was lost, which is what the remaining cases (permission withdrawn, private browsing, a project
-    last opened before the IndexedDB store existed) actually are.
-  - **Promoted from 20 and done out of order** because it was not a nicety: every reload disconnected,
-    so it contaminated every browser pass and produced three separate "reload doesn't work" reports.
-  - `Open Recent` was deferred here and shipped as Task 258 (2026-08-10), on `isSameEntry()`.
 - 20|225.13| **`dev/lpn-file-lock-test-punchlist.md` §13 needs the rewrite §0–§8 got** (Tom: *"Some
   stuff no longer exists or is renamed"*), before anybody is asked to run that section again.
   Split out of Task 225 when the rest of it closed 2026-08-09 — this piece is a punch-list document
@@ -4562,10 +4534,23 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   too confusing — and it **deleted more than it built**: no autosave to file, opt-in read-only, no
   Delete, an ordinary File menu. Made Task 208 obsolete. Full design narrative archived.
 
+- 0|212| **[DONE 2026-08-05] Persisted file handles — a reload no longer drops the file.**
+  Handles live in IndexedDB (localStorage cannot hold them); on boot `queryPermission()` reconnects
+  a granted one silently, holds a `prompt` one for the first pointerdown/keydown so the revival
+  needs no user activation of its own, and drops a denied one. Verified by
+  `dev/lpn-spike/handle-restore-harness.js` (26 checks, mutation-tested). `Open Recent` was deferred
+  from here and shipped as Task 258. Full narrative in `dev/roadmap-closed-archive.md`.
+
 - 0|208| **[OBSOLETE 2026-08-05] A lock that travels with a COPY of a file is the wrong lock.**
   Ruled obsolete by Tom on reading the post-211 state: opening a file someone else holds now offers
   **Create a copy** as a first-class answer, so the lockout this existed to fix no longer happens to
   a user. Analysis archived.
+
+- 0|195| **[DONE 2026-08-03 — both phases shipped] Export/import a `lpn_` project as a file.**
+  Phase 1 one-shot JSON download/import; Phase 2 live `FileSystemFileHandle` with a server lock
+  broker (`lpn-lock.php`). Phase 2's UI was then superseded by Task 211's tab-and-File-menu rebuild.
+  Design narrative archived in `dev/roadmap-closed-archive.md`.
+  **Browser verification is NOT part of this task — it is Task 220.**
 
 - 0|210| **[DONE 2026-08-03] Stop counting Tom's own visits in the usage logs.** Asked 2026-08-03: *"is it hard to
   ignore my visits? I suppose we can pretty easily detect me in the logs if I exercise many

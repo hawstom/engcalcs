@@ -1917,3 +1917,32 @@ declaration from Task 203, Simple English from Task 98, glossary write-back from
     Nobody is stranded meanwhile — "Save as my own copy" still works and `pollLock()` still hands the
     file over when the holder closes it. `lpn_lock_idle` is left in the lang files unused rather than
     deleted across 27 files for a surface about to be replaced.
+
+
+## Task 212
+
+Moved out of the roadmap body 2026-08-14, when the block was found still sitting among the open
+tasks at priority 0. Compressed to a stub there; this is the full text as it stood.
+
+- 0|212| **[DONE 2026-08-05] Persisted file handles — a reload no longer drops the file.**
+  Handles are kept in IndexedDB (structured-cloneable; localStorage cannot hold them). On boot
+  `queryPermission()` decides: **granted** reconnects silently, **prompt** is held pending and the
+  banner becomes a one-click *Reconnect to this file* — no picker, no hunting — and **denied** or a
+  missing API is dropped. A handle whose project has been closed is dropped rather than restored.
+  Verified by `dev/lpn-spike/handle-restore-harness.js` (26 checks, mutation-tested) rather than by
+  adding six boxes to Tom's punch list.
+  - **A banner is not "nothing"** (Tom, 2026-08-05, on the first cut: "I should get nothing, or a
+    prompt for single-click permission to reconnect"). A grant does not vanish on reload, it goes
+    **dormant**: `queryPermission()` says `prompt`, but `requestPermission()` revives it showing the
+    user *nothing* — provided it has a live user activation. Boot has none, which is why it must not
+    ask. So the **first pointerdown or keydown** on the page is spent on it instead
+    (`armPendingReconnect()`), once per project. Ordinary case: the banner is gone before it is read.
+    Where the grant really is gone the browser puts its own one-click bubble up, which is the honest
+    version of the question and what Tom asked for.
+  - `lpn_file_needs_reopen` said "a browser does not stay connected to a file after the page is
+    reloaded" — no longer true, and the sentence Tom hit. It now says the connection to *that file*
+    was lost, which is what the remaining cases (permission withdrawn, private browsing, a project
+    last opened before the IndexedDB store existed) actually are.
+  - **Promoted from 20 and done out of order** because it was not a nicety: every reload disconnected,
+    so it contaminated every browser pass and produced three separate "reload doesn't work" reports.
+  - `Open Recent` was deferred here and shipped as Task 258 (2026-08-10), on `isSameEntry()`.
