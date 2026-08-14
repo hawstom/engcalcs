@@ -71,7 +71,7 @@ $ec_lang['template_printable_subtitle']='Поднаслов за штампу';
 $ec_lang['consent_body']='Можемо ли да сачувамо по једну цифру за сваку страницу у складишту овог профила прегледача, како бисмо избегли да поновно бележимо њене посете?';
 $ec_lang['consent_accept']='Прихвати ово';
 $ec_lang['consent_accept_all']='Прихвати трајно';
-$ec_lang['consent_decline']='Одбиј';
+$ec_lang['consent_decline']='Одбиј трајно';
 $ec_lang['consent_current_granted']='Дозволили сте ово. Ограничавамо бележење за овај профил прегледача.';
 $ec_lang['consent_current_denied']='Одбили сте ово. Не чувамо ништа, чиме ограничавамо бележење за овај профил прегледача.';
 $ec_lang['consent_region_label']='Ваш избор о ограничавању бележења.';
@@ -697,6 +697,8 @@ $ec_lang['lpn_menu_view']='Приказ';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Подешавања';
+$ec_lang['lpn_menu_help']='Помоћ';
+$ec_lang['lpn_help_walkthroughs']='Водичи';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1018,14 +1020,16 @@ $ec_lang['lpn_labels_decimals_tip']='Број децимала приказан 
 $ec_lang['lpn_labels_mark_extrema']='Означи највеће и најмање вредности';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Позадинска слика…';
-$ec_lang['lpn_backdrop_add']='Додај слику';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='Постави размеру слике';
-$ec_lang['lpn_backdrop_position']='Помери слику';
-$ec_lang['lpn_backdrop_remove']='Уклони слику';
+$ec_lang['lpn_backdrop_add']='Додај';
+// Bare verbs (role change, 2026-08-13): the menu now prints the "Background image..." heading
+// directly above these, so the heading carries the object and the verbs no longer name it.
+$ec_lang['lpn_backdrop_scale']='Одреди размеру бирањем';
+$ec_lang['lpn_backdrop_scale_entry']='Размера према ворлд-фајлу или величини пиксела на мапи';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Унесите величину једног пиксела на мапи, или налепите цео садржај ворлд-фајла за слику';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Унесите један број за величину пиксела на мапи, или налепите свих шест редова ворлд-фајла.';
+$ec_lang['lpn_backdrop_wld_bad']='Овај ворлд-фајл ротира, огледално обрће или неравномерно развлачи слику. Мапа може само да помери слику и промени њену величину подједнако у оба правца, па фајл није коришћен.';
+$ec_lang['lpn_backdrop_position']='Помери';
+$ec_lang['lpn_backdrop_remove']='Уклони';
 $ec_lang['lpn_backdrop_remove_confirm']='Уклонити позадинску слику?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Кликните две тачке на позадинској слици, на пример два краја размерне траке. Затим упишите стварно растојање између њих.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Стварно растојање између те две тачке';

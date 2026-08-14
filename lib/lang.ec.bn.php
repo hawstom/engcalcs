@@ -72,7 +72,7 @@ $ec_lang['template_printable_subtitle']='মুদ্রণযোগ্য উ�
 $ec_lang['consent_body']='বারবার একই পরিদর্শন লগ করা এড়াতে, আমরা কি এই ব্রাউজার প্রোফাইলের সংরক্ষণে প্রতি পৃষ্ঠার জন্য একটি মাত্র সংখ্যা রাখতে পারি?';
 $ec_lang['consent_accept']='এটি গ্রহণ করুন';
 $ec_lang['consent_accept_all']='সর্বদা গ্রহণ করুন';
-$ec_lang['consent_decline']='প্রত্যাখ্যান করুন';
+$ec_lang['consent_decline']='সর্বদা প্রত্যাখ্যান করুন';
 $ec_lang['consent_current_granted']='আপনি এটি অনুমতি দিয়েছেন। আমরা এই ব্রাউজার প্রোফাইলের জন্য লগিং সীমিত করি।';
 $ec_lang['consent_current_denied']='আপনি এটি প্রত্যাখ্যান করেছেন। এই ব্রাউজার প্রোফাইলের লগিং সীমিত করতে আমরা কিছুই সংরক্ষণ করি না।';
 $ec_lang['consent_region_label']='লগিং সীমিত করা সংক্রান্ত আপনার সিদ্ধান্ত।';
@@ -698,6 +698,8 @@ $ec_lang['lpn_menu_view']='দৃশ্য';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='সেটিংস';
+$ec_lang['lpn_menu_help']='সহায়তা';
+$ec_lang['lpn_help_walkthroughs']='ধাপে ধাপে নির্দেশিকা';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1019,14 +1021,16 @@ $ec_lang['lpn_labels_decimals_tip']='এই লেবেলের জন্য �
 $ec_lang['lpn_labels_mark_extrema']='সর্বোচ্চ ও সর্বনিম্ন মান চিহ্নিত করুন';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='পটভূমি চিত্র…';
-$ec_lang['lpn_backdrop_add']='চিত্র যোগ করুন';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='চিত্রের স্কেল নির্ধারণ করুন';
-$ec_lang['lpn_backdrop_position']='চিত্র সরান';
-$ec_lang['lpn_backdrop_remove']='চিত্র সরিয়ে ফেলুন';
+$ec_lang['lpn_backdrop_add']='যোগ করুন';
+// BARE VERBS: both doors now print a "Background image" heading above them, so the object need
+// not be repeated in each command.
+$ec_lang['lpn_backdrop_scale']='বেছে স্কেল করুন';
+$ec_lang['lpn_backdrop_scale_entry']='ওয়ার্ল্ড ফাইল বা মানচিত্রে এক পিক্সেলের আকার দিয়ে স্কেল করুন';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='মানচিত্রে এক পিক্সেলের আকার লিখুন, অথবা চিত্রের ওয়ার্ল্ড ফাইলের সম্পূর্ণ বিষয়বস্তু পেস্ট করুন';
+$ec_lang['lpn_backdrop_scale_entry_bad']='মানচিত্রে এক পিক্সেলের আকারের জন্য একটি সংখ্যা লিখুন, অথবা ওয়ার্ল্ড ফাইলের সবকটি (ছয়টি) লাইন পেস্ট করুন।';
+$ec_lang['lpn_backdrop_wld_bad']='এই ওয়ার্ল্ড ফাইলটি চিত্রকে ঘোরায়, উল্টে দেয় বা অসমভাবে টেনে বড় করে। মানচিত্র শুধু একটি চিত্র সরাতে এবং উভয় দিকে সমান পরিমাণে আকার পরিবর্তন করতে পারে, তাই ফাইলটি ব্যবহার করা হয়নি।';
+$ec_lang['lpn_backdrop_position']='সরান';
+$ec_lang['lpn_backdrop_remove']='সরিয়ে ফেলুন';
 $ec_lang['lpn_backdrop_remove_confirm']='পটভূমি চিত্রটি সরিয়ে ফেলবেন?';
 $ec_lang['lpn_backdrop_scale_prompt1']='পটভূমি চিত্রে দুটি বিন্দুতে ক্লিক করুন, যেমন একটি বার স্কেলের দুই প্রান্ত। তারপর তাদের মধ্যের প্রকৃত দূরত্ব লিখুন।';
 $ec_lang['lpn_backdrop_scale_prompt2']='দুই বিন্দুর মধ্যে প্রকৃত দূরত্ব';

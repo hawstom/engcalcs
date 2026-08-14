@@ -72,7 +72,7 @@ $ec_lang['template_printable_subtitle']='Subjudul Cetak';
 $ec_lang['consent_body']='Bolehkah kami menyimpan satu digit angka per halaman di penyimpanan profil peramban ini untuk mencegah kami mencatat kunjungannya berulang kali?';
 $ec_lang['consent_accept']='Terima kali ini';
 $ec_lang['consent_accept_all']='Selalu terima';
-$ec_lang['consent_decline']='Tolak';
+$ec_lang['consent_decline']='Selalu tolak';
 $ec_lang['consent_current_granted']='Anda mengizinkan ini. Kami membatasi pencatatan untuk profil peramban ini.';
 $ec_lang['consent_current_denied']='Anda menolak ini. Kami tidak menyimpan apa pun untuk membatasi pencatatan pada profil peramban ini.';
 $ec_lang['consent_region_label']='Pilihan Anda tentang pembatasan pencatatan.';
@@ -698,6 +698,8 @@ $ec_lang['lpn_menu_view']='Tampilan';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Pengaturan';
+$ec_lang['lpn_menu_help']='Bantuan';
+$ec_lang['lpn_help_walkthroughs']='Tutorial';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1019,14 +1021,17 @@ $ec_lang['lpn_labels_decimals_tip']='Jumlah angka desimal yang ditampilkan untuk
 $ec_lang['lpn_labels_mark_extrema']='Tandai nilai tertinggi dan terendah';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Gambar latar…';
-$ec_lang['lpn_backdrop_add']='Tambah gambar';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='Atur skala gambar';
-$ec_lang['lpn_backdrop_position']='Pindahkan gambar';
-$ec_lang['lpn_backdrop_remove']='Hapus gambar';
+$ec_lang['lpn_backdrop_add']='Tambah';
+// Bare imperative verbs (RESYNC 2026-08-13): the menu now prints "Gambar latar…" as a heading
+// directly above these, so the heading itself carries the object and repeating "gambar" here
+// reads as an oversight. Supersedes the 2026-08-04 "name the object" rationale.
+$ec_lang['lpn_backdrop_scale']='Skalakan dengan memilih';
+$ec_lang['lpn_backdrop_scale_entry']='Skalakan dari world file atau ukuran satu piksel di peta';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Masukkan ukuran satu piksel di peta, atau tempel seluruh isi world file untuk gambar ini';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Ketik satu angka untuk ukuran satu piksel di peta, atau tempel keenam baris world file.';
+$ec_lang['lpn_backdrop_wld_bad']='World file ini memutar, mencerminkan, atau meregangkan gambar secara tidak merata. Peta hanya dapat memindahkan gambar dan mengubah ukurannya dengan jumlah yang sama di kedua arah, sehingga file ini tidak digunakan.';
+$ec_lang['lpn_backdrop_position']='Pindahkan';
+$ec_lang['lpn_backdrop_remove']='Hapus';
 $ec_lang['lpn_backdrop_remove_confirm']='Hapus gambar latar ini?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Klik dua titik pada gambar latar, misalnya kedua ujung skala batang. Kemudian ketik jarak sebenarnya di antara keduanya.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Jarak sebenarnya antara kedua titik';

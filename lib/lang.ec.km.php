@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='ចំណងជើងរងដែលអ
 $ec_lang['consent_body']='តើយើងអាចរក្សាលេខមួយខ្ទង់ក្នុងទំព័រនីមួយៗ នៅក្នុងទំហំផ្ទុករបស់កម្មវិធីរុករកនេះ ដើម្បីការពារយើងកុំឲ្យកត់ត្រាការចូលមើលដដែលៗបានទេ?';
 $ec_lang['consent_accept']='យល់ព្រមលើសំណើនេះ';
 $ec_lang['consent_accept_all']='យល់ព្រមជានិច្ច';
-$ec_lang['consent_decline']='បដិសេធ';
+$ec_lang['consent_decline']='បដិសេធជានិច្ច';
 $ec_lang['consent_current_granted']='អ្នកបានអនុញ្ញាតរឿងនេះ។ យើងកំណត់ការកត់ត្រាសម្រាប់ទម្រង់កម្មវិធីរុករកនេះ។';
 $ec_lang['consent_current_denied']='អ្នកបានបដិសេធរឿងនេះ។ យើងមិនរក្សាទុកអ្វីទាំងអស់ ដើម្បីកំណត់ការកត់ត្រាសម្រាប់ទម្រង់កម្មវិធីរុករកនេះ។';
 $ec_lang['consent_region_label']='ជម្រើសរបស់អ្នកអំពីការកំណត់ការកត់ត្រា។';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='ទិដ្ឋភាព';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='ការកំណត់';
+$ec_lang['lpn_menu_help']='ជំនួយ';
+$ec_lang['lpn_help_walkthroughs']='មគ្គុទ្ទេសក៍';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,17 @@ $ec_lang['lpn_labels_decimals_tip']='ចំនួនខ្ទង់ទសភា�
 $ec_lang['lpn_labels_mark_extrema']='សម្គាល់តម្លៃខ្ពស់បំផុត និងទាបបំផុត';
 $ec_lang['lpn_field_id']='លេខសម្គាល់';
 $ec_lang['lpn_backdrop_menu']='រូបភាពផ្ទៃខាងក្រោយ…';
-$ec_lang['lpn_backdrop_add']='បន្ថែមរូបភាព';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='កំណត់មាត្រដ្ឋានរូបភាព';
-$ec_lang['lpn_backdrop_position']='ផ្លាស់ទីរូបភាព';
-$ec_lang['lpn_backdrop_remove']='លុបរូបភាព';
+$ec_lang['lpn_backdrop_add']='បន្ថែម';
+// Bare verbs (Add/Move/Remove/Scale...), not "...image": the menu heading lpn_backdrop_menu
+// ("Background image...") already carries the object, so repeating "image" on every command
+// reads as an oversight, not as clarity.
+$ec_lang['lpn_backdrop_scale']='កំណត់មាត្រដ្ឋានដោយចុចចំណុច';
+$ec_lang['lpn_backdrop_scale_entry']='កំណត់មាត្រដ្ឋានតាមឯកសារកូអរដោនេផែនទី ឬតាមទំហំភីកសែលមួយលើផែនទី';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='បញ្ចូលទំហំភីកសែលមួយលើផែនទី ឬបិទភ្ជាប់មាតិកាពេញលេញនៃឯកសារកូអរដោនេផែនទីសម្រាប់រូបភាព';
+$ec_lang['lpn_backdrop_scale_entry_bad']='វាយបញ្ចូលលេខមួយសម្រាប់ទំហំភីកសែលមួយលើផែនទី ឬបិទភ្ជាប់ទាំងប្រាំមួយបន្ទាត់នៃឯកសារកូអរដោនេផែនទី។';
+$ec_lang['lpn_backdrop_wld_bad']='ឯកសារកូអរដោនេផែនទីនេះបង្វិល ត្រឡប់ ឬលាតសន្ធឹងរូបភាពមិនស្មើគ្នា។ ផែនទីអាចផ្លាស់ទី និងប្តូរទំហំរូបភាពដោយកម្រិតដូចគ្នាទាំងពីរទិសប៉ុណ្ណោះ ដូច្នេះឯកសារនេះមិនត្រូវបានប្រើទេ។';
+$ec_lang['lpn_backdrop_position']='ផ្លាស់ទី';
+$ec_lang['lpn_backdrop_remove']='លុប';
 $ec_lang['lpn_backdrop_remove_confirm']='លុបរូបភាពផ្ទៃខាងក្រោយមែនទេ?';
 $ec_lang['lpn_backdrop_scale_prompt1']='ចុចពីរចំណុចលើរូបភាពផ្ទៃខាងក្រោយ ដូចជាចុងទាំងពីរនៃរបារមាត្រដ្ឋាន។ បន្ទាប់មកវាយចម្ងាយពិតប្រាកដរវាងចំណុចទាំងពីរ។';
 $ec_lang['lpn_backdrop_scale_prompt2']='ចម្ងាយពិតប្រាកដរវាងចំណុចទាំងពីរ';

@@ -123,6 +123,78 @@
             ],
             "disposition": "dismissed",
             "resolution": "No English change -- Tom wrote these four himself and the ROADMAP exempts them from Wave 0. Recorded here because the ambiguity is real and the fix already exists in the channel that should carry it: $ec_lang_syn['consent_decline'] already reads 'Refuse (decline, deny) this and any later ask; do not ask (question) me again', which states the temporal reading explicitly. Verified present before dismissing rather than assumed. The resync prompts quote it."
+        },
+        {
+            "key": "world file",
+            "source": "translator",
+            "lang": "(14 languages: am, bn, cs, de, fa, he, hi, hr, km, my, ps, ro, sr, sw, tr, ur, zh)",
+            "complaint": "The single loudest signal of the sprint: FOURTEEN agents independently reported they could not verify an established term for 'world file' in their language and were coining or guessing. They split three ways -- descriptive georeferencing phrase, the English term kept, or phonetic transliteration -- and several asked for native review before their choice is treated as standard.",
+            "readings": [],
+            "disposition": "glossary",
+            "resolution": "All 26 choices written into glossary.json's 'world file' entry, with the three-way split named and an explicit warning that they are PROPOSALS, not verified standards. That is the honest disposition: a 14-of-26 unverifiable rate is a fact about the concept, not a fault in the translations, and recording it stops the next sprint re-deriving 26 answers from scratch. Not escalated to Tom because there is no decision for him to make -- native GIS review in fourteen languages is not something this project can schedule, and pretending it is queued would be the 'awaiting native review' pipe dream CLAUDE.md forbids. RESOLVED FURTHER, same day: Tom supplied a substitutable synonym phrase for $ec_lang_syn -- 'World (Map Coordinates or Georeference) File for the image' -- now carried on all four keys that use the term, alongside the gloss pointer. This answers the fourteen agents directly: a translator who cannot find an attested term no longer has to guess what 'world' means, because the label now offers 'map coordinates' and 'georeference' as substitutable readings. It is the cheapest possible fix and it arrived from the human, not from the tooling."
+        },
+        {
+            "key": "lpn_backdrop_scale",
+            "source": "translator",
+            "lang": "(9 languages: cs, es, fa, fr, id, it, km, my, sr, sw, tr, ur, zh)",
+            "complaint": "'Scale by picking' is NOT a bare verb, unlike its three siblings Add/Move/Remove, and nearly every agent stopped on it. Several asked whether they had misread the bare-verb instruction; several kept the qualifier anyway and said so; one (it) noted a bare Italian 'Scala' would collide with the noun for staircase.",
+            "readings": [],
+            "disposition": "dismissed",
+            "resolution": "Deliberate, and every agent that kept the qualifier was right. The two scale commands sit adjacent in the same menu -- 'by picking' versus 'by world file or by the size of one pixel on the map' -- so the method IS the distinguishing content and a bare verb would make the pair indistinguishable. Not a defect and not an oversight; the asymmetry with Add/Move/Remove is the price of that distinction. Recorded here so a future audit does not 'fix' it into a bare verb and destroy the contrast, which is exactly what the sw and km agents warned about."
+        },
+        {
+            "key": "lpn_backdrop_scale_entry",
+            "source": "translator",
+            "lang": "(4 languages: bg, pt, uk, zh)",
+            "complaint": "Tagged 'layout: nav item' (i.e. keep it short) but is a full clause naming two alternative methods. pt proposed shortening the ENGLISH source so every language gets a shorter label for free; bg, uk and zh each offered a trimmed version of their own and flagged menu-width risk.",
+            "readings": [],
+            "disposition": "dismissed",
+            "resolution": "The premise is out of date, and that is my error in the brief rather than theirs. Task 276 replaced this control's <select> with a menu BUTTON, so a row label no longer sets the collapsed width -- length here costs nothing, which is precisely why the longer unambiguous wording was affordable in Wave 0. Tom ruled on this exact string on 2026-08-13. ACTION TAKEN: the 'layout: nav item' tag is wrong for this key and misled four agents; it should be dropped from $ec_lang_syn['lpn_backdrop_scale_entry'], which needs Tom's permission and is proposed to him at sprint close rather than done silently."
+        },
+        {
+            "key": "(process) $ec_lang_syn",
+            "source": "translator",
+            "lang": "(de, id, sw wrote them; es escalated instead)",
+            "complaint": "My agent brief listed the payload's key_syn field ambiguously enough that three agents read it as an instruction to WRITE $ec_lang_syn entries into their own language file. de, id and sw each added three. The es agent hit the same reading, recognised the CLAUDE.md prohibition, reverted, and escalated the question instead.",
+            "readings": [],
+            "disposition": "dismissed",
+            "resolution": "Not an English-source defect -- a defect in my prompt, and the es agent's escalation is the channel working exactly as designed. All nine leaked lines removed and all 26 files verified back to their baseline syn counts before commit. THE FIX FOR NEXT TIME IS ONE SENTENCE IN THE BRIEF: 'key_syn is guidance for HOW to translate; never write $ec_lang_syn into a target file -- it exists only in lang.ec.en.php.' Worth noting the shape of this: three of twenty-six agents independently misread the same line, so it was the brief, not the agents."
+        },
+        {
+            "key": "consent_decline",
+            "source": "translator",
+            "lang": "(all 26)",
+            "complaint": "Every single language found the same defect independently: the shipped translation was a bare 'Refuse' carrying no temporal sense, while its sibling consent_accept_all already said 'always'. The two buttons were therefore not parallel and 'all' was recoverable only as a categorical reading.",
+            "readings": [],
+            "disposition": "dismissed",
+            "resolution": "No English change -- the English was already right; the translations were stale, which is what the ROLE CHANGE flag existed to catch. All 26 now carry a temporal marker and read as an obvious pair (de 'Immer ablehnen', fr 'Toujours refuser', zh '拒绝，以后不再询问'). Twenty-six independent agents converging on one repair is the strongest available evidence that detect_english_drift.php's new role-change detector earns its keep."
+        },
+        {
+            "key": "consent_decline",
+            "source": "translator",
+            "lang": "uk",
+            "complaint": "Noted a real asymmetry in the English: accept has two buttons ('Allow this' / 'Allow all') but refuse has only one, so 'Refuse all' has no 'Refuse this' counterpart to contrast against and its 'all' must be inferred from the accept pair rather than from its own sibling.",
+            "readings": [],
+            "disposition": "dismissed",
+            "resolution": "Correct observation, deliberate design. A one-time refusal is meaningless here: there is nothing to store, so 'refuse this once' and 'refuse always' would do the same thing on this visit and differ only in whether the visitor is asked again -- which is what the single button already means. Flagged forward: if a 'Refuse this' is ever added, all 26 of these strings need re-reading."
+        },
+        {
+            "key": "lpn_backdrop_wld_bad",
+            "source": "translator",
+            "lang": "hi",
+            "complaint": "POST-SPRINT QA DEFECT, not a translator report. Hindi shipped 'विश्व फ़ाइल' for world file, where विश्व is the ordinary word for world/universe -- the planet calque the glossary avoid list forbids in its first entry.",
+            "readings": [],
+            "disposition": "glossary",
+            "resolution": "Fixed in QA to 'भू-संदर्भ फ़ाइल' (geo-reference file) across all four hi keys, matching what ur, fa, fr and es chose independently. One failure in 26 for a guard that was seeded the same day it was tested. Worth recording WHY it got through: hi is one of the languages with a documented transliteration-risk history, and the avoid list warned against the planet sense in English prose -- an agent reaching for the natural Hindi word for 'world' is not obviously transliterating or obviously calquing, which is the gap. No mechanical check can catch it; reading the shipped values across all 26 side by side is what caught it, and that comparison should stay in the QA routine."
+        },
+        {
+            "key": "(observation) menu command form",
+            "source": "translator",
+            "lang": "ro",
+            "complaint": "Reported that lang.ec.ro.php is internally inconsistent about menu command style, mixing imperative ('Salvează tot') with noun forms ('Deschidere', 'Salvare', 'Ștergere rețea'), and had to pick one for the four backdrop verbs.",
+            "readings": [],
+            "disposition": "dismissed",
+            "resolution": "Out of scope for this sprint and correctly reported rather than silently resolved. The agent chose the noun form for parallelism with the adjacent 'Ștergere rețea', which is the right local call. A full-file style consistency pass for ro is a separate piece of work; noted here so it is not lost, not opened as a task, because nobody has asked for it."
         }
     ]
 }

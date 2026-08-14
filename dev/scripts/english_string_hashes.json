@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-08-09",
-    "count": 854,
+    "count": 859,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -127,6 +127,74 @@
                 "lpn_settings_engine_epanet_tip"
             ],
             "reason": "Tom simplified 'EPANET's own solver' to 'the EPANET solver' (less idiomatic, and it removes the modifier that 16 languages had rendered as 'original'). All 16 resynced by targeted 1-key agents; the other 10 never carried a modifier."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "consent_accept"
+            ],
+            "reason": "Task 297 sprint: resynced in all 26 languages 2026-08-13; consent_decline and the three backdrop bare verbs were the role changes, all 26 verified by reading the shipped values side by side."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "consent_accept_all"
+            ],
+            "reason": "Task 297 sprint: resynced in all 26 languages 2026-08-13; consent_decline and the three backdrop bare verbs were the role changes, all 26 verified by reading the shipped values side by side."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "consent_body"
+            ],
+            "reason": "Task 297 sprint: resynced in all 26 languages 2026-08-13; consent_decline and the three backdrop bare verbs were the role changes, all 26 verified by reading the shipped values side by side."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "consent_decline"
+            ],
+            "reason": "Task 297 sprint: resynced in all 26 languages 2026-08-13; consent_decline and the three backdrop bare verbs were the role changes, all 26 verified by reading the shipped values side by side."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_backdrop_add"
+            ],
+            "reason": "Task 297 sprint: resynced in all 26 languages 2026-08-13; consent_decline and the three backdrop bare verbs were the role changes, all 26 verified by reading the shipped values side by side."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_backdrop_position"
+            ],
+            "reason": "Task 297 sprint: resynced in all 26 languages 2026-08-13; consent_decline and the three backdrop bare verbs were the role changes, all 26 verified by reading the shipped values side by side."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_backdrop_remove"
+            ],
+            "reason": "Task 297 sprint: resynced in all 26 languages 2026-08-13; consent_decline and the three backdrop bare verbs were the role changes, all 26 verified by reading the shipped values side by side."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_backdrop_scale"
+            ],
+            "reason": "Task 297 sprint: resynced in all 26 languages 2026-08-13; consent_decline and the three backdrop bare verbs were the role changes, all 26 verified by reading the shipped values side by side."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_backdrop_scale_entry",
+                "lpn_backdrop_scale_entry_bad",
+                "lpn_backdrop_scale_entry_prompt",
+                "lpn_backdrop_wld_bad",
+                "lpn_help_walkthroughs",
+                "lpn_menu_help"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         }
     ],
     "hashes": {
@@ -198,12 +266,12 @@
         "calc_set_units": "7d540cbd217557683ae11dbdc0e7ba2a25723fc9",
         "calc_units_si": "2cd845399ebc86aad1fd9e1e6bfa6aa61179694a",
         "calc_units_us": "aa3093554472fd113135bed5b63e12f84c2e9fe8",
-        "consent_accept": "d70660482fc37c9e84464f4c9e81bec47fd2b05d",
-        "consent_accept_all": "821d1f7909a5146fa98fd5228675c49e64c6e60b",
-        "consent_body": "cc63ce4d5560f9bb512da5731b34e783602e22dc",
+        "consent_accept": "a3dbf7dfe2395afe78e8d13d23fd35e6f495284c",
+        "consent_accept_all": "a1632610ee60f8649cb3b39c50ab635c4a5e130f",
+        "consent_body": "b7b245c45701833cc2307d2d45dccb0c2d8f63a7",
         "consent_current_denied": "4f4019a7eed9cfda0702532cf68f7eb715bbc1aa",
         "consent_current_granted": "a70c7b65ebc0d04276f74b1a0432d7de44adccd2",
-        "consent_decline": "3eb80c1e8645ea1b0f5251cf40506b3e94906905",
+        "consent_decline": "7139480f1e084b9e5cc9cfa9044c6831f74b24f1",
         "consent_region_label": "bf5a6eb3a4bb648f4f732c3533cb4991cc599900",
         "consent_settings_link": "9e0cba87adec3208cfb83ceb40225bab61ab634d",
         "contactSendMessage": "0f175d5b1fca6693ed65ff5370e26b300120c394",
@@ -265,9 +333,9 @@
         "dw_reynolds_number": "358f207b83fde6f0c87c401efaf67522f85492f0",
         "dw_roughness": "58e6b3a414a1e090dfc6029add0f3555ccba127f",
         "dw_roughness_tip": "598bcce6a2110428e7692b3b2b9602170fdbb0e7",
-        "ec_name_tip": "5a3db208f87a4a1e135a97821c995b88d918778a",
         "ec_name_label": "895f78c6584b1d407bda035450b4918ebb24dbcf",
         "ec_name_placeholder": "709a23220f2c3d64d1e1d6d18c4d5280f8d82fca",
+        "ec_name_tip": "5a3db208f87a4a1e135a97821c995b88d918778a",
         "ec_related_calcs": "7d084a2b496ab7da526088a6854cfb3f451ba5f3",
         "hw_elev_down": "87b01fadea6f67b1c960c9ff6ec34d1dbd46b85b",
         "hw_elev_up": "ab6fbe66bdfc831469c19841077236e930002bf8",
@@ -286,8 +354,8 @@
         "hw_pressure_ok_short": "2856111291f13f9709d52f9a1de6cc1b6057fad1",
         "hw_pressure_up": "fe561255ebbafbb3490f79eee4df2121289e54b5",
         "hw_roughness": "fe40bd3c08bdcbaf1e87ee5a0afc0bbbdc2b49bc",
-        "index_meta_desc_plain": "fe584d8b0460f83eb75a7f2d62bd8bcdd8b7ae9b",
         "index_main_title": "95e621bf336e91af501cf665664bce5ac80bfa7f",
+        "index_meta_desc_plain": "fe584d8b0460f83eb75a7f2d62bd8bcdd8b7ae9b",
         "install_android_heading": "63c9ebffb0a79b871ceda308759fdceb854356e8",
         "install_android_steps_html": "b97e6fb6446a60b46ff0a56a119383dd79767769",
         "install_cached_body": "8b4fb8b6e695df14b7105cd8a75aeee446ec4c12",
@@ -369,22 +437,26 @@
         "lpn_ago_minutes": "5bac86d4ed544f09d349c91c624aa7241b3b56d4",
         "lpn_ago_seconds": "c6619272c6c3cf26a6256ccc0a1bc81015d52ff0",
         "lpn_ago_unknown": "e5d8e78c934822133d687f84c0ba00f97fa6a57f",
-        "lpn_backdrop_add": "5375634e24c9546cbfc6f564d68908236dee6cc7",
+        "lpn_backdrop_add": "61cc55aa0453184734c3fa0b621eda6fa874bd83",
         "lpn_backdrop_continue": "2e02623966f9391facf6eaefc8b079ed5b630bee",
         "lpn_backdrop_coords_prompt": "37915e511dc4d903a117be2a3bf169f6397ec425",
         "lpn_backdrop_menu": "e796ad9a8e64e35a6ba906b3a5483eef5775fb11",
-        "lpn_backdrop_position": "a97c8332aa7fd0f58ad981ffb2d1ccf093d87072",
+        "lpn_backdrop_position": "76cdb950721642b6b8596d36d5a39f7705028b99",
         "lpn_backdrop_position_prompt1": "48951b5874c051c3fbb1d1e65747b206e4ecddbb",
         "lpn_backdrop_position_prompt2": "85e9e19b06c69c72537cbc74221f52b2ecd146b5",
-        "lpn_backdrop_remove": "5f94b03c2e6a8ff4713b2a3e8d25479e558fba12",
+        "lpn_backdrop_remove": "e963907dac5cd5c017869b4c96c18021c9bd058b",
         "lpn_backdrop_remove_confirm": "430ccd8092617d5eb15de9ec5253502f70cd6152",
-        "lpn_backdrop_scale": "e83762ff03df196caa090bd8964b16efa2db8dea",
+        "lpn_backdrop_scale": "f30574d5e84907b59a1962914e53acba9f836c3f",
+        "lpn_backdrop_scale_entry": "6b667fd86f3e76f193f1462d0b5356e31d690f7b",
+        "lpn_backdrop_scale_entry_bad": "87b061c13ddd15ae3d2204745e1bd7372584e61d",
+        "lpn_backdrop_scale_entry_prompt": "411e51112b1c67a84ed3640a41ce12441e1d5f04",
         "lpn_backdrop_scale_prompt1": "90111f34b5f32fe13ab585e49f3751b5647ab971",
         "lpn_backdrop_scale_prompt2": "97a9e45b8933ffa5f4e888a2e0b5e432b84f9451",
         "lpn_backdrop_target_coords": "9590e6992a1788b75675cca3daea72b26b805c9a",
         "lpn_backdrop_target_free": "1ec481ee97b92a18a0be03bea893729d88a17f44",
         "lpn_backdrop_target_label": "594fbe0875339c1591a93e0f722abd906fdc1a55",
         "lpn_backdrop_target_node": "32d94d48baeb48749abc6e461ec1568849d96888",
+        "lpn_backdrop_wld_bad": "529372c670e9e66a1f223cb8b7529c9d6f8b7ae3",
         "lpn_cancel": "77dfd2135f4db726c47299bb55be26f7f4525a46",
         "lpn_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
         "lpn_close_browser_confirm": "62f3b41b1e8e979db82162dc2f37c8e55bc65b80",
@@ -449,6 +521,7 @@
         "lpn_file_type_desc": "803ed44f8e2e9ad6dec8241b8b5073137485d8be",
         "lpn_file_upload_explain": "7ef942147ae13399f21e6bb3aefc115f91439103",
         "lpn_file_write_failed": "b708bb7732fdfad2150d432d53c22872d8666e87",
+        "lpn_help_walkthroughs": "0b78ac5827cd7cc6424e5b9b334af5c2d003d310",
         "lpn_id_invalid": "8a5f2c615619185cac2ae5645dba3a822172202b",
         "lpn_id_taken": "afa411f11b93f86d3e5593aef3404abe3f194817",
         "lpn_import_bad_file": "368d3659c55f93e76105b4c486e32f47fc930508",
@@ -503,6 +576,7 @@
         "lpn_main_menu": "19e15729a6d4e367d574cdb2c598b11c8d6a5e05",
         "lpn_main_title": "240a7028b367c659717c984b8588c008043744fc",
         "lpn_menu_edit": "5301648dcf6b53cefc9ed52999aaa92d4603cae0",
+        "lpn_menu_help": "c47ae15370cfe1ed2781eedc1dc2547d12d9e972",
         "lpn_menu_insert": "95802daab3a23990338179f72248350c1434cf39",
         "lpn_menu_settings": "c7f73bb54d928922c3838bb789ee9fb8a5b1eb37",
         "lpn_menu_view": "69bd4ef9fbd0894a22759c3766b859defbdedbc8",
@@ -638,9 +712,9 @@
         "lpn_units_length": "d28e743b3380c990918f0d2ea90ad6e8e7123967",
         "lpn_units_pressure": "d1222178efa7946ad8940a0b57a0d3cb3856180c",
         "lpn_units_velocity": "d80a548eda6c0e81c84db1aa2c1099cc803abddd",
+        "lpn_v2_restore_confirm": "733ec25f6146d8d81f7d88bbe332600bdb967cc4",
         "lpn_v2_restore_never": "f3e5ca94b1f392f437b6fc85bf3f03c306c23e5d",
         "lpn_v2_restore_no": "1f7f368c6d34c41f570dfe461879617ad1c695af",
-        "lpn_v2_restore_confirm": "733ec25f6146d8d81f7d88bbe332600bdb967cc4",
         "lpn_v2_restore_yes": "3f15ce79532d7a88716daffe2b5fa5245abe9c20",
         "lpn_view_units": "12748281e0f02357f2a2f65c1c6a7d01ee122506",
         "menu_brand": "bf8b00231568173bfc88835a77624be526d4dd96",
@@ -845,9 +919,9 @@
         "or_twe": "ca79c5240748bb0fe7f9e77010e926fc3de069d4",
         "or_width": "23f8c74f142bec4e4e96bd0ebbe2649323d3e572",
         "points_data_copy": "af74f7c5362aaee985bf8cda3dd75fc80751ce51",
+        "points_data_heading": "23f6f266b7c344a4bf4031981e3ecd514d991c07",
         "points_data_note": "80aa3d341546a15d2aa8e69687993b287c0fe202",
         "points_data_paste": "db2483000d154ca9fd74d41fc4e063a4b28faa87",
-        "points_data_heading": "23f6f266b7c344a4bf4031981e3ecd514d991c07",
         "privacy_link": "ec7c829b39081dee8e886f1ca577b3fb1d099f64",
         "rc_D50": "55cb18d181974f6cd1a0bef46cbbbed74fe00af6",
         "rc_Hp": "30107365d68bacf4e442f774565307aaafa4979e",
@@ -1525,16 +1599,16 @@
             "words": 27,
             "ends_sentence": true
         },
-        "ec_name_tip": {
-            "words": 12,
-            "ends_sentence": false
-        },
         "ec_name_label": {
             "words": 3,
             "ends_sentence": true
         },
         "ec_name_placeholder": {
             "words": 1,
+            "ends_sentence": false
+        },
+        "ec_name_tip": {
+            "words": 12,
             "ends_sentence": false
         },
         "ec_related_calcs": {
@@ -1609,13 +1683,13 @@
             "words": 3,
             "ends_sentence": false
         },
-        "index_meta_desc_plain": {
-            "words": 23,
-            "ends_sentence": true
-        },
         "index_main_title": {
             "words": 4,
             "ends_sentence": false
+        },
+        "index_meta_desc_plain": {
+            "words": 23,
+            "ends_sentence": true
         },
         "install_android_heading": {
             "words": 2,
@@ -1977,6 +2051,18 @@
             "words": 3,
             "ends_sentence": false
         },
+        "lpn_backdrop_scale_entry": {
+            "words": 14,
+            "ends_sentence": false
+        },
+        "lpn_backdrop_scale_entry_bad": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_backdrop_scale_entry_prompt": {
+            "words": 21,
+            "ends_sentence": false
+        },
         "lpn_backdrop_scale_prompt1": {
             "words": 23,
             "ends_sentence": true
@@ -2000,6 +2086,10 @@
         "lpn_backdrop_target_node": {
             "words": 2,
             "ends_sentence": false
+        },
+        "lpn_backdrop_wld_bad": {
+            "words": 33,
+            "ends_sentence": true
         },
         "lpn_cancel": {
             "words": 1,
@@ -2249,6 +2339,10 @@
             "words": 27,
             "ends_sentence": true
         },
+        "lpn_help_walkthroughs": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_id_invalid": {
             "words": 10,
             "ends_sentence": true
@@ -2450,6 +2544,10 @@
             "ends_sentence": true
         },
         "lpn_menu_edit": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_menu_help": {
             "words": 1,
             "ends_sentence": false
         },
@@ -2985,6 +3083,10 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_v2_restore_confirm": {
+            "words": 60,
+            "ends_sentence": true
+        },
         "lpn_v2_restore_never": {
             "words": 4,
             "ends_sentence": true
@@ -2992,10 +3094,6 @@
         "lpn_v2_restore_no": {
             "words": 10,
             "ends_sentence": false
-        },
-        "lpn_v2_restore_confirm": {
-            "words": 60,
-            "ends_sentence": true
         },
         "lpn_v2_restore_yes": {
             "words": 1,
@@ -3813,16 +3911,16 @@
             "words": 1,
             "ends_sentence": false
         },
+        "points_data_heading": {
+            "words": 5,
+            "ends_sentence": false
+        },
         "points_data_note": {
             "words": 6,
             "ends_sentence": false
         },
         "points_data_paste": {
             "words": 1,
-            "ends_sentence": false
-        },
-        "points_data_heading": {
-            "words": 5,
             "ends_sentence": false
         },
         "privacy_link": {

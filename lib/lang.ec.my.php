@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='မှတ်တမ်းတင်ရာ
 $ec_lang['consent_body']='ဤဘရောက်ဇာပရိုဖိုင်၏ သိုလှောင်ခန်းထဲတွင် စာမျက်နှာတစ်ခုလျှင် ဂဏန်းတစ်လုံးစီ ထားရှိပြီး၊ ဤစာမျက်နှာသို့ အကြိမ်ကြိမ် ဝင်ရောက်ကြည့်ရှုမှုများကို ထပ်ခါထပ်ခါ မှတ်တမ်းမတင်စေရန် ခွင့်ပြုပါမည်လား။';
 $ec_lang['consent_accept']='ဤတောင်းဆိုချက်ကို လက်ခံမည်';
 $ec_lang['consent_accept_all']='အမြဲတမ်း လက်ခံမည်';
-$ec_lang['consent_decline']='ငြင်းပယ်မည်';
+$ec_lang['consent_decline']='အမြဲတမ်း ငြင်းပယ်မည်';
 $ec_lang['consent_current_granted']='သင်ခွင့်ပြုခဲ့ပါသည်။ ဤဘရောက်ဇာပရိုဖိုင်အတွက် မှတ်တမ်းတင်ခြင်းကို ကန့်သတ်ထားပါသည်။';
 $ec_lang['consent_current_denied']='သင်ငြင်းပယ်ခဲ့ပါသည်။ ဤဘရောက်ဇာပရိုဖိုင်အတွက် မှတ်တမ်းတင်ခြင်းကို ကန့်သတ်ရန် ဘာမျှ မသိမ်းဆည်းပါ။';
 $ec_lang['consent_region_label']='မှတ်တမ်းတင်ခြင်း ကန့်သတ်ရေးနှင့် ပတ်သက်၍ သင်၏ရွေးချယ်မှု။';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='ကြည့်ရှုရန်';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='ဆက်တင်များ';
+$ec_lang['lpn_menu_help']='အကူအညီ';
+$ec_lang['lpn_help_walkthroughs']='လမ်းညွှန်များ';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,16 @@ $ec_lang['lpn_labels_decimals_tip']='ဤအညွှန်းအတွက် ပ
 $ec_lang['lpn_labels_mark_extrema']='အမြင့်ဆုံးနှင့် အနိမ့်ဆုံး တန်ဖိုးများကို အမှတ်အသားပြုရန်';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='နောက်ခံပုံ…';
-$ec_lang['lpn_backdrop_add']='ပုံ ထည့်ရန်';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='ပုံအတိုင်းအတာ သတ်မှတ်ရန်';
-$ec_lang['lpn_backdrop_position']='ပုံ ရွှေ့ရန်';
-$ec_lang['lpn_backdrop_remove']='ပုံ ဖယ်ရှားရန်';
+$ec_lang['lpn_backdrop_add']='ထည့်ရန်';
+// BARE VERBS: the "Background image…" heading above them now carries the object, so the verb
+// alone acts on it (see the English source comment at this key for the full history).
+$ec_lang['lpn_backdrop_scale']='ရွေးချယ်၍ အတိုင်းအတာ သတ်မှတ်ရန်';
+$ec_lang['lpn_backdrop_scale_entry']='ပုံနေရာသတ်မှတ်ဖိုင် (သို့) မြေပုံပေါ်ရှိ ပစ်ဆယ်တစ်ခု၏ အရွယ်အစားဖြင့် အတိုင်းအတာ သတ်မှတ်ရန်';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='မြေပုံပေါ်ရှိ ပစ်ဆယ်တစ်ခု၏ အရွယ်အစားကို ရိုက်ထည့်ပါ၊ (သို့) ပုံအတွက် ပုံနေရာသတ်မှတ်ဖိုင်၏ အကြောင်းအရာအပြည့်အစုံကို ကူးထည့်ပါ';
+$ec_lang['lpn_backdrop_scale_entry_bad']='မြေပုံပေါ်ရှိ ပစ်ဆယ်တစ်ခု၏ အရွယ်အစားအတွက် ဂဏန်းတစ်လုံးကို ရိုက်ထည့်ပါ၊ (သို့) ပုံနေရာသတ်မှတ်ဖိုင်၏ လိုင်းခြောက်လုံးလုံးကို ကူးထည့်ပါ။';
+$ec_lang['lpn_backdrop_wld_bad']='ဤပုံနေရာသတ်မှတ်ဖိုင်သည် ပုံကို လှည့်စေခြင်း၊ ပြောင်းပြန်ထင်ဟပ်စေခြင်း (သို့) ဒေါင်လိုက်၊ အလျားလိုက် မတူညီစွာ ဆန့်တန်းစေခြင်းများ ပြုလုပ်ပါသည်။ မြေပုံသည် ပုံတစ်ခုကို ရွှေ့ခြင်းနှင့် လမ်းကြောင်းနှစ်ခုစလုံးတွင် အချိုးတူ အရွယ်အစားပြောင်းခြင်းကိုသာ ပြုလုပ်နိုင်သောကြောင့်၊ ဤဖိုင်ကို အသုံးမပြုခဲ့ပါ။';
+$ec_lang['lpn_backdrop_position']='ရွှေ့ရန်';
+$ec_lang['lpn_backdrop_remove']='ဖယ်ရှားရန်';
 $ec_lang['lpn_backdrop_remove_confirm']='နောက်ခံပုံကို ဖယ်ရှားမလား။';
 $ec_lang['lpn_backdrop_scale_prompt1']='အတိုင်းအတာတန်း၏ အစွန်းနှစ်ဖက်ကဲ့သို့သော အမှတ်နှစ်ခုကို နောက်ခံပုံပေါ်တွင် နှိပ်ပါ။ ထို့နောက် ၎င်းတို့အကြား အမှန်တကယ် အကွာအဝေးကို ရိုက်ထည့်ပါ။';
 $ec_lang['lpn_backdrop_scale_prompt2']='အမှတ်နှစ်ခုအကြား အမှန်တကယ် အကွာအဝေး';

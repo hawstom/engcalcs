@@ -72,7 +72,7 @@ $ec_lang['template_printable_subtitle']='可打印副标题';
 $ec_lang['consent_body']='是否允许我们在此浏览器保存一个数字，用于避免重复记录本页面的访问次数？';
 $ec_lang['consent_accept']='同意本次';
 $ec_lang['consent_accept_all']='同意，以后不再询问';
-$ec_lang['consent_decline']='拒绝';
+$ec_lang['consent_decline']='拒绝，以后不再询问';
 $ec_lang['consent_current_granted']='您已同意。我们据此限制本浏览器的访问记录次数。';
 $ec_lang['consent_current_denied']='您已拒绝。我们不保存任何内容，以限制本浏览器的访问记录次数。';
 $ec_lang['consent_region_label']='您关于限制访问记录的选择。';
@@ -698,6 +698,8 @@ $ec_lang['lpn_menu_view']='视图';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='设置';
+$ec_lang['lpn_menu_help']='帮助';
+$ec_lang['lpn_help_walkthroughs']='教程';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1019,14 +1021,16 @@ $ec_lang['lpn_labels_decimals_tip']='该标签显示的小数位数';
 $ec_lang['lpn_labels_mark_extrema']='标出最高值和最低值';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='背景图片…';
-$ec_lang['lpn_backdrop_add']='添加图片';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='设置图片比例';
-$ec_lang['lpn_backdrop_position']='移动图片';
-$ec_lang['lpn_backdrop_remove']='移除图片';
+$ec_lang['lpn_backdrop_add']='添加';
+// BARE VERBS: both doors now print a "Background image" heading above them, so the object no
+// longer needs naming in each row.
+$ec_lang['lpn_backdrop_scale']='选点设置比例';
+$ec_lang['lpn_backdrop_scale_entry']='按配准文件或地图上一个像素的大小设置比例';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='输入地图上一个像素的大小，或粘贴该图片配准文件的完整内容';
+$ec_lang['lpn_backdrop_scale_entry_bad']='请输入一个数字表示地图上一个像素的大小，或粘贴配准文件的全部六行内容。';
+$ec_lang['lpn_backdrop_wld_bad']='此配准文件会旋转、镜像或不均匀拉伸图片。地图只能平移图片并按相同比例整体缩放，因此未使用该文件。';
+$ec_lang['lpn_backdrop_position']='移动';
+$ec_lang['lpn_backdrop_remove']='移除';
 $ec_lang['lpn_backdrop_remove_confirm']='移除背景图片？';
 $ec_lang['lpn_backdrop_scale_prompt1']='在背景图片上点击两个点，例如比例尺的两端。然后输入这两点之间的实际距离。';
 $ec_lang['lpn_backdrop_scale_prompt2']='两点之间的实际距离';

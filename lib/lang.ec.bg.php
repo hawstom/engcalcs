@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='Подзаглавие за принт�
 $ec_lang['consent_body']='Можем ли да съхраняваме само по една цифра за страница в хранилището на този профил на браузъра, за да не записваме многократно посещенията му?';
 $ec_lang['consent_accept']='Приемам';
 $ec_lang['consent_accept_all']='Приемам винаги';
-$ec_lang['consent_decline']='Отказвам';
+$ec_lang['consent_decline']='Отказвам винаги';
 $ec_lang['consent_current_granted']='Разрешихте това. Ограничаваме записването за този профил на браузъра.';
 $ec_lang['consent_current_denied']='Отказахте това. Не съхраняваме нищо, за да ограничим записването за този профил на браузъра.';
 $ec_lang['consent_region_label']='Вашият избор относно ограничаването на записването.';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='Изглед';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Настройки';
+$ec_lang['lpn_menu_help']='Помощ';
+$ec_lang['lpn_help_walkthroughs']='Ръководства';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,16 @@ $ec_lang['lpn_labels_decimals_tip']='Брой десетични знаци, п�
 $ec_lang['lpn_labels_mark_extrema']='Отбележи най-високата и най-ниската стойност';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Фоново изображение…';
-$ec_lang['lpn_backdrop_add']='Добави изображение';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='Задай мащаб на изображението';
-$ec_lang['lpn_backdrop_position']='Премести изображението';
-$ec_lang['lpn_backdrop_remove']='Премахни изображението';
+$ec_lang['lpn_backdrop_add']='Добави';
+// Bare verbs (English changed 2026-08-13): the "Фоново изображение…" heading directly above these
+// now carries the object, so the object is not repeated in each command.
+$ec_lang['lpn_backdrop_scale']='Мащабирай чрез посочване';
+$ec_lang['lpn_backdrop_scale_entry']='Мащаб по файл за геопривързване или размер на пиксел';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Въведете размера на един пиксел на картата или поставете цялото съдържание на файла за геопривързване на изображението';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Въведете едно число за размера на един пиксел на картата или поставете всичките шест реда на файл за геопривързване.';
+$ec_lang['lpn_backdrop_wld_bad']='Този файл за геопривързване завърта, огледално обръща или неравномерно разтяга изображението. Картата може само да премества изображение и да го мащабира еднакво и в двете посоки, затова файлът не беше използван.';
+$ec_lang['lpn_backdrop_position']='Премести';
+$ec_lang['lpn_backdrop_remove']='Премахни';
 $ec_lang['lpn_backdrop_remove_confirm']='Да се премахне ли фоновото изображение?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Щракнете върху две точки от фоновото изображение, например двата края на графичен мащаб. После въведете реалното разстояние между тях.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Реално разстояние между двете точки';

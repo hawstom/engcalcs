@@ -72,7 +72,7 @@ $ec_lang['template_printable_subtitle']='Tisknutelný podtitul';
 $ec_lang['consent_body']='Smíme si v úložišti tohoto profilu prohlížeče uchovávat jednu číslici na stránku, abychom zabránili opakovanému zaznamenávání jejích návštěv?';
 $ec_lang['consent_accept']='Přijmout tentokrát';
 $ec_lang['consent_accept_all']='Přijmout natrvalo';
-$ec_lang['consent_decline']='Odmítnout';
+$ec_lang['consent_decline']='Odmítnout natrvalo';
 $ec_lang['consent_current_granted']='Povolili jste to. Omezujeme zaznamenávání pro tento profil prohlížeče.';
 $ec_lang['consent_current_denied']='Odmítli jste to. Neukládáme nic, co by omezovalo zaznamenávání pro tento profil prohlížeče.';
 $ec_lang['consent_region_label']='Vaše volba ohledně omezení zaznamenávání.';
@@ -698,6 +698,8 @@ $ec_lang['lpn_menu_view']='Zobrazení';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Nastavení';
+$ec_lang['lpn_menu_help']='Nápověda';
+$ec_lang['lpn_help_walkthroughs']='Návody';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1019,14 +1021,16 @@ $ec_lang['lpn_labels_decimals_tip']='Počet desetinných míst zobrazených u to
 $ec_lang['lpn_labels_mark_extrema']='Označit nejvyšší a nejnižší hodnoty';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Podkladový obrázek…';
-$ec_lang['lpn_backdrop_add']='Přidat obrázek';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='Nastavit měřítko obrázku';
-$ec_lang['lpn_backdrop_position']='Přesunout obrázek';
-$ec_lang['lpn_backdrop_remove']='Odebrat obrázek';
+$ec_lang['lpn_backdrop_add']='Přidat';
+// BARE VERBS: both doors now print a "Podkladový obrázek" heading above them, so the object need
+// not be repeated in each command.
+$ec_lang['lpn_backdrop_scale']='Nastavit měřítko';
+$ec_lang['lpn_backdrop_scale_entry']='Měřítko podle world file nebo podle velikosti jednoho pixelu na mapě';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Zadejte velikost jednoho pixelu na mapě, nebo vložte celý obsah world file pro tento obrázek';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Zadejte jedno číslo pro velikost jednoho pixelu na mapě, nebo vložte všech šest řádků world file.';
+$ec_lang['lpn_backdrop_wld_bad']='Tento world file otáčí, zrcadlí nebo nerovnoměrně roztahuje obrázek. Mapa může obrázek pouze přesunout a zvětšit či zmenšit stejně v obou směrech, proto nebyl soubor použit.';
+$ec_lang['lpn_backdrop_position']='Přesunout';
+$ec_lang['lpn_backdrop_remove']='Odebrat';
 $ec_lang['lpn_backdrop_remove_confirm']='Odebrat podkladový obrázek?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Klikněte na dva body na podkladovém obrázku, například na oba konce měřítkové úsečky. Poté zadejte skutečnou vzdálenost mezi nimi.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Skutečná vzdálenost mezi oběma body';

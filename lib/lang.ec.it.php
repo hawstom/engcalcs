@@ -72,7 +72,7 @@ $ec_lang['template_printable_subtitle']='Sottotitolo stampabile';
 $ec_lang['consent_body']='Possiamo conservare una sola cifra per pagina nella memoria di questo profilo del browser, per evitare di registrare ripetutamente le sue visite?';
 $ec_lang['consent_accept']='Accetta';
 $ec_lang['consent_accept_all']='Accetta sempre';
-$ec_lang['consent_decline']='Rifiuta';
+$ec_lang['consent_decline']='Rifiuta sempre';
 $ec_lang['consent_current_granted']='Hai acconsentito. Limitiamo la registrazione per questo profilo del browser.';
 $ec_lang['consent_current_denied']='Hai rifiutato. Non conserviamo nulla per limitare la registrazione per questo profilo del browser.';
 $ec_lang['consent_region_label']='La tua scelta sulla limitazione della registrazione.';
@@ -698,6 +698,8 @@ $ec_lang['lpn_menu_view']='Visualizza';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Impostazioni';
+$ec_lang['lpn_menu_help']='Guida';
+$ec_lang['lpn_help_walkthroughs']='Esercitazioni';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1019,14 +1021,16 @@ $ec_lang['lpn_labels_decimals_tip']='Cifre decimali mostrate per questa etichett
 $ec_lang['lpn_labels_mark_extrema']='Segna i valori più alti e più bassi';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Immagine di sfondo…';
-$ec_lang['lpn_backdrop_add']='Aggiungi immagine';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='Imposta la scala dell\'immagine';
-$ec_lang['lpn_backdrop_position']='Sposta immagine';
-$ec_lang['lpn_backdrop_remove']='Rimuovi immagine';
+$ec_lang['lpn_backdrop_add']='Aggiungi';
+// Bare verbs (2026-08-13): the heading "Immagine di sfondo…" above these voci di menu porta già
+// l'oggetto, quindi ripeterlo qui sarebbe ridondante.
+$ec_lang['lpn_backdrop_scale']='Ridimensiona su due punti';
+$ec_lang['lpn_backdrop_scale_entry']='Ridimensiona con un file world o con la dimensione di un pixel sulla mappa';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Inserisci la dimensione di un pixel sulla mappa, oppure incolla il contenuto completo del file world dell\'immagine';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Digita un numero per la dimensione di un pixel sulla mappa, oppure incolla tutte e sei le righe di un file world.';
+$ec_lang['lpn_backdrop_wld_bad']='Questo file world ruota, specchia o deforma in modo non uniforme l\'immagine. La mappa può solo spostare un\'immagine e ridimensionarla della stessa quantità in entrambe le direzioni, quindi il file non è stato usato.';
+$ec_lang['lpn_backdrop_position']='Sposta';
+$ec_lang['lpn_backdrop_remove']='Rimuovi';
 $ec_lang['lpn_backdrop_remove_confirm']='Rimuovere l\'immagine di sfondo?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Fai clic su due punti dell\'immagine di sfondo, ad esempio i due estremi di una scala grafica. Poi digita la distanza reale tra loro.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Distanza reale tra i due punti';

@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='Subtítulo Imprimible';
 $ec_lang['consent_body']='¿Podemos guardar un solo dígito por página en el almacenamiento de este perfil de navegador para evitar registrar sus visitas repetidamente?';
 $ec_lang['consent_accept']='Aceptar';
 $ec_lang['consent_accept_all']='Aceptar siempre';
-$ec_lang['consent_decline']='Rechazar';
+$ec_lang['consent_decline']='Rechazar siempre';
 $ec_lang['consent_current_granted']='Usted permitió esto. Limitamos el registro para este perfil de navegador.';
 $ec_lang['consent_current_denied']='Usted rechazó esto. No guardamos nada para limitar el registro de este perfil de navegador.';
 $ec_lang['consent_region_label']='Su elección sobre limitar el registro.';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='Ver';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Configuración';
+$ec_lang['lpn_menu_help']='Ayuda';
+$ec_lang['lpn_help_walkthroughs']='Tutoriales';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,18 @@ $ec_lang['lpn_labels_decimals_tip']='Decimales mostrados para esta etiqueta';
 $ec_lang['lpn_labels_mark_extrema']='Marcar los valores más alto y más bajo';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Imagen de fondo...';
-$ec_lang['lpn_backdrop_add']='Agregar imagen';
+$ec_lang['lpn_backdrop_add']='Agregar';
 // "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
 // under the toolbar select's own "Background image..." heading and read as orphans in the Insert
 // menu, where nothing above them says what is being scaled. Naming the object costs one word and
 // works in both places.
-$ec_lang['lpn_backdrop_scale']='Definir escala de la imagen';
-$ec_lang['lpn_backdrop_position']='Mover imagen';
-$ec_lang['lpn_backdrop_remove']='Quitar imagen';
+$ec_lang['lpn_backdrop_scale']='Escalar por selección';
+$ec_lang['lpn_backdrop_scale_entry']='Escalar por archivo de georreferenciación o por el tamaño de un píxel en el mapa';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Ingrese el tamaño de un píxel en el mapa, o pegue el contenido completo del archivo de georreferenciación de la imagen';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Escriba un solo número para el tamaño de un píxel en el mapa, o pegue las seis líneas completas de un archivo de georreferenciación.';
+$ec_lang['lpn_backdrop_wld_bad']='Este archivo de georreferenciación rota, refleja o estira la imagen de forma desigual. El mapa solo puede mover una imagen y cambiar su tamaño en la misma proporción en ambas direcciones, por lo que el archivo no se utilizó.';
+$ec_lang['lpn_backdrop_position']='Mover';
+$ec_lang['lpn_backdrop_remove']='Quitar';
 $ec_lang['lpn_backdrop_remove_confirm']='¿Quitar la imagen de fondo?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Haga clic en dos puntos de la imagen de fondo, como los dos extremos de una escala gráfica. Luego escriba la distancia real entre ellos.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Distancia real entre los dos puntos';

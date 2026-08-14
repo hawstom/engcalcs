@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='زیرعنوان قابل چاپ';
 $ec_lang['consent_body']='آیا اجازه می‌دهید یک رقم به ازای هر صفحه در حافظه این مرورگر نگه داریم تا از ثبت مکرر بازدیدها جلوگیری شود؟';
 $ec_lang['consent_accept']='پذیرفتن همین درخواست';
 $ec_lang['consent_accept_all']='پذیرفتن همیشگی';
-$ec_lang['consent_decline']='رد کردن';
+$ec_lang['consent_decline']='رد همیشگی';
 $ec_lang['consent_current_granted']='شما این را پذیرفته‌اید. ثبت بازدید برای این مرورگر محدود می‌شود.';
 $ec_lang['consent_current_denied']='شما این را رد کرده‌اید. برای محدود کردن ثبت بازدید، چیزی ذخیره نمی‌کنیم.';
 $ec_lang['consent_region_label']='انتخاب شما درباره محدود کردن ثبت بازدید.';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='نما';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='تنظیمات';
+$ec_lang['lpn_menu_help']='راهنما';
+$ec_lang['lpn_help_walkthroughs']='راهنماهای گام‌به‌گام';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,18 @@ $ec_lang['lpn_labels_decimals_tip']='تعداد ارقام اعشار نشان�
 $ec_lang['lpn_labels_mark_extrema']='علامت‌گذاری بیشترین و کمترین مقدار';
 $ec_lang['lpn_field_id']='شناسه';
 $ec_lang['lpn_backdrop_menu']='تصویر پس‌زمینه…';
-$ec_lang['lpn_backdrop_add']='افزودن تصویر';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='تنظیم مقیاس تصویر';
-$ec_lang['lpn_backdrop_position']='جابه‌جایی تصویر';
-$ec_lang['lpn_backdrop_remove']='حذف تصویر';
+$ec_lang['lpn_backdrop_add']='افزودن';
+// Bare imperative-noun verbs (RESYNC 2026-08-13): the toolbar now prints "Background image…" as a
+// heading directly above these commands, so the object no longer needs repeating in each label.
+// The former "Scale image" / "Position image" naming (Tom, 2026-08-04) is superseded by that
+// heading change; matches the other bare-verb siblings (افزودن / جابه‌جایی / حذف).
+$ec_lang['lpn_backdrop_scale']='مقیاس‌گذاری با انتخاب';
+$ec_lang['lpn_backdrop_scale_entry']='مقیاس‌گذاری با فایل مرجع‌گذاری یا اندازه هر پیکسل روی نقشه';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='اندازه یک پیکسل روی نقشه را وارد کنید، یا کل محتوای فایل مرجع‌گذاری تصویر را اینجا جای‌گذاری کنید';
+$ec_lang['lpn_backdrop_scale_entry_bad']='یک عدد برای اندازه یک پیکسل روی نقشه تایپ کنید، یا هر شش خط یک فایل مرجع‌گذاری را جای‌گذاری کنید.';
+$ec_lang['lpn_backdrop_wld_bad']='این فایل مرجع‌گذاری، تصویر را می‌چرخاند، آینه می‌کند یا به‌طور نامتقارن می‌کشد. نقشه فقط می‌تواند تصویر را جابه‌جا کند و آن را به یک نسبت یکسان در هر دو جهت تغییر اندازه دهد، بنابراین این فایل استفاده نشد.';
+$ec_lang['lpn_backdrop_position']='جابه‌جایی';
+$ec_lang['lpn_backdrop_remove']='حذف';
 $ec_lang['lpn_backdrop_remove_confirm']='تصویر پس‌زمینه حذف شود؟';
 $ec_lang['lpn_backdrop_scale_prompt1']='دو نقطه را روی تصویر پس‌زمینه کلیک کنید، مانند دو سر یک مقیاس خط‌کشی. سپس فاصله واقعی میان آن‌ها را تایپ کنید.';
 $ec_lang['lpn_backdrop_scale_prompt2']='فاصله واقعی میان دو نقطه';

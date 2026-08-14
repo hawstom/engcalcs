@@ -72,7 +72,7 @@ $ec_lang['template_printable_subtitle']='Druckbarer Untertitel';
 $ec_lang['consent_body']='Dürfen wir eine einzelne Ziffer pro Seite im Speicher dieses Browserprofils behalten, um zu verhindern, dass wir dessen Besuche wiederholt protokollieren?';
 $ec_lang['consent_accept']='Diesmal annehmen';
 $ec_lang['consent_accept_all']='Immer annehmen';
-$ec_lang['consent_decline']='Ablehnen';
+$ec_lang['consent_decline']='Immer ablehnen';
 $ec_lang['consent_current_granted']='Sie haben dem zugestimmt. Wir schränken die Protokollierung für dieses Browserprofil ein.';
 $ec_lang['consent_current_denied']='Sie haben dies abgelehnt. Wir speichern nichts, um die Protokollierung für dieses Browserprofil einzuschränken.';
 $ec_lang['consent_region_label']='Ihre Wahl zur Einschränkung der Protokollierung.';
@@ -698,6 +698,8 @@ $ec_lang['lpn_menu_view']='Ansicht';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Einstellungen';
+$ec_lang['lpn_menu_help']='Hilfe';
+$ec_lang['lpn_help_walkthroughs']='Anleitungen';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1019,14 +1021,14 @@ $ec_lang['lpn_labels_decimals_tip']='Für diese Beschriftung angezeigte Dezimals
 $ec_lang['lpn_labels_mark_extrema']='Höchste und niedrigste Werte markieren';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Hintergrundbild…';
-$ec_lang['lpn_backdrop_add']='Bild hinzufügen';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='Bildmaßstab festlegen';
-$ec_lang['lpn_backdrop_position']='Bild verschieben';
-$ec_lang['lpn_backdrop_remove']='Bild entfernen';
+$ec_lang['lpn_backdrop_add']='Hinzufügen';
+$ec_lang['lpn_backdrop_scale']='Maßstab festlegen';
+$ec_lang['lpn_backdrop_scale_entry']='Maßstab per Worldfile oder Pixelgröße';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Geben Sie die Größe eines Pixels auf der Karte ein, oder fügen Sie den vollständigen Inhalt der Worldfile für das Bild ein';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Geben Sie eine einzige Zahl für die Größe eines Pixels auf der Karte ein, oder fügen Sie alle sechs Zeilen einer Worldfile ein.';
+$ec_lang['lpn_backdrop_wld_bad']='Diese Worldfile dreht, spiegelt oder verzerrt das Bild ungleichmäßig. Die Karte kann ein Bild nur verschieben und in beide Richtungen gleich stark skalieren, daher wurde die Datei nicht verwendet.';
+$ec_lang['lpn_backdrop_position']='Verschieben';
+$ec_lang['lpn_backdrop_remove']='Entfernen';
 $ec_lang['lpn_backdrop_remove_confirm']='Das Hintergrundbild entfernen?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Klicken Sie zwei Punkte auf dem Hintergrundbild an, etwa die beiden Enden eines Maßstabsbalkens. Geben Sie dann den wirklichen Abstand zwischen ihnen ein.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Wirklicher Abstand zwischen den beiden Punkten';

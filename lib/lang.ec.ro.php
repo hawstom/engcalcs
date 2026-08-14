@@ -68,10 +68,10 @@ $ec_lang['template_printable_subtitle']='Subtitlu tipărit';
 // prose, and they are translated into all 26 languages for one reason: consent that the visitor
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
-$ec_lang['consent_body']='Putem păstra o singură cifră per pagină în stocarea acestui profil de browser, pentru a evita înregistrarea repetată a vizitelor?';
-$ec_lang['consent_accept']='Accept acum';
-$ec_lang['consent_accept_all']='Accept mereu';
-$ec_lang['consent_decline']='Refuz';
+$ec_lang['consent_body']='Ne permiteți să păstrăm o singură cifră per pagină în stocarea acestui profil de browser, pentru a evita înregistrarea repetată a vizitelor?';
+$ec_lang['consent_accept']='Permit acum';
+$ec_lang['consent_accept_all']='Permit mereu';
+$ec_lang['consent_decline']='Refuz mereu';
 $ec_lang['consent_current_granted']='Ați permis aceasta. Limităm înregistrarea pentru acest profil de browser.';
 $ec_lang['consent_current_denied']='Ați refuzat aceasta. Nu stocăm nimic, pentru a limita înregistrarea pentru acest profil de browser.';
 $ec_lang['consent_region_label']='Alegerea dvs. privind limitarea înregistrării.';
@@ -697,6 +697,8 @@ $ec_lang['lpn_menu_view']='Vizualizare';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Setări';
+$ec_lang['lpn_menu_help']='Ajutor';
+$ec_lang['lpn_help_walkthroughs']='Tutoriale';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1018,14 +1020,14 @@ $ec_lang['lpn_labels_decimals_tip']='Numărul de zecimale afișate pentru aceast
 $ec_lang['lpn_labels_mark_extrema']='Marchează valorile cele mai mari și cele mai mici';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Imagine de fundal…';
-$ec_lang['lpn_backdrop_add']='Adaugă imagine';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='Setează scara imaginii';
-$ec_lang['lpn_backdrop_position']='Mută imaginea';
-$ec_lang['lpn_backdrop_remove']='Elimină imaginea';
+$ec_lang['lpn_backdrop_add']='Adăugare';
+$ec_lang['lpn_backdrop_scale']='Scalare prin indicare';
+$ec_lang['lpn_backdrop_scale_entry']='Scalare din fișier de georeferențiere sau din dimensiunea unui pixel de pe hartă';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Introduceți dimensiunea unui pixel de pe hartă sau lipiți conținutul complet al fișierului de georeferențiere al imaginii';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Introduceți un singur număr pentru dimensiunea unui pixel de pe hartă, sau lipiți toate cele șase linii ale unui fișier de georeferențiere.';
+$ec_lang['lpn_backdrop_wld_bad']='Acest fișier de georeferențiere rotește, oglindește sau întinde neuniform imaginea. Harta poate doar să mute o imagine și să o redimensioneze cu același factor pe ambele direcții, așa că fișierul nu a fost utilizat.';
+$ec_lang['lpn_backdrop_position']='Mutare';
+$ec_lang['lpn_backdrop_remove']='Eliminare';
 $ec_lang['lpn_backdrop_remove_confirm']='Eliminați imaginea de fundal?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Faceți clic pe două puncte de pe imaginea de fundal, cum ar fi cele două capete ale unei scări grafice. Apoi introduceți distanța reală dintre ele.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Distanța reală dintre cele două puncte';

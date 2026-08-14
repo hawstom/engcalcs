@@ -1575,12 +1575,13 @@ $ec_lang['lpn_backdrop_add']='Add';
 // behind lpn_backdrop_scale_entry. Do not re-add an ask.
 $ec_lang['lpn_backdrop_scale']='Scale by picking';
 $ec_lang['lpn_backdrop_scale_entry']='Scale by world file or by the size of one pixel on the map';
-$ec_lang_syn['lpn_backdrop_scale_entry']='gloss: world file; layout: nav item';
+$ec_lang_syn['lpn_backdrop_scale_entry']='World (Map Coordinates or Georeference) File for the image | gloss: world file; layout: nav item';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Enter the size of one pixel on the map, or paste the complete contents of the world file for the image';
-$ec_lang_syn['lpn_backdrop_scale_entry_prompt']='gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text';
+$ec_lang_syn['lpn_backdrop_scale_entry_prompt']='World (Map Coordinates or Georeference) File for the image | gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Type one number for the size of one pixel on the map, or paste all six lines of a world file.';
+$ec_lang_syn['lpn_backdrop_scale_entry_bad']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
 $ec_lang['lpn_backdrop_wld_bad']='This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.';
-$ec_lang_syn['lpn_backdrop_wld_bad']='gloss: world file';
+$ec_lang_syn['lpn_backdrop_wld_bad']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
 $ec_lang['lpn_backdrop_position']='Move';
 $ec_lang['lpn_backdrop_remove']='Remove';
 $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';

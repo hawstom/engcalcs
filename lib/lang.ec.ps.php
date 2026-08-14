@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='د چاپ فرعي سرلیک';
 $ec_lang['consent_body']='ایا موږ کولی شو په دې براوزر پروفایل کې د هرې پاڼې یو رقم وساتو ترڅو مخنیوی وکړو چې ستاسو کتنې په بیا بیا ډول ثبت نشي؟';
 $ec_lang['consent_accept']='دا ومنئ';
 $ec_lang['consent_accept_all']='تل يې ومنئ';
-$ec_lang['consent_decline']='رد کړئ';
+$ec_lang['consent_decline']='تل يې رد کړئ';
 $ec_lang['consent_current_granted']='تاسو دا اجازه ورکړې ده. موږ د دې براوزر پروفایل لپاره ثبت محدودوو.';
 $ec_lang['consent_current_denied']='تاسو دا رد کړې ده. موږ د ثبت محدودولو لپاره هیڅ نه ساتو.';
 $ec_lang['consent_region_label']='ستاسو د ثبت محدودولو په اړه انتخاب.';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='لیدنه';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='تنظیمات';
+$ec_lang['lpn_menu_help']='مرسته';
+$ec_lang['lpn_help_walkthroughs']='لارښودونه';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,16 @@ $ec_lang['lpn_labels_decimals_tip']='د دې لیبل لپاره ښودل شوي
 $ec_lang['lpn_labels_mark_extrema']='لوړ ترین او ټیټ ترین ارزښتونه نښه کول';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='شاليد انځور…';
-$ec_lang['lpn_backdrop_add']='انځور اضافه کول';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='د انځور مقیاس ټاکل';
-$ec_lang['lpn_backdrop_position']='انځور لیږدول';
-$ec_lang['lpn_backdrop_remove']='انځور لرې کول';
+// BARE VERBS (resynced 2026-08-13): both doors now print a "Background image…" heading
+// (lpn_backdrop_menu) directly above these, so the object no longer needs repeating in each verb.
+$ec_lang['lpn_backdrop_add']='اضافه کول';
+$ec_lang['lpn_backdrop_scale']='په نقطو مقیاس ټاکل';
+$ec_lang['lpn_backdrop_scale_entry']='د نقشې همغږۍ دوتنې یا د یو پیکسل اندازې له مخې مقیاس';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='د نقشه کې د یو پیکسل اندازه ولیکئ، یا د انځور د نقشې همغږۍ دوتنې بشپړ منځپانګه پیسټ کړئ';
+$ec_lang['lpn_backdrop_scale_entry_bad']='د نقشه کې د یو پیکسل اندازې لپاره یو عدد ولیکئ، یا د نقشې همغږۍ دوتنې ټولې شپږ کرښې پیسټ کړئ.';
+$ec_lang['lpn_backdrop_wld_bad']='دا د نقشې همغږۍ دوتنه انځور څرخوي، منعکس کوي، یا يې په ناورته ډول غزوي. نقشه یوازې کولی شي انځور ولیږدوي او په دواړو لورو کې يې يو شان اندازه بدله کړي، نو دا دوتنه و نه کارول شوه.';
+$ec_lang['lpn_backdrop_position']='لیږدول';
+$ec_lang['lpn_backdrop_remove']='لرې کول';
 $ec_lang['lpn_backdrop_remove_confirm']='شاليد انځور لرې کړئ؟';
 $ec_lang['lpn_backdrop_scale_prompt1']='په شاليد انځور کې دوه ټکي کلیک کړئ، لکه د یوې مقیاس پټې دواړه سرونه. بیا د دوی ترمنځ اصلي واټن ولیکئ.';
 $ec_lang['lpn_backdrop_scale_prompt2']='د دوو ټکو ترمنځ اصلي واټن';

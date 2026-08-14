@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='ሊታተም የሚችል ንዑስ ር
 $ec_lang['consent_body']='ተደጋጋሚ ጉብኝቶችን መመዝገብ ለማስቀረት በዚህ አሳሽ መገለጫ ማከማቻ ውስጥ በእያንዳንዱ ገጽ አንድ ቁጥር ብቻ እንድናስቀምጥ ይፈቅዱልናል?';
 $ec_lang['consent_accept']='ይህን ይፍቀዱ';
 $ec_lang['consent_accept_all']='ሁሌም ይፍቀዱ';
-$ec_lang['consent_decline']='ይከልክሉ';
+$ec_lang['consent_decline']='ሁሌም ይከልክሉ';
 $ec_lang['consent_current_granted']='ይህን ፈቅደዋል። ለዚህ አሳሽ መገለጫ የመመዝገብን መጠን እንገድባለን።';
 $ec_lang['consent_current_denied']='ይህን ከልክለዋል። ለዚህ አሳሽ መገለጫ የመመዝገብን መጠን ለመገደብ ምንም አናስቀምጥም።';
 $ec_lang['consent_region_label']='የምዝገባ መገደብ ላይ ያደረጉት ምርጫ።';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='ዕይታ';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='ቅንብሮች';
+$ec_lang['lpn_menu_help']='እገዛ';
+$ec_lang['lpn_help_walkthroughs']='ደረጃ በደረጃ መመሪያ';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,17 @@ $ec_lang['lpn_labels_decimals_tip']='ለዚህ ምልክት የሚታዩ የአ�
 $ec_lang['lpn_labels_mark_extrema']='ከፍተኛውንና ዝቅተኛውን ዋጋዎች ምልክት አድርግ';
 $ec_lang['lpn_field_id']='መለያ';
 $ec_lang['lpn_backdrop_menu']='የበስተጀርባ ምስል…';
-$ec_lang['lpn_backdrop_add']='ምስል ጨምር';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='የምስል መጠን አዘጋጅ';
-$ec_lang['lpn_backdrop_position']='ምስል አንቀሳቅስ';
-$ec_lang['lpn_backdrop_remove']='ምስል አስወግድ';
+$ec_lang['lpn_backdrop_add']='ጨምር';
+// Bare verbs, not "Scale image" / "Position image" (Tom, 2026-08-13 supersedes the 2026-08-04 note
+// this replaced): the "Background image..." heading above them in the menu now carries the object,
+// so repeating "image" on one member of the set reads as an oversight.
+$ec_lang['lpn_backdrop_scale']='በመምረጥ አዘጋጅ';
+$ec_lang['lpn_backdrop_scale_entry']='በወርልድ ፋይል ወይም በካርታው ላይ ባለው የአንድ ፒክሰል መጠን አዘጋጅ';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='በካርታው ላይ የአንድ ፒክሰል መጠን ያስገቡ፣ ወይም ለምስሉ የወርልድ ፋይሉን ሙሉ ይዘት ይለጥፉ';
+$ec_lang['lpn_backdrop_scale_entry_bad']='በካርታው ላይ ለአንድ ፒክሰል መጠን አንድ ቁጥር ይተይቡ፣ ወይም የወርልድ ፋይሉን ስድስቱንም መስመሮች ይለጥፉ።';
+$ec_lang['lpn_backdrop_wld_bad']='ይህ የወርልድ ፋይል ምስሉን ያዞራል፣ ያንፀባርቃል ወይም ባልተመጣጠነ መንገድ ይዘረጋል። ካርታው ምስልን ማንቀሳቀስ እና በሁለቱም አቅጣጫዎች በእኩል መጠን ብቻ ማስፋት ወይም ማጥበብ ስለሚችል ፋይሉ አልተጠቀመም።';
+$ec_lang['lpn_backdrop_position']='አንቀሳቅስ';
+$ec_lang['lpn_backdrop_remove']='አስወግድ';
 $ec_lang['lpn_backdrop_remove_confirm']='የበስተጀርባ ምስሉን ያስወግዱ?';
 $ec_lang['lpn_backdrop_scale_prompt1']='በበስተጀርባ ምስሉ ላይ እንደ ባር ስኬል ሁለት ጫፎች ያሉ ሁለት ነጥቦችን ይጫኑ። ከዚያም በመካከላቸው ያለውን እውነተኛ ርቀት ይተይቡ።';
 $ec_lang['lpn_backdrop_scale_prompt2']='በሁለቱ ነጥቦች መካከል ያለው እውነተኛ ርቀት';

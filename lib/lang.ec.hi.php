@@ -1026,12 +1026,12 @@ $ec_lang['lpn_backdrop_add']='जोड़ें';
 // BARE VERBS -- the "Background image…" heading above them now carries the object (Task 297,
 // resyncing the 2026-08-04 "Scale image"/"Position image" wording, which re-added the object word).
 $ec_lang['lpn_backdrop_scale']='चुनकर पैमाना सेट करें';
-$ec_lang['lpn_backdrop_scale_entry']='विश्व फ़ाइल से या मानचित्र पर एक पिक्सेल के आकार से पैमाना सेट करें';
+$ec_lang['lpn_backdrop_scale_entry']='भू-संदर्भ फ़ाइल से या मानचित्र पर एक पिक्सेल के आकार से पैमाना सेट करें';
 $ec_lang_syn['lpn_backdrop_scale_entry']='gloss: world file; layout: nav item';
-$ec_lang['lpn_backdrop_scale_entry_prompt']='मानचित्र पर एक पिक्सेल का आकार दर्ज करें, या छवि की विश्व फ़ाइल की पूरी सामग्री चिपकाएँ';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='मानचित्र पर एक पिक्सेल का आकार दर्ज करें, या छवि की भू-संदर्भ फ़ाइल की पूरी सामग्री चिपकाएँ';
 $ec_lang_syn['lpn_backdrop_scale_entry_prompt']='gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text';
-$ec_lang['lpn_backdrop_scale_entry_bad']='मानचित्र पर एक पिक्सेल के आकार के लिए एक संख्या टाइप करें, या विश्व फ़ाइल की सभी छह पंक्तियाँ चिपकाएँ।';
-$ec_lang['lpn_backdrop_wld_bad']='यह विश्व फ़ाइल चित्र को घुमाती, दर्पण-प्रतिबिंबित करती, या असमान रूप से खींचती है। मानचित्र किसी चित्र को केवल स्थानांतरित कर सकता है और दोनों दिशाओं में समान मात्रा में उसका आकार बदल सकता है, इसलिए इस फ़ाइल का उपयोग नहीं किया गया।';
+$ec_lang['lpn_backdrop_scale_entry_bad']='मानचित्र पर एक पिक्सेल के आकार के लिए एक संख्या टाइप करें, या भू-संदर्भ फ़ाइल की सभी छह पंक्तियाँ चिपकाएँ।';
+$ec_lang['lpn_backdrop_wld_bad']='यह भू-संदर्भ फ़ाइल चित्र को घुमाती, दर्पण-प्रतिबिंबित करती, या असमान रूप से खींचती है। मानचित्र किसी चित्र को केवल स्थानांतरित कर सकता है और दोनों दिशाओं में समान मात्रा में उसका आकार बदल सकता है, इसलिए इस फ़ाइल का उपयोग नहीं किया गया।';
 $ec_lang_syn['lpn_backdrop_wld_bad']='gloss: world file';
 $ec_lang['lpn_backdrop_position']='ले जाएँ';
 $ec_lang['lpn_backdrop_remove']='हटाएँ';
