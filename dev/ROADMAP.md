@@ -452,6 +452,32 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     hand-maintained — a hand-kept index and a folder of files drift, and the drift is silent.
   - **Sub-categories and paging are explicitly in Tom's picture** but are not needed at three. Build
     the pane so they can arrive without a rewrite; do not build them yet.
+  - **THE EMPTY CANVAS BECOMES THE SHOP WINDOW (Tom, 2026-08-14).** *"I agree with the CC idea of
+    using our first-visit map as an examples shop window. Possibly there can be no project tabs at
+    all until either one of the examples is double-clicked (or maybe each of them has a little
+    'Open' button) or the File menu is used. It's not a map until the first project is started or
+    opened?"* This is the strongest form of the feature and it retires a standing problem: a blank
+    canvas with a placeholder on it is the dominant failure of every map editor, and this page has
+    carried one since 2026-07-29 by an explicit decision *made with no data at all*.
+    - **The question mark in his last sentence is real and is the design decision.** "It is not a
+      map until a project is opened" is a clean, familiar pattern — VS Code's welcome tab, Excel's
+      start screen, HEC-RAS itself — and no-tabs-until-a-project falls straight out of it.
+    - **But it cuts against this suite's own oldest rule**, stated for every other calculator in
+      CLAUDE.md: *choose defaults that open on a passing design… a page that greets a first-time
+      visitor with a warning is worse than one that greets them with a worked example.* Every other
+      page in the suite lands you IN a worked example. A gallery is a wall in front of one, and the
+      visitor arriving from a search came to see a calculator work, not to choose from a menu.
+    - **The synthesis worth trying first**: the gallery is what you land on, *over a map that
+      already holds an example*, so dismissing it leaves you working rather than blank. That keeps
+      the shop window and keeps the suite's rule. Prototype both before committing — this is a
+      first-impression decision and it is cheap to try and expensive to get wrong.
+    - **TASK 200'S INSTRUMENTATION WAS BUILT TO ANSWER EXACTLY THIS AND THE DATA IS ON PRODUCTION.**
+      `log/lang-log-stats.sh` prints "First action on the map": a histogram of which of the four ways
+      in a visitor reaches for first, plus the residual who did NOTHING. Its own header says a large
+      `nothing` share overturns the empty-canvas decision. **The signal log does not exist on the dev
+      box** — run `sh log/lang-log-stats.sh` on production and read the Looped-Network section before
+      finalising this. It sizes the prize, and it is the difference between designing this from
+      evidence and designing it from taste.
   - **Every example commits to a unit system and does not adapt to yours** — this decision already
     exists (Task 264, `newProjectFromExample`) and carries over unchanged. Say the units in the
     description.
