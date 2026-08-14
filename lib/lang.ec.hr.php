@@ -71,7 +71,7 @@ $ec_lang['template_printable_subtitle']='Podnaslov za ispis';
 $ec_lang['consent_body']='Smijemo li zadržati jednu znamenku po stranici u pohrani ovog profila preglednika kako bismo spriječili ponovljeno bilježenje njegovih posjeta?';
 $ec_lang['consent_accept']='Prihvati ovo';
 $ec_lang['consent_accept_all']='Prihvati uvijek';
-$ec_lang['consent_decline']='Odbij';
+$ec_lang['consent_decline']='Odbij uvijek';
 $ec_lang['consent_current_granted']='Dopustili ste ovo. Ograničavamo bilježenje za ovaj profil preglednika.';
 $ec_lang['consent_current_denied']='Odbili ste ovo. Ne pohranjujemo ništa za ograničavanje bilježenja za ovaj profil preglednika.';
 $ec_lang['consent_region_label']='Vaš izbor o ograničavanju bilježenja.';
@@ -697,6 +697,8 @@ $ec_lang['lpn_menu_view']='Prikaz';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Postavke';
+$ec_lang['lpn_menu_help']='Pomoć';
+$ec_lang['lpn_help_walkthroughs']='Vodiči';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1018,14 +1020,14 @@ $ec_lang['lpn_labels_decimals_tip']='Broj decimalnih mjesta prikazan za ovu ozna
 $ec_lang['lpn_labels_mark_extrema']='Označi najveće i najmanje vrijednosti';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Pozadinska slika…';
-$ec_lang['lpn_backdrop_add']='Dodaj sliku';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='Postavi mjerilo slike';
-$ec_lang['lpn_backdrop_position']='Pomakni sliku';
-$ec_lang['lpn_backdrop_remove']='Ukloni sliku';
+$ec_lang['lpn_backdrop_add']='Dodaj';
+$ec_lang['lpn_backdrop_scale']='Postavi mjerilo';
+$ec_lang['lpn_backdrop_scale_entry']='Mjerilo prema datoteci za georeferenciranje ili veličini jednog piksela na karti';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Unesite veličinu jednog piksela na karti ili zalijepite cjelokupni sadržaj datoteke za georeferenciranje slike';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Upišite jedan broj za veličinu jednog piksela na karti ili zalijepite svih šest redaka datoteke za georeferenciranje.';
+$ec_lang['lpn_backdrop_wld_bad']='Ova datoteka za georeferenciranje rotira, zrcali ili neravnomjerno rasteže sliku. Karta može samo pomaknuti sliku i promijeniti joj veličinu jednako u oba smjera, pa datoteka nije korištena.';
+$ec_lang['lpn_backdrop_position']='Pomakni';
+$ec_lang['lpn_backdrop_remove']='Ukloni';
 $ec_lang['lpn_backdrop_remove_confirm']='Ukloniti pozadinsku sliku?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Kliknite dvije točke na pozadinskoj slici, primjerice dva kraja mjerila. Zatim upišite stvarnu udaljenost između njih.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Stvarna udaljenost između dviju točaka';
