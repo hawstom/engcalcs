@@ -5,42 +5,16 @@
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
  *
- * WHY THIS EXISTS. A roadmap ID is a PERMANENT HANDLE. CLAUDE.md's own rule is to say "Task N"
- * and never invent other naming, and prose across ROADMAP.md, CLAUDE.md and dev/*.md refers to
- * tasks by number — Task 296 alone is cited seven times. The moment two tasks share a number,
- * every one of those references becomes ambiguous, and nothing anywhere says so.
+ * A task ID is a permanent handle — prose across ROADMAP.md, CLAUDE.md and dev/*.md cites tasks by
+ * number, so two tasks sharing one makes every such reference ambiguous, silently. Six duplicates
+ * had accumulated by 2026-08-14 and were renumbered then.
  *
- * It kept happening, and always by the same mechanism: a session allocates the next ID by reading
- * its OWN copy of ROADMAP.md while another session has already claimed that number somewhere the
- * first cannot see — a second worktree, an unmerged branch, or simply a commit not yet pulled.
- * Six collisions had accumulated by 2026-08-14 (294, 295, 296, 298, 300, and 304/305 twice over),
- * two of them leaving an OPEN task sharing a number with a closed one. Every session involved had
- * read the rule; none of them could have seen the conflict.
+ * WHEN THIS FAILS: renumber the newer task to the next free ID, preferring a closed one, and grep
+ * `Task <id>` across dev/*.md and CLAUDE.md to move its references with it. Usually one member of
+ * a colliding pair has no references at all, and that is the one to move.
  *
- * That is exactly the case CLAUDE.md's review-office section says to convert from prose into a
- * check: "a rule a machine enforces is worth roughly ten a human must remember." This is the
- * cheapest check in the suite and it has the longest list of prior failures behind it.
- *
- * THE FIX WHEN THIS FAILS is to renumber the NEWER task to a fresh ID (the highest in use, plus
- * one), not the older one — the older ID is the one already referenced in prose. Prefer renumbering
- * a CLOSED task over an open one, and grep for `Task <id>` across dev/*.md and CLAUDE.md before
- * moving anything, because those references have to move with it.
- *
- * THERE IS NO EXEMPTION LIST, DELIBERATELY. The first draft of this check grandfathered the three
- * closed/closed pairs that existed when it was written, on the theory that a check failing on day
- * one gets bypassed. Tom rejected that on 2026-08-14 — *"I don't agree with grandfathering
- * duplicates"* — and he was right on the facts, not just the principle:
- *
- *   - The cost of fixing them had been overstated. Each pair had one member with ZERO prose
- *     references, so renumbering that member cost no reference rewrites at all. The claim that
- *     Task 296 was "too entangled at 11 references" was wrong: all of them meant the same one of
- *     the two tasks.
- *   - One pair was worse than reported. "Task 300" had been used for THREE different things, and a
- *     live reference (ROADMAP.md, in the file-extension task) pointed at a meaning that is not
- *     either of the lines the checker could see. Grandfathering would have frozen that.
- *
- * The general lesson, worth keeping: an exemption list here would do what CLAUDE.md already forbids
- * for the translation exempt-keys list — "never to quiet a number you don't want to fix."
+ * No exemption list, deliberately (Tom, 2026-08-14) — same principle as the translation exempt
+ * list: never to quiet a number you don't want to fix.
  *
  * Usage:
  *   php dev/scripts/roadmap_id_check.php            # exit 1 if any ID is duplicated

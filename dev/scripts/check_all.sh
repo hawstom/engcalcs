@@ -83,13 +83,8 @@ run_check "coverage declaration"         blocking php dev/scripts/coverage_selft
 run_check "payload freshness"            blocking php dev/scripts/generate_translation_payloads.php --check
 
 # --- The roadmap's own integrity ---------------------------------------------------------------
-# A task ID is a permanent handle that prose cites by number, and it kept getting duplicated: six
-# collisions by 2026-08-14, every one because a session allocated the next ID from its own copy of
-# ROADMAP.md while another session had already claimed it in a worktree, an unmerged branch, or a
-# commit not yet pulled. Nobody involved could have seen the conflict, which is what makes it a
-# check rather than a rule. There is NO exemption list: all six collisions were renumbered on
-# 2026-08-14 rather than grandfathered (Tom: "I don't agree with grandfathering duplicates"), and
-# it turned out each pair had a member with zero prose references, so the fix cost nothing.
+# A task ID is a permanent handle that prose cites by number; a duplicate makes every such
+# reference ambiguous, and nothing else would say so.
 run_check "roadmap ids unique"           blocking php dev/scripts/roadmap_id_check.php
 
 # --- lpn solver and editor --------------------------------------------------------------------
