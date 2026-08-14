@@ -1501,6 +1501,72 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     without a per-visit identifier we will not store.
 
 
+- 85|304| **Settle the project file's NAME and EXTENSION before there are files in the world.**
+  Raised by Tom, 2026-08-14: *"now I am having doubts about our save conventions. Instead of the
+  long names, maybe we should just use something like 'Elm-Street-Center.___' … Unfortunately it's
+  a little bit urgent because we want to settle it before we make too much traction in the world."*
+  - **Today we write `<Name>-lpn-hawsedc-engcalcs.json`** — `projectFileName()`,
+    `js/looped-network.js:2888`, and again in the Save-a-copy path at :3876. The picker offers
+    `{'application/json': ['.json']}` at :3471. Three places, one decision.
+  - **Candidates Tom listed:** `lpndb` (looped pipe network), `ledb` (libreepanet),
+    `leodb` (libreEpanet.Org), `netj` (EPANET's `.net` with a j for json).
+  - **The urgency is real but the blast radius is small RIGHT NOW**, which is the argument for
+    doing it now rather than a reason to panic: lpn had 12 confirmed users in its first two weeks,
+    so the installed base of saved files is tiny today and will not be tiny for long.
+  - **Split the decision in two — only half of it is urgent.** READING permissively costs nothing
+    and can ship immediately: accept `.json` and the new extension forever, since the picker filter
+    and the parser are independent. Only WRITING needs the naming decision. Do the read side first
+    and the choice stops being a deadline.
+  - **Arguments the choice should weigh, so they are not re-derived:**
+    - `netj` **overclaims**. Our document is not EPANET's `.net` in JSON — it carries labels, a
+      backdrop image, scenarios, per-project settings and unit selections that no EPANET format
+      has. A name implying "EPANET, as JSON" promises interchange we do not offer, and Task 281
+      (write `.inp`) is where that promise would actually be kept.
+    - `ledb` / `leodb` **bind the format to a brand that does not exist yet.** Extensions outlive
+      product names; if the name changes the extension is stuck forever. Prefer a descriptive
+      extension over a brand one unless the brand is certain.
+    - `db` says database; this is a document. `.lpn` alone is cleaner if it is free — **check
+      whether `.lpn` is already claimed** before assuming.
+    - **A custom extension over JSON content is normal and fine** — `.ipynb` is literally JSON.
+      What is lost is "any tool recognises it as text/JSON"; what is gained is file association,
+      a distinct icon, and an unambiguous picker filter (Task 300 already moved the picker to
+      naming types by extension rather than MIME).
+  - **The short-name question is separable and easier.** `<Name>.<ext>` instead of
+    `<Name>-lpn-hawsedc-engcalcs.json` is strictly better once the extension identifies us: the
+    suffix exists only because `.json` does not. Note `safeFileName()` round-trips the name back
+    into the project title (see :2517), so shortening changes what a re-opened file is called —
+    check that path when editing.
+
+- 70|305| **How a visitor opens an EXAMPLE, and the New-vs-Open lie.** Raised by Tom, 2026-08-14:
+  *"currently we are using New to 'open' examples, which is linguistically confusing, and maybe we
+  need some sort of library paradigm."* And, rejecting a proposed reword of the placeholder:
+  *"Saying it differently doesn't change the lie. And I don't know how to fix it."*
+  - **The mismatch:** New creates something that did not exist; Open retrieves something that does.
+    An example exists, so it belongs under Open. `File > Open example…` (Tom's idea (a)) is the
+    linguistically correct home for it.
+  - **The trap one level down:** if "Open example" then lets you edit and save over it, it was
+    New-from-template after all and the lie returns. The honest primitive is **Open a copy** (Word
+    has exactly this): the example is read-only source, opening it drops a copy into a new tab, the
+    original is untouched and re-openable. The tab strip then shows an ordinary project and nothing
+    is misnamed.
+  - **What epanetjs.com gets right is NOT the modal — it is that there is no verb at all.** Tom,
+    2026-08-14: *"epanetjs.com just throws a box at you on load that gives you a large thumbnail of
+    a US and an SI example. No 'open' or 'new'. Just 'Hmm. I guess I click one of these.'"* Take
+    that without taking the box: **put the thumbnails on the empty canvas itself.** A returning user
+    with projects never sees them, because the canvas is not empty — so it is a passive readout
+    rather than a modal in front of the common action. Nothing to dismiss, no verb to misuse.
+  - **Why examples and not an empty canvas at all:** Tom, 2026-08-14, on why the old placeholder was
+    worse than the new one — *"'Add a background image' is not harnessing dilettantism. 'Open an
+    example' is."* A dabbler clicks a picture; they do not read a sentence about a menu path. This
+    is also the first thing the Task 200 `lpn first:` histogram will bear on.
+  - **Consequence for translation:** if thumbnails land, `lpn_empty_hint` goes away. **Do not spend
+    a resync sprint on it** — it is 26 of the 4 outstanding keys' strings and may be deleted.
+  - **Examples to ship:** the two basics, plus `Elm-Street-Center` (Tom anonymised a real model for
+    this on 2026-08-14, which is what makes it publishable — the source in `dev/epanet-models/` is
+    gitignored because those carry client names, coordinates, base maps and fire-flow results).
+    EPANET's Net1/Net2/Net3 are a free third option: public domain, ship with EPANET, and every
+    water engineer recognises them.
+
 ## New Calculators (Mission Expansion)
 
 Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
