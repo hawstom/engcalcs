@@ -1353,18 +1353,27 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     same item twice.
   - Changing `menu_more`'s English makes 26 translations stale — a resync, not a new key.
 
-- 15|297| **Resync 13 backdrop-and-menu keys into all 26 languages.** Nine are NEW
-  (`lpn_backdrop_scale_entry`, `_prompt`, `_bad`, `lpn_backdrop_wld_ask`, `_none`, `_choose`,
-  `_bad`, plus `menu_walkthroughs` and `menu_walkthroughs_tip`). Four CHANGED and are stale:
-  `lpn_backdrop_add`/`_position`/`_remove` dropped the word "image" and `lpn_backdrop_scale` became
-  "Scale by picking".
-  - **Three are ROLE CHANGES** — two words down to one. The drift tripwire flags them as the
-    expensive kind, and it is right: they are now bare verbs that only read correctly under the
-    "Background image" heading `backdropRows()` prints above them. A translator must see the
-    heading to translate the verb.
+- 15|297| **ONE sprint clears the whole standing translation backlog: 17 keys × 26 languages = 442
+  strings.** 9 NEW (`lpn_backdrop_scale_entry`/`_prompt`/`_bad`, `lpn_backdrop_wld_ask`/`_none`/
+  `_choose`/`_bad`, `lpn_menu_help`, `lpn_help_walkthroughs`) + 8 CHANGED
+  (`lpn_backdrop_add`/`_position`/`_remove`/`_scale`, `consent_body`/`_accept`/`_accept_all`/
+  `_decline`). Verified 2026-08-13: that is the entire `lang_parity_check` + drift report.
+  - **Only the 9 NEW keys are in the payloads.** The 8 CHANGED ones come from
+    `detect_english_drift.php --json` and must be pasted into the agent prompts by hand — a resync
+    key is present-but-stale, so no payload-delta will ever carry it.
+  - **Four are ROLE CHANGES.** `lpn_backdrop_add`/`_position`/`_remove` went two words to one and
+    are now bare verbs that only read right under the "Background image" heading `backdropRows()`
+    prints above them — the translator must be shown that heading. `consent_decline` went "Refuse"
+    → "Refuse all", where "all" means *now and later*, not *every category*.
+  - **Wave 0 has not been run on the 9 new keys** (last friction file is `251-lpn-26lang.json`).
+    It is a launch prerequisite; the consent four were written by Tom and need none.
+  - `consent` is not in `prefixToTermNames()`, so those keys silently get the 3 default hydraulic
+    glossary terms. Harmless for privacy prose — but wire it, or note it, rather than rediscover it.
+  - Close with `detect_english_drift.php --update` AND `--baseline-new`, or the next English edit to
+    any of these 17 is invisible to both tools at once.
   - English falls back automatically (`base.inc.php` loads `lang.ec.en.php` first), so every
-    language works today; this is the delta `lang_parity_check.php` reports.
-  - `menu_walkthroughs` carries NO "(in English)" marker by decision (Tom, 2026-08-13) — browser
+    language works today.
+  - `lpn_help_walkthroughs` carries NO "(in English)" marker by decision (Tom, 2026-08-13) — browser
     translation is the bet, rather than a permanent flag in 27 navbars.
 
 - 40|257|[H] **[HUMAN] Find or build the example PROJECTS (plural) for lpn.** **Reassigned to Tom,
