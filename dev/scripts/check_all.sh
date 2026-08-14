@@ -63,10 +63,11 @@ echo ""
 
 # --- Does it parse at all -------------------------------------------------------------------
 run_check "php syntax (all .php)"        blocking sh -c 'find . -name "*.php" -not -path "./dev/lpn-spike/*" -print0 | xargs -0 -n1 php -l >/dev/null'
-# sw.js AND js/vendor/ are in the glob deliberately (2026-08-14). The old pattern was js/*.js only,
-# so the service worker at the repo root -- the file Task 318 is entirely about -- was never once
-# syntax-checked, and neither was the vendored EPANET engine we ship to every visitor who enables it.
-run_check "js syntax (all shipped js)"   blocking sh -c 'for f in js/*.js js/vendor/*.js sw.js; do [ -f "$f" ] || continue; node --check "$f" >/dev/null || { echo "FAILED: $f"; exit 1; }; done'
+# js/vendor/ is in the glob deliberately (2026-08-14): the old pattern was js/*.js only, so the
+# vendored EPANET engine we ship to every visitor who enables it was never syntax-checked. The
+# service worker is no longer a file here -- Task 318 replaced sw.js with the generated sw.php --
+# so its syntax is checked by parsing what sw.php actually emits, inside the manifest check below.
+run_check "js syntax (all shipped js)"   blocking sh -c 'for f in js/*.js js/vendor/*.js; do [ -f "$f" ] || continue; node --check "$f" >/dev/null || { echo "FAILED: $f"; exit 1; }; done'
 
 # --- Does every page still produce well-formed HTML ------------------------------------------
 run_check "html balance (every page)"    blocking php dev/scripts/html_balance_check.php
@@ -77,6 +78,12 @@ run_check "html balance (every page)"    blocking php dev/scripts/html_balance_c
 # target. Neither is visible to the person who introduced it.
 run_check "pageConfig php->js bridge"    blocking php dev/scripts/pageconfig_check.php
 run_check "tip markup via helpers"       blocking php dev/scripts/tip_markup_check.php
+# Third of the same kind, and the worst of the three while it was missing: the service worker
+# precached bare paths while every page requested '?v=<filemtime>', so 22 of 25 precache entries
+# were unreachable and the offline promise on About.php was simply false. Nothing rendered wrong,
+# nothing errored, and the only place the defect existed was the GAP between two files. This
+# renders real pages and diffs their asset URLs against what the worker will really cache.
+run_check "service worker precache"      blocking php dev/scripts/sw_manifest_check.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php

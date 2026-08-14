@@ -44,7 +44,10 @@ const NOT_CALCULATORS = new Set([
 	'lpn-lock.php', 'privacy.php', 'terms.php',
 	'Looped-Network.php',
 	// A reference table, not a calculator: it has a form but defines no pageCalculator.
-	'Orifice-Drain-Time-Ref.php'
+	'Orifice-Drain-Time-Ref.php',
+	// Not a page at all: it emits the service worker as JavaScript (Task 318). Its own syntax is
+	// checked by dev/scripts/sw_manifest_check.php, which parses what it generates.
+	'sw.php'
 ]);
 
 // A page whose results live in DYNAMIC ROWS writes nothing until those rows exist, and building

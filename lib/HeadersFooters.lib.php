@@ -168,8 +168,13 @@ if (function_exists('echoConsentFooterLinks')) echoConsentFooterLinks();
 </div>
 <?php if (function_exists('echoConsentBanner')) echoConsentBanner(); ?>
 <script>
+// The worker is GENERATED (sw.php, ROADMAP Task 318) so its precached URLs carry the same
+// filemtime the pages request; a static sw.js could not, because deployment is `git pull` and
+// git does not preserve mtimes. sw.php sits in the suite root, so '/engcalcs/' is the widest
+// scope it is allowed and no Service-Worker-Allowed header is needed. A registration is keyed by
+// SCOPE, so this replaces a returning visitor's old '/engcalcs/sw.js' registration in place.
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/engcalcs/sw.js', { scope: '/engcalcs/' });
+  navigator.serviceWorker.register('/engcalcs/sw.php', { scope: '/engcalcs/' });
 }
 </script>
 </body>
