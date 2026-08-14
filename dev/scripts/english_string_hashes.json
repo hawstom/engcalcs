@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-08-09",
-    "count": 859,
+    "count": 862,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -193,6 +193,16 @@
                 "lpn_backdrop_wld_bad",
                 "lpn_help_walkthroughs",
                 "lpn_menu_help"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_backdrop_unreadable",
+                "lpn_field_closed",
+                "lpn_field_closed_tip",
+                "lpn_method_switch_confirm"
             ],
             "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         }
@@ -456,6 +466,7 @@
         "lpn_backdrop_target_free": "1ec481ee97b92a18a0be03bea893729d88a17f44",
         "lpn_backdrop_target_label": "594fbe0875339c1591a93e0f722abd906fdc1a55",
         "lpn_backdrop_target_node": "32d94d48baeb48749abc6e461ec1568849d96888",
+        "lpn_backdrop_unreadable": "bc6db696992e7e1c486477c42163ff843e55c5e7",
         "lpn_backdrop_wld_bad": "529372c670e9e66a1f223cb8b7529c9d6f8b7ae3",
         "lpn_cancel": "77dfd2135f4db726c47299bb55be26f7f4525a46",
         "lpn_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
@@ -478,6 +489,8 @@
         "lpn_engine_loading": "a95a376c68c16cf3eb5079ad02b19405532cd3ed",
         "lpn_engine_manning_note": "f592588a42fae119b629699fe84bcaf7e8881e51",
         "lpn_field_auto": "c614ba7c453cdcd4d21b20e8286c6266c891e0c6",
+        "lpn_field_closed": "88d86b7721d587644e9c4cf33a084202cb3b0ff0",
+        "lpn_field_closed_tip": "8ea56358bac56c15ec1a0572174984f26b1fe200",
         "lpn_field_diameter": "8314fd7f3668393803a7ab4d1434731a5b296c40",
         "lpn_field_elev": "a514da1094ce1bd6b9267e8a0e3df8736da457a5",
         "lpn_field_elev_tip": "7c0c7fa90cc68e7ed58d0cb236adc54dfbdb550c",
@@ -580,6 +593,7 @@
         "lpn_menu_insert": "95802daab3a23990338179f72248350c1434cf39",
         "lpn_menu_settings": "c7f73bb54d928922c3838bb789ee9fb8a5b1eb37",
         "lpn_menu_view": "69bd4ef9fbd0894a22759c3766b859defbdedbc8",
+        "lpn_method_switch_confirm": "aa6867d35bf579e45ac92808126b0a29c92c8b0a",
         "lpn_mode_add_junction": "227d697f0ea10bde6f4edbc9fe6116e96a959639",
         "lpn_mode_add_pipe": "b0c507a90cb8ac61a5f37b35641f7051dc2b3566",
         "lpn_mode_add_pump": "e26d5c560b24459a83aef7539494d756585f110c",
@@ -2086,6 +2100,10 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_backdrop_unreadable": {
+            "words": 21,
+            "ends_sentence": true
+        },
         "lpn_backdrop_wld_bad": {
             "words": 33,
             "ends_sentence": true
@@ -2169,6 +2187,14 @@
         "lpn_field_auto": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_field_closed": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_closed_tip": {
+            "words": 30,
+            "ends_sentence": true
         },
         "lpn_field_diameter": {
             "words": 1,
@@ -2561,6 +2587,10 @@
         "lpn_menu_view": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_method_switch_confirm": {
+            "words": 33,
+            "ends_sentence": true
         },
         "lpn_mode_add_junction": {
             "words": 21,

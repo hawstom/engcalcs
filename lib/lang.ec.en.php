@@ -1583,6 +1583,7 @@ $ec_lang['lpn_backdrop_scale_entry_bad']='Type one number for the size of one pi
 $ec_lang_syn['lpn_backdrop_scale_entry_bad']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
 $ec_lang['lpn_backdrop_wld_bad']='This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.';
 $ec_lang_syn['lpn_backdrop_wld_bad']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
+$ec_lang['lpn_backdrop_unreadable']='This picture cannot be shown by your web browser. Save it as a PNG or JPEG picture and add it again.';
 $ec_lang['lpn_backdrop_position']='Move';
 $ec_lang['lpn_backdrop_remove']='Remove';
 $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';

@@ -1030,6 +1030,7 @@ $ec_lang['lpn_backdrop_scale_entry_prompt']='Введите размер одн�
 $ec_lang_syn['lpn_backdrop_scale_entry_prompt']='gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Введите одно число — размер одного пикселя на карте, — или вставьте все шесть строк world-файла.';
 $ec_lang['lpn_backdrop_wld_bad']='Этот world-файл поворачивает, зеркально отражает или растягивает изображение неравномерно. Карта может только перемещать изображение и изменять его размер одинаково по обеим осям, поэтому файл не был использован.';
+$ec_lang['lpn_backdrop_unreadable']='Ваш браузер не может показать это изображение. Сохраните его в формате PNG или JPEG и добавьте снова.';
 $ec_lang_syn['lpn_backdrop_wld_bad']='gloss: world file';
 $ec_lang['lpn_backdrop_position']='Переместить';
 $ec_lang['lpn_backdrop_remove']='Удалить';

@@ -1029,6 +1029,7 @@ $ec_lang['lpn_backdrop_scale_entry_prompt']='أدخل حجم البكسل الو
 $ec_lang_syn['lpn_backdrop_scale_entry_prompt']='gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text';
 $ec_lang['lpn_backdrop_scale_entry_bad']='اكتب رقماً واحداً لحجم البكسل الواحد على الخريطة، أو الصق كل الأسطر الستة لملف الإسناد الجغرافي.';
 $ec_lang['lpn_backdrop_wld_bad']='يقوم ملف الإسناد الجغرافي هذا بتدوير الصورة أو عكسها أو تمديدها بشكل غير متساوٍ. يمكن للخريطة فقط تحريك الصورة وتغيير حجمها بنفس المقدار في كلا الاتجاهين، لذلك لم يُستخدم الملف.';
+$ec_lang['lpn_backdrop_unreadable']='لا يستطيع متصفحك عرض هذه الصورة. احفظها بصيغة PNG أو JPEG ثم أضفها من جديد.';
 $ec_lang_syn['lpn_backdrop_wld_bad']='gloss: world file';
 $ec_lang['lpn_backdrop_position']='نقل';
 $ec_lang['lpn_backdrop_remove']='إزالة';

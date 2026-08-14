@@ -1025,6 +1025,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Mjerilo prema datoteci za georeferenciranj
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Unesite veličinu jednog piksela na karti ili zalijepite cjelokupni sadržaj datoteke za georeferenciranje slike';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Upišite jedan broj za veličinu jednog piksela na karti ili zalijepite svih šest redaka datoteke za georeferenciranje.';
 $ec_lang['lpn_backdrop_wld_bad']='Ova datoteka za georeferenciranje rotira, zrcali ili neravnomjerno rasteže sliku. Karta može samo pomaknuti sliku i promijeniti joj veličinu jednako u oba smjera, pa datoteka nije korištena.';
+$ec_lang['lpn_backdrop_unreadable']='Vaš preglednik ne može prikazati ovu sliku. Spremite je kao PNG ili JPEG i dodajte je ponovno.';
 $ec_lang['lpn_backdrop_position']='Pomakni';
 $ec_lang['lpn_backdrop_remove']='Ukloni';
 $ec_lang['lpn_backdrop_remove_confirm']='Ukloniti pozadinsku sliku?';

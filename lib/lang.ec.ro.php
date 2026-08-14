@@ -1025,6 +1025,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Scalare din fișier de georeferențiere sa
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Introduceți dimensiunea unui pixel de pe hartă sau lipiți conținutul complet al fișierului de georeferențiere al imaginii';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Introduceți un singur număr pentru dimensiunea unui pixel de pe hartă, sau lipiți toate cele șase linii ale unui fișier de georeferențiere.';
 $ec_lang['lpn_backdrop_wld_bad']='Acest fișier de georeferențiere rotește, oglindește sau întinde neuniform imaginea. Harta poate doar să mute o imagine și să o redimensioneze cu același factor pe ambele direcții, așa că fișierul nu a fost utilizat.';
+$ec_lang['lpn_backdrop_unreadable']='Browserul dumneavoastră nu poate afișa această imagine. Salvați-o ca PNG sau JPEG și adăugați-o din nou.';
 $ec_lang['lpn_backdrop_position']='Mutare';
 $ec_lang['lpn_backdrop_remove']='Eliminare';
 $ec_lang['lpn_backdrop_remove_confirm']='Eliminați imaginea de fundal?';

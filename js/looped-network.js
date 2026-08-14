@@ -157,7 +157,9 @@ var EngCalcs = EngCalcs || {};
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(pos.x - anchor.x, pos.y - anchor.y);
 		if (d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
-		var halfW = holder.tw / 2,
+		// labelBoxWidth(), not tw: the extrema badge hangs past the digits, and attaching to the
+		// text's own right edge draws the leader through it -- see measureDecorRight().
+		var halfW = labelBoxWidth(holder) / 2,
 			att = Geom.leaderAttach(holder.side, pos.x + halfW, halfW, anchor.x, ADVERSE_FRAC);
 		holder.side = att.side;
 		holder.leader.style.display = '';
@@ -201,7 +203,7 @@ var EngCalcs = EngCalcs || {};
 		var n = nodeById(id), ne = nodeEls[id]; if (!ne) { return; }
 		var pos = nodeLabelPos(n);
 		repositionMultilineText(ne.text, pos.x, pos.y);
-		if (ne.empty) { hideMask(ne.mask); } else { positionMaskRect(ne.mask, pos.x, pos.y, ne.tw, dataLabelBoxHeight(ne.lineCount), 'start', 'top'); }
+		if (ne.empty) { hideMask(ne.mask); } else { positionMaskRect(ne.mask, pos.x, pos.y, labelBoxWidth(ne), dataLabelBoxHeight(ne.lineCount), 'start', 'top'); }
 		updateDataLeader(ne, { x: n.x, y: n.y }, pos);
 	}
 	// Same as layoutNodeLabel() above, for a link's data label -- anchor is the link's own mid-
@@ -210,7 +212,7 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		var pos = linkLabelPos(l), mid = linkLabelMid(l);
 		repositionMultilineText(le.text, pos.x, pos.y);
-		if (le.empty) { hideMask(le.mask); } else { positionMaskRect(le.mask, pos.x, pos.y, le.tw, dataLabelBoxHeight(le.lineCount), 'start', 'top'); }
+		if (le.empty) { hideMask(le.mask); } else { positionMaskRect(le.mask, pos.x, pos.y, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'start', 'top'); }
 		updateDataLeader(le, { x: mid.x, y: mid.y }, pos);
 	}
 	// Double-click-to-reset (Tom, 2026-07-30): clears a manually-dragged label's offset entirely
@@ -256,7 +258,7 @@ var EngCalcs = EngCalcs || {};
 		function dataLeader(holder, anchor, pos) {
 			if (!holder || holder.empty) { return; }
 			if (Math.hypot(pos.x - anchor.x, pos.y - anchor.y) <= leaderThreshold()) { return; }
-			var halfW = holder.tw / 2;
+			var halfW = labelBoxWidth(holder) / 2;
 			Collide.pushLeaderSamples(out, anchor.x, anchor.y,
 				Geom.leaderAttachX(pos.x + halfW, halfW, anchor.x), pos.y, holder);
 		}
@@ -308,7 +310,7 @@ var EngCalcs = EngCalcs || {};
 			labels.push({
 				ref: holder, owner: null, movable: !manual,
 				weight: manual ? LPN_COLLIDE_WEIGHT.manual : LPN_COLLIDE_WEIGHT.label,
-				base: base, yOff: -fs * 0.85, w: holder.tw, h: dataLabelBoxHeight(lineCount)
+				base: base, yOff: -fs * 0.85, w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount)
 			});
 		}
 		doc.nodes.forEach(function (n) {
@@ -415,6 +417,34 @@ var EngCalcs = EngCalcs || {};
 				'stroke-width': stroke, 'class': 'lpn-tick'
 			}, layer));
 		}
+	}
+	// How far right of the label's text origin the extrema badge reaches, 0 when this label has no
+	// decorated line. The badge hangs OFF THE END of the digits it decorates (applyExtremaTicks()
+	// above), so it is part of the label's footprint and nothing else in the file knew that: a label
+	// dragged to the left of its anchor attached its leader at the right edge of the TEXT, and the
+	// rule then ran straight through the rails and the chevron sitting beyond it (Tom, 2026-08-14).
+	// Collision avoidance and zoom-to-fit had the same blind spot, from the same cause.
+	//
+	// Measured per line rather than added to the bbox width, because the decorated line is often
+	// NOT the widest one -- "1.20" with a badge can reach further right than "125.00" without.
+	//
+	// AND THIS IS WHERE THE Task 190 TOGGLE ARRIVES, with no test for it anywhere. Marks off means
+	// decorationFor() returns undefined, means no line here is decorated, means 0. There is no
+	// second code path to keep in step with the switch, which is what makes "sensitive to the toggle
+	// state" cost nothing.
+	function measureDecorRight(textEl, lines) {
+		var tf = textFactor(), pad = (TICK_GAP + TICK_LENGTH) * tf, right = 0, i, w;
+		for (i = 0; i < lines.length; i++) {
+			if (!lines[i].decoration) { continue; }
+			try { w = textEl.childNodes[i].getComputedTextLength(); } catch (err) { w = 0; }
+			if (w + pad > right) { right = w + pad; }
+		}
+		return right;
+	}
+	// The width every consumer of a data label's box should use: the text, or the badge if it
+	// reaches further. `holder` is nodeEls[id]/linkEls[id].
+	function labelBoxWidth(holder) {
+		return Math.max(holder.tw || 0, holder.decorRight || 0);
 	}
 	// Repositions an already-built multi-line label (drag/geometry updates) without touching its
 	// content -- setMultilineText() gives each tspan its own explicit x (needed for the multi-line
@@ -1360,7 +1390,7 @@ var EngCalcs = EngCalcs || {};
 		if (doc.nodes.length === 0) { return { minx: 0, maxx: 10, miny: 0, maxy: 10 }; }
 		for (i = 0; i < doc.nodes.length; i++) {
 			var n = doc.nodes[i], r = nodeRadius(n) + 0.2, ne = nodeEls[n.id] || {},
-				tw = ne.tw || 8, lc = ne.lineCount || 1,
+				tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1,
 				nlx = ne.text ? +ne.text.getAttribute('x') : n.x + 2, nly = ne.text ? +ne.text.getAttribute('y') : n.y - 2;
 			inc(n.x - r, n.y - r); inc(n.x + r, n.y + r);
 			// "J1"-style id/data label beside the circle -- extended downward per extra toggled-on
@@ -1392,7 +1422,7 @@ var EngCalcs = EngCalcs || {};
 			var l = doc.links[i], lle = linkEls[l.id];
 			if (lle) {
 				var lx = +lle.text.getAttribute('x'), ly = +lle.text.getAttribute('y'),
-					ltw = lle.tw || 8, llc = lle.lineCount || 1;
+					ltw = labelBoxWidth(lle) || 8, llc = lle.lineCount || 1;
 				inc(lx, ly - 2); inc(lx + ltw, ly + 0.6 + (llc - 1) * effectiveLineHeight());
 			}
 		}
@@ -1506,22 +1536,48 @@ var EngCalcs = EngCalcs || {};
 			if (scale === 1 && dataUrl.length <= out.length) { out = dataUrl; }
 			cb(out, img.width, img.height);
 		};
+		// A FILE THE BROWSER CANNOT DECODE MUST SAY SO. What we can accept is not a list we choose --
+		// it is whatever this browser's own image decoder handles, and the picker cannot know that.
+		// TIFF is the one that bites: no major browser decodes it, yet the OS reports it as
+		// image/tiff, so it sailed through the type filter, failed here, and -- with only an onload
+		// handler -- did NOTHING AT ALL. No image, no message, no way to tell that from a picture
+		// placed somewhere off screen, which is the other half of Tom's "I cannot find the image".
+		img.onerror = function () {
+			var pc = EngCalcs.pageConfig || {};
+			alert(pc.lpn_backdrop_unreadable || 'This picture cannot be shown by your web browser. Save it as a PNG or JPEG picture and add it again.');
+		};
 		img.src = dataUrl;
 	}
-	// Initial placement size: the new image's longer side roughly matches the current network's own
-	// bbox extent (a fixed default when the network is empty), aspect-ratio-preserved -- Scale/
-	// Position are how the user then registers it precisely. An explicit open question in the Phase 0
-	// acceptance doc ("no way to *position* a freshly loaded backdrop relative to a grid already on
-	// screen... decide in Phase 2, not now") -- the spike's own arbitrary fixed 40x30 wasn't ported.
-	function initialBackdropSize(iw, ih) {
+	// Initial placement, SIZE AND POSITION TOGETHER: the new image's longer side roughly matches the
+	// current network's own bbox extent (a fixed default when the network is empty), aspect-ratio-
+	// preserved, CENTRED ON THAT BBOX -- Scale/Position are how the user then registers it precisely.
+	// An explicit open question in the Phase 0 acceptance doc ("no way to *position* a freshly loaded
+	// backdrop relative to a grid already on screen... decide in Phase 2, not now") -- the spike's own
+	// arbitrary fixed 40x30 wasn't ported.
+	//
+	// THE CENTRING IS THE HALF THAT WAS MISSING, and without it the size was no help (Tom,
+	// 2026-08-14: "I added a background image to an existing model, and I cannot find the image").
+	// The image landed at tx/ty = 0, i.e. the world ORIGIN, which is nowhere near a network imported
+	// with real survey or state-plane coordinates -- a correctly-sized picture, hundreds of thousands
+	// of units off screen, with the only controls that could move it (Scale, Move) needing you to
+	// click on the thing you cannot see. Sizing a picture to a model you are not putting it on top of
+	// is a fit in one dimension only; the pair is what makes it "at least visible".
+	function initialBackdropPlacement(iw, ih) {
 		var b = bbox(), extent = Math.max(b.maxx - b.minx, b.maxy - b.miny, 1),
-			target = doc.nodes.length > 0 ? extent : 40, longer = Math.max(iw, ih), scale = target / longer;
-		return { width: iw * scale, height: ih * scale };
+			target = doc.nodes.length > 0 ? extent : 40, longer = Math.max(iw, ih), scale = target / longer,
+			width = iw * scale, height = ih * scale;
+		// backdrop.x/y stay 0 and s stays 1 on a fresh image, so the world position of the image's
+		// top-left corner is exactly tx/ty -- see applyBackdropTransform().
+		return {
+			width: width, height: height,
+			tx: (b.minx + b.maxx) / 2 - width / 2,
+			ty: (b.miny + b.maxy) / 2 - height / 2
+		};
 	}
 	function addBackdropFromDataUrl(dataUrl, done) {
 		downscaleImage(dataUrl, BACKDROP_MAX_SIDE, function (href, iw, ih) {
-			var size = initialBackdropSize(iw, ih);
-			backdrop = { href: href, iw: iw, ih: ih, x: 0, y: 0, width: size.width, height: size.height, tx: 0, ty: 0, s: 1 };
+			var p = initialBackdropPlacement(iw, ih);
+			backdrop = { href: href, iw: iw, ih: ih, x: 0, y: 0, width: p.width, height: p.height, tx: p.tx, ty: p.ty, s: 1 };
 			buildBackdropImg();
 			saveToStorage();
 			// Anything that wants to register the image has to wait for this: downscaleImage() is
@@ -8482,6 +8538,10 @@ var EngCalcs = EngCalcs || {};
 			nodeLines[n.id] = lines;
 			ne.lines = lines; // cached for relayoutLabels(), which re-runs layout without rebuilding text
 			try { ne.tw = ne.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
+			// Measured HERE, beside tw and before collision avoidance, not inside applyExtremaTicks()
+			// -- the ticks are drawn after layout, so reading the badge's reach from them would feed
+			// every consumer the PREVIOUS pass's answer, one refresh stale.
+			ne.decorRight = measureDecorRight(ne.text, lines);
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
@@ -8507,6 +8567,7 @@ var EngCalcs = EngCalcs || {};
 			linkLines[l.id] = lines;
 			le.lines = lines;
 			try { le.tw = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
+			le.decorRight = measureDecorRight(le.text, lines);
 		});
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
 		// laid out for real (text/mask/leader) at its final, possibly-nudged position, THEN extrema

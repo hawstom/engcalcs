@@ -1031,6 +1031,7 @@ $ec_lang['lpn_backdrop_scale_entry_prompt']='मानचित्र पर ए
 $ec_lang_syn['lpn_backdrop_scale_entry_prompt']='gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text';
 $ec_lang['lpn_backdrop_scale_entry_bad']='मानचित्र पर एक पिक्सेल के आकार के लिए एक संख्या टाइप करें, या भू-संदर्भ फ़ाइल की सभी छह पंक्तियाँ चिपकाएँ।';
 $ec_lang['lpn_backdrop_wld_bad']='यह भू-संदर्भ फ़ाइल चित्र को घुमाती, दर्पण-प्रतिबिंबित करती, या असमान रूप से खींचती है। मानचित्र किसी चित्र को केवल स्थानांतरित कर सकता है और दोनों दिशाओं में समान मात्रा में उसका आकार बदल सकता है, इसलिए इस फ़ाइल का उपयोग नहीं किया गया।';
+$ec_lang['lpn_backdrop_unreadable']='आपका ब्राउज़र यह चित्र नहीं दिखा सकता। इसे PNG या JPEG के रूप में सहेजें और फिर से जोड़ें।';
 $ec_lang_syn['lpn_backdrop_wld_bad']='gloss: world file';
 $ec_lang['lpn_backdrop_position']='ले जाएँ';
 $ec_lang['lpn_backdrop_remove']='हटाएँ';

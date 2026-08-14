@@ -1754,6 +1754,32 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|300| **[DONE 2026-08-14] A new background image landed at the world origin, not on the model.**
+  `initialBackdropPlacement()` (was `initialBackdropSize`) now centres the image on `bbox()` as well
+  as sizing it to that extent. Tom: *"I added a background image to an existing model, and I cannot
+  find the image."* Sizing alone was a fit in one dimension: a network at state-plane coordinates put
+  a correctly-sized picture ~10⁶ units off screen, and Scale/Move both need you to click the thing
+  you cannot see. Also: `downscaleImage()` had no `onerror`, so a file the browser cannot decode
+  (TIFF — offered by `accept="image/*"`, decoded by no major browser) did *nothing at all*; it now
+  says so (`lpn_backdrop_unreadable`, 26 languages) and the picker enumerates the seven decodable
+  formats instead of `image/*`. Tom asked whether to allow `*.*`: no — what we accept is whatever
+  the visitor's own browser decodes, so the list is narrowed *and* a decode failure is reported.
+  Covered by `dev/lpn-spike/backdrop-scale-harness.js` §10–11.
+
+- 0|298| **[DONE 2026-08-14] The extrema badge was not part of the label's footprint.** Tom: *"The
+  extrema glyph is not accounted for in the leader attachment. So it can overhang a steeply vertical
+  leader when label is dragged left."* `measureDecorRight()`/`labelBoxWidth()` in
+  `js/looped-network.js`; the leader, collision boxes, mask rect and `bbox()` all read the wider
+  number. Measured per line, because the decorated line is often not the widest one.
+  - **Task 190's toggle needs no code of its own.** Marks off → `decorationFor()` returns undefined →
+    no decorated line → zero reserved. Tom asked for the treatment to be "sensitive to the toggle
+    state"; deriving it from the decoration is what makes that free and unbreakable.
+  - **Tom's `##.##(^)` / `##.##(v)` alternative was not taken.** It would fix the width for free
+    (parens are text, so `getBBox()` includes them) but discards the two-rail badge he specified and
+    iterated over eight rounds on 2026-07-30, and `(v)` reads as a letter, not a direction. Reopen if
+    the badge ever costs more than it earns.
+  - Harness: `dev/lpn-spike/label-decor-harness.js` (25 checks).
+
 - 0|295| **[DONE 2026-08-14] Manning Trap Channel's roughness/rock iteration converged on a
   different answer depending on where you started.** Third defect in `mtc_iterate`, found by
   `dev/calc-spike/mtc-harness.js` (Task 292) while fixing the first two, and fixed with Tom's

@@ -804,6 +804,7 @@
         "lpn_backdrop_scale_entry_prompt": "Enter the size of one pixel on the map, or paste the complete contents of the world file for the image",
         "lpn_backdrop_scale_entry_bad": "Type one number for the size of one pixel on the map, or paste all six lines of a world file.",
         "lpn_backdrop_wld_bad": "This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.",
+        "lpn_backdrop_unreadable": "This picture cannot be shown by your web browser. Save it as a PNG or JPEG picture and add it again.",
         "lpn_backdrop_position": "Move",
         "lpn_backdrop_remove": "Remove",
         "lpn_backdrop_remove_confirm": "Remove the background image?",
@@ -863,7 +864,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 861,
+    "count": 862,
     "active_prefixes": [
         "about",
         "bpn",

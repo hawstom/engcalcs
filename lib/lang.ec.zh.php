@@ -1028,6 +1028,7 @@ $ec_lang['lpn_backdrop_scale_entry']='按配准文件或地图上一个像素的
 $ec_lang['lpn_backdrop_scale_entry_prompt']='输入地图上一个像素的大小，或粘贴该图片配准文件的完整内容';
 $ec_lang['lpn_backdrop_scale_entry_bad']='请输入一个数字表示地图上一个像素的大小，或粘贴配准文件的全部六行内容。';
 $ec_lang['lpn_backdrop_wld_bad']='此配准文件会旋转、镜像或不均匀拉伸图片。地图只能平移图片并按相同比例整体缩放，因此未使用该文件。';
+$ec_lang['lpn_backdrop_unreadable']='您的浏览器无法显示这张图片。请将它另存为 PNG 或 JPEG 后重新添加。';
 $ec_lang['lpn_backdrop_position']='移动';
 $ec_lang['lpn_backdrop_remove']='移除';
 $ec_lang['lpn_backdrop_remove_confirm']='移除背景图片？';

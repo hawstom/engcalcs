@@ -1029,6 +1029,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Escala por world file ou por tamanho de pi
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Digite o tamanho de um pixel no mapa, ou cole o conteúdo completo do world file da imagem';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Digite um número para o tamanho de um pixel no mapa, ou cole as seis linhas de um world file.';
 $ec_lang['lpn_backdrop_wld_bad']='Este world file gira, espelha ou distorce a imagem de forma desigual. O mapa só pode mover uma imagem e redimensioná-la igualmente nas duas direções, então o arquivo não foi usado.';
+$ec_lang['lpn_backdrop_unreadable']='O seu navegador não consegue mostrar esta imagem. Guarde-a como imagem PNG ou JPEG e adicione-a novamente.';
 $ec_lang['lpn_backdrop_position']='Mover';
 $ec_lang['lpn_backdrop_remove']='Remover';
 $ec_lang['lpn_backdrop_remove_confirm']='Remover a imagem de fundo?';

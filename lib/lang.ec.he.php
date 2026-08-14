@@ -1027,6 +1027,7 @@ $ec_lang['lpn_backdrop_scale_entry']='קנה מידה לפי קובץ וורלד
 $ec_lang['lpn_backdrop_scale_entry_prompt']='הזינו את גודל הפיקסל האחד במפה, או הדביקו את כל תוכן קובץ הוורלד של התמונה';
 $ec_lang['lpn_backdrop_scale_entry_bad']='הקלידו מספר אחד עבור גודל פיקסל אחד במפה, או הדביקו את שש השורות של קובץ הוורלד.';
 $ec_lang['lpn_backdrop_wld_bad']='קובץ הוורלד הזה מסובב, משקף או מותח את התמונה בצורה לא אחידה. המפה יכולה רק להזיז תמונה ולשנות את גודלה באותה מידה בשני הכיוונים, ולכן הקובץ לא נעשה בו שימוש.';
+$ec_lang['lpn_backdrop_unreadable']='הדפדפן שלך אינו יכול להציג את התמונה הזאת. שמרו אותה כקובץ PNG או JPEG והוסיפו אותה שוב.';
 $ec_lang['lpn_backdrop_position']='הזז';
 $ec_lang['lpn_backdrop_remove']='הסר';
 $ec_lang['lpn_backdrop_remove_confirm']='להסיר את תמונת הרקע?';

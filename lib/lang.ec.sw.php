@@ -1029,6 +1029,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Weka kipimo kwa faili la kuratibu za picha
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Andika ukubwa wa pikseli moja kwenye ramani, au bandika maudhui yote ya faili la kuratibu za picha';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Andika nambari moja kwa ukubwa wa pikseli moja kwenye ramani, au bandika mistari yote sita ya faili la kuratibu za picha.';
 $ec_lang['lpn_backdrop_wld_bad']='Faili hili la kuratibu za picha linazungusha, linaakisi, au kunyoosha picha kwa viwango visivyo sawa. Ramani inaweza tu kuhamisha picha na kubadilisha ukubwa wake kwa kiwango sawa pande zote mbili, hivyo faili halikutumika.';
+$ec_lang['lpn_backdrop_unreadable']='Kivinjari chako hakiwezi kuonyesha picha hii. Ihifadhi kama PNG au JPEG kisha uiongeze tena.';
 $ec_lang['lpn_backdrop_position']='Hamisha';
 $ec_lang['lpn_backdrop_remove']='Ondoa';
 $ec_lang['lpn_backdrop_remove_confirm']='Ondoa picha ya nyuma?';

@@ -1030,6 +1030,7 @@ $ec_lang['lpn_backdrop_scale_entry']='በወርልድ ፋይል ወይም በካ
 $ec_lang['lpn_backdrop_scale_entry_prompt']='በካርታው ላይ የአንድ ፒክሰል መጠን ያስገቡ፣ ወይም ለምስሉ የወርልድ ፋይሉን ሙሉ ይዘት ይለጥፉ';
 $ec_lang['lpn_backdrop_scale_entry_bad']='በካርታው ላይ ለአንድ ፒክሰል መጠን አንድ ቁጥር ይተይቡ፣ ወይም የወርልድ ፋይሉን ስድስቱንም መስመሮች ይለጥፉ።';
 $ec_lang['lpn_backdrop_wld_bad']='ይህ የወርልድ ፋይል ምስሉን ያዞራል፣ ያንፀባርቃል ወይም ባልተመጣጠነ መንገድ ይዘረጋል። ካርታው ምስልን ማንቀሳቀስ እና በሁለቱም አቅጣጫዎች በእኩል መጠን ብቻ ማስፋት ወይም ማጥበብ ስለሚችል ፋይሉ አልተጠቀመም።';
+$ec_lang['lpn_backdrop_unreadable']='ይህ ምስል በአሳሽዎ ሊታይ አይችልም። እንደ PNG ወይም JPEG አድርገው ካስቀመጡት በኋላ እንደገና ያክሉት።';
 $ec_lang['lpn_backdrop_position']='አንቀሳቅስ';
 $ec_lang['lpn_backdrop_remove']='አስወግድ';
 $ec_lang['lpn_backdrop_remove_confirm']='የበስተጀርባ ምስሉን ያስወግዱ?';

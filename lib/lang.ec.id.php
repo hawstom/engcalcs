@@ -1029,6 +1029,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Skalakan dari world file atau ukuran satu 
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Masukkan ukuran satu piksel di peta, atau tempel seluruh isi world file untuk gambar ini';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Ketik satu angka untuk ukuran satu piksel di peta, atau tempel keenam baris world file.';
 $ec_lang['lpn_backdrop_wld_bad']='World file ini memutar, mencerminkan, atau meregangkan gambar secara tidak merata. Peta hanya dapat memindahkan gambar dan mengubah ukurannya dengan jumlah yang sama di kedua arah, sehingga file ini tidak digunakan.';
+$ec_lang['lpn_backdrop_unreadable']='Peramban Anda tidak dapat menampilkan gambar ini. Simpan gambar sebagai PNG atau JPEG lalu tambahkan lagi.';
 $ec_lang['lpn_backdrop_position']='Pindahkan';
 $ec_lang['lpn_backdrop_remove']='Hapus';
 $ec_lang['lpn_backdrop_remove_confirm']='Hapus gambar latar ini?';

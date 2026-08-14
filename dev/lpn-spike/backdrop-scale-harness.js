@@ -218,5 +218,58 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 	report(set.every(k => !/\bimage\b/i.test(val(k) || '')), 'no member of the set repeats "image" — the heading carries it');
 }
 
+// ---- 10. a new image lands ON the model, not at the world origin --------
+// Tom, 2026-08-14: "I added a background image to an existing model, and I cannot find the image."
+// The size was already fitted to the network; the POSITION was not, so an image sized correctly for
+// a network at state-plane coordinates was drawn hundreds of thousands of units away at (0,0) — and
+// every control that could have moved it (Scale, Move) needs you to click the thing you cannot see.
+// Asserting the centres coincide is the whole invariant, and it needs no browser.
+{
+	let doc = { nodes: [] }, box = { minx: 0, maxx: 10, miny: 0, maxy: 10 };
+	function bbox() { return box; }
+	eval(extract('initialBackdropPlacement'));
+
+	// An imported network far from the origin — the case that produced the report.
+	doc = { nodes: [{}, {}] };
+	box = { minx: 620000, maxx: 620400, miny: 3700000, maxy: 3700300 };
+	let p = initialBackdropPlacement(1600, 1200);
+	report(near(p.width, 400) && near(p.height, 300), 'longer side matches the network extent', `${p.width} x ${p.height}`);
+	report(near(p.tx + p.width / 2, 620200) && near(p.ty + p.height / 2, 3700150),
+		'the image is centred on the network it was added to', `${p.tx}, ${p.ty}`);
+
+	// Empty document: still centred on what bbox() reports, so the picture is where the view is.
+	doc = { nodes: [] };
+	box = { minx: 0, maxx: 10, miny: 0, maxy: 10 };
+	p = initialBackdropPlacement(800, 800);
+	report(near(p.width, 40) && near(p.height, 40), 'empty document falls back to the fixed 40 default', String(p.width));
+	report(near(p.tx, -15) && near(p.ty, -15), 'and is centred on the default bbox', `${p.tx}, ${p.ty}`);
+
+	// A tall image keeps its aspect ratio — the fit is on the LONGER side.
+	doc = { nodes: [{}] };
+	box = { minx: 0, maxx: 100, miny: 0, maxy: 100 };
+	p = initialBackdropPlacement(500, 1000);
+	report(near(p.width, 50) && near(p.height, 100), 'aspect ratio preserved, longer side fitted', `${p.width} x ${p.height}`);
+
+	// The placement is only meaningful while x/y are 0 and s is 1 on a fresh image — that is what
+	// makes tx/ty the world position of the corner (applyBackdropTransform()).
+	report(/backdrop = \{ href: href, iw: iw, ih: ih, x: 0, y: 0, width: p\.width, height: p\.height, tx: p\.tx, ty: p\.ty, s: 1 \}/.test(src),
+		'a fresh backdrop still starts at x/y 0 and s 1, so tx/ty ARE the corner');
+}
+
+// ---- 11. a file the browser cannot decode says so -----------------------
+// TIFF is reported by the OS as image/tiff, passes the picker and the type filter, and then fails
+// in the decoder. With only an onload handler that produced NOTHING — indistinguishable from an
+// image placed off screen, which is the other half of the same report.
+{
+	report(/img\.onerror = function/.test(src), 'downscaleImage() handles a decode failure at all');
+	report(/lpn_backdrop_unreadable/.test(src), 'and reports it with a translated message');
+	const php = fs.readFileSync(path.join(__dirname, '../../Looped-Network.php'), 'utf8');
+	const accept = (php.match(/id="lpn_backdrop_file"[^>]*accept="([^"]*)"/) || [])[1] || '';
+	report(!/image\/\*/.test(accept), 'the picker no longer offers every image/* type, TIFF included', accept.slice(0, 40) + '…');
+	report(/\.png/.test(accept) && /\.jpg/.test(accept) && /image\/png/.test(accept),
+		'it names both extensions and MIME types — desktop pickers filter on one, mobile on the other');
+	report(/\.wld/.test(accept) && /\.pgw/.test(accept), 'world-file sidecars are still offered');
+}
+
 console.log(`\n${checks - failures}/${checks} passed`);
 process.exit(failures ? 1 : 0);

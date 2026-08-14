@@ -1031,6 +1031,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Escalar por archivo de georreferenciación
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Ingrese el tamaño de un píxel en el mapa, o pegue el contenido completo del archivo de georreferenciación de la imagen';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Escriba un solo número para el tamaño de un píxel en el mapa, o pegue las seis líneas completas de un archivo de georreferenciación.';
 $ec_lang['lpn_backdrop_wld_bad']='Este archivo de georreferenciación rota, refleja o estira la imagen de forma desigual. El mapa solo puede mover una imagen y cambiar su tamaño en la misma proporción en ambas direcciones, por lo que el archivo no se utilizó.';
+$ec_lang['lpn_backdrop_unreadable']='Su navegador web no puede mostrar esta imagen. Guárdela como imagen PNG o JPEG y añádala de nuevo.';
 $ec_lang['lpn_backdrop_position']='Mover';
 $ec_lang['lpn_backdrop_remove']='Quitar';
 $ec_lang['lpn_backdrop_remove_confirm']='¿Quitar la imagen de fondo?';

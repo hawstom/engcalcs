@@ -1028,6 +1028,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Měřítko podle world file nebo podle vel
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Zadejte velikost jednoho pixelu na mapě, nebo vložte celý obsah world file pro tento obrázek';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Zadejte jedno číslo pro velikost jednoho pixelu na mapě, nebo vložte všech šest řádků world file.';
 $ec_lang['lpn_backdrop_wld_bad']='Tento world file otáčí, zrcadlí nebo nerovnoměrně roztahuje obrázek. Mapa může obrázek pouze přesunout a zvětšit či zmenšit stejně v obou směrech, proto nebyl soubor použit.';
+$ec_lang['lpn_backdrop_unreadable']='Tento obrázek nelze ve vašem prohlížeči zobrazit. Uložte jej jako PNG nebo JPEG a přidejte znovu.';
 $ec_lang['lpn_backdrop_position']='Přesunout';
 $ec_lang['lpn_backdrop_remove']='Odebrat';
 $ec_lang['lpn_backdrop_remove_confirm']='Odebrat podkladový obrázek?';

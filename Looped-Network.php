@@ -122,8 +122,19 @@ echoHeader("EngCalcs", $html_title, "");
 	      // don't ask for world file... We ask for a paste of World File contents") -- scaling waits
 	      // in the Background image menu until the user goes looking for it. The second hidden input
 	      // that the deleted offer dialog opened is gone with it. The accept list still has to name
-	      // the world-file extensions explicitly -- image/* alone would hide them from the picker. ?>
-	<input type="file" id="lpn_backdrop_file" multiple accept="image/*,.wld,.jgw,.jpgw,.pgw,.pngw,.tfw,.gfw,.tifw,.bpw,.wf,text/plain" style="display:none">
+	      // the world-file extensions explicitly -- image/* alone would hide them from the picker.
+	      //
+	      // THE PICTURE FORMATS ARE ENUMERATED, NOT image/* (Tom, 2026-08-14: "I don't know what
+	      // kinds of files we really can accept"). The answer is not ours to choose: the file goes
+	      // through <img> and a canvas re-encode, so what we accept is exactly what the visitor's
+	      // OWN BROWSER decodes. image/* was wider than that in one direction that matters -- it
+	      // offered TIFF, which no major browser decodes and which therefore failed silently. These
+	      // seven are decoded everywhere current. Both MIME types and extensions are listed because
+	      // desktop pickers filter on one and mobile pickers on the other. *.* was the alternative
+	      // and is worse: it would put every unopenable file back in front of the user with nothing
+	      // to distinguish it. Since the list can never be exactly right, js/looped-network.js also
+	      // reports a file it could not decode (lpn_backdrop_unreadable) rather than doing nothing. ?>
+	<input type="file" id="lpn_backdrop_file" multiple accept="image/png,image/jpeg,image/gif,image/webp,image/bmp,image/avif,image/svg+xml,.png,.jpg,.jpeg,.gif,.webp,.bmp,.avif,.svg,.wld,.jgw,.jpgw,.pgw,.pngw,.tfw,.gfw,.tifw,.bpw,.wf,text/plain" style="display:none">
 	<?php // Project import (Task 195). Lives here in the page, not inside any popover body, because
 	      // those bodies get rebuilt wholesale and would take the input's wired change handler with
 	      // them -- the same reason lpn_backdrop_file sits here. ?>
@@ -527,6 +538,7 @@ EngCalcs.pageConfig = {
 	lpn_backdrop_scale_entry_prompt: <?=json_encode($ec_lang['lpn_backdrop_scale_entry_prompt'])?>,
 	lpn_backdrop_scale_entry_bad: <?=json_encode($ec_lang['lpn_backdrop_scale_entry_bad'])?>,
 	lpn_backdrop_wld_bad: <?=json_encode($ec_lang['lpn_backdrop_wld_bad'])?>,
+	lpn_backdrop_unreadable: <?=json_encode($ec_lang['lpn_backdrop_unreadable'])?>,
 	lpn_backdrop_position: <?=json_encode($ec_lang['lpn_backdrop_position'])?>,
 	lpn_backdrop_remove: <?=json_encode($ec_lang['lpn_backdrop_remove'])?>,
 	lpn_backdrop_remove_confirm: <?=json_encode($ec_lang['lpn_backdrop_remove_confirm'])?>,

@@ -1026,6 +1026,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Maßstab per Worldfile oder Pixelgröße';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Geben Sie die Größe eines Pixels auf der Karte ein, oder fügen Sie den vollständigen Inhalt der Worldfile für das Bild ein';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Geben Sie eine einzige Zahl für die Größe eines Pixels auf der Karte ein, oder fügen Sie alle sechs Zeilen einer Worldfile ein.';
 $ec_lang['lpn_backdrop_wld_bad']='Diese Worldfile dreht, spiegelt oder verzerrt das Bild ungleichmäßig. Die Karte kann ein Bild nur verschieben und in beide Richtungen gleich stark skalieren, daher wurde die Datei nicht verwendet.';
+$ec_lang['lpn_backdrop_unreadable']='Dieses Bild kann in Ihrem Browser nicht angezeigt werden. Speichern Sie es als PNG oder JPEG und fügen Sie es erneut hinzu.';
 $ec_lang['lpn_backdrop_position']='Verschieben';
 $ec_lang['lpn_backdrop_remove']='Entfernen';
 $ec_lang['lpn_backdrop_remove_confirm']='Das Hintergrundbild entfernen?';

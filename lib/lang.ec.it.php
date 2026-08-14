@@ -1028,6 +1028,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Ridimensiona con un file world o con la di
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Inserisci la dimensione di un pixel sulla mappa, oppure incolla il contenuto completo del file world dell\'immagine';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Digita un numero per la dimensione di un pixel sulla mappa, oppure incolla tutte e sei le righe di un file world.';
 $ec_lang['lpn_backdrop_wld_bad']='Questo file world ruota, specchia o deforma in modo non uniforme l\'immagine. La mappa può solo spostare un\'immagine e ridimensionarla della stessa quantità in entrambe le direzioni, quindi il file non è stato usato.';
+$ec_lang['lpn_backdrop_unreadable']='Il browser non può mostrare questa immagine. Salvala come PNG o JPEG e aggiungila di nuovo.';
 $ec_lang['lpn_backdrop_position']='Sposta';
 $ec_lang['lpn_backdrop_remove']='Rimuovi';
 $ec_lang['lpn_backdrop_remove_confirm']='Rimuovere l\'immagine di sfondo?';

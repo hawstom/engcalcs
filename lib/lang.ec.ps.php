@@ -1029,6 +1029,7 @@ $ec_lang['lpn_backdrop_scale_entry']='د نقشې همغږۍ دوتنې یا د 
 $ec_lang['lpn_backdrop_scale_entry_prompt']='د نقشه کې د یو پیکسل اندازه ولیکئ، یا د انځور د نقشې همغږۍ دوتنې بشپړ منځپانګه پیسټ کړئ';
 $ec_lang['lpn_backdrop_scale_entry_bad']='د نقشه کې د یو پیکسل اندازې لپاره یو عدد ولیکئ، یا د نقشې همغږۍ دوتنې ټولې شپږ کرښې پیسټ کړئ.';
 $ec_lang['lpn_backdrop_wld_bad']='دا د نقشې همغږۍ دوتنه انځور څرخوي، منعکس کوي، یا يې په ناورته ډول غزوي. نقشه یوازې کولی شي انځور ولیږدوي او په دواړو لورو کې يې يو شان اندازه بدله کړي، نو دا دوتنه و نه کارول شوه.';
+$ec_lang['lpn_backdrop_unreadable']='ستاسو براوزر دا انځور نه شي ښودلی. دا د PNG یا JPEG په بڼه خوندي کړئ او بیا یې ورزیات کړئ.';
 $ec_lang['lpn_backdrop_position']='لیږدول';
 $ec_lang['lpn_backdrop_remove']='لرې کول';
 $ec_lang['lpn_backdrop_remove_confirm']='شاليد انځور لرې کړئ؟';

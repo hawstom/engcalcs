@@ -1031,6 +1031,7 @@ $ec_lang['lpn_backdrop_scale_entry']='World dosyası veya haritadaki bir pikseli
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Haritadaki bir pikselin boyutunu girin veya görüntünün world dosyasının tüm içeriğini yapıştırın';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Haritadaki bir pikselin boyutu için tek bir sayı yazın veya bir world dosyasının altı satırının tamamını yapıştırın.';
 $ec_lang['lpn_backdrop_wld_bad']='Bu world dosyası görüntüyü döndürüyor, yansıtıyor veya iki yönde eşit olmayan biçimde geriyor. Harita bir görüntüyü yalnızca taşıyabilir ve her iki yönde aynı oranda yeniden boyutlandırabilir, bu yüzden dosya kullanılmadı.';
+$ec_lang['lpn_backdrop_unreadable']='Bu resim web tarayıcınızda gösterilemiyor. Resmi PNG veya JPEG olarak kaydedip yeniden ekleyin.';
 $ec_lang['lpn_backdrop_position']='Taşı';
 $ec_lang['lpn_backdrop_remove']='Kaldır';
 $ec_lang['lpn_backdrop_remove_confirm']='Arka plan görüntüsü kaldırılsın mı?';

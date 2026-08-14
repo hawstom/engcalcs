@@ -1029,6 +1029,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Échelle par fichier de géoréférencemen
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Indiquez la taille d\'un pixel sur la carte, ou collez le contenu complet du fichier de géoréférencement de l\'image';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Saisissez un nombre pour la taille d\'un pixel sur la carte, ou collez les six lignes d\'un fichier de géoréférencement.';
 $ec_lang['lpn_backdrop_wld_bad']='Ce fichier de géoréférencement fait pivoter, inverse ou déforme l\'image de façon inégale. La carte ne peut que déplacer une image et la redimensionner de façon identique dans les deux directions ; le fichier n\'a donc pas été utilisé.';
+$ec_lang['lpn_backdrop_unreadable']='Votre navigateur web ne peut pas afficher cette image. Enregistrez-la au format PNG ou JPEG, puis ajoutez-la de nouveau.';
 $ec_lang['lpn_backdrop_position']='Déplacer';
 $ec_lang['lpn_backdrop_remove']='Retirer';
 $ec_lang['lpn_backdrop_remove_confirm']='Retirer l\'image de fond ?';
