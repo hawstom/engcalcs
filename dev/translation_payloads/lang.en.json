@@ -592,7 +592,7 @@
         "lpn_field_head": "Head",
         "lpn_field_head_tip": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation.",
         "lpn_close": "Close",
-        "lpn_empty_hint": "Start by adding a background image or a reservoir from the toolbar, or open File, New project to begin from an example.",
+        "lpn_empty_hint": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar.",
         "lpn_tool_undo": "Undo",
         "lpn_confirm_example": "This adds the example to the network you already have. Continue?",
         "lpn_field_diameter": "Diameter",

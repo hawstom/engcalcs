@@ -1143,7 +1143,7 @@ $ec_lang['lpn_field_head']='Head';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation.';
 $ec_lang['lpn_close']='Close';
-$ec_lang['lpn_empty_hint']='Start by adding a background image or a reservoir from the toolbar, or open File, New project to begin from an example.';
+$ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
