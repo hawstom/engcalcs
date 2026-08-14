@@ -393,164 +393,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   instrument exists and starts at zero on 2026-08-07: read the "Contact funnel" section of
   `log/lang-log-stats.sh` once both counts are out of single digits, and let the clicks-vs-sends
   split pick which lever this task pulls.
-- 85|146| **Looped pipe network calculator with a map interface — new page `lpn_`. Scoped with Tom
-  2026-07-28; was "Looped-network (Hardy Cross) solving", extracted from Task 137 on 2026-07-27.**
-  A canvas/map-centric calculator where the interface *is* a drawing surface: elements (Junction,
-  Pipe, Reservoir, Pump, Text) added from a toolbar, properties edited in a popup, loops solved to
-  convergence. Full design record: **`dev/looped-network-calculator-scope.md`** — read that before
-  starting anything; this entry is the summary and the decision log.
-
-  **Three corrections to the entry this replaces, each a real change of direction:**
-  1. **New page and new prefix — not "extend `bpn_` (or build alongside it)".** `bpn_` /
-     `Branched-Network.php` stays exactly as shipped; the row-table form is genuinely better for a
-     simple series run, and this is a different UX with a different audience. `lpn_`,
-     `Looped-Network.php`, `js/looped-network.js`.
-  2. **Global gradient algorithm (Todini), not Hardy Cross.** Hardy Cross needs an explicit
-     independent-loop set, pseudo-loops through every pair of fixed-head sources, and an initial flow
-     distribution that *already* satisfies continuity at every node — all of which get re-derived
-     every time a user draws one more pipe on a map. GGA needs none of the three and is
-     Newton-quadratic. Hardy Cross is now recorded as the method **not** chosen, with that reason.
-  3. **Target scale is ~10–20 nodes, and that is a design decision, not a shortfall (Tom).** An
-     engineer with a 200-node model would rather crack open EPANET, and 200 nodes is past the
-     comfortable usability limit of a browser canvas unless we are *very* good at this. **Our
-     strength is the map interface, not capacity.** 200 nodes survives only as a headroom check —
-     we must not fall over — never as the sizing target. This single decision **deletes the hardest
-     part of the solver**: at 20 nodes a dense Cholesky is ~30 lines and microseconds, so the CSR /
-     conjugate-gradient / fill-reducing-ordering machinery is **cut, not deferred**.
-
-  **Identity strings** (decided 2026-07-28): menu "Looped Pipe Network (Map Interface)"; title "Free
-  Online Looped Pipe Network Calculator with Map Interface"; desc "Pressure and Flow in a Looped Pipe
-  Network You Draw on a Map". **"…on a Map" alone was rejected**: it reads as a *geographic overlay*,
-  which is Phase 4 and may never ship, whereas what actually distinguishes this page is that the
-  interface is a drawing surface. Do not let a later edit quietly shorten it back.
-
-  **Gate: satisfied.** Task 137's original gate was an OR — "after we're map-mashup experts **or**
-  users ask" — and it is now moot from a third direction: Tom committed to the calculator directly,
-  and Task 145 moved here (below), so this page is *how* we become map-mashup experts rather than
-  something waiting on it. Task 144's finding is still welcome evidence but is no longer a blocker.
-
-  **Commit direct to `master` (Tom, 2026-07-30 cleanup — this project does not normally use
-  branches; the per-phase `lpn-solver`/`lpn-labels` branches this task used through Phase 2 were an
-  inconsistency with the standing no-branching policy already recorded elsewhere in this file, e.g.
-  the entity-migration task below, not a deliberate exception. Both branches were fast-forward-merged
-  into `master` and deleted 2026-07-30.)** The scope doc and these roadmap entries are planning
-  artifacts and belong on `master` as always.
-
-  **Biggest standing risk is scope gravity toward EPANET.** The scope doc opens with a "Cut, not
-  deferred" list (extended-period simulation, water quality, PRV/PSV/FCV, demand patterns, energy
-  cost, **Tank** — Tom is right that it is a time-modeling element in a steady-state tool). Second
-  biggest is translation cost: ~85–95 new keys ≈ 1.7× the `bpn_` sprint, which is why **Phase 1
-  ships English-only** and the sprint waits until the string set stops moving.
-
-  **Phases. Risk is carried by two cheap spikes rather than by the old gate.** The two spikes are
-  **independent of each other**, so a failure in one wastes nothing from the other, and each is a
-  real abort point. (These were briefly filed as separate Tasks 171/172 on 2026-07-28 and folded back
-  the same day — the "extract unbuilt phases to their own task" lesson from Task 137 applies to
-  *closing a parent*, because blocks in `## Completed` are never re-scanned. This parent is open and
-  gets scanned every pass, so extraction bought nothing and only scattered the design.)
-
-  - **Phase 0 — canvas spike. DONE 2026-07-29, on branch `lpn-solver`.** `dev/lpn-spike/canvas-spike.html`
-    (standalone, no PHP/lang keys/solver/persistence) plus the full round-by-round record in
-    `dev/lpn-spike/phase0-acceptance.md`. Settled the technology empirically: **SVG DOM
-    (`createElementNS`, not `innerHTML` rebuilds) is the chosen technology** — 12 rounds of on-device
-    iteration with Tom plus an independent Opus subagent review found no SVG-blocking issue, so the
-    Leaflet + `CRS.Simple` fallback was never triggered. Demonstrated: pan, wheel zoom about the
-    cursor, pinch, double-tap zoom, click-to-popup with a writeback field, node/vertex/label drag,
-    **arbitrary-vertex link editing** (not capped at one — see the Phase 1 note below), zoom-extent
-    fitted to rendered extent (not bare coordinates), a draggable label with a leader (Arabic and
-    Amharic shape and order correctly), a two-point-registered backdrop image with separate Scale/
-    Position steps, a 200-node headroom grid, and print output. On-device phone pass (drag
-    smoothness, pinch vs. page scroll, tap-target size) confirmed 2026-07-29. Real bugs found and
-    fixed along the way — several are suite-relevant beyond this spike: SVG is a CSS replaced
-    element and won't stretch from `position:absolute` insets alone (needs `width`/`height`
-    attributes); combining top+bottom insets *with* an explicit height over-constrains the box per
-    CSS2.1 §10.6.4 and silently drops one constraint; `setPointerCapture` retargets the synthesized
-    `click` event to the capturing element on desktop Chrome, breaking naive tap-detection.
-  - **Phase 0.5 — headless GGA solver. DONE 2026-07-29, on branch `lpn-solver`.**
-    `js/lpn-solver.js` + `dev/lpn-spike/`; `node dev/lpn-spike/validate.js`, 46 checks, no network
-    access or `node_modules` needed.
-    **The reference is the real EPANET engine, not published tables:** `epanet-js` (EPANET's C code
-    as WASM) runs EPA's Net1/Net2/Net3 and its output is committed. Result: heads within 0.0002 ft,
-    flows within 0.004 gpm, continuity and energy residuals at machine precision, closed-form cases
-    exact to 1e−12, and the head-loss kernel exact to 1e−12 against `branched-network.js`.
-    **Three things this task said would be true, that the spike proved wrong** — recorded because
-    they are the entire justification for spiking before building:
-    1. *"Linearize below a flow cutoff Qmin."* Not sufficient, and not what EPANET does. A flow
-       cutoff leaves the gradient unbounded just above it, so a near-zero-flow link gets an enormous
-       conductance. Net3's pipe 333 oscillated between 0 and −2.28 gpm forever. The guard must floor
-       **dh/dQ**, not |Q|.
-    2. *"A 0.6 relaxation factor, without which pumps and emitters oscillate forever."* No such
-       oscillation exists once the gradient floor is right — everything converges in 5–16 iterations
-       with no damping. And the relaxation as specified was itself a bug: multiplying every flow by
-       0.6 is arbitrary shrinkage, not under-relaxation, and would have destroyed the exact
-       continuity the GGA update guarantees.
-    3. *"200 nodes is ~2.7 M flops, a few milliseconds."* Off by an order of magnitude — it forgot
-       the iteration count. Measured: 0.4 ms at the 21-node target, 30 ms at 201 nodes. The
-       conclusion (dense Cholesky, sparse machinery cut) survives; the arithmetic did not.
-    **Two requirements nobody anticipated**, both found by cases that only exist because the harness
-    was written first: convergence must be normalised by total **demand** rather than total flow, and
-    **stagnation detection** is mandatory — without it a large network burns 100 iterations and
-    330 ms re-deriving the answer it had at iteration 6, on every keystroke.
-    Also confirmed: **structural diagnostics run before the solve** (no fixed head / unreachable
-    node named by id / node isolated behind a closed link), and this suite's Hazen-Williams differs
-    from EPANET's by ~0.012%, so the solver carries both constant sets and defaults to ours.
-  - **Phases 1–4 were originally scoped in the scope doc; Phase 1 is DONE** (shipped 2026-07-29,
-    live as a PREVIEW page: page, toolbar, elements, popups, solve, autosave, diagnostics). Phase
-    2 shipped most of its scope (labels, gear/settings panel, legend positioning, user-supplied
-    backdrop image). **The rest of Phase 2/3/4's unbuilt items are no longer tracked as phases —
-    reorganized 2026-07-29 into individually-prioritized child tasks 146.01–146.09 below** (plus
-    Task 145, which already covers what was Phase 4), so each item's priority is visible instead
-    of buried in phase prose. The scope doc retains the phase framing as historical narrative;
-    ROADMAP priority is authoritative for what to work on next.
-
-  **Backdrop: the network is drawn over a background, and the background is usually not a map (Tom,
-  2026-07-28).** Nobody uses EPANET without a backdrop, and in practice that backdrop is a plan
-  sheet, a CAD export, or a local aerial — **not** a Google map or Google aerial. So the primary
-  backdrop feature is **a user-supplied image with a two-point scale/rotate registration**, in the
-  page's own flat Cartesian world coordinates, with **no projection anywhere**. That is what EPANET
-  itself does, it is a Phase 2-sized feature rather than a Phase 4 one, and it needs no API key, no
-  terms of service, and no network connection — so it survives offline in the PWA. **Tiled online
-  maps (Task 145) then become one more backdrop type that happens to arrive pre-registered**, not
-  the foundation. Design consequence for Phase 0: the coordinate seam must be able to place and
-  scale a backdrop image from day one, which is why the spike now includes one.
-  **The canonical case is a screenshot with a bar scale on it** (Tom, 2026-07-29) — often a Google
-  Maps screenshot, which is a completely different thing from a Google Maps integration: a plain
-  image the user already has, no API, no key, no terms of service. It is also *why* two-point
-  registration beats a scale-factor field: the user clicks the two ends of the bar scale and types
-  what it says, which needs no knowledge of projections or units-per-pixel and works the same for a
-  scanned plan, a CAD export, or a phone photo of a drawing on a wall. Make that the spike's
-  backdrop acceptance test. A blank project carries placeholder text across the canvas — "Start by
-  adding a background image using the toolbar." **The empty-canvas question is closed** (was open
-  as of this paragraph's original writing; resolved by commit `7428ff0 Task 146: close the
-  empty-canvas open question`, 2026-07-29) — a new project opens on the placeholder-text canvas
-  above, not a worked example.
-
-  **WHAT STILL BLOCKS CLOSING THIS — four child tasks, and nothing in the parent's own scope
-  (audited 2026-08-13).** Every phase this task declared is shipped: 0, 0.5, 1, and all of Phase 2
-  except two items. The remaining four are the only ones the scope doc ever *owed*:
-  **146.04** (node/link report tables) and **146.05** (element browser) — both named in Phase 2's
-  bullet; **146.07** (Open/Closed link) and **146.09** (map insets) — both named in Phase 3's.
-  **Close Task 146 when those four are closed.**
-
-  - **146.07 is nearly free and should go first.** The `status` field already exists on every link,
-    defaults to `'open'`, serializes, is scenario-overridable, and is consumed by `js/lpn-solver.js`
-    in four places; `js/lpn-inp.js` already reads `CLOSED`. `js/looped-network.js` says so at the
-    declaration: *"Task 146.07 will surface it."* What is missing is a control in the Pipe popup.
-  - **`(Task 146 child)` now means SCOPE, and only those four carry it.** Nine other open tasks
-    (177, 181, 184, 185, 186, 191, 192, 201, 209) carried the same tag while being ideas raised
-    *during* the build rather than work this task owed — 209 was even tagged "but suite-shaped."
-    They were retagged **`(originated during Task 146)`** on 2026-08-13, which keeps the provenance
-    a reader wants without letting a wishlist hold a shipped feature open. Nothing was deprioritized
-    and nothing was closed; only the tag changed. **Do not re-tag a new `lpn_` idea as a child** —
-    a child is something Phase 1–3 promised, and that list is now closed at four.
-  - **Phase 4 (Task 145, the tiled-map mashup) does not block closure.** It was extracted to its own
-    ID with its own priority precisely so it would not be buried, and Tom confirmed it 2026-07-29 as
-    "maybe cool, try it sometime" at priority 11. It closes on its own merits, whenever.
-  - **The design record does not need relocating.** `dev/looped-network-calculator-scope.md` already
-    carries every load-bearing decision — the GGA-not-Hardy-Cross rationale, the 10–20 node target,
-    the cut list, the scope-gravity warning, the backdrop reasoning, and what Phase 0.5 disproved.
-    This block is a summary of that document, so moving it to `## Completed` (never re-scanned)
-    costs nothing, which is the usual reason a parent like this cannot close.
 - 15|202| **`zh` converts at ~15% where its peers convert at 50–75% — PARKED until n=30, with a
   pre-registered threshold.** Everything cheap has been eliminated; what remains is a decision that
   data will make for free.
@@ -572,7 +414,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the answer**, and the log accrues at zero cost. Re-read it when `zh` passes 30 views.
   - **Do not re-score `zh`'s QUALITY in either direction before then.**
 
-- 10|181| **Per-element symbol sizing (originated during Task 146).** Task 180 shipped one overall
+- 5|181| **Per-element symbol sizing (originated during Task 146).** Task 180 shipped one overall
   `settings.symbolScale` multiplier ("Symbol size (relative to text)") covering node radius, pipe
   width, pump/vertex/arrow marks and stroke widths together. Tom, 2026-07-30, named the
   fine-grained version as the eventual shape — a base pipe width, node size, pump size, reservoir
@@ -810,12 +652,18 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   the delta decision above** — the naming problem disappears with scenario-level copy, and the
   sequencing note inverts: the container must come first, not the flat saves.
 
-- 30|192| **Right-click / long-press context-menu system (originated during Task 146).** Raised by Tom,
+- 5|192| **Right-click / long-press context-menu system (originated during Task 146).** Raised by Tom,
   2026-07-30, when "Create scenario geometry variant" (Task 184) was proposed as a right-click
   action: the calculator has **no right-click capability at all today**, so that action cannot
   quietly introduce one. Tom: *"if we add right-click, it should be built out robustly. It's a habit
   that, once taught or discovered, we should leverage."* Hence a task of its own, and hence 146.08
   ships its command on the toolbar/menu path only — this is not a blocker for it.
+
+  **PARKED at 5, 2026-08-13 (Tom: "I am not currently seeing the need for this").** Not declined —
+  the reasoning below is still sound, and the day something wants a context menu it should be built
+  the robust way this task describes rather than smuggled in. But nothing currently wants one: the
+  action that raised it (Task 184's scenario variant) is itself parked, so this is a mechanism with
+  no live caller. Do not build it on the strength of "every app has right-click."
   - **Every clickable class gets a menu** — node, link, vertex, label, backdrop, empty canvas. A menu
     missing on some objects is exactly what teaches users to stop trying.
   - **Long-press is the touch equivalent, and every item stays reachable without it.** This page runs
@@ -826,7 +674,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Disable-with-reason rather than hide**, where practical, so the vocabulary stays learnable.
   - Menu contents are contextual to the clicked object (and later to the selection, if multi-select
     lands). Escape closes.
-- 40|201| **Scenario UI — build what Task 184 decided (originated during Task 146).** Created 2026-08-03 while
+- 15|201| **Scenario UI — build what Task 184 decided (originated during Task 146).** Created 2026-08-03 while
   closing 146.08. Task 184 settled the delta model and 146.08 shipped the storage for it, but
   **nothing in the app can create, name, or switch a scenario**, and there is no write path for an
   override — `setOverride()` deliberately does not exist yet (`effective(el, prop)` is a pure
@@ -866,7 +714,17 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   copied. Worth a deliberate decision on whether ID is ever copyable (it must not be — IDs are
   unique) and whether geometry is (it must not be — that is a move, not a property copy). This is
   the cheap 80% of Task 186 and should ship long before it.
-- 15|186| **Table-paradigm editor with spreadsheet copy/paste (originated during Task 146).** Tom, 2026-07-30:
+
+  **Kept and still liked (Tom, 2026-08-13): "Very nice idea. I love it."** With a sharp observation
+  about why EPANET does not have one: **EPANET/epanet-js would reach for SEARCH AND REPLACE instead,
+  because they are aimed at MANAGEMENT of a huge existing network, where we are aimed at DESIGN.**
+  Find-and-replace is the right tool when you have 4,000 pipes and need every PVC one re-roughened;
+  click-the-source-then-click-the-targets is the right tool when you are drawing 15 pipes and want
+  this one to look like that one. **Do not "improve" this into a search-and-replace** — that would
+  be borrowing a big-network tool for a small-network job and is the same scope gravity toward
+  EPANET that Task 146's scope doc warns about. If a find-and-replace is ever genuinely wanted, it
+  is a separate task with a separate justification, not this one grown up.
+- 8|186| **Table-paradigm editor with spreadsheet copy/paste (originated during Task 146).** Tom, 2026-07-30:
   "For the future a table-paradigm editor with spreadsheet-like copy and paste would be very cool."
   A grid of nodes and a grid of links, editable in place, with clipboard paste from a spreadsheet —
   what EPANET's own Data Browser tables and every serious package's tabular view provide, and the
@@ -904,8 +762,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 15|146.07| **Open/Closed link property (Task 146 child).** A simple boolean state on a link. Tom,
   2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
   a plain open/closed state, kept simple.
-- 15|194| **Touch gesture model: one finger scrolls the page, two fingers pan the map (Task 146
-  child).** Raised by Tom, 2026-07-31, after the canvas-fills-the-phone lock-up: *"It didn't occur
+- 15|194| **Touch gesture model: one finger scrolls the page, two fingers pan the map (originated
+  during Task 146).** Raised by Tom, 2026-07-31, after the canvas-fills-the-phone lock-up: *"It didn't occur
   to me to try to scroll with two fingers. That's just an idea. It looks like it occurred to you
   too."* The height cap in `applyMapHeight()` already prevents the trap, so this is an improvement,
   not a fix — it removes the underlying conflict instead of bounding it.
@@ -953,20 +811,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   rewrite against live controls, not a code fix, so it needs a browser pass rather than static
   reading.
 
-- 45|209| **A snoozable tip system (originated during Task 146; suite-shaped).** Asked for by Tom,
-  2026-08-03, while reviewing Task 195's file-and-lock explanation: the page needs somewhere to put
-  "here is what is about to happen" text that a user can dismiss for now and see again later, rather
-  than the two states we have (shown once ever, or shown every time). Phase 2's training panel is the
-  first instance and currently uses the crude version — **shown once per browser, keyed off whether
-  an identity exists** — which is right for onboarding and wrong for anything a user might want back.
-  Wants: dismiss, snooze, and a way to bring a tip back deliberately (a "show me that again" in
-  Settings). Suite-shaped rather than `lpn_`-only: every calculator has explanations it currently
-  either buries in Notes or repeats forever.
-  - **Second concrete instance, 2026-08-06:** Save all switches tabs as it saves — ugly, but the
-    honest consequence of the write path writing the OPEN project (punch list §3). Tom: *"Some sort
-    of an explanation might be nice. But I don't know where or how unless we had a snoozable tip
-    system."* That is this task, and it is why the priority moved 40 → 45: it now has two real things
-    to say, and a tip system with nothing to say is scaffolding.
 
 - 25|281| **EPANET `.inp` EXPORT — the unbuilt half of Task 196.** Import shipped 2026-08-11;
   writing an `.inp` did not. It is the much easier direction and most of it already exists:
@@ -1223,27 +1067,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     is strictly better than the two-point scale gesture a human would otherwise perform by eye.
 
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
-- 20|177| **Link head loss: report the per-length gradient alongside total (originated during Task 146).**
-  Conventional network software and reports express pipe head loss in TWO forms, not one, because
-  they answer different questions: **total head loss** (ft or m across the whole link — what you
-  need to build the HGL/EGL, and what `lpn_` already reports) and a **per-length gradient/slope**
-  (independent of how long the pipe happens to be — the form used to screen/compare pipes against a
-  design criterion, e.g. "keep it under 5 ft per 1000 ft"). EPANET's own default Link Results table
-  leads with the per-length form ("Unit Headloss", ft/1000ft or m/km) and derives total separately;
-  WaterCAD/InfoWater-class tools show both as separate columns for the same reason. **`lpn_` should
-  reuse this suite's OWN existing convention for this exact concept, not invent a new one**:
-  `mpf_`/`mphl_` already report friction slope through the `'slope'` unit family
-  (`lib/Units.lib.php`: `grade` = ft/ft or m/m, `gradePercent` = %) — a dimensionless ratio, not
-  EPANET's per-1000-length form, but the same underlying quantity (head loss ÷ length) and already
-  translated/established suite-wide. Add a link "Head loss gradient" field (`headloss/length`)
-  alongside the existing total, using the `slope` family — parallel to how `headgain` just got
-  split out from `headloss` as its own field/color/extrema bucket, not merged into it. Needs one
-  new unit selector on the page (`echoUnitSelect('lpn_u_gradient', 'slope', '')`) and a
-  `lpnFieldColors`/`linkFieldDefs`/`defaultLabelSettings` entry, same shape as every other field
-  added this way. Not yet built — a real design question (does `lpn_` want `grade`/`gradePercent`
-  like `mpf_`/`mphl_`, or is a per-1000-length form worth introducing as a second option) should be
-  confirmed with Tom before wiring the selector, since it's the kind of suite-wide convention choice
-  CLAUDE.md's concept-level reuse rule cares about getting right once rather than per-page.
 - 15|178| **Cheap filmstrip-GIF recipe for Help-menu docs (handoff, 2026-07-30).** A proof of
   concept (drag-a-label-and-reset, add/drag/delete-a-vertex) showed this is genuinely cheap to
   produce once set up — the fiddly part is precise SVG click targeting, not GIF assembly. Recipe,
@@ -2010,6 +1833,278 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|146| **[DONE 2026-08-13] Looped pipe network calculator with a map interface — new page `lpn_`.
+  Scoped with Tom 2026-07-28; was "Looped-network (Hardy Cross) solving", extracted from Task 137 on
+  2026-07-27.**
+
+  **CLOSED WITH FOUR CHILDREN STILL OPEN, AND THAT IS THE CORRECT CLOSE — read this before
+  reopening it.** 146.04 (report tables), 146.05 (element browser), 146.07 (Open/Closed link) and
+  146.09 (map insets) are unbuilt. They do **not** block, for the reason this project's own
+  parent-closing rule gives: *extract the unbuilt work into its own tasks first, because blocks in
+  `## Completed` are never re-scanned.* **That extraction happened on 2026-07-29** — it is exactly
+  what created 146.01–146.09. The precondition was met six weeks before this close.
+
+  What kept the task open afterwards was the dotted ID *looking* like containment. It is not; this
+  file's own format spec says so at the top: a dotted task is "still a full `Priority|ID|status`
+  bullet like any other task, just grouped under its parent by ID rather than living inside the
+  parent's prose." **Grouping, not blocking.** The precedent is inside this very task: Phase 4 was
+  extracted as **Task 145** and nobody ever thought 145 blocked 146. The four dotted children are in
+  the identical position — own IDs, own priorities, visible on every pass, and each one closes on
+  its own merits whenever it is built.
+
+  Two things make this safe rather than merely convenient. **The design record does not live here** —
+  `dev/looped-network-calculator-scope.md` carries the GGA-not-Hardy-Cross rationale, the 10–20 node
+  target, the cut list, the scope-gravity warning, the backdrop reasoning and what Phase 0.5
+  disproved, so nothing is lost to a section that is never re-scanned. And **the nine tasks that
+  merely originated during this build were retagged first** (2026-08-13, see below), so no wishlist
+  item was silently closed along with the parent.
+
+  **The generalizable lesson, because this cost six weeks of a misleading priority-85 slot: a parent
+  feature task should close when its scope is SHIPPED, not when its idea list is EMPTY.** A living
+  page keeps generating ideas; if the parent waits for them it never closes, and its priority
+  becomes a lie about what is next. Tom, 2026-08-13, on the thirteen tasks then filed under it:
+  *"If these block 146, it will never close."*
+
+  Everything below is the original entry, kept as the decision log.
+  A canvas/map-centric calculator where the interface *is* a drawing surface: elements (Junction,
+  Pipe, Reservoir, Pump, Text) added from a toolbar, properties edited in a popup, loops solved to
+  convergence. Full design record: **`dev/looped-network-calculator-scope.md`** — read that before
+  starting anything; this entry is the summary and the decision log.
+
+  **Three corrections to the entry this replaces, each a real change of direction:**
+  1. **New page and new prefix — not "extend `bpn_` (or build alongside it)".** `bpn_` /
+     `Branched-Network.php` stays exactly as shipped; the row-table form is genuinely better for a
+     simple series run, and this is a different UX with a different audience. `lpn_`,
+     `Looped-Network.php`, `js/looped-network.js`.
+  2. **Global gradient algorithm (Todini), not Hardy Cross.** Hardy Cross needs an explicit
+     independent-loop set, pseudo-loops through every pair of fixed-head sources, and an initial flow
+     distribution that *already* satisfies continuity at every node — all of which get re-derived
+     every time a user draws one more pipe on a map. GGA needs none of the three and is
+     Newton-quadratic. Hardy Cross is now recorded as the method **not** chosen, with that reason.
+  3. **Target scale is ~10–20 nodes, and that is a design decision, not a shortfall (Tom).** An
+     engineer with a 200-node model would rather crack open EPANET, and 200 nodes is past the
+     comfortable usability limit of a browser canvas unless we are *very* good at this. **Our
+     strength is the map interface, not capacity.** 200 nodes survives only as a headroom check —
+     we must not fall over — never as the sizing target. This single decision **deletes the hardest
+     part of the solver**: at 20 nodes a dense Cholesky is ~30 lines and microseconds, so the CSR /
+     conjugate-gradient / fill-reducing-ordering machinery is **cut, not deferred**.
+
+  **Identity strings** (decided 2026-07-28): menu "Looped Pipe Network (Map Interface)"; title "Free
+  Online Looped Pipe Network Calculator with Map Interface"; desc "Pressure and Flow in a Looped Pipe
+  Network You Draw on a Map". **"…on a Map" alone was rejected**: it reads as a *geographic overlay*,
+  which is Phase 4 and may never ship, whereas what actually distinguishes this page is that the
+  interface is a drawing surface. Do not let a later edit quietly shorten it back.
+
+  **Gate: satisfied.** Task 137's original gate was an OR — "after we're map-mashup experts **or**
+  users ask" — and it is now moot from a third direction: Tom committed to the calculator directly,
+  and Task 145 moved here (below), so this page is *how* we become map-mashup experts rather than
+  something waiting on it. Task 144's finding is still welcome evidence but is no longer a blocker.
+
+  **Commit direct to `master` (Tom, 2026-07-30 cleanup — this project does not normally use
+  branches; the per-phase `lpn-solver`/`lpn-labels` branches this task used through Phase 2 were an
+  inconsistency with the standing no-branching policy already recorded elsewhere in this file, e.g.
+  the entity-migration task below, not a deliberate exception. Both branches were fast-forward-merged
+  into `master` and deleted 2026-07-30.)** The scope doc and these roadmap entries are planning
+  artifacts and belong on `master` as always.
+
+  **Biggest standing risk is scope gravity toward EPANET.** The scope doc opens with a "Cut, not
+  deferred" list (extended-period simulation, water quality, PRV/PSV/FCV, demand patterns, energy
+  cost, **Tank** — Tom is right that it is a time-modeling element in a steady-state tool). Second
+  biggest is translation cost: ~85–95 new keys ≈ 1.7× the `bpn_` sprint, which is why **Phase 1
+  ships English-only** and the sprint waits until the string set stops moving.
+
+  **Phases. Risk is carried by two cheap spikes rather than by the old gate.** The two spikes are
+  **independent of each other**, so a failure in one wastes nothing from the other, and each is a
+  real abort point. (These were briefly filed as separate Tasks 171/172 on 2026-07-28 and folded back
+  the same day — the "extract unbuilt phases to their own task" lesson from Task 137 applies to
+  *closing a parent*, because blocks in `## Completed` are never re-scanned. This parent is open and
+  gets scanned every pass, so extraction bought nothing and only scattered the design.)
+
+  - **Phase 0 — canvas spike. DONE 2026-07-29, on branch `lpn-solver`.** `dev/lpn-spike/canvas-spike.html`
+    (standalone, no PHP/lang keys/solver/persistence) plus the full round-by-round record in
+    `dev/lpn-spike/phase0-acceptance.md`. Settled the technology empirically: **SVG DOM
+    (`createElementNS`, not `innerHTML` rebuilds) is the chosen technology** — 12 rounds of on-device
+    iteration with Tom plus an independent Opus subagent review found no SVG-blocking issue, so the
+    Leaflet + `CRS.Simple` fallback was never triggered. Demonstrated: pan, wheel zoom about the
+    cursor, pinch, double-tap zoom, click-to-popup with a writeback field, node/vertex/label drag,
+    **arbitrary-vertex link editing** (not capped at one — see the Phase 1 note below), zoom-extent
+    fitted to rendered extent (not bare coordinates), a draggable label with a leader (Arabic and
+    Amharic shape and order correctly), a two-point-registered backdrop image with separate Scale/
+    Position steps, a 200-node headroom grid, and print output. On-device phone pass (drag
+    smoothness, pinch vs. page scroll, tap-target size) confirmed 2026-07-29. Real bugs found and
+    fixed along the way — several are suite-relevant beyond this spike: SVG is a CSS replaced
+    element and won't stretch from `position:absolute` insets alone (needs `width`/`height`
+    attributes); combining top+bottom insets *with* an explicit height over-constrains the box per
+    CSS2.1 §10.6.4 and silently drops one constraint; `setPointerCapture` retargets the synthesized
+    `click` event to the capturing element on desktop Chrome, breaking naive tap-detection.
+  - **Phase 0.5 — headless GGA solver. DONE 2026-07-29, on branch `lpn-solver`.**
+    `js/lpn-solver.js` + `dev/lpn-spike/`; `node dev/lpn-spike/validate.js`, 46 checks, no network
+    access or `node_modules` needed.
+    **The reference is the real EPANET engine, not published tables:** `epanet-js` (EPANET's C code
+    as WASM) runs EPA's Net1/Net2/Net3 and its output is committed. Result: heads within 0.0002 ft,
+    flows within 0.004 gpm, continuity and energy residuals at machine precision, closed-form cases
+    exact to 1e−12, and the head-loss kernel exact to 1e−12 against `branched-network.js`.
+    **Three things this task said would be true, that the spike proved wrong** — recorded because
+    they are the entire justification for spiking before building:
+    1. *"Linearize below a flow cutoff Qmin."* Not sufficient, and not what EPANET does. A flow
+       cutoff leaves the gradient unbounded just above it, so a near-zero-flow link gets an enormous
+       conductance. Net3's pipe 333 oscillated between 0 and −2.28 gpm forever. The guard must floor
+       **dh/dQ**, not |Q|.
+    2. *"A 0.6 relaxation factor, without which pumps and emitters oscillate forever."* No such
+       oscillation exists once the gradient floor is right — everything converges in 5–16 iterations
+       with no damping. And the relaxation as specified was itself a bug: multiplying every flow by
+       0.6 is arbitrary shrinkage, not under-relaxation, and would have destroyed the exact
+       continuity the GGA update guarantees.
+    3. *"200 nodes is ~2.7 M flops, a few milliseconds."* Off by an order of magnitude — it forgot
+       the iteration count. Measured: 0.4 ms at the 21-node target, 30 ms at 201 nodes. The
+       conclusion (dense Cholesky, sparse machinery cut) survives; the arithmetic did not.
+    **Two requirements nobody anticipated**, both found by cases that only exist because the harness
+    was written first: convergence must be normalised by total **demand** rather than total flow, and
+    **stagnation detection** is mandatory — without it a large network burns 100 iterations and
+    330 ms re-deriving the answer it had at iteration 6, on every keystroke.
+    Also confirmed: **structural diagnostics run before the solve** (no fixed head / unreachable
+    node named by id / node isolated behind a closed link), and this suite's Hazen-Williams differs
+    from EPANET's by ~0.012%, so the solver carries both constant sets and defaults to ours.
+  - **Phases 1–4 were originally scoped in the scope doc; Phase 1 is DONE** (shipped 2026-07-29,
+    live as a PREVIEW page: page, toolbar, elements, popups, solve, autosave, diagnostics). Phase
+    2 shipped most of its scope (labels, gear/settings panel, legend positioning, user-supplied
+    backdrop image). **The rest of Phase 2/3/4's unbuilt items are no longer tracked as phases —
+    reorganized 2026-07-29 into individually-prioritized child tasks 146.01–146.09 below** (plus
+    Task 145, which already covers what was Phase 4), so each item's priority is visible instead
+    of buried in phase prose. The scope doc retains the phase framing as historical narrative;
+    ROADMAP priority is authoritative for what to work on next.
+
+  **Backdrop: the network is drawn over a background, and the background is usually not a map (Tom,
+  2026-07-28).** Nobody uses EPANET without a backdrop, and in practice that backdrop is a plan
+  sheet, a CAD export, or a local aerial — **not** a Google map or Google aerial. So the primary
+  backdrop feature is **a user-supplied image with a two-point scale/rotate registration**, in the
+  page's own flat Cartesian world coordinates, with **no projection anywhere**. That is what EPANET
+  itself does, it is a Phase 2-sized feature rather than a Phase 4 one, and it needs no API key, no
+  terms of service, and no network connection — so it survives offline in the PWA. **Tiled online
+  maps (Task 145) then become one more backdrop type that happens to arrive pre-registered**, not
+  the foundation. Design consequence for Phase 0: the coordinate seam must be able to place and
+  scale a backdrop image from day one, which is why the spike now includes one.
+  **The canonical case is a screenshot with a bar scale on it** (Tom, 2026-07-29) — often a Google
+  Maps screenshot, which is a completely different thing from a Google Maps integration: a plain
+  image the user already has, no API, no key, no terms of service. It is also *why* two-point
+  registration beats a scale-factor field: the user clicks the two ends of the bar scale and types
+  what it says, which needs no knowledge of projections or units-per-pixel and works the same for a
+  scanned plan, a CAD export, or a phone photo of a drawing on a wall. Make that the spike's
+  backdrop acceptance test. A blank project carries placeholder text across the canvas — "Start by
+  adding a background image using the toolbar." **The empty-canvas question is closed** (was open
+  as of this paragraph's original writing; resolved by commit `7428ff0 Task 146: close the
+  empty-canvas open question`, 2026-07-29) — a new project opens on the placeholder-text canvas
+  above, not a worked example.
+
+  **THE CLOSING AUDIT, 2026-08-13 — what shipped, and what was still open at the close.** Every
+  phase this task declared is shipped: 0, 0.5, 1, and all of Phase 2 except two items. Four child
+  tasks were still open, and they are the only four the scope doc ever *owed*:
+  **146.04** (node/link report tables) and **146.05** (element browser) — both named in Phase 2's
+  bullet; **146.07** (Open/Closed link) and **146.09** (map insets) — both named in Phase 3's.
+  **They remain open and standalone; see the closing note at the top of this entry for why that is
+  the right close rather than a loose end.**
+
+  - **146.07 is nearly free and should go first.** The `status` field already exists on every link,
+    defaults to `'open'`, serializes, is scenario-overridable, and is consumed by `js/lpn-solver.js`
+    in four places; `js/lpn-inp.js` already reads `CLOSED`. `js/looped-network.js` says so at the
+    declaration: *"Task 146.07 will surface it."* What is missing is a control in the Pipe popup.
+  - **`(Task 146 child)` now means SCOPE, and only those four carry it.** Nine other open tasks
+    (177, 181, 184, 185, 186, 191, 192, 201, 209) carried the same tag while being ideas raised
+    *during* the build rather than work this task owed — 209 was even tagged "but suite-shaped."
+    They were retagged **`(originated during Task 146)`** on 2026-08-13, which keeps the provenance
+    a reader wants without letting a wishlist hold a shipped feature open. Nothing was deprioritized
+    and nothing was closed by the retag itself; only the tag changed. **Do not tag a new `lpn_` idea
+    as a child** — a child is something Phase 1–3 promised, and that list is permanently closed at
+    four. Of those nine, Tom then ruled on all nine the same day: **177 turned out to be already
+    built** and closed DONE; **209 was declined** (the Help menu's walkthroughs solved it from the
+    other direction); 192 and 181 parked at 5, 186 at 8, 201 at 15; 184, 185 and 191 unchanged.
+  - **Phase 4 (Task 145, the tiled-map mashup) does not block closure.** It was extracted to its own
+    ID with its own priority precisely so it would not be buried, and Tom confirmed it 2026-07-29 as
+    "maybe cool, try it sometime" at priority 11. It closes on its own merits, whenever.
+  - **The design record does not need relocating.** `dev/looped-network-calculator-scope.md` already
+    carries every load-bearing decision — the GGA-not-Hardy-Cross rationale, the 10–20 node target,
+    the cut list, the scope-gravity warning, the backdrop reasoning, and what Phase 0.5 disproved.
+    This block is a summary of that document, so moving it to `## Completed` (never re-scanned)
+    costs nothing, which is the usual reason a parent like this cannot close.
+
+- 0|177| **[DONE 2026-07-30, closed 2026-08-13] Link head loss: report the per-length gradient
+  alongside total (originated during Task 146).**
+
+  **This shipped 2026-07-30 and nobody closed the task**, so it sat open at priority 20 for six
+  weeks describing work that already existed. Found 2026-08-13 when Tom said "I don't think there is
+  any value here. We already have gradient" and proposed deleting it — he was right about the
+  gradient and the task was checked rather than deleted, which is the only reason the record
+  survived. **Deleting an open task is not the same as closing it**: a delete would have erased the
+  evidence that the suite-convention question below was ever decided, and the next person to want a
+  per-1000-length form would have re-derived the whole argument.
+
+  **What was actually built** (`js/looped-network.js:8341` names this task in its comment): a
+  `gradient` map-label field with its own colour and extrema bucket, a read-only "Head loss
+  gradient" field in the link popup, and its **own `gradient` unit family** in `lib/Units.lib.php`
+  — reusing the `slope` family's `grade`/`gradePercent` options but defaulting to `gradePercent`,
+  because `lpn_`'s generic 2-decimal label formatter renders a typical pipe gradient as "0.00" in
+  the ratio form. The open design question below was therefore answered: **this suite's own
+  dimensionless convention won, and EPANET's per-1000-length form was not introduced.** One
+  subtlety worth keeping: the divisor is `linkLengthSI()`, never `effective(l,'length')` — a
+  gradient is dimensionless, so both sides of the division must be in the same unit system, and the
+  numerator is a solver head loss in metres.
+
+  Original entry follows.
+
+  **Link head loss: report the per-length gradient alongside total.**
+  Conventional network software and reports express pipe head loss in TWO forms, not one, because
+  they answer different questions: **total head loss** (ft or m across the whole link — what you
+  need to build the HGL/EGL, and what `lpn_` already reports) and a **per-length gradient/slope**
+  (independent of how long the pipe happens to be — the form used to screen/compare pipes against a
+  design criterion, e.g. "keep it under 5 ft per 1000 ft"). EPANET's own default Link Results table
+  leads with the per-length form ("Unit Headloss", ft/1000ft or m/km) and derives total separately;
+  WaterCAD/InfoWater-class tools show both as separate columns for the same reason. **`lpn_` should
+  reuse this suite's OWN existing convention for this exact concept, not invent a new one**:
+  `mpf_`/`mphl_` already report friction slope through the `'slope'` unit family
+  (`lib/Units.lib.php`: `grade` = ft/ft or m/m, `gradePercent` = %) — a dimensionless ratio, not
+  EPANET's per-1000-length form, but the same underlying quantity (head loss ÷ length) and already
+  translated/established suite-wide. Add a link "Head loss gradient" field (`headloss/length`)
+  alongside the existing total, using the `slope` family — parallel to how `headgain` just got
+  split out from `headloss` as its own field/color/extrema bucket, not merged into it. Needs one
+  new unit selector on the page (`echoUnitSelect('lpn_u_gradient', 'slope', '')`) and a
+  `lpnFieldColors`/`linkFieldDefs`/`defaultLabelSettings` entry, same shape as every other field
+  added this way. Not yet built — a real design question (does `lpn_` want `grade`/`gradePercent`
+  like `mpf_`/`mphl_`, or is a per-1000-length form worth introducing as a second option) should be
+  confirmed with Tom before wiring the selector, since it's the kind of suite-wide convention choice
+  CLAUDE.md's concept-level reuse rule cares about getting right once rather than per-page.
+
+- 0|209| **[DECLINED 2026-08-13] A snoozable tip system (originated during Task 146; suite-shaped).**
+
+  **Tom, 2026-08-13: "It seems that we are getting along fine without tips especially since adding
+  the Walkthroughs to our menu. What do you say we delete this task?"** Closed as declined rather
+  than deleted, so the reasoning survives if anyone proposes it again — the problem it named was
+  real (the page had only two states, shown-once-ever or shown-every-time), and the answer turned
+  out to be **a place a user can go and look**, not a mechanism for interrupting them. The Help menu
+  and its walkthroughs solved it from the other direction: pull instead of push, no snooze state to
+  store, no per-tip translation cost, and nothing to dismiss.
+
+  **The general shape, worth remembering before building any tip/onboarding mechanism here: a
+  discoverable page beat a dismissible overlay, and cost less.** Reopen only if something genuinely
+  needs to speak up *unprompted at a specific moment* — which is the one thing a menu cannot do, and
+  which nothing has yet wanted badly enough.
+
+  Original entry follows.
+
+  **A snoozable tip system.** Asked for by Tom,
+  2026-08-03, while reviewing Task 195's file-and-lock explanation: the page needs somewhere to put
+  "here is what is about to happen" text that a user can dismiss for now and see again later, rather
+  than the two states we have (shown once ever, or shown every time). Phase 2's training panel is the
+  first instance and currently uses the crude version — **shown once per browser, keyed off whether
+  an identity exists** — which is right for onboarding and wrong for anything a user might want back.
+  Wants: dismiss, snooze, and a way to bring a tip back deliberately (a "show me that again" in
+  Settings). Suite-shaped rather than `lpn_`-only: every calculator has explanations it currently
+  either buries in Notes or repeats forever.
+  - **Second concrete instance, 2026-08-06:** Save all switches tabs as it saves — ugly, but the
+    honest consequence of the write path writing the OPEN project (punch list §3). Tom: *"Some sort
+    of an explanation might be nice. But I don't know where or how unless we had a snoozable tip
+    system."* That is this task, and it is why the priority moved 40 → 45: it now has two real things
+    to say, and a tip system with nothing to say is scaffolding.
 
 - 0|299| **[DONE 2026-08-13] A wrong `layout:` tag misled four translators, and now a check catches
   the class.** The tag on `$ec_lang_syn['lpn_backdrop_scale_entry']` said `nav item` — "competing
