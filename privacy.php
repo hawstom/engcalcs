@@ -60,9 +60,9 @@ information in your browser, which is why we ask permission first. It is a singl
 page, recording only which counts we have already made. <strong>There is no identifier of any kind
 &mdash; nothing stored on your device could be used to recognise you, here or anywhere else.</strong></p>
 
-<p>You can answer in three ways. <em>Refuse</em> and we store nothing and never ask again.
-<em>Accept this</em> covers exactly what is described above, and we will ask again only if we ever
-want to do something different. <em>Accept all</em> covers that too, so we never ask again.</p>
+<p>You can answer in three ways. <em>Refuse all</em> and we store nothing and never ask again.
+<em>Allow this</em> covers exactly what is described above, and we will ask again only if we ever
+want to do something different. <em>Allow all</em> covers that too, so we never ask again.</p>
 
 <p><strong>If you say no, we keep nothing in your browser, and nothing we record can be connected
 to you or to your other visits.</strong> We still count the page load itself, in the same way any

@@ -210,7 +210,15 @@ echoHeader("EngCalcs", $html_title, "");
       // (not #lpn_popup/currentPopup) so this never interacts with the rename/undo/element-property
       // machinery. position:fixed and positioned from the Labels button's own screen rect (same
       // reasoning as #lpn_popup above: viewport-relative, clamped into view by JS on open). ?>
-<div id="lpn_labels_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<?php // NO CLOSE X, and none is coming back (Tom, 2026-08-13): "What are these boxes? ... Or are they
+      // pull-down menus, which is what they appear to be? If pull-down menus, then an X to close is
+      // not idiomatic or expected." They are pull-downs -- anchored under the button that opened
+      // them, dismissed by clicking away, by Escape, by the button again, or by opening any other
+      // menu or panel. So they close the way a pull-down closes and carry no chrome of their own.
+      // #lpn_popup above keeps its X because it is NOT one of these: it opens at the point on the
+      // map that was clicked, belongs to an element rather than to a button, and so reads as a
+      // floating property sheet, where a corner X is exactly what is expected. ?>
+<div id="lpn_labels_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
 	<div class="lpn-popover-body">
 	<div style="font-weight:bold"><?=$ec_lang['lpn_labels_heading_node']?></div>
 	<div id="lpn_labels_node_fields"></div>
@@ -220,18 +228,17 @@ echoHeader("EngCalcs", $html_title, "");
 	      // toggle), below both per-field lists. Built in JS by rebuildLabelsFields(). ?>
 	<div id="lpn_labels_options"></div>
 	</div>
-	<button type="button" id="lpn_labels_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
 </div>
 <?php // Gear/settings panel (Task 146 Phase 2, 2026-07-30): ID prefixes, solver emitter exponent
       // and convergence tolerance, text size (+ map-vs-screen units), legend position -- same
       // static-panel, non-#lpn_popup pattern as #lpn_labels_popup directly above. Fields are built
       // entirely in JS (wireSettingsPopup() in looped-network.js), not PHP, so #lpn_settings_fields
       // starts empty here. ?>
-<div id="lpn_settings_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+<?php // Pull-down, not a box -- no close X. See the note over #lpn_labels_popup. ?>
+<div id="lpn_settings_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
 	<div class="lpn-popover-body">
 	<div id="lpn_settings_fields"></div>
 	</div>
-	<button type="button" id="lpn_settings_popup_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">×</button>
 </div>
 <?php // ONE menu popover, reused by all three menus (ROADMAP Task 211): the File menu, a tab's own
       // menu, and the tab-strip overflow list. They differ only in their rows, and openMenu() in

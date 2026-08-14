@@ -95,13 +95,15 @@ English and need retranslating from the new wording.
 
 ## One thing that is easy to get wrong in this batch
 
-The consent banner has **three** buttons: `consent_decline` ("Refuse"), `consent_accept`
-("Accept this"), `consent_accept_all` ("Accept all"). The two "Accept" answers differ in
-**time, not in amount** — this is NOT the usual cookie-banner "accept all categories":
+The consent banner has **three** buttons: `consent_decline` ("Refuse all"), `consent_accept`
+("Allow this"), `consent_accept_all` ("Allow all"). The two "Allow" answers differ in
+**time, not in amount** — this is NOT the usual cookie-banner "accept all categories", and
+"Refuse all" likewise means "no, now and later", not "no to every category":
 
-- `consent_accept` = accept **this particular ask**; the visitor is asked again if the request
+- `consent_accept` = allow **this particular ask**; the visitor is asked again if the request
   materially changes.
-- `consent_accept_all` = accept this **and any later ask**; never ask me again.
+- `consent_accept_all` = allow this **and any later ask**; never ask me again.
+- `consent_decline` = refuse this **and any later ask**; never ask me again.
 
 Their `key_syn` entries spell this out. Translate the temporal distinction, and make sure the
 two labels are visibly different from each other in your language. Keep both short — they sit

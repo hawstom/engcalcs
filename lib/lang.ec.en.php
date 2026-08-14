@@ -129,13 +129,13 @@ $ec_lang_syn['template_printable_subtitle']='';
 // prose, and they are translated into all 26 languages for one reason: consent that the visitor
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
-$ec_lang['consent_body']='May we keep a single digit per page in this browser profile\'s storage to prevent us from logging its visits repeatedly?';
+$ec_lang['consent_body']='Will you allow us to keep a single digit per page in this browser profile\'s storage to prevent us from logging its visits repeatedly?';
 $ec_lang_syn['consent_body']='May we keep (store, save, put) a single digit per page in this browser profile\'s storage to prevent us from logging (recording) its visits repeatedly?';
-$ec_lang['consent_accept']='Accept this';
+$ec_lang['consent_accept']='Allow this';
 $ec_lang_syn['consent_accept']='Accept (allow) this ask (this request, this question)';
-$ec_lang['consent_accept_all']='Accept all';
+$ec_lang['consent_accept_all']='Allow all';
 $ec_lang_syn['consent_accept_all']='Accept (allow) this and any later ask; do not ask (question) me again';
-$ec_lang['consent_decline']='Refuse';
+$ec_lang['consent_decline']='Refuse all';
 $ec_lang_syn['consent_decline']='Refuse (decline or deny)';
 $ec_lang['consent_current_granted']='You allowed this. We limit logging for this browser profile.';
 $ec_lang_syn['consent_current_granted']='You allowed this. We limit logging (recording) for this browser profile.';

@@ -5192,6 +5192,16 @@ var EngCalcs = EngCalcs || {};
 		closeSubMenu();   // the fly-out belongs to the pull-down; it cannot outlive it
 		openMenuAnchor = null;
 	}
+	// Escape dismisses whatever pull-down is showing -- the other half of "these are menus, not
+	// boxes" (Tom, 2026-08-13). It is what closed the panels before the X went away, and it is the
+	// keyboard equivalent of clicking away. The DIALOG is deliberately untouched here: it asks a
+	// question that has to be answered and Cancel is one of the answers, which is the same reason
+	// the click-away dismissal skips it.
+	document.addEventListener('keydown', function (e) {
+		if (e.key !== 'Escape') { return; }
+		closeMenu();
+		closeViewPopovers();
+	});
 	// File > New project (ROADMAP Task 264, Tom 2026-08-10). A second popup off the same anchor
 	// rather than a hover-out submenu: the menu machinery here is one flat popover, hover submenus are
 	// a poor bargain on the touch screens this page is used on, and one extra click on a command used
@@ -6936,9 +6946,8 @@ var EngCalcs = EngCalcs || {};
 		}
 	}
 	function wireLabelsPopup() {
-		document.getElementById('lpn_labels_popup_close').addEventListener('click', function () {
-			document.getElementById('lpn_labels_popup').style.display = 'none';
-		});
+		// No close button to wire: this is a pull-down (see Looped-Network.php). It is dismissed by
+		// clicking away, by Escape, by its own toolbar button, or by opening another menu/panel.
 		rebuildLabelsFields();
 	}
 	// A color key that survives printing (Tom, 2026-07-30): the Labels popover itself is toolbar
@@ -6980,6 +6989,13 @@ var EngCalcs = EngCalcs || {};
 	function toggleLabelsPopup(evt) {
 		var popup = document.getElementById('lpn_labels_popup');
 		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+		// ONE PULL-DOWN AT A TIME. Tom, 2026-08-13: "When I click Settings then Labels, Labels opens
+		// beneath Settings. I expect Settings to close." openMenu() has always closed these; they
+		// never closed each other, because the document-level dismissal deliberately treats a click
+		// anywhere on #lpn_toolbar as chrome and leaves them alone -- so the opener is the only place
+		// that can do it.
+		closeMenu();
+		closeViewPopovers('lpn_labels_popup');
 		var r = evt.currentTarget.getBoundingClientRect();
 		popup.style.left = r.left + 'px'; popup.style.top = r.bottom + 'px'; popup.style.display = 'block';
 		// Clamp into the viewport same as openPopupAt() -- measured after display:block since size
@@ -7559,14 +7575,15 @@ var EngCalcs = EngCalcs || {};
 		tipsIn(fields);
 	}
 	function wireSettingsPopup() {
-		document.getElementById('lpn_settings_popup_close').addEventListener('click', function () {
-			document.getElementById('lpn_settings_popup').style.display = 'none';
-		});
+		// No close button to wire -- pull-down, same as Labels above.
 		rebuildSettingsFields();
 	}
 	function toggleSettingsPopup(evt) {
 		var popup = document.getElementById('lpn_settings_popup');
 		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+		// One pull-down at a time -- see the same two lines in toggleLabelsPopup().
+		closeMenu();
+		closeViewPopovers('lpn_settings_popup');
 		// REBUILD ON EVERY OPEN. The panel used to be built once, by wireSettingsPopup() at init,
 		// and then only rebuilt by the paths that happened to remember (Restore defaults, opening a
 		// project). Anything else that wrote to `settings` left the panel showing the value from

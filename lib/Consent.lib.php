@@ -33,9 +33,9 @@
 function echoConsentBanner() {
     global $ec_lang;
     $state = ecConsentState();
-    // 'unknown' covers both a first visit AND somebody who chose "Accept this" before the ask
+    // 'unknown' covers both a first visit AND somebody who chose "Allow this" before the ask
     // materially changed -- they asked to be asked again, so they see the banner again. Anyone who
-    // chose "Accept all" or "Refuse" never does.
+    // chose "Allow all" or "Refuse all" never does.
     $answered = ($state !== 'unknown');
     $current = '';
     if ($state === 'granted' || $state === 'granted_all') $current = $ec_lang['consent_current_granted'];
@@ -62,7 +62,7 @@ function echoConsentBanner() {
 			      // the same size, weight and colour -- so never give one of them its own rule, and
 			      // never put the refusal last where it reads as the afterthought.
 			      //
-			      // "Accept this" is SCOPE-LIMITED consent, pinned to EC_CONSENT_VERSION: yes to this,
+			      // "Allow this" is SCOPE-LIMITED consent, pinned to EC_CONSENT_VERSION: yes to this,
 			      // ask me again if the ask itself materially changes. It does NOT mean "ask me again
 			      // next visit" -- nagging somebody who already said yes is the one direction that
 			      // makes a consent flow worse rather than safer. ?>

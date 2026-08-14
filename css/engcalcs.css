@@ -358,8 +358,12 @@ html[lang="zh"] .ec-welcome {
    The translated word survives as title/aria-label, so the accessible name is still "Close" (and
    still translated) rather than a bare multiplication sign. Sized well past the ~44px touch-target
    guidance -- this page runs on phones, and a bare glyph at its natural type size would be a target
-   only a few pixels across. The popovers carry a matching 40px top padding so the button can never
-   overlap their first row, which is what a smaller pad plus a full-size hit area would have done. */
+   only a few pixels across. #lpn_popup carries a matching 40px top padding so the button can never
+   overlap its first row, which is what a smaller pad plus a full-size hit area would have done.
+   ONLY #lpn_popup uses this now (Tom, 2026-08-13). Labels and Settings dropped their X and their
+   40px pad: they hang under the toolbar button that opened them, so they are pull-downs, and a
+   pull-down with a close button reads as a box that is pretending to be a menu. #lpn_popup is a
+   real floating property sheet -- it opens at the point on the map you clicked -- so it keeps its X. */
 .lpn-popover-x {
 	position: absolute; top: 0; right: 0;
 	width: 40px; height: 40px; line-height: 1;
