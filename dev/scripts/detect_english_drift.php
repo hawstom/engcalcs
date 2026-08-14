@@ -83,6 +83,69 @@ function load_manifest(): array
     return is_array($data['hashes'] ?? null) ? $data['hashes'] : [];
 }
 
+/**
+ * A coarse fingerprint of what KIND of string this is, so a change of ROLE can be told apart from
+ * a change of wording. Added 2026-08-13 after lpn_settings_scope_project shipped wrong in the four
+ * highest-use languages: the key had been 'Saved with this project.' (a note) and became 'Project
+ * settings' (a heading beside 'Calculator settings'). es/fr/pt/tr were translated from the note and
+ * still read as a sentence where a heading belongs. A hash saw that as "some edit"; nothing said
+ * "this string stopped being a sentence", which is the signal a translator needed.
+ *
+ * Deliberately crude -- word count and terminal punctuation. It is a smoke alarm, not a parser.
+ */
+function string_shape(string $v): array
+{
+    $plain = trim(strip_tags($v));
+    return [
+        'words' => $plain === '' ? 0 : count(preg_split('/\s+/u', $plain)),
+        'ends_sentence' => (bool)preg_match('/[.!?:]$/u', $plain),
+    ];
+}
+
+/** key => shape for the current English source. */
+function current_shapes(): array
+{
+    $out = [];
+    foreach (load_ec_lang(EN_FILE) as $k => $v) {
+        $out[$k] = string_shape((string)$v);
+    }
+    return $out;
+}
+
+/** Whatever shapes the manifest recorded. Empty for a manifest written before this existed. */
+function load_shapes(): array
+{
+    if (!is_file(MANIFEST)) {
+        return [];
+    }
+    $data = json_decode(file_get_contents(MANIFEST), true);
+    return is_array($data['shapes'] ?? null) ? $data['shapes'] : [];
+}
+
+/**
+ * Did this key change ROLE, not merely wording? Two signals, either one is enough:
+ *   - it gained or lost terminal sentence punctuation (note <-> label), or
+ *   - its length changed by more than half (a heading rewritten as prose, or the reverse).
+ * Returns '' when the shape is unchanged or unknowable.
+ */
+function role_change(array $was, array $now): string
+{
+    if (!$was) {
+        return '';
+    }
+    if ($was['ends_sentence'] !== $now['ends_sentence']) {
+        return $now['ends_sentence']
+            ? 'became a sentence (gained terminal punctuation) — was it a label before?'
+            : 'stopped being a sentence (lost terminal punctuation) — is it a heading or label now?';
+    }
+    $a = max(1, (int)$was['words']);
+    $b = max(1, (int)$now['words']);
+    if ($b >= $a * 2 || $a >= $b * 2) {
+        return "length changed sharply ({$was['words']} → {$now['words']} words) — check it still plays the same role";
+    }
+    return '';
+}
+
 /** Whatever partial re-baselines have been recorded, so the history survives a full --update. */
 function load_notes(): array
 {
@@ -99,9 +162,12 @@ function load_notes(): array
  *   report prints it as such, so stamping today onto a one-key update would claim a sync that
  *   never happened -- the report would read "last synced: today" over 500 keys nobody looked at.
  */
-function write_manifest(array $hashes, array $notes = [], string $updated = ''): void
+function write_manifest(array $hashes, array $notes = [], string $updated = '', array $shapes = null): void
 {
     ksort($hashes);
+    if ($shapes === null) {
+        $shapes = load_shapes();
+    }
     $payload = [
         'description' => 'sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. '
             . 'Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means '
@@ -116,6 +182,10 @@ function write_manifest(array $hashes, array $notes = [], string $updated = ''):
         $payload['partial_updates'] = $notes;
     }
     $payload['hashes'] = $hashes;
+    if ($shapes) {
+        ksort($shapes);
+        $payload['shapes'] = $shapes;
+    }
     file_put_contents(MANIFEST, json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
 }
 
@@ -267,10 +337,135 @@ if ($mode === '--update-partial') {
     exit(0);
 }
 
+// --baseline-new [--except=k1,k2] : fold NEW keys into the manifest after a sprint has translated
+// them. Closes a deadlock that made the tripwire blind to its own successes: a key added and
+// translated in a sprint stays NEW forever, because only --update baselines it and --update is
+// refused while any drift is open. A later English edit to such a key is then invisible to BOTH
+// tools -- the payload delta sees a translated key and says nothing, and the drift report files it
+// under NEW rather than CHANGED. Found 2026-08-13, when 'EPANET engine' -> 'EPANET solver' across
+// five keys produced a delta of zero and no CHANGED flag, despite 26 stale translations.
+//
+// --except is not optional politeness: it is how you exclude a key whose English you edited AFTER
+// the sprint, which is stale and must stay visible.
+if ($mode === '--baseline-new') {
+    if (!$manifest) {
+        fwrite(STDERR, "No manifest yet. Run --update first.\n");
+        exit(2);
+    }
+    $except = [];
+    foreach (array_slice($argv, 1) as $arg) {
+        if (strpos($arg, '--except=') === 0) {
+            $except = array_values(array_filter(array_map('trim', explode(',', substr($arg, strlen('--except='))))));
+        }
+    }
+    $d = diff($current, $manifest);
+    $shapes = load_shapes();
+    $nowShapes = current_shapes();
+    $added = [];
+    foreach ($d['new'] as $k) {
+        if (in_array($k, $except, true)) {
+            continue;
+        }
+        $manifest[$k] = $current[$k];
+        $shapes[$k] = $nowShapes[$k];
+        $added[] = $k;
+    }
+    if (!$added) {
+        echo "Nothing to baseline: no NEW keys" . ($except ? " outside the --except list" : "") . ".\n";
+        exit(0);
+    }
+    $notes = load_notes();
+    $notes[] = [
+        'date' => date('Y-m-d'),
+        'keys' => $added,
+        'reason' => '[--baseline-new] translated by a completed sprint; folded into the manifest so a '
+            . 'later English edit shows up as CHANGED'
+            . ($except ? '. Held back as still-stale: ' . implode(', ', $except) : ''),
+    ];
+    $syncDate = json_decode(file_get_contents(MANIFEST), true)['updated'] ?? '';
+    write_manifest($manifest, $notes, $syncDate, $shapes);
+    echo "Baselined " . count($added) . " NEW key(s) as translated.\n";
+    if ($except) {
+        echo "Held back " . count($except) . " key(s) you named as still stale:\n";
+        foreach ($except as $k) {
+            echo "  ! $k\n";
+        }
+        echo "These stay in NEW until a resync translates them; baseline them then.\n";
+    }
+    exit(0);
+}
+
+// --record-shapes : back-fill the shape fingerprints WITHOUT re-baselining any hash.
+// Safe by construction: it records shapes only for keys whose hash already matches the manifest,
+// so what it writes is genuinely "the shape as of the last sync". A CHANGED key is skipped --
+// its old shape is unrecoverable, and guessing it would be worse than admitting the gap.
+if ($mode === '--record-shapes') {
+    if (!$manifest) {
+        fwrite(STDERR, "No manifest yet. Run --update first.\n");
+        exit(2);
+    }
+    $d = diff($current, $manifest);
+    $shapes = load_shapes();
+    $nowShapes = current_shapes();
+    $added = 0;
+    $skipped = [];
+    foreach ($manifest as $k => $h) {
+        if (in_array($k, $d['changed'], true)) {
+            $skipped[] = $k;
+            continue;
+        }
+        if (!isset($shapes[$k]) && isset($nowShapes[$k])) {
+            $shapes[$k] = $nowShapes[$k];
+            $added++;
+        }
+    }
+    $syncDate = json_decode(file_get_contents(MANIFEST), true)['updated'] ?? '';
+    write_manifest($manifest, load_notes(), $syncDate, $shapes);
+    echo "Recorded shapes for $added in-sync key(s). No hash was re-baselined.\n";
+    if ($skipped) {
+        echo "Skipped " . count($skipped) . " CHANGED key(s) — their pre-drift shape is unrecoverable:\n";
+        foreach ($skipped as $k) {
+            echo "  ! $k\n";
+        }
+        echo "Role-change detection starts working for those once they are resynced.\n";
+    }
+    exit(0);
+}
+
 if ($mode === '--update') {
     $existed = is_file(MANIFEST);
-    write_manifest($current, load_notes());
     $d = diff($current, $manifest);
+
+    // A full re-baseline over keys that are still CHANGED erases the only record that a resync was
+    // owed. That is not hypothetical: lpn_settings_scope_project changed role from a note to a
+    // heading, four languages were never resynced, the manifest was re-baselined anyway, and the
+    // tripwire forgot. Tom found it by eye months later. So the blanket --update now refuses, and
+    // erasing the evidence has to be a deliberate, reasoned act.
+    $force = in_array('--force', array_slice($argv, 1), true);
+    if ($existed && $d['changed'] && !$force) {
+        fwrite(STDERR, "REFUSED: " . count($d['changed']) . " key(s) are still CHANGED and would be silently re-baselined.\n\n");
+        foreach ($d['changed'] as $k) {
+            fwrite(STDERR, "  ! $k\n");
+        }
+        fwrite(STDERR, "\n--update means \"every flagged key has been resynced\". If that is true, say so per key:\n");
+        fwrite(STDERR, "    php detect_english_drift.php --update=<key> --reason=\"...\"\n");
+        fwrite(STDERR, "  which checks each one and records why. To re-baseline everything anyway and\n");
+        fwrite(STDERR, "  discard these signals, pass --force --reason=\"...\".\n");
+        exit(2);
+    }
+    if ($force && $reason === '') {
+        fwrite(STDERR, "REFUSED: --force discards " . count($d['changed']) . " drift signal(s); it needs --reason=\"...\".\n");
+        exit(2);
+    }
+    $notes = load_notes();
+    if ($force && $d['changed']) {
+        $notes[] = [
+            'date' => date('Y-m-d'),
+            'keys' => $d['changed'],
+            'reason' => '[--force] ' . $reason,
+        ];
+    }
+    write_manifest($current, $notes, '', current_shapes());
     if (!$existed) {
         echo "Manifest created: " . MANIFEST . " (" . count($current) . " English keys baselined).\n";
     } else {
@@ -301,11 +496,32 @@ echo str_repeat('-', 60) . "\n";
 
 if ($d['changed']) {
     echo "CHANGED — English edited since last sync; translations may be STALE (" . count($d['changed']) . "):\n";
+    $wasShapes = load_shapes();
+    $nowShapes = current_shapes();
+    $roleChanges = [];
     foreach ($d['changed'] as $k) {
-        echo "  ! $k\n";
+        $why = role_change($wasShapes[$k] ?? [], $nowShapes[$k] ?? ['words' => 0, 'ends_sentence' => false]);
+        echo "  ! $k" . ($why ? "   ← ROLE CHANGE" : "") . "\n";
+        if ($why) {
+            $roleChanges[$k] = $why;
+        }
     }
     echo "  → Feed these to a resync sprint (semantic per-language read vs current English),\n";
     echo "    then run --update once every language is brought into sync.\n";
+    if ($roleChanges) {
+        echo "\n  ROLE CHANGES (" . count($roleChanges) . ") — these are the expensive kind. A key that stops\n";
+        echo "  being a sentence, or doubles in length, has changed what it IS, and a translation\n";
+        echo "  written against the old role reads wrong even when the words are right:\n";
+        foreach ($roleChanges as $k => $why) {
+            echo "    ! $k: $why\n";
+        }
+        echo "  Resync these first, and read the sibling keys beside them — a heading has siblings\n";
+        echo "  it must stay parallel with.\n";
+    }
+    if (!$wasShapes) {
+        echo "\n  (No shapes recorded in the manifest yet, so role changes cannot be detected for\n";
+        echo "   these. The next --update will record them.)\n";
+    }
 } else {
     echo "CHANGED: none — every synced English string is unchanged.\n";
 }

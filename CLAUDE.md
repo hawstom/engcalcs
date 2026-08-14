@@ -402,7 +402,16 @@ give it **all three** of these, in this order:
 3. **A visible definitional tip on any input label**, in the whole-label `.ec-help`/`.ec-tip` form.
    The tip both helps the user and — because its text is translated with the label — anchors the
    concept for translators (e.g. specific gravity → "Density relative to water"; head → "Energy per
-   unit weight of water, a height of water column, not a pressure"). Plus a **commentary-only** intent
+   unit weight of water, read as a height of water column or as a pressure"). Note that "head" is
+   **not** a units trap the way specific gravity is: the suite reads head loss in psi/kPa/bar as
+   well as in metres, and defaults to psi under the US preset (`partial_head` in `lib/Units.lib.php`).
+   Only *total* head — EGL/HGL — is water-column-only, because an EGL is an elevation. Tom,
+   2026-08-13: *"The units can be in height or in pressure. So we should allow translators to use
+   the engineers' common term if there is clearly no use of head/height and head/height loss by
+   **engineers**."* So German *Druckverlust*, French *perte de charge* and Urdu *دباؤ نقصان* are all
+   correct, and a glossary `avoid` must never forbid them. A glossary claim about units is a claim
+   about `Units.lib.php` — check it there rather than reasoning from physics alone. Plus a
+   **commentary-only** intent
    guard (`| avoid: anatomical "head"`) so no translatable payload is duplicated. (This is the one
    sanctioned case where a documented-polysemy label *does* get an intent — it is not the "plain label"
    defect above.)
@@ -592,6 +601,31 @@ core languages. An AND would leave Manning-Pipe-Flow untranslated in 22 language
 
 Always announce the launch count before spawning so the user knows what is happening.
 
+**Every agent writes in ~50-key batches, saving each batch before translating the next. This is
+mandatory and it goes in the prompt.** A sprint can be killed at any moment by an account session
+limit nobody can see coming. An agent that composed everything in memory loses all of it; an agent
+that has been appending keeps what is on disk. Measured cost is ~5–15k tokens out of ~120k per
+agent (~10%) — the translations are output once either way, so only tool-call overhead is added.
+
+**Batching is the throttle that works; the wave split is retired** (Tom, 2026-08-13). Sprint 251
+ran both at once and separated them cleanly:
+
+- **The wave split** — 5 agents at a time, stop and wait between waves — **did not prevent a limit**
+  (wave 2 hit one anyway) and cost a verify/commit/report boundary each time. It buys *probability*,
+  not protection, because a wave cannot prevent a limit it was already close to when it started.
+- **The batched appends bounded the damage twice.** Khmer and Burmese each had exactly 100 keys on
+  disk when wave 2 died, so 200 finished keys survived an interruption that, in all three earlier
+  crashes, would have thrown everything away. They resumed at 189 keys each instead of 289.
+
+So: **launch every language at once and rely on batching**, rather than splitting into waves. If a
+future sprint loses a whole language's work despite batching, that is new evidence — reopen the
+question then, and change one mechanism at a time.
+
+**Do not bundle an unauthorized mechanism into an authorized one.** Batching was added to the
+sprint-251 brief in the same breath as the wave split Tom had actually approved, which confounded
+the experiment — two variables changed at once, so neither could be judged until a later wave
+happened to separate them. Tom's objection was correct. Propose each mechanism on its own.
+
 **Model policy** (Haiku fully deprecated for translation, 2026-07-12 — Tom): evidence from the 2026-07 rc_/ip_ sprint (`dev/translation-audit-rc-ip-2026-07.md`) showed Haiku mistranslated polysemous words in long prose and produced script contamination, escape leakage, and truncation in low-resource languages even with full glossary + intent injection. The suite previously carved out an exception allowing Haiku for "short-labels-only" batches; that exception is **removed** — even short labels carry real mistranslation risk (a wrong word in a 3-word label is just as wrong as one in a paragraph), and a standing exception is an easy trap to fall back into by habit. **Sonnet is mandatory for every translation agent, every batch size, every language, no exceptions.** Do not propose, launch, or accept Haiku for any translation task, including future sprints reasoning "it's just a short string."
 
 **Every translation agent gets a suggestion box, and it is part of its prompt.** Tom, 2026-08-08:
@@ -738,6 +772,45 @@ and paid by a command, not by anybody reading diffs.
 - **Name new keys parallel to their siblings.** `lpn_settings_scope_project` /
   `lpn_settings_scope_calculator`, not `..._scope_note` / `..._scope_calculator`. Non-parallel names
   cost every future reader a lookup, which is Tom's own objection and a correct one.
+- **And keep the VALUES parallel, in all 27 files — that is where it actually broke.** Those two
+  keys were renamed into parallel *names* while es/fr/pt/tr still carried the pre-rename *value*:
+  a full sentence ("Se guarda con este proyecto.", "Enregistré avec ce projet.") sitting beside a
+  correctly parallel "Configuración de la calculadora". Tom spotted it by eye on 2026-08-13 —
+  *"Project and Calculator settings should be parallel always. I am not always finding this."* —
+  and it was in the four highest-use languages, i.e. ~98% of measured use. When you edit one member
+  of a sibling set, read the whole set **across every language**, not just in English.
+
+**A key that changes ROLE is the expensive kind of drift, and the tripwire now says so.** That
+defect began as `lpn_settings_scope_note` = *'Saved with this project.'* — a note. The English
+later became *'Project settings'* — a heading. Four languages had been translated from the note and
+never resynced, and the manifest was re-baselined anyway, so the evidence was erased. Three
+changes, all in `detect_english_drift.php` (Tom, 2026-08-13):
+
+- **Blanket `--update` now REFUSES while any key is still CHANGED.** It tells you to resync and use
+  `--update=<key> --reason="..."` per key (which already verifies each one). Discarding signals
+  wholesale requires `--force` *and* a `--reason`, which is recorded in the manifest.
+- **The report flags ROLE CHANGE** — a key that gained or lost terminal sentence punctuation, or
+  changed length by more than half. A hash only ever said "some edit"; role is the part that makes
+  an otherwise-correct translation read wrong.
+- **`--record-shapes`** back-fills the shape fingerprints without touching a single hash, recording
+  them only for keys already in sync (where "current shape" genuinely *is* "last-synced shape").
+  CHANGED keys are skipped and named, because their pre-drift shape is unrecoverable and guessing
+  it would be worse than admitting the gap.
+
+**`--baseline-new` closes a sprint, and a sprint is not finished until you run it.** A key added and
+translated by a sprint stayed `NEW` forever, because only `--update` could baseline it and `--update`
+is refused while any drift is open. That deadlock made a later English edit to such a key invisible
+to **both** tools at once: the payload delta sees a translated key and reports zero, and the drift
+report files it under NEW rather than CHANGED. Demonstrated 2026-08-13 — changing "EPANET engine" to
+"EPANET solver" across five keys produced **a delta of zero and no CHANGED flag**, with 26 stale
+translations sitting behind it. Add to the post-sprint QA list:
+
+```
+php dev/scripts/detect_english_drift.php --baseline-new            # after the sprint's keys land
+php dev/scripts/detect_english_drift.php --baseline-new --except=k1,k2   # hold back any key whose
+                                                                        # English you edited AFTER
+```
+Use `--except` for exactly that case; baselining a key you have since edited buries the staleness.
 
 ## Unit Sets
 

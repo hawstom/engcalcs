@@ -1,5 +1,12 @@
 # Sprint 251 — wave plan (Tom's split, 2026-08-13)
 
+> **CLOSED, and the wave split is RETIRED** (Tom, 2026-08-13, after wave 4). The sprint finished
+> 26 of 26. Tom's ruling on the two throttles: **retire the wave split, keep the batching.** The
+> split never prevented a limit and cost a boundary per wave; the batching demonstrably saved 200
+> keys of finished work. Future sprints launch every language at once and rely on batched appends.
+> The standing rule now lives in CLAUDE.md § Translation Sprints — this file is the evidence
+> behind it, kept as the record of how the two mechanisms were told apart.
+
 **Tom controls the throttle.** Each wave launches, finishes, is verified and committed, and then
 **STOPS and waits**. Nothing launches without him naming the wave: *"Proceed with wave 1 of 4."*
 

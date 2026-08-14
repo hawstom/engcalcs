@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-08-09",
-    "count": 790,
+    "count": 851,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -16,6 +16,73 @@
                 "template_feedback"
             ],
             "reason": "Task 205(d) resync complete: all 26 languages rewritten to the current English on 2026-08-08, first-person singular restored"
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "consent_accept",
+                "consent_accept_all",
+                "consent_body",
+                "consent_current_denied",
+                "consent_current_granted",
+                "consent_decline",
+                "consent_region_label",
+                "consent_settings_link",
+                "lpn_dialog_ok",
+                "lpn_engine_manning_note",
+                "lpn_file_import_inp",
+                "lpn_file_import_inp_tip",
+                "lpn_file_recent",
+                "lpn_inp_bad_file",
+                "lpn_inp_drop_backdrop",
+                "lpn_inp_drop_controls",
+                "lpn_inp_drop_curve_long",
+                "lpn_inp_drop_curve_missing",
+                "lpn_inp_drop_cv",
+                "lpn_inp_drop_dangling",
+                "lpn_inp_drop_demands",
+                "lpn_inp_drop_emitters",
+                "lpn_inp_drop_eps",
+                "lpn_inp_drop_headloss",
+                "lpn_inp_drop_patterns",
+                "lpn_inp_drop_pump_other",
+                "lpn_inp_drop_quality",
+                "lpn_inp_drop_setting",
+                "lpn_inp_drop_tank_links",
+                "lpn_inp_drop_tanks",
+                "lpn_inp_drop_tcv",
+                "lpn_inp_drop_units",
+                "lpn_inp_drop_valve",
+                "lpn_inp_report_clean",
+                "lpn_inp_report_counts",
+                "lpn_inp_report_heading",
+                "lpn_inp_report_lead",
+                "lpn_net_bad_file",
+                "lpn_new_blank_si",
+                "lpn_new_blank_us",
+                "lpn_new_example_si",
+                "lpn_new_example_us",
+                "lpn_new_from_examples",
+                "lpn_recent_denied",
+                "lpn_recent_gone",
+                "lpn_recent_tip",
+                "lpn_settings_computation",
+                "lpn_settings_scope_calculator",
+                "lpn_settings_scope_project",
+                "lpn_settings_show_titles",
+                "lpn_settings_show_titles_tip",
+                "lpn_tab_move_left",
+                "lpn_tab_move_right",
+                "lpn_title_units",
+                "lpn_v2_restore_never",
+                "lpn_v2_restore_no",
+                "lpn_v2_restore_prompt",
+                "lpn_v2_restore_yes",
+                "privacy_link",
+                "rc_notes_7_term",
+                "terms_link"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED. Held back as still-stale: lpn_main_title, lpn_settings_engine_epanet, lpn_settings_engine_epanet_tip, lpn_engine_loading, lpn_engine_failed"
         }
     ],
     "hashes": {
@@ -87,6 +154,14 @@
         "calc_set_units": "7d540cbd217557683ae11dbdc0e7ba2a25723fc9",
         "calc_units_si": "2cd845399ebc86aad1fd9e1e6bfa6aa61179694a",
         "calc_units_us": "aa3093554472fd113135bed5b63e12f84c2e9fe8",
+        "consent_accept": "d70660482fc37c9e84464f4c9e81bec47fd2b05d",
+        "consent_accept_all": "821d1f7909a5146fa98fd5228675c49e64c6e60b",
+        "consent_body": "cc63ce4d5560f9bb512da5731b34e783602e22dc",
+        "consent_current_denied": "4f4019a7eed9cfda0702532cf68f7eb715bbc1aa",
+        "consent_current_granted": "a70c7b65ebc0d04276f74b1a0432d7de44adccd2",
+        "consent_decline": "3eb80c1e8645ea1b0f5251cf40506b3e94906905",
+        "consent_region_label": "bf5a6eb3a4bb648f4f732c3533cb4991cc599900",
+        "consent_settings_link": "9e0cba87adec3208cfb83ceb40225bab61ab634d",
         "contactSendMessage": "0f175d5b1fca6693ed65ff5370e26b300120c394",
         "contactSpamPostfix": "f3e325c1b46f0197228f76a8ec227c1f1a0856ff",
         "contactSpamPrefix": "2c025e7b8bda6f5b203981cafc9c05a23dcce39a",
@@ -281,8 +356,10 @@
         "lpn_diag_no_fixed_head": "f07f4428fbda17512daed4aefc6d72e6efdb6d11",
         "lpn_diag_not_converged": "8a0e0e6c781b06efcfbc5ce272c62b62d2f7f87d",
         "lpn_diag_unreachable": "1cdaa4fbda79821a8ae138af20d55dd0d6ea969f",
+        "lpn_dialog_ok": "9ce3bd4224c8c1780db56b4125ecf3f24bf748b7",
         "lpn_edit_delete_network": "54a5ed21b23a4160bde2d86b22750824c8ee6b16",
         "lpn_empty_hint": "2ac83eebbbd393db37faa0a1d475810c760a0e50",
+        "lpn_engine_manning_note": "f592588a42fae119b629699fe84bcaf7e8881e51",
         "lpn_field_auto": "c614ba7c453cdcd4d21b20e8286c6266c891e0c6",
         "lpn_field_diameter": "8314fd7f3668393803a7ab4d1434731a5b296c40",
         "lpn_field_elev": "a514da1094ce1bd6b9267e8a0e3df8736da457a5",
@@ -302,9 +379,12 @@
         "lpn_field_y": "23eb4d3f4155395a74e9d534f97ff4c1908f5aac",
         "lpn_file_changed_elsewhere": "b28191a691cef7b9b535a1d1e40a40966522a88e",
         "lpn_file_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
+        "lpn_file_import_inp": "422aa12aac66e90544516fbace883e795deba9fd",
+        "lpn_file_import_inp_tip": "c623a26c5f2ddcf490bb0d8a09b6ac49df0c8b8f",
         "lpn_file_needs_reopen": "21ae110d61e50bb7a2a02b67937d9dfa7603f601",
         "lpn_file_new": "e5bcbe241fab3ba265fd7c73f973cd93072e27d9",
         "lpn_file_open": "22b676fbcf6ed2eb3339ff94db2f46c8b584fc76",
+        "lpn_file_recent": "95c6a85a61ec3f4fefa80882adb555d78ef45199",
         "lpn_file_reconnect": "16374fbf6ef5ee8c9c7886a2881682be7227a4b2",
         "lpn_file_reconnect_prompt": "6892ed145808feb5f5796bdb5e6fc2bcc7546e73",
         "lpn_file_relink": "d5fa88cc6e26c6bf62ccedb79ed79ef82f8c1a78",
@@ -328,6 +408,30 @@
         "lpn_id_taken": "afa411f11b93f86d3e5593aef3404abe3f194817",
         "lpn_import_bad_file": "368d3659c55f93e76105b4c486e32f47fc930508",
         "lpn_import_no_room": "9556ce89b8be4a1eccb0948329905223bd14da09",
+        "lpn_inp_bad_file": "4c44d8c2fd5a6162a15695b4f671d271f01cd3c3",
+        "lpn_inp_drop_backdrop": "94e5a8aa28dfe204309465c4d1fe0c39dd33c6ff",
+        "lpn_inp_drop_controls": "087b854e0e8b17c7598ac08e1a55f76c95a37cce",
+        "lpn_inp_drop_curve_long": "d6226b38feaea5400b89e71773d7548a55a04dff",
+        "lpn_inp_drop_curve_missing": "9a8d623f4037e3261d8153dba634977c8527d83b",
+        "lpn_inp_drop_cv": "df7f7635a0fc09f8d0a6124430366e1a19429062",
+        "lpn_inp_drop_dangling": "0ad893dffef80c6ad8297058a6c3c5342495ea43",
+        "lpn_inp_drop_demands": "cf2f85eab05344924f34a11ae91613cb99403657",
+        "lpn_inp_drop_emitters": "cb5e11821f1c11edc0487fa662dfbcce0f963480",
+        "lpn_inp_drop_eps": "66bdbb261c9f1ecb6009eadd421813095414f411",
+        "lpn_inp_drop_headloss": "cc465d1b3227861365056837ff778139615a211b",
+        "lpn_inp_drop_patterns": "e3038319b256be5a8d2527dea6f495149018c512",
+        "lpn_inp_drop_pump_other": "9ae4a33dc9693072e607a8697645900d73f2821d",
+        "lpn_inp_drop_quality": "818ea06fbda03f7c835cf8c6b9aa37463e24e368",
+        "lpn_inp_drop_setting": "fd1ae50cac0307d3a4620c8ec88ad91084a39d6d",
+        "lpn_inp_drop_tank_links": "103bae1c4010b131765f171ccddd17f1023b011f",
+        "lpn_inp_drop_tanks": "56235c82e76759c10b8b28cad30e9b2e1b30b804",
+        "lpn_inp_drop_tcv": "26853ed1c160ade71fbf590ae769468fa4387354",
+        "lpn_inp_drop_units": "55c690f08835dee3b2dae331d5eef82089b13c32",
+        "lpn_inp_drop_valve": "a133c045bbf94ced5479d910c255d8140e65d55c",
+        "lpn_inp_report_clean": "84abd1231b503db79d2f28ef6f451e3373ce1bf0",
+        "lpn_inp_report_counts": "19b6c77de071f8ceff7fbb4107fd557f61f16fe3",
+        "lpn_inp_report_heading": "997509d5dea07c7e08c021ecd446ce4c80515e8c",
+        "lpn_inp_report_lead": "44f8c44833361c87e76515b2dc4c1484615d1fa9",
         "lpn_labels_decimals_tip": "8a4d3b146623e92ce0534c7cca63d79fd7c410e7",
         "lpn_labels_heading_link": "4fc42eb0a2d30bdf0d4d9a4ad8fea8c9b94a07db",
         "lpn_labels_heading_node": "1aa6d7578bd4ddb3158dd09910b714b3629dbe0c",
@@ -364,6 +468,12 @@
         "lpn_mode_add_text": "601e632ff92e50ae2241de1e0612d310a8a6d976",
         "lpn_mode_delete": "4a09e68ab03ef268f609a792c3e8f95adc12e205",
         "lpn_mode_select": "70c17f33358920ac4b1b46048d22f477ffd20f54",
+        "lpn_net_bad_file": "e8efd822c75e111af12d170f300b643b1c75daf7",
+        "lpn_new_blank_si": "e92675640833cb92c6fd8f4776c4d4d722cdb8d7",
+        "lpn_new_blank_us": "26e10b45391e9fd1532479996e64c6cde6df2797",
+        "lpn_new_example_si": "2926375ffdb9d4f4b4d3b091a7084e0b9b46d883",
+        "lpn_new_example_us": "5022c78ec0553c0d2189b2bd52c0123b3ce5e75d",
+        "lpn_new_from_examples": "6412998a89bdd9cb8ad64e3429d6a3e34c0f7745",
         "lpn_new_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
         "lpn_notes_1_def": "ef67299b03052441a98b71735d2b8c9f88e1281d",
         "lpn_notes_1_term": "8940eaa461ed01deafb4e767bb78d184ec42a156",
@@ -394,6 +504,9 @@
         "lpn_push_none_displayed": "459853116e1c40b54f86f5e337c78ddd9f120acf",
         "lpn_push_nothing": "79e9a0d336c84a5564847658059c9ef2e9f5c305",
         "lpn_push_properties": "351f56a6fefd5127c90506d3e91990f1d7631787",
+        "lpn_recent_denied": "fa0a139f94256479cbe5eb1d85af96f4b5196f5f",
+        "lpn_recent_gone": "0243f7fc2917862176d94fd93e131aaad8dcfc4c",
+        "lpn_recent_tip": "190a8d0b5ac5b675a2277e3b006a4c61ec102f34",
         "lpn_reset_all_tip": "ebd2596e8d975f0f2694252ae21ee8e54330d756",
         "lpn_result_flow": "86eff8eb789b097ddca83f2c9c4617ed23605105",
         "lpn_result_gradient": "3834e07b8e0207b88e3eab743621f7e9a5db40a5",
@@ -408,6 +521,7 @@
         "lpn_saveas_overwrites_project": "5b617ca583782738f2bfd0b8ab6a752defdd46ab",
         "lpn_saveas_same_file": "304ca763bd1a84a61a60dff7eb9921ff571e9953",
         "lpn_settings_backdrop_opacity": "ae0b083283f290f299d0c96969e0f7b53d4aa536",
+        "lpn_settings_computation": "cd260770f98f9ac256c0d151419fd05e77f6fc69",
         "lpn_settings_defaults": "77403a7b5092aad6e52d47ff9b28dc162b459922",
         "lpn_settings_defaults_note": "990606b34087faf589658448074aa7621295f825",
         "lpn_settings_emitter_exponent": "1d8660383db35f7b4b2754b1f2451fddc60c0a03",
@@ -425,6 +539,10 @@
         "lpn_settings_push_btn": "9e7e67a26fdccd90f3ffa64b26f56d540a79e7af",
         "lpn_settings_push_note": "d3754624671985db69287dabd915782065100ae0",
         "lpn_settings_restore_tip": "bed80101899be9074fc0a7d09a97cd87101e678b",
+        "lpn_settings_scope_calculator": "00dfef22ecb2664741976fcf9fcd2bf6ff5c6167",
+        "lpn_settings_scope_project": "95590645e1aac6068a614f2f94ed6e4a7b9f3192",
+        "lpn_settings_show_titles": "35992d6f38a21a851fe018bde1467dc3a8a875ad",
+        "lpn_settings_show_titles_tip": "dd31ce362cd1df8e82d1e17ec6704662aea70c5d",
         "lpn_settings_symbol_opacity": "60ff3b0e2ee09b63c828a1055c6f7ca7e5a817df",
         "lpn_settings_symbol_size": "2f1983b4117fe2eed3a0fae017d31832fad471b2",
         "lpn_settings_text_size": "3cc6e124a8e4ead7eaa273d4c6cf0bac274d0913",
@@ -449,10 +567,13 @@
         "lpn_tab_all": "403b21693efab2805499d4aee91052b2caeaaca4",
         "lpn_tab_duplicate": "972d57379db3e5be76d4ead709fef1ad71ff03d6",
         "lpn_tab_menu": "9366f1f5f9f30a76d9aec360abb78a963c39bf1e",
+        "lpn_tab_move_left": "525df57dc3610e74377113b92951476bb9387e4d",
+        "lpn_tab_move_right": "3a43e56f34dece6eb3d79dee1eff7b2f87db6040",
         "lpn_tab_new": "e5bcbe241fab3ba265fd7c73f973cd93072e27d9",
         "lpn_tab_unsaved": "b3c7270ccae3543a687dce9dd7f731425c01ba63",
         "lpn_tip_labels_draggable": "92f776113028066fb944d2830ea89966bc053369",
         "lpn_tip_select": "37d09593a45674d7bdda9dc4756e16452007fccb",
+        "lpn_title_units": "75f0b482bd12a3548ccf34447815426657c142dd",
         "lpn_tool_add_junction": "e4f6c05840cecf544ec74b542c80584accfbc5ad",
         "lpn_tool_add_pipe": "00dae071c082bb73eaed17b4bb3429280e110e8c",
         "lpn_tool_add_pump": "e8bd8201473a0e0c20662af1aadbccb008935117",
@@ -471,6 +592,10 @@
         "lpn_units_length": "d28e743b3380c990918f0d2ea90ad6e8e7123967",
         "lpn_units_pressure": "d1222178efa7946ad8940a0b57a0d3cb3856180c",
         "lpn_units_velocity": "d80a548eda6c0e81c84db1aa2c1099cc803abddd",
+        "lpn_v2_restore_never": "f3e5ca94b1f392f437b6fc85bf3f03c306c23e5d",
+        "lpn_v2_restore_no": "1f7f368c6d34c41f570dfe461879617ad1c695af",
+        "lpn_v2_restore_prompt": "733ec25f6146d8d81f7d88bbe332600bdb967cc4",
+        "lpn_v2_restore_yes": "3f15ce79532d7a88716daffe2b5fa5245abe9c20",
         "lpn_view_units": "12748281e0f02357f2a2f65c1c6a7d01ee122506",
         "menu_brand": "bf8b00231568173bfc88835a77624be526d4dd96",
         "menu_libre": "38f2a5b458b1b859bea3099c904d3eab6c585532",
@@ -677,6 +802,7 @@
         "points_data_help": "80aa3d341546a15d2aa8e69687993b287c0fe202",
         "points_data_paste": "db2483000d154ca9fd74d41fc4e063a4b28faa87",
         "points_data_title": "23f6f266b7c344a4bf4031981e3ecd514d991c07",
+        "privacy_link": "ec7c829b39081dee8e886f1ca577b3fb1d099f64",
         "rc_D50": "55cb18d181974f6cd1a0bef46cbbbed74fe00af6",
         "rc_Hp": "30107365d68bacf4e442f774565307aaafa4979e",
         "rc_S0": "3343766e7c791bc15f431c059d20658adebdf847",
@@ -716,6 +842,7 @@
         "rc_notes_6_def": "1ba379a67d958a1feed9cb94104ab238c5044989",
         "rc_notes_6_term": "1e38625ac384fb845d5c40f2191c5810ed7b325d",
         "rc_notes_7_def": "56fb2487ab67da78e56467ea5bd2c06bce5b289a",
+        "rc_notes_7_term": "f0ccb242198788d78e881fdd242cbb74411d702d",
         "rc_np": "9895e66ba9d61cd595ee9ba119acbad7b50599a7",
         "rc_pond_ok": "ce343e013f211df6c0aeb02a6345403898ccd646",
         "rc_pond_ok_tip": "44ad1cc614e829412b685d5683702110b7f13585",
@@ -742,6 +869,7 @@
         "template_printable_subtitle": "ed172446717fad6d8990c6169f1796e931a3758c",
         "template_printable_title": "595ceee10f8b51d2a11baf28141d435ff342675a",
         "template_welcome": "d4b38b7735664c0fd812adb91762276720a73c96",
+        "terms_link": "8a069ed1c667c9e5dc357ae198dc0a380968bcca",
         "u_acft": "1eae6154e3db0f039276e069c8a183b4bd7eea4f",
         "u_bar": "62cdb7020ff920e5aa642c3d4066950dd1f01f4d",
         "u_depthFrac": "ca3ad46f5661e96d2e1ef3d978d23729f84f2efd",
@@ -809,5 +937,3375 @@
         "ws_notes_we_term": "d947357207fd6f45499c4e1b55805d7947db5b86",
         "ws_weirCoefficient": "666cd333d6f05a663a5f161d0dbb35aca4f73cc7",
         "ws_weirLength": "abe290363ad03925c8459d3e0b52c8aedad80efb"
+    },
+    "shapes": {
+        "about_body_html": {
+            "words": 346,
+            "ends_sentence": true
+        },
+        "about_main_desc": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "about_main_menu": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "about_main_title": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "bpn_demand": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_demand_mult": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "bpn_demand_mult_tip": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "bpn_demand_tip": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "bpn_elev_down": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "bpn_elev_source": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "bpn_h_source_tip": {
+            "words": 46,
+            "ends_sentence": true
+        },
+        "bpn_h_supply": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "bpn_h_supply_tip": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "bpn_id": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_id_tip": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "bpn_line_table_title": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "bpn_main_desc": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "bpn_main_menu": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "bpn_main_title": {
+            "words": 9,
+            "ends_sentence": false
+        },
+        "bpn_method": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "bpn_method_dw": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_method_hw": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_method_manning": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_notes_1_def": {
+            "words": 35,
+            "ends_sentence": true
+        },
+        "bpn_notes_1_term": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "bpn_notes_2_def": {
+            "words": 33,
+            "ends_sentence": true
+        },
+        "bpn_notes_2_term": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "bpn_notes_3_def": {
+            "words": 28,
+            "ends_sentence": true
+        },
+        "bpn_notes_3_term": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "bpn_notes_epanet_def": {
+            "words": 40,
+            "ends_sentence": true
+        },
+        "bpn_notes_epanet_term": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "bpn_p_down": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "bpn_p_down_tip": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "bpn_p_min": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "bpn_p_min_tip": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "bpn_pressure_warn": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "bpn_pressure_warn_short": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_q_line": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "bpn_q_line_tip": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "bpn_q_total": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "bpn_q_total_tip": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "bpn_roughness_tip": {
+            "words": 32,
+            "ends_sentence": true
+        },
+        "bpn_show_diameter": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_show_elevation": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_show_length": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_show_p": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_show_q": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_sketch_title": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "bpn_source_label": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_supply1_h": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "bpn_supply2_h": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "bpn_supply2_q": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "bpn_supply3_h": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "bpn_supply3_q": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "bpn_supply_pt_tip": {
+            "words": 56,
+            "ends_sentence": true
+        },
+        "bpn_topology_warn": {
+            "words": 33,
+            "ends_sentence": true
+        },
+        "bpn_topology_warn_short": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "bpn_upstream": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "bpn_upstream_tip": {
+            "words": 31,
+            "ends_sentence": true
+        },
+        "calc_copy_link": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "calc_copy_link_done": {
+            "words": 1,
+            "ends_sentence": true
+        },
+        "calc_defaults": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "calc_defaults_confirm": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "calc_inputs": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "calc_results": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "calc_set_units": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "calc_units_si": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "calc_units_us": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "consent_accept": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "consent_accept_all": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "consent_body": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "consent_current_denied": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "consent_current_granted": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "consent_decline": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "consent_region_label": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "consent_settings_link": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "contactSendMessage": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "contactSpamPostfix": {
+            "words": 15,
+            "ends_sentence": false
+        },
+        "contactSpamPrefix": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "contactSubject": {
+            "words": 1,
+            "ends_sentence": true
+        },
+        "contactSubmitButton": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "contactYourEmail": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "contactYourName": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "contact_main_menu": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "contact_message": {
+            "words": 1,
+            "ends_sentence": true
+        },
+        "contact_success": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "contact_title": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "cs_Ec": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "cs_Ec_check": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "cs_Ec_fair": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "cs_Ec_good": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "cs_Ec_poor": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "cs_Ec_target": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "cs_L": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "cs_Q_in": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "cs_Q_loss": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "cs_Q_loss_per_L": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "cs_Q_out": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "cs_Vol_day": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "cs_Vol_year": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "cs_annual_value_lost": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "cs_annual_value_recovered": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "cs_lining_area": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "cs_lining_cost": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "cs_lining_total_cost": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "cs_loss_check": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "cs_loss_negative": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "cs_loss_positive": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "cs_loss_zero": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "cs_main_desc": {
+            "words": 9,
+            "ends_sentence": false
+        },
+        "cs_main_menu": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "cs_main_title": {
+            "words": 9,
+            "ends_sentence": false
+        },
+        "cs_notes_1_def": {
+            "words": 44,
+            "ends_sentence": true
+        },
+        "cs_notes_2_def": {
+            "words": 27,
+            "ends_sentence": false
+        },
+        "cs_notes_2_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "cs_notes_3_def": {
+            "words": 67,
+            "ends_sentence": true
+        },
+        "cs_notes_3_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "cs_notes_4_def": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "cs_payback_years": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "cs_pct_loss": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "cs_water_value": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "dw_flow_regime": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "dw_friction_factor": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "dw_friction_factor_method": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "dw_kinematic_viscosity": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "dw_kinematic_viscosity_short": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "dw_kinematic_viscosity_tip": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "dw_main_desc": {
+            "words": 10,
+            "ends_sentence": false
+        },
+        "dw_main_menu": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "dw_main_title": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "dw_regime_laminar": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "dw_regime_transitional": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "dw_regime_turbulent": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "dw_reynolds_number": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "dw_roughness": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "dw_roughness_tip": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "ec_name_hint": {
+            "words": 12,
+            "ends_sentence": false
+        },
+        "ec_name_label": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "ec_name_placeholder": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ec_related_calcs": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "hw_elev_down": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "hw_elev_up": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "hw_hgl_1": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "hw_hgl_2": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "hw_main_desc": {
+            "words": 10,
+            "ends_sentence": false
+        },
+        "hw_main_menu": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "hw_main_title": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "hw_note_1": {
+            "words": 221,
+            "ends_sentence": true
+        },
+        "hw_notes_epanet_def": {
+            "words": 40,
+            "ends_sentence": true
+        },
+        "hw_notes_epanet_term": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "hw_pressure_check": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "hw_pressure_down": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "hw_pressure_neg": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "hw_pressure_neg_short": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "hw_pressure_ok_short": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "hw_pressure_up": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "hw_roughness": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "index_meta_desc_plain": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "index_title": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "install_android_heading": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "install_android_steps_html": {
+            "words": 41,
+            "ends_sentence": true
+        },
+        "install_cached_body": {
+            "words": 39,
+            "ends_sentence": true
+        },
+        "install_cached_heading": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "install_desktop_heading": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "install_desktop_steps_html": {
+            "words": 33,
+            "ends_sentence": true
+        },
+        "install_firefox_body": {
+            "words": 30,
+            "ends_sentence": true
+        },
+        "install_firefox_heading": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "install_intro": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "install_ios_heading": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "install_ios_note": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "install_ios_steps_html": {
+            "words": 28,
+            "ends_sentence": true
+        },
+        "install_main_desc": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "install_main_menu": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "install_main_title": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "install_now_btn": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "install_prompt_unavailable": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "ip_a_e": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "ip_count": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "ip_d": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "ip_diameter": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_dp_avg": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "ip_du_estimate": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "ip_elev_ds": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "ip_elev_ds_missing_warn": {
+            "words": 19,
+            "ends_sentence": false
+        },
+        "ip_elev_supply": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "ip_flow": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_group_downstream": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_group_loss": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_group_reach": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_group_upstream": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_h_design": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "ip_h_far": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "ip_h_supply": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "ip_hf": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_hl": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "ip_hm": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_is_lateral": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "ip_length": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_main_desc": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "ip_main_menu": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "ip_main_title": {
+            "words": 8,
+            "ends_sentence": false
+        },
+        "ip_max_head": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "ip_max_head_tip": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "ip_n_e": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "ip_n_l": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "ip_no_solution": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "ip_notes_1_def": {
+            "words": 84,
+            "ends_sentence": true
+        },
+        "ip_notes_2_def": {
+            "words": 172,
+            "ends_sentence": true
+        },
+        "ip_notes_2_term": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "ip_notes_3_def": {
+            "words": 213,
+            "ends_sentence": true
+        },
+        "ip_notes_3_term": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_notes_4_def": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "ip_notes_5_def": {
+            "words": 63,
+            "ends_sentence": true
+        },
+        "ip_notes_5_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "ip_pr": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "ip_press": {
+            "words": 1,
+            "ends_sentence": true
+        },
+        "ip_pressure_high": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "ip_pressure_high_short": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_pressure_warn": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "ip_pressure_warn_short": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_q_avg_field": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "ip_q_avg_lateral": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "ip_q_critical": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "ip_q_design": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "ip_q_lat": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "ip_q_ratio": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "ip_q_supply": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "ip_q_sys": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "ip_reach_table_title": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "ip_roughness": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ip_se": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "ip_sl": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "ip_t_run": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "ip_worst_case_warn": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "ip_x": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "lpn_ago_days": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ago_hours": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ago_minutes": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ago_seconds": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_ago_unknown": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_backdrop_add": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_backdrop_continue": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_backdrop_coords_prompt": {
+            "words": 8,
+            "ends_sentence": false
+        },
+        "lpn_backdrop_position": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_backdrop_position_prompt1": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "lpn_backdrop_position_prompt2": {
+            "words": 9,
+            "ends_sentence": true
+        },
+        "lpn_backdrop_remove": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_backdrop_remove_confirm": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "lpn_backdrop_scale": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_backdrop_scale_prompt1": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "lpn_backdrop_scale_prompt2": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_backdrop_target_coords": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_backdrop_target_free": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_backdrop_target_label": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "lpn_backdrop_target_node": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_cancel": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_close": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_close_browser_prompt": {
+            "words": 22,
+            "ends_sentence": true
+        },
+        "lpn_close_discard": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_close_save_prompt": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_confirm_delete_network": {
+            "words": 25,
+            "ends_sentence": true
+        },
+        "lpn_confirm_example": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_confirm_restore_defaults": {
+            "words": 38,
+            "ends_sentence": true
+        },
+        "lpn_confirm_wipe": {
+            "words": 34,
+            "ends_sentence": true
+        },
+        "lpn_demand_tip": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_diag_dangling_link": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_diag_no_fixed_head": {
+            "words": 17,
+            "ends_sentence": true
+        },
+        "lpn_diag_not_converged": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_diag_unreachable": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_dialog_ok": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_edit_delete_network": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_engine_manning_note": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "lpn_field_auto": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_diameter": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_elev": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_elev_tip": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "lpn_field_head": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_head_tip": {
+            "words": 26,
+            "ends_sentence": true
+        },
+        "lpn_field_id": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_km": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_field_km_short": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_field_km_tip": {
+            "words": 25,
+            "ends_sentence": true
+        },
+        "lpn_field_length": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_length_tip": {
+            "words": 28,
+            "ends_sentence": true
+        },
+        "lpn_field_roughness": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_roughness_tip": {
+            "words": 25,
+            "ends_sentence": true
+        },
+        "lpn_field_text_size": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_field_x": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_y": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_file_changed_elsewhere": {
+            "words": 43,
+            "ends_sentence": true
+        },
+        "lpn_file_close": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_file_import_inp": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_file_import_inp_tip": {
+            "words": 46,
+            "ends_sentence": true
+        },
+        "lpn_file_needs_reopen": {
+            "words": 22,
+            "ends_sentence": true
+        },
+        "lpn_file_open": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_file_recent": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_file_reconnect": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_file_reconnect_prompt": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_file_relink": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_file_revert": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_file_save": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_file_save_tip": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "lpn_file_saveall": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_file_saveas": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_file_saveas_tip": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_file_saveas_tip_download": {
+            "words": 45,
+            "ends_sentence": true
+        },
+        "lpn_file_training_1": {
+            "words": 32,
+            "ends_sentence": true
+        },
+        "lpn_file_training_2": {
+            "words": 40,
+            "ends_sentence": true
+        },
+        "lpn_file_training_3": {
+            "words": 29,
+            "ends_sentence": true
+        },
+        "lpn_file_training_continue": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_file_training_name": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_file_training_permission": {
+            "words": 44,
+            "ends_sentence": true
+        },
+        "lpn_file_type_desc": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_file_upload_explain": {
+            "words": 44,
+            "ends_sentence": true
+        },
+        "lpn_file_write_failed": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "lpn_id_invalid": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_id_taken": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "lpn_import_bad_file": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "lpn_import_no_room": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_inp_bad_file": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_backdrop": {
+            "words": 22,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_controls": {
+            "words": 24,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_curve_long": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_curve_missing": {
+            "words": 22,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_cv": {
+            "words": 26,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_dangling": {
+            "words": 16,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_demands": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_emitters": {
+            "words": 30,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_eps": {
+            "words": 24,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_headloss": {
+            "words": 33,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_patterns": {
+            "words": 22,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_pump_other": {
+            "words": 28,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_quality": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_setting": {
+            "words": 16,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_tank_links": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_tanks": {
+            "words": 30,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_tcv": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_units": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_valve": {
+            "words": 33,
+            "ends_sentence": true
+        },
+        "lpn_inp_report_clean": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_inp_report_counts": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_inp_report_heading": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_inp_report_lead": {
+            "words": 16,
+            "ends_sentence": true
+        },
+        "lpn_labels_decimals_tip": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_labels_heading_link": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_labels_heading_node": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_labels_mark_extrema": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_lock_break": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_lock_dismiss": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_lock_full_error": {
+            "words": 44,
+            "ends_sentence": true
+        },
+        "lpn_lock_not_asked": {
+            "words": 46,
+            "ends_sentence": true
+        },
+        "lpn_lock_open_choices": {
+            "words": 66,
+            "ends_sentence": true
+        },
+        "lpn_lock_open_copy": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_lock_open_heading": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "lpn_lock_open_heading_saved": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_lock_open_heading_seen": {
+            "words": 17,
+            "ends_sentence": true
+        },
+        "lpn_lock_open_heading_times": {
+            "words": 16,
+            "ends_sentence": true
+        },
+        "lpn_lock_open_heading_unsaved": {
+            "words": 22,
+            "ends_sentence": true
+        },
+        "lpn_lock_open_readonly": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_lock_prompt_name": {
+            "words": 29,
+            "ends_sentence": true
+        },
+        "lpn_lock_readonly_banner": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "lpn_lock_restored": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "lpn_lock_somebody": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_lock_storage_error": {
+            "words": 47,
+            "ends_sentence": true
+        },
+        "lpn_lock_unavailable": {
+            "words": 39,
+            "ends_sentence": true
+        },
+        "lpn_menu_edit": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_menu_insert": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_menu_settings": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_menu_view": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_mode_add_junction": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_mode_add_pipe": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "lpn_mode_add_pump": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "lpn_mode_add_reservoir": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_mode_add_text": {
+            "words": 33,
+            "ends_sentence": true
+        },
+        "lpn_mode_delete": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_mode_select": {
+            "words": 32,
+            "ends_sentence": true
+        },
+        "lpn_net_bad_file": {
+            "words": 36,
+            "ends_sentence": true
+        },
+        "lpn_new_blank_si": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_new_blank_us": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_new_example_si": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_new_example_us": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_new_from_examples": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_new_text": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_notes_1_def": {
+            "words": 26,
+            "ends_sentence": true
+        },
+        "lpn_notes_1_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_notes_2_def": {
+            "words": 43,
+            "ends_sentence": true
+        },
+        "lpn_notes_2_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_notes_3_def": {
+            "words": 130,
+            "ends_sentence": true
+        },
+        "lpn_notes_3_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_notes_4_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_notes_5_def": {
+            "words": 167,
+            "ends_sentence": true
+        },
+        "lpn_notes_5_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_notes_epanet_def": {
+            "words": 40,
+            "ends_sentence": true
+        },
+        "lpn_notes_epanet_term": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_project_copy_suffix": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_project_numbered": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_project_rename": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_prompt_project_name": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_pump_curve_note": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "lpn_pump_curve_own": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_pump_curve_ref_note": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "lpn_pump_curve_source": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_pump_point1": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_pump_point2": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_pump_point3": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_push_confirm": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "lpn_push_elements": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "lpn_push_no_change": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_push_none_displayed": {
+            "words": 32,
+            "ends_sentence": true
+        },
+        "lpn_push_nothing": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_push_properties": {
+            "words": 1,
+            "ends_sentence": true
+        },
+        "lpn_recent_denied": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "lpn_recent_gone": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_recent_tip": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_reset_all_tip": {
+            "words": 31,
+            "ends_sentence": true
+        },
+        "lpn_result_flow": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_result_gradient": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_result_gradient_tip": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_result_head": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_result_head_tip": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_result_headloss": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_result_pressure": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_result_velocity": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_revert_confirm": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "lpn_saveas_overwrites_newer": {
+            "words": 26,
+            "ends_sentence": true
+        },
+        "lpn_saveas_overwrites_project": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "lpn_saveas_same_file": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "lpn_settings_backdrop_opacity": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_settings_computation": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_settings_defaults": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_defaults_note": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "lpn_settings_emitter_exponent": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_id_prefixes": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_legend_bottom_left": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_legend_bottom_right": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_legend_middle_left": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_legend_middle_right": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_legend_position": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_legend_top_left": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_legend_top_right": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_map_display": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_map_height_px": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_settings_map_height_tip": {
+            "words": 22,
+            "ends_sentence": true
+        },
+        "lpn_settings_push_btn": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_settings_push_note": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_settings_scope_calculator": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_scope_project": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_show_titles": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_settings_show_titles_tip": {
+            "words": 21,
+            "ends_sentence": true
+        },
+        "lpn_settings_symbol_opacity": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_settings_symbol_size": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_settings_text_size": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_text_size_map": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_text_size_screen": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_text_size_units": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_settings_tolerance": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_tolerance_tip": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_settings_wipe_btn": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_status_already_open": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_status_already_open_dirty": {
+            "words": 37,
+            "ends_sentence": true
+        },
+        "lpn_status_closed_empty": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "lpn_status_closed_opened": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "lpn_status_downloaded": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_status_file_opened": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "lpn_status_imported": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "lpn_status_reverted": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "lpn_status_saved": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "lpn_status_uploaded": {
+            "words": 25,
+            "ends_sentence": true
+        },
+        "lpn_storage_full": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_storage_too_new": {
+            "words": 17,
+            "ends_sentence": true
+        },
+        "lpn_tab_all": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_tab_duplicate": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tab_menu": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_tab_move_left": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_tab_move_right": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_tab_new": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_tab_unsaved": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_tip_labels_draggable": {
+            "words": 19,
+            "ends_sentence": true
+        },
+        "lpn_tip_select": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_title_units": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_tool_add_junction": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_add_pipe": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_add_pump": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_add_reservoir": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_add_text": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_delete": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_file": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_labels": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_select": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_settings": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_undo": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tool_zoom_extent": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_units_elevhead": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_units_flow": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_units_length": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_units_pressure": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_units_velocity": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_v2_restore_never": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "lpn_v2_restore_no": {
+            "words": 10,
+            "ends_sentence": false
+        },
+        "lpn_v2_restore_prompt": {
+            "words": 60,
+            "ends_sentence": true
+        },
+        "lpn_v2_restore_yes": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_view_units": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "menu_brand": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "menu_libre": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "menu_main_hydraulics": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "menu_main_language": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "menu_main_list": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "menu_more": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mhp_annual_kwh": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "mhp_diameter": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "mhp_efficiency": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "mhp_gross_head": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mhp_hl_bad_tip": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "mhp_hl_check": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mhp_hl_ok_tip": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "mhp_hl_warn_tip": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "mhp_hnet": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mhp_length": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mhp_main_desc": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "mhp_main_menu": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mhp_main_title": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "mhp_notes_1_def": {
+            "words": 34,
+            "ends_sentence": true
+        },
+        "mhp_notes_1_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mhp_notes_2_def": {
+            "words": 29,
+            "ends_sentence": true
+        },
+        "mhp_notes_2_term": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mhp_notes_3_def": {
+            "words": 30,
+            "ends_sentence": true
+        },
+        "mhp_notes_3_term": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mhp_notes_6_def": {
+            "words": 24,
+            "ends_sentence": true
+        },
+        "mhp_notes_6_term": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mhp_notes_7_def": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "mhp_notes_7_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mhp_power": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mhp_vel_check": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mhp_vel_high": {
+            "words": 16,
+            "ends_sentence": true
+        },
+        "mhp_vel_high_short": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mhp_vel_low": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "mhp_vel_low_short": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mhp_vel_ok_short": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mhp_vel_ok_tip": {
+            "words": 9,
+            "ends_sentence": true
+        },
+        "mi_a": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_d50in": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "mi_elevation": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_fr617": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_groupPoint": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_groupRegion": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_groupSegment": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_hv617": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_is_bank": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "mi_main_desc": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "mi_main_title": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "mi_menu": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mi_n": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_n617": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_notes_1_def": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "mi_notes_1_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mi_notes_2_def": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "mi_notes_2_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mi_pw": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_q617": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_q_617": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "mi_rh": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_station": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_t": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_tau": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mi_v617": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mi_waterSurfaceElevation": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mi_xSecPoints": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mpf_area_ratio": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mpf_depth_ratio": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "mpf_flow": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mpf_flow_area": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mpf_flow_tip": {
+            "words": 30,
+            "ends_sentence": true
+        },
+        "mpf_friction_slope": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "mpf_froude_number": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mpf_full_flow": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mpf_full_flow_ratio": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "mpf_hydraulic_radius": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mpf_main_desc": {
+            "words": 10,
+            "ends_sentence": false
+        },
+        "mpf_main_menu": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mpf_main_title": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "mpf_manningRoughness": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mpf_note_1": {
+            "words": 57,
+            "ends_sentence": true
+        },
+        "mpf_pipe_area": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mpf_pipe_diameter": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mpf_sewer_ref": {
+            "words": 41,
+            "ends_sentence": true
+        },
+        "mpf_shear_stress": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "mpf_solve_btn": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "mpf_solve_for_flow": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "mpf_solver_enter_positive_q": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "mpf_solver_no_solution": {
+            "words": 16,
+            "ends_sentence": true
+        },
+        "mpf_spreadheet_notice": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "mpf_top_width": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mpf_velocity": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mpf_velocity_head": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "mpf_wetted_perimeter": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mphl_area": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mphl_egl_1": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mphl_egl_2": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mphl_friction_loss": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mphl_friction_slope": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mphl_hgl_egl_tip": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "mphl_junction_loss": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "mphl_main_desc": {
+            "words": 8,
+            "ends_sentence": false
+        },
+        "mphl_main_menu": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "mphl_main_title": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "mphl_note_1": {
+            "words": 139,
+            "ends_sentence": true
+        },
+        "mphl_pipe_length": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mphl_total_junction_k": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "mphl_total_junction_k_short": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mphl_total_junction_k_tip": {
+            "words": 78,
+            "ends_sentence": true
+        },
+        "mphl_total_loss": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mtc_bend_angle": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "mtc_blodgett_v_bathurst": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mtc_bottom_width": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mtc_channel_slope": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mtc_d50_bottom": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "mtc_d50_in": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "mtc_d50_mra": {
+            "words": 10,
+            "ends_sentence": false
+        },
+        "mtc_d50_searcy": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "mtc_d50_z1": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "mtc_d50_z2": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "mtc_flow_depth": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mtc_iteration_tip": {
+            "words": 48,
+            "ends_sentence": true
+        },
+        "mtc_main_desc": {
+            "words": 11,
+            "ends_sentence": false
+        },
+        "mtc_main_title": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "mtc_menu": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mtc_n_bathurst": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "mtc_n_blodgett": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "mtc_n_pi": {
+            "words": 9,
+            "ends_sentence": false
+        },
+        "mtc_n_strickler": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "mtc_note_1": {
+            "words": 107,
+            "ends_sentence": true
+        },
+        "mtc_note_2_def": {
+            "words": 35,
+            "ends_sentence": true
+        },
+        "mtc_note_2_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mtc_pi_ok": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "mtc_pi_ok_tip": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "mtc_pi_out_of_range": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "mtc_pi_range_check": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "mtc_pi_tip": {
+            "words": 22,
+            "ends_sentence": false
+        },
+        "mtc_sgrock": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "mtc_side_slope_1": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "mtc_side_slope_2": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "mtc_solver_no_solution": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "mtc_vel_high": {
+            "words": 25,
+            "ends_sentence": true
+        },
+        "mtc_vel_low": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "mtc_vel_ok": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "odt_a0": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "odt_a1": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "odt_a_ending": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "odt_d": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "odt_h1": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "odt_h1_elev": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "odt_h2_check": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "odt_h2_elev": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "odt_h2_ok": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "odt_h2_warn": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "odt_h2_warn_tip": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "odt_main_desc": {
+            "words": 12,
+            "ends_sentence": false
+        },
+        "odt_main_menu": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "odt_main_title": {
+            "words": 10,
+            "ends_sentence": false
+        },
+        "odt_notes_1_def": {
+            "words": 43,
+            "ends_sentence": true
+        },
+        "odt_notes_1_term": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "odt_notes_2_def": {
+            "words": 74,
+            "ends_sentence": true
+        },
+        "odt_notes_2_term": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "odt_q_max": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "odt_sketch_end": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "odt_sketch_start": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "odt_t_day": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "odt_t_hr": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "odt_t_min": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "odt_t_sec": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "odt_vol": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "odt_w": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "or_area": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "or_cd": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "or_centroid_elev": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "or_diameter": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "or_head": {
+            "words": 4,
+            "ends_sentence": true
+        },
+        "or_hwe": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "or_invert": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "or_main_desc": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "or_main_menu": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "or_main_title": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "or_notes_1_def": {
+            "words": 26,
+            "ends_sentence": true
+        },
+        "or_notes_1_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "or_notes_2_def": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "or_notes_2_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "or_notes_3_def": {
+            "words": 27,
+            "ends_sentence": true
+        },
+        "or_notes_3_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "or_notes_4_def": {
+            "words": 39,
+            "ends_sentence": true
+        },
+        "or_notes_4_term": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "or_regime": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "or_regime_submerged": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "or_regime_submerged_tip": {
+            "words": 8,
+            "ends_sentence": false
+        },
+        "or_regime_twe_above_hwe": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "or_regime_twe_above_hwe_tip": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "or_regime_valid": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "or_regime_warn": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "or_regime_warn_tip": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "or_shape": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "or_shape_circular": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "or_shape_rectangular": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "or_twe": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "or_width": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "points_data_copy": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "points_data_help": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "points_data_paste": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "points_data_title": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "privacy_link": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "rc_D50": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "rc_Hp": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "rc_S0": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "rc_SD": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "rc_SD_check": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "rc_SD_high": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "rc_SD_high_tip": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "rc_SD_low": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "rc_SD_low_tip": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "rc_SD_ok": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "rc_SD_ok_tip": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "rc_Vm": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "rc_apron_length": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "rc_crest_length": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "rc_crest_radius": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "rc_d": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "rc_eq1": {
+            "words": 8,
+            "ends_sentence": false
+        },
+        "rc_eq2": {
+            "words": 10,
+            "ends_sentence": false
+        },
+        "rc_eq_used": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "rc_eq_warn_high": {
+            "words": 8,
+            "ends_sentence": false
+        },
+        "rc_eq_warn_low": {
+            "words": 8,
+            "ends_sentence": false
+        },
+        "rc_layer": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "rc_main_desc": {
+            "words": 11,
+            "ends_sentence": false
+        },
+        "rc_main_menu": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "rc_main_title": {
+            "words": 9,
+            "ends_sentence": false
+        },
+        "rc_n_chute": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "rc_notes_1_def": {
+            "words": 63,
+            "ends_sentence": true
+        },
+        "rc_notes_1_term": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "rc_notes_2_def": {
+            "words": 45,
+            "ends_sentence": true
+        },
+        "rc_notes_2_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "rc_notes_3_def": {
+            "words": 61,
+            "ends_sentence": true
+        },
+        "rc_notes_3_term": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "rc_notes_4_def": {
+            "words": 30,
+            "ends_sentence": true
+        },
+        "rc_notes_4_term": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "rc_notes_5_def": {
+            "words": 28,
+            "ends_sentence": true
+        },
+        "rc_notes_5_term": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "rc_notes_6_def": {
+            "words": 33,
+            "ends_sentence": true
+        },
+        "rc_notes_6_term": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "rc_notes_7_def": {
+            "words": 76,
+            "ends_sentence": true
+        },
+        "rc_notes_7_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "rc_np": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "rc_pond_ok": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "rc_pond_ok_tip": {
+            "words": 14,
+            "ends_sentence": false
+        },
+        "rc_pond_warn": {
+            "words": 10,
+            "ends_sentence": false
+        },
+        "rc_pond_warn_tip": {
+            "words": 13,
+            "ends_sentence": false
+        },
+        "rc_ponding_check": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "rc_qm": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "rc_qs": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "rc_qt": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "rc_sg": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "rc_sg_check": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "rc_sg_high": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "rc_sg_high_tip": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "rc_sg_low": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "rc_sg_low_tip": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "rc_sg_ok": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "rc_sg_ok_tip": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "rc_sketch_filter": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "rc_sketch_outlet_apron": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "rc_sketch_radius": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "rc_sketch_top_crest_curve": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "rc_yn": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "template_feedback": {
+            "words": 24,
+            "ends_sentence": true
+        },
+        "template_printable_subtitle": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "template_printable_title": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "template_welcome": {
+            "words": 23,
+            "ends_sentence": true
+        },
+        "terms_link": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "u_acft": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_bar": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_depthFrac": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_depthPercent": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_ft": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_ft2": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_ft2ps": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_ft3": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_ft3ps": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_fth2o": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "u_ftps": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_gph": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_gpm": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_grade": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_gradePercent": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "u_hp": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_in": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_in2": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "u_inh2o": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "u_inph": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_kgfcm2": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_knpcm2": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_knpm2": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_kpa": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_kw": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_kwh_yr": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_lph": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_lps": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_m": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_m2": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_m2ps": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_m3": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_m3ps": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_mgd": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_mh2o": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "u_mld": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_mm": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_mm2": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_mmh2o": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "u_mmph": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_mps": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_mw": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_mwh_yr": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_npm2": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_pa": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_psf": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_psi": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "u_s": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "view_hide_line": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "view_printable": {
+            "words": 11,
+            "ends_sentence": false
+        },
+        "wi_cumulativeFlow": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "wi_incrementalFlow": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "wi_main_desc": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "wi_main_title": {
+            "words": 9,
+            "ends_sentence": false
+        },
+        "wi_menu": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "wi_notes_we_def": {
+            "words": 28,
+            "ends_sentence": false
+        },
+        "wi_pondingHeight": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "wi_save_and_calculate": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "wi_weirPoints": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "ws_headWaterHeight": {
+            "words": 3,
+            "ends_sentence": true
+        },
+        "ws_main_desc": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "ws_main_menu": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "ws_main_title": {
+            "words": 7,
+            "ends_sentence": false
+        },
+        "ws_notes_heading": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "ws_notes_we_term": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "ws_weirCoefficient": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "ws_weirLength": {
+            "words": 3,
+            "ends_sentence": false
+        }
     }
 }
