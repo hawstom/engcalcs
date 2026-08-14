@@ -268,6 +268,62 @@
                 "lpn_valve_type_tcv"
             ],
             "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_diag_no_fixed_head"
+            ],
+            "reason": "Resync 318: all 26 languages retranslated against the tank/valve English. Verified by diff against commit 5cbe899 -- every language's value changed."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_inp_drop_tcv"
+            ],
+            "reason": "Resync 318: all 26 languages retranslated against the tank/valve English. Verified by diff against commit 5cbe899 -- every language's value changed."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_inp_drop_valve"
+            ],
+            "reason": "Resync 318: all 26 languages retranslated against the tank/valve English. Verified by diff against commit 5cbe899 -- every language's value changed."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_inp_report_counts"
+            ],
+            "reason": "Resync 318: all 26 languages retranslated against the tank/valve English. Verified by diff against commit 5cbe899 -- every language's value changed."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_notes_1_def"
+            ],
+            "reason": "Resync 318: all 26 languages retranslated against the tank/valve English. Verified by diff against commit 5cbe899 -- every language's value changed."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_notes_2_def"
+            ],
+            "reason": "Resync 318: all 26 languages retranslated against the tank/valve English. Verified by diff against commit 5cbe899 -- every language's value changed."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_empty_hint"
+            ],
+            "reason": "Resync 318: pre-existing drift, not today's. Ten-plus languages described a BACKGROUND IMAGE workflow the English has not mentioned for some time. All 26 rewritten against current English."
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "mtc_d50_mra"
+            ],
+            "reason": "Resync 318: pre-existing STRUCTURAL drift. Ten languages had lost the entire .ec-help/.ec-tip tooltip wrapper -- 83 chars against English's 337, citation invisible. Restored in all 26; lang_tag_parity_check.php now blocks a recurrence."
         }
     ],
     "hashes": {
@@ -543,14 +599,14 @@
         "lpn_delete_drops_overrides": "fd7bc476eff55d809c96e1f1c13650ce1c9ed7d4",
         "lpn_demand_tip": "49412527839a82f8d80d81a0d7c70a12a716ecdc",
         "lpn_diag_dangling_link": "3e707f064fe4a646d36fefce9ca038ef743be5f6",
-        "lpn_diag_no_fixed_head": "f07f4428fbda17512daed4aefc6d72e6efdb6d11",
+        "lpn_diag_no_fixed_head": "db0f2f80d2029f28447b4f0bfc931dc32e18e8b8",
         "lpn_diag_not_converged": "8a0e0e6c781b06efcfbc5ce272c62b62d2f7f87d",
         "lpn_diag_unreachable": "1cdaa4fbda79821a8ae138af20d55dd0d6ea969f",
         "lpn_diag_valve_needs_epanet": "06a186f7715796b95c7305b142cc47c31c3d5407",
         "lpn_diag_valve_on_fixed_head": "eb866ad71e25b073c8fa4c2192da833a2e7cd08c",
         "lpn_dialog_ok": "9ce3bd4224c8c1780db56b4125ecf3f24bf748b7",
         "lpn_edit_delete_network": "54a5ed21b23a4160bde2d86b22750824c8ee6b16",
-        "lpn_empty_hint": "07332b6b347465c2e5cf43be7115d3d206231c56",
+        "lpn_empty_hint": "cd3bcd4a5e9d51c509ada5fdd4a2214ff6cb43fc",
         "lpn_engine_failed": "80527f0a7cecad6338ab900c58c906eee6236d93",
         "lpn_engine_loading": "a95a376c68c16cf3eb5079ad02b19405532cd3ed",
         "lpn_engine_manning_note": "f592588a42fae119b629699fe84bcaf7e8881e51",
@@ -644,12 +700,12 @@
         "lpn_inp_drop_tank_curve": "cca9bf5223c4e9c65a90e49d604fdd1a6cc0e278",
         "lpn_inp_drop_tank_links": "103bae1c4010b131765f171ccddd17f1023b011f",
         "lpn_inp_drop_tanks": "56235c82e76759c10b8b28cad30e9b2e1b30b804",
-        "lpn_inp_drop_tcv": "26853ed1c160ade71fbf590ae769468fa4387354",
+        "lpn_inp_drop_tcv": "02558f263c18562e179350eff398e2737da590db",
         "lpn_inp_drop_units": "55c690f08835dee3b2dae331d5eef82089b13c32",
-        "lpn_inp_drop_valve": "a133c045bbf94ced5479d910c255d8140e65d55c",
+        "lpn_inp_drop_valve": "66aa4dfeca59b13ab80493ed03805a95eb5c7342",
         "lpn_inp_drop_valve_active": "4418c2a222c53784b5a7b35ddc7a7aef5582cfed",
         "lpn_inp_report_clean": "84abd1231b503db79d2f28ef6f451e3373ce1bf0",
-        "lpn_inp_report_counts": "19b6c77de071f8ceff7fbb4107fd557f61f16fe3",
+        "lpn_inp_report_counts": "f0dc2d6a8c1bcbda661844843f8c8a02d372d43e",
         "lpn_inp_report_heading": "997509d5dea07c7e08c021ecd446ce4c80515e8c",
         "lpn_inp_report_lead": "44f8c44833361c87e76515b2dc4c1484615d1fa9",
         "lpn_labels_decimals_tip": "8a4d3b146623e92ce0534c7cca63d79fd7c410e7",
@@ -699,9 +755,9 @@
         "lpn_new_example_us": "5022c78ec0553c0d2189b2bd52c0123b3ce5e75d",
         "lpn_new_from_examples": "6412998a89bdd9cb8ad64e3429d6a3e34c0f7745",
         "lpn_new_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
-        "lpn_notes_1_def": "ef67299b03052441a98b71735d2b8c9f88e1281d",
+        "lpn_notes_1_def": "a34f72b64fd479a231b286ad4d04f3760895030b",
         "lpn_notes_1_term": "8940eaa461ed01deafb4e767bb78d184ec42a156",
-        "lpn_notes_2_def": "c80340ac574c413cd7949414d0dcf09eae3444c2",
+        "lpn_notes_2_def": "ab097861d866d10f54fb60537a925a89d1c35646",
         "lpn_notes_2_term": "20cecc9c899cf61a3401106b5611f95adce3ad89",
         "lpn_notes_3_def": "92c38e93fc98e6246163b279aedaeaff02ff8ab7",
         "lpn_notes_3_term": "c6bf37fe1cd4249e4de2da6de2a9ba4ee14b45e3",
@@ -965,7 +1021,7 @@
         "mtc_channel_slope": "08f96da986b67612fa79b0e94973888dfdccc6f9",
         "mtc_d50_bottom": "8c2242f96c2d4c343467888ae748ce01744f08a9",
         "mtc_d50_in": "46f1897f6981bad6c0800741189ef2bf21bf7784",
-        "mtc_d50_mra": "1a59c33edec4e366e7f327efeb0f14d844ba5e35",
+        "mtc_d50_mra": "e9d8d1335eda4df6f9ffdcebe2f37aaf9f67c475",
         "mtc_d50_searcy": "4b106fad3090c6d8726af86d1a27175d2fbb020b",
         "mtc_d50_z1": "c56b0b2158ef2275c37117f2f277bd163c6c9ab0",
         "mtc_d50_z2": "1a934aac0a2d2c91166ea5030fbe6b409197307e",
