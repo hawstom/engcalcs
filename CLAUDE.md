@@ -46,6 +46,15 @@ not reopen branching by habit:
   tracks that both need `js/lpn-epanet.js` are sequential work wearing a parallel costume; the merge
   cost lands on the orchestrator, who is the one person who cannot see either diff while it is being
   written.
+- **AND DISJOINT FILES ARE NOT ENOUGH, because tracks also share SEAMS.** Task 184 (scenarios) and
+  Task 248 phase 2 (valves) ran in parallel worktrees with perfectly disjoint files and still
+  produced five user-reachable defects, because both wrote element properties and only one of them
+  knew about `setProp()` — the single write seam whose own comment predicted the failure verbatim.
+  Neither harness could see it either: one never said "valve", the other never said "scenario".
+  **When two tracks share a CONCEPT — a write seam, a resolver, a single source of truth — either
+  sequence them, or name that seam in BOTH briefs and require each to say how it goes through it.**
+  A brief that assigns only files is a brief that has not looked for the seam.
+  `dev/scenario-seam-repair.md` is the record; `dev/scripts/scenario_seam_check.php` is the guard.
 - **Subagents commit inside their own worktree and never push.** Pushing is the orchestrator's, after
   the merge and after `sh dev/scripts/check_all.sh` passes on the merged tree — a check that passed
   in two worktrees separately has not been run on the thing that ships.
