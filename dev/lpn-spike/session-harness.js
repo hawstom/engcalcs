@@ -112,6 +112,18 @@ const cases = require('./cases.js');
 const GRID = cases.twoLoopGrid;      // R -> A, loops A-B-C-D-A and B-C-E
 const PUMP = cases.pumpCase;         // reservoir, curved pump, two junctions in a loop
 const TANK = cases.tankCase;         // two tanks either side of one junction
+const TCV = cases.valveTcvCase;      // reservoir -> pipe -> throttle valve -> pipe -> demand
+// The same network with a parallel route around the valve, so closing the valve leaves the demand
+// reachable. Built here rather than in cases.js: it exists for one assertion in this file, and
+// cases.js is shared with validate.js and validate_epanet.js, where an extra case costs a run.
+const TCV_BYPASS = {
+	name: 'throttle-valve-with-bypass',
+	method: 'hw',
+	nodes: JSON.parse(JSON.stringify(TCV.nodes)),
+	links: JSON.parse(JSON.stringify(TCV.links)).concat([
+		{ id: 'LB', type: 'pipe', from: 'J1', to: 'J2', length: 500, diameter: 0.15, roughness: 130, k: 0, status: 'open' }
+	])
+};
 
 const node = (m, id) => m.nodes.find(n => n.id === id);
 const link = (m, id) => m.links.find(l => l.id === id);
@@ -147,6 +159,38 @@ const TESTS = [
 		n: 'pump shutoff head', base: PUMP, kind: 'value', mutate: m => { link(m, 'PU').h0 = 70; }
 	},
 	{ n: 'pump curve slope', base: PUMP, kind: 'value', mutate: m => { link(m, 'PU').a = 12000; } },
+	{
+		// A VALVE SETTING, and this case is here because its absence was a real shipped bug.
+		// Valves (Task 248 phase 2) and this session (Task 313) were built in separate worktrees
+		// on the same afternoon, so neither harness could see the other's element: a valve fell
+		// through pushValues()'s pipe branch, where setPipeData() is not even valid on a valve
+		// index, and the setting was never pushed at all. It surfaced only on the merged tree.
+		//
+		// It also pins the ORDER inside that branch, which is the subtler half. A valve has three
+		// states in EPANET -- closed, fully open, and ACTIVE -- and writing EN_INITSTATUS = OPEN
+		// after the setting drops it out of active, wide open, ignoring its setting. That cost
+		// exactly one k V^2/2g of head with the flows still agreeing to 2e-10 m3/s, which is to
+		// say it looked entirely reasonable.
+		n: 'throttle valve setting', base: TCV, kind: 'value', mutate: m => { link(m, 'V1').setting = 40; }
+	},
+	{
+		// Retyping a valve is a TOPOLOGY change even though nothing moved: EPANET fixes a link's
+		// type when the file is read, and the setting means a different quantity per type -- a
+		// pressure for a PRV, a flow for an FCV, a loss coefficient for a TCV. A signature that
+		// missed this would push a pressure into a slot the engine reads as a loss coefficient.
+		n: 'valve retyped TCV -> PRV', base: TCV, kind: 'topology',
+		mutate: m => { link(m, 'V1').valveType = 'PRV'; link(m, 'V1').setting = 30; }
+	},
+	{
+		// Closing a valve needs a network that SURVIVES it. cases.valveTcvCase is a series run, so
+		// closing V1 isolates the only demand and lpnDiagnose refuses the model before either
+		// engine is reached -- which tests the diagnostic, not the push. TCV_BYPASS adds a parallel
+		// pipe so the network still solves and the closure is an ordinary value edit.
+		//
+		// Worth its own case because the valve branch writes the status ITSELF, before the setting,
+		// and skips the setting entirely when closed. Nothing else exercises that pair.
+		n: 'close a valve', base: TCV_BYPASS, kind: 'value', mutate: m => { link(m, 'V1').status = 'closed'; }
+	},
 
 	// ---- topology edits: discrete clicks, and they must rebuild ----
 	{

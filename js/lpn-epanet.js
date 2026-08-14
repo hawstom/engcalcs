@@ -82,7 +82,12 @@
 		EN_FLOW = 8,
 		EN_VELOCITY = 9,
 		EN_HEADLOSS = 10,
-		EN_INITSTATUS = 4;
+		EN_INITSTATUS = 4,
+		// Link properties a VALVE needs and a pipe does not (Task 248 phase 2 x Task 313).
+		// EN_DIAMETER is shared with a pipe but reached separately here, because setPipeData()
+		// is not valid on a valve index.
+		EN_DIAMETER = 0,
+		EN_INITSETTING = 5;
 
 	/**
 	 * Roughness as EPANET wants it for the chosen formula.
@@ -369,8 +374,15 @@
 			l = model.links[i];
 			// isCurvedPump decides whether this link is a [PUMPS] row or a [PIPES] row, so a pump
 			// gaining or losing its curve is a topology change even though nothing moved.
+			// VALVE TYPE IS IN THE SIGNATURE, and it has to be. The setting of a PRV is a
+			// pressure and the setting of an FCV is a flow, so retyping a valve changes what the
+			// number beside it MEANS -- and, because lpnValveIsNative() sends the active types to
+			// a different engine entirely, it can change which engine is answering. Pushing a new
+			// type through a setter is not possible anyway: EPANET fixes a link's type when the
+			// file is read. Task 248 phase 2 x Task 313, 2026-08-14.
 			parts.push('l' + l.id + '\u0001' + l.type + '\u0001' + l.from + '\u0001' + l.to +
-				'\u0001' + (isCurvedPump(l) ? 'c' : 'p'));
+				'\u0001' + (isCurvedPump(l) ? 'c' : 'p') +
+				'\u0001' + (l.type === 'valve' ? String(l.valveType || 'TCV').toUpperCase() : ''));
 		}
 		// U+0001 between fields and U+0002 between records, because an id is user-typed: with a
 		// plain separator a node called "A|B" could forge another network's signature, and the
@@ -471,10 +483,43 @@
 			} else if (l.type === 'pump') {
 				// Curveless pump: a stand-in pipe whose geometry lpnToInp fixes from the method,
 				// and the method is in the signature. Only its status can change.
+			} else if (l.type === 'valve') {
+				// A VALVE IS NOT A PIPE AND setPipeData() IS NOT VALID ON ONE. This branch is the
+				// merge of Task 248 phase 2 into Task 313, and its absence was a real bug caught by
+				// validate_epanet.js on the merged tree after passing in both worktrees separately:
+				// a valve fell through to the pipe branch, so its SETTING was never pushed at all.
+				//
+				// ORDER IS LOAD-BEARING, AND GETTING IT WRONG COSTS THE WHOLE VALVE. In EPANET a
+				// valve has THREE states, not two: closed, fully open, and ACTIVE (controlling to
+				// its setting). Writing EN_INITSTATUS = OPEN puts it in the fully-open state, where
+				// the setting is IGNORED -- that is what "open" means for a valve, as distinct from
+				// a pipe, where it only means not closed. Writing EN_INITSETTING is what puts it
+				// back into the active state. So the status is written HERE, before the setting,
+				// and the shared status line below skips valves entirely.
+				//
+				// Written in the other order the network solves with the valve wide open: measured
+				// as exactly one k V^2/2g of missing head (0.271 m on cases.valveTcvCase) with the
+				// flows still agreeing to 2e-10 m3/s. A plausible number in a plausible place.
+				//
+				// Same two unit traps as the [VALVES] writer above, and they must agree with it or
+				// the cold path and the warm path answer differently: diameter m -> MILLIMETRES
+				// (the pipe convention, the opposite of a tank's), and the setting means a
+				// different quantity per type, of which only FCV is scaled.
+				p.setLinkValue(idx, EN_DIAMETER, l.diameter * 1000);
+				p.setLinkValue(idx, EN_INITSTATUS, l.status === 'closed' ? 0 : 1);
+				if (l.status !== 'closed') {
+					p.setLinkValue(idx, EN_INITSETTING,
+						String(l.valveType || 'TCV').toUpperCase() === 'FCV'
+							? (l.setting || 0) * 1000
+							: (l.setting || 0));
+				}
+				continue;
 			} else {
 				// length m, diameter m -> mm, minor-loss coefficient dimensionless.
 				p.setPipeData(idx, l.length, l.diameter * 1000, roughnessFor(method, l), l.k || 0);
 			}
+			// Valves never reach this line -- they `continue` above, having written their own
+			// status BEFORE their setting. See that comment for why the order cannot be shared.
 			p.setLinkValue(idx, EN_INITSTATUS, l.status === 'closed' ? 0 : 1);
 		}
 	}
