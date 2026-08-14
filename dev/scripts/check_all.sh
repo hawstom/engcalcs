@@ -16,9 +16,15 @@
 # without a human or a paid agent, and it is deliberately the first thing to reach for.
 #
 # WHAT IT DOES NOT COVER, stated because a checklist that hides its own gaps is worse than none:
-#   - The 19 non-lpn calculators have no behavioural test. Their math is verified by reading and by
-#     Tom driving a browser. run_harnesses.sh covers the lpn solver thoroughly, and since Task 293
-#     the map editor's pure geometry and label collision avoidance -- but nothing else.
+#   - Only TWO calculators have a worked-example test of their math: Manning Pipe Flow and Manning
+#     Trapezoidal Channel, the two core ones (Task 292). Every other calculator is checked only for
+#     running, for not emitting NaN, and for opening on a passing design -- which is real coverage
+#     of the catastrophic failures, and no coverage at all of a wrong coefficient. Adding a worked
+#     example is a per-page cost; spend it on the page being edited.
+#   - Calculators whose results live in DYNAMIC ROWS (Branched-Network, Irrigation-Pressure,
+#     Manning-Irregular, Weir-Flow-Irregular) are run, but their row results are not: building the
+#     rows needs a richer DOM than dev/calc-spike/calc-page.js has. The smoke harness names them
+#     as it goes rather than passing them silently.
 #   - Nothing here reads code for design, duplication, or a subtle logic error. That is what
 #     /code-review is for, and it is billed and user-triggered -- an AI cannot launch it.
 #
@@ -83,6 +89,13 @@ run_check "payload freshness"            blocking php dev/scripts/generate_trans
 LPN_HARNESS_N=$(ls dev/lpn-spike/*harness*.js dev/lpn-spike/validate*.js 2>/dev/null | wc -l | tr -d ' ')
 run_check "lpn harnesses ($LPN_HARNESS_N)"  blocking sh dev/scripts/run_harnesses.sh
 
+# --- the other 19 calculators ------------------------------------------------------------------
+# Task 292. Runs every calculator page's own pageCalculator against its own rendered HTML: all of
+# them on their factory defaults in both unit presets, plus worked examples for the two core
+# calculators (mpf, mtc). Same derived count as above -- never typed.
+CALC_HARNESS_N=$(ls dev/calc-spike/*harness*.js 2>/dev/null | wc -l | tr -d ' ')
+run_check "calculator harnesses ($CALC_HARNESS_N)" blocking sh dev/scripts/run_calc_harnesses.sh
+
 # --- Advisory: real findings, but judgement calls that must not block a commit ------------------
 run_check "key hygiene"                  advisory php dev/scripts/key_hygiene_check.php --strict
 run_check "size budget"                  advisory php dev/scripts/size_budget_check.php --strict
@@ -100,7 +113,8 @@ if [ -n "$ADVISORY" ]; then
 fi
 echo "All blocking checks pass."
 echo ""
-echo "Not covered here, and worth knowing: the 19 non-lpn calculators have no behavioural test,"
-echo "and nothing above reads code for design or logic errors. /code-review covers that, is billed,"
-echo "and only a human can start it."
+echo "Not covered here, and worth knowing: only mpf and mtc have a worked-example test of their"
+echo "math -- the other calculators are checked for running, not for being right -- and nothing"
+echo "above reads code for design or logic errors. /code-review covers that, is billed, and only a"
+echo "human can start it."
 exit 0

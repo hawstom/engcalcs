@@ -46,7 +46,12 @@ engcalcs; it is not a general "never branch" rule for other projects.
    ```php
    <script src="/engcalcs/js/my-calc.js?v=<?=filemtime(__DIR__.'/js/my-calc.js')?>"></script>
    ```
-10. **Add the prefix to `prefixToTermNames()` in `dev/scripts/generate_translation_payloads.php`,
+10. **Add a worked example to `dev/calc-spike/`.** The new page is picked up by
+    `all-calcs-smoke-harness.js` automatically (the page list is derived), so it is already checked
+    for running, for not emitting NaN, and for opening on a passing design. What that cannot check
+    is whether the math is right — copy `mpf-harness.js` and anchor the new calculator against its
+    source method. `dev/calc-spike/README.md` is the recipe.
+11. **Add the prefix to `prefixToTermNames()` in `dev/scripts/generate_translation_payloads.php`,
     listing the `glossary.json` terms the calculator uses.** A prefix that is missing there falls
     back to three default terms (`flow`, `velocity`, `slope`), so **every glossary entry written for
     the calculator — definitions, `preferred_translation`, and the `avoid` arrays that are the whole
@@ -725,11 +730,11 @@ office."* There are three tiers and they have very different prices. Knowing whi
 belongs to IS the budgeting decision.
 
 **Tier 1 — automated, seconds, free. `sh dev/scripts/check_all.sh` before every commit.**
-Fourteen checks: PHP and JS syntax, HTML balance on every page, the pageConfig PHP→JS bridge, tip
+Fifteen checks: PHP and JS syntax, HTML balance on every page, the pageConfig PHP→JS bridge, tip
 markup via the helpers, language rules A–D, gloss pointers, layout tags, the coverage declaration, payload
-freshness, the lpn harnesses (count derived from the glob, never typed — it read "12" while 15 were
-actually running), plus three advisory ones (key hygiene, size budget, English
-drift). Blocking failures exit 1. **This list used to live only in prose and in whoever remembered
+freshness, the lpn harnesses, the calculator harnesses (both counts derived from the glob, never
+typed — the lpn one read "12" while 15 were actually running), plus three advisory ones (key
+hygiene, size budget, English drift). Blocking failures exit 1. **This list used to live only in prose and in whoever remembered
 it** — a check nobody runs is indistinguishable from a check that does not exist, which is the same
 failure that hid six Rock Chute notes and the missing `lpn`/`bpn` glossary wiring.
 
@@ -759,12 +764,46 @@ the tooling is built on that assumption. Reserve it for decisions the tools cann
 scope, wording, and whether an unreferenced key is debt or lost content. Every one of those calls
 he made on 2026-08-12 was in this tier and none of them could have been automated.
 
-**THE GAP, stated plainly because a checklist that hides its own holes is worse than none: the 19
-non-lpn calculators have no behavioural test.** `run_harnesses.sh` covers the lpn solver thoroughly,
-and since Task 293 the map editor's pure geometry and label collision avoidance as well — but
-nothing else. Their math is verified by reading and by Tom driving a browser — which is slow and
-tiring, and is exactly the constraint that produced the lpn harness suite in the first place. See
-ROADMAP Task 292.
+**THE GAP, NARROWED BUT NOT CLOSED (Task 292, 2026-08-13).** It used to read: the 19 non-lpn
+calculators have no behavioural test at all. `dev/calc-spike/` now runs **every** calculator on its
+own factory defaults in **both** unit presets and asserts it runs, writes no NaN/Infinity/undefined,
+and opens on a passing design — plus worked examples for the two core calculators, `mpf_` and
+`mtc_`. What remains uncovered, and should be said plainly rather than rounded off:
+
+- **Seventeen calculators are checked for RUNNING, not for being RIGHT.** A wrong coefficient in
+  Rock Chute or Orifice Drain Time still ships silently. That is deliberate — the value is
+  concentrated, and a page nobody has edited in two years is not where a regression appears — but
+  it means *"the harnesses pass"* is not *"the math is right"* for anything but mpf and mtc.
+  **Add a worked example for the page you are editing**; `dev/calc-spike/README.md` is the recipe
+  and it is under an hour.
+- **Row-table calculators** (Branched-Network, Irrigation-Pressure, Manning-Irregular,
+  Weir-Flow-Irregular) run, but the results inside their dynamic rows do not: building the rows
+  needs a richer DOM than `calc-page.js` has. The smoke harness names them as it goes.
+
+**And how a calculator became testable at all, since the obstacle was never the math.** Every
+`pageCalculator` is already a pure function of its form — it reads `objForm[name].value` and writes
+`getElementById(name).innerHTML`, and touches nothing else about a browser. The obstacle was that
+the form lives in rendered PHP. `dev/scripts/dump_calc_form.php` renders the real page and hands
+the harness the form it actually shipped: field names, page defaults, unit selects with their
+families and options, both presets, the pageConfig strings, the script list. **Nothing about the
+form is restated in a harness** — restating it builds a second copy that drifts, testing itself
+while the page ships something else. There is no fixture on disk and therefore none to go stale.
+
+**A page must be rendered at GLOBAL scope and ONE PAGE PER PROCESS** — `dev/scripts/render_page.php`
+exists to be the only place that knows it. `include`ing a page from inside a *function* runs its
+top-level code in that function's scope, so `$ec_lang` and the rest of the bootstrap land as locals
+while every library function looking for them as globals finds nothing. The page still renders and
+still looks like a page; it is simply missing its menus and 16 of its 17 unit selects. **This had
+been true of `html_balance_check.php` since the day it was written** — every "ok" it printed was
+about a 22 KB stub of a 45 KB page, so the results table was never actually checked. Fixed in the
+same commit. And `lib/base.inc.php` is `require_once`d, so a second page in the same process
+renders as a fragment: a caller wanting several pages runs the renderer once per page.
+
+**A page's SI defaults are reachable only through the LANGUAGE.** `EC_DEFAULT_UNIT_SET` is derived
+from it (`en` → `us`, everything else → `si`), and clicking the SI button afterwards reinterprets
+the typed numbers rather than converting them — so `units('si')` turns an 18 in pipe into an 18 mm
+one, which is correct behaviour and useless as a defaults test. `loadCalculator(page, { lang: 'es' })`
+is how the SI defaults get tested, and it is why the smoke harness renders everything twice.
 
 **How to make an untestable file testable — the Task 293 pattern, 2026-08-13.** `looped-network.js`
 was 8,700 lines with ~30 shared mutable closure variables, so nothing in it could be reached without
@@ -969,6 +1008,9 @@ Set `APP_ENV=development` in your web server config or a `.env` file for local d
 | `js/PipeHydraulics.lib.js` | The suite's one Hazen-Williams constant pair (EPANET's) and `hwSlope()` — load before any calculator that uses it |
 | `js/lpn-geom.js` | `lpn_` map editor's pure geometry — polyline arc-length, the arrow dodge, leader attachment + hysteresis, label box/mask rects. No DOM. Harness: `dev/lpn-spike/geom-harness.js` |
 | `js/lpn-collide.js` | `lpn_` label collision avoidance as pure weighted-box relaxation. No DOM. Harness: `dev/lpn-spike/collide-harness.js` |
+| `dev/scripts/render_page.php` | Renders ONE page to stdout, at global scope, one page per process. The only correct way to render a page outside a web request — see the review-office section |
+| `dev/scripts/dump_calc_form.php` | Renders a calculator page and dumps its form as JSON (fields, defaults, unit selects, presets, pageConfig, scripts) for the Node harnesses |
+| `dev/calc-spike/calc-page.js` | Headless scaffolding for the non-lpn calculators: builds a form from the dumped page, runs the real `pageCalculator`, reads results. Harnesses: `dev/calc-spike/*-harness.js` |
 | `lib/Menus.lib.php` | `echoMainMenu()`, `echoHeader()`, `echoFooter()` |
 | `lib/Units.lib.php` | Unit sets and conversion factors |
 | `lib/Language.lib.php` | Language detection and switching |
@@ -985,6 +1027,8 @@ Non-web files live in `dev/` (blocked from web access via `dev/.htaccess`):
 | `dev/ROADMAP.md` | Prioritized improvement roadmap |
 | `dev/cross-platform-planning.md` | CC/CP collaboration conventions |
 | `dev/scripts/` | CLI tools: parity checker, scaffold, translation driver, etc. |
+| `dev/calc-spike/` | Headless behavioural tests for the non-lpn calculators (Task 292). See its README |
+| `dev/lpn-spike/` | Headless tests for the lpn solver and map editor |
 | `dev/translation_payloads/` | Per-language JSON payloads for translation sprints |
 | `dev/scripts/glossary.json` | Engineering term glossary for translation prompts |
 

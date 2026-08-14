@@ -983,25 +983,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Not legal advice and not from a lawyer.** The inventory is what an adviser would ask for
     first, which is why it exists; the verdict is not ours to give.
 
-- 35|292| **The 19 non-lpn calculators have no behavioural test, and that is the biggest hole in
-  the review office.** Named 2026-08-12 while answering Tom's question about budgeting review.
-  `dev/scripts/check_all.sh` runs ten checks and every one of them is either syntax, structure, or
-  the lpn solver. **Nothing anywhere confirms that Manning Pipe Flow still computes Manning pipe
-  flow.**
-  - **The asymmetry is stark and it is historical, not principled:** `lpn` has 11 harnesses and
-    ~1,500 assertions because Tom said his manual browser passes were slow and fatiguing, so the
-    harness was built to spend machine time instead of his. That reasoning applies to all 19 of the
-    others and was simply never extended to them.
-  - **What a test would look like here is already solved** — `dev/lpn-spike/` stubs a DOM, requires
-    the calculator JS, and asserts on numbers. The same shape works for any page whose
-    `pageCalculator` is a pure function of its form: seed inputs, run, compare against a worked
-    example from the source method's own paper.
-  - **Start with the two core calculators** (`mpf`, `mtc`) — they carry the coverage cross and the
-    most measured use, so a defect there is worth the most. One worked example each from Manning's
-    published tables would be a real regression test where there is currently none.
-  - **Do not attempt all 19 at once.** The value is concentrated: a calculator nobody has changed in
-    two years is not where a regression will appear. Test what is being edited.
-
 - 20|285| **We do not know what devices anybody uses this on, and several decisions have quietly
   assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."* He
   is right, and it is worth being precise about why: `log-human-view.php` and `log-calc-event.php`
@@ -1772,6 +1753,59 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|292| **[DONE 2026-08-13] Give the non-lpn calculators a behavioural test.** Shipped as
+  `dev/calc-spike/` (3 harnesses, 198 assertions) plus `dev/scripts/dump_calc_form.php`,
+  `dev/scripts/render_page.php` and `dev/scripts/run_calc_harnesses.sh`, wired into
+  `check_all.sh` as a blocking check. Runs in ~3 s.
+  - **`all-calcs-smoke-harness.js` covers ALL 15 calculator pages, both unit presets** (115
+    assertions): the page's own `pageCalculator` runs on its own factory defaults, writes no
+    NaN/Infinity/undefined/null into a results cell, and opens on a passing design. The page list
+    is derived from the directory, so a new calculator is covered the day it ships.
+  - **`mpf-harness.js` (36) and `mtc-harness.js` (47) test the two CORE calculators' math**, as the
+    task asked. Three anchors each, weakest first: the published dimensionless tables (the circular
+    hydraulic-elements table for mpf — 0.5/0.8/0.9/0.938 depths, and the Q peak at y/D = 0.938 that
+    the page's own solver depends on; exact geometry identities for mtc), Manning's own
+    proportionalities (V ∝ S^½, V ∝ 1/n, Q ∝ L^(8/3)), and one absolute hand-computed worked
+    example with the arithmetic written into the comments. mtc additionally feeds its ITERATION's
+    converged answer back into its defining equation — Strickler, P&I, B/B, Isbash, Maynord,
+    Searcy — because a converging loop that stops early still returns a number.
+  - **Mutation-tested before being trusted.** Five deliberate defects planted in the calculator JS
+    (wrong Manning exponent, perturbed geometry, wrong wetted perimeter, wrong Strickler constant,
+    iteration cut to a single pass) — all five caught, none needed a browser.
+  - **NOTHING ABOUT THE FORM IS RESTATED IN A HARNESS**, and that was the design decision that
+    made this cheap. `dump_calc_form.php` renders the real page and hands the harness the form it
+    actually shipped — field names, defaults, unit selects with families and options, both presets,
+    pageConfig, script list. A hand-written form would be a second copy that drifts, testing itself
+    while the page ships something else. It also buys coverage such a copy could not: an id a
+    calculator writes to but the page no longer has now throws by name.
+  - **FOUND ON THE WAY: `html_balance_check.php` had been checking a crippled page since the day it
+    was written.** It `include`d each page from inside a FUNCTION, which runs the page's top-level
+    code in that function's scope — so `$ec_lang` and the whole bootstrap landed as locals while
+    every library function looking for them as globals found nothing. The page still rendered and
+    still looked like a page: 22 KB of a 45 KB page, with 1 of its 17 unit selects. Every "ok" it
+    printed was about that stub, so the results table — the part most likely to lose a tag — was
+    never actually checked. Fixed by routing it through the new `render_page.php`; all 25 pages
+    still balance at full size.
+  - **A page's SI defaults are reachable only through the LANGUAGE**, which is why the smoke
+    harness renders everything twice. `EC_DEFAULT_UNIT_SET` derives from the language, and clicking
+    SI afterwards reinterprets rather than converts — `units('si')` turns an 18 in pipe into an
+    18 mm pipe, correctly, and uselessly as a defaults test.
+  - **One finding for Tom, deliberately NOT fixed here** (a defaults decision is his call): Manning
+    Trap Channel's factory defaults open with a ⚠ on the P&I range check, because the default rock
+    is 6 in = 0.5 ft and the Pemberton & Irons relation is calibrated over 0.28–0.36 ft. It is an
+    advisory about a column no visitor has selected — the velocity check is a clean ✓ — but
+    CLAUDE.md does say a page should not greet a first-time visitor with a warning. Recorded as a
+    named, reasoned exception in `all-calcs-smoke-harness.js`, which still fails on a ⚠ anywhere
+    else AND fails if that one ever stops warning, so the exception cannot go stale unnoticed.
+  - **What is left, stated rather than rounded off:** 17 calculators are checked for RUNNING, not
+    for being RIGHT — a wrong coefficient in Rock Chute or Orifice Drain Time still ships silently.
+    That is the intended shape (the task said not to attempt all 19 at once, and to test what is
+    being edited), and `dev/calc-spike/README.md` carries the under-an-hour recipe for adding the
+    next worked example. Row-table calculators (Branched-Network, Irrigation-Pressure,
+    Manning-Irregular, Weir-Flow-Irregular) run, but the results inside their dynamic rows are not
+    checked: building the rows needs a richer DOM than `calc-page.js` has, and the smoke harness
+    names them as it goes rather than passing them silently.
 
 - 0|293| **[DONE 2026-08-13] Extract the pure functions out of `js/looped-network.js` so the map
   editor becomes testable.** Shipped as `js/lpn-geom.js` (151 lines) and `js/lpn-collide.js` (144),

@@ -41,24 +41,25 @@ if ($argvFiles) {
     });
 }
 
-/** Renders a page in-process and returns its HTML, or null if it could not be rendered. */
+/**
+ * Renders a page and returns its HTML, or null if it could not be rendered.
+ *
+ * ONE SUBPROCESS PER PAGE, via dev/scripts/render_page.php (2026-08-13, ROADMAP Task 292).
+ * This function used to `include` the page HERE, from inside a function -- which runs the page's
+ * top-level code in this function's scope, so `$ec_lang`, `$ec_units` and the rest of the
+ * bootstrap landed as locals while every library function looking for them as globals found
+ * nothing. The page still rendered and still looked like a page. It was simply missing its menus,
+ * its footer and 16 of its 17 unit selects: 22 KB of a 45 KB page. Every "ok" this file printed
+ * before today was about that stub, so the results table -- the part most likely to lose a tag --
+ * was never actually checked. Found while building the Task 292 calculator harness, which needs
+ * those selects and got an empty list.
+ */
 function render_page($path)
 {
-    // The suite reads these; a CLI SAPI supplies none of them.
-    $_SERVER['REQUEST_URI'] = '/engcalcs/' . basename($path);
-    $_SERVER['SCRIPT_NAME'] = '/engcalcs/' . basename($path);
-    $_SERVER['SERVER_NAME'] = 'hawsedc.com';
-    $_SERVER['HTTP_HOST'] = 'hawsedc.com';
-    $_SERVER['REQUEST_METHOD'] = 'GET';
-    $_SERVER['HTTPS'] = 'on';
-    ob_start();
-    try {
-        include $path;
-    } catch (Throwable $e) {
-        ob_end_clean();
-        return null;
-    }
-    return ob_get_clean();
+    $cmd = escapeshellarg(PHP_BINARY) . ' ' . escapeshellarg(__DIR__ . '/render_page.php')
+         . ' ' . escapeshellarg(basename($path)) . ' 2>/dev/null';
+    $html = shell_exec($cmd);
+    return ($html === null || trim($html) === '') ? null : $html;
 }
 
 /** Depth-tracks one tag through one document. Returns [finalDepth, lowestDepth, offsetOfLowest]. */
@@ -108,7 +109,9 @@ if ($single === null) {
             continue;
         }
         echo $text . "\n";
-        $checked++;
+        // A page the child skipped was not measured, so it must not be counted as measured --
+        // otherwise the closing tally quietly overstates the coverage of this check.
+        if (strpos($text, 'SKIP') === false) { $checked++; }
         if ($rc !== 0) { $failures++; }
     }
     echo "\n$checked page(s) checked, $failures failing.\n";
