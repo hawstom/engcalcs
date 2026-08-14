@@ -215,6 +215,13 @@ echoHeader("EngCalcs", $html_title, "");
 			<?php // What the numbers on the map ARE. Map labels are bare numbers by design, so without
 			      // this a first-time visitor cannot tell gpm from l/s -- they get US on an English
 			      // page and SI on every other, and nothing said which. Filled by refreshMapStatus(). ?>
+			<?php // WHICH SCENARIO the drawing is showing and solving, and how many values that
+			      // scenario holds of its own (ROADMAP Task 184). A readout you can click: the same
+			      // control answers "what am I working on right now" and switches, creates, renames
+			      // and deletes. pointer-events:auto because the strip itself is inert -- it is an
+			      // overlay over the map, and this is the one thing in it that is not just a
+			      // readout. Filled and wired by refreshScenarioStatus()/wireScenarioButton(). ?>
+			<button type="button" id="lpn_scenario_btn" style="pointer-events:auto;font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px;border:1px solid #bbb"></button>
 			<div id="lpn_map_status" style="background:rgba(255,255,255,.8);padding:2px 6px"></div>
 			<?php // Monospace, and only this one: the X/Y digits change on every pointer move, and a
 			      // proportional font makes the whole readout jitter as they do. ?>
@@ -608,6 +615,33 @@ EngCalcs.pageConfig = {
 	lpn_push_none_displayed: <?=json_encode($ec_lang['lpn_push_none_displayed'])?>,
 	lpn_push_nothing: <?=json_encode($ec_lang['lpn_push_nothing'])?>,
 	lpn_push_no_change: <?=json_encode($ec_lang['lpn_push_no_change'])?>,
+<?php // Scenarios (ROADMAP Task 184) -- the selector/readout in the map's status strip, the
+      // override marker in every property row, and the two confirms that count what an action is
+      // about to throw away. ?>
+	lpn_scenario_label: <?=json_encode($ec_lang['lpn_scenario_label'])?>,
+	lpn_scenario_base: <?=json_encode($ec_lang['lpn_scenario_base'])?>,
+	lpn_scenario_overrides: <?=json_encode($ec_lang['lpn_scenario_overrides'])?>,
+	lpn_scenario_tip: <?=json_encode($ec_lang['lpn_scenario_tip'])?>,
+	lpn_scenario_new: <?=json_encode($ec_lang['lpn_scenario_new'])?>,
+	lpn_scenario_new_name: <?=json_encode($ec_lang['lpn_scenario_new_name'])?>,
+	lpn_scenario_prompt_name: <?=json_encode($ec_lang['lpn_scenario_prompt_name'])?>,
+	lpn_scenario_rename: <?=json_encode($ec_lang['lpn_scenario_rename'])?>,
+	lpn_scenario_delete: <?=json_encode($ec_lang['lpn_scenario_delete'])?>,
+	lpn_scenario_delete_confirm: <?=json_encode($ec_lang['lpn_scenario_delete_confirm'])?>,
+	lpn_scenario_override: <?=json_encode($ec_lang['lpn_scenario_override'])?>,
+	lpn_scenario_override_tip: <?=json_encode($ec_lang['lpn_scenario_override_tip'])?>,
+	lpn_scenario_base_value: <?=json_encode($ec_lang['lpn_scenario_base_value'])?>,
+	lpn_scenario_deactivated: <?=json_encode($ec_lang['lpn_scenario_deactivated'])?>,
+	lpn_scenario_push_btn: <?=json_encode($ec_lang['lpn_scenario_push_btn'])?>,
+	lpn_scenario_push_tip: <?=json_encode($ec_lang['lpn_scenario_push_tip'])?>,
+	lpn_scenario_push_confirm: <?=json_encode($ec_lang['lpn_scenario_push_confirm'])?>,
+	lpn_scenario_push_scenarios: <?=json_encode($ec_lang['lpn_scenario_push_scenarios'])?>,
+	lpn_scenario_push_values: <?=json_encode($ec_lang['lpn_scenario_push_values'])?>,
+	lpn_scenario_push_none: <?=json_encode($ec_lang['lpn_scenario_push_none'])?>,
+	lpn_delete_drops_overrides: <?=json_encode($ec_lang['lpn_delete_drops_overrides'])?>,
+	lpn_push_base_only: <?=json_encode($ec_lang['lpn_push_base_only'])?>,
+	lpn_field_active: <?=json_encode($ec_lang['lpn_field_active'])?>,
+	lpn_field_active_tip: <?=json_encode($ec_lang['lpn_field_active_tip'])?>,
 <?php // lpn_settings_emitter_exponent is deliberately NOT wired here: its Settings row was removed
       // 2026-07-30 because nothing can create an emitter yet (ROADMAP Task 191). The language key
       // stays in lib/lang.ec.en.php so restoring the control is one line here and one there. ?>
