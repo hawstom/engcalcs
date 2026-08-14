@@ -70,10 +70,10 @@ $ec_lang['template_printable_subtitle']='عنوان فرعي للطباعة';
 // prose, and they are translated into all 26 languages for one reason: consent that the visitor
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
-$ec_lang['consent_body']='هل يمكننا الاحتفاظ برقم واحد لكل صفحة في تخزين ملف تعريف هذا المتصفح لمنع تسجيل زياراته بشكل متكرر؟';
+$ec_lang['consent_body']='هل تسمح لنا بالاحتفاظ برقم واحد لكل صفحة في تخزين ملف تعريف هذا المتصفح لمنع تسجيل زياراته بشكل متكرر؟';
 $ec_lang['consent_accept']='الموافقة هذه المرة';
 $ec_lang['consent_accept_all']='الموافقة دائماً';
-$ec_lang['consent_decline']='رفض';
+$ec_lang['consent_decline']='رفض دائماً';
 $ec_lang['consent_current_granted']='لقد وافقت على هذا. نحن نحدّ من التسجيل لملف تعريف هذا المتصفح.';
 $ec_lang['consent_current_denied']='لقد رفضت هذا. لا نخزّن شيئاً للحد من التسجيل لملف تعريف هذا المتصفح.';
 $ec_lang['consent_region_label']='اختيارك بشأن الحد من التسجيل.';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='عرض';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='الإعدادات';
+$ec_lang['lpn_menu_help']='مساعدة';
+$ec_lang['lpn_help_walkthroughs']='جولات إرشادية';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,17 @@ $ec_lang['lpn_labels_decimals_tip']='عدد الخانات العشرية الم
 $ec_lang['lpn_labels_mark_extrema']='تمييز أعلى القيم وأدناها';
 $ec_lang['lpn_field_id']='المعرّف';
 $ec_lang['lpn_backdrop_menu']='صورة خلفية…';
-$ec_lang['lpn_backdrop_add']='إضافة صورة';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='ضبط مقياس الصورة';
-$ec_lang['lpn_backdrop_position']='تحريك الصورة';
-$ec_lang['lpn_backdrop_remove']='إزالة الصورة';
+$ec_lang['lpn_backdrop_add']='إضافة';
+$ec_lang['lpn_backdrop_scale']='معايرة بالنقر';
+$ec_lang['lpn_backdrop_scale_entry']='معايرة بملف الإسناد الجغرافي أو بحجم البكسل الواحد على الخريطة';
+$ec_lang_syn['lpn_backdrop_scale_entry']='gloss: world file; layout: nav item';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='أدخل حجم البكسل الواحد على الخريطة، أو الصق المحتوى الكامل لملف الإسناد الجغرافي الخاص بالصورة';
+$ec_lang_syn['lpn_backdrop_scale_entry_prompt']='gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text';
+$ec_lang['lpn_backdrop_scale_entry_bad']='اكتب رقماً واحداً لحجم البكسل الواحد على الخريطة، أو الصق كل الأسطر الستة لملف الإسناد الجغرافي.';
+$ec_lang['lpn_backdrop_wld_bad']='يقوم ملف الإسناد الجغرافي هذا بتدوير الصورة أو عكسها أو تمديدها بشكل غير متساوٍ. يمكن للخريطة فقط تحريك الصورة وتغيير حجمها بنفس المقدار في كلا الاتجاهين، لذلك لم يُستخدم الملف.';
+$ec_lang_syn['lpn_backdrop_wld_bad']='gloss: world file';
+$ec_lang['lpn_backdrop_position']='نقل';
+$ec_lang['lpn_backdrop_remove']='إزالة';
 $ec_lang['lpn_backdrop_remove_confirm']='هل تريد إزالة الصورة الخلفية؟';
 $ec_lang['lpn_backdrop_scale_prompt1']='انقر نقطتين على الصورة الخلفية، مثل طرفي مقياس رسم. ثم اكتب المسافة الحقيقية بينهما.';
 $ec_lang['lpn_backdrop_scale_prompt2']='المسافة الحقيقية بين النقطتين';
