@@ -10,10 +10,16 @@
 // produces a network that solves perfectly well and answers a question nobody asked. Running both
 // engines over the same file is the only thing that catches them.
 //
-// The comparison is only valid where the import kept the whole network. A file with TANKS is a
-// different network after import by design, so those are reported as SKIPPED with the reason
-// rather than being held to a tolerance they cannot meet -- which is why the fixture beside this
-// file has none, and why EPA's Net1/Net2/Net3 (all of which do) are not the fixture here.
+// The comparison is only valid where the import kept the whole network, so a file that still loses
+// something (a control valve, a pattern, an extended-period run) is reported as SKIPPED with the
+// reason rather than being held to a tolerance it cannot meet.
+//
+// TANKS LEFT THAT LIST IN TASK 248. They used to be the headline example of it -- the fixture
+// beside this file was hand-written without any for exactly that reason -- and now a tank is
+// imported as a tank, at its initial level, which is the same boundary condition EPANET solves at
+// t = 0. So EPA's own Net1/Net2/Net3 are finally in scope here:
+//
+//   node dev/lpn-spike/validate_inp.js dev/lpn-spike/reference/Net1.inp
 
 const fs = require('fs');
 const path = require('path');
@@ -38,9 +44,17 @@ function report(ok, label, detail) {
 /** The parse result, as js/lpn-solver.js wants it: everything SI, lengths included. */
 function toSolverModel(parsed) {
 	const lenSI = parsed.lengthUnit === 'ft' ? FT : 1;
-	const nodes = parsed.nodes.map((n) => n.type === 'reservoir'
-		? { id: n.id, type: 'reservoir', elev: n.elev, head: n.head }
-		: { id: n.id, type: 'junction', elev: n.elev, demand: n.demand, emitter: n.emitter });
+	const nodes = parsed.nodes.map((n) => {
+		// A tank passes its vessel geometry through as well, because js/lpn-epanet.js writes it
+		// into [TANKS] and the native solver ignores it -- see EngCalcs.lpnIsFixedHead.
+		if (n.type === 'tank') {
+			return { id: n.id, type: 'tank', elev: n.elev, head: n.head,
+				level: n.level, minLevel: n.minLevel, maxLevel: n.maxLevel, diameter: n.diameter };
+		}
+		return n.type === 'reservoir'
+			? { id: n.id, type: 'reservoir', elev: n.elev, head: n.head }
+			: { id: n.id, type: 'junction', elev: n.elev, demand: n.demand, emitter: n.emitter };
+	});
 	const links = parsed.links.map((l) => {
 		const out = {
 			id: l.id, type: l.type, from: l.from, to: l.to,
@@ -96,7 +110,12 @@ async function checkFile(file) {
 	// A file whose import removed elements is no longer the same network, so the numbers below
 	// would be comparing two different things. Say so instead of pretending.
 	const structural = parsed.dropped.filter((d) =>
-		d.code === 'tanks' || d.code === 'links-on-tanks' || d.code === 'dangling-link' ||
+		// 'tanks' and 'links-on-tanks' are gone from this list because they are gone from the
+		// importer (Task 248): a tank now comes in as a tank, so a file with tanks IS the same
+		// network after import and is held to the same tolerance as any other. That is what makes
+		// EPA's Net1/Net2/Net3 usable here -- all three have tanks, which is exactly why the
+		// fixture beside this file had to be hand-written without any.
+		d.code === 'dangling-link' ||
 		d.code === 'valve-dropped' || d.code === 'pump-constant-power' || d.code === 'controls' ||
 		d.code === 'rules' || d.code === 'patterns' || d.code === 'extended-period' ||
 		d.code === 'headloss-formula' || d.code === 'pump-curve-reduced' || d.code === 'link-setting');

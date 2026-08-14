@@ -1194,9 +1194,33 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 
 - 60|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
-  Task 243 shipped the engine and the toggle; none of this is built. The engine makes each of
-  these a mapping-and-UI job rather than a numerical one, which is the entire reason it was worth
-  vendoring.
+  Task 243 shipped the engine and the toggle. The engine makes each of these a mapping-and-UI job
+  rather than a numerical one, which is the entire reason it was worth vendoring.
+
+  **PHASE 1, TANKS: DONE 2026-08-14.** A third node type, in both engines, in the `.inp` reader and
+  writer, on the map, in the popup and in the settings. Phases 2 (valves) and 3 (extended-period)
+  are still open, so the gate on Tasks 306/307 has NOT cleared.
+  - **A tank is a fixed head at its water surface, and that is not a simplification** — it is what
+    EPANET solves at t = 0 of an extended-period run, before it integrates any level forward.
+    `EngCalcs.lpnIsFixedHead` is the one place the equivalence with a reservoir is declared; the
+    difference between the two types is entirely about what happens NEXT, which is phase 3.
+    `cases.tankCase` runs both engines over a two-tank network and they agree to 1.1e-5 m.
+  - **The bigger payoff was the IMPORTER, and it was not the reason the phase was scoped.** Until
+    now `.inp` import dropped every tank *and every link touching one* — honest handling of a
+    missing element, but it meant a municipal model arrived missing whole branches, and tanks are in
+    the majority of real models. EPA's own Net1/Net2/Net3 all have them.
+  - **THE DIAMETER IS THE TRAP AND NO SOLVE CAN SEE IT.** In an `.inp` a PIPE diameter is in
+    millimetres and a TANK diameter is in metres — same word, two units, three sections apart in one
+    file. Writing `diameter * 1000` on purpose leaves `validate_epanet.js` green to the last digit,
+    because a steady-state solve never reads a tank diameter. `dev/lpn-spike/tank-harness.js` exists
+    for exactly that class and round-trips the text; it was mutation-tested against that break
+    before being trusted. Do not let `cases.tankCase` stand in for it.
+  - **Text's ID letter moved from `T` to `X`** so EPANET's tanks can be T1, T2. A text element's ID
+    is unreachable from every screen, so nothing a user can see changed; old documents are not
+    migrated and do not need to be, because `mintId()` now refuses to reissue an id that is taken.
+  - `lpn_notes_1_def` says out loud that a tank is held at its level and neither runs down nor
+    fills. A tank that never empties is not a tank anybody has met, so leaving that unsaid would
+    have been the dishonest part of shipping this phase.
 
   **RAISED 20 → 60 on 2026-08-14, and it is now a GATE, not just a feature.** Tom's ruling is that
   the LibreEPANET.org launch (Tasks 306 and 307) waits until these three ship: they are exactly what

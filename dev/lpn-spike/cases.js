@@ -110,6 +110,38 @@ const closedLinkCase = {
 	]
 };
 
+// A TANK as the only source, plus a second one being fed from it (ROADMAP Task 248).
+//
+// WHAT THIS CASE CAN AND CANNOT CATCH, measured rather than assumed (2026-08-14). Both tanks'
+// initial levels sit deliberately close to their maxima, so a LEVEL written at the wrong scale
+// lands outside the min/max band and EPANET refuses the network outright -- verified by writing
+// level*1000 on purpose, which turns this line into "EPANET Error 110".
+//
+// It does NOT catch a wrong tank DIAMETER, and that is worth stating plainly because the diameter
+// is the likelier mistake: in an .inp under LPS a PIPE diameter is in MILLIMETRES and a TANK
+// diameter is in METRES, the same word in two units three sections apart in one file. Writing
+// diameter*1000 on purpose leaves this case PASSING to the last digit, because a steady-state
+// solve never reads a tank diameter at all. Only an .inp round trip can see it, which is exactly
+// what dev/lpn-spike/tank-harness.js exists to do -- do not let this case stand in for it.
+//
+// The physics being asserted here: T1's surface is elev + level = 60 + 8 = 68 m, T2's is
+// 20 + 9 = 29 m, and both are FIXED for this instant. So this is a two-fixed-head network and the junction
+// between them sits wherever the two pipes balance. If a tank were quietly treated as a reservoir
+// at its BOTTOM elevation instead of its surface, every head here moves by the level.
+const tankCase = {
+	name: 'tanks-as-fixed-heads',
+	method: 'hw',
+	nodes: [
+		{ id: 'T1', type: 'tank', elev: 60, head: 68, level: 8, minLevel: 0, maxLevel: 10, diameter: 15 },
+		{ id: 'J1', type: 'junction', elev: 10, demand: 25 * M3S_PER_LPS },
+		{ id: 'T2', type: 'tank', elev: 20, head: 29, level: 9, minLevel: 0.5, maxLevel: 9.5, diameter: 12 }
+	],
+	links: [
+		pipe('L1', 'T1', 'J1', 600, 0.3, 130),
+		pipe('L2', 'J1', 'T2', 400, 0.25, 130)
+	]
+};
+
 const noReservoirCase = {
 	name: 'no-fixed-head',
 	method: 'hw',
@@ -193,6 +225,7 @@ module.exports = {
 	twoLoopMinorLosses,
 	emitterCase,
 	closedLinkCase,
+	tankCase,
 	noReservoirCase,
 	unreachableCase,
 	zeroDemandCase

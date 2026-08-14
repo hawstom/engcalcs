@@ -6,7 +6,8 @@
 // things Tom named on 2026-08-09: for some agencies "does it run the actual EPANET engine?"
 // is a yes/no procurement gate that no amount of mobile-and-26-languages substitutes for
 // (ROADMAP Task 222), and it is the door to tanks, valves, extended-period simulation and
-// .inp interop that we would otherwise hand-write.
+// .inp interop that we would otherwise hand-write. Task 248 walked through that door: TANKS
+// shipped 2026-08-14 and are written into [TANKS] below.
 //
 // It stays OFF by default because the costs are real and land on our differentiator: the
 // engine module is 678 KB (236 KB gzipped) and loading it is async, against a native solve
@@ -68,6 +69,7 @@
 			emitterExp = model.emitterExponent || 0.5,
 			junctions = [],
 			reservoirs = [],
+			tanks = [],
 			pipes = [],
 			pumps = [],
 			curves = [],
@@ -80,6 +82,22 @@
 			if (n.type === 'reservoir') {
 				// EPANET reservoirs carry a total head, which is exactly what we store.
 				reservoirs.push(' ' + n.id + '  ' + (n.head || 0));
+			} else if (n.type === 'tank') {
+				// [TANKS] is  ID  Elev  InitLvl  MinLvl  MaxLvl  Diam  MinVol  [VolCurve].
+				//
+				// EVERY ONE OF THESE IS IN THE LENGTH UNIT, INCLUDING THE DIAMETER -- metres under
+				// LPS. That is NOT the rule for a pipe, whose diameter is in millimetres in the
+				// same file (see roughnessFor() and the [PIPES] writer below), and mixing the two
+				// up is the exact silent failure this file's header warns about: a 20 m tank
+				// written as 20000 still solves, it just holds a thousand times the water. Task
+				// 248, 2026-08-14.
+				//
+				// MinVol is written as 0 and no VolCurve is written, because this page has neither.
+				// 0 means "no separate minimum volume", which is EPANET's own default, not a
+				// stand-in for missing data. A non-cylindrical tank imported from a file with a
+				// volume curve is reported as a difference rather than faked (js/lpn-inp.js).
+				tanks.push(' ' + n.id + '  ' + (n.elev || 0) + '  ' + (n.level || 0) + '  ' +
+					(n.minLevel || 0) + '  ' + (n.maxLevel || 0) + '  ' + (n.diameter || 0) + '  0');
 			} else {
 				// Demand m3/s -> L/s.
 				junctions.push(' ' + n.id + '  ' + (n.elev || 0) + '  ' + (n.demand || 0) * 1000);
@@ -166,6 +184,7 @@
 		var inp = '[TITLE]\nEngCalcs looped network\n\n' +
 			'[JUNCTIONS]\n' + junctions.join('\n') + '\n\n' +
 			'[RESERVOIRS]\n' + reservoirs.join('\n') + '\n\n' +
+			(tanks.length ? '[TANKS]\n' + tanks.join('\n') + '\n\n' : '') +
 			(pipes.length ? '[PIPES]\n' + pipes.join('\n') + '\n\n' : '') +
 			(pumps.length ? '[PUMPS]\n' + pumps.join('\n') + '\n\n' : '') +
 			(curves.length ? '[CURVES]\n' + curves.join('\n') + '\n\n' : '') +

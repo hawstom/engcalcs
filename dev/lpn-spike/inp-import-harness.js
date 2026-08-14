@@ -73,6 +73,11 @@ const L = loadLoopedNetwork(
 	"\t\tgetProject: function () { return project; }, nextId: function () { return nextId; },\n" +
 	"\t\tindexEntry: indexEntry, openId: function () { return library.openId; },\n" +
 	"\t\tassembleModel: assembleModel,\n" +
+	// Task 248: the tank's MAP SYMBOL. buildNodeEls() gives a reservoir and a tank a second,
+	// non-interactive element over the plain node circle; a junction gets none. Reaching the
+	// element map is the only way to tell "the symbol was built" from "the node exists".
+	"\t\tnodeEl: function (id) { return nodeEls[id]; },\n" +
+	"\t\tnodeRadius: function (id) { return nodeRadius(nodeById(id)); },\n" +
 	"\t\tlabelWidth: function (id) { return labelEls[id].width; },\n" +
 	"\t\tlineHeight: function () { return effectiveFontSize(1) * 1.2; },\n" +
 	// init() never runs (that is the point of the injection), so the SVG layer variables it would
@@ -296,6 +301,92 @@ console.log('\n--- an LPS file ---');
 	ok('elevation stays 30 m', near(doc.nodes[0].elev, 30, 1e-9), doc.nodes[0].elev);
 	ok('nothing was left out of a file this simple',
 		dialogText().indexOf('Nothing was left out') >= 0);
+}
+
+// ---------------------------------------------------------------------------
+// 4b. A TANK becomes a tank in the DOCUMENT (ROADMAP Task 248).
+// ---------------------------------------------------------------------------
+// js/lpn-inp.js's own reading of a tank row is covered by tank-harness.js. What is checked here is
+// the layer above it: does the parsed tank become a correct DOCUMENT? A document holds DECLARED
+// numbers in the project's own units, so all five of a tank's lengths cross a unit boundary here,
+// and a tank's diameter is the one that would go wrong quietly -- it belongs with the elevations,
+// not with the pipe diameters, and a document showing 15000 for a 15 m tank still draws and solves.
+//
+// The pipe on the tank is the other half. Before Task 248 every link touching a tank was dropped
+// as an orphan, so an imported municipal model arrived missing whole branches.
+console.log('\n--- a tank, in an LPS file ---');
+{
+	const tankInp = [
+		'[JUNCTIONS]', ' J1 30 5', '',
+		'[TANKS]', ' TK1 40 6 1 9 15 0', '',
+		'[PIPES]', ' P1 TK1 J1 400 300 130 0 Open', '',
+		'[OPTIONS]', ' Units LPS', ' Headloss H-W', '',
+		'[COORDINATES]', ' J1 100 0', ' TK1 0 0', '', '[END]', ''
+	].join('\n');
+	setUnitSet('us');
+	importText(tankInp, 'tank.inp');
+	const doc = L.getDoc();
+	const tk = doc.nodes.filter((n) => n.id === 'TK1')[0];
+	ok('the tank is a node of type tank', !!tk && tk.type === 'tank', tk && tk.type);
+	ok('...bottom elevation, declared in metres', near(tk.elev, 40, 1e-9), tk && tk.elev);
+	ok('...water level, declared in metres', near(tk._level, 6, 1e-9), tk && tk._level);
+	ok('...lowest and highest levels', near(tk.minLevel, 1, 1e-9) && near(tk.maxLevel, 9, 1e-9));
+	ok('...VESSEL DIAMETER in the elevation unit (15 m), not the pipe unit (15000 mm)',
+		near(tk.tankDiameter, 15, 1e-9), tk && tk.tankDiameter);
+	ok('THE PIPE ON THE TANK SURVIVED THE IMPORT', doc.links.length === 1 && doc.links[0].from === 'TK1',
+		doc.links.length + ' link(s)');
+	ok('nothing was reported as left out', dialogText().indexOf('Nothing was left out') >= 0);
+	// The document must be solvable straight off the import, with the tank as the only source --
+	// which is also the diagnostic that used to say "add a reservoir" and now accepts a tank.
+	const res = EngCalcs.lpnSolve(L.assembleModel());
+	ok('...and it solves, anchored only by the tank', res.ok && res.converged, JSON.stringify(res.issues));
+	ok('...with the tank held at bottom + level = 46 m', near(res.heads.TK1, 46, 1e-6), res.heads.TK1);
+
+	// The map symbol. A tank must NOT draw as the reservoir's mark -- that was the whole Task
+	// 146.10 finding, one mark for two elements, indistinguishable in greyscale.
+	const tkEl = L.nodeEl('TK1'), jEl = L.nodeEl('J1');
+	ok('the tank draws its own overlay symbol', !!tkEl && !!tkEl.symbol);
+	ok('...which is the TANK icon, not the reservoir one',
+		!!tkEl && /lpn-node-symbol-tank/.test(tkEl.symbol.getAttribute('class') || ''),
+		tkEl && tkEl.symbol && tkEl.symbol.getAttribute('class'));
+	ok('a junction still draws no overlay symbol', !!jEl && !jEl.symbol);
+	// Tall and narrow, where a reservoir is wide and short. nodeRadius() is the circumscribing
+	// half-diagonal every other consumer reads, so this also pins that a tank is bigger than a
+	// junction and every clear-run inset, label leader and hit test follows.
+	ok('the tank reads taller than it is wide',
+		parseFloat(tkEl.symbol.getAttribute('height')) > parseFloat(tkEl.symbol.getAttribute('width')),
+		tkEl.symbol.getAttribute('width') + ' x ' + tkEl.symbol.getAttribute('height'));
+	ok('...and its hit radius is bigger than a junction\'s', L.nodeRadius('TK1') > L.nodeRadius('J1'),
+		L.nodeRadius('TK1') + ' vs ' + L.nodeRadius('J1'));
+}
+
+// ---------------------------------------------------------------------------
+// 4c. A tank called T1 and a text label in the SAME file (Task 248).
+// ---------------------------------------------------------------------------
+// EPANET's own default tank names are T1, T2 -- and until Task 248 this importer minted text
+// element ids as 'T' + n, because nothing else used the letter. Two elements sharing an id is not
+// a crash: nodeEls and labelEls are separate maps, so the drawing looks right. It breaks the ID
+// VALIDATOR, which reads one flat list -- so renaming something to a genuinely free name gets
+// refused, and renaming it onto a taken one gets accepted. Exactly the kind of defect that is
+// invisible until somebody hits it.
+console.log('\n--- a tank named T1 beside a text label ---');
+{
+	const clash = [
+		'[JUNCTIONS]', ' J1 30 5', '',
+		'[TANKS]', ' T1 40 6 1 9 15 0', '',
+		'[PIPES]', ' P1 T1 J1 400 300 130 0 Open', '',
+		'[OPTIONS]', ' Units LPS', ' Headloss H-W', '',
+		'[COORDINATES]', ' J1 100 0', ' T1 0 0', '',
+		'[LABELS]', ' 10 10 "North tank"', ' 20 20 "Zone 2"', '',
+		'[END]', ''
+	].join('\n');
+	importText(clash, 'clash.inp');
+	const doc = L.getDoc();
+	const ids = doc.nodes.map((n) => n.id).concat(doc.links.map((l) => l.id), doc.labels.map((b) => b.id));
+	const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
+	ok('the tank kept the name the file gave it', doc.nodes.some((n) => n.id === 'T1' && n.type === 'tank'));
+	ok('both labels came in', doc.labels.length === 2, doc.labels.length + ' label(s)');
+	ok('NO TWO ELEMENTS SHARE AN ID', dupes.length === 0, ids.join(', '));
 }
 
 // ---------------------------------------------------------------------------

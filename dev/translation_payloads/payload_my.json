@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 862,
-        "delta_key_count": 3,
+        "expected_key_count": 873,
+        "delta_key_count": 16,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -295,16 +295,250 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_tool_add_tank": "Tank",
+        "lpn_tank_elev_tip": "Level of the tank bottom. Water depths in the tank are measured up from here.",
+        "lpn_field_tank_level": "Water level",
+        "lpn_field_tank_level_tip": "Depth of water standing in the tank, measured up from the tank bottom. The water surface is the tank bottom level plus this depth.",
+        "lpn_field_tank_minlevel": "Lowest water level",
+        "lpn_field_tank_minlevel_tip": "Depth of water at which the tank is treated as empty, measured up from the tank bottom.",
+        "lpn_field_tank_maxlevel": "Highest water level",
+        "lpn_field_tank_maxlevel_tip": "Depth of water at which the tank is full, measured up from the tank bottom.",
+        "lpn_field_tank_diameter": "Tank diameter",
+        "lpn_field_tank_diameter_tip": "Width of the tank across. Read it in the same units as elevation, not in the pipe diameter units. It sets how much water a given depth holds.",
+        "lpn_tank_head_tip": "Water surface level in the tank: the tank bottom level plus the water level. This is the level the network is solved against.",
+        "lpn_inp_drop_tank_curve": "These tanks are not straight-sided: the file gives their shape as a curve. They came in as round tanks of the stated width. The water level is the level the file gives, so the answers match; only the shape is simplified.",
+        "lpn_mode_add_tank": "Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move elements and labels.",
         "lpn_method_switch_confirm": "Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?",
         "lpn_field_closed": "Closed",
         "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
     },
     "keys": {
+        "lpn_tool_add_tank": "Tank",
+        "lpn_tank_elev_tip": "Level of the tank bottom. Water depths in the tank are measured up from here.",
+        "lpn_field_tank_level": "Water level",
+        "lpn_field_tank_level_tip": "Depth of water standing in the tank, measured up from the tank bottom. The water surface is the tank bottom level plus this depth.",
+        "lpn_field_tank_minlevel": "Lowest water level",
+        "lpn_field_tank_minlevel_tip": "Depth of water at which the tank is treated as empty, measured up from the tank bottom.",
+        "lpn_field_tank_maxlevel": "Highest water level",
+        "lpn_field_tank_maxlevel_tip": "Depth of water at which the tank is full, measured up from the tank bottom.",
+        "lpn_field_tank_diameter": "Tank diameter",
+        "lpn_field_tank_diameter_tip": "Width of the tank across. Read it in the same units as elevation, not in the pipe diameter units. It sets how much water a given depth holds.",
+        "lpn_tank_head_tip": "Water surface level in the tank: the tank bottom level plus the water level. This is the level the network is solved against.",
+        "lpn_inp_drop_tank_curve": "These tanks are not straight-sided: the file gives their shape as a curve. They came in as round tanks of the stated width. The water level is the level the file gives, so the answers match; only the shape is simplified.",
+        "lpn_mode_add_tank": "Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move elements and labels.",
         "lpn_method_switch_confirm": "Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?",
         "lpn_field_closed": "Closed",
         "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
     },
     "key_context": {
+        "lpn_tool_add_tank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_tool_add_reservoir",
+                    "value": "ရေကန်",
+                    "english": "Reservoir"
+                },
+                "next_translated": {
+                    "key": "lpn_tool_add_pipe",
+                    "value": "ပိုက်လိုင်း",
+                    "english": "Pipe"
+                }
+            }
+        },
+        "lpn_tank_elev_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_head_tip",
+                    "value": "ရေကန်ရှိ ရေမျက်နှာပြင်အဆင့်ကို အမြင့်တစ်ခုအဖြစ် တိုင်းတာသည်၊ ဖိအားအဖြစ် မဟုတ်ပါ။ ရေမျက်နှာပြင်ကို ရေကန်၏အမြင့်တွင် ထားလိုပါက ဗလာချန်ထားပါ။",
+                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_close",
+                    "value": "ပိတ်ရန်",
+                    "english": "Close"
+                }
+            }
+        },
+        "lpn_field_tank_level": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_head_tip",
+                    "value": "ရေကန်ရှိ ရေမျက်နှာပြင်အဆင့်ကို အမြင့်တစ်ခုအဖြစ် တိုင်းတာသည်၊ ဖိအားအဖြစ် မဟုတ်ပါ။ ရေမျက်နှာပြင်ကို ရေကန်၏အမြင့်တွင် ထားလိုပါက ဗလာချန်ထားပါ။",
+                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_close",
+                    "value": "ပိတ်ရန်",
+                    "english": "Close"
+                }
+            }
+        },
+        "lpn_field_tank_level_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_head_tip",
+                    "value": "ရေကန်ရှိ ရေမျက်နှာပြင်အဆင့်ကို အမြင့်တစ်ခုအဖြစ် တိုင်းတာသည်၊ ဖိအားအဖြစ် မဟုတ်ပါ။ ရေမျက်နှာပြင်ကို ရေကန်၏အမြင့်တွင် ထားလိုပါက ဗလာချန်ထားပါ။",
+                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_close",
+                    "value": "ပိတ်ရန်",
+                    "english": "Close"
+                }
+            }
+        },
+        "lpn_field_tank_minlevel": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_head_tip",
+                    "value": "ရေကန်ရှိ ရေမျက်နှာပြင်အဆင့်ကို အမြင့်တစ်ခုအဖြစ် တိုင်းတာသည်၊ ဖိအားအဖြစ် မဟုတ်ပါ။ ရေမျက်နှာပြင်ကို ရေကန်၏အမြင့်တွင် ထားလိုပါက ဗလာချန်ထားပါ။",
+                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_close",
+                    "value": "ပိတ်ရန်",
+                    "english": "Close"
+                }
+            }
+        },
+        "lpn_field_tank_minlevel_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_head_tip",
+                    "value": "ရေကန်ရှိ ရေမျက်နှာပြင်အဆင့်ကို အမြင့်တစ်ခုအဖြစ် တိုင်းတာသည်၊ ဖိအားအဖြစ် မဟုတ်ပါ။ ရေမျက်နှာပြင်ကို ရေကန်၏အမြင့်တွင် ထားလိုပါက ဗလာချန်ထားပါ။",
+                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_close",
+                    "value": "ပိတ်ရန်",
+                    "english": "Close"
+                }
+            }
+        },
+        "lpn_field_tank_maxlevel": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_head_tip",
+                    "value": "ရေကန်ရှိ ရေမျက်နှာပြင်အဆင့်ကို အမြင့်တစ်ခုအဖြစ် တိုင်းတာသည်၊ ဖိအားအဖြစ် မဟုတ်ပါ။ ရေမျက်နှာပြင်ကို ရေကန်၏အမြင့်တွင် ထားလိုပါက ဗလာချန်ထားပါ။",
+                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_close",
+                    "value": "ပိတ်ရန်",
+                    "english": "Close"
+                }
+            }
+        },
+        "lpn_field_tank_maxlevel_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_head_tip",
+                    "value": "ရေကန်ရှိ ရေမျက်နှာပြင်အဆင့်ကို အမြင့်တစ်ခုအဖြစ် တိုင်းတာသည်၊ ဖိအားအဖြစ် မဟုတ်ပါ။ ရေမျက်နှာပြင်ကို ရေကန်၏အမြင့်တွင် ထားလိုပါက ဗလာချန်ထားပါ။",
+                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_close",
+                    "value": "ပိတ်ရန်",
+                    "english": "Close"
+                }
+            }
+        },
+        "lpn_field_tank_diameter": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_head_tip",
+                    "value": "ရေကန်ရှိ ရေမျက်နှာပြင်အဆင့်ကို အမြင့်တစ်ခုအဖြစ် တိုင်းတာသည်၊ ဖိအားအဖြစ် မဟုတ်ပါ။ ရေမျက်နှာပြင်ကို ရေကန်၏အမြင့်တွင် ထားလိုပါက ဗလာချန်ထားပါ။",
+                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_close",
+                    "value": "ပိတ်ရန်",
+                    "english": "Close"
+                }
+            }
+        },
+        "lpn_field_tank_diameter_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_head_tip",
+                    "value": "ရေကန်ရှိ ရေမျက်နှာပြင်အဆင့်ကို အမြင့်တစ်ခုအဖြစ် တိုင်းတာသည်၊ ဖိအားအဖြစ် မဟုတ်ပါ။ ရေမျက်နှာပြင်ကို ရေကန်၏အမြင့်တွင် ထားလိုပါက ဗလာချန်ထားပါ။",
+                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_close",
+                    "value": "ပိတ်ရန်",
+                    "english": "Close"
+                }
+            }
+        },
+        "lpn_tank_head_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_head_tip",
+                    "value": "ရေကန်ရှိ ရေမျက်နှာပြင်အဆင့်ကို အမြင့်တစ်ခုအဖြစ် တိုင်းတာသည်၊ ဖိအားအဖြစ် မဟုတ်ပါ။ ရေမျက်နှာပြင်ကို ရေကန်၏အမြင့်တွင် ထားလိုပါက ဗလာချန်ထားပါ။",
+                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
+                },
+                "next_translated": {
+                    "key": "lpn_close",
+                    "value": "ပိတ်ရန်",
+                    "english": "Close"
+                }
+            }
+        },
+        "lpn_inp_drop_tank_curve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_headloss",
+                    "value": "ဤဖိုင်သည် Hazen-Williams ညီမျှခြင်းကို အသုံးမပြုပါ။ ဤစာမျက်နှာက Hazen-Williams ဖြင့် တွက်ချက်သောကြောင့်၊ ပိုက်ကြမ်းတမ်းမှု ဂဏန်းများကို ရေးထားသည့်အတိုင်း တိတိကျကျ ဆက်ထားသော်လည်း၊ ဤနေရာရှိ အဖြေများသည် EPANET ၏ အဖြေများနှင့် မကိုက်ညီပါ။",
+                    "english": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_tcv",
+                    "value": "ဤစီးဆင်းမှုထိန်းချုပ် ဗားလ်များကို တူညီသော ဒေသဆိုင်ရာ ဆုံးရှုံးမှုကို ဆောင်ကြဉ်းသည့် အလွန်တိုသော ပိုက်လိုင်းများအဖြစ် တင်သွင်းခဲ့ပါသည်။ ရေ၏အပြုအမူသည် တူညီသော်လည်း၊ အစိတ်အပိုင်းမှာ မတူညီပါ။",
+                    "english": "These throttle control valves came in as very short pipes carrying the same local loss. The water behaves the same way; the element is not the same."
+                }
+            }
+        },
+        "lpn_mode_add_tank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_add_reservoir",
+                    "value": "မုဒ် - ရေကန် ထည့်ရန်။ ရေကန်တစ်ခု ထားရန် မြေပုံကို နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းလဲရန် (သို့) ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။",
+                    "english": "Mode: Add Reservoir. Click the map to place a reservoir. Switch to Select mode to change or move elements and labels."
+                },
+                "next_translated": {
+                    "key": "lpn_mode_add_pipe",
+                    "value": "မုဒ် - ပိုက်လိုင်း ထည့်ရန်။ နေရာတစ်ခုနှင့် ကျန်နေရာတစ်ခုကို ချိတ်ဆက်ရန် ၎င်းတို့ကို အသီးသီး နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းလဲရန် (သို့) ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။",
+                    "english": "Mode: Add Pipe. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels."
+                }
+            }
+        },
         "lpn_method_switch_confirm": {
             "reason": "missing",
             "current_value": null,

@@ -73,8 +73,20 @@ valuable page. Everything below is **out permanently**. Reopening any of it requ
 with a new reason, not an appeal to completeness.
 
 - **Extended-period simulation.** Steady state only.
-- **Tank.** Tom's own read, and it is correct: a tank is a *time-modeling* element and this is a
-  steady-state tool. Say so in the user-facing Notes rather than leaving it as an implied gap.
+- ~~**Tank.**~~ **REOPENED AND SHIPPED, 2026-08-14 (ROADMAP Task 248).** This is the first entry
+  ever to leave this list, and the section above asks for a new decision with a new reason rather
+  than an appeal to completeness, so here is both. The reason is not completeness: Tom raised Task
+  248 to a GATE on the LibreEPANET.org launch, because tanks/valves/extended-period are exactly what
+  Task 296 leaned on when it refused the phrase "web clone of EPANET" — they are the honesty case
+  for the name. The decision is his, dated, and about sequencing, not about scope creep.
+  What made it cheap enough to be worth doing was Task 243's engine: a tank in a steady-state solve
+  is a fixed head at its water surface, which is precisely what EPANET itself solves at t = 0, so
+  the original objection ("a tank is a *time-modeling* element") turns out to describe the phases
+  that follow rather than this one. The Notes still say so out loud — `lpn_notes_1_def`: *"A tank
+  is held at the water level you give it: within one solution it never runs down and never fills."*
+  The second payoff was not anticipated and is larger than the first: `.inp` import used to drop
+  every tank **and every link touching one**, so a municipal model arrived missing whole branches.
+  EPA's own Net1, Net2 and Net3 all have tanks.
 - **Water quality**, in every form (age, trace, chlorine decay, multi-species).
 - **Active pressure controls — PRV / PSV / FCV.** Their open/active/closed status depends on the
   flow and pressure being solved for, which is a whole extra layer of logic. A *fixed* minor-loss
@@ -182,9 +194,10 @@ comfortably inside a debounced edit, so **the decision holds even though the ari
 
 Never diagnose topology by watching the solver fail. Four checks, four distinct messages:
 
-1. **No reservoir at all** → "Add a reservoir or fixed-head source." (A reservoir carries an
-   elevation AND a head as of 2026-07-30, ROADMAP Task 179; a blank head means "the water surface is
-   at this reservoir's own elevation", so a reservoir doubles as a tank.)
+1. **No fixed head at all** → "Add a reservoir or a tank." (A reservoir carries an elevation AND a
+   head as of 2026-07-30, ROADMAP Task 179; a blank head means "the water surface is at this
+   reservoir's own elevation". Since Task 248 a **tank** satisfies this check too — see
+   `EngCalcs.lpnIsFixedHead`, the one place the two types are declared equivalent.)
 2. **A node not connected to any fixed-head source** → BFS/union-find from all reservoirs over open
    links. **Name the specific node IDs and grey them on the map.** This is *the* dominant user error
    in a map editor: a pipe drawn near a junction but not snapped to it.

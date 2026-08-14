@@ -510,11 +510,52 @@ var EngCalcs = EngCalcs || {};
 		return undefined;
 	}
 
-	// The document. nodes: Junction/Reservoir (point elements). links: Pipe/Pump (two
+	// The document. nodes: Junction/Reservoir/Tank (point elements). links: Pipe/Pump (two
 	// endpoints + optional bend vertices). labels: Text elements with a leader to an
 	// anchor node, OR a free-floating text with anchorNode === null.
 	var doc = { nodes: [], links: [], labels: [] };
-	var nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
+
+	// The structural ID letters. These are LOOKUP KEYS into nextId and settings.idPrefixes, not the
+	// text an ID starts with -- that is settings.idPrefixes[key], which the user can change and
+	// which merely defaults to the key itself.
+	//
+	// TEXT MOVED FROM 'T' TO 'X' WHEN TANKS ARRIVED (Task 248, 2026-08-14), because EPANET's tanks
+	// are T1, T2 and a reader of the map should see that. Text was the one element that could give
+	// the letter up for free: its ID is unreachable from every screen in the app (the settings row
+	// for it was removed in Task 146 for exactly that reason), so nothing a user can see changed.
+	// An OLD document is not migrated and does not need to be -- its text elements keep their T3
+	// ids, recountNextId() counts them against the tank counter, and mintId() refuses to reissue an
+	// id that is already taken. So the worst case is a first tank numbered T4, never a collision.
+	var LPN_ID_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', text: 'X' };
+	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, X: 1 }; }
+	var nextId = newNextId();
+	// Re-derive the counters from the ids actually present. Matches against the CURRENT
+	// settings.idPrefixes, not a hardcoded single-uppercase-letter regex (Task 146 gear panel,
+	// 2026-07-30) -- a customized prefix can be any non-empty, space/quote-free string
+	// (validatePrefix()), not necessarily one letter. Known limitation, not worth guarding further:
+	// an element created under a PRIOR prefix (before the user renamed it mid-session) won't be
+	// matched here after a prefix rename, so a counter could under-count for that letter. Starting
+	// at 1 per key is already the safe floor, and mintId() below is the actual guarantee.
+	function recountNextId() {
+		nextId = newNextId();
+		doc.nodes.concat(doc.links, doc.labels).forEach(function (x) {
+			Object.keys(settings.idPrefixes).forEach(function (key) {
+				var p = settings.idPrefixes[key] || key, rest = String(x.id).indexOf(p) === 0 ? String(x.id).slice(p.length) : null;
+				if (rest !== null && /^\d+$/.test(rest) && nextId[key] !== undefined) { nextId[key] = Math.max(nextId[key], +rest + 1); }
+			});
+		});
+	}
+	// The ONE place an id is generated. The counter is a hint, not the guarantee: it can be behind
+	// after an undo, after an import, or after a prefix rename, and two prefixes can be set to the
+	// same text by a user who is entitled to do that. So the id is checked against every id in the
+	// document and the counter walks forward until it is free.
+	function mintId(key) {
+		var prefix = settings.idPrefixes[key] || key, used = {}, id;
+		allIds().forEach(function (x) { used[x] = 1; });
+		if (nextId[key] === undefined) { nextId[key] = 1; }
+		do { id = prefix + (nextId[key]++); } while (used[id]);
+		return id;
+	}
 
 	// ---- Project / scenario container (ROADMAP Task 184, shipped by 146.08) ----
 	// A save is a PROJECT: one network (doc above) plus a list of SCENARIOS. Base is canon and has
@@ -640,10 +681,10 @@ var EngCalcs = EngCalcs || {};
 	// before this panel existed, so adding it is a visual/behavioral no-op until a user opens it.
 	function defaultSettings() {
 		return {
-			// Keyed by the same structural letters nextId already uses (J/R/L/P/T) -- changing a
+			// Keyed by the same structural letters nextId already uses (LPN_ID_KEY) -- changing a
 			// prefix only affects IDs generated AFTER the change; existing element IDs are never
 			// live-renamed by a settings edit.
-			idPrefixes: { J: 'J', R: 'R', L: 'L', P: 'P', T: 'T' },
+			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', X: 'X' },
 			// Matches js/lpn-solver.js's own default -- see assembleModel(). No UI edits this since
 			// 2026-07-30: nothing can create an emitter yet, so the control was a no-op (ROADMAP
 			// Task 191, and the longer note in rebuildSettingsFields()).
@@ -678,7 +719,11 @@ var EngCalcs = EngCalcs || {};
 			// reservoir now has no head until the user gives it one, which is the same "squash the
 			// secrets" call already made for the pump curve in addLink() -- no invisible driving
 			// head the user never entered. Change this one number if that trade reads wrong.
-			defaults: { nodeElev: null, demand: null, diameter: null, roughness: null, k: null },
+			defaults: { nodeElev: null, demand: null, diameter: null, roughness: null, k: null,
+				// Tank geometry (Task 248). Null here and filled by seedDefaultInputs(), same as
+				// every other row -- which is also what migrates a document saved before tanks
+				// existed, with no migration step of its own.
+				tankLevel: null, tankMinLevel: null, tankMaxLevel: null, tankDiameter: null },
 			// Open/closed state of the settings panel's collapsible sections, persisted so a user
 			// who lives in Default inputs is not re-opening it every session. Default inputs starts
 			// OPEN because it is the mode-switching section above; the other two are set-once.
@@ -719,6 +764,16 @@ var EngCalcs = EngCalcs || {};
 		fill('diameter', niceDefault('lpn_u_diameter', 'in', 4, 0.1));
 		fill('roughness', 100);
 		fill('k', 2);
+		// A TANK'S FOUR NUMBERS ARE ALL VERTICAL DISTANCES IN THE ELEVATION/HEAD UNIT, the vessel
+		// diameter included -- EPANET's own convention, and the one that catches people out, since
+		// a PIPE diameter two rows up is in inches or millimetres. Numbers chosen to describe an
+		// ordinary municipal storage tank -- roughly 15 m across and 9 m tall, sitting about
+		// two-thirds full -- so that a tank dropped on the map without being opened is a plausible
+		// design rather than a shape that has to be fixed before the network will read sensibly.
+		fill('tankLevel', niceDefault('lpn_u_elevhead', 'fth2o', 20, 6));
+		fill('tankMinLevel', 0);
+		fill('tankMaxLevel', niceDefault('lpn_u_elevhead', 'fth2o', 30, 9));
+		fill('tankDiameter', niceDefault('lpn_u_elevhead', 'fth2o', 50, 15));
 	}
 
 	// User-supplied backdrop image (Task 146 Phase 2), ported from dev/lpn-spike/canvas-spike.html
@@ -822,6 +877,16 @@ var EngCalcs = EngCalcs || {};
 		var h = effective(n, 'head');
 		return (h === undefined || h === null || h === '') ? (n.elev || 0) : h;
 	}
+	// The water surface at ANY fixed-head node, in the Elevation/Head display unit. A tank's is
+	// derived rather than stored -- bottom elevation plus the level standing in the vessel -- which
+	// is why there is no blank-means-follow rule for it: both halves are always real numbers.
+	// Everything that draws, labels, solves or reports a fixed head goes through here, so the two
+	// types' different arithmetic is stated once (Task 248).
+	function nodeFixedHead(n) {
+		if (n.type === 'tank') { return (n.elev || 0) + (effective(n, 'level') || 0); }
+		return reservoirHead(n);
+	}
+	function isFixedHeadNode(n) { return !!n && (n.type === 'reservoir' || n.type === 'tank'); }
 	function linkById(id) {
 		var i;
 		for (i = 0; i < doc.links.length; i++) { if (doc.links[i].id === id) { return doc.links[i]; } }
@@ -924,8 +989,18 @@ var EngCalcs = EngCalcs || {};
 	// shared path will fight each other.
 	var RESERVOIR_HALF_W = 1.408;
 	var RESERVOIR_HALF_H = 1.1;
-	function reservoirSize() {
+	// A TANK is the reservoir's mirror image in proportion, deliberately (Task 248): narrower than
+	// it is tall, where the reservoir is wider than it is tall. Together with the domed roof in
+	// lib/Icons.lib.php that is the second of the two cues separating the two symbols, and it is
+	// the one that still works in a thumbnail. Area is kept close to the reservoir's so neither
+	// dominates a drawing containing both. Both numbers are one-line changes.
+	var TANK_HALF_W = 1.0;
+	var TANK_HALF_H = 1.45;
+	// The drawn box for a node that has an overlay symbol. Sized per TYPE, not per node -- so the
+	// map reads as a symbol set rather than as a set of scaled circles.
+	function nodeSymbolSize(n) {
 		var k = symbolFactor();
+		if (n && n.type === 'tank') { return { w: 2 * TANK_HALF_W * k, h: 2 * TANK_HALF_H * k }; }
 		return { w: 2 * RESERVOIR_HALF_W * k, h: 2 * RESERVOIR_HALF_H * k };
 	}
 	// The single scalar every OTHER consumer of node geometry reads -- clear-run insets, label
@@ -935,19 +1010,19 @@ var EngCalcs = EngCalcs || {};
 	// radius -- generous rather than tight, so none of those consumers ever clips the wide/short
 	// tank short on any one side (ROADMAP Task 146.10 and its 2026-08-09 follow-up).
 	function nodeRadius(n) {
-		if (n.type === 'reservoir') { var s = reservoirSize(); return Math.max(s.w, s.h) / 2; }
+		if (n.type === 'reservoir' || n.type === 'tank') { var s = nodeSymbolSize(n); return Math.max(s.w, s.h) / 2; }
 		return JUNCTION_R * symbolFactor();
 	}
-	// Positions/sizes a node's overlay symbol (currently: the reservoir tank -- see buildNodeEls()).
-	// Only a reservoir ever has one (`ne.symbol` is null for a junction, which draws as the plain
-	// circle above with no overlay), so this always sizes to reservoirSize() -- an independent
-	// width/height, not nodeRadius()'s single circumscribing scalar; see buildNodeEls() for the
+	// Positions/sizes a node's overlay symbol (the reservoir basin and the tank -- see
+	// buildNodeEls()). Only those two ever have one (`ne.symbol` is null for a junction, which draws
+	// as the plain circle above with no overlay), so this sizes to nodeSymbolSize() -- an independent
+	// width/height per type, not nodeRadius()'s single circumscribing scalar; see buildNodeEls() for the
 	// `preserveAspectRatio="none"` that makes the icon actually stretch to that box instead of
 	// being letterboxed inside it.
 	function positionNodeSymbol(id) {
 		var n = nodeById(id), ne = nodeEls[id];
 		if (!ne || !ne.symbol) { return; }
-		var s = reservoirSize();
+		var s = nodeSymbolSize(n);
 		ne.symbol.setAttribute('x', n.x - s.w / 2); ne.symbol.setAttribute('y', n.y - s.h / 2);
 		ne.symbol.setAttribute('width', s.w); ne.symbol.setAttribute('height', s.h);
 	}
@@ -995,10 +1070,16 @@ var EngCalcs = EngCalcs || {};
 		// data-node, same click/drag/hit-test path as before. This is a second, non-interactive
 		// element laid on top of it, built from the exact path data the toolbar's reservoir icon
 		// uses (buildMapIconSvg() below) -- never a redrawn copy of that shape.
-		var symbol = n.type === 'reservoir' ? buildMapIconSvg('reservoir', 'lpn-node-symbol lpn-node-symbol-reservoir') : null;
+		// A TANK gets the same treatment on the same path (Task 248): its own icon over the same
+		// invisible-but-clickable circle, so every consumer of node geometry keeps reading one
+		// scalar radius and nothing else in the file had to learn about a third node type.
+		var symbol = (n.type === 'reservoir' || n.type === 'tank')
+			? buildMapIconSvg(n.type, 'lpn-node-symbol lpn-node-symbol-' + n.type)
+			: null;
 		if (symbol) {
 			// The nested <svg>'s viewBox is square (0 0 24 24, same as every icon) but the box it's
-			// placed into is not (reservoirSize() -- wide, short). Default preserveAspectRatio
+			// placed into is not (nodeSymbolSize() -- wide and short for a reservoir, narrow and
+			// tall for a tank). Default preserveAspectRatio
 			// ("xMidYMid meet") would keep the icon square and letterbox it inside that box; "none"
 			// is what actually stretches the tank horizontally and squashes it vertically to fill
 			// the box, which is the whole point of giving it an independent width/height.
@@ -1008,7 +1089,14 @@ var EngCalcs = EngCalcs || {};
 			// out past the tank's own outline nor leaves a sliver of it uncovered. It stretches
 			// along with the rest of the icon's content since it lives in the same viewBox. Keep
 			// this in sync with that path's own x-coordinates if it's ever widened/narrowed again.
-			prependSymbolBackdrop(symbol, 'rect', { x: 3, y: 4, width: 18, height: 16 }, 'lpn-node-symbol-backdrop');
+			// A tank's silhouette is domed, so its patch is that same path rather than a rect -- a
+			// rect to the top of the dome would leave its corners standing outside the outline and
+			// a pipe would appear to stop short of the tank instead of running behind it.
+			if (n.type === 'tank') {
+				prependSymbolBackdrop(symbol, 'path', { d: 'M5 6q7-3.5 14 0v14H5z' }, 'lpn-node-symbol-backdrop');
+			} else {
+				prependSymbolBackdrop(symbol, 'rect', { x: 3, y: 4, width: 18, height: 16 }, 'lpn-node-symbol-backdrop');
+			}
 			nodesLayer.appendChild(symbol);
 		}
 		// Mask (Task 146.01) goes in the shared maskLayer, not here alongside the circle -- see
@@ -1983,6 +2071,7 @@ var EngCalcs = EngCalcs || {};
 	var MODE_HINT_KEYS = {
 		'select': 'lpn_mode_select', 'delete': 'lpn_mode_delete',
 		'add-junction': 'lpn_mode_add_junction', 'add-reservoir': 'lpn_mode_add_reservoir',
+		'add-tank': 'lpn_mode_add_tank',
 		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump', 'add-text': 'lpn_mode_add_text'
 	};
 	function updateModeHint() {
@@ -2006,7 +2095,7 @@ var EngCalcs = EngCalcs || {};
 		// text is settings.idPrefixes[key] (customizable via the gear/settings panel, Task 146 Phase
 		// 2) -- defaults to the key itself, so this reproduces the original hardcoded J1/R1 behavior
 		// until a user changes it.
-		var key = type === 'reservoir' ? 'R' : 'J', id = (settings.idPrefixes[key] || key) + (nextId[key]++);
+		var id = mintId(LPN_ID_KEY[type] || 'J');
 		// Both node types carry an elevation. A reservoir ALSO carries a head -- the fixed-head
 		// boundary condition js/lpn-solver.js solves against -- and that head is left blank by
 		// default, meaning "same as the elevation" (Tom, 2026-07-30: a reservoir with both fields
@@ -2017,9 +2106,26 @@ var EngCalcs = EngCalcs || {};
 		// Both node types now take the SAME settings.defaults.nodeElev (Tom, 2026-07-30) -- see the
 		// note on settings.defaults for why the old reservoir-sits-100-ft-higher asymmetry went away.
 		// A reservoir still gets no `head` key at all, which is what keeps it following its elevation.
-		var n = type === 'reservoir'
-			? { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev }
-			: { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev, _demand: settings.defaults.demand };
+		//
+		// A TANK (Task 248, 2026-08-14) is the third node type and it is NOT a reservoir with a
+		// head typed into it, even though a steady-state solve cannot tell the two apart. What
+		// separates them is what happens next: a reservoir's level never moves, a tank's does.
+		// Its `elev` is the BOTTOM of the vessel and its level is measured up from there, which is
+		// EPANET's own convention and the reason the popup shows the water surface as a computed
+		// row rather than as a second editable field -- two editable numbers that must agree is
+		// exactly the "hidden curve" trap Tom named on the pump.
+		var n;
+		if (type === 'reservoir') {
+			n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev };
+		} else if (type === 'tank') {
+			n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev,
+				_level: settings.defaults.tankLevel,
+				minLevel: settings.defaults.tankMinLevel,
+				maxLevel: settings.defaults.tankMaxLevel,
+				tankDiameter: settings.defaults.tankDiameter };
+		} else {
+			n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev, _demand: settings.defaults.demand };
+		}
 		doc.nodes.push(n);
 		buildNodeEls(n);
 		incidentLinks[id] = []; labelsByAnchor[id] = [];
@@ -2028,7 +2134,7 @@ var EngCalcs = EngCalcs || {};
 		return n;
 	}
 	function addLink(type, fromId, toId) {
-		var key = type === 'pump' ? 'P' : 'L', id = (settings.idPrefixes[key] || key) + (nextId[key]++);
+		var id = mintId(LPN_ID_KEY[type] || 'L');
 		var l = {
 			id: id, type: type, from: fromId, to: toId, verts: [],
 			_diameter: settings.defaults.diameter,
@@ -2063,7 +2169,7 @@ var EngCalcs = EngCalcs || {};
 	// OFFSET from the node (matching buildLabelEls'/updateLabelGeometry's model), computed here so
 	// the label still appears exactly where the user tapped, not snapped onto the node itself.
 	function addText(x, y, anchorNode) {
-		var id = (settings.idPrefixes.T || 'T') + (nextId.T++), an = anchorNode ? nodeById(anchorNode) : null;
+		var id = mintId('X'), an = anchorNode ? nodeById(anchorNode) : null;
 		var lb = an
 			? { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x - an.x, y: y - an.y, anchorNode: anchorNode, sizeMult: 1 }
 			: { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null, sizeMult: 1 };
@@ -2445,7 +2551,7 @@ var EngCalcs = EngCalcs || {};
 		doc.nodes.forEach(function (n) {
 			if (n.type === 'reservoir' && n.elev === undefined) { n.elev = n._head || 0; }
 		});
-		nextId = saved.nextId || { J: 1, R: 1, L: 1, P: 1, T: 1 };
+		nextId = saved.nextId || newNextId();
 		// Object.assign onto the current defaults, not saved.x || defaults() -- a plain "||" swaps in
 		// a saved object wholesale, so a preference added AFTER a user's last save (e.g. Task 146.03's
 		// mapHeight) is simply missing from it and reads as undefined rather than falling back to its
@@ -2476,10 +2582,15 @@ var EngCalcs = EngCalcs || {};
 		// value while still picking up NEW keys (which seedDefaultInputs() then fills).
 		var savedSettings = Object.assign({}, saved.settings || {});
 		var savedDefaults = savedSettings.defaults || {}, savedSections = savedSettings.sectionsOpen || {};
-		delete savedSettings.defaults; delete savedSettings.sectionsOpen;
+		// idPrefixes joined this list when tanks arrived (Task 248): a document saved before then
+		// carries {J,R,L,P,T} with no key for the tank, and a top-level assign would leave the new
+		// element with no prefix at all rather than with its default.
+		var savedPrefixes = savedSettings.idPrefixes || {};
+		delete savedSettings.defaults; delete savedSettings.sectionsOpen; delete savedSettings.idPrefixes;
 		settings = Object.assign(defaultSettings(), savedSettings);
 		Object.assign(settings.defaults, savedDefaults);
 		Object.assign(settings.sectionsOpen, savedSections);
+		Object.assign(settings.idPrefixes, savedPrefixes);
 		// `kmDefault` was the single-purpose predecessor of settings.defaults.k (renamed 2026-07-30
 		// when defaults grew to cover every input). Carry a saved one across so a user who set it
 		// does not silently lose it, then drop the old key so it cannot drift.
@@ -2796,7 +2907,7 @@ var EngCalcs = EngCalcs || {};
 		// Computed BEFORE the push below, or the project would be counted against itself.
 		var name = nextProjectName();
 		doc = { nodes: [], links: [], labels: [] };
-		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
+		nextId = newNextId();
 		scenarios = defaultScenarios();
 		project = { name: name, activeScenario: 'base' };
 		settings = inheritedSettings;
@@ -3029,6 +3140,26 @@ var EngCalcs = EngCalcs || {};
 				// between them (see reservoirHead()).
 				return { id: n.id, type: 'reservoir', x: n.x, y: n.y, elev: toDisplay(n.elev, 'lpn_u_elevhead') };
 			}
+			if (n.type === 'tank') {
+				// A tank's four levels and its diameter are ALL in the Elevation/Head unit, because
+				// they are all vertical distances measured on the same staff -- the diameter
+				// included, which is the one that surprises people (see js/lpn-epanet.js). Nothing
+				// here is blank-means-follow the way a reservoir's head is: EPANET states every one
+				// of them, so every one is written.
+				return {
+					id: n.id, type: 'tank', x: n.x, y: n.y,
+					elev: toDisplay(n.elev, 'lpn_u_elevhead'),
+					// _level is scenario-overridable (leading underscore, read through effective())
+					// because "what if the tank is drawn down to 2 m" is a scenario, and the same
+					// treatment demand gets. The vessel's own geometry is not -- it sits beside
+					// elev, which is a plain property for the same reason: a scenario changes
+					// operating state, not what was built.
+					_level: toDisplay(n.level, 'lpn_u_elevhead'),
+					minLevel: toDisplay(n.minLevel, 'lpn_u_elevhead'),
+					maxLevel: toDisplay(n.maxLevel, 'lpn_u_elevhead'),
+					tankDiameter: toDisplay(n.diameter, 'lpn_u_elevhead')
+				};
+			}
 			var j = {
 				id: n.id, type: 'junction', x: n.x, y: n.y,
 				elev: toDisplay(n.elev, 'lpn_u_elevhead'),
@@ -3071,12 +3202,30 @@ var EngCalcs = EngCalcs || {};
 		});
 		var nodeAt = {};
 		nodes.forEach(function (n) { nodeAt[n.id] = n; });
-		var labels = parsed.labels.map(function (lb, i) {
+		// A TEXT ELEMENT'S ID IS MINTED HERE AND MUST NOT COLLIDE WITH ONE THE FILE BROUGHT.
+		//
+		// This used to read 'T' + (i + 1), which was safe only while nothing else in the app used
+		// the letter T -- and Task 248 gave it to tanks, which are T1, T2 in EPANET's own default
+		// naming. An imported file with a tank T1 and a label would then have produced two elements
+		// sharing an id, which allIds() treats as one: the rename validator would refuse a free
+		// name and accept a taken one. So the prefix follows the text element's own key ('X') and
+		// the number walks past anything already claimed.
+		var takenIds = {};
+		nodes.forEach(function (n) { takenIds[n.id] = 1; });
+		links.forEach(function (l) { takenIds[l.id] = 1; });
+		var textPrefix = settings.idPrefixes.X || 'X', textN = 0;
+		function mintTextId() {
+			var id;
+			do { id = textPrefix + (++textN); } while (takenIds[id]);
+			takenIds[id] = 1;
+			return id;
+		}
+		var labels = parsed.labels.map(function (lb) {
 			// An anchored label stores an OFFSET from its node, not a position (buildLabelEls'
 			// model); EPANET stores the absolute point, so the anchor is subtracted here.
 			var an = lb.anchorNode && nodeAt[lb.anchorNode] ? nodeAt[lb.anchorNode] : null;
 			return {
-				id: 'T' + (i + 1), text: lb.text,
+				id: mintTextId(), text: lb.text,
 				x: an ? lb.x - an.x : lb.x,
 				y: an ? lb.y - an.y : lb.y,
 				anchorNode: an ? lb.anchorNode : null,
@@ -3086,15 +3235,16 @@ var EngCalcs = EngCalcs || {};
 		// nextId must clear every id the file brought, or the next element drawn would collide with
 		// one. Only ids shaped like this page's own (prefix + number) can collide, so only those are
 		// counted -- an EPANET id like "J-TF" is left alone and simply never reproduced.
-		var next = { J: 1, R: 1, L: 1, P: 1, T: labels.length + 1 };
+		var next = newNextId();
+		next.X = textN + 1;
 		function claim(id, key) {
 			var prefix = settings.idPrefixes[key] || key;
 			if (id.slice(0, prefix.length) !== prefix) { return; }
 			var n = parseInt(id.slice(prefix.length), 10);
 			if (isFinite(n) && String(n) === id.slice(prefix.length) && n >= next[key]) { next[key] = n + 1; }
 		}
-		nodes.forEach(function (n) { claim(n.id, n.type === 'reservoir' ? 'R' : 'J'); });
-		links.forEach(function (l) { claim(l.id, l.type === 'pump' ? 'P' : 'L'); });
+		nodes.forEach(function (n) { claim(n.id, LPN_ID_KEY[n.type] || 'J'); });
+		links.forEach(function (l) { claim(l.id, LPN_ID_KEY[l.type] || 'L'); });
 
 		return {
 			v: LPN_STORAGE_VERSION,
@@ -3115,8 +3265,9 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		switch (code) {
 			case 'headloss-formula': return pc.lpn_inp_drop_headloss || 'This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written but the results here will not match the results in EPANET.';
-			case 'tanks': return pc.lpn_inp_drop_tanks || 'Storage tanks were left out. This page has reservoirs, which hold a fixed water level, and a tank is not one.';
-			case 'links-on-tanks': return pc.lpn_inp_drop_tank_links || 'These pipes were left out because they connect to a tank that was left out.';
+			// 'tanks' and 'links-on-tanks' are gone (Task 248): tanks are imported now, so neither
+			// case can be reported. The lang keys are retired with them.
+			case 'tank-volume-curve': return pc.lpn_inp_drop_tank_curve || 'These tanks have a volume curve, so they are not straight-sided. They were brought in as round tanks of the stated diameter. The water level in them is the level the file gives, so the results match; only the shape is simplified.';
 			case 'valve-tcv-as-pipe': return pc.lpn_inp_drop_tcv || 'These throttle control valves came in as very short pipes carrying the same local loss. The hydraulics are the same; the element is not.';
 			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves control pressure or flow, and this page has no such element. They came in as open pipes, so the network is still connected but nothing is controlling it.';
 			case 'check-valve': return pc.lpn_inp_drop_cv || 'These pipes only let water flow one way in EPANET. They came in as ordinary pipes, so water may now flow either way through them.';
@@ -5384,6 +5535,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
 			{ icon: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', fn: function () { setMode('add-reservoir'); } },
+			{ icon: 'tank', label: pc.lpn_tool_add_tank || 'Tank', fn: function () { setMode('add-tank'); } },
 			{ icon: 'pump', label: pc.lpn_tool_add_pump || 'Pump', fn: function () { setMode('add-pump'); } },
 			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', fn: function () { setMode('add-junction'); } },
 			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
@@ -5719,7 +5871,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (!window.confirm(pc.lpn_confirm_delete_network || 'Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.')) { return; }
 		doc = { nodes: [], links: [], labels: [] };
-		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
+		nextId = newNextId();
 		// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone
 		// (their overrides key element IDs that no longer exist). Preferences (settings/labelSettings)
 		// still survive, as below.
@@ -5961,6 +6113,7 @@ var EngCalcs = EngCalcs || {};
 		addGroup.dataset.edits = '1';
 		[
 			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
+			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank' },
 			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump' },
 			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
 			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe' },
@@ -6500,13 +6653,13 @@ var EngCalcs = EngCalcs || {};
 			// user-requested action only.
 			// Undo covers Add too, not just Delete (Tom) -- snapshot before every mutation so
 			// "Undo" stays honest about what it does rather than needing a narrower name.
-			if (mode === 'add-junction' || mode === 'add-reservoir') {
+			if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
 				// Snap-on-create: a click within NODE_SNAP_PX of an existing node reuses it instead
 				// of creating a new, overlapping one -- see nearestNodeNearScreen()'s comment.
 				if (!nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX)) {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
-					addNode(mode === 'add-reservoir' ? 'reservoir' : 'junction', w.x, w.y);
+					addNode(mode.slice('add-'.length), w.x, w.y);
 				}
 			}
 			else if (mode === 'add-text') {
@@ -7319,7 +7472,8 @@ var EngCalcs = EngCalcs || {};
 		// the concept. Restore the row (one array entry) if Task 146.05's element browser ever
 		// lists text elements the way EPANET's own Browser does.
 		[
-			['R', pc.lpn_tool_add_reservoir || 'Reservoir'], ['J', pc.lpn_tool_add_junction || 'Junction'],
+			['R', pc.lpn_tool_add_reservoir || 'Reservoir'], ['T', pc.lpn_tool_add_tank || 'Tank'],
+			['J', pc.lpn_tool_add_junction || 'Junction'],
 			['P', pc.lpn_tool_add_pump || 'Pump'], ['L', pc.lpn_tool_add_pipe || 'Pipe']
 		].forEach(function (f) {
 			var key = f[0], input = document.createElement('input');
@@ -7375,7 +7529,7 @@ var EngCalcs = EngCalcs || {};
 			{ key: 'nodeElev', group: 'node', field: 'elev', label: pc.lpn_field_elev || 'Elevation',
 				applies: function () { return true; }, get: function (n) { return n.elev; }, set: function (n, v) { n.elev = v; } },
 			{ key: 'demand', group: 'node', field: 'demand', label: pc.bpn_demand || 'Demand',
-				applies: function (n) { return n.type !== 'reservoir'; }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },
+				applies: function (n) { return !isFixedHeadNode(n); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },
 			{ key: 'diameter', group: 'link', field: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },
 			{ key: 'roughness', group: 'link', field: 'roughness', label: roughnessLabel(),
@@ -7981,7 +8135,39 @@ var EngCalcs = EngCalcs || {};
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(n.id, function (newId) { renameNode(nodeId, newId); });
 		clearFields(fields);
-		if (n.type === 'reservoir') {
+		if (n.type === 'tank') {
+			// FIVE INPUTS AND ONE COMPUTED ROW, in the order a person builds a tank: where the
+			// bottom sits, how much water is in it right now, how far it can go either way, and how
+			// wide it is. The WATER SURFACE is deliberately read-only and derived (Task 248): it is
+			// the number the solve actually uses, so the user must be able to see it, but making it
+			// a second editable field would be two numbers that have to agree -- the "hidden curve"
+			// trap Tom named on the pump (see addLink()).
+			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
+				function () { return n.elev; },
+				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				pc.lpn_tank_elev_tip);
+			unitNumberField(fields, pc.lpn_field_tank_level || 'Water level', 'lpn_u_elevhead',
+				function () { return effective(n, 'level'); },
+				function (v) { n._level = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_level_tip);
+			unitNumberField(fields, pc.lpn_field_tank_minlevel || 'Lowest water level', 'lpn_u_elevhead',
+				function () { return n.minLevel; },
+				function (v) { n.minLevel = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_minlevel_tip);
+			unitNumberField(fields, pc.lpn_field_tank_maxlevel || 'Highest water level', 'lpn_u_elevhead',
+				function () { return n.maxLevel; },
+				function (v) { n.maxLevel = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_maxlevel_tip);
+			// The Elevation/Head unit, NOT the pipe-diameter unit, and the tip says so. A tank
+			// diameter is a distance across the ground, of the same order as the elevations beside
+			// it; reading it in inches or millimetres would put a 15 m tank on screen as 15000.
+			unitNumberField(fields, pc.lpn_field_tank_diameter || 'Tank diameter', 'lpn_u_elevhead',
+				function () { return n.tankDiameter; },
+				function (v) { n.tankDiameter = v; updateNode(nodeId); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_diameter_tip);
+			readonlyUnitField(fields, pc.lpn_result_head || 'Head', 'lpn_u_elevhead',
+				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip);
+		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; },
 				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
@@ -8329,20 +8515,7 @@ var EngCalcs = EngCalcs || {};
 	function undo() {
 		if (undoStack.length === 0) { return; }
 		doc = undoStack.pop();
-		nextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };
-		// Matches against the CURRENT settings.idPrefixes, not a hardcoded single-uppercase-letter
-		// regex (Task 146 gear panel, 2026-07-30) -- a customized prefix can be any non-empty,
-		// space/quote-free string (validatePrefix()), not necessarily one letter. Known limitation,
-		// not worth guarding further on a preview page: an element created under a PRIOR prefix
-		// (before the user renamed it mid-session) won't be matched here after a prefix rename, so
-		// nextId could under-count for that letter post-undo. Renaming a prefix mid-session is rare;
-		// starting nextId at 1 per key is already the safe floor.
-		doc.nodes.concat(doc.links, doc.labels).forEach(function (x) {
-			Object.keys(settings.idPrefixes).forEach(function (key) {
-				var p = settings.idPrefixes[key] || key, rest = x.id.indexOf(p) === 0 ? x.id.slice(p.length) : null;
-				if (rest !== null && /^\d+$/.test(rest)) { nextId[key] = Math.max(nextId[key], +rest + 1); }
-			});
-		});
+		recountNextId();
 		closePopup(); // whatever it referenced may no longer exist post-undo (e.g. undoing an Add)
 		buildDom();
 		updateEmptyHint();
@@ -8390,6 +8563,22 @@ var EngCalcs = EngCalcs || {};
 	var lastSolveResult = null;
 	function assembleModel() {
 		var nodes = doc.nodes.map(function (n) {
+			if (n.type === 'tank') {
+				// A tank passes BOTH its resolved surface head (what the steady-state solve reads,
+				// see EngCalcs.lpnIsFixedHead) AND its vessel geometry, which the native solver
+				// ignores and js/lpn-epanet.js writes into [TANKS]. All five are lengths in the
+				// Elevation/Head unit, the vessel diameter included -- it is a vertical distance's
+				// unit because it is measured on the same staff, not a pipe diameter.
+				return {
+					id: n.id, type: n.type,
+					elev: toSI(n.elev || 0, 'lpn_u_elevhead'),
+					head: toSI(nodeFixedHead(n), 'lpn_u_elevhead'),
+					level: toSI(effective(n, 'level') || 0, 'lpn_u_elevhead'),
+					minLevel: toSI(n.minLevel || 0, 'lpn_u_elevhead'),
+					maxLevel: toSI(n.maxLevel || 0, 'lpn_u_elevhead'),
+					diameter: toSI(n.tankDiameter || 0, 'lpn_u_elevhead')
+				};
+			}
 			return n.type === 'reservoir'
 				// Reservoirs pass a resolved head: the solver wants a real number, but the document
 				// deliberately stores that field blank when the head just follows the elevation (see
@@ -8412,7 +8601,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
-		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a reservoir. The network needs at least one known water level before it can be solved.'; }
+		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a reservoir or a tank. The network needs at least one known water level before it can be solved.'; }
 		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'A pipe or pump connects to a node that no longer exists:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
@@ -8514,16 +8703,16 @@ var EngCalcs = EngCalcs || {};
 			// treatment length/roughness/km have always had. Only solve RESULTS still come out of the
 			// solver in SI and go through displayRound().
 			elev: fieldExtrema(doc.nodes.map(function (n) { return plainRound(n.elev, nd.elev); })),
-			demand: fieldExtrema(doc.nodes.map(function (n) { return n.type !== 'reservoir' ? plainRound(effective(n, 'demand'), nd.demand) : undefined; })),
+			demand: fieldExtrema(doc.nodes.map(function (n) { return !isFixedHeadNode(n) ? plainRound(effective(n, 'demand'), nd.demand) : undefined; })),
 			head: fieldExtrema(doc.nodes.map(function (n) {
-				// Head is an INPUT on a reservoir and a RESULT on a junction, so the two halves of
-				// this one field cross the boundary differently. Both end up in Elevation/Head units,
-				// which is what makes them comparable for the extrema tick.
-				if (n.type === 'reservoir') { return plainRound(reservoirHead(n), nd.head); }
+				// Head is an INPUT on a reservoir or tank and a RESULT on a junction, so the two
+				// halves of this one field cross the boundary differently. Both end up in
+				// Elevation/Head units, which is what makes them comparable for the extrema tick.
+				if (isFixedHeadNode(n)) { return plainRound(nodeFixedHead(n), nd.head); }
 				return lastSolveResult ? displayRound(lastSolveResult.heads[n.id], 'lpn_u_elevhead', nd.head) : undefined;
 			})),
 			pressure: fieldExtrema(doc.nodes.map(function (n) {
-				if (n.type === 'reservoir') { return displayRound(toSI(reservoirHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure', nd.pressure); }
+				if (isFixedHeadNode(n)) { return displayRound(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure', nd.pressure); }
 				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], 'lpn_u_pressure', nd.pressure) : undefined;
 			})),
 			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'diameter'), ld.diameter) : undefined; })),
@@ -8568,16 +8757,18 @@ var EngCalcs = EngCalcs || {};
 			// demand is the thing the user set as a design target, head/pressure are what the solve
 			// produced from it, and elevation (the input least likely to change page to page) trails.
 			if (ls.node.id) { lines.push({ text: n.id, color: fc.id }); }
-			if (n.type !== 'reservoir' && ls.node.demand) { lines.push(rawLine(effective(n, 'demand'), extrema.demand, fc.demand, nd.demand)); }
+			if (!isFixedHeadNode(n) && ls.node.demand) { lines.push(rawLine(effective(n, 'demand'), extrema.demand, fc.demand, nd.demand)); }
 			// Both are already IN Elevation/Head and Pressure units by the time they get here -- the
-			// reservoir branch because those are declared inputs, the junction branch because the
+			// fixed-head branch because those are declared inputs, the junction branch because the
 			// solve result is converted on the spot. rawLine() then prints what it is given, so the
-			// two halves of each field agree with the extrema computed above.
-			var headVal = n.type === 'reservoir'
-				? reservoirHead(n)
+			// two halves of each field agree with the extrema computed above. A TANK's pressure is
+			// the depth of water standing in it, which is the same head-minus-elevation subtraction
+			// a reservoir makes -- see nodeFixedHead().
+			var headVal = isFixedHeadNode(n)
+				? nodeFixedHead(n)
 				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], 'lpn_u_elevhead') : undefined);
-			var pressVal = n.type === 'reservoir'
-				? toDisplay(toSI(reservoirHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure')
+			var pressVal = isFixedHeadNode(n)
+				? toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure')
 				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], 'lpn_u_pressure') : undefined);
 			if (ls.node.head && headVal !== undefined) { lines.push(rawLine(headVal, extrema.head, fc.head, nd.head)); }
 			if (ls.node.pressure && pressVal !== undefined) { lines.push(rawLine(pressVal, extrema.pressure, fc.pressure, nd.pressure)); }

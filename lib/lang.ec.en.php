@@ -1120,6 +1120,11 @@ $ec_lang['lpn_tool_select']='Select';
 $ec_lang_syn['lpn_tool_select']='Select mode; the mode (state) in which you pick (select, choose, pick, point at, indicate, signal) things to act on rather than add things.';
 $ec_lang['lpn_tool_add_junction']='Junction';
 $ec_lang['lpn_tool_add_reservoir']='Reservoir';
+// A TANK is a separate element from a reservoir (ROADMAP Task 248, 2026-08-14), not a
+// reservoir with a level typed into it. A reservoir never runs down; a tank does. A
+// steady-state solve cannot tell them apart, which is exactly why the two need different
+// names on screen -- the difference is in what happens next, not in this instant.
+$ec_lang['lpn_tool_add_tank']='Tank';
 $ec_lang['lpn_tool_add_pipe']='Pipe';
 $ec_lang['lpn_tool_add_pump']='Pump';
 $ec_lang['lpn_tool_add_text']='Text';
@@ -1134,14 +1139,36 @@ $ec_lang['lpn_field_elev']='Elevation';
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='Ground or pipe level at this node. Measure it from any zero you like, as long as every node uses the same one.';
-// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
-// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
-// string is what shows in that empty box.
+// A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
+// at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
+// This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
+// was no tank. Since Task 248 there is one, and the two are different elements: a reservoir's level
+// never moves, a tank's does. Raising a reservoir's head is still a legitimate thing to do -- it is
+// just not how you model storage any more.
 $ec_lang['lpn_field_head']='Head';
 // 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
 // outright that it is a height and not a pressure, which is the exact confusion the glossary's
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation.';
+// ---- Tank fields (Task 248) ----
+// EVERY ONE OF THESE IS A HEIGHT IN THE ELEVATION/HEAD UNIT, the tank diameter included, and each
+// tip says so in words a reader can act on. The diameter is the one that catches people: it is a
+// distance across the ground of the same order as the elevations beside it, so reading it in the
+// pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
+// "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
+// a tank level from the vessel floor, not from the same zero the elevations use.
+$ec_lang['lpn_tank_elev_tip']='Level of the tank bottom. Water depths in the tank are measured up from here.';
+$ec_lang['lpn_field_tank_level']='Water level';
+$ec_lang['lpn_field_tank_level_tip']='Depth of water standing in the tank, measured up from the tank bottom. The water surface is the tank bottom level plus this depth.';
+$ec_lang['lpn_field_tank_minlevel']='Lowest water level';
+$ec_lang['lpn_field_tank_minlevel_tip']='Depth of water at which the tank is treated as empty, measured up from the tank bottom.';
+$ec_lang['lpn_field_tank_maxlevel']='Highest water level';
+$ec_lang['lpn_field_tank_maxlevel_tip']='Depth of water at which the tank is full, measured up from the tank bottom.';
+$ec_lang['lpn_field_tank_diameter']='Tank diameter';
+$ec_lang['lpn_field_tank_diameter_tip']='Width of the tank across. Read it in the same units as elevation, not in the pipe diameter units. It sets how much water a given depth holds.';
+// 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
+// same guard lpn_field_head_tip carries for the reservoir.
+$ec_lang['lpn_tank_head_tip']='Water surface level in the tank: the tank bottom level plus the water level. This is the level the network is solved against.';
 $ec_lang['lpn_close']='Close';
 $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar.';
 $ec_lang['lpn_tool_undo']='Undo';
@@ -1290,12 +1317,11 @@ $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network f
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use the File, Export, Network command there to save it as an .inp file, then import that.';
 $ec_lang['lpn_inp_report_heading']='Imported {file}';
-$ec_lang['lpn_inp_report_counts']='{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.';
+$ec_lang['lpn_inp_report_counts']='{nodes} junctions, reservoirs and tanks, {links} pipes and pumps, in {units}.';
 $ec_lang['lpn_inp_report_clean']='Everything in the file came across. Nothing was left out.';
 $ec_lang['lpn_inp_report_lead']='This page does not hold everything EPANET does. Here is what changed on the way in:';
 $ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
-$ec_lang['lpn_inp_drop_tanks']='Storage tanks were left out. This page has reservoirs, which hold one fixed water level. A storage tank does not hold a fixed level, so it is not a reservoir.';
-$ec_lang['lpn_inp_drop_tank_links']='These pipes were left out because they connect to a tank that was left out.';
+$ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. They came in as round tanks of the stated width. The water level is the level the file gives, so the answers match; only the shape is simplified.';
 $ec_lang['lpn_inp_drop_tcv']='These throttle control valves came in as very short pipes carrying the same local loss. The water behaves the same way; the element is not the same.';
 $ec_lang['lpn_inp_drop_valve']='These valves control pressure or flow, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is controlling it any more.';
 $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.';
@@ -1467,9 +1493,14 @@ $ec_lang['lpn_status_closed_opened']='Closed {closed}. Now showing {opened}.';
 $ec_lang['lpn_status_closed_empty']='Closed {closed}. Started a new empty project.';
 $ec_lang['lpn_storage_full']='Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.';
 $ec_lang['lpn_notes_1_term']='Steady state';
-$ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same global gradient algorithm EPANET uses. It does not model how the network changes over time.';
+// A TANK IS HELD AT ITS LEVEL, and the note says so out loud (Task 248). This is the honest
+// limit of a steady-state tool with a tank in it: the tank is a correct fixed water level for
+// the instant being solved -- which is exactly what EPANET solves at time zero -- but the level
+// does not fall as water is drawn from it. A reader who is not told that will reasonably assume
+// otherwise, because a tank that never empties is not a tank anybody has met.
+$ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same global gradient algorithm EPANET uses. It does not model how the network changes over time. A tank is held at the water level you give it: within one solution it never runs down and never fills.';
 $ec_lang['lpn_notes_2_term']='Not modeled';
-$ec_lang['lpn_notes_2_def']='Tanks, water quality, and control valves that open and close on their own (PRV, PSV, FCV) are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.';
+$ec_lang['lpn_notes_2_def']='Water quality, and control valves that open and close on their own (PRV, PSV, FCV), are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.';
 $ec_lang['lpn_notes_3_term']='Saving projects';
 $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -1486,7 +1517,7 @@ $ec_lang['lpn_notes_epanet_term']='Hazen-Williams constants match EPANET';
 $ec_lang['lpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
 $ec_lang['lpn_id_taken']='That ID is already in use.';
-$ec_lang['lpn_diag_no_fixed_head']='Add a reservoir. The network needs at least one known water level before it can be solved.';
+$ec_lang['lpn_diag_no_fixed_head']='Add a reservoir or a tank. The network needs at least one known water level before it can be solved.';
 $ec_lang['lpn_diag_dangling_link']='A pipe or pump connects to a node that no longer exists:';
 $ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for values that are impossible in real life, such as a diameter of zero.';
@@ -1523,6 +1554,7 @@ $ec_lang['lpn_mode_select']='Mode: Select. Click an element or a label to see or
 $ec_lang['lpn_mode_delete']='Mode: Delete. Click an element to remove it.';
 $ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels.';
 $ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Click the map to place a reservoir. Switch to Select mode to change or move elements and labels.';
+$ec_lang['lpn_mode_add_tank']='Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move elements and labels.';
 $ec_lang['lpn_mode_add_pipe']='Mode: Add Pipe. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.';
 $ec_lang['lpn_mode_add_pump']='Mode: Add Pump. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click

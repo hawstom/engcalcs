@@ -4,8 +4,8 @@
 // real EPANET engine can solve what this page has drawn. This is the missing half, and it is much
 // the harder one -- writing only has to express what we model, while reading has to survive
 // everything EPANET can express, including the elements this calculator deliberately does not
-// have (dev/looped-network-calculator-scope.md's "Cut, not deferred" list: tanks, control valves,
-// patterns, water quality, extended-period simulation).
+// have (dev/looped-network-calculator-scope.md's "Cut, not deferred" list: control valves,
+// patterns, water quality, extended-period simulation -- tanks left that list in Task 248).
 //
 // THE ONE RULE THAT DECIDES EVERY CASE BELOW: never drop anything silently. The ROADMAP framed the
 // choice as "reject a file that uses a cut feature, or import the supported subset and report
@@ -58,7 +58,7 @@
 	// solve (report/times/graphics settings) or a cut feature, and the cut ones are named in
 	// REPORTABLE below so they are counted rather than skipped in silence.
 	var REPORTABLE = {
-		TANKS: 'tanks', VALVES: 'valves', PATTERNS: 'patterns', CONTROLS: 'controls',
+		VALVES: 'valves', PATTERNS: 'patterns', CONTROLS: 'controls',
 		RULES: 'rules', ENERGY: 'energy', QUALITY: 'quality', REACTIONS: 'reactions',
 		SOURCES: 'sources', MIXING: 'mixing'
 	};
@@ -194,14 +194,42 @@
 			if (r[2]) { drop('head-pattern', [r[0]], r[2]); }
 		}
 
-		// A tank is a cut element and there is nothing honest to turn it into: importing it as a
-		// reservoir at its initial level would silently convert a storage element into an infinite
-		// source, which is a different network that happens to solve. Its LINKS are dropped with
-		// it, below, since they would otherwise dangle.
-		var tankIds = [];
+		// TANKS ARE IMPORTED AS TANKS (ROADMAP Task 248, 2026-08-14). Until then they were a cut
+		// element and were dropped WITH EVERY LINK TOUCHING THEM, which is the honest handling of a
+		// missing element but cost real networks whole branches -- and tanks are in the majority of
+		// municipal models, so this was the single biggest reason an imported file did not look like
+		// the file. The old reasoning ("importing it as a reservoir at its initial level would
+		// silently convert a storage element into an infinite source") stays true and is exactly why
+		// the fix was a tank type rather than a substitution.
+		//
+		// [TANKS] is  ID  Elev  InitLvl  MinLvl  MaxLvl  Diam  MinVol  [VolCurve]  [Overflow].
+		// EVERY LENGTH HERE IS IN THE FILE'S LENGTH UNIT, THE DIAMETER INCLUDED -- unlike a pipe
+		// diameter two sections later, which is in inches or millimetres. MinVol is a VOLUME, so it
+		// is the length unit cubed.
 		rows = rawSections.TANKS || [];
-		for (i = 0; i < rows.length; i++) { if (rows[i][0]) { tankIds.push(rows[i][0]); } }
-		if (tankIds.length) { drop('tanks', tankIds); }
+		var volCurveIds = [];
+		for (i = 0; i < rows.length; i++) {
+			r = rows[i];
+			if (!r[0]) { continue; }
+			addNode({
+				id: r[0], type: 'tank', x: 0, y: 0,
+				elev: num(r[1]) * headSI,
+				level: num(r[2]) * headSI,
+				minLevel: num(r[3]) * headSI,
+				maxLevel: num(r[4]) * headSI,
+				diameter: num(r[5]) * headSI,
+				// The solve reads `head`, and at the instant a steady-state solve describes, the
+				// water surface is the bottom plus the initial level. See EngCalcs.lpnIsFixedHead.
+				head: (num(r[1]) + num(r[2])) * headSI
+			});
+			// A VOLUME CURVE makes the tank non-cylindrical, and this page holds only a diameter.
+			// The level -> head relationship a steady-state solve uses is unaffected (the surface is
+			// still Elev + InitLvl), so the imported network solves identically; what is lost is how
+			// the level would MOVE over time, which matters once extended-period simulation lands.
+			// Reported rather than faked, per this module's whole contract.
+			if (r[7] && r[7] !== '*' && r[7] !== '0') { volCurveIds.push(r[0]); }
+		}
+		if (volCurveIds.length) { drop('tank-volume-curve', volCurveIds); }
 
 		// ---- demand categories ----
 		// [DEMANDS] REPLACES the [JUNCTIONS] demand rather than adding to it, and this is the one
@@ -244,14 +272,11 @@
 
 		// ---- links ----
 		var links = [], linkIndex = {};
-		function touchesTank(a, b) { return tankIds.indexOf(a) >= 0 || tankIds.indexOf(b) >= 0; }
-		var orphanLinks = [];
 
 		rows = rawSections.PIPES || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			if (!r[0]) { continue; }
-			if (touchesTank(r[1], r[2])) { orphanLinks.push(r[0]); continue; }
 			var st = (r[7] || 'OPEN').toUpperCase();
 			// A check valve is a cut element. It is imported as an OPEN pipe -- the same pipe
 			// minus the one-way rule -- because dropping it would disconnect the network, and the
@@ -283,7 +308,6 @@
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			if (!r[0]) { continue; }
-			if (touchesTank(r[1], r[2])) { orphanLinks.push(r[0]); continue; }
 			var pump = { id: r[0], type: 'pump', from: r[1], to: r[2], curvePoints: [], verts: [] },
 				j, kw;
 			for (j = 3; j < r.length; j++) {
@@ -333,7 +357,6 @@
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			if (!r[0]) { continue; }
-			if (touchesTank(r[1], r[2])) { orphanLinks.push(r[0]); continue; }
 			var vtype = (r[4] || '').toUpperCase(),
 				vdia = num(r[3]) * diaSI,
 				setting = num(r[5]),
@@ -368,7 +391,6 @@
 		}
 		if (tcvIds.length) { drop('valve-tcv-as-pipe', tcvIds); }
 		if (otherValveIds.length) { drop('valve-dropped', otherValveIds); }
-		if (orphanLinks.length) { drop('links-on-tanks', orphanLinks); }
 
 		// ---- [STATUS] overrides ----
 		rows = rawSections.STATUS || [];
@@ -434,8 +456,9 @@
 
 		// ---- everything else we can only count ----
 		Object.keys(REPORTABLE).forEach(function (name) {
-			// TANKS and VALVES are reported above, element by element, which is strictly better.
-			if (name === 'TANKS' || name === 'VALVES') { return; }
+			// VALVES is reported above, element by element, which is strictly better. TANKS is not
+			// in this table at all any more -- Task 248 imports tanks, so there is nothing to report.
+			if (name === 'VALVES') { return; }
 			if (seen[name]) { drop(REPORTABLE[name], [], seen[name]); }
 		});
 		// An extended-period run is a cut feature, and [TIMES] Duration is the only place it shows.

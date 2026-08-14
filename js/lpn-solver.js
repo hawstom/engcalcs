@@ -178,6 +178,25 @@ EngCalcs.lpnSolveSPD = function (A, b) {
 	return x;
 };
 
+// A FIXED-HEAD node: one whose head is boundary data rather than an unknown.
+//
+// Two types qualify and they are the same thing to a steady-state solve (ROADMAP Task 248,
+// 2026-08-14). A reservoir is an inexhaustible source at a stated head. A TANK is a storage
+// vessel whose water surface is at a stated head AT THIS INSTANT -- and an instant is all a
+// steady-state solve has. EPANET does exactly this too: at t = 0 of an extended-period run it
+// solves the network with every tank held at its initial level, and only then integrates the
+// level forward. So a tank here is not an approximation of EPANET, it is EPANET's own t = 0.
+//
+// The DIFFERENCE between the two is entirely about time, which is why the tank carries level,
+// diameter and min/max fields this file never reads: they are what Task 248's extended-period
+// phase integrates, and what the .inp round-trip has to preserve meanwhile.
+//
+// The caller passes a resolved `head` for both types (see assembleModel() in looped-network.js),
+// so nothing below has to know how a tank's head is built from its bottom elevation and level.
+EngCalcs.lpnIsFixedHead = function (node) {
+	return node.type === 'reservoir' || node.type === 'tank';
+};
+
 // Structural checks, run BEFORE the solve, never by watching it fail.
 //
 // Each returns a distinct machine-readable code so the UI can say something
@@ -201,7 +220,7 @@ EngCalcs.lpnDiagnose = function (model) {
 		node = model.nodes[i];
 		byId[node.id] = node;
 		adj[node.id] = [];
-		if (node.type === 'reservoir') { fixed.push(node.id); }
+		if (EngCalcs.lpnIsFixedHead(node)) { fixed.push(node.id); }
 	}
 
 	if (fixed.length === 0) {
@@ -291,7 +310,7 @@ EngCalcs.lpnSolve = function (model, options) {
 
 	for (i = 0; i < nodes.length; i++) {
 		byId[nodes[i].id] = nodes[i];
-		if (nodes[i].type !== 'reservoir') {
+		if (!EngCalcs.lpnIsFixedHead(nodes[i])) {
 			junctionIndex[nodes[i].id] = junctions.length;
 			junctions.push(nodes[i]);
 		}
@@ -513,11 +532,13 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		g = EngCalcs.lpnG;
 
 	for (i = 0; i < model.nodes.length; i++) {
-		if (model.nodes[i].type === 'reservoir') {
+		if (EngCalcs.lpnIsFixedHead(model.nodes[i])) {
 			// A reservoir now carries an elevation as well as a head, so its pressure is the same
 			// head-minus-elevation a junction's is -- zero only when the water surface sits at the
-			// reservoir's own ground elevation, which is the default but no longer the only case
-			// (a tank is a reservoir whose head is above its elevation).
+			// reservoir's own ground elevation, which is the default but no longer the only case.
+			// A TANK is the case where the two routinely differ: its elevation is the bottom of the
+			// vessel and its head is the water surface, so the pressure reported here is the depth
+			// of water standing in it -- which is exactly what a reader wants to see at a tank.
 			heads[model.nodes[i].id] = model.nodes[i].head;
 			pressures[model.nodes[i].id] = model.nodes[i].head - (model.nodes[i].elev || 0);
 		}

@@ -119,6 +119,21 @@ $ec_icons = array(
 	// ROADMAP Task 146.10) -- see RESERVOIR_HALF_W there for how the map compensates its own box
 	// width so widening this shared path doesn't also widen the map's rendering.
 	'reservoir'  => '<path d="M3 9h18v11H3z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 4v16h18V4"/><path d="M3 9h18"/>',
+	// A STORAGE TANK (ROADMAP Task 248, 2026-08-14), and its whole job is to not be the reservoir
+	// directly above it. Two independent cues, so it survives greyscale and a red-green colour-blind
+	// reader — the same test Task 146.10 was written to pass:
+	//   1. CLOSED, not open. The reservoir's walls run up past the water and stop; this one has a
+	//      domed roof over it. That is the real physical difference between a basin and a tank, and
+	//      it is the one a person can name without being taught a symbol.
+	//   2. TALL AND NARROW where the reservoir is wide and short (x:5–19 against x:3–21, and the map
+	//      box in js/looped-network.js pushes the proportion further). "The proportion is the
+	//      identity" is the pump's own lesson four entries down, and it applies twice as hard when
+	//      the two shapes are otherwise siblings.
+	// The dome, not a flat lid: a flat one makes the mark a rectangle with a line in it, which reads
+	// as a box before it reads as a tank. Same shared-path rule as the reservoir — this ONE string
+	// draws both the toolbar button and the map symbol, and the map's backdrop patch traces the
+	// identical outline, so a change here needs the matching `d` in buildNodeEls() changed with it.
+	'tank'       => '<path d="M5 11h14v9H5z" fill="currentColor" stroke="none" opacity=".18"/><path d="M5 6q7-3.5 14 0v14H5z"/><path d="M5 11h14"/>',
 	// Casing plus a discharge tail leaving it on the top tangent — the tangency is what makes this
 	// read as a pump rather than as a magnifier.
 	//

@@ -201,13 +201,19 @@ html[lang="zh"] .ec-welcome {
    anyway (data-node, drag, hit-testing all still read THIS element, unchanged), same trick used
    for any invisible-but-clickable hit target. `.lpn-node-pending`'s ring below still overrides
    stroke, so the pending-link indicator still shows on a reservoir mid-pipe-draw. */
-.lpn-node-reservoir { fill: none; stroke: none; pointer-events: all; }
+.lpn-node-reservoir, .lpn-node-tank { fill: none; stroke: none; pointer-events: all; }
 /* The tank/pump overlay symbols themselves (looped-network.js buildMapIconSvg()) -- purely
    visual, never a click target; the interactive element is always the plain node circle or link
    polyline underneath. `color` is the currentColor the icon paths read for both stroke and the
    reservoir's translucent water-fill path. */
 .lpn-node-symbol, .lpn-link-symbol { pointer-events: none; }
-.lpn-node-symbol-reservoir { color: #26a; }
+.lpn-node-symbol-reservoir, .lpn-node-symbol-tank { color: #26a; }
+/* THE SAME BLUE AS THE RESERVOIR, deliberately (Task 248). A tank and a reservoir are both
+   water bodies, and colour here is decoration, not meaning -- the two are told apart by SHAPE
+   (closed and tall against open and wide, lib/Icons.lib.php), which is what still works in
+   greyscale and for a colour-blind reader. Giving the tank its own hue would spend a colour on
+   a distinction the shape already carries, and colour is the budget this map is saving for
+   CONDITION -- see the note above. */
 .lpn-link-symbol-pump { color: #a52; }
 /* Opaque patch behind a symbol's own linework (prependSymbolBackdrop() in looped-network.js) so a
    pipe running under a reservoir's open tank or a pump's unfilled casing doesn't show through --
