@@ -30,6 +30,26 @@ one branch. It's live on preview and master, and per-task branches accumulated a
 needing periodic manual cleanup. "We are no longer branching by habit." This is specific to
 engcalcs; it is not a general "never branch" rule for other projects.
 
+**THE ONE EXCEPTION: parallel subagents get worktrees (Tom, 2026-08-14).** He asked for several
+tracks to run at once — *"feel free to use subagents to keep both engines in development as well as
+to keep translations up to date and to implement scenarios… This may obviously require worktrees
+and branches, and I don't want to hobble you."* That is authorization for a mechanism, and it does
+not reopen branching by habit:
+
+- **A worktree is justified by CONCURRENCY, never by caution.** One agent working alone still works
+  on `master`. The reason to isolate is that two agents editing `js/looped-network.js` at the same
+  time corrupt each other's edits — not that the work is risky or unfinished.
+- **The orchestrator merges, and merges promptly.** A worktree branch that outlives its agent by
+  more than a session is the stale-ref problem Tom closed in July, arriving by a different door.
+  Merge to `master` and delete the branch as each track lands; do not accumulate a shelf of them.
+- **Give concurrent agents DISJOINT file territory in their briefs**, and say so explicitly. Two
+  tracks that both need `js/lpn-epanet.js` are sequential work wearing a parallel costume; the merge
+  cost lands on the orchestrator, who is the one person who cannot see either diff while it is being
+  written.
+- **Subagents commit inside their own worktree and never push.** Pushing is the orchestrator's, after
+  the merge and after `sh dev/scripts/check_all.sh` passes on the merged tree — a check that passed
+  in two worktrees separately has not been run on the thing that ships.
+
 ## How to Add a New Calculator
 
 1. Copy an existing calculator file (e.g. `Manning-Pipe-Flow.php`) as your starting point.
