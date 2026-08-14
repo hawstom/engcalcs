@@ -69,10 +69,10 @@ $ec_lang['template_printable_subtitle']='Печатный подзаголово
 // prose, and they are translated into all 26 languages for one reason: consent that the visitor
 // cannot read is not consent. The long-form privacy notice and terms are a separate question --
 // English-authoritative, and translated by a human later if at all.
-$ec_lang['consent_body']='Разрешаете ли вы нам хранить одну цифру для этой страницы в данных вашего браузера, чтобы не записывать её посещения по нескольку раз?';
+$ec_lang['consent_body']='Разрешаете ли вы нам хранить одну цифру на страницу в хранилище этого профиля браузера, чтобы не записывать её посещения по нескольку раз?';
 $ec_lang['consent_accept']='Принять';
 $ec_lang['consent_accept_all']='Всегда принимать';
-$ec_lang['consent_decline']='Отклонить';
+$ec_lang['consent_decline']='Всегда отклонять';
 $ec_lang['consent_current_granted']='Вы разрешили это. Мы ограничиваем учёт посещений для этого профиля браузера.';
 $ec_lang['consent_current_denied']='Вы отказали в этом. Мы ничего не храним, чтобы ограничить учёт посещений для этого профиля браузера.';
 $ec_lang['consent_region_label']='Ваш выбор об ограничении учёта посещений.';
@@ -698,6 +698,8 @@ $ec_lang['lpn_menu_view']='Вид';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Настройки';
+$ec_lang['lpn_menu_help']='Справка';
+$ec_lang['lpn_help_walkthroughs']='Пошаговые руководства';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1019,14 +1021,19 @@ $ec_lang['lpn_labels_decimals_tip']='Число десятичных знако�
 $ec_lang['lpn_labels_mark_extrema']='Отмечать наибольшее и наименьшее значения';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Фоновое изображение…';
-$ec_lang['lpn_backdrop_add']='Добавить изображение';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='Задать масштаб изображения';
-$ec_lang['lpn_backdrop_position']='Переместить изображение';
-$ec_lang['lpn_backdrop_remove']='Удалить изображение';
+$ec_lang['lpn_backdrop_add']='Добавить';
+// BARE VERBS/short forms, matching lang.ec.en.php: both menus that show these rows now print a
+// "Фоновое изображение…" heading above them, so the object need not be repeated in every label.
+$ec_lang['lpn_backdrop_scale']='Масштабировать по точкам';
+$ec_lang['lpn_backdrop_scale_entry']='Масштабировать по world-файлу или по размеру одного пикселя на карте';
+$ec_lang_syn['lpn_backdrop_scale_entry']='gloss: world file; layout: nav item';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Введите размер одного пикселя на карте или вставьте полное содержимое world-файла для изображения';
+$ec_lang_syn['lpn_backdrop_scale_entry_prompt']='gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Введите одно число — размер одного пикселя на карте, — или вставьте все шесть строк world-файла.';
+$ec_lang['lpn_backdrop_wld_bad']='Этот world-файл поворачивает, зеркально отражает или растягивает изображение неравномерно. Карта может только перемещать изображение и изменять его размер одинаково по обеим осям, поэтому файл не был использован.';
+$ec_lang_syn['lpn_backdrop_wld_bad']='gloss: world file';
+$ec_lang['lpn_backdrop_position']='Переместить';
+$ec_lang['lpn_backdrop_remove']='Удалить';
 $ec_lang['lpn_backdrop_remove_confirm']='Удалить фоновое изображение?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Щёлкните две точки на фоновом изображении, например два конца полосы масштаба. Затем введите настоящее расстояние между ними.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Настоящее расстояние между двумя точками';
