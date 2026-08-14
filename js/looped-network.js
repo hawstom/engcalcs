@@ -1889,9 +1889,15 @@ var EngCalcs = EngCalcs || {};
 			// rather than assuming files[0] is the picture.
 			var picked = Array.prototype.slice.call(fileInput.files), img = null, sidecar = null, i;
 			fileInput.value = '';
+			// A world file is named by its EXTENSION, because it has no MIME type of its own -- an OS
+			// may report it as text/plain, or as nothing at all. So the sidecar is identified first,
+			// by name, and whatever else was picked is the picture. Testing the picture's type first
+			// (the original order) went wrong in one silent way: a picture the OS reports with an
+			// empty type left img null and the whole pick did nothing, which is the same dead end
+			// Task 300 removed from downscaleImage().
 			for (i = 0; i < picked.length; i++) {
-				if (!img && /^image\//.test(picked[i].type)) { img = picked[i]; }
-				else if (!sidecar) { sidecar = picked[i]; }
+				if (!sidecar && /\.(pgw|jgw|gfw|bpw|wld)$/i.test(picked[i].name)) { sidecar = picked[i]; }
+				else if (!img) { img = picked[i]; }
 			}
 			if (!img) { return; }
 			var reader = new FileReader();

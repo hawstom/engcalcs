@@ -1802,7 +1802,11 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   you cannot see. Also: `downscaleImage()` had no `onerror`, so a file the browser cannot decode
   (TIFF — offered by `accept="image/*"`, decoded by no major browser) did *nothing at all*; it now
   says so (`lpn_backdrop_unreadable`, 26 languages) and the picker offers png/jpg/gif/bmp plus their
-  world files — 11 entries, readable in one line. Not `*.*`, and **not "everything a browser can
+  world files — 10 entries, **extensions only**. A MIME type is expanded by the browser to every
+  extension registered for it, so `image/jpeg` put `.jfif`, `.pjp`, `.pjpeg` and `.jpe` in the
+  dialog (Tom: *"Do we really need pjp, jpe, jfif?"*). The sidecar is now identified by extension in
+  the handler too, which also removes a silent dead end: a picture the OS reported with an empty
+  type used to leave `img` null and the pick did nothing. Not `*.*`, and **not "everything a browser can
   decode" either**: CC's first cut listed webp/avif/svg on that reasoning and Tom rejected it —
   *"Either the list is so long that it's unreadable or there are no such world files in the list."*
   Decodable is not the test; somebody turning up holding one is. BMP stays on that test (a

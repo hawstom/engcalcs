@@ -135,14 +135,19 @@ echoHeader("EngCalcs", $html_title, "");
 	      // test: nobody has ever handed this page one. image/* had the opposite problem -- it
 	      // offered TIFF, which NO browser decodes, so a GeoTIFF site plan was picked and then
 	      // failed silently.
-	      // MIME for the pictures (one token covers .jpg/.jpeg/.jpe, and mobile pickers filter on
-	      // type), extensions for the world files, which have no MIME type of their own.
+	      // EXTENSIONS ONLY, NO MIME TYPES (Tom, 2026-08-14: "Do we really need pjp, jpe, jfif?").
+	      // No -- and naming image/jpeg was how they got in. A browser expands a MIME type to every
+	      // extension registered for it, so one tidy token puts .jfif, .pjp, .pjpeg and .jpe in the
+	      // dialog's filter, which is the clutter he was looking at. An extension list shows exactly
+	      // what it says. Extensions in accept= have been honoured by mobile pickers for years, so
+	      // the MIME half bought nothing.
+	      // Paired picture-then-world-file, in Tom's own order, so a missing sidecar is visible.
 	      // A SHORT LIST IS CHEAP HERE, which is what settles the argument: accept= only filters the
 	      // dialog, "All files" is always one click away, and since Task 300 a file we cannot decode
 	      // says so (lpn_backdrop_unreadable) instead of doing nothing. So the cost of omitting a
 	      // format is one extra click and a clear message -- not a dead end. Add one back when
 	      // somebody actually turns up holding it. ?>
-	<input type="file" id="lpn_backdrop_file" multiple accept="image/png,image/jpeg,image/gif,image/bmp,.pgw,.pngw,.jgw,.jpgw,.gfw,.bpw,.wld" style="display:none">
+	<input type="file" id="lpn_backdrop_file" multiple accept=".png,.pgw,.jpg,.jpeg,.jgw,.gif,.gfw,.bmp,.bpw,.wld" style="display:none">
 	<?php // Project import (Task 195). Lives here in the page, not inside any popover body, because
 	      // those bodies get rebuilt wholesale and would take the input's wired change handler with
 	      // them -- the same reason lpn_backdrop_file sits here. ?>

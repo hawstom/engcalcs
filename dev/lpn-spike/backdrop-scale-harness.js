@@ -266,15 +266,23 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 	const php = fs.readFileSync(path.join(__dirname, '../../Looped-Network.php'), 'utf8');
 	const accept = (php.match(/id="lpn_backdrop_file"[^>]*accept="([^"]*)"/) || [])[1] || '';
 	report(!/image\/\*/.test(accept), 'the picker no longer offers every image/* type, TIFF included', accept);
-	report(['image/png', 'image/jpeg', 'image/gif', 'image/bmp'].every(t => accept.includes(t)),
+	report(['.png', '.jpg', '.jpeg', '.gif', '.bmp'].every(t => accept.split(',').includes(t)),
 		'the four formats anybody has actually brought here are offered');
 	report(!/webp|avif|svg/.test(accept), 'and nothing is offered on the strength of being decodable alone');
+	// A MIME type is expanded by the browser to EVERY extension registered for it, so image/jpeg
+	// alone puts .jfif, .pjp, .pjpeg and .jpe in the dialog's filter. Extensions show what they say.
+	report(!/\w+\/\w+/.test(accept), 'no MIME type, so the dialog cannot expand one into .jfif/.pjp/.jpe', accept);
 	// A user picks the picture AND its world file in one go (the input is multiple), so the sidecars
 	// have to be in the filter or they are invisible in the dialog. They have no MIME type, so they
 	// are named by extension while the pictures are named by type.
 	report(/multiple/.test(php.match(/<input[^>]*id="lpn_backdrop_file"[^>]*>/)[0]), 'the picker still takes both files at once');
-	report(['.pgw', '.pngw', '.jgw', '.jpgw', '.gfw', '.bpw', '.wld'].every(e => accept.includes(e)),
+	report(['.pgw', '.jgw', '.gfw', '.bpw', '.wld'].every(e => accept.split(',').includes(e)),
 		'every offered picture format has its world file offered too, plus generic .wld');
+	// The handler must recognise the sidecar by the SAME extensions the picker offers, or a world
+	// file the user was invited to pick gets read as the picture.
+	const sniff = (src.match(/\/\\\.\(([a-z|]+)\)\$\/i\.test\(picked\[i\]\.name\)/) || [])[1] || '';
+	report(sniff.split('|').every(e => accept.split(',').includes('.' + e)) && sniff.split('|').length === 5,
+		'the handler sniffs the same five sidecar extensions the picker offers', sniff);
 	// Short enough to read in one line. A filter nobody can read is one nobody can check, which is
 	// how image/* survived while quietly offering a format that could never work.
 	report(accept.split(',').length <= 12, 'the list is still readable', `${accept.split(',').length} entries`);
