@@ -233,7 +233,7 @@ $ec_lang['mtc_pi_tip']='Estrapolazione oltre l\'intervallo di dati 0,28–0,36 f
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Secondo Isbash (1936) e Maricopa County, Arizona, US.">Dimensione roccia angolare richiesta sul fondo, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Secondo Isbash (1936) e Maricopa County, Arizona, US.">Dimensione roccia angolare richiesta scarpata 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Secondo Isbash (1936) e Maricopa County, Arizona, US.">Dimensione roccia angolare richiesta scarpata 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='Dimensione roccia angolare richiesta, D<sub>50</sub> (Maynord, Ruff, e Abt 1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="Secondo Maynord, Ruff e Abt (1989). In una curva la roccia è dimensionata per una velocità di curva pari a 4/3 della media, secondo California Division of Highways (1970); il valore originale di Maynord di 1,5 si applica ai canali naturali.">Dimensione roccia angolare richiesta, D<sub>50</sub> (Maynord, Ruff, e Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Dimensione roccia angolare richiesta, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Velocità ragionevole per le ipotesi di flusso uniforme.';
 $ec_lang['mtc_vel_low']='Velocità bassa — rischio di sedimentazione.';
@@ -637,7 +637,7 @@ $ec_lang['lpn_field_head']='Carico';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Livello della superficie dell\'acqua nel serbatoio, misurato come altezza, non come pressione. Lascialo vuoto per porre la superficie dell\'acqua alla quota del serbatoio.';
 $ec_lang['lpn_close']='Chiudi';
-$ec_lang['lpn_empty_hint']='Inizia aggiungendo un\'immagine di sfondo o un serbatoio dalla barra degli strumenti, oppure apri File, Nuovo progetto per partire da un esempio.';
+$ec_lang['lpn_empty_hint']='Usa File, Nuovo progetto per aprire un esempio. Oppure inizia aggiungendo un serbatoio, un nodo e una tubazione dalla barra degli strumenti.';
 $ec_lang['lpn_tool_undo']='Annulla';
 $ec_lang['lpn_confirm_example']='Questo aggiunge l\'esempio alla rete che hai già. Continuare?';
 $ec_lang['lpn_field_diameter']='Diametro';
@@ -765,12 +765,12 @@ $ec_lang['lpn_inp_bad_file']='Quel file non può essere letto come un file di re
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='Questo sembra un file .net di EPANET, ma questa pagina non è riuscita a leggerlo. Aprilo in EPANET e usa il comando File, Esporta, Rete per salvarlo come file .inp, poi importa quello.';
 $ec_lang['lpn_inp_report_heading']='Importato {file}';
-$ec_lang['lpn_inp_report_counts']='{nodes} nodi e serbatoi, {links} tubazioni e pompe, in {units}.';
+$ec_lang['lpn_inp_report_counts']='{nodes} nodi, serbatoi e vasche, {links} tubazioni, pompe e valvole, in {units}.';
 $ec_lang['lpn_inp_report_clean']='Tutto il contenuto del file è stato importato. Nulla è stato tralasciato.';
 $ec_lang['lpn_inp_report_lead']='Questa pagina non gestisce tutto ciò che gestisce EPANET. Ecco cosa è cambiato durante l\'importazione:';
 $ec_lang['lpn_inp_drop_headloss']='Questo file non usa la formula di Hazen-Williams. Questa pagina calcola con Hazen-Williams, quindi i valori di scabrezza delle tubazioni sono stati mantenuti esattamente come scritti, ma i risultati qui non corrisponderanno a quelli di EPANET.';
-$ec_lang['lpn_inp_drop_tcv']='Queste valvole di regolazione a strozzamento (TCV) sono state importate come tubazioni molto corte che portano la stessa perdita concentrata. L\'acqua si comporta allo stesso modo; l\'elemento non è lo stesso.';
-$ec_lang['lpn_inp_drop_valve']='Queste valvole controllano la pressione o la portata, e questa pagina non ha un elemento di questo tipo. Sono state importate come tubazioni aperte, quindi la rete resta collegata, ma nulla la controlla più.';
+$ec_lang['lpn_inp_drop_tcv']='Queste valvole di regolazione a strozzamento sono state importate come valvole di regolazione a strozzamento, mantenendo la stessa perdita indicata dal file. Entrambi i risolutori possono calcolarle.';
+$ec_lang['lpn_inp_drop_valve']='Queste valvole sono descritte da una curva o da una perdita di pressione fissa, e questa pagina non ha un elemento di questo tipo. Sono state importate come tubazioni aperte, quindi la rete resta collegata, ma nulla ne controlla più la pressione o la portata.';
 $ec_lang['lpn_inp_drop_cv']='In EPANET queste tubazioni lasciano passare l\'acqua in una sola direzione. Sono state importate come tubazioni ordinarie, quindi ora l\'acqua può scorrere in entrambi i sensi.';
 $ec_lang['lpn_inp_drop_demands']='Questi nodi avevano più di una richiesta. Le richieste sono state sommate in un\'unica richiesta, come previsto da questa pagina.';
 $ec_lang['lpn_inp_drop_patterns']='I modelli temporali di richiesta sono stati tralasciati. Questa pagina risolve un solo istante nel tempo, quindi ogni richiesta è il numero scritto nel file.';
@@ -939,9 +939,9 @@ $ec_lang['lpn_status_closed_opened']='Chiuso {closed}. Ora visualizzato {opened}
 $ec_lang['lpn_status_closed_empty']='Chiuso {closed}. Avviato un nuovo progetto vuoto.';
 $ec_lang['lpn_storage_full']='Non salvato. Lo spazio di archiviazione del browser è pieno o non disponibile, quindi le modifiche recenti andranno perse alla chiusura di questa scheda.';
 $ec_lang['lpn_notes_1_term']='Regime stazionario';
-$ec_lang['lpn_notes_1_def']='Risolve un solo insieme di richieste alla volta, usando lo stesso algoritmo del gradiente globale usato da EPANET. Non modella come la rete cambia nel tempo.';
+$ec_lang['lpn_notes_1_def']='Risolve un solo insieme di richieste alla volta, usando lo stesso algoritmo del gradiente globale usato da EPANET. Non modella come la rete cambia nel tempo. Una vasca viene mantenuta al livello dell\'acqua che le assegni: entro una singola soluzione non si svuota mai e non si riempie mai.';
 $ec_lang['lpn_notes_2_term']='Non modellato';
-$ec_lang['lpn_notes_2_def']='Le vasche, la qualità dell\'acqua e le valvole di controllo che si aprono e chiudono da sole (PRV, PSV, FCV) non sono modellate. Una tubazione può portare una perdita concentrata fissa, ma non una valvola il cui stato aperto o chiuso dipende dalla portata che si sta risolvendo.';
+$ec_lang['lpn_notes_2_def']='La qualità dell\'acqua e le richieste che variano nel corso della giornata non sono modellate. Per le valvole: una valvola di regolazione a strozzamento funziona con entrambi i risolutori, mentre le valvole che si aprono e chiudono da sole (PRV, PSV, FCV) vengono risolte con il risolutore EPANET, che questa pagina attiva automaticamente quando la rete ne contiene una.';
 $ec_lang['lpn_notes_3_term']='Salvataggio dei progetti';
 $ec_lang['lpn_notes_3_def']='Ogni progetto è una scheda, e ogni scheda viene salvata in questo browser mentre lavori. Cancellare i dati del browser li elimina tutti, quindi conserva il tuo lavoro in un file: File, Salva con nome. Un asterisco su una scheda indica che contiene modifiche non presenti in un file. Nulla viene mai scritto su un file a meno che tu non lo chieda. In alcuni browser un progetto si collega al file in cui lo salvi, e da quel momento File, Salva scrive su quello stesso file; in altri nessuna connessione è possibile, quindi Salva è disattivato ed è disponibile solo Salva con nome. Quando un file di progetto è conservato su un\'unità condivisa, questa pagina ti avvisa se un collega lo ha già aperto, in modo che due persone non scrivano l\'una sopra il lavoro dell\'altra.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -958,7 +958,7 @@ $ec_lang['lpn_notes_epanet_term']='Le costanti di Hazen-Williams corrispondono a
 $ec_lang['lpn_notes_epanet_def']='Nell\'agosto 2026 il coefficiente e l\'esponente di Hazen-Williams sono stati modificati per corrispondere a EPANET. I risultati di perdita di carico differiscono dalle versioni precedenti di questa pagina fino allo 0,1 percento, un valore molto più piccolo dell\'incertezza sul valore di C stesso.';
 $ec_lang['lpn_id_invalid']='Inserisci un ID senza spazi e senza virgolette.';
 $ec_lang['lpn_id_taken']='Quell\'ID è già in uso.';
-$ec_lang['lpn_diag_no_fixed_head']='Aggiungi un serbatoio. La rete ha bisogno di almeno un livello dell\'acqua noto prima di poter essere risolta.';
+$ec_lang['lpn_diag_no_fixed_head']='Aggiungi un serbatoio o una vasca. La rete ha bisogno di almeno un livello dell\'acqua noto prima di poter essere risolta.';
 $ec_lang['lpn_diag_dangling_link']='Una tubazione o una pompa si collega a un nodo che non esiste più:';
 $ec_lang['lpn_diag_unreachable']='Questi nodi non hanno un percorso verso un serbatoio:';
 $ec_lang['lpn_diag_not_converged']='Non è stata trovata alcuna soluzione. Controlla se ci sono valori impossibili nella realtà, come un diametro pari a zero.';

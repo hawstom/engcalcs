@@ -234,7 +234,7 @@ $ec_lang['mtc_pi_tip']='Extrapolation hors de la plage de données (0,28–0,36 
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Selon Isbash (1936) et le comté de Maricopa, Arizona, États-Unis.">Granulométrie d\'enrochement anguleux requise au fond, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Selon Isbash (1936) et le comté de Maricopa, Arizona, États-Unis.">Granulométrie d\'enrochement anguleux requise sur talus 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Selon Isbash (1936) et le comté de Maricopa, Arizona, États-Unis.">Granulométrie d\'enrochement anguleux requise sur talus 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='Granulométrie d\'enrochement anguleux requise, D<sub>50</sub> (Maynord, Ruff et Abt 1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="Selon Maynord, Ruff et Abt (1989). Dans une courbe, la roche est dimensionnée pour une vitesse de courbure de 4/3 de la moyenne, selon California Division of Highways (1970) ; le facteur 1,5 propre à Maynord s\'applique aux chenaux naturels.">Granulométrie d\'enrochement anguleux requise, D<sub>50</sub> (Maynord, Ruff et Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Granulométrie d\'enrochement anguleux requise, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Vitesse raisonnable pour les hypothèses d\'écoulement uniforme.';
 $ec_lang['mtc_vel_low']='Vitesse faible — risque de sédimentation.';
@@ -638,7 +638,7 @@ $ec_lang['lpn_field_head']='Charge';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Niveau de la surface libre dans le réservoir, exprimé comme une hauteur, pas comme une pression. Laissez ce champ vide pour placer la surface libre à la cote du réservoir.';
 $ec_lang['lpn_close']='Fermer';
-$ec_lang['lpn_empty_hint']='Pour commencer, utilisez la barre d\'outils pour ajouter une image de fond ou un réservoir, ou pour démarrer un Nouveau projet à partir d\'un exemple.';
+$ec_lang['lpn_empty_hint']='Utilisez Fichier, Nouveau projet pour ouvrir un exemple. Ou commencez par ajouter un réservoir, une jonction et une conduite depuis la barre d\'outils.';
 $ec_lang['lpn_tool_undo']='Annuler';
 $ec_lang['lpn_confirm_example']='Ceci ajoute l\'exemple au réseau que vous avez déjà. Continuer ?';
 $ec_lang['lpn_field_diameter']='Diamètre';
@@ -766,12 +766,12 @@ $ec_lang['lpn_inp_bad_file']='Ce fichier n\'a pas pu être lu comme un fichier d
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='Ceci ressemble à un fichier .net d\'EPANET, mais cette page n\'a pas pu le lire. Ouvrez-le dans EPANET et utilisez-y la commande Fichier, Exporter, Réseau pour l\'enregistrer en fichier .inp, puis importez celui-ci.';
 $ec_lang['lpn_inp_report_heading']='{file} importé';
-$ec_lang['lpn_inp_report_counts']='{nodes} jonctions et réservoirs, {links} conduites et pompes, en {units}.';
+$ec_lang['lpn_inp_report_counts']='{nodes} jonctions, réservoirs et bâches, {links} conduites, pompes et vannes, en {units}.';
 $ec_lang['lpn_inp_report_clean']='Tout le contenu du fichier a été repris. Rien n\'a été laissé de côté.';
 $ec_lang['lpn_inp_report_lead']='Cette page ne conserve pas tout ce qu\'EPANET modélise. Voici ce qui a changé lors de l\'import :';
 $ec_lang['lpn_inp_drop_headloss']='Ce fichier n\'utilise pas la formule de Hazen-Williams. Cette page calcule avec Hazen-Williams, les valeurs de rugosité des conduites ont donc été conservées telles quelles, mais les résultats obtenus ici ne correspondront pas à ceux d\'EPANET.';
-$ec_lang['lpn_inp_drop_tcv']='Ces vannes de régulation par étranglement (TCV) sont entrées comme des conduites très courtes portant la même perte de charge singulière. L\'eau se comporte de la même façon, mais l\'élément n\'est pas le même.';
-$ec_lang['lpn_inp_drop_valve']='Ces vannes régulent la pression ou le débit, et cette page ne dispose pas d\'un tel élément. Elles sont entrées comme des conduites ouvertes, le réseau reste donc relié, mais plus rien ne le régule.';
+$ec_lang['lpn_inp_drop_tcv']='Ces vannes de régulation par étranglement (TCV) sont entrées comme des vannes de régulation par étranglement, portant la même perte de charge que le fichier leur donne. L\'un ou l\'autre solveur peut les résoudre.';
+$ec_lang['lpn_inp_drop_valve']='Ces vannes sont décrites par une courbe ou par une perte de pression fixe, et cette page ne dispose pas d\'un tel élément. Elles sont entrées comme des conduites ouvertes, le réseau reste donc relié, mais plus rien n\'y régule la pression ou le débit.';
 $ec_lang['lpn_inp_drop_cv']='Dans EPANET, ces conduites ne laissent passer l\'eau que dans un seul sens. Elles sont entrées comme des conduites ordinaires, l\'eau peut donc désormais y circuler dans les deux sens.';
 $ec_lang['lpn_inp_drop_demands']='Ces jonctions avaient plus d\'une demande. Les demandes ont été additionnées pour former la demande unique que cette page conserve.';
 $ec_lang['lpn_inp_drop_patterns']='Les variations de demande dans le temps ont été laissées de côté. Cette page résout un seul instant, donc chaque demande est le nombre écrit dans le fichier.';
@@ -940,9 +940,9 @@ $ec_lang['lpn_status_closed_opened']='{closed} fermé. {opened} affiché mainten
 $ec_lang['lpn_status_closed_empty']='{closed} fermé. Un nouveau projet vide a été créé.';
 $ec_lang['lpn_storage_full']='Non enregistré. Le stockage du navigateur est plein ou indisponible, donc vos modifications récentes seront perdues à la fermeture de cet onglet.';
 $ec_lang['lpn_notes_1_term']='Régime permanent';
-$ec_lang['lpn_notes_1_def']='Résout un jeu de demandes à la fois, avec la même méthode du gradient qu\'utilise EPANET. Il ne simule pas l\'évolution du réseau dans le temps.';
+$ec_lang['lpn_notes_1_def']='Résout un jeu de demandes à la fois, avec la même méthode du gradient qu\'utilise EPANET. Il ne simule pas l\'évolution du réseau dans le temps. Une bâche est maintenue au niveau d\'eau que vous lui donnez : au sein d\'une même résolution, elle ne se vide jamais et ne se remplit jamais.';
 $ec_lang['lpn_notes_2_term']='Non modélisé';
-$ec_lang['lpn_notes_2_def']='Les réservoirs à niveau variable, la qualité de l\'eau et les vannes de régulation qui s\'ouvrent et se ferment d\'elles-mêmes (PRV, PSV, FCV) ne sont pas modélisés. Une conduite peut porter une perte de charge singulière fixe, mais pas une vanne dont l\'état ouvert ou fermé dépend du débit en cours de résolution.';
+$ec_lang['lpn_notes_2_def']='La qualité de l\'eau et les demandes qui varient au cours de la journée ne sont pas modélisées. Pour les vannes : une vanne de régulation par étranglement fonctionne avec l\'un ou l\'autre solveur, et les vannes qui s\'ouvrent et se ferment d\'elles-mêmes (PRV, PSV, FCV) sont résolues avec le solveur EPANET, que cette page active automatiquement dès que votre réseau en contient une.';
 $ec_lang['lpn_notes_3_term']='Enregistrement des projets';
 $ec_lang['lpn_notes_3_def']='Chaque projet est un onglet, et chaque onglet est enregistré dans ce navigateur au fur et à mesure que vous travaillez. Effacer les données de votre navigateur les supprime tous, alors conservez votre travail dans un fichier : Fichier, Enregistrer sous. Un astérisque sur un onglet signifie qu\'il contient des modifications absentes d\'un fichier. Rien n\'est jamais écrit dans un fichier sans que vous le demandiez. Dans certains navigateurs, un projet se connecte au fichier dans lequel vous l\'enregistrez, et Fichier, Enregistrer y écrit désormais à chaque fois ; dans d\'autres, aucune connexion n\'est possible, donc Enregistrer est désactivé et seul Enregistrer sous est disponible. Quand un fichier de projet est conservé sur un lecteur partagé, cette page vous indique si un collègue l\'a déjà ouvert, afin que deux personnes n\'écrivent pas l\'une par-dessus l\'autre.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -959,7 +959,7 @@ $ec_lang['lpn_notes_epanet_term']='Les constantes de Hazen-Williams corresponden
 $ec_lang['lpn_notes_epanet_def']='En août 2026, le coefficient et l\'exposant de Hazen-Williams ont été modifiés pour correspondre à EPANET. Les résultats de perte de charge diffèrent des versions précédentes de cette page de 0,1 pour cent au plus, ce qui est bien plus petit que l\'incertitude sur la valeur de C elle-même.';
 $ec_lang['lpn_id_invalid']='Entrez un identifiant sans espace ni guillemets.';
 $ec_lang['lpn_id_taken']='Cet identifiant est déjà utilisé.';
-$ec_lang['lpn_diag_no_fixed_head']='Ajoutez un réservoir. Le réseau a besoin d\'au moins un niveau d\'eau connu avant de pouvoir être résolu.';
+$ec_lang['lpn_diag_no_fixed_head']='Ajoutez un réservoir ou une bâche. Le réseau a besoin d\'au moins un niveau d\'eau connu avant de pouvoir être résolu.';
 $ec_lang['lpn_diag_dangling_link']='Une conduite ou une pompe se connecte à un nœud qui n\'existe plus :';
 $ec_lang['lpn_diag_unreachable']='Ces nœuds n\'ont aucun chemin vers un réservoir :';
 $ec_lang['lpn_diag_not_converged']='Aucune solution n\'a été trouvée. Vérifiez l\'absence de valeurs impossibles, comme un diamètre nul.';

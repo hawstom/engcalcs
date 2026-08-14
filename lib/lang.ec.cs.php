@@ -233,7 +233,7 @@ $ec_lang['mtc_pi_tip']='Extrapolace mimo rozsah datového souboru 0,28–0,36 ft
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Dle Isbash (1936) a Maricopa County, Arizona, USA.">Požadovaná velikost lomového kamene na dně, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Dle Isbash (1936) a Maricopa County, Arizona, USA.">Požadovaná velikost lomového kamene svahu 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Dle Isbash (1936) a Maricopa County, Arizona, USA.">Požadovaná velikost lomového kamene svahu 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='Požadovaná velikost lomového kamene, D<sub>50</sub> (Maynord, Ruff a Abt 1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="Podle Maynorda, Ruffa a Abta (1989). V zatáčce je kámen navržen na rychlost v zatáčce rovnou 4/3 průměrné rychlosti, podle California Division of Highways (1970); Maynordova vlastní hodnota 1,5 platí pro přirozené kanály.">Požadovaná velikost lomového kamene, D<sub>50</sub> (Maynord, Ruff a Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Požadovaná velikost lomového kamene, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Rychlost přiměřená pro předpoklady rovnoměrného proudění.';
 $ec_lang['mtc_vel_low']='Rychlost nízká — riziko sedimentace.';
@@ -637,7 +637,7 @@ $ec_lang['lpn_field_head']='Tlaková výška';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Hladina vody u zdroje, vyjádřená jako výška, nikoli jako tlak. Ponechte prázdné, pokud má být hladina vody na nadmořské výšce zdroje.';
 $ec_lang['lpn_close']='Zavřít';
-$ec_lang['lpn_empty_hint']='Začněte přidáním podkladového obrázku nebo zdroje z panelu nástrojů, nebo otevřete Soubor, Nový projekt a začněte od příkladu.';
+$ec_lang['lpn_empty_hint']='Otevřete Soubor, Nový projekt a začněte od příkladu. Nebo začněte přidáním zdroje, uzlu a potrubí z panelu nástrojů.';
 $ec_lang['lpn_tool_undo']='Zpět';
 $ec_lang['lpn_confirm_example']='Tímto se příklad přidá do sítě, kterou už máte. Pokračovat?';
 $ec_lang['lpn_field_diameter']='Průměr';
@@ -765,12 +765,12 @@ $ec_lang['lpn_inp_bad_file']='Tento soubor se nepodařilo přečíst jako soubor
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='Vypadá to na soubor .net z programu EPANET, ale tato stránka jej nedokázala přečíst. Otevřete jej v programu EPANET a pomocí příkazu Soubor, Export, Síť jej tam uložte jako soubor .inp, a poté tento soubor importujte.';
 $ec_lang['lpn_inp_report_heading']='Importováno {file}';
-$ec_lang['lpn_inp_report_counts']='{nodes} uzlů a zdrojů, {links} potrubí a čerpadel, v jednotkách {units}.';
+$ec_lang['lpn_inp_report_counts']='{nodes} uzlů, zdrojů a nádrží, {links} potrubí, čerpadel a ventilů, v jednotkách {units}.';
 $ec_lang['lpn_inp_report_clean']='Vše ze souboru bylo přeneseno. Nic nebylo vynecháno.';
 $ec_lang['lpn_inp_report_lead']='Tato stránka nepodporuje vše, co umí EPANET. Zde je přehled toho, co se při importu změnilo:';
 $ec_lang['lpn_inp_drop_headloss']='Tento soubor nepoužívá vzorec Hazen-Williams. Tato stránka počítá podle Hazen-Williams, proto byla čísla drsnosti potrubí zachována přesně tak, jak byla zapsána, ale výsledky zde se nebudou shodovat s výsledky v programu EPANET.';
-$ec_lang['lpn_inp_drop_tcv']='Tyto škrticí regulační ventily byly převedeny jako velmi krátké potrubí se stejnou místní ztrátou. Voda se chová stejně, ale prvek to není stejný.';
-$ec_lang['lpn_inp_drop_valve']='Tyto ventily regulují tlak nebo průtok, a tato stránka takový prvek nemá. Byly převedeny jako otevřené potrubí, takže síť zůstává propojená, ale už ji nic neřídí.';
+$ec_lang['lpn_inp_drop_tcv']='Tyto škrticí ventily byly převedeny jako škrticí ventily se stejnou ztrátou, jakou udává soubor. Vyřeší je kterýkoli řešič.';
+$ec_lang['lpn_inp_drop_valve']='Tyto ventily jsou popsány křivkou nebo pevným poklesem tlaku, a tato stránka takový prvek nemá. Byly převedeny jako otevřené potrubí, takže síť zůstává propojená, ale už tam nic neudržuje tlak ani průtok.';
 $ec_lang['lpn_inp_drop_cv']='V programu EPANET toto potrubí propouští vodu pouze jedním směrem. Bylo převedeno jako běžné potrubí, takže voda jím nyní může proudit oběma směry.';
 $ec_lang['lpn_inp_drop_demands']='Tyto uzly měly více než jeden odběr. Odběry byly sečteny do jediného odběru, který tato stránka uchovává.';
 $ec_lang['lpn_inp_drop_patterns']='Vzorce odběru v čase byly vynechány. Tato stránka řeší jeden okamžik, takže každý odběr je číslo zapsané v souboru.';
@@ -939,9 +939,9 @@ $ec_lang['lpn_status_closed_opened']='Zavřeno {closed}. Nyní zobrazeno {opened
 $ec_lang['lpn_status_closed_empty']='Zavřeno {closed}. Byl zahájen nový prázdný projekt.';
 $ec_lang['lpn_storage_full']='Neuloženo. Úložiště prohlížeče je plné nebo nedostupné, takže vaše nedávné změny se při zavření této karty ztratí.';
 $ec_lang['lpn_notes_1_term']='Ustálený stav';
-$ec_lang['lpn_notes_1_def']='Řeší vždy jednu sadu odběrů, pomocí stejného algoritmu globálního gradientu, jaký používá EPANET. Nemodeluje, jak se síť mění v čase.';
+$ec_lang['lpn_notes_1_def']='Řeší vždy jednu sadu odběrů, pomocí stejného algoritmu globálního gradientu, jaký používá EPANET. Nemodeluje, jak se síť mění v čase. Nádrž je udržována na zadané hladině vody: v rámci jednoho řešení nikdy neklesá ani se neplní.';
 $ec_lang['lpn_notes_2_term']='Nemodelováno';
-$ec_lang['lpn_notes_2_def']='Nádrže, kvalita vody a regulační ventily, které se samy otevírají a zavírají (PRV, PSV, FCV), nejsou modelovány. Potrubí může nést pevnou místní ztrátu, ale ne ventil, jehož otevřený nebo zavřený stav závisí na právě počítaném průtoku.';
+$ec_lang['lpn_notes_2_def']='Kvalita vody a odběry měnící se v průběhu dne nejsou modelovány. Ventily: škrticí ventil funguje v obou řešičích a ventily, které se samy otevírají a zavírají (PRV, PSV, FCV), řeší řešič EPANET, který tato stránka sama zapne, jakmile síť takový ventil obsahuje.';
 $ec_lang['lpn_notes_3_term']='Ukládání projektů';
 $ec_lang['lpn_notes_3_def']='Každý projekt je karta a každá karta se během práce ukládá do tohoto prohlížeče. Vymazání dat prohlížeče je všechny smaže, proto si práci ukládejte do souboru: Soubor, Uložit jako. Hvězdička na kartě znamená, že obsahuje změny, které nejsou v souboru. Do souboru se nikdy nic nezapíše, pokud o to nepožádáte. V některých prohlížečích se projekt připojí k souboru, do kterého jej uložíte, a Soubor, Uložit od té chvíle zapisuje zpět do stejného souboru; v jiných spojení možné není, proto je Uložit zakázáno a dostupné je pouze Uložit jako. Když je soubor projektu uložen na sdíleném disku, tato stránka vám sdělí, pokud jej má kolega už otevřený, aby si dva lidé navzájem nepřepsali práci.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -958,7 +958,7 @@ $ec_lang['lpn_notes_epanet_term']='Konstanty Hazen-Williams odpovídají program
 $ec_lang['lpn_notes_epanet_def']='V srpnu 2026 byl součinitel a exponent Hazen-Williams upraveny tak, aby odpovídaly programu EPANET. Výsledky ztráty tlakové výšky se od dřívějších verzí této stránky liší až o 0,1 procenta, což je mnohem méně, než je nejistota samotné hodnoty C.';
 $ec_lang['lpn_id_invalid']='Zadejte ID bez mezer a bez uvozovek.';
 $ec_lang['lpn_id_taken']='Toto ID se už používá.';
-$ec_lang['lpn_diag_no_fixed_head']='Přidejte zdroj. Síť potřebuje alespoň jednu známou hladinu vody, než ji lze vyřešit.';
+$ec_lang['lpn_diag_no_fixed_head']='Přidejte zdroj nebo nádrž. Síť potřebuje alespoň jednu známou hladinu vody, než ji lze vyřešit.';
 $ec_lang['lpn_diag_dangling_link']='Potrubí nebo čerpadlo se připojuje k uzlu, který již neexistuje:';
 $ec_lang['lpn_diag_unreachable']='Tyto uzly nemají cestu ke zdroji:';
 $ec_lang['lpn_diag_not_converged']='Nebylo nalezeno žádné řešení. Zkontrolujte, zda nejsou zadány hodnoty nemožné ve skutečnosti, například nulový průměr.';

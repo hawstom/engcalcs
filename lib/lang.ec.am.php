@@ -234,7 +234,7 @@ $ec_lang['mtc_pi_tip']='ይህ ቀመር ከተገኘበት 0.28–0.36 ft የ�
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="በIsbash (1936) እና Maricopa County, Arizona, US. መሠረት">የሚፈለግ የታች ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="በIsbash (1936) እና Maricopa County, Arizona, US. መሠረት">የሚፈለግ የጎን ቁልቁለት 1 ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="በIsbash (1936) እና Maricopa County, Arizona, US. መሠረት">የሚፈለግ የጎን ቁልቁለት 2 ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Maynord, Ruff, and Abt 1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="በMaynord, Ruff, and Abt (1989) መሠረት። በመዞሪያ ላይ ድንጋዩ እንደ California Division of Highways (1970) በአማካይ ፍጥነት 4/3 የመዞሪያ ፍጥነት ይለካል፤ የMaynord ራሱ 1.5 ለተፈጥሮ ቻናሎች ይሠራል።">የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='የሚፈለግ ማዕዘናዊ የድንጋይ መጠን, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='ፍጥነቱ ለወጥ ፍሰት ግምቶች ምክንያታዊ ነው።';
 $ec_lang['mtc_vel_low']='ፍጥነቱ ዝቅ ያለ ነው - የደለል አደጋ አለ።';
@@ -638,7 +638,7 @@ $ec_lang['lpn_field_head']='ሄድ';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='በማጠራቀሚያው ውስጥ ያለው የውሃ ወለል ደረጃ፣ እንደ ከፍታ የሚለካ እንጂ እንደ ግፊት አይደለም። የውሃ ወለሉን በማጠራቀሚያው ከፍታ ላይ ለማድረግ ባዶ ይተውት።';
 $ec_lang['lpn_close']='ዝጋ';
-$ec_lang['lpn_empty_hint']='ከመሳሪያ አሞሌው የበስተጀርባ ምስል ወይም ማጠራቀሚያ በመጨመር ይጀምሩ፣ ወይም ናሙና ለመጀመር ፋይል፣ አዲስ ፕሮጀክት ይክፈቱ።';
+$ec_lang['lpn_empty_hint']='ናሙና ለመክፈት ፋይል፣ አዲስ ፕሮጀክት ይጠቀሙ። ወይም ከመሳሪያ አሞሌው ማጠራቀሚያ፣ መገናኛ እና ቧንቧ በመጨመር ይጀምሩ።';
 $ec_lang['lpn_tool_undo']='ቀልብስ';
 $ec_lang['lpn_confirm_example']='ይህ ናሙናውን ቀድሞ ወዳለዎት መረብ ይጨምራል። ይቀጥሉ?';
 $ec_lang['lpn_field_diameter']='ዲያሜትር';
@@ -766,12 +766,12 @@ $ec_lang['lpn_inp_bad_file']='ያ ፋይል እንደ EPANET መረብ ፋይል
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='ይህ የEPANET .net ፋይል ይመስላል፣ ነገር ግን ይህ ገጽ ሊያነበው አልቻለም። በEPANET ውስጥ ይክፈቱትና እዚያ ያለውን ፋይል፣ ላክ፣ መረብ የሚለውን ትዕዛዝ ተጠቅመው እንደ .inp ፋይል ያስቀምጡት፣ ከዚያም እሱን ያስገቡ።';
 $ec_lang['lpn_inp_report_heading']='{file} ገብቷል';
-$ec_lang['lpn_inp_report_counts']='{nodes} መገናኛዎችና ማጠራቀሚያዎች፣ {links} ቧንቧዎችና ፓምፖች፣ በ{units}።';
+$ec_lang['lpn_inp_report_counts']='{nodes} መገናኛዎች፣ ማጠራቀሚያዎችና ታንኮች፣ {links} ቧንቧዎች፣ ፓምፖችና ቫልቮች፣ በ{units}።';
 $ec_lang['lpn_inp_report_clean']='በፋይሉ ውስጥ ያለው ሁሉ ገብቷል። ምንም አልቀረም።';
 $ec_lang['lpn_inp_report_lead']='ይህ ገጽ EPANET የያዘውን ሁሉ አይይዝም። ሲገባ የተለወጠው እነሆ፦';
 $ec_lang['lpn_inp_drop_headloss']='ይህ ፋይል የHazen-Williams ቀመርን አይጠቀምም። ይህ ገጽ Hazen-Williams ስለሚያሰላ፣ የቧንቧ ሻካሪነት ቁጥሮች በትክክል እንደተጻፉ ተጠብቀዋል፣ ነገር ግን እዚህ ያለው መልስ ከEPANET መልስ ጋር አይመሳሰልም።';
-$ec_lang['lpn_inp_drop_tcv']='እነዚህ የፍሰት መቆጣጠሪያ ቫልቮች ተመሳሳይ አካባቢያዊ ኪሳራ የሚያስተላልፉ በጣም አጭር ቧንቧዎች ሆነው ገብተዋል። ውሃው ተመሳሳይ ባህሪ ያሳያል፤ ነገር ግን አካሉ ተመሳሳይ አይደለም።';
-$ec_lang['lpn_inp_drop_valve']='እነዚህ ቫልቮች ግፊት ወይም ፍሰት ይቆጣጠራሉ፣ ይህ ገጽ ግን እንዲህ ያለ አካል የለውም። ክፍት ቧንቧዎች ሆነው ገብተዋል፣ ስለዚህ መረቡ አሁንም የተገናኘ ነው፣ ነገር ግን ምንም ነገር አይቆጣጠረውም።';
+$ec_lang['lpn_inp_drop_tcv']='እነዚህ መቆጣጠሪያ ቫልቮች እንደ መቆጣጠሪያ ቫልቮች ገብተዋል፣ ፋይሉ የሰጣቸውን ተመሳሳይ ኪሳራ ይዘው። ማንኛውም ፈታች ሊያሰላቸው ይችላል።';
+$ec_lang['lpn_inp_drop_valve']='እነዚህ ቫልቮች በኩርባ ወይም በቋሚ የግፊት ቅናሽ ይገለጻሉ፣ ይህ ገጽ ግን እንዲህ ያለ አካል የለውም። ክፍት ቧንቧዎች ሆነው ገብተዋል፣ ስለዚህ መረቡ አሁንም የተገናኘ ነው፣ ነገር ግን ግፊትን ወይም ፍሰትን የሚይዝ ምንም ነገር የለም።';
 $ec_lang['lpn_inp_drop_cv']='በEPANET ውስጥ እነዚህ ቧንቧዎች ውሃ በአንድ አቅጣጫ ብቻ እንዲያልፍ ያደርጋሉ። እንደ ተራ ቧንቧዎች ገብተዋል፣ ስለዚህ ውሃ አሁን በሁለቱም አቅጣጫ ሊፈስባቸው ይችላል።';
 $ec_lang['lpn_inp_drop_demands']='እነዚህ መገናኛዎች ከአንድ በላይ ፍላጎት ነበራቸው። ፍላጎቶቹ ይህ ገጽ ወደሚይዘው ነጠላ ፍላጎት ተደምረዋል።';
 $ec_lang['lpn_inp_drop_patterns']='የፍላጎት ስርዓቶች ቀርተዋል። ይህ ገጽ አንድ ጊዜያዊ ወቅት ብቻ ስለሚፈታ፣ እያንዳንዱ ፍላጎት በፋይሉ ውስጥ የተጻፈው ቁጥር ነው።';
@@ -940,9 +940,9 @@ $ec_lang['lpn_status_closed_opened']='{closed} ተዘግቷል። አሁን {ope
 $ec_lang['lpn_status_closed_empty']='{closed} ተዘግቷል። አዲስ ባዶ ፕሮጀክት ተጀምሯል።';
 $ec_lang['lpn_storage_full']='አልተቀመጠም። የአሳሽ ማከማቻ ሞልቷል ወይም አይገኝም፣ ስለዚህ ይህን ትር ሲዘጉ የቅርብ ጊዜ ለውጦችዎ ይጠፋሉ።';
 $ec_lang['lpn_notes_1_term']='የተረጋጋ ሁኔታ';
-$ec_lang['lpn_notes_1_def']='EPANET የሚጠቀምበትን ተመሳሳይ ዓለም አቀፍ ቅልመት ስልተ ቀመር ተጠቅሞ በአንድ ጊዜ አንድ የፍላጎት ስብስብ ይፈታል። መረቡ በጊዜ ሂደት እንዴት እንደሚለወጥ አይመስልም።';
+$ec_lang['lpn_notes_1_def']='EPANET የሚጠቀምበትን ተመሳሳይ ዓለም አቀፍ ቅልመት ስልተ ቀመር ተጠቅሞ በአንድ ጊዜ አንድ የፍላጎት ስብስብ ይፈታል። መረቡ በጊዜ ሂደት እንዴት እንደሚለወጥ አይመስልም። አንድ ታንክ በሚሰጡት የውሃ ደረጃ ይያዛል፦ በአንድ መፍትሄ ውስጥ በጭራሽ አይቀንስም አይሞላምም።';
 $ec_lang['lpn_notes_2_term']='ያልተመሰለ';
-$ec_lang['lpn_notes_2_def']='ታንኮች፣ የውሃ ጥራት፣ እና በራሳቸው የሚከፈቱና የሚዘጉ መቆጣጠሪያ ቫልቮች (PRV, PSV, FCV) አይመሰሉም። አንድ ቧንቧ ቋሚ አካባቢያዊ ኪሳራ ሊይዝ ይችላል፣ ነገር ግን የመክፈት ወይም የመዝጋት ሁኔታው በሚፈታው ፍሰት ላይ የተመሰረተ ቫልቭ አይችልም።';
+$ec_lang['lpn_notes_2_def']='የውሃ ጥራትና በቀን ውስጥ የሚለዋወጡ ፍላጎቶች አይመሰሉም። ቫልቮች እንዲህ ናቸው፦ የመቆጣጠሪያ ቫልቭ በማንኛውም ፈታች ይሰራል፣ በራሳቸው የሚከፈቱና የሚዘጉ ቫልቮች (PRV, PSV, FCV) ደግሞ በEPANET ፈታች ይፈታሉ፣ ይህም ገጽ መረብዎ አንዱን ሲይዝ በራሱ የሚያበራው ነው።';
 $ec_lang['lpn_notes_3_term']='ፕሮጀክቶችን ማስቀመጥ';
 $ec_lang['lpn_notes_3_def']='እያንዳንዱ ፕሮጀክት አንድ ትር ነው፣ እያንዳንዱ ትርም ሲሰሩ በዚህ አሳሽ ውስጥ ይቀመጣል። የአሳሽዎን መረጃ ማጽዳት ሁሉንም ይሰርዛል፣ ስለዚህ ስራዎን በፋይል ውስጥ ያቆዩ፦ ፋይል፣ እንደ አስቀምጥ። በትር ላይ ያለ ኮከብ ምልክት ወደ ፋይል ያልገቡ ለውጦችን እንደያዘ ያሳያል። እርስዎ ካልጠየቁ በስተቀር ምንም ነገር ወደ ፋይል አይጻፍም። በአንዳንድ አሳሾች ፕሮጀክት ካስቀመጡበት ፋይል ጋር ይገናኛል፣ ከዚያ በኋላ ፋይል፣ አስቀምጥ ወደዚያው ፋይል መልሶ ይጽፋል፤ በሌሎች ደግሞ ግንኙነት አይቻልም፣ ስለዚህ አስቀምጥ ተሰናክሎ እንደ አስቀምጥ ብቻ ይገኛል። የፕሮጀክት ፋይል በጋራ ድራይቭ ላይ ሲቀመጥ፣ ይህ ገጽ ባልደረባ ቀድሞውኑ ከፍቶት እንደሆነ ይነግርዎታል፣ ስለዚህ ሁለት ሰዎች እርስ በእርስ አይተካኩም።';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -959,7 +959,7 @@ $ec_lang['lpn_notes_epanet_term']='የHazen-Williams ቋሚ ቁጥሮች ከEPAN
 $ec_lang['lpn_notes_epanet_def']='እ.ኤ.አ. ነሐሴ 2026 የHazen-Williams ኮፊሸንትና አርቃቂ ከEPANET ጋር እንዲመሳሰሉ ተቀይረዋል። የሄድ ኪሳራ ውጤቶች ከዚህ ገጽ ቀደምት እትሞች እስከ 0.1 በመቶ ይለያያሉ፣ ይህም ከራሱ ከC ዋጋ አለመረጋገጥ በጣም ያነሰ ነው።';
 $ec_lang['lpn_id_invalid']='ክፍተትና ጥቅስ ምልክት የሌለበት መለያ ያስገቡ።';
 $ec_lang['lpn_id_taken']='ያ መለያ አስቀድሞ ጥቅም ላይ ውሏል።';
-$ec_lang['lpn_diag_no_fixed_head']='ማጠራቀሚያ ይጨምሩ። መረቡ ከመፈታቱ በፊት ቢያንስ አንድ የታወቀ የውሃ ደረጃ ያስፈልገዋል።';
+$ec_lang['lpn_diag_no_fixed_head']='ማጠራቀሚያ ወይም ታንክ ይጨምሩ። መረቡ ከመፈታቱ በፊት ቢያንስ አንድ የታወቀ የውሃ ደረጃ ያስፈልገዋል።';
 $ec_lang['lpn_diag_dangling_link']='ቧንቧ ወይም ፓምፕ ከዚህ በኋላ ወደሌለ ነጥብ ይገናኛል፦';
 $ec_lang['lpn_diag_unreachable']='እነዚህ ነጥቦች ወደ ማጠራቀሚያ የሚወስድ መንገድ የላቸውም፦';
 $ec_lang['lpn_diag_not_converged']='መፍትሄ አልተገኘም። እንደ ዜሮ ዲያሜትር ያሉ በእውነታው የማይቻሉ ዋጋዎችን ያረጋግጡ።';

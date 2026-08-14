@@ -232,7 +232,7 @@ $ec_lang['mtc_pi_tip']='Ekstrapolacija izvan raspona podataka od 0,28–0,36 ft 
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Prema Isbash (1936) i Maricopa County, Arizona, US.">Potrebna veličina uglatog kamena dna, D<sub>50</sub> (Isbash i MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Prema Isbash (1936) i Maricopa County, Arizona, US.">Potrebna veličina uglatog kamena bočne strane 1, D<sub>50</sub> (Isbash i MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Prema Isbash (1936) i Maricopa County, Arizona, US.">Potrebna veličina uglatog kamena bočne strane 2, D<sub>50</sub> (Isbash i MC) <span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='Potrebna veličina uglatog kamena, D<sub>50</sub> (Maynord, Ruff i Abt 1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="Prema Maynordu, Ruffu i Abtu (1989). U zavoju je kamen dimenzioniran za brzinu u zavoju od 4/3 prosječne brzine, prema California Division of Highways (1970); Maynordova vlastita vrijednost 1,5 primjenjuje se na prirodne kanale.">Potrebna veličina uglatog kamena, D<sub>50</sub> (Maynord, Ruff i Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Potrebna veličina uglatog kamena, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Brzina prihvatljiva za pretpostavke jednolikog tečenja.';
 $ec_lang['mtc_vel_low']='Brzina niska — opasnost od sedimentacije.';
@@ -636,7 +636,7 @@ $ec_lang['lpn_field_head']='Tlačna visina';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Razina vodene površine u rezervoaru, izražena kao visina, a ne kao tlak. Ostavite prazno da vodena površina bude na koti rezervoara.';
 $ec_lang['lpn_close']='Zatvori';
-$ec_lang['lpn_empty_hint']='Počnite dodavanjem pozadinske slike ili rezervoara s alatne trake, ili otvorite Datoteka, Novi projekt da započnete od primjera.';
+$ec_lang['lpn_empty_hint']='Upotrijebite Datoteka, Novi projekt da otvorite primjer. Ili počnite dodavanjem rezervoara, čvora i cijevi s alatne trake.';
 $ec_lang['lpn_tool_undo']='Poništi';
 $ec_lang['lpn_confirm_example']='Ovo dodaje primjer u mrežu koju već imate. Nastaviti?';
 $ec_lang['lpn_field_diameter']='Promjer';
@@ -764,12 +764,12 @@ $ec_lang['lpn_inp_bad_file']='Tu datoteku nije moguće pročitati kao EPANET dat
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='Ovo izgleda kao EPANET .net datoteka, ali je ova stranica nije mogla pročitati. Otvorite je u EPANET-u i upotrijebite naredbu Datoteka, Izvoz, Mreža da je spremite kao .inp datoteku, zatim uvezite tu.';
 $ec_lang['lpn_inp_report_heading']='Uvezeno: {file}';
-$ec_lang['lpn_inp_report_counts']='{nodes} čvorova i rezervoara, {links} cijevi i pumpi, u jedinicama {units}.';
+$ec_lang['lpn_inp_report_counts']='{nodes} čvorova, rezervoara i spremnika, {links} cijevi, pumpi i ventila, u jedinicama {units}.';
 $ec_lang['lpn_inp_report_clean']='Sve iz datoteke je preneseno. Ništa nije izostavljeno.';
 $ec_lang['lpn_inp_report_lead']='Ova stranica ne obuhvaća sve što EPANET podržava. Evo što se promijenilo prilikom uvoza:';
 $ec_lang['lpn_inp_drop_headloss']='Ova datoteka ne koristi Hazen-Williamsovu formulu. Ova stranica računa prema Hazen-Williamsu, pa su brojevi hrapavosti cijevi zadržani točno onako kako su zapisani, ali rezultati ovdje neće odgovarati rezultatima u EPANET-u.';
-$ec_lang['lpn_inp_drop_tcv']='Ovi prigušni regulacijski ventili uvezeni su kao vrlo kratke cijevi koje nose isti lokalni gubitak. Voda se ponaša jednako; element nije isti.';
-$ec_lang['lpn_inp_drop_valve']='Ovi ventili reguliraju tlak ili protok, a ova stranica nema takav element. Uvezeni su kao otvorene cijevi, pa je mreža i dalje povezana, ali ništa je više ne regulira.';
+$ec_lang['lpn_inp_drop_tcv']='Ovi prigušni ventili uvezeni su kao prigušni ventili, koji nose isti gubitak koji im datoteka daje. Bilo koji rješavač ih može izračunati.';
+$ec_lang['lpn_inp_drop_valve']='Ovi ventili opisani su krivuljom ili fiksnim padom tlaka, a ova stranica nema takav element. Uvezeni su kao otvorene cijevi, pa je mreža i dalje povezana, ali ništa više ne regulira tlak ili protok.';
 $ec_lang['lpn_inp_drop_cv']='U EPANET-u ove cijevi propuštaju vodu samo u jednom smjeru. Uvezene su kao obične cijevi, pa voda sada kroz njih može teći u oba smjera.';
 $ec_lang['lpn_inp_drop_demands']='Ovi čvorovi imali su više od jedne potražnje. Potražnje su zbrojene u jednu potražnju koju ova stranica drži.';
 $ec_lang['lpn_inp_drop_patterns']='Obrasci potražnje su izostavljeni. Ova stranica rješava jedan trenutak u vremenu, pa je svaka potražnja broj zapisan u datoteci.';
@@ -938,9 +938,9 @@ $ec_lang['lpn_status_closed_opened']='Zatvoreno {closed}. Sada prikazano {opened
 $ec_lang['lpn_status_closed_empty']='Zatvoreno {closed}. Pokrenut novi prazan projekt.';
 $ec_lang['lpn_storage_full']='Nije spremljeno. Pohrana preglednika je puna ili nedostupna, pa će vaše nedavne promjene biti izgubljene kada zatvorite ovu karticu.';
 $ec_lang['lpn_notes_1_term']='Ustaljeno stanje';
-$ec_lang['lpn_notes_1_def']='Rješava jedan skup potražnji odjednom, koristeći isti globalni gradijentni algoritam koji koristi EPANET. Ne modelira kako se mreža mijenja tijekom vremena.';
+$ec_lang['lpn_notes_1_def']='Rješava jedan skup potražnji odjednom, koristeći isti globalni gradijentni algoritam koji koristi EPANET. Ne modelira kako se mreža mijenja tijekom vremena. Spremnik se drži na razini vode koju mu zadate: unutar jednog rješenja nikada se ne prazni i nikada se ne puni.';
 $ec_lang['lpn_notes_2_term']='Nije modelirano';
-$ec_lang['lpn_notes_2_def']='Spremnici, kvaliteta vode i regulacijski ventili koji se sami otvaraju i zatvaraju (PRV, PSV, FCV) nisu modelirani. Cijev može nositi fiksni lokalni gubitak, ali ne i ventil čije stanje otvoreno/zatvoreno ovisi o protoku koji se rješava.';
+$ec_lang['lpn_notes_2_def']='Kvaliteta vode i potražnje koje se mijenjaju tijekom dana nisu modelirane. Ventili: prigušni ventil radi u oba rješavača, a ventili koji se sami otvaraju i zatvaraju (PRV, PSV, FCV) rješavaju se EPANET rješavačem, koji ova stranica sama uključuje kada vaša mreža sadrži takav ventil.';
 $ec_lang['lpn_notes_3_term']='Spremanje projekata';
 $ec_lang['lpn_notes_3_def']='Svaki projekt je kartica, a svaka kartica se sprema u ovaj preglednik dok radite. Brisanje podataka preglednika briše ih sve, pa svoj rad čuvajte u datoteci: Datoteka, Spremi kao. Zvjezdica na kartici znači da sadrži promjene koje nisu u datoteci. Ništa se nikada ne zapisuje u datoteku osim ako to ne zatražite. U nekim preglednicima projekt se povezuje s datotekom u koju ga spremite, i Datoteka, Spremi od tada zapisuje natrag u tu istu datoteku; u drugima veza nije moguća, pa je Spremi onemogućeno i dostupno je samo Spremi kao. Kada je projektna datoteka na dijeljenom disku, ova stranica vas obavještava ako je kolega već ima otvorenu, tako da dvoje ljudi ne prepisuju jedno preko drugoga.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -957,7 +957,7 @@ $ec_lang['lpn_notes_epanet_term']='Hazen-Williams konstante odgovaraju EPANET-u'
 $ec_lang['lpn_notes_epanet_def']='U kolovozu 2026. koeficijent i eksponent Hazen-Williamsa promijenjeni su kako bi odgovarali EPANET-u. Rezultati gubitka tlačne visine razlikuju se od ranijih verzija ove stranice do 0,1 posto, što je znatno manje od nesigurnosti same vrijednosti C.';
 $ec_lang['lpn_id_invalid']='Unesite ID bez razmaka i bez navodnika.';
 $ec_lang['lpn_id_taken']='Taj ID je već u upotrebi.';
-$ec_lang['lpn_diag_no_fixed_head']='Dodajte rezervoar. Mreža treba barem jednu poznatu razinu vode prije nego što se može riješiti.';
+$ec_lang['lpn_diag_no_fixed_head']='Dodajte rezervoar ili spremnik. Mreža treba barem jednu poznatu razinu vode prije nego što se može riješiti.';
 $ec_lang['lpn_diag_dangling_link']='Cijev ili pumpa spaja se na čvor koji više ne postoji:';
 $ec_lang['lpn_diag_unreachable']='Ovi čvorovi nemaju put do rezervoara:';
 $ec_lang['lpn_diag_not_converged']='Rješenje nije pronađeno. Provjerite ima li vrijednosti koje su nemoguće u stvarnosti, poput promjera nula.';

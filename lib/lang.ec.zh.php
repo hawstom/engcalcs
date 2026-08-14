@@ -233,7 +233,7 @@ $ec_lang['mtc_pi_tip']='超出该公式所依据的 0.28–0.36 英尺数据范�
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="依据 Isbash（1936）及美国亚利桑那州马里科帕县（Maricopa County）标准。">渠底所需棱角石材粒径，D<sub>50</sub>（Isbash 与 MC）<span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="依据 Isbash（1936）及美国亚利桑那州马里科帕县（Maricopa County）标准。">边坡 1 所需棱角石材粒径，D<sub>50</sub>（Isbash 与 MC）<span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="依据 Isbash（1936）及美国亚利桑那州马里科帕县（Maricopa County）标准。">边坡 2 所需棱角石材粒径，D<sub>50</sub>（Isbash 与 MC）<span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='所需棱角石材粒径，D<sub>50</sub>（Maynord、Ruff 和 Abt，1989）';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="依据 Maynord、Ruff 和 Abt（1989）。弯道处按平均流速的 4/3 确定石料粒径，依据美国加利福尼亚州公路局（1970）；Maynord 本人提出的 1.5 倍系数适用于天然河道。">所需棱角石材粒径，D<sub>50</sub>（Maynord、Ruff 和 Abt，1989）<span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='所需棱角石材粒径，D<sub>50</sub>（Searcy，1967）';
 $ec_lang['mtc_vel_ok']='流速符合均匀流假设，属合理范围。';
 $ec_lang['mtc_vel_low']='流速偏低，存在泥沙淤积风险。';
@@ -637,7 +637,7 @@ $ec_lang['lpn_field_head']='水头';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='水库的水面标高，以高度表示，而非压力。留空则水面标高取节点高程。';
 $ec_lang['lpn_close']='关闭';
-$ec_lang['lpn_empty_hint']='从工具栏添加背景图片或水库开始，或打开"文件"菜单中的"新建项目"以某个示例为起点。';
+$ec_lang['lpn_empty_hint']='使用"文件"菜单中的"新建项目"打开示例。或者从工具栏开始添加水库、节点和管道。';
 $ec_lang['lpn_tool_undo']='撤销';
 $ec_lang['lpn_confirm_example']='这会将示例添加到您现有的管网中。是否继续？';
 $ec_lang['lpn_field_diameter']='管径';
@@ -765,12 +765,12 @@ $ec_lang['lpn_inp_bad_file']='该文件无法作为 EPANET 管网文件读取。
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='这看起来是一个 EPANET .net 文件，但本页面无法读取它。请在 EPANET 中打开它，使用其中的"文件"、"导出"、"管网"命令另存为 .inp 文件，然后再导入该文件。';
 $ec_lang['lpn_inp_report_heading']='已导入 {file}';
-$ec_lang['lpn_inp_report_counts']='{nodes} 个节点和水库，{links} 条管道和水泵，单位为 {units}。';
+$ec_lang['lpn_inp_report_counts']='{nodes} 个节点、水库和水箱，{links} 条管道、水泵和阀门，单位为 {units}。';
 $ec_lang['lpn_inp_report_clean']='文件中的全部内容均已成功导入，没有遗漏。';
 $ec_lang['lpn_inp_report_lead']='本页面不支持 EPANET 的全部功能。以下是导入过程中发生的变化：';
 $ec_lang['lpn_inp_drop_headloss']='该文件未使用 Hazen-Williams 公式。本页面按 Hazen-Williams 公式计算，因此管道糙率数值已按原样保留，但这里得到的结果将与 EPANET 中的结果不一致。';
-$ec_lang['lpn_inp_drop_tcv']='这些节流控制阀（TCV）已作为承载相同局部损失的极短管道导入。水流表现相同，但元件本身并不相同。';
-$ec_lang['lpn_inp_drop_valve']='这些阀门用于控制压力或流量，而本页面没有此类元件。它们已作为开放管道导入，因此管网仍保持连通，但已不再受到控制。';
+$ec_lang['lpn_inp_drop_tcv']='这些节流阀（TCV）已作为节流阀导入，保留了文件中给定的相同损失。两种求解器均可对其求解。';
+$ec_lang['lpn_inp_drop_valve']='这些阀门由曲线或固定压降描述，而本页面没有此类元件。它们已作为开放管道导入，因此管网仍保持连通，但已不再对压力或流量进行控制。';
 $ec_lang['lpn_inp_drop_cv']='在 EPANET 中，这些管道只允许水单向流动。它们已作为普通管道导入，因此水现在可能双向流动。';
 $ec_lang['lpn_inp_drop_demands']='这些节点原有多个需水量。这些需水量已合并为本页面所支持的单一需水量。';
 $ec_lang['lpn_inp_drop_patterns']='用水模式未被导入。本页面只求解某一时刻的状态，因此每个需水量均取文件中写明的数值。';
@@ -939,9 +939,9 @@ $ec_lang['lpn_status_closed_opened']='已关闭 {closed}。当前显示 {opened}
 $ec_lang['lpn_status_closed_empty']='已关闭 {closed}。已新建一个空项目。';
 $ec_lang['lpn_storage_full']='未保存。浏览器存储空间已满或不可用，因此关闭此标签页时您近期的更改将丢失。';
 $ec_lang['lpn_notes_1_term']='稳态计算';
-$ec_lang['lpn_notes_1_def']='一次求解一组需水量，使用与 EPANET 相同的全局梯度算法。它不模拟管网随时间的变化。';
+$ec_lang['lpn_notes_1_def']='一次求解一组需水量，使用与 EPANET 相同的全局梯度算法。它不模拟管网随时间的变化。水箱的水位保持为您所设定的数值：在一次求解内，水位既不下降也不上升。';
 $ec_lang['lpn_notes_2_term']='未建模的内容';
-$ec_lang['lpn_notes_2_def']='储水池、水质，以及能自行开关的控制阀（PRV、PSV、FCV）均未建模。管道可以承载固定的局部损失，但不能是开闭状态取决于所求解流量的阀门。';
+$ec_lang['lpn_notes_2_def']='水质以及全天变化的需水量均未建模。关于阀门：节流阀（TCV）可在两种求解器中使用；能自行开关的阀门（PRV、PSV、FCV）由 EPANET 求解器求解，当管网中含有此类阀门时，本页面会自动启用该求解器。';
 $ec_lang['lpn_notes_3_term']='保存项目';
 $ec_lang['lpn_notes_3_def']='每个项目对应一个标签页，且在您操作时即保存在本浏览器中。清除浏览器数据会将它们全部删除，因此请把成果保存到文件中：使用"文件"、"另存为"。标签页上的星号表示其中含有尚未保存到文件的更改。除非您主动要求，否则不会有任何内容写入文件。在部分浏览器中，项目会连接到您保存的文件，此后"文件"、"保存"会写回该文件；在另一些浏览器中无法建立此连接，因此"保存"不可用，只能使用"另存为"。当项目文件保存在共享磁盘上时，本页面会提示您该文件是否已被同事打开，以避免两人互相覆盖成果。';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -958,7 +958,7 @@ $ec_lang['lpn_notes_epanet_term']='Hazen-Williams 常数已与 EPANET 一致';
 $ec_lang['lpn_notes_epanet_def']='2026 年 8 月，Hazen-Williams 系数和指数已调整为与 EPANET 一致。水头损失结果与本页面早期版本相比最多相差 0.1%，这远小于 C 值本身的不确定性。';
 $ec_lang['lpn_id_invalid']='请输入不含空格和引号的 ID。';
 $ec_lang['lpn_id_taken']='该 ID 已被使用。';
-$ec_lang['lpn_diag_no_fixed_head']='请添加一个水库。管网在求解前需要至少一个已知水位。';
+$ec_lang['lpn_diag_no_fixed_head']='请添加一个水库或水箱。管网在求解前需要至少一个已知水位。';
 $ec_lang['lpn_diag_dangling_link']='有管道或水泵连接到一个已不存在的节点：';
 $ec_lang['lpn_diag_unreachable']='以下节点没有通往水库的路径：';
 $ec_lang['lpn_diag_not_converged']='未找到解。请检查是否存在现实中不可能出现的数值，例如管径为零。';

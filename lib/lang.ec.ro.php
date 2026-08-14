@@ -232,7 +232,7 @@ $ec_lang['mtc_pi_tip']='Extrapolare în afara intervalului de date de 0,28–0,3
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Conform Isbash (1936) și Comitatul Maricopa, Arizona, SUA.">Dimensiunea necesară a rocii unghiulare de fund, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Conform Isbash (1936) și Comitatul Maricopa, Arizona, SUA.">Dimensiunea necesară a rocii unghiulare pentru taluzul 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Conform Isbash (1936) și Comitatul Maricopa, Arizona, SUA.">Dimensiunea necesară a rocii unghiulare pentru taluzul 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='Dimensiunea necesară a rocii unghiulare, D<sub>50</sub> (Maynord, Ruff și Abt 1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="Conform Maynord, Ruff și Abt (1989). Într-o curbă, roca este dimensionată pentru o viteză de curbă de 4/3 din viteza medie, conform California Division of Highways (1970); valoarea proprie de 1,5 a lui Maynord se aplică canalelor naturale.">Dimensiunea necesară a rocii unghiulare, D<sub>50</sub> (Maynord, Ruff și Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Dimensiunea necesară a rocii unghiulare, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Viteză rezonabilă pentru ipotezele de curgere uniformă.';
 $ec_lang['mtc_vel_low']='Viteză mică — risc de sedimentare.';
@@ -636,7 +636,7 @@ $ec_lang['lpn_field_head']='Sarcină';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Nivelul suprafeței apei în rezervor, măsurat ca înălțime, nu ca presiune. Lăsați necompletat pentru a plasa suprafața apei la cota rezervorului.';
 $ec_lang['lpn_close']='Închidere';
-$ec_lang['lpn_empty_hint']='Începeți adăugând o imagine de fundal sau un rezervor din bara de instrumente, sau deschideți Fișier, Proiect nou pentru a porni de la un exemplu.';
+$ec_lang['lpn_empty_hint']='Utilizați Fișier, Proiect nou pentru a deschide un exemplu. Sau începeți prin a adăuga un rezervor, o joncțiune și o conductă din bara de instrumente.';
 $ec_lang['lpn_tool_undo']='Anulare';
 $ec_lang['lpn_confirm_example']='Aceasta adaugă exemplul la rețeaua pe care o aveți deja. Continuați?';
 $ec_lang['lpn_field_diameter']='Diametru';
@@ -764,12 +764,12 @@ $ec_lang['lpn_inp_bad_file']='Acel fișier nu a putut fi citit ca fișier de re�
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='Acesta pare a fi un fișier .net EPANET, dar această pagină nu l-a putut citi. Deschideți-l în EPANET și folosiți acolo comanda Fișier, Export, Rețea pentru a-l salva ca fișier .inp, apoi importați acel fișier.';
 $ec_lang['lpn_inp_report_heading']='S-a importat {file}';
-$ec_lang['lpn_inp_report_counts']='{nodes} joncțiuni și rezervoare, {links} conducte și pompe, în {units}.';
+$ec_lang['lpn_inp_report_counts']='{nodes} joncțiuni, rezervoare și bazine, {links} conducte, pompe și vane, în {units}.';
 $ec_lang['lpn_inp_report_clean']='Totul din fișier a fost preluat. Nimic nu a fost omis.';
 $ec_lang['lpn_inp_report_lead']='Această pagină nu conține tot ce conține EPANET. Iată ce s-a schimbat la import:';
 $ec_lang['lpn_inp_drop_headloss']='Acest fișier nu folosește formula Hazen-Williams. Această pagină calculează cu Hazen-Williams, deci numerele de rugozitate ale conductelor au fost păstrate exact așa cum au fost scrise, dar rezultatele de aici nu vor coincide cu cele din EPANET.';
-$ec_lang['lpn_inp_drop_tcv']='Aceste vane de reglare a debitului (TCV) au fost importate ca și conducte foarte scurte care poartă aceeași pierdere locală. Apa se comportă la fel; elementul nu este același.';
-$ec_lang['lpn_inp_drop_valve']='Aceste vane controlează presiunea sau debitul, iar această pagină nu are un astfel de element. Au fost importate ca și conducte deschise, deci rețeaua rămâne conectată, dar nimic nu o mai controlează.';
+$ec_lang['lpn_inp_drop_tcv']='Aceste vane de reglare au fost importate ca vane de reglare, păstrând pierderea pe care le-o dă fișierul. Oricare dintre cei doi rezolvitori le poate calcula.';
+$ec_lang['lpn_inp_drop_valve']='Aceste vane sunt descrise printr-o curbă sau printr-o pierdere de presiune fixă, iar această pagină nu are un astfel de element. Au fost importate ca și conducte deschise, deci rețeaua rămâne conectată, dar nimic nu mai reține presiunea sau debitul acolo.';
 $ec_lang['lpn_inp_drop_cv']='În EPANET aceste conducte lasă apa să treacă într-un singur sens. Au fost importate ca și conducte obișnuite, deci apa poate curge acum în ambele sensuri prin ele.';
 $ec_lang['lpn_inp_drop_demands']='Aceste joncțiuni aveau mai mult de o cerință. Cerințele au fost însumate într-o singură cerință, pe care o păstrează această pagină.';
 $ec_lang['lpn_inp_drop_patterns']='Modelele de variație a cerinței au fost omise. Această pagină rezolvă un singur moment în timp, deci fiecare cerință este numărul scris în fișier.';
@@ -938,9 +938,9 @@ $ec_lang['lpn_status_closed_opened']='S-a închis {closed}. Se afișează acum {
 $ec_lang['lpn_status_closed_empty']='S-a închis {closed}. S-a pornit un proiect nou, gol.';
 $ec_lang['lpn_storage_full']='Nu s-a salvat. Spațiul de stocare al browserului este plin sau indisponibil, deci modificările dvs. recente se vor pierde la închiderea acestei file.';
 $ec_lang['lpn_notes_1_term']='Regim permanent';
-$ec_lang['lpn_notes_1_def']='Rezolvă un singur set de cerințe odată, folosind același algoritm de gradient global pe care îl folosește EPANET. Nu modelează modul în care rețeaua se schimbă în timp.';
+$ec_lang['lpn_notes_1_def']='Rezolvă un singur set de cerințe odată, folosind același algoritm de gradient global pe care îl folosește EPANET. Nu modelează modul în care rețeaua se schimbă în timp. Un bazin este menținut la nivelul de apă pe care îl introduceți: în cadrul unei singure soluții, nu se golește și nu se umple niciodată.';
 $ec_lang['lpn_notes_2_term']='Nu este modelat';
-$ec_lang['lpn_notes_2_def']='Bazinele de acumulare, calitatea apei și vanele de control care se deschid și se închid singure (PRV, PSV, FCV) nu sunt modelate. O conductă poate purta o pierdere locală fixă, dar nu o vană a cărei stare deschisă sau închisă depinde de debitul care este calculat.';
+$ec_lang['lpn_notes_2_def']='Calitatea apei și cerințele care variază pe parcursul zilei nu sunt modelate. Despre vane: o vană de reglare funcționează cu oricare dintre cei doi rezolvitori, iar vanele care se deschid și se închid singure (PRV, PSV, FCV) sunt rezolvate cu rezolvitorul EPANET, pe care această pagină îl activează singură atunci când rețeaua dvs. conține una.';
 $ec_lang['lpn_notes_3_term']='Salvarea proiectelor';
 $ec_lang['lpn_notes_3_def']='Fiecare proiect este o filă, iar fiecare filă este salvată în acest browser pe măsură ce lucrați. Ștergerea datelor browserului le șterge pe toate, deci păstrați-vă munca într-un fișier: Fișier, Salvare ca. Un asterisc pe o filă înseamnă că aceasta conține modificări care nu se află într-un fișier. Nimic nu este scris vreodată într-un fișier decât dacă solicitați. În unele browsere un proiect se conectează la fișierul în care îl salvați, iar Fișier, Salvare scrie de atunci încolo în același fișier; în altele nicio conexiune nu este posibilă, deci Salvare este dezactivată și este disponibilă doar Salvare ca. Atunci când un fișier proiect este păstrat pe o unitate partajată, această pagină vă spune dacă un coleg îl are deja deschis, astfel încât două persoane să nu scrie una peste alta.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -957,7 +957,7 @@ $ec_lang['lpn_notes_epanet_term']='Constantele Hazen-Williams corespund cu EPANE
 $ec_lang['lpn_notes_epanet_def']='În august 2026, coeficientul și exponentul Hazen-Williams au fost modificate pentru a corespunde cu EPANET. Rezultatele pierderii de sarcină diferă față de versiunile anterioare ale acestei pagini cu până la 0,1 procente, ceea ce este mult mai mic decât incertitudinea valorii C în sine.';
 $ec_lang['lpn_id_invalid']='Introduceți un ID fără spații și fără ghilimele.';
 $ec_lang['lpn_id_taken']='Acel ID este deja folosit.';
-$ec_lang['lpn_diag_no_fixed_head']='Adăugați un rezervor. Rețeaua are nevoie de cel puțin un nivel de apă cunoscut înainte de a putea fi rezolvată.';
+$ec_lang['lpn_diag_no_fixed_head']='Adăugați un rezervor sau un bazin. Rețeaua are nevoie de cel puțin un nivel de apă cunoscut înainte de a putea fi rezolvată.';
 $ec_lang['lpn_diag_dangling_link']='O conductă sau o pompă se conectează la un nod care nu mai există:';
 $ec_lang['lpn_diag_unreachable']='Aceste noduri nu au niciun traseu către un rezervor:';
 $ec_lang['lpn_diag_not_converged']='Nu s-a găsit nicio soluție. Verificați dacă există valori imposibile în realitate, cum ar fi un diametru zero.';

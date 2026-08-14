@@ -233,7 +233,7 @@ $ec_lang['mtc_pi_tip']='Ekstrapolasi di luar rentang data 0,28–0,36 ft yang me
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Menurut Isbash (1936) dan Maricopa County, Arizona, AS.">Ukuran batu sudut yang dibutuhkan di dasar, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Menurut Isbash (1936) dan Maricopa County, Arizona, AS.">Ukuran batu sudut yang dibutuhkan di tebing 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Menurut Isbash (1936) dan Maricopa County, Arizona, AS.">Ukuran batu sudut yang dibutuhkan di tebing 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='Ukuran batu sudut yang dibutuhkan, D<sub>50</sub> (Maynord, Ruff, dan Abt 1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="Menurut Maynord, Ruff, dan Abt (1989). Di tikungan, batu diukur untuk kecepatan tikungan sebesar 4/3 dari rata-rata, menurut California Division of Highways (1970); nilai 1,5 dari Maynord sendiri berlaku untuk saluran alami.">Ukuran batu sudut yang dibutuhkan, D<sub>50</sub> (Maynord, Ruff, dan Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Ukuran batu sudut yang dibutuhkan, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Kecepatan wajar untuk asumsi aliran seragam.';
 $ec_lang['mtc_vel_low']='Kecepatan rendah — risiko sedimentasi.';
@@ -637,7 +637,7 @@ $ec_lang['lpn_field_head']='Tinggi tekan';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Ketinggian muka air di reservoir, diukur sebagai suatu ketinggian, bukan tekanan. Biarkan kosong agar muka air berada pada elevasi reservoir.';
 $ec_lang['lpn_close']='Tutup';
-$ec_lang['lpn_empty_hint']='Mulailah dengan menambahkan gambar latar atau reservoir dari bilah alat, atau buka File, Proyek baru untuk memulai dari contoh.';
+$ec_lang['lpn_empty_hint']='Gunakan File, Proyek baru untuk membuka contoh. Atau mulai dengan menambahkan reservoir, simpul, dan pipa dari bilah alat.';
 $ec_lang['lpn_tool_undo']='Urungkan';
 $ec_lang['lpn_confirm_example']='Ini menambahkan contoh ke jaringan yang sudah Anda miliki. Lanjutkan?';
 $ec_lang['lpn_field_diameter']='Diameter';
@@ -765,12 +765,12 @@ $ec_lang['lpn_inp_bad_file']='Berkas itu tidak dapat dibaca sebagai berkas jarin
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='Berkas ini tampaknya berkas .net EPANET, tetapi halaman ini tidak dapat membacanya. Buka berkas itu di EPANET dan gunakan perintah File, Export, Network di sana untuk menyimpannya sebagai berkas .inp, lalu impor berkas tersebut.';
 $ec_lang['lpn_inp_report_heading']='Berkas {file} diimpor';
-$ec_lang['lpn_inp_report_counts']='{nodes} simpul dan reservoir, {links} pipa dan pompa, dalam satuan {units}.';
+$ec_lang['lpn_inp_report_counts']='{nodes} simpul, reservoir dan tangki, {links} pipa, pompa dan katup, dalam satuan {units}.';
 $ec_lang['lpn_inp_report_clean']='Semua isi berkas berhasil dibawa masuk. Tidak ada yang tertinggal.';
 $ec_lang['lpn_inp_report_lead']='Halaman ini tidak menampung semua yang dimiliki EPANET. Berikut yang berubah saat impor:';
 $ec_lang['lpn_inp_drop_headloss']='Berkas ini tidak menggunakan rumus Hazen-Williams. Halaman ini menghitung dengan Hazen-Williams, sehingga angka kekasaran pipa disimpan persis seperti tertulis, tetapi hasilnya di sini tidak akan sama dengan hasil di EPANET.';
-$ec_lang['lpn_inp_drop_tcv']='Katup kendali throttle ini masuk sebagai pipa sangat pendek yang membawa kehilangan lokal yang sama. Perilaku airnya sama; elemennya tidak sama.';
-$ec_lang['lpn_inp_drop_valve']='Katup-katup ini mengendalikan tekanan atau debit, dan halaman ini tidak memiliki elemen semacam itu. Katup-katup tersebut masuk sebagai pipa terbuka, sehingga jaringan tetap tersambung, tetapi tidak ada lagi yang mengendalikannya.';
+$ec_lang['lpn_inp_drop_tcv']='Katup throttle ini masuk sebagai katup throttle, dengan kehilangan yang sama seperti pada berkas asal. Kedua penyelesai dapat menghitungnya.';
+$ec_lang['lpn_inp_drop_valve']='Katup-katup ini dijelaskan dengan kurva atau dengan penurunan tekanan tetap, dan halaman ini tidak memiliki elemen semacam itu. Katup-katup tersebut masuk sebagai pipa terbuka, sehingga jaringan tetap tersambung, tetapi tidak ada lagi yang menahan tekanan atau debit di titik itu.';
 $ec_lang['lpn_inp_drop_cv']='Di EPANET, pipa-pipa ini hanya melewatkan air dalam satu arah. Pipa-pipa tersebut masuk sebagai pipa biasa, sehingga air kini dapat mengalir ke kedua arah melaluinya.';
 $ec_lang['lpn_inp_drop_demands']='Simpul-simpul ini memiliki lebih dari satu kebutuhan. Kebutuhan-kebutuhan tersebut dijumlahkan menjadi satu kebutuhan tunggal yang ditampung halaman ini.';
 $ec_lang['lpn_inp_drop_patterns']='Pola kebutuhan tidak disertakan. Halaman ini menyelesaikan satu saat waktu, sehingga setiap kebutuhan adalah angka yang tertulis di berkas.';
@@ -939,9 +939,9 @@ $ec_lang['lpn_status_closed_opened']='Menutup {closed}. Kini menampilkan {opened
 $ec_lang['lpn_status_closed_empty']='Menutup {closed}. Memulai proyek kosong baru.';
 $ec_lang['lpn_storage_full']='Tidak tersimpan. Penyimpanan peramban penuh atau tidak tersedia, sehingga perubahan terbaru Anda akan hilang saat Anda menutup tab ini.';
 $ec_lang['lpn_notes_1_term']='Keadaan tunak';
-$ec_lang['lpn_notes_1_def']='Menyelesaikan satu set kebutuhan pada satu waktu, menggunakan algoritme gradien global yang sama dengan yang digunakan EPANET. Tidak memodelkan bagaimana jaringan berubah seiring waktu.';
+$ec_lang['lpn_notes_1_def']='Menyelesaikan satu set kebutuhan pada satu waktu, menggunakan algoritme gradien global yang sama dengan yang digunakan EPANET. Tidak memodelkan bagaimana jaringan berubah seiring waktu. Tangki dipertahankan pada muka air yang Anda berikan: dalam satu penyelesaian, tangki tidak pernah surut dan tidak pernah penuh.';
 $ec_lang['lpn_notes_2_term']='Tidak dimodelkan';
-$ec_lang['lpn_notes_2_def']='Tangki, kualitas air, dan katup kendali yang membuka dan menutup secara otomatis (PRV, PSV, FCV) tidak dimodelkan. Sebuah pipa dapat membawa kehilangan lokal tetap, tetapi bukan katup yang keadaan buka/tutupnya bergantung pada debit yang sedang diselesaikan.';
+$ec_lang['lpn_notes_2_def']='Kualitas air dan kebutuhan yang berubah sepanjang hari tidak dimodelkan. Untuk katup: katup throttle dihitung oleh kedua penyelesai, sedangkan katup yang membuka dan menutup secara otomatis (PRV, PSV, FCV) dihitung dengan penyelesai EPANET, yang diaktifkan sendiri oleh halaman ini bila jaringan Anda memilikinya.';
 $ec_lang['lpn_notes_3_term']='Menyimpan proyek';
 $ec_lang['lpn_notes_3_def']='Setiap proyek adalah sebuah tab, dan setiap tab disimpan di peramban ini saat Anda bekerja. Membersihkan data peramban Anda akan menghapus semuanya, jadi simpan pekerjaan Anda ke berkas: File, Simpan sebagai. Tanda bintang pada tab berarti tab itu berisi perubahan yang belum ada di berkas. Tidak ada yang pernah ditulis ke berkas kecuali Anda memintanya. Pada sebagian peramban, sebuah proyek tersambung ke berkas yang Anda simpan, dan File, Simpan sejak itu menulis kembali ke berkas yang sama itu; pada peramban lain sambungan tidak dimungkinkan, sehingga Simpan dinonaktifkan dan hanya Simpan sebagai yang tersedia. Ketika berkas proyek disimpan di drive bersama, halaman ini memberi tahu Anda jika rekan kerja sudah membukanya, sehingga dua orang tidak saling menimpa pekerjaan.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -958,7 +958,7 @@ $ec_lang['lpn_notes_epanet_term']='Konstanta Hazen-Williams disesuaikan dengan E
 $ec_lang['lpn_notes_epanet_def']='Pada Agustus 2026, koefisien dan eksponen Hazen-Williams diubah agar sesuai dengan EPANET. Hasil kehilangan tinggi tekan berbeda dari versi halaman ini sebelumnya hingga 0.1 persen, yang jauh lebih kecil daripada ketidakpastian pada nilai C itu sendiri.';
 $ec_lang['lpn_id_invalid']='Masukkan ID tanpa spasi dan tanpa tanda kutip.';
 $ec_lang['lpn_id_taken']='ID itu sudah digunakan.';
-$ec_lang['lpn_diag_no_fixed_head']='Tambahkan reservoir. Jaringan memerlukan setidaknya satu muka air yang diketahui sebelum dapat diselesaikan.';
+$ec_lang['lpn_diag_no_fixed_head']='Tambahkan reservoir atau tangki. Jaringan memerlukan setidaknya satu muka air yang diketahui sebelum dapat diselesaikan.';
 $ec_lang['lpn_diag_dangling_link']='Sebuah pipa atau pompa tersambung ke simpul yang sudah tidak ada:';
 $ec_lang['lpn_diag_unreachable']='Simpul-simpul ini tidak memiliki jalur ke reservoir:';
 $ec_lang['lpn_diag_not_converged']='Tidak ditemukan solusi. Periksa apakah ada nilai yang tidak mungkin terjadi di dunia nyata, seperti diameter nol.';

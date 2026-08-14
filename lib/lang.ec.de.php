@@ -233,7 +233,7 @@ $ec_lang['mtc_pi_tip']='Extrapolation außerhalb des Datenbereichs von 0,28–0,
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Nach Isbash (1936) und Maricopa County, Arizona, USA.">Erforderliche Körnung kantenreicher Steine Sohle, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Nach Isbash (1936) und Maricopa County, Arizona, USA.">Erforderliche Körnung kantenreicher Steine Böschung 1, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Nach Isbash (1936) und Maricopa County, Arizona, USA.">Erforderliche Körnung kantenreicher Steine Böschung 2, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='Erforderliche Körnung kantenreicher Steine, D<sub>50</sub> (Maynord, Ruff und Abt 1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="Nach Maynord, Ruff und Abt (1989). In einer Kurve wird das Gestein für eine Kurvengeschwindigkeit von 4/3 der mittleren Geschwindigkeit bemessen, nach California Division of Highways (1970); Maynords eigener Wert von 1,5 gilt für natürliche Gerinne.">Erforderliche Körnung kantenreicher Steine, D<sub>50</sub> (Maynord, Ruff und Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Erforderliche Körnung kantenreicher Steine, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Geschwindigkeit plausibel für Gleichströmungsannahmen.';
 $ec_lang['mtc_vel_low']='Geschwindigkeit niedrig – Sedimentationsrisiko.';
@@ -649,7 +649,7 @@ $ec_lang['lpn_field_tank_diameter']='Tankdurchmesser';
 $ec_lang['lpn_field_tank_diameter_tip']='Breite des Tanks von Seite zu Seite. Sie wird in derselben Einheit wie die Höhe angegeben, nicht in der Einheit für den Rohrdurchmesser. Sie bestimmt, wie viel Wasser eine bestimmte Tiefe fasst.';
 $ec_lang['lpn_tank_head_tip']='Höhe des Wasserspiegels im Tank: die Höhe des Tankbodens zuzüglich der Wassertiefe. Dies ist der Stand, den der Löser für den Tank verwendet.';
 $ec_lang['lpn_close']='Schließen';
-$ec_lang['lpn_empty_hint']='Beginnen Sie, indem Sie über die Werkzeugleiste ein Hintergrundbild oder ein Reservoir hinzufügen, oder öffnen Sie Datei, Neues Projekt, um mit einem Beispiel zu beginnen.';
+$ec_lang['lpn_empty_hint']='Verwenden Sie Datei, Neues Projekt, um ein Beispiel zu öffnen. Oder beginnen Sie, indem Sie über die Werkzeugleiste ein Reservoir, einen Entnahmeknoten und ein Rohr hinzufügen.';
 $ec_lang['lpn_tool_undo']='Rückgängig';
 $ec_lang['lpn_confirm_example']='Dies fügt das Beispiel zu dem bereits vorhandenen Netz hinzu. Fortfahren?';
 $ec_lang['lpn_field_diameter']='Durchmesser';
@@ -777,14 +777,14 @@ $ec_lang['lpn_inp_bad_file']='Diese Datei konnte nicht als EPANET-Netzdatei gele
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='Dies sieht wie eine EPANET-.net-Datei aus, konnte von dieser Seite aber nicht gelesen werden. Öffnen Sie sie in EPANET, und speichern Sie sie dort mit dem Befehl Datei, Exportieren, Netz als .inp-Datei; importieren Sie anschließend diese.';
 $ec_lang['lpn_inp_report_heading']='{file} importiert';
-$ec_lang['lpn_inp_report_counts']='{nodes} Entnahmeknoten und Reservoire, {links} Rohre und Pumpen, in {units}.';
+$ec_lang['lpn_inp_report_counts']='{nodes} Entnahmeknoten, Reservoire und Tanks, {links} Rohre, Pumpen und Ventile, in {units}.';
 $ec_lang['lpn_inp_report_clean']='Alles aus der Datei wurde übernommen. Nichts wurde weggelassen.';
 $ec_lang['lpn_inp_report_lead']='Diese Seite bildet nicht alles ab, was EPANET kann. Hier ist, was sich beim Import geändert hat:';
 $ec_lang['lpn_inp_drop_headloss']='Diese Datei verwendet nicht die Hazen-Williams-Formel. Diese Seite rechnet mit Hazen-Williams, daher wurden die Rauheitswerte der Rohre genau wie geschrieben übernommen, aber die hier angezeigten Ergebnisse stimmen nicht mit den Ergebnissen in EPANET überein.';
 $ec_lang['lpn_inp_drop_tank_curve']='Diese Tanks haben keine geraden Seitenwände: Die Datei gibt ihre Form als Kurve an. Sie wurden als runde Tanks übernommen, jeweils mit dem in der Datei angegebenen Durchmesser. Der Wasserspiegel entspricht weiterhin dem in der Datei festgelegten Wert, sodass die Ergebnisse übereinstimmen; nur die Form wurde vereinfacht.';
-$ec_lang['lpn_inp_drop_tcv']='Diese Drosselventile (TCV) wurden als sehr kurze Rohre mit demselben Einzelverlust übernommen. Das Wasser verhält sich gleich; das Element ist nicht dasselbe.';
+$ec_lang['lpn_inp_drop_tcv']='Diese Drosselventile wurden als Drosselventile übernommen und behalten den Verlust, den die Datei ihnen vorgibt. Beide Löser können sie berechnen.';
 $ec_lang['lpn_inp_drop_valve_active']='Diese Ventile regeln Druck oder Durchfluss und öffnen und schließen sich selbstständig, wenn sich das Wasser ändert. Beim Import ist nichts verloren gegangen; diese Seite berechnet sie mit dem EPANET-Löser und schaltet diesen Löser für dieses Netz automatisch ein.';
-$ec_lang['lpn_inp_drop_valve']='Diese Ventile steuern Druck oder Durchfluss, und diese Seite kennt kein solches Element. Sie wurden als offene Rohre übernommen, sodass das Netz weiterhin verbunden ist, aber nichts mehr gesteuert wird.';
+$ec_lang['lpn_inp_drop_valve']='Diese Ventile werden durch eine Kennlinie oder einen festen Druckabfall beschrieben, und diese Seite kennt kein solches Element. Sie wurden als offene Rohre übernommen, sodass das Netz weiterhin verbunden ist, aber dort nichts mehr Druck oder Durchfluss hält.';
 $ec_lang['lpn_inp_drop_cv']='In EPANET lassen diese Rohre Wasser nur in eine Richtung fließen. Sie wurden als gewöhnliche Rohre übernommen, sodass das Wasser jetzt in beide Richtungen fließen kann.';
 $ec_lang['lpn_inp_drop_demands']='Diese Entnahmeknoten hatten mehr als eine Entnahme. Die Entnahmen wurden zu der einzelnen Entnahme addiert, die diese Seite führt.';
 $ec_lang['lpn_inp_drop_patterns']='Entnahmemuster wurden nicht übernommen. Diese Seite löst einen einzelnen Zeitpunkt, daher ist jede Entnahme die in der Datei angegebene Zahl.';
@@ -953,9 +953,9 @@ $ec_lang['lpn_status_closed_opened']='{closed} geschlossen. Zeigt jetzt {opened}
 $ec_lang['lpn_status_closed_empty']='{closed} geschlossen. Ein neues leeres Projekt wurde gestartet.';
 $ec_lang['lpn_storage_full']='Nicht gespeichert. Der Browserspeicher ist voll oder nicht verfügbar, daher gehen Ihre letzten Änderungen beim Schließen dieses Tabs verloren.';
 $ec_lang['lpn_notes_1_term']='Stationärer Zustand';
-$ec_lang['lpn_notes_1_def']='Löst jeweils einen einzelnen Satz von Entnahmen, mit demselben globalen Gradientenverfahren, das auch EPANET verwendet. Es wird nicht abgebildet, wie sich das Netz im Zeitverlauf ändert.';
+$ec_lang['lpn_notes_1_def']='Löst jeweils einen einzelnen Satz von Entnahmen, mit demselben globalen Gradientenverfahren, das auch EPANET verwendet. Es wird nicht abgebildet, wie sich das Netz im Zeitverlauf ändert. Ein Tank wird auf dem von Ihnen angegebenen Wasserspiegel gehalten: Innerhalb einer Lösung läuft er nie leer und läuft nie über.';
 $ec_lang['lpn_notes_2_term']='Nicht abgebildet';
-$ec_lang['lpn_notes_2_def']='Hochbehälter, Wasserqualität und Regelventile, die selbsttätig öffnen und schließen (PRV, PSV, FCV), werden nicht abgebildet. Ein Rohr kann einen festen Einzelverlust tragen, aber kein Ventil, dessen offener oder geschlossener Zustand vom gerade berechneten Durchfluss abhängt.';
+$ec_lang['lpn_notes_2_def']='Wasserqualität und im Tagesverlauf veränderliche Entnahmen werden nicht abgebildet. Zu den Ventilen: Ein Drosselventil funktioniert mit beiden Lösern, und die Ventile, die sich selbstständig öffnen und schließen (PRV, PSV, FCV), werden mit dem EPANET-Löser berechnet, den diese Seite automatisch einschaltet, sobald Ihr Netz eines enthält.';
 $ec_lang['lpn_notes_3_term']='Projekte speichern';
 $ec_lang['lpn_notes_3_def']='Jedes Projekt ist ein Tab, und jeder Tab wird während der Arbeit in diesem Browser gespeichert. Das Löschen Ihrer Browserdaten löscht sie alle, bewahren Sie Ihre Arbeit deshalb in einer Datei auf: Datei, Speichern unter. Ein Sternchen an einem Tab bedeutet, dass er Änderungen enthält, die nicht in einer Datei stehen. Es wird nie in eine Datei geschrieben, ohne dass Sie es verlangen. In manchen Browsern verbindet sich ein Projekt mit der Datei, in der Sie es speichern, und Datei, Speichern schreibt von da an in dieselbe Datei zurück; in anderen ist keine Verbindung möglich, sodass Speichern deaktiviert ist und nur Speichern unter verfügbar ist. Wird eine Projektdatei auf einem gemeinsam genutzten Laufwerk aufbewahrt, teilt diese Seite mit, ob ein Kollege sie bereits geöffnet hat, damit niemand über den anderen schreibt.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -972,7 +972,7 @@ $ec_lang['lpn_notes_epanet_term']='Hazen-Williams-Konstanten stimmen mit EPANET 
 $ec_lang['lpn_notes_epanet_def']='Im August 2026 wurden der Hazen-Williams-Koeffizient und -Exponent geändert, damit sie mit EPANET übereinstimmen. Die Druckverlust-Ergebnisse weichen um bis zu 0,1 Prozent von früheren Versionen dieser Seite ab, was weit kleiner ist als die Unsicherheit im C-Wert selbst.';
 $ec_lang['lpn_id_invalid']='Geben Sie eine ID ohne Leerzeichen und ohne Anführungszeichen ein.';
 $ec_lang['lpn_id_taken']='Diese ID wird bereits verwendet.';
-$ec_lang['lpn_diag_no_fixed_head']='Fügen Sie ein Reservoir hinzu. Das Netz benötigt mindestens einen bekannten Wasserspiegel, bevor es gelöst werden kann.';
+$ec_lang['lpn_diag_no_fixed_head']='Fügen Sie ein Reservoir oder einen Tank hinzu. Das Netz benötigt mindestens einen bekannten Wasserspiegel, bevor es gelöst werden kann.';
 $ec_lang['lpn_diag_dangling_link']='Ein Rohr oder eine Pumpe ist mit einem Knoten verbunden, der nicht mehr existiert:';
 $ec_lang['lpn_diag_unreachable']='Diese Knoten haben keinen Weg zu einem Reservoir:';
 $ec_lang['lpn_diag_valve_needs_epanet']='Diese Ventile öffnen und schließen sich selbstständig, und nur der EPANET-Löser kann sie berechnen. Der EPANET-Löser konnte nicht geladen werden, daher fehlen diese Ergebnisse:';

@@ -234,7 +234,7 @@ $ec_lang['mtc_pi_tip']='Extrapolación fuera del rango de datos de 0,28–0,36 f
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Según Isbash (1936) y el condado de Maricopa, Arizona, EE. UU.">Tamaño de roca angular requerido en el fondo, D<sub>50</sub> (Isbash y MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Según Isbash (1936) y el condado de Maricopa, Arizona, EE. UU.">Tamaño de roca angular requerido en el lado 1, D<sub>50</sub> (Isbash y MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Según Isbash (1936) y el condado de Maricopa, Arizona, EE. UU.">Tamaño de roca angular requerido en el lado 2, D<sub>50</sub> (Isbash y MC) <span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='Tamaño de roca angular requerido, D<sub>50</sub>, según Maynord, Ruff, y Abt (1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="Según Maynord, Ruff, y Abt (1989). En una curva, la roca se dimensiona para una velocidad de curva de 4/3 de la media, según el Departamento de Carreteras de California (1970); el valor propio de Maynord de 1.5 se aplica a canales naturales.">Tamaño de roca angular requerido, D<sub>50</sub> (Maynord, Ruff, y Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Tamaño de roca angular requerido, D<sub>50</sub>, según Searcy (1967)';
 $ec_lang['mtc_vel_ok']='Velocidad razonable para supuestos de flujo uniforme.';
 $ec_lang['mtc_vel_low']='Velocidad baja — riesgo de sedimentación.';
@@ -638,7 +638,7 @@ $ec_lang['lpn_field_head']='Carga';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Nivel de la superficie del agua en el embalse, medido como una altura, no como una presión. Déjelo en blanco para colocar la superficie del agua en la elevación del embalse.';
 $ec_lang['lpn_close']='Cerrar';
-$ec_lang['lpn_empty_hint']='Para comenzar, use la barra de herramientas para agregar una imagen de fondo o un embalse, o para iniciar un Nuevo proyecto a partir de un ejemplo.';
+$ec_lang['lpn_empty_hint']='Use Archivo, Nuevo proyecto para abrir un ejemplo. O comience agregando un embalse, un nudo y una tubería desde la barra de herramientas.';
 $ec_lang['lpn_tool_undo']='Deshacer';
 $ec_lang['lpn_confirm_example']='Esto agrega el ejemplo a la red que ya tiene. ¿Continuar?';
 $ec_lang['lpn_field_diameter']='Diámetro';
@@ -766,12 +766,12 @@ $ec_lang['lpn_inp_bad_file']='Ese archivo no se pudo leer como un archivo de red
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='Esto parece un archivo .net de EPANET, pero esta página no pudo leerlo. Ábralo en EPANET y use allí el comando Archivo, Exportar, Red para guardarlo como un archivo .inp, y luego importe ese archivo.';
 $ec_lang['lpn_inp_report_heading']='Se importó {file}';
-$ec_lang['lpn_inp_report_counts']='{nodes} nudos y embalses, {links} tuberías y bombas, en {units}.';
+$ec_lang['lpn_inp_report_counts']='{nodes} nudos, embalses y depósitos, {links} tuberías, bombas y válvulas, en {units}.';
 $ec_lang['lpn_inp_report_clean']='Todo el contenido del archivo se incorporó. No se dejó nada fuera.';
 $ec_lang['lpn_inp_report_lead']='Esta página no contiene todo lo que EPANET contiene. Esto es lo que cambió al importar:';
 $ec_lang['lpn_inp_drop_headloss']='Este archivo no usa la fórmula de Hazen-Williams. Esta página calcula con Hazen-Williams, así que los valores de rugosidad de la tubería se conservaron exactamente como estaban escritos, pero los resultados aquí no coincidirán con los de EPANET.';
-$ec_lang['lpn_inp_drop_tcv']='Estas válvulas de control de estrangulamiento se incorporaron como tuberías muy cortas que llevan la misma pérdida localizada. El agua se comporta igual, pero el elemento no es el mismo.';
-$ec_lang['lpn_inp_drop_valve']='Estas válvulas controlan la presión o el caudal, y esta página no tiene un elemento así. Se incorporaron como tuberías abiertas, así que la red sigue conectada, pero ya nada la controla.';
+$ec_lang['lpn_inp_drop_tcv']='Estas válvulas de estrangulamiento se incorporaron como válvulas de estrangulamiento, conservando la misma pérdida que indica el archivo. Cualquiera de los dos solucionadores puede resolverlas.';
+$ec_lang['lpn_inp_drop_valve']='Estas válvulas se describen mediante una curva o una caída de presión fija, y esta página no tiene un elemento así. Se incorporaron como tuberías abiertas, así que la red sigue conectada, pero ya nada mantiene la presión o el caudal allí.';
 $ec_lang['lpn_inp_drop_cv']='En EPANET estas tuberías dejan pasar el agua en un solo sentido. Se incorporaron como tuberías comunes, así que ahora el agua puede fluir en cualquier sentido por ellas.';
 $ec_lang['lpn_inp_drop_demands']='Estos nudos tenían más de una demanda. Las demandas se sumaron en la única demanda que maneja esta página.';
 $ec_lang['lpn_inp_drop_patterns']='Se dejaron fuera los patrones de demanda. Esta página resuelve un solo instante, así que cada demanda es el número escrito en el archivo.';
@@ -940,9 +940,9 @@ $ec_lang['lpn_status_closed_opened']='Se cerró {closed}. Ahora se muestra {open
 $ec_lang['lpn_status_closed_empty']='Se cerró {closed}. Se inició un nuevo proyecto vacío.';
 $ec_lang['lpn_storage_full']='No guardado. El almacenamiento del navegador está lleno o no disponible, así que sus cambios recientes se perderán al cerrar esta pestaña.';
 $ec_lang['lpn_notes_1_term']='Estado estacionario';
-$ec_lang['lpn_notes_1_def']='Resuelve un conjunto de demandas a la vez, usando el mismo método del gradiente que usa EPANET. No modela cómo cambia la red con el tiempo.';
+$ec_lang['lpn_notes_1_def']='Resuelve un conjunto de demandas a la vez, usando el mismo método del gradiente que usa EPANET. No modela cómo cambia la red con el tiempo. Un depósito se mantiene al nivel de agua que usted indica: dentro de una misma solución nunca se vacía ni se llena.';
 $ec_lang['lpn_notes_2_term']='No modelado';
-$ec_lang['lpn_notes_2_def']='No se modelan los depósitos, la calidad del agua, ni las válvulas de control que se abren y cierran por sí solas (PRV, PSV, FCV). Una tubería puede llevar una pérdida localizada fija, pero no una válvula cuyo estado abierto o cerrado dependa del caudal que se está resolviendo.';
+$ec_lang['lpn_notes_2_def']='No se modelan la calidad del agua ni las demandas que cambian a lo largo del día. En cuanto a las válvulas: una válvula de estrangulamiento funciona con cualquiera de los dos solucionadores, y las válvulas que se abren y cierran por sí solas (PRV, PSV, FCV) se resuelven con el solucionador de EPANET, que esta página activa por sí sola cuando su red tiene una.';
 $ec_lang['lpn_notes_3_term']='Guardado de proyectos';
 $ec_lang['lpn_notes_3_def']='Cada proyecto es una pestaña, y cada pestaña se guarda en este navegador mientras usted trabaja. Borrar los datos de su navegador los elimina todos, así que guarde su trabajo en un archivo: Archivo, Guardar como. Un asterisco en una pestaña indica que contiene cambios que no están en un archivo. Nada se escribe nunca en un archivo a menos que usted lo pida. En algunos navegadores, un proyecto se conecta al archivo en el que lo guarda, y Archivo, Guardar escribe de vuelta a ese mismo archivo de ahí en adelante; en otros no es posible ninguna conexión, así que Guardar está deshabilitado y solo está disponible Guardar como. Cuando un archivo de proyecto se mantiene en una unidad compartida, esta página le indica si un colega ya lo tiene abierto, para que dos personas no escriban una sobre la otra.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -959,7 +959,7 @@ $ec_lang['lpn_notes_epanet_term']='Las constantes de Hazen-Williams coinciden co
 $ec_lang['lpn_notes_epanet_def']='En agosto de 2026 se cambiaron el coeficiente y el exponente de Hazen-Williams para coincidir con EPANET. Los resultados de pérdida de carga difieren de los de las versiones anteriores de esta página hasta en un 0,1 por ciento, mucho menos que la incertidumbre del propio valor de C.';
 $ec_lang['lpn_id_invalid']='Ingrese un ID sin espacios y sin comillas.';
 $ec_lang['lpn_id_taken']='Ese ID ya está en uso.';
-$ec_lang['lpn_diag_no_fixed_head']='Agregue un embalse. La red necesita al menos un nivel de agua conocido antes de poder resolverse.';
+$ec_lang['lpn_diag_no_fixed_head']='Agregue un embalse o un depósito. La red necesita al menos un nivel de agua conocido antes de poder resolverse.';
 $ec_lang['lpn_diag_dangling_link']='Una tubería o bomba se conecta a un nodo que ya no existe:';
 $ec_lang['lpn_diag_unreachable']='Estos nodos no tienen ruta hacia un embalse:';
 $ec_lang['lpn_diag_not_converged']='No se encontró una solución. Revise si hay valores que no pueden ser reales, como un diámetro de cero.';

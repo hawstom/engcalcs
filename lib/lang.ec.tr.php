@@ -234,7 +234,7 @@ $ec_lang['mtc_pi_tip']='Bu denklemin türetildiği 0.28–0.36 ft veri seti aral
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre.">Taban için gerekli köşeli taş boyutu, D<sub>50</sub> (Isbash ve MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre.">Yan eğim 1 için gerekli köşeli taş boyutu, D<sub>50</sub> (Isbash ve MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Isbash (1936) ve Maricopa County, Arizona, US\'ye göre.">Yan eğim 2 için gerekli köşeli taş boyutu, D<sub>50</sub> (Isbash ve MC) <span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='Gerekli köşeli taş boyutu, D<sub>50</sub> (Maynord, Ruff ve Abt 1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="Maynord, Ruff ve Abt\'a (1989) göre. Bir dönemeçte kaya, California Division of Highways\'e (1970) göre ortalamanın 4/3\'ü olan dönemeç hızına göre boyutlandırılır; Maynord\'un kendi 1,5 katsayısı doğal kanallara uygulanır.">Gerekli köşeli taş boyutu, D<sub>50</sub> (Maynord, Ruff ve Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Gerekli köşeli taş boyutu, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Hız, düzgün akış varsayımları için makul.';
 $ec_lang['mtc_vel_low']='Hız düşük — çökelme riski.';
@@ -650,7 +650,7 @@ $ec_lang['lpn_field_tank_diameter']='Depo çapı';
 $ec_lang['lpn_field_tank_diameter_tip']='Deponun bir yanından diğer yanına genişliği. Kot ile aynı birimdedir, boru çapı birimleriyle değil. Verilen bir derinliğin ne kadar su tuttuğunu belirler.';
 $ec_lang['lpn_tank_head_tip']='Depodaki su yüzü kotu: depo tabanı kotu artı su derinliği. Çözücünün depo için kullandığı seviye budur.';
 $ec_lang['lpn_close']='Kapat';
-$ec_lang['lpn_empty_hint']='Başlamak için araç çubuğunu kullanarak bir arka plan görüntüsü veya rezervuar ekleyin, ya da örnekten Yeni proje başlatın.';
+$ec_lang['lpn_empty_hint']='Bir örnek açmak için Dosya, Yeni proje\'yi kullanın. Ya da araç çubuğundan bir rezervuar, düğüm ve boru ekleyerek başlayın.';
 $ec_lang['lpn_tool_undo']='Geri al';
 $ec_lang['lpn_confirm_example']='Bu, örneği mevcut şebekenize ekler. Devam edilsin mi?';
 $ec_lang['lpn_field_diameter']='Çap';
@@ -778,14 +778,14 @@ $ec_lang['lpn_inp_bad_file']='O dosya bir EPANET şebeke dosyası olarak okunama
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='Bu bir EPANET .net dosyasına benziyor, ancak bu sayfa onu okuyamadı. EPANET\'te açın ve orada Dosya, Dışa Aktar, Şebeke komutunu kullanarak .inp dosyası olarak kaydedin, ardından onu içe aktarın.';
 $ec_lang['lpn_inp_report_heading']='{file} içe aktarıldı';
-$ec_lang['lpn_inp_report_counts']='{units} biriminde {nodes} düğüm ve rezervuar, {links} boru ve pompa.';
+$ec_lang['lpn_inp_report_counts']='{units} biriminde {nodes} düğüm, rezervuar ve depo, {links} boru, pompa ve vana.';
 $ec_lang['lpn_inp_report_clean']='Dosyadaki her şey aktarıldı. Hiçbir şey dışarıda bırakılmadı.';
 $ec_lang['lpn_inp_report_lead']='Bu sayfa EPANET\'in tuttuğu her şeyi tutmaz. İçe aktarım sırasında değişenler şunlardır:';
 $ec_lang['lpn_inp_drop_headloss']='Bu dosya Hazen-Williams formülünü kullanmıyor. Bu sayfa Hazen-Williams hesapladığından, boru pürüzlülük sayıları tam olarak yazıldığı gibi korundu, ancak buradaki sonuçlar EPANET\'teki sonuçlarla eşleşmeyecek.';
-$ec_lang['lpn_inp_drop_tcv']='Bu kısma kontrol vanaları, aynı yerel kaybı taşıyan çok kısa borular olarak aktarıldı. Su aynı şekilde davranır; öğe aynı değildir.';
+$ec_lang['lpn_inp_drop_tcv']='Bu kısma vanaları, dosyanın verdiği aynı kaybı taşıyan kısma vanaları olarak aktarıldı. Her iki çözücü de bunları çözebilir.';
 $ec_lang['lpn_inp_drop_tank_curve']='Bu depolar düz kenarlı değildir: dosya şekillerini bir eğri olarak verir. Dosyada yazılı çapıyla yuvarlak depolar olarak aktarıldılar. Su yüzü hâlâ dosyanın belirlediği seviyededir, bu yüzden sonuçlar eşleşir; yalnızca şekil basitleştirildi.';
 $ec_lang['lpn_inp_drop_valve_active']='Bu vanalar basıncı veya debiyi kontrol eder ve su değiştikçe kendiliğinden açılıp kapanır. Aktarım sırasında hiçbir şey kaybolmadı, ve bu sayfa bunları EPANET çözücüsüyle çözer, bu şebeke için o çözücüyü kendiliğinden devreye alarak.';
-$ec_lang['lpn_inp_drop_valve']='Bu vanalar basıncı veya debiyi kontrol eder, ve bu sayfada böyle bir öğe yoktur. Açık borular olarak aktarıldılar, bu yüzden şebeke hâlâ bağlıdır, ancak artık hiçbir şey onu kontrol etmiyor.';
+$ec_lang['lpn_inp_drop_valve']='Bu vanalar bir eğriyle veya sabit bir basınç düşüşüyle tanımlanır, ve bu sayfada böyle bir öğe yoktur. Açık borular olarak aktarıldılar, bu yüzden şebeke hâlâ bağlıdır, ancak artık orada basıncı veya debiyi tutan bir şey yoktur.';
 $ec_lang['lpn_inp_drop_cv']='EPANET\'te bu borular suyun yalnızca tek yönde geçmesine izin verir. Sıradan borular olarak aktarıldılar, bu yüzden artık su içlerinden her iki yönde de akabilir.';
 $ec_lang['lpn_inp_drop_demands']='Bu düğümlerin birden fazla talebi vardı. Talepler, bu sayfanın tuttuğu tek talep içinde toplandı.';
 $ec_lang['lpn_inp_drop_patterns']='Talep desenleri dışarıda bırakıldı. Bu sayfa tek bir zaman anını çözer, bu yüzden her talep dosyada yazılı sayıdır.';
@@ -954,9 +954,9 @@ $ec_lang['lpn_status_closed_opened']='{closed} kapatıldı. Şimdi {opened} gös
 $ec_lang['lpn_status_closed_empty']='{closed} kapatıldı. Yeni boş bir proje başlatıldı.';
 $ec_lang['lpn_storage_full']='Kaydedilmedi. Tarayıcı depolama alanı dolu veya kullanılamıyor, bu yüzden bu sekmeyi kapattığınızda son değişiklikleriniz kaybolacak.';
 $ec_lang['lpn_notes_1_term']='Kararlı durum';
-$ec_lang['lpn_notes_1_def']='EPANET\'in kullandığı aynı küresel gradyan algoritmasını kullanarak seferde bir talep kümesini çözer. Şebekenin zaman içinde nasıl değiştiğini modellemez.';
+$ec_lang['lpn_notes_1_def']='EPANET\'in kullandığı aynı küresel gradyan algoritmasını kullanarak seferde bir talep kümesini çözer. Şebekenin zaman içinde nasıl değiştiğini modellemez. Bir depo, verdiğiniz su seviyesinde tutulur: bir çözüm içinde asla boşalmaz ve asla dolmaz.';
 $ec_lang['lpn_notes_2_term']='Modellenmeyenler';
-$ec_lang['lpn_notes_2_def']='Depolar, su kalitesi ve kendi kendine açılıp kapanan kontrol vanaları (PRV, PSV, FCV) modellenmez. Bir boru sabit bir yerel kayıp taşıyabilir, ancak açık veya kapalı durumu çözülmekte olan debiye bağlı bir vana taşıyamaz.';
+$ec_lang['lpn_notes_2_def']='Su kalitesi ve gün içinde değişen talepler modellenmez. Vanalara gelince: bir kısma vanası her iki çözücüde de çalışır, kendiliğinden açılıp kapanan vanalar (PRV, PSV, FCV) ise, şebekeniz bunlardan birini içerdiğinde bu sayfanın kendiliğinden devreye soktuğu EPANET çözücüsüyle çözülür.';
 $ec_lang['lpn_notes_3_term']='Projeleri kaydetme';
 $ec_lang['lpn_notes_3_def']='Her proje bir sekmedir ve çalışırken her sekme bu tarayıcıya kaydedilir. Tarayıcı verilerinizi temizlemek hepsini siler, bu yüzden çalışmanızı bir dosyada tutun: Dosya, Farklı Kaydet. Bir sekmedeki yıldız işareti, bir dosyada olmayan değişiklikler taşıdığı anlamına gelir. Siz istemedikçe hiçbir şey bir dosyaya yazılmaz. Bazı tarayıcılarda bir proje, kaydettiğiniz dosyaya bağlanır ve Dosya, Kaydet bundan sonra o aynı dosyaya geri yazar; diğerlerinde bağlantı mümkün değildir, bu yüzden Kaydet devre dışıdır ve yalnızca Farklı Kaydet kullanılabilir. Bir proje dosyası paylaşılan bir sürücüde tutulduğunda, bu sayfa bir meslektaşınızın onu zaten açık tutup tutmadığını size söyler, böylece iki kişi birbirinin üzerine yazmaz.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -973,7 +973,7 @@ $ec_lang['lpn_notes_epanet_term']='Hazen-Williams sabitleri artık EPANET ile e�
 $ec_lang['lpn_notes_epanet_def']='Ağustos 2026\'da Hazen-Williams katsayısı ve üssü, EPANET ile eşleşecek şekilde değiştirildi. Yük kaybı sonuçları bu sayfanın önceki sürümlerinden en fazla yüzde 0,1 farklıdır; bu, C değerinin kendisindeki belirsizlikten çok daha küçüktür.';
 $ec_lang['lpn_id_invalid']='Boşluk ve tırnak işareti içermeyen bir kimlik girin.';
 $ec_lang['lpn_id_taken']='Bu kimlik zaten kullanılıyor.';
-$ec_lang['lpn_diag_no_fixed_head']='Bir rezervuar ekleyin. Şebekenin çözülebilmesi için en az bir bilinen su seviyesine ihtiyacı var.';
+$ec_lang['lpn_diag_no_fixed_head']='Bir rezervuar veya depo ekleyin. Şebekenin çözülebilmesi için en az bir bilinen su seviyesine ihtiyacı var.';
 $ec_lang['lpn_diag_dangling_link']='Bir boru veya pompa, artık var olmayan bir düğüme bağlanıyor:';
 $ec_lang['lpn_diag_unreachable']='Bu düğümlerin bir rezervuara giden yolu yok:';
 $ec_lang['lpn_diag_valve_needs_epanet']='Bu vanalar kendiliğinden açılıp kapanır ve yalnızca EPANET çözücüsü bunları hesaplayabilir. EPANET çözücüsü yüklenemedi, bu yüzden şu sonuçlar eksik:';

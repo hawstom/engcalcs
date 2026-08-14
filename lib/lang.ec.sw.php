@@ -234,7 +234,7 @@ $ec_lang['mtc_pi_tip']='Unakadiria nje ya wigo wa data ya futi 0.28–0.36 uliot
 $ec_lang['mtc_d50_bottom']='<span class="ec-help" title="Kulingana na Isbash (1936) na Maricopa County, Arizona, US.">Ukubwa wa jiwe la pembe unaohitajika chini, D<sub>50</sub> (Isbash na MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Kulingana na Isbash (1936) na Maricopa County, Arizona, US.">Ukubwa wa jiwe la pembe unaohitajika kwa mteremko wa upande 1, D<sub>50</sub> (Isbash na MC) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Kulingana na Isbash (1936) na Maricopa County, Arizona, US.">Ukubwa wa jiwe la pembe unaohitajika kwa mteremko wa upande 2, D<sub>50</sub> (Isbash na MC) <span class="ec-tip">?</span></span>';
-$ec_lang['mtc_d50_mra']='Ukubwa wa jiwe la pembe unaohitajika, D<sub>50</sub> (Maynord, Ruff, na Abt 1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="Kulingana na Maynord, Ruff, na Abt (1989). Kwenye kona, jiwe hupimwa kwa kasi ya kona ya 4/3 ya wastani, kulingana na California Division of Highways (1970); thamani ya awali ya Maynord ya 1.5 hutumika kwa mikondo ya asili.">Ukubwa wa jiwe la pembe unaohitajika, D<sub>50</sub> (Maynord, Ruff, na Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang['mtc_d50_searcy']='Ukubwa wa jiwe la pembe unaohitajika, D<sub>50</sub> (Searcy 1967)';
 $ec_lang['mtc_vel_ok']='Kasi inakubalika kwa makadirio ya mtiririko sawia.';
 $ec_lang['mtc_vel_low']='Kasi ya chini — hatari ya mashapo.';
@@ -638,7 +638,7 @@ $ec_lang['lpn_field_head']='Kimo';
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Kiwango cha uso wa maji katika hifadhi, kilichopimwa kama kimo, si kama shinikizo. Acha wazi ili uso wa maji uwe kwenye mwinuko wa hifadhi.';
 $ec_lang['lpn_close']='Funga';
-$ec_lang['lpn_empty_hint']='Anza kwa kuongeza picha ya nyuma au hifadhi ya maji kutoka kwenye upau wa zana, au fungua Faili, Mradi Mpya ili kuanzia kwa mfano.';
+$ec_lang['lpn_empty_hint']='Tumia Faili, Mradi Mpya ili kufungua mfano. Au anza kwa kuongeza hifadhi ya maji, muunganiko, na bomba kutoka kwenye upau wa zana.';
 $ec_lang['lpn_tool_undo']='Tengua';
 $ec_lang['lpn_confirm_example']='Hii inaongeza mfano kwenye mtandao ulio nao tayari. Endelea?';
 $ec_lang['lpn_field_diameter']='Kipenyo';
@@ -766,12 +766,12 @@ $ec_lang['lpn_inp_bad_file']='Faili hilo halikuweza kusomwa kama faili la mtanda
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='Hii inaonekana kama faili la .net la EPANET, lakini ukurasa huu haukuweza kulisoma. Lifungue katika EPANET na utumie amri ya Faili, Hamisha, Mtandao huko ili kulihifadhi kama faili la .inp, kisha ulete hilo.';
 $ec_lang['lpn_inp_report_heading']='Imeletwa {file}';
-$ec_lang['lpn_inp_report_counts']='Miunganiko na hifadhi za maji {nodes}, mabomba na pampu {links}, kwa vitengo vya {units}.';
+$ec_lang['lpn_inp_report_counts']='Miunganiko, hifadhi za maji na matanki {nodes}, mabomba, pampu na vali {links}, kwa vitengo vya {units}.';
 $ec_lang['lpn_inp_report_clean']='Kila kitu kwenye faili kilipita salama. Hakuna kilichoachwa.';
 $ec_lang['lpn_inp_report_lead']='Ukurasa huu hauhifadhi kila kitu ambacho EPANET inahifadhi. Haya ndiyo yaliyobadilika njiani:';
 $ec_lang['lpn_inp_drop_headloss']='Faili hili halitumii fomula ya Hazen-Williams. Ukurasa huu unakokotoa Hazen-Williams, hivyo namba za usuguo wa bomba zilibaki kama zilivyoandikwa, lakini majibu hapa hayatalingana na majibu ya EPANET.';
-$ec_lang['lpn_inp_drop_tcv']='Vali hizi za udhibiti wa kubana (throttle control valves) ziliingia kama mabomba mafupi sana yenye upotevu ule ule wa ndani. Maji yanafanya kazi vivyo hivyo; kipengele si kile kile.';
-$ec_lang['lpn_inp_drop_valve']='Vali hizi hudhibiti shinikizo au mtiririko, na ukurasa huu hauna kipengele cha aina hiyo. Ziliingia kama mabomba wazi, hivyo mtandao bado umeunganika, lakini hakuna kinachozidhibiti tena.';
+$ec_lang['lpn_inp_drop_tcv']='Vali hizi za kubana ziliingia kama vali za kubana, zikiwa na upotevu uleule ambao faili linaupa. Kitatuzi chochote kati ya viwili kinaweza kuzitatua.';
+$ec_lang['lpn_inp_drop_valve']='Vali hizi zinaelezwa kwa mkondo (curve) au kwa upotevu wa shinikizo uliowekwa, na ukurasa huu hauna kipengele cha aina hiyo. Ziliingia kama mabomba wazi, hivyo mtandao bado umeunganika, lakini hakuna kinachodhibiti shinikizo au mtiririko huko tena.';
 $ec_lang['lpn_inp_drop_cv']='Katika EPANET mabomba haya huruhusu maji kupita upande mmoja tu. Yaliingia kama mabomba ya kawaida, hivyo maji sasa yanaweza kutiririka pande zote mbili kupitia hayo.';
 $ec_lang['lpn_inp_drop_demands']='Miunganiko hii ilikuwa na mahitaji zaidi ya moja. Mahitaji hayo yaliongezwa pamoja kuwa mahitaji moja anayoshikilia ukurasa huu.';
 $ec_lang['lpn_inp_drop_patterns']='Miundo ya mahitaji (demand patterns) iliachwa nje. Ukurasa huu hutatua wakati mmoja tu, hivyo kila mahitaji ni namba iliyoandikwa kwenye faili.';
@@ -940,9 +940,9 @@ $ec_lang['lpn_status_closed_opened']='Imefungwa {closed}. Sasa inaonyesha {opene
 $ec_lang['lpn_status_closed_empty']='Imefungwa {closed}. Umeanzishwa mradi mpya tupu.';
 $ec_lang['lpn_storage_full']='Haijahifadhiwa. Hifadhi ya kivinjari imejaa au haipatikani, hivyo mabadiliko yako ya hivi karibuni yatapotea ukifunga kichupo hiki.';
 $ec_lang['lpn_notes_1_term']='Hali tulivu (Steady state)';
-$ec_lang['lpn_notes_1_def']='Hutatua seti moja ya mahitaji kwa wakati mmoja, ukitumia algoriti ile ile ya mteremko wa jumla (global gradient) ambayo EPANET hutumia. Haiigi jinsi mtandao unavyobadilika kwa muda.';
+$ec_lang['lpn_notes_1_def']='Hutatua seti moja ya mahitaji kwa wakati mmoja, ukitumia algoriti ile ile ya mteremko wa jumla (global gradient) ambayo EPANET hutumia. Haiigi jinsi mtandao unavyobadilika kwa muda. Tanki huwekwa kwenye kiwango cha maji unachokipa: ndani ya suluhisho moja haliwahi kupungua wala kujaa.';
 $ec_lang['lpn_notes_2_term']='Havijaigwa';
-$ec_lang['lpn_notes_2_def']='Matanki, ubora wa maji, na vali za udhibiti zinazojifungua na kujifunga zenyewe (PRV, PSV, FCV) haziigwi. Bomba linaweza kubeba upotevu wa ndani uliowekwa, lakini si vali ambayo hali yake ya kufunguka au kufungwa inategemea mtiririko unaotatuliwa.';
+$ec_lang['lpn_notes_2_def']='Ubora wa maji na mahitaji yanayobadilika kwa siku hayaigwi. Kuhusu vali: vali ya kubana hufanya kazi kwenye kitatuzi chochote, na vali zinazojifungua na kujifunga zenyewe (PRV, PSV, FCV) hutatuliwa kwa kitatuzi cha EPANET, ambacho ukurasa huu huwasha wenyewe pale mtandao wako unapokuwa na moja.';
 $ec_lang['lpn_notes_3_term']='Kuhifadhi miradi';
 $ec_lang['lpn_notes_3_def']='Kila mradi ni kichupo, na kila kichupo kinahifadhiwa kwenye kivinjari hiki unapofanya kazi. Kufuta data ya kivinjari chako kunafuta yote, hivyo weka kazi yako kwenye faili: Faili, Hifadhi kama. Alama ya nyota kwenye kichupo inamaanisha kina mabadiliko ambayo hayamo kwenye faili. Hakuna kinachoandikwa kwenye faili isipokuwa uombe. Katika baadhi ya vivinjari, mradi huunganika na faili ulilolihifadhia, na Faili, Hifadhi huandika kwenye faili hilo hilo tangu wakati huo; katika vingine muunganiko hauwezekani, hivyo Hifadhi imezimwa na Hifadhi kama pekee inapatikana. Wakati faili la mradi linahifadhiwa kwenye diski inayoshirikiwa, ukurasa huu unakuambia ikiwa mwenzako tayari analo wazi, ili watu wawili wasiandikiane kazi.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -959,7 +959,7 @@ $ec_lang['lpn_notes_epanet_term']='Vigezo vya Hazen-Williams vinalingana na EPAN
 $ec_lang['lpn_notes_epanet_def']='Mnamo Agosti 2026 mgawo na kipeo cha Hazen-Williams vilibadilishwa ili kulingana na EPANET. Matokeo ya upotevu wa kimo yanatofautiana na matoleo ya awali ya ukurasa huu kwa hadi asilimia 0.1, jambo dogo zaidi kuliko kutokuwa na uhakika kwa thamani ya C yenyewe.';
 $ec_lang['lpn_id_invalid']='Ingiza kitambulisho kisicho na nafasi wala alama za nukuu.';
 $ec_lang['lpn_id_taken']='Kitambulisho hicho tayari kinatumika.';
-$ec_lang['lpn_diag_no_fixed_head']='Ongeza hifadhi ya maji. Mtandao unahitaji angalau kiwango kimoja cha maji kinachojulikana kabla ya kutatuliwa.';
+$ec_lang['lpn_diag_no_fixed_head']='Ongeza hifadhi ya maji au tanki. Mtandao unahitaji angalau kiwango kimoja cha maji kinachojulikana kabla ya kutatuliwa.';
 $ec_lang['lpn_diag_dangling_link']='Bomba au pampu inaunganika na kifundo ambacho hakipo tena:';
 $ec_lang['lpn_diag_unreachable']='Vifundo hivi havina njia ya kufika kwenye hifadhi ya maji:';
 $ec_lang['lpn_diag_not_converged']='Hakuna suluhisho lililopatikana. Kagua thamani zisizowezekana maishani halisi, kama kipenyo cha sifuri.';
