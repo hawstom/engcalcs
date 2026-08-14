@@ -1241,11 +1241,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the expensive 10% remains true as a *cost* estimate — it is the priority that changed, not the
     arithmetic.)
 
-- 0|306| **LibreEPANET.org: the rebranded site variant. BLOCKED on Task 248.** Tom bought the
+- 1|306| **LibreEPANET.org: the rebranded site variant. BLOCKED on Task 248.** Tom bought the
   domain 2026-08-14; it 302-redirects to `Looped-Network.php?lang=en` as a placeholder and stays
   that way until the gate clears. Rationale, the name ruling and the gate are in
-  `dev/positioning.md` §6 — read that before touching this. Priority 0 means blocked, not
-  unwanted.
+  `dev/positioning.md` §6 — read that before touching this. Priority 1, not 0: 0 means completed,
+  and this is blocked, not done. It rises when Task 248 clears.
 
   Tom's spec: (1) EPANET engine on by default, (2) custom navbar without HawsEDC and the Hydraulics
   menu, (3) page title and description removed, (4) Notes moved elsewhere — perhaps under More as
@@ -1290,7 +1290,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **The Notes block has no id or class** (`Looped-Network.php`, below `echoFeedback()`), so moving
     it under a Help menu needs a wrapper added first.
 
-- 0|307|[H] **LibreEPANET.org front-door copy. BLOCKED on Task 248.** Holds the approved register so
+- 1|307|[H] **LibreEPANET.org front-door copy. BLOCKED on Task 248.** Holds the approved register so
   the wording is not re-derived later. Tom, 2026-08-14: **"Join us in building LibreEPANET, for the
   community and by the community, today."** Or some such — the *shape* is the ruling, not the exact
   words: an invitation to build, not a pitch to switch, and no comparison to anyone.
