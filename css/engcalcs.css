@@ -222,6 +222,16 @@ html[lang="zh"] .ec-welcome {
    is deliberately NOT thickened with it; see .lpn-arrow below. */
 .lpn-link { stroke: #557; stroke-width: calc(0.7 * var(--lpn-sym, 1)); cursor: pointer; }
 .lpn-link-pump { stroke: #a52; }
+/* A CLOSED link (ROADMAP Task 146.07). Dashed, because a closed pipe carries no water and would
+   otherwise be indistinguishable from an open one -- an invisible cause for a network that will
+   not solve, or that solves to a surprising answer. The dash lengths are in WORLD units and scale
+   with --lpn-sym exactly as the stroke width above does, so the dashes keep their proportion to
+   the line at every zoom and symbol size rather than dissolving into a dotted line when zoomed
+   out. Colour is deliberately unchanged: a closed pipe is still the same pipe, and recolouring it
+   would collide with the per-field label colours (lpnFieldColors). */
+.lpn-link-closed {
+	stroke-dasharray: calc(1.8 * var(--lpn-sym, 1)) calc(1.4 * var(--lpn-sym, 1));
+}
 /* Flow-direction arrow at each link's midpoint (Tom, 2026-07-30, matching EPANET) -- hidden
    until a solve result exists (see updateArrow() in looped-network.js). pointer-events:none so
    it never intercepts a click meant for the link/vertex underneath it.

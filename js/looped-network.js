@@ -1085,9 +1085,14 @@ var EngCalcs = EngCalcs || {};
 		layoutNodeLabel(n.id);
 	}
 	function buildLinkEls(l) {
+		// A closed link is DASHED (Task 146.07). Without a visual, a closed pipe is identical to an
+		// open one on the map while carrying no water, which turns a one-click state into an
+		// invisible cause of a network that will not solve. Read through effective(), so a future
+		// scenario override changes the drawing too, not only the arithmetic.
 		var line = el('polyline', {
 			points: linkPoints(l), fill: 'none',
-			'class': 'lpn-link lpn-link-' + l.type, 'data-link': l.id
+			'class': 'lpn-link lpn-link-' + l.type + (effective(l, 'status') === 'closed' ? ' lpn-link-closed' : ''),
+			'data-link': l.id
 		}, linksLayer);
 		var handles = [], i;
 		for (i = 0; i < l.verts.length; i++) {
@@ -8001,6 +8006,7 @@ var EngCalcs = EngCalcs || {};
 				function (v) { l._k = v; }, pc.lpn_field_km_tip);
 			lengthField(fields, l);
 		}
+		closedField(fields, l, linkId);
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
 			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', 'lpn_u_flow', lastSolveResult.flows[linkId]);
 			// A pump has no diameter (Tom, 2026-07-30: "how can a pump have a velocity if it has no
@@ -8090,6 +8096,49 @@ var EngCalcs = EngCalcs || {};
 	// default), whose C-factor is dimensionless. Darcy-Weisbach's roughness HEIGHT does need
 	// units (the scope doc's roughness family is "DW only") -- revisit once a friction-method
 	// selector exists (matching bpn_'s own method switch) and this can be genuinely conditional.
+	// Open/Closed link state (ROADMAP Task 146.07). Tom, 2026-07-29: explicitly NOT a "valve" and
+	// NOT modelled by abusing the minor-loss coefficient -- a plain boolean, kept small.
+	//
+	// Everything under this checkbox already existed and was simply unreachable: `_status` is set to
+	// 'open' at addLink(), serialized with the project, listed in LPN_OVERRIDABLE, read by
+	// assembleModel() through effective(), honoured in four places by js/lpn-solver.js, and already
+	// parsed from an EPANET .inp by js/lpn-inp.js. This function is the whole feature.
+	//
+	// The checkbox says "Closed", not "Open", although 'open' is the stored default. The state worth
+	// SEEING is the exceptional one: a ticked box next to the word Closed reads as a deliberate act,
+	// where an unticked box next to "Open" would make every ordinary pipe look like something had
+	// been switched off. Same reason the map dashes closed links rather than styling open ones.
+	//
+	// Offered on pumps as well as pipes: the solver's status check is on the link, not the type, and
+	// EPANET can close a pump too. It sits OUTSIDE renderLinkFields' pipe/pump branch for that
+	// reason -- a pump renders a curve table instead of diameter/roughness, but still gets this.
+	function closedField(fields, l, linkId) {
+		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
+			input = document.createElement('input');
+		input.type = 'checkbox';
+		input.checked = effective(l, 'status') === 'closed';
+		input.addEventListener('change', function () {
+			saveUndoSnapshot();
+			l._status = input.checked ? 'closed' : 'open';
+			// rebuildLink() rather than a classList toggle: the dashed/solid state is applied in
+			// buildLinkEls(), so going through the one builder keeps a single source of truth for
+			// how a link is drawn. Then solve -- closing a pipe can isolate a node, which the
+			// solver's pre-solve diagnostics already name by id.
+			rebuildLink(l);
+			scheduleSolve();
+		});
+		// The text goes in its own <span>, NOT straight into the <label>: setFieldLabel() assigns
+		// textContent, which would wipe a checkbox already appended to the same element. Box first,
+		// then words -- matching the "Auto" checkbox in lengthField() rather than inventing a second
+		// order for the same control shape on the same popup.
+		var text = document.createElement('span');
+		setFieldLabel(text, pc.lpn_field_closed || 'Closed', pc.lpn_field_closed_tip);
+		label.appendChild(input);
+		label.appendChild(document.createTextNode(' '));
+		label.appendChild(text);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
 	function numberFieldPlain(fields, labelText, value, onChange, tip) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.value = value;

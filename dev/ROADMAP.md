@@ -742,9 +742,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     design-tool framing matters — fixed demands stay the default; an emitter is opt-in per junction.
   - **Open:** whether demand and emitter can coexist on one junction (EPANET allows both, summing
     them). Probably yes, but it needs a label that makes the sum legible rather than surprising.
-- 15|146.07| **Open/Closed link property (Task 146 child).** A simple boolean state on a link. Tom,
-  2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
-  a plain open/closed state, kept simple.
 - 15|194| **Touch gesture model: one finger scrolls the page, two fingers pan the map (originated
   during Task 146).** Raised by Tom, 2026-07-31, after the canvas-fills-the-phone lock-up: *"It didn't occur
   to me to try to scroll with two fingers. That's just an idea. It looks like it occurred to you
@@ -1236,18 +1233,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Partly mitigated already: `zoomExtent()` now reserves the overlays' measured height so a fit
     never places content under them. That does not survive a pan, which is why this still exists.
 
-- 25|250|[H] **Where do we explain lpn at all? A Help menu on the page.** Tom, 2026-08-09, after
-  the EPANET toggle shipped: *"Where are we going to discuss, explain, or feature this? Does lpn
-  need its own Help menu in the pull-down and the toolbar after Settings? Help > About and Help >
-  I don't know what else (Videos? I already have two. Features? Discover?)."*
-  - **The real gap is that lpn has no front door.** Every claim we just built — real EPANET
-    engine, GPL, offline, 26 languages — is invisible on the page itself. That is also Task 222's
-    unfinished half: positioning nobody can read is not positioning.
-  - **Tom already has two videos.** Linking what exists beats authoring anything new, so the
-    cheapest real version is Help > About (what this is, what engine, what licence, link to
-    About.php) + Help > Videos. "Features"/"Discover" needs content that does not exist — do not
-    scope it until something is written.
-  - **[H] Tom decides the menu shape before this is built.**
 
 - 20|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
   Task 243 shipped the engine and the toggle; none of this is built. The engine makes each of
@@ -1810,6 +1795,80 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|146.07| **[DONE 2026-08-13] Open/Closed link property (Task 146 child).**
+
+  **The feature was ~90% built and unreachable.** `_status` was already written at `addLink()`,
+  serialized with the project, listed in `LPN_OVERRIDABLE`, read by `assembleModel()` through
+  `effective()`, honoured in four places by `js/lpn-solver.js`, and parsed from an EPANET `.inp` by
+  `js/lpn-inp.js`. `js/looped-network.js` even said so at the declaration: *"Task 146.07 will
+  surface it."* All that shipped here is `closedField()` — one checkbox — plus the two things that
+  were genuinely missing.
+
+  - **A closed pipe is DASHED on the map** (`.lpn-link-closed`). Without it a closed pipe is
+    pixel-identical to an open one while carrying no water — an invisible cause for a network that
+    will not solve, or that solves to a surprising answer. Dash lengths are in world units scaled
+    by `--lpn-sym`, so they hold their proportion at every zoom instead of dissolving into dots.
+    Colour is deliberately unchanged: a closed pipe is still the same pipe, and recolouring would
+    collide with the per-field label colours.
+  - **The label is "Closed", not "Open", though `'open'` is the stored default.** The state worth
+    seeing is the exceptional one. A ticked box beside "Closed" reads as a deliberate act; an
+    unticked box beside "Open" would make every ordinary pipe look switched off.
+  - **Offered on pumps too**, since the solver's status check is on the link, not the type, and
+    EPANET can close a pump. It sits outside `renderLinkFields()`'s pipe/pump branch for that reason.
+
+  **`dev/lpn-spike/closed-link-harness.js`, 18 checks, in `run_harnesses.sh`.** This is the shape of
+  change that LOOKS finished after one browser click — the box ticks, the pipe goes dashed — while
+  the half nobody can see from the map goes unverified. The harness closes a pipe *through the
+  checkbox* on the example ring and asserts the closed pipe carries exactly zero flow, that the flow
+  redistributes round the ring, that the state survives `serializeProject` + `applySaved` +
+  `buildDom`, that closing takes an undo snapshot, and that reopening restores the original flows to
+  1e-6. **Mutation-tested**: breaking the checkbox write, the map class, or the status handoff to
+  the solver fails 8, 3 and 3 checks respectively, so it is not passing vacuously.
+
+  **Cost: 2 new keys × 26 languages = 52 outstanding.** `lpn_field_closed` and its tip. `lpn` is a
+  core calculator (Task 251), so a new `lpn_` key now owes every language, not the core four —
+  worth pricing in before adding keys to this page. Payloads regenerated; no sprint launched.
+
+  Original entry follows.
+
+  **Open/Closed link property (Task 146 child).** A simple boolean state on a link. Tom,
+  2026-07-29: explicitly not a "valve" and not modeled via minor-loss-coefficient (Km) abuse — just
+  a plain open/closed state, kept simple.
+
+- 0|250|[H] **[DONE 2026-08-13] Where do we explain lpn at all? A Help menu on the page.**
+
+  **Shipped and confirmed by Tom 2026-08-13.** `openHelpMenu()` in `js/looped-network.js` — the menu
+  landed in `a9b7a9e` (Walkthroughs moved into a Help menu) and `956fb5e` (Contact and About added,
+  with icons). Rows: **Walkthroughs** → Tom's own blog post on the looped calculator, **Contact**,
+  and **About** → `About.php`, About last "where every other Help menu in the world puts it".
+  The `[H]` gate — Tom decides the menu shape before it is built — was met the same day: *"We can
+  repeat About and Contact in this new Help menu."* That duplication of the navbar is deliberate and
+  the code says why: the navbar serves somebody CHOOSING a calculator, this menu serves somebody
+  already INSIDE one who wants to know who wrote it or how to complain. Both reuse existing keys, so
+  the whole feature cost **no new translation** — worth noting now that `lpn_` is a core calculator
+  and every new key owes all 26 languages.
+
+  **One residual, and it is Task 222's, not this one's: `About.php` never names EPANET.** It covers
+  the licence (Libre/GPL), offline use and the language count, but the engine claim — the thing Task
+  243 actually built — is invisible on every page including this one. This task's own text already
+  routed that (*"positioning nobody can read is not positioning"*), so it closes as the DOOR being
+  built and 222 keeps the CONTENT. Do not reopen this to write copy; that is 222.
+
+  Original entry follows.
+
+  **Where do we explain lpn at all? A Help menu on the page.** Tom, 2026-08-09, after
+  the EPANET toggle shipped: *"Where are we going to discuss, explain, or feature this? Does lpn
+  need its own Help menu in the pull-down and the toolbar after Settings? Help > About and Help >
+  I don't know what else (Videos? I already have two. Features? Discover?)."*
+  - **The real gap is that lpn has no front door.** Every claim we just built — real EPANET
+    engine, GPL, offline, 26 languages — is invisible on the page itself. That is also Task 222's
+    unfinished half: positioning nobody can read is not positioning.
+  - **Tom already has two videos.** Linking what exists beats authoring anything new, so the
+    cheapest real version is Help > About (what this is, what engine, what licence, link to
+    About.php) + Help > Videos. "Features"/"Discover" needs content that does not exist — do not
+    scope it until something is written.
+  - **[H] Tom decides the menu shape before this is built.**
 
 - 0|249| **[DONE 2026-08-12, closed 2026-08-13] Translate the 5 `lpn_` engine keys — now into
   all 26, not the core four.**

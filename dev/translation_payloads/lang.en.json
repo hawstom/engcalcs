@@ -785,6 +785,8 @@
         "lpn_tip_select": "Use this mode to change, move, and drag things on the map.",
         "lpn_tip_labels_draggable": "You can drag a label to move it. Double-click a label to send it back to its automatic position.",
         "lpn_field_auto": "Auto",
+        "lpn_field_closed": "Closed",
+        "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.",
         "lpn_field_x": "X",
         "lpn_field_y": "Y",
         "lpn_field_text_size": "Size multiplier",
@@ -860,7 +862,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 858,
+    "count": 860,
     "active_prefixes": [
         "about",
         "bpn",
