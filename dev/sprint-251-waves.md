@@ -93,7 +93,7 @@ reason**, never globally to quiet a warning; and write terminology back to `glos
 | **1 of 4** | am, ar, bg, bn, cs | 1,445 | Done. |
 | **2 of 4** | de, hi, id, km, my | 1,445 | de, hi, id done. **km and my died on a session limit at 100 of 289 each.** |
 | **3 of 4** | ps, ro, ru, sw, uk | 1,445 | Done, all five, no losses. |
-| **4 of 4** | km, my (189 each) + ur, zh + cs, fr, pt | 963 | Awaiting authorization. |
+| **4 of 4** | km, my (189 each) + ur, zh + cs, fr, pt | 963 | Done, all seven, no losses. **Sprint complete: 26 of 26.** |
 
 Wave 4 absorbs the two half-finished wave-2 languages and stays the cheap wave: `cs`/`fr`/`pt` owe
 1–3 identity keys each, left over from the Task 296 retitle.
@@ -110,12 +110,46 @@ That is the first clean evidence separating the two mechanisms, and it points th
 cost model does: the batching is cheap insurance that works, while wave size buys probability, not
 protection. If Tom wants to retire one, the batching is the one that has now demonstrably paid.
 
-## Landed so far (22 of 26 complete)
+## What wave 4 settled
 
-Before this plan: es, fr\*, pt\*, fa, he, tr, sr, it, hr.
-Wave 1: am, ar, bg, bn, cs\*. Wave 2: de, hi, id. Wave 3: ps, ro, ru, sw, uk.
-Partial: km (100/289), my (100/289).
-\* fr and pt still owe three Task 296 identity keys each, cs owes one; all listed in wave 4.
+**Seven agents, not five** — four full loads (km 189, my 189, ur 289, zh 289) plus cs/fr/pt owing
+1–3 keys each. The three top-ups cost almost nothing, so forcing a fifth wave for seven keys would
+have bought no safety. **No losses, no session limit.** Both throttles ran, as in every wave.
+
+**The two resumed languages are the batching's clearest receipt.** km and my each picked up at
+exactly the 100 keys their interrupted wave-2 run had written, translated 189, and finished. The
+mechanism did precisely what it was added to do, twice, and neither language had to be redone.
+
+**The `head loss` avoid entry was wrong, and Tom retired it mid-wave.** The ur agent reported that
+its handed-down `preferred_translation` (دباؤ نقصان, "pressure loss") was the exact sense the same
+entry's `avoid` list forbade — a real self-contradiction, verified in the JSON. Tom: *"many
+languages use pressure loss instead of head loss. Maybe it's jargon in English. There's no real
+reason to prefer one over the other."* He is right, and the entry had already been proving it: it
+"fixed" ro/tr/id/fa/sw/ps into head-sense while explicitly waiving de *Druckverlust* as legitimate,
+and still carries pressure-sense ar and he untouched. A rule applied to six languages and waived
+for three is not a rule. The avoid now forbids only the physical error — pressure **units** or a
+pressure symbol on a quantity that is a length of water column — and names de/fr/ur as protected
+standards. **The operative test is now consistency WITHIN a language file, not conformity to the
+English metaphor.** The five ur `lpn_` strings were realigned to that file's 12-occurrence
+incumbent on those grounds, not because the agent's term was wrong.
+
+**All four defect classes came back clean this time** — the first wave where none of them fired.
+All four languages wrote a native word for "Auto" (ur and my each flagged the auto-rickshaw
+false friend unprompted), all four rendered the consent pair temporally, the Latin residue was
+entirely placeholders and proper nouns, and the menu/toolbar sets were complete. **That makes it
+26 of 26 on the consent trap with ps the lone historical miss.** The checklist is now earning its
+keep by passing, which is the outcome to want — do not drop it on that account.
+
+## Landed so far (26 of 26 complete — sprint closed)
+
+Before this plan: es, fr, pt, fa, he, tr, sr, it, hr.
+Wave 1: am, ar, bg, bn, cs. Wave 2: de, hi, id. Wave 3: ps, ro, ru, sw, uk.
+Wave 4: km, my, ur, zh — plus the fr/pt identity keys and cs's `lpn_dialog_ok`, all now closed.
+
+`lpn_dialog_ok` turned out to be an exempt-list case rather than a translation: cs already had a
+correct `'OK'`. It is exempt for **cs, de, fr, id, it, pt, ro only** — the other 19 languages
+translate it (zh 确定, tr Tamam, es Aceptar, hr U redu, uk Гаразд, sw Sawa), so a global
+exemption would have hidden real gaps. Scope an exemption, never blanket it.
 
 **21 of 22 on the consent-button trap.** Twenty-one languages rendered the two Accept answers
 *temporally* — this ask vs. never ask again — rather than as the conventional "accept all

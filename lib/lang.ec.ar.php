@@ -66,6 +66,20 @@ $ec_lang['template_welcome']='اتركوا مخاوفكم عند الباب؛ ه
 $ec_lang['template_feedback']='هل يمكنكم اقتراح صياغة أفضل لهذه الصفحة أو أي شيء آخر؟ هل ترغبون في المساعدة أو في تعلّم إنشاء أدوات مثل هذه؟ يرجى التواصل معي.';
 $ec_lang['template_printable_title']='عنوان للطباعة';
 $ec_lang['template_printable_subtitle']='عنوان فرعي للطباعة';
+// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
+// prose, and they are translated into all 26 languages for one reason: consent that the visitor
+// cannot read is not consent. The long-form privacy notice and terms are a separate question --
+// English-authoritative, and translated by a human later if at all.
+$ec_lang['consent_body']='هل يمكننا الاحتفاظ برقم واحد لكل صفحة في تخزين ملف تعريف هذا المتصفح لمنع تسجيل زياراته بشكل متكرر؟';
+$ec_lang['consent_accept']='الموافقة هذه المرة';
+$ec_lang['consent_accept_all']='الموافقة دائماً';
+$ec_lang['consent_decline']='رفض';
+$ec_lang['consent_current_granted']='لقد وافقت على هذا. نحن نحدّ من التسجيل لملف تعريف هذا المتصفح.';
+$ec_lang['consent_current_denied']='لقد رفضت هذا. لا نخزّن شيئاً للحد من التسجيل لملف تعريف هذا المتصفح.';
+$ec_lang['consent_region_label']='اختيارك بشأن الحد من التسجيل.';
+$ec_lang['consent_settings_link']='إعدادات ملفات تعريف الارتباط';
+$ec_lang['privacy_link']='إشعار الخصوصية';
+$ec_lang['terms_link']='شروط الاستخدام';
 $ec_lang['index_title']='حاسبات هندسية مجانية عبر الإنترنت';
 $ec_lang['index_meta_desc_plain']='حاسبات هندسة هيدروليكية مجانية للأنابيب والقنوات والسدود والري. تعمل في متصفحك، دون اتصال بالإنترنت، وهي متاحة بـ27 لغة.';
 $ec_lang['calc_set_units']='تحديد الوحدات:';
@@ -119,6 +133,8 @@ $ec_lang['hw_pressure_neg_short']='ضغط سالب';
 $ec_lang['hw_pressure_neg']='ضغط المصب أقل من الصفر. ينخفض خط المتدرج الهيدروليكي عن مستوى الأنبوب، لذا لن يجري الأنبوب ممتلئاً، وقد لا تكون هذه النتيجة صالحة.';
 $ec_lang['hw_roughness']='معامل هيزن-وليامز، C';
 $ec_lang['hw_note_1']='<dl><dt>لا تُمثِّل هذه الحاسبة مسار الأنبوب (البروفايل) بين الطرفين.</dt><dd>تستخدم فقط منسوبَي المنبع والمصب اللذين تُدخلهما. إذا ارتفع سطح الأرض عن أي من الطرفين في نقطة ما بينهما، فإن الضغط عند تلك النقطة المرتفعة يكون أقل من أي ضغط مذكور هنا. أعد تشغيل الحاسبة لطول القطعة من طرف المنبع حتى تلك النقطة المرتفعة للتحقق منها.</dd><dd>حيثما ينخفض خط المتدرج الهيدروليكي عن مستوى الأنبوب، يكون الماء تحت ضغط سالب. يخرج الهواء من المحلول، ويمكن أن ينهار الأنبوب رقيق الجدار، وقد تتسرب مياه جوفية ملوثة عبر الوصلات. حافظ على أن يبقى الخط تحت ضغط موجب في كل مكان، وفكّر في تركيب صمام هواء عند كل نقطة مرتفعة.</dd><dt>ضغط المنبع هو شرط حدّي (Boundary Condition) تُدخله أنت.</dt><dd>اقرأه من مقياس ضغط، أو من منسوب الماء في خزان (ارتفاع الماء فوق الأنبوب)، أو من منحنى المضخة. تُعطي المضخة ضغطاً أقل كلما ارتفع التدفق، لذا استخدم النقطة على المنحنى التي تطابق التدفق المُدخل أعلاه.</dd><dt>اجمع معاملات الفواقد الموضعية (Minor Losses) بنفسك.</dt><dd>اجمع قيم K لكل صمام وانحناء ووصلة تفرع (Tee) وعداد ومدخل على الخط، وأدخل المجموع. اتبع الرابط عند هذا الحقل للحصول على القيم النموذجية. في خط النقل الرئيسي الطويل تكون هذه الفواقد صغيرة مقارنة بفاقد الاحتكاك، لكن في أنابيب المحطة القصيرة قد تشكل معظم الفاقد.</dd></dl>';
+
+
 // Manning Irregular
 $ec_lang['mi_menu']='قناة غير منتظمة المقطع — مانينغ';
 $ec_lang['mi_main_title']='الحاسبة المجانية عبر الإنترنت لقناة مانينغ غير المنتظمة المقطع';
@@ -478,6 +494,7 @@ $ec_lang['rc_notes_5_term']='نطاق حجم الصخر الصحيح';
 $ec_lang['rc_notes_5_def']='طُوِّرت المعادلات باستخدام نطاق D<sub>50</sub> من 15 مم إلى 278 مم. النتائج خارج هذا النطاق تُعدّ استقراءً وينبغي استخدامها بحكم هندسي إضافي.';
 $ec_lang['rc_notes_6_term']='منسوب مصطبة المخرج';
 $ec_lang['rc_notes_6_def']='ينبغي أن يكون منسوب أعلى حجارة الحماية في قطاع المخرج مساوياً لمنسوب قاع القناة في أسفل المجرى أو أقل منه. إذا كان أعلى، فستكون حجارة المخرج غير مستقرة.';
+
 $ec_lang['rc_notes_7_def']='عندما يكون العمق الطبيعي في قناة المدخل أقل من علو المياه فوق الهدار (H<sub>p</sub>) اللازم لتمرير q<sub>t</sub>، يحدث تدفق مقيّد أو تجمّع للمياه في أعلى مدخل المزلق. هذا مقبول عموماً — فتجمّع المياه يقلل السرعة ويمنع التآكل في أعلى المجرى. للتحقق: استخدم حاسبة تدفق الهدار لإيجاد H<sub>p</sub> لقيمة q<sub>t</sub> وعرض التاج المعطيين، وقارِن الناتج بالعمق الطبيعي لقناة المدخل. إذا تجاوز H<sub>p</sub> العمق الطبيعي، سيحدث تجمّع للمياه.';
 $ec_lang['rc_notes_4_term']='المرجع';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. تنشر وزارة الزراعة الأمريكية (USDA ARS) أيضاً <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">جدول Excel</a> يعتمد على نفس الطريقة.';
@@ -584,6 +601,8 @@ $ec_lang['bpn_notes_2_term']='شبكات متفرعة فقط، بلا حلقات
 $ec_lang['bpn_notes_2_def']='لكل خط خط منبع واحد فقط بالضبط (شجرة). لا تحل هذه الأداة الشبكات الحلقية؛ فتلك تحتاج إلى طرائق تكرارية (مثل EPANET أو ما شابهها). استبعاد الحلقات هو ما يجعل الحل بسيطاً ودقيقاً.';
 $ec_lang['bpn_notes_3_term']='بلا عناصر تحكم فعّالة بالضغط';
 $ec_lang['bpn_notes_3_def']='يمكنك إضافة صمام ذي فاقد موضعي ثابت (قيمة k)، ولكن ليس صمامات تخفيض الضغط أو مواصلة الضغط (PRV/PSV). فحالة فتحها أو إغلاقها تعتمد على التدفق والضغط، مما يفرض الحل التكراري.';
+
+
 $ec_lang['bpn_supply2_q']='تدفق الإمداد 2';
 $ec_lang['bpn_supply2_h']='علو الإمداد 2';
 $ec_lang['bpn_supply3_q']='تدفق الإمداد 3';
@@ -593,16 +612,6 @@ $ec_lang['bpn_h_supply']='علو الإمداد';
 $ec_lang['bpn_h_supply_tip']='علو المصدر عند التدفق التصميمي، مقروءاً من منحنى الإمداد. يساوي علو المصدر المُدخل عندما يكون المنحنى مستوياً (خزان).';
 $ec_lang['bpn_show_elevation']='المنسوب';
 $ec_lang['bpn_supply1_h']='العلو الساكن للإمداد';
-$ec_lang['consent_body']='هل يمكننا الاحتفاظ برقم واحد لكل صفحة في تخزين ملف تعريف هذا المتصفح لمنع تسجيل زياراته بشكل متكرر؟';
-$ec_lang['consent_accept']='الموافقة هذه المرة';
-$ec_lang['consent_accept_all']='الموافقة دائماً';
-$ec_lang['consent_decline']='رفض';
-$ec_lang['consent_current_granted']='لقد وافقت على هذا. نحن نحدّ من التسجيل لملف تعريف هذا المتصفح.';
-$ec_lang['consent_current_denied']='لقد رفضت هذا. لا نخزّن شيئاً للحد من التسجيل لملف تعريف هذا المتصفح.';
-$ec_lang['consent_region_label']='اختيارك بشأن الحد من التسجيل.';
-$ec_lang['consent_settings_link']='إعدادات ملفات تعريف الارتباط';
-$ec_lang['privacy_link']='إشعار الخصوصية';
-$ec_lang['terms_link']='شروط الاستخدام';
 $ec_lang['lpn_main_menu']='شبكة إمداد المياه';
 $ec_lang['lpn_main_title']='حاسبة مجانية عبر الإنترنت لشبكات توزيع المياه بمحرك EPANET';
 $ec_lang['lpn_main_desc']='تحليل شبكة إمداد المياه: ارسم شبكة أنابيب حلقية أو استورد ملفات EPANET';
@@ -617,8 +626,18 @@ $ec_lang['lpn_tool_delete']='حذف';
 $ec_lang['lpn_tool_zoom_extent']='إظهار الكل';
 $ec_lang['lpn_new_text']='نص';
 $ec_lang['lpn_field_elev']='المنسوب';
+// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
+// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
+// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
+// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='منسوب الأرض أو الأنبوب عند هذه العقدة. قسه من أي نقطة صفر تختارها، طالما استخدمت جميع العقد النقطة نفسها.';
+// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
+// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
+// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='العلو';
+// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
+// outright that it is a height and not a pressure, which is the exact confusion the glossary's
+// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='منسوب سطح الماء في الخزان، ويُقاس كارتفاع لا كضغط. اتركه فارغاً لجعل سطح الماء عند منسوب الخزان.';
 $ec_lang['lpn_close']='إغلاق';
 $ec_lang['lpn_empty_hint']='ابدأ بإضافة صورة خلفية أو خزان من شريط الأدوات، أو افتح ملف، مشروع جديد للبدء من مثال.';
@@ -631,6 +650,10 @@ $ec_lang['lpn_units_elevhead']='المنسوب والعلو';
 $ec_lang['lpn_units_pressure']='الضغط';
 $ec_lang['lpn_units_flow']='التدفق';
 $ec_lang['lpn_units_velocity']='السرعة';
+// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
+// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
+// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
+// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='تدرج فقدان الضغط';
 $ec_lang['lpn_result_gradient_tip']='فقدان الضغط مقسوماً على طول الأنبوب. استخدمه لمقارنة الأنابيب ذات الأطوال المختلفة بحد تصميم واحد.';
 $ec_lang['lpn_result_head']='العلو';
@@ -639,29 +662,70 @@ $ec_lang['lpn_result_pressure']='الضغط';
 $ec_lang['lpn_result_flow']='التدفق';
 $ec_lang['lpn_result_velocity']='السرعة';
 $ec_lang['lpn_result_headloss']='فقدان الضغط';
+// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
+// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
+// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
+// Settings live INSIDE each project document, so deleting every project deletes every setting too:
+// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
+// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
+// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='يعيد ضبط إعدادات هذا المشروع فقط. لا يتغيّر رسمك ولا مشاريعك الأخرى. لحفظ إعداداتك المفضّلة لإعادة استخدامها، احفظ ملف مشروع لا يحتوي إلا على الإعدادات.';
 $ec_lang['lpn_reset_all_tip']='يحذف كل مشروع، وكل صورة خلفية، وكل إعداد، واختياراتك للوحدات، ثم يعيد تحميل الصفحة تماماً كما يراها زائر لأول مرة. هذا هو إعادة الضبط الوحيدة التي تمسح كل شيء.';
+// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
+// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
+// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
+// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
+// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_prompt']='تخزّن هذه الحاسبة وحدات المشروع ومدخلاته كما أُدخلت، لكنها كانت سابقاً تحوّل الأرقام إلى النظام الدولي للوحدات (SI) عند التخزين. حُفظ هذا المشروع قبل ذلك التغيير، لذا كانت أرقامه مخزَّنة بالنظام الدولي. هل تريد تحويلها مرة أخيرة إلى الوحدات الحالية؟ لتتمكّن من الحكم، إليك بعض الأقطار التي ستُحوَّل، بقيمها قبل التحويل وبعده:';
 $ec_lang['lpn_v2_restore_yes']='تحويل';
 $ec_lang['lpn_v2_restore_never']='لا. لا تسألني مرة أخرى.';
 $ec_lang['lpn_v2_restore_no']='إغلاق لأتحقق أولاً من الوحدات الحالية';
 $ec_lang['lpn_storage_too_new']='حُفظ هذا المشروع بإصدار أحدث من الصفحة، لذا لا يمكن فتحه هنا.';
+// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
+// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
+// something that is not in a file, so closing it asks first; a tab without one closes silently. A
+// browser project always wears one (it is in no file at all); a file project wears one only while it
+// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
+// our words for talking about the code, and the user sees only a name, an asterisk, and a file
+// extension.
+// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
+// conventional relationship and the reason the duplication between them is correct rather than
+// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
+// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
+// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='ملف';
 $ec_lang['lpn_menu_edit']='تحرير';
 $ec_lang['lpn_menu_insert']='إدراج';
 $ec_lang['lpn_menu_view']='عرض';
+// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
+// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='الإعدادات';
+// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
+// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
+// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
+// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
+// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='حذف الشبكة';
 $ec_lang['lpn_confirm_delete_network']='هل تريد حذف كل عقدة وأنبوب وتسمية نصية في هذا المشروع؟ تبقى الصورة الخلفية واسم المشروع وإعداداتك دون تغيير. لا يمكن التراجع عن هذا.';
 $ec_lang['lpn_view_units']='الوحدات';
+// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='حفظ الكل';
+// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
+// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
+// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='مشروع{n}';
 $ec_lang['lpn_project_copy_suffix']='(نسخة)';
 $ec_lang['lpn_project_rename']='إعادة تسمية';
+// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='مشروع جديد…';
+// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
+// with the toolbar button of that name -- an example is a whole network, so it starts a project
+// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='مشروع فارغ، وحدات أمريكية (gpm)';
 $ec_lang['lpn_new_blank_si']='مشروع فارغ، وحدات النظام الدولي (l/s)';
 $ec_lang['lpn_new_from_examples']='من الأمثلة';
+// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
+// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_new_example_us']='شبكة أساسية، وحدات أمريكية (gpm)';
 $ec_lang['lpn_new_example_si']='شبكة أساسية، وحدات النظام الدولي (l/s)';
 $ec_lang['lpn_file_open']='فتح…';
@@ -669,10 +733,14 @@ $ec_lang['lpn_file_save']='حفظ';
 $ec_lang['lpn_file_saveas']='حفظ باسم…';
 $ec_lang['lpn_file_revert']='استرجاع';
 $ec_lang['lpn_file_close']='إغلاق';
+// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
+// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='الملفات الأخيرة';
 $ec_lang['lpn_recent_tip']='أعد فتح {file} دون الحاجة إلى البحث عنه في جهازك.';
 $ec_lang['lpn_recent_denied']='لم يُمنح الإذن لفتح ذلك الملف، لذا لم يُفتح.';
 $ec_lang['lpn_recent_gone']='تعذّر فتح {file}. ربما نُقل أو أُعيدت تسميته أو حُذف، لذا أُزيل من القائمة الأخيرة.';
+// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
+// around it.
 $ec_lang['lpn_tab_new']='مشروع جديد';
 $ec_lang['lpn_tab_all']='كل المشاريع';
 $ec_lang['lpn_tab_menu']='قائمة المشروع';
@@ -682,10 +750,20 @@ $ec_lang['lpn_tab_move_right']='نقل إلى اليمين';
 $ec_lang['lpn_tab_unsaved']='غير محفوظ في ملف';
 $ec_lang['lpn_import_bad_file']='تعذّرت قراءة ذلك الملف كمشروع محفوظ من هذه الصفحة.';
 $ec_lang['lpn_import_no_room']='لا توجد مساحة تخزين كافية في المتصفح لإضافة هذا المشروع. احذف مشروعاً لم تعد بحاجة إليه وحاول مرة أخرى.';
+// ---- EPANET .inp import (ROADMAP Task 196) ----
+// The import REPORTS every difference between the file and what this page can hold, so each
+// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
+// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
+// another sentence, and none may become one.
+// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
+// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='موافق';
 $ec_lang['lpn_file_import_inp']='استيراد ملف EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='اقرأ شبكة من ملف EPANET، سواء الملف النصي .inp أو ملف .net الذي يحفظه EPANET، واحفظها في هذا المتصفح كمشروع جديد. لا يمكن لهذه الصفحة كتابة ملف EPANET مرة أخرى، فاستخدم ملف، حفظ باسم للحفاظ على عملك.';
 $ec_lang['lpn_inp_bad_file']='تعذّرت قراءة ذلك الملف كملف شبكة EPANET.';
+// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
+// the way out named here always works, so keep the instruction in the message rather than leaving
+// the reader to guess.
 $ec_lang['lpn_net_bad_file']='يبدو هذا ملف .net من EPANET، لكن هذه الصفحة تعذّر عليها قراءته. افتحه في EPANET واستخدم أمر ملف، تصدير، شبكة هناك لحفظه كملف .inp، ثم استورد ذلك الملف.';
 $ec_lang['lpn_inp_report_heading']='تم استيراد {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} من الملتقيات والخزانات، و{links} من الأنابيب والمضخات، بوحدات {units}.';
@@ -710,11 +788,44 @@ $ec_lang['lpn_inp_drop_quality']='استُبعدت إعدادات جودة ال�
 $ec_lang['lpn_inp_drop_backdrop']='يشير هذا الملف إلى صورة خلفية لكنه لا يحتوي على الصورة نفسها. أضفها بنفسك عبر ملف، صورة خلفية، إضافة صورة.';
 $ec_lang['lpn_inp_drop_dangling']='تشير هذه الأنابيب إلى ملتقى غير موجود في الملف، لذا استُبعدت.';
 $ec_lang['lpn_inp_drop_units']='لم تُعرَف وحدات التدفق في هذا الملف، فافتُرضت غالونات في الدقيقة. تحقق من كل رقم قبل استخدام النتائج.';
+// {name} is a project name; word order is the translator's to choose. Says where the user landed,
+// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
+// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='فُتح {name} من ملف، وأُضيف إلى هذا المتصفح كمشروع جديد.';
+// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
+// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
+// browser they test in. That is expected, not a bug.
+// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='ملف مشروع';
+// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
+// a save cannot connect to a file, so every press really is another copy in the downloads folder.
+// The label says which of the two you are getting rather than leaving the duplicate looking like a
+// bug.
+// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
+// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
+// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
+// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
+// notice after the act -- at the moment the question arises -- rather than in a label forever.
+// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
+// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
+// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
+// anyway -- a disabled button fires no mouse events.
+// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
+// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
+// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
+// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
+// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='لا يستطيع هذا المتصفح الاتصال بملف، فإن فتح ملف هنا هو في الواقع رفع: يُنسخ المشروع إلى هذا المتصفح، والطريقة الوحيدة لحفظ عملك في الملف مرة أخرى هي الكتابة فوقه عبر ملف، حفظ باسم.';
+// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
+// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='يحفظ في الملف المتصل.';
 $ec_lang['lpn_file_saveas_tip']='اختر ملفاً لتحفظ فيه. يتصل هذا المشروع بذلك الملف، ويكتب أمر الحفظ فيه من الآن فصاعداً.';
+// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
+// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
+// is no API for it, and the download attribute cannot override the setting -- but the user can turn
+// that setting on themselves, and then Save as really does let them overwrite the file they started
+// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
+// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='يحفظ باستخدام إعدادات التنزيل في متصفحك. لا يستطيع هذا المتصفح الاتصال بملف، لذا فإن الحفظ معطّل ولا يتوفر إلا حفظ باسم. إذا فعّلت إعداد المتصفح “السؤال عن مكان حفظ كل ملف”، يمكنك اختيار الملف الأصلي والكتابة فوقه.';
 $ec_lang['lpn_status_uploaded']='تم رفع ملف المشروع. لا يمكن الحفاظ على اتصال به، فالطريقة الوحيدة للحفظ فيه مرة أخرى هي استخدام ملف، حفظ باسم.';
 $ec_lang['lpn_status_downloaded']='تم تنزيل {file}. لا يستطيع هذا المتصفح الاتصال بملف، لذا يبقى هذا المشروع معلَّماً بأنه غير محفوظ في ملف.';
@@ -723,18 +834,45 @@ $ec_lang['lpn_status_already_open']='ذلك الملف مفتوح هنا بال�
 $ec_lang['lpn_status_already_open_dirty']='ذلك الملف مفتوح هنا بالفعل باسم {name}، وفيه تغييرات لم تُحفظ. تم التحويل إليه بدلاً من فتح نسخة ثانية. استخدم ملف، استرجاع إذا أردت النسخة الموجودة على القرص بدلاً من ذلك.';
 $ec_lang['lpn_status_saved']='تم حفظ {file}.';
 $ec_lang['lpn_status_reverted']='أُعيد تحميل {file} من القرص.';
+// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
+// purpose: a program that writes your file behind your back takes away your right to walk away from
+// a session. So these three carry the whole close/discard/revert conversation.
+// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_prompt']='هل تريد حفظ تغييراتك في {name} قبل إغلاقه؟';
+// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
+// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_prompt']='يُحفظ {name} في هذا المتصفح فقط. إذا أغلقته دون حفظه في ملف، فسيضيع نهائياً.';
 $ec_lang['lpn_close_discard']='إغلاق دون حفظ';
 $ec_lang['lpn_cancel']='إلغاء';
 $ec_lang['lpn_revert_confirm']='هل تريد التخلص من التغييرات التي أجريتها وإعادة تحميل {file} من القرص؟';
+// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
+// page load, so the link is gone even though we still know the name. Says what to do, not just what
+// happened.
 $ec_lang['lpn_file_needs_reopen']='جاء هذا المشروع من {file}، لكن الاتصال بذلك الملف انقطع. اختر الملف مرة أخرى للاتصال به.';
+// Says what is still safe before it says what failed: the reassurance is the part a worried user
+// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='تعذّرت الكتابة في الملف. ربما نُقل أو أُعيدت تسميته، أو سُحب الإذن. لا يزال عملك محفوظاً في هذا المتصفح.';
 $ec_lang['lpn_file_changed_elsewhere']='حفظ شخص آخر في هذا الملف منذ أن فتحته، فالحفظ الآن سيكتب فوق عمله. استخدم ملف، حفظ باسم للاحتفاظ بتغييراتك في ملف خاص بك، أو ملف، استرجاع للتخلص من تغييراتك وتحميل تغييراته.';
+// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
+// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
+// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
+// Initials, and said to be public: whoever opens the same file sees this name, including outside the
+// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
+// rather than a name makes the safe answer the obvious one.
+// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
+// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='ماذا يجب أن يرى زملاؤك عندما يكون هذا المشروع مفتوحاً لديك؟ الأحرف الأولى من اسمك مثالية. يمكن لأي شخص يفتح الملف نفسه أن يرى هذا، فلا تستخدم أي معلومة خاصة.';
+// The stand-in when someone locked a project before giving a name. Reads in place of {name}
+// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='شخص آخر';
+// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
+// moment of opening, with both real answers on it -- the way every drawing and document program has
+// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} فتح هذا الملف.';
 $ec_lang['lpn_lock_open_readonly']='فتح للقراءة فقط';
+// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
+// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
+// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='إنشاء نسخة';
 $ec_lang['lpn_lock_break']='كسر قفلهم';
 $ec_lang['lpn_lock_open_heading_times']='{name} فتح هذا الملف؛ كان آخر تعديل قبل {x}، أي بعد {y} من آخر حفظ.';
@@ -747,26 +885,59 @@ $ec_lang['lpn_ago_minutes']='{n} دقيقة';
 $ec_lang['lpn_ago_hours']='{n} ساعة';
 $ec_lang['lpn_ago_days']='{n} يوم';
 $ec_lang['lpn_ago_unknown']='وقت غير معروف';
+// Read-only means read-only: it never turns itself back into an editable file while you are looking
+// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
+// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
+// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='للقراءة فقط: {name} فتح هذا الملف. يمكنك تغيير أي شيء تريده هنا، لكن لا يمكنك الحفظ. استخدم ملف، حفظ باسم للحفظ في ملف آخر.';
+// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
+// stops a colleague editing the same file. Editing still works -- an unreachable server must never
+// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
+// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='تنبيه: تعذّر الوصول إلى الخادم للتحقق من قفل هذا المشروع أو إنشائه، فلا شيء يمنع زميلاً من تعديل الملف نفسه في الوقت نفسه. ستُبلَّغ إذا عاد القفل للعمل.';
 $ec_lang['lpn_lock_storage_error']='تنبيه: لا يستطيع هذا الموقع حفظ سجلات القفل، فلا شيء يمنع زميلاً من تعديل الملف نفسه في الوقت نفسه. هذا خلل في إعداد الخادم، وليس شيئاً يمكنك إصلاحه هنا — مجلد القفل غير قابل للكتابة من قبل خادم الويب.';
 $ec_lang['lpn_lock_full_error']='تنبيه: نفدت مساحة هذا الموقع لتسجيل من فتح أي مشروع، فلا شيء يمنع زميلاً من تعديل الملف نفسه في الوقت نفسه. هذا خلل في إعداد الخادم، وليس شيئاً يمكنك إصلاحه هنا.';
 $ec_lang['lpn_lock_not_asked']='لا يعمل القفل لهذا المشروع، فلا شيء يمنع زميلاً من تعديل الملف نفسه في الوقت نفسه. لم يُسجَّل بعد اسم لك في هذا المتصفح، أو ليس للمشروع معرّف — يحدّد حفظ المشروع في ملف كليهما.';
 $ec_lang['lpn_lock_restored']='عاد القفل للعمل، وأصبح هذا الملف الآن لك لتحفظ فيه.';
 $ec_lang['lpn_lock_dismiss']='إخفاء هذه الرسالة';
+// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
+// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
+// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='سيُحفظ مشروعك في ملف على هذا الجهاز. يُحفظ عندما تطلب ذلك، ولا يُحفظ في أي وقت آخر، فلا يُكتب في ذلك الملف شيء دون علمك.';
 $ec_lang['lpn_file_training_2']='لكي لا يعدّل شخصان ملفاً واحداً في الوقت نفسه، يتتبّع هذا الموقع من فتحه. إذا كان شخص ما قد فتحه بالفعل، لا يزال بإمكانك فتحه ومشاهدته، أو الاحتفاظ بنسخة خاصة بك.';
+// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
+// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
+// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
+// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
+// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='في أول مرة تحفظ فيها، سيسألك متصفحك عمّا إذا كان يجوز لهذا الموقع تعديل الملف. هذا السؤال يأتي من المتصفح لا منّا، والموافقة عليه هي ما يسمح لأمر الحفظ بكتابة عملك مرة أخرى في الملف. عادةً ما يُسأل مرة واحدة فقط لكل ملف.';
+// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
+// false -- the name is never written into the project file. It is held in this browser and on this
+// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
+// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='أعطِ اسماً قصيراً يعرفك به زملاؤك. الأحرف الأولى من اسمك مثالية. يمكن لأي شخص يفتح الملف نفسه أن يرى هذا، فلا تستخدم أي معلومة خاصة.';
 $ec_lang['lpn_file_training_name']='الأحرف الأولى من اسمك';
 $ec_lang['lpn_file_training_continue']='متابعة';
+// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
+// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='اختيار الملف مرة أخرى';
 $ec_lang['lpn_file_reconnect']='إعادة الاتصال بهذا الملف';
 $ec_lang['lpn_file_reconnect_prompt']='جاء هذا المشروع من {file}. يحتاج متصفحك إلى إذنك مرة أخرى قبل أن يتمكن من الكتابة فيه. أعد الاتصال أدناه.';
+// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
+// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='هذا هو الملف نفسه الذي فتحه شخص آخر، فلا يمكن الكتابة فوقه. اختر ملفاً آخر أو اسماً آخر.';
 $ec_lang['lpn_saveas_overwrites_project']='يحتوي ذلك الملف بالفعل على مشروع مختلف، {name}. سيؤدي الحفظ هنا إلى استبداله بالكامل. هل تريد المتابعة؟';
 $ec_lang['lpn_saveas_overwrites_newer']='تغيّر ذلك الملف منذ آخر مرة رأيته فيها، فمن شبه المؤكد أن شخصاً آخر حفظ فيه. سيؤدي الحفظ هنا إلى استبدال نسخته بنسختك. هل تريد المتابعة؟';
+// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
+// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
+// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
+// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='اسم لهذا المشروع';
+// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
+// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
+// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
+// separate Delete for it to be confused with.)
+// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='تم إغلاق {closed}. يُعرض الآن {opened}.';
 $ec_lang['lpn_status_closed_empty']='تم إغلاق {closed}. بدأ مشروع فارغ جديد.';
 $ec_lang['lpn_storage_full']='لم يُحفظ. تخزين المتصفح ممتلئ أو غير متاح، لذا ستُفقد تغييراتك الأخيرة عند إغلاق هذا التبويب.';
@@ -776,6 +947,12 @@ $ec_lang['lpn_notes_2_term']='غير مُحاكى';
 $ec_lang['lpn_notes_2_def']='لا تُحاكى الصهاريج ولا جودة المياه ولا صمامات التحكم التي تفتح وتغلق من تلقاء نفسها (PRV وPSV وFCV). يمكن للأنبوب أن يحمل فاقداً موضعياً ثابتاً، لكن ليس صماماً تعتمد حالة فتحه أو إغلاقه على التدفق قيد الحل.';
 $ec_lang['lpn_notes_3_term']='حفظ المشاريع';
 $ec_lang['lpn_notes_3_def']='كل مشروع هو تبويب، وكل تبويب يُحفظ في هذا المتصفح أثناء عملك. يؤدي مسح بيانات متصفحك إلى حذفها جميعاً، فاحتفظ بعملك في ملف: ملف، حفظ باسم. تعني علامة النجمة على تبويب أنه يحمل تغييرات غير موجودة في ملف. لا يُكتب شيء في ملف أبداً ما لم تطلب ذلك. في بعض المتصفحات يتصل المشروع بالملف الذي تحفظه فيه، ويكتب أمر ملف، حفظ في ذلك الملف نفسه من حينها؛ وفي متصفحات أخرى لا يمكن الاتصال، فيكون الحفظ معطّلاً ولا يتوفر إلا حفظ باسم. عندما يُحفظ ملف مشروع على قرص مشترك، تخبرك هذه الصفحة إذا كان زميل قد فتحه بالفعل، حتى لا يكتب شخصان فوق عمل بعضهما.';
+// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
+// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
+// to stay readable on a phone, while the Notes section is already this page's documentation home,
+// prints with the page, and is translated with everything else. The popup carries a one-line
+// pointer to here instead (lpn_pump_curve_note).
+// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='منحنى المضخة';
 $ec_lang['lpn_notes_5_def']='تتبع المضخة العلاقة H = H₀ − aQ^b، حيث H هو العلو الذي تضيفه المضخة وQ هو التدفق خلالها. أدخل نقطة واحدة أو نقطتين أو ثلاث نقاط من منحنى الشركة المصنعة. النقاط الثلاث — العلو عند تدفق صفري، ونقطة التشغيل العادية، ونقطة أعلى تدفق — توائم H₀ وa وb مباشرة، وتتبع المنحنى المنشور عن كثب. توائم النقطتان قطعاً مكافئاً (b = 2) قمته عند تدفق صفري. تستخدم النقطة الواحدة قاعدة شائعة: العلو عند تدفق صفري يساوي 1.33 × العلو الذي تُدخله، وأعلى تدفق يساوي 2 × التدفق الذي تُدخله، مما يعطي أيضاً b = 2. المضخة التي لا تُدخل لها أي نقاط لا تضيف أي علو على الإطلاق. لا يُقطع المنحنى عند وصول العلو إلى الصفر، لذا فإن طلب تدفق من مضخة أكبر مما يستطيع منحناها تقديمه يعطي علواً سالباً. الحل هو مضخة أكبر أو طلب أصغر، لا موائمة منحنى مختلفة.';
 $ec_lang['lpn_notes_4_term']='إضافات مخطط لها';
@@ -789,12 +966,24 @@ $ec_lang['lpn_diag_dangling_link']='يتصل أنبوب أو مضخة بعقدة
 $ec_lang['lpn_diag_unreachable']='لا يوجد مسار من هذه العقد إلى أي خزان:';
 $ec_lang['lpn_diag_not_converged']='لم يُعثر على حل. تحقق من وجود قيم مستحيلة في الواقع، مثل قطر يساوي صفراً.';
 $ec_lang['lpn_field_roughness']='الخشونة';
+// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
+// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
+// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='معامل هيزن-وليامز C. كلما زاد الرقم كان الأنبوب أملس: نحو 150 للبلاستيك الجديد، و130 للفولاذ أو الحديد الجديد، و100 للأنبوب القديم.';
 $ec_lang['lpn_field_length']='الطول';
 $ec_lang['lpn_field_length_tip']='طول الأنبوب. عند تفعيل تلقائي، يُقاس الطول مما رسمته. أوقف تلقائي لكتابة طول مختلف عن الرسم.';
+// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
+// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
+// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='معامل الفاقد الموضعي، k';
 $ec_lang['lpn_field_km_tip']='الفاقد من الانحناءات والصمامات والوصلات على هذا الأنبوب، ويُحتسب كمضاعف لعلو السرعة. استخدم 0 لأنبوب مستقيم بسيط.';
+// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
+// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
+// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
+// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='الفاقد الموضعي، k';
+// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
+// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='مصدر المنحنى';
 $ec_lang['lpn_pump_curve_own']='أدخل النقاط أدناه';
 $ec_lang['lpn_pump_curve_ref_note']='يُستخدم المنحنى المُدخل للمضخة {id}.';
@@ -802,13 +991,23 @@ $ec_lang['lpn_pump_curve_note']='نقطة واحدة أو نقطتان أو ثل
 $ec_lang['lpn_pump_point1']='النقطة 1 (مطلوبة)';
 $ec_lang['lpn_pump_point2']='النقطة 2 (اختيارية)';
 $ec_lang['lpn_pump_point3']='النقطة 3 (اختيارية)';
+// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
+// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
+// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='الوضع: تحديد. انقر عنصراً أو تسمية لعرضه أو تغييره. اسحب لتحريك عقدة أو نقطة انعطاف أو تسمية. انقر نقراً مزدوجاً على أنبوب لإضافة نقطة انعطاف أو إزالتها.';
 $ec_lang['lpn_mode_delete']='الوضع: حذف. انقر عنصراً لإزالته.';
 $ec_lang['lpn_mode_add_junction']='الوضع: إضافة ملتقى. انقر على الخريطة لوضع ملتقى. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
 $ec_lang['lpn_mode_add_reservoir']='الوضع: إضافة خزان. انقر على الخريطة لوضع خزان. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
 $ec_lang['lpn_mode_add_pipe']='الوضع: إضافة أنبوب. انقر عقدة، ثم عقدة أخرى، لتوصيلهما. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
 $ec_lang['lpn_mode_add_pump']='الوضع: إضافة مضخة. انقر عقدة، ثم عقدة أخرى، لتوصيلهما. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
+// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
+// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='الوضع: إضافة نص. انقر على الخريطة لوضع تسمية نصية. انقر بالقرب من عقدة لإلحاق النص بتلك العقدة. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.';
+// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
+// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
+// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
+// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
+// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='استخدم هذا الوضع لتغيير الأشياء على الخريطة وتحريكها وسحبها.';
 $ec_lang['lpn_tip_labels_draggable']='يمكنك سحب تسمية لتحريكها. انقر نقراً مزدوجاً على تسمية لإعادتها إلى موضعها التلقائي.';
 $ec_lang['lpn_field_auto']='تلقائي';
@@ -823,6 +1022,10 @@ $ec_lang['lpn_labels_mark_extrema']='تمييز أعلى القيم وأدناه
 $ec_lang['lpn_field_id']='المعرّف';
 $ec_lang['lpn_backdrop_menu']='صورة خلفية…';
 $ec_lang['lpn_backdrop_add']='إضافة صورة';
+// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
+// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
+// menu, where nothing above them says what is being scaled. Naming the object costs one word and
+// works in both places.
 $ec_lang['lpn_backdrop_scale']='ضبط مقياس الصورة';
 $ec_lang['lpn_backdrop_position']='تحريك الصورة';
 $ec_lang['lpn_backdrop_remove']='إزالة الصورة';
@@ -854,6 +1057,8 @@ $ec_lang['lpn_push_none_displayed']='لا تظهر أي قيمة ابتدائي�
 $ec_lang['lpn_push_nothing']='لا يحمل أي عنصر موجود أياً من الخصائص التي يجري تطبيقها.';
 $ec_lang['lpn_push_no_change']='يحمل كل عنصر هذه القيم بالفعل، فلن يتغيّر شيء.';
 $ec_lang['lpn_settings_emitter_exponent']='أسّ الرشاش';
+// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
+// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='الحساب';
 $ec_lang['lpn_settings_tolerance']='سماحية التقارب';
 $ec_lang['lpn_settings_tolerance_tip']='مدى القرب الذي يجب أن يصل إليه الحلّال قبل أن يتوقف. الرقم الأصغر أكثر دقة ويستغرق وقتاً أطول.';
@@ -865,12 +1070,21 @@ $ec_lang['lpn_engine_manning_note']='ملاحظة: مع خشونة مانينج�
 $ec_lang['lpn_settings_text_size']='حجم النص';
 $ec_lang['lpn_settings_text_size_map']='مسافة الخريطة';
 $ec_lang['lpn_settings_text_size_screen']='بكسلات الشاشة';
+// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
+// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
+// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='حجم الرمز (نسبةً إلى النص)';
+// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
+// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='عتامة الرمز (0 إلى 1)';
+// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
+// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='عتامة الصورة الخلفية (0 إلى 1)';
 $ec_lang['lpn_settings_text_size_units']='وحدات حجم النص';
 $ec_lang['lpn_settings_map_display']='مظهر الخريطة';
 $ec_lang['lpn_settings_map_height_px']='ارتفاع الخريطة (بكسلات الشاشة)';
+// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
+// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='على الشاشة الصغيرة تُرسم الخريطة أقصر من هذا، ليبقى دائماً جزء من الصفحة قابلاً للتمرير.';
 $ec_lang['lpn_settings_legend_position']='موضع مفتاح الرموز';
 $ec_lang['lpn_settings_legend_top_left']='أعلى اليسار';

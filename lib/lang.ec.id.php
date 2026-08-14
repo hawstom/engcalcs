@@ -65,6 +65,20 @@ $ec_lang['template_welcome']='Buang rasa takutmu di pintu; di sini cinta adalah 
 $ec_lang['template_feedback']='Bisakah Anda menyarankan kata-kata yang lebih baik untuk halaman ini, atau ada hal lain yang bisa diperbaiki? Apakah Anda ingin membantu, atau belajar membuat alat seperti ini? Silakan hubungi saya.';
 $ec_lang['template_printable_title']='Judul Cetak';
 $ec_lang['template_printable_subtitle']='Subjudul Cetak';
+// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
+// prose, and they are translated into all 26 languages for one reason: consent that the visitor
+// cannot read is not consent. The long-form privacy notice and terms are a separate question --
+// English-authoritative, and translated by a human later if at all.
+$ec_lang['consent_body']='Bolehkah kami menyimpan satu digit angka per halaman di penyimpanan profil peramban ini untuk mencegah kami mencatat kunjungannya berulang kali?';
+$ec_lang['consent_accept']='Terima kali ini';
+$ec_lang['consent_accept_all']='Selalu terima';
+$ec_lang['consent_decline']='Tolak';
+$ec_lang['consent_current_granted']='Anda mengizinkan ini. Kami membatasi pencatatan untuk profil peramban ini.';
+$ec_lang['consent_current_denied']='Anda menolak ini. Kami tidak menyimpan apa pun untuk membatasi pencatatan pada profil peramban ini.';
+$ec_lang['consent_region_label']='Pilihan Anda tentang pembatasan pencatatan.';
+$ec_lang['consent_settings_link']='Pengaturan cookie';
+$ec_lang['privacy_link']='Kebijakan Privasi';
+$ec_lang['terms_link']='Ketentuan Penggunaan';
 $ec_lang['index_title']='Kalkulator Teknik Gratis Daring';
 $ec_lang['index_meta_desc_plain']='Kalkulator teknik hidraulika gratis untuk pipa, saluran, ambang, dan irigasi. Berjalan di peramban Anda, bisa dipakai luring, dan tersedia dalam 27 bahasa.';
 $ec_lang['calc_set_units']='Atur satuan:';
@@ -118,6 +132,8 @@ $ec_lang['hw_pressure_neg_short']='Tekanan negatif';
 $ec_lang['hw_pressure_neg']='Tekanan hilir di bawah nol. Garis tinggi tekan hidrolik (HGL) turun di bawah pipa, sehingga pipa tidak akan mengalir penuh dan hasil ini mungkin tidak valid.';
 $ec_lang['hw_roughness']='Koefisien Hazen-Williams, C';
 $ec_lang['hw_note_1']='<dl><dt>Kalkulator ini tidak memodelkan profil pipa di antara kedua ujungnya.</dt><dd>Kalkulator hanya menggunakan elevasi hulu dan hilir yang Anda masukkan. Jika permukaan tanah naik lebih tinggi daripada salah satu ujung di suatu titik di antaranya, tekanan pada titik tertinggi itu lebih rendah daripada tekanan mana pun yang dilaporkan di sini. Jalankan kembali kalkulator untuk panjang dari ujung hulu hingga titik tertinggi tersebut untuk memeriksanya.</dd><dd>Ketika garis tinggi tekan hidrolik (HGL) turun di bawah pipa, air berada dalam tekanan negatif. Udara keluar dari larutan, pipa berdinding tipis dapat runtuh, dan air tanah yang kotor dapat tertarik masuk melalui sambungan. Jaga agar jalur tetap berada dalam tekanan positif di semua titik, dan pertimbangkan pemasangan katup udara di setiap titik tertinggi.</dd><dt>Tekanan hulu adalah kondisi batas yang Anda tetapkan sendiri.</dt><dd>Baca nilainya dari alat ukur tekanan (gauge), dari muka air tangki (tinggi air di atas pipa), atau dari kurva pompa. Pompa menghasilkan tekanan yang lebih rendah seiring meningkatnya debit, jadi gunakan titik pada kurva yang sesuai dengan debit yang dimasukkan di atas.</dd><dt>Jumlahkan sendiri koefisien kehilangan kecil (lokal).</dt><dd>Totalkan nilai K untuk setiap katup, belokan, tee, meter, dan lubang masuk pada jalur pipa, lalu masukkan jumlah tersebut. Ikuti tautan pada input tersebut untuk nilai-nilai umum. Pada pipa transmisi utama yang panjang, kehilangan ini kecil dibandingkan dengan gesekan, tetapi pada pipa pendek di dalam stasiun pompa, kehilangan ini bisa menjadi bagian terbesar dari total kehilangan.</dd></dl>';
+
+
 // Manning Irregular
 $ec_lang['mi_menu']='Saluran Penampang Tidak Beraturan Manning';
 $ec_lang['mi_main_title']='Kalkulator Saluran Penampang Tidak Beraturan Manning Gratis Daring';
@@ -477,6 +493,7 @@ $ec_lang['rc_notes_5_term']='Rentang Ukuran Batu yang Valid';
 $ec_lang['rc_notes_5_def']='Persamaan dikembangkan menggunakan rentang D<sub>50</sub> dari 15 mm hingga 278 mm. Hasil di luar rentang ini diekstrapolasi dan harus digunakan dengan pertimbangan teknis tambahan.';
 $ec_lang['rc_notes_6_term']='Elevasi Lantai Hilir Outlet';
 $ec_lang['rc_notes_6_def']='Elevasi bagian atas lapisan batu di saluran outlet harus berada pada atau di bawah elevasi dasar saluran hilir. Jika lebih tinggi, batu outlet akan tidak stabil.';
+
 $ec_lang['rc_notes_7_def']='Ketika kedalaman normal di saluran inlet lebih kecil dari tinggi muka air mercu (H<sub>p</sub>) yang diperlukan untuk mengalirkan q<sub>t</sub>, terjadi aliran terbatas atau genangan di hulu inlet. Hal ini umumnya dapat diterima — genangan mengurangi kecepatan dan mencegah erosi di hulu. Untuk memeriksa: gunakan kalkulator aliran mercu untuk mencari H<sub>p</sub> bagi q<sub>t</sub> dan lebar mercu yang diberikan, lalu bandingkan dengan kedalaman normal saluran inlet. Jika H<sub>p</sub> melebihi kedalaman normal, genangan akan terjadi.';
 $ec_lang['rc_notes_4_term']='Referensi';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS juga menerbitkan <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">lembar kerja Excel</a> berdasarkan metode yang sama.';
@@ -583,6 +600,8 @@ $ec_lang['bpn_notes_2_term']='Hanya jaringan bercabang, tanpa loop';
 $ec_lang['bpn_notes_2_def']='Setiap jalur hanya memiliki satu jalur hulu (sebuah pohon). Alat ini tidak menyelesaikan jaringan berloop; jaringan seperti itu memerlukan metode iteratif (EPANET atau sejenisnya). Meniadakan loop adalah yang membuat alat ini tetap sederhana dan akurat.';
 $ec_lang['bpn_notes_3_term']='Tanpa kendali tekanan aktif';
 $ec_lang['bpn_notes_3_def']='Anda dapat menambahkan katup kehilangan lokal tetap (nilai-k), tetapi bukan katup penurun tekanan atau penopang tekanan (PRV/PSV). Status buka/tutup katup tersebut bergantung pada debit dan tekanan, yang akan memaksa perhitungan iteratif.';
+
+
 $ec_lang['bpn_supply2_q']='Debit pasokan 2';
 $ec_lang['bpn_supply2_h']='Tinggi tekan pasokan 2';
 $ec_lang['bpn_supply3_q']='Debit pasokan 3';
@@ -592,16 +611,6 @@ $ec_lang['bpn_h_supply']='Tinggi tekan pasokan';
 $ec_lang['bpn_h_supply_tip']='Tinggi tekan sumber pada debit rencana, dibaca dari kurva pasokan. Sama dengan tinggi tekan sumber yang dimasukkan bila kurvanya datar (reservoir).';
 $ec_lang['bpn_show_elevation']='Elevasi';
 $ec_lang['bpn_supply1_h']='Tinggi tekan pasokan statis';
-$ec_lang['consent_body']='Bolehkah kami menyimpan satu digit angka per halaman di penyimpanan profil peramban ini untuk mencegah kami mencatat kunjungannya berulang kali?';
-$ec_lang['consent_accept']='Terima kali ini';
-$ec_lang['consent_accept_all']='Selalu terima';
-$ec_lang['consent_decline']='Tolak';
-$ec_lang['consent_current_granted']='Anda mengizinkan ini. Kami membatasi pencatatan untuk profil peramban ini.';
-$ec_lang['consent_current_denied']='Anda menolak ini. Kami tidak menyimpan apa pun untuk membatasi pencatatan pada profil peramban ini.';
-$ec_lang['consent_region_label']='Pilihan Anda tentang pembatasan pencatatan.';
-$ec_lang['consent_settings_link']='Pengaturan cookie';
-$ec_lang['privacy_link']='Kebijakan Privasi';
-$ec_lang['terms_link']='Ketentuan Penggunaan';
 $ec_lang['lpn_main_menu']='Jaringan Distribusi Air';
 $ec_lang['lpn_main_title']='Kalkulator Daring Gratis Jaringan Distribusi Air dengan Mesin EPANET';
 $ec_lang['lpn_main_desc']='Analisis Jaringan Distribusi Air: Gambar Jaringan Pipa Tertutup atau Impor Berkas EPANET';
@@ -616,8 +625,18 @@ $ec_lang['lpn_tool_delete']='Hapus';
 $ec_lang['lpn_tool_zoom_extent']='Tampilkan Semua';
 $ec_lang['lpn_new_text']='Teks';
 $ec_lang['lpn_field_elev']='Elevasi';
+// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
+// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
+// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
+// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='Ketinggian tanah atau pipa di simpul ini. Ukur dari titik nol mana pun yang Anda pilih, asalkan setiap simpul menggunakan titik nol yang sama.';
+// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
+// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
+// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='Tinggi tekan';
+// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
+// outright that it is a height and not a pressure, which is the exact confusion the glossary's
+// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Ketinggian muka air di reservoir, diukur sebagai suatu ketinggian, bukan tekanan. Biarkan kosong agar muka air berada pada elevasi reservoir.';
 $ec_lang['lpn_close']='Tutup';
 $ec_lang['lpn_empty_hint']='Mulailah dengan menambahkan gambar latar atau reservoir dari bilah alat, atau buka File, Proyek baru untuk memulai dari contoh.';
@@ -630,6 +649,10 @@ $ec_lang['lpn_units_elevhead']='Elevasi dan tinggi tekan';
 $ec_lang['lpn_units_pressure']='Tekanan';
 $ec_lang['lpn_units_flow']='Debit';
 $ec_lang['lpn_units_velocity']='Kecepatan';
+// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
+// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
+// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
+// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='Gradien kehilangan tinggi tekan';
 $ec_lang['lpn_result_gradient_tip']='Kehilangan tinggi tekan dibagi panjang pipa. Gunakan untuk membandingkan pipa dengan panjang berbeda terhadap satu batas desain.';
 $ec_lang['lpn_result_head']='Tinggi tekan';
@@ -638,29 +661,70 @@ $ec_lang['lpn_result_pressure']='Tekanan';
 $ec_lang['lpn_result_flow']='Debit';
 $ec_lang['lpn_result_velocity']='Kecepatan';
 $ec_lang['lpn_result_headloss']='Kehilangan tinggi tekan';
+// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
+// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
+// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
+// Settings live INSIDE each project document, so deleting every project deletes every setting too:
+// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
+// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
+// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='Mengatur ulang hanya pengaturan proyek ini. Gambar dan proyek Anda yang lain tidak berubah. Untuk menyimpan pengaturan favorit Anda agar dapat digunakan kembali, simpan berkas proyek yang hanya berisi pengaturan.';
 $ec_lang['lpn_reset_all_tip']='Menghapus setiap proyek, setiap gambar latar, setiap pengaturan, dan pilihan satuan Anda, lalu memuat ulang halaman persis seperti yang dilihat pengunjung pertama kali. Ini satu-satunya pengaturan ulang yang menghapus semuanya.';
+// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
+// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
+// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
+// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
+// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_prompt']='Kalkulator ini menyimpan satuan dan input proyek persis seperti yang dimasukkan, tetapi sebelumnya mengonversi angka ke satuan SI untuk penyimpanan. Proyek ini disimpan sebelum perubahan tersebut, sehingga angkanya tersimpan dalam SI. Konversi angka-angka ini sekali lagi ke satuan saat ini? Agar Anda dapat menilainya, berikut beberapa diameter yang akan dikonversi, beserta nilainya sebelum dan sesudah:';
 $ec_lang['lpn_v2_restore_yes']='Konversi';
 $ec_lang['lpn_v2_restore_never']='Tidak. Jangan tanya lagi.';
 $ec_lang['lpn_v2_restore_no']='Tutup agar saya bisa memeriksa satuan saat ini terlebih dahulu';
 $ec_lang['lpn_storage_too_new']='Proyek ini disimpan oleh versi halaman yang lebih baru, sehingga tidak dapat dibuka di sini.';
+// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
+// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
+// something that is not in a file, so closing it asks first; a tab without one closes silently. A
+// browser project always wears one (it is in no file at all); a file project wears one only while it
+// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
+// our words for talking about the code, and the user sees only a name, an asterisk, and a file
+// extension.
+// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
+// conventional relationship and the reason the duplication between them is correct rather than
+// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
+// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
+// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='Berkas';
 $ec_lang['lpn_menu_edit']='Edit';
 $ec_lang['lpn_menu_insert']='Sisipkan';
 $ec_lang['lpn_menu_view']='Tampilan';
+// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
+// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Pengaturan';
+// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
+// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
+// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
+// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
+// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Hapus jaringan';
 $ec_lang['lpn_confirm_delete_network']='Hapus semua simpul, pipa, dan label teks di proyek ini? Gambar latar, nama proyek, dan pengaturan Anda tetap disimpan. Tindakan ini tidak dapat dibatalkan.';
 $ec_lang['lpn_view_units']='Satuan';
+// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Simpan semua';
+// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
+// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
+// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='Proyek{n}';
 $ec_lang['lpn_project_copy_suffix']='(salinan)';
 $ec_lang['lpn_project_rename']='Ganti nama';
+// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='Proyek baru…';
+// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
+// with the toolbar button of that name -- an example is a whole network, so it starts a project
+// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Proyek kosong, satuan AS (gpm)';
 $ec_lang['lpn_new_blank_si']='Proyek kosong, satuan SI (l/s)';
 $ec_lang['lpn_new_from_examples']='Dari contoh';
+// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
+// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_new_example_us']='Jaringan dasar, satuan AS (gpm)';
 $ec_lang['lpn_new_example_si']='Jaringan dasar, satuan SI (l/s)';
 $ec_lang['lpn_file_open']='Buka…';
@@ -668,10 +732,14 @@ $ec_lang['lpn_file_save']='Simpan';
 $ec_lang['lpn_file_saveas']='Simpan sebagai…';
 $ec_lang['lpn_file_revert']='Kembalikan';
 $ec_lang['lpn_file_close']='Tutup';
+// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
+// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Berkas terbaru';
 $ec_lang['lpn_recent_tip']='Buka {file} lagi tanpa perlu mencarinya di komputer Anda.';
 $ec_lang['lpn_recent_denied']='Izin untuk membuka berkas itu tidak diberikan, sehingga berkas tersebut tidak dibuka.';
 $ec_lang['lpn_recent_gone']='Tidak dapat membuka {file}. Berkas ini mungkin telah dipindahkan, diganti namanya, atau dihapus, sehingga dikeluarkan dari daftar terbaru.';
+// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
+// around it.
 $ec_lang['lpn_tab_new']='Proyek baru';
 $ec_lang['lpn_tab_all']='Semua proyek';
 $ec_lang['lpn_tab_menu']='Menu proyek';
@@ -681,10 +749,20 @@ $ec_lang['lpn_tab_move_right']='Pindah ke kanan';
 $ec_lang['lpn_tab_unsaved']='Belum disimpan ke berkas';
 $ec_lang['lpn_import_bad_file']='Berkas itu tidak dapat dibaca sebagai proyek yang disimpan dari halaman ini.';
 $ec_lang['lpn_import_no_room']='Ruang penyimpanan peramban tidak cukup untuk menambahkan proyek ini. Hapus proyek yang sudah tidak Anda perlukan lalu coba lagi.';
+// ---- EPANET .inp import (ROADMAP Task 196) ----
+// The import REPORTS every difference between the file and what this page can hold, so each
+// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
+// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
+// another sentence, and none may become one.
+// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
+// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_inp']='Impor berkas EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Membaca jaringan dari berkas EPANET, baik berkas teks .inp maupun berkas .net yang disimpan EPANET, dan menyimpannya di peramban ini sebagai proyek baru. Halaman ini tidak dapat menulis kembali berkas EPANET, jadi gunakan File, Simpan sebagai untuk menyimpan pekerjaan Anda.';
 $ec_lang['lpn_inp_bad_file']='Berkas itu tidak dapat dibaca sebagai berkas jaringan EPANET.';
+// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
+// the way out named here always works, so keep the instruction in the message rather than leaving
+// the reader to guess.
 $ec_lang['lpn_net_bad_file']='Berkas ini tampaknya berkas .net EPANET, tetapi halaman ini tidak dapat membacanya. Buka berkas itu di EPANET dan gunakan perintah File, Export, Network di sana untuk menyimpannya sebagai berkas .inp, lalu impor berkas tersebut.';
 $ec_lang['lpn_inp_report_heading']='Berkas {file} diimpor';
 $ec_lang['lpn_inp_report_counts']='{nodes} simpul dan reservoir, {links} pipa dan pompa, dalam satuan {units}.';
@@ -709,11 +787,44 @@ $ec_lang['lpn_inp_drop_quality']='Pengaturan kualitas air, reaksi kimia, dan ene
 $ec_lang['lpn_inp_drop_backdrop']='Berkas ini menyebut sebuah gambar latar tetapi tidak berisi gambar itu sendiri. Tambahkan sendiri melalui File, Gambar latar, Tambah gambar.';
 $ec_lang['lpn_inp_drop_dangling']='Pipa-pipa ini menyebut simpul yang tidak ada di dalam berkas, sehingga tidak disertakan.';
 $ec_lang['lpn_inp_drop_units']='Satuan debit di berkas ini tidak dikenali, sehingga galon per menit diasumsikan. Periksa setiap angka sebelum menggunakan hasilnya.';
+// {name} is a project name; word order is the translator's to choose. Says where the user landed,
+// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
+// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='Membuka {name} dari sebuah berkas, dan menambahkannya ke peramban ini sebagai proyek baru.';
+// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
+// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
+// browser they test in. That is expected, not a bug.
+// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='Berkas proyek';
+// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
+// a save cannot connect to a file, so every press really is another copy in the downloads folder.
+// The label says which of the two you are getting rather than leaving the duplicate looking like a
+// bug.
+// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
+// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
+// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
+// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
+// notice after the act -- at the moment the question arises -- rather than in a label forever.
+// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
+// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
+// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
+// anyway -- a disabled button fires no mouse events.
+// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
+// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
+// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
+// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
+// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='Peramban ini tidak dapat tersambung ke berkas, sehingga membuka berkas di sini sebenarnya adalah mengunggah: proyek disalin ke dalam peramban ini, dan satu-satunya cara menyimpan pekerjaan Anda kembali ke berkas adalah menimpa berkas itu dengan File, Simpan sebagai.';
+// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
+// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='Menyimpan ke berkas yang tersambung.';
 $ec_lang['lpn_file_saveas_tip']='Pilih berkas untuk disimpan. Proyek ini akan tersambung ke berkas itu, dan sejak saat itu Simpan akan menulis ke berkas tersebut.';
+// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
+// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
+// is no API for it, and the download attribute cannot override the setting -- but the user can turn
+// that setting on themselves, and then Save as really does let them overwrite the file they started
+// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
+// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='Menyimpan menggunakan pengaturan Unduhan peramban Anda. Peramban ini tidak dapat tersambung ke berkas, sehingga Simpan dinonaktifkan dan hanya Simpan sebagai yang tersedia. Jika Anda mengaktifkan pengaturan peramban "Tanyakan tempat menyimpan setiap berkas", Anda dapat memilih berkas aslinya dan menimpanya.';
 $ec_lang['lpn_status_uploaded']='Berkas proyek diunggah. Tidak ada sambungan ke berkas itu yang dapat dipertahankan, sehingga satu-satunya cara menyimpan kembali ke berkas itu adalah menggunakan File, Simpan sebagai.';
 $ec_lang['lpn_status_downloaded']='Mengunduh {file}. Peramban ini tidak dapat tersambung ke berkas, sehingga proyek ini tetap ditandai belum disimpan ke berkas.';
@@ -722,18 +833,45 @@ $ec_lang['lpn_status_already_open']='Berkas itu sudah terbuka di sini sebagai {n
 $ec_lang['lpn_status_already_open_dirty']='Berkas itu sudah terbuka di sini sebagai {name}, dengan perubahan yang belum Anda simpan ke berkas tersebut. Ini beralih ke berkas tersebut, bukan membuka salinan kedua. Gunakan File, Kembalikan jika Anda ingin versi yang ada di disk.';
 $ec_lang['lpn_status_saved']='Menyimpan {file}.';
 $ec_lang['lpn_status_reverted']='Memuat {file} lagi dari disk.';
+// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
+// purpose: a program that writes your file behind your back takes away your right to walk away from
+// a session. So these three carry the whole close/discard/revert conversation.
+// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_prompt']='Simpan perubahan Anda ke {name} sebelum menutupnya?';
+// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
+// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_prompt']='{name} hanya tersimpan di peramban ini. Jika Anda menutupnya tanpa menyimpannya ke berkas, proyek ini akan hilang selamanya.';
 $ec_lang['lpn_close_discard']='Tutup tanpa menyimpan';
 $ec_lang['lpn_cancel']='Batal';
 $ec_lang['lpn_revert_confirm']='Buang perubahan yang telah Anda buat dan muat {file} lagi dari disk?';
+// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
+// page load, so the link is gone even though we still know the name. Says what to do, not just what
+// happened.
 $ec_lang['lpn_file_needs_reopen']='Proyek ini berasal dari {file}, tetapi sambungan ke berkas itu telah hilang. Pilih berkas itu lagi untuk tersambung ke sana.';
+// Says what is still safe before it says what failed: the reassurance is the part a worried user
+// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Tidak dapat menulis ke berkas. Berkas ini mungkin telah dipindahkan atau diganti namanya, atau izin mungkin telah dicabut. Pekerjaan Anda tetap tersimpan di peramban ini.';
 $ec_lang['lpn_file_changed_elsewhere']='Orang lain telah menyimpan ke berkas ini sejak Anda membukanya, sehingga menyimpan sekarang akan menimpa pekerjaan mereka. Gunakan File, Simpan sebagai untuk menyimpan perubahan Anda ke berkas Anda sendiri, atau File, Kembalikan untuk membuang perubahan Anda dan memuat milik mereka.';
+// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
+// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
+// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
+// Initials, and said to be public: whoever opens the same file sees this name, including outside the
+// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
+// rather than a name makes the safe answer the obvious one.
+// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
+// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='Apa yang harus dilihat rekan kerja saat Anda membuka proyek ini? Inisial Anda paling ideal. Siapa pun yang membuka berkas yang sama dapat melihatnya, jadi jangan gunakan apa pun yang bersifat pribadi.';
+// The stand-in when someone locked a project before giving a name. Reads in place of {name}
+// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Orang lain';
+// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
+// moment of opening, with both real answers on it -- the way every drawing and document program has
+// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} sedang membuka berkas ini.';
 $ec_lang['lpn_lock_open_readonly']='Buka hanya-baca';
+// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
+// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
+// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Buat salinan';
 $ec_lang['lpn_lock_break']='Ambil alih kunci mereka';
 $ec_lang['lpn_lock_open_heading_times']='{name} sedang membuka berkas ini; suntingan terakhir {x} yang lalu, {y} setelah penyimpanan terakhir.';
@@ -746,26 +884,59 @@ $ec_lang['lpn_ago_minutes']='{n} menit';
 $ec_lang['lpn_ago_hours']='{n} jam';
 $ec_lang['lpn_ago_days']='{n} hari';
 $ec_lang['lpn_ago_unknown']='waktu yang tidak diketahui';
+// Read-only means read-only: it never turns itself back into an editable file while you are looking
+// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
+// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
+// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='Hanya-baca: {name} sedang membuka berkas ini. Anda dapat mengubah apa pun yang Anda mau di sini, tetapi tidak dapat menyimpan. Gunakan File, Simpan sebagai untuk menyimpan ke berkas lain.';
+// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
+// stops a colleague editing the same file. Editing still works -- an unreachable server must never
+// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
+// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='Perhatian: tidak dapat menghubungi server untuk memeriksa atau membuat kunci pada proyek ini, sehingga tidak ada yang mencegah rekan kerja menyunting berkas yang sama pada saat bersamaan. Anda akan diberi tahu jika penguncian mulai berfungsi kembali.';
 $ec_lang['lpn_lock_storage_error']='Perhatian: situs ini tidak dapat menyimpan catatan kunci, sehingga tidak ada yang mencegah rekan kerja menyunting berkas yang sama pada saat bersamaan. Ini kesalahan pengaturan pada server, bukan sesuatu yang dapat Anda perbaiki di sini — folder kunci tidak dapat ditulisi oleh server web.';
 $ec_lang['lpn_lock_full_error']='Perhatian: situs ini kehabisan ruang untuk mencatat siapa membuka proyek yang mana, sehingga tidak ada yang mencegah rekan kerja menyunting berkas yang sama pada saat bersamaan. Ini kesalahan pengaturan pada server, bukan sesuatu yang dapat Anda perbaiki di sini.';
 $ec_lang['lpn_lock_not_asked']='Penguncian tidak berjalan untuk proyek ini, sehingga tidak ada yang mencegah rekan kerja menyunting berkas yang sama pada saat bersamaan. Peramban ini belum mencatat nama Anda, atau proyek ini belum memiliki pengenal — menyimpan proyek ke berkas akan mengatur keduanya.';
 $ec_lang['lpn_lock_restored']='Penguncian berfungsi kembali, dan berkas ini kini milik Anda untuk disimpan.';
 $ec_lang['lpn_lock_dismiss']='Sembunyikan pesan ini';
+// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
+// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
+// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='Proyek Anda akan disimpan dalam sebuah berkas di komputer ini. Berkas itu disimpan saat Anda memintanya, dan tidak pada saat lain, sehingga tidak ada yang ditulis ke berkas itu tanpa sepengetahuan Anda.';
 $ec_lang['lpn_file_training_2']='Agar dua orang tidak pernah menyunting satu berkas pada saat bersamaan, situs ini mencatat siapa yang sedang membukanya. Jika sudah ada yang membukanya, Anda tetap dapat membukanya untuk melihat, atau menyimpan salinan Anda sendiri.';
+// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
+// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
+// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
+// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
+// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='Saat pertama kali Anda menyimpan, peramban Anda akan menanyakan apakah situs ini boleh menyunting berkas tersebut. Pertanyaan itu berasal dari peramban, bukan dari kami, dan menjawab ya adalah yang memungkinkan Simpan menuliskan kembali pekerjaan Anda. Pertanyaan ini biasanya hanya ditanyakan sekali untuk setiap berkas.';
+// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
+// false -- the name is never written into the project file. It is held in this browser and on this
+// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
+// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='Berikan nama singkat yang akan dikenali rekan kerja Anda. Inisial Anda paling ideal. Siapa pun yang membuka berkas yang sama dapat melihatnya, jadi jangan gunakan apa pun yang bersifat pribadi.';
 $ec_lang['lpn_file_training_name']='Inisial Anda';
 $ec_lang['lpn_file_training_continue']='Lanjutkan';
+// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
+// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Pilih berkas itu lagi';
 $ec_lang['lpn_file_reconnect']='Sambungkan kembali ke berkas ini';
 $ec_lang['lpn_file_reconnect_prompt']='Proyek ini berasal dari {file}. Peramban Anda memerlukan izin Anda lagi sebelum dapat menulis ke berkas itu. Sambungkan kembali di bawah ini.';
+// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
+// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Itu adalah berkas yang sama yang sedang dibuka orang lain, sehingga tidak dapat ditimpa. Pilih berkas lain atau nama lain.';
 $ec_lang['lpn_saveas_overwrites_project']='Berkas itu sudah berisi proyek lain, {name}. Menyimpan di sini akan menggantinya sepenuhnya. Lanjutkan?';
 $ec_lang['lpn_saveas_overwrites_newer']='Berkas itu telah berubah sejak terakhir Anda melihatnya, sehingga hampir pasti orang lain telah menyimpan ke berkas tersebut. Menyimpan di sini akan mengganti versi mereka dengan versi Anda. Lanjutkan?';
+// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
+// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
+// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
+// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='Nama untuk proyek ini';
+// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
+// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
+// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
+// separate Delete for it to be confused with.)
+// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='Menutup {closed}. Kini menampilkan {opened}.';
 $ec_lang['lpn_status_closed_empty']='Menutup {closed}. Memulai proyek kosong baru.';
 $ec_lang['lpn_storage_full']='Tidak tersimpan. Penyimpanan peramban penuh atau tidak tersedia, sehingga perubahan terbaru Anda akan hilang saat Anda menutup tab ini.';
@@ -775,6 +946,12 @@ $ec_lang['lpn_notes_2_term']='Tidak dimodelkan';
 $ec_lang['lpn_notes_2_def']='Tangki, kualitas air, dan katup kendali yang membuka dan menutup secara otomatis (PRV, PSV, FCV) tidak dimodelkan. Sebuah pipa dapat membawa kehilangan lokal tetap, tetapi bukan katup yang keadaan buka/tutupnya bergantung pada debit yang sedang diselesaikan.';
 $ec_lang['lpn_notes_3_term']='Menyimpan proyek';
 $ec_lang['lpn_notes_3_def']='Setiap proyek adalah sebuah tab, dan setiap tab disimpan di peramban ini saat Anda bekerja. Membersihkan data peramban Anda akan menghapus semuanya, jadi simpan pekerjaan Anda ke berkas: File, Simpan sebagai. Tanda bintang pada tab berarti tab itu berisi perubahan yang belum ada di berkas. Tidak ada yang pernah ditulis ke berkas kecuali Anda memintanya. Pada sebagian peramban, sebuah proyek tersambung ke berkas yang Anda simpan, dan File, Simpan sejak itu menulis kembali ke berkas yang sama itu; pada peramban lain sambungan tidak dimungkinkan, sehingga Simpan dinonaktifkan dan hanya Simpan sebagai yang tersedia. Ketika berkas proyek disimpan di drive bersama, halaman ini memberi tahu Anda jika rekan kerja sudah membukanya, sehingga dua orang tidak saling menimpa pekerjaan.';
+// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
+// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
+// to stay readable on a phone, while the Notes section is already this page's documentation home,
+// prints with the page, and is translated with everything else. The popup carries a one-line
+// pointer to here instead (lpn_pump_curve_note).
+// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Kurva pompa';
 $ec_lang['lpn_notes_5_def']='Pompa mengikuti H = H₀ − aQ^b, dengan H adalah tinggi tekan yang ditambahkan pompa dan Q adalah debit yang melaluinya. Masukkan satu, dua, atau tiga titik dari kurva pabrikan. Tiga titik — tinggi tekan pada debit nol, titik kerja normal, dan titik debit tertinggi — mencocokkan H₀, a, dan b secara langsung, dan mengikuti kurva yang diterbitkan paling dekat. Dua titik mencocokkan sebuah parabola (b = 2) dengan puncaknya pada debit nol. Satu titik menggunakan aturan umum: tinggi tekan pada debit nol adalah 1.33 × tinggi tekan yang Anda masukkan, dan debit tertinggi adalah 2 × debit yang Anda masukkan, yang kembali menghasilkan b = 2. Pompa tanpa titik yang dimasukkan tidak menambahkan tinggi tekan sama sekali. Kurva ini tidak dipotong di titik tinggi tekan mencapai nol, sehingga meminta pompa mengalirkan debit lebih besar daripada yang dapat diberikan kurvanya menghasilkan tinggi tekan negatif. Solusinya adalah pompa yang lebih besar atau kebutuhan yang lebih kecil, bukan pencocokan kurva yang berbeda.';
 $ec_lang['lpn_notes_4_term']='Penambahan yang direncanakan';
@@ -788,12 +965,24 @@ $ec_lang['lpn_diag_dangling_link']='Sebuah pipa atau pompa tersambung ke simpul 
 $ec_lang['lpn_diag_unreachable']='Simpul-simpul ini tidak memiliki jalur ke reservoir:';
 $ec_lang['lpn_diag_not_converged']='Tidak ditemukan solusi. Periksa apakah ada nilai yang tidak mungkin terjadi di dunia nyata, seperti diameter nol.';
 $ec_lang['lpn_field_roughness']='Kekasaran';
+// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
+// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
+// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='C Hazen-Williams. Angka yang lebih tinggi berarti pipa yang lebih halus: sekitar 150 untuk plastik baru, 130 untuk baja atau besi baru, dan 100 untuk pipa lama.';
 $ec_lang['lpn_field_length']='Panjang';
 $ec_lang['lpn_field_length_tip']='Panjang pipa. Dengan Otomatis diaktifkan, panjang diukur dari apa yang Anda gambar. Nonaktifkan Otomatis untuk mengetik panjang yang berbeda dari gambar.';
+// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
+// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
+// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='Koefisien kehilangan lokal, k';
 $ec_lang['lpn_field_km_tip']='Kehilangan dari belokan, katup, dan sambungan pada pipa ini, dihitung sebagai kelipatan tinggi kecepatan. Gunakan 0 untuk pipa lurus biasa.';
+// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
+// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
+// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
+// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='Kehilangan lokal, k';
+// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
+// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Sumber kurva';
 $ec_lang['lpn_pump_curve_own']='Masukkan titik di bawah';
 $ec_lang['lpn_pump_curve_ref_note']='Menggunakan kurva yang dimasukkan untuk pompa {id}.';
@@ -801,13 +990,23 @@ $ec_lang['lpn_pump_curve_note']='Satu, dua, atau tiga titik — lihat "Kurva pom
 $ec_lang['lpn_pump_point1']='Titik 1 (wajib)';
 $ec_lang['lpn_pump_point2']='Titik 2 (opsional)';
 $ec_lang['lpn_pump_point3']='Titik 3 (opsional)';
+// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
+// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
+// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='Mode: Pilih. Klik sebuah elemen atau label untuk melihat atau mengubahnya. Seret untuk memindahkan simpul, verteks, atau label. Klik dua kali pada pipa untuk menambah atau menghapus verteks.';
 $ec_lang['lpn_mode_delete']='Mode: Hapus. Klik sebuah elemen untuk menghapusnya.';
 $ec_lang['lpn_mode_add_junction']='Mode: Tambah Simpul. Klik peta untuk menempatkan simpul. Beralih ke mode Pilih untuk mengubah atau memindahkan elemen dan label.';
 $ec_lang['lpn_mode_add_reservoir']='Mode: Tambah Reservoir. Klik peta untuk menempatkan reservoir. Beralih ke mode Pilih untuk mengubah atau memindahkan elemen dan label.';
 $ec_lang['lpn_mode_add_pipe']='Mode: Tambah Pipa. Klik satu simpul, lalu simpul lainnya, untuk menyambungkannya. Beralih ke mode Pilih untuk mengubah atau memindahkan elemen dan label.';
 $ec_lang['lpn_mode_add_pump']='Mode: Tambah Pompa. Klik satu simpul, lalu simpul lainnya, untuk menyambungkannya. Beralih ke mode Pilih untuk mengubah atau memindahkan elemen dan label.';
+// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
+// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Mode: Tambah Teks. Klik peta untuk menempatkan label teks. Klik di dekat simpul untuk melampirkan teks ke simpul itu. Beralih ke mode Pilih untuk mengubah atau memindahkan elemen dan label.';
+// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
+// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
+// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
+// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
+// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Gunakan mode ini untuk mengubah, memindahkan, dan menyeret sesuatu di peta.';
 $ec_lang['lpn_tip_labels_draggable']='Anda dapat menyeret label untuk memindahkannya. Klik dua kali pada label untuk mengembalikannya ke posisi otomatis.';
 $ec_lang['lpn_field_auto']='Otomatis';
@@ -822,6 +1021,10 @@ $ec_lang['lpn_labels_mark_extrema']='Tandai nilai tertinggi dan terendah';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Gambar latar…';
 $ec_lang['lpn_backdrop_add']='Tambah gambar';
+// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
+// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
+// menu, where nothing above them says what is being scaled. Naming the object costs one word and
+// works in both places.
 $ec_lang['lpn_backdrop_scale']='Atur skala gambar';
 $ec_lang['lpn_backdrop_position']='Pindahkan gambar';
 $ec_lang['lpn_backdrop_remove']='Hapus gambar';
@@ -853,6 +1056,8 @@ $ec_lang['lpn_push_none_displayed']='Tidak ada nilai awal yang sedang ditampilka
 $ec_lang['lpn_push_nothing']='Tidak ada elemen yang ada memiliki properti apa pun yang sedang diterapkan.';
 $ec_lang['lpn_push_no_change']='Setiap elemen sudah memiliki nilai-nilai ini, sehingga tidak ada yang akan berubah.';
 $ec_lang['lpn_settings_emitter_exponent']='Eksponen emitter';
+// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
+// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Perhitungan';
 $ec_lang['lpn_settings_tolerance']='Toleransi konvergensi';
 $ec_lang['lpn_settings_tolerance_tip']='Seberapa dekat penyelesai harus mencapai sebelum berhenti. Angka yang lebih kecil lebih tepat dan memerlukan waktu lebih lama.';
@@ -864,12 +1069,21 @@ $ec_lang['lpn_engine_manning_note']='Catatan: dengan kekasaran Manning, EPANET m
 $ec_lang['lpn_settings_text_size']='Ukuran teks';
 $ec_lang['lpn_settings_text_size_map']='Jarak peta';
 $ec_lang['lpn_settings_text_size_screen']='Piksel layar';
+// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
+// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
+// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Ukuran simbol (relatif terhadap teks)';
+// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
+// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Opasitas simbol (0 hingga 1)';
+// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
+// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Opasitas gambar latar (0 hingga 1)';
 $ec_lang['lpn_settings_text_size_units']='Satuan ukuran teks';
 $ec_lang['lpn_settings_map_display']='Tampilan peta';
 $ec_lang['lpn_settings_map_height_px']='Tinggi peta (piksel layar)';
+// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
+// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='Pada layar kecil, peta digambar lebih pendek dari ini, sehingga selalu ada bagian halaman yang tersisa untuk digulir.';
 $ec_lang['lpn_settings_legend_position']='Posisi legenda';
 $ec_lang['lpn_settings_legend_top_left']='Kiri atas';

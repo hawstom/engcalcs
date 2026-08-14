@@ -65,6 +65,20 @@ $ec_lang['template_welcome']='Nechejte strachy za dveřmi; zde je láska naším
 $ec_lang['template_feedback']='Můžete navrhnout lepší znění tohoto textu, nebo máte jiný nápad? Chcete pomoci, nebo se naučit vytvářet podobné nástroje? Napište mi, prosím.';
 $ec_lang['template_printable_title']='Tisknutelný název';
 $ec_lang['template_printable_subtitle']='Tisknutelný podtitul';
+// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
+// prose, and they are translated into all 26 languages for one reason: consent that the visitor
+// cannot read is not consent. The long-form privacy notice and terms are a separate question --
+// English-authoritative, and translated by a human later if at all.
+$ec_lang['consent_body']='Smíme si v úložišti tohoto profilu prohlížeče uchovávat jednu číslici na stránku, abychom zabránili opakovanému zaznamenávání jejích návštěv?';
+$ec_lang['consent_accept']='Přijmout tentokrát';
+$ec_lang['consent_accept_all']='Přijmout natrvalo';
+$ec_lang['consent_decline']='Odmítnout';
+$ec_lang['consent_current_granted']='Povolili jste to. Omezujeme zaznamenávání pro tento profil prohlížeče.';
+$ec_lang['consent_current_denied']='Odmítli jste to. Neukládáme nic, co by omezovalo zaznamenávání pro tento profil prohlížeče.';
+$ec_lang['consent_region_label']='Vaše volba ohledně omezení zaznamenávání.';
+$ec_lang['consent_settings_link']='Nastavení cookies';
+$ec_lang['privacy_link']='Zásady ochrany osobních údajů';
+$ec_lang['terms_link']='Podmínky použití';
 $ec_lang['index_title']='Bezplatné inženýrské kalkulačky online';
 $ec_lang['index_meta_desc_plain']='Bezplatné inženýrské kalkulátory pro potrubí, koryta, přelivy a závlahy. Fungují přímo v prohlížeči, pracují offline a jsou dostupné ve 27 jazycích.';
 $ec_lang['calc_set_units']='Nastavit jednotky:';
@@ -118,6 +132,8 @@ $ec_lang['hw_pressure_neg_short']='Záporný tlak';
 $ec_lang['hw_pressure_neg']='Tlak po proudu je pod nulou. Čára HGL klesá pod potrubí, takže by potrubí neproudilo zcela plné a tento výsledek nemusí být platný.';
 $ec_lang['hw_roughness']='Hazen-Williamsův součinitel, C';
 $ec_lang['hw_note_1']='<dl><dt>Tento kalkulátor nemodeluje profil potrubí mezi oběma konci.</dt><dd>Používá pouze kóty proti proudu a po proudu, které zadáte. Pokud terén mezi oběma konci stoupá výše než kterýkoli z nich, je tlak v tomto vysokém bodě nižší než jakýkoli tlak zde uvedený. Spusťte výpočet znovu pro úsek od konce proti proudu po tento vysoký bod, abyste jej ověřili.</dd><dd>Tam, kde čára HGL klesne pod potrubí, je voda pod záporným tlakem. Z vody se uvolňuje vzduch, tenkostěnné potrubí se může zhroutit a spárami může být nasáta znečištěná podzemní voda. Udržujte na celé trase kladný tlak a zvažte osazení vzdušníku v každém vysokém bodě.</dd><dt>Tlak proti proudu je okrajová podmínka, kterou zadáváte sami.</dt><dd>Odečtěte jej z manometru, z hladiny vody v nádrži (výška vody nad potrubím) nebo z charakteristiky čerpadla. Čerpadlo dodává s rostoucím průtokem nižší tlak, proto použijte bod na křivce odpovídající průtoku zadanému výše.</dd><dt>Součinitele místních (lokálních) ztrát si sečtěte sami.</dt><dd>Sečtěte hodnoty K pro každý ventil, koleno, T-kus, vodoměr a vstup na trase a zadejte jejich součet. Typické hodnoty najdete přes odkaz u tohoto pole. U dlouhého přivaděče jsou tyto ztráty ve srovnání s třením malé, ale u krátkého potrubí ve stanici mohou tvořit většinu ztráty.</dd></dl>';
+
+
 // Manning Irregular
 $ec_lang['mi_menu']='Nepravidelné koryto Manning';
 $ec_lang['mi_main_title']='Bezplatný online kalkulátor nepravidelného koryta Manning';
@@ -477,6 +493,7 @@ $ec_lang['rc_notes_5_term']='Platný rozsah velikosti kamene';
 $ec_lang['rc_notes_5_def']='Rovnice byly vyvinuty pro rozsah D<sub>50</sub> od 15 mm do 278 mm. Výsledky mimo tento rozsah jsou extrapolované a měly by být použity s dodatečným inženýrským posouzením.';
 $ec_lang['rc_notes_6_term']='Výška vývarové desky na výtoku';
 $ec_lang['rc_notes_6_def']='Výška horní plochy záhozu ve výtokovém úseku by měla být na úrovni nebo pod úrovní dna dolního koryta. Pokud je výše, zához na výtoku bude nestabilní.';
+
 $ec_lang['rc_notes_7_def']='Pokud je normální hloubka ve vtokové stoce menší než přepadová výška (H<sub>p</sub>) potřebná k převedení q<sub>t</sub>, dochází k omezení průtoku nebo vzdutí proti proudu od vtoku skluzu. To je obecně přijatelné — vzdutí snižuje rychlost a zabraňuje erozi proti proudu. Kontrola: pomocí kalkulátoru přelivu zjistěte H<sub>p</sub> pro dané q<sub>t</sub> a šířku koruny a porovnejte ji s normální hloubkou ve vtokové stoce. Pokud H<sub>p</sub> překračuje normální hloubku, dojde ke vzdutí.';
 $ec_lang['rc_notes_4_term']='Literatura';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS také zveřejňuje <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">tabulku Excel</a> založenou na stejné metodě.';
@@ -583,6 +600,8 @@ $ec_lang['bpn_notes_2_term']='Pouze větvené sítě, bez okruhů';
 $ec_lang['bpn_notes_2_def']='Každá řada má právě jednu horní řadu (strom). Tento nástroj neřeší okruhové sítě; ty vyžadují iterační metody (EPANET nebo podobné). Vynechání okruhů udržuje výpočet jednoduchý a přesný.';
 $ec_lang['bpn_notes_3_term']='Žádné aktivní tlakové regulátory';
 $ec_lang['bpn_notes_3_def']='Lze přidat pevný ventil s místní ztrátou (hodnota k), ale ne redukční nebo udržovací tlakové ventily (PRV/PSV). Jejich otevřený/zavřený stav závisí na průtoku a tlaku, což by vyžadovalo iteraci.';
+
+
 $ec_lang['bpn_supply2_q']='Dodávkový průtok 2';
 $ec_lang['bpn_supply2_h']='Dodávková výška 2';
 $ec_lang['bpn_supply3_q']='Dodávkový průtok 3';
@@ -592,16 +611,6 @@ $ec_lang['bpn_h_supply']='Dodávková výška';
 $ec_lang['bpn_h_supply_tip']='Výška zdroje při návrhovém průtoku, čtená z dodávkové křivky. Rovná se zadané výšce zdroje, pokud je křivka plochá (nádrž).';
 $ec_lang['bpn_show_elevation']='Nadmořská výška';
 $ec_lang['bpn_supply1_h']='Statická dodávková výška';
-$ec_lang['consent_body']='Smíme si v úložišti tohoto profilu prohlížeče uchovávat jednu číslici na stránku, abychom zabránili opakovanému zaznamenávání jejích návštěv?';
-$ec_lang['consent_accept']='Přijmout tentokrát';
-$ec_lang['consent_accept_all']='Přijmout natrvalo';
-$ec_lang['consent_decline']='Odmítnout';
-$ec_lang['consent_current_granted']='Povolili jste to. Omezujeme zaznamenávání pro tento profil prohlížeče.';
-$ec_lang['consent_current_denied']='Odmítli jste to. Neukládáme nic, co by omezovalo zaznamenávání pro tento profil prohlížeče.';
-$ec_lang['consent_region_label']='Vaše volba ohledně omezení zaznamenávání.';
-$ec_lang['consent_settings_link']='Nastavení cookies';
-$ec_lang['privacy_link']='Zásady ochrany osobních údajů';
-$ec_lang['terms_link']='Podmínky použití';
 $ec_lang['lpn_main_menu']='Vodovodní síť';
 $ec_lang['lpn_main_title']='Bezplatný online kalkulátor vodovodní sítě s výpočetním jádrem EPANET';
 $ec_lang['lpn_main_desc']='Analýza vodovodní sítě: Nakreslete okruhovou potrubní síť nebo importujte soubory EPANET';
@@ -616,8 +625,18 @@ $ec_lang['lpn_tool_delete']='Smazat';
 $ec_lang['lpn_tool_zoom_extent']='Zobrazit vše';
 $ec_lang['lpn_new_text']='Text';
 $ec_lang['lpn_field_elev']='Nadmořská výška';
+// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
+// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
+// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
+// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='Úroveň terénu nebo potrubí v tomto uzlu. Měřte ji od libovolné nuly, pokud ji použijete stejně pro všechny uzly.';
+// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
+// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
+// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='Tlaková výška';
+// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
+// outright that it is a height and not a pressure, which is the exact confusion the glossary's
+// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Hladina vody u zdroje, vyjádřená jako výška, nikoli jako tlak. Ponechte prázdné, pokud má být hladina vody na nadmořské výšce zdroje.';
 $ec_lang['lpn_close']='Zavřít';
 $ec_lang['lpn_empty_hint']='Začněte přidáním podkladového obrázku nebo zdroje z panelu nástrojů, nebo otevřete Soubor, Nový projekt a začněte od příkladu.';
@@ -630,6 +649,10 @@ $ec_lang['lpn_units_elevhead']='Nadmořská výška a tlaková výška';
 $ec_lang['lpn_units_pressure']='Tlak';
 $ec_lang['lpn_units_flow']='Průtok';
 $ec_lang['lpn_units_velocity']='Rychlost';
+// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
+// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
+// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
+// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='Gradient ztráty tlakové výšky';
 $ec_lang['lpn_result_gradient_tip']='Ztráta tlakové výšky dělená délkou potrubí. Použijte ji k porovnání potrubí různých délek podle jednoho návrhového limitu.';
 $ec_lang['lpn_result_head']='Tlaková výška';
@@ -638,29 +661,70 @@ $ec_lang['lpn_result_pressure']='Tlak';
 $ec_lang['lpn_result_flow']='Průtok';
 $ec_lang['lpn_result_velocity']='Rychlost';
 $ec_lang['lpn_result_headloss']='Ztráta tlakové výšky';
+// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
+// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
+// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
+// Settings live INSIDE each project document, so deleting every project deletes every setting too:
+// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
+// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
+// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='Obnoví pouze nastavení tohoto projektu. Vaše kresba a ostatní projekty se nemění. Chcete-li si oblíbené nastavení uložit pro pozdější použití, uložte soubor projektu, který obsahuje jen nastavení.';
 $ec_lang['lpn_reset_all_tip']='Smaže každý projekt, každý podkladový obrázek, všechna nastavení i vaši volbu jednotek a znovu načte stránku přesně tak, jak ji vidí návštěvník poprvé. Toto je jediné obnovení, které vymaže úplně vše.';
+// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
+// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
+// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
+// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
+// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_prompt']='Tento kalkulátor ukládá jednotky a zadané hodnoty projektu tak, jak byly zadány, ale dříve převáděl čísla pro uložení na jednotky SI. Tento projekt byl uložen před touto změnou, takže jeho čísla byla uložena v SI. Převést je naposledy na aktuální jednotky? Abyste mohli posoudit, zde jsou některé průměry, které by byly převedeny, s hodnotami před převodem a po něm:';
 $ec_lang['lpn_v2_restore_yes']='Převést';
 $ec_lang['lpn_v2_restore_never']='Ne. Už se neptat.';
 $ec_lang['lpn_v2_restore_no']='Zavřít, abych si nejdřív zkontroloval aktuální jednotky';
 $ec_lang['lpn_storage_too_new']='Tento projekt byl uložen novější verzí stránky, takže jej zde nelze otevřít.';
+// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
+// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
+// something that is not in a file, so closing it asks first; a tab without one closes silently. A
+// browser project always wears one (it is in no file at all); a file project wears one only while it
+// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
+// our words for talking about the code, and the user sees only a name, an asterisk, and a file
+// extension.
+// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
+// conventional relationship and the reason the duplication between them is correct rather than
+// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
+// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
+// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='Soubor';
 $ec_lang['lpn_menu_edit']='Úpravy';
 $ec_lang['lpn_menu_insert']='Vložit';
 $ec_lang['lpn_menu_view']='Zobrazení';
+// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
+// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Nastavení';
+// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
+// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
+// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
+// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
+// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Smazat síť';
 $ec_lang['lpn_confirm_delete_network']='Smazat všechny uzly, potrubí a textové popisky v tomto projektu? Podkladový obrázek, název projektu a nastavení zůstanou zachovány. Tuto akci nelze vrátit zpět.';
 $ec_lang['lpn_view_units']='Jednotky';
+// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Uložit vše';
+// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
+// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
+// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='Projekt{n}';
 $ec_lang['lpn_project_copy_suffix']='(kopie)';
 $ec_lang['lpn_project_rename']='Přejmenovat';
+// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='Nový projekt…';
+// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
+// with the toolbar button of that name -- an example is a whole network, so it starts a project
+// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Prázdný projekt, americké jednotky (gpm)';
 $ec_lang['lpn_new_blank_si']='Prázdný projekt, jednotky SI (l/s)';
 $ec_lang['lpn_new_from_examples']='Z příkladů';
+// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
+// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_new_example_us']='Základní síť, americké jednotky (gpm)';
 $ec_lang['lpn_new_example_si']='Základní síť, jednotky SI (l/s)';
 $ec_lang['lpn_file_open']='Otevřít…';
@@ -668,10 +732,14 @@ $ec_lang['lpn_file_save']='Uložit';
 $ec_lang['lpn_file_saveas']='Uložit jako…';
 $ec_lang['lpn_file_revert']='Vrátit k uloženému';
 $ec_lang['lpn_file_close']='Zavřít';
+// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
+// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Nedávné soubory';
 $ec_lang['lpn_recent_tip']='Znovu otevřít {file}, aniž byste jej museli hledat v počítači.';
 $ec_lang['lpn_recent_denied']='Nebylo uděleno oprávnění k otevření tohoto souboru, takže nebyl otevřen.';
 $ec_lang['lpn_recent_gone']='Nepodařilo se otevřít {file}. Soubor mohl být přesunut, přejmenován nebo smazán, proto byl odebrán ze seznamu nedávných.';
+// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
+// around it.
 $ec_lang['lpn_tab_new']='Nový projekt';
 $ec_lang['lpn_tab_all']='Všechny projekty';
 $ec_lang['lpn_tab_menu']='Nabídka projektu';
@@ -681,10 +749,20 @@ $ec_lang['lpn_tab_move_right']='Přesunout doprava';
 $ec_lang['lpn_tab_unsaved']='Neuloženo do souboru';
 $ec_lang['lpn_import_bad_file']='Tento soubor se nepodařilo přečíst jako projekt uložený z této stránky.';
 $ec_lang['lpn_import_no_room']='V úložišti prohlížeče není dost místa pro přidání tohoto projektu. Smažte projekt, který už nepotřebujete, a zkuste to znovu.';
+// ---- EPANET .inp import (ROADMAP Task 196) ----
+// The import REPORTS every difference between the file and what this page can hold, so each
+// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
+// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
+// another sentence, and none may become one.
+// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
+// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_inp']='Importovat soubor EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Načte síť ze souboru EPANET, ať už jde o textový soubor .inp, nebo soubor .net, který ukládá EPANET, a uloží ji v tomto prohlížeči jako nový projekt. Tato stránka neumí zapsat soubor EPANET zpět, proto svou práci uchovejte pomocí Soubor, Uložit jako.';
 $ec_lang['lpn_inp_bad_file']='Tento soubor se nepodařilo přečíst jako soubor sítě EPANET.';
+// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
+// the way out named here always works, so keep the instruction in the message rather than leaving
+// the reader to guess.
 $ec_lang['lpn_net_bad_file']='Vypadá to na soubor .net z programu EPANET, ale tato stránka jej nedokázala přečíst. Otevřete jej v programu EPANET a pomocí příkazu Soubor, Export, Síť jej tam uložte jako soubor .inp, a poté tento soubor importujte.';
 $ec_lang['lpn_inp_report_heading']='Importováno {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} uzlů a zdrojů, {links} potrubí a čerpadel, v jednotkách {units}.';
@@ -709,11 +787,44 @@ $ec_lang['lpn_inp_drop_quality']='Nastavení kvality vody, chemických reakcí a
 $ec_lang['lpn_inp_drop_backdrop']='Tento soubor odkazuje na podkladový obrázek, ale samotný obrázek neobsahuje. Přidejte jej sami pomocí Soubor, Podkladový obrázek, Přidat obrázek.';
 $ec_lang['lpn_inp_drop_dangling']='Toto potrubí odkazuje na uzel, který v souboru není, proto bylo vynecháno.';
 $ec_lang['lpn_inp_drop_units']='Jednotky průtoku v tomto souboru nebyly rozpoznány, proto byly předpokládány galony za minutu. Než výsledky použijete, zkontrolujte každé číslo.';
+// {name} is a project name; word order is the translator's to choose. Says where the user landed,
+// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
+// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='Otevřeno {name} ze souboru a přidáno do tohoto prohlížeče jako nový projekt.';
+// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
+// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
+// browser they test in. That is expected, not a bug.
+// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='Soubor projektu';
+// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
+// a save cannot connect to a file, so every press really is another copy in the downloads folder.
+// The label says which of the two you are getting rather than leaving the duplicate looking like a
+// bug.
+// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
+// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
+// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
+// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
+// notice after the act -- at the moment the question arises -- rather than in a label forever.
+// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
+// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
+// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
+// anyway -- a disabled button fires no mouse events.
+// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
+// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
+// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
+// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
+// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='Tento prohlížeč se neumí připojit k souboru, takže otevření souboru zde je ve skutečnosti nahrání: projekt se zkopíruje do tohoto prohlížeče a jediný způsob, jak uložit vaši práci zpět do souboru, je přepsat jej pomocí Soubor, Uložit jako.';
+// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
+// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='Uloží do připojeného souboru.';
 $ec_lang['lpn_file_saveas_tip']='Vyberte soubor, do kterého se má uložit. Tento projekt se k danému souboru připojí a Uložit do něj od té chvíle zapisuje.';
+// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
+// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
+// is no API for it, and the download attribute cannot override the setting -- but the user can turn
+// that setting on themselves, and then Save as really does let them overwrite the file they started
+// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
+// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='Ukládá pomocí nastavení stahování vašeho prohlížeče. Tento prohlížeč se neumí připojit k souboru, proto je Uložit zakázáno a dostupné je pouze Uložit jako. Pokud v prohlížeči zapnete nastavení „Zeptat se, kam uložit každý soubor“, můžete vybrat původní soubor a přepsat jej.';
 $ec_lang['lpn_status_uploaded']='Soubor projektu byl nahrán. Spojení s ním nelze udržet, proto je jediný způsob, jak do něj uložit, použít Soubor, Uložit jako.';
 $ec_lang['lpn_status_downloaded']='Staženo {file}. Tento prohlížeč se neumí připojit k souboru, proto tento projekt zůstává označen jako neuložený do souboru.';
@@ -722,18 +833,45 @@ $ec_lang['lpn_status_already_open']='Tento soubor je zde už otevřen jako {name
 $ec_lang['lpn_status_already_open_dirty']='Tento soubor je zde už otevřen jako {name}, se změnami, které do něj nebyly uloženy. Přepnulo se na něj, místo aby se otevřela druhá kopie. Pokud chcete místo toho verzi z disku, použijte Soubor, Vrátit k uloženému.';
 $ec_lang['lpn_status_saved']='Uloženo {file}.';
 $ec_lang['lpn_status_reverted']='Znovu načteno {file} z disku.';
+// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
+// purpose: a program that writes your file behind your back takes away your right to walk away from
+// a session. So these three carry the whole close/discard/revert conversation.
+// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_prompt']='Uložit vaše změny do {name} před zavřením?';
+// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
+// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_prompt']='{name} je uchováno pouze v tomto prohlížeči. Pokud jej zavřete bez uložení do souboru, nenávratně o něj přijdete.';
 $ec_lang['lpn_close_discard']='Zavřít bez uložení';
 $ec_lang['lpn_cancel']='Zrušit';
 $ec_lang['lpn_revert_confirm']='Zahodit provedené změny a znovu načíst {file} z disku?';
+// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
+// page load, so the link is gone even though we still know the name. Says what to do, not just what
+// happened.
 $ec_lang['lpn_file_needs_reopen']='Tento projekt pochází ze souboru {file}, ale spojení s tímto souborem bylo ztraceno. Vyberte soubor znovu, abyste se k němu připojili.';
+// Says what is still safe before it says what failed: the reassurance is the part a worried user
+// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Do souboru se nepodařilo zapsat. Mohl být přesunut nebo přejmenován, nebo mohlo být odebráno oprávnění. Vaše práce je stále uložena v tomto prohlížeči.';
 $ec_lang['lpn_file_changed_elsewhere']='Někdo jiný uložil do tohoto souboru poté, co jste jej otevřeli, takže uložení nyní by přepsalo jeho práci. Pomocí Soubor, Uložit jako uchovejte své změny ve vlastním souboru, nebo pomocí Soubor, Vrátit k uloženému zahoďte své změny a načtěte jeho verzi.';
+// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
+// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
+// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
+// Initials, and said to be public: whoever opens the same file sees this name, including outside the
+// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
+// rather than a name makes the safe answer the obvious one.
+// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
+// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='Co mají kolegové vidět, když máte tento projekt otevřený? Ideální jsou vaše iniciály. Kdokoli, kdo otevře stejný soubor, to uvidí, proto nepoužívejte nic soukromého.';
+// The stand-in when someone locked a project before giving a name. Reads in place of {name}
+// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Někdo jiný';
+// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
+// moment of opening, with both real answers on it -- the way every drawing and document program has
+// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} má tento soubor otevřený.';
 $ec_lang['lpn_lock_open_readonly']='Otevřít jen pro čtení';
+// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
+// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
+// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Vytvořit kopii';
 $ec_lang['lpn_lock_break']='Převzít zámek souboru';
 $ec_lang['lpn_lock_open_heading_times']='{name} má tento soubor otevřený; poslední úprava byla před {x}, {y} po posledním uložení.';
@@ -746,26 +884,59 @@ $ec_lang['lpn_ago_minutes']='{n} minutami';
 $ec_lang['lpn_ago_hours']='{n} hodinami';
 $ec_lang['lpn_ago_days']='{n} dny';
 $ec_lang['lpn_ago_unknown']='neznámou dobou';
+// Read-only means read-only: it never turns itself back into an editable file while you are looking
+// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
+// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
+// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='Jen pro čtení: {name} má tento soubor otevřený. Zde můžete měnit cokoli chcete, ale nemůžete ukládat. Použijte Soubor, Uložit jako a uložte do jiného souboru.';
+// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
+// stops a colleague editing the same file. Editing still works -- an unreachable server must never
+// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
+// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='Pozor: nepodařilo se spojit se serverem a zkontrolovat nebo vytvořit zámek tohoto projektu, takže nic nebrání kolegovi upravovat stejný soubor současně. Jakmile začne zamykání znovu fungovat, budete o tom informováni.';
 $ec_lang['lpn_lock_storage_error']='Pozor: tento web nemůže ukládat záznamy o zámcích, takže nic nebrání kolegovi upravovat stejný soubor současně. Jde o chybu nastavení serveru, kterou zde nelze opravit — složka pro zámky není zapisovatelná pro webový server.';
 $ec_lang['lpn_lock_full_error']='Pozor: tomuto webu došlo místo pro záznam o tom, kdo má který projekt otevřený, takže nic nebrání kolegovi upravovat stejný soubor současně. Jde o chybu nastavení serveru, kterou zde nelze opravit.';
 $ec_lang['lpn_lock_not_asked']='Pro tento projekt neběží zamykání, takže nic nebrání kolegovi upravovat stejný soubor současně. Tento prohlížeč pro vás zatím nemá zaznamenané jméno, nebo projekt nemá identifikátor — uložení projektu do souboru nastaví obojí.';
 $ec_lang['lpn_lock_restored']='Zamykání znovu funguje a tento soubor je nyní váš, můžete do něj ukládat.';
 $ec_lang['lpn_lock_dismiss']='Skrýt tuto zprávu';
+// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
+// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
+// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='Váš projekt bude uložen do souboru v tomto počítači. Ukládá se jen tehdy, když o to požádáte, a jindy vůbec, takže se do souboru nic nezapisuje bez vašeho vědomí.';
 $ec_lang['lpn_file_training_2']='Aby dva lidé nikdy neupravovali jeden soubor současně, tento web sleduje, kdo jej má otevřený. Pokud jej už někdo má otevřený, přesto jej můžete otevřít a prohlédnout, nebo si ponechat vlastní kopii.';
+// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
+// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
+// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
+// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
+// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='Při prvním uložení se váš prohlížeč zeptá, zda tento web smí soubor upravovat. Tuto otázku klade prohlížeč, ne my, a teprve souhlas umožní Uložit zapsat vaši práci zpět. Obvykle se ptá jen jednou na soubor.';
+// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
+// false -- the name is never written into the project file. It is held in this browser and on this
+// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
+// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='Zadejte krátké jméno, podle kterého vás kolegové poznají. Ideální jsou vaše iniciály. Kdokoli, kdo otevře stejný soubor, jej uvidí, proto nepoužívejte nic soukromého.';
 $ec_lang['lpn_file_training_name']='Vaše iniciály';
 $ec_lang['lpn_file_training_continue']='Pokračovat';
+// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
+// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Vybrat soubor znovu';
 $ec_lang['lpn_file_reconnect']='Znovu se připojit k tomuto souboru';
 $ec_lang['lpn_file_reconnect_prompt']='Tento projekt pochází ze souboru {file}. Váš prohlížeč znovu potřebuje vaše svolení, než do něj bude moci zapisovat. Připojte se znovu níže.';
+// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
+// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Jde o stejný soubor, který má otevřený někdo jiný, proto jej nelze přepsat. Vyberte jiný soubor nebo jiný název.';
 $ec_lang['lpn_saveas_overwrites_project']='Tento soubor už obsahuje jiný projekt, {name}. Uložením zde jej zcela nahradíte. Pokračovat?';
 $ec_lang['lpn_saveas_overwrites_newer']='Tento soubor se od chvíle, kdy jste jej naposledy viděli, změnil, takže do něj téměř jistě uložil někdo jiný. Uložením zde nahradíte cizí verzi svou vlastní. Pokračovat?';
+// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
+// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
+// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
+// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='Název tohoto projektu';
+// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
+// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
+// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
+// separate Delete for it to be confused with.)
+// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='Zavřeno {closed}. Nyní zobrazeno {opened}.';
 $ec_lang['lpn_status_closed_empty']='Zavřeno {closed}. Byl zahájen nový prázdný projekt.';
 $ec_lang['lpn_storage_full']='Neuloženo. Úložiště prohlížeče je plné nebo nedostupné, takže vaše nedávné změny se při zavření této karty ztratí.';
@@ -775,6 +946,12 @@ $ec_lang['lpn_notes_2_term']='Nemodelováno';
 $ec_lang['lpn_notes_2_def']='Nádrže, kvalita vody a regulační ventily, které se samy otevírají a zavírají (PRV, PSV, FCV), nejsou modelovány. Potrubí může nést pevnou místní ztrátu, ale ne ventil, jehož otevřený nebo zavřený stav závisí na právě počítaném průtoku.';
 $ec_lang['lpn_notes_3_term']='Ukládání projektů';
 $ec_lang['lpn_notes_3_def']='Každý projekt je karta a každá karta se během práce ukládá do tohoto prohlížeče. Vymazání dat prohlížeče je všechny smaže, proto si práci ukládejte do souboru: Soubor, Uložit jako. Hvězdička na kartě znamená, že obsahuje změny, které nejsou v souboru. Do souboru se nikdy nic nezapíše, pokud o to nepožádáte. V některých prohlížečích se projekt připojí k souboru, do kterého jej uložíte, a Soubor, Uložit od té chvíle zapisuje zpět do stejného souboru; v jiných spojení možné není, proto je Uložit zakázáno a dostupné je pouze Uložit jako. Když je soubor projektu uložen na sdíleném disku, tato stránka vám sdělí, pokud jej má kolega už otevřený, aby si dva lidé navzájem nepřepsali práci.';
+// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
+// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
+// to stay readable on a phone, while the Notes section is already this page's documentation home,
+// prints with the page, and is translated with everything else. The popup carries a one-line
+// pointer to here instead (lpn_pump_curve_note).
+// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Křivka čerpadla';
 $ec_lang['lpn_notes_5_def']='Čerpadlo se řídí vztahem H = H₀ − aQ^b, kde H je tlaková výška, kterou čerpadlo přidává, a Q je průtok, který jím prochází. Zadejte jeden, dva nebo tři body z křivky výrobce. Tři body — tlaková výška při nulovém průtoku, normální pracovní bod a bod nejvyššího průtoku — proloží H₀, a a b přímo a nejvěrněji sledují publikovanou křivku. Dva body proloží parabolu (b = 2) s vrcholem při nulovém průtoku. Jeden bod používá běžné pravidlo: tlaková výška při nulovém průtoku je 1,33 × zadaná tlaková výška a nejvyšší průtok je 2 × zadaný průtok, což opět dává b = 2. Čerpadlo bez zadaných bodů nepřidává žádnou tlakovou výšku. Křivka není oříznuta v místě, kde tlaková výška dosáhne nuly, takže požadavek na vyšší průtok, než jaký křivka dokáže dodat, dá zápornou tlakovou výšku. Řešením je větší čerpadlo nebo menší odběr, ne jiné proložení křivky.';
 $ec_lang['lpn_notes_4_term']='Plánovaná rozšíření';
@@ -788,12 +965,24 @@ $ec_lang['lpn_diag_dangling_link']='Potrubí nebo čerpadlo se připojuje k uzlu
 $ec_lang['lpn_diag_unreachable']='Tyto uzly nemají cestu ke zdroji:';
 $ec_lang['lpn_diag_not_converged']='Nebylo nalezeno žádné řešení. Zkontrolujte, zda nejsou zadány hodnoty nemožné ve skutečnosti, například nulový průměr.';
 $ec_lang['lpn_field_roughness']='Drsnost';
+// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
+// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
+// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Součinitel C podle Hazen-Williams. Vyšší číslo znamená hladší potrubí: přibližně 150 pro nový plast, 130 pro novou ocel nebo litinu a 100 pro staré potrubí.';
 $ec_lang['lpn_field_length']='Délka';
 $ec_lang['lpn_field_length_tip']='Délka potrubí. Je-li zapnuto Automaticky, délka se měří z toho, co jste nakreslili. Vypněte Automaticky, chcete-li zadat délku, která se od kresby liší.';
+// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
+// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
+// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='Součinitel místní ztráty, k';
 $ec_lang['lpn_field_km_tip']='Ztráta z ohybů, ventilů a tvarovek na tomto potrubí, vyjádřená jako násobek rychlostní výšky. Pro obyčejné rovné potrubí použijte 0.';
+// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
+// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
+// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
+// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='Místní ztráta, k';
+// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
+// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Zdroj křivky';
 $ec_lang['lpn_pump_curve_own']='Zadat body níže';
 $ec_lang['lpn_pump_curve_ref_note']='Použita křivka zadaná pro čerpadlo {id}.';
@@ -801,13 +990,23 @@ $ec_lang['lpn_pump_curve_note']='Jeden, dva nebo tři body — viz „Křivka č
 $ec_lang['lpn_pump_point1']='Bod 1 (povinný)';
 $ec_lang['lpn_pump_point2']='Bod 2 (volitelný)';
 $ec_lang['lpn_pump_point3']='Bod 3 (volitelný)';
+// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
+// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
+// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='Režim: Výběr. Klikněte na prvek nebo popisek, chcete-li jej zobrazit nebo změnit. Přetažením přesunete uzel, zlomový bod nebo popisek. Dvojitým kliknutím na potrubí přidáte nebo odeberete zlomový bod.';
 $ec_lang['lpn_mode_delete']='Režim: Smazat. Kliknutím na prvek jej odstraníte.';
 $ec_lang['lpn_mode_add_junction']='Režim: Přidat uzel. Kliknutím na mapu umístíte uzel. Přepněte do režimu Výběr, chcete-li měnit nebo přesouvat prvky a popisky.';
 $ec_lang['lpn_mode_add_reservoir']='Režim: Přidat zdroj. Kliknutím na mapu umístíte zdroj. Přepněte do režimu Výběr, chcete-li měnit nebo přesouvat prvky a popisky.';
 $ec_lang['lpn_mode_add_pipe']='Režim: Přidat potrubí. Klikněte na uzel a poté na další uzel, abyste je propojili. Přepněte do režimu Výběr, chcete-li měnit nebo přesouvat prvky a popisky.';
 $ec_lang['lpn_mode_add_pump']='Režim: Přidat čerpadlo. Klikněte na uzel a poté na další uzel, abyste je propojili. Přepněte do režimu Výběr, chcete-li měnit nebo přesouvat prvky a popisky.';
+// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
+// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Režim: Přidat text. Kliknutím na mapu umístíte textový popisek. Kliknutím poblíž uzlu jej k tomuto uzlu připojíte. Přepněte do režimu Výběr, chcete-li měnit nebo přesouvat prvky a popisky.';
+// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
+// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
+// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
+// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
+// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Tento režim použijte ke změně, přesunu a přetažení věcí na mapě.';
 $ec_lang['lpn_tip_labels_draggable']='Popisek můžete přetáhnout, abyste jej přesunuli. Dvojitým kliknutím na popisek jej vrátíte na automatickou pozici.';
 $ec_lang['lpn_field_auto']='Automaticky';
@@ -822,6 +1021,10 @@ $ec_lang['lpn_labels_mark_extrema']='Označit nejvyšší a nejnižší hodnoty'
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Podkladový obrázek…';
 $ec_lang['lpn_backdrop_add']='Přidat obrázek';
+// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
+// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
+// menu, where nothing above them says what is being scaled. Naming the object costs one word and
+// works in both places.
 $ec_lang['lpn_backdrop_scale']='Nastavit měřítko obrázku';
 $ec_lang['lpn_backdrop_position']='Přesunout obrázek';
 $ec_lang['lpn_backdrop_remove']='Odebrat obrázek';
@@ -853,6 +1056,8 @@ $ec_lang['lpn_push_none_displayed']='Momentálně není zobrazen žádný popise
 $ec_lang['lpn_push_nothing']='Žádný stávající prvek nemá žádnou z použitých vlastností.';
 $ec_lang['lpn_push_no_change']='Všechny prvky už tyto hodnoty mají, takže by se nic nezměnilo.';
 $ec_lang['lpn_settings_emitter_exponent']='Exponent emitoru';
+// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
+// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Výpočet';
 $ec_lang['lpn_settings_tolerance']='Tolerance konvergence';
 $ec_lang['lpn_settings_tolerance_tip']='Jak blízko se musí řešič přiblížit, než se zastaví. Menší číslo je přesnější a trvá déle.';
@@ -864,12 +1069,21 @@ $ec_lang['lpn_engine_manning_note']='Poznámka: s drsností podle Manninga poč�
 $ec_lang['lpn_settings_text_size']='Velikost textu';
 $ec_lang['lpn_settings_text_size_map']='Vzdálenost na mapě';
 $ec_lang['lpn_settings_text_size_screen']='Pixely obrazovky';
+// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
+// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
+// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Velikost symbolu (vzhledem k textu)';
+// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
+// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Krytí symbolu (0 až 1)';
+// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
+// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Krytí podkladového obrázku (0 až 1)';
 $ec_lang['lpn_settings_text_size_units']='Jednotky velikosti textu';
 $ec_lang['lpn_settings_map_display']='Vzhled mapy';
 $ec_lang['lpn_settings_map_height_px']='Výška mapy (pixely obrazovky)';
+// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
+// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='Na malé obrazovce se mapa vykreslí nižší než tato hodnota, aby na stránce vždy zbylo místo pro posouvání.';
 $ec_lang['lpn_settings_legend_position']='Umístění legendy';
 $ec_lang['lpn_settings_legend_top_left']='Vlevo nahoře';

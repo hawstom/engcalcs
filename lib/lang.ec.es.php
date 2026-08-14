@@ -66,6 +66,20 @@ $ec_lang['template_welcome']='Dejad vuestros miedos en la puerta; el amor se hab
 $ec_lang['template_feedback']='¿Puede sugerir una mejor redacción para este texto, o algo más? ¿Quiere ayudar, o aprender a crear herramientas como estas? Por favor, contácteme.';
 $ec_lang['template_printable_title']='Título Imprimible';
 $ec_lang['template_printable_subtitle']='Subtítulo Imprimible';
+// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
+// prose, and they are translated into all 26 languages for one reason: consent that the visitor
+// cannot read is not consent. The long-form privacy notice and terms are a separate question --
+// English-authoritative, and translated by a human later if at all.
+$ec_lang['consent_body']='¿Podemos guardar un solo dígito por página en el almacenamiento de este perfil de navegador para evitar registrar sus visitas repetidamente?';
+$ec_lang['consent_accept']='Aceptar';
+$ec_lang['consent_accept_all']='Aceptar siempre';
+$ec_lang['consent_decline']='Rechazar';
+$ec_lang['consent_current_granted']='Usted permitió esto. Limitamos el registro para este perfil de navegador.';
+$ec_lang['consent_current_denied']='Usted rechazó esto. No guardamos nada para limitar el registro de este perfil de navegador.';
+$ec_lang['consent_region_label']='Su elección sobre limitar el registro.';
+$ec_lang['consent_settings_link']='Configuración de cookies';
+$ec_lang['privacy_link']='Aviso de privacidad';
+$ec_lang['terms_link']='Términos de uso';
 $ec_lang['index_title']='Calculadoras para ingenieros gratis en línea';
 $ec_lang['index_meta_desc_plain']='Calculadoras hidráulicas gratuitas para tuberías, canales, vertederos y riego. Funcionan en su navegador, sin conexión a internet, y están disponibles en 27 idiomas.';
 $ec_lang['calc_set_units']='Cambiar sistema de medidas:';
@@ -480,6 +494,7 @@ $ec_lang['rc_notes_5_term']='Rango válido de tamaño de roca';
 $ec_lang['rc_notes_5_def']='Las ecuaciones fueron desarrolladas usando un rango de D<sub>50</sub> de 15 mm a 278 mm. Los resultados fuera de este rango son extrapolados y deben usarse con juicio de ingeniería adicional.';
 $ec_lang['rc_notes_6_term']='Cota del zampeado de salida';
 $ec_lang['rc_notes_6_def']='La cota de la parte superior de la escollera en el tramo de salida debe estar a la misma cota o por debajo de la plantilla del canal aguas abajo. Si es más alta, la roca de salida será inestable.';
+$ec_lang['rc_notes_7_term']='Remanso en la entrada';
 $ec_lang['rc_notes_7_def']='Cuando el tirante normal en el canal de entrada es menor que la carga en el vertedor (H<sub>p</sub>) requerida para pasar q<sub>t</sub>, ocurre flujo restringido o remanso aguas arriba de la entrada del canal. Esto es generalmente aceptable — el remanso reduce la velocidad y evita la erosión aguas arriba. Para verificarlo: use una calculadora de flujo de vertedor para hallar H<sub>p</sub> para el q<sub>t</sub> y ancho de cresta dados, y compárelo con el tirante normal del canal de entrada. Si H<sub>p</sub> supera el tirante normal, se producirá remanso.';
 $ec_lang['rc_notes_4_term']='Referencia';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., y Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. El USDA ARS también publica una <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">hoja de cálculo Excel</a> basada en el mismo método.';
@@ -545,232 +560,6 @@ $ec_lang['ip_notes_5_def']='Tasa de aplicación y caudal de sistema/zona usan el
 $ec_lang['bpn_main_menu']='Red de tuberías ramificada';
 $ec_lang['bpn_main_title']='Calculadora gratuita en línea de presión para redes de tuberías ramificadas (sin bucles)';
 $ec_lang['bpn_main_desc']='Caudal y presión en red de tuberías ramificada (en árbol)';
-$ec_lang['lpn_title_units']='Unidades {units}';
-$ec_lang['lpn_tool_select']='Seleccionar';
-$ec_lang['lpn_tool_add_junction']='Nudo';
-$ec_lang['lpn_tool_add_reservoir']='Embalse';
-$ec_lang['lpn_tool_add_pipe']='Tubería';
-$ec_lang['lpn_tool_add_pump']='Bomba';
-$ec_lang['lpn_tool_add_text']='Texto';
-$ec_lang['lpn_tool_delete']='Eliminar';
-$ec_lang['lpn_tool_zoom_extent']='Ver todo';
-$ec_lang['lpn_new_text']='Texto';
-$ec_lang['lpn_field_elev']='Elevación';
-$ec_lang['lpn_field_elev_tip']='Nivel del terreno o de la tubería en este nodo. Mídalo desde cualquier cero que prefiera, siempre que todos los nodos usen el mismo.';
-$ec_lang['lpn_field_head']='Carga';
-$ec_lang['lpn_field_head_tip']='Nivel de la superficie del agua en el embalse, medido como una altura, no como una presión. Déjelo en blanco para colocar la superficie del agua en la elevación del embalse.';
-$ec_lang['lpn_close']='Cerrar';
-$ec_lang['lpn_empty_hint']='Para comenzar, use la barra de herramientas para agregar una imagen de fondo o un embalse, o para iniciar un Nuevo proyecto a partir de un ejemplo.';
-$ec_lang['lpn_tool_undo']='Deshacer';
-$ec_lang['lpn_confirm_example']='Esto agrega el ejemplo a la red que ya tiene. ¿Continuar?';
-$ec_lang['lpn_field_diameter']='Diámetro';
-$ec_lang['lpn_demand_tip']='Caudal extraído de la red en este nodo. Ingrese un número negativo para el caudal que se introduce en la red aquí.';
-$ec_lang['lpn_units_length']='Longitud y coordenadas del mapa';
-$ec_lang['lpn_units_elevhead']='Elevación y carga';
-$ec_lang['lpn_units_pressure']='Presión';
-$ec_lang['lpn_units_flow']='Caudal';
-$ec_lang['lpn_units_velocity']='Velocidad';
-$ec_lang['lpn_result_gradient']='Gradiente de pérdida de carga';
-$ec_lang['lpn_result_gradient_tip']='Pérdida de carga dividida entre la longitud de la tubería. Úselo para comparar tuberías de diferente longitud contra un mismo límite de diseño.';
-$ec_lang['lpn_result_head']='Carga';
-$ec_lang['lpn_result_head_tip']='Energía del agua en este nodo, expresada como una altura de columna de agua. Es una altura, no una presión.';
-$ec_lang['lpn_result_pressure']='Presión';
-$ec_lang['lpn_result_flow']='Caudal';
-$ec_lang['lpn_result_velocity']='Velocidad';
-$ec_lang['lpn_result_headloss']='Pérdida de carga';
-$ec_lang['lpn_settings_restore_tip']='Restablece solo la configuración de este proyecto. Su dibujo y sus otros proyectos no cambian. Para guardar su configuración favorita y reutilizarla, guarde un archivo de proyecto que solo contenga la configuración.';
-$ec_lang['lpn_reset_all_tip']='Elimina todos los proyectos, todas las imágenes de fondo, toda la configuración y sus unidades elegidas, y luego recarga la página exactamente como la ve un visitante por primera vez. Este es el único restablecimiento que borra todo.';
-$ec_lang['lpn_storage_too_new']='Este proyecto fue guardado por una versión más reciente de la página, por lo que no se puede abrir aquí.';
-$ec_lang['lpn_tool_file']='Archivo';
-$ec_lang['lpn_menu_edit']='Editar';
-$ec_lang['lpn_menu_insert']='Insertar';
-$ec_lang['lpn_menu_view']='Ver';
-$ec_lang['lpn_menu_settings']='Configuración';
-$ec_lang['lpn_edit_delete_network']='Eliminar red';
-$ec_lang['lpn_confirm_delete_network']='¿Eliminar todos los nodos, tuberías y etiquetas de texto de este proyecto? La imagen de fondo, el nombre del proyecto y su configuración se conservan. Esto no se puede deshacer.';
-$ec_lang['lpn_view_units']='Unidades';
-$ec_lang['lpn_file_saveall']='Guardar todo';
-$ec_lang['lpn_project_numbered']='Proyecto{n}';
-$ec_lang['lpn_project_copy_suffix']='(copia)';
-$ec_lang['lpn_project_rename']='Cambiar nombre';
-$ec_lang['lpn_file_new']='Nuevo proyecto…';
-$ec_lang['lpn_file_open']='Abrir…';
-$ec_lang['lpn_file_save']='Guardar';
-$ec_lang['lpn_file_saveas']='Guardar como…';
-$ec_lang['lpn_file_revert']='Revertir';
-$ec_lang['lpn_file_close']='Cerrar';
-$ec_lang['lpn_tab_new']='Nuevo proyecto';
-$ec_lang['lpn_tab_all']='Todos los proyectos';
-$ec_lang['lpn_tab_menu']='Menú del proyecto';
-$ec_lang['lpn_tab_duplicate']='Duplicar';
-$ec_lang['lpn_tab_move_left']='Mover a la izquierda';
-$ec_lang['lpn_tab_move_right']='Mover a la derecha';
-$ec_lang['lpn_tab_unsaved']='No guardado en un archivo';
-$ec_lang['lpn_import_bad_file']='Ese archivo no pudo leerse como un proyecto guardado desde esta página.';
-$ec_lang['lpn_import_no_room']='No queda suficiente almacenamiento del navegador para agregar este proyecto. Elimine un proyecto que ya no necesite e inténtelo de nuevo.';
-$ec_lang['lpn_status_imported']='Se abrió {name} desde un archivo y se agregó a este navegador como un nuevo proyecto.';
-$ec_lang['lpn_file_type_desc']='Archivo de proyecto';
-$ec_lang['lpn_file_upload_explain']='Este navegador no puede conectarse a un archivo, así que abrir un archivo aquí es en realidad una carga: el proyecto se copia en este navegador, y la única forma de guardar su trabajo de vuelta al archivo es sobrescribirlo con Archivo, Guardar como.';
-$ec_lang['lpn_file_save_tip']='Guarda en el archivo conectado.';
-$ec_lang['lpn_file_saveas_tip']='Elija un archivo donde guardar. Este proyecto se conecta a ese archivo, y Guardar escribe en él a partir de entonces.';
-$ec_lang['lpn_file_saveas_tip_download']='Guarda usando la configuración de Descargas de su navegador. Este navegador no puede conectarse a un archivo, así que Guardar está deshabilitado y solo está disponible Guardar como. Si activa la opción de su navegador "Preguntar dónde guardar cada archivo", puede elegir el archivo original y sobrescribirlo.';
-$ec_lang['lpn_status_uploaded']='Archivo de proyecto cargado. No se puede mantener una conexión con él, así que la única forma de guardar de vuelta es usando Archivo, Guardar como.';
-$ec_lang['lpn_status_downloaded']='Se descargó {file}. Este navegador no puede conectarse a un archivo, así que este proyecto permanece marcado como no guardado en un archivo.';
-$ec_lang['lpn_status_file_opened']='Se abrió {file}.';
-$ec_lang['lpn_status_already_open']='Ese archivo ya está abierto aquí como {name}, así que se cambió a él en lugar de abrir una segunda copia.';
-$ec_lang['lpn_status_already_open_dirty']='Ese archivo ya está abierto aquí como {name}, con cambios que no ha guardado en él. Se cambió a él en lugar de abrir una segunda copia. Use Archivo, Revertir si prefiere la versión del disco.';
-$ec_lang['lpn_status_saved']='Se guardó {file}.';
-$ec_lang['lpn_status_reverted']='Se volvió a cargar {file} desde el disco.';
-$ec_lang['lpn_close_save_prompt']='¿Guardar los cambios de {name} antes de cerrarlo?';
-$ec_lang['lpn_close_browser_prompt']='{name} se conserva solo en este navegador. Si lo cierra sin guardarlo en un archivo, se perderá para siempre.';
-$ec_lang['lpn_close_discard']='Cerrar sin guardar';
-$ec_lang['lpn_cancel']='Cancelar';
-$ec_lang['lpn_revert_confirm']='¿Descartar los cambios que ha hecho y volver a cargar {file} desde el disco?';
-$ec_lang['lpn_file_needs_reopen']='Este proyecto proviene de {file}, pero se perdió la conexión con ese archivo. Elija el archivo de nuevo para conectarse a él.';
-$ec_lang['lpn_file_write_failed']='No se pudo escribir en el archivo. Puede que se haya movido o renombrado, o que se haya retirado el permiso. Su trabajo sigue guardado en este navegador.';
-$ec_lang['lpn_file_changed_elsewhere']='Otra persona guardó en este archivo desde que usted lo abrió, así que guardar ahora sobrescribiría su trabajo. Use Archivo, Guardar como para conservar sus cambios en un archivo propio, o Archivo, Revertir para descartar los suyos y cargar los de ellos.';
-$ec_lang['lpn_lock_prompt_name']='¿Qué deberían ver sus colegas cuando usted tenga este proyecto abierto? Sus iniciales son ideales. Cualquiera que abra el mismo archivo puede verlo, así que no use nada privado.';
-$ec_lang['lpn_lock_somebody']='Otra persona';
-$ec_lang['lpn_lock_open_heading']='{name} tiene este archivo abierto.';
-$ec_lang['lpn_lock_open_readonly']='Abrir solo lectura';
-$ec_lang['lpn_lock_open_copy']='Crear una copia';
-$ec_lang['lpn_lock_break']='Romper su bloqueo';
-$ec_lang['lpn_lock_open_heading_times']='{name} tiene este archivo abierto; la última edición fue hace {x}, {y} después del último guardado.';
-$ec_lang['lpn_lock_open_heading_unsaved']='{name} tiene este archivo abierto; la última edición fue hace {x}, y nada de ella se ha guardado en este archivo todavía.';
-$ec_lang['lpn_lock_open_heading_saved']='{name} tiene este archivo abierto; la última edición fue hace {x}, y su trabajo está guardado en el archivo.';
-$ec_lang['lpn_lock_open_heading_seen']='{name} tiene este archivo abierto pero no lo ha editado. Su navegador se conectó por última vez hace {x}.';
-$ec_lang['lpn_lock_open_choices']='Sus opciones: (1) Cancelar y pedirles que lo abran si es necesario y luego lo cierren correctamente (cerrar el navegador no cierra el proyecto), (2) Abrir solo lectura, o (3) si todo lo demás falla, puede romper su bloqueo. Su trabajo no guardado no se pierde, pero no podrán guardar sobre sus cambios, y alguien podría tener que combinar los dos a mano.';
-$ec_lang['lpn_ago_seconds']='{n} segundos';
-$ec_lang['lpn_ago_minutes']='{n} minutos';
-$ec_lang['lpn_ago_hours']='{n} horas';
-$ec_lang['lpn_ago_days']='{n} días';
-$ec_lang['lpn_ago_unknown']='un tiempo desconocido';
-$ec_lang['lpn_lock_readonly_banner']='Solo lectura: {name} tiene este archivo abierto. Puede cambiar lo que quiera aquí, pero no puede guardar. Use Archivo, Guardar como para guardar en un archivo diferente.';
-$ec_lang['lpn_lock_unavailable']='Atención: no se pudo contactar al servidor para verificar o crear un bloqueo en este proyecto, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Se le avisará si el bloqueo vuelve a funcionar.';
-$ec_lang['lpn_lock_storage_error']='Atención: este sitio no puede guardar los registros de bloqueo, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Esto es una falla de configuración del servidor, no algo que usted pueda corregir aquí — la carpeta de bloqueo no tiene permiso de escritura para el servidor web.';
-$ec_lang['lpn_lock_full_error']='Atención: este sitio se quedó sin espacio para registrar quién tiene abierto cada proyecto, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Esto es una falla de configuración del servidor, no algo que usted pueda corregir aquí.';
-$ec_lang['lpn_lock_not_asked']='El bloqueo no está activo para este proyecto, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Este navegador aún no tiene un nombre registrado para usted, o el proyecto no tiene identificador — guardar el proyecto en un archivo establece ambos.';
-$ec_lang['lpn_lock_restored']='El bloqueo volvió a funcionar, y este archivo ahora es suyo para guardar.';
-$ec_lang['lpn_lock_dismiss']='Ocultar este mensaje';
-$ec_lang['lpn_file_training_1']='Su proyecto se guardará en un archivo en esta computadora. Se guarda cuando usted lo pide, y en ningún otro momento, así que nada se escribe en ese archivo sin su conocimiento.';
-$ec_lang['lpn_file_training_2']='Para que dos personas nunca editen un mismo archivo al mismo tiempo, este sitio lleva registro de quién lo tiene abierto. Si alguien ya lo tiene, usted igual puede abrirlo y mirarlo, o quedarse con una copia propia.';
-$ec_lang['lpn_file_training_permission']='La primera vez que guarde, su navegador le preguntará si este sitio puede editar el archivo. Esa pregunta viene del navegador, no de nosotros, y decir que sí es lo que permite que Guardar escriba su trabajo de vuelta. Normalmente se pregunta solo una vez por archivo.';
-$ec_lang['lpn_file_training_3']='Dé un nombre corto por el que sus colegas lo reconozcan. Sus iniciales son ideales. Cualquiera que abra el mismo archivo puede verlo, así que no use nada privado.';
-$ec_lang['lpn_file_training_name']='Sus iniciales';
-$ec_lang['lpn_file_training_continue']='Continuar';
-$ec_lang['lpn_file_relink']='Elegir el archivo de nuevo';
-$ec_lang['lpn_file_reconnect']='Reconectar a este archivo';
-$ec_lang['lpn_file_reconnect_prompt']='Este proyecto proviene de {file}. Su navegador necesita su permiso de nuevo antes de poder escribir en él. Reconecte abajo.';
-$ec_lang['lpn_saveas_same_file']='Ese es el mismo archivo que otra persona tiene abierto, así que no se puede sobrescribir. Elija un archivo o un nombre diferente.';
-$ec_lang['lpn_saveas_overwrites_project']='Ese archivo ya contiene un proyecto diferente, {name}. Guardar aquí lo reemplaza por completo. ¿Continuar?';
-$ec_lang['lpn_saveas_overwrites_newer']='Ese archivo ha cambiado desde la última vez que lo vio, así que casi con seguridad alguien más ha guardado en él. Guardar aquí reemplaza su versión con la suya. ¿Continuar?';
-$ec_lang['lpn_prompt_project_name']='Nombre para este proyecto';
-$ec_lang['lpn_status_closed_opened']='Se cerró {closed}. Ahora se muestra {opened}.';
-$ec_lang['lpn_status_closed_empty']='Se cerró {closed}. Se inició un nuevo proyecto vacío.';
-$ec_lang['lpn_storage_full']='No guardado. El almacenamiento del navegador está lleno o no disponible, así que sus cambios recientes se perderán al cerrar esta pestaña.';
-$ec_lang['lpn_notes_1_term']='Estado estacionario';
-$ec_lang['lpn_notes_1_def']='Resuelve un conjunto de demandas a la vez, usando el mismo método del gradiente que usa EPANET. No modela cómo cambia la red con el tiempo.';
-$ec_lang['lpn_notes_2_term']='No modelado';
-$ec_lang['lpn_notes_2_def']='No se modelan los depósitos, la calidad del agua, ni las válvulas de control que se abren y cierran por sí solas (PRV, PSV, FCV). Una tubería puede llevar una pérdida localizada fija, pero no una válvula cuyo estado abierto o cerrado dependa del caudal que se está resolviendo.';
-$ec_lang['lpn_notes_3_term']='Guardado de proyectos';
-$ec_lang['lpn_notes_3_def']='Cada proyecto es una pestaña, y cada pestaña se guarda en este navegador mientras usted trabaja. Borrar los datos de su navegador los elimina todos, así que guarde su trabajo en un archivo: Archivo, Guardar como. Un asterisco en una pestaña indica que contiene cambios que no están en un archivo. Nada se escribe nunca en un archivo a menos que usted lo pida. En algunos navegadores, un proyecto se conecta al archivo en el que lo guarda, y Archivo, Guardar escribe de vuelta a ese mismo archivo de ahí en adelante; en otros no es posible ninguna conexión, así que Guardar está deshabilitado y solo está disponible Guardar como. Cuando un archivo de proyecto se mantiene en una unidad compartida, esta página le indica si un colega ya lo tiene abierto, para que dos personas no escriban una sobre la otra.';
-$ec_lang['lpn_notes_5_term']='Curva de la bomba';
-$ec_lang['lpn_notes_5_def']='Una bomba sigue H = H₀ − aQ^b, donde H es la carga que agrega la bomba y Q es el caudal que pasa por ella. Ingrese uno, dos o tres puntos de la curva del fabricante. Tres puntos — la carga a caudal cero, el punto normal de trabajo y el punto de caudal más alto — ajustan H₀, a y b directamente, y siguen más de cerca una curva publicada. Dos puntos ajustan una parábola (b = 2) con su pico en caudal cero. Un punto usa una regla común: la carga a caudal cero es 1,33 × la carga que ingresa, y el caudal más alto es 2 × el caudal que ingresa, lo que de nuevo da b = 2. Una bomba sin puntos ingresados no agrega carga alguna. La curva no se detiene en cero, así que pedirle a una bomba más caudal del que su curva puede entregar da una carga negativa. La solución es una bomba más grande o una demanda menor, no un ajuste de curva diferente.';
-$ec_lang['lpn_notes_4_term']='Adiciones planificadas';
-$ec_lang['lpn_notes_4_def']='Escenarios, para que un proyecto pueda contener varios conjuntos de demandas. Tablas de resultados de nodos y tuberías. Leer y escribir archivos .inp de EPANET. Los comentarios y sugerencias siempre son bienvenidos (vea el enlace de comentarios arriba).';
-$ec_lang['lpn_notes_epanet_term']='Las constantes de Hazen-Williams coinciden con EPANET';
-$ec_lang['lpn_notes_epanet_def']='En agosto de 2026 se cambiaron el coeficiente y el exponente de Hazen-Williams para coincidir con EPANET. Los resultados de pérdida de carga difieren de los de las versiones anteriores de esta página hasta en un 0,1 por ciento, mucho menos que la incertidumbre del propio valor de C.';
-$ec_lang['lpn_id_invalid']='Ingrese un ID sin espacios y sin comillas.';
-$ec_lang['lpn_id_taken']='Ese ID ya está en uso.';
-$ec_lang['lpn_diag_no_fixed_head']='Agregue un embalse. La red necesita al menos un nivel de agua conocido antes de poder resolverse.';
-$ec_lang['lpn_diag_dangling_link']='Una tubería o bomba se conecta a un nodo que ya no existe:';
-$ec_lang['lpn_diag_unreachable']='Estos nodos no tienen ruta hacia un embalse:';
-$ec_lang['lpn_diag_not_converged']='No se encontró una solución. Revise si hay valores que no pueden ser reales, como un diámetro de cero.';
-$ec_lang['lpn_field_roughness']='Rugosidad';
-$ec_lang['lpn_field_roughness_tip']='C de Hazen-Williams. Un número más alto significa una tubería más lisa: alrededor de 150 para plástico nuevo, 130 para acero o hierro nuevo, y 100 para tubería vieja.';
-$ec_lang['lpn_field_length']='Longitud';
-$ec_lang['lpn_field_length_tip']='Longitud de la tubería. Con Auto activado, sigue lo que usted dibujó. Desactive Auto para escribir una longitud diferente a la del dibujo.';
-$ec_lang['lpn_field_km']='Coeficiente de pérdida localizada (menor), k';
-$ec_lang['lpn_field_km_tip']='Pérdida por los codos, válvulas y accesorios de esta tubería, contada como un múltiplo de la carga de velocidad. Use 0 para una tubería recta simple.';
-$ec_lang['lpn_field_km_short']='Pérdida localizada, k';
-$ec_lang['lpn_pump_curve_source']='Origen de la curva';
-$ec_lang['lpn_pump_curve_own']='Ingrese los puntos abajo';
-$ec_lang['lpn_pump_curve_ref_note']='Usando la curva ingresada para la bomba {id}.';
-$ec_lang['lpn_pump_curve_note']='Uno, dos o tres puntos — vea "Curva de la bomba" en las Notas abajo.';
-$ec_lang['lpn_pump_point1']='Punto 1 (obligatorio)';
-$ec_lang['lpn_pump_point2']='Punto 2 (opcional)';
-$ec_lang['lpn_pump_point3']='Punto 3 (opcional)';
-$ec_lang['lpn_mode_select']='Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Haga doble clic en una tubería para agregar o quitar un vértice.';
-$ec_lang['lpn_mode_delete']='Modo: Eliminar. Haga clic en un elemento para quitarlo.';
-$ec_lang['lpn_mode_add_junction']='Modo: Agregar nudo. Haga clic en el mapa para colocar un nudo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
-$ec_lang['lpn_mode_add_reservoir']='Modo: Agregar embalse. Haga clic en el mapa para colocar un embalse. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
-$ec_lang['lpn_mode_add_pipe']='Modo: Agregar tubería. Haga clic en un nodo, y luego en otro nodo, para conectarlos. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
-$ec_lang['lpn_mode_add_pump']='Modo: Agregar bomba. Haga clic en un nodo, y luego en otro nodo, para conectarlos. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
-$ec_lang['lpn_mode_add_text']='Modo: Agregar texto. Haga clic en el mapa para colocar una etiqueta de texto. Haga clic cerca de un nodo para asociar el texto a ese nodo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
-$ec_lang['lpn_tip_select']='Use este modo para cambiar, mover y arrastrar cosas en el mapa.';
-$ec_lang['lpn_tip_labels_draggable']='Puede arrastrar una etiqueta para moverla. Haga doble clic en una etiqueta para devolverla a su posición automática.';
-$ec_lang['lpn_field_auto']='Auto';
-$ec_lang['lpn_field_x']='X';
-$ec_lang['lpn_field_y']='Y';
-$ec_lang['lpn_field_text_size']='Multiplicador de tamaño';
-$ec_lang['lpn_tool_labels']='Etiquetas';
-$ec_lang['lpn_labels_heading_node']='Etiquetas de nodo';
-$ec_lang['lpn_labels_heading_link']='Etiquetas de línea';
-$ec_lang['lpn_labels_decimals_tip']='Decimales mostrados para esta etiqueta';
-$ec_lang['lpn_labels_mark_extrema']='Marcar los valores más alto y más bajo';
-$ec_lang['lpn_field_id']='ID';
-$ec_lang['lpn_backdrop_menu']='Imagen de fondo...';
-$ec_lang['lpn_backdrop_add']='Agregar imagen';
-$ec_lang['lpn_backdrop_scale']='Definir escala de la imagen';
-$ec_lang['lpn_backdrop_position']='Mover imagen';
-$ec_lang['lpn_backdrop_remove']='Quitar imagen';
-$ec_lang['lpn_backdrop_remove_confirm']='¿Quitar la imagen de fondo?';
-$ec_lang['lpn_backdrop_scale_prompt1']='Haga clic en dos puntos de la imagen de fondo, como los dos extremos de una escala gráfica. Luego escriba la distancia real entre ellos.';
-$ec_lang['lpn_backdrop_scale_prompt2']='Distancia real entre los dos puntos';
-$ec_lang['lpn_backdrop_position_prompt1']='Haga clic en cualquier punto de la imagen de fondo. Este es el punto que moverá.';
-$ec_lang['lpn_backdrop_position_prompt2']='Elija a dónde debe ir ese punto, y luego haga clic en Continuar.';
-$ec_lang['lpn_backdrop_target_label']='Moverlo a:';
-$ec_lang['lpn_backdrop_target_node']='Un nodo';
-$ec_lang['lpn_backdrop_target_free']='Cualquier punto del mapa';
-$ec_lang['lpn_backdrop_target_coords']='Coordenadas que usted escribe';
-$ec_lang['lpn_backdrop_coords_prompt']='Escriba las coordenadas X,Y a las que debe moverse ese punto';
-$ec_lang['lpn_backdrop_continue']='Continuar';
-$ec_lang['lpn_tool_settings']='Configuración';
-$ec_lang['lpn_settings_scope_project']='Se guarda con este proyecto.';
-$ec_lang['lpn_settings_id_prefixes']='Prefijos de ID';
-$ec_lang['lpn_settings_defaults']='Valores iniciales';
-$ec_lang['lpn_settings_defaults_note']='Se usan para los elementos que cree de ahora en adelante. Los elementos existentes no cambian.';
-$ec_lang['lpn_settings_push_note']='Solo se aplican las propiedades cuyas etiquetas están visibles en este momento.';
-$ec_lang['lpn_settings_push_btn']='Aplicar valores iniciales a todos los elementos';
-$ec_lang['lpn_push_confirm']='¿Reemplazar estas propiedades en todos los elementos existentes con los valores iniciales actuales? Los valores que haya escrito se sobrescribirán. Puede deshacer esto.';
-$ec_lang['lpn_push_properties']='Propiedades:';
-$ec_lang['lpn_push_elements']='Nodos y tuberías:';
-$ec_lang['lpn_push_none_displayed']='Ningún valor inicial se muestra como etiqueta en este momento, así que no hay nada que aplicar. Active las etiquetas de las propiedades que desee en el panel Etiquetas, y luego intente de nuevo.';
-$ec_lang['lpn_push_nothing']='Ningún elemento existente tiene ninguna de las propiedades que se están aplicando.';
-$ec_lang['lpn_push_no_change']='Todos los elementos ya tienen estos valores, así que nada cambiaría.';
-$ec_lang['lpn_settings_emitter_exponent']='Exponente del emisor';
-$ec_lang['lpn_settings_tolerance']='Tolerancia de convergencia';
-$ec_lang['lpn_settings_tolerance_tip']='Qué tan cerca debe llegar el solucionador antes de detenerse. Un número más pequeño es más exacto y tarda más.';
-$ec_lang['lpn_settings_text_size']='Tamaño del texto';
-$ec_lang['lpn_settings_text_size_map']='Distancia del mapa';
-$ec_lang['lpn_settings_text_size_screen']='Píxeles de pantalla';
-$ec_lang['lpn_settings_symbol_size']='Tamaño del símbolo (relativo al texto)';
-$ec_lang['lpn_settings_symbol_opacity']='Opacidad del símbolo (0 a 1)';
-$ec_lang['lpn_settings_backdrop_opacity']='Opacidad de la imagen de fondo (0 a 1)';
-$ec_lang['lpn_settings_text_size_units']='Unidades del tamaño de texto';
-$ec_lang['lpn_settings_map_display']='Apariencia del mapa';
-$ec_lang['lpn_settings_map_height_px']='Altura del mapa (píxeles de pantalla)';
-$ec_lang['lpn_settings_map_height_tip']='En una pantalla pequeña el mapa se dibuja más corto que esto, para que siempre quede una parte de la página para desplazar.';
-$ec_lang['lpn_settings_legend_position']='Posición de la leyenda';
-$ec_lang['lpn_settings_legend_top_left']='Superior izquierda';
-$ec_lang['lpn_settings_legend_top_right']='Superior derecha';
-$ec_lang['lpn_settings_legend_middle_left']='Media izquierda';
-$ec_lang['lpn_settings_legend_middle_right']='Media derecha';
-$ec_lang['lpn_settings_legend_bottom_left']='Inferior izquierda';
-$ec_lang['lpn_settings_legend_bottom_right']='Inferior derecha';
-$ec_lang['lpn_confirm_restore_defaults']='¿Restablecer toda la configuración (prefijos de ID, valores iniciales, configuración del solucionador, apariencia del mapa, posición de la leyenda y etiquetas visibles) a sus valores originales? Su red no cambia. La configuración pertenece al proyecto abierto, así que sus otros proyectos conservan la suya.';
-$ec_lang['lpn_settings_wipe_btn']='Borrar todo en esta página';
-$ec_lang['lpn_confirm_wipe']='¿Eliminar TODO lo guardado para esta página — cada proyecto, cada imagen de fondo, toda la configuración y sus unidades elegidas — y recargar la página como la vería un visitante completamente nuevo? Esto no se puede deshacer.';
 $ec_lang['bpn_h_source_tip']='Carga estática de suministro: la carga de la fuente con caudal cero. El nivel de agua de un embalse o tanque por encima de la elevación de suministro, o la carga a válvula cerrada de una bomba. Agregue los puntos de suministro 2 y 3 para definir una bomba o una curva de suministro variable; la herramienta lee la carga en el caudal de diseño.';
 $ec_lang['bpn_elev_source']='Elevación de suministro';
 $ec_lang['bpn_q_total']='Caudal total';
@@ -822,38 +611,159 @@ $ec_lang['bpn_supply_pt_tip']='Puntos opcionales 2 y 3 de la curva de suministro
 $ec_lang['bpn_h_supply']='Carga de suministro';
 $ec_lang['bpn_h_supply_tip']='Carga de la fuente en el caudal de diseño, leída de la curva de suministro. Es igual a la carga de fuente ingresada cuando la curva es plana (un embalse).';
 $ec_lang['bpn_show_elevation']='Elevación';
-
-// ---- Translation sprint 251: lpn_ promotion + consent/privacy/terms ----
-$ec_lang['consent_body']='¿Podemos guardar un solo dígito por página en el almacenamiento de este perfil de navegador para evitar registrar sus visitas repetidamente?';
-$ec_lang['consent_accept']='Aceptar';
-$ec_lang['consent_accept_all']='Aceptar siempre';
-$ec_lang['consent_decline']='Rechazar';
-$ec_lang['consent_current_granted']='Usted permitió esto. Limitamos el registro para este perfil de navegador.';
-$ec_lang['consent_current_denied']='Usted rechazó esto. No guardamos nada para limitar el registro de este perfil de navegador.';
-$ec_lang['consent_region_label']='Su elección sobre limitar el registro.';
-$ec_lang['consent_settings_link']='Configuración de cookies';
-$ec_lang['privacy_link']='Aviso de privacidad';
-$ec_lang['terms_link']='Términos de uso';
-$ec_lang['rc_notes_7_term']='Remanso en la entrada';
+$ec_lang['bpn_supply1_h']='Carga estática de suministro';
+$ec_lang['lpn_main_menu']='Red de Abastecimiento de Agua';
+$ec_lang['lpn_main_title']='Calculadora gratis en línea de redes de distribución de agua con el motor EPANET';
+$ec_lang['lpn_main_desc']='Análisis de redes de abastecimiento de agua: dibuje una red de tuberías mallada o importe archivos de EPANET';
+$ec_lang['lpn_title_units']='Unidades {units}';
+$ec_lang['lpn_tool_select']='Seleccionar';
+$ec_lang['lpn_tool_add_junction']='Nudo';
+$ec_lang['lpn_tool_add_reservoir']='Embalse';
+$ec_lang['lpn_tool_add_pipe']='Tubería';
+$ec_lang['lpn_tool_add_pump']='Bomba';
+$ec_lang['lpn_tool_add_text']='Texto';
+$ec_lang['lpn_tool_delete']='Eliminar';
+$ec_lang['lpn_tool_zoom_extent']='Ver todo';
+$ec_lang['lpn_new_text']='Texto';
+$ec_lang['lpn_field_elev']='Elevación';
+// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
+// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
+// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
+// entry carrying translatable payload nobody on the page can see.
+$ec_lang['lpn_field_elev_tip']='Nivel del terreno o de la tubería en este nodo. Mídalo desde cualquier cero que prefiera, siempre que todos los nodos usen el mismo.';
+// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
+// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
+// string is what shows in that empty box.
+$ec_lang['lpn_field_head']='Carga';
+// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
+// outright that it is a height and not a pressure, which is the exact confusion the glossary's
+// avoid list guards against.
+$ec_lang['lpn_field_head_tip']='Nivel de la superficie del agua en el embalse, medido como una altura, no como una presión. Déjelo en blanco para colocar la superficie del agua en la elevación del embalse.';
+$ec_lang['lpn_close']='Cerrar';
+$ec_lang['lpn_empty_hint']='Para comenzar, use la barra de herramientas para agregar una imagen de fondo o un embalse, o para iniciar un Nuevo proyecto a partir de un ejemplo.';
+$ec_lang['lpn_tool_undo']='Deshacer';
+$ec_lang['lpn_confirm_example']='Esto agrega el ejemplo a la red que ya tiene. ¿Continuar?';
+$ec_lang['lpn_field_diameter']='Diámetro';
+$ec_lang['lpn_demand_tip']='Caudal extraído de la red en este nodo. Ingrese un número negativo para el caudal que se introduce en la red aquí.';
+$ec_lang['lpn_units_length']='Longitud y coordenadas del mapa';
+$ec_lang['lpn_units_elevhead']='Elevación y carga';
+$ec_lang['lpn_units_pressure']='Presión';
+$ec_lang['lpn_units_flow']='Caudal';
+$ec_lang['lpn_units_velocity']='Velocidad';
+// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
+// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
+// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
+// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
+$ec_lang['lpn_result_gradient']='Gradiente de pérdida de carga';
+$ec_lang['lpn_result_gradient_tip']='Pérdida de carga dividida entre la longitud de la tubería. Úselo para comparar tuberías de diferente longitud contra un mismo límite de diseño.';
+$ec_lang['lpn_result_head']='Carga';
+$ec_lang['lpn_result_head_tip']='Energía del agua en este nodo, expresada como una altura de columna de agua. Es una altura, no una presión.';
+$ec_lang['lpn_result_pressure']='Presión';
+$ec_lang['lpn_result_flow']='Caudal';
+$ec_lang['lpn_result_velocity']='Velocidad';
+$ec_lang['lpn_result_headloss']='Pérdida de carga';
+// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
+// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
+// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
+// Settings live INSIDE each project document, so deleting every project deletes every setting too:
+// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
+// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
+// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
+$ec_lang['lpn_settings_restore_tip']='Restablece solo la configuración de este proyecto. Su dibujo y sus otros proyectos no cambian. Para guardar su configuración favorita y reutilizarla, guarde un archivo de proyecto que solo contenga la configuración.';
+$ec_lang['lpn_reset_all_tip']='Elimina todos los proyectos, todas las imágenes de fondo, toda la configuración y sus unidades elegidas, y luego recarga la página exactamente como la ve un visitante por primera vez. Este es el único restablecimiento que borra todo.';
+// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
+// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
-// stopped being converted, and never again whatever the answer. Plain text only.
+// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
+// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_prompt']='Esta calculadora guarda las unidades del proyecto y los valores tal como se ingresaron, pero antes convertía los números a unidades SI para guardarlos. Este proyecto se guardó antes de ese cambio, así que sus números quedaron guardados en SI. ¿Convertirlos una última vez a las unidades actuales? Para que usted pueda juzgar, aquí hay algunos diámetros que se convertirían, con sus valores antes y después:';
 $ec_lang['lpn_v2_restore_yes']='Convertir';
 $ec_lang['lpn_v2_restore_never']='No. No preguntar de nuevo.';
 $ec_lang['lpn_v2_restore_no']='Cerrar para revisar primero las unidades actuales';
+$ec_lang['lpn_storage_too_new']='Este proyecto fue guardado por una versión más reciente de la página, por lo que no se puede abrir aquí.';
+// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
+// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
+// something that is not in a file, so closing it asks first; a tab without one closes silently. A
+// browser project always wears one (it is in no file at all); a file project wears one only while it
+// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
+// our words for talking about the code, and the user sees only a name, an asterisk, and a file
+// extension.
+// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
+// conventional relationship and the reason the duplication between them is correct rather than
+// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
+// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
+// taught it (Tom, 2026-08-04).
+$ec_lang['lpn_tool_file']='Archivo';
+$ec_lang['lpn_menu_edit']='Editar';
+$ec_lang['lpn_menu_insert']='Insertar';
+$ec_lang['lpn_menu_view']='Ver';
+// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
+// this one, and of the three, Settings is the word a person is most likely to look for first.
+$ec_lang['lpn_menu_settings']='Configuración';
+// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
+// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
+// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
+// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
+// keep its settings and its background image.
+$ec_lang['lpn_edit_delete_network']='Eliminar red';
+$ec_lang['lpn_confirm_delete_network']='¿Eliminar todos los nodos, tuberías y etiquetas de texto de este proyecto? La imagen de fondo, el nombre del proyecto y su configuración se conservan. Esto no se puede deshacer.';
+$ec_lang['lpn_view_units']='Unidades';
+// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
+$ec_lang['lpn_file_saveall']='Guardar todo';
+// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
+// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
+// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
+$ec_lang['lpn_project_numbered']='Proyecto{n}';
+$ec_lang['lpn_project_copy_suffix']='(copia)';
+$ec_lang['lpn_project_rename']='Cambiar nombre';
+// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
+$ec_lang['lpn_file_new']='Nuevo proyecto…';
+// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
+// with the toolbar button of that name -- an example is a whole network, so it starts a project
+// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Proyecto en blanco, unidades US (gpm)';
 $ec_lang['lpn_new_blank_si']='Proyecto en blanco, unidades SI (l/s)';
 $ec_lang['lpn_new_from_examples']='A partir de ejemplos';
+// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
+// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_new_example_us']='Red básica, unidades US (gpm)';
 $ec_lang['lpn_new_example_si']='Red básica, unidades SI (l/s)';
+$ec_lang['lpn_file_open']='Abrir…';
+$ec_lang['lpn_file_save']='Guardar';
+$ec_lang['lpn_file_saveas']='Guardar como…';
+$ec_lang['lpn_file_revert']='Revertir';
+$ec_lang['lpn_file_close']='Cerrar';
+// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
+// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Archivos recientes';
 $ec_lang['lpn_recent_tip']='Vuelva a abrir {file} sin tener que buscarlo en su computadora.';
 $ec_lang['lpn_recent_denied']='No se concedió permiso para abrir ese archivo, así que no se abrió.';
 $ec_lang['lpn_recent_gone']='No se pudo abrir {file}. Puede que se haya movido, renombrado o eliminado, así que se quitó de la lista de archivos recientes.';
+// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
+// around it.
+$ec_lang['lpn_tab_new']='Nuevo proyecto';
+$ec_lang['lpn_tab_all']='Todos los proyectos';
+$ec_lang['lpn_tab_menu']='Menú del proyecto';
+$ec_lang['lpn_tab_duplicate']='Duplicar';
+$ec_lang['lpn_tab_move_left']='Mover a la izquierda';
+$ec_lang['lpn_tab_move_right']='Mover a la derecha';
+$ec_lang['lpn_tab_unsaved']='No guardado en un archivo';
+$ec_lang['lpn_import_bad_file']='Ese archivo no pudo leerse como un proyecto guardado desde esta página.';
+$ec_lang['lpn_import_no_room']='No queda suficiente almacenamiento del navegador para agregar este proyecto. Elimine un proyecto que ya no necesite e inténtelo de nuevo.';
+// ---- EPANET .inp import (ROADMAP Task 196) ----
+// The import REPORTS every difference between the file and what this page can hold, so each
+// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
+// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
+// another sentence, and none may become one.
+// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
+// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='Aceptar';
 $ec_lang['lpn_file_import_inp']='Importar archivo de EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Lee una red desde un archivo de EPANET, ya sea el archivo de texto .inp o el archivo .net que guarda EPANET, y la guarda en este navegador como un proyecto nuevo. Esta página no puede volver a escribir un archivo de EPANET, así que use Archivo, Guardar como para conservar su trabajo.';
 $ec_lang['lpn_inp_bad_file']='Ese archivo no se pudo leer como un archivo de red de EPANET.';
+// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
+// the way out named here always works, so keep the instruction in the message rather than leaving
+// the reader to guess.
 $ec_lang['lpn_net_bad_file']='Esto parece un archivo .net de EPANET, pero esta página no pudo leerlo. Ábralo en EPANET y use allí el comando Archivo, Exportar, Red para guardarlo como un archivo .inp, y luego importe ese archivo.';
 $ec_lang['lpn_inp_report_heading']='Se importó {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} nudos y embalses, {links} tuberías y bombas, en {units}.';
@@ -878,16 +788,311 @@ $ec_lang['lpn_inp_drop_quality']='Se dejaron fuera la calidad del agua, la reacc
 $ec_lang['lpn_inp_drop_backdrop']='Este archivo nombra una imagen de fondo pero no contiene la imagen en sí. Agréguela usted mismo con Archivo, Imagen de fondo, Agregar imagen.';
 $ec_lang['lpn_inp_drop_dangling']='Estas tuberías nombran un nudo que no está en el archivo, así que se dejaron fuera.';
 $ec_lang['lpn_inp_drop_units']='No se reconocieron las unidades de caudal de este archivo, así que se supusieron galones por minuto. Revise cada número antes de usar los resultados.';
+// {name} is a project name; word order is the translator's to choose. Says where the user landed,
+// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
+// that is the part a user cannot see for themselves.
+$ec_lang['lpn_status_imported']='Se abrió {name} desde un archivo y se agregó a este navegador como un nuevo proyecto.';
+// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
+// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
+// browser they test in. That is expected, not a bug.
+// {file} is a file name and {name} a project name; word order is the translator's to choose.
+$ec_lang['lpn_file_type_desc']='Archivo de proyecto';
+// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
+// a save cannot connect to a file, so every press really is another copy in the downloads folder.
+// The label says which of the two you are getting rather than leaving the duplicate looking like a
+// bug.
+// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
+// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
+// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
+// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
+// notice after the act -- at the moment the question arises -- rather than in a label forever.
+// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
+// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
+// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
+// anyway -- a disabled button fires no mouse events.
+// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
+// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
+// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
+// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
+// lpn_status_uploaded.
+$ec_lang['lpn_file_upload_explain']='Este navegador no puede conectarse a un archivo, así que abrir un archivo aquí es en realidad una carga: el proyecto se copia en este navegador, y la única forma de guardar su trabajo de vuelta al archivo es sobrescribirlo con Archivo, Guardar como.';
+// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
+// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
+$ec_lang['lpn_file_save_tip']='Guarda en el archivo conectado.';
+$ec_lang['lpn_file_saveas_tip']='Elija un archivo donde guardar. Este proyecto se conecta a ese archivo, y Guardar escribe en él a partir de entonces.';
+// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
+// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
+// is no API for it, and the download attribute cannot override the setting -- but the user can turn
+// that setting on themselves, and then Save as really does let them overwrite the file they started
+// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
+// the user is choosing where their work goes.
+$ec_lang['lpn_file_saveas_tip_download']='Guarda usando la configuración de Descargas de su navegador. Este navegador no puede conectarse a un archivo, así que Guardar está deshabilitado y solo está disponible Guardar como. Si activa la opción de su navegador "Preguntar dónde guardar cada archivo", puede elegir el archivo original y sobrescribirlo.';
+$ec_lang['lpn_status_uploaded']='Archivo de proyecto cargado. No se puede mantener una conexión con él, así que la única forma de guardar de vuelta es usando Archivo, Guardar como.';
+$ec_lang['lpn_status_downloaded']='Se descargó {file}. Este navegador no puede conectarse a un archivo, así que este proyecto permanece marcado como no guardado en un archivo.';
+$ec_lang['lpn_status_file_opened']='Se abrió {file}.';
+$ec_lang['lpn_status_already_open']='Ese archivo ya está abierto aquí como {name}, así que se cambió a él en lugar de abrir una segunda copia.';
+$ec_lang['lpn_status_already_open_dirty']='Ese archivo ya está abierto aquí como {name}, con cambios que no ha guardado en él. Se cambió a él en lugar de abrir una segunda copia. Use Archivo, Revertir si prefiere la versión del disco.';
+$ec_lang['lpn_status_saved']='Se guardó {file}.';
+$ec_lang['lpn_status_reverted']='Se volvió a cargar {file} desde el disco.';
+// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
+// purpose: a program that writes your file behind your back takes away your right to walk away from
+// a session. So these three carry the whole close/discard/revert conversation.
+// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
+$ec_lang['lpn_close_save_prompt']='¿Guardar los cambios de {name} antes de cerrarlo?';
+// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
+// than softened -- this is the one destructive act left on the page.
+$ec_lang['lpn_close_browser_prompt']='{name} se conserva solo en este navegador. Si lo cierra sin guardarlo en un archivo, se perderá para siempre.';
+$ec_lang['lpn_close_discard']='Cerrar sin guardar';
+$ec_lang['lpn_cancel']='Cancelar';
+$ec_lang['lpn_revert_confirm']='¿Descartar los cambios que ha hecho y volver a cargar {file} desde el disco?';
+// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
+// page load, so the link is gone even though we still know the name. Says what to do, not just what
+// happened.
+$ec_lang['lpn_file_needs_reopen']='Este proyecto proviene de {file}, pero se perdió la conexión con ese archivo. Elija el archivo de nuevo para conectarse a él.';
+// Says what is still safe before it says what failed: the reassurance is the part a worried user
+// needs, and it is true -- the browser copy is written on every edit regardless.
+$ec_lang['lpn_file_write_failed']='No se pudo escribir en el archivo. Puede que se haya movido o renombrado, o que se haya retirado el permiso. Su trabajo sigue guardado en este navegador.';
+$ec_lang['lpn_file_changed_elsewhere']='Otra persona guardó en este archivo desde que usted lo abrió, así que guardar ahora sobrescribiría su trabajo. Use Archivo, Guardar como para conservar sus cambios en un archivo propio, o Archivo, Revertir para descartar los suyos y cargar los de ellos.';
+// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
+// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
+// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
+// Initials, and said to be public: whoever opens the same file sees this name, including outside the
+// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
+// rather than a name makes the safe answer the obvious one.
+// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
+// name is never written into the project file, so "anyone you send the file to" was false here too.
+$ec_lang['lpn_lock_prompt_name']='¿Qué deberían ver sus colegas cuando usted tenga este proyecto abierto? Sus iniciales son ideales. Cualquiera que abra el mismo archivo puede verlo, así que no use nada privado.';
+// The stand-in when someone locked a project before giving a name. Reads in place of {name}
+// everywhere above, so it has to work mid-sentence.
+$ec_lang['lpn_lock_somebody']='Otra persona';
+// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
+// moment of opening, with both real answers on it -- the way every drawing and document program has
+// always done it.
+$ec_lang['lpn_lock_open_heading']='{name} tiene este archivo abierto.';
+$ec_lang['lpn_lock_open_readonly']='Abrir solo lectura';
+// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
+// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
+// trying not to encourage. "Create a copy" says what happens and claims nothing.
+$ec_lang['lpn_lock_open_copy']='Crear una copia';
+$ec_lang['lpn_lock_break']='Romper su bloqueo';
+$ec_lang['lpn_lock_open_heading_times']='{name} tiene este archivo abierto; la última edición fue hace {x}, {y} después del último guardado.';
+$ec_lang['lpn_lock_open_heading_unsaved']='{name} tiene este archivo abierto; la última edición fue hace {x}, y nada de ella se ha guardado en este archivo todavía.';
+$ec_lang['lpn_lock_open_heading_saved']='{name} tiene este archivo abierto; la última edición fue hace {x}, y su trabajo está guardado en el archivo.';
+$ec_lang['lpn_lock_open_heading_seen']='{name} tiene este archivo abierto pero no lo ha editado. Su navegador se conectó por última vez hace {x}.';
+$ec_lang['lpn_lock_open_choices']='Sus opciones: (1) Cancelar y pedirles que lo abran si es necesario y luego lo cierren correctamente (cerrar el navegador no cierra el proyecto), (2) Abrir solo lectura, o (3) si todo lo demás falla, puede romper su bloqueo. Su trabajo no guardado no se pierde, pero no podrán guardar sobre sus cambios, y alguien podría tener que combinar los dos a mano.';
+$ec_lang['lpn_ago_seconds']='{n} segundos';
+$ec_lang['lpn_ago_minutes']='{n} minutos';
+$ec_lang['lpn_ago_hours']='{n} horas';
+$ec_lang['lpn_ago_days']='{n} días';
+$ec_lang['lpn_ago_unknown']='un tiempo desconocido';
+// Read-only means read-only: it never turns itself back into an editable file while you are looking
+// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
+// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
+// everything else, including changing the network and keeping it as a file of your own.
+$ec_lang['lpn_lock_readonly_banner']='Solo lectura: {name} tiene este archivo abierto. Puede cambiar lo que quiera aquí, pero no puede guardar. Use Archivo, Guardar como para guardar en un archivo diferente.';
+// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
+// stops a colleague editing the same file. Editing still works -- an unreachable server must never
+// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
+// lpn_lock_restored keeps.
+$ec_lang['lpn_lock_unavailable']='Atención: no se pudo contactar al servidor para verificar o crear un bloqueo en este proyecto, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Se le avisará si el bloqueo vuelve a funcionar.';
+$ec_lang['lpn_lock_storage_error']='Atención: este sitio no puede guardar los registros de bloqueo, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Esto es una falla de configuración del servidor, no algo que usted pueda corregir aquí — la carpeta de bloqueo no tiene permiso de escritura para el servidor web.';
+$ec_lang['lpn_lock_full_error']='Atención: este sitio se quedó sin espacio para registrar quién tiene abierto cada proyecto, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Esto es una falla de configuración del servidor, no algo que usted pueda corregir aquí.';
+$ec_lang['lpn_lock_not_asked']='El bloqueo no está activo para este proyecto, así que nada impide que un colega edite el mismo archivo al mismo tiempo. Este navegador aún no tiene un nombre registrado para usted, o el proyecto no tiene identificador — guardar el proyecto en un archivo establece ambos.';
+$ec_lang['lpn_lock_restored']='El bloqueo volvió a funcionar, y este archivo ahora es suyo para guardar.';
+$ec_lang['lpn_lock_dismiss']='Ocultar este mensaje';
+// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
+// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
+// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
+$ec_lang['lpn_file_training_1']='Su proyecto se guardará en un archivo en esta computadora. Se guarda cuando usted lo pide, y en ningún otro momento, así que nada se escribe en ese archivo sin su conocimiento.';
+$ec_lang['lpn_file_training_2']='Para que dos personas nunca editen un mismo archivo al mismo tiempo, este sitio lleva registro de quién lo tiene abierto. Si alguien ya lo tiene, usted igual puede abrirlo y mirarlo, o quedarse con una copia propia.';
+// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
+// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
+// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
+// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
+// warn that it is coming and say it is normal, which is what this line is for.
+$ec_lang['lpn_file_training_permission']='La primera vez que guarde, su navegador le preguntará si este sitio puede editar el archivo. Esa pregunta viene del navegador, no de nosotros, y decir que sí es lo que permite que Guardar escriba su trabajo de vuelta. Normalmente se pregunta solo una vez por archivo.';
+// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
+// false -- the name is never written into the project file. It is held in this browser and on this
+// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
+// saying, so the warning stays and only the claim changes.
+$ec_lang['lpn_file_training_3']='Dé un nombre corto por el que sus colegas lo reconozcan. Sus iniciales son ideales. Cualquiera que abra el mismo archivo puede verlo, así que no use nada privado.';
+$ec_lang['lpn_file_training_name']='Sus iniciales';
+$ec_lang['lpn_file_training_continue']='Continuar';
+// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
+// finding; the message never tells someone to go hunting through a menu.
+$ec_lang['lpn_file_relink']='Elegir el archivo de nuevo';
+$ec_lang['lpn_file_reconnect']='Reconectar a este archivo';
+$ec_lang['lpn_file_reconnect_prompt']='Este proyecto proviene de {file}. Su navegador necesita su permiso de nuevo antes de poder escribir en él. Reconecte abajo.';
+// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
+// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
+$ec_lang['lpn_saveas_same_file']='Ese es el mismo archivo que otra persona tiene abierto, así que no se puede sobrescribir. Elija un archivo o un nombre diferente.';
+$ec_lang['lpn_saveas_overwrites_project']='Ese archivo ya contiene un proyecto diferente, {name}. Guardar aquí lo reemplaza por completo. ¿Continuar?';
+$ec_lang['lpn_saveas_overwrites_newer']='Ese archivo ha cambiado desde la última vez que lo vio, así que casi con seguridad alguien más ha guardado en él. Guardar aquí reemplaza su versión con la suya. ¿Continuar?';
+// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
+// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
+// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
+// Nothing is written to a file on a timer any more, so there is no interval to set.
+$ec_lang['lpn_prompt_project_name']='Nombre para este proyecto';
+// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
+// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
+// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
+// separate Delete for it to be confused with.)
+// {closed} and {opened} are project names; word order is the translator's to choose.
+$ec_lang['lpn_status_closed_opened']='Se cerró {closed}. Ahora se muestra {opened}.';
+$ec_lang['lpn_status_closed_empty']='Se cerró {closed}. Se inició un nuevo proyecto vacío.';
+$ec_lang['lpn_storage_full']='No guardado. El almacenamiento del navegador está lleno o no disponible, así que sus cambios recientes se perderán al cerrar esta pestaña.';
+$ec_lang['lpn_notes_1_term']='Estado estacionario';
+$ec_lang['lpn_notes_1_def']='Resuelve un conjunto de demandas a la vez, usando el mismo método del gradiente que usa EPANET. No modela cómo cambia la red con el tiempo.';
+$ec_lang['lpn_notes_2_term']='No modelado';
+$ec_lang['lpn_notes_2_def']='No se modelan los depósitos, la calidad del agua, ni las válvulas de control que se abren y cierran por sí solas (PRV, PSV, FCV). Una tubería puede llevar una pérdida localizada fija, pero no una válvula cuyo estado abierto o cerrado dependa del caudal que se está resolviendo.';
+$ec_lang['lpn_notes_3_term']='Guardado de proyectos';
+$ec_lang['lpn_notes_3_def']='Cada proyecto es una pestaña, y cada pestaña se guarda en este navegador mientras usted trabaja. Borrar los datos de su navegador los elimina todos, así que guarde su trabajo en un archivo: Archivo, Guardar como. Un asterisco en una pestaña indica que contiene cambios que no están en un archivo. Nada se escribe nunca en un archivo a menos que usted lo pida. En algunos navegadores, un proyecto se conecta al archivo en el que lo guarda, y Archivo, Guardar escribe de vuelta a ese mismo archivo de ahí en adelante; en otros no es posible ninguna conexión, así que Guardar está deshabilitado y solo está disponible Guardar como. Cuando un archivo de proyecto se mantiene en una unidad compartida, esta página le indica si un colega ya lo tiene abierto, para que dos personas no escriban una sobre la otra.';
+// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
+// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
+// to stay readable on a phone, while the Notes section is already this page's documentation home,
+// prints with the page, and is translated with everything else. The popup carries a one-line
+// pointer to here instead (lpn_pump_curve_note).
+// H and Q are symbols -- keep them as they are in every language.
+$ec_lang['lpn_notes_5_term']='Curva de la bomba';
+$ec_lang['lpn_notes_5_def']='Una bomba sigue H = H₀ − aQ^b, donde H es la carga que agrega la bomba y Q es el caudal que pasa por ella. Ingrese uno, dos o tres puntos de la curva del fabricante. Tres puntos — la carga a caudal cero, el punto normal de trabajo y el punto de caudal más alto — ajustan H₀, a y b directamente, y siguen más de cerca una curva publicada. Dos puntos ajustan una parábola (b = 2) con su pico en caudal cero. Un punto usa una regla común: la carga a caudal cero es 1,33 × la carga que ingresa, y el caudal más alto es 2 × el caudal que ingresa, lo que de nuevo da b = 2. Una bomba sin puntos ingresados no agrega carga alguna. La curva no se detiene en cero, así que pedirle a una bomba más caudal del que su curva puede entregar da una carga negativa. La solución es una bomba más grande o una demanda menor, no un ajuste de curva diferente.';
+$ec_lang['lpn_notes_4_term']='Adiciones planificadas';
+$ec_lang['lpn_notes_4_def']='Escenarios, para que un proyecto pueda contener varios conjuntos de demandas. Tablas de resultados de nodos y tuberías. Leer y escribir archivos .inp de EPANET. Los comentarios y sugerencias siempre son bienvenidos (vea el enlace de comentarios arriba).';
+$ec_lang['lpn_notes_epanet_term']='Las constantes de Hazen-Williams coinciden con EPANET';
+$ec_lang['lpn_notes_epanet_def']='En agosto de 2026 se cambiaron el coeficiente y el exponente de Hazen-Williams para coincidir con EPANET. Los resultados de pérdida de carga difieren de los de las versiones anteriores de esta página hasta en un 0,1 por ciento, mucho menos que la incertidumbre del propio valor de C.';
+$ec_lang['lpn_id_invalid']='Ingrese un ID sin espacios y sin comillas.';
+$ec_lang['lpn_id_taken']='Ese ID ya está en uso.';
+$ec_lang['lpn_diag_no_fixed_head']='Agregue un embalse. La red necesita al menos un nivel de agua conocido antes de poder resolverse.';
+$ec_lang['lpn_diag_dangling_link']='Una tubería o bomba se conecta a un nodo que ya no existe:';
+$ec_lang['lpn_diag_unreachable']='Estos nodos no tienen ruta hacia un embalse:';
+$ec_lang['lpn_diag_not_converged']='No se encontró una solución. Revise si hay valores que no pueden ser reales, como un diámetro de cero.';
+$ec_lang['lpn_field_roughness']='Rugosidad';
+// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
+// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
+// selector lands (see numberFieldPlain()'s own note).
+$ec_lang['lpn_field_roughness_tip']='C de Hazen-Williams. Un número más alto significa una tubería más lisa: alrededor de 150 para plástico nuevo, 130 para acero o hierro nuevo, y 100 para tubería vieja.';
+$ec_lang['lpn_field_length']='Longitud';
+$ec_lang['lpn_field_length_tip']='Longitud de la tubería. Con Auto activado, sigue lo que usted dibujó. Desactive Auto para escribir una longitud diferente a la del dibujo.';
+// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
+// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
+// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
+$ec_lang['lpn_field_km']='Coeficiente de pérdida localizada (menor), k';
+$ec_lang['lpn_field_km_tip']='Pérdida por los codos, válvulas y accesorios de esta tubería, contada como un múltiplo de la carga de velocidad. Use 0 para una tubería recta simple.';
+// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
+// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
+// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
+// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
+$ec_lang['lpn_field_km_short']='Pérdida localizada, k';
+// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
+// another pump's curve so several identical pumps need the curve entered only once.
+$ec_lang['lpn_pump_curve_source']='Origen de la curva';
+$ec_lang['lpn_pump_curve_own']='Ingrese los puntos abajo';
+$ec_lang['lpn_pump_curve_ref_note']='Usando la curva ingresada para la bomba {id}.';
+$ec_lang['lpn_pump_curve_note']='Uno, dos o tres puntos — vea "Curva de la bomba" en las Notas abajo.';
+$ec_lang['lpn_pump_point1']='Punto 1 (obligatorio)';
+$ec_lang['lpn_pump_point2']='Punto 2 (opcional)';
+$ec_lang['lpn_pump_point3']='Punto 3 (opcional)';
+// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
+// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
+// word order/grammar around a mode name varies by language, so each mode gets its own full string.
+$ec_lang['lpn_mode_select']='Modo: Selección. Haga clic en un elemento o una etiqueta para verlo o cambiarlo. Arrastre para mover un nodo, un vértice o una etiqueta. Haga doble clic en una tubería para agregar o quitar un vértice.';
+$ec_lang['lpn_mode_delete']='Modo: Eliminar. Haga clic en un elemento para quitarlo.';
+$ec_lang['lpn_mode_add_junction']='Modo: Agregar nudo. Haga clic en el mapa para colocar un nudo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+$ec_lang['lpn_mode_add_reservoir']='Modo: Agregar embalse. Haga clic en el mapa para colocar un embalse. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+$ec_lang['lpn_mode_add_pipe']='Modo: Agregar tubería. Haga clic en un nodo, y luego en otro nodo, para conectarlos. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+$ec_lang['lpn_mode_add_pump']='Modo: Agregar bomba. Haga clic en un nodo, y luego en otro nodo, para conectarlos. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
+// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
+$ec_lang['lpn_mode_add_text']='Modo: Agregar texto. Haga clic en el mapa para colocar una etiqueta de texto. Haga clic cerca de un nodo para asociar el texto a ese nodo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.';
+// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
+// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
+// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
+// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
+// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
+$ec_lang['lpn_tip_select']='Use este modo para cambiar, mover y arrastrar cosas en el mapa.';
+$ec_lang['lpn_tip_labels_draggable']='Puede arrastrar una etiqueta para moverla. Haga doble clic en una etiqueta para devolverla a su posición automática.';
+$ec_lang['lpn_field_auto']='Auto';
+$ec_lang['lpn_field_x']='X';
+$ec_lang['lpn_field_y']='Y';
+$ec_lang['lpn_field_text_size']='Multiplicador de tamaño';
+$ec_lang['lpn_tool_labels']='Etiquetas';
+$ec_lang['lpn_labels_heading_node']='Etiquetas de nodo';
+$ec_lang['lpn_labels_heading_link']='Etiquetas de línea';
+$ec_lang['lpn_labels_decimals_tip']='Decimales mostrados para esta etiqueta';
+$ec_lang['lpn_labels_mark_extrema']='Marcar los valores más alto y más bajo';
+$ec_lang['lpn_field_id']='ID';
+$ec_lang['lpn_backdrop_menu']='Imagen de fondo...';
+$ec_lang['lpn_backdrop_add']='Agregar imagen';
+// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
+// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
+// menu, where nothing above them says what is being scaled. Naming the object costs one word and
+// works in both places.
+$ec_lang['lpn_backdrop_scale']='Definir escala de la imagen';
+$ec_lang['lpn_backdrop_position']='Mover imagen';
+$ec_lang['lpn_backdrop_remove']='Quitar imagen';
+$ec_lang['lpn_backdrop_remove_confirm']='¿Quitar la imagen de fondo?';
+$ec_lang['lpn_backdrop_scale_prompt1']='Haga clic en dos puntos de la imagen de fondo, como los dos extremos de una escala gráfica. Luego escriba la distancia real entre ellos.';
+$ec_lang['lpn_backdrop_scale_prompt2']='Distancia real entre los dos puntos';
+$ec_lang['lpn_backdrop_position_prompt1']='Haga clic en cualquier punto de la imagen de fondo. Este es el punto que moverá.';
+$ec_lang['lpn_backdrop_position_prompt2']='Elija a dónde debe ir ese punto, y luego haga clic en Continuar.';
+$ec_lang['lpn_backdrop_target_label']='Moverlo a:';
+$ec_lang['lpn_backdrop_target_node']='Un nodo';
+$ec_lang['lpn_backdrop_target_free']='Cualquier punto del mapa';
+$ec_lang['lpn_backdrop_target_coords']='Coordenadas que usted escribe';
+$ec_lang['lpn_backdrop_coords_prompt']='Escriba las coordenadas X,Y a las que debe moverse ese punto';
+$ec_lang['lpn_backdrop_continue']='Continuar';
+$ec_lang['lpn_tool_settings']='Configuración';
+$ec_lang['lpn_settings_scope_project']='Se guarda con este proyecto.';
 $ec_lang['lpn_settings_scope_calculator']='Configuración de la calculadora';
 $ec_lang['lpn_settings_show_titles']='Mostrar títulos de página';
 $ec_lang['lpn_settings_show_titles_tip']='Oculta el encabezado de la página y la línea de bienvenida sobre el dibujo, para que el mapa tenga más espacio. La impresión no cambia.';
+$ec_lang['lpn_settings_id_prefixes']='Prefijos de ID';
+$ec_lang['lpn_settings_defaults']='Valores iniciales';
+$ec_lang['lpn_settings_defaults_note']='Se usan para los elementos que cree de ahora en adelante. Los elementos existentes no cambian.';
+$ec_lang['lpn_settings_push_note']='Solo se aplican las propiedades cuyas etiquetas están visibles en este momento.';
+$ec_lang['lpn_settings_push_btn']='Aplicar valores iniciales a todos los elementos';
+$ec_lang['lpn_push_confirm']='¿Reemplazar estas propiedades en todos los elementos existentes con los valores iniciales actuales? Los valores que haya escrito se sobrescribirán. Puede deshacer esto.';
+$ec_lang['lpn_push_properties']='Propiedades:';
+$ec_lang['lpn_push_elements']='Nodos y tuberías:';
+$ec_lang['lpn_push_none_displayed']='Ningún valor inicial se muestra como etiqueta en este momento, así que no hay nada que aplicar. Active las etiquetas de las propiedades que desee en el panel Etiquetas, y luego intente de nuevo.';
+$ec_lang['lpn_push_nothing']='Ningún elemento existente tiene ninguna de las propiedades que se están aplicando.';
+$ec_lang['lpn_push_no_change']='Todos los elementos ya tienen estos valores, así que nada cambiaría.';
+$ec_lang['lpn_settings_emitter_exponent']='Exponente del emisor';
+// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
+// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Cálculo';
+$ec_lang['lpn_settings_tolerance']='Tolerancia de convergencia';
+$ec_lang['lpn_settings_tolerance_tip']='Qué tan cerca debe llegar el solucionador antes de detenerse. Un número más pequeño es más exacto y tarda más.';
 $ec_lang['lpn_settings_engine_epanet']='Resolver con el motor de EPANET';
 $ec_lang['lpn_settings_engine_epanet_tip']='Ejecuta el motor original de EPANET de la EPA de EE. UU., aquí en su navegador. El solucionador incorporado da los mismos resultados y es más rápido, así que deje esto desactivado a menos que necesite EPANET en sí.';
 $ec_lang['lpn_engine_loading']='Cargando el motor de EPANET…';
 $ec_lang['lpn_engine_failed']='No se pudo cargar el motor de EPANET. Se muestra el solucionador incorporado en su lugar.';
 $ec_lang['lpn_engine_manning_note']='Nota: con rugosidad de Manning, EPANET calcula una pérdida de carga aproximadamente 0,6% menor que el solucionador incorporado.';
-$ec_lang['bpn_supply1_h']='Carga estática de suministro';
-$ec_lang['lpn_main_menu']='Red de Abastecimiento de Agua';
-$ec_lang['lpn_main_title']='Calculadora gratis en línea de redes de distribución de agua con el motor EPANET';
-$ec_lang['lpn_main_desc']='Análisis de redes de abastecimiento de agua: dibuje una red de tuberías mallada o importe archivos de EPANET';
+$ec_lang['lpn_settings_text_size']='Tamaño del texto';
+$ec_lang['lpn_settings_text_size_map']='Distancia del mapa';
+$ec_lang['lpn_settings_text_size_screen']='Píxeles de pantalla';
+// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
+// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
+// everything on the map is and symbols follow the text into map-vs-screen units automatically.
+$ec_lang['lpn_settings_symbol_size']='Tamaño del símbolo (relativo al texto)';
+// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
+// through the network while you place nodes on top of it (Tom, 2026-07-30).
+$ec_lang['lpn_settings_symbol_opacity']='Opacidad del símbolo (0 a 1)';
+// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
+// network drawn over it (Tom, 2026-07-30).
+$ec_lang['lpn_settings_backdrop_opacity']='Opacidad de la imagen de fondo (0 a 1)';
+$ec_lang['lpn_settings_text_size_units']='Unidades del tamaño de texto';
+$ec_lang['lpn_settings_map_display']='Apariencia del mapa';
+$ec_lang['lpn_settings_map_height_px']='Altura del mapa (píxeles de pantalla)';
+// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
+// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
+$ec_lang['lpn_settings_map_height_tip']='En una pantalla pequeña el mapa se dibuja más corto que esto, para que siempre quede una parte de la página para desplazar.';
+$ec_lang['lpn_settings_legend_position']='Posición de la leyenda';
+$ec_lang['lpn_settings_legend_top_left']='Superior izquierda';
+$ec_lang['lpn_settings_legend_top_right']='Superior derecha';
+$ec_lang['lpn_settings_legend_middle_left']='Media izquierda';
+$ec_lang['lpn_settings_legend_middle_right']='Media derecha';
+$ec_lang['lpn_settings_legend_bottom_left']='Inferior izquierda';
+$ec_lang['lpn_settings_legend_bottom_right']='Inferior derecha';
+$ec_lang['lpn_confirm_restore_defaults']='¿Restablecer toda la configuración (prefijos de ID, valores iniciales, configuración del solucionador, apariencia del mapa, posición de la leyenda y etiquetas visibles) a sus valores originales? Su red no cambia. La configuración pertenece al proyecto abierto, así que sus otros proyectos conservan la suya.';
+$ec_lang['lpn_settings_wipe_btn']='Borrar todo en esta página';
+$ec_lang['lpn_confirm_wipe']='¿Eliminar TODO lo guardado para esta página — cada proyecto, cada imagen de fondo, toda la configuración y sus unidades elegidas — y recargar la página como la vería un visitante completamente nuevo? Esto no se puede deshacer.';

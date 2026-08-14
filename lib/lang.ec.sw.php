@@ -66,6 +66,20 @@ $ec_lang['template_welcome']='Acha wasiwasi wako mlangoni; hapa upendo unasemwa.
 $ec_lang['template_feedback']='Je, unaweza kupendekeza maneno bora zaidi ya ukurasa huu, au kitu kingine chochote? Unataka kusaidia, au kujifunza kutengeneza vikokotoo kama hivi? Tafadhali wasiliana nami.';
 $ec_lang['template_printable_title']='Kichwa cha Kuchapishwa';
 $ec_lang['template_printable_subtitle']='Kichwa Kidogo cha Kuchapishwa';
+// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
+// prose, and they are translated into all 26 languages for one reason: consent that the visitor
+// cannot read is not consent. The long-form privacy notice and terms are a separate question --
+// English-authoritative, and translated by a human later if at all.
+$ec_lang['consent_body']='Je, tunaweza kuhifadhi tarakimu moja kwa kila ukurasa katika hifadhi ya kivinjari hiki, ili kuzuia kurekodi matembezi yake mara kwa mara?';
+$ec_lang['consent_accept']='Kubali hili';
+$ec_lang['consent_accept_all']='Kubali siku zote';
+$ec_lang['consent_decline']='Kataa';
+$ec_lang['consent_current_granted']='Ulikubali hili. Tunapunguza urekodiaji kwa kivinjari hiki.';
+$ec_lang['consent_current_denied']='Ulikataa hili. Hatuhifadhi chochote cha kupunguza urekodiaji kwa kivinjari hiki.';
+$ec_lang['consent_region_label']='Chaguo lako kuhusu kupunguza urekodiaji.';
+$ec_lang['consent_settings_link']='Mipangilio ya Cookie';
+$ec_lang['privacy_link']='Taarifa ya Faragha';
+$ec_lang['terms_link']='Masharti ya Matumizi';
 $ec_lang['index_title']='Vikokotoo vya Uhandisi Bure Mtandaoni';
 $ec_lang['index_meta_desc_plain']='Vikokotoo bure vya uhandisi wa majimaji kwa ajili ya mabomba, mifereji, vizingiti vya maji na umwagiliaji. Hufanya kazi kwenye kivinjari chako, hufanya kazi bila mtandao, na vinapatikana katika lugha 27.';
 $ec_lang['calc_set_units']='Weka vitengo:';
@@ -119,6 +133,8 @@ $ec_lang['hw_pressure_neg_short']='Shinikizo hasi';
 $ec_lang['hw_pressure_neg']='Shinikizo la chini ya mkondo liko chini ya sifuri. HGL inashuka chini ya bomba, hivyo bomba halitatiririsha likiwa limejaa, na matokeo haya huenda yasiwe sahihi.';
 $ec_lang['hw_roughness']='Mgawo wa Hazen-Williams, C';
 $ec_lang['hw_note_1']='<dl><dt>Kikokotoo hiki hakiigi mwinuko wa bomba kati ya ncha mbili.</dt><dd>Hutumia tu miinuko ya juu na chini ya mkondo unayoingiza. Ikiwa ardhi inapanda juu zaidi ya ncha yoyote mahali fulani katikati, shinikizo katika sehemu hiyo ya juu kabisa ni ndogo kuliko shinikizo lolote lililoripotiwa hapa. Endesha kikokotoo tena kwa urefu kutoka ncha ya juu ya mkondo hadi sehemu ya juu kabisa ili kuikagua.</dd><dd>Pale HGL inaposhuka chini ya bomba, maji huwa chini ya shinikizo hasi. Hewa hutoka kwenye myeyusho, bomba lenye kuta nyembamba linaweza kubonyea, na maji machafu ya ardhini yanaweza kuvutwa ndani kupitia viungio. Weka bomba chini ya shinikizo chanya kila mahali, na fikiria kuweka vali ya hewa kwenye kila sehemu ya juu kabisa.</dd><dt>Shinikizo la juu ya mkondo ni hali ya mpaka unayoitoa wewe mwenyewe.</dt><dd>Lisome kutoka kwa kipimo (gauge), kutoka kwa kiwango cha maji cha tangi (kimo cha maji juu ya bomba), au kutoka kwa mkondo wa pampu (pump curve). Pampu hutoa shinikizo dogo zaidi kadiri mtiririko unavyoongezeka, hivyo tumia sehemu ya mkondo huo inayolingana na mtiririko ulioingizwa hapo juu.</dd><dt>Jumlisha mgawo wa upotevu mdogo (wa ndani) K mwenyewe.</dt><dd>Jumlisha thamani za K za kila vali, kigeuzo, tee, mita, na muingilio kwenye mstari, kisha ingiza jumla hiyo. Fuata kiungo kwenye ingizo hilo kupata thamani za kawaida. Katika bomba kuu refu la usafirishaji, upotevu huu ni mdogo ukilinganisha na msuguano, lakini katika mabomba mafupi ya kituo unaweza kuwa sehemu kubwa ya upotevu.</dd></dl>';
+
+
 // Manning Irregular
 $ec_lang['mi_menu']='Mfereji wa Mkato Usio wa Kawaida wa Manning';
 $ec_lang['mi_main_title']='Kikokotoo cha Bure Mtandaoni cha Mfereji wa Mkato Usio wa Kawaida wa Manning';
@@ -478,6 +494,7 @@ $ec_lang['rc_notes_5_term']='Wigo Halali wa Ukubwa wa Mawe';
 $ec_lang['rc_notes_5_def']='Milinganyo ilitengenezwa ikitumia wigo wa D<sub>50</sub> kuanzia 15 mm hadi 278 mm. Matokeo nje ya wigo huu ni makadirio na yanapaswa kutumika pamoja na uamuzi wa ziada wa kihandisi.';
 $ec_lang['rc_notes_6_term']='Mwinuko wa Sakafu ya Kutokea';
 $ec_lang['rc_notes_6_def']='Mwinuko wa juu ya mawe katika mkondo wa kutokea unapaswa kuwa sawa na au chini ya mwinuko wa sakafu ya mkondo wa chini. Ukiwa juu zaidi, mawe ya kutokea hayatakuwa thabiti.';
+
 $ec_lang['rc_notes_7_def']='Kina cha kawaida katika njia ya ingizo kinapokuwa chini ya kimo cha bwawa (H<sub>p</sub>) kinachohitajika kupitisha q<sub>t</sub>, mtiririko mdogo au kutuama kwa maji hutokea juu ya mkondo kabla ya ingizo la mfereji. Hii kwa ujumla inakubalika — kutuama kwa maji hupunguza kasi na huzuia mmomonyoko juu ya mkondo. Kukagua: tumia kikokotoo cha mtiririko wa bwawa kupata H<sub>p</sub> kwa q<sub>t</sub> na upana wa kilele uliopewa, kisha ulinganishe na kina cha kawaida cha njia ya ingizo. Ikiwa H<sub>p</sub> inazidi kina cha kawaida, kutuama kwa maji kutatokea.';
 $ec_lang['rc_notes_4_term']='Marejeo';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Usanifu wa mifereji ya mawe ya mwinuko</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS pia inachapisha <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">lahajedwali la Excel</a> linalotumia mbinu ile ile.';
@@ -584,6 +601,8 @@ $ec_lang['bpn_notes_2_term']='Mitandao yenye matawi tu, bila mizunguko';
 $ec_lang['bpn_notes_2_def']='Kila mstari una mstari mmoja tu wa juu ya mkondo (mti). Zana hii haisuluhishi mitandao yenye mizunguko; hiyo inahitaji mbinu za marudio (EPANET au kama hiyo). Kuacha mizunguko nje ndiko kunakoifanya iwe rahisi na sahihi.';
 $ec_lang['bpn_notes_3_term']='Hakuna vidhibiti hai vya shinikizo';
 $ec_lang['bpn_notes_3_def']='Unaweza kuongeza vali ya upotevu wa ndani uliowekwa (thamani ya k), lakini si vali za kupunguza au kudumisha shinikizo (PRV/PSV). Hali yao ya kufunguka/kufungwa hutegemea mtiririko na shinikizo, jambo ambalo lingelazimisha marudio.';
+
+
 $ec_lang['bpn_supply2_q']='Mtiririko wa usambazaji 2';
 $ec_lang['bpn_supply2_h']='Kimo cha usambazaji 2';
 $ec_lang['bpn_supply3_q']='Mtiririko wa usambazaji 3';
@@ -593,16 +612,6 @@ $ec_lang['bpn_h_supply']='Kimo cha usambazaji';
 $ec_lang['bpn_h_supply_tip']='Kimo cha chanzo kwenye mtiririko wa kubuni, kilichosomwa kutoka kwenye mkondo wa usambazaji. Ni sawa na kimo cha chanzo kilichoingizwa wakati mkondo ni tambarare (hifadhi ya maji).';
 $ec_lang['bpn_show_elevation']='Mwinuko';
 $ec_lang['bpn_supply1_h']='Kimo tuli cha usambazaji';
-$ec_lang['consent_body']='Je, tunaweza kuhifadhi tarakimu moja kwa kila ukurasa katika hifadhi ya kivinjari hiki, ili kuzuia kurekodi matembezi yake mara kwa mara?';
-$ec_lang['consent_accept']='Kubali hili';
-$ec_lang['consent_accept_all']='Kubali siku zote';
-$ec_lang['consent_decline']='Kataa';
-$ec_lang['consent_current_granted']='Ulikubali hili. Tunapunguza urekodiaji kwa kivinjari hiki.';
-$ec_lang['consent_current_denied']='Ulikataa hili. Hatuhifadhi chochote cha kupunguza urekodiaji kwa kivinjari hiki.';
-$ec_lang['consent_region_label']='Chaguo lako kuhusu kupunguza urekodiaji.';
-$ec_lang['consent_settings_link']='Mipangilio ya Cookie';
-$ec_lang['privacy_link']='Taarifa ya Faragha';
-$ec_lang['terms_link']='Masharti ya Matumizi';
 $ec_lang['lpn_main_menu']='Mtandao wa Usambazaji Maji';
 $ec_lang['lpn_main_title']='Kikokotoo cha Bure Mtandaoni cha Mtandao wa Usambazaji Maji chenye Injini ya EPANET';
 $ec_lang['lpn_main_desc']='Uchambuzi wa Mtandao wa Usambazaji Maji: Chora Mtandao wa Bomba wenye Mizunguko au Leta Faili za EPANET';
@@ -617,8 +626,18 @@ $ec_lang['lpn_tool_delete']='Futa';
 $ec_lang['lpn_tool_zoom_extent']='Onyesha Yote';
 $ec_lang['lpn_new_text']='Maandishi';
 $ec_lang['lpn_field_elev']='Mwinuko';
+// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
+// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
+// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
+// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='Kiwango cha ardhi au bomba katika kifundo hiki. Pima kutoka mahali popote unapotaka kuwa sifuri, mradi kila kifundo kitumie kiwango kimoja cha kuanzia.';
+// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
+// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
+// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='Kimo';
+// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
+// outright that it is a height and not a pressure, which is the exact confusion the glossary's
+// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Kiwango cha uso wa maji katika hifadhi, kilichopimwa kama kimo, si kama shinikizo. Acha wazi ili uso wa maji uwe kwenye mwinuko wa hifadhi.';
 $ec_lang['lpn_close']='Funga';
 $ec_lang['lpn_empty_hint']='Anza kwa kuongeza picha ya nyuma au hifadhi ya maji kutoka kwenye upau wa zana, au fungua Faili, Mradi Mpya ili kuanzia kwa mfano.';
@@ -631,6 +650,10 @@ $ec_lang['lpn_units_elevhead']='Mwinuko na Kimo';
 $ec_lang['lpn_units_pressure']='Shinikizo';
 $ec_lang['lpn_units_flow']='Mtiririko';
 $ec_lang['lpn_units_velocity']='Kasi';
+// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
+// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
+// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
+// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='Mteremko wa Upotevu wa Kimo';
 $ec_lang['lpn_result_gradient_tip']='Upotevu wa kimo ukigawanywa na urefu wa bomba. Tumia hii kulinganisha mabomba ya urefu tofauti dhidi ya kikomo kimoja cha kubuni.';
 $ec_lang['lpn_result_head']='Kimo';
@@ -639,29 +662,70 @@ $ec_lang['lpn_result_pressure']='Shinikizo';
 $ec_lang['lpn_result_flow']='Mtiririko';
 $ec_lang['lpn_result_velocity']='Kasi';
 $ec_lang['lpn_result_headloss']='Upotevu wa Kimo';
+// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
+// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
+// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
+// Settings live INSIDE each project document, so deleting every project deletes every setting too:
+// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
+// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
+// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='Inarejesha mipangilio ya mradi huu tu. Mchoro wako na miradi yako mingine haibadiliki. Ili kuhifadhi mipangilio unayoipenda kwa matumizi tena, hifadhi faili la mradi lisilo na chochote isipokuwa mipangilio.';
 $ec_lang['lpn_reset_all_tip']='Inafuta kila mradi, kila picha ya nyuma, kila mpangilio, na chaguo lako la vitengo, kisha inapakia upya ukurasa kama vile mtembeleaji wa mara ya kwanza anavyouona. Hii ndiyo urejeshaji pekee unaofuta kila kitu.';
+// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
+// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
+// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
+// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
+// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_prompt']='Kikokotoo hiki huhifadhi vitengo na maingizo ya mradi kama yalivyoingizwa, lakini hapo awali kilibadilisha namba kuwa SI kwa ajili ya kuhifadhi. Mradi huu ulihifadhiwa kabla ya mabadiliko hayo, hivyo namba zake zilihifadhiwa kwa SI. Ubadilishe mara ya mwisho kwenda vitengo vya sasa? Ili uweze kuamua, hapa kuna baadhi ya vipenyo ambavyo vingebadilishwa, pamoja na thamani zake kabla na baada:';
 $ec_lang['lpn_v2_restore_yes']='Badilisha';
 $ec_lang['lpn_v2_restore_never']='Hapana. Usiulize tena.';
 $ec_lang['lpn_v2_restore_no']='Funga ili nikague vitengo vya sasa kwanza';
 $ec_lang['lpn_storage_too_new']='Mradi huu ulihifadhiwa na toleo jipya zaidi la ukurasa huu, hivyo hauwezi kufunguliwa hapa.';
+// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
+// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
+// something that is not in a file, so closing it asks first; a tab without one closes silently. A
+// browser project always wears one (it is in no file at all); a file project wears one only while it
+// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
+// our words for talking about the code, and the user sees only a name, an asterisk, and a file
+// extension.
+// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
+// conventional relationship and the reason the duplication between them is correct rather than
+// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
+// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
+// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='Faili';
 $ec_lang['lpn_menu_edit']='Hariri';
 $ec_lang['lpn_menu_insert']='Ingiza';
 $ec_lang['lpn_menu_view']='Onyesho';
+// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
+// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Mipangilio';
+// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
+// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
+// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
+// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
+// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Futa mtandao';
 $ec_lang['lpn_confirm_delete_network']='Futa kila kifundo, bomba, na lebo ya maandishi katika mradi huu? Picha ya nyuma, jina la mradi, na mipangilio yako vitabaki. Hili haliwezi kutenguliwa.';
 $ec_lang['lpn_view_units']='Vitengo';
+// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Hifadhi vyote';
+// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
+// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
+// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='Mradi{n}';
 $ec_lang['lpn_project_copy_suffix']='(nakala)';
 $ec_lang['lpn_project_rename']='Badilisha Jina';
+// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='Mradi Mpya…';
+// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
+// with the toolbar button of that name -- an example is a whole network, so it starts a project
+// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Mradi tupu, vitengo vya US (gpm)';
 $ec_lang['lpn_new_blank_si']='Mradi tupu, vitengo vya SI (l/s)';
 $ec_lang['lpn_new_from_examples']='Kutoka kwa mifano';
+// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
+// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_new_example_us']='Mtandao wa msingi, vitengo vya US (gpm)';
 $ec_lang['lpn_new_example_si']='Mtandao wa msingi, vitengo vya SI (l/s)';
 $ec_lang['lpn_file_open']='Fungua…';
@@ -669,10 +733,14 @@ $ec_lang['lpn_file_save']='Hifadhi';
 $ec_lang['lpn_file_saveas']='Hifadhi kama…';
 $ec_lang['lpn_file_revert']='Rudisha';
 $ec_lang['lpn_file_close']='Funga';
+// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
+// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Faili za hivi karibuni';
 $ec_lang['lpn_recent_tip']='Fungua {file} tena bila kulazimika kuitafuta kwenye kompyuta yako.';
 $ec_lang['lpn_recent_denied']='Ruhusa ya kufungua faili hilo haikutolewa, hivyo halikufunguliwa.';
 $ec_lang['lpn_recent_gone']='Imeshindwa kufungua {file}. Huenda lilihamishwa, kubadilishwa jina, au kufutwa, hivyo liliondolewa kwenye orodha ya hivi karibuni.';
+// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
+// around it.
 $ec_lang['lpn_tab_new']='Mradi mpya';
 $ec_lang['lpn_tab_all']='Miradi yote';
 $ec_lang['lpn_tab_menu']='Menyu ya mradi';
@@ -682,10 +750,20 @@ $ec_lang['lpn_tab_move_right']='Hamisha kulia';
 $ec_lang['lpn_tab_unsaved']='Haijahifadhiwa kwenye faili';
 $ec_lang['lpn_import_bad_file']='Faili hilo halikuweza kusomwa kama mradi uliohifadhiwa kutoka ukurasa huu.';
 $ec_lang['lpn_import_no_room']='Hifadhi ya kivinjari haitoshi kuongeza mradi huu. Futa mradi usioutumia tena kisha ujaribu tena.';
+// ---- EPANET .inp import (ROADMAP Task 196) ----
+// The import REPORTS every difference between the file and what this page can hold, so each
+// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
+// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
+// another sentence, and none may become one.
+// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
+// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='Sawa';
 $ec_lang['lpn_file_import_inp']='Leta Faili la EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Soma mtandao kutoka faili la EPANET, iwe faili la maandishi la .inp au faili la .net linalohifadhiwa na EPANET, na ulihifadhi katika kivinjari hiki kama mradi mpya. Ukurasa huu hauwezi kuandika faili la EPANET tena, hivyo tumia Faili, Hifadhi kama ili kuhifadhi kazi yako.';
 $ec_lang['lpn_inp_bad_file']='Faili hilo halikuweza kusomwa kama faili la mtandao la EPANET.';
+// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
+// the way out named here always works, so keep the instruction in the message rather than leaving
+// the reader to guess.
 $ec_lang['lpn_net_bad_file']='Hii inaonekana kama faili la .net la EPANET, lakini ukurasa huu haukuweza kulisoma. Lifungue katika EPANET na utumie amri ya Faili, Hamisha, Mtandao huko ili kulihifadhi kama faili la .inp, kisha ulete hilo.';
 $ec_lang['lpn_inp_report_heading']='Imeletwa {file}';
 $ec_lang['lpn_inp_report_counts']='Miunganiko na hifadhi za maji {nodes}, mabomba na pampu {links}, kwa vitengo vya {units}.';
@@ -710,11 +788,44 @@ $ec_lang['lpn_inp_drop_quality']='Ubora wa maji, miitikio ya kemikali, na mipang
 $ec_lang['lpn_inp_drop_backdrop']='Faili hili linataja picha ya nyuma lakini halina picha yenyewe. Iongeze mwenyewe kwa Faili, Picha ya Nyuma, Ongeza picha.';
 $ec_lang['lpn_inp_drop_dangling']='Mabomba haya yanataja kifundo ambacho hakipo kwenye faili, hivyo yaliachwa nje.';
 $ec_lang['lpn_inp_drop_units']='Vitengo vya mtiririko kwenye faili hili havikutambuliwa, hivyo galoni kwa dakika (gpm) zilidhaniwa. Kagua kila namba kabla ya kutumia majibu.';
+// {name} is a project name; word order is the translator's to choose. Says where the user landed,
+// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
+// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='Imefunguliwa {name} kutoka faili, na kuongezwa kwenye kivinjari hiki kama mradi mpya.';
+// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
+// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
+// browser they test in. That is expected, not a bug.
+// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='Faili la mradi';
+// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
+// a save cannot connect to a file, so every press really is another copy in the downloads folder.
+// The label says which of the two you are getting rather than leaving the duplicate looking like a
+// bug.
+// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
+// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
+// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
+// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
+// notice after the act -- at the moment the question arises -- rather than in a label forever.
+// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
+// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
+// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
+// anyway -- a disabled button fires no mouse events.
+// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
+// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
+// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
+// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
+// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='Kivinjari hiki hakiwezi kuunganika na faili, hivyo kufungua faili hapa ni kupakia kweli kweli: mradi unanakiliwa ndani ya kivinjari hiki, na njia pekee ya kuhifadhi kazi yako kwenye faili ni kuliandika upya kwa Faili, Hifadhi kama.';
+// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
+// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='Inahifadhi kwenye faili lililounganishwa.';
 $ec_lang['lpn_file_saveas_tip']='Chagua faili la kuhifadhi. Mradi huu utaunganika na faili hilo, na Hifadhi itaandika kwake tangu wakati huo.';
+// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
+// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
+// is no API for it, and the download attribute cannot override the setting -- but the user can turn
+// that setting on themselves, and then Save as really does let them overwrite the file they started
+// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
+// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='Inahifadhi ukitumia mipangilio ya Upakuaji (Download) ya kivinjari chako. Kivinjari hiki hakiwezi kuunganika na faili, hivyo Hifadhi imezimwa na Hifadhi kama pekee inapatikana. Ukiwasha mpangilio wa kivinjari chako wa "Uliza mahali pa kuhifadhi kila faili", unaweza kuchagua faili la asili na kuliandika upya.';
 $ec_lang['lpn_status_uploaded']='Faili la mradi limepakiwa. Hakuna muunganiko unaoweza kudumishwa nalo, hivyo njia pekee ya kuhifadhi kwake ni kutumia Faili, Hifadhi kama.';
 $ec_lang['lpn_status_downloaded']='Imepakuliwa {file}. Kivinjari hiki hakiwezi kuunganika na faili, hivyo mradi huu unabaki umewekwa alama kuwa haujahifadhiwa kwenye faili.';
@@ -723,18 +834,45 @@ $ec_lang['lpn_status_already_open']='Faili hilo tayari limefunguliwa hapa kama {
 $ec_lang['lpn_status_already_open_dirty']='Faili hilo tayari limefunguliwa hapa kama {name}, likiwa na mabadiliko usiyoyahifadhi bado. Hii ilibadilisha kwenda kwake badala ya kufungua nakala ya pili. Tumia Faili, Rudisha ikiwa unataka toleo lililopo diskini badala yake.';
 $ec_lang['lpn_status_saved']='Imehifadhiwa {file}.';
 $ec_lang['lpn_status_reverted']='Imepakiwa {file} tena kutoka diskini.';
+// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
+// purpose: a program that writes your file behind your back takes away your right to walk away from
+// a session. So these three carry the whole close/discard/revert conversation.
+// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_prompt']='Hifadhi mabadiliko yako kwenye {name} kabla ya kuyafunga?';
+// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
+// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_prompt']='{name} inahifadhiwa kwenye kivinjari hiki tu. Ukiifunga bila kuihifadhi kwenye faili, imepotea kabisa.';
 $ec_lang['lpn_close_discard']='Funga bila kuhifadhi';
 $ec_lang['lpn_cancel']='Ghairi';
 $ec_lang['lpn_revert_confirm']='Tupa mabadiliko uliyoyafanya na upakie {file} tena kutoka diskini?';
+// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
+// page load, so the link is gone even though we still know the name. Says what to do, not just what
+// happened.
 $ec_lang['lpn_file_needs_reopen']='Mradi huu ulitoka {file}, lakini muunganiko na faili hilo umepotea. Chagua faili hilo tena ili kuunganika nalo.';
+// Says what is still safe before it says what failed: the reassurance is the part a worried user
+// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Imeshindwa kuandika kwenye faili. Huenda lilihamishwa au kubadilishwa jina, au ruhusa iliondolewa. Kazi yako bado imehifadhiwa kwenye kivinjari hiki.';
 $ec_lang['lpn_file_changed_elsewhere']='Mtu mwingine amehifadhi kwenye faili hili tangu ulipolifungua, hivyo kuhifadhi sasa kutaandika juu ya kazi yake. Tumia Faili, Hifadhi kama ili kuweka mabadiliko yako kwenye faili lako mwenyewe, au Faili, Rudisha ili kutupa yako na kupakia yake.';
+// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
+// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
+// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
+// Initials, and said to be public: whoever opens the same file sees this name, including outside the
+// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
+// rather than a name makes the safe answer the obvious one.
+// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
+// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='Wenzako waone jina gani unapokuwa na mradi huu wazi? Herufi zako za mwanzo ni bora. Yeyote anayefungua faili hilo hilo anaweza kuliona, hivyo usitumie kitu chochote cha faragha.';
+// The stand-in when someone locked a project before giving a name. Reads in place of {name}
+// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Mtu mwingine';
+// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
+// moment of opening, with both real answers on it -- the way every drawing and document program has
+// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} ana faili hili wazi.';
 $ec_lang['lpn_lock_open_readonly']='Fungua kwa kusoma tu';
+// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
+// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
+// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Tengeneza nakala';
 $ec_lang['lpn_lock_break']='Vunja mfungo wao';
 $ec_lang['lpn_lock_open_heading_times']='{name} ana faili hili wazi; hariri ya mwisho ilikuwa {x} zilizopita, {y} baada ya kuhifadhi mara ya mwisho.';
@@ -747,26 +885,59 @@ $ec_lang['lpn_ago_minutes']='dakika {n}';
 $ec_lang['lpn_ago_hours']='saa {n}';
 $ec_lang['lpn_ago_days']='siku {n}';
 $ec_lang['lpn_ago_unknown']='muda usiojulikana';
+// Read-only means read-only: it never turns itself back into an editable file while you are looking
+// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
+// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
+// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='Kusoma tu: {name} ana faili hili wazi. Unaweza kubadilisha chochote unachotaka hapa, lakini huwezi kuhifadhi. Tumia Faili, Hifadhi kama ili kuhifadhi kwenye faili tofauti.';
+// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
+// stops a colleague editing the same file. Editing still works -- an unreachable server must never
+// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
+// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='Onyo: imeshindikana kufikia seva kukagua au kutengeneza mfungo kwenye mradi huu, hivyo hakuna kinachozuia mwenzako kuhariri faili hilo hilo wakati mmoja. Utaarifiwa mfungo ukianza kufanya kazi tena.';
 $ec_lang['lpn_lock_storage_error']='Onyo: tovuti hii haiwezi kuhifadhi rekodi za mfungo, hivyo hakuna kinachozuia mwenzako kuhariri faili hilo hilo wakati mmoja. Hili ni kosa la usanidi la seva, si kitu unachoweza kukirekebisha hapa — folda ya mfungo haiandikiki na seva ya wavuti.';
 $ec_lang['lpn_lock_full_error']='Onyo: tovuti hii imeishiwa nafasi ya kurekodi ni nani ana mradi gani wazi, hivyo hakuna kinachozuia mwenzako kuhariri faili hilo hilo wakati mmoja. Hili ni kosa la usanidi la seva, si kitu unachoweza kukirekebisha hapa.';
 $ec_lang['lpn_lock_not_asked']='Mfungo haufanyi kazi kwa mradi huu, hivyo hakuna kinachozuia mwenzako kuhariri faili hilo hilo wakati mmoja. Kivinjari hiki bado hakina jina lililorekodiwa kwa ajili yako, au mradi huu hauna kitambulisho — kuhifadhi mradi kwenye faili huweka vyote viwili.';
 $ec_lang['lpn_lock_restored']='Mfungo unafanya kazi tena, na faili hili sasa ni lako kuhifadhi.';
 $ec_lang['lpn_lock_dismiss']='Ficha ujumbe huu';
+// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
+// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
+// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='Mradi wako utahifadhiwa kwenye faili katika kompyuta hii. Unahifadhiwa unapoomba, na wakati mwingine wowote hapana, hivyo hakuna kinachoandikwa kwenye faili hilo bila wewe kujua.';
 $ec_lang['lpn_file_training_2']='Ili watu wawili wasihariri faili moja wakati mmoja, tovuti hii hufuatilia ni nani ana faili hilo wazi. Ikiwa mtu tayari analo, bado unaweza kulifungua na kutazama, au kuweka nakala yako mwenyewe.';
+// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
+// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
+// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
+// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
+// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='Mara ya kwanza unapohifadhi, kivinjari chako kitauliza kama tovuti hii inaweza kuhariri faili hilo. Swali hilo linatoka kwa kivinjari, si kwetu, na kukubali ndiko kunakoruhusu Hifadhi kuandika kazi yako kwenye faili hilo. Kwa kawaida linaulizwa mara moja tu kwa kila faili.';
+// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
+// false -- the name is never written into the project file. It is held in this browser and on this
+// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
+// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='Toa jina fupi ambalo wenzako watakujua kwalo. Herufi zako za mwanzo ni bora. Yeyote anayefungua faili hilo hilo anaweza kuliona, hivyo usitumie kitu chochote cha faragha.';
 $ec_lang['lpn_file_training_name']='Herufi zako za mwanzo';
 $ec_lang['lpn_file_training_continue']='Endelea';
+// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
+// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Chagua faili tena';
 $ec_lang['lpn_file_reconnect']='Unganika tena na faili hili';
 $ec_lang['lpn_file_reconnect_prompt']='Mradi huu ulitoka {file}. Kivinjari chako kinahitaji ruhusa yako tena kabla ya kuweza kuandika kwake. Unganika tena hapa chini.';
+// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
+// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Hilo ni faili lile lile ambalo mtu mwingine analo wazi, hivyo haliwezi kuhifadhiwa juu yake. Chagua faili tofauti au jina tofauti.';
 $ec_lang['lpn_saveas_overwrites_project']='Faili hilo tayari lina mradi tofauti, {name}. Kuhifadhi hapa kunalibadilisha kabisa. Endelea?';
 $ec_lang['lpn_saveas_overwrites_newer']='Faili hilo limebadilika tangu ulipoliona mara ya mwisho, hivyo mtu mwingine karibu kabisa amelihifadhi. Kuhifadhi hapa kunabadilisha toleo lao na lako. Endelea?';
+// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
+// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
+// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
+// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='Jina la mradi huu';
+// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
+// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
+// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
+// separate Delete for it to be confused with.)
+// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='Imefungwa {closed}. Sasa inaonyesha {opened}.';
 $ec_lang['lpn_status_closed_empty']='Imefungwa {closed}. Umeanzishwa mradi mpya tupu.';
 $ec_lang['lpn_storage_full']='Haijahifadhiwa. Hifadhi ya kivinjari imejaa au haipatikani, hivyo mabadiliko yako ya hivi karibuni yatapotea ukifunga kichupo hiki.';
@@ -776,6 +947,12 @@ $ec_lang['lpn_notes_2_term']='Havijaigwa';
 $ec_lang['lpn_notes_2_def']='Matanki, ubora wa maji, na vali za udhibiti zinazojifungua na kujifunga zenyewe (PRV, PSV, FCV) haziigwi. Bomba linaweza kubeba upotevu wa ndani uliowekwa, lakini si vali ambayo hali yake ya kufunguka au kufungwa inategemea mtiririko unaotatuliwa.';
 $ec_lang['lpn_notes_3_term']='Kuhifadhi miradi';
 $ec_lang['lpn_notes_3_def']='Kila mradi ni kichupo, na kila kichupo kinahifadhiwa kwenye kivinjari hiki unapofanya kazi. Kufuta data ya kivinjari chako kunafuta yote, hivyo weka kazi yako kwenye faili: Faili, Hifadhi kama. Alama ya nyota kwenye kichupo inamaanisha kina mabadiliko ambayo hayamo kwenye faili. Hakuna kinachoandikwa kwenye faili isipokuwa uombe. Katika baadhi ya vivinjari, mradi huunganika na faili ulilolihifadhia, na Faili, Hifadhi huandika kwenye faili hilo hilo tangu wakati huo; katika vingine muunganiko hauwezekani, hivyo Hifadhi imezimwa na Hifadhi kama pekee inapatikana. Wakati faili la mradi linahifadhiwa kwenye diski inayoshirikiwa, ukurasa huu unakuambia ikiwa mwenzako tayari analo wazi, ili watu wawili wasiandikiane kazi.';
+// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
+// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
+// to stay readable on a phone, while the Notes section is already this page's documentation home,
+// prints with the page, and is translated with everything else. The popup carries a one-line
+// pointer to here instead (lpn_pump_curve_note).
+// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Mkondo wa pampu';
 $ec_lang['lpn_notes_5_def']='Pampu hufuata H = H₀ − aQ^b, ambapo H ni kimo ambacho pampu inaongeza na Q ni mtiririko unaopita ndani yake. Ingiza kituo kimoja, viwili, au vitatu kutoka kwenye mkondo wa mtengenezaji. Vituo vitatu — kimo katika mtiririko sifuri, kituo cha kawaida cha kufanya kazi, na kituo cha mtiririko mkubwa zaidi — hupatanisha H₀, a na b moja kwa moja, na kufuata mkondo uliochapishwa kwa ukaribu zaidi. Vituo viwili hupatanisha parabola (b = 2) yenye kilele chake kwenye mtiririko sifuri. Kituo kimoja hutumia kanuni ya kawaida: kimo katika mtiririko sifuri ni mara 1.33 ya kimo unachoingiza, na mtiririko mkubwa zaidi ni mara 2 ya mtiririko unaoingiza, jambo linalotoa tena b = 2. Pampu isiyo na kituo chochote kilichoingizwa haiongezi kimo chochote. Mkondo haukatiki pale kimo kinapofika sifuri, hivyo kuomba pampu mtiririko zaidi ya uwezo wa mkondo wake hutoa kimo hasi. Suluhisho ni pampu kubwa zaidi au mahitaji madogo zaidi, si upatanishaji tofauti wa mkondo.';
 $ec_lang['lpn_notes_4_term']='Nyongeza zilizopangwa';
@@ -789,12 +966,24 @@ $ec_lang['lpn_diag_dangling_link']='Bomba au pampu inaunganika na kifundo ambach
 $ec_lang['lpn_diag_unreachable']='Vifundo hivi havina njia ya kufika kwenye hifadhi ya maji:';
 $ec_lang['lpn_diag_not_converged']='Hakuna suluhisho lililopatikana. Kagua thamani zisizowezekana maishani halisi, kama kipenyo cha sifuri.';
 $ec_lang['lpn_field_roughness']='Usuguo';
+// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
+// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
+// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. Namba kubwa zaidi inamaanisha bomba laini zaidi: kama 150 kwa plastiki mpya, 130 kwa chuma au chuma pua mpya, na 100 kwa bomba kuukuu.';
 $ec_lang['lpn_field_length']='Urefu';
 $ec_lang['lpn_field_length_tip']='Urefu wa bomba. Auto ikiwa imewashwa, urefu unapimwa kutoka kwenye mchoro wako. Zima Auto ili kuandika urefu unaotofautiana na mchoro.';
+// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
+// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
+// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='Mgawo wa upotevu wa ndani (wa mahali), k';
 $ec_lang['lpn_field_km_tip']='Upotevu kutoka kwenye mapinde, vali, na viungio kwenye bomba hili, ukihesabiwa kama kizidishi cha kimo cha kasi. Tumia 0 kwa bomba jepesi lililonyooka.';
+// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
+// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
+// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
+// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='Upotevu wa ndani, k';
+// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
+// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Chanzo cha mkondo';
 $ec_lang['lpn_pump_curve_own']='Ingiza vituo hapa chini';
 $ec_lang['lpn_pump_curve_ref_note']='Inatumia mkondo ulioingizwa kwa pampu {id}.';
@@ -802,13 +991,23 @@ $ec_lang['lpn_pump_curve_note']='Kituo kimoja, viwili, au vitatu — angalia "Mk
 $ec_lang['lpn_pump_point1']='Kituo cha 1 (lazima)';
 $ec_lang['lpn_pump_point2']='Kituo cha 2 (hiari)';
 $ec_lang['lpn_pump_point3']='Kituo cha 3 (hiari)';
+// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
+// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
+// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='Hali: Chagua. Bofya kipengele au lebo ili kuiona au kuibadilisha. Buruta ili kuhamisha kifundo, kona, au lebo. Bofya mara mbili bomba ili kuongeza au kuondoa kona.';
 $ec_lang['lpn_mode_delete']='Hali: Futa. Bofya kipengele ili kukiondoa.';
 $ec_lang['lpn_mode_add_junction']='Hali: Ongeza Muunganiko. Bofya ramani ili kuweka muunganiko. Badilisha kwenda Hali ya Chagua ili kubadilisha au kuhamisha vipengele na lebo.';
 $ec_lang['lpn_mode_add_reservoir']='Hali: Ongeza Hifadhi ya Maji. Bofya ramani ili kuweka hifadhi ya maji. Badilisha kwenda Hali ya Chagua ili kubadilisha au kuhamisha vipengele na lebo.';
 $ec_lang['lpn_mode_add_pipe']='Hali: Ongeza Bomba. Bofya kifundo, kisha kifundo kingine, ili kuviunganisha. Badilisha kwenda Hali ya Chagua ili kubadilisha au kuhamisha vipengele na lebo.';
 $ec_lang['lpn_mode_add_pump']='Hali: Ongeza Pampu. Bofya kifundo, kisha kifundo kingine, ili kuviunganisha. Badilisha kwenda Hali ya Chagua ili kubadilisha au kuhamisha vipengele na lebo.';
+// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
+// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Hali: Ongeza Maandishi. Bofya ramani ili kuweka lebo ya maandishi. Bofya karibu na kifundo ili kuambatisha maandishi kwenye kifundo hicho. Badilisha kwenda Hali ya Chagua ili kubadilisha au kuhamisha vipengele na lebo.';
+// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
+// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
+// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
+// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
+// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Tumia hali hii kubadilisha, kuhamisha, na kuburuta vitu kwenye ramani.';
 $ec_lang['lpn_tip_labels_draggable']='Unaweza kuburuta lebo ili kuihamisha. Bofya mara mbili lebo ili kuirudisha kwenye nafasi yake ya kiotomatiki.';
 $ec_lang['lpn_field_auto']='Auto';
@@ -823,6 +1022,10 @@ $ec_lang['lpn_labels_mark_extrema']='Weka alama thamani za juu na za chini kabis
 $ec_lang['lpn_field_id']='Kitambulisho';
 $ec_lang['lpn_backdrop_menu']='Picha ya Nyuma…';
 $ec_lang['lpn_backdrop_add']='Ongeza picha';
+// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
+// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
+// menu, where nothing above them says what is being scaled. Naming the object costs one word and
+// works in both places.
 $ec_lang['lpn_backdrop_scale']='Weka kipimo cha picha';
 $ec_lang['lpn_backdrop_position']='Hamisha picha';
 $ec_lang['lpn_backdrop_remove']='Ondoa picha';
@@ -854,6 +1057,8 @@ $ec_lang['lpn_push_none_displayed']='Hakuna thamani ya kuanzia inayoonekana kama
 $ec_lang['lpn_push_nothing']='Hakuna kipengele kilichopo kinachomiliki sifa yoyote kati ya zinazotumiwa.';
 $ec_lang['lpn_push_no_change']='Kila kipengele tayari kina thamani hizi, hivyo hakuna kitakachobadilika.';
 $ec_lang['lpn_settings_emitter_exponent']='Kipeo cha emitter';
+// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
+// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Ukokotoaji';
 $ec_lang['lpn_settings_tolerance']='Uvumilivu wa muunganiko (convergence)';
 $ec_lang['lpn_settings_tolerance_tip']='Ukaribu unaohitajika kabla kikokotoo hakijasimama. Namba ndogo zaidi ni sahihi zaidi na huchukua muda mrefu zaidi.';
@@ -865,12 +1070,21 @@ $ec_lang['lpn_engine_manning_note']='Kumbuka: kwa usuguo wa Manning, EPANET huko
 $ec_lang['lpn_settings_text_size']='Ukubwa wa maandishi';
 $ec_lang['lpn_settings_text_size_map']='Umbali wa ramani';
 $ec_lang['lpn_settings_text_size_screen']='Pikseli za skrini';
+// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
+// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
+// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Ukubwa wa alama (kwa uwiano na maandishi)';
+// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
+// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Uzito wa alama (0 hadi 1)';
+// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
+// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Uzito wa picha ya nyuma (0 hadi 1)';
 $ec_lang['lpn_settings_text_size_units']='Vitengo vya ukubwa wa maandishi';
 $ec_lang['lpn_settings_map_display']='Mwonekano wa ramani';
 $ec_lang['lpn_settings_map_height_px']='Urefu wa ramani (pikseli za skrini)';
+// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
+// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='Kwenye skrini ndogo ramani huchorwa fupi zaidi ya hii, ili sehemu ya ukurasa ibaki ikiweza kusogezwa.';
 $ec_lang['lpn_settings_legend_position']='Nafasi ya ufunguo wa ramani';
 $ec_lang['lpn_settings_legend_top_left']='Juu kushoto';

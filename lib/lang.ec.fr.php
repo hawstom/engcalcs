@@ -66,6 +66,20 @@ $ec_lang['template_welcome']='Laissez vos peurs à la porte; l\'amour est parlé
 $ec_lang['template_feedback']='Pouvez-vous suggérer une meilleure formulation pour cette page, ou autre chose ? Voulez-vous m\'aider ou apprendre à créer des outils comme ceux-ci ? N\'hésitez pas à me contacter.';
 $ec_lang['template_printable_title']='Titre imprimable';
 $ec_lang['template_printable_subtitle']='Sous-titre imprimable';
+// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
+// prose, and they are translated into all 26 languages for one reason: consent that the visitor
+// cannot read is not consent. The long-form privacy notice and terms are a separate question --
+// English-authoritative, and translated by a human later if at all.
+$ec_lang['consent_body']='Pouvons-nous conserver un seul chiffre par page dans le stockage de ce profil de navigateur, afin de ne pas enregistrer ses visites à plusieurs reprises ?';
+$ec_lang['consent_accept']='Accepter cette fois';
+$ec_lang['consent_accept_all']='Toujours accepter';
+$ec_lang['consent_decline']='Refuser';
+$ec_lang['consent_current_granted']='Vous avez autorisé cela. Nous limitons l\'enregistrement pour ce profil de navigateur.';
+$ec_lang['consent_current_denied']='Vous avez refusé cela. Nous ne conservons rien pour limiter l\'enregistrement pour ce profil de navigateur.';
+$ec_lang['consent_region_label']='Votre choix concernant la limitation de l\'enregistrement.';
+$ec_lang['consent_settings_link']='Paramètres des cookies';
+$ec_lang['privacy_link']='Politique de confidentialité';
+$ec_lang['terms_link']='Conditions d\'utilisation';
 $ec_lang['index_title']='Calculateurs d\'ingénierie gratuits en ligne';
 $ec_lang['index_meta_desc_plain']='Calculateurs gratuits d\'ingénierie hydraulique pour conduites, canaux, déversoirs et irrigation. Ils fonctionnent dans votre navigateur, hors ligne, et sont disponibles en 27 langues.';
 $ec_lang['calc_set_units']='Définir les unités:';
@@ -480,6 +494,7 @@ $ec_lang['rc_notes_5_term']='Plage valide de taille de blocs';
 $ec_lang['rc_notes_5_def']='Les équations ont été développées pour une plage D<sub>50</sub> de 15 mm à 278 mm. Les résultats hors de cette plage sont extrapolés et doivent être utilisés avec un jugement d\'ingénierie complémentaire.';
 $ec_lang['rc_notes_6_term']='Cote du radier de sortie';
 $ec_lang['rc_notes_6_def']='La cote du dessus de l\'enrochement dans le tronçon de sortie doit être égale ou inférieure à la cote du fond du canal aval. Si elle est plus haute, l\'enrochement de sortie sera instable.';
+$ec_lang['rc_notes_7_term']='Mise en charge à l\'entrée';
 $ec_lang['rc_notes_7_def']='Lorsque le tirant d\'eau normal dans le canal d\'entrée est inférieur à la charge de déversoir (H<sub>p</sub>) nécessaire pour transiter q<sub>t</sub>, un écoulement limité ou une mise en charge se produit en amont de l\'entrée du coursier. Ceci est généralement acceptable — la mise en charge réduit la vitesse et prévient l\'érosion en amont. Pour vérifier : utiliser un calculateur d\'écoulement de déversoir pour trouver H<sub>p</sub> pour le q<sub>t</sub> et la largeur de crête donnés, puis comparer au tirant d\'eau normal du canal d\'entrée. Si H<sub>p</sub> dépasse le tirant d\'eau normal, une mise en charge se produira.';
 $ec_lang['rc_notes_4_term']='Référence';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., et Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. L\'USDA ARS publie également un <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">tableur Excel</a> basé sur la même méthode.';
@@ -597,6 +612,9 @@ $ec_lang['bpn_h_supply']='Charge d\'alimentation';
 $ec_lang['bpn_h_supply_tip']='Charge à la source au débit de dimensionnement, lue sur la courbe d\'alimentation. Égale la charge à la source saisie lorsque la courbe est plate (un réservoir).';
 $ec_lang['bpn_show_elevation']='Cote';
 $ec_lang['bpn_supply1_h']='Charge statique d\'alimentation';
+$ec_lang['lpn_main_menu']='Réseau d\'eau potable';
+$ec_lang['lpn_main_title']='Calculateur gratuit en ligne de réseau de distribution d\'eau avec moteur EPANET';
+$ec_lang['lpn_main_desc']='Analyse de réseau de distribution d\'eau : dessinez un réseau maillé ou importez des fichiers EPANET';
 $ec_lang['lpn_title_units']='Unités {units}';
 $ec_lang['lpn_tool_select']='Sélectionner';
 $ec_lang['lpn_tool_add_junction']='Jonction';
@@ -732,6 +750,44 @@ $ec_lang['lpn_tab_move_right']='Déplacer à droite';
 $ec_lang['lpn_tab_unsaved']='Non enregistré dans un fichier';
 $ec_lang['lpn_import_bad_file']='Ce fichier n\'a pas pu être lu comme un projet enregistré depuis cette page.';
 $ec_lang['lpn_import_no_room']='Il ne reste pas assez d\'espace de stockage dans le navigateur pour ajouter ce projet. Supprimez un projet dont vous n\'avez plus besoin et réessayez.';
+// ---- EPANET .inp import (ROADMAP Task 196) ----
+// The import REPORTS every difference between the file and what this page can hold, so each
+// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
+// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
+// another sentence, and none may become one.
+// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
+// the translator's to choose.
+$ec_lang['lpn_dialog_ok']='OK';
+$ec_lang['lpn_file_import_inp']='Importer un fichier EPANET…';
+$ec_lang['lpn_file_import_inp_tip']='Lit un réseau depuis un fichier EPANET, qu\'il s\'agisse du fichier texte .inp ou du fichier .net qu\'EPANET enregistre, et l\'enregistre dans ce navigateur comme nouveau projet. Cette page ne peut pas réécrire un fichier EPANET, donc utilisez Fichier, Enregistrer sous pour conserver votre travail.';
+$ec_lang['lpn_inp_bad_file']='Ce fichier n\'a pas pu être lu comme un fichier de réseau EPANET.';
+// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
+// the way out named here always works, so keep the instruction in the message rather than leaving
+// the reader to guess.
+$ec_lang['lpn_net_bad_file']='Ceci ressemble à un fichier .net d\'EPANET, mais cette page n\'a pas pu le lire. Ouvrez-le dans EPANET et utilisez-y la commande Fichier, Exporter, Réseau pour l\'enregistrer en fichier .inp, puis importez celui-ci.';
+$ec_lang['lpn_inp_report_heading']='{file} importé';
+$ec_lang['lpn_inp_report_counts']='{nodes} jonctions et réservoirs, {links} conduites et pompes, en {units}.';
+$ec_lang['lpn_inp_report_clean']='Tout le contenu du fichier a été repris. Rien n\'a été laissé de côté.';
+$ec_lang['lpn_inp_report_lead']='Cette page ne conserve pas tout ce qu\'EPANET modélise. Voici ce qui a changé lors de l\'import :';
+$ec_lang['lpn_inp_drop_headloss']='Ce fichier n\'utilise pas la formule de Hazen-Williams. Cette page calcule avec Hazen-Williams, les valeurs de rugosité des conduites ont donc été conservées telles quelles, mais les résultats obtenus ici ne correspondront pas à ceux d\'EPANET.';
+$ec_lang['lpn_inp_drop_tanks']='Les réservoirs à niveau variable ont été laissés de côté. Cette page dispose de réservoirs, qui gardent un niveau d\'eau fixe. Un réservoir à niveau variable ne garde pas de niveau fixe, ce n\'est donc pas un réservoir.';
+$ec_lang['lpn_inp_drop_tank_links']='Ces conduites ont été laissées de côté car elles se connectent à un réservoir à niveau variable qui a été laissé de côté.';
+$ec_lang['lpn_inp_drop_tcv']='Ces vannes de régulation par étranglement (TCV) sont entrées comme des conduites très courtes portant la même perte de charge singulière. L\'eau se comporte de la même façon, mais l\'élément n\'est pas le même.';
+$ec_lang['lpn_inp_drop_valve']='Ces vannes régulent la pression ou le débit, et cette page ne dispose pas d\'un tel élément. Elles sont entrées comme des conduites ouvertes, le réseau reste donc relié, mais plus rien ne le régule.';
+$ec_lang['lpn_inp_drop_cv']='Dans EPANET, ces conduites ne laissent passer l\'eau que dans un seul sens. Elles sont entrées comme des conduites ordinaires, l\'eau peut donc désormais y circuler dans les deux sens.';
+$ec_lang['lpn_inp_drop_demands']='Ces jonctions avaient plus d\'une demande. Les demandes ont été additionnées pour former la demande unique que cette page conserve.';
+$ec_lang['lpn_inp_drop_patterns']='Les variations de demande dans le temps ont été laissées de côté. Cette page résout un seul instant, donc chaque demande est le nombre écrit dans le fichier.';
+$ec_lang['lpn_inp_drop_emitters']='Ces jonctions ont un coefficient d\'arroseur ou de fuite. Il a été conservé et il est pris en compte dans le calcul, mais cette page ne permet pas encore de le voir ou de le modifier.';
+$ec_lang['lpn_inp_drop_curve_long']='Cette courbe de pompe comptait plus de trois points. Son point le plus bas, son point médian et son point le plus haut ont été conservés, car cette page ajuste une courbe sur trois points au plus.';
+$ec_lang['lpn_inp_drop_curve_missing']='Cette pompe désigne une courbe absente du fichier. Elle est entrée sans courbe, elle n\'ajoute donc aucune charge.';
+$ec_lang['lpn_inp_drop_pump_other']='Cette pompe est décrite par une puissance, une vitesse ou un horaire, plutôt que par une courbe. Elle est entrée sans courbe, elle n\'ajoute donc aucune charge.';
+$ec_lang['lpn_inp_drop_setting']='Ces conduites, pompes et vannes portent un réglage que cette page ne peut pas conserver. Elles sont entrées ouvertes.';
+$ec_lang['lpn_inp_drop_controls']='Les commandes et les règles ont été laissées de côté. Chaque conduite, pompe et vanne est entrée dans l\'état écrit dans le fichier, et ne change pas.';
+$ec_lang['lpn_inp_drop_eps']='Ce fichier décrit une simulation qui s\'étend sur une période. Cette page résout un seul instant, seules les conditions initiales sont donc entrées.';
+$ec_lang['lpn_inp_drop_quality']='Les paramètres de qualité de l\'eau, de réaction chimique et d\'énergie des pompes ont été laissés de côté. Cette page ne résout que le débit et la pression.';
+$ec_lang['lpn_inp_drop_backdrop']='Ce fichier nomme une image de fond mais ne contient pas l\'image elle-même. Ajoutez-la vous-même avec Fichier, Image de fond, Ajouter une image.';
+$ec_lang['lpn_inp_drop_dangling']='Ces conduites désignent une jonction absente du fichier, elles ont donc été laissées de côté.';
+$ec_lang['lpn_inp_drop_units']='Les unités de débit de ce fichier n\'ont pas été reconnues ; le gallon par minute a donc été supposé. Vérifiez chaque nombre avant d\'utiliser les résultats.';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
 // that is the part a user cannot see for themselves.
@@ -986,6 +1042,9 @@ $ec_lang['lpn_backdrop_coords_prompt']='Saisissez les X,Y vers lesquels ce point
 $ec_lang['lpn_backdrop_continue']='Continuer';
 $ec_lang['lpn_tool_settings']='Paramètres';
 $ec_lang['lpn_settings_scope_project']='Enregistré avec ce projet.';
+$ec_lang['lpn_settings_scope_calculator']='Paramètres du calculateur';
+$ec_lang['lpn_settings_show_titles']='Afficher les titres de page';
+$ec_lang['lpn_settings_show_titles_tip']='Masque le titre de la page et la ligne d\'accueil au-dessus du dessin, afin de laisser plus de place à la carte. L\'impression n\'est pas modifiée.';
 $ec_lang['lpn_settings_id_prefixes']='Préfixes d\'identifiant';
 $ec_lang['lpn_settings_defaults']='Valeurs initiales';
 $ec_lang['lpn_settings_defaults_note']='Utilisées pour les éléments que vous créez à partir de maintenant. Les éléments existants ne sont pas modifiés.';
@@ -1003,11 +1062,11 @@ $ec_lang['lpn_settings_emitter_exponent']='Exposant de l\'émetteur';
 $ec_lang['lpn_settings_computation']='Calcul';
 $ec_lang['lpn_settings_tolerance']='Tolérance de convergence';
 $ec_lang['lpn_settings_tolerance_tip']='À quel point le solveur doit s\'approcher avant de s\'arrêter. Un nombre plus petit est plus précis et prend plus de temps.';
-
-
-
-
-
+$ec_lang['lpn_settings_engine_epanet']='Résoudre avec le moteur EPANET';
+$ec_lang['lpn_settings_engine_epanet_tip']='Exécute le moteur EPANET original de l\'agence américaine EPA, ici même dans votre navigateur. Le solveur intégré donne les mêmes résultats et est plus rapide ; laissez cette option désactivée sauf si vous avez besoin d\'EPANET lui-même.';
+$ec_lang['lpn_engine_loading']='Chargement du moteur EPANET…';
+$ec_lang['lpn_engine_failed']='Le moteur EPANET n\'a pas pu être chargé. Le solveur intégré est utilisé à la place.';
+$ec_lang['lpn_engine_manning_note']='Remarque : avec la rugosité de Manning, EPANET calcule une perte de charge environ 0,6 % plus faible que le solveur intégré.';
 $ec_lang['lpn_settings_text_size']='Taille du texte';
 $ec_lang['lpn_settings_text_size_map']='Distance sur la carte';
 $ec_lang['lpn_settings_text_size_screen']='Pixels d\'écran';
@@ -1037,52 +1096,3 @@ $ec_lang['lpn_settings_legend_bottom_right']='En bas à droite';
 $ec_lang['lpn_confirm_restore_defaults']='Réinitialiser tous les paramètres (préfixes d\'identifiant, valeurs initiales, paramètres du solveur, aspect de la carte, position de la légende et étiquettes visibles) à leurs valeurs d\'origine ? Votre réseau n\'est pas modifié. Les paramètres appartiennent au projet ouvert, donc vos autres projets conservent les leurs.';
 $ec_lang['lpn_settings_wipe_btn']='Effacer tout sur cette page';
 $ec_lang['lpn_confirm_wipe']='Supprimer TOUT ce qui est enregistré pour cette page — chaque projet, chaque image de fond, tous les paramètres et vos choix d\'unités — et recharger la page comme la verrait un tout nouveau visiteur ? Cette action est irréversible.';
-
-// Sprint 251: lpn_ promotion (EPANET .inp import diagnostics, EPANET engine option) + consent/privacy/terms.
-$ec_lang['consent_body']='Pouvons-nous conserver un seul chiffre par page dans le stockage de ce profil de navigateur, afin de ne pas enregistrer ses visites à plusieurs reprises ?';
-$ec_lang['consent_accept']='Accepter cette fois';
-$ec_lang['consent_accept_all']='Toujours accepter';
-$ec_lang['consent_decline']='Refuser';
-$ec_lang['consent_current_granted']='Vous avez autorisé cela. Nous limitons l\'enregistrement pour ce profil de navigateur.';
-$ec_lang['consent_current_denied']='Vous avez refusé cela. Nous ne conservons rien pour limiter l\'enregistrement pour ce profil de navigateur.';
-$ec_lang['consent_region_label']='Votre choix concernant la limitation de l\'enregistrement.';
-$ec_lang['consent_settings_link']='Paramètres des cookies';
-$ec_lang['privacy_link']='Politique de confidentialité';
-$ec_lang['terms_link']='Conditions d\'utilisation';
-$ec_lang['rc_notes_7_term']='Mise en charge à l\'entrée';
-$ec_lang['lpn_dialog_ok']='OK';
-$ec_lang['lpn_file_import_inp']='Importer un fichier EPANET…';
-$ec_lang['lpn_file_import_inp_tip']='Lit un réseau depuis un fichier EPANET, qu\'il s\'agisse du fichier texte .inp ou du fichier .net qu\'EPANET enregistre, et l\'enregistre dans ce navigateur comme nouveau projet. Cette page ne peut pas réécrire un fichier EPANET, donc utilisez Fichier, Enregistrer sous pour conserver votre travail.';
-$ec_lang['lpn_inp_bad_file']='Ce fichier n\'a pas pu être lu comme un fichier de réseau EPANET.';
-$ec_lang['lpn_net_bad_file']='Ceci ressemble à un fichier .net d\'EPANET, mais cette page n\'a pas pu le lire. Ouvrez-le dans EPANET et utilisez-y la commande Fichier, Exporter, Réseau pour l\'enregistrer en fichier .inp, puis importez celui-ci.';
-$ec_lang['lpn_inp_report_heading']='{file} importé';
-$ec_lang['lpn_inp_report_counts']='{nodes} jonctions et réservoirs, {links} conduites et pompes, en {units}.';
-$ec_lang['lpn_inp_report_clean']='Tout le contenu du fichier a été repris. Rien n\'a été laissé de côté.';
-$ec_lang['lpn_inp_report_lead']='Cette page ne conserve pas tout ce qu\'EPANET modélise. Voici ce qui a changé lors de l\'import :';
-$ec_lang['lpn_inp_drop_headloss']='Ce fichier n\'utilise pas la formule de Hazen-Williams. Cette page calcule avec Hazen-Williams, les valeurs de rugosité des conduites ont donc été conservées telles quelles, mais les résultats obtenus ici ne correspondront pas à ceux d\'EPANET.';
-$ec_lang['lpn_inp_drop_tanks']='Les réservoirs à niveau variable ont été laissés de côté. Cette page dispose de réservoirs, qui gardent un niveau d\'eau fixe. Un réservoir à niveau variable ne garde pas de niveau fixe, ce n\'est donc pas un réservoir.';
-$ec_lang['lpn_inp_drop_tank_links']='Ces conduites ont été laissées de côté car elles se connectent à un réservoir à niveau variable qui a été laissé de côté.';
-$ec_lang['lpn_inp_drop_tcv']='Ces vannes de régulation par étranglement (TCV) sont entrées comme des conduites très courtes portant la même perte de charge singulière. L\'eau se comporte de la même façon, mais l\'élément n\'est pas le même.';
-$ec_lang['lpn_inp_drop_valve']='Ces vannes régulent la pression ou le débit, et cette page ne dispose pas d\'un tel élément. Elles sont entrées comme des conduites ouvertes, le réseau reste donc relié, mais plus rien ne le régule.';
-$ec_lang['lpn_inp_drop_cv']='Dans EPANET, ces conduites ne laissent passer l\'eau que dans un seul sens. Elles sont entrées comme des conduites ordinaires, l\'eau peut donc désormais y circuler dans les deux sens.';
-$ec_lang['lpn_inp_drop_demands']='Ces jonctions avaient plus d\'une demande. Les demandes ont été additionnées pour former la demande unique que cette page conserve.';
-$ec_lang['lpn_inp_drop_patterns']='Les variations de demande dans le temps ont été laissées de côté. Cette page résout un seul instant, donc chaque demande est le nombre écrit dans le fichier.';
-$ec_lang['lpn_inp_drop_emitters']='Ces jonctions ont un coefficient d\'arroseur ou de fuite. Il a été conservé et il est pris en compte dans le calcul, mais cette page ne permet pas encore de le voir ou de le modifier.';
-$ec_lang['lpn_inp_drop_curve_long']='Cette courbe de pompe comptait plus de trois points. Son point le plus bas, son point médian et son point le plus haut ont été conservés, car cette page ajuste une courbe sur trois points au plus.';
-$ec_lang['lpn_inp_drop_curve_missing']='Cette pompe désigne une courbe absente du fichier. Elle est entrée sans courbe, elle n\'ajoute donc aucune charge.';
-$ec_lang['lpn_inp_drop_pump_other']='Cette pompe est décrite par une puissance, une vitesse ou un horaire, plutôt que par une courbe. Elle est entrée sans courbe, elle n\'ajoute donc aucune charge.';
-$ec_lang['lpn_inp_drop_setting']='Ces conduites, pompes et vannes portent un réglage que cette page ne peut pas conserver. Elles sont entrées ouvertes.';
-$ec_lang['lpn_inp_drop_controls']='Les commandes et les règles ont été laissées de côté. Chaque conduite, pompe et vanne est entrée dans l\'état écrit dans le fichier, et ne change pas.';
-$ec_lang['lpn_inp_drop_eps']='Ce fichier décrit une simulation qui s\'étend sur une période. Cette page résout un seul instant, seules les conditions initiales sont donc entrées.';
-$ec_lang['lpn_inp_drop_quality']='Les paramètres de qualité de l\'eau, de réaction chimique et d\'énergie des pompes ont été laissés de côté. Cette page ne résout que le débit et la pression.';
-$ec_lang['lpn_inp_drop_backdrop']='Ce fichier nomme une image de fond mais ne contient pas l\'image elle-même. Ajoutez-la vous-même avec Fichier, Image de fond, Ajouter une image.';
-$ec_lang['lpn_inp_drop_dangling']='Ces conduites désignent une jonction absente du fichier, elles ont donc été laissées de côté.';
-$ec_lang['lpn_inp_drop_units']='Les unités de débit de ce fichier n\'ont pas été reconnues ; le gallon par minute a donc été supposé. Vérifiez chaque nombre avant d\'utiliser les résultats.';
-$ec_lang['lpn_settings_scope_calculator']='Paramètres du calculateur';
-$ec_lang['lpn_settings_show_titles']='Afficher les titres de page';
-$ec_lang['lpn_settings_show_titles_tip']='Masque le titre de la page et la ligne d\'accueil au-dessus du dessin, afin de laisser plus de place à la carte. L\'impression n\'est pas modifiée.';
-$ec_lang['lpn_settings_engine_epanet']='Résoudre avec le moteur EPANET';
-$ec_lang['lpn_settings_engine_epanet_tip']='Exécute le moteur EPANET original de l\'agence américaine EPA, ici même dans votre navigateur. Le solveur intégré donne les mêmes résultats et est plus rapide ; laissez cette option désactivée sauf si vous avez besoin d\'EPANET lui-même.';
-$ec_lang['lpn_engine_loading']='Chargement du moteur EPANET…';
-$ec_lang['lpn_engine_failed']='Le moteur EPANET n\'a pas pu être chargé. Le solveur intégré est utilisé à la place.';
-$ec_lang['lpn_engine_manning_note']='Remarque : avec la rugosité de Manning, EPANET calcule une perte de charge environ 0,6 % plus faible que le solveur intégré.';

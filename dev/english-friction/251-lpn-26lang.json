@@ -296,6 +296,18 @@
             ],
             "disposition": "intent",
             "resolution": "RESOLVED by Tom, 2026-08-13 (\"yes to both\"). The cs translator was right and the complaint generalizes, so the fix is a reusable token rather than a one-off note: CLAUDE.md gains `layout: button` -- \"Renders as a button label competing for width with its siblings in a row or dialog; keep it as short as the language allows and imperative in mood\" -- and lpn_lock_break gains `| layout: button` after its synonyms, which are unchanged. js/looped-network.js:4039 renders the string as a button `label:`, so the register question had a factual answer all along; what was missing was a channel to deliver it. Sweeping the other lpn_ button labels for the same missing register was offered separately and is NOT covered by this ruling."
+        },
+        {
+            "key": "lpn_result_headloss",
+            "source": "translator",
+            "lang": "ur",
+            "complaint": "The glossary handed me a preferred_translation for head loss (دباؤ نقصان) that back-translates to \"pressure loss\" — the exact sense its own avoid list forbade for that term. I could not obey both, so I ignored the preferred_translation and wrote ہیڈ نقصان.",
+            "readings": [
+                "ہیڈ نقصان (head loss, matching the ur head root ہیڈ)",
+                "دباؤ نقصان (the glossary preferred_translation, self-contradictory against its own avoid list)"
+            ],
+            "disposition": "glossary",
+            "resolution": "Agent was right that the entry contradicted itself; Tom ruled on the direction (2026-08-13): \"many languages use pressure loss instead of head loss. Maybe it is jargon in English. There is no real reason to prefer one over the other.\" So the AVOID was the defect, not the ur value. The avoid array now forbids only the physical error (pressure UNITS or a pressure symbol on a quantity that is a length of water column) and explicitly protects de Druckverlust, fr perte de charge, ur دباؤ نقصان as genuine standards. The entry had already been waiving de while \"fixing\" ro/tr/id/fa/sw/ps, so it was applying a rule it did not believe. The five lpn_ ur strings were realigned to the file incumbent (12 occurrences across dw_/hw_/mphl_/mhp_, including every identity string) — on consistency grounds, not because ہیڈ نقصان was wrong. Operative test going forward: consistency within a language file, not conformity to the English metaphor."
         }
     ]
 }

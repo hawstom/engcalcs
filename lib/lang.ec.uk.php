@@ -66,6 +66,20 @@ $ec_lang['template_welcome']='Залиш свої страхи за дверим
 $ec_lang['template_feedback']='Чи можете ви запропонувати краще формулювання тексту на цій сторінці, чи щось інше? Хочете допомогти або навчитися створювати такі інструменти? Будь ласка, зв\'яжіться зі мною.';
 $ec_lang['template_printable_title']='Заголовок для друку';
 $ec_lang['template_printable_subtitle']='Підзаголовок для друку';
+// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
+// prose, and they are translated into all 26 languages for one reason: consent that the visitor
+// cannot read is not consent. The long-form privacy notice and terms are a separate question --
+// English-authoritative, and translated by a human later if at all.
+$ec_lang['consent_body']='Чи можемо ми зберігати одну цифру для кожної сторінки в сховищі цього профілю браузера, щоб не реєструвати його відвідування щоразу заново?';
+$ec_lang['consent_accept']='Прийняти цей запит';
+$ec_lang['consent_accept_all']='Приймати завжди';
+$ec_lang['consent_decline']='Відхилити';
+$ec_lang['consent_current_granted']='Ви дозволили це. Ми обмежуємо реєстрацію відвідувань для цього профілю браузера.';
+$ec_lang['consent_current_denied']='Ви відхилили це. Ми нічого не зберігаємо, щоб обмежити реєстрацію відвідувань для цього профілю браузера.';
+$ec_lang['consent_region_label']='Ваш вибір щодо обмеження реєстрації відвідувань.';
+$ec_lang['consent_settings_link']='Налаштування файлів cookie';
+$ec_lang['privacy_link']='Політика конфіденційності';
+$ec_lang['terms_link']='Умови використання';
 $ec_lang['index_title']='Безкоштовні онлайн-калькулятори для інженерів';
 $ec_lang['index_meta_desc_plain']='Безкоштовні гідротехнічні калькулятори для труб, каналів, водозливів та зрошення. Працюють просто у браузері, навіть без інтернету, і доступні 27 мовами.';
 $ec_lang['calc_set_units']='Встановити одиниці:';
@@ -119,6 +133,8 @@ $ec_lang['hw_pressure_neg_short']='Від\'ємний тиск';
 $ec_lang['hw_pressure_neg']='Тиск нижче за течією нижчий за нуль. П\'єзометрична лінія опускається нижче труби, тому труба не буде текти повним перерізом, і цей результат може бути недійсним.';
 $ec_lang['hw_roughness']='Коефіцієнт Hazen-Williams, C';
 $ec_lang['hw_note_1']='<dl><dt>Цей калькулятор не моделює профіль труби між двома кінцями.</dt><dd>Він використовує лише введені вами відмітки вище та нижче за течією. Якщо десь між ними земля піднімається вище будь-якого з кінців, тиск у цій найвищій точці нижчий за будь-який тиск, наведений тут. Виконайте розрахунок ще раз для довжини від верхнього кінця до найвищої точки, щоб перевірити це.</dd><dd>Там, де п\'єзометрична лінія опускається нижче труби, вода перебуває під від\'ємним тиском. Повітря виділяється з розчину, тонкостінна труба може зруйнуватися, а забруднені підземні води можуть потрапляти через стики. Підтримуйте додатний тиск на всій лінії та розгляньте встановлення повітряного клапана в кожній найвищій точці.</dd><dt>Тиск вище за течією — це гранична умова, яку задаєте ви.</dt><dd>Візьміть його з манометра, з рівня води в резервуарі (висота води над трубою) або з напірної характеристики насоса. Насос створює менший тиск при зростанні витрати, тому використовуйте точку на характеристиці, що відповідає витраті, введеній вище.</dd><dt>Підсумуйте коефіцієнти місцевих втрат самостійно.</dt><dd>Додайте значення K для кожного клапана, коліна, трійника, лічильника та входу на лінії та введіть цю суму. Перейдіть за посиланням біля цього поля, щоб побачити типові значення. На довгому магістральному трубопроводі ці втрати малі порівняно з тертям, але в короткому трубопроводі станції вони можуть становити більшу частину втрат.</dd></dl>';
+
+
 // Manning Irregular
 $ec_lang['mi_menu']='Manning — Русло довільного перерізу';
 $ec_lang['mi_main_title']='Безкоштовний онлайн-калькулятор Manning для русла довільного перерізу';
@@ -478,6 +494,7 @@ $ec_lang['rc_notes_5_term']='Допустимий діапазон розмір�
 $ec_lang['rc_notes_5_def']='Рівняння розроблені для діапазону D<sub>50</sub> від 15 мм до 278 мм. Результати за межами цього діапазону є екстраполяцією і мають застосовуватись з додатковою інженерною обережністю.';
 $ec_lang['rc_notes_6_term']='Відмітка водобійної плити на виході';
 $ec_lang['rc_notes_6_def']='Відмітка верху накидки на вихідній ділянці повинна бути на рівні або нижче відмітки дна каналу нижче за течією. Якщо вона вища — вихідний камінь буде нестійким.';
+
 $ec_lang['rc_notes_7_def']='Якщо нормальна глибина у вхідному каналі менша за напір на водозливі (H<sub>p</sub>), необхідний для пропуску q<sub>t</sub>, вище за течією від входу в швидкотік виникає стиснення потоку або підпір. Це, як правило, допустимо — підпір знижує швидкість і запобігає ерозії вище за течією. Для перевірки: скористайтесь калькулятором водозливу, знайдіть H<sub>p</sub> для заданих q<sub>t</sub> і ширини гребеня, потім порівняйте з нормальною глибиною вхідного каналу. Якщо H<sub>p</sub> перевищує нормальну глибину, підпір виникне.';
 $ec_lang['rc_notes_4_term']='Джерело';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS також публікує <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">таблицю Excel</a> на основі того ж методу.';
@@ -584,6 +601,8 @@ $ec_lang['bpn_notes_2_term']='Лише розгалужені мережі, бе
 $ec_lang['bpn_notes_2_def']='Кожна ділянка має рівно одну ділянку вище за течією (дерево). Цей інструмент не розраховує кільцеві мережі; для них потрібні ітераційні методи (EPANET або подібні). Виключення кілець і є тим, що робить розрахунок простим і точним.';
 $ec_lang['bpn_notes_3_term']='Без активних регуляторів тиску';
 $ec_lang['bpn_notes_3_def']='Можна додати фіксований клапан місцевих втрат (значення k), але не редукційні чи підтримувальні клапани тиску (PRV/PSV). Їхній стан «відкрито/закрито» залежить від витрати й тиску, що вимагало б ітерацій.';
+
+
 $ec_lang['bpn_supply2_q']='Витрата подачі 2';
 $ec_lang['bpn_supply2_h']='Напір подачі 2';
 $ec_lang['bpn_supply3_q']='Витрата подачі 3';
@@ -593,16 +612,6 @@ $ec_lang['bpn_h_supply']='Напір подачі';
 $ec_lang['bpn_h_supply_tip']='Напір джерела при розрахунковій витраті, визначений за кривою подачі. Дорівнює введеному напору джерела, якщо крива стала (резервуар).';
 $ec_lang['bpn_show_elevation']='Відмітка';
 $ec_lang['bpn_supply1_h']='Статичний напір подачі';
-$ec_lang['consent_body']='Чи можемо ми зберігати одну цифру для кожної сторінки в сховищі цього профілю браузера, щоб не реєструвати його відвідування щоразу заново?';
-$ec_lang['consent_accept']='Прийняти цей запит';
-$ec_lang['consent_accept_all']='Приймати завжди';
-$ec_lang['consent_decline']='Відхилити';
-$ec_lang['consent_current_granted']='Ви дозволили це. Ми обмежуємо реєстрацію відвідувань для цього профілю браузера.';
-$ec_lang['consent_current_denied']='Ви відхилили це. Ми нічого не зберігаємо, щоб обмежити реєстрацію відвідувань для цього профілю браузера.';
-$ec_lang['consent_region_label']='Ваш вибір щодо обмеження реєстрації відвідувань.';
-$ec_lang['consent_settings_link']='Налаштування файлів cookie';
-$ec_lang['privacy_link']='Політика конфіденційності';
-$ec_lang['terms_link']='Умови використання';
 $ec_lang['lpn_main_menu']='Мережа водопостачання';
 $ec_lang['lpn_main_title']='Безкоштовний онлайн-калькулятор мережі водопостачання на основі рушія EPANET';
 $ec_lang['lpn_main_desc']='Аналіз мережі водопостачання: намалюйте кільцеву трубопровідну мережу або імпортуйте файли EPANET';
@@ -617,8 +626,18 @@ $ec_lang['lpn_tool_delete']='Видалити';
 $ec_lang['lpn_tool_zoom_extent']='Показати все';
 $ec_lang['lpn_new_text']='Текст';
 $ec_lang['lpn_field_elev']='Відмітка';
+// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
+// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
+// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
+// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='Відмітка поверхні землі або труби в цьому вузлі. Відлічуйте її від будь-якого нуля, аби лише всі вузли використовували один і той самий.';
+// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
+// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
+// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='Напір';
+// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
+// outright that it is a height and not a pressure, which is the exact confusion the glossary's
+// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Рівень водної поверхні в резервуарі, виміряний як висота, а не як тиск. Залиште поле порожнім, щоб водна поверхня збіглася з відміткою резервуара.';
 $ec_lang['lpn_close']='Закрити';
 $ec_lang['lpn_empty_hint']='Почніть з додавання фонового зображення або резервуара з панелі інструментів, або відкрийте меню «Файл → Новий проєкт», щоб почати з прикладу.';
@@ -631,6 +650,10 @@ $ec_lang['lpn_units_elevhead']='Відмітка і напір';
 $ec_lang['lpn_units_pressure']='Тиск';
 $ec_lang['lpn_units_flow']='Витрата';
 $ec_lang['lpn_units_velocity']='Швидкість';
+// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
+// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
+// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
+// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='Ухил втрат напору';
 $ec_lang['lpn_result_gradient_tip']='Втрати напору, поділені на довжину труби. Використовуйте це, щоб порівнювати труби різної довжини за єдиною проєктною межею.';
 $ec_lang['lpn_result_head']='Напір';
@@ -639,29 +662,70 @@ $ec_lang['lpn_result_pressure']='Тиск';
 $ec_lang['lpn_result_flow']='Витрата';
 $ec_lang['lpn_result_velocity']='Швидкість';
 $ec_lang['lpn_result_headloss']='Втрати напору';
+// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
+// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
+// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
+// Settings live INSIDE each project document, so deleting every project deletes every setting too:
+// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
+// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
+// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='Скидає лише налаштування цього проєкту. Ваше креслення та інші проєкти не змінюються. Щоб зберегти улюблені налаштування для повторного використання, збережіть файл проєкту, що містить лише налаштування.';
 $ec_lang['lpn_reset_all_tip']='Видаляє кожен проєкт, кожне фонове зображення, кожне налаштування та ваш вибір одиниць, а потім перезавантажує сторінку так, як її бачить відвідувач уперше. Це єдине скидання, яке очищає все.';
+// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
+// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
+// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
+// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
+// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_prompt']='Цей калькулятор зберігає одиниці й введені значення проєкту так, як ви їх ввели, але раніше він переводив числа в СІ для зберігання. Цей проєкт був збережений до цієї зміни, тому його числа зберігалися в СІ. Перевести їх востаннє в поточні одиниці? Щоб ви могли оцінити зміну, ось кілька діаметрів, які будуть переведені, з їхніми значеннями до і після:';
 $ec_lang['lpn_v2_restore_yes']='Перевести';
 $ec_lang['lpn_v2_restore_never']='Ні. Більше не питати.';
 $ec_lang['lpn_v2_restore_no']='Закрити, щоб я спершу перевірив поточні одиниці';
 $ec_lang['lpn_storage_too_new']='Цей проєкт був збережений новішою версією сторінки, тому тут його не можна відкрити.';
+// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
+// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
+// something that is not in a file, so closing it asks first; a tab without one closes silently. A
+// browser project always wears one (it is in no file at all); a file project wears one only while it
+// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
+// our words for talking about the code, and the user sees only a name, an asterisk, and a file
+// extension.
+// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
+// conventional relationship and the reason the duplication between them is correct rather than
+// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
+// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
+// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='Файл';
 $ec_lang['lpn_menu_edit']='Правка';
 $ec_lang['lpn_menu_insert']='Вставка';
 $ec_lang['lpn_menu_view']='Вигляд';
+// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
+// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Налаштування';
+// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
+// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
+// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
+// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
+// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Видалити мережу';
 $ec_lang['lpn_confirm_delete_network']='Видалити всі вузли, труби й текстові підписи в цьому проєкті? Фонове зображення, назва проєкту та налаштування збережуться. Це неможливо скасувати.';
 $ec_lang['lpn_view_units']='Одиниці';
+// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Зберегти все';
+// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
+// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
+// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='Проєкт{n}';
 $ec_lang['lpn_project_copy_suffix']='(копія)';
 $ec_lang['lpn_project_rename']='Перейменувати';
+// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='Новий проєкт…';
+// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
+// with the toolbar button of that name -- an example is a whole network, so it starts a project
+// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Порожній проєкт, одиниці США (gpm)';
 $ec_lang['lpn_new_blank_si']='Порожній проєкт, одиниці СІ (л/с)';
 $ec_lang['lpn_new_from_examples']='З прикладів';
+// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
+// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_new_example_us']='Базова мережа, одиниці США (gpm)';
 $ec_lang['lpn_new_example_si']='Базова мережа, одиниці СІ (л/с)';
 $ec_lang['lpn_file_open']='Відкрити…';
@@ -669,10 +733,14 @@ $ec_lang['lpn_file_save']='Зберегти';
 $ec_lang['lpn_file_saveas']='Зберегти як…';
 $ec_lang['lpn_file_revert']='Відновити';
 $ec_lang['lpn_file_close']='Закрити';
+// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
+// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Останні файли';
 $ec_lang['lpn_recent_tip']='Відкрити {file} знову, не шукаючи його на комп\'ютері.';
 $ec_lang['lpn_recent_denied']='Дозвіл на відкриття цього файлу не було надано, тому його не відкрито.';
 $ec_lang['lpn_recent_gone']='Не вдалося відкрити {file}. Можливо, його перемістили, перейменували або видалили, тому його прибрано зі списку останніх.';
+// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
+// around it.
 $ec_lang['lpn_tab_new']='Новий проєкт';
 $ec_lang['lpn_tab_all']='Усі проєкти';
 $ec_lang['lpn_tab_menu']='Меню проєкту';
@@ -682,10 +750,20 @@ $ec_lang['lpn_tab_move_right']='Перемістити праворуч';
 $ec_lang['lpn_tab_unsaved']='Не збережено у файл';
 $ec_lang['lpn_import_bad_file']='Не вдалося прочитати цей файл як проєкт, збережений із цієї сторінки.';
 $ec_lang['lpn_import_no_room']='У сховищі браузера недостатньо місця, щоб додати цей проєкт. Видаліть непотрібний проєкт і спробуйте ще раз.';
+// ---- EPANET .inp import (ROADMAP Task 196) ----
+// The import REPORTS every difference between the file and what this page can hold, so each
+// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
+// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
+// another sentence, and none may become one.
+// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
+// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='Гаразд';
 $ec_lang['lpn_file_import_inp']='Імпортувати файл EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Зчитати мережу з файлу EPANET — текстового файлу .inp або файлу .net, який зберігає EPANET, — і зберегти її в цьому браузері як новий проєкт. Ця сторінка не може записати файл EPANET назад, тож використовуйте «Файл → Зберегти як», щоб зберегти свою роботу.';
 $ec_lang['lpn_inp_bad_file']='Не вдалося прочитати цей файл як файл мережі EPANET.';
+// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
+// the way out named here always works, so keep the instruction in the message rather than leaving
+// the reader to guess.
 $ec_lang['lpn_net_bad_file']='Це схоже на файл EPANET .net, але ця сторінка не змогла його прочитати. Відкрийте його в EPANET і скористайтеся там командою «Файл → Експорт → Мережа», щоб зберегти його як файл .inp, а потім імпортуйте цей файл.';
 $ec_lang['lpn_inp_report_heading']='Імпортовано {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} вузлів і резервуарів, {links} труб і насосів, в одиницях {units}.';
@@ -710,11 +788,44 @@ $ec_lang['lpn_inp_drop_quality']='Налаштування якості води
 $ec_lang['lpn_inp_drop_backdrop']='Цей файл називає фонове зображення, але не містить самого зображення. Додайте його самостійно через «Фонове зображення → Додати зображення».';
 $ec_lang['lpn_inp_drop_dangling']='Ці труби посилаються на вузол, якого немає у файлі, тому їх пропущено.';
 $ec_lang['lpn_inp_drop_units']='Одиниці витрати в цьому файлі не розпізнано, тому прийнято галони на хвилину. Перевірте кожне число, перш ніж використовувати відповіді.';
+// {name} is a project name; word order is the translator's to choose. Says where the user landed,
+// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
+// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='Відкрито {name} з файлу й додано до цього браузера як новий проєкт.';
+// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
+// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
+// browser they test in. That is expected, not a bug.
+// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='Файл проєкту';
+// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
+// a save cannot connect to a file, so every press really is another copy in the downloads folder.
+// The label says which of the two you are getting rather than leaving the duplicate looking like a
+// bug.
+// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
+// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
+// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
+// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
+// notice after the act -- at the moment the question arises -- rather than in a label forever.
+// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
+// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
+// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
+// anyway -- a disabled button fires no mouse events.
+// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
+// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
+// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
+// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
+// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='Цей браузер не може підключитися до файлу, тому відкриття файлу тут — це фактично завантаження: проєкт копіюється в цей браузер, і єдиний спосіб зберегти вашу роботу назад у файл — перезаписати файл через «Файл → Зберегти як».';
+// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
+// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='Зберігає у під\'єднаний файл.';
 $ec_lang['lpn_file_saveas_tip']='Виберіть файл для збереження. Цей проєкт під\'єднається до нього, і надалі «Зберегти» записуватиме саме в нього.';
+// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
+// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
+// is no API for it, and the download attribute cannot override the setting -- but the user can turn
+// that setting on themselves, and then Save as really does let them overwrite the file they started
+// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
+// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='Зберігає, використовуючи налаштування завантаження вашого браузера. Цей браузер не може під\'єднатися до файлу, тому «Зберегти» вимкнено, доступно лише «Зберегти як». Якщо увімкнути в браузері налаштування «Запитувати, куди зберігати кожен файл», можна буде вибрати початковий файл і перезаписати його.';
 $ec_lang['lpn_status_uploaded']='Файл проєкту завантажено. Під\'єднання до нього неможливе, тож єдиний спосіб зберегти в нього — використати «Файл → Зберегти як».';
 $ec_lang['lpn_status_downloaded']='Завантажено {file}. Цей браузер не може під\'єднатися до файлу, тому проєкт лишається позначеним як не збережений у файл.';
@@ -723,18 +834,45 @@ $ec_lang['lpn_status_already_open']='Цей файл уже відкрито т�
 $ec_lang['lpn_status_already_open_dirty']='Цей файл уже відкрито тут як {name}, зі змінами, яких ви ще не зберегли в нього. Перемкнено на нього замість відкриття другої копії. Скористайтеся «Файл → Відновити», якщо потрібна версія з диска.';
 $ec_lang['lpn_status_saved']='Збережено {file}.';
 $ec_lang['lpn_status_reverted']='Завантажено {file} знову з диска.';
+// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
+// purpose: a program that writes your file behind your back takes away your right to walk away from
+// a session. So these three carry the whole close/discard/revert conversation.
+// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_prompt']='Зберегти ваші зміни в {name} перед закриттям?';
+// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
+// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_prompt']='{name} зберігається лише в цьому браузері. Якщо закрити без збереження у файл, це буде втрачено назавжди.';
 $ec_lang['lpn_close_discard']='Закрити без збереження';
 $ec_lang['lpn_cancel']='Скасувати';
 $ec_lang['lpn_revert_confirm']='Відкинути зроблені зміни і завантажити {file} знову з диска?';
+// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
+// page load, so the link is gone even though we still know the name. Says what to do, not just what
+// happened.
 $ec_lang['lpn_file_needs_reopen']='Цей проєкт походить із {file}, але з\'єднання з цим файлом втрачено. Виберіть файл знову, щоб під\'єднатися до нього.';
+// Says what is still safe before it says what failed: the reassurance is the part a worried user
+// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Не вдалося записати у файл. Можливо, його перемістили чи перейменували або скасували дозвіл. Ваша робота все ще збережена в цьому браузері.';
 $ec_lang['lpn_file_changed_elsewhere']='Хтось інший зберіг зміни в цей файл, відколи ви його відкрили, тож збереження зараз перезапише його роботу. Скористайтеся «Файл → Зберегти як», щоб зберегти свої зміни в окремому файлі, або «Файл → Відновити», щоб відкинути свої й завантажити їхню версію.';
+// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
+// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
+// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
+// Initials, and said to be public: whoever opens the same file sees this name, including outside the
+// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
+// rather than a name makes the safe answer the obvious one.
+// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
+// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='Що мають бачити колеги, коли цей проєкт відкрито у вас? Ваші ініціали — ідеальний варіант. Це може побачити будь-хто, хто відкриє той самий файл, тож не використовуйте нічого приватного.';
+// The stand-in when someone locked a project before giving a name. Reads in place of {name}
+// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Хтось інший';
+// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
+// moment of opening, with both real answers on it -- the way every drawing and document program has
+// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} має цей файл відкритим.';
 $ec_lang['lpn_lock_open_readonly']='Відкрити лише для читання';
+// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
+// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
+// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Створити копію';
 $ec_lang['lpn_lock_break']='Зняти їхнє блокування';
 $ec_lang['lpn_lock_open_heading_times']='{name} має цей файл відкритим; останню правку зроблено {x} тому, {y} після останнього збереження.';
@@ -747,26 +885,59 @@ $ec_lang['lpn_ago_minutes']='{n} хвилин';
 $ec_lang['lpn_ago_hours']='{n} годин';
 $ec_lang['lpn_ago_days']='{n} днів';
 $ec_lang['lpn_ago_unknown']='невідомий час';
+// Read-only means read-only: it never turns itself back into an editable file while you are looking
+// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
+// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
+// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='Лише для читання: {name} має цей файл відкритим. Тут можна змінювати що завгодно, але зберегти не можна. Скористайтеся «Файл → Зберегти як», щоб зберегти в інший файл.';
+// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
+// stops a colleague editing the same file. Editing still works -- an unreachable server must never
+// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
+// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='Увага: не вдалося зв\'язатися із сервером, щоб перевірити чи створити блокування цього проєкту, тож ніщо не заважає колезі одночасно редагувати той самий файл. Вас повідомлять, коли блокування запрацює знову.';
 $ec_lang['lpn_lock_storage_error']='Увага: цей сайт не може зберігати записи блокувань, тож ніщо не заважає колезі одночасно редагувати той самий файл. Це несправність налаштувань сервера, яку ви не можете виправити тут — папка блокувань недоступна для запису вебсервером.';
 $ec_lang['lpn_lock_full_error']='Увага: на цьому сайті закінчилося місце для запису, хто який проєкт відкрив, тож ніщо не заважає колезі одночасно редагувати той самий файл. Це несправність налаштувань сервера, яку ви не можете виправити тут.';
 $ec_lang['lpn_lock_not_asked']='Блокування не працює для цього проєкту, тож ніщо не заважає колезі одночасно редагувати той самий файл. У цьому браузері ще не записано вашого імені, або проєкт не має ідентифікатора — збереження проєкту у файл встановлює обидва.';
 $ec_lang['lpn_lock_restored']='Блокування знову працює, і тепер ви можете зберігати в цей файл.';
 $ec_lang['lpn_lock_dismiss']='Приховати це повідомлення';
+// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
+// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
+// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='Ваш проєкт буде збережено у файл на цьому комп\'ютері. Він зберігається, коли ви про це просите, і ніколи інакше, тож у цей файл нічого не записується непомітно для вас.';
 $ec_lang['lpn_file_training_2']='Щоб дві людини ніколи не редагували один файл одночасно, цей сайт відстежує, у кого він відкритий. Якщо файл уже в когось відкритий, ви все одно можете відкрити його й переглянути або зберегти власну копію.';
+// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
+// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
+// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
+// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
+// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='Під час першого збереження браузер запитає, чи може цей сайт редагувати файл. Це запитання від браузера, а не від нас, і відповідь «так» дозволяє команді «Зберегти» записувати вашу роботу назад. Зазвичай це запитується лише раз для кожного файлу.';
+// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
+// false -- the name is never written into the project file. It is held in this browser and on this
+// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
+// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='Вкажіть коротке ім\'я, за яким вас впізнають колеги. Ваші ініціали — ідеальний варіант. Це може побачити будь-хто, хто відкриє той самий файл, тож не використовуйте нічого приватного.';
 $ec_lang['lpn_file_training_name']='Ваші ініціали';
 $ec_lang['lpn_file_training_continue']='Продовжити';
+// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
+// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Вибрати файл знову';
 $ec_lang['lpn_file_reconnect']='Під\'єднатися до цього файлу знову';
 $ec_lang['lpn_file_reconnect_prompt']='Цей проєкт походить із {file}. Браузеру знову потрібен ваш дозвіл, щоб записувати в нього. Під\'єднайтеся нижче.';
+// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
+// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Це той самий файл, що вже відкритий у когось іншого, тож зберегти поверх нього не можна. Виберіть інший файл або іншу назву.';
 $ec_lang['lpn_saveas_overwrites_project']='У цьому файлі вже є інший проєкт, {name}. Збереження тут повністю замінить його. Продовжити?';
 $ec_lang['lpn_saveas_overwrites_newer']='Цей файл змінився, відколи ви бачили його востаннє, тож хтось інший майже напевно зберіг у нього зміни. Збереження тут замінить їхню версію вашою. Продовжити?';
+// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
+// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
+// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
+// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='Назва цього проєкту';
+// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
+// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
+// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
+// separate Delete for it to be confused with.)
+// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='Закрито {closed}. Тепер показано {opened}.';
 $ec_lang['lpn_status_closed_empty']='Закрито {closed}. Розпочато новий порожній проєкт.';
 $ec_lang['lpn_storage_full']='Не збережено. Сховище браузера заповнене або недоступне, тож ваші останні зміни буде втрачено при закритті цієї вкладки.';
@@ -776,6 +947,12 @@ $ec_lang['lpn_notes_2_term']='Не моделюється';
 $ec_lang['lpn_notes_2_def']='Ємності-накопичувачі, якість води та регулювальні клапани, що самостійно відкриваються й закриваються (PRV, PSV, FCV), не моделюються. Труба може мати фіксовані місцеві втрати, але не клапан, чий стан відкрито/закрито залежить від витрати, яку розраховують.';
 $ec_lang['lpn_notes_3_term']='Збереження проєктів';
 $ec_lang['lpn_notes_3_def']='Кожен проєкт — це вкладка, і кожна вкладка зберігається в цьому браузері під час роботи. Очищення даних браузера видаляє їх усі, тож зберігайте свою роботу у файл: «Файл → Зберегти як». Зірочка на вкладці означає, що вона містить зміни, яких немає у файлі. У файл нічого не записується, поки ви цього не попросите. У деяких браузерах проєкт під\'єднується до файлу, у який ви його зберегли, і надалі «Файл → Зберегти» записує саме в нього; в інших під\'єднання неможливе, тож «Зберегти» вимкнено й доступне лише «Зберегти як». Коли файл проєкту зберігається на спільному диску, ця сторінка повідомляє, якщо файл уже відкритий у колеги, щоб двоє людей не перезаписували роботу одне одного.';
+// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
+// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
+// to stay readable on a phone, while the Notes section is already this page's documentation home,
+// prints with the page, and is translated with everything else. The popup carries a one-line
+// pointer to here instead (lpn_pump_curve_note).
+// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Крива насоса';
 $ec_lang['lpn_notes_5_def']='Насос підпорядковується формулі H = H₀ − aQ^b, де H — напір, який додає насос, а Q — витрата через нього. Введіть одну, дві або три точки з кривої виробника. Три точки — напір при нульовій витраті, звичайна робоча точка та точка найбільшої витрати — визначають H₀, a і b безпосередньо й найточніше відповідають опублікованій кривій. Дві точки визначають параболу (b = 2) з вершиною при нульовій витраті. Одна точка використовує загальне правило: напір при нульовій витраті дорівнює 1,33 × введеного вами напору, а найбільша витрата дорівнює 2 × введеної вами витрати, що знову дає b = 2. Насос без жодної введеної точки не додає напору взагалі. Крива не обривається там, де напір досягає нуля, тож якщо вимагати від насоса більшу витрату, ніж може дати його крива, вийде від\'ємний напір. Виправлення — більший насос або менша витрата споживання, а не інша апроксимація кривої.';
 $ec_lang['lpn_notes_4_term']='Заплановані доповнення';
@@ -789,12 +966,24 @@ $ec_lang['lpn_diag_dangling_link']='Труба або насос з\'єднан�
 $ec_lang['lpn_diag_unreachable']='Ці вузли не мають шляху до резервуара:';
 $ec_lang['lpn_diag_not_converged']='Розв\'язок не знайдено. Перевірте значення, неможливі в реальному житті, наприклад нульовий діаметр.';
 $ec_lang['lpn_field_roughness']='Шорсткість';
+// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
+// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
+// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Коефіцієнт Гейзена-Вільямса C. Більше число означає гладшу трубу: приблизно 150 для нового пластику, 130 для нової сталі чи заліза та 100 для старої труби.';
 $ec_lang['lpn_field_length']='Довжина';
 $ec_lang['lpn_field_length_tip']='Довжина труби. Коли увімкнено «Авто», довжина вимірюється з того, що ви намалювали. Вимкніть «Авто», щоб ввести довжину, яка відрізняється від креслення.';
+// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
+// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
+// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='Коефіцієнт місцевих втрат, k';
 $ec_lang['lpn_field_km_tip']='Втрати від колін, клапанів і фітингів на цій трубі, виражені як кратна величина швидкісного напору. Використовуйте 0 для звичайної прямої труби.';
+// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
+// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
+// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
+// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='Місцеві втрати, k';
+// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
+// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Джерело кривої';
 $ec_lang['lpn_pump_curve_own']='Ввести точки нижче';
 $ec_lang['lpn_pump_curve_ref_note']='Використовується крива, введена для насоса {id}.';
@@ -802,13 +991,23 @@ $ec_lang['lpn_pump_curve_note']='Одна, дві або три точки — �
 $ec_lang['lpn_pump_point1']='Точка 1 (обов\'язкова)';
 $ec_lang['lpn_pump_point2']='Точка 2 (необов\'язкова)';
 $ec_lang['lpn_pump_point3']='Точка 3 (необов\'язкова)';
+// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
+// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
+// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='Режим: Вибір. Клацніть на елементі або підписі, щоб переглянути чи змінити його. Перетягуйте, щоб пересунути вузол, вершину або підпис. Двічі клацніть на трубі, щоб додати або прибрати вершину.';
 $ec_lang['lpn_mode_delete']='Режим: Видалення. Клацніть на елементі, щоб видалити його.';
 $ec_lang['lpn_mode_add_junction']='Режим: Додавання вузла. Клацніть на карті, щоб розмістити вузол. Перейдіть у режим «Вибір», щоб змінювати або пересувати елементи й підписи.';
 $ec_lang['lpn_mode_add_reservoir']='Режим: Додавання резервуара. Клацніть на карті, щоб розмістити резервуар. Перейдіть у режим «Вибір», щоб змінювати або пересувати елементи й підписи.';
 $ec_lang['lpn_mode_add_pipe']='Режим: Додавання труби. Клацніть на вузлі, потім на іншому вузлі, щоб з\'єднати їх. Перейдіть у режим «Вибір», щоб змінювати або пересувати елементи й підписи.';
 $ec_lang['lpn_mode_add_pump']='Режим: Додавання насоса. Клацніть на вузлі, потім на іншому вузлі, щоб з\'єднати їх. Перейдіть у режим «Вибір», щоб змінювати або пересувати елементи й підписи.';
+// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
+// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Режим: Додавання тексту. Клацніть на карті, щоб розмістити текстовий підпис. Клацніть біля вузла, щоб прикріпити текст до нього. Перейдіть у режим «Вибір», щоб змінювати або пересувати елементи й підписи.';
+// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
+// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
+// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
+// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
+// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Використовуйте цей режим, щоб змінювати, пересувати й перетягувати об\'єкти на карті.';
 $ec_lang['lpn_tip_labels_draggable']='Підпис можна перетягнути, щоб пересунути його. Двічі клацніть на підписі, щоб повернути його на автоматичне місце.';
 $ec_lang['lpn_field_auto']='Авто';
@@ -823,6 +1022,10 @@ $ec_lang['lpn_labels_mark_extrema']='Позначати найвищі й най
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Фонове зображення…';
 $ec_lang['lpn_backdrop_add']='Додати зображення';
+// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
+// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
+// menu, where nothing above them says what is being scaled. Naming the object costs one word and
+// works in both places.
 $ec_lang['lpn_backdrop_scale']='Задати масштаб зображення';
 $ec_lang['lpn_backdrop_position']='Перемістити зображення';
 $ec_lang['lpn_backdrop_remove']='Видалити зображення';
@@ -854,6 +1057,8 @@ $ec_lang['lpn_push_none_displayed']='Наразі жодне початкове 
 $ec_lang['lpn_push_nothing']='Жоден наявний елемент не має жодної із застосовуваних властивостей.';
 $ec_lang['lpn_push_no_change']='У кожного елемента вже є ці значення, тож нічого не зміниться.';
 $ec_lang['lpn_settings_emitter_exponent']='Показник степеня розбризкувача';
+// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
+// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Обчислення';
 $ec_lang['lpn_settings_tolerance']='Точність збіжності';
 $ec_lang['lpn_settings_tolerance_tip']='Наскільки близько має підійти розв\'язувач, перш ніж зупинитися. Менше число точніше, але триває довше.';
@@ -865,12 +1070,21 @@ $ec_lang['lpn_engine_manning_note']='Примітка: з коефіцієнто
 $ec_lang['lpn_settings_text_size']='Розмір тексту';
 $ec_lang['lpn_settings_text_size_map']='Відстань на карті';
 $ec_lang['lpn_settings_text_size_screen']='Пікселі екрана';
+// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
+// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
+// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Розмір символів (відносно тексту)';
+// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
+// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Непрозорість символів (від 0 до 1)';
+// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
+// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Непрозорість фонового зображення (від 0 до 1)';
 $ec_lang['lpn_settings_text_size_units']='Одиниці розміру тексту';
 $ec_lang['lpn_settings_map_display']='Зовнішній вигляд карти';
 $ec_lang['lpn_settings_map_height_px']='Висота карти (пікселі екрана)';
+// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
+// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='На малому екрані карта малюється нижчою за це значення, щоб на сторінці завжди лишалося місце для прокручування.';
 $ec_lang['lpn_settings_legend_position']='Розташування умовних позначень';
 $ec_lang['lpn_settings_legend_top_left']='Вгорі ліворуч';
