@@ -530,8 +530,16 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 	for (k = 0; k < model.links.length; k++) {
 		link = model.links[k];
 		flows[link.id] = Q[k];
+		// Velocity is a SPEED, so it is never negative -- |Q|/A, matching EPANET, which reports
+		// signed flow and unsigned velocity from the same solve (verified against its own output
+		// in dev/lpn-spike/reference/ref_Net1-3.json, where negative flows carry positive
+		// velocities). Direction is already carried twice over: by the sign of the flow and by
+		// the arrow the map draws from it. A signed velocity added no information and made the
+		// two engines disagree -- EngCalcs.lpnSolveEpanet reads EN_VELOCITY, which is unsigned --
+		// while quietly breaking any "highest velocity" comparison, since a fast reverse flow
+		// sorted to the BOTTOM of the range.
 		velocities[link.id] = link.diameter > 0
-			? Q[k] / (Math.PI * link.diameter * link.diameter / 4)
+			? Math.abs(Q[k]) / (Math.PI * link.diameter * link.diameter / 4)
 			: 0;
 		if (link.type === 'pump') {
 			// Sign convention: a pump's head loss is the negation of its head gain, so a working

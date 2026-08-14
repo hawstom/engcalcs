@@ -1754,6 +1754,22 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|302| **[DONE 2026-08-14] The looped network reported NEGATIVE velocities.** Tom: *"I am
+  seeing some negative velocities. I don't think that's compatible with our paradigm."* Correct —
+  `lpnReport()` computed `Q/A` from the SIGNED flow, so any pipe carrying flow against the
+  direction it was drawn in reported a negative speed. **A velocity is a speed; direction is
+  already carried twice**, by the sign of the flow beside it and by the arrow the map draws.
+  Three independent confirmations that magnitude is the paradigm: EPANET's own output in
+  `dev/lpn-spike/reference/ref_Net1-3.json` pairs negative flows with positive velocities;
+  `js/lpn-epanet.js` reads `EN_VELOCITY` and so the two engines DISAGREED on the same solve; and
+  `example-network-harness.js` already computed `|Q|/A` by hand when it wanted a velocity.
+  It also broke every velocity COMPARISON silently — the fastest reverse-flowing pipe sorted to
+  the *bottom* of the extrema range, so a "highest velocity" badge or colour scale pointed at the
+  wrong pipe. Fixed in `js/lpn-solver.js` (`Math.abs(Q[k])`), with an assertion on the ring
+  example — the one network guaranteed to reverse — that every reported velocity is unsigned and
+  equals an independently computed `|Q|/A`. Mutation-tested: reverting the fix fails it in both
+  unit presets.
+
 - 0|301| **[DONE 2026-08-14] The click that ended a backdrop Move also acted on the node it
   landed on.** Tom: *"When moving a background image, node select and delete needs to be disabled."*
   Every pointer path did check `regMode`; the leak was the sequence's LAST click. Registration

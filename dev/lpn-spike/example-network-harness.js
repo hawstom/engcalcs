@@ -331,6 +331,16 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   ok('velocities stay under the 5 fps / 1.5 m/s design ceiling', Math.max(...vel) < 1.5,
     vel.map(v => (us ? (v / FT).toFixed(2) + 'fps' : v.toFixed(2) + 'm/s')).join(' '));
 
+  // A velocity is a SPEED. The ring above has just been asserted to reverse somewhere, so this
+  // network is the one place in the suite guaranteed to carry a negative flow -- which is exactly
+  // what used to leak a negative velocity out of lpnReport(). Direction lives in the sign of the
+  // flow; the speed reported beside it never goes below zero, and it agrees with |Q|/A computed
+  // independently right above.
+  const badV = pipes.filter((p, i) => !(r.velocities[p.id] >= 0) ||
+    Math.abs(r.velocities[p.id] - vel[i]) > 1e-9);
+  ok('every reported velocity is an unsigned speed equal to |Q|/A', badV.length === 0,
+    badV.map(p => p.id + '=' + r.velocities[p.id]).join(' ') || pipes.length + ' pipes checked');
+
   // Auto length must already include the bends -- the defect Tom caught on the old example.
   const dogleg = pipes.find(p => p.verts.length > 1);
   const straightDist = (() => {
