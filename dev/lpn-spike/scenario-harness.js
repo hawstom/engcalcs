@@ -225,7 +225,14 @@ console.log('\n--- the property row shows the marker and Base\'s value ---');
 	L.renderNodeFields(j2.id);
 	const txt = fieldsText();
 	ok('a scenario row offers the override marker', /Only in this scenario/.test(txt), txt);
-	ok('...and shows Base\'s value beside the scenario\'s', /Base: 100/.test(txt), txt);
+	// Built from the LIVE lang string, never a hardcoded 'Base: '. That literal broke on 2026-08-14
+	// when lpn_scenario_base_value became 'Base scenario: {value}' -- and it would have broken
+	// identically in all 26 translations, which is the tell that the assertion was testing the
+	// wording rather than the behaviour. What matters here is that BASE'S NUMBER is shown beside the
+	// scenario's, not which words surround it.
+	const baseShown = ((EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_scenario_base_value) || 'Base: {value}')
+		.replace('{value}', '100');
+	ok('...and shows Base\'s value beside the scenario\'s', txt.indexOf(baseShown) !== -1, txt);
 
 	const marker = checkboxes().filter(function (c) { return c.checked; })[0];
 	ok('the marker is ticked for an overridden property', !!marker);
@@ -234,7 +241,8 @@ console.log('\n--- the property row shows the marker and Base\'s value ---');
 	ok('unticking it in the popup returns the value to Base', L.effective(j2, 'demand') === 100);
 	L.renderNodeFields(j2.id);
 	ok('...and Base\'s value is no longer shown, because nothing is diverging',
-		!/Base: /.test(fieldsText()));
+		fieldsText().indexOf(((EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_scenario_base_value) || 'Base: {value}')
+			.replace('{value}', '')) === -1);
 
 	L.undo();
 	ok('undo restores the override -- the scenarios ride with the document',
