@@ -1754,6 +1754,44 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|294| **[DONE 2026-08-14] Two real defects in Manning Trap Channel, both in `mtc_iterate`'s
+  loop-exit condition, both invisible from the page.** Found by `dev/calc-spike/mtc-harness.js`
+  (Task 292) within an hour of the harness existing, while checking a question Tom asked about the
+  P&I range check: *"The check may be working wrong."* It was, and something worse was behind it.
+  - **DEFECT 1 — the reported velocity was computed from the WRONG n. 24% high for Strickler, 28%
+    for P&I, 82% for B/B.** Pick a roughness method and leave the rock size typed, and the loop ran
+    exactly ONE pass: the rock switch's `default` branch set `iterate_p = false`, killing the
+    roughness iteration along with its own. `v` is computed near the top of a pass from the
+    PREVIOUS pass's n, and n is updated near the bottom — so the page put the new n in the
+    roughness box and reported a velocity, Q, Froude number and shear stress computed from the n
+    the user had typed. **Every combination with a rock radio ALSO on was correct**, because the
+    rock loop kept iterating and n converged as a side effect. Three of every four combinations
+    were right, which is exactly why this survived years of use: a hand check that happened to have
+    a rock method selected would have shown nothing wrong.
+  - **DEFECT 2 — the safety factor was applied to a d50 the user TYPED.** With no rock radio the
+    loop did `d50_in = p.d50_safety * d50_calc` on a `d50_calc` that was simply the typed value.
+    The factor exists to scale a CALCULATED rock size; there is nothing to scale when the user
+    names the rock. The page rightly never wrote that inflated number back into the form, so its
+    only visible effect was the P&I range check — which was testing 1.25× the rock asked for. This
+    is the one Tom spotted, and it is the smaller of the two.
+  - **The fix is to decide which loop is running ONCE, from the radios, and iterate until BOTH
+    unknowns have settled** — rather than inferring it inside the loop by letting each `switch`'s
+    default branch set `iterate_p = false`. No separate final pass: once n has *settled* (not
+    merely been updated), the `v` computed from the previous n is the same `v`, which is the whole
+    point of iterating to convergence.
+  - **Verified across all 16 roughness × rock-size combinations**, now a standing assertion in
+    `mtc-harness.js`: the velocity on the page is the velocity the displayed n produces. The twelve
+    combinations that were already correct are unchanged to within 0.04%.
+  - **`d50` default moved 6 in → 4 in (150 → 100 mm), Tom's call, 2026-08-14.** Once the range
+    check read the typed rock, the P&I window is 0.28–0.36 ft = 3.36–4.32 in, so the page's own
+    default was outside it. 4 in (0.333 ft) is mid-window and the page now opens on a clean ✓
+    everywhere. **Tom first proposed 3 in (0.25 ft)** — reasonable, and it *appeared* to clear the
+    warning while the check was broken (1.25 × 3 = 3.75 in landed in the window by accident); with
+    the check fixed it is below the 0.28 ft floor. Worth remembering as a case where a defect made
+    a wrong value look right.
+  - **The `KNOWN_DEFAULT_WARNINGS` exception added for this in `all-calcs-smoke-harness.js` lasted
+    one day and is now empty** — the right outcome for an allow-list. It is not kept "just in case".
+
 - 0|292| **[DONE 2026-08-13] Give the non-lpn calculators a behavioural test.** Shipped as
   `dev/calc-spike/` (3 harnesses, 198 assertions) plus `dev/scripts/dump_calc_form.php`,
   `dev/scripts/render_page.php` and `dev/scripts/run_calc_harnesses.sh`, wired into
@@ -1791,13 +1829,9 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     harness renders everything twice. `EC_DEFAULT_UNIT_SET` derives from the language, and clicking
     SI afterwards reinterprets rather than converts — `units('si')` turns an 18 in pipe into an
     18 mm pipe, correctly, and uselessly as a defaults test.
-  - **One finding for Tom, deliberately NOT fixed here** (a defaults decision is his call): Manning
-    Trap Channel's factory defaults open with a ⚠ on the P&I range check, because the default rock
-    is 6 in = 0.5 ft and the Pemberton & Irons relation is calibrated over 0.28–0.36 ft. It is an
-    advisory about a column no visitor has selected — the velocity check is a clean ✓ — but
-    CLAUDE.md does say a page should not greet a first-time visitor with a warning. Recorded as a
-    named, reasoned exception in `all-calcs-smoke-harness.js`, which still fails on a ⚠ anywhere
-    else AND fails if that one ever stops warning, so the exception cannot go stale unnoticed.
+  - **AND IT IMMEDIATELY EARNED ITS KEEP — see Task 294, two real defects in Manning Trap Channel
+    found within an hour of the harness existing, one of them a 24–82% velocity error.** That is
+    the argument for extending worked examples to a third calculator, not for stopping here.
   - **What is left, stated rather than rounded off:** 17 calculators are checked for RUNNING, not
     for being RIGHT — a wrong coefficient in Rock Chute or Orifice Drain Time still ships silently.
     That is the intended shape (the task said not to attempt all 19 at once, and to test what is

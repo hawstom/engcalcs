@@ -19,8 +19,10 @@
 //   2. MANNING'S OWN PROPORTIONALITIES, also exact: V goes as S^(1/2) and as 1/n, so quadrupling
 //      the slope doubles the velocity and halving n doubles it. These catch a wrong exponent that
 //      a single worked example would sail past.
-//   3. ONE ABSOLUTE WORKED EXAMPLE -- the page's own default channel, 4 ft bottom, 2:1 sides,
-//      2 ft deep, n = 0.025, S = 0.001 -- computed by hand and quoted in the comments below.
+//   3. ONE ABSOLUTE WORKED EXAMPLE -- 4 ft bottom, 2:1 sides, 2 ft deep, n = 0.025, S = 0.001,
+//      d50 = 6 in -- computed by hand and quoted in the comments below. Its inputs are set
+//      explicitly rather than taken from the page defaults, so a later change to a default cannot
+//      silently invalidate the published numbers it is checked against.
 //   4. THE ITERATION'S OWN FIXED POINT. Rather than restate Strickler, Isbash, Blodgett and
 //      Maynord here (a second copy that would drift), the converged answer is fed back into the
 //      defining equation: if the page says "Strickler", the n it settled on must equal
@@ -79,8 +81,8 @@ page.set({ b: 6, y: 2 }).run();
 r.close(page.si('q') / smallQ, Math.pow(2, 8 / 3), 2e-3, 'doubling every length multiplies Q by 2^(8/3)');
 
 // ---- 3. the absolute worked example -----------------------------------------------------
-// The page's own default channel, in US units: b = 4 ft, z = 2:1 both sides, y = 2 ft,
-// n = 0.025 (typed, no radio), S = 0.001. By hand, in SI (b = 1.219 m, y = 0.6096 m):
+// b = 4 ft, z = 2:1 both sides, y = 2 ft, n = 0.025 (typed, no radio), S = 0.001.
+// By hand, in SI (b = 1.219 m, y = 0.6096 m):
 //   A  = y(b + (z1+z2)y/2)  = 1.486485 m^2  = 16.0005 ft^2
 //   P  = b + y(2 sqrt 5)    = 3.945462 m    = 12.9443 ft
 //   R  = A/P                = 0.376758 m    =  1.2361 ft
@@ -90,10 +92,12 @@ r.close(page.si('q') / smallQ, Math.pow(2, 8 / 3), 2e-3, 'doubling every length 
 //   hv = V^2/2g             = 0.022200 m    =  0.0728 ft
 //   F  = 0.3305, firmly subcritical
 //   tau= R S = 3.7676e-4 m of water = 0.0772 psf
-r.section('worked example: the page default channel (4 ft bottom, 2:1, 2 ft deep)');
+// d50 is set EXPLICITLY rather than taken from the page default, so the published roughness
+// numbers below stay valid whatever default rock size the page later ships.
+r.section('worked example: 4 ft bottom, 2:1, 2 ft deep, n=0.025, S=0.001, d50=6 in');
 
 const dflt = loadCalculator('Manning-Trap.php', { lang: 'en' });
-dflt.run();
+dflt.set({ d50_in: 6 }).run();
 r.close(dflt.num('a'), 16.0005, TIGHT, 'A = 16.0005 ft^2');
 r.close(dflt.num('pw'), 12.9443, TIGHT, 'Pw = 12.9443 ft');
 r.close(dflt.num('rh'), 1.2361, TIGHT, 'R = 1.2361 ft');
@@ -104,8 +108,8 @@ r.close(dflt.num('hv'), 0.0728, 1e-2, 'velocity head = 0.0728 ft');
 r.close(dflt.num('froude'), 0.33, 2e-2, 'Froude = 0.33, subcritical');
 r.close(dflt.num('tau'), 0.0772, 1e-3, 'boundary shear = 0.0772 psf');
 
-// The roughness estimators, all evaluated at the default d50 of 6 in (0.15240 m) and the
-// default section. Published forms, each computed by hand:
+// The roughness estimators, all evaluated at d50 = 6 in (0.15240 m) and the section above.
+// Published forms, each computed by hand:
 //   Strickler  n = d50^(1/6)/21.1                                  = 0.034638
 //   Blodgett   n = 0.319 da^(1/6) / (2.25 + 5.23 log10(da/d50))    = 0.061312   (da = A/T)
 //   Bathurst   (Bathurst 1985, as coded in Manning.lib.js)         = 0.041305
@@ -132,6 +136,7 @@ r.ok(/⚠/.test(dflt.html('pi_range_check')),
 r.section('auto-iteration converges on its own defining equation');
 
 const it = loadCalculator('Manning-Trap.php', { lang: 'en' });
+it.set({ d50_in: 6 });
 it.radio('n_radio', 'strickler').run();
 {
 	const n = parseFloat(it.input('n_in'));
@@ -182,6 +187,66 @@ const typed = loadCalculator('Manning-Trap.php', { lang: 'en' });
 typed.set({ n_in: 0.031, d50_in: 9 }).run();
 r.eq(typed.input('n_in'), '0.031', 'no roughness radio: the typed n is left exactly as typed');
 r.eq(typed.input('d50_in'), '9', 'no rock radio: the typed d50 is left exactly as typed');
+
+// ---- the two defects this harness found, 2026-08-13 ---------------------------------------
+// Both lived in mtc_iterate's loop-exit condition, and both were invisible from the page.
+r.section('regression: every radio combination is self-consistent');
+
+// DEFECT 1. Pick a roughness method and leave the rock size typed, and the loop used to run
+// exactly ONE pass -- because the rock switch's default branch set iterate_p = false, killing the
+// roughness iteration along with its own. `v` is computed near the top of a pass from the
+// PREVIOUS pass's n, so the page showed the new n in the roughness box and a velocity, Q, Froude
+// number and shear stress computed from the n the user had typed: 24% high for Strickler, 28% for
+// P&I, 82% for B/B on the page's own default channel. Combinations with a rock radio ALSO on were
+// correct, because the rock loop kept iterating and n converged as a side effect -- which is
+// exactly why this survived: three of every four combinations were right.
+//
+// All sixteen are checked, not just the four that were broken. The invariant is simple and it is
+// the one a user would assume: the velocity on the page is the velocity that n produces.
+{
+	let bad = [];
+	for (const nr of ['', 'strickler', 'pi', 'bb']) {
+		for (const dr of ['', 'isbash', 'maynord', 'searcy']) {
+			const q = loadCalculator('Manning-Trap.php', { lang: 'en' });
+			q.radio('n_radio', nr).radio('d50_radio', dr).run();
+			const n = parseFloat(q.input('n_in'));
+			const expected = (1 / n) * Math.pow(q.si('rh'), 2 / 3) * Math.sqrt(0.001);
+			const shown = q.si('v');
+			if (Math.abs(shown / expected - 1) > 5e-3) {
+				bad.push(`${nr || '(none)'}/${dr || '(none)'}: v=${shown.toFixed(4)} but n=${n.toFixed(4)} gives ${expected.toFixed(4)}`);
+			}
+		}
+	}
+	r.ok(bad.length === 0,
+		'all 16 roughness x rock-size combinations: v is computed from the n the page shows',
+		bad.join('; '));
+}
+
+// DEFECT 2. With no rock radio the loop did `d50_in = d50_safety * d50_calc` on a d50_calc that
+// was simply the value the user TYPED. The safety factor exists to scale a CALCULATED rock size;
+// there is nothing to scale when the user names the rock. The page rightly never wrote that
+// inflated number back into the form, so its only visible effect was the P&I range check -- which
+// was testing 1.25x the rock the user asked for. The window is 0.28-0.36 ft, so a typed 0.30 ft
+// (3.6 in) must PASS, and it used to fail because the check saw 0.375 ft.
+{
+	const q = loadCalculator('Manning-Trap.php', { lang: 'en' });
+	q.set({ d50_in: 3.6 }).run();     // 0.3000 ft, mid-window
+	r.ok(/✓/.test(q.html('pi_range_check')),
+		'a typed d50 of 3.6 in (0.300 ft) is inside the P&I window, safety factor not applied',
+		q.html('pi_range_check').replace(/<[^>]*>/g, ''));
+
+	q.set({ d50_in: 3.0 }).run();     // 0.2500 ft, below the floor
+	r.ok(/⚠/.test(q.html('pi_range_check')),
+		'and 3.0 in (0.250 ft) is genuinely below the 0.28 ft floor, so it still warns',
+		q.html('pi_range_check').replace(/<[^>]*>/g, ''));
+
+	// The safety factor must still apply where it belongs: to a CALCULATED rock size.
+	const w = loadCalculator('Manning-Trap.php', { lang: 'en' });
+	w.radio('d50_radio', 'searcy').run();
+	r.close(parseFloat(w.input('d50_in')),
+		parseFloat(w.input('d50_safety')) * w.num('d50_searcy'), 2e-3,
+		'the safety factor still scales a calculated rock size');
+}
 
 // ---- the page's own defaults ---------------------------------------------------------------
 r.section('factory defaults open on a passing design');

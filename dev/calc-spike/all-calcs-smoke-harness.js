@@ -60,17 +60,17 @@ const rowTableJs = new Set(
 		.map(f => 'js/' + f)
 );
 
-// A default that opens on a caution, WITH THE REASON, so the exception is visible and revisitable
-// rather than quietly assumed. Anything not listed here still fails, and so does a listed page
-// that starts warning somewhere ELSE -- the exception is the exact cell, not the page.
-const KNOWN_DEFAULT_WARNINGS = {
-	// The default rock is 6 in = 0.5 ft and the Pemberton & Irons roughness relation is only
-	// calibrated over 0.28-0.36 ft, so the P&I column flags itself as an extrapolation. It is an
-	// advisory about a column the visitor has not selected (no roughness radio is on by default),
-	// not a statement that the default channel is a bad design. Worth a look, and Tom's call --
-	// see the Task 292 report.
-	'Manning-Trap.php': ['pi_range_check']
-};
+// Pages allowed to open on a caution, per cell, WITH THE REASON -- so an exception is visible and
+// revisitable rather than quietly assumed. Anything not listed still fails, a listed page that
+// starts warning somewhere ELSE still fails, and a listed cell that STOPS warning fails too, so an
+// entry cannot rot here describing something that is no longer true.
+//
+// EMPTY, and that is the point. It had one entry for a day: Manning Trap Channel opened on a
+// ⚠ because its default rock was 6 in = 0.5 ft and the Pemberton & Irons roughness relation is
+// calibrated over 0.28-0.36 ft. Tom's answer was to move the default to 4 in (0.333 ft), which is
+// mid-window -- so the exception was never needed and is not kept "just in case". Add an entry
+// only when a caution is genuinely correct to show a first-time visitor, and say why.
+const KNOWN_DEFAULT_WARNINGS = {};
 
 const pages = fs.readdirSync(ROOT)
 	.filter(f => f.endsWith('.php') && !NOT_CALCULATORS.has(f))

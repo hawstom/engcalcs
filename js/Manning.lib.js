@@ -40,7 +40,31 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 	if (d50_in === 0) { d50_in = 0.1 * p.y; }
 	var n_strickler = Math.pow(d50_in, 1 / 6) / 21.1;
 	if (n_in === 0) { n_in = n_strickler; }
+	// WHICH LOOP IS RUNNING IS A PROPERTY OF THE RADIOS, and is decided once, here (fixed
+	// 2026-08-13, found by dev/calc-spike/mtc-harness.js). It used to be inferred inside the loop
+	// by letting each `switch`'s default branch set `iterate_p = false`, and that had two
+	// consequences, both silent:
+	//
+	//   1. **The rock switch's default killed the ROUGHNESS iteration too.** Pick Strickler (or
+	//      P&I, or B/B) and leave the rock size typed, and the loop ran exactly one pass. `v` is
+	//      computed near the top of the pass from the n of the PREVIOUS pass, and n is updated
+	//      near the bottom -- so the page put the new n in the roughness box and reported a
+	//      velocity, Q, Froude number and shear stress computed from the n the user had typed.
+	//      24% high for Strickler, 28% for P&I, 82% for B/B on the page's own defaults. Every
+	//      combination with a rock radio ALSO on was correct, which is why it survived: the rock
+	//      loop kept iterating and n converged as a side effect.
+	//   2. **The safety factor was applied to a d50 the user TYPED.** With no rock radio the
+	//      `else` branch did `d50_in = p.d50_safety * d50_calc` where d50_calc was simply the
+	//      typed value. The safety factor exists to scale a CALCULATED rock size; there is
+	//      nothing to scale when the user names the rock. The page rightly declines to write that
+	//      inflated number back into the form, so its only visible effect was the P&I range
+	//      check, which was testing 1.25x the rock the user asked for.
+	//
+	// So: iterate while EITHER unknown is still moving, and stop only when BOTH have settled.
+	var n_iterating = (p.n_radio === 'bb' || p.n_radio === 'strickler' || p.n_radio === 'pi');
+	var d50_iterating = (p.d50_radio === 'isbash' || p.d50_radio === 'maynord' || p.d50_radio === 'searcy');
 	var iterate_p = true;
+	var n_prev, n_settled, d50_settled;
 	var a, pw, rh, t, da, da_over_d50, v, q, froude, tau,
 		n_blodgett, n_bathurst, n_pi, rh_ft, d50_ft, blodgett_v_bathurst,
 		d50_mra, d50_searcy, c_isbash, d50_bottom, d50_z1, d50_z2, d50_calc;
@@ -62,6 +86,7 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 		d50_ft = d50_in * ft_per_m;
 		n_pi = 0.0926 * Math.pow(rh_ft, 1 / 6) / (1.46 + 2.23 * Math.log10(rh_ft / d50_ft));
 		blodgett_v_bathurst = (da_over_d50 < 0.3) ? '----' : (da_over_d50 < 1.5) ? 'Bathurst' : (da_over_d50 <= 185) ? 'Blodgett' : '++++';
+		n_prev = n_in;
 		switch (p.n_radio) {
 			case 'bb':
 				switch (blodgett_v_bathurst) {
@@ -82,7 +107,8 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 				n_in = n_pi;
 				break;
 			default:
-				iterate_p = false;
+				// No roughness radio: n stays exactly as the user typed it.
+				break;
 		}
 		c_isbash = (p.beta <= 30) ? 1.2 : 0.86;
 		d50_bottom = EngCalcs.Manning.mc_riprap_size(p.y, a, v, g, 1000, p.s0, c_isbash, p.sgrock);
@@ -101,15 +127,24 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 				d50_calc = d50_searcy;
 				break;
 			default:
+				// No rock radio: the rock is the one the user named, and the safety factor has
+				// nothing to scale. d50 does not move, so this half is settled by definition.
 				d50_calc = d50_in;
-				iterate_p = false;
+				break;
 		}
-		if (iterate_p === true) {
-			iterate_p = (Math.abs(p.d50_safety * d50_calc / d50_in - 1) > max_err);
+		if (d50_iterating === true) {
+			d50_settled = (Math.abs(p.d50_safety * d50_calc / d50_in - 1) <= max_err);
 			d50_in = (d50_in + 5 * p.d50_safety * d50_calc) / 6;
 		} else {
-			d50_in = p.d50_safety * d50_calc;
+			d50_settled = true;
 		}
+		// n is SETTLED, not merely updated. That distinction is the whole fix: `v` in this pass
+		// was computed from n_prev, so it is only a valid answer once n_prev and n_in agree.
+		// Iterating to that point is what makes the reported v, q, froude and tau consistent with
+		// the n in the roughness box -- no separate final pass needed, and none wanted, because a
+		// final pass would also recompute n_strickler and change answers this fix is not about.
+		n_settled = (n_iterating !== true) || (Math.abs(n_in / n_prev - 1) <= max_err);
+		iterate_p = !(n_settled && d50_settled);
 	}
 	return {
 		a: a, pw: pw, rh: rh, t: t, v: v, q: q, froude: froude, tau: tau,

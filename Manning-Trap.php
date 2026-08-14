@@ -23,7 +23,7 @@ echoCalculatorForm(
 		Array('name' => 'sgrock', 'type' => 'number', 'default' => '2.65', 'units' => NULL, 'label' => $ec_lang['mtc_sgrock']),
 		Array(
 			'name' => 'd50_in', 
-			'type' => 'number', 'default' => Array('us' => '6', 'si' => '150'), 
+			'type' => 'number', 'default' => Array('us' => '4', 'si' => '100'),
 			'units' => 'distance_small', 
 			'label' => ecTipLabel($ec_lang['mtc_d50_in'], $ec_lang['mtc_iteration_tip']) . '<br /> <input type="radio" name="d50_radio" id="d50_radio_isbash" value="isbash" onchange="EngCalcs.submitForm()" /><label for="d50_radio_isbash">Isbash</label> <input type="radio" name="d50_radio" id="d50_radio_maynord" value="maynord" onchange="EngCalcs.submitForm()" /><label for="d50_radio_maynord">Maynord</label> <input type="radio" name="d50_radio" id="d50_radio_searcy" value="searcy" onchange="EngCalcs.submitForm()" /><label for="d50_radio_searcy">Searcy</label><br />*' . inputHtml('d50_safety', 'number', '1.25', '')),
 	),
