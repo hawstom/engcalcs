@@ -159,10 +159,18 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					      // NO language flag, though the post is English: Tom, 2026-08-13, "I am inclined
 					      // to take my chances with automatic browser translators and not flag it as
 					      // English." A permanent "(in English)" in all 27 navbars costs more, and costs
-					      // it constantly, than the occasional reader who meets an untranslated page. ?>
+					      // it constantly, than the occasional reader who meets an untranslated page.
+					      //
+					      // NO TIP, deliberately (Tom, 2026-08-13: "Why a tip? Isn't 'Walkthroughs' good
+					      // enough?"). It is. The tip said "Step-by-step guides to the calculators, on
+					      // Tom Haws's blog" -- the first half restates the label and the second is
+					      // off-site trivia. It was also a bare <a title>, which no tip selector in
+					      // js/Calculators.lib.js matches, so touch users never saw it; the fix would
+					      // have been to add a ? glyph to a nav dropdown and then translate the text 26
+					      // times. Deleting it was cheaper than either. No sibling in this menu has a
+					      // tip. ?>
 					<a class="dropdown-item" href="https://tomsthird.blogspot.com/2026/08/hawsedc-free-unlimited-online-looped.html"
-						target="_blank" rel="noopener"
-						title="<?=htmlspecialchars($ec_lang['menu_walkthroughs_tip'], ENT_QUOTES, 'UTF-8')?>"><?=$ec_lang['menu_walkthroughs']?></a>
+						target="_blank" rel="noopener"><?=$ec_lang['menu_walkthroughs']?></a>
 				</div>
 			</li>
 		</ul>

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ar",
-        "expected_key_count": 863,
-        "delta_key_count": 9,
+        "expected_key_count": 861,
+        "delta_key_count": 8,
         "exempt_key_count": 13,
         "exempt_keys": [
             "calc_units_us",
@@ -295,7 +295,6 @@
     },
     "keys_to_translate": {
         "menu_walkthroughs": "Walkthroughs",
-        "menu_walkthroughs_tip": "Step-by-step guides to the calculators, on Tom Haws's blog.",
         "lpn_backdrop_scale_entry": "Scale by World File or pixel size",
         "lpn_backdrop_scale_entry_prompt": "Enter the size of a pixel or paste the complete contents of the World File for the image",
         "lpn_backdrop_scale_entry_bad": "Type one number for the size of a pixel, or paste all six lines of a world file.",
@@ -306,7 +305,6 @@
     },
     "keys": {
         "menu_walkthroughs": "Walkthroughs",
-        "menu_walkthroughs_tip": "Step-by-step guides to the calculators, on Tom Haws's blog.",
         "lpn_backdrop_scale_entry": "Scale by World File or pixel size",
         "lpn_backdrop_scale_entry_prompt": "Enter the size of a pixel or paste the complete contents of the World File for the image",
         "lpn_backdrop_scale_entry_bad": "Type one number for the size of a pixel, or paste all six lines of a world file.",
@@ -317,22 +315,6 @@
     },
     "key_context": {
         "menu_walkthroughs": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "menu_more",
-                    "value": "المزيد",
-                    "english": "More"
-                },
-                "next_translated": {
-                    "key": "menu_libre",
-                    "value": "برمجيات حرة",
-                    "english": "Libre Software"
-                }
-            }
-        },
-        "menu_walkthroughs_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

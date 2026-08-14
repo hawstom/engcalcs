@@ -2027,13 +2027,20 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     instead of wrapping it, so the tap target was the single `?` the whole-label convention exists
     to prevent. Now `ecTipLabel()`. (It was *not* invisible on touch, as first reported here:
     `EngCalcs.initTips` also matches `[title][style*="cursor:help"]`, so the tip did work.)
-  - **Still open, deliberately, and both are Tom's call:**
-    - **`contact_title` is rendered by nothing** — `contact.php` uses `contact_main_menu` instead.
-      Left untouched rather than renamed, because renaming an orphan makes it look live. Delete
-      (27 strings) or wire it up?
-    - **`menu_walkthroughs_tip` IS the invisible-on-touch case** (`lib/Menus.lib.php:165`): a bare
-      `<a title="…">` matching neither tip selector, exactly what CLAUDE.md warns against. Not
-      fixed here because the fix adds a `?` glyph to a nav dropdown, which is a design change.
+  - **Two adjacent keys were surfaced for Tom and both were DELETED, same day.** Neither was a
+    naming question, which is why the check could never have reached them:
+    - **`contact_title` was rendered by nothing** — `contact.php` titles itself from
+      `contact_main_menu`, and the page still reads `<title>Contact</title>` with the key gone.
+      27 strings recovered. It was surfaced rather than renamed on purpose: renaming an orphan is
+      the one move that makes it look live.
+    - **`menu_walkthroughs_tip` was deleted rather than fixed** (Tom: *"Why a tip? Isn't
+      'Walkthroughs' good enough?"*). It is. The tip read "Step-by-step guides to the calculators,
+      on Tom Haws's blog" — the first half restates the label, the second is off-site trivia — and
+      no sibling in that menu carries a tip at all. **The cost asymmetry is the point:** it was a
+      bare `<a title>` matching neither selector in `js/Calculators.lib.js`, so fixing it meant
+      adding a `?` glyph to a nav dropdown *and* paying 26 translations for a string added only the
+      day before (`938c51e`, English-only). Deleting beat both. The suite's cheapest tip is the one
+      whose label already said it.
 
 - 0|276| **[DONE 2026-08-13] Precise background-image scaling: type the number, or hand over a
   world file.** The backdrop menu now offers "Scale by picking" (the coarse step) and "Scale by
