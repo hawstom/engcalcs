@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='طباعت کے قابل ذیلی عن�
 $ec_lang['consent_body']='کیا ہم اس براؤزر پروفائل کے سٹوریج میں فی صفحہ ایک ہندسہ محفوظ کر سکتے ہیں تاکہ اس کے بار بار ملاحظوں کو ریکارڈ کرنے سے بچا جا سکے؟';
 $ec_lang['consent_accept']='یہ قبول کریں';
 $ec_lang['consent_accept_all']='ہمیشہ قبول کریں';
-$ec_lang['consent_decline']='انکار کریں';
+$ec_lang['consent_decline']='ہمیشہ انکار کریں';
 $ec_lang['consent_current_granted']='آپ نے اس کی اجازت دی۔ ہم اس براؤزر پروفائل کے لیے ریکارڈنگ محدود رکھتے ہیں۔';
 $ec_lang['consent_current_denied']='آپ نے اس سے انکار کیا۔ ہم اس براؤزر پروفائل کی ریکارڈنگ محدود کرنے کے لیے کچھ بھی محفوظ نہیں کرتے۔';
 $ec_lang['consent_region_label']='ریکارڈنگ محدود کرنے کے بارے میں آپ کا انتخاب۔';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='منظر';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='ترتیبات';
+$ec_lang['lpn_menu_help']='مدد';
+$ec_lang['lpn_help_walkthroughs']='مرحلہ وار رہنما';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,14 @@ $ec_lang['lpn_labels_decimals_tip']='اس لیبل کے لیے دکھائے گئ
 $ec_lang['lpn_labels_mark_extrema']='سب سے زیادہ اور سب سے کم قدریں نشان زد کریں';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='پس منظر کی تصویر…';
-$ec_lang['lpn_backdrop_add']='تصویر شامل کریں';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='تصویر کا پیمانہ مقرر کریں';
-$ec_lang['lpn_backdrop_position']='تصویر منتقل کریں';
-$ec_lang['lpn_backdrop_remove']='تصویر ہٹائیں';
+$ec_lang['lpn_backdrop_add']='شامل کریں';
+$ec_lang['lpn_backdrop_scale']='چن کر پیمانہ مقرر کریں';
+$ec_lang['lpn_backdrop_scale_entry']='جغرافیائی حوالہ فائل یا نقشے پر ایک پکسل کے سائز سے پیمانہ مقرر کریں';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='نقشے پر ایک پکسل کا سائز درج کریں، یا تصویر کی جغرافیائی حوالہ فائل کا مکمل مواد پیسٹ کریں';
+$ec_lang['lpn_backdrop_scale_entry_bad']='نقشے پر ایک پکسل کے سائز کے لیے ایک عدد ٹائپ کریں، یا جغرافیائی حوالہ فائل کی تمام چھ سطریں پیسٹ کریں۔';
+$ec_lang['lpn_backdrop_wld_bad']='یہ جغرافیائی حوالہ فائل تصویر کو گھماتی، اُلٹاتی، یا دونوں سمتوں میں غیر مساوی طور پر کھینچتی ہے۔ نقشہ صرف تصویر کو منتقل کر سکتا ہے اور دونوں سمتوں میں یکساں مقدار سے اس کا حجم تبدیل کر سکتا ہے، اس لیے یہ فائل استعمال نہیں کی گئی۔';
+$ec_lang['lpn_backdrop_position']='منتقل کریں';
+$ec_lang['lpn_backdrop_remove']='ہٹائیں';
 $ec_lang['lpn_backdrop_remove_confirm']='پس منظر کی تصویر ہٹائیں؟';
 $ec_lang['lpn_backdrop_scale_prompt1']='پس منظر کی تصویر پر دو پوائنٹس پر کلک کریں، جیسے بار سکیل کے دو سرے۔ پھر ان کے درمیان اصل فاصلہ ٹائپ کریں۔';
 $ec_lang['lpn_backdrop_scale_prompt2']='دونوں پوائنٹس کے درمیان اصل فاصلہ';
