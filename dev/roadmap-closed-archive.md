@@ -1946,3 +1946,61 @@ tasks at priority 0. Compressed to a stub there; this is the full text as it sto
   - **Promoted from 20 and done out of order** because it was not a nicety: every reload disconnected,
     so it contaminated every browser pass and produced three separate "reload doesn't work" reports.
   - `Open Recent` was deferred here and shipped as Task 258 (2026-08-10), on `isSameEntry()`.
+
+
+## Task 313
+
+- 0|313| **[DONE 2026-08-14] Timed both engines, and kept the EPANET Workspace and Project alive
+  across solves.** Tom, 2026-08-14: *"We've proceeded telling ourselves that our engine is faster
+  than the EPANET engine. But I haven't seen evidence of this in my browser tests."* There was none.
+  The native 0.4 ms was measured; the EPANET side had only ever been INFERRED from "async, and a
+  678 KB import". `dev/lpn-spike/engine-bench.js` measures both.
+
+  **THE FIRST MEASUREMENT WAS ALSO WRONG, AND THAT IS THE LESSON WORTH KEEPING.** The bench was
+  written as a decomposition — build the `.inp`, open a Project, solve — and it hoisted the
+  `Workspace` out of its own timing loop. It therefore measured a shape the shipped code never had,
+  and reported a 1.25 ms round trip. **The exported function actually cost 9–10 ms per solve**,
+  because `lpnSolveEpanet()` constructed a Workspace and instantiated the WASM engine *on every
+  solve* — ~8 ms nobody had counted, on a page that re-solves on every keystroke. A decomposition
+  measures the parts you thought of. **Time the exported function, unmodified, or you are timing
+  your own mental model.**
+
+  | network | before | after, value edit | after, reopen | native |
+  |---|---|---|---|---|
+  | 6 nodes | 10.2 ms | **0.14 ms** | 0.98 ms | 0.04 ms |
+  | 21 nodes | 9.0 ms | **0.41 ms** | 1.56 ms | 0.30 ms |
+  | 201 nodes | 18.9 ms | **3.19 ms** | 6.19 ms | 33.7 ms |
+
+  - **Where each engine actually wins, stated carefully, because the tempting summary is wrong.**
+    EPANET's *solver* is faster at every size — 0.04 ms against our 0.30 ms at 21 nodes. But the
+    *path* is not the solver: at the page's 10–20 node design target the native path is still
+    marginally ahead end to end (0.30 vs 0.41 ms), because the remaining EPANET cost is **our own
+    glue** — `lpnDiagnose`, plus a few hundred individual WASM calls at ~1.5–2.4 µs each to push
+    values in and read results back. The crossover is between 21 and 201 nodes, and above it the
+    native O(n³) dense Cholesky runs away: 10.5x at 201 nodes. **Neither difference is perceptible
+    at the design size** — 0.3 ms and 0.4 ms are the same number to a person — which is exactly what
+    Tom reported seeing in the browser.
+  - **A bulk read was checked and is not available**: the vendored build's `getNodeValues`/
+    `getLinkValues` return a single value, not a property vector, so the per-call overhead above is
+    a floor rather than an oversight.
+  - **What triggers a reopen is derived from the MODEL, never declared by the caller** —
+    `signatureOf()`: node `id|type`, link `id|type|from|to|hasCurve`, `method`, `emitterExponent`.
+    A caller that has to remember to say "this was a topology edit" is a rule that gets broken
+    silently within a month. Units are deliberately absent: the model reaching that file is always
+    SI, so a unit switch arrives as changed numbers and the value path already handles it.
+  - **`dev/lpn-spike/session-harness.js`, 121 assertions, and its own sabotage check runs EVERY
+    time.** The core assertion is one comparison per edit: the incremental answer must equal a cold
+    engine's answer for the same model. That catches a missed reopen and an unpushed value with the
+    same test. Each run also re-requires the module in a child process with `signatureOf()`
+    replaced by a constant and **requires that copy to fail** — it produces 22 failures, most of
+    them quiet ones 6–92 L/s off rather than loud engine errors. It fails the build if it can no
+    longer find `signatureOf`, so the check cannot rot into a no-op.
+  - **Pressures had to join the comparison.** In a demand-driven solve an elevation change moves no
+    head and no flow, so head+flow alone cannot tell a pushed elevation from an ignored one.
+  - **The case for `engine: 'native'` as the default is now ONLY the one-time 663 KB module load**
+    (236 KB gzipped, ~36 ms to import and instantiate in Node). That is a real bandwidth argument
+    for the offline/low-connectivity audience this suite exists for. **It is not a speed argument
+    and must not be written up as one again.**
+  - Measured in Node. WASM instantiation, the fetch and the JIT all differ in a browser, and the
+    fetch is what a user actually waits for — the per-solve numbers are representative, the load
+    number is a floor.
