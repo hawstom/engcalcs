@@ -524,6 +524,33 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   as of this paragraph's original writing; resolved by commit `7428ff0 Task 146: close the
   empty-canvas open question`, 2026-07-29) — a new project opens on the placeholder-text canvas
   above, not a worked example.
+
+  **WHAT STILL BLOCKS CLOSING THIS — four child tasks, and nothing in the parent's own scope
+  (audited 2026-08-13).** Every phase this task declared is shipped: 0, 0.5, 1, and all of Phase 2
+  except two items. The remaining four are the only ones the scope doc ever *owed*:
+  **146.04** (node/link report tables) and **146.05** (element browser) — both named in Phase 2's
+  bullet; **146.07** (Open/Closed link) and **146.09** (map insets) — both named in Phase 3's.
+  **Close Task 146 when those four are closed.**
+
+  - **146.07 is nearly free and should go first.** The `status` field already exists on every link,
+    defaults to `'open'`, serializes, is scenario-overridable, and is consumed by `js/lpn-solver.js`
+    in four places; `js/lpn-inp.js` already reads `CLOSED`. `js/looped-network.js` says so at the
+    declaration: *"Task 146.07 will surface it."* What is missing is a control in the Pipe popup.
+  - **`(Task 146 child)` now means SCOPE, and only those four carry it.** Nine other open tasks
+    (177, 181, 184, 185, 186, 191, 192, 201, 209) carried the same tag while being ideas raised
+    *during* the build rather than work this task owed — 209 was even tagged "but suite-shaped."
+    They were retagged **`(originated during Task 146)`** on 2026-08-13, which keeps the provenance
+    a reader wants without letting a wishlist hold a shipped feature open. Nothing was deprioritized
+    and nothing was closed; only the tag changed. **Do not re-tag a new `lpn_` idea as a child** —
+    a child is something Phase 1–3 promised, and that list is now closed at four.
+  - **Phase 4 (Task 145, the tiled-map mashup) does not block closure.** It was extracted to its own
+    ID with its own priority precisely so it would not be buried, and Tom confirmed it 2026-07-29 as
+    "maybe cool, try it sometime" at priority 11. It closes on its own merits, whenever.
+  - **The design record does not need relocating.** `dev/looped-network-calculator-scope.md` already
+    carries every load-bearing decision — the GGA-not-Hardy-Cross rationale, the 10–20 node target,
+    the cut list, the scope-gravity warning, the backdrop reasoning, and what Phase 0.5 disproved.
+    This block is a summary of that document, so moving it to `## Completed` (never re-scanned)
+    costs nothing, which is the usual reason a parent like this cannot close.
 - 15|202| **`zh` converts at ~15% where its peers convert at 50–75% — PARKED until n=30, with a
   pre-registered threshold.** Everything cheap has been eliminated; what remains is a decision that
   data will make for free.
@@ -545,7 +572,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the answer**, and the log accrues at zero cost. Re-read it when `zh` passes 30 views.
   - **Do not re-score `zh`'s QUALITY in either direction before then.**
 
-- 10|181| **Per-element symbol sizing (Task 146 child).** Task 180 shipped one overall
+- 10|181| **Per-element symbol sizing (originated during Task 146).** Task 180 shipped one overall
   `settings.symbolScale` multiplier ("Symbol size (relative to text)") covering node radius, pipe
   width, pump/vertex/arrow marks and stroke widths together. Tom, 2026-07-30, named the
   fine-grained version as the eventual shape — a base pipe width, node size, pump size, reservoir
@@ -553,7 +580,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   give more fine-grained control and right now just a two-dimensional control." Build it when
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
 - 40|184| **Project/scenario model for saved networks: DELTA model — one save, canonical Base,
-  scenarios are collections of overrides (Task 146 child).** Raised by Tom, 2026-07-30, thinking ahead to Task 146.08 (multiple named saved
+  scenarios are collections of overrides (originated during Task 146).** Raised by Tom, 2026-07-30, thinking ahead to Task 146.08 (multiple named saved
   networks): "I am wondering whether the concept of project.scenario buys us anything… if multiple
   saves were grouped as scenarios under a project, we could conceivably, for any element, 'Push to
   project' to sync across scenarios. We could even get fine-grained with checkboxes in popups."
@@ -783,7 +810,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   the delta decision above** — the naming problem disappears with scenario-level copy, and the
   sequencing note inverts: the container must come first, not the flat saves.
 
-- 30|192| **Right-click / long-press context-menu system (Task 146 child).** Raised by Tom,
+- 30|192| **Right-click / long-press context-menu system (originated during Task 146).** Raised by Tom,
   2026-07-30, when "Create scenario geometry variant" (Task 184) was proposed as a right-click
   action: the calculator has **no right-click capability at all today**, so that action cannot
   quietly introduce one. Tom: *"if we add right-click, it should be built out robustly. It's a habit
@@ -799,7 +826,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Disable-with-reason rather than hide**, where practical, so the vocabulary stays learnable.
   - Menu contents are contextual to the clicked object (and later to the selection, if multi-select
     lands). Escape closes.
-- 40|201| **Scenario UI — build what Task 184 decided (Task 146 child).** Created 2026-08-03 while
+- 40|201| **Scenario UI — build what Task 184 decided (originated during Task 146).** Created 2026-08-03 while
   closing 146.08. Task 184 settled the delta model and 146.08 shipped the storage for it, but
   **nothing in the app can create, name, or switch a scenario**, and there is no write path for an
   override — `setOverride()` deliberately does not exist yet (`effective(el, prop)` is a pure
@@ -827,7 +854,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     "ambient state, not modal" decision). Note `setNotice()` now exists in `js/looped-network.js` —
     built for Task 193's delete narration — so the status-bar half of that is already available.
 
-- 35|185| **Match/Copy properties tool (Task 146 child).** Tom, 2026-07-30: "In the absence of the
+- 35|185| **Match/Copy properties tool (originated during Task 146).** Tom, 2026-07-30: "In the absence of the
   table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
   labels) say what properties to copy, top shows (or initial click gives) the Source object then you
   click the Target objects." Same interaction as AutoCAD's MATCHPROP and every GIS attribute-copy
@@ -839,7 +866,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   copied. Worth a deliberate decision on whether ID is ever copyable (it must not be — IDs are
   unique) and whether geometry is (it must not be — that is a move, not a property copy). This is
   the cheap 80% of Task 186 and should ship long before it.
-- 15|186| **Table-paradigm editor with spreadsheet copy/paste (Task 146 child).** Tom, 2026-07-30:
+- 15|186| **Table-paradigm editor with spreadsheet copy/paste (originated during Task 146).** Tom, 2026-07-30:
   "For the future a table-paradigm editor with spreadsheet-like copy and paste would be very cool."
   A grid of nodes and a grid of links, editable in place, with clipboard paste from a spreadsheet —
   what EPANET's own Data Browser tables and every serious package's tabular view provide, and the
@@ -857,7 +884,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   one array entry in `rebuildSettingsFields()`. That row is only worth having once a text ID is
   something the user can actually see.
 - 15|191| **Junction emitters — surface the pressure-dependent demand the solver already has
-  (Task 146 child).** Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"
+  (originated during Task 146).** Raised 2026-07-30 when Tom asked of the Settings panel's "Emitter exponent"
   row: *"Do we have emitters? Do we do something with this?"* The honest answer was **no** — that
   control was removed in the same session (see the note in `rebuildSettingsFields()`), because:
   - **`js/lpn-solver.js` fully implements emitters** — `qe = K·ΔH^n` with the matching Jacobian
@@ -926,7 +953,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   rewrite against live controls, not a code fix, so it needs a browser pass rather than static
   reading.
 
-- 45|209| **A snoozable tip system (Task 146 child, but suite-shaped).** Asked for by Tom,
+- 45|209| **A snoozable tip system (originated during Task 146; suite-shaped).** Asked for by Tom,
   2026-08-03, while reviewing Task 195's file-and-lock explanation: the page needs somewhere to put
   "here is what is about to happen" text that a user can dismiss for now and see again later, rather
   than the two states we have (shown once ever, or shown every time). Phase 2's training panel is the
@@ -1196,7 +1223,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     is strictly better than the two-point scale gesture a human would otherwise perform by eye.
 
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
-- 20|177| **Link head loss: report the per-length gradient alongside total (Task 146 child).**
+- 20|177| **Link head loss: report the per-length gradient alongside total (originated during Task 146).**
   Conventional network software and reports express pipe head loss in TWO forms, not one, because
   they answer different questions: **total head loss** (ft or m across the whole link — what you
   need to build the HGL/EGL, and what `lpn_` already reports) and a **per-length gradient/slope**
