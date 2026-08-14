@@ -195,12 +195,26 @@ $ec_icons = array(
 	//
 	// Two concentric circles plus four spokes on the diagonals, so it stays readable at 16px where a
 	// drawn-in rope texture would silt up. Stroked outline in currentColor like the rest of the set.
-	// The spokes start on r=4 and end on r=9, both at 45 degrees. That is not arbitrary: with
-	// stroke-width 2 the rings occupy r=3..5 and r=8..10, and a round cap adds 1 unit at each end,
-	// so each spoke lands exactly flush with the inner edge of one ring and the outer edge of the
-	// other. It reads as one welded object instead of four lines with hairline gaps.
-	'help'       => '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>'
-	              . '<path d="M14.8 9.2l3.6-3.6M9.2 9.2l-3.6-3.6M9.2 14.8l-3.6 3.6M14.8 14.8l3.6 3.6"/>',
+	// FOUR PAINTED BANDS, not spokes (Tom, 2026-08-13: "would look more correct with wider dark
+	// bands... often depicted as equal eights of the circle"). He is right, and the first attempt was
+	// wrong in kind, not degree: four thin diagonal lines between two rings is a ship's wheel. A
+	// buoy's bands are painted ACROSS the full width of the ring, which is why they have to be as
+	// thick as the ring itself.
+	//
+	// Drawn as ONE dashed circle rather than four arc paths. Stroke width 6 on r=7 fills r=4..10 --
+	// exactly the ring's cross-section, bounded by the two outlines below. The circumference is
+	// 43.98, so an eighth is 5.4978, and a 5.5/5.5 dash pattern paints four eighths and leaves four.
+	// dashoffset -2.75 is half a segment, which centres the bands on the 45 degree diagonals; without
+	// it they would start there instead and sit visibly askew.
+	//
+	// stroke-linecap MUST be butt here, overriding the round cap the shared open tag sets: a round
+	// cap on a 6-wide stroke adds a 3-unit bulge to each end of all four bands, which closes the
+	// white gaps and turns the ring into a solid disc.
+	//
+	// Bands first, outlines second, so the two circles draw ON TOP and stay unbroken.
+	'help'       => '<circle cx="12" cy="12" r="7" stroke-width="6" stroke-linecap="butt"'
+	              . ' stroke-dasharray="5.5 5.5" stroke-dashoffset="-2.75"/>'
+	              . '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/>',
 	// The ONE brand mark in this set, and the one exception to "stroked outline, currentColor".
 	// GitHub's Octocat is a filled silhouette; redrawing it as strokes would make it unrecognizable,
 	// and recognition is the entire job here -- the mark is what tells a passing engineer that the
