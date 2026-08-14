@@ -56,7 +56,7 @@ about batching; if waves stop dying, that is evidence about wave size. Keep them
 |------|-----------|------|---------|
 | **1 of 4** | am, ar, bg, bn, cs | 1,445 | Done. |
 | **2 of 4** | de, hi, id, km, my | 1,445 | de, hi, id done. **km and my died on a session limit at 100 of 289 each.** |
-| **3 of 4** | ps, ro, ru, sw, uk | 1,445 | Awaiting authorization. |
+| **3 of 4** | ps, ro, ru, sw, uk | 1,445 | Done, all five, no losses. |
 | **4 of 4** | km, my (189 each) + ur, zh + cs, fr, pt | 963 | Awaiting authorization. |
 
 Wave 4 absorbs the two half-finished wave-2 languages and stays the cheap wave: `cs`/`fr`/`pt` owe
@@ -74,14 +74,21 @@ That is the first clean evidence separating the two mechanisms, and it points th
 cost model does: the batching is cheap insurance that works, while wave size buys probability, not
 protection. If Tom wants to retire one, the batching is the one that has now demonstrably paid.
 
-## Landed so far (17 of 26 complete)
+## Landed so far (22 of 26 complete)
 
 Before this plan: es, fr\*, pt\*, fa, he, tr, sr, it, hr.
-Wave 1: am, ar, bg, bn, cs\*. Wave 2: de, hi, id.
+Wave 1: am, ar, bg, bn, cs\*. Wave 2: de, hi, id. Wave 3: ps, ro, ru, sw, uk.
 Partial: km (100/289), my (100/289).
 \* fr and pt still owe three Task 296 identity keys each, cs owes one; all listed in wave 4.
 
-**17 for 17 on the consent-button trap** (de *Diesmal/Immer*, hi *अभी/हमेशा*, id *kali ini/Selalu*
-joining the previous fourteen): every completed language has rendered the two Accept answers
-*temporally* (this ask vs. never ask again) rather than as the conventional "accept all
-categories". That is the guidance in `$ec_lang_syn` working exactly as intended.
+**21 of 22 on the consent-button trap.** Twenty-one languages rendered the two Accept answers
+*temporally* — this ask vs. never ask again — rather than as the conventional "accept all
+categories": de *Diesmal/Immer*, hi *अभी/हमेशा*, id *kali ini/Selalu*, ro *acum/mereu*,
+uk *цей запит/завжди*, sw *hili/siku zote*, ru *Принять/Всегда принимать*.
+
+**Pashto is the one miss**, and it is worth keeping visible rather than quietly fixing: the ps
+agent wrote `ټول ومنئ` — *accept all* — the exact amount reading the design rejects. Corrected to
+`تل يې ومنئ` (*accept always*). One failure in twenty-two says the `$ec_lang_syn` guidance is
+working but is not self-enforcing, so **check this pair by hand in every remaining language**; it
+is the single most reliable place a translator reverts to the industry cliché instead of reading
+the guidance.
