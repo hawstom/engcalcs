@@ -77,6 +77,11 @@ run_check "html balance (every page)"    blocking php dev/scripts/html_balance_c
 # target. Neither is visible to the person who introduced it.
 run_check "pageConfig php->js bridge"    blocking php dev/scripts/pageconfig_check.php
 run_check "tip markup via helpers"       blocking php dev/scripts/tip_markup_check.php
+# Task 319. A log column is written by a machine and read by awk, so a stray tab in visitor-supplied
+# text forges a row that looks exactly like a real one. The defect was DUPLICATION -- the same three
+# unfiltered lines pasted into five writers -- so this checks the helper's behaviour AND that nobody
+# has pasted the raw read back in.
+run_check "log columns cannot be forged" blocking php dev/scripts/browser_lang_tag_check.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php

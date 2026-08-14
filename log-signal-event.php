@@ -69,10 +69,9 @@ if (isset($_POST['offline_ts'])) {
     }
 }
 
-$browserLang = '';
-if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-    $browserLang = strtolower(trim(explode(';', explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'])[0])[0]));
-}
+// Task 319: same treatment the detail column above gets, and for the same reason -- a header is
+// visitor-supplied text and a stray tab in it would shift every column after it.
+$browserLang = ecBrowserLangTag();
 
 $dir = dirname(SIGNAL_LOG);
 if (!is_dir($dir)) {

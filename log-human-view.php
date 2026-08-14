@@ -73,10 +73,8 @@ $alreadyLogged = ecAnalyticsConsented() && ecSeen($page, EC_SEEN_HUMAN_VIEW);
 if (!$alreadyLogged) {
     ecMarkSeen($page, EC_SEEN_HUMAN_VIEW);
 
-    $browserLang = '';
-    if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-        $browserLang = strtolower(trim(explode(';', explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'])[0])[0]));
-    }
+    // Task 319: filtered and length-capped like the two columns above -- see ecBrowserLangTag().
+    $browserLang = ecBrowserLangTag();
 
     $dir = dirname(HUMAN_VIEW_LOG);
     if (!is_dir($dir)) {

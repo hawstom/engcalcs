@@ -46,10 +46,9 @@ function ecLogContactSend() {
   // Blank when a visitor never chose one, which is itself the honest answer.
   $lang = isset($_COOKIE['ec_language']) ? preg_replace('/[^A-Za-z-]/', '', $_COOKIE['ec_language']) : '';
 
-  $browserLang = '';
-  if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-    $browserLang = strtolower(trim(explode(';', explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'])[0])[0]));
-  }
+  // Task 319: filtered and length-capped in one place, because this column goes into the same
+  // tab-separated line as the sanitised ones above.
+  $browserLang = ecBrowserLangTag();
 
   $dir = dirname(CONTACT_SEND_LOG);
   if (!is_dir($dir)) {
@@ -68,35 +67,50 @@ $errspam='Sorry, you need to enter '.$testanswer.' in the last box.';
 
 // We read the POST variables below.
 
+// ROADMAP Task 321: read every field ONCE, defaulting a field the request never sent to the empty
+// string. Under PHP 8 a bare POST -- a bot, a bookmarked URL, a form that lost a field -- made each
+// of the five reads below emit an *Undefined array key* warning, and anywhere display_errors is on
+// those land in the response body. Hygiene, not a hole: the header-injection guards below are
+// unchanged and still reject exactly what they rejected before. A MISSING field now behaves the way
+// an EMPTY one always did, which is the behaviour that was already reachable from the real form --
+// in particular a missing e-mail address still fails the address pattern and still dies.
+// is_string() rather than isset() alone: name[]=x posts an ARRAY, and passing one to preg_match()
+// is a fatal TypeError in PHP 8 -- a second way to reach the same 500 this task is closing.
+$postName        = isset($_POST['name'])         && is_string($_POST['name'])         ? $_POST['name']         : '';
+$postEmail       = isset($_POST['email'])        && is_string($_POST['email'])        ? $_POST['email']        : '';
+$postSubject     = isset($_POST['subject'])      && is_string($_POST['subject'])      ? $_POST['subject']      : '';
+$postMessage     = isset($_POST['message'])      && is_string($_POST['message'])      ? $_POST['message']      : '';
+$postMoreMessage = isset($_POST['more_message']) && is_string($_POST['more_message']) ? $_POST['more_message'] : '';
+
 // 2026-07-15 Trying the form without this.
 // Get the spam test or abort.
 // $test = $_POST['test'];
 // if (strtoupper($test) !== strtoupper($testanswer)) die($errspam);
 
 // Get the commentor's name
-if (preg_match("/(\r|\n)/", $_POST['name']) or preg_match("/@/",$_POST['name'])) {
+if (preg_match("/(\r|\n)/", $postName) or preg_match("/@/",$postName)) {
   die("Are you trying to spam this form?  Please don't do that.");
 } else {
-  $name = $_POST['name'];
+  $name = $postName;
 }
 
 // Get the commentor's e-mail address
-if (preg_match("/(\r|\n)/", $_POST['email']) or !preg_match("/^[a-z0-9]+([_\\.-][a-z0-9]+)*" ."@"."([a-z0-9]+([\.-][a-z0-9]+)*)+"."\\.[a-z]{2,}"."$/",$_POST['email'])) {
+if (preg_match("/(\r|\n)/", $postEmail) or !preg_match("/^[a-z0-9]+([_\\.-][a-z0-9]+)*" ."@"."([a-z0-9]+([\.-][a-z0-9]+)*)+"."\\.[a-z]{2,}"."$/",$postEmail)) {
   die("Invalid e-mail address.");
 } else {
-  $email = $_POST['email'];
+  $email = $postEmail;
 }
 
 // Get the Subject: header.
-if (preg_match("/(\r|\n)/", $_POST['subject']) or preg_match("/@/",$_POST['subject'])) {
+if (preg_match("/(\r|\n)/", $postSubject) or preg_match("/@/",$postSubject)) {
   die("Get out, spammer.");
 } else {
-  $subject = $_POST['subject'];
+  $subject = $postSubject;
 }
 
 
 // Get the message
-$message = $_POST['message'].$_POST['more_message'];
+$message = $postMessage.$postMoreMessage;
 
 // Use a fixed internal success page (do not trust user input for redirects).
 $successfile = 'formmailsuccess.php';

@@ -394,6 +394,43 @@ function ecSessionAgeMs() {
 }
 
 /**
+ * The visitor's first Accept-Language tag, safe to write into a tab-separated log line.
+ *
+ * ROADMAP Task 319. Every log writer sanitises its columns carefully -- log-signal-event.php even
+ * says why: *"a log line is read by awk and a stray tab or newline would silently shift every
+ * column after it"*. That reasoning was applied to every field EXCEPT this one, in five
+ * copy-pasted copies of the same three lines, because trim() looks like a filter and is not: it
+ * strips the EDGES only, so a header carrying an embedded tab or newline forged whole rows, and a
+ * 4 KB header went into the file at full length.
+ *
+ * Bounded, and worth saying plainly rather than overstating: nothing here is executable and no
+ * visitor can see another visitor's data. What a forged row corrupts is OUR OWN analytics -- and
+ * those numbers are what several roadmap decisions are being made from, so a fabricated row is a
+ * corrupted decision.
+ *
+ * DROPPED, not escaped, exactly like log-signal-event.php's detail column: a log line has no
+ * escaping convention, so inventing one here would mean teaching log/lang-log-stats.sh about it
+ * too. [a-z0-9-] is the whole of a well-formed RFC 5646 tag once it is lower-cased, and 35 is
+ * comfortably past the longest realistic one ('sr-latn-rs', 'zh-hant-hk') while being far too
+ * short to smuggle anything interesting into the file.
+ *
+ * TRUNCATE AT THE FIRST ILLEGAL CHARACTER rather than deleting illegal characters throughout.
+ * Deleting is equally SAFE -- no separator survives either way -- but it silently welds the
+ * attacker's payload onto the real tag, so "en\n2026-01-01T…" would be logged as one 35-character
+ * word beginning "en". Truncating logs 'en', which is both the honest reading of the header and a
+ * value the report can actually count.
+ *
+ * @return string  e.g. 'en-gb', or '' when the header is absent or holds nothing usable.
+ */
+function ecBrowserLangTag() {
+    if (!isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) return '';
+    // First language-range, minus its q-value -- the same reading the five writers always did.
+    $tag = explode(';', explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'])[0])[0];
+    // trim() first so an ordinary ' en-gb' still yields a tag; it is not the filter, it never was.
+    return preg_match('/^[a-z0-9-]{1,35}/', strtolower(trim($tag)), $m) ? $m[0] : '';
+}
+
+/**
  * The bucket a log row belongs to, appended as a trailing column (see log/lang-log-stats.sh).
  *
  * Answers Tom's question of 2026-08-11: *"If a user opts out of being logged as a returner, do we
