@@ -493,10 +493,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **File > Open > Examples**, per Tom, NOT File > New. The current placement under New was right
     when there were two; a library is a thing you browse and open.
   - **Three to start**: Basic SI, Basic US, and *Elm Street Center US design loop fire flow plus max
-    day snapshot*. **That third one is a scenario document** — design loop, fire flow, and max day
-    are three scenarios of one network — which is why this task sits behind Task 184 and why it is
-    the example that proves scenarios are real. It is also the first example drawn from an actual
-    project rather than invented.
+    day snapshot*. It is the first example drawn from an actual project rather than invented.
+  - **ELM STREET IS NOT A SCENARIO DOCUMENT, and this task is NOT blocked on Task 184** (Tom,
+    2026-08-14, correcting an error written here earlier the same day): *"Elm Street is not a
+    scenario document. It is an EPANET import, and EPANET doesn't do scenarios. Elm Street is a
+    single-scenario snapshot that represents one scenario of a design."* The long name describes
+    **which** snapshot it is, not a document containing several. Worth keeping the correction
+    visible, because the mistake is an easy one to make twice: a name listing three design
+    conditions reads like a document holding three, and **EPANET has no scenario concept at all** —
+    one `.inp` per condition is exactly why Task 184 exists. So all three examples can ship
+    together with no dependency.
   - **The examples folder is a web-served directory, so it needs an index**: the pane cannot list a
     directory it cannot read. A generated manifest (title, description, units, thumbnail, file) is
     the obvious answer, and it must be generated from the files by a script in `dev/scripts/`, never
@@ -510,34 +516,58 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     opened?"* This is the strongest form of the feature and it retires a standing problem: a blank
     canvas with a placeholder on it is the dominant failure of every map editor, and this page has
     carried one since 2026-07-29 by an explicit decision *made with no data at all*.
-    - **The question mark in his last sentence is real and is the design decision.** "It is not a
-      map until a project is opened" is a clean, familiar pattern — VS Code's welcome tab, Excel's
-      start screen, HEC-RAS itself — and no-tabs-until-a-project falls straight out of it.
-    - **But it cuts against this suite's own oldest rule**, stated for every other calculator in
-      CLAUDE.md: *choose defaults that open on a passing design… a page that greets a first-time
-      visitor with a warning is worse than one that greets them with a worked example.* Every other
-      page in the suite lands you IN a worked example. A gallery is a wall in front of one, and the
-      visitor arriving from a search came to see a calculator work, not to choose from a menu.
-    - **The synthesis worth trying first**: the gallery is what you land on, *over a map that
-      already holds an example*, so dismissing it leaves you working rather than blank. That keeps
-      the shop window and keeps the suite's rule. Prototype both before committing — this is a
-      first-impression decision and it is cheap to try and expensive to get wrong.
-    - **TASK 200'S INSTRUMENTATION WAS BUILT TO ANSWER EXACTLY THIS AND THE DATA IS ON PRODUCTION.**
-      `log/lang-log-stats.sh` prints "First action on the map": a histogram of which of the four ways
-      in a visitor reaches for first, plus the residual who did NOTHING. Its own header says a large
-      `nothing` share overturns the empty-canvas decision. **The signal log does not exist on the dev
-      box** — run `sh log/lang-log-stats.sh` on production and read the Looped-Network section before
-      finalising this. It sizes the prize, and it is the difference between designing this from
-      evidence and designing it from taste.
+    - **"It is not a map until a project is opened" is the decision.** VS Code's welcome tab,
+      Excel's start screen, HEC-RAS itself; no-tabs-until-a-project falls straight out of it.
+    - **THE "GALLERY IS A WALL IN FRONT OF A WORKED EXAMPLE" OBJECTION WAS RAISED HERE AND TOM
+      OVERRULED IT, and the overruling is the more useful record.** The objection ran: every other
+      calculator in this suite lands you IN a worked example, per CLAUDE.md's own rule, so a gallery
+      costs a visitor who arrived from a search. A gallery-over-a-live-map hybrid was proposed as
+      the synthesis. Tom, 2026-08-14: *"A gallery is a universe of working examples. The tension is
+      small-minded. This is not a two-minute calculator. I disagree with gallery-over-map."*
+      - **He is right, and the error was treating a rule about CALCULATORS as a rule about this
+        page.** "Open on a worked example" earns its keep where a visitor can read the whole tool in
+        one screen and be finished in two minutes. A network editor is not that; the thing a visitor
+        needs first is *the range of what can be built*, and one example cannot show a range. A wall
+        of working examples IS the worked example, at the scale this page actually operates at.
+      - **Do not re-propose the hybrid.** It was declined on the merits, not deferred.
+      - One factual note he added, worth keeping because it is the nearest competitor's answer to
+        the same question: **epanet-js does put an empty Google Map behind its gallery of two.** So
+        the map-behind-gallery shape exists in the wild — and is exactly what he does not want.
+    - **THE LOG QUESTION IS CLOSED and the instrumentation is not needed for this.** Task 200's
+      `first:` histogram was cited here as the evidence that should settle the empty-canvas
+      question. Tom offered to pull it and asked which logs were wanted; the honest answer is that
+      the decision has now been made on grounds the histogram cannot speak to — it counts what
+      visitors did with the OLD page, and cannot say what they would do with a gallery that does not
+      exist yet. **Spending his time on it to confirm a decision already taken would have been
+      theatre.** The fine-grained `first:` rows remain worth reading later, on their own schedule, as
+      a before/after on this change rather than as an input to it.
   - **Every example commits to a unit system and does not adapt to yours** — this decision already
     exists (Task 264, `newProjectFromExample`) and carries over unchanged. Say the units in the
     description.
-  - Blocked on Task 184 for the Elm Street example only; the pane and the two basic examples could
-    ship first. Prefer shipping all three together — a library whose one interesting entry is
-    missing makes the wrong first impression.
+  - **Not blocked on anything.** All three examples are single-scenario documents.
 
 - 95|184| **Project/scenario model for saved networks: DELTA model — one save, canonical Base,
   scenarios are collections of overrides (originated during Task 146).**
+
+  **SHIPPED 2026-08-14, and Tom reviewed it the same day. Three rulings:**
+  - **The push CLEARS a scenario's overrides rather than writing Base's number in as a fresh one.**
+    Confirmed — *"Yes. Push clears rather than overwriting."* Both leave every scenario showing
+    Base's value; clearing leaves no stale marker claiming an intent the user has just overruled,
+    and does not pin scenarios to today's Base value forever.
+  - **The override count reads "Own values", and it STAYS.** Tom: *"'Own values' is good. Simple
+    English is good. 'Local values' or 'Scen. values' may be better."* Keeping "Own values", for a
+    reason he could not have been expected to have in view: **this suite already owns the word
+    "local"** — "Minor (local) loss" is its suite-wide standard for `h_m`, and that parenthetical
+    exists specifically to block a mistranslation. A second, unrelated technical "local" on the same
+    page would spend that word twice. "Scen." is an abbreviation of a word 26 languages do not
+    abbreviate alike, and `layout: nav item` is the only thing that justifies compressing a label.
+    **If Tom overrules this it is one string and one sprint key** — `lpn_scenario_overrides`.
+  - **The selector belongs at the BOTTOM, and may eventually want a row of its own.** Tom: *"I
+    thought it would occupy the entire bottom. But if it can coexist with status items, maybe that's
+    okay. But envision it possibly needing its own bottommost row."* It currently shares the map
+    status strip. **This is a re-parenting, not a rewrite** — `#lpn_scenario_btn` is one element with
+    its own id, so promoting it to a dedicated bottom row is a CSS and container change. Do that
+    when the strip actually gets crowded, not before.
 
   **RAISED 40 → 95 ON 2026-08-14, AND IT IS NOW THE TOP OF THE LIST.** Tom: *"I have got distracted,
   and a real customer, my colleague with a real project willing to use lpn, could use scenarios
