@@ -1,0 +1,102 @@
+{
+ "_comment": [
+  "WHICH OF OUR 26 LANGUAGES ARE RELATIVES, and what a disagreement between two relatives means.",
+  "",
+  "Tom, 2026-08-14: \"we need to systematize relations like croatian and serbian to leverage them",
+  "for each other every time and make our English design better and simpler.\"",
+  "",
+  "WHY THIS FILE EXISTS. In sprint 316 the Croatian and Serbian agents reported OPPOSITE things",
+  "about the same surface word: hr said 'vlastita vrijednost' is the term for eigenvalues and",
+  "avoided it; sr said its eigenvalue term is a different root ('sopstvena') and therefore used",
+  "'vlastite' freely. Both were RIGHT -- the same word sits at a different distance from each",
+  "language's dominant mathematical term. That is a genuinely useful piece of research, and it was",
+  "found BY ACCIDENT: both agents happened to run in the same sprint, both happened to report their",
+  "reasoning, and the orchestrator happened to notice the contradiction. Nothing in the process",
+  "would have caught it. Next time the two might run in different sprints, or one might not explain",
+  "itself, and the insight is simply lost.",
+  "",
+  "WHAT A DIVERGENCE INSIDE A CLUSTER MEANS. Exactly one of three things, and they are worth",
+  "separating because they need opposite responses:",
+  "  1. A REAL DISTINCTION between two similar languages (hr/sr above). Record it in glossary.json",
+  "     so neither language is later 'corrected' to match the other. This is the valuable case.",
+  "  2. An ERROR in one of them. Two languages this close should not disagree about an ordinary",
+  "     term; when they do and there is no linguistic reason, one of them is wrong.",
+  "  3. RESEARCH ONE SIBLING DID AND THE OTHER DID NOT. The cheapest win here: hr's finding about",
+  "     the eigenvalue alternate is directly useful to sr, bg and cs, and none of them had it.",
+  "",
+  "HOW TO USE IT: `php dev/scripts/lang_kinship.php <key> [<key>...]` dumps the sibling renderings",
+  "grouped by cluster, so they can be read side by side without assembling that by hand. That dump",
+  "is what a post-sprint cluster pass reads (see CLAUDE.md, post-sprint QA).",
+  "",
+  "THIS IS NOT A CLAIM THAT RELATIVES SHOULD MATCH. Serbian and Croatian are different languages",
+  "and the whole point of the worked example is that they legitimately differ. The file asserts",
+  "only that a difference between close relatives is worth a LOOK -- never that it is a defect."
+ ],
+ "clusters": [
+  {
+   "id": "bcs",
+   "name": "Bosnian-Croatian-Serbian",
+   "languages": ["hr", "sr"],
+   "tightness": "very-high",
+   "note": "Mutually intelligible standards of one pluricentric language, in two scripts (hr Latin, sr Cyrillic here). A semantic divergence is almost always signal. The known real distinction is mathematical vocabulary: hr's dominant eigenvalue term is 'svojstvena vrijednost' with 'vlastita vrijednost' documented as an alternate, while sr's is 'sopstvena vrednost' -- so the 'vlastit-' root is safe in sr and risky in hr. Verified sprint 316."
+  },
+  {
+   "id": "east-slavic",
+   "name": "East Slavic",
+   "languages": ["ru", "uk"],
+   "tightness": "high",
+   "note": "Close, and this suite's two files already agree on most engineering register. Known shared trap: both calque 'own value' onto the eigenvalue term (ru 'собственное значение', uk 'власне значення'), and both independently solved it the same way in sprint 316 with the reflexive 'свои/свої'. When one finds a trap, check the other."
+  },
+  {
+   "id": "south-slavic-bg",
+   "name": "Bulgarian",
+   "languages": ["bg"],
+   "relatives": ["hr", "sr", "ru", "uk"],
+   "tightness": "medium",
+   "note": "South Slavic but grammatically apart (no cases, definite article suffixed). Shares vocabulary roots with both clusters above, so their findings usually transfer while their PHRASING does not. bg is also the ONE language in this suite with a real native-speaker review on file (dev/Bulgarian-engineer-feedback.md, QUALITY 0.95), which makes it the right place to route a Slavic question that needs a human."
+  },
+  {
+   "id": "west-slavic",
+   "name": "West Slavic",
+   "languages": ["cs"],
+   "relatives": ["hr", "sr", "ru", "uk", "bg"],
+   "tightness": "medium",
+   "note": "Only Czech is served. Its eigenvalue term is 'vlastní hodnota' -- the same root that is risky in hr and safe in sr, so cs patterns with hr here. A future Slovak or Polish file would join this cluster."
+  },
+  {
+   "id": "romance",
+   "name": "Romance",
+   "languages": ["es", "pt", "fr", "it", "ro"],
+   "tightness": "high",
+   "note": "Five of them, which makes this the most informative cluster in the set: a 4-1 split points hard at the one. All five calque 'own values' onto their eigenvalue term (valores propios / próprios / valeurs propres / valori propri / valori proprii) and all five independently avoided it in sprint 316 -- a unanimity that was itself the evidence the ENGLISH should move. Watch also for the false friend 'actual' (= current, not real) across all five."
+  },
+  {
+   "id": "indo-aryan",
+   "name": "Indo-Aryan",
+   "languages": ["hi", "ur", "bn"],
+   "tightness": "very-high for hi/ur",
+   "note": "Hindi and Urdu are substantially the same spoken language in two scripts and two literary registers -- Devanagari with Sanskrit-leaning vocabulary, Nastaliq with Perso-Arabic. A SEMANTIC divergence between hi and ur is a strong error signal even though the strings can never be string-compared. They legitimately differ in register, not in meaning. bn is a cousin, looser. All three sit in the low-resource register finding: engineering practice is English-medium, so transliteration is often correct rather than lazy."
+  },
+  {
+   "id": "iranian",
+   "name": "Iranian",
+   "languages": ["fa", "ps"],
+   "tightness": "high",
+   "note": "Persian and Pashto share much technical vocabulary, and fa is the better-resourced of the two -- so fa's choices are a reasonable first reference for ps, which more often has to describe rather than name. ps is where a coined term is most likely and most needs flagging."
+  },
+  {
+   "id": "semitic",
+   "name": "Semitic",
+   "languages": ["ar", "he", "am"],
+   "tightness": "medium for ar/he, low for am",
+   "note": "ar and he share root morphology and often parallel technical coinages; both are RTL. am is Ethio-Semitic and far enough apart that a divergence is rarely signal -- it is listed so that a reviewer does not mistake distance for error."
+  },
+  {
+   "id": "no-sibling",
+   "name": "Served languages with no relative in this suite",
+   "languages": ["de", "tr", "zh", "id", "km", "my", "sw"],
+   "tightness": "n/a",
+   "note": "No cross-check is available from kinship, so these depend entirely on the glossary, the friction log and (for sw, km, my, am) native review. THIS IS WHERE UNCAUGHT ERRORS LIVE -- a term-centric sweep should weight them accordingly rather than treating all 26 as equally covered. de is the odd one: no relative here, but English is its close cousin, which is exactly why the eigenvalue calque bites hardest there ('Eigenwerte' is one closed space from 'Eigene Werte')."
+  }
+ ]
+}

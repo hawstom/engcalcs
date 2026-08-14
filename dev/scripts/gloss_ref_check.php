@@ -127,6 +127,41 @@ foreach ($syn as $key => $value) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------
+// SECOND CHECK: does every term NAMED in prefixToTermNames() actually exist in the glossary?
+//
+// Added 2026-08-14 after the near-miss that motivated it. prefixToTermNames()['lpn'] named
+// 'scenario' while glossary.json had no such term -- for how long, nobody knows. That name
+// silently delivered NOTHING to every lpn_ agent, and no check could see it: the pointer check
+// above only validates `gloss:` references written in $ec_lang_syn, and a prefix-map entry is not
+// a pointer. It surfaced only because a human happened to seed the term for another reason.
+//
+// This is the same silent-delivery class CLAUDE.md documents at length for prefixToTermNames() --
+// "payloads generate, --check says FRESH, the sprint runs, and the guards simply were never
+// delivered" -- and the documentation had been in place the whole time without preventing it,
+// which is the argument for a check rather than for reading more carefully.
+//
+// Duplicates are reported too: harmless to a sprint, but they mean two people wired the same term
+// and neither saw the other's.
+$mapErrors = [];
+$mapWarnings = [];
+foreach (prefixToTermNames() as $prefix => $names) {
+    $seen = [];
+    foreach ($names as $name) {
+        $lc = strtolower($name);
+        if (!isset($termsByName[$name]) && !isset($termsByName[$lc])) {
+            $mapErrors[] = "prefixToTermNames()['$prefix'] names '$name', which is not a term in "
+                . "glossary.json. It delivers nothing, silently, to every $prefix" . "_ agent.";
+        }
+        if (isset($seen[$lc])) {
+            $mapWarnings[] = "prefixToTermNames()['$prefix'] lists '$name' twice.";
+        }
+        $seen[$lc] = true;
+    }
+}
+$errors = array_merge($errors, $mapErrors);
+$warnings = array_merge($warnings, $mapWarnings);
+
 echo "gloss: pointers checked in " . basename(EN_LANG_FILE) . "\n";
 printf("  %d delivering, %d error(s), %d warning(s)\n\n", $ok, count($errors), count($warnings));
 
@@ -137,6 +172,11 @@ if ($verbose && $ok > 0) {
     echo "All other pointers resolve to a real term that is wired to their key's prefix.\n";
 }
 
+if ($mapErrors) {
+    echo "A term named in prefixToTermNames() but absent from glossary.json is invisible: nothing\n";
+    echo "warns, the payload still generates, and every agent for that prefix is simply never given\n";
+    echo "the guard. Add the term to glossary.json, or remove the name from the map.\n\n";
+}
 if ($errors) {
     echo "A gloss pointer that does not resolve is WORSE than no pointer: the synonyms it replaced\n";
     echo "are gone and nothing took their place. Fix the term name, or wire the prefix in\n";
