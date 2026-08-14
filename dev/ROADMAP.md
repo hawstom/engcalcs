@@ -530,9 +530,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
         needs first is *the range of what can be built*, and one example cannot show a range. A wall
         of working examples IS the worked example, at the scale this page actually operates at.
       - **Do not re-propose the hybrid.** It was declined on the merits, not deferred.
-      - One factual note he added, worth keeping because it is the nearest competitor's answer to
-        the same question: **epanet-js does put an empty Google Map behind its gallery of two.** So
-        the map-behind-gallery shape exists in the wild — and is exactly what he does not want.
+      - **What epanet-js actually does, stated precisely, because the imprecise version reads as
+        support for the hybrid and is not** (Tom, 2026-08-14): *"epanetjs doesn't have a project on
+        the map. All they have is a Google Map background on the screen behind their gallery of
+        two."* So the thing behind their gallery is a **decorative backdrop, not a network** —
+        nobody's worked example, nothing to click, nothing that becomes your document. That is the
+        opposite of the gallery-over-a-live-example hybrid proposed here, and it is consistent with
+        Tom's own rule: **it is not a map until a project is opened.**
+      - **This does leave a usable middle, and it is the one to build:** the map canvas may be
+        VISIBLE behind the gallery — empty, no project, no tabs — so the page still reads as a map
+        tool at a glance without pretending a document exists.
     - **THE LOG QUESTION IS CLOSED and the instrumentation is not needed for this.** Task 200's
       `first:` histogram was cited here as the evidence that should settle the empty-canvas
       question. Tom offered to pull it and asked which logs were wanted; the honest answer is that
@@ -562,6 +569,34 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     page would spend that word twice. "Scen." is an abbreviation of a word 26 languages do not
     abbreviate alike, and `layout: nav item` is the only thing that justifies compressing a label.
     **If Tom overrules this it is one string and one sprint key** — `lpn_scenario_overrides`.
+
+    **THE FULL OPTION SET, settled 2026-08-14 before the sprint so it is not re-litigated after 26
+    translations exist.** Tom raised five more candidates; every one was checked for a collision
+    inside this suite, because that is what killed "Local values":
+    - **"Active values" — the worst of them, and it looks the best.** `active` is ALREADY a
+      property of this very feature (`lpn_field_active`, the overridable boolean that carries the
+      whole topology-varies case). "Active values" and "In this network" would be the same word
+      meaning two unrelated things one popup apart.
+    - **"Present values" — collides with net present value**, in a tool whose users cost projects.
+    - **"Actual values" — the classic false friend, and Tom spotted it himself** by writing
+      *"Present (other language: Actual)"*. In Romance, Slavic and Germanic languages
+      *actual/actuel/aktuell/aktualny* means CURRENT, not REAL. An English reader gets "the real
+      ones"; a translator gets "the current ones". Two readings is a Wave 0 failure by definition —
+      and it is a reason to avoid BOTH halves of that pair, not to choose between them.
+    - **"Values here" — no collision, and the runner-up.** Declined only because "here" has no fixed
+      antecedent in a status strip: here could be the scenario, the element, or the map.
+    - **"Plan values" — the HEC-RAS evangelism idea, and Tom called its odds himself**: *"it's
+      probably not going to happen."* Agreed, and worth recording why rather than just declining.
+      HEC-RAS's "Plan" is the outlier; **WaterGEMS and InfoWater both say Scenario**, and Tom's own
+      word for it is *pervasive*. Shipping "scenario (plan)" would put TWO terms into 26 languages
+      for one concept, and `glossary.json`'s standing rule is to defer to each language's own
+      dominant term — which for this concept is a translation of *scenario*, not of *plan*.
+      Evangelising English usage is the one thing this suite's translation policy is built to not do.
+    - **The decisive argument for "Own values" is positional and none of the alternatives have it:
+      the antecedent is one word away on the same line.** The strip reads
+      `Scenario: Fire flow | Own values: 7`. "Own" refers back to "Scenario", visibly, so the label
+      never has to re-name the concept — which is exactly why it can afford to be the shortest and
+      plainest option on the list.
   - **The selector belongs at the BOTTOM, and may eventually want a row of its own.** Tom: *"I
     thought it would occupy the entire bottom. But if it can coexist with status items, maybe that's
     okay. But envision it possibly needing its own bottommost row."* It currently shares the map
