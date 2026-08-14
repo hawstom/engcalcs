@@ -249,6 +249,61 @@ r.section('regression: every radio combination is self-consistent');
 		'the safety factor still scales a calculated rock size');
 }
 
+// A CONVERGED ANSWER MUST NOT DEPEND ON WHERE YOU STARTED. This is the cleanest invariant in
+// this file: it needs no reference, no published table and no hand arithmetic -- an iteration
+// whose fixed point moves with the initial guess is simply not converged.
+//
+// It failed until 2026-08-14. `n_strickler` was computed ONCE before the loop and never again,
+// while its three siblings were recomputed every pass, so with Strickler (or B/B falling back to
+// it) plus any rock method the rock converged against a FROZEN roughness. The same channel settled
+// on 0.542 in from a typed 4 in, 0.376 in from 12 in and 0.298 in from 24 in. Tom had assumed
+// users would "play with numbers until they settle down", which is a fair assumption for a tool
+// driven by hand -- and precisely the assumption a harness exists to retire.
+r.section('regression: the converged answer is independent of the starting guess');
+
+for (const nr of ['strickler', 'bb']) {
+	const settled = [];
+	for (const guess of [2, 4, 12, 24, 60]) {
+		const q = loadCalculator('Manning-Trap.php', { lang: 'en' });
+		q.set({ d50_in: guess }).radio('n_radio', nr).radio('d50_radio', 'isbash').run();
+		settled.push({ guess: guess, d50: parseFloat(q.input('d50_in')), n: parseFloat(q.input('n_in')) });
+	}
+	const spreadD50 = Math.max(...settled.map(x => x.d50)) / Math.min(...settled.map(x => x.d50)) - 1;
+	const spreadN = Math.max(...settled.map(x => x.n)) / Math.min(...settled.map(x => x.n)) - 1;
+	r.ok(spreadD50 < 2e-3, `${nr} + Isbash: five starting guesses converge on one rock size`,
+		settled.map(x => `${x.guess}in->${x.d50.toFixed(4)}`).join('  '));
+	r.ok(spreadN < 2e-3, `${nr} + Isbash: and on one roughness`,
+		settled.map(x => x.n.toFixed(4)).join('  '));
+}
+
+// And the fixed point is the RIGHT one, from first principles rather than from the page's own
+// column: Strickler evaluated at the rock the loop settled on.
+{
+	const q = loadCalculator('Manning-Trap.php', { lang: 'en' });
+	q.radio('n_radio', 'strickler').radio('d50_radio', 'isbash').run();
+	const d50m = parseFloat(q.input('d50_in')) * 0.0254;       // in -> m
+	r.close(parseFloat(q.input('n_in')), Math.pow(d50m, 1 / 6) / 21.1, 3e-3,
+		'Strickler + Isbash: the settled n is d50^(1/6)/21.1 for the SETTLED d50');
+}
+
+// Every combination must actually reach its fixed point rather than run out of passes.
+{
+	let unconverged = [];
+	const q0 = loadCalculator('Manning-Trap.php', { lang: 'en' });
+	for (const nr of ['', 'strickler', 'pi', 'bb']) {
+		for (const dr of ['', 'isbash', 'maynord', 'searcy']) {
+			const res = q0.EngCalcs.Manning.mtc_iterate({
+				b: 4 / 3.2808, y: 2 / 3.2808, z1: 2, z2: 2, s0: 0.001,
+				n_radio: nr, n_in: 0.025, d50_radio: dr, d50_in: 4 * 0.0254,
+				d50_safety: 1.25, beta: 0, sgrock: 2.65
+			});
+			if (!res.converged) { unconverged.push(`${nr || '(none)'}/${dr || '(none)'}`); }
+		}
+	}
+	r.ok(unconverged.length === 0, 'all 16 combinations reach a fixed point inside the pass limit',
+		unconverged.join(', '));
+}
+
 // DEFECT 1's REAL HARM IS IN THE SOLVER, and that is where it PERSISTS.
 // On the main form the single-pass bug was self-healing: the pass wrote the new n back into the
 // roughness box, so the very next recalculation used it and the numbers corrected themselves.

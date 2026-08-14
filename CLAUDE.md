@@ -799,6 +799,18 @@ sees a sequence.** So when a harness finding cannot be reproduced by hand, the h
 on trial — and prefer invariants that survive the difference: *solve for a Q and the page must then
 show that Q* is unambiguous in a way that *"is v consistent with n right now"* was not.
 
+**A THIRD defect followed from the same file, and its test is the cheapest one here (Task 295).**
+`n_strickler` was computed once before the loop while its three siblings were recomputed every
+pass, so a rock size chosen by Strickler converged against a frozen roughness — and the answer
+depended on the number you happened to type first (0.542 in from 4 in, 0.298 in from 24 in, same
+channel). Tom's response is worth recording as a general principle: *"I assumed that people would
+play with numbers until they settle down. If you can make it better, please do."* **That assumption
+is reasonable for a hand-driven tool and is exactly the kind a harness exists to retire** — it
+works for the person who knows to do it and silently hands everyone else a defensible-looking wrong
+number. **So: an iteration whose fixed point moves with the initial guess is not converged, and
+asserting that costs nothing** — no reference, no published table, no hand arithmetic, just the
+same solve from several starting points.
+
 The invariant worth carrying anyway: **a coupled iteration's failure mode is a plausible number,
 and what catches it is asking whether the output is consistent with the input the page is
 showing.** That needs no reference, no published table and no judgement, and it is worth asking of

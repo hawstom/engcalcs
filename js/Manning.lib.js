@@ -38,6 +38,8 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 	var i = 0;
 	var d50_in = p.d50_in, n_in = p.n_in;
 	if (d50_in === 0) { d50_in = 0.1 * p.y; }
+	// Seed only. n_strickler is RECOMPUTED inside the loop from the current d50, alongside
+	// n_blodgett, n_bathurst and n_pi -- see the note there.
 	var n_strickler = Math.pow(d50_in, 1 / 6) / 21.1;
 	if (n_in === 0) { n_in = n_strickler; }
 	// WHICH LOOP IS RUNNING IS A PROPERTY OF THE RADIOS, and is decided once, here (fixed
@@ -84,6 +86,18 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 		q = v * a;
 		froude = v * Math.sqrt(t / (g * a * Math.cos(Math.atan(p.s0))));
 		tau = rh * p.s0;
+		// RECOMPUTED EVERY PASS, from the CURRENT d50 (fixed 2026-08-14). It used to be computed
+		// once before the loop and never again, while its three siblings below were recomputed
+		// every pass -- so with Strickler (or B/B falling back to it) plus any rock method, the
+		// rock size converged against a FROZEN roughness and the loop never actually coupled. The
+		// symptom was that the converged answer depended on the starting guess: the same channel
+		// settled on 0.542 in from a typed 4 in, 0.376 in from 12 in and 0.298 in from 24 in.
+		// Tom, 2026-08-14: *"I assumed that people would play with numbers until they settle
+		// down."* -- a fair assumption for a tool driven by hand, and one worth retiring now that
+		// dev/calc-spike/mtc-harness.js can assert the answer no longer depends on where you start.
+		// Harmless where nothing moves: with no rock radio d50 is constant, so this is the same
+		// value every pass.
+		n_strickler = Math.pow(d50_in, 1 / 6) / 21.1;
 		n_blodgett = alpha_blodgett * Math.pow(da, 1 / 6) / (2.25 + 5.23 * Math.log10(da / d50_in));
 		n_bathurst = EngCalcs.Manning.bathurst_n(alpha_bathurst, g, t, da, d50_in, froude);
 		rh_ft = rh * ft_per_m;

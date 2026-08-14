@@ -1754,6 +1754,39 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|295| **[DONE 2026-08-14] Manning Trap Channel's roughness/rock iteration converged on a
+  different answer depending on where you started.** Third defect in `mtc_iterate`, found by
+  `dev/calc-spike/mtc-harness.js` (Task 292) while fixing the first two, and fixed with Tom's
+  go-ahead: *"I assumed that people would play with numbers until they settle down. If you can make
+  it better, please do."*
+  - **`n_strickler` was computed ONCE before the loop and never again**, while its three siblings
+    (`n_blodgett`, `n_bathurst`, `n_pi`) were recomputed every pass. So with Strickler — or B/B
+    falling back to Strickler — plus any rock method, the rock size converged against a **frozen**
+    roughness and the two loops never actually coupled. Same channel, same settings, five starting
+    guesses, five different answers:
+
+    | typed d50 | 2 in | 4 in | 12 in | 24 in | 60 in |
+    |---|---|---|---|---|---|
+    | settled on (before) | 0.683 in | 0.542 in | 0.376 in | 0.298 in | 0.220 in |
+    | settled on (after) | 0.894 in | 0.894 in | 0.894 in | 0.894 in | 0.894 in |
+
+  - **The assumption was reasonable and it is the kind a harness exists to retire.** Playing with
+    numbers until they settle is exactly what a person does with a hand-driven tool, and it works —
+    it just cannot be relied on, cannot be taught to a first-time visitor, and silently produces a
+    defensible-looking number for anyone who does not do it. An iteration whose fixed point moves
+    with the initial guess is not converged.
+  - **Fix: recompute `n_strickler` inside the loop from the current d50**, alongside the other
+    three. The pre-loop value is kept purely as the seed for a user who types n = 0. Harmless where
+    nothing moves — with no rock radio d50 is constant, so it is the same value every pass.
+  - **Scope, measured across all 16 roughness × rock-size combinations:** only the Strickler-plus-a-
+    rock-method rows moved, which is exactly the intended set. P&I rows, B/B rows at submergences
+    that select Blodgett, and every no-rock-radio row are byte-identical to before.
+  - **The regression test needs no reference at all**, which makes it the cleanest assertion in the
+    file: five starting guesses must converge on one rock size and one roughness; the settled n
+    must equal `d50^(1/6)/21.1` for the **settled** d50; and all 16 combinations must reach a fixed
+    point inside the pass limit. Mutation-tested — re-freezing `n_strickler` turns exactly those
+    three red.
+
 - 0|294| **[DONE 2026-08-14] Two real defects in Manning Trap Channel, both in `mtc_iterate`'s
   loop-exit condition, both invisible from the page.** Found by `dev/calc-spike/mtc-harness.js`
   (Task 292) within an hour of the harness existing, while checking a question Tom asked about the
