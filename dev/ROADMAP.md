@@ -2018,8 +2018,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     sight: *"mi should no longer have any d50 keys."* Removed from the 27 lang files and from
     `english_string_hashes.json`. **The glossary's `median rock size` research note is KEPT** — it
     is a dated record of a 2026-07-13 cross-language pass that also covers `rc_D50`, which still
-    ships, so deleting it would throw away research still in use. The `mi` wiring in
-    `prefix_terms.inc.php` also stays: `mi_notes_2` still discusses rock lining.
+    ships, so deleting it would throw away research still in use.
+  - **D50 has three owners and `mi` is not one of them.** Tom, confirming: *"mtc needs and has D50
+    too. Keep. But not mi."* Verified intact and untouched — six `mtc_d50_*` keys, all rendered in
+    `Manning-Trap.php`, all 27 files, plus `rc_D50`. Only `mi_d50in` went.
+  - `median rock size` also unwired from `mi` in `prefix_terms.inc.php`, which follows from the same
+    ruling: `mi_` now has no rock-sizing key at all, and `mi_notes_2_def` sends the reader to the
+    Manning Trapezoidal calculator for rock lining — so the concept was being shipped to `mi_`
+    translators as context for a decision they no longer make. Still wired to `mtc`, `rc`, `rrc`.
 
 - 0|297| **[DONE 2026-08-13] ONE sprint cleared the whole standing translation backlog.** 26
   Sonnet agents, one per language, all launched at once. Final size 364 strings, not the 442

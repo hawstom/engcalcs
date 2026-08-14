@@ -25,7 +25,12 @@ function prefixToTermNames(): array
         // mtc_d50_in, both rock-lining concepts, and both were pointing at glossary entries that
         // could not reach an agent from here. Found by gloss_ref_check.php.
         'mtc' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope', 'specific gravity', 'median rock size'],
-        'mi' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope', 'irregular channel', 'median rock size'],
+        // 'median rock size' REMOVED 2026-08-13 with mi_d50in. Tom: "mtc needs and has D50 too.
+        // Keep. But not mi." mi_ now has no rock-sizing key at all -- mi_notes_2_def sends the
+        // reader to the Manning Trapezoidal calculator for rock lining -- so shipping the concept
+        // to mi_ translators was context for a decision they no longer make. mtc and rc still
+        // carry it, and the glossary entry itself is untouched.
+        'mi' => ['flow', 'velocity', 'hydraulic radius', 'wetted perimeter', 'Manning roughness', 'slope', 'irregular channel'],
         'wfs' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
         'wfi' => ['flow', 'weir', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
         'ws' => ['flow', 'weir', 'head', 'headwater elevation', 'tailwater elevation', 'discharge coefficient'],
