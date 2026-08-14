@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='Kichwa Kidogo cha Kuchapishwa';
 $ec_lang['consent_body']='Je, tunaweza kuhifadhi tarakimu moja kwa kila ukurasa katika hifadhi ya kivinjari hiki, ili kuzuia kurekodi matembezi yake mara kwa mara?';
 $ec_lang['consent_accept']='Kubali hili';
 $ec_lang['consent_accept_all']='Kubali siku zote';
-$ec_lang['consent_decline']='Kataa';
+$ec_lang['consent_decline']='Kataa siku zote';
 $ec_lang['consent_current_granted']='Ulikubali hili. Tunapunguza urekodiaji kwa kivinjari hiki.';
 $ec_lang['consent_current_denied']='Ulikataa hili. Hatuhifadhi chochote cha kupunguza urekodiaji kwa kivinjari hiki.';
 $ec_lang['consent_region_label']='Chaguo lako kuhusu kupunguza urekodiaji.';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='Onyesho';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Mipangilio';
+$ec_lang['lpn_menu_help']='Msaada';
+$ec_lang['lpn_help_walkthroughs']='Mafunzo';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,16 @@ $ec_lang['lpn_labels_decimals_tip']='Idadi ya tarakimu za desimali zinazoonyeshw
 $ec_lang['lpn_labels_mark_extrema']='Weka alama thamani za juu na za chini kabisa';
 $ec_lang['lpn_field_id']='Kitambulisho';
 $ec_lang['lpn_backdrop_menu']='Picha ya Nyuma…';
-$ec_lang['lpn_backdrop_add']='Ongeza picha';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='Weka kipimo cha picha';
-$ec_lang['lpn_backdrop_position']='Hamisha picha';
-$ec_lang['lpn_backdrop_remove']='Ondoa picha';
+$ec_lang['lpn_backdrop_add']='Ongeza';
+// BARE VERBS -- the "Background image..." heading above them now carries the object, so the word
+// "picha" (image) is not repeated in each command. See lang.ec.en.php for the full 2026-08-13 note.
+$ec_lang['lpn_backdrop_scale']='Weka kipimo kwa kubofya';
+$ec_lang['lpn_backdrop_scale_entry']='Weka kipimo kwa faili la kuratibu za picha au ukubwa wa pikseli moja kwenye ramani';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Andika ukubwa wa pikseli moja kwenye ramani, au bandika maudhui yote ya faili la kuratibu za picha';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Andika nambari moja kwa ukubwa wa pikseli moja kwenye ramani, au bandika mistari yote sita ya faili la kuratibu za picha.';
+$ec_lang['lpn_backdrop_wld_bad']='Faili hili la kuratibu za picha linazungusha, linaakisi, au kunyoosha picha kwa viwango visivyo sawa. Ramani inaweza tu kuhamisha picha na kubadilisha ukubwa wake kwa kiwango sawa pande zote mbili, hivyo faili halikutumika.';
+$ec_lang['lpn_backdrop_position']='Hamisha';
+$ec_lang['lpn_backdrop_remove']='Ondoa';
 $ec_lang['lpn_backdrop_remove_confirm']='Ondoa picha ya nyuma?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Bofya vituo viwili kwenye picha ya nyuma, kama ncha mbili za kipimo cha mstari (bar scale). Kisha andika umbali halisi kati yake.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Umbali halisi kati ya vituo hivyo viwili';
