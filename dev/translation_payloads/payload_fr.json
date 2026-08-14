@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 920,
-        "delta_key_count": 3,
+        "expected_key_count": 922,
+        "delta_key_count": 5,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_depthFrac",
@@ -340,13 +340,17 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_engine_fetching": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
-        "lpn_engine_ready": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
+        "lpn_engine_fetching": "Getting the EPANET solver. It is downloaded once and then kept on this device, so it works offline afterwards.",
+        "lpn_engine_ready": "The EPANET solver is on this device now, and works offline.",
+        "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
+        "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
         "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
     },
     "keys": {
-        "lpn_engine_fetching": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
-        "lpn_engine_ready": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
+        "lpn_engine_fetching": "Getting the EPANET solver. It is downloaded once and then kept on this device, so it works offline afterwards.",
+        "lpn_engine_ready": "The EPANET solver is on this device now, and works offline.",
+        "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
+        "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
         "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
     },
     "key_context": {
@@ -367,6 +371,38 @@
             }
         },
         "lpn_engine_ready": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_unreachable",
+                    "value": "Ces nœuds n'ont aucun chemin vers un réservoir :",
+                    "english": "These nodes have no path to a reservoir:"
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_needs_epanet",
+                    "value": "Ces vannes s'ouvrent et se ferment d'elles-mêmes, et seul le solveur EPANET peut les calculer. Le solveur EPANET n'a pas pu être chargé, donc ces résultats sont manquants :",
+                    "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_engine_fetching_valve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_diag_unreachable",
+                    "value": "Ces nœuds n'ont aucun chemin vers un réservoir :",
+                    "english": "These nodes have no path to a reservoir:"
+                },
+                "next_translated": {
+                    "key": "lpn_diag_valve_needs_epanet",
+                    "value": "Ces vannes s'ouvrent et se ferment d'elles-mêmes, et seul le solveur EPANET peut les calculer. Le solveur EPANET n'a pas pu être chargé, donc ces résultats sont manquants :",
+                    "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_engine_ready_valve": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

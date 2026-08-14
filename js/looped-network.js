@@ -8263,7 +8263,7 @@ var EngCalcs = EngCalcs || {};
 			settings.engine = engInput.checked ? 'epanet' : 'native';
 			// Fetch it now rather than on the next solve: the user just asked for this engine, so
 			// this is the moment to spend the 664 KB and the moment they will understand the wait.
-			if (settings.engine === 'epanet') { warmEpanetEngine(); }
+			if (settings.engine === 'epanet') { warmEpanetEngine('engine'); }
 			scheduleSolve();
 		});
 		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET engine', engInput, pc.lpn_settings_engine_epanet_tip);
@@ -8965,7 +8965,7 @@ var EngCalcs = EngCalcs || {};
 			// The moment an active type is chosen is the moment the 664 KB engine becomes necessary,
 			// and the moment the user is most likely to still be online. See warmEpanetEngine().
 			if (EngCalcs.lpnValveIsNative && !EngCalcs.lpnValveIsNative({ type: 'valve', valveType: v })) {
-				warmEpanetEngine();
+				warmEpanetEngine('valve');
 			}
 			// RE-SEEDED, NOT CARRIED ACROSS. The old number was a pressure, a flow or a loss
 			// coefficient, and none of the three means anything as one of the other two -- 60 psi
@@ -9747,18 +9747,21 @@ var EngCalcs = EngCalcs || {};
 	// gap between choosing a valve type and the solve firing is exactly where a phone drops its
 	// connection, and the solve's own failure message arrives after the user has moved on.
 	var epanetWarmState = 'cold';   // cold | warming | ready | unavailable
-	function warmEpanetEngine() {
-		var pc = EngCalcs.pageConfig || {};
+	// `why` is 'valve' or 'engine'. THE SAME FETCH HAS TWO REASONS and one message cannot be true of
+	// both: Tom turned the solver on and was told about valves he had not created (2026-08-14).
+	function warmEpanetEngine(why) {
+		var pc = EngCalcs.pageConfig || {},
+			suffix = (why === 'valve') ? '_valve' : '';
 		if (!EngCalcs.lpnEpanetLoad) { return; }
 		// 'unavailable' is retried on purpose -- the engine load no longer caches a failure
 		// (js/lpn-epanet.js), so a user who was offline a moment ago gets another attempt the next
 		// time they touch a valve, which is the moment they care.
 		if (epanetWarmState === 'warming' || epanetWarmState === 'ready') { return; }
 		epanetWarmState = 'warming';
-		setNotice(pc.lpn_engine_fetching || 'Getting the EPANET solver, so this valve can be worked out now and offline later.');
+		setNotice(pc['lpn_engine_fetching' + suffix] || 'Getting the EPANET solver.');
 		EngCalcs.lpnEpanetLoad().then(function () {
 			epanetWarmState = 'ready';
-			setNotice(pc.lpn_engine_ready || 'The EPANET solver is on this device now. Valves that open and close on their own will work offline.');
+			setNotice(pc['lpn_engine_ready' + suffix] || 'The EPANET solver is on this device now, and works offline.');
 		}, function () {
 			epanetWarmState = 'unavailable';
 			setNotice(pc.lpn_engine_unavailable || 'Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.');
@@ -9770,7 +9773,7 @@ var EngCalcs = EngCalcs || {};
 	function warmEpanetIfNeeded() {
 		if (!EngCalcs.lpnEpanetOnlyValves) { return; }
 		try {
-			if (EngCalcs.lpnEpanetOnlyValves(assembleModel()).length > 0) { warmEpanetEngine(); }
+			if (EngCalcs.lpnEpanetOnlyValves(assembleModel()).length > 0) { warmEpanetEngine('valve'); }
 		} catch (e) { /* a half-built document is not a reason to shout */ }
 	}
 

@@ -1543,8 +1543,14 @@ $ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir:';
 // and the point of all three is the SECOND half of each sentence: the fetch happens once and then
 // the network works offline. A message that only said "downloading" would explain the wait without
 // explaining why it is worth it.
-$ec_lang['lpn_engine_fetching']='Getting the EPANET solver, so this valve can be worked out now and offline later.';
-$ec_lang['lpn_engine_ready']='The EPANET solver is on this device now. Valves that open and close on their own will work offline.';
+// TWO PAIRS, because the same fetch has two reasons and one message cannot be true of both.
+// Tom turned the solver ON and was told about VALVES he had not created (2026-08-14). The valve
+// pair is right when a valve triggered the fetch; the plain pair is right when the user simply
+// chose the solver.
+$ec_lang['lpn_engine_fetching']='Getting the EPANET solver. It is downloaded once and then kept on this device, so it works offline afterwards.';
+$ec_lang['lpn_engine_ready']='The EPANET solver is on this device now, and works offline.';
+$ec_lang['lpn_engine_fetching_valve']='Getting the EPANET solver, so this valve can be worked out now and offline later.';
+$ec_lang['lpn_engine_ready_valve']='The EPANET solver is on this device now. Valves that open and close on their own will work offline.';
 $ec_lang['lpn_engine_unavailable']='Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.';
 $ec_lang['lpn_diag_valve_needs_epanet']='These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:';
@@ -1769,7 +1775,14 @@ $ec_lang['lpn_settings_tolerance']='Convergence tolerance';
 $ec_lang['lpn_settings_tolerance_tip']='How close the solver has to get before it stops. A smaller number is more exact and takes longer.';
 $ec_lang['lpn_settings_engine_epanet']='Solve with the EPANET solver';
 $ec_lang_syn['lpn_settings_engine_epanet']='';
-$ec_lang['lpn_settings_engine_epanet_tip']='Runs the EPANET solver from the US EPA, here in your browser. The built-in solver gives the same answers and is faster, so leave this off unless you need EPANET itself.';
+// "IS FASTER" WAS FALSE AND IS GONE (Tom, 2026-08-14: *"is our tip about 'faster' right? I
+// thought you proved that it's too close to call."* He is right, and it was my own measurement
+// that showed it). Task 313 timed both: at this page's 10-20 node target the built-in solver is
+// 0.30 ms against EPANET's 0.41 ms -- the same number to a person -- and at 201 nodes EPANET is
+// TEN TIMES faster, because ours is a dense O(n^3) Cholesky and EPANET is sparse. So the honest
+// trade is not speed at all: it is the one-time download, which is the thing a visitor on a slow
+// connection actually pays.
+$ec_lang['lpn_settings_engine_epanet_tip']='Runs the EPANET solver from the US EPA, here in your browser. Both solvers give the same answers, and on a network this size you will not see a speed difference. The first time you turn this on, about 650 KB is downloaded and then kept on this device.';
 $ec_lang_syn['lpn_settings_engine_epanet_tip']='';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang_syn['lpn_engine_loading']='';
