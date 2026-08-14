@@ -2657,6 +2657,10 @@ var EngCalcs = EngCalcs || {};
 		setStatus('');
 		setMode('select');
 		refreshMapStatus();   // units belong to the project now, so switching projects can change this
+		// The friction method belongs to the project too (Task 271), so opening one has to re-apply
+		// the roughness unit selector's visibility -- otherwise a Darcy-Weisbach project opened
+		// after a Hazen-Williams one shows a roughness length with no unit named anywhere.
+		applyMethodUI();
 		zoomExtent();
 		scheduleSolve();
 		renderTabs();
@@ -6049,6 +6053,20 @@ var EngCalcs = EngCalcs || {};
 			if (!window.confirm(pc.lpn_confirm_example || 'This adds the example to the network you already have. Continue?')) { return; }
 		}
 		saveUndoSnapshot();
+		// THE EXAMPLE FORCES HAZEN-WILLIAMS (ROADMAP Task 271), for the same reason it forces its
+		// units. Its pipe roughness is 130 -- an HW C. newProject() INHERITS settings from the
+		// project you were in, so once the friction method became switchable, a visitor sitting on
+		// Manning who chose Example got a ring main whose every pipe carried n = 130: a roughness
+		// four orders of magnitude out, converging happily to nonsense, with nothing on screen to
+		// say why. Tom's rule for units is exactly the rule here -- *"We never create an example
+		// based on the current units... We should force the units we want and label thusly."*
+		//
+		// This is the one place the method is set without asking, and it is safe precisely because
+		// it is not a switch: the network is being CREATED at this instant, so there are no
+		// already-typed roughness numbers for it to invalidate. Contrast the settings-panel select,
+		// which must confirm.
+		settings.method = 'hw';
+		applyMethodUI();
 		// THIS FUNCTION DELIBERATELY DOES NOT TOUCH settings.textSize. It did, briefly, because
 		// raising defaultSettings().textSize to 20 reaches only a first-time visitor -- a returning
 		// one carries their stored value through loadFromStorage()'s
@@ -6729,6 +6747,66 @@ var EngCalcs = EngCalcs || {};
 		if (m === 'manning') { return pc.bpn_method_manning || 'Manning'; }
 		return pc.bpn_method_hw || 'Hazen-Williams';
 	}
+	// ---- ROUGHNESS IS THREE DIFFERENT QUANTITIES WEARING ONE FIELD (ROADMAP Task 271) ----
+	//
+	// Manning n and Hazen-Williams C are dimensionless; Darcy-Weisbach roughness height e is a
+	// LENGTH. bpn_ solved this years ago with one column whose symbol and units follow the method
+	// (bpnUpdateMethodUI()), and this is deliberately the same design rather than a second one:
+	// three separate fields would mean three stored properties, three defaults, and a document that
+	// remembers two numbers nobody can see.
+	//
+	// The symbols n / C / e are NOT translated and match bpn_'s exactly. CLAUDE.md's `symbol` rule:
+	// a variable letter keeps its letters in every language. Using "e" rather than the prettier
+	// Greek epsilon is a consistency call -- the same quantity must not be called two things in two
+	// calculators of the same suite.
+	function roughnessSymbol() {
+		var m = frictionMethod();
+		return m === 'manning' ? 'n' : m === 'dw' ? 'e' : 'C';
+	}
+	// "Roughness, C" -- the same shape as lpn_field_km's "Minor (local) loss coefficient, k", so the
+	// translated word carries the meaning and the untranslated letter carries the identity.
+	function roughnessLabel() {
+		var pc = EngCalcs.pageConfig || {};
+		return (pc.lpn_field_roughness || 'Roughness') + ', ' + roughnessSymbol();
+	}
+	// Under Hazen-Williams the page keeps its own HW-specific tip, which is more useful than a
+	// generic one ("about 150 for new plastic, 130 for new steel"). Under the other two it borrows
+	// bpn_roughness_tip, which names all three methods' roughness in one already-translated string.
+	// Both keys stay live and no new key is created.
+	function roughnessTip() {
+		var pc = EngCalcs.pageConfig || {};
+		return frictionMethod() === 'hw'
+			? pc.lpn_field_roughness_tip
+			: (pc.bpn_roughness_tip || pc.lpn_field_roughness_tip);
+	}
+	// The declared roughness as the SOLVER wants it. Dimensionless for Manning/HW, so the number
+	// passes through untouched; a length for Darcy-Weisbach, so it crosses the same unit boundary
+	// every other quantity does (Task 263: the document stores what was typed, the handoff
+	// converts). js/lpn-solver.js hands this straight to lpnDwFriction(q, d, roughness, visc),
+	// where d is already SI metres -- so e MUST be metres too or the relative roughness e/d is
+	// wrong by the unit factor, silently and in a direction nothing else would reveal.
+	function roughnessSI(l) {
+		var r = effective(l, 'roughness');
+		return frictionMethod() === 'dw' ? toSI(r, 'lpn_u_roughness') : r;
+	}
+	// Typical roughness for a method, in the unit the roughness field is currently showing. Used
+	// only for settings.defaults.roughness when the method changes -- never to rewrite an existing
+	// pipe, per the Default inputs section's own "future, not retroactive" rule.
+	// C = 130 and n = 0.013 are dimensionless. e = 0.0015 m (0.15 mm, commercial steel) is a
+	// length, so it is scaled into the displayed unit exactly as niceDefault() does.
+	function defaultRoughnessFor(method) {
+		if (method === 'manning') { return 0.013; }
+		if (method === 'dw') { return +(0.0015 * unitFactor('lpn_u_roughness')).toPrecision(3); }
+		return 130;
+	}
+	// The roughness unit selector is the one unit control on this page that is conditional: it is
+	// meaningless under Manning and Hazen-Williams, where the number has no units at all. Hidden
+	// rather than removed, so the select keeps its unit family and stays visible to the us/si
+	// preset buttons (CLAUDE.md: a select with no family is invisible to the presets).
+	function applyMethodUI() {
+		var row = document.getElementById('lpn_u_roughness_row');
+		if (row) { row.style.display = frictionMethod() === 'dw' ? '' : 'none'; }
+	}
 	// The bottom-right map overlay: the few facts you need in order to read the numbers on the map at
 	// all. Map labels are bare numbers by design (Tom, 2026-07-30 -- "no units and no prefix"), which
 	// is right for the drawing and left a first-time visitor no way to tell gpm from l/s. They get US
@@ -6897,7 +6975,10 @@ var EngCalcs = EngCalcs || {};
 			// results), rather than appended at the end -- inputs-then-results is the order the
 			// existing list already follows, and Tom left the placement open ("do something and we
 			// can change later"), so this follows the pattern already there.
-			['roughness', pc.lpn_field_roughness || 'Roughness'], ['km', pc.lpn_field_km_short || 'Minor loss, k'],
+			// Carries the method's symbol like every other roughness label (Task 271) -- the Labels
+			// popover is the map's only legend, so "Roughness" alone would leave the map's numbers
+			// unattributed to a method.
+			['roughness', roughnessLabel()], ['km', pc.lpn_field_km_short || 'Minor loss, k'],
 			['flow', pc.lpn_result_flow || 'Flow'],
 			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss'],
 			['gradient', pc.lpn_result_gradient || 'Head loss gradient']
@@ -7255,7 +7336,9 @@ var EngCalcs = EngCalcs || {};
 		defaultRow(defBody, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter', 'diameter', positive);
 		// Roughness and K are dimensionless, so no unit factor and no unit in the label -- same
 		// reasoning as refreshLabelText()'s plainRound() treatment of these two fields.
-		defaultRow(defBody, pc.lpn_field_roughness || 'Roughness', null, 'roughness', positive);
+		// unitId is the roughness selector under Darcy-Weisbach (e is a length) and null otherwise
+		// (n and C are dimensionless) -- the one row here whose units depend on another setting.
+		defaultRow(defBody, roughnessLabel(), frictionMethod() === 'dw' ? 'lpn_u_roughness' : null, 'roughness', positive);
 		// No Length row, deliberately (Tom, 2026-07-30): lenAuto derives a pipe's length from the
 		// drawn geometry, so any default here would be overwritten the moment the pipe is drawn.
 		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, k', null, 'k', nonNegative);
@@ -7284,7 +7367,7 @@ var EngCalcs = EngCalcs || {};
 				applies: function (n) { return n.type !== 'reservoir'; }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },
 			{ key: 'diameter', group: 'link', field: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },
-			{ key: 'roughness', group: 'link', field: 'roughness', label: pc.lpn_field_roughness || 'Roughness',
+			{ key: 'roughness', group: 'link', field: 'roughness', label: roughnessLabel(),
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },
 			{ key: 'k', group: 'link', field: 'km', label: pc.lpn_field_km || 'Minor (local) loss coefficient, k',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } }
@@ -7477,6 +7560,62 @@ var EngCalcs = EngCalcs || {};
 		// close enough -- and "solver" is jargon for the internals, while what the user is choosing
 		// is the arithmetic they get.
 		var compBody = section('computation', pc.lpn_settings_computation || 'Computation');
+		// ---- friction method (ROADMAP Task 271) ----
+		// FIRST row in Computation, above tolerance and the engine toggle, because it is the only
+		// one of the three that changes the ANSWER's physics rather than how precisely or by whose
+		// code it is reached. It lives under "Project settings" (the heading above) and not
+		// "Calculator settings": the method decides what every roughness number in this document
+		// MEANS, so it belongs to the document, exactly as the units do.
+		//
+		// Every label is borrowed from bpn_ -- bpn_method, bpn_method_hw/_dw/_manning are already
+		// translated everywhere this page is, so the control costs no new keys.
+		var methodSelect = document.createElement('select');
+		[
+			['hw', pc.bpn_method_hw || 'Hazen-Williams'],
+			['dw', pc.bpn_method_dw || 'Darcy-Weisbach'],
+			['manning', pc.bpn_method_manning || 'Manning']
+		].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			if (o[0] === frictionMethod()) { opt.selected = true; }
+			methodSelect.appendChild(opt);
+		});
+		methodSelect.addEventListener('change', function () {
+			var was = frictionMethod(), now = methodSelect.value;
+			if (was === now) { return; }
+			// SWITCHING METHOD DOES NOT CONVERT ANYTHING, and on a network that already has pipes
+			// that is worth saying out loud. C = 130 read as Manning n is not a rough answer, it is
+			// nonsense by four orders of magnitude -- and unlike a unit switch, nothing on screen
+			// changes to show it happened except one letter in a label. Tom, on this exact risk:
+			// "being unaware of those on a new project (model) is dangerous."
+			//
+			// This is the same principle as the suite-wide ban on converting inputs when units
+			// switch (CLAUDE.md, Unit Sets): the stored number is what the user typed. The
+			// difference is only that here we ASK first, because there is no unit strip to make the
+			// change self-evident afterwards.
+			if (doc.links.some(function (l) { return l.type !== 'pump'; })) {
+				if (!confirm(pc.lpn_method_switch_confirm
+					|| 'Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?')) {
+					methodSelect.value = was;
+					return;
+				}
+			}
+			settings.method = now;
+			// The DEFAULT follows the method -- future elements only, never existing ones, per the
+			// Default inputs section's own stated rule. Without this, a user who switches to Manning
+			// and draws a pipe gets C = 130 as an n.
+			settings.defaults.roughness = defaultRoughnessFor(now);
+			applyMethodUI();
+			saveToStorage();
+			// Rebuild rather than patch: the roughness row's LABEL and its unit both changed, and so
+			// did this select's own read of frictionMethod(). refreshPopupIfOpen() catches an open
+			// element popup showing the old symbol.
+			rebuildSettingsFields();
+			refreshPopupIfOpen();
+			refreshMapStatus();
+			scheduleSolve();
+		});
+		row(compBody, pc.bpn_method || 'Friction method', methodSelect, pc.bpn_roughness_tip);
 		// ---- Calculator settings (Task 289) ----
 		// Built HERE, before `tail`, purely for DOM order: headings and sections append to `fields`
 		// as they are called, and the actions in `tail` must stay last.
@@ -7993,8 +8132,11 @@ var EngCalcs = EngCalcs || {};
 		} else {
 			unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
 				function () { return effective(l, 'diameter'); }, function (v) { l._diameter = v; });
-			numberFieldPlain(fields, pc.lpn_field_roughness || 'Roughness', effective(l, 'roughness'),
-				function (v) { l._roughness = v; }, pc.lpn_field_roughness_tip);
+			// Label, symbol and tip all follow settings.method (Task 271). Under Darcy-Weisbach the
+			// unit is named too, because e is a length and the bare number would be ambiguous.
+			numberFieldPlain(fields,
+				roughnessLabel() + (frictionMethod() === 'dw' ? ' (' + unitLabel('lpn_u_roughness') + ')' : ''),
+				effective(l, 'roughness'), function (v) { l._roughness = v; }, roughnessTip());
 			// Minor (local) loss coefficient, k_m -- dimensionless, so no unit conversion (same as
 			// Roughness above). Defaults from settings.defaults.k at creation (addLink()); editable
 			// per-pipe here, same pattern as every other pipe property. Plain-text wording only
@@ -8250,7 +8392,7 @@ var EngCalcs = EngCalcs || {};
 				id: l.id, type: l.type, from: l.from, to: l.to,
 				// roughness (Hazen-Williams C) and k are dimensionless, so they cross this boundary
 				// unchanged -- the same reason they use rawLine() rather than numLine() on the map.
-				diameter: toSI(effective(l, 'diameter') || 0, 'lpn_u_diameter'), roughness: effective(l, 'roughness'),
+				diameter: toSI(effective(l, 'diameter') || 0, 'lpn_u_diameter'), roughness: roughnessSI(l),
 				length: linkLengthSI(l), status: effective(l, 'status'), k: effective(l, 'k'),
 				h0: l.h0, a: l.a, b: l.b
 			};

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hr",
-        "expected_key_count": 860,
-        "delta_key_count": 2,
+        "expected_key_count": 861,
+        "delta_key_count": 3,
         "exempt_key_count": 17,
         "exempt_keys": [
             "calc_units_us",
@@ -294,14 +294,32 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_method_switch_confirm": "Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?",
         "lpn_field_closed": "Closed",
         "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
     },
     "keys": {
+        "lpn_method_switch_confirm": "Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?",
         "lpn_field_closed": "Closed",
         "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
     },
     "key_context": {
+        "lpn_method_switch_confirm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_auto",
+                    "value": "Automatski",
+                    "english": "Auto"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Množitelj veličine",
+                    "english": "Size multiplier"
+                }
+            }
+        },
         "lpn_field_closed": {
             "reason": "missing",
             "current_value": null,

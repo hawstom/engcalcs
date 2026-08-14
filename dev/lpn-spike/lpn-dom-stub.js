@@ -111,13 +111,21 @@ function setUnitSet(which) {
   mkUnitSelect('lpn_u_flow', 'flow_node', [['lps', 1000], ['gpm', 1 / GPM]], us ? 'gpm' : 'lps');
   mkUnitSelect('lpn_u_velocity', 'velocity', [['mps', 1], ['ftps', 1 / FT]], us ? 'ftps' : 'mps');
   mkUnitSelect('lpn_u_gradient', 'gradient', [['gradePercent', 100], ['grade', 1]], 'gradePercent');
+  // Darcy-Weisbach roughness height e (ROADMAP Task 271) -- family `roughness`, which lib/Units.lib.php
+  // aliases to $u_distance (m/mm/ft/in), us => ft, si => mm. Conditional in the PAGE (shown only
+  // under Darcy-Weisbach) but unconditional here: applyMethodUI() hides the row, and a stub that
+  // withheld the select would make that hiding untestable.
+  mkUnitSelect('lpn_u_roughness', 'roughness', [['m', 1], ['mm', 1000], ['ft', 1 / FT], ['in', 1 / IN]], us ? 'ft' : 'mm');
+  // The wrapper applyMethodUI() shows and hides. Created here so every harness has it, since it is
+  // part of the units strip's markup rather than of any one test.
+  ensure('lpn_u_roughness_row');
 }
-// The two presets exactly as lib/Units.lib.php declares them for the seven families this page owns.
+// The two presets exactly as lib/Units.lib.php declares them for the eight families this page owns.
 // EngCalcs.unitSets is emitted by echoUnitsRow() in the browser; unitSetName() compares the strip
 // against it, so the harness needs the real mapping, not a placeholder.
 const LPN_UNIT_PRESETS = {
-  us: { distance_site: 'ft', total_head: 'fth2o', partial_head: 'psi', distance_small: 'in', flow_node: 'gpm', velocity: 'ftps', gradient: 'gradePercent' },
-  si: { distance_site: 'm', total_head: 'mh2o', partial_head: 'mh2o', distance_small: 'mm', flow_node: 'lps', velocity: 'mps', gradient: 'gradePercent' }
+  us: { distance_site: 'ft', total_head: 'fth2o', partial_head: 'psi', distance_small: 'in', flow_node: 'gpm', velocity: 'ftps', gradient: 'gradePercent', roughness: 'ft' },
+  si: { distance_site: 'm', total_head: 'mh2o', partial_head: 'mh2o', distance_small: 'mm', flow_node: 'lps', velocity: 'mps', gradient: 'gradePercent', roughness: 'mm' }
 };
 
 global.document = {

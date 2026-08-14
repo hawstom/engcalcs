@@ -1536,6 +1536,7 @@ $ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a text lab
 $ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on the map.';
 $ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
+$ec_lang['lpn_method_switch_confirm']='Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?';
 $ec_lang['lpn_field_closed']='Closed';
 $ec_lang['lpn_field_closed_tip']='Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.';
 $ec_lang['lpn_field_x']='X';

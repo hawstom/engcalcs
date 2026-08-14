@@ -76,9 +76,15 @@ echoHeader("EngCalcs", $html_title, "");
 	      // same energy scale, and letting them diverge would make elev+pressure-head arithmetic
 	      // meaningless. Pressure and Velocity have no INPUT field (they're solve results,
 	      // canonically shown in the property popups per Tom, 2026-07-30), but the selectors are
-	      // established now so results render in the right unit from the start. Roughness stays
-	      // unitless (Hazen-Williams C-factor is dimensionless; Darcy-Weisbach's roughness height
-	      // would need one -- see the numberFieldPlain() comment in looped-network.js). ?>
+	      // established now so results render in the right unit from the start.
+	      //
+	      // ROUGHNESS NOW HAS A UNIT SELECTOR, and it is the one selector here that is conditional
+	      // (ROADMAP Task 271). Manning n and Hazen-Williams C are dimensionless; Darcy-Weisbach
+	      // roughness height e is a LENGTH. Rather than three roughness fields, there is one whose
+	      // MEANING follows settings.method -- exactly what bpn_ does (bpnUpdateMethodUI()) -- and
+	      // this select is shown only under Darcy-Weisbach. It is server-rendered like every other
+	      // one so it keeps its unit family and is visible to the us/si preset buttons; hiding it
+	      // is a display decision made later, in applyMethodUI(). ?>
 	<div class="d-print-none" id="lpn_units_strip">
 		<?=$ec_lang['lpn_units_length']?> <?php echoUnitSelect('lpn_u_length', 'distance_site', ''); ?>
 		<?=$ec_lang['lpn_units_elevhead']?> <?php echoUnitSelect('lpn_u_elevhead', 'total_head', ''); ?>
@@ -87,6 +93,7 @@ echoHeader("EngCalcs", $html_title, "");
 		<?=$ec_lang['lpn_units_flow']?> <?php echoUnitSelect('lpn_u_flow', 'flow_node', ''); ?>
 		<?=$ec_lang['lpn_units_velocity']?> <?php echoUnitSelect('lpn_u_velocity', 'velocity', ''); ?>
 		<?=$ec_lang['lpn_result_gradient']?> <?php echoUnitSelect('lpn_u_gradient', 'gradient', ''); ?>
+		<span id="lpn_u_roughness_row"><?=$ec_lang['lpn_field_roughness']?> <?php echoUnitSelect('lpn_u_roughness', 'roughness', ''); ?></span>
 	</div><?php // #lpn_units_strip ?>
 	</div><?php // the flex wrapper ?>
 	</div><?php // #lpn_units_block -- the node rebuildSettingsFields() adopts into the panel ?>
@@ -308,6 +315,11 @@ EngCalcs.pageConfig = {
 	lpn_field_km_tip: <?=json_encode($ec_lang['lpn_field_km_tip'])?>,
 	lpn_field_km_short: <?=json_encode($ec_lang['lpn_field_km_short'])?>,
 	lpn_field_auto: <?=json_encode($ec_lang['lpn_field_auto'])?>,
+	lpn_method_switch_confirm: <?=json_encode($ec_lang['lpn_method_switch_confirm'])?>,
+	<?php // Borrowed for the roughness field, whose meaning follows the friction method (Task 271):
+	      // bpn_roughness_tip names Manning n, Hazen-Williams C and Darcy-Weisbach e in one
+	      // already-translated string, so the switchable field costs no new key. ?>
+	bpn_roughness_tip: <?=json_encode($ec_lang['bpn_roughness_tip'])?>,
 	lpn_field_closed: <?=json_encode($ec_lang['lpn_field_closed'])?>,
 	lpn_field_closed_tip: <?=json_encode($ec_lang['lpn_field_closed_tip'])?>,
 	lpn_field_x: <?=json_encode($ec_lang['lpn_field_x'])?>,

@@ -1151,20 +1151,21 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
 
-- 60|271| **Give `lpn_` a friction-method choice: HW, DW, Manning.** Tom, 2026-08-10. `bpn_` has
-  one; `lpn_` hardcodes `hw`. `assembleModel()` and the map readout already read `frictionMethod()`
-  (`settings.method || 'hw'`), and `bpn_method`/`_hw`/`_dw`/`_manning` are translated, so a control
-  writing `settings.method` is the missing piece.
-  - **The solver already does all three** — `lpnResistance()` branches on manning/hw/dw, and DW
-    iterates on friction factor in `lpnSolve` and `lpnReport`. UI task, not numerics.
-  - **The real cost is ROUGHNESS**: C, absolute height ε (a LENGTH, so a unit family), n. Label,
-    unit, default, validation and `settings.defaults.roughness` all change with the choice.
-  - **A new project must be INTENTIONAL about both** — Tom: *"being unaware of those on a new
-    project (model) is dangerous."* 2 units × 3 methods is six blank menu rows, so **"Blank project"
-    collapses back to ONE row plus a WIZARD picking units and method.** That reverses the two-row
-    split shipped 2026-08-10, which was right for units alone. `openDialog()` is the pattern.
-  - **Examples carry a method implicitly**: their roughness is HW C = 130, nonsense under Manning.
-    Fix them to HW, or give each one a method.
+
+- 20|300| **A "New project" wizard picking units AND friction method (extracted from Task 271,
+  2026-08-13).** Task 271 made the friction method switchable but left project creation alone. Its
+  own proposal was to collapse the two "Blank project" menu rows into ONE row plus a wizard that
+  asks for units and method up front, because 2 units x 3 methods is six menu rows and a menu is
+  the wrong shape for that.
+  - **Tom's reason, and it is a safety argument rather than a tidiness one:** *"being unaware of
+    those on a new project (model) is dangerous."* A method inherited silently from the last
+    project is a roughness number that means something else than the user thinks.
+  - **Not urgent, because 271 closed the danger another way:** the default is `hw`, the Example
+    forces its own method, and switching on a network with pipes asks first. So this is now a
+    clarity improvement, not a hole.
+  - **It REVERSES a shipped decision**, which is why it is its own task: the two-row units split
+    shipped 2026-08-10 and was right for units alone. Weigh the reversal deliberately.
+  - `openDialog()` is the pattern.
 
 - 35|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
   for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
@@ -1795,6 +1796,72 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|271| **[DONE 2026-08-13] Give `lpn_` a friction-method choice: HW, DW, Manning.**
+
+  A select in Settings, Computation writes `settings.method`; `frictionMethod()` had been reading
+  it since Task 254 with nothing anywhere writing it, so the page was Hazen-Williams-only in
+  practice. Every label is borrowed from `bpn_` (`bpn_method`, `bpn_method_hw`/`_dw`/`_manning`,
+  `bpn_roughness_tip`), so the control itself cost **no new keys**.
+
+  **Roughness is three quantities wearing one field, and that is the whole difficulty.** Manning n
+  and HW C are dimensionless; Darcy-Weisbach e is a LENGTH. Same design as `bpn_`'s
+  `bpnUpdateMethodUI()` rather than a second one — one field whose symbol (`n`/`C`/`e`, untranslated
+  per CLAUDE.md's `symbol` rule), tip and units follow the method. New `lpn_u_roughness` selector
+  (family `roughness`), **shown only under Darcy-Weisbach** and hidden rather than removed so it
+  keeps its family and stays visible to the us/si presets.
+
+  - **`roughnessSI()` is the dangerous line.** `js/lpn-solver.js` hands roughness to
+    `lpnDwFriction(q, d, e, visc)` with `d` already in SI metres, so e must be metres too or the
+    relative roughness e/d is wrong by the unit factor — converging happily, every number
+    plausible, nothing on screen saying otherwise. Same shape as the Task 255 length bug. The
+    harness therefore checks it against a **hand-computed** value, never against the app's own
+    `toSI`, and checks the mirror bug too (n and C must NOT be converted).
+  - **Switching the method converts nothing, and asks first when pipes exist.** C = 130 read as a
+    Manning n is not a rough answer, it is nonsense by four orders of magnitude, and unlike a unit
+    switch nothing on screen changes except one letter. Consistent with the suite-wide ban on
+    converting inputs on a unit switch (CLAUDE.md, Unit Sets); it asks because there is no unit
+    strip to make the change self-evident afterwards.
+  - **`settings.defaults.roughness` follows the method** (130 / 0.013 / 0.0015 m in the displayed
+    unit) — future elements only, per the Default inputs section's own rule.
+  - **A trap this task CREATED, found and fixed here: the example had to force Hazen-Williams.**
+    `newProject()` inherits settings from the project you were in, so once the method was
+    switchable, a visitor on Manning who chose Example got a ring main carrying n = 130. The
+    example now forces `hw` exactly as it forces its units — Tom's own rule, *"We never create an
+    example based on the current units... We should force the units we want and label thusly."*
+
+  **`dev/lpn-spike/friction-method-harness.js`, 31 checks, in `run_harnesses.sh`.** Mutation-tested:
+  dropping the DW conversion, converting the dimensionless methods, never writing `settings.method`,
+  removing the confirm guard, always showing the unit row, and letting the example inherit the
+  method fail 2, 2, 5, 3, 2 and 1 checks respectively. `lpn-dom-stub.js` gained the `roughness`
+  family so every harness sees the same eight-family strip the page has.
+
+  **NOT BUILT, deliberately — the blank-project WIZARD.** This task also proposed collapsing the
+  two "Blank project" menu rows into one row plus a wizard picking units *and* method, on the
+  argument that 2 units x 3 methods is six rows. It is not built, and it should be a separate
+  decision rather than a side effect of this one: it **reverses a two-row split shipped 2026-08-10**
+  that was right for units alone, and it is a visible menu change Tom should weigh on its own
+  merits. Nothing here depends on it — the method has a safe default (`hw`), the example forces its
+  own, and switching asks. **Extracted as Task 300.**
+
+  **Cost: 1 new key x 26 languages.** `lpn_method_switch_confirm`, the guard's text.
+
+  Original entry follows.
+
+  **Give `lpn_` a friction-method choice: HW, DW, Manning.** Tom, 2026-08-10. `bpn_` has
+  one; `lpn_` hardcodes `hw`. `assembleModel()` and the map readout already read `frictionMethod()`
+  (`settings.method || 'hw'`), and `bpn_method`/`_hw`/`_dw`/`_manning` are translated, so a control
+  writing `settings.method` is the missing piece.
+  - **The solver already does all three** — `lpnResistance()` branches on manning/hw/dw, and DW
+    iterates on friction factor in `lpnSolve` and `lpnReport`. UI task, not numerics.
+  - **The real cost is ROUGHNESS**: C, absolute height ε (a LENGTH, so a unit family), n. Label,
+    unit, default, validation and `settings.defaults.roughness` all change with the choice.
+  - **A new project must be INTENTIONAL about both** — Tom: *"being unaware of those on a new
+    project (model) is dangerous."* 2 units × 3 methods is six blank menu rows, so **"Blank project"
+    collapses back to ONE row plus a WIZARD picking units and method.** That reverses the two-row
+    split shipped 2026-08-10, which was right for units alone. `openDialog()` is the pattern.
+  - **Examples carry a method implicitly**: their roughness is HW C = 130, nonsense under Manning.
+    Fix them to HW, or give each one a method.
 
 - 0|146.07| **[DONE 2026-08-13] Open/Closed link property (Task 146 child).**
 
