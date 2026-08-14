@@ -144,8 +144,8 @@ ceiling, 200 nodes is carried explicitly as a headroom check (*"we must not fall
 larger network already runs in the UX. When stating our limits, name the three missing features and
 nothing else. (Tom, 2026-08-14, correcting a draft of this file that said "caps the tool.")
 
-The build itself, and its costed feasibility findings, are **Task 304**. The front-door copy is
-**Task 305**.
+The build itself, and its costed feasibility findings, are **Task 306**. The front-door copy is
+**Task 307**.
 
 ## 7. Deferred: epanet-js's founding partners
 
