@@ -63,7 +63,10 @@ echo ""
 
 # --- Does it parse at all -------------------------------------------------------------------
 run_check "php syntax (all .php)"        blocking sh -c 'find . -name "*.php" -not -path "./dev/lpn-spike/*" -print0 | xargs -0 -n1 php -l >/dev/null'
-run_check "js syntax (js/*.js)"          blocking sh -c 'for f in js/*.js; do node --check "$f" >/dev/null || exit 1; done'
+# sw.js AND js/vendor/ are in the glob deliberately (2026-08-14). The old pattern was js/*.js only,
+# so the service worker at the repo root -- the file Task 318 is entirely about -- was never once
+# syntax-checked, and neither was the vendored EPANET engine we ship to every visitor who enables it.
+run_check "js syntax (all shipped js)"   blocking sh -c 'for f in js/*.js js/vendor/*.js sw.js; do [ -f "$f" ] || continue; node --check "$f" >/dev/null || { echo "FAILED: $f"; exit 1; }; done'
 
 # --- Does every page still produce well-formed HTML ------------------------------------------
 run_check "html balance (every page)"    blocking php dev/scripts/html_balance_check.php

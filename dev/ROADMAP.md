@@ -469,6 +469,73 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     exactly why the in-file `format`/`app` marker is part of the same change rather than a
     nice-to-have.
 
+- 85|318| **The offline promise is FALSE: the service-worker asset precache is dead code.**
+  Found by a smell-test pass, 2026-08-14, and verified. `sw.js` precaches 25 bare paths
+  (`/engcalcs/js/looped-network.js`); every page requests those assets with `?v=<filemtime>`; and
+  `cacheFirst()` uses `caches.match(request)` — **exact URL, query included**. So the 22 CSS/JS
+  entries can never be served. Only the 3 query-less icons work.
+  - **`networkFirst()` strips the query and `cacheFirst()` does not**, which is why PAGES cache
+    correctly and assets do not. A page visited online does work offline, because its assets are
+    then cached at runtime under their real `?v=` URLs. What is dead is the PRECACHE — the
+    "visit one page, get all the calculators" promise.
+  - **It is a false claim on the About page**, aimed at exactly the audience the mission names:
+    `about_body_html` says *"Visit any calculator page while connected… After that, all calculators
+    work offline."* `Install.php` says the same. Either make it true or stop saying it.
+  - **The fix is a design choice with a real cost either way.** `{ignoreSearch: true}` makes the
+    precache live but permanently defeats `filemtime` busting — stale JS forever, which is worse.
+    **Generate `sw.js` from PHP** so precached URLs carry the same `filemtime` the pages request.
+    That is the recommended route and it also retires `CACHE_VERSION`.
+  - **Two hand-maintained lists have already drifted, and would still be wrong after the fix.**
+    Missing assets: `PipeHydraulics.lib.js`, `branched-network.js`, `lpn-geom.js`, `lpn-collide.js`,
+    `lpn-inp.js`, `lpn-net.js`. Missing page: **`Branched-Network.php` — a whole shipped
+    calculator**. Note `hazen-williams.js` is precached while its dependency `PipeHydraulics.lib.js`
+    is not: the list is INCOHERENT, not merely short.
+  - **`sw.js` is an undocumented FOURTH place a new lpn module must be registered.** CLAUDE.md names
+    three (`Looped-Network.php`, `lpn-dom-stub.js`, the harnesses); Task 293's split silently missed
+    this one. Derive both lists from the glob, or add `sw_manifest_check.php` to `check_all.sh`.
+  - **`CACHE_VERSION = 'engcalcs-v9'` is the banned hardcoded `?v=N`, reintroduced** — a manually
+    bumped string in the one file where forgetting it is invisible (a returning visitor silently
+    keeps the old cache). The Task 287 comment above it documents a bump that was required for
+    correctness, which proves the risk is live. Generating `sw.js` removes it entirely.
+
+- 55|319| **Log-row injection through `Accept-Language`, in five copy-pasted copies.** Every log
+  writer sanitises its columns carefully — `log-signal-event.php` even explains why — but
+  `$browserLang` comes raw from `$_SERVER['HTTP_ACCEPT_LANGUAGE']` with no filter and no length cap,
+  into the same tab-separated line. The identical 3-line snippet sits in `formmail.php`,
+  `log-signal-event.php`, `log-title-event.php`, `log-human-view.php`, `log-calc-event.php`, which is
+  why the miss is uniform. `trim()` strips edges only, so an embedded tab or newline forges rows, and
+  a 4 KB header goes in unbounded. **Impact is bounded — it corrupts our own analytics, nothing
+  executable — but those analytics are what roadmap decisions are being made from.** One helper
+  `ecBrowserLangTag()` in `lib/config.inc.php` (`[a-z0-9-]`, ~35 chars), called from all five: kills
+  the duplication and the defect together.
+
+- 50|320| **`dev/ROADMAP.md` has re-bloated past its own stated limits.** Its LENGTH DISCIPLINE
+  section (Tom, 2026-08-05) sets a 1–3 line default and a ~15 line cap, and records 5,634 lines as
+  the problem. It is now **7,000** — 59 open tasks in ~2,160 lines, plus **251 completed tasks in
+  4,838 lines** sitting in the same file while `dev/roadmap-closed-archive.md` already exists for
+  exactly that. Moving `## Completed` into the archive drops the file ~70% with zero information
+  loss. **This file is loaded to answer almost any question about the project, so every line is paid
+  for repeatedly, forever** — which is Tom's own stated reason and makes this the cheapest large win
+  available.
+
+- 20|321| **`formmail.php` reads five `$_POST` keys with no `isset()`.** `name`, `email`, `subject`,
+  `message`, `more_message`. Under PHP 8 a bare POST emits *Undefined array key* warnings, and with
+  `display_errors` on anywhere they land in the response body. The header-injection guards on
+  name/email/subject are present and correct, so this is hygiene rather than a hole — but it is the
+  site's only mail path.
+
+- 20|322| **Standing advisories worth converting rather than re-reading.** `check_all.sh` reports
+  these every run and nobody can act on them.
+  - **`js/looped-network.js` is 9,740 lines**, with `rebuildSettingsFields()` at 507 and
+    `drawExampleNetwork()` at 290. Task 293 established the split-by-PURITY pattern and it worked;
+    these two are the obvious next extractions.
+  - **`mpf_spreadheet_notice`** — misspelled, and `_notice` against the suite's seven `_note`. It is
+    one of the dead keys parked in Task 294 awaiting Tom's ruling; whatever he rules,
+    `rename_lang_key.php` fixes the spelling in one command.
+  - **The js syntax check globs `js/*.js` only**, so `sw.js` at the repo root and `js/vendor/` are
+    never syntax-checked. Given Task 318 lives entirely in `sw.js`, that is a gap worth one
+    character of glob. **DONE 2026-08-14** — glob widened; the rest of this task stands.
+
 - 85|317| **Push Base values to all scenarios PER ELEMENT, not only per property.** Tom, 2026-08-14,
   looking at the shipped scenario menu: *"I assume that Apply Base values to all scenarios will be
   fine-grained; each property or element (maybe start only with the element level, will have a way
