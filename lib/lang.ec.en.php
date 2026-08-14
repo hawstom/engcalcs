@@ -115,11 +115,13 @@ $ec_lang['menu_main_language']='Language';
 $ec_lang_syn['menu_main_language']='';
 $ec_lang['menu_more']='More';
 $ec_lang_syn['menu_more']='';
-// Tom's own step-by-step guides, which live on his blog rather than on this site. TRANSLATORS: the
-// linked page is in English only and the navbar has no tooltip that works on touch, so include your
-// language's own "(in English)" marker in the label -- a reader should know before tapping.
-$ec_lang['menu_walkthroughs']='Walkthroughs (in English)';
-$ec_lang['menu_walkthroughs_tip']='Step-by-step guides to the calculators, on Tom Haws\'s blog. Written in English only.';
+// Tom's own step-by-step guides, which live on his blog rather than on this site. The post is in
+// English and the label does NOT say so (Tom, 2026-08-13): "I am inclined to take my chances with
+// automatic browser translators and not flag it as English." Browser translation is good enough on
+// a blog page, and a permanent "(in English)" on every language's navbar was a bigger, more
+// visible cost than the occasional reader who meets it untranslated.
+$ec_lang['menu_walkthroughs']='Walkthroughs';
+$ec_lang['menu_walkthroughs_tip']='Step-by-step guides to the calculators, on Tom Haws\'s blog.';
 $ec_lang['menu_libre']='Libre Software';
 $ec_lang_syn['menu_libre']='Lock-free Software, Unlocked Software, Unchained Software, FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share. | layout: nav item; gloss: libre software; avoid: free of charge (gratis); transliterating "libre" as a brand name';
 $ec_lang['template_welcome']='Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target="_blank" href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too.';
@@ -1537,28 +1539,29 @@ $ec_lang['lpn_labels_decimals_tip']='Decimal places shown for this label';
 $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Background image…';
-$ec_lang['lpn_backdrop_add']='Add image';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
+$ec_lang['lpn_backdrop_add']='Add';
+// BARE VERBS, and they are only correct because BOTH doors now print a "Background image" heading
+// over them (backdropRows() in js/looped-network.js). The 2026-08-04 ruling that made these
+// "Scale image"/"Position image" was right about the defect -- a bare verb orphans in the Insert
+// menu, where nothing above it says what is being scaled -- and wrong about the cheapest fix: the
+// object belongs in ONE heading, not repeated in five labels. Never restore a bare verb here
+// without checking the heading is still rendered.
 // Two ways to set the same number, so both say which one they are (Task 276). Picking is the coarse
-// step and typing is the correction -- Tom, 2026-08-10: "mouse (and hand!!!) picking is never
-// precise."
-// "The size of a pixel", never the compound "pixel size" (Tom, 2026-08-13). Two reasons at once:
-// the readers here are civil engineers rather than graphic artists, so the compound is not the
-// term of art it would be in an imaging tool -- and a translator gets "size of pixel" out of it
-// anyway, so spelling it out costs the English nothing and hands them the phrase already unpacked.
-$ec_lang['lpn_backdrop_scale']='Set image scale by picking';
-$ec_lang['lpn_backdrop_scale_entry']='Set image scale by typing or World File';
+// step -- Tom, 2026-08-10: "mouse (and hand!!!) picking is never precise" -- and the other is the
+// correction. The second label NAMES the World File rather than saying "by typing", because the
+// World File was "hidden and hard to discover" (Tom, 2026-08-13) and a menu is where it gets found.
+// Note "pixel size" here and "the size of a pixel" in the prompt below: a menu label is terse by
+// nature, and the prompt is where there is room to say it the way an engineer would read it.
+$ec_lang['lpn_backdrop_scale']='Scale by picking';
+$ec_lang['lpn_backdrop_scale_entry']='Scale by World File or pixel size';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Enter the size of a pixel or paste the complete contents of the World File for the image';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Type one number for the size of a pixel, or paste all six lines of a world file.';
 $ec_lang['lpn_backdrop_wld_ask']='Choose a World File for automatic scale and location?';
 $ec_lang['lpn_backdrop_wld_none']='No world file found. Scale and move using the menu.';
 $ec_lang['lpn_backdrop_wld_choose']='Choose World File';
 $ec_lang['lpn_backdrop_wld_bad']='This world file turns, mirrors or unevenly stretches the picture. The map can only move and resize it evenly, so the file was not used.';
-$ec_lang['lpn_backdrop_position']='Move image';
-$ec_lang['lpn_backdrop_remove']='Remove image';
+$ec_lang['lpn_backdrop_position']='Move';
+$ec_lang['lpn_backdrop_remove']='Remove';
 $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Real distance between the two points';

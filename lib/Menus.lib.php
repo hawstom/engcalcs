@@ -156,8 +156,10 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<?php // Tom's walkthroughs (2026-08-13). A new TAB rather than a navigation: the one
 					      // page most likely to send somebody looking for a guide is Looped-Network.php,
 					      // and leaving it mid-drawing to read one is the wrong trade. The label carries
-					      // its own "(in English)" because the navbar's only tip mechanism is title=,
-					      // which js/Calculators.lib.js never activates on touch. ?>
+					      // NO language flag, though the post is English: Tom, 2026-08-13, "I am inclined
+					      // to take my chances with automatic browser translators and not flag it as
+					      // English." A permanent "(in English)" in all 27 navbars costs more, and costs
+					      // it constantly, than the occasional reader who meets an untranslated page. ?>
 					<a class="dropdown-item" href="https://tomsthird.blogspot.com/2026/08/hawsedc-free-unlimited-online-looped.html"
 						target="_blank" rel="noopener"
 						title="<?=htmlspecialchars($ec_lang['menu_walkthroughs_tip'], ENT_QUOTES, 'UTF-8')?>"><?=$ec_lang['menu_walkthroughs']?></a>

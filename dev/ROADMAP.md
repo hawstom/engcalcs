@@ -1367,15 +1367,19 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     same item twice.
   - Changing `menu_more`'s English makes 26 translations stale — a resync, not a new key.
 
-- 15|297| **Translate Task 276's 10 backdrop-and-menu keys into all 26 languages.** Seven are new
+- 15|297| **Resync 13 backdrop-and-menu keys into all 26 languages.** Nine are NEW
   (`lpn_backdrop_scale_entry`, `_prompt`, `_bad`, `lpn_backdrop_wld_ask`, `_none`, `_choose`,
-  `_bad`); the eighth is `lpn_backdrop_scale`, whose English changed to "Set image scale by
-  picking" and whose 26 translations are now stale — the drift tripwire flags it as CHANGED.
-  English falls back automatically (`base.inc.php` loads `lang.ec.en.php` first), so the feature
-  works everywhere today; this is the delta `lang_parity_check.php` reports.
-  Plus `menu_walkthroughs` and `menu_walkthroughs_tip` (2026-08-13). The label must carry each
-  language's own "(in English)" marker: the target is Tom's English-only blog, and the navbar's only
-  tip mechanism is `title=`, which `js/Calculators.lib.js` never activates on touch.
+  `_bad`, plus `menu_walkthroughs` and `menu_walkthroughs_tip`). Four CHANGED and are stale:
+  `lpn_backdrop_add`/`_position`/`_remove` dropped the word "image" and `lpn_backdrop_scale` became
+  "Scale by picking".
+  - **Three are ROLE CHANGES** — two words down to one. The drift tripwire flags them as the
+    expensive kind, and it is right: they are now bare verbs that only read correctly under the
+    "Background image" heading `backdropRows()` prints above them. A translator must see the
+    heading to translate the verb.
+  - English falls back automatically (`base.inc.php` loads `lang.ec.en.php` first), so every
+    language works today; this is the delta `lang_parity_check.php` reports.
+  - `menu_walkthroughs` carries NO "(in English)" marker by decision (Tom, 2026-08-13) — browser
+    translation is the bet, rather than a permanent flag in 27 navbars.
 
 - 40|257|[H] **[HUMAN] Find or build the example PROJECTS (plural) for lpn.** **Reassigned to Tom,
   2026-08-11, at his own request: *"Let's change this task to a human assignment to create or find
@@ -2009,8 +2013,8 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Completed
 
 - 0|276| **[DONE 2026-08-13] Precise background-image scaling: type the number, or hand over a
-  world file.** Menu now offers "Set image scale by picking" (the coarse step) and "Set image scale
-  by typing or World File" — one box taking either a pixel size or a pasted world file.
+  world file.** The backdrop menu now offers "Scale by picking" (the coarse step) and "Scale by
+  World File or pixel size" — one box taking either a pixel size or a pasted world file.
   Adding an image offers a world-file pick; choosing image and world file together skips that step.
   A file that rotates, mirrors or unevenly stretches is refused with a message, never half-applied.
   Verified by `dev/lpn-spike/backdrop-scale-harness.js` (32 assertions, including the half-pixel

@@ -1565,7 +1565,6 @@ var EngCalcs = EngCalcs || {};
 		backdrop = null; backdropImg = null;
 		backdropLayer.innerHTML = '';
 		saveToStorage();
-		updateBackdropMenuState();
 	}
 	// Cap the longest side at 1600px before storing (scope doc: "a scanned plan can be large, so
 	// downscale on import and record the original dimensions") -- nothing else in this feature bounds
@@ -1618,7 +1617,6 @@ var EngCalcs = EngCalcs || {};
 			backdrop = { href: href, iw: iw, ih: ih, x: 0, y: 0, width: size.width, height: size.height, tx: 0, ty: 0, s: 1 };
 			buildBackdropImg();
 			saveToStorage();
-			updateBackdropMenuState();
 			// Anything that wants to register the image has to wait for this: downscaleImage() is
 			// asynchronous, so `backdrop` does not exist yet when the caller returns.
 			if (done) { done(); }
@@ -1886,10 +1884,7 @@ var EngCalcs = EngCalcs || {};
 			activeCancel = function () { svg.removeEventListener('pointerup', handler2, true); setNodeCursorAllowed(false); setRegMode(false); };
 		};
 	}
-	// Menu-select build + Scale/Position/Remove enablement, wired from wireToolbar() below.
-	var updateBackdropMenuStateFn = null;
-	function updateBackdropMenuState() { if (updateBackdropMenuStateFn) { updateBackdropMenuStateFn(); } }
-	// The four backdrop commands, in ONE implementation with two doors: the toolbar's select and the
+	// The five backdrop commands, in ONE implementation with two doors: the toolbar's button and the
 	// Insert > Background image submenu (Tom, 2026-08-04: "In EPANET, Backdrop has its submenu, so
 	// that's what the paradigm calls us to do... Can we duplicate the toolbar item into the pull-down
 	// menu?" -- yes, and duplication between a menu and a toolbar is the correct relationship, not
@@ -1905,29 +1900,39 @@ var EngCalcs = EngCalcs || {};
 			if (window.confirm(pc.lpn_backdrop_remove_confirm || 'Remove the background image?')) { removeBackdrop(); }
 		}
 	}
+	// The rows themselves, built fresh on every open so `disabled` is simply read from the current
+	// state -- which is why the old updateBackdropMenuState() machinery is gone rather than kept as a
+	// no-op. Shared verbatim by both doors, so the two can no longer drift apart.
+	//
+	// The HEADING is what lets these be bare verbs. Tom, 2026-08-04, was right that "Scale"/"Position"
+	// orphan in the Insert menu, "where nothing above them says what is being scaled" -- so now
+	// something does, in both doors, and the object moves out of five labels into one word.
+	function backdropRows() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ heading: true, label: pc.lpn_backdrop_menu || 'Background image…' },
+			{ icon: 'image', label: pc.lpn_backdrop_add || 'Add', fn: function () { backdropAction('add'); } },
+			{ icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale by picking', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
+			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Scale by World File or pixel size', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
+			{ icon: 'position', label: pc.lpn_backdrop_position || 'Move', fn: function () { backdropAction('position'); }, disabled: !backdrop },
+			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove', fn: function () { backdropAction('remove'); }, disabled: !backdrop }
+		];
+	}
 	function wireBackdropMenu(into) {
-		var pc = EngCalcs.pageConfig || {}, menu = document.createElement('select');
+		var pc = EngCalcs.pageConfig || {}, menu = document.createElement('button');
+		menu.type = 'button';
+		// A BUTTON, not a <select> (Tom, 2026-08-13). A select is as wide as its widest option, so
+		// "Scale by World File or pixel size" set the width of a control that spends all its time
+		// reading "Background image…" -- and the longer a command's name got, the more toolbar it
+		// cost, which is a bad trade to have wired into the widget. A menu button is as wide as its
+		// own label and nothing else. The id stays: showBackdropTargetPanel() positions the target
+		// panel off this element's rect.
 		menu.id = 'lpn_backdrop_menu';
-		menu.dataset.edits = '1'; // adding/scaling/removing a backdrop is a document change like any other
-		function opt(value, text, disabled) {
-			var o = document.createElement('option');
-			o.value = value; o.textContent = text; if (disabled) { o.disabled = true; }
-			menu.appendChild(o);
-		}
-		// An <option> can hold text and nothing else -- no element, so no SVG. These stay words, and
-		// the identical commands in Insert > Background image carry the icons instead.
-		opt('', pc.lpn_backdrop_menu || 'Background image...');
-		opt('add', pc.lpn_backdrop_add || 'Add image');
-		opt('scale', pc.lpn_backdrop_scale || 'Scale', true);
-		opt('scale-entry', pc.lpn_backdrop_scale_entry || 'Set image scale by typing or World File', true);
-		opt('position', pc.lpn_backdrop_position || 'Position', true);
-		opt('remove', pc.lpn_backdrop_remove || 'Remove image', true);
+		setLabel(menu, 'image', pc.lpn_backdrop_menu || 'Background image…');
+		// stopPropagation for the same reason every menubar item does it -- see buildMenuBar().
+		menu.addEventListener('click', function (e) { e.stopPropagation(); openMenu(e.currentTarget, backdropRows()); });
 		var fileInput = document.getElementById('lpn_backdrop_file');
 		var wldInput = document.getElementById('lpn_backdrop_wld_file');
-		menu.addEventListener('change', function () {
-			var v = menu.value; menu.value = '';
-			backdropAction(v);
-		});
 		fileInput.addEventListener('change', function () {
 			// The picker accepts both the image and its world file, so sort what came back by type
 			// rather than assuming files[0] is the picture.
@@ -1952,16 +1957,6 @@ var EngCalcs = EngCalcs || {};
 				if (f && backdrop) { readWorldFile(f); }
 			});
 		}
-		updateBackdropMenuStateFn = function () {
-			// Everything but the title row and Add needs an image present. Asked of each option
-			// rather than counted by index, because the index arithmetic this replaced was already
-			// wrong the moment a fifth command joined the menu.
-			for (var i = 0; i < menu.options.length; i++) {
-				var v = menu.options[i].value;
-				if (v && v !== 'add') { menu.options[i].disabled = !backdrop; }
-			}
-		};
-		updateBackdropMenuStateFn();
 		into.appendChild(menu);
 	}
 
@@ -2658,7 +2653,6 @@ var EngCalcs = EngCalcs || {};
 		backdropImg = null;
 		backdropLayer.innerHTML = '';
 		if (backdrop) { buildBackdropImg(); }
-		updateBackdropMenuState();
 		lastSolveResult = null;
 		closePopup();
 		buildDom();
@@ -5396,15 +5390,8 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', fn: function () { setMode('add-junction'); } },
 			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
 			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
-			{ separator: true },
-			// The backdrop submenu, flattened into a labelled group. Scale/Position/Remove are greyed
-			// with no image present, exactly as the toolbar select greys them -- one state, read from
-			// the same place.
-			{ icon: 'image', label: pc.lpn_backdrop_add || 'Add image', fn: function () { backdropAction('add'); } },
-			{ icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
-			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Set image scale by typing or World File', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
-			{ icon: 'position', label: pc.lpn_backdrop_position || 'Position', fn: function () { backdropAction('position'); }, disabled: !backdrop },
-			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove image', fn: function () { backdropAction('remove'); }, disabled: !backdrop },
+			{ separator: true }
+		].concat(backdropRows()).concat([
 			{ separator: true },
 			// "Draw example network" is GONE from here (Task 264, Tom 2026-08-10). Insert adds an element
 			// to the drawing you are in; an example is a whole network, and dropping one on top of your
@@ -5416,7 +5403,7 @@ var EngCalcs = EngCalcs || {};
 			// settled -- see drawTestGrid(). Putting a throwaway through 26 languages would be worse
 			// than leaving it in English.
 			{ icon: 'devtest', label: '[dev] Draw large test network', fn: drawTestGrid }
-		]);
+		]));
 	}
 	function openViewMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
@@ -5777,7 +5764,6 @@ var EngCalcs = EngCalcs || {};
 			applySaved(opening);
 			buildDom(); scheduleSolve();
 			if (backdrop) { buildBackdropImg(); }
-			updateBackdropMenuState();
 		} else if (!indexEntry(library.openId)) {
 			// **`!indexEntry()`, not `!library.openId`** (fixed 2026-08-06): an id pointing at a
 			// project that is no longer in the library is not an open project, and treating it as one

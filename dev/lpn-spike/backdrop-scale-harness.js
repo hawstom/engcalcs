@@ -150,5 +150,57 @@ report(formatPixelSize(0.5) === '0.5', 'a round number prefills without trailing
 report(formatPixelSize(1 / 3) === '0.33333333', 'a long number prefills at eight significant digits', formatPixelSize(1 / 3));
 report(formatPixelSize(0) === '', 'no image, no prefill');
 
+// ---- 8. the menu rows, and the heading the bare verbs depend on ---------
+// Tom, 2026-08-13, asked for "Scale by picking" / "Scale by World File or pixel size" parallel to
+// "Move". Bare verbs are only correct while BOTH doors print "Background image" over them --
+// without that heading this set reverts to the exact defect the 2026-08-04 ruling named, and it
+// reverts silently, because a menu of orphaned verbs still renders perfectly.
+{
+	const rowSrc = extract('backdropRows');
+	let backdropAction = function () { };
+	let rows;
+	eval(rowSrc);
+
+	backdrop = null;
+	rows = backdropRows();
+	report(rows[0] && rows[0].heading === true, 'the first row is a heading, not a command');
+	report(/Background image/.test(rows[0].label), 'and it names the object the verbs below it act on', rows[0].label);
+
+	const commands = rows.filter(r => !r.heading);
+	report(commands.length === 5, 'five commands: add, scale by picking, scale by entry, move, remove', commands.length);
+	report(commands.every(r => typeof r.fn === 'function'), 'every command row is wired to a function');
+	// With no image, only Add can do anything.
+	report(commands[0].disabled !== true, 'Add works with no image present');
+	report(commands.slice(1).every(r => r.disabled === true), 'the other four are disabled with no image');
+
+	freshBackdrop();
+	report(backdropRows().filter(r => !r.heading).every(r => !r.disabled), 'all five enable once an image is present');
+
+	// ONE definition, two doors. A second literal list is how the toolbar and the Insert menu drifted
+	// apart before, and it is invisible until somebody opens both and compares.
+	report(/\.concat\(backdropRows\(\)\)/.test(src), 'the Insert menu reuses backdropRows() rather than restating it');
+	report((src.match(/lpn_backdrop_scale_entry \|\|/g) || []).length === 1,
+		'each backdrop label has exactly one call site', (src.match(/lpn_backdrop_scale_entry \|\|/g) || []).length);
+	// The toolbar control is a BUTTON now; a <select> is as wide as its widest option, which is what
+	// made a long command name cost toolbar width.
+	report(/menu = document\.createElement\('button'\)/.test(src), 'the toolbar control is a button, not a select');
+}
+
+// ---- 9. the English labels are the ones Tom approved --------------------
+{
+	const en = fs.readFileSync(path.join(__dirname, '../../lib/lang.ec.en.php'), 'utf8');
+	function val(key) {
+		const m = en.match(new RegExp("\\$ec_lang\\['" + key + "'\\]='((?:[^'\\\\]|\\\\.)*)'"));
+		return m ? m[1].replace(/\\'/g, "'") : null;
+	}
+	report(val('lpn_backdrop_scale') === 'Scale by picking', 'lpn_backdrop_scale', val('lpn_backdrop_scale'));
+	report(val('lpn_backdrop_scale_entry') === 'Scale by World File or pixel size', 'lpn_backdrop_scale_entry', val('lpn_backdrop_scale_entry'));
+	report(val('lpn_backdrop_position') === 'Move', 'lpn_backdrop_position', val('lpn_backdrop_position'));
+	// Parallel or not at all: a set where one member still names the object reads as an oversight,
+	// which is the drift Tom keeps catching by eye.
+	const set = ['lpn_backdrop_add', 'lpn_backdrop_scale', 'lpn_backdrop_scale_entry', 'lpn_backdrop_position', 'lpn_backdrop_remove'];
+	report(set.every(k => !/\bimage\b/i.test(val(k) || '')), 'no member of the set repeats "image" — the heading carries it');
+}
+
 console.log(`\n${checks - failures}/${checks} passed`);
 process.exit(failures ? 1 : 0);

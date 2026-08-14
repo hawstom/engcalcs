@@ -305,9 +305,9 @@
         ]
     },
     "keys_to_translate": {
-        "menu_walkthroughs": "Walkthroughs (in English)",
-        "menu_walkthroughs_tip": "Step-by-step guides to the calculators, on Tom Haws's blog. Written in English only.",
-        "lpn_backdrop_scale_entry": "Set image scale by typing or World File",
+        "menu_walkthroughs": "Walkthroughs",
+        "menu_walkthroughs_tip": "Step-by-step guides to the calculators, on Tom Haws's blog.",
+        "lpn_backdrop_scale_entry": "Scale by World File or pixel size",
         "lpn_backdrop_scale_entry_prompt": "Enter the size of a pixel or paste the complete contents of the World File for the image",
         "lpn_backdrop_scale_entry_bad": "Type one number for the size of a pixel, or paste all six lines of a world file.",
         "lpn_backdrop_wld_ask": "Choose a World File for automatic scale and location?",
@@ -316,9 +316,9 @@
         "lpn_backdrop_wld_bad": "This world file turns, mirrors or unevenly stretches the picture. The map can only move and resize it evenly, so the file was not used."
     },
     "keys": {
-        "menu_walkthroughs": "Walkthroughs (in English)",
-        "menu_walkthroughs_tip": "Step-by-step guides to the calculators, on Tom Haws's blog. Written in English only.",
-        "lpn_backdrop_scale_entry": "Set image scale by typing or World File",
+        "menu_walkthroughs": "Walkthroughs",
+        "menu_walkthroughs_tip": "Step-by-step guides to the calculators, on Tom Haws's blog.",
+        "lpn_backdrop_scale_entry": "Scale by World File or pixel size",
         "lpn_backdrop_scale_entry_prompt": "Enter the size of a pixel or paste the complete contents of the World File for the image",
         "lpn_backdrop_scale_entry_bad": "Type one number for the size of a pixel, or paste all six lines of a world file.",
         "lpn_backdrop_wld_ask": "Choose a World File for automatic scale and location?",
@@ -366,12 +366,12 @@
                 "previous_translated": {
                     "key": "lpn_backdrop_scale",
                     "value": "Bildmaßstab festlegen",
-                    "english": "Set image scale by picking"
+                    "english": "Scale by picking"
                 },
                 "next_translated": {
                     "key": "lpn_backdrop_position",
                     "value": "Bild verschieben",
-                    "english": "Move image"
+                    "english": "Move"
                 }
             }
         },
@@ -382,12 +382,12 @@
                 "previous_translated": {
                     "key": "lpn_backdrop_scale",
                     "value": "Bildmaßstab festlegen",
-                    "english": "Set image scale by picking"
+                    "english": "Scale by picking"
                 },
                 "next_translated": {
                     "key": "lpn_backdrop_position",
                     "value": "Bild verschieben",
-                    "english": "Move image"
+                    "english": "Move"
                 }
             }
         },
@@ -398,12 +398,12 @@
                 "previous_translated": {
                     "key": "lpn_backdrop_scale",
                     "value": "Bildmaßstab festlegen",
-                    "english": "Set image scale by picking"
+                    "english": "Scale by picking"
                 },
                 "next_translated": {
                     "key": "lpn_backdrop_position",
                     "value": "Bild verschieben",
-                    "english": "Move image"
+                    "english": "Move"
                 }
             }
         },
@@ -414,12 +414,12 @@
                 "previous_translated": {
                     "key": "lpn_backdrop_scale",
                     "value": "Bildmaßstab festlegen",
-                    "english": "Set image scale by picking"
+                    "english": "Scale by picking"
                 },
                 "next_translated": {
                     "key": "lpn_backdrop_position",
                     "value": "Bild verschieben",
-                    "english": "Move image"
+                    "english": "Move"
                 }
             }
         },
@@ -430,12 +430,12 @@
                 "previous_translated": {
                     "key": "lpn_backdrop_scale",
                     "value": "Bildmaßstab festlegen",
-                    "english": "Set image scale by picking"
+                    "english": "Scale by picking"
                 },
                 "next_translated": {
                     "key": "lpn_backdrop_position",
                     "value": "Bild verschieben",
-                    "english": "Move image"
+                    "english": "Move"
                 }
             }
         },
@@ -446,12 +446,12 @@
                 "previous_translated": {
                     "key": "lpn_backdrop_scale",
                     "value": "Bildmaßstab festlegen",
-                    "english": "Set image scale by picking"
+                    "english": "Scale by picking"
                 },
                 "next_translated": {
                     "key": "lpn_backdrop_position",
                     "value": "Bild verschieben",
-                    "english": "Move image"
+                    "english": "Move"
                 }
             }
         },
@@ -462,12 +462,12 @@
                 "previous_translated": {
                     "key": "lpn_backdrop_scale",
                     "value": "Bildmaßstab festlegen",
-                    "english": "Set image scale by picking"
+                    "english": "Scale by picking"
                 },
                 "next_translated": {
                     "key": "lpn_backdrop_position",
                     "value": "Bild verschieben",
-                    "english": "Move image"
+                    "english": "Move"
                 }
             }
         }
