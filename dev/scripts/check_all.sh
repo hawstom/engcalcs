@@ -75,7 +75,7 @@ run_check "coverage declaration"         blocking php dev/scripts/coverage_selft
 run_check "payload freshness"            blocking php dev/scripts/generate_translation_payloads.php --check
 
 # --- lpn solver and editor --------------------------------------------------------------------
-run_check "lpn harnesses (11)"           blocking sh dev/scripts/run_harnesses.sh
+run_check "lpn harnesses (12)"           blocking sh dev/scripts/run_harnesses.sh
 
 # --- Advisory: real findings, but judgement calls that must not block a commit ------------------
 run_check "key hygiene"                  advisory php dev/scripts/key_hygiene_check.php --strict

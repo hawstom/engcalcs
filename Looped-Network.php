@@ -109,7 +109,15 @@ echoHeader("EngCalcs", $html_title, "");
 	      // no server to lock against, or a linked file that has gone missing (amber). renderBanner()
 	      // in js/looped-network.js fills it and sets the colors; read-only wins when both apply. ?>
 	<div class="d-print-none" id="lpn_lock_banner" role="status" style="display:none;margin:4px 0;padding:6px 8px;border:1px solid #a80;background:#fffbe6"></div>
-	<input type="file" id="lpn_backdrop_file" accept="image/*" style="display:none">
+	<?php // `multiple` is the EXPERT shortcut for Task 276: pick the picture and its world file
+	      // together and the registration happens with no further step. Picking only the picture is
+	      // the ordinary path and gets the offer dialog. The accept list has to name the world-file
+	      // extensions explicitly -- image/* alone would hide them from the picker. ?>
+	<input type="file" id="lpn_backdrop_file" multiple accept="image/*,.wld,.jgw,.jpgw,.pgw,.pngw,.tfw,.gfw,.tifw,.bpw,.wf,text/plain" style="display:none">
+	<?php // The second door to the same file, opened by the offer dialog once an image is already in
+	      // place. Separate from the input above for the same reason the EPANET picker is separate
+	      // from the project one: they feed different readers. ?>
+	<input type="file" id="lpn_backdrop_wld_file" accept=".wld,.jgw,.jpgw,.pgw,.pngw,.tfw,.gfw,.tifw,.bpw,.wf,text/plain" style="display:none">
 	<?php // Project import (Task 195). Lives here in the page, not inside any popover body, because
 	      // those bodies get rebuilt wholesale and would take the input's wired change handler with
 	      // them -- the same reason lpn_backdrop_file sits here. ?>
@@ -489,6 +497,13 @@ EngCalcs.pageConfig = {
 	lpn_backdrop_menu: <?=json_encode($ec_lang['lpn_backdrop_menu'])?>,
 	lpn_backdrop_add: <?=json_encode($ec_lang['lpn_backdrop_add'])?>,
 	lpn_backdrop_scale: <?=json_encode($ec_lang['lpn_backdrop_scale'])?>,
+	lpn_backdrop_scale_entry: <?=json_encode($ec_lang['lpn_backdrop_scale_entry'])?>,
+	lpn_backdrop_scale_entry_prompt: <?=json_encode($ec_lang['lpn_backdrop_scale_entry_prompt'])?>,
+	lpn_backdrop_scale_entry_bad: <?=json_encode($ec_lang['lpn_backdrop_scale_entry_bad'])?>,
+	lpn_backdrop_wld_ask: <?=json_encode($ec_lang['lpn_backdrop_wld_ask'])?>,
+	lpn_backdrop_wld_none: <?=json_encode($ec_lang['lpn_backdrop_wld_none'])?>,
+	lpn_backdrop_wld_choose: <?=json_encode($ec_lang['lpn_backdrop_wld_choose'])?>,
+	lpn_backdrop_wld_bad: <?=json_encode($ec_lang['lpn_backdrop_wld_bad'])?>,
 	lpn_backdrop_position: <?=json_encode($ec_lang['lpn_backdrop_position'])?>,
 	lpn_backdrop_remove: <?=json_encode($ec_lang['lpn_backdrop_remove'])?>,
 	lpn_backdrop_remove_confirm: <?=json_encode($ec_lang['lpn_backdrop_remove_confirm'])?>,

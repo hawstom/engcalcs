@@ -1225,12 +1225,15 @@ console.log('\n--- Settings panel stays in sync ---');
     global.prompt = global.window.prompt = () => 'X';
   }
 
-  // 4. ONE HOME for the concept. Four call sites is already enough for two of them to drift apart.
+  // 4. ONE HOME for the concept. Four call sites was already enough for two of them to drift apart;
+  // Task 276 added a fifth when applyWorldFile() started reading a world file's Cartesian C,F into
+  // the internal Y-down frame. Raising this number is fine when the new site is a real boundary --
+  // the point of the check is that a boundary never gets its own inline `-y` instead.
   {
     const js = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
     const uses = (js.match(/cartesianY\(/g) || []).length;
-    ok('the flip has exactly one definition and every boundary goes through it', uses === 5,
-      uses + ' occurrences (1 definition + 4 boundary sites)');
+    ok('the flip has exactly one definition and every boundary goes through it', uses === 6,
+      uses + ' occurrences (1 definition + 5 boundary sites)');
   }
 }
 

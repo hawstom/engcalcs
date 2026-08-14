@@ -711,7 +711,7 @@ belongs to IS the budgeting decision.
 **Tier 1 — automated, seconds, free. `sh dev/scripts/check_all.sh` before every commit.**
 Thirteen checks: PHP and JS syntax, HTML balance on every page, the pageConfig PHP→JS bridge, tip
 markup via the helpers, language rules A–D, gloss pointers, the coverage declaration, payload
-freshness, the 11 lpn harnesses, plus three advisory ones (key hygiene, size budget, English
+freshness, the 12 lpn harnesses, plus three advisory ones (key hygiene, size budget, English
 drift). Blocking failures exit 1. **This list used to live only in prose and in whoever remembered
 it** — a check nobody runs is indistinguishable from a check that does not exist, which is the same
 failure that hid six Rock Chute notes and the missing `lpn`/`bpn` glossary wiring.

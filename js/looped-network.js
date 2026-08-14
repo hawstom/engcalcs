@@ -1612,14 +1612,83 @@ var EngCalcs = EngCalcs || {};
 			target = doc.nodes.length > 0 ? extent : 40, longer = Math.max(iw, ih), scale = target / longer;
 		return { width: iw * scale, height: ih * scale };
 	}
-	function addBackdropFromDataUrl(dataUrl) {
+	function addBackdropFromDataUrl(dataUrl, done) {
 		downscaleImage(dataUrl, BACKDROP_MAX_SIDE, function (href, iw, ih) {
 			var size = initialBackdropSize(iw, ih);
 			backdrop = { href: href, iw: iw, ih: ih, x: 0, y: 0, width: size.width, height: size.height, tx: 0, ty: 0, s: 1 };
 			buildBackdropImg();
 			saveToStorage();
 			updateBackdropMenuState();
+			// Anything that wants to register the image has to wait for this: downscaleImage() is
+			// asynchronous, so `backdrop` does not exist yet when the caller returns.
+			if (done) { done(); }
 		});
+	}
+
+	// ---- pixel size, typed rather than picked (Task 276) ----
+	// Tom, 2026-08-10: "mouse (and hand!!!) picking is never precise". Picking stays as the coarse
+	// step; this is the correction. `backdrop.s` scales the PLACEMENT BOX, not the image's own
+	// pixels, so the number a user actually thinks in -- ground distance per ORIGINAL image pixel --
+	// is one conversion away from it. `downscaleImage()` reports the original iw/ih rather than the
+	// downscaled canvas size, which is what makes this hold for a big image that was shrunk on the
+	// way in; do not "tidy" that callback into passing canvas.width.
+	function backdropPixelSize() {
+		if (!backdrop || !backdrop.width || !backdrop.iw) { return 0; }
+		return backdrop.s * backdrop.width / backdrop.iw;
+	}
+	function setBackdropPixelSize(p) {
+		if (!backdrop || !(p > 0) || !backdrop.width || !backdrop.iw) { return; }
+		backdrop.s = p * backdrop.iw / backdrop.width;
+		applyBackdropTransform();
+		saveToStorage();
+	}
+	function formatPixelSize(p) { return p > 0 ? String(+p.toPrecision(8)) : ''; }
+
+	// A world file is six numbers, one per line: A, D, B, E, C, F. A and E are the pixel size, E
+	// negative because image rows run downward while map Y runs up; D and B are rotation terms; C and
+	// F are the map coordinates of the CENTRE of the upper-left pixel. It gives pixel size directly,
+	// which is strictly more than EPANET's own method asks for, at the cost of a six-line parse.
+	function parseWorldFile(text) {
+		var lines = String(text || '').split(/[\r\n]+/).map(function (s) { return s.trim(); })
+			.filter(function (s) { return s !== ''; });
+		if (lines.length !== 6) { return null; }
+		var n = lines.map(Number), i;
+		for (i = 0; i < 6; i++) { if (!isFinite(n[i])) { return null; } }
+		return { A: n[0], D: n[1], B: n[2], E: n[3], C: n[4], F: n[5], ok: worldFileRepresentable(n) };
+	}
+	// Our transform is translate + ONE uniform positive scale (applyBackdropTransform) -- no rotation,
+	// no skew, no mirroring, no independent X/Y. A file that asks for any of those cannot be honoured,
+	// so it is refused with a message rather than half-applied from A alone.
+	function worldFileRepresentable(n) {
+		var A = n[0], D = n[1], B = n[2], E = n[3];
+		if (D !== 0 || B !== 0) { return false; }
+		if (!(A > 0) || !(E < 0)) { return false; }
+		return Math.abs(A + E) <= 1e-9 * Math.abs(A);
+	}
+	// Scale AND location together -- that is the whole content of a world file, and applying half of
+	// it would leave the image correctly sized in the wrong place.
+	function applyWorldFile(w) {
+		if (!backdrop || !backdrop.width || !backdrop.iw) { return; }
+		backdrop.s = w.A * backdrop.iw / backdrop.width;
+		// C,F name the pixel CENTRE, so the image's top-left CORNER is half a pixel out in each
+		// direction; -E/2 is positive because E is negative. Both are Cartesian, which since Task 274
+		// is also the document's own convention -- but the INTERNAL frame is still Y-down, so the Y
+		// crosses the same boundary applySaved() crosses.
+		var cornerX = w.C - w.A / 2, cornerY = w.F - w.E / 2;
+		backdrop.tx = cornerX - backdrop.x * backdrop.s;
+		backdrop.ty = cartesianY(cornerY) - backdrop.y * backdrop.s;
+		applyBackdropTransform();
+		saveToStorage();
+	}
+	function readWorldFile(file) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
+		reader.onload = function (ev) {
+			var w = parseWorldFile(ev.target.result);
+			if (!w) { alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the pixel size, or paste all six lines of a world file.'); return; }
+			if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file turns, mirrors or unevenly stretches the picture. The map can only move and resize it evenly, so the file was not used.'); return; }
+			applyWorldFile(w);
+		};
+		reader.readAsText(file);
 	}
 
 	// ---- backdrop registration wizard (regMode gate, Scale, Position) ----
@@ -1677,6 +1746,78 @@ var EngCalcs = EngCalcs || {};
 		};
 		svg.addEventListener('pointerup', handler, true);
 		activeCancel = function () { svg.removeEventListener('pointerup', handler, true); setRegMode(false); };
+	}
+	// The typed half of Task 276. One box takes either form, because a user who has a world file and a
+	// user who has a number are asking for the same thing. Tom's wording, used verbatim: "Enter pixel
+	// size or paste the complete contents of the World File for the image" -- he wanted the paste
+	// spelled out rather than left to be discovered ("I don't like the paste unless it's very clear;
+	// it could get confusing").
+	function startBackdropScaleEntry() {
+		cancelActive();
+		if (!backdrop) { return; }
+		var pc = EngCalcs.pageConfig || {}, ta = null;
+		openDialog(function (body) {
+			var p = document.createElement('p');
+			p.style.margin = '0 0 8px';
+			p.textContent = (pc.lpn_backdrop_scale_entry_prompt || 'Enter pixel size or paste the complete contents of the World File for the image')
+				+ ' (' + unitLabel('lpn_u_length') + ')';
+			body.appendChild(p);
+			// A textarea, not a number input: a pasted world file is six lines, and a control that
+			// cannot hold them would make half the label a lie.
+			ta = document.createElement('textarea');
+			ta.rows = 6; ta.style.width = '100%'; ta.style.boxSizing = 'border-box';
+			ta.value = formatPixelSize(backdropPixelSize());
+			body.appendChild(ta);
+		}, [
+			{ label: pc.lpn_backdrop_continue || 'Continue', fn: function () { applyScaleEntry(ta ? ta.value : ''); } },
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+		]);
+		if (ta) { ta.focus(); ta.select(); }
+	}
+	function applyScaleEntry(text) {
+		var pc = EngCalcs.pageConfig || {}, t = String(text || '').trim(), one = Number(t), w;
+		// Number('1\n2') is NaN, so a six-line paste never reads as a single number by accident.
+		if (t !== '' && isFinite(one)) {
+			if (one > 0) { setBackdropPixelSize(one); return; }
+		} else {
+			w = parseWorldFile(t);
+			if (w) {
+				if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file turns, mirrors or unevenly stretches the picture. The map can only move and resize it evenly, so the file was not used.'); return; }
+				applyWorldFile(w);
+				return;
+			}
+		}
+		alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the pixel size, or paste all six lines of a world file.');
+	}
+	// A sidecar cannot be auto-detected in ANY browser: a file picker returns the files the user
+	// picked and nothing about their folder, and the only API that enumerates siblings
+	// (showDirectoryPicker) is a far larger permission ask and Chromium-only. So the world file is
+	// always user-supplied, never discovered -- and Tom ruled the extra step in rather than a silent
+	// multi-select: "An extra step is excusable as tutorial; better than silent 'allow multiple'."
+	// Picking both files at once still works, and skips this step, which is the expert shortcut.
+	function offerWorldFile() {
+		var pc = EngCalcs.pageConfig || {};
+		openDialog(function (body) {
+			var q = document.createElement('p');
+			q.style.margin = '0 0 8px';
+			q.textContent = pc.lpn_backdrop_wld_ask || 'Choose a World File for automatic scale and location?';
+			body.appendChild(q);
+			// The answer to "and if I have not got one?", in the same breath as the question, so
+			// declining does not cost a second dialog.
+			var hint = document.createElement('p');
+			hint.style.margin = '0'; hint.style.fontSize = '90%';
+			hint.textContent = pc.lpn_backdrop_wld_none || 'No world file found. Scale and move using the menu.';
+			body.appendChild(hint);
+		}, [
+			{
+				label: pc.lpn_backdrop_wld_choose || 'Choose World File',
+				fn: function () {
+					var wf = document.getElementById('lpn_backdrop_wld_file');
+					if (wf) { wf.click(); }
+				}
+			},
+			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
+		]);
 	}
 	function positionTo(refWorld, target) {
 		backdrop.tx += target.x - refWorld.x; backdrop.ty += target.y - refWorld.y;
@@ -1758,6 +1899,7 @@ var EngCalcs = EngCalcs || {};
 		var fileInput = document.getElementById('lpn_backdrop_file');
 		if (v === 'add') { cancelActive(); if (fileInput) { fileInput.click(); } }
 		else if (v === 'scale') { startBackdropScale(); }
+		else if (v === 'scale-entry') { startBackdropScaleEntry(); }
 		else if (v === 'position') { startBackdropPosition(); }
 		else if (v === 'remove') {
 			if (window.confirm(pc.lpn_backdrop_remove_confirm || 'Remove the background image?')) { removeBackdrop(); }
@@ -1777,21 +1919,47 @@ var EngCalcs = EngCalcs || {};
 		opt('', pc.lpn_backdrop_menu || 'Background image...');
 		opt('add', pc.lpn_backdrop_add || 'Add image');
 		opt('scale', pc.lpn_backdrop_scale || 'Scale', true);
+		opt('scale-entry', pc.lpn_backdrop_scale_entry || 'Set image scale by typing', true);
 		opt('position', pc.lpn_backdrop_position || 'Position', true);
 		opt('remove', pc.lpn_backdrop_remove || 'Remove image', true);
 		var fileInput = document.getElementById('lpn_backdrop_file');
+		var wldInput = document.getElementById('lpn_backdrop_wld_file');
 		menu.addEventListener('change', function () {
 			var v = menu.value; menu.value = '';
 			backdropAction(v);
 		});
 		fileInput.addEventListener('change', function () {
-			var f = fileInput.files[0]; fileInput.value = ''; if (!f) { return; }
+			// The picker accepts both the image and its world file, so sort what came back by type
+			// rather than assuming files[0] is the picture.
+			var picked = Array.prototype.slice.call(fileInput.files), img = null, sidecar = null, i;
+			fileInput.value = '';
+			for (i = 0; i < picked.length; i++) {
+				if (!img && /^image\//.test(picked[i].type)) { img = picked[i]; }
+				else if (!sidecar) { sidecar = picked[i]; }
+			}
+			if (!img) { return; }
 			var reader = new FileReader();
-			reader.onload = function (ev) { addBackdropFromDataUrl(ev.target.result); };
-			reader.readAsDataURL(f);
+			reader.onload = function (ev) {
+				addBackdropFromDataUrl(ev.target.result, function () {
+					if (sidecar) { readWorldFile(sidecar); } else { offerWorldFile(); }
+				});
+			};
+			reader.readAsDataURL(img);
 		});
+		if (wldInput) {
+			wldInput.addEventListener('change', function () {
+				var f = wldInput.files[0]; wldInput.value = '';
+				if (f && backdrop) { readWorldFile(f); }
+			});
+		}
 		updateBackdropMenuStateFn = function () {
-			menu.options[2].disabled = !backdrop; menu.options[3].disabled = !backdrop; menu.options[4].disabled = !backdrop;
+			// Everything but the title row and Add needs an image present. Asked of each option
+			// rather than counted by index, because the index arithmetic this replaced was already
+			// wrong the moment a fifth command joined the menu.
+			for (var i = 0; i < menu.options.length; i++) {
+				var v = menu.options[i].value;
+				if (v && v !== 'add') { menu.options[i].disabled = !backdrop; }
+			}
 		};
 		updateBackdropMenuStateFn();
 		into.appendChild(menu);
@@ -5234,6 +5402,7 @@ var EngCalcs = EngCalcs || {};
 			// the same place.
 			{ icon: 'image', label: pc.lpn_backdrop_add || 'Add image', fn: function () { backdropAction('add'); } },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
+			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Set image scale by typing', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
 			{ icon: 'position', label: pc.lpn_backdrop_position || 'Position', fn: function () { backdropAction('position'); }, disabled: !backdrop },
 			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove image', fn: function () { backdropAction('remove'); }, disabled: !backdrop },
 			{ separator: true },

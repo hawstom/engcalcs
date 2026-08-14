@@ -1537,7 +1537,17 @@ $ec_lang['lpn_backdrop_add']='Add image';
 // under the toolbar select's own "Background image..." heading and read as orphans in the Insert
 // menu, where nothing above them says what is being scaled. Naming the object costs one word and
 // works in both places.
-$ec_lang['lpn_backdrop_scale']='Set image scale';
+// Two ways to set the same number, so both say which one they are (Task 276). Picking is the coarse
+// step and typing is the correction -- Tom, 2026-08-10: "mouse (and hand!!!) picking is never
+// precise."
+$ec_lang['lpn_backdrop_scale']='Set image scale by picking';
+$ec_lang['lpn_backdrop_scale_entry']='Set image scale by typing';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Enter pixel size or paste the complete contents of the World File for the image';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Type one number for the pixel size, or paste all six lines of a world file.';
+$ec_lang['lpn_backdrop_wld_ask']='Choose a World File for automatic scale and location?';
+$ec_lang['lpn_backdrop_wld_none']='No world file found. Scale and move using the menu.';
+$ec_lang['lpn_backdrop_wld_choose']='Choose World File';
+$ec_lang['lpn_backdrop_wld_bad']='This world file turns, mirrors or unevenly stretches the picture. The map can only move and resize it evenly, so the file was not used.';
 $ec_lang['lpn_backdrop_position']='Move image';
 $ec_lang['lpn_backdrop_remove']='Remove image';
 $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';

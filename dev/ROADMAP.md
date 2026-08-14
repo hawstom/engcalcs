@@ -49,12 +49,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   be) or debt to delete; only Tom can say which. Recorded so far only inside closed Task 290, where
   nothing re-scans it.
 
-- 15|295| **`Compare-Languages.php` fatals when visited without `?lang1=&lang2=`.** Line 5 passes
-  undefined `$_GET` keys straight to `compare_langs()`, which ends in
-  `require('lib/lang.ec..php')` — an uncaught Error, so a bare visit is a 500 (and leaks the
-  absolute server path wherever `display_errors` is on; the app never sets it either way). Excluded
-  from the sitemap and there is no `robots.txt`, so it stays reachable. Default both params to `en`
-  and a second language, or return early with a picker.
 
 - 55|233| **Manning-Irregular opens in metric on English pages, and greets everyone with a warning.
   One root cause, found 2026-08-08.** `js/manning-irregular.js:184` seeds a hard-coded cookie:
@@ -1340,50 +1334,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     checkable; just do not spend the blog/video headline on it.** Do not relitigate.
   - Consequence: raised 146.06 to 90 and 220 to 95.
 
-- 40|276| **Precise background-image scaling.** Tom, 2026-08-10: pick-two-points is handy but never
-  precise ("mouse (and hand!!!) picking is never precise"); EPANET's is precise but painful. Full
-  option list and his own ranking are in the task body below; his lead candidate is a **World File**.
-  - **Recommended order, cheapest real gain first: (4) then (3).** (4) is *store, report and allow
-    editing of the pixel size we already compute* — `backdrop.s` exists, so this is a number in a
-    box: **Scale (by picking)** stays, **Scale (by entry)** joins it, and picking becomes the coarse
-    step you then correct. It removes the imprecision without adding a file format.
-  - (3) **World file** is the parsimonious *import* answer and should follow, not lead: it gives
-    pixel size directly, which is strictly more than EPANET's method, and costs a six-line text
-    parse. It cannot lead because it only helps a user who already has one, and a screenshot never
-    does. Menu prompt when only the image arrives: "No world file found. Scale and move using the
-    menu."
-  - **A sidecar cannot be auto-detected in ANY browser, not only non-Chromium ones** (Tom,
-    2026-08-10, asking about non-connect browsers — the limit is broader than he assumed). A file
-    picker returns the files the user picked and nothing about their folder; the only API that
-    enumerates siblings is `showDirectoryPicker`, a much larger permission ask than picking a file,
-    and Chromium-only. So the world file is always **user-supplied**, never discovered.
-  - **RULED, Tom 2026-08-10: the second step WINS over silent multi-select.** *"An extra step is
-    excusable as tutorial; better than silent 'allow multiple'."* So: prompt "Choose a World File for
-    automatic scale and location?" after the image is picked. Allow multiple anyway — *"though if
-    they **do** choose multiple, they don't get the tutorial second step; nice"* — i.e. multi-select
-    is the expert shortcut that skips the tutorial, not the primary path.
-  - **Paste-a-world-file into the entry box: yes, but only with explicit wording.** Tom: *"I don't
-    like the paste unless it's very clear; it could get confusing."* His own label, use it verbatim:
-    **"Enter pixel size or paste the complete contents of the World File for the image"**.
-  - **Our transform is `translate + uniform scale`** (`applyBackdropTransform`) — no rotation, no
-    skew, no independent X/Y. A world file with nonzero B/D, or |A| ≠ |E|, cannot be represented:
-    reject it with a message rather than silently using A and dropping the rest.
-  - **Task 274 settled the sign question**: from v4 the stored document is Cartesian, so a world
-    file's negative E now maps onto the file's own convention with no extra decision. The INTERNAL
-    frame is still Y-down, so a world file read has to cross the same boundary `applySaved()` does.
-  - **`downscaleImage()` already reports the ORIGINAL width/height**, not the downscaled canvas
-    dimensions, so a world file's pixel size maps onto `backdrop.iw/ih` with no correction
-    (`s = A * iw / backdrop.width`). Do not "tidy" that callback into passing `canvas.width`.
-  - (2) **enter map width/height** is EPANET's own paradigm and Tom does not like it; with (4) built
-    it is redundant. **(5) nearest-edge picking is REJECTED** (Tom, 2026-08-10: *"probably more
-    trouble than it's worth; we have to document it; I say no"*) — do not re-propose it.
-  - (1) **A precise crosshair cursor is a separate, cheap fix and should just be done** — Tom agreed
-    2026-08-10: a CSS
-    `cursor: crosshair` is already better than the default arrow, and a custom single-pixel-gap
-    crosshair (Tom's reference: <https://www.cursor.cc/?action=icon&file_id=190223>) is a data-URI
-    cursor on `.regmode`. It helps every pick on the page, not only scaling.
-  - **epanet-js's silence is not evidence.** It prioritised map tiles, where registration is the
-    basemap's job; that is a different product decision, not a verdict on world files.
 
 - 60|271| **Give `lpn_` a friction-method choice: HW, DW, Manning.** Tom, 2026-08-10. `bpn_` has
   one; `lpn_` hardcodes `hw`. `assembleModel()` and the map readout already read `frictionMethod()`
@@ -1407,6 +1357,13 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
+
+- 15|297| **Translate Task 276's 8 backdrop-scale keys into all 26 languages.** Seven are new
+  (`lpn_backdrop_scale_entry`, `_prompt`, `_bad`, `lpn_backdrop_wld_ask`, `_none`, `_choose`,
+  `_bad`); the eighth is `lpn_backdrop_scale`, whose English changed to "Set image scale by
+  picking" and whose 26 translations are now stale — the drift tripwire flags it as CHANGED.
+  English falls back automatically (`base.inc.php` loads `lang.ec.en.php` first), so the feature
+  works everywhere today; this is the 182-key delta `lang_parity_check.php` reports.
 
 - 40|257|[H] **[HUMAN] Find or build the example PROJECTS (plural) for lpn.** **Reassigned to Tom,
   2026-08-11, at his own request: *"Let's change this task to a human assignment to create or find
@@ -2038,6 +1995,19 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|276| **[DONE 2026-08-13] Precise background-image scaling: type the number, or hand over a
+  world file.** Menu now offers "Set image scale by picking" (the coarse step) and "Set image scale
+  by typing" — one box taking either a pixel size or a pasted world file, per Tom's own wording.
+  Adding an image offers a world-file pick; choosing image and world file together skips that step.
+  A file that rotates, mirrors or unevenly stretches is refused with a message, never half-applied.
+  Verified by `dev/lpn-spike/backdrop-scale-harness.js` (32 assertions, including the half-pixel
+  centre-vs-corner offset and the Cartesian-to-Y-down flip). Translation debt: Task 297.
+
+- 0|295| **[DONE 2026-08-13] `Compare-Languages.php` no longer fatals on a bare visit.** Unknown or
+  missing `lang1`/`lang2` now render a two-select picker instead of reaching
+  `require('lib/lang.ec..php')`. Also dropped the unconditional `echo "$langDir"` that printed the
+  absolute server path on every comparison.
 
 - 0|251| **Promote `lpn` to a core calculator — DONE 2026-08-13, all 26 languages, 6,522 keys.**
   Ran in four waves after a session limit killed 23 of 26 agents on the first attempt; `lpn` is now

@@ -319,9 +319,46 @@ function ec_title($sentence) {
     return implode(' ', $words);
 }
 
+// The language codes Compare-Languages.php will accept. Both halves have to hold: a code declared in
+// Language.Settings.php whose lang file is missing would still fatal in the require() below, and a
+// stray lang.ec.*.php with no settings entry is not a language this app serves.
+function ec_compare_langs_available () {
+    global $all_language_settings;
+    $out = array();
+    foreach (array_keys((array)$all_language_settings) as $code) {
+        if (is_file(__DIR__ . "/lang.ec.$code.php")) { $out[] = $code; }
+    }
+    return $out;
+}
+// Returns the code if it is one we serve, null otherwise -- including the missing-parameter case,
+// which is what a bare visit sends.
+function ec_compare_lang_or_null ($code) {
+    if (!is_string($code)) { return null; }
+    return in_array($code, ec_compare_langs_available(), true) ? $code : null;
+}
+// Shown instead of a comparison when either code is missing or unknown. Two selects and a Compare
+// button; whichever code WAS valid is preselected, so a half-typed URL keeps the half that worked.
+function ec_compare_lang_picker ($lang1, $lang2) {
+    global $all_language_settings;
+    $codes = ec_compare_langs_available();
+    echo "\n<form method=\"get\" action=\"\">\n";
+    foreach (array('lang1' => $lang1, 'lang2' => $lang2) as $field => $current) {
+        if ($current === null) { $current = ($field === 'lang1') ? 'en' : ''; }
+        echo "<label>$field <select name=\"$field\">\n";
+        if ($current === '') { echo "<option value=\"\">--</option>\n"; }
+        foreach ($codes as $code) {
+            $name = isset($all_language_settings[$code]['LANGNAME']) ? $all_language_settings[$code]['LANGNAME'] : $code;
+            $sel = ($code === $current) ? ' selected="selected"' : '';
+            echo '<option value="' . htmlspecialchars($code) . '"' . $sel . '>'
+                . htmlspecialchars($code . ' — ' . $name) . "</option>\n";
+        }
+        echo "</select></label>\n";
+    }
+    echo "<button type=\"submit\">Compare</button>\n</form>\n";
+}
+
 function compare_langs ($baseLang, $secondLang) {
     $langDir = __DIR__;
-    echo "$langDir<br />";
     unset($ec_lang);
     require("$langDir/lang.ec.$baseLang.php");
     $baseLang=$ec_lang;
@@ -335,7 +372,7 @@ function compare_langs ($baseLang, $secondLang) {
         if(!isset($secondLang[$key])) {
             echo "<tr><td>$key:$basestring</td><td></td><td></td></tr>";
         }
-        if($baseLang[$key] == $secondLang[$key]) {
+        if(isset($secondLang[$key]) && $baseLang[$key] == $secondLang[$key]) {
             echo "<tr><td></td><td></td><td>$key:$basestring</td></tr>";
         }
     }
