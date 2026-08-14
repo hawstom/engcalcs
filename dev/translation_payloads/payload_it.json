@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 862,
-        "delta_key_count": 9,
+        "expected_key_count": 859,
+        "delta_key_count": 6,
         "exempt_key_count": 21,
         "exempt_keys": [
             "calc_units_us",
@@ -39,7 +39,7 @@
         "syn_notes": "Use key_syn when present; these entries provide terse disambiguation comments only where translation risk exists."
     },
     "prompt_context_by_prefix": {
-        "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head (H): carico\n    DO NOT render as: a lazy anatomical calque that is NOT the language's natural hydraulic term — but an anatomically-derived word that IS the dominant local standard is correct (English 'head' is itself the body-part word repurposed); defer to the cultural standard, do not 'fix' a natural term for containing a body-part morpheme; treating it as the gauge pressure at a point. Head is energy per unit weight -- it can legitimately be READ in either height units or pressure units (the suite offers both, and defaults to psi for head loss under the US preset), so a pressure-flavoured term or a psi reading is not itself an error. The real constraint: TOTAL head (EGL, HGL) is offered in water-column units ONLY, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28, encoded in the total_head unit family).; source\/origin of a stream\n- head loss (h_L): perdita di carico\n    DO NOT render as: calquing the English word \"head\" into a language whose engineers do not use a height word here. Defer to the term the language's own engineers actually use: German Druckverlust, French perte de charge, Urdu دباؤ نقصان all read literally as \"pressure loss\" and are all correct, dominant professional usage. NOTE ON UNITS -- this concept is legitimately read in EITHER height or pressure units, so a pressure-flavoured term is not a units error: the suite's own partial_head family (h_f, h_m, h_L) offers psi\/kPa\/bar\/kgfcm2 and DEFAULTS to psi in the US preset. The one real constraint is on TOTAL head (EGL\/HGL), which the total_head family deliberately offers in water-column units only, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28) -- see the 'head' root entry.; a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction loss (h_f): perdita di carico distribuita\n- minor loss (h_m): perdita di carico concentrata\n- pressure (p): Pressione\n    DO NOT render as: the HEAD term (a height of water column) — pressure here is what a gauge reads; atmospheric or meteorological pressure senses; a stress or material-strength sense; figurative 'pressure' (urgency, coercion)\n- elevation (z): Quota\n    DO NOT render as: the HEAD term — an elevation is a position above a datum, not an energy; a generic 'tall\/high' adjective where the language has a surveying term; altitude in the aviation or geographic sense where a levelled survey term exists\n- demand: Richiesta\n    DO NOT render as: economic or market demand; a legal demand\/claim; a request in the everyday sense\n- static head (H): Carico statico di alimentazione\n    DO NOT render as: electrostatic \/ static electricity; 'stationary\/motionless' in a non-hydraulic sense\n- maximum allowable head (H): Press. max. amm. tubo\n    DO NOT render as: the operating \/ computed head (this is a fixed design limit, not the pressure the network actually develops)\n- supply head (H): Carico di alimentazione\n    DO NOT render as: an economic 'supply'; confusing supply (source) head with the delivered\/residual head at a demand point\n- supply curve: [needs translation sprint]\n    DO NOT render as: an economic supply curve; a demand curve\n- looped network: rete di tubazioni magliata\n    DO NOT render as: a control-flow \/ programming loop; a physical loop, knot, or coil\n- branched network: Rete di tubazioni ramificata\n    DO NOT render as: a literal botanical 'tree' where the language has a proper network\/graph term; a looped or meshed network (branched means no loops)\n- pipe line: Tratti di tubazione\n    DO NOT render as: a queue or line of people; a rope, cord, or cable; a line of text; a purely geometric line\/segment\n- pressure rating: Press. max. amm. tubo\n    DO NOT render as: a stress or material strength rather than a water pressure; blood-pressure or tyre-pressure senses; a general word for strong or high\n- pressure reduction: riduzione della pressione\n    DO NOT render as: naming a specific device (break pressure tank, BPT, pressure-reducing valve) as if the tool recommends one; depressurizing in the sense of emptying or draining the pipe\n- energy grade line (EGL): linea dei carichi totali\n- Manning roughness (n): coefficiente di scabrezza di Manning\n- friction factor (f): fattore di attrito\n- draw (a diagram): [needs translation sprint]\n    DO NOT render as: draw water (abstract, pump, or take water from a source) -- the wrong sense here, and PLAUSIBLE in a hydraulics context, which is what makes it dangerous; pull, drag, or haul; draw as in a lottery or a tie\/stalemate; withdraw money\n- junction: [needs translation sprint]\n    DO NOT render as: a road junction, crossroads, or intersection; a physical pipe fitting (tee, cross, elbow) -- a junction here is a point in the model, not a part you buy; a railway junction; an electrical junction box\n- reservoir: [needs translation sprint]\n    DO NOT render as: a tank whose level changes over time -- lpn_ explicitly does NOT model tanks (see lpn_notes_2_def), and calling this one would promise time-varying behaviour that does not exist; a natural lake specifically, where the language has a general storage\/supply term; a reserve or reservation in the non-physical sense\n- node: [needs translation sprint]\n    DO NOT render as: a computing\/server node (a transliterated loanword where the language has a real graph or network-diagram term); a knot, lump, or swelling (the anatomical\/botanical sense of the Latin root); a node in the wave-physics sense (a point of zero amplitude)\n- link: [needs translation sprint]\n    DO NOT render as: a hyperlink or web link -- the dominant modern sense of the English word, and the wrong one here; a chain link (the physical object); a connection in the social or logistical sense\n- vertex: [needs translation sprint]\n    DO NOT render as: a mathematical vertex of a polygon or a parabola apex, where the language has a plainer word for a bend or corner point in a drawn line; a peak or summit; a vertex in the anatomical sense (crown of the head)\n- background image: [needs translation sprint]\n    DO NOT render as: a backdrop in the theatrical\/stage sense (the English source word was CHANGED to \"background image\" in Task 193 precisely to remove this transliteration lure); a wallpaper or decorative background; an online\/satellite map layer -- this is a plain image file the user already has\n- pump curve: [needs translation sprint]\n    DO NOT render as: a curve in the geometric\/road sense; a pump characteristic confused with an efficiency or power curve -- this one is head against flow\n- project (saved network): [needs translation sprint]\n    DO NOT render as: an engineering project or job in the contractual sense (a scheme, a works, a contract) -- this is a saved document; a projection (optical or cartographic); to project or forecast\n- scenario: [needs translation sprint]\n    DO NOT render as: a scene or setting in the dramatic\/film sense; a scenario in the \"worst case story\" narrative sense, where the language has a modelling or variant-case term; a copy or duplicate of the network -- a scenario is a set of differences, not a second network\n- zoom to extents: [needs translation sprint]\n    DO NOT render as: a general \"adjust\/change the zoom\" — this is the trap. es \"Ajustar zoom\" and pt \"Zoom para ajustar\" both shipped meaning ADJUST THE ZOOM, which describes the zoom slider, not this button. A verb meaning adjust\/regulate\/set is wrong unless the label also says WHAT is fitted; zoom in \/ zoom out \/ a zoom level or percentage — this command has no direction and no amount; a transliterated \"zoom\" loanword standing alone, where the language has a real word for showing the whole drawing; the photographic or camera sense of zoom (a lens movement)\n- default (setting): predefinito\n    DO NOT render as: the financial sense — failure to pay a debt, defaulting on a loan. This is the dominant everyday sense of the English word in many languages and the single most dangerous confusion here; the legal sense — failure to appear or to act, a default judgment; a bare \"reset\" or \"restore\" with the default concept dropped entirely. ro shipped calc_defaults as just \"Reseteaza\" (Reset) while its own calc_defaults_confirm used \"valorile implicite\" correctly — the button must say WHAT is restored; a word meaning normal\/usual\/ordinary where the language has a real settings term. sw shipped \"maadili ya kawaida\" (normal values) instead of \"chaguo-msingi\"; \"kawaida\" describes what is typical, not what the software ships with; the sports sense — winning or losing by default, by forfeit\n- upstream: a monte\n- downstream: a valle"
+        "lpn": "Use these preferred technical term translations when relevant:\n- flow (Q): portata\n- velocity (v): velocità\n- head (H): carico\n    DO NOT render as: a lazy anatomical calque that is NOT the language's natural hydraulic term — but an anatomically-derived word that IS the dominant local standard is correct (English 'head' is itself the body-part word repurposed); defer to the cultural standard, do not 'fix' a natural term for containing a body-part morpheme; treating it as the gauge pressure at a point. Head is energy per unit weight -- it can legitimately be READ in either height units or pressure units (the suite offers both, and defaults to psi for head loss under the US preset), so a pressure-flavoured term or a psi reading is not itself an error. The real constraint: TOTAL head (EGL, HGL) is offered in water-column units ONLY, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28, encoded in the total_head unit family).; source\/origin of a stream\n- head loss (h_L): perdita di carico\n    DO NOT render as: calquing the English word \"head\" into a language whose engineers do not use a height word here. Defer to the term the language's own engineers actually use: German Druckverlust, French perte de charge, Urdu دباؤ نقصان all read literally as \"pressure loss\" and are all correct, dominant professional usage. NOTE ON UNITS -- this concept is legitimately read in EITHER height or pressure units, so a pressure-flavoured term is not a units error: the suite's own partial_head family (h_f, h_m, h_L) offers psi\/kPa\/bar\/kgfcm2 and DEFAULTS to psi in the US preset. The one real constraint is on TOTAL head (EGL\/HGL), which the total_head family deliberately offers in water-column units only, because an EGL is an elevation and psi there is close to meaningless (Tom, 2026-07-28) -- see the 'head' root entry.; a lazy anatomical calque that is not the local standard — an anatomically-derived word that IS the dominant standard is correct; see 'head' root entry\n- friction loss (h_f): perdita di carico distribuita\n- minor loss (h_m): perdita di carico concentrata\n- pressure (p): Pressione\n    DO NOT render as: the HEAD term (a height of water column) — pressure here is what a gauge reads; atmospheric or meteorological pressure senses; a stress or material-strength sense; figurative 'pressure' (urgency, coercion)\n- elevation (z): Quota\n    DO NOT render as: the HEAD term — an elevation is a position above a datum, not an energy; a generic 'tall\/high' adjective where the language has a surveying term; altitude in the aviation or geographic sense where a levelled survey term exists\n- demand: Richiesta\n    DO NOT render as: economic or market demand; a legal demand\/claim; a request in the everyday sense\n- static head (H): Carico statico di alimentazione\n    DO NOT render as: electrostatic \/ static electricity; 'stationary\/motionless' in a non-hydraulic sense\n- maximum allowable head (H): Press. max. amm. tubo\n    DO NOT render as: the operating \/ computed head (this is a fixed design limit, not the pressure the network actually develops)\n- supply head (H): Carico di alimentazione\n    DO NOT render as: an economic 'supply'; confusing supply (source) head with the delivered\/residual head at a demand point\n- supply curve: [needs translation sprint]\n    DO NOT render as: an economic supply curve; a demand curve\n- looped network: rete di tubazioni magliata\n    DO NOT render as: a control-flow \/ programming loop; a physical loop, knot, or coil\n- branched network: Rete di tubazioni ramificata\n    DO NOT render as: a literal botanical 'tree' where the language has a proper network\/graph term; a looped or meshed network (branched means no loops)\n- pipe line: Tratti di tubazione\n    DO NOT render as: a queue or line of people; a rope, cord, or cable; a line of text; a purely geometric line\/segment\n- pressure rating: Press. max. amm. tubo\n    DO NOT render as: a stress or material strength rather than a water pressure; blood-pressure or tyre-pressure senses; a general word for strong or high\n- pressure reduction: riduzione della pressione\n    DO NOT render as: naming a specific device (break pressure tank, BPT, pressure-reducing valve) as if the tool recommends one; depressurizing in the sense of emptying or draining the pipe\n- energy grade line (EGL): linea dei carichi totali\n- Manning roughness (n): coefficiente di scabrezza di Manning\n- friction factor (f): fattore di attrito\n- draw (a diagram): [needs translation sprint]\n    DO NOT render as: draw water (abstract, pump, or take water from a source) -- the wrong sense here, and PLAUSIBLE in a hydraulics context, which is what makes it dangerous; pull, drag, or haul; draw as in a lottery or a tie\/stalemate; withdraw money\n- junction: [needs translation sprint]\n    DO NOT render as: a road junction, crossroads, or intersection; a physical pipe fitting (tee, cross, elbow) -- a junction here is a point in the model, not a part you buy; a railway junction; an electrical junction box\n- reservoir: [needs translation sprint]\n    DO NOT render as: a tank whose level changes over time -- lpn_ explicitly does NOT model tanks (see lpn_notes_2_def), and calling this one would promise time-varying behaviour that does not exist; a natural lake specifically, where the language has a general storage\/supply term; a reserve or reservation in the non-physical sense\n- node: [needs translation sprint]\n    DO NOT render as: a computing\/server node (a transliterated loanword where the language has a real graph or network-diagram term); a knot, lump, or swelling (the anatomical\/botanical sense of the Latin root); a node in the wave-physics sense (a point of zero amplitude)\n- link: [needs translation sprint]\n    DO NOT render as: a hyperlink or web link -- the dominant modern sense of the English word, and the wrong one here; a chain link (the physical object); a connection in the social or logistical sense\n- vertex: [needs translation sprint]\n    DO NOT render as: a mathematical vertex of a polygon or a parabola apex, where the language has a plainer word for a bend or corner point in a drawn line; a peak or summit; a vertex in the anatomical sense (crown of the head)\n- background image: [needs translation sprint]\n    DO NOT render as: a backdrop in the theatrical\/stage sense (the English source word was CHANGED to \"background image\" in Task 193 precisely to remove this transliteration lure); a wallpaper or decorative background; an online\/satellite map layer -- this is a plain image file the user already has\n- world file: [needs translation sprint]\n    DO NOT render as: any reading of \"world\" as the PLANET, the globe, or the earth. The word names a coordinate space, not a place -- \"planet file\", \"earth file\", \"global file\" are all wrong.; a phonetic transliteration of the English words where the language's GIS community already has a real term (fr \"fichier de géoréférencement\", es \"archivo de georreferenciación\" are the kind of thing wanted). Transliterate only where nothing established exists.; confusing it with the IMAGE file itself, or calling it a \"map file\" or \"project file\" -- it is a tiny six-line plain-text SIDECAR that travels beside the picture.; translating the file EXTENSIONS that carry it (.wld, .jgw, .tfw, .pgw). Those are literal filename suffixes.\n- pump curve: [needs translation sprint]\n    DO NOT render as: a curve in the geometric\/road sense; a pump characteristic confused with an efficiency or power curve -- this one is head against flow\n- project (saved network): [needs translation sprint]\n    DO NOT render as: an engineering project or job in the contractual sense (a scheme, a works, a contract) -- this is a saved document; a projection (optical or cartographic); to project or forecast\n- scenario: [needs translation sprint]\n    DO NOT render as: a scene or setting in the dramatic\/film sense; a scenario in the \"worst case story\" narrative sense, where the language has a modelling or variant-case term; a copy or duplicate of the network -- a scenario is a set of differences, not a second network\n- zoom to extents: [needs translation sprint]\n    DO NOT render as: a general \"adjust\/change the zoom\" — this is the trap. es \"Ajustar zoom\" and pt \"Zoom para ajustar\" both shipped meaning ADJUST THE ZOOM, which describes the zoom slider, not this button. A verb meaning adjust\/regulate\/set is wrong unless the label also says WHAT is fitted; zoom in \/ zoom out \/ a zoom level or percentage — this command has no direction and no amount; a transliterated \"zoom\" loanword standing alone, where the language has a real word for showing the whole drawing; the photographic or camera sense of zoom (a lens movement)\n- default (setting): predefinito\n    DO NOT render as: the financial sense — failure to pay a debt, defaulting on a loan. This is the dominant everyday sense of the English word in many languages and the single most dangerous confusion here; the legal sense — failure to appear or to act, a default judgment; a bare \"reset\" or \"restore\" with the default concept dropped entirely. ro shipped calc_defaults as just \"Reseteaza\" (Reset) while its own calc_defaults_confirm used \"valorile implicite\" correctly — the button must say WHAT is restored; a word meaning normal\/usual\/ordinary where the language has a real settings term. sw shipped \"maadili ya kawaida\" (normal values) instead of \"chaguo-msingi\"; \"kawaida\" describes what is typical, not what the software ships with; the sports sense — winning or losing by default, by forfeit\n- upstream: a monte\n- downstream: a valle"
     },
     "glossary_terms_by_prefix": {
         "lpn": [
@@ -240,6 +240,13 @@
                 "preferred_translation": ""
             },
             {
+                "term": "world file",
+                "symbol": "",
+                "context": "A six-line plain-text sidecar file that says where a raster image sits in real-world coordinates and how big one of its pixels is: pixel size in X, two rotation terms, pixel size in Y, and the coordinates of the centre of the top-left pixel. Named for the \"world\" (real\/ground) coordinate space it maps the image's pixel coordinates into. Standard in GIS since ESRI introduced it; the extension follows the image (.jgw for .jpg, .tfw for .tif, .pgw for .png, or plain .wld). In lpn_ it is the alternative to scaling the background image by clicking two points -- keys lpn_backdrop_wld_* and lpn_backdrop_scale_entry*.",
+                "translation_notes": "Seeded 2026-08-13 for ROADMAP Task 297 (Wave 0). The English source was normalised to lowercase \"world file\" in the same pass: it had been Title Cased in two of the five keys and lowercase in the other three, and Title Case reads as a brand name, which invites leaving it untranslated and would have split the five keys half-and-half. Translations deliberately EMPTY -- this entry exists to carry the avoid-list into the sprint prompts, not to assert a translation nobody has made. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back.",
+                "preferred_translation": ""
+            },
+            {
                 "term": "pump curve",
                 "symbol": "",
                 "context": "The relationship between the flow through a pump and the head it adds, H = H0 - aQ^b. lpn_ fits it from one, two, or three points read off a manufacturer's published curve. Documented in lpn_notes_5_def.",
@@ -293,24 +300,18 @@
     "keys_to_translate": {
         "lpn_menu_help": "Help",
         "lpn_help_walkthroughs": "Walkthroughs",
-        "lpn_backdrop_scale_entry": "Scale by World File or pixel size",
-        "lpn_backdrop_scale_entry_prompt": "Enter the size of a pixel or paste the complete contents of the World File for the image",
-        "lpn_backdrop_scale_entry_bad": "Type one number for the size of a pixel, or paste all six lines of a world file.",
-        "lpn_backdrop_wld_ask": "Choose a World File for automatic scale and location?",
-        "lpn_backdrop_wld_none": "No world file found. Scale and move using the menu.",
-        "lpn_backdrop_wld_choose": "Choose World File",
-        "lpn_backdrop_wld_bad": "This world file turns, mirrors or unevenly stretches the picture. The map can only move and resize it evenly, so the file was not used."
+        "lpn_backdrop_scale_entry": "Scale by world file or by the size of one pixel on the map",
+        "lpn_backdrop_scale_entry_prompt": "Enter the size of one pixel on the map, or paste the complete contents of the world file for the image",
+        "lpn_backdrop_scale_entry_bad": "Type one number for the size of one pixel on the map, or paste all six lines of a world file.",
+        "lpn_backdrop_wld_bad": "This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used."
     },
     "keys": {
         "lpn_menu_help": "Help",
         "lpn_help_walkthroughs": "Walkthroughs",
-        "lpn_backdrop_scale_entry": "Scale by World File or pixel size",
-        "lpn_backdrop_scale_entry_prompt": "Enter the size of a pixel or paste the complete contents of the World File for the image",
-        "lpn_backdrop_scale_entry_bad": "Type one number for the size of a pixel, or paste all six lines of a world file.",
-        "lpn_backdrop_wld_ask": "Choose a World File for automatic scale and location?",
-        "lpn_backdrop_wld_none": "No world file found. Scale and move using the menu.",
-        "lpn_backdrop_wld_choose": "Choose World File",
-        "lpn_backdrop_wld_bad": "This world file turns, mirrors or unevenly stretches the picture. The map can only move and resize it evenly, so the file was not used."
+        "lpn_backdrop_scale_entry": "Scale by world file or by the size of one pixel on the map",
+        "lpn_backdrop_scale_entry_prompt": "Enter the size of one pixel on the map, or paste the complete contents of the world file for the image",
+        "lpn_backdrop_scale_entry_bad": "Type one number for the size of one pixel on the map, or paste all six lines of a world file.",
+        "lpn_backdrop_wld_bad": "This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used."
     },
     "key_context": {
         "lpn_menu_help": {
@@ -393,54 +394,6 @@
                 }
             }
         },
-        "lpn_backdrop_wld_ask": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_backdrop_scale",
-                    "value": "Imposta la scala dell'immagine",
-                    "english": "Scale by picking"
-                },
-                "next_translated": {
-                    "key": "lpn_backdrop_position",
-                    "value": "Sposta immagine",
-                    "english": "Move"
-                }
-            }
-        },
-        "lpn_backdrop_wld_none": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_backdrop_scale",
-                    "value": "Imposta la scala dell'immagine",
-                    "english": "Scale by picking"
-                },
-                "next_translated": {
-                    "key": "lpn_backdrop_position",
-                    "value": "Sposta immagine",
-                    "english": "Move"
-                }
-            }
-        },
-        "lpn_backdrop_wld_choose": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_backdrop_scale",
-                    "value": "Imposta la scala dell'immagine",
-                    "english": "Scale by picking"
-                },
-                "next_translated": {
-                    "key": "lpn_backdrop_position",
-                    "value": "Sposta immagine",
-                    "english": "Move"
-                }
-            }
-        },
         "lpn_backdrop_wld_bad": {
             "reason": "missing",
             "current_value": null,
@@ -458,5 +411,11 @@
             }
         }
     },
-    "key_syn": []
+    "key_syn": {
+        "lpn_menu_help": "Help, Guidance, Assistance, Support, or Information",
+        "lpn_help_walkthroughs": "Walkthroughs, Guided tours, Step-by-step guides, Worked examples, or Tutorials",
+        "lpn_backdrop_scale_entry": "gloss: world file; layout: nav item",
+        "lpn_backdrop_scale_entry_prompt": "gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text",
+        "lpn_backdrop_wld_bad": "gloss: world file"
+    }
 }

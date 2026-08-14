@@ -1213,6 +1213,7 @@ $ec_lang['lpn_menu_settings']='Settings';
 // And every other menu-bar item acts on the project, while this one leaves the site -- unremarkable
 // as a row inside Help, out of place as a sixth document verb.
 $ec_lang['lpn_menu_help']='Help';
+$ec_lang_syn['lpn_menu_help']='Help, Guidance, Assistance, Support, or Information | layout: nav item';
 // PLURAL is literally true and is not aspirational (Tom, 2026-08-13): the single post contains
 // three use-case walkthroughs of this calculator. So the row links straight to the post; no blog
 // label page is needed to make the plural honest.
@@ -1222,6 +1223,7 @@ $ec_lang['lpn_menu_help']='Help';
 // good enough on a blog page, and a permanent "(in English)" cost more, constantly, than the
 // occasional reader who meets it untranslated.
 $ec_lang['lpn_help_walkthroughs']='Walkthroughs';
+$ec_lang_syn['lpn_help_walkthroughs']='Walkthroughs, Guided tours, Step-by-step guides, Worked examples, or Tutorials | layout: nav item';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1557,16 +1559,28 @@ $ec_lang['lpn_backdrop_add']='Add';
 // step -- Tom, 2026-08-10: "mouse (and hand!!!) picking is never precise" -- and the other is the
 // correction. The second label NAMES the World File rather than saying "by typing", because the
 // World File was "hidden and hard to discover" (Tom, 2026-08-13) and a menu is where it gets found.
-// Note "pixel size" here and "the size of a pixel" in the prompt below: a menu label is terse by
-// nature, and the prompt is where there is room to say it the way an engineer would read it.
+// "The size of one pixel ON THE MAP", in all three, and NOT "pixel size" (Task 297 Wave 0). "Pixel
+// size" reads just as easily as the image's pixel DIMENSIONS -- a property of the file -- as it does
+// the distance one pixel covers, which is the only thing the code wants. Tom, 2026-08-13, chose the
+// qualifier: "'map' is better than real world or real" -- the reader is looking at a map, so the
+// frame they are being asked about is the one already in front of them.
+// The longer label costs nothing since Task 276 made this control a menu button rather than a
+// <select>, so a row label no longer sets the collapsed width.
+// "world file" stays LOWERCASE. Title Case reads as a brand and invites a translator to leave it in
+// English; the concept carries its own glossary.json entry instead.
+//
+// There are NO lpn_backdrop_wld_ask/_none/_choose keys (Tom, 2026-08-13): "We don't ask for world
+// file... We ask for a paste of World File contents." The dialog that opened a second file picker is
+// gone; the two doors that remain both take the CONTENTS -- the multi-select picker and the textarea
+// behind lpn_backdrop_scale_entry. Do not re-add an ask.
 $ec_lang['lpn_backdrop_scale']='Scale by picking';
-$ec_lang['lpn_backdrop_scale_entry']='Scale by World File or pixel size';
-$ec_lang['lpn_backdrop_scale_entry_prompt']='Enter the size of a pixel or paste the complete contents of the World File for the image';
-$ec_lang['lpn_backdrop_scale_entry_bad']='Type one number for the size of a pixel, or paste all six lines of a world file.';
-$ec_lang['lpn_backdrop_wld_ask']='Choose a World File for automatic scale and location?';
-$ec_lang['lpn_backdrop_wld_none']='No world file found. Scale and move using the menu.';
-$ec_lang['lpn_backdrop_wld_choose']='Choose World File';
-$ec_lang['lpn_backdrop_wld_bad']='This world file turns, mirrors or unevenly stretches the picture. The map can only move and resize it evenly, so the file was not used.';
+$ec_lang['lpn_backdrop_scale_entry']='Scale by world file or by the size of one pixel on the map';
+$ec_lang_syn['lpn_backdrop_scale_entry']='gloss: world file; layout: nav item';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Enter the size of one pixel on the map, or paste the complete contents of the world file for the image';
+$ec_lang_syn['lpn_backdrop_scale_entry_prompt']='gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Type one number for the size of one pixel on the map, or paste all six lines of a world file.';
+$ec_lang['lpn_backdrop_wld_bad']='This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.';
+$ec_lang_syn['lpn_backdrop_wld_bad']='gloss: world file';
 $ec_lang['lpn_backdrop_position']='Move';
 $ec_lang['lpn_backdrop_remove']='Remove';
 $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';

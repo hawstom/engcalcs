@@ -1682,8 +1682,8 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) {
 			var w = parseWorldFile(ev.target.result);
-			if (!w) { alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of a pixel, or paste all six lines of a world file.'); return; }
-			if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file turns, mirrors or unevenly stretches the picture. The map can only move and resize it evenly, so the file was not used.'); return; }
+			if (!w) { alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.'); return; }
+			if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
 			applyWorldFile(w);
 		};
 		reader.readAsText(file);
@@ -1757,7 +1757,7 @@ var EngCalcs = EngCalcs || {};
 		openDialog(function (body) {
 			var p = document.createElement('p');
 			p.style.margin = '0 0 8px';
-			p.textContent = (pc.lpn_backdrop_scale_entry_prompt || 'Enter the size of a pixel or paste the complete contents of the World File for the image')
+			p.textContent = (pc.lpn_backdrop_scale_entry_prompt || 'Enter the size of one pixel on the map, or paste the complete contents of the world file for the image')
 				+ ' (' + unitLabel('lpn_u_length') + ')';
 			body.appendChild(p);
 			// A textarea, not a number input: a pasted world file is six lines, and a control that
@@ -1780,43 +1780,26 @@ var EngCalcs = EngCalcs || {};
 		} else {
 			w = parseWorldFile(t);
 			if (w) {
-				if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file turns, mirrors or unevenly stretches the picture. The map can only move and resize it evenly, so the file was not used.'); return; }
+				if (!w.ok) { alert(pc.lpn_backdrop_wld_bad || 'This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.'); return; }
 				applyWorldFile(w);
 				return;
 			}
 		}
-		alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of a pixel, or paste all six lines of a world file.');
+		alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.');
 	}
-	// A sidecar cannot be auto-detected in ANY browser: a file picker returns the files the user
-	// picked and nothing about their folder, and the only API that enumerates siblings
-	// (showDirectoryPicker) is a far larger permission ask and Chromium-only. So the world file is
-	// always user-supplied, never discovered -- and Tom ruled the extra step in rather than a silent
-	// multi-select: "An extra step is excusable as tutorial; better than silent 'allow multiple'."
-	// Picking both files at once still works, and skips this step, which is the expert shortcut.
-	function offerWorldFile() {
-		var pc = EngCalcs.pageConfig || {};
-		openDialog(function (body) {
-			var q = document.createElement('p');
-			q.style.margin = '0 0 8px';
-			q.textContent = pc.lpn_backdrop_wld_ask || 'Choose a World File for automatic scale and location?';
-			body.appendChild(q);
-			// The answer to "and if I have not got one?", in the same breath as the question, so
-			// declining does not cost a second dialog.
-			var hint = document.createElement('p');
-			hint.style.margin = '0'; hint.style.fontSize = '90%';
-			hint.textContent = pc.lpn_backdrop_wld_none || 'No world file found. Scale and move using the menu.';
-			body.appendChild(hint);
-		}, [
-			{
-				label: pc.lpn_backdrop_wld_choose || 'Choose World File',
-				fn: function () {
-					var wf = document.getElementById('lpn_backdrop_wld_file');
-					if (wf) { wf.click(); }
-				}
-			},
-			{ label: pc.lpn_cancel || 'Cancel', fn: function () { } }
-		]);
-	}
+	// WE NEVER ASK FOR A WORLD FILE AS A FILE (Tom, 2026-08-13): "We don't ask for world file...
+	// We ask for a paste of World File contents." An offerWorldFile() dialog used to open a SECOND
+	// file picker the moment an image landed, and it is gone -- along with its three language keys
+	// (lpn_backdrop_wld_ask/_none/_choose) and the hidden #lpn_backdrop_wld_file input.
+	//
+	// Nothing is lost, because both surviving doors already take the file's CONTENTS:
+	//   - pick the image and its sidecar together in the one picker (readWorldFile, below), and
+	//   - Background image > "Scale by world file or by the size of one pixel on the map", whose
+	//     textarea accepts those same six lines pasted.
+	// A sidecar still cannot be auto-detected in ANY browser -- a file picker returns the files the
+	// user picked and nothing about their folder, and showDirectoryPicker is a far larger permission
+	// ask and Chromium-only -- so a world file is always user-supplied, never discovered. That fact is
+	// what made the deleted dialog's "No world file found" a report of a search that never ran.
 	function positionTo(refWorld, target) {
 		backdrop.tx += target.x - refWorld.x; backdrop.ty += target.y - refWorld.y;
 		applyBackdropTransform();
@@ -1902,27 +1885,33 @@ var EngCalcs = EngCalcs || {};
 	}
 	// The rows themselves, built fresh on every open so `disabled` is simply read from the current
 	// state -- which is why the old updateBackdropMenuState() machinery is gone rather than kept as a
-	// no-op. Shared verbatim by both doors, so the two can no longer drift apart.
+	// no-op. The COMMANDS are shared verbatim by both doors, so the two can no longer drift apart.
 	//
 	// The HEADING is what lets these be bare verbs. Tom, 2026-08-04, was right that "Scale"/"Position"
-	// orphan in the Insert menu, "where nothing above them says what is being scaled" -- so now
-	// something does, in both doors, and the object moves out of five labels into one word.
-	function backdropRows() {
+	// orphan in the Insert menu, "where nothing above them says what is being scaled" -- so something
+	// does, and the object moves out of five labels into one word.
+	//
+	// But it belongs to ONE door, not both (Tom, 2026-08-13: "remove the top wording from the
+	// Background image menu. It's unnecessarily redundant"). Off the toolbar button the heading
+	// repeats the button you just clicked, which reads as a stutter; spliced into Insert it is the
+	// only thing in sight that says what Add/Move/Remove act on. So `withHeading` is passed by the
+	// Insert door alone. Do not "simplify" it back to always-on or always-off -- each door has been
+	// ruled on separately, and the two rulings disagree for good reasons.
+	function backdropRows(withHeading) {
 		var pc = EngCalcs.pageConfig || {};
-		return [
-			{ heading: true, label: pc.lpn_backdrop_menu || 'Background image…' },
+		return (withHeading ? [{ heading: true, label: pc.lpn_backdrop_menu || 'Background image…' }] : []).concat([
 			{ icon: 'image', label: pc.lpn_backdrop_add || 'Add', fn: function () { backdropAction('add'); } },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale by picking', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
-			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Scale by World File or pixel size', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
+			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Scale by world file or by the size of one pixel on the map', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
 			{ icon: 'position', label: pc.lpn_backdrop_position || 'Move', fn: function () { backdropAction('position'); }, disabled: !backdrop },
 			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove', fn: function () { backdropAction('remove'); }, disabled: !backdrop }
-		];
+		]);
 	}
 	function wireBackdropMenu(into) {
 		var pc = EngCalcs.pageConfig || {}, menu = document.createElement('button');
 		menu.type = 'button';
 		// A BUTTON, not a <select> (Tom, 2026-08-13). A select is as wide as its widest option, so
-		// "Scale by World File or pixel size" set the width of a control that spends all its time
+		// "Scale by world file or by the size of one pixel on the map" set the width of a control that spends all its time
 		// reading "Background image…" -- and the longer a command's name got, the more toolbar it
 		// cost, which is a bad trade to have wired into the widget. A menu button is as wide as its
 		// own label and nothing else. The id stays: showBackdropTargetPanel() positions the target
@@ -1932,7 +1921,6 @@ var EngCalcs = EngCalcs || {};
 		// stopPropagation for the same reason every menubar item does it -- see buildMenuBar().
 		menu.addEventListener('click', function (e) { e.stopPropagation(); openMenu(e.currentTarget, backdropRows()); });
 		var fileInput = document.getElementById('lpn_backdrop_file');
-		var wldInput = document.getElementById('lpn_backdrop_wld_file');
 		fileInput.addEventListener('change', function () {
 			// The picker accepts both the image and its world file, so sort what came back by type
 			// rather than assuming files[0] is the picture.
@@ -1946,17 +1934,13 @@ var EngCalcs = EngCalcs || {};
 			var reader = new FileReader();
 			reader.onload = function (ev) {
 				addBackdropFromDataUrl(ev.target.result, function () {
-					if (sidecar) { readWorldFile(sidecar); } else { offerWorldFile(); }
+					// No sidecar picked means no prompt: the user scales from the Background image
+					// menu when they are ready. We do not chase them for a file (see above).
+					if (sidecar) { readWorldFile(sidecar); }
 				});
 			};
 			reader.readAsDataURL(img);
 		});
-		if (wldInput) {
-			wldInput.addEventListener('change', function () {
-				var f = wldInput.files[0]; wldInput.value = '';
-				if (f && backdrop) { readWorldFile(f); }
-			});
-		}
 		into.appendChild(menu);
 	}
 
@@ -5401,7 +5385,7 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
 			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
 			{ separator: true }
-		].concat(backdropRows()).concat([
+		].concat(backdropRows(true)).concat([
 			{ separator: true },
 			// "Draw example network" is GONE from here (Task 264, Tom 2026-08-10). Insert adds an element
 			// to the drawing you are in; an example is a whole network, and dropping one on top of your

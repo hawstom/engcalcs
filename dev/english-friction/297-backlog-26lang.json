@@ -1,0 +1,128 @@
+{
+    "sprint": "297-backlog-26lang",
+    "description": "Wave 0 for ROADMAP Task 297, the one sprint that clears the whole standing translation backlog (17 keys x 26 languages). Scope was the 9 NEW keys, of which Tom deleted three outright on review (see lpn_backdrop_wld_ask/_none/_choose), leaving 6 -- the 8 CHANGED ones are the four backdrop bare-verb role changes (already reasoned about in Task 276 and given a heading to sit under) and the four consent-banner keys Tom wrote himself, which the ROADMAP exempts. Run 2026-08-13. The question asked of every string was NOT 'is this good' but 'list every plausible reading; if there is more than one, propose a rewrite', with every claim checked against js/looped-network.js rather than against the string alone.",
+    "entries": [
+        {
+            "key": "lpn_backdrop_wld_none",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"No world file found.\" is a REPORT OF A SEARCH THAT NEVER HAPPENS. offerWorldFile() runs unconditionally after an image is added, and its own code comment states the opposite of the string: \"A sidecar cannot be auto-detected in ANY browser... the world file is always user-supplied, never discovered.\" So the app tells the user it looked and failed, when it did not look. The intended meaning -- documented in the comment above the line -- is the answer to \"and if I have not got one?\". Same class as the 251 sprint's lpn_inp_drop_backdrop finding: a string making a claim about behaviour that nothing checks.",
+            "readings": [
+                "the program searched for a world file and did not find one",
+                "if you do not have a world file, here is what to do instead"
+            ],
+            "disposition": "english",
+            "resolution": "THE KEY IS DELETED, and so is the dialog behind it. Tom, 2026-08-13, ruled the whole ask obsolete: \"We don't ask for world file. Those keys are obsolete. We ask for a paste of World File contents.\" That is a better answer than any rewording of mine -- my fix repaired a false sentence inside a dialog that should not have existed. offerWorldFile(), the hidden #lpn_backdrop_wld_file input, the else-branch that opened it, and the three pageConfig bridge lines are all gone; the two doors that remain both take the file's CONTENTS (pick image + sidecar together in the one picker, or paste the six lines into the Scale-by-entry textarea). A new harness assertion fails the build if any of the three keys returns, so the ask cannot come back by accident. Sprint cost drops from 9 new keys to 6."
+        },
+        {
+            "key": "lpn_backdrop_scale_entry",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"pixel size\" has two readings and the menu row carries nothing to settle them: the size of the IMAGE in pixels (640 x 782, a property of the file) or the real-world extent of ONE pixel (0.5 m, the quantity the code wants -- backdropPixelSize()/setBackdropPixelSize()). An English reader stumbles here, which routes it to the English column and not to _syn. The dialog form escapes this only by accident, because startBackdropScaleEntry() appends the unit label at runtime; the menu row has no such suffix and the translator never sees the concatenation at all.",
+            "readings": [
+                "the pixel dimensions of the image file",
+                "the real-world ground distance one pixel covers"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to \"the size of one pixel ON THE MAP\". Tom, 2026-08-13, supplied the qualifier and the reasoning: \"That is why the real prompt asks for the size of one pixel. We can expand to say the 'size of one pixel on the map'. 'map' is better than real world or real.\" My proposal had said \"the real size of one pixel\", borrowing 'real' from lpn_backdrop_scale_prompt2; he is right that 'map' beats it, because the reader is looking at a map and the frame being asked about is the one already in front of them, whereas 'real' asks them to hold two frames at once. Applied to the menu row, the prompt and the error, and to the matching JS fallbacks. dev/lpn-spike/backdrop-scale-harness.js section 9 -- which pins these labels to the wording Tom approved, and which correctly failed the build on my first attempt -- was updated to the approved string in the same change. Length is affordable because Task 276 made the backdrop control a menu BUTTON rather than a <select>, so a long row label no longer sets the width of the collapsed control."
+        },
+        {
+            "key": "lpn_backdrop_scale_entry_prompt",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Carries the same 'size of a pixel' ambiguity as the menu row above. Noted separately because this string is Tom's own verbatim wording (recorded in the comment above startBackdropScaleEntry()), so changing it is a decision and not a typo fix.",
+            "readings": [
+                "the pixel dimensions of the image file",
+                "the real-world ground distance one pixel covers"
+            ],
+            "disposition": "english",
+            "resolution": "\"Enter the size of one pixel on the map, or paste the complete contents of the world file for the image\". 'On the map' is Tom's qualifier, ruled on 2026-08-13 -- see the lpn_backdrop_scale_entry entry above for his reasoning and for the harness change that came with it. Tom's structure and his explicit requirement that the paste be spelled out (\"I don't like the paste unless it's very clear\") are both preserved; only the ambiguous noun phrase changed."
+        },
+        {
+            "key": "lpn_backdrop_scale_entry_bad",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Same 'size of a pixel' ambiguity. The 'all six lines' claim was checked and is exactly right -- parseWorldFile() returns null unless it has precisely six non-blank numeric lines -- so it stays.",
+            "readings": [
+                "the pixel dimensions of the image file",
+                "the real-world ground distance one pixel covers"
+            ],
+            "disposition": "english",
+            "resolution": "\"Type one number for the size of one pixel on the map, or paste all six lines of a world file.\" Same qualifier as its two siblings. The 'all six lines' claim was checked and is exactly right -- parseWorldFile() returns null unless it has precisely six non-blank numeric lines -- so it stays."
+        },
+        {
+            "key": "lpn_backdrop_wld_ask",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Two problems in six words. (a) \"for automatic scale and location\" -- 'location' beside the word 'File' reads as the location OF THE FILE at least as easily as the location of the image on the map, and both nouns are doing verb work. (b) 'World File' is Title Cased here and in _choose but lowercase in _bad and _none. Inconsistent capitalisation of the same term inside one dialog is a signal to a translator: Title Case reads as a proper noun or a brand, which is an invitation to leave it in English, and the four keys would then split half-translated.",
+            "readings": [
+                "choose a world file, and the image will be scaled and placed automatically",
+                "choose a world file, for automatic scaling and for the file's location"
+            ],
+            "disposition": "english",
+            "resolution": "THE KEY IS DELETED, and so is the dialog behind it. Tom, 2026-08-13, ruled the whole ask obsolete: \"We don't ask for world file. Those keys are obsolete. We ask for a paste of World File contents.\" That is a better answer than any rewording of mine -- my fix repaired a false sentence inside a dialog that should not have existed. offerWorldFile(), the hidden #lpn_backdrop_wld_file input, the else-branch that opened it, and the three pageConfig bridge lines are all gone; the two doors that remain both take the file's CONTENTS (pick image + sidecar together in the one picker, or paste the six lines into the Scale-by-entry textarea). A new harness assertion fails the build if any of the three keys returns, so the ask cannot come back by accident. Sprint cost drops from 9 new keys to 6."
+        },
+        {
+            "key": "lpn_backdrop_wld_choose",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Title Case 'World File' -- see lpn_backdrop_wld_ask. Its siblings in the same dialog (lpn_backdrop_continue 'Continue', lpn_cancel 'Cancel') are sentence case.",
+            "readings": [],
+            "disposition": "english",
+            "resolution": "THE KEY IS DELETED, and so is the dialog behind it. Tom, 2026-08-13, ruled the whole ask obsolete: \"We don't ask for world file. Those keys are obsolete. We ask for a paste of World File contents.\" That is a better answer than any rewording of mine -- my fix repaired a false sentence inside a dialog that should not have existed. offerWorldFile(), the hidden #lpn_backdrop_wld_file input, the else-branch that opened it, and the three pageConfig bridge lines are all gone; the two doors that remain both take the file's CONTENTS (pick image + sidecar together in the one picker, or paste the six lines into the Scale-by-entry textarea). A new harness assertion fails the build if any of the three keys returns, so the ask cannot come back by accident. Sprint cost drops from 9 new keys to 6."
+        },
+        {
+            "key": "lpn_backdrop_wld_bad",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Two findings. (a) 'turns' and 'mirrors' are both verbs here, and both are commoner as something else -- 'turns' as 'becomes' (turns into), 'mirrors' as a plural noun. A translator parsing 'This world file turns, mirrors or unevenly stretches the picture' as a noun list is not being careless; the sentence permits it until the third item forces a re-read. (b) 'The map can only move and resize it evenly' -- 'evenly' can attach to 'resize' alone (uniform scaling, which is what worldFileRepresentable() enforces: A + E must cancel) or to both verbs, where 'move evenly' means nothing.",
+            "readings": [
+                "the file rotates / mirrors / non-uniformly stretches the picture",
+                "the file becomes a mirror, or a list of things the file is",
+                "the map can move the picture and resize it uniformly",
+                "the map can move the picture evenly and resize it evenly"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to \"This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.\" 'Rotates' replaces 'turns' against the Simple-English preference on purpose: 'turn' is the simpler word but carries the heavier polysemy, and 'rotate' has a transparent cognate in most of the 26. 'By the same amount in both directions' spells out uniform scaling rather than leaning on an adverb that can float."
+        },
+        {
+            "key": "lpn_menu_help",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Checked for a reusable incumbent per CLAUDE.md's concept-level reuse rule before accepting a new key: there is none -- this is the suite's only 'Help' string today. Also checked for the noun/imperative ambiguity ('Help' the section vs 'Help!' the cry); its position last in a menu bar beside File/Edit/Insert/View/Settings settles it, and every menu bar on earth does the same.",
+            "readings": [],
+            "disposition": "dismissed",
+            "resolution": "No change. Flagged forward rather than silently: ROADMAP Task 298 proposes renaming the navbar's menu_more to 'Help', which would give the suite two Help keys with identical English -- at that point lpn_menu_help is the one that should be retired in favour of the navbar's, per the incumbency rule. Recorded on Task 298 so the sprint's 26 translations are not paid for twice."
+        },
+        {
+            "key": "lpn_help_walkthroughs",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "'Walkthrough' is a transliteration lure of exactly the 'riprap' shape: an opaque-looking compound with nothing a lower-resource translator can compositionally parse, which is the condition under which the 2026-07-13 audit found six languages phonetically transliterating rather than translating. Unambiguous to an English reader, so the English stays and the guard belongs in _syn. The absence of an '(in English)' marker on this off-site link is Tom's explicit decision of 2026-08-13 and is NOT a finding.",
+            "readings": [],
+            "disposition": "intent",
+            "resolution": "English unchanged. $ec_lang_syn entry added (approved by Tom before launch) offering the substitutable alternates a translator can compress in their own language -- guided tours, step-by-step guides, worked examples -- so no language is left with only the English compound to phonetically render."
+        },
+        {
+            "key": "lpn_backdrop_wld_ask",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Second entry, terminology rather than wording: 'world file' is a GIS term of art appearing in four of the six surviving new keys, with a genuine established translation in some languages and none in others, and with a hard false-friend problem -- the 'world' in it is not the planet, it is the coordinate space, so a literal rendering ('planet file', 'earth file') is both plausible and wrong. Per CLAUDE.md's routing rule, a concept recurring across labels goes to the glossary rather than being re-explained in five _syn entries.",
+            "readings": [],
+            "disposition": "glossary",
+            "resolution": "New glossary.json term 'world file' with an avoid array (the planet sense, a transliterated loanword where a real term exists, confusion with the image file itself) and 'world file' added to the lpn entry in dev/scripts/prefix_terms.inc.php -- without which, per CLAUDE.md's standing warning, the entry would generate cleanly, report FRESH, and reach no agent. STILL WANTED after the three wld_ask/_none/_choose keys were deleted: 'world file' survives in lpn_backdrop_scale_entry, _entry_prompt, _entry_bad and _wld_bad, so the false-friend guard has four call sites and the glossary is still the right home for it."
+        },
+        {
+            "key": "consent_decline",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Not a new key, but detect_english_drift.php flags it as a ROLE CHANGE ('Refuse' -> 'Refuse all') and the sprint must not translate 'all' as 'every category'. There are no categories; the single ask has one purpose, and 'all' means now AND every later time -- the same axis as consent_accept_all.",
+            "readings": [
+                "refuse every category of storage",
+                "refuse this ask and every later one"
+            ],
+            "disposition": "dismissed",
+            "resolution": "No English change -- Tom wrote these four himself and the ROADMAP exempts them from Wave 0. Recorded here because the ambiguity is real and the fix already exists in the channel that should carry it: $ec_lang_syn['consent_decline'] already reads 'Refuse (decline, deny) this and any later ask; do not ask (question) me again', which states the temporal reading explicitly. Verified present before dismissing rather than assumed. The resync prompts quote it."
+        }
+    ]
+}

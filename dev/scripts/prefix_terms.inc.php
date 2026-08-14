@@ -63,7 +63,10 @@ function prefixToTermNames(): array
             'supply curve', 'looped network', 'branched network', 'pipe line', 'pressure rating',
             'pressure reduction', 'energy grade line', 'Manning roughness', 'friction factor',
             'draw (a diagram)', 'junction', 'reservoir', 'node', 'link', 'vertex',
-            'background image', 'pump curve', 'project (saved network)', 'scenario',
+            // 'world file' added 2026-08-13 (Task 297): it appears in five of that sprint's nine new
+            // keys, and its 'world' is a coordinate space, not the planet -- a false friend nothing
+            // else would have guarded against.
+            'background image', 'world file', 'pump curve', 'project (saved network)', 'scenario',
             'zoom to extents', 'default (setting)', 'upstream', 'downstream'],
         'bpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',

@@ -162,9 +162,18 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 	eval(rowSrc);
 
 	backdrop = null;
-	rows = backdropRows();
-	report(rows[0] && rows[0].heading === true, 'the first row is a heading, not a command');
+	rows = backdropRows(true);
+	// The Insert door passes withHeading. Tom, 2026-08-13: in Insert the heading "has a place, however
+	// unconventional" -- it is the only thing there naming what Add/Move/Remove act on.
+	report(rows[0] && rows[0].heading === true, 'the Insert door leads with a heading, not a command');
 	report(/Background image/.test(rows[0].label), 'and it names the object the verbs below it act on', rows[0].label);
+
+	// The toolbar-button door does NOT, because the button you just clicked already says it. Tom,
+	// 2026-08-13: "remove the top wording from the Background image menu. It's unnecessarily
+	// redundant."
+	const barerows = backdropRows();
+	report(!barerows.some(r => r.heading), 'the button door has no heading — the button already says it');
+	report(barerows.length === rows.length - 1, 'and is otherwise the same rows', barerows.length);
 
 	const commands = rows.filter(r => !r.heading);
 	report(commands.length === 5, 'five commands: add, scale by picking, scale by entry, move, remove', commands.length);
@@ -178,7 +187,7 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 
 	// ONE definition, two doors. A second literal list is how the toolbar and the Insert menu drifted
 	// apart before, and it is invisible until somebody opens both and compares.
-	report(/\.concat\(backdropRows\(\)\)/.test(src), 'the Insert menu reuses backdropRows() rather than restating it');
+	report(/\.concat\(backdropRows\(true\)\)/.test(src), 'the Insert menu reuses backdropRows() rather than restating it');
 	report((src.match(/lpn_backdrop_scale_entry \|\|/g) || []).length === 1,
 		'each backdrop label has exactly one call site', (src.match(/lpn_backdrop_scale_entry \|\|/g) || []).length);
 	// The toolbar control is a BUTTON now; a <select> is as wide as its widest option, which is what
@@ -194,10 +203,17 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 		return m ? m[1].replace(/\\'/g, "'") : null;
 	}
 	report(val('lpn_backdrop_scale') === 'Scale by picking', 'lpn_backdrop_scale', val('lpn_backdrop_scale'));
-	report(val('lpn_backdrop_scale_entry') === 'Scale by World File or pixel size', 'lpn_backdrop_scale_entry', val('lpn_backdrop_scale_entry'));
+	// Reworded in Task 297's Wave 0 and re-approved by Tom on 2026-08-13. "Pixel size" read just as
+	// easily as the image's pixel DIMENSIONS; "on the map" is Tom's own qualifier ("'map' is better
+	// than real world or real").
+	report(val('lpn_backdrop_scale_entry') === 'Scale by world file or by the size of one pixel on the map', 'lpn_backdrop_scale_entry', val('lpn_backdrop_scale_entry'));
 	report(val('lpn_backdrop_position') === 'Move', 'lpn_backdrop_position', val('lpn_backdrop_position'));
 	// Parallel or not at all: a set where one member still names the object reads as an oversight,
 	// which is the drift Tom keeps catching by eye.
+	// We never ask for a world file AS A FILE (Task 297). These three keys backed a dialog that
+	// opened a second file picker; if one comes back, so has the ask.
+	report(['lpn_backdrop_wld_ask', 'lpn_backdrop_wld_none', 'lpn_backdrop_wld_choose'].every(k => val(k) === null),
+		'no key asks for a world file as a file — we take a paste of its contents');
 	const set = ['lpn_backdrop_add', 'lpn_backdrop_scale', 'lpn_backdrop_scale_entry', 'lpn_backdrop_position', 'lpn_backdrop_remove'];
 	report(set.every(k => !/\bimage\b/i.test(val(k) || '')), 'no member of the set repeats "image" — the heading carries it');
 }

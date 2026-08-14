@@ -1,6 +1,6 @@
 {
     "meta": {
-        "version": "1.27",
+        "version": "1.28",
         "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
         "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
         "language_codes": [
@@ -3400,6 +3400,47 @@
                 "zh": "求解器"
             },
             "source": "sprint-252 translation agents, harvested from shipped strings"
+        },
+        "world file": {
+            "term": "world file",
+            "symbol": "",
+            "avoid": [
+                "any reading of \"world\" as the PLANET, the globe, or the earth. The word names a coordinate space, not a place -- \"planet file\", \"earth file\", \"global file\" are all wrong.",
+                "a phonetic transliteration of the English words where the language's GIS community already has a real term (fr \"fichier de géoréférencement\", es \"archivo de georreferenciación\" are the kind of thing wanted). Transliterate only where nothing established exists.",
+                "confusing it with the IMAGE file itself, or calling it a \"map file\" or \"project file\" -- it is a tiny six-line plain-text SIDECAR that travels beside the picture.",
+                "translating the file EXTENSIONS that carry it (.wld, .jgw, .tfw, .pgw). Those are literal filename suffixes."
+            ],
+            "context": "A six-line plain-text sidecar file that says where a raster image sits in real-world coordinates and how big one of its pixels is: pixel size in X, two rotation terms, pixel size in Y, and the coordinates of the centre of the top-left pixel. Named for the \"world\" (real/ground) coordinate space it maps the image's pixel coordinates into. Standard in GIS since ESRI introduced it; the extension follows the image (.jgw for .jpg, .tfw for .tif, .pgw for .png, or plain .wld). In lpn_ it is the alternative to scaling the background image by clicking two points -- keys lpn_backdrop_wld_* and lpn_backdrop_scale_entry*.",
+            "translation_notes": "Seeded 2026-08-13 for ROADMAP Task 297 (Wave 0). The English source was normalised to lowercase \"world file\" in the same pass: it had been Title Cased in two of the five keys and lowercase in the other three, and Title Case reads as a brand name, which invites leaving it untranslated and would have split the five keys half-and-half. Translations deliberately EMPTY -- this entry exists to carry the avoid-list into the sprint prompts, not to assert a translation nobody has made. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back.",
+            "translations": {
+                "am": "",
+                "ar": "",
+                "bg": "",
+                "bn": "",
+                "cs": "",
+                "de": "",
+                "es": "",
+                "fa": "",
+                "fr": "",
+                "he": "",
+                "hi": "",
+                "hr": "",
+                "id": "",
+                "it": "",
+                "km": "",
+                "my": "",
+                "ps": "",
+                "pt": "",
+                "ro": "",
+                "ru": "",
+                "sr": "",
+                "sw": "",
+                "tr": "",
+                "uk": "",
+                "ur": "",
+                "zh": ""
+            },
+            "source": "ESRI world file specification; seeded for Task 297"
         }
     }
 }
