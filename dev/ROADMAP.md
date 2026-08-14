@@ -1381,6 +1381,25 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     be — those types never reach the comparison, because the native solver refuses them by design.
   - `lpn_notes_2_def` no longer says control valves are unmodelled; it says which engine works them
     out. 20 English keys are new or edited and need a translation sprint.
+  - **THE MERGE INTO TASK 313 WAS BROKEN, AND ONLY THE MERGED TREE COULD SHOW IT.** Valves and the
+    persistent EPANET session were built in separate worktrees the same afternoon; each was green in
+    its own. Together, `pushValues()` had no valve case, so a valve fell through to the pipe branch —
+    where `setPipeData()` is not valid on a valve index — and the setting was never pushed at all.
+    - **The ORDER inside the fix is load-bearing and is the durable finding. A valve has THREE
+      states in EPANET, not two:** closed, fully open, and ACTIVE. Writing `EN_INITSTATUS = OPEN`
+      puts it fully open with its setting IGNORED, because "open" means something different for a
+      valve than for a pipe, where it only means not closed; `EN_INITSETTING` is what restores
+      active. So status is written BEFORE setting, and the shared status line skips valves. Written
+      the other way the network solved with the valve wide open: **exactly one k V²/2g of missing
+      head, 0.271 m, with flows still agreeing to 2e-10 m³/s** — a plausible number in a plausible
+      place.
+    - `signatureOf()` also had to learn `valveType`: EPANET fixes a link's type when the file is
+      read, and the setting means a different quantity per type, so a retype must reopen.
+    - `session-harness.js` gained a setting edit, a retype and a closure. The closure needed a
+      network that SURVIVES it — the shared TCV case is a series run, so closing the valve isolates
+      the demand and tests the diagnostic instead of the push.
+    - **This is the whole case for the merge rule in CLAUDE.md**: a check that passed in two
+      worktrees separately has not been run on the thing that ships.
 
   **PHASE 1, TANKS: DONE 2026-08-14.** A third node type, in both engines, in the `.inp` reader and
   writer, on the map, in the popup and in the settings. Phase 3 (extended-period) is still open, so
