@@ -49,9 +49,12 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 	//      P&I, or B/B) and leave the rock size typed, and the loop ran exactly one pass. `v` is
 	//      computed near the top of the pass from the n of the PREVIOUS pass, and n is updated
 	//      near the bottom -- so the page put the new n in the roughness box and reported a
-	//      velocity, Q, Froude number and rock sizes computed from the n the user had typed --
-	//      24% high for Strickler, 28% for P&I, over 100% for B/B on the page's own defaults.
-	//      (NOT the shear stress: tau = R S depends on geometry and slope alone.) Every
+	//      velocity, Q, Froude number and rock sizes computed from the n the user had typed. (NOT
+	//      the shear stress: tau = R S depends on geometry and slope alone.) On the MAIN FORM that
+	//      was transient -- the pass wrote the new n back into the box, so the next recalculation
+	//      healed it. In solveForY it PERSISTED, because that calls this function once per trial
+	//      depth and there is no next recalculation: asking for 60 cfs with B/B on returned a depth
+	//      carrying 66.97 cfs and reported success. Every
 	//      combination with a rock radio ALSO on was correct, which is why it survived: the rock
 	//      loop kept iterating and n converged as a side effect.
 	//   2. **The safety factor was applied to a d50 the user TYPED.** With no rock radio the

@@ -782,14 +782,25 @@ and opens on a passing design — plus worked examples for the two core calculat
 
 **IT PAID FOR ITSELF THE SAME DAY (Task 294).** Within an hour of `mtc-harness.js` existing it
 found two defects in Manning Trap Channel, a core calculator: the reported velocity was computed
-from the *previous* iteration's n whenever a roughness radio was on and no rock radio was — 24%
-high for Strickler, 28% for P&I, **over 100% for B/B** (the page showed Q = 34.6 cfs for a channel
-that carries 17.0) — and the safety factor was being applied to a d50 the user had typed. Both lived in one loop-exit condition, and **three of every four radio
-combinations were correct**, which is why years of hand-checking never caught either. The lesson
-worth carrying: **a coupled iteration's failure mode is a plausible number, and the invariant that
-catches it is usually "is the output consistent with the input the page is showing?"** — here,
-does the velocity equal the one the displayed n produces? That question needs no reference, no
-published table and no judgement, and it is worth asking of every iterative calculator.
+from the *previous* iteration's n whenever a roughness radio was on and no rock radio was, and the
+safety factor was being applied to a d50 the user had typed. Both lived in one loop-exit condition, and **three of every four radio
+combinations were correct**, which is why years of hand-checking never caught either.
+
+**AND THE HARNESS OVERSTATED IT, which is its own lesson (Tom, 2026-08-14: *"That's not true. It
+immediately changes to 17.0275 when I choose B/B."*).** He was right. The assertions measured a
+SINGLE `pageCalculator` call — but on the main form the bad pass wrote the corrected n back into
+the box, so the next recalculation healed it. What the harness had actually measured was a
+transient a browser passes through, not a state a user reads. The defect was real and persistent
+only in `solveForY`, which calls the iteration once per trial depth and gets no second pass: it
+returned a depth carrying 66.97 cfs when asked for 60. **A headless harness sees one call; a user
+sees a sequence.** So when a harness finding cannot be reproduced by hand, the harness is the thing
+on trial — and prefer invariants that survive the difference: *solve for a Q and the page must then
+show that Q* is unambiguous in a way that *"is v consistent with n right now"* was not.
+
+The invariant worth carrying anyway: **a coupled iteration's failure mode is a plausible number,
+and what catches it is asking whether the output is consistent with the input the page is
+showing.** That needs no reference, no published table and no judgement, and it is worth asking of
+every iterative calculator — just ask it of the state the user actually reads.
 
 **And how a calculator became testable at all, since the obstacle was never the math.** Every
 `pageCalculator` is already a pure function of its form — it reads `objForm[name].value` and writes

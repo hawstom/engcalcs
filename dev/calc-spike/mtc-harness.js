@@ -249,6 +249,33 @@ r.section('regression: every radio combination is self-consistent');
 		'the safety factor still scales a calculated rock size');
 }
 
+// DEFECT 1's REAL HARM IS IN THE SOLVER, and that is where it PERSISTS.
+// On the main form the single-pass bug was self-healing: the pass wrote the new n back into the
+// roughness box, so the very next recalculation used it and the numbers corrected themselves.
+// Clicking B/B showed the wrong Q for exactly ONE render. Bad, but transient -- and worth being
+// precise about, because it is easy to overstate (Tom, testing in a browser, saw the corrected
+// number and said so).
+//
+// solveForY has no such second chance. It calls mtc_iterate once per TRIAL DEPTH, reading n from
+// the form, so every trial used the form's n instead of the roughness method's n at that depth --
+// and the answer it writes into the depth box is the number a user writes down. Asking the
+// pre-fix page for 60 cfs with B/B on returned a depth carrying 66.97 cfs: 12% over, reported as
+// success. The invariant below needs no reference and no worked example -- solve for a Q, and the
+// page must then SHOW that Q.
+r.section('regression: the solver hits the target it was given');
+
+for (const nr of ['', 'strickler', 'pi', 'bb']) {
+	for (const target of [20, 60]) {
+		const q = loadCalculator('Manning-Trap.php', { lang: 'en' });
+		q.radio('n_radio', nr).run();
+		q.set({ solver_q: target }).run();
+		q.EngCalcs.solveForY();
+		r.close(q.num('q'), target, 2e-3,
+			`${(nr || 'typed n').padEnd(9)} solve for Q = ${target} cfs -> the page then shows ${target} cfs`,
+			`y = ${parseFloat(q.input('y')).toFixed(4)} ft, n = ${q.input('n_in')}`);
+	}
+}
+
 // ---- the page's own defaults ---------------------------------------------------------------
 r.section('factory defaults open on a passing design');
 
