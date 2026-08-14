@@ -1385,7 +1385,7 @@ $ec_lang['lpn_lock_open_readonly']='Open read-only';
 // trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Create a copy';
 $ec_lang['lpn_lock_break']='Break their lock';
-$ec_lang_syn['lpn_lock_break']='Break their lock, unlock the file, take over the file, release their hold on it, claim the file, override their claim';
+$ec_lang_syn['lpn_lock_break']='Break their lock, unlock the file, take over the file, release their hold on it, claim the file, override their claim | layout: button';
 $ec_lang['lpn_lock_open_heading_times']='{name} has this file open; the last edit was {x} ago, {y} after the last save.';
 $ec_lang['lpn_lock_open_heading_unsaved']='{name} has this file open; the last edit was {x} ago, and none of it has been saved to this file yet.';
 $ec_lang['lpn_lock_open_heading_saved']='{name} has this file open; the last edit was {x} ago, and their work is saved to the file.';

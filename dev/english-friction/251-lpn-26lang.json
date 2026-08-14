@@ -1,301 +1,301 @@
 {
-  "sprint": "251-lpn-26lang",
-  "description": "Wave 0 for ROADMAP Task 251, the lpn_ promotion sprint into all 26 languages, run 2026-08-12. Scope was the 65 English strings that have never had an adversarial pass: 61 added since the 2026-08-09 drift sync (the 24 lpn_inp_* import-report sentences, the EPANET-engine and recent-files batches, the v2 unit-restore prompt) plus the 4 detect_english_drift.php reports as CHANGED, plus the ten consent-banner and legal-link keys written for Task 286 -- which are in this sprint precisely so they ride it rather than paying for a sprint of their own. The question asked of every string was NOT 'is this good' but 'list every plausible reading; if there is more than one, propose a rewrite'.",
-  "entries": [
-    {
-      "key": "lpn_inp_drop_backdrop",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "Sent the reader to a menu path that DOES NOT EXIST. \"Add it yourself with Map, Backdrop\" -- there is no Map menu (the menus are File, Edit, Insert, View, Settings) and no item called Backdrop (it is 'Background image…' then 'Add image'). Not an ambiguity: an instruction that cannot be followed, which 26 agents would have translated faithfully.",
-      "readings": [],
-      "disposition": "english",
-      "resolution": "Rewritten to \"Add it yourself with File, Background image, Add image.\" The general lesson is worth more than the fix: a string that names a UI path is a claim about the UI, and nothing checks it. Every such string in this batch was verified against the actual lpn_menu_*/lpn_backdrop_* labels."
-    },
-    {
-      "key": "lpn_net_bad_file",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"Open it in EPANET and use File, Export, Network\" names EPANET's OWN menu, not ours, and nothing in the sentence says so. A translator will translate that path -- correctly, by their instructions -- and send the reader looking for a menu that does not exist in the EPANET they have.",
-      "readings": [
-        "use our File, Export, Network command",
-        "use EPANET's File, Export, Network command"
-      ],
-      "disposition": "english",
-      "resolution": "Rewritten to \"use the File, Export, Network command there\", which pins the path to EPANET by grammar rather than by hoping the translator infers it. Deliberately NOT solved by asking translators to leave the path in English: we cannot know whether a given reader's EPANET is localised, and 'there' is right either way."
-    },
-    {
-      "key": "lpn_notes_4_def",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "Listed \"Reading and writing EPANET .inp files\" under the heading 'Planned additions'. Reading .inp SHIPPED on Task 196. The same key was already an english-disposition entry in 146.06 for a stale claim of exactly this kind, which is the argument for reading a page's own prose before every sprint rather than once.",
-      "readings": [],
-      "disposition": "english",
-      "resolution": "Narrowed to \"Writing EPANET .inp files, so that a project can go back out to EPANET\" (Task 281 is the remaining half). Caught because this key is one of the four detect_english_drift.php flagged as CHANGED, so it was read rather than assumed."
-    },
-    {
-      "key": "lpn_inp_drop_setting",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"These links carry a setting this page cannot hold.\" In a web page, 'link' means hyperlink to almost every reader on earth; the EPANET sense (pipe, pump or valve) is domain jargon sitting inside a browser, which is the worst possible place for it.",
-      "readings": [
-        "these pipes, pumps and valves",
-        "these hyperlinks"
-      ],
-      "disposition": "english",
-      "resolution": "Rewritten to \"These pipes, pumps and valves carry a setting this page cannot hold.\" Naming the three elements is longer than 'links' and unambiguous in every language, and this page has exactly three kinds so the enumeration cannot go stale silently."
-    },
-    {
-      "key": "lpn_inp_drop_tanks",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"This page has reservoirs, which hold one fixed water level, and a tank is not one.\" The referent of 'one' is unrecoverable: not a reservoir, or not a fixed water level?",
-      "readings": [
-        "a tank is not a reservoir",
-        "a tank does not hold a fixed water level"
-      ],
-      "disposition": "english",
-      "resolution": "Rewritten to state both explicitly and in causal order: \"A storage tank does not hold a fixed level, so it is not a reservoir.\" Both readings were true, which is exactly why neither could be dropped."
-    },
-    {
-      "key": "lpn_inp_drop_eps",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"This file runs over a period of time\" -- a file does not run; the simulation it describes does.",
-      "readings": [
-        "the simulation this file describes covers a period of time",
-        "this file takes a while to process"
-      ],
-      "disposition": "english",
-      "resolution": "Rewritten to \"This file describes a simulation that runs over a period of time.\""
-    },
-    {
-      "key": "lpn_settings_scope_note",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"Saved with this project.\" A bare participial fragment with no subject. What is saved -- these settings, or something the reader just did?",
-      "readings": [
-        "these settings are stored in the project",
-        "something was saved along with this project"
-      ],
-      "disposition": "english",
-      "resolution": "Rewritten to \"These settings are saved in this project.\" Fragments are the most reliable ambiguity generator in this whole batch: a language with agreement or gendered participles cannot render one without inventing the subject."
-    },
-    {
-      "key": "lpn_empty_hint",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"To start, use the toolbar to add a background image or a reservoir, or to start a New project from examples.\" Two 'start's competing, and 'New project' is a UI label mid-sentence with nothing marking it as one.",
-      "readings": [
-        "three ways to begin",
-        "add a background image, or add a reservoir-or-New-project taken from examples"
-      ],
-      "disposition": "english",
-      "resolution": "Rewritten to \"Start by adding a background image or a reservoir from the toolbar, or open File, New project to begin from an example.\" The menu path now marks the UI reference as one."
-    },
-    {
-      "key": "lpn_inp_drop_curve_long",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"...which is the most this page can fit a curve to\" -- a stranded preposition modifying a relative clause whose antecedent is the whole preceding sentence. Grammatical, and very hard to re-compose in a language that does not allow the construction.",
-      "readings": [],
-      "disposition": "english",
-      "resolution": "Rewritten as a causal clause with an explicit subject: \"...because this page fits a curve to three points at most.\" No ambiguity here, only unnecessary difficulty -- which is still a defect when 26 people have to reproduce it."
-    },
-    {
-      "key": "lpn_inp_drop_controls",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"...came in at the state written in the file, and stays there.\" 'Stays there' reads spatially first; the intended sense is temporal persistence in a state.",
-      "readings": [
-        "does not change state",
-        "remains in that place"
-      ],
-      "disposition": "english",
-      "resolution": "Rewritten to \"and does not change.\""
-    },
-    {
-      "key": "lpn_recent_tip",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"Open {file} again, without looking for it.\" Who is not looking -- the user, or the program? The intended promise is that the user need not browse for it.",
-      "readings": [
-        "you will not have to find it in a file dialog",
-        "the program will not go looking for it on disk"
-      ],
-      "disposition": "english",
-      "resolution": "Rewritten to \"Open {file} again without having to find it on your computer.\""
-    },
-    {
-      "key": "lpn_file_import_inp_tip",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"add it to this browser as a new project\" -- one adds a thing to a collection, not to an application. And the bare 'Save as' names a menu item without its menu, unlike every other UI reference in the lpn_ prose, which say 'File, Save as'.",
-      "readings": [],
-      "disposition": "english",
-      "resolution": "\"save it in this browser as a new project\", and 'Save as' promoted to 'File, Save as' to match lpn_notes_3_def. Consistency in how UI paths are written is worth more than it looks: it is the signal that tells a translator these words are a path rather than prose."
-    },
-    {
-      "key": "lpn_v2_restore_prompt",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"For your evaluation, these are some diameters that will be converted.\" 'For your evaluation' is register-mismatched with the rest of the page and reads as a formal appraisal; and 'will be converted' promises the conversion the dialog is still asking permission for.",
-      "readings": [
-        "so you can judge whether to accept",
-        "for your formal assessment"
-      ],
-      "disposition": "english",
-      "resolution": "Rewritten to \"So that you can judge, here are some diameters that would be converted, with their values before and after:\" -- conditional mood, matching a dialog that has not been answered yet."
-    },
-    {
-      "key": "lpn_backdrop_menu",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"Background image...\" uses three ASCII periods where every sibling menu item ('New project…', 'Open…', 'Save as…') uses the single ellipsis character.",
-      "readings": [],
-      "disposition": "english",
-      "resolution": "Changed to the ellipsis character. Trivial, but it is the kind of inconsistency that gets faithfully reproduced 26 times and then has to be fixed 26 times."
-    },
-    {
-      "key": "consent_body",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "The first draft ran three sentences and buried the ask: \"...we need to keep a small note in your browser.\" 'Note' reads first as a written message, which is not what a cookie is. Tom, 2026-08-12, asked for something brief and targeted and offered his own: \"May we store a single breadcrumb in this browser to help us distinguish visitors from visits? This does not give consent for anything else.\"",
-      "readings": [
-        "a small amount of stored data",
-        "a short written message"
-      ],
-      "disposition": "english",
-      "resolution": "Rewritten to Tom's shape and very nearly his words: \"May we store a little information in this browser, so that we can tell visitors apart from visits when we count? It is used for counting only, and it gives permission for nothing else.\" TWO DELIBERATE DEPARTURES from his draft, both flagged to him. (1) 'a single breadcrumb' would be inaccurate -- there are two items (PHPSESSID and ec_blang) plus the offline queue, all listed in privacy.php's table, and a consent notice that undercounts what it asks for is the one place to be exact. 'A little information' is accurate and count-neutral. (2) 'breadcrumb' is a food metaphor; across 26 languages, several of them low-resource, the reliable outcome is the literal crumb. His 'distinguish visitors from visits' is kept almost verbatim because it names precisely what the two log buckets are."
-    },
-    {
-      "key": "consent_heading",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"May we count your visit?\" -- 'count' is polysemous (tally / matter / rely on), and 'make it count' is a live English idiom, so a translator may render it as 'value' or 'appreciate'.",
-      "readings": [
-        "may we include your visit in a tally",
-        "may we treat your visit as valuable"
-      ],
-      "disposition": "english",
-      "resolution": "The heading no longer carries the ask at all -- it is now the plain noun phrase 'Visitors and visits', and the question moved into consent_body where 'when we count' sits next to 'tell visitors apart from visits' and cannot be read as valuing anything. See the separate glossary entry for 'count' below: the word recurs across several of these strings, so it needed a home of its own as well."
-    },
-    {
-      "key": "consent_accept",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"Yes, count me\" / \"No, do not count me\" carried the polysemous 'count' onto the buttons themselves, where there is no surrounding sentence to disambiguate it.",
-      "readings": [
-        "include me in the tally",
-        "consider me important"
-      ],
-      "disposition": "english",
-      "resolution": "Tom's pair adopted: 'Allow this' / 'Refuse this'. Both refer to the single ask in the body, both are the same length and the same grammatical shape, and neither repeats a trap word. The equal-shape point is not cosmetic -- these two strings are styled by one CSS rule precisely so refusing is exactly as easy as accepting, and a translation that makes one of them three times longer would undo that."
-    },
-    {
-      "key": "consent_settings_link",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"Cookie settings\" is the phrase visitors and regulators both look for, and it is also a food word. Several languages will reach for the biscuit.",
-      "readings": [
-        "settings governing browser cookies",
-        "settings about biscuits"
-      ],
-      "disposition": "glossary",
-      "resolution": "English KEPT -- an English reader does not stumble, and this label's whole job is to be the findable, conventional one, so rewriting it would defeat it. Routed to glossary instead, since 'cookie' recurs across privacy.php, the banner and this link. Most languages simply keep the English word, which is the answer the glossary entry should carry."
-    },
-    {
-      "key": "consent_current_granted",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "\"You said yes. We count you once instead of once per visit.\" Terse to the point of cryptic, and 'once instead of once' is a near-repetition a translator has to unpick before they can render it.",
-      "readings": [],
-      "disposition": "english",
-      "resolution": "Rewritten to \"You allowed this. We count you as one visitor rather than as one visit each time.\" -- and its sibling to \"You refused this. We store nothing in this browser for our counts.\" Both now echo the button the visitor actually pressed, which is what makes a state message legible when the banner is reopened from the footer months later."
-    },
-    {
-      "key": "count",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "CONCEPT-LEVEL, not one label. 'Count' appears in the banner, in the two state messages, in privacy.php and in the visitor/visit distinction the whole Task 286 design rests on. English 'count' spans tally, matter, and rely on. Getting it wrong in one language makes the consent ask itself unclear, which is the one thing a consent ask may not be.",
-      "readings": [
-        "to tally, to add to a total",
-        "to matter, to be of value",
-        "to rely on somebody"
-      ],
-      "disposition": "glossary",
-      "resolution": "Glossary concept 'count (tally)' created in glossary.json with an avoid list covering all four wrong senses (mattering, relying on, the financial/accounting sense, and the noble title -- a real trap in Romance and Slavic languages, where the tallying verb and the rank can share a root), and wired into prefixToTermNames() under 'consent'. A sibling entry 'cookie (browser storage)' was created at the same time for consent_settings_link, wired under 'consent', 'privacy' and 'terms'. Both ship with EMPTY translations on purpose: these concepts have settled ordinary words in every language, we have no attested values, and inventing 26 would be judging other people's terminology. The sprint fills them and the mandatory write-back records what each language chose.\n\nCLOSED AS GLOSSARY, NOT AS FULLY DONE. The escalation asked for two things and this is one. The other -- a $ec_lang_syn synonym entry on consent_body -- is human-authored and off-limits to AI without written permission in-conversation, so it is being PROPOSED to Tom as a diff alongside the sprint authorisation rather than parked here as an open entry. By the routing rule this concept's home is the glossary anyway: it recurs across the banner, both state messages and privacy.php, so it is about consistency across call sites rather than about one label. If Tom approves the syn entry it is an addition, not the missing half."
-    },
-    {
-      "key": "lpn_file_new",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "Checked, not changed. 'New project…' could be read as an adjective phrase rather than a command, but the ellipsis marks it as a menu item that opens a dialog and every sibling in the File menu shares the shape.",
-      "readings": [],
-      "disposition": "dismissed",
-      "resolution": "No ambiguity a translator could act wrongly on. Recorded because it is one of the four keys detect_english_drift.php flagged as CHANGED, and a flagged key that turns out to be fine should say so rather than vanish."
-    },
-    {
-      "key": "lpn_settings_restore_tip",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "Checked, not changed. The fourth CHANGED key. Three plain sentences, each with an explicit subject; the only candidate was 'save a project file with nothing but settings in it', which has one reading.",
-      "readings": [],
-      "disposition": "dismissed",
-      "resolution": "No defect found. This string is also the answer to 'where do my preferred settings live' (ROADMAP Task 263), so its wording was checked against that decision and matches it."
-    },
-    {
-      "key": "lpn_inp_report_counts",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "Checked, not changed. \"{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.\" A verbless list, which is normally this batch's worst offender.",
-      "readings": [],
-      "disposition": "dismissed",
-      "resolution": "Kept: it renders directly under lpn_inp_report_heading ('Imported {file}'), so it is a caption on a stated subject rather than a floating fragment, and the three placeholders make the shape self-evident. Noted rather than silently passed over, because the same shape was a real defect in lpn_settings_scope_note above -- the difference is having a heading above it."
-    },
-    {
-      "key": "rc_notes_7_term",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "NEW STRING, written 2026-08-12, and it exists because note 7 on the Rock Chute page had a body and no heading in any of the 27 languages. Adversarial reading of the candidates: 'Inlet Ponding' parses two ways -- ponding ABOVE the inlet (meant) or ponding OF the inlet (not meant, and physically a different picture). 'Upstream Ponding' loses the reference point entirely, since everything on the page is upstream of something.",
-      "readings": [
-        "water backing up above the steep channel inlet",
-        "the inlet itself being submerged or flooded"
-      ],
-      "disposition": "english",
-      "resolution": "FIRST ANSWER WAS WRONG, corrected by Tom the same day: *\"'Inlet ponding' is the term used in the calculator, and this is an explanation about that. So I think we need to keep 'Inlet ponding', and we explain in the definition.\"* Right, and the mistake is worth recording because it is a whole class. The adversarial reading was sound in isolation and ignored the page it lives on: rc_ponding_check already says \"Inlet ponding check\", so the heading and the check now name the same thing, and the ambiguity the first answer worried about is resolved by the definition sitting directly underneath rather than by a longer heading. CLAUDE.md's concept-level label reuse rule says this outright — reuse the whole label a sibling already uses — and Wave 0 read the string without reading its siblings.\n\nShipped as 'Inlet Ponding', Title Case to match its six sibling headings (Rock Sizing Equations, Unit Discharge, ...) while naming the calculator's own term. THE LESSON: an adversarial pass must check whether a sibling label already owns the concept before proposing new wording, or it will invent clarity at the cost of consistency."
-    },
-    {
-      "key": "consent_accept",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "BLOCKS THE SPRINT UNTIL TOM RULES. Task 288 changed this label from 'Allow this logging reducer' to 'Accept this', and added a third answer ('Accept all, and do not ask again') because the ask now has two kinds of yes. Tom's hand-written $ec_lang_syn entry still reads 'Allow this logging (recording) reducer (limiter)' -- synonyms for a label that no longer exists. Shipping it would hand 26 agents alternate wordings for the wrong string, which is worse than no guidance at all.",
-      "readings": [],
-      "disposition": "intent",
-      "resolution": "CLOSED BY TOM 2026-08-12. He had already answered the original complaint himself in 470a7ec/b20693d, hand-authoring all three entries so they match the current labels; the escalation text above was stale by the time it was read.\n\nThe ruling covers a SECOND defect found while verifying that, which the original entry had not seen. ecConsentState() in lib/config.inc.php makes the two yeses TEMPORAL: '1' consents to this version of the ask and is re-asked if the ask materially changes, '2' consents to all later versions and is never asked again. But on a consent banner 'Accept all' carries an overwhelming conventional meaning -- all cookie CATEGORIES -- so the button has two plausible readings, and 26 agents would each guess with the convention pushing them toward the wrong one.\n\nBy CLAUDE.md's routing rule a two-way parse for an English reader is normally an English fix, and that was the recommendation. Tom ruled otherwise: keep the English, sharpen the synonyms. Recorded as his call, not an oversight -- 'Accept this' / 'Accept all' is the button pair users already recognize, and the parallel two-word shape is worth keeping on three side-by-side buttons that compete for width. The temporal distinction is carried to translators through $ec_lang_syn instead, which is the channel for exactly this case: the English serves its own audience and only the translator is left guessing.\n\nShipped, with Tom's in-conversation approval of the proposed wording:\n  consent_accept     -> 'Accept (allow) this ask (this request, this question)'\n  consent_accept_all -> 'Accept (allow) this and any later ask; do not ask (question) me again'\nBoth pass the substitution test. consent_body, consent_current_granted and consent_region_label were checked against their current labels and need no change."
-    },
-    {
-      "key": "lpn_field_head",
-      "source": "translator",
-      "lang": "cs",
-      "complaint": "The glossary's Czech preferred_translation 'tlakova vyska' (pressure head) reads oddly on lpn_field_head, which is a RESERVOIR's water-surface level where no pipe pressure exists yet. Applied it for glossary consistency, but plain 'Hladina' (water level) might be equally or more defensible here.",
-      "readings": [
-        "Tlakova vyska -- glossary-consistent root-concept term",
-        "Hladina -- plain water-level term, reads more naturally for a reservoir-only field"
-      ],
-      "disposition": "glossary",
-      "resolution": "REAL AND WELL-FOUNDED, and it is a distinction the English already makes but the glossary does not. lpn_field_head is a reservoir's water surface -- elevation head -- while lpn_result_head is total/piezometric head at a node. English disambiguates both in their tips ('measured as a height, not as a pressure'), so an English reader is served and no English fix is owed. What was missing is a Czech note in glossary.json saying the one term is not equally apt at both call sites. Recorded there rather than rewritten in lang.ec.cs.php: the tip carries the disambiguation, the agent applied the term consistently and deliberately, and choosing between two defensible Czech terms is a native-speaker call this project defers to the cultural standard on. Flagged for any future cs native review."
-    },
-    {
-      "key": "lpn_lock_break",
-      "source": "translator",
-      "lang": "cs",
-      "complaint": "$ec_lang_syn offers many alternates (break / unlock / take over / claim / override) with no indication of REGISTER -- whether this is a short button label or a longer explanatory phrase matching a dialog body. The English is a plausible idiom but ambiguous on formality and length.",
-      "readings": [
-        "short imperative button label",
-        "longer explanatory phrase matching the dialog body's tone"
-      ],
-      "disposition": "refer-to-human",
-      "resolution": "AWAITING TOM. The fact is settled -- js/looped-network.js:4039 renders it as `label:` on a button, so the answer is 'short label' -- but delivering that answer means adding a commentary tag to lpn_lock_break's $ec_lang_syn entry, and $ec_lang_syn is human-authored and off-limits to AI without in-conversation permission. It also needs a new token in the CLAUDE.md tag vocabulary, which today has `layout: column heading | unit token | nav item` and no button. Proposed to Tom 2026-08-13; nothing written pending his ruling. Note this complaint generalizes: every lpn_ button label has the same missing-register problem, so a `layout: button` token would pay off well beyond this one key."
-    }
-  ]
+    "sprint": "251-lpn-26lang",
+    "description": "Wave 0 for ROADMAP Task 251, the lpn_ promotion sprint into all 26 languages, run 2026-08-12. Scope was the 65 English strings that have never had an adversarial pass: 61 added since the 2026-08-09 drift sync (the 24 lpn_inp_* import-report sentences, the EPANET-engine and recent-files batches, the v2 unit-restore prompt) plus the 4 detect_english_drift.php reports as CHANGED, plus the ten consent-banner and legal-link keys written for Task 286 -- which are in this sprint precisely so they ride it rather than paying for a sprint of their own. The question asked of every string was NOT 'is this good' but 'list every plausible reading; if there is more than one, propose a rewrite'.",
+    "entries": [
+        {
+            "key": "lpn_inp_drop_backdrop",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Sent the reader to a menu path that DOES NOT EXIST. \"Add it yourself with Map, Backdrop\" -- there is no Map menu (the menus are File, Edit, Insert, View, Settings) and no item called Backdrop (it is 'Background image…' then 'Add image'). Not an ambiguity: an instruction that cannot be followed, which 26 agents would have translated faithfully.",
+            "readings": [],
+            "disposition": "english",
+            "resolution": "Rewritten to \"Add it yourself with File, Background image, Add image.\" The general lesson is worth more than the fix: a string that names a UI path is a claim about the UI, and nothing checks it. Every such string in this batch was verified against the actual lpn_menu_*/lpn_backdrop_* labels."
+        },
+        {
+            "key": "lpn_net_bad_file",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Open it in EPANET and use File, Export, Network\" names EPANET's OWN menu, not ours, and nothing in the sentence says so. A translator will translate that path -- correctly, by their instructions -- and send the reader looking for a menu that does not exist in the EPANET they have.",
+            "readings": [
+                "use our File, Export, Network command",
+                "use EPANET's File, Export, Network command"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to \"use the File, Export, Network command there\", which pins the path to EPANET by grammar rather than by hoping the translator infers it. Deliberately NOT solved by asking translators to leave the path in English: we cannot know whether a given reader's EPANET is localised, and 'there' is right either way."
+        },
+        {
+            "key": "lpn_notes_4_def",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Listed \"Reading and writing EPANET .inp files\" under the heading 'Planned additions'. Reading .inp SHIPPED on Task 196. The same key was already an english-disposition entry in 146.06 for a stale claim of exactly this kind, which is the argument for reading a page's own prose before every sprint rather than once.",
+            "readings": [],
+            "disposition": "english",
+            "resolution": "Narrowed to \"Writing EPANET .inp files, so that a project can go back out to EPANET\" (Task 281 is the remaining half). Caught because this key is one of the four detect_english_drift.php flagged as CHANGED, so it was read rather than assumed."
+        },
+        {
+            "key": "lpn_inp_drop_setting",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"These links carry a setting this page cannot hold.\" In a web page, 'link' means hyperlink to almost every reader on earth; the EPANET sense (pipe, pump or valve) is domain jargon sitting inside a browser, which is the worst possible place for it.",
+            "readings": [
+                "these pipes, pumps and valves",
+                "these hyperlinks"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to \"These pipes, pumps and valves carry a setting this page cannot hold.\" Naming the three elements is longer than 'links' and unambiguous in every language, and this page has exactly three kinds so the enumeration cannot go stale silently."
+        },
+        {
+            "key": "lpn_inp_drop_tanks",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"This page has reservoirs, which hold one fixed water level, and a tank is not one.\" The referent of 'one' is unrecoverable: not a reservoir, or not a fixed water level?",
+            "readings": [
+                "a tank is not a reservoir",
+                "a tank does not hold a fixed water level"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to state both explicitly and in causal order: \"A storage tank does not hold a fixed level, so it is not a reservoir.\" Both readings were true, which is exactly why neither could be dropped."
+        },
+        {
+            "key": "lpn_inp_drop_eps",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"This file runs over a period of time\" -- a file does not run; the simulation it describes does.",
+            "readings": [
+                "the simulation this file describes covers a period of time",
+                "this file takes a while to process"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to \"This file describes a simulation that runs over a period of time.\""
+        },
+        {
+            "key": "lpn_settings_scope_note",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Saved with this project.\" A bare participial fragment with no subject. What is saved -- these settings, or something the reader just did?",
+            "readings": [
+                "these settings are stored in the project",
+                "something was saved along with this project"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to \"These settings are saved in this project.\" Fragments are the most reliable ambiguity generator in this whole batch: a language with agreement or gendered participles cannot render one without inventing the subject."
+        },
+        {
+            "key": "lpn_empty_hint",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"To start, use the toolbar to add a background image or a reservoir, or to start a New project from examples.\" Two 'start's competing, and 'New project' is a UI label mid-sentence with nothing marking it as one.",
+            "readings": [
+                "three ways to begin",
+                "add a background image, or add a reservoir-or-New-project taken from examples"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to \"Start by adding a background image or a reservoir from the toolbar, or open File, New project to begin from an example.\" The menu path now marks the UI reference as one."
+        },
+        {
+            "key": "lpn_inp_drop_curve_long",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"...which is the most this page can fit a curve to\" -- a stranded preposition modifying a relative clause whose antecedent is the whole preceding sentence. Grammatical, and very hard to re-compose in a language that does not allow the construction.",
+            "readings": [],
+            "disposition": "english",
+            "resolution": "Rewritten as a causal clause with an explicit subject: \"...because this page fits a curve to three points at most.\" No ambiguity here, only unnecessary difficulty -- which is still a defect when 26 people have to reproduce it."
+        },
+        {
+            "key": "lpn_inp_drop_controls",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"...came in at the state written in the file, and stays there.\" 'Stays there' reads spatially first; the intended sense is temporal persistence in a state.",
+            "readings": [
+                "does not change state",
+                "remains in that place"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to \"and does not change.\""
+        },
+        {
+            "key": "lpn_recent_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Open {file} again, without looking for it.\" Who is not looking -- the user, or the program? The intended promise is that the user need not browse for it.",
+            "readings": [
+                "you will not have to find it in a file dialog",
+                "the program will not go looking for it on disk"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to \"Open {file} again without having to find it on your computer.\""
+        },
+        {
+            "key": "lpn_file_import_inp_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"add it to this browser as a new project\" -- one adds a thing to a collection, not to an application. And the bare 'Save as' names a menu item without its menu, unlike every other UI reference in the lpn_ prose, which say 'File, Save as'.",
+            "readings": [],
+            "disposition": "english",
+            "resolution": "\"save it in this browser as a new project\", and 'Save as' promoted to 'File, Save as' to match lpn_notes_3_def. Consistency in how UI paths are written is worth more than it looks: it is the signal that tells a translator these words are a path rather than prose."
+        },
+        {
+            "key": "lpn_v2_restore_prompt",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"For your evaluation, these are some diameters that will be converted.\" 'For your evaluation' is register-mismatched with the rest of the page and reads as a formal appraisal; and 'will be converted' promises the conversion the dialog is still asking permission for.",
+            "readings": [
+                "so you can judge whether to accept",
+                "for your formal assessment"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to \"So that you can judge, here are some diameters that would be converted, with their values before and after:\" -- conditional mood, matching a dialog that has not been answered yet."
+        },
+        {
+            "key": "lpn_backdrop_menu",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Background image...\" uses three ASCII periods where every sibling menu item ('New project…', 'Open…', 'Save as…') uses the single ellipsis character.",
+            "readings": [],
+            "disposition": "english",
+            "resolution": "Changed to the ellipsis character. Trivial, but it is the kind of inconsistency that gets faithfully reproduced 26 times and then has to be fixed 26 times."
+        },
+        {
+            "key": "consent_body",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "The first draft ran three sentences and buried the ask: \"...we need to keep a small note in your browser.\" 'Note' reads first as a written message, which is not what a cookie is. Tom, 2026-08-12, asked for something brief and targeted and offered his own: \"May we store a single breadcrumb in this browser to help us distinguish visitors from visits? This does not give consent for anything else.\"",
+            "readings": [
+                "a small amount of stored data",
+                "a short written message"
+            ],
+            "disposition": "english",
+            "resolution": "Rewritten to Tom's shape and very nearly his words: \"May we store a little information in this browser, so that we can tell visitors apart from visits when we count? It is used for counting only, and it gives permission for nothing else.\" TWO DELIBERATE DEPARTURES from his draft, both flagged to him. (1) 'a single breadcrumb' would be inaccurate -- there are two items (PHPSESSID and ec_blang) plus the offline queue, all listed in privacy.php's table, and a consent notice that undercounts what it asks for is the one place to be exact. 'A little information' is accurate and count-neutral. (2) 'breadcrumb' is a food metaphor; across 26 languages, several of them low-resource, the reliable outcome is the literal crumb. His 'distinguish visitors from visits' is kept almost verbatim because it names precisely what the two log buckets are."
+        },
+        {
+            "key": "consent_heading",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"May we count your visit?\" -- 'count' is polysemous (tally / matter / rely on), and 'make it count' is a live English idiom, so a translator may render it as 'value' or 'appreciate'.",
+            "readings": [
+                "may we include your visit in a tally",
+                "may we treat your visit as valuable"
+            ],
+            "disposition": "english",
+            "resolution": "The heading no longer carries the ask at all -- it is now the plain noun phrase 'Visitors and visits', and the question moved into consent_body where 'when we count' sits next to 'tell visitors apart from visits' and cannot be read as valuing anything. See the separate glossary entry for 'count' below: the word recurs across several of these strings, so it needed a home of its own as well."
+        },
+        {
+            "key": "consent_accept",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Yes, count me\" / \"No, do not count me\" carried the polysemous 'count' onto the buttons themselves, where there is no surrounding sentence to disambiguate it.",
+            "readings": [
+                "include me in the tally",
+                "consider me important"
+            ],
+            "disposition": "english",
+            "resolution": "Tom's pair adopted: 'Allow this' / 'Refuse this'. Both refer to the single ask in the body, both are the same length and the same grammatical shape, and neither repeats a trap word. The equal-shape point is not cosmetic -- these two strings are styled by one CSS rule precisely so refusing is exactly as easy as accepting, and a translation that makes one of them three times longer would undo that."
+        },
+        {
+            "key": "consent_settings_link",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"Cookie settings\" is the phrase visitors and regulators both look for, and it is also a food word. Several languages will reach for the biscuit.",
+            "readings": [
+                "settings governing browser cookies",
+                "settings about biscuits"
+            ],
+            "disposition": "glossary",
+            "resolution": "English KEPT -- an English reader does not stumble, and this label's whole job is to be the findable, conventional one, so rewriting it would defeat it. Routed to glossary instead, since 'cookie' recurs across privacy.php, the banner and this link. Most languages simply keep the English word, which is the answer the glossary entry should carry."
+        },
+        {
+            "key": "consent_current_granted",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "\"You said yes. We count you once instead of once per visit.\" Terse to the point of cryptic, and 'once instead of once' is a near-repetition a translator has to unpick before they can render it.",
+            "readings": [],
+            "disposition": "english",
+            "resolution": "Rewritten to \"You allowed this. We count you as one visitor rather than as one visit each time.\" -- and its sibling to \"You refused this. We store nothing in this browser for our counts.\" Both now echo the button the visitor actually pressed, which is what makes a state message legible when the banner is reopened from the footer months later."
+        },
+        {
+            "key": "count",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "CONCEPT-LEVEL, not one label. 'Count' appears in the banner, in the two state messages, in privacy.php and in the visitor/visit distinction the whole Task 286 design rests on. English 'count' spans tally, matter, and rely on. Getting it wrong in one language makes the consent ask itself unclear, which is the one thing a consent ask may not be.",
+            "readings": [
+                "to tally, to add to a total",
+                "to matter, to be of value",
+                "to rely on somebody"
+            ],
+            "disposition": "glossary",
+            "resolution": "Glossary concept 'count (tally)' created in glossary.json with an avoid list covering all four wrong senses (mattering, relying on, the financial/accounting sense, and the noble title -- a real trap in Romance and Slavic languages, where the tallying verb and the rank can share a root), and wired into prefixToTermNames() under 'consent'. A sibling entry 'cookie (browser storage)' was created at the same time for consent_settings_link, wired under 'consent', 'privacy' and 'terms'. Both ship with EMPTY translations on purpose: these concepts have settled ordinary words in every language, we have no attested values, and inventing 26 would be judging other people's terminology. The sprint fills them and the mandatory write-back records what each language chose.\n\nCLOSED AS GLOSSARY, NOT AS FULLY DONE. The escalation asked for two things and this is one. The other -- a $ec_lang_syn synonym entry on consent_body -- is human-authored and off-limits to AI without written permission in-conversation, so it is being PROPOSED to Tom as a diff alongside the sprint authorisation rather than parked here as an open entry. By the routing rule this concept's home is the glossary anyway: it recurs across the banner, both state messages and privacy.php, so it is about consistency across call sites rather than about one label. If Tom approves the syn entry it is an addition, not the missing half."
+        },
+        {
+            "key": "lpn_file_new",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Checked, not changed. 'New project…' could be read as an adjective phrase rather than a command, but the ellipsis marks it as a menu item that opens a dialog and every sibling in the File menu shares the shape.",
+            "readings": [],
+            "disposition": "dismissed",
+            "resolution": "No ambiguity a translator could act wrongly on. Recorded because it is one of the four keys detect_english_drift.php flagged as CHANGED, and a flagged key that turns out to be fine should say so rather than vanish."
+        },
+        {
+            "key": "lpn_settings_restore_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Checked, not changed. The fourth CHANGED key. Three plain sentences, each with an explicit subject; the only candidate was 'save a project file with nothing but settings in it', which has one reading.",
+            "readings": [],
+            "disposition": "dismissed",
+            "resolution": "No defect found. This string is also the answer to 'where do my preferred settings live' (ROADMAP Task 263), so its wording was checked against that decision and matches it."
+        },
+        {
+            "key": "lpn_inp_report_counts",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Checked, not changed. \"{nodes} junctions and reservoirs, {links} pipes and pumps, in {units}.\" A verbless list, which is normally this batch's worst offender.",
+            "readings": [],
+            "disposition": "dismissed",
+            "resolution": "Kept: it renders directly under lpn_inp_report_heading ('Imported {file}'), so it is a caption on a stated subject rather than a floating fragment, and the three placeholders make the shape self-evident. Noted rather than silently passed over, because the same shape was a real defect in lpn_settings_scope_note above -- the difference is having a heading above it."
+        },
+        {
+            "key": "rc_notes_7_term",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "NEW STRING, written 2026-08-12, and it exists because note 7 on the Rock Chute page had a body and no heading in any of the 27 languages. Adversarial reading of the candidates: 'Inlet Ponding' parses two ways -- ponding ABOVE the inlet (meant) or ponding OF the inlet (not meant, and physically a different picture). 'Upstream Ponding' loses the reference point entirely, since everything on the page is upstream of something.",
+            "readings": [
+                "water backing up above the steep channel inlet",
+                "the inlet itself being submerged or flooded"
+            ],
+            "disposition": "english",
+            "resolution": "FIRST ANSWER WAS WRONG, corrected by Tom the same day: *\"'Inlet ponding' is the term used in the calculator, and this is an explanation about that. So I think we need to keep 'Inlet ponding', and we explain in the definition.\"* Right, and the mistake is worth recording because it is a whole class. The adversarial reading was sound in isolation and ignored the page it lives on: rc_ponding_check already says \"Inlet ponding check\", so the heading and the check now name the same thing, and the ambiguity the first answer worried about is resolved by the definition sitting directly underneath rather than by a longer heading. CLAUDE.md's concept-level label reuse rule says this outright — reuse the whole label a sibling already uses — and Wave 0 read the string without reading its siblings.\n\nShipped as 'Inlet Ponding', Title Case to match its six sibling headings (Rock Sizing Equations, Unit Discharge, ...) while naming the calculator's own term. THE LESSON: an adversarial pass must check whether a sibling label already owns the concept before proposing new wording, or it will invent clarity at the cost of consistency."
+        },
+        {
+            "key": "consent_accept",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "BLOCKS THE SPRINT UNTIL TOM RULES. Task 288 changed this label from 'Allow this logging reducer' to 'Accept this', and added a third answer ('Accept all, and do not ask again') because the ask now has two kinds of yes. Tom's hand-written $ec_lang_syn entry still reads 'Allow this logging (recording) reducer (limiter)' -- synonyms for a label that no longer exists. Shipping it would hand 26 agents alternate wordings for the wrong string, which is worse than no guidance at all.",
+            "readings": [],
+            "disposition": "intent",
+            "resolution": "CLOSED BY TOM 2026-08-12. He had already answered the original complaint himself in 470a7ec/b20693d, hand-authoring all three entries so they match the current labels; the escalation text above was stale by the time it was read.\n\nThe ruling covers a SECOND defect found while verifying that, which the original entry had not seen. ecConsentState() in lib/config.inc.php makes the two yeses TEMPORAL: '1' consents to this version of the ask and is re-asked if the ask materially changes, '2' consents to all later versions and is never asked again. But on a consent banner 'Accept all' carries an overwhelming conventional meaning -- all cookie CATEGORIES -- so the button has two plausible readings, and 26 agents would each guess with the convention pushing them toward the wrong one.\n\nBy CLAUDE.md's routing rule a two-way parse for an English reader is normally an English fix, and that was the recommendation. Tom ruled otherwise: keep the English, sharpen the synonyms. Recorded as his call, not an oversight -- 'Accept this' / 'Accept all' is the button pair users already recognize, and the parallel two-word shape is worth keeping on three side-by-side buttons that compete for width. The temporal distinction is carried to translators through $ec_lang_syn instead, which is the channel for exactly this case: the English serves its own audience and only the translator is left guessing.\n\nShipped, with Tom's in-conversation approval of the proposed wording:\n  consent_accept     -> 'Accept (allow) this ask (this request, this question)'\n  consent_accept_all -> 'Accept (allow) this and any later ask; do not ask (question) me again'\nBoth pass the substitution test. consent_body, consent_current_granted and consent_region_label were checked against their current labels and need no change."
+        },
+        {
+            "key": "lpn_field_head",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "The glossary's Czech preferred_translation 'tlakova vyska' (pressure head) reads oddly on lpn_field_head, which is a RESERVOIR's water-surface level where no pipe pressure exists yet. Applied it for glossary consistency, but plain 'Hladina' (water level) might be equally or more defensible here.",
+            "readings": [
+                "Tlakova vyska -- glossary-consistent root-concept term",
+                "Hladina -- plain water-level term, reads more naturally for a reservoir-only field"
+            ],
+            "disposition": "glossary",
+            "resolution": "REAL AND WELL-FOUNDED, and it is a distinction the English already makes but the glossary does not. lpn_field_head is a reservoir's water surface -- elevation head -- while lpn_result_head is total/piezometric head at a node. English disambiguates both in their tips ('measured as a height, not as a pressure'), so an English reader is served and no English fix is owed. What was missing is a Czech note in glossary.json saying the one term is not equally apt at both call sites. Recorded there rather than rewritten in lang.ec.cs.php: the tip carries the disambiguation, the agent applied the term consistently and deliberately, and choosing between two defensible Czech terms is a native-speaker call this project defers to the cultural standard on. Flagged for any future cs native review."
+        },
+        {
+            "key": "lpn_lock_break",
+            "source": "translator",
+            "lang": "cs",
+            "complaint": "$ec_lang_syn offers many alternates (break / unlock / take over / claim / override) with no indication of REGISTER -- whether this is a short button label or a longer explanatory phrase matching a dialog body. The English is a plausible idiom but ambiguous on formality and length.",
+            "readings": [
+                "short imperative button label",
+                "longer explanatory phrase matching the dialog body's tone"
+            ],
+            "disposition": "intent",
+            "resolution": "RESOLVED by Tom, 2026-08-13 (\"yes to both\"). The cs translator was right and the complaint generalizes, so the fix is a reusable token rather than a one-off note: CLAUDE.md gains `layout: button` -- \"Renders as a button label competing for width with its siblings in a row or dialog; keep it as short as the language allows and imperative in mood\" -- and lpn_lock_break gains `| layout: button` after its synonyms, which are unchanged. js/looped-network.js:4039 renders the string as a button `label:`, so the register question had a factual answer all along; what was missing was a channel to deliver it. Sweeping the other lpn_ button labels for the same missing register was offered separately and is NOT covered by this ruling."
+        }
+    ]
 }

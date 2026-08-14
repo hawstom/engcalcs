@@ -429,6 +429,7 @@ A string with **no pipe** is entirely intent (all existing clean strings stay va
 | `layout` | `column heading` | Renders as a header in a very narrow fixed-width results-table column; keep the term as short as the language allows. |
 | `layout` | `unit token` | Renders inside a narrow units selector (dropdown); keep the token as short as the language allows. |
 | `layout` | `nav item` | Renders as a top-level item in the site navigation bar, competing for width with every sibling item; keep it as short as the language allows, and prefer the shortest synonym offered rather than the most explanatory one. |
+| `layout` | `button` | Renders as a button label competing for width with its siblings in a row or dialog; keep it as short as the language allows and imperative in mood. |
 | `avoid` | `<wrong sense>` | This label must NOT be read or translated in the named sense (e.g. `avoid: temporal "sporadic"`). |
 | `symbol` | *(flag, no value)* | This label contains a variable symbol; keep every letter and subscript in it exactly as in English in every language, including RTL. Subscripted names (e.g. `q<sub>avg,field</sub>`) are symbols, not words to translate. The specific subscript is read from the label itself, so it need not be repeated in the note. |
 | `gloss` | `<term>` | Defer to `glossary.json` term `<term>` for full disambiguation; do not restate it inline. |

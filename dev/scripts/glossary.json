@@ -2769,21 +2769,21 @@
                 "a railway junction",
                 "an electrical junction box"
             ],
-            "translation_notes": "EPANET and every network package use this word for the demand-bearing node type; use the term local water engineers use for a node in a pipe network, not the civil-works word for a road crossing. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): the demand-bearing node subtype (the Add Junction tool). See the node entry for the es split and the tr non-split.",
+            "translation_notes": "EPANET and every network package use this word for the demand-bearing node type; use the term local water engineers use for a node in a pipe network, not the civil-works word for a road crossing. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): the demand-bearing node subtype (the Add Junction tool). See the node entry for the es split and the tr non-split. Task 251 wave 2 (2026-08-13), harvested from what the de/hi/id agents actually shipped: de distinguishes Entnahmeknoten (a demand junction) from the bare graph Knoten and uses Reservoir as the settled water-engineering loanword; id borrows reservoir likewise (KBBI) while translating the graph terms natively (simpul / penghubung). hi KEPT जंक्शन / नोड / लिंक as transliterations -- a deliberate judgement, not laziness: the hi agent argued these are the dominant forms among Indian engineers, who work in English-medium practice, and the file already carries native words where native words are actually used (जलाशय for reservoir, पाइप for pipe). Consistent with the low-resource register finding: the local tongue is field register, the engineering register is English-inflected. Flag for native review before promoting hi above 0.65.",
             "translations": {
                 "am": "",
                 "ar": "",
                 "bg": "",
                 "bn": "",
                 "cs": "",
-                "de": "",
+                "de": "Entnahmeknoten",
                 "es": "nudo",
                 "fa": "",
                 "fr": "jonction",
                 "he": "",
-                "hi": "",
+                "hi": "जंक्शन",
                 "hr": "",
-                "id": "",
+                "id": "Simpul",
                 "it": "",
                 "km": "",
                 "my": "",
@@ -2808,21 +2808,21 @@
                 "a natural lake specifically, where the language has a general storage/supply term",
                 "a reserve or reservation in the non-physical sense"
             ],
-            "translation_notes": "The user-facing meaning is \"the place the network gets its head from\", broader than a dam reservoir. Where a language distinguishes a storage basin from a supply point, prefer the term an engineer would use for a fixed supply level. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): the fixed-head node type. Note the paired trap: English also says \"Tanks\" in lpn_notes_2_def for the thing lpn_ deliberately does NOT model, so each language kept a SECOND, distinct word for that — es depósitos, pt tanques, fr réservoirs à niveau variable — rather than reusing the reservoir word and implying time-varying behaviour.",
+            "translation_notes": "The user-facing meaning is \"the place the network gets its head from\", broader than a dam reservoir. Where a language distinguishes a storage basin from a supply point, prefer the term an engineer would use for a fixed supply level. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): the fixed-head node type. Note the paired trap: English also says \"Tanks\" in lpn_notes_2_def for the thing lpn_ deliberately does NOT model, so each language kept a SECOND, distinct word for that — es depósitos, pt tanques, fr réservoirs à niveau variable — rather than reusing the reservoir word and implying time-varying behaviour. Task 251 wave 2 (2026-08-13), harvested from what the de/hi/id agents actually shipped: de distinguishes Entnahmeknoten (a demand junction) from the bare graph Knoten and uses Reservoir as the settled water-engineering loanword; id borrows reservoir likewise (KBBI) while translating the graph terms natively (simpul / penghubung). hi KEPT जंक्शन / नोड / लिंक as transliterations -- a deliberate judgement, not laziness: the hi agent argued these are the dominant forms among Indian engineers, who work in English-medium practice, and the file already carries native words where native words are actually used (जलाशय for reservoir, पाइप for pipe). Consistent with the low-resource register finding: the local tongue is field register, the engineering register is English-inflected. Flag for native review before promoting hi above 0.65.",
             "translations": {
                 "am": "",
                 "ar": "",
                 "bg": "",
                 "bn": "",
                 "cs": "",
-                "de": "",
+                "de": "Reservoir",
                 "es": "embalse",
                 "fa": "",
                 "fr": "réservoir",
                 "he": "",
-                "hi": "",
+                "hi": "जलाशय",
                 "hr": "",
-                "id": "",
+                "id": "Reservoir",
                 "it": "",
                 "km": "",
                 "my": "",
@@ -2847,21 +2847,21 @@
                 "a knot, lump, or swelling (the anatomical/botanical sense of the Latin root)",
                 "a node in the wave-physics sense (a point of zero amplitude)"
             ],
-            "translation_notes": "Pairs with \"link\". Use the language's established network-diagram or graph vocabulary; many languages have one from surveying or electrical network analysis. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): generic node concept (junction + reservoir), distinct from the junction subtype. es deliberately splits nodo (generic) from nudo (junction), matching EPANET-Spanish \"nudo de consumo\"; tr does NOT split — Turkish water-engineering practice uses düğüm for both and disambiguates by context, so no artificial coinage was invented.",
+            "translation_notes": "Pairs with \"link\". Use the language's established network-diagram or graph vocabulary; many languages have one from surveying or electrical network analysis. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): generic node concept (junction + reservoir), distinct from the junction subtype. es deliberately splits nodo (generic) from nudo (junction), matching EPANET-Spanish \"nudo de consumo\"; tr does NOT split — Turkish water-engineering practice uses düğüm for both and disambiguates by context, so no artificial coinage was invented. Task 251 wave 2 (2026-08-13), harvested from what the de/hi/id agents actually shipped: de distinguishes Entnahmeknoten (a demand junction) from the bare graph Knoten and uses Reservoir as the settled water-engineering loanword; id borrows reservoir likewise (KBBI) while translating the graph terms natively (simpul / penghubung). hi KEPT जंक्शन / नोड / लिंक as transliterations -- a deliberate judgement, not laziness: the hi agent argued these are the dominant forms among Indian engineers, who work in English-medium practice, and the file already carries native words where native words are actually used (जलाशय for reservoir, पाइप for pipe). Consistent with the low-resource register finding: the local tongue is field register, the engineering register is English-inflected. Flag for native review before promoting hi above 0.65.",
             "translations": {
                 "am": "",
                 "ar": "",
                 "bg": "",
                 "bn": "",
                 "cs": "",
-                "de": "",
+                "de": "Knoten",
                 "es": "nodo",
                 "fa": "",
                 "fr": "nœud",
                 "he": "",
-                "hi": "",
+                "hi": "नोड",
                 "hr": "",
-                "id": "",
+                "id": "simpul",
                 "it": "",
                 "km": "",
                 "my": "",
@@ -2886,21 +2886,21 @@
                 "a chain link (the physical object)",
                 "a connection in the social or logistical sense"
             ],
-            "translation_notes": "Pairs with \"node\". If the language has no neutral graph-edge term, \"pipe or pump\" (the two things it actually covers) reads better than a computing loanword. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): the pipe-or-pump edge. Every language avoided its hyperlink word (es enlace, fr lien, tr bağlantı) as the avoid list requires. es línea and pt trecho match the incumbent bpn_ line-table wording already shipped; tr hat matches bpn_ usage.",
+            "translation_notes": "Pairs with \"node\". If the language has no neutral graph-edge term, \"pipe or pump\" (the two things it actually covers) reads better than a computing loanword. Seeded 2026-07-31 for ROADMAP Task 193 (the lpn_ English tightening pass), ahead of sprint 146.06. Translations are deliberately EMPTY: this entry exists to carry the avoid-list guard into the sprint prompts, not to assert a translation nobody has made yet. Fill them from the sprint output per CLAUDE.md's mandatory glossary write-back. [2026-08-08] Task 146.06 lpn_ sprint (es, pt, fr, tr): the pipe-or-pump edge. Every language avoided its hyperlink word (es enlace, fr lien, tr bağlantı) as the avoid list requires. es línea and pt trecho match the incumbent bpn_ line-table wording already shipped; tr hat matches bpn_ usage. Task 251 wave 2 (2026-08-13), harvested from what the de/hi/id agents actually shipped: de distinguishes Entnahmeknoten (a demand junction) from the bare graph Knoten and uses Reservoir as the settled water-engineering loanword; id borrows reservoir likewise (KBBI) while translating the graph terms natively (simpul / penghubung). hi KEPT जंक्शन / नोड / लिंक as transliterations -- a deliberate judgement, not laziness: the hi agent argued these are the dominant forms among Indian engineers, who work in English-medium practice, and the file already carries native words where native words are actually used (जलाशय for reservoir, पाइप for pipe). Consistent with the low-resource register finding: the local tongue is field register, the engineering register is English-inflected. Flag for native review before promoting hi above 0.65.",
             "translations": {
                 "am": "",
                 "ar": "",
                 "bg": "",
                 "bn": "",
                 "cs": "",
-                "de": "",
+                "de": "Verbindung",
                 "es": "línea",
                 "fa": "",
                 "fr": "liaison",
                 "he": "",
-                "hi": "",
+                "hi": "लिंक",
                 "hr": "",
-                "id": "",
+                "id": "penghubung",
                 "it": "",
                 "km": "",
                 "my": "",
@@ -3316,7 +3316,7 @@
                 "the noble title — count, as in a European rank. A real trap in Romance and Slavic languages, where the tallying verb and the title can share a root",
                 "rendering it as MEASURE or TRACK, both of which imply more than we do. We add one to a total; we do not measure or follow anybody"
             ],
-            "translations": {},
+            "translations": [],
             "translation_notes": "Created 2026-08-12 for the ROADMAP Task 286 consent banner, as the glossary half of a Wave 0 finding (dev/english-friction/251-lpn-26lang.json, key 'count'). Translations are deliberately EMPTY: this concept has an ordinary, settled verb in every language, we have no shipped values to attest, and inventing 26 of them would be exactly the judging-other-people's-terminology that CLAUDE.md forbids. The sprint fills them, and the mandatory glossary write-back records what each language actually chose. What the entry carries in the meantime is the part an agent cannot derive — which of the English senses is meant, and which four are traps."
         },
         "cookie (browser storage)": {
@@ -3328,7 +3328,7 @@
                 "coining a descriptive phrase where your language already borrows 'cookie'. A visitor hunting for cookie settings will not recognise an invented term",
                 "widening it to all browser storage. The privacy notice distinguishes cookies from localStorage and IndexedDB deliberately, because they are listed as separate rows"
             ],
-            "translations": {},
+            "translations": [],
             "translation_notes": "Created 2026-08-12 alongside 'count (tally)', from the same Wave 0 pass. Empty translations for the same reason, with one extra: this is the term where deferring to the culture matters most, because the label's whole value is being the findable, conventional one. See CLAUDE.md, 'defer to cultural standard' — we are not the judges of terminology."
         },
         "log (record)": {
@@ -3342,7 +3342,7 @@
                 "rendering it as MONITOR, TRACK or FOLLOW, all of which imply watching a person over time. We write one line saying a page was opened; we do not follow anybody",
                 "borrowing the English word where an ordinary verb for recording exists"
             ],
-            "translations": {},
+            "translations": [],
             "translation_notes": "Created 2026-08-12 at Tom's suggestion: *\"There must be a better way to help translate 'logging' (recording) than to repeat that synonym in several _syn keys. Isn't that what our glossary is for?\"* Exactly right, and this entry is the answer — the CONCEPT gloss belongs here once, not repeated in four labels. Note the boundary, which is easy to get wrong in the other direction: this replaces the repeated '(recording)' gloss, and NOT a label's own alternate wordings. See CLAUDE.md's routing rule and the retirement of the Task 132 trimming exception — the left-of-pipe is the payload, and a glossary pointer accompanies the synonyms rather than deleting them.\n\nTranslations empty on purpose, as with 'count (tally)' and 'cookie (browser storage)': every language has a settled ordinary verb for this, we have nothing attested, and inventing 26 would be judging other people's terminology. The sprint fills them via the mandatory write-back."
         },
         "bisection": {
@@ -3355,7 +3355,7 @@
                 "rendering it as simply 'halving' or 'dividing in two', which names the step and loses the fact that it is an iterative solving method converging on an answer",
                 "borrowing the English word where a settled numerical-analysis term exists"
             ],
-            "translations": {},
+            "translations": [],
             "translation_notes": "Created 2026-08-12. Found by dev/scripts/gloss_ref_check.php on its very first run: ip_notes_1_def had carried `gloss: bisection` since it was written, pointing at a term that did not exist, so that pointer had been delivering nothing to every ip_ translation agent. Exactly the silent failure the check was built for, and a good argument for the check.\n\nTranslations empty on purpose, like the other concepts seeded this way — the sprint fills them and the mandatory write-back records what each language chose."
         }
     }
