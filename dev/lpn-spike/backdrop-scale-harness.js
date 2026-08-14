@@ -288,5 +288,36 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 	report(accept.split(',').length <= 12, 'the list is still readable', `${accept.split(',').length} entries`);
 }
 
+// ---- 12. registration blanks the tools, INCLUDING its own last click ----
+// Tom, 2026-08-14: "When moving a background image, node select and delete needs to be disabled."
+// Every pointer path did check regMode. The leak was the one click that ENDS the sequence: the
+// registration listeners are capture-phase, so handler2 clears regMode before the tool's own
+// bubble-phase pointerup on the same element runs — and picking a node as a Move target then opened
+// its popup, or deleted it outright with the Delete tool active. Structural assertions, because the
+// defect is in the ORDER two listeners on one element see one event, which is a browser fact the
+// extract-a-function harnesses here cannot reproduce.
+{
+	// The premise: registration really does listen in the capture phase, and really does clear the
+	// flag inside the handler. If either stops being true this section is guarding nothing.
+	report(/svg\.addEventListener\('pointerup', handler2?, true\)/.test(src),
+		'registration clicks are still capture-phase listeners');
+	report(/activeCancel = null;( setNodeCursorAllowed\(false\);)? setRegMode\(false\);\n\s+positionTo/.test(src),
+		'Position still clears regMode in that handler, before the tool sees the event');
+
+	// The fix: the tap's START is gated, so the click that ends registration can never complete one.
+	report(/svg\.addEventListener\('pointerdown', function \(e\) \{\s*\n\s*if \(regMode\) \{ downPt = null; return; \}/.test(src),
+		'a tap cannot BEGIN while a registration is pending');
+
+	// And the three paths that were already right stay right — a tool must not act at any point in
+	// the sequence, not just at its end.
+	const wire = extract('wirePointerEvents');
+	report((wire.match(/if \(regMode\)/g) || []).length >= 4,
+		'every pointer path in wirePointerEvents() checks regMode', `${(wire.match(/if \(regMode\)/g) || []).length} gates`);
+	// The delete branch and the select-popup branch both live in that one pointerup, so one gate
+	// covers both — which is why the fix is one line and not two.
+	report(/mode === 'delete'/.test(wire) && /mode === 'select' && t\.dataset\.node/.test(wire),
+		'delete and select-popup are both inside the gated pointerup');
+}
+
 console.log(`\n${checks - failures}/${checks} passed`);
 process.exit(failures ? 1 : 0);

@@ -6442,7 +6442,20 @@ var EngCalcs = EngCalcs || {};
 		// Add-* and Delete tools act on a plain click (tap without drag), same threshold as
 		// the spike's tap-vs-drag detection.
 		var downPt = null;
-		svg.addEventListener('pointerdown', function (e) { downPt = { x: e.clientX, y: e.clientY }; });
+		// THE CLICK THAT ENDS A REGISTRATION IS NOT A TAP FOR A TOOL (Tom, 2026-08-14: "When moving a
+		// background image, node select and delete needs to be disabled"). Every other pointer path
+		// already checked regMode, and the pointerup below checks it too -- but the LAST click of a
+		// Scale/Position sequence clears regMode in a CAPTURE-phase listener (startBackdropPosition(),
+		// handler2), and the tool's own pointerup runs afterwards, in the bubble phase of that same
+		// event, by which time the flag it depends on is already false. So picking a node as the
+		// target of a Move also opened that node's popup -- or, with the Delete tool active, DELETED
+		// the node you had just aimed at.
+		// Gating the tap's START, not its end, is what makes this hold: the pointerdown happens while
+		// regMode is unambiguously still on, and a tap with no beginning cannot be completed.
+		svg.addEventListener('pointerdown', function (e) {
+			if (regMode) { downPt = null; return; }
+			downPt = { x: e.clientX, y: e.clientY };
+		});
 		svg.addEventListener('pointerup', function (e) {
 			if (regMode) { downPt = null; return; } // a Scale/Position registration click sequence is pending
 			if (!downPt || Math.hypot(e.clientX - downPt.x, e.clientY - downPt.y) >= 4) { downPt = null; return; }

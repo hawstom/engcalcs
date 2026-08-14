@@ -1754,6 +1754,18 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|301| **[DONE 2026-08-14] The click that ended a backdrop Move also acted on the node it
+  landed on.** Tom: *"When moving a background image, node select and delete needs to be disabled."*
+  Every pointer path did check `regMode`; the leak was the sequence's LAST click. Registration
+  listens in the CAPTURE phase and clears `regMode` inside its handler, so the tool's own
+  bubble-phase `pointerup` on the same element ran with the flag already false — picking a node as
+  a Move target opened its popup, or deleted it with the Delete tool active. Fixed by gating the
+  tap's START (`downPt`) instead: the `pointerdown` happens while `regMode` is unambiguously on, and
+  a tap with no beginning cannot complete. **General shape worth remembering: a flag cleared inside
+  a capture-phase listener is already false for every bubble-phase listener on the same element.**
+  `dev/lpn-spike/backdrop-scale-harness.js` §12 asserts it structurally — the defect is in the order
+  two listeners see one event, which the extract-a-function harnesses cannot reproduce.
+
 - 0|296| **[DONE 2026-08-14] Two errors in Manning Trap Channel's Maynord riprap column, one of
   them ~4x in the unsafe direction.** Surfaced by `/code-review high js/Manning.lib.js` (the first
   Tier 2 review this calculator has had), then checked against the primary source: Witheridge,
