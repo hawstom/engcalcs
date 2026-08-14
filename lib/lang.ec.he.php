@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='אזור כותרת משנה להדפס
 $ec_lang['consent_body']='האם נוכל לשמור ספרה אחת בלבד לכל עמוד באחסון של פרופיל דפדפן זה, כדי למנוע רישום חוזר של ביקוריו?';
 $ec_lang['consent_accept']='אשר בקשה זו';
 $ec_lang['consent_accept_all']='אשר תמיד';
-$ec_lang['consent_decline']='דחה';
+$ec_lang['consent_decline']='דחה תמיד';
 $ec_lang['consent_current_granted']='אישרת זאת. אנו מגבילים את הרישום עבור פרופיל דפדפן זה.';
 $ec_lang['consent_current_denied']='דחית זאת. איננו שומרים דבר כדי להגביל את הרישום עבור פרופיל דפדפן זה.';
 $ec_lang['consent_region_label']='הבחירה שלכם לגבי הגבלת הרישום.';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='תצוגה';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='הגדרות';
+$ec_lang['lpn_menu_help']='עזרה';
+$ec_lang['lpn_help_walkthroughs']='מדריכים';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,14 @@ $ec_lang['lpn_labels_decimals_tip']='מספר הספרות אחרי הנקודה
 $ec_lang['lpn_labels_mark_extrema']='סמן את הערכים הגבוהים והנמוכים ביותר';
 $ec_lang['lpn_field_id']='מזהה';
 $ec_lang['lpn_backdrop_menu']='תמונת רקע…';
-$ec_lang['lpn_backdrop_add']='הוסף תמונה';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='קבע קנה מידה לתמונה';
-$ec_lang['lpn_backdrop_position']='הזז תמונה';
-$ec_lang['lpn_backdrop_remove']='הסר תמונה';
+$ec_lang['lpn_backdrop_add']='הוסף';
+$ec_lang['lpn_backdrop_scale']='קבע קנה מידה בבחירה';
+$ec_lang['lpn_backdrop_scale_entry']='קנה מידה לפי קובץ וורלד או גודל פיקסל אחד במפה';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='הזינו את גודל הפיקסל האחד במפה, או הדביקו את כל תוכן קובץ הוורלד של התמונה';
+$ec_lang['lpn_backdrop_scale_entry_bad']='הקלידו מספר אחד עבור גודל פיקסל אחד במפה, או הדביקו את שש השורות של קובץ הוורלד.';
+$ec_lang['lpn_backdrop_wld_bad']='קובץ הוורלד הזה מסובב, משקף או מותח את התמונה בצורה לא אחידה. המפה יכולה רק להזיז תמונה ולשנות את גודלה באותה מידה בשני הכיוונים, ולכן הקובץ לא נעשה בו שימוש.';
+$ec_lang['lpn_backdrop_position']='הזז';
+$ec_lang['lpn_backdrop_remove']='הסר';
 $ec_lang['lpn_backdrop_remove_confirm']='להסיר את תמונת הרקע?';
 $ec_lang['lpn_backdrop_scale_prompt1']='לחצו על שתי נקודות בתמונת הרקע, כגון שני קצוות של קנה מידה גרפי. אז הקלידו את המרחק האמיתי ביניהן.';
 $ec_lang['lpn_backdrop_scale_prompt2']='מרחק אמיתי בין שתי הנקודות';
