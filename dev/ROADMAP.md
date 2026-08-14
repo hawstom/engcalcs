@@ -1768,22 +1768,29 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     **Every combination with a rock radio ALSO on was correct**, because the
     rock loop kept iterating and n converged as a side effect. Three of every four combinations
     were right, which is part of why this survived years of use.
-  - **WHERE THE HARM ACTUALLY WAS — corrected 2026-08-14 after Tom tested it in a browser and said
-    plainly "that's not true, it immediately changes to 17.0275 when I choose B/B."** He was right,
-    and the correction matters more than the original claim:
+  - **WHERE THE HARM ACTUALLY WAS — corrected 2026-08-14 after Tom tested it in a browser.** He
+    was right, and his framing is the clearer one: *"a lag of one step in the triggers."* Exactly
+    that — the pass updated n and left Q showing the previous n's answer, and the next trigger
+    healed it. The distinction that follows from his framing, and the one worth keeping:
+    **a trigger heals a stale OUTPUT; it cannot heal a wrong INPUT.**
     - **On the MAIN FORM the defect was TRANSIENT and self-healing.** The bad pass wrote the new n
       back into the roughness box, so the *next* recalculation — any keystroke, any radio, any unit
       change — used it and the numbers corrected themselves. Measured on the pre-fix code: clicking
       B/B showed Q = 34.6362 for exactly one render, then 17.0119 from the second recalculation
       onward. A wrong number for one render is still a defect, but "you would size a channel
       believing it carries 34.6 cfs" was an overstatement and is withdrawn.
-    - **In the SOLVER it PERSISTED, and that is the real harm.** `solveForY` calls `mtc_iterate`
-      once per TRIAL DEPTH, reading n from the form, so a single-pass iterate used the form's n at
-      every depth instead of the roughness method's n at that depth. There is no second
-      recalculation to heal it, and the answer lands in the depth box as a result the user writes
-      down. Pre-fix, asking for **60 cfs with B/B on returned y = 3.6219 ft, a depth that carries
-      66.97 cfs — 12% over the target, reported as success.** Fixed: y = 3.4584 ft and the page
-      then shows exactly 60.
+    - **In the SOLVER it PERSISTED, and that is the real harm — because the solver's damage is an
+      INPUT.** `solveForY` calls `mtc_iterate` once per TRIAL DEPTH, reading n from the form, so a
+      single-pass iterate used the form's n at every depth instead of the roughness method's n at
+      that depth. It then writes the result into the DEPTH BOX. No number of further triggers can
+      heal that: recalculating merely re-derives the correct Q at the wrong depth. Measured pre-fix,
+      asking for **60 cfs with B/B on gave y = 3.6219 ft and Q = 66.97 — and it stayed 66.97
+      through every subsequent recalculation**, 12% over target, reported as success. Fixed:
+      y = 3.4584 ft and the page shows exactly 60.
+    - **This is also the argument for fixing the shared iteration rather than adding a recalc
+      trigger** — Tom's first proposal, and a correct and sufficient fix for the form. It would
+      have been entirely inert for the solver, whose 38 `mtc_iterate` calls per press never touch
+      `pageCalculator` at all (it runs once, at the end).
     - **The lesson for the harness, not just for this bug:** the original assertions measured a
       SINGLE `pageCalculator` call, which is the transient state a browser passes through and not
       the state a user reads. `mtc-harness.js` now also asserts the invariant that has no such

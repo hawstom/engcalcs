@@ -786,8 +786,10 @@ from the *previous* iteration's n whenever a roughness radio was on and no rock 
 safety factor was being applied to a d50 the user had typed. Both lived in one loop-exit condition, and **three of every four radio
 combinations were correct**, which is why years of hand-checking never caught either.
 
-**AND THE HARNESS OVERSTATED IT, which is its own lesson (Tom, 2026-08-14: *"That's not true. It
-immediately changes to 17.0275 when I choose B/B."*).** He was right. The assertions measured a
+**AND THE HARNESS OVERSTATED IT, which is its own lesson (Tom, 2026-08-14, testing in a browser:
+*"a lag of one step in the triggers"*).** He was right, and his framing is the one to keep: **a
+trigger heals a stale OUTPUT; it cannot heal a wrong INPUT.** That single sentence separates the
+two halves of the defect and tells you which layer a fix belongs in. The assertions measured a
 SINGLE `pageCalculator` call — but on the main form the bad pass wrote the corrected n back into
 the box, so the next recalculation healed it. What the harness had actually measured was a
 transient a browser passes through, not a state a user reads. The defect was real and persistent
