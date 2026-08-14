@@ -24,6 +24,23 @@ $basedirectory = realpath(__DIR__.'/../..');
 // Set some global variables
 define('DEBUG_MODE', getenv('APP_ENV') === 'development');
 
+// A DEVELOPMENT SERVER MUST BE ABLE TO SAY WHAT WENT WRONG. Until 2026-08-14 DEBUG_MODE only
+// controlled a validator link, and nothing anywhere set display_errors -- so when dev.hawsedc.com's
+// first deploy answered 500 with an EMPTY BODY on every page, the one machine whose whole purpose is
+// to be broken safely could not report its own fatal. Diagnosing it from outside took an hour of
+// narrowing (static assets answer, sw.php answers, therefore the fault is inside base.inc.php's
+// include chain) to reach a conclusion the error log states in one line.
+//
+// Gated on APP_ENV, so production is untouched: with the variable unset, DEBUG_MODE is false and
+// nothing below runs. display_errors leaks filesystem paths, which is exactly why it belongs on a
+// dev box and nowhere else -- and why this is opt-in by environment rather than by editing a file
+// somebody then forgets to edit back.
+if (DEBUG_MODE) {
+    @ini_set('display_errors', '1');
+    @ini_set('display_startup_errors', '1');
+    error_reporting(E_ALL);
+}
+
 define('BASE_DIRECTORY', $basedirectory);
 
 // The one origin every canonical/hreflang/sitemap URL is built from (ROADMAP Task 149).

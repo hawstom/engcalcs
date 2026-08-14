@@ -361,5 +361,49 @@ if ($optLinks) {
     }
 }
 
+// ---------------------------------------------------------------------------------------------
+// TRIAGE: if everything failed, say WHY rather than just how much.
+//
+// 2026-08-14, dev.hawsedc.com's first deploy: every page returned 500 with an EMPTY body, on every
+// header. That reads like "the site is down" and sends you looking at Apache, PHP versions and
+// .htaccess -- and it was none of those. Two facts, taken together, localised it in one step:
+//
+//   - a STATIC asset under /engcalcs/ returned 200, so .htaccess and AllowOverride were fine (the
+//     failure mode CLAUDE.md warns about would have 500'd those too);
+//   - sw.php returned 200, and sw.php is the ONE php file in this suite that does not include
+//     lib/base.inc.php. So PHP itself was healthy and the fatal was inside that include chain.
+//
+// The cause was a PARTIAL UPLOAD: lib/Language.lib.php was new and called ecBrowserLangTag(), which
+// had just moved into lib/config.inc.php, which was old. Call to undefined function, on every page.
+// A deploy that copies files rather than pulling a commit can always land half a change, and the
+// two halves of one commit are exactly the pair that fatals.
+//
+// So this block runs the same two probes and prints the same reasoning. It costs two requests.
+if ($bad) {
+    $probeStatic = @file_get_contents($base . '/css/engcalcs.css', false, stream_context_create(
+        ['http' => ['method' => 'HEAD', 'timeout' => 10, 'ignore_errors' => true]]));
+    $staticOk = isset($http_response_header) && strpos(implode(' ', $http_response_header), '200') !== false;
+    $probeSw = @file_get_contents($base . '/sw.php', false, stream_context_create(
+        ['http' => ['method' => 'HEAD', 'timeout' => 10, 'ignore_errors' => true]]));
+    $swOk = isset($http_response_header) && strpos(implode(' ', $http_response_header), '200') !== false;
+
+    echo "\ntriage\n";
+    printf("  %-34s %s\n", 'static asset under /engcalcs/', $staticOk ? 'answers' : 'DOES NOT ANSWER');
+    printf("  %-34s %s\n", 'sw.php (no lib/base.inc.php)', $swOk ? 'answers' : 'DOES NOT ANSWER');
+    if ($staticOk && $swOk) {
+        echo "\n  PHP is healthy and the web server is serving files. Every failure above is a page\n";
+        echo "  that loads lib/base.inc.php, so the fatal is inside THAT include chain -- and the\n";
+        echo "  overwhelmingly likely cause is a PARTIAL UPLOAD of lib/. Two halves of one commit\n";
+        echo "  landing separately is enough: a caller shipped without the function it calls fatals\n";
+        echo "  every page while leaving static files and sw.php answering normally.\n";
+        echo "  Re-upload lib/ in full, then run this again.\n";
+    } elseif (!$staticOk) {
+        echo "\n  Even a static file will not serve. That is the web server, not this suite --\n";
+        echo "  check .htaccess first: `Options -Indexes` needs an `AllowOverride Options` grant, and\n";
+        echo "  where it is missing Apache returns 500 for EVERY request under /engcalcs/ rather than\n";
+        echo "  ignoring the line. See CLAUDE.md, Deploying.\n";
+    }
+}
+
 echo "\n" . ($bad ? "$bad FAILED\n" : "all clear\n");
 exit($bad ? 1 : 0);

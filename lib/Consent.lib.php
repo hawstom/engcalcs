@@ -121,6 +121,31 @@ function echoConsentBanner() {
 		});
 	}
 
+	// A CACHED PAGE MUST CORRECT ITSELF. Whether the banner is hidden is decided SERVER-SIDE at
+	// render time (the `hidden` attribute above), which was fine until this suite became
+	// installable: the service worker caches pages, so a page cached BEFORE the visitor answered
+	// carries banner markup with no `hidden` attribute, and serving it later shows the banner again
+	// to somebody who has already consented. Reported by Tom on 2026-08-14 as "I keep getting the
+	// consent banner", on an installed PWA.
+	//
+	// Nagging somebody who already said yes is the one direction that makes a consent flow worse
+	// rather than safer -- this file says so twenty lines up -- and a cached page was doing exactly
+	// that. So re-decide on load from the cookie, which is always current even when the HTML is not.
+	//
+	// THE RULE IS DUPLICATED FROM ecConsentState() IN lib/config.inc.php AND MUST STAY IN STEP:
+	// state 0 or 2 is answered forever; state 1 is answered only for the policy version it was given
+	// for, which is what makes bumping EC_CONSENT_VERSION re-ask exactly those people. Two copies is
+	// the cost of the page being cacheable; it is written out here rather than left implicit.
+	(function () {
+		var m = document.cookie.match(/(?:^|;\s*)ec_consent=([^;]*)/);
+		if (!m) { return; }
+		var parts = decodeURIComponent(m[1]).split('.');
+		var state = parts[0], version = parts[2] || '';
+		var answered = (state === '0' || state === '2' ||
+			(state === '1' && version === <?=json_encode(EC_CONSENT_VERSION)?>));
+		if (answered) { banner.hidden = true; }
+	}());
+
 	// The permanent "Cookie settings" link in the footer. Reopening is the withdrawal mechanism,
 	// so it must work from every page and in both directions.
 	document.addEventListener('click', function (event) {
