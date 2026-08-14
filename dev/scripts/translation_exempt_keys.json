@@ -1,295 +1,299 @@
 {
-  "_comment": [
-    "Keys whose translation is CORRECTLY byte-identical to the English source.",
-    "",
-    "Why this file exists (ROADMAP Task 161): generate_translation_payloads.php counts a value",
-    "that equals English as 'equal_to_english' delta. For the keys below that is permanently",
-    "wrong by design, not by neglect, so the delta count could never reach zero and every sprint",
-    "proposal had to re-derive the same hand-classification from scratch. With this file, delta",
-    "zero means zero.",
-    "",
-    "SCOPE: this suppresses ONLY the equal_to_english reason. A key listed here that is MISSING",
-    "or BLANK in a lang file is still reported as delta -- exemption says 'identical is allowed',",
-    "never 'this key does not need a value'.",
-    "",
-    "'languages': '*' means every language; an explicit array means only those languages may",
-    "legitimately land on the English string. Use the array form for coincidental cognates -- a",
-    "global exemption there would hide a genuinely untranslated string in an unrelated script.",
-    "A language added later is therefore reported until someone confirms the cognate holds.",
-    "",
-    "NOTE ON THE $ec_lang_intent 'symbol' TAG: it is NOT a usable exemption source and was",
-    "rejected as the mechanism here. 'symbol' means 'keep the symbols inside this string intact',",
-    "not 'this whole string is a symbol' -- ip_notes_1_def, ip_notes_2_def and wi_notes_we_def",
-    "carry the tag and are full prose that must be translated. Only 2 of the 7 symbol-only keys",
-    "below even carry the tag. An explicit list is the honest mechanism."
-  ],
-  "exempt": {
-    "dw_roughness": {
-      "category": "symbol",
-      "languages": "*",
-      "reason": "e -- absolute roughness symbol; identical in every language and script."
-    },
-    "ip_length": {
-      "category": "symbol",
-      "languages": "*",
-      "reason": "L -- length symbol."
-    },
-    "ip_diameter": {
-      "category": "symbol",
-      "languages": "*",
-      "reason": "D -- diameter symbol."
-    },
-    "ip_roughness": {
-      "category": "symbol",
-      "languages": "*",
-      "reason": "e -- absolute roughness symbol."
-    },
-    "ip_hf": {
-      "category": "symbol",
-      "languages": "*",
-      "reason": "h_f -- friction head loss symbol; carries the intent 'symbol' tag."
-    },
-    "ip_hm": {
-      "category": "symbol",
-      "languages": "*",
-      "reason": "h_m -- minor (local) head loss symbol; carries the intent 'symbol' tag."
-    },
-    "bpn_id": {
-      "category": "symbol",
-      "languages": "*",
-      "reason": "ID -- node identifier column heading, used as a symbol."
-    },
-    "lpn_field_id": {
-      "category": "symbol",
-      "languages": "*",
-      "reason": "ID -- the same node-identifier heading as bpn_id above, and the same symbol. Task 146.06 found tr had rendered it 'Kimlik' while its own bpn_id stayed 'ID'; aligned to the incumbent per the concept-level label reuse convention."
-    },
-    "lpn_field_x": {
-      "category": "symbol",
-      "languages": "*",
-      "reason": "X -- map coordinate axis symbol."
-    },
-    "lpn_field_y": {
-      "category": "symbol",
-      "languages": "*",
-      "reason": "Y -- map coordinate axis symbol."
-    },
-    "bpn_method_hw": {
-      "category": "eponym",
-      "languages": "*",
-      "reason": "Hazen-Williams -- surnames are never renamed (CLAUDE.md, Simple English section)."
-    },
-    "bpn_method_dw": {
-      "category": "eponym",
-      "languages": "*",
-      "reason": "Darcy-Weisbach -- surnames are never renamed."
-    },
-    "bpn_method_manning": {
-      "category": "eponym",
-      "languages": "*",
-      "reason": "Manning -- surname, never renamed."
-    },
-    "install_android_heading": {
-      "category": "brand",
-      "languages": "*",
-      "reason": "Android (Chrome) -- product names. Languages that transliterate into their own script are still free to; this only permits the identical form."
-    },
-    "install_ios_heading": {
-      "category": "brand",
-      "languages": "*",
-      "reason": "iOS (Safari) -- product names, same reasoning as install_android_heading."
-    },
-    "dw_regime_laminar": {
-      "category": "cognate",
-      "languages": [
-        "de",
-        "es",
-        "id",
-        "pt",
-        "ro"
-      ],
-      "reason": "'Laminar' is the correct word in these languages. Others (fr laminaire, it laminare, cs/hr laminarni) genuinely differ, so this is not a global exemption."
-    },
-    "or_shape_circular": {
-      "category": "cognate",
-      "languages": [
-        "es",
-        "pt"
-      ],
-      "reason": "'Circular' is correct Spanish and Portuguese."
-    },
-    "or_shape_rectangular": {
-      "category": "cognate",
-      "languages": [
-        "es"
-      ],
-      "reason": "'Rectangular' is correct Spanish; Portuguese is 'Retangular'."
-    },
-    "u_depthFrac": {
-      "category": "cognate",
-      "languages": [
-        "fr"
-      ],
-      "reason": "'Fraction' is the correct French word, spelled identically. Surfaced only when Task 163 taught the validator to read double-quoted assignments -- this key had never been checked. Not global: es fraccion, it frazione, pt fracao, ro fractie, de Anteil all genuinely differ."
-    },
-    "install_desktop_heading": {
-      "category": "cognate",
-      "languages": [
-        "de",
-        "id",
-        "it"
-      ],
-      "reason": "'Desktop' is the ordinary word in German, Indonesian and Italian; Chrome/Edge are brands. Not global: es Escritorio, fr Ordinateur, pt Computador, ru/uk/bg/cs/hr/sr each use their own word, zh 桌面版."
-    },
-    "ec_name_placeholder": {
-      "category": "cognate",
-      "languages": [
-        "de"
-      ],
-      "reason": "'Name' is the German word, spelled identically. Not global: es Nombre, fr Nom, it/pt Nome, ru Imya, tr Ad."
-    },
-    "lpn_field_auto": {
-      "category": "cognate",
-      "languages": [
-        "es",
-        "fr",
-        "it"
-      ],
-      "reason": "'Auto' is the ordinary short form in Spanish, French and Italian software UI, and this is a narrow toggle label where the English is deliberately short. Not global: pt Automatico, tr Otomatik. Confirmed by the es and fr agents in the Task 146.06 sprint, 2026-08-08, and by the it agent in the Task 251 sprint, 2026-08-13."
-    },
-    "lpn_ago_minutes": {
-      "category": "cognate",
-      "languages": [
-        "fr"
-      ],
-      "reason": "'{n} minutes' is identical in French, placeholder and all. Not global: es/pt minutos, tr dakika. Task 146.06 sprint, 2026-08-08."
-    },
-    "dw_regime_turbulent": {
-      "category": "cognate",
-      "languages": [
-        "fr"
-      ],
-      "reason": "'Turbulent' is the correct French word, spelled identically -- the sibling of dw_regime_laminar above, which fr does NOT share (laminaire). Task 146.06 sprint, 2026-08-08."
-    },
-    "mi_groupPoint": {
-      "category": "cognate",
-      "languages": [
-        "fr"
-      ],
-      "reason": "'Point' is the French word, spelled identically."
-    },
-    "mi_groupSegment": {
-      "category": "cognate",
-      "languages": [
-        "fr"
-      ],
-      "reason": "'Segment' is the French word, spelled identically."
-    },
-    "contact_main_menu": {
-      "category": "cognate",
-      "languages": [
-        "fr"
-      ],
-      "reason": "'Contact' is the French word, spelled identically."
-    },
-    "bpn_source_label": {
-      "category": "cognate",
-      "languages": [
-        "fr"
-      ],
-      "reason": "'Source' is the French word, spelled identically -- and is the hydraulic sense here, not a false friend."
-    },
-    "mhp_vel_ok_short": {
-      "category": "cognate",
-      "languages": [
-        "pt"
-      ],
-      "reason": "'OK' is the ordinary Brazilian-Portuguese form in a narrow verdict column. Not global: es/fr Bien, tr Tamam, ru Horosho, zh and ar each use their own word."
-    },
-    "ip_press": {
-      "category": "abbreviation",
-      "languages": [
-        "fr",
-        "pt"
-      ],
-      "reason": "'Press.' is the natural abbreviation of Pression / Pressao in a narrow column heading, and matches the suite's own incumbent bpn_p_down ('Press. av.'). Task 146.06 sprint, 2026-08-08."
-    },
-    "mtc_pi_ok_tip": {
-      "category": "numeric",
-      "languages": [
-        "am",
-        "bn",
-        "he",
-        "hi",
-        "my"
-      ],
-      "reason": "'0.28-0.36 ft (Phillips & Ingersoll, 1998)' is two numbers, the unit token these five languages themselves use for foot (each one's own u_ft is 'ft'), and two surnames -- nothing in it can legitimately change. Not global: comma-decimal languages render 0,28-0,36 (id, pt and sr were corrected to the comma 2026-08-05) and ru/zh translate the unit word."
-    },
-    "calc_units_us": {
-      "category": "abbreviation",
-      "languages": "*",
-      "reason": "US -- the unit-preset button. All 26 languages independently kept it in the Task 166 sprint; it is the international abbreviation for the customary system and renders in a narrow button beside SI."
-    },
-    "calc_units_si": {
-      "category": "abbreviation",
-      "languages": "*",
-      "reason": "SI -- Systeme International, an international abbreviation by definition. Same button pair as calc_units_us."
-    },
-    "lpn_dialog_ok": {
-      "category": "abbreviation",
-      "languages": [
-        "fr",
-        "pt",
-        "it",
-        "de",
-        "id"
-      ],
-      "reason": "OK -- the dialog confirm button. Scoped to the four languages whose Task 251 agents independently kept it, 2026-08-13. Widen only on the same evidence, never by assumption: the sibling lpn_field_auto entry shows how easily a plausible-looking cognate list overreaches."
-    },
-    "lpn_tool_file": {
-      "category": "abbreviation",
-      "languages": [
-        "it"
-      ],
-      "reason": "File -- the File menu label. Scoped to Italian, whose Task 251 agent chose it deliberately and where it is the standard menu label. Add a language only on the same evidence."
-    },
-    "lpn_tool_add_text": {
-      "category": "cognate",
-      "languages": [
-        "cs",
-        "de"
-      ],
-      "reason": "Text -- the text-tool button. 'Text' is the ordinary word in Czech and German; their Task 251 agents chose it deliberately, 2026-08-13."
-    },
-    "lpn_new_text": {
-      "category": "cognate",
-      "languages": [
-        "cs",
-        "de"
-      ],
-      "reason": "Text -- the default contents of a newly placed text label. Same word and same evidence as lpn_tool_add_text."
-    },
-    "lpn_tool_add_reservoir": {
-      "category": "cognate",
-      "languages": [
-        "de",
-        "id"
-      ],
-      "reason": "Reservoir -- the German water-engineering term is the same word, and the de agent chose it deliberately in Task 251 while picking Hochbehaelter for the variable-level tank lpn_ does not model, so the documented pair stays distinct. Indonesian likewise borrows 'reservoir' as its standard civil-engineering word (KBBI); its Task 251 agent confirmed it against bpn_h_supply_tip already in the file."
-    },
-    "lpn_menu_edit": {
-      "category": "cognate",
-      "languages": [
-        "id"
-      ],
-      "reason": "Edit -- 'edit' is an absorbed Indonesian verb (KBBI, cf. mengedit) and the ordinary menu label. Kept where the sibling lpn_tool_file was changed to Berkas, because 'file' has a settled native alternative in Indonesian localization and 'edit' does not. Flag for native review."
-    },
-    "lpn_field_diameter": {
-      "category": "cognate",
-      "languages": [
-        "id"
-      ],
-      "reason": "Diameter -- the same word in Indonesian (KBBI). Scoped to id; other languages inflect or spell it differently."
+    "_comment": [
+        "Keys whose translation is CORRECTLY byte-identical to the English source.",
+        "",
+        "Why this file exists (ROADMAP Task 161): generate_translation_payloads.php counts a value",
+        "that equals English as 'equal_to_english' delta. For the keys below that is permanently",
+        "wrong by design, not by neglect, so the delta count could never reach zero and every sprint",
+        "proposal had to re-derive the same hand-classification from scratch. With this file, delta",
+        "zero means zero.",
+        "",
+        "SCOPE: this suppresses ONLY the equal_to_english reason. A key listed here that is MISSING",
+        "or BLANK in a lang file is still reported as delta -- exemption says 'identical is allowed',",
+        "never 'this key does not need a value'.",
+        "",
+        "'languages': '*' means every language; an explicit array means only those languages may",
+        "legitimately land on the English string. Use the array form for coincidental cognates -- a",
+        "global exemption there would hide a genuinely untranslated string in an unrelated script.",
+        "A language added later is therefore reported until someone confirms the cognate holds.",
+        "",
+        "NOTE ON THE $ec_lang_intent 'symbol' TAG: it is NOT a usable exemption source and was",
+        "rejected as the mechanism here. 'symbol' means 'keep the symbols inside this string intact',",
+        "not 'this whole string is a symbol' -- ip_notes_1_def, ip_notes_2_def and wi_notes_we_def",
+        "carry the tag and are full prose that must be translated. Only 2 of the 7 symbol-only keys",
+        "below even carry the tag. An explicit list is the honest mechanism."
+    ],
+    "exempt": {
+        "dw_roughness": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "e -- absolute roughness symbol; identical in every language and script."
+        },
+        "ip_length": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "L -- length symbol."
+        },
+        "ip_diameter": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "D -- diameter symbol."
+        },
+        "ip_roughness": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "e -- absolute roughness symbol."
+        },
+        "ip_hf": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "h_f -- friction head loss symbol; carries the intent 'symbol' tag."
+        },
+        "ip_hm": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "h_m -- minor (local) head loss symbol; carries the intent 'symbol' tag."
+        },
+        "bpn_id": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "ID -- node identifier column heading, used as a symbol."
+        },
+        "lpn_field_id": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "ID -- the same node-identifier heading as bpn_id above, and the same symbol. Task 146.06 found tr had rendered it 'Kimlik' while its own bpn_id stayed 'ID'; aligned to the incumbent per the concept-level label reuse convention."
+        },
+        "lpn_field_x": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "X -- map coordinate axis symbol."
+        },
+        "lpn_field_y": {
+            "category": "symbol",
+            "languages": "*",
+            "reason": "Y -- map coordinate axis symbol."
+        },
+        "bpn_method_hw": {
+            "category": "eponym",
+            "languages": "*",
+            "reason": "Hazen-Williams -- surnames are never renamed (CLAUDE.md, Simple English section)."
+        },
+        "bpn_method_dw": {
+            "category": "eponym",
+            "languages": "*",
+            "reason": "Darcy-Weisbach -- surnames are never renamed."
+        },
+        "bpn_method_manning": {
+            "category": "eponym",
+            "languages": "*",
+            "reason": "Manning -- surname, never renamed."
+        },
+        "install_android_heading": {
+            "category": "brand",
+            "languages": "*",
+            "reason": "Android (Chrome) -- product names. Languages that transliterate into their own script are still free to; this only permits the identical form."
+        },
+        "install_ios_heading": {
+            "category": "brand",
+            "languages": "*",
+            "reason": "iOS (Safari) -- product names, same reasoning as install_android_heading."
+        },
+        "dw_regime_laminar": {
+            "category": "cognate",
+            "languages": [
+                "de",
+                "es",
+                "id",
+                "pt",
+                "ro"
+            ],
+            "reason": "'Laminar' is the correct word in these languages. Others (fr laminaire, it laminare, cs/hr laminarni) genuinely differ, so this is not a global exemption."
+        },
+        "or_shape_circular": {
+            "category": "cognate",
+            "languages": [
+                "es",
+                "pt"
+            ],
+            "reason": "'Circular' is correct Spanish and Portuguese."
+        },
+        "or_shape_rectangular": {
+            "category": "cognate",
+            "languages": [
+                "es"
+            ],
+            "reason": "'Rectangular' is correct Spanish; Portuguese is 'Retangular'."
+        },
+        "u_depthFrac": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "'Fraction' is the correct French word, spelled identically. Surfaced only when Task 163 taught the validator to read double-quoted assignments -- this key had never been checked. Not global: es fraccion, it frazione, pt fracao, ro fractie, de Anteil all genuinely differ."
+        },
+        "install_desktop_heading": {
+            "category": "cognate",
+            "languages": [
+                "de",
+                "id",
+                "it"
+            ],
+            "reason": "'Desktop' is the ordinary word in German, Indonesian and Italian; Chrome/Edge are brands. Not global: es Escritorio, fr Ordinateur, pt Computador, ru/uk/bg/cs/hr/sr each use their own word, zh 桌面版."
+        },
+        "ec_name_placeholder": {
+            "category": "cognate",
+            "languages": [
+                "de"
+            ],
+            "reason": "'Name' is the German word, spelled identically. Not global: es Nombre, fr Nom, it/pt Nome, ru Imya, tr Ad."
+        },
+        "lpn_field_auto": {
+            "category": "cognate",
+            "languages": [
+                "es",
+                "fr",
+                "it",
+                "sw"
+            ],
+            "reason": "'Auto' is the ordinary short form in Spanish, French and Italian software UI, and this is a narrow toggle label where the English is deliberately short. Not global: pt Automatico, tr Otomatik. Confirmed by the es and fr agents in the Task 146.06 sprint, 2026-08-08, and by the it agent in the Task 251 sprint, 2026-08-13. Added sw, Task 251 wave 3, 2026-08-13: Latin script, so this is NOT the script-contamination defect that made hi and de fail here, and Swahili has no false-friend collision (a car is gari, not auto). The sw agent declared the choice explicitly as asked, reasoning that Otomatiki does not fit a narrow toggle and that Auto is the field register -- consistent with this project's finding that Tanzanian engineering practice is English-medium. Flag for native review; a native reader could still prefer Otomatiki."
+        },
+        "lpn_ago_minutes": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "'{n} minutes' is identical in French, placeholder and all. Not global: es/pt minutos, tr dakika. Task 146.06 sprint, 2026-08-08."
+        },
+        "dw_regime_turbulent": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "'Turbulent' is the correct French word, spelled identically -- the sibling of dw_regime_laminar above, which fr does NOT share (laminaire). Task 146.06 sprint, 2026-08-08."
+        },
+        "mi_groupPoint": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "'Point' is the French word, spelled identically."
+        },
+        "mi_groupSegment": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "'Segment' is the French word, spelled identically."
+        },
+        "contact_main_menu": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "'Contact' is the French word, spelled identically."
+        },
+        "bpn_source_label": {
+            "category": "cognate",
+            "languages": [
+                "fr"
+            ],
+            "reason": "'Source' is the French word, spelled identically -- and is the hydraulic sense here, not a false friend."
+        },
+        "mhp_vel_ok_short": {
+            "category": "cognate",
+            "languages": [
+                "pt"
+            ],
+            "reason": "'OK' is the ordinary Brazilian-Portuguese form in a narrow verdict column. Not global: es/fr Bien, tr Tamam, ru Horosho, zh and ar each use their own word."
+        },
+        "ip_press": {
+            "category": "abbreviation",
+            "languages": [
+                "fr",
+                "pt"
+            ],
+            "reason": "'Press.' is the natural abbreviation of Pression / Pressao in a narrow column heading, and matches the suite's own incumbent bpn_p_down ('Press. av.'). Task 146.06 sprint, 2026-08-08."
+        },
+        "mtc_pi_ok_tip": {
+            "category": "numeric",
+            "languages": [
+                "am",
+                "bn",
+                "he",
+                "hi",
+                "my"
+            ],
+            "reason": "'0.28-0.36 ft (Phillips & Ingersoll, 1998)' is two numbers, the unit token these five languages themselves use for foot (each one's own u_ft is 'ft'), and two surnames -- nothing in it can legitimately change. Not global: comma-decimal languages render 0,28-0,36 (id, pt and sr were corrected to the comma 2026-08-05) and ru/zh translate the unit word."
+        },
+        "calc_units_us": {
+            "category": "abbreviation",
+            "languages": "*",
+            "reason": "US -- the unit-preset button. All 26 languages independently kept it in the Task 166 sprint; it is the international abbreviation for the customary system and renders in a narrow button beside SI."
+        },
+        "calc_units_si": {
+            "category": "abbreviation",
+            "languages": "*",
+            "reason": "SI -- Systeme International, an international abbreviation by definition. Same button pair as calc_units_us."
+        },
+        "lpn_dialog_ok": {
+            "category": "abbreviation",
+            "languages": [
+                "fr",
+                "pt",
+                "it",
+                "de",
+                "id",
+                "ro"
+            ],
+            "reason": "OK -- the dialog confirm button. Scoped to the four languages whose Task 251 agents independently kept it, 2026-08-13. Widen only on the same evidence, never by assumption: the sibling lpn_field_auto entry shows how easily a plausible-looking cognate list overreaches. Added ro, Task 251 wave 3, 2026-08-13: text is the ordinary Romanian noun and OK is universal; the ro agent kept them while translating every other Latin-script term, and its one genuine false cognate (Auto, which reads automotive in Romanian) was caught separately and changed to Automat."
+        },
+        "lpn_tool_file": {
+            "category": "abbreviation",
+            "languages": [
+                "it"
+            ],
+            "reason": "File -- the File menu label. Scoped to Italian, whose Task 251 agent chose it deliberately and where it is the standard menu label. Add a language only on the same evidence."
+        },
+        "lpn_tool_add_text": {
+            "category": "cognate",
+            "languages": [
+                "cs",
+                "de",
+                "ro"
+            ],
+            "reason": "Text -- the text-tool button. 'Text' is the ordinary word in Czech and German; their Task 251 agents chose it deliberately, 2026-08-13. Added ro, Task 251 wave 3, 2026-08-13: text is the ordinary Romanian noun and OK is universal; the ro agent kept them while translating every other Latin-script term, and its one genuine false cognate (Auto, which reads automotive in Romanian) was caught separately and changed to Automat."
+        },
+        "lpn_new_text": {
+            "category": "cognate",
+            "languages": [
+                "cs",
+                "de",
+                "ro"
+            ],
+            "reason": "Text -- the default contents of a newly placed text label. Same word and same evidence as lpn_tool_add_text. Added ro, Task 251 wave 3, 2026-08-13: text is the ordinary Romanian noun and OK is universal; the ro agent kept them while translating every other Latin-script term, and its one genuine false cognate (Auto, which reads automotive in Romanian) was caught separately and changed to Automat."
+        },
+        "lpn_tool_add_reservoir": {
+            "category": "cognate",
+            "languages": [
+                "de",
+                "id"
+            ],
+            "reason": "Reservoir -- the German water-engineering term is the same word, and the de agent chose it deliberately in Task 251 while picking Hochbehaelter for the variable-level tank lpn_ does not model, so the documented pair stays distinct. Indonesian likewise borrows 'reservoir' as its standard civil-engineering word (KBBI); its Task 251 agent confirmed it against bpn_h_supply_tip already in the file."
+        },
+        "lpn_menu_edit": {
+            "category": "cognate",
+            "languages": [
+                "id"
+            ],
+            "reason": "Edit -- 'edit' is an absorbed Indonesian verb (KBBI, cf. mengedit) and the ordinary menu label. Kept where the sibling lpn_tool_file was changed to Berkas, because 'file' has a settled native alternative in Indonesian localization and 'edit' does not. Flag for native review."
+        },
+        "lpn_field_diameter": {
+            "category": "cognate",
+            "languages": [
+                "id"
+            ],
+            "reason": "Diameter -- the same word in Indonesian (KBBI). Scoped to id; other languages inflect or spell it differently."
+        }
     }
-  }
 }
