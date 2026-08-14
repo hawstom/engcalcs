@@ -1344,6 +1344,23 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
 
+- 5|299|[H] **A wrong `layout:` tag misled four translators — drop it.**
+  `$ec_lang_syn['lpn_backdrop_scale_entry']` carries `layout: nav item`, which stands for "competing
+  for width with every sibling; prefer the shortest synonym". That was true of a `<select>` and has
+  been false since Task 276 made the control a menu BUTTON, which is as wide as its own label and
+  nothing else. The row label now sets no width at all.
+  - **The cost was measurable, which is why this is worth a task rather than a note.** In the Task
+    297 sprint, bg, pt, uk and zh each flagged the string as too long for the tag and offered a
+    compressed version; pt went further and proposed shortening the ENGLISH source so every language
+    would get a shorter label. All four were reasoning correctly from a constraint that no longer
+    exists. A wrong tag is worse than a missing one: it is confidently obeyed.
+  - **[H] Needs Tom's permission** — `$ec_lang_syn` is human-authored and there are no standing
+    carve-outs. One-line edit once he says so.
+  - **While in there, audit the other `layout:` tags against what the controls now are.** This one
+    went stale because a widget changed under it, and nothing connects a tag to the widget it
+    describes. If more than one or two are wrong, the real answer is a check, per CLAUDE.md's own
+    rule that a rule a machine enforces is worth ten a human must remember.
+
 - 30|298| **Rebrand the navbar's "More" as "Help" and move it beside the Language picker.** Tom,
   2026-08-13: About, Install and Contact sit under it "just fine" as Help, and Walkthroughs now
   joins them. Two edits in `lib/Menus.lib.php` — the `menu_more` value, and moving the `<li>` into
@@ -1352,29 +1369,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     Both want the space next to the language menu, and settling them one at a time means moving the
     same item twice.
   - Changing `menu_more`'s English makes 26 translations stale — a resync, not a new key.
-
-- 15|297| **ONE sprint clears the whole standing translation backlog: 17 keys × 26 languages = 442
-  strings.** 9 NEW (`lpn_backdrop_scale_entry`/`_prompt`/`_bad`, `lpn_backdrop_wld_ask`/`_none`/
-  `_choose`/`_bad`, `lpn_menu_help`, `lpn_help_walkthroughs`) + 8 CHANGED
-  (`lpn_backdrop_add`/`_position`/`_remove`/`_scale`, `consent_body`/`_accept`/`_accept_all`/
-  `_decline`). Verified 2026-08-13: that is the entire `lang_parity_check` + drift report.
-  - **Only the 9 NEW keys are in the payloads.** The 8 CHANGED ones come from
-    `detect_english_drift.php --json` and must be pasted into the agent prompts by hand — a resync
-    key is present-but-stale, so no payload-delta will ever carry it.
-  - **Four are ROLE CHANGES.** `lpn_backdrop_add`/`_position`/`_remove` went two words to one and
-    are now bare verbs that only read right under the "Background image" heading `backdropRows()`
-    prints above them — the translator must be shown that heading. `consent_decline` went "Refuse"
-    → "Refuse all", where "all" means *now and later*, not *every category*.
-  - **Wave 0 has not been run on the 9 new keys** (last friction file is `251-lpn-26lang.json`).
-    It is a launch prerequisite; the consent four were written by Tom and need none.
-  - `consent` is not in `prefixToTermNames()`, so those keys silently get the 3 default hydraulic
-    glossary terms. Harmless for privacy prose — but wire it, or note it, rather than rediscover it.
-  - Close with `detect_english_drift.php --update` AND `--baseline-new`, or the next English edit to
-    any of these 17 is invisible to both tools at once.
-  - English falls back automatically (`base.inc.php` loads `lang.ec.en.php` first), so every
-    language works today.
-  - `lpn_help_walkthroughs` carries NO "(in English)" marker by decision (Tom, 2026-08-13) — browser
-    translation is the bet, rather than a permanent flag in 27 navbars.
 
 - 40|257|[H] **[HUMAN] Find or build the example PROJECTS (plural) for lpn.** **Reassigned to Tom,
   2026-08-11, at his own request: *"Let's change this task to a human assignment to create or find
@@ -2006,6 +2000,41 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|297| **[DONE 2026-08-13] ONE sprint cleared the whole standing translation backlog.** 26
+  Sonnet agents, one per language, all launched at once. Final size 364 strings, not the 442
+  scoped: Wave 0 deleted three keys before launch. Commits `1427049` (Wave 0) and `ff82beb` (the
+  sprint and its QA), plus eleven agents that committed their own language as they finished.
+  Delta is now zero, drift is empty, and `friction_check --sprint=297-backlog-26lang` closes 19
+  entries with none open.
+  - **Wave 0 deleted a feature, which is the best thing it did.** It caught
+    `lpn_backdrop_wld_none` telling a lie — "No world file found" reported a search that never
+    runs, as `offerWorldFile()`'s own comment said. Tom's answer beat the rewrite: *"We don't ask
+    for world file. Those keys are obsolete. We ask for a paste of World File contents."* The
+    dialog, its hidden input and three keys are gone; a harness assertion fails if any returns.
+    **The general lesson is the one from sprint 251, now confirmed twice: a string that describes
+    what the program DID is a claim nothing checks.**
+  - **"Pixel size" had two readings** — the image's pixel dimensions, or the ground distance one
+    pixel covers. Now "the size of one pixel on the map"; *map* is Tom's word over my *real*,
+    and it is better because the reader is already looking at a map.
+  - **The role-change detector paid for itself on its first sprint.** All 26 languages
+    independently found `consent_decline` stale — a bare "Refuse" that had lost the temporal
+    sense while `consent_accept_all` already said "always". Twenty-six agents converging on one
+    repair is as strong as evidence gets that the flag was right.
+  - **One translation defect survived to QA: hi shipped `विश्व फ़ाइल`**, where विश्व is the plain
+    Hindi word for world/universe — the planet calque the glossary forbids in its first `avoid`
+    entry. Fixed to `भू-संदर्भ फ़ाइल`. **No mechanical check can catch this**; reading all 26
+    shipped values side by side is what did, so that comparison is now part of post-sprint QA.
+  - **Three agents (de, id, sw) wrote `$ec_lang_syn` into their own language file**, which that
+    array forbids. Removed, all 26 verified back to baseline. The es agent hit the same reading
+    and escalated instead — the suggestion box working. Three of 26 misreading one line means the
+    defect was the brief; the fixing sentence is in the friction log for the next sprint to copy.
+  - **`world file` is now a glossary term** with an `avoid` array whose lead entry is that its
+    "world" is a coordinate space, not the planet. All 26 renderings recorded, split three ways
+    (descriptive georeferencing / English kept / transliterated) and **marked as proposals, not
+    standards**: 14 agents said outright they could not verify a term in their language. Tom then
+    supplied the `_syn` payload — *World (Map Coordinates or Georeference) File for the image* —
+    and *"I like 'georeference' very much!"*, which is what 14 of the 26 had already chosen.
 
 - 0|291| **[DONE 2026-08-13] Suffix vocabulary the hygiene check cannot judge, and a human did.**
   The three groups `key_hygiene_check.php` excludes were read key by key with Tom ruling on each.
