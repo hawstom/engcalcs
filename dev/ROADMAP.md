@@ -1095,8 +1095,26 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is
   useful for about a year; after that it is archaeology in a user-facing Notes list.
 
-- 85|222| **Position `lpn_` against epanet-js — do not lead with "free EPANET in the browser."**
+- 40|222| **Position `lpn_` against epanet-js — do not lead with "free EPANET in the browser."**
   Researched 2026-08-05 at Tom's request, before a blog/YouTube push.
+
+  **THE RESEARCH BELOW NOW LIVES IN `dev/positioning.md` (created 2026-08-14), which is the place
+  to read and to edit it.** Priority dropped 85 → 40 because the thinking is no longer the
+  bottleneck. What is left of this task is the CONTENT residual Task 250 handed it: **`About.php`
+  never names EPANET**, so the engine claim — the thing Task 243 actually built — is invisible on
+  every page. That edit touches `about_body_html`, a string translated into 26 languages, so it
+  needs its own drift-aware pass and is not a five-minute job.
+
+  **Two rulings from Tom, 2026-08-14, that govern any copy written under this task:**
+  - **Lead with invitation, not comparison.** *"I'm not keen on saying a lot about comparisons with
+    EPANET or epanetjs. I lean toward saying little more than 'Join us in building LibreEPANET, for
+    the community and by the community, today.'"* State our own licence; do not narrate theirs.
+    This voluntarily extends Task 296's trademark ban to competitors we legally *could* name.
+  - **Design, not management.** *"While I am sure that the big money is in management, somebody has
+    to design things."* The annotated, publishable map is the differentiator, and it is already
+    built (`js/lpn-geom.js`, `js/lpn-collide.js`, draggable labels, backdrops). It is a
+    **screenshot** story, not a printing one — see `dev/positioning.md` §4 before proposing a print
+    stylesheet.
   - **The pitch is taken.** epanetjs.com (Iterating Inc.) launched ~2025-08: full EPANET via WASM,
     local-first, **free tier with no model-size limits**, satellite basemaps, automated elevations,
     `.inp` import/export, no account to start, multi-language on all tiers. Pro $950/yr. Trade press
@@ -1107,11 +1125,22 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **What survives:** mobile/phone (they market Mac/Linux/Windows only), 26 languages vs. an
     unstated number, distribution (MPF alone is 2,721 humans/period — they buy every user), and GPL
     with no tier that can be revoked.
+    - **SUPERSEDED ON ITS ORDERING, 2026-08-14 — this bullet leads with the item Tom has since
+      demoted.** *"I think that phone is a dead end. We will keep caring and trying. But I don't
+      want to tout it. I could be wrong, and I should get advice."* The live order is in
+      `dev/positioning.md` §3: licence first (the only item that is a checkable fact), then 26
+      languages, the annotated map, offline/no-third-party, distribution. **Mobile does not appear
+      in a headline, tagline, or list of reasons to choose us.** We keep caring — the
+      `innerHeight * 0.72` touch-trap cap stays and phone regressions are still bugs — but the
+      claim is not made. Left in place rather than rewritten so the change of mind is visible.
   - **Unverified, do not claim publicly until checked:** their actual language count. Their help
     centre is Notion and did not scrape; only Spanish was confirmed.
   - **Why not lead with it as a TAGLINE:** on that exact claim they are already better and free, so
     the comparison a reader runs next is one we lose. Lead where they have publicly conceded the
     ground — phone/field use, 26 languages, offline PWA, GPL that cannot be revoked.
+    - **The list in this sentence is superseded for the same reason as the bullet above** (Tom,
+      2026-08-14). The *reasoning* stands — do not lead on the claim where they are already better
+      and free — but "phone/field use" is no longer one of the grounds we lead on.
   - **TOM OVERRULED THE BROADER VERSION OF THIS, 2026-08-09, and he is right:** *"I disagree with
     not leading with EPANET engine once we have it. I think it could be a litmus test for some
     orgs."* The two claims are about different things. Mine was about the consumer-facing headline;
@@ -1192,11 +1221,87 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     never places content under them. That does not survive a pan, which is why this still exists.
 
 
-- 20|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
+- 60|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
   Task 243 shipped the engine and the toggle; none of this is built. The engine makes each of
   these a mapping-and-UI job rather than a numerical one, which is the entire reason it was worth
-  vendoring. Do NOT start until someone asks for one — Task 243's own conclusion was that the
-  toggle is the cheap 90% of the value and these are the expensive 10%.
+  vendoring.
+
+  **RAISED 20 → 60 on 2026-08-14, and it is now a GATE, not just a feature.** Tom's ruling is that
+  the LibreEPANET.org launch (Tasks 304 and 305) waits until these three ship: they are exactly what
+  Task 296 relied on when it refused *"web clone of EPANET"*, so they are the whole of the honesty
+  case for the name. **Nothing else is missing** — there is no node-count limit and the gate must
+  never be described as one (`dev/positioning.md` §6).
+
+  Two things this does NOT mean:
+  - **It is not a doubt about our right to the name.** Tom, 2026-08-14: *"we have no less technical
+    authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
+    all public domain."* The gate is about sequencing only.
+  - **The old "do NOT start until someone asks" instruction is retired by this raise.** Someone has
+    now asked, and it is Tom. (Task 243's conclusion that the toggle was the cheap 90% and these are
+    the expensive 10% remains true as a *cost* estimate — it is the priority that changed, not the
+    arithmetic.)
+
+- 0|304| **LibreEPANET.org: the rebranded site variant. BLOCKED on Task 248.** Tom bought the
+  domain 2026-08-14; it 302-redirects to `Looped-Network.php?lang=en` as a placeholder and stays
+  that way until the gate clears. Rationale, the name ruling and the gate are in
+  `dev/positioning.md` §6 — read that before touching this. Priority 0 means blocked, not
+  unwanted.
+
+  Tom's spec: (1) EPANET engine on by default, (2) custom navbar without HawsEDC and the Hydraulics
+  menu, (3) page title and description removed, (4) Notes moved elsewhere — perhaps under More as
+  "Technical notes", (5) navbar + lpn menus + map fill the whole browser tab. Built in collaboration
+  with HawsEDC engcalcs, which is happy to provide helpers or APIs.
+
+  **Feasibility was checked 2026-08-14 so this is costed when it unblocks. It is a VARIANT, not a
+  fork — do not start by copying the page.**
+  - **A chrome-free header largely exists already.** `echoHeader()`'s `"normal"` branch
+    (`lib/HeadersFooters.lib.php`) already skips the navbar, `engcalcs.css` and the calculator JS.
+    No page currently uses it for a calculator, but the branch is live.
+  - **The real cost is path-shaped: 112 hardcoded `/engcalcs/` absolute paths**, plus `sw.js` and
+    `manifest.json` both scoped to `/engcalcs/`. **The cheapest hosting answer avoids that refactor
+    entirely:** a vhost for the domain with an `Alias /engcalcs` pointing at this directory, plus a
+    rewrite of `/` to `Looped-Network.php`, so every asset path resolves unchanged. Only deep-link
+    URLs look odd. Prefer this over an `EC_BASE` refactor unless something else needs one.
+  - **`CANONICAL_ORIGIN` is deliberately hardcoded and explicitly NOT derived from
+    `$_SERVER['HTTP_HOST']`** (`lib/config.inc.php`, with the reasoning in a comment). A second
+    domain therefore needs a **host → variant whitelist**, never a bare Host read, or it
+    reintroduces exactly the canonical-poisoning hole that comment exists to prevent. `ec_canonical_url()`
+    in `lib/Language.lib.php` builds every canonical and hreflang from that constant.
+  - **EPANET-on-by-default is a one-line change** to `engine: 'native'` in `defaultSettings()`
+    (`js/looped-network.js` — find it by name, the line number has already rotted twice). But
+    **engine is a PROJECT setting**, under the Computation section, so the change affects *new*
+    projects only, and a LibreEPANET-saved project keeps EPANET on when opened on hawsedc. That is
+    good interop and worth keeping.
+  - **Two consequences that must be ANSWERED, not discovered.**
+    1. **The 678 KB engine is lazily imported precisely because it is off by default.** On by
+       default means every visit pays it. Decide deliberately whether the LibreEPANET audience wants
+       that; it cuts against the low-bandwidth case.
+    2. **`lpn_settings_engine_epanet_tip` currently reads *"the built-in solver gives the same
+       answers and is faster, so leave this off unless you need EPANET itself."*** On a
+       LibreEPANET-branded page that is the page arguing with itself — the exact defect Task 296
+       named. **Copy must change with the default**, and it is translated into 26 languages, so it
+       is a resync, not a free edit.
+  - **A full-viewport map is a JS change, not CSS.** There is no `#lpn_canvas` height rule anywhere
+    in `css/engcalcs.css`; height comes from `effectiveMapHeight()`. Its `innerHeight * 0.72` cap is
+    **load-bearing**: `#lpn_canvas` has `touch-action:none`, so a canvas taller than the viewport
+    swallows every touch and leaves a phone user with no scrollable page — Tom hit exactly that on
+    2026-07-31 and had to reload. **Any full-screen variant must answer that trap**, not delete the
+    cap.
+  - **The Notes block has no id or class** (`Looped-Network.php`, below `echoFeedback()`), so moving
+    it under a Help menu needs a wrapper added first.
+
+- 0|305|[H] **LibreEPANET.org front-door copy. BLOCKED on Task 248.** Holds the approved register so
+  the wording is not re-derived later. Tom, 2026-08-14: **"Join us in building LibreEPANET, for the
+  community and by the community, today."** Or some such — the *shape* is the ruling, not the exact
+  words: an invitation to build, not a pitch to switch, and no comparison to anyone.
+  - **Do not import the reasoning from `dev/positioning.md` into the copy.** That file exists so the
+    page does not have to make the argument.
+  - The one comparative fact licensed for public use is our own licence (GPL v3+, no tier that can
+    be revoked) — stated as a fact about us, never as a claim about them. `dev/positioning.md` §2.
+  - **[H] Tom approves the final wording.**
+  - **Courtesy note to OpenWaterAnalytics before launch**, in the register of
+    `dev/outreach-owa-post.md` — a real question, not an announcement. The name is legally safe
+    (EPANET is public domain) but names run on community norms, and the note is cheap insurance.
 
 
 - 40|244| **Standardize the distinguishing term, and put it in the navbar next to the language menu.**
@@ -1318,6 +1423,17 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
       no answer arrives.
     - **ASCE EWRI** Hydraulics & Waterways technical committees, and the **Arizona Section** locally.
       Committee work is where senior people are actually reachable; conference floors are not.
+    - **epanet-js's founding partners — Optimatics, Affinity Water, AtkinsRéalis. DEFERRED, not
+      dropped** (Tom raised it 2026-08-14; recorded in `dev/positioning.md` §7). Each put $50,000
+      into epanet-js.
+      - **The honest angle, if ever taken:** not "switch to us" but a governance argument a funder
+        can act on — they paid so that a free EPANET in the browser would *exist*, and a licence
+        that cannot be revoked serves that goal more durably than one that is FSL today. A point
+        about permanence, not about features.
+      - **Why it waits, and why it ranks below everything above it:** they are sunk-cost sponsors of
+        a competitor, so a cold approach is low-yield and risks reading as poaching — against the
+        invitation-not-comparison rule. And we have nothing distinct to show them until the Task 248
+        gate clears. **Revisit then, not before.**
   - **ACTION LOG.**
     - **2026-08-05 — OWA Q&A post SENT** (advisor side). Text and venue facts:
       `dev/outreach-owa-post.md`. Quiet room; silence is the expected case for weeks.
