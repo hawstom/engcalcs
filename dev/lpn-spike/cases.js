@@ -142,6 +142,50 @@ const tankCase = {
 	]
 };
 
+// A THROTTLE VALVE (TCV) IN BOTH ENGINES -- ROADMAP Task 248 phase 2.
+//
+// This is the one valve type both engines solve, so it is the only one validate_epanet.js can
+// compare. A TCV is a zero-length link whose whole head loss is k V^2 / 2g with k = its SETTING,
+// so the two engines agreeing here is evidence about exactly two things: that lpnToInp writes the
+// diameter in MILLIMETRES (a valve diameter follows the PIPE convention, not the tank's) and that
+// the setting lands in the SETTING column rather than the minor-loss column beside it.
+//
+// WHAT IT CANNOT SEE, and the reason dev/lpn-spike/valve-harness.js exists beside it: both engines
+// here read the SAME model object, so a setting converted into the wrong unit on the way to the
+// file is converted wrongly for EPANET only -- but a TCV setting is DIMENSIONLESS, so there is no
+// conversion to get wrong on this case at all. A PRV's setting is a pressure and an FCV's is a
+// flow, and neither type can appear in this suite because the native solver refuses them by
+// design. So the two conversions most likely to be wrong are invisible to every engine comparison
+// there is, and only a round trip through the file text can check them.
+//
+// V1 sits between two junctions on purpose: an active valve may not touch a fixed-head node
+// (EPANET input error 219, and EngCalcs.lpnDiagnose's 'valve-on-fixed-head'), and while a TCV is
+// exempt from that rule, keeping the case to the stricter placement means it stays valid if its
+// type is ever changed in a future test.
+function valve(id, from, to, valveType, setting, diameter, k) {
+	return {
+		id, type: 'valve', valveType, from, to,
+		length: 0, diameter, roughness: 150,
+		setting, k: k || 0, status: 'open'
+	};
+}
+
+const valveTcvCase = {
+	name: 'throttle-valve',
+	method: 'hw',
+	nodes: [
+		{ id: 'R', type: 'reservoir', elev: 0, head: 100 },
+		{ id: 'J1', type: 'junction', elev: 10, demand: 0 },
+		{ id: 'J2', type: 'junction', elev: 10, demand: 0 },
+		{ id: 'J3', type: 'junction', elev: 5, demand: 40 * M3S_PER_LPS }
+	],
+	links: [
+		pipe('L1', 'R', 'J1', 400, 0.25, 130),
+		valve('V1', 'J1', 'J2', 'TCV', 8, 0.25),
+		pipe('L2', 'J2', 'J3', 300, 0.25, 130)
+	]
+};
+
 const noReservoirCase = {
 	name: 'no-fixed-head',
 	method: 'hw',
@@ -226,6 +270,7 @@ module.exports = {
 	emitterCase,
 	closedLinkCase,
 	tankCase,
+	valveTcvCase,
 	noReservoirCase,
 	unreachableCase,
 	zeroDemandCase

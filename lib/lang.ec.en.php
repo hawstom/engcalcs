@@ -1127,6 +1127,11 @@ $ec_lang['lpn_tool_add_reservoir']='Reservoir';
 $ec_lang['lpn_tool_add_tank']='Tank';
 $ec_lang['lpn_tool_add_pipe']='Pipe';
 $ec_lang['lpn_tool_add_pump']='Pump';
+// A VALVE is a LINK, like a pipe and a pump -- it sits in the line between two nodes, not on a
+// node (ROADMAP Task 248 phase 2, 2026-08-14). Four types are offered and the page names each one
+// by what it does as well as by the abbreviation an engineer already knows, because the letters
+// alone teach nobody and the words alone are longer than a modeller wants to read every time.
+$ec_lang['lpn_tool_add_valve']='Valve';
 $ec_lang['lpn_tool_add_text']='Text';
 $ec_lang['lpn_tool_delete']='Delete';
 $ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
@@ -1317,13 +1322,17 @@ $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network f
 // the reader to guess.
 $ec_lang['lpn_net_bad_file']='This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use the File, Export, Network command there to save it as an .inp file, then import that.';
 $ec_lang['lpn_inp_report_heading']='Imported {file}';
-$ec_lang['lpn_inp_report_counts']='{nodes} junctions, reservoirs and tanks, {links} pipes and pumps, in {units}.';
+$ec_lang['lpn_inp_report_counts']='{nodes} junctions, reservoirs and tanks, {links} pipes, pumps and valves, in {units}.';
 $ec_lang['lpn_inp_report_clean']='Everything in the file came across. Nothing was left out.';
 $ec_lang['lpn_inp_report_lead']='This page does not hold everything EPANET does. Here is what changed on the way in:';
 $ec_lang['lpn_inp_drop_headloss']='This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.';
 $ec_lang['lpn_inp_drop_tank_curve']='These tanks are not straight-sided: the file gives their shape as a curve. They came in as round tanks of the stated width. The water level is the level the file gives, so the answers match; only the shape is simplified.';
-$ec_lang['lpn_inp_drop_tcv']='These throttle control valves came in as very short pipes carrying the same local loss. The water behaves the same way; the element is not the same.';
-$ec_lang['lpn_inp_drop_valve']='These valves control pressure or flow, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is controlling it any more.';
+// Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
+// a loss; the first two are reported because the reader deserves to know which engine is now
+// working out their network, not because anything was thrown away.
+$ec_lang['lpn_inp_drop_tcv']='These throttle valves came in as throttle valves, holding the same loss the file gives them. Either solver can work them out.';
+$ec_lang['lpn_inp_drop_valve_active']='These valves control pressure or flow, and they open and close on their own as the water changes. They came in whole, and this page works them out with the EPANET engine, which it turns on by itself for this network.';
+$ec_lang['lpn_inp_drop_valve']='These valves are described by a curve or by a fixed pressure drop, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is holding pressure or flow there any more.';
 $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.';
 $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
 $ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
@@ -1500,7 +1509,11 @@ $ec_lang['lpn_notes_1_term']='Steady state';
 // otherwise, because a tank that never empties is not a tank anybody has met.
 $ec_lang['lpn_notes_1_def']='Solves one set of demands at a time, using the same global gradient algorithm EPANET uses. It does not model how the network changes over time. A tank is held at the water level you give it: within one solution it never runs down and never fills.';
 $ec_lang['lpn_notes_2_term']='Not modeled';
-$ec_lang['lpn_notes_2_def']='Water quality, and control valves that open and close on their own (PRV, PSV, FCV), are not modeled. A pipe can carry a fixed minor loss, but not a valve whose open or closed state depends on the flow being solved for.';
+// VALVES LEFT THIS NOTE ON 2026-08-14 (Task 248 phase 2), and what replaces the old sentence is
+// the honest half of it: the valves are all modeled now, but the three that open and close on
+// their own are worked out by the EPANET engine and not by the built-in solver. That is a real
+// thing for a reader to know -- it is why such a network needs the engine downloaded once.
+$ec_lang['lpn_notes_2_def']='Water quality and demands that change through the day are not modeled. Valves are: a throttle valve works in either solver, and the valves that open and close on their own (PRV, PSV, FCV) are worked out with the EPANET engine, which this page turns on by itself when your network holds one.';
 $ec_lang['lpn_notes_3_term']='Saving projects';
 $ec_lang['lpn_notes_3_def']='Every project is a tab, and every tab is saved in this browser as you work. Clearing your browser data deletes them all, so keep your work in a file: File, Save as. An asterisk on a tab means it holds changes that are not in a file. Nothing is ever written to a file unless you ask. In some browsers a project connects to the file you save it to, and File, Save writes back to that same file from then on; in others no connection is possible, so Save is disabled and only Save as is available. When a project file is kept on a shared drive, this page tells you if a colleague already has it open, so that two people do not write over each other.';
 // Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
@@ -1520,6 +1533,11 @@ $ec_lang['lpn_id_taken']='That ID is already in use.';
 $ec_lang['lpn_diag_no_fixed_head']='Add a reservoir or a tank. The network needs at least one known water level before it can be solved.';
 $ec_lang['lpn_diag_dangling_link']='A pipe or pump connects to a node that no longer exists:';
 $ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir:';
+// BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
+// this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
+// looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
+$ec_lang['lpn_diag_valve_needs_epanet']='These valves open and close on their own, and only the EPANET engine can work them out. The EPANET engine could not be loaded, so these results are missing:';
+$ec_lang['lpn_diag_valve_on_fixed_head']='These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to hold. Put a short pipe between them:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for values that are impossible in real life, such as a diameter of zero.';
 $ec_lang['lpn_field_roughness']='Roughness';
 // Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
@@ -1531,6 +1549,24 @@ $ec_lang['lpn_field_length_tip']='Length of the pipe. With Auto turned on the le
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
+// ---- Valve fields (Task 248 phase 2) ----
+// THE SETTING IS A DIFFERENT QUANTITY FOR EACH TYPE, which is why there are three labels here and
+// not one "Setting". A pressure, a flow and a bare loss coefficient are not the same number in
+// different units, and one shared label would have to be vague enough to cover all three.
+$ec_lang['lpn_field_valve_type']='Valve type';
+$ec_lang['lpn_field_valve_type_tip']='What the valve does. A throttle valve holds a fixed loss. The other three hold a pressure or a flow, and open, close, or hold as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient.';
+$ec_lang['lpn_valve_type_tcv']='Throttle (TCV)';
+$ec_lang['lpn_valve_type_prv']='Pressure reducing (PRV)';
+$ec_lang['lpn_valve_type_psv']='Pressure sustaining (PSV)';
+$ec_lang['lpn_valve_type_fcv']='Flow control (FCV)';
+$ec_lang['lpn_field_valve_setting_pressure']='Pressure setting';
+$ec_lang['lpn_field_valve_setting_pressure_tip']='The pressure the valve holds. A pressure reducing valve keeps the pressure just after it at or below this value. A pressure sustaining valve keeps the pressure just before it at or above this value.';
+$ec_lang['lpn_field_valve_setting_flow']='Flow setting';
+$ec_lang['lpn_field_valve_setting_flow_tip']='The most water the valve lets through. Below this the valve is fully open and does nothing.';
+$ec_lang['lpn_field_valve_setting_loss']='Loss coefficient';
+$ec_lang['lpn_field_valve_setting_loss_tip']='How much head the throttle valve takes out, counted as a multiple of the velocity head. Use 0 for a valve standing fully open. This one number is the whole of a throttle valve\'s loss.';
+$ec_lang['lpn_field_valve_diameter_tip']='Width of the opening through the valve. It is used to work out the speed of the water through it, so the loss depends on it.';
+$ec_lang['lpn_field_valve_km_tip']='Extra loss from the valve body while the valve stands fully open, counted as a multiple of the velocity head. Use 0 to leave it out.';
 $ec_lang['lpn_field_km']='Minor (local) loss coefficient, k';
 $ec_lang['lpn_field_km_tip']='Loss from the bends, valves, and fittings on this pipe, counted as a multiple of the velocity head. Use 0 for a plain straight pipe.';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
@@ -1557,6 +1593,7 @@ $ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Click the map to place 
 $ec_lang['lpn_mode_add_tank']='Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move elements and labels.';
 $ec_lang['lpn_mode_add_pipe']='Mode: Add Pipe. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.';
 $ec_lang['lpn_mode_add_pump']='Mode: Add Pump. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.';
+$ec_lang['lpn_mode_add_valve']='Mode: Add Valve. Click a node, then another node, to connect them. Switch to Select mode to change or move elements and labels.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Mode: Add Text. Click the map to place a text label. Click near a node to attach the text to that node. Switch to Select mode to change or move elements and labels.';
@@ -1659,6 +1696,10 @@ $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang_syn['lpn_engine_loading']='';
 $ec_lang['lpn_engine_failed']='The EPANET solver could not be loaded. Showing the built-in solver instead.';
 $ec_lang_syn['lpn_engine_failed']='';
+// Said out loud, never silently: the user picked the built-in solver and this network was sent to
+// the EPANET engine anyway, because it holds a valve the built-in solver does not work out. The
+// setting is not changed, so removing the valve puts the page straight back on the chosen engine.
+$ec_lang['lpn_engine_valve_route']='Worked out with the EPANET engine, because these valves open and close on their own:';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.';
 $ec_lang_syn['lpn_engine_manning_note']='';
 $ec_lang['lpn_settings_text_size']='Text size';

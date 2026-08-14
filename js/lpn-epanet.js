@@ -7,7 +7,14 @@
 // is a yes/no procurement gate that no amount of mobile-and-26-languages substitutes for
 // (ROADMAP Task 222), and it is the door to tanks, valves, extended-period simulation and
 // .inp interop that we would otherwise hand-write. Task 248 walked through that door: TANKS
-// shipped 2026-08-14 and are written into [TANKS] below.
+// shipped 2026-08-14 and are written into [TANKS] below, and VALVES the same day into [VALVES].
+//
+// VALVES ARE THE FIRST FEATURE THIS PAGE HAS THAT THE ENGINE TOGGLE DOES NOT MERELY ACCELERATE.
+// A throttle valve (TCV) is a minor loss and solves in either engine. A PRV, PSV or FCV switches
+// its own state during the solve, and that is numerics we deliberately did not write a second
+// copy of -- so a network containing one is SOLVED HERE whatever the user's engine preference
+// says, and js/lpn-solver.js refuses it by name if this module cannot be reached. See the note
+// on EngCalcs.lpnValveIsNative there for the reasoning and the measurement behind it.
 //
 // IT IS OFF BY DEFAULT, AND THE STATED REASON FOR THAT WAS WRONG. This paragraph used to read
 // "the native solve is synchronous and takes 0.4 ms at the 21-node target" against an EPANET
@@ -92,6 +99,8 @@
 			tanks = [],
 			pipes = [],
 			pumps = [],
+			valves = [],
+			statuses = [],
 			curves = [],
 			emitters = [],
 			warnings = [],
@@ -132,7 +141,44 @@
 
 		for (k = 0; k < model.links.length; k++) {
 			link = model.links[k];
-			if (link.type === 'pump') {
+			if (link.type === 'valve') {
+				// [VALVES] is  ID  Node1  Node2  Diameter  Type  Setting  [MinorLoss].
+				//
+				// TWO DIFFERENT UNIT TRAPS SIT ON ONE ROW, and neither one can be caught by
+				// comparing engines -- both produce a network that solves perfectly, just not the
+				// network the user drew (ROADMAP Task 248 phase 2, 2026-08-14):
+				//
+				//   DIAMETER is in the PIPE diameter unit -- MILLIMETRES under LPS. That is the
+				//   OPPOSITE of a tank's diameter twenty lines up, which is in metres. Same word,
+				//   three units, one file. It is only read through the minor-loss term (k V^2/2g),
+				//   so a 200 mm valve written as "0.2" is read as 0.2 mm and develops an
+				//   astronomically large loss -- which at least shows. Written the other way, a
+				//   valve on a network with a small k barely moves and the error hides.
+				//
+				//   SETTING MEANS A DIFFERENT QUANTITY PER TYPE, and this is the one with no
+				//   symptom at all:
+				//     PRV/PSV  a PRESSURE   -> LPS pressure unit is METRES of water, which is what
+				//                             this suite stores, so it passes through unscaled.
+				//     FCV      a FLOW       -> m3/s to L/s, x1000, same as a junction demand.
+				//     TCV      a LOSS COEFFICIENT, dimensionless, unscaled.
+				//   dev/lpn-spike/valve-harness.js round-trips all three through the text, because
+				//   validate_epanet.js cannot: it compares two engines reading the SAME .inp, so a
+				//   setting written in the wrong unit is wrong identically on both sides.
+				var vt = (link.valveType || 'TCV').toUpperCase(),
+					setting = link.setting || 0;
+				if (vt === 'FCV') { setting = setting * 1000; }
+				valves.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  ' +
+					(link.diameter * 1000) + '  ' + vt + '  ' + setting + '  ' +
+					// A TCV's minor-loss column is IGNORED by EPANET (measured -- see
+					// EngCalcs.lpnLinkK), so writing anything but 0 there would be a number the
+					// file states and the engine discards. Every other type applies it while the
+					// valve is fully open, so it is written.
+					(vt === 'TCV' ? 0 : (link.k || 0)));
+				// A VALVE HAS NO STATUS COLUMN of its own -- unlike a pipe, whose Open/Closed is
+				// the eighth token on its own row. A closed valve is stated in [STATUS] instead,
+				// which is why that section exists below and did not before.
+				if (link.status === 'closed') { statuses.push(' ' + link.id + '  Closed'); }
+			} else if (link.type === 'pump') {
 				if (link.h0 > 0 || link.a > 0) {
 					// Our curve is H = h0 - a Q^b, and EPANET fits exactly that form to a 3-point
 					// HEAD curve -- so three points sampled off our own curve round-trip it
@@ -207,8 +253,12 @@
 			(tanks.length ? '[TANKS]\n' + tanks.join('\n') + '\n\n' : '') +
 			(pipes.length ? '[PIPES]\n' + pipes.join('\n') + '\n\n' : '') +
 			(pumps.length ? '[PUMPS]\n' + pumps.join('\n') + '\n\n' : '') +
+			(valves.length ? '[VALVES]\n' + valves.join('\n') + '\n\n' : '') +
 			(curves.length ? '[CURVES]\n' + curves.join('\n') + '\n\n' : '') +
 			(emitters.length ? '[EMITTERS]\n' + emitters.join('\n') + '\n\n' : '') +
+			// After [VALVES] and [PUMPS], because a [STATUS] line names a link that must already
+			// have been declared.
+			(statuses.length ? '[STATUS]\n' + statuses.join('\n') + '\n\n' : '') +
 			'[OPTIONS]\n Units LPS\n Headloss ' + headloss +
 			'\n Emitter Exponent ' + emitterExp +
 			// Match our own convergence, which is far tighter than EPANET's 0.001 default,

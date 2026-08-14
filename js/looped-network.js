@@ -526,8 +526,10 @@ var EngCalcs = EngCalcs || {};
 	// An OLD document is not migrated and does not need to be -- its text elements keep their T3
 	// ids, recountNextId() counts them against the tank counter, and mintId() refuses to reissue an
 	// id that is already taken. So the worst case is a first tank numbered T4, never a collision.
-	var LPN_ID_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', text: 'X' };
-	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, X: 1 }; }
+	// V is the valve (Task 248 phase 2, 2026-08-14) -- EPANET's own default letter for one, so an
+	// imported V1 keeps its name and a drawn one reads the way a modeller expects.
+	var LPN_ID_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', text: 'X' };
+	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 }; }
 	var nextId = newNextId();
 	// Re-derive the counters from the ids actually present. Matches against the CURRENT
 	// settings.idPrefixes, not a hardcoded single-uppercase-letter regex (Task 146 gear panel,
@@ -600,7 +602,10 @@ var EngCalcs = EngCalcs || {};
 	// Base's auto length for every scenario.
 	var LPN_OVERRIDABLE = {
 		node: { demand: true, emitter: true, head: true, active: true },
-		link: { diameter: true, roughness: true, k: true, status: true, length: true, active: true }
+		// `setting` is a VALVE's setting (Task 248 phase 2). It belongs here for the same reason
+		// demand does: "what if the pressure reducing valve is set to 50 psi" is an operating
+		// question, which is what a scenario asks, where the valve's diameter is what was built.
+		link: { diameter: true, roughness: true, k: true, status: true, length: true, setting: true, active: true }
 	};
 
 	// The one resolver seam. Solver, renderer, labels and popups read element properties through
@@ -684,7 +689,7 @@ var EngCalcs = EngCalcs || {};
 			// Keyed by the same structural letters nextId already uses (LPN_ID_KEY) -- changing a
 			// prefix only affects IDs generated AFTER the change; existing element IDs are never
 			// live-renamed by a settings edit.
-			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', X: 'X' },
+			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X' },
 			// Matches js/lpn-solver.js's own default -- see assembleModel(). No UI edits this since
 			// 2026-07-30: nothing can create an emitter yet, so the control was a no-op (ROADMAP
 			// Task 191, and the longer note in rebuildSettingsFields()).
@@ -1182,10 +1187,13 @@ var EngCalcs = EngCalcs || {};
 		// nodesLayer, same layer as node symbols, so a pump reads on top of every pipe it crosses);
 		// symbolSvg inside it is the icon box itself, non-interactive -- clicking/dragging a pump
 		// still goes through `line` above, unchanged.
+		// A VALVE takes the identical path (Task 248 phase 2) -- its own icon, on the same rotate/
+		// flip pivot, over the same interactive polyline. Nothing else in this file had to learn
+		// about a third link type to draw it.
 		var symbolG = null, symbolSvg = null;
-		if (l.type === 'pump') {
-			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-pump' }, nodesLayer);
-			symbolSvg = buildMapIconSvg('pump', '');
+		if (l.type === 'pump' || l.type === 'valve') {
+			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-' + l.type }, nodesLayer);
+			symbolSvg = buildMapIconSvg(l.type, '');
 			if (symbolSvg) {
 				symbolG.appendChild(symbolSvg);
 				// Backdrop matches the casing circle in lib/Icons.lib.php's pump path
@@ -1194,7 +1202,15 @@ var EngCalcs = EngCalcs || {};
 				// the pipe on both sides of it. The thin discharge tail gets no backdrop of its own;
 				// a stroke-width line crossing a pipe reads as two lines crossing, not as seeing
 				// through a symbol.
-				prependSymbolBackdrop(symbolSvg, 'circle', { cx: 9.8, cy: 12.5, r: 5 }, 'lpn-link-symbol-backdrop');
+				// A VALVE'S backdrop is the bowtie itself, traced from lib/Icons.lib.php's own two
+				// triangles -- a rectangle over its bounding box would blank out the pipe on both
+				// sides of the waist, where the bowtie is at its thinnest and the pipe should still
+				// be visible running through it.
+				if (l.type === 'valve') {
+					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M4 5v14l8-7zM20 5v14l-8-7z' }, 'lpn-link-symbol-backdrop');
+				} else {
+					prependSymbolBackdrop(symbolSvg, 'circle', { cx: 9.8, cy: 12.5, r: 5 }, 'lpn-link-symbol-backdrop');
+				}
 			} else { symbolG.remove(); symbolG = null; }
 		}
 		linkEls[l.id] = {
@@ -2079,7 +2095,8 @@ var EngCalcs = EngCalcs || {};
 		'select': 'lpn_mode_select', 'delete': 'lpn_mode_delete',
 		'add-junction': 'lpn_mode_add_junction', 'add-reservoir': 'lpn_mode_add_reservoir',
 		'add-tank': 'lpn_mode_add_tank',
-		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump', 'add-text': 'lpn_mode_add_text'
+		'add-pipe': 'lpn_mode_add_pipe', 'add-pump': 'lpn_mode_add_pump',
+		'add-valve': 'lpn_mode_add_valve', 'add-text': 'lpn_mode_add_text'
 	};
 	function updateModeHint() {
 		var el = document.getElementById('lpn_mode_hint'); if (!el) { return; }
@@ -2151,6 +2168,20 @@ var EngCalcs = EngCalcs || {};
 			_k: settings.defaults.k // pump ignores k -- only the pipe friction branch reads it
 		};
 		l._length = linkGeomLength(l);
+		if (type === 'valve') {
+			// A VALVE IS A ZERO-LENGTH LINK, and that is exact rather than a small number standing
+			// in for one: EngCalcs.lpnResistance returns r = 0 for a zero-length link, so the
+			// friction term vanishes and what is left is the pure local loss a valve is. lenAuto is
+			// off, or linkGeomLength() would give it the drawn distance between its two nodes and
+			// quietly add pipe friction to it.
+			l._length = 0;
+			l.lenAuto = false;
+			// TCV IS THE DEFAULT TYPE, deliberately: it is the one type both engines solve, so a
+			// freshly drawn valve never changes which engine the page is using until the user asks
+			// for a type that does. See EngCalcs.lpnValveIsNative.
+			l.valveType = 'TCV';
+			l._setting = defaultValveSetting('TCV');
+		}
 		if (type === 'pump') {
 			// Pump curve entry (Task 146, 2026-07-30): l.curvePoints holds 1-3 [Q,H] pairs in SI,
 			// fitted to h0/a/b by EngCalcs.lpnPumpFromCurve (see its own comment for the 1/2/3-point
@@ -2171,6 +2202,18 @@ var EngCalcs = EngCalcs || {};
 		buildLinkEls(l);
 		scheduleSolve();
 		return l;
+	}
+	// A NEW VALVE'S SETTING, per type -- and it has to be per type, because the setting is a
+	// different QUANTITY for each one (see js/lpn-epanet.js): a pressure for a PRV or PSV, a flow
+	// for an FCV, a dimensionless loss coefficient for a TCV. Carrying one number across a type
+	// change would read 60 psi as a loss coefficient of 60, which is not a valve anybody built.
+	// So changeValveType() re-seeds through here, and says so in the popup rather than silently.
+	// Numbers chosen so a valve dropped on a network is a plausible design on arrival: a district
+	// PRV holding 60 psi (40 m), a 250 gpm (15 l/s) flow limit, and a throttle at k = 2.
+	function defaultValveSetting(type) {
+		if (type === 'PRV' || type === 'PSV') { return niceDefault('lpn_u_pressure', 'psi', 60, 40); }
+		if (type === 'FCV') { return niceDefault('lpn_u_flow', 'gpm', 250, 0.015); }
+		return 2;
 	}
 	// anchorNode, if given, anchors the new Text to that node with a leader -- lb.x/lb.y become an
 	// OFFSET from the node (matching buildLabelEls'/updateLabelGeometry's model), computed here so
@@ -3193,6 +3236,15 @@ var EngCalcs = EngCalcs || {};
 				_status: l.status,
 				_k: l.k || 0
 			};
+			if (l.type === 'valve') {
+				// The parser hands back SI in the unit the valve's TYPE names (js/lpn-inp.js's
+				// valveSettingSI), so each one goes back out through the matching display unit --
+				// and a throttle's loss coefficient through none at all, because it has none.
+				out.valveType = (l.valveType || 'TCV').toUpperCase();
+				out._setting = (out.valveType === 'PRV' || out.valveType === 'PSV')
+					? toDisplay(l.setting, 'lpn_u_pressure')
+					: (out.valveType === 'FCV' ? toDisplay(l.setting, 'lpn_u_flow') : (l.setting || 0));
+			}
 			if (l.type === 'pump') {
 				out.curvePoints = (l.curvePoints || []).map(function (pt) {
 					return [toDisplay(pt[0], 'lpn_u_flow'), toDisplay(pt[1], 'lpn_u_elevhead')];
@@ -3275,8 +3327,13 @@ var EngCalcs = EngCalcs || {};
 			// 'tanks' and 'links-on-tanks' are gone (Task 248): tanks are imported now, so neither
 			// case can be reported. The lang keys are retired with them.
 			case 'tank-volume-curve': return pc.lpn_inp_drop_tank_curve || 'These tanks have a volume curve, so they are not straight-sided. They were brought in as round tanks of the stated diameter. The water level in them is the level the file gives, so the results match; only the shape is simplified.';
-			case 'valve-tcv-as-pipe': return pc.lpn_inp_drop_tcv || 'These throttle control valves came in as very short pipes carrying the same local loss. The hydraulics are the same; the element is not.';
-			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves control pressure or flow, and this page has no such element. They came in as open pipes, so the network is still connected but nothing is controlling it.';
+			// 'valve-tcv-as-pipe' is gone (Task 248 phase 2): a throttle valve is a valve now, so
+			// there is no substitution left to report. The remaining three say which of the three
+			// outcomes a valve met -- kept and solvable here, kept but needing the EPANET engine,
+			// or turned back into a pipe.
+			case 'valve-tcv': return pc.lpn_inp_drop_tcv || 'These throttle valves came in as throttle valves, with the same loss the file gives them. Either solver can compute them.';
+			case 'valve-active': return pc.lpn_inp_drop_valve_active || 'These valves control pressure or flow, and they open and close on their own as the water moves. They came in whole, and this page solves them with the EPANET engine, which it switches to on its own for this network.';
+			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves are described by a curve or by a fixed pressure drop, and this page has no such element. They came in as open pipes, so the network is still connected but nothing is controlling it.';
 			case 'check-valve': return pc.lpn_inp_drop_cv || 'These pipes only let water flow one way in EPANET. They came in as ordinary pipes, so water may now flow either way through them.';
 			case 'demand-categories': return pc.lpn_inp_drop_demands || 'These junctions had more than one demand. The demands were added together into the one demand this page holds.';
 			case 'demand-pattern':
@@ -5544,6 +5601,7 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', fn: function () { setMode('add-reservoir'); } },
 			{ icon: 'tank', label: pc.lpn_tool_add_tank || 'Tank', fn: function () { setMode('add-tank'); } },
 			{ icon: 'pump', label: pc.lpn_tool_add_pump || 'Pump', fn: function () { setMode('add-pump'); } },
+			{ icon: 'valve', label: pc.lpn_tool_add_valve || 'Valve', fn: function () { setMode('add-valve'); } },
 			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', fn: function () { setMode('add-junction'); } },
 			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
 			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
@@ -6122,6 +6180,7 @@ var EngCalcs = EngCalcs || {};
 			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
 			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank' },
 			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump' },
+			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve' },
 			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
 			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe' },
 			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' }
@@ -6681,7 +6740,7 @@ var EngCalcs = EngCalcs || {};
 				logLpnFirstAction('element');
 				addText(w.x, w.y, nearNode ? nearNode.id : null);
 			}
-			else if (mode === 'add-pipe' || mode === 'add-pump') {
+			else if (mode === 'add-pipe' || mode === 'add-pump' || mode === 'add-valve') {
 				// Same snap: elementFromPoint requires landing exactly on the node's small hit
 				// area, which a real tap on a real screen routinely misses by a few pixels -- that
 				// miss is diagnostic #2's dominant cause ("a pipe drawn near a junction but not
@@ -6693,7 +6752,7 @@ var EngCalcs = EngCalcs || {};
 					else if (hitId !== pendingLinkFrom) {
 						saveUndoSnapshot();
 						logLpnFirstAction('element');
-						addLink(mode === 'add-pump' ? 'pump' : 'pipe', pendingLinkFrom, hitId);
+						addLink(mode.slice('add-'.length), pendingLinkFrom, hitId);
 						setPendingLinkFrom(null);
 					}
 				} else { setPendingLinkFrom(null); }
@@ -7481,7 +7540,8 @@ var EngCalcs = EngCalcs || {};
 		[
 			['R', pc.lpn_tool_add_reservoir || 'Reservoir'], ['T', pc.lpn_tool_add_tank || 'Tank'],
 			['J', pc.lpn_tool_add_junction || 'Junction'],
-			['P', pc.lpn_tool_add_pump || 'Pump'], ['L', pc.lpn_tool_add_pipe || 'Pipe']
+			['P', pc.lpn_tool_add_pump || 'Pump'], ['V', pc.lpn_tool_add_valve || 'Valve'],
+			['L', pc.lpn_tool_add_pipe || 'Pipe']
 		].forEach(function (f) {
 			var key = f[0], input = document.createElement('input');
 			input.type = 'text'; input.size = 4; input.value = settings.idPrefixes[key];
@@ -7539,8 +7599,10 @@ var EngCalcs = EngCalcs || {};
 				applies: function (n) { return !isFixedHeadNode(n); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },
 			{ key: 'diameter', group: 'link', field: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },
+			// PIPE-ONLY: a valve is a zero-length link, so no friction formula ever reads its
+			// roughness. Offering a default for it would be a control with no effect.
 			{ key: 'roughness', group: 'link', field: 'roughness', label: roughnessLabel(),
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },
+				applies: function (l) { return l.type === 'pipe'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },
 			{ key: 'k', group: 'link', field: 'km', label: pc.lpn_field_km || 'Minor (local) loss coefficient, k',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } }
 		];
@@ -8331,7 +8393,9 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
 		idField(l.id, function (newId) { renameLink(linkId, newId); });
 		clearFields(fields);
-		if (l.type === 'pump') {
+		if (l.type === 'valve') {
+			renderValveFields(fields, l, linkId);
+		} else if (l.type === 'pump') {
 			renderPumpCurveFields(fields, l, linkId);
 		} else {
 			unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
@@ -8373,6 +8437,59 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		tipsIn(fields);
+	}
+	// THE VALVE POPUP. Its shape changes with the type, and that is the point rather than an
+	// awkwardness: a valve's SETTING is a different physical quantity per type, so the field has a
+	// different label AND a different unit selector behind it (see js/lpn-epanet.js for the three
+	// conventions and why getting one wrong is silent). Rendering one "Setting" box in whatever
+	// unit happened to be last would be the trap this whole task is about.
+	function renderValveFields(fields, l, linkId) {
+		var pc = EngCalcs.pageConfig || {}, vt = (l.valveType || 'TCV').toUpperCase();
+		selectFieldPlain(fields, pc.lpn_field_valve_type || 'Valve type', [
+			['TCV', pc.lpn_valve_type_tcv || 'Throttle (TCV)'],
+			['PRV', pc.lpn_valve_type_prv || 'Pressure reducing (PRV)'],
+			['PSV', pc.lpn_valve_type_psv || 'Pressure sustaining (PSV)'],
+			['FCV', pc.lpn_valve_type_fcv || 'Flow control (FCV)']
+		], vt, function (v) {
+			if (v === vt) { return; }
+			saveUndoSnapshot();
+			l.valveType = v;
+			// RE-SEEDED, NOT CARRIED ACROSS. The old number was a pressure, a flow or a loss
+			// coefficient, and none of the three means anything as one of the other two -- 60 psi
+			// read as a loss coefficient of 60 is a valve nobody built. The tip on the setting
+			// field says this happens, so the change is not a surprise.
+			l._setting = defaultValveSetting(v);
+			refreshPopupIfOpen();
+			scheduleSolve();
+		}, pc.lpn_field_valve_type_tip);
+		// GPV IS ABSENT FROM THAT LIST ON PURPOSE. A general purpose valve's whole behaviour is a
+		// head-loss CURVE, and this page has no curve element outside the pump. Offering the type
+		// with nowhere to enter the curve would be a control that does nothing. An imported GPV is
+		// reported and comes in as an open pipe (js/lpn-inp.js).
+		if (vt === 'PRV' || vt === 'PSV') {
+			unitNumberField(fields, pc.lpn_field_valve_setting_pressure || 'Pressure setting', 'lpn_u_pressure',
+				function () { return effective(l, 'setting'); }, function (v) { l._setting = v; },
+				pc.lpn_field_valve_setting_pressure_tip);
+		} else if (vt === 'FCV') {
+			unitNumberField(fields, pc.lpn_field_valve_setting_flow || 'Flow setting', 'lpn_u_flow',
+				function () { return effective(l, 'setting'); }, function (v) { l._setting = v; },
+				pc.lpn_field_valve_setting_flow_tip);
+		} else {
+			numberFieldPlain(fields, pc.lpn_field_valve_setting_loss || 'Loss coefficient',
+				effective(l, 'setting') || 0, function (v) { l._setting = v; },
+				pc.lpn_field_valve_setting_loss_tip);
+		}
+		unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
+			function () { return effective(l, 'diameter'); }, function (v) { l._diameter = v; },
+			pc.lpn_field_valve_diameter_tip);
+		// A TCV GETS NO SEPARATE MINOR LOSS, and that is EPANET's behaviour rather than a
+		// simplification of ours: it ignores the [VALVES] minor-loss column for a throttle valve,
+		// whose loss is its setting alone (measured -- see EngCalcs.lpnLinkK). A box here would be
+		// a number the user types and neither engine reads.
+		if (vt !== 'TCV') {
+			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k',
+				effective(l, 'k') || 0, function (v) { l._k = v; }, pc.lpn_field_valve_km_tip);
+		}
 	}
 	function openLinkPopup(linkId, sx, sy) {
 		var l = linkById(linkId), le = linkEls[linkId];
@@ -8482,6 +8599,24 @@ var EngCalcs = EngCalcs || {};
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(text);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
+	// A dropdown field. `options` is [[value, label], ...]. The only popup control that is not a
+	// number or a checkbox, added for the valve type (Task 248 phase 2) -- a valve's type decides
+	// what its other fields MEAN, so it cannot be a free-text or numeric input.
+	function selectFieldPlain(fields, labelText, options, current, onChange, tip) {
+		var label = document.createElement('label'), sel = document.createElement('select'), i, o;
+		for (i = 0; i < options.length; i++) {
+			o = document.createElement('option');
+			o.value = options[i][0];
+			o.textContent = options[i][1];
+			if (options[i][0] === current) { o.selected = true; }
+			sel.appendChild(o);
+		}
+		sel.addEventListener('change', function () { onChange(sel.value); });
+		setFieldLabel(label, labelText, tip);
+		label.appendChild(sel);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
@@ -8595,7 +8730,7 @@ var EngCalcs = EngCalcs || {};
 				: { id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'), demand: toSI(effective(n, 'demand') || 0, 'lpn_u_flow'), emitter: effective(n, 'emitter') };
 		});
 		var links = doc.links.map(function (l) {
-			return {
+			var out = {
 				id: l.id, type: l.type, from: l.from, to: l.to,
 				// roughness (Hazen-Williams C) and k are dimensionless, so they cross this boundary
 				// unchanged -- the same reason they use rawLine() rather than numLine() on the map.
@@ -8603,6 +8738,25 @@ var EngCalcs = EngCalcs || {};
 				length: linkLengthSI(l), status: effective(l, 'status'), k: effective(l, 'k'),
 				h0: l.h0, a: l.a, b: l.b
 			};
+			if (l.type === 'valve') {
+				// THE SETTING CROSSES THIS BOUNDARY IN THE UNIT ITS TYPE NAMES, which is the whole
+				// reason a valve needs a line here at all. A pressure setting is a head in metres,
+				// a flow setting is m3/s, and a throttle's loss coefficient is dimensionless and
+				// must NOT be put through a converter -- feeding it to toSI('lpn_u_pressure') would
+				// divide a loss coefficient by 1.42 under the US preset and the network would still
+				// solve. Downstream, js/lpn-epanet.js converts each one again into EPANET's own
+				// convention; this half only has to get it into SI.
+				out.valveType = (l.valveType || 'TCV').toUpperCase();
+				out.length = 0;
+				if (out.valveType === 'PRV' || out.valveType === 'PSV') {
+					out.setting = toSI(effective(l, 'setting') || 0, 'lpn_u_pressure');
+				} else if (out.valveType === 'FCV') {
+					out.setting = toSI(effective(l, 'setting') || 0, 'lpn_u_flow');
+				} else {
+					out.setting = effective(l, 'setting') || 0;
+				}
+			}
+			return out;
 		});
 		return { nodes: nodes, links: links, method: frictionMethod(), visc: 1.007e-6, emitterExponent: settings.emitterExponent };
 	}
@@ -8611,6 +8765,10 @@ var EngCalcs = EngCalcs || {};
 		if (issue.code === 'no-fixed-head') { return pc.lpn_diag_no_fixed_head || 'Add a reservoir or a tank. The network needs at least one known water level before it can be solved.'; }
 		if (issue.code === 'dangling-link') { return (pc.lpn_diag_dangling_link || 'A pipe or pump connects to a node that no longer exists:') + ' ' + issue.ids.join(', '); }
 		if (issue.code === 'unreachable') { return (pc.lpn_diag_unreachable || 'These nodes have no path to a reservoir:') + ' ' + issue.ids.join(', '); }
+		// NAMES THE VALVES, which is the entire reason this page keeps its own diagnostics instead
+		// of surfacing EPANET's numeric error codes. A user staring at a drawing can act on "V3".
+		if (issue.code === 'valve-needs-epanet') { return (pc.lpn_diag_valve_needs_epanet || 'These valves open and close on their own, and only the EPANET engine can compute them. The EPANET engine could not be loaded, so these results are missing:') + ' ' + issue.ids.join(', '); }
+		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between them:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
 	// The status bar has two writers with different lifetimes, and a naive setStatus() call loses to
@@ -8723,10 +8881,13 @@ var EngCalcs = EngCalcs || {};
 				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], 'lpn_u_pressure', nd.pressure) : undefined;
 			})),
 			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'diameter'), ld.diameter) : undefined; })),
-			length: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'length'), ld.length) : undefined; })),
+			// PIPE-ONLY, not merely not-a-pump (Task 248 phase 2). A valve has no length by
+			// definition and no roughness to speak of, so including it would drag the low end of
+			// both ranges to zero and put a "smallest" tick on every valve on the map.
+			length: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'length'), ld.length) : undefined; })),
 			// Both dimensionless, so they use rawLine()/plainRound() like Length, not displayRound().
-			roughness: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'roughness'), ld.roughness) : undefined; })),
-			km: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'k') || 0, ld.km) : undefined; })),
+			roughness: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'roughness'), ld.roughness) : undefined; })),
+			km: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'k') || 0, ld.km) : undefined; })),
 			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(lastSolveResult.flows[l.id], 'lpn_u_flow', ld.flow) : undefined; })),
 			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity', ld.velocity) : undefined; })),
 			// One head-loss bucket for every link type, pumps included: a pump reports a negative
@@ -8798,11 +8959,18 @@ var EngCalcs = EngCalcs || {};
 			var le = linkEls[l.id]; if (!le) { return; }
 			var lines = [];
 			if (ls.link.id) { lines.push({ text: l.id, color: fc.id }); }
-			if (l.type !== 'pump') {
+			if (l.type === 'pipe') {
 				if (ls.link.diameter) { lines.push(rawLine(effective(l, 'diameter'), extrema.diameter, fc.diameter, ld.diameter)); }
 				if (ls.link.length) { lines.push(rawLine(effective(l, 'length'), extrema.length, fc.length, ld.length)); }
 				if (ls.link.roughness) { lines.push(rawLine(effective(l, 'roughness'), extrema.roughness, fc.roughness, ld.roughness)); }
 				if (ls.link.km) { lines.push(rawLine(effective(l, 'k') || 0, extrema.km, fc.km, ld.km)); }
+			} else if (l.type === 'valve') {
+				// A VALVE PRINTS ITS DIAMETER AND NOTHING ELSE FROM THIS GROUP. Length and
+				// roughness do not exist on it, and its loss lives in a SETTING whose meaning
+				// changes with the type -- so a bare number beside a pipe's k would be read as the
+				// same quantity when it is a pressure or a flow. The setting belongs in the popup,
+				// where it is labelled, until a label toggle of its own is worth 26 translations.
+				if (ls.link.diameter) { lines.push(rawLine(effective(l, 'diameter'), extrema.diameter, fc.diameter, ld.diameter)); }
 			}
 			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
 				if (ls.link.flow) { lines.push(numLine(lastSolveResult.flows[l.id], 'lpn_u_flow', extrema.flow, fc.flow, ld.flow)); }
@@ -8882,17 +9050,50 @@ var EngCalcs = EngCalcs || {};
 			consumeFitAfterSolve();
 			return;
 		}
-		if (settings.engine === 'epanet' && EngCalcs.lpnSolveEpanet) {
+		// AN ACTIVE VALVE ROUTES THE SOLVE TO EPANET, whatever the engine PREFERENCE says, and the
+		// status bar says so out loud (Task 248 phase 2, 2026-08-14).
+		//
+		// The setting is a preference; the routing is a fact about THIS network. A PRV, PSV or FCV
+		// switches its own state during the solve and js/lpn-solver.js deliberately does not
+		// implement that -- EPANET already does, and measured ~9x faster than our own solver at the
+		// 21-node target (ROADMAP Task 313), so a second implementation would have been slower code
+		// for a solved problem. So the routing is automatic, because refusing to solve a network we
+		// can solve would be absurd, and it is VISIBLE, because a user who ticked "built-in solver"
+		// and silently got a different engine has been lied to. settings.engine is NOT rewritten:
+		// delete the valve and the page goes straight back to the engine the user chose.
+		var epanetOnly = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [];
+		valveRouteNote = '';
+		if ((settings.engine === 'epanet' || epanetOnly.length > 0) && EngCalcs.lpnSolveEpanet) {
+			if (epanetOnly.length > 0 && settings.engine !== 'epanet') {
+				valveRouteNote = ((EngCalcs.pageConfig || {}).lpn_engine_valve_route ||
+					'Worked out with the EPANET engine, because these valves open and close on their own:') +
+					' ' + epanetOnly.join(', ');
+			}
 			runSolveEpanet(model);
 			return;
 		}
 		applySolveResult(EngCalcs.lpnSolve(model, { tol: settings.tolerance }));
 	}
+	// Set by runSolve() when a network was routed to EPANET by its own contents rather than by the
+	// user's choice; read by applySolveResult(), which owns the status bar after a successful solve.
+	var valveRouteNote = '';
 
 	function applySolveResult(result) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!result.ok || !result.converged) {
 			lastSolveResult = null;
+			// A REFUSAL AND A FAILURE TO CONVERGE ARE DIFFERENT THINGS, and until Task 248 phase 2
+			// both printed "Did not converge". They separated the moment the native solver gained a
+			// reason to refuse a perfectly sound network (an active valve, when EPANET could not be
+			// loaded): telling that user their network did not converge sends them to look for a
+			// zero diameter that is not there.
+			if (result.issues && result.issues.length > 0) {
+				result.issues.forEach(function (issue) { logLpnDiag(issue.code); });
+				setStatus(result.issues.map(diagIssueText).join(' '));
+				refreshLabelText();
+				consumeFitAfterSolve();
+				return;
+			}
 			// Not one of lpnDiagnose()'s pre-solve codes -- this is the solver itself giving up, and
 			// it belongs in the same histogram because to the user it is the same kind of dead end.
 			logLpnDiag('not-converged');
@@ -8905,7 +9106,8 @@ var EngCalcs = EngCalcs || {};
 		// The only case where the two engines knowingly disagree, so say so rather than let a
 		// user discover a 0.6% shift by switching the checkbox. See js/lpn-epanet.js.
 		var manningNote = (result.warnings || []).some(function (w) { return w.code === 'manning-constant-differs'; });
-		setStatus(manningNote ? (pc.lpn_engine_manning_note || '') : '');
+		setStatus([valveRouteNote, manningNote ? (pc.lpn_engine_manning_note || '') : '']
+			.filter(function (t) { return !!t; }).join(' '));
 		refreshLabelText();
 		consumeFitAfterSolve();
 	}
