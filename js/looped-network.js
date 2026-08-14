@@ -598,8 +598,11 @@ var EngCalcs = EngCalcs || {};
 	// `status` is this file's existing name for the open/closed state (Task 146.07 will surface it);
 	// `length` is the escape valve for "same drawing, different length", since a drag recomputes
 	// Base's auto length for every scenario.
+	// `level` joined the node list when the scenario UI landed (Task 184): a tank's starting water
+	// level is a design variable in exactly the way a reservoir's head is, and the two sit in the
+	// same popup a row apart. Widening is the cheap direction, per the note above.
 	var LPN_OVERRIDABLE = {
-		node: { demand: true, emitter: true, head: true, active: true },
+		node: { demand: true, emitter: true, head: true, level: true, active: true },
 		link: { diameter: true, roughness: true, k: true, status: true, length: true, active: true }
 	};
 
@@ -620,10 +623,286 @@ var EngCalcs = EngCalcs || {};
 		if (prop === 'active' && el['_' + prop] === undefined) { return true; }
 		return el['_' + prop];
 	}
-	// The write side (setOverride/clearOverride) and the status-bar override count deliberately do
-	// NOT exist yet: with Base the only scenario there is nothing they could do but write into a map
-	// that must stay empty, and an untestable write path is how a marker convention drifts before it
-	// ever runs. They land with the scenario UI, against LPN_OVERRIDABLE above.
+	// ---- the write side (ROADMAP Task 184's scenario UI, 2026-08-14) ----
+	// THE MARKER IS THE KEY'S PRESENCE, and it records INTENT at edit time -- never a diff. Writing
+	// overrides[id][prop] says "I set this deliberately, here"; deleting it is the undo. Both hold
+	// when the value equals Base's, because a diff cannot tell "I chose this number for this
+	// scenario" from "Base happens to agree today", and those two need opposite treatment the
+	// moment Base moves.
+	//
+	// A LINK IS TOLD FROM A NODE BY `from`, not by a list of type names: another element type
+	// (a valve) can arrive at any time, and a hardcoded type list would silently classify it as a
+	// node and quietly refuse every override on it.
+	function elGroup(el) { return (el && el.from !== undefined) ? 'link' : 'node'; }
+	function isOverridable(el, prop) { return !!(LPN_OVERRIDABLE[elGroup(el)] || {})[prop]; }
+	function inBaseScenario() { return !!activeScenario().isBase; }
+	function hasOverride(el, prop) {
+		var ov = activeScenario().overrides[el.id];
+		return !!(ov && Object.prototype.hasOwnProperty.call(ov, prop));
+	}
+	// Base's OWN value for a property, ignoring whatever the active scenario says -- what the
+	// popup shows beside an overridden field, and what clearing a marker returns the field to.
+	function baseValue(el, prop) {
+		if (prop === 'active' && el['_' + prop] === undefined) { return true; }
+		return el['_' + prop];
+	}
+	function setOverride(el, prop, value) {
+		if (!el || !isOverridable(el, prop) || inBaseScenario()) { return; }
+		var scn = activeScenario();
+		if (!scn.overrides[el.id]) { scn.overrides[el.id] = {}; }
+		scn.overrides[el.id][prop] = value;
+	}
+	function clearOverride(el, prop) {
+		var scn = activeScenario(), ov = scn.overrides[el.id];
+		if (!ov) { return; }
+		delete ov[prop];
+		// An empty map is dropped rather than left behind: the override COUNT is a sum of key
+		// counts, and an element with an empty object still occupying the map would otherwise
+		// read to any future reader as "this element is touched here", which is exactly the claim
+		// the marker exists to make precisely.
+		if (!Object.keys(ov).length) { delete scn.overrides[el.id]; }
+	}
+	// THE ONE WRITE SEAM every property editor goes through. In Base it writes the element (which
+	// IS the propagation -- there is no push upward in the delta model); in a scenario it records
+	// an override. A call site that writes `el._diameter` directly is therefore not merely
+	// impolite: inside a scenario it silently edits Base under every other scenario at once.
+	function setProp(el, prop, value) {
+		if (!inBaseScenario() && isOverridable(el, prop)) { setOverride(el, prop, value); return; }
+		el['_' + prop] = value;
+	}
+	function overrideCount(scn) {
+		var total = 0;
+		Object.keys(scn.overrides || {}).forEach(function (id) { total += Object.keys(scn.overrides[id]).length; });
+		return total;
+	}
+	// Every scenario's overrides on one element -- what a Base-side deletion is about to destroy,
+	// which is why it is counted before the confirm rather than after it.
+	function overrideCountForElement(id) {
+		var total = 0;
+		scenarios.forEach(function (s) {
+			if (s.isBase || !s.overrides[id]) { return; }
+			total += Object.keys(s.overrides[id]).length;
+		});
+		return total;
+	}
+	function purgeOverrides(id) {
+		scenarios.forEach(function (s) { delete s.overrides[id]; });
+	}
+
+	// ---- the scenario selector, and its "what am I working on right now" readout ----
+	// The count is the half that makes the question answerable at a glance (Task 184), and it is
+	// only cheap to compute because a scenario IS its overrides -- there is no second document to
+	// diff against.
+	function scenarioDisplayName(s) {
+		var pc = EngCalcs.pageConfig || {};
+		// Base's stored name is the language-free literal 'Base' (defaultScenarios()); the word on
+		// screen comes from the lang file, so a user's data never carries an English word.
+		return s.isBase ? (pc.lpn_scenario_base || 'Base') : (s.name || '');
+	}
+	function refreshScenarioStatus() {
+		var btn = document.getElementById('lpn_scenario_btn'), pc = EngCalcs.pageConfig || {};
+		if (!btn) { return; }
+		var scn = activeScenario();
+		// Same "Label: value | Label: value" shape as the units readout beside it (refreshMapStatus),
+		// and no plural agreement anywhere -- "Overrides: 1" needs no rule in any of the 27 languages.
+		btn.textContent = (pc.lpn_scenario_label || 'Scenario') + ': ' + scenarioDisplayName(scn)
+			+ ' | ' + (pc.lpn_scenario_overrides || 'Overrides') + ': ' + overrideCount(scn);
+	}
+	// Everything a scenario can change at once: which values the solve reads, which links are
+	// dashed, which elements are greyed out, which carry a halo, and what an open popup shows.
+	// A full rebuild rather than a targeted refresh, because a scenario switch can change every
+	// element on the map and the cost is one buildDom on a network of a few hundred elements.
+	function applyScenarioChange() {
+		closePopup();
+		buildDom();
+		refreshSymbolSizes();
+		refreshScenarioStatus();
+		scheduleSolve();
+		saveToStorage();
+	}
+	function switchScenario(id) {
+		if (project.activeScenario === id) { return; }
+		project.activeScenario = id;
+		applyScenarioChange();
+	}
+	function newScenarioId() {
+		var n = 1, used = {};
+		scenarios.forEach(function (s) { used[s.id] = true; });
+		while (used['s' + n]) { n++; }
+		return 's' + n;
+	}
+	function createScenario(name) {
+		var s = { id: newScenarioId(), name: name, overrides: {} };
+		scenarios.push(s);
+		project.activeScenario = s.id;
+		applyScenarioChange();
+		return s;
+	}
+	function deleteScenario(id) {
+		var s = scenarioById(id);
+		if (!s || s.isBase) { return; }
+		scenarios = scenarios.filter(function (x) { return x.id !== id; });
+		if (project.activeScenario === id) { project.activeScenario = baseScenario().id; }
+		applyScenarioChange();
+	}
+	function scenarioById(id) {
+		for (var i = 0; i < scenarios.length; i++) { if (scenarios[i].id === id) { return scenarios[i]; } }
+		return null;
+	}
+	function openScenarioMenu(anchor) {
+		var pc = EngCalcs.pageConfig || {}, rows = [], scn = activeScenario();
+		scenarios.forEach(function (s) {
+			rows.push({
+				// A tick on the row you are already in, the way every view menu in this file's
+				// neighbourhood marks a current choice. No icon column entry, so the marker cannot
+				// be mistaken for a command's glyph.
+				label: (s.id === scn.id ? '✓ ' : '  ') + scenarioDisplayName(s)
+					+ (s.isBase ? '' : ' (' + overrideCount(s) + ')'),
+				fn: function () { switchScenario(s.id); }
+			});
+		});
+		rows.push({ separator: true });
+		rows.push({
+			icon: 'insert', label: pc.lpn_scenario_new || 'New scenario…',
+			fn: function () {
+				var suggested = (pc.lpn_scenario_new_name || 'Scenario {n}').replace('{n}', scenarios.length);
+				var v = window.prompt(pc.lpn_scenario_prompt_name || 'Name for this scenario', suggested);
+				if (v === null) { return; }
+				v = v.trim();
+				if (!v) { return; }
+				saveUndoSnapshot();
+				createScenario(v);
+			}
+		});
+		rows.push({
+			// Base cannot be renamed away: its name is not stored in the user's language and the
+			// selector keys off isBase, so a rename here would rename nothing a user can see.
+			icon: 'edit', label: pc.lpn_scenario_rename || 'Rename scenario…', disabled: scn.isBase,
+			fn: function () {
+				var v = window.prompt(pc.lpn_scenario_prompt_name || 'Name for this scenario', scn.name || '');
+				if (v === null || !v.trim()) { return; }
+				saveUndoSnapshot();
+				scn.name = v.trim();
+				refreshScenarioStatus();
+				saveToStorage();
+			}
+		});
+		rows.push({
+			icon: 'close', label: pc.lpn_scenario_delete || 'Delete scenario', disabled: scn.isBase,
+			fn: function () {
+				// The count is the whole of the warning: a scenario holding nothing is worth no
+				// question, and one holding forty values is worth a specific one.
+				var msg = (pc.lpn_scenario_delete_confirm || 'Delete the scenario {name}, and the {n} values it holds? The drawing itself is not changed.')
+					.replace('{name}', scenarioDisplayName(scn)).replace('{n}', overrideCount(scn));
+				if (!window.confirm(msg)) { return; }
+				saveUndoSnapshot();
+				deleteScenario(scn.id);
+			}
+		});
+		rows.push({ separator: true });
+		rows.push({
+			label: pc.lpn_scenario_push_btn || 'Apply Base values to all scenarios',
+			tip: pc.lpn_scenario_push_tip,
+			// BASE-LEVEL ONLY, and disabled rather than hidden so the vocabulary stays learnable
+			// (the menu convention this file already follows). Run from inside a scenario the
+			// action has no meaning: it pushes Base's values outward, and Base is not where you
+			// are standing.
+			disabled: !scn.isBase || scenarios.length < 2,
+			fn: pushBaseToScenarios
+		});
+		openMenu(anchor, rows);
+	}
+	// THE SELECTOR AND THE READOUT ARE ONE CONTROL, in the map's bottom status strip beside the
+	// units. Task 184 asks for both -- "what am I working on right now", answered at a glance, and
+	// a way to switch -- and a readout you can click is one thing to find rather than two. It sits
+	// in the strip because that is where this page already answers continuous questions about the
+	// state of the map (units, friction method, cursor position).
+	function wireScenarioButton() {
+		var btn = document.getElementById('lpn_scenario_btn');
+		if (!btn) { return; }
+		var pc = EngCalcs.pageConfig || {};
+		if (pc.lpn_scenario_tip) { btn.title = pc.lpn_scenario_tip; btn.className += ' ec-help'; }
+		// stopPropagation for the same reason every other menu opener in this file does it: the
+		// document-level dismissal in wireTabs() would otherwise close the menu this click opens.
+		btn.addEventListener('click', function (e) { e.stopPropagation(); openScenarioMenu(e.currentTarget); });
+		refreshScenarioStatus();
+	}
+
+	// The property list BOTH pushes share -- the Settings panel's "apply starting values to every
+	// element" and the scenario menu's "apply Base values to every scenario". Lifted out of
+	// rebuildSettingsFields() when the second one arrived, rather than copied: the two must agree
+	// about which properties exist, which elements physically carry them, and what each is called,
+	// and a second copy of that list is a second thing to keep in step.
+	// `applies` is what keeps a push physical rather than blindly per-field: a reservoir has no
+	// demand, and a pump has no diameter/roughness/km, so neither is counted or touched.
+	function pushSpecList() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ key: 'nodeElev', group: 'node', field: 'elev', label: pc.lpn_field_elev || 'Elevation',
+				// Elevation is survey data, not an overridable design variable (LPN_OVERRIDABLE), so
+				// it has no `prop` and the scenario push skips it. It stays in the Settings push,
+				// which writes Base.
+				applies: function () { return true; }, get: function (n) { return n.elev; }, set: function (n, v) { n.elev = v; } },
+			{ key: 'demand', group: 'node', field: 'demand', prop: 'demand', label: pc.bpn_demand || 'Demand',
+				applies: function (n) { return !isFixedHeadNode(n); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },
+			{ key: 'diameter', group: 'link', field: 'diameter', prop: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },
+			{ key: 'roughness', group: 'link', field: 'roughness', prop: 'roughness', label: roughnessLabel(),
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },
+			{ key: 'k', group: 'link', field: 'km', prop: 'k', label: pc.lpn_field_km || 'Minor (local) loss coefficient, k',
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } }
+		];
+	}
+	// **THE DANGEROUS ACTION** (Task 184, and it stays -- Tom, 2026-07-30: "still needed for good
+	// UX"). Base-side, it forces the displayed properties onto every scenario, ignoring their
+	// markers. In the delta model "forcing Base's value onto a scenario" IS clearing that
+	// scenario's override: the value then follows Base, and no stale marker is left claiming an
+	// intent the user has just overruled. Writing Base's number in as a fresh override would leave
+	// every scenario permanently pinned to today's Base value, which is the opposite of what a
+	// push is for.
+	//
+	// SCOPED BY THE DISPLAYED LABELS, the same filter the Settings push uses: the Labels panel is
+	// already a per-property checkbox list and is already on screen, so the user's own current view
+	// defines the blast radius and this needs no property picker of its own.
+	function pushBaseToScenarios() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!inBaseScenario()) { return; }
+		var active = pushSpecList().filter(function (s) { return s.prop && labelSettings[s.group][s.field]; });
+		if (!active.length) {
+			alert(pc.lpn_push_none_displayed || 'No default input is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
+			return;
+		}
+		// Counted, not estimated: how many overrides would actually be discarded. Zero says so in
+		// its own words, because "nothing to push" and "pushed nothing" look identical afterwards.
+		var hits = 0, touched = 0;
+		scenarios.forEach(function (s) {
+			if (s.isBase) { return; }
+			var any = false;
+			Object.keys(s.overrides).forEach(function (id) {
+				active.forEach(function (spec) {
+					if (Object.prototype.hasOwnProperty.call(s.overrides[id], spec.prop)) { hits++; any = true; }
+				});
+			});
+			if (any) { touched++; }
+		});
+		if (!hits) { alert(pc.lpn_scenario_push_none || 'No scenario has its own value for any of these properties, so nothing would change.'); return; }
+		// NAMES the properties as well as counting them, exactly as the Settings push does -- a
+		// bare count leaves the user guessing which properties, and this action is not one to guess at.
+		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values those scenarios hold of their own are discarded. You can undo this.')
+			+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
+			+ '\n' + (pc.lpn_scenario_push_scenarios || 'Scenarios:') + ' ' + touched
+			+ '\n' + (pc.lpn_scenario_push_values || 'Values discarded:') + ' ' + hits;
+		if (!window.confirm(msg)) { return; }
+		saveUndoSnapshot();
+		scenarios.forEach(function (s) {
+			if (s.isBase) { return; }
+			Object.keys(s.overrides).forEach(function (id) {
+				active.forEach(function (spec) { delete s.overrides[id][spec.prop]; });
+				if (!Object.keys(s.overrides[id]).length) { delete s.overrides[id]; }
+			});
+		});
+		applyScenarioChange();
+	}
 
 	// Map label toggles (Task 146 Phase 2) -- a VIEW preference, not network content, so it is
 	// deliberately NOT part of the undo-snapshotted `doc` and is untouched by clearNetwork()/undo().
@@ -1136,6 +1415,15 @@ var EngCalcs = EngCalcs || {};
 		layoutNodeLabel(n.id);
 	}
 	function buildLinkEls(l) {
+		// AUDIT HALO (ROADMAP Task 184) -- a wider line UNDER the pipe, so what the user sees is an
+		// outline around it and never a fill: the pipe keeps its own colour, its dashes and every
+		// future result-driven styling, and the halo composes with all of them instead of competing.
+		// Built for every link and hidden by CSS until refreshScenarioMarks() marks it, which keeps
+		// it out of the per-frame path entirely -- toggling a class is cheaper than creating and
+		// destroying an element on every scenario switch.
+		var halo = el('polyline', {
+			points: linkPoints(l), fill: 'none', 'class': 'lpn-link-halo'
+		}, linksLayer);
 		// A closed link is DASHED (Task 146.07). Without a visual, a closed pipe is identical to an
 		// open one on the map while carrying no water, which turns a one-click state into an
 		// invisible cause of a network that will not solve. Read through effective(), so a future
@@ -1198,7 +1486,7 @@ var EngCalcs = EngCalcs || {};
 			} else { symbolG.remove(); symbolG = null; }
 		}
 		linkEls[l.id] = {
-			line: line, handles: handles, arrows: arrows, text: text, tw: 8, mask: mask, leader: leader,
+			line: line, halo: halo, handles: handles, arrows: arrows, text: text, tw: 8, mask: mask, leader: leader,
 			nudge: { x: 0, y: 0 }, lineCount: 1, symbolG: symbolG, symbolSvg: symbolSvg
 		};
 		if (symbolG) { resizePumpSymbol(l.id); positionPumpSymbol(l.id); }
@@ -1387,6 +1675,7 @@ var EngCalcs = EngCalcs || {};
 	function updateLinkGeometry(id) {
 		var l = linkById(id), le = linkEls[id];
 		le.line.setAttribute('points', linkPoints(l));
+		if (le.halo) { le.halo.setAttribute('points', linkPoints(l)); }
 		layoutLinkLabel(id);
 		if (l.lenAuto) { l._length = linkGeomLength(l); }
 		updateArrow(id);
@@ -1470,6 +1759,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function rebuildLink(l) {
 		linkEls[l.id].line.remove();
+		if (linkEls[l.id].halo) { linkEls[l.id].halo.remove(); }
 		linkEls[l.id].handles.forEach(function (h) { h.remove(); });
 		linkEls[l.id].arrows.forEach(function (a) { a.remove(); });
 		linkEls[l.id].text.remove();
@@ -2133,6 +2423,7 @@ var EngCalcs = EngCalcs || {};
 		} else {
 			n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev, _demand: settings.defaults.demand };
 		}
+		bornInScenario(n);
 		doc.nodes.push(n);
 		buildNodeEls(n);
 		incidentLinks[id] = []; labelsByAnchor[id] = [];
@@ -2166,6 +2457,7 @@ var EngCalcs = EngCalcs || {};
 			l.curveRef = null;
 			recomputePumpCurve(l);
 		}
+		bornInScenario(l);
 		doc.links.push(l);
 		incidentLinks[fromId].push(id); incidentLinks[toId].push(id);
 		buildLinkEls(l);
@@ -2188,6 +2480,48 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 		return lb;
 	}
+	// ---- drawing and deleting inside a scenario (ROADMAP Task 184) ----
+	// DRAWING: the app silently creates the element in BASE as inactive and overrides it active
+	// here. The user gets ordinary drawing; the model keeps ONE id space and ONE element set, which
+	// is what makes "membership is overridable, identity is not" feel like no rule at all.
+	function bornInScenario(el) {
+		if (inBaseScenario()) { return; }
+		el._active = false;
+		setOverride(el, 'active', true);
+	}
+	// DELETING: inside a scenario it means "not in this network", so it sets inactive rather than
+	// destroying an element every other scenario may be using. In BASE it is a real deletion and
+	// takes every scenario's overrides on that element with it -- confirmed with a count, because
+	// that is work in documents the user is not looking at.
+	// A node carries its incident links with it either way: a link to a node that is not there is
+	// the "dangling-link" diagnostic, and leaving one behind would trade a delete for an error.
+	function deleteElement(kind, id) {
+		var pc = EngCalcs.pageConfig || {}, el = kind === 'node' ? nodeById(id) : linkById(id);
+		// One guard for both branches. A delete gesture can name an element that is already gone --
+		// a cascade beat it to it, or a second tap landed on the same handle -- and the Base branch
+		// would otherwise walk an incidentLinks entry that no longer exists.
+		if (!el) { return; }
+		if (!inBaseScenario()) {
+			saveUndoSnapshot();
+			setOverride(el, 'active', false);
+			if (kind === 'node') {
+				incidentLinks[id].forEach(function (lid) { setOverride(linkById(lid), 'active', false); });
+			}
+			afterPropertyEdit(el);
+			if (kind === 'node') { buildDom(); }
+			setNotice((pc.lpn_scenario_deactivated || '{id} is switched off in {scenario}. It is still in the drawing, and in your other scenarios.')
+				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(activeScenario())));
+			return;
+		}
+		var ids = [id];
+		if (kind === 'node') { ids = ids.concat(incidentLinks[id] || []); }
+		var lost = 0;
+		ids.forEach(function (x) { lost += overrideCountForElement(x); });
+		if (lost && !window.confirm((pc.lpn_delete_drops_overrides || 'Deleting this also throws away {n} values your scenarios hold for it. Continue?').replace('{n}', lost))) { return; }
+		saveUndoSnapshot();
+		if (kind === 'node') { deleteNode(id); } else { deleteLink(id); }
+		refreshScenarioStatus();
+	}
 	function deleteNode(id) {
 		var links = incidentLinks[id].slice(), i;
 		for (i = 0; i < links.length; i++) { deleteLink(links[i]); }
@@ -2200,6 +2534,10 @@ var EngCalcs = EngCalcs || {};
 		if (nodeEls[id].tickEls) { nodeEls[id].tickEls.forEach(function (t) { t.remove(); }); }
 		delete nodeEls[id]; delete incidentLinks[id]; delete labelsByAnchor[id];
 		doc.nodes = doc.nodes.filter(function (n) { return n.id !== id; });
+		// A real deletion drops every scenario's overrides on the element (Task 184). Left behind,
+		// they would be a map entry keyed by an id nothing answers to -- silently counted in the
+		// status bar, and silently reattached the day a new element minted the same id.
+		purgeOverrides(id);
 		if (currentPopup && currentPopup.kind === 'node' && currentPopup.id === id) { closePopup(); }
 		updateEmptyHint();
 		scheduleSolve();
@@ -2211,6 +2549,7 @@ var EngCalcs = EngCalcs || {};
 	function deleteLink(id) {
 		var l = linkById(id);
 		linkEls[id].line.remove();
+		if (linkEls[id].halo) { linkEls[id].halo.remove(); }
 		linkEls[id].handles.forEach(function (h) { h.remove(); });
 		linkEls[id].arrows.forEach(function (a) { a.remove(); });
 		linkEls[id].text.remove();
@@ -2224,6 +2563,7 @@ var EngCalcs = EngCalcs || {};
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
 		incidentLinks[l.to] = incidentLinks[l.to].filter(function (x) { return x !== id; });
 		doc.links = doc.links.filter(function (x) { return x.id !== id; });
+		purgeOverrides(id);   // see deleteNode()
 		if (currentPopup && currentPopup.kind === 'link' && currentPopup.id === id) { closePopup(); }
 		scheduleSolve();
 	}
@@ -2765,6 +3105,7 @@ var EngCalcs = EngCalcs || {};
 		setStatus('');
 		setMode('select');
 		refreshMapStatus();   // units belong to the project now, so switching projects can change this
+		refreshScenarioStatus();   // and so do the scenarios -- they are part of the document (Task 184)
 		// The friction method belongs to the project too (Task 271), so opening one has to re-apply
 		// the roughness unit selector's visibility -- otherwise a Darcy-Weisbach project opened
 		// after a Hazen-Williams one shows a roughness length with no unit named anywhere.
@@ -2819,6 +3160,11 @@ var EngCalcs = EngCalcs || {};
 			if (obj && typeof obj[key] === 'number') { obj[key] = obj[key] * f; }
 		}
 		saveUndoSnapshot(); // one Ctrl-Z undoes the whole migration
+		// ELEMENTS ONLY, and no override is scaled -- deliberately, not by omission. A v2 document
+		// predates the scenario UI (Task 184), so nothing could ever have written an override into
+		// one: the container shipped with Base as the only scenario and no write path at all. If a
+		// v2 file ever turns up carrying overrides it was hand-edited, and guessing at its units
+		// would be worse than leaving the numbers it states alone.
 		doc.nodes.forEach(function (n) {
 			scale(n, 'elev', hf);
 			scale(n, '_head', hf);
@@ -5903,6 +6249,7 @@ var EngCalcs = EngCalcs || {};
 		updateEmptyHint();
 		setStatus('');
 		setMode('select');
+		refreshScenarioStatus();
 		zoomExtent();
 	}
 
@@ -5981,6 +6328,7 @@ var EngCalcs = EngCalcs || {};
 		seedDefaultInputs();
 		wireSettingsPopup();
 		buildMenuBar();
+		wireScenarioButton();
 		wireTabs();
 		applyLegendPosition();
 		applyMapHeight();
@@ -6702,9 +7050,12 @@ var EngCalcs = EngCalcs || {};
 				// whole document just before any destructive action, not inside the delete
 				// functions themselves, so a cascade (deleting a node also deletes its links)
 				// captures one clean "before" state rather than a partial one.
-				if (t.dataset.node) { saveUndoSnapshot(); deleteNode(t.dataset.node); }
+				// deleteElement() owns the snapshot for the two real elements: inside a scenario the
+				// gesture is not a deletion at all but an `active` override, and in Base it may have
+				// to ask first -- neither of which a snapshot taken out here could know about.
+				if (t.dataset.node) { deleteElement('node', t.dataset.node); }
 				else if (t.classList.contains('lpn-vhandle')) { saveUndoSnapshot(); removeVertex(t.dataset.link, +t.dataset.vidx); }
-				else if (t.dataset.link !== undefined) { saveUndoSnapshot(); deleteLink(t.dataset.link); }
+				else if (t.dataset.link !== undefined) { deleteElement('link', t.dataset.link); }
 				else if (t.dataset.lbl !== undefined) { saveUndoSnapshot(); deleteLabelById(t.dataset.lbl); }
 			} else if (mode === 'select' && t.dataset.node) {
 				openPopup(t.dataset.node, e.clientX, e.clientY);
@@ -7528,27 +7879,24 @@ var EngCalcs = EngCalcs || {};
 		// push-to-scenarios, which is why it is worth reusing rather than inventing a third picker.
 		// Result fields (flow, velocity, pressure, head loss, gradient) have no default at all, so
 		// the effective filter is "displayed INTERSECT has-a-default".
-		// WHEN TASK 184 LANDS this must stay a Base-level action: run inside a scenario it would
-		// mint an override on every element at once, which is never what anyone means by it.
-		var pushSpecs = [
-			// `applies` is what keeps the push physical rather than blindly per-field: a reservoir
-			// has no demand, and a pump has no diameter/roughness/km, so neither is counted or touched.
-			{ key: 'nodeElev', group: 'node', field: 'elev', label: pc.lpn_field_elev || 'Elevation',
-				applies: function () { return true; }, get: function (n) { return n.elev; }, set: function (n, v) { n.elev = v; } },
-			{ key: 'demand', group: 'node', field: 'demand', label: pc.bpn_demand || 'Demand',
-				applies: function (n) { return !isFixedHeadNode(n); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },
-			{ key: 'diameter', group: 'link', field: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },
-			{ key: 'roughness', group: 'link', field: 'roughness', label: roughnessLabel(),
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },
-			{ key: 'k', group: 'link', field: 'km', label: pc.lpn_field_km || 'Minor (local) loss coefficient, k',
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } }
-		];
+		// TASK 184 LANDED AND THIS STAYED A BASE-LEVEL ACTION, exactly as this note required: run
+		// inside a scenario it would mint an override on every element at once, which is never
+		// what anyone means by it. The guard is in the click handler below.
+		var pushSpecs = pushSpecList();
 		note(defBody, pc.lpn_settings_push_note || 'Only the properties whose labels are showing right now are applied.');
 		var pushBtn = document.createElement('button');
 		pushBtn.type = 'button';
 		pushBtn.textContent = pc.lpn_settings_push_btn || 'Apply defaults to all elements';
 		pushBtn.addEventListener('click', function () {
+			// Base-level, and it SAYS SO rather than doing something defensible-looking. Inside a
+			// scenario this would write an override onto every element in one click -- the single
+			// most expensive thing this page can do to a document, from a button whose label says
+			// nothing about scenarios.
+			if (!inBaseScenario()) {
+				alert((pc.lpn_push_base_only || 'This applies your starting values to the drawing itself, so it can only be done in {base}. Switch to {base} and try again.')
+					.replace(/\{base\}/g, pc.lpn_scenario_base || 'Base'));
+				return;
+			}
 			var active = pushSpecs.filter(function (s) { return labelSettings[s.group][s.field]; });
 			// An empty intersection SAYS SO rather than silently doing nothing: with no input labels
 			// displayed this button would otherwise look broken, and the reason is off-screen in
@@ -7966,9 +8314,74 @@ var EngCalcs = EngCalcs || {};
 		}
 		fields.innerHTML = '';
 	}
+	// ---- the override marker (ROADMAP Task 184) ----
+	// EVERY EDIT IN A NON-BASE SCENARIO IS AN OVERRIDE, FULL STOP -- even when the typed value
+	// equals Base's. The tick records INTENT at edit time and is never computed by diffing, because
+	// a diff cannot tell "I chose this deliberately here" from "Base happens to agree with me
+	// today", and those two need opposite treatment the moment Base moves. Clearing the tick is the
+	// undo, and the field goes straight back to Base's value.
+	//
+	// Base's value is shown BESIDE the scenario's whenever the tick is set. That is the cheap fix
+	// for the one genuinely confusing case the delta model leaves (Task 184): you correct a
+	// diameter in Base, and a scenario that overrode it does not move. Seeing what you are
+	// diverging from, at the moment you can act on it, needs no change-tracking and no "Base
+	// changed since" bookkeeping.
+	function formatPropValue(v) {
+		if (v === undefined || v === null || v === '') { return ''; }
+		// A boolean reads as a MARK, not as a word: "Base: ✓" beside a checkbox is exactly the box's
+		// own vocabulary, it is language-free and RTL-safe (the same reason the suite's verdict
+		// strings lead with a glyph), and it costs no key in 27 languages to say Yes and No.
+		if (typeof v === 'boolean') { return v ? '✓' : '—'; }
+		return (typeof v === 'number') ? String(+v.toFixed(6)) : String(v);
+	}
+	// What every property editor calls after it writes: redraw the element (its dash, its grey, its
+	// halo), re-solve, re-count the status bar, persist. One seam, so a new field cannot forget a
+	// third of it.
+	function afterPropertyEdit(el) {
+		if (elGroup(el) === 'link') { rebuildLink(el); } else if (nodeEls[el.id]) { updateNode(el.id); }
+		refreshScenarioMarks();
+		refreshScenarioStatus();
+		scheduleSolve();
+		saveToStorage();
+	}
+	function overrideMarker(fields, el, prop, format) {
+		var pc = EngCalcs.pageConfig || {};
+		// Nothing at all in Base: there is no scenario to belong to, and a permanently-unticked box
+		// on every row of every popup would be noise the overwhelming majority of the time.
+		if (!el || inBaseScenario() || !isOverridable(el, prop)) { return; }
+		var label = document.createElement('label'), box = document.createElement('input'),
+			text = document.createElement('span'), on = hasOverride(el, prop);
+		label.className = 'lpn-ov-marker';
+		box.type = 'checkbox';
+		box.checked = on;
+		box.addEventListener('change', function () {
+			saveUndoSnapshot();
+			// Ticking records the value the field is ALREADY showing -- which is Base's, since
+			// nothing overrode it yet. That is deliberate: the tick is a claim about intent, not an
+			// edit, so it must not change any number by itself.
+			if (box.checked) { setOverride(el, prop, effective(el, prop)); } else { clearOverride(el, prop); }
+			afterPropertyEdit(el);
+			refreshPopupIfOpen();
+		});
+		setFieldLabel(text, pc.lpn_scenario_override || 'Only in this scenario', pc.lpn_scenario_override_tip);
+		label.appendChild(box);
+		label.appendChild(document.createTextNode(' '));
+		label.appendChild(text);
+		if (on) {
+			var base = document.createElement('span');
+			base.className = 'lpn-ov-base';
+			base.textContent = (pc.lpn_scenario_base_value || 'Base: {value}')
+				.replace('{value}', (format || formatPropValue)(baseValue(el, prop)));
+			label.appendChild(base);
+		}
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+	}
 	// get/set are DECLARED values, not SI (Task 263) -- what the user typed, in the unit the label
 	// names. No factor in either direction; the solver does the converting at its own boundary.
-	function unitNumberField(fields, labelText, unitId, get, set, tip) {
+	// `ov` (optional) is {el, prop}: the element and the overridable property this row edits, which
+	// is what earns the row its override marker inside a scenario.
+	function unitNumberField(fields, labelText, unitId, get, set, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input'), v0 = get();
 		input.type = 'number';
 		// Printed with trailing zeros stripped rather than a fixed toFixed(4). Under SI storage the
@@ -7983,12 +8396,13 @@ var EngCalcs = EngCalcs || {};
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
+		if (ov) { overrideMarker(fields, ov.el, ov.prop); }
 	}
 	// Same as unitNumberField(), but the value may be BLANK, meaning "follow whatever this field
 	// defaults to" -- currently a reservoir's head following its elevation (Tom, 2026-07-30).
 	// placeholderSI is that fallback, shown greyed in the empty box so the field never looks like it
 	// is missing a number; clearing the box stores undefined, which is what re-links the two.
-	function unitNumberFieldBlank(fields, labelText, unitId, get, set, placeholder, tip) {
+	function unitNumberFieldBlank(fields, labelText, unitId, get, set, placeholder, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input'),
 			v = get();
 		input.type = 'number';
@@ -8002,6 +8416,7 @@ var EngCalcs = EngCalcs || {};
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
+		if (ov) { overrideMarker(fields, ov.el, ov.prop); }
 	}
 	// Read-only, like EPANET's own property-form coordinate display (Tom) -- also doubles as
 	// the touch answer to "show coordinates of the selected element": the corner tracker
@@ -8034,11 +8449,20 @@ var EngCalcs = EngCalcs || {};
 			input = document.createElement('input'), autoLabel = document.createElement('label'),
 			auto = document.createElement('input');
 		input.type = 'number'; input.value = effective(l, 'length').toFixed(2);
-		input.addEventListener('change', function () { l._length = +input.value; l.lenAuto = false; auto.checked = false; scheduleSolve(); });
+		input.addEventListener('change', function () { setProp(l, 'length', +input.value); l.lenAuto = false; auto.checked = false; refreshPopupIfOpen(); scheduleSolve(); });
 		auto.type = 'checkbox'; auto.checked = l.lenAuto;
 		auto.addEventListener('change', function () {
 			l.lenAuto = auto.checked;
-			if (l.lenAuto) { l._length = linkGeomLength(l); input.value = effective(l, 'length').toFixed(2); }
+			// The auto length writes BASE, never an override, and clears any override on the way:
+			// geometry is Base-owned (a node cannot be in two places at once in one rendered map),
+			// so "follow the drawing" is a statement about the drawing, which every scenario shares.
+			// `lenAuto` itself is that same kind of flag and is deliberately not overridable.
+			if (l.lenAuto) {
+				l._length = linkGeomLength(l);
+				if (!inBaseScenario()) { clearOverride(l, 'length'); }
+				input.value = effective(l, 'length').toFixed(2);
+				refreshPopupIfOpen();
+			}
 			scheduleSolve();
 		});
 		setFieldLabel(label, (pc.lpn_field_length || 'Length') + ' (' + unitLabel('lpn_u_length') + ')',
@@ -8048,6 +8472,7 @@ var EngCalcs = EngCalcs || {};
 		autoLabel.appendChild(document.createTextNode(' ' + (pc.lpn_field_auto || 'Auto')));
 		fields.appendChild(label); fields.appendChild(autoLabel);
 		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, l, 'length');
 	}
 	// World -> screen, the inverse of screenToWorld() above. Both are client (viewport) coordinates,
 	// which is what a position:fixed popup wants.
@@ -8107,9 +8532,22 @@ var EngCalcs = EngCalcs || {};
 		});
 		title.appendChild(input);
 	}
+	// AN OVERRIDE MAP IS KEYED BY ELEMENT ID, so a rename has to carry it (Task 184). Missing this
+	// is silent in the worst way: the scenario's values simply stop applying, the map falls back to
+	// Base, and the status bar still counts them -- there is nothing on screen that says a number
+	// went away. Renames are cheap and we own the path, which is the same reasoning the "compare
+	// with base ID" field records for following a rename.
+	function renameOverrides(oldId, newId) {
+		scenarios.forEach(function (s) {
+			if (!s.overrides[oldId]) { return; }
+			s.overrides[newId] = s.overrides[oldId];
+			delete s.overrides[oldId];
+		});
+	}
 	function renameNode(oldId, newId) {
 		var n = nodeById(oldId), i;
 		n.id = newId;
+		renameOverrides(oldId, newId);
 		nodeEls[newId] = nodeEls[oldId]; delete nodeEls[oldId];
 		incidentLinks[newId] = incidentLinks[oldId]; delete incidentLinks[oldId];
 		labelsByAnchor[newId] = labelsByAnchor[oldId]; delete labelsByAnchor[oldId];
@@ -8128,6 +8566,7 @@ var EngCalcs = EngCalcs || {};
 	function renameLink(oldId, newId) {
 		var l = linkById(oldId);
 		l.id = newId;
+		renameOverrides(oldId, newId);
 		// Any OTHER pump referencing this one by curveRef must follow the rename, or its curve
 		// silently reverts to nothing (resolveCurvePoints() only matches an exact id).
 		doc.links.forEach(function (other) { if (other.curveRef === oldId) { other.curveRef = newId; } });
@@ -8155,8 +8594,8 @@ var EngCalcs = EngCalcs || {};
 				pc.lpn_tank_elev_tip);
 			unitNumberField(fields, pc.lpn_field_tank_level || 'Water level', 'lpn_u_elevhead',
 				function () { return effective(n, 'level'); },
-				function (v) { n._level = v; updateNode(nodeId); refreshPopupIfOpen(); },
-				pc.lpn_field_tank_level_tip);
+				function (v) { setProp(n, 'level', v); updateNode(nodeId); refreshPopupIfOpen(); },
+				pc.lpn_field_tank_level_tip, { el: n, prop: 'level' });
 			unitNumberField(fields, pc.lpn_field_tank_minlevel || 'Lowest water level', 'lpn_u_elevhead',
 				function () { return n.minLevel; },
 				function (v) { n.minLevel = v; updateNode(nodeId); refreshPopupIfOpen(); },
@@ -8188,8 +8627,8 @@ var EngCalcs = EngCalcs || {};
 			// result), so it can and should be right the moment either number is committed.
 			unitNumberFieldBlank(fields, pc.lpn_field_head || 'Head', 'lpn_u_elevhead',
 				function () { return effective(n, 'head'); },
-				function (v) { n._head = v; updateNode(nodeId); refreshPopupIfOpen(); },
-				n.elev || 0, pc.lpn_field_head_tip);
+				function (v) { setProp(n, 'head', v); updateNode(nodeId); refreshPopupIfOpen(); },
+				n.elev || 0, pc.lpn_field_head_tip, { el: n, prop: 'head' });
 			// No read-only Head row here (a junction gets one because its head is a solve RESULT) --
 			// the editable field above already shows this reservoir's head, typed or inherited.
 			// The one place two DISPLAY units meet: head and elevation are declared in the Elevation/
@@ -8207,14 +8646,16 @@ var EngCalcs = EngCalcs || {};
 			// bpn_demand_tip says "at this line's downstream end", which is branched-network
 			// wording and false here, where a demand sits on a node.
 			unitNumberField(fields, pc.bpn_demand || 'Demand', 'lpn_u_flow',
-				function () { return effective(n, 'demand'); }, function (v) { n._demand = v; updateNode(nodeId); },
-				pc.lpn_demand_tip);
+				function () { return effective(n, 'demand'); },
+				function (v) { setProp(n, 'demand', v); updateNode(nodeId); refreshPopupIfOpen(); },
+				pc.lpn_demand_tip, { el: n, prop: 'demand' });
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
 				readonlyUnitField(fields, pc.lpn_result_head || 'Head', 'lpn_u_elevhead', lastSolveResult.heads[nodeId],
 					pc.lpn_result_head_tip);
 				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure', lastSolveResult.pressures[nodeId]);
 			}
 		}
+		activeField(fields, n);
 		readonlyField(fields, pc.lpn_field_x || 'X', n.x);
 		readonlyField(fields, pc.lpn_field_y || 'Y', cartesianY(n.y));
 		tipsIn(fields);
@@ -8335,12 +8776,16 @@ var EngCalcs = EngCalcs || {};
 			renderPumpCurveFields(fields, l, linkId);
 		} else {
 			unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
-				function () { return effective(l, 'diameter'); }, function (v) { l._diameter = v; });
+				function () { return effective(l, 'diameter'); },
+				function (v) { setProp(l, 'diameter', v); refreshPopupIfOpen(); }, null,
+				{ el: l, prop: 'diameter' });
 			// Label, symbol and tip all follow settings.method (Task 271). Under Darcy-Weisbach the
 			// unit is named too, because e is a length and the bare number would be ambiguous.
 			numberFieldPlain(fields,
 				roughnessLabel() + (frictionMethod() === 'dw' ? ' (' + unitLabel('lpn_u_roughness') + ')' : ''),
-				effective(l, 'roughness'), function (v) { l._roughness = v; }, roughnessTip());
+				effective(l, 'roughness'),
+				function (v) { setProp(l, 'roughness', v); refreshPopupIfOpen(); }, roughnessTip(),
+				{ el: l, prop: 'roughness' });
 			// Minor (local) loss coefficient, k_m -- dimensionless, so no unit conversion (same as
 			// Roughness above). Defaults from settings.defaults.k at creation (addLink()); editable
 			// per-pipe here, same pattern as every other pipe property. Plain-text wording only
@@ -8349,10 +8794,12 @@ var EngCalcs = EngCalcs || {};
 			// with that call site; CLAUDE.md's concept-level reuse rule is about wording, not
 			// forcing markup into a plain-text slot.
 			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
-				function (v) { l._k = v; }, pc.lpn_field_km_tip);
+				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, pc.lpn_field_km_tip,
+				{ el: l, prop: 'k' });
 			lengthField(fields, l);
 		}
 		closedField(fields, l, linkId);
+		activeField(fields, l);
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
 			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', 'lpn_u_flow', lastSolveResult.flows[linkId]);
 			// A pump has no diameter (Tom, 2026-07-30: "how can a pump have a velocity if it has no
@@ -8465,7 +8912,7 @@ var EngCalcs = EngCalcs || {};
 		input.checked = effective(l, 'status') === 'closed';
 		input.addEventListener('change', function () {
 			saveUndoSnapshot();
-			l._status = input.checked ? 'closed' : 'open';
+			setProp(l, 'status', input.checked ? 'closed' : 'open');
 			// rebuildLink() rather than a classList toggle: the dashed/solid state is applied in
 			// buildLinkEls(), so going through the one builder keeps a single source of truth for
 			// how a link is drawn. Then solve -- closing a pipe can isolate a node, which the
@@ -8484,8 +8931,12 @@ var EngCalcs = EngCalcs || {};
 		label.appendChild(text);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
+		// Base's status is reported as an answer to the word on THIS box ("Closed"), not as the
+		// stored token: "Base: open" beside a box labelled Closed is one negation more than a
+		// reader should have to do, and it needs no key of its own.
+		overrideMarker(fields, l, 'status', function (v) { return formatPropValue(v === 'closed'); });
 	}
-	function numberFieldPlain(fields, labelText, value, onChange, tip) {
+	function numberFieldPlain(fields, labelText, value, onChange, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.value = value;
 		input.addEventListener('change', function () { onChange(+input.value); scheduleSolve(); });
@@ -8493,6 +8944,35 @@ var EngCalcs = EngCalcs || {};
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
+		if (ov) { overrideMarker(fields, ov.el, ov.prop); }
+	}
+	// ---- `active`: an ordinary overridable boolean, and the whole of how topology varies ----
+	// Task 184's corrected rule -- MEMBERSHIP is overridable, IDENTITY is not. A proposed loop lives
+	// in Base inactive and a scenario overrides it active; deleting inside a scenario sets it
+	// inactive. No new delta type and no second element set, which is exactly why the "with the new
+	// 12 inch loop vs. without" case stays coherent.
+	// Offered on every node and every link, in Base too: unticking here in Base is how a proposed
+	// element is parked without deleting it.
+	function activeField(fields, el) {
+		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
+			input = document.createElement('input'), text = document.createElement('span');
+		input.type = 'checkbox';
+		input.checked = effective(el, 'active') !== false;
+		input.addEventListener('change', function () {
+			saveUndoSnapshot();
+			setProp(el, 'active', input.checked);
+			afterPropertyEdit(el);
+			refreshPopupIfOpen();
+		});
+		// Box first, then words, in its own <span> -- setFieldLabel() assigns textContent, which
+		// would wipe a checkbox already appended to the same element. Same order as closedField().
+		setFieldLabel(text, pc.lpn_field_active || 'In this network', pc.lpn_field_active_tip);
+		label.appendChild(input);
+		label.appendChild(document.createTextNode(' '));
+		label.appendChild(text);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, el, 'active');
 	}
 	function refreshPopupIfOpen() {
 		var popup = document.getElementById('lpn_popup');
@@ -8510,9 +8990,15 @@ var EngCalcs = EngCalcs || {};
 	// shift() drops the oldest snapshot once the stack is full rather than growing unbounded.
 	var UNDO_LIMIT = 20;
 	var undoStack = [];
+	// THE SCENARIOS RIDE WITH THE DOCUMENT (ROADMAP Task 184: "one document, one undo stack"), which
+	// is the one-line change the container's own comment anticipated. They have to: an override edit
+	// changes what the map shows and what the solver reads exactly as an element edit does, and a
+	// stack that restored the elements while leaving the overrides behind would undo half of a
+	// scenario-side change -- or, after undoing a Base-side deletion, resurrect an element whose
+	// overrides the deletion had purged.
 	function saveUndoSnapshot() {
 		markEdited(); // one seam, because every real mutation snapshots before it changes anything
-		undoStack.push(JSON.parse(JSON.stringify(doc)));
+		undoStack.push(JSON.parse(JSON.stringify({ doc: doc, scenarios: scenarios, active: project.activeScenario })));
 		if (undoStack.length > UNDO_LIMIT) { undoStack.shift(); }
 	}
 	// Switching projects drops the undo history (Task 146.08). The stack holds snapshots of the
@@ -8521,11 +9007,17 @@ var EngCalcs = EngCalcs || {};
 	function clearUndo() { undoStack.length = 0; }
 	function undo() {
 		if (undoStack.length === 0) { return; }
-		doc = undoStack.pop();
+		var snap = undoStack.pop();
+		doc = snap.doc;
+		scenarios = snap.scenarios;
+		// Restored too, because a snapshot taken in one scenario and undone from another would
+		// otherwise leave the map showing a scenario the restored values were never about.
+		if (scenarios.some(function (s) { return s.id === snap.active; })) { project.activeScenario = snap.active; }
 		recountNextId();
 		closePopup(); // whatever it referenced may no longer exist post-undo (e.g. undoing an Add)
 		buildDom();
 		updateEmptyHint();
+		refreshScenarioStatus();
 		scheduleSolve();
 	}
 	document.addEventListener('keydown', function (e) {
@@ -8568,8 +9060,17 @@ var EngCalcs = EngCalcs || {};
 		return effective(l, 'length') / unitFactor('lpn_u_length');
 	}
 	var lastSolveResult = null;
+	// AN INACTIVE ELEMENT IS NOT IN THE NETWORK (Task 184). `active` is an ordinary overridable
+	// boolean, so this is the whole of how a scenario varies topology: the proposed loop is in the
+	// document, drawn greyed, and simply absent from the model handed to the solver.
+	// A link whose END is inactive goes with it, or the solver is handed the dangling reference its
+	// own diagnostics exist to complain about -- and a "delete this node" in a scenario would report
+	// an error instead of doing what it said.
+	function isActive(el) { return effective(el, 'active') !== false; }
 	function assembleModel() {
-		var nodes = doc.nodes.map(function (n) {
+		var live = {};
+		doc.nodes.forEach(function (n) { if (isActive(n)) { live[n.id] = true; } });
+		var nodes = doc.nodes.filter(isActive).map(function (n) {
 			if (n.type === 'tank') {
 				// A tank passes BOTH its resolved surface head (what the steady-state solve reads,
 				// see EngCalcs.lpnIsFixedHead) AND its vessel geometry, which the native solver
@@ -8594,7 +9095,9 @@ var EngCalcs = EngCalcs || {};
 				? { id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'), head: toSI(reservoirHead(n), 'lpn_u_elevhead') }
 				: { id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'), demand: toSI(effective(n, 'demand') || 0, 'lpn_u_flow'), emitter: effective(n, 'emitter') };
 		});
-		var links = doc.links.map(function (l) {
+		var links = doc.links.filter(function (l) {
+			return isActive(l) && live[l.from] && live[l.to];
+		}).map(function (l) {
 			return {
 				id: l.id, type: l.type, from: l.from, to: l.to,
 				// roughness (Hazen-Williams C) and k are dimensionless, so they cross this boundary
@@ -8828,6 +9331,51 @@ var EngCalcs = EngCalcs || {};
 		relayoutLabels();
 		doc.links.forEach(function (l) { updateArrow(l.id); });
 		renderLabelsLegend();
+		// Called from HERE and not from every caller of it, because the halos are filtered by the
+		// Labels panel and this function is what every label-affecting change already goes through:
+		// a toggle, a solve, a unit switch, a rebuild. Anything that can change which properties are
+		// on screen therefore re-decides which halos are on screen, with nothing to remember.
+		refreshScenarioMarks();
+	}
+	// ---- audit halos, and the greying of inactive elements (ROADMAP Task 184) ----
+	// A halo marks an element carrying an override IN THE CURRENT SCENARIO, filtered by the same
+	// Labels-panel checkboxes the rest of the page uses as its property filter (Task 184; the same
+	// reuse the two pushes make). This is why the overrides REPORT is explicitly low priority --
+	// the halo puts the same information in the place the user is already looking.
+	//
+	// A property with no Labels checkbox (status, active, a tank's level) is ALWAYS shown: the
+	// filter can only hide what it is able to name, and silently dropping an override the panel has
+	// no row for would make the halos quietly incomplete rather than filtered.
+	var LPN_OVERRIDE_LABEL_FIELD = {
+		node: { demand: 'demand', head: null, level: null, emitter: null, active: null },
+		link: { diameter: 'diameter', roughness: 'roughness', k: 'km', length: 'length', status: null, active: null }
+	};
+	function overrideIsDisplayed(el, prop) {
+		var group = elGroup(el), field = (LPN_OVERRIDE_LABEL_FIELD[group] || {})[prop];
+		return field ? !!labelSettings[group][field] : true;
+	}
+	function hasDisplayedOverride(el) {
+		var ov = activeScenario().overrides[el.id];
+		if (!ov) { return false; }
+		return Object.keys(ov).some(function (p) { return overrideIsDisplayed(el, p); });
+	}
+	function refreshScenarioMarks() {
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id], off = !isActive(n);
+			if (!ne) { return; }
+			ne.circle.classList.toggle('lpn-override', hasDisplayedOverride(n));
+			ne.circle.classList.toggle('lpn-inactive', off);
+			if (ne.symbol) { ne.symbol.classList.toggle('lpn-inactive', off); }
+			ne.text.classList.toggle('lpn-inactive', off);
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id], off = !isActive(l);
+			if (!le) { return; }
+			if (le.halo) { le.halo.classList.toggle('lpn-override', hasDisplayedOverride(l)); }
+			le.line.classList.toggle('lpn-inactive', off);
+			le.text.classList.toggle('lpn-inactive', off);
+			if (le.symbolG) { le.symbolG.classList.toggle('lpn-inactive', off); }
+		});
 	}
 	// The layout half of refreshLabelText(), without rebuilding any text: re-run collision
 	// avoidance, then place every label (text, mask, leader) and its extrema ticks at the resulting

@@ -1645,6 +1645,35 @@ $ec_lang['lpn_push_elements']='Nodes and pipes:';
 $ec_lang['lpn_push_none_displayed']='No starting value is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.';
 $ec_lang['lpn_push_nothing']='No existing element has any of the properties being applied.';
 $ec_lang['lpn_push_no_change']='Every element already has these values, so nothing would change.';
+// ---- Scenarios (ROADMAP Task 184) ----
+// A project holds one drawing and a list of scenarios. Base is the drawing itself; every other
+// scenario is nothing but a set of values of its own, laid over Base.
+// "Own values", not "overrides": the readout sits in an 11px status strip beside the units, and the
+// question it answers is how much of this scenario is its own rather than inherited.
+$ec_lang['lpn_scenario_label']='Scenario';
+$ec_lang['lpn_scenario_base']='Base';
+$ec_lang['lpn_scenario_overrides']='Own values';
+$ec_lang['lpn_scenario_tip']='Which set of values the drawing is showing and solving right now. Click to switch scenarios, or to add, rename, or delete one.';
+$ec_lang['lpn_scenario_new']='New scenario…';
+$ec_lang['lpn_scenario_new_name']='Scenario {n}';
+$ec_lang['lpn_scenario_prompt_name']='Name for this scenario';
+$ec_lang['lpn_scenario_rename']='Rename scenario…';
+$ec_lang['lpn_scenario_delete']='Delete scenario';
+$ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and the {n} values it holds of its own? The drawing itself is not changed.';
+$ec_lang['lpn_scenario_override']='Only in this scenario';
+$ec_lang['lpn_scenario_override_tip']='Ticked means this value belongs to this scenario alone, even when it is the same number as Base. Clear the tick to use the Base value again.';
+$ec_lang['lpn_scenario_base_value']='Base: {value}';
+$ec_lang['lpn_scenario_deactivated']='{id} is switched off in {scenario}. It is still in the drawing, and in your other scenarios.';
+$ec_lang['lpn_scenario_push_btn']='Apply Base values to all scenarios';
+$ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value for the properties whose labels are showing right now. Values those scenarios hold of their own are thrown away.';
+$ec_lang['lpn_scenario_push_confirm']='Make every scenario use the Base values for these properties? Values those scenarios hold of their own are thrown away. You can undo this.';
+$ec_lang['lpn_scenario_push_scenarios']='Scenarios:';
+$ec_lang['lpn_scenario_push_values']='Values thrown away:';
+$ec_lang['lpn_scenario_push_none']='No scenario has a value of its own for any of these properties, so nothing would change.';
+$ec_lang['lpn_delete_drops_overrides']='Deleting this also throws away {n} values your scenarios hold for it. Continue?';
+$ec_lang['lpn_push_base_only']='This changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.';
+$ec_lang['lpn_field_active']='In this network';
+$ec_lang['lpn_field_active_tip']='Clear this to leave the element on the drawing but out of the network: it is drawn grey and the solver ignores it. In a scenario this is how a proposed pipe is switched on and off.';
 $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.

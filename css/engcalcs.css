@@ -257,6 +257,31 @@ html[lang="zh"] .ec-welcome {
    not as a third node type) -- previously a hollow white circle with the pump's #a52 stroke,
    which had no relation to the link it belonged to and could be mistaken for a small pump. */
 .lpn-vhandle { fill: #557; stroke: #223; stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: move; }
+/* ---- Scenarios: the audit halo and the inactive element (ROADMAP Task 184) ----
+   AN OUTLINE, NEVER A FILL, and that is the whole reason a link gets a second element rather than
+   a restyle: the pipe's own stroke IS the pipe, so recolouring it to mark an override would
+   collide with the closed-link dashes, the pump's colour, and every future result-driven styling
+   this map spends colour on. A wider line UNDERNEATH composes with all of them.
+   Amber rather than red: an override is a deliberate act, not a fault, and red is spent on
+   condition here (.lpn-node-pending). Hidden until refreshScenarioMarks() adds .lpn-override,
+   which is why every link can carry one at no visual cost. */
+.lpn-link-halo { stroke: none; pointer-events: none; }
+.lpn-link-halo.lpn-override { stroke: #e8a33d; stroke-width: calc(2 * var(--lpn-sym, 1)); }
+/* A node's own circle carries its halo as a ring: it already draws as a filled disc, so a stroke
+   around it IS an outline. Placed BEFORE .lpn-node-pending below, so a node that is both
+   overridden and mid-pipe-draw shows the pending ring -- that one is about what your next click
+   does, and it is the more urgent of the two. */
+.lpn-node.lpn-override { stroke: #e8a33d; stroke-width: calc(0.5 * var(--lpn-sym, 1)); }
+/* NOT IN THIS NETWORK: drawn, but out of the model (see isActive() in js/looped-network.js). Faded
+   rather than hidden, because the whole point of the inactive/active pair is to see both at once --
+   "with the new loop vs. without" wants the proposal visible beside the network it would join. */
+.lpn-inactive { opacity: 0.3; }
+/* The override marker under a property row, and Base's value beside it. Indented and small so the
+   row above stays the property and this reads as a note about it -- there is one of these under
+   every editable field once you are inside a scenario, and at full weight they would outnumber and
+   outshout the numbers they annotate. */
+.lpn-ov-marker { margin-left: 1.5em; font-size: 0.85em; }
+.lpn-ov-base { margin-left: 0.6em; color: #666; }
 /* Feedback for the first-picked node of a pipe/pump (Tom, 2026-07-30: "otherwise there's no
    indication that anything is working") -- a wide red ring around the existing node fill/stroke,
    cleared by setPendingLinkFrom(null) in looped-network.js on completion or cancel. */

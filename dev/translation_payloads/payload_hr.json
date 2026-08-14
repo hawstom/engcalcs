@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hr",
-        "expected_key_count": 873,
-        "delta_key_count": 16,
+        "expected_key_count": 897,
+        "delta_key_count": 40,
         "exempt_key_count": 17,
         "exempt_keys": [
             "calc_units_us",
@@ -309,7 +309,31 @@
         "lpn_mode_add_tank": "Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move elements and labels.",
         "lpn_method_switch_confirm": "Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?",
         "lpn_field_closed": "Closed",
-        "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+        "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.",
+        "lpn_scenario_label": "Scenario",
+        "lpn_scenario_base": "Base",
+        "lpn_scenario_overrides": "Own values",
+        "lpn_scenario_tip": "Which set of values the drawing is showing and solving right now. Click to switch scenarios, or to add, rename, or delete one.",
+        "lpn_scenario_new": "New scenario…",
+        "lpn_scenario_new_name": "Scenario {n}",
+        "lpn_scenario_prompt_name": "Name for this scenario",
+        "lpn_scenario_rename": "Rename scenario…",
+        "lpn_scenario_delete": "Delete scenario",
+        "lpn_scenario_delete_confirm": "Delete the scenario {name}, and the {n} values it holds of its own? The drawing itself is not changed.",
+        "lpn_scenario_override": "Only in this scenario",
+        "lpn_scenario_override_tip": "Ticked means this value belongs to this scenario alone, even when it is the same number as Base. Clear the tick to use the Base value again.",
+        "lpn_scenario_base_value": "Base: {value}",
+        "lpn_scenario_deactivated": "{id} is switched off in {scenario}. It is still in the drawing, and in your other scenarios.",
+        "lpn_scenario_push_btn": "Apply Base values to all scenarios",
+        "lpn_scenario_push_tip": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values those scenarios hold of their own are thrown away.",
+        "lpn_scenario_push_confirm": "Make every scenario use the Base values for these properties? Values those scenarios hold of their own are thrown away. You can undo this.",
+        "lpn_scenario_push_scenarios": "Scenarios:",
+        "lpn_scenario_push_values": "Values thrown away:",
+        "lpn_scenario_push_none": "No scenario has a value of its own for any of these properties, so nothing would change.",
+        "lpn_delete_drops_overrides": "Deleting this also throws away {n} values your scenarios hold for it. Continue?",
+        "lpn_push_base_only": "This changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.",
+        "lpn_field_active": "In this network",
+        "lpn_field_active_tip": "Clear this to leave the element on the drawing but out of the network: it is drawn grey and the solver ignores it. In a scenario this is how a proposed pipe is switched on and off."
     },
     "keys": {
         "lpn_tool_add_tank": "Tank",
@@ -327,7 +351,31 @@
         "lpn_mode_add_tank": "Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move elements and labels.",
         "lpn_method_switch_confirm": "Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?",
         "lpn_field_closed": "Closed",
-        "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+        "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.",
+        "lpn_scenario_label": "Scenario",
+        "lpn_scenario_base": "Base",
+        "lpn_scenario_overrides": "Own values",
+        "lpn_scenario_tip": "Which set of values the drawing is showing and solving right now. Click to switch scenarios, or to add, rename, or delete one.",
+        "lpn_scenario_new": "New scenario…",
+        "lpn_scenario_new_name": "Scenario {n}",
+        "lpn_scenario_prompt_name": "Name for this scenario",
+        "lpn_scenario_rename": "Rename scenario…",
+        "lpn_scenario_delete": "Delete scenario",
+        "lpn_scenario_delete_confirm": "Delete the scenario {name}, and the {n} values it holds of its own? The drawing itself is not changed.",
+        "lpn_scenario_override": "Only in this scenario",
+        "lpn_scenario_override_tip": "Ticked means this value belongs to this scenario alone, even when it is the same number as Base. Clear the tick to use the Base value again.",
+        "lpn_scenario_base_value": "Base: {value}",
+        "lpn_scenario_deactivated": "{id} is switched off in {scenario}. It is still in the drawing, and in your other scenarios.",
+        "lpn_scenario_push_btn": "Apply Base values to all scenarios",
+        "lpn_scenario_push_tip": "Every scenario goes back to the Base value for the properties whose labels are showing right now. Values those scenarios hold of their own are thrown away.",
+        "lpn_scenario_push_confirm": "Make every scenario use the Base values for these properties? Values those scenarios hold of their own are thrown away. You can undo this.",
+        "lpn_scenario_push_scenarios": "Scenarios:",
+        "lpn_scenario_push_values": "Values thrown away:",
+        "lpn_scenario_push_none": "No scenario has a value of its own for any of these properties, so nothing would change.",
+        "lpn_delete_drops_overrides": "Deleting this also throws away {n} values your scenarios hold for it. Continue?",
+        "lpn_push_base_only": "This changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.",
+        "lpn_field_active": "In this network",
+        "lpn_field_active_tip": "Clear this to leave the element on the drawing but out of the network: it is drawn grey and the solver ignores it. In a scenario this is how a proposed pipe is switched on and off."
     },
     "key_context": {
         "lpn_tool_add_tank": {
@@ -583,6 +631,390 @@
                     "key": "lpn_field_text_size",
                     "value": "Množitelj veličine",
                     "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_scenario_label": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_base": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_overrides": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_new": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_new_name": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_prompt_name": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_rename": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_delete": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_delete_confirm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_override": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_override_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_base_value": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_deactivated": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_push_btn": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_push_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_push_confirm": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_push_scenarios": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_push_values": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_scenario_push_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_delete_drops_overrides": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_push_base_only": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_field_active": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
+                }
+            }
+        },
+        "lpn_field_active_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_push_no_change",
+                    "value": "Svaki element već ima ove vrijednosti, pa se ništa ne bi promijenilo.",
+                    "english": "Every element already has these values, so nothing would change."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_emitter_exponent",
+                    "value": "Eksponent emitera",
+                    "english": "Emitter exponent"
                 }
             }
         }
