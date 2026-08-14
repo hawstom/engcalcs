@@ -217,7 +217,7 @@
         "mtc_d50_bottom": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required bottom angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
         "mtc_d50_z1": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required side slope 1 angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
         "mtc_d50_z2": "<span class=\"ec-help\" title=\"Per Isbash (1936) and Maricopa County, Arizona, US.\">Required side slope 2 angular rock size, D<sub>50<\/sub> (Isbash & MC) <span class=\"ec-tip\">?<\/span><\/span>",
-        "mtc_d50_mra": "Required angular rock size, D<sub>50<\/sub> (Maynord, Ruff, and Abt 1989)",
+        "mtc_d50_mra": "<span class=\"ec-help\" title=\"Per Maynord, Ruff, and Abt (1989). At a bend the rock is sized for a bend velocity of 4\/3 of the average, per California Division of Highways (1970); Maynord's own 1.5 applies to natural channels.\">Required angular rock size, D<sub>50<\/sub> (Maynord, Ruff, and Abt 1989) <span class=\"ec-tip\">?<\/span><\/span>",
         "mtc_d50_searcy": "Required angular rock size, D<sub>50<\/sub> (Searcy 1967)",
         "mtc_vel_ok": "Velocity is reasonable for the uniform-flow assumptions.",
         "mtc_vel_low": "Velocity is low; sedimentation risk.",

@@ -249,6 +249,72 @@ r.section('regression: every radio combination is self-consistent');
 		'the safety factor still scales a calculated rock size');
 }
 
+// ---- the riprap columns, against their published forms -------------------------------------
+// Source: Witheridge, "Background to Rock Sizing Equations" (Catchments & Creeks), read and
+// confirmed by Tom, 2026-08-14. All SI: d50 m, V m/s, y m.
+r.section('riprap sizing against the published equations');
+
+{
+	// A steep channel, so the rock sizes are large enough to compare meaningfully.
+	const mk = (beta) => {
+		const q = loadCalculator('Manning-Trap.php', { lang: 'en' });
+		q.set({ b: 4, y: 2, z1: 2, z2: 2, s0: 0.05, n_in: 0.03, d50_in: 6, beta: beta, sgrock: 2.65 }).run();
+		return q;
+	};
+	const straight = mk(0), bend = mk(45);
+	// V from the results cell; y is an INPUT on this page, so it is converted with the page's own
+	// unit factor rather than read from a result.
+	const V = straight.si('v');
+	const Y = 2 / straight.factor('y');
+
+	// MAYNORD, RUFF & ABT (1989), Eq 14/17:  d50 = 0.031 (Ss-1)^-1.25 V^2.5 / y^0.25
+	// Computed here from first principles, not from the page's own numbers.
+	const mraDoc = 0.031 * Math.pow(2.65 - 1, -1.25) * Math.pow(V, 2.5) / Math.pow(Y, 0.25);
+	r.close(straight.si('d50_mra'), mraDoc, 2e-3,
+		'Maynord d50 = 0.031 (Ss-1)^-1.25 V^2.5 / y^0.25');
+
+	// THE EXPONENT, isolated. -0.25 (the old code) and -1.25 (the source) agree at no sg but
+	// differ by exactly (Ss-1) -- so this is the assertion that would have caught the lost digit.
+	const heavy = loadCalculator('Manning-Trap.php', { lang: 'en' });
+	heavy.set({ b: 4, y: 2, z1: 2, z2: 2, s0: 0.05, n_in: 0.03, d50_in: 6, beta: 0, sgrock: 2.0 }).run();
+	r.close(heavy.si('d50_mra') / straight.si('d50_mra'),
+		Math.pow((2.0 - 1) / (2.65 - 1), -1.25), 3e-3,
+		'Maynord responds to specific gravity as (Ss-1)^-1.25, not ^-0.25');
+
+	// SEARCY (1967), Eq 6: 0.022 V^2, stated in SI by the reference. Deliberately NOT converted.
+	r.close(straight.si('d50_searcy'), 0.022 * V * V, 2e-3,
+		'Searcy d50 = 0.022 V^2, read as SI (see the note in Manning.lib.js)');
+
+	// A BEND MAKES ROCK BIGGER. This is the direction lock: the pre-fix code divided the Maynord
+	// d50 by 1.5, so a 45 deg bend returned a 33% SMALLER rock while the page's own Isbash column
+	// returned a 95% larger one -- two methods disagreeing in direction on one input.
+	r.ok(bend.num('d50_mra') > straight.num('d50_mra'),
+		'a bend INCREASES the Maynord rock size',
+		`${straight.num('d50_mra').toFixed(2)} in -> ${bend.num('d50_mra').toFixed(2)} in`);
+	r.ok(bend.num('d50_z1') > straight.num('d50_z1'),
+		'a bend INCREASES the Isbash rock size',
+		`${straight.num('d50_z1').toFixed(2)} in -> ${bend.num('d50_z1').toFixed(2)} in`);
+
+	// The factor is California Division of Highways (1970), V_bend = 4/3 V_avg, applied to the
+	// VELOCITY -- so d50, which goes as V^2.5, grows by (4/3)^2.5. Not Maynord's 1.5, which is for
+	// natural channels; this calculator is mostly used on artificial ones (Tom, 2026-08-14).
+	r.close(bend.si('d50_mra') / straight.si('d50_mra'), Math.pow(4 / 3, 2.5), 3e-3,
+		'the bend factor is (4/3)^2.5, applied to V and not to d50');
+
+	// Searcy carries no bend term at all, so it must not move.
+	r.close(bend.si('d50_searcy'), straight.si('d50_searcy'), 1e-6,
+		'Searcy has no bend term, so a bend leaves it alone');
+
+	// And with the bend factor now on the right side, the two independent methods agree to within
+	// 15% instead of disagreeing about which way the answer goes.
+	for (const [label, c] of [['straight', straight], ['45 deg bend', bend]]) {
+		const ratio = c.num('d50_mra') / c.num('d50_z1');
+		r.ok(ratio > 0.6 && ratio < 1.6,
+			`${label}: Maynord and Isbash agree within a factor of 1.6`,
+			`Maynord ${c.num('d50_mra').toFixed(2)} in vs Isbash ${c.num('d50_z1').toFixed(2)} in`);
+	}
+}
+
 // A CONVERGED ANSWER MUST NOT DEPEND ON WHERE YOU STARTED. This is the cleanest invariant in
 // this file: it needs no reference, no published table and no hand arithmetic -- an iteration
 // whose fixed point moves with the initial guess is simply not converged.

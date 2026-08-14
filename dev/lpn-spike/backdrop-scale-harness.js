@@ -265,10 +265,19 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 	report(/lpn_backdrop_unreadable/.test(src), 'and reports it with a translated message');
 	const php = fs.readFileSync(path.join(__dirname, '../../Looped-Network.php'), 'utf8');
 	const accept = (php.match(/id="lpn_backdrop_file"[^>]*accept="([^"]*)"/) || [])[1] || '';
-	report(!/image\/\*/.test(accept), 'the picker no longer offers every image/* type, TIFF included', accept.slice(0, 40) + '…');
-	report(/\.png/.test(accept) && /\.jpg/.test(accept) && /image\/png/.test(accept),
-		'it names both extensions and MIME types — desktop pickers filter on one, mobile on the other');
-	report(/\.wld/.test(accept) && /\.pgw/.test(accept), 'world-file sidecars are still offered');
+	report(!/image\/\*/.test(accept), 'the picker no longer offers every image/* type, TIFF included', accept);
+	report(['image/png', 'image/jpeg', 'image/gif', 'image/bmp'].every(t => accept.includes(t)),
+		'the four formats anybody has actually brought here are offered');
+	report(!/webp|avif|svg/.test(accept), 'and nothing is offered on the strength of being decodable alone');
+	// A user picks the picture AND its world file in one go (the input is multiple), so the sidecars
+	// have to be in the filter or they are invisible in the dialog. They have no MIME type, so they
+	// are named by extension while the pictures are named by type.
+	report(/multiple/.test(php.match(/<input[^>]*id="lpn_backdrop_file"[^>]*>/)[0]), 'the picker still takes both files at once');
+	report(['.pgw', '.pngw', '.jgw', '.jpgw', '.gfw', '.bpw', '.wld'].every(e => accept.includes(e)),
+		'every offered picture format has its world file offered too, plus generic .wld');
+	// Short enough to read in one line. A filter nobody can read is one nobody can check, which is
+	// how image/* survived while quietly offering a format that could never work.
+	report(accept.split(',').length <= 12, 'the list is still readable', `${accept.split(',').length} entries`);
 }
 
 console.log(`\n${checks - failures}/${checks} passed`);

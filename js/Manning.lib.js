@@ -73,7 +73,7 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 	var n_prev, n_settled, d50_settled;
 	var a, pw, rh, t, da, da_over_d50, v, q, froude, tau,
 		n_blodgett, n_bathurst, n_pi, rh_ft, d50_ft, blodgett_v_bathurst,
-		d50_mra, d50_searcy, c_isbash, d50_bottom, d50_z1, d50_z2, d50_calc;
+		d50_mra, d50_searcy, c_isbash, d50_bottom, d50_z1, d50_z2, d50_calc, v_bend;
 	while (iterate_p === true && i < 100) {
 		i++;
 		a = p.y * (p.b + (+p.z1 + +p.z2) * p.y / 2);
@@ -132,7 +132,37 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 		d50_bottom = EngCalcs.Manning.mc_riprap_size(p.y, a, v, g, 1000, p.s0, c_isbash, p.sgrock);
 		d50_z1 = EngCalcs.Manning.mc_riprap_size(p.y, a, v, g, p.z1, p.s0, c_isbash, p.sgrock);
 		d50_z2 = EngCalcs.Manning.mc_riprap_size(p.y, a, v, g, p.z2, p.s0, c_isbash, p.sgrock);
-		d50_mra = 0.031 * Math.pow(v, 2.5) / (Math.pow(p.sgrock - 1, 0.25) * Math.pow(p.y, 0.25) * ((p.beta <= 30) ? 1 : 1.5));
+		// MAYNORD, RUFF & ABT (1989), corrected 2026-08-14 against Witheridge, "Background to Rock
+		// Sizing Equations" (Catchments & Creeks), Eq 14/17, verified by Tom against the source:
+		//
+		//     d50 = 0.031 sf (Ss-1)^-1.25 V^2.5 / y^0.25      [d50 m, V m/s, y m]
+		//
+		// Two things were wrong here and both were silent:
+		//   * THE EXPONENT ON (Ss-1) HAD LOST A DIGIT -- 0.25 where the source says 1.25. At the
+		//     default sg = 2.65 that made the rock 1.65x oversized (conservative, so nothing ever
+		//     looked wrong), and it under-responded to sgrock, which is a user-editable input.
+		//   * THE BEND FACTOR WAS APPLIED TO d50 AND INVERTED. The source adjusts the VELOCITY,
+		//     not the rock: a bend raises V, and d50 goes as V^2.5. Dividing d50 by 1.5 instead of
+		//     raising V multiplied the answer by 0.67 where it should be ~2, an error of about
+		//     4x IN THE UNSAFE DIRECTION -- the smallest rock exactly where a bend demands the
+		//     most. The page's own Isbash column disagreed with it in DIRECTION, which is what
+		//     gave it away (Isbash handles a bend through K, 1.2 -> 0.86, and correctly grows).
+		//
+		// 4/3, not Maynord's 1.5: Maynord's 1.5 is for NATURAL channels, and this calculator is
+		// mostly used on artificial ones. 4/3 is California Division of Highways (1970), cited in
+		// the same reference (Eq 18) -- and cited on the label too, since the column carries
+		// Maynord's name and this factor is not his. Tom's call, 2026-08-14.
+		//
+		// sf lives OUTSIDE this expression, as the page's own d50_safety input applied to
+		// d50_calc below, which is the same thing in a different place.
+		v_bend = (p.beta <= 30) ? v : v * 4 / 3;
+		d50_mra = 0.031 * Math.pow(v_bend, 2.5) / (Math.pow(p.sgrock - 1, 1.25) * Math.pow(p.y, 0.25));
+		// SEARCY (1967), Eq 6 of the same reference: 0.022 V^2, and the reference states it in SI.
+		// LEFT AS IT IS ON PURPOSE. A code review argued this was a US-customary constant applied
+		// to an SI velocity, because 0.022 is also exactly the Isbash form at K = 0.86 in ft units
+		// -- but that is a coincidence, not a derivation, and read as SI it sits sensibly BELOW
+		// Maynord and both Isbash values rather than landing precisely on one of them. Resolves
+		// the open question at dev/ai-report.md:125. Do not "fix" this without Searcy 1967 itself.
 		d50_searcy = 0.022 * Math.pow(v, 2);
 		switch (p.d50_radio) {
 			case 'isbash':

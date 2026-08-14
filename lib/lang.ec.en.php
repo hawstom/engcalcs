@@ -442,7 +442,7 @@ $ec_lang['mtc_d50_z1']='<span class="ec-help" title="Per Isbash (1936) and Maric
 $ec_lang_syn['mtc_d50_z1']='';
 $ec_lang['mtc_d50_z2']='<span class="ec-help" title="Per Isbash (1936) and Maricopa County, Arizona, US.">Required side slope 2 angular rock size, D<sub>50</sub> (Isbash & MC) <span class="ec-tip">?</span></span>';
 $ec_lang_syn['mtc_d50_z2']='';
-$ec_lang['mtc_d50_mra']='Required angular rock size, D<sub>50</sub> (Maynord, Ruff, and Abt 1989)';
+$ec_lang['mtc_d50_mra']='<span class="ec-help" title="Per Maynord, Ruff, and Abt (1989). At a bend the rock is sized for a bend velocity of 4/3 of the average, per California Division of Highways (1970); Maynord\'s own 1.5 applies to natural channels.">Required angular rock size, D<sub>50</sub> (Maynord, Ruff, and Abt 1989) <span class="ec-tip">?</span></span>';
 $ec_lang_syn['mtc_d50_mra']='';
 $ec_lang['mtc_d50_searcy']='Required angular rock size, D<sub>50</sub> (Searcy 1967)';
 $ec_lang_syn['mtc_d50_searcy']='';

@@ -1754,6 +1754,46 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|296| **[DONE 2026-08-14] Two errors in Manning Trap Channel's Maynord riprap column, one of
+  them ~4x in the unsafe direction.** Surfaced by `/code-review high js/Manning.lib.js` (the first
+  Tier 2 review this calculator has had), then checked against the primary source: Witheridge,
+  *Background to Rock Sizing Equations* (Catchments & Creeks), which Tom read and transcribed.
+  The published form is `d50 = 0.031 sf (Ss-1)^-1.25 V^2.5 / y^0.25` (Eq 14/17), SI throughout.
+  - **THE BEND FACTOR WAS ON THE WRONG QUANTITY AND INVERTED.** The source raises the VELOCITY at a
+    bend; the code divided d50 by 1.5. Since d50 goes as V^2.5 that is x0.67 where it should be
+    ~x2 — **about 4x too small, exactly where a bend demands the most armour.** What gave it away
+    was that the page's own Isbash column moved the OTHER way on the same input (Isbash handles a
+    bend through K, 1.2 -> 0.86, and correctly grows): two methods disagreeing in DIRECTION is a
+    signal no single-method check could produce.
+  - **THE (Ss-1) EXPONENT HAD LOST A DIGIT** — `^0.25` where the source says `^1.25`. At the default
+    sg = 2.65 that made the rock 1.65x oversized, which is conservative and therefore never looked
+    wrong, and it under-responded to `sgrock`, a user-editable input. Tom verified `-1.25` against
+    the reference before it was changed.
+  - **4/3, not Maynord's 1.5 — Tom's call, and it needed a citation.** Maynord's 1.5 is for NATURAL
+    channels and this calculator is mostly used on artificial ones, so the bend velocity is 4/3 of
+    average per California Division of Highways (1970), Eq 18 of the same reference. Because the
+    column carries Maynord's name and this factor is not his, `mtc_d50_mra` now carries a tip
+    saying so. **Costs one key x 26 languages**, flagged CHANGED by the drift tripwire and
+    degrading gracefully meanwhile (the label still renders; only the tip is English-only).
+  - **Searcy's 0.022 was challenged and SURVIVED.** The review argued it was a US constant on an SI
+    velocity because it matches Isbash at K = 0.86 in ft units to 2%. It is a coincidence: the
+    reference states Searcy in SI, and the SI reading puts it sensibly below the other three
+    methods rather than exactly on one. Left alone, pinned by an assertion, and `dev/ai-report.md`
+    updated from "unverified" to resolved.
+  - **MRA's side-slope rule is deliberately not implemented** (Tom: *"I agree no correction for
+    mra"*). The source recommends no change from the bottom d50 for sides flatter than 1V:2H and
+    +25% at 1V:1.5H; the page sizes sides with Isbash instead, which is a different and defensible
+    method, not an omission.
+  - **The two methods now AGREE**, which is the corroboration worth recording: on a steep test
+    channel Maynord and Isbash give 22.0 vs 25.3 in straight and 45.2 vs 49.2 in on a 45 deg bend,
+    where before the fix they disagreed about which way the answer went. Nine new assertions in
+    `mtc-harness.js` pin each equation to its published form, the bend DIRECTION for both methods,
+    the `(4/3)^2.5` factor, and the sg exponent. Mutation-tested: reverting the exponent fails 2,
+    inverting the bend fails 3, "converting" Searcy fails 1.
+  - **Direction of the changes, for anyone asking why numbers moved:** at a bend the Maynord rock
+    got substantially BIGGER (the safety-relevant fix); away from a bend it got SMALLER by 1.65x at
+    the default sg (removing conservatism that was never intended); Searcy and Isbash are unchanged.
+
 - 0|300| **[DONE 2026-08-14] A new background image landed at the world origin, not on the model.**
   `initialBackdropPlacement()` (was `initialBackdropSize`) now centres the image on `bbox()` as well
   as sizing it to that extent. Tom: *"I added a background image to an existing model, and I cannot
@@ -1761,10 +1801,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   a correctly-sized picture ~10⁶ units off screen, and Scale/Move both need you to click the thing
   you cannot see. Also: `downscaleImage()` had no `onerror`, so a file the browser cannot decode
   (TIFF — offered by `accept="image/*"`, decoded by no major browser) did *nothing at all*; it now
-  says so (`lpn_backdrop_unreadable`, 26 languages) and the picker enumerates the seven decodable
-  formats instead of `image/*`. Tom asked whether to allow `*.*`: no — what we accept is whatever
-  the visitor's own browser decodes, so the list is narrowed *and* a decode failure is reported.
-  Covered by `dev/lpn-spike/backdrop-scale-harness.js` §10–11.
+  says so (`lpn_backdrop_unreadable`, 26 languages) and the picker offers png/jpg/gif/bmp plus their
+  world files — 11 entries, readable in one line. Not `*.*`, and **not "everything a browser can
+  decode" either**: CC's first cut listed webp/avif/svg on that reasoning and Tom rejected it —
+  *"Either the list is so long that it's unreadable or there are no such world files in the list."*
+  Decodable is not the test; somebody turning up holding one is. BMP stays on that test (a
+  colleague's utility maps, 2026-08-11). **A short list is cheap because "All files" is one click
+  away and an undecodable file now explains itself** — omitting a format costs a click, not a dead
+  end. Covered by `dev/lpn-spike/backdrop-scale-harness.js` §10–11.
 
 - 0|298| **[DONE 2026-08-14] The extrema badge was not part of the label's footprint.** Tom: *"The
   extrema glyph is not accounted for in the leader attachment. So it can overhang a steeply vertical
