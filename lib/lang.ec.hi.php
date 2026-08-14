@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='प्रिंट करने यो�
 $ec_lang['consent_body']='क्या हम इस ब्राउज़र प्रोफ़ाइल के संग्रहण में प्रति पृष्ठ केवल एक अंक रख सकते हैं, ताकि इसकी विज़िट को बार-बार लॉग होने से रोका जा सके?';
 $ec_lang['consent_accept']='अभी स्वीकार करें';
 $ec_lang['consent_accept_all']='हमेशा के लिए स्वीकार करें';
-$ec_lang['consent_decline']='अस्वीकार करें';
+$ec_lang['consent_decline']='हमेशा के लिए अस्वीकार करें';
 $ec_lang['consent_current_granted']='आपने इसे स्वीकार किया है। हम इस ब्राउज़र प्रोफ़ाइल के लिए लॉगिंग सीमित रखते हैं।';
 $ec_lang['consent_current_denied']='आपने इसे अस्वीकार किया है। लॉगिंग सीमित रखने के लिए हम कुछ भी संग्रहीत नहीं करते।';
 $ec_lang['consent_region_label']='लॉगिंग सीमित करने के बारे में आपकी पसंद।';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='देखें';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='सेटिंग्स';
+$ec_lang['lpn_menu_help']='सहायता';
+$ec_lang['lpn_help_walkthroughs']='मार्गदर्शिकाएँ';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,19 @@ $ec_lang['lpn_labels_decimals_tip']='इस लेबल के लिए दि
 $ec_lang['lpn_labels_mark_extrema']='सबसे ऊँचे और सबसे नीचे के मान चिह्नित करें';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='पृष्ठभूमि छवि…';
-$ec_lang['lpn_backdrop_add']='छवि जोड़ें';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
-$ec_lang['lpn_backdrop_scale']='छवि का पैमाना सेट करें';
-$ec_lang['lpn_backdrop_position']='छवि ले जाएँ';
-$ec_lang['lpn_backdrop_remove']='छवि हटाएँ';
+$ec_lang['lpn_backdrop_add']='जोड़ें';
+// BARE VERBS -- the "Background image…" heading above them now carries the object (Task 297,
+// resyncing the 2026-08-04 "Scale image"/"Position image" wording, which re-added the object word).
+$ec_lang['lpn_backdrop_scale']='चुनकर पैमाना सेट करें';
+$ec_lang['lpn_backdrop_scale_entry']='विश्व फ़ाइल से या मानचित्र पर एक पिक्सेल के आकार से पैमाना सेट करें';
+$ec_lang_syn['lpn_backdrop_scale_entry']='gloss: world file; layout: nav item';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='मानचित्र पर एक पिक्सेल का आकार दर्ज करें, या छवि की विश्व फ़ाइल की पूरी सामग्री चिपकाएँ';
+$ec_lang_syn['lpn_backdrop_scale_entry_prompt']='gloss: world file; layout: the units are appended at runtime -- do not name a unit in the text';
+$ec_lang['lpn_backdrop_scale_entry_bad']='मानचित्र पर एक पिक्सेल के आकार के लिए एक संख्या टाइप करें, या विश्व फ़ाइल की सभी छह पंक्तियाँ चिपकाएँ।';
+$ec_lang['lpn_backdrop_wld_bad']='यह विश्व फ़ाइल चित्र को घुमाती, दर्पण-प्रतिबिंबित करती, या असमान रूप से खींचती है। मानचित्र किसी चित्र को केवल स्थानांतरित कर सकता है और दोनों दिशाओं में समान मात्रा में उसका आकार बदल सकता है, इसलिए इस फ़ाइल का उपयोग नहीं किया गया।';
+$ec_lang_syn['lpn_backdrop_wld_bad']='gloss: world file';
+$ec_lang['lpn_backdrop_position']='ले जाएँ';
+$ec_lang['lpn_backdrop_remove']='हटाएँ';
 $ec_lang['lpn_backdrop_remove_confirm']='पृष्ठभूमि छवि हटाएँ?';
 $ec_lang['lpn_backdrop_scale_prompt1']='पृष्ठभूमि छवि पर दो बिंदुओं पर क्लिक करें, जैसे किसी बार-स्केल के दोनों छोर। फिर उनके बीच की वास्तविक दूरी टाइप करें।';
 $ec_lang['lpn_backdrop_scale_prompt2']='दोनों बिंदुओं के बीच वास्तविक दूरी';
