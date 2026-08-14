@@ -1008,6 +1008,14 @@ Full inventory and reasoning: `dev/cookie-storage-inventory.md`. The rules a cha
   service-related value in it — that is what made `PHPSESSID` a mixed-purpose cookie and therefore
   unlawful under a per-purpose test. A visitor preference belongs in its own cookie that the
   visitor set deliberately (`ec_language` is the worked example).
+- **Before adding storage at all, check whether something EXEMPT already answers the question**
+  (Task 200, 2026-08-14). The repeat-use signal wanted a visited-page list in `localStorage`; the
+  page's own input cookie already says the same thing, better ("they calculated here", not "they
+  glanced at it"), and is exempt because it holds what the visitor typed. The cost of storing
+  something new is never the bytes — it is the sentence in `consent_body` it makes false, and
+  therefore a banner rewrite, 26 retranslations and an `EC_CONSENT_VERSION` bump that re-asks
+  everybody. **An analytics READ of exempt storage still needs consent**, so gate the log row; you
+  just do not need to ask for anything new.
 - **New storage needs the exemption test, per purpose:** is it *strictly necessary for a service
   the visitor explicitly requested*? User-input storage (what they typed), an explicit preference,
   the consent record and the log opt-out all pass. Anything whose job is to make a **statistic**

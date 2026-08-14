@@ -327,6 +327,117 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 });
 
+// ---- Behaviour signals (ROADMAP Tasks 216 and 200) ----
+//
+// The four beacons above count PEOPLE. These count what those people then did: which reference
+// they went looking for, whether they touched the form at all, which units they landed on, whether
+// they had been here before, and where the map interface loses them. See lib/config.inc.php for
+// the five events and what each one decides.
+//
+// DEDUPED IN THIS PAGE'S MEMORY AND NOWHERE ELSE. The other beacons dedupe per (visit, page)
+// against the ec_seen cookie, whose five bits are full: a sixth would make it two base-32 digits
+// and make the consent banner's "a single digit per page" a false sentence. So a reload starts
+// these counters over, which is a small and honest cost. Nothing new is stored on the device by
+// any of this except the repeat-visit list below, which is gated on consent because it must be.
+EngCalcs._signalSent = {};
+EngCalcs.logSignal = function (event, detail) {
+	'use strict';
+	detail = detail || '';
+	var key = event + '|' + detail;
+	if (this._signalSent[key]) return;
+	this._signalSent[key] = true;
+	this._sendOrQueue('/engcalcs/log-signal-event.php', {
+		page: this.cookieName || '',
+		lang: document.documentElement.lang || '',
+		event: event,
+		detail: detail
+	});
+};
+
+// Task 216: a reference link out of the calculator. Delegated at the document rather than tagged
+// onto each <a> in PHP, because the links worth measuring live in five different pages AND in 27
+// language files (mpf_friction_slope carries its own <a> in every one of them) -- a per-link
+// attribute would have to be added in all of those and would be silently absent from the next one
+// somebody writes. "Out of the calculator" is the whole test: a different origin, or this origin
+// outside /engcalcs/ (which is how ../frictionslope.php, our own English-only explainer, counts).
+// Internal navigation between calculators is not a reference lookup and is already in the view log.
+document.addEventListener('click', function (e) {
+	'use strict';
+	var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
+	if (!a) return;
+	var url;
+	try { url = new URL(a.href, window.location.href); } catch (err) { return; }
+	// mailto:, tel: and javascript: are not reference lookups.
+	if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+	var away = (url.origin !== window.location.origin) || (url.pathname.indexOf('/engcalcs/') !== 0);
+	if (!away) return;
+	// Host and path only. A query string on one of these is a session-shaped thing (the EPA's
+	// nepis.epa.gov link is 600 characters of it) and tells us nothing the path does not.
+	EngCalcs.logSignal('outbound', (url.host + url.pathname).replace(/\/$/, '').slice(0, 80));
+}, true);
+
+// Task 200: did they touch anything before leaving? One bit, and it is the cheapest diagnostic on
+// the list -- a human view with no calculation and no touch is "could not understand it", one with
+// a touch is "tried it and did not want it", and those are opposite development responses.
+// 'change' rather than 'input' so a half-typed number is not an event, and so a value restored
+// from the cookie or a shared URL fires nothing at all.
+document.addEventListener('change', function (e) {
+	'use strict';
+	var el = e.target;
+	if (!el || !el.tagName) return;
+	var tag = el.tagName.toLowerCase();
+	if (tag !== 'input' && tag !== 'select' && tag !== 'textarea') return;
+	EngCalcs.logSignal('touch', 'input');
+	// Task 200's units question, the per-select half: which unit did each family actually land on?
+	// Only a select the presets can see (Task 162's data-family) is asked -- one with no family is
+	// invisible to the preset buttons and would be a bug to report a statistic about.
+	if (tag === 'select' && el.dataset && el.dataset.family) {
+		var opt = el.options[el.selectedIndex];
+		var unit = opt && opt.dataset ? opt.dataset.unit : '';
+		if (unit) EngCalcs.logSignal('units', el.dataset.family + ':' + unit);
+	}
+}, true);
+
+// Task 200: has this browser used this calculator before? The strongest value signal the suite
+// does not otherwise collect -- a calculator a working engineer returns to is worth more than a
+// hundred one-off visits, and nothing else here can tell those two apart.
+//
+// AND IT STORES NOTHING NEW, which is the whole design of it. The obvious build was a list of
+// visited pages in localStorage; that is durable analytics storage, so it would have needed
+// consent -- and the consent already granted is for "a single digit per page ... to prevent us
+// from logging its visits repeatedly" (consent_body). A page-name list is not a digit and its
+// purpose is the opposite one, so shipping it would have meant rewriting the banner, retranslating
+// it into 26 languages, and bumping EC_CONSENT_VERSION to re-ask everybody. For a diagnostic.
+//
+// The page's own input cookie answers the same question for free. It is EXEMPT storage -- the
+// numbers the visitor typed, written only after they typed them -- and its presence at load means
+// this browser calculated here before, within the last year. That is a better signal than a page
+// list anyway: it says they USED the calculator, not that they glanced at it. Reading it for an
+// analytics purpose is still an analytics access, so the LOG is gated on consent even though the
+// storage needs none.
+//
+// Only a 'return' is ever logged. A first visit already wrote a human-view row, and logging both
+// would double every page's count for consenters only -- exactly the mixture the two-bucket rule
+// exists to prevent.
+//
+// Known undercount, stated rather than hidden: Looped-Network keeps its work in localStorage
+// projects rather than an input cookie, so a returning map user is invisible here.
+EngCalcs.maybeLogRepeatVisit = function () {
+	'use strict';
+	var page = this.cookieName || '';
+	if (!page) return;
+	if (typeof this.analyticsConsented === 'function' && !this.analyticsConsented()) return;
+	// Read at DOMContentLoaded, which is before any page's own restore-and-recalculate runs (this
+	// file is loaded from echoHTMLHead, so its handler is registered first) and well before
+	// createCookie() could write this load's own cookie and make every visit look like a return.
+	if (new RegExp('(?:^|;\\s*)' + page.replace(/[^A-Za-z0-9_-]/g, '') + '=').test(document.cookie)) {
+		this.logSignal('repeat', 'return');
+	}
+};
+document.addEventListener('DOMContentLoaded', function () {
+	EngCalcs.maybeLogRepeatVisit();
+});
+
 EngCalcs.updateUrl = function () {
 	'use strict';
 	var params = new URLSearchParams();

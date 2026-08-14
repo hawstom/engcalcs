@@ -82,6 +82,27 @@ The one piece of client-side storage that is NOT exempt is the offline beacon qu
 (`engcalcs-offline-queue`, `js/Calculators.lib.js`): it is analytics, so it is written only with
 consent and emptied by `EngCalcs.flushQueue()` on withdrawal.
 
+### Task 200's repeat-visit signal stores nothing, on purpose
+
+The obvious build was a list of visited pages in `localStorage`. That is durable analytics storage,
+so it would have needed consent — and **the consent already granted does not cover it**:
+`consent_body` asks for *"a single digit per page … to prevent us from logging its visits
+repeatedly."* A page-name list is not a digit, and its purpose is the opposite one. Shipping it
+would have meant rewriting the banner, retranslating it into 26 languages, and bumping
+`EC_CONSENT_VERSION` to re-ask everybody — for a diagnostic.
+
+So it reads the page's **own input cookie** instead, which is exempt storage that already exists:
+present at load ⇒ this browser calculated here before, within the last year. Better signal, no new
+storage, no banner change. Reading exempt storage for an analytics purpose is still an analytics
+access, so the *log row* is gated on `analyticsConsented()` even though the *storage* needs no
+consent — which is also why the repeat-visit table in `log/lang-log-stats.sh` is a sample of
+consenting visitors and never a total. **Looped-Network is invisible to it** (its work lives in the
+`lpn_` localStorage keys, not an input cookie); the report says so rather than rounding it off.
+
+**The general rule this is a worked example of: when a new measurement seems to need new storage,
+check whether something exempt already answers the question.** The expensive part of storing
+something is never the bytes — it is the sentence in the banner it makes false.
+
 **No third party at all, storage or otherwise** — as of 2026-08-12 (Task 287). No analytics
 vendor, no tag manager, no ad network, no CDN fonts, no embedded maps, and now no CDN either:
 Bootstrap was coming from jsDelivr, which set no cookie but did tell a third party the visitor's IP
@@ -98,6 +119,7 @@ page false**, not merely add a line to it.
 | `HUMAN_VIEW_LOG` | page, language, timestamp | Same |
 | `CALC_USAGE_LOG` | page, language, timestamp | Same |
 | `TITLE_LOG` | page title event | Same |
+| `SIGNAL_LOG` | page, language, event, short slug (a link's host+path, a unit token, a diagnostic code) | Same. The outbound row names a page we linked to, never anything the visitor typed |
 | `CONTACT_SEND_LOG` + `formmail.php` | **name, email, message** | **Yes** |
 | `lpn-locks/*.json` | project id, **holder name/initials**, timestamps | **Yes, if initials identify a colleague** |
 

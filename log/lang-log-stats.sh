@@ -69,6 +69,24 @@
 #      send. This answers the only question the suite's mission actually cares about: are people
 #      not clicking the invitation, or clicking it and then not writing?
 #
+#   6. engcalcs-signal.log — BEHAVIOUR SIGNALS (ROADMAP Tasks 216 and 200). Written by
+#      log-signal-event.php from EngCalcs.logSignal(). The four logs above count PEOPLE and divide
+#      into each other as a funnel; this one counts what those people then DID and is never divided
+#      by anything but the human-view count. Six columns: the usual four, then event, then detail.
+#        outbound  a reference link out of /engcalcs/ was clicked; detail = host + path.
+#        touch     they changed some input on the page; detail = 'input'.
+#        units     a unit was chosen; detail = 'preset:us' | 'preset:si' | '<family>:<unit>'.
+#        repeat    detail = 'return' — this browser had this page's input cookie already, i.e. it
+#                  calculated here within the last year. Stores nothing new; reads exempt storage.
+#                  CONSENTING VISITORS ONLY (an analytics READ still needs consent), so the
+#                  denominator for any repeat rate is the consented rows, never all of them.
+#        lpn       detail = 'first:<example|element|backdrop|import>' or 'diag:<code>'.
+#      DEDUPED PER PAGE LOAD, IN THE PAGE'S OWN MEMORY — not per visit like the logs above, whose
+#      ec_seen digit is full at five bits (the consent banner promises "a single digit per page").
+#      So a visitor who reloads and clicks the same reference twice is two rows. Compare these
+#      counts against each other, not against the deduplicated view counts, unless the section
+#      below says otherwise.
+#
 #   5. engcalcs-title.log — NAMED CALCULATION (ROADMAP Task 215). Written by log-title-event.php
 #      from EngCalcs.maybeLogTitleEvent() when a visitor types a Printable Title or Subtitle.
 #      The four usual columns plus a fifth, 'title' or 'subtitle'. Deduped per (session, page,
@@ -94,6 +112,10 @@ SEND_LOG="$(dirname "$0")/engcalcs-contact-send.log"
 # Named calculations (ROADMAP Task 215): someone typed a Printable Title or Subtitle, i.e. told us
 # they mean to show this to another person. Reported in its own section below.
 TITLE_LOG="$(dirname "$0")/engcalcs-title.log"
+# Behaviour signals (ROADMAP Tasks 216 and 200): what people did, as opposed to how many of them
+# there were. Its own section below, deliberately after the funnel -- it explains the funnel's
+# numbers rather than joining them.
+SIGNAL_LOG="$(dirname "$0")/engcalcs-signal.log"
 
 # ---- TWO BUCKETS, AND THEY ARE NEVER ADDED TOGETHER (ROADMAP Task 286) ----
 #
@@ -123,6 +145,7 @@ RAW_LOG="$LOG"
 RAW_VIEW_LOG="$VIEW_LOG"
 RAW_USAGE_LOG="$USAGE_LOG"
 RAW_TITLE_LOG="$TITLE_LOG"
+RAW_SIGNAL_LOG="$SIGNAL_LOG"
 
 if [ ! -f "$RAW_LOG" ]; then
     echo "Log file not found: $RAW_LOG"
@@ -146,14 +169,17 @@ ec_split_bucket "$RAW_LOG" 5
 ec_split_bucket "$RAW_VIEW_LOG" 5
 ec_split_bucket "$RAW_USAGE_LOG" 5
 ec_split_bucket "$RAW_TITLE_LOG" 6   # the title log carries 'title'/'subtitle' in column 5
+ec_split_bucket "$RAW_SIGNAL_LOG" 7  # the signal log carries event in column 5 and detail in 6
 
 LOG="$EC_BUCKET_TMP/$(basename "$RAW_LOG")"
 [ -f "$RAW_VIEW_LOG" ]  && VIEW_LOG="$EC_BUCKET_TMP/$(basename "$RAW_VIEW_LOG")"
 [ -f "$RAW_USAGE_LOG" ] && USAGE_LOG="$EC_BUCKET_TMP/$(basename "$RAW_USAGE_LOG")"
 [ -f "$RAW_TITLE_LOG" ] && TITLE_LOG="$EC_BUCKET_TMP/$(basename "$RAW_TITLE_LOG")"
+[ -f "$RAW_SIGNAL_LOG" ] && SIGNAL_LOG="$EC_BUCKET_TMP/$(basename "$RAW_SIGNAL_LOG")"
 VISITS_LOG="$EC_BUCKET_TMP/visits-$(basename "$RAW_LOG")"
 VISITS_VIEW_LOG="$EC_BUCKET_TMP/visits-$(basename "$RAW_VIEW_LOG")"
 VISITS_USAGE_LOG="$EC_BUCKET_TMP/visits-$(basename "$RAW_USAGE_LOG")"
+VISITS_SIGNAL_LOG="$EC_BUCKET_TMP/visits-$(basename "$RAW_SIGNAL_LOG")"
 
 # Counted from the raw file: "total log entries" means what it says, both buckets.
 TOTAL=$(wc -l < "$RAW_LOG")
@@ -184,6 +210,9 @@ print_footer() {
     fi
     if [ -f "$RAW_TITLE_LOG" ]; then
         printf "    %-34s %12s  %s\n" "$(basename "$RAW_TITLE_LOG")" "$(wc -l < "$RAW_TITLE_LOG")" "$(head -1 "$RAW_TITLE_LOG" | awk -F'\t' '{print $1}')"
+    fi
+    if [ -f "$RAW_SIGNAL_LOG" ]; then
+        printf "    %-34s %12s  %s\n" "$(basename "$RAW_SIGNAL_LOG")" "$(wc -l < "$RAW_SIGNAL_LOG")" "$(head -1 "$RAW_SIGNAL_LOG" | awk -F'\t' '{print $1}')"
     fi
     echo ""
 }
@@ -389,6 +418,149 @@ else
     echo "    Nobody has typed a Printable Title since this began logging -- or nobody has yet since"
     echo "    the feature shipped. Check the coverage dates in the footer before reading anything"
     echo "    into it."
+fi
+
+echo ""
+echo "========================================="
+echo " What people did next (ROADMAP Tasks 216 and 200)"
+echo "========================================="
+echo "    Everything above counts PEOPLE. This counts what those people then did — which reference"
+echo "    they went looking for, whether they touched the form at all, which units they landed on,"
+echo "    whether they had been here before, and where the map interface loses them."
+echo ""
+echo "    ONE CAUTION GOVERNS THE WHOLE SECTION, so read it once here rather than at every table."
+echo "    These rows are deduplicated per PAGE LOAD, in the page's own memory; the view and calc"
+echo "    rows above are deduplicated per VISIT, against the ec_seen cookie — whose five bits are"
+echo "    full, and whose sixth would make the consent banner's \"a single digit per page\" untrue."
+echo "    So a signal count and a view count are different units and dividing one by the other is"
+echo "    meaningless — EXCEPT in the visits bucket, where nothing is stored and therefore BOTH"
+echo "    are page loads. That is why the rates below are computed from the visits bucket and the"
+echo "    visitor bucket is shown as raw counts. It is the one place in this report where the"
+echo "    people who declined to be counted twice give the cleaner number."
+echo ""
+if [ ! -f "$RAW_SIGNAL_LOG" ]; then
+    echo "    (no signal log yet: $RAW_SIGNAL_LOG)"
+    echo "    Nothing has been recorded since this shipped. Check the coverage dates in the footer"
+    echo "    before reading anything into that — an empty file and a feature that shipped"
+    echo "    yesterday look identical from here."
+else
+echo "--- Signal rows by event (visitors bucket) ---"
+awk -F'\t' '{print $5}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn
+
+echo ""
+echo "========== Reference lookups (Task 216) =========="
+echo "    A click on a link OUT of /engcalcs/ — the roughness tables, the EPA document, and our own"
+echo "    English-only frictionslope.php explainer. Tom, 2026-08-05: \"How often are non-English"
+echo "    people asking for 'n' help?\" The click IS the complaint: a visitor reading the page in"
+echo "    Spanish who opens an English-only roughness table has told us everything a survey would."
+echo "    Feeds ROADMAP Task 217, so this number arrives with a decision already attached."
+echo ""
+echo "--- Reference destinations clicked ---"
+awk -F'\t' '$5 == "outbound" {print $6}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn | head -20
+echo ""
+echo "--- Reference clicks by served language ---"
+echo "    THE ROW THAT MATTERS IS ANY ROW THAT IS NOT 'en'. Everything we link to is English."
+awk -F'\t' '$5 == "outbound" {print ($3 == "" ? "(none)" : $3)}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn
+echo ""
+echo "--- Reference clicks by page, non-English visitors only ---"
+awk -F'\t' '$5 == "outbound" && $3 != "en" && $3 != "" {print $2}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn
+
+echo ""
+echo "========== Did they touch anything? (Task 200) =========="
+echo "    A human view with no calculation splits two ways, and the two call for opposite fixes:"
+echo "    somebody who never touched an input could not understand the page, and somebody who"
+echo "    touched it and left tried it and did not want it. This is the cheapest diagnostic here."
+echo "    Rate computed from the VISITS bucket only, where views and touches are both page loads."
+echo ""
+if [ -f "$VISITS_VIEW_LOG" ] && [ -s "$VISITS_VIEW_LOG" ]; then
+    {
+        awk -F'\t' '$5 == "touch" {print $2"\ttouch"}' "$VISITS_SIGNAL_LOG" 2>/dev/null
+        awk -F'\t' '{print $2"\tview"}' "$VISITS_VIEW_LOG"
+    } | awk -F'\t' '
+        { if ($2 == "touch") t[$1]++; else v[$1]++; seen[$1] = 1 }
+        END { for (p in seen) printf "%d\t%s\t%d\n", (p in v ? v[p] : 0), p, (p in t ? t[p] : 0) }
+    ' | sort -rn | awk -F'\t' '
+        !hdr { printf "    %-28s %10s %10s %10s\n", "page", "views", "touched", "%touched"; hdr = 1 }
+        { printf "    %-28s %10d %10d %9s%%\n", $2, $1, $3, ($1 > 0 ? sprintf("%.1f", 100*$3/$1) : "-") }'
+    echo ""
+    echo "    Under about 40 views a row cannot support a decision — the same floor that applies to"
+    echo "    %used everywhere else in this report."
+else
+    echo "    (no page-load-bucket views yet, so no honest denominator; raw touch counts follow)"
+    awk -F'\t' '$5 == "touch" {print $2}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn
+fi
+
+echo ""
+echo "========== Units actually chosen (Task 200) =========="
+echo "    Validates EC_DEFAULT_UNIT_SET-by-language and the per-family defaults of Task 162."
+echo "    READ THIS TO REORDER OPTIONS, NOT TO DELETE THEM. An unused option in a dropdown costs a"
+echo "    user essentially nothing; a missing one costs them the whole calculator. With a few"
+echo "    thousand humans in total, \"no hits in three months\" on a long-tail unit is deleting on"
+echo "    absence of data from a small sample. Set a high bar for any actual removal."
+echo ""
+echo "--- Preset button clicks ---"
+awk -F'\t' '$5 == "units" && $6 ~ /^preset:/ {print $6}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn
+echo ""
+echo "--- Preset clicks by served language ---"
+echo "    A language whose visitors keep clicking US is a language EC_DEFAULT_UNIT_SET has wrong."
+awk -F'\t' '$5 == "units" && $6 ~ /^preset:/ {print ($3 == "" ? "(none)" : $3)"\t"$6}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn | head -30
+echo ""
+echo "--- Individual unit selections, by family ---"
+echo "    Somebody overriding one select is saying that family's default is wrong for their work."
+awk -F'\t' '$5 == "units" && $6 !~ /^preset:/ {print $6}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn | head -40
+
+echo ""
+echo "========== Returning users (Task 200) =========="
+echo "    A calculator a working engineer comes back to is worth more than a hundred one-off"
+echo "    visits, and nothing else in this report can tell those two apart."
+echo ""
+echo "    A row means: this browser had this page's input cookie already, i.e. it CALCULATED here"
+echo "    within the last year. That cookie is exempt storage that exists anyway, which is why this"
+echo "    measurement stores nothing new — see dev/cookie-storage-inventory.md for why that mattered"
+echo "    enough to design around."
+echo ""
+echo "    TWO UNDERCOUNTS, both structural, neither a defect to fix:"
+echo "      - CONSENTING VISITORS ONLY. Reading that cookie for an analytics purpose is still an"
+echo "        analytics access, so the row is not written otherwise. Treat this as a sample, never"
+echo "        as a total, and never divide it by a count that includes the visits bucket."
+echo "      - LOOPED-NETWORK IS INVISIBLE HERE. Its work lives in localStorage projects, not an"
+echo "        input cookie, so a returning map user leaves no trace in this table."
+echo ""
+awk -F'\t' '$5 == "repeat" {print $2}' "$RAW_SIGNAL_LOG" | sort | uniq -c | sort -rn
+echo ""
+echo "--- Returning users by served language ---"
+awk -F'\t' '$5 == "repeat" {print ($3 == "" ? "(none)" : $3)}' "$RAW_SIGNAL_LOG" | sort | uniq -c | sort -rn
+
+echo ""
+echo "========== Looped-Network: where the map interface loses people (Task 200) =========="
+echo "    first:  which of the four ways INTO a network the visitor reached for first, one row per"
+echo "            page load. This is the first evidence bearing on the empty-canvas decision closed"
+echo "            2026-07-29 (a new project opens on placeholder text rather than a worked example),"
+echo "            which was made with no data at all: a large first:example share vindicates it, a"
+echo "            large 'nothing' share overturns it."
+echo "    diag:   which of the solver's complaints is actually met. The biggest one names the next"
+echo "            thing to fix on that page."
+echo ""
+echo "--- First action on the map ---"
+awk -F'\t' '$5 == "lpn" && $6 ~ /^first:/ {print $6}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn
+if [ -f "$VISITS_VIEW_LOG" ]; then
+    LPN_VIEWS=$(awk -F'\t' '$2 == "Looped-Network"' "$VISITS_VIEW_LOG" 2>/dev/null | wc -l)
+    LPN_FIRST=$(awk -F'\t' '$5 == "lpn" && $6 ~ /^first:/' "$VISITS_SIGNAL_LOG" 2>/dev/null | wc -l)
+    if [ "$LPN_VIEWS" -gt 0 ]; then
+        echo ""
+        printf "    %-28s %10d\n" "page loads (visits bucket)" "$LPN_VIEWS"
+        printf "    %-28s %10d\n" "  of those, did something" "$LPN_FIRST"
+        printf "    %-28s %10d\n" "  of those, did NOTHING" "$((LPN_VIEWS - LPN_FIRST))"
+        echo "    'Nothing' is the row the empty-canvas decision turns on. It is a residual, not a"
+        echo "    logged event, so it also absorbs anyone who left before the page finished loading."
+    fi
+fi
+echo ""
+echo "--- Diagnostics met ---"
+awk -F'\t' '$5 == "lpn" && $6 ~ /^diag:/ {print $6}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn
+echo ""
+echo "--- Most recent 10 signal rows ---"
+tail -10 "$RAW_SIGNAL_LOG"
 fi
 
 if [ ! -f "$USAGE_LOG" ]; then

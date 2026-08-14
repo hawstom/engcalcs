@@ -1372,93 +1372,18 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     17% conversion anomaly is still outstanding (`dev/usage-data-log.md`). `he` (10 humans, 60%,
     squarely in the band) is the cleaner next candidate, with no urgency.
 
-- 80|216| **Beacon outbound reference-link clicks, with the visitor's language.** Raised by Tom,
-  2026-08-05: *"How often are non-English people asking for 'n' help? And should we let them somehow
-  complain that the reference is only English?"*
-  - **Build the beacon; skip the complaint UI.** The click *is* the complaint. A non-English visitor
-    clicking an English-only reference is a complete, zero-cost, unambiguous signal. A button asking
-    them to additionally *say* they would like it translated collects the same bit at a much higher
-    price, and an interstitial page would tax the majority to survey the minority. Tom agreed,
-    2026-08-05.
-  - **What to log:** page, `lang`, and which link. Same beacon pattern and the same
-    `ecLoggingOptedOut()` check as the other writers.
-  - **The links that matter:** the Manning's n table
-    (`engineeringtoolbox.com/mannings-roughness-d_799.html`, on `Manning-Pipe-Flow.php` and
-    `Manning-Trap.php`), the Hazen-Williams C table (`Hazen-Williams.php`), the EPA roughness
-    document (`Darcy-Weisbach.php`, `Micro-Hydro-Power.php`), and our own English-only
-    `frictionslope.php` — whose tip already admits "English only" in all 26 languages, so we know
-    the visitor clicked *knowing* that.
-  - **The decision it feeds is Task 217**, so this metric arrives with a decision already attached
-    rather than becoming another number nobody acts on.
+- 60|303| **Usage logging: the remaining lower-value questions.** Extracted from Task 200 when it
+  closed 2026-08-14, so they survive the close rather than being buried in a DONE block nobody
+  re-reads. All three are cheap and none of them decides anything on its own; take one when a
+  specific question makes it worth the wiring.
+  - **Time-to-first-calc** — separates a page that is confusing from one that is merely long.
+  - **Print / copy-link use**, as a proxy for work somebody intends to keep. Note this overlaps
+    Task 215's named-calculation signal, which already measures intent-to-share more directly, so
+    check whether the title log has already answered the question before building it.
+  - **Intra-site path** — which calculator is the entry point and where people go next. The most
+    expensive of the three, because a path needs an ordering the logs deliberately cannot express
+    without a per-visit identifier we will not store.
 
-- 80|200| **Usage logging: the questions the current report cannot answer.** Raised by Tom,
-  2026-08-03: *"I'd like to get more guidance about our development priorities from usage logging."*
-  Ordered by value ÷ effort. Nothing here needs a database — the existing
-  `log-calc-event.php` / `log-human-view.php` beacon pattern covers all of it.
-  - **First, two things about how the CURRENT report must be read, which cost nothing to adopt:**
-    - **There is a bot floor around 900.** Almost every page sits at 834–1193 reach regardless of
-      how many humans it gets; only Manning-Pipe-Flow (3619) and Manning-Trap (2141) rise above it.
-      So for every other page `%human of reach` is a signal-to-noise ratio, not a conversion rate,
-      and driving it up is not a goal.
-    - **Below roughly 40 humans, `%used` is noise.** Only MPF (1576 humans), Manning-Trap (242) and
-      marginally Hazen-Williams (60) have the sample for that ratio to mean anything. The single-digit
-      rows — Canal-Seepage at 1 human, Weir-Flow-Irregular at 2 — cannot support any decision, and
-      reading them as failure is a mistake. What those pages need is not a metric, it is either
-      traffic or an honest decision that they are niche.
-  - **Repeat use — the strongest value signal we do not collect.** One flag in `localStorage` per
-    page ("this browser has logged a calc here before") turns every event into new-vs-returning. A
-    calculator a working engineer comes back to is worth more than a hundred one-off visits, and
-    nothing in the present report can distinguish those two.
-  - **Did they touch anything before leaving?** For a human who never calculates, one bit: did any
-    input change at all? Splits "could not understand it" from "did not want it", which are opposite
-    development responses, and it is the cheapest diagnostic on this list.
-  - **`lpn_` first action, and `lpn_` diagnostic frequency.** Which of draw-example / add-element /
-    add-background / nothing happens first, and which of the four diagnostics fires most. Between
-    them they name exactly where the map interface loses people. **This is also the first evidence
-    that would bear on the empty-canvas decision** (closed 2026-07-29, commit `7428ff0`: a new
-    project opens on placeholder text rather than a worked example) — a decision made with no data,
-    which the first-action histogram would either vindicate or overturn.
-  - ~~Language × calculator cross-tab~~ — **BUILT 2026-08-03**, and it was nearly free as predicted.
-    All three tiers already carried both dimensions (`engcalcs-lang.log` = ts/lang/source/page; both
-    human logs = ts/page/lang). New "Non-English HUMANS by calculator" section in
-    `log/lang-log-stats.sh`.
-    - **A reach-tier version already existed** ("Non-English demand by page") and is the reason this
-      looked answered. It is built from `engcalcs-lang.log` — the tier with the ~900/page bot floor —
-      so it largely counts crawlers. The new section is built from the two confirmed-human logs,
-      which bots essentially never reach, so every row is a real person. Keep both; they answer
-      different questions and only one of them should sequence a sprint.
-    - **An empty table is the finding**, and the section says so in place: 26 translated languages
-      with no confirmed non-English human use would bear directly on how much further translation
-      work is worth before the pages themselves earn traffic. Verified against fixtures for both the
-      populated and empty cases, including `es-MX` → `es` subtag folding.
-    - Not yet run against production data — the dev machine has 7 human-view rows and no usage log
-      at all.
-  - **US vs SI actually chosen**, one bit per session — validates `EC_DEFAULT_UNIT_SET`-by-language
-    and shows whether per-page unit-family defaults are right (ROADMAP Task 162's design).
-    **Widen this to the unit token each select actually lands on**, per family, not just the preset.
-    Asked by Tom, 2026-08-05: *"How often are units being used? Are there units we can drop because
-    nobody really uses them?"* Three findings from that discussion, recorded so they are not
-    re-brainstormed:
-    - **Prefer REORDERING to removal.** An unused option in a dropdown costs a user essentially
-      nothing; a *missing* one costs them the whole calculator. And with roughly four thousand humans
-      total, "no hits in three months" on a long-tail unit is weak evidence — that is deleting on
-      absence of data from a small sample. Reordering by measured frequency captures most of the
-      benefit at none of the risk. Set a high bar for any actual removal.
-    - **An "Other" option INSIDE a unit select is actively dangerous here.** Per the standing rule in
-      CLAUDE.md, changing a unit select *reinterprets* the typed number rather than converting it, so
-      choosing "Other" would silently reinterpret the user's value while a dialog sits open. If the
-      ask is wanted it must be a non-selecting affordance — an item that opens a prompt and reverts
-      the select, or better a small `?` beside the unit strip.
-    - **Tom likes the units `?` as an EXPERIMENT** (2026-08-05). Frame it that way: it is really
-      Rung 0 of the feedback cost-ladder (Task 207) applied to units, not a units feature, and it
-      should be measured like an experiment rather than shipped as a permanent affordance on faith.
-  - **First run happened 2026-08-03 and the cross-tab immediately paid for itself** — see
-    `dev/usage-data-log.md` and Task 202. Headline: 290 non-English humans shopping, 170 using, and
-    one clear quality outlier that no other instrument in the suite had surfaced. The remaining
-    ideas below are still unbuilt.
-  - **Lower value, listed so they are not re-brainstormed:** time-to-first-calc (separates a
-    confusing page from a long one); print / copy-link use as a proxy for work someone intends to
-    keep; intra-site path (which calculator is the entry point and where people go next).
 
 ## New Calculators (Mission Expansion)
 
@@ -1753,6 +1678,78 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|216| **[DONE 2026-08-14] Outbound reference-link clicks are logged, with the visitor's
+  language.** Raised by Tom, 2026-08-05: *"How often are non-English people asking for 'n' help?
+  And should we let them somehow complain that the reference is only English?"* Shipped as
+  `outbound` rows in the new `SIGNAL_LOG` (`log-signal-event.php`), reported in
+  `log/lang-log-stats.sh` by destination, by served language, and by page for non-English visitors
+  only. Feeds Task 217, so the metric arrives with a decision already attached.
+  - **Built the beacon, skipped the complaint UI**, as decided at the time: the click IS the
+    complaint. A non-English visitor opening an English-only roughness table is a complete,
+    zero-cost, unambiguous signal, and asking them to additionally *say so* collects the same one
+    bit at a much higher price.
+  - **DELEGATED AT THE DOCUMENT, NOT TAGGED ONTO EACH LINK — and that turned out to be the whole
+    implementation decision.** The plan named five pages' links. But `mpf_friction_slope` carries
+    its own `<a href="../frictionslope.php">` **inside all 27 language files**, so a per-link
+    attribute would have had to be added in 27 places for one link, and would then be silently
+    absent from the next reference anybody writes. One `click` listener on `document` needs no
+    per-link maintenance and cannot miss one.
+  - **The test is "out of /engcalcs/", not "off-site".** `../frictionslope.php` is our own
+    English-only explainer on the same origin, and it is the single most interesting destination
+    here: its tip already admits "English only" in all 26 languages, so a click on it is a visitor
+    proceeding *knowing* the page will not be in their language. Navigation between calculators is
+    not a reference lookup and is already in the view log.
+  - Host and path only, never the query string. The EPA roughness link is ~600 characters of
+    query and tells us nothing the path does not.
+
+- 0|200| **[DONE 2026-08-14] Usage logging: the questions the current report could not answer.**
+  Raised by Tom, 2026-08-03: *"I'd like to get more guidance about our development priorities from
+  usage logging."* Everything on the list above the "lower value" line is now built, in one new log
+  (`SIGNAL_LOG`, `log-signal-event.php`) with an `event` column and a new report section. The three
+  leftovers were extracted to Task 303 rather than left in this block.
+  - **Shipped:** `touch` (did they change any input before leaving), `units` (preset clicks and the
+    unit each family actually lands on), `repeat` (has this browser calculated here before), `lpn`
+    (`first:` — which of example / element / backdrop / import happens first, and `diag:` — which
+    solver complaint fires most). The language x calculator cross-tab was already built 2026-08-03.
+  - **ONE LOG WITH AN EVENT COLUMN, not five more endpoints.** The four existing logs are separate
+    because each is a TIER of one funnel and the report divides them by each other. These are not a
+    funnel — they are diagnostics of the same shape, and five near-identical 90-line writers would
+    be five places to keep the offline queue, the opt-out check, the bucket suffix and the
+    timestamp trust window in step.
+  - **THE CONSTRAINT THAT SHAPED ALL OF IT: the `ec_seen` digit is FULL.** Five bits, maximum 31,
+    which is exactly one base-32 digit — and *"a single digit per page"* is the sentence in the
+    consent banner. A sixth bit for "touched" would have made that sentence false. So these events
+    dedupe **in the page's own memory, per page load**, and store nothing.
+  - **Which then produced the one genuinely nice finding here: the visits bucket gives the CLEANER
+    number.** A signal count (per page load) cannot be divided by a view count (per visit) — except
+    among the people who declined to be counted twice, where nothing is stored and therefore both
+    are page loads. So `%touched` is computed from the visits bucket and the visitor bucket is
+    shown as raw counts. The one place in this report where non-consenting traffic is the better
+    instrument, and it is stated in the section rather than quietly assumed.
+  - **Repeat use stores NOTHING NEW, after the obvious build was rejected.** A visited-page list in
+    `localStorage` is durable analytics storage; the granted consent covers *"a single digit per
+    page … to prevent us from logging its visits repeatedly"*, which a page-name list is not, and
+    whose purpose is the opposite. Shipping it meant rewriting the banner, retranslating it into 26
+    languages, and bumping `EC_CONSENT_VERSION` to re-ask everybody — for a diagnostic. The page's
+    **own input cookie** answers the same question for free: exempt storage, already there, and a
+    *better* signal (they calculated here, not merely glanced). The row is still gated on consent,
+    because an analytics READ is an analytics access. **Generalise it:** when a new measurement
+    seems to need new storage, check whether something exempt already answers the question — the
+    cost of storing something is never the bytes, it is the sentence in the banner it makes false.
+  - **Stated undercounts, in the report rather than in a comment:** Looped-Network is invisible to
+    the repeat signal (its work lives in `lpn_` localStorage, not an input cookie), and the map's
+    "did nothing" figure is a residual, so it also absorbs anyone who left before the page loaded.
+  - **The two reading rules from the original block still stand and are unchanged:** there is a bot
+    floor around 900, so `%human of reach` is a signal-to-noise ratio and not a conversion rate for
+    any page but MPF and Manning-Trap; and below roughly 40 humans `%used` is noise, so a page with
+    a handful of rows needs traffic or an honest niche decision, not a metric.
+  - **The units answer is REORDERING, not removal**, as decided 2026-08-05 and now printed above
+    the table itself so the next reader cannot miss it. An unused dropdown option costs a user
+    essentially nothing; a missing one costs them the whole calculator, and "no hits in three
+    months" across a few thousand humans is deletion on absence of data from a small sample. The
+    units `?` experiment (Rung 0 of Task 207's cost ladder) is untouched by this and still open.
+
 
 - 0|302| **[DONE 2026-08-14] The looped network reported NEGATIVE velocities.** Tom: *"I am
   seeing some negative velocities. I don't think that's compatible with our paradigm."* Correct —

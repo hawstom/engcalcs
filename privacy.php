@@ -24,7 +24,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 ?>
 <div class="ec-legal">
 
-<p><em>Last updated: 12 August 2026. This notice covers hawsedc.com, including the EngCalcs
+<p><em>Last updated: 14 August 2026. This notice covers hawsedc.com, including the EngCalcs
 engineering calculators at hawsedc.com/engcalcs.</em></p>
 
 <h2>The short version</h2>
@@ -54,6 +54,14 @@ USA.</p>
 Each record is the page name, the language, and the time. It contains no IP address, no account,
 and no identifier of any kind. We use it to decide which calculators to improve and which languages
 to translate into.</p>
+
+<p>Some records carry one extra short fact about what happened on the page, so that we can tell an
+unhelpful page from an uninteresting one. That fact is one of: which reference link you followed
+(the address of the page we sent you to &mdash; never anything you typed); that you changed some
+input, without which input or what you put in it; which measurement units you chose; that this
+browser had used this calculator before; or, on the pipe-network map, which drawing tool you
+reached for first and which error message you met. <strong>Nothing you type is ever included</strong>,
+and none of it can be connected to you.</p>
 
 <p>To count you once rather than once per page you open, we need to keep a small amount of
 information in your browser, which is why we ask permission first. It is a single digit for each

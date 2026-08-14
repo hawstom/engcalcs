@@ -219,8 +219,18 @@ EngCalcs.unitSets = <?=json_encode($GLOBALS['ec_unit_sets'], JSON_UNESCAPED_UNIC
 // their seed numbers to match, or a metric sample renders as a 100-inch pipe.
 EngCalcs.defaultUnitSet = '<?=EC_DEFAULT_UNIT_SET?>';
 document.addEventListener('DOMContentLoaded', function() {
-	document.getElementById('set_units_us').addEventListener('click', function() { EngCalcs.setUnits('us'); });
-	document.getElementById('set_units_si').addEventListener('click', function() { EngCalcs.setUnits('si'); });
+	// Task 200 logs the preset HERE rather than inside setUnits(), so the number means "a person
+	// clicked US" and not "some code applied a preset" -- looped-network.js calls setUnits() itself
+	// when a new project picks up its unit system, and counting that would answer a different
+	// question than the one asked.
+	document.getElementById('set_units_us').addEventListener('click', function() {
+		if (EngCalcs.logSignal) EngCalcs.logSignal('units', 'preset:us');
+		EngCalcs.setUnits('us');
+	});
+	document.getElementById('set_units_si').addEventListener('click', function() {
+		if (EngCalcs.logSignal) EngCalcs.logSignal('units', 'preset:si');
+		EngCalcs.setUnits('si');
+	});
 });
 </script>
 <div class="collapse d-print-none<?php if ($flagHideUnits === false) : ?> show<?php endif; ?>" id="set_units_row">

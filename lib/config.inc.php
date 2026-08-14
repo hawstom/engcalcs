@@ -98,9 +98,58 @@ define('CONTACT_SEND_LOG', dirname(__DIR__) . '/log/engcalcs-contact-send.log');
 // Run log/lang-log-stats.sh to analyze.
 define('TITLE_LOG', dirname(__DIR__) . '/log/engcalcs-title.log');
 
+// Behaviour-signal log (ROADMAP Tasks 216 and 200) — the questions the four logs above cannot
+// answer. Written by log-signal-event.php from EngCalcs.logSignal() (js/Calculators.lib.js).
+// Each line: ISO-8601 UTC timestamp TAB page TAB served-lang TAB raw-Accept-Language TAB event TAB detail
+//
+// ONE LOG WITH AN EVENT COLUMN, not five more endpoints. Each of the five questions below is the
+// same shape as the others and as the four logs above — when, which page, which language, plus one
+// short fact — so five near-identical 90-line writers would be five places to keep the offline-
+// queue handling, the opt-out check, the bucket suffix and the timestamp trust window in step. The
+// four logs above are separate because each is a TIER of one funnel and the report divides them by
+// each other; these are not a funnel, they are diagnostics, and they are never divided by anything
+// but the human-view count.
+//
+//   outbound  A reference link out of /engcalcs/ was clicked (Task 216). detail = host + path.
+//             Tom, 2026-08-05: *"How often are non-English people asking for 'n' help?"* The click
+//             IS the complaint — a non-English visitor opening an English-only roughness table is
+//             a complete signal, and asking them to also say so costs more for the same one bit.
+//             Feeds Task 217.
+//   touch     The visitor changed some input on this page (Task 200). Splits a human view with no
+//             calculation into "could not understand it" and "did not want it" — opposite
+//             development responses, and the cheapest diagnostic available.
+//   units     A unit was chosen, either by preset button or by one select. detail =
+//             'preset:us' | 'preset:si' | '<family>:<unit>'. Validates EC_DEFAULT_UNIT_SET by
+//             language and the per-family defaults of Task 162. Read it to REORDER options by
+//             measured frequency, not to delete them: an unused option in a dropdown costs a user
+//             nothing, a missing one costs them the calculator.
+//   repeat    detail = 'return', logged when this browser has calculated on this page before. The
+//             strongest value signal the suite does not otherwise collect — a calculator a working
+//             engineer comes back to is worth more than a hundred one-off visits. STORES NOTHING
+//             NEW: it reads the page's own input cookie, which is exempt storage that already
+//             exists, rather than a page list that would have made the consent banner's wording
+//             false. Reading it for analytics is still an analytics access, so the row is gated on
+//             consent and is absent for everybody else. There is no 'new' row: a first visit is
+//             already a human-view row, and writing both would double every page's view count for
+//             consenters only. See dev/cookie-storage-inventory.md.
+//   lpn       Map-interface diagnostics (Task 200). detail = 'first:<example|element|backdrop|
+//             import>' — which of those a visitor does FIRST, the first evidence bearing on the
+//             empty-canvas decision closed 2026-07-29 with no data — or 'diag:<code>', which of
+//             the solver's pre-solve complaints fires most. Between them they name where the map
+//             interface loses people.
+//
+// DE-DUPLICATION IS IN THE PAGE'S OWN MEMORY, NOT ON THE DEVICE, and that is a deliberate limit.
+// The four logs above dedupe per (visit, page) using one base-32 digit in ec_seen — five bits, the
+// maximum a single digit holds, which is exactly the sentence in the consent banner ("a single
+// digit per page"). A sixth bit would make it two digits and make that sentence false, so these
+// events dedupe per PAGE LOAD in JS and store nothing new. The cost is honest and small: a visitor
+// who reloads a page and clicks the same reference twice is two rows. The cost of the alternative
+// was a promise we would have had to go back on.
+define('SIGNAL_LOG', dirname(__DIR__) . '/log/engcalcs-signal.log');
+
 // ---- Author/tester opt-out from the usage logs (ROADMAP Task 210) ----
 // Visit any page with ?ec_nolog=1 once per browser to stop that browser being counted by EVERY log
-// writer -- LANG_LOG, CALC_USAGE_LOG, HUMAN_VIEW_LOG, CONTACT_SEND_LOG and TITLE_LOG;
+// writer -- LANG_LOG, CALC_USAGE_LOG, HUMAN_VIEW_LOG, CONTACT_SEND_LOG, TITLE_LOG and SIGNAL_LOG;
 // ?ec_nolog=0 undoes it. A new writer joins that list by calling ecLoggingOptedOut(), and every one
 // of them must: an opt-out with an exception in it is not an opt-out.
 // Deliberately an opt-out AT WRITE TIME rather than a filter applied afterwards. The logs carry no

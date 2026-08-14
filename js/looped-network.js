@@ -59,6 +59,31 @@ var EngCalcs = EngCalcs || {};
 	// absolute size while the lettering grew 8x. Leave it at 2.5 unless those base dimensions are
 	// themselves re-drawn.
 	var LPN_BASE_TEXT_SIZE = 2.5;
+
+	// ---- Map-interface instrumentation (ROADMAP Task 200) ----
+	// Two questions, and between them they name exactly where this page loses people: which of the
+	// four ways INTO a network a visitor reaches for first, and which of the solver's pre-solve
+	// complaints they hit most. The first-action histogram is also the first evidence that bears on
+	// the empty-canvas decision (closed 2026-07-29, commit 7428ff0: a new project opens on
+	// placeholder text rather than a worked example) -- which was made with no data at all, and
+	// which this will either vindicate or overturn.
+	//
+	// FIRST means first: only one row per page load, so the counts are a histogram of opening moves
+	// rather than of total activity. "Nothing" is not logged and does not need to be -- it is the
+	// Looped-Network human-view rows that carry no first: row at all, which log/lang-log-stats.sh
+	// reports as the residual.
+	var lpnFirstActionLogged = false;
+	function logLpnFirstAction(what) {
+		if (lpnFirstActionLogged) { return; }
+		lpnFirstActionLogged = true;
+		if (EngCalcs.logSignal) { EngCalcs.logSignal('lpn', 'first:' + what); }
+	}
+	function logLpnDiag(code) {
+		// Deduped per (page load, code) by EngCalcs.logSignal itself: runSolve() re-runs on a 300ms
+		// debounce after every keystroke and drag, so counting every occurrence would measure typing
+		// speed rather than how often a diagnostic is met.
+		if (EngCalcs.logSignal) { EngCalcs.logSignal('lpn', 'diag:' + code); }
+	}
 	// Leader slope for the example network's anchored callouts, degrees above horizontal.
 	// 70, not the 60 Tom named on 2026-08-09, because he named it while approving the J3 callout he
 	// was looking at -- and that one measures ~70 (a 60-unit rise over a 22.2-unit gap). He asked
@@ -1575,6 +1600,7 @@ var EngCalcs = EngCalcs || {};
 		};
 	}
 	function addBackdropFromDataUrl(dataUrl, done) {
+		logLpnFirstAction('backdrop');
 		downscaleImage(dataUrl, BACKDROP_MAX_SIDE, function (href, iw, ih) {
 			var p = initialBackdropPlacement(iw, ih);
 			backdrop = { href: href, iw: iw, ih: ih, x: 0, y: 0, width: p.width, height: p.height, tx: p.tx, ty: p.ty, s: 1 };
@@ -3231,6 +3257,10 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	function importInpFromFile(file) {
+		// Logged on the attempt, not on success: somebody who arrives with an .inp file has already
+		// told us how they mean to start, and a parse failure is a first action that went wrong --
+		// which is a thing worth being able to see rather than a thing to hide from the histogram.
+		logLpnFirstAction('import');
 		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
 		reader.onload = function (ev) {
 			var text = inpTextFromBytes(ev.target.result, file.name);
@@ -5222,6 +5252,7 @@ var EngCalcs = EngCalcs || {};
 		renderTabs();
 	}
 	function newProjectFromExample(system) {
+		logLpnFirstAction('example');
 		var id = newProjectWithUnits(system);
 		drawExampleNetwork(system);
 		// The example is not the user's unsaved work either -- it arrived by their choosing it from a
@@ -6474,6 +6505,7 @@ var EngCalcs = EngCalcs || {};
 				// of creating a new, overlapping one -- see nearestNodeNearScreen()'s comment.
 				if (!nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX)) {
 					saveUndoSnapshot();
+					logLpnFirstAction('element');
 					addNode(mode === 'add-reservoir' ? 'reservoir' : 'junction', w.x, w.y);
 				}
 			}
@@ -6486,6 +6518,7 @@ var EngCalcs = EngCalcs || {};
 				// ready, waiting on this). A tap within NODE_SNAP_PX anchors the new Text to that
 				// node, so it drags with it and grows a leader; otherwise it's free-floating.
 				var nearNode = nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
+				logLpnFirstAction('element');
 				addText(w.x, w.y, nearNode ? nearNode.id : null);
 			}
 			else if (mode === 'add-pipe' || mode === 'add-pump') {
@@ -6499,6 +6532,7 @@ var EngCalcs = EngCalcs || {};
 					if (!pendingLinkFrom) { setPendingLinkFrom(hitId); }
 					else if (hitId !== pendingLinkFrom) {
 						saveUndoSnapshot();
+						logLpnFirstAction('element');
 						addLink(mode === 'add-pump' ? 'pump' : 'pipe', pendingLinkFrom, hitId);
 						setPendingLinkFrom(null);
 					}
@@ -8644,6 +8678,7 @@ var EngCalcs = EngCalcs || {};
 		var model = assembleModel(), issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
 			lastSolveResult = null;
+			issues.forEach(function (issue) { logLpnDiag(issue.code); });
 			setStatus(issues.map(diagIssueText).join(' '));
 			refreshLabelText();
 			consumeFitAfterSolve();
@@ -8660,6 +8695,9 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (!result.ok || !result.converged) {
 			lastSolveResult = null;
+			// Not one of lpnDiagnose()'s pre-solve codes -- this is the solver itself giving up, and
+			// it belongs in the same histogram because to the user it is the same kind of dead end.
+			logLpnDiag('not-converged');
 			setStatus(pc.lpn_diag_not_converged || 'Did not converge.');
 			refreshLabelText();
 			consumeFitAfterSolve();
