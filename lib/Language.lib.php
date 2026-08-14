@@ -64,9 +64,13 @@ function logLanguageSelection($lang, $source) {
  */
 function logAnonymousView($servedLang) {
     $raw = $servedLang;
-    if (isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-        $raw = strtolower(trim(explode(';', explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'])[0])[0]));
-    }
+    // ecBrowserLangTag(), not a raw read (Task 319, second pass). This was the SIXTH copy of the
+    // same unfiltered snippet, and it and its twin below feed LANG_LOG -- the largest log here and
+    // the one log/lang-log-stats.sh reads most. logLanguageSelection() writes $lang straight into a
+    // tab-separated line, so an embedded tab forged rows in the very file the language decisions
+    // are made from. Found by the agent that fixed the other five, which reported it rather than
+    // silently widening its own task.
+    $raw = ecBrowserLangTag();
     logLanguageSelection($raw, 'anon');
 }
 
@@ -249,7 +253,8 @@ function chooseLanguage($all_language_settings) {
     // nothing stored anywhere.
     if ($dedupe) {
         if (!isset($_COOKIE['ec_blang']) && isset($_SERVER['HTTP_ACCEPT_LANGUAGE'])) {
-            $rawLang = strtolower(trim(explode(';', explode(',', $_SERVER['HTTP_ACCEPT_LANGUAGE'])[0])[0]));
+            // Filtered -- see the note on the 'anon' call above. Same defect, same fix.
+            $rawLang = ecBrowserLangTag();
             logLanguageSelection($rawLang, 'browser');
             // VALUE IS A LITERAL 1 as of Task 288. It was the raw language tag, but every use site
             // is isset() -- the value was written and never read once. Storing a tag we do not read

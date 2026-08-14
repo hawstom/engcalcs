@@ -76,13 +76,24 @@ $files = array_merge(
     glob($root . '/*.php'),
     glob($root . '/lib/*.php')
 );
-// lib/config.inc.php is where the helper LIVES, so it is the one legitimate reader.
-$allowed = array($root . '/lib/config.inc.php');
-// KNOWN, REPORTED, NOT FIXED HERE (Task 319 names five files; these are two more of the same
-// snippet, feeding logLanguageSelection() into LANG_LOG). Listed so the grep stays honest rather
-// than being scoped down to hide them. DELETE THIS ENTRY when the file is fixed -- the check will
-// then guard it like the rest.
-$pending = array($root . '/lib/Language.lib.php');
+// lib/config.inc.php is where the helper LIVES, so it is a legitimate reader.
+// lib/Language.lib.php is the other: chooseLanguage() must read the WHOLE q-value list to negotiate
+// a language, filtering it would break the choice, and nothing from that read reaches a log -- only
+// a language code from our own list comes out the far end. Its two LOGGING reads were the defect and
+// are fixed; this one is not the same thing.
+$allowed = array($root . '/lib/config.inc.php', $root . '/lib/Language.lib.php');
+// lib/Language.lib.php WAS on this list and is now fixed (2026-08-14, same day). It held the SIXTH
+// and SEVENTH copies of the snippet -- Task 319's block said "five files" and was wrong -- and both
+// fed logLanguageSelection(), which writes straight into LANG_LOG, the largest log here and the one
+// log/lang-log-stats.sh reads most. The agent that fixed the other five found them, reported them,
+// and left them alone because they were outside its territory. That was the right call twice over:
+// it did not silently widen its task, and it did not scope this grep down to hide what it had seen.
+//
+// The file STILL reads the header once more, in chooseLanguage(), and that read is CORRECT and must
+// stay: language negotiation needs the whole q-value list, filtering it would break the choice, and
+// nothing from it reaches a log -- only a language code from our own list comes out the other end.
+// So the file is allowed, not pending.
+$pending = array();
 
 foreach ($files as $f) {
     if (in_array($f, $allowed, true)) continue;
