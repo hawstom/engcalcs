@@ -707,6 +707,27 @@ closes as `english`, `intent`, `glossary` or `dismissed` *with a reason*, or it 
    performs the same check inline: for every sprinted key, read the target-language string,
    back-translate it to English independently, and compare against the source meaning (same rigor, no
    billing). Applies retroactively to any wave that was closed without it.
+
+   **AND COMPARE THE LANGUAGES WITH EACH OTHER, not only each against the English. This is the step
+   that reads the English (Tom, 2026-08-14: *"translation is our superpower, and it may teach us
+   something unexpected"*).** Cluster the renderings of one key by MEANING rather than by word. If
+   they agree, the English licensed one reading. **If they SPLIT, the English licensed two, and the
+   split is the finding** — no single translation looks wrong on its own, and the English reads
+   perfectly to an English reader, which is exactly why nothing else catches it.
+   - **Worked example, sprint 316.** "Own values" — the count of properties a scenario holds of its
+     own — came back in three families: *its own* (13 languages), *custom/specific/exclusive* (7),
+     and **CHANGED** (cs, hr, bg). The first two are the same concept; the third is a different and
+     FALSE one, because a scenario's own value may be identical to Base's — the decision the whole
+     delta model turns on, asserted outright in `scenario-harness.js`. Three translators had read an
+     ambiguity in the English that no English reader would.
+   - **The mechanism is worth understanding, because it is what makes this repeatable.** All three
+     were forced off the literal calque by an unrelated collision (in most European languages "own
+     values" *is* the term for EIGENVALUES). **Being forced off a calque forces a translator to
+     choose a READING** — and a divergence in those forced choices is a direct measurement of how
+     many readings the source has. A language that can calque never has to decide, so it tells you
+     nothing.
+   - So: the languages that had to work hardest are the most informative, and a term-centric sweep
+     should read them first rather than treating them as the risky ones.
 4. **Glossary write-back — mandatory, not optional, no "later" exception (Tom, 2026-07-19).** Any
    confirmed terminology decision this sprint/stage produced — a wrong-term fix, a cross-key drift
    resolved, a new concept translated for the first time — gets written into `glossary.json`

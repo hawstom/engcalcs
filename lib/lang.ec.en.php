@@ -1689,7 +1689,19 @@ $ec_lang['lpn_push_no_change']='Every element already has these values, so nothi
 // question it answers is how much of this scenario is its own rather than inherited.
 $ec_lang['lpn_scenario_label']='Scenario';
 $ec_lang['lpn_scenario_base']='Base';
-$ec_lang['lpn_scenario_overrides']='Own values';
+// "Custom", not "Own" (Tom, 2026-08-14: *"I love 'custom'. 'Changed' is a little dangerous."*),
+// and the reason is a TRANSLATION reason rather than an English one -- which is why it is worth
+// a comment. "Own values" calques directly onto the standard term for EIGENVALUES in most of
+// Europe: es valores propios, pt valores proprios, de Eigenwerte, cs vlastni hodnota, hr vlastita
+// vrijednost, bg/ru/sr sobstveni. Ten languages in sprint 316 had to detect and route around that
+// independently, and three of them, forced off the calque, landed on "CHANGED values" -- which is
+// FALSE here, because a scenario's custom value may be identical to Base's (see
+// lpn_scenario_override_tip, and the assertion in dev/lpn-spike/scenario-harness.js).
+// "Custom" has no calque path into mathematics in any of them, so the trap does not exist to be
+// routed around, and it says ownership without implying difference. Seven languages had already
+// chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
+// pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
+$ec_lang['lpn_scenario_overrides']='Custom values';
 $ec_lang['lpn_scenario_tip']='The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.';
 $ec_lang['lpn_scenario_new']='New scenario…';
 $ec_lang['lpn_scenario_new_name']='Scenario {n}';

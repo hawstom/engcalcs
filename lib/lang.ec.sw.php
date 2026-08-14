@@ -1097,3 +1097,79 @@ $ec_lang['lpn_settings_legend_bottom_right']='Chini kulia';
 $ec_lang['lpn_confirm_restore_defaults']='Rejesha mipangilio yote (viambishi vya kitambulisho, thamani za kuanzia, mipangilio ya kikokotoo, mwonekano wa ramani, nafasi ya ufunguo wa ramani, na lebo zinazoonekana) kwenye thamani zake za asili? Mtandao wako haubadiliki. Mipangilio ni ya mradi ulio wazi, hivyo miradi yako mingine inabaki na yake.';
 $ec_lang['lpn_settings_wipe_btn']='Futa kila kitu kwenye ukurasa huu';
 $ec_lang['lpn_confirm_wipe']='Futa KILA KITU kilichohifadhiwa kwa ukurasa huu — kila mradi, kila picha ya nyuma, mipangilio yote, na chaguo lako la vitengo — na upakie ukurasa upya kama vile mtembeleaji mpya kabisa angeuona? Hili haliwezi kutenguliwa.';
+
+// Sprint 316-tanks-valves-scenarios (2026-08-14). Tank fields: the three levels are DEPTHS
+// measured up from the tank floor (kina), never elevations on the site datum (mwinuko) --
+// kept lexically distinct per the glossary tank entry and the sprint brief's own trap #2.
+$ec_lang['lpn_tool_add_tank']='Tanki';
+$ec_lang['lpn_tool_add_valve']='Vali';
+$ec_lang['lpn_tank_elev_tip']='Mwinuko wa sakafu ya tanki. Kina cha maji tangani hupimwa kutoka hapa kwenda juu.';
+$ec_lang['lpn_field_tank_level']='Kina cha maji';
+$ec_lang['lpn_field_tank_level_tip']='Kina cha maji yaliyosimama tangani, kikipimwa kutoka sakafu ya tanki kwenda juu. Uso wa maji ni mwinuko wa sakafu ya tanki pamoja na kina hiki.';
+$ec_lang['lpn_field_tank_minlevel']='Kina cha chini kabisa cha maji';
+$ec_lang['lpn_field_tank_minlevel_tip']='Kina cha maji ambapo tanki huchukuliwa kuwa tupu, kikipimwa kutoka sakafu ya tanki kwenda juu.';
+$ec_lang['lpn_field_tank_maxlevel']='Kina cha juu kabisa cha maji';
+$ec_lang['lpn_field_tank_maxlevel_tip']='Kina cha maji ambapo tanki huchukuliwa kuwa imejaa, kikipimwa kutoka sakafu ya tanki kwenda juu.';
+$ec_lang['lpn_field_tank_diameter']='Kipenyo cha tanki';
+$ec_lang['lpn_field_tank_diameter_tip']='Upana wa tanki kutoka upande mmoja hadi mwingine. Uko katika vitengo vile vile vya mwinuko, si vitengo vya kipenyo cha bomba. Huamua kiasi cha maji kinachoshikiliwa na kina fulani.';
+$ec_lang['lpn_tank_head_tip']='Mwinuko wa uso wa maji tangani: mwinuko wa sakafu ya tanki pamoja na kina cha maji. Hiki ndicho kiwango kinachotumiwa na kitatuzi kwa tanki hili.';
+
+$ec_lang['lpn_inp_drop_tank_curve']='Matanki haya hayana kuta zilizonyooka: faili linaeleza umbo lake kama mkondo. Yaliingia kama matanki ya duara, kila moja likiwa na kipenyo kilichoandikwa kwenye faili. Uso wa maji bado ni ule uliowekwa na faili, hivyo majibu yanalingana; umbo pekee ndilo lililorahisishwa.';
+$ec_lang['lpn_inp_drop_valve_active']='Vali hizi hudhibiti shinikizo au mtiririko, na hujifungua na kujifunga zenyewe maji yanapobadilika. Hakuna kilichopotea kwenye maelezo yake wakati wa kuingiza, na ukurasa huu huzitatua kwa kitatuzi cha EPANET, ukiwasha kitatuzi hicho chenyewe kwa mtandao huu.';
+$ec_lang['lpn_diag_valve_needs_epanet']='Vali hizi hujifungua na kujifunga zenyewe, na ni kitatuzi cha EPANET pekee kinachoweza kuzikokotoa. Kitatuzi cha EPANET kimeshindwa kupakiwa, hivyo majibu haya hayapo:';
+$ec_lang['lpn_diag_valve_on_fixed_head']='Vali hizi zimeunganishwa moja kwa moja kwenye hifadhi ya maji au tanki, ambayo tayari huweka kiwango cha maji hapo, hivyo hakuna kilichobaki kwa vali kudhibiti. Weka bomba fupi kati ya vali na hifadhi ya maji au tanki:';
+
+// Valve type dropdown. Four labels for one field: pressure (PRV/PSV), flow (FCV), or a
+// dimensionless loss coefficient (TCV) -- kept as three distinct setting labels below, per
+// the sprint brief's trap #3. Parallel infinitive-verb forms across all four type names.
+$ec_lang['lpn_field_valve_type']='Aina ya vali';
+$ec_lang['lpn_field_valve_type_tip']='Kinachofanywa na vali. Vali ya kubana hushikilia upotevu uliowekwa. Nyingine tatu hushikilia shinikizo au mtiririko, na hufunguka kabisa, kufunga, au kufunga kwa sehemu maji yanapobadilika. Kubadilisha aina huweka namba mpya ya kuanzia kwenye mpangilio hapa chini, kwa sababu shinikizo si mtiririko, wala hakuna kati ya hizo mbili kilicho mgawo wa upotevu.';
+$ec_lang['lpn_valve_type_tcv']='Kubana (TCV)';
+$ec_lang['lpn_valve_type_prv']='Kupunguza shinikizo (PRV)';
+$ec_lang['lpn_valve_type_psv']='Kudumisha shinikizo (PSV)';
+$ec_lang['lpn_valve_type_fcv']='Kudhibiti mtiririko (FCV)';
+$ec_lang['lpn_field_valve_setting_pressure']='Mpangilio wa shinikizo';
+$ec_lang['lpn_field_valve_setting_pressure_tip']='Shinikizo linaloshikiliwa na vali. Vali ya kupunguza shinikizo hushikilia shinikizo upande wa chini ya mkondo kwenye thamani hii au chini yake. Vali ya kudumisha shinikizo hushikilia shinikizo upande wa juu ya mkondo kwenye thamani hii au juu yake.';
+$ec_lang['lpn_field_valve_setting_flow']='Mpangilio wa mtiririko';
+$ec_lang['lpn_field_valve_setting_flow_tip']='Kiwango cha juu cha maji vali inachoruhusu kupita. Kunapohitajika maji kidogo kuliko hiki kupita, vali husimama wazi kabisa na haiongezi upotevu wowote.';
+$ec_lang['lpn_field_valve_setting_loss']='Mgawo wa upotevu';
+$ec_lang['lpn_field_valve_setting_loss_tip']='Kiasi cha kimo kinachoondolewa na vali ya kubana, kikihesabiwa kama kizidishi cha kimo cha kasi. Tumia 0 kwa vali iliyosimama wazi kabisa. Namba hii moja ndiyo upotevu wote wa vali ya kubana.';
+$ec_lang['lpn_field_valve_diameter_tip']='Upana wa tundu linalopitisha maji kwenye vali. Kasi ya maji kupitia vali hukokotolewa kutoka upana huu, na upotevu hutokana na kasi hiyo.';
+$ec_lang['lpn_field_valve_km_tip']='Upotevu kutoka kwenye mwili wa vali wakati vali imesimama wazi kabisa, ukiongezwa juu ya chochote kinachoondolewa na mpangilio wa vali. Huhesabiwa kama kizidishi cha kimo cha kasi. Tumia 0 kuupuuza.';
+
+$ec_lang['lpn_mode_add_tank']='Hali: Ongeza Tanki. Bofya ramani ili kuweka tanki. Badilisha kwenda Hali ya Chagua ili kubadilisha au kuhamisha vipengele na lebo.';
+$ec_lang['lpn_mode_add_valve']='Hali: Ongeza Vali. Bofya kifundo, kisha kifundo kingine, ili kuviunganisha. Badilisha kwenda Hali ya Chagua ili kubadilisha au kuhamisha vipengele na lebo.';
+$ec_lang['lpn_method_switch_confirm']='Kubadilisha njia ya msuguano hakubadilishi namba za usuguo ulizokwisha andika kwenye mabomba yako, na usuguo wa njia moja hauna maana kwa njia nyingine. Kagua kila bomba baada ya hili. Ubadilishe hata hivyo?';
+$ec_lang['lpn_field_closed']='Imefungwa';
+$ec_lang['lpn_field_closed_tip']='Funga bomba hili ili maji yasiweze kupita ndani yake. Bomba linabaki kwenye ramani na kubaki na namba zake zote, na unaweza kulifungua tena wakati wowote.';
+$ec_lang['lpn_engine_valve_route']='Kimetatuliwa kwa kitatuzi cha EPANET, kwa sababu vali hizi hujifungua na kujifunga zenyewe:';
+
+// Scenario feature. "Senario" (transliteration) chosen because no established Swahili
+// engineering standard was found and the native words already carry other UI meanings in
+// this file: "hali" = Mode, "mfano" = example, "toleo" = file version. "Msingi" = Base.
+// "Own values" ("Thamani zake mwenyewe") deliberately avoids any eigenvalue-adjacent word
+// per the sprint brief's trap #4.
+$ec_lang['lpn_scenario_label']='Senario';
+$ec_lang['lpn_scenario_base']='Msingi';
+$ec_lang['lpn_scenario_overrides']='Thamani zake mwenyewe';
+$ec_lang['lpn_scenario_tip']='Mkusanyiko wa thamani ambazo mchoro unaonyesha na ukurasa unatatua sasa hivi. Bofya ili kubadilisha senario, au kuongeza, kubadilisha jina, au kufuta moja.';
+$ec_lang['lpn_scenario_new']='Senario mpya…';
+$ec_lang['lpn_scenario_new_name']='Senario {n}';
+$ec_lang['lpn_scenario_prompt_name']='Jina la senario hii';
+$ec_lang['lpn_scenario_rename']='Badilisha jina la senario…';
+$ec_lang['lpn_scenario_delete']='Futa senario';
+$ec_lang['lpn_scenario_delete_confirm']='Futa senario {name}, na thamani {n} zinazoimilikia peke yake? Mchoro wenyewe hautabadilika.';
+$ec_lang['lpn_scenario_override']='Katika senario hii pekee';
+$ec_lang['lpn_scenario_override_tip']='Kuweka alama kunamaanisha thamani hii inamilikiwa na senario hii pekee, hata ikiwa ni namba ile ile ya Msingi. Ondoa alama ili kutumia tena thamani ya Msingi.';
+$ec_lang['lpn_scenario_base_value']='Msingi: {value}';
+$ec_lang['lpn_scenario_deactivated']='{id} haimo kwenye mtandao katika {scenario}. Bado ipo kwenye mchoro, na kwenye senario zako nyingine.';
+$ec_lang['lpn_scenario_push_btn']='Weka thamani za Msingi kwenye senario zote';
+$ec_lang['lpn_scenario_push_tip']='Kila senario inarudi kwenye thamani ya Msingi kwa sifa ambazo lebo zake zinaonyeshwa sasa hivi. Thamani zinazomilikiwa na senario hizo pekee zinatupwa.';
+$ec_lang['lpn_scenario_push_confirm']='Fanya kila senario itumie thamani za Msingi kwa sifa hizi? Thamani zinazomilikiwa na senario hizo pekee zinatupwa. Unaweza kutengua hili.';
+$ec_lang['lpn_scenario_push_scenarios']='Senario zinazoathirika:';
+$ec_lang['lpn_scenario_push_values']='Thamani zinazotupwa:';
+$ec_lang['lpn_scenario_push_none']='Hakuna senario yenye thamani yake mwenyewe kwa sifa yoyote kati ya hizi, hivyo hakuna kitakachobadilika. Hakuna kinachotupwa.';
+$ec_lang['lpn_delete_drops_overrides']='Kufuta kipengele hiki pia kunatupa thamani {n} ambazo senario zako zinazishikilia kwa ajili yake. Endelea?';
+$ec_lang['lpn_push_base_only']='Kitendo hiki kinabadilisha mchoro wenyewe, hivyo kinaweza kufanywa tu katika {base}. Badilisha kwenda {base} na ujaribu tena.';
+$ec_lang['lpn_field_active']='Sehemu ya mtandao huu';
+$ec_lang['lpn_field_active_tip']='Ondoa alama kwenye kisanduku hiki ili kipengele kibaki kwenye mchoro lakini nje ya mtandao: kinachorwa kwa rangi ya kijivu na kitatuzi hukipuuza. Katika senario, hivi ndivyo bomba linalopendekezwa huwashwa na kuzimwa.';

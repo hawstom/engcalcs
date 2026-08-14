@@ -2,7 +2,7 @@
     "meta": {
         "language": "km",
         "expected_key_count": 917,
-        "delta_key_count": 60,
+        "delta_key_count": 42,
         "exempt_key_count": 16,
         "exempt_keys": [
             "calc_units_us",
@@ -328,24 +328,6 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_tool_add_tank": "Tank",
-        "lpn_tool_add_valve": "Valve",
-        "lpn_tank_elev_tip": "Elevation of the tank bottom. Water depths in the tank are measured up from here.",
-        "lpn_field_tank_level": "Water depth",
-        "lpn_field_tank_level_tip": "Depth of water standing in the tank, measured up from the tank bottom. The water surface is the tank bottom elevation plus this depth.",
-        "lpn_field_tank_minlevel": "Lowest water depth",
-        "lpn_field_tank_minlevel_tip": "Depth of water at which the tank is treated as empty, measured up from the tank bottom.",
-        "lpn_field_tank_maxlevel": "Highest water depth",
-        "lpn_field_tank_maxlevel_tip": "Depth of water at which the tank is full, measured up from the tank bottom.",
-        "lpn_field_tank_diameter": "Tank diameter",
-        "lpn_field_tank_diameter_tip": "Width of the tank from side to side. It is in the same units as elevation, not in the pipe diameter units. It sets how much water a given depth holds.",
-        "lpn_tank_head_tip": "Water surface elevation in the tank: the tank bottom elevation plus the water depth. This is the level the solver uses for the tank.",
-        "lpn_inp_drop_tank_curve": "These tanks are not straight-sided: the file gives their shape as a curve. They came in as round tanks, each with the diameter written in the file. The water surface is still the one the file sets, so the answers match; only the shape is simplified.",
-        "lpn_inp_drop_valve_active": "These valves control pressure or flow, and they open and close on their own as the water changes. Nothing about them was lost on the way in, and this page solves them with the EPANET solver, turning that solver on by itself for this network.",
-        "lpn_diag_valve_needs_epanet": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:",
-        "lpn_diag_valve_on_fixed_head": "These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:",
-        "lpn_field_valve_type": "Valve type",
-        "lpn_field_valve_type_tip": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient.",
         "lpn_valve_type_tcv": "Throttle (TCV)",
         "lpn_valve_type_prv": "Pressure reducing (PRV)",
         "lpn_valve_type_psv": "Pressure sustaining (PSV)",
@@ -365,7 +347,7 @@
         "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.",
         "lpn_scenario_label": "Scenario",
         "lpn_scenario_base": "Base",
-        "lpn_scenario_overrides": "Own values",
+        "lpn_scenario_overrides": "Custom values",
         "lpn_scenario_tip": "The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.",
         "lpn_scenario_new": "New scenario…",
         "lpn_scenario_new_name": "Scenario {n}",
@@ -390,24 +372,6 @@
         "lpn_engine_valve_route": "Solved with the EPANET solver, because these valves open and close on their own:"
     },
     "keys": {
-        "lpn_tool_add_tank": "Tank",
-        "lpn_tool_add_valve": "Valve",
-        "lpn_tank_elev_tip": "Elevation of the tank bottom. Water depths in the tank are measured up from here.",
-        "lpn_field_tank_level": "Water depth",
-        "lpn_field_tank_level_tip": "Depth of water standing in the tank, measured up from the tank bottom. The water surface is the tank bottom elevation plus this depth.",
-        "lpn_field_tank_minlevel": "Lowest water depth",
-        "lpn_field_tank_minlevel_tip": "Depth of water at which the tank is treated as empty, measured up from the tank bottom.",
-        "lpn_field_tank_maxlevel": "Highest water depth",
-        "lpn_field_tank_maxlevel_tip": "Depth of water at which the tank is full, measured up from the tank bottom.",
-        "lpn_field_tank_diameter": "Tank diameter",
-        "lpn_field_tank_diameter_tip": "Width of the tank from side to side. It is in the same units as elevation, not in the pipe diameter units. It sets how much water a given depth holds.",
-        "lpn_tank_head_tip": "Water surface elevation in the tank: the tank bottom elevation plus the water depth. This is the level the solver uses for the tank.",
-        "lpn_inp_drop_tank_curve": "These tanks are not straight-sided: the file gives their shape as a curve. They came in as round tanks, each with the diameter written in the file. The water surface is still the one the file sets, so the answers match; only the shape is simplified.",
-        "lpn_inp_drop_valve_active": "These valves control pressure or flow, and they open and close on their own as the water changes. Nothing about them was lost on the way in, and this page solves them with the EPANET solver, turning that solver on by itself for this network.",
-        "lpn_diag_valve_needs_epanet": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:",
-        "lpn_diag_valve_on_fixed_head": "These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:",
-        "lpn_field_valve_type": "Valve type",
-        "lpn_field_valve_type_tip": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient.",
         "lpn_valve_type_tcv": "Throttle (TCV)",
         "lpn_valve_type_prv": "Pressure reducing (PRV)",
         "lpn_valve_type_psv": "Pressure sustaining (PSV)",
@@ -427,7 +391,7 @@
         "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.",
         "lpn_scenario_label": "Scenario",
         "lpn_scenario_base": "Base",
-        "lpn_scenario_overrides": "Own values",
+        "lpn_scenario_overrides": "Custom values",
         "lpn_scenario_tip": "The set of values the drawing is showing and the page is solving right now. Click to switch scenarios, or to add, rename, or delete one.",
         "lpn_scenario_new": "New scenario…",
         "lpn_scenario_new_name": "Scenario {n}",
@@ -452,302 +416,14 @@
         "lpn_engine_valve_route": "Solved with the EPANET solver, because these valves open and close on their own:"
     },
     "key_context": {
-        "lpn_tool_add_tank": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_add_reservoir",
-                    "value": "អាងស្តុក",
-                    "english": "Reservoir"
-                },
-                "next_translated": {
-                    "key": "lpn_tool_add_pipe",
-                    "value": "ខ្សែបំពង់",
-                    "english": "Pipe"
-                }
-            }
-        },
-        "lpn_tool_add_valve": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_tool_add_pump",
-                    "value": "ម៉ាស៊ីនបូម",
-                    "english": "Pump"
-                },
-                "next_translated": {
-                    "key": "lpn_tool_add_text",
-                    "value": "អក្សរ",
-                    "english": "Text"
-                }
-            }
-        },
-        "lpn_tank_elev_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_head_tip",
-                    "value": "កម្រិតផ្ទៃទឹកនៅក្នុងអាងស្តុក វាស់ជាកម្ពស់ មិនមែនជាសម្ពាធទេ។ ទុកទទេ ដើម្បីឲ្យផ្ទៃទឹកស្ថិតនៅកម្ពស់អាងស្តុក។",
-                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
-                },
-                "next_translated": {
-                    "key": "lpn_close",
-                    "value": "បិទ",
-                    "english": "Close"
-                }
-            }
-        },
-        "lpn_field_tank_level": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_head_tip",
-                    "value": "កម្រិតផ្ទៃទឹកនៅក្នុងអាងស្តុក វាស់ជាកម្ពស់ មិនមែនជាសម្ពាធទេ។ ទុកទទេ ដើម្បីឲ្យផ្ទៃទឹកស្ថិតនៅកម្ពស់អាងស្តុក។",
-                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
-                },
-                "next_translated": {
-                    "key": "lpn_close",
-                    "value": "បិទ",
-                    "english": "Close"
-                }
-            }
-        },
-        "lpn_field_tank_level_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_head_tip",
-                    "value": "កម្រិតផ្ទៃទឹកនៅក្នុងអាងស្តុក វាស់ជាកម្ពស់ មិនមែនជាសម្ពាធទេ។ ទុកទទេ ដើម្បីឲ្យផ្ទៃទឹកស្ថិតនៅកម្ពស់អាងស្តុក។",
-                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
-                },
-                "next_translated": {
-                    "key": "lpn_close",
-                    "value": "បិទ",
-                    "english": "Close"
-                }
-            }
-        },
-        "lpn_field_tank_minlevel": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_head_tip",
-                    "value": "កម្រិតផ្ទៃទឹកនៅក្នុងអាងស្តុក វាស់ជាកម្ពស់ មិនមែនជាសម្ពាធទេ។ ទុកទទេ ដើម្បីឲ្យផ្ទៃទឹកស្ថិតនៅកម្ពស់អាងស្តុក។",
-                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
-                },
-                "next_translated": {
-                    "key": "lpn_close",
-                    "value": "បិទ",
-                    "english": "Close"
-                }
-            }
-        },
-        "lpn_field_tank_minlevel_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_head_tip",
-                    "value": "កម្រិតផ្ទៃទឹកនៅក្នុងអាងស្តុក វាស់ជាកម្ពស់ មិនមែនជាសម្ពាធទេ។ ទុកទទេ ដើម្បីឲ្យផ្ទៃទឹកស្ថិតនៅកម្ពស់អាងស្តុក។",
-                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
-                },
-                "next_translated": {
-                    "key": "lpn_close",
-                    "value": "បិទ",
-                    "english": "Close"
-                }
-            }
-        },
-        "lpn_field_tank_maxlevel": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_head_tip",
-                    "value": "កម្រិតផ្ទៃទឹកនៅក្នុងអាងស្តុក វាស់ជាកម្ពស់ មិនមែនជាសម្ពាធទេ។ ទុកទទេ ដើម្បីឲ្យផ្ទៃទឹកស្ថិតនៅកម្ពស់អាងស្តុក។",
-                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
-                },
-                "next_translated": {
-                    "key": "lpn_close",
-                    "value": "បិទ",
-                    "english": "Close"
-                }
-            }
-        },
-        "lpn_field_tank_maxlevel_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_head_tip",
-                    "value": "កម្រិតផ្ទៃទឹកនៅក្នុងអាងស្តុក វាស់ជាកម្ពស់ មិនមែនជាសម្ពាធទេ។ ទុកទទេ ដើម្បីឲ្យផ្ទៃទឹកស្ថិតនៅកម្ពស់អាងស្តុក។",
-                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
-                },
-                "next_translated": {
-                    "key": "lpn_close",
-                    "value": "បិទ",
-                    "english": "Close"
-                }
-            }
-        },
-        "lpn_field_tank_diameter": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_head_tip",
-                    "value": "កម្រិតផ្ទៃទឹកនៅក្នុងអាងស្តុក វាស់ជាកម្ពស់ មិនមែនជាសម្ពាធទេ។ ទុកទទេ ដើម្បីឲ្យផ្ទៃទឹកស្ថិតនៅកម្ពស់អាងស្តុក។",
-                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
-                },
-                "next_translated": {
-                    "key": "lpn_close",
-                    "value": "បិទ",
-                    "english": "Close"
-                }
-            }
-        },
-        "lpn_field_tank_diameter_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_head_tip",
-                    "value": "កម្រិតផ្ទៃទឹកនៅក្នុងអាងស្តុក វាស់ជាកម្ពស់ មិនមែនជាសម្ពាធទេ។ ទុកទទេ ដើម្បីឲ្យផ្ទៃទឹកស្ថិតនៅកម្ពស់អាងស្តុក។",
-                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
-                },
-                "next_translated": {
-                    "key": "lpn_close",
-                    "value": "បិទ",
-                    "english": "Close"
-                }
-            }
-        },
-        "lpn_tank_head_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_head_tip",
-                    "value": "កម្រិតផ្ទៃទឹកនៅក្នុងអាងស្តុក វាស់ជាកម្ពស់ មិនមែនជាសម្ពាធទេ។ ទុកទទេ ដើម្បីឲ្យផ្ទៃទឹកស្ថិតនៅកម្ពស់អាងស្តុក។",
-                    "english": "Water surface level in the reservoir, measured as a height, not as a pressure. Leave it blank to put the water surface at the reservoir elevation."
-                },
-                "next_translated": {
-                    "key": "lpn_close",
-                    "value": "បិទ",
-                    "english": "Close"
-                }
-            }
-        },
-        "lpn_inp_drop_tank_curve": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_inp_drop_headloss",
-                    "value": "ឯកសារនេះមិនប្រើរូបមន្ត Hazen-Williams ទេ។ ទំព័រនេះគណនាតាម Hazen-Williams ដូច្នេះលេខភាពរដិបរដុបបំពង់ត្រូវបានរក្សាទុកដូចដែលបានសរសេរជាក់លាក់ ប៉ុន្តែចម្លើយនៅទីនេះនឹងមិនត្រូវនឹងចម្លើយក្នុង EPANET ទេ។",
-                    "english": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET."
-                },
-                "next_translated": {
-                    "key": "lpn_inp_drop_tcv",
-                    "value": "វ៉ាល់ត្រួតពិនិត្យរបាំងលំហូរទាំងនេះចូលមកជាបំពង់ខ្លីៗដែលមានការបាត់បង់មូលដ្ឋានដូចគ្នា។ ទឹកនៅតែហូរដូចគ្នា ប៉ុន្តែធាតុនេះមិនមែនធាតុដដែលទេ។",
-                    "english": "These throttle valves came in as throttle valves, holding the same loss the file gives them. Either solver can work them out."
-                }
-            }
-        },
-        "lpn_inp_drop_valve_active": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_inp_drop_tcv",
-                    "value": "វ៉ាល់ត្រួតពិនិត្យរបាំងលំហូរទាំងនេះចូលមកជាបំពង់ខ្លីៗដែលមានការបាត់បង់មូលដ្ឋានដូចគ្នា។ ទឹកនៅតែហូរដូចគ្នា ប៉ុន្តែធាតុនេះមិនមែនធាតុដដែលទេ។",
-                    "english": "These throttle valves came in as throttle valves, holding the same loss the file gives them. Either solver can work them out."
-                },
-                "next_translated": {
-                    "key": "lpn_inp_drop_valve",
-                    "value": "វ៉ាល់ទាំងនេះត្រួតពិនិត្យសម្ពាធ ឬលំហូរ ហើយទំព័រនេះគ្មានធាតុបែបនេះទេ។ វាចូលមកជាបំពង់បើក ដូច្នេះបណ្ដាញនៅតែភ្ជាប់គ្នា ប៉ុន្តែគ្មានអ្វីត្រួតពិនិត្យវាទៀតទេ។",
-                    "english": "These valves are described by a curve or by a fixed pressure drop, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is holding pressure or flow there any more."
-                }
-            }
-        },
-        "lpn_diag_valve_needs_epanet": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_diag_unreachable",
-                    "value": "ថ្នាំងទាំងនេះគ្មានផ្លូវទៅអាងស្តុកទេ៖",
-                    "english": "These nodes have no path to a reservoir:"
-                },
-                "next_translated": {
-                    "key": "lpn_diag_not_converged",
-                    "value": "រកមិនឃើញដំណោះស្រាយទេ។ សូមពិនិត្យរកតម្លៃដែលមិនអាចមានក្នុងជីវិតពិត ដូចជាអង្កត់ផ្ចិតសូន្យ។",
-                    "english": "No solution was found. Check for values that are impossible in real life, such as a diameter of zero."
-                }
-            }
-        },
-        "lpn_diag_valve_on_fixed_head": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_diag_unreachable",
-                    "value": "ថ្នាំងទាំងនេះគ្មានផ្លូវទៅអាងស្តុកទេ៖",
-                    "english": "These nodes have no path to a reservoir:"
-                },
-                "next_translated": {
-                    "key": "lpn_diag_not_converged",
-                    "value": "រកមិនឃើញដំណោះស្រាយទេ។ សូមពិនិត្យរកតម្លៃដែលមិនអាចមានក្នុងជីវិតពិត ដូចជាអង្កត់ផ្ចិតសូន្យ។",
-                    "english": "No solution was found. Check for values that are impossible in real life, such as a diameter of zero."
-                }
-            }
-        },
-        "lpn_field_valve_type": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
-                },
-                "next_translated": {
-                    "key": "lpn_field_km",
-                    "value": "មេគុណការបាត់បង់មូលដ្ឋាន, k",
-                    "english": "Minor (local) loss coefficient, k"
-                }
-            }
-        },
-        "lpn_field_valve_type_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
-                },
-                "next_translated": {
-                    "key": "lpn_field_km",
-                    "value": "មេគុណការបាត់បង់មូលដ្ឋាន, k",
-                    "english": "Minor (local) loss coefficient, k"
-                }
-            }
-        },
         "lpn_valve_type_tcv": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
@@ -761,9 +437,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
@@ -777,9 +453,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
@@ -793,9 +469,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
@@ -809,9 +485,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
@@ -825,9 +501,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
@@ -841,9 +517,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
@@ -857,9 +533,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
@@ -873,9 +549,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
@@ -889,9 +565,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
@@ -905,9 +581,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
@@ -921,9 +597,9 @@
             "current_value": null,
             "neighbors": {
                 "previous_translated": {
-                    "key": "lpn_field_length_tip",
-                    "value": "ប្រវែងបំពង់។ ជាមួយ ស្វ័យប្រវត្តិ បើក ប្រវែងត្រូវបានវាស់ពីអ្វីដែលអ្នកបានគូរ។ បិទ ស្វ័យប្រវត្តិ ដើម្បីវាយបញ្ចូលប្រវែងផ្សេងពីការគូរ។",
-                    "english": "Length of the pipe. With Auto turned on the length is measured from what you drew. Turn Auto off to type a length that differs from the drawing."
+                    "key": "lpn_field_valve_type_tip",
+                    "value": "អ្វីដែលវ៉ាល់ធ្វើ។ វ៉ាល់ប្រភេទ “ការបាត់បង់ថេរ” រក្សាការបាត់បង់ថេរមួយ។ ប្រភេទបីទៀតរក្សាសម្ពាធ ឬលំហូរមួយ ហើយបើកពេញ បិទ ឬបិទដោយផ្នែកទៅតាមការផ្លាស់ប្ដូរទឹក។ ការប្ដូរប្រភេទដាក់លេខចាប់ផ្ដើមថ្មីនៅក្នុងការកំណត់ខាងក្រោម ព្រោះសម្ពាធមិនមែនជាលំហូរទេ ហើយទាំងពីរក៏មិនមែនជាមេគុណការបាត់បង់ដែរ។",
+                    "english": "What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient."
                 },
                 "next_translated": {
                     "key": "lpn_field_km",
