@@ -380,16 +380,23 @@ if ($optLinks) {
 //
 // So this block runs the same two probes and prints the same reasoning. It costs two requests.
 if ($bad) {
-    $probeStatic = @file_get_contents($base . '/css/engcalcs.css', false, stream_context_create(
-        ['http' => ['method' => 'HEAD', 'timeout' => 10, 'ignore_errors' => true]]));
-    $staticOk = isset($http_response_header) && strpos(implode(' ', $http_response_header), '200') !== false;
-    $probeSw = @file_get_contents($base . '/sw.php', false, stream_context_create(
-        ['http' => ['method' => 'HEAD', 'timeout' => 10, 'ignore_errors' => true]]));
-    $swOk = isset($http_response_header) && strpos(implode(' ', $http_response_header), '200') !== false;
+    // http_probe(), NOT a hand-rolled file_get_contents. The first version of this triage built its
+    // own HEAD request with a stream context and read $http_response_header -- and reported "DOES
+    // NOT ANSWER" for two files that answered 200, sending the reader to .htaccess for a fault that
+    // was not there. This file already had a correct fetcher twenty lines up, which picks curl or
+    // streams depending on what the machine has, precisely because a smoke check that cannot run
+    // where you are sitting is not a smoke check. A TRIAGE THAT LIES IS WORSE THAN NO TRIAGE: it
+    // spends the reader's trust and their time, and it does it at the moment they are already lost.
+    $staticProbe = http_probe($base . '/css/engcalcs.css', 'en');
+    $swProbe     = http_probe($base . '/sw.php', 'en');
+    $staticOk = ($staticProbe['code'] === 200);
+    $swOk     = ($swProbe['code'] === 200);
 
     echo "\ntriage\n";
-    printf("  %-34s %s\n", 'static asset under /engcalcs/', $staticOk ? 'answers' : 'DOES NOT ANSWER');
-    printf("  %-34s %s\n", 'sw.php (no lib/base.inc.php)', $swOk ? 'answers' : 'DOES NOT ANSWER');
+    printf("  %-34s %s\n", 'static asset under /engcalcs/',
+        $staticOk ? 'answers 200' : ('DOES NOT ANSWER (' . ($staticProbe['err'] ?: $staticProbe['code']) . ')'));
+    printf("  %-34s %s\n", 'sw.php (no lib/base.inc.php)',
+        $swOk ? 'answers 200' : ('DOES NOT ANSWER (' . ($swProbe['err'] ?: $swProbe['code']) . ')'));
     if ($staticOk && $swOk) {
         echo "\n  The web server is serving files and PHP runs. Every failure above is a page that\n";
         echo "  loads lib/base.inc.php, so the fault is inside THAT include chain. sw.php is the one\n";
