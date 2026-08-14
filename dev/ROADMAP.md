@@ -1612,6 +1612,15 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
   **Feasibility was checked 2026-08-14 so this is costed when it unblocks. It is a VARIANT, not a
   fork — do not start by copying the page.**
+  - **THE SUITE COULD NOT STAND ALONE UNTIL 2026-08-14, and this task would have hit it first.**
+    Every page loads `/hawsedc.css` — 464 bytes at the SITE ROOT, not tracked by this repository,
+    belonging to hawsedc.com — and it carries the calculator form backgrounds and the table borders.
+    Found when dev.hawsedc.com's first deploy came up 95% right: everything present except the blue
+    and the borders, which reads like a cache problem for a day before anyone checks for a 404. Its
+    rules are now duplicated into `css/engcalcs.css` (self-sufficiency block at the top) and
+    `dev/scripts/standalone_assets_check.php` blocks any new asset outside `/engcalcs/`. **A
+    different domain is exactly the condition that exposes this class**, so treat any parent-site
+    dependency as this task's problem by default.
   - **A chrome-free header largely exists already.** `echoHeader()`'s `"normal"` branch
     (`lib/HeadersFooters.lib.php`) already skips the navbar, `engcalcs.css` and the calculator JS.
     No page currently uses it for a calculator, but the branch is live.

@@ -89,6 +89,11 @@ run_check "log columns cannot be forged" blocking php dev/scripts/browser_lang_t
 # wrong, nothing errored, and the only place the defect existed was the GAP between two files. This
 # renders real pages and diffs their asset URLs against what the worker will really cache.
 run_check "service worker precache"      blocking php dev/scripts/sw_manifest_check.php
+# Can this suite stand up ALONE? dev.hawsedc.com's first deploy came up with no blue form
+# backgrounds and no table borders, because /hawsedc.css lives in the PARENT site and is not in this
+# repo -- present on every machine anyone looks at, absent exactly where nobody looks until a deploy.
+# LibreEPANET.org (Task 306) is by definition a standalone deploy and would have hit the same wall.
+run_check "suite ships its own assets"   blocking php dev/scripts/standalone_assets_check.php
 # Task 184 x Task 248. setProp() is the ONE write seam for an overridable property; a call site that
 # writes el._diameter directly edits BASE from inside a scenario, silently, under every other
 # scenario at once. That is not hypothetical -- the valve popup did it on five fields, and the two

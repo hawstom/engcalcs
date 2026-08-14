@@ -1,3 +1,41 @@
+/* ---------------------------------------------------------------------------------------------
+   SELF-SUFFICIENCY BLOCK -- rules this suite needs that used to live only in the PARENT SITE.
+   Added 2026-08-14 after dev.hawsedc.com's first deploy came up with no blue form backgrounds and
+   no table borders.
+
+   WHAT HAPPENED. Every page loads three stylesheets: bootstrap, this file, and `/hawsedc.css` --
+   and that third one sits at the SITE ROOT and is NOT tracked by the engcalcs repository. It
+   belongs to hawsedc.com. Deploy engcalcs on its own and it simply is not there, so `form`
+   backgrounds and table borders vanish while everything else looks fine. 464 bytes, outside the
+   repo, invisible to every check we have.
+
+   WHY IT MATTERS BEYOND ONE DEV BOX: LibreEPANET.org (ROADMAP Task 306) is BY DEFINITION a
+   standalone deploy of this suite on another domain. It would have walked into exactly this, and
+   the symptom -- most of the page fine, some styling missing -- is the kind that gets blamed on a
+   cache for a day before anyone looks at a 404.
+
+   DUPLICATION IS DELIBERATE AND SAFE. On hawsedc.com `/hawsedc.css` still loads LAST, so its
+   identical declarations win and nothing changes there. On a standalone deploy these are the only
+   copy. Kept at the TOP of this file so every engcalcs rule below can still override them, which is
+   how they behaved when they were in a stylesheet loaded before... nothing. Keep the VALUES in step
+   with `/hawsedc.css` if that file is ever edited.
+   --------------------------------------------------------------------------------------------- */
+body { font-family: sans-serif; }
+form {
+	background: #f7f9ff;
+	border: 1px solid #66c;
+	margin-bottom: 1px;
+}
+.left { float: left; margin: 0.5em; }
+table, th, tr, td {
+	border: 1px solid blue;
+	border-collapse: collapse;
+	padding: 0px 2px 0px 2px;
+}
+/* "bare" tables and their immediate children show no border -- the layout tables the calculator
+   forms are built from. Without this every calculator is a grid of blue boxes. */
+table.bare, table.bare > tbody > tr, table.bare > tbody > tr > td { border-width: 0px; }
+
 .input {
 	width: 7em;
 }
