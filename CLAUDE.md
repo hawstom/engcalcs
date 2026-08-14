@@ -662,6 +662,19 @@ So: **launch every language at once and rely on batching**, rather than splittin
 future sprint loses a whole language's work despite batching, that is new evidence — reopen the
 question then, and change one mechanism at a time.
 
+**THERE IS A HARD CONCURRENCY CAP, and 26 > it by default (found 2026-08-14, sprint 316).** The
+harness allows **20 concurrent subagents** unless `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` is raised,
+and the 21st call fails with "Concurrent subagent limit reached. Do not retry." So a 26-language
+sprint launches **20 immediately and queues 6**, which the orchestrator then starts as slots free.
+- **This is a platform limit, NOT the retired wave split, and must not be written up as one.** The
+  wave split was a deliberate throttle with a stop-and-wait boundary between waves; this is a queue
+  with no boundary — the moment a slot frees, the next language starts. Nobody waits for a wave to
+  finish.
+- **Plan for it in the proposal**, so the count you announce to the user is honest: say "26 agents,
+  20 at once and 6 as slots free", not "26 agents".
+- Raising the env var is the way to launch all 26 at once, and is worth asking the user about only
+  if a sprint's wall-clock actually matters.
+
 **Do not bundle an unauthorized mechanism into an authorized one.** Batching was added to the
 sprint-251 brief in the same breath as the wave split Tom had actually approved, which confounded
 the experiment — two variables changed at once, so neither could be judged until a later wave
