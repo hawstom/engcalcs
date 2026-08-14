@@ -1919,7 +1919,7 @@ var EngCalcs = EngCalcs || {};
 		opt('', pc.lpn_backdrop_menu || 'Background image...');
 		opt('add', pc.lpn_backdrop_add || 'Add image');
 		opt('scale', pc.lpn_backdrop_scale || 'Scale', true);
-		opt('scale-entry', pc.lpn_backdrop_scale_entry || 'Set image scale by typing', true);
+		opt('scale-entry', pc.lpn_backdrop_scale_entry || 'Set image scale by typing or World File', true);
 		opt('position', pc.lpn_backdrop_position || 'Position', true);
 		opt('remove', pc.lpn_backdrop_remove || 'Remove image', true);
 		var fileInput = document.getElementById('lpn_backdrop_file');
@@ -5402,7 +5402,7 @@ var EngCalcs = EngCalcs || {};
 			// the same place.
 			{ icon: 'image', label: pc.lpn_backdrop_add || 'Add image', fn: function () { backdropAction('add'); } },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
-			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Set image scale by typing', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
+			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Set image scale by typing or World File', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
 			{ icon: 'position', label: pc.lpn_backdrop_position || 'Position', fn: function () { backdropAction('position'); }, disabled: !backdrop },
 			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove image', fn: function () { backdropAction('remove'); }, disabled: !backdrop },
 			{ separator: true },

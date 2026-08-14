@@ -54,6 +54,8 @@
         "menu_main_hydraulics": "Hydraulics",
         "menu_main_language": "Language",
         "menu_more": "More",
+        "menu_walkthroughs": "Walkthroughs (in English)",
+        "menu_walkthroughs_tip": "Step-by-step guides to the calculators, on Tom Haws's blog. Written in English only.",
         "menu_libre": "Libre Software",
         "template_welcome": "Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target=\"_blank\" href=\"https:\/\/hawsedc.com\/download.php\">free libre HawsEDC AutoCAD tools<\/a> too.",
         "template_feedback": "Can you suggest better wording or anything else? Do you want to help or to learn to create tools like these? Please contact me.",
@@ -797,7 +799,7 @@
         "lpn_backdrop_menu": "Background image…",
         "lpn_backdrop_add": "Add image",
         "lpn_backdrop_scale": "Set image scale by picking",
-        "lpn_backdrop_scale_entry": "Set image scale by typing",
+        "lpn_backdrop_scale_entry": "Set image scale by typing or World File",
         "lpn_backdrop_scale_entry_prompt": "Enter the size of a pixel or paste the complete contents of the World File for the image",
         "lpn_backdrop_scale_entry_bad": "Type one number for the size of a pixel, or paste all six lines of a world file.",
         "lpn_backdrop_wld_ask": "Choose a World File for automatic scale and location?",
@@ -863,7 +865,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 861,
+    "count": 863,
     "active_prefixes": [
         "about",
         "bpn",

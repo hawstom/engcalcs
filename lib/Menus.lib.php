@@ -153,6 +153,14 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<a class="dropdown-item" href="About.php"><?=$ec_lang['about_main_menu']?></a>
 					<a class="dropdown-item" href="Install.php"><?=$ec_lang['install_main_menu']?></a>
 					<a class="dropdown-item" href="contact.php"><?=$ec_lang['contact_main_menu']?></a>
+					<?php // Tom's walkthroughs (2026-08-13). A new TAB rather than a navigation: the one
+					      // page most likely to send somebody looking for a guide is Looped-Network.php,
+					      // and leaving it mid-drawing to read one is the wrong trade. The label carries
+					      // its own "(in English)" because the navbar's only tip mechanism is title=,
+					      // which js/Calculators.lib.js never activates on touch. ?>
+					<a class="dropdown-item" href="https://tomsthird.blogspot.com/2026/08/hawsedc-free-unlimited-online-looped.html"
+						target="_blank" rel="noopener"
+						title="<?=htmlspecialchars($ec_lang['menu_walkthroughs_tip'], ENT_QUOTES, 'UTF-8')?>"><?=$ec_lang['menu_walkthroughs']?></a>
 				</div>
 			</li>
 		</ul>

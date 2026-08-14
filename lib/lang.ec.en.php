@@ -115,6 +115,11 @@ $ec_lang['menu_main_language']='Language';
 $ec_lang_syn['menu_main_language']='';
 $ec_lang['menu_more']='More';
 $ec_lang_syn['menu_more']='';
+// Tom's own step-by-step guides, which live on his blog rather than on this site. TRANSLATORS: the
+// linked page is in English only and the navbar has no tooltip that works on touch, so include your
+// language's own "(in English)" marker in the label -- a reader should know before tapping.
+$ec_lang['menu_walkthroughs']='Walkthroughs (in English)';
+$ec_lang['menu_walkthroughs_tip']='Step-by-step guides to the calculators, on Tom Haws\'s blog. Written in English only.';
 $ec_lang['menu_libre']='Libre Software';
 $ec_lang_syn['menu_libre']='Lock-free Software, Unlocked Software, Unchained Software, FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share. | layout: nav item; gloss: libre software; avoid: free of charge (gratis); transliterating "libre" as a brand name';
 $ec_lang['template_welcome']='Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target="_blank" href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too.';
@@ -1545,7 +1550,7 @@ $ec_lang['lpn_backdrop_add']='Add image';
 // term of art it would be in an imaging tool -- and a translator gets "size of pixel" out of it
 // anyway, so spelling it out costs the English nothing and hands them the phrase already unpacked.
 $ec_lang['lpn_backdrop_scale']='Set image scale by picking';
-$ec_lang['lpn_backdrop_scale_entry']='Set image scale by typing';
+$ec_lang['lpn_backdrop_scale_entry']='Set image scale by typing or World File';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Enter the size of a pixel or paste the complete contents of the World File for the image';
 $ec_lang['lpn_backdrop_scale_entry_bad']='Type one number for the size of a pixel, or paste all six lines of a world file.';
 $ec_lang['lpn_backdrop_wld_ask']='Choose a World File for automatic scale and location?';

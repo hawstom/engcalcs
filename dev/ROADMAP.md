@@ -1358,12 +1358,24 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
 
-- 15|297| **Translate Task 276's 8 backdrop-scale keys into all 26 languages.** Seven are new
+- 30|298| **Rebrand the navbar's "More" as "Help" and move it beside the Language picker.** Tom,
+  2026-08-13: About, Install and Contact sit under it "just fine" as Help, and Walkthroughs now
+  joins them. Two edits in `lib/Menus.lib.php` — the `menu_more` value, and moving the `<li>` into
+  the right-hand `ms-auto` list ahead of the language dropdown.
+  - **Decide it together with Task 244**, which stakes out the same navbar strip for the FLOSS mark.
+    Both want the space next to the language menu, and settling them one at a time means moving the
+    same item twice.
+  - Changing `menu_more`'s English makes 26 translations stale — a resync, not a new key.
+
+- 15|297| **Translate Task 276's 10 backdrop-and-menu keys into all 26 languages.** Seven are new
   (`lpn_backdrop_scale_entry`, `_prompt`, `_bad`, `lpn_backdrop_wld_ask`, `_none`, `_choose`,
   `_bad`); the eighth is `lpn_backdrop_scale`, whose English changed to "Set image scale by
   picking" and whose 26 translations are now stale — the drift tripwire flags it as CHANGED.
   English falls back automatically (`base.inc.php` loads `lang.ec.en.php` first), so the feature
-  works everywhere today; this is the 182-key delta `lang_parity_check.php` reports.
+  works everywhere today; this is the delta `lang_parity_check.php` reports.
+  Plus `menu_walkthroughs` and `menu_walkthroughs_tip` (2026-08-13). The label must carry each
+  language's own "(in English)" marker: the target is Tom's English-only blog, and the navbar's only
+  tip mechanism is `title=`, which `js/Calculators.lib.js` never activates on touch.
 
 - 40|257|[H] **[HUMAN] Find or build the example PROJECTS (plural) for lpn.** **Reassigned to Tom,
   2026-08-11, at his own request: *"Let's change this task to a human assignment to create or find
@@ -1998,7 +2010,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 - 0|276| **[DONE 2026-08-13] Precise background-image scaling: type the number, or hand over a
   world file.** Menu now offers "Set image scale by picking" (the coarse step) and "Set image scale
-  by typing" — one box taking either a pixel size or a pasted world file, per Tom's own wording.
+  by typing or World File" — one box taking either a pixel size or a pasted world file.
   Adding an image offers a world-file pick; choosing image and world file together skips that step.
   A file that rotates, mirrors or unevenly stretches is refused with a message, never half-applied.
   Verified by `dev/lpn-spike/backdrop-scale-harness.js` (32 assertions, including the half-pixel
