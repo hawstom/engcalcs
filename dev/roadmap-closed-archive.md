@@ -6997,3 +6997,35 @@ tasks at priority 0. Compressed to a stub there; this is the full text as it sto
   **Shared-library bugs found and fixed during this build** (benefit every calculator using these patterns, not just this one): `js/Calculators.lib.js`'s `addCalcRow` never applied initial values to checkbox/radio row inputs; a `points_data`-textarea null dereference when a calculator's table omits the copy/paste feature; `loadFromUrl` could crash assigning `.value` to a non-Element when a field name collided with a reserved DOM collection property (e.g. `length` shadowing `HTMLFormControlsCollection.length`); `js/Cookies.lib.js`'s `cookieToForm` had no detection for a stored cookie no longer matching the current page's field layout — now bails cleanly to reinitialize instead of crashing or partially populating.
 
   Reused existing precedent throughout rather than inventing new architecture: `Manning-Irregular.php`'s dynamic add/remove row table (`EngCalcs.addCalcRow` etc. in `js/Calculators.lib.js`) and `js/darcy-weisbach.js`'s 3-regime friction factor. Deliberately dropped for this pass: the points-data copy/paste bulk-edit textarea (kept add/remove single-row controls only) and a sketch/diagram. Deferred/out of scope: pump-curve supply boundary (fixed inlet pressure only), a dedicated pressure-compensating-emitter toggle (usable today via the free `x` exponent input), and the 26-language translation sprint (English only; `$ec_lang_intent['ip_*']` left blank per the sprint process, not yet run — see the separate symbol-convention roadmap item, H-vs-P and q-vs-Q, to resolve before that sprint). `php -l` and JS syntax clean on all touched/new files throughout.
+
+
+## Task 318
+
+- 85|318| **The offline promise is FALSE: the service-worker asset precache is dead code.**
+  Found by a smell-test pass, 2026-08-14, and verified. `sw.js` precaches 25 bare paths
+  (`/engcalcs/js/looped-network.js`); every page requests those assets with `?v=<filemtime>`; and
+  `cacheFirst()` uses `caches.match(request)` — **exact URL, query included**. So the 22 CSS/JS
+  entries can never be served. Only the 3 query-less icons work.
+  - **`networkFirst()` strips the query and `cacheFirst()` does not**, which is why PAGES cache
+    correctly and assets do not. A page visited online does work offline, because its assets are
+    then cached at runtime under their real `?v=` URLs. What is dead is the PRECACHE — the
+    "visit one page, get all the calculators" promise.
+  - **It is a false claim on the About page**, aimed at exactly the audience the mission names:
+    `about_body_html` says *"Visit any calculator page while connected… After that, all calculators
+    work offline."* `Install.php` says the same. Either make it true or stop saying it.
+  - **The fix is a design choice with a real cost either way.** `{ignoreSearch: true}` makes the
+    precache live but permanently defeats `filemtime` busting — stale JS forever, which is worse.
+    **Generate `sw.js` from PHP** so precached URLs carry the same `filemtime` the pages request.
+    That is the recommended route and it also retires `CACHE_VERSION`.
+  - **Two hand-maintained lists have already drifted, and would still be wrong after the fix.**
+    Missing assets: `PipeHydraulics.lib.js`, `branched-network.js`, `lpn-geom.js`, `lpn-collide.js`,
+    `lpn-inp.js`, `lpn-net.js`. Missing page: **`Branched-Network.php` — a whole shipped
+    calculator**. Note `hazen-williams.js` is precached while its dependency `PipeHydraulics.lib.js`
+    is not: the list is INCOHERENT, not merely short.
+  - **`sw.js` is an undocumented FOURTH place a new lpn module must be registered.** CLAUDE.md names
+    three (`Looped-Network.php`, `lpn-dom-stub.js`, the harnesses); Task 293's split silently missed
+    this one. Derive both lists from the glob, or add `sw_manifest_check.php` to `check_all.sh`.
+  - **`CACHE_VERSION = 'engcalcs-v9'` is the banned hardcoded `?v=N`, reintroduced** — a manually
+    bumped string in the one file where forgetting it is invisible (a returning visitor silently
+    keeps the old cache). The Task 287 comment above it documents a bump that was required for
+    correctness, which proves the risk is live. Generating `sw.js` removes it entirely.

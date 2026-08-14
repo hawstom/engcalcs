@@ -469,35 +469,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     exactly why the in-file `format`/`app` marker is part of the same change rather than a
     nice-to-have.
 
-- 85|318| **The offline promise is FALSE: the service-worker asset precache is dead code.**
-  Found by a smell-test pass, 2026-08-14, and verified. `sw.js` precaches 25 bare paths
-  (`/engcalcs/js/looped-network.js`); every page requests those assets with `?v=<filemtime>`; and
-  `cacheFirst()` uses `caches.match(request)` — **exact URL, query included**. So the 22 CSS/JS
-  entries can never be served. Only the 3 query-less icons work.
-  - **`networkFirst()` strips the query and `cacheFirst()` does not**, which is why PAGES cache
-    correctly and assets do not. A page visited online does work offline, because its assets are
-    then cached at runtime under their real `?v=` URLs. What is dead is the PRECACHE — the
-    "visit one page, get all the calculators" promise.
-  - **It is a false claim on the About page**, aimed at exactly the audience the mission names:
-    `about_body_html` says *"Visit any calculator page while connected… After that, all calculators
-    work offline."* `Install.php` says the same. Either make it true or stop saying it.
-  - **The fix is a design choice with a real cost either way.** `{ignoreSearch: true}` makes the
-    precache live but permanently defeats `filemtime` busting — stale JS forever, which is worse.
-    **Generate `sw.js` from PHP** so precached URLs carry the same `filemtime` the pages request.
-    That is the recommended route and it also retires `CACHE_VERSION`.
-  - **Two hand-maintained lists have already drifted, and would still be wrong after the fix.**
-    Missing assets: `PipeHydraulics.lib.js`, `branched-network.js`, `lpn-geom.js`, `lpn-collide.js`,
-    `lpn-inp.js`, `lpn-net.js`. Missing page: **`Branched-Network.php` — a whole shipped
-    calculator**. Note `hazen-williams.js` is precached while its dependency `PipeHydraulics.lib.js`
-    is not: the list is INCOHERENT, not merely short.
-  - **`sw.js` is an undocumented FOURTH place a new lpn module must be registered.** CLAUDE.md names
-    three (`Looped-Network.php`, `lpn-dom-stub.js`, the harnesses); Task 293's split silently missed
-    this one. Derive both lists from the glob, or add `sw_manifest_check.php` to `check_all.sh`.
-  - **`CACHE_VERSION = 'engcalcs-v9'` is the banned hardcoded `?v=N`, reintroduced** — a manually
-    bumped string in the one file where forgetting it is invisible (a returning visitor silently
-    keeps the old cache). The Task 287 comment above it documents a bump that was required for
-    correctness, which proves the risk is live. Generating `sw.js` removes it entirely.
-
 - 55|319| **Log-row injection through `Accept-Language`, in five copy-pasted copies.** Every log
   writer sanitises its columns carefully — `log-signal-event.php` even explains why — but
   `$browserLang` comes raw from `$_SERVER['HTTP_ACCEPT_LANGUAGE']` with no filter and no length cap,
@@ -2227,6 +2198,20 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|318| **[DONE 2026-08-14] The offline promise is now TRUE, and verified on a real device.**
+  `sw.js` precached bare paths while every page requested `?v=<filemtime>`, and `cacheFirst()`
+  matched the exact URL including the query — so 22 of 25 precache entries could never be served and
+  the About page's "visit any calculator, then all of them work offline" was simply false. Replaced
+  by a generated `sw.php` (deployment is `git pull`, and **git does not preserve mtimes**, so a baked
+  file could never carry the values pages request). `CACHE_VERSION` retired; both lists derived from
+  the filesystem, picking up six missing modules and Branched-Network, a whole calculator.
+  `dev/scripts/sw_manifest_check.php` renders 21 pages and diffs 174 asset URLs against what the
+  worker will really cache.
+  **TOM CONFIRMED IT OFFLINE, 2026-08-14**: one calculator loaded online, network set to Offline,
+  then Branched-Network — never opened on that device, and absent from the old precache entirely —
+  rendered and computed, fully styled. That is the claim observed rather than reasoned about.
+
 
 - 0|323| **[DONE 2026-08-14] Scenario writes that bypassed `setProp`: the valve popup, `lenAuto`,
   blank overrides, and a stale count.** Five confirmed defects from the Task 184 x Task 248 merge,
