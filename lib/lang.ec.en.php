@@ -1555,10 +1555,18 @@ $ec_lang['lpn_field_length_tip']='Length of the pipe. With Auto turned on the le
 // different units, and one shared label would have to be vague enough to cover all three.
 $ec_lang['lpn_field_valve_type']='Valve type';
 $ec_lang['lpn_field_valve_type_tip']='What the valve does. A throttle valve keeps a fixed loss. The other three keep a pressure or a flow, and open fully, close, or partly close as the water changes. Changing the type puts a fresh starting number in the setting below, because a pressure is not a flow and neither one is a loss coefficient.';
+// THE ENGLISH IS ELLIPTICAL ON PURPOSE -- the noun "valve" is dropped because the dropdown above
+// already says "Valve type" -- so a translator meets a bare modifier with no head noun, and
+// "throttle" alone pulls hard toward a car accelerator. Each _syn supplies the noun plus alternates
+// (Wave 0, sprint 316; wording approved by Tom 2026-08-14, who rejected "pressure holding" for PSV).
 $ec_lang['lpn_valve_type_tcv']='Throttle (TCV)';
+$ec_lang_syn['lpn_valve_type_tcv']='Throttle valve (TCV), Throttling valve, Fixed-loss valve | gloss: valve';
 $ec_lang['lpn_valve_type_prv']='Pressure reducing (PRV)';
+$ec_lang_syn['lpn_valve_type_prv']='Pressure reducing valve (PRV), Pressure-lowering valve | gloss: valve';
 $ec_lang['lpn_valve_type_psv']='Pressure sustaining (PSV)';
+$ec_lang_syn['lpn_valve_type_psv']='Pressure sustaining valve (PSV), Pressure-supporting valve, Pressure-maintaining valve | gloss: valve';
 $ec_lang['lpn_valve_type_fcv']='Flow control (FCV)';
+$ec_lang_syn['lpn_valve_type_fcv']='Flow control valve (FCV), Flow-limiting valve, Maximum-flow valve | gloss: valve';
 $ec_lang['lpn_field_valve_setting_pressure']='Pressure setting';
 $ec_lang['lpn_field_valve_setting_pressure_tip']='The pressure the valve keeps. A pressure reducing valve keeps the pressure on its downstream side at or below this value. A pressure sustaining valve keeps the pressure on its upstream side at or above this value.';
 $ec_lang['lpn_field_valve_setting_flow']='Flow setting';
@@ -1606,7 +1614,15 @@ $ec_lang['lpn_tip_select']='Use this mode to change, move, and drag things on th
 $ec_lang['lpn_tip_labels_draggable']='You can drag a label to move it. Double-click a label to send it back to its automatic position.';
 $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_method_switch_confirm']='Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?';
-$ec_lang['lpn_field_closed']='Closed';
+// "Shut", not "Closed" (Tom, 2026-08-14: *"We change in English to ... good catch!"*). Wave 0 found
+// that "closed" is a live polysemy INSIDE hydraulics -- a CLOSED CONDUIT is a full, pressurised pipe
+// as opposed to an open channel, and every pipe on this page is one, so the wrong reading is not
+// obviously wrong to a translator. Fixing the English fixes all 27 languages and needs no _syn.
+// Chosen over Tom's other candidates for reasons worth keeping: "Blocked" and "Plugged" imply a
+// FAULT rather than a state the user chose; "Off" is vague on a pipe; "No flow" names the RESULT, on
+// a page where flow is a computed output. And this label's own tip already said "Shut this pipe so
+// no water can pass through it" -- the English had already picked the word, in the sentence beside it.
+$ec_lang['lpn_field_closed']='Shut';
 $ec_lang['lpn_field_closed_tip']='Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
@@ -1689,6 +1705,11 @@ $ec_lang['lpn_push_no_change']='Every element already has these values, so nothi
 // question it answers is how much of this scenario is its own rather than inherited.
 $ec_lang['lpn_scenario_label']='Scenario';
 $ec_lang['lpn_scenario_base']='Base';
+// "Base" is four letters carrying six English senses, standing alone as a proper name in a dropdown.
+// KEPT, because Tom is right that it is solid where it sits (2026-08-14) and it is what WaterGEMS and
+// InfoWater scenario managers call it -- so the fix belongs here, not in the English. Word list is
+// his; "Original" was struck at his instruction.
+$ec_lang_syn['lpn_scenario_base']='Base case, Baseline, Canonical, Source, Root, Trunk | gloss: scenario; avoid: a chemical base; a foundation; a military base; a base amount';
 // "Custom", not "Own" (Tom, 2026-08-14: *"I love 'custom'. 'Changed' is a little dangerous."*),
 // and the reason is a TRANSLATION reason rather than an English one -- which is why it is worth
 // a comment. "Own values" calques directly onto the standard term for EIGENVALUES in most of
@@ -1711,13 +1732,20 @@ $ec_lang['lpn_scenario_delete']='Delete scenario';
 $ec_lang['lpn_scenario_delete_confirm']='Delete the scenario {name}, and the {n} values that belong to it alone? The drawing itself is not changed.';
 $ec_lang['lpn_scenario_override']='Only in this scenario';
 $ec_lang['lpn_scenario_override_tip']='Checked means this value belongs to this scenario alone, even when it is the same number as Base. Clear the box to use the Base value again.';
-$ec_lang['lpn_scenario_base_value']='Base: {value}';
+// "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
+// place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
+// scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
+// The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
+// Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='Base scenario: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} is out of the network in {scenario}. It is still in the drawing, and in your other scenarios.';
 $ec_lang['lpn_scenario_push_btn']='Apply Base values to all scenarios';
 $ec_lang['lpn_scenario_push_tip']='Every scenario goes back to the Base value for the properties whose labels are showing right now. Values that belong to those scenarios alone are thrown away.';
 $ec_lang['lpn_scenario_push_confirm']='Make every scenario use the Base values for these properties? Values that belong to those scenarios alone are thrown away. You can undo this.';
 $ec_lang['lpn_scenario_push_scenarios']='Scenarios affected:';
 $ec_lang['lpn_scenario_push_values']='Values thrown away:';
+// A COUNT follows this label, not a list. Alternates are Tom's own (2026-08-14).
+$ec_lang_syn['lpn_scenario_push_values']='Values thrown away, Values discarded, Values lost, Values wiped, Values replaced, Values displaced, Values cleared, Custom values cleared | a count follows this label, not a list of values';
 $ec_lang['lpn_scenario_push_none']='No scenario has a value of its own for any of these properties, so nothing would change. Nothing is thrown away.';
 $ec_lang['lpn_delete_drops_overrides']='Deleting this element also throws away {n} values that your scenarios hold for it. Continue?';
 $ec_lang['lpn_push_base_only']='This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.';

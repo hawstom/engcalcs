@@ -56,8 +56,18 @@ function allText(n) {
 	return t;
 }
 
-// Finds the Closed checkbox the popup actually rendered, rather than trusting a field order --
-// so reordering renderLinkFields() does not silently retarget this test at another checkbox.
+// Finds the shut-this-pipe checkbox the popup actually rendered, rather than trusting a field
+// order -- so reordering renderLinkFields() does not silently retarget this test at another
+// checkbox.
+//
+// IT MATCHES ON THE LIVE LANG STRING, NEVER ON A HARDCODED WORD. This used to test /Closed/, and
+// on 2026-08-14 the English label became "Shut" (the word "closed" is a polysemy inside hydraulics
+// -- a closed conduit is a pressurised pipe) and all ten assertions below failed at once. The
+// harness was right to fail: it had a real coupling to the label. But it was coupled to the wrong
+// thing -- a test that breaks when a WORD changes is testing the wording, and this one would have
+// broken identically for any of the 26 translations. Reading pageConfig makes it track whatever the
+// label says, in whatever language the stub is running.
+//
 // NOTE two shapes of the DOM stub: tagName is UPPERCASE (mkEl uppercases it), and there is no
 // dispatchEvent -- the house pattern in these harnesses is to call the registered _listeners
 // directly. Getting either wrong makes every assertion below fail for the wrong reason.
@@ -70,8 +80,9 @@ function closedBoxIn(fields) {
 			walk(c);
 		}
 	})(fields);
+	const label = (global.EngCalcs && EngCalcs.pageConfig && EngCalcs.pageConfig.lpn_field_closed) || 'Shut';
 	for (const f of found) {
-		if (/Closed/.test(allText(f.parent))) { return f.box; }
+		if (allText(f.parent).indexOf(label) !== -1) { return f.box; }
 	}
 	return null;
 }

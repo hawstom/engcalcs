@@ -3,7 +3,7 @@
         "language": "pt",
         "expected_key_count": 917,
         "delta_key_count": 0,
-        "exempt_key_count": 24,
+        "exempt_key_count": 23,
         "exempt_keys": [
             "calc_units_us",
             "calc_units_si",
@@ -27,8 +27,7 @@
             "lpn_field_x",
             "lpn_field_y",
             "lpn_field_id",
-            "lpn_scenario_base",
-            "lpn_scenario_base_value"
+            "lpn_scenario_base"
         ],
         "out_of_scope_key_count": 0,
         "coverage": "coverage: core calculators [mpf, mtc, lpn] x core languages [es, pt, fr, tr] (in scope iff calculator OR language is core; identity strings always)",
