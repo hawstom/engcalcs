@@ -89,6 +89,12 @@ run_check "log columns cannot be forged" blocking php dev/scripts/browser_lang_t
 # wrong, nothing errored, and the only place the defect existed was the GAP between two files. This
 # renders real pages and diffs their asset URLs against what the worker will really cache.
 run_check "service worker precache"      blocking php dev/scripts/sw_manifest_check.php
+# Task 184 x Task 248. setProp() is the ONE write seam for an overridable property; a call site that
+# writes el._diameter directly edits BASE from inside a scenario, silently, under every other
+# scenario at once. That is not hypothetical -- the valve popup did it on five fields, and the two
+# worktrees that produced it had DISJOINT FILE TERRITORY exactly as required. The file rule protects
+# files; this protects the seam, which is what they actually shared.
+run_check "scenario write seam"          blocking php dev/scripts/scenario_seam_check.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php

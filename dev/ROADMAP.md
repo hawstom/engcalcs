@@ -2219,6 +2219,16 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|323| **[DONE 2026-08-14] Scenario writes that bypassed `setProp`: the valve popup, `lenAuto`,
+  blank overrides, and a stale count.** Five confirmed defects from the Task 184 x Task 248 merge,
+  all fixed, plus `dev/scripts/scenario_seam_check.php` (blocking) so the seam cannot be bypassed
+  again — it derives the property list from `LPN_OVERRIDABLE` and fails rather than passing if that
+  parse breaks. **The lesson is the asset: the two worktrees had DISJOINT FILE TERRITORY exactly as
+  CLAUDE.md requires and still collided, because what they shared was a SEAM, not a file.** Neither
+  harness could see it — `scenario-harness.js` never said "valve", `valve-harness.js` never said
+  "scenario". Brief: `dev/scenario-seam-repair.md`.
+
+
 - 0|320| **[DONE 2026-08-14] Moved `## Completed` into the archive: ROADMAP 7,067 -> 3,325 lines
   (-53%).** 143 blocks moved, 108 already-short ones left, 251 IDs before and after, every moved
   block verified present in `dev/roadmap-closed-archive.md` byte-for-byte. Two deploy facts found

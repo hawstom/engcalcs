@@ -655,7 +655,19 @@ var EngCalcs = EngCalcs || {};
 		if (!el || !isOverridable(el, prop) || inBaseScenario()) { return; }
 		var scn = activeScenario();
 		if (!scn.overrides[el.id]) { scn.overrides[el.id] = {}; }
-		scn.overrides[el.id][prop] = value;
+		// UNDEFINED BECOMES NULL, and the asymmetry is the point. In Base, `undefined` is a perfectly
+		// good way to say "no head typed" -- it means the same thing as the key being absent. In an
+		// override map absence means something ELSE entirely: "inherit Base". So a blank-capable
+		// field (a reservoir head cleared inside a scenario) stored as undefined said "inherit"
+		// rather than "deliberately blank" -- and worse, JSON.stringify DROPS an undefined value, so
+		// the override evaporated on the next save, undo snapshot or file write, all three of which
+		// round-trip through it.
+		//
+		// Fixed at the seam rather than at the call site, so every future blank-capable field is
+		// covered without anyone remembering: null survives JSON, and every existing consumer
+		// already handles it -- reservoirHead() tests undefined/null/'', formatPropValue() returns
+		// '', and unitNumberFieldBlank's own setter tests all three.
+		scn.overrides[el.id][prop] = (value === undefined) ? null : value;
 	}
 	function clearOverride(el, prop) {
 		var scn = activeScenario(), ov = scn.overrides[el.id];
@@ -849,17 +861,17 @@ var EngCalcs = EngCalcs || {};
 				// which writes Base.
 				applies: function () { return true; }, get: function (n) { return n.elev; }, set: function (n, v) { n.elev = v; } },
 			{ key: 'demand', group: 'node', field: 'demand', prop: 'demand', label: pc.bpn_demand || 'Demand',
-				applies: function (n) { return !isFixedHeadNode(n); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },
+				applies: function (n) { return !isFixedHeadNode(n); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'diameter', group: 'link', field: 'diameter', prop: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			// PIPE-ONLY, not merely not-a-pump (Task 248 phase 2, carried into this shared list when
 			// Task 184 lifted it out of rebuildSettingsFields): a valve is a zero-length link, so no
 			// friction formula ever reads its roughness. Offering a default for it would be a
 			// control with no effect.
 			{ key: 'roughness', group: 'link', field: 'roughness', prop: 'roughness', label: roughnessLabel(),
-				applies: function (l) { return l.type === 'pipe'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },
+				applies: function (l) { return l.type === 'pipe'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'k', group: 'link', field: 'km', prop: 'k', label: pc.lpn_field_km || 'Minor (local) loss coefficient, k',
-				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } }
+				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 		];
 	}
 	// **THE DANGEROUS ACTION** (Task 184, and it stays -- Tom, 2026-07-30: "still needed for good
@@ -1697,7 +1709,7 @@ var EngCalcs = EngCalcs || {};
 		le.line.setAttribute('points', linkPoints(l));
 		if (le.halo) { le.halo.setAttribute('points', linkPoints(l)); }
 		layoutLinkLabel(id);
-		if (l.lenAuto) { l._length = linkGeomLength(l); }
+		if (l.lenAuto) { l._length = linkGeomLength(l); }   // base-write: auto length follows the drawing, and geometry is Base-owned
 		updateArrow(id);
 		positionPumpSymbol(id);
 	}
@@ -2462,20 +2474,20 @@ var EngCalcs = EngCalcs || {};
 			_roughness: settings.defaults.roughness, _length: 0, lenAuto: true, _status: 'open',
 			_k: settings.defaults.k // pump ignores k -- only the pipe friction branch reads it
 		};
-		l._length = linkGeomLength(l);
+		l._length = linkGeomLength(l);   // base-write: construction: a link is born in Base before any scenario can override it
 		if (type === 'valve') {
 			// A VALVE IS A ZERO-LENGTH LINK, and that is exact rather than a small number standing
 			// in for one: EngCalcs.lpnResistance returns r = 0 for a zero-length link, so the
 			// friction term vanishes and what is left is the pure local loss a valve is. lenAuto is
 			// off, or linkGeomLength() would give it the drawn distance between its two nodes and
 			// quietly add pipe friction to it.
-			l._length = 0;
+			l._length = 0;   // base-write: construction: a valve is born with zero length in Base
 			l.lenAuto = false;
 			// TCV IS THE DEFAULT TYPE, deliberately: it is the one type both engines solve, so a
 			// freshly drawn valve never changes which engine the page is using until the user asks
 			// for a type that does. See EngCalcs.lpnValveIsNative.
 			l.valveType = 'TCV';
-			l._setting = defaultValveSetting('TCV');
+			l._setting = defaultValveSetting('TCV');   // base-write: construction: a valve is born with its type default in Base
 		}
 		if (type === 'pump') {
 			// Pump curve entry (Task 146, 2026-07-30): l.curvePoints holds 1-3 [Q,H] pairs in SI,
@@ -2533,7 +2545,7 @@ var EngCalcs = EngCalcs || {};
 	// is what makes "membership is overridable, identity is not" feel like no rule at all.
 	function bornInScenario(el) {
 		if (inBaseScenario()) { return; }
-		el._active = false;
+		el._active = false;   // base-write: born inactive in Base, then overridden active here -- the whole membership design
 		setOverride(el, 'active', true);
 	}
 	// DELETING: inside a scenario it means "not in this network", so it sets inactive rather than
@@ -3571,7 +3583,7 @@ var EngCalcs = EngCalcs || {};
 			// Dimensionless in the solver's own terms (m3/s per m^gamma), so it is stored as parsed
 			// and never shown -- nothing in the UI edits an emitter yet, which is why the import
 			// report names every junction that has one.
-			if (n.emitter) { j._emitter = n.emitter; }
+			if (n.emitter) { j._emitter = n.emitter; }   // base-write: import builds Base: an .inp arrives as one network with no scenarios
 			return j;
 		});
 		var links = parsed.links.map(function (l) {
@@ -3594,7 +3606,7 @@ var EngCalcs = EngCalcs || {};
 				// valveSettingSI), so each one goes back out through the matching display unit --
 				// and a throttle's loss coefficient through none at all, because it has none.
 				out.valveType = (l.valveType || 'TCV').toUpperCase();
-				out._setting = (out.valveType === 'PRV' || out.valveType === 'PSV')
+				out._setting = (out.valveType === 'PRV' || out.valveType === 'PSV')   // base-write: import builds Base: an .inp arrives as one network with no scenarios
 					? toDisplay(l.setting, 'lpn_u_pressure')
 					: (out.valveType === 'FCV' ? toDisplay(l.setting, 'lpn_u_flow') : (l.setting || 0));
 			}
@@ -6655,7 +6667,7 @@ var EngCalcs = EngCalcs || {};
 		r.elev = niceDefault('lpn_u_elevhead', 'fth2o', 50, 15);
 		// J1 is the tie-in: no demand of its own, it is where the pump discharges into the ring.
 		var j1 = addNode('junction', 4500, 5000);
-		j1.elev = niceDefault('lpn_u_elevhead', 'fth2o', 45, 14); j1._demand = 0;
+		j1.elev = niceDefault('lpn_u_elevhead', 'fth2o', 45, 14); j1._demand = 0;   // base-write: the example network is drawn into a fresh project, always Base
 		// The example's pump gets a curve explicitly, as document content the user can see and edit
 		// in its popup -- addLink() no longer invents one (see its comment). Everything else in this
 		// example is pre-filled the same way (elevations, demands, diameters), so a worked pump
@@ -6701,13 +6713,13 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < ring.length; i++) {
 			n = addNode('junction', ring[i].x, ring[i].y);
 			n.elev = niceDefault('lpn_u_elevhead', 'fth2o', ring[i].elev[0], ring[i].elev[1]);
-			n._demand = niceDefault('lpn_u_flow', 'gpm', ring[i].demand[0], ring[i].demand[1]);
+			n._demand = niceDefault('lpn_u_flow', 'gpm', ring[i].demand[0], ring[i].demand[1]);   // base-write: the example network is drawn into a fresh project, always Base
 			nodes.push(n);
 		}
 		for (i = 0; i < nodes.length; i++) {
 			pipe = addLink('pipe', nodes[i].id, nodes[(i + 1) % nodes.length].id);
-			pipe._diameter = dia;
-			pipe._roughness = rough;
+			pipe._diameter = dia;   // base-write: the example network is drawn into a fresh project, always Base
+			pipe._roughness = rough;   // base-write: the example network is drawn into a fresh project, always Base
 			if (bends[i]) { bends[i].forEach(function (v) { pipe.verts.push({ x: v.x, y: v.y }); }); }
 			// addLink() computed .length before those vertices existed (straight node-to-node
 			// distance); rebuildLink() only rebuilds the DOM, not the length -- recompute
@@ -6715,7 +6727,7 @@ var EngCalcs = EngCalcs || {};
 			// next dragged (which goes through updateVertex()/updateLinkGeometry(), where lenAuto
 			// recomputation already happens correctly). Tom caught this: 25 ft shown, jumped to
 			// 28 ft only after a drag.
-			pipe._length = linkGeomLength(pipe);
+			pipe._length = linkGeomLength(pipe);   // base-write: the example network is drawn into a fresh project, always Base
 			rebuildLink(pipe);
 		}
 		// ---- a SECOND, SEPARATE system (Tom, 2026-08-09) ----
@@ -6746,11 +6758,11 @@ var EngCalcs = EngCalcs || {};
 		r2.elev = niceDefault('lpn_u_elevhead', 'fth2o', 200, 60);
 		var j6 = addNode('junction', 5320, 5080);
 		j6.elev = niceDefault('lpn_u_elevhead', 'fth2o', 60, 18);
-		j6._demand = niceDefault('lpn_u_flow', 'gpm', 100, 0.006);
+		j6._demand = niceDefault('lpn_u_flow', 'gpm', 100, 0.006);   // base-write: the example network is drawn into a fresh project, always Base
 		var sep = addLink('pipe', r2.id, j6.id);
-		sep._diameter = dia;
-		sep._roughness = rough;
-		sep._length = linkGeomLength(sep);
+		sep._diameter = dia;   // base-write: the example network is drawn into a fresh project, always Base
+		sep._roughness = rough;   // base-write: the example network is drawn into a fresh project, always Base
+		sep._length = linkGeomLength(sep);   // base-write: the example network is drawn into a fresh project, always Base
 		rebuildLink(sep);
 
 		// ---- annotations (Tom, 2026-08-09) ----
@@ -6926,7 +6938,7 @@ var EngCalcs = EngCalcs || {};
 					n = addNode('reservoir', 0, 0);
 				} else {
 					n = addNode('junction', col * SPACING, row * SPACING);
-					n._demand = demand;
+					n._demand = demand;   // base-write: drawTestGrid builds a scratch network in Base
 				}
 				grid[row].push(n);
 			}
@@ -8447,6 +8459,19 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
+	// Completes an ordinary value edit. The three field helpers below all used to end at
+	// scheduleSolve(), which is a THIRD of the job: afterPropertyEdit() also refreshes the audit
+	// halos, refreshes the "Custom values" count in the status strip, and saves. Its own comment
+	// says "one seam, so a new field cannot forget a third of it" -- and the ordinary edit path,
+	// the commonest action on the page, was simply never reaching it, so the count in the status
+	// strip was wrong in the common case (2026-08-14).
+	//
+	// Only when `ov` is present, deliberately: a row with no overridable property (X, Y, a read-only
+	// result) has no marks, no count and no override to save, and routing it here would rebuild the
+	// element for nothing. Those rows keep the plain scheduleSolve().
+	function completeEdit(ov) {
+		if (ov && ov.el) { afterPropertyEdit(ov.el); } else { scheduleSolve(); }
+	}
 	// get/set are DECLARED values, not SI (Task 263) -- what the user typed, in the unit the label
 	// names. No factor in either direction; the solver does the converting at its own boundary.
 	// `ov` (optional) is {el, prop}: the element and the overridable property this row edits, which
@@ -8461,12 +8486,12 @@ var EngCalcs = EngCalcs || {};
 		// scheduleSolve() here, not just inside set callbacks, centralizes it for every current
 		// and future use of this helper (elev/demand/head's set already also calls updateNode(),
 		// which itself schedules a solve -- calling it twice is harmless, debounced).
-		input.addEventListener('change', function () { set(+input.value); scheduleSolve(); });
+		input.addEventListener('change', function () { set(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText + ' (' + unitLabel(unitId) + ')', tip);
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
-		if (ov) { overrideMarker(fields, ov.el, ov.prop); }
+		if (ov) { overrideMarker(fields, ov.el, ov.prop); }   // and see completeEdit() on the setter
 	}
 	// Same as unitNumberField(), but the value may be BLANK, meaning "follow whatever this field
 	// defaults to" -- currently a reservoir's head following its elevation (Tom, 2026-07-30).
@@ -8480,13 +8505,13 @@ var EngCalcs = EngCalcs || {};
 		input.placeholder = String(+(+placeholder).toFixed(6));
 		input.addEventListener('change', function () {
 			set(input.value === '' ? undefined : +input.value);
-			scheduleSolve();
+			completeEdit(ov);
 		});
 		setFieldLabel(label, labelText + ' (' + unitLabel(unitId) + ')', tip);
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
-		if (ov) { overrideMarker(fields, ov.el, ov.prop); }
+		if (ov) { overrideMarker(fields, ov.el, ov.prop); }   // and see completeEdit() on the setter
 	}
 	// Read-only, like EPANET's own property-form coordinate display (Tom) -- also doubles as
 	// the touch answer to "show coordinates of the selected element": the corner tracker
@@ -8519,7 +8544,23 @@ var EngCalcs = EngCalcs || {};
 			input = document.createElement('input'), autoLabel = document.createElement('label'),
 			auto = document.createElement('input');
 		input.type = 'number'; input.value = effective(l, 'length').toFixed(2);
-		input.addEventListener('change', function () { setProp(l, 'length', +input.value); l.lenAuto = false; auto.checked = false; refreshPopupIfOpen(); scheduleSolve(); });
+		input.addEventListener('change', function () {
+			setProp(l, 'length', +input.value);
+			// lenAuto IS BASE-OWNED and a scenario must not touch it. The Auto handler directly below
+			// already says why -- geometry is shared, because a node cannot be in two places at once
+			// in one rendered map -- and this line used to clear the flag unconditionally, so typing
+			// a length inside a scenario silently switched EVERY scenario, and Base, off Auto.
+			//
+			// WHAT A SCENARIO WITH A LENGTH OVERRIDE ON AN AUTO LINK SHOWS, since the next reader
+			// will ask: the override wins. effective() finds the override before it ever reaches
+			// Base's auto-derived value, so the box shows the typed number and the solve uses it,
+			// while Base and every other scenario go on following the drawing. The Auto checkbox
+			// keeps showing Base's state, which is the truth about the link -- and unticking the
+			// override marker hands the value straight back to that.
+			if (inBaseScenario()) { l.lenAuto = false; auto.checked = false; }
+			refreshPopupIfOpen();
+			scheduleSolve();
+		});
 		auto.type = 'checkbox'; auto.checked = l.lenAuto;
 		auto.addEventListener('change', function () {
 			l.lenAuto = auto.checked;
@@ -8528,7 +8569,7 @@ var EngCalcs = EngCalcs || {};
 			// so "follow the drawing" is a statement about the drawing, which every scenario shares.
 			// `lenAuto` itself is that same kind of flag and is deliberately not overridable.
 			if (l.lenAuto) {
-				l._length = linkGeomLength(l);
+				l._length = linkGeomLength(l);   // base-write: Auto reverts to the drawing, which every scenario shares; the override is cleared on the next line
 				if (!inBaseScenario()) { clearOverride(l, 'length'); }
 				input.value = effective(l, 'length').toFixed(2);
 				refreshPopupIfOpen();
@@ -8898,6 +8939,18 @@ var EngCalcs = EngCalcs || {};
 	// different label AND a different unit selector behind it (see js/lpn-epanet.js for the three
 	// conventions and why getting one wrong is silent). Rendering one "Setting" box in whatever
 	// unit happened to be last would be the trap this whole task is about.
+	// EVERY WRITE HERE GOES THROUGH setProp, AND EVERY ROW CARRIES ITS `ov`. Both halves were missing
+	// until 2026-08-14 and both were user-reachable: the setters wrote l._setting / l._diameter / l._k
+	// directly, which inside a scenario edits BASE under every other scenario at once -- the exact
+	// failure setProp's own comment predicts in words -- and with no `ov` a valve was the only
+	// element type in the page with no scenario marker on any row at all.
+	//
+	// HOW IT GOT THROUGH, because the mechanism matters more than the bug: valves (Task 248 phase 2)
+	// and scenarios (Task 184) were built in parallel worktrees the same day with DISJOINT FILE
+	// TERRITORY, exactly as CLAUDE.md requires -- and they still collided, because they shared a
+	// SEAM rather than a file. Neither harness could see it either: scenario-harness.js never says
+	// "valve" and valve-harness.js never says "scenario". The file rule protects files; nothing
+	// protected the seam. dev/scripts/scenario_seam_check.php does now.
 	function renderValveFields(fields, l, linkId) {
 		var pc = EngCalcs.pageConfig || {}, vt = (l.valveType || 'TCV').toUpperCase();
 		selectFieldPlain(fields, pc.lpn_field_valve_type || 'Valve type', [
@@ -8918,7 +8971,21 @@ var EngCalcs = EngCalcs || {};
 			// coefficient, and none of the three means anything as one of the other two -- 60 psi
 			// read as a loss coefficient of 60 is a valve nobody built. The tip on the setting
 			// field says this happens, so the change is not a surprise.
-			l._setting = defaultValveSetting(v);
+			// BASE, and every scenario's override on `setting` is DROPPED with it. The brief that
+			// found the other seam defects flagged this line as a judgement call rather than
+			// guessing at it, and the answer follows from what is overridable and what is not:
+			// `valveType` is NOT in LPN_OVERRIDABLE, so a type change is Base-wide by construction.
+			// A setting that belongs to a type must therefore be Base-wide too.
+			//
+			// And the overrides have to go, which is the part that is easy to miss. The comment
+			// above says a number carried across a type change is "a valve nobody built" -- 60 psi
+			// read as a loss coefficient of 60. That is exactly as true of a scenario's override as
+			// of Base's own value, and the override would have SURVIVED, silently, as a stale
+			// pressure sitting under a valve that now wants a flow.
+			l._setting = defaultValveSetting(v);   // base-write: valveType is Base-owned, so the setting that belongs to it is too
+			scenarios.forEach(function (sc) {
+				if (sc.overrides[l.id]) { delete sc.overrides[l.id].setting; }
+			});
 			refreshPopupIfOpen();
 			scheduleSolve();
 		}, pc.lpn_field_valve_type_tip);
@@ -8928,27 +8995,33 @@ var EngCalcs = EngCalcs || {};
 		// reported and comes in as an open pipe (js/lpn-inp.js).
 		if (vt === 'PRV' || vt === 'PSV') {
 			unitNumberField(fields, pc.lpn_field_valve_setting_pressure || 'Pressure setting', 'lpn_u_pressure',
-				function () { return effective(l, 'setting'); }, function (v) { l._setting = v; },
-				pc.lpn_field_valve_setting_pressure_tip);
+				function () { return effective(l, 'setting'); },
+				function (v) { setProp(l, 'setting', v); refreshPopupIfOpen(); },
+				pc.lpn_field_valve_setting_pressure_tip, { el: l, prop: 'setting' });
 		} else if (vt === 'FCV') {
 			unitNumberField(fields, pc.lpn_field_valve_setting_flow || 'Flow setting', 'lpn_u_flow',
-				function () { return effective(l, 'setting'); }, function (v) { l._setting = v; },
-				pc.lpn_field_valve_setting_flow_tip);
+				function () { return effective(l, 'setting'); },
+				function (v) { setProp(l, 'setting', v); refreshPopupIfOpen(); },
+				pc.lpn_field_valve_setting_flow_tip, { el: l, prop: 'setting' });
 		} else {
 			numberFieldPlain(fields, pc.lpn_field_valve_setting_loss || 'Loss coefficient',
-				effective(l, 'setting') || 0, function (v) { l._setting = v; },
-				pc.lpn_field_valve_setting_loss_tip);
+				effective(l, 'setting') || 0,
+				function (v) { setProp(l, 'setting', v); refreshPopupIfOpen(); },
+				pc.lpn_field_valve_setting_loss_tip, { el: l, prop: 'setting' });
 		}
 		unitNumberField(fields, pc.lpn_field_diameter || 'Diameter', 'lpn_u_diameter',
-			function () { return effective(l, 'diameter'); }, function (v) { l._diameter = v; },
-			pc.lpn_field_valve_diameter_tip);
+			function () { return effective(l, 'diameter'); },
+			function (v) { setProp(l, 'diameter', v); refreshPopupIfOpen(); },
+			pc.lpn_field_valve_diameter_tip, { el: l, prop: 'diameter' });
 		// A TCV GETS NO SEPARATE MINOR LOSS, and that is EPANET's behaviour rather than a
 		// simplification of ours: it ignores the [VALVES] minor-loss column for a throttle valve,
 		// whose loss is its setting alone (measured -- see EngCalcs.lpnLinkK). A box here would be
 		// a number the user types and neither engine reads.
 		if (vt !== 'TCV') {
 			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k',
-				effective(l, 'k') || 0, function (v) { l._k = v; }, pc.lpn_field_valve_km_tip);
+				effective(l, 'k') || 0,
+				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); },
+				pc.lpn_field_valve_km_tip, { el: l, prop: 'k' });
 		}
 	}
 	function openLinkPopup(linkId, sx, sy) {
@@ -9047,8 +9120,13 @@ var EngCalcs = EngCalcs || {};
 			// buildLinkEls(), so going through the one builder keeps a single source of truth for
 			// how a link is drawn. Then solve -- closing a pipe can isolate a node, which the
 			// solver's pre-solve diagnostics already name by id.
-			rebuildLink(l);
-			scheduleSolve();
+			// afterPropertyEdit() rather than rebuildLink + scheduleSolve by hand. This row DREW an
+			// override marker and then never refreshed it, so ticking Closed inside a scenario left
+			// the marker beside it unticked -- the page contradicting itself in the same popup. The
+			// seam exists precisely so a field cannot forget a third of the job; this one was not
+			// reaching it. refreshPopupIfOpen() re-renders so the marker catches up.
+			afterPropertyEdit(l);
+			refreshPopupIfOpen();
 		});
 		// The text goes in its own <span>, NOT straight into the <label>: setFieldLabel() assigns
 		// textContent, which would wipe a checkbox already appended to the same element. Box first,
@@ -9087,12 +9165,12 @@ var EngCalcs = EngCalcs || {};
 	function numberFieldPlain(fields, labelText, value, onChange, tip, ov) {
 		var label = document.createElement('label'), input = document.createElement('input');
 		input.type = 'number'; input.value = value;
-		input.addEventListener('change', function () { onChange(+input.value); scheduleSolve(); });
+		input.addEventListener('change', function () { onChange(+input.value); completeEdit(ov); });
 		setFieldLabel(label, labelText, tip);
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
-		if (ov) { overrideMarker(fields, ov.el, ov.prop); }
+		if (ov) { overrideMarker(fields, ov.el, ov.prop); }   // and see completeEdit() on the setter
 	}
 	// ---- `active`: an ordinary overridable boolean, and the whole of how topology varies ----
 	// Task 184's corrected rule -- MEMBERSHIP is overridable, IDENTITY is not. A proposed loop lives

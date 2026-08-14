@@ -494,5 +494,99 @@ console.log('\n--- create, rename, delete, and the two things Base may not do --
 		L.getScenarios()[1].name === 'Fire flow', L.getScenarios()[1].name);
 }
 
+// ---------------------------------------------------------------------------
+// 9. THE SEAM, field by field -- the five defects this harness could not see
+// ---------------------------------------------------------------------------
+// EVERY ASSERTION ABOVE DRIVES ONE FIELD: junction demand, which happened to be the correctly
+// wired one. That single-field width is why five real, user-reachable defects survived a
+// 60-assertion mutation-tested harness -- a valve's setting wrote Base from inside a scenario, a
+// typed length switched every scenario off Auto, a blanked override evaporated on the next save,
+// the Closed checkbox drew a marker it never ticked, and the status count was wrong on the
+// commonest action on the page. Breadth across FIELDS is what was missing, not depth.
+console.log('\n--- the write seam, per field (the Task 184 x Task 248 collision) ---');
+{
+	L.switchScenario('base');
+	const doc = L.getDoc();
+	const valve = L.addLink('valve', doc.nodes[0].id, doc.nodes[1].id);
+	valve.valveType = 'PRV';
+	L.setProp(valve, 'setting', 40);
+	const scn = L.createScenario('Seam');
+	L.switchScenario(scn.id);
+
+	// 1. A valve setting edited in a scenario must record an override and leave Base alone. It used
+	//    to write l._setting straight through, which IS Base, under every other scenario at once.
+	L.renderLinkFields(valve.id);
+	const boxes = [];
+	(function walk(n) { (n.children || []).forEach(function (c) {
+		if (c.tagName === 'INPUT' && c.type === 'number') { boxes.push(c); } walk(c); }); })(L.popupFields());
+	ok('the valve popup renders editable rows', boxes.length > 0, boxes.length + ' number inputs');
+	const settingBox = boxes[0];
+	settingBox.value = '75';
+	(settingBox._listeners.change || []).forEach(function (fn) { fn({ target: settingBox }); });
+	ok('editing a valve setting in a scenario records an OVERRIDE',
+		L.hasOverride(valve, 'setting'), JSON.stringify(L.activeScenario().overrides[valve.id]));
+	ok('...and BASE DOES NOT MOVE', L.baseValue(valve, 'setting') === 40, L.baseValue(valve, 'setting'));
+	L.switchScenario('base');
+	ok('...confirmed from Base itself', L.effective(valve, 'setting') === 40, L.effective(valve, 'setting'));
+	L.switchScenario(scn.id);
+	ok('...and the scenario sees its own value', L.effective(valve, 'setting') === 75, L.effective(valve, 'setting'));
+
+	// 2. lenAuto is Base-owned. Typing a length inside a scenario must not switch Base off Auto.
+	const pipe = doc.links.filter(function (l) { return l.type === 'pipe'; })[0];
+	pipe.lenAuto = true;
+	L.renderLinkFields(pipe.id);
+	const lenBoxes = [];
+	(function walk(n) { (n.children || []).forEach(function (c) {
+		if (c.tagName === 'INPUT' && c.type === 'number') { lenBoxes.push(c); } walk(c); }); })(L.popupFields());
+	const lenBox = lenBoxes[lenBoxes.length - 1];
+	lenBox.value = '1234';
+	(lenBox._listeners.change || []).forEach(function (fn) { fn({ target: lenBox }); });
+	ok('a length typed in a scenario leaves lenAuto alone in Base', pipe.lenAuto === true, pipe.lenAuto);
+
+	// 3. A blanked override must SURVIVE a save. Stored as undefined it was silently dropped by
+	//    JSON.stringify, so the override vanished on the next save, undo or file write.
+	const res = doc.nodes.filter(function (n) { return n.type === 'reservoir'; })[0];
+	if (res) {
+		L.setProp(res, 'head', undefined);
+		ok('a blanked value still records an override', L.hasOverride(res, 'head'),
+			JSON.stringify(L.activeScenario().overrides[res.id]));
+		const round = JSON.parse(JSON.stringify(L.serializeProject()));
+		const kept = round.scenarios.filter(function (x) { return x.id === scn.id; })[0];
+		ok('...and SURVIVES JSON.stringify, which drops undefined',
+			kept && kept.overrides[res.id] && 'head' in kept.overrides[res.id],
+			JSON.stringify(kept && kept.overrides[res.id]));
+	}
+
+	// 4/5. The ordinary edit path must reach afterPropertyEdit(), which is what refreshes the
+	//      "Custom values" count. It used to end at scheduleSolve() -- a third of the job.
+	// A FRESH junction and its DEMAND box, not the first box on the popup. Elevation is row one and
+	// is deliberately NOT overridable -- it is survey data, Base-owned, as pushSpecList() records --
+	// so editing it correctly changes no count, and asserting on it would have tested nothing while
+	// looking like it tested something. Demand is the second row.
+	L.switchScenario('base');
+	const fresh = L.addNode('junction', 900, 900);
+	L.switchScenario(scn.id);
+	const before = L.overrideCount();
+	L.renderNodeFields(fresh.id);
+	const nBoxes = [];
+	(function walk(n) { (n.children || []).forEach(function (c) {
+		if (c.tagName === 'INPUT' && c.type === 'number') { nBoxes.push(c); } walk(c); }); })(L.popupFields());
+	nBoxes[1].value = '77';
+	(nBoxes[1]._listeners.change || []).forEach(function (fn) { fn({ target: nBoxes[1] }); });
+	ok('an ordinary edit records the override', L.overrideCount() === before + 1,
+		before + ' -> ' + L.overrideCount());
+	// AND THE STATUS STRIP MUST AGREE. This is the assertion that actually catches finding 5, and
+	// the first version of it did not: asserting on overrideCount() reads the DATA, which setProp
+	// had already written correctly, so it passed with completeEdit() deliberately broken. What was
+	// wrong was the READOUT -- afterPropertyEdit() is what refreshes it, and the ordinary edit path
+	// never reached it, so the strip kept showing the old count while the value beneath it changed.
+	// Mutation-testing is what exposed that: a mutation the harness cannot feel means the harness is
+	// watching the wrong layer.
+	ok('...and the STATUS STRIP shows the new count, not the old one',
+		L.statusText().indexOf(String(before + 1)) !== -1,
+		JSON.stringify(L.statusText()) + ' should mention ' + (before + 1));
+	L.switchScenario('base');
+}
+
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);
