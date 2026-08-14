@@ -831,7 +831,7 @@
         "lpn_settings_tolerance": "Convergence tolerance",
         "lpn_settings_tolerance_tip": "How close the solver has to get before it stops. A smaller number is more exact and takes longer.",
         "lpn_settings_engine_epanet": "Solve with the EPANET solver",
-        "lpn_settings_engine_epanet_tip": "Runs EPANET's own solver from the US EPA, here in your browser. The built-in solver gives the same answers and is faster, so leave this off unless you need EPANET itself.",
+        "lpn_settings_engine_epanet_tip": "Runs the EPANET solver from the US EPA, here in your browser. The built-in solver gives the same answers and is faster, so leave this off unless you need EPANET itself.",
         "lpn_engine_loading": "Loading the EPANET solver…",
         "lpn_engine_failed": "The EPANET solver could not be loaded. Showing the built-in solver instead.",
         "lpn_engine_manning_note": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.",

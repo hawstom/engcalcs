@@ -2131,3 +2131,21 @@ verified present in them (bg/ru/uk appear in inflected case, which is correct, n
 needed three new verbs on `detect_english_drift.php` (`--baseline-new`, `--record-shapes`,
 `--drop-removed`) plus a refusal on the blanket `--update`. Before this, a sprint could not record
 its own output, so every sprint-translated key sat permanently invisible to the tripwire.
+
+**Follow-up the same day, and the reason it is worth recording.** A back-translation check on the
+tip found that 16 of 26 languages had rendered "EPANET's own solver" as *"the **original** EPANET
+solver"* — es/fr/it/de/pt/ro `original`, zh `原版` ("original edition"), uk `оригінальний`, and
+authenticity-leaning words in ar/fa/id/hi/ur/ps. The agents had done a surgical motor→solver swap
+and kept the adjective from their translation of the older English. That reintroduced precisely the
+version-vs-authentic ambiguity the wave-0 pass had just removed from the English.
+
+Tom settled it: *"the EPANET solver" or "EPANET's solver" is preferable to "EPANET's own solver"
+because it is less idiomatic.* English is now "Runs the EPANET solver from the US EPA", and all 16
+affected languages were resynced on that single key (the other 10 never carried a modifier).
+
+**The lesson generalises beyond this string: when a word is ambiguous, check whether it can simply
+be DELETED before reaching for a better word.** Replacing "original" with "own" still left a
+modifier for 26 translators to interpret, and most of them put "original" straight back. Deleting
+it leaves nothing there to get wrong. This is also the clearest argument yet for the mandatory
+back-translation step — the structural checks were all green, and only reading the meaning back
+found it.

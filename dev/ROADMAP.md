@@ -1471,116 +1471,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     scope it until something is written.
   - **[H] Tom decides the menu shape before this is built.**
 
-- 35|251| **Promote `lpn` to a core calculator — SPRINT PART-RUN 2026-08-12: 3 of 26 landed.**
-  - **STATE, so the resume is one command.** Launched 2026-08-12 with Tom's go-ahead, 26 Sonnet
-    agents, 6,522 keys. **es (61), pt (61) and fr (47) landed and are committed** (`6f26329`) —
-    verified independently, not on the agents' word: `php -l`, `lang_syntax_validate` clean, and a
-    per-key check that every key is present exactly once, single-quoted, entity-free, tag-free,
-    with every `{placeholder}` matching English. **The other 23 died on an account session limit**,
-    nearly all before writing; `git status` confirmed only three files touched. Romanian is the
-    cautionary one — its last message claimed all 286 keys were ready, and its file was untouched.
-    Trust the file, never the self-report.
-  - **TO RESUME:** regenerate payloads, `--check` for FRESH, then relaunch the 23 remaining
-    (am ar bg bn cs de fa he hi hr id it km my ps ro ru sr sw tr uk ur zh) with the same brief.
-    **Concurrency caps at 20 agents**, so it is two batches, not one.
-  - **Task 296's retitle was settled and folded in before the relaunch** — see that task. The three `lpn_` identity
-    strings are already translated in all 26 languages and are therefore NOT in the delta; changing
-    the English after this sprint means a separate 26-language resync, while folding it in now is
-    three extra keys on a 286-key job.
-  - **`lpn_dialog_ok` is legitimately identical to English** in fr and pt ("OK"). Exempt-list
-    candidate at sprint close, not a gap.
-  - **Key order is deliberately unnormalized** until the sprint closes; run
-    `lang_key_order_normalizer.php` once at the end, not per language.
-
-  Tom, 2026-08-09: *"If we care about lpn and its 26-language offering, then we must irrationally add
-  2026-08-09: *"If we care about lpn and its 26-language offering, then we must irrationally add
-  lpn to the top tier... But maybe we block this behind other tasks."* He is right that it is
-  irrational on current evidence and right to hesitate.
-  - **THE DECLARATION WAS TWO DAYS LATE, AND THE LESSON IS THE VALUE HERE.** The decision below was
-    taken and written up on 2026-08-09; the one-line edit to `translation_coverage.json` was never
-    made. So for two days every counter in this project reported `lpn_` as out of scope and the
-    standing debt was understated by about 6,000 keys, while this block said DECIDED: DO IT. Tom
-    found it by saying *"remember that we have moved lpn to top-tier meaning 26 languages"* — true
-    of the decision, false of the file. **A decision that lives only in a ROADMAP block is not in
-    effect. The declaration file is what the tools read**, and closing a decision means editing it
-    in the same session.
-  - **Now declared. The real debt is visible: 6,180 keys missing, up from 174**, of which ~6,006 is
-    `lpn_` across the 22 non-core languages (~273 keys each). That number was always owed; it was
-    simply not being counted.
-  - **THE GATE IS SMALLER AND MORE CONCRETE THAN "STABILITY", AND IT IS MEASURED.** Tom,
-    2026-08-11: *"stability may be elusive... What I think matters is that we foresee mostly
-    additions rather than tweaks. And I think we may already have that kind of stability now that we
-    have seen how .inp handling goes."* **His instinct is right, and the git history of
-    `lib/lang.ec.en.php` says so.** Since the 2026-08-08 English-hardening pass: **52 keys added, 8
-    edited** — better than 6 additions per tweak. The one bad day in the record, 2026-08-08 itself
-    (34 edits, 0 additions), was the *pre-sprint adversarial English pass* for the core-four sprint,
-    which is a thing that happens BEFORE a sprint by design, not churn that threatens one. Over the
-    whole life of `lpn_`: 327 added, 158 edited, 51 deleted — and the edits are heavily
-    front-loaded into the first week, exactly as a new page should be.
-  - **So the gate is ONE Wave 0 pass over ~56 strings, not a wait for the page to stop moving.**
-    CLAUDE.md's pre-sprint checklist wants the adversarial English pass over *new or changed*
-    strings. That is the 52 added since 2026-08-08 plus the 4 `detect_english_drift.php` reports as
-    changed since the 08-09 sync (`lpn_empty_hint`, `lpn_file_new`, `lpn_notes_4_def`,
-    `lpn_settings_restore_tip`) — **not all 276**. The 24 new `lpn_inp_*` keys are the batch that
-    most needs it: long explanatory sentences about what an import could not keep, which is exactly
-    where "list every plausible reading" earns its keep.
-  - **Everything else on the checklist is already green**, checked 2026-08-11: `friction_check.php`
-    passes on all four existing sprint files (every entry answered, nothing open or escalated);
-    `lpn` is properly registered in `prefixToTermNames()` with **35 glossary terms**, not the
-    three-term fallback that silently blinds a sprint; payloads are FRESH.
-  - **The size, so the decision is made on a real number:** 22 non-core languages at **273 keys**
-    each, plus the core four at 47 each (their delta since 146.06) — 26 agents in one sprint, the
-    same shape as a wave-1 category sprint. Tom, 2026-08-11: *"Translation is a huge task, but maybe
-    we will do it this week."*
-  - **READY AND HELD, 2026-08-12. Nothing below needs re-deriving; the sprint is one command away.**
-    - **Wave 0 is DONE and the gate is green.** `dev/english-friction/251-lpn-26lang.json`, 23
-      entries over the 65 strings that had never had an adversarial pass — 18 English rewrites, 2
-      routed to the glossary, 3 dismissals recorded rather than dropped.
-      `php dev/scripts/friction_check.php --sprint=251-lpn-26lang` exits 0.
-    - **The finding that paid for the pass:** `lpn_inp_drop_backdrop` told the reader to use "Map,
-      Backdrop". There is no Map menu and no Backdrop item. Not an ambiguity — an instruction that
-      cannot be followed, which 26 agents would have translated faithfully. **A string that names a
-      UI path is a claim about the UI, and nothing checks it.** Two more of the same family:
-      `lpn_net_bad_file` named EPANET's own menu with nothing saying so, and `lpn_notes_4_def` still
-      listed reading .inp files under "Planned additions" months after Task 196 shipped it.
-    - **The measured delta is 6,440**, up from the 6,180 this block estimated, because the ten Task
-      286 consent/legal keys ride along: 22 non-core languages at **283** each (273 `lpn_` + 10),
-      plus es/pt/tr at 57 and fr at 43. `--check` says FRESH; `lang_parity_check`,
-      `translation_completion_matrix` and the payloads all agree on 6,440.
-    - **Glossary verified delivered, not assumed:** `payload_sw.json` carries 35 `lpn` terms (not
-      the three-term fallback) plus the two new ones, `count (tally)` and `cookie (browser
-      storage)`, wired into `prefixToTermNames()` under `consent`/`privacy`/`terms`. Both ship with
-      **empty translations on purpose** — settled ordinary words exist in every language, we have
-      nothing attested, and inventing 26 would be judging other people's terminology. The sprint
-      fills them via the mandatory write-back.
-    - **HELD BY TOM 2026-08-12** in answer to a proposal of 26 Sonnet agents. He also asked to edit
-      the proposed `$ec_lang_syn['consent_body']` entry himself before it lands, so **that key has
-      no syn entry yet** — the proposed text is in the conversation of 2026-08-12 and in the
-      `count` entry of the friction file. **Payloads go stale the moment any English string
-      changes; regenerate and re-run `--check` before launching.**
-  - **Still needs Tom's explicit go-ahead per CLAUDE.md.** Declaring scope costs nothing and makes
-    the number honest; spending 26 agents does not.
-  - **DECIDED: DO IT. Tom asked 2026-08-09 why CC was resistant, and the resistance was wrong.**
-    Three counts. (1) The cost was overstated: 22 languages x 226 keys is 22 agents in ONE sprint,
-    the same shape as the wave-1 category sprints and as 146.06 itself — not "the largest
-    commitment ever considered". (2) "Least measured reach" is the wrong test here, and this
-    project already knows it: zero reach is not low value when the mission is reach into places
-    that have none. (3) The Task 216 gate was borrowed from Task 217, where it fits an
-    outsourceable reference table; it does not fit a mission claim.
-  - **The one REAL cost is churn, not the sprint: maintenance.** Today an English edit to an
-    `lpn_` string costs 4 languages; after promotion it costs 26. `lpn_` is still moving —
-    Tasks 248, 250, 252, 253 all add or change strings. **So the gate is ENGLISH STABILITY, not
-    the beacon:** land the current `lpn_` UI batch, then promote and sprint once over a settled
-    surface rather than three times over a moving one.
-  - **BUT THE HONESTY PROBLEM IS SEPARATE AND DOES NOT WAIT FOR THE BEACON.** Tom, 2026-08-09:
-    *"Maybe irrational, but consistent. We've been talking out of one side of our mouth that
-    languages are a superpower of lpn when it really has only 4 (about the same as epanet-js)."*
-    He is right, and this is the more urgent half. Task 222's surviving differentiator list says
-    "26 languages"; on `lpn_` that is FOUR, which is parity with the competitor, not an edge. So
-    **either promote lpn, or stop citing 26 languages when positioning lpn specifically** — the
-    suite-wide claim stays true, the page-level one does not. Fix the claim now; decide the
-    promotion on the beacon.
-
 - 20|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
   Task 243 shipped the engine and the toggle; none of this is built. The engine makes each of
   these a mapping-and-UI job rather than a numerical one, which is the entire reason it was worth
@@ -2148,6 +2038,13 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|251| **Promote `lpn` to a core calculator — DONE 2026-08-13, all 26 languages, 6,522 keys.**
+  Ran in four waves after a session limit killed 23 of 26 agents on the first attempt; `lpn` is now
+  core in `translation_coverage.json`. **Wave split retired, ~50-key batched appends kept** (the
+  split never prevented a limit; batching twice saved work on disk) — rule in CLAUDE.md, evidence in
+  `dev/sprint-251-waves.md`. **Verify on disk, never on an agent self-report.** Follow-on sprint 252
+  (engine → solver) in `dev/translation-execution-log.md`.
 
 - 0|296| **The word "water" appeared nowhere in `lpn_`'s name, title or description. DONE 2026-08-12.**
   Tom, 2026-08-12: *"We have water nowhere in our titles or description. I think this is bad...

@@ -120,6 +120,13 @@
                 "lpn_settings_engine_epanet_tip"
             ],
             "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
+        },
+        {
+            "date": "2026-08-14",
+            "keys": [
+                "lpn_settings_engine_epanet_tip"
+            ],
+            "reason": "Tom simplified 'EPANET's own solver' to 'the EPANET solver' (less idiomatic, and it removes the modifier that 16 languages had rendered as 'original'). All 16 resynced by targeted 1-key agents; the other 10 never carried a modifier."
         }
     ],
     "hashes": {
@@ -565,7 +572,7 @@
         "lpn_settings_defaults_note": "990606b34087faf589658448074aa7621295f825",
         "lpn_settings_emitter_exponent": "1d8660383db35f7b4b2754b1f2451fddc60c0a03",
         "lpn_settings_engine_epanet": "518a1af690a64303884cc20e84489abd5ef44ce3",
-        "lpn_settings_engine_epanet_tip": "e7d198d611297e57e2528169e188e8b949d843a3",
+        "lpn_settings_engine_epanet_tip": "bff7b5c7d8e8537f52e8da2fab82bd2f2f9e041f",
         "lpn_settings_id_prefixes": "2d1b802116e8a45191c6a614df0e16eddff87671",
         "lpn_settings_legend_bottom_left": "1a7ce96fd00912d9386ea02f98f0b8b8e3f7b530",
         "lpn_settings_legend_bottom_right": "c2fc57681a0fac785dae0742b58ab9cae369ce38",

@@ -48,6 +48,18 @@
             ],
             "disposition": "glossary",
             "resolution": "Chose correctly, and the observation generalises further than the agent could see from inside one language: the SAME split existed in more than twenty files (sr језгро/решавач, cs jádro/řešič, hi इंजन/सॉल्वर, tr motor/çözücü, ro motorul/rezolvitorul, and so on). That is the signature of an English-source defect reproduced faithfully by good translators, not of 20 independent mistakes -- and it is the strongest evidence for Tom's decision to change the English word rather than guard it. Recorded in the 'solver' glossary entry."
+        },
+        {
+            "key": "lpn_settings_engine_epanet_tip",
+            "source": "wave0",
+            "lang": null,
+            "complaint": "Follow-up to the \"original\" fix in this same sprint. The replacement, \"EPANET's own solver\", was still carrying a modifier that did not need to exist, and a back-translation check found 16 of 26 languages had rendered it as \"original\" anyway -- reintroducing the exact version-vs-authentic ambiguity the first fix removed.",
+            "readings": [
+                "the authentic EPANET solver (intended)",
+                "the first/earlier version of it (what \"original\" invites)"
+            ],
+            "disposition": "english",
+            "resolution": "Tom, 2026-08-13: \"the EPANET solver\" or \"EPANET's solver\" is preferable to \"EPANET's own solver\" because it is less idiomatic. Settled on \"Runs the EPANET solver from the US EPA\". Dropping the modifier entirely is strictly better than choosing a better modifier: there is no longer a word there to mistranslate. All 16 affected languages resynced on that one key. LESSON: an ambiguous word is not always best replaced -- check first whether it can simply be deleted."
         }
     ]
 }
