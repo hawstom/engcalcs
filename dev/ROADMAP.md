@@ -1152,20 +1152,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 
 
-- 20|300| **A "New project" wizard picking units AND friction method (extracted from Task 271,
-  2026-08-13).** Task 271 made the friction method switchable but left project creation alone. Its
-  own proposal was to collapse the two "Blank project" menu rows into ONE row plus a wizard that
-  asks for units and method up front, because 2 units x 3 methods is six menu rows and a menu is
-  the wrong shape for that.
-  - **Tom's reason, and it is a safety argument rather than a tidiness one:** *"being unaware of
-    those on a new project (model) is dangerous."* A method inherited silently from the last
-    project is a roughness number that means something else than the user thinks.
-  - **Not urgent, because 271 closed the danger another way:** the default is `hw`, the Example
-    forces its own method, and switching on a network with pipes asks first. So this is now a
-    clarity improvement, not a hole.
-  - **It REVERSES a shipped decision**, which is why it is its own task: the two-row units split
-    shipped 2026-08-10 and was right for units alone. Weigh the reversal deliberately.
-  - `openDialog()` is the pattern.
 
 - 35|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
   for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
@@ -1796,6 +1782,73 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|300| **[DECLINED 2026-08-13] A "New project" wizard picking units AND friction method
+  (extracted from Task 271, then declined the same day).**
+
+  **The arithmetic was right and the premise was wrong.** Tom: *"The reason we need a wizard is that
+  two rows becomes six. Does that make sense?"* It does — `File > New` has four rows today (2 blank,
+  2 example) and making the method a menu-level choice takes the blank half from 2 to 6. (Not to 12:
+  Task 271 made the EXAMPLE force Hazen-Williams, so the example rows do not multiply.) Six rows
+  stops being a template list and becomes a Cartesian product — a form pretending to be a menu.
+
+  **But the method does not belong in that menu at all, and the reason is specific.** Units earned
+  their two rows because a single row *"inherited whatever units happened to be on the strip, which
+  is the one thing left on this page that decided a project's units by accident"* (Tom, 2026-08-10).
+  Method looks symmetric to that and is not: **the danger of a wrong unit or a wrong method is
+  entirely about EXISTING numbers changing meaning, and a blank project has none.** No pipes, no
+  roughness values, nothing to misread.
+
+  **And the one hazard that WAS real is already closed — by Task 271, not by this task.** All three:
+
+  | Danger | Closed by |
+  |---|---|
+  | An example carries a method implicitly | The example forces `hw` |
+  | Switching method on a network with pipes | Confirms first |
+  | A blank project inherits a stale roughness default | `settings.defaults.roughness` follows the method |
+
+  That third row is the load-bearing one and it is easy to miss: `newProject()` inherits `settings`,
+  so a blank project made from a Manning project inherits **both** `method: 'manning'` **and**
+  `roughness: 0.013`. The inherited pair is self-consistent, which is exactly what makes the
+  inheritance harmless here and dangerous in an example (where the roughness is fixed at C = 130).
+
+  **What a wizard would have bought is CLARITY, not safety** — telling a new user that a friction
+  method exists. **Tom, 2026-08-13, naming that more exactly: *"It amounts to nothing but
+  advertising. We can do that better other ways."*** That is the sentence to remember, because it
+  generalizes past this task: a feature announcement wearing the costume of a required choice is
+  still an advertisement, and the creation path is the worst place to put one — it taxes the most
+  common action, every time, forever, to deliver a message that lands once. It would also cost ~4
+  new keys x 26 languages now that `lpn_` is a core calculator.
+
+  **The better ways already exist or are already tasked.** The map status strip reports the method
+  continuously (`refreshMapStatus()`: "Friction method: Hazen-Williams"), where the user is already
+  looking and at no cost to anything. Beyond that, telling people what this calculator can do is
+  **Task 222**'s job (positioning) and the Help menu's (Task 250, shipped) — a place someone GOES to
+  find out, not a door they must push through to start work. Route any future "but users won't know
+  about X on `lpn_`" impulse to those, not to the New menu.
+
+  **Reopen only on evidence**: a real user who is confused about which friction method they are in.
+  The map status strip already reports it continuously (`refreshMapStatus()` shows
+  "Friction method: Hazen-Williams"), which is the cheap version of the same clarity and already
+  shipped. **Do not reopen on the symmetry argument alone** — that method and units are both
+  project properties is true and is not sufficient; the asymmetry above is the point.
+
+  Original entry follows.
+
+  **A "New project" wizard picking units AND friction method (extracted from Task 271,
+  2026-08-13).** Task 271 made the friction method switchable but left project creation alone. Its
+  own proposal was to collapse the two "Blank project" menu rows into ONE row plus a wizard that
+  asks for units and method up front, because 2 units x 3 methods is six menu rows and a menu is
+  the wrong shape for that.
+  - **Tom's reason, and it is a safety argument rather than a tidiness one:** *"being unaware of
+    those on a new project (model) is dangerous."* A method inherited silently from the last
+    project is a roughness number that means something else than the user thinks.
+  - **Not urgent, because 271 closed the danger another way:** the default is `hw`, the Example
+    forces its own method, and switching on a network with pipes asks first. So this is now a
+    clarity improvement, not a hole.
+  - **It REVERSES a shipped decision**, which is why it is its own task: the two-row units split
+    shipped 2026-08-10 and was right for units alone. Weigh the reversal deliberately.
+  - `openDialog()` is the pattern.
 
 - 0|271| **[DONE 2026-08-13] Give `lpn_` a friction-method choice: HW, DW, Manning.**
 
