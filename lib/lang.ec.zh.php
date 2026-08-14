@@ -79,15 +79,15 @@ $ec_lang['consent_region_label']='您关于限制访问记录的选择。';
 $ec_lang['consent_settings_link']='Cookie 设置';
 $ec_lang['privacy_link']='隐私声明';
 $ec_lang['terms_link']='使用条款';
-$ec_lang['index_title']='免费在线工程计算器';
+$ec_lang['index_main_title']='免费在线工程计算器';
 $ec_lang['index_meta_desc_plain']='免费的水力工程计算器，涵盖管道、渠道、堰和灌溉。可在浏览器中直接运行，支持离线使用，并提供27种语言。';
 $ec_lang['calc_set_units']='单位设置：';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='恢复默认值';
 $ec_lang['calc_defaults_confirm']='将计算器重置为原始默认值吗？';
-$ec_lang['points_data_help']='（或使用数据区域复制/粘贴）';
-$ec_lang['points_data_title']='测点数据<br />（逗号或制表符分隔）';
+$ec_lang['points_data_note']='（或使用数据区域复制/粘贴）';
+$ec_lang['points_data_heading']='测点数据<br />（逗号或制表符分隔）';
 $ec_lang['points_data_copy']='复制';
 $ec_lang['points_data_paste']='粘贴';
 $ec_lang['calc_inputs']='输入';
@@ -96,7 +96,7 @@ $ec_lang['view_hide_line']='[隐藏此行]';
 $ec_lang['view_printable']='打印版本（刷新页面可恢复）';
 $ec_lang['ec_name_label']='保存此计算：';
 $ec_lang['ec_name_placeholder']='名称';
-$ec_lang['ec_name_hint']='将这些输入值保存到网址中以便书签、历史记录和分享';
+$ec_lang['ec_name_tip']='将这些输入值保存到网址中以便书签、历史记录和分享';
 $ec_lang['calc_copy_link']='复制链接';
 $ec_lang['ec_related_calcs']='相关计算器：';
 $ec_lang['calc_copy_link_done']='已复制！';
@@ -511,7 +511,7 @@ $ec_lang['ip_elev_supply']='供水高程，z<sub>supply</sub>';
 $ec_lang['ip_q_design']='滴头设计流量，q<sub>design</sub>';
 $ec_lang['ip_h_design']='滴头设计压力';
 $ec_lang['ip_x']='<span class="ec-help" title="标准非压力补偿滴头取0.5；压力补偿滴头接近0">滴头流量指数，x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='测试路径';
+$ec_lang['ip_reach_table_heading']='测试路径';
 $ec_lang['ip_group_reach']='管段';
 $ec_lang['ip_group_upstream']='上游';
 $ec_lang['ip_group_downstream']='下游';
@@ -569,7 +569,7 @@ $ec_lang['bpn_method']='摩擦计算方法';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='管线';
+$ec_lang['bpn_line_table_heading']='管线';
 $ec_lang['bpn_id']='编号';
 $ec_lang['bpn_id_tip']='该管线的名称。其他管线在"上游"列中引用该名称。';
 $ec_lang['bpn_upstream']='上游编号';
@@ -584,7 +584,7 @@ $ec_lang['bpn_q_line']='管线流量';
 $ec_lang['bpn_q_line_tip']='该管线输送的总流量：其自身需水量加上其下游所供给的全部需水量。';
 $ec_lang['bpn_p_down']='下游压力';
 $ec_lang['bpn_p_down_tip']='该管线下游节点处的相对压力水头。负值（会被标记）表示低于大气压，需检查设计。';
-$ec_lang['bpn_sketch_title']='管网示意图';
+$ec_lang['bpn_sketch_heading']='管网示意图';
 $ec_lang['bpn_show_length']='长度';
 $ec_lang['bpn_show_diameter']='直径';
 $ec_lang['bpn_show_q']='流量';
@@ -675,7 +675,7 @@ $ec_lang['lpn_reset_all_tip']='删除全部项目、全部背景图片、全部�
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='本计算器现在按输入原样存储项目单位和数值，但此前曾将数值转换为国际单位制（SI）后存储。该项目保存于此更改之前，因此其数值以 SI 存储。是否再转换一次为当前单位？为便于您判断，以下列出几个将被转换的管径，附转换前后的数值：';
+$ec_lang['lpn_v2_restore_confirm']='本计算器现在按输入原样存储项目单位和数值，但此前曾将数值转换为国际单位制（SI）后存储。该项目保存于此更改之前，因此其数值以 SI 存储。是否再转换一次为当前单位？为便于您判断，以下列出几个将被转换的管径，附转换前后的数值：';
 $ec_lang['lpn_v2_restore_yes']='转换';
 $ec_lang['lpn_v2_restore_never']='不。以后不再询问。';
 $ec_lang['lpn_v2_restore_no']='关闭，让我先检查当前单位';
@@ -837,10 +837,10 @@ $ec_lang['lpn_status_reverted']='已从磁盘重新载入 {file}。';
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='关闭前是否将更改保存到 {name}？';
+$ec_lang['lpn_close_save_confirm']='关闭前是否将更改保存到 {name}？';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} 仅保存在本浏览器中。若不将其保存到文件即关闭，它将永久丢失。';
+$ec_lang['lpn_close_browser_confirm']='{name} 仅保存在本浏览器中。若不将其保存到文件即关闭，它将永久丢失。';
 $ec_lang['lpn_close_discard']='不保存并关闭';
 $ec_lang['lpn_cancel']='取消';
 $ec_lang['lpn_revert_confirm']='放弃您所做的更改，并从磁盘重新载入 {file}？';
@@ -921,7 +921,7 @@ $ec_lang['lpn_file_training_continue']='继续';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='重新选择该文件';
 $ec_lang['lpn_file_reconnect']='重新连接该文件';
-$ec_lang['lpn_file_reconnect_prompt']='此项目来自 {file}。浏览器需要您再次授权才能写入该文件。请在下方重新连接。';
+$ec_lang['lpn_file_reconnect_alert']='此项目来自 {file}。浏览器需要您再次授权才能写入该文件。请在下方重新连接。';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='这与他人已打开的文件相同，因此无法保存覆盖。请选择其他文件或其他名称。';

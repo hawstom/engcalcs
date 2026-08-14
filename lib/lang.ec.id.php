@@ -79,15 +79,15 @@ $ec_lang['consent_region_label']='Pilihan Anda tentang pembatasan pencatatan.';
 $ec_lang['consent_settings_link']='Pengaturan cookie';
 $ec_lang['privacy_link']='Kebijakan Privasi';
 $ec_lang['terms_link']='Ketentuan Penggunaan';
-$ec_lang['index_title']='Kalkulator Teknik Gratis Daring';
+$ec_lang['index_main_title']='Kalkulator Teknik Gratis Daring';
 $ec_lang['index_meta_desc_plain']='Kalkulator teknik hidraulika gratis untuk pipa, saluran, ambang, dan irigasi. Berjalan di peramban Anda, bisa dipakai luring, dan tersedia dalam 27 bahasa.';
 $ec_lang['calc_set_units']='Atur satuan:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Pulihkan Default';
 $ec_lang['calc_defaults_confirm']='Setel ulang kalkulator ke nilai default asli?';
-$ec_lang['points_data_help']='(atau Salin/Tempel menggunakan area data)';
-$ec_lang['points_data_title']='Data titik<br />(dipisah koma atau tabulasi)';
+$ec_lang['points_data_note']='(atau Salin/Tempel menggunakan area data)';
+$ec_lang['points_data_heading']='Data titik<br />(dipisah koma atau tabulasi)';
 $ec_lang['points_data_copy']='Salin';
 $ec_lang['points_data_paste']='Tempel';
 $ec_lang['calc_inputs']='Masukan';
@@ -96,7 +96,7 @@ $ec_lang['view_hide_line']='[Sembunyikan baris ini]';
 $ec_lang['view_printable']='Versi cetak (muat ulang untuk memulihkan)';
 $ec_lang['ec_name_label']='Simpan perhitungan ini:';
 $ec_lang['ec_name_placeholder']='Nama';
-$ec_lang['ec_name_hint']='Menyimpan nilai masukan ini ke URL untuk penanda halaman, pengambilan riwayat, dan berbagi';
+$ec_lang['ec_name_tip']='Menyimpan nilai masukan ini ke URL untuk penanda halaman, pengambilan riwayat, dan berbagi';
 $ec_lang['calc_copy_link']='Salin tautan';
 $ec_lang['ec_related_calcs']='Kalkulator terkait:';
 $ec_lang['calc_copy_link_done']='Tersalin!';
@@ -511,7 +511,7 @@ $ec_lang['ip_elev_supply']='Elevasi pasokan, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='Debit desain emiter, q<sub>design</sub>';
 $ec_lang['ip_h_design']='Tekanan desain emiter';
 $ec_lang['ip_x']='<span class="ec-help" title="0.5 untuk emiter non-kompensasi standar; mendekati 0 untuk emiter kompensasi tekanan">Eksponen debit emiter, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='Jalur pengujian';
+$ec_lang['ip_reach_table_heading']='Jalur pengujian';
 $ec_lang['ip_group_reach']='Segmen';
 $ec_lang['ip_group_upstream']='Hulu';
 $ec_lang['ip_group_downstream']='Hilir';
@@ -569,7 +569,7 @@ $ec_lang['bpn_method']='Metode gesekan';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='Jalur pipa';
+$ec_lang['bpn_line_table_heading']='Jalur pipa';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='Nama jalur pipa ini. Jalur lain merujuknya pada kolom Hulu.';
 $ec_lang['bpn_upstream']='ID Hulu';
@@ -584,7 +584,7 @@ $ec_lang['bpn_q_line']='Debit jalur';
 $ec_lang['bpn_q_line_tip']='Debit total yang dialirkan jalur ini: kebutuhannya sendiri ditambah seluruh kebutuhan hilir yang dipasoknya.';
 $ec_lang['bpn_p_down']='Tekanan hilir';
 $ec_lang['bpn_p_down_tip']='Tinggi tekan ukur (gauge) di simpul hilir jalur ini. Nilai negatif (ditandai) berarti tekanan di bawah atmosfer; periksa kembali desainnya.';
-$ec_lang['bpn_sketch_title']='Diagram Jaringan';
+$ec_lang['bpn_sketch_heading']='Diagram Jaringan';
 $ec_lang['bpn_show_length']='Panjang';
 $ec_lang['bpn_show_diameter']='Diameter';
 $ec_lang['bpn_show_q']='Debit';
@@ -675,7 +675,7 @@ $ec_lang['lpn_reset_all_tip']='Menghapus setiap proyek, setiap gambar latar, set
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='Kalkulator ini menyimpan satuan dan input proyek persis seperti yang dimasukkan, tetapi sebelumnya mengonversi angka ke satuan SI untuk penyimpanan. Proyek ini disimpan sebelum perubahan tersebut, sehingga angkanya tersimpan dalam SI. Konversi angka-angka ini sekali lagi ke satuan saat ini? Agar Anda dapat menilainya, berikut beberapa diameter yang akan dikonversi, beserta nilainya sebelum dan sesudah:';
+$ec_lang['lpn_v2_restore_confirm']='Kalkulator ini menyimpan satuan dan input proyek persis seperti yang dimasukkan, tetapi sebelumnya mengonversi angka ke satuan SI untuk penyimpanan. Proyek ini disimpan sebelum perubahan tersebut, sehingga angkanya tersimpan dalam SI. Konversi angka-angka ini sekali lagi ke satuan saat ini? Agar Anda dapat menilainya, berikut beberapa diameter yang akan dikonversi, beserta nilainya sebelum dan sesudah:';
 $ec_lang['lpn_v2_restore_yes']='Konversi';
 $ec_lang['lpn_v2_restore_never']='Tidak. Jangan tanya lagi.';
 $ec_lang['lpn_v2_restore_no']='Tutup agar saya bisa memeriksa satuan saat ini terlebih dahulu';
@@ -837,10 +837,10 @@ $ec_lang['lpn_status_reverted']='Memuat {file} lagi dari disk.';
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='Simpan perubahan Anda ke {name} sebelum menutupnya?';
+$ec_lang['lpn_close_save_confirm']='Simpan perubahan Anda ke {name} sebelum menutupnya?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} hanya tersimpan di peramban ini. Jika Anda menutupnya tanpa menyimpannya ke berkas, proyek ini akan hilang selamanya.';
+$ec_lang['lpn_close_browser_confirm']='{name} hanya tersimpan di peramban ini. Jika Anda menutupnya tanpa menyimpannya ke berkas, proyek ini akan hilang selamanya.';
 $ec_lang['lpn_close_discard']='Tutup tanpa menyimpan';
 $ec_lang['lpn_cancel']='Batal';
 $ec_lang['lpn_revert_confirm']='Buang perubahan yang telah Anda buat dan muat {file} lagi dari disk?';
@@ -921,7 +921,7 @@ $ec_lang['lpn_file_training_continue']='Lanjutkan';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Pilih berkas itu lagi';
 $ec_lang['lpn_file_reconnect']='Sambungkan kembali ke berkas ini';
-$ec_lang['lpn_file_reconnect_prompt']='Proyek ini berasal dari {file}. Peramban Anda memerlukan izin Anda lagi sebelum dapat menulis ke berkas itu. Sambungkan kembali di bawah ini.';
+$ec_lang['lpn_file_reconnect_alert']='Proyek ini berasal dari {file}. Peramban Anda memerlukan izin Anda lagi sebelum dapat menulis ke berkas itu. Sambungkan kembali di bawah ini.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Itu adalah berkas yang sama yang sedang dibuka orang lain, sehingga tidak dapat ditimpa. Pilih berkas lain atau nama lain.';

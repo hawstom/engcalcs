@@ -80,15 +80,15 @@ $ec_lang['consent_region_label']='Chaguo lako kuhusu kupunguza urekodiaji.';
 $ec_lang['consent_settings_link']='Mipangilio ya Cookie';
 $ec_lang['privacy_link']='Taarifa ya Faragha';
 $ec_lang['terms_link']='Masharti ya Matumizi';
-$ec_lang['index_title']='Vikokotoo vya Uhandisi Bure Mtandaoni';
+$ec_lang['index_main_title']='Vikokotoo vya Uhandisi Bure Mtandaoni';
 $ec_lang['index_meta_desc_plain']='Vikokotoo bure vya uhandisi wa majimaji kwa ajili ya mabomba, mifereji, vizingiti vya maji na umwagiliaji. Hufanya kazi kwenye kivinjari chako, hufanya kazi bila mtandao, na vinapatikana katika lugha 27.';
 $ec_lang['calc_set_units']='Weka vitengo:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Rejesha chaguo-msingi';
 $ec_lang['calc_defaults_confirm']='Weka upya kikokotoo hadi thamani za awali za chaguo-msingi?';
-$ec_lang['points_data_help']='(au Nakili/Bandika ukitumia eneo la data)';
-$ec_lang['points_data_title']='Data za vituo<br />(kwa mkato au kichupo)';
+$ec_lang['points_data_note']='(au Nakili/Bandika ukitumia eneo la data)';
+$ec_lang['points_data_heading']='Data za vituo<br />(kwa mkato au kichupo)';
 $ec_lang['points_data_copy']='Nakili';
 $ec_lang['points_data_paste']='Bandika';
 $ec_lang['calc_inputs']='Maingizo';
@@ -97,7 +97,7 @@ $ec_lang['view_hide_line']='[Ficha mstari huu]';
 $ec_lang['view_printable']='Toleo la kuchapishwa (pakia upya ili kurejesha)';
 $ec_lang['ec_name_label']='Hifadhi hesabu hii:';
 $ec_lang['ec_name_placeholder']='Jina';
-$ec_lang['ec_name_hint']='Huhifadhi maingizo haya kwenye URL kwa ajili ya kuweka alama, kurejea historia, na kushiriki';
+$ec_lang['ec_name_tip']='Huhifadhi maingizo haya kwenye URL kwa ajili ya kuweka alama, kurejea historia, na kushiriki';
 $ec_lang['calc_copy_link']='Nakili kiungo';
 $ec_lang['ec_related_calcs']='Vikokotoo vinavyohusiana:';
 $ec_lang['calc_copy_link_done']='Imenakiliwa!';
@@ -512,7 +512,7 @@ $ec_lang['ip_elev_supply']='Mwinuko wa usambazaji, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='Mtiririko wa kubuni wa kituo cha maji, q<sub>design</sub>';
 $ec_lang['ip_h_design']='Shinikizo la kubuni la kituo cha maji';
 $ec_lang['ip_x']='<span class="ec-help" title="0.5 kwa vituo vya maji vya kawaida visivyofidia shinikizo; karibu 0 kwa vituo vya maji vinavyofidia shinikizo">Kipeo cha utoaji wa kituo cha maji, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='Njia ya jaribio';
+$ec_lang['ip_reach_table_heading']='Njia ya jaribio';
 $ec_lang['ip_group_reach']='Sehemu ya bomba';
 $ec_lang['ip_group_upstream']='Juu ya Mkondo';
 $ec_lang['ip_group_downstream']='Chini ya Mkondo';
@@ -570,7 +570,7 @@ $ec_lang['bpn_method']='Njia ya msuguano';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='Mistari ya bomba';
+$ec_lang['bpn_line_table_heading']='Mistari ya bomba';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='Jina la mstari huu wa bomba. Mistari mingine hurejelea kwake katika safu ya Juu ya Mkondo.';
 $ec_lang['bpn_upstream']='Kitambulisho cha Juu ya Mkondo';
@@ -585,7 +585,7 @@ $ec_lang['bpn_q_line']='Mtiririko wa mstari';
 $ec_lang['bpn_q_line_tip']='Jumla ya mtiririko unaobebwa na mstari huu: mahitaji yake yenyewe pamoja na mahitaji yote ya chini ya mkondo unayolisha.';
 $ec_lang['bpn_p_down']='Shinikizo la CM';
 $ec_lang['bpn_p_down_tip']='Kimo cha shinikizo la kipimo kwenye nodi ya chini ya mkondo ya mstari huu. Thamani hasi (iliyowekwa alama) inamaanisha shinikizo lililo chini ya la anga; kagua ubunifu.';
-$ec_lang['bpn_sketch_title']='Mchoro wa Mtandao';
+$ec_lang['bpn_sketch_heading']='Mchoro wa Mtandao';
 $ec_lang['bpn_show_length']='Urefu';
 $ec_lang['bpn_show_diameter']='Kipenyo';
 $ec_lang['bpn_show_q']='Mtiririko';
@@ -676,7 +676,7 @@ $ec_lang['lpn_reset_all_tip']='Inafuta kila mradi, kila picha ya nyuma, kila mpa
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='Kikokotoo hiki huhifadhi vitengo na maingizo ya mradi kama yalivyoingizwa, lakini hapo awali kilibadilisha namba kuwa SI kwa ajili ya kuhifadhi. Mradi huu ulihifadhiwa kabla ya mabadiliko hayo, hivyo namba zake zilihifadhiwa kwa SI. Ubadilishe mara ya mwisho kwenda vitengo vya sasa? Ili uweze kuamua, hapa kuna baadhi ya vipenyo ambavyo vingebadilishwa, pamoja na thamani zake kabla na baada:';
+$ec_lang['lpn_v2_restore_confirm']='Kikokotoo hiki huhifadhi vitengo na maingizo ya mradi kama yalivyoingizwa, lakini hapo awali kilibadilisha namba kuwa SI kwa ajili ya kuhifadhi. Mradi huu ulihifadhiwa kabla ya mabadiliko hayo, hivyo namba zake zilihifadhiwa kwa SI. Ubadilishe mara ya mwisho kwenda vitengo vya sasa? Ili uweze kuamua, hapa kuna baadhi ya vipenyo ambavyo vingebadilishwa, pamoja na thamani zake kabla na baada:';
 $ec_lang['lpn_v2_restore_yes']='Badilisha';
 $ec_lang['lpn_v2_restore_never']='Hapana. Usiulize tena.';
 $ec_lang['lpn_v2_restore_no']='Funga ili nikague vitengo vya sasa kwanza';
@@ -838,10 +838,10 @@ $ec_lang['lpn_status_reverted']='Imepakiwa {file} tena kutoka diskini.';
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='Hifadhi mabadiliko yako kwenye {name} kabla ya kuyafunga?';
+$ec_lang['lpn_close_save_confirm']='Hifadhi mabadiliko yako kwenye {name} kabla ya kuyafunga?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} inahifadhiwa kwenye kivinjari hiki tu. Ukiifunga bila kuihifadhi kwenye faili, imepotea kabisa.';
+$ec_lang['lpn_close_browser_confirm']='{name} inahifadhiwa kwenye kivinjari hiki tu. Ukiifunga bila kuihifadhi kwenye faili, imepotea kabisa.';
 $ec_lang['lpn_close_discard']='Funga bila kuhifadhi';
 $ec_lang['lpn_cancel']='Ghairi';
 $ec_lang['lpn_revert_confirm']='Tupa mabadiliko uliyoyafanya na upakie {file} tena kutoka diskini?';
@@ -922,7 +922,7 @@ $ec_lang['lpn_file_training_continue']='Endelea';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Chagua faili tena';
 $ec_lang['lpn_file_reconnect']='Unganika tena na faili hili';
-$ec_lang['lpn_file_reconnect_prompt']='Mradi huu ulitoka {file}. Kivinjari chako kinahitaji ruhusa yako tena kabla ya kuweza kuandika kwake. Unganika tena hapa chini.';
+$ec_lang['lpn_file_reconnect_alert']='Mradi huu ulitoka {file}. Kivinjari chako kinahitaji ruhusa yako tena kabla ya kuweza kuandika kwake. Unganika tena hapa chini.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Hilo ni faili lile lile ambalo mtu mwingine analo wazi, hivyo haliwezi kuhifadhiwa juu yake. Chagua faili tofauti au jina tofauti.';

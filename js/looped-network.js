@@ -2769,7 +2769,7 @@ var EngCalcs = EngCalcs || {};
 		openDialog(function (body) {
 			var p1 = document.createElement('p');
 			p1.style.margin = '0 0 8px';
-			p1.textContent = (pc.lpn_v2_restore_prompt || 'This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? For your evaluation, these are some diameters that will be converted. Before and after values are shown:');
+			p1.textContent = (pc.lpn_v2_restore_confirm || 'This calculator stores project units and inputs as entered, but it formerly converted numbers to SI for storage. This project was saved before that change, so its numbers were stored in SI. Convert them one last time to the current units? For your evaluation, these are some diameters that will be converted. Before and after values are shown:');
 			body.appendChild(p1);
 			var p2 = document.createElement('p');
 			p2.style.cssText = 'margin:0;font-weight:bold';
@@ -4484,7 +4484,7 @@ var EngCalcs = EngCalcs || {};
 			bannerWarn = {
 				kind: 'reopen',
 				message: (pendingHandles.has(id)
-					? (pc.lpn_file_reconnect_prompt || 'This project came from {file}. Your browser needs your permission again before it can write to it. Reconnect below.')
+					? (pc.lpn_file_reconnect_alert || 'This project came from {file}. Your browser needs your permission again before it can write to it. Reconnect below.')
 					: (pc.lpn_file_needs_reopen || 'This project came from {file}, but the connection to that file has been lost. Choose the file again to connect to it.')
 				).replace('{file}', entry.fileName),
 				// One click when the handle survived the reload and only needs permission (Task 212);
@@ -5540,8 +5540,8 @@ var EngCalcs = EngCalcs || {};
 			var p = document.createElement('p');
 			p.style.margin = '0';
 			p.textContent = (isBrowser
-				? (pc.lpn_close_browser_prompt || '{name} is kept only in this browser. If you close it without saving it to a file, it is gone for good.')
-				: (pc.lpn_close_save_prompt || 'Save your changes to {name} before closing it?')).replace('{name}', name);
+				? (pc.lpn_close_browser_confirm || '{name} is kept only in this browser. If you close it without saving it to a file, it is gone for good.')
+				: (pc.lpn_close_save_confirm || 'Save your changes to {name} before closing it?')).replace('{name}', name);
 			body.appendChild(p);
 		}, [
 			{

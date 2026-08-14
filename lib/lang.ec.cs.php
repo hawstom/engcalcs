@@ -79,15 +79,15 @@ $ec_lang['consent_region_label']='Vaše volba ohledně omezení zaznamenávání
 $ec_lang['consent_settings_link']='Nastavení cookies';
 $ec_lang['privacy_link']='Zásady ochrany osobních údajů';
 $ec_lang['terms_link']='Podmínky použití';
-$ec_lang['index_title']='Bezplatné inženýrské kalkulačky online';
+$ec_lang['index_main_title']='Bezplatné inženýrské kalkulačky online';
 $ec_lang['index_meta_desc_plain']='Bezplatné inženýrské kalkulátory pro potrubí, koryta, přelivy a závlahy. Fungují přímo v prohlížeči, pracují offline a jsou dostupné ve 27 jazycích.';
 $ec_lang['calc_set_units']='Nastavit jednotky:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Obnovit výchozí hodnoty';
 $ec_lang['calc_defaults_confirm']='Resetovat kalkulačku na výchozí hodnoty?';
-$ec_lang['points_data_help']='(nebo Kopírovat/Vložit pomocí datové oblasti)';
-$ec_lang['points_data_title']='Data bodů<br />(oddělena čárkou nebo tabulátorem)';
+$ec_lang['points_data_note']='(nebo Kopírovat/Vložit pomocí datové oblasti)';
+$ec_lang['points_data_heading']='Data bodů<br />(oddělena čárkou nebo tabulátorem)';
 $ec_lang['points_data_copy']='Kopírovat';
 $ec_lang['points_data_paste']='Vložit';
 $ec_lang['calc_inputs']='Vstupy';
@@ -96,7 +96,7 @@ $ec_lang['view_hide_line']='[Skrýt tento řádek]';
 $ec_lang['view_printable']='Verze pro tisk (obnovit pro vrácení)';
 $ec_lang['ec_name_label']='Uložit tento výpočet:';
 $ec_lang['ec_name_placeholder']='Název';
-$ec_lang['ec_name_hint']='Uloží tyto zadané hodnoty do adresy URL pro přidání do záložek, načtení z historie a sdílení';
+$ec_lang['ec_name_tip']='Uloží tyto zadané hodnoty do adresy URL pro přidání do záložek, načtení z historie a sdílení';
 $ec_lang['calc_copy_link']='Kopírovat odkaz';
 $ec_lang['ec_related_calcs']='Související kalkulačky:';
 $ec_lang['calc_copy_link_done']='Zkopírováno!';
@@ -511,7 +511,7 @@ $ec_lang['ip_elev_supply']='Nadmořská výška vstupu, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='Návrhový průtok emitoru, q<sub>design</sub>';
 $ec_lang['ip_h_design']='Návrhový tlak emitoru';
 $ec_lang['ip_x']='<span class="ec-help" title="0,5 pro standardní nekompenzované emitory; blízko 0 pro tlakově kompenzované emitory">Exponent výstupního průtoku emitoru, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='Testovací cesta';
+$ec_lang['ip_reach_table_heading']='Testovací cesta';
 $ec_lang['ip_group_reach']='Úsek';
 $ec_lang['ip_group_upstream']='Proti proudu';
 $ec_lang['ip_group_downstream']='Po proudu';
@@ -569,7 +569,7 @@ $ec_lang['bpn_method']='Metoda tření';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='Potrubní řady';
+$ec_lang['bpn_line_table_heading']='Potrubní řady';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='Název této potrubní řady. Ostatní řady na ni odkazují ve sloupci Horní ID.';
 $ec_lang['bpn_upstream']='Horní ID';
@@ -584,7 +584,7 @@ $ec_lang['bpn_q_line']='Průtok řady';
 $ec_lang['bpn_q_line_tip']='Celkový průtok vedený touto řadou: její vlastní odběr plus všechny dolní odběry, které napájí.';
 $ec_lang['bpn_p_down']='DS tlak';
 $ec_lang['bpn_p_down_tip']='Manometrický tlak (tlaková výška) v dolním uzlu této řady. Záporná hodnota (označena) znamená podatmosférický tlak; zkontrolujte návrh.';
-$ec_lang['bpn_sketch_title']='Schéma sítě';
+$ec_lang['bpn_sketch_heading']='Schéma sítě';
 $ec_lang['bpn_show_length']='Délka';
 $ec_lang['bpn_show_diameter']='Průměr';
 $ec_lang['bpn_show_q']='Průtok';
@@ -675,7 +675,7 @@ $ec_lang['lpn_reset_all_tip']='Smaže každý projekt, každý podkladový obrá
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='Tento kalkulátor ukládá jednotky a zadané hodnoty projektu tak, jak byly zadány, ale dříve převáděl čísla pro uložení na jednotky SI. Tento projekt byl uložen před touto změnou, takže jeho čísla byla uložena v SI. Převést je naposledy na aktuální jednotky? Abyste mohli posoudit, zde jsou některé průměry, které by byly převedeny, s hodnotami před převodem a po něm:';
+$ec_lang['lpn_v2_restore_confirm']='Tento kalkulátor ukládá jednotky a zadané hodnoty projektu tak, jak byly zadány, ale dříve převáděl čísla pro uložení na jednotky SI. Tento projekt byl uložen před touto změnou, takže jeho čísla byla uložena v SI. Převést je naposledy na aktuální jednotky? Abyste mohli posoudit, zde jsou některé průměry, které by byly převedeny, s hodnotami před převodem a po něm:';
 $ec_lang['lpn_v2_restore_yes']='Převést';
 $ec_lang['lpn_v2_restore_never']='Ne. Už se neptat.';
 $ec_lang['lpn_v2_restore_no']='Zavřít, abych si nejdřív zkontroloval aktuální jednotky';
@@ -837,10 +837,10 @@ $ec_lang['lpn_status_reverted']='Znovu načteno {file} z disku.';
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='Uložit vaše změny do {name} před zavřením?';
+$ec_lang['lpn_close_save_confirm']='Uložit vaše změny do {name} před zavřením?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} je uchováno pouze v tomto prohlížeči. Pokud jej zavřete bez uložení do souboru, nenávratně o něj přijdete.';
+$ec_lang['lpn_close_browser_confirm']='{name} je uchováno pouze v tomto prohlížeči. Pokud jej zavřete bez uložení do souboru, nenávratně o něj přijdete.';
 $ec_lang['lpn_close_discard']='Zavřít bez uložení';
 $ec_lang['lpn_cancel']='Zrušit';
 $ec_lang['lpn_revert_confirm']='Zahodit provedené změny a znovu načíst {file} z disku?';
@@ -921,7 +921,7 @@ $ec_lang['lpn_file_training_continue']='Pokračovat';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Vybrat soubor znovu';
 $ec_lang['lpn_file_reconnect']='Znovu se připojit k tomuto souboru';
-$ec_lang['lpn_file_reconnect_prompt']='Tento projekt pochází ze souboru {file}. Váš prohlížeč znovu potřebuje vaše svolení, než do něj bude moci zapisovat. Připojte se znovu níže.';
+$ec_lang['lpn_file_reconnect_alert']='Tento projekt pochází ze souboru {file}. Váš prohlížeč znovu potřebuje vaše svolení, než do něj bude moci zapisovat. Připojte se znovu níže.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Jde o stejný soubor, který má otevřený někdo jiný, proto jej nelze přepsat. Vyberte jiný soubor nebo jiný název.';

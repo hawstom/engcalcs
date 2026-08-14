@@ -47,8 +47,8 @@ function echoCalculatorFormAppend() {
 		<thead>
 			<tr>
 				<th colspan="12">
-					<?=$ec_lang['bpn_line_table_title']?>
-					<a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a> <?=$ec_lang['points_data_help']?>
+					<?=$ec_lang['bpn_line_table_heading']?>
+					<a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a> <?=$ec_lang['points_data_note']?>
 				</th>
 			</tr>
 			<tr>
@@ -100,7 +100,7 @@ function echoCalculatorFormAppend() {
 	</table>
 	<div class="d-print-none" style="float:left;">
 		<p>
-			<?=$ec_lang['points_data_title']?>
+			<?=$ec_lang['points_data_heading']?>
 			<br />
 			<button type="button" id="points_data_copy"><?=$ec_lang['points_data_copy']?></button>
 			<button type="button" id="points_data_paste"><?=$ec_lang['points_data_paste']?></button>
@@ -112,7 +112,7 @@ function echoCalculatorFormAppend() {
 }
 ?>
 
-<h2><?=$ec_lang['bpn_sketch_title']?></h2>
+<h2><?=$ec_lang['bpn_sketch_heading']?></h2>
 <p class="d-print-none">
 	<label><input type="checkbox" id="bpn_show_length" onchange="EngCalcs.bpnToggleSketch('length', this.checked)" /> <span style="color:#2e7d32"><?=$ec_lang['bpn_show_length']?></span></label>
 	<label><input type="checkbox" id="bpn_show_diameter" onchange="EngCalcs.bpnToggleSketch('diameter', this.checked)" /> <span style="color:#bf4b2b"><?=$ec_lang['bpn_show_diameter']?></span></label>

@@ -80,15 +80,15 @@ $ec_lang['consent_region_label']='הבחירה שלכם לגבי הגבלת הר
 $ec_lang['consent_settings_link']='הגדרות עוגיות';
 $ec_lang['privacy_link']='הצהרת פרטיות';
 $ec_lang['terms_link']='תנאי שימוש';
-$ec_lang['index_title']='מחשבוני הנדסה חינמיים מקוונים';
+$ec_lang['index_main_title']='מחשבוני הנדסה חינמיים מקוונים';
 $ec_lang['index_meta_desc_plain']='מחשבוני הנדסה הידראולית חינמיים לצינורות, תעלות, שפיכונים והשקיה. הם פועלים בדפדפן שלכם, עובדים גם ללא חיבור לאינטרנט, וזמינים ב-27 שפות.';
 $ec_lang['calc_set_units']='הגדרת יחידות';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='אפס לברירת מחדל';
 $ec_lang['calc_defaults_confirm']='האם לאפס את המחשבון לערכי ברירת המחדל?';
-$ec_lang['points_data_help']='(או העתק/הדבק באמצעות אזור הנתונים)';
-$ec_lang['points_data_title']='נתוני נקודות<br />(מופרדות בפסיקים או טאבים)';
+$ec_lang['points_data_note']='(או העתק/הדבק באמצעות אזור הנתונים)';
+$ec_lang['points_data_heading']='נתוני נקודות<br />(מופרדות בפסיקים או טאבים)';
 $ec_lang['points_data_copy']='העתק';
 $ec_lang['points_data_paste']='הדבק';
 $ec_lang['calc_inputs']='נתוני קלט';
@@ -97,7 +97,7 @@ $ec_lang['view_hide_line']='[הסתר שורה זו]';
 $ec_lang['view_printable']='גרסה להדפסה (טען מחדש לשחזור)';
 $ec_lang['ec_name_label']='שמור חישוב זה:';
 $ec_lang['ec_name_placeholder']='שם';
-$ec_lang['ec_name_hint']='שמירת הערכים האלה בכתובת עם סימניה, אחזור מהיסטוריה, ושיתוף';
+$ec_lang['ec_name_tip']='שמירת הערכים האלה בכתובת עם סימניה, אחזור מהיסטוריה, ושיתוף';
 $ec_lang['calc_copy_link']='העתק קישור';
 $ec_lang['ec_related_calcs']='מחשבונים קשורים:';
 $ec_lang['calc_copy_link_done']='הועתק!';
@@ -512,7 +512,7 @@ $ec_lang['ip_elev_supply']='רום אספקה, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='ספיקת תכנון המטפטף, q<sub>design</sub>';
 $ec_lang['ip_h_design']='לחץ תכנון המטפטף';
 $ec_lang['ip_x']='<span class="ec-help" title="0.5 למטפטפים רגילים ללא ויסות לחץ; קרוב ל-0 למטפטפים מווסתי לחץ">מעריך ספיקת המטפטף, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='נתיב בדיקה';
+$ec_lang['ip_reach_table_heading']='נתיב בדיקה';
 $ec_lang['ip_group_reach']='קטע';
 $ec_lang['ip_group_upstream']='זרם מעלה';
 $ec_lang['ip_group_downstream']='זרם מורד';
@@ -570,7 +570,7 @@ $ec_lang['bpn_method']='שיטת חיכוך';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='קווי צנרת';
+$ec_lang['bpn_line_table_heading']='קווי צנרת';
 $ec_lang['bpn_id']='מזהה';
 $ec_lang['bpn_id_tip']='שם קו צנרת זה. קווים אחרים מתייחסים אליו בעמודת מזהה במעלה הזרם.';
 $ec_lang['bpn_upstream']='מזהה במעלה הזרם';
@@ -585,7 +585,7 @@ $ec_lang['bpn_q_line']='ספיקת הקו';
 $ec_lang['bpn_q_line_tip']='הספיקה הכוללת שקו זה נושא: הדרישה שלו עצמו בתוספת כל דרישה במורד הזרם שהוא מזין.';
 $ec_lang['bpn_p_down']='לחץ מורד';
 $ec_lang['bpn_p_down_tip']='גובה הלחץ (מד לחץ) בצומת מורד הזרם של קו זה. ערך שלילי (מסומן) פירושו לחץ תת-אטמוספרי; יש לבדוק את התכנון.';
-$ec_lang['bpn_sketch_title']='תרשים הרשת';
+$ec_lang['bpn_sketch_heading']='תרשים הרשת';
 $ec_lang['bpn_show_length']='אורך';
 $ec_lang['bpn_show_diameter']='קוטר';
 $ec_lang['bpn_show_q']='ספיקה';
@@ -676,7 +676,7 @@ $ec_lang['lpn_reset_all_tip']='מוחק כל פרויקט, כל תמונת רק�
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='מחשבון זה שומר יחידות פרויקט ונתוני קלט כפי שהוזנו, אך בעבר הוא המיר מספרים ליחידות SI לצורך אחסון. פרויקט זה נשמר לפני השינוי, כך שהמספרים בו נשמרו ביחידות SI. להמיר אותם פעם אחרונה ליחידות הנוכחיות? כדי שתוכלו לשפוט, הנה כמה קטרים שיומרו, עם ערכיהם לפני ואחרי:';
+$ec_lang['lpn_v2_restore_confirm']='מחשבון זה שומר יחידות פרויקט ונתוני קלט כפי שהוזנו, אך בעבר הוא המיר מספרים ליחידות SI לצורך אחסון. פרויקט זה נשמר לפני השינוי, כך שהמספרים בו נשמרו ביחידות SI. להמיר אותם פעם אחרונה ליחידות הנוכחיות? כדי שתוכלו לשפוט, הנה כמה קטרים שיומרו, עם ערכיהם לפני ואחרי:';
 $ec_lang['lpn_v2_restore_yes']='המר';
 $ec_lang['lpn_v2_restore_never']='לא. אל תשאל שוב.';
 $ec_lang['lpn_v2_restore_no']='סגור כדי שאבדוק תחילה את היחידות הנוכחיות';
@@ -838,10 +838,10 @@ $ec_lang['lpn_status_reverted']='{file} נטען שוב מהדיסק.';
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='לשמור את השינויים שלכם ל-{name} לפני סגירתו?';
+$ec_lang['lpn_close_save_confirm']='לשמור את השינויים שלכם ל-{name} לפני סגירתו?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} נשמר רק בדפדפן זה. אם תסגרו אותו בלי לשמור אותו לקובץ, הוא ילך לאיבוד לצמיתות.';
+$ec_lang['lpn_close_browser_confirm']='{name} נשמר רק בדפדפן זה. אם תסגרו אותו בלי לשמור אותו לקובץ, הוא ילך לאיבוד לצמיתות.';
 $ec_lang['lpn_close_discard']='סגור בלי לשמור';
 $ec_lang['lpn_cancel']='בטל';
 $ec_lang['lpn_revert_confirm']='להשליך את השינויים שעשיתם ולטעון את {file} שוב מהדיסק?';
@@ -922,7 +922,7 @@ $ec_lang['lpn_file_training_continue']='המשך';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='בחר את הקובץ שוב';
 $ec_lang['lpn_file_reconnect']='התחבר מחדש לקובץ זה';
-$ec_lang['lpn_file_reconnect_prompt']='פרויקט זה הגיע מ-{file}. הדפדפן שלכם זקוק להרשאתכם שוב לפני שיוכל לכתוב אליו. התחברו מחדש למטה.';
+$ec_lang['lpn_file_reconnect_alert']='פרויקט זה הגיע מ-{file}. הדפדפן שלכם זקוק להרשאתכם שוב לפני שיוכל לכתוב אליו. התחברו מחדש למטה.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='זהו אותו קובץ שמישהו אחר פתח, ולכן לא ניתן לשמור מעליו. בחרו קובץ אחר או שם אחר.';

@@ -79,15 +79,15 @@ $ec_lang['consent_region_label']='Ihre Wahl zur Einschränkung der Protokollieru
 $ec_lang['consent_settings_link']='Cookie-Einstellungen';
 $ec_lang['privacy_link']='Datenschutzerklärung';
 $ec_lang['terms_link']='Nutzungsbedingungen';
-$ec_lang['index_title']='Kostenlose Ingenieurrechner online';
+$ec_lang['index_main_title']='Kostenlose Ingenieurrechner online';
 $ec_lang['index_meta_desc_plain']='Kostenlose Ingenieurrechner für Hydraulik: Rohre, Kanäle, Wehre und Bewässerung. Sie laufen im Browser, funktionieren offline und sind in 27 Sprachen verfügbar.';
 $ec_lang['calc_set_units']='Einheiten festlegen:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Standardwerte wiederherstellen';
 $ec_lang['calc_defaults_confirm']='Rechner auf die ursprünglichen Standardwerte zurücksetzen?';
-$ec_lang['points_data_help']='(oder Kopieren/Einfügen im Datenbereich)';
-$ec_lang['points_data_title']='Punktdaten<br />(durch Komma oder Tabulator getrennt)';
+$ec_lang['points_data_note']='(oder Kopieren/Einfügen im Datenbereich)';
+$ec_lang['points_data_heading']='Punktdaten<br />(durch Komma oder Tabulator getrennt)';
 $ec_lang['points_data_copy']='Kopieren';
 $ec_lang['points_data_paste']='Einfügen';
 $ec_lang['calc_inputs']='Eingaben';
@@ -96,7 +96,7 @@ $ec_lang['view_hide_line']='[Diese Zeile ausblenden]';
 $ec_lang['view_printable']='Druckversion (Seite neu laden zum Zurücksetzen)';
 $ec_lang['ec_name_label']='Diese Berechnung speichern:';
 $ec_lang['ec_name_placeholder']='Name';
-$ec_lang['ec_name_hint']='Speichert diese Eingaben in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen';
+$ec_lang['ec_name_tip']='Speichert diese Eingaben in der URL zum Lesezeichen, zum Abrufen aus dem Verlauf und zum Teilen';
 $ec_lang['calc_copy_link']='Link kopieren';
 $ec_lang['ec_related_calcs']='Verwandte Rechner:';
 $ec_lang['calc_copy_link_done']='Kopiert!';
@@ -511,7 +511,7 @@ $ec_lang['ip_elev_supply']='Versorgungshöhe, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='Emitter-Bemessungsdurchfluss, q<sub>design</sub>';
 $ec_lang['ip_h_design']='Emitter-Bemessungsdruck';
 $ec_lang['ip_x']='<span class="ec-help" title="0,5 für Standard-Emitter ohne Druckausgleich; nahe 0 für druckkompensierte Emitter">Emitter-Abflussexponent, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='Testpfad';
+$ec_lang['ip_reach_table_heading']='Testpfad';
 $ec_lang['ip_group_reach']='Strecke';
 $ec_lang['ip_group_upstream']='Oberstrom';
 $ec_lang['ip_group_downstream']='Unterstrom';
@@ -569,7 +569,7 @@ $ec_lang['bpn_method']='Reibungsmethode';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='Rohrleitungen';
+$ec_lang['bpn_line_table_heading']='Rohrleitungen';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='Name dieser Rohrleitung. Andere Leitungen verweisen in der Spalte Oberstrom-ID darauf.';
 $ec_lang['bpn_upstream']='Oberstrom-ID';
@@ -584,7 +584,7 @@ $ec_lang['bpn_q_line']='Leitungsdurchfluss';
 $ec_lang['bpn_q_line_tip']='Gesamtdurchfluss, den diese Leitung führt: ihre eigene Entnahme plus jede unterstromige Entnahme, die sie versorgt.';
 $ec_lang['bpn_p_down']='US-Druck';
 $ec_lang['bpn_p_down_tip']='Druckhöhe (Überdruck) am unterstromigen Knoten dieser Leitung. Ein negativer Wert (markiert) bedeutet Unterdruck (unter Atmosphärendruck); Bemessung prüfen.';
-$ec_lang['bpn_sketch_title']='Netzdiagramm';
+$ec_lang['bpn_sketch_heading']='Netzdiagramm';
 $ec_lang['bpn_show_length']='Länge';
 $ec_lang['bpn_show_diameter']='Durchmesser';
 $ec_lang['bpn_show_q']='Durchfluss';
@@ -675,7 +675,7 @@ $ec_lang['lpn_reset_all_tip']='Löscht jedes Projekt, jedes Hintergrundbild, jed
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='Dieser Rechner speichert Projekteinheiten und Eingaben so, wie sie eingegeben wurden, hat Zahlen früher jedoch zur Speicherung in SI umgerechnet. Dieses Projekt wurde vor dieser Änderung gespeichert, seine Zahlen liegen also in SI vor. Sollen sie ein letztes Mal in die aktuellen Einheiten umgerechnet werden? Damit Sie das beurteilen können, hier einige Durchmesser, die umgerechnet würden, mit ihren Werten vorher und nachher:';
+$ec_lang['lpn_v2_restore_confirm']='Dieser Rechner speichert Projekteinheiten und Eingaben so, wie sie eingegeben wurden, hat Zahlen früher jedoch zur Speicherung in SI umgerechnet. Dieses Projekt wurde vor dieser Änderung gespeichert, seine Zahlen liegen also in SI vor. Sollen sie ein letztes Mal in die aktuellen Einheiten umgerechnet werden? Damit Sie das beurteilen können, hier einige Durchmesser, die umgerechnet würden, mit ihren Werten vorher und nachher:';
 $ec_lang['lpn_v2_restore_yes']='Umrechnen';
 $ec_lang['lpn_v2_restore_never']='Nein. Nie wieder fragen.';
 $ec_lang['lpn_v2_restore_no']='Schließen, damit ich zuerst die aktuellen Einheiten prüfen kann';
@@ -837,10 +837,10 @@ $ec_lang['lpn_status_reverted']='{file} erneut von der Festplatte geladen.';
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='Ihre Änderungen an {name} vor dem Schließen speichern?';
+$ec_lang['lpn_close_save_confirm']='Ihre Änderungen an {name} vor dem Schließen speichern?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} wird nur in diesem Browser aufbewahrt. Wenn Sie es schließen, ohne es in einer Datei zu speichern, ist es unwiderruflich verloren.';
+$ec_lang['lpn_close_browser_confirm']='{name} wird nur in diesem Browser aufbewahrt. Wenn Sie es schließen, ohne es in einer Datei zu speichern, ist es unwiderruflich verloren.';
 $ec_lang['lpn_close_discard']='Ohne Speichern schließen';
 $ec_lang['lpn_cancel']='Abbrechen';
 $ec_lang['lpn_revert_confirm']='Ihre Änderungen verwerfen und {file} erneut von der Festplatte laden?';
@@ -921,7 +921,7 @@ $ec_lang['lpn_file_training_continue']='Weiter';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Datei erneut auswählen';
 $ec_lang['lpn_file_reconnect']='Verbindung zu dieser Datei wiederherstellen';
-$ec_lang['lpn_file_reconnect_prompt']='Dieses Projekt stammt aus {file}. Ihr Browser benötigt erneut Ihre Erlaubnis, bevor er hineinschreiben kann. Unten erneut verbinden.';
+$ec_lang['lpn_file_reconnect_alert']='Dieses Projekt stammt aus {file}. Ihr Browser benötigt erneut Ihre Erlaubnis, bevor er hineinschreiben kann. Unten erneut verbinden.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Das ist dieselbe Datei, die jemand anderes geöffnet hat, daher kann nicht darüber gespeichert werden. Wählen Sie eine andere Datei oder einen anderen Namen.';

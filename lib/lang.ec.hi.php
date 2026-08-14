@@ -80,15 +80,15 @@ $ec_lang['consent_region_label']='लॉगिंग सीमित करन�
 $ec_lang['consent_settings_link']='कुकी सेटिंग्स';
 $ec_lang['privacy_link']='गोपनीयता सूचना';
 $ec_lang['terms_link']='उपयोग की शर्तें';
-$ec_lang['index_title']='मुफ़्त ऑनलाइन इंजीनियरिंग कैलकुलेटर';
+$ec_lang['index_main_title']='मुफ़्त ऑनलाइन इंजीनियरिंग कैलकुलेटर';
 $ec_lang['index_meta_desc_plain']='पाइप, चैनल, वियर और सिंचाई के लिए मुफ़्त हाइड्रॉलिक इंजीनियरिंग कैलकुलेटर। ये आपके ब्राउज़र में चलते हैं, ऑफ़लाइन काम करते हैं, और 27 भाषाओं में उपलब्ध हैं।';
 $ec_lang['calc_set_units']='इकाइयाँ निर्धारित करें:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='डिफ़ॉल्ट पुनर्स्थापित करें';
 $ec_lang['calc_defaults_confirm']='कैलकुलेटर को मूल डिफ़ॉल्ट मानों पर रीसेट करूँ?';
-$ec_lang['points_data_help']='(या डेटा क्षेत्र से कॉपी/पेस्ट करें)';
-$ec_lang['points_data_title']='बिंदु डेटा<br />(अल्पविराम या टैब से अलग)';
+$ec_lang['points_data_note']='(या डेटा क्षेत्र से कॉपी/पेस्ट करें)';
+$ec_lang['points_data_heading']='बिंदु डेटा<br />(अल्पविराम या टैब से अलग)';
 $ec_lang['points_data_copy']='कॉपी';
 $ec_lang['points_data_paste']='पेस्ट';
 $ec_lang['calc_inputs']='इनपुट';
@@ -97,7 +97,7 @@ $ec_lang['view_hide_line']='[यह पंक्ति छुपाएँ]';
 $ec_lang['view_printable']='प्रिंट करने योग्य संस्करण (पुनर्स्थापित करने के लिए पुनः लोड करें)';
 $ec_lang['ec_name_label']='इस गणना को सहेजें:';
 $ec_lang['ec_name_placeholder']='नाम';
-$ec_lang['ec_name_hint']='इन इनपुटों को बुकमार्किंग, इतिहास पुनः प्राप्त करने और साझा करने के लिए URL में सहेजता है';
+$ec_lang['ec_name_tip']='इन इनपुटों को बुकमार्किंग, इतिहास पुनः प्राप्त करने और साझा करने के लिए URL में सहेजता है';
 $ec_lang['calc_copy_link']='लिंक कॉपी करें';
 $ec_lang['ec_related_calcs']='संबंधित कैलकुलेटर:';
 $ec_lang['calc_copy_link_done']='कॉपी किया गया!';
@@ -512,7 +512,7 @@ $ec_lang['ip_elev_supply']='आपूर्ति स्तर, z<sub>supply</su
 $ec_lang['ip_q_design']='उत्सर्जक डिज़ाइन प्रवाह, q<sub>design</sub>';
 $ec_lang['ip_h_design']='उत्सर्जक डिज़ाइन दाब';
 $ec_lang['ip_x']='<span class="ec-help" title="मानक गैर-क्षतिपूरक उत्सर्जकों के लिए 0.5; दाब-क्षतिपूरक उत्सर्जकों के लिए लगभग 0">उत्सर्जक निर्वहन घातांक, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='परीक्षण पथ';
+$ec_lang['ip_reach_table_heading']='परीक्षण पथ';
 $ec_lang['ip_group_reach']='खंड';
 $ec_lang['ip_group_upstream']='ऊर्ध्वप्रवाह';
 $ec_lang['ip_group_downstream']='अनुप्रवाह';
@@ -570,7 +570,7 @@ $ec_lang['bpn_method']='घर्षण विधि';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='पाइप लाइनें';
+$ec_lang['bpn_line_table_heading']='पाइप लाइनें';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='इस पाइप लाइन का नाम। अन्य लाइनें इसे ऊर्ध्वप्रवाह कॉलम में संदर्भित करती हैं।';
 $ec_lang['bpn_upstream']='ऊर्ध्वप्रवाह ID';
@@ -585,7 +585,7 @@ $ec_lang['bpn_q_line']='लाइन प्रवाह';
 $ec_lang['bpn_q_line_tip']='इस लाइन द्वारा वहन किया गया कुल प्रवाह: इसकी अपनी माँग जमा हर अनुप्रवाह माँग जिसे यह पूर्ति करती है।';
 $ec_lang['bpn_p_down']='DS दाब';
 $ec_lang['bpn_p_down_tip']='इस लाइन के अनुप्रवाह नोड पर गेज दाब शीर्ष। एक नकारात्मक मान (चिह्नित) अवायुमंडलीय दाब दर्शाता है; डिज़ाइन जाँचें।';
-$ec_lang['bpn_sketch_title']='नेटवर्क आरेख';
+$ec_lang['bpn_sketch_heading']='नेटवर्क आरेख';
 $ec_lang['bpn_show_length']='लंबाई';
 $ec_lang['bpn_show_diameter']='व्यास';
 $ec_lang['bpn_show_q']='प्रवाह';
@@ -676,7 +676,7 @@ $ec_lang['lpn_reset_all_tip']='हर प्रोजेक्ट, हर पृ
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='यह कैलकुलेटर प्रोजेक्ट की इकाइयों और इनपुट को वैसे ही संग्रहीत करता है जैसे दर्ज किए गए थे, लेकिन पहले यह संख्याओं को संग्रहण के लिए SI में बदल देता था। यह प्रोजेक्ट उस बदलाव से पहले सहेजा गया था, इसलिए इसकी संख्याएँ SI में संग्रहीत थीं। क्या उन्हें अंतिम बार वर्तमान इकाइयों में बदल दिया जाए? आपके निर्णय के लिए, यहाँ कुछ व्यास दिए गए हैं जो बदले जाएँगे, बदलाव से पहले और बाद के मानों सहित:';
+$ec_lang['lpn_v2_restore_confirm']='यह कैलकुलेटर प्रोजेक्ट की इकाइयों और इनपुट को वैसे ही संग्रहीत करता है जैसे दर्ज किए गए थे, लेकिन पहले यह संख्याओं को संग्रहण के लिए SI में बदल देता था। यह प्रोजेक्ट उस बदलाव से पहले सहेजा गया था, इसलिए इसकी संख्याएँ SI में संग्रहीत थीं। क्या उन्हें अंतिम बार वर्तमान इकाइयों में बदल दिया जाए? आपके निर्णय के लिए, यहाँ कुछ व्यास दिए गए हैं जो बदले जाएँगे, बदलाव से पहले और बाद के मानों सहित:';
 $ec_lang['lpn_v2_restore_yes']='बदलें';
 $ec_lang['lpn_v2_restore_never']='नहीं। फिर कभी न पूछें।';
 $ec_lang['lpn_v2_restore_no']='बंद करें ताकि मैं पहले वर्तमान इकाइयाँ जाँच सकूँ';
@@ -838,10 +838,10 @@ $ec_lang['lpn_status_reverted']='{file} डिस्क से फिर लो�
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='बंद करने से पहले क्या {name} में अपने बदलाव सहेज दिए जाएँ?';
+$ec_lang['lpn_close_save_confirm']='बंद करने से पहले क्या {name} में अपने बदलाव सहेज दिए जाएँ?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} केवल इस ब्राउज़र में रखा गया है। यदि आप इसे फ़ाइल में सहेजे बिना बंद करते हैं, तो यह हमेशा के लिए खो जाएगा।';
+$ec_lang['lpn_close_browser_confirm']='{name} केवल इस ब्राउज़र में रखा गया है। यदि आप इसे फ़ाइल में सहेजे बिना बंद करते हैं, तो यह हमेशा के लिए खो जाएगा।';
 $ec_lang['lpn_close_discard']='बिना सहेजे बंद करें';
 $ec_lang['lpn_cancel']='रद्द करें';
 $ec_lang['lpn_revert_confirm']='क्या आपके किए गए बदलावों को त्यागकर {file} को डिस्क से फिर लोड किया जाए?';
@@ -922,7 +922,7 @@ $ec_lang['lpn_file_training_continue']='जारी रखें';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='फ़ाइल फिर से चुनें';
 $ec_lang['lpn_file_reconnect']='इस फ़ाइल से फिर जुड़ें';
-$ec_lang['lpn_file_reconnect_prompt']='यह प्रोजेक्ट {file} से आया था। इसमें लिखने से पहले आपके ब्राउज़र को आपकी अनुमति फिर से चाहिए। नीचे फिर से जुड़ें।';
+$ec_lang['lpn_file_reconnect_alert']='यह प्रोजेक्ट {file} से आया था। इसमें लिखने से पहले आपके ब्राउज़र को आपकी अनुमति फिर से चाहिए। नीचे फिर से जुड़ें।';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='यह वही फ़ाइल है जिसे किसी और ने खोल रखा है, इसलिए इस पर सहेजा नहीं जा सकता। कोई अलग फ़ाइल या अलग नाम चुनें।';

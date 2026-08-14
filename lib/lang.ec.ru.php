@@ -79,15 +79,15 @@ $ec_lang['consent_region_label']='Ваш выбор об ограничении 
 $ec_lang['consent_settings_link']='Настройки файлов cookie';
 $ec_lang['privacy_link']='Политика конфиденциальности';
 $ec_lang['terms_link']='Условия использования';
-$ec_lang['index_title']='Бесплатные инженерные калькуляторы онлайн';
+$ec_lang['index_main_title']='Бесплатные инженерные калькуляторы онлайн';
 $ec_lang['index_meta_desc_plain']='Бесплатные калькуляторы для гидравлических расчётов труб, каналов, водосливов и орошения. Работают прямо в браузере, в том числе офлайн, на 27 языках.';
 $ec_lang['calc_set_units']='Установить единицы:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Восстановить значения по умолчанию';
 $ec_lang['calc_defaults_confirm']='Сбросить калькулятор на исходные значения по умолчанию?';
-$ec_lang['points_data_help']='(или Копировать/Вставить через область данных)';
-$ec_lang['points_data_title']='Данные точек<br />(разделены запятой или табуляцией)';
+$ec_lang['points_data_note']='(или Копировать/Вставить через область данных)';
+$ec_lang['points_data_heading']='Данные точек<br />(разделены запятой или табуляцией)';
 $ec_lang['points_data_copy']='Копировать';
 $ec_lang['points_data_paste']='Вставить';
 $ec_lang['calc_inputs']='Входные данные';
@@ -96,7 +96,7 @@ $ec_lang['view_hide_line']='[Скрыть эту строку]';
 $ec_lang['view_printable']='Версия для печати (обновить страницу для восстановления)';
 $ec_lang['ec_name_label']='Сохранить этот расчёт:';
 $ec_lang['ec_name_placeholder']='Имя';
-$ec_lang['ec_name_hint']='Сохраняет входные данные в URL для сохранения в закладках, получения из истории и обмена';
+$ec_lang['ec_name_tip']='Сохраняет входные данные в URL для сохранения в закладках, получения из истории и обмена';
 $ec_lang['calc_copy_link']='Копировать ссылку';
 $ec_lang['ec_related_calcs']='Похожие калькуляторы:';
 $ec_lang['calc_copy_link_done']='Скопировано!';
@@ -511,7 +511,7 @@ $ec_lang['ip_elev_supply']='Отметка подачи, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='Расход эмиттера по проекту, q<sub>design</sub>';
 $ec_lang['ip_h_design']='Давление эмиттера по проекту';
 $ec_lang['ip_x']='<span class="ec-help" title="0,5 для стандартных эмиттеров без компенсации давления; близко к 0 для эмиттеров с компенсацией давления">Показатель степени расхода эмиттера, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='Тестовая трасса';
+$ec_lang['ip_reach_table_heading']='Тестовая трасса';
 $ec_lang['ip_group_reach']='Участок';
 $ec_lang['ip_group_upstream']='Верхний';
 $ec_lang['ip_group_downstream']='Нижний';
@@ -569,7 +569,7 @@ $ec_lang['bpn_method']='Метод расчёта трения';
 $ec_lang['bpn_method_hw']='Хазен-Вильямс';
 $ec_lang['bpn_method_dw']='Дарси-Вейсбах';
 $ec_lang['bpn_method_manning']='Маннинг';
-$ec_lang['bpn_line_table_title']='Участки трубопровода';
+$ec_lang['bpn_line_table_heading']='Участки трубопровода';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='Название этого участка трубопровода. Другие участки ссылаются на него в столбце «Вышестоящий».';
 $ec_lang['bpn_upstream']='ID вышестоящего';
@@ -584,7 +584,7 @@ $ec_lang['bpn_q_line']='Расход участка';
 $ec_lang['bpn_q_line_tip']='Общий расход, проходящий по этому участку: его собственный расход отбора плюс расходы всех участков ниже по течению, которые он питает.';
 $ec_lang['bpn_p_down']='Давл. НБ';
 $ec_lang['bpn_p_down_tip']='Избыточное давление (напор) в узле ниже по течению этого участка. Отрицательное значение (отмечено) означает давление ниже атмосферного; проверьте проект.';
-$ec_lang['bpn_sketch_title']='Схема сети';
+$ec_lang['bpn_sketch_heading']='Схема сети';
 $ec_lang['bpn_show_length']='Длина';
 $ec_lang['bpn_show_diameter']='Диаметр';
 $ec_lang['bpn_show_q']='Расход';
@@ -675,7 +675,7 @@ $ec_lang['lpn_reset_all_tip']='Удаляет все проекты, все фо
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='Этот калькулятор хранит единицы измерения и введённые значения проекта в том виде, в котором они были введены, но раньше числа при сохранении переводились в единицы СИ. Этот проект был сохранён до этого изменения, поэтому его числа хранятся в единицах СИ. Перевести их в текущие единицы в последний раз? Чтобы вы могли оценить результат, вот несколько диаметров, которые будут переведены, с их значениями до и после:';
+$ec_lang['lpn_v2_restore_confirm']='Этот калькулятор хранит единицы измерения и введённые значения проекта в том виде, в котором они были введены, но раньше числа при сохранении переводились в единицы СИ. Этот проект был сохранён до этого изменения, поэтому его числа хранятся в единицах СИ. Перевести их в текущие единицы в последний раз? Чтобы вы могли оценить результат, вот несколько диаметров, которые будут переведены, с их значениями до и после:';
 $ec_lang['lpn_v2_restore_yes']='Перевести';
 $ec_lang['lpn_v2_restore_never']='Нет. Больше не спрашивать.';
 $ec_lang['lpn_v2_restore_no']='Закрыть, чтобы я сначала проверил текущие единицы измерения';
@@ -837,10 +837,10 @@ $ec_lang['lpn_status_reverted']='Файл {file} снова загружен с 
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='Сохранить изменения в {name} перед закрытием?';
+$ec_lang['lpn_close_save_confirm']='Сохранить изменения в {name} перед закрытием?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} хранится только в этом браузере. Если закрыть его без сохранения в файл, он будет потерян безвозвратно.';
+$ec_lang['lpn_close_browser_confirm']='{name} хранится только в этом браузере. Если закрыть его без сохранения в файл, он будет потерян безвозвратно.';
 $ec_lang['lpn_close_discard']='Закрыть без сохранения';
 $ec_lang['lpn_cancel']='Отмена';
 $ec_lang['lpn_revert_confirm']='Отбросить сделанные вами изменения и снова загрузить {file} с диска?';
@@ -921,7 +921,7 @@ $ec_lang['lpn_file_training_continue']='Продолжить';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Выбрать файл заново';
 $ec_lang['lpn_file_reconnect']='Переподключиться к этому файлу';
-$ec_lang['lpn_file_reconnect_prompt']='Этот проект был получен из {file}. Вашему браузеру снова нужно ваше разрешение, прежде чем он сможет записать в него. Переподключитесь ниже.';
+$ec_lang['lpn_file_reconnect_alert']='Этот проект был получен из {file}. Вашему браузеру снова нужно ваше разрешение, прежде чем он сможет записать в него. Переподключитесь ниже.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Это тот же файл, который уже открыт у кого-то другого, поэтому поверх него сохранить нельзя. Выберите другой файл или другое имя.';

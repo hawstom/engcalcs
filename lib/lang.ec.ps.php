@@ -80,15 +80,15 @@ $ec_lang['consent_region_label']='ستاسو د ثبت محدودولو په ا�
 $ec_lang['consent_settings_link']='د کوکي تنظیمات';
 $ec_lang['privacy_link']='د محرمیت خبرتیا';
 $ec_lang['terms_link']='د کارونې شرایط';
-$ec_lang['index_title']='وړیا آنلاین انجینري محاسبې';
+$ec_lang['index_main_title']='وړیا آنلاین انجینري محاسبې';
 $ec_lang['index_meta_desc_plain']='وړیا هایدرولیکي انجینري محاسبې د پایپونو، کانالونو، ویئرونو او آبیارۍ لپاره. دا ستاسو په براوزر کې چلیږي، پرته له انټرنېټ هم کار کوي، او په ۲۷ ژبو کې شتون لري.';
 $ec_lang['calc_set_units']='واحدونه تنظیم کړئ:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='ډيفالټ ارزښتونه بيرته راولئ';
 $ec_lang['calc_defaults_confirm']='ایا محاسبه اصلي (لومړنیو) ډيفالټ ارزښتونو ته بیرته تنظیم شي؟';
-$ec_lang['points_data_help']='(یا د معلوماتو ساحې له لارې کاپي/پیسټ وکړئ)';
-$ec_lang['points_data_title']='د نقطو معلومات<br />(د کوما یا ټب لخوا جلا شوي)';
+$ec_lang['points_data_note']='(یا د معلوماتو ساحې له لارې کاپي/پیسټ وکړئ)';
+$ec_lang['points_data_heading']='د نقطو معلومات<br />(د کوما یا ټب لخوا جلا شوي)';
 $ec_lang['points_data_copy']='کاپي';
 $ec_lang['points_data_paste']='پیسټ';
 $ec_lang['calc_inputs']='ننوتنې';
@@ -97,7 +97,7 @@ $ec_lang['view_hide_line']='[دا کرښه پټه کړئ]';
 $ec_lang['view_printable']='د چاپ وړ نسخه (د بیا ترلاسه کولو لپاره بیا پورته کړئ)';
 $ec_lang['ec_name_label']='دا محاسبه خوندي کړئ:';
 $ec_lang['ec_name_placeholder']='نوم';
-$ec_lang['ec_name_hint']='دا ننوتنې URL ته خوندي کوي د نشان کتاب، تاریخ بیر کیدو، او شریکولو لپاره';
+$ec_lang['ec_name_tip']='دا ننوتنې URL ته خوندي کوي د نشان کتاب، تاریخ بیر کیدو، او شریکولو لپاره';
 $ec_lang['calc_copy_link']='لینک کاپي کړئ';
 $ec_lang['ec_related_calcs']='اړوند محاسبې:';
 $ec_lang['calc_copy_link_done']='کاپي شو!';
@@ -512,7 +512,7 @@ $ec_lang['ip_elev_supply']='د تامین لوړوالی، z<sub>supply</sub>';
 $ec_lang['ip_q_design']='د وریز ډیزاین بهاو، q<sub>design</sub>';
 $ec_lang['ip_h_design']='د وریز ډیزاین فشار';
 $ec_lang['ip_x']='<span class="ec-help" title="د معیاري غیر-جبرانوونکو وریزونو لپاره 0.5؛ د فشار-جبرانوونکو وریزونو لپاره نږدې 0">د وریز خارجېدنې اکسپوننټ، x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='د ازموینې لار';
+$ec_lang['ip_reach_table_heading']='د ازموینې لار';
 $ec_lang['ip_group_reach']='برخه';
 $ec_lang['ip_group_upstream']='پورتنۍ خوا';
 $ec_lang['ip_group_downstream']='ښکتنۍ خوا';
@@ -570,7 +570,7 @@ $ec_lang['bpn_method']='د اصطکاک طریقه';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='د پایپ کرښې';
+$ec_lang['bpn_line_table_heading']='د پایپ کرښې';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='د دې پایپ کرښې نوم. نورې کرښې دې ته د پورتني ستون له لارې اشاره کوي.';
 $ec_lang['bpn_upstream']='پورتنی ID';
@@ -585,7 +585,7 @@ $ec_lang['bpn_q_line']='د کرښې بهاو';
 $ec_lang['bpn_q_line_tip']='هغه ټول بهاو چې دا کرښه وړي: خپله غوښتنه به‌علاوه د هرې ښکتنۍ غوښتنې چې دا تغذیه کوي.';
 $ec_lang['bpn_p_down']='ښکتنی فشار';
 $ec_lang['bpn_p_down_tip']='د دې کرښې په ښکتني نوډ کې د ګیج فشار سر. منفي ارزښت (نښه شوی) د فضا لاندې فشار مانا لري؛ ډیزاین وګورئ.';
-$ec_lang['bpn_sketch_title']='د شبکې نقشه';
+$ec_lang['bpn_sketch_heading']='د شبکې نقشه';
 $ec_lang['bpn_show_length']='اوږدوالی';
 $ec_lang['bpn_show_diameter']='قطر';
 $ec_lang['bpn_show_q']='بهاو';
@@ -676,7 +676,7 @@ $ec_lang['lpn_reset_all_tip']='هرې پروژې، هر شاليد انځور، 
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='دا محاسبګر د پروژې واحدونه او ننوتنې لکه دننه شوي ساتي، خو مخکې یې شمېرې د ساتلو لپاره SI ته اړولې. دا پروژه له دې بدلون نه مخکې ساتل شوې وه، نو د هغې شمېرې په SI کې ساتل شوې وې. دا اوس د اوسنیو واحدونو ته وروستی ځل واړوو؟ ترڅو تاسو وکولی شئ قضاوت وکړئ، دلته یو څو قطرونه دي چې به واړول شي، د خپلو بدلون نه مخکې او وروسته ارزښتونو سره:';
+$ec_lang['lpn_v2_restore_confirm']='دا محاسبګر د پروژې واحدونه او ننوتنې لکه دننه شوي ساتي، خو مخکې یې شمېرې د ساتلو لپاره SI ته اړولې. دا پروژه له دې بدلون نه مخکې ساتل شوې وه، نو د هغې شمېرې په SI کې ساتل شوې وې. دا اوس د اوسنیو واحدونو ته وروستی ځل واړوو؟ ترڅو تاسو وکولی شئ قضاوت وکړئ، دلته یو څو قطرونه دي چې به واړول شي، د خپلو بدلون نه مخکې او وروسته ارزښتونو سره:';
 $ec_lang['lpn_v2_restore_yes']='واړوئ';
 $ec_lang['lpn_v2_restore_never']='نه. بیا هیڅکله مه پوښتئ.';
 $ec_lang['lpn_v2_restore_no']='بندول ترڅو زه لومړی اوسني واحدونه وګورم';
@@ -838,10 +838,10 @@ $ec_lang['lpn_status_reverted']='{file} بیا د ډیسک نه پورته شو.
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='د {name} بندولو نه مخکې خپل بدلونونه ورته وساتئ؟';
+$ec_lang['lpn_close_save_confirm']='د {name} بندولو نه مخکې خپل بدلونونه ورته وساتئ؟';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} یوازې په دې براوزر کې ساتل شوی دی. که تاسو یې پرته له فایل ته ساتلو بند کړئ، دا تل ورک کیږي.';
+$ec_lang['lpn_close_browser_confirm']='{name} یوازې په دې براوزر کې ساتل شوی دی. که تاسو یې پرته له فایل ته ساتلو بند کړئ، دا تل ورک کیږي.';
 $ec_lang['lpn_close_discard']='پرته له ساتلو بندول';
 $ec_lang['lpn_cancel']='لغوه کول';
 $ec_lang['lpn_revert_confirm']='هغه بدلونونه چې کړي دي پرېږدئ او {file} بیا د ډیسک نه پورته کړئ؟';
@@ -922,7 +922,7 @@ $ec_lang['lpn_file_training_continue']='دوام ورکړئ';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='فایل بیا غوره کول';
 $ec_lang['lpn_file_reconnect']='دې فایل ته بیا وصلیدل';
-$ec_lang['lpn_file_reconnect_prompt']='دا پروژه د {file} نه راغلې. ستاسو براوزر بیا اجازه غواړي مخکې لدې چې ورته ولیکي. لاندې بیا وصل شئ.';
+$ec_lang['lpn_file_reconnect_alert']='دا پروژه د {file} نه راغلې. ستاسو براوزر بیا اجازه غواړي مخکې لدې چې ورته ولیکي. لاندې بیا وصل شئ.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='دا هماغه فایل دی چې یو بل چا پرانیستی دی، نو دا نشي ساتل کیدی. یوه بله فایل یا بل نوم غوره کړئ.';

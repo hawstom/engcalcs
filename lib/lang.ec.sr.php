@@ -78,15 +78,15 @@ $ec_lang['consent_region_label']='Ваш избор о ограничавању 
 $ec_lang['consent_settings_link']='Подешавања колачића';
 $ec_lang['privacy_link']='Обавештење о приватности';
 $ec_lang['terms_link']='Услови коришћења';
-$ec_lang['index_title']='Бесплатни онлајн инжењерски калкулатори';
+$ec_lang['index_main_title']='Бесплатни онлајн инжењерски калкулатори';
 $ec_lang['index_meta_desc_plain']='Бесплатни хидротехнички калкулатори за цеви, канале, преливе и наводњавање. Раде директно у прегледачу, доступни су и без интернета, на 27 језика.';
 $ec_lang['calc_set_units']='Подеси јединице:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Врати подразумеване вредности';
 $ec_lang['calc_defaults_confirm']='Повратити калкулатор на подразумеване вредности?';
-$ec_lang['points_data_help']='(или Копирај/Налепи помоћу поља за податке)';
-$ec_lang['points_data_title']='Подаци тачака<br />(одвојени зарезом или табулатором)';
+$ec_lang['points_data_note']='(или Копирај/Налепи помоћу поља за податке)';
+$ec_lang['points_data_heading']='Подаци тачака<br />(одвојени зарезом или табулатором)';
 $ec_lang['points_data_copy']='Копирај';
 $ec_lang['points_data_paste']='Налепи';
 $ec_lang['calc_inputs']='Улазне вредности';
@@ -95,7 +95,7 @@ $ec_lang['view_hide_line']='[Сакриј овај ред]';
 $ec_lang['view_printable']='Верзија за штампу (освежите страницу да бисте вратили)';
 $ec_lang['ec_name_label']='Сачувајте овај прорачун:';
 $ec_lang['ec_name_placeholder']='Назив';
-$ec_lang['ec_name_hint']='Чува унете вредности у URL адресу за обележавање, преузимање из историје и дељење';
+$ec_lang['ec_name_tip']='Чува унете вредности у URL адресу за обележавање, преузимање из историје и дељење';
 $ec_lang['calc_copy_link']='Копирај линк';
 $ec_lang['ec_related_calcs']='Слични калкулатори:';
 $ec_lang['calc_copy_link_done']='Копирано!';
@@ -510,7 +510,7 @@ $ec_lang['ip_elev_supply']='Кота напајања, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='Пројектни проток емитера, q<sub>design</sub>';
 $ec_lang['ip_h_design']='Пројектни притисак емитера';
 $ec_lang['ip_x']='<span class="ec-help" title="0,5 за стандардне емитере без компензације притиска; близу 0 за емитере са компензацијом притиска">Експонент протока емитера, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='Путања теста';
+$ec_lang['ip_reach_table_heading']='Путања теста';
 $ec_lang['ip_group_reach']='Деоница';
 $ec_lang['ip_group_upstream']='Узводно';
 $ec_lang['ip_group_downstream']='Низводно';
@@ -568,7 +568,7 @@ $ec_lang['bpn_method']='Метода трења';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='Цевне линије';
+$ec_lang['bpn_line_table_heading']='Цевне линије';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='Назив ове цевне линије. Друге линије је наводе у колони Узводни ID.';
 $ec_lang['bpn_upstream']='Узводни ID';
@@ -583,7 +583,7 @@ $ec_lang['bpn_q_line']='Проток линије';
 $ec_lang['bpn_q_line_tip']='Укупан проток кроз ову линију: сопствена потрошња плус свака низводна потрошња коју напаја.';
 $ec_lang['bpn_p_down']='Низв. прит.';
 $ec_lang['bpn_p_down_tip']='Манометарски притисак (напор) на низводном чвору ове линије. Негативна вредност (означена) значи притисак испод атмосферског; проверите пројекат.';
-$ec_lang['bpn_sketch_title']='Шема мреже';
+$ec_lang['bpn_sketch_heading']='Шема мреже';
 $ec_lang['bpn_show_length']='Дужина';
 $ec_lang['bpn_show_diameter']='Пречник';
 $ec_lang['bpn_show_q']='Проток';
@@ -674,7 +674,7 @@ $ec_lang['lpn_reset_all_tip']='Брише сваки пројекат, свак�
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='Овај калкулатор чува пројектне јединице и уносе онако како су унети, али је раније претварао бројеве у SI јединице ради чувања. Овај пројекат је сачуван пре те измене, па су његови бројеви сачувани у SI јединицама. Претворити их последњи пут у тренутне јединице? Да бисте могли да проценити, ево неколико пречника који би били претворени, са вредностима пре и после:';
+$ec_lang['lpn_v2_restore_confirm']='Овај калкулатор чува пројектне јединице и уносе онако како су унети, али је раније претварао бројеве у SI јединице ради чувања. Овај пројекат је сачуван пре те измене, па су његови бројеви сачувани у SI јединицама. Претворити их последњи пут у тренутне јединице? Да бисте могли да проценити, ево неколико пречника који би били претворени, са вредностима пре и после:';
 $ec_lang['lpn_v2_restore_yes']='Претвори';
 $ec_lang['lpn_v2_restore_never']='Не. Не питај ме више.';
 $ec_lang['lpn_v2_restore_no']='Затвори да бих прво проверио тренутне јединице';
@@ -836,10 +836,10 @@ $ec_lang['lpn_status_reverted']='Поново учитано {file} са дис�
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='Сачувати ваше измене у {name} пре затварања?';
+$ec_lang['lpn_close_save_confirm']='Сачувати ваше измене у {name} пре затварања?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} се чува само у овом прегледачу. Ако га затворите без чувања у датотеку, трајно је изгубљен.';
+$ec_lang['lpn_close_browser_confirm']='{name} се чува само у овом прегледачу. Ако га затворите без чувања у датотеку, трајно је изгубљен.';
 $ec_lang['lpn_close_discard']='Затвори без чувања';
 $ec_lang['lpn_cancel']='Откажи';
 $ec_lang['lpn_revert_confirm']='Одбацити измене које сте направили и поново учитати {file} са диска?';
@@ -920,7 +920,7 @@ $ec_lang['lpn_file_training_continue']='Настави';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Изаберите датотеку поново';
 $ec_lang['lpn_file_reconnect']='Поново се повежи са овом датотеком';
-$ec_lang['lpn_file_reconnect_prompt']='Овај пројекат потиче из {file}. Вашем прегледачу је поново потребна ваша дозвола пре него што може да пише у њу. Поново се повежите испод.';
+$ec_lang['lpn_file_reconnect_alert']='Овај пројекат потиче из {file}. Вашем прегледачу је поново потребна ваша дозвола пре него што може да пише у њу. Поново се повежите испод.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='То је иста датотека коју неко други има отворену, па се не може преписати. Изаберите другу датотеку или друго име.';

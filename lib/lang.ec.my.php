@@ -80,15 +80,15 @@ $ec_lang['consent_region_label']='မှတ်တမ်းတင်ခြင်�
 $ec_lang['consent_settings_link']='ကွတ်ကီး ဆက်တင်များ';
 $ec_lang['privacy_link']='ကိုယ်ရေးလုံခြုံမှု ကြေညာချက်';
 $ec_lang['terms_link']='အသုံးပြုမှု စည်းမျဉ်းများ';
-$ec_lang['index_title']='အခမဲ့ အွန်လိုင်း အင်ဂျင်နီယာ တွက်ချက်မှုကိရိယာများ';
+$ec_lang['index_main_title']='အခမဲ့ အွန်လိုင်း အင်ဂျင်နီယာ တွက်ချက်မှုကိရိယာများ';
 $ec_lang['index_meta_desc_plain']='ပိုက်၊ ရေလမ်းကြောင်း၊ ရေလွှမ်းတမံနှင့် ဆည်မြောင်းအတွက် အခမဲ့ ဟိုက်ဒရောလစ် အင်ဂျင်နီယာ တွက်ချက်စက်များ။ သင့်ဘရောက်ဇာထဲတွင် အလုပ်လုပ်ပြီး အင်တာနက်မရှိဘဲလည်း (အော့ဖ်လိုင်း) အသုံးပြုနိုင်ပြီး ဘာသာစကား ၂၇ မျိုးဖြင့် ရရှိနိုင်ပါသည်။';
 $ec_lang['calc_set_units']='ယူနစ်သတ်မှတ်ရန်:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='ပုံမှန်သို့ ပြန်ယူပါ';
 $ec_lang['calc_defaults_confirm']='တွက်ချက်မှုကိရိယာကို မူလ ပုံမှန် တန်ဖိုးများသို့ ပြန်လည်သတ်မှတ်မလား?';
-$ec_lang['points_data_help']='(သို့မဟုတ် ဒေတာနေရာကို အသုံးပြု၍ ကူးယူ/ကူးထည့်ပါ)';
-$ec_lang['points_data_title']='အမှတ်ဒေတာ<br />(ကော်မာ သို့မဟုတ် tab ဖြင့် ခွဲ)';
+$ec_lang['points_data_note']='(သို့မဟုတ် ဒေတာနေရာကို အသုံးပြု၍ ကူးယူ/ကူးထည့်ပါ)';
+$ec_lang['points_data_heading']='အမှတ်ဒေတာ<br />(ကော်မာ သို့မဟုတ် tab ဖြင့် ခွဲ)';
 $ec_lang['points_data_copy']='ကူးယူ';
 $ec_lang['points_data_paste']='ကူးထည့်';
 $ec_lang['calc_inputs']='ထည့်သွင်းချက်များ';
@@ -97,7 +97,7 @@ $ec_lang['view_hide_line']='[ဤစာကြောင်း ဝှက်ရန�
 $ec_lang['view_printable']='မှတ်တမ်းတင်နိုင်သောဗားရှင်း (ပြန်ရယူရန် ပြန်လည်တင်/ရှင်းလင်းပါ)';
 $ec_lang['ec_name_label']='ဤတွက်ချက်မှုကိုသိမ်းဆည်းပါ:';
 $ec_lang['ec_name_placeholder']='အမည်';
-$ec_lang['ec_name_hint']='ထည့်သွင်းချက်များကို URL သို့သိမ်းဆည်းကာ စာမှတ်မုံးခြင်း၊ မှတ်တမ်းများ ပြန်လည်ရယူခြင်းနှင့် မျှဝေခြင်းအတွက်ဖြစ်သည်။';
+$ec_lang['ec_name_tip']='ထည့်သွင်းချက်များကို URL သို့သိမ်းဆည်းကာ စာမှတ်မုံးခြင်း၊ မှတ်တမ်းများ ပြန်လည်ရယူခြင်းနှင့် မျှဝေခြင်းအတွက်ဖြစ်သည်။';
 $ec_lang['calc_copy_link']='လင့်ခ် ကူးယူရန်';
 $ec_lang['ec_related_calcs']='ဆက်စပ်တွက်ချက်စက်များ:';
 $ec_lang['calc_copy_link_done']='ကူးယူပြီးပါပြီ!';
@@ -512,7 +512,7 @@ $ec_lang['ip_elev_supply']='ပေးသွင်းအမြင့်, z<sub>su
 $ec_lang['ip_q_design']='ရေထုတ်ကိရိယာ ဒီဇိုင်း ရေစီးနှုန်း, q<sub>design</sub>';
 $ec_lang['ip_h_design']='ရေထုတ်ကိရိယာ ဒီဇိုင်း ဖိအား';
 $ec_lang['ip_x']='<span class="ec-help" title="ပုံမှန် ဖိအားမညှိသော ရေထုတ်ကိရိယာများအတွက် 0.5; ဖိအားညှိ ရေထုတ်ကိရိယာများအတွက် သုညအနီး">ရေထုတ်ကိရိယာ စီးထွက်ထပ်ကိန်း, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='စမ်းသပ် လမ်းကြောင်း';
+$ec_lang['ip_reach_table_heading']='စမ်းသပ် လမ်းကြောင်း';
 $ec_lang['ip_group_reach']='ပိုက်အပိုင်း';
 $ec_lang['ip_group_upstream']='ရေအထက်ဘက်';
 $ec_lang['ip_group_downstream']='ရေအောက်ဘက်';
@@ -570,7 +570,7 @@ $ec_lang['bpn_method']='ပွတ်တိုက်မှု နည်းလမ�
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='ပိုက်လိုင်းများ';
+$ec_lang['bpn_line_table_heading']='ပိုက်လိုင်းများ';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='ဤပိုက်လိုင်း၏ အမည်။ အခြားလိုင်းများသည် ၎င်းအား ရေအထက်ဘက် ကော်လံတွင် ကိုးကားသည်။';
 $ec_lang['bpn_upstream']='ရေအထက်ဘက် ID';
@@ -585,7 +585,7 @@ $ec_lang['bpn_q_line']='လိုင်းရေစီးနှုန်း';
 $ec_lang['bpn_q_line_tip']='ဤလိုင်းက သယ်ဆောင်သော စုစုပေါင်းရေစီးနှုန်း: ၎င်း၏ ကိုယ်ပိုင်လိုအပ်ချက်နှင့် ၎င်းက ပေးသွင်းသော ရေအောက်ဘက် လိုအပ်ချက်များအားလုံး ပေါင်းထားသည်။';
 $ec_lang['bpn_p_down']='ရေအောက်ဘက် ဖိအား';
 $ec_lang['bpn_p_down_tip']='ဤလိုင်း၏ ရေအောက်ဘက်ဆုံမှတ်တွင် ဂေ့ချ်ဖိအားဖိမြင့်။ အနှုတ်တန်ဖိုး (အမှတ်အသားပြုထား) သည် လေထုဖိအားအောက် ဖြစ်ကြောင်းညွှန်ပြသည်; ဒီဇိုင်းကို စစ်ဆေးပါ။';
-$ec_lang['bpn_sketch_title']='ကွန်ရက် ပုံကြမ်း';
+$ec_lang['bpn_sketch_heading']='ကွန်ရက် ပုံကြမ်း';
 $ec_lang['bpn_show_length']='အလျား';
 $ec_lang['bpn_show_diameter']='အချင်း';
 $ec_lang['bpn_show_q']='ရေစီးနှုန်း';
@@ -676,7 +676,7 @@ $ec_lang['lpn_reset_all_tip']='ပရောဂျက်အားလုံး၊ 
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='ဤတွက်ချက်စက်သည် ပရောဂျက်ယူနစ်များနှင့် ထည့်သွင်းချက်များကို ရိုက်ထည့်သည့်အတိုင်း သိမ်းဆည်းသည်၊ သို့သော် ယခင်က ဂဏန်းများကို SI ယူနစ်သို့ ပြောင်းလဲပြီး သိမ်းဆည်းခဲ့သည်။ ဤပရောဂျက်ကို ထိုပြောင်းလဲမှုမတိုင်မီ သိမ်းဆည်းခဲ့ခြင်းဖြစ်၍ ၎င်း၏ဂဏန်းများသည် SI ဖြင့် သိမ်းထားသည်။ ၎င်းတို့ကို လက်ရှိယူနစ်များသို့ နောက်ဆုံးတစ်ကြိမ် ပြောင်းလဲမလား။ သင်ဆုံးဖြတ်နိုင်ရန် ပြောင်းလဲမည့် အချင်းအချို့ကို ပြောင်းလဲမီနှင့် ပြောင်းလဲပြီးတန်ဖိုးများနှင့်တကွ ဖော်ပြထားသည် -';
+$ec_lang['lpn_v2_restore_confirm']='ဤတွက်ချက်စက်သည် ပရောဂျက်ယူနစ်များနှင့် ထည့်သွင်းချက်များကို ရိုက်ထည့်သည့်အတိုင်း သိမ်းဆည်းသည်၊ သို့သော် ယခင်က ဂဏန်းများကို SI ယူနစ်သို့ ပြောင်းလဲပြီး သိမ်းဆည်းခဲ့သည်။ ဤပရောဂျက်ကို ထိုပြောင်းလဲမှုမတိုင်မီ သိမ်းဆည်းခဲ့ခြင်းဖြစ်၍ ၎င်း၏ဂဏန်းများသည် SI ဖြင့် သိမ်းထားသည်။ ၎င်းတို့ကို လက်ရှိယူနစ်များသို့ နောက်ဆုံးတစ်ကြိမ် ပြောင်းလဲမလား။ သင်ဆုံးဖြတ်နိုင်ရန် ပြောင်းလဲမည့် အချင်းအချို့ကို ပြောင်းလဲမီနှင့် ပြောင်းလဲပြီးတန်ဖိုးများနှင့်တကွ ဖော်ပြထားသည် -';
 $ec_lang['lpn_v2_restore_yes']='ပြောင်းလဲရန်';
 $ec_lang['lpn_v2_restore_never']='မလုပ်ပါနှင့်။ နောက်နောင် ထပ်မမေးပါနှင့်။';
 $ec_lang['lpn_v2_restore_no']='လက်ရှိယူနစ်များကို အရင်စစ်ဆေးနိုင်ရန် ပိတ်ပါ';
@@ -838,10 +838,10 @@ $ec_lang['lpn_status_reverted']='{file} ကို ဒစ်စ်ခ်မှ �
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='{name} ကို မပိတ်မီ သင့်ပြောင်းလဲမှုများကို သိမ်းမလား။';
+$ec_lang['lpn_close_save_confirm']='{name} ကို မပိတ်မီ သင့်ပြောင်းလဲမှုများကို သိမ်းမလား။';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} ကို ဤဘရောက်ဇာတွင်သာ သိမ်းဆည်းထားပါသည်။ ဖိုင်တစ်ခုသို့ မသိမ်းဘဲ ပိတ်လိုက်ပါက၊ ၎င်းသည် အပြီးတိုင် ပျောက်ဆုံးသွားပါလိမ့်မည်။';
+$ec_lang['lpn_close_browser_confirm']='{name} ကို ဤဘရောက်ဇာတွင်သာ သိမ်းဆည်းထားပါသည်။ ဖိုင်တစ်ခုသို့ မသိမ်းဘဲ ပိတ်လိုက်ပါက၊ ၎င်းသည် အပြီးတိုင် ပျောက်ဆုံးသွားပါလိမ့်မည်။';
 $ec_lang['lpn_close_discard']='မသိမ်းဘဲ ပိတ်ရန်';
 $ec_lang['lpn_cancel']='ပယ်ဖျက်ရန်';
 $ec_lang['lpn_revert_confirm']='သင်ပြုလုပ်ထားသော ပြောင်းလဲမှုများကို စွန့်ပစ်ပြီး {file} ကို ဒစ်စ်ခ်မှ ထပ်မံဖွင့်မလား။';
@@ -922,7 +922,7 @@ $ec_lang['lpn_file_training_continue']='ဆက်လုပ်ရန်';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='ဖိုင်ကို ထပ်မံရွေးချယ်ရန်';
 $ec_lang['lpn_file_reconnect']='ဤဖိုင်နှင့် ပြန်ချိတ်ဆက်ရန်';
-$ec_lang['lpn_file_reconnect_prompt']='ဤပရောဂျက်သည် {file} မှ လာခဲ့ပါသည်။ ၎င်းထဲသို့ ရေးသွင်းနိုင်ရန် သင့်ဘရောက်ဇာက သင့်ခွင့်ပြုချက်ကို ထပ်မံလိုအပ်ပါသည်။ အောက်တွင် ပြန်ချိတ်ဆက်ပါ။';
+$ec_lang['lpn_file_reconnect_alert']='ဤပရောဂျက်သည် {file} မှ လာခဲ့ပါသည်။ ၎င်းထဲသို့ ရေးသွင်းနိုင်ရန် သင့်ဘရောက်ဇာက သင့်ခွင့်ပြုချက်ကို ထပ်မံလိုအပ်ပါသည်။ အောက်တွင် ပြန်ချိတ်ဆက်ပါ။';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='ထိုဖိုင်သည် တခြားတစ်ဦး ဖွင့်ထားသော ဖိုင်တစ်ခုတည်း ဖြစ်သောကြောင့်၊ ၎င်းအပေါ် ပြန်ရေးသိမ်း၍မရပါ။ တခြားဖိုင် (သို့) တခြားအမည်တစ်ခုကို ရွေးချယ်ပါ။';

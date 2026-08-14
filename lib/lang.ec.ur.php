@@ -80,15 +80,15 @@ $ec_lang['consent_region_label']='ریکارڈنگ محدود کرنے کے با
 $ec_lang['consent_settings_link']='کوکی کی ترتیبات';
 $ec_lang['privacy_link']='رازداری کی پالیسی';
 $ec_lang['terms_link']='استعمال کی شرائط';
-$ec_lang['index_title']='مفت آنلائن انجینئرنگ حاسبات';
+$ec_lang['index_main_title']='مفت آنلائن انجینئرنگ حاسبات';
 $ec_lang['index_meta_desc_plain']='پائپوں، نہروں، ویئر اور آبپاشی کے لیے مفت ہائیڈرولک انجینئرنگ حاسبات۔ یہ آپ کے براؤزر میں چلتے ہیں، آف لائن کام کرتے ہیں، اور 27 زبانوں میں دستیاب ہیں۔';
 $ec_lang['calc_set_units']='اکائیاں مقرر کریں:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='پہلے سے مقررہ اقدار بحال کریں';
 $ec_lang['calc_defaults_confirm']='کیا حاسبے کو اصل پہلے سے مقرر اقدار میں دوبارہ مقرر کریں؟';
-$ec_lang['points_data_help']='(یا ڈیٹا علاقے سے کاپی/پیسٹ کریں)';
-$ec_lang['points_data_title']='نقطہ ڈیٹا<br />(کاما یا ٹیب سے علیحدہ)';
+$ec_lang['points_data_note']='(یا ڈیٹا علاقے سے کاپی/پیسٹ کریں)';
+$ec_lang['points_data_heading']='نقطہ ڈیٹا<br />(کاما یا ٹیب سے علیحدہ)';
 $ec_lang['points_data_copy']='کاپی';
 $ec_lang['points_data_paste']='پیسٹ';
 $ec_lang['calc_inputs']='ان پٹ';
@@ -97,7 +97,7 @@ $ec_lang['view_hide_line']='[یہ سطر چھپائیں]';
 $ec_lang['view_printable']='طباعت کے قابل ورژن (بحال کرنے کے لیے دوبارہ لوڈ کریں)';
 $ec_lang['ec_name_label']='یہ حساب محفوظ کریں:';
 $ec_lang['ec_name_placeholder']='نام';
-$ec_lang['ec_name_hint']='ان درج کردہ قدریوں کو URL میں محفوظ کریں نشان زدگی، تاریخ سے بازیافت، اور شیئرنگ کے لیے';
+$ec_lang['ec_name_tip']='ان درج کردہ قدریوں کو URL میں محفوظ کریں نشان زدگی، تاریخ سے بازیافت، اور شیئرنگ کے لیے';
 $ec_lang['calc_copy_link']='لنک کاپی کریں';
 $ec_lang['ec_related_calcs']='متعلقہ کیلکولیٹرز:';
 $ec_lang['calc_copy_link_done']='کاپی ہو گیا!';
@@ -512,7 +512,7 @@ $ec_lang['ip_elev_supply']='سپلائی کی بلندی، z<sub>supply</sub>';
 $ec_lang['ip_q_design']='ایمیٹر ڈیزائن بہاؤ، q<sub>design</sub>';
 $ec_lang['ip_h_design']='ایمیٹر ڈیزائن دباؤ';
 $ec_lang['ip_x']='<span class="ec-help" title="معیاری غیر معاوضی ایمیٹرز کے لیے 0.5؛ دباؤ معاوضی ایمیٹرز کے لیے تقریباً 0">ایمیٹر اخراج قوت نما، x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='ٹیسٹ پاتھ';
+$ec_lang['ip_reach_table_heading']='ٹیسٹ پاتھ';
 $ec_lang['ip_group_reach']='حصہ';
 $ec_lang['ip_group_upstream']='بالائی رخ';
 $ec_lang['ip_group_downstream']='زیریں رخ';
@@ -570,7 +570,7 @@ $ec_lang['bpn_method']='رگڑ کا طریقہ';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='پائپ لائنیں';
+$ec_lang['bpn_line_table_heading']='پائپ لائنیں';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='اس پائپ لائن کا نام۔ دیگر لائنیں اپ سٹریم کالم میں اس کا حوالہ دیتی ہیں۔';
 $ec_lang['bpn_upstream']='بالائی رخ ID';
@@ -585,7 +585,7 @@ $ec_lang['bpn_q_line']='لائن بہاؤ';
 $ec_lang['bpn_q_line_tip']='اس لائن سے گزرنے والا کل بہاؤ: اس کی اپنی طلب جمع ہر زیریں رخ کی طلب جسے یہ فراہم کرتی ہے۔';
 $ec_lang['bpn_p_down']='زیریں دباؤ';
 $ec_lang['bpn_p_down_tip']='اس لائن کے زیریں رخ نوڈ پر گیج دباؤ ہیڈ۔ منفی قدر (نشان زد) کا مطلب ماحول سے کم دباؤ ہے؛ ڈیزائن کی جانچ کریں۔';
-$ec_lang['bpn_sketch_title']='نیٹ ورک خاکہ';
+$ec_lang['bpn_sketch_heading']='نیٹ ورک خاکہ';
 $ec_lang['bpn_show_length']='لمبائی';
 $ec_lang['bpn_show_diameter']='قطر';
 $ec_lang['bpn_show_q']='بہاؤ';
@@ -676,7 +676,7 @@ $ec_lang['lpn_reset_all_tip']='ہر پراجیکٹ، ہر پس منظر کی ت�
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='یہ کیلکولیٹر پراجیکٹ کے یونٹس اور اندراجات کو بعینہ محفوظ کرتا ہے، لیکن پہلے یہ اعداد کو محفوظ کرنے کے لیے SI میں تبدیل کرتا تھا۔ یہ پراجیکٹ اس تبدیلی سے پہلے محفوظ کیا گیا تھا، اس لیے اس کے اعداد SI میں محفوظ ہیں۔ کیا انہیں آخری بار موجودہ یونٹس میں تبدیل کیا جائے؟ فیصلہ کرنے میں مدد کے لیے، یہاں کچھ قطر دیے گئے ہیں جو تبدیل ہوں گے، پہلے اور بعد کی قدروں کے ساتھ:';
+$ec_lang['lpn_v2_restore_confirm']='یہ کیلکولیٹر پراجیکٹ کے یونٹس اور اندراجات کو بعینہ محفوظ کرتا ہے، لیکن پہلے یہ اعداد کو محفوظ کرنے کے لیے SI میں تبدیل کرتا تھا۔ یہ پراجیکٹ اس تبدیلی سے پہلے محفوظ کیا گیا تھا، اس لیے اس کے اعداد SI میں محفوظ ہیں۔ کیا انہیں آخری بار موجودہ یونٹس میں تبدیل کیا جائے؟ فیصلہ کرنے میں مدد کے لیے، یہاں کچھ قطر دیے گئے ہیں جو تبدیل ہوں گے، پہلے اور بعد کی قدروں کے ساتھ:';
 $ec_lang['lpn_v2_restore_yes']='تبدیل کریں';
 $ec_lang['lpn_v2_restore_never']='نہیں۔ دوبارہ کبھی نہ پوچھیں۔';
 $ec_lang['lpn_v2_restore_no']='بند کریں تاکہ میں پہلے موجودہ یونٹس چیک کر سکوں';
@@ -838,10 +838,10 @@ $ec_lang['lpn_status_reverted']='{file} ڈسک سے دوبارہ لوڈ ہو گ�
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='بند کرنے سے پہلے اپنی تبدیلیاں {name} میں محفوظ کریں؟';
+$ec_lang['lpn_close_save_confirm']='بند کرنے سے پہلے اپنی تبدیلیاں {name} میں محفوظ کریں؟';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} صرف اسی براؤزر میں رکھا گیا ہے۔ اگر آپ اسے فائل میں محفوظ کیے بغیر بند کریں تو یہ ہمیشہ کے لیے ختم ہو جائے گا۔';
+$ec_lang['lpn_close_browser_confirm']='{name} صرف اسی براؤزر میں رکھا گیا ہے۔ اگر آپ اسے فائل میں محفوظ کیے بغیر بند کریں تو یہ ہمیشہ کے لیے ختم ہو جائے گا۔';
 $ec_lang['lpn_close_discard']='بغیر محفوظ کیے بند کریں';
 $ec_lang['lpn_cancel']='منسوخ کریں';
 $ec_lang['lpn_revert_confirm']='اپنی کی گئی تبدیلیاں ضائع کر کے {file} ڈسک سے دوبارہ لوڈ کریں؟';
@@ -922,7 +922,7 @@ $ec_lang['lpn_file_training_continue']='جاری رکھیں';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='فائل دوبارہ منتخب کریں';
 $ec_lang['lpn_file_reconnect']='اس فائل سے دوبارہ منسلک ہوں';
-$ec_lang['lpn_file_reconnect_prompt']='یہ پراجیکٹ {file} سے آیا تھا۔ اس میں لکھنے سے پہلے آپ کے براؤزر کو دوبارہ آپ کی اجازت درکار ہے۔ نیچے دوبارہ منسلک ہوں۔';
+$ec_lang['lpn_file_reconnect_alert']='یہ پراجیکٹ {file} سے آیا تھا۔ اس میں لکھنے سے پہلے آپ کے براؤزر کو دوبارہ آپ کی اجازت درکار ہے۔ نیچے دوبارہ منسلک ہوں۔';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='یہ وہی فائل ہے جو کسی اور نے کھول رکھی ہے، اس لیے اسے اوور رائٹ نہیں کیا جا سکتا۔ کوئی مختلف فائل یا مختلف نام منتخب کریں۔';

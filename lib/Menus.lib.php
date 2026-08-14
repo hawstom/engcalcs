@@ -169,12 +169,16 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 <?php if ($show_name_field) : ?>
 		<button id="ec-install-btn" type="button" class="btn btn-sm btn-outline-primary ms-3" style="display:none" onclick="EngCalcs.installPWA()"><?=ecIcon('install')?><?=$ec_lang['install_main_menu']?></button>
 		<form class="d-flex align-items-center ms-3" style="gap:0.4em" onsubmit="return false;">
-			<label for="ec_calc_name" class="small fw-semibold text-nowrap mb-0"><?=$ec_lang['ec_name_label'] ?? 'Label:'?></label><span title="<?=htmlspecialchars($ec_lang['ec_name_hint'] ?? '', ENT_QUOTES, 'UTF-8')?>" style="cursor:help;color:steelblue;font-size:0.9em" tabindex="0">?</span>
+			<?php // Task 291: this hand-rolled a .ec-tip glyph -- inline styles copying that class rule for
+			      // rule, beside the label rather than wrapping it -- so the tap target was the one "?"
+			      // character the whole-label convention exists to avoid. ecTipLabel() gives the
+			      // no-link nesting: .ec-help wraps the label text AND the glyph. ?>
+			<label for="ec_calc_name" class="small fw-semibold text-nowrap mb-0"><?=ecTipLabel($ec_lang['ec_name_label'] ?? 'Label:', $ec_lang['ec_name_tip'] ?? '')?></label>
 			<input type="text" id="ec_calc_name"
 				class="form-control form-control-sm"
 				style="width:14em"
 				placeholder="<?=htmlspecialchars($ec_lang['ec_name_placeholder'] ?? 'Label for bookmarking/sharing', ENT_QUOTES, 'UTF-8')?>"
-				title="<?=htmlspecialchars($ec_lang['ec_name_hint'] ?? 'letters, digits, spaces, – _ .', ENT_QUOTES, 'UTF-8')?>"
+				title="<?=htmlspecialchars($ec_lang['ec_name_tip'] ?? 'letters, digits, spaces, – _ .', ENT_QUOTES, 'UTF-8')?>"
 				value="<?=htmlspecialchars($calc_name, ENT_QUOTES, 'UTF-8')?>"
 				maxlength="50"
 				autocomplete="off">

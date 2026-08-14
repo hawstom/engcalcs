@@ -80,15 +80,15 @@ $ec_lang['consent_region_label']='የምዝገባ መገደብ ላይ ያደረ�
 $ec_lang['consent_settings_link']='የኩኪ ቅንብሮች';
 $ec_lang['privacy_link']='የግላዊነት መግለጫ';
 $ec_lang['terms_link']='የአጠቃቀም ደንቦች';
-$ec_lang['index_title']='ነፃ የኦንላይን ምህንድስና ካልኩሌተሮች';
+$ec_lang['index_main_title']='ነፃ የኦንላይን ምህንድስና ካልኩሌተሮች';
 $ec_lang['index_meta_desc_plain']='ነፃ የሃይድሮሊክ ምህንድስና ካልኩሌተሮች ለቧንቧዎች፣ ለቦዮች፣ ለዊሮች እና ለመስኖ። በአሳሽዎ ውስጥ ይሰራሉ፣ ያለ ኢንተርኔት ግንኙነት ይሰራሉ፣ እንዲሁም በ27 ቋንቋዎች ይገኛሉ።';
 $ec_lang['calc_set_units']='አሃዶችን አዘጋጅ:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='ነባሪዎችን መልስ';
 $ec_lang['calc_defaults_confirm']='ካልኩሌተሩን ወደ ነባር ዋጋዎች ማስጀምር?';
-$ec_lang['points_data_help']='(ወይም የውሂብ ቦታ ተጠቅሞ ቅዳ/ለጥፍ)';
-$ec_lang['points_data_title']='የነጥቦች ውሂብ<br />(በኮማ ወይም ታብ የተለዩ)';
+$ec_lang['points_data_note']='(ወይም የውሂብ ቦታ ተጠቅሞ ቅዳ/ለጥፍ)';
+$ec_lang['points_data_heading']='የነጥቦች ውሂብ<br />(በኮማ ወይም ታብ የተለዩ)';
 $ec_lang['points_data_copy']='ቅዳ';
 $ec_lang['points_data_paste']='ለጥፍ';
 $ec_lang['calc_inputs']='ግቤቶች';
@@ -97,7 +97,7 @@ $ec_lang['view_hide_line']='[ይህን መስመር ደብቅ]';
 $ec_lang['view_printable']='ሊታተም የሚችል እትም (ለመመለስ አደስ)';
 $ec_lang['ec_name_label']='ይህን ስሌት አስቀምጥ:';
 $ec_lang['ec_name_placeholder']='ስም';
-$ec_lang['ec_name_hint']='እነዚህ ግቤቶች ወደ URL ያስቀምጣል በደንብ ምልክት ለመስጠት ታሪክ ማግኛ እና ማጋራት';
+$ec_lang['ec_name_tip']='እነዚህ ግቤቶች ወደ URL ያስቀምጣል በደንብ ምልክት ለመስጠት ታሪክ ማግኛ እና ማጋራት';
 $ec_lang['calc_copy_link']='ቅዳ ሊንክ';
 $ec_lang['ec_related_calcs']='ተዛማጅ ማስያዎች፦';
 $ec_lang['calc_copy_link_done']='ተቀድቷል!';
@@ -512,7 +512,7 @@ $ec_lang['ip_elev_supply']='የአቅርቦት ከፍታ, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='የኤሚተር ዲዛይን ፍሰት, q<sub>design</sub>';
 $ec_lang['ip_h_design']='የኤሚተር ዲዛይን ግፊት';
 $ec_lang['ip_x']='<span class="ec-help" title="ለመደበኛ ግፊት-ላልማይካካሱ ኤሚተሮች 0.5፤ ግፊት ለሚካክሱ ኤሚተሮች ወደ 0 ቅርብ">የኤሚተር ፍሰት ኤክስፖነንት, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='የሙከራ መንገድ';
+$ec_lang['ip_reach_table_heading']='የሙከራ መንገድ';
 $ec_lang['ip_group_reach']='ክፍል';
 $ec_lang['ip_group_upstream']='የላይኛው ጎን';
 $ec_lang['ip_group_downstream']='የታችኛው ጎን';
@@ -570,7 +570,7 @@ $ec_lang['bpn_method']='የግጭት ዘዴ';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='የቧንቧ መስመሮች';
+$ec_lang['bpn_line_table_heading']='የቧንቧ መስመሮች';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='የዚህ የቧንቧ መስመር ስም። ሌሎች መስመሮች በ«የላይኛው መለያ» ዓምድ ውስጥ ይህንኑ ይጠቅሳሉ።';
 $ec_lang['bpn_upstream']='የላይኛው መለያ';
@@ -585,7 +585,7 @@ $ec_lang['bpn_q_line']='የመስመር ፍሰት';
 $ec_lang['bpn_q_line_tip']='በዚህ መስመር የሚጓጓዝ ጠቅላላ ፍሰት፦ የራሱ ፍላጎት እና የሚመግባቸው ሁሉም ታች ፍላጎቶች ድምር።';
 $ec_lang['bpn_p_down']='ታች ግፊት';
 $ec_lang['bpn_p_down_tip']='በዚህ መስመር ታች መገናኛ ላይ ያለ የመለኪያ ግፊት ሄድ። አሉታዊ እሴት (ምልክት የተደረገበት) ከከባቢ አየር ግፊት በታች መሆኑን ያሳያል፤ ንድፉን ያረጋግጡ።';
-$ec_lang['bpn_sketch_title']='የመረብ ንድፍ';
+$ec_lang['bpn_sketch_heading']='የመረብ ንድፍ';
 $ec_lang['bpn_show_length']='ርዝመት';
 $ec_lang['bpn_show_diameter']='ዲያሜትር';
 $ec_lang['bpn_show_q']='ፍሰት';
@@ -676,7 +676,7 @@ $ec_lang['lpn_reset_all_tip']='ሁሉንም ፕሮጀክቶች፣ ሁሉንም �
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='ይህ ማስያ የፕሮጀክት መለኪያ ክፍሎችንና ግቤቶችን እንደገቡ ያስቀምጣል፣ ነገር ግን ቀደም ብሎ ቁጥሮችን ለማከማቻ ወደ SI ይለውጥ ነበር። ይህ ፕሮጀክት ከዚያ ለውጥ በፊት ስለተቀመጠ፣ ቁጥሮቹ በSI ተቀምጠዋል። ለመጨረሻ ጊዜ ወደ አሁኑ መለኪያ ክፍሎች ይለውጧቸው? እርስዎ እንዲፈርዱበት፣ የሚለወጡ አንዳንድ ዲያሜትሮች ከለውጡ በፊትና በኋላ ካላቸው ዋጋዎች ጋር እነሆ፦';
+$ec_lang['lpn_v2_restore_confirm']='ይህ ማስያ የፕሮጀክት መለኪያ ክፍሎችንና ግቤቶችን እንደገቡ ያስቀምጣል፣ ነገር ግን ቀደም ብሎ ቁጥሮችን ለማከማቻ ወደ SI ይለውጥ ነበር። ይህ ፕሮጀክት ከዚያ ለውጥ በፊት ስለተቀመጠ፣ ቁጥሮቹ በSI ተቀምጠዋል። ለመጨረሻ ጊዜ ወደ አሁኑ መለኪያ ክፍሎች ይለውጧቸው? እርስዎ እንዲፈርዱበት፣ የሚለወጡ አንዳንድ ዲያሜትሮች ከለውጡ በፊትና በኋላ ካላቸው ዋጋዎች ጋር እነሆ፦';
 $ec_lang['lpn_v2_restore_yes']='ለውጥ';
 $ec_lang['lpn_v2_restore_never']='አይ። ዳግም አትጠይቅ።';
 $ec_lang['lpn_v2_restore_no']='አሁን ያለውን መለኪያ ክፍል መጀመሪያ ለማየት ዝጋ';
@@ -838,10 +838,10 @@ $ec_lang['lpn_status_reverted']='{file}ን ከዲስክ ዳግም ጭኗል።';
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='ከመዝጋትዎ በፊት ለውጦችዎን ወደ {name} ያስቀምጡ?';
+$ec_lang['lpn_close_save_confirm']='ከመዝጋትዎ በፊት ለውጦችዎን ወደ {name} ያስቀምጡ?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} የሚቀመጠው በዚህ አሳሽ ውስጥ ብቻ ነው። ወደ ፋይል ሳያስቀምጡት ከዘጉት፣ ለዘላለም ይጠፋል።';
+$ec_lang['lpn_close_browser_confirm']='{name} የሚቀመጠው በዚህ አሳሽ ውስጥ ብቻ ነው። ወደ ፋይል ሳያስቀምጡት ከዘጉት፣ ለዘላለም ይጠፋል።';
 $ec_lang['lpn_close_discard']='ሳያስቀምጡ ዝጋ';
 $ec_lang['lpn_cancel']='ይቅር';
 $ec_lang['lpn_revert_confirm']='ያደረጓቸውን ለውጦች ጥለው {file}ን ከዲስክ ዳግም ይጫኑ?';
@@ -922,7 +922,7 @@ $ec_lang['lpn_file_training_continue']='ቀጥል';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='ፋይሉን እንደገና ይምረጡ';
 $ec_lang['lpn_file_reconnect']='ከዚህ ፋይል ጋር ዳግም ተገናኝ';
-$ec_lang['lpn_file_reconnect_prompt']='ይህ ፕሮጀክት ከ{file} የመጣ ነው። ወደ እሱ ከመጻፉ በፊት አሳሽዎ ፈቃድዎን እንደገና ይፈልጋል። ከታች ዳግም ይገናኙ።';
+$ec_lang['lpn_file_reconnect_alert']='ይህ ፕሮጀክት ከ{file} የመጣ ነው። ወደ እሱ ከመጻፉ በፊት አሳሽዎ ፈቃድዎን እንደገና ይፈልጋል። ከታች ዳግም ይገናኙ።';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='ያ ሌላ ሰው ከፍቶት ካለው ፋይል ጋር ተመሳሳይ ስለሆነ በላዩ ላይ ማስቀመጥ አይቻልም። ሌላ ፋይል ወይም ሌላ ስም ይምረጡ።';

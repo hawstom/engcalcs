@@ -80,15 +80,15 @@ $ec_lang['consent_region_label']='ជម្រើសរបស់អ្នកអ�
 $ec_lang['consent_settings_link']='ការកំណត់ខូគី';
 $ec_lang['privacy_link']='សេចក្ដីជូនដំណឹងឯកជនភាព';
 $ec_lang['terms_link']='លក្ខខណ្ឌប្រើប្រាស់';
-$ec_lang['index_title']='ម៉ាស៊ីនគណនាវិស្វកម្មតាមអ៊ីនធឺណិតឥតគិតថ្លៃ';
+$ec_lang['index_main_title']='ម៉ាស៊ីនគណនាវិស្វកម្មតាមអ៊ីនធឺណិតឥតគិតថ្លៃ';
 $ec_lang['index_meta_desc_plain']='ម៉ាស៊ីនគណនាវិស្វកម្មធារាសាស្ត្រឥតគិតថ្លៃ សម្រាប់បំពង់ ប្រឡាយ ស្ទីង និងការស្រោចស្រព។ វាដំណើរការនៅក្នុងកម្មវិធីរុករករបស់អ្នក ដំណើរការបានទោះមិនមានអ៊ីនធឺណិត ហើយមានជាភាសាចំនួន 27។';
 $ec_lang['calc_set_units']='កំណត់ឯកតា:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='កំណត់ឡើងវិញតម្លៃលំនាំដើម';
 $ec_lang['calc_defaults_confirm']='កំណត់ឡើងវិញម៉ាស៊ីនគណនាទៅតម្លៃលំនាំដើមដែលបានកំណត់ដើម?';
-$ec_lang['points_data_help']='(ឬ ចម្លង/បិទភ្ជាប់ ដោយប្រើផ្ទៃទិន្នន័យ)';
-$ec_lang['points_data_title']='ទិន្នន័យចំណុច<br />(បំបែកដោយក្បៀស ឬ tab)';
+$ec_lang['points_data_note']='(ឬ ចម្លង/បិទភ្ជាប់ ដោយប្រើផ្ទៃទិន្នន័យ)';
+$ec_lang['points_data_heading']='ទិន្នន័យចំណុច<br />(បំបែកដោយក្បៀស ឬ tab)';
 $ec_lang['points_data_copy']='ចម្លង';
 $ec_lang['points_data_paste']='បិទភ្ជាប់';
 $ec_lang['calc_inputs']='ទិន្នន័យបញ្ចូល';
@@ -97,7 +97,7 @@ $ec_lang['view_hide_line']='[លាក់បន្ទាត់នេះ]';
 $ec_lang['view_printable']='កំណែដែលអាចបោះពុម្ព (ផ្ទុកឡើងវិញ/ធ្វើឱ្យស្រស់ ដើម្បីស្ដារ)';
 $ec_lang['ec_name_label']='រក្សាទុកការគណនានេះ៖';
 $ec_lang['ec_name_placeholder']='ឈ្មោះ';
-$ec_lang['ec_name_hint']='រក្សាទុកទិន្នន័យបញ្ចូលនេះទៅក្នុង URL សម្រាប់ការចាប់ផ្តើមវិញ ប្រវត្តិ ឬការចែងលែង';
+$ec_lang['ec_name_tip']='រក្សាទុកទិន្នន័យបញ្ចូលនេះទៅក្នុង URL សម្រាប់ការចាប់ផ្តើមវិញ ប្រវត្តិ ឬការចែងលែង';
 $ec_lang['calc_copy_link']='ចម្លងតំណ';
 $ec_lang['ec_related_calcs']='ម៉ាស៊ីនគណនាដែលពាក់ព័ន្ធ៖';
 $ec_lang['calc_copy_link_done']='បានចម្លង!';
@@ -512,7 +512,7 @@ $ec_lang['ip_elev_supply']='កម្ពស់ផ្គត់ផ្គង់, z<
 $ec_lang['ip_q_design']='លំហូររចនារបស់ក្បាលបញ្ចេញទឹក, q<sub>design</sub>';
 $ec_lang['ip_h_design']='សម្ពាធរចនារបស់ក្បាលបញ្ចេញទឹក';
 $ec_lang['ip_x']='<span class="ec-help" title="0.5 សម្រាប់ក្បាលបញ្ចេញទឹកធម្មតាដែលមិនទូទាត់សម្ពាធ; ជិត 0 សម្រាប់ក្បាលបញ្ចេញទឹកដែលទូទាត់សម្ពាធ">និទស្សន្តលំហូររបស់ក្បាលបញ្ចេញទឹក, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='ផ្លូវសាកល្បង';
+$ec_lang['ip_reach_table_heading']='ផ្លូវសាកល្បង';
 $ec_lang['ip_group_reach']='ចម្រៀកបំពង់';
 $ec_lang['ip_group_upstream']='ខាងលើទឹក';
 $ec_lang['ip_group_downstream']='ខាងក្រោមទឹក';
@@ -570,7 +570,7 @@ $ec_lang['bpn_method']='វិធីសាស្ត្រកកិត';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='ខ្សែបំពង់';
+$ec_lang['bpn_line_table_heading']='ខ្សែបំពង់';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='ឈ្មោះខ្សែបំពង់នេះ។ ខ្សែបំពង់ផ្សេងទៀតយោងទៅវានៅក្នុងជួរឈរ ID ខាងលើ។';
 $ec_lang['bpn_upstream']='ID ខាងលើ';
@@ -585,7 +585,7 @@ $ec_lang['bpn_q_line']='លំហូរខ្សែបំពង់';
 $ec_lang['bpn_q_line_tip']='លំហូរសរុបដែលខ្សែបំពង់នេះផ្ទុក: រួមទាំងតម្រូវការផ្ទាល់ខ្លួន បូកនឹងគ្រប់តម្រូវការនៅខាងក្រោមទាំងអស់ដែលវាផ្គត់ផ្គង់។';
 $ec_lang['bpn_p_down']='សម្ពាធក្រោម';
 $ec_lang['bpn_p_down_tip']='សម្ពាធវាស់ (gauge) នៅថ្នាំងខាងក្រោមទឹករបស់ខ្សែបំពង់នេះ។ តម្លៃអវិជ្ជមាន (ដែលបានសម្គាល់) មានន័យថាសម្ពាធក្រោមបរិយាកាស; សូមពិនិត្យការរចនា។';
-$ec_lang['bpn_sketch_title']='ប្លង់បណ្ដាញ';
+$ec_lang['bpn_sketch_heading']='ប្លង់បណ្ដាញ';
 $ec_lang['bpn_show_length']='ប្រវែង';
 $ec_lang['bpn_show_diameter']='អង្កត់ផ្ចិត';
 $ec_lang['bpn_show_q']='លំហូរ';
@@ -676,7 +676,7 @@ $ec_lang['lpn_reset_all_tip']='លុបគម្រោងទាំងអស់ 
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='ម៉ាស៊ីនគណនានេះរក្សាទុកខ្នាតវាស់ និងតម្លៃបញ្ចូលរបស់គម្រោងតាមអ្វីដែលបានវាយបញ្ចូល ប៉ុន្តែពីមុនវាបំប្លែងលេខទៅជា SI សម្រាប់ការផ្ទុក។ គម្រោងនេះត្រូវបានរក្សាទុកមុនពេលមានការផ្លាស់ប្ដូរនោះ ដូច្នេះលេខរបស់វាត្រូវបានផ្ទុកជា SI។ តើបំប្លែងវាម្ដងចុងក្រោយទៅជាខ្នាតវាស់បច្ចុប្បន្នទេ? ដើម្បីឲ្យអ្នកវិនិច្ឆ័យ នេះជាអង្កត់ផ្ចិតមួយចំនួនដែលនឹងត្រូវបំប្លែង ជាមួយតម្លៃមុន និងក្រោយ:';
+$ec_lang['lpn_v2_restore_confirm']='ម៉ាស៊ីនគណនានេះរក្សាទុកខ្នាតវាស់ និងតម្លៃបញ្ចូលរបស់គម្រោងតាមអ្វីដែលបានវាយបញ្ចូល ប៉ុន្តែពីមុនវាបំប្លែងលេខទៅជា SI សម្រាប់ការផ្ទុក។ គម្រោងនេះត្រូវបានរក្សាទុកមុនពេលមានការផ្លាស់ប្ដូរនោះ ដូច្នេះលេខរបស់វាត្រូវបានផ្ទុកជា SI។ តើបំប្លែងវាម្ដងចុងក្រោយទៅជាខ្នាតវាស់បច្ចុប្បន្នទេ? ដើម្បីឲ្យអ្នកវិនិច្ឆ័យ នេះជាអង្កត់ផ្ចិតមួយចំនួនដែលនឹងត្រូវបំប្លែង ជាមួយតម្លៃមុន និងក្រោយ:';
 $ec_lang['lpn_v2_restore_yes']='បំប្លែង';
 $ec_lang['lpn_v2_restore_never']='ទេ។ កុំសួរម្ដងទៀត។';
 $ec_lang['lpn_v2_restore_no']='បិទ ដើម្បីឲ្យខ្ញុំពិនិត្យខ្នាតវាស់បច្ចុប្បន្នសិន';
@@ -838,10 +838,10 @@ $ec_lang['lpn_status_reverted']='បានផ្ទុក {file} ម្ដងទ
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='រក្សាទុកការផ្លាស់ប្ដូររបស់អ្នកទៅ {name} មុននឹងបិទវាទេ?';
+$ec_lang['lpn_close_save_confirm']='រក្សាទុកការផ្លាស់ប្ដូររបស់អ្នកទៅ {name} មុននឹងបិទវាទេ?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} ត្រូវបានរក្សាទុកនៅក្នុងកម្មវិធីរុករកនេះតែប៉ុណ្ណោះ។ បើអ្នកបិទវាដោយមិនរក្សាទុកទៅឯកសារមួយ វានឹងបាត់អស់កល្បជានិច្ច។';
+$ec_lang['lpn_close_browser_confirm']='{name} ត្រូវបានរក្សាទុកនៅក្នុងកម្មវិធីរុករកនេះតែប៉ុណ្ណោះ។ បើអ្នកបិទវាដោយមិនរក្សាទុកទៅឯកសារមួយ វានឹងបាត់អស់កល្បជានិច្ច។';
 $ec_lang['lpn_close_discard']='បិទដោយមិនរក្សាទុក';
 $ec_lang['lpn_cancel']='បោះបង់';
 $ec_lang['lpn_revert_confirm']='បោះបង់ការផ្លាស់ប្ដូរដែលអ្នកបានធ្វើ ហើយផ្ទុក {file} ម្ដងទៀតពីថាសមែនទេ?';
@@ -922,7 +922,7 @@ $ec_lang['lpn_file_training_continue']='បន្ត';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='ជ្រើសរើសឯកសារម្ដងទៀត';
 $ec_lang['lpn_file_reconnect']='ភ្ជាប់ទៅឯកសារនេះឡើងវិញ';
-$ec_lang['lpn_file_reconnect_prompt']='គម្រោងនេះមកពី {file}។ កម្មវិធីរុករករបស់អ្នកត្រូវការសិទ្ធិពីអ្នកម្ដងទៀត មុននឹងអាចសរសេរទៅវាបាន។ ភ្ជាប់ឡើងវិញខាងក្រោម។';
+$ec_lang['lpn_file_reconnect_alert']='គម្រោងនេះមកពី {file}។ កម្មវិធីរុករករបស់អ្នកត្រូវការសិទ្ធិពីអ្នកម្ដងទៀត មុននឹងអាចសរសេរទៅវាបាន។ ភ្ជាប់ឡើងវិញខាងក្រោម។';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='នោះជាឯកសារដូចគ្នាដែលអ្នកណាម្នាក់ផ្សេងទៀតកំពុងបើក ដូច្នេះមិនអាចរក្សាទុកជាន់ពីលើវាបានទេ។ ជ្រើសរើសឯកសារ ឬឈ្មោះផ្សេង។';

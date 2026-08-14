@@ -78,15 +78,15 @@ $ec_lang['consent_region_label']='Alegerea dvs. privind limitarea înregistrări
 $ec_lang['consent_settings_link']='Setări cookie-uri';
 $ec_lang['privacy_link']='Politica de confidențialitate';
 $ec_lang['terms_link']='Termeni de utilizare';
-$ec_lang['index_title']='Calculatoare Inginerești Gratuite Online';
+$ec_lang['index_main_title']='Calculatoare Inginerești Gratuite Online';
 $ec_lang['index_meta_desc_plain']='Calculatoare gratuite de inginerie hidraulică pentru conducte, canale, deversoare și irigații. Rulează direct în browser, funcționează offline și sunt disponibile în 27 de limbi.';
 $ec_lang['calc_set_units']='Alegeți unitatea de măsură:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Restabilește valorile implicite';
 $ec_lang['calc_defaults_confirm']='Resetează calculatorul la valorile implicite inițiale?';
-$ec_lang['points_data_help']='(sau Copiați/Lipiți folosind zona de date)';
-$ec_lang['points_data_title']='Date puncte<br />(separate prin virgulă sau tabulație)';
+$ec_lang['points_data_note']='(sau Copiați/Lipiți folosind zona de date)';
+$ec_lang['points_data_heading']='Date puncte<br />(separate prin virgulă sau tabulație)';
 $ec_lang['points_data_copy']='Copiați';
 $ec_lang['points_data_paste']='Lipiți';
 $ec_lang['calc_inputs']='Date de intrare';
@@ -95,7 +95,7 @@ $ec_lang['view_hide_line']='[Ascunde această linie]';
 $ec_lang['view_printable']='Versiune tipăribilă (reîncărcați/actualizați pentru a restaura)';
 $ec_lang['ec_name_label']='Salvați acest calcul:';
 $ec_lang['ec_name_placeholder']='Nume';
-$ec_lang['ec_name_hint']='Salvează valorile introduse în URL pentru marcaj, recuperare istoric și partajare';
+$ec_lang['ec_name_tip']='Salvează valorile introduse în URL pentru marcaj, recuperare istoric și partajare';
 $ec_lang['calc_copy_link']='Copiați linkul';
 $ec_lang['ec_related_calcs']='Calculatoare conexe:';
 $ec_lang['calc_copy_link_done']='Copiat!';
@@ -510,7 +510,7 @@ $ec_lang['ip_elev_supply']='Cota de alimentare, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='Debit de proiectare al emițătorului, q<sub>design</sub>';
 $ec_lang['ip_h_design']='Presiune de proiectare a emițătorului';
 $ec_lang['ip_x']='<span class="ec-help" title="0,5 pentru emițători standard necompensați; aproape de 0 pentru emițători cu compensare de presiune">Exponentul de debit al emițătorului, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='Calea test';
+$ec_lang['ip_reach_table_heading']='Calea test';
 $ec_lang['ip_group_reach']='Tronson';
 $ec_lang['ip_group_upstream']='Amonte';
 $ec_lang['ip_group_downstream']='Aval';
@@ -568,7 +568,7 @@ $ec_lang['bpn_method']='Metoda de frecare';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='Tronsoane de conductă';
+$ec_lang['bpn_line_table_heading']='Tronsoane de conductă';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='Numele acestui tronson de conductă. Alte tronsoane îl referențiază în coloana ID amonte.';
 $ec_lang['bpn_upstream']='ID amonte';
@@ -583,7 +583,7 @@ $ec_lang['bpn_q_line']='Debit tronson';
 $ec_lang['bpn_q_line_tip']='Debitul total transportat de acest tronson: cerința sa proprie plus fiecare cerință aval pe care o alimentează.';
 $ec_lang['bpn_p_down']='Pres. av.';
 $ec_lang['bpn_p_down_tip']='Sarcina de presiune manometrică la nodul aval al acestui tronson. O valoare negativă (semnalată) înseamnă presiune subatmosferică; verificați proiectul.';
-$ec_lang['bpn_sketch_title']='Schema rețelei';
+$ec_lang['bpn_sketch_heading']='Schema rețelei';
 $ec_lang['bpn_show_length']='Lungime';
 $ec_lang['bpn_show_diameter']='Diametru';
 $ec_lang['bpn_show_q']='Debit';
@@ -674,7 +674,7 @@ $ec_lang['lpn_reset_all_tip']='Șterge fiecare proiect, fiecare imagine de funda
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='Acest calculator stochează unitățile și valorile introduse ale proiectului așa cum au fost tastate, dar anterior converta numerele în SI pentru stocare. Acest proiect a fost salvat înainte de această schimbare, deci numerele sale sunt stocate în SI. Le convertim o ultimă dată la unitățile curente? Pentru a vă putea decide, iată câteva diametre care ar fi convertite, cu valorile lor înainte și după:';
+$ec_lang['lpn_v2_restore_confirm']='Acest calculator stochează unitățile și valorile introduse ale proiectului așa cum au fost tastate, dar anterior converta numerele în SI pentru stocare. Acest proiect a fost salvat înainte de această schimbare, deci numerele sale sunt stocate în SI. Le convertim o ultimă dată la unitățile curente? Pentru a vă putea decide, iată câteva diametre care ar fi convertite, cu valorile lor înainte și după:';
 $ec_lang['lpn_v2_restore_yes']='Conversie';
 $ec_lang['lpn_v2_restore_never']='Nu. Nu mai întrebați niciodată.';
 $ec_lang['lpn_v2_restore_no']='Închide, ca să verific mai întâi unitățile curente';
@@ -836,10 +836,10 @@ $ec_lang['lpn_status_reverted']='S-a încărcat din nou {file} de pe disc.';
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='Salvați modificările din {name} înainte de a-l închide?';
+$ec_lang['lpn_close_save_confirm']='Salvați modificările din {name} înainte de a-l închide?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} este păstrat doar în acest browser. Dacă îl închideți fără să îl salvați într-un fișier, se pierde definitiv.';
+$ec_lang['lpn_close_browser_confirm']='{name} este păstrat doar în acest browser. Dacă îl închideți fără să îl salvați într-un fișier, se pierde definitiv.';
 $ec_lang['lpn_close_discard']='Închide fără să salvezi';
 $ec_lang['lpn_cancel']='Anulare';
 $ec_lang['lpn_revert_confirm']='Renunțați la modificările făcute și încărcați din nou {file} de pe disc?';
@@ -920,7 +920,7 @@ $ec_lang['lpn_file_training_continue']='Continuare';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Alegeți din nou fișierul';
 $ec_lang['lpn_file_reconnect']='Reconectare la acest fișier';
-$ec_lang['lpn_file_reconnect_prompt']='Acest proiect provine din {file}. Browserul dvs. are nevoie din nou de permisiunea dvs. înainte de a putea scrie în el. Reconectați-vă mai jos.';
+$ec_lang['lpn_file_reconnect_alert']='Acest proiect provine din {file}. Browserul dvs. are nevoie din nou de permisiunea dvs. înainte de a putea scrie în el. Reconectați-vă mai jos.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Acesta este același fișier pe care îl are deschis altcineva, deci nu poate fi suprascris. Alegeți un alt fișier sau un alt nume.';

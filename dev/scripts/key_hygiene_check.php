@@ -82,9 +82,25 @@ foreach ($keys as $k) {
 //
 // So the rule for adding a group here: every member must mean the same thing in EVERY key that
 // carries it. If judging that needs the value or the call site, it is not an automatable group.
-// Left to a human on purpose: tip/help/hint (points_data_help may well be a real stray),
-// heading/head/title (`_head` is usually hydraulic head), confirm/prompt (yes-or-no vs asking for
-// a value). Under-reporting beats a check people learn to ignore.
+// Left to a human on purpose: tip/help/hint, heading/head/title (`_head` is usually hydraulic
+// head), confirm/prompt (yes-or-no vs asking for a value). Under-reporting beats a check people
+// learn to ignore.
+//
+// ADJUDICATED 2026-08-13 (ROADMAP Task 291, Tom). The residue this comment deferred has now been
+// read key by key, and the outcome is worth recording because it argues for keeping these groups
+// out rather than for automating them later:
+//   - tip/help/hint: 3 of the 3 non-`_tip` keys needed a different answer each. `points_data_help`
+//     was a real stray (visible inline text, and `_help` collided with the .ec-help tooltip class)
+//     -> `_note`. `ec_name_hint` was the genuine tooltip nobody had flagged -> `_tip`. And
+//     `lpn_empty_hint` was right all along. No rule over names could have produced that spread.
+//   - heading/head/title: every `_head` was hydraulic, exactly as predicted. The drift was
+//     somewhere the name could not show -- `_title` meant BOTH "browser <title>" and "on-page
+//     heading". The section headings became `_heading`; `template_printable_title` stayed, because
+//     it really is a title (the printed sheet's).
+//   - confirm/prompt: NOT already correct, which was the surprise. Four keys asked yes-or-no while
+//     named `_prompt`. Deciding them needed the call site -- `lpn_close_browser_prompt` reads as a
+//     statement but is the body of a confirm dialog, in a ternary with its `_confirm` sibling.
+// A dialog-body warning that asks nothing is now `_alert` (lpn_file_reconnect_alert).
 $synonymGroups = [
     ['btn', 'button'],
     ['note', 'notice'],

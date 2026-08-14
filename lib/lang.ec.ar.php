@@ -80,15 +80,15 @@ $ec_lang['consent_region_label']='اختيارك بشأن الحد من التس
 $ec_lang['consent_settings_link']='إعدادات ملفات تعريف الارتباط';
 $ec_lang['privacy_link']='إشعار الخصوصية';
 $ec_lang['terms_link']='شروط الاستخدام';
-$ec_lang['index_title']='حاسبات هندسية مجانية عبر الإنترنت';
+$ec_lang['index_main_title']='حاسبات هندسية مجانية عبر الإنترنت';
 $ec_lang['index_meta_desc_plain']='حاسبات هندسة هيدروليكية مجانية للأنابيب والقنوات والسدود والري. تعمل في متصفحك، دون اتصال بالإنترنت، وهي متاحة بـ27 لغة.';
 $ec_lang['calc_set_units']='تحديد الوحدات:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='استعادة الافتراضي';
 $ec_lang['calc_defaults_confirm']='إعادة تعيين الحاسبة إلى القيم الافتراضية؟';
-$ec_lang['points_data_help']='(أو نسخ/لصق باستخدام منطقة البيانات)';
-$ec_lang['points_data_title']='بيانات النقاط<br />(مفصولة بفاصلة أو مسافة جدولة)';
+$ec_lang['points_data_note']='(أو نسخ/لصق باستخدام منطقة البيانات)';
+$ec_lang['points_data_heading']='بيانات النقاط<br />(مفصولة بفاصلة أو مسافة جدولة)';
 $ec_lang['points_data_copy']='نسخ';
 $ec_lang['points_data_paste']='لصق';
 $ec_lang['calc_inputs']='المدخلات';
@@ -97,7 +97,7 @@ $ec_lang['view_hide_line']='[إخفاء هذا السطر]';
 $ec_lang['view_printable']='نسخة قابلة للطباعة (أعد التحميل للاستعادة)';
 $ec_lang['ec_name_label']='احفظ هذا الحساب:';
 $ec_lang['ec_name_placeholder']='الاسم';
-$ec_lang['ec_name_hint']='يحفظ المدخلات في عنوان URL للإشارات المرجعية واسترجاع السجل والمشاركة';
+$ec_lang['ec_name_tip']='يحفظ المدخلات في عنوان URL للإشارات المرجعية واسترجاع السجل والمشاركة';
 $ec_lang['calc_copy_link']='نسخ الرابط';
 $ec_lang['ec_related_calcs']='حاسبات ذات صلة:';
 $ec_lang['calc_copy_link_done']='تم النسخ!';
@@ -512,7 +512,7 @@ $ec_lang['ip_elev_supply']='منسوب الإمداد، z<sub>supply</sub>';
 $ec_lang['ip_q_design']='تدفق القطارة التصميمي، q<sub>design</sub>';
 $ec_lang['ip_h_design']='ضغط القطارة التصميمي';
 $ec_lang['ip_x']='<span class="ec-help" title="0.5 للقطارات القياسية غير المعوَّضة؛ قريب من 0 للقطارات المعوَّضة بالضغط">أس تصريف القطارة، x <span class="ec-tip">؟</span></span>';
-$ec_lang['ip_reach_table_title']='مسار الاختبار';
+$ec_lang['ip_reach_table_heading']='مسار الاختبار';
 $ec_lang['ip_group_reach']='قطاع';
 $ec_lang['ip_group_upstream']='المنبع';
 $ec_lang['ip_group_downstream']='المصب';
@@ -570,7 +570,7 @@ $ec_lang['bpn_method']='طريقة الاحتكاك';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='خطوط الأنابيب';
+$ec_lang['bpn_line_table_heading']='خطوط الأنابيب';
 $ec_lang['bpn_id']='المعرّف';
 $ec_lang['bpn_id_tip']='اسم خط الأنبوب هذا. تشير إليه الخطوط الأخرى في عمود المنبع.';
 $ec_lang['bpn_upstream']='معرّف المنبع';
@@ -585,7 +585,7 @@ $ec_lang['bpn_q_line']='تدفق الخط';
 $ec_lang['bpn_q_line_tip']='إجمالي التدفق الذي يحمله هذا الخط: طلبه الخاص مضافاً إليه كل طلب مصبّي يغذّيه.';
 $ec_lang['bpn_p_down']='ضغط المصب';
 $ec_lang['bpn_p_down_tip']='علو الضغط المقيسي عند عقدة مصب هذا الخط. القيمة السالبة (المميَّزة) تعني ضغطاً دون الضغط الجوي؛ راجع التصميم.';
-$ec_lang['bpn_sketch_title']='مخطط الشبكة';
+$ec_lang['bpn_sketch_heading']='مخطط الشبكة';
 $ec_lang['bpn_show_length']='الطول';
 $ec_lang['bpn_show_diameter']='القطر';
 $ec_lang['bpn_show_q']='التدفق';
@@ -676,7 +676,7 @@ $ec_lang['lpn_reset_all_tip']='يحذف كل مشروع، وكل صورة خلف
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='تخزّن هذه الحاسبة وحدات المشروع ومدخلاته كما أُدخلت، لكنها كانت سابقاً تحوّل الأرقام إلى النظام الدولي للوحدات (SI) عند التخزين. حُفظ هذا المشروع قبل ذلك التغيير، لذا كانت أرقامه مخزَّنة بالنظام الدولي. هل تريد تحويلها مرة أخيرة إلى الوحدات الحالية؟ لتتمكّن من الحكم، إليك بعض الأقطار التي ستُحوَّل، بقيمها قبل التحويل وبعده:';
+$ec_lang['lpn_v2_restore_confirm']='تخزّن هذه الحاسبة وحدات المشروع ومدخلاته كما أُدخلت، لكنها كانت سابقاً تحوّل الأرقام إلى النظام الدولي للوحدات (SI) عند التخزين. حُفظ هذا المشروع قبل ذلك التغيير، لذا كانت أرقامه مخزَّنة بالنظام الدولي. هل تريد تحويلها مرة أخيرة إلى الوحدات الحالية؟ لتتمكّن من الحكم، إليك بعض الأقطار التي ستُحوَّل، بقيمها قبل التحويل وبعده:';
 $ec_lang['lpn_v2_restore_yes']='تحويل';
 $ec_lang['lpn_v2_restore_never']='لا. لا تسألني مرة أخرى.';
 $ec_lang['lpn_v2_restore_no']='إغلاق لأتحقق أولاً من الوحدات الحالية';
@@ -838,10 +838,10 @@ $ec_lang['lpn_status_reverted']='أُعيد تحميل {file} من القرص.';
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='هل تريد حفظ تغييراتك في {name} قبل إغلاقه؟';
+$ec_lang['lpn_close_save_confirm']='هل تريد حفظ تغييراتك في {name} قبل إغلاقه؟';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='يُحفظ {name} في هذا المتصفح فقط. إذا أغلقته دون حفظه في ملف، فسيضيع نهائياً.';
+$ec_lang['lpn_close_browser_confirm']='يُحفظ {name} في هذا المتصفح فقط. إذا أغلقته دون حفظه في ملف، فسيضيع نهائياً.';
 $ec_lang['lpn_close_discard']='إغلاق دون حفظ';
 $ec_lang['lpn_cancel']='إلغاء';
 $ec_lang['lpn_revert_confirm']='هل تريد التخلص من التغييرات التي أجريتها وإعادة تحميل {file} من القرص؟';
@@ -922,7 +922,7 @@ $ec_lang['lpn_file_training_continue']='متابعة';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='اختيار الملف مرة أخرى';
 $ec_lang['lpn_file_reconnect']='إعادة الاتصال بهذا الملف';
-$ec_lang['lpn_file_reconnect_prompt']='جاء هذا المشروع من {file}. يحتاج متصفحك إلى إذنك مرة أخرى قبل أن يتمكن من الكتابة فيه. أعد الاتصال أدناه.';
+$ec_lang['lpn_file_reconnect_alert']='جاء هذا المشروع من {file}. يحتاج متصفحك إلى إذنك مرة أخرى قبل أن يتمكن من الكتابة فيه. أعد الاتصال أدناه.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='هذا هو الملف نفسه الذي فتحه شخص آخر، فلا يمكن الكتابة فوقه. اختر ملفاً آخر أو اسماً آخر.';

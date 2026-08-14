@@ -80,15 +80,15 @@ $ec_lang['consent_region_label']='Kaydı sınırlama tercihiniz.';
 $ec_lang['consent_settings_link']='Çerez ayarları';
 $ec_lang['privacy_link']='Gizlilik bildirimi';
 $ec_lang['terms_link']='Kullanım koşulları';
-$ec_lang['index_title']='Bedava çevrimiçi mühendislik hesaplayıcıları';
+$ec_lang['index_main_title']='Bedava çevrimiçi mühendislik hesaplayıcıları';
 $ec_lang['index_meta_desc_plain']='Boru, kanal, savak ve sulama için ücretsiz hidrolik mühendislik hesaplayıcıları. Tarayıcınızda çalışır, çevrimdışı kullanılabilir ve 27 dilde sunulur.';
 $ec_lang['calc_set_units']='Birimleri ayarla:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='Varsayılanları geri yükle';
 $ec_lang['calc_defaults_confirm']='Hesap makinesini varsayılan değerlere sıfırla?';
-$ec_lang['points_data_help']='(veya veri alanını kullanarak Kopyala/Yapıştır)';
-$ec_lang['points_data_title']='Nokta verileri<br />(virgül veya sekme ile ayrılmış)';
+$ec_lang['points_data_note']='(veya veri alanını kullanarak Kopyala/Yapıştır)';
+$ec_lang['points_data_heading']='Nokta verileri<br />(virgül veya sekme ile ayrılmış)';
 $ec_lang['points_data_copy']='Kopyala';
 $ec_lang['points_data_paste']='Yapıştır';
 $ec_lang['calc_inputs']='Girdiler';
@@ -97,7 +97,7 @@ $ec_lang['view_hide_line']='[Bu satırı gizle]';
 $ec_lang['view_printable']='Yazdırılabilir sürüm (geri yüklemek için yeniden yükleyin)';
 $ec_lang['ec_name_label']='Bu hesaplamayı kaydet:';
 $ec_lang['ec_name_placeholder']='Ad';
-$ec_lang['ec_name_hint']='Bu girdileri URL\'ye kaydeder (yer işareti, geçmiş ve paylaşım için)';
+$ec_lang['ec_name_tip']='Bu girdileri URL\'ye kaydeder (yer işareti, geçmiş ve paylaşım için)';
 $ec_lang['calc_copy_link']='Bağlantıyı kopyala';
 $ec_lang['ec_related_calcs']='İlgili hesaplayıcılar:';
 $ec_lang['calc_copy_link_done']='Kopyalandı!';
@@ -512,7 +512,7 @@ $ec_lang['ip_elev_supply']='Beslenme kotu, z<sub>supply</sub>';
 $ec_lang['ip_q_design']='Damlatıcı tasarım debisi, q<sub>design</sub>';
 $ec_lang['ip_h_design']='Damlatıcı tasarım basıncı';
 $ec_lang['ip_x']='<span class="ec-help" title="Standart kompanse etmeyen damlatıcılar için 0,5; kompanse edici damlatıcılar için 0\'a yakın">Damlatıcı deşarj üssü, x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='Test yolu';
+$ec_lang['ip_reach_table_heading']='Test yolu';
 $ec_lang['ip_group_reach']='Hat';
 $ec_lang['ip_group_upstream']='Memba';
 $ec_lang['ip_group_downstream']='Mansap';
@@ -570,7 +570,7 @@ $ec_lang['bpn_method']='Sürtünme yöntemi';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='Boru hatları';
+$ec_lang['bpn_line_table_heading']='Boru hatları';
 $ec_lang['bpn_id']='ID';
 $ec_lang['bpn_id_tip']='Bu boru hattının adı. Diğer hatlar, Memba sütununda bu hatta atıfta bulunur.';
 $ec_lang['bpn_upstream']='Memba ID';
@@ -585,7 +585,7 @@ $ec_lang['bpn_q_line']='Hat debisi';
 $ec_lang['bpn_q_line_tip']='Bu hattın taşıdığı toplam debi: kendi talebi artı beslediği tüm mansap taleplerinin toplamı.';
 $ec_lang['bpn_p_down']='MS basınç';
 $ec_lang['bpn_p_down_tip']='Bu hattın mansap düğümündeki manometrik basınç yükü. Negatif bir değer (işaretlenir), atmosfer altı basınç anlamına gelir; tasarımı kontrol edin.';
-$ec_lang['bpn_sketch_title']='Şebeke Şeması';
+$ec_lang['bpn_sketch_heading']='Şebeke Şeması';
 $ec_lang['bpn_show_length']='Uzunluk';
 $ec_lang['bpn_show_diameter']='Çap';
 $ec_lang['bpn_show_q']='Debi';
@@ -676,7 +676,7 @@ $ec_lang['lpn_reset_all_tip']='Her projeyi, her arka plan görüntüsünü, her 
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='Bu hesaplayıcı proje birimlerini ve girdileri girildiği gibi saklar, ancak eskiden sayıları depolama için SI birimlerine dönüştürürdü. Bu proje o değişiklikten önce kaydedildiğinden, sayıları SI olarak saklanmıştı. Bunları son bir kez geçerli birimlere dönüştürelim mi? Değerlendirebilmeniz için, dönüştürülecek bazı çaplar ile öncesi ve sonrası değerleri aşağıdadır:';
+$ec_lang['lpn_v2_restore_confirm']='Bu hesaplayıcı proje birimlerini ve girdileri girildiği gibi saklar, ancak eskiden sayıları depolama için SI birimlerine dönüştürürdü. Bu proje o değişiklikten önce kaydedildiğinden, sayıları SI olarak saklanmıştı. Bunları son bir kez geçerli birimlere dönüştürelim mi? Değerlendirebilmeniz için, dönüştürülecek bazı çaplar ile öncesi ve sonrası değerleri aşağıdadır:';
 $ec_lang['lpn_v2_restore_yes']='Dönüştür';
 $ec_lang['lpn_v2_restore_never']='Hayır. Bir daha sorma.';
 $ec_lang['lpn_v2_restore_no']='Kapat, önce geçerli birimleri kontrol edeyim';
@@ -838,10 +838,10 @@ $ec_lang['lpn_status_reverted']='{file} diskten yeniden yüklendi.';
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='Kapatmadan önce {name} üzerindeki değişiklikleriniz kaydedilsin mi?';
+$ec_lang['lpn_close_save_confirm']='Kapatmadan önce {name} üzerindeki değişiklikleriniz kaydedilsin mi?';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} yalnızca bu tarayıcıda tutuluyor. Bir dosyaya kaydetmeden kapatırsanız, kalıcı olarak kaybolur.';
+$ec_lang['lpn_close_browser_confirm']='{name} yalnızca bu tarayıcıda tutuluyor. Bir dosyaya kaydetmeden kapatırsanız, kalıcı olarak kaybolur.';
 $ec_lang['lpn_close_discard']='Kaydetmeden kapat';
 $ec_lang['lpn_cancel']='İptal';
 $ec_lang['lpn_revert_confirm']='Yaptığınız değişiklikler atılsın ve {file} diskten yeniden yüklensin mi?';
@@ -922,7 +922,7 @@ $ec_lang['lpn_file_training_continue']='Devam et';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Dosyayı tekrar seçin';
 $ec_lang['lpn_file_reconnect']='Bu dosyayla yeniden bağlan';
-$ec_lang['lpn_file_reconnect_prompt']='Bu proje {file} dosyasından geldi. Tarayıcınızın ona yazabilmesi için izninize yeniden ihtiyacı var. Aşağıdan yeniden bağlanın.';
+$ec_lang['lpn_file_reconnect_alert']='Bu proje {file} dosyasından geldi. Tarayıcınızın ona yazabilmesi için izninize yeniden ihtiyacı var. Aşağıdan yeniden bağlanın.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Bu, başka birinin açık tuttuğu aynı dosya, bu yüzden üzerine kaydedilemez. Farklı bir dosya veya farklı bir isim seçin.';

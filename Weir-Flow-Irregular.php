@@ -26,7 +26,7 @@ function echoCalculatorFormAppend() {
         <thead>
             <tr>
                 <th colspan="5"><?=$ec_lang['wi_weirPoints']?>
-                    <a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a> <?=$ec_lang['points_data_help']?>
+                    <a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a> <?=$ec_lang['points_data_note']?>
                </th>
             </tr>
             <tr>
@@ -42,7 +42,7 @@ function echoCalculatorFormAppend() {
     </table>
 	<div class='d-print-none' style='float:left;'>
 		<p>
-			<?=$ec_lang['points_data_title']?>
+			<?=$ec_lang['points_data_heading']?>
 			<br />
 			<button type="button" id="points_data_copy"><?=$ec_lang['points_data_copy']?></button>
 			<button type="button" id="points_data_paste"><?=$ec_lang['points_data_paste']?></button>

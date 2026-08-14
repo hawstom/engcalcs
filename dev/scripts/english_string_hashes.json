@@ -76,7 +76,7 @@
                 "lpn_title_units",
                 "lpn_v2_restore_never",
                 "lpn_v2_restore_no",
-                "lpn_v2_restore_prompt",
+                "lpn_v2_restore_confirm",
                 "lpn_v2_restore_yes",
                 "privacy_link",
                 "rc_notes_7_term",
@@ -145,7 +145,7 @@
         "bpn_h_supply_tip": "17d2e065577e24c79c2b0bfc3d2c6810e63684a6",
         "bpn_id": "89f89c02cf47e091e726a4e07b88af0966806897",
         "bpn_id_tip": "607db4531e46da11e8ec6c8683354b3bc1cb7a33",
-        "bpn_line_table_title": "8076081423317e58f94d0d9cd1f5dcdcc65a99a2",
+        "bpn_line_table_heading": "8076081423317e58f94d0d9cd1f5dcdcc65a99a2",
         "bpn_main_desc": "baf87335c8929da1ffdec9b230c4b1270f021cec",
         "bpn_main_menu": "5bca165e2b07ce0e2cc28602feed33a63530406b",
         "bpn_main_title": "88f19bdd9ff3129daf41f9f596cf3ce0ccfa8171",
@@ -177,7 +177,7 @@
         "bpn_show_length": "3bade34ecbc5d996b2f301ebd4ba689e81c7c9ea",
         "bpn_show_p": "d1222178efa7946ad8940a0b57a0d3cb3856180c",
         "bpn_show_q": "86eff8eb789b097ddca83f2c9c4617ed23605105",
-        "bpn_sketch_title": "557a001b0ffb9abeb66fa3fff6c4a1e8bd2b3675",
+        "bpn_sketch_heading": "557a001b0ffb9abeb66fa3fff6c4a1e8bd2b3675",
         "bpn_source_label": "6da13addb000b67d42a6d66391713819e634149f",
         "bpn_supply1_h": "76badd409ef10f629e796a7407d518d2f04269f8",
         "bpn_supply2_h": "3f03b62bb580f624b3d7edb1056a7d73b79ae77b",
@@ -266,7 +266,7 @@
         "dw_reynolds_number": "358f207b83fde6f0c87c401efaf67522f85492f0",
         "dw_roughness": "58e6b3a414a1e090dfc6029add0f3555ccba127f",
         "dw_roughness_tip": "598bcce6a2110428e7692b3b2b9602170fdbb0e7",
-        "ec_name_hint": "5a3db208f87a4a1e135a97821c995b88d918778a",
+        "ec_name_tip": "5a3db208f87a4a1e135a97821c995b88d918778a",
         "ec_name_label": "895f78c6584b1d407bda035450b4918ebb24dbcf",
         "ec_name_placeholder": "709a23220f2c3d64d1e1d6d18c4d5280f8d82fca",
         "ec_related_calcs": "7d084a2b496ab7da526088a6854cfb3f451ba5f3",
@@ -288,7 +288,7 @@
         "hw_pressure_up": "fe561255ebbafbb3490f79eee4df2121289e54b5",
         "hw_roughness": "fe40bd3c08bdcbaf1e87ee5a0afc0bbbdc2b49bc",
         "index_meta_desc_plain": "fe584d8b0460f83eb75a7f2d62bd8bcdd8b7ae9b",
-        "index_title": "95e621bf336e91af501cf665664bce5ac80bfa7f",
+        "index_main_title": "95e621bf336e91af501cf665664bce5ac80bfa7f",
         "install_android_heading": "63c9ebffb0a79b871ceda308759fdceb854356e8",
         "install_android_steps_html": "b97e6fb6446a60b46ff0a56a119383dd79767769",
         "install_cached_body": "8b4fb8b6e695df14b7105cd8a75aeee446ec4c12",
@@ -358,7 +358,7 @@
         "ip_q_ratio": "fc6a764f519c6713c3bbde8b57a3432530995138",
         "ip_q_supply": "456fed65cdeccebff3c84d9922bdc5e4962e36e0",
         "ip_q_sys": "b099b9aa9abc7150e7a94bb79b8c0619d575810b",
-        "ip_reach_table_title": "b012a3081b54e7efb5e12c5835bfa43aecb7df17",
+        "ip_reach_table_heading": "b012a3081b54e7efb5e12c5835bfa43aecb7df17",
         "ip_roughness": "58e6b3a414a1e090dfc6029add0f3555ccba127f",
         "ip_se": "97e89abcaaaab61043bc9d0355a5b30b80cc8c4e",
         "ip_sl": "cfe909f5cdb355b1d0f0b6f89ed97d2892f08620",
@@ -388,9 +388,9 @@
         "lpn_backdrop_target_node": "32d94d48baeb48749abc6e461ec1568849d96888",
         "lpn_cancel": "77dfd2135f4db726c47299bb55be26f7f4525a46",
         "lpn_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
-        "lpn_close_browser_prompt": "62f3b41b1e8e979db82162dc2f37c8e55bc65b80",
+        "lpn_close_browser_confirm": "62f3b41b1e8e979db82162dc2f37c8e55bc65b80",
         "lpn_close_discard": "e4591957da0d53d53d8ce0766bb7a241a3e05904",
-        "lpn_close_save_prompt": "128d1c2703b177c7b05ef44ca0c590d4e796d014",
+        "lpn_close_save_confirm": "128d1c2703b177c7b05ef44ca0c590d4e796d014",
         "lpn_confirm_delete_network": "4cf6c58cb637a11d560bbe78024166deaa022e95",
         "lpn_confirm_example": "a37dfb08ed3bcb4faae1781660bedfdd43f2465a",
         "lpn_confirm_restore_defaults": "e55654deccb6f0c5322ce0cf2f2e95dbd5c71437",
@@ -432,7 +432,7 @@
         "lpn_file_open": "22b676fbcf6ed2eb3339ff94db2f46c8b584fc76",
         "lpn_file_recent": "95c6a85a61ec3f4fefa80882adb555d78ef45199",
         "lpn_file_reconnect": "16374fbf6ef5ee8c9c7886a2881682be7227a4b2",
-        "lpn_file_reconnect_prompt": "6892ed145808feb5f5796bdb5e6fc2bcc7546e73",
+        "lpn_file_reconnect_alert": "6892ed145808feb5f5796bdb5e6fc2bcc7546e73",
         "lpn_file_relink": "d5fa88cc6e26c6bf62ccedb79ed79ef82f8c1a78",
         "lpn_file_revert": "272607a7bd015aa5ea07720535332e32ec3a6ad3",
         "lpn_file_save": "efc007a393f66cdb14d57d385822a3d9e36ef873",
@@ -641,7 +641,7 @@
         "lpn_units_velocity": "d80a548eda6c0e81c84db1aa2c1099cc803abddd",
         "lpn_v2_restore_never": "f3e5ca94b1f392f437b6fc85bf3f03c306c23e5d",
         "lpn_v2_restore_no": "1f7f368c6d34c41f570dfe461879617ad1c695af",
-        "lpn_v2_restore_prompt": "733ec25f6146d8d81f7d88bbe332600bdb967cc4",
+        "lpn_v2_restore_confirm": "733ec25f6146d8d81f7d88bbe332600bdb967cc4",
         "lpn_v2_restore_yes": "3f15ce79532d7a88716daffe2b5fa5245abe9c20",
         "lpn_view_units": "12748281e0f02357f2a2f65c1c6a7d01ee122506",
         "menu_brand": "bf8b00231568173bfc88835a77624be526d4dd96",
@@ -846,9 +846,9 @@
         "or_twe": "ca79c5240748bb0fe7f9e77010e926fc3de069d4",
         "or_width": "23f8c74f142bec4e4e96bd0ebbe2649323d3e572",
         "points_data_copy": "af74f7c5362aaee985bf8cda3dd75fc80751ce51",
-        "points_data_help": "80aa3d341546a15d2aa8e69687993b287c0fe202",
+        "points_data_note": "80aa3d341546a15d2aa8e69687993b287c0fe202",
         "points_data_paste": "db2483000d154ca9fd74d41fc4e063a4b28faa87",
-        "points_data_title": "23f6f266b7c344a4bf4031981e3ecd514d991c07",
+        "points_data_heading": "23f6f266b7c344a4bf4031981e3ecd514d991c07",
         "privacy_link": "ec7c829b39081dee8e886f1ca577b3fb1d099f64",
         "rc_D50": "55cb18d181974f6cd1a0bef46cbbbed74fe00af6",
         "rc_Hp": "30107365d68bacf4e442f774565307aaafa4979e",
@@ -1046,7 +1046,7 @@
             "words": 14,
             "ends_sentence": true
         },
-        "bpn_line_table_title": {
+        "bpn_line_table_heading": {
             "words": 2,
             "ends_sentence": false
         },
@@ -1174,7 +1174,7 @@
             "words": 1,
             "ends_sentence": false
         },
-        "bpn_sketch_title": {
+        "bpn_sketch_heading": {
             "words": 2,
             "ends_sentence": false
         },
@@ -1530,7 +1530,7 @@
             "words": 27,
             "ends_sentence": true
         },
-        "ec_name_hint": {
+        "ec_name_tip": {
             "words": 12,
             "ends_sentence": false
         },
@@ -1618,7 +1618,7 @@
             "words": 23,
             "ends_sentence": true
         },
-        "index_title": {
+        "index_main_title": {
             "words": 4,
             "ends_sentence": false
         },
@@ -1898,7 +1898,7 @@
             "words": 3,
             "ends_sentence": false
         },
-        "ip_reach_table_title": {
+        "ip_reach_table_heading": {
             "words": 2,
             "ends_sentence": false
         },
@@ -2014,7 +2014,7 @@
             "words": 1,
             "ends_sentence": false
         },
-        "lpn_close_browser_prompt": {
+        "lpn_close_browser_confirm": {
             "words": 22,
             "ends_sentence": true
         },
@@ -2022,7 +2022,7 @@
             "words": 3,
             "ends_sentence": false
         },
-        "lpn_close_save_prompt": {
+        "lpn_close_save_confirm": {
             "words": 8,
             "ends_sentence": true
         },
@@ -2182,7 +2182,7 @@
             "words": 4,
             "ends_sentence": false
         },
-        "lpn_file_reconnect_prompt": {
+        "lpn_file_reconnect_alert": {
             "words": 19,
             "ends_sentence": true
         },
@@ -2998,7 +2998,7 @@
             "words": 10,
             "ends_sentence": false
         },
-        "lpn_v2_restore_prompt": {
+        "lpn_v2_restore_confirm": {
             "words": 60,
             "ends_sentence": true
         },
@@ -3818,7 +3818,7 @@
             "words": 1,
             "ends_sentence": false
         },
-        "points_data_help": {
+        "points_data_note": {
             "words": 6,
             "ends_sentence": false
         },
@@ -3826,7 +3826,7 @@
             "words": 1,
             "ends_sentence": false
         },
-        "points_data_title": {
+        "points_data_heading": {
             "words": 5,
             "ends_sentence": false
         },

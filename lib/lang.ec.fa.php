@@ -80,15 +80,15 @@ $ec_lang['consent_region_label']='انتخاب شما درباره محدود ک
 $ec_lang['consent_settings_link']='تنظیمات کوکی';
 $ec_lang['privacy_link']='اعلامیه حریم خصوصی';
 $ec_lang['terms_link']='شرایط استفاده';
-$ec_lang['index_title']='ماشین‌حساب‌های رایگان مهندسی آنلاین';
+$ec_lang['index_main_title']='ماشین‌حساب‌های رایگان مهندسی آنلاین';
 $ec_lang['index_meta_desc_plain']='ماشین‌حساب‌های رایگان مهندسی هیدرولیک برای لوله، کانال، سرریز و آبیاری. این ابزارها در مرورگر شما اجرا می‌شوند، بدون اینترنت هم کار می‌کنند و به ۲۷ زبان در دسترس‌اند.';
 $ec_lang['calc_set_units']='تنظیم واحدها:';
 $ec_lang['calc_units_us']='US';
 $ec_lang['calc_units_si']='SI';
 $ec_lang['calc_defaults']='بازگردانی مقادیر پیش‌فرض';
 $ec_lang['calc_defaults_confirm']='بازگردانی ماشین‌حساب به مقادیر پیش‌فرض اصلی؟';
-$ec_lang['points_data_help']='(یا با استفاده از ناحیه داده کپی/چسباندن کنید)';
-$ec_lang['points_data_title']='داده‌های نقاط<br />(جداشده با کاما یا تب)';
+$ec_lang['points_data_note']='(یا با استفاده از ناحیه داده کپی/چسباندن کنید)';
+$ec_lang['points_data_heading']='داده‌های نقاط<br />(جداشده با کاما یا تب)';
 $ec_lang['points_data_copy']='کپی';
 $ec_lang['points_data_paste']='چسباندن';
 $ec_lang['calc_inputs']='ورودی‌ها';
@@ -97,7 +97,7 @@ $ec_lang['view_hide_line']='[پنهان کردن این خط]';
 $ec_lang['view_printable']='نسخه قابل چاپ (برای بازگشت بارگذاری مجدد کنید)';
 $ec_lang['ec_name_label']='این محاسبه را ذخیره کنید:';
 $ec_lang['ec_name_placeholder']='نام';
-$ec_lang['ec_name_hint']='این داده‌های ورودی را به URL ذخیره می‌کند برای نشانک‌گذاری، بازیابی سابقه و اشتراک';
+$ec_lang['ec_name_tip']='این داده‌های ورودی را به URL ذخیره می‌کند برای نشانک‌گذاری، بازیابی سابقه و اشتراک';
 $ec_lang['calc_copy_link']='کپی پیوند';
 $ec_lang['ec_related_calcs']='ماشین‌حساب‌های مرتبط:';
 $ec_lang['calc_copy_link_done']='کپی شد!';
@@ -512,7 +512,7 @@ $ec_lang['ip_elev_supply']='تراز تامین، z<sub>supply</sub>';
 $ec_lang['ip_q_design']='دبی طراحی قطره‌چکان، q<sub>design</sub>';
 $ec_lang['ip_h_design']='فشار طراحی قطره‌چکان';
 $ec_lang['ip_x']='<span class="ec-help" title="0.5 برای قطره‌چکان‌های استاندارد غیرجبران‌کننده؛ نزدیک به 0 برای قطره‌چکان‌های جبران‌کننده فشار">توان تخلیه قطره‌چکان، x <span class="ec-tip">?</span></span>';
-$ec_lang['ip_reach_table_title']='مسیر آزمایش';
+$ec_lang['ip_reach_table_heading']='مسیر آزمایش';
 $ec_lang['ip_group_reach']='بخش';
 $ec_lang['ip_group_upstream']='بالادست';
 $ec_lang['ip_group_downstream']='پایین‌دست';
@@ -570,7 +570,7 @@ $ec_lang['bpn_method']='روش اصطکاک';
 $ec_lang['bpn_method_hw']='Hazen-Williams';
 $ec_lang['bpn_method_dw']='Darcy-Weisbach';
 $ec_lang['bpn_method_manning']='Manning';
-$ec_lang['bpn_line_table_title']='خطوط لوله';
+$ec_lang['bpn_line_table_heading']='خطوط لوله';
 $ec_lang['bpn_id']='شناسه';
 $ec_lang['bpn_id_tip']='نام این خط لوله. خطوط دیگر در ستون بالادست به آن ارجاع می‌دهند.';
 $ec_lang['bpn_upstream']='شناسه بالادست';
@@ -585,7 +585,7 @@ $ec_lang['bpn_q_line']='دبی خط';
 $ec_lang['bpn_q_line_tip']='دبی کل حمل‌شده توسط این خط: مصرف خودش به‌علاوه هر مصرف پایین‌دستی که تغذیه می‌کند.';
 $ec_lang['bpn_p_down']='فشار پ‌د';
 $ec_lang['bpn_p_down_tip']='هد فشار مانومتری در گره پایین‌دست این خط. مقدار منفی (علامت‌گذاری‌شده) یعنی فشار زیر جو؛ طراحی را بررسی کنید.';
-$ec_lang['bpn_sketch_title']='نمودار شبکه';
+$ec_lang['bpn_sketch_heading']='نمودار شبکه';
 $ec_lang['bpn_show_length']='طول';
 $ec_lang['bpn_show_diameter']='قطر';
 $ec_lang['bpn_show_q']='دبی';
@@ -676,7 +676,7 @@ $ec_lang['lpn_reset_all_tip']='هر پروژه، هر تصویر پس‌زمین
 // Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
 // stopped being converted, and never again whatever the answer. Plain text only -- it is built with
 // textContent into the dialog body.
-$ec_lang['lpn_v2_restore_prompt']='این ماشین‌حساب واحدها و مقادیر ورودی پروژه را همان‌طور که تایپ شده‌اند ذخیره می‌کند، اما پیش‌تر اعداد را برای ذخیره‌سازی به واحد SI تبدیل می‌کرد. این پروژه پیش از آن تغییر ذخیره شده، پس اعدادش به SI ذخیره شده‌اند. آیا آن‌ها را یک‌بار دیگر به واحدهای فعلی تبدیل می‌کنید؟ برای اینکه بتوانید قضاوت کنید، چند قطر که تبدیل می‌شوند، با مقدار پیش و پس از تبدیل، در اینجا آمده است:';
+$ec_lang['lpn_v2_restore_confirm']='این ماشین‌حساب واحدها و مقادیر ورودی پروژه را همان‌طور که تایپ شده‌اند ذخیره می‌کند، اما پیش‌تر اعداد را برای ذخیره‌سازی به واحد SI تبدیل می‌کرد. این پروژه پیش از آن تغییر ذخیره شده، پس اعدادش به SI ذخیره شده‌اند. آیا آن‌ها را یک‌بار دیگر به واحدهای فعلی تبدیل می‌کنید؟ برای اینکه بتوانید قضاوت کنید، چند قطر که تبدیل می‌شوند، با مقدار پیش و پس از تبدیل، در اینجا آمده است:';
 $ec_lang['lpn_v2_restore_yes']='تبدیل';
 $ec_lang['lpn_v2_restore_never']='نه. دیگر نپرس.';
 $ec_lang['lpn_v2_restore_no']='بستن تا واحدهای فعلی را بررسی کنم';
@@ -838,10 +838,10 @@ $ec_lang['lpn_status_reverted']='{file} دوباره از دیسک بارگذا�
 // purpose: a program that writes your file behind your back takes away your right to walk away from
 // a session. So these three carry the whole close/discard/revert conversation.
 // {name} is a project name and {file} a file name; word order is the translator\'s to choose.
-$ec_lang['lpn_close_save_prompt']='پیش از بستن {name}، تغییراتتان در آن ذخیره شود؟';
+$ec_lang['lpn_close_save_confirm']='پیش از بستن {name}، تغییراتتان در آن ذخیره شود؟';
 // A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
 // than softened -- this is the one destructive act left on the page.
-$ec_lang['lpn_close_browser_prompt']='{name} فقط در این مرورگر نگه داشته می‌شود. اگر بدون ذخیره در فایل آن را ببندید، برای همیشه از دست می‌رود.';
+$ec_lang['lpn_close_browser_confirm']='{name} فقط در این مرورگر نگه داشته می‌شود. اگر بدون ذخیره در فایل آن را ببندید، برای همیشه از دست می‌رود.';
 $ec_lang['lpn_close_discard']='بستن بدون ذخیره';
 $ec_lang['lpn_cancel']='لغو';
 $ec_lang['lpn_revert_confirm']='تغییراتی که داده‌اید دور ریخته شود و {file} دوباره از دیسک بارگذاری شود؟';
@@ -922,7 +922,7 @@ $ec_lang['lpn_file_training_continue']='ادامه';
 // finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='فایل را دوباره انتخاب کنید';
 $ec_lang['lpn_file_reconnect']='اتصال دوباره به این فایل';
-$ec_lang['lpn_file_reconnect_prompt']='این پروژه از {file} آمده. مرورگرتان دوباره به اجازه شما نیاز دارد تا بتواند در آن بنویسد. در پایین دوباره اتصال دهید.';
+$ec_lang['lpn_file_reconnect_alert']='این پروژه از {file} آمده. مرورگرتان دوباره به اجازه شما نیاز دارد تا بتواند در آن بنویسد. در پایین دوباره اتصال دهید.';
 // Read-only means read-only, so Save as from a read-only project refuses the file it came from --
 // the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='آن همان فایلی است که شخص دیگری باز دارد، پس نمی‌توان روی آن ذخیره کرد. فایل یا نام دیگری انتخاب کنید.';

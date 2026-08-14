@@ -1142,20 +1142,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Not legal advice and not from a lawyer.** The inventory is what an adviser would ask for
     first, which is why it exists; the verdict is not ours to give.
 
-- 25|291| **Suffix vocabulary the hygiene check cannot judge, and a human should.** Three synonym
-  groups are deliberately excluded from `key_hygiene_check.php` because deciding them needs the
-  value or the call site, not the name:
-  - **tip / help / hint.** `_tip` is not a spelling preference in this suite — it names a delivery
-    mechanism (an `.ec-help`/`.ec-tip` tooltip through `pageConfig`, asserted on by
-    `popup-tips-harness.js`). `lpn_empty_hint` is canvas empty-state text and is right as it is.
-    `points_data_help` may be a genuine stray; somebody should look.
-  - **heading / head / title.** `_head` is usually hydraulic head. An automated rename here would
-    turn physics into typography.
-  - **confirm / prompt.** A confirm asks yes-or-no; a prompt asks for a value. Probably already
-    correct, and worth confirming once rather than re-deriving every time somebody notices.
-  - Low priority on purpose. This is the residue after the automatable part was automated, and the
-    honest reason it is not automated is that a check that cries wolf gets muted.
-
 - 35|292| **The 19 non-lpn calculators have no behavioural test, and that is the biggest hole in
   the review office.** Named 2026-08-12 while answering Tom's question about budgeting review.
   `dev/scripts/check_all.sh` runs ten checks and every one of them is either syntax, structure, or
@@ -2011,6 +1997,43 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|291| **[DONE 2026-08-13] Suffix vocabulary the hygiene check cannot judge, and a human did.**
+  The three groups `key_hygiene_check.php` excludes were read key by key with Tom ruling on each.
+  Eleven renames, all through `rename_lang_key.php --apply`, so no translated value changed and no
+  sprint was owed. **Each group needed a different answer, which is the argument for keeping all
+  three out of the automated check rather than automating them later:**
+  - **tip / help / hint — three keys, three different verdicts.** `points_data_help` was a real
+    stray: visible inline text beside the +/- links on four pages, and `_help` collided with the
+    `.ec-help` tooltip class, so the name claimed the opposite of the truth → `points_data_note`.
+    `ec_name_hint` was the genuine tooltip nobody had flagged, delivered as a `title=` → `_tip`.
+    `lpn_empty_hint` was right all along, as predicted.
+  - **heading / head / title — `_head` was clean; the drift was where the name could not show it.**
+    All seven `_head` keys were hydraulic head, so the check's caution was correct. But `_title`
+    carried **two meanings**: browser `<title>` *and* on-page heading, while `ws_notes_heading` did
+    the identical job on ten pages. The four section headings became `_heading`
+    (`bpn_line_table`, `bpn_sketch`, `ip_reach_table`, `points_data`), and `index_title` →
+    `index_main_title` to match the other sixteen. **`template_printable_title` deliberately
+    stayed** — it is the placeholder for the *printed sheet's* title, a real title.
+  - **confirm / prompt — NOT already correct, which was the surprise.** Four keys named `_prompt`
+    asked yes-or-no. Deciding them needed the call site, not the value:
+    `lpn_close_browser_prompt` reads as a bare statement but is the body of the close dialog, in a
+    literal ternary with its `_confirm` sibling (`js/looped-network.js:5543`). It, plus
+    `lpn_close_save_prompt` and `lpn_v2_restore_prompt`, became `_confirm`. Tom's suggestion of
+    "one of each" was right: `lpn_file_reconnect_prompt` is not a dialog at all but a warning
+    banner that asks nothing → **`lpn_file_reconnect_alert`**, establishing `_alert` for that shape.
+  - **Two findings adjacent to the renames.** `lib/Menus.lib.php` hand-rolled a `.ec-tip` glyph for
+    `ec_name_tip` — inline styles copying that CSS rule for rule, sitting *beside* the label
+    instead of wrapping it, so the tap target was the single `?` the whole-label convention exists
+    to prevent. Now `ecTipLabel()`. (It was *not* invisible on touch, as first reported here:
+    `EngCalcs.initTips` also matches `[title][style*="cursor:help"]`, so the tip did work.)
+  - **Still open, deliberately, and both are Tom's call:**
+    - **`contact_title` is rendered by nothing** — `contact.php` uses `contact_main_menu` instead.
+      Left untouched rather than renamed, because renaming an orphan makes it look live. Delete
+      (27 strings) or wire it up?
+    - **`menu_walkthroughs_tip` IS the invisible-on-touch case** (`lib/Menus.lib.php:165`): a bare
+      `<a title="…">` matching neither tip selector, exactly what CLAUDE.md warns against. Not
+      fixed here because the fix adds a `?` glyph to a nav dropdown, which is a design change.
 
 - 0|276| **[DONE 2026-08-13] Precise background-image scaling: type the number, or hand over a
   world file.** The backdrop menu now offers "Scale by picking" (the coarse step) and "Scale by

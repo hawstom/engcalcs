@@ -53,8 +53,8 @@ function echoCalculatorFormAppend() {
 		<thead>
 			<tr>
 				<th colspan="16">
-					<?=$ec_lang['ip_reach_table_title']?>
-					<a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a> <?=$ec_lang['points_data_help']?>
+					<?=$ec_lang['ip_reach_table_heading']?>
+					<a href="javascript:EngCalcs.addSingleCalcRow()">+</a>/<a href="javascript:EngCalcs.deleteSingleCalcRow()">-</a> <?=$ec_lang['points_data_note']?>
 				</th>
 			</tr>
 			<tr>
@@ -128,7 +128,7 @@ function echoCalculatorFormAppend() {
 	</table>
 	<div class='d-print-none' style='float:left;'>
 		<p>
-			<?=$ec_lang['points_data_title']?>
+			<?=$ec_lang['points_data_heading']?>
 			<br />
 			<button type="button" id="points_data_copy"><?=$ec_lang['points_data_copy']?></button>
 			<button type="button" id="points_data_paste"><?=$ec_lang['points_data_paste']?></button>
