@@ -727,7 +727,8 @@ belongs to IS the budgeting decision.
 **Tier 1 — automated, seconds, free. `sh dev/scripts/check_all.sh` before every commit.**
 Fourteen checks: PHP and JS syntax, HTML balance on every page, the pageConfig PHP→JS bridge, tip
 markup via the helpers, language rules A–D, gloss pointers, layout tags, the coverage declaration, payload
-freshness, the 12 lpn harnesses, plus three advisory ones (key hygiene, size budget, English
+freshness, the lpn harnesses (count derived from the glob, never typed — it read "12" while 15 were
+actually running), plus three advisory ones (key hygiene, size budget, English
 drift). Blocking failures exit 1. **This list used to live only in prose and in whoever remembered
 it** — a check nobody runs is indistinguishable from a check that does not exist, which is the same
 failure that hid six Rock Chute notes and the missing `lpn`/`bpn` glossary wiring.
@@ -759,10 +760,32 @@ scope, wording, and whether an unreferenced key is debt or lost content. Every o
 he made on 2026-08-12 was in this tier and none of them could have been automated.
 
 **THE GAP, stated plainly because a checklist that hides its own holes is worse than none: the 19
-non-lpn calculators have no behavioural test.** `run_harnesses.sh` covers the lpn solver thoroughly
-and nothing else. Their math is verified by reading and by Tom driving a browser — which is slow and
+non-lpn calculators have no behavioural test.** `run_harnesses.sh` covers the lpn solver thoroughly,
+and since Task 293 the map editor's pure geometry and label collision avoidance as well — but
+nothing else. Their math is verified by reading and by Tom driving a browser — which is slow and
 tiring, and is exactly the constraint that produced the lpn harness suite in the first place. See
 ROADMAP Task 292.
+
+**How to make an untestable file testable — the Task 293 pattern, 2026-08-13.** `looped-network.js`
+was 8,700 lines with ~30 shared mutable closure variables, so nothing in it could be reached without
+a browser, and the earlier harnesses coped by reading it as TEXT and brace-matching a function out
+of it (`extract()` in `backdrop-scale-harness.js` and four others). That works, but it tests a
+*copy* in a context the browser never has: a function lifted out of its closure sees whatever stubs
+the harness defines, so a harness can pass while the real call site is broken.
+- **Split by PURITY, not by subject.** `js/lpn-geom.js` and `js/lpn-collide.js` take values and
+  return values — no DOM, no `doc`, no `nodeEls`, no settings, no closure variables. A module that
+  still reached back into the editor's closure would be just as untestable, one file further away,
+  which is why "split it into files" was explicitly not the task.
+- **What is left behind is the GATHERING** — turning `doc`, the element handles and the current font
+  size into plain arguments. That part still needs a browser and that is fine; it is thin enough to
+  read.
+- **Prove the lift is behaviour-preserving before trusting the new tests.** A fuzz comparing each new
+  function against the pre-refactor body from `git show HEAD:` over a few thousand random inputs is
+  minutes of work and is the only thing that distinguishes a refactor from a rewrite.
+- **A new module must be added in THREE places or the harnesses break in a confusing way:** the
+  `<script>` tags in `Looped-Network.php`, `dev/lpn-spike/lpn-dom-stub.js`, and any harness that
+  eval's `looped-network.js` itself. Use **indirect** eval — `(0, eval)(src)` — in those harnesses;
+  a direct eval hoists its own `var EngCalcs` and starts a second, empty one.
 
 ## Renaming a language key, and finding key debt (Tom, 2026-08-12)
 
@@ -944,6 +967,8 @@ Set `APP_ENV=development` in your web server config or a `.env` file for local d
 | `js/Calculators.lib.js` | Client-side calculation engine, unit conversion, form wiring |
 | `js/Manning.lib.js` | Shared JS for Manning/irregular geometry and sketch rendering |
 | `js/PipeHydraulics.lib.js` | The suite's one Hazen-Williams constant pair (EPANET's) and `hwSlope()` — load before any calculator that uses it |
+| `js/lpn-geom.js` | `lpn_` map editor's pure geometry — polyline arc-length, the arrow dodge, leader attachment + hysteresis, label box/mask rects. No DOM. Harness: `dev/lpn-spike/geom-harness.js` |
+| `js/lpn-collide.js` | `lpn_` label collision avoidance as pure weighted-box relaxation. No DOM. Harness: `dev/lpn-spike/collide-harness.js` |
 | `lib/Menus.lib.php` | `echoMainMenu()`, `echoHeader()`, `echoFooter()` |
 | `lib/Units.lib.php` | Unit sets and conversion factors |
 | `lib/Language.lib.php` | Language detection and switching |

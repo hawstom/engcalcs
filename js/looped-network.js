@@ -19,6 +19,14 @@ var EngCalcs = EngCalcs || {};
 (function () {
 	'use strict';
 
+	// The pure halves of this file, lifted out so they can be run without a browser
+	// (ROADMAP Task 293). Geom is polyline/leader/label-box arithmetic; Collide is the
+	// label relaxation. Both are values-in/values-out and know nothing about `doc`, the
+	// SVG handles, or the settings below -- resolving those stays this file's job.
+	// Their <script> tags precede this one in Looped-Network.php; the harnesses in
+	// dev/lpn-spike/ require them directly.
+	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
+
 	var NS = 'http://www.w3.org/2000/svg';
 	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, maskLayer, labelsLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
@@ -89,30 +97,17 @@ var EngCalcs = EngCalcs || {};
 		return { x: n.x + (n.lx !== undefined ? n.lx : d.x),
 			y: n.y + (n.ly !== undefined ? n.ly : d.y) };
 	}
+	// A link's centerline as a point list: its two end nodes with any user vertices between.
+	// This is the one place link topology becomes plain geometry, and everything in
+	// EngCalcs.lpnGeom takes its input in this form.
+	function linkPointList(l) {
+		return [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]);
+	}
 	// The point a fraction `f` of the way along the WHOLE polyline, by arc length -- not the
 	// midpoint of some chosen segment. Returns the point plus the along-distance it sits at, so
 	// callers can reason about spacing between things placed on the same link.
 	function pointAlongLink(l, f) {
-		var pts = [nodeById(l.from)].concat(l.verts, [nodeById(l.to)]), segs = [], total = 0, i, d, want, run;
-		for (i = 0; i < pts.length - 1; i++) {
-			d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
-			segs.push(d); total += d;
-		}
-		if (!(total > 0)) { return { x: pts[0].x, y: pts[0].y, dist: 0, total: 0 }; }
-		want = f * total; run = 0;
-		for (i = 0; i < segs.length; i++) {
-			if (run + segs[i] >= want || i === segs.length - 1) {
-				var t = segs[i] > 0 ? (want - run) / segs[i] : 0;
-				t = Math.max(0, Math.min(1, t));
-				return {
-					x: pts[i].x + (pts[i + 1].x - pts[i].x) * t,
-					y: pts[i].y + (pts[i + 1].y - pts[i].y) * t,
-					dist: want, total: total
-				};
-			}
-			run += segs[i];
-		}
-		return { x: pts[0].x, y: pts[0].y, dist: 0, total: total };
+		return Geom.pointAlongPolyline(linkPointList(l), f);
 	}
 	// A link's label anchors at the halfway point OF THE WHOLE PIPE, measured along its length
 	// (Tom, 2026-07-30: "link label is placing within last segment instead of overall length. Not
@@ -125,21 +120,9 @@ var EngCalcs = EngCalcs || {};
 	// The label moves along the pipe rather than off it, keeping it on the thing it labels, and is
 	// clamped well inside the ends so it never crowds a node.
 	function linkLabelMid(l) {
-		var here = pointAlongLink(l, LINK_LABEL_ALONG);
-		if (!(here.total > 0)) { return here; }
-		var clear = (ARROW_NOMINAL_LEN * symbolFactor()) * 1.5,
-			arrows = arrowAlongDistances(l), i, f;
-		for (i = 0; i < arrows.length; i++) {
-			if (Math.abs(arrows[i] - here.dist) >= clear) { continue; }
-			// Step to whichever side of this arrow is farther from the pipe's own ends, so the
-			// dodge never pushes the label off the end of a short pipe.
-			f = (arrows[i] > here.dist)
-				? (arrows[i] - clear) / here.total
-				: (arrows[i] + clear) / here.total;
-			f = Math.max(0.12, Math.min(0.88, f));
-			return pointAlongLink(l, f);
-		}
-		return here;
+		var clear = (ARROW_NOMINAL_LEN * symbolFactor()) * 1.5;
+		return Geom.dodgeAlongPolyline(linkPointList(l), LINK_LABEL_ALONG,
+			arrowAlongDistances(l), clear, 0.12, 0.88);
 	}
 	function linkLabelBase(l) {
 		var mid = linkLabelMid(l), d = defaultLabelOffset();
@@ -174,15 +157,12 @@ var EngCalcs = EngCalcs || {};
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(pos.x - anchor.x, pos.y - anchor.y);
 		if (d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
-		var halfW = holder.tw / 2, boxCenterX = pos.x + halfW, offset = boxCenterX - anchor.x,
-			trigger = halfW * (1 - 2 * ADVERSE_FRAC);
-		if (!holder.side) { holder.side = 'right'; }
-		if (holder.side === 'right' && offset < trigger) { holder.side = 'left'; }
-		else if (holder.side === 'left' && offset > -trigger) { holder.side = 'right'; }
-		var leaderX = holder.side === 'right' ? pos.x : pos.x + holder.tw;
+		var halfW = holder.tw / 2,
+			att = Geom.leaderAttach(holder.side, pos.x + halfW, halfW, anchor.x, ADVERSE_FRAC);
+		holder.side = att.side;
 		holder.leader.style.display = '';
 		holder.leader.setAttribute('x1', anchor.x); holder.leader.setAttribute('y1', anchor.y);
-		holder.leader.setAttribute('x2', leaderX); holder.leader.setAttribute('y2', pos.y);
+		holder.leader.setAttribute('x2', att.x); holder.leader.setAttribute('y2', pos.y);
 	}
 	// Approximate vertical box of a left-anchored, top-down multi-line <text> (node/link labels):
 	// no exact ascent/descent metrics available cross-browser without layout, so this uses a
@@ -190,8 +170,7 @@ var EngCalcs = EngCalcs || {};
 	// letters, no descenders like "g"/"y"). Good enough for a mask rect and collision boxes; not
 	// meant to be pixel-exact.
 	function dataLabelBoxHeight(lineCount) {
-		var fs = effectiveFontSize();
-		return fs * 1.1 + Math.max(0, lineCount - 1) * effectiveLineHeight();
+		return Geom.dataLabelBoxHeight(lineCount, effectiveFontSize(), effectiveLineHeight());
 	}
 	// Background mask (Task 146.01): a plain rect behind a label's text so it stays legible over a
 	// backdrop image, colored fill, or another element -- sized from the SAME w/h the label's own
@@ -200,14 +179,13 @@ var EngCalcs = EngCalcs || {};
 	// hAlign/vAlign describe what x/y MEAN for the label being masked, matching each label type's own
 	// text-anchor/dominant-baseline: 'start'/'top' for a node or link label (x = left edge, y = first
 	// line's baseline); 'middle'/'middle' for a Text label (x = center, y = vertical center).
+	var MASK_PAD = 0.4;
 	function positionMaskRect(mask, x, y, w, h, hAlign, vAlign) {
-		var pad = 0.4, fs = effectiveFontSize();
-		var left = hAlign === 'middle' ? x - w / 2 : x;
-		var top = vAlign === 'middle' ? y - h / 2 : y - fs * 0.85;
-		mask.setAttribute('x', left - pad);
-		mask.setAttribute('y', top - pad);
-		mask.setAttribute('width', w + 2 * pad);
-		mask.setAttribute('height', h + 2 * pad);
+		var r = Geom.maskRect(x, y, w, h, hAlign, vAlign, effectiveFontSize(), MASK_PAD);
+		mask.setAttribute('x', r.x);
+		mask.setAttribute('y', r.y);
+		mask.setAttribute('width', r.width);
+		mask.setAttribute('height', r.height);
 	}
 	// Final per-frame layout of one node's data label -- text position, its mask, and its leader (if
 	// dragged/nudged past LABEL_LEADER_THRESHOLD). Called from buildNodeEls() (first layout),
@@ -263,50 +241,11 @@ var EngCalcs = EngCalcs || {};
 	// silently undone by this pass. Nudges are transient (recomputed every refreshLabelText() call,
 	// never written into n.lx/l.ly), so they are not undo-tracked or persisted -- only an actual
 	// user drag is.
-	// Per-OBJECT repel strength -- how hard a given thing on the map pushes a label out of itself
-	// (Tom, 2026-07-30, restating the strengths he had already given after an earlier cut misread
-	// them as "node labels resist harder than link labels"):
-	//   pipe   0    -- a pipe never pushes a label at all. Pipe routes cross the whole drawing and a
-	//                  number sitting on one still reads perfectly well, so pipes are simply left out
-	//                  of the pass below rather than added with a zero that can never do anything.
-	//   node   0.5  -- a node SYMBOL pushes at half strength: worth stepping off, but not worth
-	//                  flinging a label across the map to avoid.
-	//   label  1    -- another label pushes at full strength. Text over text is the unreadable case.
-	//   leader 1    -- so does a leader LINE: a rule drawn straight through a number is just as bad.
-	// Node data labels and link data labels are the same kind of object and therefore carry the same
-	// strength (1); there is no node-vs-link distinction here.
-	// A box's push SHARE is proportional to the OTHER object's strength, so two labels split a
-	// separation 50/50 while an immovable obstacle (node symbol, leader, or a manually-dragged label)
-	// absorbs none of it. A manually-dragged label is flagged immovable AND given a very large
-	// strength, so "practically immovable" falls out of the same formula instead of being a second
-	// code path.
-	var LPN_COLLIDE_WEIGHT = { pipe: 0, node: 0.5, label: 1, leader: 1, manual: 1000 };
-	// A leader line is sampled into a chain of small boxes rather than intersected analytically --
-	// the same overlap/push code then handles it with no second geometry path. The step is well
-	// under a label box's smallest dimension, so a box cannot slip between two samples; the cap
-	// keeps a very long leader from generating an unbounded chain.
-	var LEADER_SAMPLE_STEP = 0.5, LEADER_SAMPLE_MAX = 60, LEADER_SAMPLE_HALF = 0.15;
-	// owner is the holder whose OWN label this leader belongs to -- that one label is exempt below,
-	// or the leader (which by construction ends on the label's near edge) would push its own label
-	// a little farther away on every iteration, forever.
-	function pushLeaderSamples(out, ax, ay, bx, by, owner) {
-		var len = Math.hypot(bx - ax, by - ay), i, t,
-			n = Math.min(LEADER_SAMPLE_MAX, Math.max(1, Math.ceil(len / LEADER_SAMPLE_STEP)));
-		for (i = 0; i <= n; i++) {
-			t = i / n;
-			out.push({
-				ref: null, owner: owner || null, movable: false, weight: LPN_COLLIDE_WEIGHT.leader,
-				base: { x: ax + (bx - ax) * t - LEADER_SAMPLE_HALF, y: ay + (by - ay) * t - LEADER_SAMPLE_HALF },
-				yOff: 0, w: LEADER_SAMPLE_HALF * 2, h: LEADER_SAMPLE_HALF * 2
-			});
-		}
-	}
-	// Top-left corner of a box at its CURRENT position: the persisted/default base, plus this
-	// element's live nudge (movable labels only), plus the box's own baseline-to-top offset.
-	function collideBoxTopLeft(b) {
-		var nx = b.ref ? b.ref.nudge.x : 0, ny = b.ref ? b.ref.nudge.y : 0;
-		return { x: b.base.x + nx, y: b.base.y + ny + b.yOff };
-	}
+	// The push strengths, the leader sampling and the relaxation itself now live in
+	// js/lpn-collide.js, where they can be tested without a browser (Task 293); the box
+	// weights are documented there. What stays here is the GATHERING -- turning `doc`, the
+	// element handles and the current font size into boxes.
+	var LPN_COLLIDE_WEIGHT = Collide.WEIGHT;
 	// Every leader currently drawn, as sample boxes -- recomputed inside the relaxation loop because
 	// a leader follows its own label: nudging the label moves the line, which changes what that line
 	// collides with. Mirrors updateDataLeader()/updateLabelGeometry()'s own geometry, minus the
@@ -317,8 +256,9 @@ var EngCalcs = EngCalcs || {};
 		function dataLeader(holder, anchor, pos) {
 			if (!holder || holder.empty) { return; }
 			if (Math.hypot(pos.x - anchor.x, pos.y - anchor.y) <= leaderThreshold()) { return; }
-			var right = (pos.x + holder.tw / 2) >= anchor.x;
-			pushLeaderSamples(out, anchor.x, anchor.y, right ? pos.x : pos.x + holder.tw, pos.y, holder);
+			var halfW = holder.tw / 2;
+			Collide.pushLeaderSamples(out, anchor.x, anchor.y,
+				Geom.leaderAttachX(pos.x + halfW, halfW, anchor.x), pos.y, holder);
 		}
 		doc.nodes.forEach(function (n) { dataLeader(nodeEls[n.id], { x: n.x, y: n.y }, nodeLabelPos(n)); });
 		doc.links.forEach(function (l) { dataLeader(linkEls[l.id], linkLabelMid(l), linkLabelPos(l)); });
@@ -326,7 +266,7 @@ var EngCalcs = EngCalcs || {};
 			var le = labelEls[lb.id], an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
 			if (!le || !an) { return; }
 			var halfW = le.width / 2, px = an.x + lb.x, py = an.y + lb.y;
-			pushLeaderSamples(out, an.x, an.y, lb.x >= 0 ? px - halfW : px + halfW, py, null);
+			Collide.pushLeaderSamples(out, an.x, an.y, Geom.leaderAttachX(px, halfW, an.x), py, null);
 		});
 		return out;
 	}
@@ -355,7 +295,7 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	function runLabelCollisionAvoidance() {
-		var fs = effectiveFontSize(), labels = [], statics = staticObstacleBoxes(), boxes, i, j, iter, moved;
+		var fs = effectiveFontSize(), labels = [], statics = staticObstacleBoxes();
 		function addDataLabel(holder, base, manual, lineCount) {
 			// Every nudge is cleared and re-derived from scratch on every pass, manual or not, so the
 			// pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer as
@@ -379,44 +319,9 @@ var EngCalcs = EngCalcs || {};
 			var le = linkEls[l.id]; if (!le) { return; }
 			addDataLabel(le, linkLabelBase(l), l.lx !== undefined, le.lineCount);
 		});
-		for (iter = 0; iter < 4; iter++) {
-			moved = false;
-			// Leaders are rebuilt every iteration (they track their labels); node symbols and Text
-			// labels do not move, so they are built once above.
-			// The label boxes are first in `boxes`, so an outer loop over just those, with the inner
-			// loop starting at i+1, visits every label-label pair exactly once and every
-			// label-obstacle pair exactly once, and never wastes a comparison on two obstacles
-			// (neither of which could move anyway).
-			boxes = labels.concat(statics, currentLeaderBoxes());
-			for (i = 0; i < labels.length; i++) {
-				for (j = i + 1; j < boxes.length; j++) {
-					var A = boxes[i], B = boxes[j];
-					if (!A.movable && !B.movable) { continue; } // nothing can absorb the push; skip rather than spin
-					if (B.owner === A.ref) { continue; }        // a label never collides with its own leader
-					var At = collideBoxTopLeft(A), Bt = collideBoxTopLeft(B);
-					var overlapX = Math.min(At.x + A.w, Bt.x + B.w) - Math.max(At.x, Bt.x);
-					var overlapY = Math.min(At.y + A.h, Bt.y + B.h) - Math.max(At.y, Bt.y);
-					if (overlapX <= 0 || overlapY <= 0) { continue; }
-					moved = true;
-					// A's share of the separation is proportional to B's strength (and vice versa) --
-					// a stronger object moves the other one more than it moves itself.
-					var wSum = A.weight + B.weight;
-					if (wSum <= 0) { continue; }
-					if (overlapX < overlapY) {
-						var shareAx = (overlapX + 0.1) * B.weight / wSum, shareBx = (overlapX + 0.1) * A.weight / wSum;
-						var dirX = (At.x + A.w / 2 <= Bt.x + B.w / 2) ? -1 : 1;
-						if (A.movable) { A.ref.nudge.x += dirX * shareAx; }
-						if (B.movable) { B.ref.nudge.x -= dirX * shareBx; }
-					} else {
-						var shareAy = (overlapY + 0.1) * B.weight / wSum, shareBy = (overlapY + 0.1) * A.weight / wSum;
-						var dirY = (At.y + A.h / 2 <= Bt.y + B.h / 2) ? -1 : 1;
-						if (A.movable) { A.ref.nudge.y += dirY * shareAy; }
-						if (B.movable) { B.ref.nudge.y -= dirY * shareBy; }
-					}
-				}
-			}
-			if (!moved) { break; }
-		}
+		// Leaders are rebuilt every iteration (they track their labels); node symbols and Text
+		// labels do not move, so they are built once above.
+		Collide.relax(labels, statics, currentLeaderBoxes, 4);
 	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped. Each tspan repeats the same x (not a
@@ -902,9 +807,7 @@ var EngCalcs = EngCalcs || {};
 		doc.links.forEach(function (l) { if (l.type === 'pump') { recomputePumpCurve(l); } });
 	}
 	function linkPoints(l) {
-		var a = nodeById(l.from), b = nodeById(l.to), pts = [a].concat(l.verts, [b]), i, out = [];
-		for (i = 0; i < pts.length; i++) { out.push(pts[i].x + ',' + pts[i].y); }
-		return out.join(' ');
+		return Geom.polylinePointsAttr(linkPointList(l));
 	}
 	// Schematic polyline distance in map/world units -- NOT a real ground length (that needs
 	// the backdrop registration's scale, which is Phase 2). Good enough as the "auto" default
@@ -912,9 +815,7 @@ var EngCalcs = EngCalcs || {};
 	// a real number to start from rather than a blank field, with lenAuto tracking whether the
 	// user has taken control (per the Auto Length design note in the scope doc).
 	function linkGeomLength(l) {
-		var a = nodeById(l.from), b = nodeById(l.to), pts = [a].concat(l.verts, [b]), i, sum = 0;
-		for (i = 0; i < pts.length - 1; i++) { sum += Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y); }
-		return sum;
+		return Geom.polylineLength(linkPointList(l));
 	}
 
 	// ---- one-time DOM build per element + incremental per-frame updates ----
@@ -1349,7 +1250,7 @@ var EngCalcs = EngCalcs || {};
 	// has to reach clear across the text).
 	var ADVERSE_FRAC = 0.75;
 	function updateLabelGeometry(id) {
-		var lb = labelById(id), le = labelEls[id], an, px, py, halfW, trigger, leaderX,
+		var lb = labelById(id), le = labelEls[id], an, px, py, halfW, att,
 			maskH = effectiveFontSize(lb.sizeMult) * 1.2;
 		if (!lb.anchorNode) {
 			le.text.setAttribute('x', lb.x); le.text.setAttribute('y', lb.y);
@@ -1357,12 +1258,13 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		an = nodeById(lb.anchorNode); px = an.x + lb.x; py = an.y + lb.y; halfW = le.width / 2;
-		trigger = halfW * (1 - 2 * ADVERSE_FRAC);
-		if (le.side === 'right' && lb.x < trigger) { le.side = 'left'; }
-		else if (le.side === 'left' && lb.x > -trigger) { le.side = 'right'; }
-		leaderX = le.side === 'right' ? px - halfW : px + halfW;
+		// A Text label is text-anchor:middle, so px IS its box centre and lb.x IS the centre's
+		// offset from the anchor -- the same two arguments a data label works out from its own
+		// left-anchored box in updateDataLeader().
+		att = Geom.leaderAttach(le.side, px, halfW, an.x, ADVERSE_FRAC);
+		le.side = att.side;
 		le.leader.setAttribute('x1', an.x); le.leader.setAttribute('y1', an.y);
-		le.leader.setAttribute('x2', leaderX); le.leader.setAttribute('y2', py);
+		le.leader.setAttribute('x2', att.x); le.leader.setAttribute('y2', py);
 		le.text.setAttribute('x', px); le.text.setAttribute('y', py);
 		positionMaskRect(le.mask, px, py, le.width, maskH, 'middle', 'middle');
 	}

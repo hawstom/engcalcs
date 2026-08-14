@@ -17,7 +17,8 @@
 #
 # WHAT IT DOES NOT COVER, stated because a checklist that hides its own gaps is worse than none:
 #   - The 19 non-lpn calculators have no behavioural test. Their math is verified by reading and by
-#     Tom driving a browser. run_harnesses.sh covers the lpn solver thoroughly and nothing else.
+#     Tom driving a browser. run_harnesses.sh covers the lpn solver thoroughly, and since Task 293
+#     the map editor's pure geometry and label collision avoidance -- but nothing else.
 #   - Nothing here reads code for design, duplication, or a subtle logic error. That is what
 #     /code-review is for, and it is billed and user-triggered -- an AI cannot launch it.
 #
@@ -76,7 +77,11 @@ run_check "coverage declaration"         blocking php dev/scripts/coverage_selft
 run_check "payload freshness"            blocking php dev/scripts/generate_translation_payloads.php --check
 
 # --- lpn solver and editor --------------------------------------------------------------------
-run_check "lpn harnesses (12)"           blocking sh dev/scripts/run_harnesses.sh
+# Count derived, not typed: the label said "(12)" while 15 scripts were running, because
+# run_harnesses.sh globs and nothing tied the number to the glob. A stale count in a checklist is
+# the same defect this file exists to remove.
+LPN_HARNESS_N=$(ls dev/lpn-spike/*harness*.js dev/lpn-spike/validate*.js 2>/dev/null | wc -l | tr -d ' ')
+run_check "lpn harnesses ($LPN_HARNESS_N)"  blocking sh dev/scripts/run_harnesses.sh
 
 # --- Advisory: real findings, but judgement calls that must not block a commit ------------------
 run_check "key hygiene"                  advisory php dev/scripts/key_hygiene_check.php --strict

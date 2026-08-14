@@ -151,6 +151,10 @@ require('./bootstrap.js');
 // Deliberately no `var EngCalcs` here -- that would be hoisted to the top of this script and
 // shadow global.EngCalcs for the pageConfig loader above, which reads/writes the bare identifier.
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-solver.js'));
+// The map editor's pure halves (ROADMAP Task 293) -- looped-network.js reads
+// EngCalcs.lpnGeom/lpnCollide as its IIFE runs, so they go in before the eval below, in the
+// same order their <script> tags have in Looped-Network.php.
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-geom.js'), require(ROOT + 'js/lpn-collide.js'));
 
 // ---- the file under test ------------------------------------------------
 let src = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
@@ -179,13 +183,15 @@ src = src.replace(marker,
   "\t\twipeAllStorage: wipeAllStorage,\n" +
   "\t\tsetDoc: function (d, s2) { doc = d; if (s2) { scenarios = s2; } },\n" +
   "\t\tgetDoc: function () { return doc; } };\n" + marker);
-eval(src);
-// The eval above ran `var EngCalcs = EngCalcs || {}` (js/looped-network.js:17) as a direct eval in
-// sloppy mode, which declares a module-scope `EngCalcs` binding here for the first time -- pulling
-// in whatever the bare identifier resolved to at that moment. Reconcile it back onto
-// global.EngCalcs's contents explicitly rather than trust that resolution, so every later `PC =
-// EngCalcs.pageConfig` and `EngCalcs.lpnSolve` below is reading the real, fully-assembled object.
-Object.assign(EngCalcs, global.EngCalcs);
+// INDIRECT eval, and the indirection is load-bearing -- the same reasoning lpn-dom-stub.js
+// spells out. js/looped-network.js opens with `var EngCalcs = EngCalcs || {};`, the browser
+// idiom for "reuse the one the earlier script tags made". A DIRECT eval here would hoist a
+// fresh module-scope `EngCalcs`, so that line would read its own undefined binding and start
+// a SECOND, empty EngCalcs -- which used to be survivable (the solver was only read later,
+// and a trailing Object.assign patched it up) but stopped being so once Task 293 made the
+// file read EngCalcs.lpnGeom/lpnCollide as its IIFE runs. Running at global scope makes the
+// line find global.EngCalcs, exactly as the browser's script order gives it.
+(0, eval)(src);
 
 const L = global.__LPN;
 let fails = 0;

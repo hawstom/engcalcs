@@ -32,16 +32,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## Calculator Improvements
 
-- 35|293| **Extract the pure functions out of `js/looped-network.js` so the map editor becomes
-  testable.** 8,381 lines, 327 functions, ~30 shared mutable closure variables — 58% of all JS in
-  the suite. The solver has 11 harnesses because it is 641 lines with clean inputs and outputs; the
-  editor has none because no part of it can be reached without the other 8,000 lines and a browser.
-  That is the direct cause of Tom's manual-testing load on lpn. Do NOT "split it into files" — lift
-  out the parts that already take values and return values: label collision avoidance
-  (`currentLeaderBoxes`/`runLabelCollisionAvoidance`, ~lines 283–430) and link geometry
-  (`pointAlongLink`, `linkPoints`, `linkGeomLength`). Each becomes harness-testable without a
-  browser. `php dev/scripts/size_budget_check.php` tracks the shape.
-
 - 15|294|[H] **Decide the 7 remaining dead language keys, one each.** `menu_main_list`,
   `menu_main_language`, `mi_d50in`, `mpf_spreadheet_notice` (key name is misspelled too),
   `wi_save_and_calculate`, `or_shape`, `contact_title` — rendered by nothing, 27 translated strings
@@ -1782,6 +1772,54 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|293| **[DONE 2026-08-13] Extract the pure functions out of `js/looped-network.js` so the map
+  editor becomes testable.** Shipped as `js/lpn-geom.js` (151 lines) and `js/lpn-collide.js` (144),
+  with `dev/lpn-spike/geom-harness.js` (45 assertions) and `dev/lpn-spike/collide-harness.js` (28).
+  `looped-network.js` went 8,765 → 8,667 lines; the point was never the line count.
+
+  **The split is by PURITY, not by subject.** Both new files take values and return values — no
+  DOM, no `doc`, no `nodeEls`, no settings, no closure variables — which is what makes them
+  `require()`-able from a harness. "Split it into files" was explicitly not the task: a module that
+  still reached back into the editor's closure would be exactly as untestable, one file further
+  away. What stayed behind in `looped-network.js` is the GATHERING — turning `doc`, the element
+  handles and the current font size into plain arguments — and that is right where it belongs.
+  - **`lpn-geom.js`** — `polylineLength`, `polylinePointsAttr`, `pointAlongPolyline`,
+    `dodgeAlongPolyline` (the flow-arrow dodge), `leaderAttachX` / `leaderAttach` (the side-flip
+    hysteresis), `dataLabelBoxHeight`, `maskRect`.
+  - **`lpn-collide.js`** — the weights, `pushLeaderSamples`, `boxTopLeft`, and the four-iteration
+    `relax()`.
+
+  **These are the FIRST harnesses in `dev/lpn-spike/` that simply `require()` their subject.** Five
+  earlier ones read `looped-network.js` as TEXT and brace-match a function out of it, because
+  nothing in that file could be reached any other way. That trick works but it tests a *copy* in a
+  context the browser never has — a function lifted out of its closure sees whatever stubs the
+  harness happens to define, so a harness can pass while the real call site is broken. What runs in
+  the two new harnesses is byte-for-byte the module the page loads.
+
+  **Proved behaviour-preserving before the new tests were trusted at all.** A throwaway fuzz
+  compared every lifted function against its pre-refactor body from `git show HEAD:` over 4,000
+  random link geometries (bends, degenerate zero-length links, out-of-range fractions, random
+  symbol scales and arrow sets): **24,000/24,000 comparisons bit-identical**. The relaxation loop
+  was verified by text diff instead — every difference is the parameterization or comment
+  rewrapping, no logic. Without that step this would have been a rewrite wearing a refactor's
+  clothes, and the new assertions would only have been asserting the new behaviour.
+
+  **One real finding, recorded rather than fixed.** Against a half-strength obstacle (a node
+  SYMBOL, weight 0.5 vs a label's 1) the relaxation removes only a third of the remaining overlap
+  per pass, so **four passes stop short**: from a 2-unit overlap it leaves ~0.31, i.e. a data label
+  resting slightly on a node symbol. It does converge given ~40 passes; the weight slows it, it does
+  not stall. Nobody had seen this because nothing could measure it, and whether 0.3 world units is
+  worth another iteration or a different weight is Tom's call, not the harness's — so
+  `collide-harness.js` asserts the *actual* numbers, and any future change to either shows up as a
+  diff instead of a surprise.
+
+  **Two incidental fixes it forced.** `popup-tips-harness.js` used a DIRECT `eval`, which hoists its
+  own `var EngCalcs` and starts a second, empty one — survivable while the solver was only read
+  later, and fatal the moment `looped-network.js` began reading `EngCalcs.lpnGeom` as its IIFE runs;
+  it now uses indirect `(0, eval)` like `lpn-dom-stub.js`. And `check_all.sh` labelled the harness
+  step "(12)" while 15 scripts were actually running — the count is now derived from the glob, since
+  a stale number in the checklist is the same defect the checklist exists to remove. It reads (17).
 
 - 0|300| **[DECLINED 2026-08-13] A "New project" wizard picking units AND friction method
   (extracted from Task 271, then declined the same day).**

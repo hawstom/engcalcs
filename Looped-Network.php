@@ -596,6 +596,10 @@ EngCalcs.pageConfig = {
 <script src="/engcalcs/js/lpn-epanet.js?v=<?=filemtime(__DIR__.'/js/lpn-epanet.js')?>"></script>
 <script src="/engcalcs/js/lpn-inp.js?v=<?=filemtime(__DIR__.'/js/lpn-inp.js')?>"></script>
 <script src="/engcalcs/js/lpn-net.js?v=<?=filemtime(__DIR__.'/js/lpn-net.js')?>"></script>
+<?php // The pure geometry/collision halves of the map editor (ROADMAP Task 293) -- must precede
+      // looped-network.js, which reads EngCalcs.lpnGeom/lpnCollide as it defines itself. ?>
+<script src="/engcalcs/js/lpn-geom.js?v=<?=filemtime(__DIR__.'/js/lpn-geom.js')?>"></script>
+<script src="/engcalcs/js/lpn-collide.js?v=<?=filemtime(__DIR__.'/js/lpn-collide.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

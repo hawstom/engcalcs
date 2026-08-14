@@ -210,6 +210,11 @@ require('./bootstrap.js');
 // require() rather than eval() for the solver: lpn-solver.js's own require('./PipeHydraulics.lib.js')
 // would resolve relative to THIS file if it were eval'd here, not to js/.
 var EngCalcs = Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-solver.js'));
+// The map editor's pure halves (ROADMAP Task 293), which looped-network.js reads as
+// EngCalcs.lpnGeom/lpnCollide the moment its IIFE runs -- so they must be in place before
+// the eval below, exactly as their <script> tags precede it in Looped-Network.php.
+// require()d rather than eval'd for the same reason as the solver: they are real modules.
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-geom.js'), require(ROOT + 'js/lpn-collide.js'));
 
 // The pointer handlers hit-test through document.elementFromPoint rather than trusting e.target (a
 // real tap moves a few pixels between down and up). A test sets this to whatever it is pretending
