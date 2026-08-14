@@ -73,7 +73,7 @@ $ec_lang['template_printable_subtitle']='Yazdırılabilir Alt Başlık';
 $ec_lang['consent_body']='Bu tarayıcı profilinin ziyaretlerini tekrar tekrar kaydetmemizi önlemek için, sayfa başına tek bir rakamı bu tarayıcı profilinin deposunda saklayabilir miyiz?';
 $ec_lang['consent_accept']='Kabul et';
 $ec_lang['consent_accept_all']='Her zaman kabul et';
-$ec_lang['consent_decline']='Reddet';
+$ec_lang['consent_decline']='Her zaman reddet';
 $ec_lang['consent_current_granted']='Buna izin verdiniz. Bu tarayıcı profili için kaydı sınırlıyoruz.';
 $ec_lang['consent_current_denied']='Bunu reddettiniz. Bu tarayıcı profili için kaydı sınırlamak amacıyla hiçbir şey saklamıyoruz.';
 $ec_lang['consent_region_label']='Kaydı sınırlama tercihiniz.';
@@ -699,6 +699,8 @@ $ec_lang['lpn_menu_view']='Görünüm';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Ayarlar';
+$ec_lang['lpn_menu_help']='Yardım';
+$ec_lang['lpn_help_walkthroughs']='Rehberler';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
 // starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
@@ -1020,14 +1022,18 @@ $ec_lang['lpn_labels_decimals_tip']='Bu etiket için gösterilen ondalık basama
 $ec_lang['lpn_labels_mark_extrema']='En yüksek ve en düşük değerleri işaretle';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Arka plan görüntüsü...';
-$ec_lang['lpn_backdrop_add']='Görüntü ekle';
+$ec_lang['lpn_backdrop_add']='Ekle';
 // "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
 // under the toolbar select's own "Background image..." heading and read as orphans in the Insert
 // menu, where nothing above them says what is being scaled. Naming the object costs one word and
 // works in both places.
-$ec_lang['lpn_backdrop_scale']='Görüntü ölçeğini ayarla';
-$ec_lang['lpn_backdrop_position']='Görüntüyü taşı';
-$ec_lang['lpn_backdrop_remove']='Görüntüyü kaldır';
+$ec_lang['lpn_backdrop_scale']='Seçerek ölçekle';
+$ec_lang['lpn_backdrop_scale_entry']='World dosyası veya haritadaki bir pikselin boyutuyla ölçekle';
+$ec_lang['lpn_backdrop_scale_entry_prompt']='Haritadaki bir pikselin boyutunu girin veya görüntünün world dosyasının tüm içeriğini yapıştırın';
+$ec_lang['lpn_backdrop_scale_entry_bad']='Haritadaki bir pikselin boyutu için tek bir sayı yazın veya bir world dosyasının altı satırının tamamını yapıştırın.';
+$ec_lang['lpn_backdrop_wld_bad']='Bu world dosyası görüntüyü döndürüyor, yansıtıyor veya iki yönde eşit olmayan biçimde geriyor. Harita bir görüntüyü yalnızca taşıyabilir ve her iki yönde aynı oranda yeniden boyutlandırabilir, bu yüzden dosya kullanılmadı.';
+$ec_lang['lpn_backdrop_position']='Taşı';
+$ec_lang['lpn_backdrop_remove']='Kaldır';
 $ec_lang['lpn_backdrop_remove_confirm']='Arka plan görüntüsü kaldırılsın mı?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Arka plan görüntüsü üzerinde iki nokta tıklayın, örneğin bir ölçek çubuğunun iki ucu. Ardından aralarındaki gerçek mesafeyi yazın.';
 $ec_lang['lpn_backdrop_scale_prompt2']='İki nokta arasındaki gerçek mesafe';
