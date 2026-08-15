@@ -588,11 +588,27 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     `dev/lpn-spike/geom-harness.js` (53 total), mutation-tested three ways: dropping the flip (2
     failures), a down-screen normal (3), a top block straddling the pipe (1). No DOM, so it is
     testable now and the renderer is the only browser-dependent part left.
-  - **NOT DONE: the wiring**, deliberately — this is a visual judgement Tom has to make in a browser,
-    and the honest way to give it to him is a toggle, not a decision made for him. Render a link label
-    as `<text transform="rotate(angle x y)" text-anchor="middle">` with `dy` tspans; the anchor maths
-    is already right for that, and rotation maps `+y'` onto the bottom side so the tspans need no
-    per-side handling.
+  - **DONE: the wiring**, behind `settings.alignPipeLabels`, shipping **OFF**. Aligned-vs-horizontal
+    is a visual judgement and defaulting it on would make that judgement for the user instead of
+    offering it. One seam: `layoutLinkLabel()`. A **dragged** label always opts out — the user placed
+    it, and rotating what they positioned by hand would overrule a deliberate act.
+  - **An aligned label draws NO LEADER, by construction.** Lying along the pipe, its ORIENTATION
+    already says which pipe it belongs to — that is the whole economy of the GIS convention and the
+    reason it survives on maps carrying thousands of labels.
+  - **The angle is the pipe's LOCAL direction at the label**, not end-to-end (`linkDirectionAt()`).
+    On a bent pipe the straight line between endpoints can lie at a completely different angle from
+    the piece of pipe the label is sitting on, which is the difference between a label that reads as
+    attached and one that reads as loose.
+  - **TOM WENT AND LOOKED AT epanet-js, AND THERE IS NO RULE THERE TO COPY** (2026-08-14): *"Not on
+    top; not on left from start to end node or high head to low head node. ??? We can do better: top
+    or avoid congestion."* He tested three plausible rules — screen-top, drawing order, hydraulic
+    gradient — and none of them predicts their side. So the top-plus-congestion design is not us
+    deviating from a convention; there is no convention at that spot, and we are choosing one.
+  - **STILL OPEN: the congestion half.** The geometry returns both sides as candidates, but the
+    aligned path currently takes the top and does not enter `runLabelCollisionAvoidance()` at all —
+    it returns before the nudge. Offering the bottom as a second candidate is the remaining work,
+    and it is worth doing only once Tom has looked at the aligned rendering: if top-always reads
+    well on real networks, the second candidate is complexity with no reader benefit.
   - **The thing to watch when he looks at it:** GIS aligns ONE short name along a line. Our link
     labels default to THREE lines (id, flow, velocity) and can carry nine. A rotated three-line stack
     is legible; a nine-line one is a wall of text lying at 40°. If alignment reads well, it may argue

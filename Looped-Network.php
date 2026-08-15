@@ -666,6 +666,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_text_size: <?=json_encode($ec_lang['lpn_settings_text_size'])?>,
 	lpn_settings_symbol_size: <?=json_encode($ec_lang['lpn_settings_symbol_size'])?>,
 	lpn_settings_link_width: <?=json_encode($ec_lang['lpn_settings_link_width'])?>,
+	lpn_settings_align_labels: <?=json_encode($ec_lang['lpn_settings_align_labels'])?>,
 	lpn_settings_label_max_width: <?=json_encode($ec_lang['lpn_settings_label_max_width'])?>,
 	lpn_settings_label_use_view: <?=json_encode($ec_lang['lpn_settings_label_use_view'])?>,
 	lpn_settings_label_always: <?=json_encode($ec_lang['lpn_settings_label_always'])?>,

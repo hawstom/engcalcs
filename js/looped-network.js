@@ -244,9 +244,70 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Same as layoutNodeLabel() above, for a link's data label -- anchor is the link's own mid-
 	// segment point (linkLabelMid()), which itself moves whenever a vertex/endpoint drags.
+	// Local direction of the pipe AT the label's own point, not end-to-end: on a bent pipe the
+	// straight line between endpoints can lie at a completely different angle from the piece of pipe
+	// the label is actually sitting on, which is the difference between a label that reads as
+	// attached and one that reads as loose. Falls back to the endpoints for a link with no usable
+	// segment (all-coincident points), where any angle is as good as any other.
+	function linkDirectionAt(l, at) {
+		var pts = linkPointList(l), best = null, bestD = Infinity, i, ax, ay, bx, by, t, px, py, d;
+		for (i = 0; i + 1 < pts.length; i++) {
+			ax = pts[i].x; ay = pts[i].y; bx = pts[i + 1].x; by = pts[i + 1].y;
+			var vx = bx - ax, vy = by - ay, len2 = vx * vx + vy * vy;
+			if (!len2) { continue; }
+			t = ((at.x - ax) * vx + (at.y - ay) * vy) / len2;
+			t = t < 0 ? 0 : (t > 1 ? 1 : t);
+			px = ax + vx * t; py = ay + vy * t;
+			d = (px - at.x) * (px - at.x) + (py - at.y) * (py - at.y);
+			if (d < bestD) { bestD = d; best = { ax: ax, ay: ay, bx: bx, by: by }; }
+		}
+		if (best) { return best; }
+		var a = nodeById(l.from), b = nodeById(l.to);
+		return a && b ? { ax: a.x, ay: a.y, bx: b.x, by: b.y } : { ax: 0, ay: 0, bx: 1, by: 0 };
+	}
+	// TRUE when this link's label should be drawn ALONG the pipe (the GIS way) rather than
+	// horizontally beside it. A DRAGGED label always opts out: the user placed it, and rotating what
+	// they positioned by hand would overrule a deliberate act -- alignment is what we do when nobody
+	// has said otherwise. See ROADMAP Task 329.
+	function linkLabelAligned(l) {
+		return !!settings.alignPipeLabels && l.lx === undefined && l.ly === undefined;
+	}
 	function layoutLinkLabel(id) {
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
-		var pos = linkLabelPos(l), mid = linkLabelMid(l);
+		var mid = linkLabelMid(l);
+		if (linkLabelAligned(l)) {
+			// ALIGNED: text-anchor middle, rotated about its own anchor, no leader and no nudge.
+			// A leader would be redundant by construction -- a label lying along the pipe already
+			// says which pipe it belongs to by its ORIENTATION, which is the whole economy of the
+			// GIS convention and the reason it survives on maps carrying thousands of labels.
+			var dir = linkDirectionAt(l, mid),
+				a = Geom.alignedLabelAnchor(dir.ax, dir.ay, dir.bx, dir.by, {
+					frac: 0, gap: nodeRadius({ type: 'junction' }) + effectiveFontSize() * 0.35,
+					fontSize: effectiveFontSize(), lineHeight: effectiveLineHeight(),
+					nLines: le.lineCount || 1, side: 1
+				}),
+				// alignedLabelAnchor() offsets from a point ALONG the segment it is given; we want it
+				// offset from the label's own dodged mid-point, so pass frac 0 and re-base here.
+				ax = mid.x + (a.x - dir.ax), ay = mid.y + (a.y - dir.ay);
+			le.text.setAttribute('text-anchor', 'middle');
+			le.text.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + ax + ' ' + ay + ')');
+			repositionMultilineText(le.text, ax, ay);
+			// The mask has to rotate WITH the text or it stops covering it -- it is sized from the
+			// same box, so the same transform about the same point is exactly right.
+			if (le.empty) { hideMask(le.mask); } else {
+				positionMaskRect(le.mask, ax, ay, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'middle', 'top');
+				le.mask.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + ax + ' ' + ay + ')');
+			}
+			if (le.leader) { le.leader.style.display = 'none'; }
+			return;
+		}
+		// Unaligned: exactly as before, and the transforms are CLEARED rather than left behind --
+		// a stale rotate on an element that is no longer aligned is invisible in the code and
+		// obvious on screen.
+		le.text.removeAttribute('transform');
+		le.text.setAttribute('text-anchor', 'start');
+		if (le.mask) { le.mask.removeAttribute('transform'); }
+		var pos = linkLabelPos(l);
 		repositionMultilineText(le.text, pos.x, pos.y);
 		if (le.empty) { hideMask(le.mask); } else { positionMaskRect(le.mask, pos.x, pos.y, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'start', 'top'); }
 		updateDataLeader(le, { x: mid.x, y: mid.y }, pos);
@@ -1094,6 +1155,10 @@ var EngCalcs = EngCalcs || {};
 			// because no single number is meaningful across networks 400 ft and 40 miles wide. The
 			// settings panel captures it from the current view instead of asking anyone to guess.
 			labelMaxWidth: null,
+			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
+			// (ROADMAP Task 329). OFF by default while Tom compares the two in a browser -- this is
+			// a visual judgement, and shipping it on would be making it for him.
+			alignPipeLabels: false,
 			legendPosition: 'top-right', // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
 			// `fileAutosaveSeconds` was removed by Task 211 along with autosave-to-file itself. A saved
 			// document may still carry one; applySaved() merges the save ONTO these defaults, so a
@@ -8285,6 +8350,15 @@ var EngCalcs = EngCalcs || {};
 			else { lwInput.value = settings.linkWidth; }
 		});
 		row(mapBody, pc.lpn_settings_link_width || 'Pipe width (pixels)', lwInput);
+		// Task 329, and it ships OFF: aligned-vs-horizontal is a visual judgement, and turning it on
+		// by default would be making that judgement for the user rather than offering it to them.
+		var alignInput = document.createElement('input');
+		alignInput.type = 'checkbox'; alignInput.checked = !!settings.alignPipeLabels;
+		alignInput.addEventListener('change', function () {
+			settings.alignPipeLabels = alignInput.checked;
+			relayoutLabels(); saveToStorage();
+		});
+		row(mapBody, pc.lpn_settings_align_labels || 'Align pipe labels with pipes', alignInput);
 		// ---- Scale-dependent label visibility ----
 		// THE CONTROL IS A CAPTURE BUTTON, NOT JUST A NUMBER, AND THAT IS THE WHOLE USABILITY OF IT.
 		// The threshold is a width in model length units, and no default is meaningful across

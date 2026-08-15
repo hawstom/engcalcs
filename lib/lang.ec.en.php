@@ -1800,6 +1800,7 @@ $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Symbol size (pixels)';
 $ec_lang['lpn_settings_link_width']='Pipe width (pixels)';
+$ec_lang['lpn_settings_align_labels']='Align pipe labels with pipes';
 $ec_lang['lpn_settings_label_max_width']='Show labels when the map is narrower than';
 $ec_lang['lpn_settings_label_use_view']='Use current view';
 $ec_lang['lpn_settings_label_always']='Always show labels';

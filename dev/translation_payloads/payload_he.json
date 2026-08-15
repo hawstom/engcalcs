@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 923,
-        "delta_key_count": 9,
+        "expected_key_count": 924,
+        "delta_key_count": 10,
         "exempt_key_count": 14,
         "exempt_keys": [
             "calc_units_us",
@@ -332,6 +332,7 @@
         "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
         "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.",
         "lpn_settings_link_width": "Pipe width (pixels)",
+        "lpn_settings_align_labels": "Align pipe labels with pipes",
         "lpn_settings_label_max_width": "Show labels when the map is narrower than",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_settings_label_always": "Always show labels"
@@ -343,6 +344,7 @@
         "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
         "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.",
         "lpn_settings_link_width": "Pipe width (pixels)",
+        "lpn_settings_align_labels": "Align pipe labels with pipes",
         "lpn_settings_label_max_width": "Show labels when the map is narrower than",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_settings_label_always": "Always show labels"
@@ -429,6 +431,22 @@
             }
         },
         "lpn_settings_link_width": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_symbol_size",
+                    "value": "גודל סמל (יחסית לטקסט)",
+                    "english": "Symbol size (pixels)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "אטימות סמל (0 עד 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_align_labels": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
