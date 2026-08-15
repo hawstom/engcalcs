@@ -178,6 +178,7 @@ foreach ($files as $name) {
 
 	$manifest[] = array(
 		'file' => $name,
+		'order' => (int)($descriptions[$name]['order'] ?? 0),
 		'title' => $title,
 		'description' => $desc,
 		'system' => $system,
@@ -191,8 +192,17 @@ foreach ($files as $name) {
 }
 
 /* Biggest last is deliberate: a visitor scanning the wall should meet the small, legible networks
- * first and grow into Net3, rather than opening on the densest thing we ship. */
-usort($manifest, function ($a, $b) { return ($a['nodes'] + $a['links']) - ($b['nodes'] + $b['links']); });
+ * first and grow into Net3, rather than opening on the densest thing we ship.
+ *
+ * `order` in descriptions.json overrides that where size cannot express the intent. The two basics
+ * are the same size, so size alone left their sequence to whatever the file system happened to
+ * return -- and Tom wants SI FIRST on purpose (2026-08-14: "I like that the SI network comes first
+ * since it's our only SI example"). An intent that survives only because a sort happens to be
+ * stable is an intent that will silently flip; the explicit key is what makes it a decision. */
+usort($manifest, function ($a, $b) {
+	if ($a['order'] !== $b['order']) { return $a['order'] - $b['order']; }
+	return ($a['nodes'] + $a['links']) - ($b['nodes'] + $b['links']);
+});
 $written['manifest.json'] = json_encode(
 	array('v' => 1, 'generated' => 'dev/scripts/generate_examples.php', 'examples' => $manifest),
 	JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";

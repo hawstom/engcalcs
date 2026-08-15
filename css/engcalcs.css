@@ -679,30 +679,38 @@ html[lang="zh"] .ec-welcome {
    Tom's "usable middle": the canvas may be VISIBLE behind the gallery, empty, with no project. */
 .lpn-examples {
 	pointer-events: auto;
-	max-width: 60rem;
+	max-width: 68rem;
 	margin: 0 auto;
-	padding: 1.25rem 1rem 2rem;
+	padding: 1rem 1rem 1.5rem;
 	text-align: center;
 }
 .lpn-examples-h { margin: 0 0 .15em; font-size: 1.35em; font-weight: 600; }
-.lpn-examples-sub { margin: 0 0 1.1em; opacity: .75; font-size: .95em; }
+.lpn-examples-sub { margin: 0 0 .5em; opacity: .75; font-size: .95em; }
 .lpn-examples-msg { margin: 3em auto; max-width: 30em; opacity: .7; }
-/* auto-fit rather than a fixed column count, so sub-categories and paging can arrive later
-   without a rewrite (explicitly in Tom's picture, explicitly not needed at four). */
+/* ONE ROW WHEN THERE IS ROOM, wrapping down when there is not (Tom, 2026-08-14: "There is no
+   guarantee that the examples will all fit... Wrapping degrades gracefully. So it might be better
+   to put them all in one row initially").
+
+   auto-fit with a small min is what buys both at once: at full width the six cards share one row,
+   and on a narrower window the column count simply drops. The min is deliberately small enough
+   that the CURRENT count fits across -- if the shelf grows past what one row can hold, this wraps
+   to two rather than shrinking cards to illegibility, which is the right failure. Sub-categories
+   and paging (in Tom's picture, not needed yet) drop straight into this without a rewrite. */
 .lpn-examples-grid {
 	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
-	gap: .85rem;
+	grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+	gap: .7rem;
 }
 .lpn-example-card {
 	display: flex;
 	flex-direction: column;
 	align-items: stretch;
-	gap: .3em;
-	padding: .6rem .6rem .7rem;
+	gap: .25em;
+	padding: .5rem .5rem .6rem;
 	border: 1px solid rgba(128, 128, 128, .45);
 	border-radius: 6px;
-	background: rgba(255, 255, 255, .92);
+	background: rgba(255, 255, 255, .94);
+	color: #222;
 	font: inherit;
 	text-align: left;
 	cursor: pointer;
@@ -711,24 +719,37 @@ html[lang="zh"] .ec-welcome {
 	border-color: #2a6ebb;
 	box-shadow: 0 1px 6px rgba(0, 0, 0, .18);
 }
-/* currentColor in the generated SVG means the thumbnail inks itself from here, so one file is
-   legible in light and dark alike -- see thumbnailSvg() in dev/scripts/generate_examples.php. */
+/* **THE DRAWING SITS ON WHITE PAPER, IN BOTH THEMES** (Tom, 2026-08-14: "The examples all have
+   very dark backgrounds. It would be better for them to have white backgrounds with a nice
+   border"). The thumbnail SVG has no background of its own, so before this it inherited the
+   card's -- which the dark-theme rule below turned near-black, and a water network rendered white
+   on black does not read as a drawing at all. A plan is a thing on paper; giving the thumbnail its
+   own white ground and its own border makes that explicit instead of leaving it at the mercy of
+   whatever is behind it. The ink is set here too, so `currentColor` inside the SVG resolves
+   against the white rather than against the card. */
 .lpn-example-thumb {
 	display: block;
 	width: 100%;
-	height: 7.5rem;
+	height: 6rem;
 	object-fit: contain;
-	margin-bottom: .2em;
+	margin-bottom: .15em;
+	padding: 2px;
+	box-sizing: border-box;
+	background: #fff;
+	border: 1px solid rgba(128, 128, 128, .4);
+	border-radius: 3px;
 	color: #17406b;
 }
-.lpn-example-title { font-weight: 600; }
-.lpn-example-desc { font-size: .85em; opacity: .8; line-height: 1.35; }
-.lpn-example-meta { font-size: .78em; opacity: .6; }
+.lpn-example-title { font-weight: 600; font-size: .92em; }
+.lpn-example-desc { font-size: .8em; opacity: .8; line-height: 1.3; }
+.lpn-example-meta { font-size: .75em; opacity: .6; }
+/* Above the grid, not below it -- see renderExamplesGallery(). */
 .lpn-examples-blank {
-	margin-top: 1.1em;
+	display: inline-block;
+	margin: 0 0 .9em;
 	border: 0;
 	background: none;
-	padding: .4em;
+	padding: .3em;
 	font: inherit;
 	font-size: .9em;
 	color: #17406b;
@@ -736,8 +757,9 @@ html[lang="zh"] .ec-welcome {
 	cursor: pointer;
 }
 @media (prefers-color-scheme: dark) {
-	.lpn-example-card { background: rgba(32, 32, 32, .92); }
-	.lpn-example-thumb, .lpn-examples-blank { color: #8ab4e8; }
+	.lpn-example-card { background: rgba(38, 38, 38, .94); color: #eee; }
+	.lpn-examples-blank { color: #8ab4e8; }
+	/* The thumbnail keeps its white paper and its dark ink -- deliberately NOT themed. */
 }
 /* Printing a network should print the network, never the shop window. */
 @media print { #lpn_empty_hint { display: none !important; } }

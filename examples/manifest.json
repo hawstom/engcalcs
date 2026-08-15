@@ -4,8 +4,9 @@
     "examples": [
         {
             "file": "Basic-example-SI-units-lpn.json",
+            "order": -20,
             "title": "Basic network, SI units",
-            "description": "The same starting network drawn in metres and litres per second. SI units (l/s).",
+            "description": "Start here. A reservoir, a pump and a small loop: the least a working water network can be. Metres, millimetres and litres per second.",
             "system": "si",
             "flow": "lps",
             "nodes": 8,
@@ -14,8 +15,9 @@
         },
         {
             "file": "Basic-example-US-units-lpn.json",
+            "order": -10,
             "title": "Basic network, US units",
-            "description": "A reservoir, a pump and a short branched system. The smallest thing that shows how the drawing works. US units (gpm).",
+            "description": "The same starting network in feet, inches and gallons per minute.",
             "system": "us",
             "flow": "gpm",
             "nodes": 8,
@@ -24,6 +26,7 @@
         },
         {
             "file": "Net1-lpn.json",
+            "order": 0,
             "title": "EPANET Net1",
             "description": "The smallest of EPANET's own three sample networks: one reservoir, a pump and a single loop. US units (gpm).",
             "system": "us",
@@ -34,6 +37,7 @@
         },
         {
             "file": "Elm-Street-Center-lpn.json",
+            "order": 0,
             "title": "Elm Street Center",
             "description": "A commercial site's fire-flow-plus-max-day design snapshot, drawn over a CAD site plan. US units (gpm).",
             "system": "us",
@@ -44,6 +48,7 @@
         },
         {
             "file": "Net2-lpn.json",
+            "order": 0,
             "title": "EPANET Net2",
             "description": "A branched distribution system with a tank, from EPANET's samples. US units (gpm).",
             "system": "us",
@@ -54,6 +59,7 @@
         },
         {
             "file": "Net3-lpn.json",
+            "order": 0,
             "title": "EPANET Net3",
             "description": "EPANET's large sample: 97 junctions, two tanks and a river source. Worth opening to see how a real-sized model reads. US units (gpm).",
             "system": "us",

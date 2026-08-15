@@ -153,6 +153,59 @@ console.log('\n-- wiring: the gallery is reachable, dismissible, and under OPEN 
 	report(/function elh\(tag, attrs, text\)/.test(src), 'HTML controls are built in the HTML namespace');
 }
 
+console.log('\n-- layout: the way out is ABOVE the wall --');
+{
+	const fn = src.slice(src.indexOf('function renderExamplesGallery'));
+	const body = fn.slice(0, fn.indexOf('\n\tfunction ', 10));
+	// Nothing guarantees the cards fit the map's height -- the shelf grows, the map height is a
+	// user setting, and a phone is short -- so whatever comes after the grid is the first thing to
+	// fall off the bottom. The escape hatch must not be that thing.
+	report(body.indexOf('lpn-examples-blank') < body.indexOf("elh('div', { 'class': 'lpn-examples-grid' })"),
+		'the blank-drawing link is appended before the grid');
+}
+
+console.log('\n-- layout: a deliberate order, not an accident of equal size --');
+{
+	report(examples.every(function (e) { return typeof e.order === 'number'; }),
+		'every entry carries an explicit order');
+	const si = examples.filter(function (e) { return e.system === 'si'; });
+	report(si.length > 0, 'the shelf has at least one SI example', `${si.length}`);
+	// Tom, 2026-08-14: "I like that the SI network comes first since it's our only SI example." Two
+	// examples of the same size cannot express that through a size sort, so it is pinned here --
+	// an intent that survives only because a sort happens to be stable will silently flip.
+	report(examples[0].system === 'si', 'and an SI example leads the wall', examples[0].title);
+	let sorted = true;
+	for (let i = 1; i < examples.length; i++) {
+		const a = examples[i - 1], b = examples[i];
+		const ka = [a.order, a.nodes + a.links], kb = [b.order, b.nodes + b.links];
+		if (ka[0] > kb[0] || (ka[0] === kb[0] && ka[1] > kb[1])) { sorted = false; }
+	}
+	report(sorted, 'the wall runs order-then-size, so it grows from small to large');
+	// The two basics are the pair the reader compares, so the longer explanation belongs on the one
+	// they meet first; the second only has to say how it differs.
+	const basics = examples.filter(function (e) { return /^Basic network/.test(e.title); });
+	if (basics.length === 2) {
+		report(basics[0].description.length > basics[1].description.length,
+			'the leading basic carries the fuller description; the other is the also-ran',
+			`${basics[0].description.length} vs ${basics[1].description.length}`);
+	}
+}
+
+console.log('\n-- layout: thumbnails are drawings on white paper, in both themes --');
+{
+	const css = fs.readFileSync(path.join(root, 'css/engcalcs.css'), 'utf8');
+	const thumb = css.slice(css.indexOf('.lpn-example-thumb'), css.indexOf('.lpn-example-title'));
+	report(/background:\s*#fff/.test(thumb), 'the thumbnail sets its own white ground');
+	report(/border:\s*1px solid/.test(thumb), 'and its own border');
+	// The defect this replaced: the SVG has no background of its own, so it inherited the card's,
+	// which the dark-theme rule turned near-black. A water network rendered white on black does not
+	// read as a drawing. So the dark block must not re-theme the thumbnail.
+	const darkBlock = css.slice(css.indexOf('@media (prefers-color-scheme: dark)', css.indexOf('.lpn-examples')));
+	const darkEnd = darkBlock.indexOf('\n}');
+	report(darkBlock.slice(0, darkEnd).indexOf('.lpn-example-thumb') < 0,
+		'and the dark theme leaves it alone rather than inverting it');
+}
+
 console.log('\n-- wiring: the manifest is fetched lazily --');
 {
 	const fn = src.slice(src.indexOf('function updateEmptyHint'));

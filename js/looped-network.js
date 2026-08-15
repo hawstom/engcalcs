@@ -1428,7 +1428,14 @@ var EngCalcs = EngCalcs || {};
 			// `fileAutosaveSeconds` was removed by Task 211 along with autosave-to-file itself. A saved
 			// document may still carry one; applySaved() merges the save ONTO these defaults, so a
 			// stale key is simply carried along and never read, and needs no migration step.
-			mapHeight: 500 // px -- the original fixed <svg height="500"> value; see applyMapHeight()
+			// 800, raised from the original fixed <svg height="500"> (Tom, 2026-08-14: "Since the map
+			// height limiter seems to work, we may as well set it to 800 or more"). The raise is
+			// safe BECAUSE of effectiveMapHeight()'s render-time cap and would not be safe without
+			// it: the cap keeps a strip of ordinary page reachable below the canvas on every screen,
+			// which is the invariant that prevents the touch trap it was written for. A taller
+			// DEFAULT now simply means desktops use the room they have while phones are unchanged.
+			// An existing visitor keeps whatever they had -- this is a default, not a migration.
+			mapHeight: 800 // px, capped at render time to 72% of the viewport; see applyMapHeight()
 		};
 	}
 	var settings = defaultSettings();
@@ -3064,6 +3071,16 @@ var EngCalcs = EngCalcs || {};
 		}
 		pane.appendChild(elh('h2', { 'class': 'lpn-examples-h' }, pc.lpn_examples_heading || ''));
 		pane.appendChild(elh('p', { 'class': 'lpn-examples-sub' }, pc.lpn_examples_sub || ''));
+		// **THE WAY OUT IS ABOVE THE WALL, NOT BELOW IT** (Tom, 2026-08-14: "The link at the bottom
+		// should be at the top"). Nothing here guarantees the cards fit the map's height -- the
+		// count grows, the map height is a user setting, and a phone is short -- so anything placed
+		// after the grid is the first thing to fall off the bottom. A visitor who wants to draw
+		// their own network would then have to scroll a wall of examples to find out they need not
+		// look at it. Put it where it is always seen and the fit question stops mattering for it.
+		var blank = elh('button', { type: 'button', 'class': 'lpn-examples-blank' },
+			pc.lpn_examples_blank || '');
+		blank.addEventListener('click', function () { hideExamplesGallery(); });
+		pane.appendChild(blank);
 		var grid = elh('div', { 'class': 'lpn-examples-grid' });
 		examplesManifest.forEach(function (ex) {
 			// A BUTTON, not a div with a click handler: the whole card is the target, it reaches
@@ -3087,13 +3104,6 @@ var EngCalcs = EngCalcs || {};
 			grid.appendChild(card);
 		});
 		pane.appendChild(grid);
-		// The way OUT of the gallery, and it has to be here rather than only in the File menu: a
-		// visitor who wants to draw their own network should not have to work out that the wall of
-		// pictures is dismissed by a menu they have not opened yet.
-		var blank = elh('button', { type: 'button', 'class': 'lpn-examples-blank' },
-			pc.lpn_examples_blank || '');
-		blank.addEventListener('click', function () { hideExamplesGallery(); });
-		pane.appendChild(blank);
 	}
 	// Dismissed for THIS project only, and not persisted. The gallery's whole job is to appear on
 	// an empty canvas; a visitor who dismissed it once a month ago and now has an empty drawing in
