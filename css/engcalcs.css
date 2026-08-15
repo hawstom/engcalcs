@@ -356,18 +356,23 @@ html[lang="zh"] .ec-welcome {
    `visibility`, not `display`: a leader and an arrow each have their own show/hide logic and this
    must compose with them rather than overwrite them -- something already hidden for its own reasons
    stays hidden, and something visible is merely made invisible. visibility:hidden also drops
-   pointer events, so nothing suppressed here is still clickable. */
-.lpn-labels-hidden .lpn-lbl[data-nodelbl],
-.lpn-labels-hidden .lpn-lbl[data-linklbl],
-.lpn-labels-hidden .lpn-datalbl-part,
-.lpn-labels-hidden .lpn-arrow { visibility: hidden; }
-/* THE EXTREMA MARK IS NO LONGER IN THIS LIST, AND THAT IS A FIX RATHER THAN AN OMISSION (Task 333).
-   `.lpn-tick` used to be here, and it was MISSED in the first cut -- Tom caught it on screen:
-   "Extrema glyphs forgot to hide when zoomed out." The mark is now the number's own
-   text-decoration, so it is part of the text and hides when the text hides, with nothing to
-   remember. That is one member of this category retired at the source rather than added to the
-   list; the rest still have the trap waiting, which is ROADMAP Task 334 (a single .lpn-annotation
-   class declared where the element is built). */
+   pointer events, so nothing suppressed here is still clickable.
+
+   ONE CLASS, DECLARED AT THE BUILD SITE (Task 334, 2026-08-15). This used to be a list of four
+   selectors naming each kind of annotation, and the extrema badge was missed out of it -- Tom
+   caught it on screen the same day: "Extrema glyphs forgot to hide when zoomed out." A list in a
+   stylesheet has to be remembered by whoever adds the next mark, months later, in another file.
+   `annotationEl()` in js/looped-network.js applies this class where the element is created, where
+   the author already knows what they are making. Add nothing here; build through that instead.
+
+   The extrema mark itself is no longer even a member: Task 333 made it the number's own
+   text-decoration, so it hides, moves and dies with the text. Prefer that where it is available. */
+.lpn-labels-hidden .lpn-annotation { visibility: hidden; }
+/* A USER'S OWN TEXT LABEL IS NOT ANNOTATION AND IS NOT IN THAT RULE -- it is authored content, and
+   it hides on its OWN threshold, scaled by its own size (Task 340): a title block drawn at 3x
+   survives to 3x the map width, exactly the way sheet lettering works. Per label, so it cannot be
+   a descendant selector; applyLabelVisibility() adds this class to the ones that are over it. */
+.lpn-lbl-hidden { visibility: hidden; }
 .lpn-link-halo.lpn-override { stroke: #e8a33d; stroke-width: calc(2.857 * var(--lpn-lw, 0.7)); }
 /* A node's own circle carries its halo as a ring: it already draws as a filled disc, so a stroke
    around it IS an outline. Placed BEFORE .lpn-node-pending below, so a node that is both
@@ -408,6 +413,13 @@ html[lang="zh"] .ec-welcome {
    (positionMaskRect() in looped-network.js); pointer-events:none so it never steals the drag/click
    that .lpn-draglbl's text needs. */
 .lpn-lbl-mask { fill: rgba(255, 255, 255, 0.75); pointer-events: none; }
+/* Masking is switchable (Task 330, Tom 2026-08-14: "We want to be able to turn off and on
+   background masking"). One class on the <svg>, written by applyMaskLabels() from the PROJECT's own
+   setting -- masking is a property of how the sheet is meant to be read, not of the browser, so per
+   Task 263 it is saved with the project like units and ID prefixes. `display`, not the fill: a rect
+   painted transparent still has to be laid out and still sits in the layer, and "off" here means
+   the mask is not there at all. */
+.lpn-masks-off .lpn-lbl-mask { display: none; }
 /* Pump curve entry inside the element property popup (Tom, 2026-07-30: "the table needs headings
    for Head and Flow"). Scoped rather than left to the suite's general results-table styling: this
    is a compact input grid inside a floating popup, not a page-width results table, so it must not

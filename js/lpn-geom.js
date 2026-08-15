@@ -145,17 +145,31 @@ EngCalcs.lpnGeom = (function () {
 		return fontSize * 1.1 + Math.max(0, lineCount - 1) * lineHeight;
 	}
 
+	// WHERE A LABEL'S BOX ACTUALLY IS, given the point it is anchored at and what that point
+	// MEANS to the text element -- i.e. its own text-anchor/dominant-baseline. This is the one
+	// place the anchor convention is interpreted, so a mask, a bounding box, a collision box and
+	// a leader attachment can never disagree about where the same label is (ROADMAP Task 332).
+	//
+	// hAlign is the SVG text-anchor vocabulary ('start' | 'middle' | 'end') and vAlign says what
+	// y is: 'middle' (dominant-baseline:central -- vertical centre), 'hanging' (y IS the top of
+	// the text, which is how EPANET anchors a [LABELS] point), or anything else meaning y is the
+	// FIRST LINE'S BASELINE, the node/link data-label convention. The 0.85·fontSize ascent in
+	// that last case is an approximation on purpose -- no cross-browser metrics without layout.
+	//
+	// Returns {x, y, w, h} with x/y at the TOP-LEFT, the same shape lpn-collide uses.
+	function labelBoxAt(x, y, w, h, hAlign, vAlign, fontSize) {
+		var left = hAlign === 'middle' ? x - w / 2 : hAlign === 'end' ? x - w : x;
+		var top = vAlign === 'middle' ? y - h / 2 : vAlign === 'hanging' ? y : y - fontSize * 0.85;
+		return { x: left, y: top, w: w, h: h };
+	}
+
 	// Geometry of the background rect drawn behind a label so it stays legible over a
 	// backdrop image or another element -- sized from the SAME w/h the label's own
 	// geometry uses, so it never drifts out of sync with what it is supposed to cover.
-	// hAlign/vAlign describe what x/y MEAN for the label being masked, matching each
-	// label type's own text-anchor/dominant-baseline: 'start'/'top' for a node or link
-	// label (x = left edge, y = first line's baseline); 'middle'/'middle' for a Text
-	// label (x = centre, y = vertical centre).
+	// Nothing but padding on top of labelBoxAt() above.
 	function maskRect(x, y, w, h, hAlign, vAlign, fontSize, pad) {
-		var left = hAlign === 'middle' ? x - w / 2 : x;
-		var top = vAlign === 'middle' ? y - h / 2 : y - fontSize * 0.85;
-		return { x: left - pad, y: top - pad, width: w + 2 * pad, height: h + 2 * pad };
+		var b = labelBoxAt(x, y, w, h, hAlign, vAlign, fontSize);
+		return { x: b.x - pad, y: b.y - pad, width: w + 2 * pad, height: h + 2 * pad };
 	}
 
 	// The AXIS-ALIGNED BOUNDING BOX of a label that is drawn ROTATED, given where it would be
@@ -295,6 +309,7 @@ EngCalcs.lpnGeom = (function () {
 		leaderAttach: leaderAttach,
 		labelSideAtEnd: labelSideAtEnd,
 		dataLabelBoxHeight: dataLabelBoxHeight,
+		labelBoxAt: labelBoxAt,
 		maskRect: maskRect,
 		alignedLabelAnchor: alignedLabelAnchor,
 		rotatedLabelBox: rotatedLabelBox,

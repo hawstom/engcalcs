@@ -698,6 +698,7 @@
         "lpn_inp_report_heading": "Imported {file}",
         "lpn_inp_report_counts": "{nodes} junctions, reservoirs and tanks, {links} pipes, pumps and valves, in {units}.",
         "lpn_inp_report_clean": "Everything in the file came across. Nothing was left out.",
+        "lpn_inp_report_label_anchor": "Text labels are placed as EPANET places them, from their top left corner.",
         "lpn_inp_report_lead": "This page does not hold everything EPANET does. Here is what changed on the way in:",
         "lpn_inp_drop_headloss": "This file does not use the Hazen-Williams formula. This page computes Hazen-Williams, so the pipe roughness numbers were kept exactly as written, but the answers here will not match the answers in EPANET.",
         "lpn_inp_drop_tank_curve": "These tanks are not straight-sided: the file gives their shape as a curve. They came in as round tanks, each with the diameter written in the file. The water surface is still the one the file sets, so the answers match; only the shape is simplified.",
@@ -940,6 +941,7 @@
         "lpn_settings_symbol_size": "Symbol size (pixels)",
         "lpn_settings_link_width": "Pipe width (pixels)",
         "lpn_settings_align_labels": "Align pipe labels with pipes",
+        "lpn_settings_mask_labels": "Background patch behind labels",
         "lpn_settings_label_max_width": "Show labels when the map is narrower than",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_settings_label_always": "Always show labels",
@@ -959,7 +961,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 957,
+    "count": 959,
     "active_prefixes": [
         "about",
         "bpn",

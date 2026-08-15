@@ -155,6 +155,31 @@ report(near(m2.x, 85 - 0.4) && near(m2.y, 194 - 0.4) && near(m2.width, 30.8) && 
 const m3 = Geom.maskRect(0, 0, 10, 10, 'start', 'top', 0, 1);
 report(near(m3.width, 12) && near(m3.height, 12) && near(m3.x, -1), 'pad applies on both sides');
 
+// ---- labelBoxAt (Task 332) ----------------------------------------------
+console.log('--- labelBoxAt ---');
+// maskRect is now nothing but padding on top of this, and the reason the box moved out into its
+// own function is that FOUR call sites need it: the mask, bbox(), the collision obstacle, and the
+// leader attachment. While every Text label was centred those four could each do the arithmetic
+// themselves and agree by luck; with lb.align in the document they cannot, and a leader reaching
+// for a box that is not where the mask was painted is the failure that would follow.
+const b1 = Geom.labelBoxAt(100, 200, 30, 12, 'middle', 'middle', 10);
+report(near(b1.x, 85) && near(b1.y, 194), 'centred: the point is the box centre', JSON.stringify(b1));
+// EPANET's own convention, and the whole reason this vocabulary grew two new words: the stored
+// point is the TOP-LEFT CORNER, so the box hangs down and to the right of it with no arithmetic.
+const b2 = Geom.labelBoxAt(100, 200, 30, 12, 'start', 'hanging', 10);
+report(near(b2.x, 100) && near(b2.y, 200), 'top-left: the box hangs off the point itself', JSON.stringify(b2));
+// Right-justified, which Task 342 puts in the popup. The box ends at the point.
+const b3 = Geom.labelBoxAt(100, 200, 30, 12, 'end', 'middle', 10);
+report(near(b3.x, 70) && near(b3.y, 194), 'right-justified: the box ends at the point', JSON.stringify(b3));
+// Unchanged for a data label: y is the first line's BASELINE, so the top is an ascent above it.
+const b4 = Geom.labelBoxAt(100, 200, 30, 11, 'start', 'top', 10);
+report(near(b4.x, 100) && near(b4.y, 191.5), 'baseline-relative is untouched', JSON.stringify(b4));
+// The three horizontal modes must actually be three: a left-anchored and a right-anchored label at
+// one point differ by a full width, which is exactly the distance an EPANET title block was wrong
+// by before Task 332 -- and the check is worth stating because 'end' was the newly added branch.
+report(near(b2.x - b3.x, 30) && near(b3.x + b3.w, b2.x),
+	'left and right anchoring differ by a whole width, meeting at the point', (b2.x - b3.x));
+
 
 // ---------------------------------------------------------------------------------------------
 // 7. alignedLabelAnchor — GIS-style labels drawn ALONG the pipe (Task 329)

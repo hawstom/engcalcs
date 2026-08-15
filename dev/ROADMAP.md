@@ -8,26 +8,23 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 **`CHECK: YYYY-MM-DD` marks a task waiting on the calendar rather than on work** (Task 155's Search Console wait; Task 202's `zh` n=30). Tom asked 2026-08-05 whether dated tasks should always be priority 100. **No, and the date must never promote the task.** A `CHECK:` date is a **gate, not a deadline**: before it, the work is impossible (attempting it yields nothing); after it, the task simply becomes doable **at whatever priority it already had**. So Task 155 stays at 10 forever if a Search Console look is worth 10 — an arrived date means "you may now do this", never "do this next". *(CC's first draft of this paragraph said to raise the priority when the date arrives. That was wrong, and it smuggled promotion back in after arguing against it; Tom caught it: "Use the real priority, and don't let the date promote it." That is the rule.)* The one genuine exception is a task whose **value decays** — evidence that expires, a real external deadline. That is a change in worth, so change the priority and say why; it is not the date doing the work.
 
-## NEXT SESSION (agreed 2026-08-15, and Tom works one arrow per `/clear`)
+## NEXT SESSION (updated 2026-08-15, and Tom works one arrow per `/clear`)
 
-**The batch, in this order — do it in ONE session, then stop:**
+**The 2026-08-15 batch has LANDED — Tasks 334, 332, 330 and 340 are closed.** Nothing in it is
+waiting on code. Task 329 remains **[H]**: it is built and ships OFF, and only Tom can judge it on
+screen.
 
-1. **Task 334** first, because 330, 332, 337 and 340 all create or move marks and would each walk
-   into the same trap one at a time.
-2. **Task 332**, storing the anchor as `lb.align` (see that task and Task 342).
-3. **Task 330** (mask toggle) and **Task 340** (a Text label's threshold scaled by its own size).
-4. **Task 329 is [H]** — it is BUILT and ships OFF. Tom turns it on and judges it; no code waits.
-
-**Then the next arrow is a TRANSLATION SPRINT**, covering the whole labels era in one pass. The
-delta as of 2026-08-15 is **48 keys per language** (43 new, 5 whose English changed), all `lpn`, in
-all 26 languages. Pre-sprint order is in CLAUDE.md: Wave 0 adversarial English pass →
+**The next arrow is a TRANSLATION SPRINT**, covering the whole labels era in one pass. The delta as
+of 2026-08-15 is **50 keys per language** (45 new, 5 whose English changed), all `lpn`, in all 26
+languages. Pre-sprint order is in CLAUDE.md: Wave 0 adversarial English pass →
 `friction_check.php` → `gloss_ref_check.php` → regenerate payloads → propose to Tom → launch.
-`$ec_lang_syn` entries are proposed as a diff and approved in that session, not before.
+`$ec_lang_syn` entries are proposed as a diff and approved in that session, not before. Note the
+harness concurrency cap: 26 agents means 20 at once and 6 as slots free.
 
 **Then Task 248 (extended-period simulation)** — the LibreEPANET.org gate, and big enough to want a
 session of its own with nothing else in it.
 
-*Delete this block once the batch has landed; it is a handoff, not a standing plan.*
+*Delete this block once the sprint has landed; it is a handoff, not a standing plan.*
 
 ## LENGTH DISCIPLINE (Tom, 2026-08-05) — read this before writing a task
 
@@ -515,40 +512,6 @@ session of its own with nothing else in it.
   - Still true: if alignment reads well it may argue for fewer values per pipe at a given scale,
     which is Task 326's scale-dependent visibility arriving from an unrelated direction.
 
-- 70|330| **Toggle for label background masking.** Tom, 2026-08-14: *"We want to be able to turn off
-  and on background masking."* The mask geometry exists (`lpnGeom.maskRect`); this is the control and
-  its persistence. **Decide the scope deliberately** — masking is a property of how the sheet is
-  meant to be read, not of the browser, so per Task 263's rule it belongs to the PROJECT, saved with
-  it, like units and ID prefixes. Interacts with Task 329: a label lying along a pipe needs a mask
-  more than a horizontal one beside it does, because it crosses the very line it describes.
-
-- 72|332| **Render imported EPANET labels top-left anchored instead of converting their
-  coordinates.** Found while shipping Task 331, and it is a genuine ill-posedness rather than a
-  slip. EPANET anchors a Text label by its top-left CORNER; we anchor by the centre.
-  `reanchorImportedLabels()` translates between them by measuring the label's width and line height
-  **in world units** — quantities a SCREEN-PIXEL-sized label does not have at any particular zoom.
-  - **The consequence is stored data that depends on view state:** the same `.inp` imported from two
-    different zooms writes two different sets of label coordinates, and the difference is saved.
-  - **Fitting before converting was tried and reverted the same hour.** `zoomExtent()` derives its
-    scale from `bbox()`, which measures the rendered label text — so fit-then-convert is circular. It
-    reduces the dependence while reading as though it had removed it, which is worse than leaving it
-    visible.
-  - **The fix is to stop converting**: store EPANET's point unchanged and render those labels with
-    `text-anchor: start` / `dominant-baseline: hanging`. Exact at every zoom, no arithmetic. The cost
-    is that a Text label gains an anchor mode the drag, mask and leader paths must respect.
-  - **STORE IT AS `lb.align` (left/centre/right), NEVER AS AN "IMPORTED" FLAG** (Tom, 2026-08-15).
-    The distinction is an ALIGNMENT, not a provenance, and Task 342 makes it a user control the
-    moment Text labels can hold two lines — *"text alignment is very interesting to a user"*. A
-    boolean here would have to be migrated there; `lb.align` means 332 ships the storage and the
-    renderer, and 342 only adds the row in the popup.
-  - **No toggle and no explanation in the UI for the import itself.** An anchor mode is not a
-    preference a user can hold an opinion about before they have seen it. The place that already
-    exists for this is the import report, which lists every difference we found in the file: one
-    line there ("Text labels are placed as EPANET places them, from their top-left corner") reaches
-    the person who cares at the moment they care, for one string instead of a setting.
-  - `dev/lpn-spike/inp-import-harness.js` asserts the nondeterminism **inverted, as a known defect**,
-    so whoever fixes this is told by a failing check to flip it.
-
 - 35|347| **No project tabs at all until a project is opened.** Tom's strongest form of the examples
   gallery (*"It's not a map until the first project is started or opened?"*), extracted from Task 314
   when it closed. Left out there on grounds worth restating: `init()` guarantees an invariant in as
@@ -575,24 +538,6 @@ session of its own with nothing else in it.
   safe. Interacts with Task 331's visibility threshold and Task 329's aligned labels, where a
   rotated label has the least room.
 
-- 78|334| **One `.lpn-annotation` class, declared where an element is built, instead of a selector
-  list in the stylesheet.** Task 331 hides generated annotation by naming each kind in CSS, and the
-  extrema badges were missed — Tom caught it on screen the same day: *"Extrema glyphs forgot to hide
-  when zoomed out."* (Fixed by adding `.lpn-tick`; this task removes the class of bug.)
-  - **The badge is part of a data label by every meaning that matters** — it decorates a number
-    inside one, it is built in the same pass, it scales with the same text factor — **and is a
-    separate ELEMENT in its own layer, so nothing in the code connected the two.** Membership in
-    "generated annotation" is a fact about why an element exists, and it should be declared at the
-    point of creation, where the author knows it, rather than remembered in a stylesheet by someone
-    editing an unrelated feature months later.
-  - **The motivating example is GONE as of Task 333, and the way it went is the lesson.** The badge
-    is no longer an element at all — the extrema mark is the number's own `text-decoration`, so it
-    hides, moves, rotates and dies with the text, and `.lpn-tick` has left the selector list. That
-    is one member of this category retired AT THE SOURCE rather than added to a list. Prefer that
-    move where it exists; this task is for the marks that genuinely must be their own element.
-  - Every future mark that annotates a label — a units suffix, a warning glyph, a thematic swatch —
-    walks into the same trap until this is done.
-
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
   2026-08-14, correcting my first reading: *"Not mtext labels. Mtext Text objects."* So the target
   is the thing you place with the Text tool (`lb.text`, one centre-anchored `<text>`), and node/link
@@ -607,11 +552,10 @@ session of its own with nothing else in it.
     we wrap alignment selection in with the paragraph text task."* — and he is right that a two-line
     note makes it visible where a one-line callout hides it). So: `lb.align` gets its row in the
     Text label's property popup here, left/centre/right.
-  - **Task 332 introduces the same property one task earlier, and must introduce it as `lb.align`
-    rather than as an "imported" flag.** That task stops converting EPANET's top-left label point
-    and renders those labels anchored where EPANET anchors them — which is an alignment, not a
-    provenance. Written as a boolean about where a label came from, this task then has to migrate
-    it; written as `lb.align`, 332 ships the storage and the renderer and 342 only adds the control.
+  - **`lb.align` ALREADY EXISTS — Task 332 shipped it 2026-08-15, storage and renderer both**, plus
+    `lb.valign` for the other axis (together they are AutoCAD's MTEXT attachment point, which is why
+    the pair is the right shape). `Geom.labelBoxAt()` is the one place either is interpreted. So all
+    this task owes alignment is the row in the popup; nothing about it has to be migrated.
   - Ship centre as the default either way: it is what every existing label already is, so no drawing
     changes shape on upgrade.
   - **Rung 2, a wrap WIDTH — about a day, and it is what actually makes it MTEXT.** AutoCAD's
@@ -664,18 +608,6 @@ session of its own with nothing else in it.
     is a sentence in the scenario UI or Help — not a mechanism.
   - The line to state: **a scenario is a set of HYDRAULIC differences. The drawing is the network's,
     not the scenario's.**
-
-- 70|340| **A Text label hides at a threshold scaled by ITS OWN size.** Tom, 2026-08-14: *"Text
-  objects should hide at factors depending on their size compared to label size."*
-  - Task 331 exempts user Text labels from `labelMaxWidth` entirely, on the grounds that they are
-    authored content. Right about the principle, too blunt about the rule: **a title block and a
-    small note are both authored, and they do not deserve the same survival.** Sheet lettering works
-    exactly this way — the drawing title is legible from across the room, the callouts are not.
-  - The rule: a Text label's own threshold is `labelMaxWidth × its size ratio to a data label`, so a
-    label drawn at 3× survives to 3× the map width. **It falls out of `lb.sizeMult`, which is already
-    in the document** — no new per-label setting, which is what makes it worth doing at all.
-  - Keeps the useful floor: a Text label at 1× has exactly the data labels' threshold, so nothing
-    authored vanishes while anything generated is still drawn.
 
 - 60|325| **A successful import can render INVISIBLE, and the sizing paradigm is why.** Tom, 2026-08-14,
   after Net3 imported correctly and showed nothing: *"the text size for Net3.inp was so small (0.2)
@@ -1911,6 +1843,31 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|334| **One `.lpn-annotation` class, declared where the element is built — DONE 2026-08-15.**
+  `annotationEl()` in `js/looped-network.js` applies it to every generated mark (data label, its
+  mask and leader, flow arrows); `css/engcalcs.css` is one rule instead of a four-selector list, and
+  a Text label is deliberately not a member. The list is what let the extrema badge ship unhidden in
+  Task 331. Asserted both ways in `dev/lpn-spike/label-visibility-harness.js`.
+
+- 0|332| **Imported EPANET labels are rendered at EPANET's own anchor, not converted — DONE
+  2026-08-15.** `reanchorImportedLabels()` is gone: it moved every label by half its own width and
+  half a line, both measured in world units against text sized in screen pixels, so the same `.inp`
+  imported from two zooms stored two different sets of coordinates. Now the point is stored
+  unchanged and `lb.align`/`lb.valign` (left/top on import) say what it means, interpreted in one
+  place — `Geom.labelBoxAt()`. `inp-import-harness.js`'s inverted xfail is flipped and passing. The
+  import report carries one line about it (`lpn_inp_report_label_anchor`); there is no setting.
+
+- 0|330| **Toggle for label background masking — DONE 2026-08-15.** `settings.maskLabels`, ships ON,
+  saved with the PROJECT (Task 263's rule: masking is a property of the sheet, not the browser).
+  One class on the `<svg>`, `.lpn-masks-off`. Read as `=== false` so a project written before this
+  still masks — a truthiness test would have restyled every drawing in the library on ship day.
+
+- 0|340| **A Text label hides at a threshold scaled by ITS OWN size — DONE 2026-08-15.**
+  `labelMaxWidth x lb.sizeMult` in `applyLabelVisibility()`, so a 3x title block survives to 3x the
+  map width and a 1x note goes exactly when the data labels do. No new per-label setting — it falls
+  out of `lb.sizeMult`, which was already in the document. Replaces Task 331's blanket exemption of
+  authored text, which treated a title block and a small note alike.
 
 - 0|305| **How a visitor opens an EXAMPLE, and the New-vs-Open lie — CLOSED 2026-08-15, absorbed by Task 314.**
 

@@ -493,8 +493,11 @@ var EngCalcs = EngCalcs || {};
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id], an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
 			if (!le || !an) { return; }
-			var halfW = le.width / 2, px = an.x + lb.x, py = an.y + lb.y;
-			Collide.pushLeaderSamples(out, an.x, an.y, Geom.leaderAttachX(px, halfW, an.x), py, null);
+			// Through the label's own box, since lb.align may put it somewhere other than centred
+			// on its point (Task 332) -- the same box updateLabelGeometry() attaches the leader to.
+			var box = textLabelBox(lb, le, an.x + lb.x, an.y + lb.y), halfW = box.w / 2;
+			Collide.pushLeaderSamples(out, an.x, an.y,
+				Geom.leaderAttachX(box.x + halfW, halfW, an.x), box.y + box.h / 2, null);
 		});
 		return out;
 	}
@@ -513,11 +516,13 @@ var EngCalcs = EngCalcs || {};
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id]; if (!le) { return; }
 			var an = lb.anchorNode ? nodeById(lb.anchorNode) : null,
-				cx = an ? an.x + lb.x : lb.x, cy = an ? an.y + lb.y : lb.y,
-				h = effectiveFontSize(lb.sizeMult) * 1.2;
+				// The label's own box at its own anchor (Task 332): a left-anchored label occupies
+				// the space to the RIGHT of its point, and a data label shoved off the centred box
+				// it used to be told about would be shoved out of the way of nothing.
+				box = textLabelBox(lb, le, an ? an.x + lb.x : lb.x, an ? an.y + lb.y : lb.y);
 			out.push({
 				ref: null, owner: null, movable: false, weight: LPN_COLLIDE_WEIGHT.label,
-				base: { x: cx - le.width / 2, y: cy - h / 2 }, yOff: 0, w: le.width, h: h
+				base: { x: box.x, y: box.y }, yOff: 0, w: box.w, h: box.h
 			});
 		});
 		return out;
@@ -1354,6 +1359,11 @@ var EngCalcs = EngCalcs || {};
 			// (ROADMAP Task 329). OFF by default while Tom compares the two in a browser -- this is
 			// a visual judgement, and shipping it on would be making it for him.
 			alignPipeLabels: false,
+			// Draw the pale background patch behind every label (ROADMAP Task 330). ON, which is
+			// what the page has always done and what keeps a label legible over a backdrop image --
+			// the control exists because a clean drawing with no backdrop reads better without the
+			// patches, which is a judgement about the sheet and therefore the user's to make.
+			maskLabels: true,
 			// LAST ENTRY. `mapHeight` used to follow this one and was removed 2026-08-14 -- see
 			// LPN_MAP_MIN for why. Same shape as `fileAutosaveSeconds` below: a saved document may
 			// still carry it, and applySaved() merges onto these defaults, so it rides along unread.
@@ -1421,6 +1431,24 @@ var EngCalcs = EngCalcs || {};
 		var e = document.createElementNS(NS, tag), k;
 		for (k in attrs) { if (attrs.hasOwnProperty(k)) { e.setAttribute(k, attrs[k]); } }
 		if (parent) { parent.appendChild(e); }
+		return e;
+	}
+	// GENERATED ANNOTATION, DECLARED WHERE IT IS BUILT (ROADMAP Task 334). Membership in "things
+	// we generated to be read" is a fact about WHY an element exists, which only the code creating
+	// it knows -- so it is declared here rather than remembered as a selector list in the
+	// stylesheet by someone editing an unrelated feature months later. That list is exactly how
+	// the extrema badge was missed in Task 331 and caught by Tom on screen the same day.
+	//
+	// One class, one rule (`.lpn-labels-hidden .lpn-annotation` in css/engcalcs.css). Every future
+	// mark that annotates a label -- a units suffix, a warning glyph, a thematic swatch -- is
+	// covered by being built through this instead of by an edit somewhere else.
+	//
+	// NOT annotation: the network itself (nodes, pipes, pumps, valves, tanks) and the user's own
+	// Text labels, which are authored content. A Text label's own scale threshold is its size
+	// ratio, handled per label in applyLabelVisibility() (Task 340), not by this class.
+	function annotationEl(tag, attrs, parent) {
+		var e = el(tag, attrs, parent), cls = e.getAttribute('class');
+		e.setAttribute('class', (cls ? cls + ' ' : '') + 'lpn-annotation');
 		return e;
 	}
 	function setTransform() {
@@ -1729,8 +1757,8 @@ var EngCalcs = EngCalcs || {};
 		// layer, same reasoning: this label must never be covered by a LATER node/link's own
 		// symbol. Both mask and leader start effectively invisible (mask sized 0, leader hidden)
 		// until layoutNodeLabel() below positions them for real.
-		var mask = el('rect', { 'class': 'lpn-lbl-mask lpn-datalbl-part' }, maskLayer);
-		var leader = el('line', { 'class': 'lpn-leader lpn-datalbl-part', style: 'display:none' }, labelsLayer);
+		var mask = annotationEl('rect', { 'class': 'lpn-lbl-mask' }, maskLayer);
+		var leader = annotationEl('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
 		// font-size inline, NOT the .lpn-lbl CSS class's 11px: SVG font-size is interpreted in the
 		// local (world-unit) coordinate system, same as any other geometry under this scaled <g> --
 		// an "11-unit" font is enormous next to nodes spaced 10-40 units apart, which is what was
@@ -1741,7 +1769,7 @@ var EngCalcs = EngCalcs || {};
 		// lpn-draglbl (Task 146.01): draggable off its default offset, same pointer-events:all/
 		// cursor:move convention as a Text label -- data-nodelbl (not data-node, already claimed by
 		// the circle above) is this label's own drag/hit-test key.
-		var text = el('text', {
+		var text = annotationEl('text', {
 			'class': 'lpn-lbl lpn-draglbl', 'data-nodelbl': n.id, style: 'font-size:' + effectiveFontSize() + 'px'
 		}, labelsLayer);
 		text.textContent = n.id;
@@ -1788,7 +1816,7 @@ var EngCalcs = EngCalcs || {};
 		// entirely via `transform` in updateArrow() below, never via its own x/y/points.
 		var segCount = l.verts.length + 1, arrows = [], j;
 		for (j = 0; j < segCount; j++) {
-			arrows.push(el('polyline', {
+			arrows.push(annotationEl('polyline', {
 				points: '-0.8,-1.2 0.8,0 -0.8,1.2', fill: 'none',
 				'class': 'lpn-arrow', 'data-link': l.id, style: 'display:none'
 			}, linksLayer));
@@ -1797,9 +1825,9 @@ var EngCalcs = EngCalcs || {};
 		// node's, positioned at the middle segment's midpoint -- content filled in by
 		// refreshLabelText(), not here (this only creates the element; it starts empty). Mask goes
 		// in maskLayer, leader+text in labelsLayer -- see maskLayer's declaration comment.
-		var mask = el('rect', { 'class': 'lpn-lbl-mask lpn-datalbl-part' }, maskLayer);
-		var leader = el('line', { 'class': 'lpn-leader lpn-datalbl-part', style: 'display:none' }, labelsLayer);
-		var text = el('text', {
+		var mask = annotationEl('rect', { 'class': 'lpn-lbl-mask' }, maskLayer);
+		var leader = annotationEl('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
+		var text = annotationEl('text', {
 			'class': 'lpn-lbl lpn-draglbl', 'data-linklbl': l.id, style: 'font-size:' + effectiveFontSize() + 'px'
 		}, labelsLayer);
 		// A pump is a LINK, not a node (see the file header), so it had no symbol at all -- just a
@@ -2008,6 +2036,37 @@ var EngCalcs = EngCalcs || {};
 	// page expresses a head GAIN (Tom, 2026-07-30: "I don't think we need a separate Head Gain.
 	// Negative head loss is fine."). So the type decides, and a pump keeps its sign.
 	function shownHeadloss(l, h) { return (l && l.type === 'pump') || typeof h !== 'number' ? h : Math.abs(h); }
+	// ---- A TEXT LABEL'S ATTACHMENT POINT (ROADMAP Task 332) --------------------------------
+	//
+	// `lb.x`/`lb.y` is a POINT; `lb.align`/`lb.valign` say which corner or edge of the text that
+	// point is. Together they are AutoCAD's MTEXT attachment point, which is why they are stored
+	// this way rather than as a flag: EPANET anchors a [LABELS] point at the text's TOP-LEFT and
+	// we have always anchored at the centre, and that difference is an ALIGNMENT, not a
+	// provenance (Tom, 2026-08-15 -- *"text alignment is very interesting to a user"*). Written
+	// as an "imported" boolean it would have to be migrated the moment Task 342 turns alignment
+	// into a control; written as `lb.align`, that task only adds the row in the popup.
+	//
+	// THE POINT OF STORING IT IS THAT NOTHING IS CONVERTED. reanchorImportedLabels() used to
+	// translate EPANET's corner into our centre by measuring the label in WORLD units -- a
+	// quantity a SCREEN-PIXEL-sized label does not have at any particular zoom -- so the same
+	// file imported from two different views wrote two different sets of coordinates, and the
+	// difference was saved. Rendering at EPANET's own anchor is exact at every zoom and involves
+	// no arithmetic at all.
+	//
+	// Default is centre in both axes, so every label that already exists renders unchanged.
+	function labelHAlign(lb) {
+		var a = lb && lb.align;
+		return a === 'left' ? 'start' : a === 'right' ? 'end' : 'middle';
+	}
+	function labelVAlign(lb) { return (lb && lb.valign === 'top') ? 'hanging' : 'middle'; }
+	function textLabelHeight(lb) { return effectiveFontSize(lb && lb.sizeMult) * 1.2; }
+	// The label's box, wherever its anchor puts it -- the ONE place the two properties above are
+	// turned into geometry, so the mask, the bounding box, the collision box and the leader
+	// attachment can never disagree about where the same label is.
+	function textLabelBox(lb, le, px, py) {
+		return Geom.labelBoxAt(px, py, le.width, textLabelHeight(lb),
+			labelHAlign(lb), labelVAlign(lb), effectiveFontSize(lb && lb.sizeMult));
+	}
 	function buildLabelEls(lb) {
 		var an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: lb.x, y: lb.y },
 			px = lb.anchorNode ? an.x + lb.x : lb.x,
@@ -2021,14 +2080,15 @@ var EngCalcs = EngCalcs || {};
 		// creation order.
 		mask = el('rect', { 'class': 'lpn-lbl-mask' }, maskLayer);
 		text = el('text', {
-			x: px, y: py, 'class': 'lpn-lbl lpn-draglbl', 'text-anchor': 'middle',
-			'dominant-baseline': 'central', 'data-lbl': lb.id, style: 'font-size:' + effectiveFontSize(lb.sizeMult) + 'px'
+			x: px, y: py, 'class': 'lpn-lbl lpn-draglbl', 'text-anchor': labelHAlign(lb),
+			'dominant-baseline': labelVAlign(lb) === 'hanging' ? 'hanging' : 'central',
+			'data-lbl': lb.id, style: 'font-size:' + effectiveFontSize(lb.sizeMult) + 'px'
 		}, labelsLayer);
 		text.textContent = lb.text;
 		var w = 10;
 		try { w = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
 		labelEls[lb.id] = { leader: leader, text: text, side: 'right', width: w, mask: mask };
-		positionMaskRect(mask, px, py, w, effectiveFontSize(lb.sizeMult) * 1.2, 'middle', 'middle');
+		positionMaskRect(mask, px, py, w, textLabelHeight(lb), labelHAlign(lb), labelVAlign(lb));
 		if (lb.anchorNode) { labelsByAnchor[lb.anchorNode].push(lb.id); }
 	}
 
@@ -2047,6 +2107,10 @@ var EngCalcs = EngCalcs || {};
 			updateLabelGeometry(doc.labels[i].id);
 		}
 		refreshLabelText();
+		// Every element here is brand new and therefore carries no visibility class, so the current
+		// threshold has to be re-applied to it (Task 340's per-Text-label half in particular -- the
+		// one class on the <svg> would survive a rebuild, a class on a discarded <text> does not).
+		applyLabelVisibility();
 	}
 	function updateLinkGeometry(id) {
 		var l = linkById(id), le = linkEls[id];
@@ -2065,23 +2129,26 @@ var EngCalcs = EngCalcs || {};
 	// has to reach clear across the text).
 	var ADVERSE_FRAC = 0.75;
 	function updateLabelGeometry(id) {
-		var lb = labelById(id), le = labelEls[id], an, px, py, halfW, att,
-			maskH = effectiveFontSize(lb.sizeMult) * 1.2;
+		var lb = labelById(id), le = labelEls[id], an, px, py, box, halfW, att,
+			maskH = textLabelHeight(lb), hA = labelHAlign(lb), vA = labelVAlign(lb);
 		if (!lb.anchorNode) {
 			le.text.setAttribute('x', lb.x); le.text.setAttribute('y', lb.y);
-			positionMaskRect(le.mask, lb.x, lb.y, le.width, maskH, 'middle', 'middle');
+			positionMaskRect(le.mask, lb.x, lb.y, le.width, maskH, hA, vA);
 			return;
 		}
-		an = nodeById(lb.anchorNode); px = an.x + lb.x; py = an.y + lb.y; halfW = le.width / 2;
-		// A Text label is text-anchor:middle, so px IS its box centre and lb.x IS the centre's
-		// offset from the anchor -- the same two arguments a data label works out from its own
-		// left-anchored box in updateDataLeader().
-		att = Geom.leaderAttach(le.side, px, halfW, an.x, ADVERSE_FRAC);
+		an = nodeById(lb.anchorNode); px = an.x + lb.x; py = an.y + lb.y;
+		// THE LEADER ATTACHES TO THE BOX, NOT TO THE ANCHOR POINT. It used to read px straight as
+		// the box centre, which was true only while every Text label was centred; with lb.align in
+		// the document the two are different numbers, and the leader would otherwise reach for a
+		// place the text is not. Centred labels get identical geometry to before, by construction.
+		box = textLabelBox(lb, le, px, py);
+		halfW = box.w / 2;
+		att = Geom.leaderAttach(le.side, box.x + halfW, halfW, an.x, ADVERSE_FRAC);
 		le.side = att.side;
 		le.leader.setAttribute('x1', an.x); le.leader.setAttribute('y1', an.y);
-		le.leader.setAttribute('x2', att.x); le.leader.setAttribute('y2', py);
+		le.leader.setAttribute('x2', att.x); le.leader.setAttribute('y2', box.y + box.h / 2);
 		le.text.setAttribute('x', px); le.text.setAttribute('y', py);
-		positionMaskRect(le.mask, px, py, le.width, maskH, 'middle', 'middle');
+		positionMaskRect(le.mask, px, py, le.width, maskH, hA, vA);
 	}
 	// Double-click-to-reset for a Text label (Tom, 2026-07-30) -- only meaningful when anchored: an
 	// anchored Text's lb.x/lb.y is an offset from its node, same convention as a node/link label's,
@@ -2186,16 +2253,14 @@ var EngCalcs = EngCalcs || {};
 			var lb = doc.labels[i], le = labelEls[lb.id] || { width: 10 },
 				an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: 0, y: 0 },
 				px = lb.anchorNode ? an.x + lb.x : lb.x, py = lb.anchorNode ? an.y + lb.y : lb.y,
-				halfW = le.width / 2,
-				// Half the label's OWN rendered height, not a constant. buildLabelEls() sets
-				// dominant-baseline:central, so py is the vertical centre and the text reaches
-				// half a font size either side -- times the label's own sizeMult, which is the
-				// part a constant cannot know. This was a hardcoded 2, correct only while the
-				// text size was 2.5; at the shipped default of 20 a title at sizeMult 2 is 40
-				// units tall and bbox() was reserving 4, so zoom-to-fit clipped it. Found
-				// 2026-08-09 adding the example's title block (Task 254).
-				halfH = effectiveFontSize(lb.sizeMult) / 2;
-			inc(px - halfW, py - halfH); inc(px + halfW, py + halfH);
+				// The label's OWN box, at its OWN anchor (Task 332) -- px/py is not necessarily
+				// its centre any more. The height is the label's own rendered height rather than
+				// a constant: this was a hardcoded 2, correct only while the text size was 2.5,
+				// and at the shipped default a title at sizeMult 2 is 40 units tall while bbox()
+				// reserved 4, so zoom-to-fit clipped it. Found 2026-08-09 adding the example's
+				// title block (Task 254).
+				lbox = textLabelBox(lb, le, px, py);
+			inc(lbox.x, lbox.y); inc(lbox.x + lbox.w, lbox.y + lbox.h);
 		}
 		for (i = 0; i < doc.links.length; i++) {
 			for (j = 0; j < doc.links[i].verts.length; j++) {
@@ -3798,6 +3863,7 @@ var EngCalcs = EngCalcs || {};
 		refreshFontSizes();
 		refreshSymbolSizes();
 		renderLabelsLegend();
+		applyMaskLabels();   // the setting belongs to the project, so opening one can change it
 		updateEmptyHint();
 		setStatus('');
 		setMode('select');
@@ -4316,7 +4382,11 @@ var EngCalcs = EngCalcs || {};
 				x: an ? lb.x - an.x : lb.x,
 				y: an ? lb.y - an.y : lb.y,
 				anchorNode: an ? lb.anchorNode : null,
-				sizeMult: 1
+				sizeMult: 1,
+				// EPANET's point is its label's TOP-LEFT CORNER, so that is what these two say and
+				// the coordinate above is stored exactly as the file wrote it (Task 332). Not an
+				// "imported" flag: it is an alignment, and Task 342 makes it a user control.
+				align: 'left', valign: 'top'
 			};
 		});
 		// nextId must clear every id the file brought, or the next element drawn would collide with
@@ -4426,6 +4496,18 @@ var EngCalcs = EngCalcs || {};
 				.replace('{links}', parsed.links.length)
 				.replace('{units}', parsed.flowUnits);
 			body.appendChild(sum);
+			// The one place an anchor mode is worth mentioning, and only to someone whose file
+			// actually had labels in it (Task 332). It is deliberately NOT a setting: an anchor mode
+			// is not a preference anybody can hold an opinion about before they have seen it, and
+			// this report already exists to say what is different about the file you just opened --
+			// so it reaches the person who cares at the moment they care, for one string.
+			if (parsed.labels && parsed.labels.length) {
+				var anchorNote = document.createElement('p');
+				anchorNote.style.margin = '0 0 8px';
+				anchorNote.textContent = pc.lpn_inp_report_label_anchor
+					|| 'Text labels are placed as EPANET places them, from their top left corner.';
+				body.appendChild(anchorNote);
+			}
 			if (!byText.length) {
 				var ok = document.createElement('p');
 				ok.style.margin = '0';
@@ -4450,7 +4532,7 @@ var EngCalcs = EngCalcs || {};
 		}, [{ label: pc.lpn_dialog_ok || 'OK', fn: function () { } }]);
 	}
 
-	// ---- EPANET anchors a map label at its UPPER-LEFT CORNER; this page anchors at the CENTRE ----
+	// ---- EPANET anchors a map label at its UPPER-LEFT CORNER; we STORE that and render it ----
 	//
 	// Not a detail, and not a guess. EPANET 2.2's own [LABELS] documentation says "the coordinates
 	// refer to the upper left corner of the label", and Tom's own files show it: the two lines of
@@ -4458,55 +4540,19 @@ var EngCalcs = EngCalcs || {};
 	// map units. Centre-anchored, two strings six characters apart would sit ~85 units apart at that
 	// drawing's scale. Left-anchored, they share an edge -- which is what a title block IS.
 	//
-	// So an imported label has to move by half its own width, and that means it can only be done
-	// once the label has been RENDERED and measured (buildLabelEls() reads getBBox().width). Hence
-	// this runs after importProject() rather than inside docFromInp().
+	// THIS USED TO BE A CONVERSION, AND THE CONVERSION WAS ILL-POSED (ROADMAP Task 332, closed
+	// 2026-08-15). reanchorImportedLabels() moved every imported label by half its own width and half
+	// a line height, both measured in WORLD units -- quantities a SCREEN-PIXEL-sized label does not
+	// have at any particular zoom. So the same file imported from two different views wrote two
+	// different sets of label coordinates, and the difference was saved. Fitting the view first was
+	// tried and reverted the same hour: zoomExtent() derives its scale from bbox(), which measures the
+	// rendered label text, so fit-then-convert is circular -- it reduces the dependence while reading
+	// as though it had removed it.
 	//
-	// The Y term goes the other way from what the word "upper" suggests: `doc` in memory is Y-DOWN
-	// (SVG's frame), so the top of the text is at a SMALLER y and the centre is half a line further
-	// on. Getting the sign wrong here moves every label one line up instead of down -- visible, but
-	// only if you have the original open beside it.
-	function reanchorImportedLabels() {
-		// THIS CONVERSION IS ILL-POSED UNDER PIXEL TEXT, AND SAYING SO IS MORE USE THAN A FIX THAT
-		// ISN'T ONE (Task 331/332, 2026-08-14). Both terms below measure text in WORLD units while
-		// the text is sized in SCREEN PIXELS, so both depend on the zoom in force when the import
-		// runs -- which is whatever the PREVIOUSLY OPEN PROJECT was left at. The same file imported
-		// from two different views therefore stores two different sets of label coordinates.
-		//
-		// A latent defect promoted, not a new one: it was already true for anyone who chose 'screen'
-		// text units, and the old comment here even noted that effectiveFontSize() divides by the
-		// zoom. Making pixels the only mode moved it onto the default path, which is the ordinary way
-		// a paradigm change surfaces what was always there.
-		//
-		// AND FITTING FIRST DOES NOT FIX IT -- that was tried and reverted the same hour. zoomExtent()
-		// derives its scale from bbox(), which measures the RENDERED LABEL TEXT, whose width depends
-		// on the scale you arrived with. Fit-then-convert is circular, so it reduces the dependence
-		// without removing it, while reading as though the problem were solved. dev/lpn-spike/
-		// inp-import-harness.js asserts the nondeterminism explicitly as a known defect, so whoever
-		// closes Task 332 is told to flip it.
-		//
-		// THE REAL FIX IS TO STOP CONVERTING. EPANET anchors a label by its top-left CORNER; we
-		// anchor by the centre, and translating between them needs a text height in map units, which
-		// a pixel-sized label does not have at any particular zoom. Render imported labels top-left
-		// anchored and store EPANET's point unchanged -- exact at every zoom, no arithmetic at all.
-		// ROADMAP Task 332.
-		doc.labels.forEach(function (lb) {
-			var le = labelEls[lb.id];
-			if (!le) { return; }
-			lb.x += le.width / 2;
-			// The same visual box height positionMaskRect() is given, so the label's mask and its
-			// centring agree about how tall a line is. effectiveFontSize() is always a WORLD size --
-			// it divides by the zoom in 'screen' mode -- so this is the right frame for lb.y.
-			lb.y += effectiveFontSize(lb.sizeMult) * 1.2 / 2;
-			updateLabelGeometry(lb.id);
-		});
-		if (!doc.labels.length) { return; }
-		// The nudge is part of the document, so it has to reach storage before the baseline below
-		// calls this project saved -- otherwise a reload would quietly restore the un-nudged labels
-		// from a project the tab strip swears is clean.
-		saveToStorage();
-		zoomExtent();
-	}
+	// The fix was to stop converting. EPANET's point is stored unchanged and the label is RENDERED
+	// where EPANET anchors it, via lb.align/lb.valign (see labelHAlign() above): exact at every zoom,
+	// no arithmetic, and nothing to run after the labels have been measured -- which is why the
+	// import path lost a step rather than gaining one.
 
 	// BOTH of EPANET's file formats, decided by the CONTENT rather than the extension.
 	//
@@ -4553,8 +4599,9 @@ var EngCalcs = EngCalcs || {};
 			var name = String(file.name).replace(/\.inp$/i, '') || String(file.name);
 			var id = importProject(docFromInp(parsed, name));
 			if (!id) { return; }   // importProject already reported the storage failure
-			// AFTER the document is on screen, because this needs the labels MEASURED.
-			reanchorImportedLabels();
+			// NO RE-ANCHORING STEP HERE ANY MORE (Task 332): the labels are stored at EPANET's own
+			// point and rendered from its own corner, so there is nothing to measure and nothing to
+			// run after the document is on screen.
 			// Arrives SAVED, for the same reason an uploaded project does: a file the user just
 			// handed us off their own disk is not unsaved work. It earns its asterisk on the first
 			// edit, and it can only ever go out as one of our own files, via Save as.
@@ -7208,6 +7255,7 @@ var EngCalcs = EngCalcs || {};
 		// refreshSymbolSizes() -- so a saved non-default symbol size needs this call to take effect.
 		refreshSymbolSizes();
 		applyLabelVisibility();
+		applyMaskLabels();
 		updateEmptyHint();
 		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
 		renderTabs();
@@ -8707,18 +8755,47 @@ var EngCalcs = EngCalcs || {};
 	// link data label is the same kind of thing, so suppressing either costs the user nothing they
 	// authored. A user Text label is the opposite: they typed the words and chose the spot, and
 	// making their annotation disappear under a threshold that never mentions Text labels would read
-	// as a bug. Hence .lpn-datalbl-part on the mask and leader built beside each data label -- the
-	// three pieces of one assembly hide together, the arrow hides with them, and the network itself
-	// never does. The full rule is in css/engcalcs.css beside the selector.
+	// as a bug. Each label's mask and leader are built through annotationEl() beside it (Task 334),
+	// so the three pieces of one assembly hide together, the arrow hides with them, and the network
+	// itself never does. The full rule is in css/engcalcs.css beside the selector.
 	//
 	// visibility rather than display, so this composes with the leader's own show/hide logic instead
 	// of fighting it -- a leader that is display:none for its own reasons stays gone, and one that is
 	// visible is merely made invisible. One class on the <svg>, so a zoom step costs nothing per
 	// element however large the network is.
+	//
+	// A TEXT LABEL GETS ITS OWN THRESHOLD, SCALED BY ITS OWN SIZE (ROADMAP Task 340). Task 331
+	// exempted user Text labels entirely -- right about the principle, too blunt about the rule, as
+	// Tom put it: *"Text objects should hide at factors depending on their size compared to label
+	// size."* A title block and a small note are both authored and do not deserve the same survival,
+	// and sheet lettering already works this way -- the drawing title is legible from across the
+	// room, the callouts are not. So the threshold is `labelMaxWidth x lb.sizeMult`: a label drawn
+	// at 3x survives to 3x the map width, and one at 1x has exactly the data labels' threshold, so
+	// nothing authored vanishes while anything generated is still drawn. It falls out of a property
+	// already in the document -- no new per-label setting, which is what makes it worth doing.
+	//
+	// Per label, so it cannot ride the one class on the <svg>: doc.labels is the user's own Text
+	// labels only (typically a handful), never the per-element data labels, so the loop is cheap.
 	function applyLabelVisibility() {
 		var lim = settings.labelMaxWidth,
-			hide = typeof lim === 'number' && lim > 0 && visibleMapWidth() > lim;
-		if (svg) { svg.classList.toggle('lpn-labels-hidden', hide); }
+			on = typeof lim === 'number' && lim > 0,
+			vw = visibleMapWidth();
+		if (svg) { svg.classList.toggle('lpn-labels-hidden', on && vw > lim); }
+		doc.labels.forEach(function (lb) {
+			var le = labelEls[lb.id];
+			if (!le) { return; }
+			var mult = +lb.sizeMult > 0 ? +lb.sizeMult : 1,
+				gone = on && vw > lim * mult;
+			[le.text, le.mask, le.leader].forEach(function (e) {
+				if (e && e.classList) { e.classList.toggle('lpn-lbl-hidden', gone); }
+			});
+		});
+	}
+	// Task 330. A saved setting that is merely absent (any project written before this) reads as
+	// undefined and must mask -- `=== false` rather than a truthiness test, so an old document is
+	// not silently restyled by an upgrade.
+	function applyMaskLabels() {
+		if (svg) { svg.classList.toggle('lpn-masks-off', settings.maskLabels === false); }
 	}
 	function onZoomChanged() {
 		refreshFontSizes();
@@ -9080,6 +9157,15 @@ var EngCalcs = EngCalcs || {};
 			relayoutLabels(); saveToStorage();
 		});
 		row(mapBody, pc.lpn_settings_align_labels || 'Align pipe labels with pipes', alignInput);
+		// Task 330, and it ships ON because that is what the page has always drawn -- a label over a
+		// backdrop image is unreadable without it, and an upgrade must not restyle anyone's drawing.
+		var maskInput = document.createElement('input');
+		maskInput.type = 'checkbox'; maskInput.checked = settings.maskLabels !== false;
+		maskInput.addEventListener('change', function () {
+			settings.maskLabels = maskInput.checked;
+			applyMaskLabels(); saveToStorage();
+		});
+		row(mapBody, pc.lpn_settings_mask_labels || 'Background patch behind labels', maskInput);
 		// ---- Scale-dependent label visibility ----
 		// THE CONTROL IS A CAPTURE BUTTON, NOT JUST A NUMBER, AND THAT IS THE WHOLE USABILITY OF IT.
 		// The threshold is a width in model length units, and no default is meaningful across
@@ -10285,6 +10371,7 @@ var EngCalcs = EngCalcs || {};
 			le.text.style.fontSize = effectiveFontSize(lb.sizeMult) + 'px';
 			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
 			updateLabelGeometry(labelId);
+			applyLabelVisibility();   // the size IS this label's own hide threshold (Task 340)
 			saveToStorage();
 		});
 		sizeLabel.textContent = (pc.lpn_field_text_size || 'Size ×') + ' ';
