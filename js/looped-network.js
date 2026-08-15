@@ -156,7 +156,7 @@ var EngCalcs = EngCalcs || {};
 	// The label moves along the pipe rather than off it, keeping it on the thing it labels, and is
 	// clamped well inside the ends so it never crowds a node.
 	function linkLabelMid(l) {
-		var clear = (ARROW_NOMINAL_LEN * symbolFactor()) * 1.5;
+		var clear = (ARROW_NOMINAL_LEN * arrowFactor()) * 1.5;
 		return Geom.dodgeAlongPolyline(linkPointList(l), LINK_LABEL_ALONG,
 			arrowAlongDistances(l), clear, 0.12, 0.88);
 	}
@@ -1767,13 +1767,21 @@ var EngCalcs = EngCalcs || {};
 	// Nominal chevron length along the pipe: the polyline spans -0.8..0.8 in its own coordinates
 	// before symbolFactor() scales it.
 	var ARROW_NOMINAL_LEN = 1.6;
+	// The arrow is drawn at 75% of every other symbol (Tom, 2026-08-14: "make the flow arrow about
+	// 75% as large as it is relative to the other symbols"). It is a direction mark on a pipe, not
+	// an element of the network like a node or a pump, so it should read as the smallest thing on
+	// the drawing. Everything that measures the arrow goes through arrowFactor() -- the fit test
+	// ("is this run long enough to hold one"), the label's dodge clearance, and the drawing itself
+	// -- or a 75% arrow would still reserve 100% of the space.
+	var ARROW_SIZE_MULT = 0.75;
+	function arrowFactor() { return symbolFactor() * ARROW_SIZE_MULT; }
 	// Along-the-whole-pipe distance of every arrow that is actually DRAWN on this link -- the same
 	// two rules updateArrow() applies (skip a segment too short to hold an arrow; measure
 	// ARROW_ALONG from the upstream end), expressed as one distance per arrow so linkLabelMid() can
 	// keep the label clear of them. Returns [] before the first solve, when no arrow is shown.
 	function arrowAlongDistances(l) {
 		var mids = segmentMidpoints(l), flow = lastSolveResult ? lastSolveResult.flows[l.id] : undefined,
-			k = symbolFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, out = [], run = 0, i, t;
+			k = arrowFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, out = [], run = 0, i, t;
 		if (flow === undefined) { return out; }
 		for (i = 0; i < mids.length; i++) {
 			// Measured within the CLEAR RUN, then shifted back into whole-centerline distance by
@@ -1797,7 +1805,7 @@ var EngCalcs = EngCalcs || {};
 	function updateArrow(id) {
 		var le = linkEls[id]; if (!le || !le.arrows) { return; }
 		var mids = segmentMidpoints(linkById(id)), flow = lastSolveResult ? lastSolveResult.flows[id] : undefined,
-			k = symbolFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, i;
+			k = arrowFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, i;
 		for (i = 0; i < le.arrows.length; i++) {
 			if (!mids[i] || flow === undefined) { le.arrows[i].style.display = 'none'; continue; }
 			// A segment with no room for the arrow shows none (Tom, 2026-07-30: "toggle off flow
@@ -1823,6 +1831,24 @@ var EngCalcs = EngCalcs || {};
 			le.arrows[i].style.display = '';
 		}
 	}
+	// THE SIGN OF Q IS A FACT ABOUT THE DRAWING ORDER, NOT ABOUT THE WATER (Tom, 2026-08-14: "pipe
+	// flows are still displaying as negative... Q being negative is a simple oversight"). The solver
+	// signs every flow against the link's own from->to direction, which is whichever end the user
+	// happened to click first -- so "-38.75 gpm" tells a reader nothing except that they drew this
+	// pipe backwards. Direction is already carried by the arrow, which is drawn FROM the same sign
+	// (updateArrow above), so a magnitude on the readout loses nothing.
+	// The solve itself keeps the sign: it is the model's truth, EPANET reports it the same way, and
+	// validate_epanet.js compares the two. This is a display rule and lives only here.
+	// The precedent is already in js/lpn-solver.js, on velocity: |Q|/A, "direction is already
+	// carried twice over", and a signed value "quietly breaking any highest-velocity comparison,
+	// since a fast reverse flow sorted to the BOTTOM of the range". Every word of that applies to
+	// flow, which is why the extrema badges read these functions too.
+	function shownFlow(q) { return typeof q === 'number' ? Math.abs(q) : q; }
+	// Head loss is a LOSS, so it is a magnitude on a pipe or a valve for the same reason -- except
+	// on a PUMP, where the negative sign is not an accident of drawing order but the entire way this
+	// page expresses a head GAIN (Tom, 2026-07-30: "I don't think we need a separate Head Gain.
+	// Negative head loss is fine."). So the type decides, and a pump keeps its sign.
+	function shownHeadloss(l, h) { return (l && l.type === 'pump') || typeof h !== 'number' ? h : Math.abs(h); }
 	function buildLabelEls(lb) {
 		var an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: lb.x, y: lb.y },
 			px = lb.anchorNode ? an.x + lb.x : lb.x,
@@ -9277,7 +9303,7 @@ var EngCalcs = EngCalcs || {};
 		closedField(fields, l, linkId);
 		activeField(fields, l);
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
-			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', 'lpn_u_flow', lastSolveResult.flows[linkId]);
+			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', 'lpn_u_flow', shownFlow(lastSolveResult.flows[linkId]));
 			// A pump has no diameter (Tom, 2026-07-30: "how can a pump have a velocity if it has no
 			// diameter?") -- js/lpn-solver.js can only compute velocity = Q/area from a real
 			// diameter, so a pump's stored velocity is always the fallback 0, which reads as "no
@@ -9287,12 +9313,12 @@ var EngCalcs = EngCalcs || {};
 			}
 			// Head loss, for a pump too: lpn-solver.js reports a pump's contribution as a NEGATIVE
 			// head loss, which is the whole of how a head gain is expressed on this page.
-			readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', 'lpn_u_elevhead', lastSolveResult.headlosses[linkId]);
+			readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', 'lpn_u_elevhead', shownHeadloss(l, lastSolveResult.headlosses[linkId]));
 			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
 			// length to spread its head over. linkLengthSI(), not the declared length: see Task 255.
 			if (l.type !== 'pump' && linkLengthSI(l)) {
 				readonlyUnitField(fields, pc.lpn_result_gradient || 'Head loss gradient', 'lpn_u_gradient',
-					lastSolveResult.headlosses[linkId] / linkLengthSI(l), pc.lpn_result_gradient_tip);
+					shownHeadloss(l, lastSolveResult.headlosses[linkId]) / linkLengthSI(l), pc.lpn_result_gradient_tip);
 			}
 		}
 		tipsIn(fields);
@@ -9858,14 +9884,14 @@ var EngCalcs = EngCalcs || {};
 			// Both dimensionless, so they use rawLine()/plainRound() like Length, not displayRound().
 			roughness: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'roughness'), ld.roughness) : undefined; })),
 			km: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'k') || 0, ld.km) : undefined; })),
-			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(lastSolveResult.flows[l.id], 'lpn_u_flow', ld.flow) : undefined; })),
+			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow', ld.flow) : undefined; })),
 			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity', ld.velocity) : undefined; })),
 			// One head-loss bucket for every link type, pumps included: a pump reports a negative
 			// head loss (Tom, 2026-07-30), so it lands at the min end of this same range rather
 			// than needing a field of its own.
 			headloss: fieldExtrema(doc.links.map(function (l) {
 				if (!lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
-				return displayRound(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', ld.headloss);
+				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]), 'lpn_u_elevhead', ld.headloss);
 			})),
 			// Head loss GRADIENT (ROADMAP Task 177, Tom agreed 2026-07-30): headloss/length as a
 			// dimensionless ratio, reusing the same grade/gradePercent OPTIONS as mpf_/mphl_'s own
@@ -9884,7 +9910,7 @@ var EngCalcs = EngCalcs || {};
 			gradient: fieldExtrema(doc.links.map(function (l) {
 				var len = linkLengthSI(l);
 				if (l.type === 'pump' || !len || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
-				return displayRound(lastSolveResult.headlosses[l.id] / len, 'lpn_u_gradient', ld.gradient);
+				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / len, 'lpn_u_gradient', ld.gradient);
 			}))
 		};
 		var fc = lpnFieldColors, nodeLines = {}, linkLines = {};
@@ -9943,14 +9969,14 @@ var EngCalcs = EngCalcs || {};
 				if (ls.link.diameter) { lines.push(rawLine(effective(l, 'diameter'), extrema.diameter, fc.diameter, ld.diameter)); }
 			}
 			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
-				if (ls.link.flow) { lines.push(numLine(lastSolveResult.flows[l.id], 'lpn_u_flow', extrema.flow, fc.flow, ld.flow)); }
+				if (ls.link.flow) { lines.push(numLine(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow', extrema.flow, fc.flow, ld.flow)); }
 				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
 				if (ls.link.velocity && l.type !== 'pump') { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity, ld.velocity)); }
-				if (ls.link.headloss) { lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss, ld.headloss)); }
+				if (ls.link.headloss) { lines.push(numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), 'lpn_u_elevhead', extrema.headloss, fc.headloss, ld.headloss)); }
 				// The '%' is read from the SELECT, not assumed: this family offers rise/run too, and
 				// a "%" on a ratio would be a lie rather than a redundancy. Blank in that form --
 				// there is no token for a bare ratio that is shorter than the ambiguity it fixes.
-				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(numLine(lastSolveResult.headlosses[l.id] / linkLengthSI(l), 'lpn_u_gradient', extrema.gradient, fc.gradient, ld.gradient, gradientSuffix())); }
+				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), 'lpn_u_gradient', extrema.gradient, fc.gradient, ld.gradient, gradientSuffix())); }
 			}
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
