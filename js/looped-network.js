@@ -8522,24 +8522,66 @@ var EngCalcs = EngCalcs || {};
 		'bottom-left': { top: '', bottom: '4px', left: '4px', right: '', transform: '' },
 		'bottom-right': { top: '', bottom: '4px', left: '', right: '4px', transform: '' }
 	};
-	// Map height (settings panel): the page is scrollable, so a user working on a large monitor
-	// can size the map view up toward the full screen instead of the original fixed 500px.
-	// The map is never allowed to fill the screen (Tom, 2026-07-31, on a phone: "a phone can get
-	// stuck on the canvas when it fills the screen... I recovered safely by reloading the page").
-	// #lpn_canvas carries `touch-action: none` so the app can own pan/zoom gestures -- which means
-	// every touch that lands on the canvas is swallowed and CANNOT scroll the page. With a canvas
-	// taller than the viewport there is then no reachable page left to touch, and the only way out
-	// is a reload. Capping the rendered height guarantees a strip of ordinary page is always within
-	// reach, which is the invariant that actually prevents the trap; a scroll affordance or a
-	// two-finger-pan rule would each be a bigger change to reach the same place.
-	// settings.mapHeight keeps the user's UNCLAMPED number -- this is a render-time cap, so a 900px
-	// map set on a desktop is not permanently rewritten by one visit on a phone.
+	// Map height (settings panel): a user on a large monitor can size the map up from the original
+	// fixed 500px, and since 2026-08-14 the default is 800.
+	//
+	// **THE RULE IS "THE PAGE MUST NOT NEED SCROLLING", NOT "72% OF THE VIEWPORT".** The old cap was
+	// a flat 0.72 x innerHeight, defended here as the invariant that prevents a real trap Tom hit on
+	// a phone (2026-07-31: "a phone can get stuck on the canvas when it fills the screen... I
+	// recovered safely by reloading the page"). The trap is real and the mechanism is exactly as
+	// described: #lpn_canvas carries `touch-action: none` so the app can own pan/zoom, which means
+	// every touch landing on the canvas is swallowed and CANNOT scroll the page. With a canvas
+	// taller than the viewport and CONTENT BELOW IT, there is no reachable page left to touch.
+	//
+	// But 0.72 was never the invariant -- it was a hedge sized for a page that then carried a
+	// feedback line, six Notes and a ten-link site footer. Tom, 2026-08-14: *"I don't understand.
+	// There is nothing below the epanetjs map. There's no need to scroll if the page is not
+	// scrollable."* He is right, and the correction matters: the trap is being unable to REACH
+	// content that exists, so the honest fix is to leave nothing out of reach rather than to
+	// reserve a strip of viewport in case something is. Task 314 moved the Notes into Help and
+	// dropped the site-nav row, so what remains below the canvas is one line of legal links.
+	//
+	// So the cap is now MEASURED: fill the window exactly, minus whatever is genuinely above and
+	// below the canvas in normal flow. The page then fits and never needs to scroll, which is the
+	// same place epanetjs is standing. Two properties worth keeping in mind if this is edited:
+	//
+	//   * It self-corrects. If a future change puts something tall back under the map, `below`
+	//     grows and the canvas shrinks to keep it reachable -- no constant to remember to revisit.
+	//   * It is a FLOOR, not just a cap. LPN_MAP_MIN keeps a usable canvas on a short screen even
+	//     if that reintroduces a little scrolling, because a 60px map is not a working map.
+	//
+	// settings.mapHeight keeps the user's UNCLAMPED number -- this is a render-time cap, so an
+	// 800px map set on a desktop is not permanently rewritten by one visit on a phone.
+	var LPN_MAP_MIN = 240;
+	// How much ordinary page sits BELOW the canvas, in document flow. The popovers do not count:
+	// every one of them is position:fixed and display:none, so they occupy no flow at all -- which
+	// is why this measures the document rather than listing elements by id, a list that would go
+	// stale the first time somebody added one.
+	function flowBelowMap() {
+		if (!svg) { return 0; }
+		var docEl = document.documentElement;
+		var rect = svg.getBoundingClientRect();
+		var topInDoc = rect.top + (window.pageYOffset || docEl.scrollTop || 0);
+		var below = docEl.scrollHeight - (topInDoc + rect.height);
+		return below > 0 ? below : 0;
+	}
 	function effectiveMapHeight() {
-		var room = Math.max(240, Math.round((window.innerHeight || 800) * 0.72));
-		return Math.min(settings.mapHeight, room);
+		var vh = window.innerHeight || 800;
+		if (!svg) { return Math.min(settings.mapHeight, vh); }
+		var docEl = document.documentElement;
+		var rect = svg.getBoundingClientRect();
+		var above = rect.top + (window.pageYOffset || docEl.scrollTop || 0);
+		// 8px of slack so a sub-pixel layout rounding cannot leave the page one stubborn pixel
+		// scrollable -- which on a touch screen is a scrollbar with nothing to reach.
+		var room = Math.round(vh - above - flowBelowMap() - 8);
+		return Math.max(LPN_MAP_MIN, Math.min(settings.mapHeight, room));
 	}
 	function applyMapHeight() {
-		if (svg) { svg.setAttribute('height', effectiveMapHeight()); }
+		if (!svg) { return; }
+		// Measure with the CURRENT height already applied, then apply the answer. flowBelowMap()
+		// reads scrollHeight, which includes the canvas itself, so the two cancel -- but only if
+		// nothing else moved in between, which is why this is one statement and not a loop.
+		svg.setAttribute('height', effectiveMapHeight());
 	}
 	function applyLegendPosition() {
 		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }

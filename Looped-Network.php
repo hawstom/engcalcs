@@ -765,5 +765,5 @@ EngCalcs.pageConfig = {
 <?php echoCookieScript(); ?>
 </script>
 <?php
-echoFooter("EngCalcs");
+echoFooter("EngCalcs", false); // no site-nav row: this page needs the vertical room (Task 314)
 // Omit last closing tag is good practice

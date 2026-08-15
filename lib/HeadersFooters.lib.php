@@ -128,14 +128,36 @@ EngCalcs.iconOpenTag = <?=json_encode(EC_ICON_OPEN_TAG)?>;</script>
 //                                         Normal Footer                                                        //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /****************************************************************************************************************/
-function echoFooter($type) {
+// $nav = false drops the site-wide navigation row and its rule, and NOTHING else. Added 2026-08-14
+// for Looped-Network.php (Tom: "lpn is very greedy for real estate. I think it's okay to remove all
+// the footers. They are available at the HawsEDC Calculators home").
+//
+// **WHAT "ALL THE FOOTERS" CAN AND CANNOT MEAN, because the difference is legal rather than
+// aesthetic.** Four things live down here, and only the first is navigation:
+//
+//   1. the ten-link parent-site row -- genuinely redundant, genuinely available on the calculators
+//      home, and the whole of the real estate Tom is objecting to;
+//   2. the privacy / terms / cookie-settings links;
+//   3. the consent banner itself;
+//   4. the service worker registration.
+//
+// ROADMAP Task 286 put 2 and 3 in every footer on every page for a stated reason -- "a privacy
+// notice nobody can find is not notice", and "Cookie settings" must have something to reopen
+// "wherever the visitor happens to be standing". Those are not available at the calculators home in
+// any sense that matters: a visitor who arrived at this page from a search has never seen that
+// page. So this parameter reclaims the row and leaves the notice, which is what the request was
+// actually about. It costs one line of links -- and after Task 314 moved the Notes into Help, one
+// line is very nearly all that is left below the map.
+function echoFooter($type, $nav = true) {
 ?>
 <div class="left d-print-none">
 <?php
-if (function_exists('engcalcsParentMenu')) engcalcsParentMenu();
+if ($nav) {
+	if (function_exists('engcalcsParentMenu')) engcalcsParentMenu();
 ?>
 <hr />
 <?php
+}
 // ROADMAP Task 286. Both go in every footer on every page: the links because a privacy notice
 // nobody can find is not notice, and the banner because "Cookie settings" has to have something
 // to reopen wherever the visitor happens to be standing.

@@ -115,6 +115,54 @@ console.log('\n-- the Help menu rows --');
 		'Notes reveals in place rather than opening a tab');
 }
 
+console.log('\n-- the footer gives up its navigation and keeps its notice --');
+{
+	const hf = fs.readFileSync(path.join(root, 'lib/HeadersFooters.lib.php'), 'utf8');
+	report(/function echoFooter\(\$type, \$nav = true\)/.test(hf),
+		'echoFooter takes a $nav flag, defaulting to the old behaviour');
+	report(/echoFooter\("EngCalcs", false\)/.test(page), 'and Looped-Network.php passes false');
+	// **THE HALF THAT MUST NOT BE DROPPED.** Task 286 put the privacy/terms/cookie links and the
+	// consent banner in every footer on every page because "a privacy notice nobody can find is not
+	// notice", and Cookie settings must have something to reopen "wherever the visitor happens to
+	// be standing". Those are NOT redundant with the calculators home: a visitor who arrived here
+	// from a search has never seen that page. Only the ten-link site-nav row is.
+	const guard = hf.slice(hf.indexOf('function echoFooter'));
+	const navBlock = guard.slice(guard.indexOf('if ($nav)'), guard.indexOf('echoConsentFooterLinks'));
+	report(navBlock.indexOf('engcalcsParentMenu') > 0, 'the nav row is inside the flag');
+	report(navBlock.indexOf('echoConsentFooterLinks') < 0 && navBlock.indexOf('echoConsentBanner') < 0,
+		'and the consent links and banner are NOT — they render either way');
+	report(guard.indexOf('serviceWorker') > 0, 'the service worker registration also survives');
+	// Every other calculator keeps the full footer; this is one page's exemption, not a suite change.
+	const others = fs.readdirSync(root)
+		.filter(f => /\.php$/.test(f) && f !== 'Looped-Network.php')
+		.filter(f => fs.readFileSync(path.join(root, f), 'utf8').indexOf('echoFooter(') > 0);
+	const trimmed = others.filter(f => /echoFooter\([^)]*,\s*false/.test(fs.readFileSync(path.join(root, f), 'utf8')));
+	report(trimmed.length === 0, 'no other page drops its nav row', `${others.length} pages keep it`);
+}
+
+console.log('\n-- the map fits the window instead of guessing 72% of it --');
+{
+	const fn = src.slice(src.indexOf('function effectiveMapHeight'));
+	const body = fn.slice(0, fn.indexOf('\n\tfunction applyMapHeight'));
+	report(!/0\.72/.test(body), 'the flat 0.72 hedge is gone');
+	// Tom, 2026-08-14: "There's no need to scroll if the page is not scrollable." The rule is now
+	// the actual invariant — leave nothing out of reach — rather than reserving a strip of viewport
+	// in case something is.
+	report(/flowBelowMap\(\)/.test(body), 'it subtracts what genuinely sits below the canvas');
+	report(/rect\.top \+ \(window\.pageYOffset/.test(body), 'and what sits above it');
+	report(/Math\.max\(LPN_MAP_MIN/.test(body), 'with a floor, so a short screen still gets a usable map');
+	report(/Math\.min\(settings\.mapHeight/.test(body), 'and the user’s own setting still caps it');
+	// THE STRUCTURAL GUARANTEE. `above` is at least the header's height and is always > 0, so the
+	// computed room is always strictly less than the viewport — the canvas can never be as tall as
+	// the screen, which is the precondition of the touch trap. It is prevented by construction now
+	// rather than by a chosen fraction.
+	report(/vh - above - flowBelowMap\(\) - 8/.test(body),
+		'room is viewport minus above minus below, so the canvas is never viewport-tall');
+	const below = src.slice(src.indexOf('function flowBelowMap'));
+	report(/scrollHeight/.test(below.slice(0, 600)),
+		'“below” is measured from the document, not from a list of element ids that would go stale');
+}
+
 console.log('\n-- the strings exist --');
 ['lpn_help_fix', 'lpn_help_notes', 'lpn_examples_blank'].forEach(function (k) {
 	report(en.indexOf(`$ec_lang['${k}']`) >= 0, `${k} is in lang.ec.en.php`);
