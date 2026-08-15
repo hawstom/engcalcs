@@ -174,18 +174,26 @@ echoHeader("EngCalcs", $html_title, "");
 	</div>
 	<p id="lpn_status" class="ec-status-warn"></p>
 	<div style="overflow-x:auto;position:relative">
-		<?php // **height="0", AND THAT IS THE POINT** (Tom, 2026-08-15: *"Why set a map bottom at all
-		      // when it can't be calculated? Why not stay blank or whatever?"*). This used to say 500,
-		      // which is a guess -- and a guess drawn on screen is a stage the user WATCHES: the map
-		      // appeared half-way up the window, then jumped to its real height once the page had
-		      // finished assembling and applyMapHeight() could measure something true. Starting at
-		      // zero means the space below the toolbar is simply empty until the height is known,
-		      // which is one honest state instead of two states and a jump.
+		<?php // **height="10000" IS A CURTAIN, NOT A GUESS, AND THE DIFFERENCE IS THE WHOLE POINT.**
 		      //
-		      // It also measures BETTER. flowBelowMap() is `body.bottom - svg.bottom`, so a canvas
-		      // that occupies no height at all lets the first measurement read exactly what is above
-		      // and below it, with nothing of its own in the way. ?>
-		<svg id="lpn_canvas" dir="ltr" width="100%" height="0" style="border:1px solid #ccc;background:#fff"></svg>
+		      // It used to say 500. That is a guess at the answer, and a guess drawn on screen is a
+		      // stage the user WATCHES: the map appeared half-way up the window and then jumped once
+		      // the page had finished assembling and applyMapHeight() could measure something true
+		      // (Tom, 2026-08-15: *"Why set a map bottom at all when it can't be calculated?"*).
+		      //
+		      // Zero was tried first and is worse, which Tom caught immediately: *"I say that height
+		      // 10000 is better so that we don't see the 'under construction' stuff."* A zero-height
+		      // canvas does not show nothing -- it pulls the site footer, the nav and the legal row
+		      // up into the viewport, so the first thing a visitor sees is the page's plumbing. A
+		      // number far larger than any screen pushes all of that below the fold instead, and what
+		      // shows while the page settles is an empty map area: the right shape, waiting.
+		      //
+		      // NOBODY CAN MISTAKE 10000 FOR AN ANSWER, which is what makes it safe. 500 was in the
+		      // range of a real height, so it read as a decision and survived for months.
+		      //
+		      // The measurement is unaffected either way: flowBelowMap() is `body.bottom -
+		      // svg.bottom`, and the canvas's own height appears in both terms, so it cancels. ?>
+		<svg id="lpn_canvas" dir="ltr" width="100%" height="10000" style="border:1px solid #ccc;background:#fff"></svg>
 		<?php // Persistent mode signal, INSIDE the canvas (Tom, 2026-07-30, second look: "I envisioned
 		      // the mode status in the canvas area since it's active like coordinates" -- moved from a
 		      // <p> above the map to this overlay, matching #lpn_coords' own treatment below: an

@@ -1887,11 +1887,15 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   **AND STAGE 1 WAS NOT A MEASUREMENT AT ALL — IT WAS THE MARKUP.** `<svg id="lpn_canvas">` was
   authored `height="500"`, so the map appeared half-way up the window before any JS ran, then jumped.
   Tom: *"Why set a map bottom at all when it can't be calculated? Why not stay blank or whatever?"*
-  Now `height="0"`, and `applyMapHeight()` refuses to size at all until `document.readyState` is
-  `complete`, with a 2-second failsafe so a subresource that never loads cannot leave the page with
-  no map. One honest state instead of two states and a jump — and a zero-height canvas measures
-  BETTER, since `flowBelowMap()` then reads what is above and below with nothing of its own in the
-  way. **The wasted strip underneath was `LPN_MAP_SLACK`, and it is GONE rather than smaller**
+  Now **`height="10000"` — a curtain, not a guess** — and `applyMapHeight()` refuses to size at all
+  until `document.readyState` is `complete`, with a 2-second failsafe so a subresource that never
+  loads cannot leave the page with no map. Zero was tried first and Tom improved on it in one line:
+  *"I say that height 10000 is better so that we don't see the 'under construction' stuff."* A
+  zero-height canvas does not show nothing — it pulls the footer, the nav and the legal row up into
+  the viewport, so the first thing a visitor sees is the page's plumbing. A number taller than any
+  screen pushes that below the fold and leaves an empty map area waiting. It is also unmistakable
+  for an answer, which is exactly what let 500 survive for months. The measurement is unaffected:
+  the canvas's own height appears in both terms of `flowBelowMap()` and cancels. **The wasted strip underneath was `LPN_MAP_SLACK`, and it is GONE rather than smaller**
   (Tom: *"Slack: I don't really like it"*). It was a margin against rounding overshoot; `Math.floor`
   cannot overshoot, so the margin had nothing left to guard.
   **AND THE HEIGHT IS AN ENVIRONMENT FACT, NOT A DOCUMENT ONE** (Tom, stating it twice: *"Bottom of
@@ -1906,7 +1910,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   the TOP-LEFT, so a canvas that grows by 12 px revealed 12 px more at the bottom and moved
   everything relative to the frame — a window resize had always done this too. Half the delta goes
   into `state.tx`/`state.ty`, so the view CENTRE stays put, and a 1 px dead band stops sub-pixel
-  churn from writing a height at all. `dev/lpn-spike/map-height-harness.js`, 27 checks, every guard
+  churn from writing a height at all. `dev/lpn-spike/map-height-harness.js`, 28 checks, every guard
   mutation-tested. **Not reproduced in a browser — the mechanism is inferred from the arithmetic, so
   if it recurs, the console error is the next thing to look at.**
 

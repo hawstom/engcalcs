@@ -207,17 +207,32 @@ console.log('\n--- opening a project does not resize the canvas ---');
 		callers.length + ' call sites');
 }
 
-// --- NOTHING IS DRAWN UNTIL A HEIGHT CAN BE CALCULATED ------------------------
+// --- NO GUESSED HEIGHT, AND NO SIZING BEFORE THE PAGE SETTLES -----------------
 // Tom, 2026-08-15: "Why set a map bottom at all when it can't be calculated? Why not stay blank or
 // whatever?" The canvas used to be authored at height="500" -- a guess, and a guess that is drawn
 // is a stage the user watches: the map appeared half-way up the window and then jumped when the
-// page finished assembling and the measurement became true. Two states and a jump, replaced by one
-// honest state.
-console.log('\n--- no placeholder height, and no sizing before the page settles ---');
+// page finished assembling and the measurement became true.
+//
+// A CURTAIN, NOT A GUESS. Zero was the first attempt and Tom improved on it in one line: "I say
+// that height 10000 is better so that we don't see the 'under construction' stuff." A zero-height
+// canvas does not show nothing -- it pulls the footer, the nav and the legal row up into the
+// viewport, so the first thing a visitor sees is the page's plumbing. A number far larger than any
+// screen pushes all of that below the fold and leaves an empty map area waiting. It is also
+// unmistakable for an answer, which is what let 500 survive for months.
+console.log('\n--- the authored height is a curtain, and nothing is sized before the page settles ---');
 {
 	const page = fs.readFileSync(path.join(__dirname, '../../Looped-Network.php'), 'utf8');
 	const tag = (page.match(/<svg id="lpn_canvas"[^>]*>/) || [''])[0];
-	report(/height="0"/.test(tag), 'the canvas is authored with no height at all', tag.slice(0, 90));
+	const authored = Number((tag.match(/height="(\d+)"/) || [])[1]);
+	// Taller than any screen anyone will open this on, so nothing below the map can appear before
+	// the map is sized. The bound is what is asserted, not the digits: 10000 is not special, being
+	// larger than a viewport is.
+	report(authored >= 4000, 'the authored height is far taller than any viewport', tag.slice(0, 90));
+	// AND IT MUST NOT LOOK LIKE A REAL ANSWER. That is the property 500 failed: it sat in the range
+	// of a plausible canvas height, so it read as a decision rather than as a placeholder, and
+	// nobody questioned it until a user watched it jump.
+	report(!(authored > 200 && authored < 2000),
+		'...and not a number anybody could mistake for a measured one', authored);
 	// The gate itself. readyState is the browser's own answer to "has everything finished", which is
 	// the only trustworthy moment to measure a navbar and a footer that are still swapping fonts.
 	report(/function pageSettled\(\)/.test(src) && /readyState === 'complete'/.test(src),
