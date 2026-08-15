@@ -1849,6 +1849,24 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|360| **The map remembers where you were looking — DONE 2026-08-15.** Tom, on being told the
+  view was stored nowhere at all: *"In-memory per tab now and saved to file."* Both.
+  - **Per tab, in memory** (`tabViews`, keyed by project id, captured on the way out of
+    `openProject()`): switching away and back puts you exactly where you were. This is the real
+    answer to a week of zoom complaints — every project open used to run a fit, and no fit, however
+    exact, is as good as not moving.
+  - **In the file** (`serializeProject().view`), so a project reopens cold where it was left. It
+    rides along with saves that happen anyway; panning is never itself a reason to save, and never
+    marks a project dirty.
+  - **Stored as a world CENTRE plus a scale, never as tx/ty.** A translation is screen-space, so
+    restoring one on a different-sized window puts the same CORNER back and shows a different part
+    of the drawing; a centre and a scale put the same thing in the middle at the same size. A centre
+    is also a world point, so it flips into the Cartesian file frame (`flipStoredY`) with every
+    other coordinate rather than being a private convention inside a public format.
+  - The fit is now the FALLBACK: a project nobody has looked at, a fresh import, or a file written
+    before this. A malformed view falls back too. `dev/lpn-spike/view-memory-harness.js`, 20 checks,
+    mutation-tested three ways.
+
 - 0|359| **Zoom to fit is now a FIXED POINT, so the same drawing fits the same way every time —
   DONE 2026-08-15.** Tom: *"The model that is current when the page is reloaded gets zoom in"* and
   *"Switching tabs still changes the zoom. Could it be affected by the Mode string?"* Two causes,
@@ -1880,11 +1898,18 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     a max of straight lines and right side a min of them. Their difference is convex and crosses
     zero once; 60 bisection steps find it to machine precision, in arithmetic, with no DOM.
     `fitItems()` / `fitScaleFor()` / `fitWindow()`.
-  - **What remains needs a re-layout and cannot be arithmetic: WHERE the layout put things.** The
-    collision relaxation and the arrow dodge work in world units, so a drawing two pixels wide
-    nudges its labels differently from the same drawing filling the screen. So: solve, apply,
-    re-lay-out at the answer, solve once more against a layout that finally belongs to the right
-    scale. **Two re-layouts, measured by the harness, where the converging version spent eight.**
+  - **AND THEN THE RE-LAYOUTS WENT TOO, ONE TEST LATER.** Tom found the property that had been
+    missing all along: *"a simple test is to open, reload, or switch and then zoom extents. Ideally
+    nothing happens. The result is still that if labels are hidden there is no change, but if there
+    are labels, there is a change."* That is IDEMPOTENCE, and it is stronger than the
+    start-independence above. The remaining culprit was reading each label's DRAWN position, which
+    carries the collision nudge and the arrow dodge — both computed in world units against pipes
+    whose pixel length moves with the zoom, so the fit's input moved whenever the fit moved the
+    view. `fitItems()` now builds every box from the MODEL (anchor + stored offset + measured pixel
+    width), which leaves nothing in the list that depends on the scale. **One re-layout per fit, and
+    pressing the button again changes nothing to the last bit** — both asserted.
+  - The cost, stated: a label the relaxation pushed outward sits a few pixels nearer the edge than
+    the arithmetic believes. The fit reserves 16px, and a nudge is small against that.
   - **THE TRAP IN THE NEW DESIGN, recorded because it bit immediately:** every quantity converted
     from world to pixels must itself be px/s. The old `bbox()` carried world fudges (`- 2` above the
     baseline, `+ 0.6` below, `+ 0.2` around a node) and multiplying a WORLD constant by the scale

@@ -161,11 +161,22 @@ console.log('--- the fit does not depend on the view it started from ---');
 	// version, so it is here only to prove the fit is not accumulating anything.
 	L.zoomExtent();
 	ok('...and fitting twice in a row changes nothing', same(view(), fromOne), view());
-	// THE POINT OF THE WHOLE REDESIGN, stated as a number. Solving the continuous part in closed
-	// form means the re-layouts are no longer a convergence budget -- they only confirm that the
-	// layout belongs to the scale that was chosen, which takes two.
+	// THE POINT OF THE WHOLE REDESIGN, stated as a number. The continuous part is solved in closed
+	// form and the item list is built from the model, so nothing in the answer depends on a layout
+	// -- which leaves exactly one re-layout, the one that draws the labels at the new scale. The
+	// version this replaced spent eight, one per convergence pass.
 	const layouts = L.countLayouts(() => L.zoomExtent());
-	ok('a fit costs two re-layouts, not eight', layouts <= 2, layouts + ' re-layout(s)');
+	ok('a fit costs ONE re-layout, not eight', layouts === 1, layouts + ' re-layout(s)');
+	// TOM'S OWN TEST, 2026-08-15: "open, reload, or switch and then zoom extents. Ideally nothing
+	// happens." Nothing happening is IDEMPOTENCE, and it is a stronger property than the
+	// start-independence above: a fit must be a fixed point of itself, to the last bit, or every
+	// press of the button walks the view a little further.
+	const settled = view();
+	L.zoomExtent();
+	ok('pressing Zoom to fit again changes NOTHING -- not nearly nothing', view() === settled,
+		settled + ' vs ' + view());
+	L.zoomExtent(); L.zoomExtent();
+	ok('...and it is still exactly the same after three more presses', view() === settled, view());
 	// NOT COVERED HERE, and said so rather than implied: the too-short-pipe rule inside fitItems()
 	// never fires on this fixture, because every pipe in it is long compared with its label.
 	// dev/lpn-spike/short-line-label-harness.js owns that rule; what is missing is a case where it

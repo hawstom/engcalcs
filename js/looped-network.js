@@ -2715,13 +2715,28 @@ var EngCalcs = EngCalcs || {};
 		// symbolFactor(), all of which are a pixel size divided by the scale, so the multiplication
 		// gives the pixel size straight back. Any constant added here belongs in PIXELS.
 		var ascent = effectiveFontSize() * 0.85;
+		// **BUILT FROM THE MODEL, NEVER FROM THE RENDERED POSITION** -- and this is what makes a fit
+		// IDEMPOTENT, which is the property Tom went looking for: *"a simple test is to open,
+		// reload, or switch and then zoom extents. Ideally nothing happens."*
+		//
+		// Reading each label's drawn x/y looks more accurate and is the thing that ruined it. Those
+		// positions carry the collision pass's NUDGE and the arrow DODGE, both of which are computed
+		// in world units against pipes whose length in pixels changes with the zoom -- so the fit's
+		// input moved every time the fit moved the view, and pressing Zoom to fit twice gave two
+		// answers. Using the label's HOME position instead (anchor + its own stored offset) leaves
+		// nothing in the list that depends on the scale, so the second press has nothing left to
+		// change.
+		//
+		// What that costs is a label the relaxation pushed outward by a few pixels being a few
+		// pixels closer to the edge than the arithmetic thinks. The fit already reserves 16px, and a
+		// nudge is small compared with that -- a fair price for an answer that holds still.
 		doc.nodes.forEach(function (n) {
 			var rad = nodeRadius(n) * sc + 1, ne = nodeEls[n.id] || {};
 			fitItem(out, n.x, n.y, rad, rad, rad, rad);
-			if (ignoreDataLabels || !ne.text) { return; }
-			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1,
-				lx = +ne.text.getAttribute('x'), ly = +ne.text.getAttribute('y');
-			boxFor(n.x, n.y, lx, ly - ascent, tw, dataLabelBoxHeight(lc));
+			if (ignoreDataLabels || !ne.text || ne.empty) { return; }
+			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n),
+				lx = (ne.side === 'left') ? base.x - tw : base.x;
+			boxFor(n.x, n.y, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactor() * sc;
@@ -2732,9 +2747,16 @@ var EngCalcs = EngCalcs || {};
 			// An ALIGNED label lies along its pipe, whose own points are already here, and so do a
 			// repeated chain's copies. Counting them again would add a term that moves with the
 			// zoom, which is the whole thing this design removes.
-			if (!le || !le.text || ignoreDataLabels || linkLabelAligned(l)) { return; }
-			var mid = linkLabelMid(l), tw = labelBoxWidth(le) || 8, lc = le.lineCount || 1,
-				lx = +le.text.getAttribute('x'), ly = +le.text.getAttribute('y');
+			if (!le || !le.text || le.empty || ignoreDataLabels || linkLabelAligned(l)) { return; }
+			// The UNDODGED midpoint, for the same reason: the arrow dodge slides the label along the
+			// pipe by a world distance derived from the arrow's pixel size, so it moves with the
+			// zoom. It also never leaves the pipe, whose own points are already in this list.
+			var pts = linkPointList(l), mid = Geom.pointAlongPolyline(pts, LINK_LABEL_ALONG),
+				d = defaultLabelOffset(),
+				tw = labelBoxWidth(le) || 8, lc = le.lineCount || 1,
+				ex = mid.x + (l.lx !== undefined ? l.lx : d.x),
+				ey = mid.y + (l.ly !== undefined ? l.ly : d.y),
+				lx = (le.side === 'left') ? ex - tw : ex, ly = ey;
 			// TOO SHORT A PIPE DRAWS NO LABEL, and whether a pipe is too short is a question about
 			// the scale being tested: the label is a fixed width in pixels, so it covers more of a
 			// pipe the further out you are. Asked here at atScale rather than at the current one.
@@ -2779,6 +2801,60 @@ var EngCalcs = EngCalcs || {};
 		}
 		return lo;
 	}
+	// ---- REMEMBERING WHERE YOU WERE (Tom, 2026-08-15: "In-memory per tab now and saved to file") --
+	//
+	// Until now nothing anywhere held the view: `state` was a module variable, `serializeProject()`
+	// did not mention it, and every project open ran a fit. That is WHY switching tabs re-zoomed --
+	// and no fit, however exact, is as good as simply putting the reader back where they were.
+	//
+	// **STORED AS A WORLD CENTRE AND A SCALE, NOT AS tx/ty.** Two reasons, and both are about the
+	// view surviving a change of circumstances:
+	//   * tx/ty are screen-space translations, so restoring them on a bigger or smaller window puts
+	//     the same CORNER in place and shows a different part of the drawing. A centre and a scale
+	//     put the same thing in the middle at the same size, which is what a person means by "where
+	//     I was".
+	//   * a centre is a world point, so it flips with everything else into the Cartesian file frame
+	//     (flipStoredY) instead of being a private convention smuggled into a public format.
+	function currentView() {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0,
+			sc = state.s || 1;
+		if (!w || !h) { return null; }
+		return { cx: (w / 2 - state.tx) / sc, cy: (h / 2 - state.ty) / sc, s: sc };
+	}
+	function validView(v) {
+		return !!v && isFinite(v.cx) && isFinite(v.cy) && isFinite(v.s) && v.s > 0;
+	}
+	function applyView(v) {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0, sc;
+		if (!validView(v) || !w || !h) { return false; }
+		sc = Math.max(MIN_SCALE, Math.min(MAX_SCALE, v.s));
+		state.s = sc;
+		state.tx = w / 2 - sc * v.cx;
+		state.ty = h / 2 - sc * v.cy;
+		setTransform();
+		onZoomChanged();
+		return true;
+	}
+	// Per TAB, in memory only, and deliberately not in the library index: this is where you were
+	// looking a moment ago, which is a fact about this browsing session rather than about the
+	// project. The file carries its own copy for the next time it is opened cold.
+	var tabViews = {}, pendingView = null;
+	function rememberCurrentView() {
+		var v = currentView();
+		if (v && library.openId) { tabViews[library.openId] = v; }
+	}
+	// Where a project open goes instead of straight to a fit. The in-memory view wins over the
+	// file's: it is the more recent answer to the same question, and it is the one the user was
+	// looking at thirty seconds ago.
+	function restoreViewOrFit() {
+		var v = tabViews[library.openId] || pendingView;
+		pendingView = null;
+		if (!validView(v)) { zoomExtent(); return; }
+		if (!mapSized) { pendingRestore = v; fitWhenSized = true; return; }
+		if (!applyView(v)) { zoomExtent(); }
+	}
 	function zoomExtent() {
 		if (!mapSized) { fitWhenSized = true; return; }
 		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it (Tom, 2026-08-09:
@@ -2809,28 +2885,22 @@ var EngCalcs = EngCalcs || {};
 			setTransform();
 			onZoomChanged();
 		}
-		// **WHAT IS LEFT IS NOT THE SIZES, IT IS WHERE THE LAYOUT PUT THINGS.** The continuous part
-		// -- how many pixels of label have to fit alongside how many world units of pipe -- is now
-		// solved exactly, in closed form, by fitScaleFor(). Two things still depend on the scale in
-		// a way arithmetic cannot reach:
+		// **NO RE-LAYOUT IN THE LOOP, BECAUSE THERE IS NOTHING LEFT FOR ONE TO TELL US.** With the
+		// item list built from the model rather than from the drawn positions, the only thing still
+		// depending on the scale is a handful of BOOLEANS -- which labels are drawn at all. Those
+		// are settled by re-asking the same arithmetic, which costs a few array sweeps and touches
+		// neither the DOM nor the layout. Two rounds on every real drawing; four is a stop, not an
+		// expectation.
 		//
-		//   * WHICH labels are drawn: the map-width threshold and the too-short-pipe rule are
-		//     booleans, and fitItems() is told which scale to answer them for;
-		//   * WHERE each label sits: the collision relaxation and the arrow dodge both work in world
-		//     units, so a drawing whose pipes are two pixels long nudges its labels differently from
-		//     the same drawing filling the screen. Only a re-layout can answer that.
-		//
-		// So: solve, apply, and let onZoomChanged() re-lay-out at the answer; then solve once more
-		// against a layout that finally belongs to the right scale. It agrees on the second round
-		// and stops. Three is a hard stop, not an expectation -- and where the old version spent
-		// eight re-layouts converging on a NUMBER, this spends two confirming a LAYOUT.
-		for (k = 0; k < 3; k++) {
+		// The single re-layout at the end is apply()'s, and it is the one that was always needed:
+		// the labels have to be redrawn at the new scale.
+		for (k = 0; k < 4; k++) {
 			items = fitItems(s);
 			s = solve();
-			apply(s);
 			if (s === prev) { break; }
 			prev = s;
 		}
+		apply(s);
 	}
 
 	// ---- backdrop image (Task 146 Phase 2, ported from dev/lpn-spike/canvas-spike.html) ----
@@ -3790,6 +3860,11 @@ var EngCalcs = EngCalcs || {};
 		});
 		(o.labels || []).forEach(function (lb) { if (typeof lb.y === 'number') { lb.y = -lb.y; } });
 		if (o.backdrop && typeof o.backdrop.ty === 'number') { o.backdrop.ty = -o.backdrop.ty; }
+		// The saved VIEW is a world POINT plus a scale (see currentView()), so its y belongs in this
+		// list for the same reason every other y does. Storing the raw tx/ty instead would have put
+		// a screen-space translation of the internal frame into a file that is otherwise Cartesian
+		// -- consistent for us and a lie to anybody else reading it.
+		if (o.view && typeof o.view.cy === 'number') { o.view.cy = -o.view.cy; }
 		return o;
 	}
 	// The version at which inputs became declarative. A document below it holds SI numbers that have
@@ -3883,6 +3958,9 @@ var EngCalcs = EngCalcs || {};
 			v: openDocVersion, project: project, scenarios: scenarios,
 			nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
 			labelSettings: labelSettings, backdrop: backdrop, settings: settings,
+			// Where the reader was looking. Not a reason to SAVE -- panning marks nothing dirty --
+			// but it rides along whenever something else does, so a file reopens where it was left.
+			view: currentView(),
 			// The units the numbers above are IN. Not a preference -- without it the document does
 			// not say what it means, and a 400 mm main would open as a 400 inch main (Tom).
 			units: readUnitSelections()
@@ -4151,6 +4229,9 @@ var EngCalcs = EngCalcs || {};
 		baseScenario().overrides = {}; // Base is canon and has no overrides, by definition
 		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
+		// Consumed once, by the restoreViewOrFit() at the end of refreshAllFromDocument(). A file
+		// written before this existed has none, and gets a fit exactly as it always did.
+		pendingView = validView(saved.view) ? saved.view : null;
 		// Reservoirs written before they had an elevation (2026-07-30) carry only a head. Giving
 		// such a reservoir an elevation EQUAL to its head keeps the old network solving and reading
 		// exactly as it did -- same fixed head, and a pressure of zero at the water surface --
@@ -4395,7 +4476,7 @@ var EngCalcs = EngCalcs || {};
 		// A project or an .inp may ARRIVE holding a PRV/PSV/FCV, with the user never having picked a
 		// type -- the case a warm-up hooked only to the type selector would miss entirely.
 		warmEpanetIfNeeded();
-		zoomExtent();
+		restoreViewOrFit();
 		scheduleSolve();
 		renderTabs();
 		// The banner belongs to the project you are looking at: a read-only tab, a file that needs
@@ -4521,6 +4602,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function openProject(id) {
 		if (id === library.openId) { return true; }
+		rememberCurrentView();   // ...and where we were looking in it
 		saveToStorage(); // flush the outgoing project before switching away from it
 		flushOutgoingFile();
 		var doc2 = readDocument(projectKey(id));
@@ -9324,7 +9406,7 @@ var EngCalcs = EngCalcs || {};
 	// that a fit asked for before the canvas has a real height is DEFERRED rather than answered
 	// wrongly. Same shape as fitAfterSolve() above: remember that one was wanted, and do it when the
 	// missing fact arrives.
-	var mapSized = false, fitWhenSized = false;
+	var mapSized = false, fitWhenSized = false, pendingRestore = null;
 	function armMapSizing() {
 		if (mapSizingArmed) { return; }
 		mapSizingArmed = true;
@@ -9334,7 +9416,12 @@ var EngCalcs = EngCalcs || {};
 	function noteMapSized() {
 		if (mapSized) { return; }
 		mapSized = true;
-		if (fitWhenSized) { fitWhenSized = false; zoomExtent(); }
+		if (!fitWhenSized) { return; }
+		fitWhenSized = false;
+		var v = pendingRestore;
+		pendingRestore = null;
+		if (validView(v) && applyView(v)) { return; }
+		zoomExtent();
 	}
 	function applyMapHeight(secondPass) {
 		if (!svg) { return; }
