@@ -382,6 +382,12 @@ EngCalcs.pageConfig = {
 	lpn_status_example_opened: <?=json_encode($ec_lang['lpn_status_example_opened'])?>,
 	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
 	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
+<?php   // The suite's existing legal-link strings, needed here because this page's Help menu and
+        // examples gallery carry them instead of a footer. Reused, never re-keyed: the wording must
+        // match the identical links on every other page. ?>
+	privacy_link: <?=json_encode($ec_lang['privacy_link'])?>,
+	terms_link: <?=json_encode($ec_lang['terms_link'])?>,
+	consent_settings_link: <?=json_encode($ec_lang['consent_settings_link'])?>,
 <?php   // Every example card's title and description, emitted BY PATTERN rather than one line each.
         // The gallery reads them by the key name the manifest gives it, so the set is data, not a
         // fixed list -- adding an example means adding two lang keys and nothing here.
@@ -765,5 +771,7 @@ EngCalcs.pageConfig = {
 <?php echoCookieScript(); ?>
 </script>
 <?php
-echoFooter("EngCalcs", false); // no site-nav row: this page needs the vertical room (Task 314)
+echoFooter("EngCalcs", false, false); // no site-nav row and no legal row: both live in the Help menu
+// and the examples gallery instead (Task 314). The consent BANNER and the service worker still
+// render -- those are not footer furniture, and echoFooter() emits them regardless.
 // Omit last closing tag is good practice

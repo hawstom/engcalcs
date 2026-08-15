@@ -146,14 +146,25 @@ function echoConsentBanner() {
 		if (answered) { banner.hidden = true; }
 	}());
 
-	// The permanent "Cookie settings" link in the footer. Reopening is the withdrawal mechanism,
-	// so it must work from every page and in both directions.
+	// The permanent "Cookie settings" control. Reopening is the withdrawal mechanism, so it must
+	// work from every page and in both directions.
+	//
+	// EXPOSED AS A FUNCTION as well as a delegated click handler (2026-08-14). Looped-Network.php
+	// has no footer row to carry the link -- its legal links live in the Help menu and the examples
+	// gallery instead, which is where epanet-js puts its own Terms and Privacy too -- and a menu row
+	// there is a button with a callback, not an <a> the delegation can see. Two lines of "unhide and
+	// scroll" copied into looped-network.js would be two lines free to drift from the banner they
+	// operate; one exported function cannot.
+	function reopen() {
+		banner.hidden = false;
+		banner.scrollIntoView({ block: 'center' });
+	}
+	window.ecReopenConsent = reopen;
 	document.addEventListener('click', function (event) {
 		var link = event.target.closest ? event.target.closest('.ec-consent-reopen') : null;
 		if (!link) return;
 		event.preventDefault();
-		banner.hidden = false;
-		banner.scrollIntoView({ block: 'center' });
+		reopen();
 	});
 }());
 </script>

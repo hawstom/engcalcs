@@ -148,7 +148,15 @@ EngCalcs.iconOpenTag = <?=json_encode(EC_ICON_OPEN_TAG)?>;</script>
 // page. So this parameter reclaims the row and leaves the notice, which is what the request was
 // actually about. It costs one line of links -- and after Task 314 moved the Notes into Help, one
 // line is very nearly all that is left below the map.
-function echoFooter($type, $nav = true) {
+// $legal = false ALSO drops the privacy/terms/cookie-settings row -- and is legitimate ONLY where
+// the page carries those links somewhere else that is always reachable. Looped-Network.php puts
+// them in its Help menu and in the examples gallery, which is exactly where epanet-js puts its own
+// Terms and Privacy: in the app's own chrome, not in a footer under the map (checked 2026-08-14 at
+// Tom's suggestion -- their splash panel carries "Terms and conditions" and "Privacy policy" in its
+// sidebar). Task 286's requirement is that the notice be FINDABLE and that withdrawal be as easy as
+// consent; it never required a particular piece of furniture. What is not negotiable is that the
+// banner itself and the service worker below still render, which they do either way.
+function echoFooter($type, $nav = true, $legal = true) {
 ?>
 <div class="left d-print-none">
 <?php
@@ -161,7 +169,7 @@ if ($nav) {
 // ROADMAP Task 286. Both go in every footer on every page: the links because a privacy notice
 // nobody can find is not notice, and the banner because "Cookie settings" has to have something
 // to reopen wherever the visitor happens to be standing.
-if (function_exists('echoConsentFooterLinks')) echoConsentFooterLinks();
+if ($legal && function_exists('echoConsentFooterLinks')) echoConsentFooterLinks();
 ?>
 <?php if (DEBUG_MODE === TRUE) : ?>
 	<p>

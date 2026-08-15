@@ -118,9 +118,10 @@ console.log('\n-- the Help menu rows --');
 console.log('\n-- the footer gives up its navigation and keeps its notice --');
 {
 	const hf = fs.readFileSync(path.join(root, 'lib/HeadersFooters.lib.php'), 'utf8');
-	report(/function echoFooter\(\$type, \$nav = true\)/.test(hf),
-		'echoFooter takes a $nav flag, defaulting to the old behaviour');
-	report(/echoFooter\("EngCalcs", false\)/.test(page), 'and Looped-Network.php passes false');
+	report(/function echoFooter\(\$type, \$nav = true, \$legal = true\)/.test(hf),
+		'echoFooter takes $nav and $legal, both defaulting to the old behaviour');
+	report(/echoFooter\("EngCalcs", false, false\)/.test(page),
+		'and Looped-Network.php declines both rows');
 	// **THE HALF THAT MUST NOT BE DROPPED.** Task 286 put the privacy/terms/cookie links and the
 	// consent banner in every footer on every page because "a privacy notice nobody can find is not
 	// notice", and Cookie settings must have something to reopen "wherever the visitor happens to
@@ -129,15 +130,49 @@ console.log('\n-- the footer gives up its navigation and keeps its notice --');
 	const guard = hf.slice(hf.indexOf('function echoFooter'));
 	const navBlock = guard.slice(guard.indexOf('if ($nav)'), guard.indexOf('echoConsentFooterLinks'));
 	report(navBlock.indexOf('engcalcsParentMenu') > 0, 'the nav row is inside the flag');
-	report(navBlock.indexOf('echoConsentFooterLinks') < 0 && navBlock.indexOf('echoConsentBanner') < 0,
-		'and the consent links and banner are NOT — they render either way');
+	// **THE LINE THAT IS NOT NEGOTIABLE.** $legal=false is allowed only because the links moved to
+	// the Help menu and the gallery -- checked against epanet-js, whose arrival panel carries its
+	// own Terms and Privacy in the sidebar rather than in a footer. But the BANNER and the service
+	// worker are not furniture and must render on every page regardless of either flag.
+	report(!/if \(\$nav\)[\s\S]{0,400}echoConsentBanner/.test(guard) &&
+		!/\$legal[\s\S]{0,80}echoConsentBanner/.test(guard),
+		'the consent banner is behind NEITHER flag');
 	report(guard.indexOf('serviceWorker') > 0, 'the service worker registration also survives');
+	report(/\$legal && function_exists\('echoConsentFooterLinks'\)/.test(guard),
+		'the legal ROW is behind $legal');
 	// Every other calculator keeps the full footer; this is one page's exemption, not a suite change.
 	const others = fs.readdirSync(root)
 		.filter(f => /\.php$/.test(f) && f !== 'Looped-Network.php')
 		.filter(f => fs.readFileSync(path.join(root, f), 'utf8').indexOf('echoFooter(') > 0);
 	const trimmed = others.filter(f => /echoFooter\([^)]*,\s*false/.test(fs.readFileSync(path.join(root, f), 'utf8')));
-	report(trimmed.length === 0, 'no other page drops its nav row', `${others.length} pages keep it`);
+	report(trimmed.length === 0, 'no other page drops its footer', `${others.length} pages keep it`);
+}
+
+console.log('\n-- and the notice it dropped is reachable twice over --');
+{
+	// Task 286 required the notice to be FINDABLE and withdrawal to be as easy as consent. Dropping
+	// the footer row is only legitimate while BOTH of these hold, so they are asserted together.
+	const help = src.slice(src.indexOf('function openHelpMenu'));
+	const menu = help.slice(0, help.indexOf('\n\tfunction ', 10));
+	report(/pc\.privacy_link/.test(menu) && /pc\.terms_link/.test(menu) && /pc\.consent_settings_link/.test(menu),
+		'the Help menu carries privacy, terms and cookie settings');
+	const gal = src.slice(src.indexOf('function renderExamplesGallery'));
+	const pane = gal.slice(0, gal.indexOf('\n\tfunction ', 10));
+	report(/lpn-examples-legal/.test(pane) && /ec-consent-reopen/.test(pane),
+		'and so does the gallery, which is what a first-time visitor sees');
+	// Reopening must not be a second copy of the banner logic.
+	report(/window\.ecReopenConsent/.test(src), 'the menu reopens the banner through the exported function');
+	const consent = fs.readFileSync(path.join(root, 'lib/Consent.lib.php'), 'utf8');
+	report(/window\.ecReopenConsent = reopen;/.test(consent), 'which lib/Consent.lib.php exports');
+	report(/function reopen\(\)/.test(consent) && (consent.match(/banner\.scrollIntoView/g) || []).length === 1,
+		'and there is exactly ONE copy of the unhide-and-scroll logic');
+	// The gallery link keeps the class the delegated handler listens for, so it needs no wiring.
+	report(/'class': 'ec-consent-reopen'/.test(pane),
+		'the gallery link works through the same delegated handler as every other page');
+	// Reused keys, never re-keyed: this wording must match the identical links elsewhere.
+	['privacy_link', 'terms_link', 'consent_settings_link'].forEach(function (k) {
+		report(page.indexOf(`$ec_lang['${k}']`) > 0, `${k} is bridged to pageConfig`);
+	});
 }
 
 console.log('\n-- the map fits the window instead of guessing 72% of it --');

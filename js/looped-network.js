@@ -3112,6 +3112,24 @@ var EngCalcs = EngCalcs || {};
 			grid.appendChild(card);
 		});
 		pane.appendChild(grid);
+		// The legal row, in the gallery as well as in the Help menu -- this page has no footer to
+		// carry it, and the gallery is what a first-time visitor actually looks at. epanet-js puts
+		// its own Terms and Privacy in exactly this position, in the sidebar of the panel it shows
+		// on arrival. Built here rather than rendered by PHP because the whole pane is; the strings
+		// are the SUITE's existing keys, so this costs no translation and cannot word itself
+		// differently from the same links on every other page.
+		var legal = elh('p', { 'class': 'lpn-examples-legal' });
+		[[pc.privacy_link || 'Privacy notice', 'privacy.php'],
+			[pc.terms_link || 'Terms of use', 'terms.php']].forEach(function (pair) {
+			var a = elh('a', { href: pair[1], target: '_blank', rel: 'noopener' }, pair[0]);
+			legal.appendChild(a);
+		});
+		// The class is the whole mechanism: lib/Consent.lib.php listens for a click on
+		// `.ec-consent-reopen` anywhere in the document, so this needs no wiring of its own and
+		// cannot fall out of step with the identical control on every other page's footer.
+		legal.appendChild(elh('a', { href: '#ec-consent', 'class': 'ec-consent-reopen' },
+			pc.consent_settings_link || 'Cookie settings'));
+		pane.appendChild(legal);
 	}
 	// Dismissed for THIS project only, and not persisted. The gallery's whole job is to appear on
 	// an empty canvas; a visitor who dismissed it once a month ago and now has an empty drawing in
@@ -6820,6 +6838,25 @@ var EngCalcs = EngCalcs || {};
 			// wrote it or how to complain"; About answers the first and this answers the second, in
 			// a verb. Contact keeps its own place in the suite navbar for the other moment.
 			{ icon: 'mail', label: pc.lpn_help_fix || 'Fix something', fn: ext('contact.php') },
+			{ separator: true },
+			// **THE LEGAL ROW LIVES HERE BECAUSE THIS PAGE HAS NO FOOTER** (2026-08-14). Task 286
+			// required the notice to be FINDABLE and withdrawal to be as easy as consent; it never
+			// required a particular piece of furniture, and a footer under a full-window map editor
+			// is furniture this page cannot afford. Checked against epanet-js at Tom's suggestion:
+			// their splash panel carries "Terms and conditions" and "Privacy policy" in its own
+			// sidebar, not in a page footer. Same answer, arrived at independently.
+			//
+			// Also mirrored in the examples gallery, which is what a first-time visitor actually
+			// sees -- again as epanet-js does it. Two placements, because the gallery is absent
+			// once you have a network and the menu is absent until you open it.
+			{ icon: 'info', label: pc.privacy_link || 'Privacy notice', fn: ext('privacy.php') },
+			{ icon: 'info', label: pc.terms_link || 'Terms of use', fn: ext('terms.php') },
+			// NOT ext(): this reopens the banner in place. window.ecReopenConsent is exported by
+			// lib/Consent.lib.php so the two lines of "unhide and scroll" are not copied here, free
+			// to drift from the banner they operate.
+			{ icon: 'settings', label: pc.consent_settings_link || 'Cookie settings',
+				fn: function () { if (window.ecReopenConsent) { window.ecReopenConsent(); } } },
+			{ separator: true },
 			// About last, where every other Help menu in the world puts it.
 			{ icon: 'info', label: pc.about_main_menu || 'About', fn: ext('About.php') }
 		]);

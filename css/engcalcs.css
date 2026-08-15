@@ -763,3 +763,7 @@ html[lang="zh"] .ec-welcome {
 }
 /* Printing a network should print the network, never the shop window. */
 @media print { #lpn_empty_hint { display: none !important; } }
+/* The gallery's legal row -- this page has no footer, so Privacy/Terms/Cookie settings sit here and
+   in the Help menu (ROADMAP Task 314). Same position epanet-js uses in its own arrival panel. */
+.lpn-examples-legal { margin: 1.1em 0 0; font-size: .78em; opacity: .7; }
+.lpn-examples-legal a { margin: 0 .5em; }
