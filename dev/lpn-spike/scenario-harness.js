@@ -474,6 +474,71 @@ console.log('\n--- the readout, the halos, and the guards ---');
 }
 
 // ---------------------------------------------------------------------------
+// 7b. The SCOPED push -- one element, not the whole drawing (Task 317)
+// ---------------------------------------------------------------------------
+// Tom: "each property or element -- maybe start only with the element level". The everyday case is
+// "I corrected P-12 in Base and want that one correction everywhere", and the danger of getting it
+// wrong is invisible: a push that takes one element too many looks exactly like one that did not,
+// until somebody opens the other scenario. So the assertions are about what SURVIVES, not only
+// about what went.
+console.log('\n--- the push, scoped to one element ---');
+{
+	const E = reload();
+	const scn = L.getScenarios()[1];
+	L.switchScenario(scn.id);
+	L.setProp(E.l1, 'diameter', 4);
+	L.setProp(E.l2, 'diameter', 5);
+	L.switchScenario('base');
+	L.labelSettings().link.diameter = true;
+
+	confirmAnswer = true; confirmText = null;
+	L.pushBaseToScenarios(E.l1);
+	ok('the confirm NAMES the element it is scoped to', new RegExp(E.l1.id).test(confirmText || ''),
+		JSON.stringify(confirmText));
+	ok('...and counts one value, not two', /\b1\b/.test(confirmText || '') && !/\b2\b/.test(confirmText || ''),
+		JSON.stringify(confirmText));
+	ok('the named element goes back to Base', !scn.overrides[L.ovKey(E.l1)],
+		JSON.stringify(scn.overrides));
+	ok('...AND THE OTHER ONE IS UNTOUCHED -- the whole point of the task',
+		!!scn.overrides[L.ovKey(E.l2)] && scn.overrides[L.ovKey(E.l2)].diameter === 5,
+		JSON.stringify(scn.overrides));
+
+	// GROUP SCOPING: a node push considers node properties only. With a link override outstanding
+	// and Diameter on screen, it must report that nothing would change -- not silently clear the
+	// link's value on its way past, and not ask a question the user could confirm out of habit.
+	lastAlert = null; confirmText = null;
+	L.pushBaseToScenarios(E.j1);
+	ok('a node push sees no link property to push', /nothing would change/.test(lastAlert || ''),
+		JSON.stringify(lastAlert));
+	ok('...and asked nothing, so nothing could be confirmed by habit', confirmText === null);
+	ok('...and l2 STILL has its own value', !!scn.overrides[L.ovKey(E.l2)], JSON.stringify(scn.overrides));
+
+	// ...and the node push is not merely inert: give the node its own overridden demand and the
+	// same call clears that, so the assertion above is about SCOPE and not about a broken button.
+	L.switchScenario(scn.id);
+	L.setProp(E.j1, 'demand', 0.01);
+	L.switchScenario('base');
+	confirmAnswer = true; confirmText = null;
+	L.pushBaseToScenarios(E.j1);
+	ok('a node push DOES clear that node\'s own demand', !scn.overrides[L.ovKey(E.j1)],
+		JSON.stringify(scn.overrides));
+	// The confirm names the properties of THIS element's kind only. Diameter is on screen and is
+	// unreachable from a node either way, so listing it would be a promise about something that
+	// cannot happen -- the one part of the group filter a user actually sees.
+	ok('...and named Demand without naming Diameter',
+		/Demand/.test(confirmText || '') && !/Diameter/.test(confirmText || ''), JSON.stringify(confirmText));
+	ok('...and STILL left the pipe alone', !!scn.overrides[L.ovKey(E.l2)], JSON.stringify(scn.overrides));
+
+	// Scope does not weaken the Base-only guard.
+	L.switchScenario(scn.id);
+	confirmText = null;
+	L.pushBaseToScenarios(E.l2);
+	ok('a scoped push from inside a scenario does nothing at all',
+		!!scn.overrides[L.ovKey(E.l2)] && confirmText === null, JSON.stringify(scn.overrides));
+	L.switchScenario('base');
+}
+
+// ---------------------------------------------------------------------------
 // 8. The menu: create, rename, delete, and what Base may not do
 // ---------------------------------------------------------------------------
 // Base cannot be deleted or renamed away (Task 184). Disabled rather than hidden, which is this

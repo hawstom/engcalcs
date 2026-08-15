@@ -1027,7 +1027,10 @@ var EngCalcs = EngCalcs || {};
 			// action has no meaning: it pushes Base's values outward, and Base is not where you
 			// are standing.
 			disabled: !scn.isBase || scenarios.length < 2,
-			fn: pushBaseToScenarios
+			// Wrapped, NOT passed by reference: pushBaseToScenarios() now takes an element to scope
+			// itself to, and openMenu() calling fn(anything) would silently turn the all-elements
+			// push into a push against whatever it happened to hand over.
+			fn: function () { pushBaseToScenarios(); }
 		});
 		openMenu(anchor, rows);
 	}
@@ -1087,10 +1090,26 @@ var EngCalcs = EngCalcs || {};
 	// SCOPED BY THE DISPLAYED LABELS, the same filter the Settings push uses: the Labels panel is
 	// already a per-property checkbox list and is already on screen, so the user's own current view
 	// defines the blast radius and this needs no property picker of its own.
-	function pushBaseToScenarios() {
+	// `only` (ROADMAP Task 317, Tom 2026-08-14: "I assume that Apply Base values to all scenarios
+	// will be fine-grained; each property or element -- maybe start only with the element level")
+	// narrows the same action to ONE element. It is a parameter rather than a second function on
+	// purpose: the counting, the naming, the finger-wag and the undo snapshot are already right
+	// here, and a fork of them would drift silently -- nothing about a wrong count is visible until
+	// somebody has already lost values by trusting it.
+	// The element-scoped push is the SAFE and COMMON case ("I corrected P-12 in Base and want that
+	// one correction everywhere"), which is why it lives in the element's own popup while the
+	// all-elements version stays in the scenario menu where it is deliberately harder to reach.
+	function pushBaseToScenarios(only) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!inBaseScenario()) { return; }
-		var active = pushSpecList().filter(function (s) { return s.prop && labelSettings[s.group][s.field]; });
+		var key = only ? ovKey(only) : null, group = only ? elGroup(only) : null;
+		// Scoped to ONE element, the other group's properties are not merely absent -- they are
+		// nonsense. A node has no diameter, so counting one would produce a confirm naming
+		// properties this element cannot hold, and "nothing displayed" would be reported when the
+		// user is looking at three displayed labels.
+		var active = pushSpecList().filter(function (s) {
+			return s.prop && labelSettings[s.group][s.field] && (!group || s.group === group);
+		});
 		if (!active.length) {
 			alert(pc.lpn_push_none_displayed || 'No default input is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
 			return;
@@ -1098,15 +1117,19 @@ var EngCalcs = EngCalcs || {};
 		// Counted, not estimated: how many overrides would actually be discarded. Zero says so in
 		// its own words, because "nothing to push" and "pushed nothing" look identical afterwards.
 		var hits = 0, touched = 0;
+		// The one place the scope is applied, to both the count and the delete below -- they read
+		// the same list, so a confirm can never promise a different blast radius from the one that
+		// happens.
+		function scopedKeys(s) { return key ? (s.overrides[key] ? [key] : []) : Object.keys(s.overrides); }
 		scenarios.forEach(function (s) {
 			if (s.isBase) { return; }
 			var any = false;
 			// Walks the map by KEY and matches on the property NAME only -- deliberately group-blind,
 			// because no property in pushSpecList() exists on both groups (`active` is the only name
 			// LPN_OVERRIDABLE shares, and it is not pushable). Task 324.
-			Object.keys(s.overrides).forEach(function (key) {
+			scopedKeys(s).forEach(function (k) {
 				active.forEach(function (spec) {
-					if (Object.prototype.hasOwnProperty.call(s.overrides[key], spec.prop)) { hits++; any = true; }
+					if (Object.prototype.hasOwnProperty.call(s.overrides[k], spec.prop)) { hits++; any = true; }
 				});
 			});
 			if (any) { touched++; }
@@ -1114,7 +1137,11 @@ var EngCalcs = EngCalcs || {};
 		if (!hits) { alert(pc.lpn_scenario_push_none || 'No scenario has its own value for any of these properties, so nothing would change.'); return; }
 		// NAMES the properties as well as counting them, exactly as the Settings push does -- a
 		// bare count leaves the user guessing which properties, and this action is not one to guess at.
+		// NAMES THE ELEMENT when the push is scoped to one, reusing lpn_field_id ("ID") rather than
+		// minting a key: it is a whole label meaning exactly this, which is the reuse rule, and a
+		// scoped confirm that did not say WHICH element would be the one thing worth saying missing.
 		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values those scenarios hold of their own are discarded. You can undo this.')
+			+ (only ? '\n\n' + (pc.lpn_field_id || 'ID') + ': ' + only.id : '')
 			+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
 			+ '\n' + (pc.lpn_scenario_push_scenarios || 'Scenarios:') + ' ' + touched
 			+ '\n' + (pc.lpn_scenario_push_values || 'Values discarded:') + ' ' + hits;
@@ -1122,9 +1149,9 @@ var EngCalcs = EngCalcs || {};
 		saveUndoSnapshot();
 		scenarios.forEach(function (s) {
 			if (s.isBase) { return; }
-			Object.keys(s.overrides).forEach(function (key) {
-				active.forEach(function (spec) { delete s.overrides[key][spec.prop]; });
-				if (!Object.keys(s.overrides[key]).length) { delete s.overrides[key]; }
+			scopedKeys(s).forEach(function (k) {
+				active.forEach(function (spec) { delete s.overrides[k][spec.prop]; });
+				if (!Object.keys(s.overrides[k]).length) { delete s.overrides[k]; }
 			});
 		});
 		applyScenarioChange();
@@ -9233,6 +9260,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		activeField(fields, n);
+		pushHereButton(fields, n);
 		readonlyField(fields, pc.lpn_field_x || 'X', n.x);
 		readonlyField(fields, pc.lpn_field_y || 'Y', cartesianY(n.y));
 		tipsIn(fields);
@@ -9379,6 +9407,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		closedField(fields, l, linkId);
 		activeField(fields, l);
+		pushHereButton(fields, l);
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
 			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', 'lpn_u_flow', shownFlow(lastSolveResult.flows[linkId]));
 			// A pump has no diameter (Tom, 2026-07-30: "how can a pump have a velocity if it has no
@@ -9646,6 +9675,27 @@ var EngCalcs = EngCalcs || {};
 	// 12 inch loop vs. without" case stays coherent.
 	// Offered on every node and every link, in Base too: unticking here in Base is how a proposed
 	// element is parked without deleting it.
+	// THE EVERYDAY PUSH, in the element's own popup (ROADMAP Task 317). Same action and the same two
+	// strings as the scenario menu's row -- it IS that action, narrowed by WHERE the button is, so a
+	// second label would be two names for one thing in 27 languages.
+	// Base only, and ABSENT rather than disabled outside Base: the menu row is disabled there
+	// because a menu teaches its own vocabulary by staying the same shape, but a popup is a list of
+	// this element's properties and a permanently dead button on every one of them is noise. It is
+	// also absent when there are no scenarios, where the action has nothing to act on.
+	function pushHereButton(fields, el) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!el || !inBaseScenario() || scenarios.length < 2) { return; }
+		var btn = document.createElement('button');
+		btn.type = 'button';
+		btn.textContent = pc.lpn_scenario_push_btn || 'Apply Base values to all scenarios';
+		helpTip(btn, pc.lpn_scenario_push_tip);
+		btn.addEventListener('click', function () {
+			pushBaseToScenarios(el);
+			refreshPopupIfOpen();
+		});
+		fields.appendChild(btn);
+		fields.appendChild(document.createElement('br'));
+	}
 	function activeField(fields, el) {
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input'), text = document.createElement('span');

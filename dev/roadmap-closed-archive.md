@@ -7171,3 +7171,42 @@ on both sides for that reason, and the mutant restoring the old derivation fails
     from the box's width, so the far-edge attachment still moves and the angle still slides. It
     addressed the symptom I had noticed rather than the mechanism. Closed as superseded.
   - This also dissolves the drift Task 335 was invented to fix.
+
+
+## Task 317
+
+Closed 2026-08-14; the open-task text follows and is what shipped.
+
+- 97|317| **Push Base values to all scenarios PER ELEMENT, not only per property.** Tom, 2026-08-14,
+  looking at the shipped scenario menu: *"I assume that Apply Base values to all scenarios will be
+  fine-grained; each property or element (maybe start only with the element level, will have a way
+  to Apply values to all scenarios."*
+
+  **Half of that assumption is already true and half is not, which is the reason this task exists.**
+  `pushBaseToScenarios()` is scoped **by PROPERTY** — the Labels panel's checkboxes are the filter,
+  so the user's own current view defines the blast radius and no second property picker was needed
+  (Task 184's design, and the same mechanism the Settings push uses). It is scoped **by ELEMENT not
+  at all**: it walks `Object.keys(s.overrides)` for every scenario and takes everything.
+
+  - **The element-level push is the SAFE and COMMON case, and the global one is neither.** The real
+    workflow is "I corrected P-12's diameter in Base and I want that one correction everywhere" —
+    a single element, deliberately chosen, with a countable blast radius. The all-elements push
+    exists for the rare bulk case and is the most destructive thing on the page; that asymmetry
+    argues for building the narrow one first, exactly as Tom suggests.
+  - **Where it goes: the element's own popup**, beside the override markers already there. That
+    keeps the dangerous global action in the scenario menu where it is deliberately hard to reach,
+    and puts the everyday action where the user is already looking at the element.
+  - **Reuse `pushBaseToScenarios()`, do not fork it.** Give it an optional element-id filter; the
+    counting, the naming of properties, the finger-wag confirm and the undo snapshot are all
+    already right and must not be duplicated into a second implementation that drifts.
+  - **Still Base-only**, for the reason the existing guard states: run inside a scenario it would
+    mint an override on every element at once.
+  - Per-property-per-element (a single cell) is the third level and is explicitly NOT wanted yet —
+    Tom's own "maybe start only with the element level". The Labels panel already narrows properties,
+    so element + displayed-properties covers the real case without a new picker.
+
+  - **THE AFFORDANCE IS IN BASE, opposite the scenarios' "This scenario only"** (Tom asked,
+    2026-08-14: *"Are we going to add 'Apply to all scenarios' in Base?"*). Yes — and note it is
+    not there for symmetry, which is never a reason on its own: it is there because pushing a
+    value down is a real action a user needs, and Base is the only place standing where that
+    action makes sense.

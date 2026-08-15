@@ -742,39 +742,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Related and unfiled until Tom rules: a toggle for label background masking, and search within a
     large model.
 
-- 97|317| **Push Base values to all scenarios PER ELEMENT, not only per property.** Tom, 2026-08-14,
-  looking at the shipped scenario menu: *"I assume that Apply Base values to all scenarios will be
-  fine-grained; each property or element (maybe start only with the element level, will have a way
-  to Apply values to all scenarios."*
-
-  **Half of that assumption is already true and half is not, which is the reason this task exists.**
-  `pushBaseToScenarios()` is scoped **by PROPERTY** — the Labels panel's checkboxes are the filter,
-  so the user's own current view defines the blast radius and no second property picker was needed
-  (Task 184's design, and the same mechanism the Settings push uses). It is scoped **by ELEMENT not
-  at all**: it walks `Object.keys(s.overrides)` for every scenario and takes everything.
-
-  - **The element-level push is the SAFE and COMMON case, and the global one is neither.** The real
-    workflow is "I corrected P-12's diameter in Base and I want that one correction everywhere" —
-    a single element, deliberately chosen, with a countable blast radius. The all-elements push
-    exists for the rare bulk case and is the most destructive thing on the page; that asymmetry
-    argues for building the narrow one first, exactly as Tom suggests.
-  - **Where it goes: the element's own popup**, beside the override markers already there. That
-    keeps the dangerous global action in the scenario menu where it is deliberately hard to reach,
-    and puts the everyday action where the user is already looking at the element.
-  - **Reuse `pushBaseToScenarios()`, do not fork it.** Give it an optional element-id filter; the
-    counting, the naming of properties, the finger-wag confirm and the undo snapshot are all
-    already right and must not be duplicated into a second implementation that drifts.
-  - **Still Base-only**, for the reason the existing guard states: run inside a scenario it would
-    mint an override on every element at once.
-  - Per-property-per-element (a single cell) is the third level and is explicitly NOT wanted yet —
-    Tom's own "maybe start only with the element level". The Labels panel already narrows properties,
-    so element + displayed-properties covers the real case without a new picker.
-
-  - **THE AFFORDANCE IS IN BASE, opposite the scenarios' "This scenario only"** (Tom asked,
-    2026-08-14: *"Are we going to add 'Apply to all scenarios' in Base?"*). Yes — and note it is
-    not there for symmetry, which is never a reason on its own: it is there because pushing a
-    value down is a real action a user needs, and Base is the only place standing where that
-    action makes sense.
 - 96|314| **An EXAMPLES LIBRARY, on the HEC-RAS model: a pane of many examples, not a menu of two.**
   Tom, 2026-08-14: *"I envision a stunning array of examples that fills a screen with mere titles or
   brief descriptions and could span pages or sub-categories of large thumbnails… Therefore it is
@@ -2448,6 +2415,13 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|317| **Push Base values PER ELEMENT — CLOSED 2026-08-14.** `pushBaseToScenarios(el)` takes an
+  optional element instead of forking: one count, one confirm, one undo snapshot, so a confirm can
+  never promise a different blast radius from the one that happens. The button lives in the
+  element's own popup (Base only, absent rather than disabled) and reuses the scenario menu's own
+  two strings — it is the same action, narrowed by where it is. It also filters the property list
+  to the element's GROUP, which is the only part of the scoping a user sees. Per-property-per-element
+  is the third level and is still not wanted. Harness section 7b in `dev/lpn-spike/scenario-harness.js`.
 - 0|326| **The paper-units paradigm — CLOSED 2026-08-14 as ALREADY DELIVERED, and it was never a
   build.** Tom, asked whether to store paper heights and a drawing scale: *"I don't think we store
   anything as paper heights. I was just fleshing out a paradigm. Everything is in pixels... drawing
