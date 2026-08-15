@@ -476,11 +476,15 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - The work: offer BOTH sides from `alignedLabelAnchor()` as candidates and let
     `runLabelCollisionAvoidance()` choose. The aligned path currently returns before the nudge, so it
     never enters the engine at all — that early return is the change.
-  - **The thing to watch when he looks at it:** GIS aligns ONE short name along a line. Our link
-    labels default to THREE lines (id, flow, velocity) and can carry nine. A rotated three-line stack
-    is legible; a nine-line one is a wall of text lying at 40°. If alignment reads well, it may argue
-    for fewer values per pipe at a given scale — which is Task 326's scale-dependent visibility
-    arriving from an unrelated direction, and therefore evidence rather than coincidence.
+  - **THE WALL-OF-TEXT WORRY IS GONE, ANSWERED BY TASK 333 (2026-08-15).** This used to read: GIS
+    aligns ONE short name along a line, while our link labels default to three and can carry nine, so
+    a rotated nine-line stack would be a wall of text at 40°. A link label is now **one line** unless
+    dragged (`L1 Q=133 V=1.5`), which is exactly the shape GIS aligns — so the aligned path should be
+    re-looked-at with that in mind, and the remaining question is only which SIDE, not whether the
+    thing being rotated is too tall. The prefixes are what make the one-line form readable, so the
+    two tasks landed in the right order by accident.
+  - Still true: if alignment reads well it may argue for fewer values per pipe at a given scale,
+    which is Task 326's scale-dependent visibility arriving from an unrelated direction.
 
 - 70|330| **Toggle for label background masking.** Tom, 2026-08-14: *"We want to be able to turn off
   and on background masking."* The mask geometry exists (`lpnGeom.maskRect`); this is the control and
