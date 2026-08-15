@@ -7029,3 +7029,30 @@ tasks at priority 0. Compressed to a stub there; this is the full text as it sto
     bumped string in the one file where forgetting it is invisible (a returning visitor silently
     keeps the old cache). The Task 287 comment above it documents a bump that was required for
     correctness, which proves the risk is live. Generating `sw.js` removes it entirely.
+
+
+## Task 324
+
+- 90|324| **Scenario overrides collide between a NODE and a LINK that share an id — and EPANET files
+  do that constantly.** Found by Tom, 2026-08-14: *"When I changed a demand, a remote pipe changed
+  to orange along with the node. The pipe has no changes."* He is right, and the halo is the
+  harmless half.
+  - `scenarios[].overrides` is **one flat map keyed by the bare element id**, which assumes a single
+    id space. **EPANET keeps nodes and links in SEPARATE namespaces**, so a junction `20` and a pipe
+    `20` are both legal and both common. Measured on the files in `dev/epanet-models/`:
+    **Net2 has 35 collisions, Net3 has 72.**
+  - **The halo is cosmetic; `effective()` is not.** Everything reads the same map, so a node's
+    override is visible to a link with the same id. `active` is the dangerous one — it is on BOTH
+    groups, so unticking "Part of this network" on a junction can silently drop a pipe out of the
+    solve. `demand` and `diameter` do not overlap by name, which is why this reads as a display
+    glitch until it does not.
+  - **Fix: key by group + id** (`n:20` / `l:20`), through one `ovKey(el)` seam — 18 call sites touch
+    `.overrides[` and all must go through it. `renameOverrides`, `purgeOverrides`, `deleteElement`
+    and `overrideCount` included.
+  - **It is a document-format change**, so saved projects need migrating: an existing bare-id key is
+    ambiguous by construction, and the honest migration resolves it against the element actually
+    present, preferring the node (which is what the old code effectively did first).
+  - **A harness case belongs with it**: import Net2, override a demand on a node whose id a pipe also
+    carries, assert the pipe is untouched in the solve AND unhaloed. `scenario-harness.js` never had
+    a colliding id because its fixtures are hand-built with unique ones — the same blind spot that
+    let the valve seam through.

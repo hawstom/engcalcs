@@ -551,30 +551,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Related and unfiled until Tom rules: a toggle for label background masking, and search within a
     large model.
 
-- 90|324| **Scenario overrides collide between a NODE and a LINK that share an id — and EPANET files
-  do that constantly.** Found by Tom, 2026-08-14: *"When I changed a demand, a remote pipe changed
-  to orange along with the node. The pipe has no changes."* He is right, and the halo is the
-  harmless half.
-  - `scenarios[].overrides` is **one flat map keyed by the bare element id**, which assumes a single
-    id space. **EPANET keeps nodes and links in SEPARATE namespaces**, so a junction `20` and a pipe
-    `20` are both legal and both common. Measured on the files in `dev/epanet-models/`:
-    **Net2 has 35 collisions, Net3 has 72.**
-  - **The halo is cosmetic; `effective()` is not.** Everything reads the same map, so a node's
-    override is visible to a link with the same id. `active` is the dangerous one — it is on BOTH
-    groups, so unticking "Part of this network" on a junction can silently drop a pipe out of the
-    solve. `demand` and `diameter` do not overlap by name, which is why this reads as a display
-    glitch until it does not.
-  - **Fix: key by group + id** (`n:20` / `l:20`), through one `ovKey(el)` seam — 18 call sites touch
-    `.overrides[` and all must go through it. `renameOverrides`, `purgeOverrides`, `deleteElement`
-    and `overrideCount` included.
-  - **It is a document-format change**, so saved projects need migrating: an existing bare-id key is
-    ambiguous by construction, and the honest migration resolves it against the element actually
-    present, preferring the node (which is what the old code effectively did first).
-  - **A harness case belongs with it**: import Net2, override a demand on a node whose id a pipe also
-    carries, assert the pipe is untouched in the solve AND unhaloed. `scenario-harness.js` never had
-    a colliding id because its fixtures are hand-built with unique ones — the same blind spot that
-    let the valve seam through.
-
 - 85|317| **Push Base values to all scenarios PER ELEMENT, not only per property.** Tom, 2026-08-14,
   looking at the shipped scenario menu: *"I assume that Apply Base values to all scenarios will be
   fine-grained; each property or element (maybe start only with the element level, will have a way
@@ -2275,6 +2251,16 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|324| **[DONE 2026-08-14] Scenario overrides no longer collide between a node and a link sharing
+  an id.** One flat map keyed by bare id met EPANET's two namespaces: re-measured, **Net1 has 7
+  shared ids, Net2 35, Net3 72** — even the smallest EPA example collides, which the task did not
+  know. The halo Tom saw was the harmless half; `active` is on both groups, so unticking "Part of
+  this network" on a junction silently dropped an unrelated pipe out of the SOLVE. Now keyed `n:20`
+  / `l:20` through one `ovKey()` seam, storage v4→v5 with a migration that states its rule. Harness
+  drives an IMPORTED network, because the editor refuses duplicate ids and a hand-built fixture
+  could never reach this state. Full record: `dev/scenario-seam-repair.md`.
+
 
 - 0|318| **[DONE 2026-08-14] The offline promise is now TRUE, and verified on a real device.**
   `sw.js` precached bare paths while every page requested `?v=<filemtime>`, and `cacheFirst()`
