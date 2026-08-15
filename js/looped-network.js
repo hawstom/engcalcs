@@ -1435,7 +1435,7 @@ var EngCalcs = EngCalcs || {};
 			// which is the invariant that prevents the touch trap it was written for. A taller
 			// DEFAULT now simply means desktops use the room they have while phones are unchanged.
 			// An existing visitor keeps whatever they had -- this is a default, not a migration.
-			mapHeight: 800 // px, capped at render time to 72% of the viewport; see applyMapHeight()
+			mapHeight: 0 // 0 = fill the window; a positive number is a maximum. See effectiveMapHeight()
 		};
 	}
 	var settings = defaultSettings();
@@ -3702,6 +3702,9 @@ var EngCalcs = EngCalcs || {};
 		var savedPrefixes = savedSettings.idPrefixes || {};
 		delete savedSettings.defaults; delete savedSettings.sectionsOpen; delete savedSettings.idPrefixes;
 		settings = Object.assign(defaultSettings(), savedSettings);
+		// A project saved before the map learned to fit the window carries whichever fixed height was
+		// the default when it was written; see normalizeMapHeight() for why that is not a choice.
+		settings.mapHeight = normalizeMapHeight(settings.mapHeight);
 		Object.assign(settings.defaults, savedDefaults);
 		Object.assign(settings.sectionsOpen, savedSections);
 		Object.assign(settings.idPrefixes, savedPrefixes);
@@ -8590,27 +8593,58 @@ var EngCalcs = EngCalcs || {};
 	// settings.mapHeight keeps the user's UNCLAMPED number -- this is a render-time cap, so an
 	// 800px map set on a desktop is not permanently rewritten by one visit on a phone.
 	var LPN_MAP_MIN = 240;
+	// settings.mapHeight === LPN_MAP_FIT means "fill the window", and it is the default.
+	//
+	// **A FIXED PIXEL HEIGHT CANNOT PUT THE BOTTOM AT THE BOTTOM**, which is what Tom keeps asking
+	// for -- it can only be right on one window size. So the number became an optional MAXIMUM and
+	// the default became a behaviour. Anyone who wants a specific height still types one; everyone
+	// else gets a map that ends where the window ends, on every screen.
+	var LPN_MAP_FIT = 0;
+	// The two heights we ever SHIPPED as the default: the original fixed <svg height="500"> and the
+	// 800 it briefly became earlier today. A stored value equal to either is a value nobody chose --
+	// it is the default lying in a settings object -- so it migrates to fit. A number the user
+	// actually typed is kept. This is the whole migration, and it is deliberately not a version
+	// bump: it changes a preference's meaning, not the document's shape.
+	var LPN_MAP_SHIPPED_DEFAULTS = [500, 800];
+	function normalizeMapHeight(v) {
+		var n = +v;
+		if (!isFinite(n) || n <= 0) { return LPN_MAP_FIT; }
+		return LPN_MAP_SHIPPED_DEFAULTS.indexOf(n) >= 0 ? LPN_MAP_FIT : n;
+	}
 	// How much ordinary page sits BELOW the canvas, in document flow. The popovers do not count:
 	// every one of them is position:fixed and display:none, so they occupy no flow at all -- which
 	// is why this measures the document rather than listing elements by id, a list that would go
 	// stale the first time somebody added one.
 	function flowBelowMap() {
-		if (!svg) { return 0; }
-		var docEl = document.documentElement;
-		var rect = svg.getBoundingClientRect();
-		var topInDoc = rect.top + (window.pageYOffset || docEl.scrollTop || 0);
-		var below = docEl.scrollHeight - (topInDoc + rect.height);
+		if (!svg || !document.body) { return 0; }
+		// **MEASURED FROM THE BODY'S OWN BOX, NOT FROM scrollHeight** -- and the difference is the
+		// whole bug Tom photographed on 2026-08-14 ("The bottom still isn't at the bottom").
+		//
+		// documentElement.scrollHeight NEVER REPORTS LESS THAN THE VIEWPORT. So the moment the page
+		// became shorter than the window -- which is precisely what this whole feature is trying to
+		// achieve -- `scrollHeight - canvasBottom` stopped measuring content below the canvas and
+		// started measuring the EMPTY SPACE below it. Subtracting that is circular: with
+		// below = vh - above - H, the formula collapses to room = H - 8, so every recompute simply
+		// shrank the map by the slack and re-created the gap it was trying to close. It could never
+		// converge, because the gap was its own input.
+		//
+		// body's rect is the CONTENT box: it is not clamped to the viewport, and position:fixed
+		// popovers are out of flow so they never inflate it. That is what makes it the honest
+		// measure of "what is actually under the map".
+		var b = document.body.getBoundingClientRect(), s = svg.getBoundingClientRect();
+		var below = b.bottom - s.bottom;
 		return below > 0 ? below : 0;
 	}
 	function effectiveMapHeight() {
 		var vh = window.innerHeight || 800;
-		if (!svg) { return Math.min(settings.mapHeight, vh); }
+		if (!svg) { return settings.mapHeight === LPN_MAP_FIT ? vh : Math.min(settings.mapHeight, vh); }
 		var docEl = document.documentElement;
 		var rect = svg.getBoundingClientRect();
 		var above = rect.top + (window.pageYOffset || docEl.scrollTop || 0);
 		// 8px of slack so a sub-pixel layout rounding cannot leave the page one stubborn pixel
 		// scrollable -- which on a touch screen is a scrollbar with nothing to reach.
 		var room = Math.round(vh - above - flowBelowMap() - 8);
+		if (settings.mapHeight === LPN_MAP_FIT) { return Math.max(LPN_MAP_MIN, room); }
 		return Math.max(LPN_MAP_MIN, Math.min(settings.mapHeight, room));
 	}
 	function applyMapHeight() {
@@ -9079,10 +9113,20 @@ var EngCalcs = EngCalcs || {};
 		});
 		row(mapBody, pc.lpn_settings_backdrop_opacity || 'Background image opacity (0 to 1)', backdropOpacityInput);
 		var heightInput = document.createElement('input');
-		heightInput.type = 'number'; heightInput.step = 'any'; heightInput.min = '100'; heightInput.value = settings.mapHeight;
+		// BLANK MEANS FIT THE WINDOW, and the placeholder shows the height that is actually in use --
+		// so an empty box reads as "automatic, currently 592" rather than as a missing value. Blank
+		// for auto needs no new string, which matters: the label and its tip are already translated
+		// into 26 languages and a reworded tip would put them all out of date at once.
+		heightInput.type = 'number'; heightInput.step = 'any'; heightInput.min = '0';
+		heightInput.value = settings.mapHeight === LPN_MAP_FIT ? '' : settings.mapHeight;
+		heightInput.placeholder = effectiveMapHeight();
 		heightInput.addEventListener('change', function () {
-			if (+heightInput.value >= 100) { settings.mapHeight = +heightInput.value; applyMapHeight(); saveToStorage(); }
-			else { heightInput.value = settings.mapHeight; }
+			var raw = heightInput.value.trim();
+			if (raw === '' || +raw === 0) { settings.mapHeight = LPN_MAP_FIT; }
+			else if (+raw >= 100) { settings.mapHeight = +raw; }
+			else { heightInput.value = settings.mapHeight === LPN_MAP_FIT ? '' : settings.mapHeight; return; }
+			applyMapHeight(); saveToStorage();
+			heightInput.placeholder = effectiveMapHeight();
 		});
 		row(mapBody, pc.lpn_settings_map_height_px || 'Map height (screen pixels)', heightInput,
 			pc.lpn_settings_map_height_tip);

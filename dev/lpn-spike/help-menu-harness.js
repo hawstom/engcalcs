@@ -193,9 +193,17 @@ console.log('\n-- the map fits the window instead of guessing 72% of it --');
 	// rather than by a chosen fraction.
 	report(/vh - above - flowBelowMap\(\) - 8/.test(body),
 		'room is viewport minus above minus below, so the canvas is never viewport-tall');
-	const below = src.slice(src.indexOf('function flowBelowMap'));
-	report(/scrollHeight/.test(below.slice(0, 600)),
-		'“below” is measured from the document, not from a list of element ids that would go stale');
+	// It passed only because the PROSE above it mentions scrollHeight — which is now the thing this
+	// code must not do. Assert the measurement, not a word that appears near it.
+	const flow = src.slice(src.indexOf('function flowBelowMap'));
+	const flowBody = flow.slice(0, flow.indexOf('\n\tfunction ', 10)).replace(/^\s*\/\/.*$/gm, '');
+	report(/document\.body\.getBoundingClientRect\(\)/.test(flowBody),
+		'“below” is measured from the body’s content box');
+	// documentElement.scrollHeight never reports less than the viewport, so once the page is
+	// shorter than the window it measures the GAP rather than the content — and subtracting the gap
+	// from the height that created it is circular. See map-height-harness.js, which reproduces the
+	// 8px-per-pass shrink that produced Tom's photograph.
+	report(!/scrollHeight/.test(flowBody), 'and never from scrollHeight, which is clamped to the viewport');
 }
 
 console.log('\n-- the strings exist --');
