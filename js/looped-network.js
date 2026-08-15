@@ -1871,6 +1871,9 @@ var EngCalcs = EngCalcs || {};
 	// teardown-and-rebuild on every drag frame was measured at 20-45fps; touching only the
 	// elements incident to what moved keeps drag at the display's real refresh rate.
 	var nodeEls = {}, linkEls = {}, labelEls = {}, incidentLinks = {}, labelsByAnchor = {};
+	// Whether generated annotation is currently suppressed by settings.labelMaxWidth. Written only
+	// by applyLabelVisibility(); read by onZoomChanged() and bbox().
+	var dataLabelsHidden = false;
 
 	// Symbol size. SCREEN PIXELS and INDEPENDENT OF THE TEXT since 2026-08-14 (Task 331). Tom:
 	// *"decouple label, link, and node size (in pixels? EPANET is fuzzy about that and epanet-js
@@ -2532,6 +2535,16 @@ var EngCalcs = EngCalcs || {};
 				tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1,
 				nlx = ne.text ? +ne.text.getAttribute('x') : n.x + 2, nly = ne.text ? +ne.text.getAttribute('y') : n.y - 2;
 			inc(n.x - r, n.y - r); inc(n.x + r, n.y + r);
+			// **A LABEL THAT IS NOT DRAWN RESERVES NO ROOM** (Tom, 2026-08-15: *"Zoom to Fit is
+			// giving me unexpected padding even with all labels off at that zoom."* — it was
+			// reserving space for every hidden label). Zoom-to-fit is a question about what is on
+			// the screen, so it has to ask the same question the renderer just answered.
+			//
+			// It settles at the state the user could SEE when they pressed the button, which is the
+			// honest reading of "fit this". Fitting can zoom in far enough to bring the labels back,
+			// and then they are outside the box that was fitted -- accepted deliberately, because
+			// the alternative is a fit that re-decides its own inputs and never converges.
+			if (dataLabelsHidden) { continue; }
 			// "J1"-style id/data label beside the circle -- extended downward per extra toggled-on
 			// line (Task 146 Phase 2 label toggles), since multi-line labels grow toward +y (dy>0).
 			// Read from the label's OWN rendered x/y (Task 146.01), not a hardcoded n.x+2/n.y-2--
@@ -2549,6 +2562,10 @@ var EngCalcs = EngCalcs || {};
 				// reserved 4, so zoom-to-fit clipped it. Found 2026-08-09 adding the example's
 				// title block (Task 254).
 				lbox = textLabelBox(lb, le, px, py);
+			// Same rule for an authored label, which has its OWN threshold (Task 340): a note that
+			// has vanished at this zoom is not part of what is being fitted, while a title block
+			// pinned with "Always show" still is.
+			if (le.text && le.text.classList && le.text.classList.contains('lpn-lbl-hidden')) { continue; }
 			inc(lbox.x, lbox.y); inc(lbox.x + lbox.w, lbox.y + lbox.h);
 		}
 		for (i = 0; i < doc.links.length; i++) {
@@ -2564,7 +2581,7 @@ var EngCalcs = EngCalcs || {};
 			// the Task 332 defect wearing different clothes; the cheapest way not to have it is not
 			// to ask. A lone label still counts: it sits off to the side of its pipe and nothing
 			// else in this loop knows where.
-			if (lle && linkLabelStations(l).length > 1) { continue; }
+			if (lle && (dataLabelsHidden || linkLabelStations(l).length > 1)) { continue; }
 			if (lle) {
 				var lx = +lle.text.getAttribute('x'), ly = +lle.text.getAttribute('y'),
 					ltw = labelBoxWidth(lle) || 8, llc = lle.lineCount || 1;
@@ -7587,6 +7604,15 @@ var EngCalcs = EngCalcs || {};
 		// browsers fire only one of the two, and re-applying a height twice is free.
 		window.addEventListener('resize', applyMapHeight);
 		window.addEventListener('orientationchange', applyMapHeight);
+		// COMING BACK TO THE TAB RE-MEASURES (Tom, 2026-08-15: *"Zoom changes for Net3 when I go to
+		// another tab and then return."*). Nothing here changes state.s, so a "zoom change" on
+		// return can only be the CANVAS changing size under a transform that did not -- i.e. a
+		// height applied while the tab was hidden and the rects were unreliable. The guard in
+		// applyMapHeight() stops the bad value being stored; this re-runs the measurement once the
+		// page is visible and the numbers mean something again.
+		document.addEventListener('visibilitychange', function () {
+			if (!document.hidden) { applyMapHeight(); }
+		});
 		// **Nothing is flushed to a file on the way out any more** (Task 211). The locks ARE handed
 		// back, so a colleague is never left waiting on a browser that has gone; `visibilitychange` ->
 		// hidden is the one that actually fires on mobile, and `beforeunload` is the desktop net.
@@ -9023,10 +9049,28 @@ var EngCalcs = EngCalcs || {};
 		// 8px of slack so a sub-pixel layout rounding cannot leave the page one stubborn pixel
 		// scrollable -- which on a touch screen is a scrollbar with nothing to reach.
 		var room = Math.round(vh - above - flowBelowMap() - 8);
+		// **A MAP TALLER THAN THE WINDOW IS NEVER THE RIGHT ANSWER, AND THE OLD FORMULA COULD
+		// PRODUCE ONE** (guard added 2026-08-15 after Tom hit an unrecoverable state: *"The bottom
+		// of the map overflowed the bottom of the screen. And status line is gone. Reload doesn't
+		// fix."*). Every term above is a measurement, and `above` in particular goes NEGATIVE if the
+		// rect and the scroll offset ever disagree -- at which point room exceeds the viewport, the
+		// map runs off the bottom, and #lpn_map_footer goes with it because it is pinned to the
+		// map's own bottom edge. Worse, that state feeds itself: an overflowing map makes the page
+		// scrollable, and the next resize measures a scrolled page.
+		//
+		// The clamp costs nothing in the healthy case -- with above and below both >= 0 the formula
+		// already yields at most vh - 8 -- so it bites only when an input was wrong, which is
+		// exactly when a floor and a ceiling earn their keep.
+		room = Math.min(room, vh - 8);
 		return Math.max(LPN_MAP_MIN, room);
 	}
 	function applyMapHeight() {
 		if (!svg) { return; }
+		// NOT LAID OUT YET, so every measurement below is a fiction -- a hidden tab, a display:none
+		// ancestor, or a call before first layout. Doing nothing leaves the last good height in
+		// place, which is strictly better than replacing it with an answer derived from zeros.
+		var r = svg.getBoundingClientRect();
+		if (!r.width && !r.height) { return; }
 		// Measure with the CURRENT height already applied, then apply the answer. flowBelowMap()
 		// reads scrollHeight, which includes the canvas itself, so the two cancel -- but only if
 		// nothing else moved in between, which is why this is one statement and not a loop.
@@ -9044,6 +9088,18 @@ var EngCalcs = EngCalcs || {};
 	// needed both when the user edits Text size directly and whenever state.s changes
 	// (zoomAbout()/zoomExtent() call onZoomChanged() below), since a pixel size is by definition
 	// state.s-dependent while every other geometry in this file is left to the SVG's own transform.
+	// The user's own Text labels only. Split out of refreshFontSizes() because they survive a zoom
+	// that hides every generated label (Task 340: a Text label has its own size-scaled threshold),
+	// so the zoom fast path below still has to resize them -- and there are a handful of them, not
+	// one per element.
+	function refreshTextLabelSizes() {
+		Object.keys(labelEls).forEach(function (id) {
+			var le = labelEls[id], lb = labelById(id);
+			le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
+			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
+			updateLabelGeometry(id);
+		});
+	}
 	function refreshFontSizes() {
 		var fs = effectiveFontSize() + 'px';
 		Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
@@ -9054,12 +9110,7 @@ var EngCalcs = EngCalcs || {};
 			// rather than the other way round.
 			(linkEls[id].repeats || []).forEach(function (r) { r.text.style.fontSize = fs; });
 		});
-		Object.keys(labelEls).forEach(function (id) {
-			var le = labelEls[id], lb = labelById(id);
-			le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
-			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
-			updateLabelGeometry(id);
-		});
+		refreshTextLabelSizes();
 		refreshSymbolSizes(); // publishes --lpn-sym / --lpn-lw, both of which are state.s-dependent too
 		refreshLabelText(); // recomputes multi-line tspan dy spacing and extrema tick positions at the new size
 	}
@@ -9110,7 +9161,12 @@ var EngCalcs = EngCalcs || {};
 		var lim = settings.labelMaxWidth,
 			on = typeof lim === 'number' && lim > 0,
 			vw = visibleMapWidth();
-		if (svg) { svg.classList.toggle('lpn-labels-hidden', on && vw > lim); }
+		// Recorded, not just applied. Two things need to KNOW whether generated annotation is on
+		// screen rather than merely being styled by it: the zoom path, which can skip the whole
+		// label pipeline when nothing readable is drawn, and bbox(), which must not reserve space
+		// for labels nobody can see. Both used to re-derive it and one of them got it wrong.
+		dataLabelsHidden = !!(on && vw > lim);
+		if (svg) { svg.classList.toggle('lpn-labels-hidden', dataLabelsHidden); }
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id];
 			if (!le) { return; }
@@ -9133,8 +9189,32 @@ var EngCalcs = EngCalcs || {};
 	function applyMaskLabels() {
 		if (svg) { svg.classList.toggle('lpn-masks-off', settings.maskLabels === false); }
 	}
+	// **A ZOOM STEP DOES NOT REBUILD LABELS NOBODY CAN SEE** (Tom, 2026-08-15: *"the Net3 example is
+	// a little sluggish to zoom even when labels are all hidden. Is recalc triggering on zoom and can
+	// be turned off? Maybe labels are being handled at all zoom levels."* — the second guess was the
+	// right one, and no, nothing hydraulic runs here: `scheduleSolve()` is never called from a zoom).
+	//
+	// The full path is refreshFontSizes() -> refreshLabelText(), which recomposes every node's and
+	// every link's text, re-measures each one with getBBox(), and then runs four iterations of the
+	// collision relaxation over the lot. On Net3 that is ~200 elements of work per wheel notch,
+	// every notch, to update text that `.lpn-labels-hidden` is not drawing.
+	//
+	// So when annotation is hidden and STAYS hidden, only two things still change with the zoom:
+	// the symbol/stroke custom properties, and the user's own Text labels, which have their own
+	// size-scaled threshold and may still be on screen. The transition in either direction takes
+	// the full path, so nothing comes back stale.
 	function onZoomChanged() {
+		var wasHidden = dataLabelsHidden;
+		applyLabelVisibility();
+		if (wasHidden && dataLabelsHidden) {
+			refreshSymbolSizes();
+			refreshTextLabelSizes();
+			return;
+		}
 		refreshFontSizes();
+		// applyLabelVisibility() again, because refreshFontSizes() can change a Text label's own
+		// width and therefore nothing about the threshold -- but buildDom-time elements created
+		// inside refreshLabelText() have no visibility class yet.
 		applyLabelVisibility();
 	}
 	// ID-prefix validation, same illegal-character set as validateNewId() (no spaces/quotes) plus

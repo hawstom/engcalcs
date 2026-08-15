@@ -64,9 +64,17 @@ session of its own with nothing else in it.
     fixes it, contained; (b) the whole path is culled for enormous device bounds → only a RENDER
     ORIGIN fixes it (subtract a per-document offset from every coordinate written to the DOM,
     keeping the document's true coordinates).
-  - **THE EXPERIMENT THAT DECIDES IT TAKES TEN SECONDS**: zoom in until P11 disappears, then raise
-    Settings ▸ Map ▸ Pipe width to 20. If the pipe comes back it is the stroke and the fix is (a).
-    If it stays gone it is the coordinates and the fix is (b).
+  - **THE EXPERIMENT WAS RUN AND IT CAME BACK AMBIGUOUS, WHICH IS ITSELF THE ANSWER** (Tom,
+    2026-08-15): *"20 works fine at the zoom shared. But any closer both pipes and the labels
+    disappear."* A wider stroke surviving longer says the stroke IS one term — cause (a) is real —
+    and the LABELS going too at the next zoom step says it is not the only one, because a label is
+    glyphs, not a stroked path. **So both causes are live and the fix is both**: pixel stroke widths
+    via `non-scaling-stroke` for (a), and a render origin for (b). Do (b) properly; (a) alone would
+    move the cliff without removing it.
+  - Tom's own reading, same message: *"(a) we need to try culling the pipe and (b) maybe we are
+    being hit by a rounding problem on the map size."* The second half is worth checking on its own
+    — `visibleMapWidth()` divides by `state.s`, and at scale 500 on 1.3e6 coordinates that quotient
+    is doing the same float arithmetic everything else here is.
   - Only affects models far from the origin. Our own examples sit at ~5,000 and Net1/2/3 at 0-100,
     which is why this never showed until a real client model was imported — and it is exactly the
     class of model LibreEPANET.org exists for, so it gates nothing formally but it should.
@@ -81,11 +89,11 @@ session of its own with nothing else in it.
     asking "which elements are interesting", and a search that can answer "velocity > 5" makes the
     mark's job smaller.
 
-- 50|355| **[H] Long labels and short pipes.** Tom raised it 2026-08-15 as five words and no more;
-  the question of WHAT should happen is open and is his to answer. What exists today:
-  `linkLabelTooShort()` hides a link's whole label when the pipe is shorter than the label box
-  times `SHORT_LINE_MULT`, which is all-or-nothing. Candidates if he wants them: drop lines by
-  priority (Task 343), shrink the label, let it overrun the pipe, or put it on a leader.
+- 15|355| **Long labels and short pipes — WAIT AND TEST.** Tom, 2026-08-15, after the repeat and
+  alignment work landed: *"I think we are good, to tell the truth. Nothing to do, I think."* So
+  nothing is scheduled. `linkLabelTooShort()` still hides a short pipe's label all-or-nothing; if
+  that ever reads wrong in practice the candidates are Task 343's line-priority drop, shrinking the
+  label, letting it overrun, or a leader. Reopen on evidence, not on tidiness.
 
 - 15|294|[H] **Decide the 7 remaining dead language keys, one each.** `menu_main_list`,
   `menu_main_language`, `mi_d50in`, `mpf_spreadheet_notice` (key name is misspelled too),
@@ -1816,6 +1824,35 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|356| **A zoom step no longer rebuilds labels nobody can see — DONE 2026-08-15.** Tom:
+  *"the Net3 example is a little sluggish to zoom even when labels are all hidden. Is recalc
+  triggering on zoom and can be turned off?"* No solve runs on a zoom; what ran was
+  `refreshFontSizes()` → `refreshLabelText()`, recomposing and re-measuring every node's and every
+  link's text and then running four iterations of collision relaxation — per wheel notch, on labels
+  `.lpn-labels-hidden` was not drawing. When annotation is hidden and stays hidden, a zoom now
+  updates only the symbol/stroke custom properties and the user's own Text labels (which have their
+  own threshold and may still be on screen). Either transition takes the full path.
+
+- 0|357| **Zoom-to-fit stops padding for labels it is not drawing — DONE 2026-08-15.** Tom: *"Zoom
+  to Fit is giving me unexpected padding even with all labels off at that zoom."* `bbox()` reserved
+  every label's box unconditionally. It now skips node and link labels while annotation is hidden,
+  and skips a Text label carrying `.lpn-lbl-hidden`. It settles at the state the user could see when
+  they pressed the button; fitting can zoom in far enough to bring labels back, which is accepted
+  rather than iterated, because a fit that re-decides its own inputs does not converge.
+
+- 0|358| **The canvas can no longer grow taller than the window — DONE 2026-08-15.** Tom: *"The
+  bottom of the map overflowed the bottom of the screen. And status line is gone. Unrecoverable.
+  Reload doesn't fix."* One symptom, not two: `#lpn_map_footer` is `bottom:4px` INSIDE the canvas.
+  `effectiveMapHeight()`'s `above` term is `rect.top + scrollY`, which goes NEGATIVE when those two
+  disagree, and the result then exceeded the viewport — after which the page scrolls, and a scrolled
+  page is what makes the measurement wrong, so the state feeds itself. Two guards: the room is
+  clamped to `vh - 8` (a no-op unless an input was wrong), and `applyMapHeight()` refuses to size
+  from an empty rect, which is what a hidden tab reports. `visibilitychange` re-measures on return —
+  the likely cause of Tom's *"Zoom changes for Net3 when I go to another tab and then return"*, since
+  nothing on that path touches `state.s` and only the canvas size can change what you see.
+  `dev/lpn-spike/map-height-harness.js`, 10 checks. **Not reproduced in a browser — the mechanism is
+  inferred from the arithmetic, so if it recurs, the console error is the next thing to look at.**
 
 - 0|351| **A readability-bias angle for aligned pipe labels — DONE 2026-08-15.**
   `settings.labelReadabilityBias`, default **110 degrees**, in Settings ▸ Map under the align
