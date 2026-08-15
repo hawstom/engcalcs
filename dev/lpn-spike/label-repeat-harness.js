@@ -26,8 +26,9 @@ const L = loadLoopedNetwork(
 	"\t\tseedDefaultInputs: seedDefaultInputs, refreshLabelText: refreshLabelText,\n" +
 	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tsetSetting: function (k, v) { settings[k] = v; },\n" +
-	"\t\tstations: linkLabelStations, spacing: labelRepeatSpacing,\n" +
-	"\t\trepeatMax: function () { return LPN_LABEL_REPEAT_MAX; },\n" +
+	"\t\tstations: linkLabelStations, drawn: drawnLinkLabelStations, spacing: labelRepeatSpacing,\n" +
+	"\t\tplacement: alignedLabelPlacement, relayout: relayoutLabels, addText: addText,\n" +
+	"\t\tpan: function (tx, ty) { state.tx = tx; state.ty = ty; },\n" +
 	"\t\tpipeLength: function (id) { return Geom.polylineLength(linkPointList(linkById(id))); },\n" +
 	"\t\tlinkEl: function (id) { return linkEls[id]; },\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
@@ -111,14 +112,23 @@ console.log('\n--- a pipe longer than the spacing repeats along itself ---');
 	ok('...each saying the same thing as the original',
 		le.repeats.every(r => textOf(r.text) === textOf(le.text)),
 		textOf(le.text) + ' vs ' + le.repeats.map(r => textOf(r.text)).join(' / '));
-	// A REPEAT IS PIXELS, NOT A SECOND LABEL. It must be invisible to hit testing, or the map grows
-	// four drag targets per pipe that each claim to be the label and disagree about where it is.
-	ok('a repeat is not a drag target', le.repeats.every(r =>
-		!/lpn-draglbl/.test(r.text.getAttribute('class') || '')),
+	// EVERY COPY IS PICKABLE (Tom, 2026-08-15: "The problem is that I can only drag one upstream
+	// label"). The first version made repeats inert, which left one magic copy per pipe that could
+	// be dragged and no way to tell which. Now they are all the same: same link id, same drag class.
+	ok('every repeat is a drag target, so there is no magic copy to find', le.repeats.every(r =>
+		/lpn-draglbl/.test(r.text.getAttribute('class') || '')),
 		le.repeats.map(r => r.text.getAttribute('class')).join(' / '));
-	ok('...and carries no link-label identity for a hit test to find',
-		le.repeats.every(r => r.text.getAttribute('data-linklbl') === undefined ||
-			r.text.getAttribute('data-linklbl') === null));
+	ok('...and every one of them names the SAME link, so a grab drags that link\'s label',
+		le.repeats.every(r => r.text.getAttribute('data-linklbl') === long.id),
+		le.repeats.map(r => r.text.getAttribute('data-linklbl')).join(' / '));
+	// The index is how a pointerdown knows WHICH copy was grabbed, which is what lets the chain
+	// collapse to that spot instead of jumping to the half-way point first.
+	ok('...and carries its own index, so a grab knows which copy it took hold of',
+		le.repeats.every((r, k) => +r.text.getAttribute('data-repeat') === k),
+		le.repeats.map(r => r.text.getAttribute('data-repeat')).join(' / '));
+	ok('...and each remembers its station, which is where that grab starts from',
+		le.repeats.every(r => typeof r.along === 'number'),
+		le.repeats.map(r => r.along).join(' / '));
 	// But it IS generated annotation (Task 334), so it hides with everything else at low zoom.
 	ok('...while still being generated annotation, so it hides with the rest',
 		le.repeats.every(r => /lpn-annotation/.test(r.text.getAttribute('class') || '') &&
@@ -128,15 +138,33 @@ console.log('\n--- a pipe longer than the spacing repeats along itself ---');
 // ---- 3. The count re-derives on zoom, which is what makes it a rule ---------------------------
 console.log('\n--- the count follows the view, not the model ---');
 {
-	// Zoom IN 4x: the view is now 250 units across, the spacing 62.5, and the same pipe wants 16 --
-	// capped at 12. Nothing about the network changed; the reader's distance did.
+	// Zoom IN 4x: the view is 250 units across, the spacing 62.5, and the same pipe wants 16.
+	// Nothing about the network changed; the reader's distance did.
 	L.setZoom(4);
 	L.refreshLabelText();
 	const st = L.stations(long);
-	ok('zooming in asks for more labels', st.length > 4, st.length);
-	ok('...but never more than the cap', st.length === L.repeatMax(), st.length + ' vs cap ' + L.repeatMax());
-	ok('...and the elements followed the count', L.linkEl(long.id).repeats.length === st.length - 1,
-		L.linkEl(long.id).repeats.length);
+	ok('zooming in asks for more labels', st.length === 16, st.length);
+	// **THE DIVISION IS UNCAPPED AND THE DRAWING IS BOUNDED** (Tom: "Do you want only to draw the 4
+	// that appear on the screen? That makes most sense. No cap on the division?"). A cap on n would
+	// be a cap on the SPACING -- the rule would quietly stop holding on a long pipe at high zoom --
+	// whereas not building elements nobody can see costs the reader nothing at all.
+	const dr = L.drawn(long);
+	ok('...but only the ones near the window are built', dr.length < st.length,
+		dr.length + ' of ' + st.length);
+	ok('...and the elements followed the DRAWN count, not n',
+		L.linkEl(long.id).repeats.length === dr.length - 1, L.linkEl(long.id).repeats.length);
+	// The window is the viewport plus a full view-span on each side, so panning by less than a
+	// screen never reaches a stretch that was never labelled.
+	ok('...every drawn station is inside the padded window',
+		dr.every(f => f * 1000 >= -1000 && f * 1000 <= 1500), JSON.stringify(dr));
+	// PANNING TO THE FAR END DRAWS THE FAR END'S LABELS, which is the half a count-based cap could
+	// never do: twelve labels spread over a pipe is not the same as the four you can see.
+	L.pan(-4400, 0);      // world x ~1100-1350 in view at zoom 4
+	const far = L.drawn(long);
+	ok('panning down the pipe draws the stations that are now in view',
+		far.length > 0 && far[0] > dr[dr.length - 1], JSON.stringify(dr) + ' -> ' + JSON.stringify(far));
+	ok('...and none of the ones it left behind', far.every(f => dr.indexOf(f) < 0));
+	L.pan(0, 0);
 
 	// Zoom OUT until the whole pipe is inside a quarter-view: back to one label, and the repeat
 	// elements are REMOVED rather than parked off-screen -- a stale repeat left in the layer is a
@@ -166,6 +194,54 @@ console.log('\n--- VD = max(map width, map height) ---');
 		L.visibleMapWidth() + ' x ' + L.visibleMapHeight());
 	ok('...and the spacing is a quarter of the HEIGHT, the larger of the two',
 		near(L.spacing(), 400), L.spacing());
+}
+
+// ---- 4b. The station is fixed; the SIDE is not -------------------------------------------------
+console.log('\n--- a chain cannot slide, but it can change sides ---');
+{
+	L.setCanvas(1000, 1000);
+	L.setZoom(1);
+	L.setSetting('alignPipeLabels', true);
+	L.relayout();
+	// The mechanism, first: alignedLabelPlacement() takes a forced side, and the two sides are
+	// really on opposite sides of the pipe. Without this the flip below could "work" by returning
+	// the same placement twice.
+	const le = L.linkEl(long.id);
+	const top = L.placement(long, le, 0.5, 1), bot = L.placement(long, le, 0.5, -1);
+	ok('a placement can be forced to either side of the pipe', top.side === 1 && bot.side === -1,
+		top.side + ' / ' + bot.side);
+	ok('...and the two really are on opposite sides', (top.ay - 0) * (bot.ay - 0) < 0,
+		top.ay + ' vs ' + bot.ay);
+	// The natural choice is the top, unless the clearance rule sees a reason -- the pipe here is
+	// alone, so it is the top.
+	ok('...with the top as the natural choice on an uncrowded pipe',
+		L.placement(long, le, 0.5).side === 1);
+	// Now the flip in anger. A Text label parked exactly where one station's top-side box lands is
+	// an immovable obstacle, and the chain has no station to slide to -- so if the side is not free,
+	// that label lies on top of the obstacle and Tom's question is answered "no".
+	const st = L.drawn(long), blocked = st[1], at = L.placement(long, le, blocked, 1);
+	// Sized 1x on purpose: a taller blocker would straddle the pipe and block BOTH sides, and the
+	// station would have nowhere to go -- which is a real outcome but not the one under test here.
+	L.addText(at.ax, at.ay, null);
+	L.relayout();
+	ok('the blocked station moved to the other side of its pipe',
+		L.linkEl(long.id).stationSides[1] === -1,
+		JSON.stringify(L.linkEl(long.id).stationSides));
+	// BOTH neighbours, and the one AFTER matters more than the one before: the flip is decided in a
+	// loop, so a decision that leaked into the next iteration would put a label on the wrong side of
+	// a pipe nothing was blocking, and only a later station can catch that.
+	ok('...and its neighbours, which nothing was blocking, stayed where they were',
+		L.linkEl(long.id).stationSides[0] === undefined &&
+		L.linkEl(long.id).stationSides[2] === undefined &&
+		L.linkEl(long.id).stationSides[3] === undefined,
+		JSON.stringify(L.linkEl(long.id).stationSides));
+	// THE SPACING SURVIVED, which is the whole reason the side is the freedom being spent rather
+	// than the station: an evenly spaced chain that shuffles along its pipe to dodge things stops
+	// reading as one name repeated.
+	ok('...and the stations did NOT move -- the even spacing is intact',
+		JSON.stringify(L.drawn(long)) === JSON.stringify(st), JSON.stringify(L.drawn(long)));
+	L.getDoc().labels.length = 0;
+	L.relayout();
 }
 
 // ---- 5. A label the user placed by hand is never copied ---------------------------------------

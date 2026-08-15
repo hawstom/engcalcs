@@ -1793,16 +1793,26 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   *"Link labels spacing = 25% of view size."* Stations are `(i + 0.5)/n`, so **n = 1 lands on 0.5
   and every pipe shorter than a quarter-view is bit-for-bit what it was**; that is the property the
   harness guards first. In view units, so it needs no number from anyone and re-derives on zoom.
-  - A repeat is PIXELS, not a second label: no `data-linklbl`, no `.lpn-draglbl`, so hit testing,
-    dragging and the popup still see exactly one label per link. A **dragged** label is never
-    repeated — `l.lx`/`l.ly` can only describe one of them.
+  - **The division is uncapped; what is bounded is what gets DRAWN** (Tom's call on being shown a
+    cap of 12: *"Do you want only to draw the 4 that appear on the screen? That makes most sense.
+    No cap on the division?"*). A cap on n is a cap on the spacing. `drawnLinkLabelStations()`
+    clips the polyline to the viewport grown by one view-span (`Geom.segmentRectRange()`,
+    Liang–Barsky) and builds only those — so a pipe a thousand view-widths long costs what a short
+    one costs. Re-culled at the end of a pan; a bounding-box test instead of a clip culls nothing,
+    which is why the clip is its own tested function.
+  - **Every copy is pickable** (Tom: *"The problem is that I can only drag one upstream label"*).
+    Same `data-linklbl`, same `.lpn-draglbl`, plus `data-repeat` so a grab knows which copy it took
+    and the chain collapses to THERE rather than jumping to mid-pipe first. His alternative —
+    make the draggable one the upstream label — was declined on one fact: upstream is a solve
+    result, so a reversing flow would move the drag target when an unrelated demand changed.
+  - **The station is fixed but the SIDE is not** (Tom: *"I assume that side can still be nudged?"*).
+    A blocked station takes the other side of its pipe if that one is clear; the even spacing, which
+    is what makes a chain read as one repeated name, never moves.
   - A chain does not participate in the collision relaxation, it OBSTRUCTS — the same category an
-    aligned label is in, and for the same reason: its station is spent on the even spacing.
-    `placeAlignedLabels()` became `placeStationedLabels()` and commits every station's box.
-  - **Capped at 12 per pipe**, which the spec does not mention: VD shrinks with the view, so zoomed
-    in far enough the formula is unbounded. Twelve covers three view-spans, so panning never reaches
-    an unlabelled stretch. Past the cap the stations spread evenly rather than holding the spacing.
-  - `dev/lpn-spike/label-repeat-harness.js`, 26 checks, mutation-tested five ways.
+    aligned label is in. `placeAlignedLabels()` became `placeStationedLabels()`.
+  - `bbox()` ignores a chain's labels: how many exist is a function of the zoom, and zoom-to-fit
+    reading them back is the Task 332 circularity in different clothes.
+  - `dev/lpn-spike/label-repeat-harness.js`, 34 checks, mutation-tested nine ways.
 
 - 0|350| **"Always show" on a Text label — DONE 2026-08-15.** `lb.alwaysShow`, a checkbox under the
   size in the Text property popup, exempting that one label from Task 340's threshold. Tom named and

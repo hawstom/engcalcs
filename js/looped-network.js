@@ -203,14 +203,19 @@ var EngCalcs = EngCalcs || {};
 	// which is LINK_LABEL_ALONG -- the whole existing single-label path, the arrow dodge and the
 	// aligned-label station search are untouched on any pipe shorter than a quarter of the view.
 	var LPN_LABEL_REPEAT_FRAC = 0.25;
-	// A CAP THE SPEC DOES NOT MENTION, because the formula is unbounded as you zoom in: VD shrinks
-	// with the view, so a pipe 500 times the width of the current view asks for 500 labels of which
-	// four are on screen. Twelve covers three full view-spans in each direction, so panning never
-	// arrives at an unlabelled stretch, and it bounds the DOM at high zoom where the arithmetic
-	// would otherwise run away. Past the cap the stations spread evenly over the whole pipe rather
-	// than holding the spacing and clustering in the middle -- sparse everywhere beats correct in
-	// one place and absent at both ends.
-	var LPN_LABEL_REPEAT_MAX = 12;
+	// **THE DIVISION IS UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN** (Tom, 2026-08-15, on being
+	// shown a cap of 12: *"Do you want only to draw the 4 that appear on the screen? That makes most
+	// sense. No cap on the division?"* — and he is right, it is the better shape). A cap on n is a
+	// cap on the SPACING, so a very long pipe zoomed into would silently stop obeying the rule; a
+	// cap on the drawing is just not building elements nobody can see. So n is exactly
+	// ceil(L / (0.25 VD)) at every zoom, and drawnLinkLabelStations() below keeps only the stations
+	// near the window.
+	//
+	// A LAST-RESORT GUARD, not a rule: a pipe that folds back and forth INSIDE the window can
+	// legitimately have many stations in view, and a pathological one could have thousands. This
+	// bounds the DOM without ever being reached by an ordinary drawing (a straight pipe crossing the
+	// padded window has at most about 13).
+	var LPN_LABEL_DRAWN_MAX = 40;
 	function visibleMapHeight() {
 		var h = svg && svg.clientHeight ? svg.clientHeight : 0;
 		return h / (state.s || 1);
@@ -218,8 +223,22 @@ var EngCalcs = EngCalcs || {};
 	function labelRepeatSpacing() {
 		return LPN_LABEL_REPEAT_FRAC * Math.max(visibleMapWidth(), visibleMapHeight());
 	}
-	// The fractions along one pipe at which its label is drawn. Always at least one entry, and
-	// exactly one entry unless the pipe is longer than the spacing.
+	// The window, in world units, that a label has to be near to be worth building: the viewport
+	// grown by one full view-span on every side. Panning by less than a screen therefore never
+	// arrives at an unlabelled stretch, and the re-cull at the end of a pan fills in the rest.
+	function viewWorldRect(pad) {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0,
+			s = state.s || 1;
+		return {
+			x0: (-state.tx) / s - pad, y0: (-state.ty) / s - pad,
+			x1: (w - state.tx) / s + pad, y1: (h - state.ty) / s + pad
+		};
+	}
+	// THE SPEC'S n, in full: every station this pipe's label belongs at, whether or not any of them
+	// is on screen. Always at least one entry, and exactly one unless the pipe is longer than the
+	// spacing -- in which case the stations are (i + 0.5)/n, which puts a lone label back at the
+	// half-way point and leaves every short pipe exactly as it was.
 	//
 	// A MANUALLY DRAGGED LABEL IS NEVER REPEATED. The user put that label in that spot; copying it
 	// to five other spots is not what they asked for, and l.lx/l.ly can only describe one of them.
@@ -227,8 +246,43 @@ var EngCalcs = EngCalcs || {};
 	function linkLabelStations(l) {
 		var s = labelRepeatSpacing(), len = Geom.polylineLength(linkPointList(l)), n, i, out = [];
 		if (labelIsDragged(l) || !(s > 0) || !(len > s)) { return [LINK_LABEL_ALONG]; }
-		n = Math.min(LPN_LABEL_REPEAT_MAX, Math.ceil(len / s));
+		n = Math.ceil(len / s);
 		for (i = 0; i < n; i++) { out.push((i + 0.5) / n); }
+		return out;
+	}
+	// ...and the ones actually worth building elements for. Derived from the POLYLINE rather than
+	// from each station's own position, so the cost is proportional to what is drawn instead of to
+	// how long the pipe is: a segment whose bounding box misses the window contributes no stations,
+	// and one that meets it contributes the index range its along-distances cover. A pipe a thousand
+	// view-widths long therefore costs the same as a short one.
+	function drawnLinkLabelStations(l) {
+		var all = linkLabelStations(l);
+		// An ordinary single-label pipe is never culled. Its <text> is the link's own element and
+		// bbox() reads its position for zoom-to-fit, so removing it off-screen would make the fit
+		// depend on the view it started from -- the circularity Task 332 exists to avoid.
+		if (all.length === 1) { return all; }
+		var pts = linkPointList(l), n = all.length,
+			len = Geom.polylineLength(pts),
+			rect = viewWorldRect(Math.max(visibleMapWidth(), visibleMapHeight())),
+			out = [], run = 0, i, j, d, lo, hi, i0, i1, clip;
+		for (i = 0; i + 1 < pts.length && out.length < LPN_LABEL_DRAWN_MAX; i++) {
+			d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+			// CLIPPED, not merely bounding-box tested. A single 1000-unit segment crossing a
+			// 750-unit window has a bounding box that overlaps it, and accepting the whole segment
+			// on that basis draws every station on the pipe -- which is the cull not happening.
+			clip = Geom.segmentRectRange(pts[i].x, pts[i].y, pts[i + 1].x, pts[i + 1].y, rect);
+			if (clip && d > 0) {
+				// Station j sits at along-distance (j + 0.5)·len/n, so the clipped part of this
+				// segment covers the index range below.
+				lo = run + clip.t0 * d; hi = run + clip.t1 * d;
+				i0 = Math.max(0, Math.ceil(lo * n / len - 0.5));
+				i1 = Math.min(n - 1, Math.floor(hi * n / len - 0.5));
+				for (j = i0; j <= i1 && out.length < LPN_LABEL_DRAWN_MAX; j++) {
+					if (out.indexOf(all[j]) < 0) { out.push(all[j]); }
+				}
+			}
+			run += d;
+		}
 		return out;
 	}
 	function linkLabelBase(l) {
@@ -246,6 +300,12 @@ var EngCalcs = EngCalcs || {};
 	function linkLabelPos(l) {
 		var base = linkLabelBase(l), le = linkEls[l.id], nudge = (le && le.nudge) || { x: 0, y: 0 };
 		return { x: base.x + nudge.x, y: base.y + nudge.y };
+	}
+	// The same quantity for one REPEAT of a chain: its own station's point plus the plain default
+	// offset. No drag offset and no nudge, because a chain has neither (see layoutLinkLabelAt()).
+	function repeatLabelPos(l, rep) {
+		var mid = linkLabelMid(l, rep.along), d = defaultLabelOffset();
+		return { x: mid.x + d.x, y: mid.y + d.y };
 	}
 	// Shared leader-line show/hide + endpoint math for a node or link data label -- anchor is the
 	// node center or the link's mid-segment point; pos is the label's final rendered position
@@ -423,7 +483,7 @@ var EngCalcs = EngCalcs || {};
 	// pixels. It does carry the annotation class (Task 334), so it hides with everything else
 	// generated. `side` is its own leader-hysteresis state, unused while unaligned repeats draw no
 	// leader, kept so dataLabelOrigin() has somewhere to write.
-	function ensureLabelRepeats(le, n) {
+	function ensureLabelRepeats(le, n, linkId) {
 		if (!le.repeats) { le.repeats = []; }
 		while (le.repeats.length > n) {
 			var gone = le.repeats.pop();
@@ -432,7 +492,23 @@ var EngCalcs = EngCalcs || {};
 		while (le.repeats.length < n) {
 			le.repeats.push({
 				mask: annotationEl('rect', { 'class': 'lpn-lbl-mask' }, maskLayer),
-				text: annotationEl('text', { 'class': 'lpn-lbl', style: 'font-size:' + effectiveFontSize() + 'px' }, labelsLayer),
+				// EVERY COPY IS PICKABLE, and that is Tom's call on 2026-08-15: *"The problem is
+				// that I can only drag one upstream label."* It carries the same `data-linklbl` and
+				// the same `.lpn-draglbl` as the original, so grabbing any of them drags THE label,
+				// opens THE link's properties, and double-click sends it home -- there is no magic
+				// copy to learn. The alternative he offered, making the draggable one the UPSTREAM
+				// label, was rejected on one fact he could not have known: upstream is a SOLVE
+				// RESULT, so a reversing flow would move the drag target to the other end of the
+				// pipe when an unrelated demand changed. A target that moves for invisible reasons
+				// is not learnable.
+				// `data-repeat` is how a pointerdown finds WHICH copy was grabbed, which is what
+				// lets the chain collapse to exactly where the user took hold of it instead of
+				// jumping to the half-way point first.
+				text: annotationEl('text', {
+					'class': 'lpn-lbl lpn-draglbl', 'data-linklbl': linkId,
+					'data-repeat': le.repeats.length,
+					style: 'font-size:' + effectiveFontSize() + 'px'
+				}, labelsLayer),
 				side: 'right', empty: false
 			});
 		}
@@ -461,7 +537,7 @@ var EngCalcs = EngCalcs || {};
 	// an aligned label is must come through here; a second copy of this arithmetic would drift from
 	// the drawing the moment either side changed, and drift here is invisible in code and obvious
 	// on screen.
-	function alignedLabelPlacement(l, le, along) {
+	function alignedLabelPlacement(l, le, along, force) {
 		var mid = linkLabelMid(l, along),
 			dir = linkDirectionAt(l, mid),
 			opt = {
@@ -480,23 +556,30 @@ var EngCalcs = EngCalcs || {};
 			// congestion at a place the label is never drawn.
 			topPt = { x: mid.x + (candTop.x - dir.ax), y: mid.y + (candTop.y - dir.ay) },
 			botPt = { x: mid.x + (candBot.x - dir.ax), y: mid.y + (candBot.y - dir.ay) },
-			a = alignedSideFor(l, topPt, botPt) < 0 ? candBot : candTop;
+			// `force` overrides the clearance choice: -1 bottom, 1 top. The station search cannot
+			// slide a repeated chain (its even spacing IS the reading), so flipping a single link
+			// of it to the other side of its pipe is the one degree of freedom it has left --
+			// Tom, 2026-08-15: *"That applies to station, but I assume that side can still be
+			// nudged?"* It can, and this is where. Left undefined, the clearance rule decides as
+			// it always has.
+			a = (force === -1 || (force !== 1 && alignedSideFor(l, topPt, botPt) < 0)) ? candBot : candTop;
 		// alignedLabelAnchor() offsets from a point ALONG the segment it is given; we want it
 		// offset from the label's own dodged mid-point, so pass frac 0 and re-base here.
-		return { ax: mid.x + (a.x - dir.ax), ay: mid.y + (a.y - dir.ay), angle: a.angle };
+		return { ax: mid.x + (a.x - dir.ax), ay: mid.y + (a.y - dir.ay), angle: a.angle,
+			side: a === candBot ? -1 : 1 };
 	}
 	// One rendering of a link's label, at one station. `part` is {text, mask} -- the link's own
 	// elements for the first station, a repeat's for the rest (see ensureLabelRepeats()). The two
 	// are laid out by the SAME code on purpose: a repeat that drifted from the original in angle,
 	// side or mask would read as a different label rather than the same one said again.
 	function layoutLinkLabelAt(l, le, part, along, isPrimary, single) {
-		if (!isPrimary) { syncRepeatText(le, part); }
+		if (!isPrimary) { syncRepeatText(le, part); part.along = along; }
 		if (linkLabelAligned(l)) {
 			// le.alignedAlong is the station placeAlignedLabels() settled on during the collision
 			// pass. Undefined until that has run once (and for an empty label), in which case
 			// alignedLabelPlacement() falls back to the half-way default -- the same value the
 			// search tries first, so the two agree on an uncrowded drawing.
-			var a = alignedLabelPlacement(l, le, along);
+			var a = alignedLabelPlacement(l, le, along, part.forceSide);
 			part.text.setAttribute('text-anchor', 'middle');
 			part.text.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + a.ax + ' ' + a.ay + ')');
 			repositionMultilineText(part.text, a.ax, a.ay);
@@ -537,14 +620,25 @@ var EngCalcs = EngCalcs || {};
 		// Set BEFORE anything is placed, so every station obeys it.
 		le.hiddenShort = linkLabelTooShort(l, le);
 		setLabelAssemblyHidden(le, le.hiddenShort);
-		var stations = linkLabelStations(l), single = stations.length === 1, i;
-		ensureLabelRepeats(le, stations.length - 1);
-		// Station 0 goes to the link's own elements: for n = 1 that is the half-way point and the
-		// whole of today's behaviour, and for n > 1 it is simply the first of the chain. When the
-		// aligned station SEARCH has run (single-label case only), it overrides station 0 -- a lone
-		// label may slide to dodge a neighbour, a chain may not, since even spacing IS the reading.
-		layoutLinkLabelAt(l, le, le, single ? le.alignedAlong : stations[0], true, single);
+		var single = linkLabelStations(l).length === 1,
+			stations = single ? [le.alignedAlong] : drawnLinkLabelStations(l), i;
+		ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
+		// The link's own elements take the FIRST DRAWN station, not a fixed one. With every copy
+		// pickable that costs nothing -- they are interchangeable -- and it means a chain whose
+		// first stations are off-screen still renders through the element bbox() and the popup
+		// know about, rather than parking it somewhere nobody is looking.
+		// For n = 1 the station is le.alignedAlong, which is what the aligned SEARCH settled on
+		// (undefined until it has run, which falls back to the half-way default): a lone label may
+		// slide to dodge a neighbour, a chain may not, since even spacing IS the reading.
+		if (!stations.length) { setLabelAssemblyHidden(le, true); return; }
+		// The side each station settled on, decided in placeStationedLabels() where the obstacles
+		// are known and carried here by index. Undefined means "whatever the clearance rule says",
+		// which is every case except a chain that had to step round something.
+		var sides = le.stationSides || [];
+		le.forceSide = sides[0];
+		layoutLinkLabelAt(l, le, le, stations[0], true, single);
 		for (i = 1; i < stations.length; i++) {
+			le.repeats[i - 1].forceSide = sides[i];
 			layoutLinkLabelAt(l, le, le.repeats[i - 1], stations[i], false, false);
 		}
 	}
@@ -673,9 +767,16 @@ var EngCalcs = EngCalcs || {};
 	// A repeated chain of horizontal labels is not aligned, so its boxes are the ordinary
 	// left-anchored ones -- generous side ('right'), which is the right way to err for a
 	// legibility guard.
-	function stationedLabelBox(l, le, along, w, h, fs) {
+	// Does this box have the map to itself? The same overlap test the station search uses, lifted
+	// out because the side flip below needs to ask it too.
+	function boxIsClear(box, statics, pad) {
+		return !statics.some(function (s) {
+			return Collide.rectsOverlap(box, { x: s.base.x, y: s.base.y + s.yOff, w: s.w, h: s.h }, pad);
+		});
+	}
+	function stationedLabelBox(l, le, along, w, h, fs, force) {
 		if (linkLabelAligned(l)) {
-			var ap = alignedLabelPlacement(l, le, along);
+			var ap = alignedLabelPlacement(l, le, along, force);
 			return Geom.rotatedLabelBox(ap.ax, ap.ay, w, h, ap.angle, fs);
 		}
 		var mid = linkLabelMid(l, along), d = defaultLabelOffset();
@@ -694,30 +795,52 @@ var EngCalcs = EngCalcs || {};
 		}).sort(function (a, b) { return b.len - a.len; }).forEach(function (rec) {
 			var l = rec.l, le = linkEls[l.id];
 			if (!le || le.empty) { if (le) { le.alignedAlong = undefined; } return; }
+			// The boxes are for the stations that are actually DRAWN, so the indices here line up
+			// with layoutLinkLabel()'s -- that is what lets le.stationSides carry a decision made
+			// here into the render. Whether this is a lone label or a chain is decided by the FULL
+			// station list, though: a chain whose other links are off-screen is still a chain and
+			// must not start sliding.
 			var w = labelBoxWidth(le), h = dataLabelBoxHeight(le.lineCount),
-				stations = linkLabelStations(l), boxes = [],
-				best = null, bestBox = null, i, ap, box, clear;
-			if (linkLabelAligned(l) && stations.length === 1) {
+				full = linkLabelStations(l),
+				stations = full.length === 1 ? full : drawnLinkLabelStations(l), boxes = [],
+				best = null, bestBox = null, i, ap, box, clear, forced, natural, other;
+			if (linkLabelAligned(l) && full.length === 1) {
 				// THE SLIDE, which only a lone label gets. It has one degree of freedom -- where
 				// along the pipe -- and uses it, exactly as a GIS slides a road name.
 				for (i = 0; i < LPN_ALIGNED_STATIONS.length; i++) {
 					ap = alignedLabelPlacement(l, le, LPN_ALIGNED_STATIONS[i]);
 					box = Geom.rotatedLabelBox(ap.ax, ap.ay, w, h, ap.angle, fs);
-					clear = !statics.some(function (s) {
-						return Collide.rectsOverlap(box, { x: s.base.x, y: s.base.y + s.yOff, w: s.w, h: s.h }, pad);
-					});
+					clear = boxIsClear(box, statics, pad);
 					// The FIRST clear station wins and the search stops -- it is already the most
 					// central one available, because the list is ordered outward from the middle.
 					if (clear) { best = LPN_ALIGNED_STATIONS[i]; bestBox = box; break; }
 					if (!bestBox) { bestBox = box; best = LPN_ALIGNED_STATIONS[i]; } // fall back to the middle
 				}
 				le.alignedAlong = best;
+				le.forceSide = undefined;
+				le.stationSides = [];
 				boxes.push(bestBox);
 			} else {
-				// A chain's stations are fixed by the spacing rule, so there is nothing to search.
+				// A chain's stations are fixed by the spacing rule, so there is nothing to search
+				// ALONG. What is still free is the SIDE of the pipe each link of the chain sits on
+				// (Tom: "I assume that side can still be nudged?"). Each station keeps the side the
+				// clearance rule chose unless that box is blocked and the other side is not -- so a
+				// chain can step round an obstacle without ever losing its even spacing.
 				le.alignedAlong = undefined;
+				le.stationSides = [];
 				for (i = 0; i < stations.length; i++) {
-					boxes.push(stationedLabelBox(l, le, stations[i], w, h, fs));
+					box = stationedLabelBox(l, le, stations[i], w, h, fs);
+					// RESET EVERY ITERATION. `var` is function-scoped, so a flip decided for one
+					// station would otherwise carry into the next one and put a label on the wrong
+					// side of a pipe nothing was blocking.
+					forced = undefined;
+					if (linkLabelAligned(l) && !boxIsClear(box, statics, pad)) {
+						natural = alignedLabelPlacement(l, le, stations[i]).side;
+						other = stationedLabelBox(l, le, stations[i], w, h, fs, -natural);
+						if (boxIsClear(other, statics, pad)) { box = other; forced = -natural; }
+					}
+					le.stationSides[i] = forced;
+					boxes.push(box);
 				}
 			}
 			// Committed as obstacles for everyone placed after -- including the node and Text
@@ -2416,6 +2539,14 @@ var EngCalcs = EngCalcs || {};
 				inc(v.x - 0.65, v.y - 0.65); inc(v.x + 0.65, v.y + 0.65);
 			}
 			var l = doc.links[i], lle = linkEls[l.id];
+			// A REPEATED CHAIN CONTRIBUTES NOTHING HERE, ON PURPOSE. Its labels lie along the pipe,
+			// whose own points are already counted above -- and reading their rendered positions
+			// would make zoom-to-fit depend on the view it started from, because how many of them
+			// exist and which are drawn are both functions of the current zoom. That circularity is
+			// the Task 332 defect wearing different clothes; the cheapest way not to have it is not
+			// to ask. A lone label still counts: it sits off to the side of its pipe and nothing
+			// else in this loop knows where.
+			if (lle && linkLabelStations(l).length > 1) { continue; }
 			if (lle) {
 				var lx = +lle.text.getAttribute('x'), ly = +lle.text.getAttribute('y'),
 					ltw = labelBoxWidth(lle) || 8, llc = lle.lineCount || 1;
@@ -8011,7 +8142,17 @@ var EngCalcs = EngCalcs || {};
 				drag = { type: 'nodelbl', id: t.dataset.nodelbl, offX: posN.x - w4.x, offY: posN.y - w4.y };
 				Object.assign(drag, common);
 			} else if (t.dataset.linklbl !== undefined) {
-				var ll = linkById(t.dataset.linklbl), posL = linkLabelPos(ll), w5 = screenToWorld(e.clientX, e.clientY);
+				// GRABBING A REPEAT COLLAPSES THE CHAIN TO WHERE IT WAS GRABBED, and this line is the
+				// whole of why it does not jump first. A dragged link label is stored as ONE offset
+				// from the pipe's half-way point (l.lx/l.ly), so the moment a drag starts the other
+				// copies go away -- there is only one of them to describe. Seeding the offset from
+				// the COPY's own station means the surviving label appears exactly under the cursor
+				// rather than sliding to the middle of the pipe and then following.
+				var ll = linkById(t.dataset.linklbl), le5 = linkEls[t.dataset.linklbl],
+					rep5 = (t.dataset.repeat !== undefined && le5 && le5.repeats)
+						? le5.repeats[+t.dataset.repeat] : null,
+					posL = rep5 ? repeatLabelPos(ll, rep5) : linkLabelPos(ll),
+					w5 = screenToWorld(e.clientX, e.clientY);
 				drag = { type: 'linklbl', id: t.dataset.linklbl, offX: posL.x - w5.x, offY: posL.y - w5.y };
 				Object.assign(drag, common);
 			} else {
@@ -8025,8 +8166,15 @@ var EngCalcs = EngCalcs || {};
 		});
 		function endPointer(e) {
 			pointers.delete(e.pointerId);
+			// A PAN CHANGES WHICH REPEATED LABELS ARE WORTH DRAWING, so the cull is re-run when the
+			// pan finishes -- not on every frame of it, which would rebuild elements at 60 Hz for a
+			// gesture whose whole point is that nothing in the drawing changed. The cull keeps a
+			// full view-span of margin on every side, so a pan shorter than a screen never reaches
+			// a stretch that has not been labelled yet, and a longer one fills in on release.
+			var wasPan = drag && drag.type === 'pan';
 			if (drag && drag.type === 'pinch' && pointers.size < 2) { drag = null; dragDirty = false; return; }
 			if (drag && drag.pointerId === e.pointerId) { drag = null; dragDirty = false; }
+			if (wasPan && !drag) { relayoutLabels(); }
 		}
 		svg.addEventListener('pointerup', endPointer);
 		svg.addEventListener('pointercancel', endPointer);

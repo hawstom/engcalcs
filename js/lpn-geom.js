@@ -172,6 +172,35 @@ EngCalcs.lpnGeom = (function () {
 		return { x: b.x - pad, y: b.y - pad, width: w + 2 * pad, height: h + 2 * pad };
 	}
 
+	// WHICH PART OF A SEGMENT IS INSIDE A RECTANGLE, as the parameter range [t0, t1] along it
+	// (0 = a, 1 = b), or null if none of it is. Liang–Barsky, which is the standard answer and
+	// is exact -- no sampling, no stepping.
+	//
+	// Added 2026-08-15 for repeated link labels, where the alternative was tempting and wrong:
+	// testing each label's own point against the rectangle is O(number of labels), and the whole
+	// point of the cull is that a pipe a thousand view-widths long must not cost a thousand tests
+	// to draw four labels. Clipping the LINE first turns it into O(segments), after which the
+	// station indices in view are two divisions.
+	//
+	// A segment lying exactly along an edge counts as inside (the p === 0 branch keeps it when it
+	// is not strictly outside) -- for a cull, keeping a borderline label is the harmless direction.
+	function segmentRectRange(ax, ay, bx, by, rect) {
+		var dx = bx - ax, dy = by - ay, t0 = 0, t1 = 1, i,
+			p = [-dx, dx, -dy, dy],
+			q = [ax - rect.x0, rect.x1 - ax, ay - rect.y0, rect.y1 - ay],
+			r;
+		for (i = 0; i < 4; i++) {
+			if (p[i] === 0) {
+				if (q[i] < 0) { return null; }   // parallel to this edge and outside it
+				continue;
+			}
+			r = q[i] / p[i];
+			if (p[i] < 0) { if (r > t1) { return null; } if (r > t0) { t0 = r; } }
+			else { if (r < t0) { return null; } if (r < t1) { t1 = r; } }
+		}
+		return { t0: t0, t1: t1 };
+	}
+
 	// The AXIS-ALIGNED BOUNDING BOX of a label that is drawn ROTATED, given where it would be
 	// unrotated. Added 2026-08-14 for the aligned-pipe-label collision defect (ROADMAP Task 329).
 	//
@@ -310,6 +339,7 @@ EngCalcs.lpnGeom = (function () {
 		labelSideAtEnd: labelSideAtEnd,
 		dataLabelBoxHeight: dataLabelBoxHeight,
 		labelBoxAt: labelBoxAt,
+		segmentRectRange: segmentRectRange,
 		maskRect: maskRect,
 		alignedLabelAnchor: alignedLabelAnchor,
 		rotatedLabelBox: rotatedLabelBox,

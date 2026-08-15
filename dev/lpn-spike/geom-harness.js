@@ -180,6 +180,33 @@ report(near(b4.x, 100) && near(b4.y, 191.5), 'baseline-relative is untouched', J
 report(near(b2.x - b3.x, 30) && near(b3.x + b3.w, b2.x),
 	'left and right anchoring differ by a whole width, meeting at the point', (b2.x - b3.x));
 
+// ---- segmentRectRange (repeated link labels) ----------------------------
+console.log('--- segmentRectRange ---');
+// WHY THIS IS A CLIP AND NOT A BOUNDING-BOX TEST, which is the mistake it was written to fix: a
+// 1000-unit pipe crossing a 750-unit window has a bounding box that overlaps the window, so a
+// box test accepts the WHOLE pipe and every label on it. The cull then culls nothing. Only the
+// clipped RANGE says which part of the line is actually on screen.
+const R = { x0: 0, y0: 0, x1: 100, y1: 100 };
+const c1 = Geom.segmentRectRange(-100, 50, 300, 50, R);
+report(c1 && near(c1.t0, 0.25) && near(c1.t1, 0.5), 'a line crossing right through is clipped at both ends',
+	JSON.stringify(c1));
+const c2 = Geom.segmentRectRange(10, 10, 90, 90, R);
+report(c2 && near(c2.t0, 0) && near(c2.t1, 1), 'a line wholly inside keeps all of itself', JSON.stringify(c2));
+report(Geom.segmentRectRange(200, 200, 300, 300, R) === null, 'a line wholly outside is null');
+report(Geom.segmentRectRange(-50, 50, -10, 50, R) === null, 'and so is one that stops short of the rect');
+const c3 = Geom.segmentRectRange(50, 50, 200, 50, R);
+report(c3 && near(c3.t0, 0) && near(c3.t1, 1 / 3), 'a line starting inside is clipped only at the far end',
+	JSON.stringify(c3));
+// A zero-length segment is a real case (a duplicated vertex) and must not divide by zero.
+const c4 = Geom.segmentRectRange(50, 50, 50, 50, R);
+report(c4 && c4.t0 === 0 && c4.t1 === 1, 'a zero-length segment inside the rect is inside it', JSON.stringify(c4));
+report(Geom.segmentRectRange(500, 500, 500, 500, R) === null, '...and outside it is outside it');
+// Exactly along an edge counts as inside: for a cull, keeping a borderline label is the harmless
+// direction to err in.
+const c5 = Geom.segmentRectRange(-10, 0, 110, 0, R);
+report(c5 && near(c5.t1 - c5.t0, 100 / 120), 'a line along the top edge is kept, not dropped',
+	JSON.stringify(c5));
+
 
 // ---------------------------------------------------------------------------------------------
 // 7. alignedLabelAnchor — GIS-style labels drawn ALONG the pipe (Task 329)
