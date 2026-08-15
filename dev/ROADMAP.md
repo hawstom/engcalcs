@@ -529,11 +529,17 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **"The label flips rather than the leader flipping"** is the part worth preserving verbatim. The
     leader's direction is the user's decision and must be stable; which SIDE of it the text sits on
     is a layout consequence, and should be free to flip so the text never crosses its own leader.
-  - **The open question is when dragging applies at all**, and Tom names both candidates without
-    choosing: either placement is decided once and reused at every zoom, or it is decided
-    per-zoom-band until labels are hidden entirely. The first is simpler and matches a drawing; the
-    second matches a GIS. Decide it alongside Task 326, since scale-dependent visibility is the same
-    question wearing a different hat.
+  - **ANSWERED by Tom's own leader insight, later the same day**: *"the vestiges of mapped units
+    that we preserve are the leaders… they exist because something is close to something else in
+    terms of map units."* A leader is not a property of anything — it is a RELATIONSHIP between two
+    points in the model, which is why its endpoints are map coordinates while its thickness is paper
+    units like every other stroke. And crowding is a function of SCALE. So placement belongs to a
+    **declared scale**: one set of callout positions per scale, not one per zoom level and not one
+    forever. That is exactly what AutoCAD's annotative objects do, and it is why that feature exists.
+  - **So `lb.x`/`lb.y` are HALF RIGHT, which is why they half work.** The anchor end is genuinely
+    map-space and stays; the label end should be a direction plus a PAPER distance, so the text sits
+    a fixed distance off the leader on the sheet while the leader stretches with the geometry. Tom's
+    *"fixed end point… possibly shortened at the same angle"* is the same split from the drawing side.
   - `LPN_CALLOUT_ANGLE` (70°) and the existing collision avoidance already assume a leader has a
     direction, so the machinery is half there.
 

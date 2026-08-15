@@ -135,3 +135,57 @@ domain.**
 
 Related: at 97 nodes the clutter is the labels, not their size. Scale-dependent visibility and the
 Labels panel are the same tool from two directions — one hides by *zoom*, the other by *field*.
+
+---
+
+# The one thing that stays in map units: the leader
+
+Tom, 2026-08-14:
+
+> I think that the vestiges of mapped units that we preserve are the leaders. They make sense only
+> in terms of map units. They exist because something is close to something else in terms of map
+> units. If they are not in terms of map units, then we don't need leaders.
+
+This is the exception that makes the rule coherent, and it is worth stating precisely because it
+looks like a contradiction and is not.
+
+**Every other quantity on this map is ABSOLUTE.** A text height, a symbol size, a stroke width, a
+visibility threshold — each is a property of one thing, and each is properly expressed on paper.
+
+**A leader is not a property of anything. It is a RELATIONSHIP between two points in the model.** It
+exists to say *this label belongs to that node over there*, and the "over there" is a fact about the
+network's geometry, not about the sheet. So its endpoints are map coordinates by nature, while its
+*thickness* is paper units like every other stroke. The leader is not an exception to the paradigm;
+it is the one place where the two frames legitimately meet, and it meets them one property at a time.
+
+## Why leaders exist at all, restated
+
+A leader appears because a label could not sit next to its anchor. That crowding is a function of
+**scale**: the paper size of the text against the paper distance between two nodes. Zoom in far
+enough and any two nodes separate until no leader is needed; zoom out and everything collides. So
+leaders are neither always necessary nor ever obsolete — **they are a function of the scale you are
+drawing at**, which is exactly what Task 326 makes explicit.
+
+## This answers the dragging question Tom left open
+
+Task 328 records two candidates without choosing: label placement decided **once** and reused at
+every zoom, or decided **per zoom band** until labels hide. Under the paper paradigm the answer
+falls out rather than needing a preference:
+
+**Placement belongs to a SCALE.** A drawing plotted at 1:500 has one set of callout positions, and
+they are correct for that plot. A second scale is a second drawing and may want different ones —
+which is precisely what AutoCAD's annotative objects do, holding a separate position per annotation
+scale, and why that feature exists at all.
+
+So: one placement per declared scale, not one per zoom level and not one forever. On screen, use the
+placement for the nearest declared scale. That is simpler than a per-zoom-band rule, honest about
+what a drawing is, and it has a century of practice behind it.
+
+## The practical consequence
+
+`lb.x` / `lb.y` today are a map-unit offset from the anchor — and under this reading that storage is
+**half right**, which is why it half works. The anchor end is genuinely map-space and should stay.
+The label end should be a direction plus a paper distance, so the text sits a fixed distance off the
+leader on the sheet while the leader itself stretches or shortens with the geometry. Tom's own
+phrasing — *"the fixed end point of the leader… possibly shortened at the same angle"* — is that
+same split, arrived at from the drawing side.
