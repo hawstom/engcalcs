@@ -7635,13 +7635,18 @@ var EngCalcs = EngCalcs || {};
 		// measurement is taken of a page that is still moving. That is stages 1 and 2 of Tom's
 		// report, and no amount of arithmetic fixes a measurement of the wrong thing: the answer is
 		// to measure again when there is something stable to measure.
-		window.addEventListener('load', function () { applyMapHeight(); });
+		window.addEventListener('load', armMapSizing);
 		if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
 			document.fonts.ready.then(function () { applyMapHeight(); });
 		}
-		// One frame after init, for the common case where everything is cached and `load` has
-		// already fired by the time this listener is attached.
+		// One frame after init, for the common case where everything is cached and `load` fired
+		// before this listener was attached -- pageSettled() decides whether it is too early.
 		if (window.requestAnimationFrame) { window.requestAnimationFrame(function () { applyMapHeight(); }); }
+		// THE FAILSAFE, and the only reason it exists: a canvas authored at height 0 stays invisible
+		// until something sizes it, so a subresource that never finishes would leave the page with no
+		// map at all. Two seconds is long enough that it never beats a real `load`, and short enough
+		// that a broken one is not a dead page.
+		window.setTimeout(armMapSizing, 2000);
 		// **Nothing is flushed to a file on the way out any more** (Task 211). The locks ARE handed
 		// back, so a colleague is never left waiting on a browser that has gone; `visibilitychange` ->
 		// hidden is the one that actually fires on mobile, and `beforeunload` is the desktop net.
@@ -9045,7 +9050,6 @@ var EngCalcs = EngCalcs || {};
 	// The two lang keys are PARKED, not deleted -- see lib/lang.ec.en.php. Restoring the row is
 	// cheap; recovering 27 translations is not. Rewrite the tip before reusing it: it is wrong.
 	var LPN_MAP_MIN = 240;
-	var LPN_MAP_SLACK = 2;
 	// How much ordinary page sits BELOW the canvas, in document flow. The popovers do not count:
 	// every one of them is position:fixed and display:none, so they occupy no flow at all -- which
 	// is why this measures the document rather than listing elements by id, a list that would go
@@ -9076,13 +9080,14 @@ var EngCalcs = EngCalcs || {};
 		var docEl = document.documentElement;
 		var rect = svg.getBoundingClientRect();
 		var above = rect.top + (window.pageYOffset || docEl.scrollTop || 0);
-		// Slack so a sub-pixel layout rounding cannot leave the page one stubborn pixel scrollable --
-		// which on a touch screen is a scrollbar with nothing to reach. It was 8 until 2026-08-15,
-		// when Tom named it: *"There is a wasted area below the map now... a small (a little smaller
-		// than the status line) wasted margin below it."* He was looking at this constant. Fractional
-		// layout is under a pixel, so 2 covers what it exists to cover and 8 was six pixels of
-		// nothing. If a stubborn scrollbar ever comes back, this is the line.
-		var room = Math.round(vh - above - flowBelowMap() - LPN_MAP_SLACK);
+		// **NO SLACK CONSTANT. FLOOR INSTEAD** (Tom, 2026-08-15: *"Slack: I don't really like it. But
+		// I can live with it only if you insist."* — I do not insist, because it was never the right
+		// tool). The slack existed so a sub-pixel layout rounding could not leave the page one
+		// stubborn pixel scrollable, and it was 8px, then 2. But the only way rounding can leave the
+		// page scrollable is by rounding UP, and the fix for that is to round DOWN: `floor` can never
+		// return more room than there is. A guard that cannot overshoot needs no margin for
+		// overshooting, so the wasted strip below the map is gone rather than merely smaller.
+		var room = Math.floor(vh - above - flowBelowMap());
 		// **A MAP TALLER THAN THE WINDOW IS NEVER THE RIGHT ANSWER, AND THE OLD FORMULA COULD
 		// PRODUCE ONE** (guard added 2026-08-15 after Tom hit an unrecoverable state: *"The bottom
 		// of the map overflowed the bottom of the screen. And status line is gone. Reload doesn't
@@ -9095,7 +9100,7 @@ var EngCalcs = EngCalcs || {};
 		// The clamp costs nothing in the healthy case -- with above and below both >= 0 the formula
 		// already yields at most vh - 8 -- so it bites only when an input was wrong, which is
 		// exactly when a floor and a ceiling earn their keep.
-		room = Math.min(room, vh - LPN_MAP_SLACK);
+		room = Math.min(room, Math.floor(vh));
 		return Math.max(LPN_MAP_MIN, room);
 	}
 	// A canvas resize must not slide the drawing, and until 2026-08-15 it did. The world transform
@@ -9105,8 +9110,26 @@ var EngCalcs = EngCalcs || {};
 	// Half the delta on each axis keeps the view CENTRE where it was, which is what every map
 	// application does and what makes a resize feel like a window changing rather than a pan.
 	var LPN_MAP_HEIGHT_DEADBAND = 1;
+	// **A HEIGHT IS NOT APPLIED UNTIL ONE CAN BE CALCULATED** (Tom, 2026-08-15). Everything this
+	// measures -- the site navbar above the canvas, the footer below it -- is still moving while the
+	// page loads: stylesheets are applying, webfonts are swapping, Bootstrap has not collapsed the
+	// nav. A number derived then is not a measurement, it is a guess with arithmetic in front of it,
+	// and applying it makes the user watch the map jump when the truth arrives.
+	//
+	// `readyState === 'complete'` is the browser's own answer to "has everything finished", so it is
+	// the gate. Before it, the canvas keeps the height="0" it is authored with and the space is
+	// simply blank. The failsafe below covers the one way this could strand the page: a subresource
+	// that never finishes, which would otherwise mean a map that never appears.
+	var mapSizingArmed = false;
+	function armMapSizing() {
+		if (mapSizingArmed) { return; }
+		mapSizingArmed = true;
+		applyMapHeight();
+	}
+	function pageSettled() { return mapSizingArmed || document.readyState === 'complete'; }
 	function applyMapHeight(secondPass) {
 		if (!svg) { return; }
+		if (!pageSettled()) { return; }
 		// NOT LAID OUT YET, so every measurement below is a fiction -- a hidden tab, a display:none
 		// ancestor, or a call before first layout. Doing nothing leaves the last good height in
 		// place, which is strictly better than replacing it with an answer derived from zeros.
