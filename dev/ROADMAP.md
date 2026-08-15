@@ -1849,6 +1849,23 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|361| **"Map size" always names its dimension — DONE 2026-08-15.** Tom: *"One question is how
+  transparent and pedantic to be about 'screen size'. I assume that we use, and possibly disclose,
+  minimum or maximum or diagonal dimension. Being intentional and consistent about that... can only
+  be a good thing."* The audit found **three conventions already in use and not one of them named**:
+  `max` for the label repeat spacing, `min` for the fit and the restored view, and WIDTH ALONE for
+  the label-visibility threshold.
+  - **Consistency would have been the wrong goal**, which is the finding worth keeping. Each answers
+    a different question and the question picks the dimension: `min` because "must all of it fit" is
+    settled by the tighter side; `max` because a repeat that used the tighter side would crowd a
+    wide window (Tom's own spec); `width` because the control says *"narrower than"* and its capture
+    button reads the width. What was wrong was that none of them said so.
+  - `mapSpan('min'|'max'|'diag'|'w'|'h')` is now the one definition, every caller names its choice,
+    and a check in `zoom-fit-harness.js` fails if anything combines the two axes behind its back.
+  - **And it is not the SCREEN, it is the map area** — narrower than the window and much shorter.
+    Any wording shown to a user says map, or it promises a relationship to the display that does not
+    exist. Asserted too.
+
 - 0|360| **The map remembers where you were looking — DONE 2026-08-15.** Tom, on being told the
   view was stored nowhere at all: *"In-memory per tab now and saved to file."* Both.
   - **Per tab, in memory** (`tabViews`, keyed by project id, captured on the way out of

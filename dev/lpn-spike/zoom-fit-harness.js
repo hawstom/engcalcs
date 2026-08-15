@@ -234,5 +234,36 @@ console.log('\n--- an overlay reserves its space before it has any text in it --
 		s0 / s1 < 1.02, (s0 / s1).toFixed(4));
 }
 
+// ---- 4. "Screen size" always says WHICH dimension ---------------------------------------------
+// Tom, 2026-08-15: "One question is how transparent and pedantic to be about 'screen size'. I
+// assume that we use, and possibly disclose, minimum or maximum or diagonal dimension. Being
+// intentional and consistent about that... can only be a good thing." An audit that day found three
+// conventions in use and not one of them named: max for the label repeat spacing, min for the fit,
+// width alone for the label-visibility threshold.
+//
+// CONSISTENCY IS NOT THE GOAL AND THAT IS THE POINT. Each answers a different question and the
+// question picks the dimension -- min because "must all of it fit" is decided by the tighter side,
+// max because a repeat should not crowd a wide window, width because the control literally says
+// "narrower than". What was wrong was that none of them said so. This asserts they still do.
+console.log('\n--- every "map size" names its own dimension ---');
+{
+	const fs2 = require('fs');
+	const src = fs2.readFileSync(require('path').join(__dirname, '../../js/looped-network.js'), 'utf8');
+	const code = src.replace(/^[ \t]*\/\/.*$/gm, '');
+	ok('there is one place that defines the vocabulary', /function mapSpan\(which\)/.test(code));
+	ok('...offering min, max, diagonal and each axis',
+		/'min'/.test(code) && /'diag'/.test(code) && /'w'/.test(code) && /'h'/.test(code));
+	// The raw pair is what an unnamed convention looks like: Math.max(visibleMapWidth(),
+	// visibleMapHeight()) tells a reader the answer but never the reason.
+	ok('and nothing combines the two axes behind its back any more',
+		!/Math\.(max|min|hypot)\(\s*visibleMapWidth\(\)/.test(code),
+		'a raw Math.max/min over the two accessors is the unnamed form this replaced');
+	// It is the MAP AREA, not the display -- narrower than the window and much shorter. Any wording
+	// shown to a user has to say so, or it promises a relationship to the screen that is not there.
+	ok('the wording in the UI says MAP, never screen',
+		/narrower than/i.test(src) && !/screen (size|width|height)/i.test(
+			(src.match(/lpn_settings_label_max_width[^\n]*/) || [''])[0]));
+}
+
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);

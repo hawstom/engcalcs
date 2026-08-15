@@ -220,8 +220,43 @@ var EngCalcs = EngCalcs || {};
 		var h = svg && svg.clientHeight ? svg.clientHeight : 0;
 		return h / (state.s || 1);
 	}
+	// ---- "SCREEN SIZE": SAY WHICH DIMENSION, EVERY TIME (Tom, 2026-08-15) -----------------------
+	//
+	// *"One question is how transparent and pedantic to be about 'screen size'. I assume that we
+	// use, and possibly disclose, minimum or maximum or diagonal dimension. In any case, being
+	// intentional and consistent about that, maybe including disclosing it to user, can only be a
+	// good thing."* He is right, and an audit found the page already using THREE conventions with
+	// nothing naming any of them: `max` for the label repeat spacing, `min` for the fit and the
+	// restored view, and WIDTH ALONE for the label-visibility threshold.
+	//
+	// **CONSISTENCY HERE WOULD BE THE WRONG GOAL**, which is the part worth writing down. The three
+	// answer different questions and the question decides the dimension:
+	//
+	//   * `min` -- "must all of it be visible?" The tighter dimension binds, by arithmetic, not by
+	//     preference. zoomExtent() and applyView().
+	//   * `max` -- "how often should something repeat across the view?" Using the tighter dimension
+	//     would crowd a wide window with labels. Tom specified it: "VD = max(map width, map
+	//     height)".
+	//   * `width` -- "is the map narrower than N?" The control says NARROWER, and the button beside
+	//     it captures the current width, so width is not a choice here, it is the meaning.
+	//
+	// What was wrong was that none of them SAID so. Every caller now names its dimension through
+	// this one function, so the choice is greppable and a new call site has to make one.
+	//
+	// AND IT IS NOT THE SCREEN. It is the map area -- the canvas, which is narrower than the window
+	// and much shorter. Any wording shown to a user should say map, not screen, or it promises a
+	// relationship to the display that does not exist.
+	function mapSpan(which) {
+		var w = visibleMapWidth(), h = visibleMapHeight();
+		if (which === 'w') { return w; }
+		if (which === 'h') { return h; }
+		if (which === 'min') { return Math.min(w, h); }
+		if (which === 'diag') { return Math.hypot(w, h); }
+		return Math.max(w, h);   // 'max', and the default because it is the commonest ask
+	}
 	function labelRepeatSpacing() {
-		return LPN_LABEL_REPEAT_FRAC * Math.max(visibleMapWidth(), visibleMapHeight());
+		// MAX: Tom's spec, and the right dimension for a repeat -- see mapSpan().
+		return LPN_LABEL_REPEAT_FRAC * mapSpan('max');
 	}
 	// The window, in world units, that a label has to be near to be worth building: the viewport
 	// grown by one full view-span on every side. Panning by less than a screen therefore never
@@ -263,7 +298,7 @@ var EngCalcs = EngCalcs || {};
 		if (all.length === 1) { return all; }
 		var pts = linkPointList(l), n = all.length,
 			len = Geom.polylineLength(pts),
-			rect = viewWorldRect(Math.max(visibleMapWidth(), visibleMapHeight())),
+			rect = viewWorldRect(mapSpan('max')),
 			out = [], run = 0, i, j, d, lo, hi, i0, i1, clip;
 		for (i = 0; i + 1 < pts.length && out.length < LPN_LABEL_DRAWN_MAX; i++) {
 			d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
@@ -2701,6 +2736,8 @@ var EngCalcs = EngCalcs || {};
 	function fitItems(atScale) {
 		var out = [], sc = state.s || 1,
 			lim = settings.labelMaxWidth,
+			// The same WIDTH question the threshold itself asks (see mapSpan()), but asked about the
+			// scale being considered rather than the one in force.
 			mapW = (svg && svg.clientWidth ? svg.clientWidth : 0) / (atScale || 1),
 			ignoreDataLabels = typeof lim === 'number' && lim > 0 && mapW > lim;
 		function boxFor(x, y, bx, by, bw, bh) {
@@ -9573,7 +9610,9 @@ var EngCalcs = EngCalcs || {};
 	function applyLabelVisibility() {
 		var lim = settings.labelMaxWidth,
 			on = typeof lim === 'number' && lim > 0,
-			vw = visibleMapWidth();
+			// WIDTH, and that is the control's own word: "Show labels when the map is narrower
+			// than". See mapSpan() for why this one is not min or max.
+			vw = mapSpan('w');
 		// Recorded, not just applied. Two things need to KNOW whether generated annotation is on
 		// screen rather than merely being styled by it: the zoom path, which can skip the whole
 		// label pipeline when nothing readable is drawn, and bbox(), which must not reserve space
@@ -10037,7 +10076,8 @@ var EngCalcs = EngCalcs || {};
 			// Rounded to three significant figures: the captured number is a JUDGEMENT ("about this
 			// zoomed in"), and writing 1283.4177 into the box would present an accident of the
 			// current pan as a decision worth preserving.
-			var w = visibleMapWidth();
+			// WIDTH, matching the threshold it is capturing for -- see mapSpan().
+			var w = mapSpan('w');
 			if (!(w > 0)) { return; }
 			settings.labelMaxWidth = +w.toPrecision(3);
 			lmwInput.value = settings.labelMaxWidth;
