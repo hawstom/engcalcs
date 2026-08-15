@@ -430,7 +430,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Connects to Task 253 (clean map for screenshots) — a thematic view with no labels IS the clean
     map, arrived at from the other side.
 
-- 88|329| **Test the GIS paradigm: pipe labels aligned ALONG the pipe.** Tom, 2026-08-14: *"I think
+- 50|329| [H] **Test the GIS paradigm: pipe labels aligned ALONG the pipe — BUILT, awaiting Tom's verdict on screen.** Tom, 2026-08-14: *"I think
   we first want to test the GIS thing of aligning our pipe labels with pipes… Maybe I can investigate
   to try to figure out how epanet-js makes the decision of which side of a pipe you label. I don't
   think it matters. If I had to choose, I would say the top side. Or if I had to get cute, I would say
@@ -473,9 +473,17 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     space on the other side — *"Other side of pipe would have been very nice here."* One real drawing
     settled a question I had proposed deferring until one existed, which is the argument for putting
     a rough version in front of him early rather than reasoning about it longer.
-  - The work: offer BOTH sides from `alignedLabelAnchor()` as candidates and let
-    `runLabelCollisionAvoidance()` choose. The aligned path currently returns before the nudge, so it
-    never enters the engine at all — that early return is the change.
+  - **DONE: the side, by clearance** — and NOT by the mechanism this task first proposed. It reads
+    "hand both sides to `runLabelCollisionAvoidance()`", which was superseded: `alignedSideFor()`
+    measures each candidate's distance to the nearest OTHER link and takes the bottom only when it
+    is clearly better (`LPN_SIDE_SWITCH_MARGIN`, 1.35), so the top stays the default rather than
+    becoming "whichever side won by a hair". `placeAlignedLabels()` then walks stations out from the
+    middle of the pipe and commits each placed label as an immovable obstacle. 29 checks in
+    `dev/lpn-spike/aligned-label-harness.js`.
+  - **SO THE CODE IS DONE AND WHAT IS LEFT IS A VERDICT.** It ships OFF behind
+    `settings.alignPipeLabels` (Settings ▸ Map ▸ "Align pipe labels with pipes"). Turn it on, look
+    at Elm Street, and decide whether it earns the default. Nobody but Tom can answer that, which is
+    why this is no longer a priority-88 build.
   - **THE WALL-OF-TEXT WORRY IS GONE, ANSWERED BY TASK 333 (2026-08-15).** This used to read: GIS
     aligns ONE short name along a line, while our link labels default to three and can carry nine, so
     a rotated nine-line stack would be a wall of text at 40°. A link label is now **one line** unless
@@ -509,6 +517,18 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     is that a Text label gains an anchor mode the drag, mask and leader paths must respect.
   - `dev/lpn-spike/inp-import-harness.js` asserts the nondeterminism **inverted, as a known defect**,
     so whoever fixes this is told by a failing check to flip it.
+
+- 35|347| **No project tabs at all until a project is opened.** Tom's strongest form of the examples
+  gallery (*"It's not a map until the first project is started or opened?"*), extracted from Task 314
+  when it closed. Left out there on grounds worth restating: `init()` guarantees an invariant in as
+  many words — *"the library always has exactly one open project, so there is never a state where
+  drawing has nowhere to be saved"* — and a tabless boot breaks it everywhere at once (autosave,
+  `saveToStorage()`, the scenario container, `renderTabs()`). It is a storage-model change wearing a
+  UI change's clothes: it deserves its own `/code-review`. He phrased it as *"possibly"*.
+
+- 20|348| **Sub-categories and paging in the examples gallery.** The grid is `auto-fit`, so both
+  arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops
+  fitting on a screen.
 
 - 62|346| **An extrema mark shared by a dozen tied elements is noise.** Elm Street prints `Q=0.00`
   on thirteen zero-demand junctions and a closed pipe, and every one of them is marked "lowest".
@@ -648,190 +668,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
       Tom's own "maintenance / GIS-style viewing" note points the same way.
   - Related and unfiled until Tom rules: a toggle for label background masking, and search within a
     large model.
-
-- 40|314| **An EXAMPLES LIBRARY, on the HEC-RAS model: a pane of many examples, not a menu of two.**
-
-  **BUILT AND SHIPPED 2026-08-14 — the gallery is live; ONE decision of Tom's is deliberately NOT
-  built, and it is named below rather than quietly dropped.** What exists now:
-  - `dev/scripts/generate_examples.php` publishes `dev/water-network-examples/` to the web-served
-    `examples/` with a manifest and a generated SVG thumbnail per example. **The served copy is
-    generated, never hand-kept**, and `check_all.sh` fails if it drifts. It publishes exactly what
-    the `.gitignore` whitelist publishes — one list, not two that can disagree, so a client model
-    dropped in to test the `.inp` importer is invisible to both.
-  - **The empty canvas IS the shop window.** The placeholder sentence that had been there since
-    2026-07-29 is gone; the canvas stays visible and pannable behind the cards, which is the
-    "usable middle" Tom described. `File > Open example…` opens the same wall on demand, **under
-    Open, not New** (Task 305's linguistic argument, built here).
-  - **Opening one goes through `acceptImportedText()` + `importProject()`** — the upload path's own
-    loader, not a second one. So an example lands as an ordinary project the user owns and may Save
-    As, carrying the version migration and structural repair for free. That is
-    *"they were your copies because you downloaded and installed them"*, as far as a served file can
-    get to it.
-  - `dev/lpn-spike/examples-gallery-harness.js`, 69 checks. **The one worth knowing about is the
-    upside-down test**: a `v >= 4` document is stored Cartesian and SVG is Y-down, so drawing stored
-    coordinates straight into a thumbnail mirrors every drawing vertically — and on an unfamiliar
-    water network that looks entirely plausible. It is asserted against `applySaved()`'s own rule
-    rather than by eye, because eye is exactly what would pass it.
-
-  **NOT BUILT: "no project tabs at all until a project is opened".** Tom's strongest form of the
-  feature (*"It's not a map until the first project is started or opened?"*) is the half that is
-  missing, and it was left out on grounds worth stating rather than on grounds of effort. `init()`
-  guarantees an invariant in as many words — *"the library always has exactly one open project, so
-  there is never a state where drawing has nowhere to be saved"* — and a tabless boot breaks it
-  everywhere at once: autosave, `saveToStorage()`, the scenario container and `renderTabs()` all
-  assume an open project exists. **The gallery delivers the user-visible benefit without touching
-  that invariant**, which is why it went first; the tabless boot is a storage-model change wearing a
-  UI change's clothes and deserves its own task and its own `/code-review`. He phrased it as
-  *"possibly"*, so this is a deferral, not a decline.
-  - Also still open, and cheap: **sub-categories and paging** (the grid is `auto-fit`, so they
-    arrive without a rewrite — deliberately not built at four examples), and **`lpn_empty_hint` is
-    now rendered by nothing**. Keep the key: it is the fallback sentence when the manifest cannot be
-    fetched, and it is 26 translated strings that would be expensive to get back.
-  - **STEP ZERO IS DONE, 2026-08-14: the shelf is stocked, tracked, and on the new filename
-    convention.** `dev/water-network-examples/` (Tom renamed it from `dev/epanet-models/` the same
-    day) now holds four saved projects of ours — `Net1-lpn.json` (11 nodes), `Net2-lpn.json` (36),
-    `Net3-lpn.json` (97) and `Elm-Street-Center-lpn.json` (18) — each carrying the Task 315
-    `format`/`app` marker. A useful spread, and Net3 is the one that will actually exercise label
-    clutter and the sizing paradigm in a thumbnail.
-  - **AND THE RENAME QUIETLY UNPROTECTED THE CLIENT MODELS, which is worth recording because
-    nothing warned.** The root `.gitignore` excluded `dev/epanet-models/` BY PATH; renaming the
-    directory did not carry the rule with it, so for a few minutes every real client model in there
-    — `Estrellas-*`, a 1.5 MB utility base map — was an ordinary untracked file one
-    `git add <dir>` away from GitHub. **A path-named ignore rule is a rule that a rename silently
-    revokes.** The fix is `dev/water-network-examples/.gitignore`, which is a WHITELIST: an
-    unrecognised file is ignored by default, and publishing one is an explicit line somebody has to
-    write, visible in the diff. Prefer that shape anywhere a folder mixes shippable and private
-    files — a blacklist has to predict the next client file's name.
-  - **`.inp` sources are deliberately NOT tracked**, including Net1/2/3's. The saved project is the
-    artifact the gallery serves; the `.inp` is an upstream input, and `dev/lpn-spike/reference/`
-    already keeps the one the importer is validated against.
-  - **THE GAP IS AN SI EXAMPLE, and it cannot be made by converting one** (Tom: *"We just need an SI
-    one now. I will eventually make one or find one."*). All three EPANET nets are `Units GPM`, and
-    this suite's standing rule is that switching a unit REINTERPRETS the typed number rather than
-    converting it — so opening Net1 and clicking SI gives 8 mm mains, not 200 mm ones. An SI example
-    has to be AUTHORED in metres, or imported from an `.inp` that declares LPS/LPM/CMH/MLD, which
-    `js/lpn-inp.js` already reads correctly. That is the cheap route if a public SI model turns up.
-  - **The real first exhibit, Tom's own "Elm Street Center", is OUT of his browser and on the shelf**
-    (2026-08-14: *"should be a solid US units example now"*). 18 nodes, 19 links, a CAD site plan as
-    its backdrop. It was the first honest test of the Task 315 filename convention and of whether a
-    saved project opens on a machine that never made it.
-  - **It ships as-is, on Tom's explicit ruling (2026-08-14), with two residual identifiers named
-    here so nobody re-discovers them and panics.** The map labels are anonymised (`ELM STREET
-    CENTER`, `ST. FRANCIS`) and the backdrop image carries no text at all — but `project.name` is
-    still the real client model name, and the node coordinates are real state-plane, which
-    geolocates the site. A sanitisation was offered and declined; **that is a decision, not an
-    oversight, and it should not be silently "fixed" by a later pass.** If it is ever revisited:
-    pipe `_length` is explicit with `lenAuto:false`, so translating coordinates to a local origin is
-    hydraulically lossless for those links, while elevations cannot move without changing every
-    pressure.
-  Tom, 2026-08-14: *"I envision a stunning array of examples that fills a screen with mere titles or
-  brief descriptions and could span pages or sub-categories of large thumbnails… Therefore it is
-  some sort of an Examples library or pane. And you probably get there using File Open Examples."*
-
-  **THIS IS A RE-ARCHITECTURE, NOT A THIRD EXAMPLE.** Today an example is a JS FUNCTION —
-  `drawExampleNetwork(system)` builds Basic US or Basic SI by executing ~290 lines of drawing code,
-  reached from File > New project > From examples. That shape cannot scale to a screen full of
-  them: every example would be more code, none could carry a description or a thumbnail, and none
-  could be authored by anyone who is not editing `js/looped-network.js`. **An example must become a
-  FILE** — an ordinary saved project in an examples folder, with metadata beside it.
-
-  - **Metadata: Description primarily, Thumbnail(s) possibly** (Tom's own ranking). A description is
-    what makes a wall of titles browsable; a thumbnail is what makes it *stunning*, and is the more
-    expensive half — decide whether it is generated at build time from the project itself (right, no
-    drift) or committed as an image (wrong, goes stale the moment the example is edited).
-  - **"They were your copies because you downloaded and installed them."** Tom is naming the thing
-    HEC-RAS got right without ever saying it: opening an example gives you a document you own and
-    may save, and nobody had to explain that. Ours are served rather than installed, so **opening an
-    example must produce an unsaved project the user can Save As**, never a read-only view of a file
-    on our server, and never something that writes back.
-  - **File > Open > Examples**, per Tom, NOT File > New. The current placement under New was right
-    when there were two; a library is a thing you browse and open.
-  - **Three to start**: Basic SI, Basic US, and *Elm Street Center US design loop fire flow plus max
-    day snapshot*. It is the first example drawn from an actual project rather than invented.
-  - **ELM STREET IS NOT A SCENARIO DOCUMENT, and this task is NOT blocked on Task 184** (Tom,
-    2026-08-14, correcting an error written here earlier the same day): *"Elm Street is not a
-    scenario document. It is an EPANET import, and EPANET doesn't do scenarios. Elm Street is a
-    single-scenario snapshot that represents one scenario of a design."* The long name describes
-    **which** snapshot it is, not a document containing several. Worth keeping the correction
-    visible, because the mistake is an easy one to make twice: a name listing three design
-    conditions reads like a document holding three, and **EPANET has no scenario concept at all** —
-    one `.inp` per condition is exactly why Task 184 exists. So all three examples can ship
-    together with no dependency.
-  - **The examples folder is a web-served directory, so it needs an index**: the pane cannot list a
-    directory it cannot read. A generated manifest (title, description, units, thumbnail, file) is
-    the obvious answer, and it must be generated from the files by a script in `dev/scripts/`, never
-    hand-maintained — a hand-kept index and a folder of files drift, and the drift is silent.
-  - **Sub-categories and paging are explicitly in Tom's picture** but are not needed at three. Build
-    the pane so they can arrive without a rewrite; do not build them yet.
-  - **THE EMPTY CANVAS BECOMES THE SHOP WINDOW (Tom, 2026-08-14).** *"I agree with the CC idea of
-    using our first-visit map as an examples shop window. Possibly there can be no project tabs at
-    all until either one of the examples is double-clicked (or maybe each of them has a little
-    'Open' button) or the File menu is used. It's not a map until the first project is started or
-    opened?"* This is the strongest form of the feature and it retires a standing problem: a blank
-    canvas with a placeholder on it is the dominant failure of every map editor, and this page has
-    carried one since 2026-07-29 by an explicit decision *made with no data at all*.
-    - **"It is not a map until a project is opened" is the decision.** VS Code's welcome tab,
-      Excel's start screen, HEC-RAS itself; no-tabs-until-a-project falls straight out of it.
-    - **THE "GALLERY IS A WALL IN FRONT OF A WORKED EXAMPLE" OBJECTION WAS RAISED HERE AND TOM
-      OVERRULED IT, and the overruling is the more useful record.** The objection ran: every other
-      calculator in this suite lands you IN a worked example, per CLAUDE.md's own rule, so a gallery
-      costs a visitor who arrived from a search. A gallery-over-a-live-map hybrid was proposed as
-      the synthesis. Tom, 2026-08-14: *"A gallery is a universe of working examples. The tension is
-      small-minded. This is not a two-minute calculator. I disagree with gallery-over-map."*
-      - **He is right, and the error was treating a rule about CALCULATORS as a rule about this
-        page.** "Open on a worked example" earns its keep where a visitor can read the whole tool in
-        one screen and be finished in two minutes. A network editor is not that; the thing a visitor
-        needs first is *the range of what can be built*, and one example cannot show a range. A wall
-        of working examples IS the worked example, at the scale this page actually operates at.
-      - **Do not re-propose the hybrid.** It was declined on the merits, not deferred.
-      - **What epanet-js actually does, stated precisely, because the imprecise version reads as
-        support for the hybrid and is not** (Tom, 2026-08-14): *"epanetjs doesn't have a project on
-        the map. All they have is a Google Map background on the screen behind their gallery of
-        two."* So the thing behind their gallery is a **decorative backdrop, not a network** —
-        nobody's worked example, nothing to click, nothing that becomes your document. That is the
-        opposite of the gallery-over-a-live-example hybrid proposed here, and it is consistent with
-        Tom's own rule: **it is not a map until a project is opened.**
-      - **This does leave a usable middle, and it is the one to build:** the map canvas may be
-        VISIBLE behind the gallery — empty, no project, no tabs — so the page still reads as a map
-        tool at a glance without pretending a document exists.
-    - **THE LOG QUESTION IS CLOSED and the instrumentation is not needed for this.** Task 200's
-      `first:` histogram was cited here as the evidence that should settle the empty-canvas
-      question. Tom offered to pull it and asked which logs were wanted; the honest answer is that
-      the decision has now been made on grounds the histogram cannot speak to — it counts what
-      visitors did with the OLD page, and cannot say what they would do with a gallery that does not
-      exist yet. **Spending his time on it to confirm a decision already taken would have been
-      theatre.** The fine-grained `first:` rows remain worth reading later, on their own schedule, as
-      a before/after on this change rather than as an input to it.
-  - **Every example commits to a unit system and does not adapt to yours** — this decision already
-    exists (Task 264, `newProjectFromExample`) and carries over unchanged. Say the units in the
-    description.
-  - **Not blocked on anything.** All three examples are single-scenario documents.
-  - **THE SHELF IS NOT WEB-REACHABLE YET, and this is the first thing the build phase hits.**
-    `dev/.htaccess` is `Require all denied`, so the gallery cannot `fetch()` anything under `dev/`.
-    Three ways out, and the choice should be made deliberately rather than discovered:
-    - **A child `.htaccess` granting access to that one subdirectory.** One copy, no drift — but it
-      depends on `AllowOverride AuthConfig` being granted on the host, and CLAUDE.md's deploy
-      section already records that a `.htaccess` directive the host has not granted returns **500
-      for every request under `/engcalcs/`**, not a quiet ignore. Cheap, with a tail risk that takes
-      the whole suite down on a host change.
-    - **A served directory outside `dev/`** (e.g. `engcalcs/examples/`), with `dev/water-network-
-      examples/` as the authoring source and a `dev/scripts/` step that copies. No Apache risk;
-      costs a build step and introduces two copies that can drift.
-    - **A PHP endpoint that reads the file and echoes it.** No Apache config, no copy, and it can
-      emit the manifest too — but it is a new server-side surface on a suite that otherwise computes
-      entirely client-side.
-    **Recommended: the served directory, generated.** The manifest has to be generated from the
-    files by a script anyway (a hand-kept index and a folder of files drift silently, already
-    decided above), so the copy is free — the same script that writes the manifest writes the
-    served copies, and there is exactly one authoring location. It also keeps a `git pull` deploy
-    honest, which the `.htaccess` route does not.
-  - **The loader already exists and should not be rewritten.** `acceptImportedText(text)` →
-    `importProject(saved)` is the exact pipeline the gallery needs: it parses, runs
-    `prepareDocument()`'s version/structure repair, lands the document as a NEW browser project,
-    and stamps it clean. That is precisely Tom's *"they were your copies because you downloaded and
-    installed them"* — the user gets a document they own and may Save As, and nothing writes back.
-    A gallery click is a `fetch()` plus the two calls the upload path already makes; anything more
-    is a second import path that will drift from the first.
 
 - 5|192| **Right-click / long-press context-menu system (originated during Task 146).** Raised by Tom,
   2026-07-30, when "Create scenario geometry variant" (Task 184) was proposed as a right-click
@@ -1775,79 +1611,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     without a per-visit identifier we will not store.
 
 
-- 70|305| **How a visitor opens an EXAMPLE, and the New-vs-Open lie.** Raised by Tom, 2026-08-14:
-
-  **THIS IS THE DESIGN RECORD FOR TASK 314's ENTRY POINT — BUILD IT THERE, NOT HERE** (noted
-  2026-08-14 while prioritising the gallery). Everything below was written before 314 existed and
-  314 has since absorbed its conclusions: File > Open rather than New, "Open a copy" as the honest
-  primitive, thumbnails on the empty canvas rather than a modal, and the same three examples. Kept
-  as a separate entry because the *linguistic* argument — why New is a lie and what Word's "Open a
-  copy" gets right — is the reasoning 314 assumes rather than restates. **Do not schedule 305 as
-  its own build; closing 314 closes this.** The one live consequence to watch is the last bullet:
-  if thumbnails land, `lpn_empty_hint` is deleted, so do not spend a resync sprint on it.
-
-  *"currently we are using New to 'open' examples, which is linguistically confusing, and maybe we
-  need some sort of library paradigm."* And, rejecting a proposed reword of the placeholder:
-  *"Saying it differently doesn't change the lie. And I don't know how to fix it."*
-  - **The mismatch:** New creates something that did not exist; Open retrieves something that does.
-    An example exists, so it belongs under Open. `File > Open example…` (Tom's idea (a)) is the
-    linguistically correct home for it.
-  - **The trap one level down:** if "Open example" then lets you edit and save over it, it was
-    New-from-template after all and the lie returns. The honest primitive is **Open a copy** (Word
-    has exactly this): the example is read-only source, opening it drops a copy into a new tab, the
-    original is untouched and re-openable. The tab strip then shows an ordinary project and nothing
-    is misnamed.
-  - **What epanetjs.com gets right is NOT the modal — it is that there is no verb at all.** Tom,
-    2026-08-14: *"epanetjs.com just throws a box at you on load that gives you a large thumbnail of
-    a US and an SI example. No 'open' or 'new'. Just 'Hmm. I guess I click one of these.'"* Take
-    that without taking the box: **put the thumbnails on the empty canvas itself.** A returning user
-    with projects never sees them, because the canvas is not empty — so it is a passive readout
-    rather than a modal in front of the common action. Nothing to dismiss, no verb to misuse.
-  - **Why examples and not an empty canvas at all:** Tom, 2026-08-14, on why the old placeholder was
-    worse than the new one — *"'Add a background image' is not harnessing dilettantism. 'Open an
-    example' is."* A dabbler clicks a picture; they do not read a sentence about a menu path. This
-    is also the first thing the Task 200 `lpn first:` histogram will bear on.
-  - **Consequence for translation:** if thumbnails land, `lpn_empty_hint` goes away. **Do not spend
-    a resync sprint on it** — it is 26 of the 4 outstanding keys' strings and may be deleted.
-  - **Examples to ship:** the two basics, plus `Elm-Street-Center` (Tom anonymised a real model for
-    this on 2026-08-14, which is what makes it publishable — the source in `dev/epanet-models/` is
-    gitignored because those carry client names, coordinates, base maps and fire-flow results).
-    EPANET's Net1/Net2/Net3 are a free third option: public domain, ship with EPANET, and every
-    water engineer recognises them.
-
-## New Calculators (Mission Expansion)
-
-Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
-the kind of design work that normally only lives in mission/NGO field manuals (Peace Corps water &
-sanitation guides, CAWST, RWSN, Engineers Without Borders) — "systematize what's normally esoteric,"
-staying true to the suite's mission (serving engineers and field workers in water-scarce,
-low-resource regions). None of the tasks below are scoped for build yet — each needs a full spec
-pass (inputs/outputs, formulas, unit sets, worked-example verification, new-calculator checklist per
-`CLAUDE.md`) before implementation starts, same as any new calculator.
-
-### Prioritization framework (Tom, 2026-07-14)
-
-Candidates are scored on four axes, not just "sounds like a good mission fit":
-1. **Availability/commoditization** — is this calculation already well-served worldwide by existing
-   free tools/apps, or trivial in a spreadsheet? **Low availability (a genuine gap) raises priority;
-   a saturated market lowers it**, even for calculators with strong humanitarian relevance — the
-   relevance doesn't help if ten other free tools already solve it.
-2. **Technology emergence** — is the underlying tech/practice currently maturing or dropping in cost
-   (e.g. solar panel costs, PWA/offline capability)?
-3. **Demand for development** — real field/humanitarian need, e.g. how heavily a method is taught in
-   NGO/Peace Corps/WHO/CAWST/RWSN field manuals.
-4. **Search keyword research** — actual external search/demand signal, not a guess.
-
-A 2026-07-14 research pass (real web search, not assumption) across 13 candidates on all four axes
-overturned some initial intuitions — most notably, rainwater harvesting (the lead candidate from the
-first brainstorm) turned out to be a saturated market, while several backlog items (VIP latrine
-sizing, handpump/rope pump selection, check dams) turned out to be genuine gaps with strong
-humanitarian demand and no existing calculator found. **Honest caveat on all "no calculator found"
-verdicts below**: this is a real signal from web search, not a verified global negative — regional,
-institutional, paywalled, or non-English tools may exist that search didn't surface. Priorities
-below reflect this research; re-run the same 4-axis check before adding new candidates rather than
-prioritizing on mission-fit intuition alone.
-
 - 4|114| **Reservoir / detention routing calculator (Modified Puls).** Re-scoped 2026-07-23 (Tom):
   the original "check-dam *spillway sizing*" framing collapsed — a spillway is a weir (`wfs_`/`wfi_`)
   plus rock lining (`rc_`) plus freeboard arithmetic, i.e. no new engine and largely subsumed by
@@ -2108,6 +1871,261 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|305| **How a visitor opens an EXAMPLE, and the New-vs-Open lie — CLOSED 2026-08-15, absorbed by Task 314.**
+
+  Its own text said not to schedule it separately and that closing 314 closes it; 314 is now closed,
+  so this is too. The gallery opens examples under **File ▸ Open example…**, not New, and drops a
+  COPY into a new tab — the linguistic argument below is what that design is built on, kept because
+  314 assumes the reasoning rather than restating it. Raised by Tom, 2026-08-14:
+
+  **THIS IS THE DESIGN RECORD FOR TASK 314's ENTRY POINT — BUILD IT THERE, NOT HERE** (noted
+  2026-08-14 while prioritising the gallery). Everything below was written before 314 existed and
+  314 has since absorbed its conclusions: File > Open rather than New, "Open a copy" as the honest
+  primitive, thumbnails on the empty canvas rather than a modal, and the same three examples. Kept
+  as a separate entry because the *linguistic* argument — why New is a lie and what Word's "Open a
+  copy" gets right — is the reasoning 314 assumes rather than restates. **Do not schedule 305 as
+  its own build; closing 314 closes this.** The one live consequence to watch is the last bullet:
+  if thumbnails land, `lpn_empty_hint` is deleted, so do not spend a resync sprint on it.
+
+  *"currently we are using New to 'open' examples, which is linguistically confusing, and maybe we
+  need some sort of library paradigm."* And, rejecting a proposed reword of the placeholder:
+  *"Saying it differently doesn't change the lie. And I don't know how to fix it."*
+  - **The mismatch:** New creates something that did not exist; Open retrieves something that does.
+    An example exists, so it belongs under Open. `File > Open example…` (Tom's idea (a)) is the
+    linguistically correct home for it.
+  - **The trap one level down:** if "Open example" then lets you edit and save over it, it was
+    New-from-template after all and the lie returns. The honest primitive is **Open a copy** (Word
+    has exactly this): the example is read-only source, opening it drops a copy into a new tab, the
+    original is untouched and re-openable. The tab strip then shows an ordinary project and nothing
+    is misnamed.
+  - **What epanetjs.com gets right is NOT the modal — it is that there is no verb at all.** Tom,
+    2026-08-14: *"epanetjs.com just throws a box at you on load that gives you a large thumbnail of
+    a US and an SI example. No 'open' or 'new'. Just 'Hmm. I guess I click one of these.'"* Take
+    that without taking the box: **put the thumbnails on the empty canvas itself.** A returning user
+    with projects never sees them, because the canvas is not empty — so it is a passive readout
+    rather than a modal in front of the common action. Nothing to dismiss, no verb to misuse.
+  - **Why examples and not an empty canvas at all:** Tom, 2026-08-14, on why the old placeholder was
+    worse than the new one — *"'Add a background image' is not harnessing dilettantism. 'Open an
+    example' is."* A dabbler clicks a picture; they do not read a sentence about a menu path. This
+    is also the first thing the Task 200 `lpn first:` histogram will bear on.
+  - **Consequence for translation:** if thumbnails land, `lpn_empty_hint` goes away. **Do not spend
+    a resync sprint on it** — it is 26 of the 4 outstanding keys' strings and may be deleted.
+  - **Examples to ship:** the two basics, plus `Elm-Street-Center` (Tom anonymised a real model for
+    this on 2026-08-14, which is what makes it publishable — the source in `dev/epanet-models/` is
+    gitignored because those carry client names, coordinates, base maps and fire-flow results).
+    EPANET's Net1/Net2/Net3 are a free third option: public domain, ship with EPANET, and every
+    water engineer recognises them.
+
+## New Calculators (Mission Expansion)
+
+Tom, 2026-07-14: interested in expanding beyond hydraulic-structure/irrigation calculators toward
+the kind of design work that normally only lives in mission/NGO field manuals (Peace Corps water &
+sanitation guides, CAWST, RWSN, Engineers Without Borders) — "systematize what's normally esoteric,"
+staying true to the suite's mission (serving engineers and field workers in water-scarce,
+low-resource regions). None of the tasks below are scoped for build yet — each needs a full spec
+pass (inputs/outputs, formulas, unit sets, worked-example verification, new-calculator checklist per
+`CLAUDE.md`) before implementation starts, same as any new calculator.
+
+### Prioritization framework (Tom, 2026-07-14)
+
+Candidates are scored on four axes, not just "sounds like a good mission fit":
+1. **Availability/commoditization** — is this calculation already well-served worldwide by existing
+   free tools/apps, or trivial in a spreadsheet? **Low availability (a genuine gap) raises priority;
+   a saturated market lowers it**, even for calculators with strong humanitarian relevance — the
+   relevance doesn't help if ten other free tools already solve it.
+2. **Technology emergence** — is the underlying tech/practice currently maturing or dropping in cost
+   (e.g. solar panel costs, PWA/offline capability)?
+3. **Demand for development** — real field/humanitarian need, e.g. how heavily a method is taught in
+   NGO/Peace Corps/WHO/CAWST/RWSN field manuals.
+4. **Search keyword research** — actual external search/demand signal, not a guess.
+
+A 2026-07-14 research pass (real web search, not assumption) across 13 candidates on all four axes
+overturned some initial intuitions — most notably, rainwater harvesting (the lead candidate from the
+first brainstorm) turned out to be a saturated market, while several backlog items (VIP latrine
+sizing, handpump/rope pump selection, check dams) turned out to be genuine gaps with strong
+humanitarian demand and no existing calculator found. **Honest caveat on all "no calculator found"
+verdicts below**: this is a real signal from web search, not a verified global negative — regional,
+institutional, paywalled, or non-English tools may exist that search didn't surface. Priorities
+below reflect this research; re-run the same 4-axis check before adding new candidates rather than
+prioritizing on mission-fit intuition alone.
+
+- 0|314| **An EXAMPLES LIBRARY, on the HEC-RAS model: a pane of many examples, not a menu of two.**
+
+  **BUILT AND SHIPPED 2026-08-14 — the gallery is live; ONE decision of Tom's is deliberately NOT
+  built, and it is named below rather than quietly dropped.** What exists now:
+  - `dev/scripts/generate_examples.php` publishes `dev/water-network-examples/` to the web-served
+    `examples/` with a manifest and a generated SVG thumbnail per example. **The served copy is
+    generated, never hand-kept**, and `check_all.sh` fails if it drifts. It publishes exactly what
+    the `.gitignore` whitelist publishes — one list, not two that can disagree, so a client model
+    dropped in to test the `.inp` importer is invisible to both.
+  - **The empty canvas IS the shop window.** The placeholder sentence that had been there since
+    2026-07-29 is gone; the canvas stays visible and pannable behind the cards, which is the
+    "usable middle" Tom described. `File > Open example…` opens the same wall on demand, **under
+    Open, not New** (Task 305's linguistic argument, built here).
+  - **Opening one goes through `acceptImportedText()` + `importProject()`** — the upload path's own
+    loader, not a second one. So an example lands as an ordinary project the user owns and may Save
+    As, carrying the version migration and structural repair for free. That is
+    *"they were your copies because you downloaded and installed them"*, as far as a served file can
+    get to it.
+  - `dev/lpn-spike/examples-gallery-harness.js`, 69 checks. **The one worth knowing about is the
+    upside-down test**: a `v >= 4` document is stored Cartesian and SVG is Y-down, so drawing stored
+    coordinates straight into a thumbnail mirrors every drawing vertically — and on an unfamiliar
+    water network that looks entirely plausible. It is asserted against `applySaved()`'s own rule
+    rather than by eye, because eye is exactly what would pass it.
+
+  **The unbuilt half is now Task 347, not a paragraph in here.** Tom's strongest form of the feature
+  (*"It's not a map until the first project is started or opened?"*) is a storage-model change
+  wearing a UI change's clothes, and this block will not be read again; sub-categories and paging
+  went to Task 348 for the same reason. `lpn_empty_hint` is now rendered by nothing and is KEPT
+  deliberately — it is the fallback sentence when the manifest cannot be fetched, and 26 translated
+  strings that would be expensive to get back.
+
+  - **STEP ZERO IS DONE, 2026-08-14: the shelf is stocked, tracked, and on the new filename
+    convention.** `dev/water-network-examples/` (Tom renamed it from `dev/epanet-models/` the same
+    day) now holds four saved projects of ours — `Net1-lpn.json` (11 nodes), `Net2-lpn.json` (36),
+    `Net3-lpn.json` (97) and `Elm-Street-Center-lpn.json` (18) — each carrying the Task 315
+    `format`/`app` marker. A useful spread, and Net3 is the one that will actually exercise label
+    clutter and the sizing paradigm in a thumbnail.
+  - **AND THE RENAME QUIETLY UNPROTECTED THE CLIENT MODELS, which is worth recording because
+    nothing warned.** The root `.gitignore` excluded `dev/epanet-models/` BY PATH; renaming the
+    directory did not carry the rule with it, so for a few minutes every real client model in there
+    — `Estrellas-*`, a 1.5 MB utility base map — was an ordinary untracked file one
+    `git add <dir>` away from GitHub. **A path-named ignore rule is a rule that a rename silently
+    revokes.** The fix is `dev/water-network-examples/.gitignore`, which is a WHITELIST: an
+    unrecognised file is ignored by default, and publishing one is an explicit line somebody has to
+    write, visible in the diff. Prefer that shape anywhere a folder mixes shippable and private
+    files — a blacklist has to predict the next client file's name.
+  - **`.inp` sources are deliberately NOT tracked**, including Net1/2/3's. The saved project is the
+    artifact the gallery serves; the `.inp` is an upstream input, and `dev/lpn-spike/reference/`
+    already keeps the one the importer is validated against.
+  - **THE GAP IS AN SI EXAMPLE, and it cannot be made by converting one** (Tom: *"We just need an SI
+    one now. I will eventually make one or find one."*). All three EPANET nets are `Units GPM`, and
+    this suite's standing rule is that switching a unit REINTERPRETS the typed number rather than
+    converting it — so opening Net1 and clicking SI gives 8 mm mains, not 200 mm ones. An SI example
+    has to be AUTHORED in metres, or imported from an `.inp` that declares LPS/LPM/CMH/MLD, which
+    `js/lpn-inp.js` already reads correctly. That is the cheap route if a public SI model turns up.
+  - **The real first exhibit, Tom's own "Elm Street Center", is OUT of his browser and on the shelf**
+    (2026-08-14: *"should be a solid US units example now"*). 18 nodes, 19 links, a CAD site plan as
+    its backdrop. It was the first honest test of the Task 315 filename convention and of whether a
+    saved project opens on a machine that never made it.
+  - **It ships as-is, on Tom's explicit ruling (2026-08-14), with two residual identifiers named
+    here so nobody re-discovers them and panics.** The map labels are anonymised (`ELM STREET
+    CENTER`, `ST. FRANCIS`) and the backdrop image carries no text at all — but `project.name` is
+    still the real client model name, and the node coordinates are real state-plane, which
+    geolocates the site. A sanitisation was offered and declined; **that is a decision, not an
+    oversight, and it should not be silently "fixed" by a later pass.** If it is ever revisited:
+    pipe `_length` is explicit with `lenAuto:false`, so translating coordinates to a local origin is
+    hydraulically lossless for those links, while elevations cannot move without changing every
+    pressure.
+  Tom, 2026-08-14: *"I envision a stunning array of examples that fills a screen with mere titles or
+  brief descriptions and could span pages or sub-categories of large thumbnails… Therefore it is
+  some sort of an Examples library or pane. And you probably get there using File Open Examples."*
+
+  **THIS IS A RE-ARCHITECTURE, NOT A THIRD EXAMPLE.** Today an example is a JS FUNCTION —
+  `drawExampleNetwork(system)` builds Basic US or Basic SI by executing ~290 lines of drawing code,
+  reached from File > New project > From examples. That shape cannot scale to a screen full of
+  them: every example would be more code, none could carry a description or a thumbnail, and none
+  could be authored by anyone who is not editing `js/looped-network.js`. **An example must become a
+  FILE** — an ordinary saved project in an examples folder, with metadata beside it.
+
+  - **Metadata: Description primarily, Thumbnail(s) possibly** (Tom's own ranking). A description is
+    what makes a wall of titles browsable; a thumbnail is what makes it *stunning*, and is the more
+    expensive half — decide whether it is generated at build time from the project itself (right, no
+    drift) or committed as an image (wrong, goes stale the moment the example is edited).
+  - **"They were your copies because you downloaded and installed them."** Tom is naming the thing
+    HEC-RAS got right without ever saying it: opening an example gives you a document you own and
+    may save, and nobody had to explain that. Ours are served rather than installed, so **opening an
+    example must produce an unsaved project the user can Save As**, never a read-only view of a file
+    on our server, and never something that writes back.
+  - **File > Open > Examples**, per Tom, NOT File > New. The current placement under New was right
+    when there were two; a library is a thing you browse and open.
+  - **Three to start**: Basic SI, Basic US, and *Elm Street Center US design loop fire flow plus max
+    day snapshot*. It is the first example drawn from an actual project rather than invented.
+  - **ELM STREET IS NOT A SCENARIO DOCUMENT, and this task is NOT blocked on Task 184** (Tom,
+    2026-08-14, correcting an error written here earlier the same day): *"Elm Street is not a
+    scenario document. It is an EPANET import, and EPANET doesn't do scenarios. Elm Street is a
+    single-scenario snapshot that represents one scenario of a design."* The long name describes
+    **which** snapshot it is, not a document containing several. Worth keeping the correction
+    visible, because the mistake is an easy one to make twice: a name listing three design
+    conditions reads like a document holding three, and **EPANET has no scenario concept at all** —
+    one `.inp` per condition is exactly why Task 184 exists. So all three examples can ship
+    together with no dependency.
+  - **The examples folder is a web-served directory, so it needs an index**: the pane cannot list a
+    directory it cannot read. A generated manifest (title, description, units, thumbnail, file) is
+    the obvious answer, and it must be generated from the files by a script in `dev/scripts/`, never
+    hand-maintained — a hand-kept index and a folder of files drift, and the drift is silent.
+  - **Sub-categories and paging are explicitly in Tom's picture** but are not needed at three. Build
+    the pane so they can arrive without a rewrite; do not build them yet.
+  - **THE EMPTY CANVAS BECOMES THE SHOP WINDOW (Tom, 2026-08-14).** *"I agree with the CC idea of
+    using our first-visit map as an examples shop window. Possibly there can be no project tabs at
+    all until either one of the examples is double-clicked (or maybe each of them has a little
+    'Open' button) or the File menu is used. It's not a map until the first project is started or
+    opened?"* This is the strongest form of the feature and it retires a standing problem: a blank
+    canvas with a placeholder on it is the dominant failure of every map editor, and this page has
+    carried one since 2026-07-29 by an explicit decision *made with no data at all*.
+    - **"It is not a map until a project is opened" is the decision.** VS Code's welcome tab,
+      Excel's start screen, HEC-RAS itself; no-tabs-until-a-project falls straight out of it.
+    - **THE "GALLERY IS A WALL IN FRONT OF A WORKED EXAMPLE" OBJECTION WAS RAISED HERE AND TOM
+      OVERRULED IT, and the overruling is the more useful record.** The objection ran: every other
+      calculator in this suite lands you IN a worked example, per CLAUDE.md's own rule, so a gallery
+      costs a visitor who arrived from a search. A gallery-over-a-live-map hybrid was proposed as
+      the synthesis. Tom, 2026-08-14: *"A gallery is a universe of working examples. The tension is
+      small-minded. This is not a two-minute calculator. I disagree with gallery-over-map."*
+      - **He is right, and the error was treating a rule about CALCULATORS as a rule about this
+        page.** "Open on a worked example" earns its keep where a visitor can read the whole tool in
+        one screen and be finished in two minutes. A network editor is not that; the thing a visitor
+        needs first is *the range of what can be built*, and one example cannot show a range. A wall
+        of working examples IS the worked example, at the scale this page actually operates at.
+      - **Do not re-propose the hybrid.** It was declined on the merits, not deferred.
+      - **What epanet-js actually does, stated precisely, because the imprecise version reads as
+        support for the hybrid and is not** (Tom, 2026-08-14): *"epanetjs doesn't have a project on
+        the map. All they have is a Google Map background on the screen behind their gallery of
+        two."* So the thing behind their gallery is a **decorative backdrop, not a network** —
+        nobody's worked example, nothing to click, nothing that becomes your document. That is the
+        opposite of the gallery-over-a-live-example hybrid proposed here, and it is consistent with
+        Tom's own rule: **it is not a map until a project is opened.**
+      - **This does leave a usable middle, and it is the one to build:** the map canvas may be
+        VISIBLE behind the gallery — empty, no project, no tabs — so the page still reads as a map
+        tool at a glance without pretending a document exists.
+    - **THE LOG QUESTION IS CLOSED and the instrumentation is not needed for this.** Task 200's
+      `first:` histogram was cited here as the evidence that should settle the empty-canvas
+      question. Tom offered to pull it and asked which logs were wanted; the honest answer is that
+      the decision has now been made on grounds the histogram cannot speak to — it counts what
+      visitors did with the OLD page, and cannot say what they would do with a gallery that does not
+      exist yet. **Spending his time on it to confirm a decision already taken would have been
+      theatre.** The fine-grained `first:` rows remain worth reading later, on their own schedule, as
+      a before/after on this change rather than as an input to it.
+  - **Every example commits to a unit system and does not adapt to yours** — this decision already
+    exists (Task 264, `newProjectFromExample`) and carries over unchanged. Say the units in the
+    description.
+  - **Not blocked on anything.** All three examples are single-scenario documents.
+  - **THE SHELF IS NOT WEB-REACHABLE YET, and this is the first thing the build phase hits.**
+    `dev/.htaccess` is `Require all denied`, so the gallery cannot `fetch()` anything under `dev/`.
+    Three ways out, and the choice should be made deliberately rather than discovered:
+    - **A child `.htaccess` granting access to that one subdirectory.** One copy, no drift — but it
+      depends on `AllowOverride AuthConfig` being granted on the host, and CLAUDE.md's deploy
+      section already records that a `.htaccess` directive the host has not granted returns **500
+      for every request under `/engcalcs/`**, not a quiet ignore. Cheap, with a tail risk that takes
+      the whole suite down on a host change.
+    - **A served directory outside `dev/`** (e.g. `engcalcs/examples/`), with `dev/water-network-
+      examples/` as the authoring source and a `dev/scripts/` step that copies. No Apache risk;
+      costs a build step and introduces two copies that can drift.
+    - **A PHP endpoint that reads the file and echoes it.** No Apache config, no copy, and it can
+      emit the manifest too — but it is a new server-side surface on a suite that otherwise computes
+      entirely client-side.
+    **Recommended: the served directory, generated.** The manifest has to be generated from the
+    files by a script anyway (a hand-kept index and a folder of files drift silently, already
+    decided above), so the copy is free — the same script that writes the manifest writes the
+    served copies, and there is exactly one authoring location. It also keeps a `git pull` deploy
+    honest, which the `.htaccess` route does not.
+  - **The loader already exists and should not be rewritten.** `acceptImportedText(text)` →
+    `importProject(saved)` is the exact pipeline the gallery needs: it parses, runs
+    `prepareDocument()`'s version/structure repair, lands the document as a NEW browser project,
+    and stamps it clean. That is precisely Tom's *"they were your copies because you downloaded and
+    installed them"* — the user gets a document they own and may Save As, and nothing writes back.
+    A gallery click is a `fetch()` plus the two calls the upload path already makes; anything more
+    is a second import path that will drift from the first.
 
 - 0|344| **The element property box is DRAGGABLE — SHIPPED 2026-08-15.** Tom: *"EPANET has an
   element properties box. But it is draggable. epanetjs has a side pane. Of the two, the EPANET UX
