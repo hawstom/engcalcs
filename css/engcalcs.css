@@ -245,14 +245,24 @@ html[lang="zh"] .ec-welcome {
    polyline underneath. `color` is the currentColor the icon paths read for both stroke and the
    reservoir's translucent water-fill path. */
 .lpn-node-symbol, .lpn-link-symbol { pointer-events: none; }
-.lpn-node-symbol-reservoir, .lpn-node-symbol-tank { color: #26a; }
+/* BLACK since 2026-08-14 (Tom: "Let's turn pumps and reservoirs black now"). This is the same
+   argument the blue was chosen under, now being cashed in: colour on this map is the budget we are
+   saving for MEANING, and Task 327's colour-by-value view is what will spend it. A reservoir that is
+   blue because reservoirs are watery is decoration, and decoration is what makes EPANET "practically
+   an act of Congress to get a pipe to show as black while showing values from the model" (Tom,
+   2026-08-14). Black base state, colour reserved for what the model says.
+   THE TANK GOES WITH IT even though Tom named only pumps and reservoirs: it shares this rule, and a
+   lone blue tank among black reservoirs would read as an oversight rather than a distinction --
+   the two are told apart by SHAPE, which is the test every symbol here is held to. Easy to revert
+   if that was not the intent. The junction dot is deliberately left blue for now; nobody asked. */
+.lpn-node-symbol-reservoir, .lpn-node-symbol-tank { color: #000; }
 /* THE SAME BLUE AS THE RESERVOIR, deliberately (Task 248). A tank and a reservoir are both
    water bodies, and colour here is decoration, not meaning -- the two are told apart by SHAPE
    (closed and tall against open and wide, lib/Icons.lib.php), which is what still works in
    greyscale and for a colour-blind reader. Giving the tank its own hue would spend a colour on
    a distinction the shape already carries, and colour is the budget this map is saving for
    CONDITION -- see the note above. */
-.lpn-link-symbol-pump { color: #a52; }
+.lpn-link-symbol-pump { color: #000; }
 /* A VALVE takes the PIPE's own colour, not a hue of its own (Task 248 phase 2). It is a fitting
    in the line rather than a separate kind of thing, and its SHAPE -- an angular bowtie against
    the pump's circle -- already tells it apart in greyscale, which is the test this map's symbols
@@ -278,7 +288,8 @@ html[lang="zh"] .ec-welcome {
    symbol furniture and stays on --lpn-sym. The multipliers preserve the exact proportions the
    0.7-based versions had, so nothing about the drawing's appearance changed with the decoupling. */
 .lpn-link { stroke: #557; stroke-width: var(--lpn-lw, 0.7); cursor: pointer; }
-.lpn-link-pump { stroke: #a52; }
+/* Black with its symbol (2026-08-14) -- the pump's polyline and its circle are one mark. */
+.lpn-link-pump { stroke: #000; }
 /* No .lpn-link-valve rule: a valve's polyline is a pipe-coloured line by design -- see
    .lpn-link-symbol-valve above. */
 /* A CLOSED link (ROADMAP Task 146.07). Dashed, because a closed pipe carries no water and would
@@ -339,7 +350,16 @@ html[lang="zh"] .ec-welcome {
 .lpn-labels-hidden .lpn-lbl[data-nodelbl],
 .lpn-labels-hidden .lpn-lbl[data-linklbl],
 .lpn-labels-hidden .lpn-datalbl-part,
+.lpn-labels-hidden .lpn-tick,
 .lpn-labels-hidden .lpn-arrow { visibility: hidden; }
+/* .lpn-tick was MISSED in the first cut and Tom caught it on screen: "Extrema glyphs forgot to hide
+   when zoomed out." It is the clearest possible statement of why this selector list is a liability
+   -- an extrema badge is part of a data label BY EVERY MEANING THAT MATTERS (it decorates a number
+   inside one, it is built in the same pass, it scales with the same text factor) and is a separate
+   ELEMENT, in its own layer, so nothing about the code connected the two. Every future mark that
+   annotates a label has the same trap waiting. The durable fix is a single .lpn-annotation class
+   applied at build time to everything in this category, so membership is declared where the element
+   is created rather than remembered here; ROADMAP Task 334. */
 .lpn-link-halo.lpn-override { stroke: #e8a33d; stroke-width: calc(2.857 * var(--lpn-lw, 0.7)); }
 /* A node's own circle carries its halo as a ring: it already draws as a filled disc, so a stroke
    around it IS an outline. Placed BEFORE .lpn-node-pending below, so a node that is both

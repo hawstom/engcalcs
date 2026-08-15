@@ -469,17 +469,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     exactly why the in-file `format`/`app` marker is part of the same change rather than a
     nice-to-have.
 
-- 55|319| **Log-row injection through `Accept-Language`, in five copy-pasted copies.** Every log
-  writer sanitises its columns carefully — `log-signal-event.php` even explains why — but
-  `$browserLang` comes raw from `$_SERVER['HTTP_ACCEPT_LANGUAGE']` with no filter and no length cap,
-  into the same tab-separated line. The identical 3-line snippet sits in `formmail.php`,
-  `log-signal-event.php`, `log-title-event.php`, `log-human-view.php`, `log-calc-event.php`, which is
-  why the miss is uniform. `trim()` strips edges only, so an embedded tab or newline forges rows, and
-  a 4 KB header goes in unbounded. **Impact is bounded — it corrupts our own analytics, nothing
-  executable — but those analytics are what roadmap decisions are being made from.** One helper
-  `ecBrowserLangTag()` in `lib/config.inc.php` (`[a-z0-9-]`, ~35 chars), called from all five: kills
-  the duplication and the defect together.
-
 - 20|321| **`formmail.php` reads five `$_POST` keys with no `isset()`.** `name`, `email`, `subject`,
   `message`, `more_message`. Under PHP 8 a bare POST emits *Undefined array key* warnings, and with
   `display_errors` on anywhere they land in the response body. The header-injection guards on
@@ -649,6 +638,68 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Prefix strings are per-field and translatable (`Q` is `Q` everywhere, but not every symbol is).
     They interact with Task 331's visibility threshold and with aligned labels (Task 329): a rotated
     label lying along a pipe has less room, so it wants the shortest self-describing form there is.
+  - **PREFIXES REPLACE THE PER-FIELD LABEL COLOURS — that is the point, not a side effect** (Tom,
+    2026-08-14: *"Exchange label colors for prefixes specified in settings and in legend"*). It is
+    the same trade as turning pumps and reservoirs black on the same day: colour is the budget being
+    saved for MEANING, and Task 327's colour-by-value view is what spends it. A prefix also works in
+    greyscale, on a printed sheet, and for a colour-blind reader — none of which the colour key does.
+  - **Tom's default set**, 2026-08-14: `L` pipe or pump ID, `V` valve, `J` node ID, `R` reservoir ID,
+    `P` pump ID, `Q` flow or demand, `V` velocity, `S` head-loss gradient (% or blank), `H` head,
+    `P` pressure, `E` elevation, blank diameter, blank length, `C`/`n`/`f` roughness (whichever the
+    current method uses), `km`, `Hl`.
+  - **ONE GENUINE COLLISION, and it is on the element that has least room: `V` is both the valve ID
+    prefix and velocity, and both can appear in the same link label.** `P` looks like a second
+    collision (pump ID, pressure) but is not — pressure is a node quantity and a pump ID is a link
+    one, so they never share a label. Needs Tom's call: a different valve prefix, or velocity as
+    `v` lowercase (loses the greyscale-safe distinction at small sizes), or accept it because the
+    ID is always the first line. **A blank prefix for diameter and length is deliberate and is worth
+    keeping**: those two are the ones a reader identifies by their units, so a prefix would be
+    noise on the field that needs the room most.
+  - Prefixes are editable in settings and shown in the legend, so a set the user has changed is still
+    readable by someone else looking at the sheet.
+
+- 78|334| **One `.lpn-annotation` class, declared where an element is built, instead of a selector
+  list in the stylesheet.** Task 331 hides generated annotation by naming each kind in CSS, and the
+  extrema badges were missed — Tom caught it on screen the same day: *"Extrema glyphs forgot to hide
+  when zoomed out."* (Fixed by adding `.lpn-tick`; this task removes the class of bug.)
+  - **The badge is part of a data label by every meaning that matters** — it decorates a number
+    inside one, it is built in the same pass, it scales with the same text factor — **and is a
+    separate ELEMENT in its own layer, so nothing in the code connected the two.** Membership in
+    "generated annotation" is a fact about why an element exists, and it should be declared at the
+    point of creation, where the author knows it, rather than remembered in a stylesheet by someone
+    editing an unrelated feature months later.
+  - Every future mark that annotates a label — a units suffix, a warning glyph, a thematic swatch —
+    walks into the same trap until this is done.
+
+- 80|335| **Store a dragged label's offset in SCREEN PIXELS, which fixes the drifting leader angle
+  outright.** Tom, 2026-08-14: *"As I zoom in and out, the angle of leaders changes. Can we get the
+  leader endpoint from user and change only its length, if anything, as zoom changes? Or is this
+  impractical?"*
+  - **Practical, and there is a better answer than holding the angle: `n.lx`/`n.ly` are the LAST
+    MAP-UNIT QUANTITY left in the label system.** Text became pixels in Task 331, so a label's
+    on-screen size no longer changes with zoom — but its stored offset from the node still does, so
+    the geometric relationship between the box and its anchor changes at every zoom step, and the
+    attachment point and angle drift out of it. Fixing the angle would be treating the symptom.
+  - **Store the offset in pixels and BOTH the angle and the length become constant for free** — the
+    label sits exactly where the user dropped it, relative to its node, at every zoom. No rule to
+    state, no special case, nothing to hold. This is the same move as the text size, applied to the
+    one place it was not.
+  - **The cost is a migration with the Task 332 ill-posedness in it**: converting an existing
+    world-unit offset to pixels needs a scale, and no document records the zoom it was dragged at.
+    Options, for Tom: convert at the open-time fit scale (one-time, approximate, visible immediately
+    and adjustable); or keep `lx/ly` for legacy documents and write pixels only on the next drag
+    (lossless, but two mechanisms in the file at once). **Not a decision to make silently** — it
+    changes stored meaning.
+
+- 60|336| **Concatenate a link's label values onto one line where they fit.** Tom, 2026-08-14:
+  *"Concatenate pipe labels where/when possible. More readable."*
+  - Depends on Task 333: `8" 250 ft` is ambiguous concatenated, `D=8" L=250 ft` is not. **Prefixes
+    are what make concatenation safe**, which is the same reason they are what make a hide-priority
+    order safe — one mechanism buys both.
+  - Matters most under Task 329's aligned labels, where a three-line stack lying at 40° along a pipe
+    is exactly the wall of text flagged when that geometry landed. A one-line aligned label is the
+    form GIS actually uses, and is probably where these two tasks are heading together.
+
 
 - 92|326| **PARADIGM: size text and symbols in PRINTED units, not real-world units.** Tom,
   2026-08-14: *"the end product of all text and symbols is in printed units… engineers and architects
@@ -2404,6 +2455,11 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|319| **Accept-Language log injection, in five copy-pasted writers — CLOSED.** `ecBrowserLangTag()`
+  in `lib/config.inc.php` filters to `[a-z0-9-]` and truncates rather than rejecting (a long header is
+  a real browser's, not an attack). All five writers call it, and
+  `dev/scripts/browser_lang_tag_check.php` is blocking in `check_all.sh` so no sixth can reintroduce
+  the raw read. Narrative in `dev/roadmap-closed-archive.md`.
 - 0|331| **GIS paradigm phase 1: text/symbol/pipe sizes are three independent SCREEN-PIXEL settings,
   and labels hide by map width.** Deleted `textSizeUnits`, `symbolScale`, both pixel floors and
   `importTextSize()` — the paradigm keeps removing controls rather than adding them. `labelMaxWidth`

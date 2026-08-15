@@ -7090,3 +7090,22 @@ tasks at priority 0. Compressed to a stub there; this is the full text as it sto
     at a pixel count that depended on the reader's zoom, so there is no factor to apply, and
     inventing one would carry the ambiguity forward wearing an authoritative number.
 
+## Task 319 — Accept-Language log injection (closed 2026-08-14)
+- 55|319| **Log-row injection through `Accept-Language`, in five copy-pasted copies.** Every log
+  writer sanitises its columns carefully — `log-signal-event.php` even explains why — but
+  `$browserLang` comes raw from `$_SERVER['HTTP_ACCEPT_LANGUAGE']` with no filter and no length cap,
+  into the same tab-separated line. The identical 3-line snippet sits in `formmail.php`,
+  `log-signal-event.php`, `log-title-event.php`, `log-human-view.php`, `log-calc-event.php`, which is
+  why the miss is uniform. `trim()` strips edges only, so an embedded tab or newline forges rows, and
+  a 4 KB header goes in unbounded. **Impact is bounded — it corrupts our own analytics, nothing
+  executable — but those analytics are what roadmap decisions are being made from.** One helper
+  `ecBrowserLangTag()` in `lib/config.inc.php` (`[a-z0-9-]`, ~35 chars), called from all five: kills
+  the duplication and the defect together.
+
+Shipped during the dev.hawsedc.com deploy debugging and left open by accident until Tom asked
+whether any smell-test findings remained. `ecBrowserLangTag()` in `lib/config.inc.php` filters to
+`[a-z0-9-]` and TRUNCATES rather than rejecting (a header that is merely long is a real browser's,
+not an attack, and dropping it would lose the datum we are collecting). All five writers call it;
+`dev/scripts/browser_lang_tag_check.php` is blocking in `check_all.sh` and proves no sixth writer
+can reintroduce the raw read.
+
