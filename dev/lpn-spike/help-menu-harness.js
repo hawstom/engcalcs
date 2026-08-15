@@ -1,0 +1,131 @@
+// The Help menu, and the two things that moved into it (ROADMAP Task 314 follow-on).
+//
+//   node dev/lpn-spike/help-menu-harness.js
+//
+// On 2026-08-14 the Notes and the feedback invitation both left the body of Looped-Network.php --
+// Tom: "LPN has a Help menu now. Are we going to put the notes there and bump the bottom of the map
+// against the bottom of the screen?" On a twenty-line calculator the Notes sit a scroll below the
+// answer and cost nothing; on a full-window map editor they are why the canvas stops short of the
+// fold, on the one page in the suite where vertical room IS the product.
+//
+// MOVED CONTENT IS THE KIND THAT ROTS SILENTLY, which is the whole reason for this file:
+//
+//   * The Notes are six translated definition pairs -- the only prose on the page saying what the
+//     calculator assumes. The tempting implementation is a JS string, and it would quietly delete
+//     them from the HTML a search engine reads, from print, and from Find-in-page. So the markup
+//     must STAY IN THE PAGE, hidden, and the menu row must only reveal it. Nothing else in the repo
+//     can tell the difference between the two implementations; both look right on screen.
+//   * The invitation had to land somewhere real. Dropping echoFeedback() from one page is a
+//     one-line edit that silently removes the suite's only ask; it is only legitimate because the
+//     string now lives on contact.php, and that is a fact about a DIFFERENT file.
+//   * Task 290's lesson, in the same shape: content a page lost is indistinguishable from content
+//     nobody wanted, once the diff is old.
+
+const fs = require('fs');
+const path = require('path');
+
+const root = path.join(__dirname, '../..');
+const page = fs.readFileSync(path.join(root, 'Looped-Network.php'), 'utf8');
+const src = fs.readFileSync(path.join(root, 'js/looped-network.js'), 'utf8');
+const contact = fs.readFileSync(path.join(root, 'contact.php'), 'utf8');
+const en = fs.readFileSync(path.join(root, 'lib/lang.ec.en.php'), 'utf8');
+
+let checks = 0, failures = 0;
+function report(ok, label, detail) {
+	checks++;
+	if (!ok) { failures++; }
+	console.log(`${ok ? '  ok  ' : ' FAIL '} ${label}${detail ? '   ' + detail : ''}`);
+}
+
+console.log('\n-- the Notes are still CONTENT, not a JS string --');
+{
+	report(page.indexOf('id="lpn_notes_popup"') > 0, 'the notes popover exists in the page');
+	// Every note is still a real <dt>/<dd> pair emitted by PHP from a lang key. If these ever move
+	// into JS they leave the indexable document, and no other check would notice.
+	const dts = (page.match(/<dt><\?=\$ec_lang\['lpn_notes_/g) || []).length;
+	report(dts >= 6, 'every note is still PHP-rendered markup in the page', `${dts} terms`);
+	report(page.indexOf("$ec_lang['ws_notes_heading']") > 0, 'and it keeps the suite-wide Notes heading');
+	// Inside the popover, not floating loose: the popover opens with display:none, so the content
+	// is present but not occupying the page.
+	const at = page.indexOf('id="lpn_notes_popup"');
+	const block = page.slice(at, at + 4000);
+	report(/display:none/.test(block.slice(0, 300)), 'the popover starts hidden');
+	report(block.indexOf("$ec_lang['lpn_notes_1_term']") > 0, 'and the notes live inside it');
+	report(!/lpn_notes_\w+ *:/.test(src), 'no note text was smuggled into pageConfig as a JS string');
+}
+
+console.log('\n-- the popover behaves like the others --');
+{
+	report(/VIEW_POPOVERS = \[[^\]]*'lpn_notes_popup'/.test(src),
+		'it is in VIEW_POPOVERS, so another menu or a click away closes it');
+	report(/function toggleNotesPopup/.test(src), 'it toggles rather than only opening');
+	report(/wireNotesPopup\(\);/.test(src), 'its close button is wired at init');
+	report(page.indexOf('id="lpn_notes_close"') > 0, 'and it has a close button');
+	report(/lpn-popover-body/.test(page.slice(page.indexOf('id="lpn_notes_popup"'), page.indexOf('id="lpn_notes_popup"') + 1500)),
+		'its body scrolls, since prose can be taller than the map it covers');
+}
+
+console.log('\n-- the invitation landed somewhere real before the page dropped it --');
+{
+	// The order of these two assertions is the argument: removing the call is only legitimate
+	// BECAUSE the string exists on contact.php. Asserted together so neither half can be undone
+	// alone.
+	report(contact.indexOf("$ec_lang['template_feedback']") > 0,
+		'contact.php carries the template_feedback prose');
+	// Strip // comments first: the page EXPLAINS in prose why it does not call echoFeedback(), and
+	// a naive substring search finds the explanation and calls it a call.
+	const pageCode = page.replace(/^\s*\/\/.*$/gm, '');
+	report(!/(^|[^\w>])echoFeedback\s*\(/.test(pageCode),
+		'and only then is Looped-Network.php excused from calling echoFeedback()');
+	// It must NOT be a link on contact.php -- every other appearance of this string links to
+	// contact.php, which from contact.php is a link to here.
+	const at = contact.indexOf("$ec_lang['template_feedback']");
+	const around = contact.slice(Math.max(0, at - 200), at + 100);
+	report(around.indexOf('<a ') < 0, 'and it is prose there, not a link back to the same page');
+	// Every OTHER calculator still calls it. Dropping it suite-wide would be a different decision
+	// from the one Tom made, and this is what tells the two apart.
+	const others = fs.readdirSync(root)
+		.filter(f => /\.php$/.test(f) && f !== 'Looped-Network.php')
+		.filter(f => fs.readFileSync(path.join(root, f), 'utf8').indexOf('echoCalculatorForm') > 0);
+	const withFeedback = others.filter(f => fs.readFileSync(path.join(root, f), 'utf8').indexOf('echoFeedback()') > 0);
+	report(others.length > 0 && withFeedback.length === others.length,
+		'every other calculator page still shows the invitation',
+		`${withFeedback.length}/${others.length}`);
+}
+
+console.log('\n-- the Help menu rows --');
+{
+	const fn = src.slice(src.indexOf('function openHelpMenu'));
+	const body = fn.slice(0, fn.indexOf('\n\tfunction ', 10));
+	report(/pc\.lpn_help_walkthroughs/.test(body), 'Walkthroughs');
+	report(/pc\.lpn_help_notes/.test(body), 'Notes');
+	report(/pc\.lpn_help_fix/.test(body), 'Fix something');
+	report(/pc\.about_main_menu/.test(body), 'About');
+	// "Fix something" REPLACED Contact rather than joining it. Both go to contact.php, and
+	// lib/Calculators.lib.php records what two links to one destination do to each other: they
+	// "halve each other's weight rather than doubling the invitation".
+	report(!/pc\.contact_main_menu/.test(body),
+		'and Contact is gone, so two rows do not compete for one destination');
+	const dests = body.match(/ext\('contact\.php'\)/g) || [];
+	report(dests.length === 1, 'exactly one row opens contact.php', `${dests.length}`);
+	// About last, where every other Help menu in the world puts it.
+	report(body.indexOf('about_main_menu') > body.indexOf('lpn_help_fix'), 'About is last');
+	// Notes is the one row that does not leave the page, so it must NOT be an ext().
+	report(/label: pc\.lpn_help_notes \|\| 'Notes', fn: toggleNotesPopup/.test(body),
+		'Notes reveals in place rather than opening a tab');
+}
+
+console.log('\n-- the strings exist --');
+['lpn_help_fix', 'lpn_help_notes', 'lpn_examples_blank'].forEach(function (k) {
+	report(en.indexOf(`$ec_lang['${k}']`) >= 0, `${k} is in lang.ec.en.php`);
+});
+{
+	// Tom, 2026-08-14, choosing "map" over "drawing": the page calls itself a map everywhere else
+	// (map height, map footer, map appearance), so a second word for the same thing was the odd
+	// one out.
+	const m = en.match(/\$ec_lang\['lpn_examples_blank'\]='([^']*)'/);
+	report(!!m && /\bmap\b/.test(m[1]), 'the blank-canvas button says "map"', m && m[1]);
+}
+
+console.log(`\n${checks - failures}/${checks} checks passed`);
+process.exit(failures ? 1 : 0);

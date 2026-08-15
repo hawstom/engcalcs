@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 945,
-        "delta_key_count": 31,
+        "expected_key_count": 947,
+        "delta_key_count": 33,
         "exempt_key_count": 14,
         "exempt_keys": [
             "calc_units_us",
@@ -330,10 +330,12 @@
         "lpn_examples_sub": "Each one opens as your own copy. Change it, save it, or start over.",
         "lpn_examples_open": "Open",
         "lpn_examples_menu": "Open example...",
-        "lpn_examples_blank": "Or start with a blank drawing",
+        "lpn_examples_blank": "Or start with a blank map",
         "lpn_examples_size": "{nodes} junctions, {links} pipes",
         "lpn_examples_failed": "The examples could not be loaded. Use File, New project to start a drawing.",
         "lpn_examples_loading": "Loading examples...",
+        "lpn_help_fix": "Fix something",
+        "lpn_help_notes": "Notes",
         "lpn_status_example_opened": "Opened {name}. It is your copy: save it with File, Save as.",
         "lpn_ex_basic_si_title": "Basic network, l\/s (SI)",
         "lpn_ex_basic_si_desc": "Start here. A reservoir, a pump and a small loop: the least a working water network can be. Litres per second, with metres and millimetres.",
@@ -363,10 +365,12 @@
         "lpn_examples_sub": "Each one opens as your own copy. Change it, save it, or start over.",
         "lpn_examples_open": "Open",
         "lpn_examples_menu": "Open example...",
-        "lpn_examples_blank": "Or start with a blank drawing",
+        "lpn_examples_blank": "Or start with a blank map",
         "lpn_examples_size": "{nodes} junctions, {links} pipes",
         "lpn_examples_failed": "The examples could not be loaded. Use File, New project to start a drawing.",
         "lpn_examples_loading": "Loading examples...",
+        "lpn_help_fix": "Fix something",
+        "lpn_help_notes": "Notes",
         "lpn_status_example_opened": "Opened {name}. It is your copy: save it with File, Save as.",
         "lpn_ex_basic_si_title": "Basic network, l\/s (SI)",
         "lpn_ex_basic_si_desc": "Start here. A reservoir, a pump and a small loop: the least a working water network can be. Litres per second, with metres and millimetres.",
@@ -505,6 +509,38 @@
             }
         },
         "lpn_examples_loading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "השתמשו בקובץ, פרויקט חדש כדי לפתוח דוגמה. או התחילו בהוספת מאגר, צומת וצינור מסרגל הכלים.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "בטל",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_help_fix": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "השתמשו בקובץ, פרויקט חדש כדי לפתוח דוגמה. או התחילו בהוספת מאגר, צומת וצינור מסרגל הכלים.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "בטל",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_help_notes": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

@@ -5,6 +5,22 @@ echoHeader("EngCalcs", $html_title, "", false);
 // Task 206: this page has no calculator form, so nothing else names it for the human-view beacon.
 echoPageNameScript();
 ?>
+<?php // THE INVITATION ITSELF, now that the page it used to sit on no longer carries it (Tom,
+      // 2026-08-14: "I can put the Help Wanted string on the Contact Page?"). Looped-Network.php is
+      // the one calculator that does not call echoFeedback() -- vertical room is the product on a
+      // full-window map editor -- and its Help > Fix something row brings people here instead.
+      //
+      // Reuses template_feedback rather than a new key: it is already written, already translated
+      // into 26 languages, and already says exactly this. What changes is only WHO reads it. On a
+      // calculator page it was an invitation to somebody who had not decided to write; here it is
+      // the first thing read by somebody who already has, so it works as an opening line telling
+      // them what is worth sending -- including the "better wording" ask, which is the one report
+      // only a non-English reader can file.
+      //
+      // NOT a link, unlike every other place this string appears: linking to contact.php from
+      // contact.php is a link to here. ?>
+<p><?=$ec_lang['template_feedback']?></p>
+
 <p>Tom Haws, Professional Engineer (Civil)<br />
 859 N Lafayette<br />
 Mesa, AZ  85201<br />

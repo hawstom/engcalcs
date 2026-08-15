@@ -6337,7 +6337,7 @@ var EngCalcs = EngCalcs || {};
 	// Labels form go away when user clicks away or at least when another menu item is selected? We
 	// are currently seeing the other menus while Labels persists." The property popup (#lpn_popup) is
 	// deliberately NOT in this list: it has its own currentPopup machinery and its own dismissal.
-	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup'];
+	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup', 'lpn_notes_popup'];
 	function closeViewPopovers(except) {
 		VIEW_POPOVERS.forEach(function (id) {
 			if (id === except) { return; }
@@ -6796,13 +6796,54 @@ var EngCalcs = EngCalcs || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
 		openMenu(anchor, [
 			{ icon: 'help', label: pc.lpn_help_walkthroughs || 'Walkthroughs', fn: ext(LPN_WALKTHROUGHS_URL) },
+			// The page's own Notes, which used to sit below the map (Tom, 2026-08-14). This is the
+			// ONE row in this menu that does not open a new tab, because it does not leave the page
+			// at all -- the notes are still in this document, hidden, and this reveals them. See the
+			// comment on #lpn_notes_popup in Looped-Network.php for why the markup stayed in the
+			// page rather than becoming a JS string.
+			{ icon: 'help', label: pc.lpn_help_notes || 'Notes', fn: toggleNotesPopup },
 			{ separator: true },
-			{ icon: 'mail', label: pc.contact_main_menu || 'Contact', fn: ext('contact.php') },
+			// **A VERB, not a noun** (Tom, 2026-08-14, choosing it over "Contribute": both were a
+			// downgrade for the old page-bottom invitation, and this one is the least of them).
+			// "Contribute" reads as money or code to most visitors; the reports Tom actually gets
+			// are a wrong word or a bad number, and "Fix something" is what invites those. The old
+			// template_feedback prose moved to contact.php, so the invitation still exists in
+			// words -- it is now read by somebody who has already decided to write.
+			//
+			// It REPLACES the Contact row rather than joining it, and that is deliberate: both go to
+			// contact.php, and echoFeedback()'s own history in lib/Calculators.lib.php records what
+			// happens when two links to one destination sit near each other -- "two collapsible
+			// links to one destination halve each other's weight rather than doubling the
+			// invitation" -- which is why echoHelpWanted() was absorbed into template_feedback in
+			// the first place. The 2026-08-13 note calling Contact a deliberate repeat of the
+			// navbar described it as being for somebody inside a calculator "who wants to know who
+			// wrote it or how to complain"; About answers the first and this answers the second, in
+			// a verb. Contact keeps its own place in the suite navbar for the other moment.
+			{ icon: 'mail', label: pc.lpn_help_fix || 'Fix something', fn: ext('contact.php') },
 			// About last, where every other Help menu in the world puts it.
 			{ icon: 'info', label: pc.about_main_menu || 'About', fn: ext('About.php') }
 		]);
 	}
 
+	// The Notes, revealed. Centred rather than hung off the menu button, because this is a column of
+	// prose to be read, not a control panel to be operated next to the thing it controls -- and it
+	// is the only popover here that can be taller than the map it covers, so it takes its own
+	// scrollbar via .lpn-popover-body.
+	function toggleNotesPopup() {
+		var popup = document.getElementById('lpn_notes_popup');
+		if (!popup) { return; }
+		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+		closeMenu();
+		closeViewPopovers();
+		popup.style.display = 'block';
+		var pr = popup.getBoundingClientRect();
+		popup.style.left = Math.max(4, (window.innerWidth - pr.width) / 2) + 'px';
+		popup.style.top = Math.max(4, (window.innerHeight - pr.height) / 2) + 'px';
+	}
+	function wireNotesPopup() {
+		var x = document.getElementById('lpn_notes_close');
+		if (x) { x.addEventListener('click', function () { document.getElementById('lpn_notes_popup').style.display = 'none'; }); }
+	}
 	function openViewMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
@@ -7183,6 +7224,7 @@ var EngCalcs = EngCalcs || {};
 			saveIndex();
 		}
 		wireLabelsPopup();
+		wireNotesPopup();
 		// AFTER loadFromStorage() (so a saved default is never overwritten -- seedDefaultInputs()
 		// fills nulls only) and BEFORE wireSettingsPopup() (which calls rebuildSettingsFields(),
 		// where a still-null default would render as an empty box). Also necessarily after the

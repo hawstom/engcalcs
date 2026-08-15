@@ -1184,10 +1184,16 @@ $ec_lang['lpn_examples_heading']='Open an example';
 $ec_lang['lpn_examples_sub']='Each one opens as your own copy. Change it, save it, or start over.';
 $ec_lang['lpn_examples_open']='Open';
 $ec_lang['lpn_examples_menu']='Open example...';
-$ec_lang['lpn_examples_blank']='Or start with a blank drawing';
+$ec_lang['lpn_examples_blank']='Or start with a blank map';
 $ec_lang['lpn_examples_size']='{nodes} junctions, {links} pipes';
 $ec_lang['lpn_examples_failed']='The examples could not be loaded. Use File, New project to start a drawing.';
 $ec_lang['lpn_examples_loading']='Loading examples...';
+// Two new Help rows (Tom, 2026-08-14). "Fix something" is a VERB, which is the point: it invites
+// the small correction people actually send -- a wrong word, a bad number -- rather than sounding
+// like a request for money or code, which is what "Contribute" reads as to most visitors. It opens
+// contact.php, the same place the old page-bottom invitation went.
+$ec_lang['lpn_help_fix']='Fix something';
+$ec_lang['lpn_help_notes']='Notes';
 $ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it with File, Save as.';
 // Each example's own card text. These live here, and NOT in the examples folder's own JSON, for one
 // reason: a string that is not in a lang file is a string no translator will ever see. The manifest

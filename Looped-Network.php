@@ -324,7 +324,26 @@ echoHeader("EngCalcs", $html_title, "");
 	<div id="lpn_dialog_buttons" style="margin-top:10px;text-align:right"></div>
 </div>
 
-<?php echoFeedback(); ?>
+<?php // THE NOTES AND THE FEEDBACK LINE BOTH LEFT THE PAGE BODY (Tom, 2026-08-14: "LPN has a Help
+      // menu now. Are we going to put the notes there and bump the bottom of the map against the
+      // bottom of the screen?"). On a twenty-line calculator the Notes sit a scroll below the
+      // answer and cost nothing; on a full-window map editor they are the reason the canvas stops
+      // short of the fold, on the one page in the suite where vertical room IS the product.
+      //
+      // **THE MARKUP STAYS IN THE PAGE, hidden, rather than being built by JS.** These are six
+      // translated definition pairs -- real content in 27 languages, and the only prose on this
+      // page that says what the calculator assumes. Moving them into a JS string would take them
+      // out of the HTML a search engine reads and out of the document a reader can print or
+      // Find-in-page. So the popover below IS the notes: one copy, in the source, revealed by
+      // Help > Notes.
+      //
+      // echoFeedback() is simply not called here, alone among the calculators. Its invitation now
+      // lives as Help > Fix something (which opens contact.php in a new tab, like every other row
+      // in that menu) and the template_feedback prose itself moved onto contact.php, where somebody
+      // who followed the invitation actually reads it. ?>
+<div id="lpn_notes_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 12px 12px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:44rem">
+	<button type="button" id="lpn_notes_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body">
 <h2><?=$ec_lang['ws_notes_heading']?></h2>
 <dl>
 	<dt><?=$ec_lang['lpn_notes_1_term']?></dt><dd><?=$ec_lang['lpn_notes_1_def']?></dd>
@@ -334,6 +353,8 @@ echoHeader("EngCalcs", $html_title, "");
 	<dt><?=$ec_lang['lpn_notes_4_term']?></dt><dd><?=$ec_lang['lpn_notes_4_def']?></dd>
 	<dt><?=$ec_lang['lpn_notes_epanet_term']?></dt><dd><?=$ec_lang['lpn_notes_epanet_def']?></dd>
 </dl>
+	</div>
+</div>
 
 <script>
 EngCalcs.pageConfig = {
@@ -359,6 +380,8 @@ EngCalcs.pageConfig = {
 	lpn_examples_failed: <?=json_encode($ec_lang['lpn_examples_failed'])?>,
 	lpn_examples_loading: <?=json_encode($ec_lang['lpn_examples_loading'])?>,
 	lpn_status_example_opened: <?=json_encode($ec_lang['lpn_status_example_opened'])?>,
+	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
+	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
 <?php   // Every example card's title and description, emitted BY PATTERN rather than one line each.
         // The gallery reads them by the key name the manifest gives it, so the set is data, not a
         // fixed list -- adding an example means adding two lang keys and nothing here.
