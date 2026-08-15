@@ -7210,3 +7210,297 @@ Closed 2026-08-14; the open-task text follows and is what shipped.
     not there for symmetry, which is never a reason on its own: it is there because pushing a
     value down is a real action a user needs, and Base is the only place standing where that
     action makes sense.
+
+
+## Task 184
+
+Closed 2026-08-14 once the per-element push (Task 317) landed. This is the full decision record;
+it was never a build task, and its remaining UI work is Task 201.
+
+- 95|184| **Project/scenario model for saved networks: DELTA model — one save, canonical Base,
+  scenarios are collections of overrides (originated during Task 146).**
+
+  **SHIPPED 2026-08-14, and Tom reviewed it the same day. Three rulings:**
+  - **The push CLEARS a scenario's overrides rather than writing Base's number in as a fresh one.**
+    Confirmed — *"Yes. Push clears rather than overwriting."* Both leave every scenario showing
+    Base's value; clearing leaves no stale marker claiming an intent the user has just overruled,
+    and does not pin scenarios to today's Base value forever.
+  - **The override count reads "Own values", and it STAYS.** Tom: *"'Own values' is good. Simple
+    English is good. 'Local values' or 'Scen. values' may be better."* Keeping "Own values", for a
+    reason he could not have been expected to have in view: **this suite already owns the word
+    "local"** — "Minor (local) loss" is its suite-wide standard for `h_m`, and that parenthetical
+    exists specifically to block a mistranslation. A second, unrelated technical "local" on the same
+    page would spend that word twice. "Scen." is an abbreviation of a word 26 languages do not
+    abbreviate alike, and `layout: nav item` is the only thing that justifies compressing a label.
+    **If Tom overrules this it is one string and one sprint key** — `lpn_scenario_overrides`.
+
+    **THE FULL OPTION SET, settled 2026-08-14 before the sprint so it is not re-litigated after 26
+    translations exist.** Tom raised five more candidates; every one was checked for a collision
+    inside this suite, because that is what killed "Local values":
+    - **"Active values" — the worst of them, and it looks the best.** `active` is ALREADY a
+      property of this very feature (`lpn_field_active`, the overridable boolean that carries the
+      whole topology-varies case). "Active values" and "In this network" would be the same word
+      meaning two unrelated things one popup apart.
+    - **"Present values" — collides with net present value**, in a tool whose users cost projects.
+    - **"Actual values" — the classic false friend, and Tom spotted it himself** by writing
+      *"Present (other language: Actual)"*. In Romance, Slavic and Germanic languages
+      *actual/actuel/aktuell/aktualny* means CURRENT, not REAL. An English reader gets "the real
+      ones"; a translator gets "the current ones". Two readings is a Wave 0 failure by definition —
+      and it is a reason to avoid BOTH halves of that pair, not to choose between them.
+    - **"Values here" — no collision, and the runner-up.** Declined only because "here" has no fixed
+      antecedent in a status strip: here could be the scenario, the element, or the map.
+    - **"Plan values" — the HEC-RAS evangelism idea, and Tom called its odds himself**: *"it's
+      probably not going to happen."* Agreed, and worth recording why rather than just declining.
+      HEC-RAS's "Plan" is the outlier; **WaterGEMS and InfoWater both say Scenario**, and Tom's own
+      word for it is *pervasive*. Shipping "scenario (plan)" would put TWO terms into 26 languages
+      for one concept, and `glossary.json`'s standing rule is to defer to each language's own
+      dominant term — which for this concept is a translation of *scenario*, not of *plan*.
+      Evangelising English usage is the one thing this suite's translation policy is built to not do.
+    - **The decisive argument for "Own values" is positional and none of the alternatives have it:
+      the antecedent is one word away on the same line.** The strip reads
+      `Scenario: Fire flow | Own values: 7`. "Own" refers back to "Scenario", visibly, so the label
+      never has to re-name the concept — which is exactly why it can afford to be the shortest and
+      plainest option on the list.
+  - **The selector belongs at the BOTTOM, and may eventually want a row of its own.** Tom: *"I
+    thought it would occupy the entire bottom. But if it can coexist with status items, maybe that's
+    okay. But envision it possibly needing its own bottommost row."* It currently shares the map
+    status strip. **This is a re-parenting, not a rewrite** — `#lpn_scenario_btn` is one element with
+    its own id, so promoting it to a dedicated bottom row is a CSS and container change. Do that
+    when the strip actually gets crowded, not before.
+
+  **RAISED 40 → 95 ON 2026-08-14, AND IT IS NOW THE TOP OF THE LIST.** Tom: *"I have got distracted,
+  and a real customer, my colleague with a real project willing to use lpn, could use scenarios
+  nearly immediately. I erred in pushing LibreEPANET.org at the expense of scenarios. We need to
+  push scenarios forward."* **A named user with a live project outranks a positioning exercise**, and
+  that is the whole of the reasoning — it does not need re-deriving next time the two compete. Task
+  248's remaining phases and Tasks 306/307 drop behind this accordingly.
+
+  Raised by Tom, 2026-07-30, thinking ahead to Task 146.08 (multiple named saved
+  networks): "I am wondering whether the concept of project.scenario buys us anything… if multiple
+  saves were grouped as scenarios under a project, we could conceivably, for any element, 'Push to
+  project' to sync across scenarios. We could even get fine-grained with checkboxes in popups."
+  **The question is not "should saves be grouped" but "what is shared and what varies."** Grouping
+  alone buys a folder. Every serious package sells the answer as its differentiator — InfoWater's
+  scenario manager over facility sets and alternatives, WaterGEMS' Alternatives / Scenarios /
+  Calculation Options triple, WNTR's one `WaterNetworkModel` with programmatic overrides — and they
+  all agree on the split: **topology and geometry are shared; demands, link statuses, roughness
+  ageing and boundary heads are what vary.** None of them lets a scenario freely add and delete
+  pipes and still call it a scenario; conflating those two is the usual way this feature turns
+  confusing. EPANET itself gives you none of it: one `.inp` per scenario, whole network duplicated,
+  no way to push a diameter correction across them.
+
+  **DECISION (current, 2026-07-30, third and final pass): the DELTA model — one project save, a
+  canonical Base, and scenarios that are nothing but collections of overrides.** Tom: "There is a
+  project. It's a single save… It has scenarios that consist of overrides. That's all. A scenario is
+  simply a collection of overrides? Base is canon is parent and has no overrides."
+
+  **Why this reverses the copy-model decision recorded earlier the same day (kept below as
+  superseded).** The copy-model argument was: the dangerous "clear/override children" action has to
+  exist in BOTH models, so the delta model's remaining advantages are only organizational overhead
+  and file-size parsimony, which no user feels. **That reasoning missed the bigger cost it was
+  spending to avoid the smaller one.** In the copy model, propagation is an *action* — "Push to
+  project" — and Tom found its failure by inspection: *"If I edit a child and then Push to Project,
+  the original parent doesn't get my push because everything there is an override."* Push is the
+  hassle, and a user feels it on every single edit. In the delta model **propagation is not an action
+  at all**: editing Base *is* the propagation, there is no Push upward, and nothing silently fails to
+  arrive. What survives is one dangerous action (below), and it operates inside a single document
+  where its effects are visible in the same view and reversible in one undo — categorically safer
+  than the copy model's push, which edits documents that are not on screen.
+
+  The copy model's one genuine win was **"what am I working on right now"** (Tom's words). The status
+  bar answers it: `Scenario: Fire flow · 7 overrides | Mode: …`. The override count is what makes it
+  answerable at a glance, and it is only cheap to compute in the delta model.
+
+  **Shape to build:**
+  - **Two levels, permanently.** Base is canon and has no overrides; scenarios are leaves. No
+    scenario-of-a-scenario. The asymmetry must be **structural, not conventional** — Tom's own
+    diagnosis of what went wrong before: *"pushing becomes chaotic if everybody is equal."* Lazy
+    overrides and ambiguous parentage are what a second level would reintroduce.
+  - **Every edit in a non-Base scenario is an override, full stop** — even when the typed value
+    equals Base's. This preserves the one decision worth carrying over from the copy-model writeup:
+    the marker records **user INTENT at edit time** and is never computed by diffing. A diff cannot
+    tell "I set this deliberately here" from "Base moved underneath me", and those need opposite
+    treatment. Unchecking the marker is the un-do; the value returns to Base's.
+  - **Show Base's value beside the scenario's** whenever a marker is checked, in the property row.
+    This is the cheap fix for the one confusing case the model leaves: you correct a diameter in Base
+    and a scenario that overrode it does not move. Seeing what you are diverging from, at the moment
+    you can act on it, needs no change-tracking or "Base changed since" bookkeeping.
+  - **"Push displayed properties hard downstream"** — the dangerous action, and it stays (Tom,
+    2026-07-30: *"still needed for good UX"*). Base-side, it forces the displayed properties onto
+    every scenario, ignoring their markers. Finger-wag with a count of scenarios and properties.
+    "Displayed" is deliberate: the Labels panel is already the per-property checkbox filter, so
+    Task 185's "reuse the Labels panel as the property filter" idea applies here directly and the
+    user's own current view defines the blast radius.
+  - **An overrides report is explicitly low priority** (Tom, 2026-07-30) — the map halos below make
+    the same information visible in the place the user is already looking.
+  - **Audit halos.** A highlight (outline, not fill, so it composes with the flow/pressure coloring)
+    around every element carrying an override in the current scenario, filtered by the same Labels
+    panel checkboxes.
+  - **Copy is a project-level operation, not a scenario-level one.** "Save project as" duplicates the
+    whole project — Base, scenarios, and markers together. This is where a self-contained copy is
+    genuinely what the user wants, and it is the answer to the delta model's one real cost (one save
+    = one blast radius). **Copy at the project level, delta at the scenario level**; each does the job
+    it is good at. This retires the "Copy with / without overrides" naming problem entirely — there is
+    no scenario-level copy that has to decide.
+
+  **REVERSED, 2026-07-30: "topology and geometry are shared, only properties vary" was too strong.**
+  Tom pushed back on it — *"Is it possibly not true even though this is what everybody does?"* — and
+  he is right; the survey paragraph above overstated what the packages actually do. **WaterGEMS
+  varies topology every day, via an active-topology alternative that toggles elements on and off.**
+  What the packages really share is the *element set*, not the topology: membership is itself an
+  overridable property. And the reason they stop there is partly historical — EPANET-lineage engines
+  index links by array position and store result series against a fixed link set, which is an
+  implementation constraint from the 1990s, not a conceptual truth. Meanwhile "with the new 12-inch
+  loop vs. without" is *the* most common real design question this calculator will be asked, so a
+  rule that forbids it would gut the feature. Corrected rule:
+  - **Existence is an ordinary overridable boolean** (`active`). A proposed loop lives in Base as
+    inactive; the "Build the loop" scenario overrides it to active. Deleting in a scenario means
+    setting it inactive. No new delta type, no new machinery — the whole "topology varies" case is
+    just a property override, which is exactly why this stays coherent.
+  - **Drawing inside a scenario must still work.** When the user draws a new pipe in a scenario, the
+    app silently creates it in Base as inactive and overrides it active in the current scenario. The
+    user gets ordinary drawing; the model keeps a single ID space and a single element set. This is
+    what makes the corrected rule feel like no rule at all.
+  - **Deleting in Base is a real deletion** — it drops the element and every scenario's overrides on
+    it. Confirm with a count.
+  - **Geometry genuinely does stay shared**, and this is the part of the original rule with an actual
+    reason rather than an inherited one: a node cannot be in two places at once in a single rendered
+    map view.
+
+  **The line, stated exactly (2026-07-30, agreed): MEMBERSHIP is overridable, IDENTITY is not.** A
+  link's `from`/`to` and a node's `x`/`y` are Base-owned and never override; `active` is an ordinary
+  property override like any other. This is narrower than the retired "topology is shared" rule and
+  is the form worth defending, because:
+  - **The escape hatch is cheaper than the feature it replaces, and better.** "Same pipe, different
+    alignment" is two pipes with opposite `active` flags — one extra ID. And it is the *superior*
+    representation: alignment variants nearly always differ in length, diameter and cost, so they
+    want to be two separately priceable elements anyway.
+  - **A connectivity override has no picture.** Re-pointing P-12 from J-5 to J-9 renders as a pipe
+    that silently jumps when you switch scenarios, with no halo that reads as "this is the change."
+    The inactive/active pair draws *both at once*, greyed and solid — precisely the image an engineer
+    wants for "with the loop vs. without." The restriction is not a limitation; it is the mechanism
+    that makes the comparison visible.
+  - **Do not inherit the vendors' reason.** EPANET-lineage engines index links by array position
+    against fixed result series; we store no result series and re-solve on scenario switch, so that
+    constraint is theirs, not ours. Only the two reasons above are ours.
+  - **Two honest costs, accepted with eyes open.** (1) Report tables (146.04) get two rows for one
+    physical decision — the compare-with field below is the fix. (2) Mid-pipe insertion in one
+    scenario clutters Base: a service tap means Base gains a junction plus two half-pipes, all
+    inactive, plus deactivating the original run. That argues for an eventual "purge elements
+    inactive in every scenario" affordance, and for the audit halos to also mark inactive-everywhere
+    elements.
+
+  **Storage shape (v2), and the one seam that matters:**
+  ```json
+  { "v": 2,
+    "project": { "name": "Elm St. subdivision", "activeScenario": "base" },
+    "nodes": [], "links": [], "labels": [],
+    "nextId": {}, "labelSettings": {}, "backdrop": {}, "settings": {},
+    "scenarios": [
+      { "id": "base", "name": "Base", "isBase": true, "overrides": {} },
+      { "id": "s1", "name": "Fire flow", "overrides": {
+          "J-3":  { "demand": 1500 },
+          "P-12": { "active": true },
+          "P-4":  { "active": false } } } ] }
+  ```
+  - **The key's presence IS the marker.** No parallel marker array to drift out of sync: writing
+    `overrides["J-3"].demand` records intent, deleting it is the un-do, and both hold even when the
+    value equals Base's. The status bar's override count is a sum of key counts.
+  - **Base is a row in the same array**, flagged `isBase` with a permanently empty `overrides`. The
+    scenario selector then has no special case, and because nothing carries a parent pointer, a
+    scenario-of-a-scenario is *unrepresentable* rather than merely discouraged — the structural
+    asymmetry the model requires.
+  - **One resolver seam:** `effective(el, prop)` → `override ?? el[prop]`. Solver, renderer, labels
+    and popups all read through it. **Build this seam in 146.08 while Base is still the only
+    scenario** — it, not the JSON wrapper, is what makes scenarios purely additive later.
+  - **An overridable-property whitelist**, cheap to widen and expensive to narrow. Start with:
+    junction `demand` and `emitter` (Task 191); reservoir/tank `head`; pipe `diameter`, `roughness`,
+    `k`, `open` (146.07); `active` on anything. Explicitly out: `id`, `from`, `to`, `x`, `y`, `verts`,
+    `type`, and junction `elev` (survey data, not a design variable).
+  - **v1 → v2 is a wrap, no data loss**: the existing `lpn_document` becomes project "Untitled" with
+    one Base scenario.
+
+  **Dragging inside a scenario: no dialog. Silent to Base, with ambient warning.** Two unequal
+  intents hide behind a drag — "that node is in the wrong place" (a fact about reality, the
+  overwhelming majority) and "in this scenario the manhole is 40 ft north" (rare, and when real it
+  wants to be a separate priced element anyway). A modal taxes the common case to serve the rare one,
+  and drags are not discrete decisions but nudge-nudge-nudge; users would learn to click through
+  without reading, which is worse than no dialog. **Note this is a hydraulic edit, not just a
+  cartographic one:** `lenAuto` (`js/looped-network.js:740`) makes `length` follow geometry until the
+  user takes control, so a drag changes a solver input in every scenario. What replaces the dialog:
+  - **A one-time, dismissible notice** on the first drag in a non-Base scenario: "Moving elements
+    changes the drawing in every scenario. Property changes stay in this scenario." [OK] [Don't show
+    again].
+  - **Ambient state, not modal** — flash the recomputed length in the status bar on mouse-up when the
+    dragged link is auto-length, so the hydraulic consequence leaves a visible trace.
+  - **Undo.** One document, one undo stack, effect on screen — categorically better than the retired
+    copy model, whose push edited documents the user could not see.
+  - **"Create scenario geometry variant"** (Tom's wording, 2026-07-30) is the deliberate path, and it
+    is an *up-front command, never a post-drag question*: clone the element (new ID, same geometry and
+    properties), set the original inactive here, set the clone active only here — then drag the clone.
+    By the time a post-drag modal could fire the gesture is already complete, so "create a copy" would
+    have to retroactively reinterpret what just happened. Same machinery as drawing a new pipe in a
+    scenario, so no new concept. **Entry path in 146.08 is the toolbar/menu only** — see Task 192 for
+    why the right-click path is a separate build.
+  - **A non-clone escape valve already exists:** `length` is a property with a manual-override flag,
+    so a scenario wanting a different length *without* a different drawing just overrides `length`.
+    The clone stays reserved for real re-routes. Vertices follow the identical rule — a vertex list is
+    geometry, Base-owned.
+
+  **"Compare with base ID" — a visible, blank-by-default, usually-guessable string field** (Tom,
+  2026-07-30, simplifying an earlier proposal for a hidden clone id + named group). It is what makes
+  the two-elements-per-variant rule legible instead of chaotic, and it is load-bearing for 146.08
+  rather than a 146.04 report-table nicety — it is simultaneously the table's row key, the halo
+  grouping, and the cleanup handle for "pipes could get out of control fast."
+  - **A string, never a live reference.** Grouping is string equality; nothing is ever dereferenced.
+    This is why deleting the base object cannot break it — the earlier objection to a pointer applied
+    only to a resolved one. The group's name simply *is* that string, normally the base object's ID.
+  - **Capture, don't infer, as the primary path.** "Create scenario geometry variant" knows the
+    relationship with certainty at creation and writes it then — the same principle as the override
+    marker: a diff cannot tell "deliberate" from "drifted," and a geometric guess cannot tell
+    "alternative alignment" from "two pipes that happen to be near each other," least of all in the
+    congested drawings where it matters most.
+  - **Guessing is the secondary path**, for pipes drawn independently before the user thought of them
+    as alternatives. Two signals, the second near-conclusive: same endpoints, and **never active in
+    the same scenario**. Offer as a *suggestion*, visually distinct from confirmed, one click to
+    accept or reject.
+  - **Follow renames while the object exists; freeze on delete.** Renaming P-12 → P-100 updates every
+    member's field (we own the rename path, it is cheap, and it is what the user meant). Once P-12 is
+    deleted there is nothing to follow, so it freezes into a plain name and we hint, at that moment
+    and not as a standing nag: "Group is named after a deleted object ID. Consider changing to a
+    friendly name."
+  - **A collision is cosmetic, not corrupting.** If a later pipe is renamed *into* a deleted group's
+    name the label reads oddly, but since the string is never resolved nothing breaks. Warn on the
+    rename; build no machinery.
+  - **What the table then does:** one row per *design decision*, not per element. The group name is
+    the row; each scenario's column shows whichever member is active there, with the member ID in a
+    sub-cell.
+  - **Two guards fall out free.** Two members active in the same scenario is a table flag and a halo
+    candidate (not necessarily an error — you might build both). A group whose members are inactive
+    everywhere is exactly the "purge unused" candidate above.
+
+  **This entry is the DECISION RECORD, not a build task.** Everything above is settled; what remains
+  is to build it, which is **Task 201**. Two bullets that used to live in 146.08 moved there on
+  2026-08-03 rather than being left in a closed block.
+
+  **Sequencing:** 146.08 must ship the **project container from day one**, holding Base as its only
+  scenario. Then scenarios are purely additive and there is never a storage migration. Tom flagged
+  this himself — *"this is an important decision because we want to introduce it early"* — and it is
+  the reason the model had to be settled before 146.08 rather than after.
+
+  ---
+  **SUPERSEDED (kept for the reasoning, not the conclusion) — the copy model, decided and reversed
+  2026-07-30.** A scenario would be a whole, self-contained network; it keeps working if the project
+  is renamed or deleted, "Save as" is a copy, and undo/versioning stay per-document. It needed:
+  "Push to project" (promote this scenario's values up and out to siblings that have NOT overridden
+  that property, finger-wagged because it edits documents not on screen); "Push through all
+  overrides" (the same, ignoring markers — double finger-wag, and it destroys deliberate work in
+  scenarios the user cannot see); and a two-mode copy, since a copy must decide what happens to the
+  source's markers — "Copy with overrides" (default) / "Copy without overrides", preferred over
+  Tom's original "Copy as child / Copy as sibling" because in that model every scenario is already
+  both a child of the project and a sibling of every other scenario, so the genealogy named a
+  distinction that did not exist, and because "child"/"sibling" applied to a FILE is an English
+  computing idiom that does not carry into 26 languages. Its sequencing note read: ship 146.08 as
+  flat named saves first, since flat saves ARE the copy model already. **All of this is retired by
+  the delta decision above** — the naming problem disappears with scenario-level copy, and the
+  sequencing note inverts: the container must come first, not the flat saves.

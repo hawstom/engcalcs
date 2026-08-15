@@ -1,7 +1,8 @@
 <?php
 /**
- * Checks dev/ROADMAP.md's two structural invariants: every task ID is unique, and priority 0 means
- * completed.
+ * Checks dev/ROADMAP.md's structural invariants: every task ID is unique, priority 0 means
+ * completed, every Task number cited from CODE resolves, and every task in the archive still has a
+ * stub in the roadmap.
  *
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
@@ -177,6 +178,46 @@ if (!empty($dangling)) {
     echo "task id (they look identical in a comment and live in different namespaces), or the task\n";
     echo "was never written down. Fix the comment or write the block.\n";
     $failed = true;
+}
+
+// ---------------------------------------------------------------------------------------------
+// FOURTH CHECK: does every task in the ARCHIVE still have a stub in ROADMAP.md?
+//
+// The archive is the LONG FORM of a closed task; the roadmap keeps a <=5-line stub pointing here.
+// So an ID in the archive with no line in ROADMAP.md means a task fell out of the file entirely --
+// and the way that happens is not carelessness, it is nesting: an OPEN task written inside a
+// parent's block travels with the parent when the parent is archived, and nothing about the move
+// says so.
+//
+// Found 2026-08-14 closing Task 184, whose 288-line block had THREE open tasks living inside it
+// (185 Match/Copy, 192 context menus, 201 scenario UI). Moving the parent silently took all three
+// out of the roadmap. Only 185 was noticed, and only because live code happened to cite it -- the
+// other two were recovered by diffing the ID list against git, which is not a thing anyone will
+// remember to do. This check finds all three in a second.
+//
+// It also catches the plainer mistake of archiving a task's narrative and forgetting the stub,
+// which leaves a closed task invisible to anyone reading the roadmap alone.
+$archivePath = $root . '/dev/roadmap-closed-archive.md';
+if (is_readable($archivePath)) {
+    $orphans = array();
+    foreach (file($archivePath, FILE_IGNORE_NEW_LINES) as $i => $line) {
+        if (!preg_match('/^- (\d+)\|([0-9.]+)\|/', $line, $m)) { continue; }
+        if (isset($seen[$m[2]])) { continue; }
+        $orphans[$m[2]] = $i + 1;
+    }
+    if ($orphans) {
+        if (!empty($failed)) { echo "\n"; }
+        echo "IN THE ARCHIVE BUT NOT IN THE ROADMAP (" . count($orphans) . "):\n\n";
+        foreach ($orphans as $id => $ln) {
+            printf("    archive line %-6d Task %s\n", $ln, $id);
+        }
+        echo "\nThe archive is the long form of a task the roadmap still lists as a stub, so an ID\n";
+        echo "here and nowhere there means the task left the roadmap altogether. The usual cause is\n";
+        echo "NESTING: an open task written inside a parent's block travels with the parent when the\n";
+        echo "parent is archived. Move it back out to ROADMAP.md at its own priority -- or, if it is\n";
+        echo "genuinely closed, write its stub under `## Completed`.\n";
+        $failed = true;
+    }
 }
 
 if (!empty($failed)) {
