@@ -1068,8 +1068,6 @@ $ec_lang['lpn_engine_loading']='EPANET সমাধানকারী লোড 
 $ec_lang['lpn_engine_failed']='EPANET সমাধানকারী লোড করা যায়নি। এর পরিবর্তে বিল্ট-ইন সমাধানকারী দেখানো হচ্ছে।';
 $ec_lang['lpn_engine_manning_note']='দ্রষ্টব্য: ম্যানিং রাফনেসের ক্ষেত্রে, EPANET বিল্ট-ইন সমাধানকারীর চেয়ে প্রায় ০.৬% কম জলশীর্ষ ক্ষতি গণনা করে।';
 $ec_lang['lpn_settings_text_size']='টেক্সটের আকার';
-$ec_lang['lpn_settings_text_size_map']='মানচিত্র দূরত্ব';
-$ec_lang['lpn_settings_text_size_screen']='স্ক্রিন পিক্সেল';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1080,7 +1078,6 @@ $ec_lang['lpn_settings_symbol_opacity']='প্রতীকের অস্ব�
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='পটভূমি চিত্রের অস্বচ্ছতা (0 থেকে 1)';
-$ec_lang['lpn_settings_text_size_units']='টেক্সট আকারের একক';
 $ec_lang['lpn_settings_map_display']='মানচিত্রের চেহারা';
 $ec_lang['lpn_settings_map_height_px']='মানচিত্রের উচ্চতা (স্ক্রিন পিক্সেল)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

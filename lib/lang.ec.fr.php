@@ -1069,8 +1069,6 @@ $ec_lang['lpn_engine_loading']='Chargement du solveur EPANET…';
 $ec_lang['lpn_engine_failed']='Le solveur EPANET n\'a pas pu être chargé. Le solveur intégré est utilisé à la place.';
 $ec_lang['lpn_engine_manning_note']='Remarque : avec la rugosité de Manning, EPANET calcule une perte de charge environ 0,6 % plus faible que le solveur intégré.';
 $ec_lang['lpn_settings_text_size']='Taille du texte';
-$ec_lang['lpn_settings_text_size_map']='Distance sur la carte';
-$ec_lang['lpn_settings_text_size_screen']='Pixels d\'écran';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1081,7 +1079,6 @@ $ec_lang['lpn_settings_symbol_opacity']='Opacité des symboles (0 à 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Opacité de l\'image de fond (0 à 1)';
-$ec_lang['lpn_settings_text_size_units']='Unités de taille du texte';
 $ec_lang['lpn_settings_map_display']='Apparence de la carte';
 $ec_lang['lpn_settings_map_height_px']='Hauteur de la carte (pixels d\'écran)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

@@ -1067,8 +1067,6 @@ $ec_lang['lpn_engine_loading']='Завантаження розв\'язувач�
 $ec_lang['lpn_engine_failed']='Не вдалося завантажити розв\'язувач EPANET. Замість нього показано вбудований розв\'язувач.';
 $ec_lang['lpn_engine_manning_note']='Примітка: з коефіцієнтом шорсткості Маннінга EPANET обчислює втрати напору приблизно на 0,6% нижче, ніж вбудований розв\'язувач.';
 $ec_lang['lpn_settings_text_size']='Розмір тексту';
-$ec_lang['lpn_settings_text_size_map']='Відстань на карті';
-$ec_lang['lpn_settings_text_size_screen']='Пікселі екрана';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1079,7 +1077,6 @@ $ec_lang['lpn_settings_symbol_opacity']='Непрозорість символі
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Непрозорість фонового зображення (від 0 до 1)';
-$ec_lang['lpn_settings_text_size_units']='Одиниці розміру тексту';
 $ec_lang['lpn_settings_map_display']='Зовнішній вигляд карти';
 $ec_lang['lpn_settings_map_height_px']='Висота карти (пікселі екрана)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

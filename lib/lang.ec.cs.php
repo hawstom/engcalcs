@@ -1068,8 +1068,6 @@ $ec_lang['lpn_engine_loading']='Načítání řešiče EPANET…';
 $ec_lang['lpn_engine_failed']='Řešič EPANET se nepodařilo načíst. Místo něj se zobrazuje vestavěný řešič.';
 $ec_lang['lpn_engine_manning_note']='Poznámka: s drsností podle Manninga počítá EPANET ztrátu tlakové výšky přibližně o 0,6 % nižší než vestavěný řešič.';
 $ec_lang['lpn_settings_text_size']='Velikost textu';
-$ec_lang['lpn_settings_text_size_map']='Vzdálenost na mapě';
-$ec_lang['lpn_settings_text_size_screen']='Pixely obrazovky';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1080,7 +1078,6 @@ $ec_lang['lpn_settings_symbol_opacity']='Krytí symbolu (0 až 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Krytí podkladového obrázku (0 až 1)';
-$ec_lang['lpn_settings_text_size_units']='Jednotky velikosti textu';
 $ec_lang['lpn_settings_map_display']='Vzhled mapy';
 $ec_lang['lpn_settings_map_height_px']='Výška mapy (pixely obrazovky)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

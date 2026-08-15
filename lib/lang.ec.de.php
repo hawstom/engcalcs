@@ -1126,8 +1126,6 @@ $ec_lang['lpn_engine_failed']='Der EPANET-Löser konnte nicht geladen werden. St
 $ec_lang['lpn_engine_valve_route']='Mit dem EPANET-Löser berechnet, weil diese Ventile sich selbstständig öffnen und schließen:';
 $ec_lang['lpn_engine_manning_note']='Hinweis: Bei Manning-Rauheit berechnet EPANET den Druckverlust etwa 0,6 % niedriger als der eingebaute Löser.';
 $ec_lang['lpn_settings_text_size']='Textgröße';
-$ec_lang['lpn_settings_text_size_map']='Kartenabstand';
-$ec_lang['lpn_settings_text_size_screen']='Bildschirmpixel';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1138,7 +1136,6 @@ $ec_lang['lpn_settings_symbol_opacity']='Symboldeckkraft (0 bis 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Deckkraft des Hintergrundbilds (0 bis 1)';
-$ec_lang['lpn_settings_text_size_units']='Einheit der Textgröße';
 $ec_lang['lpn_settings_map_display']='Kartendarstellung';
 $ec_lang['lpn_settings_map_height_px']='Kartenhöhe (Bildschirmpixel)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

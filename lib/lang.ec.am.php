@@ -1070,8 +1070,6 @@ $ec_lang['lpn_engine_loading']='የEPANET ፈታች በመጫን ላይ…';
 $ec_lang['lpn_engine_failed']='የEPANET ፈታች ሊጫን አልቻለም። በምትኩ አብሮ የተሰራውን ማስያ በማሳየት ላይ።';
 $ec_lang['lpn_engine_manning_note']='ማስታወሻ፦ የማኒንግ ሻካሪነት ሲጠቀሙ፣ EPANET ከአብሮ ከተሰራው ማስያ በግምት 0.6% ያነሰ የሄድ ኪሳራ ያሰላል።';
 $ec_lang['lpn_settings_text_size']='የጽሑፍ መጠን';
-$ec_lang['lpn_settings_text_size_map']='የካርታ ርቀት';
-$ec_lang['lpn_settings_text_size_screen']='የማያ ገጽ ፒክሰሎች';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1082,7 +1080,6 @@ $ec_lang['lpn_settings_symbol_opacity']='የምልክት ግልጽነት (0 እ�
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='የበስተጀርባ ምስል ግልጽነት (0 እስከ 1)';
-$ec_lang['lpn_settings_text_size_units']='የጽሑፍ መጠን መለኪያ ክፍሎች';
 $ec_lang['lpn_settings_map_display']='የካርታ ገጽታ';
 $ec_lang['lpn_settings_map_height_px']='የካርታ ቁመት (የማያ ገጽ ፒክሰሎች)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

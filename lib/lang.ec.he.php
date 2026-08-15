@@ -1067,8 +1067,6 @@ $ec_lang['lpn_engine_loading']='טוען את פותר EPANET…';
 $ec_lang['lpn_engine_failed']='לא ניתן היה לטעון את פותר EPANET. מציג את הפותר המובנה במקום.';
 $ec_lang['lpn_engine_manning_note']='הערה: עם חספוס Manning,‏ EPANET מחשב אובדן גובה נמוך בכ-0.6% מהפותר המובנה.';
 $ec_lang['lpn_settings_text_size']='גודל טקסט';
-$ec_lang['lpn_settings_text_size_map']='מרחק על המפה';
-$ec_lang['lpn_settings_text_size_screen']='פיקסלים במסך';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1079,7 +1077,6 @@ $ec_lang['lpn_settings_symbol_opacity']='אטימות סמל (0 עד 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='אטימות תמונת רקע (0 עד 1)';
-$ec_lang['lpn_settings_text_size_units']='יחידות גודל טקסט';
 $ec_lang['lpn_settings_map_display']='מראה המפה';
 $ec_lang['lpn_settings_map_height_px']='גובה מפה (פיקסלים במסך)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

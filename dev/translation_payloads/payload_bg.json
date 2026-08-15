@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 922,
-        "delta_key_count": 5,
+        "expected_key_count": 923,
+        "delta_key_count": 9,
         "exempt_key_count": 14,
         "exempt_keys": [
             "calc_units_us",
@@ -330,14 +330,22 @@
         "lpn_engine_ready": "The EPANET solver is on this device now, and works offline.",
         "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
         "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
-        "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
+        "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.",
+        "lpn_settings_link_width": "Pipe width (pixels)",
+        "lpn_settings_label_max_width": "Show labels when the map is narrower than",
+        "lpn_settings_label_use_view": "Use current view",
+        "lpn_settings_label_always": "Always show labels"
     },
     "keys": {
         "lpn_engine_fetching": "Getting the EPANET solver. It is downloaded once and then kept on this device, so it works offline afterwards.",
         "lpn_engine_ready": "The EPANET solver is on this device now, and works offline.",
         "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
         "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
-        "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on."
+        "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.",
+        "lpn_settings_link_width": "Pipe width (pixels)",
+        "lpn_settings_label_max_width": "Show labels when the map is narrower than",
+        "lpn_settings_label_use_view": "Use current view",
+        "lpn_settings_label_always": "Always show labels"
     },
     "key_context": {
         "lpn_engine_fetching": {
@@ -417,6 +425,70 @@
                     "key": "lpn_diag_valve_needs_epanet",
                     "value": "Тези вентили се отварят и затварят сами, и само решаващият модул на EPANET може да ги изчисли. Решаващият модул на EPANET не можа да бъде зареден, затова тези резултати липсват:",
                     "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_settings_link_width": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_symbol_size",
+                    "value": "Размер на символите (спрямо текста)",
+                    "english": "Symbol size (pixels)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Непрозрачност на символите (0 до 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_label_max_width": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_symbol_size",
+                    "value": "Размер на символите (спрямо текста)",
+                    "english": "Symbol size (pixels)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Непрозрачност на символите (0 до 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_label_use_view": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_symbol_size",
+                    "value": "Размер на символите (спрямо текста)",
+                    "english": "Symbol size (pixels)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Непрозрачност на символите (0 до 1)",
+                    "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_label_always": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_symbol_size",
+                    "value": "Размер на символите (спрямо текста)",
+                    "english": "Symbol size (pixels)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_symbol_opacity",
+                    "value": "Непрозрачност на символите (0 до 1)",
+                    "english": "Symbol opacity (0 to 1)"
                 }
             }
         }

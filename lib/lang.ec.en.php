@@ -1794,20 +1794,21 @@ $ec_lang_syn['lpn_engine_failed']='';
 $ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because these valves open and close on their own:';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.';
 $ec_lang_syn['lpn_engine_manning_note']='';
-$ec_lang['lpn_settings_text_size']='Text size';
-$ec_lang['lpn_settings_text_size_map']='Map distance';
-$ec_lang['lpn_settings_text_size_screen']='Screen pixels';
+$ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
-$ec_lang['lpn_settings_symbol_size']='Symbol size (relative to text)';
+$ec_lang['lpn_settings_symbol_size']='Symbol size (pixels)';
+$ec_lang['lpn_settings_link_width']='Pipe width (pixels)';
+$ec_lang['lpn_settings_label_max_width']='Show labels when the map is narrower than';
+$ec_lang['lpn_settings_label_use_view']='Use current view';
+$ec_lang['lpn_settings_label_always']='Always show labels';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Background image opacity (0 to 1)';
-$ec_lang['lpn_settings_text_size_units']='Text size units';
 $ec_lang['lpn_settings_map_display']='Map appearance';
 $ec_lang_syn['lpn_settings_map_display']='How the map looks (appearance, style, the way it is drawn) — sizes, opacity, position.';
 $ec_lang['lpn_settings_map_height_px']='Map height (screen pixels)';

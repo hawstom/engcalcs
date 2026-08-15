@@ -214,13 +214,21 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // TEXT SIZE IS THE SHIPPED DEFAULT AND THE EXAMPLE MUST NOT TOUCH IT. Tom, 2026-08-09: ship a
   // default that suits the example, and "anything other is on the user, not us." So the stored 2.5
   // seeded above must survive the draw -- a visitor who set their own size keeps it.
-  ok('20 is the shipped default, for a first-time visitor',
-    L.defaultSettings().textSize === 20, L.defaultSettings().textSize);
+  ok('11 px is the shipped default, for a first-time visitor',
+    L.defaultSettings().textSize === 11, L.defaultSettings().textSize);
   ok('the example does NOT overwrite a size the visitor had already chosen', s.textSize === 2.5,
     s.textSize);
-  const ratio = w / L.defaultSettings().textSize;
-  ok('extent:default-text ratio reads like plan lettering (50-100)', ratio > 50 && ratio < 100,
-    ratio.toFixed(0));
+  // THE "extent:default-text ratio reads like plan lettering (50-100)" ASSERTION WAS DELETED HERE,
+  // NOT RETUNED (Task 331, 2026-08-14), and the reason is the point of the whole task. It divided
+  // the model's extent by settings.textSize, which was a defensible thing to measure only while text
+  // was sized in MAP UNITS -- the ratio then really did describe lettering on a plan, the way a
+  // drafter reads 1:500. With text in SCREEN PIXELS the two quantities are in different spaces and
+  // their ratio changes every time anyone zooms, so no band of values could be right or wrong.
+  //
+  // Retuning it to some new band would have been the easy move and would have been worse than
+  // useless: a green assertion measuring a meaningless number is how a harness stops being evidence.
+  // What replaced this concern is not a number at all -- it is settings.labelMaxWidth deciding
+  // whether a label is DRAWN at a given zoom, which is checked in section 10 below.
 
   // ---- annotations, all composed from already-translated strings ----
   const PC = EngCalcs.pageConfig;
@@ -485,7 +493,7 @@ console.log('\n--- Settings panel stays in sync ---');
     let found;
     (function walk(n) {
       (n.children || []).forEach(c => {
-        if (c.type === 'number' && c.step === 'any' && c.min === '0.1' && found === undefined) { found = c.value; }
+        if (c.type === 'number' && c.step === '1' && c.min === '1' && found === undefined) { found = c.value; }
         walk(c);
       });
     })(fieldsEl);
@@ -495,7 +503,7 @@ console.log('\n--- Settings panel stays in sync ---');
   // shipped default rather than from the previous block's leftovers.
   L.settings().textSize = L.defaultSettings().textSize;
   L.rebuildSettingsFields();
-  ok('panel opens on the shipped default', String(textSizeInputValue()) === '20', textSizeInputValue());
+  ok('panel opens on the shipped default', String(textSizeInputValue()) === '11', textSizeInputValue());
   L.settings().textSize = 37;                       // a writer that does NOT repaint the panel
   const popup = byId.lpn_settings_popup;
   popup.style.display = 'none';

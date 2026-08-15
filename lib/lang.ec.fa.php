@@ -1071,8 +1071,6 @@ $ec_lang['lpn_engine_loading']='در حال بارگذاری حل‌کننده E
 $ec_lang['lpn_engine_failed']='حل‌کننده EPANET بارگذاری نشد. به‌جای آن حل‌کننده داخلی نمایش داده می‌شود.';
 $ec_lang['lpn_engine_manning_note']='توجه: با زبری مانینگ، EPANET افت هد را حدود ۰٫۶ درصد کمتر از حل‌کننده داخلی محاسبه می‌کند.';
 $ec_lang['lpn_settings_text_size']='اندازه متن';
-$ec_lang['lpn_settings_text_size_map']='فاصله روی نقشه';
-$ec_lang['lpn_settings_text_size_screen']='پیکسل صفحه';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1083,7 +1081,6 @@ $ec_lang['lpn_settings_symbol_opacity']='تیرگی نماد (۰ تا ۱)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='تیرگی تصویر پس‌زمینه (۰ تا ۱)';
-$ec_lang['lpn_settings_text_size_units']='واحدهای اندازه متن';
 $ec_lang['lpn_settings_map_display']='ظاهر نقشه';
 $ec_lang['lpn_settings_map_height_px']='ارتفاع نقشه (پیکسل صفحه)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

@@ -1131,8 +1131,6 @@ $ec_lang['lpn_engine_failed']='EPANET çözücüsü yüklenemedi. Bunun yerine y
 $ec_lang['lpn_engine_manning_note']='Not: Manning pürüzlülüğüyle, EPANET yük kaybını yerleşik çözücüye göre yaklaşık %0,6 daha düşük hesaplar.';
 $ec_lang['lpn_engine_valve_route']='EPANET çözücüsüyle çözüldü, çünkü bu vanalar kendiliğinden açılıp kapanır:';
 $ec_lang['lpn_settings_text_size']='Metin boyutu';
-$ec_lang['lpn_settings_text_size_map']='Harita mesafesi';
-$ec_lang['lpn_settings_text_size_screen']='Ekran pikseli';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1143,7 +1141,6 @@ $ec_lang['lpn_settings_symbol_opacity']='Sembol opaklığı (0 ile 1 arası)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Arka plan görüntüsü opaklığı (0 ile 1 arası)';
-$ec_lang['lpn_settings_text_size_units']='Metin boyutu birimleri';
 $ec_lang['lpn_settings_map_display']='Harita görünümü';
 $ec_lang['lpn_settings_map_height_px']='Harita yüksekliği (ekran pikseli)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

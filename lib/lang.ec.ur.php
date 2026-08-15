@@ -1127,8 +1127,6 @@ $ec_lang['lpn_engine_failed']='EPANET حل کار لوڈ نہیں ہو سکا۔ 
 $ec_lang['lpn_engine_valve_route']='EPANET حل کار سے حل کیا گیا، کیونکہ یہ والوز خود بخود کھلتے اور بند ہوتے ہیں:';
 $ec_lang['lpn_engine_manning_note']='نوٹ: مانیننگ کھردرا پن کے ساتھ، EPANET بلٹ ان حل کار سے تقریباً 0.6% کم دباؤ نقصان کا حساب لگاتا ہے۔';
 $ec_lang['lpn_settings_text_size']='متن کا سائز';
-$ec_lang['lpn_settings_text_size_map']='نقشے کا فاصلہ';
-$ec_lang['lpn_settings_text_size_screen']='سکرین پکسلز';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1139,7 +1137,6 @@ $ec_lang['lpn_settings_symbol_opacity']='علامت کی دھندلاہٹ (0 س�
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='پس منظر کی تصویر کی دھندلاہٹ (0 سے 1)';
-$ec_lang['lpn_settings_text_size_units']='متن کے سائز کے یونٹس';
 $ec_lang['lpn_settings_map_display']='نقشے کی ظاہری شکل';
 $ec_lang['lpn_settings_map_height_px']='نقشے کی اونچائی (سکرین پکسلز)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

@@ -270,7 +270,14 @@ html[lang="zh"] .ec-welcome {
    rather than his "maybe double" -- heavier and easier to see over a busy backdrop, still lighter
    than a node's own outline so the original over-wide problem does not come back. The flow arrow
    is deliberately NOT thickened with it; see .lpn-arrow below. */
-.lpn-link { stroke: #557; stroke-width: calc(0.7 * var(--lpn-sym, 1)); cursor: pointer; }
+/* --lpn-lw, NOT --lpn-sym (Task 331, 2026-08-14). Pipe width is its own setting in screen pixels
+   now that text, symbols and links are decoupled: a pipe network's PIPES are its primary content,
+   and how heavy they are is a drawing decision in its own right rather than a consequence of how
+   big the junction dots happen to be. The three rules below (stroke, closed-link dashes, override
+   halo) are the link-weight family and all read --lpn-lw; every other stroke width on the map is
+   symbol furniture and stays on --lpn-sym. The multipliers preserve the exact proportions the
+   0.7-based versions had, so nothing about the drawing's appearance changed with the decoupling. */
+.lpn-link { stroke: #557; stroke-width: var(--lpn-lw, 0.7); cursor: pointer; }
 .lpn-link-pump { stroke: #a52; }
 /* No .lpn-link-valve rule: a valve's polyline is a pipe-coloured line by design -- see
    .lpn-link-symbol-valve above. */
@@ -282,7 +289,7 @@ html[lang="zh"] .ec-welcome {
    out. Colour is deliberately unchanged: a closed pipe is still the same pipe, and recolouring it
    would collide with the per-field label colours (lpnFieldColors). */
 .lpn-link-closed {
-	stroke-dasharray: calc(1.8 * var(--lpn-sym, 1)) calc(1.4 * var(--lpn-sym, 1));
+	stroke-dasharray: calc(2.571 * var(--lpn-lw, 0.7)) calc(2 * var(--lpn-lw, 0.7));
 }
 /* Flow-direction arrow at each link's midpoint (Tom, 2026-07-30, matching EPANET) -- hidden
    until a solve result exists (see updateArrow() in looped-network.js). pointer-events:none so
@@ -312,7 +319,28 @@ html[lang="zh"] .ec-welcome {
    condition here (.lpn-node-pending). Hidden until refreshScenarioMarks() adds .lpn-override,
    which is why every link can carry one at no visual cost. */
 .lpn-link-halo { stroke: none; pointer-events: none; }
-.lpn-link-halo.lpn-override { stroke: #e8a33d; stroke-width: calc(2 * var(--lpn-sym, 1)); }
+/* ---- Scale-dependent visibility of GENERATED ANNOTATION (Task 331, 2026-08-14) ----
+   Set by applyLabelVisibility() when the visible map is wider than settings.labelMaxWidth.
+
+   THE LINE IS NOT "LABELS", IT IS "THINGS WE GENERATED TO BE READ" -- and the flow arrow proved it
+   belongs on this side (Tom, 2026-08-14: "Arrows also should hide at hideable zoom levels"). An
+   arrow is a symbol by construction and an annotation by purpose: nobody drew it, it exists to be
+   read, and zoomed out it is noise on top of a network you are trying to see the shape of. So:
+
+     HIDDEN  data labels, their masks and leaders (.lpn-datalbl-part), flow arrows
+     KEPT    the network itself -- nodes, pipes, pumps, valves, tanks -- and the user's own Text
+             labels, which are authored content: they typed the words and chose the spot, and
+             vanishing them under a threshold that never mentions Text labels would read as a bug.
+
+   `visibility`, not `display`: a leader and an arrow each have their own show/hide logic and this
+   must compose with them rather than overwrite them -- something already hidden for its own reasons
+   stays hidden, and something visible is merely made invisible. visibility:hidden also drops
+   pointer events, so nothing suppressed here is still clickable. */
+.lpn-labels-hidden .lpn-lbl[data-nodelbl],
+.lpn-labels-hidden .lpn-lbl[data-linklbl],
+.lpn-labels-hidden .lpn-datalbl-part,
+.lpn-labels-hidden .lpn-arrow { visibility: hidden; }
+.lpn-link-halo.lpn-override { stroke: #e8a33d; stroke-width: calc(2.857 * var(--lpn-lw, 0.7)); }
 /* A node's own circle carries its halo as a ring: it already draws as a filled disc, so a stroke
    around it IS an outline. Placed BEFORE .lpn-node-pending below, so a node that is both
    overridden and mid-pipe-draw shows the pending ring -- that one is about what your next click

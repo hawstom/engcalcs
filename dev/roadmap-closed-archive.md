@@ -7056,3 +7056,37 @@ tasks at priority 0. Compressed to a stub there; this is the full text as it sto
     carries, assert the pipe is untouched in the solve AND unhaloed. `scenario-harness.js` never had
     a colliding id because its fixtures are hand-built with unique ones — the same blind spot that
     let the valve seam through.
+
+## Task 331 — The GIS paradigm, phase 1: screen-pixel sizing (closed 2026-08-14)
+- 0|331| **The GIS paradigm, phase 1: sizes in SCREEN PIXELS, decoupled, with scale-dependent
+  visibility.** Tom, 2026-08-14: *"proceed to implement the GIS paradigm insofar as that means…
+  (3) deprecate/remove map units text sizing, (4) decouple label, link, and node size (in pixels?
+  EPANET is fuzzy about that and epanet-js seems to have it hard coded)"*. SHIPPED.
+  - **`textSize`, `symbolSize` and `linkWidth` are three independent screen-pixel numbers.** Symbol
+    size is the junction dot's DIAMETER, which is the one dimension a person can picture; every
+    other fixed-shape symbol is drawn against it. Pipe width got `--lpn-lw` of its own so the
+    link-weight family (stroke, closed-link dashes, override halo) no longer rides on `--lpn-sym`.
+  - **`textSizeUnits` and `symbolScale` are DELETED, not defaulted.** A map-unit size is illegible or
+    enormous depending on where you happen to be zoomed, which is not a setting anyone can hold an
+    opinion about; `symbolScale` existed only to express symbols as a multiple of text and made the
+    user do a division to answer "how big is the dot".
+  - **The paradigm keeps deleting things, and that is the strongest evidence it is right.** Also gone:
+    both screen-pixel floors (`LPN_MIN_TEXT_PX`, `LPN_MIN_SYMBOL_PX` — in pixels a pixel is a pixel
+    at every zoom, so there is nothing to floor) and **`importTextSize()`**, the diagonal/40 heuristic
+    written on 2026-08-14 to stop an imported network arriving unreadable. That heuristic was removed
+    the same week by the change that made it unnecessary. Worth noting as a general lesson: **a
+    plausible estimate is the most expensive kind of workaround, because it works well enough that
+    nobody looks for the cause.**
+  - **Scale-dependent visibility replaces map-unit sizing rather than joining it.** `labelMaxWidth`
+    is a width in MODEL LENGTH UNITS (Tom: *"you specify zoom threshold in terms of how many units
+    wide the map is"*), and the settings panel captures it from the current view — you zoom until the
+    drawing is as sparse as you want and press the button, because no default is meaningful across
+    networks 400 ft and 40 miles wide. Blank = always show.
+  - **What hides is GENERATED ANNOTATION, not "labels", and the flow arrow is what proved it** (Tom:
+    *"Arrows also should hide at hideable zoom levels"*). An arrow is a symbol by construction and an
+    annotation by purpose. Hidden: data labels, their masks and leaders, flow arrows. Kept: the
+    network itself, and the user's own Text labels, which are authored content.
+  - Storage v5 -> v6. Old sizes are DISCARDED rather than converted: a stored map-unit size rendered
+    at a pixel count that depended on the reader's zoom, so there is no factor to apply, and
+    inventing one would carry the ambiguity forward wearing an authoritative number.
+

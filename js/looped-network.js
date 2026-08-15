@@ -30,51 +30,45 @@ var EngCalcs = EngCalcs || {};
 	var NS = 'http://www.w3.org/2000/svg';
 	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, maskLayer, labelsLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
-	// Text size (Task 146 gear/settings panel, 2026-07-30): user-configurable via `settings.textSize`/
-	// `settings.textSizeUnits` (see defaultSettings() below), shared by a node's ID/pressure label,
-	// a link's label, and a user-added Text label -- no reason for these to render at different sizes
-	// by default. 'map' units (the default, reproducing the original fixed LABEL_FONT_SIZE=2.5
-	// behavior byte-for-byte) means the size is a world-unit constant that scales with zoom, same as
-	// the network geometry itself. 'screen' units means the text stays a constant ON-SCREEN size
-	// regardless of zoom -- achieved by dividing the world-unit size by the current scale, so it must
-	// be recomputed (see refreshFontSizes() below) whenever state.s changes, not just once at build
-	// time like every other geometry in this file.
+	// Text size (Task 146 gear/settings panel, 2026-07-30; PARADIGM CHANGED 2026-08-14, Task 331).
+	// `settings.textSize` is now SCREEN PIXELS, full stop -- shared by a node's ID/pressure label, a
+	// link's label, and a user-added Text label. It is returned in WORLD units (divided by the
+	// current scale) because everything in this file is drawn in world coordinates; the division is
+	// what holds the on-screen size constant as you zoom, so it must be re-applied whenever state.s
+	// changes (refreshFontSizes(), called from onZoomChanged()) rather than once at build time like
+	// every other geometry here.
+	//
+	// WHAT WAS REMOVED, AND WHY IT IS A DELETION RATHER THAN A DEFAULT. `settings.textSizeUnits`
+	// offered 'map' (a world-unit constant that zoomed with the network) alongside 'screen', and
+	// 'map' was the default. Tom, 2026-08-14: *"deprecate/remove map units text sizing"*, after
+	// importing Net3 and seeing a correct network with invisible labels -- map-unit text at 0.2
+	// units is a fraction of a pixel, and no floor, warning or better default fixes a size whose
+	// legibility depends on how far you happen to be zoomed out.
+	//
+	// This is the GIS paradigm and it is what every GIS does: text and symbols are furniture of the
+	// VIEW, not features of the model. A label is 11 px because 11 px is legible; the map underneath
+	// it is 400 ft wide or 4 miles wide and the lettering does not care. What replaces map-unit text
+	// is not a size setting at all -- it is `settings.labelMaxWidth`, which decides whether a label
+	// is drawn at this zoom instead of drawing it too small to read.
+	//
+	// AND IT DELETED BOTH SCREEN-PIXEL FLOORS. LPN_MIN_TEXT_PX and LPN_MIN_SYMBOL_PX existed solely
+	// to stop map-unit sizes going sub-pixel; in pixels a pixel is a pixel at every zoom, so there is
+	// nothing left to floor. That is the fourth control this paradigm has removed rather than added
+	// (after symbolScale, the per-scale placement table, and textSizeUnits itself), which is the
+	// strongest evidence available that the frame matches the domain.
+	//
 	// mult (Task 146.03): a Text label's own per-label size multiplier (lb.sizeMult, default 1),
-	// stacked on top of the shared settings.textSize -- node/link labels never pass one, so they
-	// are unaffected.
-	// A FLOOR IN SCREEN PIXELS, so a label can never render too small to be a label.
-	//
-	// Tom's framing, 2026-08-14, and it is the one that makes this easy: *"I guess the pipe width can
-	// never be less than one pixel, and it's a really easy solution after all."* A pipe stroke cannot
-	// practically vanish -- the display floors it at a hairline -- but TEXT AND SYMBOLS are in map
-	// units with no floor at all, so they go sub-pixel and disappear completely. That asymmetry is
-	// the whole of what he hit importing Net3: the network was there, drawn, correct, and the labels
-	// were rendering at a fraction of a pixel.
-	//
-	// Below about seven device pixels a label is a smudge rather than information, so rendering it
-	// smaller serves nobody. The floor only engages when the result WOULD be illegible: zoom in and
-	// textSize * state.s exceeds it immediately, so a deliberately small size still behaves normally
-	// everywhere it can actually be read. It is a floor on the OUTPUT, not a clamp on the setting --
-	// the number the user typed is untouched, which matters because that number is saved.
-	var LPN_MIN_TEXT_PX = 7;
+	// stacked on top of the shared settings.textSize -- node/link labels never pass one.
 	function effectiveFontSize(mult) {
-		var base = settings.textSizeUnits === 'screen' ? settings.textSize / state.s : settings.textSize,
-			floor = LPN_MIN_TEXT_PX / (state.s || 1);
-		if (base < floor) { base = floor; }
-		return base * (mult || 1);
+		return (settings.textSize / (state.s || 1)) * (mult || 1);
 	}
 	function effectiveLineHeight() { return effectiveFontSize() * 1.2; }
-	// Everything on the map that is drawn at a fixed world size was drawn against THIS size, so it
-	// is expressed as "base dimension x textFactor()" -- tracking the user's Text size (and, in
-	// 'screen' units, the zoom) everywhere else. Used by the extrema badges, the leader threshold,
-	// the default label offset, and -- multiplied by the user's own symbolScale -- every symbol;
-	// see symbolFactor().
-	// NOT defaultSettings().textSize any more (2026-08-09, Task 254): that default moved to 20 and
-	// this did NOT follow it, deliberately. This number's only job is to say what size the fixed
-	// world dimensions below were drawn for, so that everything scales together; moving it in step
-	// with the default would hold textFactor() at 1 and leave symbols and offsets at their old
-	// absolute size while the lettering grew 8x. Leave it at 2.5 unless those base dimensions are
-	// themselves re-drawn.
+	// Everything on the map that is drawn at a fixed world size relative to the LETTERING was drawn
+	// against THIS size, so it is expressed as "base dimension x textFactor()". Used by the extrema
+	// badges, the leader threshold and the default label offset. It no longer feeds symbolFactor():
+	// symbols have had their own pixel size since Task 331, which is the decoupling Tom asked for.
+	// This number's only job is to say what size those fixed world dimensions were drawn for, so
+	// that they scale together with the text.
 	var LPN_BASE_TEXT_SIZE = 2.5;
 
 	// ---- Map-interface instrumentation (ROADMAP Task 200) ----
@@ -1082,11 +1076,24 @@ var EngCalcs = EngCalcs || {};
 			// object ON TOP of these defaults, so anyone who used the page before this changed
 			// keeps their stored 2.5 forever. That is why drawExampleNetwork() also sets 20
 			// explicitly -- raising the default alone left Tom looking at the old size.
-			textSize: 20,
-			symbolScale: 1, // symbol size relative to text size -- see symbolFactor() above
+			// SCREEN PIXELS since Task 331 (2026-08-14) -- see effectiveFontSize() above for why
+			// map units went away entirely. 11 px is a legible small label at any zoom, and unlike
+			// the 20 map units it replaces it means the same thing on every network ever imported.
+			textSize: 11,
+			// Junction dot DIAMETER in screen pixels; every other symbol is drawn against it.
+			// 7 keeps a dot readable next to 11 px lettering without swallowing it.
+			symbolSize: 7,
+			// Pipe stroke in screen pixels, independent of both (Tom: "decouple label, link, and
+			// node size"). 2 is a line that reads as a pipe rather than a hairline or a road.
+			linkWidth: 2,
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
 			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
-			textSizeUnits: 'map', // 'map' | 'screen' -- see effectiveFontSize() above
+			// Labels are drawn only when the visible map is at most this many LENGTH UNITS wide
+			// (Tom, 2026-08-14: "you specify zoom threshold in terms of how many units wide the map
+			// is"). null = always draw, which is the pre-Task-331 behaviour and the right default
+			// because no single number is meaningful across networks 400 ft and 40 miles wide. The
+			// settings panel captures it from the current view instead of asking anyone to guess.
+			labelMaxWidth: null,
 			legendPosition: 'top-right', // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
 			// `fileAutosaveSeconds` was removed by Task 211 along with autosave-to-file itself. A saved
 			// document may still carry one; applySaved() merges the save ONTO these defaults, so a
@@ -1287,24 +1294,29 @@ var EngCalcs = EngCalcs || {};
 	// elements incident to what moved keeps drag at the display's real refresh rate.
 	var nodeEls = {}, linkEls = {}, labelEls = {}, incidentLinks = {}, labelsByAnchor = {};
 
-	// Symbol size (Tom, 2026-07-30: "we need a symbol size and units setting too"). Deliberately
-	// NOT a second size-and-units pair: symbols are sized RELATIVE TO THE TEXT, so they inherit the
-	// text's map-vs-screen units for free and there is only one place to change how big everything
-	// on the map is. settings.symbolScale is the "relative to text" multiplier on top of that, so
-	// 1 reproduces exactly the fixed sizes that shipped before this setting existed.
-	// A per-element breakdown (separate pipe width, node size, pump size, reservoir size) is the
-	// obvious next step and is deliberately not built yet -- this is the two-dimensional control
-	// Tom asked for, with the fine-grained one left for when someone actually needs it.
-	// Same screen-pixel floor as effectiveFontSize(), for the same reason: a junction drawn at a
-	// fraction of a pixel is an invisible node, and an invisible node on a correct drawing is the
-	// worst failure this map has -- nothing to click, nothing to diagnose. JUNCTION_R is 0.9, so the
-	// factor needed for a minimum-radius dot is LPN_MIN_SYMBOL_PX / (2 * JUNCTION_R) screen pixels
-	// converted back into map units.
-	var LPN_MIN_SYMBOL_PX = 4;
+	// Symbol size. SCREEN PIXELS and INDEPENDENT OF THE TEXT since 2026-08-14 (Task 331). Tom:
+	// *"decouple label, link, and node size (in pixels? EPANET is fuzzy about that and epanet-js
+	// seems to have it hard coded)"* -- and, the day before, *"I found myself wanting to control
+	// symbol size and text size independently instead of having them linked."*
+	//
+	// `settings.symbolSize` is the DIAMETER OF A JUNCTION DOT in screen pixels, which is the one
+	// dimension on this map a person can actually picture. Everything else on the drawing that has a
+	// fixed shape -- reservoir, tank, pump, valve, vertex handle, arrow chevron, node outline -- was
+	// drawn against JUNCTION_R and follows from it, so there is still exactly one number to turn.
+	//
+	// What went away is `settings.symbolScale`, the old "relative to text" multiplier. It existed
+	// because symbols inherited the text's map-vs-screen units and could not have had their own; with
+	// both in pixels that coupling buys nothing and costs the user a mental division every time they
+	// want a bigger dot. Link width is likewise its own setting now -- see linkStrokeWidth() below.
 	function symbolFactor() {
-		var f = textFactor() * (settings.symbolScale > 0 ? settings.symbolScale : 1),
-			floor = (LPN_MIN_SYMBOL_PX / (2 * JUNCTION_R)) / (state.s || 1);
-		return f < floor ? floor : f;
+		return (settings.symbolSize / 2) / JUNCTION_R / (state.s || 1);
+	}
+	// Pipe stroke width in world units, from `settings.linkWidth` screen pixels. Published to CSS as
+	// --lpn-lw (refreshSymbolSizes()), which is why the .lpn-link rules read that rather than
+	// --lpn-sym: a pipe network's PIPES are its primary content and their weight is a drawing
+	// decision of its own, not a consequence of how big the junction dots are.
+	function linkStrokeWidth() {
+		return settings.linkWidth / (state.s || 1);
 	}
 	// Junction radius. 1.6 -> 0.72 earlier on 2026-08-09 ("about twice as large" next to text),
 	// then 0.9 the same day once the node became a stroke-less solid dot: with the 1-unit ring
@@ -1385,6 +1397,7 @@ var EngCalcs = EngCalcs || {};
 	function refreshSymbolSizes() {
 		var k = symbolFactor(), op = settings.symbolOpacity;
 		svg.style.setProperty('--lpn-sym', k);
+		svg.style.setProperty('--lpn-lw', linkStrokeWidth());
 		// Symbols only, never labels or their masks (Tom, 2026-07-30: "symbols opacity would be a
 		// very nice setting during layout") -- the point is to see the backdrop THROUGH the network
 		// while placing it against an aerial or a plan, and fading the numbers at the same time
@@ -1455,8 +1468,8 @@ var EngCalcs = EngCalcs || {};
 		// layer, same reasoning: this label must never be covered by a LATER node/link's own
 		// symbol. Both mask and leader start effectively invisible (mask sized 0, leader hidden)
 		// until layoutNodeLabel() below positions them for real.
-		var mask = el('rect', { 'class': 'lpn-lbl-mask' }, maskLayer);
-		var leader = el('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
+		var mask = el('rect', { 'class': 'lpn-lbl-mask lpn-datalbl-part' }, maskLayer);
+		var leader = el('line', { 'class': 'lpn-leader lpn-datalbl-part', style: 'display:none' }, labelsLayer);
 		// font-size inline, NOT the .lpn-lbl CSS class's 11px: SVG font-size is interpreted in the
 		// local (world-unit) coordinate system, same as any other geometry under this scaled <g> --
 		// an "11-unit" font is enormous next to nodes spaced 10-40 units apart, which is what was
@@ -1523,8 +1536,8 @@ var EngCalcs = EngCalcs || {};
 		// node's, positioned at the middle segment's midpoint -- content filled in by
 		// refreshLabelText(), not here (this only creates the element; it starts empty). Mask goes
 		// in maskLayer, leader+text in labelsLayer -- see maskLayer's declaration comment.
-		var mask = el('rect', { 'class': 'lpn-lbl-mask' }, maskLayer);
-		var leader = el('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
+		var mask = el('rect', { 'class': 'lpn-lbl-mask lpn-datalbl-part' }, maskLayer);
+		var leader = el('line', { 'class': 'lpn-leader lpn-datalbl-part', style: 'display:none' }, labelsLayer);
 		var text = el('text', {
 			'class': 'lpn-lbl lpn-draglbl', 'data-linklbl': l.id, style: 'font-size:' + effectiveFontSize() + 'px'
 		}, labelsLayer);
@@ -2702,7 +2715,7 @@ var EngCalcs = EngCalcs || {};
 	// nothing about units, which is why opening one runs the one-time restore offer below.
 	// 5 (Task 324, 2026-08-14): a scenario override is keyed by GROUP AND id ('n:20' / 'l:20')
 	// rather than by the bare id, because a node and a link may legally share one.
-	var LPN_STORAGE_VERSION = 5;
+	var LPN_STORAGE_VERSION = 6;
 	// ---- ROADMAP Task 274, second half (Tom, 2026-08-11: "Eventually needs to be Cartesian. If we
 	// can do that now without causing trouble, let's do it.") ----
 	//
@@ -2984,6 +2997,36 @@ var EngCalcs = EngCalcs || {};
 		if (saved.v === 4) {
 			migrateOverrideKeys(saved);
 			saved.v = 5;
+		}
+		// ---- v5 -> v6: sizes become SCREEN PIXELS (Task 331) --------------------------------------
+		//
+		// THE OLD VALUES ARE DISCARDED RATHER THAN CONVERTED, AND THAT IS THE HONEST ANSWER RATHER
+		// THAN THE LAZY ONE. A v5 `textSize` in 'map' units is a WORLD size; the pixels it rendered
+		// at depended on the zoom the reader happened to be at, so there is no scale factor to apply
+		// -- the same stored 20 was a banner headline on one screen and invisible on another. That
+		// ambiguity IS the defect this task removes, and inventing a conversion factor would carry it
+		// forward wearing a number that looks authoritative.
+		//
+		// A v5 document written with textSizeUnits:'screen' *could* be carried across unchanged, and
+		// deliberately is not. Splitting the migration by a flag would mean two classes of reopened
+		// document behaving differently for a reason invisible to the person looking at them; every
+		// v5 document opens at the new defaults, which is one sentence to explain and is what the
+		// paradigm is FOR. Nothing about the network is touched -- only how it is drawn.
+		//
+		// The stale keys are deleted rather than left to be ignored, because settings is serialized
+		// whole: leaving them would write textSizeUnits back out of every future save of a document
+		// that has not had one since v5, and a key that reads as live but is never consulted is the
+		// kind of thing that gets 'restored' by a well-meaning future edit.
+		if (saved.v === 5) {
+			if (saved.settings) {
+				var d = defaultSettings();
+				delete saved.settings.textSizeUnits;
+				delete saved.settings.symbolScale;
+				saved.settings.textSize = d.textSize;
+				saved.settings.symbolSize = d.symbolSize;
+				saved.settings.linkWidth = d.linkWidth;
+			}
+			saved.v = 6;
 		}
 		// **There is deliberately NO v2 -> v3 step here, and v2 is the ONLY version that lags.**
 		// Every other migration in this function converts the document and stamps it; this one
@@ -3642,23 +3685,6 @@ var EngCalcs = EngCalcs || {};
 		};
 	}
 
-	// A legible starting text size for a model whose coordinate scale we have never seen. Falls back
-	// to the current setting when a model has no extent to measure (one node, or all coincident),
-	// because a guess is worse than the status quo there.
-	function importTextSize(nodes) {
-		var xs = [], ys = [], i;
-		for (i = 0; i < nodes.length; i++) {
-			if (typeof nodes[i].x === 'number' && typeof nodes[i].y === 'number') {
-				xs.push(nodes[i].x); ys.push(nodes[i].y);
-			}
-		}
-		if (xs.length < 2) { return settings.textSize; }
-		var w = Math.max.apply(null, xs) - Math.min.apply(null, xs),
-			h = Math.max.apply(null, ys) - Math.min.apply(null, ys),
-			diag = Math.sqrt(w * w + h * h);
-		if (!(diag > 0)) { return settings.textSize; }
-		return +(diag / 40).toPrecision(2);
-	}
 
 	/**
 	 * The parsed .inp as a saved document, ready for importProject().
@@ -3797,19 +3823,19 @@ var EngCalcs = EngCalcs || {};
 			nodes: nodes, links: links, labels: labels, nextId: next,
 			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
 			backdrop: null,   // an .inp names an image file; it never carries one. See the report.
-			// TEXT SIZE IS DERIVED FROM THE MODEL, not inherited from whatever the last project
-			// needed. settings.textSize is in MAP UNITS, and every model brings its own coordinate
-			// scale: Net1 spans 60x80 units, Net3 spans 37x31, a state-plane survey model spans tens
-			// of thousands. Carrying the previous project's number across meant a correct import
-			// could render INVISIBLE -- which is worse than failing, because there is nothing on
-			// screen to act on. Tom hit exactly that with Net3 at a size of 0.2 (2026-08-14).
+			// SETTINGS ARE INHERITED WHOLE, and since Task 331 that needs no asterisk. An import
+			// used to override `textSize` with a fortieth of the model's diagonal, because text was
+			// sized in MAP UNITS and a file whose coordinates we had never seen could therefore
+			// arrive unreadable -- which is exactly what Tom hit with Net3, a correct network whose
+			// labels rendered at 0.2 units, a fraction of a pixel.
 			//
-			// A fortieth of the diagonal is not a tuned constant; it is a starting value that reads
-			// sensibly across the three scales above and is a one-line change. Everything else in
-			// `settings` is still inherited, deliberately -- units, method and ID prefixes are the
-			// user's working preferences and have nothing to do with the file's geometry.
-			settings: Object.assign(JSON.parse(JSON.stringify(settings)),
-				{ textSize: importTextSize(nodes) }),
+			// Pixel sizing deletes the problem rather than estimating around it: 11 px is 11 px
+			// whether the file is in feet, metres or State Plane coordinates, so there is nothing
+			// left to guess and importTextSize() is gone. That heuristic was written on 2026-08-14
+			// and removed the same week by the paradigm that made it unnecessary -- worth noting,
+			// because a plausible estimate is the most expensive kind of workaround: it works well
+			// enough that nobody looks for the cause.
+			settings: JSON.parse(JSON.stringify(settings)),
 			units: readUnitSelections()
 		};
 	}
@@ -3924,6 +3950,29 @@ var EngCalcs = EngCalcs || {};
 	// on. Getting the sign wrong here moves every label one line up instead of down -- visible, but
 	// only if you have the original open beside it.
 	function reanchorImportedLabels() {
+		// THIS CONVERSION IS ILL-POSED UNDER PIXEL TEXT, AND SAYING SO IS MORE USE THAN A FIX THAT
+		// ISN'T ONE (Task 331/332, 2026-08-14). Both terms below measure text in WORLD units while
+		// the text is sized in SCREEN PIXELS, so both depend on the zoom in force when the import
+		// runs -- which is whatever the PREVIOUSLY OPEN PROJECT was left at. The same file imported
+		// from two different views therefore stores two different sets of label coordinates.
+		//
+		// A latent defect promoted, not a new one: it was already true for anyone who chose 'screen'
+		// text units, and the old comment here even noted that effectiveFontSize() divides by the
+		// zoom. Making pixels the only mode moved it onto the default path, which is the ordinary way
+		// a paradigm change surfaces what was always there.
+		//
+		// AND FITTING FIRST DOES NOT FIX IT -- that was tried and reverted the same hour. zoomExtent()
+		// derives its scale from bbox(), which measures the RENDERED LABEL TEXT, whose width depends
+		// on the scale you arrived with. Fit-then-convert is circular, so it reduces the dependence
+		// without removing it, while reading as though the problem were solved. dev/lpn-spike/
+		// inp-import-harness.js asserts the nondeterminism explicitly as a known defect, so whoever
+		// closes Task 332 is told to flip it.
+		//
+		// THE REAL FIX IS TO STOP CONVERTING. EPANET anchors a label by its top-left CORNER; we
+		// anchor by the centre, and translating between them needs a text height in map units, which
+		// a pixel-sized label does not have at any particular zoom. Render imported labels top-left
+		// anchored and store EPANET's point unchanged -- exact at every zoom, no arithmetic at all.
+		// ROADMAP Task 332.
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id];
 			if (!le) { return; }
@@ -6545,6 +6594,7 @@ var EngCalcs = EngCalcs || {};
 		// but the --lpn-sym custom property the stroke widths read is only ever written here and in
 		// refreshSymbolSizes() -- so a saved non-default symbol size needs this call to take effect.
 		refreshSymbolSizes();
+		applyLabelVisibility();
 		updateEmptyHint();
 		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
 		renderTabs();
@@ -7851,10 +7901,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Re-applies the current effectiveFontSize() to every already-built text element and reflows
 	// whatever depends on it (multi-line spacing, extrema ticks, a Text label's own width/leader) --
-	// needed both when the user edits Text size/units directly (settings.textSize/textSizeUnits
-	// changed) and, in 'screen' mode only, whenever state.s changes (zoomAbout()/zoomExtent() call
-	// onZoomChanged() below), since 'screen' mode's effective size is state.s-dependent while every
-	// other geometry in this file is left to the SVG's own scale transform.
+	// needed both when the user edits Text size directly and whenever state.s changes
+	// (zoomAbout()/zoomExtent() call onZoomChanged() below), since a pixel size is by definition
+	// state.s-dependent while every other geometry in this file is left to the SVG's own transform.
 	function refreshFontSizes() {
 		var fs = effectiveFontSize() + 'px';
 		Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
@@ -7865,14 +7914,47 @@ var EngCalcs = EngCalcs || {};
 			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
 			updateLabelGeometry(id);
 		});
-		refreshSymbolSizes(); // symbols are sized relative to the text, so they follow it everywhere it changes
+		refreshSymbolSizes(); // publishes --lpn-sym / --lpn-lw, both of which are state.s-dependent too
 		refreshLabelText(); // recomputes multi-line tspan dy spacing and extrema tick positions at the new size
 	}
-	// Cheap no-op in 'map' mode (the default): map-mode text scales for free via the SVG's own
-	// world-to-screen transform, exactly like the network geometry, so there is nothing to redo on
-	// zoom. Called from zoomAbout()/zoomExtent() below.
+	// Called from zoomAbout()/zoomExtent(). NO LONGER CONDITIONAL (Task 331): with text, symbols and
+	// pipe width all specified in screen pixels, every one of them is state.s-dependent, so a zoom
+	// always invalidates all three. The old 'map' fast path -- where text scaled for free via the
+	// SVG's own transform and this was a no-op -- went away with map-unit sizing itself.
+	// refreshFontSizes() calls refreshSymbolSizes(), which publishes --lpn-sym and --lpn-lw, so one
+	// call still covers the lot.
+	// Visible width of the map in MODEL LENGTH UNITS -- the quantity Tom named as the control:
+	// *"you specify zoom threshold in terms of how many units wide the map is"* (2026-08-14). It is
+	// the honest way to say "when should this be readable", because it is a statement about the
+	// DRAWING rather than about the viewport: 400 ft across means the same thing on a phone and on a
+	// 32-inch monitor, whereas a zoom factor or a pixels-per-foot ratio does not.
+	function visibleMapWidth() {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0;
+		return w / (state.s || 1);
+	}
+	// GENERATED ANNOTATION only, and the flow arrow is what showed that is the right line rather
+	// than "labels" (Tom, 2026-08-14: *"Arrows also should hide at hideable zoom levels"*). An arrow
+	// is a symbol by construction and an annotation by purpose -- nobody drew it, it exists to be
+	// read, and zoomed out it is noise over the network you are trying to see the shape of. A node/
+	// link data label is the same kind of thing, so suppressing either costs the user nothing they
+	// authored. A user Text label is the opposite: they typed the words and chose the spot, and
+	// making their annotation disappear under a threshold that never mentions Text labels would read
+	// as a bug. Hence .lpn-datalbl-part on the mask and leader built beside each data label -- the
+	// three pieces of one assembly hide together, the arrow hides with them, and the network itself
+	// never does. The full rule is in css/engcalcs.css beside the selector.
+	//
+	// visibility rather than display, so this composes with the leader's own show/hide logic instead
+	// of fighting it -- a leader that is display:none for its own reasons stays gone, and one that is
+	// visible is merely made invisible. One class on the <svg>, so a zoom step costs nothing per
+	// element however large the network is.
+	function applyLabelVisibility() {
+		var lim = settings.labelMaxWidth,
+			hide = typeof lim === 'number' && lim > 0 && visibleMapWidth() > lim;
+		if (svg) { svg.classList.toggle('lpn-labels-hidden', hide); }
+	}
 	function onZoomChanged() {
-		if (settings.textSizeUnits === 'screen') { refreshFontSizes(); }
+		refreshFontSizes();
+		applyLabelVisibility();
 	}
 	// ID-prefix validation, same illegal-character set as validateNewId() (no spaces/quotes) plus
 	// non-empty -- a prefix becomes the leading substring of every future auto-generated ID for that
@@ -8178,37 +8260,68 @@ var EngCalcs = EngCalcs || {};
 		// more clicking than it saves.
 		var mapBody = section('mapDisplay', pc.lpn_settings_map_display || 'Map display and sizes');
 		var sizeInput = document.createElement('input');
-		sizeInput.type = 'number'; sizeInput.step = 'any'; sizeInput.min = '0.1'; sizeInput.value = settings.textSize;
+		sizeInput.type = 'number'; sizeInput.step = '1'; sizeInput.min = '1'; sizeInput.value = settings.textSize;
 		sizeInput.addEventListener('change', function () {
 			if (+sizeInput.value > 0) { settings.textSize = +sizeInput.value; refreshFontSizes(); saveToStorage(); }
 			else { sizeInput.value = settings.textSize; }
 		});
-		row(mapBody, pc.lpn_settings_text_size || 'Text size', sizeInput);
-		var unitsSelect = document.createElement('select');
-		[
-			['map', pc.lpn_settings_text_size_map || 'Map units'],
-			['screen', pc.lpn_settings_text_size_screen || 'Screen pixels']
-		].forEach(function (o) {
-			var opt = document.createElement('option');
-			opt.value = o[0]; opt.textContent = o[1]; if (o[0] === settings.textSizeUnits) { opt.selected = true; }
-			unitsSelect.appendChild(opt);
-		});
-		unitsSelect.addEventListener('change', function () {
-			settings.textSizeUnits = unitsSelect.value;
-			refreshFontSizes();
-			saveToStorage();
-		});
-		row(mapBody, pc.lpn_settings_text_size_units || 'Text size units', unitsSelect);
-		// Symbol size rides on the text-size block on purpose: it is expressed as a multiple of the
-		// text size and inherits its map-vs-screen units, so it belongs beside it rather than
-		// looking like an independent size system with its own units selector.
+		row(mapBody, pc.lpn_settings_text_size || 'Text size (pixels)', sizeInput);
+		// THREE INDEPENDENT PIXEL SIZES, and no units selector anywhere (Task 331). The "Text size
+		// units" map/screen dropdown is gone with map-unit sizing itself, and the old "Symbol size
+		// (relative to text)" multiplier is gone with the coupling that forced it -- a symbol size
+		// expressed as a multiple of a text size made the user do a division to answer "how big is
+		// the dot", which is the only question they were ever asking.
 		var symInput = document.createElement('input');
-		symInput.type = 'number'; symInput.step = 'any'; symInput.min = '0.1'; symInput.value = settings.symbolScale;
+		symInput.type = 'number'; symInput.step = '1'; symInput.min = '1'; symInput.value = settings.symbolSize;
 		symInput.addEventListener('change', function () {
-			if (+symInput.value > 0) { settings.symbolScale = +symInput.value; refreshSymbolSizes(); relayoutLabels(); saveToStorage(); }
-			else { symInput.value = settings.symbolScale; }
+			if (+symInput.value > 0) { settings.symbolSize = +symInput.value; refreshSymbolSizes(); relayoutLabels(); saveToStorage(); }
+			else { symInput.value = settings.symbolSize; }
 		});
-		row(mapBody, pc.lpn_settings_symbol_size || 'Symbol size (relative to text)', symInput);
+		row(mapBody, pc.lpn_settings_symbol_size || 'Symbol size (pixels)', symInput);
+		var lwInput = document.createElement('input');
+		lwInput.type = 'number'; lwInput.step = '0.5'; lwInput.min = '0.5'; lwInput.value = settings.linkWidth;
+		lwInput.addEventListener('change', function () {
+			if (+lwInput.value > 0) { settings.linkWidth = +lwInput.value; refreshSymbolSizes(); saveToStorage(); }
+			else { lwInput.value = settings.linkWidth; }
+		});
+		row(mapBody, pc.lpn_settings_link_width || 'Pipe width (pixels)', lwInput);
+		// ---- Scale-dependent label visibility ----
+		// THE CONTROL IS A CAPTURE BUTTON, NOT JUST A NUMBER, AND THAT IS THE WHOLE USABILITY OF IT.
+		// The threshold is a width in model length units, and no default is meaningful across
+		// networks that are 400 ft and 40 miles across -- so asking someone to type one blind asks
+		// them to predict a number they can only recognise by seeing it. Instead: zoom until the
+		// labels are as sparse as you want them, press the button, and the current view's width
+		// becomes the threshold. The number stays editable for anyone who does know what they want.
+		// Blank means always show, which is both the default and the pre-Task-331 behaviour.
+		var lmwWrap = document.createElement('span');
+		var lmwInput = document.createElement('input');
+		lmwInput.type = 'number'; lmwInput.step = 'any'; lmwInput.min = '0';
+		lmwInput.style.width = '7em';
+		lmwInput.placeholder = pc.lpn_settings_label_always || 'Always show labels';
+		lmwInput.value = settings.labelMaxWidth === null || settings.labelMaxWidth === undefined ? '' : settings.labelMaxWidth;
+		lmwInput.addEventListener('change', function () {
+			var v = lmwInput.value.trim();
+			settings.labelMaxWidth = (v === '' || !(+v > 0)) ? null : +v;
+			if (settings.labelMaxWidth === null) { lmwInput.value = ''; }
+			applyLabelVisibility(); saveToStorage();
+		});
+		var lmwBtn = document.createElement('button');
+		lmwBtn.type = 'button'; lmwBtn.className = 'lpn-btn';
+		lmwBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
+		lmwBtn.addEventListener('click', function () {
+			// Rounded to three significant figures: the captured number is a JUDGEMENT ("about this
+			// zoomed in"), and writing 1283.4177 into the box would present an accident of the
+			// current pan as a decision worth preserving.
+			var w = visibleMapWidth();
+			if (!(w > 0)) { return; }
+			settings.labelMaxWidth = +w.toPrecision(3);
+			lmwInput.value = settings.labelMaxWidth;
+			applyLabelVisibility(); saveToStorage();
+		});
+		lmwWrap.appendChild(lmwInput);
+		lmwWrap.appendChild(document.createTextNode(' '));
+		lmwWrap.appendChild(lmwBtn);
+		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when the map is narrower than', lmwWrap);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;

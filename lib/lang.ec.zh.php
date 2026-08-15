@@ -1068,8 +1068,6 @@ $ec_lang['lpn_engine_loading']='正在加载 EPANET 求解器…';
 $ec_lang['lpn_engine_failed']='无法加载 EPANET 求解器，改用内置求解器。';
 $ec_lang['lpn_engine_manning_note']='注意：使用曼宁糙率时，EPANET 计算出的水头损失比内置求解器约低 0.6%。';
 $ec_lang['lpn_settings_text_size']='文字大小';
-$ec_lang['lpn_settings_text_size_map']='地图距离';
-$ec_lang['lpn_settings_text_size_screen']='屏幕像素';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1080,7 +1078,6 @@ $ec_lang['lpn_settings_symbol_opacity']='符号不透明度（0 到 1）';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='背景图片不透明度（0 到 1）';
-$ec_lang['lpn_settings_text_size_units']='文字大小单位';
 $ec_lang['lpn_settings_map_display']='地图外观';
 $ec_lang['lpn_settings_map_height_px']='地图高度（屏幕像素）';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

@@ -1070,8 +1070,6 @@ $ec_lang['lpn_engine_loading']='កំពុងផ្ទុកឧបករណ៍
 $ec_lang['lpn_engine_failed']='មិនអាចផ្ទុកឧបករណ៍ដោះស្រាយ EPANET បានទេ។ កំពុងបង្ហាញឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយជំនួសវិញ។';
 $ec_lang['lpn_engine_manning_note']='ចំណាំ៖ ជាមួយភាពក្រញ៉ោងម៉ាន់នីង EPANET គណនាការបាត់បង់ថ្ពល់ទាបជាងឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយប្រហែល ០.៦%។';
 $ec_lang['lpn_settings_text_size']='ទំហំអក្សរ';
-$ec_lang['lpn_settings_text_size_map']='ចម្ងាយលើផែនទី';
-$ec_lang['lpn_settings_text_size_screen']='ភិចសែលអេក្រង់';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1082,7 +1080,6 @@ $ec_lang['lpn_settings_symbol_opacity']='ភាពស្រអាប់សញ្
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='ភាពស្រអាប់រូបភាពផ្ទៃខាងក្រោយ (០ ដល់ ១)';
-$ec_lang['lpn_settings_text_size_units']='ខ្នាតវាស់ទំហំអក្សរ';
 $ec_lang['lpn_settings_map_display']='រូបរាងផែនទី';
 $ec_lang['lpn_settings_map_height_px']='កម្ពស់ផែនទី (ភិចសែលអេក្រង់)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

@@ -1069,8 +1069,6 @@ $ec_lang['lpn_engine_loading']='Inapakia kitatuzi cha EPANET…';
 $ec_lang['lpn_engine_failed']='Imeshindwa kupakia kitatuzi cha EPANET. Inaonyesha kitatuzi cha ndani badala yake.';
 $ec_lang['lpn_engine_manning_note']='Kumbuka: kwa usuguo wa Manning, EPANET hukokotoa upotevu wa kimo karibu asilimia 0.6 chini kuliko kikokotoo cha ndani.';
 $ec_lang['lpn_settings_text_size']='Ukubwa wa maandishi';
-$ec_lang['lpn_settings_text_size_map']='Umbali wa ramani';
-$ec_lang['lpn_settings_text_size_screen']='Pikseli za skrini';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
@@ -1081,7 +1079,6 @@ $ec_lang['lpn_settings_symbol_opacity']='Uzito wa alama (0 hadi 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Uzito wa picha ya nyuma (0 hadi 1)';
-$ec_lang['lpn_settings_text_size_units']='Vitengo vya ukubwa wa maandishi';
 $ec_lang['lpn_settings_map_display']='Mwonekano wa ramani';
 $ec_lang['lpn_settings_map_height_px']='Urefu wa ramani (pikseli za skrini)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's

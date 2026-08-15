@@ -606,6 +606,34 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   it, like units and ID prefixes. Interacts with Task 329: a label lying along a pipe needs a mask
   more than a horizontal one beside it does, because it crosses the very line it describes.
 
+- 72|332| **Render imported EPANET labels top-left anchored instead of converting their
+  coordinates.** Found while shipping Task 331, and it is a genuine ill-posedness rather than a
+  slip. EPANET anchors a Text label by its top-left CORNER; we anchor by the centre.
+  `reanchorImportedLabels()` translates between them by measuring the label's width and line height
+  **in world units** — quantities a SCREEN-PIXEL-sized label does not have at any particular zoom.
+  - **The consequence is stored data that depends on view state:** the same `.inp` imported from two
+    different zooms writes two different sets of label coordinates, and the difference is saved.
+  - **Fitting before converting was tried and reverted the same hour.** `zoomExtent()` derives its
+    scale from `bbox()`, which measures the rendered label text — so fit-then-convert is circular. It
+    reduces the dependence while reading as though it had removed it, which is worse than leaving it
+    visible.
+  - **The fix is to stop converting**: store EPANET's point unchanged and render those labels with
+    `text-anchor: start` / `dominant-baseline: hanging`. Exact at every zoom, no arithmetic. The cost
+    is that a Text label gains an anchor mode the drag, mask and leader paths must respect.
+  - `dev/lpn-spike/inp-import-harness.js` asserts the nondeterminism **inverted, as a known defect**,
+    so whoever fixes this is told by a failing check to flip it.
+
+- 65|333| **Label value prefixes (`P=`, `Q=`) and a hide-last priority order.** Tom, 2026-08-14,
+  proposing them alongside aligned pipe labels: *"we can implement label prefixes P=, Q= etc… and
+  maybe priorities for labels to hide last"*.
+  - **The two belong together because they answer the same question at different budgets.** A stack
+    of bare numbers is only readable while all of it is present — take a line away and the reader
+    cannot tell which quantity survived. Prefixes make any SUBSET self-describing, which is what
+    makes a priority order safe to act on.
+  - Prefix strings are per-field and translatable (`Q` is `Q` everywhere, but not every symbol is).
+    They interact with Task 331's visibility threshold and with aligned labels (Task 329): a rotated
+    label lying along a pipe has less room, so it wants the shortest self-describing form there is.
+
 - 92|326| **PARADIGM: size text and symbols in PRINTED units, not real-world units.** Tom,
   2026-08-14: *"the end product of all text and symbols is in printed units… engineers and architects
   achieve precise control of prints by fixing the printed scale early… but these heights are
@@ -2360,6 +2388,13 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|331| **GIS paradigm phase 1: text/symbol/pipe sizes are three independent SCREEN-PIXEL settings,
+  and labels hide by map width.** Deleted `textSizeUnits`, `symbolScale`, both pixel floors and
+  `importTextSize()` — the paradigm keeps removing controls rather than adding them. `labelMaxWidth`
+  (model length units, captured from the current view) hides GENERATED ANNOTATION: data labels, their
+  masks and leaders, and flow arrows; never the network or the user's own Text labels. Storage v5->v6
+  discards old map-unit sizes rather than inventing a conversion factor. Narrative in
+  `dev/roadmap-closed-archive.md`; the ill-posedness it exposed is Task 332.
 - 0|324| **[DONE 2026-08-14] Scenario overrides no longer collide between a node and a link sharing
   an id.** One flat map keyed by bare id met EPANET's two namespaces: re-measured, **Net1 has 7
   shared ids, Net2 35, Net3 72** — even the smallest EPA example collides, which the task did not
