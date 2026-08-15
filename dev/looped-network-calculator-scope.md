@@ -614,9 +614,17 @@ SVG `<tspan>`s).
 
 - **Pure numbers, color-coded — not "Label: value unit" text (Tom, round 2).** Reusing
   `js/branched-network.js`'s `EngCalcs.bpnFieldColors`/colored-checkbox convention instead of a
-  label/unit suffix: `lpnFieldColors` reuses bpn's colors where the concept overlaps
-  (id/length/diameter/flow/elevation/pressure) and adds new ones for demand/head/velocity/headloss.
-  The color-coded checkbox in the Labels popover is the only legend; the map itself stays uncluttered.
+  label/unit suffix: `lpnFieldColors` reused bpn's colors where the concept overlapped
+  (id/length/diameter/flow/elevation/pressure) and added new ones for demand/head/velocity/headloss.
+  The color-coded checkbox in the Labels popover was the only legend.
+  - **SUPERSEDED 2026-08-15 by ROADMAP Task 333** (Tom: *"No more label colors"*). The palette is
+    gone; a field now says which quantity it is with a per-field **prefix** (`Q`, `V`, `S`, `H`,
+    `P`, `E`, `Hl`, `km`, `C`/`n`/`e`) and optional **suffix**, both editable per project in the
+    Labels box, separated from the number by one blanket separator that defaults to a space. The
+    legend keys on the prefix instead of on a colour swatch. The "pure numbers, not sentences" half
+    of the decision stands — a prefix is one or two characters, not a label — but colour is now
+    saved for MEANING (Task 327's colour-by-value view) rather than spent on identity, and a prefix
+    survives greyscale, a printed sheet and a colour-blind reader.
 - **Extrema mark is a tick beside the number, not text-decoration on it (Tom, round 2: "it's not
   such a great idea because it's ambiguous... I don't know if there is something else").** The first
   cut used CSS overline/underline on the number itself; Tom read that as ambiguous and an unfamiliar

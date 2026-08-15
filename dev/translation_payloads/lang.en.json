@@ -854,6 +854,10 @@
         "lpn_labels_heading_link": "Link labels",
         "lpn_labels_decimals_tip": "Decimal places shown for this label",
         "lpn_labels_mark_extrema": "Mark highest and lowest values",
+        "lpn_labels_prefix_tip": "Text printed before this value on the map",
+        "lpn_labels_suffix_tip": "Text printed after this value on the map",
+        "lpn_labels_separator": "Separator",
+        "lpn_labels_separator_tip": "Text between a prefix or suffix and the value. A space by default.",
         "lpn_field_id": "ID",
         "lpn_backdrop_menu": "Background image…",
         "lpn_backdrop_add": "Add",
@@ -949,7 +953,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 947,
+    "count": 951,
     "active_prefixes": [
         "about",
         "bpn",

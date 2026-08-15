@@ -639,7 +639,8 @@ var EngCalcs = EngCalcs || {};
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped. Each tspan repeats the same x (not a
 	// relative dx) so every line stays left/anchor-aligned under the first, which is the standard
-	// SVG multi-line-text idiom. line.color tints the field per lpnFieldColors; the extrema
+	// SVG multi-line-text idiom. A line carries no colour of its own (Task 333 retired the per-field
+	// palette); the extrema
 	// tick mark (line.decoration) is drawn separately by applyExtremaTicks() below, not here --
 	// text-decoration on the number itself (the original design) read as ambiguous (Tom, 2026-07-30:
 	// "I don't know if there is something else"), so the mark lives beside the number, not on it.
@@ -647,7 +648,6 @@ var EngCalcs = EngCalcs || {};
 		while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
 		lines.forEach(function (line, i) {
 			var tspan = el('tspan', { x: x, dy: i === 0 ? 0 : effectiveLineHeight() }, textEl);
-			if (line.color) { tspan.setAttribute('fill', line.color); }
 			tspan.textContent = line.text;
 		});
 	}
@@ -735,11 +735,11 @@ var EngCalcs = EngCalcs || {};
 			// judge where one line sat relative to digits it wasn't touching, a relative one.
 			y = lines[i].decoration === 'high' ? yHigh : yLow;
 			tick('line', {
-				x1: x0, y1: yHigh, x2: x1, y2: yHigh, stroke: lines[i].color || '#000',
+				x1: x0, y1: yHigh, x2: x1, y2: yHigh, stroke: '#000',
 				'stroke-width': stroke, 'class': 'lpn-tick'
 			});
 			tick('line', {
-				x1: x0, y1: yLow, x2: x1, y2: yLow, stroke: lines[i].color || '#000',
+				x1: x0, y1: yLow, x2: x1, y2: yLow, stroke: '#000',
 				'stroke-width': stroke, 'class': 'lpn-tick'
 			});
 			vertexY = y + dir * CARET_TIP_INSET * tf;
@@ -748,7 +748,7 @@ var EngCalcs = EngCalcs || {};
 			chevronPts = (vertexX - CARET_LEG_HALF * tf) + ',' + legY + ' ' + vertexX + ',' + vertexY + ' ' +
 				(vertexX + CARET_LEG_HALF * tf) + ',' + legY;
 			tick('polyline', {
-				points: chevronPts, fill: 'none', stroke: lines[i].color || '#000',
+				points: chevronPts, fill: 'none', stroke: '#000',
 				'stroke-width': stroke, 'class': 'lpn-tick'
 			});
 		}
@@ -1320,6 +1320,23 @@ var EngCalcs = EngCalcs || {};
 				node: { demand: 2, head: 2, pressure: 2, elev: 2 },
 				link: { diameter: 0, length: 2, roughness: 0, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 4 }
 			},
+			// Per-field PREFIX and SUFFIX text (ROADMAP Task 333, Tom 2026-08-15), and the one
+			// blanket separator that sits between either of them and the number.
+			//
+			// EMPTY IS NOT THE SAME AS UNSET, which is why these maps ship EMPTY rather than
+			// pre-filled with the defaults. A field with no entry here uses labelDefaultPrefix()
+			// below, which is allowed to be dynamic -- roughness prints C, n or e depending on the
+			// friction method currently selected, and a stored 'C' could not follow that. Typing an
+			// empty box stores an empty string, which is a real answer meaning "no prefix" and is
+			// honoured. So: undefined -> ask the default; '' -> print nothing.
+			//
+			// The separator is blanket, per Tom: "One blanket separator and individual prefixes and
+			// postfixes, of course." A space by default, so a prefixed line reads 'Q 12.5'. Set it
+			// to '' for 'Q12.5' or to '=' for 'Q=12.5' -- the '=' form Task 333 was originally
+			// written around is one keystroke away rather than baked into fifteen prefix strings.
+			prefix: { node: {}, link: {} },
+			suffix: { node: {}, link: {} },
+			separator: ' ',
 			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
 			// Global, not per field: the mark answers one network-wide question per field, and Tom
 			// described it as a single toggle. Lives here with its siblings and NOT in `settings`
@@ -1470,23 +1487,22 @@ var EngCalcs = EngCalcs || {};
 	// consumed once by offerUnitRestore() at the tail of refreshAllFromDocument().
 	var pendingV2Restore = false;
 
-	// One color per data field, matching js/branched-network.js's EngCalcs.bpnFieldColors
-	// convention (Tom, 2026-07-30): a colored number on the map, a colored span in the checkbox
-	// label as the only legend -- no unit suffix, no field-name prefix cluttering the map itself.
-	// Reused verbatim where the concept overlaps bpn's palette (id/length/diameter/flow/elevation/
-	// pressure); demand/head/velocity/headloss are new colors, chosen to stay visually distinct
-	// from every other entry here.
-	// demand and flow share one color (Tom, 2026-07-30): both are a flow rate, Q -- a node's demand
-	// IS the flow leaving the network at that point, so the legend should read them as the same
-	// quantity, not as two unrelated fields that happen to both be numbers.
-	// There is no separate head-GAIN field or color (Tom, 2026-07-30: "I don't think we need a
-	// separate Head Gain. Negative head loss is fine."): a pump's contribution is reported as a
-	// negative head loss, under the same label, color, and extrema bucket as every other link.
-	var lpnFieldColors = {
-		id: '#000', elev: '#8b5a2b', demand: '#1565c0', head: '#00838f', pressure: '#455a64',
-		diameter: '#bf4b2b', length: '#2e7d32', roughness: '#00695c', km: '#827717',
-		flow: '#1565c0', velocity: '#ad1457', headloss: '#4527a0', gradient: '#8e24aa'
-	};
+	// THERE ARE NO PER-FIELD LABEL COLOURS ANY MORE (ROADMAP Task 333, Tom 2026-08-15: "No more
+	// label colors"). Every data label draws in the map's one text colour and says which quantity
+	// it is with a PREFIX instead (labelPrefixFor() below).
+	//
+	// The trade is the same one that turned pumps and reservoirs black: colour is a budget, and it
+	// is being saved for MEANING (Task 327's colour-by-value view), not spent on identity. A prefix
+	// also survives greyscale, a printed sheet and a colour-blind reader -- none of which the old
+	// colour key did, and the key itself was only ever readable beside the legend, so a number on a
+	// map handed to someone else was unattributed either way.
+	//
+	// What used to be encoded in the palette and now has to live somewhere else:
+	//   - demand and flow shared one colour because both are a flow rate, Q. They now share the
+	//     PREFIX 'Q' by default, which says it out loud instead of asking the reader to match hues.
+	//   - There is still no separate head-GAIN field (Tom, 2026-07-30: "I don't think we need a
+	//     separate Head Gain. Negative head loss is fine."): a pump reports a negative head loss,
+	//     under the same label, prefix and extrema bucket as every other link.
 
 	function el(tag, attrs, parent) {
 		var e = document.createElementNS(NS, tag), k;
@@ -3682,6 +3698,18 @@ var EngCalcs = EngCalcs || {};
 		Object.assign(labelSettings.link, savedLS.link || {});
 		Object.assign(labelSettings.decimals.node, savedDec.node || {});
 		Object.assign(labelSettings.decimals.link, savedDec.link || {});
+		// Task 333's affixes merge the same way, one level deeper. They ship EMPTY, so this is
+		// really just a copy -- but written as a merge for the same reason as its siblings: the day
+		// a field gains a stored default here, a document saved before it must still pick it up.
+		var savedPre = savedLS.prefix || {}, savedSuf = savedLS.suffix || {};
+		Object.assign(labelSettings.prefix.node, savedPre.node || {});
+		Object.assign(labelSettings.prefix.link, savedPre.link || {});
+		Object.assign(labelSettings.suffix.node, savedSuf.node || {});
+		Object.assign(labelSettings.suffix.link, savedSuf.link || {});
+		// A bare string, so it takes the same guarded assignment markExtrema does. An EMPTY string
+		// is a real setting ("Q12.5", no gap) and must survive this, which is why the test is on the
+		// type and not on truthiness.
+		if (typeof savedLS.separator === 'string') { labelSettings.separator = savedLS.separator; }
 		if (typeof savedLS.markExtrema === 'boolean') { labelSettings.markExtrema = savedLS.markExtrema; }
 		backdrop = saved.backdrop || null;
 		// Same one-level-deeper merge the labelSettings block above documents, and for the same
@@ -8373,18 +8401,22 @@ var EngCalcs = EngCalcs || {};
 	// row, or omit it for a non-numeric field (ID) that has nothing to round. The spinner sits on the
 	// SAME row as the checkbox because decimal places are a property of that one field -- the Labels
 	// popover is already the per-field row list, which is why this lives here and not in Settings
-	// (page-wide preferences).
-	function labelCheckbox(container, labelText, color, checked, onChange, decimals) {
-		var label = document.createElement('label'), input = document.createElement('input'),
-			span = document.createElement('span');
+	// (page-wide preferences). `affix` (Task 333) is the same bargain for the prefix/suffix boxes.
+	// The row is a flex line so those three controls form COLUMNS down the panel: the field names
+	// are of wildly different lengths, and boxes that stagger with them are unreadable as a set.
+	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt) {
+		var row = document.createElement('div'), label = document.createElement('label'),
+			input = document.createElement('input'), span = document.createElement('span');
+		row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '6px';
 		input.type = 'checkbox'; input.checked = checked;
 		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); refreshLabelText(); });
-		span.style.color = color;
 		span.textContent = labelText;
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(span);
-		container.appendChild(label);
+		label.style.flex = '1 1 auto';
+		row.appendChild(label);
+		if (affixOpt) { row.appendChild(affixBox(affixOpt.prefix)); row.appendChild(affixBox(affixOpt.suffix)); }
 		if (decimals) {
 			var pc = EngCalcs.pageConfig || {}, dec = document.createElement('input');
 			// Upper bound 32, not a defensible-looking 4 (Tom, 2026-07-30): "possibly some absurd limit
@@ -8414,9 +8446,26 @@ var EngCalcs = EngCalcs || {};
 				saveToStorage();
 				refreshLabelText();
 			});
-			container.appendChild(dec);
+			row.appendChild(dec);
 		}
-		container.appendChild(document.createElement('br'));
+		container.appendChild(row);
+	}
+	// One prefix or suffix box. `spec` is {value, placeholder, title, onChange}. The VALUE shown is
+	// always the EFFECTIVE one (labelPrefixFor() resolves an unset field to its default), so the box
+	// reads as what the map is actually printing rather than as an empty box beside a label that
+	// visibly carries a letter. Typing into it stores whatever is there, empty string included --
+	// that is the user saying "none", and it is honoured (see defaultLabelSettings()).
+	// `input`, not `change`: a prefix is one or two characters and the map should follow the
+	// keystroke, the way the rest of this panel follows a click.
+	function affixBox(spec) {
+		var box = document.createElement('input');
+		box.type = 'text';
+		box.value = spec.value;
+		box.title = spec.title;
+		box.setAttribute('aria-label', spec.title);
+		box.style.width = '3.5em'; box.style.flex = '0 0 auto';
+		box.addEventListener('input', function () { spec.onChange(box.value); saveToStorage(); refreshLabelText(); });
+		return box;
 	}
 	// Shared with renderLabelsLegend() below -- one place naming which fields exist and what their
 	// checkbox/legend text says, so the popover and the legend can never drift out of sync.
@@ -8462,20 +8511,51 @@ var EngCalcs = EngCalcs || {};
 			if (typeof map[key] !== 'number') { return null; }
 			return { value: map[key], onChange: function (v) { map[key] = v; } };
 		}
+		// The prefix/suffix pair for one row. Both boxes show the EFFECTIVE text (so an untouched
+		// row still displays the default the map is printing) and write into labelSettings, which
+		// is what makes them per-project and what carries them into a saved file.
+		function affixFor(group, key) {
+			return {
+				prefix: {
+					value: labelPrefixFor(group, key),
+					title: pc.lpn_labels_prefix_tip || 'Text printed before this value on the map',
+					onChange: function (v) { labelSettings.prefix[group][key] = v; }
+				},
+				suffix: {
+					value: labelSuffixFor(group, key),
+					title: pc.lpn_labels_suffix_tip || 'Text printed after this value on the map',
+					onChange: function (v) { labelSettings.suffix[group][key] = v; }
+				}
+			};
+		}
 		nodeFieldDefs(pc).forEach(function (f) {
-			labelCheckbox(nodeBox, f[1], lpnFieldColors[f[0]], labelSettings.node[f[0]],
-				function (v) { labelSettings.node[f[0]] = v; }, decimalsFor('node', f[0]));
+			labelCheckbox(nodeBox, f[1], labelSettings.node[f[0]],
+				function (v) { labelSettings.node[f[0]] = v; }, decimalsFor('node', f[0]), affixFor('node', f[0]));
 		});
 		linkFieldDefs(pc).forEach(function (f) {
-			labelCheckbox(linkBox, f[1], lpnFieldColors[f[0]], labelSettings.link[f[0]],
-				function (v) { labelSettings.link[f[0]] = v; }, decimalsFor('link', f[0]));
+			labelCheckbox(linkBox, f[1], labelSettings.link[f[0]],
+				function (v) { labelSettings.link[f[0]] = v; }, decimalsFor('link', f[0]), affixFor('link', f[0]));
 		});
-		// Task 190's toggle: one row, no color swatch and no decimals, sitting below both field lists
-		// because it applies to every field at once rather than to any one row.
+		// Options applying to every field at once, below both field lists rather than on any one row:
+		// Task 190's high/low mark, and Task 333's one blanket separator (Tom, 2026-08-15: "One
+		// blanket separator and individual prefixes and postfixes, of course").
 		if (optBox) {
 			optBox.innerHTML = '';
-			labelCheckbox(optBox, pc.lpn_labels_mark_extrema || 'Mark highest and lowest values', 'inherit',
+			labelCheckbox(optBox, pc.lpn_labels_mark_extrema || 'Mark highest and lowest values',
 				labelSettings.markExtrema, function (v) { labelSettings.markExtrema = v; });
+			var sepRow = document.createElement('div'), sepLabel = document.createElement('span');
+			sepRow.style.display = 'flex'; sepRow.style.alignItems = 'center'; sepRow.style.gap = '6px';
+			sepLabel.textContent = pc.lpn_labels_separator || 'Separator';
+			sepLabel.style.flex = '1 1 auto';
+			sepRow.appendChild(sepLabel);
+			sepRow.appendChild(affixBox({
+				value: labelSeparator(),
+				title: pc.lpn_labels_separator_tip || 'Text between a prefix or suffix and the value. A space by default.',
+				// Stored EXACTLY as typed, spaces included -- a space is the default value of this
+				// very box, so trimming it would delete the setting it exists to hold.
+				onChange: function (v) { labelSettings.separator = v; }
+			}));
+			optBox.appendChild(sepRow);
 		}
 	}
 	function wireLabelsPopup() {
@@ -8483,11 +8563,16 @@ var EngCalcs = EngCalcs || {};
 		// clicking away, by Escape, by its own toolbar button, or by opening another menu/panel.
 		rebuildLabelsFields();
 	}
-	// A color key that survives printing (Tom, 2026-07-30): the Labels popover itself is toolbar
+	// The key that survives printing (Tom, 2026-07-30): the Labels popover itself is toolbar
 	// chrome (d-print-none), so a legend that only lived there would vanish on a printed page --
 	// this renders into #lpn_labels_legend, which is NOT d-print-none, and is kept live by being
 	// called from refreshLabelText() (every toggle change, solve, and unit switch already calls
 	// that). Hidden entirely when no field is toggled on, so it costs nothing by default.
+	// Since Task 333 it keys on the PREFIX/SUFFIX rather than on a colour swatch, so a set the user
+	// has changed is still readable by someone else looking at the sheet -- and it now works in
+	// greyscale, which the colour key never did. A field with neither affix (diameter, length, ID)
+	// is listed with a blank key: it is identified on the map by its unit and by its position in
+	// the stack, which is the same order this list is in.
 	function renderLabelsLegend() {
 		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }
 		var pc = EngCalcs.pageConfig || {}, any = false;
@@ -8508,9 +8593,17 @@ var EngCalcs = EngCalcs || {};
 			h.textContent = headingText;
 			box.appendChild(h);
 			shown.forEach(function (f) {
-				var div = document.createElement('div');
-				div.style.color = lpnFieldColors[f[0]];
-				div.textContent = f[1];
+				var group = fieldSettings === labelSettings.node ? 'node' : 'link',
+					div = document.createElement('div'), key = document.createElement('span'),
+					p = labelPrefixFor(group, f[0]), suf = labelSuffixFor(group, f[0]);
+				div.style.display = 'flex'; div.style.gap = '0.5em';
+				// The key column is fixed-width so the field names line up under each other whether
+				// or not a given row has a prefix -- a ragged left edge is what made the original
+				// horizontal legend unreadable.
+				key.style.minWidth = '2.5em'; key.style.fontWeight = 'bold';
+				key.textContent = p + (p && suf ? '\u2026' : '') + suf;
+				div.appendChild(key);
+				div.appendChild(document.createTextNode(f[1]));
 				box.appendChild(div);
 			});
 		}
@@ -9278,7 +9371,11 @@ var EngCalcs = EngCalcs || {};
 			applyMapHeight();
 			applyLegendPosition();
 			refreshFontSizes();
-			renderLabelsLegend();
+			// refreshLabelText(), not renderLabelsLegend(): resetting labelSettings changes which
+			// fields are printed and what prefix each carries, so the labels themselves have to be
+			// rebuilt -- and that call renders the legend on its way through. Restoring defaults
+			// used to redraw only the legend, which left the map showing the old label set.
+			refreshLabelText();
 			rebuildSettingsFields();
 			rebuildLabelsFields();
 			saveToStorage();
@@ -10442,6 +10539,65 @@ var EngCalcs = EngCalcs || {};
 	// extrema/decoration invariant only requires that two labels printing the SAME text compare equal,
 	// and at that precision two labels printing the same text ARE bit-identical. Nothing to guard.
 	function fieldDecimals(decimals) { return typeof decimals === 'number' ? decimals : 2; }
+	// ---- label prefixes and suffixes (ROADMAP Task 333) ----
+	//
+	// A prefix makes any SUBSET of a stacked label self-describing, which is the whole reason the
+	// per-field colours could go: a bare stack of numbers is only readable while all of it is
+	// present, because taking a line away leaves the reader no way to tell which quantity survived.
+	//
+	// Tom's default set, 2026-08-15 (his own list, 2026-08-14, plus the reading of it below):
+	//   Q flow and demand, V velocity, S gradient, H head, P pressure, E elevation,
+	//   Hl head loss, km minor loss, C/n/e roughness, blank diameter, blank length, blank ID.
+	//
+	// A PREFIX ONLY HAS TO BE UNAMBIGUOUS IN ITS SLOT, not globally unique (Tom, 2026-08-14: "valve
+	// and velocity are okay since different contexts... Pump and Pipe are the same context, but we
+	// are calling them both L; so why not both P? Hah!"). A link's velocity line and a node's
+	// pressure line are different slots, so V and P doing double duty elsewhere costs no reader
+	// anything.
+	//
+	// BLANK FOR DIAMETER AND LENGTH IS DELIBERATE: those are the two a reader identifies from the
+	// magnitude and its unit, so a prefix would be noise on the fields with the least room.
+	//
+	// BLANK FOR ID IS NOT IN TOM'S LIST AND IS THE ONE READING ADDED HERE. His J/R/P/L/V letters are
+	// already on the map: an ID is generated as settings.idPrefixes[key] + n, so a junction is
+	// literally named 'J12'. A label prefix would print 'J J12'. The user who renames their
+	// junctions to '12' can put the J back in this box, which is exactly why the box exists for ID
+	// too rather than being hidden on that row.
+	var LPN_DEFAULT_LABEL_PREFIX = {
+		node: { id: '', demand: 'Q', head: 'H', pressure: 'P', elev: 'E' },
+		link: { id: '', diameter: '', length: '', km: 'km', flow: 'Q', velocity: 'V', headloss: 'Hl', gradient: 'S' }
+	};
+	// Roughness is the one dynamic default: the symbol IS the friction method (C, n or e), so it
+	// follows the method selector rather than being frozen at the moment defaults were built.
+	function labelDefaultPrefix(group, field) {
+		if (group === 'link' && field === 'roughness') { return roughnessSymbol(); }
+		var m = LPN_DEFAULT_LABEL_PREFIX[group] || {};
+		return typeof m[field] === 'string' ? m[field] : '';
+	}
+	function labelDefaultSuffix() { return ''; }
+	// undefined -> the default; '' -> the user's own answer of "none". See defaultLabelSettings().
+	function labelPrefixFor(group, field) {
+		var m = (labelSettings.prefix || {})[group] || {};
+		return typeof m[field] === 'string' ? m[field] : labelDefaultPrefix(group, field);
+	}
+	function labelSuffixFor(group, field) {
+		var m = (labelSettings.suffix || {})[group] || {};
+		return typeof m[field] === 'string' ? m[field] : labelDefaultSuffix();
+	}
+	function labelSeparator() {
+		return typeof labelSettings.separator === 'string' ? labelSettings.separator : ' ';
+	}
+	// Wraps a built line's text in its field's prefix/suffix. Applied HERE, to the finished line,
+	// and never inside numLine()/rawLine(): the extrema comparison upstream of both works on the
+	// rounded NUMBER, so affixing afterwards is what guarantees a prefix can never change which
+	// label gets a tick. Both affixes are skipped when empty -- so is the separator, or a blank
+	// prefix would still push every number one space right.
+	function affix(group, field, line) {
+		var p = labelPrefixFor(group, field), s = labelSuffixFor(group, field), sep = labelSeparator();
+		if (p) { line.text = p + sep + line.text; }
+		if (s) { line.text = line.text + sep + s; }
+		return line;
+	}
 	function displayRound(siValue, unitId, decimals) {
 		if (typeof siValue !== 'number') { return undefined; } // guards a stray NaN contaminating Math.min/max in fieldExtrema
 		var p = Math.pow(10, fieldDecimals(decimals));
@@ -10454,29 +10610,29 @@ var EngCalcs = EngCalcs || {};
 		var p = Math.pow(10, fieldDecimals(decimals));
 		return Math.round(value * p) / p;
 	}
-	// One line of a numeric label field: a bare number, colored per lpnFieldColors (Tom, 2026-07-30:
-	// "make all the labels pure numbers, no units and no prefix/description... color code like we
-	// did for bpn" -- the color-coded checkbox in the Labels popover is the only legend), decorated
+	// One line of a numeric label field: the number alone, decorated
 	// with a high/low tick when it ties the network-wide max/min for that field
-	// (fieldExtrema()/decorationFor() above, drawn by applyExtremaTicks()).
-	// `suffix` is the ONE exception to "no units on a label" (Tom, 2026-08-14: "we are omitting all
-	// other units as excessively redundant, I think that the % is crucial"). It exists for the head
-	// loss gradient and should stay rare: every other field's unit is redundant because the number's
-	// magnitude and the Labels legend already say what it is, but a gradient's two forms differ by
-	// 100x with no other tell -- 0.43 is a plausible reading in BOTH, so "0.43" alone is ambiguous
-	// in a way "0.43%" is not. Extrema still compare the NUMBER, so a suffix never affects which
+	// (fieldExtrema()/decorationFor() above, drawn by applyExtremaTicks()). Whatever names the
+	// quantity is added afterwards by affix(), never here -- see its comment.
+	// `suffix` here is the UNIT-DERIVED one, not the user's: the head loss gradient's '%' (Tom,
+	// 2026-08-14: "we are omitting all other units as excessively redundant, I think that the % is
+	// crucial"). It stays automatic rather than becoming a default in labelSettings.suffix because
+	// it is read from the units strip on every rebuild -- this family also offers plain rise/run,
+	// where the same token would be a lie rather than a redundancy, and 0.43 is a plausible reading
+	// in BOTH forms. A static stored suffix could not follow that switch. The user's own suffix, if
+	// they set one, lands outside this one. Extrema compare the NUMBER, so neither affects which
 	// label gets a tick.
-	function numLine(siValue, unitId, extrema, color, decimals, suffix) {
+	function numLine(siValue, unitId, extrema, decimals, suffix) {
 		var displayValue = displayRound(siValue, unitId, decimals);
-		return { text: displayValue.toFixed(fieldDecimals(decimals)) + (suffix || ''), color: color, decoration: decorationFor(extrema, displayValue) };
+		return { text: displayValue.toFixed(fieldDecimals(decimals)) + (suffix || ''), decoration: decorationFor(extrema, displayValue) };
 	}
 	// Length is declarative, not SI-converted (see the lengthField() comment above: "1 grid unit IS
 	// 1 ft or 1 m, whichever is currently selected, by declaration") -- unlike every other field
 	// here, effective(l,'length') is already in the displayed unit, so this must NOT run it through
 	// unitFactor.
-	function rawLine(value, extrema, color, decimals) {
+	function rawLine(value, extrema, decimals) {
 		var displayValue = plainRound(value, decimals);
-		return { text: displayValue.toFixed(fieldDecimals(decimals)), color: color, decoration: decorationFor(extrema, displayValue) };
+		return { text: displayValue.toFixed(fieldDecimals(decimals)), decoration: decorationFor(extrema, displayValue) };
 	}
 	// Rebuilds every node's and link's map-label text from `labelSettings` + `lastSolveResult`.
 	// Extrema are computed ONCE per field, network-wide, before any label is built, so every
@@ -10545,15 +10701,15 @@ var EngCalcs = EngCalcs || {};
 				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / len, 'lpn_u_gradient', ld.gradient);
 			}))
 		};
-		var fc = lpnFieldColors, nodeLines = {}, linkLines = {};
+		var nodeLines = {}, linkLines = {};
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
 			var lines = [];
 			// Order (Tom, 2026-07-30, thinking physically): ID, Demand, Head, Pressure, Elevation --
 			// demand is the thing the user set as a design target, head/pressure are what the solve
 			// produced from it, and elevation (the input least likely to change page to page) trails.
-			if (ls.node.id) { lines.push({ text: n.id, color: fc.id }); }
-			if (!isFixedHeadNode(n) && ls.node.demand) { lines.push(rawLine(effective(n, 'demand'), extrema.demand, fc.demand, nd.demand)); }
+			if (ls.node.id) { lines.push(affix('node', 'id', { text: n.id })); }
+			if (!isFixedHeadNode(n) && ls.node.demand) { lines.push(affix('node', 'demand', rawLine(effective(n, 'demand'), extrema.demand, nd.demand))); }
 			// Both are already IN Elevation/Head and Pressure units by the time they get here -- the
 			// fixed-head branch because those are declared inputs, the junction branch because the
 			// solve result is converted on the spot. rawLine() then prints what it is given, so the
@@ -10566,9 +10722,9 @@ var EngCalcs = EngCalcs || {};
 			var pressVal = isFixedHeadNode(n)
 				? toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure')
 				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], 'lpn_u_pressure') : undefined);
-			if (ls.node.head && headVal !== undefined) { lines.push(rawLine(headVal, extrema.head, fc.head, nd.head)); }
-			if (ls.node.pressure && pressVal !== undefined) { lines.push(rawLine(pressVal, extrema.pressure, fc.pressure, nd.pressure)); }
-			if (ls.node.elev) { lines.push(rawLine(n.elev, extrema.elev, fc.elev, nd.elev)); }
+			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, extrema.head, nd.head))); }
+			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, extrema.pressure, nd.pressure))); }
+			if (ls.node.elev) { lines.push(affix('node', 'elev', rawLine(n.elev, extrema.elev, nd.elev))); }
 			ne.empty = lines.length === 0; // captured BEFORE the placeholder below -- see hideMask()'s comment
 			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
 			// x here is a placeholder -- layoutNodeLabel() below (after collision avoidance) sets the
@@ -10586,29 +10742,29 @@ var EngCalcs = EngCalcs || {};
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
 			var lines = [];
-			if (ls.link.id) { lines.push({ text: l.id, color: fc.id }); }
+			if (ls.link.id) { lines.push(affix('link', 'id', { text: l.id })); }
 			if (l.type === 'pipe') {
-				if (ls.link.diameter) { lines.push(rawLine(effective(l, 'diameter'), extrema.diameter, fc.diameter, ld.diameter)); }
-				if (ls.link.length) { lines.push(rawLine(effective(l, 'length'), extrema.length, fc.length, ld.length)); }
-				if (ls.link.roughness) { lines.push(rawLine(effective(l, 'roughness'), extrema.roughness, fc.roughness, ld.roughness)); }
-				if (ls.link.km) { lines.push(rawLine(effective(l, 'k') || 0, extrema.km, fc.km, ld.km)); }
+				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), extrema.diameter, ld.diameter))); }
+				if (ls.link.length) { lines.push(affix('link', 'length', rawLine(effective(l, 'length'), extrema.length, ld.length))); }
+				if (ls.link.roughness) { lines.push(affix('link', 'roughness', rawLine(effective(l, 'roughness'), extrema.roughness, ld.roughness))); }
+				if (ls.link.km) { lines.push(affix('link', 'km', rawLine(effective(l, 'k') || 0, extrema.km, ld.km))); }
 			} else if (l.type === 'valve') {
 				// A VALVE PRINTS ITS DIAMETER AND NOTHING ELSE FROM THIS GROUP. Length and
 				// roughness do not exist on it, and its loss lives in a SETTING whose meaning
 				// changes with the type -- so a bare number beside a pipe's k would be read as the
 				// same quantity when it is a pressure or a flow. The setting belongs in the popup,
 				// where it is labelled, until a label toggle of its own is worth 26 translations.
-				if (ls.link.diameter) { lines.push(rawLine(effective(l, 'diameter'), extrema.diameter, fc.diameter, ld.diameter)); }
+				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), extrema.diameter, ld.diameter))); }
 			}
 			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
-				if (ls.link.flow) { lines.push(numLine(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow', extrema.flow, fc.flow, ld.flow)); }
+				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow', extrema.flow, ld.flow))); }
 				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
-				if (ls.link.velocity && l.type !== 'pump') { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity, ld.velocity)); }
-				if (ls.link.headloss) { lines.push(numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), 'lpn_u_elevhead', extrema.headloss, fc.headloss, ld.headloss)); }
+				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, ld.velocity))); }
+				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), 'lpn_u_elevhead', extrema.headloss, ld.headloss))); }
 				// The '%' is read from the SELECT, not assumed: this family offers rise/run too, and
 				// a "%" on a ratio would be a lie rather than a redundancy. Blank in that form --
 				// there is no token for a bare ratio that is shorter than the ambiguity it fixes.
-				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), 'lpn_u_gradient', extrema.gradient, fc.gradient, ld.gradient, gradientSuffix())); }
+				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), 'lpn_u_gradient', extrema.gradient, ld.gradient, gradientSuffix()))); }
 			}
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }

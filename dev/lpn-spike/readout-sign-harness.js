@@ -85,14 +85,19 @@ const ls = L.labelSettings();
 Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'flow' || k === 'headloss'); });
 L.refreshLabelText();
 
-const negLabels = pipes.filter(function (l) { return L.linkLabel(l.id).some(function (t) { return /^-/.test(t); }); });
+// Since Task 333 a label line reads "<prefix><separator><number>", so the sign and the magnitude
+// live PAST the prefix. Everything below tests the number, which is what carries the sign -- a
+// regex anchored at the start of the whole line would now pass vacuously on every label.
+function numberPart(text) { return String(text).replace(/^[^0-9+\-.]*/, ''); }
+
+const negLabels = pipes.filter(function (l) { return L.linkLabel(l.id).some(function (t) { return /^-/.test(numberPart(t)); }); });
 ok('no pipe label prints a minus sign', negLabels.length === 0,
 	negLabels.map(function (l) { return l.id + ': ' + L.linkLabel(l.id).join('/'); }).join('  '));
 ok('...and the numbers are the magnitudes, not zeroed or dropped',
-	reversed.every(function (l) { return L.linkLabel(l.id).some(function (t) { return parseFloat(t) > 0; }); }),
+	reversed.every(function (l) { return L.linkLabel(l.id).some(function (t) { return parseFloat(numberPart(t)) > 0; }); }),
 	reversed.map(function (l) { return l.id + ': ' + L.linkLabel(l.id).join('/'); }).join('  '));
 ok('a PUMP still shows its negative head loss -- that sign is a head gain, not drawing order',
-	pumps.every(function (l) { return L.linkLabel(l.id).some(function (t) { return /^-/.test(t); }); }),
+	pumps.every(function (l) { return L.linkLabel(l.id).some(function (t) { return /^-/.test(numberPart(t)); }); }),
 	pumps.map(function (l) { return l.id + ': ' + L.linkLabel(l.id).join('/'); }).join('  '));
 
 // ---- 2. The POPUP, which is the canonical results location ---------------------------------

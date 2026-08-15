@@ -506,39 +506,10 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - `dev/lpn-spike/inp-import-harness.js` asserts the nondeterminism **inverted, as a known defect**,
     so whoever fixes this is told by a failing check to flip it.
 
-- 65|333| **Label value prefixes (`P=`, `Q=`) and a hide-last priority order.** Tom, 2026-08-14,
-  proposing them alongside aligned pipe labels: *"we can implement label prefixes P=, Q= etc… and
-  maybe priorities for labels to hide last"*.
-  - **The two belong together because they answer the same question at different budgets.** A stack
-    of bare numbers is only readable while all of it is present — take a line away and the reader
-    cannot tell which quantity survived. Prefixes make any SUBSET self-describing, which is what
-    makes a priority order safe to act on.
-  - Prefix strings are per-field and translatable (`Q` is `Q` everywhere, but not every symbol is).
-    They interact with Task 331's visibility threshold and with aligned labels (Task 329): a rotated
-    label lying along a pipe has less room, so it wants the shortest self-describing form there is.
-  - **PREFIXES REPLACE THE PER-FIELD LABEL COLOURS — that is the point, not a side effect** (Tom,
-    2026-08-14: *"Exchange label colors for prefixes specified in settings and in legend"*). It is
-    the same trade as turning pumps and reservoirs black on the same day: colour is the budget being
-    saved for MEANING, and Task 327's colour-by-value view is what spends it. A prefix also works in
-    greyscale, on a printed sheet, and for a colour-blind reader — none of which the colour key does.
-  - **Tom's default set**, 2026-08-14: `L` pipe or pump ID, `V` valve, `J` node ID, `R` reservoir ID,
-    `P` pump ID, `Q` flow or demand, `V` velocity, `S` head-loss gradient (% or blank), `H` head,
-    `P` pressure, `E` elevation, blank diameter, blank length, `C`/`n`/`f` roughness (whichever the
-    current method uses), `km`, `Hl`.
-  - **THE COLLISION I FLAGGED WAS OVERSTATED, and Tom's dismissal is the more useful rule**
-    (2026-08-14: *"valve and velocity are okay since different contexts… Pump and Pipe are the same
-    context, but we are calling them both L; so why not both P? Hah!"*). **A prefix has to be
-    unambiguous IN ITS SLOT, not globally unique.** A link's ID line and its velocity line are
-    different slots, so `V` in both costs a reader nothing — and the proof was already shipped and
-    unremarked: a pipe and a pump are the same kind of thing in the same slot and have shared `L` all
-    along without anyone minding, which is exactly why either letter would do. Global uniqueness is
-    what a naming scheme reaches for when nobody has asked what the reader actually has to tell apart.
-  - **A blank prefix for diameter and length is deliberate and worth keeping**: those are the two a
-    reader identifies by their units, so a prefix is noise on the fields with least room.
-  - Prefixes are editable in settings and shown in the legend, so a set the user has changed is still
-    readable by someone else looking at the sheet.
-  - **The gradient already prints a trailing `%` of its own** (2026-08-14, `gradientSuffix()`), so it
-    is the one field whose prefix competes with a token already on the line.
+- 55|343| **Priority order for hiding label lines when they do not fit.** The other half of Task
+  333: with prefixes shipped, any SUBSET of a stack is self-describing, so dropping a line is now
+  safe. Interacts with Task 331's visibility threshold and Task 329's aligned labels, where a
+  rotated label has the least room.
 
 - 78|334| **One `.lpn-annotation` class, declared where an element is built, instead of a selector
   list in the stylesheet.** Task 331 hides generated annotation by naming each kind in CSS, and the
@@ -2136,6 +2107,40 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|333| **Label prefixes, suffixes and one blanket separator — SHIPPED 2026-08-15, and the label
+  COLOURS are gone with them.** Tom: *"(1) Let people specify label prefix and postfix/suffix in the
+  Labels box. (2) No more label colors."* Every field's line is now `<prefix><sep><number><sep><suffix>`,
+  all three editable per project in the Labels box, and the legend keys on the prefix instead of a
+  colour swatch. Harness: `dev/lpn-spike/label-affix-harness.js`.
+  - **Defaults**: `Q` flow and demand, `V` velocity, `S` gradient, `H` head, `P` pressure, `E`
+    elevation, `Hl` head loss, `km` minor loss, `C`/`n`/`e` roughness (the one dynamic default — it
+    follows the friction method at print time, which a stored letter could not), blank diameter and
+    length. Separator defaults to a space, so `Q=12.5` is one keystroke rather than fifteen edited
+    prefixes.
+  - **Blank for ID is the one reading added to Tom's list**: his `J`/`R`/`P`/`L`/`V` letters are
+    already on the map, because an ID is generated as `settings.idPrefixes[key] + n`. A prefix there
+    would print `J J12`. The box still exists on that row for the user who renames their junctions.
+  - **UNSET IS NOT EMPTY, and that distinction is the whole storage design.** A field with no stored
+    affix takes its default; a field storing `''` has been told to print nothing. Collapse the two
+    and a prefix cannot be turned off — it refills itself on the next rebuild. Same for the
+    separator, whose own default is a space, so the test is on the TYPE and never on truthiness.
+  - **The gradient's `%` stays automatic and lands INSIDE any user suffix.** It is read from the
+    units strip on every rebuild because that family also offers plain rise/run, where the token
+    would be a lie; a stored suffix could not follow the switch.
+  - Extrema badges compare the rounded NUMBER, so affixes are applied to the finished line, after
+    the comparison. The harness asserts the same pipes are marked with affixes as without.
+  - **A prefix only has to be unambiguous IN ITS SLOT** (Tom, 2026-08-14: *"valve and velocity are
+    okay since different contexts… Pump and Pipe are the same context, but we are calling them both
+    L; so why not both P? Hah!"*), which is why `V` and `P` doing double duty across groups costs
+    nothing.
+  - Four new English keys (`lpn_labels_prefix_tip`, `lpn_labels_suffix_tip`, `lpn_labels_separator`,
+    `lpn_labels_separator_tip`) are in the standing translation delta. The prefix STRINGS themselves
+    are variable symbols and are not translated: they are user-editable per project, which is a
+    better answer for a non-English user than 405 new strings.
+  - **Not done here: the hide-last priority order** the original task paired with prefixes. Prefixes
+    were the half that makes a priority order safe (any subset is self-describing); the order itself
+    is now Task 343.
 
 - 0|304| **The project file's NAME and EXTENSION — CLOSED 2026-08-14, ratified by Tom.** The
   answer is *not an extension*: stay on `.json`, shorten the suffix to `-lpn`, and put the identity

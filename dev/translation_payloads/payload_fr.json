@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 947,
-        "delta_key_count": 33,
+        "expected_key_count": 951,
+        "delta_key_count": 37,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_depthFrac",
@@ -368,6 +368,10 @@
         "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
         "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
         "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.",
+        "lpn_labels_prefix_tip": "Text printed before this value on the map",
+        "lpn_labels_suffix_tip": "Text printed after this value on the map",
+        "lpn_labels_separator": "Separator",
+        "lpn_labels_separator_tip": "Text between a prefix or suffix and the value. A space by default.",
         "lpn_settings_link_width": "Pipe width (pixels)",
         "lpn_settings_align_labels": "Align pipe labels with pipes",
         "lpn_settings_label_max_width": "Show labels when the map is narrower than",
@@ -403,6 +407,10 @@
         "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
         "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
         "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.",
+        "lpn_labels_prefix_tip": "Text printed before this value on the map",
+        "lpn_labels_suffix_tip": "Text printed after this value on the map",
+        "lpn_labels_separator": "Separator",
+        "lpn_labels_separator_tip": "Text between a prefix or suffix and the value. A space by default.",
         "lpn_settings_link_width": "Pipe width (pixels)",
         "lpn_settings_align_labels": "Align pipe labels with pipes",
         "lpn_settings_label_max_width": "Show labels when the map is narrower than",
@@ -855,6 +863,70 @@
                     "key": "lpn_diag_valve_needs_epanet",
                     "value": "Ces vannes s'ouvrent et se ferment d'elles-mêmes, et seul le solveur EPANET peut les calculer. Le solveur EPANET n'a pas pu être chargé, donc ces résultats sont manquants :",
                     "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_labels_prefix_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "Repérer les valeurs les plus hautes et les plus basses",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Image de fond...",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_labels_suffix_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "Repérer les valeurs les plus hautes et les plus basses",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Image de fond...",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_labels_separator": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "Repérer les valeurs les plus hautes et les plus basses",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Image de fond...",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_labels_separator_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "Repérer les valeurs les plus hautes et les plus basses",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Image de fond...",
+                    "english": "Background image…"
                 }
             }
         },

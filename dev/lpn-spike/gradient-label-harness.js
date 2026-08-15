@@ -30,6 +30,12 @@ const L = loadLoopedNetwork(
 	"\t\t\trubberBandEl = el('line', {}, world); },\n"
 );
 
+// Since Task 333 a label line is "<prefix><separator><number><unit suffix>", and the gradient's
+// default prefix is 'S'. The number is still the thing under test here, so it is read past the
+// prefix rather than by loosening the assertions -- a '%' still has to be the LAST thing on the
+// line, and the digits still have to be the ratio form times 100.
+function labelNumber(text) { return parseFloat(String(text).replace(/^[^0-9+-]*/, '')); }
+
 let fails = 0;
 function ok(name, cond, extra) {
 	if (cond) { console.log('  ok   ' + name); return; }
@@ -70,7 +76,7 @@ ok('every pipe prints exactly one gradient line', pipes.every(function (l) { ret
 ok('...and it ends in %', pct.every(function (t) { return /%$/.test(t); }), JSON.stringify(pct));
 // The suffix must be an ADDITION, not a reformat: the digits ahead of it are what the ratio form
 // prints times 100, at the same per-field decimals.
-const pctNums = pct.map(function (t) { return parseFloat(t); });
+const pctNums = pct.map(labelNumber);
 ok('...on a real number, not an empty one', pctNums.every(function (v) { return isFinite(v); }), JSON.stringify(pct));
 
 ok('the units strip offers the ratio form too', setGradientUnit('grade'));
@@ -78,7 +84,7 @@ L.refreshLabelText();
 const raw = pipes.map(function (l) { return L.linkLabel(l.id)[0]; });
 ok('the ratio form carries NO suffix -- a % there would be a lie',
 	raw.every(function (t) { return !/%/.test(t); }), JSON.stringify(raw));
-const rawNums = raw.map(function (t) { return parseFloat(t); });
+const rawNums = raw.map(labelNumber);
 ok('...and is the same quantity, 100x smaller',
 	rawNums.every(function (v, i) { return Math.abs(v * 100 - pctNums[i]) < 0.51 * Math.pow(10, -2); }),
 	JSON.stringify(raw) + ' vs ' + JSON.stringify(pct));
