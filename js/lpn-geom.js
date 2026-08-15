@@ -256,6 +256,19 @@ EngCalcs.lpnGeom = (function () {
 	// correct, because "the side with least congestion" is not a new algorithm -- it is
 	// runLabelCollisionAvoidance() being handed two positions instead of one.
 	//
+	// **WHERE THE FLIP HAPPENS IS `opts.bias`, AND THE DEFAULT OF 90 IS THE WORST PLACE FOR IT**
+	// (Tom, 2026-08-15: a "readability bias angle", default 110). The normalisation window is
+	// (bias - 180, bias], so at the natural-looking 90 the decision boundary sits exactly on
+	// VERTICAL -- which is where street mains, risers and property services actually are. Two
+	// parallel vertical pipes drawn in opposite directions then land either side of the knife
+	// edge and their labels read in opposite directions, for a difference of a tenth of a degree
+	// that nobody can see. Moving the doorway to 110 puts it 20 degrees past vertical, so the
+	// whole near-vertical cluster falls on one side of it and reads the same way.
+	//
+	// The cost of moving it is that a pipe between 90 and `bias` renders text tilted past vertical
+	// (at 110, twenty degrees past), which is a head-tilt to read but never upside down. That is
+	// the trade the number expresses, which is why it is a setting rather than a constant.
+	//
 	// Returns the first line's baseline anchor in UNROTATED map coordinates, so the renderer can
 	// draw a plain rotated text block:
 	//
@@ -274,14 +287,18 @@ EngCalcs.lpnGeom = (function () {
 			lh = opts.lineHeight || fontSize,
 			nLines = Math.max(1, opts.nLines || 1),
 			side = opts.side === -1 ? -1 : 1,
+			bias = typeof opts.bias === 'number' && isFinite(opts.bias) ? opts.bias : 90,
 			dx = bx - ax,
 			dy = by - ay,
 			deg = Math.atan2(dy, dx) * 180 / Math.PI,
 			flipped = false;
 		// A zero-length link has no direction; treat it as horizontal rather than returning NaN.
 		if (!dx && !dy) { deg = 0; }
-		if (deg > 90 || deg <= -90) { deg += 180; flipped = true; }
+		// The readable window is (bias - 180, bias]. Anything outside it turns 180 degrees, which
+		// is the same line read from the other end.
+		if (deg > bias || deg <= bias - 180) { deg += 180; flipped = true; }
 		if (deg > 180) { deg -= 360; }
+		if (deg <= -180) { deg += 360; }
 		var rad = deg * Math.PI / 180,
 			// Unit normal pointing UP-SCREEN (SVG y grows downward, and cos(deg) >= 0 after the
 			// flip, so this component is always <= 0 -- i.e. always the top).

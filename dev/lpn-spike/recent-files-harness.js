@@ -210,6 +210,21 @@ async function run() {
 		report(s._opened.length === 0, 'a row with no handle opens nothing');
 	}
 
+	// --- WHERE THE LIST SITS IN THE MENU ---------------------------------------
+	// Tom, 2026-08-15: "File, Save needs to be more handy. It appears after Recents. Put Recents
+	// last." The list GROWS, and every row it grows used to push Save further down a menu Save is
+	// the most-used row of. That makes its position a real decision rather than a layout detail,
+	// so it is asserted rather than left to whoever next edits this menu.
+	{
+		const menu = extract('openFileMenu');
+		const save = menu.indexOf('lpn_file_save ||');
+		const recents = menu.lastIndexOf('recentRows');
+		report(save > 0 && recents > save, 'Recent files are concatenated AFTER Save, not before it',
+			'save@' + save + ' recents@' + recents);
+		report(!/\.concat\(recentRows/.test(menu),
+			'...and nothing puts them back in the middle of the menu');
+	}
+
 	console.log(`\n${checks - failures}/${checks} checks passed`);
 	process.exit(failures ? 1 : 0);
 }

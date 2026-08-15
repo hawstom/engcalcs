@@ -50,6 +50,43 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
+- 85|354| **A pipe VANISHES when you zoom in far on a model with real survey coordinates.** Tom,
+  2026-08-15, on Elm Street: P11 gone, its five repeated labels still drawn along exactly where it
+  should be, P9 beside it drawn normally.
+  - **The labels being right is the diagnosis.** They are positioned from the same coordinates the
+    polyline is, so the arithmetic is fine and what failed is the RASTERISER.
+  - **Elm Street is in state plane: x ≈ 579,350, y ≈ 1,304,070.** Float32 spacing at that magnitude
+    is 0.0625 world units. A pipe's stroke is `linkWidth / scale` world units (3 px at the shipped
+    default), so past **scale ≈ 48** the stroke is thinner than the coordinate resolution. Position
+    error measured the same way: 0.8 px at scale 10, 12 px at 200, 32 px at MAX_SCALE 500.
+  - **TWO CANDIDATE CAUSES AND THEY HAVE DIFFERENT FIXES**, which is why this is not built yet:
+    (a) the stroke outline collapses → `vector-effect: non-scaling-stroke` and pixel stroke widths
+    fixes it, contained; (b) the whole path is culled for enormous device bounds → only a RENDER
+    ORIGIN fixes it (subtract a per-document offset from every coordinate written to the DOM,
+    keeping the document's true coordinates).
+  - **THE EXPERIMENT THAT DECIDES IT TAKES TEN SECONDS**: zoom in until P11 disappears, then raise
+    Settings ▸ Map ▸ Pipe width to 20. If the pipe comes back it is the stroke and the fix is (a).
+    If it stays gone it is the coordinates and the fix is (b).
+  - Only affects models far from the origin. Our own examples sit at ~5,000 and Net1/2/3 at 0-100,
+    which is why this never showed until a real client model was imported — and it is exactly the
+    class of model LibreEPANET.org exists for, so it gates nothing formally but it should.
+
+- 60|353| **Find elements by searching for them.** Tom, 2026-08-15. One text input, an "Elements to
+  search" pull-down (all / junctions / pipes / …) and a Condition pull-down, roughly the shape of a
+  Google Sheets filter. Start there rather than with a query language.
+  - The obvious first conditions are contains / equals on an ID, and greater-than / less-than on a
+    numeric property (pressure, velocity, diameter, demand). The result wants to select and zoom to
+    the element, not just list it.
+  - Interacts with Task 346 (an extrema mark shared by a dozen tied elements): both are ways of
+    asking "which elements are interesting", and a search that can answer "velocity > 5" makes the
+    mark's job smaller.
+
+- 50|355| **[H] Long labels and short pipes.** Tom raised it 2026-08-15 as five words and no more;
+  the question of WHAT should happen is open and is his to answer. What exists today:
+  `linkLabelTooShort()` hides a link's whole label when the pipe is shorter than the label box
+  times `SHORT_LINE_MULT`, which is all-or-nothing. Candidates if he wants them: drop lines by
+  priority (Task 343), shrink the label, let it overrun the pipe, or put it on a leader.
+
 - 15|294|[H] **Decide the 7 remaining dead language keys, one each.** `menu_main_list`,
   `menu_main_language`, `mi_d50in`, `mpf_spreadheet_notice` (key name is misspelled too),
   `wi_save_and_calculate`, `or_shape`, `contact_title` — rendered by nothing, 27 translated strings
@@ -1779,6 +1816,21 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|351| **A readability-bias angle for aligned pipe labels — DONE 2026-08-15.**
+  `settings.labelReadabilityBias`, default **110 degrees**, in Settings ▸ Map under the align
+  checkbox; clamped 90..135 where it is read. The flip window is `(bias - 180, bias]`, and **90 is
+  the worst possible place for it**: the boundary sits exactly on vertical, where mains are, so two
+  pipes a tenth of a degree either side of vertical read in opposite directions. 110 moves the
+  doorway 20 degrees past the crowd. The cost is that a pipe between 90 and the bias renders tilted
+  past vertical — a head-tilt, never upside down. Four checks in `geom-harness.js` measure exactly
+  that pair before and after.
+
+- 0|352| **Recent files go LAST in the File menu — DONE 2026-08-15.** Tom: *"File, Save needs to be
+  more handy. It appears after Recents. Put Recents last."* The list grows, and every row it grows
+  pushed Save further down a menu Save is the most-used row of. The old placement (under Open…, per
+  thirty years of File menus) was an argument from convention that using the menu answered. Asserted
+  in `recent-files-harness.js` so the next edit cannot quietly undo it.
 
 - 0|329| **Pipe labels aligned ALONG the pipe, GIS-style — SHIPPED ON 2026-08-15.** Tom, after a day
   with it behind a setting: *"Ship with it on. Very much earns its keep."* `settings.alignPipeLabels`

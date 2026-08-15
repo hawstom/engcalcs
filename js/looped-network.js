@@ -411,6 +411,14 @@ var EngCalcs = EngCalcs || {};
 	// horizontally beside it. A DRAGGED label always opts out: the user placed it, and rotating what
 	// they positioned by hand would overrule a deliberate act -- alignment is what we do when nobody
 	// has said otherwise. See ROADMAP Task 329.
+	// Clamped where it is READ, not where it is written, so a document carrying a wild number from
+	// some future edit still draws something readable rather than upside-down text.
+	var LPN_BIAS_MIN = 90, LPN_BIAS_MAX = 135;
+	function labelReadabilityBias() {
+		var b = +settings.labelReadabilityBias;
+		if (!isFinite(b)) { return 110; }
+		return Math.max(LPN_BIAS_MIN, Math.min(LPN_BIAS_MAX, b));
+	}
 	function linkLabelAligned(l) {
 		return !!settings.alignPipeLabels && l.lx === undefined && l.ly === undefined;
 	}
@@ -543,7 +551,10 @@ var EngCalcs = EngCalcs || {};
 			opt = {
 				frac: 0, gap: nodeRadius({ type: 'junction' }) + effectiveFontSize() * 0.35,
 				fontSize: effectiveFontSize(), lineHeight: effectiveLineHeight(),
-				nLines: le.lineCount || 1
+				nLines: le.lineCount || 1,
+				// Where the 180-degree readability flip happens (Task 351). See
+				// alignedLabelAnchor() for why 90 is the worst possible place for it.
+				bias: labelReadabilityBias()
 			},
 			// Both candidates come from the same call, which is why alignedLabelAnchor() returns
 			// a side rather than choosing one -- see ROADMAP Task 329.
@@ -1630,6 +1641,13 @@ var EngCalcs = EngCalcs || {};
 			// aligned-vs-horizontal on a real drawing rather than have the judgement made for him,
 			// and his verdict was *"Ship with it on. Very much earns its keep."*
 			alignPipeLabels: true,
+			// The angle at which an aligned label turns 180 degrees to stay readable, in degrees
+			// (Tom, 2026-08-15). The window is (bias - 180, bias], so 90 puts the decision boundary
+			// exactly on vertical -- where most mains are -- and two parallel vertical pipes drawn
+			// in opposite directions get labels reading opposite ways. 110 moves that doorway past
+			// the crowd. Clamped to 90..135 by labelReadabilityBias(): below 90 the window excludes
+			// horizontal, and well past 135 the text is more upside down than not.
+			labelReadabilityBias: 110,
 			// Draw the pale background patch behind every label (ROADMAP Task 330). ON, which is
 			// what the page has always done and what keeps a label legible over a backdrop image --
 			// the control exists because a clean drawing with no backdrop reads better without the
@@ -6898,11 +6916,17 @@ var EngCalcs = EngCalcs || {};
 	function openFileMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
 		var linked = isLinked(id), api = fileApiAvailable();
-		// Recent files sit directly under Open…, which is where thirty years of File menus have put
-		// them, and are simply ABSENT when there are none -- an empty "Recent files" heading over
-		// nothing teaches the user only that the feature does not work yet. They cannot appear at all
-		// without the File System Access API, because a browser with no handle to keep has nothing to
-		// remember: there, opening a file is an upload and there is no way back to it.
+		// **RECENT FILES GO LAST, BELOW EVERYTHING** (Tom, 2026-08-15: *"File, Save needs to be more
+		// handy. It appears after Recents. Put Recents last."*). This block used to sit directly
+		// under Open…, on the argument that thirty years of File menus put it there -- and the
+		// argument was answered by using the menu: a recents list grows, and every row it grows
+		// pushes SAVE further down a menu that Save is the most-used row of. A convention about
+		// where a list goes does not outrank the cost it imposes on the command above it.
+		//
+		// Still ABSENT when there are none -- an empty "Recent files" heading over nothing teaches
+		// the user only that the feature does not work yet. They cannot appear at all without the
+		// File System Access API, because a browser with no handle to keep has nothing to remember:
+		// there, opening a file is an upload and there is no way back to it.
 		var recentRows = [];
 		if (api && recentFiles.length) {
 			recentRows.push({ separator: true });
@@ -6939,7 +6963,7 @@ var EngCalcs = EngCalcs || {};
 			// the same word would promise a round trip we cannot make. Import says what it is.
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file (.inp)…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile }
-		].concat(recentRows, [
+		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser** (Tom, 2026-08-04, overruling the
 			// first version: *"'Download a copy' is a mistake, and the menu item we want is
@@ -6997,7 +7021,7 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'revert', label: pc.lpn_file_revert || 'Revert', fn: revertCurrent, disabled: !(linked && entry && entry.dirty) },
 			{ separator: true },
 			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
-		]));
+		], recentRows));
 	}
 	// ---- The menu bar (ROADMAP Task 211, 2026-08-04) ----
 	// Every command on this page is reachable from here. The toolbar below is the high-use subset,
@@ -9469,6 +9493,21 @@ var EngCalcs = EngCalcs || {};
 			relayoutLabels(); saveToStorage();
 		});
 		row(mapBody, pc.lpn_settings_align_labels || 'Align pipe labels with pipes', alignInput);
+		// Task 351, and it belongs directly under the checkbox it only means anything for. A number
+		// rather than a checkbox because the right value depends on the drawing: a subdivision of
+		// north-south mains wants the doorway well clear of vertical, and a diagonal transmission
+		// main barely cares.
+		var biasInput = document.createElement('input');
+		biasInput.type = 'number'; biasInput.step = '5'; biasInput.min = LPN_BIAS_MIN; biasInput.max = LPN_BIAS_MAX;
+		biasInput.value = labelReadabilityBias();
+		biasInput.addEventListener('change', function () {
+			var v = +biasInput.value;
+			if (!isFinite(v)) { biasInput.value = labelReadabilityBias(); return; }
+			settings.labelReadabilityBias = Math.max(LPN_BIAS_MIN, Math.min(LPN_BIAS_MAX, v));
+			biasInput.value = settings.labelReadabilityBias;
+			relayoutLabels(); saveToStorage();
+		});
+		row(mapBody, pc.lpn_settings_readability_bias || 'Flip labels to stay readable past (degrees)', biasInput);
 		// Task 330, and it ships ON because that is what the page has always drawn -- a label over a
 		// backdrop image is unreadable without it, and an upgrade must not restyle anyone's drawing.
 		var maskInput = document.createElement('input');
