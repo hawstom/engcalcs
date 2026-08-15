@@ -186,7 +186,11 @@ console.log('\n-- the map fits the window instead of guessing 72% of it --');
 	report(/flowBelowMap\(\)/.test(body), 'it subtracts what genuinely sits below the canvas');
 	report(/rect\.top \+ \(window\.pageYOffset/.test(body), 'and what sits above it');
 	report(/Math\.max\(LPN_MAP_MIN/.test(body), 'with a floor, so a short screen still gets a usable map');
-	report(/Math\.min\(settings\.mapHeight/.test(body), 'and the user’s own setting still caps it');
+	// The "Map height" setting was removed on 2026-08-14 once the map filled the window by itself
+	// (Tom: "So Map height is now obsolete. Right?"). dev/lpn-spike/map-height-harness.js owns the
+	// assertions about its absence; what matters here is that nothing caps the fit again, because a
+	// stored 500 holding the map short of a 900px window reads as a layout bug, not a preference.
+	report(!/settings\.mapHeight/.test(body), 'and no stored height caps the fit any more');
 	// THE STRUCTURAL GUARANTEE. `above` is at least the header's height and is always > 0, so the
 	// computed room is always strictly less than the viewport — the canvas can never be as tall as
 	// the screen, which is the precondition of the touch trap. It is prevented by construction now

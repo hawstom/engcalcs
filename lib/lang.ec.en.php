@@ -1851,6 +1851,16 @@ $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';
 $ec_lang['lpn_settings_backdrop_opacity']='Background image opacity (0 to 1)';
 $ec_lang['lpn_settings_map_display']='Map appearance';
 $ec_lang_syn['lpn_settings_map_display']='How the map looks (appearance, style, the way it is drawn) — sizes, opacity, position.';
+// PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
+// to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
+// LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
+// will list them; that is expected and they are kept on purpose, because restoring a settings row
+// is cheap and recovering 27 translations is not.
+//
+// **IF THE ROW EVER COMES BACK, REWRITE THE TIP FIRST -- it is now FALSE in all 27 languages.** It
+// promises "part of the page is always left to scroll", which is the exact behaviour the fit-the-
+// window change removed. Reusing it as-is would ship a confident wrong explanation everywhere at
+// once, which is worse than having no tip at all.
 $ec_lang['lpn_settings_map_height_px']='Map height (screen pixels)';
 // The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
 // own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.

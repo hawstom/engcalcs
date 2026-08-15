@@ -51,9 +51,6 @@ function constant(name) {
 }
 
 const LPN_MAP_MIN = constant('LPN_MAP_MIN');
-const LPN_MAP_FIT = constant('LPN_MAP_FIT');
-const LPN_MAP_SHIPPED_DEFAULTS = JSON.parse(
-	(src.match(/var LPN_MAP_SHIPPED_DEFAULTS = (\[[^\]]*\])/) || [])[1]);
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -64,14 +61,13 @@ function report(ok, label, detail) {
 
 // A fake page: `above` px of chrome over the canvas, `realBelow` px of genuine content under it.
 // The canvas's own height is the thing being solved for.
-function makeWorld(vh, above, realBelow, mapHeight) {
+function makeWorld(vh, above, realBelow) {
 	const state = { H: 500 };
 	const svg = {
 		getBoundingClientRect() {
 			return { top: above, bottom: above + state.H, height: state.H };
 		}
 	};
-	const settings = { mapHeight: mapHeight };
 	const window = { innerHeight: vh, pageYOffset: 0 };
 	const document = {
 		documentElement: {
@@ -85,10 +81,10 @@ function makeWorld(vh, above, realBelow, mapHeight) {
 			}
 		}
 	};
-	const scope = { svg, settings, window, document, LPN_MAP_MIN, LPN_MAP_FIT, state };
-	const fn = new Function('svg', 'settings', 'window', 'document', 'LPN_MAP_MIN', 'LPN_MAP_FIT',
+	const scope = { svg, window, document, LPN_MAP_MIN, state };
+	const fn = new Function('svg', 'window', 'document', 'LPN_MAP_MIN',
 		extract('flowBelowMap') + '\n' + extract('effectiveMapHeight') + '\nreturn effectiveMapHeight;');
-	state.effective = fn(svg, settings, window, document, LPN_MAP_MIN, LPN_MAP_FIT);
+	state.effective = fn(svg, window, document, LPN_MAP_MIN);
 	return scope;
 }
 // One "browser pass": measure with the current height applied, then apply the answer.
@@ -104,7 +100,7 @@ function settle(world, passes) {
 
 console.log('\n-- it converges, and it converges immediately --');
 {
-	const w = makeWorld(900, 300, 0, LPN_MAP_FIT);
+	const w = makeWorld(900, 300, 0);
 	const seen = settle(w, 6);
 	report(new Set(seen.slice(1)).size === 1, 'the height stops moving after the first pass', seen.join(' -> '));
 	// THE REGRESSION TEST FOR THE CIRCULAR BUG: a monotonically shrinking series is exactly what
@@ -116,7 +112,7 @@ console.log('\n-- it converges, and it converges immediately --');
 console.log('\n-- and it settles with the page exactly filling the window --');
 [[900, 300, 0], [768, 260, 0], [1200, 340, 0], [900, 300, 40]].forEach(function (c) {
 	const [vh, above, below] = c;
-	const w = makeWorld(vh, above, below, LPN_MAP_FIT);
+	const w = makeWorld(vh, above, below);
 	settle(w, 4);
 	const total = above + w.state.H + below;
 	report(total <= vh && total >= vh - 10,
@@ -131,7 +127,7 @@ console.log('\n-- the trap it was written for cannot come back --');
 	// gesture landing on the canvas), and it is now prevented by construction rather than by a
 	// chosen fraction.
 	[[640, 120, 0], [900, 300, 0], [1400, 200, 0]].forEach(function (c) {
-		const w = makeWorld(c[0], c[1], c[2], LPN_MAP_FIT);
+		const w = makeWorld(c[0], c[1], c[2]);
 		settle(w, 4);
 		report(w.state.H < c[0], `vh=${c[0]}: the canvas is never viewport-tall`, `${w.state.H} < ${c[0]}`);
 	});
@@ -139,8 +135,8 @@ console.log('\n-- the trap it was written for cannot come back --');
 
 console.log('\n-- real content below shrinks the map to keep itself reachable --');
 {
-	const bare = makeWorld(900, 300, 0, LPN_MAP_FIT); settle(bare, 4);
-	const withFooter = makeWorld(900, 300, 120, LPN_MAP_FIT); settle(withFooter, 4);
+	const bare = makeWorld(900, 300, 0); settle(bare, 4);
+	const withFooter = makeWorld(900, 300, 120); settle(withFooter, 4);
 	report(withFooter.state.H === bare.state.H - 120,
 		'adding 120px under the map takes exactly 120px off it',
 		`${bare.state.H} -> ${withFooter.state.H}`);
@@ -150,7 +146,7 @@ console.log('\n-- real content below shrinks the map to keep itself reachable --
 
 console.log('\n-- a short screen keeps a usable map even if that means scrolling --');
 {
-	const w = makeWorld(420, 300, 60, LPN_MAP_FIT);
+	const w = makeWorld(420, 300, 60);
 	settle(w, 4);
 	report(w.state.H === LPN_MAP_MIN, 'the floor holds', `${w.state.H} = LPN_MAP_MIN`);
 	// And the trap still cannot occur, because a floor well under any real viewport leaves plenty
@@ -158,28 +154,29 @@ console.log('\n-- a short screen keeps a usable map even if that means scrolling
 	report(w.state.H < 420, 'and the canvas is still shorter than the viewport');
 }
 
-console.log('\n-- an explicit height is a MAXIMUM, never a stretch --');
+console.log('\n-- there is no map-height SETTING left to disagree with --');
 {
-	const small = makeWorld(900, 300, 0, 400); settle(small, 4);
-	report(small.state.H === 400, 'a typed 400 is honoured on a tall window', `${small.state.H}`);
-	const big = makeWorld(700, 300, 0, 4000); settle(big, 4);
-	report(big.state.H < 700 - 300, 'a typed 4000 is still clamped to the room available', `${big.state.H}`);
-}
-
-console.log('\n-- a stored default is not a choice --');
-{
-	const norm = new Function('LPN_MAP_FIT', 'LPN_MAP_SHIPPED_DEFAULTS',
-		extract('normalizeMapHeight') + '\nreturn normalizeMapHeight;')(LPN_MAP_FIT, LPN_MAP_SHIPPED_DEFAULTS);
-	// 500 was the original fixed <svg height="500">; 800 was the default for a few hours on
-	// 2026-08-14. A stored value equal to either is the default sitting in a settings object, not a
-	// number anybody typed — and leaving it would have left every existing visitor with the very
-	// gap Tom photographed, since the cap would hold the map short of the window forever.
-	LPN_MAP_SHIPPED_DEFAULTS.forEach(function (d) {
-		report(norm(d) === LPN_MAP_FIT, `a stored ${d} migrates to fit-the-window`);
-	});
-	report(norm(640) === 640, 'but a height the user actually typed is kept');
-	report(norm(0) === LPN_MAP_FIT && norm(undefined) === LPN_MAP_FIT && norm(-5) === LPN_MAP_FIT,
-		'and anything absent or nonsensical means fit');
+	// Removed 2026-08-14 (Tom: "So Map height is now obsolete. Right?"). It existed to grow the map
+	// past a fixed 500px, which now happens by itself; all it could still do was make the map
+	// shorter than the window, and there is nothing below the map to shorten it for. Asserted
+	// because a re-added cap would silently reintroduce exactly the gap he photographed -- a stored
+	// 500 holding the map short of a 900px window looks like a layout bug, not a preference.
+	report(!/settings\.mapHeight/.test(extract('effectiveMapHeight')),
+		'effectiveMapHeight consults no stored height');
+	// Comments stripped first: defaultSettings still EXPLAINS that mapHeight used to live there,
+	// and matching the explanation instead of the code is how an assertion passes for the wrong
+	// reason -- which had already happened once today in help-menu-harness.js.
+	const defaults = extract('defaultSettings').replace(/^\s*\/\/.*$/gm, '');
+	report(!/mapHeight/.test(defaults), 'and defaultSettings no longer defines one');
+	const page = fs.readFileSync(path.join(__dirname, '../../Looped-Network.php'), 'utf8');
+	report(!/lpn_settings_map_height/.test(page), 'the page stops bridging its two strings');
+	report(!/lpn_settings_map_height/.test(src.replace(/^\s*\/\/.*$/gm, '')),
+		'and nothing in the editor renders the row');
+	// Parked, not deleted -- and the tip is WRONG, so the note saying so must survive with them.
+	const en = fs.readFileSync(path.join(__dirname, '../../lib/lang.ec.en.php'), 'utf8');
+	report(/\$ec_lang\['lpn_settings_map_height_px'\]/.test(en), 'the keys are parked, not deleted');
+	report(/PARKED 2026-08-14[\s\S]{0,900}REWRITE THE TIP FIRST/.test(en),
+		'with the warning that the parked tip is false in 27 languages');
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed`);

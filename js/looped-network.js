@@ -1424,18 +1424,13 @@ var EngCalcs = EngCalcs || {};
 			// (ROADMAP Task 329). OFF by default while Tom compares the two in a browser -- this is
 			// a visual judgement, and shipping it on would be making it for him.
 			alignPipeLabels: false,
-			legendPosition: 'top-right', // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
+			// LAST ENTRY. `mapHeight` used to follow this one and was removed 2026-08-14 -- see
+			// LPN_MAP_MIN for why. Same shape as `fileAutosaveSeconds` below: a saved document may
+			// still carry it, and applySaved() merges onto these defaults, so it rides along unread.
+			legendPosition: 'top-right' // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
 			// `fileAutosaveSeconds` was removed by Task 211 along with autosave-to-file itself. A saved
 			// document may still carry one; applySaved() merges the save ONTO these defaults, so a
 			// stale key is simply carried along and never read, and needs no migration step.
-			// 800, raised from the original fixed <svg height="500"> (Tom, 2026-08-14: "Since the map
-			// height limiter seems to work, we may as well set it to 800 or more"). The raise is
-			// safe BECAUSE of effectiveMapHeight()'s render-time cap and would not be safe without
-			// it: the cap keeps a strip of ordinary page reachable below the canvas on every screen,
-			// which is the invariant that prevents the touch trap it was written for. A taller
-			// DEFAULT now simply means desktops use the room they have while phones are unchanged.
-			// An existing visitor keeps whatever they had -- this is a default, not a migration.
-			mapHeight: 0 // 0 = fill the window; a positive number is a maximum. See effectiveMapHeight()
 		};
 	}
 	var settings = defaultSettings();
@@ -3702,9 +3697,6 @@ var EngCalcs = EngCalcs || {};
 		var savedPrefixes = savedSettings.idPrefixes || {};
 		delete savedSettings.defaults; delete savedSettings.sectionsOpen; delete savedSettings.idPrefixes;
 		settings = Object.assign(defaultSettings(), savedSettings);
-		// A project saved before the map learned to fit the window carries whichever fixed height was
-		// the default when it was written; see normalizeMapHeight() for why that is not a choice.
-		settings.mapHeight = normalizeMapHeight(settings.mapHeight);
 		Object.assign(settings.defaults, savedDefaults);
 		Object.assign(settings.sectionsOpen, savedSections);
 		Object.assign(settings.idPrefixes, savedPrefixes);
@@ -8590,27 +8582,22 @@ var EngCalcs = EngCalcs || {};
 	//   * It is a FLOOR, not just a cap. LPN_MAP_MIN keeps a usable canvas on a short screen even
 	//     if that reintroduces a little scrolling, because a 60px map is not a working map.
 	//
-	// settings.mapHeight keeps the user's UNCLAMPED number -- this is a render-time cap, so an
-	// 800px map set on a desktop is not permanently rewritten by one visit on a phone.
-	var LPN_MAP_MIN = 240;
-	// settings.mapHeight === LPN_MAP_FIT means "fill the window", and it is the default.
+	// **THERE IS NO "MAP HEIGHT" SETTING ANY MORE** (Tom, 2026-08-14: "So Map height is now
+	// obsolete. Right?" -- yes). It existed so a user on a large monitor could grow the map beyond
+	// the original fixed 500px, and that is what this function now does by itself, on every screen,
+	// without being asked. What the control could still do was make the map SHORTER than the
+	// window, and once the page below the map was down to nothing there was nothing to shorten it
+	// FOR. Its tip had also become false in 27 languages -- it promised "part of the page is always
+	// left to scroll", which is precisely the behaviour this replaced -- so keeping the row meant
+	// paying for a reworded tip and a 26-language resync to describe a control with no use case.
 	//
-	// **A FIXED PIXEL HEIGHT CANNOT PUT THE BOTTOM AT THE BOTTOM**, which is what Tom keeps asking
-	// for -- it can only be right on one window size. So the number became an optional MAXIMUM and
-	// the default became a behaviour. Anyone who wants a specific height still types one; everyone
-	// else gets a map that ends where the window ends, on every screen.
-	var LPN_MAP_FIT = 0;
-	// The two heights we ever SHIPPED as the default: the original fixed <svg height="500"> and the
-	// 800 it briefly became earlier today. A stored value equal to either is a value nobody chose --
-	// it is the default lying in a settings object -- so it migrates to fit. A number the user
-	// actually typed is kept. This is the whole migration, and it is deliberately not a version
-	// bump: it changes a preference's meaning, not the document's shape.
-	var LPN_MAP_SHIPPED_DEFAULTS = [500, 800];
-	function normalizeMapHeight(v) {
-		var n = +v;
-		if (!isFinite(n) || n <= 0) { return LPN_MAP_FIT; }
-		return LPN_MAP_SHIPPED_DEFAULTS.indexOf(n) >= 0 ? LPN_MAP_FIT : n;
-	}
+	// A document written before this still carries `settings.mapHeight`; applySaved() merges saved
+	// settings ONTO the defaults, so the stale key rides along unread and needs no migration. Same
+	// shape as `fileAutosaveSeconds`, retired by Task 211.
+	//
+	// The two lang keys are PARKED, not deleted -- see lib/lang.ec.en.php. Restoring the row is
+	// cheap; recovering 27 translations is not. Rewrite the tip before reusing it: it is wrong.
+	var LPN_MAP_MIN = 240;
 	// How much ordinary page sits BELOW the canvas, in document flow. The popovers do not count:
 	// every one of them is position:fixed and display:none, so they occupy no flow at all -- which
 	// is why this measures the document rather than listing elements by id, a list that would go
@@ -8637,15 +8624,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	function effectiveMapHeight() {
 		var vh = window.innerHeight || 800;
-		if (!svg) { return settings.mapHeight === LPN_MAP_FIT ? vh : Math.min(settings.mapHeight, vh); }
+		if (!svg) { return vh; }
 		var docEl = document.documentElement;
 		var rect = svg.getBoundingClientRect();
 		var above = rect.top + (window.pageYOffset || docEl.scrollTop || 0);
 		// 8px of slack so a sub-pixel layout rounding cannot leave the page one stubborn pixel
 		// scrollable -- which on a touch screen is a scrollbar with nothing to reach.
 		var room = Math.round(vh - above - flowBelowMap() - 8);
-		if (settings.mapHeight === LPN_MAP_FIT) { return Math.max(LPN_MAP_MIN, room); }
-		return Math.max(LPN_MAP_MIN, Math.min(settings.mapHeight, room));
+		return Math.max(LPN_MAP_MIN, room);
 	}
 	function applyMapHeight() {
 		if (!svg) { return; }
@@ -9112,24 +9098,6 @@ var EngCalcs = EngCalcs || {};
 			else { backdropOpacityInput.value = settings.backdropOpacity; }
 		});
 		row(mapBody, pc.lpn_settings_backdrop_opacity || 'Background image opacity (0 to 1)', backdropOpacityInput);
-		var heightInput = document.createElement('input');
-		// BLANK MEANS FIT THE WINDOW, and the placeholder shows the height that is actually in use --
-		// so an empty box reads as "automatic, currently 592" rather than as a missing value. Blank
-		// for auto needs no new string, which matters: the label and its tip are already translated
-		// into 26 languages and a reworded tip would put them all out of date at once.
-		heightInput.type = 'number'; heightInput.step = 'any'; heightInput.min = '0';
-		heightInput.value = settings.mapHeight === LPN_MAP_FIT ? '' : settings.mapHeight;
-		heightInput.placeholder = effectiveMapHeight();
-		heightInput.addEventListener('change', function () {
-			var raw = heightInput.value.trim();
-			if (raw === '' || +raw === 0) { settings.mapHeight = LPN_MAP_FIT; }
-			else if (+raw >= 100) { settings.mapHeight = +raw; }
-			else { heightInput.value = settings.mapHeight === LPN_MAP_FIT ? '' : settings.mapHeight; return; }
-			applyMapHeight(); saveToStorage();
-			heightInput.placeholder = effectiveMapHeight();
-		});
-		row(mapBody, pc.lpn_settings_map_height_px || 'Map height (screen pixels)', heightInput,
-			pc.lpn_settings_map_height_tip);
 		var legendSelect = document.createElement('select');
 		[
 			['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
