@@ -4177,7 +4177,16 @@ var EngCalcs = EngCalcs || {};
 		rebuildSettingsFields();
 		rebuildLabelsFields();
 		applyLegendPosition();
-		applyMapHeight();
+		// **NO applyMapHeight() HERE. THE BOTTOM OF THE MAP DOES NOT DEPEND ON THE MODEL** (Tom,
+		// 2026-08-15, stating it as a rule: *"Bottom of map should not depend on the model."*). The
+		// canvas height is a fact about the WINDOW and the page's own chrome; opening a different
+		// project cannot change it, so re-deriving it on every open could only ever produce the same
+		// answer or a wrong one -- and it was producing wrong ones, because this runs in the middle
+		// of a rebuild, with the tab strip and the status row mid-flight.
+		//
+		// The one document-driven thing that CAN legitimately change it is the tab strip's own
+		// height, when enough projects are open to wrap it onto another line. That is chrome, not
+		// model, and renderTabs() re-measures for exactly that reason.
 		refreshFontSizes();
 		refreshSymbolSizes();
 		renderLabelsLegend();
@@ -6604,6 +6613,7 @@ var EngCalcs = EngCalcs || {};
 	function renderTabs() {
 		var pc = EngCalcs.pageConfig || {}, strip = document.getElementById('lpn_tabs');
 		if (!strip) { return; }
+		var stripHeightBefore = strip.getBoundingClientRect().height;
 		strip.innerHTML = '';
 		// The vertical list lives at the LEFT edge of the strip (Tom's sketch). On a narrow screen it
 		// is the only way in, because CSS hides the strip itself there: this page has no horizontal
@@ -6636,6 +6646,12 @@ var EngCalcs = EngCalcs || {};
 		// stopPropagation for the reason every menu opener here does it: see buildMenuBar().
 		plus.addEventListener('click', function (e) { e.stopPropagation(); openNewProjectMenu(e.currentTarget); });
 		strip.appendChild(plus);
+		// THE ONLY DOCUMENT-DRIVEN THING THAT MAY MOVE THE MAP'S BOTTOM, and it is not the document:
+		// it is this strip wrapping onto another line when enough projects are open. Measured rather
+		// than assumed, so opening a project that does not change the strip's height re-measures
+		// nothing -- which is the whole of Tom's rule that the bottom of the map must not depend on
+		// the model (see refreshAllFromDocument()).
+		if (strip.getBoundingClientRect().height !== stripHeightBefore) { applyMapHeight(); }
 	}
 	function switchToTab(id) {
 		if (id === library.openId) { return; }
@@ -7613,6 +7629,19 @@ var EngCalcs = EngCalcs || {};
 		document.addEventListener('visibilitychange', function () {
 			if (!document.hidden) { applyMapHeight(); }
 		});
+		// **AND AGAIN ONCE THE PAGE HAS ACTUALLY FINISHED ASSEMBLING ITSELF.** init() runs at
+		// DOMContentLoaded, which is before stylesheets finish applying, before the webfonts land,
+		// and before the site navbar above the canvas has settled to its real height -- so the first
+		// measurement is taken of a page that is still moving. That is stages 1 and 2 of Tom's
+		// report, and no amount of arithmetic fixes a measurement of the wrong thing: the answer is
+		// to measure again when there is something stable to measure.
+		window.addEventListener('load', function () { applyMapHeight(); });
+		if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
+			document.fonts.ready.then(function () { applyMapHeight(); });
+		}
+		// One frame after init, for the common case where everything is cached and `load` has
+		// already fired by the time this listener is attached.
+		if (window.requestAnimationFrame) { window.requestAnimationFrame(function () { applyMapHeight(); }); }
 		// **Nothing is flushed to a file on the way out any more** (Task 211). The locks ARE handed
 		// back, so a colleague is never left waiting on a browser that has gone; `visibilitychange` ->
 		// hidden is the one that actually fires on mobile, and `beforeunload` is the desktop net.
@@ -9016,6 +9045,7 @@ var EngCalcs = EngCalcs || {};
 	// The two lang keys are PARKED, not deleted -- see lib/lang.ec.en.php. Restoring the row is
 	// cheap; recovering 27 translations is not. Rewrite the tip before reusing it: it is wrong.
 	var LPN_MAP_MIN = 240;
+	var LPN_MAP_SLACK = 2;
 	// How much ordinary page sits BELOW the canvas, in document flow. The popovers do not count:
 	// every one of them is position:fixed and display:none, so they occupy no flow at all -- which
 	// is why this measures the document rather than listing elements by id, a list that would go
@@ -9046,9 +9076,13 @@ var EngCalcs = EngCalcs || {};
 		var docEl = document.documentElement;
 		var rect = svg.getBoundingClientRect();
 		var above = rect.top + (window.pageYOffset || docEl.scrollTop || 0);
-		// 8px of slack so a sub-pixel layout rounding cannot leave the page one stubborn pixel
-		// scrollable -- which on a touch screen is a scrollbar with nothing to reach.
-		var room = Math.round(vh - above - flowBelowMap() - 8);
+		// Slack so a sub-pixel layout rounding cannot leave the page one stubborn pixel scrollable --
+		// which on a touch screen is a scrollbar with nothing to reach. It was 8 until 2026-08-15,
+		// when Tom named it: *"There is a wasted area below the map now... a small (a little smaller
+		// than the status line) wasted margin below it."* He was looking at this constant. Fractional
+		// layout is under a pixel, so 2 covers what it exists to cover and 8 was six pixels of
+		// nothing. If a stubborn scrollbar ever comes back, this is the line.
+		var room = Math.round(vh - above - flowBelowMap() - LPN_MAP_SLACK);
 		// **A MAP TALLER THAN THE WINDOW IS NEVER THE RIGHT ANSWER, AND THE OLD FORMULA COULD
 		// PRODUCE ONE** (guard added 2026-08-15 after Tom hit an unrecoverable state: *"The bottom
 		// of the map overflowed the bottom of the screen. And status line is gone. Reload doesn't
@@ -9061,7 +9095,7 @@ var EngCalcs = EngCalcs || {};
 		// The clamp costs nothing in the healthy case -- with above and below both >= 0 the formula
 		// already yields at most vh - 8 -- so it bites only when an input was wrong, which is
 		// exactly when a floor and a ceiling earn their keep.
-		room = Math.min(room, vh - 8);
+		room = Math.min(room, vh - LPN_MAP_SLACK);
 		return Math.max(LPN_MAP_MIN, room);
 	}
 	// A canvas resize must not slide the drawing, and until 2026-08-15 it did. The world transform
@@ -9071,7 +9105,7 @@ var EngCalcs = EngCalcs || {};
 	// Half the delta on each axis keeps the view CENTRE where it was, which is what every map
 	// application does and what makes a resize feel like a window changing rather than a pan.
 	var LPN_MAP_HEIGHT_DEADBAND = 1;
-	function applyMapHeight() {
+	function applyMapHeight(secondPass) {
 		if (!svg) { return; }
 		// NOT LAID OUT YET, so every measurement below is a fiction -- a hidden tab, a display:none
 		// ancestor, or a call before first layout. Doing nothing leaves the last good height in
@@ -9086,14 +9120,35 @@ var EngCalcs = EngCalcs || {};
 		// differently after fonts load, after a tab comes back, after a scrollbar appears -- and
 		// re-applying a height that differs by half a pixel would move the drawing for no reason a
 		// reader could name.
-		if (Math.abs(h - before.height) < LPN_MAP_HEIGHT_DEADBAND) { return; }
-		svg.setAttribute('height', h);
-		var after = svg.getBoundingClientRect(),
-			dw = after.width - before.width,
-			dh = after.height - before.height;
-		if (Math.abs(dw) > 0.5 || Math.abs(dh) > 0.5) {
-			state.tx += dw / 2; state.ty += dh / 2;
-			setTransform();
+		if (Math.abs(h - before.height) >= LPN_MAP_HEIGHT_DEADBAND) {
+			svg.setAttribute('height', h);
+			var after = svg.getBoundingClientRect(),
+				dw = after.width - before.width,
+				dh = after.height - before.height;
+			if (Math.abs(dw) > 0.5 || Math.abs(dh) > 0.5) {
+				state.tx += dw / 2; state.ty += dh / 2;
+				setTransform();
+			}
+			before = after;
+		}
+		// **IF IT STILL RUNS OFF THE BOTTOM, MEASURE ONCE MORE AND BELIEVE THE SECOND ANSWER.**
+		//
+		// Tom's staged report, 2026-08-15, is what this is for: *"(1) map bottom is about half-way
+		// up from screen bottom and page is partway loaded. (2) map bottom is below screen bottom
+		// and page is finished loading."* Every term in the formula is a measurement of a page that
+		// is still assembling itself -- the site's own navbar above the canvas, and the footer below
+		// it, both change height as Bootstrap's CSS and the webfonts land. A height computed at
+		// stage 1 is simply the wrong answer by stage 2, and the clamp cannot save it: the clamp
+		// bounds the HEIGHT to the window, while what went wrong is WHERE THE MAP STARTS.
+		//
+		// So: one bounded re-measure, never a loop (see the note on applyMapHeight above). By the
+		// time this runs the new height has been applied and the page has re-laid out around it, so
+		// `above` and `below` are finally being read from the arrangement the user is looking at.
+		// The floor is exempt because a canvas at LPN_MAP_MIN is allowed to overflow -- that
+		// overflow is a decision, and re-measuring would only re-derive the same number.
+		var vh = window.innerHeight || 800;
+		if (!secondPass && before.bottom > vh + 1 && before.height > LPN_MAP_MIN) {
+			applyMapHeight(true);
 		}
 	}
 	function applyLegendPosition() {
@@ -9850,7 +9905,10 @@ var EngCalcs = EngCalcs || {};
 			// here, or every default input would come back blank instead of at its starting value.
 			seedDefaultInputs();
 			labelSettings = defaultLabelSettings();
-			applyMapHeight();
+			// No applyMapHeight() -- the canvas height stopped being a setting when the Map height
+			// row was retired, and it is a fact about the ENVIRONMENT (Tom, 2026-08-15: *"Map bottom
+			// has nothing to do with the model at all. It's the environment."*). Restoring defaults
+			// cannot change how much room the window has.
 			applyLegendPosition();
 			refreshFontSizes();
 			// refreshLabelText(), not renderLabelsLegend(): resetting labelSettings changes which

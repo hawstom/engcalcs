@@ -22,6 +22,11 @@ const fs = require('fs');
 const path = require('path');
 const src = fs.readFileSync(path.join(__dirname, '../../js/looped-network.js'), 'utf8');
 
+// Comments stripped, because several checks below ask whether a function CALLS something, and a
+// comment explaining why it deliberately does not call it would answer yes.
+function stripComments(t) {
+	return t.replace(/^[ \t]*\/\/.*$/gm, '');
+}
 function extract(name) {
 	const at = src.search(new RegExp('function ' + name + '\\s*\\('));
 	if (at < 0) { throw new Error('not found: ' + name); }
@@ -44,6 +49,11 @@ function report(ok, label, detail) {
 // testing the constant the moment somebody changes it.
 const MIN = Number((src.match(/var LPN_MAP_MIN = (\d+);/) || [])[1]);
 if (!MIN) { throw new Error('LPN_MAP_MIN not found'); }
+// The slack is read from the source too, and the expected numbers below are computed from it --
+// Tom shrank it from 8 to 2 on 2026-08-15 ("a wasted area below the map"), and a harness carrying
+// its own copy of a constant somebody is actively tuning tests the copy, not the page.
+const SLACK = Number((src.match(/var LPN_MAP_SLACK = (\d+);/) || [])[1]);
+if (!(SLACK >= 0)) { throw new Error('LPN_MAP_SLACK not found'); }
 
 // A world just real enough to run the two functions in: a window, a canvas rect, a body rect and a
 // scroll offset. Everything else they touch is stubbed to nothing.
@@ -58,10 +68,10 @@ function scope(env) {
 		LPN_MAP_MIN: MIN,
 		Math: Math
 	};
-	const fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN',
+	const fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'LPN_MAP_SLACK',
 		extract('flowBelowMap') + '\n' + extract('effectiveMapHeight') + '\n' +
 		'return effectiveMapHeight();');
-	return fn(sandbox.window, sandbox.document, sandbox.svg, sandbox.LPN_MAP_MIN);
+	return fn(sandbox.window, sandbox.document, sandbox.svg, sandbox.LPN_MAP_MIN, SLACK);
 }
 
 // A healthy desktop page: 900px window, canvas starting 180 down, one line of legal links below it.
@@ -72,8 +82,8 @@ console.log('--- the ordinary case is untouched ---');
 		svg: { top: 180, bottom: 860, width: 1400, height: 680 },
 		body: { bottom: 890 }
 	});
-	// 900 - 180 above - 30 below - 8 slack.
-	report(h === 682, 'the canvas fills the window minus what is above and below it', h);
+	// 900 - 180 above - 30 below - the slack.
+	report(h === 900 - 180 - 30 - SLACK, 'the canvas fills the window minus what is above and below it', h);
 	report(180 + h <= 900, '...and its bottom lands inside the window', 180 + h);
 }
 
@@ -87,12 +97,12 @@ console.log('\n--- a measurement that disagrees with itself cannot produce an ov
 		svg: { top: -400, bottom: 280, width: 1400, height: 680 },   // scrolled, but scrollY says 0
 		body: { bottom: 300 }
 	});
-	report(h <= 900 - 8, 'the canvas is never taller than the window', h);
+	report(h <= 900 - SLACK, 'the canvas is never taller than the window', h);
 	// Without the clamp this returns 1272 — a canvas 372px taller than the window, which is the
 	// screenshot: the map running off the bottom and the status strip going with it. Named rather
 	// than merely bounded, so a future edit that changes the formula has to look at this case
 	// again instead of passing it by accident.
-	report(h !== 1272, '...specifically, not the 1272 the unclamped formula gives here', h);
+	report(h !== 900 + 400 - 20 - SLACK, '...specifically, not the oversized answer the unclamped formula gives', h);
 }
 {
 	// The same shape from the other direction: a body rect that has not caught up, so `below`
@@ -102,7 +112,7 @@ console.log('\n--- a measurement that disagrees with itself cannot produce an ov
 		svg: { top: -250, bottom: 430, width: 1400, height: 680 },
 		body: { bottom: 430 }
 	});
-	report(h <= 700 - 8, 'and still never taller when the scroll offset is the honest half', h);
+	report(h <= 700 - SLACK, 'and still never taller when the scroll offset is the honest half', h);
 }
 
 console.log('\n--- the floor still holds, because a 60px map is not a map ---');
@@ -136,21 +146,22 @@ console.log('\n--- resizing the canvas keeps the view centre, and tiny changes a
 	}
 	function run(env) {
 		var svg = fakeCanvas(env.h0), state = { tx: env.tx || 0, ty: env.ty || 0, s: 1 }, transforms = 0;
-		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'state', 'setTransform',
+		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'LPN_MAP_SLACK', 'state', 'setTransform',
 			extract('flowBelowMap') + '\n' + extract('effectiveMapHeight') + '\n' +
 			src.slice(src.indexOf('var LPN_MAP_HEIGHT_DEADBAND'), src.indexOf('function applyLegendPosition')) +
 			'\nreturn applyMapHeight();');
 		fn({ innerHeight: env.vh, pageYOffset: 0 },
 			{ documentElement: { scrollTop: 0 }, body: { getBoundingClientRect: function () { return { bottom: env.bodyBottom }; } } },
-			svg, MIN, state, function () { transforms++; });
+			svg, MIN, SLACK, state, function () { transforms++; });
 		return { h: svg._h, state: state, transforms: transforms };
 	}
 	// The canvas is 600 tall and the window has room for 682. Growing it by 82 must show 41 more at
 	// the top and 41 more at the bottom, not 82 more at the bottom.
 	var grown = run({ vh: 900, h0: 600, bodyBottom: 810, ty: 0 });
-	report(grown.h === 682, 'the canvas takes the height the measurement asks for', grown.h);
-	report(grown.state.ty === 41, '...and the view centre stays put, half the delta on each side',
-		grown.state.ty);
+	var want = 900 - 180 - 30 - SLACK;      // window, minus what is above, below, and the slack
+	report(grown.h === want, 'the canvas takes the height the measurement asks for', grown.h);
+	report(grown.state.ty === (want - 600) / 2,
+		'...and the view centre stays put, half the delta on each side', grown.state.ty);
 	report(grown.transforms === 1, '...applied once, not per frame', grown.transforms);
 	// Shrinking goes the other way, by the same rule.
 	var shrunk = run({ vh: 500, h0: 600, bodyBottom: 810, ty: 0 });
@@ -160,9 +171,37 @@ console.log('\n--- resizing the canvas keeps the view centre, and tiny changes a
 	// and re-applying a height half a pixel different would move the drawing for no visible reason.
 	// Sub-pixel on purpose: 682.4 against a computed 682. Without the dead band the attribute is
 	// rewritten every single time the page is measured, which is every resize and every tab return.
-	var same = run({ vh: 900, h0: 682.4, bodyBottom: 892.4 });
-	report(same.h === 682.4 && same.transforms === 0 && same.state.ty === 0,
+	// Arranged so the computed height lands 0.4px under the current one, whatever the slack is.
+	var same = run({ vh: 900, h0: 688, bodyBottom: 900 - SLACK + 0.4 });
+	report(same.h === 688 && same.transforms === 0 && same.state.ty === 0,
 		'a height that has not really changed is not even written', same.h + ' ty ' + same.state.ty);
+}
+
+// --- THE HEIGHT IS A FACT ABOUT THE WINDOW, NOT ABOUT THE MODEL ---------------
+// Tom, 2026-08-15, as a rule: "Bottom of map should not depend on the model." Opening a different
+// project cannot change how much room the window has, so re-deriving the height on every open can
+// only produce the same answer or a wrong one -- and it produced wrong ones, because
+// refreshAllFromDocument() runs it in the middle of a rebuild with the chrome mid-flight.
+console.log('\n--- opening a project does not resize the canvas ---');
+{
+	const refresh = stripComments(extract('refreshAllFromDocument'));
+	report(!/applyMapHeight\(\)/.test(refresh),
+		'refreshAllFromDocument does not touch the map height');
+	// The one thing that legitimately can: the tab strip wrapping to another line when several
+	// projects are open. That is page chrome, and renderTabs() re-measures only when its own height
+	// actually changed.
+	const tabs = stripComments(extract('renderTabs'));
+	report(/stripHeightBefore/.test(tabs) && /applyMapHeight\(\)/.test(tabs),
+		'renderTabs re-measures when the strip changes height');
+	report(/!== stripHeightBefore/.test(tabs),
+		'...and only then, so switching between projects moves nothing');
+	// Every remaining caller must be an ENVIRONMENT event. Restoring defaults used to be in this
+	// list, left over from when the map height was a setting; it is not one any more.
+	const callers = stripComments(src).split('\n')
+		.filter(l => /applyMapHeight/.test(l) && !/function applyMapHeight/.test(l));
+	report(callers.every(l => /resize|orientationchange|document\.hidden|'load'|fonts|requestAnimationFrame|stripHeightBefore|applyMapHeight\(true\)|^\s*applyMapHeight\(\);$/.test(l)),
+		'every caller is a window/chrome event, never a document one',
+		callers.length + ' call sites');
 }
 
 console.log('\n--- an element with no layout box is not measured at all ---');

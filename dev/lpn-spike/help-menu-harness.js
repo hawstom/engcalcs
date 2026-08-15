@@ -195,7 +195,11 @@ console.log('\n-- the map fits the window instead of guessing 72% of it --');
 	// computed room is always strictly less than the viewport — the canvas can never be as tall as
 	// the screen, which is the precondition of the touch trap. It is prevented by construction now
 	// rather than by a chosen fraction.
-	report(/vh - above - flowBelowMap\(\) - 8/.test(body),
+	// The literal 8 became LPN_MAP_SLACK on 2026-08-15 and shrank to 2 -- Tom saw it as "a wasted
+	// area below the map", which is what a slack constant looks like from the outside once it is
+	// bigger than the rounding it guards against. map-height-harness.js owns its value; what this
+	// line cares about is only that the three terms are still subtracted.
+	report(/vh - above - flowBelowMap\(\) - LPN_MAP_SLACK/.test(body),
 		'room is viewport minus above minus below, so the canvas is never viewport-tall');
 	// It passed only because the PROSE above it mentions scrollHeight — which is now the thing this
 	// code must not do. Assert the measurement, not a word that appears near it.

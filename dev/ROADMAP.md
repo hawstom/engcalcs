@@ -1863,12 +1863,30 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   from an empty rect, which is what a hidden tab reports. `visibilitychange` re-measures on return —
   the likely cause of Tom's *"Zoom changes for Net3 when I go to another tab and then return"*, since
   nothing on that path touches `state.s` and only the canvas size can change what you see.
+  **THEN TOM STAGED IT, AND THE STAGES NAMED THE REAL CAUSE** (2026-08-15: *"(1) map bottom is
+  about half-way up from screen bottom and page is partway loaded. (2) map bottom is below screen
+  bottom and page is finished loading."*). Every term in the formula measures a page that is still
+  assembling itself — the site navbar above the canvas and the footer below it both change height as
+  Bootstrap's CSS and the webfonts land. A height computed at stage 1 is simply the wrong answer by
+  stage 2, and the clamp cannot save it: the clamp bounds the HEIGHT, while what went wrong is where
+  the map STARTS. Fixed by measuring again when there is something stable to measure —
+  `window.load`, `document.fonts.ready`, one `requestAnimationFrame` after init — plus ONE bounded
+  re-measure inside `applyMapHeight()` if the canvas still runs past the bottom after being sized.
+  The wasted strip he saw underneath was `LPN_MAP_SLACK`, 8px of rounding guard where fractional
+  layout is under a pixel; now 2.
+  **AND THE HEIGHT IS AN ENVIRONMENT FACT, NOT A DOCUMENT ONE** (Tom, stating it twice: *"Bottom of
+  map should not depend on the model"*, then *"Map bottom has nothing to do with the model at all.
+  It's the environment."*). `refreshAllFromDocument()` and Restore defaults no longer size the
+  canvas — opening a project cannot change how much room the window has, and running the
+  measurement mid-rebuild is how it produced wrong answers. The one document-triggered thing that
+  legitimately can is the TAB STRIP wrapping onto another line, which is chrome: `renderTabs()`
+  re-measures only when its own height actually changed.
   **A RESIZE ALSO STOPPED SLIDING THE DRAWING**, which is what remained of the tab-return complaint
   after the guards landed (Tom: *"Still changing a little"*). The world transform anchors content at
   the TOP-LEFT, so a canvas that grows by 12 px revealed 12 px more at the bottom and moved
   everything relative to the frame — a window resize had always done this too. Half the delta goes
   into `state.tx`/`state.ty`, so the view CENTRE stays put, and a 1 px dead band stops sub-pixel
-  churn from writing a height at all. `dev/lpn-spike/map-height-harness.js`, 15 checks, every guard
+  churn from writing a height at all. `dev/lpn-spike/map-height-harness.js`, 19 checks, every guard
   mutation-tested. **Not reproduced in a browser — the mechanism is inferred from the arithmetic, so
   if it recurs, the console error is the next thing to look at.**
 
