@@ -35,7 +35,22 @@
 // breaks is the MARKER, and the marker mutant above is the one that catches it.
 
 const { ROOT, setUnitSet, loadLoopedNetwork, ensure } = require('./lpn-dom-stub.js');
+const fs = require('fs');
+const path = require('path');
 function byId(id) { return ensure(id); }
+
+// The .inp reader, for section 10. Loaded here rather than there because the page loads it BEFORE
+// js/looped-network.js and onto the same EngCalcs, and the import path expects it to already exist.
+require(ROOT + 'js/lpn-inp.js');
+// FileReader is the browser's; importInpFromFile() is written around it, so it is stubbed exactly
+// as inp-import-harness.js stubs it rather than reaching past it into docFromInp().
+global.FileReader = function () {
+	this.readAsArrayBuffer = function (file) {
+		const bytes = new TextEncoder().encode(file._text);
+		this.result = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength);
+		if (this.onload) { this.onload({ target: { result: this.result } }); }
+	};
+};
 
 // window.confirm/prompt are stubbed to "yes"/"X" by lpn-dom-stub.js; the destructive paths below
 // need to answer both ways, so they are made settable here rather than assumed.
@@ -50,6 +65,11 @@ const L = loadLoopedNetwork(
 	"\t\tseedDefaultInputs: seedDefaultInputs,\n" +
 	"\t\taddNode: addNode, addLink: addLink, effective: effective, setProp: setProp,\n" +
 	"\t\tsetOverride: setOverride, clearOverride: clearOverride, hasOverride: hasOverride,\n" +
+	// The override map's KEY (Task 324). Exported so the assertions below read the map through the
+	// same seam the page writes it with -- a harness that spelled 'n:' + id itself would be a second
+	// copy of the format, free to agree with a page that had changed underneath it.
+	"\t\tovKey: ovKey, ovKeyFor: ovKeyFor, migrateOverrideKeys: migrateOverrideKeys,\n" +
+	"\t\timportInp: importInpFromFile, storageVersion: function () { return LPN_STORAGE_VERSION; },\n" +
 	"\t\tbaseValue: baseValue, overrideCount: function () { return overrideCount(activeScenario()); },\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario, deleteScenario: deleteScenario,\n" +
 	"\t\tactiveScenario: activeScenario, assembleModel: assembleModel, isActive: isActive,\n" +
@@ -171,7 +191,7 @@ console.log('\n--- the marker records intent, not a difference ---');
 {
 	L.setProp(j1, 'demand', 100);   // exactly Base's value
 	ok('an edit that equals Base STILL records an override',
-		L.hasOverride(j1, 'demand'), JSON.stringify(L.activeScenario().overrides[j1.id]));
+		L.hasOverride(j1, 'demand'), JSON.stringify(L.activeScenario().overrides[L.ovKey(j1)]));
 	ok('...and it is counted', L.overrideCount() === 2, L.overrideCount());
 
 	// THE CASE THAT DECIDES THE WHOLE DESIGN, and the only one that can tell a marker from a diff:
@@ -194,7 +214,7 @@ console.log('\n--- the marker records intent, not a difference ---');
 	L.clearOverride(j2, 'demand');
 	ok('clearing the marker returns the value to Base', L.effective(j2, 'demand') === 100);
 	ok('...and the empty map is not left behind as a phantom mark',
-		L.activeScenario().overrides[j2.id] === undefined);
+		L.activeScenario().overrides[L.ovKey(j2)] === undefined);
 	L.setProp(j2, 'demand', 500);
 
 	// A rename must CARRY the overrides. If it does not, the scenario's values quietly stop
@@ -207,14 +227,14 @@ console.log('\n--- the marker records intent, not a difference ---');
 		JSON.stringify(L.activeScenario().overrides));
 	L.renameNode('J-9', j2id);
 	ok('...and back again, leaving nothing stranded under the old name',
-		L.effective(j2, 'demand') === 500 && !L.activeScenario().overrides['J-9'],
+		L.effective(j2, 'demand') === 500 && !L.activeScenario().overrides[L.ovKeyFor('node', 'J-9')],
 		JSON.stringify(L.activeScenario().overrides));
 
 	// A property NOT on the whitelist is Base-owned identity and must write through even inside a
 	// scenario -- MEMBERSHIP is overridable, IDENTITY is not.
 	L.setProp(j2, 'elev', 42);
 	ok('a property outside the whitelist writes the element, not an override',
-		j2._elev === 42 && L.activeScenario().overrides[j2.id].elev === undefined);
+		j2._elev === 42 && L.activeScenario().overrides[L.ovKey(j2)].elev === undefined);
 }
 
 // ---------------------------------------------------------------------------
@@ -269,7 +289,7 @@ console.log('\n--- an override survives save and load ---');
 	L.applySaved(file);
 	const back = L.getScenarios()[1];
 	ok('the scenario comes back with its name', back.name === 'Fire flow', back.name);
-	ok('...and with its overrides', back.overrides[j2.id].demand === 500,
+	ok('...and with its overrides', back.overrides[L.ovKey(j2)].demand === 500,
 		JSON.stringify(back.overrides));
 	ok('...and the document opens in the scenario it was saved in',
 		L.getProject().activeScenario === back.id);
@@ -370,12 +390,12 @@ console.log('\n--- deleting in a scenario switches off; deleting in Base really 
 	L.deleteElement('link', E.l2.id);
 	ok('Yes deletes it', L.getDoc().links.length === 2);
 	ok('...and drops every scenario\'s values for it',
-		L.getScenarios()[1].overrides[E.l2.id] === undefined,
+		L.getScenarios()[1].overrides[L.ovKey(E.l2)] === undefined,
 		JSON.stringify(L.getScenarios()[1].overrides));
 
 	L.undo();
 	ok('undo brings back the element AND the values that went with it',
-		L.getDoc().links.length === 3 && !!L.getScenarios()[1].overrides[E.l2.id],
+		L.getDoc().links.length === 3 && !!L.getScenarios()[1].overrides[L.ovKey(E.l2)],
 		JSON.stringify(L.getScenarios()[1].overrides));
 
 	// An element no scenario has touched is deleted without a question -- the confirm is about the
@@ -445,7 +465,7 @@ console.log('\n--- the readout, the halos, and the guards ---');
 	ok('from Base it names the property and counts what it will throw away',
 		/Diameter/.test(confirmText || '') && /\b1\b/.test(confirmText || ''), JSON.stringify(confirmText));
 	ok('...and the scenario goes back to the Base value',
-		!L.getScenarios()[1].overrides[E.l1.id], JSON.stringify(L.getScenarios()[1].overrides));
+		!L.getScenarios()[1].overrides[L.ovKey(E.l1)], JSON.stringify(L.getScenarios()[1].overrides));
 
 	lastAlert = null;
 	L.pushBaseToScenarios();
@@ -524,7 +544,7 @@ console.log('\n--- the write seam, per field (the Task 184 x Task 248 collision)
 	settingBox.value = '75';
 	(settingBox._listeners.change || []).forEach(function (fn) { fn({ target: settingBox }); });
 	ok('editing a valve setting in a scenario records an OVERRIDE',
-		L.hasOverride(valve, 'setting'), JSON.stringify(L.activeScenario().overrides[valve.id]));
+		L.hasOverride(valve, 'setting'), JSON.stringify(L.activeScenario().overrides[L.ovKey(valve)]));
 	ok('...and BASE DOES NOT MOVE', L.baseValue(valve, 'setting') === 40, L.baseValue(valve, 'setting'));
 	L.switchScenario('base');
 	ok('...confirmed from Base itself', L.effective(valve, 'setting') === 40, L.effective(valve, 'setting'));
@@ -549,12 +569,12 @@ console.log('\n--- the write seam, per field (the Task 184 x Task 248 collision)
 	if (res) {
 		L.setProp(res, 'head', undefined);
 		ok('a blanked value still records an override', L.hasOverride(res, 'head'),
-			JSON.stringify(L.activeScenario().overrides[res.id]));
+			JSON.stringify(L.activeScenario().overrides[L.ovKey(res)]));
 		const round = JSON.parse(JSON.stringify(L.serializeProject()));
 		const kept = round.scenarios.filter(function (x) { return x.id === scn.id; })[0];
 		ok('...and SURVIVES JSON.stringify, which drops undefined',
-			kept && kept.overrides[res.id] && 'head' in kept.overrides[res.id],
-			JSON.stringify(kept && kept.overrides[res.id]));
+			kept && kept.overrides[L.ovKey(res)] && 'head' in kept.overrides[L.ovKey(res)],
+			JSON.stringify(kept && kept.overrides[L.ovKey(res)]));
 	}
 
 	// 4/5. The ordinary edit path must reach afterPropertyEdit(), which is what refreshes the
@@ -586,6 +606,215 @@ console.log('\n--- the write seam, per field (the Task 184 x Task 248 collision)
 		L.statusText().indexOf(String(before + 1)) !== -1,
 		JSON.stringify(L.statusText()) + ' should mention ' + (before + 1));
 	L.switchScenario('base');
+}
+
+// ---------------------------------------------------------------------------
+// 10. A NODE AND A LINK THAT SHARE AN ID -- ROADMAP Task 324
+// ---------------------------------------------------------------------------
+// EVERY FIXTURE ABOVE IS HAND-BUILT WITH UNIQUE IDS, which is why this shipped. EPANET keeps nodes
+// and links in SEPARATE namespaces, so a junction 20 and a pipe 20 are both legal and both
+// ordinary -- re-measured 2026-08-14 over dev/epanet-models/: Net1 7 shared ids, Net2 35, Net3 72.
+// With one flat map keyed by the bare id, a demand typed on junction 20 was read back by pipe 20.
+// Tom saw the halo ("a remote pipe changed to orange along with the node"); the halo is the
+// harmless half, and `active` -- which exists on BOTH groups -- is the one that silently drops an
+// unrelated pipe out of the SOLVE.
+//
+// The network is imported rather than assembled, because the editor's own rename validation
+// (validateNewId -> allIds) refuses a duplicate id: an import is the only way a user reaches this,
+// which is the same reason the collision was invisible to a hand-built fixture.
+//
+//   R1 --P1-- 10 --P2-- 20 --P3-- 30 --"20"-- 40
+//                        \_______"10"________/
+//
+// Link "20" joins 30 and 40, and link "10" joins 20 and 40: NEITHER touches the node it shares a
+// name with. That is deliberate -- switching off node 20 legitimately takes its own incident links
+// with it, so a collision test on an incident link could not tell a correct cascade from the bug.
+console.log('\n--- a node and a link with the SAME ID are two different elements ---');
+const COLLIDE_INP = [
+	'[TITLE]',
+	'Node/link id collision -- ROADMAP Task 324. EPANET namespaces are separate.',
+	'',
+	'[JUNCTIONS]',
+	';ID  Elev  Demand',
+	' 10  100   50',
+	' 20  95    50',
+	' 30  90    50',
+	' 40  85    50',
+	'',
+	'[RESERVOIRS]',
+	';ID  Head',
+	' R1  260',
+	'',
+	'[PIPES]',
+	';ID  Node1  Node2  Length  Diam  Rough  MinorLoss  Status',
+	' P1  R1     10     900     12    130    0          Open',
+	' P2  10     20     800     10    130    0          Open',
+	' P3  20     30     800     10    130    0          Open',
+	' 20  30     40     700     8     130    0          Open',
+	' 10  20     40     1500    6     130    0          Open',
+	'',
+	'[COORDINATES]',
+	' 10  0    0',
+	' 20  100  0',
+	' 30  200  0',
+	' 40  300  0',
+	' R1  -100 0',
+	'',
+	'[OPTIONS]',
+	' Units     GPM',
+	' Headloss  H-W',
+	''
+].join('\n');
+
+function nodeOf(id) { return L.getDoc().nodes.filter(function (n) { return n.id === id; })[0]; }
+function linkOf(id) { return L.getDoc().links.filter(function (l) { return l.id === id; })[0]; }
+function modelHas(m, group, id) {
+	return (group === 'link' ? m.links : m.nodes).some(function (x) { return x.id === id; });
+}
+{
+	L.importInp({ name: 'collide.inp', _text: COLLIDE_INP });
+	ok('the imported document really does hold a node AND a link called 20',
+		!!nodeOf('20') && !!linkOf('20'), JSON.stringify({ node: !!nodeOf('20'), link: !!linkOf('20') }));
+	ok('...and their override keys are different strings',
+		L.ovKey(nodeOf('20')) !== L.ovKey(linkOf('20')),
+		L.ovKey(nodeOf('20')) + ' vs ' + L.ovKey(linkOf('20')));
+
+	const scn = L.createScenario('Collision');
+	L.switchScenario(scn.id);
+
+	// --- an override on the NODE leaves the LINK alone: in the map, in the solve, and on screen ---
+	L.setProp(nodeOf('20'), 'demand', 500);
+	ok('the node carries the override', L.hasOverride(nodeOf('20'), 'demand'),
+		JSON.stringify(L.activeScenario().overrides));
+	ok('...and the pipe of the same name carries NOTHING',
+		L.activeScenario().overrides[L.ovKey(linkOf('20'))] === undefined,
+		JSON.stringify(Object.keys(L.activeScenario().overrides)));
+	L.refreshLabelText();
+	ok('the node is haloed', L.nodeCircle('20').classList.contains('lpn-override'));
+	ok('...and the pipe is NOT -- this is the symptom Tom reported',
+		!L.linkHalo('20').classList.contains('lpn-override'));
+
+	// THE DANGEROUS HALF. `active` is on both groups, so under one flat map switching the junction
+	// off took a pipe it never touched out of the solve with it.
+	L.setProp(nodeOf('20'), 'active', false);
+	const m = L.assembleModel();
+	ok('switching the junction off removes the junction', !modelHas(m, 'node', '20'));
+	ok('...and its OWN incident pipes, which is the correct cascade',
+		!modelHas(m, 'link', 'P2') && !modelHas(m, 'link', 'P3') && !modelHas(m, 'link', '10'));
+	ok('...but the PIPE called 20, which it never touched, is still in the solve',
+		modelHas(m, 'link', '20'), JSON.stringify(m.links.map(function (l) { return l.id; })));
+	L.clearOverride(nodeOf('20'), 'active');
+
+	// --- and the same in reverse: an override on the LINK leaves the NODE alone ---
+	// The node's own override is cleared first, so "the node is unhaloed" means what it says. Left
+	// in place it would halo the node legitimately, and the assertion would pass either way.
+	L.clearOverride(nodeOf('20'), 'demand');
+	L.setProp(linkOf('20'), 'active', false);
+	const m2 = L.assembleModel();
+	ok('switching the pipe off removes the pipe', !modelHas(m2, 'link', '20'));
+	ok('...and the junction of the same name stays in the solve', modelHas(m2, 'node', '20'));
+	L.setProp(linkOf('20'), 'diameter', 4);
+	L.refreshLabelText();
+	ok('the pipe is haloed by its own override', L.linkHalo('20').classList.contains('lpn-override'));
+	ok('...and the junction of the same name is NOT -- the reverse of Tom\'s symptom',
+		!L.nodeCircle('20').classList.contains('lpn-override'),
+		JSON.stringify(L.activeScenario().overrides));
+	L.clearOverride(linkOf('20'), 'active');
+	L.setProp(nodeOf('20'), 'demand', 500);
+	ok('the two elements hold their own values side by side',
+		L.effective(nodeOf('20'), 'demand') === 500 && L.effective(linkOf('20'), 'diameter') === 4,
+		L.effective(nodeOf('20'), 'demand') + ' / ' + L.effective(linkOf('20'), 'diameter'));
+
+	// --- the round trip: both keys survive save and load, still telling the two apart ---
+	const file = JSON.parse(JSON.stringify(L.serializeProject()));
+	ok('the file is written at the group-keyed version', file.v === L.storageVersion(), 'v' + file.v);
+	L.applySaved(file);
+	ok('after a reload the node still has its demand and the pipe still has its diameter',
+		L.effective(nodeOf('20'), 'demand') === 500 && L.effective(linkOf('20'), 'diameter') === 4,
+		JSON.stringify(L.getScenarios()[1].overrides));
+
+	// --- deleting one of the pair leaves the other's values alone ---
+	L.switchScenario('base');
+	confirmAnswer = true;
+	L.deleteElement('link', '20');
+	ok('deleting the pipe drops the pipe\'s values', !L.getScenarios()[1].overrides['l:20'],
+		JSON.stringify(L.getScenarios()[1].overrides));
+	ok('...and leaves the junction\'s untouched', !!L.getScenarios()[1].overrides['n:20'],
+		JSON.stringify(L.getScenarios()[1].overrides));
+	L.undo();
+}
+
+// ---------------------------------------------------------------------------
+// 10b. The v4 -> v5 migration, which has to GUESS and must say how
+// ---------------------------------------------------------------------------
+// A bare key in a stored document is ambiguous by construction -- that ambiguity IS the defect --
+// so the migration resolves each key against the elements the file actually holds and prefers the
+// NODE where both exist. The rule is asserted here rather than left to the comment, because a
+// migration nobody tests runs exactly once per user, unobserved, on their own data.
+console.log('\n--- a v4 document migrates its bare override keys ---');
+{
+	const v4 = {
+		v: 4,
+		nodes: [{ id: '20', type: 'junction', x: 0, y: 0, _demand: 1 }, { id: 'J9', type: 'junction', x: 1, y: 0 }],
+		links: [{ id: '20', type: 'pipe', from: '20', to: 'J9', _diameter: 8 },
+			{ id: 'P1', type: 'pipe', from: '20', to: 'J9', _diameter: 8 }],
+		labels: [],
+		scenarios: [{ id: 'base', name: 'Base', isBase: true, overrides: {} },
+			{ id: 's1', name: 'S', overrides: { '20': { demand: 500 }, 'P1': { diameter: 4 }, 'GONE': { demand: 7 } } }]
+	};
+	const out = L.migrateSaved(JSON.parse(JSON.stringify(v4)));
+	const ov = out.scenarios[1].overrides;
+	ok('the migrated document is at the current version', out.v === L.storageVersion(), 'v' + out.v);
+	ok('an ambiguous key resolves to the NODE, as the rule states', !!ov['n:20'] && ov['n:20'].demand === 500,
+		JSON.stringify(ov));
+	ok('...and NOT to the link, which gets nothing', ov['l:20'] === undefined, JSON.stringify(ov));
+	ok('an unambiguous key keeps its own group', !!ov['l:P1'] && ov['l:P1'].diameter === 4, JSON.stringify(ov));
+	ok('a key naming no element at all is dropped, not carried forward',
+		ov['n:GONE'] === undefined && ov['l:GONE'] === undefined && ov['GONE'] === undefined,
+		JSON.stringify(ov));
+	// The report exists so the rule is auditable from outside; assert it counts what it did.
+	const rep = L.migrateOverrideKeys(JSON.parse(JSON.stringify(v4)));
+	ok('the migration reports what it moved, dropped and had to guess at',
+		rep.moved === 2 && rep.dropped === 1 && rep.ambiguous === 1, JSON.stringify(rep));
+}
+
+// ---------------------------------------------------------------------------
+// 10c. THE REAL FILE, when it is on disk
+// ---------------------------------------------------------------------------
+// dev/epanet-models/ is gitignored, so it is absent from a worktree and present in the main
+// checkout. That is reported rather than passed over in silence -- a skipped test that says
+// nothing is indistinguishable from one that passed.
+{
+	const NET2 = path.join(ROOT, 'dev', 'epanet-models', 'Net2.inp');
+	if (!fs.existsSync(NET2)) {
+		console.log('\n--- Net2.inp not present (dev/epanet-models is gitignored) -- SKIPPED ---');
+	} else {
+		console.log('\n--- the same, on EPANET\'s own Net2.inp ---');
+		L.importInp({ name: 'Net2.inp', _text: fs.readFileSync(NET2, 'utf8') });
+		const nodeIds = {}, shared = [];
+		L.getDoc().nodes.forEach(function (n) { nodeIds[n.id] = true; });
+		L.getDoc().links.forEach(function (l) { if (nodeIds[l.id]) { shared.push(l.id); } });
+		// COUNTED HERE, never quoted from the roadmap: the number is a fact about the file, and a
+		// fact restated in prose is one that can go stale without anything noticing.
+		ok('Net2 really does name nodes and links alike', shared.length > 0,
+			shared.length + ' shared ids, e.g. ' + shared.slice(0, 6).join(' '));
+		// A shared id whose link does not touch its namesake node -- the only kind that can tell the
+		// collision apart from a legitimate cascade.
+		const id = shared.filter(function (x) {
+			const l = linkOf(x);
+			return l && l.from !== x && l.to !== x;
+		})[0];
+		ok('...including one where the two are nowhere near each other', !!id, id);
+		if (id) {
+			const scn = L.createScenario('Net2 collision');
+			L.switchScenario(scn.id);
+			L.setProp(nodeOf(id), 'active', false);
+			ok('switching junction ' + id + ' off leaves pipe ' + id + ' in the solve',
+				modelHas(L.assembleModel(), 'link', id));
+			L.refreshLabelText();
+			ok('...and leaves it unhaloed', !L.linkHalo(id).classList.contains('lpn-override'));
+		}
+	}
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
