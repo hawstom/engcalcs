@@ -620,7 +620,7 @@ var EngCalcs = EngCalcs || {};
 	// than silently working today and breaking invisibly once a second scenario exists.
 	function effective(el, prop) {
 		if (!el) { return undefined; }
-		var ov = activeScenario().overrides[el.id];
+		var ov = activeScenario().overrides[ovKey(el)];
 		if (ov && Object.prototype.hasOwnProperty.call(ov, prop)) { return ov[prop]; }
 		// `active` has no stored property yet (nothing sets it) -- its absence must read as true, not
 		// undefined/falsy, so a topology no scenario has touched is never mistaken for inactive. This
@@ -630,7 +630,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- the write side (ROADMAP Task 184's scenario UI, 2026-08-14) ----
 	// THE MARKER IS THE KEY'S PRESENCE, and it records INTENT at edit time -- never a diff. Writing
-	// overrides[id][prop] says "I set this deliberately, here"; deleting it is the undo. Both hold
+	// overrides[ovKey(el)][prop] says "I set this deliberately, here"; deleting it is the undo. Both hold
 	// when the value equals Base's, because a diff cannot tell "I chose this number for this
 	// scenario" from "Base happens to agree today", and those two need opposite treatment the
 	// moment Base moves.
@@ -639,10 +639,23 @@ var EngCalcs = EngCalcs || {};
 	// (a valve) can arrive at any time, and a hardcoded type list would silently classify it as a
 	// node and quietly refuse every override on it.
 	function elGroup(el) { return (el && el.from !== undefined) ? 'link' : 'node'; }
+	// THE OVERRIDE MAP'S KEY, and it carries the element's GROUP because an id alone does not
+	// identify an element (ROADMAP Task 324). EPANET keeps nodes and links in SEPARATE namespaces,
+	// so a junction 20 and a pipe 20 are both legal and both ordinary -- re-measured 2026-08-14 on
+	// the files in dev/epanet-models/: Net1 has 7 ids that name both a node and a link, Net2 has 35,
+	// Net3 has 72. Keyed by the bare id, a demand typed on junction 20 was read back by pipe 20:
+	// the halo Tom saw ("a remote pipe changed to orange along with the node") was the harmless
+	// half, and `active` -- which is on BOTH groups -- was the dangerous one, because switching a
+	// junction off silently dropped an unrelated pipe out of the solve.
+	//
+	// ONE SEAM, so the format is stated once: every read, write, count, rename and purge goes
+	// through ovKey()/ovKeyFor() and none of them spells 'n:' or 'l:' itself.
+	function ovKey(el) { return ovKeyFor(elGroup(el), el && el.id); }
+	function ovKeyFor(group, id) { return (group === 'link' ? 'l:' : 'n:') + id; }
 	function isOverridable(el, prop) { return !!(LPN_OVERRIDABLE[elGroup(el)] || {})[prop]; }
 	function inBaseScenario() { return !!activeScenario().isBase; }
 	function hasOverride(el, prop) {
-		var ov = activeScenario().overrides[el.id];
+		var ov = activeScenario().overrides[ovKey(el)];
 		return !!(ov && Object.prototype.hasOwnProperty.call(ov, prop));
 	}
 	// Base's OWN value for a property, ignoring whatever the active scenario says -- what the
@@ -653,8 +666,8 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setOverride(el, prop, value) {
 		if (!el || !isOverridable(el, prop) || inBaseScenario()) { return; }
-		var scn = activeScenario();
-		if (!scn.overrides[el.id]) { scn.overrides[el.id] = {}; }
+		var scn = activeScenario(), key = ovKey(el);
+		if (!scn.overrides[key]) { scn.overrides[key] = {}; }
 		// UNDEFINED BECOMES NULL, and the asymmetry is the point. In Base, `undefined` is a perfectly
 		// good way to say "no head typed" -- it means the same thing as the key being absent. In an
 		// override map absence means something ELSE entirely: "inherit Base". So a blank-capable
@@ -667,17 +680,17 @@ var EngCalcs = EngCalcs || {};
 		// covered without anyone remembering: null survives JSON, and every existing consumer
 		// already handles it -- reservoirHead() tests undefined/null/'', formatPropValue() returns
 		// '', and unitNumberFieldBlank's own setter tests all three.
-		scn.overrides[el.id][prop] = (value === undefined) ? null : value;
+		scn.overrides[key][prop] = (value === undefined) ? null : value;
 	}
 	function clearOverride(el, prop) {
-		var scn = activeScenario(), ov = scn.overrides[el.id];
+		var scn = activeScenario(), key = ovKey(el), ov = scn.overrides[key];
 		if (!ov) { return; }
 		delete ov[prop];
 		// An empty map is dropped rather than left behind: the override COUNT is a sum of key
 		// counts, and an element with an empty object still occupying the map would otherwise
 		// read to any future reader as "this element is touched here", which is exactly the claim
 		// the marker exists to make precisely.
-		if (!Object.keys(ov).length) { delete scn.overrides[el.id]; }
+		if (!Object.keys(ov).length) { delete scn.overrides[key]; }
 	}
 	// THE ONE WRITE SEAM every property editor goes through. In Base it writes the element (which
 	// IS the propagation -- there is no push upward in the delta model); in a scenario it records
@@ -689,21 +702,24 @@ var EngCalcs = EngCalcs || {};
 	}
 	function overrideCount(scn) {
 		var total = 0;
-		Object.keys(scn.overrides || {}).forEach(function (id) { total += Object.keys(scn.overrides[id]).length; });
+		Object.keys(scn.overrides || {}).forEach(function (key) { total += Object.keys(scn.overrides[key]).length; });
 		return total;
 	}
 	// Every scenario's overrides on one element -- what a Base-side deletion is about to destroy,
 	// which is why it is counted before the confirm rather than after it.
-	function overrideCountForElement(id) {
+	// TAKES A KEY, not an id: the caller is the one that knows whether it is holding a node or a
+	// link, and an id on its own cannot say (Task 324). Passing the bare id here counted -- and
+	// purged -- whichever element of the pair the map happened to have.
+	function overrideCountForElement(key) {
 		var total = 0;
 		scenarios.forEach(function (s) {
-			if (s.isBase || !s.overrides[id]) { return; }
-			total += Object.keys(s.overrides[id]).length;
+			if (s.isBase || !s.overrides[key]) { return; }
+			total += Object.keys(s.overrides[key]).length;
 		});
 		return total;
 	}
-	function purgeOverrides(id) {
-		scenarios.forEach(function (s) { delete s.overrides[id]; });
+	function purgeOverrides(key) {
+		scenarios.forEach(function (s) { delete s.overrides[key]; });
 	}
 
 	// ---- the scenario selector, and its "what am I working on right now" readout ----
@@ -899,9 +915,12 @@ var EngCalcs = EngCalcs || {};
 		scenarios.forEach(function (s) {
 			if (s.isBase) { return; }
 			var any = false;
-			Object.keys(s.overrides).forEach(function (id) {
+			// Walks the map by KEY and matches on the property NAME only -- deliberately group-blind,
+			// because no property in pushSpecList() exists on both groups (`active` is the only name
+			// LPN_OVERRIDABLE shares, and it is not pushable). Task 324.
+			Object.keys(s.overrides).forEach(function (key) {
 				active.forEach(function (spec) {
-					if (Object.prototype.hasOwnProperty.call(s.overrides[id], spec.prop)) { hits++; any = true; }
+					if (Object.prototype.hasOwnProperty.call(s.overrides[key], spec.prop)) { hits++; any = true; }
 				});
 			});
 			if (any) { touched++; }
@@ -917,9 +936,9 @@ var EngCalcs = EngCalcs || {};
 		saveUndoSnapshot();
 		scenarios.forEach(function (s) {
 			if (s.isBase) { return; }
-			Object.keys(s.overrides).forEach(function (id) {
-				active.forEach(function (spec) { delete s.overrides[id][spec.prop]; });
-				if (!Object.keys(s.overrides[id]).length) { delete s.overrides[id]; }
+			Object.keys(s.overrides).forEach(function (key) {
+				active.forEach(function (spec) { delete s.overrides[key][spec.prop]; });
+				if (!Object.keys(s.overrides[key]).length) { delete s.overrides[key]; }
 			});
 		});
 		applyScenarioChange();
@@ -2572,10 +2591,14 @@ var EngCalcs = EngCalcs || {};
 				.replace('{id}', id).replace('{scenario}', scenarioDisplayName(activeScenario())));
 			return;
 		}
-		var ids = [id];
-		if (kind === 'node') { ids = ids.concat(incidentLinks[id] || []); }
+		// The element itself, plus -- for a node -- every link the cascade is about to take with it.
+		// Built as KEYS rather than ids, because those incident ones are links whatever `kind` is.
+		var keys = [ovKeyFor(kind, id)];
+		if (kind === 'node') {
+			keys = keys.concat((incidentLinks[id] || []).map(function (lid) { return ovKeyFor('link', lid); }));
+		}
 		var lost = 0;
-		ids.forEach(function (x) { lost += overrideCountForElement(x); });
+		keys.forEach(function (k) { lost += overrideCountForElement(k); });
 		if (lost && !window.confirm((pc.lpn_delete_drops_overrides || 'Deleting this also throws away {n} values your scenarios hold for it. Continue?').replace('{n}', lost))) { return; }
 		saveUndoSnapshot();
 		if (kind === 'node') { deleteNode(id); } else { deleteLink(id); }
@@ -2596,7 +2619,7 @@ var EngCalcs = EngCalcs || {};
 		// A real deletion drops every scenario's overrides on the element (Task 184). Left behind,
 		// they would be a map entry keyed by an id nothing answers to -- silently counted in the
 		// status bar, and silently reattached the day a new element minted the same id.
-		purgeOverrides(id);
+		purgeOverrides(ovKeyFor('node', id));
 		if (currentPopup && currentPopup.kind === 'node' && currentPopup.id === id) { closePopup(); }
 		updateEmptyHint();
 		scheduleSolve();
@@ -2622,7 +2645,7 @@ var EngCalcs = EngCalcs || {};
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
 		incidentLinks[l.to] = incidentLinks[l.to].filter(function (x) { return x !== id; });
 		doc.links = doc.links.filter(function (x) { return x.id !== id; });
-		purgeOverrides(id);   // see deleteNode()
+		purgeOverrides(ovKeyFor('link', id));   // see deleteNode()
 		if (currentPopup && currentPopup.kind === 'link' && currentPopup.id === id) { closePopup(); }
 		scheduleSolve();
 	}
@@ -2652,7 +2675,9 @@ var EngCalcs = EngCalcs || {};
 	// 3 (Task 263, 2026-08-10): inputs are stored AS DECLARED rather than in SI, and the document
 	// records the unit selection it was written under. A v2 document holds SI numbers and says
 	// nothing about units, which is why opening one runs the one-time restore offer below.
-	var LPN_STORAGE_VERSION = 4;
+	// 5 (Task 324, 2026-08-14): a scenario override is keyed by GROUP AND id ('n:20' / 'l:20')
+	// rather than by the bare id, because a node and a link may legally share one.
+	var LPN_STORAGE_VERSION = 5;
 	// ---- ROADMAP Task 274, second half (Tom, 2026-08-11: "Eventually needs to be Cartesian. If we
 	// can do that now without causing trouble, let's do it.") ----
 	//
@@ -2856,6 +2881,28 @@ var EngCalcs = EngCalcs || {};
 	// Ordered, one step per version, each taking the object from v(n) to v(n+1). A save older than
 	// the newest migration therefore walks the whole chain rather than needing a special case per
 	// starting version.
+	// The v4 -> v5 override re-keying, split out so the rule above sits beside the step that runs it
+	// and the harness can drive it on its own. Returns a small report -- how many keys were re-keyed
+	// and how many were dropped -- because a migration that guesses silently is worse than one that
+	// states its rule, and nothing else in the document afterwards can say what it did.
+	function migrateOverrideKeys(saved) {
+		var nodeIds = {}, linkIds = {}, moved = 0, dropped = 0, both = 0;
+		(saved.nodes || []).forEach(function (n) { if (n && n.id !== undefined) { nodeIds[n.id] = true; } });
+		(saved.links || []).forEach(function (l) { if (l && l.id !== undefined) { linkIds[l.id] = true; } });
+		(saved.scenarios || []).forEach(function (s) {
+			if (!s || !s.overrides) { return; }
+			var out = {};
+			Object.keys(s.overrides).forEach(function (id) {
+				if (nodeIds[id] && linkIds[id]) { both++; }
+				var group = nodeIds[id] ? 'node' : (linkIds[id] ? 'link' : null);
+				if (!group) { dropped++; return; }
+				out[ovKeyFor(group, id)] = s.overrides[id];
+				moved++;
+			});
+			s.overrides = out;
+		});
+		return { moved: moved, dropped: dropped, ambiguous: both };
+	}
 	function migrateSaved(saved) {
 		if (saved.v === 1) {
 			// The single autosaved network becomes the project's Base. Its name is left blank, not
@@ -2888,6 +2935,31 @@ var EngCalcs = EngCalcs || {};
 			flipStoredY(saved);
 			saved.v = 4;
 		}
+		// v4 -> v5: OVERRIDE KEYS GAIN THEIR ELEMENT'S GROUP (Task 324). A bare key in a v4 document
+		// is genuinely ambiguous -- that ambiguity IS the defect -- so this cannot be a mechanical
+		// re-spelling; it has to resolve each key against the elements the document actually holds,
+		// and say out loud what it does when the answer is not unique:
+		//
+		//   - only a node has that id  -> 'n:<id>'   unambiguous
+		//   - only a link has that id  -> 'l:<id>'   unambiguous
+		//   - BOTH have it             -> 'n:<id>', the NODE. Not a coin toss: the old effective()
+		//     read one flat map, so the value the user was actually looking at while they typed it
+		//     was being applied to both elements at once, and every property in a v4 map that can
+		//     belong to a node (demand, head, level, emitter) belongs to a node exclusively. A wrong
+		//     guess here re-keys a value onto an element that has no such property, where it is
+		//     dead; the node guess keeps it where it is most likely to still mean something.
+		//   - NEITHER has it           -> dropped. It was already dead: purgeOverrides() removes a
+		//     deleted element's overrides, so a key with no element is a leftover from a hand-edited
+		//     or partially-written file, and carrying it forward would resurrect it the day someone
+		//     minted that id again.
+		//
+		// A key is never pattern-matched for a leading 'n:'/'l:' -- at v4 every key is bare BY
+		// DEFINITION, and an element legitimately named 'n:20' would be re-keyed to 'n:n:20', which
+		// is right. Guessing from the shape of the string would break that one and gain nothing.
+		if (saved.v === 4) {
+			migrateOverrideKeys(saved);
+			saved.v = 5;
+		}
 		// **There is deliberately NO v2 -> v3 step here, and v2 is the ONLY version that lags.**
 		// Every other migration in this function converts the document and stamps it; this one
 		// cannot, because the conversion is the USER'S to authorise. So the document stays at v2
@@ -2899,6 +2971,11 @@ var EngCalcs = EngCalcs || {};
 		// serializeProject() both gate on the same version -- and picks up Cartesian for free the
 		// moment the units question is answered, because stampDocAnswered() moves it to
 		// LPN_STORAGE_VERSION.
+		// A LAGGING v2 DOCUMENT THEREFORE NEVER REACHES THE v4 -> v5 STEP EITHER, and that is safe
+		// rather than lucky: v2 predates the scenario UI entirely, so no v2 document can carry an
+		// override at all (applyV2Restore() records the same fact and declines to scale them for the
+		// same reason). Adding a re-keying pass for a case that cannot occur would be dead code in a
+		// one-time migration -- which reads as evidence the case is real, and is worse than absent.
 		return saved;
 	}
 	// Version-checks one already-parsed document and runs it up to the current version. Returns null
@@ -8678,17 +8755,21 @@ var EngCalcs = EngCalcs || {};
 	// Base, and the status bar still counts them -- there is nothing on screen that says a number
 	// went away. Renames are cheap and we own the path, which is the same reasoning the "compare
 	// with base ID" field records for following a rename.
-	function renameOverrides(oldId, newId) {
+	// The GROUP comes in with the ids because the key carries it (Task 324) -- and a rename is the
+	// one path where getting it wrong would be invisible twice over: it would strand the values
+	// under the old key AND hand them to whatever element of the other group answers to the new id.
+	function renameOverrides(group, oldId, newId) {
+		var oldKey = ovKeyFor(group, oldId), newKey = ovKeyFor(group, newId);
 		scenarios.forEach(function (s) {
-			if (!s.overrides[oldId]) { return; }
-			s.overrides[newId] = s.overrides[oldId];
-			delete s.overrides[oldId];
+			if (!s.overrides[oldKey]) { return; }
+			s.overrides[newKey] = s.overrides[oldKey];
+			delete s.overrides[oldKey];
 		});
 	}
 	function renameNode(oldId, newId) {
 		var n = nodeById(oldId), i;
 		n.id = newId;
-		renameOverrides(oldId, newId);
+		renameOverrides('node', oldId, newId);
 		nodeEls[newId] = nodeEls[oldId]; delete nodeEls[oldId];
 		incidentLinks[newId] = incidentLinks[oldId]; delete incidentLinks[oldId];
 		labelsByAnchor[newId] = labelsByAnchor[oldId]; delete labelsByAnchor[oldId];
@@ -8707,7 +8788,7 @@ var EngCalcs = EngCalcs || {};
 	function renameLink(oldId, newId) {
 		var l = linkById(oldId);
 		l.id = newId;
-		renameOverrides(oldId, newId);
+		renameOverrides('link', oldId, newId);
 		// Any OTHER pump referencing this one by curveRef must follow the rename, or its curve
 		// silently reverts to nothing (resolveCurvePoints() only matches an exact id).
 		doc.links.forEach(function (other) { if (other.curveRef === oldId) { other.curveRef = newId; } });
@@ -9014,7 +9095,8 @@ var EngCalcs = EngCalcs || {};
 			// pressure sitting under a valve that now wants a flow.
 			l._setting = defaultValveSetting(v);   // base-write: valveType is Base-owned, so the setting that belongs to it is too
 			scenarios.forEach(function (sc) {
-				if (sc.overrides[l.id]) { delete sc.overrides[l.id].setting; }
+				var ovv = sc.overrides[ovKey(l)];
+				if (ovv) { delete ovv.setting; }
 			});
 			refreshPopupIfOpen();
 			scheduleSolve();
@@ -9649,7 +9731,7 @@ var EngCalcs = EngCalcs || {};
 		return field ? !!labelSettings[group][field] : true;
 	}
 	function hasDisplayedOverride(el) {
-		var ov = activeScenario().overrides[el.id];
+		var ov = activeScenario().overrides[ovKey(el)];
 		if (!ov) { return false; }
 		return Object.keys(ov).some(function (p) { return overrideIsDisplayed(el, p); });
 	}

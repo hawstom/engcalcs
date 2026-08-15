@@ -89,3 +89,82 @@ it goes through it.
 And the harness lesson: **a harness that exercises one instance of a pattern has tested that
 instance, not the pattern.** Ask what vocabulary a harness never uses; that is where its blind spot
 is.
+
+---
+
+# The second seam: one key space for two namespaces (Task 324)
+
+2026-08-14, the same week. Tom, using a scenario: *"When I changed a demand, a remote pipe changed
+to orange along with the node. The pipe has no changes."*
+
+`scenarios[].overrides` was **one flat map keyed by the bare element id**, which quietly assumes a
+single id space across the document. **EPANET does not have one** — nodes and links are separate
+namespaces, so a junction `20` and a pipe `20` are both legal and both ordinary. Re-measured over
+`dev/epanet-models/`: **Net1 7 shared ids, Net2 35, Net3 72**. The `.inp` importer does not rename
+anything (correctly — an id is the user's data), so importing any of those three built a document
+where the map could not tell the two elements apart.
+
+The halo Tom saw is the harmless half. `effective()` read the same map, so a node's override was
+visible to a link of the same name; `demand` and `diameter` happen not to overlap by name, which is
+exactly why it reads as a display glitch. **`active` is on BOTH groups**, so unticking "Part of this
+network" on a junction dropped an unrelated pipe out of the SOLVE, silently.
+
+## The fix
+
+One seam. `ovKey(el)` / `ovKeyFor(group, id)` returns `n:20` / `l:20`, and every read, write, count,
+rename, purge and halo goes through it — `effective`, `hasOverride`, `setOverride`, `clearOverride`,
+`overrideCountForElement`, `purgeOverrides`, `renameOverrides`, `deleteElement`, the valve-type
+clear, `hasDisplayedOverride`. The group comes from `elGroup()`, which already tells a link from a
+node by whether it has `from`; no second rule was invented. `overrideCount()` and
+`pushBaseToScenarios()` walk the map generically and are group-blind on purpose — no property in
+`pushSpecList()` exists on both groups.
+
+Two functions changed shape rather than just their body, and that is the honest signal:
+`purgeOverrides` and `overrideCountForElement` now take a **key**, not an id. An id on its own
+cannot answer the question they are asked, and a caller that has one always knows which group it is
+holding.
+
+## The migration, and why it must state its rule
+
+It is a document-format change, so `LPN_STORAGE_VERSION` is 5 and `migrateSaved()` gained a
+`v4 -> v5` step. **A bare key in a v4 document is genuinely ambiguous — that ambiguity is the
+defect** — so the migration resolves each key against the elements the file actually holds:
+
+| Case | Result |
+|---|---|
+| Only a node has that id | `n:<id>` |
+| Only a link has that id | `l:<id>` |
+| **Both** | `n:<id>` — the node |
+| Neither | dropped |
+
+**Why the node wins:** the old `effective()` read one flat map, so whichever element the user was
+looking at while they typed, the value was being applied to both at once — there is no recorded
+intent to recover. Every v4-era property that can belong to a node (`demand`, `head`, `level`,
+`emitter`) belongs to a node *exclusively*, so a wrong guess re-keys the value onto an element with
+no such property, where it is dead. The node guess keeps it somewhere it can still mean something.
+**Neither** is dropped because it was already dead: `purgeOverrides()` removes a deleted element's
+overrides, so a key naming no element is a leftover that would otherwise be resurrected the day
+someone minted that id again. `migrateOverrideKeys()` returns a `{moved, dropped, ambiguous}` report
+so the rule is auditable from outside, and the harness asserts all four cases.
+
+A lagging v2 document never reaches the step, which is safe rather than lucky: v2 predates the
+scenario UI entirely, so no v2 document can carry an override at all.
+
+## The harness lesson, which is the same one as last time
+
+`scenario-harness.js` was mutation-tested, ~60 assertions, and **could not have caught this**: every
+fixture in it is hand-built with unique ids. Last time the blind spot was a missing *vocabulary*
+(one harness never said "valve", the other never said "scenario"). This time it was a missing
+*shape* — the harness had no fixture in which two elements shared a name, because a person building
+a network by hand never makes one.
+
+So the new section 10 **imports** its network, since the editor's own rename validation refuses a
+duplicate id and an import is the only way a user reaches this state at all. It uses an inline
+`.inp` whose colliding link is deliberately **not incident** to its namesake node — otherwise a
+correct cascade and the bug look identical — and then repeats the check against real `Net2.inp` when
+`dev/epanet-models/` is present, counting the collisions itself rather than quoting a number.
+Mutation-tested four ways: bare-id keys (11 failures, reproducing the reported symptom exactly),
+a wrong group on purge (3), a migration preferring the link (2), a rename using the wrong group (1).
+
+**Ask what shape of input a harness's fixtures cannot express.** That is where its next blind spot
+is, and it is a different question from what vocabulary it never uses.

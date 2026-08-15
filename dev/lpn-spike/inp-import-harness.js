@@ -88,7 +88,11 @@ const L = loadLoopedNetwork(
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
 	"\t\t\tmaskLayer = el('g', {}, world); labelsLayer = el('g', {}, world);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); },\n" +
-	"\t\tdocVersion: function () { return openDocVersion; }, "
+	"\t\tdocVersion: function () { return openDocVersion; },\n" +
+	// Read from the page rather than typed here: the assertion below is "the import writes a
+	// CURRENT document", and a literal 4 made it "the import writes v4" -- a different claim, which
+	// went stale at the next format bump (Task 324).
+	"\t\tstorageVersion: function () { return LPN_STORAGE_VERSION; }, "
 );
 L.buildLayers();
 
@@ -244,7 +248,8 @@ importText(usInp, 'import-cases.inp');
 	ok('the project is named after the file', L.getProject().name === 'import-cases',
 		L.getProject().name);
 	ok('an imported project starts SAVED, not modified', L.indexEntry(L.openId()).dirty === false);
-	ok('the document is written at the current version', L.docVersion() === 4, L.docVersion());
+	ok('the document is written at the current version', L.docVersion() === L.storageVersion(),
+		L.docVersion());
 }
 
 // ---------------------------------------------------------------------------
