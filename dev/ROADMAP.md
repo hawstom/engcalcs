@@ -701,6 +701,38 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     form GIS actually uses, and is probably where these two tasks are heading together.
 
 
+- 66|337| **Text label properties: Bold, and Rotate-to-match-a-pipe with a flip toggle.** Tom,
+  2026-08-14: *"For text labels properties, it would be nice to allow Bold and Rotation to match a
+  pipe with a toggle to rotate opposite the initial result."*
+  - Bold is a per-label `lb.bold`, the sibling of the existing `lb.sizeMult`, and is the easy half.
+  - **Rotation should CAPTURE an angle, not hold a live reference to a pipe.** Matching "a pipe"
+    would need the Text label to know which link it belongs to — a relationship Text labels do not
+    have and should not grow, since a street name or a title block is not about one pipe. Take the
+    angle from the nearest link at the moment the user asks, store the NUMBER, and the label is then
+    independent of everything that happens to that pipe afterwards.
+  - **The flip toggle is then just +180°**, which is precisely why Tom asked for it in the same
+    breath: `alignedLabelAnchor()`'s readability normalisation picks the side that reads left-to-
+    right, and on a near-vertical pipe either choice is defensible. A capture-then-adjust control is
+    honest about that; an automatic rule that is right 70% of the time is not.
+  - Same shape as the leader angle-hint in Task 328: **capture the user's intent once as a number,
+    then stop deriving it.** Worth noticing that this is now the third place that pattern is the
+    answer.
+
+- 55|338| **Say out loud that GEOMETRY IS NOT SCENARIO STATE.** Tom, 2026-08-14: *"For a scenario,
+  dragging a node edits the base. Is this bad, good, or an oversight. The good thing is that it's
+  obvious."*
+  - **GOOD, and deliberate rather than lucky.** `x`/`y` are not in `LPN_OVERRIDABLE`, so a drag is a
+    Base write by construction. The reason it is right: **two scenarios of one network must LOOK the
+    same, or you cannot compare them.** If geometry were overridable, switching scenarios would move
+    the map under the reader — the one thing that makes a side-by-side reading impossible — and every
+    scenario would carry a private copy of a drawing nobody meant to fork. Label offsets (`lx`/`ly`)
+    are in the same category for the same reason.
+  - **It is not an oversight, but it IS undocumented**, and Tom's *"the good thing is that it's
+    obvious"* is the whole argument for leaving the behaviour alone and only saying so. The work here
+    is a sentence in the scenario UI or Help — not a mechanism.
+  - The line to state: **a scenario is a set of HYDRAULIC differences. The drawing is the network's,
+    not the scenario's.**
+
 - 92|326| **PARADIGM: size text and symbols in PRINTED units, not real-world units.** Tom,
   2026-08-14: *"the end product of all text and symbols is in printed units… engineers and architects
   achieve precise control of prints by fixing the printed scale early… but these heights are
@@ -782,6 +814,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     Tom's own "maybe start only with the element level". The Labels panel already narrows properties,
     so element + displayed-properties covers the real case without a new picker.
 
+  - **THE AFFORDANCE IS IN BASE, opposite the scenarios' "This scenario only"** (Tom asked,
+    2026-08-14: *"Are we going to add 'Apply to all scenarios' in Base?"*). Yes — and note it is
+    not there for symmetry, which is never a reason on its own: it is there because pushing a
+    value down is a real action a user needs, and Base is the only place standing where that
+    action makes sense.
 - 80|314| **An EXAMPLES LIBRARY, on the HEC-RAS model: a pane of many examples, not a menu of two.**
   Tom, 2026-08-14: *"I envision a stunning array of examples that fills a screen with mere titles or
   brief descriptions and could span pages or sub-categories of large thumbnails… Therefore it is

@@ -225,15 +225,19 @@ html[lang="zh"] .ec-welcome {
    ~1.8 cap height is the "about 1.33" too-big he measured by eye. Dropping the stroke and
    sizing the fill alone (JUNCTION_R in looped-network.js) puts the whole dot at one cap height.
 
-   BLUE, NOT GREEN, and matched to .lpn-node-symbol-reservoir's #26a so a junction and a
-   reservoir read as the same water system rather than two unrelated things. Tom: "I am not
-   really liking green for water system nodes." EPANET draws everything black; epanet-js draws
-   the normal case in one blue and reserves colour for CONDITION (red for a closed valve).
-   That is the convention worth copying, and it is a reason to keep the base state visually
-   boring: every colour we spend on decoration now is one we cannot spend on meaning later.
-   The one existing conditional style, .lpn-node-pending's red ring, still overrides stroke
-   below and is unaffected. */
-.lpn-node { fill: #26a; stroke: none; cursor: pointer; }
+   BLACK since 2026-08-14 (Tom: "Black reservoirs, pumps, valves, and nodes, I suppose"), and the
+   comment that used to sit here arguing for BLUE-NOT-GREEN has been removed rather than left to
+   contradict the rule below -- a stylesheet that explains a colour it no longer uses is worse than
+   one that explains nothing.
+   The reasoning it made is the reasoning that retired it, which is the satisfying part: "every
+   colour we spend on decoration now is one we cannot spend on meaning later". Blue was already the
+   restrained choice (EPANET draws everything black; epanet-js draws the normal case in one blue and
+   reserves colour for CONDITION). Going the last step to black spends nothing at all on the base
+   state, which is what Task 327's colour-by-value view needs in order to mean something -- and it
+   answers Tom's own complaint that EPANET makes it "practically an act of Congress to get a pipe to
+   show as black while showing values from the model on the map".
+   The one existing conditional style, .lpn-node-pending's red ring, still overrides stroke below
+   and is unaffected -- which is exactly the point: condition still reads, now against nothing. */.lpn-node { fill: #000; stroke: none; cursor: pointer; }
 /* A reservoir now draws as a tank symbol, not this circle (ROADMAP Task 146.10) -- fill:none/
    stroke:none hides the circle itself; pointer-events:all keeps its full disc clickable/draggable
    anyway (data-node, drag, hit-testing all still read THIS element, unchanged), same trick used
@@ -263,12 +267,13 @@ html[lang="zh"] .ec-welcome {
    a distinction the shape already carries, and colour is the budget this map is saving for
    CONDITION -- see the note above. */
 .lpn-link-symbol-pump { color: #000; }
-/* A VALVE takes the PIPE's own colour, not a hue of its own (Task 248 phase 2). It is a fitting
-   in the line rather than a separate kind of thing, and its SHAPE -- an angular bowtie against
-   the pump's circle -- already tells it apart in greyscale, which is the test this map's symbols
-   are held to. Colour on this map is being saved for CONDITION; spending one here on a
-   distinction the shape already carries would be spending it twice. */
-.lpn-link-symbol-valve { color: #557; }
+/* Black with every other symbol (2026-08-14). It was the PIPE's own colour on the argument that a
+   valve is a fitting in the line rather than a separate kind of thing -- that argument still holds
+   and is now served better, since a black valve on a pipe stroke is a mark ON the line rather than
+   a differently-coloured object sitting in it. Told apart from a pump by SHAPE (an angular bowtie
+   against a circle), which is the test every symbol here is held to and the only one that survives
+   greyscale, print, and a colour-blind reader. */
+.lpn-link-symbol-valve { color: #000; }
 /* Opaque patch behind a symbol's own linework (prependSymbolBackdrop() in looped-network.js) so a
    pipe running under a reservoir's open tank or a pump's unfilled casing doesn't show through --
    the icon's own paths are untouched, this only paints underneath them. */
