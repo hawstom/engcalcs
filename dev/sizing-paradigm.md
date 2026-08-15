@@ -229,3 +229,48 @@ precisely that spot on a plot cannot have it from a hint. If that turns out to m
 a per-label "pin" that stores a real position and opts out of avoidance — but it should wait for
 someone to actually want it, because a hint is more robust for a drawing that re-solves and
 re-labels on every edit.
+
+---
+
+# How to actually ship this: the GIS paradigm first, dragging last
+
+Tom, 2026-08-14, closing the thread:
+
+> Keep in mind here that the simple way to proceed is the way that EPANET-JS did it, which is to
+> start only with the GIS paradigm. We align the labels with pipes, we assemble them the way we want
+> to assemble them, and we make them disappear when we are zoomed out. No dragging. Dragging is more
+> advanced.
+
+**This is the sequencing decision, and it should be read before any of the design above is built.**
+Everything earlier in this document is a good answer to a question that phase 1 may not have to ask.
+
+## Phase 1 — the whole of it
+
+1. **Sizes in paper units** (Task 326). Text and symbols specified for the sheet, scale declared.
+2. **Labels placed by the engine.** `runLabelCollisionAvoidance()` already exists and already does
+   this; it stops being handed a stored answer to argue with.
+3. **Pipe labels aligned to the pipe.** Rotated along the segment axis, the way every GIS labels a
+   road or a main. This is a real technique with a real payoff: an aligned label needs no leader,
+   because its position already says what it belongs to.
+4. **Scale-dependent visibility.** Hidden when zoomed out, shown when zoomed in — stated as a scale
+   (*"show at 1:500 and closer"*), which the paper frame makes sayable.
+5. **No dragging.**
+
+## Why this is the right order, beyond "it is simpler"
+
+**Dragging exists to fix a badly placed label. Items 2, 3 and 4 are three different ways of not
+placing one badly.** So phase 1 does not defer the dragging problem — it may dissolve it, and we
+will not know which until we have used it.
+
+That is the same shape as two findings already in this document: paper units removed `symbolScale`,
+and the angle-hint removed the per-scale placement table. **A paradigm worth adopting keeps deleting
+controls.** If GIS-first placement deletes dragging too, that is the third instance and strong
+evidence the frame is right.
+
+## What this means for the work already recorded
+
+- The **angle-as-hint** design (section above) is still the right answer *if dragging returns*, and
+  it costs nothing to leave written down. It should not be built in phase 1.
+- **Dragging ships today**, so phase 1 is not "do not build it" but "do not carry it forward
+  unexamined". The honest question after phase 1 is whether anyone reaches for it any more.
+- ROADMAP Task 328 drops accordingly. It is not wrong; it is premature.

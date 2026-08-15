@@ -516,7 +516,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Connects to Task 253 (clean map for screenshots) — a thematic view with no labels IS the clean
     map, arrived at from the other side.
 
-- 58|328| **Label dragging should move the LEADER'S ENDPOINT, not the label's offset.** Tom,
+- 25|328| **Label dragging should move the LEADER'S ENDPOINT, not the label's offset.** Tom,
   2026-08-14: *"dragging needs to be modified so that when you start to drag an item, you are really
   dragging the end point of the leader, and the label flips rather than the leader flipping. And…
   the end point of the leader you choose will be the fixed end point of the leader at multiple zoom
@@ -551,6 +551,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     asks.
   - `LPN_CALLOUT_ANGLE` (70°) and the existing collision avoidance already assume a leader has a
     direction, so the machinery is half there.
+  - **LOWERED 58 -> 25 (Tom, 2026-08-14): PREMATURE, not wrong.** *"Start only with the GIS
+    paradigm… no dragging. Dragging is more advanced."* Phase 1 is paper units, engine-placed labels,
+    pipe labels aligned to the pipe, and scale-dependent visibility. **Dragging exists to fix a badly
+    placed label, and all three of those are ways of not placing one badly** — so phase 1 may
+    dissolve this task rather than defer it. Ask afterwards whether anyone still reaches for it.
+    See `dev/sizing-paradigm.md`, final section.
 
 - 92|326| **PARADIGM: size text and symbols in PRINTED units, not real-world units.** Tom,
   2026-08-14: *"the end product of all text and symbols is in printed units… engineers and architects
