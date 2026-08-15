@@ -118,7 +118,7 @@ function checkAffix(what, field, prefix, text, bare) {
 	ok('...and the number follows the prefix immediately', /^-?[\d.]/.test(text.slice(pair[1].length)), text);
 });
 checkAffix('link', 'id', '', onlyLink('id')[0], pipes[0].id);
-[['demand', 'Q='], ['head', 'H='], ['pressure', 'P='], ['elev', 'E=']].forEach(function (pair) {
+[['demand', 'Q='], ['head', 'H='], ['pressure', 'P='], ['elev', 'Z=']].forEach(function (pair) {
 	const text = onlyNode(pair[0])[0];
 	checkAffix('node', pair[0], pair[1], text, text.slice(pair[1].length));
 	ok('...and the number follows the prefix immediately', /^-?[\d.]/.test(text.slice(pair[1].length)), text);
@@ -167,9 +167,13 @@ ok('three fields on an auto-placed label render as ONE row', rows.length === 1, 
 ok('...and lineCount agrees, so the mask and the collision box are sized for one line',
 	L.lineCount(P.id) === 1, String(L.lineCount(P.id)));
 ok('...with the values joined by the separator', / /.test(rowText(rows[0])) && /Q=/.test(rowText(rows[0])), rowText(rows[0]));
-// The separator is a segment of its own, so five segments: id, sep, flow, sep, velocity.
-ok('...and the separator is its own segment, so a mark can never land on it',
-	rows[0].length === 5, JSON.stringify(rows[0].map(function (s) { return s.text; })));
+// EVERY PREFIX AND EVERY SEPARATOR IS ITS OWN SEGMENT, which is what keeps an extrema mark the
+// length of the number alone: id, sep, 'Q=', value, sep, 'V=', value.
+ok('...and the prefixes and separators are their own segments',
+	rows[0].length === 7, JSON.stringify(rows[0].map(function (s) { return s.text; })));
+ok('...so no segment carrying a number also carries a prefix',
+	rows[0].every(function (s) { return !/[A-Za-z]=[\d.]/.test(s.text); }),
+	JSON.stringify(rows[0].map(function (s) { return s.text; })));
 
 ls.separator = ', ';
 rows = showThree();
@@ -184,7 +188,9 @@ P.lx = 5; P.ly = -5;
 rows = showThree();
 ok('a DRAGGED label goes back to a stack, one row per value', rows.length === 3, JSON.stringify(rows.map(rowText)));
 ok('...and lineCount follows it', L.lineCount(P.id) === 3, String(L.lineCount(P.id)));
-ok('...each row being one whole value', rows.every(function (r) { return r.length === 1; }), JSON.stringify(rows.map(rowText)));
+ok('...each row being one whole value, however many segments that takes',
+	rows.every(function (r) { return /^([A-Za-z]+\d+|Q=[\d.]+|V=[\d.]+)$/.test(rowText(r)); }),
+	JSON.stringify(rows.map(rowText)));
 delete P.lx; delete P.ly;
 ok('sending it home returns it to one line', showThree().length === 1);
 
@@ -201,13 +207,22 @@ ok('the example network really does have a marked high AND a marked low',
 	kinds.indexOf('high') >= 0 && kinds.indexOf('low') >= 0,
 	decorated.map(function (l) { return l.id + ':' + L.linkDecor(l.id)[0]; }).join(' '));
 decorated.forEach(function (l) {
-	const seg = rowsOf(L.linkTspans(l.id))[0][0];
+	const segs = L.linkTspans(l.id);
+	const marked = segs.filter(function (t) { return t.dec; });
 	const want = L.linkDecor(l.id)[0] === 'high' ? 'overline' : 'underline';
-	ok(l.id + ' carries ' + want + ' on the value itself', seg.dec === want, JSON.stringify(seg));
+	ok(l.id + ' carries ' + want + ' on exactly one segment', marked.length === 1 && marked[0].dec === want,
+		JSON.stringify(segs));
+	// THE MARK'S LENGTH IS THE NUMBER'S LENGTH. Tom, 2026-08-15, of a mark spanning a whole line:
+	// "The underline needs to be only as long as the ID." A mark that also covered 'Q=' would start
+	// at the label's left edge, which in a stacked label is exactly where the row above would be
+	// underlined -- so it would read as belonging to the wrong row.
+	ok('...and that segment is the NUMBER alone, with no prefix in it',
+		marked.length === 1 && /^-?[\d.]+%?$/.test(marked[0].text), JSON.stringify(marked));
 });
 const plain = doc.links.filter(function (l) { return !L.linkDecor(l.id)[0]; });
 ok('an unmarked value carries no decoration at all',
-	plain.every(function (l) { return !rowsOf(L.linkTspans(l.id))[0][0].dec; }), plain.length + ' unmarked');
+	plain.every(function (l) { return L.linkTspans(l.id).every(function (t) { return !t.dec; }); }),
+	plain.length + ' unmarked');
 
 // On a one-line label the mark must land on the NUMBER, not on the separator beside it.
 Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'id' || k === 'flow'); });
@@ -215,9 +230,13 @@ L.refreshLabelText();
 const markedOneLine = pipes.filter(function (l) { return L.linkDecor(l.id)[1]; })[0];
 if (markedOneLine) {
 	const row = rowsOf(L.linkTspans(markedOneLine.id))[0];
-	ok('on a one-line label the mark is on the value segment', row[2] && row[2].dec, JSON.stringify(row));
-	ok('...and NOT on the separator', !row[1].dec && row[1].text === ' ', JSON.stringify(row[1]));
-	ok('...nor on the id, which has no extrema of its own', !row[0].dec, JSON.stringify(row[0]));
+	const at = row.map(function (t) { return t.dec ? 1 : 0; }).indexOf(1);
+	ok('on a one-line label exactly one segment is marked',
+		row.filter(function (t) { return t.dec; }).length === 1, JSON.stringify(row));
+	ok('...and it is the number, not the prefix or the separator beside it',
+		at >= 0 && /^-?[\d.]+$/.test(row[at].text), JSON.stringify(row));
+	ok('...nor the id, which has no extrema of its own -- a string has no max',
+		!row[0].dec && row[0].text === markedOneLine.id, JSON.stringify(row[0]));
 } else {
 	ok('a link with a marked flow exists to check the one-line case', false);
 }

@@ -530,6 +530,15 @@ html[lang="zh"] .ec-welcome {
    overstates the room actually available. */
 .lpn-popover { box-sizing: border-box; max-width: calc(100vw - 8px); max-height: calc(100vh - 8px); }
 .lpn-popover-body { overflow: auto; max-height: calc(100vh - 56px); }
+/* The property popup is DRAGGABLE by its chrome -- the padded band around the body, which is the
+   only part of it where the event target is the popup element itself (see wirePopup()). The cursor
+   says so there, and the body puts it back, so a text input never shows a move cursor. Only
+   #lpn_popup: the Labels and Settings pull-downs share .lpn-popover but hang off toolbar buttons
+   and are dismissed by clicking away, so dragging one would be a gesture with nothing to return
+   it. `touch-action: none` is what lets a touch drag work at all -- without it the browser claims
+   the gesture for scrolling before pointermove ever fires. */
+#lpn_popup { cursor: move; touch-action: none; }
+#lpn_popup .lpn-popover-body { cursor: auto; }
 @supports (height: 100dvh) {
 	.lpn-popover { max-height: calc(100dvh - 8px); }
 	.lpn-popover-body { max-height: calc(100dvh - 56px); }

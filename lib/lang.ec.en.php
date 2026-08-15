@@ -1687,6 +1687,13 @@ $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
 $ec_lang['lpn_labels_decimals_tip']='Decimal places shown for this label';
 $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
+// "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the elements
+// you draw from now on, and this is the way to say "I meant the ones already here". {n} and
+// {skipped} are whole numbers; {prefix} is the text the user typed.
+$ec_lang['lpn_settings_apply_to_all']='Apply to all';
+$ec_lang['lpn_settings_apply_to_all_tip']='Give every element of this kind that is already drawn an ID starting with this text. Each one keeps its number. An ID that does not end in a number is left alone.';
+$ec_lang['lpn_confirm_apply_prefix']='Rename {n} elements so their IDs start with {prefix}? Each one keeps its number.';
+$ec_lang['lpn_prefix_applied']='Renamed {n} elements. {skipped} were left alone.';
 $ec_lang['lpn_labels_prefix_tip']='Text printed before this value on the map';
 $ec_lang['lpn_labels_prefix_id_tip']='Text printed before the ID on the map. Leave this blank to use the automatic ID prefixes, such as J1 and L1.';
 $ec_lang['lpn_labels_suffix_tip']='Text printed after this value on the map';

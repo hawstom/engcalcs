@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 953,
-        "delta_key_count": 39,
+        "expected_key_count": 957,
+        "delta_key_count": 43,
         "exempt_key_count": 14,
         "exempt_keys": [
             "calc_units_us",
@@ -354,6 +354,10 @@
         "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
         "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
         "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.",
+        "lpn_settings_apply_to_all": "Apply to all",
+        "lpn_settings_apply_to_all_tip": "Give every element of this kind that is already drawn an ID starting with this text. Each one keeps its number. An ID that does not end in a number is left alone.",
+        "lpn_confirm_apply_prefix": "Rename {n} elements so their IDs start with {prefix}? Each one keeps its number.",
+        "lpn_prefix_applied": "Renamed {n} elements. {skipped} were left alone.",
         "lpn_labels_prefix_tip": "Text printed before this value on the map",
         "lpn_labels_prefix_id_tip": "Text printed before the ID on the map. Leave this blank to use the automatic ID prefixes, such as J1 and L1.",
         "lpn_labels_suffix_tip": "Text printed after this value on the map",
@@ -395,6 +399,10 @@
         "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
         "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
         "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.",
+        "lpn_settings_apply_to_all": "Apply to all",
+        "lpn_settings_apply_to_all_tip": "Give every element of this kind that is already drawn an ID starting with this text. Each one keeps its number. An ID that does not end in a number is left alone.",
+        "lpn_confirm_apply_prefix": "Rename {n} elements so their IDs start with {prefix}? Each one keeps its number.",
+        "lpn_prefix_applied": "Renamed {n} elements. {skipped} were left alone.",
         "lpn_labels_prefix_tip": "Text printed before this value on the map",
         "lpn_labels_prefix_id_tip": "Text printed before the ID on the map. Leave this blank to use the automatic ID prefixes, such as J1 and L1.",
         "lpn_labels_suffix_tip": "Text printed after this value on the map",
@@ -853,6 +861,70 @@
                     "key": "lpn_diag_valve_needs_epanet",
                     "value": "以下阀门会自行开闭，只有 EPANET 求解器才能计算它们。由于无法加载 EPANET 求解器，缺少这些结果：",
                     "english": "These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:"
+                }
+            }
+        },
+        "lpn_settings_apply_to_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "标出最高值和最低值",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "背景图片…",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_settings_apply_to_all_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "标出最高值和最低值",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "背景图片…",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_confirm_apply_prefix": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "标出最高值和最低值",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "背景图片…",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_prefix_applied": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "标出最高值和最低值",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "背景图片…",
+                    "english": "Background image…"
                 }
             }
         },

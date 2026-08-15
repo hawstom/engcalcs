@@ -8895,14 +8895,32 @@ var EngCalcs = EngCalcs || {};
 			['P', pc.lpn_tool_add_pump || 'Pump'], ['V', pc.lpn_tool_add_valve || 'Valve'],
 			['L', pc.lpn_tool_add_pipe || 'Pipe']
 		].forEach(function (f) {
-			var key = f[0], input = document.createElement('input');
+			var key = f[0], input = document.createElement('input'), wrap = document.createElement('span');
 			input.type = 'text'; input.size = 4; input.value = settings.idPrefixes[key];
 			input.addEventListener('change', function () {
 				if (!validatePrefix(input.value)) { alert(pc.lpn_id_invalid || 'Enter an ID with no spaces and no quotation marks.'); input.value = settings.idPrefixes[key]; return; }
 				settings.idPrefixes[key] = input.value;
 				saveToStorage();
 			});
-			row(idBody, f[1], input);
+			// "Apply to all" beside each row rather than one button for the panel: the prefixes are
+			// edited one at a time and are independent, so a single button would have to mean "all
+			// six", which is a bigger and less reversible thing than anyone pressing it intends.
+			var apply = document.createElement('button');
+			apply.type = 'button';
+			apply.textContent = pc.lpn_settings_apply_to_all || 'Apply to all';
+			apply.style.marginLeft = '6px';
+			helpTip(apply, pc.lpn_settings_apply_to_all_tip);
+			apply.addEventListener('click', function () {
+				// Committed FIRST, so pressing Apply straight after typing (without leaving the box,
+				// which is what a hurried user does) applies what is on screen rather than the last
+				// committed value.
+				if (validatePrefix(input.value)) { settings.idPrefixes[key] = input.value; }
+				else { input.value = settings.idPrefixes[key]; }
+				applyIdPrefixToAll(key);
+				rebuildSettingsFields();
+			});
+			wrap.appendChild(input); wrap.appendChild(apply);
+			row(idBody, f[1], wrap);
 		});
 		// ---- 2. Default inputs ----
 		// Starts EXPANDED (see settings.sectionsOpen): the other two sections are set-once, but this
@@ -9358,8 +9376,59 @@ var EngCalcs = EngCalcs || {};
 		document.getElementById('lpn_popup').style.display = 'none';
 		currentPopup = null;
 	}
+	// DRAGGING THE PROPERTY POPUP (Tom, 2026-08-15). The grab surface is the popup's own CHROME --
+	// the padded band around the body, where `e.target` is the popup element itself -- and never a
+	// child. That is what makes this safe to add to a panel full of text inputs, spinners and
+	// checkboxes: a control is always a child, so a drag can never start on one, and no control had
+	// to be re-wired. It also needs no drag bar, no extra row of pixels, and no new string.
+	//
+	// Pointer events, not mouse events, so a touch drag works identically -- and with
+	// setPointerCapture the drag survives the pointer leaving the popup, which is the failure that
+	// makes hand-rolled drags feel broken at speed.
+	//
+	// Double-click the same chrome to send it home, the same gesture that resets a dragged map
+	// label. Without it a popup parked somewhere awkward could only be recovered by reloading.
 	function wirePopup() {
+		var popup = document.getElementById('lpn_popup');
 		document.getElementById('lpn_popup_close').addEventListener('click', closePopup);
+		var drag = null;
+		popup.addEventListener('pointerdown', function (e) {
+			if (e.target !== popup) { return; }   // a child is a control; only the chrome drags
+			var r = popup.getBoundingClientRect();
+			drag = { dx: e.clientX - r.left, dy: e.clientY - r.top, w: r.width, h: r.height };
+			popup.setPointerCapture(e.pointerId);
+			e.preventDefault();
+		});
+		popup.addEventListener('pointermove', function (e) {
+			if (!drag) { return; }
+			var at = clampPanel(e.clientX - drag.dx, e.clientY - drag.dy, drag.w, drag.h,
+				window.innerWidth, window.innerHeight);
+			popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
+			// Remembered as it moves rather than on release: a drag that ends off-window, or is
+			// interrupted by the pointer being cancelled, still leaves the popup where it looks.
+			popupUserPos = at;
+		});
+		function endDrag(e) {
+			if (!drag) { return; }
+			drag = null;
+			if (popup.hasPointerCapture && popup.hasPointerCapture(e.pointerId)) { popup.releasePointerCapture(e.pointerId); }
+		}
+		popup.addEventListener('pointerup', endDrag);
+		popup.addEventListener('pointercancel', endDrag);
+		popup.addEventListener('dblclick', function (e) {
+			if (e.target !== popup) { return; }
+			popupUserPos = null;
+			if (currentPopup) { reopenPopupAtElement(); }
+		});
+	}
+	// Re-opens whatever is currently open at its AUTOMATIC place -- used by the double-click reset
+	// above. Goes through the same renderers a fresh click does, so there is one path to being open.
+	function reopenPopupAtElement() {
+		var c = currentPopup;
+		if (!c) { return; }
+		if (c.kind === 'node') { openPopup(c.id); }
+		else if (c.kind === 'link') { openLinkPopup(c.id); }
+		else if (c.kind === 'label') { openLabelPopup(c.id); }
 	}
 	// ---- field labels, with an optional definitional tip (Task 193) ----
 	// CLAUDE.md's tip-only convention: .ec-help carries the title and wraps the label WORDS plus a
@@ -9626,14 +9695,36 @@ var EngCalcs = EngCalcs || {};
 		var y = labelPos.y - fs * 0.85;
 		return worldToScreen(x, y);
 	}
+	// Keeps a fixed-position panel of size w x h fully inside a vw x vh viewport, with a 4px margin.
+	// Pure, and shared by the two things that place the property popup -- opening it at a point on
+	// the map, and dragging it -- so a panel can never be parked half off the screen by one route
+	// after being clamped by the other. Smaller-than-margin viewports fall back to the left/top
+	// edge rather than going negative.
+	var POPUP_EDGE = 4;
+	function clampPanel(left, top, w, h, vw, vh) {
+		return {
+			left: Math.max(POPUP_EDGE, Math.min(left, vw - w - POPUP_EDGE)),
+			top: Math.max(POPUP_EDGE, Math.min(top, vh - h - POPUP_EDGE))
+		};
+	}
+	// WHERE THE PROPERTY POPUP OPENS, once the user has moved it: exactly where they left it.
+	// EPANET's own property window behaves this way and Tom asked for it by name (2026-08-15:
+	// "EPANET has an element properties box. But it is draggable... Our UX suffers because our
+	// properties box is not draggable"). Null until the first drag, so the automatic placement
+	// beside the element (popupAnchorFor()) is what a user who has never dragged it still gets.
+	// Session-scoped on purpose: it is a transient view choice, not a project setting, and putting
+	// it in the document would mean a colleague opening your file inherits where your screen's
+	// popup sat.
+	var popupUserPos = null;
 	function openPopupAt(sx, sy) {
-		var popup = document.getElementById('lpn_popup'), r;
+		var popup = document.getElementById('lpn_popup'), r, at;
+		if (popupUserPos) { sx = popupUserPos.left; sy = popupUserPos.top; }
 		popup.style.left = sx + 'px'; popup.style.top = sy + 'px'; popup.style.display = 'block';
 		// Clamp into the viewport (Tom, tall/phone mode: the popup opened partly off-screen).
 		// Measured after display:block since an element's size isn't known while display:none.
 		r = popup.getBoundingClientRect();
-		popup.style.left = Math.max(4, Math.min(sx, window.innerWidth - r.width - 4)) + 'px';
-		popup.style.top = Math.max(4, Math.min(sy, window.innerHeight - r.height - 4)) + 'px';
+		at = clampPanel(sx, sy, r.width, r.height, window.innerWidth, window.innerHeight);
+		popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
 		EngCalcs.initTips(popup);
 	}
 	// ---- rename (Tom: EPANET allows editing an element's ID, so must this) ----
@@ -9678,8 +9769,11 @@ var EngCalcs = EngCalcs || {};
 			delete s.overrides[oldKey];
 		});
 	}
-	function renameNode(oldId, newId) {
-		var n = nodeById(oldId), i;
+	// The rename itself, with nothing about the popup in it -- so a BULK rename (applyIdPrefixToAll()
+	// below) goes through exactly the same code a hand rename does. A second implementation of this
+	// is how a bulk operation quietly forgets one of the six places an id is written.
+	function applyNodeRename(oldId, newId) {
+		var n = nodeById(oldId);
 		n.id = newId;
 		renameOverrides('node', oldId, newId);
 		nodeEls[newId] = nodeEls[oldId]; delete nodeEls[oldId];
@@ -9691,13 +9785,16 @@ var EngCalcs = EngCalcs || {};
 			if (l.to === oldId) { l.to = newId; }
 		});
 		doc.labels.forEach(function (lb) { if (lb.anchorNode === oldId) { lb.anchorNode = newId; } });
+	}
+	function renameNode(oldId, newId) {
+		applyNodeRename(oldId, newId);
 		currentPopup = { kind: 'node', id: newId };
 		renderNodeFields(newId);
 		// lastSolveResult's pressures are keyed by the OLD id -- without a fresh solve, the
 		// pressure label would silently vanish for this node until the next unrelated edit.
 		scheduleSolve();
 	}
-	function renameLink(oldId, newId) {
+	function applyLinkRename(oldId, newId) {
 		var l = linkById(oldId);
 		l.id = newId;
 		renameOverrides('link', oldId, newId);
@@ -9707,9 +9804,97 @@ var EngCalcs = EngCalcs || {};
 		linkEls[newId] = linkEls[oldId]; delete linkEls[oldId];
 		linkEls[newId].line.setAttribute('data-link', newId);
 		linkEls[newId].handles.forEach(function (h) { h.setAttribute('data-link', newId); });
+	}
+	function renameLink(oldId, newId) {
+		applyLinkRename(oldId, newId);
 		currentPopup = { kind: 'link', id: newId };
 		renderLinkFields(newId);
 		scheduleSolve();
+	}
+	// ---- "Apply to all": re-prefix every element of one kind (Tom, 2026-08-15) ----
+	//
+	// An ID prefix has always been "future, not retroactive" -- change it and the next junction you
+	// draw is N1 while J1..J40 stay as they are. That is the right default (a rename is destructive
+	// and an id is referenced from six places), but it left no way at all to say "I meant all of
+	// them", which is what you want the day you inherit a model or decide mid-drawing.
+	//
+	// WHAT IT WILL AND WILL NOT TOUCH, and the rule is deliberately conservative:
+	//   * An id ending in DIGITS keeps its digits and swaps its head: J12 -> N12. The number is the
+	//     thing the user knows the element by and the thing every note on their desk refers to.
+	//   * An id with no trailing number (an imported 'J-TF', a hand-typed 'Tank Farm') is LEFT
+	//     ALONE. There is no number to keep, so any rename would be an invention, and these are
+	//     exactly the ids somebody chose on purpose.
+	//   * A rename that would collide with an id NOT in this batch is skipped rather than resolved
+	//     by inventing a number.
+	// Both skips are counted and reported, because a silent partial rename is worse than none.
+	//
+	// THE TWO-PHASE RENAME (everything parks on a temporary id, then takes its real one) is
+	// INSURANCE, not a requirement today, and it is worth saying which. A batch is one element type
+	// with one prefix, so a member's target is `prefix + its own digits` -- which means any member
+	// holding another's target must already start with that prefix, and is therefore not moving at
+	// all. There is no cycle to break. It stays because it is four lines and it takes ORDERING out
+	// of the reasoning entirely: the day this grows an "apply all six prefixes at once" button,
+	// cycles become reachable, and the failure would be a corrupted drawing rather than a refusal.
+	function elementsForIdKey(key) {
+		return doc.nodes.filter(function (n) { return (LPN_ID_KEY[n.type] || 'J') === key; })
+			.concat(doc.links.filter(function (l) { return (LPN_ID_KEY[l.type] || 'L') === key; }));
+	}
+	function isNodeId(id) { return !!nodeById(id); }
+	function applyIdPrefixToAll(key) {
+		var pc = EngCalcs.pageConfig || {}, prefix = settings.idPrefixes[key] || key,
+			batch = elementsForIdKey(key), moving = [], skipped = 0, taken = {}, highest = 0;
+		allIds().forEach(function (id) { taken[id] = true; });
+		batch.forEach(function (x) {
+			var m = /^(.*?)(\d+)$/.exec(String(x.id));
+			if (m && +m[2] > highest) { highest = +m[2]; }
+			if (!m) { skipped++; return; }               // no trailing number: nothing to keep
+			var want = prefix + m[2];
+			if (want !== x.id) { moving.push({ id: x.id, want: want, isNode: isNodeId(x.id) }); }
+		});
+		// WHICH TARGETS ARE ACTUALLY FREE, settled by iterating to a fixed point rather than in one
+		// pass. An id is free if nothing holds it, or if the thing holding it is itself moving away.
+		// The catch is that dropping one mover (because ITS target was blocked) re-occupies the id
+		// that mover was going to vacate, which can block a second mover -- so one pass can approve
+		// a rename that a later decision invalidates. Looping until nothing new is dropped is a few
+		// lines and removes the whole class; the alternative is an ordering rule that is right for
+		// the cases someone thought of.
+		var plan = moving, dropped;
+		do {
+			dropped = false;
+			var vacating = {}, claimed = {};
+			plan.forEach(function (st) { vacating[st.id] = true; });
+			plan = plan.filter(function (st) {
+				var blocked = (taken[st.want] && !vacating[st.want]) || claimed[st.want];
+				if (blocked) { skipped++; dropped = true; return false; }
+				claimed[st.want] = true;
+				return true;
+			});
+		} while (dropped && plan.length);
+		if (!plan.length) {
+			setNotice((pc.lpn_prefix_applied || 'Renamed {n} elements. {skipped} were left alone.')
+				.replace('{n}', '0').replace('{skipped}', String(skipped)));
+			return;
+		}
+		if (!window.confirm((pc.lpn_confirm_apply_prefix || 'Rename {n} elements so their IDs start with {prefix}? Each one keeps its number.')
+			.replace('{n}', String(plan.length)).replace('{prefix}', prefix))) { return; }
+		saveUndoSnapshot();
+		// Phase 1 parks every one of them on an id nothing can answer to: '#' is rejected by
+		// validateNewId()'s rules for a typed id, so no user-authored id can be sitting on one.
+		plan.forEach(function (step, i) {
+			step.tmp = '#tmp' + i;
+			if (step.isNode) { applyNodeRename(step.id, step.tmp); } else { applyLinkRename(step.id, step.tmp); }
+		});
+		plan.forEach(function (step) {
+			if (step.isNode) { applyNodeRename(step.tmp, step.want); } else { applyLinkRename(step.tmp, step.want); }
+		});
+		// The next element drawn must not land on a number now in use.
+		if (nextId[key] === undefined || nextId[key] <= highest) { nextId[key] = highest + 1; }
+		if (currentPopup) { closePopup(); }   // it names an id that may no longer exist
+		refreshLabelText();
+		scheduleSolve();
+		saveToStorage();
+		setNotice((pc.lpn_prefix_applied || 'Renamed {n} elements. {skipped} were left alone.')
+			.replace('{n}', String(plan.length)).replace('{skipped}', String(skipped)));
 	}
 	function renderNodeFields(nodeId) {
 		var n = nodeById(nodeId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
@@ -10474,8 +10659,11 @@ var EngCalcs = EngCalcs || {};
 	// present, because taking a line away leaves the reader no way to tell which quantity survived.
 	//
 	// Tom's default set, 2026-08-15 (his own list, 2026-08-14, plus the reading of it below):
-	//   Q flow and demand, V velocity, S gradient, H head, P pressure, E elevation,
+	//   Q flow and demand, V velocity, S gradient, H head, P pressure, Z elevation,
 	//   Hl head loss, km minor loss, C/n/e roughness, blank diameter, blank length, blank ID.
+	// Elevation is Z, not E (Tom, 2026-08-15): Z is the surveyor's and the hydraulic engineer's
+	// letter for a vertical ordinate, and it does not collide with the E that Darcy-Weisbach
+	// roughness would want.
 	//
 	// A PREFIX ONLY HAS TO BE UNAMBIGUOUS IN ITS SLOT, not globally unique (Tom, 2026-08-14: "valve
 	// and velocity are okay since different contexts... Pump and Pipe are the same context, but we
@@ -10497,7 +10685,7 @@ var EngCalcs = EngCalcs || {};
 	// 'Q ', 'Q:' or nothing at all and get precisely that. The blanket separator is a different
 	// thing entirely now: it goes BETWEEN values, not between a prefix and its value.
 	var LPN_DEFAULT_LABEL_PREFIX = {
-		node: { id: '', demand: 'Q=', head: 'H=', pressure: 'P=', elev: 'E=' },
+		node: { id: '', demand: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=' },
 		link: { id: '', diameter: '', length: '', km: 'km=', flow: 'Q=', velocity: 'V=', headloss: 'Hl=', gradient: 'S=' }
 	};
 	// Roughness is the one dynamic default: the symbol IS the friction method (C, n or e), so it
@@ -10528,10 +10716,27 @@ var EngCalcs = EngCalcs || {};
 	// and never inside numLine()/rawLine(): the extrema comparison upstream of both works on the
 	// rounded NUMBER, so affixing afterwards is what guarantees a prefix can never change which
 	// value is marked highest or lowest.
+	// THE AFFIXES ARE THEIR OWN SEGMENTS, and that is what keeps an extrema mark the length of the
+	// NUMBER (Tom, 2026-08-15, of a mark spanning a whole line: "The underline needs to be only as
+	// long as the ID"). A mark that covers 'Q=749.94' starts at the label's left edge, which in a
+	// stacked label is exactly where the line above would be underlined -- so it reads as belonging
+	// to the wrong row. Marking '749.94' alone indents the mark past the prefix, which says which
+	// row it belongs to without any convention to learn.
+	//
+	// `line.text` is still the whole thing, because that is what a reader of the code (and every
+	// harness) means by "what does this label say".
 	function affix(group, field, line) {
-		line.text = labelPrefixFor(group, field) + line.text + labelSuffixFor(group, field);
+		var p = labelPrefixFor(group, field), s = labelSuffixFor(group, field);
+		line.parts = [];
+		if (p) { line.parts.push({ text: p }); }
+		line.parts.push({ text: line.text, decoration: line.decoration });
+		if (s) { line.parts.push({ text: s }); }
+		line.text = p + line.text + s;
 		return line;
 	}
+	// A field line's drawable segments. A line that never went through affix() (the empty
+	// placeholder) is its own single segment.
+	function segmentsOf(line) { return line.parts || [line]; }
 	// A label the user has dragged. n.lx/l.lx is the manual offset; the same test already decides
 	// whether collision avoidance may move a label and whether the short-pipe rule applies to it.
 	function labelIsDragged(x) { return x.lx !== undefined || x.ly !== undefined; }
@@ -10547,11 +10752,11 @@ var EngCalcs = EngCalcs || {};
 	// The separator is its own SEGMENT rather than being appended to the value before it, so that an
 	// extrema mark underlines the number alone and never the punctuation after it.
 	function composeRows(lines, stacked) {
-		if (stacked || lines.length < 2) { return lines.map(function (line) { return [line]; }); }
+		if (stacked || lines.length < 2) { return lines.map(segmentsOf); }
 		var sep = labelSeparator(), row = [];
 		lines.forEach(function (line, i) {
 			if (i) { row.push({ text: sep }); }
-			row.push(line);
+			row = row.concat(segmentsOf(line));
 		});
 		return [row];
 	}

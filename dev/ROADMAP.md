@@ -2096,6 +2096,49 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|344| **The element property box is DRAGGABLE — SHIPPED 2026-08-15.** Tom: *"EPANET has an
+  element properties box. But it is draggable. epanetjs has a side pane. Of the two, the EPANET UX
+  is better. Our UX suffers because our properties box is not draggable."* It is now, and it stays
+  where you put it: once dragged, every element you click afterwards opens the box in the same
+  place, which is what EPANET's own window does. Double-click its chrome to send it home.
+  - **The grab surface is the CHROME — the padded band around the body, where `e.target` is the
+    popup element itself.** That is what made this safe to add to a panel full of inputs, spinners
+    and checkboxes without re-wiring one of them: a control is always a child, so a drag can never
+    start on one. No drag bar, no extra row of pixels, no new string.
+  - Pointer events with `setPointerCapture`, so touch works identically and the drag survives the
+    pointer leaving the box — the failure that makes hand-rolled drags feel broken at speed.
+    `touch-action: none` on the popup is what lets a touch drag start at all.
+  - `clampPanel()` is shared by opening and dragging, so the box cannot be parked half off-screen
+    by one route after being clamped by the other. Harness: `dev/lpn-spike/popup-drag-harness.js`.
+  - The remembered position is SESSION-scoped, deliberately: it is a view choice about this screen,
+    and putting it in the document would hand a colleague opening your file the place your popup
+    sat. Reconsider only if someone asks for it to survive a reload.
+
+- 0|345| **"Apply to all" beside each ID prefix — SHIPPED 2026-08-15.** Tom: *"How about an 'Apply
+  to all' for each ID prefix?"* An ID prefix has always been future-only — change it and the next
+  junction is N1 while J1..J40 stay — which is the right default and left no way to say "I meant
+  all of them", the day you inherit a model or change your mind mid-drawing.
+  - **An id keeps its NUMBER and swaps its head**: `J12` → `N12`. The number is what the user knows
+    the element by and what every note on their desk refers to.
+  - **An id with no trailing number is left alone** (an imported `J-TF`, a typed `Tank Farm`):
+    there is no number to keep, so a rename would be an invention, and those are exactly the ids
+    somebody chose on purpose. A rename that would collide with an id outside the batch is skipped
+    too. Both skips are counted and reported — a silent partial rename is worse than none.
+  - **The subtle half of the collision rule**, and the one a shortcut gets wrong: a target held by
+    a member of the SAME batch that is *not* moving (because it already has the target prefix) is
+    still a collision — its id is never going to come free. "They are all in this batch, so it is
+    fine" produces two elements answering to one id, and nothing else in the app would report it.
+  - **The two-phase rename through temporary ids is INSURANCE, not a requirement** — worth stating
+    plainly rather than dressing up. One batch is one element type with one prefix, so a member
+    holding another's target must already carry that prefix and is therefore stationary: no cycle
+    exists to break. It stays because it is four lines and takes ordering out of the reasoning, and
+    the day an "apply all six at once" button arrives, cycles are reachable and the failure mode is
+    a corrupted drawing rather than a refusal.
+  - It goes through the same `applyNodeRename()`/`applyLinkRename()` a hand rename does — split out
+    of `renameNode()`/`renameLink()` for this, because a second implementation is how a bulk
+    operation quietly forgets one of the six places an id is written (scenario overrides, incident
+    links, label anchors, pump `curveRef`, the DOM data attributes, `nextId`).
+
 - 0|336| **Link label values on ONE LINE — SHIPPED 2026-08-15 with Task 333's second round.** Tom,
   2026-08-14: *"Concatenate pipe labels where/when possible. More readable."* Every data label —
   node and link — renders as one row, its values joined by the blanket separator, and a DRAGGED
