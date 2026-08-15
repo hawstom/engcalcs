@@ -10814,31 +10814,23 @@ var EngCalcs = EngCalcs || {};
 		// label text itself uses (see the comment on displayRound()), so a tie in what's actually
 		// printed is always a tie in what gets decorated.
 		//
-		// ---- ONE Q POOL: a node's demand and a link's flow are judged together (Tom, 2026-08-15) ----
+		// ---- DEMAND AND FLOW ARE JUDGED SEPARATELY, and that has now been decided TWICE ----
 		//
-		// They were two pools, so a drawing could carry two "highest Q" marks -- one on the biggest
-		// demand, one on the biggest pipe flow -- and nothing on screen said they were answering
-		// different questions. That is worse now than it was in July, because Task 333 gave both
-		// fields the SAME PREFIX, on the grounds that a demand IS a flow (the flow leaving the
-		// network at that point). Having said so in the label, we have to mean it in the comparison.
+		// They print with the same prefix (a demand IS a flow -- the flow leaving the network at that
+		// point), so pooling them into one Q comparison looks obviously right, and it was tried on
+		// 2026-08-15 and reverted the same day. Two reasons, and the second is the one that decides:
 		//
-		// **THE COST IS REAL AND WORTH KNOWING: a junction will now essentially never be the
-		// network's highest Q.** A source link carries the sum of every demand downstream of it, so
-		// the top mark lands on a pump or a supply main almost every time, and "which junction draws
-		// the most" stops being answerable from the marks. If that turns out to matter more than the
-		// consistency does, the fix is to split the pool again here and give demand its own prefix.
+		//   * The report that prompted it was a misreading. Two "highest Q" marks on one drawing
+		//     turned out to be a junction's DEMAND and a pump's FLOW, not the pipe-versus-pump split
+		//     it looked like. Nothing was actually inconsistent.
+		//   * **A pooled Q can only ever be answered by a link.** A source carries the sum of every
+		//     demand downstream of it, so the top mark lands on a pump or a supply main every time
+		//     and "which junction draws the most" -- a question a designer genuinely asks -- stops
+		//     being answerable at all. Consistency of the PREFIX is not worth the loss of a whole
+		//     comparison.
 		//
-		// Each side is rounded at ITS OWN field's decimals before pooling, not at some shared
-		// figure: the invariant that survives is "the number you can see is the number that was
-		// compared", and a demand printing 2 decimals beside a flow printing 0 is normal.
-		var qPool = doc.nodes.map(function (n) {
-			// Fixed-head nodes are still out: a reservoir supplies whatever the network draws
-			// rather than demanding an amount, so it has no Q of its own to compare.
-			return !isFixedHeadNode(n) ? plainRound(effective(n, 'demand'), nd.demand) : undefined;
-		}).concat(doc.links.map(function (l) {
-			return lastSolveResult ? displayRound(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow', ld.flow) : undefined;
-		}));
-		var qExtrema = fieldExtrema(qPool);
+		// So: two pools, on purpose. If a future reader is about to merge them for tidiness, this is
+		// the note saying it was tried, and `dev/lpn-spike/label-affix-harness.js` asserts the split.
 		var extrema = {
 			// Elevation and pressure now include reservoirs -- a reservoir has a real elevation of
 			// its own, and a real pressure (head minus that elevation) whenever its head has been
@@ -10848,8 +10840,7 @@ var EngCalcs = EngCalcs || {};
 			// treatment length/roughness/km have always had. Only solve RESULTS still come out of the
 			// solver in SI and go through displayRound().
 			elev: fieldExtrema(doc.nodes.map(function (n) { return plainRound(n.elev, nd.elev); })),
-			// demand and flow SHARE ONE POOL -- see qPool above.
-			demand: qExtrema,
+			demand: fieldExtrema(doc.nodes.map(function (n) { return !isFixedHeadNode(n) ? plainRound(effective(n, 'demand'), nd.demand) : undefined; })),
 			head: fieldExtrema(doc.nodes.map(function (n) {
 				// Head is an INPUT on a reservoir or tank and a RESULT on a junction, so the two
 				// halves of this one field cross the boundary differently. Both end up in
@@ -10869,7 +10860,7 @@ var EngCalcs = EngCalcs || {};
 			// Both dimensionless, so they use rawLine()/plainRound() like Length, not displayRound().
 			roughness: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'roughness'), ld.roughness) : undefined; })),
 			km: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'k') || 0, ld.km) : undefined; })),
-			flow: qExtrema,
+			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow', ld.flow) : undefined; })),
 			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity', ld.velocity) : undefined; })),
 			// One head-loss bucket for every link type, pumps included: a pump reports a negative
 			// head loss (Tom, 2026-07-30), so it lands at the min end of this same range rather

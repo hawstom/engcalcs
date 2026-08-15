@@ -218,34 +218,36 @@ Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'flow'); });
 Object.keys(ls.node).forEach(function (k) { ls.node[k] = (k === 'demand'); });
 L.refreshLabelText();
 
-// ONE Q POOL: a node's demand and a link's flow are the same quantity, print with the same prefix,
-// and are judged against each other (Tom, 2026-08-15 -- he had a drawing carrying two "highest Q"
-// marks, one on a junction's demand and one on a pump's flow). So the assertion is drawing-wide:
-// every element holding the largest printed Q is marked, nothing else is, and the same for the
-// smallest. Written against the VALUES rather than against an expected element, so it still means
-// something when the example network changes.
-const qs = doc.nodes.filter(function (n) { return n.type === 'junction'; })
+// DEMAND AND FLOW ARE JUDGED SEPARATELY, decided twice (2026-08-15: pooled in the morning at Tom's
+// request, reverted in the afternoon once the report behind it turned out to be a misreading). They
+// share the Q= prefix, which makes pooling them look obviously right, so this asserts the split
+// directly rather than leaving it to a comment.
+//
+// The reason it must stay split: a pooled Q can only ever be answered by a LINK, because a source
+// carries the sum of every demand downstream of it -- so "which junction draws the most" would stop
+// being answerable at all. That is exactly what this checks: the biggest demand is marked even
+// though a link carries more.
+const nodeQ = doc.nodes.filter(function (n) { return n.type === 'junction'; })
 	.map(function (n) { return { id: n.id, v: parseFloat(L.nodeLabel(n.id)[0].slice(2)), dec: L.nodeDecor(n.id)[0] }; })
-	.concat(doc.links.map(function (l) {
-		return { id: l.id, v: parseFloat(L.linkLabel(l.id)[0].slice(2)), dec: L.linkDecor(l.id)[0] };
-	}))
 	.filter(function (e) { return isFinite(e.v); });
-ok('both kinds of Q are on the drawing at once', qs.length > doc.links.length, qs.length + ' values');
-const hi = Math.max.apply(null, qs.map(function (e) { return e.v; }));
-const lo = Math.min.apply(null, qs.map(function (e) { return e.v; }));
-ok('the biggest Q anywhere is marked high, whichever kind of element holds it',
-	qs.filter(function (e) { return e.v === hi; }).every(function (e) { return e.dec === 'high'; }),
-	JSON.stringify(qs.filter(function (e) { return e.v === hi; })));
-ok('...and NOTHING smaller is marked high -- the pools are not judged separately',
-	qs.filter(function (e) { return e.dec === 'high'; }).every(function (e) { return e.v === hi; }),
-	JSON.stringify(qs.filter(function (e) { return e.dec === 'high'; })));
-ok('the smallest Q anywhere is marked low',
-	qs.filter(function (e) { return e.v === lo; }).every(function (e) { return e.dec === 'low'; }),
-	JSON.stringify(qs.filter(function (e) { return e.v === lo; }).slice(0, 4)));
-ok('...and nothing bigger is marked low',
-	qs.filter(function (e) { return e.dec === 'low'; }).every(function (e) { return e.v === lo; }),
-	JSON.stringify(qs.filter(function (e) { return e.dec === 'low'; }).slice(0, 4)));
-ok('...and the two ends are not the same value, or the marks would be vacuous', hi !== lo, hi + ' vs ' + lo);
+const linkQ = doc.links
+	.map(function (l) { return { id: l.id, v: parseFloat(L.linkLabel(l.id)[0].slice(2)), dec: L.linkDecor(l.id)[0] }; })
+	.filter(function (e) { return isFinite(e.v); });
+ok('both kinds of Q are on the drawing at once', nodeQ.length > 0 && linkQ.length > 0,
+	nodeQ.length + ' demands, ' + linkQ.length + ' flows');
+function topOf(list) { return Math.max.apply(null, list.map(function (e) { return e.v; })); }
+const topNode = topOf(nodeQ), topLink = topOf(linkQ);
+ok('a link really does carry more than any junction demands -- so the pools are distinguishable',
+	topLink > topNode, topLink + ' vs ' + topNode);
+ok('the biggest DEMAND is marked high, even though a link carries more',
+	nodeQ.filter(function (e) { return e.v === topNode; }).every(function (e) { return e.dec === 'high'; }),
+	JSON.stringify(nodeQ.filter(function (e) { return e.v === topNode; })));
+ok('the biggest FLOW is marked high too -- each pool has its own top',
+	linkQ.filter(function (e) { return e.v === topLink; }).every(function (e) { return e.dec === 'high'; }),
+	JSON.stringify(linkQ.filter(function (e) { return e.v === topLink; })));
+ok('...and no junction is judged against a link: nothing below the demand top is marked high',
+	nodeQ.filter(function (e) { return e.dec === 'high'; }).every(function (e) { return e.v === topNode; }),
+	JSON.stringify(nodeQ.filter(function (e) { return e.dec === 'high'; })));
 
 // The mark itself: on the value segment, at the value's own length.
 doc.links.filter(function (l) { return L.linkDecor(l.id)[0]; }).forEach(function (l) {

@@ -8,6 +8,27 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 **`CHECK: YYYY-MM-DD` marks a task waiting on the calendar rather than on work** (Task 155's Search Console wait; Task 202's `zh` n=30). Tom asked 2026-08-05 whether dated tasks should always be priority 100. **No, and the date must never promote the task.** A `CHECK:` date is a **gate, not a deadline**: before it, the work is impossible (attempting it yields nothing); after it, the task simply becomes doable **at whatever priority it already had**. So Task 155 stays at 10 forever if a Search Console look is worth 10 — an arrived date means "you may now do this", never "do this next". *(CC's first draft of this paragraph said to raise the priority when the date arrives. That was wrong, and it smuggled promotion back in after arguing against it; Tom caught it: "Use the real priority, and don't let the date promote it." That is the rule.)* The one genuine exception is a task whose **value decays** — evidence that expires, a real external deadline. That is a change in worth, so change the priority and say why; it is not the date doing the work.
 
+## NEXT SESSION (agreed 2026-08-15, and Tom works one arrow per `/clear`)
+
+**The batch, in this order — do it in ONE session, then stop:**
+
+1. **Task 334** first, because 330, 332, 337 and 340 all create or move marks and would each walk
+   into the same trap one at a time.
+2. **Task 332**, storing the anchor as `lb.align` (see that task and Task 342).
+3. **Task 330** (mask toggle) and **Task 340** (a Text label's threshold scaled by its own size).
+4. **Task 329 is [H]** — it is BUILT and ships OFF. Tom turns it on and judges it; no code waits.
+
+**Then the next arrow is a TRANSLATION SPRINT**, covering the whole labels era in one pass. The
+delta as of 2026-08-15 is **48 keys per language** (43 new, 5 whose English changed), all `lpn`, in
+all 26 languages. Pre-sprint order is in CLAUDE.md: Wave 0 adversarial English pass →
+`friction_check.php` → `gloss_ref_check.php` → regenerate payloads → propose to Tom → launch.
+`$ec_lang_syn` entries are proposed as a diff and approved in that session, not before.
+
+**Then Task 248 (extended-period simulation)** — the LibreEPANET.org gate, and big enough to want a
+session of its own with nothing else in it.
+
+*Delete this block once the batch has landed; it is a handoff, not a standing plan.*
+
 ## LENGTH DISCIPLINE (Tom, 2026-08-05) — read this before writing a task
 
 **Tom's complaint, verbatim and correct:** *"We are getting huge, and now apparently gratuitous, roadmap bloat. Task 219 could have been a single line: 'Add lpn to Related links on hw, bpn, and ip.'"* He was right. This file went **1,720 → 5,634 lines in nine days** (2026-07-27 → 2026-08-05, a 3.3× growth), and Task 219 was written at 44 lines for what is a three-line PHP edit plus one real blocker. It is now 9.
@@ -515,6 +536,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **The fix is to stop converting**: store EPANET's point unchanged and render those labels with
     `text-anchor: start` / `dominant-baseline: hanging`. Exact at every zoom, no arithmetic. The cost
     is that a Text label gains an anchor mode the drag, mask and leader paths must respect.
+  - **STORE IT AS `lb.align` (left/centre/right), NEVER AS AN "IMPORTED" FLAG** (Tom, 2026-08-15).
+    The distinction is an ALIGNMENT, not a provenance, and Task 342 makes it a user control the
+    moment Text labels can hold two lines — *"text alignment is very interesting to a user"*. A
+    boolean here would have to be migrated there; `lb.align` means 332 ships the storage and the
+    renderer, and 342 only adds the row in the popup.
+  - **No toggle and no explanation in the UI for the import itself.** An anchor mode is not a
+    preference a user can hold an opinion about before they have seen it. The place that already
+    exists for this is the import report, which lists every difference we found in the file: one
+    line there ("Text labels are placed as EPANET places them, from their top-left corner") reaches
+    the person who cares at the moment they care, for one string instead of a setting.
   - `dev/lpn-spike/inp-import-harness.js` asserts the nondeterminism **inverted, as a known defect**,
     so whoever fixes this is told by a failing check to flip it.
 
@@ -571,9 +602,18 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     `\n` in `lb.text`, rendered through `setMultilineText()`, edited in a `<textarea>` (the backdrop
     world-file field already is one). Centre the block on `lb.y` so a ONE-line label renders
     pixel-identically to today — that is the whole migration.
-  - **JUSTIFICATION becomes a real question the moment there are two lines.** Today's Text is
-    centre-anchored, which is right for a callout and wrong for a note block; AutoCAD MTEXT defaults
-    left. Ship centre (no visible change), add `lb.align` when someone wants it.
+  - **JUSTIFICATION IS A USER CONTROL AND BELONGS HERE, NOT IN TASK 332** (Tom, 2026-08-15:
+    *"text alignment is very interesting to a user, especially if we allow paragraph text. But maybe
+    we wrap alignment selection in with the paragraph text task."* — and he is right that a two-line
+    note makes it visible where a one-line callout hides it). So: `lb.align` gets its row in the
+    Text label's property popup here, left/centre/right.
+  - **Task 332 introduces the same property one task earlier, and must introduce it as `lb.align`
+    rather than as an "imported" flag.** That task stops converting EPANET's top-left label point
+    and renders those labels anchored where EPANET anchors them — which is an alignment, not a
+    provenance. Written as a boolean about where a label came from, this task then has to migrate
+    it; written as `lb.align`, 332 ships the storage and the renderer and 342 only adds the control.
+  - Ship centre as the default either way: it is what every existing label already is, so no drawing
+    changes shape on upgrade.
   - **Rung 2, a wrap WIDTH — about a day, and it is what actually makes it MTEXT.** AutoCAD's
     defining feature is the width box, not the line breaks. SVG does not wrap, so it needs a
     per-label width plus a greedy re-wrap on every font-size change; the wrap itself is pure and
@@ -2251,19 +2291,21 @@ prioritizing on mission-fit intuition alone.
       lies along a PIPE and competes for length, which is the whole argument for concatenating,
       while a node label hangs off a POINT with open space above and below — and carries up to five
       fields against a link's typical two.
-    - **Demand and flow now share ONE extrema pool** (*"I think they should be aggregated for
-      evaluation"*). Task 333 gave them the same prefix on the grounds that a demand IS a flow;
-      having said so in the label, the comparison had to mean it, or a drawing carries two
-      "highest Q" marks answering different questions with nothing on screen to say so.
-      **The cost is real: a junction will now essentially never be the network's highest Q**, since
-      a source link carries the sum of everything downstream of it. If "which junction draws the
-      most" turns out to matter more than the consistency, split the pool again and give demand its
-      own prefix.
-    - Tom's report named the wrong two elements (*"an overline at 749.94 on a pipe when the pump Q
-      also had an overline for 1960"*) — 749.94 was a junction's DEMAND, not a pipe's flow, and the
-      pipe/pump split he suspected never existed. **The phenomenon was real and the fix he asked for
-      was the right one**, which is worth recording: a report can be wrong about the mechanism and
-      still be right about the symptom, and the symptom is the part only he can see.
+    - **Demand and flow were pooled into one extrema comparison, and un-pooled the same day** —
+      recorded because the idea looks obviously right and will occur to the next reader too.
+      Tom asked for it (*"I think they should be aggregated for evaluation"*) on seeing two
+      "highest Q" marks; the two turned out to be a junction's **demand** and a pump's **flow**, not
+      the pipe-versus-pump split they looked like, so nothing was actually inconsistent. He called
+      the revert himself once that was clear.
+    - **The reason it stays split is stronger than the reason it was tried: a pooled Q can only ever
+      be answered by a LINK.** A source carries the sum of every demand downstream of it, so the top
+      mark lands on a pump or a supply main every time and *"which junction draws the most"* — a
+      question a designer genuinely asks — stops being answerable at all. Consistency of the prefix
+      is not worth the loss of a whole comparison. `label-affix-harness.js` asserts the split so the
+      third attempt fails a check instead of shipping.
+    - Worth keeping for its own sake: **a report can be wrong about the mechanism and right about
+      the symptom**, and the symptom is the half only Tom can see. Check the mechanism before acting
+      on it — here that took one headless run against his own file.
 
 
 - 0|304| **The project file's NAME and EXTENSION — CLOSED 2026-08-14, ratified by Tom.** The
