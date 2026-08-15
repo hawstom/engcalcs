@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 951,
-        "delta_key_count": 37,
+        "expected_key_count": 953,
+        "delta_key_count": 39,
         "exempt_key_count": 14,
         "exempt_keys": [
             "calc_units_us",
@@ -355,9 +355,11 @@
         "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
         "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.",
         "lpn_labels_prefix_tip": "Text printed before this value on the map",
+        "lpn_labels_prefix_id_tip": "Text printed before the ID on the map. Leave this blank to use the automatic ID prefixes, such as J1 and L1.",
         "lpn_labels_suffix_tip": "Text printed after this value on the map",
+        "lpn_labels_suffix_gradient_tip": "Text printed after the head loss gradient on the map. Do not type a percent sign here. It is added for you when the units are percent.",
         "lpn_labels_separator": "Separator",
-        "lpn_labels_separator_tip": "Text between a prefix or suffix and the value. A space by default.",
+        "lpn_labels_separator_tip": "Text between one value and the next on a label. A space by default.",
         "lpn_settings_link_width": "Pipe width (pixels)",
         "lpn_settings_align_labels": "Align pipe labels with pipes",
         "lpn_settings_label_max_width": "Show labels when the map is narrower than",
@@ -394,9 +396,11 @@
         "lpn_engine_ready_valve": "The EPANET solver is on this device now. Valves that open and close on their own will work offline.",
         "lpn_engine_unavailable": "Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.",
         "lpn_labels_prefix_tip": "Text printed before this value on the map",
+        "lpn_labels_prefix_id_tip": "Text printed before the ID on the map. Leave this blank to use the automatic ID prefixes, such as J1 and L1.",
         "lpn_labels_suffix_tip": "Text printed after this value on the map",
+        "lpn_labels_suffix_gradient_tip": "Text printed after the head loss gradient on the map. Do not type a percent sign here. It is added for you when the units are percent.",
         "lpn_labels_separator": "Separator",
-        "lpn_labels_separator_tip": "Text between a prefix or suffix and the value. A space by default.",
+        "lpn_labels_separator_tip": "Text between one value and the next on a label. A space by default.",
         "lpn_settings_link_width": "Pipe width (pixels)",
         "lpn_settings_align_labels": "Align pipe labels with pipes",
         "lpn_settings_label_max_width": "Show labels when the map is narrower than",
@@ -868,7 +872,39 @@
                 }
             }
         },
+        "lpn_labels_prefix_id_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "Отмечать наибольшее и наименьшее значения",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Фоновое изображение…",
+                    "english": "Background image…"
+                }
+            }
+        },
         "lpn_labels_suffix_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "Отмечать наибольшее и наименьшее значения",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_menu",
+                    "value": "Фоновое изображение…",
+                    "english": "Background image…"
+                }
+            }
+        },
+        "lpn_labels_suffix_gradient_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

@@ -618,13 +618,18 @@ SVG `<tspan>`s).
   (id/length/diameter/flow/elevation/pressure) and added new ones for demand/head/velocity/headloss.
   The color-coded checkbox in the Labels popover was the only legend.
   - **SUPERSEDED 2026-08-15 by ROADMAP Task 333** (Tom: *"No more label colors"*). The palette is
-    gone; a field now says which quantity it is with a per-field **prefix** (`Q`, `V`, `S`, `H`,
-    `P`, `E`, `Hl`, `km`, `C`/`n`/`e`) and optional **suffix**, both editable per project in the
-    Labels box, separated from the number by one blanket separator that defaults to a space. The
-    legend keys on the prefix instead of on a colour swatch. The "pure numbers, not sentences" half
-    of the decision stands — a prefix is one or two characters, not a label — but colour is now
-    saved for MEANING (Task 327's colour-by-value view) rather than spent on identity, and a prefix
-    survives greyscale, a printed sheet and a colour-blind reader.
+    gone; a field now says which quantity it is with a per-field **prefix** (`Q=`, `V=`, `S=`, `H=`,
+    `P=`, `E=`, `Hl=`, `km=`, `C=`/`n=`/`e=`) and optional **suffix**, both editable per project in
+    the Labels box. The whole label is **one line** unless the user has dragged it, its values
+    joined by one blanket separator (a space by default). The legend keys on the prefix instead of
+    on a colour swatch. The "pure numbers, not sentences" half of the decision stands — a prefix is
+    one or two characters, not a label — but colour is now saved for MEANING (Task 327's
+    colour-by-value view) rather than spent on identity, and a prefix survives greyscale, a printed
+    sheet and a colour-blind reader.
+  - **The extrema mark went with it**: no more rails and chevron beside the number, just overline
+    for the network max and underline for the min, drawn by the text engine inside the label's own
+    text. Tom, 2026-08-15: *"Extrema are not placing right. This is a perpetual problem."* It was —
+    a badge has to be positioned, and a decoration does not.
 - **Extrema mark is a tick beside the number, not text-decoration on it (Tom, round 2: "it's not
   such a great idea because it's ambiguous... I don't know if there is something else").** The first
   cut used CSS overline/underline on the number itself; Tom read that as ambiguous and an unfamiliar

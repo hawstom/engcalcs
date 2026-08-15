@@ -144,22 +144,12 @@ console.log('\n-- wiring: longest pipe first, so the placement order is stable -
 	report(/movable: false/.test(body), 'a placed aligned label is committed as an IMMOVABLE obstacle');
 }
 
-console.log('\n-- wiring: extrema badges inherit their label’s transform --');
-{
-	const fn = src.slice(src.indexOf('function applyExtremaTicks'));
-	const body = fn.slice(0, fn.indexOf('\n\tfunction ', 10));
-	report(/xform = textEl\.getAttribute\('transform'\)/.test(body),
-		'the badge reads the transform off the text element rather than recomputing it');
-	report(/if \(xform\) \{ attrs\.transform = xform; \}/.test(body),
-		'and applies it to every badge it builds');
-	// The regression that would orphan them again is a badge appended with a bare el('line'|
-	// 'polyline') call, bypassing the helper. The helper's own push (which takes `tag`, a variable)
-	// is the one legitimate occurrence, so match on a QUOTED tag to tell them apart.
-	report(!/holder\.tickEls\.push\(el\('/.test(body),
-		'no badge is created outside the transform-aware helper');
-	const n = (body.match(/\n\t\t\ttick\('/g) || []).length;
-	report(n === 3, 'all three badge parts (two rails, one chevron) go through it', `found ${n}`);
-}
+// The block that used to stand here asserted that the extrema BADGE inherited its label's
+// transform -- Tom, 2026-08-14: "These glyphs somehow got orphaned", rails and chevrons lying
+// beside a rotated pipe label instead of on the end of it. Task 333 removed the badge: the mark is
+// now the number's own text-decoration, drawn by the text engine inside the <text> that carries the
+// rotation, so there is no second element that could be left behind and nothing here to assert.
+// That is the strongest argument the change had, and it is recorded rather than merely deleted.
 
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);

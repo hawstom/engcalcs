@@ -360,16 +360,14 @@ html[lang="zh"] .ec-welcome {
 .lpn-labels-hidden .lpn-lbl[data-nodelbl],
 .lpn-labels-hidden .lpn-lbl[data-linklbl],
 .lpn-labels-hidden .lpn-datalbl-part,
-.lpn-labels-hidden .lpn-tick,
 .lpn-labels-hidden .lpn-arrow { visibility: hidden; }
-/* .lpn-tick was MISSED in the first cut and Tom caught it on screen: "Extrema glyphs forgot to hide
-   when zoomed out." It is the clearest possible statement of why this selector list is a liability
-   -- an extrema badge is part of a data label BY EVERY MEANING THAT MATTERS (it decorates a number
-   inside one, it is built in the same pass, it scales with the same text factor) and is a separate
-   ELEMENT, in its own layer, so nothing about the code connected the two. Every future mark that
-   annotates a label has the same trap waiting. The durable fix is a single .lpn-annotation class
-   applied at build time to everything in this category, so membership is declared where the element
-   is created rather than remembered here; ROADMAP Task 334. */
+/* THE EXTREMA MARK IS NO LONGER IN THIS LIST, AND THAT IS A FIX RATHER THAN AN OMISSION (Task 333).
+   `.lpn-tick` used to be here, and it was MISSED in the first cut -- Tom caught it on screen:
+   "Extrema glyphs forgot to hide when zoomed out." The mark is now the number's own
+   text-decoration, so it is part of the text and hides when the text hides, with nothing to
+   remember. That is one member of this category retired at the source rather than added to the
+   list; the rest still have the trap waiting, which is ROADMAP Task 334 (a single .lpn-annotation
+   class declared where the element is built). */
 .lpn-link-halo.lpn-override { stroke: #e8a33d; stroke-width: calc(2.857 * var(--lpn-lw, 0.7)); }
 /* A node's own circle carries its halo as a ring: it already draws as a filled disc, so a stroke
    around it IS an outline. Placed BEFORE .lpn-node-pending below, so a node that is both
@@ -397,13 +395,13 @@ html[lang="zh"] .ec-welcome {
    buildNodeEls/buildLabelEls comments in looped-network.js for why a screen-pixel-flavored
    CSS font-size is wrong inside this scaled SVG group). */
 .lpn-lbl { fill: #333; pointer-events: none; user-select: none; }
-/* pointer-events:none on both, found 2026-07-30 while verifying popup placement: labelsLayer draws
-   ABOVE the symbol layers, so a leader line or an extrema tick crossing a node swallowed the click
-   meant for that node and the property popup simply never opened. Neither is a thing you can click
-   -- a label's own text (.lpn-draglbl) is the drag/click target, and a tick decorates that text --
-   so neither has any business in hit testing. */
+/* pointer-events:none, found 2026-07-30 while verifying popup placement: labelsLayer draws ABOVE the
+   symbol layers, so a leader line crossing a node swallowed the click meant for that node and the
+   property popup simply never opened. A leader is not a thing you can click -- a label's own text
+   (.lpn-draglbl) is the drag/click target -- so it has no business in hit testing. (The extrema
+   badge needed the same rule and no longer exists to need it: Task 333 made the mark a
+   text-decoration inside the label's own text.) */
 .lpn-leader { stroke: #000; stroke-width: calc(0.125 * var(--lpn-sym, 1)); pointer-events: none; }
-.lpn-tick { pointer-events: none; }
 .lpn-draglbl { cursor: move; pointer-events: all; }
 /* Background mask behind a node/link/Text label (Task 146.01) so it stays legible over a backdrop
    image, another element, or a busy area of the map -- sized/positioned entirely from JS

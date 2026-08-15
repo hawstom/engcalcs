@@ -521,25 +521,13 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     "generated annotation" is a fact about why an element exists, and it should be declared at the
     point of creation, where the author knows it, rather than remembered in a stylesheet by someone
     editing an unrelated feature months later.
+  - **The motivating example is GONE as of Task 333, and the way it went is the lesson.** The badge
+    is no longer an element at all — the extrema mark is the number's own `text-decoration`, so it
+    hides, moves, rotates and dies with the text, and `.lpn-tick` has left the selector list. That
+    is one member of this category retired AT THE SOURCE rather than added to a list. Prefer that
+    move where it exists; this task is for the marks that genuinely must be their own element.
   - Every future mark that annotates a label — a units suffix, a warning glyph, a thematic swatch —
     walks into the same trap until this is done.
-
-- 60|336| **Concatenate a link's label values onto one line where they fit.** Tom, 2026-08-14:
-  *"Concatenate pipe labels where/when possible. More readable."*
-  - Depends on Task 333: `8" 250 ft` is ambiguous concatenated, `D=8" L=250 ft` is not. **Prefixes
-    are what make concatenation safe**, which is the same reason they are what make a hide-priority
-    order safe — one mechanism buys both.
-  - Matters most under Task 329's aligned labels, where a three-line stack lying at 40° along a pipe
-    is exactly the wall of text flagged when that geometry landed. A one-line aligned label is the
-    form GIS actually uses, and is probably where these two tasks are heading together.
-  - **DRAGGED = multi-line, still prefixed** (Tom, 2026-08-14: *"if they are dragged, they keep
-    their prefixes, but go into multi-line mode?"*). Yes, and it needs no new switch: `l.lx`
-    already decides aligned-vs-loose, so the same test decides one-line-vs-stacked. The reason it
-    is right and not just convenient: concatenation is what buys ROOM on a pipe, and a dragged
-    label is in open space where it has none of that pressure — there, a stack is more readable and
-    each prefixed value reads as its own row. The prefixes stay because they are what make a
-    SUBSET self-describing, which has nothing to do with which shape the label is in.
-
 
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
   2026-08-14, correcting my first reading: *"Not mtext labels. Mtext Text objects."* So the target
@@ -2108,6 +2096,19 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|336| **Link label values on ONE LINE — SHIPPED 2026-08-15 with Task 333's second round.** Tom,
+  2026-08-14: *"Concatenate pipe labels where/when possible. More readable."* Every data label —
+  node and link — renders as one row, its values joined by the blanket separator, and a DRAGGED
+  label goes back to a stack, which is the rule this task had already worked out (*"if they are
+  dragged, they keep their prefixes, but go into multi-line mode?"*). `l.lx`/`n.lx` decides, so
+  there is no new switch and double-clicking a label sends it home and back to one line.
+  - **It shipped unconditionally rather than "where they fit"**, because the prefixes are what make
+    a one-line label readable and they landed in the same change. A width test can be added later if
+    a long label proves it necessary; it would be a second mechanism competing with Task 343's
+    hide-priority order, which is the one actually aimed at "does not fit".
+  - The separator is its own text SEGMENT, not appended to the value before it, so an extrema mark
+    underlines the number alone and never the punctuation after it.
+
 - 0|333| **Label prefixes, suffixes and one blanket separator — SHIPPED 2026-08-15, and the label
   COLOURS are gone with them.** Tom: *"(1) Let people specify label prefix and postfix/suffix in the
   Labels box. (2) No more label colors."* Every field's line is now `<prefix><sep><number><sep><suffix>`,
@@ -2141,6 +2142,33 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   - **Not done here: the hide-last priority order** the original task paired with prefixes. Prefixes
     were the half that makes a priority order safe (any subset is self-describing); the order itself
     is now Task 343.
+  - **SECOND ROUND, same day, after Tom used it.** Four changes and one replacement:
+    - **The '=' moved INTO the prefix strings** (*"Make the initial defaults for prefixes include an
+      '=' so that is user supplied"*), so a prefix is printed exactly as typed and the page inserts
+      nothing of its own. `Q=`, `V=`, `H=`, `P=`, `E=`, `Hl=`, `km=`, `S=`, `C=`/`n=`/`e=`.
+    - **The blanket separator changed jobs**: it is what goes BETWEEN VALUES (*"(', ', ' ', '|')"*),
+      not between a prefix and its number. Default still a space, and stored exactly as typed —
+      two of the three forms he named carry their own spaces, so nothing may trim it.
+    - **One line unless dragged** (*"Make them all one line unless dragged"*), which is Task 336
+      landing at the same time. `l.lx`/`n.lx` decides, as that task predicted.
+    - **The ID row reserves the decimals column** so its two boxes line up with every other row's,
+      and carries its own tip saying to leave it blank for the automatic `J1`/`L1` prefixes. A tip
+      rather than a parenthetical in the label, because label strings are shared with the legend and
+      a parenthetical would print on the map.
+    - **The extrema badge is replaced by text-decoration** — overline for the max, underline for the
+      min (*"Extrema are not placing right. This is a perpetual problem. Should we replace them
+      with underline for min and overline for max?"*). Yes. **Tom rejected exactly this in July
+      2026 as ambiguous, and that objection was fair AT THE TIME**: the mark sat on a bare number in
+      a column of bare numbers. Two things changed under it — every value now carries a prefix
+      naming its quantity, and the values sit on one line — so the mark is attached to one named
+      number rather than floating in a stack. **The structural argument is the stronger one**: a
+      badge had to be POSITIONED (measure the digits, know the row, inherit the label's transform,
+      tear down and rebuild), and every one of those was a real bug at some point — orphaned glyphs
+      beside a rotated label, marks left behind by a deleted pipe, a footprint four other consumers
+      measured wrongly (Task 298). A text-decoration is drawn by the text engine at the exact
+      extent of the characters it marks, at any rotation, in any row, for free.
+      `labelBoxWidth()` is the text again, `measureDecorRight()`/`applyExtremaTicks()` are gone,
+      and `dev/lpn-spike/label-decor-harness.js` is half its old length.
 
 - 0|304| **The project file's NAME and EXTENSION — CLOSED 2026-08-14, ratified by Tom.** The
   answer is *not an extension*: stay on `.json`, shorten the suffix to `-lpn`, and put the identity

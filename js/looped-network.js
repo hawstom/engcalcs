@@ -224,9 +224,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	// WHERE THE TEXT GOES, given the endpoint the user placed. The box hangs off B on whichever
 	// side keeps it from lying across its own leader, which is a fact about legibility and is
-	// therefore allowed to move with the zoom -- unlike B itself. labelBoxWidth(), not tw: the
-	// extrema badge hangs past the digits, and hanging the box off the text's own edge would let
-	// the badge sit over the rule -- see measureDecorRight().
+	// therefore allowed to move with the zoom -- unlike B itself. labelBoxWidth() rather than tw
+	// directly, because the box is a concept several places share; since Task 333 the two are equal
+	// (the extrema mark no longer hangs past the digits), and this call is what keeps the
+	// dependency in one place if that ever changes again.
 	// holder.side persists across calls to carry the hysteresis, exactly as it did when this was
 	// the leader's attachment edge.
 	function dataLabelOrigin(holder, anchor, end) {
@@ -361,7 +362,6 @@ var EngCalcs = EngCalcs || {};
 		if (le.text) { le.text.style.visibility = v; }
 		if (le.mask) { le.mask.style.visibility = v; }
 		if (le.leader) { le.leader.style.visibility = v; }
-		(le.tickEls || []).forEach(function (t) { t.style.visibility = v; });
 	}
 	// WHERE AN ALIGNED LINK LABEL ACTUALLY LANDS: {ax, ay, angle}. Extracted from layoutLinkLabel()
 	// on 2026-08-14 because it now has TWO callers, and the reason it needed two is the whole bug.
@@ -405,9 +405,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function layoutLinkLabel(id) {
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
-		// Set BEFORE the aligned branch returns, so both label styles obey it. applyExtremaTicks()
-		// reads the flag too rather than being hidden after the fact: a badge on a suppressed label
-		// is not merely invisible, it should not be built.
+		// Set BEFORE the aligned branch returns, so both label styles obey it.
 		le.hiddenShort = linkLabelTooShort(l, le);
 		setLabelAssemblyHidden(le, le.hiddenShort);
 		var mid = linkLabelMid(l);
@@ -637,154 +635,69 @@ var EngCalcs = EngCalcs || {};
 		Collide.relax(labels, statics, currentLeaderBoxes, 4);
 	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
-	// count changes every time a label toggle is flipped. Each tspan repeats the same x (not a
-	// relative dx) so every line stays left/anchor-aligned under the first, which is the standard
-	// SVG multi-line-text idiom. A line carries no colour of its own (Task 333 retired the per-field
-	// palette); the extrema
-	// tick mark (line.decoration) is drawn separately by applyExtremaTicks() below, not here --
-	// text-decoration on the number itself (the original design) read as ambiguous (Tom, 2026-07-30:
-	// "I don't know if there is something else"), so the mark lives beside the number, not on it.
-	function setMultilineText(textEl, x, lines) {
+	// count changes every time a label toggle is flipped.
+	//
+	// `rows` is an array of ROWS, and a row is an array of SEGMENTS, because since Task 333 a label
+	// is normally ONE row carrying several values (Tom, 2026-08-15: "Make them all one line unless
+	// dragged"). The first segment of each row repeats the same x (not a relative dx) so every row
+	// stays left/anchor-aligned under the first, which is the standard SVG multi-line-text idiom;
+	// every later segment in a row carries NO x, which is what makes it flow inline after its
+	// predecessor.
+	//
+	// THE EXTREMA MARK IS NOW THE SEGMENT'S OWN text-decoration, not a separate badge (Tom,
+	// 2026-08-15: "Extrema are not placing right. This is a perpetual problem. Should we replace
+	// them with underline for min and overline for max?"). Yes -- and the reason is structural
+	// rather than a change of taste. A badge hung off the end of a number has to be POSITIONED,
+	// which means measuring the digits (getComputedTextLength()), knowing which line they are on,
+	// inheriting the label's transform, and being torn down and rebuilt whenever any of that moves.
+	// Every one of those was a real bug at some point: orphaned glyphs beside a rotated label, a
+	// badge left behind by a deleted pipe, a footprint four other things measured wrongly. A
+	// text-decoration is drawn by the text engine at the exact extent of the characters it marks,
+	// at any rotation, in any row, for free.
+	//
+	// Tom rejected overline/underline in July 2026 as ambiguous ("I don't know if there is something
+	// else") and that objection was fair AT THE TIME: the mark sat on a bare number in a stack of
+	// bare numbers. Two things changed under it. Every value now carries a PREFIX naming its
+	// quantity, and the values sit on ONE line, so the mark is unmistakably attached to one named
+	// number rather than floating in a column.
+	//
+	// Set as a presentation ATTRIBUTE rather than only a class: text-decoration on a tspan is SVG
+	// 1.1, and an attribute needs no stylesheet to have loaded. The class rides along for anyone
+	// who wants to restyle it.
+	function setMultilineText(textEl, x, rows) {
 		while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
-		lines.forEach(function (line, i) {
-			var tspan = el('tspan', { x: x, dy: i === 0 ? 0 : effectiveLineHeight() }, textEl);
-			tspan.textContent = line.text;
+		rows.forEach(function (row, i) {
+			row.forEach(function (seg, j) {
+				var tspan = el('tspan', j === 0 ? { x: x, dy: i === 0 ? 0 : effectiveLineHeight() } : {}, textEl);
+				if (seg.decoration) {
+					tspan.setAttribute('text-decoration', seg.decoration === 'high' ? 'overline' : 'underline');
+					tspan.setAttribute('class', seg.decoration === 'high' ? 'lpn-max' : 'lpn-min');
+				}
+				tspan.textContent = seg.text;
+			});
 		});
 	}
-	// A two-rail badge just after a decorated number -- a chevron pointing UP at the top rail for the
-	// network-wide max, DOWN at the bottom rail for the min (Tom, 2026-07-30, replacing an
-	// overline/underline-the-number design that read as ambiguous and unfamiliar). Positioned from
-	// the number tspan's OWN rendered width
-	// (getComputedTextLength(), only meaningful once the tspan is attached and laid out -- i.e.
-	// called right after setMultilineText()), so it sits immediately after the digits regardless of
-	// how wide they are. `holder` is nodeEls[id]/linkEls[id]; old ticks are removed first since the
-	// line count/decorations can change on every toggle or solve.
-	// Per Tom's reference sketch (2026-07-30): the rail and the chevron TOUCH -- the chevron's vertex
-	// KISSES the rail it points at (the visible tip lands on that rail's near edge without crossing
-	// it) and its two legs splay from there back toward the digit, between the rails. A single
-	// connected mark, rail-then-caret, not two marks with daylight between them.
-	// Every dimension below is per unit of TEXT FACTOR (textFactor(), = 1 at the default 2.5 text
-	// size), not a fixed world size: the badge decorates a number, so it has to grow and shrink with
-	// that number or it stops reading as part of it (Tom, 2026-07-30: "extrema indicators aren't
-	// scaling"). The rise/drop constants below were already × font size; these were the ones that
-	// were not.
-	var TICK_STROKE = 0.3;
-	var CARET_LEG_DROP = 0.45; // vertex-to-leg-end vertical size of the caret itself
-	var CARET_LEG_HALF = 0.5;  // vertex-to-leg-end horizontal half-width
-	var TICK_LENGTH = 1.6;
-	var TICK_GAP = 0.3;        // digits-to-rail gap
-	// A stroked polyline's mitered vertex extends past its GEOMETRIC vertex by
-	// halfWidth / sin(half-angle between the legs) -- so a vertex placed exactly on the tick pokes
-	// visibly through it (Tom, 2026-07-30: "the points of the chevrons are extending past the
-	// lines"). Backing the vertex off by that overshoot plus the tick's own half-width puts the tip
-	// on the tick's near edge instead. Scale-free (a ratio of two lengths that scale together), so
-	// it is still computed once.
-	var CARET_TIP_INSET = (TICK_STROKE / 2) *
-		(Math.sqrt(CARET_LEG_HALF * CARET_LEG_HALF + CARET_LEG_DROP * CARET_LEG_DROP) / CARET_LEG_HALF) +
-		TICK_STROKE / 2;
-	// Tick line placement relative to the number's baseline. "high" sits near the digit's cap height
-	// above the baseline; "low" sits so its OUTSIDE (lower) edge is even with the outside (baseline)
-	// of the digits -- pulled 1/8 of a text height back toward the middle from the first cut
-	// (Tom, 2026-07-30, reference sketch "FIX MIN POSITION").
-	var TICK_HIGH_RISE = 0.62;  // × font size, above baseline
-	var TICK_LOW_DROP = 0.125;  // × font size, subtracted from the old +0.2 below baseline
-	function applyExtremaTicks(holder, textEl, layer, lines) {
-		if (holder.tickEls) { holder.tickEls.forEach(function (t) { t.remove(); }); }
-		holder.tickEls = [];
-		// A label suppressed for its pipe being too short takes its badges with it -- and they are
-		// not built at all, so nothing has to remember to hide them. This is the trap .lpn-tick fell
-		// into under the map-width rule (see css/engcalcs.css), avoided here by construction.
-		if (holder.hiddenShort) { return; }
-		var x = +textEl.getAttribute('x'), baseY = +textEl.getAttribute('y'), fs = effectiveFontSize(),
-			tf = textFactor(), stroke = TICK_STROKE * tf,
-			// **THE BADGE INHERITS THE LABEL'S OWN TRANSFORM, OR IT IS ORPHANED** (2026-08-14, Tom:
-			// "These glyphs somehow got orphaned", with a picture of rails and chevrons lying beside
-			// a rotated pipe label instead of on the end of it).
-			//
-			// Everything below is positioned from textEl's RAW x/y and appended as a SIBLING of the
-			// text, into `layer`. For a horizontal label the two coordinate systems are the same and
-			// this is invisible. For an aligned pipe label the <text> carries `rotate(angle ax ay)`
-			// -- so the digits swing round to lie along the pipe and their badges, which never got
-			// the transform, stay exactly where the label would have been if it were horizontal.
-			// The further the label is from horizontal, the further the badge is left behind.
-			//
-			// Copied from the element rather than recomputed, so the two can never disagree about
-			// the angle or the centre. It is deliberately not gated on "is this link aligned": the
-			// rule is simply that a badge decorating a transformed text shares its transform, which
-			// stays true for whatever transform some later feature puts on a label.
-			xform = textEl.getAttribute('transform'),
-			i, tspan, width, y, lineY, yHigh, yLow, x0, x1, dir, vertexY, legY, vertexX, chevronPts;
-		function tick(tag, attrs) {
-			if (xform) { attrs.transform = xform; }
-			holder.tickEls.push(el(tag, attrs, layer));
-		}
-		for (i = 0; i < lines.length; i++) {
-			if (!lines[i].decoration) { continue; }
-			tspan = textEl.childNodes[i];
-			try { width = tspan.getComputedTextLength(); } catch (err) { width = 0; }
-			x0 = x + width + TICK_GAP * tf; x1 = x0 + TICK_LENGTH * tf;
-			// dir points from the marked rail back toward the baseline -- down for a "high" mark
-			// (which nests under the top rail), up for a "low" one (which nests over the bottom rail).
-			dir = lines[i].decoration === 'high' ? 1 : -1;
-			lineY = baseY + i * effectiveLineHeight();
-			yHigh = lineY - fs * TICK_HIGH_RISE;
-			yLow = lineY + 0.2 * tf - fs * TICK_LOW_DROP;
-			// BOTH rails are drawn on every mark (Tom, 2026-07-30) -- the badge's footprint is then
-			// identical for a max and a min, so the only thing the eye decodes is which way the
-			// chevron points, an absolute judgment. The earlier single-rail design asked the reader to
-			// judge where one line sat relative to digits it wasn't touching, a relative one.
-			y = lines[i].decoration === 'high' ? yHigh : yLow;
-			tick('line', {
-				x1: x0, y1: yHigh, x2: x1, y2: yHigh, stroke: '#000',
-				'stroke-width': stroke, 'class': 'lpn-tick'
-			});
-			tick('line', {
-				x1: x0, y1: yLow, x2: x1, y2: yLow, stroke: '#000',
-				'stroke-width': stroke, 'class': 'lpn-tick'
-			});
-			vertexY = y + dir * CARET_TIP_INSET * tf;
-			legY = vertexY + dir * CARET_LEG_DROP * tf;
-			vertexX = (x0 + x1) / 2;
-			chevronPts = (vertexX - CARET_LEG_HALF * tf) + ',' + legY + ' ' + vertexX + ',' + vertexY + ' ' +
-				(vertexX + CARET_LEG_HALF * tf) + ',' + legY;
-			tick('polyline', {
-				points: chevronPts, fill: 'none', stroke: '#000',
-				'stroke-width': stroke, 'class': 'lpn-tick'
-			});
-		}
-	}
-	// How far right of the label's text origin the extrema badge reaches, 0 when this label has no
-	// decorated line. The badge hangs OFF THE END of the digits it decorates (applyExtremaTicks()
-	// above), so it is part of the label's footprint and nothing else in the file knew that: a label
-	// dragged to the left of its anchor attached its leader at the right edge of the TEXT, and the
-	// rule then ran straight through the rails and the chevron sitting beyond it (Tom, 2026-08-14).
-	// Collision avoidance and zoom-to-fit had the same blind spot, from the same cause.
+	// The width every consumer of a data label's box should use. `holder` is nodeEls[id]/linkEls[id].
 	//
-	// Measured per line rather than added to the bbox width, because the decorated line is often
-	// NOT the widest one -- "1.20" with a badge can reach further right than "125.00" without.
-	//
-	// AND THIS IS WHERE THE Task 190 TOGGLE ARRIVES, with no test for it anywhere. Marks off means
-	// decorationFor() returns undefined, means no line here is decorated, means 0. There is no
-	// second code path to keep in step with the switch, which is what makes "sensitive to the toggle
-	// state" cost nothing.
-	function measureDecorRight(textEl, lines) {
-		var tf = textFactor(), pad = (TICK_GAP + TICK_LENGTH) * tf, right = 0, i, w;
-		for (i = 0; i < lines.length; i++) {
-			if (!lines[i].decoration) { continue; }
-			try { w = textEl.childNodes[i].getComputedTextLength(); } catch (err) { w = 0; }
-			if (w + pad > right) { right = w + pad; }
-		}
-		return right;
-	}
-	// The width every consumer of a data label's box should use: the text, or the badge if it
-	// reaches further. `holder` is nodeEls[id]/linkEls[id].
+	// It is now just the text, and that is the POINT of Task 333's extrema change rather than a
+	// simplification made in passing. This used to be max(text, badge reach), because the old
+	// chevron badge hung off the END of a decorated number and so stuck out past the <text>'s own
+	// bbox -- a fact four separate consumers (leader attachment, collision boxes, mask rect,
+	// zoom-to-fit) each had to be taught, and each got wrong first (ROADMAP Task 298). An
+	// underline/overline is drawn INSIDE the glyph box by the text engine, so the text's bbox is
+	// the whole footprint again, by construction and for every consumer at once.
 	function labelBoxWidth(holder) {
-		return Math.max(holder.tw || 0, holder.decorRight || 0);
+		return holder.tw || 0;
 	}
 	// Repositions an already-built multi-line label (drag/geometry updates) without touching its
-	// content -- setMultilineText() gives each tspan its own explicit x (needed for the multi-line
-	// stacking idiom), so moving the parent <text>'s x/y alone would leave old tspans stranded at
-	// the previous position; every tspan's x must move with it.
+	// content -- setMultilineText() gives each ROW's first tspan its own explicit x (needed for the
+	// multi-line stacking idiom), so moving the parent <text>'s x/y alone would leave old tspans
+	// stranded at the previous position; every row's x must move with it.
+	//
+	// ONLY the tspans that already HAVE an x are moved. Since Task 333 a row can hold several
+	// segments, and every segment after the first deliberately carries no x -- that absence is what
+	// makes it flow inline after its predecessor. Writing an x onto those would stack the whole
+	// line on top of itself at one point.
 	function repositionMultilineText(textEl, x, y) {
 		textEl.setAttribute('x', x); textEl.setAttribute('y', y);
 		var i, child;
@@ -794,7 +707,7 @@ var EngCalcs = EngCalcs || {};
 			// label (Task 146.01's layoutNodeLabel()/layoutLinkLabel(), called before the first
 			// refreshLabelText() pass converts it) still holds a single plain text node from its
 			// initial textContent assignment, which has no setAttribute.
-			if (child.nodeType === 1) { child.setAttribute('x', x); }
+			if (child.nodeType === 1 && child.getAttribute('x') != null) { child.setAttribute('x', x); }
 		}
 	}
 	// Network-wide max/min of a field's values, skipping undefined (element types that don't carry
@@ -1331,9 +1244,9 @@ var EngCalcs = EngCalcs || {};
 			// honoured. So: undefined -> ask the default; '' -> print nothing.
 			//
 			// The separator is blanket, per Tom: "One blanket separator and individual prefixes and
-			// postfixes, of course." A space by default, so a prefixed line reads 'Q 12.5'. Set it
-			// to '' for 'Q12.5' or to '=' for 'Q=12.5' -- the '=' form Task 333 was originally
-			// written around is one keystroke away rather than baked into fifteen prefix strings.
+			// postfixes, of course." It goes BETWEEN VALUES on a one-line label ('Q=120 V=3.1'),
+			// which is what he asked for a day later; ', ' and ' | ' are the other two he named. A
+			// prefix's own punctuation is part of the prefix string, so the defaults carry '='.
 			prefix: { node: {}, link: {} },
 			suffix: { node: {}, link: {} },
 			separator: ' ',
@@ -2229,9 +2142,6 @@ var EngCalcs = EngCalcs || {};
 		linkEls[l.id].mask.remove();
 		linkEls[l.id].leader.remove();
 		if (linkEls[l.id].symbolG) { linkEls[l.id].symbolG.remove(); }
-		// tick marks (applyExtremaTicks()) are separate elements, not text children -- buildLinkEls()
-		// below replaces linkEls[l.id] wholesale, which would otherwise orphan them on screen.
-		if (linkEls[l.id].tickEls) { linkEls[l.id].tickEls.forEach(function (t) { t.remove(); }); }
 		buildLinkEls(l);
 		refreshLabelText();
 	}
@@ -3023,9 +2933,6 @@ var EngCalcs = EngCalcs || {};
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
 		nodeEls[id].mask.remove(); nodeEls[id].leader.remove();
 		if (nodeEls[id].symbol) { nodeEls[id].symbol.remove(); }
-		// Same orphaned-tick-mark bug as deleteLink()/rebuildLink() -- these are separate elements,
-		// not text children.
-		if (nodeEls[id].tickEls) { nodeEls[id].tickEls.forEach(function (t) { t.remove(); }); }
 		delete nodeEls[id]; delete incidentLinks[id]; delete labelsByAnchor[id];
 		doc.nodes = doc.nodes.filter(function (n) { return n.id !== id; });
 		// A real deletion drops every scenario's overrides on the element (Task 184). Left behind,
@@ -3231,10 +3138,10 @@ var EngCalcs = EngCalcs || {};
 		linkEls[id].text.remove();
 		linkEls[id].mask.remove(); linkEls[id].leader.remove();
 		if (linkEls[id].symbolG) { linkEls[id].symbolG.remove(); }
-		// Extrema tick marks (applyExtremaTicks()) are separate elements, not text children --
-		// orphaned on screen otherwise (Tom, 2026-07-30: "when I delete a pipe, its orphaned labels
-		// are left behind"). Same fix rebuildLink() already needed for the same reason.
-		if (linkEls[id].tickEls) { linkEls[id].tickEls.forEach(function (t) { t.remove(); }); }
+		// The extrema mark needs no line of its own here any more (Task 333): it is the
+		// text's own text-decoration, so removing the text removes it. It used to be a set of
+		// separate elements that this had to hunt down, and forgetting to was Tom's 2026-07-30
+		// "when I delete a pipe, its orphaned labels are left behind".
 		delete linkEls[id];
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
 		incidentLinks[l.to] = incidentLinks[l.to].filter(function (x) { return x !== id; });
@@ -8417,6 +8324,15 @@ var EngCalcs = EngCalcs || {};
 		label.style.flex = '1 1 auto';
 		row.appendChild(label);
 		if (affixOpt) { row.appendChild(affixBox(affixOpt.prefix)); row.appendChild(affixBox(affixOpt.suffix)); }
+		// A ROW WITH NO DECIMALS STILL RESERVES THE COLUMN (Tom, 2026-08-15: "Can you make their
+		// inputs align with the others?"). ID is the only such row, and without this its two boxes
+		// slide right by the width of the spinner every other row has, which reads as a different
+		// kind of row rather than as the same row missing one control.
+		if (affixOpt && !decimals) {
+			var spacer = document.createElement('span');
+			spacer.style.width = '4.5em'; spacer.style.flex = '0 0 auto';
+			row.appendChild(spacer);
+		}
 		if (decimals) {
 			var pc = EngCalcs.pageConfig || {}, dec = document.createElement('input');
 			// Upper bound 32, not a defensible-looking 4 (Tom, 2026-07-30): "possibly some absurd limit
@@ -8514,16 +8430,26 @@ var EngCalcs = EngCalcs || {};
 		// The prefix/suffix pair for one row. Both boxes show the EFFECTIVE text (so an untouched
 		// row still displays the default the map is printing) and write into labelSettings, which
 		// is what makes them per-project and what carries them into a saved file.
+		// TWO ROWS GET THEIR OWN TIP, and both answer a question the user is going to ask AT THAT BOX:
+		//   * ID ships blank while every other row shows a letter, which looks like an omission until
+		//     you know an ID already begins with its own automatic prefix (J1, L1).
+		//   * The gradient prints a '%' nobody typed (Tom: "This may need a tip or something. 'No %
+		//     here. It is automatic.'").
+		// A tip and not a parenthetical in the row's LABEL, which was the other option Tom offered:
+		// those label strings are shared with renderLabelsLegend(), so a parenthetical would print
+		// on the map legend too, where it is noise on a printed sheet.
 		function affixFor(group, key) {
 			return {
 				prefix: {
 					value: labelPrefixFor(group, key),
-					title: pc.lpn_labels_prefix_tip || 'Text printed before this value on the map',
+					title: (key === 'id' ? pc.lpn_labels_prefix_id_tip : pc.lpn_labels_prefix_tip) ||
+						'Text printed before this value on the map',
 					onChange: function (v) { labelSettings.prefix[group][key] = v; }
 				},
 				suffix: {
 					value: labelSuffixFor(group, key),
-					title: pc.lpn_labels_suffix_tip || 'Text printed after this value on the map',
+					title: (key === 'gradient' ? pc.lpn_labels_suffix_gradient_tip : pc.lpn_labels_suffix_tip) ||
+						'Text printed after this value on the map',
 					onChange: function (v) { labelSettings.suffix[group][key] = v; }
 				}
 			};
@@ -8550,9 +8476,10 @@ var EngCalcs = EngCalcs || {};
 			sepRow.appendChild(sepLabel);
 			sepRow.appendChild(affixBox({
 				value: labelSeparator(),
-				title: pc.lpn_labels_separator_tip || 'Text between a prefix or suffix and the value. A space by default.',
+				title: pc.lpn_labels_separator_tip || 'Text between one value and the next on a label. A space by default.',
 				// Stored EXACTLY as typed, spaces included -- a space is the default value of this
-				// very box, so trimming it would delete the setting it exists to hold.
+				// very box, and ", " and " | " carry their own, so trimming would rewrite two of the
+				// three forms Tom named.
 				onChange: function (v) { labelSettings.separator = v; }
 			}));
 			optBox.appendChild(sepRow);
@@ -9685,16 +9612,17 @@ var EngCalcs = EngCalcs || {};
 	// Where an element's property popup opens (Tom, 2026-07-30). NOT at the click point: on an
 	// orthogonal network -- which is most real ones -- a popup centred on the element covers the
 	// elements directly north and south of it, which are exactly the ones you are usually comparing
-	// it against. Instead it opens off to the RIGHT of that element's own data label, just past
-	// where its extrema glyph would sit, plus about a node across ("roughly a node size to the right
-	// of the extrema location" -- Tom's own measure). The popup then sits in the horizontal gap
+	// it against. Instead it opens off to the RIGHT of that element's own data label, clear of it by
+	// about a node across ("roughly a node size to the right of the extrema location" -- Tom's own
+	// measure, from when a badge hung off the end of the digits; the label's own right edge is that
+	// same place now that the mark is inside the text). The popup then sits in the horizontal gap
 	// beside the element rather than on top of its neighbours, and its position still reads as
 	// belonging to the element because it lines up with that element's label.
 	// Falls back to the click point when the element has no rendered label to hang off.
 	function popupAnchorFor(holder, labelPos, gapUnits, fallbackX, fallbackY) {
 		if (!holder || labelPos === null) { return { x: fallbackX, y: fallbackY }; }
-		var tf = textFactor(), fs = effectiveFontSize();
-		var x = labelPos.x + (holder.tw || 0) + (TICK_GAP + TICK_LENGTH) * tf + gapUnits;
+		var fs = effectiveFontSize();
+		var x = labelPos.x + (holder.tw || 0) + gapUnits;
 		var y = labelPos.y - fs * 0.85;
 		return worldToScreen(x, y);
 	}
@@ -10563,14 +10491,19 @@ var EngCalcs = EngCalcs || {};
 	// literally named 'J12'. A label prefix would print 'J J12'. The user who renames their
 	// junctions to '12' can put the J back in this box, which is exactly why the box exists for ID
 	// too rather than being hidden on that row.
+	// THE '=' IS PART OF THE PREFIX STRING, NOT A SEPARATOR THE PAGE ADDS (Tom, 2026-08-15: "Make
+	// the initial defaults for prefixes include an '=' so that is user supplied"). The prefix is
+	// therefore printed exactly as typed, hard against the number -- which is what lets someone type
+	// 'Q ', 'Q:' or nothing at all and get precisely that. The blanket separator is a different
+	// thing entirely now: it goes BETWEEN values, not between a prefix and its value.
 	var LPN_DEFAULT_LABEL_PREFIX = {
-		node: { id: '', demand: 'Q', head: 'H', pressure: 'P', elev: 'E' },
-		link: { id: '', diameter: '', length: '', km: 'km', flow: 'Q', velocity: 'V', headloss: 'Hl', gradient: 'S' }
+		node: { id: '', demand: 'Q=', head: 'H=', pressure: 'P=', elev: 'E=' },
+		link: { id: '', diameter: '', length: '', km: 'km=', flow: 'Q=', velocity: 'V=', headloss: 'Hl=', gradient: 'S=' }
 	};
 	// Roughness is the one dynamic default: the symbol IS the friction method (C, n or e), so it
 	// follows the method selector rather than being frozen at the moment defaults were built.
 	function labelDefaultPrefix(group, field) {
-		if (group === 'link' && field === 'roughness') { return roughnessSymbol(); }
+		if (group === 'link' && field === 'roughness') { return roughnessSymbol() + '='; }
 		var m = LPN_DEFAULT_LABEL_PREFIX[group] || {};
 		return typeof m[field] === 'string' ? m[field] : '';
 	}
@@ -10584,19 +10517,43 @@ var EngCalcs = EngCalcs || {};
 		var m = (labelSettings.suffix || {})[group] || {};
 		return typeof m[field] === 'string' ? m[field] : labelDefaultSuffix();
 	}
+	// WHAT THE BLANKET SEPARATOR SEPARATES: one value from the NEXT value on the same line (Tom,
+	// 2026-08-15: "Make the blanket separator be what comes between multiple labels on a link.
+	// (', ', ' ', '|')"). Not the prefix from its number -- that gap, if wanted, is typed into the
+	// prefix itself.
 	function labelSeparator() {
 		return typeof labelSettings.separator === 'string' ? labelSettings.separator : ' ';
 	}
 	// Wraps a built line's text in its field's prefix/suffix. Applied HERE, to the finished line,
 	// and never inside numLine()/rawLine(): the extrema comparison upstream of both works on the
 	// rounded NUMBER, so affixing afterwards is what guarantees a prefix can never change which
-	// label gets a tick. Both affixes are skipped when empty -- so is the separator, or a blank
-	// prefix would still push every number one space right.
+	// value is marked highest or lowest.
 	function affix(group, field, line) {
-		var p = labelPrefixFor(group, field), s = labelSuffixFor(group, field), sep = labelSeparator();
-		if (p) { line.text = p + sep + line.text; }
-		if (s) { line.text = line.text + sep + s; }
+		line.text = labelPrefixFor(group, field) + line.text + labelSuffixFor(group, field);
 		return line;
+	}
+	// A label the user has dragged. n.lx/l.lx is the manual offset; the same test already decides
+	// whether collision avoidance may move a label and whether the short-pipe rule applies to it.
+	function labelIsDragged(x) { return x.lx !== undefined || x.ly !== undefined; }
+	// The field lines as ROWS OF SEGMENTS for setMultilineText().
+	//
+	// ONE LINE UNLESS DRAGGED (Tom, 2026-08-15). A dragged label has been placed deliberately, in
+	// space its author chose, where a stack is the more readable shape and there is room for it --
+	// the same reading of a drag that exempts it from the short-pipe rule and from the collision
+	// nudge. An auto-placed label is competing for room with everything around it, so it goes on
+	// one line and stays out of the way. The gesture that switches shape is one the user already
+	// makes, and double-clicking the label sends it home and back to one line.
+	//
+	// The separator is its own SEGMENT rather than being appended to the value before it, so that an
+	// extrema mark underlines the number alone and never the punctuation after it.
+	function composeRows(lines, stacked) {
+		if (stacked || lines.length < 2) { return lines.map(function (line) { return [line]; }); }
+		var sep = labelSeparator(), row = [];
+		lines.forEach(function (line, i) {
+			if (i) { row.push({ text: sep }); }
+			row.push(line);
+		});
+		return [row];
 	}
 	function displayRound(siValue, unitId, decimals) {
 		if (typeof siValue !== 'number') { return undefined; } // guards a stray NaN contaminating Math.min/max in fieldExtrema
@@ -10612,7 +10569,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	// One line of a numeric label field: the number alone, decorated
 	// with a high/low tick when it ties the network-wide max/min for that field
-	// (fieldExtrema()/decorationFor() above, drawn by applyExtremaTicks()). Whatever names the
+	// (fieldExtrema()/decorationFor() above, drawn as the segment's own text-decoration). Whatever names the
 	// quantity is added afterwards by affix(), never here -- see its comment.
 	// `suffix` here is the UNIT-DERIVED one, not the user's: the head loss gradient's '%' (Tom,
 	// 2026-08-14: "we are omitting all other units as excessively redundant, I think that the % is
@@ -10729,15 +10686,12 @@ var EngCalcs = EngCalcs || {};
 			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
 			// x here is a placeholder -- layoutNodeLabel() below (after collision avoidance) sets the
 			// real, final x/y on both the <text> and its tspans via repositionMultilineText().
-			setMultilineText(ne.text, nodeLabelBase(n).x, lines);
-			ne.lineCount = lines.length;
+			var nRows = composeRows(lines, labelIsDragged(n));
+			setMultilineText(ne.text, nodeLabelBase(n).x, nRows);
+			ne.lineCount = nRows.length;
 			nodeLines[n.id] = lines;
-			ne.lines = lines; // cached for relayoutLabels(), which re-runs layout without rebuilding text
+			ne.lines = lines; // the FIELD lines, one per value, whatever shape they were drawn in
 			try { ne.tw = ne.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
-			// Measured HERE, beside tw and before collision avoidance, not inside applyExtremaTicks()
-			// -- the ticks are drawn after layout, so reading the badge's reach from them would feed
-			// every consumer the PREVIOUS pass's answer, one refresh stale.
-			ne.decorRight = measureDecorRight(ne.text, lines);
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
@@ -10768,18 +10722,17 @@ var EngCalcs = EngCalcs || {};
 			}
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
-			setMultilineText(le.text, linkLabelBase(l).x, lines);
-			le.lineCount = lines.length;
+			var lRows = composeRows(lines, labelIsDragged(l));
+			setMultilineText(le.text, linkLabelBase(l).x, lRows);
+			le.lineCount = lRows.length;
 			linkLines[l.id] = lines;
 			le.lines = lines;
 			try { le.tw = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
-			le.decorRight = measureDecorRight(le.text, lines);
 		});
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
-		// laid out for real (text/mask/leader) at its final, possibly-nudged position, THEN extrema
-		// ticks are placed from that final <text> x/y -- ticks read textEl.getAttribute('x'/'y')
-		// directly (see applyExtremaTicks()), so they must come last or they'd be measured from the
-		// placeholder position set above and go stale the moment a nudge or a drag moves the label.
+		// laid out for real (text/mask/leader) at its final, possibly-nudged position. The extrema
+		// marks need no third pass of their own any more (Task 333): they are text-decoration on the
+		// tspans set above, so they move with the text whatever moves it.
 		relayoutLabels();
 		doc.links.forEach(function (l) { updateArrow(l.id); });
 		renderLabelsLegend();
@@ -10839,19 +10792,8 @@ var EngCalcs = EngCalcs || {};
 	// refreshLabelText().
 	function relayoutLabels() {
 		runLabelCollisionAvoidance();
-		doc.nodes.forEach(function (n) {
-			var ne = nodeEls[n.id]; if (!ne) { return; }
-			layoutNodeLabel(n.id);
-			// labelsLayer, not nodesLayer -- ticks decorate the label TEXT, which now lives in
-			// labelsLayer (Task 146.01 draw-order fix), not beside the node's own circle. A tick
-			// appended into nodesLayer would render underneath maskLayer/labelsLayer and never be seen.
-			applyExtremaTicks(ne, ne.text, labelsLayer, ne.lines || []);
-		});
-		doc.links.forEach(function (l) {
-			var le = linkEls[l.id]; if (!le) { return; }
-			layoutLinkLabel(l.id);
-			applyExtremaTicks(le, le.text, labelsLayer, le.lines || []);
-		});
+		doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
+		doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
 	}
 	function runSolve() {
 		// Autosave piggybacks on the same debounce as the solve, not a separate timer -- one

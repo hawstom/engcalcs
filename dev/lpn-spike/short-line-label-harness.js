@@ -27,11 +27,12 @@ const L = loadLoopedNetwork(
 	"\t\tsetZoom: function (s) { state.s = s; },\n" +
 	"\t\tsetLabelMaxWidth: function (w) { settings.labelMaxWidth = w; applyLabelVisibility(); },\n" +
 	"\t\tglobalHide: function () { return svg.classList.contains('lpn-labels-hidden'); },\n" +
-	"\t\tsetBox: function (id, tw, dr) { linkEls[id].tw = tw; linkEls[id].decorRight = dr; },\n" +
-	"\t\tdecorOf: function (id) { return linkEls[id].decorRight; },\n" +
+	"\t\tsetBox: function (id, tw) { linkEls[id].tw = tw; },\n" +
 	"\t\tvis: function (id) { var e = linkEls[id];\n" +
 	"\t\t\treturn { text: e.text.style.visibility, mask: e.mask.style.visibility,\n" +
-	"\t\t\t\tleader: e.leader.style.visibility, ticks: (e.tickEls || []).length }; },\n" +
+	"\t\t\t\tleader: e.leader.style.visibility,\n" +
+	"\t\t\t\tmarked: Array.prototype.filter.call(e.text.childNodes, function (t) {\n" +
+	"\t\t\t\t\treturn t.getAttribute('text-decoration'); }).length }; },\n" +
 	"\t\tnudgeOf: function (id) { return linkEls[id].nudge; },\n" +
 	"\t\thiddenShort: function (id) { return !!linkEls[id].hiddenShort; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -79,13 +80,12 @@ L.refreshLabelText();
 
 // The label is 10 world units wide at this zoom -- wider than the stub, far narrower than the main.
 const TW = 10;
-// The extrema badge scales with the text too, so a zoom simulation that moved only tw would leave
-// labelBoxWidth() pinned at the badge's reach and no label would ever come back. Both halves of the
-// box move together, by the same factor, exactly as the browser moves them.
-const DR0 = [long.id, stub.id, other.id].map(function (id) { return L.decorOf(id) || 0; });
+// One number to simulate a zoom, because since Task 333 the label's footprint IS its text: the
+// extrema mark is the number's own text-decoration and adds nothing beside it. This used to have to
+// scale a second quantity (the badge's reach) in step, or labelBoxWidth() stayed pinned at the
+// badge's width and no label ever came back.
 function layoutAt(tw) {
-	const f = tw / TW;
-	[long.id, stub.id, other.id].forEach(function (id, i) { L.setBox(id, tw, DR0[i] * f); });
+	[long.id, stub.id, other.id].forEach(function (id) { L.setBox(id, tw); });
 	L.relayoutLabels();
 }
 
@@ -96,11 +96,13 @@ ok('the short stub is suppressed', L.hiddenShort(stub.id));
 ok('...text, mask and leader all hidden together',
 	L.vis(stub.id).text === 'hidden' && L.vis(stub.id).mask === 'hidden' && L.vis(stub.id).leader === 'hidden',
 	JSON.stringify(L.vis(stub.id)));
-ok('...and no extrema badge is built for it at all', L.vis(stub.id).ticks === 0);
+// The mark rides INSIDE the text now, so hiding the text hides it by construction -- there is no
+// separate element left to forget, which is what the old ticks === 0 assertion was guarding.
+ok('...and its extrema mark goes with the text, being part of it', L.vis(stub.id).text === 'hidden');
 ok('the 200-unit main keeps its label', !L.hiddenShort(long.id));
 ok('...visibly', L.vis(long.id).text !== 'hidden', JSON.stringify(L.vis(long.id)));
-ok('...and DOES carry badges, so the line above is not vacuous', L.vis(long.id).ticks > 0,
-	String(L.vis(long.id).ticks));
+ok('...and DOES carry an extrema mark, so the line above is not vacuous', L.vis(long.id).marked > 0,
+	String(L.vis(long.id).marked));
 
 // ---- 2. It comes back when there is room, which is what "even if the map is closer" means -------
 // Zooming in does not lengthen the pipe -- it shrinks the label's world width, because the label is
