@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 933,
-        "delta_key_count": 19,
+        "expected_key_count": 945,
+        "delta_key_count": 31,
         "exempt_key_count": 15,
         "exempt_keys": [
             "calc_units_us",
@@ -336,6 +336,18 @@
         "lpn_examples_failed": "The examples could not be loaded. Use File, New project to start a drawing.",
         "lpn_examples_loading": "Loading examples...",
         "lpn_status_example_opened": "Opened {name}. It is your copy: save it with File, Save as.",
+        "lpn_ex_basic_si_title": "Basic network, l\/s (SI)",
+        "lpn_ex_basic_si_desc": "Start here. A reservoir, a pump and a small loop: the least a working water network can be. Litres per second, with metres and millimetres.",
+        "lpn_ex_basic_us_title": "Basic network, gpm (US)",
+        "lpn_ex_basic_us_desc": "The same starting network in gallons per minute, with feet and inches.",
+        "lpn_ex_net1_title": "EPANET Net1",
+        "lpn_ex_net1_desc": "The smallest of EPANET's own three sample networks: one reservoir, a pump and a single loop.",
+        "lpn_ex_net2_title": "EPANET Net2",
+        "lpn_ex_net2_desc": "A branched distribution system with a tank, from EPANET's samples.",
+        "lpn_ex_net3_title": "EPANET Net3",
+        "lpn_ex_net3_desc": "EPANET's large sample: 97 junctions, two tanks and a river source. Worth opening to see how a real-sized model reads.",
+        "lpn_ex_elm_street_title": "Elm Street Center",
+        "lpn_ex_elm_street_desc": "A commercial site's fire flow plus maximum day design snapshot, drawn over a site plan.",
         "lpn_engine_fetching": "Getting the EPANET solver. It is downloaded once and then kept on this device, so it works offline afterwards.",
         "lpn_engine_ready": "The EPANET solver is on this device now, and works offline.",
         "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
@@ -357,6 +369,18 @@
         "lpn_examples_failed": "The examples could not be loaded. Use File, New project to start a drawing.",
         "lpn_examples_loading": "Loading examples...",
         "lpn_status_example_opened": "Opened {name}. It is your copy: save it with File, Save as.",
+        "lpn_ex_basic_si_title": "Basic network, l\/s (SI)",
+        "lpn_ex_basic_si_desc": "Start here. A reservoir, a pump and a small loop: the least a working water network can be. Litres per second, with metres and millimetres.",
+        "lpn_ex_basic_us_title": "Basic network, gpm (US)",
+        "lpn_ex_basic_us_desc": "The same starting network in gallons per minute, with feet and inches.",
+        "lpn_ex_net1_title": "EPANET Net1",
+        "lpn_ex_net1_desc": "The smallest of EPANET's own three sample networks: one reservoir, a pump and a single loop.",
+        "lpn_ex_net2_title": "EPANET Net2",
+        "lpn_ex_net2_desc": "A branched distribution system with a tank, from EPANET's samples.",
+        "lpn_ex_net3_title": "EPANET Net3",
+        "lpn_ex_net3_desc": "EPANET's large sample: 97 junctions, two tanks and a river source. Worth opening to see how a real-sized model reads.",
+        "lpn_ex_elm_street_title": "Elm Street Center",
+        "lpn_ex_elm_street_desc": "A commercial site's fire flow plus maximum day design snapshot, drawn over a site plan.",
         "lpn_engine_fetching": "Getting the EPANET solver. It is downloaded once and then kept on this device, so it works offline afterwards.",
         "lpn_engine_ready": "The EPANET solver is on this device now, and works offline.",
         "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
@@ -498,6 +522,198 @@
             }
         },
         "lpn_status_example_opened": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_basic_si_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_basic_si_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_basic_us_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_basic_us_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_net1_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_net1_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_net2_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_net2_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_net3_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_net3_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_elm_street_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "فائل، نیا پراجیکٹ استعمال کر کے کوئی مثال کھولیں۔ یا ٹول بار سے ریزروائر، جنکشن، اور پائپ شامل کر کے شروع کریں۔",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "کالعدم کریں",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_ex_elm_street_desc": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

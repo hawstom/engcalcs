@@ -1,0 +1,12 @@
+{
+	"_note": "Per-example metadata for the gallery (ROADMAP Task 314), keyed by file name. Everything a machine CAN derive is derived by dev/scripts/generate_examples.php from the project itself -- node and link counts, unit system, thumbnail -- and is deliberately not repeated here. The card's TITLE and DESCRIPTION are not here either: they live in lib/lang.ec.en.php as lpn_ex_<key>_title and lpn_ex_<key>_desc, because a string outside a lang file is a string no translator will ever see. So this file holds exactly two things a machine cannot work out: which lang keys an example uses, and where it sits on the wall.",
+
+	"_order": "Lower sorts earlier. Omit it (0) to let size decide, which is the normal case: the wall runs small to large so a visitor meets the legible networks before Net3. Set it only where size cannot express the intent -- the two basics are the same size, so without it their sequence is whatever the filesystem returned.",
+
+	"Basic-example-SI-units-lpn.json": { "key": "basic_si", "order": -20 },
+	"Basic-example-US-units-lpn.json": { "key": "basic_us", "order": -10 },
+	"Net1-lpn.json": { "key": "net1" },
+	"Net2-lpn.json": { "key": "net2" },
+	"Net3-lpn.json": { "key": "net3" },
+	"Elm-Street-Center-lpn.json": { "key": "elm_street" }
+}

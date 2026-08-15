@@ -58,6 +58,11 @@ examples.forEach(function (ex) {
 	// A description is the thing that makes a wall of titles browsable, and it is the one field a
 	// machine cannot derive — so it is the one that can silently be missing.
 	report(!!ex.description, `${ex.file} has a description`);
+	// And it must be REACHABLE BY TRANSLATORS. A card whose text lives only in the manifest is a
+	// card that is permanently English on a page shipping in 27 languages — which is what the
+	// first cut of this did.
+	report(/^lpn_ex_\w+_title$/.test(ex.titleKey || ''), `${ex.file} names a title key`, ex.titleKey);
+	report(/^lpn_ex_\w+_desc$/.test(ex.descKey || ''), `${ex.file} names a description key`, ex.descKey);
 	report(ex.system === 'us' || ex.system === 'si', `${ex.file} declares a unit system`, ex.system);
 	report(ex.nodes > 0 && ex.links > 0, `${ex.file} has a network in it`, `${ex.nodes}/${ex.links}`);
 });
@@ -189,6 +194,46 @@ console.log('\n-- layout: a deliberate order, not an accident of equal size --')
 			'the leading basic carries the fuller description; the other is the also-ran',
 			`${basics[0].description.length} vs ${basics[1].description.length}`);
 	}
+}
+
+console.log('\n-- the card text is translatable, and the page supplies it --');
+{
+	const en = fs.readFileSync(path.join(root, 'lib/lang.ec.en.php'), 'utf8');
+	examples.forEach(function (ex) {
+		[ex.titleKey, ex.descKey].forEach(function (k) {
+			report(en.indexOf(`$ec_lang['${k}']`) >= 0, `${k} exists in lang.ec.en.php`);
+		});
+	});
+	// pageconfig_check.php matches literal EngCalcs.pageConfig.<key> reads and cannot see a bracket
+	// lookup, so it is blind to this whole set. The page therefore emits them BY PATTERN, and the
+	// generator's --check is what guarantees they exist — asserted here so neither half is dropped.
+	const page = fs.readFileSync(path.join(root, 'Looped-Network.php'), 'utf8');
+	report(/strpos\(\$k, 'lpn_ex_'\) !== 0/.test(page),
+		'the page emits every lpn_ex_* key into pageConfig by pattern');
+	report(/\(ex\.titleKey && pc\[ex\.titleKey\]\) \|\| ex\.title/.test(src),
+		'the gallery prefers the translated title, falling back to the manifest English');
+	report(/\(ex\.descKey && pc\[ex\.descKey\]\) \|\| ex\.description/.test(src),
+		'and likewise the description');
+}
+
+console.log('\n-- flow unit leads, the way EPANET names a unit system --');
+{
+	// EPANET's [OPTIONS] Units setting is literally GPM or LPS, never "US" or "SI", so a water
+	// engineer reads the flow unit as the name of the system (Tom, 2026-08-14: "list flow units
+	// first for two reasons: EPANET and clarity").
+	const basics = examples.filter(function (e) { return /^lpn_ex_basic_/.test(e.titleKey || ''); });
+	report(basics.length === 2, 'both basics are present', `${basics.length}`);
+	basics.forEach(function (ex) {
+		const t = ex.title, d = ex.description;
+		const flowAt = t.toLowerCase().indexOf(ex.system === 'si' ? 'l/s' : 'gpm');
+		report(flowAt > 0, `${ex.titleKey}: the title names the flow unit`, t);
+		// In the description, the flow unit must come before the length units.
+		const dl = d.toLowerCase();
+		const flowWord = ex.system === 'si' ? 'litres per second' : 'gallons per minute';
+		const lenWord = ex.system === 'si' ? 'metres' : 'feet';
+		report(dl.indexOf(flowWord) >= 0 && dl.indexOf(flowWord) < dl.indexOf(lenWord),
+			`${ex.descKey}: flow unit is listed before the length units`);
+	});
 }
 
 console.log('\n-- layout: thumbnails are drawings on white paper, in both themes --');

@@ -359,6 +359,20 @@ EngCalcs.pageConfig = {
 	lpn_examples_failed: <?=json_encode($ec_lang['lpn_examples_failed'])?>,
 	lpn_examples_loading: <?=json_encode($ec_lang['lpn_examples_loading'])?>,
 	lpn_status_example_opened: <?=json_encode($ec_lang['lpn_status_example_opened'])?>,
+<?php   // Every example card's title and description, emitted BY PATTERN rather than one line each.
+        // The gallery reads them by the key name the manifest gives it, so the set is data, not a
+        // fixed list -- adding an example means adding two lang keys and nothing here.
+        //
+        // The cost of that convenience is that dev/scripts/pageconfig_check.php cannot see these:
+        // it matches literal `EngCalcs.pageConfig.<key>` reads, and a bracket lookup is invisible to
+        // it. So the guarantee is bought back in the generator instead --
+        // generate_examples.php --check fails when an example's lpn_ex_*_title/_desc is missing from
+        // lang.ec.en.php, and it is blocking in check_all.sh. Same protection, different tool,
+        // because this is the one place on the page where the key set is not known in advance.
+        foreach ($ec_lang as $k => $v) {
+            if (strpos($k, 'lpn_ex_') !== 0) { continue; }
+            echo "\t" . $k . ': ' . json_encode($v) . ",\n";
+        } ?>
 	lpn_new_text: <?=json_encode($ec_lang['lpn_new_text'])?>,
 	lpn_field_elev: <?=json_encode($ec_lang['lpn_field_elev'])?>,
 	lpn_field_elev_tip: <?=json_encode($ec_lang['lpn_field_elev_tip'])?>,

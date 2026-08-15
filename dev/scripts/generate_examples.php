@@ -27,16 +27,21 @@
  * fonts, no backdrop image, no solver, and it stays a few KB, which is what lets a wall of them
  * load at once.
  *
- * The DESCRIPTION is the one thing here a machine cannot derive, so it is the one thing kept by
- * hand -- in descriptions.json beside the projects, keyed by file name. A missing description is
- * reported, not invented: an examples wall whose subtitles were auto-generated from node counts
- * would say nothing a title does not already say.
+ * THE CARD'S TITLE AND DESCRIPTION ARE LANG KEYS, not fields in a JSON file beside the projects.
+ * That is the answer to "are these translatable?" -- a string outside lib/lang.ec.*.php is a string
+ * no translator will ever see, and would have left six cards permanently English on a page that
+ * ships in 27 languages. examples.json therefore holds only what a machine genuinely cannot work
+ * out: which lang key an example uses, and where it sits on the wall.
+ *
+ * The English is copied into the manifest as a FALLBACK, so an example whose keys do not exist yet
+ * still shows up in English the moment its file is dropped in; the page prefers the translated
+ * string when there is one. A missing key is reported, never invented.
  */
 
 $root = dirname(__DIR__, 2);
 $srcDir = $root . '/dev/water-network-examples';
 $outDir = $root . '/examples';
-$descFile = $srcDir . '/descriptions.json';
+$metaFile = $srcDir . '/examples.json';
 $check = in_array('--check', $argv, true);
 
 /* The whitelist in the source folder's .gitignore IS the publication decision (see that file and
@@ -51,7 +56,7 @@ function whitelistedExamples($srcDir) {
 		$line = trim($line);
 		if ($line === '' || $line[0] !== '!') { continue; }
 		$name = substr($line, 1);
-		if (substr($name, -5) !== '.json' || $name === 'descriptions.json') { continue; }
+		if (substr($name, -5) !== '.json' || $name === 'examples.json') { continue; }
 		if (is_file($srcDir . '/' . $name)) { $out[] = $name; }
 	}
 	sort($out);
@@ -141,9 +146,15 @@ function thumbnailSvg($doc, $w = 320, $h = 200) {
 		. implode('', $parts) . implode('', $dots) . '</svg>';
 }
 
-$descriptions = is_file($descFile)
-	? (json_decode(file_get_contents($descFile), true) ?: array())
+$meta = is_file($metaFile)
+	? (json_decode(file_get_contents($metaFile), true) ?: array())
 	: array();
+
+/* The English values, read from the real lang file through the suite's own parser rather than by
+ * regex -- the parser is what knows about escaped apostrophes, which every one of these strings is
+ * one edit away from containing. */
+require_once __DIR__ . '/lang_parse.inc.php';
+$en = ecLangValues(file_get_contents($root . '/lib/lang.ec.en.php'));
 
 $files = whitelistedExamples($srcDir);
 if (!$files) {
@@ -168,9 +179,20 @@ foreach ($files as $name) {
 	 * the one the New-project menu already puts in its labels. Deriving it beats storing it: a
 	 * stored system could disagree with the file it describes. */
 	$system = in_array($flow, array('gpm', 'mgd', 'cfs', 'gpd'), true) ? 'us' : 'si';
-	$title = $descriptions[$name]['title'] ?? preg_replace('/-lpn$/', '', pathinfo($name, PATHINFO_FILENAME));
-	$desc = $descriptions[$name]['description'] ?? '';
-	if ($desc === '') { $problems[] = "$name: no description in descriptions.json"; }
+	$key = $meta[$name]['key'] ?? '';
+	$titleKey = $key === '' ? '' : "lpn_ex_{$key}_title";
+	$descKey = $key === '' ? '' : "lpn_ex_{$key}_desc";
+	if ($key === '') {
+		$problems[] = "$name: no key in examples.json, so its card cannot be translated";
+	} else {
+		foreach (array($titleKey, $descKey) as $k) {
+			if (!isset($en[$k]) || $en[$k] === '') { $problems[] = "$name: \$ec_lang['$k'] is missing from lang.ec.en.php"; }
+		}
+	}
+	/* Falls back to the file name so a brand-new example is still a usable card before anybody has
+	 * written its strings -- reported above, but not blank on screen. */
+	$title = $en[$titleKey] ?? preg_replace('/-lpn$/', '', pathinfo($name, PATHINFO_FILENAME));
+	$desc = $en[$descKey] ?? '';
 
 	$svg = thumbnailSvg($doc);
 	$thumbName = preg_replace('/\.json$/', '.svg', $name);
@@ -178,7 +200,9 @@ foreach ($files as $name) {
 
 	$manifest[] = array(
 		'file' => $name,
-		'order' => (int)($descriptions[$name]['order'] ?? 0),
+		'order' => (int)($meta[$name]['order'] ?? 0),
+		'titleKey' => $titleKey,
+		'descKey' => $descKey,
 		'title' => $title,
 		'description' => $desc,
 		'system' => $system,

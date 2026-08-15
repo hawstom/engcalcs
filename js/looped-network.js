@@ -3095,8 +3095,16 @@ var EngCalcs = EngCalcs || {};
 					'class': 'lpn-example-thumb', src: 'examples/' + ex.thumb, alt: '', loading: 'lazy'
 				}));
 			}
-			card.appendChild(elh('span', { 'class': 'lpn-example-title' }, ex.title || ex.file));
-			card.appendChild(elh('span', { 'class': 'lpn-example-desc' }, ex.description || ''));
+			// **THE TRANSLATED STRING WINS; THE MANIFEST'S ENGLISH IS THE FALLBACK.** The card text
+			// lives in lib/lang.ec.*.php like every other string on this page -- a string kept only
+			// in the examples folder's own JSON would be one no translator ever sees, which would
+			// have left six permanently-English cards on a page that ships in 27 languages. The
+			// manifest still carries the English so a newly dropped-in example is a usable card
+			// before anybody has written its keys.
+			card.appendChild(elh('span', { 'class': 'lpn-example-title' },
+				(ex.titleKey && pc[ex.titleKey]) || ex.title || ex.file));
+			card.appendChild(elh('span', { 'class': 'lpn-example-desc' },
+				(ex.descKey && pc[ex.descKey]) || ex.description || ''));
 			card.appendChild(elh('span', { 'class': 'lpn-example-meta' },
 				(pc.lpn_examples_size || '{nodes} / {links}')
 					.replace('{nodes}', ex.nodes).replace('{links}', ex.links)));

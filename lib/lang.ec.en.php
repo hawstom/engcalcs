@@ -1189,6 +1189,26 @@ $ec_lang['lpn_examples_size']='{nodes} junctions, {links} pipes';
 $ec_lang['lpn_examples_failed']='The examples could not be loaded. Use File, New project to start a drawing.';
 $ec_lang['lpn_examples_loading']='Loading examples...';
 $ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it with File, Save as.';
+// Each example's own card text. These live here, and NOT in the examples folder's own JSON, for one
+// reason: a string that is not in a lang file is a string no translator will ever see. The manifest
+// carries the English as a fallback for an example that has no keys yet, so a new example still
+// shows up in English the moment its file is dropped in.
+// FLOW UNIT FIRST in each description (Tom, 2026-08-14: "list flow units first for two reasons:
+// EPANET and clarity"). EPANET identifies a whole unit system by its flow unit -- its [OPTIONS]
+// setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
+// the name of the system, and the length units as detail that follows from it.
+$ec_lang['lpn_ex_basic_si_title']='Basic network, l/s (SI)';
+$ec_lang['lpn_ex_basic_si_desc']='Start here. A reservoir, a pump and a small loop: the least a working water network can be. Litres per second, with metres and millimetres.';
+$ec_lang['lpn_ex_basic_us_title']='Basic network, gpm (US)';
+$ec_lang['lpn_ex_basic_us_desc']='The same starting network in gallons per minute, with feet and inches.';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1';
+$ec_lang['lpn_ex_net1_desc']='The smallest of EPANET\'s own three sample networks: one reservoir, a pump and a single loop.';
+$ec_lang['lpn_ex_net2_title']='EPANET Net2';
+$ec_lang['lpn_ex_net2_desc']='A branched distribution system with a tank, from EPANET\'s samples.';
+$ec_lang['lpn_ex_net3_title']='EPANET Net3';
+$ec_lang['lpn_ex_net3_desc']='EPANET\'s large sample: 97 junctions, two tanks and a river source. Worth opening to see how a real-sized model reads.';
+$ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
+$ec_lang['lpn_ex_elm_street_desc']='A commercial site\'s fire flow plus maximum day design snapshot, drawn over a site plan.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
