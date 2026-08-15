@@ -50,7 +50,7 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
-- 85|354| **A pipe VANISHES when you zoom in far on a model with real survey coordinates.** Tom,
+- 90|354| **LOCAL MAP COORDINATES: a pipe VANISHES when you zoom in far on a model with real survey coordinates.** Tom,
   2026-08-15, on Elm Street: P11 gone, its five repeated labels still drawn along exactly where it
   should be, P9 beside it drawn normally.
   - **The labels being right is the diagnosis.** They are positioned from the same coordinates the
@@ -59,11 +59,23 @@ session of its own with nothing else in it.
     is 0.0625 world units. A pipe's stroke is `linkWidth / scale` world units (3 px at the shipped
     default), so past **scale ≈ 48** the stroke is thinner than the coordinate resolution. Position
     error measured the same way: 0.8 px at scale 10, 12 px at 200, 32 px at MAX_SCALE 500.
-  - **TWO CANDIDATE CAUSES AND THEY HAVE DIFFERENT FIXES**, which is why this is not built yet:
-    (a) the stroke outline collapses → `vector-effect: non-scaling-stroke` and pixel stroke widths
-    fixes it, contained; (b) the whole path is culled for enormous device bounds → only a RENDER
-    ORIGIN fixes it (subtract a per-document offset from every coordinate written to the DOM,
-    keeping the document's true coordinates).
+  - **THE DESIGN IS DECIDED: LOCAL MAP COORDINATES** (Tom, 2026-08-15: *"Local map coordinates: I
+    agree. Log it high priority since it's a bug."*). Store a per-document `doc.origin` and keep
+    every coordinate in the document LOCAL to it, so nothing downstream — renderer, bbox, collision,
+    fit — ever sees a number with more digits than a float can hold. The origin is added back at the
+    handful of places that face outward: the property popup's X/Y, the coordinate readout, `.inp`
+    import and export, and the backdrop world file (Task 145). That is ~5 sites against ~25 for the
+    alternative, which was to subtract an offset at every coordinate WRITE and leave the document's
+    numbers huge.
+  - Cost of the chosen design, stated so it is not a surprise: it is a **schema change** (a new
+    `doc.origin`, defaulting to 0,0 for every existing document, and a decision about whether an
+    already-imported model gets rebased on open or stays as it is). It wants its own session and a
+    `/code-review`, because a missed boundary shows up as coordinates that are wrong by half a
+    million and nothing else.
+  - The rejected cheap fix, recorded so it is not proposed again: `vector-effect: non-scaling-stroke`
+    with pixel stroke widths would move the cliff from ~47x to a few hundred x and leave it there.
+    It treats one symptom — see the measurements below, where the LABELS fail on the same arithmetic
+    and no stroke property touches them.
   - **THE EXPERIMENT WAS RUN AND IT CAME BACK AMBIGUOUS, WHICH IS ITSELF THE ANSWER** (Tom,
     2026-08-15): *"20 works fine at the zoom shared. But any closer both pipes and the labels
     disappear."* A wider stroke surviving longer says the stroke IS one term — cause (a) is real —
