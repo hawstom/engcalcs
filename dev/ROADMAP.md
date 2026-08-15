@@ -636,8 +636,31 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Matters most under Task 329's aligned labels, where a three-line stack lying at 40° along a pipe
     is exactly the wall of text flagged when that geometry landed. A one-line aligned label is the
     form GIS actually uses, and is probably where these two tasks are heading together.
+  - **DRAGGED = multi-line, still prefixed** (Tom, 2026-08-14: *"if they are dragged, they keep
+    their prefixes, but go into multi-line mode?"*). Yes, and it needs no new switch: `l.lx`
+    already decides aligned-vs-loose, so the same test decides one-line-vs-stacked. The reason it
+    is right and not just convenient: concatenation is what buys ROOM on a pipe, and a dragged
+    label is in open space where it has none of that pressure — there, a stack is more readable and
+    each prefixed value reads as its own row. The prefixes stay because they are what make a
+    SUBSET self-describing, which has nothing to do with which shape the label is in.
 
 
+- 55|342| **Multi-line Text labels (mtext), and how far up the rich-text ladder to go.** Tom,
+  2026-08-14: *"is it easy or hard to turn Text labels into mtext or paragraph text or even rich
+  text labels?"* Three different prices, and the answer differs at each rung:
+  - **Explicit line breaks — EASY, half a day.** Swap the popup's `<input>` for a `<textarea>` (the
+    backdrop world-file field is already one) and render through `setMultilineText()`, which data
+    labels have used all along. The only genuinely new arithmetic is that a Text is
+    `text-anchor:middle` + `dominant-baseline:central`, so an n-line block starts (n−1)/2 lines
+    high; `Geom.dataLabelBoxHeight()` already sizes the mask and collision box. `\n` survives JSON.
+  - **Word wrap at a set width — MEDIUM, about a day.** SVG does not wrap, so it needs a per-label
+    width plus a greedy wrap re-run whenever the font size changes. The wrap itself is pure and
+    belongs in `js/lpn-geom.js` with a harness.
+  - **Per-run rich text — HARD, and worth pushing back on.** Bold/italic/colour WITHIN one label
+    means tspan runs, a markup format in the document, and an editor for it. `foreignObject` is the
+    tempting shortcut and is a trap: HTML-in-SVG breaks the export and print fidelity Tasks 175/253
+    are for. **Per-LABEL formatting gets most of the value** — which is Task 337's Bold, already
+    queued higher than this.
 - 66|337| **Text label properties: Bold, and Rotate-to-match-a-pipe with a flip toggle.** Tom,
   2026-08-14: *"For text labels properties, it would be nice to allow Bold and Rotation to match a
   pipe with a toggle to rotate opposite the initial result."*
@@ -686,27 +709,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     in the document** — no new per-label setting, which is what makes it worth doing at all.
   - Keeps the useful floor: a Text label at 1× has exactly the data labels' threshold, so nothing
     authored vanishes while anything generated is still drawn.
-
-- 98|326| **PARADIGM: size text and symbols in PRINTED units, not real-world units.** Tom,
-  2026-08-14: *"the end product of all text and symbols is in printed units… engineers and architects
-  achieve precise control of prints by fixing the printed scale early… but these heights are
-  calibrated to printed heights."* A drawing declares a scale; text is specified as a height on
-  paper; the model-space height follows arithmetically. This is AutoCAD's annotative text, every
-  `DIMSCALE` ever set, and QGIS's reference scale — not a CAD quirk but how the profession has
-  specified drawings for a century, because **the deliverable is a sheet**.
-  - **We already have the missing half**: the map unit is DECLARED (`lpn_u_length`), so one map unit
-    is known to be one foot or one metre and the paper→model conversion needs no new input but the
-    scale itself.
-  - **It removes a control rather than adding one, which is the test that it is right.** The
-    symbol/text independence asked for in Task 325 is not a feature to build — `symbolScale` exists
-    only because neither size had an absolute frame, and paper units supply one. Text is "3 mm", a
-    junction is "2 mm", stated independently, nothing to link.
-  - **Printing becomes correct by construction**, which is Task 175's hardest part solved as a side
-    effect rather than by a print stylesheet that re-derives sizes and drifts.
-  - **The tension is real and is not resolved by picking one paradigm**: for many of this suite's
-    users the SCREEN is the deliverable. Separate storage from rendering — store paper units plus a
-    scale, render by a display mode. Full reasoning, the three paradigms, and five open questions:
-    `dev/sizing-paradigm.md`.
 
 - 60|325| **A successful import can render INVISIBLE, and the sizing paradigm is why.** Tom, 2026-08-14,
   after Net3 imported correctly and showed nothing: *"the text size for Net3.inp was so small (0.2)
@@ -2446,6 +2448,13 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|326| **The paper-units paradigm — CLOSED 2026-08-14 as ALREADY DELIVERED, and it was never a
+  build.** Tom, asked whether to store paper heights and a drawing scale: *"I don't think we store
+  anything as paper heights. I was just fleshing out a paradigm. Everything is in pixels... drawing
+  scale doesn't factor into this project at this time... this task seems to be a mirage after all."*
+  What the paradigm actually asked for — an ABSOLUTE frame for sizes, so a size means the same thing
+  on Net1 and on a state-plane model — shipped as Task 331's screen pixels. `dev/sizing-paradigm.md`
+  stays as the reasoning, and is HISTORY, not a spec: nothing in it is queued work.
 - 0|328| **The leader stored the TEXT's corner, so the angle slid with the zoom — CLOSED 2026-08-14.**
   `n.lx/n.ly` now hold point B itself (world units, the user's) and `dataLabelOrigin()` hangs the
   text off it in pixels (ours, free to flip sides). Tom had to report it three times; a
