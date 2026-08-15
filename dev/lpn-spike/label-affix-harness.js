@@ -33,6 +33,7 @@ const L = loadLoopedNetwork(
 	"\t\tlinkLabel: function (id) { return linkEls[id].lines.map(function (l) { return l.text; }); },\n" +
 	"\t\tnodeLabel: function (id) { return nodeEls[id].lines.map(function (l) { return l.text; }); },\n" +
 	"\t\tlinkDecor: function (id) { return linkEls[id].lines.map(function (l) { return l.decoration || ''; }); },\n" +
+	"\t\tnodeDecor: function (id) { return nodeEls[id].lines.map(function (l) { return l.decoration || ''; }); },\n" +
 	"\t\tlinkLineColors: function (id) { return linkEls[id].lines.map(function (l) { return l.color; }); },\n" +
 	"\t\tlinkTspans: function (id) { return this.tspanDump(linkEls[id].text); },\n" +
 	"\t\tnodeTspans: function (id) { return this.tspanDump(nodeEls[id].text); },\n" +
@@ -183,6 +184,24 @@ rows = showThree();
 ok('a " | " separator likewise', / \| /.test(rowText(rows[0])), rowText(rows[0]));
 ls.separator = ' ';
 
+// A NODE label is a stack whatever it is doing, which is the other half of Tom's rule: it hangs off
+// a point with space above and below, and carries up to five fields where a link carries two.
+function showThreeNode() {
+	Object.keys(ls.node).forEach(function (k) { ls.node[k] = (k === 'id' || k === 'demand' || k === 'pressure'); });
+	Object.keys(ls.link).forEach(function (k) { ls.link[k] = false; });
+	L.refreshLabelText();
+	return rowsOf(L.nodeTspans(junctions[0].id));
+}
+const J = junctions[0];
+delete J.lx; delete J.ly;
+const nodeRows = showThreeNode();
+ok('an UNDRAGGED node label is a stack, one row per value', nodeRows.length === 3,
+	JSON.stringify(nodeRows.map(rowText)));
+J.lx = 5; J.ly = -5;
+ok('...and dragging it changes nothing, because it was never on one line',
+	showThreeNode().length === 3);
+delete J.lx; delete J.ly;
+
 // The drag. lx/ly is the manual offset the page itself writes on a drag.
 P.lx = 5; P.ly = -5;
 rows = showThree();
@@ -196,28 +215,50 @@ ok('sending it home returns it to one line', showThree().length === 1);
 
 console.log('\n=== the extrema mark is the number\'s own text-decoration ===');
 Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'flow'); });
-Object.keys(ls.node).forEach(function (k) { ls.node[k] = false; });
+Object.keys(ls.node).forEach(function (k) { ls.node[k] = (k === 'demand'); });
 L.refreshLabelText();
-// Every LINK, not just the pipes: the network-wide flow extremes are judged across all of them,
-// and in this example the maximum flow is on the pump. Filtering to pipes first and then asserting
-// "a high and a low exist" asserted something about the example, not about the code.
-const decorated = doc.links.filter(function (l) { return L.linkDecor(l.id)[0]; });
-const kinds = decorated.map(function (l) { return L.linkDecor(l.id)[0]; });
-ok('the example network really does have a marked high AND a marked low',
-	kinds.indexOf('high') >= 0 && kinds.indexOf('low') >= 0,
-	decorated.map(function (l) { return l.id + ':' + L.linkDecor(l.id)[0]; }).join(' '));
-decorated.forEach(function (l) {
+
+// ONE Q POOL: a node's demand and a link's flow are the same quantity, print with the same prefix,
+// and are judged against each other (Tom, 2026-08-15 -- he had a drawing carrying two "highest Q"
+// marks, one on a junction's demand and one on a pump's flow). So the assertion is drawing-wide:
+// every element holding the largest printed Q is marked, nothing else is, and the same for the
+// smallest. Written against the VALUES rather than against an expected element, so it still means
+// something when the example network changes.
+const qs = doc.nodes.filter(function (n) { return n.type === 'junction'; })
+	.map(function (n) { return { id: n.id, v: parseFloat(L.nodeLabel(n.id)[0].slice(2)), dec: L.nodeDecor(n.id)[0] }; })
+	.concat(doc.links.map(function (l) {
+		return { id: l.id, v: parseFloat(L.linkLabel(l.id)[0].slice(2)), dec: L.linkDecor(l.id)[0] };
+	}))
+	.filter(function (e) { return isFinite(e.v); });
+ok('both kinds of Q are on the drawing at once', qs.length > doc.links.length, qs.length + ' values');
+const hi = Math.max.apply(null, qs.map(function (e) { return e.v; }));
+const lo = Math.min.apply(null, qs.map(function (e) { return e.v; }));
+ok('the biggest Q anywhere is marked high, whichever kind of element holds it',
+	qs.filter(function (e) { return e.v === hi; }).every(function (e) { return e.dec === 'high'; }),
+	JSON.stringify(qs.filter(function (e) { return e.v === hi; })));
+ok('...and NOTHING smaller is marked high -- the pools are not judged separately',
+	qs.filter(function (e) { return e.dec === 'high'; }).every(function (e) { return e.v === hi; }),
+	JSON.stringify(qs.filter(function (e) { return e.dec === 'high'; })));
+ok('the smallest Q anywhere is marked low',
+	qs.filter(function (e) { return e.v === lo; }).every(function (e) { return e.dec === 'low'; }),
+	JSON.stringify(qs.filter(function (e) { return e.v === lo; }).slice(0, 4)));
+ok('...and nothing bigger is marked low',
+	qs.filter(function (e) { return e.dec === 'low'; }).every(function (e) { return e.v === lo; }),
+	JSON.stringify(qs.filter(function (e) { return e.dec === 'low'; }).slice(0, 4)));
+ok('...and the two ends are not the same value, or the marks would be vacuous', hi !== lo, hi + ' vs ' + lo);
+
+// The mark itself: on the value segment, at the value's own length.
+doc.links.filter(function (l) { return L.linkDecor(l.id)[0]; }).forEach(function (l) {
 	const segs = L.linkTspans(l.id);
-	const marked = segs.filter(function (t) { return t.dec; });
+	const m = segs.filter(function (t) { return t.dec; });
 	const want = L.linkDecor(l.id)[0] === 'high' ? 'overline' : 'underline';
-	ok(l.id + ' carries ' + want + ' on exactly one segment', marked.length === 1 && marked[0].dec === want,
-		JSON.stringify(segs));
+	ok(l.id + ' carries ' + want + ' on exactly one segment', m.length === 1 && m[0].dec === want, JSON.stringify(segs));
 	// THE MARK'S LENGTH IS THE NUMBER'S LENGTH. Tom, 2026-08-15, of a mark spanning a whole line:
 	// "The underline needs to be only as long as the ID." A mark that also covered 'Q=' would start
 	// at the label's left edge, which in a stacked label is exactly where the row above would be
 	// underlined -- so it would read as belonging to the wrong row.
 	ok('...and that segment is the NUMBER alone, with no prefix in it',
-		marked.length === 1 && /^-?[\d.]+%?$/.test(marked[0].text), JSON.stringify(marked));
+		m.length === 1 && /^-?[\d.]+%?$/.test(m[0].text), JSON.stringify(m));
 });
 const plain = doc.links.filter(function (l) { return !L.linkDecor(l.id)[0]; });
 ok('an unmarked value carries no decoration at all',
@@ -226,8 +267,9 @@ ok('an unmarked value carries no decoration at all',
 
 // On a one-line label the mark must land on the NUMBER, not on the separator beside it.
 Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'id' || k === 'flow'); });
+Object.keys(ls.node).forEach(function (k) { ls.node[k] = false; });
 L.refreshLabelText();
-const markedOneLine = pipes.filter(function (l) { return L.linkDecor(l.id)[1]; })[0];
+const markedOneLine = doc.links.filter(function (l) { return L.linkDecor(l.id)[1]; })[0];
 if (markedOneLine) {
 	const row = rowsOf(L.linkTspans(markedOneLine.id))[0];
 	const at = row.map(function (t) { return t.dec ? 1 : 0; }).indexOf(1);
@@ -245,11 +287,13 @@ console.log('\n=== affixes never change WHICH value is marked ===');
 Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'flow'); });
 ls.prefix.link.flow = ''; ls.suffix.link.flow = '';
 L.refreshLabelText();
-const bare = pipes.map(function (l) { return L.linkDecor(l.id)[0]; });
+// Every link, not just the pipes: the Q pool spans nodes and links, so the network's high Q is on
+// the pump here and a pipes-only check would be asserting nothing.
+const bare = doc.links.map(function (l) { return L.linkDecor(l.id)[0]; });
 ls.prefix.link.flow = 'FLOW='; ls.suffix.link.flow = ' gpm'; ls.separator = ' | ';
 L.refreshLabelText();
-const affixed = pipes.map(function (l) { return L.linkDecor(l.id)[0]; });
-ok('the same pipes are marked high/low with affixes as without',
+const affixed = doc.links.map(function (l) { return L.linkDecor(l.id)[0]; });
+ok('the same links are marked high/low with affixes as without',
 	bare.join(',') === affixed.join(','), bare.join(',') + ' vs ' + affixed.join(','));
 ok('...and something is actually marked, so that check is not vacuous', affixed.some(function (d) { return d; }));
 

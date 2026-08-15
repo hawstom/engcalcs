@@ -37,6 +37,35 @@ are `v: 6`. `applySaved()` merges an older document onto current defaults, so al
 correctly. Re-saving one from the page will float it to the current version — fine, but do it
 deliberately rather than as a drive-by, because the diff on a re-saved 97-node file is unreadable.
 
+## THIS FOLDER IS THE SOURCE; `examples/` IS GENERATED — regenerate after every edit
+
+```
+php dev/scripts/generate_examples.php
+```
+
+**Editing a file here changes nothing that a visitor can see until you run that.** The served copy
+under `examples/` is written by the generator, along with `examples/manifest.json` and a thumbnail
+SVG per example. `sh dev/scripts/check_all.sh` fails with `STALE: <file>` when the two disagree,
+which is the backstop — but the check only speaks when it is run, so run the generator as part of
+the edit.
+
+**Why the two folders are not merged** (Tom asked, 2026-08-15, having edited Elm Street twice and
+seen the old copy both times — a fair question):
+
+- **`dev/` is unreachable over HTTP at all.** `dev/.htaccess` is `Require all denied`. Serving the
+  examples from here would need either a child `.htaccess` — the one class of change that can
+  return 500 for *every* request under `/engcalcs/` if the host has not granted the directive (see
+  CLAUDE.md's deploy section) — or a PHP endpoint that echoes files out of a folder that also holds
+  client models. Neither is worth it to save a copy.
+- **This folder holds things `examples/` must not**: the `.gitignore` whitelist that IS the
+  publication decision, the original `.inp` files, `examples.json` (which lang key each card uses
+  and where it sits on the wall), un-whitelisted client models, and this README.
+- **`examples/` holds things this folder must not**: a generated `manifest.json` and a generated
+  thumbnail per example. Both are derived, and a hand-kept index beside a folder of files drifts
+  silently — which is the reason the generator exists at all.
+
+So: keep both, edit here, regenerate. Deleting either side loses something that is not in the other.
+
 ## Filename convention
 
 `<Name>-lpn.json`, and each file carries `format: 'hawsedc-lpn'` plus an `app` URL as its first two

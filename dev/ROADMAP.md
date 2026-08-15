@@ -506,6 +506,15 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - `dev/lpn-spike/inp-import-harness.js` asserts the nondeterminism **inverted, as a known defect**,
     so whoever fixes this is told by a failing check to flip it.
 
+- 62|346| **An extrema mark shared by a dozen tied elements is noise.** Elm Street prints `Q=0.00`
+  on thirteen zero-demand junctions and a closed pipe, and every one of them is marked "lowest".
+  The existing guard only covers the degenerate case where max and min are the same value.
+  - Options, cheapest first: skip a mark when more than N elements tie for it; skip zero
+    specifically (a zero demand is "no demand", not "the smallest demand"); or mark only the
+    smallest NON-ZERO value.
+  - Found 2026-08-15 while pooling demand with flow (Task 333). Not fixed there because it is a
+    different question — what a mark MEANS, rather than which values it compares.
+
 - 55|343| **Priority order for hiding label lines when they do not fit.** The other half of Task
   333: with prefixes shipped, any SUBSET of a stack is self-describing, so dropping a line is now
   safe. Interacts with Task 331's visibility threshold and Task 329's aligned labels, where a
@@ -2212,6 +2221,28 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
       extent of the characters it marks, at any rotation, in any row, for free.
       `labelBoxWidth()` is the text again, `measureDecorRight()`/`applyExtremaTicks()` are gone,
       and `dev/lpn-spike/label-decor-harness.js` is half its old length.
+  - **THIRD ROUND, same day, after Tom used THAT.** Three more:
+    - **Elevation is `Z=`**, the surveyor's letter for a vertical ordinate.
+    - **A node label is always a stack; a link label is one line unless dragged** (*"I think that
+      either junction labels in home position should be multiline or it should be a project toggle.
+      Probably just multiline."*). The asymmetry is the geometry, not a compromise: a link label
+      lies along a PIPE and competes for length, which is the whole argument for concatenating,
+      while a node label hangs off a POINT with open space above and below — and carries up to five
+      fields against a link's typical two.
+    - **Demand and flow now share ONE extrema pool** (*"I think they should be aggregated for
+      evaluation"*). Task 333 gave them the same prefix on the grounds that a demand IS a flow;
+      having said so in the label, the comparison had to mean it, or a drawing carries two
+      "highest Q" marks answering different questions with nothing on screen to say so.
+      **The cost is real: a junction will now essentially never be the network's highest Q**, since
+      a source link carries the sum of everything downstream of it. If "which junction draws the
+      most" turns out to matter more than the consistency, split the pool again and give demand its
+      own prefix.
+    - Tom's report named the wrong two elements (*"an overline at 749.94 on a pipe when the pump Q
+      also had an overline for 1960"*) — 749.94 was a junction's DEMAND, not a pipe's flow, and the
+      pipe/pump split he suspected never existed. **The phenomenon was real and the fix he asked for
+      was the right one**, which is worth recording: a report can be wrong about the mechanism and
+      still be right about the symptom, and the symptom is the part only he can see.
+
 
 - 0|304| **The project file's NAME and EXTENSION — CLOSED 2026-08-14, ratified by Tom.** The
   answer is *not an extension*: stay on `.json`, shorten the suffix to `-lpn`, and put the identity

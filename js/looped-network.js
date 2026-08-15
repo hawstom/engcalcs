@@ -10742,12 +10742,20 @@ var EngCalcs = EngCalcs || {};
 	function labelIsDragged(x) { return x.lx !== undefined || x.ly !== undefined; }
 	// The field lines as ROWS OF SEGMENTS for setMultilineText().
 	//
-	// ONE LINE UNLESS DRAGGED (Tom, 2026-08-15). A dragged label has been placed deliberately, in
-	// space its author chose, where a stack is the more readable shape and there is room for it --
-	// the same reading of a drag that exempts it from the short-pipe rule and from the collision
-	// nudge. An auto-placed label is competing for room with everything around it, so it goes on
-	// one line and stays out of the way. The gesture that switches shape is one the user already
-	// makes, and double-clicking the label sends it home and back to one line.
+	// A LINK LABEL IS ONE LINE UNLESS DRAGGED; A NODE LABEL IS ALWAYS A STACK (Tom, 2026-08-15,
+	// after seeing both: "I think that either junction labels in home position should be multiline
+	// or it should be a project toggle. Probably just multiline.").
+	//
+	// The asymmetry is not a compromise, it is the geometry. A link label has to lie along a PIPE
+	// and compete with everything else strung out around that pipe, so one line is what buys it
+	// room -- which is the whole argument for concatenating in the first place. A node label hangs
+	// off a POINT with open space above and below it, where a stack is the more readable shape and
+	// costs nothing. And a node carries up to five fields against a link's typical two, so the
+	// one-line form is where it hurts most.
+	//
+	// A DRAGGED link label stacks too: it has been placed deliberately, in space its author chose,
+	// which is the same reading of a drag that exempts it from the short-pipe rule and from the
+	// collision nudge. Double-clicking sends it home and back to one line.
 	//
 	// The separator is its own SEGMENT rather than being appended to the value before it, so that an
 	// extrema mark underlines the number alone and never the punctuation after it.
@@ -10805,6 +10813,32 @@ var EngCalcs = EngCalcs || {};
 		// Every field below is rounded through the same displayRound()/per-field-decimals rule the
 		// label text itself uses (see the comment on displayRound()), so a tie in what's actually
 		// printed is always a tie in what gets decorated.
+		//
+		// ---- ONE Q POOL: a node's demand and a link's flow are judged together (Tom, 2026-08-15) ----
+		//
+		// They were two pools, so a drawing could carry two "highest Q" marks -- one on the biggest
+		// demand, one on the biggest pipe flow -- and nothing on screen said they were answering
+		// different questions. That is worse now than it was in July, because Task 333 gave both
+		// fields the SAME PREFIX, on the grounds that a demand IS a flow (the flow leaving the
+		// network at that point). Having said so in the label, we have to mean it in the comparison.
+		//
+		// **THE COST IS REAL AND WORTH KNOWING: a junction will now essentially never be the
+		// network's highest Q.** A source link carries the sum of every demand downstream of it, so
+		// the top mark lands on a pump or a supply main almost every time, and "which junction draws
+		// the most" stops being answerable from the marks. If that turns out to matter more than the
+		// consistency does, the fix is to split the pool again here and give demand its own prefix.
+		//
+		// Each side is rounded at ITS OWN field's decimals before pooling, not at some shared
+		// figure: the invariant that survives is "the number you can see is the number that was
+		// compared", and a demand printing 2 decimals beside a flow printing 0 is normal.
+		var qPool = doc.nodes.map(function (n) {
+			// Fixed-head nodes are still out: a reservoir supplies whatever the network draws
+			// rather than demanding an amount, so it has no Q of its own to compare.
+			return !isFixedHeadNode(n) ? plainRound(effective(n, 'demand'), nd.demand) : undefined;
+		}).concat(doc.links.map(function (l) {
+			return lastSolveResult ? displayRound(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow', ld.flow) : undefined;
+		}));
+		var qExtrema = fieldExtrema(qPool);
 		var extrema = {
 			// Elevation and pressure now include reservoirs -- a reservoir has a real elevation of
 			// its own, and a real pressure (head minus that elevation) whenever its head has been
@@ -10814,7 +10848,8 @@ var EngCalcs = EngCalcs || {};
 			// treatment length/roughness/km have always had. Only solve RESULTS still come out of the
 			// solver in SI and go through displayRound().
 			elev: fieldExtrema(doc.nodes.map(function (n) { return plainRound(n.elev, nd.elev); })),
-			demand: fieldExtrema(doc.nodes.map(function (n) { return !isFixedHeadNode(n) ? plainRound(effective(n, 'demand'), nd.demand) : undefined; })),
+			// demand and flow SHARE ONE POOL -- see qPool above.
+			demand: qExtrema,
 			head: fieldExtrema(doc.nodes.map(function (n) {
 				// Head is an INPUT on a reservoir or tank and a RESULT on a junction, so the two
 				// halves of this one field cross the boundary differently. Both end up in
@@ -10834,7 +10869,7 @@ var EngCalcs = EngCalcs || {};
 			// Both dimensionless, so they use rawLine()/plainRound() like Length, not displayRound().
 			roughness: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'roughness'), ld.roughness) : undefined; })),
 			km: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'k') || 0, ld.km) : undefined; })),
-			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow', ld.flow) : undefined; })),
+			flow: qExtrema,
 			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity', ld.velocity) : undefined; })),
 			// One head-loss bucket for every link type, pumps included: a pump reports a negative
 			// head loss (Tom, 2026-07-30), so it lands at the min end of this same range rather
@@ -10891,7 +10926,7 @@ var EngCalcs = EngCalcs || {};
 			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
 			// x here is a placeholder -- layoutNodeLabel() below (after collision avoidance) sets the
 			// real, final x/y on both the <text> and its tspans via repositionMultilineText().
-			var nRows = composeRows(lines, labelIsDragged(n));
+			var nRows = composeRows(lines, true);   // a node label always stacks -- see composeRows()
 			setMultilineText(ne.text, nodeLabelBase(n).x, nRows);
 			ne.lineCount = nRows.length;
 			nodeLines[n.id] = lines;
