@@ -394,81 +394,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   size, each independently settable — and explicitly deferred it: "that's a lot… maybe later we
   give more fine-grained control and right now just a two-dimensional control." Build it when
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
-- 75|315| **The saved filename is gratuitously long. Shorten it; decide about a generation-1
-  extension separately.** `projectFileName()` produces `Elm Street-lpn-hawsedc-engcalcs.json` — a
-  30-character suffix on every file. Tom, 2026-08-14: *"we got carried away with a long ugly
-  filename just because we didn't have a nice extension… I am less ashamed to live with two or
-  three legacy file extensions than the gratuitously long file names."*
-
-  - **These are two decisions, not one, and conflating them is what produced the long name.** The
-    suffix got long *because* an extension decision was deferred; deferring it again is fine, but
-    the filename should not keep paying for it. Shorten now (`-lpn.json` is Tom's own suggestion);
-    choose an extension when the format has stopped moving.
-  - **Three call sites, and they must move together**: `projectFileName()` (~3006), the strip in
-    `projectNameFromFileName()` (~3930), and `saveAs()`'s `suggestedName` (~4034). The strip is the
-    one that matters — **a file already saved with the long suffix must still open with its name
-    intact**, so the old suffix has to keep being recognised after the generator stops producing it.
-    A missed strip does not fail; it silently names the project `Elm Street-lpn-hawsedc-engcalcs`.
-  - Tom's own candidate extensions: `wnj` (water network js), `lwj` (librewater js), alongside
-    possible project names LibreWaterNet / waternet. Research is out with a subagent — collision
-    check, what comparable tools ship in 2026, and whether `name.lpn.json` is a good idea or a dated
-    one. **An extension is a public commitment that is expensive to walk back**, and the format is
-    moving this week (scenarios, valves), so the honest answer may be "not yet, and here is the
-    trigger".
-  - Depends on Task 184 only for merge order — it is the same save/load region of
-    `js/looped-network.js`, and Task 184 must edit `serializeProject()` to persist scenarios.
-
-  **RESEARCHED 2026-08-14, and the answer is not an extension.** Verified against the code:
-
-  - **THERE IS NO FORMAT IDENTIFIER INSIDE THE FILE AT ALL.** `serializeProject()` emits
-    `{v, project, scenarios, nodes, links, labels, nextId, labelSettings, backdrop, settings, units}`
-    — `v` is a version number, but nothing says what it is a version *of*. So "identifiable a year
-    later in a forgotten folder" is carried **100% by the filename**, which is the actual defect the
-    30 characters were compensating for. Fix it where it belongs, in one additive line:
-    `format: 'hawsedc-lpn', app: '<the page URL>'`. Old readers ignore unknown keys; the import path
-    already sniffs `.net` against `.inp` from the bytes, so the precedent exists. **This is strictly
-    more durable than any filename scheme, because a file in a forgotten folder is exactly the file
-    somebody renamed.**
-  - **Immediate change: `Elm Street-lpn.json`.** 30 characters to 4, project name still first and
-    still the sort key, and the extension does not move — so `fileTypes()`, the MIME type, the
-    download path, the Open filter and every file already saved are untouched. Nothing to migrate.
-  - **`saveAs()` hardcodes the suffix a SECOND time** for the copy branch (~4034). Route it through
-    `projectFileName()`; two copies of a filename convention is how they drift.
-  - **THE BACKWARD-COMPATIBILITY TRAP, verified in the code and worth stating exactly.**
-    `projectNameFromFileName()` must strip `.json`, then the LONG suffix, then `-lpn` — **longest
-    first**, or `-lpn` matches inside the long one and leaves `-hawsedc-engcalcs` in the project
-    name. This is not cosmetic: `saveCurrent()` at ~4107 treats a filename differing from the
-    suggested one as a deliberate rename (`if (handle.name !== suggested) { project.name = ... }`).
-    After this change, re-saving a legacy file makes those two differ *by construction*, so the
-    rename branch fires every time and a bad strip **silently renames the user's project**. Needs a
-    harness case.
-  - **A generation-1 extension is PREMATURE, and the reasons are not about which letters.** (a) The
-    format is moving weekly — scenarios and valves are landing now, extended-period is queued — and
-    an extension is a promise that a file with those letters is a thing you can open; `v` handles
-    that technically but not a user's expectation that a named file type is stable. (b) The product
-    name is unsettled: `.lwj`/`.wnj` encode a name that does not exist yet, and `lpn` is an internal
-    *variable-prefix convention* from CLAUDE.md, not a product name. **Picking an extension before
-    picking the product name is the expensive ordering.** (c) The payoff of a custom extension is OS
-    double-click association and file-manager iconography, and a web page can deliver neither.
-  - **The trigger that starts the clock — any one of:** a PWA ships with a `file_handlers` manifest
-    entry (or LibreEPANET.org launches installable), so the extension becomes functional rather than
-    decorative; or the product name settles; or the schema stops moving.
-  - **When it does: `.lpn`.** Its only occupant is LVPLAN, obscure low-voltage-network design
-    software, unregistered and with no OS association — but note the near-miss: LVPLAN is *also*
-    network-design software, so "the `.lpn` format" is not a semantically clean public claim.
-    Second choice `.wnet` if the product renames to waternet. `.wnj` and `.lwj` are free precisely
-    because nobody could guess what they mean; `.hwn` is genuinely taken twice.
-  - **`name.lpn.json` is mostly a dated pattern** — `.geojson` beat `.geo.json`, and namespacing
-    moved to the MIME layer (`application/vnd.…+json`, RFC 6839). It survives only where the second
-    half is a format people really do open with generic tools, which is *narrowly* true here (the
-    file is pretty-printed on purpose so it can be read in an editor). Still declined: it is a
-    half-commitment that pre-commits the extension shape, and a future `.lpn` and a legacy
-    `.lpn.json` look identical in Windows Explorer while being different things.
-  - **The honest cost of the change:** `-lpn` alone IS more cryptic than `-lpn-hawsedc-engcalcs`.
-    `hawsedc-engcalcs` was the part that made a stray file traceable. That loss is real, and it is
-    exactly why the in-file `format`/`app` marker is part of the same change rather than a
-    nice-to-have.
-
 - 20|321| **`formmail.php` reads five `$_POST` keys with no `isset()`.** `name`, `email`, `subject`,
   `message`, `more_message`. Under PHP 8 a bare POST emits *Undefined array key* warnings, and with
   `display_errors` on anywhere they land in the response body. The header-injection guards on
@@ -753,22 +678,43 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     large model.
 
 - 96|314| **An EXAMPLES LIBRARY, on the HEC-RAS model: a pane of many examples, not a menu of two.**
-  - **The shelf is nearly stocked already: Net1, Net2 and Net3 are good examples too** (Tom,
-    2026-08-14), and `dev/epanet-models/` already holds all three as SAVED PROJECTS of ours, not
-    just as `.inp` — 11, 36 and 97 nodes, a useful spread. **But that directory is in `.gitignore`,
-    so none of it is in the repo and none of it deploys.** Whatever the library ships, tracking the
-    files is step zero.
+  - **STEP ZERO IS DONE, 2026-08-14: the shelf is stocked, tracked, and on the new filename
+    convention.** `dev/water-network-examples/` (Tom renamed it from `dev/epanet-models/` the same
+    day) now holds four saved projects of ours — `Net1-lpn.json` (11 nodes), `Net2-lpn.json` (36),
+    `Net3-lpn.json` (97) and `Elm-Street-Center-lpn.json` (18) — each carrying the Task 315
+    `format`/`app` marker. A useful spread, and Net3 is the one that will actually exercise label
+    clutter and the sizing paradigm in a thumbnail.
+  - **AND THE RENAME QUIETLY UNPROTECTED THE CLIENT MODELS, which is worth recording because
+    nothing warned.** The root `.gitignore` excluded `dev/epanet-models/` BY PATH; renaming the
+    directory did not carry the rule with it, so for a few minutes every real client model in there
+    — `Estrellas-*`, a 1.5 MB utility base map — was an ordinary untracked file one
+    `git add <dir>` away from GitHub. **A path-named ignore rule is a rule that a rename silently
+    revokes.** The fix is `dev/water-network-examples/.gitignore`, which is a WHITELIST: an
+    unrecognised file is ignored by default, and publishing one is an explicit line somebody has to
+    write, visible in the diff. Prefer that shape anywhere a folder mixes shippable and private
+    files — a blacklist has to predict the next client file's name.
+  - **`.inp` sources are deliberately NOT tracked**, including Net1/2/3's. The saved project is the
+    artifact the gallery serves; the `.inp` is an upstream input, and `dev/lpn-spike/reference/`
+    already keeps the one the importer is validated against.
   - **THE GAP IS AN SI EXAMPLE, and it cannot be made by converting one** (Tom: *"We just need an SI
     one now. I will eventually make one or find one."*). All three EPANET nets are `Units GPM`, and
     this suite's standing rule is that switching a unit REINTERPRETS the typed number rather than
     converting it — so opening Net1 and clicking SI gives 8 mm mains, not 200 mm ones. An SI example
     has to be AUTHORED in metres, or imported from an `.inp` that declares LPS/LPM/CMH/MLD, which
     `js/lpn-inp.js` already reads correctly. That is the cheap route if a public SI model turns up.
-  - **There is a real first exhibit: Tom's own "Elm Street Center"** (2026-08-14: *"should be a
-    solid US units example now"*). It lives in HIS browser's storage, so step one of this task is
-    getting it OUT — the library needs a shipped file, not a project on one machine. That also
-    makes it the first honest test of Task 304's file name/extension and of whether a saved project
-    opens cleanly on a machine that never made it.
+  - **The real first exhibit, Tom's own "Elm Street Center", is OUT of his browser and on the shelf**
+    (2026-08-14: *"should be a solid US units example now"*). 18 nodes, 19 links, a CAD site plan as
+    its backdrop. It was the first honest test of the Task 315 filename convention and of whether a
+    saved project opens on a machine that never made it.
+  - **It ships as-is, on Tom's explicit ruling (2026-08-14), with two residual identifiers named
+    here so nobody re-discovers them and panics.** The map labels are anonymised (`ELM STREET
+    CENTER`, `ST. FRANCIS`) and the backdrop image carries no text at all — but `project.name` is
+    still the real client model name, and the node coordinates are real state-plane, which
+    geolocates the site. A sanitisation was offered and declined; **that is a decision, not an
+    oversight, and it should not be silently "fixed" by a later pass.** If it is ever revisited:
+    pipe `_length` is explicit with `lenAuto:false`, so translating coordinates to a local origin is
+    hydraulically lossless for those links, while elevations cannot move without changing every
+    pressure.
   Tom, 2026-08-14: *"I envision a stunning array of examples that fills a screen with mere titles or
   brief descriptions and could span pages or sub-categories of large thumbnails… Therefore it is
   some sort of an Examples library or pane. And you probably get there using File Open Examples."*
@@ -851,6 +797,32 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     exists (Task 264, `newProjectFromExample`) and carries over unchanged. Say the units in the
     description.
   - **Not blocked on anything.** All three examples are single-scenario documents.
+  - **THE SHELF IS NOT WEB-REACHABLE YET, and this is the first thing the build phase hits.**
+    `dev/.htaccess` is `Require all denied`, so the gallery cannot `fetch()` anything under `dev/`.
+    Three ways out, and the choice should be made deliberately rather than discovered:
+    - **A child `.htaccess` granting access to that one subdirectory.** One copy, no drift — but it
+      depends on `AllowOverride AuthConfig` being granted on the host, and CLAUDE.md's deploy
+      section already records that a `.htaccess` directive the host has not granted returns **500
+      for every request under `/engcalcs/`**, not a quiet ignore. Cheap, with a tail risk that takes
+      the whole suite down on a host change.
+    - **A served directory outside `dev/`** (e.g. `engcalcs/examples/`), with `dev/water-network-
+      examples/` as the authoring source and a `dev/scripts/` step that copies. No Apache risk;
+      costs a build step and introduces two copies that can drift.
+    - **A PHP endpoint that reads the file and echoes it.** No Apache config, no copy, and it can
+      emit the manifest too — but it is a new server-side surface on a suite that otherwise computes
+      entirely client-side.
+    **Recommended: the served directory, generated.** The manifest has to be generated from the
+    files by a script anyway (a hand-kept index and a folder of files drift silently, already
+    decided above), so the copy is free — the same script that writes the manifest writes the
+    served copies, and there is exactly one authoring location. It also keeps a `git pull` deploy
+    honest, which the `.htaccess` route does not.
+  - **The loader already exists and should not be rewritten.** `acceptImportedText(text)` →
+    `importProject(saved)` is the exact pipeline the gallery needs: it parses, runs
+    `prepareDocument()`'s version/structure repair, lands the document as a NEW browser project,
+    and stamps it clean. That is precisely Tom's *"they were your copies because you downloaded and
+    installed them"* — the user gets a document they own and may Save As, and nothing writes back.
+    A gallery click is a `fetch()` plus the two calls the upload path already makes; anything more
+    is a second import path that will drift from the first.
 
 - 5|192| **Right-click / long-press context-menu system (originated during Task 146).** Raised by Tom,
   2026-07-30, when "Create scenario geometry variant" (Task 184) was proposed as a right-click
@@ -1794,43 +1766,17 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     without a per-visit identifier we will not store.
 
 
-- 85|304| **Settle the project file's NAME and EXTENSION before there are files in the world.**
-  Raised by Tom, 2026-08-14: *"now I am having doubts about our save conventions. Instead of the
-  long names, maybe we should just use something like 'Elm-Street-Center.___' … Unfortunately it's
-  a little bit urgent because we want to settle it before we make too much traction in the world."*
-  - **Today we write `<Name>-lpn-hawsedc-engcalcs.json`** — `projectFileName()`,
-    `js/looped-network.js:2888`, and again in the Save-a-copy path at :3876. The picker offers
-    `{'application/json': ['.json']}` at :3471. Three places, one decision.
-  - **Candidates Tom listed:** `lpndb` (looped pipe network), `ledb` (libreepanet),
-    `leodb` (libreEpanet.Org), `netj` (EPANET's `.net` with a j for json).
-  - **The urgency is real but the blast radius is small RIGHT NOW**, which is the argument for
-    doing it now rather than a reason to panic: lpn had 12 confirmed users in its first two weeks,
-    so the installed base of saved files is tiny today and will not be tiny for long.
-  - **Split the decision in two — only half of it is urgent.** READING permissively costs nothing
-    and can ship immediately: accept `.json` and the new extension forever, since the picker filter
-    and the parser are independent. Only WRITING needs the naming decision. Do the read side first
-    and the choice stops being a deadline.
-  - **Arguments the choice should weigh, so they are not re-derived:**
-    - `netj` **overclaims**. Our document is not EPANET's `.net` in JSON — it carries labels, a
-      backdrop image, scenarios, per-project settings and unit selections that no EPANET format
-      has. A name implying "EPANET, as JSON" promises interchange we do not offer, and Task 281
-      (write `.inp`) is where that promise would actually be kept.
-    - `ledb` / `leodb` **bind the format to a brand that does not exist yet.** Extensions outlive
-      product names; if the name changes the extension is stuck forever. Prefer a descriptive
-      extension over a brand one unless the brand is certain.
-    - `db` says database; this is a document. `.lpn` alone is cleaner if it is free — **check
-      whether `.lpn` is already claimed** before assuming.
-    - **A custom extension over JSON content is normal and fine** — `.ipynb` is literally JSON.
-      What is lost is "any tool recognises it as text/JSON"; what is gained is file association,
-      a distinct icon, and an unambiguous picker filter (Task 300 already moved the picker to
-      naming types by extension rather than MIME).
-  - **The short-name question is separable and easier.** `<Name>.<ext>` instead of
-    `<Name>-lpn-hawsedc-engcalcs.json` is strictly better once the extension identifies us: the
-    suffix exists only because `.json` does not. Note `safeFileName()` round-trips the name back
-    into the project title (see :2517), so shortening changes what a re-opened file is called —
-    check that path when editing.
-
 - 70|305| **How a visitor opens an EXAMPLE, and the New-vs-Open lie.** Raised by Tom, 2026-08-14:
+
+  **THIS IS THE DESIGN RECORD FOR TASK 314's ENTRY POINT — BUILD IT THERE, NOT HERE** (noted
+  2026-08-14 while prioritising the gallery). Everything below was written before 314 existed and
+  314 has since absorbed its conclusions: File > Open rather than New, "Open a copy" as the honest
+  primitive, thumbnails on the empty canvas rather than a modal, and the same three examples. Kept
+  as a separate entry because the *linguistic* argument — why New is a lie and what Word's "Open a
+  copy" gets right — is the reasoning 314 assumes rather than restates. **Do not schedule 305 as
+  its own build; closing 314 closes this.** The one live consequence to watch is the last bullet:
+  if thumbnails land, `lpn_empty_hint` is deleted, so do not spend a resync sprint on it.
+
   *"currently we are using New to 'open' examples, which is linguistically confusing, and maybe we
   need some sort of library paradigm."* And, rejecting a proposed reword of the placeholder:
   *"Saying it differently doesn't change the lie. And I don't know how to fix it."*
@@ -2153,6 +2099,49 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|304| **The project file's NAME and EXTENSION — CLOSED 2026-08-14, ratified by Tom.** The
+  answer is *not an extension*: stay on `.json`, shorten the suffix to `-lpn`, and put the identity
+  INSIDE the document (`format: 'hawsedc-lpn'`, `app: <canonical URL>`). This task asked the
+  question; Task 315's research pass had already answered it the same day, which is why the two
+  closed together rather than sequentially — worth noticing, because 304 sat at priority 85 and 315
+  at 75 while 315 held the finished answer to 304. **A researched conclusion parked in a
+  lower-priority task is invisible to whoever is reading the top of the list.**
+  - **The reasons a generation-1 extension was declined are about TIMING, not letters**: the schema
+    is still moving (scenarios and valves landed this month, extended-period is queued), the product
+    name is unsettled so `.lwj`/`.wnj` would encode a name that does not exist, and the only real
+    payoff of a custom extension — OS double-click association and a file-manager icon — is
+    something a web page cannot deliver at all. When the trigger fires (a PWA `file_handlers` entry,
+    or the product name settling), the choice is `.lpn`; the collision research is in the archive.
+  - Reading was already permissive and stays so. Full record, including the rejected `name.lpn.json`
+    pattern and the extension collision survey, in `dev/roadmap-closed-archive.md`.
+- 0|315| **The 30-character filename — CLOSED 2026-08-14.** `<Name>-lpn-hawsedc-engcalcs.json`
+  became `<Name>-lpn.json`, 30 characters to 4, and `serializeProject()` now writes
+  `format`/`app` as its first two keys. The four call sites moved together: `projectFileName()` (now
+  takes a name, so `saveAs()`'s copy branch routes through it instead of spelling the convention out
+  a second time), `projectNameFromFileName()`, and the marker at the source.
+  - **THE REASON THE SUFFIX COULD SHRINK is the marker, and the order matters.** There was no format
+    identifier in the file at all — `v` is a version number and nothing said what it was a version
+    *of* — so "identifiable a year later in a forgotten folder" rested entirely on the filename,
+    which is precisely the thing a person renames. Cutting the name without adding the marker would
+    have been a straight loss.
+  - **TASK 315 PREDICTED THE WRONG HAZARD, and the correction is the useful part.** It said the rule
+    was "strip the longest suffix first", reasoning that `-lpn` matches inside
+    `-lpn-hawsedc-engcalcs`. Measured 2026-08-14: with `$`-ANCHORED strips — which is what the code
+    has always used — **order is harmless**, because `/-lpn$/` cannot match a string ending in
+    `engcalcs`. Longest-first only matters if someone drops the anchors. The defect that IS real is
+    applying BOTH strips in sequence, which is exactly what the obvious chained-replace
+    implementation does: a project a user genuinely named `Z-lpn` was written as
+    `Z-lpn-lpn-hawsedc-engcalcs.json` and re-opens as `Z`, four typed characters gone.
+  - **Why a bad strip here is expensive rather than cosmetic:** `saveCurrent()` treats a filename
+    differing from the suggested one as a DELIBERATE RENAME. Before this change a legacy file's name
+    and its suggestion were identical, so that branch slept; now they differ BY CONSTRUCTION, so it
+    fires on every re-save of every pre-existing file and whatever the strip returns becomes the
+    user's project name. `dev/lpn-spike/file-naming-harness.js` (22 checks) pins the round trip, both
+    suffixes, the overlap, and the marker.
+  - The `dev/browser-pass/` specs were deliberately LEFT on the long suffix — they now exercise the
+    legacy read path in a real browser, which still has to work forever, while the node harness
+    covers the new one.
 
 - 0|184| **Project/scenario model: the DELTA model — CLOSED 2026-08-14.** One save, a canonical Base,
   scenarios that are nothing but collections of overrides. Shipped and reviewed the same day; the

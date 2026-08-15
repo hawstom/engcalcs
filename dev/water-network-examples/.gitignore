@@ -1,0 +1,26 @@
+# DEFAULT-DENY, and the default is the point.
+#
+# This directory used to be `dev/epanet-models/`, which the root .gitignore excluded WHOLESALE
+# because Tom drops real client water models in here to stress-test the .inp importer -- models
+# carrying client names, real state-plane coordinates, base maps and fire-flow results, in a repo
+# that is on GitHub.
+#
+# Renaming the directory to `dev/water-network-examples/` on 2026-08-14 silently removed that
+# protection: the root rule named the old path, so the moment the folder changed name every client
+# file in it became an ordinary untracked file that `git add dev/water-network-examples/` would
+# publish. Nothing warned; the rename looked like a rename.
+#
+# So the protection lives INSIDE the directory now, where it travels with it, and it is a
+# whitelist rather than a blacklist. A blacklist has to predict the next client file's name; a
+# whitelist only has to know what we deliberately ship. When an example is ready to publish, add
+# a line for it here -- that line IS the publication decision, and it is reviewable in the diff.
+*
+!.gitignore
+!README.md
+
+# The shipped examples (ROADMAP Task 314). Each of these is a saved project of ours, cleared for
+# publication, and each is a file the examples gallery serves.
+!Net1-lpn.json
+!Net2-lpn.json
+!Net3-lpn.json
+!Elm-Street-Center-lpn.json

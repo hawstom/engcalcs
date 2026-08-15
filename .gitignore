@@ -16,4 +16,14 @@ dev/browser-pass/package-lock.json
 # carry client names and Windows Dropbox paths and this repo is on GitHub, so they stay local.
 # dev/scripts/epanet_net_to_inp.php converts the .net ones; dev/lpn-spike/validate_inp.js reads
 # whatever is here. Reverse this if Tom decides a model is his to publish.
+#
+# **THE DIRECTORY WAS RENAMED TO dev/water-network-examples/ ON 2026-08-14, AND A PATH-NAMED RULE
+# DOES NOT FOLLOW A RENAME.** For a few minutes every client model in it was an ordinary untracked
+# file one `git add <dir>` away from GitHub, with nothing to warn anybody -- the rename looked like
+# a rename. The replacement lives in dev/water-network-examples/.gitignore and is a WHITELIST, so
+# it cannot fail that way again: an unrecognised file there is ignored by default, and publishing
+# one is an explicit line somebody has to write.
+#
+# This line is kept anyway, as a net under the old name, in case a model is ever dropped back into
+# the path it lived in for the first half of August.
 dev/epanet-models/

@@ -1,0 +1,422 @@
+{
+	"format": "hawsedc-lpn",
+	"app": "https://hawsedc.com/engcalcs/Looped-Network.php",
+	"v": 6,
+	"project": {
+		"name": "Net1",
+		"activeScenario": "base",
+		"docId": "dmstijgnfz2XIBTx4"
+	},
+	"scenarios": [
+		{
+			"id": "base",
+			"name": "Base",
+			"isBase": true,
+			"overrides": {}
+		}
+	],
+	"nodes": [
+		{
+			"id": "10",
+			"type": "junction",
+			"x": 20,
+			"y": 70,
+			"elev": 709.9913664000001,
+			"_demand": 0,
+			"lx": 2.7612267175852345,
+			"ly": 10.608897771182313
+		},
+		{
+			"id": "11",
+			"type": "junction",
+			"x": 30,
+			"y": 70,
+			"elev": 709.9913664000001,
+			"_demand": 149.98747841154,
+			"lx": 4.464202431402988,
+			"ly": 9.837653183616553
+		},
+		{
+			"id": "12",
+			"type": "junction",
+			"x": 50,
+			"y": 70,
+			"elev": 699.9914880000001,
+			"_demand": 149.98747841154
+		},
+		{
+			"id": "13",
+			"type": "junction",
+			"x": 70,
+			"y": 70,
+			"elev": 694.9915488,
+			"_demand": 99.99165227435999
+		},
+		{
+			"id": "21",
+			"type": "junction",
+			"x": 30,
+			"y": 40,
+			"elev": 699.9914880000001,
+			"_demand": 149.98747841154
+		},
+		{
+			"id": "22",
+			"type": "junction",
+			"x": 50,
+			"y": 40,
+			"elev": 694.9915488,
+			"_demand": 199.98330454871999
+		},
+		{
+			"id": "23",
+			"type": "junction",
+			"x": 70,
+			"y": 40,
+			"elev": 689.9916096000001,
+			"_demand": 149.98747841154
+		},
+		{
+			"id": "31",
+			"type": "junction",
+			"x": 30,
+			"y": 10,
+			"elev": 699.9914880000001,
+			"_demand": 99.99165227435999
+		},
+		{
+			"id": "32",
+			"type": "junction",
+			"x": 50,
+			"y": 10,
+			"elev": 709.9913664000001,
+			"_demand": 99.99165227435999
+		},
+		{
+			"id": "9",
+			"type": "reservoir",
+			"x": 10,
+			"y": 70,
+			"elev": 799.990272,
+			"lx": -2.1937623824092682,
+			"ly": -3.6538649232705325
+		},
+		{
+			"id": "2",
+			"type": "tank",
+			"x": 50,
+			"y": 90,
+			"elev": 849.9896640000002,
+			"_level": 119.9985408,
+			"minLevel": 99.998784,
+			"maxLevel": 149.998176,
+			"tankDiameter": 50.49938592
+		}
+	],
+	"links": [
+		{
+			"id": "10",
+			"type": "pipe",
+			"from": "10",
+			"to": "11",
+			"verts": [],
+			"_diameter": 17.999964,
+			"_roughness": 100,
+			"_length": 10530,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "11",
+			"type": "pipe",
+			"from": "11",
+			"to": "12",
+			"verts": [],
+			"_diameter": 13.999971999999998,
+			"_roughness": 100,
+			"_length": 5280,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "12",
+			"type": "pipe",
+			"from": "12",
+			"to": "13",
+			"verts": [],
+			"_diameter": 9.999979999999999,
+			"_roughness": 100,
+			"_length": 5280,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "21",
+			"type": "pipe",
+			"from": "21",
+			"to": "22",
+			"verts": [],
+			"_diameter": 9.999979999999999,
+			"_roughness": 100,
+			"_length": 5280,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "22",
+			"type": "pipe",
+			"from": "22",
+			"to": "23",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 5280,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "31",
+			"type": "pipe",
+			"from": "31",
+			"to": "32",
+			"verts": [],
+			"_diameter": 5.999987999999999,
+			"_roughness": 100,
+			"_length": 5280,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "110",
+			"type": "pipe",
+			"from": "2",
+			"to": "12",
+			"verts": [],
+			"_diameter": 17.999964,
+			"_roughness": 100,
+			"_length": 200,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "111",
+			"type": "pipe",
+			"from": "11",
+			"to": "21",
+			"verts": [],
+			"_diameter": 9.999979999999999,
+			"_roughness": 100,
+			"_length": 5280,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "112",
+			"type": "pipe",
+			"from": "12",
+			"to": "22",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 5280,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "113",
+			"type": "pipe",
+			"from": "13",
+			"to": "23",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 5280,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "121",
+			"type": "pipe",
+			"from": "21",
+			"to": "31",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 5280,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "122",
+			"type": "pipe",
+			"from": "22",
+			"to": "32",
+			"verts": [],
+			"_diameter": 5.999987999999999,
+			"_roughness": 100,
+			"_length": 5280,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "9",
+			"type": "pump",
+			"from": "9",
+			"to": "10",
+			"verts": [],
+			"_diameter": 17.999964,
+			"lenAuto": false,
+			"_k": 0,
+			"curvePoints": [
+				[
+					1499.8747841154,
+					249.99696000000003
+				]
+			],
+			"curveRef": null,
+			"h0": 101.600508,
+			"a": 2836.195251533382,
+			"b": 2,
+			"lx": -1.5917033570596484,
+			"ly": 8.15802127861268
+		}
+	],
+	"labels": [
+		{
+			"id": "X1",
+			"text": "Source",
+			"x": 6.676049052918375,
+			"y": 86.00132896707797,
+			"anchorNode": null,
+			"sizeMult": 1
+		},
+		{
+			"id": "X2",
+			"text": "Pump",
+			"x": 16.244694686706623,
+			"y": 85.90004108003825,
+			"anchorNode": null,
+			"sizeMult": 1
+		},
+		{
+			"id": "X3",
+			"text": "Tank",
+			"x": 51.83593751898119,
+			"y": 94.94338958634147,
+			"anchorNode": null,
+			"sizeMult": 1
+		}
+	],
+	"nextId": {
+		"J": 1,
+		"R": 1,
+		"T": 1,
+		"L": 1,
+		"P": 1,
+		"V": 1,
+		"X": 4
+	},
+	"labelSettings": {
+		"node": {
+			"id": true,
+			"elev": true,
+			"demand": true,
+			"head": false,
+			"pressure": true
+		},
+		"link": {
+			"id": true,
+			"diameter": false,
+			"length": false,
+			"roughness": false,
+			"km": false,
+			"flow": true,
+			"velocity": true,
+			"headloss": false,
+			"gradient": false
+		},
+		"decimals": {
+			"node": {
+				"demand": 2,
+				"head": 2,
+				"pressure": 2,
+				"elev": 2
+			},
+			"link": {
+				"diameter": 0,
+				"length": 2,
+				"roughness": 0,
+				"km": 2,
+				"flow": 2,
+				"velocity": 2,
+				"headloss": 2,
+				"gradient": 4
+			}
+		},
+		"markExtrema": true
+	},
+	"backdrop": null,
+	"settings": {
+		"idPrefixes": {
+			"J": "J",
+			"R": "R",
+			"T": "T",
+			"L": "L",
+			"P": "P",
+			"V": "V",
+			"X": "X"
+		},
+		"emitterExponent": 0.5,
+		"tolerance": 1e-09,
+		"engine": "epanet",
+		"defaults": {
+			"nodeElev": 0,
+			"demand": 0,
+			"diameter": 4,
+			"roughness": 100,
+			"k": 2,
+			"tankLevel": 20,
+			"tankMinLevel": 0,
+			"tankMaxLevel": 30,
+			"tankDiameter": 50
+		},
+		"sectionsOpen": {
+			"idPrefixes": false,
+			"defaults": false,
+			"mapDisplay": true,
+			"computation": true,
+			"files": false
+		},
+		"textSize": 11,
+		"symbolSize": 7,
+		"linkWidth": 2,
+		"symbolOpacity": 1,
+		"backdropOpacity": 1,
+		"labelMaxWidth": null,
+		"alignPipeLabels": false,
+		"legendPosition": "top-right",
+		"mapHeight": 900,
+		"method": "hw"
+	},
+	"units": {
+		"lpn_u_length": "ft",
+		"lpn_u_elevhead": "fth2o",
+		"lpn_u_pressure": "psi",
+		"lpn_u_diameter": "in",
+		"lpn_u_flow": "gpm",
+		"lpn_u_velocity": "ftps",
+		"lpn_u_gradient": "gradePercent"
+	}
+}

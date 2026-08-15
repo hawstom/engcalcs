@@ -3054,8 +3054,26 @@ var EngCalcs = EngCalcs || {};
 	function newProjectId() {
 		return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 	}
+	// **WHAT THIS DOCUMENT IS, WRITTEN INSIDE THE DOCUMENT** (ROADMAP Task 315, 2026-08-14). Until
+	// this landed there was NO format identifier in the file at all: `v` is a version number, but
+	// nothing said what it was a version OF. So a saved project was identifiable only by its
+	// filename -- which is precisely the thing a person renames -- and that is the real defect the
+	// 30-character `-lpn-hawsedc-engcalcs` suffix was compensating for. Two additive keys fix it at
+	// the layer that survives a rename, a re-download and a mail attachment.
+	//
+	// `app` is a URL rather than a product name on purpose: the product name is unsettled (Task 315
+	// again, and LibreEPANET.org is unlaunched), and a URL is the one identifier that stays useful
+	// to somebody who finds this file knowing nothing. Old readers ignore unknown keys, so nothing
+	// needs to migrate and no version bump is owed.
+	var LPN_FILE_FORMAT = 'hawsedc-lpn';
+	// Matches CANONICAL_ORIGIN in lib/config.inc.php (no `www`). Hardcoded rather than derived from
+	// location.origin on purpose: a file saved from a dev host would otherwise record the dev host
+	// forever, and this key exists to tell a stranger where the format lives, not to log where one
+	// particular save happened.
+	var LPN_FILE_APP = 'https://hawsedc.com/engcalcs/Looped-Network.php';
 	function serializeProject() {
 		var out = {
+			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
 			v: openDocVersion, project: project, scenarios: scenarios,
 			nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
 			labelSettings: labelSettings, backdrop: backdrop, settings: settings,
@@ -3786,9 +3804,33 @@ var EngCalcs = EngCalcs || {};
 	function projectFileText() { return JSON.stringify(serializeProject(), null, '\t'); }
 	// Project name FIRST (Tom offered both orders, 2026-08-03). In an alphabetical folder listing a
 	// common prefix makes every file look identical and pushes the one distinguishing part off the
-	// end of the column; engineers scan these by project. The suffix still says where the file came
-	// from, which is what someone finds a year later in a folder they have forgotten about.
-	function projectFileName() { return safeFileName(projectDisplayName(project)) + '-lpn-hawsedc-engcalcs.json'; }
+	// end of the column; engineers scan these by project.
+	//
+	// **THE SUFFIX IS `-lpn`, AND IT IS NO LONGER THE THING THAT IDENTIFIES THE FILE** (ROADMAP Task
+	// 315, ratified by Tom 2026-08-14). It used to read `-lpn-hawsedc-engcalcs` -- 30 characters on
+	// every file -- and it was that long for one reason: nothing INSIDE the document said what
+	// format it was, so the whole burden of "findable a year later in a forgotten folder" sat on the
+	// name. serializeProject() now writes `format`/`app`, which is strictly more durable than any
+	// filename scheme, because a file in a forgotten folder is exactly the file somebody renamed.
+	// With that carried inside, the suffix only has to disambiguate at a glance, and four characters
+	// do that.
+	//
+	// Deliberately still `.json`: no generation-1 extension yet. The schema is moving weekly
+	// (scenarios, valves, extended-period queued) and the product name is unsettled, so an extension
+	// would encode a name that does not exist yet -- and a web page cannot deliver the only real
+	// payoff of one (OS double-click association and a file-manager icon). The trigger that starts
+	// that clock is written up in Task 315; until it fires, reading stays permissive and writing
+	// stays boring.
+	var LPN_FILE_SUFFIX = '-lpn';
+	// Every file written before 2026-08-14 wears this. It is READ FOREVER -- see
+	// projectNameFromFileName(), where stripping it in the wrong order silently renames a project.
+	var LPN_FILE_SUFFIX_LEGACY = '-lpn-hawsedc-engcalcs';
+	// Takes the name rather than reading the open project, so the copy branch in saveAs() can route
+	// through it instead of spelling the convention out a second time. Two copies of a filename
+	// convention is how they drift -- they had already drifted once by the time this was written.
+	function projectFileName(name) {
+		return safeFileName(name === undefined ? projectDisplayName(project) : name) + LPN_FILE_SUFFIX + '.json';
+	}
 	// The Phase 1 path, and still the fallback wherever the File System Access API is missing
 	// (Firefox and Safari today). A one-shot download: the browser owns where it lands and there is
 	// no handle afterwards, so nothing can be written back to it.
@@ -4761,8 +4803,34 @@ var EngCalcs = EngCalcs || {};
 	// Amendment 2). Task 195 had a Rename that renamed the project and a Save that wrote the file,
 	// each correct alone and a permanent trap together: Tom renamed a project, pressed Save, and it
 	// silently wrote the old file name. With the two fused, Rename on a file project IS Save As.
+	//
+	// **WHY A BAD STRIP HERE IS EXPENSIVE, AND IT IS NOT COSMETIC** (Task 315). saveCurrent() below
+	// treats a filename differing from the SUGGESTED one as a DELIBERATE RENAME
+	// (`if (handle.name !== suggested) { project.name = ... }`). Before 2026-08-14 a legacy file's
+	// name and its suggestion were identical, so that branch stayed asleep; now they differ BY
+	// CONSTRUCTION -- the suggestion carries `-lpn`, the file on disk carries the long form -- so
+	// the branch fires on every re-save of every pre-existing file, and whatever this function
+	// returns becomes what the user's project is called from then on.
+	//
+	// **Task 315 predicted the wrong hazard, and the correction is worth keeping.** It said the rule
+	// was "longest suffix first", reasoning that `-lpn` matches INSIDE `-lpn-hawsedc-engcalcs`.
+	// Measured 2026-08-14: with `$`-ANCHORED strips, which is what this has always used, order is
+	// harmless -- `/-lpn$/` simply does not match a string ending in `engcalcs`, so either order
+	// gives the right answer. Longest-first only matters if someone drops the anchors. The defect
+	// that IS real is applying BOTH strips in sequence, which is what the obvious chained-replace
+	// implementation does; see below. dev/lpn-spike/file-naming-harness.js pins both.
+	//
+	// EXACTLY ONE suffix is stripped, never both in sequence. A project a user genuinely named
+	// `Z-lpn` was written by the old code as `Z-lpn-lpn-hawsedc-engcalcs.json`; strip the long form
+	// and then also the short one and it re-opens as `Z`, having quietly lost a character the user
+	// typed. Chaining two replaces reads as the obvious implementation and is wrong for that case.
 	function projectNameFromFileName(fname) {
-		var s = String(fname).replace(/\.json$/i, '').replace(/-lpn-hawsedc-engcalcs$/i, '');
+		var s = String(fname).replace(/\.json$/i, ''), lower = s.toLowerCase();
+		if (lower.slice(-LPN_FILE_SUFFIX_LEGACY.length) === LPN_FILE_SUFFIX_LEGACY) {
+			s = s.slice(0, -LPN_FILE_SUFFIX_LEGACY.length);
+		} else if (lower.slice(-LPN_FILE_SUFFIX.length) === LPN_FILE_SUFFIX) {
+			s = s.slice(0, -LPN_FILE_SUFFIX.length);
+		}
 		return s || String(fname);
 	}
 	// File -> Save. Writes the file this project came from, and asks nothing.
@@ -4866,7 +4934,7 @@ var EngCalcs = EngCalcs || {};
 		// A copy needs a name of its own -- two projects cannot share one, and a picker pre-filled
 		// with the original's name invites overwriting the very file we are copying away from.
 		var suggested = forking
-			? safeFileName(projectDisplayName(project) + ' ' + (pc.lpn_project_copy_suffix || '(copy)')) + '-lpn-hawsedc-engcalcs.json'
+			? projectFileName(projectDisplayName(project) + ' ' + (pc.lpn_project_copy_suffix || '(copy)'))
 			: projectFileName();
 		var handle;
 		try { handle = await window.showSaveFilePicker({ suggestedName: suggested, types: fileTypes() }); }

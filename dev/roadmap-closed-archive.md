@@ -7504,3 +7504,121 @@ it was never a build task, and its remaining UI work is Task 201.
   flat named saves first, since flat saves ARE the copy model already. **All of this is retired by
   the delta decision above** — the naming problem disappears with scenario-level copy, and the
   sequencing note inverts: the container must come first, not the flat saves.
+
+
+---
+
+## Task 315 / Task 304 — the filename and extension question, full pre-closure text
+
+Archived 2026-08-14 on closure. 315 carried the research; 304 carried the question.
+
+- 75|315| **The saved filename is gratuitously long. Shorten it; decide about a generation-1
+  extension separately.** `projectFileName()` produces `Elm Street-lpn-hawsedc-engcalcs.json` — a
+  30-character suffix on every file. Tom, 2026-08-14: *"we got carried away with a long ugly
+  filename just because we didn't have a nice extension… I am less ashamed to live with two or
+  three legacy file extensions than the gratuitously long file names."*
+
+  - **These are two decisions, not one, and conflating them is what produced the long name.** The
+    suffix got long *because* an extension decision was deferred; deferring it again is fine, but
+    the filename should not keep paying for it. Shorten now (`-lpn.json` is Tom's own suggestion);
+    choose an extension when the format has stopped moving.
+  - **Three call sites, and they must move together**: `projectFileName()` (~3006), the strip in
+    `projectNameFromFileName()` (~3930), and `saveAs()`'s `suggestedName` (~4034). The strip is the
+    one that matters — **a file already saved with the long suffix must still open with its name
+    intact**, so the old suffix has to keep being recognised after the generator stops producing it.
+    A missed strip does not fail; it silently names the project `Elm Street-lpn-hawsedc-engcalcs`.
+  - Tom's own candidate extensions: `wnj` (water network js), `lwj` (librewater js), alongside
+    possible project names LibreWaterNet / waternet. Research is out with a subagent — collision
+    check, what comparable tools ship in 2026, and whether `name.lpn.json` is a good idea or a dated
+    one. **An extension is a public commitment that is expensive to walk back**, and the format is
+    moving this week (scenarios, valves), so the honest answer may be "not yet, and here is the
+    trigger".
+  - Depends on Task 184 only for merge order — it is the same save/load region of
+    `js/looped-network.js`, and Task 184 must edit `serializeProject()` to persist scenarios.
+
+  **RESEARCHED 2026-08-14, and the answer is not an extension.** Verified against the code:
+
+  - **THERE IS NO FORMAT IDENTIFIER INSIDE THE FILE AT ALL.** `serializeProject()` emits
+    `{v, project, scenarios, nodes, links, labels, nextId, labelSettings, backdrop, settings, units}`
+    — `v` is a version number, but nothing says what it is a version *of*. So "identifiable a year
+    later in a forgotten folder" is carried **100% by the filename**, which is the actual defect the
+    30 characters were compensating for. Fix it where it belongs, in one additive line:
+    `format: 'hawsedc-lpn', app: '<the page URL>'`. Old readers ignore unknown keys; the import path
+    already sniffs `.net` against `.inp` from the bytes, so the precedent exists. **This is strictly
+    more durable than any filename scheme, because a file in a forgotten folder is exactly the file
+    somebody renamed.**
+  - **Immediate change: `Elm Street-lpn.json`.** 30 characters to 4, project name still first and
+    still the sort key, and the extension does not move — so `fileTypes()`, the MIME type, the
+    download path, the Open filter and every file already saved are untouched. Nothing to migrate.
+  - **`saveAs()` hardcodes the suffix a SECOND time** for the copy branch (~4034). Route it through
+    `projectFileName()`; two copies of a filename convention is how they drift.
+  - **THE BACKWARD-COMPATIBILITY TRAP, verified in the code and worth stating exactly.**
+    `projectNameFromFileName()` must strip `.json`, then the LONG suffix, then `-lpn` — **longest
+    first**, or `-lpn` matches inside the long one and leaves `-hawsedc-engcalcs` in the project
+    name. This is not cosmetic: `saveCurrent()` at ~4107 treats a filename differing from the
+    suggested one as a deliberate rename (`if (handle.name !== suggested) { project.name = ... }`).
+    After this change, re-saving a legacy file makes those two differ *by construction*, so the
+    rename branch fires every time and a bad strip **silently renames the user's project**. Needs a
+    harness case.
+  - **A generation-1 extension is PREMATURE, and the reasons are not about which letters.** (a) The
+    format is moving weekly — scenarios and valves are landing now, extended-period is queued — and
+    an extension is a promise that a file with those letters is a thing you can open; `v` handles
+    that technically but not a user's expectation that a named file type is stable. (b) The product
+    name is unsettled: `.lwj`/`.wnj` encode a name that does not exist yet, and `lpn` is an internal
+    *variable-prefix convention* from CLAUDE.md, not a product name. **Picking an extension before
+    picking the product name is the expensive ordering.** (c) The payoff of a custom extension is OS
+    double-click association and file-manager iconography, and a web page can deliver neither.
+  - **The trigger that starts the clock — any one of:** a PWA ships with a `file_handlers` manifest
+    entry (or LibreEPANET.org launches installable), so the extension becomes functional rather than
+    decorative; or the product name settles; or the schema stops moving.
+  - **When it does: `.lpn`.** Its only occupant is LVPLAN, obscure low-voltage-network design
+    software, unregistered and with no OS association — but note the near-miss: LVPLAN is *also*
+    network-design software, so "the `.lpn` format" is not a semantically clean public claim.
+    Second choice `.wnet` if the product renames to waternet. `.wnj` and `.lwj` are free precisely
+    because nobody could guess what they mean; `.hwn` is genuinely taken twice.
+  - **`name.lpn.json` is mostly a dated pattern** — `.geojson` beat `.geo.json`, and namespacing
+    moved to the MIME layer (`application/vnd.…+json`, RFC 6839). It survives only where the second
+    half is a format people really do open with generic tools, which is *narrowly* true here (the
+    file is pretty-printed on purpose so it can be read in an editor). Still declined: it is a
+    half-commitment that pre-commits the extension shape, and a future `.lpn` and a legacy
+    `.lpn.json` look identical in Windows Explorer while being different things.
+  - **The honest cost of the change:** `-lpn` alone IS more cryptic than `-lpn-hawsedc-engcalcs`.
+    `hawsedc-engcalcs` was the part that made a stray file traceable. That loss is real, and it is
+    exactly why the in-file `format`/`app` marker is part of the same change rather than a
+    nice-to-have.
+
+- 85|304| **Settle the project file's NAME and EXTENSION before there are files in the world.**
+  Raised by Tom, 2026-08-14: *"now I am having doubts about our save conventions. Instead of the
+  long names, maybe we should just use something like 'Elm-Street-Center.___' … Unfortunately it's
+  a little bit urgent because we want to settle it before we make too much traction in the world."*
+  - **Today we write `<Name>-lpn-hawsedc-engcalcs.json`** — `projectFileName()`,
+    `js/looped-network.js:2888`, and again in the Save-a-copy path at :3876. The picker offers
+    `{'application/json': ['.json']}` at :3471. Three places, one decision.
+  - **Candidates Tom listed:** `lpndb` (looped pipe network), `ledb` (libreepanet),
+    `leodb` (libreEpanet.Org), `netj` (EPANET's `.net` with a j for json).
+  - **The urgency is real but the blast radius is small RIGHT NOW**, which is the argument for
+    doing it now rather than a reason to panic: lpn had 12 confirmed users in its first two weeks,
+    so the installed base of saved files is tiny today and will not be tiny for long.
+  - **Split the decision in two — only half of it is urgent.** READING permissively costs nothing
+    and can ship immediately: accept `.json` and the new extension forever, since the picker filter
+    and the parser are independent. Only WRITING needs the naming decision. Do the read side first
+    and the choice stops being a deadline.
+  - **Arguments the choice should weigh, so they are not re-derived:**
+    - `netj` **overclaims**. Our document is not EPANET's `.net` in JSON — it carries labels, a
+      backdrop image, scenarios, per-project settings and unit selections that no EPANET format
+      has. A name implying "EPANET, as JSON" promises interchange we do not offer, and Task 281
+      (write `.inp`) is where that promise would actually be kept.
+    - `ledb` / `leodb` **bind the format to a brand that does not exist yet.** Extensions outlive
+      product names; if the name changes the extension is stuck forever. Prefer a descriptive
+      extension over a brand one unless the brand is certain.
+    - `db` says database; this is a document. `.lpn` alone is cleaner if it is free — **check
+      whether `.lpn` is already claimed** before assuming.
+    - **A custom extension over JSON content is normal and fine** — `.ipynb` is literally JSON.
+      What is lost is "any tool recognises it as text/JSON"; what is gained is file association,
+      a distinct icon, and an unambiguous picker filter (Task 300 already moved the picker to
+      naming types by extension rather than MIME).
+  - **The short-name question is separable and easier.** `<Name>.<ext>` instead of
+    `<Name>-lpn-hawsedc-engcalcs.json` is strictly better once the extension identifies us: the
+    suffix exists only because `.json` does not. Note `safeFileName()` round-trips the name back
+    into the project title (see :2517), so shortening changes what a re-opened file is called —
+    check that path when editing.
