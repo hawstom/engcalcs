@@ -34,8 +34,18 @@ const L = loadLoopedNetwork(
 	// A harness that never calls that has to say so, exactly as the page does.
 	"\t\tmarkSized: noteMapSized, isSized: function () { return mapSized; },\n" +
 	"\t\tscale: function () { return state.s; },\n" +
+	// How many times a fit re-lays-out. This is the number the whole redesign is about, so it is
+	// measured rather than described: the version before it spent eight, one per convergence pass.
+	"\t\tcountLayouts: function (f) { var n = 0, real = onZoomChanged;\n" +
+	"\t\t\tonZoomChanged = function () { n++; return real.apply(null, arguments); };\n" +
+	"\t\t\ttry { f(); } finally { onZoomChanged = real; } return n; },\n" +
 	"\t\tview: function () { return { tx: state.tx, ty: state.ty, s: state.s }; },\n" +
-	"\t\tsetZoom: function (s) { state.s = s; },\n" +
+	// A REAL ZOOM RE-LAYS-OUT, and the harness has to as well. Every zoom path in the page goes
+	// through onZoomChanged(), which re-measures every label at the new scale -- so a label's
+	// measured width always corresponds to the scale in force. Setting state.s alone produces a
+	// state the browser can never be in (widths belonging to one scale, transform at another), and
+	// the fit reads both.
+	"\t\tsetZoom: function (s) { state.s = s; setTransform(); onZoomChanged(); },\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h;\n" +
 	"\t\t\tsvg.getBoundingClientRect = function () { return { top: 0, bottom: h, width: w, height: h }; }; },\n" +
 	"\t\tsetOverlay: function (id, text, h) { var e = document.getElementById(id);\n" +
@@ -151,6 +161,15 @@ console.log('--- the fit does not depend on the view it started from ---');
 	// version, so it is here only to prove the fit is not accumulating anything.
 	L.zoomExtent();
 	ok('...and fitting twice in a row changes nothing', same(view(), fromOne), view());
+	// THE POINT OF THE WHOLE REDESIGN, stated as a number. Solving the continuous part in closed
+	// form means the re-layouts are no longer a convergence budget -- they only confirm that the
+	// layout belongs to the scale that was chosen, which takes two.
+	const layouts = L.countLayouts(() => L.zoomExtent());
+	ok('a fit costs two re-layouts, not eight', layouts <= 2, layouts + ' re-layout(s)');
+	// NOT COVERED HERE, and said so rather than implied: the too-short-pipe rule inside fitItems()
+	// never fires on this fixture, because every pipe in it is long compared with its label.
+	// dev/lpn-spike/short-line-label-harness.js owns that rule; what is missing is a case where it
+	// changes the FIT, which would need a stub pipe added to the network above.
 }
 
 // ---- 2. ...including when a label threshold is in force ----------------------------------------

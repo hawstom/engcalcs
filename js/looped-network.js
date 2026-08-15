@@ -2647,12 +2647,138 @@ var EngCalcs = EngCalcs || {};
 		fitAfterSolve = false;
 		zoomExtent();
 	}
-	// Eight passes with a tight exit, not four with a loose one. The loop converges geometrically and
-	// exits as soon as it stops moving, so a drawing whose labels do not reach the edge still costs
-	// two passes -- but 1e-3 is a tenth of a percent, which is 1.4px across a 1400px canvas, and Tom
-	// could see it: *"Models with text change a bit on tab switching."* A drawing with no visible
-	// text was already exact, because there is nothing whose size depends on the scale.
-	var LPN_FIT_PASSES = 8, LPN_FIT_TOLERANCE = 1e-5;
+	// ---- ZOOM TO FIT, SOLVED RATHER THAN SEARCHED (2026-08-15) --------------------------------
+	//
+	// Tom, on being told the previous version needed eight relayout passes to converge: *"!!! Is
+	// there any way to circumvent this? Can we think harder?"* There is, and the answer is that this
+	// was never an iterative problem. It only looked like one because the two kinds of thing being
+	// fitted were being measured in the same units.
+	//
+	// **THE STRUCTURE.** Everything on the map is one of exactly two things:
+	//
+	//   * GEOMETRY -- nodes, vertices, pipes. Fixed WORLD coordinates; its size on screen is `s`
+	//     times its size in the model.
+	//   * ANNOTATION -- every label and symbol. Anchored at a world point, but its own extent is a
+	//     fixed number of SCREEN PIXELS (Task 331), the same at every zoom.
+	//
+	// So the screen position of any drawn edge is `t + s*x +- px`, where `px` does not depend on
+	// `s`. The iteration existed because bbox() converted those pixels into world units -- where
+	// they DO depend on `s` -- and then solved for the `s` it had just assumed. Keep the two apart
+	// and the circularity is gone, because it was never in the problem, only in the representation.
+	//
+	// **THE SOLVE.** Fitting is then a two-variable feasibility question per axis:
+	//
+	//     t + s*xi - li >= padLo          (nothing sticks out of the left or top)
+	//     t + s*xj + rj <= span - padHi   (nothing sticks out of the right or bottom)
+	//
+	// For a given `s` those are satisfiable iff max(padLo + li - s*xi) <= min(span - padHi - rj -
+	// s*xj), which is one O(n) sweep. The left side is a max of straight lines and the right a min
+	// of straight lines, so their difference is CONVEX in `s` -- negative while the drawing is too
+	// small to fill the canvas, positive once it is too big, crossing zero exactly once. Bisection
+	// finds that crossing to machine precision.
+	//
+	// **IT LOOKS LIKE ITERATION AND IT IS NOTHING LIKE IT.** Sixty bisection steps are sixty
+	// arithmetic sweeps over a few hundred numbers: microseconds, no DOM, no re-layout, no tolerance
+	// to tune, no residue to apologise for. The eight passes this replaces each ran
+	// refreshLabelText() and the entire collision relaxation.
+	//
+	// The pixel extents are taken from the CURRENT rendered layout and multiplied by the current
+	// scale to turn world units back into pixels. That conversion is exact for any target scale
+	// precisely because the quantity is scale-invariant, which is the same fact the design rests on.
+	var LPN_FIT_BISECTIONS = 60;
+	// One drawn thing: a world anchor, and how far its ink reaches from that anchor in SCREEN
+	// pixels. A reach may be NEGATIVE (ink that begins to the right of its own anchor); the
+	// arithmetic does not care, and clamping it would move labels that were never in the way.
+	function fitItem(out, x, y, l, r, t, b) {
+		if (isFinite(x) && isFinite(y)) { out.push({ x: x, y: y, l: l, r: r, t: t, b: b }); }
+	}
+	// `atScale` is the scale being CONSIDERED, which is not the same as the one currently in force.
+	// Two of the rules about what gets drawn are thresholds -- the map-width one that hides all
+	// annotation, and the per-pipe one that hides a label longer than its own pipe -- and both must
+	// be answered for the scale being tested, or the fit reserves room for labels that will not be
+	// there (or crops ones that will). They are booleans, so they cannot be solved for directly;
+	// zoomExtent() settles them by re-solving, which costs arithmetic and nothing else.
+	function fitItems(atScale) {
+		var out = [], sc = state.s || 1,
+			lim = settings.labelMaxWidth,
+			mapW = (svg && svg.clientWidth ? svg.clientWidth : 0) / (atScale || 1),
+			ignoreDataLabels = typeof lim === 'number' && lim > 0 && mapW > lim;
+		function boxFor(x, y, bx, by, bw, bh) {
+			fitItem(out, x, y, (x - bx) * sc, (bx + bw - x) * sc, (y - by) * sc, (by + bh - y) * sc);
+		}
+		// **EVERY QUANTITY IN HERE MUST BE px/s, OR IT IS NOT SCALE-INVARIANT AFTER ALL.** This is
+		// the one trap in the whole approach and it caught me first time: the old bbox() carried
+		// world-unit fudges (a bare `- 2` above the baseline, a `+ 0.6` below it, `+ 0.2` of air
+		// round a node), and multiplying a WORLD constant by the scale produces a pixel figure that
+		// changes with the zoom -- reintroducing, in miniature, the exact dependence this design
+		// exists to remove. Everything below is now built from effectiveFontSize(), nodeRadius() and
+		// symbolFactor(), all of which are a pixel size divided by the scale, so the multiplication
+		// gives the pixel size straight back. Any constant added here belongs in PIXELS.
+		var ascent = effectiveFontSize() * 0.85;
+		doc.nodes.forEach(function (n) {
+			var rad = nodeRadius(n) * sc + 1, ne = nodeEls[n.id] || {};
+			fitItem(out, n.x, n.y, rad, rad, rad, rad);
+			if (ignoreDataLabels || !ne.text) { return; }
+			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1,
+				lx = +ne.text.getAttribute('x'), ly = +ne.text.getAttribute('y');
+			boxFor(n.x, n.y, lx, ly - ascent, tw, dataLabelBoxHeight(lc));
+		});
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id], j, v, vr = VERTEX_HANDLE_R * symbolFactor() * sc;
+			for (j = 0; j < l.verts.length; j++) {
+				v = l.verts[j];
+				fitItem(out, v.x, v.y, vr, vr, vr, vr);
+			}
+			// An ALIGNED label lies along its pipe, whose own points are already here, and so do a
+			// repeated chain's copies. Counting them again would add a term that moves with the
+			// zoom, which is the whole thing this design removes.
+			if (!le || !le.text || ignoreDataLabels || linkLabelAligned(l)) { return; }
+			var mid = linkLabelMid(l), tw = labelBoxWidth(le) || 8, lc = le.lineCount || 1,
+				lx = +le.text.getAttribute('x'), ly = +le.text.getAttribute('y');
+			// TOO SHORT A PIPE DRAWS NO LABEL, and whether a pipe is too short is a question about
+			// the scale being tested: the label is a fixed width in pixels, so it covers more of a
+			// pipe the further out you are. Asked here at atScale rather than at the current one.
+			if (tw * sc / (atScale || 1) * SHORT_LINE_MULT > Geom.polylineLength(linkPointList(l))) { return; }
+			boxFor(mid.x, mid.y, lx, ly - ascent, tw, dataLabelBoxHeight(lc));
+		});
+		doc.labels.forEach(function (lb) {
+			var le = labelEls[lb.id]; if (!le) { return; }
+			if (ignoreDataLabels && le.text && le.text.classList &&
+				le.text.classList.contains('lpn-lbl-hidden')) { return; }
+			var an = lb.anchorNode ? nodeById(lb.anchorNode) : null,
+				px = an ? an.x + lb.x : lb.x, py = an ? an.y + lb.y : lb.y,
+				box = textLabelBox(lb, le, px, py);
+			boxFor(px, py, box.x, box.y, box.w, box.h);
+		});
+		// An empty drawing still needs two distinct points, or every scale "fits" and the bisection
+		// returns MAX_SCALE on a blank canvas.
+		if (out.length < 2) { fitItem(out, 0, 0, 0, 0, 0, 0); fitItem(out, 10, 10, 0, 0, 0, 0); }
+		return out;
+	}
+	// The translation window for one axis at one scale. `need > room` means this scale does not fit;
+	// the midpoint of the two centres the drawing in whatever slack is left over.
+	function fitWindow(items, s, key, loKey, hiKey, span, padLo, padHi) {
+		var need = -Infinity, room = Infinity, i, it;
+		for (i = 0; i < items.length; i++) {
+			it = items[i];
+			need = Math.max(need, padLo + it[loKey] - s * it[key]);
+			room = Math.min(room, span - padHi - it[hiKey] - s * it[key]);
+		}
+		return { need: need, room: room, fits: need <= room, t: (need + room) / 2 };
+	}
+	function fitScaleFor(items, key, loKey, hiKey, span, padLo, padHi) {
+		function fits(s) { return fitWindow(items, s, key, loKey, hiKey, span, padLo, padHi).fits; }
+		// Not even the smallest allowed zoom fits it, which happens when one label on its own is
+		// wider than the canvas. There is nothing to solve; take the floor and let it overhang.
+		if (!fits(MIN_SCALE)) { return MIN_SCALE; }
+		if (fits(MAX_SCALE)) { return MAX_SCALE; }
+		var lo = MIN_SCALE, hi = MAX_SCALE, k, mid;
+		for (k = 0; k < LPN_FIT_BISECTIONS; k++) {
+			mid = (lo + hi) / 2;
+			if (fits(mid)) { lo = mid; } else { hi = mid; }
+		}
+		return lo;
+	}
 	function zoomExtent() {
 		if (!mapSized) { fitWhenSized = true; return; }
 		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it (Tom, 2026-08-09:
@@ -2671,46 +2797,39 @@ var EngCalcs = EngCalcs || {};
 		var r = svg.getBoundingClientRect(), pad = 16,
 			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
 			padBottom = Math.max(pad, overlayReserve('lpn_map_footer'));
-		function fitTo(b) {
-			var w = Math.max(b.maxx - b.minx, 1), h = Math.max(b.maxy - b.miny, 1),
-				availH = Math.max(r.height - padTop - padBottom, 1);
-			state.s = Math.min((r.width - 2 * pad) / w, availH / h);
-			state.tx = pad - b.minx * state.s + (r.width - 2 * pad - w * state.s) / 2;
-			state.ty = padTop - b.miny * state.s + (availH - h * state.s) / 2;
+		var items, s = state.s, prev = 0, k;
+		function solve() {
+			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, pad, pad),
+				fitScaleFor(items, 'y', 't', 'b', r.height, padTop, padBottom));
 		}
-		// **THE FIT IS A FIXED POINT, AND THE ONLY HONEST WAY TO REACH ONE IS TO ITERATE.**
-		//
-		// Tom, 2026-08-15: *"The model that is current when the page is reloaded gets zoom in"* and
-		// *"Switching tabs still changes the zoom."* Both are the same defect: the fit depended on
-		// the view it STARTED from, so the same drawing fitted differently after a reload (scale 1)
-		// than after a tab switch (whatever the last project was left at).
-		//
-		// THE REASON IS TASK 331, not a mistake anywhere. Text and symbols are sized in SCREEN
-		// PIXELS, so how much WORLD space a label occupies is proportional to 1/scale -- and bbox()
-		// measures world space. The box you must fit is therefore a function of the scale you are
-		// solving for. One pass cannot answer that; it just answers it for whatever scale happened
-		// to be in force, which is the previous project's.
-		//
-		// It converges fast because it is a contraction: zooming in shrinks the labels' world
-		// footprint, which shrinks the box, which zooms in slightly more, in a geometric series.
-		// Four passes with an early exit puts it within a tenth of a percent from any starting
-		// scale, and the early exit means the common case (a drawing whose labels do not reach the
-		// edge) costs exactly one extra bbox.
-		//
-		// Each pass must RE-LAY-OUT before the next one measures, or the loop is reading label
-		// positions belonging to the previous scale and converging to nothing in particular. That is
-		// what onZoomChanged() is doing inside the loop; it is the expensive part, and it is why
-		// this is bounded at four rather than run to machine precision.
-		var lim = settings.labelMaxWidth, prev = 0, i;
-		for (i = 0; i < LPN_FIT_PASSES; i++) {
-			fitTo(bbox({
-				// Decided from the scale this pass is TESTING, not from the one we arrived with.
-				ignoreDataLabels: typeof lim === 'number' && lim > 0 && visibleMapWidth() > lim
-			}));
+		function apply(v) {
+			state.s = v;
+			state.tx = fitWindow(items, v, 'x', 'l', 'r', r.width, pad, pad).t;
+			state.ty = fitWindow(items, v, 'y', 't', 'b', r.height, padTop, padBottom).t;
 			setTransform();
 			onZoomChanged();
-			if (prev && Math.abs(state.s - prev) / prev < LPN_FIT_TOLERANCE) { break; }
-			prev = state.s;
+		}
+		// **WHAT IS LEFT IS NOT THE SIZES, IT IS WHERE THE LAYOUT PUT THINGS.** The continuous part
+		// -- how many pixels of label have to fit alongside how many world units of pipe -- is now
+		// solved exactly, in closed form, by fitScaleFor(). Two things still depend on the scale in
+		// a way arithmetic cannot reach:
+		//
+		//   * WHICH labels are drawn: the map-width threshold and the too-short-pipe rule are
+		//     booleans, and fitItems() is told which scale to answer them for;
+		//   * WHERE each label sits: the collision relaxation and the arrow dodge both work in world
+		//     units, so a drawing whose pipes are two pixels long nudges its labels differently from
+		//     the same drawing filling the screen. Only a re-layout can answer that.
+		//
+		// So: solve, apply, and let onZoomChanged() re-lay-out at the answer; then solve once more
+		// against a layout that finally belongs to the right scale. It agrees on the second round
+		// and stops. Three is a hard stop, not an expectation -- and where the old version spent
+		// eight re-layouts converging on a NUMBER, this spends two confirming a LAYOUT.
+		for (k = 0; k < 3; k++) {
+			items = fitItems(s);
+			s = solve();
+			apply(s);
+			if (s === prev) { break; }
+			prev = s;
 		}
 	}
 

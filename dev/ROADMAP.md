@@ -1871,7 +1871,27 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     *"Reload still zooms the current tab in drastically"*, and his instinct that the markup height
     was involved was right. A fit asked for before the canvas is sized is now DEFERRED and runs the
     moment it is, the same shape as `fitAfterSolve()`.
-  - Convergence tightened from 4 passes at 1e-3 to **8 at 1e-5** after Tom reported the residue:
+  - **AND THEN THE ITERATION WENT AWAY ENTIRELY** (Tom: *"!!! Is there any way to circumvent this?
+    Can we think harder?"*). It was never an iterative problem; it looked like one because the two
+    kinds of thing being fitted were measured in the same units. Geometry is WORLD and scales with
+    `s`; every label is anchored at a world point but extends a fixed number of SCREEN PIXELS
+    (Task 331). Keep them apart and the screen position of any drawn edge is `t + s*x ± px` with
+    `px` free of `s` — so fitting is a two-variable feasibility question per axis whose left side is
+    a max of straight lines and right side a min of them. Their difference is convex and crosses
+    zero once; 60 bisection steps find it to machine precision, in arithmetic, with no DOM.
+    `fitItems()` / `fitScaleFor()` / `fitWindow()`.
+  - **What remains needs a re-layout and cannot be arithmetic: WHERE the layout put things.** The
+    collision relaxation and the arrow dodge work in world units, so a drawing two pixels wide
+    nudges its labels differently from the same drawing filling the screen. So: solve, apply,
+    re-lay-out at the answer, solve once more against a layout that finally belongs to the right
+    scale. **Two re-layouts, measured by the harness, where the converging version spent eight.**
+  - **THE TRAP IN THE NEW DESIGN, recorded because it bit immediately:** every quantity converted
+    from world to pixels must itself be px/s. The old `bbox()` carried world fudges (`- 2` above the
+    baseline, `+ 0.6` below, `+ 0.2` around a node) and multiplying a WORLD constant by the scale
+    gives a pixel figure that moves with the zoom — the same dependence in miniature. Everything is
+    now built from `effectiveFontSize()`, `nodeRadius()` and `symbolFactor()`.
+  - Before that: convergence had been tightened from 4 passes at 1e-3 to 8 at 1e-5 after Tom
+    reported the residue:
     *"Models with all text hidden preserve the same zoom exactly. Models with text change a bit on
     tab switching."* Exactly right, and diagnostic — a drawing with no visible text has nothing
     whose size depends on the scale, so it was always exact; 1e-3 is 1.4px across a 1400px canvas.
