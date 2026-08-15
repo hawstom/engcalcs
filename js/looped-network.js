@@ -2647,8 +2647,14 @@ var EngCalcs = EngCalcs || {};
 		fitAfterSolve = false;
 		zoomExtent();
 	}
-	var LPN_FIT_PASSES = 4, LPN_FIT_TOLERANCE = 1e-3;
+	// Eight passes with a tight exit, not four with a loose one. The loop converges geometrically and
+	// exits as soon as it stops moving, so a drawing whose labels do not reach the edge still costs
+	// two passes -- but 1e-3 is a tenth of a percent, which is 1.4px across a 1400px canvas, and Tom
+	// could see it: *"Models with text change a bit on tab switching."* A drawing with no visible
+	// text was already exact, because there is nothing whose size depends on the scale.
+	var LPN_FIT_PASSES = 8, LPN_FIT_TOLERANCE = 1e-5;
 	function zoomExtent() {
+		if (!mapSized) { fitWhenSized = true; return; }
 		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it (Tom, 2026-08-09:
 		// "it seems unforgivable to have a persistent message overwriting our map... maybe what we
 		// really need to do is make Zoom to Fit account for this top margin"). The mode hint sits
@@ -9188,12 +9194,29 @@ var EngCalcs = EngCalcs || {};
 	// simply blank. The failsafe below covers the one way this could strand the page: a subresource
 	// that never finishes, which would otherwise mean a map that never appears.
 	var mapSizingArmed = false;
+	// **THE CANVAS IS 10000px TALL UNTIL IT IS SIZED, AND A FIT AGAINST THAT IS NONSENSE** (Tom,
+	// 2026-08-15: *"Reload still zooms the current tab in drastically. Did you use a markup map
+	// height of..."* — yes, 10000, and this is the price of it). zoomExtent() divides the available
+	// HEIGHT by the drawing's height and takes the smaller of that and the width ratio. With 10000
+	// of height available the height term never wins, so the drawing is fitted to WIDTH ALONE, which
+	// on anything taller than it is wide is a drastic zoom-in.
+	//
+	// The curtain is still right — see the markup comment for why 0 was worse — so the answer is
+	// that a fit asked for before the canvas has a real height is DEFERRED rather than answered
+	// wrongly. Same shape as fitAfterSolve() above: remember that one was wanted, and do it when the
+	// missing fact arrives.
+	var mapSized = false, fitWhenSized = false;
 	function armMapSizing() {
 		if (mapSizingArmed) { return; }
 		mapSizingArmed = true;
 		applyMapHeight();
 	}
 	function pageSettled() { return mapSizingArmed || document.readyState === 'complete'; }
+	function noteMapSized() {
+		if (mapSized) { return; }
+		mapSized = true;
+		if (fitWhenSized) { fitWhenSized = false; zoomExtent(); }
+	}
 	function applyMapHeight(secondPass) {
 		if (!svg) { return; }
 		if (!pageSettled()) { return; }
@@ -9240,6 +9263,9 @@ var EngCalcs = EngCalcs || {};
 		if (!secondPass && before.bottom > vh + 1 && before.height > LPN_MAP_MIN) {
 			applyMapHeight(true);
 		}
+		// The canvas now has a height derived from the window rather than from the markup, so any
+		// fit that was waiting for one can have its answer.
+		noteMapSized();
 	}
 	function applyLegendPosition() {
 		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }

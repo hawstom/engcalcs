@@ -1865,9 +1865,25 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     during boot therefore reserved nothing and took ~25px back as drawing room — the reloaded
     project's "zoom in", exactly. Neither overlay is ever legitimately blank once the page runs, so
     an empty one now reserves one line of its own computed font size.
+  - **A THIRD CAUSE, AND IT WAS THE CURTAIN.** The canvas is authored `height="10000"` (see Task 358)
+    and only gets a real height once `applyMapHeight()` runs. A fit against 10000px of available
+    height can never have the height ratio win, so the drawing is fitted to WIDTH ALONE — Tom's
+    *"Reload still zooms the current tab in drastically"*, and his instinct that the markup height
+    was involved was right. A fit asked for before the canvas is sized is now DEFERRED and runs the
+    moment it is, the same shape as `fitAfterSolve()`.
+  - Convergence tightened from 4 passes at 1e-3 to **8 at 1e-5** after Tom reported the residue:
+    *"Models with all text hidden preserve the same zoom exactly. Models with text change a bit on
+    tab switching."* Exactly right, and diagnostic — a drawing with no visible text has nothing
+    whose size depends on the scale, so it was always exact; 1e-3 is 1.4px across a 1400px canvas.
   - `bbox()` takes an explicit `ignoreDataLabels` flag instead of reading the global hidden state,
     and excludes an ALIGNED link label (a setting) rather than a repeated chain (a function of the
-    zoom). `dev/lpn-spike/zoom-fit-harness.js`, 10 checks, both causes mutation-tested.
+    zoom). `dev/lpn-spike/zoom-fit-harness.js`, 13 checks.
+  - **THE HARNESS HAD TO LEARN THE PHYSICS FIRST.** `lpn-dom-stub.js` reports a constant 10 from
+    `getBBox()`, so label widths did not shrink with zoom and a one-pass fit looked convergent —
+    the harness could not see the defect it was written for. It now reports a 60px text run
+    converted to world units at the current scale, the way a browser does. The load-bearing
+    constant is the PASS CAP, not the tolerance: one pass fails six checks, while loosening the
+    tolerance alone changes nothing, because convergence is geometric.
 
 - 0|356| **A zoom step no longer rebuilds labels nobody can see — DONE 2026-08-15.** Tom:
   *"the Net3 example is a little sluggish to zoom even when labels are all hidden. Is recalc

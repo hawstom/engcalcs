@@ -30,6 +30,10 @@ const L = loadLoopedNetwork(
 	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tsetSetting: function (k, v) { settings[k] = v; },\n" +
 	"\t\tzoomExtent: zoomExtent, bbox: bbox, reserve: overlayReserve,\n" +
+	// The canvas is authored 10000px tall and only becomes real when applyMapHeight() sizes it.
+	// A harness that never calls that has to say so, exactly as the page does.
+	"\t\tmarkSized: noteMapSized, isSized: function () { return mapSized; },\n" +
+	"\t\tscale: function () { return state.s; },\n" +
 	"\t\tview: function () { return { tx: state.tx, ty: state.ty, s: state.s }; },\n" +
 	"\t\tsetZoom: function (s) { state.s = s; },\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h;\n" +
@@ -62,10 +66,47 @@ function same(a, b, tol) {
 	return rel(x.s, y.s) < t && rel(x.tx, y.tx) < t && rel(x.ty, y.ty) < t;
 }
 
+// **THE STUB MUST MODEL THE ONE PHYSICAL FACT THIS BUG IS MADE OF**, or the harness cannot see it.
+// A label is sized in SCREEN PIXELS, so the world width getBBox() reports shrinks as you zoom in --
+// which is precisely why the box being fitted depends on the scale being solved for. The default
+// stub returns a constant 10 and would let a one-pass fit look convergent. Here every element
+// created from now on reports a 60px run of text converted into world units at the CURRENT scale,
+// the way a browser does.
+const rawCreate = document.createElementNS;
+document.createElementNS = function (ns, tag) {
+	const e = rawCreate.call(document, ns, tag);
+	e.getBBox = function () {
+		const s = L.scale() || 1;
+		return { x: 0, y: 0, width: 60 / s, height: 11 / s };
+	};
+	return e;
+};
+
 setUnitSet('us');
 L.buildLayers();
 L.seedDefaultInputs();
 L.setCanvas(1400, 700);
+
+// ---- 0. A fit asked for before the canvas is sized is DEFERRED, not answered wrongly ----------
+console.log('--- a fit against an unsized canvas waits instead of guessing ---');
+{
+	// This runs first because it is the only state the page passes through exactly once: the canvas
+	// still carries its markup height, which is a deliberate curtain far taller than any window.
+	// Fitting against it divides the drawing into 10000px of height, so the height ratio never wins
+	// and the drawing is fitted to WIDTH ALONE -- a drastic zoom-in, and the one Tom saw on reload.
+	const a0 = L.addNode('junction', 0, 0), b0 = L.addNode('junction', 100, 0);
+	L.addLink('pipe', a0.id, b0.id);
+	L.setZoom(1);
+	const before = view();
+	ok('the canvas starts unsized', !L.isSized());
+	L.zoomExtent();
+	ok('...so a fit asked for now changes nothing at all', view() === before, view());
+	L.markSized();
+	ok('...and the deferred fit runs the moment the canvas has a real height', view() !== before,
+		view());
+	// Cleaned up so the sections below start from the network they expect.
+	L.getDoc().nodes.length = 0; L.getDoc().links.length = 0;
+}
 
 // A network big enough that label boxes matter to the fit.
 const a = L.addNode('junction', 0, 0);
@@ -101,6 +142,11 @@ console.log('--- the fit does not depend on the view it started from ---');
 	const drift = Math.abs(JSON.parse(view()).s - JSON.parse(fromOne).s) / JSON.parse(fromOne).s;
 	ok('...to well under a pixel across the whole canvas',
 		drift * 1400 < 1, (drift * 1400).toFixed(3) + 'px across a 1400px canvas');
+	// WHICH CONSTANT IS LOAD-BEARING: the PASS CAP, not the tolerance. Convergence is geometric, so
+	// by the time consecutive passes differ by even 1% the answer is already far closer than that --
+	// loosening LPN_FIT_TOLERANCE alone does not move the result, while dropping to one pass fails
+	// six of these checks. Recorded because a future reader tuning the wrong knob would find it
+	// does nothing and conclude the loop is decorative.
 	// Twice in a row from the same place is the weakest form and would pass even for the broken
 	// version, so it is here only to prove the fit is not accumulating anything.
 	L.zoomExtent();
