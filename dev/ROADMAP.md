@@ -516,7 +516,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Connects to Task 253 (clean map for screenshots) — a thematic view with no labels IS the clean
     map, arrived at from the other side.
 
-- 25|328| **Label dragging should move the LEADER'S ENDPOINT, not the label's offset.** Tom,
+- 62|328| **Label dragging should move the LEADER'S ENDPOINT, not the label's offset.** Tom,
   2026-08-14: *"dragging needs to be modified so that when you start to drag an item, you are really
   dragging the end point of the leader, and the label flips rather than the leader flipping. And…
   the end point of the leader you choose will be the fixed end point of the leader at multiple zoom
@@ -557,6 +557,54 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     placed label, and all three of those are ways of not placing one badly** — so phase 1 may
     dissolve this task rather than defer it. Ask afterwards whether anyone still reaches for it.
     See `dev/sizing-paradigm.md`, final section.
+  - **RAISED 25 -> 62 the same day (Tom, 2026-08-14): "Want to do dragging, I think. It has been a
+    major weakness of EPANET."** So this is WANTED, not merely tolerated — my "phase 1 may dissolve
+    it" was half right and half wrong, and the wrong half is the interesting one. Automatic placement
+    dissolves *routine* dragging: the label nobody would have moved if the engine had placed it well.
+    It does not dissolve *deliberate* dragging — an engineer arranging a sheet for someone else to
+    read, which is a judgement no placement engine can make and the thing EPANET denies its users.
+    **Those are two different features that happen to share a gesture.** Phase 1 removes the drudgery;
+    this task keeps the authorship. Still sequenced after Task 329, because the angle-hint design only
+    makes sense once we know what automatic placement leaves behind.
+
+- 88|329| **Test the GIS paradigm: pipe labels aligned ALONG the pipe.** Tom, 2026-08-14: *"I think
+  we first want to test the GIS thing of aligning our pipe labels with pipes… Maybe I can investigate
+  to try to figure out how epanet-js makes the decision of which side of a pipe you label. I don't
+  think it matters. If I had to choose, I would say the top side. Or if I had to get cute, I would say
+  it is the side that has least congestion however we define congestion."*
+  - **Both of Tom's answers are the same answer and we can have both for free.** Prefer the top;
+    hand the bottom to `runLabelCollisionAvoidance()` as a second candidate. "Least congestion" needs
+    no definition and no new algorithm — it is the existing engine being offered two positions
+    instead of one. `alignedLabelAnchor()` therefore returns a side rather than choosing one.
+  - **THE SIDE IS NOT THE HARD PART. Text must never render upside down**, so a pipe drawn
+    right-to-left flips 180°, and that flip SWAPS which side is the top. Normalise the angle first,
+    then offset. Get the order wrong and westward pipes label on the opposite side from their
+    eastward neighbours — the drawing then reads as though the side were random, which is far worse
+    than picking the "wrong" side consistently. **The test that matters is that one physical pipe
+    labels identically whichever end the user clicked first** (harness: max drift 3e-14), because it
+    is invisible on a network drawn all one way and glaring on a real one.
+  - **DONE: the pure geometry.** `EngCalcs.lpnGeom.alignedLabelAnchor()` in `js/lpn-geom.js` — angle
+    normalisation, up-screen normal, per-side multi-line anchoring, zero-length links. 8 assertions in
+    `dev/lpn-spike/geom-harness.js` (53 total), mutation-tested three ways: dropping the flip (2
+    failures), a down-screen normal (3), a top block straddling the pipe (1). No DOM, so it is
+    testable now and the renderer is the only browser-dependent part left.
+  - **NOT DONE: the wiring**, deliberately — this is a visual judgement Tom has to make in a browser,
+    and the honest way to give it to him is a toggle, not a decision made for him. Render a link label
+    as `<text transform="rotate(angle x y)" text-anchor="middle">` with `dy` tspans; the anchor maths
+    is already right for that, and rotation maps `+y'` onto the bottom side so the tspans need no
+    per-side handling.
+  - **The thing to watch when he looks at it:** GIS aligns ONE short name along a line. Our link
+    labels default to THREE lines (id, flow, velocity) and can carry nine. A rotated three-line stack
+    is legible; a nine-line one is a wall of text lying at 40°. If alignment reads well, it may argue
+    for fewer values per pipe at a given scale — which is Task 326's scale-dependent visibility
+    arriving from an unrelated direction, and therefore evidence rather than coincidence.
+
+- 70|330| **Toggle for label background masking.** Tom, 2026-08-14: *"We want to be able to turn off
+  and on background masking."* The mask geometry exists (`lpnGeom.maskRect`); this is the control and
+  its persistence. **Decide the scope deliberately** — masking is a property of how the sheet is
+  meant to be read, not of the browser, so per Task 263's rule it belongs to the PROJECT, saved with
+  it, like units and ID prefixes. Interacts with Task 329: a label lying along a pipe needs a mask
+  more than a horizontal one beside it does, because it crosses the very line it describes.
 
 - 92|326| **PARADIGM: size text and symbols in PRINTED units, not real-world units.** Tom,
   2026-08-14: *"the end product of all text and symbols is in printed units… engineers and architects

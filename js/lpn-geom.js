@@ -134,6 +134,71 @@ EngCalcs.lpnGeom = (function () {
 		return { x: left - pad, y: top - pad, width: w + 2 * pad, height: h + 2 * pad };
 	}
 
+
+	// ---- Aligned (GIS-style) link labels ---------------------------------------------------
+	//
+	// Places a link's label ALONG the pipe rather than horizontally beside it, the way every GIS
+	// labels a road or a main. Tom, 2026-08-14: "start only with the GIS paradigm. We align the
+	// labels with pipes... and we make them disappear when we are zoomed out."
+	//
+	// THE CONSTRAINT THAT DECIDES THE MOST HERE IS NOT WHICH SIDE -- IT IS THAT TEXT MUST NEVER
+	// RENDER UPSIDE DOWN. A pipe drawn right-to-left has to be flipped 180 degrees to stay
+	// readable, and that flip SWAPS which side of the line is "the top". So the order is fixed:
+	// normalise the angle into (-90, 90] FIRST, then offset. Offsetting before flipping puts
+	// labels on westward pipes on the opposite side from their eastward neighbours, and the
+	// drawing reads as though the side were chosen at random -- which is the failure this
+	// function exists to prevent, not the failure of picking the "wrong" side.
+	//
+	// WHICH SIDE: `side` is +1 for the top (the default, and Tom's answer when forced to choose)
+	// and -1 for the bottom. Both are returned as CANDIDATES rather than one being computed as
+	// correct, because "the side with least congestion" is not a new algorithm -- it is
+	// runLabelCollisionAvoidance() being handed two positions instead of one.
+	//
+	// Returns the first line's baseline anchor in UNROTATED map coordinates, so the renderer can
+	// draw a plain rotated text block:
+	//
+	//     <text transform="rotate(angle x y)" x=x y=y text-anchor="middle">
+	//         <tspan x=x dy=0>..</tspan><tspan x=x dy=lineHeight>..</tspan>
+	//
+	// That works because rotating by `angle` maps +y' onto the BOTTOM side of the pipe, so a
+	// positive dy always steps away from the pipe on the bottom and toward it on the top -- which
+	// is why the two sides anchor at different lines (bottom anchors at the line nearest the
+	// pipe, top at the one furthest) and the tspans need no per-side handling at all.
+	function alignedLabelAnchor(ax, ay, bx, by, opts) {
+		opts = opts || {};
+		var frac = opts.frac === undefined ? 0.5 : opts.frac,
+			gap = opts.gap || 0,
+			fontSize = opts.fontSize || 0,
+			lh = opts.lineHeight || fontSize,
+			nLines = Math.max(1, opts.nLines || 1),
+			side = opts.side === -1 ? -1 : 1,
+			dx = bx - ax,
+			dy = by - ay,
+			deg = Math.atan2(dy, dx) * 180 / Math.PI,
+			flipped = false;
+		// A zero-length link has no direction; treat it as horizontal rather than returning NaN.
+		if (!dx && !dy) { deg = 0; }
+		if (deg > 90 || deg <= -90) { deg += 180; flipped = true; }
+		if (deg > 180) { deg -= 360; }
+		var rad = deg * Math.PI / 180,
+			// Unit normal pointing UP-SCREEN (SVG y grows downward, and cos(deg) >= 0 after the
+			// flip, so this component is always <= 0 -- i.e. always the top).
+			nx = Math.sin(rad),
+			ny = -Math.cos(rad),
+			// Distance along that normal to the FIRST line's baseline. Top: the block sits above
+			// the pipe, so line 0 is the furthest out. Bottom: line 0 is nearest, one ascent below.
+			d = side > 0 ? gap + (nLines - 1) * lh : -(gap + fontSize * 0.85);
+		return {
+			x: ax + dx * frac + nx * d,
+			y: ay + dy * frac + ny * d,
+			angle: deg,
+			side: side,
+			flipped: flipped,
+			nx: nx,
+			ny: ny
+		};
+	}
+
 	return {
 		polylineLength: polylineLength,
 		polylinePointsAttr: polylinePointsAttr,
@@ -142,7 +207,8 @@ EngCalcs.lpnGeom = (function () {
 		leaderAttachX: leaderAttachX,
 		leaderAttach: leaderAttach,
 		dataLabelBoxHeight: dataLabelBoxHeight,
-		maskRect: maskRect
+		maskRect: maskRect,
+		alignedLabelAnchor: alignedLabelAnchor
 	};
 }());
 

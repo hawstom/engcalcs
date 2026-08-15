@@ -274,3 +274,25 @@ evidence the frame is right.
 - **Dragging ships today**, so phase 1 is not "do not build it" but "do not carry it forward
   unexamined". The honest question after phase 1 is whether anyone reaches for it any more.
 - ROADMAP Task 328 drops accordingly. It is not wrong; it is premature.
+
+## Amended within the hour: dragging is WANTED, just not first
+
+> Want to do dragging, I think. It has been a major weakness of EPANET. We want to be able to turn
+> off and on background masking. But I think we first want to test the GIS thing of aligning our pipe
+> labels with pipes.  — Tom, 2026-08-14
+
+My "phase 1 may dissolve the dragging problem" was half right, and the wrong half is the useful one.
+
+**Automatic placement dissolves ROUTINE dragging** — the label nobody would have moved if the engine
+had placed it well. That is most dragging, and removing it is a real gain.
+
+**It does not dissolve DELIBERATE dragging** — an engineer arranging a sheet so that a particular
+reader sees a particular thing. That is authorship, not correction, and no placement engine can make
+the call because it depends on what the drawing is *for*. Denying it is exactly what makes EPANET
+painful, so building automatic placement and stopping there would reproduce the weakness we set out
+to fix.
+
+**They share a gesture and are otherwise unrelated features.** Phase 1 removes the drudgery; Task 328
+keeps the authorship. Sequencing stands — the angle-hint design can only be judged once we can see
+what automatic placement leaves behind — but the destination is both, not one.
+

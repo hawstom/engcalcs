@@ -155,5 +155,73 @@ report(near(m2.x, 85 - 0.4) && near(m2.y, 194 - 0.4) && near(m2.width, 30.8) && 
 const m3 = Geom.maskRect(0, 0, 10, 10, 'start', 'top', 0, 1);
 report(near(m3.width, 12) && near(m3.height, 12) && near(m3.x, -1), 'pad applies on both sides');
 
+
+// ---------------------------------------------------------------------------------------------
+// 7. alignedLabelAnchor — GIS-style labels drawn ALONG the pipe (Task 329)
+//
+// What can actually be wrong here, in rough order of how bad it looks on screen:
+//   * text rendering UPSIDE DOWN on any pipe drawn right-to-left -- the whole reason the angle is
+//     normalised before anything else happens;
+//   * the flip changing which side the label lands on, so that one physical pipe labels
+//     differently depending on which end the user clicked first. That is the assertion below that
+//     matters most, because it is invisible on a test network drawn all one way and glaring on a
+//     real one;
+//   * the offset normal pointing DOWN-screen, which silently makes "top" mean bottom;
+//   * a multi-line block straddling the pipe instead of sitting entirely on one side.
+{
+	const near = (a, b, tol) => Math.abs(a - b) <= (tol === undefined ? 1e-9 : tol);
+	const O = { gap: 5, fontSize: 10, lineHeight: 12, nLines: 3 };
+
+	// -- readability: never upside down, whatever direction the pipe runs
+	let worstAngle = 0;
+	for (let deg = -180; deg < 180; deg += 7) {
+		const r = Math.PI * deg / 180;
+		const a = Geom.alignedLabelAnchor(0, 0, 100 * Math.cos(r), 100 * Math.sin(r), O);
+		worstAngle = Math.max(worstAngle, Math.abs(a.angle));
+	}
+	report(worstAngle <= 90 + 1e-9, 'aligned: text is never upside down at any pipe bearing',
+		`max |angle| = ${worstAngle.toFixed(1)}°`);
+
+	// -- THE ONE THAT MATTERS: drawing direction must not change the result
+	let maxDrift = 0;
+	for (let deg = -180; deg < 180; deg += 7) {
+		const r = Math.PI * deg / 180, X = 100 * Math.cos(r), Y = 100 * Math.sin(r);
+		const f = Geom.alignedLabelAnchor(0, 0, X, Y, O);
+		const b = Geom.alignedLabelAnchor(X, Y, 0, 0, O);
+		maxDrift = Math.max(maxDrift, Math.hypot(f.x - b.x, f.y - b.y), Math.abs(f.angle - b.angle));
+	}
+	report(near(maxDrift, 0, 1e-9), 'aligned: same pipe labels identically drawn either direction',
+		`max drift = ${maxDrift.toExponential(1)}`);
+
+	// -- "top" really is up-screen (SVG y grows downward, so a top label has the smaller y)
+	const eastTop = Geom.alignedLabelAnchor(0, 0, 100, 0, Object.assign({ side: 1 }, O));
+	const eastBot = Geom.alignedLabelAnchor(0, 0, 100, 0, Object.assign({ side: -1 }, O));
+	report(eastTop.y < 0 && eastBot.y > 0, 'aligned: side +1 is above the pipe, -1 below',
+		`top y=${eastTop.y.toFixed(1)}, bottom y=${eastBot.y.toFixed(1)}`);
+
+	// -- the two sides are genuine CANDIDATES: distinct, and neither one on the pipe
+	report(Math.abs(eastTop.y - eastBot.y) > O.gap, 'aligned: the two sides are distinct candidates');
+
+	// -- a multi-line block sits ENTIRELY on its side. Rotation maps +y' to the bottom side, so
+	//    every subsequent line steps by +lineHeight along -n; check the far line has not crossed.
+	for (const side of [1, -1]) {
+		const a = Geom.alignedLabelAnchor(0, 0, 100, 0, Object.assign({}, O, { side }));
+		const lastY = a.y + (O.nLines - 1) * O.lineHeight;   // horizontal pipe: +y' is +y
+		const ys = [a.y, lastY];
+		report(ys.every(y => side > 0 ? y < 0 : y > 0),
+			`aligned: a ${O.nLines}-line block stays wholly ${side > 0 ? 'above' : 'below'} the pipe`,
+			`lines span y ${Math.min(...ys).toFixed(1)}..${Math.max(...ys).toFixed(1)}`);
+	}
+
+	// -- degenerate zero-length link returns a point, not NaN
+	const z = Geom.alignedLabelAnchor(40, 40, 40, 40, O);
+	report(isFinite(z.x) && isFinite(z.y) && isFinite(z.angle), 'aligned: zero-length link is finite',
+		`(${z.x.toFixed(1)}, ${z.y.toFixed(1)}) @ ${z.angle}°`);
+
+	// -- frac addresses a position along the pipe, not just the midpoint
+	const q = Geom.alignedLabelAnchor(0, 0, 100, 0, Object.assign({ frac: 0.25 }, O));
+	report(near(q.x, 25), 'aligned: frac positions the label along the pipe', `x=${q.x}`);
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);
