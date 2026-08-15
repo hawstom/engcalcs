@@ -1176,6 +1176,19 @@ $ec_lang['lpn_field_tank_diameter_tip']='Width of the tank from side to side. It
 $ec_lang['lpn_tank_head_tip']='Water surface elevation in the tank: the tank bottom elevation plus the water depth. This is the level the solver uses for the tank.';
 $ec_lang['lpn_close']='Close';
 $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar.';
+// The examples gallery (ROADMAP Task 314). lpn_empty_hint above is no longer rendered by the page
+// -- the empty canvas shows the gallery instead -- but the key is KEPT rather than deleted while
+// the gallery is new: it is the fallback sentence if the manifest cannot be fetched, and deleting
+// a key translated into 26 languages to get it back a week later is the expensive direction.
+$ec_lang['lpn_examples_heading']='Open an example';
+$ec_lang['lpn_examples_sub']='Each one opens as your own copy. Change it, save it, or start over.';
+$ec_lang['lpn_examples_open']='Open';
+$ec_lang['lpn_examples_menu']='Open example...';
+$ec_lang['lpn_examples_blank']='Or start with a blank drawing';
+$ec_lang['lpn_examples_size']='{nodes} junctions, {links} pipes';
+$ec_lang['lpn_examples_failed']='The examples could not be loaded. Use File, New project to start a drawing.';
+$ec_lang['lpn_examples_loading']='Loading examples...';
+$ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it with File, Save as.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';

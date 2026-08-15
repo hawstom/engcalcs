@@ -677,7 +677,44 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Related and unfiled until Tom rules: a toggle for label background masking, and search within a
     large model.
 
-- 96|314| **An EXAMPLES LIBRARY, on the HEC-RAS model: a pane of many examples, not a menu of two.**
+- 40|314| **An EXAMPLES LIBRARY, on the HEC-RAS model: a pane of many examples, not a menu of two.**
+
+  **BUILT AND SHIPPED 2026-08-14 — the gallery is live; ONE decision of Tom's is deliberately NOT
+  built, and it is named below rather than quietly dropped.** What exists now:
+  - `dev/scripts/generate_examples.php` publishes `dev/water-network-examples/` to the web-served
+    `examples/` with a manifest and a generated SVG thumbnail per example. **The served copy is
+    generated, never hand-kept**, and `check_all.sh` fails if it drifts. It publishes exactly what
+    the `.gitignore` whitelist publishes — one list, not two that can disagree, so a client model
+    dropped in to test the `.inp` importer is invisible to both.
+  - **The empty canvas IS the shop window.** The placeholder sentence that had been there since
+    2026-07-29 is gone; the canvas stays visible and pannable behind the cards, which is the
+    "usable middle" Tom described. `File > Open example…` opens the same wall on demand, **under
+    Open, not New** (Task 305's linguistic argument, built here).
+  - **Opening one goes through `acceptImportedText()` + `importProject()`** — the upload path's own
+    loader, not a second one. So an example lands as an ordinary project the user owns and may Save
+    As, carrying the version migration and structural repair for free. That is
+    *"they were your copies because you downloaded and installed them"*, as far as a served file can
+    get to it.
+  - `dev/lpn-spike/examples-gallery-harness.js`, 69 checks. **The one worth knowing about is the
+    upside-down test**: a `v >= 4` document is stored Cartesian and SVG is Y-down, so drawing stored
+    coordinates straight into a thumbnail mirrors every drawing vertically — and on an unfamiliar
+    water network that looks entirely plausible. It is asserted against `applySaved()`'s own rule
+    rather than by eye, because eye is exactly what would pass it.
+
+  **NOT BUILT: "no project tabs at all until a project is opened".** Tom's strongest form of the
+  feature (*"It's not a map until the first project is started or opened?"*) is the half that is
+  missing, and it was left out on grounds worth stating rather than on grounds of effort. `init()`
+  guarantees an invariant in as many words — *"the library always has exactly one open project, so
+  there is never a state where drawing has nowhere to be saved"* — and a tabless boot breaks it
+  everywhere at once: autosave, `saveToStorage()`, the scenario container and `renderTabs()` all
+  assume an open project exists. **The gallery delivers the user-visible benefit without touching
+  that invariant**, which is why it went first; the tabless boot is a storage-model change wearing a
+  UI change's clothes and deserves its own task and its own `/code-review`. He phrased it as
+  *"possibly"*, so this is a deferral, not a decline.
+  - Also still open, and cheap: **sub-categories and paging** (the grid is `auto-fit`, so they
+    arrive without a rewrite — deliberately not built at four examples), and **`lpn_empty_hint` is
+    now rendered by nothing**. Keep the key: it is the fallback sentence when the manifest cannot be
+    fetched, and it is 26 translated strings that would be expensive to get back.
   - **STEP ZERO IS DONE, 2026-08-14: the shelf is stocked, tracked, and on the new filename
     convention.** `dev/water-network-examples/` (Tom renamed it from `dev/epanet-models/` the same
     day) now holds four saved projects of ours — `Net1-lpn.json` (11 nodes), `Net2-lpn.json` (36),

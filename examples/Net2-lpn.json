@@ -1,0 +1,957 @@
+{
+	"format": "hawsedc-lpn",
+	"app": "https://hawsedc.com/engcalcs/Looped-Network.php",
+	"v": 4,
+	"project": {
+		"name": "Net2",
+		"activeScenario": "base",
+		"docId": "dmstij4khcoPfAd5h"
+	},
+	"scenarios": [
+		{
+			"id": "base",
+			"name": "Base",
+			"isBase": true,
+			"overrides": {}
+		}
+	],
+	"nodes": [
+		{
+			"id": "1",
+			"type": "junction",
+			"x": 21,
+			"y": 4,
+			"elev": 49.999392,
+			"_demand": -694.3420333931558
+		},
+		{
+			"id": "2",
+			"type": "junction",
+			"x": 19,
+			"y": 20,
+			"elev": 99.998784,
+			"_demand": 7.999332181948801
+		},
+		{
+			"id": "3",
+			"type": "junction",
+			"x": 11,
+			"y": 21,
+			"elev": 59.9992704,
+			"_demand": 13.998831318410401
+		},
+		{
+			"id": "4",
+			"type": "junction",
+			"x": 14,
+			"y": 28,
+			"elev": 59.9992704,
+			"_demand": 7.999332181948801
+		},
+		{
+			"id": "5",
+			"type": "junction",
+			"x": 19,
+			"y": 25,
+			"elev": 99.998784,
+			"_demand": 7.999332181948801
+		},
+		{
+			"id": "6",
+			"type": "junction",
+			"x": 28,
+			"y": 23,
+			"elev": 124.99848000000001,
+			"_demand": 4.999582613718
+		},
+		{
+			"id": "7",
+			"type": "junction",
+			"x": 36,
+			"y": 39,
+			"elev": 159.9980544,
+			"_demand": 3.9996660909744004
+		},
+		{
+			"id": "8",
+			"type": "junction",
+			"x": 38,
+			"y": 30,
+			"elev": 109.9986624,
+			"_demand": 8.9992487046924
+		},
+		{
+			"id": "9",
+			"type": "junction",
+			"x": 36,
+			"y": 42,
+			"elev": 179.99781120000003,
+			"_demand": 13.998831318410401
+		},
+		{
+			"id": "10",
+			"type": "junction",
+			"x": 37,
+			"y": 23,
+			"elev": 129.9984192,
+			"_demand": 4.999582613718
+		},
+		{
+			"id": "11",
+			"type": "junction",
+			"x": 37,
+			"y": 49,
+			"elev": 184.99775040000003,
+			"_demand": 34.77709666102241
+		},
+		{
+			"id": "12",
+			"type": "junction",
+			"x": 39,
+			"y": 60,
+			"elev": 209.99744640000003,
+			"_demand": 15.998664363897602
+		},
+		{
+			"id": "13",
+			"type": "junction",
+			"x": 38,
+			"y": 64,
+			"elev": 209.99744640000003,
+			"_demand": 1.9998330454872002
+		},
+		{
+			"id": "14",
+			"type": "junction",
+			"x": 38,
+			"y": 66,
+			"elev": 199.997568,
+			"_demand": 1.9998330454872002
+		},
+		{
+			"id": "15",
+			"type": "junction",
+			"x": 37,
+			"y": 69,
+			"elev": 189.99768960000003,
+			"_demand": 1.9998330454872002
+		},
+		{
+			"id": "16",
+			"type": "junction",
+			"x": 27,
+			"y": 65,
+			"elev": 149.998176,
+			"_demand": 19.998330454872
+		},
+		{
+			"id": "17",
+			"type": "junction",
+			"x": 27,
+			"y": 69,
+			"elev": 179.99781120000003,
+			"_demand": 19.998330454872
+		},
+		{
+			"id": "18",
+			"type": "junction",
+			"x": 23,
+			"y": 68,
+			"elev": 99.998784,
+			"_demand": 19.998330454872
+		},
+		{
+			"id": "19",
+			"type": "junction",
+			"x": 21,
+			"y": 59,
+			"elev": 149.998176,
+			"_demand": 4.999582613718
+		},
+		{
+			"id": "20",
+			"type": "junction",
+			"x": 45,
+			"y": 68,
+			"elev": 169.99793280000003,
+			"_demand": 18.9984139321284
+		},
+		{
+			"id": "21",
+			"type": "junction",
+			"x": 51,
+			"y": 62,
+			"elev": 149.998176,
+			"_demand": 15.998664363897602
+		},
+		{
+			"id": "22",
+			"type": "junction",
+			"x": 54,
+			"y": 69,
+			"elev": 199.997568,
+			"_demand": 9.999165227436
+		},
+		{
+			"id": "23",
+			"type": "junction",
+			"x": 35,
+			"y": 74,
+			"elev": 229.9972032,
+			"_demand": 7.999332181948801
+		},
+		{
+			"id": "24",
+			"type": "junction",
+			"x": 37,
+			"y": 71,
+			"elev": 189.99768960000003,
+			"_demand": 10.9990817501796
+		},
+		{
+			"id": "25",
+			"type": "junction",
+			"x": 35,
+			"y": 76,
+			"elev": 229.9972032,
+			"_demand": 5.9994991364615995
+		},
+		{
+			"id": "27",
+			"type": "junction",
+			"x": 39,
+			"y": 87,
+			"elev": 129.9984192,
+			"_demand": 7.999332181948801
+		},
+		{
+			"id": "28",
+			"type": "junction",
+			"x": 49,
+			"y": 85,
+			"elev": 109.9986624,
+			"_demand": 0
+		},
+		{
+			"id": "29",
+			"type": "junction",
+			"x": 42,
+			"y": 86,
+			"elev": 109.9986624,
+			"_demand": 6.999415659205201
+		},
+		{
+			"id": "30",
+			"type": "junction",
+			"x": 47,
+			"y": 80,
+			"elev": 129.9984192,
+			"_demand": 2.9997495682307997
+		},
+		{
+			"id": "31",
+			"type": "junction",
+			"x": 37,
+			"y": 80,
+			"elev": 189.99768960000003,
+			"_demand": 16.9985808866412
+		},
+		{
+			"id": "32",
+			"type": "junction",
+			"x": 23,
+			"y": 64,
+			"elev": 109.9986624,
+			"_demand": 16.9985808866412
+		},
+		{
+			"id": "33",
+			"type": "junction",
+			"x": 56,
+			"y": 73,
+			"elev": 179.99781120000003,
+			"_demand": 1.4998747841153999
+		},
+		{
+			"id": "34",
+			"type": "junction",
+			"x": 56,
+			"y": 77,
+			"elev": 189.99768960000003,
+			"_demand": 1.4998747841153999
+		},
+		{
+			"id": "35",
+			"type": "junction",
+			"x": 43,
+			"y": 81,
+			"elev": 109.9986624,
+			"_demand": 0
+		},
+		{
+			"id": "36",
+			"type": "junction",
+			"x": 53,
+			"y": 87,
+			"elev": 109.9986624,
+			"_demand": 0.9999165227436001
+		},
+		{
+			"id": "26",
+			"type": "tank",
+			"x": 33,
+			"y": 76,
+			"elev": 234.9971424,
+			"_level": 56.699310528000005,
+			"minLevel": 49.999392,
+			"maxLevel": 69.99914880000001,
+			"tankDiameter": 49.999392
+		}
+	],
+	"links": [
+		{
+			"id": "1",
+			"type": "pipe",
+			"from": "1",
+			"to": "2",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 2400,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "2",
+			"type": "pipe",
+			"from": "2",
+			"to": "5",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 800,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "3",
+			"type": "pipe",
+			"from": "2",
+			"to": "3",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 1300,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "4",
+			"type": "pipe",
+			"from": "3",
+			"to": "4",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 1200,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "5",
+			"type": "pipe",
+			"from": "4",
+			"to": "5",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "6",
+			"type": "pipe",
+			"from": "5",
+			"to": "6",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 1200,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "7",
+			"type": "pipe",
+			"from": "6",
+			"to": "7",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 2700,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "8",
+			"type": "pipe",
+			"from": "7",
+			"to": "8",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 140,
+			"_length": 1200,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "9",
+			"type": "pipe",
+			"from": "7",
+			"to": "9",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 400,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "10",
+			"type": "pipe",
+			"from": "8",
+			"to": "10",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 140,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "11",
+			"type": "pipe",
+			"from": "9",
+			"to": "11",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 700,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "12",
+			"type": "pipe",
+			"from": "11",
+			"to": "12",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 1900,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "13",
+			"type": "pipe",
+			"from": "12",
+			"to": "13",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 600,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "14",
+			"type": "pipe",
+			"from": "13",
+			"to": "14",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 400,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "15",
+			"type": "pipe",
+			"from": "14",
+			"to": "15",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 300,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "16",
+			"type": "pipe",
+			"from": "13",
+			"to": "16",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 1500,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "17",
+			"type": "pipe",
+			"from": "15",
+			"to": "17",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 1500,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "18",
+			"type": "pipe",
+			"from": "16",
+			"to": "17",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 600,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "19",
+			"type": "pipe",
+			"from": "17",
+			"to": "18",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 700,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "20",
+			"type": "pipe",
+			"from": "18",
+			"to": "32",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 350,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "21",
+			"type": "pipe",
+			"from": "16",
+			"to": "19",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 1400,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "22",
+			"type": "pipe",
+			"from": "14",
+			"to": "20",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 1100,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "23",
+			"type": "pipe",
+			"from": "20",
+			"to": "21",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 1300,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "24",
+			"type": "pipe",
+			"from": "21",
+			"to": "22",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 1300,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "25",
+			"type": "pipe",
+			"from": "20",
+			"to": "22",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 1300,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "26",
+			"type": "pipe",
+			"from": "24",
+			"to": "23",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 600,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "27",
+			"type": "pipe",
+			"from": "15",
+			"to": "24",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 250,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "28",
+			"type": "pipe",
+			"from": "23",
+			"to": "25",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 300,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "29",
+			"type": "pipe",
+			"from": "25",
+			"to": "26",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 200,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "30",
+			"type": "pipe",
+			"from": "25",
+			"to": "31",
+			"verts": [],
+			"_diameter": 11.999975999999998,
+			"_roughness": 100,
+			"_length": 600,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "31",
+			"type": "pipe",
+			"from": "31",
+			"to": "27",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 400,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "32",
+			"type": "pipe",
+			"from": "27",
+			"to": "29",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 400,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "34",
+			"type": "pipe",
+			"from": "29",
+			"to": "28",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 700,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "35",
+			"type": "pipe",
+			"from": "22",
+			"to": "33",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "36",
+			"type": "pipe",
+			"from": "33",
+			"to": "34",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 400,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "37",
+			"type": "pipe",
+			"from": "32",
+			"to": "19",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 500,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "38",
+			"type": "pipe",
+			"from": "29",
+			"to": "35",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 500,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "39",
+			"type": "pipe",
+			"from": "35",
+			"to": "30",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 1000,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "40",
+			"type": "pipe",
+			"from": "28",
+			"to": "35",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 700,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		},
+		{
+			"id": "41",
+			"type": "pipe",
+			"from": "28",
+			"to": "36",
+			"verts": [],
+			"_diameter": 7.9999839999999995,
+			"_roughness": 100,
+			"_length": 300,
+			"lenAuto": false,
+			"_status": "open",
+			"_k": 0
+		}
+	],
+	"labels": [
+		{
+			"id": "X1",
+			"text": "Pump",
+			"x": 26.0421142578125,
+			"y": 6.1,
+			"anchorNode": null,
+			"sizeMult": 1
+		},
+		{
+			"id": "X2",
+			"text": "Station",
+			"x": 26.4178466796875,
+			"y": 3.1,
+			"anchorNode": null,
+			"sizeMult": 1
+		},
+		{
+			"id": "X3",
+			"text": "Tank",
+			"x": 28.56922853946686,
+			"y": 76.52,
+			"anchorNode": null,
+			"sizeMult": 1
+		}
+	],
+	"nextId": {
+		"J": 1,
+		"R": 1,
+		"T": 1,
+		"L": 1,
+		"P": 1,
+		"V": 1,
+		"X": 4
+	},
+	"labelSettings": {
+		"node": {
+			"id": true,
+			"elev": true,
+			"demand": true,
+			"head": false,
+			"pressure": true
+		},
+		"link": {
+			"id": true,
+			"diameter": false,
+			"length": false,
+			"roughness": false,
+			"km": false,
+			"flow": true,
+			"velocity": true,
+			"headloss": false,
+			"gradient": false
+		},
+		"decimals": {
+			"node": {
+				"demand": 2,
+				"head": 2,
+				"pressure": 2,
+				"elev": 2
+			},
+			"link": {
+				"diameter": 0,
+				"length": 2,
+				"roughness": 0,
+				"km": 2,
+				"flow": 2,
+				"velocity": 2,
+				"headloss": 2,
+				"gradient": 4
+			}
+		},
+		"markExtrema": true
+	},
+	"backdrop": null,
+	"settings": {
+		"idPrefixes": {
+			"J": "J",
+			"R": "R",
+			"T": "T",
+			"L": "L",
+			"P": "P",
+			"V": "V",
+			"X": "X"
+		},
+		"emitterExponent": 0.5,
+		"tolerance": 1e-09,
+		"engine": "epanet",
+		"defaults": {
+			"nodeElev": 0,
+			"demand": 0,
+			"diameter": 4,
+			"roughness": 100,
+			"k": 2,
+			"tankLevel": 20,
+			"tankMinLevel": 0,
+			"tankMaxLevel": 30,
+			"tankDiameter": 50
+		},
+		"sectionsOpen": {
+			"idPrefixes": false,
+			"defaults": false,
+			"mapDisplay": true,
+			"computation": true,
+			"files": false
+		},
+		"textSize": 0.5,
+		"symbolScale": 1,
+		"symbolOpacity": 1,
+		"backdropOpacity": 1,
+		"textSizeUnits": "map",
+		"legendPosition": "top-right",
+		"mapHeight": 500,
+		"method": "hw"
+	},
+	"units": {
+		"lpn_u_length": "ft",
+		"lpn_u_elevhead": "fth2o",
+		"lpn_u_pressure": "psi",
+		"lpn_u_diameter": "in",
+		"lpn_u_flow": "gpm",
+		"lpn_u_velocity": "ftps",
+		"lpn_u_gradient": "gradePercent"
+	}
+}

@@ -3018,9 +3018,162 @@ var EngCalcs = EngCalcs || {};
 		updateEmptyHint();
 		scheduleSolve();
 	}
+	// ---- The examples gallery (ROADMAP Task 314) ---------------------------------------------
+	//
+	// **A GALLERY IS A UNIVERSE OF WORKING EXAMPLES**, and it stands where a placeholder sentence
+	// used to. Tom, 2026-08-14, overruling the objection that every other calculator in this suite
+	// lands a visitor IN a worked example so a gallery costs them: *"A gallery is a universe of
+	// working examples. The tension is small-minded. This is not a two-minute calculator."* He is
+	// right, and the error was treating a rule about CALCULATORS as a rule about this page. "Open
+	// on a worked example" earns its keep where a visitor can read the whole tool in one screen; a
+	// network editor is not that, and the thing a visitor needs first is the RANGE of what can be
+	// built, which one example cannot show.
+	//
+	// AN EXAMPLE IS A FILE, not a function. The two built-in examples are ~290 lines of drawing
+	// code (drawExampleNetwork()), which cannot carry a description or a thumbnail, cannot be
+	// authored by anyone who is not editing this file, and does not scale to a screen full of them.
+	// The shelf is dev/water-network-examples/, published to examples/ by
+	// dev/scripts/generate_examples.php together with a manifest and generated thumbnails.
+	//
+	// **OPENING ONE GIVES YOU A DOCUMENT YOU OWN.** Tom, on what HEC-RAS got right without ever
+	// saying it: *"They were your copies because you downloaded and installed them."* Ours are
+	// served rather than installed, so the equivalent is that an example lands as an ordinary new
+	// project the user may Save As -- never a read-only view of a file on our server, and never
+	// something that writes back. That is why this goes through acceptImportedText() and
+	// importProject(), the very same pair the upload path uses, rather than a loader of its own:
+	// a second import path would drift from the first, and the first is the one with the version
+	// migration, the structural repair and the storage-quota handling already in it.
+	var examplesManifest = null, examplesState = 'idle';
+	function examplesPane() { return document.getElementById('lpn_examples_pane'); }
+	// Cards are built from the manifest, which is FETCHED -- so this cannot be rendered by PHP, and
+	// a PHP copy of the list would be a second index to keep in step with the generated one.
+	function renderExamplesGallery() {
+		var pane = examplesPane(), pc = EngCalcs.pageConfig || {};
+		if (!pane) { return; }
+		pane.textContent = '';
+		if (examplesState === 'failed') {
+			// The old placeholder sentence, kept for exactly this: the gallery is the shop window,
+			// but a visitor whose network dropped the manifest still needs to be told how to start.
+			pane.appendChild(elh('p', { 'class': 'lpn-examples-msg' },
+				pc.lpn_examples_failed || pc.lpn_empty_hint || ''));
+			return;
+		}
+		if (examplesState === 'loading' || !examplesManifest) {
+			pane.appendChild(elh('p', { 'class': 'lpn-examples-msg' }, pc.lpn_examples_loading || ''));
+			return;
+		}
+		pane.appendChild(elh('h2', { 'class': 'lpn-examples-h' }, pc.lpn_examples_heading || ''));
+		pane.appendChild(elh('p', { 'class': 'lpn-examples-sub' }, pc.lpn_examples_sub || ''));
+		var grid = elh('div', { 'class': 'lpn-examples-grid' });
+		examplesManifest.forEach(function (ex) {
+			// A BUTTON, not a div with a click handler: the whole card is the target, it reaches
+			// the keyboard for free, and it announces itself to a screen reader as something that
+			// can be activated. This page is used on touch screens where a small "Open" affordance
+			// inside a big picture is the wrong hit area.
+			var card = elh('button', { type: 'button', 'class': 'lpn-example-card' });
+			if (ex.thumb) {
+				// <img> rather than inlined markup: it is cacheable, it cannot collide with the
+				// page's own ids or styles, and a broken one degrades to the title below it.
+				card.appendChild(elh('img', {
+					'class': 'lpn-example-thumb', src: 'examples/' + ex.thumb, alt: '', loading: 'lazy'
+				}));
+			}
+			card.appendChild(elh('span', { 'class': 'lpn-example-title' }, ex.title || ex.file));
+			card.appendChild(elh('span', { 'class': 'lpn-example-desc' }, ex.description || ''));
+			card.appendChild(elh('span', { 'class': 'lpn-example-meta' },
+				(pc.lpn_examples_size || '{nodes} / {links}')
+					.replace('{nodes}', ex.nodes).replace('{links}', ex.links)));
+			card.addEventListener('click', function () { openExample(ex); });
+			grid.appendChild(card);
+		});
+		pane.appendChild(grid);
+		// The way OUT of the gallery, and it has to be here rather than only in the File menu: a
+		// visitor who wants to draw their own network should not have to work out that the wall of
+		// pictures is dismissed by a menu they have not opened yet.
+		var blank = elh('button', { type: 'button', 'class': 'lpn-examples-blank' },
+			pc.lpn_examples_blank || '');
+		blank.addEventListener('click', function () { hideExamplesGallery(); });
+		pane.appendChild(blank);
+	}
+	// Dismissed for THIS project only, and not persisted. The gallery's whole job is to appear on
+	// an empty canvas; a visitor who dismissed it once a month ago and now has an empty drawing in
+	// front of them is exactly who it is for. `galleryDismissed` resets whenever a project opens.
+	//
+	// `galleryForced` is the File > Open example… route: the user asked for the wall while a
+	// network was already on screen, so "show it when the canvas is empty" is not the rule any
+	// more. Two flags rather than one tri-state because they answer different questions and both
+	// can be true -- "has this visitor waved the gallery away" and "did they just ask for it".
+	var galleryDismissed = false, galleryForced = false;
+	function showExamplesOverlay() {
+		galleryForced = true;
+		updateEmptyHint();
+	}
+	function hideExamplesGallery() {
+		galleryDismissed = true;
+		galleryForced = false;
+		updateEmptyHint();
+	}
+	function loadExamplesManifest() {
+		if (examplesState === 'loading' || examplesState === 'loaded') { return; }
+		examplesState = 'loading';
+		renderExamplesGallery();
+		fetch('examples/manifest.json', { cache: 'no-cache' })
+			.then(function (r) { if (!r.ok) { throw new Error(r.status); } return r.json(); })
+			.then(function (j) {
+				examplesManifest = (j && j.examples) || [];
+				examplesState = examplesManifest.length ? 'loaded' : 'failed';
+				renderExamplesGallery();
+			})
+			.catch(function () { examplesState = 'failed'; renderExamplesGallery(); });
+	}
+	function openExample(ex) {
+		var pc = EngCalcs.pageConfig || {};
+		logLpnFirstAction('example');
+		fetch('examples/' + ex.file, { cache: 'no-cache' })
+			.then(function (r) { if (!r.ok) { throw new Error(r.status); } return r.text(); })
+			.then(function (text) {
+				var saved = acceptImportedText(text);
+				if (!saved) { return; }
+				var id = importProject(saved);
+				if (!id) { return; }
+				// **The example's own name is the project name, not the file's.** The document
+				// carries what it should be called; deriving it from the file name here would be a
+				// third naming convention beside projectFileName() and projectNameFromFileName().
+				//
+				// It arrives SAVED, like an uploaded file and for the same reason: the user chose
+				// it from a wall, it is two clicks to get back, and an asterisk on something they
+				// have not touched is a lie. It earns the asterisk at the first edit.
+				stampProjectSaved(id);
+				galleryDismissed = false;
+				galleryForced = false; // the wall has done its job; get out of the way of the drawing
+				updateEmptyHint();
+				renderTabs();
+				setNotice((pc.lpn_status_example_opened || '')
+					.replace('{name}', projectDisplayName(project)));
+			})
+			.catch(function () {
+				examplesState = 'failed';
+				renderExamplesGallery();
+			});
+	}
+	// A tiny HTML-element helper. el() above builds SVG elements in the SVG namespace, which is
+	// wrong for a <button> -- an SVG-namespaced button is invisible to CSS and to the accessibility
+	// tree, and looks fine in the DOM inspector, which is how that mistake survives.
+	function elh(tag, attrs, text) {
+		var e = document.createElement(tag), k;
+		for (k in attrs) { if (Object.prototype.hasOwnProperty.call(attrs, k)) { e.setAttribute(k, attrs[k]); } }
+		if (text !== undefined && text !== null) { e.textContent = text; }
+		return e;
+	}
 	function updateEmptyHint() {
 		var hint = document.getElementById('lpn_empty_hint');
-		if (hint) { hint.style.display = doc.nodes.length === 0 ? 'block' : 'none'; }
+		if (!hint) { return; }
+		var empty = doc.nodes.length === 0, show = galleryForced || (empty && !galleryDismissed);
+		hint.style.display = show ? 'block' : 'none';
+		// Fetched only when it is first actually going to be seen. A returning user with a network
+		// on screen never pays for the manifest at all, which is the point of doing this here
+		// rather than at boot.
+		if (show) { loadExamplesManifest(); renderExamplesGallery(); }
 	}
 	function deleteLink(id) {
 		var l = linkById(id);
@@ -6475,6 +6628,15 @@ var EngCalcs = EngCalcs || {};
 			// extra click and every other way to start is finally reachable from the same place.
 			{ icon: 'new', label: pc.lpn_file_new || 'New project…', submenu: newProjectRows },
 			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile },
+			// **UNDER OPEN, NOT UNDER NEW** (ROADMAP Tasks 305 and 314). Tom: *"currently we are
+			// using New to 'open' examples, which is linguistically confusing"*, and on a proposed
+			// reword of the old placeholder, *"Saying it differently doesn't change the lie."* New
+			// creates something that did not exist; Open retrieves something that does. An example
+			// exists. The row placed under New was right when there were two of them and is wrong
+			// now that there is a library. Opening one drops a COPY into a new tab, which is what
+			// keeps the word honest -- see openExample().
+			{ icon: 'open', label: pc.lpn_examples_menu || 'Open example…',
+				fn: function () { galleryDismissed = false; loadExamplesManifest(); showExamplesOverlay(); } },
 			// A SEPARATE ROW FROM Open…, not a second file type on it (Task 196). Open means one of
 			// our own documents, with everything that comes with it -- a lock, a live file handle, a
 			// Save that writes back. An .inp has none of that and never will, so hiding it behind

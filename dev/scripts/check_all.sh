@@ -108,6 +108,11 @@ run_check "gloss pointers resolve"       blocking php dev/scripts/gloss_ref_chec
 run_check "layout tags match widgets" blocking php dev/scripts/layout_tag_check.php
 run_check "coverage declaration"         blocking php dev/scripts/coverage_selftest.php
 run_check "payload freshness"            blocking php dev/scripts/generate_translation_payloads.php --check
+# Task 314. The served examples/ directory is GENERATED from dev/water-network-examples/, so it can
+# go stale exactly the way the translation payloads can: someone edits an example, and the gallery
+# keeps serving the old one with no symptom until a visitor opens it. Also catches a whitelisted
+# example with no description, which is a card with a blank subtitle.
+run_check "examples library fresh"       blocking php dev/scripts/generate_examples.php --check
 
 # --- The roadmap's own integrity ---------------------------------------------------------------
 # A task ID is a permanent handle that prose cites by number; a duplicate makes every such

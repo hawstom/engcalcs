@@ -669,3 +669,75 @@ html[lang="zh"] .ec-welcome {
 .ec-legal h3 { font-size: 1.05rem; margin-top: 1rem; }
 .ec-legal-table { display: block; overflow-x: auto; border-collapse: collapse; margin: 0.5rem 0 1rem; }
 .ec-legal-table th, .ec-legal-table td { border: 1px solid #ccc; padding: 0.3rem 0.5rem; text-align: start; vertical-align: top; }
+
+/* ---- The examples gallery (ROADMAP Task 314) --------------------------------------------------
+   Sits over the map canvas when there is nothing drawn, and on demand from File > Open example.
+
+   THE WRAPPER (#lpn_empty_hint) STAYS pointer-events:none AND THE PANEL TAKES THEM BACK. That is
+   what lets the canvas behind the gallery still be panned in the gaps between the cards, so the
+   page reads as a map tool at a glance rather than as a dialog that happens to be full-bleed --
+   Tom's "usable middle": the canvas may be VISIBLE behind the gallery, empty, with no project. */
+.lpn-examples {
+	pointer-events: auto;
+	max-width: 60rem;
+	margin: 0 auto;
+	padding: 1.25rem 1rem 2rem;
+	text-align: center;
+}
+.lpn-examples-h { margin: 0 0 .15em; font-size: 1.35em; font-weight: 600; }
+.lpn-examples-sub { margin: 0 0 1.1em; opacity: .75; font-size: .95em; }
+.lpn-examples-msg { margin: 3em auto; max-width: 30em; opacity: .7; }
+/* auto-fit rather than a fixed column count, so sub-categories and paging can arrive later
+   without a rewrite (explicitly in Tom's picture, explicitly not needed at four). */
+.lpn-examples-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+	gap: .85rem;
+}
+.lpn-example-card {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: .3em;
+	padding: .6rem .6rem .7rem;
+	border: 1px solid rgba(128, 128, 128, .45);
+	border-radius: 6px;
+	background: rgba(255, 255, 255, .92);
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+}
+.lpn-example-card:hover, .lpn-example-card:focus-visible {
+	border-color: #2a6ebb;
+	box-shadow: 0 1px 6px rgba(0, 0, 0, .18);
+}
+/* currentColor in the generated SVG means the thumbnail inks itself from here, so one file is
+   legible in light and dark alike -- see thumbnailSvg() in dev/scripts/generate_examples.php. */
+.lpn-example-thumb {
+	display: block;
+	width: 100%;
+	height: 7.5rem;
+	object-fit: contain;
+	margin-bottom: .2em;
+	color: #17406b;
+}
+.lpn-example-title { font-weight: 600; }
+.lpn-example-desc { font-size: .85em; opacity: .8; line-height: 1.35; }
+.lpn-example-meta { font-size: .78em; opacity: .6; }
+.lpn-examples-blank {
+	margin-top: 1.1em;
+	border: 0;
+	background: none;
+	padding: .4em;
+	font: inherit;
+	font-size: .9em;
+	color: #17406b;
+	text-decoration: underline;
+	cursor: pointer;
+}
+@media (prefers-color-scheme: dark) {
+	.lpn-example-card { background: rgba(32, 32, 32, .92); }
+	.lpn-example-thumb, .lpn-examples-blank { color: #8ab4e8; }
+}
+/* Printing a network should print the network, never the shop window. */
+@media print { #lpn_empty_hint { display: none !important; } }

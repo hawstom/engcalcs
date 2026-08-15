@@ -198,8 +198,24 @@ echoHeader("EngCalcs", $html_title, "");
 		<?php // No template_welcome here (Tom, 2026-07-30): it already shows at the top of every
 		      // page via echoHeader(), and its link wasn't even clickable in this pointer-events:
 		      // none overlay -- redundant, not just relocatable. ?>
-		<div id="lpn_empty_hint" class="d-print-none" style="display:none;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#999;font-size:1.2em;pointer-events:none;text-align:center">
-			<?=$ec_lang['lpn_empty_hint']?>
+		<?php // THE EMPTY CANVAS IS THE SHOP WINDOW (ROADMAP Task 314, Tom 2026-08-14: "I agree with
+		      // the CC idea of using our first-visit map as an examples shop window").
+		      //
+		      // This replaces a placeholder sentence that had been on an empty canvas since
+		      // 2026-07-29 -- "a blank canvas with a placeholder on it is the dominant failure of
+		      // every map editor". Tom's own argument for why a picture beats the sentence: "'Add a
+		      // background image' is not harnessing dilettantism. 'Open an example' is." A dabbler
+		      // clicks a picture; they do not read a sentence about a menu path.
+		      //
+		      // POINTER EVENTS COME BACK ON here, unlike the placeholder that lived here before --
+		      // these are real controls, not decoration. The wrapper stays pointer-events:none so
+		      // the canvas behind the gallery is still pannable in the gaps between the cards; only
+		      // the panel itself takes clicks. It is EMPTY in the markup and filled by
+		      // renderExamplesGallery(): the manifest is fetched, so the server cannot know what
+		      // goes here, and a PHP-rendered copy of the list would be a second index to keep in
+		      // step with the generated one. ?>
+		<div id="lpn_empty_hint" class="d-print-none" style="display:none;position:absolute;inset:0;pointer-events:none;overflow:auto">
+			<div id="lpn_examples_pane" class="lpn-examples"></div>
 		</div>
 		<?php // THE BOTTOM STATUS STRIP. Both readouts in ONE flex row so their order is real rather
 		      // than two absolute boxes that happen not to collide: settings first, then the
@@ -333,6 +349,16 @@ EngCalcs.pageConfig = {
 	lpn_tool_zoom_extent: <?=json_encode($ec_lang['lpn_tool_zoom_extent'])?>,
 	lpn_tool_undo: <?=json_encode($ec_lang['lpn_tool_undo'])?>,
 	lpn_confirm_example: <?=json_encode($ec_lang['lpn_confirm_example'])?>,
+	lpn_empty_hint: <?=json_encode($ec_lang['lpn_empty_hint'])?>,
+	lpn_examples_heading: <?=json_encode($ec_lang['lpn_examples_heading'])?>,
+	lpn_examples_sub: <?=json_encode($ec_lang['lpn_examples_sub'])?>,
+	lpn_examples_open: <?=json_encode($ec_lang['lpn_examples_open'])?>,
+	lpn_examples_menu: <?=json_encode($ec_lang['lpn_examples_menu'])?>,
+	lpn_examples_blank: <?=json_encode($ec_lang['lpn_examples_blank'])?>,
+	lpn_examples_size: <?=json_encode($ec_lang['lpn_examples_size'])?>,
+	lpn_examples_failed: <?=json_encode($ec_lang['lpn_examples_failed'])?>,
+	lpn_examples_loading: <?=json_encode($ec_lang['lpn_examples_loading'])?>,
+	lpn_status_example_opened: <?=json_encode($ec_lang['lpn_status_example_opened'])?>,
 	lpn_new_text: <?=json_encode($ec_lang['lpn_new_text'])?>,
 	lpn_field_elev: <?=json_encode($ec_lang['lpn_field_elev'])?>,
 	lpn_field_elev_tip: <?=json_encode($ec_lang['lpn_field_elev_tip'])?>,

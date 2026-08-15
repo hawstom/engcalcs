@@ -1,0 +1,46 @@
+{
+    "v": 1,
+    "generated": "dev/scripts/generate_examples.php",
+    "examples": [
+        {
+            "file": "Net1-lpn.json",
+            "title": "EPANET Net1",
+            "description": "The smallest of EPANET's own three sample networks: one reservoir, a pump and a single loop. US units (gpm).",
+            "system": "us",
+            "flow": "gpm",
+            "nodes": 11,
+            "links": 13,
+            "thumb": "Net1-lpn.svg"
+        },
+        {
+            "file": "Elm-Street-Center-lpn.json",
+            "title": "Elm Street Center",
+            "description": "A commercial site's fire-flow-plus-max-day design snapshot, drawn over a CAD site plan. US units (gpm).",
+            "system": "us",
+            "flow": "gpm",
+            "nodes": 18,
+            "links": 19,
+            "thumb": "Elm-Street-Center-lpn.svg"
+        },
+        {
+            "file": "Net2-lpn.json",
+            "title": "EPANET Net2",
+            "description": "A branched distribution system with a tank, from EPANET's samples. US units (gpm).",
+            "system": "us",
+            "flow": "gpm",
+            "nodes": 36,
+            "links": 40,
+            "thumb": "Net2-lpn.svg"
+        },
+        {
+            "file": "Net3-lpn.json",
+            "title": "EPANET Net3",
+            "description": "EPANET's large sample: 97 junctions, two tanks and a river source. Worth opening to see how a real-sized model reads. US units (gpm).",
+            "system": "us",
+            "flow": "gpm",
+            "nodes": 97,
+            "links": 119,
+            "thumb": "Net3-lpn.svg"
+        }
+    ]
+}

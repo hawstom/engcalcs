@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 924,
-        "delta_key_count": 10,
+        "expected_key_count": 933,
+        "delta_key_count": 19,
         "exempt_key_count": 21,
         "exempt_keys": [
             "calc_units_us",
@@ -333,6 +333,15 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_examples_heading": "Open an example",
+        "lpn_examples_sub": "Each one opens as your own copy. Change it, save it, or start over.",
+        "lpn_examples_open": "Open",
+        "lpn_examples_menu": "Open example...",
+        "lpn_examples_blank": "Or start with a blank drawing",
+        "lpn_examples_size": "{nodes} junctions, {links} pipes",
+        "lpn_examples_failed": "The examples could not be loaded. Use File, New project to start a drawing.",
+        "lpn_examples_loading": "Loading examples...",
+        "lpn_status_example_opened": "Opened {name}. It is your copy: save it with File, Save as.",
         "lpn_engine_fetching": "Getting the EPANET solver. It is downloaded once and then kept on this device, so it works offline afterwards.",
         "lpn_engine_ready": "The EPANET solver is on this device now, and works offline.",
         "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
@@ -345,6 +354,15 @@
         "lpn_settings_label_always": "Always show labels"
     },
     "keys": {
+        "lpn_examples_heading": "Open an example",
+        "lpn_examples_sub": "Each one opens as your own copy. Change it, save it, or start over.",
+        "lpn_examples_open": "Open",
+        "lpn_examples_menu": "Open example...",
+        "lpn_examples_blank": "Or start with a blank drawing",
+        "lpn_examples_size": "{nodes} junctions, {links} pipes",
+        "lpn_examples_failed": "The examples could not be loaded. Use File, New project to start a drawing.",
+        "lpn_examples_loading": "Loading examples...",
+        "lpn_status_example_opened": "Opened {name}. It is your copy: save it with File, Save as.",
         "lpn_engine_fetching": "Getting the EPANET solver. It is downloaded once and then kept on this device, so it works offline afterwards.",
         "lpn_engine_ready": "The EPANET solver is on this device now, and works offline.",
         "lpn_engine_fetching_valve": "Getting the EPANET solver, so this valve can be worked out now and offline later.",
@@ -357,6 +375,150 @@
         "lpn_settings_label_always": "Always show labels"
     },
     "key_context": {
+        "lpn_examples_heading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Utilizați Fișier, Proiect nou pentru a deschide un exemplu. Sau începeți prin a adăuga un rezervor, o joncțiune și o conductă din bara de instrumente.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "Anulare",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_examples_sub": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Utilizați Fișier, Proiect nou pentru a deschide un exemplu. Sau începeți prin a adăuga un rezervor, o joncțiune și o conductă din bara de instrumente.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "Anulare",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_examples_open": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Utilizați Fișier, Proiect nou pentru a deschide un exemplu. Sau începeți prin a adăuga un rezervor, o joncțiune și o conductă din bara de instrumente.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "Anulare",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_examples_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Utilizați Fișier, Proiect nou pentru a deschide un exemplu. Sau începeți prin a adăuga un rezervor, o joncțiune și o conductă din bara de instrumente.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "Anulare",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_examples_blank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Utilizați Fișier, Proiect nou pentru a deschide un exemplu. Sau începeți prin a adăuga un rezervor, o joncțiune și o conductă din bara de instrumente.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "Anulare",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_examples_size": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Utilizați Fișier, Proiect nou pentru a deschide un exemplu. Sau începeți prin a adăuga un rezervor, o joncțiune și o conductă din bara de instrumente.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "Anulare",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_examples_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Utilizați Fișier, Proiect nou pentru a deschide un exemplu. Sau începeți prin a adăuga un rezervor, o joncțiune și o conductă din bara de instrumente.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "Anulare",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_examples_loading": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Utilizați Fișier, Proiect nou pentru a deschide un exemplu. Sau începeți prin a adăuga un rezervor, o joncțiune și o conductă din bara de instrumente.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "Anulare",
+                    "english": "Undo"
+                }
+            }
+        },
+        "lpn_status_example_opened": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Utilizați Fișier, Proiect nou pentru a deschide un exemplu. Sau începeți prin a adăuga un rezervor, o joncțiune și o conductă din bara de instrumente.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_tool_undo",
+                    "value": "Anulare",
+                    "english": "Undo"
+                }
+            }
+        },
         "lpn_engine_fetching": {
             "reason": "missing",
             "current_value": null,
