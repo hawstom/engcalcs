@@ -108,3 +108,30 @@ one, and they fail in different directions.
 
 ROADMAP Task 325 (sizing), Task 175 (a real printable version), Task 253 (clean map for
 screenshots), and the import heuristic in `docFromInp()` which is the stopgap this would replace.
+
+---
+
+# Label visibility, and why the paper paradigm makes it sayable
+
+Tom, 2026-08-14, describing how GIS does it:
+
+> For visibility and non-visibility of labels, what you do is specify a zoom threshold in terms of
+> how many units wide the map is. If there are fewer than that many units side to side on the map,
+> labels appear. If more, they don't. This isn't the most intuitive thing to communicate… An
+> alternative could be "Show when zoomed in to a map width less than ___." Same math.
+
+He is right that it is the standard mechanism and right that it communicates badly. **But it
+communicates badly only in map units** — and that is the same defect as the text size, in a second
+place. "Show labels when the map is under 4,000 units wide" requires the reader to know what a unit
+is here, how wide their model is, and to do arithmetic.
+
+**Under the paper paradigm the same control states itself**: *show labels at 1:500 and closer.* No
+arithmetic, no model-specific number, and it is the sentence an engineer already says out loud. The
+math is identical; the frame is what makes it speakable.
+
+That is a second, independent argument for Task 326, and worth more than the sizing argument alone:
+**a paradigm that makes an unrelated control intuitive is describing something real about the
+domain.**
+
+Related: at 97 nodes the clutter is the labels, not their size. Scale-dependent visibility and the
+Labels panel are the same tool from two directions — one hides by *zoom*, the other by *field*.

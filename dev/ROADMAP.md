@@ -498,6 +498,45 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     never syntax-checked. Given Task 318 lives entirely in `sw.js`, that is a gap worth one
     character of glob. **DONE 2026-08-14** — glob widened; the rest of this task stands.
 
+- 55|327| **A THEMATIC view: colour the network BY VALUE, as an explicit mode.** Tom, 2026-08-14, on
+  EPANET: *"it's practically an act of Congress to get a pipe to show as black while showing values
+  from the model on the map… this makes some sense if you consider a huge model zoomed far out where
+  you just want to see a bunch of colours indicating high and low values… in their paradigm, the map
+  seems to be a high level gradient view of the system."*
+  - **We do not have EPANET's problem, and that is the point.** Our pipes are already dark (`#557`),
+    and `lpnFieldColors` encodes **WHICH QUANTITY a number is**, not how much — a different axis
+    entirely. So the fix EPANET users want is our default, and what we lack is the thing their
+    default is good at.
+  - **So build the gradient view as a MODE, not as a default.** Two honest products: a DRAWING (dark
+    linework, labels, what you plot) and a THEMATIC MAP (colour ramp by a chosen field, no labels,
+    what you read at a glance across 97 nodes). EPANET's mistake is not having colour — it is having
+    only one mode and making the other one hard.
+  - Toggling it should be one control naming the field, not a colour picker. Pressure and velocity
+    are the two that matter; a ramp needs a legend, which the Labels panel already has a home for.
+  - Connects to Task 253 (clean map for screenshots) — a thematic view with no labels IS the clean
+    map, arrived at from the other side.
+
+- 58|328| **Label dragging should move the LEADER'S ENDPOINT, not the label's offset.** Tom,
+  2026-08-14: *"dragging needs to be modified so that when you start to drag an item, you are really
+  dragging the end point of the leader, and the label flips rather than the leader flipping. And…
+  the end point of the leader you choose will be the fixed end point of the leader at multiple zoom
+  levels, and possibly shortened at the same angle."*
+  - **Today a dragged label stores `lb.x/lb.y` as a MAP-UNIT OFFSET from its anchor**
+    (`js/looped-network.js`, the drag handler). So a placement chosen at one zoom is a different
+    screen distance at every other zoom — the same map-units-are-not-comparable defect as the text
+    size, in a third place. Tom's proposal replaces the stored quantity: an ANGLE and an attachment
+    point survive zoom, a distance in map units does not.
+  - **"The label flips rather than the leader flipping"** is the part worth preserving verbatim. The
+    leader's direction is the user's decision and must be stable; which SIDE of it the text sits on
+    is a layout consequence, and should be free to flip so the text never crosses its own leader.
+  - **The open question is when dragging applies at all**, and Tom names both candidates without
+    choosing: either placement is decided once and reused at every zoom, or it is decided
+    per-zoom-band until labels are hidden entirely. The first is simpler and matches a drawing; the
+    second matches a GIS. Decide it alongside Task 326, since scale-dependent visibility is the same
+    question wearing a different hat.
+  - `LPN_CALLOUT_ANGLE` (70°) and the existing collision avoidance already assume a leader has a
+    direction, so the machinery is half there.
+
 - 92|326| **PARADIGM: size text and symbols in PRINTED units, not real-world units.** Tom,
   2026-08-14: *"the end product of all text and symbols is in printed units… engineers and architects
   achieve precise control of prints by fixing the printed scale early… but these heights are
