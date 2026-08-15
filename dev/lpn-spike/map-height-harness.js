@@ -119,13 +119,59 @@ console.log('\n--- the floor still holds, because a 60px map is not a map ---');
 	report(h > 400 - 300, '...even though that means the page scrolls, which is the deliberate part');
 }
 
+// --- A RESIZE MUST NOT SLIDE THE DRAWING -------------------------------------
+// The world transform anchors content at the TOP-LEFT, so a canvas that grows by 12px reveals 12
+// more at the bottom and moves everything relative to the frame. That is what a tab return looked
+// like ("zoom changes for Net3 when I go to another tab and then return") and what a window resize
+// had always done. Half the delta on each axis keeps the view CENTRE fixed.
+console.log('\n--- resizing the canvas keeps the view centre, and tiny changes are ignored ---');
+{
+	// A canvas whose rect follows whatever height is written to it, so applyMapHeight() can be run
+	// for real rather than inspected as text.
+	function fakeCanvas(h) {
+		var el = { _h: h, _w: 1400, attrs: {} };
+		el.getBoundingClientRect = function () { return { top: 180, bottom: 180 + el._h, width: el._w, height: el._h }; };
+		el.setAttribute = function (k, v) { el.attrs[k] = v; if (k === 'height') { el._h = Number(v); } };
+		return el;
+	}
+	function run(env) {
+		var svg = fakeCanvas(env.h0), state = { tx: env.tx || 0, ty: env.ty || 0, s: 1 }, transforms = 0;
+		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'state', 'setTransform',
+			extract('flowBelowMap') + '\n' + extract('effectiveMapHeight') + '\n' +
+			src.slice(src.indexOf('var LPN_MAP_HEIGHT_DEADBAND'), src.indexOf('function applyLegendPosition')) +
+			'\nreturn applyMapHeight();');
+		fn({ innerHeight: env.vh, pageYOffset: 0 },
+			{ documentElement: { scrollTop: 0 }, body: { getBoundingClientRect: function () { return { bottom: env.bodyBottom }; } } },
+			svg, MIN, state, function () { transforms++; });
+		return { h: svg._h, state: state, transforms: transforms };
+	}
+	// The canvas is 600 tall and the window has room for 682. Growing it by 82 must show 41 more at
+	// the top and 41 more at the bottom, not 82 more at the bottom.
+	var grown = run({ vh: 900, h0: 600, bodyBottom: 810, ty: 0 });
+	report(grown.h === 682, 'the canvas takes the height the measurement asks for', grown.h);
+	report(grown.state.ty === 41, '...and the view centre stays put, half the delta on each side',
+		grown.state.ty);
+	report(grown.transforms === 1, '...applied once, not per frame', grown.transforms);
+	// Shrinking goes the other way, by the same rule.
+	var shrunk = run({ vh: 500, h0: 600, bodyBottom: 810, ty: 0 });
+	report(shrunk.h < 600 && shrunk.state.ty === (shrunk.h - 600) / 2,
+		'shrinking moves the centre the other way by half the delta', shrunk.h + ' -> ty ' + shrunk.state.ty);
+	// SUB-PIXEL CHURN IS NOT A CHANGE. Layout settles differently after fonts load or a tab returns,
+	// and re-applying a height half a pixel different would move the drawing for no visible reason.
+	// Sub-pixel on purpose: 682.4 against a computed 682. Without the dead band the attribute is
+	// rewritten every single time the page is measured, which is every resize and every tab return.
+	var same = run({ vh: 900, h0: 682.4, bodyBottom: 892.4 });
+	report(same.h === 682.4 && same.transforms === 0 && same.state.ty === 0,
+		'a height that has not really changed is not even written', same.h + ' ty ' + same.state.ty);
+}
+
 console.log('\n--- an element with no layout box is not measured at all ---');
 {
 	// applyMapHeight() returns before touching the height when the rect is empty: a hidden tab or a
 	// display:none ancestor reports zeros, and zeros are not a measurement. The last good height
 	// stays, which is what makes coming back to the tab a no-op instead of a resize.
 	const body = extract('applyMapHeight');
-	report(/getBoundingClientRect\(\)/.test(body) && /!r\.width && !r\.height/.test(body),
+	report(/getBoundingClientRect\(\)/.test(body) && /!before\.width && !before\.height/.test(body),
 		'applyMapHeight refuses to size from an empty rect');
 	report(body.indexOf('return;') < body.indexOf("setAttribute('height'"),
 		'...and it returns BEFORE writing a height, not after');

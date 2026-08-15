@@ -75,9 +75,21 @@ session of its own with nothing else in it.
     being hit by a rounding problem on the map size."* The second half is worth checking on its own
     — `visibleMapWidth()` divides by `state.s`, and at scale 500 on 1.3e6 coordinates that quotient
     is doing the same float arithmetic everything else here is.
+  - **AND IT IS NOT AN ABSURD ZOOM — THE ARITHMETIC PREDICTS THE ZOOM HE ACTUALLY SAW** (Tom,
+    2026-08-15: *"I notice that the map is still 30 wide. So this isn't a ridiculous zoom-in."*).
+    Float32 spacing is 0.0625 units at Elm Street's x (5.8e5) and **0.125 at its y (1.3e6)**. A map
+    30 units wide on a ~1400 px canvas is scale ≈ 47, so the 3 px pipe is 3/47 = **0.064 world
+    units — at the quantum**. Widening it to 20 px gives 0.43, comfortably above, which is exactly
+    why 20 worked at that zoom; three times closer (scale ≈ 140) puts 20 px back at 0.14 ≈ the
+    quantum and it fails again, and the 11 px text is 0.079 by then, which is when the labels went
+    too. Every observation he reported falls out of one number.
+  - **So the working limit on this model is about 47x, and on a model drawn near the origin it
+    would be about 11,000x.** The coordinates' magnitude is the whole of it, which is the argument
+    for the render origin over anything cheaper.
   - Only affects models far from the origin. Our own examples sit at ~5,000 and Net1/2/3 at 0-100,
     which is why this never showed until a real client model was imported — and it is exactly the
-    class of model LibreEPANET.org exists for, so it gates nothing formally but it should.
+    class of model LibreEPANET.org exists for, so it gates nothing formally but it should. **It is
+    the highest-priority open task in this file.**
 
 - 60|353| **Find elements by searching for them.** Tom, 2026-08-15. One text input, an "Elements to
   search" pull-down (all / junctions / pipes / …) and a Condition pull-down, roughly the shape of a
@@ -1851,8 +1863,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   from an empty rect, which is what a hidden tab reports. `visibilitychange` re-measures on return —
   the likely cause of Tom's *"Zoom changes for Net3 when I go to another tab and then return"*, since
   nothing on that path touches `state.s` and only the canvas size can change what you see.
-  `dev/lpn-spike/map-height-harness.js`, 10 checks. **Not reproduced in a browser — the mechanism is
-  inferred from the arithmetic, so if it recurs, the console error is the next thing to look at.**
+  **A RESIZE ALSO STOPPED SLIDING THE DRAWING**, which is what remained of the tab-return complaint
+  after the guards landed (Tom: *"Still changing a little"*). The world transform anchors content at
+  the TOP-LEFT, so a canvas that grows by 12 px revealed 12 px more at the bottom and moved
+  everything relative to the frame — a window resize had always done this too. Half the delta goes
+  into `state.tx`/`state.ty`, so the view CENTRE stays put, and a 1 px dead band stops sub-pixel
+  churn from writing a height at all. `dev/lpn-spike/map-height-harness.js`, 15 checks, every guard
+  mutation-tested. **Not reproduced in a browser — the mechanism is inferred from the arithmetic, so
+  if it recurs, the console error is the next thing to look at.**
 
 - 0|351| **A readability-bias angle for aligned pipe labels — DONE 2026-08-15.**
   `settings.labelReadabilityBias`, default **110 degrees**, in Settings ▸ Map under the align

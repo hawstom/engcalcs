@@ -9064,17 +9064,37 @@ var EngCalcs = EngCalcs || {};
 		room = Math.min(room, vh - 8);
 		return Math.max(LPN_MAP_MIN, room);
 	}
+	// A canvas resize must not slide the drawing, and until 2026-08-15 it did. The world transform
+	// anchors content at the TOP-LEFT, so growing the canvas by 12px revealed 12px more at the
+	// bottom and moved everything relative to the frame -- which is what Tom saw as *"zoom changes
+	// for Net3 when I go to another tab and then return"*, and what a window resize has always done.
+	// Half the delta on each axis keeps the view CENTRE where it was, which is what every map
+	// application does and what makes a resize feel like a window changing rather than a pan.
+	var LPN_MAP_HEIGHT_DEADBAND = 1;
 	function applyMapHeight() {
 		if (!svg) { return; }
 		// NOT LAID OUT YET, so every measurement below is a fiction -- a hidden tab, a display:none
 		// ancestor, or a call before first layout. Doing nothing leaves the last good height in
 		// place, which is strictly better than replacing it with an answer derived from zeros.
-		var r = svg.getBoundingClientRect();
-		if (!r.width && !r.height) { return; }
+		var before = svg.getBoundingClientRect();
+		if (!before.width && !before.height) { return; }
 		// Measure with the CURRENT height already applied, then apply the answer. flowBelowMap()
 		// reads scrollHeight, which includes the canvas itself, so the two cancel -- but only if
 		// nothing else moved in between, which is why this is one statement and not a loop.
-		svg.setAttribute('height', effectiveMapHeight());
+		var h = effectiveMapHeight();
+		// A DEAD BAND, because sub-pixel churn is not a change worth making. Layout settles slightly
+		// differently after fonts load, after a tab comes back, after a scrollbar appears -- and
+		// re-applying a height that differs by half a pixel would move the drawing for no reason a
+		// reader could name.
+		if (Math.abs(h - before.height) < LPN_MAP_HEIGHT_DEADBAND) { return; }
+		svg.setAttribute('height', h);
+		var after = svg.getBoundingClientRect(),
+			dw = after.width - before.width,
+			dh = after.height - before.height;
+		if (Math.abs(dw) > 0.5 || Math.abs(dh) > 0.5) {
+			state.tx += dw / 2; state.ty += dh / 2;
+			setTransform();
+		}
 	}
 	function applyLegendPosition() {
 		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }
