@@ -715,7 +715,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Keeps the useful floor: a Text label at 1× has exactly the data labels' threshold, so nothing
     authored vanishes while anything generated is still drawn.
 
-- 92|326| **PARADIGM: size text and symbols in PRINTED units, not real-world units.** Tom,
+- 98|326| **PARADIGM: size text and symbols in PRINTED units, not real-world units.** Tom,
   2026-08-14: *"the end product of all text and symbols is in printed units… engineers and architects
   achieve precise control of prints by fixing the printed scale early… but these heights are
   calibrated to printed heights."* A drawing declares a scale; text is specified as a height on
@@ -768,7 +768,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Related and unfiled until Tom rules: a toggle for label background masking, and search within a
     large model.
 
-- 85|317| **Push Base values to all scenarios PER ELEMENT, not only per property.** Tom, 2026-08-14,
+- 97|317| **Push Base values to all scenarios PER ELEMENT, not only per property.** Tom, 2026-08-14,
   looking at the shipped scenario menu: *"I assume that Apply Base values to all scenarios will be
   fine-grained; each property or element (maybe start only with the element level, will have a way
   to Apply values to all scenarios."*
@@ -801,7 +801,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     not there for symmetry, which is never a reason on its own: it is there because pushing a
     value down is a real action a user needs, and Base is the only place standing where that
     action makes sense.
-- 80|314| **An EXAMPLES LIBRARY, on the HEC-RAS model: a pane of many examples, not a menu of two.**
+- 96|314| **An EXAMPLES LIBRARY, on the HEC-RAS model: a pane of many examples, not a menu of two.**
   Tom, 2026-08-14: *"I envision a stunning array of examples that fills a screen with mere titles or
   brief descriptions and could span pages or sub-categories of large thumbnails… Therefore it is
   some sort of an Examples library or pane. And you probably get there using File Open Examples."*
