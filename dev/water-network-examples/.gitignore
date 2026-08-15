@@ -20,6 +20,8 @@
 
 # The shipped examples (ROADMAP Task 314). Each of these is a saved project of ours, cleared for
 # publication, and each is a file the examples gallery serves.
+!Basic-example-US-units-lpn.json
+!Basic-example-SI-units-lpn.json
 !Net1-lpn.json
 !Net2-lpn.json
 !Net3-lpn.json

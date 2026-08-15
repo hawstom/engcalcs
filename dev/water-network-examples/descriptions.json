@@ -1,6 +1,14 @@
 {
 	"_note": "Titles and descriptions for the examples gallery (ROADMAP Task 314). Keyed by file name. Everything else in the manifest is DERIVED from the project itself by dev/scripts/generate_examples.php -- node and link counts, unit system, thumbnail -- so this file holds only what a machine cannot work out. A description is what makes a wall of titles browsable; it should say what the network IS and what it is good for looking at, not restate the counts sitting beside it. Keep them to one line: they are card subtitles, not documentation.",
 
+	"Basic-example-US-units-lpn.json": {
+		"title": "Basic network, US units",
+		"description": "A reservoir, a pump and a short branched system. The smallest thing that shows how the drawing works. US units (gpm)."
+	},
+	"Basic-example-SI-units-lpn.json": {
+		"title": "Basic network, SI units",
+		"description": "The same starting network drawn in metres and litres per second. SI units (l/s)."
+	},
 	"Net1-lpn.json": {
 		"title": "EPANET Net1",
 		"description": "The smallest of EPANET's own three sample networks: one reservoir, a pump and a single loop. US units (gpm)."

@@ -3,6 +3,26 @@
     "generated": "dev/scripts/generate_examples.php",
     "examples": [
         {
+            "file": "Basic-example-SI-units-lpn.json",
+            "title": "Basic network, SI units",
+            "description": "The same starting network drawn in metres and litres per second. SI units (l/s).",
+            "system": "si",
+            "flow": "lps",
+            "nodes": 8,
+            "links": 7,
+            "thumb": "Basic-example-SI-units-lpn.svg"
+        },
+        {
+            "file": "Basic-example-US-units-lpn.json",
+            "title": "Basic network, US units",
+            "description": "A reservoir, a pump and a short branched system. The smallest thing that shows how the drawing works. US units (gpm).",
+            "system": "us",
+            "flow": "gpm",
+            "nodes": 8,
+            "links": 7,
+            "thumb": "Basic-example-US-units-lpn.svg"
+        },
+        {
             "file": "Net1-lpn.json",
             "title": "EPANET Net1",
             "description": "The smallest of EPANET's own three sample networks: one reservoir, a pump and a single loop. US units (gpm).",

@@ -1,0 +1,357 @@
+{
+	"format": "hawsedc-lpn",
+	"app": "https://hawsedc.com/engcalcs/Looped-Network.php",
+	"v": 6,
+	"project": {
+		"name": "Basic example SI units",
+		"activeScenario": "base",
+		"docId": "dmstw767wUsHbYfxg"
+	},
+	"scenarios": [
+		{
+			"id": "base",
+			"name": "Base",
+			"isBase": true,
+			"overrides": {}
+		}
+	],
+	"nodes": [
+		{
+			"id": "R1",
+			"type": "reservoir",
+			"x": 4300,
+			"y": 5000,
+			"elev": 15
+		},
+		{
+			"id": "J1",
+			"type": "junction",
+			"x": 4500,
+			"y": 5000,
+			"elev": 14,
+			"_demand": 0
+		},
+		{
+			"id": "J2",
+			"type": "junction",
+			"x": 4800,
+			"y": 5350,
+			"elev": 17,
+			"_demand": 4
+		},
+		{
+			"id": "J3",
+			"type": "junction",
+			"x": 5400,
+			"y": 5300,
+			"elev": 19,
+			"_demand": 5
+		},
+		{
+			"id": "J4",
+			"type": "junction",
+			"x": 5700,
+			"y": 4850,
+			"elev": 18,
+			"_demand": 3
+		},
+		{
+			"id": "J5",
+			"type": "junction",
+			"x": 5000,
+			"y": 4650,
+			"elev": 16,
+			"_demand": 3
+		},
+		{
+			"id": "R2",
+			"type": "reservoir",
+			"x": 4900,
+			"y": 4920,
+			"elev": 60
+		},
+		{
+			"id": "J6",
+			"type": "junction",
+			"x": 5320,
+			"y": 4920,
+			"elev": 18,
+			"_demand": 6
+		}
+	],
+	"links": [
+		{
+			"id": "P1",
+			"type": "pump",
+			"from": "R1",
+			"to": "J1",
+			"verts": [],
+			"_diameter": 4,
+			"_roughness": 100,
+			"_length": 200,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2,
+			"curvePoints": [
+				[
+					0,
+					50
+				],
+				[
+					15,
+					42
+				],
+				[
+					30,
+					18
+				]
+			],
+			"curveRef": null,
+			"h0": 50,
+			"a": 35555.555555555555,
+			"b": 2
+		},
+		{
+			"id": "L1",
+			"type": "pipe",
+			"from": "J1",
+			"to": "J2",
+			"verts": [],
+			"_diameter": 150,
+			"_roughness": 130,
+			"_length": 460.9772228646443,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L2",
+			"type": "pipe",
+			"from": "J2",
+			"to": "J3",
+			"verts": [],
+			"_diameter": 150,
+			"_roughness": 130,
+			"_length": 602.0797289396147,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L3",
+			"type": "pipe",
+			"from": "J3",
+			"to": "J4",
+			"verts": [],
+			"_diameter": 150,
+			"_roughness": 130,
+			"_length": 540.8326913195984,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L4",
+			"type": "pipe",
+			"from": "J4",
+			"to": "J5",
+			"verts": [
+				{
+					"x": 5550,
+					"y": 4700
+				},
+				{
+					"x": 5250,
+					"y": 4700
+				}
+			],
+			"_diameter": 150,
+			"_roughness": 130,
+			"_length": 767.0830100356036,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L5",
+			"type": "pipe",
+			"from": "J5",
+			"to": "J1",
+			"verts": [
+				{
+					"x": 4650,
+					"y": 4750
+				}
+			],
+			"_diameter": 150,
+			"_roughness": 130,
+			"_length": 655.5530892062909,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		},
+		{
+			"id": "L6",
+			"type": "pipe",
+			"from": "R2",
+			"to": "J6",
+			"verts": [],
+			"_diameter": 150,
+			"_roughness": 130,
+			"_length": 420,
+			"lenAuto": true,
+			"_status": "open",
+			"_k": 2
+		}
+	],
+	"labels": [
+		{
+			"id": "X1",
+			"text": "HawsEDC Calculators",
+			"x": 5012.227533983329,
+			"y": 5217.524631094085,
+			"anchorNode": null,
+			"sizeMult": 4
+		},
+		{
+			"id": "X2",
+			"text": "Water Supply Network",
+			"x": 5016.482659023277,
+			"y": 5172.566389191363,
+			"anchorNode": null,
+			"sizeMult": 2
+		},
+		{
+			"id": "X3",
+			"text": "SI Units",
+			"x": 5011.586040611643,
+			"y": 5131.579462401478,
+			"anchorNode": null,
+			"sizeMult": 2
+		},
+		{
+			"id": "X4",
+			"text": "Reservoir",
+			"x": -62.866516699866224,
+			"y": 29.744382128753386,
+			"anchorNode": "R1",
+			"sizeMult": 1.5
+		},
+		{
+			"id": "X5",
+			"text": "Lowest pressure",
+			"x": -108.13929914592245,
+			"y": -45.215287726381575,
+			"anchorNode": "J3",
+			"sizeMult": 1.5
+		},
+		{
+			"id": "X6",
+			"text": "Pipe vertex",
+			"x": 4602.720437143738,
+			"y": 4737.940644037533,
+			"anchorNode": null,
+			"sizeMult": 1
+		}
+	],
+	"nextId": {
+		"J": 7,
+		"R": 3,
+		"T": 1,
+		"L": 7,
+		"P": 2,
+		"V": 1,
+		"X": 7
+	},
+	"labelSettings": {
+		"node": {
+			"id": true,
+			"elev": true,
+			"demand": true,
+			"head": false,
+			"pressure": true
+		},
+		"link": {
+			"id": true,
+			"diameter": true,
+			"length": false,
+			"roughness": false,
+			"km": false,
+			"flow": true,
+			"velocity": true,
+			"headloss": false,
+			"gradient": false
+		},
+		"decimals": {
+			"node": {
+				"demand": 2,
+				"head": 2,
+				"pressure": 2,
+				"elev": 2
+			},
+			"link": {
+				"diameter": 0,
+				"length": 2,
+				"roughness": 0,
+				"km": 2,
+				"flow": 2,
+				"velocity": 2,
+				"headloss": 2,
+				"gradient": 4
+			}
+		},
+		"markExtrema": true
+	},
+	"backdrop": null,
+	"settings": {
+		"idPrefixes": {
+			"J": "J",
+			"R": "R",
+			"T": "T",
+			"L": "L",
+			"P": "P",
+			"V": "V",
+			"X": "X"
+		},
+		"emitterExponent": 0.5,
+		"tolerance": 1e-09,
+		"engine": "epanet",
+		"defaults": {
+			"nodeElev": 0,
+			"demand": 0,
+			"diameter": 4,
+			"roughness": 100,
+			"k": 2,
+			"tankLevel": 20,
+			"tankMinLevel": 0,
+			"tankMaxLevel": 30,
+			"tankDiameter": 50
+		},
+		"sectionsOpen": {
+			"idPrefixes": false,
+			"defaults": false,
+			"mapDisplay": true,
+			"computation": true,
+			"files": false
+		},
+		"textSize": 9,
+		"symbolSize": 7,
+		"linkWidth": 2,
+		"symbolOpacity": 1,
+		"backdropOpacity": 0.5,
+		"labelMaxWidth": 2650,
+		"alignPipeLabels": true,
+		"legendPosition": "top-right",
+		"mapHeight": 900,
+		"method": "hw"
+	},
+	"units": {
+		"lpn_u_length": "m",
+		"lpn_u_elevhead": "mh2o",
+		"lpn_u_pressure": "mh2o",
+		"lpn_u_diameter": "mm",
+		"lpn_u_flow": "lps",
+		"lpn_u_velocity": "mps",
+		"lpn_u_gradient": "gradePercent"
+	}
+}
