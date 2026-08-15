@@ -3540,6 +3540,24 @@ var EngCalcs = EngCalcs || {};
 		};
 	}
 
+	// A legible starting text size for a model whose coordinate scale we have never seen. Falls back
+	// to the current setting when a model has no extent to measure (one node, or all coincident),
+	// because a guess is worse than the status quo there.
+	function importTextSize(nodes) {
+		var xs = [], ys = [], i;
+		for (i = 0; i < nodes.length; i++) {
+			if (typeof nodes[i].x === 'number' && typeof nodes[i].y === 'number') {
+				xs.push(nodes[i].x); ys.push(nodes[i].y);
+			}
+		}
+		if (xs.length < 2) { return settings.textSize; }
+		var w = Math.max.apply(null, xs) - Math.min.apply(null, xs),
+			h = Math.max.apply(null, ys) - Math.min.apply(null, ys),
+			diag = Math.sqrt(w * w + h * h);
+		if (!(diag > 0)) { return settings.textSize; }
+		return +(diag / 40).toPrecision(2);
+	}
+
 	/**
 	 * The parsed .inp as a saved document, ready for importProject().
 	 *
@@ -3677,7 +3695,19 @@ var EngCalcs = EngCalcs || {};
 			nodes: nodes, links: links, labels: labels, nextId: next,
 			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
 			backdrop: null,   // an .inp names an image file; it never carries one. See the report.
-			settings: JSON.parse(JSON.stringify(settings)),
+			// TEXT SIZE IS DERIVED FROM THE MODEL, not inherited from whatever the last project
+			// needed. settings.textSize is in MAP UNITS, and every model brings its own coordinate
+			// scale: Net1 spans 60x80 units, Net3 spans 37x31, a state-plane survey model spans tens
+			// of thousands. Carrying the previous project's number across meant a correct import
+			// could render INVISIBLE -- which is worse than failing, because there is nothing on
+			// screen to act on. Tom hit exactly that with Net3 at a size of 0.2 (2026-08-14).
+			//
+			// A fortieth of the diagonal is not a tuned constant; it is a starting value that reads
+			// sensibly across the three scales above and is a one-line change. Everything else in
+			// `settings` is still inherited, deliberately -- units, method and ID prefixes are the
+			// user's working preferences and have nothing to do with the file's geometry.
+			settings: Object.assign(JSON.parse(JSON.stringify(settings)),
+				{ textSize: importTextSize(nodes) }),
 			units: readUnitSelections()
 		};
 	}

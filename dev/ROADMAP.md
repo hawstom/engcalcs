@@ -498,6 +498,35 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     never syntax-checked. Given Task 318 lives entirely in `sw.js`, that is a gap worth one
     character of glob. **DONE 2026-08-14** — glob widened; the rest of this task stands.
 
+- 88|325| **A successful import can render INVISIBLE, and the sizing paradigm is why.** Tom, 2026-08-14,
+  after Net3 imported correctly and showed nothing: *"the text size for Net3.inp was so small (0.2)
+  that nothing was visible even though the import was successful."* An import that works and looks
+  broken is worse than one that fails, because there is nothing to act on.
+  - **The cause is that `settings.textSize` is in MAP UNITS while every model has its own coordinate
+    scale.** Measured: Net1 spans 60x80 units, Net3 spans **37x31**, and a real survey model in state
+    plane spans tens of thousands. `docFromInp()` copies the CURRENT settings into the new document,
+    so whatever text size the last project needed is inherited by a model it means nothing for.
+    There is no size that is right for all three, and no warning when it is wrong.
+  - **Fix the import first**: derive an initial text size from the model's own extent (roughly
+    1/40th of the diagonal reads about right across Net1, Net3 and a state-plane model), so any
+    imported network is legible on arrival. Cheap, contained, and it removes the failure mode where
+    a correct import looks like a broken one.
+  - **THE REAL QUESTION IS THE PARADIGM, and Tom has asked for fresh thinking rather than a copy of
+    EPANET.** Today `symbolFactor() = textFactor() x symbolScale`: symbols are DERIVED from the text
+    size, with a multiplier to pull them apart. He wants them independent: *"I found myself wanting
+    to control symbol size and text size independently instead of having them linked."*
+    - The link was not arbitrary -- it exists so a drawing scales as one thing when the text grows,
+      which is right for a 20-node design sketch and wrong for a 97-node imported model where the
+      symbols carry the topology and the labels are secondary.
+    - **`textSizeUnits` already offers 'map' vs 'screen'**, and screen units are scale-independent by
+      construction. That may be the better DEFAULT for an imported model, and it is worth asking
+      whether the map/screen choice and the size are really two settings or one.
+    - Worth weighing before building: at 97 nodes the labels are the clutter, so what a large model
+      wants may not be smaller text but FEWER labels -- which is the Labels panel, already built.
+      Tom's own "maintenance / GIS-style viewing" note points the same way.
+  - Related and unfiled until Tom rules: a toggle for label background masking, and search within a
+    large model.
+
 - 90|324| **Scenario overrides collide between a NODE and a LINK that share an id — and EPANET files
   do that constantly.** Found by Tom, 2026-08-14: *"When I changed a demand, a remote pipe changed
   to orange along with the node. The pipe has no changes."* He is right, and the halo is the
