@@ -182,6 +182,55 @@ var EngCalcs = EngCalcs || {};
 		return Geom.dodgeAlongPolyline(linkPointList(l), along === undefined ? LINK_LABEL_ALONG : along,
 			arrowAlongDistances(l), clear, 0.12, 0.88);
 	}
+	// ---- A LONG PIPE CARRIES ITS LABEL SEVERAL TIMES (Tom, 2026-08-15) -------------------------
+	//
+	// His spec, verbatim and unaltered: *"Set VD = max(map width, map height) and L = pipe length.
+	// Instead of putting 1 link label at midpoint of link, put n = ceiling(L/(0.25*VD)) with
+	// 0.25*VD spacing (friendly spec: 'Link labels spacing = 25% of view size')."*
+	//
+	// This is the other half of the GIS convention Task 329 brought in. A road name is not written
+	// once in the middle of a highway; it is repeated along it, so that whatever piece of the line
+	// you are looking at names itself without your eye having to travel. One label at the midpoint
+	// is the convention that fails exactly when the drawing gets big enough to need it.
+	//
+	// THE SPACING IS IN VIEW UNITS, NOT MODEL UNITS, AND THAT IS THE WHOLE DESIGN. A quarter of the
+	// view means "about four labels across the screen" on every network ever drawn -- a 400 ft
+	// subdivision and a 40 mile transmission main both read the same way, and neither needs a number
+	// typed by anybody. It also means the count re-derives on every zoom, which it does: a zoom runs
+	// refreshFontSizes(), which ends in refreshLabelText().
+	//
+	// n = 1 REPRODUCES TODAY EXACTLY. The stations are (i + 0.5)/n, so a single label lands at 0.5,
+	// which is LINK_LABEL_ALONG -- the whole existing single-label path, the arrow dodge and the
+	// aligned-label station search are untouched on any pipe shorter than a quarter of the view.
+	var LPN_LABEL_REPEAT_FRAC = 0.25;
+	// A CAP THE SPEC DOES NOT MENTION, because the formula is unbounded as you zoom in: VD shrinks
+	// with the view, so a pipe 500 times the width of the current view asks for 500 labels of which
+	// four are on screen. Twelve covers three full view-spans in each direction, so panning never
+	// arrives at an unlabelled stretch, and it bounds the DOM at high zoom where the arithmetic
+	// would otherwise run away. Past the cap the stations spread evenly over the whole pipe rather
+	// than holding the spacing and clustering in the middle -- sparse everywhere beats correct in
+	// one place and absent at both ends.
+	var LPN_LABEL_REPEAT_MAX = 12;
+	function visibleMapHeight() {
+		var h = svg && svg.clientHeight ? svg.clientHeight : 0;
+		return h / (state.s || 1);
+	}
+	function labelRepeatSpacing() {
+		return LPN_LABEL_REPEAT_FRAC * Math.max(visibleMapWidth(), visibleMapHeight());
+	}
+	// The fractions along one pipe at which its label is drawn. Always at least one entry, and
+	// exactly one entry unless the pipe is longer than the spacing.
+	//
+	// A MANUALLY DRAGGED LABEL IS NEVER REPEATED. The user put that label in that spot; copying it
+	// to five other spots is not what they asked for, and l.lx/l.ly can only describe one of them.
+	// (Task 329's aligned path already opts out of alignment for the same reason.)
+	function linkLabelStations(l) {
+		var s = labelRepeatSpacing(), len = Geom.polylineLength(linkPointList(l)), n, i, out = [];
+		if (labelIsDragged(l) || !(s > 0) || !(len > s)) { return [LINK_LABEL_ALONG]; }
+		n = Math.min(LPN_LABEL_REPEAT_MAX, Math.ceil(len / s));
+		for (i = 0; i < n; i++) { out.push((i + 0.5) / n); }
+		return out;
+	}
 	function linkLabelBase(l) {
 		var mid = linkLabelMid(l), d = defaultLabelOffset();
 		return { x: mid.x + (l.lx !== undefined ? l.lx : d.x),
@@ -362,6 +411,39 @@ var EngCalcs = EngCalcs || {};
 		if (le.text) { le.text.style.visibility = v; }
 		if (le.mask) { le.mask.style.visibility = v; }
 		if (le.leader) { le.leader.style.visibility = v; }
+		(le.repeats || []).forEach(function (r) { r.text.style.visibility = v; r.mask.style.visibility = v; });
+	}
+	// The extra renderings of a long pipe's label (see linkLabelStations() above). Grown and shrunk
+	// in place rather than rebuilt, because the count changes on every zoom step and rebuilding a
+	// chain of elements per frame is how a map editor gets slow.
+	//
+	// A REPEAT IS NOT A SECOND LABEL. It carries neither `data-linklbl` nor `.lpn-draglbl`, so it is
+	// invisible to hit testing and cannot be dragged, renamed or reset -- there is still exactly one
+	// label per link as far as every interaction in this file is concerned, and the repeats are
+	// pixels. It does carry the annotation class (Task 334), so it hides with everything else
+	// generated. `side` is its own leader-hysteresis state, unused while unaligned repeats draw no
+	// leader, kept so dataLabelOrigin() has somewhere to write.
+	function ensureLabelRepeats(le, n) {
+		if (!le.repeats) { le.repeats = []; }
+		while (le.repeats.length > n) {
+			var gone = le.repeats.pop();
+			gone.text.remove(); gone.mask.remove();
+		}
+		while (le.repeats.length < n) {
+			le.repeats.push({
+				mask: annotationEl('rect', { 'class': 'lpn-lbl-mask' }, maskLayer),
+				text: annotationEl('text', { 'class': 'lpn-lbl', style: 'font-size:' + effectiveFontSize() + 'px' }, labelsLayer),
+				side: 'right', empty: false
+			});
+		}
+	}
+	// A repeat's glyphs, rebuilt only when the primary's content actually changed. refreshLabelText()
+	// bumps le.rowsSeq; a layout pass runs on every drag frame and must not rebuild tspans it
+	// already has.
+	function syncRepeatText(le, part) {
+		if (part.seq === le.rowsSeq || !le.rows) { return; }
+		setMultilineText(part.text, 0, le.rows);
+		part.seq = le.rowsSeq;
 	}
 	// WHERE AN ALIGNED LINK LABEL ACTUALLY LANDS: {ax, ay, angle}. Extracted from layoutLinkLabel()
 	// on 2026-08-14 because it now has TWO callers, and the reason it needed two is the whole bug.
@@ -403,40 +485,68 @@ var EngCalcs = EngCalcs || {};
 		// offset from the label's own dodged mid-point, so pass frac 0 and re-base here.
 		return { ax: mid.x + (a.x - dir.ax), ay: mid.y + (a.y - dir.ay), angle: a.angle };
 	}
-	function layoutLinkLabel(id) {
-		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
-		// Set BEFORE the aligned branch returns, so both label styles obey it.
-		le.hiddenShort = linkLabelTooShort(l, le);
-		setLabelAssemblyHidden(le, le.hiddenShort);
-		var mid = linkLabelMid(l);
+	// One rendering of a link's label, at one station. `part` is {text, mask} -- the link's own
+	// elements for the first station, a repeat's for the rest (see ensureLabelRepeats()). The two
+	// are laid out by the SAME code on purpose: a repeat that drifted from the original in angle,
+	// side or mask would read as a different label rather than the same one said again.
+	function layoutLinkLabelAt(l, le, part, along, isPrimary, single) {
+		if (!isPrimary) { syncRepeatText(le, part); }
 		if (linkLabelAligned(l)) {
 			// le.alignedAlong is the station placeAlignedLabels() settled on during the collision
 			// pass. Undefined until that has run once (and for an empty label), in which case
 			// alignedLabelPlacement() falls back to the half-way default -- the same value the
 			// search tries first, so the two agree on an uncrowded drawing.
-			var a = alignedLabelPlacement(l, le, le.alignedAlong);
-			le.text.setAttribute('text-anchor', 'middle');
-			le.text.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + a.ax + ' ' + a.ay + ')');
-			repositionMultilineText(le.text, a.ax, a.ay);
+			var a = alignedLabelPlacement(l, le, along);
+			part.text.setAttribute('text-anchor', 'middle');
+			part.text.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + a.ax + ' ' + a.ay + ')');
+			repositionMultilineText(part.text, a.ax, a.ay);
 			// The mask has to rotate WITH the text or it stops covering it -- it is sized from the
 			// same box, so the same transform about the same point is exactly right.
-			if (le.empty) { hideMask(le.mask); } else {
-				positionMaskRect(le.mask, a.ax, a.ay, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'middle', 'top');
-				le.mask.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + a.ax + ' ' + a.ay + ')');
+			if (le.empty) { hideMask(part.mask); } else {
+				positionMaskRect(part.mask, a.ax, a.ay, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'middle', 'top');
+				part.mask.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + a.ax + ' ' + a.ay + ')');
 			}
-			if (le.leader) { le.leader.style.display = 'none'; }
+			if (isPrimary && le.leader) { le.leader.style.display = 'none'; }
 			return;
 		}
 		// Unaligned: exactly as before, and the transforms are CLEARED rather than left behind --
 		// a stale rotate on an element that is no longer aligned is invisible in the code and
 		// obvious on screen.
-		le.text.removeAttribute('transform');
-		le.text.setAttribute('text-anchor', 'start');
-		if (le.mask) { le.mask.removeAttribute('transform'); }
-		var anchor = { x: mid.x, y: mid.y }, end = linkLabelPos(l), org = dataLabelOrigin(le, anchor, end);
-		repositionMultilineText(le.text, org.x, org.y);
-		if (le.empty) { hideMask(le.mask); } else { positionMaskRect(le.mask, org.x, org.y, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'start', 'top'); }
-		updateDataLeader(le, anchor, end);
+		part.text.removeAttribute('transform');
+		part.text.setAttribute('text-anchor', 'start');
+		if (part.mask) { part.mask.removeAttribute('transform'); }
+		// THE LONE LABEL'S PATH IS UNTOUCHED, and the branch is here because its two halves must
+		// agree about WHICH POINT the label belongs to. linkLabelPos() is measured from the half-way
+		// point -- it has to be, since that is where a drag offset and a collision nudge are stored
+		// -- so a label rendered at any other station would draw its leader to a place it is not.
+		// A chain therefore takes the plain default offset from its OWN station, and neither a drag
+		// nor a nudge applies to it: a dragged label is never repeated (linkLabelStations()), and a
+		// chain does not move, it obstructs (see placeStationedLabels()).
+		var d = defaultLabelOffset(),
+			lone = isPrimary && single,
+			mid = lone ? linkLabelMid(l) : linkLabelMid(l, along),
+			anchor = { x: mid.x, y: mid.y },
+			end = lone ? linkLabelPos(l) : { x: mid.x + d.x, y: mid.y + d.y },
+			org = dataLabelOrigin(isPrimary ? le : part, anchor, end);
+		repositionMultilineText(part.text, org.x, org.y);
+		if (le.empty) { hideMask(part.mask); } else { positionMaskRect(part.mask, org.x, org.y, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'start', 'top'); }
+		if (isPrimary) { updateDataLeader(le, anchor, end); }
+	}
+	function layoutLinkLabel(id) {
+		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
+		// Set BEFORE anything is placed, so every station obeys it.
+		le.hiddenShort = linkLabelTooShort(l, le);
+		setLabelAssemblyHidden(le, le.hiddenShort);
+		var stations = linkLabelStations(l), single = stations.length === 1, i;
+		ensureLabelRepeats(le, stations.length - 1);
+		// Station 0 goes to the link's own elements: for n = 1 that is the half-way point and the
+		// whole of today's behaviour, and for n > 1 it is simply the first of the chain. When the
+		// aligned station SEARCH has run (single-label case only), it overrides station 0 -- a lone
+		// label may slide to dodge a neighbour, a chain may not, since even spacing IS the reading.
+		layoutLinkLabelAt(l, le, le, single ? le.alignedAlong : stations[0], true, single);
+		for (i = 1; i < stations.length; i++) {
+			layoutLinkLabelAt(l, le, le.repeats[i - 1], stations[i], false, false);
+		}
 	}
 	// Double-click-to-reset (Tom, 2026-07-30): clears a manually-dragged label's offset entirely
 	// (n.lx/n.ly back to undefined), so it falls back to DEFAULT_LABEL_OFFSET and the leader --
@@ -559,38 +669,69 @@ var EngCalcs = EngCalcs || {};
 	// almost no usable stations, so making it choose last is making it choose from nothing. It also
 	// makes the pass STABLE -- the order does not depend on anything the user can change by
 	// clicking, so labels do not rearrange themselves for reasons nobody can see.
-	function placeAlignedLabels(aligned, statics, fs) {
+	// The box one station's label occupies, in the style that station will actually be drawn in.
+	// A repeated chain of horizontal labels is not aligned, so its boxes are the ordinary
+	// left-anchored ones -- generous side ('right'), which is the right way to err for a
+	// legibility guard.
+	function stationedLabelBox(l, le, along, w, h, fs) {
+		if (linkLabelAligned(l)) {
+			var ap = alignedLabelPlacement(l, le, along);
+			return Geom.rotatedLabelBox(ap.ax, ap.ay, w, h, ap.angle, fs);
+		}
+		var mid = linkLabelMid(l, along), d = defaultLabelOffset();
+		return { x: mid.x + d.x, y: mid.y + d.y - fs * 0.85, w: w, h: h };
+	}
+	// **A REPEATED CHAIN IS IN THE SAME CATEGORY AS AN ALIGNED LABEL, AND FOR THE SAME REASON**
+	// (extended 2026-08-15 for Tom's repeat spec). Both have spent their freedom: an aligned label
+	// gave up sideways movement by lying on its pipe, and a chain gave up its station by being
+	// evenly spaced -- move one link of the chain and the regular spacing that makes it read as one
+	// repeated name is gone. So neither is a participant in the relaxation; both are OBSTACLES that
+	// everything else must go round, and both are committed here rather than nudged there.
+	function placeStationedLabels(list, statics, fs) {
 		var pad = fs * LPN_ALIGNED_PAD_FRAC;
-		aligned.map(function (l) {
+		list.map(function (l) {
 			return { l: l, len: Geom.polylineLength(linkPointList(l)) };
 		}).sort(function (a, b) { return b.len - a.len; }).forEach(function (rec) {
 			var l = rec.l, le = linkEls[l.id];
 			if (!le || le.empty) { if (le) { le.alignedAlong = undefined; } return; }
 			var w = labelBoxWidth(le), h = dataLabelBoxHeight(le.lineCount),
+				stations = linkLabelStations(l), boxes = [],
 				best = null, bestBox = null, i, ap, box, clear;
-			for (i = 0; i < LPN_ALIGNED_STATIONS.length; i++) {
-				ap = alignedLabelPlacement(l, le, LPN_ALIGNED_STATIONS[i]);
-				box = Geom.rotatedLabelBox(ap.ax, ap.ay, w, h, ap.angle, fs);
-				clear = !statics.some(function (s) {
-					return Collide.rectsOverlap(box, { x: s.base.x, y: s.base.y + s.yOff, w: s.w, h: s.h }, pad);
-				});
-				// The FIRST clear station wins and the search stops -- it is already the most
-				// central one available, because the list is ordered outward from the middle.
-				if (clear) { best = LPN_ALIGNED_STATIONS[i]; bestBox = box; break; }
-				if (!bestBox) { bestBox = box; best = LPN_ALIGNED_STATIONS[i]; } // fall back to the middle
+			if (linkLabelAligned(l) && stations.length === 1) {
+				// THE SLIDE, which only a lone label gets. It has one degree of freedom -- where
+				// along the pipe -- and uses it, exactly as a GIS slides a road name.
+				for (i = 0; i < LPN_ALIGNED_STATIONS.length; i++) {
+					ap = alignedLabelPlacement(l, le, LPN_ALIGNED_STATIONS[i]);
+					box = Geom.rotatedLabelBox(ap.ax, ap.ay, w, h, ap.angle, fs);
+					clear = !statics.some(function (s) {
+						return Collide.rectsOverlap(box, { x: s.base.x, y: s.base.y + s.yOff, w: s.w, h: s.h }, pad);
+					});
+					// The FIRST clear station wins and the search stops -- it is already the most
+					// central one available, because the list is ordered outward from the middle.
+					if (clear) { best = LPN_ALIGNED_STATIONS[i]; bestBox = box; break; }
+					if (!bestBox) { bestBox = box; best = LPN_ALIGNED_STATIONS[i]; } // fall back to the middle
+				}
+				le.alignedAlong = best;
+				boxes.push(bestBox);
+			} else {
+				// A chain's stations are fixed by the spacing rule, so there is nothing to search.
+				le.alignedAlong = undefined;
+				for (i = 0; i < stations.length; i++) {
+					boxes.push(stationedLabelBox(l, le, stations[i], w, h, fs));
+				}
 			}
-			le.alignedAlong = best;
-			// Committed as an obstacle for everyone placed after it -- including the node and Text
+			// Committed as obstacles for everyone placed after -- including the node and Text
 			// labels the relaxation is about to move, which is the half that was missing entirely.
-			// Immovable: it has spent its one degree of freedom, and other labels must now go round.
-			statics.push({
-				ref: null, owner: null, movable: false, weight: LPN_COLLIDE_WEIGHT.label,
-				base: { x: bestBox.x, y: bestBox.y }, yOff: 0, w: bestBox.w, h: bestBox.h
+			boxes.forEach(function (b) {
+				statics.push({
+					ref: null, owner: null, movable: false, weight: LPN_COLLIDE_WEIGHT.label,
+					base: { x: b.x, y: b.y }, yOff: 0, w: b.w, h: b.h
+				});
 			});
 		});
 	}
 	function runLabelCollisionAvoidance() {
-		var fs = effectiveFontSize(), labels = [], aligned = [], statics = staticObstacleBoxes();
+		var fs = effectiveFontSize(), labels = [], stationed = [], statics = staticObstacleBoxes();
 		function addDataLabel(holder, base, manual, lineCount) {
 			// Every nudge is cleared and re-derived from scratch on every pass, manual or not, so the
 			// pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer as
@@ -631,10 +772,16 @@ var EngCalcs = EngCalcs || {};
 			// to get out of ITS way -- it has given up its own right to move by being aligned.
 			// An AABB is generous for a diagonal label (it is the enclosing rectangle, not the
 			// rotated one), and generous is the right direction to err in for a legibility guard.
-			if (linkLabelAligned(l)) { aligned.push(l); le.nudge = { x: 0, y: 0 }; return; }
+			//
+			// A REPEATED CHAIN JOINS THIS CATEGORY (2026-08-15), aligned or not -- see
+			// placeStationedLabels(). The nudge is cleared for it too: a nudge is measured from the
+			// half-way point, and a chain is not drawn there.
+			if (linkLabelAligned(l) || linkLabelStations(l).length > 1) {
+				stationed.push(l); le.nudge = { x: 0, y: 0 }; return;
+			}
 			addDataLabel(le, dataLabelOrigin(le, linkLabelMid(l), linkLabelBase(l)), l.lx !== undefined, le.lineCount);
 		});
-		placeAlignedLabels(aligned, statics, fs);
+		placeStationedLabels(stationed, statics, fs);
 		// Leaders are rebuilt every iteration (they track their labels); node symbols and Text
 		// labels do not move, so they are built once above.
 		Collide.relax(labels, statics, currentLeaderBoxes, 4);
@@ -1356,9 +1503,10 @@ var EngCalcs = EngCalcs || {};
 			// settings panel captures it from the current view instead of asking anyone to guess.
 			labelMaxWidth: null,
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
-			// (ROADMAP Task 329). OFF by default while Tom compares the two in a browser -- this is
-			// a visual judgement, and shipping it on would be making it for him.
-			alignPipeLabels: false,
+			// (ROADMAP Task 329). ON since 2026-08-15: it shipped OFF for one day so Tom could judge
+			// aligned-vs-horizontal on a real drawing rather than have the judgement made for him,
+			// and his verdict was *"Ship with it on. Very much earns its keep."*
+			alignPipeLabels: true,
 			// Draw the pale background patch behind every label (ROADMAP Task 330). ON, which is
 			// what the page has always done and what keeps a label legible over a backdrop image --
 			// the control exists because a clean drawing with no backdrop reads better without the
@@ -3202,6 +3350,10 @@ var EngCalcs = EngCalcs || {};
 		linkEls[id].arrows.forEach(function (a) { a.remove(); });
 		linkEls[id].text.remove();
 		linkEls[id].mask.remove(); linkEls[id].leader.remove();
+		// Same reason the arrows are removed one line up: a repeat is a real element in a shared
+		// layer, so a deleted pipe would leave its extra labels floating over the map -- Tom's
+		// 2026-07-30 "when I delete a pipe, its orphaned labels are left behind", one more time.
+		(linkEls[id].repeats || []).forEach(function (r) { r.text.remove(); r.mask.remove(); });
 		if (linkEls[id].symbolG) { linkEls[id].symbolG.remove(); }
 		// The extrema mark needs no line of its own here any more (Task 333): it is the
 		// text's own text-decoration, so removing the text removes it. It used to be a set of
@@ -8723,7 +8875,13 @@ var EngCalcs = EngCalcs || {};
 	function refreshFontSizes() {
 		var fs = effectiveFontSize() + 'px';
 		Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
-		Object.keys(linkEls).forEach(function (id) { linkEls[id].text.style.fontSize = fs; });
+		Object.keys(linkEls).forEach(function (id) {
+			linkEls[id].text.style.fontSize = fs;
+			// A repeat is the same label, so it is the same size -- and its line SPACING comes from
+			// the tspan dy values, which is why refreshLabelText() below has to run after this
+			// rather than the other way round.
+			(linkEls[id].repeats || []).forEach(function (r) { r.text.style.fontSize = fs; });
+		});
 		Object.keys(labelEls).forEach(function (id) {
 			var le = labelEls[id], lb = labelById(id);
 			le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
@@ -8784,8 +8942,14 @@ var EngCalcs = EngCalcs || {};
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id];
 			if (!le) { return; }
+			// AND ONE LABEL MAY OPT OUT ENTIRELY (Tom, 2026-08-15: *"Is it possible to have a 'Show
+			// always' checkbox in the text properties box? The non-customizable way to do this would
+			// be to show always the largest text, but we don't want to do that."*). He is right that
+			// the automatic version is the wrong shape: "the biggest one survives" makes a legend or
+			// a north arrow compete on font size for a property it should just declare, and it
+			// silently changes which label is permanent whenever somebody resizes another one.
 			var mult = +lb.sizeMult > 0 ? +lb.sizeMult : 1,
-				gone = on && vw > lim * mult;
+				gone = on && !lb.alwaysShow && vw > lim * mult;
 			[le.text, le.mask, le.leader].forEach(function (e) {
 				if (e && e.classList) { e.classList.toggle('lpn-lbl-hidden', gone); }
 			});
@@ -10378,6 +10542,23 @@ var EngCalcs = EngCalcs || {};
 		sizeLabel.appendChild(sizeInput);
 		fields.appendChild(sizeLabel);
 		fields.appendChild(document.createElement('br'));
+		// Task 340's escape hatch, and it sits immediately under the size because the size IS the
+		// threshold this overrides: a title block at 3x survives to 3x the map width, and this is
+		// the label that must survive whatever the reader does. Undefined on every existing label,
+		// so nothing changes shape on upgrade.
+		var alwaysLabel = document.createElement('label'), alwaysInput = document.createElement('input');
+		alwaysInput.type = 'checkbox';
+		alwaysInput.checked = !!lb.alwaysShow;
+		alwaysInput.addEventListener('change', function () {
+			saveUndoSnapshot();
+			lb.alwaysShow = alwaysInput.checked;
+			applyLabelVisibility();
+			saveToStorage();
+		});
+		alwaysLabel.textContent = (pc.lpn_field_show_always || 'Always show') + ' ';
+		alwaysLabel.appendChild(alwaysInput);
+		fields.appendChild(alwaysLabel);
+		fields.appendChild(document.createElement('br'));
 		readonlyField(fields, pc.lpn_field_x || 'X', an ? an.x + lb.x : lb.x);
 		readonlyField(fields, pc.lpn_field_y || 'Y', cartesianY(an ? an.y + lb.y : lb.y));
 	}
@@ -11043,6 +11224,11 @@ var EngCalcs = EngCalcs || {};
 			var lRows = composeRows(lines, labelIsDragged(l));
 			setMultilineText(le.text, linkLabelBase(l).x, lRows);
 			le.lineCount = lRows.length;
+			// Kept so a repeat can be rendered from the same rows without composing them twice, and
+			// stamped so a layout pass (which runs on every drag frame) only rebuilds a repeat's
+			// tspans when the content really changed. See syncRepeatText().
+			le.rows = lRows;
+			le.rowsSeq = (le.rowsSeq || 0) + 1;
 			linkLines[l.id] = lines;
 			le.lines = lines;
 			try { le.tw = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }

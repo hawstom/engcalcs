@@ -137,6 +137,23 @@ console.log('\n--- a Text label hides on its own size-scaled threshold ---');
 	L.applyLabelVisibility();
 	ok('far enough out, the title block goes too', hidden(L.labelEl(title.id).text), L.visibleMapWidth());
 
+	// THE PER-LABEL ESCAPE HATCH (Tom, 2026-08-15). He asked for a "Show always" checkbox and
+	// explicitly rejected the automatic version -- "the non-customizable way to do this would be to
+	// show always the largest text, but we don't want to do that" -- which is right: a rule that
+	// spares whichever label happens to be biggest makes a legend compete on font size for a
+	// property it should simply declare, and changes its mind whenever another label is resized.
+	// Still zoomed to 5000 units wide here, four times even the 3x title's threshold.
+	note.alwaysShow = true;
+	L.applyLabelVisibility();
+	ok('a label marked Always show survives a zoom that hides everything else',
+		!hidden(L.labelEl(note.id).text) && hidden(L.labelEl(title.id).text));
+	ok('...and it takes its mask with it', !hidden(L.labelEl(note.id).mask));
+	ok('...while the generated annotation is still gone -- this exempts ONE label, not the rule',
+		L.svgHas('lpn-labels-hidden'));
+	note.alwaysShow = false;
+	L.applyLabelVisibility();
+	ok('unticking it puts the label back under the threshold', hidden(L.labelEl(note.id).text));
+
 	// Blank means always show, which is the default and the pre-Task-331 behaviour.
 	L.setSetting('labelMaxWidth', null);
 	L.applyLabelVisibility();

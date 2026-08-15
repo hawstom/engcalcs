@@ -10,9 +10,9 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## NEXT SESSION (updated 2026-08-15, and Tom works one arrow per `/clear`)
 
-**The 2026-08-15 batch has LANDED — Tasks 334, 332, 330 and 340 are closed.** Nothing in it is
-waiting on code. Task 329 remains **[H]**: it is built and ships OFF, and only Tom can judge it on
-screen.
+**The 2026-08-15 batch has LANDED — Tasks 334, 332, 330, 340, 329, 349 and 350 are closed.**
+Aligned pipe labels now ship ON by Tom's verdict, long pipes repeat their label, and a Text label
+can be pinned with "Always show". Nothing in that batch is waiting on code.
 
 **The next arrow is a TRANSLATION SPRINT**, covering the whole labels era in one pass. The delta as
 of 2026-08-15 is **50 keys per language** (45 new, 5 whose English changed), all `lpn`, in all 26
@@ -447,70 +447,6 @@ session of its own with nothing else in it.
     are the two that matter; a ramp needs a legend, which the Labels panel already has a home for.
   - Connects to Task 253 (clean map for screenshots) — a thematic view with no labels IS the clean
     map, arrived at from the other side.
-
-- 50|329| [H] **Test the GIS paradigm: pipe labels aligned ALONG the pipe — BUILT, awaiting Tom's verdict on screen.** Tom, 2026-08-14: *"I think
-  we first want to test the GIS thing of aligning our pipe labels with pipes… Maybe I can investigate
-  to try to figure out how epanet-js makes the decision of which side of a pipe you label. I don't
-  think it matters. If I had to choose, I would say the top side. Or if I had to get cute, I would say
-  it is the side that has least congestion however we define congestion."*
-  - **Both of Tom's answers are the same answer and we can have both for free.** Prefer the top;
-    hand the bottom to `runLabelCollisionAvoidance()` as a second candidate. "Least congestion" needs
-    no definition and no new algorithm — it is the existing engine being offered two positions
-    instead of one. `alignedLabelAnchor()` therefore returns a side rather than choosing one.
-  - **THE SIDE IS NOT THE HARD PART. Text must never render upside down**, so a pipe drawn
-    right-to-left flips 180°, and that flip SWAPS which side is the top. Normalise the angle first,
-    then offset. Get the order wrong and westward pipes label on the opposite side from their
-    eastward neighbours — the drawing then reads as though the side were random, which is far worse
-    than picking the "wrong" side consistently. **The test that matters is that one physical pipe
-    labels identically whichever end the user clicked first** (harness: max drift 3e-14), because it
-    is invisible on a network drawn all one way and glaring on a real one.
-  - **DONE: the pure geometry.** `EngCalcs.lpnGeom.alignedLabelAnchor()` in `js/lpn-geom.js` — angle
-    normalisation, up-screen normal, per-side multi-line anchoring, zero-length links. 8 assertions in
-    `dev/lpn-spike/geom-harness.js` (53 total), mutation-tested three ways: dropping the flip (2
-    failures), a down-screen normal (3), a top block straddling the pipe (1). No DOM, so it is
-    testable now and the renderer is the only browser-dependent part left.
-  - **DONE: the wiring**, behind `settings.alignPipeLabels`, shipping **OFF**. Aligned-vs-horizontal
-    is a visual judgement and defaulting it on would make that judgement for the user instead of
-    offering it. One seam: `layoutLinkLabel()`. A **dragged** label always opts out — the user placed
-    it, and rotating what they positioned by hand would overrule a deliberate act.
-  - **An aligned label draws NO LEADER, by construction.** Lying along the pipe, its ORIENTATION
-    already says which pipe it belongs to — that is the whole economy of the GIS convention and the
-    reason it survives on maps carrying thousands of labels.
-  - **The angle is the pipe's LOCAL direction at the label**, not end-to-end (`linkDirectionAt()`).
-    On a bent pipe the straight line between endpoints can lie at a completely different angle from
-    the piece of pipe the label is sitting on, which is the difference between a label that reads as
-    attached and one that reads as loose.
-  - **TOM WENT AND LOOKED AT epanet-js, AND THERE IS NO RULE THERE TO COPY** (2026-08-14): *"Not on
-    top; not on left from start to end node or high head to low head node. ??? We can do better: top
-    or avoid congestion."* He tested three plausible rules — screen-top, drawing order, hydraulic
-    gradient — and none of them predicts their side. So the top-plus-congestion design is not us
-    deviating from a convention; there is no convention at that spot, and we are choosing one.
-  - **THE CONGESTION HALF IS NOW EVIDENCED, NOT SPECULATIVE — build it.** I argued it might be
-    complexity with no reader benefit if top-always read well. It does not: Tom's Elm Street
-    screenshot (2026-08-14) shows a link label sitting squarely across the pipe below it with clear
-    space on the other side — *"Other side of pipe would have been very nice here."* One real drawing
-    settled a question I had proposed deferring until one existed, which is the argument for putting
-    a rough version in front of him early rather than reasoning about it longer.
-  - **DONE: the side, by clearance** — and NOT by the mechanism this task first proposed. It reads
-    "hand both sides to `runLabelCollisionAvoidance()`", which was superseded: `alignedSideFor()`
-    measures each candidate's distance to the nearest OTHER link and takes the bottom only when it
-    is clearly better (`LPN_SIDE_SWITCH_MARGIN`, 1.35), so the top stays the default rather than
-    becoming "whichever side won by a hair". `placeAlignedLabels()` then walks stations out from the
-    middle of the pipe and commits each placed label as an immovable obstacle. 29 checks in
-    `dev/lpn-spike/aligned-label-harness.js`.
-  - **SO THE CODE IS DONE AND WHAT IS LEFT IS A VERDICT.** It ships OFF behind
-    `settings.alignPipeLabels` (Settings ▸ Map ▸ "Align pipe labels with pipes"). Turn it on, look
-    at Elm Street, and decide whether it earns the default. Nobody but Tom can answer that, which is
-    why this is no longer a priority-88 build.
-  - **THE WALL-OF-TEXT WORRY IS GONE, ANSWERED BY TASK 333 (2026-08-15).** This used to read: GIS
-    aligns ONE short name along a line, while our link labels default to three and can carry nine, so
-    a rotated nine-line stack would be a wall of text at 40°. A link label is now **one line** unless
-    dragged (`L1 Q=133 V=1.5`), which is exactly the shape GIS aligns — so the aligned path should be
-    re-looked-at with that in mind, and the remaining question is only which SIDE, not whether the
-    thing being rotated is too tall. The prefixes are what make the one-line form readable, so the
-    two tasks landed in the right order by accident.
-  - Still true: if alignment reads well it may argue for fewer values per pipe at a given scale,
-    which is Task 326's scale-dependent visibility arriving from an unrelated direction.
 
 - 35|347| **No project tabs at all until a project is opened.** Tom's strongest form of the examples
   gallery (*"It's not a map until the first project is started or opened?"*), extracted from Task 314
@@ -1843,6 +1779,37 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|329| **Pipe labels aligned ALONG the pipe, GIS-style — SHIPPED ON 2026-08-15.** Tom, after a day
+  with it behind a setting: *"Ship with it on. Very much earns its keep."* `settings.alignPipeLabels`
+  now defaults true. The geometry is `Geom.alignedLabelAnchor()` (angle normalisation so text never
+  reads upside down, which also swaps which side is the top); the side is chosen by clearance to the
+  nearest other link with a 1.35 margin so the top stays the default; an aligned label draws no
+  leader, because its orientation already says which pipe it belongs to. Harnesses:
+  `geom-harness.js` (8 checks) and `aligned-label-harness.js` (31).
+
+- 0|349| **A long pipe repeats its label along itself — DONE 2026-08-15.** Tom's spec, taken as
+  written: `VD = max(map width, map height)`, `n = ceil(L / (0.25 VD))`, spaced `0.25 VD` —
+  *"Link labels spacing = 25% of view size."* Stations are `(i + 0.5)/n`, so **n = 1 lands on 0.5
+  and every pipe shorter than a quarter-view is bit-for-bit what it was**; that is the property the
+  harness guards first. In view units, so it needs no number from anyone and re-derives on zoom.
+  - A repeat is PIXELS, not a second label: no `data-linklbl`, no `.lpn-draglbl`, so hit testing,
+    dragging and the popup still see exactly one label per link. A **dragged** label is never
+    repeated — `l.lx`/`l.ly` can only describe one of them.
+  - A chain does not participate in the collision relaxation, it OBSTRUCTS — the same category an
+    aligned label is in, and for the same reason: its station is spent on the even spacing.
+    `placeAlignedLabels()` became `placeStationedLabels()` and commits every station's box.
+  - **Capped at 12 per pipe**, which the spec does not mention: VD shrinks with the view, so zoomed
+    in far enough the formula is unbounded. Twelve covers three view-spans, so panning never reaches
+    an unlabelled stretch. Past the cap the stations spread evenly rather than holding the spacing.
+  - `dev/lpn-spike/label-repeat-harness.js`, 26 checks, mutation-tested five ways.
+
+- 0|350| **"Always show" on a Text label — DONE 2026-08-15.** `lb.alwaysShow`, a checkbox under the
+  size in the Text property popup, exempting that one label from Task 340's threshold. Tom named and
+  rejected the automatic alternative himself — *"the non-customizable way to do this would be to show
+  always the largest text, but we don't want to do that"* — and he is right: sparing whichever label
+  is biggest makes a legend compete on font size for a property it should declare, and changes its
+  mind whenever some other label is resized.
 
 - 0|334| **One `.lpn-annotation` class, declared where the element is built — DONE 2026-08-15.**
   `annotationEl()` in `js/looped-network.js` applies it to every generated mark (data label, its

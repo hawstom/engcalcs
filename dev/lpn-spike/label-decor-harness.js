@@ -67,7 +67,11 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 
 	// All four consumers, by name. Missing one is exactly how the original defect survived: the
 	// leader was the visible symptom, but collision avoidance and zoom-to-fit read the same number.
-	for (const site of ['dataLabelOrigin', 'layoutNodeLabel', 'layoutLinkLabel', 'bbox']) {
+	// `layoutLinkLabelAt` rather than `layoutLinkLabel` since 2026-08-15: a long pipe now draws its
+	// label at several stations along itself (Tom's repeat spec), and the per-station renderer is
+	// where the width is read. Same consumer, new name — and every repeat measuring through the same
+	// function is what stops a chain drifting out of step with its own original.
+	for (const site of ['dataLabelOrigin', 'layoutNodeLabel', 'layoutLinkLabelAt', 'bbox']) {
 		report(/labelBoxWidth\(/.test(extract(site)), `${site}() uses labelBoxWidth()`);
 	}
 	report(/w: labelBoxWidth\(holder\)/.test(extract('runLabelCollisionAvoidance')), 'collision boxes use labelBoxWidth()');

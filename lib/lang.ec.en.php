@@ -1683,6 +1683,7 @@ $ec_lang['lpn_field_closed_tip']='Shut this pipe so no water can pass through it
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Size multiplier';
+$ec_lang['lpn_field_show_always']='Always show';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';

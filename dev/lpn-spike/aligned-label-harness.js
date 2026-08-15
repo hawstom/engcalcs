@@ -103,15 +103,20 @@ console.log('\n-- wiring: an aligned label no longer goes through the ordinary r
 {
 	const fn = src.slice(src.indexOf('function runLabelCollisionAvoidance'));
 	const body = fn.slice(0, fn.indexOf('\n\tfunction ', 10));
-	report(/if \(linkLabelAligned\(l\)\) \{ aligned\.push\(l\)/.test(body),
+	report(/if \(linkLabelAligned\(l\) \|\| linkLabelStations\(l\)\.length > 1\) \{[\s\S]{0,120}?stationed\.push\(l\)/.test(body),
 		'aligned links are diverted out of the addDataLabel path');
-	report(/placeAlignedLabels\(aligned, statics, fs\)/.test(body),
-		'and handed to the station search, which commits them as obstacles');
+	// A REPEATED CHAIN TAKES THE SAME EXIT (2026-08-15). It is the same situation arrived at from
+	// the other side: a chain has spent its station on the even spacing, so it cannot be nudged
+	// either, and a movable box for it would be the same phantom this whole branch exists to stop.
+	report(/linkLabelStations\(l\)\.length > 1/.test(body),
+		'and so is a link whose label repeats along it');
+	report(/placeStationedLabels\(stationed, statics, fs\)/.test(body),
+		'and both are handed to the station placer, which commits them as obstacles');
 	// The phantom is the thing that must never come back: a movable box for a label the renderer
-	// will not move. What guarantees that is the `return` — the aligned branch must leave before
+	// will not move. What guarantees that is the `return` — the diverted branch must leave before
 	// the addDataLabel call on the following line, not merely be written above it.
-	report(/if \(linkLabelAligned\(l\)\) \{.*\breturn;/.test(body),
-		'the aligned branch RETURNS, so it cannot fall through into addDataLabel');
+	report(/stationed\.push\(l\);[\s\S]{0,80}?\breturn;/.test(body),
+		'the diverted branch RETURNS, so it cannot fall through into addDataLabel');
 	report(body.indexOf('linkLabelAligned(l)') < body.indexOf('addDataLabel(le, dataLabelOrigin'),
 		'and it is tested before the ordinary path is reached');
 }
@@ -137,11 +142,12 @@ console.log('\n-- wiring: the station list is ordered outward from the middle --
 
 console.log('\n-- wiring: longest pipe first, so the placement order is stable --');
 {
-	const fn = src.slice(src.indexOf('function placeAlignedLabels'));
+	const fn = src.slice(src.indexOf('function placeStationedLabels'));
 	const body = fn.slice(0, fn.indexOf('\n\tfunction ', 10));
 	report(/polylineLength/.test(body), 'pipes are measured');
 	report(/sort\(function \(a, b\) \{ return b\.len - a\.len; \}\)/.test(body), 'and sorted longest first');
 	report(/movable: false/.test(body), 'a placed aligned label is committed as an IMMOVABLE obstacle');
+	report(/boxes\.forEach/.test(body), 'and EVERY station of a repeated chain is committed, not just its first');
 }
 
 // The block that used to stand here asserted that the extrema BADGE inherited its label's

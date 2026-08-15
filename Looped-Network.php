@@ -451,6 +451,7 @@ EngCalcs.pageConfig = {
 	lpn_field_x: <?=json_encode($ec_lang['lpn_field_x'])?>,
 	lpn_field_y: <?=json_encode($ec_lang['lpn_field_y'])?>,
 	lpn_field_text_size: <?=json_encode($ec_lang['lpn_field_text_size'])?>,
+	lpn_field_show_always: <?=json_encode($ec_lang['lpn_field_show_always'])?>,
 	lpn_tool_labels: <?=json_encode($ec_lang['lpn_tool_labels'])?>,
 	lpn_labels_heading_node: <?=json_encode($ec_lang['lpn_labels_heading_node'])?>,
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
