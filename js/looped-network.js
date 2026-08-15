@@ -272,6 +272,31 @@ var EngCalcs = EngCalcs || {};
 	function linkLabelAligned(l) {
 		return !!settings.alignPipeLabels && l.lx === undefined && l.ly === undefined;
 	}
+	// WHICH SIDE OF THE PIPE. Tom's two answers turn out to be one: prefer the top, and take the
+	// other side when the top is congested (2026-08-14, on seeing a label lying across the pipe
+	// below it -- *"Other side of pipe would have been very nice here"*). Congestion is measured as
+	// distance to the nearest OTHER link, because that is what the picture showed and because
+	// staticObstacleBoxes() has never contained links at all: a data label has always been free to
+	// sit straight on a pipe, and aligning labels along pipes is simply what made it visible.
+	//
+	// A margin before switching, so the top stays the default rather than becoming "whichever side
+	// won by a hair". A drawing whose labels sit above some pipes and below others for reasons no
+	// reader can see is worse than one that is occasionally tight -- consistency IS legibility here,
+	// which is the same argument that makes the readability flip non-negotiable in
+	// alignedLabelAnchor(). So the bottom has to be clearly better, not merely better.
+	var LPN_SIDE_SWITCH_MARGIN = 1.35;
+	function alignedSideFor(l, top, bottom) {
+		var clearTop = Infinity, clearBot = Infinity;
+		doc.links.forEach(function (o) {
+			if (o.id === l.id) { return; }
+			var pts = linkPointList(o), dt, db;
+			dt = Geom.pointToPolylineDistance(pts, top.x, top.y);
+			db = Geom.pointToPolylineDistance(pts, bottom.x, bottom.y);
+			if (dt < clearTop) { clearTop = dt; }
+			if (db < clearBot) { clearBot = db; }
+		});
+		return clearBot > clearTop * LPN_SIDE_SWITCH_MARGIN ? -1 : 1;
+	}
 	function layoutLinkLabel(id) {
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		var mid = linkLabelMid(l);
@@ -281,11 +306,23 @@ var EngCalcs = EngCalcs || {};
 			// says which pipe it belongs to by its ORIENTATION, which is the whole economy of the
 			// GIS convention and the reason it survives on maps carrying thousands of labels.
 			var dir = linkDirectionAt(l, mid),
-				a = Geom.alignedLabelAnchor(dir.ax, dir.ay, dir.bx, dir.by, {
+				opt = {
 					frac: 0, gap: nodeRadius({ type: 'junction' }) + effectiveFontSize() * 0.35,
 					fontSize: effectiveFontSize(), lineHeight: effectiveLineHeight(),
-					nLines: le.lineCount || 1, side: 1
-				}),
+					nLines: le.lineCount || 1
+				},
+				// Both candidates come from the same call, which is why alignedLabelAnchor() returns
+				// a side rather than choosing one -- see ROADMAP Task 329.
+				candTop = Geom.alignedLabelAnchor(dir.ax, dir.ay, dir.bx, dir.by,
+					Object.assign({ side: 1 }, opt)),
+				candBot = Geom.alignedLabelAnchor(dir.ax, dir.ay, dir.bx, dir.by,
+					Object.assign({ side: -1 }, opt)),
+				// The candidates are offsets from dir's own start point; re-base both onto the
+				// label's dodged mid-point before measuring clearance, or we would be measuring
+				// congestion at a place the label is never drawn.
+				topPt = { x: mid.x + (candTop.x - dir.ax), y: mid.y + (candTop.y - dir.ay) },
+				botPt = { x: mid.x + (candBot.x - dir.ax), y: mid.y + (candBot.y - dir.ay) },
+				a = alignedSideFor(l, topPt, botPt) < 0 ? candBot : candTop,
 				// alignedLabelAnchor() offsets from a point ALONG the segment it is given; we want it
 				// offset from the label's own dodged mid-point, so pass frac 0 and re-base here.
 				ax = mid.x + (a.x - dir.ax), ay = mid.y + (a.y - dir.ay);

@@ -199,6 +199,34 @@ EngCalcs.lpnGeom = (function () {
 		};
 	}
 
+
+	// Shortest distance from a point to a polyline. Used to pick which SIDE of a pipe a label goes
+	// on (looped-network.js alignedSideFor()): the label's own pipe is excluded by the caller, so
+	// what this measures is how close the candidate position comes to some OTHER pipe.
+	//
+	// This exists because staticObstacleBoxes() has never included LINKS -- it collects nodes and
+	// Text labels only -- so a data label has always been free to sit straight on top of a pipe, and
+	// aligning labels along pipes made that visible immediately (Tom's Elm Street screenshot,
+	// 2026-08-14). Distance to the line is the right measure rather than a bounding box: a diagonal
+	// pipe's box is mostly empty space, and boxing it would push labels away from clear ground.
+	function pointToSegmentDistance(px, py, ax, ay, bx, by) {
+		var vx = bx - ax, vy = by - ay, len2 = vx * vx + vy * vy, t;
+		if (!len2) { return Math.hypot(px - ax, py - ay); }
+		t = ((px - ax) * vx + (py - ay) * vy) / len2;
+		t = t < 0 ? 0 : (t > 1 ? 1 : t);
+		return Math.hypot(px - (ax + vx * t), py - (ay + vy * t));
+	}
+	function pointToPolylineDistance(pts, px, py) {
+		var best = Infinity, i, d;
+		if (!pts || !pts.length) { return best; }
+		if (pts.length === 1) { return Math.hypot(px - pts[0].x, py - pts[0].y); }
+		for (i = 0; i + 1 < pts.length; i++) {
+			d = pointToSegmentDistance(px, py, pts[i].x, pts[i].y, pts[i + 1].x, pts[i + 1].y);
+			if (d < best) { best = d; }
+		}
+		return best;
+	}
+
 	return {
 		polylineLength: polylineLength,
 		polylinePointsAttr: polylinePointsAttr,
@@ -208,7 +236,9 @@ EngCalcs.lpnGeom = (function () {
 		leaderAttach: leaderAttach,
 		dataLabelBoxHeight: dataLabelBoxHeight,
 		maskRect: maskRect,
-		alignedLabelAnchor: alignedLabelAnchor
+		alignedLabelAnchor: alignedLabelAnchor,
+		pointToSegmentDistance: pointToSegmentDistance,
+		pointToPolylineDistance: pointToPolylineDistance
 	};
 }());
 

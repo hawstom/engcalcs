@@ -223,5 +223,35 @@ report(near(m3.width, 12) && near(m3.height, 12) && near(m3.x, -1), 'pad applies
 	report(near(q.x, 25), 'aligned: frac positions the label along the pipe', `x=${q.x}`);
 }
 
+
+// ---------------------------------------------------------------------------------------------
+// 8. pointToPolylineDistance — how "the side with least congestion" is actually measured (Task 329)
+//
+// staticObstacleBoxes() collects nodes and Text labels and has NEVER contained links, so a data
+// label has always been free to sit straight on top of a pipe. Aligning labels along pipes is what
+// made that visible (Tom's Elm Street screenshot). Distance to the LINE is the right measure rather
+// than to a bounding box: a diagonal pipe's box is mostly empty space, and boxing it would push
+// labels away from ground that is actually clear -- which is the assertion on the diagonal below.
+{
+	const near = (a, b) => Math.abs(a - b) < 1e-9;
+	const seg = [{ x: -10, y: 0 }, { x: 10, y: 0 }];
+	report(near(Geom.pointToPolylineDistance(seg, 0, 5), 5), 'dist: perpendicular from mid-segment');
+	report(near(Geom.pointToPolylineDistance(seg, 20, 0), 10), 'dist: past the end measures to the ENDPOINT, not the infinite line',
+		'20 -> ' + Geom.pointToPolylineDistance(seg, 20, 0));
+	report(near(Geom.pointToPolylineDistance([{ x: 0, y: 0 }, { x: 10, y: 0 }, { x: 10, y: 10 }], 12, 5), 2),
+		'dist: a bent polyline measures to the NEAREST segment, not the first');
+	// A 45-degree pipe from (0,0) to (100,100): the point (90,10) is far from the LINE and well
+	// inside its bounding box. Boxing the pipe would call this congested; it is not.
+	const diag = [{ x: 0, y: 0 }, { x: 100, y: 100 }];
+	const d = Geom.pointToPolylineDistance(diag, 90, 10);
+	report(d > 50, 'dist: a diagonal pipe does not block its own bounding box', d.toFixed(1) + ' units clear');
+	report(Geom.pointToPolylineDistance([], 0, 0) === Infinity, 'dist: no points is infinitely far, never 0',
+		'a 0 here would read as "congested" and flip every label');
+	report(near(Geom.pointToPolylineDistance([{ x: 3, y: 4 }], 0, 0), 5), 'dist: a single point is handled, not skipped');
+	// Degenerate zero-length segment inside a real polyline (coincident vertices happen on import).
+	report(near(Geom.pointToPolylineDistance([{ x: 0, y: 0 }, { x: 0, y: 0 }, { x: 0, y: 8 }], 0, 4), 0),
+		'dist: a repeated vertex does not produce NaN');
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);

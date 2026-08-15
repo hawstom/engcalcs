@@ -510,35 +510,30 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   idea about leaders. We should get from the user and store the endpoint of the leader, not the
   location of the text. We can either keep that endpoint sacred or scale it up… We have to hold the
   leader angle sacred."* He is right and this supersedes Task 335.
-  - **WHY HIS VERSION BEATS THE PIXEL-OFFSET ONE.** Both hold the angle steady, so that is not the
-    discriminator. The difference is what each one treats as the user's intent. A pixel offset says
-    *"this label sits 40 px from its node"* — the label then stays a fixed distance from the node on
-    screen forever, crowding its neighbours when you zoom out and never getting clear of a busy
-    junction when you zoom in. **Storing the endpoint says "the label belongs OVER THERE", in the
-    drawing, which is the thing the user was actually pointing at.** The endpoint is two world points
-    away from the node, so the angle is zoom-invariant BY CONSTRUCTION rather than by a rule anyone
-    has to maintain.
-  - **The separation is the whole design:** the ENDPOINT is a fact about the drawing (world units,
-    the user's choice, sacred); the TEXT's placement relative to that endpoint is a fact about
-    legibility (pixels, ours, and it flips side as needed so the label never lies across its own
-    leader). Two quantities, two frames, neither contaminating the other. Everything that was
-    confusing about label geometry came from storing one number that tried to be both.
-  - Tom's open question, and it is genuinely open: **keep the endpoint sacred in world units, or
-    scale its length while keeping the angle.** Sacred is simpler and matches a drafted sheet; scaling
-    keeps a leader from becoming a hairline at extreme zoom-out. Both preserve the angle, which is the
-    part he named as non-negotiable.
-  - **The current behaviour is not acceptable and he has said so twice, with a screenshot** —
-    *"Oops. What we have now is not producing good results."* The image (J13, zoomed in) shows four
-    or five data labels piled on top of one another with their leaders crossing: not a label in a
-    slightly wrong place, a knot.
-  - **Read that image as being about COLLISION AVOIDANCE as much as about leaders**, and do not fix
-    only the half this task names. At that zoom the nodes are a few screen-pixels apart, so every
-    label's default resting position lands in the same small patch — and `runLabelCollisionAvoidance()`
-    only ever nudges labels that are still at their default, which is all of them. Either it is not
-    converging with that many mutually-overlapping boxes, or the nudge it can apply is too small to
-    separate them. **Measure before redesigning**: the harness in `dev/lpn-spike/collide-harness.js`
-    can be handed this exact configuration, and a knot is a much easier thing to reproduce headlessly
-    than to argue about.
+  - **WHAT IS ACTUALLY HELD SACRED TODAY, read out of the code rather than guessed at, because Tom
+    had to say twice that I had not understood.** The stored quantity is `n.lx`/`n.ly`: the label
+    BOX'S ORIGIN, in world units. Point B — the leader's text end — is not stored anywhere. It is
+    recomputed every render by `Geom.leaderAttach()`, which returns `pos.x` or `pos.x + boxWidth`
+    depending on which side the box sits, and **`boxWidth` is derived from a font size that is now in
+    SCREEN PIXELS, so it is proportional to 1/zoom.** Therefore B slides along by a whole box width as
+    you zoom whenever the leader attaches to the far edge, and angle A→B slides with it. Tom's
+    diagnosis is exactly right: neither B nor angle A→B is sacred, and the one thing that IS fixed —
+    the box origin — is a point he never chose and cannot see.
+  - **THE FIX IS TO STORE B ITSELF**, in map coordinates, as the thing the user drags. A and B are
+    then both world points, so the angle is invariant with no rule to maintain, and the TEXT hangs
+    off B — placed in pixels, flipping to whichever side keeps it from lying across its own leader.
+    The endpoint is a fact about the drawing (the user's, sacred); the text placement is a fact about
+    legibility (ours). One number was trying to be both, and that is the whole of what has been wrong
+    here.
+  - **Tom's open question is about LENGTH, not width — I misread him once already.** *"The length of
+    the leader could be scaled up; you heard 'width'."* So: hold B's map coordinates fixed, or hold
+    the ANGLE fixed and let the leader's length scale with zoom. Both keep the angle, which is the
+    part he named as non-negotiable; they differ in whether a leader stays the same length on the
+    drawing or on the screen.
+  - **The pixel-offset design I proposed (Task 335) would not have fixed this at all**, and the
+    reason is worth keeping: it holds the box ORIGIN steady in screen space, but B is still derived
+    from the box's width, so the far-edge attachment still moves and the angle still slides. It
+    addressed the symptom I had noticed rather than the mechanism. Closed as superseded.
   - This also dissolves the drift Task 335 was invented to fix.
 - 88|329| **Test the GIS paradigm: pipe labels aligned ALONG the pipe.** Tom, 2026-08-14: *"I think
   we first want to test the GIS thing of aligning our pipe labels with pipes… Maybe I can investigate
