@@ -189,3 +189,43 @@ The label end should be a direction plus a paper distance, so the text sits a fi
 leader on the sheet while the leader itself stretches or shortens with the geometry. Tom's own
 phrasing — *"the fixed end point of the leader… possibly shortened at the same angle"* — is that
 same split, arrived at from the drawing side.
+
+## Correction, minutes later, and it is better: there is NO vestige
+
+Tom, immediately after the above:
+
+> Other hand, maybe they exist because of map units, but we store them only as angles. They could be
+> nothing more than a hint to us from the user about the preferred direction we would do our
+> conflict avoidance.
+
+**This supersedes the section above and is a stronger answer.** Everything written there about
+placement belonging to a declared scale — one set of callout positions per scale, AutoCAD's
+annotative table — is more machinery than the problem needs.
+
+The distinction it misses: **map units are the CAUSE of a leader, not something we have to STORE.**
+Crowding is real and is a fact about map space. But the only thing we need to remember is *which way
+the user would rather the label went* — and a direction is scale-free. Everything else (whether a
+leader is needed at all, how long it is, where the text finally lands) is recomputed by collision
+avoidance at the current scale, which is work the renderer already does.
+
+So the stored quantity is **an angle**, and its meaning is a **hint, not a coordinate**:
+
+- **Scale-free by construction.** An angle is correct at every zoom and every plot scale, so the
+  per-scale placement table disappears before it is ever built.
+- **Degrades honestly.** If the preferred direction is blocked at this scale, avoidance moves the
+  label and the user's intent is still expressed as far as it can be. A stored coordinate has no
+  such fallback — it is either honoured or overridden, and both are wrong.
+- **It matches what the renderer already is.** `runLabelCollisionAvoidance()` is a placement engine;
+  a preferred direction is exactly the input such an engine wants. Today we fight it by storing an
+  answer; this feeds it a preference instead.
+
+**Therefore the paradigm is total: nothing is stored in map units.** Text, symbols, strokes,
+thresholds and label offsets are paper quantities; a leader's direction is an angle; the network's
+own coordinates are the model. The "vestige" turned out to be a cause we were mistaking for a
+measurement.
+
+**The one thing given up, stated plainly:** exact placement. A drafter who wants a callout at
+precisely that spot on a plot cannot have it from a hint. If that turns out to matter, the answer is
+a per-label "pin" that stores a real position and opts out of avoidance — but it should wait for
+someone to actually want it, because a hint is more robust for a drawing that re-solves and
+re-labels on every edit.

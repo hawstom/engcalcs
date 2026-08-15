@@ -536,10 +536,19 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     units like every other stroke. And crowding is a function of SCALE. So placement belongs to a
     **declared scale**: one set of callout positions per scale, not one per zoom level and not one
     forever. That is exactly what AutoCAD's annotative objects do, and it is why that feature exists.
-  - **So `lb.x`/`lb.y` are HALF RIGHT, which is why they half work.** The anchor end is genuinely
-    map-space and stays; the label end should be a direction plus a PAPER distance, so the text sits
-    a fixed distance off the leader on the sheet while the leader stretches with the geometry. Tom's
-    *"fixed end point… possibly shortened at the same angle"* is the same split from the drawing side.
+  - **THEN SUPERSEDED, minutes later, by a better answer from Tom**: *"maybe they exist because of
+    map units, but we store them only as angles. They could be nothing more than a hint to us from
+    the user about the preferred direction we would do our conflict avoidance."* Map units are the
+    CAUSE of a leader, not something we must STORE. The stored quantity becomes **an angle**, and its
+    meaning a **hint** — scale-free by construction, so the per-scale placement table disappears
+    before it is built; degrading honestly when the preferred direction is blocked, where a stored
+    coordinate can only be honoured or overridden; and feeding
+    `runLabelCollisionAvoidance()` the preference such an engine actually wants instead of fighting
+    it with a stored answer.
+  - **So nothing is stored in map units at all** — `lb.x`/`lb.y` become an angle. The "vestige" was a
+    cause mistaken for a measurement. Given up: exact placement. If a drafter ever needs a callout
+    pinned to a precise spot on a plot, that is a per-label opt-out of avoidance — wait until someone
+    asks.
   - `LPN_CALLOUT_ANGLE` (70°) and the existing collision avoidance already assume a leader has a
     direction, so the machinery is half there.
 
