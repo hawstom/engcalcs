@@ -753,6 +753,17 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     large model.
 
 - 96|314| **An EXAMPLES LIBRARY, on the HEC-RAS model: a pane of many examples, not a menu of two.**
+  - **The shelf is nearly stocked already: Net1, Net2 and Net3 are good examples too** (Tom,
+    2026-08-14), and `dev/epanet-models/` already holds all three as SAVED PROJECTS of ours, not
+    just as `.inp` — 11, 36 and 97 nodes, a useful spread. **But that directory is in `.gitignore`,
+    so none of it is in the repo and none of it deploys.** Whatever the library ships, tracking the
+    files is step zero.
+  - **THE GAP IS AN SI EXAMPLE, and it cannot be made by converting one** (Tom: *"We just need an SI
+    one now. I will eventually make one or find one."*). All three EPANET nets are `Units GPM`, and
+    this suite's standing rule is that switching a unit REINTERPRETS the typed number rather than
+    converting it — so opening Net1 and clicking SI gives 8 mm mains, not 200 mm ones. An SI example
+    has to be AUTHORED in metres, or imported from an `.inp` that declares LPS/LPM/CMH/MLD, which
+    `js/lpn-inp.js` already reads correctly. That is the cheap route if a public SI model turns up.
   - **There is a real first exhibit: Tom's own "Elm Street Center"** (2026-08-14: *"should be a
     solid US units example now"*). It lives in HIS browser's storage, so step one of this task is
     getting it OUT — the library needs a shipped file, not a project on one machine. That also
