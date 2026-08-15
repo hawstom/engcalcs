@@ -109,6 +109,24 @@ var EngCalcs = EngCalcs || {};
 	// beside the symbol) unless the user drags it -- n.lx/n.ly (or l.lx/l.ly) then record that as an
 	// explicit offset, persisted with the element like any other property. undefined means "still at
 	// the default" so an old saved network (no lx/ly at all) renders identically to before this task.
+	//
+	// WHAT lx/ly LOCATE IS THE LEADER'S ENDPOINT -- point B -- NOT THE TEXT (ROADMAP Task 328, Tom
+	// 2026-08-14: "we should get from the user and store the endpoint of the leader, not the location
+	// of the text... we have to hold the leader angle sacred", and then twice more when it was still
+	// wrong: "angle is not constant. You must not be saving point B", "it appears that you have been
+	// still saving the top line text point"). He was right both times: this used to be the top-left
+	// corner of the text box, and B was recomputed from it every render as one edge of that box --
+	// a box whose width is a SCREEN-PIXEL quantity since the paper-units change, hence ~1/zoom in
+	// world units. So B slid by a whole box width as you zoomed whenever the text hung on the far
+	// side, and the angle A->B slid with it.
+	// Now B is stored and the TEXT hangs off it (dataLabelOrigin()). The two are different kinds of
+	// fact and that is the whole design: the endpoint is a fact about the DRAWING -- the user's,
+	// world units, sacred -- while which side the text sits on is a fact about LEGIBILITY, ours,
+	// and free to flip. One number was trying to be both.
+	// A pre-Task-328 save reads its lx/ly as B. That is exact for every label that hung to the
+	// RIGHT of its anchor (there B already was the box origin) and shifts a left-hanging one by one
+	// box width. Not migrated, because the old width is unrecoverable -- it depended on the zoom the
+	// label was last rendered at, which is precisely the defect.
 	// Scaled with the symbols, not fixed (Tom, 2026-07-30): the offset exists to clear the node or
 	// pipe the label belongs to, so at 2x symbols a fixed +2,-2 would start the label inside its own
 	// node. A label the user has DRAGGED keeps the exact offset they dropped it at (n.lx/n.ly are
@@ -188,19 +206,29 @@ var EngCalcs = EngCalcs || {};
 	// following the same rule as the Text leaders" -- without this a data label dragged to the left
 	// of its anchor drew its leader to the label's LEFT edge, running the line straight through the
 	// text instead of attaching to the near (right) edge.
-	function updateDataLeader(holder, anchor, pos) {
+	function updateDataLeader(holder, anchor, end) {
 		if (!holder.leader) { return; }
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
-		var d = Math.hypot(pos.x - anchor.x, pos.y - anchor.y);
+		var d = Math.hypot(end.x - anchor.x, end.y - anchor.y);
 		if (d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
-		// labelBoxWidth(), not tw: the extrema badge hangs past the digits, and attaching to the
-		// text's own right edge draws the leader through it -- see measureDecorRight().
-		var halfW = labelBoxWidth(holder) / 2,
-			att = Geom.leaderAttach(holder.side, pos.x + halfW, halfW, anchor.x, ADVERSE_FRAC);
-		holder.side = att.side;
+		// A -> B, both world points, nothing derived. This line is the whole of Task 328: the
+		// endpoint used to be computed here from the label box, so it moved when the box's
+		// pixel width did, and the angle moved with it.
 		holder.leader.style.display = '';
 		holder.leader.setAttribute('x1', anchor.x); holder.leader.setAttribute('y1', anchor.y);
-		holder.leader.setAttribute('x2', att.x); holder.leader.setAttribute('y2', pos.y);
+		holder.leader.setAttribute('x2', end.x); holder.leader.setAttribute('y2', end.y);
+	}
+	// WHERE THE TEXT GOES, given the endpoint the user placed. The box hangs off B on whichever
+	// side keeps it from lying across its own leader, which is a fact about legibility and is
+	// therefore allowed to move with the zoom -- unlike B itself. labelBoxWidth(), not tw: the
+	// extrema badge hangs past the digits, and hanging the box off the text's own edge would let
+	// the badge sit over the rule -- see measureDecorRight().
+	// holder.side persists across calls to carry the hysteresis, exactly as it did when this was
+	// the leader's attachment edge.
+	function dataLabelOrigin(holder, anchor, end) {
+		var w = labelBoxWidth(holder);
+		holder.side = Geom.labelSideAtEnd(holder.side, end.x, anchor.x, w / 2, ADVERSE_FRAC);
+		return { x: holder.side === 'right' ? end.x : end.x - w, y: end.y };
 	}
 	// Approximate vertical box of a left-anchored, top-down multi-line <text> (node/link labels):
 	// no exact ascent/descent metrics available cross-browser without layout, so this uses a
@@ -237,10 +265,10 @@ var EngCalcs = EngCalcs || {};
 	function hideMask(mask) { mask.setAttribute('width', 0); mask.setAttribute('height', 0); }
 	function layoutNodeLabel(id) {
 		var n = nodeById(id), ne = nodeEls[id]; if (!ne) { return; }
-		var pos = nodeLabelPos(n);
-		repositionMultilineText(ne.text, pos.x, pos.y);
-		if (ne.empty) { hideMask(ne.mask); } else { positionMaskRect(ne.mask, pos.x, pos.y, labelBoxWidth(ne), dataLabelBoxHeight(ne.lineCount), 'start', 'top'); }
-		updateDataLeader(ne, { x: n.x, y: n.y }, pos);
+		var anchor = { x: n.x, y: n.y }, end = nodeLabelPos(n), org = dataLabelOrigin(ne, anchor, end);
+		repositionMultilineText(ne.text, org.x, org.y);
+		if (ne.empty) { hideMask(ne.mask); } else { positionMaskRect(ne.mask, org.x, org.y, labelBoxWidth(ne), dataLabelBoxHeight(ne.lineCount), 'start', 'top'); }
+		updateDataLeader(ne, anchor, end);
 	}
 	// Same as layoutNodeLabel() above, for a link's data label -- anchor is the link's own mid-
 	// segment point (linkLabelMid()), which itself moves whenever a vertex/endpoint drags.
@@ -344,10 +372,10 @@ var EngCalcs = EngCalcs || {};
 		le.text.removeAttribute('transform');
 		le.text.setAttribute('text-anchor', 'start');
 		if (le.mask) { le.mask.removeAttribute('transform'); }
-		var pos = linkLabelPos(l);
-		repositionMultilineText(le.text, pos.x, pos.y);
-		if (le.empty) { hideMask(le.mask); } else { positionMaskRect(le.mask, pos.x, pos.y, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'start', 'top'); }
-		updateDataLeader(le, { x: mid.x, y: mid.y }, pos);
+		var anchor = { x: mid.x, y: mid.y }, end = linkLabelPos(l), org = dataLabelOrigin(le, anchor, end);
+		repositionMultilineText(le.text, org.x, org.y);
+		if (le.empty) { hideMask(le.mask); } else { positionMaskRect(le.mask, org.x, org.y, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'start', 'top'); }
+		updateDataLeader(le, anchor, end);
 	}
 	// Double-click-to-reset (Tom, 2026-07-30): clears a manually-dragged label's offset entirely
 	// (n.lx/n.ly back to undefined), so it falls back to DEFAULT_LABEL_OFFSET and the leader --
@@ -389,12 +417,12 @@ var EngCalcs = EngCalcs || {};
 	// label's own width).
 	function currentLeaderBoxes() {
 		var out = [];
-		function dataLeader(holder, anchor, pos) {
+		function dataLeader(holder, anchor, end) {
 			if (!holder || holder.empty) { return; }
-			if (Math.hypot(pos.x - anchor.x, pos.y - anchor.y) <= leaderThreshold()) { return; }
-			var halfW = labelBoxWidth(holder) / 2;
-			Collide.pushLeaderSamples(out, anchor.x, anchor.y,
-				Geom.leaderAttachX(pos.x + halfW, halfW, anchor.x), pos.y, holder);
+			if (Math.hypot(end.x - anchor.x, end.y - anchor.y) <= leaderThreshold()) { return; }
+			// The stored endpoint itself -- the same two world points updateDataLeader() draws
+			// between, with nothing derived from the box in either place (Task 328).
+			Collide.pushLeaderSamples(out, anchor.x, anchor.y, end.x, end.y, holder);
 		}
 		doc.nodes.forEach(function (n) { dataLeader(nodeEls[n.id], { x: n.x, y: n.y }, nodeLabelPos(n)); });
 		doc.links.forEach(function (l) { dataLeader(linkEls[l.id], linkLabelMid(l), linkLabelPos(l)); });
@@ -449,11 +477,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
-			addDataLabel(ne, nodeLabelBase(n), n.lx !== undefined, ne.lineCount);
+			addDataLabel(ne, dataLabelOrigin(ne, { x: n.x, y: n.y }, nodeLabelBase(n)), n.lx !== undefined, ne.lineCount);
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
-			addDataLabel(le, linkLabelBase(l), l.lx !== undefined, le.lineCount);
+			addDataLabel(le, dataLabelOrigin(le, linkLabelMid(l), linkLabelBase(l)), l.lx !== undefined, le.lineCount);
 		});
 		// Leaders are rebuilt every iteration (they track their labels); node symbols and Text
 		// labels do not move, so they are built once above.

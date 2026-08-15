@@ -110,6 +110,30 @@ EngCalcs.lpnGeom = (function () {
 		return { side: side, x: side === 'right' ? centerX - halfW : centerX + halfW };
 	}
 
+	// THE OTHER DIRECTION, and the one a data label uses now (ROADMAP Task 328). Above,
+	// the label box is the input and the leader's end is derived from it -- which is
+	// exactly why the leader angle would not hold still: the box's WIDTH is a screen-pixel
+	// quantity, so in world units it is proportional to 1/zoom, and a leader attached to
+	// the far edge slid by a whole box width as you zoomed. Here the ENDPOINT is the input
+	// (the user's own point, in map units) and the TEXT hangs off it, so the angle from
+	// anchor to endpoint is invariant by construction rather than by a rule anyone
+	// maintains.
+	// Returns which side of the endpoint the box occupies: 'right' means it extends to the
+	// right (its left edge sits ON the endpoint), 'left' means it extends left. The text
+	// therefore always continues AWAY from the anchor, so the rule never runs through it.
+	// Hysteresis is the same idea and the same number as leaderAttach()'s: with
+	// adverseFrac 0.75 the flip waits until the endpoint is half a box-half-width past the
+	// anchor's vertical line, so an endpoint parked on that line does not flicker the text
+	// from one side to the other by its full width.
+	function labelSideAtEnd(prevSide, endX, anchorX, halfW, adverseFrac) {
+		var offset = endX - anchorX,
+			hyst = halfW * (2 * adverseFrac - 1),
+			side = prevSide || 'right';
+		if (side === 'right' && offset < -hyst) { side = 'left'; }
+		else if (side === 'left' && offset > hyst) { side = 'right'; }
+		return side;
+	}
+
 	// ---- label boxes -----------------------------------------------------
 
 	// Approximate vertical box of a left-anchored, top-down multi-line <text> (node/link
@@ -234,6 +258,7 @@ EngCalcs.lpnGeom = (function () {
 		dodgeAlongPolyline: dodgeAlongPolyline,
 		leaderAttachX: leaderAttachX,
 		leaderAttach: leaderAttach,
+		labelSideAtEnd: labelSideAtEnd,
 		dataLabelBoxHeight: dataLabelBoxHeight,
 		maskRect: maskRect,
 		alignedLabelAnchor: alignedLabelAnchor,

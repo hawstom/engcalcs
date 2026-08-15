@@ -16,8 +16,14 @@
 //     highest and lowest" toggle arrives here — there is no second code path for the switch;
 //   * the leader attaching left of the badge, i.e. drawing the rule straight through it.
 //
-// The leader half is checked against the REAL Geom.leaderAttach() from js/lpn-geom.js, not a copy:
-// the defect was in what got PASSED to it, and a re-implementation here would test the wrong thing.
+// The leader half is checked against the REAL geometry from js/lpn-geom.js, not a copy: the defect
+// was in what got PASSED to it, and a re-implementation here would test the wrong thing.
+//
+// UPDATED FOR TASK 328, which turned the leader around. The endpoint is now STORED and the text
+// hangs off it, so the box width no longer decides where the rule ends -- it decides where the TEXT
+// starts. The invariant is the same one and the failure looks identical on screen: hang the box off
+// the text width alone and the badge reaches PAST the endpoint, straight across the rule. Only the
+// function that has to know it moved, from updateDataLeader() to dataLabelOrigin().
 
 const fs = require('fs');
 const path = require('path');
@@ -61,7 +67,10 @@ function fakeText(widths) {
 	return { childNodes: widths.map(w => ({ getComputedTextLength: () => w })) };
 }
 
-eval([extract('measureDecorRight'), extract('labelBoxWidth')].join('\n'));
+// ADVERSE_FRAC comes out of the file for the same reason the badge dimensions do -- a retune of the
+// hysteresis must move these assertions rather than strand them on a copied number.
+const ADVERSE_FRAC = +(src.match(/var ADVERSE_FRAC = ([\d.]+);/) || [])[1];
+eval([extract('measureDecorRight'), extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 
 // ---- 1. the reach itself ------------------------------------------------
 {
@@ -108,34 +117,47 @@ eval([extract('measureDecorRight'), extract('labelBoxWidth')].join('\n'));
 
 	// All four consumers, by name. Missing one is exactly how this defect survived: the leader was
 	// the visible symptom, but collision avoidance and zoom-to-fit read the same number.
-	for (const site of ['updateDataLeader', 'currentLeaderBoxes', 'layoutNodeLabel', 'layoutLinkLabel', 'bbox']) {
+	// dataLabelOrigin() replaced updateDataLeader()/currentLeaderBoxes() here when Task 328 moved
+	// the width from the leader's end to the text's start -- those two now draw between two stored
+	// world points and must NOT read a width at all, which is asserted directly below.
+	for (const site of ['dataLabelOrigin', 'layoutNodeLabel', 'layoutLinkLabel', 'bbox']) {
 		report(/labelBoxWidth\(/.test(extract(site)), `${site}() uses labelBoxWidth()`);
 	}
 	report(/w: labelBoxWidth\(holder\)/.test(extract('runLabelCollisionAvoidance')), 'collision boxes use labelBoxWidth()');
 }
 
-// ---- 4. the leader clears the badge -------------------------------------
-// The reported case: label dragged LEFT of its anchor, so the leader attaches to the label's RIGHT
-// edge and runs steeply back to the node. If that edge is the text's, the rule crosses the badge.
+// ---- 4. the badge stays inside the box, so the rule never crosses it ----
+// The reported case, restated for Task 328: the label hangs LEFT of its anchor, so its RIGHT edge
+// is the one sitting on the leader's endpoint. If that edge is the text's own, the badge hangs past
+// the endpoint and the steep rule runs straight through it.
 {
-	const anchorX = 100, posX = 60, tw = 20, decorRight = 34;   // badge reaches 14 past the digits
-	const badgeRight = posX + decorRight;
+	const anchorX = 100, endX = 60, tw = 20, decorRight = 34;   // badge reaches 14 past the digits
+	const end = { x: endX, y: 0 };
 
-	const bad = tw / 2;                                          // what the code used to pass
-	const before = Geom.leaderAttach('left', posX + bad, bad, anchorX, 0.25);
-	report(before.x < badgeRight, 'the old text-only width attached INSIDE the badge (the reported defect)',
-		`${before.x} < ${badgeRight}`);
+	const holder = { tw: tw, decorRight: decorRight, side: 'left' };
+	const org = dataLabelOrigin(holder, { x: anchorX, y: 0 }, end);
+	report(holder.side === 'left', 'a label left of its anchor keeps its text on the left');
+	report(near(org.x + labelBoxWidth(holder), endX),
+		'its right edge lands exactly on the stored endpoint', `${org.x + labelBoxWidth(holder)} vs ${endX}`);
+	report(near(org.x + decorRight, endX), 'and that edge IS the badge\'s outer end',
+		`${org.x + decorRight} vs ${endX}`);
+	// What the text-only width would have done: the badge lands 14 past the endpoint, over the rule.
+	report(endX - tw + decorRight > endX, 'the old text-only width would put the badge past it (the reported defect)',
+		`${endX - tw + decorRight} > ${endX}`);
 
-	const halfW = labelBoxWidth({ tw: tw, decorRight: decorRight }) / 2;
-	const after = Geom.leaderAttach('left', posX + halfW, halfW, anchorX, 0.25);
-	report(after.side === 'left', 'a label left of its anchor still attaches on the label\'s right edge');
-	report(near(after.x, badgeRight), 'and that edge is now the badge\'s outer end', `${after.x} vs ${badgeRight}`);
+	// The other side is unaffected: hanging RIGHT, the text starts AT the endpoint and the badge
+	// trails away from the rule — so widening the box must not move the origin at all.
+	const rightHolder = { tw: tw, decorRight: decorRight, side: 'right' };
+	const rightOrg = dataLabelOrigin(rightHolder, { x: anchorX, y: 0 }, { x: 200, y: 0 });
+	report(near(rightOrg.x, 200), 'hanging right, the text starts on the endpoint', String(rightOrg.x));
 
-	// The other side is unaffected: dragged RIGHT, the leader attaches to the LEFT edge, which the
-	// badge never touches — so widening the box must not move it.
-	const rightHalf = labelBoxWidth({ tw: tw, decorRight: decorRight }) / 2;
-	const rightSide = Geom.leaderAttach('right', 200 + rightHalf, rightHalf, anchorX, 0.25);
-	report(near(rightSide.x, 200), 'dragged right, the leader still attaches at the text\'s left edge', String(rightSide.x));
+	// AND THE ENDPOINT ITSELF IS NEVER DERIVED. This is the whole of Task 328: the two functions
+	// that draw the rule take two world points and must not consult a width, or the angle starts
+	// moving with the zoom again.
+	report(!/labelBoxWidth\(/.test(extract('updateDataLeader')),
+		'updateDataLeader() reads no width -- it draws A to the stored B');
+	report(!/labelBoxWidth\(/.test(extract('currentLeaderBoxes')),
+		'currentLeaderBoxes() reads no width either -- same two points');
 }
 
 // ---- 5. measured before layout, not after -------------------------------
