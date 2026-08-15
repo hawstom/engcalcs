@@ -19,6 +19,34 @@
  *
  */
 
+// PCRE's JIT compiler needs to allocate EXECUTABLE memory, and a hardened web server will not let
+// it -- PHP then emits, on the first preg_* call of the request:
+//
+//   Warning: preg_replace(): Allocation of JIT memory failed, PCRE JIT will be disabled. This is
+//   likely caused by security restrictions. Either grant PHP permission to allocate executable
+//   memory, or set pcre.jit=0
+//
+// It is a warning, not an error: PCRE falls back to the interpreter and every pattern still matches
+// correctly. What makes it worth fixing is WHERE it lands. Task 322 turned display_errors on for
+// DEBUG_MODE, so on a dev host this now prints into the page's HTML -- above the doctype, since the
+// first regex runs during the bootstrap -- and on production it goes on repeating itself into
+// error_log for the life of the install. Neither is a thing to leave alone once seen.
+//
+// **CLI IS EXCLUDED ON PURPOSE, because there the JIT works and is worth having.** Verified
+// 2026-08-14: `php -r 'preg_match(...)'` on this machine JITs without complaint; only the web SAPI
+// is restricted. The split matters -- dev/scripts/ parses 27 language files with heavy patterns on
+// every check_all.sh run, which is exactly the workload a JIT earns its keep on, while a web
+// request runs a handful of small patterns over cookie-sized inputs and cannot measure the
+// difference. So this buys back the warning at no cost anybody can observe.
+//
+// This is deliberately not left to php.ini: the suite is deployed by `git pull` onto a host we do
+// not configure, so a fix that lives in server config is a fix that does not travel.
+//
+// FIRST STATEMENT IN THE BOOTSTRAP, and it has to be. lib/base.inc.php requires this file before
+// anything else and contains no regex of its own, so this runs before the suite's first preg_* --
+// setting it later would emit the warning once and then suppress the ones that no longer matter.
+if (PHP_SAPI !== 'cli') { ini_set('pcre.jit', '0'); }
+
 $basedirectory = realpath(__DIR__.'/../..');
 
 // Set some global variables
