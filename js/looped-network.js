@@ -42,8 +42,25 @@ var EngCalcs = EngCalcs || {};
 	// mult (Task 146.03): a Text label's own per-label size multiplier (lb.sizeMult, default 1),
 	// stacked on top of the shared settings.textSize -- node/link labels never pass one, so they
 	// are unaffected.
+	// A FLOOR IN SCREEN PIXELS, so a label can never render too small to be a label.
+	//
+	// Tom's framing, 2026-08-14, and it is the one that makes this easy: *"I guess the pipe width can
+	// never be less than one pixel, and it's a really easy solution after all."* A pipe stroke cannot
+	// practically vanish -- the display floors it at a hairline -- but TEXT AND SYMBOLS are in map
+	// units with no floor at all, so they go sub-pixel and disappear completely. That asymmetry is
+	// the whole of what he hit importing Net3: the network was there, drawn, correct, and the labels
+	// were rendering at a fraction of a pixel.
+	//
+	// Below about seven device pixels a label is a smudge rather than information, so rendering it
+	// smaller serves nobody. The floor only engages when the result WOULD be illegible: zoom in and
+	// textSize * state.s exceeds it immediately, so a deliberately small size still behaves normally
+	// everywhere it can actually be read. It is a floor on the OUTPUT, not a clamp on the setting --
+	// the number the user typed is untouched, which matters because that number is saved.
+	var LPN_MIN_TEXT_PX = 7;
 	function effectiveFontSize(mult) {
-		var base = settings.textSizeUnits === 'screen' ? settings.textSize / state.s : settings.textSize;
+		var base = settings.textSizeUnits === 'screen' ? settings.textSize / state.s : settings.textSize,
+			floor = LPN_MIN_TEXT_PX / (state.s || 1);
+		if (base < floor) { base = floor; }
 		return base * (mult || 1);
 	}
 	function effectiveLineHeight() { return effectiveFontSize() * 1.2; }
@@ -1259,8 +1276,16 @@ var EngCalcs = EngCalcs || {};
 	// A per-element breakdown (separate pipe width, node size, pump size, reservoir size) is the
 	// obvious next step and is deliberately not built yet -- this is the two-dimensional control
 	// Tom asked for, with the fine-grained one left for when someone actually needs it.
+	// Same screen-pixel floor as effectiveFontSize(), for the same reason: a junction drawn at a
+	// fraction of a pixel is an invisible node, and an invisible node on a correct drawing is the
+	// worst failure this map has -- nothing to click, nothing to diagnose. JUNCTION_R is 0.9, so the
+	// factor needed for a minimum-radius dot is LPN_MIN_SYMBOL_PX / (2 * JUNCTION_R) screen pixels
+	// converted back into map units.
+	var LPN_MIN_SYMBOL_PX = 4;
 	function symbolFactor() {
-		return textFactor() * (settings.symbolScale > 0 ? settings.symbolScale : 1);
+		var f = textFactor() * (settings.symbolScale > 0 ? settings.symbolScale : 1),
+			floor = (LPN_MIN_SYMBOL_PX / (2 * JUNCTION_R)) / (state.s || 1);
+		return f < floor ? floor : f;
 	}
 	// Junction radius. 1.6 -> 0.72 earlier on 2026-08-09 ("about twice as large" next to text),
 	// then 0.9 the same day once the node became a stroke-less solid dot: with the 1-unit ring
