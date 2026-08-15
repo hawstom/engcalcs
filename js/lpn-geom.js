@@ -158,6 +158,41 @@ EngCalcs.lpnGeom = (function () {
 		return { x: left - pad, y: top - pad, width: w + 2 * pad, height: h + 2 * pad };
 	}
 
+	// The AXIS-ALIGNED BOUNDING BOX of a label that is drawn ROTATED, given where it would be
+	// unrotated. Added 2026-08-14 for the aligned-pipe-label collision defect (ROADMAP Task 329).
+	//
+	// **WHY THIS IS NEEDED AT ALL, because the answer is not "for tidiness".** An aligned pipe
+	// label is rendered `text-anchor: middle` and rotated about its own anchor, and it takes NO
+	// nudge — the GIS convention says a label lying along its pipe has already declared which pipe
+	// it belongs to, so it does not get moved. But the collision pass was still handing the
+	// relaxation an UNROTATED box at the label's UNALIGNED position. That box is a phantom in two
+	// directions at once: it shoves other labels away from a place where nothing is drawn, and the
+	// real rotated text sits somewhere else entirely, colliding with whatever is actually there
+	// and never being seen by the pass meant to prevent exactly that.
+	//
+	// The rotation is about the ANCHOR (ax, ay), not about the box's own centre — that is what the
+	// SVG `rotate(a cx cy)` on the text element does, and a box rotated about the wrong point is
+	// off by the distance between the two, which for a single-line label is most of its height.
+	// So: rotate the unrotated box's centre about the anchor, then grow the half-extents by the
+	// standard |w·cos|+|h·sin| formula.
+	//
+	// Returns the same {x, y, w, h} shape the collision boxes use (x/y = top-left), so the caller
+	// can hand it straight to lpn-collide with `movable: false`.
+	function rotatedLabelBox(ax, ay, w, h, angleDeg, fontSize) {
+		// Unrotated geometry, in the aligned label's own convention: horizontally centred on the
+		// anchor, first line's baseline at the anchor. Same 0.85·fontSize ascent approximation
+		// maskRect() uses above, for the same reason — no cross-browser metrics without layout.
+		var cx0 = ax, cy0 = ay - fontSize * 0.85 + h / 2,
+			rad = angleDeg * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad),
+			dx = cx0 - ax, dy = cy0 - ay,
+			// The rotated centre.
+			cx = ax + dx * cos - dy * sin,
+			cy = ay + dx * sin + dy * cos,
+			halfW = (Math.abs(w * cos) + Math.abs(h * sin)) / 2,
+			halfH = (Math.abs(w * sin) + Math.abs(h * cos)) / 2;
+		return { x: cx - halfW, y: cy - halfH, w: halfW * 2, h: halfH * 2 };
+	}
+
 
 	// ---- Aligned (GIS-style) link labels ---------------------------------------------------
 	//
@@ -262,6 +297,7 @@ EngCalcs.lpnGeom = (function () {
 		dataLabelBoxHeight: dataLabelBoxHeight,
 		maskRect: maskRect,
 		alignedLabelAnchor: alignedLabelAnchor,
+		rotatedLabelBox: rotatedLabelBox,
 		pointToSegmentDistance: pointToSegmentDistance,
 		pointToPolylineDistance: pointToPolylineDistance
 	};

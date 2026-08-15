@@ -173,9 +173,13 @@ var EngCalcs = EngCalcs || {};
 	// arrow"). Arrows sit at ARROW_ALONG of each SEGMENT, so on some geometries the two coincide.
 	// The label moves along the pipe rather than off it, keeping it on the thing it labels, and is
 	// clamped well inside the ends so it never crowds a node.
-	function linkLabelMid(l) {
+	// `along` overrides the default half-way station. Only the aligned-label station search passes
+	// it: an aligned label that collides with another aligned label cannot be nudged sideways (it
+	// would leave its pipe), so it SLIDES, which is what a GIS does with a road name. The arrow
+	// dodge still applies at whatever station is asked for.
+	function linkLabelMid(l, along) {
 		var clear = (ARROW_NOMINAL_LEN * arrowFactor()) * 1.5;
-		return Geom.dodgeAlongPolyline(linkPointList(l), LINK_LABEL_ALONG,
+		return Geom.dodgeAlongPolyline(linkPointList(l), along === undefined ? LINK_LABEL_ALONG : along,
 			arrowAlongDistances(l), clear, 0.12, 0.88);
 	}
 	function linkLabelBase(l) {
@@ -359,6 +363,46 @@ var EngCalcs = EngCalcs || {};
 		if (le.leader) { le.leader.style.visibility = v; }
 		(le.tickEls || []).forEach(function (t) { t.style.visibility = v; });
 	}
+	// WHERE AN ALIGNED LINK LABEL ACTUALLY LANDS: {ax, ay, angle}. Extracted from layoutLinkLabel()
+	// on 2026-08-14 because it now has TWO callers, and the reason it needed two is the whole bug.
+	//
+	// ALIGNED means: text-anchor middle, rotated about its own anchor, no leader and no nudge. A
+	// leader would be redundant by construction -- a label lying along the pipe already says which
+	// pipe it belongs to by its ORIENTATION, which is the whole economy of the GIS convention and
+	// the reason it survives on maps carrying thousands of labels.
+	//
+	// **"No nudge" was read as "not the collision pass's business", and that was the defect.** A
+	// label that does not MOVE is still an OBSTACLE, and this one is an obstacle at a rotated
+	// position that only this function can compute. While it was inlined in the layout function,
+	// the collision pass had no way to ask where the label was, so it used the unaligned position
+	// and the unrotated box -- see runLabelCollisionAvoidance(). Anything that needs to know where
+	// an aligned label is must come through here; a second copy of this arithmetic would drift from
+	// the drawing the moment either side changed, and drift here is invisible in code and obvious
+	// on screen.
+	function alignedLabelPlacement(l, le, along) {
+		var mid = linkLabelMid(l, along),
+			dir = linkDirectionAt(l, mid),
+			opt = {
+				frac: 0, gap: nodeRadius({ type: 'junction' }) + effectiveFontSize() * 0.35,
+				fontSize: effectiveFontSize(), lineHeight: effectiveLineHeight(),
+				nLines: le.lineCount || 1
+			},
+			// Both candidates come from the same call, which is why alignedLabelAnchor() returns
+			// a side rather than choosing one -- see ROADMAP Task 329.
+			candTop = Geom.alignedLabelAnchor(dir.ax, dir.ay, dir.bx, dir.by,
+				Object.assign({ side: 1 }, opt)),
+			candBot = Geom.alignedLabelAnchor(dir.ax, dir.ay, dir.bx, dir.by,
+				Object.assign({ side: -1 }, opt)),
+			// The candidates are offsets from dir's own start point; re-base both onto the
+			// label's dodged mid-point before measuring clearance, or we would be measuring
+			// congestion at a place the label is never drawn.
+			topPt = { x: mid.x + (candTop.x - dir.ax), y: mid.y + (candTop.y - dir.ay) },
+			botPt = { x: mid.x + (candBot.x - dir.ax), y: mid.y + (candBot.y - dir.ay) },
+			a = alignedSideFor(l, topPt, botPt) < 0 ? candBot : candTop;
+		// alignedLabelAnchor() offsets from a point ALONG the segment it is given; we want it
+		// offset from the label's own dodged mid-point, so pass frac 0 and re-base here.
+		return { ax: mid.x + (a.x - dir.ax), ay: mid.y + (a.y - dir.ay), angle: a.angle };
+	}
 	function layoutLinkLabel(id) {
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE the aligned branch returns, so both label styles obey it. applyExtremaTicks()
@@ -368,39 +412,19 @@ var EngCalcs = EngCalcs || {};
 		setLabelAssemblyHidden(le, le.hiddenShort);
 		var mid = linkLabelMid(l);
 		if (linkLabelAligned(l)) {
-			// ALIGNED: text-anchor middle, rotated about its own anchor, no leader and no nudge.
-			// A leader would be redundant by construction -- a label lying along the pipe already
-			// says which pipe it belongs to by its ORIENTATION, which is the whole economy of the
-			// GIS convention and the reason it survives on maps carrying thousands of labels.
-			var dir = linkDirectionAt(l, mid),
-				opt = {
-					frac: 0, gap: nodeRadius({ type: 'junction' }) + effectiveFontSize() * 0.35,
-					fontSize: effectiveFontSize(), lineHeight: effectiveLineHeight(),
-					nLines: le.lineCount || 1
-				},
-				// Both candidates come from the same call, which is why alignedLabelAnchor() returns
-				// a side rather than choosing one -- see ROADMAP Task 329.
-				candTop = Geom.alignedLabelAnchor(dir.ax, dir.ay, dir.bx, dir.by,
-					Object.assign({ side: 1 }, opt)),
-				candBot = Geom.alignedLabelAnchor(dir.ax, dir.ay, dir.bx, dir.by,
-					Object.assign({ side: -1 }, opt)),
-				// The candidates are offsets from dir's own start point; re-base both onto the
-				// label's dodged mid-point before measuring clearance, or we would be measuring
-				// congestion at a place the label is never drawn.
-				topPt = { x: mid.x + (candTop.x - dir.ax), y: mid.y + (candTop.y - dir.ay) },
-				botPt = { x: mid.x + (candBot.x - dir.ax), y: mid.y + (candBot.y - dir.ay) },
-				a = alignedSideFor(l, topPt, botPt) < 0 ? candBot : candTop,
-				// alignedLabelAnchor() offsets from a point ALONG the segment it is given; we want it
-				// offset from the label's own dodged mid-point, so pass frac 0 and re-base here.
-				ax = mid.x + (a.x - dir.ax), ay = mid.y + (a.y - dir.ay);
+			// le.alignedAlong is the station placeAlignedLabels() settled on during the collision
+			// pass. Undefined until that has run once (and for an empty label), in which case
+			// alignedLabelPlacement() falls back to the half-way default -- the same value the
+			// search tries first, so the two agree on an uncrowded drawing.
+			var a = alignedLabelPlacement(l, le, le.alignedAlong);
 			le.text.setAttribute('text-anchor', 'middle');
-			le.text.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + ax + ' ' + ay + ')');
-			repositionMultilineText(le.text, ax, ay);
+			le.text.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + a.ax + ' ' + a.ay + ')');
+			repositionMultilineText(le.text, a.ax, a.ay);
 			// The mask has to rotate WITH the text or it stops covering it -- it is sized from the
 			// same box, so the same transform about the same point is exactly right.
 			if (le.empty) { hideMask(le.mask); } else {
-				positionMaskRect(le.mask, ax, ay, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'middle', 'top');
-				le.mask.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + ax + ' ' + ay + ')');
+				positionMaskRect(le.mask, a.ax, a.ay, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'middle', 'top');
+				le.mask.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + a.ax + ' ' + a.ay + ')');
 			}
 			if (le.leader) { le.leader.style.display = 'none'; }
 			return;
@@ -500,8 +524,70 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
+	// The stations an aligned label will try, in order, as fractions along its own pipe. Half-way
+	// first -- that is where it belongs and where it stays in an uncrowded drawing -- then
+	// progressively farther out, alternating sides so the label does not drift consistently one
+	// way along every pipe it is pushed on. Stops well short of the ends: a label sitting on top of
+	// a junction is a worse picture than two labels a little close together, and dodgeAlongPolyline
+	// clamps to 0.12/0.88 anyway.
+	var LPN_ALIGNED_STATIONS = [0.5, 0.36, 0.64, 0.25, 0.75];
+	// A little air between neighbours, in world units scaled off the font -- boxes that merely
+	// touch still read as crowded.
+	var LPN_ALIGNED_PAD_FRAC = 0.35;
+	// **ALIGNED LABELS RESOLVE AMONG THEMSELVES BY SLIDING, NOT BY BEING NUDGED** (2026-08-14, Tom:
+	// "This conflict between pipe labels could and should have been avoided").
+	//
+	// Two things were wrong and only the first is obvious. An aligned label used to go into the
+	// relaxation like any other link label -- MOVABLE, at its UNALIGNED position, with an UNROTATED
+	// box. So the pass pushed a phantom: it shoved real labels out of empty space, computed a nudge
+	// the aligned renderer discards, and never saw the rotated text the user is actually looking at.
+	// Fixing only that (make it an immovable obstacle at the right place) fixes aligned-vs-node and
+	// aligned-vs-Text, and leaves aligned-vs-ALIGNED exactly as broken as before, because two
+	// immovable boxes simply overlap forever. That is the pair in the picture.
+	//
+	// A label bound to a pipe has one degree of freedom -- WHERE ALONG THE PIPE -- so it slides,
+	// which is what every GIS does with a road name and why the convention scales. Sideways is not
+	// available: moving perpendicular means leaving the line, and a rotated label off its own pipe
+	// is no longer saying which pipe it belongs to, which was the entire justification for dropping
+	// its leader.
+	//
+	// LONGEST PIPE FIRST is deliberate. Whoever is placed first gets the middle, and a long pipe
+	// has the most room to give up later while still reading as "this pipe"; a short pipe has
+	// almost no usable stations, so making it choose last is making it choose from nothing. It also
+	// makes the pass STABLE -- the order does not depend on anything the user can change by
+	// clicking, so labels do not rearrange themselves for reasons nobody can see.
+	function placeAlignedLabels(aligned, statics, fs) {
+		var pad = fs * LPN_ALIGNED_PAD_FRAC;
+		aligned.map(function (l) {
+			return { l: l, len: Geom.polylineLength(linkPointList(l)) };
+		}).sort(function (a, b) { return b.len - a.len; }).forEach(function (rec) {
+			var l = rec.l, le = linkEls[l.id];
+			if (!le || le.empty) { if (le) { le.alignedAlong = undefined; } return; }
+			var w = labelBoxWidth(le), h = dataLabelBoxHeight(le.lineCount),
+				best = null, bestBox = null, i, ap, box, clear;
+			for (i = 0; i < LPN_ALIGNED_STATIONS.length; i++) {
+				ap = alignedLabelPlacement(l, le, LPN_ALIGNED_STATIONS[i]);
+				box = Geom.rotatedLabelBox(ap.ax, ap.ay, w, h, ap.angle, fs);
+				clear = !statics.some(function (s) {
+					return Collide.rectsOverlap(box, { x: s.base.x, y: s.base.y + s.yOff, w: s.w, h: s.h }, pad);
+				});
+				// The FIRST clear station wins and the search stops -- it is already the most
+				// central one available, because the list is ordered outward from the middle.
+				if (clear) { best = LPN_ALIGNED_STATIONS[i]; bestBox = box; break; }
+				if (!bestBox) { bestBox = box; best = LPN_ALIGNED_STATIONS[i]; } // fall back to the middle
+			}
+			le.alignedAlong = best;
+			// Committed as an obstacle for everyone placed after it -- including the node and Text
+			// labels the relaxation is about to move, which is the half that was missing entirely.
+			// Immovable: it has spent its one degree of freedom, and other labels must now go round.
+			statics.push({
+				ref: null, owner: null, movable: false, weight: LPN_COLLIDE_WEIGHT.label,
+				base: { x: bestBox.x, y: bestBox.y }, yOff: 0, w: bestBox.w, h: bestBox.h
+			});
+		});
+	}
 	function runLabelCollisionAvoidance() {
-		var fs = effectiveFontSize(), labels = [], statics = staticObstacleBoxes();
+		var fs = effectiveFontSize(), labels = [], aligned = [], statics = staticObstacleBoxes();
 		function addDataLabel(holder, base, manual, lineCount) {
 			// Every nudge is cleared and re-derived from scratch on every pass, manual or not, so the
 			// pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer as
@@ -526,8 +612,26 @@ var EngCalcs = EngCalcs || {};
 			// A label nobody can see is not an obstacle. Skipping it here also clears its nudge, so
 			// zooming back in restores it where it belongs rather than where it was last pushed.
 			if (linkLabelTooShort(l, le)) { le.nudge = { x: 0, y: 0 }; return; }
+			// **AN ALIGNED LABEL DOES NOT MOVE, BUT IT IS STILL IN THE WAY** (fixed 2026-08-14,
+			// Tom: "This conflict between pipe labels could and should have been avoided").
+			//
+			// It used to fall through to addDataLabel() like any other link label, which was wrong
+			// twice over and produced exactly the collision he saw. The box went in as MOVABLE, at
+			// the UNALIGNED position, with an UNROTATED width and height -- so the relaxation spent
+			// its four iterations pushing a box that (a) is never drawn there, (b) shoved real
+			// labels out of empty space, and (c) computed a nudge that the aligned render branch
+			// then ignores anyway. Meanwhile the rotated text the user is actually looking at was
+			// invisible to the pass, free to lie across its neighbour.
+			//
+			// So: immovable, at the placement the drawing really uses, sized as the rotated box's
+			// AABB. Immovable rather than absent, because the whole point is that OTHER labels have
+			// to get out of ITS way -- it has given up its own right to move by being aligned.
+			// An AABB is generous for a diagonal label (it is the enclosing rectangle, not the
+			// rotated one), and generous is the right direction to err in for a legibility guard.
+			if (linkLabelAligned(l)) { aligned.push(l); le.nudge = { x: 0, y: 0 }; return; }
 			addDataLabel(le, dataLabelOrigin(le, linkLabelMid(l), linkLabelBase(l)), l.lx !== undefined, le.lineCount);
 		});
+		placeAlignedLabels(aligned, statics, fs);
 		// Leaders are rebuilt every iteration (they track their labels); node symbols and Text
 		// labels do not move, so they are built once above.
 		Collide.relax(labels, statics, currentLeaderBoxes, 4);
@@ -593,7 +697,27 @@ var EngCalcs = EngCalcs || {};
 		if (holder.hiddenShort) { return; }
 		var x = +textEl.getAttribute('x'), baseY = +textEl.getAttribute('y'), fs = effectiveFontSize(),
 			tf = textFactor(), stroke = TICK_STROKE * tf,
+			// **THE BADGE INHERITS THE LABEL'S OWN TRANSFORM, OR IT IS ORPHANED** (2026-08-14, Tom:
+			// "These glyphs somehow got orphaned", with a picture of rails and chevrons lying beside
+			// a rotated pipe label instead of on the end of it).
+			//
+			// Everything below is positioned from textEl's RAW x/y and appended as a SIBLING of the
+			// text, into `layer`. For a horizontal label the two coordinate systems are the same and
+			// this is invisible. For an aligned pipe label the <text> carries `rotate(angle ax ay)`
+			// -- so the digits swing round to lie along the pipe and their badges, which never got
+			// the transform, stay exactly where the label would have been if it were horizontal.
+			// The further the label is from horizontal, the further the badge is left behind.
+			//
+			// Copied from the element rather than recomputed, so the two can never disagree about
+			// the angle or the centre. It is deliberately not gated on "is this link aligned": the
+			// rule is simply that a badge decorating a transformed text shares its transform, which
+			// stays true for whatever transform some later feature puts on a label.
+			xform = textEl.getAttribute('transform'),
 			i, tspan, width, y, lineY, yHigh, yLow, x0, x1, dir, vertexY, legY, vertexX, chevronPts;
+		function tick(tag, attrs) {
+			if (xform) { attrs.transform = xform; }
+			holder.tickEls.push(el(tag, attrs, layer));
+		}
 		for (i = 0; i < lines.length; i++) {
 			if (!lines[i].decoration) { continue; }
 			tspan = textEl.childNodes[i];
@@ -610,23 +734,23 @@ var EngCalcs = EngCalcs || {};
 			// chevron points, an absolute judgment. The earlier single-rail design asked the reader to
 			// judge where one line sat relative to digits it wasn't touching, a relative one.
 			y = lines[i].decoration === 'high' ? yHigh : yLow;
-			holder.tickEls.push(el('line', {
+			tick('line', {
 				x1: x0, y1: yHigh, x2: x1, y2: yHigh, stroke: lines[i].color || '#000',
 				'stroke-width': stroke, 'class': 'lpn-tick'
-			}, layer));
-			holder.tickEls.push(el('line', {
+			});
+			tick('line', {
 				x1: x0, y1: yLow, x2: x1, y2: yLow, stroke: lines[i].color || '#000',
 				'stroke-width': stroke, 'class': 'lpn-tick'
-			}, layer));
+			});
 			vertexY = y + dir * CARET_TIP_INSET * tf;
 			legY = vertexY + dir * CARET_LEG_DROP * tf;
 			vertexX = (x0 + x1) / 2;
 			chevronPts = (vertexX - CARET_LEG_HALF * tf) + ',' + legY + ' ' + vertexX + ',' + vertexY + ' ' +
 				(vertexX + CARET_LEG_HALF * tf) + ',' + legY;
-			holder.tickEls.push(el('polyline', {
+			tick('polyline', {
 				points: chevronPts, fill: 'none', stroke: lines[i].color || '#000',
 				'stroke-width': stroke, 'class': 'lpn-tick'
-			}, layer));
+			});
 		}
 	}
 	// How far right of the label's text origin the extrema badge reaches, 0 when this label has no

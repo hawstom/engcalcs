@@ -128,8 +128,22 @@ EngCalcs.lpnCollide = (function () {
 		return iters;
 	}
 
+	// Do two PLAIN rects {x, y, w, h} overlap? The same test relax() runs inline, exposed for
+	// callers that need to ASK rather than to push -- specifically the aligned-pipe-label station
+	// search, which cannot use the relaxation at all: an aligned label is not free to move in x and
+	// y, only to slide along its own pipe, so it picks a station by trying and testing rather than
+	// by absorbing a share of a separation. Shared so the two never disagree about what "clear"
+	// means; a search that used a different predicate from the relaxation would hand back positions
+	// the relaxation then considers collided.
+	function rectsOverlap(a, b, pad) {
+		var p = pad || 0;
+		return Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > -p
+			&& Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) > -p;
+	}
+
 	return {
 		WEIGHT: WEIGHT,
+		rectsOverlap: rectsOverlap,
 		LEADER_SAMPLE_STEP: LEADER_SAMPLE_STEP,
 		LEADER_SAMPLE_MAX: LEADER_SAMPLE_MAX,
 		LEADER_SAMPLE_HALF: LEADER_SAMPLE_HALF,
