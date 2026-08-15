@@ -16,8 +16,10 @@
 //
 // THE SPACING IS IN VIEW UNITS, WHICH IS WHAT MAKES IT NEED NO NUMBER FROM ANYBODY. A quarter of
 // the view means "about four labels across the screen" on a 400 ft subdivision and on a 40 mile
-// transmission main alike. Section 2 measures that against the actual map width; section 3 checks
+// transmission main alike. Section 2 measures that against the actual map size; section 3 checks
 // it re-derives on zoom, since that is the difference between a rule and a setting.
+//
+// VD IS THE SMALLER MAP DIMENSION as of 2026-08-15 (it was the larger for a day). Section 4.
 
 const { setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 
@@ -182,18 +184,24 @@ console.log('\n--- the count follows the view, not the model ---');
 		dropped.length + ' dropped');
 }
 
-// ---- 4. VD is the LARGER of the two view dimensions -------------------------------------------
-console.log('\n--- VD = max(map width, map height) ---');
+// ---- 4. VD is the SMALLER of the two view dimensions ------------------------------------------
+console.log('\n--- VD = min(map width, map height) ---');
 {
-	// A tall narrow window. Tom specified max, not width, and the reason shows here: on a portrait
-	// phone the width alone would quarter a dimension the drawing is not actually being read along,
-	// and every long north-south main would fill with labels.
+	// TOM'S SPEC SAID max AND TOM CHANGED IT (2026-08-15): *"Label repeat spacing is fuzzy and can
+	// use whatever; there's an argument to be made for min just like max or average"*, and in the
+	// same breath he settled the page's other two uses on min. So this joins the house standard
+	// instead of keeping a private convention -- see mapSpan() in js/looped-network.js, and note
+	// that one convention is what makes the rule sayable to a user in a single sentence.
+	//
+	// A tall narrow window is where the two differ most: 400 wide by 1600 tall repeats every 100
+	// units now rather than every 400, so a long north-south main carries more labels, measured
+	// against the dimension that runs out first.
 	L.setCanvas(400, 1600);
 	L.setZoom(1);
 	ok('the view is taller than it is wide', L.visibleMapHeight() > L.visibleMapWidth(),
 		L.visibleMapWidth() + ' x ' + L.visibleMapHeight());
-	ok('...and the spacing is a quarter of the HEIGHT, the larger of the two',
-		near(L.spacing(), 400), L.spacing());
+	ok('...and the spacing is a quarter of the SMALLER of the two',
+		near(L.spacing(), 100), L.spacing());
 }
 
 // ---- 4b. The station is fixed; the SIDE is not -------------------------------------------------

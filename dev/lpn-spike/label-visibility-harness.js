@@ -33,7 +33,12 @@ const L = loadLoopedNetwork(
 	"\t\tdelSetting: function (k) { delete settings[k]; },\n" +
 	// The two knobs the rules actually read: how wide the map is on screen, and the zoom that turns
 	// that into model length units.
-	"\t\tsetCanvasWidth: function (w) { svg.clientWidth = w; },\n" +
+	// BOTH dimensions, since 2026-08-15: the threshold reads the SMALLER of the two (mapSpan('min'))
+	// rather than the width, after Tom pointed out that "narrower" was invoking field of view and
+	// then being read literally. A harness that sets only the width leaves the height undefined,
+	// which reads as zero, which is smaller than every threshold -- so nothing would ever hide and
+	// every check here would pass for the wrong reason.
+	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
 	"\t\tsetZoom: function (s) { state.s = s; },\n" +
 	"\t\tvisibleMapWidth: visibleMapWidth,\n" +
 	"\t\tsvgHas: function (c) { return svg.classList.contains(c); },\n" +
@@ -102,10 +107,10 @@ console.log('--- generated annotation carries the class, authored content does n
 // ---- 2. A Text label's own threshold, scaled by its own size (Task 340) ---------------------
 console.log('\n--- a Text label hides on its own size-scaled threshold ---');
 {
-	// 1000 px of canvas at zoom 1 is a map 1000 length units wide. The threshold below is 1000, so
-	// the drawing sits exactly AT it -- the deliberate boundary case, since the rule is a strict
-	// "wider than".
-	L.setCanvasWidth(1000);
+	// A 1000 px square canvas at zoom 1 is a map 1000 length units across in its SMALLER dimension.
+	// The threshold below is 1000, so the drawing sits exactly AT it -- the deliberate boundary
+	// case, since the rule is a strict "bigger than".
+	L.setCanvas(1000, 1000);   // square, so the smaller dimension is unambiguous
 	L.setZoom(1);
 	L.setSetting('labelMaxWidth', 1000);
 	L.applyLabelVisibility();

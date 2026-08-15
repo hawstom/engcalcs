@@ -381,7 +381,7 @@
         "lpn_settings_align_labels": "Align pipe labels with pipes",
         "lpn_settings_readability_bias": "Flip labels to stay readable past (degrees)",
         "lpn_settings_mask_labels": "Background patch behind labels",
-        "lpn_settings_label_max_width": "Show labels when the map is narrower than",
+        "lpn_settings_label_max_width": "Show labels when the view is smaller than (map units)",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_settings_label_always": "Always show labels"
     },
@@ -430,7 +430,7 @@
         "lpn_settings_align_labels": "Align pipe labels with pipes",
         "lpn_settings_readability_bias": "Flip labels to stay readable past (degrees)",
         "lpn_settings_mask_labels": "Background patch behind labels",
-        "lpn_settings_label_max_width": "Show labels when the map is narrower than",
+        "lpn_settings_label_max_width": "Show labels when the view is smaller than (map units)",
         "lpn_settings_label_use_view": "Use current view",
         "lpn_settings_label_always": "Always show labels"
     },

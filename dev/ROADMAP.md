@@ -1855,11 +1855,19 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   be a good thing."* The audit found **three conventions already in use and not one of them named**:
   `max` for the label repeat spacing, `min` for the fit and the restored view, and WIDTH ALONE for
   the label-visibility threshold.
-  - **Consistency would have been the wrong goal**, which is the finding worth keeping. Each answers
-    a different question and the question picks the dimension: `min` because "must all of it fit" is
-    settled by the tighter side; `max` because a repeat that used the tighter side would crowd a
-    wide window (Tom's own spec); `width` because the control says *"narrower than"* and its capture
-    button reads the width. What was wrong was that none of them said so.
+  - **AND THE STANDARD IS `min`** (Tom, same day, overruling my "consistency would be the wrong
+    goal"): *"we can standardize on min."* Half my argument was right — the FIT has no choice, since
+    "must all of it fit" is settled by the tighter side. The other two were wrong:
+    - the THRESHOLD reads min now, and my defence of width was bad language as much as bad design.
+      Tom: *"'Narrower' really implies 'width of field', which is a circle, not literal width. You
+      were both too pedantic and too literal ignoring the real world metaphor being invoked."* The
+      control now reads **"Show labels when the view is smaller than (map units)"**.
+    - the REPEAT spacing was the one genuinely free choice — *"fuzzy and can use whatever"* — so it
+      joins the standard instead of keeping a private convention nobody could have guessed. It had
+      been `max` for a day.
+    One convention is what makes the rule sayable to a user in a single sentence, which was the half
+    of the question that was about disclosure rather than arithmetic. `max`, `diag` and the single
+    axes stay named and available; the cull window still uses `max` on purpose, and says so.
   - `mapSpan('min'|'max'|'diag'|'w'|'h')` is now the one definition, every caller names its choice,
     and a check in `zoom-fit-harness.js` fails if anything combines the two axes behind its back.
   - **And it is not the SCREEN, it is the map area** — narrower than the window and much shorter.
