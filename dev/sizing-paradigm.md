@@ -1,0 +1,110 @@
+# Sizing text and symbols: the paper-units paradigm
+
+Tom, 2026-08-14, after importing EPA's Net2 and Net3 and finding our sizing model did not survive
+contact with real coordinate scales:
+
+> I think that we may have been naive and we may need to get real about symbols and text in the
+> mapping world. We are rubbing shoulders with the GIS world. And we need to follow the principle
+> that has been present my entire engineering career, that **the end product of all text and symbols
+> is in printed units, not real-world units**. Engineers and architects achieve precise control of
+> prints by fixing the printed scale early and knowing exactly how high in real-world units the
+> symbols and text are — but these heights are *calibrated to printed heights*.
+
+This document records the paradigm, why it is better than what we have, and the one thing it makes
+disappear.
+
+## What we do today, and why it does not work
+
+`settings.textSize` is a number in **map units**, with `textSizeUnits` offering `'map'` or
+`'screen'`. Symbol size is **derived** from it: `symbolFactor() = textFactor() × symbolScale`.
+
+Both halves fail on contact with an imported model:
+
+- **Map units are not comparable across models.** Net1 spans 60×80 units, Net3 spans 37×31, a
+  state-plane survey model spans tens of thousands. A text size of 20 is enormous on one and
+  invisible on another. There is no number that is right for all three, which is why importing Net3
+  produced a correct drawing nobody could see.
+- **The symbol/text linkage is a workaround, not a design.** It exists because there was no absolute
+  unit to express either size in, so tying one to the other at least kept them consistent with each
+  other. That is the whole reason for the coupling.
+
+## The paradigm
+
+**Specify sizes in PRINTED units, and derive everything else.**
+
+```
+model-space height  =  printed height  ×  drawing scale factor
+```
+
+A drawing declares a **scale** (1:500, or 1″ = 40′). Text is specified as a height **on paper**
+(3 mm, or 0.1″). The height in real-world units follows arithmetically. This is what AutoCAD's
+annotative text does, what every dimension style's `DIMSCALE` has always done, and what QGIS calls a
+*reference scale*. It is not a CAD quirk — it is how the profession has specified drawings for a
+century, because **the deliverable is a sheet**.
+
+Two properties fall out for free:
+
+1. **Scale independence.** Import any model, declare its scale, and the text is right — because
+   3 mm on paper is 3 mm on paper whether the model spans 40 feet or 40,000.
+2. **Printing is correct by construction**, rather than by a separate print stylesheet that has to
+   re-derive sizes and will drift. That is ROADMAP Task 175's hardest problem, solved as a side
+   effect.
+
+**We already have the missing half.** The map unit is *declared*, not guessed: `lpn_u_length`
+(family `distance_site`) states that one map unit is one foot or one metre. So the conversion from
+paper to model units is available today, and no new user input is needed beyond the scale itself.
+
+## What it makes disappear
+
+**The symbol/text independence Tom asked for is not a feature to build — it is what happens when
+you stop needing the workaround.** Under paper units, text is "3 mm" and a junction is "2 mm", each
+stated absolutely and independently. There is nothing to link, and `symbolScale` — a *relative*
+control that exists only because neither size had a frame of its own — becomes unnecessary.
+
+That is the test of whether a paradigm is right: it removes a control rather than adding one.
+
+## The honest tension
+
+**The screen is not paper, and for many of this suite's users the screen IS the deliverable.** A
+phone in a field office is not going to plot anything. Three paradigms are each correct somewhere:
+
+| paradigm | sizes are | right for |
+|---|---|---|
+| **map units** (today's default) | part of the drawing | a design sketch you zoom around |
+| **screen units** | constant on screen | interactive web maps — what Mapbox and Leaflet do for labels |
+| **paper units + scale** | calibrated to a sheet | the printed deliverable, and every engineer's mental model |
+
+The resolution is not to pick one. It is to notice they disagree about **storage** and **rendering**,
+and separate those:
+
+- **STORE in paper units plus a scale.** That is the ground truth, it is what the deliverable needs,
+  and it is the only one of the three that is meaningful across models.
+- **RENDER by a display mode.** Print and PDF are exact by construction. On screen, either scale
+  with zoom (paper-like, "you are looking at the sheet") or hold constant (web-like, "you are
+  looking at a map"). That is a view preference, and it does not touch what is saved.
+
+Keep the screen-pixel floor (`LPN_MIN_TEXT_PX`, `LPN_MIN_SYMBOL_PX`) either way. It is a rendering
+guard, not a sizing model — it guarantees a *visible* result while the paradigm supplies a *correct*
+one, and they fail in different directions.
+
+## Open questions before building
+
+1. **Does a scale get declared, or inferred?** Inferring one from the model extent and the viewport
+   is friendlier for a first-time visitor and dishonest for a plot. Probably: infer a starting scale
+   on import, show it, let it be set exactly — the same shape as the text-size heuristic already in
+   `docFromInp()`.
+2. **Which paper unit?** mm and inches both, following the existing units strip rather than inventing
+   a preference. Points are a third possibility for text specifically, and are what a typographer
+   would expect.
+3. **Does the scale belong to the project or the view?** Project, almost certainly — it is
+   declarative like units are (CLAUDE.md: "there are no browser units, only PROJECT units"), and a
+   drawing scale is a property of the drawing.
+4. **What happens to existing saved documents?** They carry a map-unit `textSize` with no scale. A
+   migration can derive an equivalent paper height once a scale is chosen, but the honest default may
+   be to keep old documents rendering exactly as they do now and apply the new model to new ones.
+5. **Is a scale bar now obligatory?** A drawing that declares a scale should probably show one.
+
+## Related
+
+ROADMAP Task 325 (sizing), Task 175 (a real printable version), Task 253 (clean map for
+screenshots), and the import heuristic in `docFromInp()` which is the stopgap this would replace.

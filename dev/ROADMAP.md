@@ -498,7 +498,28 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     never syntax-checked. Given Task 318 lives entirely in `sw.js`, that is a gap worth one
     character of glob. **DONE 2026-08-14** — glob widened; the rest of this task stands.
 
-- 88|325| **A successful import can render INVISIBLE, and the sizing paradigm is why.** Tom, 2026-08-14,
+- 92|326| **PARADIGM: size text and symbols in PRINTED units, not real-world units.** Tom,
+  2026-08-14: *"the end product of all text and symbols is in printed units… engineers and architects
+  achieve precise control of prints by fixing the printed scale early… but these heights are
+  calibrated to printed heights."* A drawing declares a scale; text is specified as a height on
+  paper; the model-space height follows arithmetically. This is AutoCAD's annotative text, every
+  `DIMSCALE` ever set, and QGIS's reference scale — not a CAD quirk but how the profession has
+  specified drawings for a century, because **the deliverable is a sheet**.
+  - **We already have the missing half**: the map unit is DECLARED (`lpn_u_length`), so one map unit
+    is known to be one foot or one metre and the paper→model conversion needs no new input but the
+    scale itself.
+  - **It removes a control rather than adding one, which is the test that it is right.** The
+    symbol/text independence asked for in Task 325 is not a feature to build — `symbolScale` exists
+    only because neither size had an absolute frame, and paper units supply one. Text is "3 mm", a
+    junction is "2 mm", stated independently, nothing to link.
+  - **Printing becomes correct by construction**, which is Task 175's hardest part solved as a side
+    effect rather than by a print stylesheet that re-derives sizes and drifts.
+  - **The tension is real and is not resolved by picking one paradigm**: for many of this suite's
+    users the SCREEN is the deliverable. Separate storage from rendering — store paper units plus a
+    scale, render by a display mode. Full reasoning, the three paradigms, and five open questions:
+    `dev/sizing-paradigm.md`.
+
+- 60|325| **A successful import can render INVISIBLE, and the sizing paradigm is why.** Tom, 2026-08-14,
   after Net3 imported correctly and showed nothing: *"the text size for Net3.inp was so small (0.2)
   that nothing was visible even though the import was successful."* An import that works and looks
   broken is worse than one that fails, because there is nothing to act on.
@@ -507,6 +528,9 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     plane spans tens of thousands. `docFromInp()` copies the CURRENT settings into the new document,
     so whatever text size the last project needed is inherited by a model it means nothing for.
     There is no size that is right for all three, and no warning when it is wrong.
+  - **PARTLY CLOSED 2026-08-14**: the import now derives a starting size from the model's extent,
+    and `effectiveFontSize()`/`symbolFactor()` carry a floor in device pixels, so a correct drawing
+    can no longer be invisible. What remains here is superseded by Task 326 — lowered 88 -> 60.
   - **Fix the import first**: derive an initial text size from the model's own extent (roughly
     1/40th of the diagonal reads about right across Net1, Net3 and a state-plane model), so any
     imported network is legible on arrival. Cheap, contained, and it removes the failure mode where
