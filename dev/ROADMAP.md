@@ -1849,6 +1849,26 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|359| **Zoom to fit is now a FIXED POINT, so the same drawing fits the same way every time —
+  DONE 2026-08-15.** Tom: *"The model that is current when the page is reloaded gets zoom in"* and
+  *"Switching tabs still changes the zoom. Could it be affected by the Mode string?"* Two causes,
+  and his guess found the second one from the outside.
+  - **The fit's input depended on the scale it was solving for.** Since Task 331 text and symbols
+    are sized in SCREEN PIXELS, so a label's WORLD footprint is proportional to 1/scale — and
+    `bbox()` measures world space. One pass answers the question for whatever scale happened to be
+    in force, which after a reload is 1 and after a tab switch is the last project's. `zoomExtent()`
+    now iterates (≤4 passes, early exit at 0.1%), re-laying-out between passes so each measurement
+    belongs to the scale being tested. It converges because it is a contraction; measured residue
+    between a 0.02x and a 37x start is 0.28px across a 1400px canvas.
+  - **`overlayReserve()` returned 0 for an overlay with no text**, and both overlays it is asked
+    about (`#lpn_mode_hint`, `#lpn_map_footer`) are empty in the markup and filled by JS. A fit
+    during boot therefore reserved nothing and took ~25px back as drawing room — the reloaded
+    project's "zoom in", exactly. Neither overlay is ever legitimately blank once the page runs, so
+    an empty one now reserves one line of its own computed font size.
+  - `bbox()` takes an explicit `ignoreDataLabels` flag instead of reading the global hidden state,
+    and excludes an ALIGNED link label (a setting) rather than a repeated chain (a function of the
+    zoom). `dev/lpn-spike/zoom-fit-harness.js`, 10 checks, both causes mutation-tested.
+
 - 0|356| **A zoom step no longer rebuilds labels nobody can see — DONE 2026-08-15.** Tom:
   *"the Net3 example is a little sluggish to zoom even when labels are all hidden. Is recalc
   triggering on zoom and can be turned off?"* No solve runs on a zoom; what ran was

@@ -2523,7 +2523,8 @@ var EngCalcs = EngCalcs || {};
 	// ---- zoom-extent: fits the actual rendered extent (symbol radius, label text box, link
 	// vertices), not bare coordinates -- see phase0-acceptance.md round 5 for why bare
 	// coordinates clip a symbol or crop a line of text at the edge.
-	function bbox() {
+	function bbox(opts) {
+		var ignoreDataLabels = !!(opts && opts.ignoreDataLabels);
 		var minx = Infinity, maxx = -Infinity, miny = Infinity, maxy = -Infinity, i, j;
 		function inc(x, y) {
 			if (x < minx) { minx = x; } if (x > maxx) { maxx = x; }
@@ -2544,7 +2545,7 @@ var EngCalcs = EngCalcs || {};
 			// honest reading of "fit this". Fitting can zoom in far enough to bring the labels back,
 			// and then they are outside the box that was fitted -- accepted deliberately, because
 			// the alternative is a fit that re-decides its own inputs and never converges.
-			if (dataLabelsHidden) { continue; }
+			if (ignoreDataLabels) { continue; }
 			// "J1"-style id/data label beside the circle -- extended downward per extra toggled-on
 			// line (Task 146 Phase 2 label toggles), since multi-line labels grow toward +y (dy>0).
 			// Read from the label's OWN rendered x/y (Task 146.01), not a hardcoded n.x+2/n.y-2--
@@ -2565,7 +2566,8 @@ var EngCalcs = EngCalcs || {};
 			// Same rule for an authored label, which has its OWN threshold (Task 340): a note that
 			// has vanished at this zoom is not part of what is being fitted, while a title block
 			// pinned with "Always show" still is.
-			if (le.text && le.text.classList && le.text.classList.contains('lpn-lbl-hidden')) { continue; }
+			if (ignoreDataLabels && le.text && le.text.classList &&
+				le.text.classList.contains('lpn-lbl-hidden')) { continue; }
 			inc(lbox.x, lbox.y); inc(lbox.x + lbox.w, lbox.y + lbox.h);
 		}
 		for (i = 0; i < doc.links.length; i++) {
@@ -2581,7 +2583,12 @@ var EngCalcs = EngCalcs || {};
 			// the Task 332 defect wearing different clothes; the cheapest way not to have it is not
 			// to ask. A lone label still counts: it sits off to the side of its pipe and nothing
 			// else in this loop knows where.
-			if (lle && (dataLabelsHidden || linkLabelStations(l).length > 1)) { continue; }
+			// ALIGNED rather than "is it a chain": a chain's station count is a function of the
+			// current zoom, and bbox() feeding zoom-dependent numbers into the fit is what made the
+			// fit depend on the view it started from. Aligned is a SETTING, and an aligned label
+			// lies along its pipe, whose own points are already counted -- so this is both the same
+			// exclusion and a deterministic one.
+			if (lle && (ignoreDataLabels || linkLabelAligned(l))) { continue; }
 			if (lle) {
 				var lx = +lle.text.getAttribute('x'), ly = +lle.text.getAttribute('y'),
 					ltw = labelBoxWidth(lle) || 8, llc = lle.lineCount || 1;
@@ -2596,10 +2603,35 @@ var EngCalcs = EngCalcs || {};
 	// footer on a narrow window). Returns 0 for an absent or empty overlay, so a hidden readout
 	// costs no margin. Measured on the footer WRAPPER, not on the coordinate box inside it: the
 	// wrapper is what actually occupies the bottom of the canvas once the strip wraps.
+	// **THE RESERVE MUST NOT DEPEND ON WHETHER THE OVERLAY HAS BEEN FILLED IN YET** (Tom, 2026-08-15,
+	// guessing the cause from the outside and getting it right: *"Switching tabs still changes the
+	// zoom. Could it be affected by the Mode string?"* — it could, and it was).
+	//
+	// This used to return 0 for an element with no text, and both overlays it is asked about are
+	// EMPTY IN THE MARKUP and filled by JS: `#lpn_mode_hint` by updateModeHint(), `#lpn_map_footer`
+	// by refreshMapStatus(). So a fit that happened before those ran reserved nothing, took the
+	// ~25px back as drawing room, and came out ZOOMED IN relative to every later fit — which is
+	// exactly the pair of symptoms reported: the project open at reload zooms in, and switching to
+	// it later gives a different answer.
+	//
+	// Both of these overlays are permanent furniture; neither is ever legitimately blank once the
+	// page is running. So an empty one is not "no overlay", it is "not filled in yet", and the
+	// honest reserve is the space it is ABOUT to take: one line of its own font.
 	function overlayReserve(id) {
 		var e = document.getElementById(id);
-		if (!e || !e.offsetHeight || !e.textContent.trim()) { return 0; }
-		return e.offsetHeight + 8;   // its own height plus a little clear air
+		if (!e) { return 0; }
+		var h = e.offsetHeight;
+		if (!h || !e.textContent.trim()) {
+			// One line, derived from the element's own computed font-size rather than a constant, so
+			// it stays right in a language whose glyphs are taller and at any browser text size.
+			var fs = 11;
+			if (window.getComputedStyle) {
+				var cs = parseFloat(window.getComputedStyle(e).fontSize);
+				if (cs > 0) { fs = cs; }
+			}
+			h = Math.ceil(fs * 1.35);
+		}
+		return h + 8;   // its own height plus a little clear air
 	}
 
 	// "Fit once the labels are real." zoomExtent() sizes the view to the RENDERED label text
@@ -2615,6 +2647,7 @@ var EngCalcs = EngCalcs || {};
 		fitAfterSolve = false;
 		zoomExtent();
 	}
+	var LPN_FIT_PASSES = 4, LPN_FIT_TOLERANCE = 1e-3;
 	function zoomExtent() {
 		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it (Tom, 2026-08-09:
 		// "it seems unforgivable to have a persistent message overwriting our map... maybe what we
@@ -2629,16 +2662,50 @@ var EngCalcs = EngCalcs || {};
 		// the overlays are screen-fixed and the drawing is not. A guarantee would need the
 		// overlays moved out of the canvas entirely -- see ROADMAP Task 253 for that argument and
 		// the screenshot case that is the real reason to want it.
-		var b = bbox(), r = svg.getBoundingClientRect(), pad = 16,
+		var r = svg.getBoundingClientRect(), pad = 16,
 			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
-			padBottom = Math.max(pad, overlayReserve('lpn_map_footer')),
-			w = Math.max(b.maxx - b.minx, 1), h = Math.max(b.maxy - b.miny, 1),
-			availH = Math.max(r.height - padTop - padBottom, 1);
-		state.s = Math.min((r.width - 2 * pad) / w, availH / h);
-		state.tx = pad - b.minx * state.s + (r.width - 2 * pad - w * state.s) / 2;
-		state.ty = padTop - b.miny * state.s + (availH - h * state.s) / 2;
-		setTransform();
-		onZoomChanged();
+			padBottom = Math.max(pad, overlayReserve('lpn_map_footer'));
+		function fitTo(b) {
+			var w = Math.max(b.maxx - b.minx, 1), h = Math.max(b.maxy - b.miny, 1),
+				availH = Math.max(r.height - padTop - padBottom, 1);
+			state.s = Math.min((r.width - 2 * pad) / w, availH / h);
+			state.tx = pad - b.minx * state.s + (r.width - 2 * pad - w * state.s) / 2;
+			state.ty = padTop - b.miny * state.s + (availH - h * state.s) / 2;
+		}
+		// **THE FIT IS A FIXED POINT, AND THE ONLY HONEST WAY TO REACH ONE IS TO ITERATE.**
+		//
+		// Tom, 2026-08-15: *"The model that is current when the page is reloaded gets zoom in"* and
+		// *"Switching tabs still changes the zoom."* Both are the same defect: the fit depended on
+		// the view it STARTED from, so the same drawing fitted differently after a reload (scale 1)
+		// than after a tab switch (whatever the last project was left at).
+		//
+		// THE REASON IS TASK 331, not a mistake anywhere. Text and symbols are sized in SCREEN
+		// PIXELS, so how much WORLD space a label occupies is proportional to 1/scale -- and bbox()
+		// measures world space. The box you must fit is therefore a function of the scale you are
+		// solving for. One pass cannot answer that; it just answers it for whatever scale happened
+		// to be in force, which is the previous project's.
+		//
+		// It converges fast because it is a contraction: zooming in shrinks the labels' world
+		// footprint, which shrinks the box, which zooms in slightly more, in a geometric series.
+		// Four passes with an early exit puts it within a tenth of a percent from any starting
+		// scale, and the early exit means the common case (a drawing whose labels do not reach the
+		// edge) costs exactly one extra bbox.
+		//
+		// Each pass must RE-LAY-OUT before the next one measures, or the loop is reading label
+		// positions belonging to the previous scale and converging to nothing in particular. That is
+		// what onZoomChanged() is doing inside the loop; it is the expensive part, and it is why
+		// this is bounded at four rather than run to machine precision.
+		var lim = settings.labelMaxWidth, prev = 0, i;
+		for (i = 0; i < LPN_FIT_PASSES; i++) {
+			fitTo(bbox({
+				// Decided from the scale this pass is TESTING, not from the one we arrived with.
+				ignoreDataLabels: typeof lim === 'number' && lim > 0 && visibleMapWidth() > lim
+			}));
+			setTransform();
+			onZoomChanged();
+			if (prev && Math.abs(state.s - prev) / prev < LPN_FIT_TOLERANCE) { break; }
+			prev = state.s;
+		}
 	}
 
 	// ---- backdrop image (Task 146 Phase 2, ported from dev/lpn-spike/canvas-spike.html) ----
