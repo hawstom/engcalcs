@@ -7618,6 +7618,9 @@ var EngCalcs = EngCalcs || {};
 	function unitFactor(name) { var s = unitEl(name); return s ? parseFloat(s.value) : 1; }
 	function unitLabel(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : ''; }
 	function unitKey(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].dataset.unit : null; }
+	// The map label's one unit token -- see numLine()'s `suffix` for why the gradient gets one and
+	// nothing else does. Not translated: '%' is the same mark in all 27 languages, including RTL.
+	function gradientSuffix() { return unitKey('lpn_u_gradient') === 'gradePercent' ? '%' : ''; }
 	// The friction method. HARDCODED to Hazen-Williams today -- this page has no control for it,
 	// unlike bpn_ -- but read through a function rather than written as a literal in two places,
 	// because js/lpn-solver.js already implements all three (hw, dw, manning) and the control is
@@ -9798,9 +9801,16 @@ var EngCalcs = EngCalcs || {};
 	// did for bpn" -- the color-coded checkbox in the Labels popover is the only legend), decorated
 	// with a high/low tick when it ties the network-wide max/min for that field
 	// (fieldExtrema()/decorationFor() above, drawn by applyExtremaTicks()).
-	function numLine(siValue, unitId, extrema, color, decimals) {
+	// `suffix` is the ONE exception to "no units on a label" (Tom, 2026-08-14: "we are omitting all
+	// other units as excessively redundant, I think that the % is crucial"). It exists for the head
+	// loss gradient and should stay rare: every other field's unit is redundant because the number's
+	// magnitude and the Labels legend already say what it is, but a gradient's two forms differ by
+	// 100x with no other tell -- 0.43 is a plausible reading in BOTH, so "0.43" alone is ambiguous
+	// in a way "0.43%" is not. Extrema still compare the NUMBER, so a suffix never affects which
+	// label gets a tick.
+	function numLine(siValue, unitId, extrema, color, decimals, suffix) {
 		var displayValue = displayRound(siValue, unitId, decimals);
-		return { text: displayValue.toFixed(fieldDecimals(decimals)), color: color, decoration: decorationFor(extrema, displayValue) };
+		return { text: displayValue.toFixed(fieldDecimals(decimals)) + (suffix || ''), color: color, decoration: decorationFor(extrema, displayValue) };
 	}
 	// Length is declarative, not SI-converted (see the lengthField() comment above: "1 grid unit IS
 	// 1 ft or 1 m, whichever is currently selected, by declaration") -- unlike every other field
@@ -9937,7 +9947,10 @@ var EngCalcs = EngCalcs || {};
 				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
 				if (ls.link.velocity && l.type !== 'pump') { lines.push(numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, fc.velocity, ld.velocity)); }
 				if (ls.link.headloss) { lines.push(numLine(lastSolveResult.headlosses[l.id], 'lpn_u_elevhead', extrema.headloss, fc.headloss, ld.headloss)); }
-				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(numLine(lastSolveResult.headlosses[l.id] / linkLengthSI(l), 'lpn_u_gradient', extrema.gradient, fc.gradient, ld.gradient)); }
+				// The '%' is read from the SELECT, not assumed: this family offers rise/run too, and
+				// a "%" on a ratio would be a lie rather than a redundancy. Blank in that form --
+				// there is no token for a bare ratio that is shorter than the ambiguity it fixes.
+				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(numLine(lastSolveResult.headlosses[l.id] / linkLengthSI(l), 'lpn_u_gradient', extrema.gradient, fc.gradient, ld.gradient, gradientSuffix())); }
 			}
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }

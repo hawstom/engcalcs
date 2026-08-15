@@ -642,6 +642,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     reader identifies by their units, so a prefix is noise on the fields with least room.
   - Prefixes are editable in settings and shown in the legend, so a set the user has changed is still
     readable by someone else looking at the sheet.
+  - **The gradient already prints a trailing `%` of its own** (2026-08-14, `gradientSuffix()`), so it
+    is the one field whose prefix competes with a token already on the line.
 
 - 78|334| **One `.lpn-annotation` class, declared where an element is built, instead of a selector
   list in the stylesheet.** Task 331 hides generated annotation by naming each kind in CSS, and the
