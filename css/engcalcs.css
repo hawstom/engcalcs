@@ -292,7 +292,12 @@ html[lang="zh"] .ec-welcome {
    halo) are the link-weight family and all read --lpn-lw; every other stroke width on the map is
    symbol furniture and stays on --lpn-sym. The multipliers preserve the exact proportions the
    0.7-based versions had, so nothing about the drawing's appearance changed with the decoupling. */
-.lpn-link { stroke: #557; stroke-width: var(--lpn-lw, 0.7); cursor: pointer; }
+/* BLACK (Tom, 2026-08-14, completing the sweep). The base drawing now spends NO colour at all --
+   pipes, nodes, reservoirs, tanks, pumps and valves are one black line-work, and every colour on the
+   map from here on means something: condition today (.lpn-node-pending's red, the override amber),
+   value tomorrow (Task 327). This is the state Tom named as the thing EPANET makes hard: "a pipe to
+   show as black while showing values from the model on the map". */
+.lpn-link { stroke: #000; stroke-width: var(--lpn-lw, 0.7); cursor: pointer; }
 /* Black with its symbol (2026-08-14) -- the pump's polyline and its circle are one mark. */
 .lpn-link-pump { stroke: #000; }
 /* No .lpn-link-valve rule: a valve's polyline is a pipe-coloured line by design -- see
@@ -325,7 +330,7 @@ html[lang="zh"] .ec-welcome {
 /* Filled the same color as .lpn-link (Tom, 2026-07-30: vertices should read as "on the pipe",
    not as a third node type) -- previously a hollow white circle with the pump's #a52 stroke,
    which had no relation to the link it belonged to and could be mistaken for a small pump. */
-.lpn-vhandle { fill: #557; stroke: #223; stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: move; }
+.lpn-vhandle { fill: #000; stroke: #223; stroke-width: calc(0.25 * var(--lpn-sym, 1)); cursor: move; }
 /* ---- Scenarios: the audit halo and the inactive element (ROADMAP Task 184) ----
    AN OUTLINE, NEVER A FILL, and that is the whole reason a link gets a second element rather than
    a restyle: the pipe's own stroke IS the pipe, so recolouring it to mark an override would

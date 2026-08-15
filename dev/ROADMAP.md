@@ -505,57 +505,41 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Connects to Task 253 (clean map for screenshots) — a thematic view with no labels IS the clean
     map, arrived at from the other side.
 
-- 62|328| **Label dragging should move the LEADER'S ENDPOINT, not the label's offset.** Tom,
-  2026-08-14: *"dragging needs to be modified so that when you start to drag an item, you are really
-  dragging the end point of the leader, and the label flips rather than the leader flipping. And…
-  the end point of the leader you choose will be the fixed end point of the leader at multiple zoom
-  levels, and possibly shortened at the same angle."*
-  - **Today a dragged label stores `lb.x/lb.y` as a MAP-UNIT OFFSET from its anchor**
-    (`js/looped-network.js`, the drag handler). So a placement chosen at one zoom is a different
-    screen distance at every other zoom — the same map-units-are-not-comparable defect as the text
-    size, in a third place. Tom's proposal replaces the stored quantity: an ANGLE and an attachment
-    point survive zoom, a distance in map units does not.
-  - **"The label flips rather than the leader flipping"** is the part worth preserving verbatim. The
-    leader's direction is the user's decision and must be stable; which SIDE of it the text sits on
-    is a layout consequence, and should be free to flip so the text never crosses its own leader.
-  - **ANSWERED by Tom's own leader insight, later the same day**: *"the vestiges of mapped units
-    that we preserve are the leaders… they exist because something is close to something else in
-    terms of map units."* A leader is not a property of anything — it is a RELATIONSHIP between two
-    points in the model, which is why its endpoints are map coordinates while its thickness is paper
-    units like every other stroke. And crowding is a function of SCALE. So placement belongs to a
-    **declared scale**: one set of callout positions per scale, not one per zoom level and not one
-    forever. That is exactly what AutoCAD's annotative objects do, and it is why that feature exists.
-  - **THEN SUPERSEDED, minutes later, by a better answer from Tom**: *"maybe they exist because of
-    map units, but we store them only as angles. They could be nothing more than a hint to us from
-    the user about the preferred direction we would do our conflict avoidance."* Map units are the
-    CAUSE of a leader, not something we must STORE. The stored quantity becomes **an angle**, and its
-    meaning a **hint** — scale-free by construction, so the per-scale placement table disappears
-    before it is built; degrading honestly when the preferred direction is blocked, where a stored
-    coordinate can only be honoured or overridden; and feeding
-    `runLabelCollisionAvoidance()` the preference such an engine actually wants instead of fighting
-    it with a stored answer.
-  - **So nothing is stored in map units at all** — `lb.x`/`lb.y` become an angle. The "vestige" was a
-    cause mistaken for a measurement. Given up: exact placement. If a drafter ever needs a callout
-    pinned to a precise spot on a plot, that is a per-label opt-out of avoidance — wait until someone
-    asks.
-  - `LPN_CALLOUT_ANGLE` (70°) and the existing collision avoidance already assume a leader has a
-    direction, so the machinery is half there.
-  - **LOWERED 58 -> 25 (Tom, 2026-08-14): PREMATURE, not wrong.** *"Start only with the GIS
-    paradigm… no dragging. Dragging is more advanced."* Phase 1 is paper units, engine-placed labels,
-    pipe labels aligned to the pipe, and scale-dependent visibility. **Dragging exists to fix a badly
-    placed label, and all three of those are ways of not placing one badly** — so phase 1 may
-    dissolve this task rather than defer it. Ask afterwards whether anyone still reaches for it.
-    See `dev/sizing-paradigm.md`, final section.
-  - **RAISED 25 -> 62 the same day (Tom, 2026-08-14): "Want to do dragging, I think. It has been a
-    major weakness of EPANET."** So this is WANTED, not merely tolerated — my "phase 1 may dissolve
-    it" was half right and half wrong, and the wrong half is the interesting one. Automatic placement
-    dissolves *routine* dragging: the label nobody would have moved if the engine had placed it well.
-    It does not dissolve *deliberate* dragging — an engineer arranging a sheet for someone else to
-    read, which is a judgement no placement engine can make and the thing EPANET denies its users.
-    **Those are two different features that happen to share a gesture.** Phase 1 removes the drudgery;
-    this task keeps the authorship. Still sequenced after Task 329, because the angle-hint design only
-    makes sense once we know what automatic placement leaves behind.
-
+- 88|328| **Store the LEADER'S ENDPOINT, not the label's position — and hold the angle sacred.**
+  Tom, 2026-08-14, after I proposed storing the label offset in pixels: *"I think you missed my main
+  idea about leaders. We should get from the user and store the endpoint of the leader, not the
+  location of the text. We can either keep that endpoint sacred or scale it up… We have to hold the
+  leader angle sacred."* He is right and this supersedes Task 335.
+  - **WHY HIS VERSION BEATS THE PIXEL-OFFSET ONE.** Both hold the angle steady, so that is not the
+    discriminator. The difference is what each one treats as the user's intent. A pixel offset says
+    *"this label sits 40 px from its node"* — the label then stays a fixed distance from the node on
+    screen forever, crowding its neighbours when you zoom out and never getting clear of a busy
+    junction when you zoom in. **Storing the endpoint says "the label belongs OVER THERE", in the
+    drawing, which is the thing the user was actually pointing at.** The endpoint is two world points
+    away from the node, so the angle is zoom-invariant BY CONSTRUCTION rather than by a rule anyone
+    has to maintain.
+  - **The separation is the whole design:** the ENDPOINT is a fact about the drawing (world units,
+    the user's choice, sacred); the TEXT's placement relative to that endpoint is a fact about
+    legibility (pixels, ours, and it flips side as needed so the label never lies across its own
+    leader). Two quantities, two frames, neither contaminating the other. Everything that was
+    confusing about label geometry came from storing one number that tried to be both.
+  - Tom's open question, and it is genuinely open: **keep the endpoint sacred in world units, or
+    scale its length while keeping the angle.** Sacred is simpler and matches a drafted sheet; scaling
+    keeps a leader from becoming a hairline at extreme zoom-out. Both preserve the angle, which is the
+    part he named as non-negotiable.
+  - **The current behaviour is not acceptable and he has said so twice, with a screenshot** —
+    *"Oops. What we have now is not producing good results."* The image (J13, zoomed in) shows four
+    or five data labels piled on top of one another with their leaders crossing: not a label in a
+    slightly wrong place, a knot.
+  - **Read that image as being about COLLISION AVOIDANCE as much as about leaders**, and do not fix
+    only the half this task names. At that zoom the nodes are a few screen-pixels apart, so every
+    label's default resting position lands in the same small patch — and `runLabelCollisionAvoidance()`
+    only ever nudges labels that are still at their default, which is all of them. Either it is not
+    converging with that many mutually-overlapping boxes, or the nudge it can apply is too small to
+    separate them. **Measure before redesigning**: the harness in `dev/lpn-spike/collide-harness.js`
+    can be handed this exact configuration, and a knot is a much easier thing to reproduce headlessly
+    than to argue about.
+  - This also dissolves the drift Task 335 was invented to fix.
 - 88|329| **Test the GIS paradigm: pipe labels aligned ALONG the pipe.** Tom, 2026-08-14: *"I think
   we first want to test the GIS thing of aligning our pipe labels with pipes… Maybe I can investigate
   to try to figure out how epanet-js makes the decision of which side of a pipe you label. I don't
@@ -593,11 +577,15 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     or avoid congestion."* He tested three plausible rules — screen-top, drawing order, hydraulic
     gradient — and none of them predicts their side. So the top-plus-congestion design is not us
     deviating from a convention; there is no convention at that spot, and we are choosing one.
-  - **STILL OPEN: the congestion half.** The geometry returns both sides as candidates, but the
-    aligned path currently takes the top and does not enter `runLabelCollisionAvoidance()` at all —
-    it returns before the nudge. Offering the bottom as a second candidate is the remaining work,
-    and it is worth doing only once Tom has looked at the aligned rendering: if top-always reads
-    well on real networks, the second candidate is complexity with no reader benefit.
+  - **THE CONGESTION HALF IS NOW EVIDENCED, NOT SPECULATIVE — build it.** I argued it might be
+    complexity with no reader benefit if top-always read well. It does not: Tom's Elm Street
+    screenshot (2026-08-14) shows a link label sitting squarely across the pipe below it with clear
+    space on the other side — *"Other side of pipe would have been very nice here."* One real drawing
+    settled a question I had proposed deferring until one existed, which is the argument for putting
+    a rough version in front of him early rather than reasoning about it longer.
+  - The work: offer BOTH sides from `alignedLabelAnchor()` as candidates and let
+    `runLabelCollisionAvoidance()` choose. The aligned path currently returns before the nudge, so it
+    never enters the engine at all — that early return is the change.
   - **The thing to watch when he looks at it:** GIS aligns ONE short name along a line. Our link
     labels default to THREE lines (id, flow, velocity) and can carry nine. A rotated three-line stack
     is legible; a nine-line one is a wall of text lying at 40°. If alignment reads well, it may argue
@@ -647,14 +635,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     `P` pump ID, `Q` flow or demand, `V` velocity, `S` head-loss gradient (% or blank), `H` head,
     `P` pressure, `E` elevation, blank diameter, blank length, `C`/`n`/`f` roughness (whichever the
     current method uses), `km`, `Hl`.
-  - **ONE GENUINE COLLISION, and it is on the element that has least room: `V` is both the valve ID
-    prefix and velocity, and both can appear in the same link label.** `P` looks like a second
-    collision (pump ID, pressure) but is not — pressure is a node quantity and a pump ID is a link
-    one, so they never share a label. Needs Tom's call: a different valve prefix, or velocity as
-    `v` lowercase (loses the greyscale-safe distinction at small sizes), or accept it because the
-    ID is always the first line. **A blank prefix for diameter and length is deliberate and is worth
-    keeping**: those two are the ones a reader identifies by their units, so a prefix would be
-    noise on the field that needs the room most.
+  - **THE COLLISION I FLAGGED WAS OVERSTATED, and Tom's dismissal is the more useful rule**
+    (2026-08-14: *"valve and velocity are okay since different contexts… Pump and Pipe are the same
+    context, but we are calling them both L; so why not both P? Hah!"*). **A prefix has to be
+    unambiguous IN ITS SLOT, not globally unique.** A link's ID line and its velocity line are
+    different slots, so `V` in both costs a reader nothing — and the proof was already shipped and
+    unremarked: a pipe and a pump are the same kind of thing in the same slot and have shared `L` all
+    along without anyone minding, which is exactly why either letter would do. Global uniqueness is
+    what a naming scheme reaches for when nobody has asked what the reader actually has to tell apart.
+  - **A blank prefix for diameter and length is deliberate and worth keeping**: those are the two a
+    reader identifies by their units, so a prefix is noise on the fields with least room.
   - Prefixes are editable in settings and shown in the legend, so a set the user has changed is still
     readable by someone else looking at the sheet.
 
@@ -670,26 +660,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     editing an unrelated feature months later.
   - Every future mark that annotates a label — a units suffix, a warning glyph, a thematic swatch —
     walks into the same trap until this is done.
-
-- 80|335| **Store a dragged label's offset in SCREEN PIXELS, which fixes the drifting leader angle
-  outright.** Tom, 2026-08-14: *"As I zoom in and out, the angle of leaders changes. Can we get the
-  leader endpoint from user and change only its length, if anything, as zoom changes? Or is this
-  impractical?"*
-  - **Practical, and there is a better answer than holding the angle: `n.lx`/`n.ly` are the LAST
-    MAP-UNIT QUANTITY left in the label system.** Text became pixels in Task 331, so a label's
-    on-screen size no longer changes with zoom — but its stored offset from the node still does, so
-    the geometric relationship between the box and its anchor changes at every zoom step, and the
-    attachment point and angle drift out of it. Fixing the angle would be treating the symptom.
-  - **Store the offset in pixels and BOTH the angle and the length become constant for free** — the
-    label sits exactly where the user dropped it, relative to its node, at every zoom. No rule to
-    state, no special case, nothing to hold. This is the same move as the text size, applied to the
-    one place it was not.
-  - **The cost is a migration with the Task 332 ill-posedness in it**: converting an existing
-    world-unit offset to pixels needs a scale, and no document records the zoom it was dragged at.
-    Options, for Tom: convert at the open-time fit scale (one-time, approximate, visible immediately
-    and adjustable); or keep `lx/ly` for legacy documents and write pixels only on the next drag
-    (lossless, but two mechanisms in the file at once). **Not a decision to make silently** — it
-    changes stored meaning.
 
 - 60|336| **Concatenate a link's label values onto one line where they fit.** Tom, 2026-08-14:
   *"Concatenate pipe labels where/when possible. More readable."*
@@ -714,9 +684,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     breath: `alignedLabelAnchor()`'s readability normalisation picks the side that reads left-to-
     right, and on a near-vertical pipe either choice is defensible. A capture-then-adjust control is
     honest about that; an automatic rule that is right 70% of the time is not.
-  - Same shape as the leader angle-hint in Task 328: **capture the user's intent once as a number,
-    then stop deriving it.** Worth noticing that this is now the third place that pattern is the
-    answer.
+  - **Tom confirmed the stored-number design and widened the input** (2026-08-14: *"Rotation as
+    number. Yes. It's just a helper/convenience, not a link. We can let them enter a number also or
+    pick among 0, 30, 45, 60, 90, etc also"*). So matching a pipe is a CONVENIENCE that fills the
+    box, and the box is the actual control: free numeric entry plus a short preset list. That
+    ordering matters — a control whose only input is "match a pipe" is unusable on a label near no
+    pipe, and a preset list is what people reach for nine times in ten.
+  - Same shape as the leader endpoint in Task 328: **capture the user's intent once as a number, then
+    stop deriving it.** Third place today that pattern has been the answer.
 
 - 55|338| **Say out loud that GEOMETRY IS NOT SCENARIO STATE.** Tom, 2026-08-14: *"For a scenario,
   dragging a node edits the base. Is this bad, good, or an oversight. The good thing is that it's
@@ -732,6 +707,18 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     is a sentence in the scenario UI or Help — not a mechanism.
   - The line to state: **a scenario is a set of HYDRAULIC differences. The drawing is the network's,
     not the scenario's.**
+
+- 70|340| **A Text label hides at a threshold scaled by ITS OWN size.** Tom, 2026-08-14: *"Text
+  objects should hide at factors depending on their size compared to label size."*
+  - Task 331 exempts user Text labels from `labelMaxWidth` entirely, on the grounds that they are
+    authored content. Right about the principle, too blunt about the rule: **a title block and a
+    small note are both authored, and they do not deserve the same survival.** Sheet lettering works
+    exactly this way — the drawing title is legible from across the room, the callouts are not.
+  - The rule: a Text label's own threshold is `labelMaxWidth × its size ratio to a data label`, so a
+    label drawn at 3× survives to 3× the map width. **It falls out of `lb.sizeMult`, which is already
+    in the document** — no new per-label setting, which is what makes it worth doing at all.
+  - Keeps the useful floor: a Text label at 1× has exactly the data labels' threshold, so nothing
+    authored vanishes while anything generated is still drawn.
 
 - 92|326| **PARADIGM: size text and symbols in PRINTED units, not real-world units.** Tom,
   2026-08-14: *"the end product of all text and symbols is in printed units… engineers and architects
@@ -2492,6 +2479,11 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|335| **Store a dragged label's offset in screen pixels — SUPERSEDED by Task 328, not shipped.**
+  It would have held the leader angle steady, but by storing the wrong thing: a pixel offset says
+  "40 px from the node", where the user meant "over there, in the drawing". Tom's leader-endpoint
+  design holds the angle by construction and keeps the intent. Recorded because the reasoning that
+  killed it is worth having — see `dev/roadmap-closed-archive.md`.
 - 0|319| **Accept-Language log injection, in five copy-pasted writers — CLOSED.** `ecBrowserLangTag()`
   in `lib/config.inc.php` filters to `[a-z0-9-]` and truncates rather than rejecting (a long header is
   a real browser's, not an attack). All five writers call it, and

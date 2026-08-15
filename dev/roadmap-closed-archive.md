@@ -7109,3 +7109,24 @@ not an attack, and dropping it would lose the datum we are collecting). All five
 `dev/scripts/browser_lang_tag_check.php` is blocking in `check_all.sh` and proves no sixth writer
 can reintroduce the raw read.
 
+## Task 335 — pixel label offsets (superseded 2026-08-14 by Task 328, never built)
+- 80|335| **Store a dragged label's offset in SCREEN PIXELS, which fixes the drifting leader angle
+  outright.** Tom, 2026-08-14: *"As I zoom in and out, the angle of leaders changes. Can we get the
+  leader endpoint from user and change only its length, if anything, as zoom changes? Or is this
+  impractical?"*
+  - **Practical, and there is a better answer than holding the angle: `n.lx`/`n.ly` are the LAST
+    MAP-UNIT QUANTITY left in the label system.** Text became pixels in Task 331, so a label's
+    on-screen size no longer changes with zoom — but its stored offset from the node still does, so
+    the geometric relationship between the box and its anchor changes at every zoom step, and the
+    attachment point and angle drift out of it. Fixing the angle would be treating the symptom.
+  - **Store the offset in pixels and BOTH the angle and the length become constant for free** — the
+    label sits exactly where the user dropped it, relative to its node, at every zoom. No rule to
+    state, no special case, nothing to hold. This is the same move as the text size, applied to the
+    one place it was not.
+  - **The cost is a migration with the Task 332 ill-posedness in it**: converting an existing
+    world-unit offset to pixels needs a scale, and no document records the zoom it was dragged at.
+    Options, for Tom: convert at the open-time fit scale (one-time, approximate, visible immediately
+    and adjustable); or keep `lx/ly` for legacy documents and write pixels only on the next drag
+    (lossless, but two mechanisms in the file at once). **Not a decision to make silently** — it
+    changes stored meaning.
+
