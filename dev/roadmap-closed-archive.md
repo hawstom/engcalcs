@@ -7130,3 +7130,44 @@ can reintroduce the raw read.
     (lossless, but two mechanisms in the file at once). **Not a decision to make silently** — it
     changes stored meaning.
 
+
+## Task 328
+
+Closed 2026-08-14. The open-task text below is the design as it stood when the fix was written; what
+actually shipped matches it, plus one thing the writeup did not predict. Tom had to report the defect
+THREE times, and his third message is the one that says why testing missed it: *"this works fine for
+leaders dragged right. But only point B works for left and right."* A right-hanging label was already
+correct, because there the box origin and B are the same point -- so any check that dragged a label
+to the right passed against the defect. `dev/lpn-spike/leader-angle-harness.js` runs every assertion
+on both sides for that reason, and the mutant restoring the old derivation fails the LEFT case only.
+
+- 88|328| **Store the LEADER'S ENDPOINT, not the label's position — and hold the angle sacred.**
+  Tom, 2026-08-14, after I proposed storing the label offset in pixels: *"I think you missed my main
+  idea about leaders. We should get from the user and store the endpoint of the leader, not the
+  location of the text. We can either keep that endpoint sacred or scale it up… We have to hold the
+  leader angle sacred."* He is right and this supersedes Task 335.
+  - **WHAT IS ACTUALLY HELD SACRED TODAY, read out of the code rather than guessed at, because Tom
+    had to say twice that I had not understood.** The stored quantity is `n.lx`/`n.ly`: the label
+    BOX'S ORIGIN, in world units. Point B — the leader's text end — is not stored anywhere. It is
+    recomputed every render by `Geom.leaderAttach()`, which returns `pos.x` or `pos.x + boxWidth`
+    depending on which side the box sits, and **`boxWidth` is derived from a font size that is now in
+    SCREEN PIXELS, so it is proportional to 1/zoom.** Therefore B slides along by a whole box width as
+    you zoom whenever the leader attaches to the far edge, and angle A→B slides with it. Tom's
+    diagnosis is exactly right: neither B nor angle A→B is sacred, and the one thing that IS fixed —
+    the box origin — is a point he never chose and cannot see.
+  - **THE FIX IS TO STORE B ITSELF**, in map coordinates, as the thing the user drags. A and B are
+    then both world points, so the angle is invariant with no rule to maintain, and the TEXT hangs
+    off B — placed in pixels, flipping to whichever side keeps it from lying across its own leader.
+    The endpoint is a fact about the drawing (the user's, sacred); the text placement is a fact about
+    legibility (ours). One number was trying to be both, and that is the whole of what has been wrong
+    here.
+  - **Tom's open question is about LENGTH, not width — I misread him once already.** *"The length of
+    the leader could be scaled up; you heard 'width'."* So: hold B's map coordinates fixed, or hold
+    the ANGLE fixed and let the leader's length scale with zoom. Both keep the angle, which is the
+    part he named as non-negotiable; they differ in whether a leader stays the same length on the
+    drawing or on the screen.
+  - **The pixel-offset design I proposed (Task 335) would not have fixed this at all**, and the
+    reason is worth keeping: it holds the box ORIGIN steady in screen space, but B is still derived
+    from the box's width, so the far-edge attachment still moves and the angle still slides. It
+    addressed the symptom I had noticed rather than the mechanism. Closed as superseded.
+  - This also dissolves the drift Task 335 was invented to fix.

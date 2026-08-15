@@ -505,36 +505,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Connects to Task 253 (clean map for screenshots) — a thematic view with no labels IS the clean
     map, arrived at from the other side.
 
-- 88|328| **Store the LEADER'S ENDPOINT, not the label's position — and hold the angle sacred.**
-  Tom, 2026-08-14, after I proposed storing the label offset in pixels: *"I think you missed my main
-  idea about leaders. We should get from the user and store the endpoint of the leader, not the
-  location of the text. We can either keep that endpoint sacred or scale it up… We have to hold the
-  leader angle sacred."* He is right and this supersedes Task 335.
-  - **WHAT IS ACTUALLY HELD SACRED TODAY, read out of the code rather than guessed at, because Tom
-    had to say twice that I had not understood.** The stored quantity is `n.lx`/`n.ly`: the label
-    BOX'S ORIGIN, in world units. Point B — the leader's text end — is not stored anywhere. It is
-    recomputed every render by `Geom.leaderAttach()`, which returns `pos.x` or `pos.x + boxWidth`
-    depending on which side the box sits, and **`boxWidth` is derived from a font size that is now in
-    SCREEN PIXELS, so it is proportional to 1/zoom.** Therefore B slides along by a whole box width as
-    you zoom whenever the leader attaches to the far edge, and angle A→B slides with it. Tom's
-    diagnosis is exactly right: neither B nor angle A→B is sacred, and the one thing that IS fixed —
-    the box origin — is a point he never chose and cannot see.
-  - **THE FIX IS TO STORE B ITSELF**, in map coordinates, as the thing the user drags. A and B are
-    then both world points, so the angle is invariant with no rule to maintain, and the TEXT hangs
-    off B — placed in pixels, flipping to whichever side keeps it from lying across its own leader.
-    The endpoint is a fact about the drawing (the user's, sacred); the text placement is a fact about
-    legibility (ours). One number was trying to be both, and that is the whole of what has been wrong
-    here.
-  - **Tom's open question is about LENGTH, not width — I misread him once already.** *"The length of
-    the leader could be scaled up; you heard 'width'."* So: hold B's map coordinates fixed, or hold
-    the ANGLE fixed and let the leader's length scale with zoom. Both keep the angle, which is the
-    part he named as non-negotiable; they differ in whether a leader stays the same length on the
-    drawing or on the screen.
-  - **The pixel-offset design I proposed (Task 335) would not have fixed this at all**, and the
-    reason is worth keeping: it holds the box ORIGIN steady in screen space, but B is still derived
-    from the box's width, so the far-edge attachment still moves and the angle still slides. It
-    addressed the symptom I had noticed rather than the mechanism. Closed as superseded.
-  - This also dissolves the drift Task 335 was invented to fix.
 - 88|329| **Test the GIS paradigm: pipe labels aligned ALONG the pipe.** Tom, 2026-08-14: *"I think
   we first want to test the GIS thing of aligning our pipe labels with pipes… Maybe I can investigate
   to try to figure out how epanet-js makes the decision of which side of a pipe you label. I don't
@@ -2476,6 +2446,20 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|328| **The leader stored the TEXT's corner, so the angle slid with the zoom — CLOSED 2026-08-14.**
+  `n.lx/n.ly` now hold point B itself (world units, the user's) and `dataLabelOrigin()` hangs the
+  text off it in pixels (ours, free to flip sides). Tom had to report it three times; a
+  right-hanging label was always correct, which is why one-sided testing missed it.
+  `dev/lpn-spike/leader-angle-harness.js` runs both sides over a 64x zoom sweep. A pre-328 save
+  reads its offset as B — exact on the right, one box width off on the left, not migrated because
+  the old width depended on the zoom it was last drawn at.
+- 0|341| **A pipe too short to carry its label does not carry one — CLOSED 2026-08-14.** Tom: "if a
+  line is too short, its label must disappear even if the map is closer than the all-disappear
+  limit." `linkLabelTooShort()` compares the pipe's world length against `labelBoxWidth()`, which is
+  pixel-derived and therefore ~1/zoom — so the label returns at exactly the zoom where it fits, with
+  no setting. **A DRAGGED label is exempt** (Tom's own hedge, same day): dragging one off a stub is
+  how a user says they want that number, so the gesture is the escape hatch. Harness:
+  `dev/lpn-spike/short-line-label-harness.js`.
 - 0|335| **Store a dragged label's offset in screen pixels — SUPERSEDED by Task 328, not shipped.**
   It would have held the leader angle steady, but by storing the wrong thing: a pixel offset says
   "40 px from the node", where the user meant "over there, in the drawing". Tom's leader-endpoint

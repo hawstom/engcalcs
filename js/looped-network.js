@@ -325,8 +325,47 @@ var EngCalcs = EngCalcs || {};
 		});
 		return clearBot > clearTop * LPN_SIDE_SWITCH_MARGIN ? -1 : 1;
 	}
+	// A PIPE TOO SHORT TO CARRY ITS OWN LABEL DOES NOT CARRY ONE (Tom, 2026-08-14: "if a line is too
+	// short, its label must disappear even if the map is closer than the all-disappear limit"). The
+	// map-width threshold answers "is this drawing being read or surveyed"; it cannot answer "is
+	// there room on THIS pipe", so a dense corner of a network at a readable zoom still fills with
+	// numbers belonging to stubs a few pixels long.
+	// The test is the label against the pipe, and it needs no setting because it is already in the
+	// right frame: labelBoxWidth() is derived from getBBox(), so it is a screen-pixel quantity
+	// expressed in world units (~1/zoom), while the pipe's length is a fixed world number. Zooming
+	// in shrinks the label relative to the pipe and the label comes back, at exactly the zoom where
+	// it fits. The same comparison in pixels on both sides would be zoom-invariant and useless.
+	// A DRAGGED LABEL IS EXEMPT, and that is Tom's own hedge on the rule, minutes after asking for it
+	// (2026-08-14: "could we soften that as 'if not dragged' to give the user the ability to keep
+	// short pipe labels from hiding?"). It makes the rule an automatic-placement rule rather than a
+	// censor: the moment someone drags a label off a stub -- which is exactly what you do when you
+	// want that number on the sheet -- it is authored, and this stops applying. So there is an escape
+	// hatch, it needs no setting, and the gesture that reveals the intent is the one a user already
+	// makes. Double-clicking the label sends it home and the rule resumes.
+	var SHORT_LINE_MULT = 1;
+	function linkLabelTooShort(l, le) {
+		if (!le || le.empty) { return false; }
+		if (l.lx !== undefined || l.ly !== undefined) { return false; }
+		var w = labelBoxWidth(le);
+		return w > 0 && Geom.polylineLength(linkPointList(l)) < w * SHORT_LINE_MULT;
+	}
+	// One label assembly, hidden together: text, mask, leader and any extrema badges. `visibility`
+	// rather than `display` for the same reason the map-width rule uses it (see css/engcalcs.css) --
+	// it composes with each part's own show/hide logic instead of overwriting it.
+	function setLabelAssemblyHidden(le, hidden) {
+		var v = hidden ? 'hidden' : '';
+		if (le.text) { le.text.style.visibility = v; }
+		if (le.mask) { le.mask.style.visibility = v; }
+		if (le.leader) { le.leader.style.visibility = v; }
+		(le.tickEls || []).forEach(function (t) { t.style.visibility = v; });
+	}
 	function layoutLinkLabel(id) {
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
+		// Set BEFORE the aligned branch returns, so both label styles obey it. applyExtremaTicks()
+		// reads the flag too rather than being hidden after the fact: a badge on a suppressed label
+		// is not merely invisible, it should not be built.
+		le.hiddenShort = linkLabelTooShort(l, le);
+		setLabelAssemblyHidden(le, le.hiddenShort);
 		var mid = linkLabelMid(l);
 		if (linkLabelAligned(l)) {
 			// ALIGNED: text-anchor middle, rotated about its own anchor, no leader and no nudge.
@@ -425,7 +464,10 @@ var EngCalcs = EngCalcs || {};
 			Collide.pushLeaderSamples(out, anchor.x, anchor.y, end.x, end.y, holder);
 		}
 		doc.nodes.forEach(function (n) { dataLeader(nodeEls[n.id], { x: n.x, y: n.y }, nodeLabelPos(n)); });
-		doc.links.forEach(function (l) { dataLeader(linkEls[l.id], linkLabelMid(l), linkLabelPos(l)); });
+		doc.links.forEach(function (l) {
+			if (linkLabelTooShort(l, linkEls[l.id])) { return; }
+			dataLeader(linkEls[l.id], linkLabelMid(l), linkLabelPos(l));
+		});
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id], an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
 			if (!le || !an) { return; }
@@ -481,6 +523,9 @@ var EngCalcs = EngCalcs || {};
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
+			// A label nobody can see is not an obstacle. Skipping it here also clears its nudge, so
+			// zooming back in restores it where it belongs rather than where it was last pushed.
+			if (linkLabelTooShort(l, le)) { le.nudge = { x: 0, y: 0 }; return; }
 			addDataLabel(le, dataLabelOrigin(le, linkLabelMid(l), linkLabelBase(l)), l.lx !== undefined, le.lineCount);
 		});
 		// Leaders are rebuilt every iteration (they track their labels); node symbols and Text
@@ -542,6 +587,10 @@ var EngCalcs = EngCalcs || {};
 	function applyExtremaTicks(holder, textEl, layer, lines) {
 		if (holder.tickEls) { holder.tickEls.forEach(function (t) { t.remove(); }); }
 		holder.tickEls = [];
+		// A label suppressed for its pipe being too short takes its badges with it -- and they are
+		// not built at all, so nothing has to remember to hide them. This is the trap .lpn-tick fell
+		// into under the map-width rule (see css/engcalcs.css), avoided here by construction.
+		if (holder.hiddenShort) { return; }
 		var x = +textEl.getAttribute('x'), baseY = +textEl.getAttribute('y'), fs = effectiveFontSize(),
 			tf = textFactor(), stroke = TICK_STROKE * tf,
 			i, tspan, width, y, lineY, yHigh, yLow, x0, x1, dir, vertexY, legY, vertexX, chevronPts;
