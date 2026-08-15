@@ -2807,29 +2807,45 @@ var EngCalcs = EngCalcs || {};
 	// did not mention it, and every project open ran a fit. That is WHY switching tabs re-zoomed --
 	// and no fit, however exact, is as good as simply putting the reader back where they were.
 	//
-	// **STORED AS A WORLD CENTRE AND A SCALE, NOT AS tx/ty.** Two reasons, and both are about the
-	// view surviving a change of circumstances:
-	//   * tx/ty are screen-space translations, so restoring them on a bigger or smaller window puts
-	//     the same CORNER in place and shows a different part of the drawing. A centre and a scale
-	//     put the same thing in the middle at the same size, which is what a person means by "where
-	//     I was".
-	//   * a centre is a world point, so it flips with everything else into the Cartesian file frame
-	//     (flipStoredY) instead of being a private convention smuggled into a public format.
+	// **A VIEW IS A REGION OF THE DRAWING, NOT A NUMBER OF PIXELS PER FOOT** (Tom, 2026-08-15,
+	// disagreeing with the first version of this and being right: *"I don't think that AutoCAD opens
+	// a DWG file to a zoom dependent on my screen's pixels... If the drawing was 50% of the view, it
+	// opens at 50% of the view."*). AutoCAD stores VIEWCTR and VIEWSIZE — a centre and a HEIGHT IN
+	// DRAWING UNITS — and the pixels-per-unit falls out of whatever window you open it in.
+	//
+	// The first version stored a centre and a SCALE, which fixed half of it: a scale is
+	// screen-independent in position but not in size, so the same file opened on a 32-inch monitor
+	// showed the same drawing at the same physical size with more empty space around it, rather than
+	// the same VIEW filled out. Storing the world extent instead makes the whole thing a statement
+	// about the model:
+	//
+	//   * same window  -> identical, to the last bit;
+	//   * bigger window -> the same part of the drawing, filling the same fraction of the view;
+	//   * a window that grew in one direction only -> `min` binds on the other, so nothing that was
+	//     visible is pushed off. That is the same rule zoomExtent() uses, which is why a saved fit
+	//     reopens as a fit.
 	function currentView() {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0,
 			sc = state.s || 1;
 		if (!w || !h) { return null; }
-		return { cx: (w / 2 - state.tx) / sc, cy: (h / 2 - state.ty) / sc, s: sc };
+		// cx/cy: the world point in the middle. w/h: how much of the model is on screen, in world
+		// units. No pixel anywhere in the record.
+		return { cx: (w / 2 - state.tx) / sc, cy: (h / 2 - state.ty) / sc, w: w / sc, h: h / sc };
 	}
 	function validView(v) {
-		return !!v && isFinite(v.cx) && isFinite(v.cy) && isFinite(v.s) && v.s > 0;
+		if (!v || !isFinite(v.cx) || !isFinite(v.cy)) { return false; }
+		// v.s is the pre-2026-08-15 form -- a pixel scale. Still read, so a project saved in the
+		// hour that shape existed still reopens where it was left; never written.
+		if (isFinite(v.w) && isFinite(v.h) && v.w > 0 && v.h > 0) { return true; }
+		return isFinite(v.s) && v.s > 0;
 	}
 	function applyView(v) {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0, sc;
 		if (!validView(v) || !w || !h) { return false; }
-		sc = Math.max(MIN_SCALE, Math.min(MAX_SCALE, v.s));
+		sc = (isFinite(v.w) && v.w > 0) ? Math.min(w / v.w, h / v.h) : v.s;
+		sc = Math.max(MIN_SCALE, Math.min(MAX_SCALE, sc));
 		state.s = sc;
 		state.tx = w / 2 - sc * v.cx;
 		state.ty = h / 2 - sc * v.cy;
@@ -3860,10 +3876,10 @@ var EngCalcs = EngCalcs || {};
 		});
 		(o.labels || []).forEach(function (lb) { if (typeof lb.y === 'number') { lb.y = -lb.y; } });
 		if (o.backdrop && typeof o.backdrop.ty === 'number') { o.backdrop.ty = -o.backdrop.ty; }
-		// The saved VIEW is a world POINT plus a scale (see currentView()), so its y belongs in this
-		// list for the same reason every other y does. Storing the raw tx/ty instead would have put
-		// a screen-space translation of the internal frame into a file that is otherwise Cartesian
-		// -- consistent for us and a lie to anybody else reading it.
+		// The saved VIEW is a world REGION -- a centre point and an extent in drawing units (see
+		// currentView()) -- so its centre's y belongs in this list for the same reason every other y
+		// does. The extent is a size, and sizes do not flip. Storing a screen-space translation
+		// instead would have put an unflipped convention into a file that is otherwise Cartesian.
 		if (o.view && typeof o.view.cy === 'number') { o.view.cy = -o.view.cy; }
 		return o;
 	}

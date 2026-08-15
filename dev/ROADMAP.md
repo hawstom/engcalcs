@@ -1858,11 +1858,19 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   - **In the file** (`serializeProject().view`), so a project reopens cold where it was left. It
     rides along with saves that happen anyway; panning is never itself a reason to save, and never
     marks a project dirty.
-  - **Stored as a world CENTRE plus a scale, never as tx/ty.** A translation is screen-space, so
-    restoring one on a different-sized window puts the same CORNER back and shows a different part
-    of the drawing; a centre and a scale put the same thing in the middle at the same size. A centre
-    is also a world point, so it flips into the Cartesian file frame (`flipStoredY`) with every
-    other coordinate rather than being a private convention inside a public format.
+  - **Stored as a world CENTRE and a world EXTENT — a REGION of the drawing — and it took two goes.**
+    The first version stored a centre and a pixel SCALE, which Tom rejected on sight and on the
+    right grounds: *"I don't think that AutoCAD opens a DWG file to a zoom dependent on my screen's
+    pixels... If the drawing was 50% of the view, it opens at 50% of the view."* That is exactly
+    what a DWG holds — VIEWCTR and VIEWSIZE, a centre and a height in DRAWING UNITS — and the
+    pixels-per-unit falls out of the window you open it in. Storing a scale is screen-independent in
+    POSITION but not in SIZE: the same file on a bigger monitor would have shown the same drawing at
+    the same physical size with more blank around it. An extent restores at `min(W/w, H/h)`, the
+    same rule `zoomExtent()` uses, so a window that grew in one direction only pushes nothing off.
+    A centre is also a world point, so it flips into the Cartesian file frame (`flipStoredY`) with
+    every other coordinate rather than being a private convention inside a public format; an extent
+    is a size, and sizes do not flip. The one-hour-old `{cx, cy, s}` form is still READ, never
+    written.
   - The fit is now the FALLBACK: a project nobody has looked at, a fresh import, or a file written
     before this. A malformed view falls back too. `dev/lpn-spike/view-memory-harness.js`, 20 checks,
     mutation-tested three ways.
