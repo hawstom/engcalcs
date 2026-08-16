@@ -82,35 +82,26 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
     rewrites every SHA, forces a push, breaks production's `git pull`, dangles 43 SHA citations in
     `dev/*.md`, and saves no context — nothing ever loads a commit message.
 
-- 88|384| **[H] Colour coding, with a colour-ramp picker — the preparation Task 248 (extended-period
+- 88|384| **Colour coding, with a colour-ramp picker — the preparation Task 248 (extended-period
   simulation) actually needs.** Tom, 2026-08-15: *"I think that a major preparation for modeling
   across time is adding color coding, which requires a color ramp picker UX. EPANET and HEC-RAS, both
   public domain software both have solid color picker systems. I would think that you could borrow
   something. epanetjs also has something, and maybe you can investigate whether it's libre."*
-  - **It is preparation, not decoration:** a number per element per timestep cannot be read as
-    numbers. Colour is how every one of these programs shows a field changing, and it is the only
-    readout that survives a network being redrawn 24 times. EPS first and colour after would ship a
-    simulation nobody can see. It also relieves the label problem — a map coloured by pressure needs
-    far fewer numbers on it, which is the cheapest answer to Tasks 379, 377 and 343.
+  - **It is preparation, not decoration:** numbers in animations or at very large scale are too overwhelming or crowded. Colors become a gradient map that is intuitive to analyze or review visually. Colour is implemented by  every one of these programs. Color is a cheap alternative (depending on use case) to Tasks 379, 377 and 343.
   - **Sources in order.** EPANET 2.2 is US EPA work in the **public domain**, so its ramp defaults and
     interval-editing dialog can be copied outright, and matching what a water engineer already knows
     is worth more here than a nicer design. HEC-RAS is USACE, also public domain. **Read epanetjs's
     LICENSE before taking anything** — if it is copyleft, take the idea and not the code.
-  - The UX is the interesting part, not the colouring: which variable, how many intervals, the break
-    values, and whether the ramp is absolute or relative to the current timestep. EPANET's answer to
-    the last is a per-variable setting and is worth reading before we invent ours.
-- 95|379| **[H] Replace the label relaxation with candidate-position scoring, which is the part that
+  - The UX is the interesting part: the colouring, which variables, how many intervals, the break values, and whether the ramp is absolute or relative to the current timestep. EPANET's answer to the last is an absolute per-variable setting and is worth reading before we invent ours.
+- 95|379| **Replace the label relaxation with candidate-position scoring, which is the part that
   can see open space.** Tom, 2026-08-15: *"There is lots of free space that is being 'wasted' while
   bad conflicts persist. The relaxation needs to understand the concept of most-open space and
   gravitate toward it."*
-  - **`dev/label-placement-goals.md` is the review document and holds the design** — six goals in
-    priority order, every shipped number with a keep/retire verdict, §6 Tom's box review, §7 the
-    map-units-or-pixels question, §8 the replacement algorithm. **Nothing in it is settled until he
-    rules.**
+  - **`dev/label-placement-goals.md` holds the spec.** §1 is Tom's ranked goal list, ruled
+    2026-08-16 and settled; §2 is the method. Read it — nothing else here restates it.
   - The one thing to carry without opening it: `relax()` is a LOCAL method, so **no tuning of the
     weights will fix this** — weights decide who yields, not where anyone goes.
-  - Order of work: 379, then 343 (dropping lines by priority), then 377 (hide) as the last resort.
-    All three are the same decision — what to do when there is not room — at three granularities.
+  - Then Task 343 (dropping lines by priority). Hiding is not a separate task (377, rejected).
 - 55|378| **[H] Give the seven harnesses a network some other way, and delete
   `drawExampleNetwork()`.** The 289-line code-drawn ring main lost its last user-facing caller when
   Task 375's follow-up removed the File > New "From examples" rows, but seven harnesses still build
@@ -123,10 +114,7 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - The care needed is that those harnesses assert solved pressures and specific IDs. Migrate one
     first and diff its output against the current run before touching the other six.
 
-- 75|376| **[H] Replace the label MASK RECT with a text halo, the way epanetjs does it.** Tom,
-  2026-08-15, reporting on their build: *"They have a very small hide/mask/patch buffer that follows
-  strokes of text and merges together where characters are close; this is very desirable instead of
-  a box."*
+- 75|376| **Replace the label MASK RECT with a text halo, the way epanetjs does it.** 
   - **It is one CSS declaration and it deletes an element.** `paint-order: stroke fill` with a white
     stroke on the text draws exactly that: a halo that follows the glyphs and merges between close
     characters. `--lpn-hair` already exists to size it in screen pixels.
@@ -137,19 +125,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
     geometry.
   - The one thing to check before committing: a halo over a dark backdrop reads differently from a
     75%-white box, and the box was there for aerial photographs.
-
-- 60|377| **[H] Do labels need to move at all? epanetjs does not drag them.** Tom, same message:
-  *"epanetjs does not autodrag junction labels; this may be a good idea. Where labels conflict, they
-  hide the one on the right; since they allow only one label, conflicts are much fewer... User cannot
-  drag labels, but this is not harmful."*
-  - The alternative to a relaxation is a RULE: on conflict, hide one, deterministically. It cannot
-    fling a label across the map (Task 371), needs no cap, no leader, and no nudge — and the whole
-    apparatus this suite has spent days on becomes one comparison.
-  - Against it: we deliberately allow several values per label, which multiplies conflicts, and
-    hiding a value is worse than moving it when the value is why the map is open. Task 343's
-    line-priority dropping is the same idea one level down and may be the better half of it.
-  - Worth measuring before choosing: how many labels does the relaxation actually rescue on Net3,
-    versus how many it merely moves?
 
 - 10|391| **[H] Evaluate `// @ts-check` with JSDoc branded types — a joint decision, not a
   proposal.** Tom, 2026-08-16, on the unit paradigm work: *"this would be a little easier if JS were
@@ -381,10 +356,7 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops
   fitting on a screen.
 
-- 55|343| **Priority order for hiding label lines when they do not fit.** The other half of Task
-  333: with prefixes shipped, any SUBSET of a stack is self-describing, so dropping a line is now
-  safe. Interacts with Task 331's visibility threshold and Task 329's aligned labels, where a
-  rotated label has the least room.
+- 55|343| **Priority order for hiding label lines when they do not fit.** Provide an input in the labels box for persistence priority 1–10.
 
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
   2026-08-14: *"Not mtext labels. Mtext Text objects."* The target is what you place with the Text

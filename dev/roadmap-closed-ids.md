@@ -14,6 +14,7 @@ state; this is only a list of numbers that were once used.
 - 0|337| Text label Bold and Rotation, with Match-pipe and Flip buttons. Rotation is a stored number, not a link to the pipe (Tom's call)
 - 0|346| REJECTED, twice — no extrema tie rule. A mark that vanishes once enough elements share it confuses users more than a shared mark. Do not re-propose.
 - 0|372| One shared popover placer: flips below/above, caps body height instead of clamping around, menubar clicks now dismiss
+- 0|377| REJECTED by Tom 2026-08-16: hiding a conflicting label is not its own task, it is the tail of Task 379
 - 0|214| Glossary anchor languages realigned to es, pt, fr, tr; declared in glossary.json meta.anchor_languages
 - 0|160| Turkish accusative on the app name settled as EngCalcs'ı (back unrounded final vowel); 3 keys fixed
 - 0|386| Repeated-label spacing was really under min/2
