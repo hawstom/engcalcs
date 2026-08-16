@@ -100,6 +100,12 @@ run_check "suite ships its own assets"   blocking php dev/scripts/standalone_ass
 # worktrees that produced it had DISJOINT FILE TERRITORY exactly as required. The file rule protects
 # files; this protects the seam, which is what they actually shared.
 run_check "scenario write seam"          blocking php dev/scripts/scenario_seam_check.php
+# Unit conversion factors, re-derived from the exact international definitions. The suite once held
+# FOUR different feet at once (ft, ft2, ft3 and ft3ps each implying a different one, up to 47 ppm
+# apart) because each factor was typed independently at 3-5 significant figures. A round trip in ONE
+# unit hides that completely, so nothing else here could see it. Also checks that the pressure
+# factors and EngCalcs.G use the same gravity.
+run_check "unit conversion factors"      blocking php dev/scripts/unit_factor_check.php
 
 # --- Language integrity: the part of this suite that costs 27x --------------------------------
 run_check "lang syntax rules A-D"        blocking php dev/scripts/lang_syntax_validate.php
