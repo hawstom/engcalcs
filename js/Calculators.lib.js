@@ -10,28 +10,13 @@ var EngCalcs = EngCalcs || {};
 // dead on touch, since a bare <a title> only navigates on first tap with no hover to fall back on.
 // getOrCreateInstance (not `new Tooltip`) makes this safe to call repeatedly on overlapping roots,
 // including document itself, without creating duplicate tooltip instances on the same element.
-// An INTERACTIVE control (a button, a link, a form field) carrying a tip is treated differently
-// from a plain label, because 'click' as a tooltip trigger fights with the control's own job
-// (Tom, 2026-07-30: "tips are getting stuck open… labels hover, then labels click, then Close.
-// Tip is now stuck open until you click and close again. It cycles."). Bootstrap tracks each
-// trigger separately and will not hide while ANY of them is still active: hovering sets the hover
-// trigger, the click then sets the click trigger too, and moving the mouse away only clears hover
-// -- so the tip stays pinned open until a second click toggles the click trigger back off. Same
-// stickiness with 'focus', since a clicked button keeps focus after the click.
-// So a control gets 'hover focus' (a mouse user and a keyboard user both still get the tip) plus
-// an explicit hide on click: Bootstrap's hide() clears all three active triggers at once, which is
-// what breaks the cycle. On touch, tapping a button performs its action -- that IS the answer, and
-// a tip left hanging over the panel it just opened is noise.
+// THE RULE: A TIP MUST NEVER CARRY BOTH A HOVER TRIGGER AND A CLICK TRIGGER, whatever the element
+// is. Bootstrap tracks each trigger separately and will not hide while ANY of them is still
+// active: hovering sets the hover trigger, a click then sets the click trigger too, and moving the
+// mouse away only clears hover -- so the tip stays pinned open until a second click toggles it back
+// off, and it visibly cycles. 'focus' sticks the same way, since a clicked button keeps focus.
 //
-// 2026-08-03: the SAME defect was reported again, on mtc_n ("Tips are getting stuck visible").
-// The 2026-07-30 fix above only ever covered CONTROLS. A plain label kept 'hover focus click' --
-// all three triggers at once -- which is precisely the accumulation the paragraph above describes,
-// so plain labels were left with the exact bug the comment explains. mtc_n reaches that branch
-// because its .ec-help sits BESIDE the <a>, not inside it, so ecTipIsControl() is false.
-//
-// The real rule is narrower than "controls differ from labels": A TIP MUST NEVER CARRY BOTH A
-// HOVER TRIGGER AND A CLICK TRIGGER. Stacking two opening gestures is what strands the tip open,
-// regardless of what the element is. So pick ONE opening gesture per DEVICE instead:
+// So pick ONE opening gesture per DEVICE:
 //   - pointer can hover (mouse/trackpad): 'hover focus'. A <span> is not focusable without
 //     tabindex, so for a plain label this is effectively hover-only -- nothing to get stuck on.
 //   - pointer cannot hover (touch): 'click' for a plain label, which is the only way to reach its
@@ -54,6 +39,8 @@ EngCalcs.initTips = function (root) {
 		var tip = bootstrap.Tooltip.getOrCreateInstance(el, {
 			trigger: (control || canHover) ? 'hover focus' : 'click'
 		});
+		// A control also hides its tip on click: hide() clears every active trigger at once, so
+		// the tip cannot hang over the panel the button just opened.
 		if (control && !el.dataset.ecTipClickWired) {
 			el.dataset.ecTipClickWired = '1';
 			el.addEventListener('click', function () { tip.hide(); });
@@ -93,7 +80,7 @@ EngCalcs._loadTime = Date.now();
 EngCalcs._calcUsageLogged = false;
 EngCalcs.sessionAgeMs = EngCalcs.sessionAgeMs || 0;
 
-// Task 119: queue-and-flush for offline usage logging. The PWA's network-first
+// Queue-and-flush for offline usage logging. The PWA's network-first
 // service worker (sw.js) still serves calculators fully from cache when offline,
 // but a plain sendBeacon to a log-*.php endpoint fails silently with no trace and
 // no way to retry -- "no one used it" and "someone used it offline" looked
@@ -124,7 +111,7 @@ EngCalcs._openQueueDB = function () {
 	});
 };
 
-// ROADMAP Task 286: the queue is analytics storage on the visitor's device, so it is written only
+// The queue is analytics storage on the visitor's device, so it is written only
 // for a visitor who agreed to it. Refusing costs the offline retry, not the count -- a live beacon
 // still reaches the server, where it lands undeduplicated in the 'visit' bucket.
 EngCalcs._queueBeacon = function (url, params) {
@@ -152,7 +139,7 @@ EngCalcs._queueBeacon = function (url, params) {
 		}
 	}).catch(function () {
 		// No IndexedDB (very old browser, private-mode restriction, etc.) -- nothing
-		// more we can do; the event is lost same as it always was pre-Task 119.
+		// more we can do; the event is lost.
 	});
 };
 
@@ -215,7 +202,7 @@ EngCalcs.flushQueue = function () {
 	'use strict';
 	if (!window.fetch) return;
 	var self = this;
-	// Task 286: withdrawing consent has to actually remove what consent was covering, or "you can
+	// Withdrawing consent has to actually remove what consent was covering, or "you can
 	// withdraw at any time" is a sentence rather than a mechanism. Anything queued while the
 	// visitor was consenting is deleted here rather than delivered.
 	if (typeof this.analyticsConsented === 'function' && !this.analyticsConsented()) {
@@ -288,7 +275,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	EngCalcs.maybeLogHumanView();
 });
 
-// Logs one "somebody named this calculation" event (see log-title-event.php) -- ROADMAP Task 215.
+// Logs one "somebody named this calculation" event (see log-title-event.php).
 // The strongest signal the suite can collect: a page view says they looked, a calc event says they
 // got an answer, and a typed title says they mean to put it in front of another person.
 //
@@ -327,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	});
 });
 
-// ---- Behaviour signals (ROADMAP Tasks 216 and 200) ----
+// ---- Behaviour signals ----
 //
 // The four beacons above count PEOPLE. These count what those people then did: which reference
 // they went looking for, whether they touched the form at all, which units they landed on, whether
@@ -354,7 +341,7 @@ EngCalcs.logSignal = function (event, detail) {
 	});
 };
 
-// Task 216: a reference link out of the calculator. Delegated at the document rather than tagged
+// A reference link out of the calculator. Delegated at the document rather than tagged
 // onto each <a> in PHP, because the links worth measuring live in five different pages AND in 27
 // language files (mpf_friction_slope carries its own <a> in every one of them) -- a per-link
 // attribute would have to be added in all of those and would be silently absent from the next one
@@ -376,7 +363,7 @@ document.addEventListener('click', function (e) {
 	EngCalcs.logSignal('outbound', (url.host + url.pathname).replace(/\/$/, '').slice(0, 80));
 }, true);
 
-// Task 200: did they touch anything before leaving? One bit, and it is the cheapest diagnostic on
+// Did they touch anything before leaving? One bit, and it is the cheapest diagnostic on
 // the list -- a human view with no calculation and no touch is "could not understand it", one with
 // a touch is "tried it and did not want it", and those are opposite development responses.
 // 'change' rather than 'input' so a half-typed number is not an event, and so a value restored
@@ -388,8 +375,8 @@ document.addEventListener('change', function (e) {
 	var tag = el.tagName.toLowerCase();
 	if (tag !== 'input' && tag !== 'select' && tag !== 'textarea') return;
 	EngCalcs.logSignal('touch', 'input');
-	// Task 200's units question, the per-select half: which unit did each family actually land on?
-	// Only a select the presets can see (Task 162's data-family) is asked -- one with no family is
+	// The units question, the per-select half: which unit did each family actually land on?
+	// Only a select the presets can see (data-family) is asked -- one with no family is
 	// invisible to the preset buttons and would be a bug to report a statistic about.
 	if (tag === 'select' && el.dataset && el.dataset.family) {
 		var opt = el.options[el.selectedIndex];
@@ -398,7 +385,7 @@ document.addEventListener('change', function (e) {
 	}
 }, true);
 
-// Task 200: has this browser used this calculator before? The strongest value signal the suite
+// Has this browser used this calculator before? The strongest value signal the suite
 // does not otherwise collect -- a calculator a working engineer returns to is worth more than a
 // hundred one-off visits, and nothing else here can tell those two apart.
 //
@@ -421,7 +408,7 @@ document.addEventListener('change', function (e) {
 // exists to prevent.
 //
 // Looped-Network keeps its work in localStorage rather than an input cookie, so it needs its own
-// probe (added 2026-08-14, Tom: the map page is exactly where the shopper/user split matters most).
+// probe -- the map page is where the shopper/user split matters most.
 // Same principle, better evidence: a SAVED PROJECT DOCUMENT proves this browser drew a network here.
 //
 // The document, NOT `lpn_index`. A brand-new visitor gets an index entry the moment init() runs --
@@ -539,7 +526,7 @@ EngCalcs.calcAndSave = function (objForm) {
 	this.maybeLogCalcUsage();
 };
 
-// ---- Icons (ROADMAP Task 231) ----
+// ---- Icons ----
 // Geometry is NOT defined here. It lives once in lib/Icons.lib.php and arrives as
 // EngCalcs.icons / EngCalcs.iconOpenTag, so PHP's ecIcon() and every JS-built control draw the
 // same shape at the same stroke weight. Redrawing a path in JS would be a second icon pretending
@@ -556,9 +543,8 @@ EngCalcs.iconEl = function (name) {
 	return wrap.firstChild;
 };
 
-// The one way a control gets an icon + word, so no call site can grow a second convention --
-// which is exactly how the lpn Settings popover shipped without its warning triangle (Tom,
-// 2026-08-08: "I see it on the pull-down menu Settings, but not on the toolbar Settings").
+// The one way a control gets an icon + word, so no call site can grow a second convention and
+// ship a control missing its icon.
 EngCalcs.setLabel = function (el, iconName, text) {
 	'use strict';
 	el.textContent = '';
@@ -576,9 +562,8 @@ EngCalcs.copyLink = function () {
 	if (!btn || !navigator.clipboard || !navigator.clipboard.writeText) { return; }
 	var self = this;
 	navigator.clipboard.writeText(window.location.href).then(function () {
-		// Swaps the icon as well as the word. The old version assigned textContent, which since
-		// Task 231 would have destroyed the button's <svg> on the first click and never restored it
-		// -- textContent reads the text back but cannot read an element back.
+		// setLabel, NOT textContent: assigning textContent destroys the button's <svg> on the
+		// first click and never restores it -- it reads text back but cannot read an element back.
 		var originalText = btn.textContent;
 		self.setLabel(btn, 'check', btn.dataset.copiedText || originalText);
 		setTimeout(function () { self.setLabel(btn, 'link', originalText); }, 1500);
@@ -734,33 +719,24 @@ EngCalcs.inlineRangeWarnHtml = function (valueSI, lowSI, highSI, labels) {
 	* into elId, with the full explanation available as a hover tip on the
 	* whole string. status is 'ok', 'high', 'low', or '' (blank/no result).
 	*/
-// Standard gravity, in SI, for the whole suite (ROADMAP Task 230 follow-up, 2026-08-08).
-// It was 9.806 written out at FOURTEEN sites under four different names -- EngCalcs.Manning.g, a
-// bare local `var g`, per-instance this.var.g, EngCalcs.g and EngCalcs.lpnG. They all happened to
-// agree, which is exactly why it was worth fixing while they still did: a physical constant that
-// drifts between calculators is a correctness bug that shows up as two pages disagreeing about the
-// same pipe, and nothing in the suite would have caught it.
-// 9.806 rather than 9.80665: it is what every site already used, and the fourth digit is far below
-// the uncertainty in any n, C or f a user will enter. Changing the VALUE is a separate decision
-// from removing the duplication; this commit only removed the duplication.
+// Standard gravity, in SI, for the whole suite. THE ONLY definition -- do not reintroduce a local
+// `g`. A physical constant that drifts between calculators is a correctness bug showing up as two
+// pages disagreeing about the same pipe, and nothing in the suite would catch it.
+// 9.806 rather than 9.80665: the fourth digit is far below the uncertainty in any n, C or f a user
+// will enter.
 EngCalcs.G = 9.806;
 
-// The velocity band every calculator's check is measured against (ROADMAP Task 230).
-// ONE definition: this used to be the literals 0.6 and 3.0 repeated in nine calculator files, so
-// changing it meant finding all nine and a missed one would disagree silently.
+// The velocity band every calculator's check is measured against. ONE definition -- do not
+// re-inline these literals into a calculator, or a missed one disagrees silently.
 //
 //   min 0.6 m/s (~2 ft/s) -- the self-cleansing minimum below which solids settle. Long-standing
 //     sanitary-sewer practice (Ten States Standards); unchanged.
-//   max 2.5 m/s (~8.2 ft/s) -- lowered from 3.0 by Tom, 2026-08-08: "I am a little worried that the
-//     trigger for the warning is too high." Both numbers have real support, and they come from
-//     different traditions: 3.0 m/s is ~10 ft/s, the customary US ceiling for abrasion in concrete
-//     pipe, while 2.5 m/s is the round metric ceiling common in water-main and sewer practice. For
-//     an ADVISORY caution the more conservative one is the better default -- it asks for a second
-//     look rather than certifying a limit, and this suite's audience is largely people who would
-//     rather be told early.
-//   Verified before the change: no calculator's factory defaults newly warn. The highest default
-//     velocity in the suite is Hazen-Williams at 1.38 m/s, comfortably inside the band, so no page
-//     greets a first-time visitor with a warning it did not have before.
+//   max 2.5 m/s (~8.2 ft/s) -- chosen over the also-defensible 3.0 m/s (~10 ft/s, the customary US
+//     ceiling for abrasion in concrete pipe). 2.5 is the round metric ceiling common in water-main
+//     and sewer practice, and for an ADVISORY caution the more conservative one is the better
+//     default: it asks for a second look rather than certifying a limit.
+//   If you change either bound, re-check that no calculator's factory defaults newly warn. The
+//     highest default velocity in the suite is Hazen-Williams at 1.38 m/s.
 EngCalcs.VELOCITY_OK = { min: 0.6, max: 2.5 };
 
 EngCalcs.writeVelocityCheck = function (elId, status, labels) {
@@ -846,7 +822,7 @@ EngCalcs.resetToDefaults = function(confirmMessage) {
 	window.location.href = window.location.pathname;
 };
 
-// Applies a preset (Task 162). A preset is a family => unit-key map, and each unit
+// Applies a preset. A preset is a family => unit-key map, and each unit
 // <select> declares its family, so exactly one option per select is chosen and nothing
 // can overwrite anything. The old version walked a flat list of TRANSLATED LABELS and
 // set every text match across the whole page, so a later entry silently overwrote an

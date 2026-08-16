@@ -24,10 +24,8 @@ EngCalcs.createCookie = function () {
 	var
 		date,
 		expires,
-		// One year, matching ec_language. This was 36,000 days (~98 years) until ROADMAP Task 286
-		// -- indefensible as "strictly necessary" whatever the purpose, and poor hygiene whatever
-		// the law says. A visitor who has not opened a calculator in a year does not need the
-		// numbers they typed then, and nobody will notice the difference.
+		// One year, matching ec_language. Keep it defensible as "strictly necessary": a visitor
+		// who has not opened a calculator in a year does not need the numbers they typed then.
 		days = 365;
 	date = new Date();
 	date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
@@ -90,7 +88,7 @@ EngCalcs.normalizeCookieValue = function () {
 };
 
 // Splices the inline solver's two positional slots -- its Q input and its units select --
-// into a cookie written before the solver moved inside the form (ROADMAP Task 143), using
+// into a cookie written before the solver moved inside the form, using
 // whatever defaults the page currently renders. solverInputIndex is the 1-based position of
 // solver_q among the form's INPUT elements. Without this, the slot-count guard in
 // cookieToForm rejects the whole cookie and the visitor silently loses their saved inputs.
@@ -163,7 +161,7 @@ EngCalcs.cookieToForm = function (form) {
 				// A saved unit that this select no longer offers leaves selectedIndex at -1,
 				// which would silently break every calculation on the page. Fall back to the
 				// server-rendered default instead. Needed because unit option lists can change
-				// (Task 162 dropped psi from EGL/HGL, where it never made sense), and a stored
+				// (psi was dropped from EGL/HGL, where it never made sense), and a stored
 				// cookie outlives any such change.
 				if (savedSelect.selectedIndex < 0) {
 					var fallback = savedSelect.querySelector('option[selected]') || savedSelect.options[0];

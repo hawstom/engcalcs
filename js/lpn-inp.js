@@ -7,18 +7,16 @@
 // have (dev/looped-network-calculator-scope.md's "Cut, not deferred" list: patterns, water
 // quality, extended-period simulation -- tanks and valves both left that list in Task 248).
 //
-// THE ONE RULE THAT DECIDES EVERY CASE BELOW: never drop anything silently. The ROADMAP framed the
-// choice as "reject a file that uses a cut feature, or import the supported subset and report
-// exactly what was dropped", and reject loses on contact with real work -- the first three
-// production models Tom handed over (2026-08-11) include two throttle-control valves, so a
-// rejecting importer would have refused a third of its first real test set. So: import the subset,
-// and hand the caller a `dropped` list precise enough to show the user element by element.
+// THE ONE RULE THAT DECIDES EVERY CASE BELOW: never drop anything silently, and never reject a
+// file for using a cut feature. Real production models routinely use them -- a rejecting importer
+// refused a third of the first real test set. So: import the supported subset, and hand the caller
+// a `dropped` list precise enough to show the user element by element.
 //
 // UNITS. An `.inp` names its flow unit, and that one keyword fixes every other unit in the file --
 // GPM means feet, inches, psi and gpm together; LPS means metres, millimetres, metres-of-water and
 // L/s together. This module normalises ALL of that to SI (m, m3/s, m of head) with two deliberate
 // exceptions, `length` and the map coordinates, which stay in the file's own length unit: the page
-// stores those declaratively (Task 263) and both of EPANET's length units, ft and m, are on our own
+// stores those declaratively and both of EPANET's length units, ft and m, are on our own
 // Length/Map selector, so passing them through untouched is exact where a round trip through SI
 // would not be. `lengthUnit` says which one, and the caller sets the selector to match.
 //
@@ -156,8 +154,8 @@
 			pressSI = us ? PSI_M : 1,       // file PRESSURE unit -> m of water (emitters, PRV/PSV)
 			qSI = fu.toSI;
 
-		// The page computes Hazen-Williams and has no control for anything else yet (ROADMAP Task
-		// 271), so a D-W or C-M file would import roughness numbers that are then read as a
+		// The page computes Hazen-Williams and has no control for anything else yet, so a D-W or
+		// C-M file would import roughness numbers that are then read as a
 		// Hazen-Williams C. The numbers are kept AS WRITTEN rather than converted into a fake C --
 		// converting would destroy the file's own data to produce an answer that is still wrong --
 		// and the caller is told, loudly, that the results will not match the source until the
@@ -194,13 +192,8 @@
 			if (r[2]) { drop('head-pattern', [r[0]], r[2]); }
 		}
 
-		// TANKS ARE IMPORTED AS TANKS (ROADMAP Task 248, 2026-08-14). Until then they were a cut
-		// element and were dropped WITH EVERY LINK TOUCHING THEM, which is the honest handling of a
-		// missing element but cost real networks whole branches -- and tanks are in the majority of
-		// municipal models, so this was the single biggest reason an imported file did not look like
-		// the file. The old reasoning ("importing it as a reservoir at its initial level would
-		// silently convert a storage element into an infinite source") stays true and is exactly why
-		// the fix was a tank type rather than a substitution.
+		// TANKS ARE IMPORTED AS TANKS, never as a reservoir at their initial level -- that
+		// substitution would silently turn a storage element into an infinite source.
 		//
 		// [TANKS] is  ID  Elev  InitLvl  MinLvl  MaxLvl  Diam  MinVol  [VolCurve]  [Overflow].
 		// EVERY LENGTH HERE IS IN THE FILE'S LENGTH UNIT, THE DIAMETER INCLUDED -- unlike a pipe
@@ -232,12 +225,10 @@
 		if (volCurveIds.length) { drop('tank-volume-curve', volCurveIds); }
 
 		// ---- demand categories ----
-		// [DEMANDS] REPLACES the [JUNCTIONS] demand rather than adding to it, and this is the one
-		// rule here that was measured rather than assumed: a junction with 100 in [JUNCTIONS] and
-		// rows of 50 and 25 in [DEMANDS] is reported by the real engine as 75, not 175 (checked
-		// against js/vendor/epanet-js.js, 2026-08-11). Adding instead of replacing would have
-		// inflated every multi-category junction in silence, which is exactly the failure mode a
-		// plausible-looking importer hides best.
+		// [DEMANDS] REPLACES the [JUNCTIONS] demand rather than adding to it, measured rather than
+		// assumed: a junction with 100 in [JUNCTIONS] and rows of 50 and 25 in [DEMANDS] is reported
+		// by the real engine as 75, not 175 (checked against js/vendor/epanet-js.js). Adding instead
+		// of replacing inflates every multi-category junction in silence.
 		// Categories then SUM into this page's single demand field. That is the same network -- a
 		// junction's total draw is what the solve uses -- and the caller is told the breakdown was
 		// flattened, since nothing here can hold two categories.
@@ -343,14 +334,8 @@
 			links.push(pump); linkIndex[pump.id] = pump;
 		}
 
-		// Valves. Every type is cut, but they are NOT all equally lossy to drop, and the difference
-		// matters enough to say separately:
-		// VALVES ARE IMPORTED AS VALVES (ROADMAP Task 248 phase 2, 2026-08-14). Until then every
-		// type was substituted with a pipe: a TCV became a short pipe carrying the same loss, and
-		// a PRV/PSV/FCV became an open pipe with the control simply gone. The first was exact and
-		// the second was a real loss of behaviour, both reported. Now four of the five types are
-		// real elements, and the split that remains is about WHICH ENGINE, not about what we can
-		// hold:
+		// VALVES ARE IMPORTED AS VALVES. Four of the five types are real elements, and the split
+		// that remains is about WHICH ENGINE, not about what we can hold:
 		//   - TCV        a throttle: a minor loss on a zero-length link, so it solves in either
 		//                engine (EngCalcs.lpnLinkK).
 		//   - PRV/PSV/FCV  active controls whose open/active/closed state comes out of the solve.
@@ -413,12 +398,12 @@
 					setting: valveSettingSI(vtype, setting),
 					// A TCV's loss is its SETTING ALONE. The [VALVES] minor-loss column is IGNORED
 					// for it, which is the opposite of what the section's own column heading
-					// suggests and was measured rather than assumed (js/vendor/epanet-js.js,
-					// 2026-08-11: setting 16 with loss 0 gives 8.00 ft, setting 12 with loss 3
-					// gives 6.00 ft = 12/16 of it, and setting 0 with loss 16 gives exactly zero).
-					// Adding the two -- the obvious reading -- put 10.6 m of phantom head into the
-					// first real model that had one. So a TCV's k is stored as zero and never read;
-					// EngCalcs.lpnLinkK is the one place that rule lives.
+					// suggests and was measured rather than assumed (js/vendor/epanet-js.js:
+					// setting 16 with loss 0 gives 8.00 ft, setting 12 with loss 3 gives 6.00 ft
+					// = 12/16 of it, and setting 0 with loss 16 gives exactly zero). Adding the
+					// two -- the obvious reading -- puts ~10.6 m of phantom head into a real model.
+					// So a TCV's k is stored as zero and never read; EngCalcs.lpnLinkK is the one
+					// place that rule lives.
 					k: vtype === 'TCV' ? 0 : vloss
 				});
 			}
@@ -439,9 +424,9 @@
 			else if (sv === 'OPEN') { sl.status = 'open'; }
 			else if (sl.type === 'valve' && r[1] !== '' && isFinite(+r[1])) {
 				// A NUMBER here is a SETTING, not a status, and for a valve that is a value this
-				// page can now hold -- so it is applied rather than reported as a loss (Task 248
-				// phase 2). It is in the same units the [VALVES] row's own setting column was, so
-				// it goes through the same converter. For a PUMP a number is a speed multiplier,
+				// page can hold -- so it is applied rather than reported as a loss. It is in the
+				// same units the [VALVES] row's own setting column was, so it goes through the
+				// same converter. For a PUMP a number is a speed multiplier,
 				// which this page has no element for, so that case still falls through to the
 				// report below.
 				sl.setting = valveSettingSI((sl.valveType || '').toUpperCase(), +r[1]);
@@ -472,10 +457,9 @@
 		// A PUMP NEEDS A DIAMETER even though no head-loss term uses one. js/lpn-solver.js seeds
 		// every link's starting flow from 0.3 * pi d^2 / 4, so a pump without one starts at NaN and
 		// the whole network solves to NaN while still reporting ok -- the trap documented on
-		// pumpCase in dev/lpn-spike/cases.js, which cost an hour on 2026-08-09 and cost another
-		// here before this line existed. EPANET pumps carry no diameter, so one is inherited from
-		// the largest pipe the pump touches (a fair guess at the main it sits in) and falls back to
-		// a plain 200 mm / 8 in main when it touches none.
+		// pumpCase in dev/lpn-spike/cases.js. EPANET pumps carry no diameter, so one is inherited
+		// from the largest pipe the pump touches (a fair guess at the main it sits in) and falls
+		// back to a plain 200 mm / 8 in main when it touches none.
 		links.forEach(function (l) {
 			if (l.type !== 'pump') { return; }
 			var best = 0;
@@ -502,7 +486,7 @@
 		// ---- everything else we can only count ----
 		Object.keys(REPORTABLE).forEach(function (name) {
 			// VALVES is reported above, element by element, which is strictly better. TANKS is not
-			// in this table at all any more -- Task 248 imports tanks, so there is nothing to report.
+			// in this table at all: tanks are imported in full, so there is nothing to report.
 			if (name === 'VALVES') { return; }
 			if (seen[name]) { drop(REPORTABLE[name], [], seen[name]); }
 		});

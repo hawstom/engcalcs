@@ -1,15 +1,11 @@
 // lpn-geom.js — the map editor's pure geometry (ROADMAP Task 293).
 //
-// Lifted out of js/looped-network.js, which is 8,000+ lines of closure state and SVG
-// element handles: nothing in it could be reached without a browser, so the whole map
-// editor had zero behavioural tests while the 641-line solver had eleven harnesses.
-// The split is by PURITY, not by subject: everything here takes values and returns
-// values — no DOM, no `doc`, no `nodeEls`, no settings, no closure variables. The
-// caller in looped-network.js stays responsible for resolving node ids to points,
-// reading the current font size, and writing the answer onto an SVG attribute.
-//
-// Deliberately NOT a "split the file into modules" pass. A module that still reached
-// back into the editor's closure would be just as untestable, one file further away.
+// Split from js/looped-network.js by PURITY, not by subject: everything here takes values
+// and returns values — no DOM, no `doc`, no `nodeEls`, no settings, no closure variables,
+// so it is reachable without a browser. Keep it that way; a module that reached back into
+// the editor's closure would be just as untestable, one file further away. The caller in
+// looped-network.js stays responsible for resolving node ids to points, reading the current
+// font size, and writing the answer onto an SVG attribute.
 //
 // Coordinates are the map's own world units, Y-DOWN (SVG convention), same as every
 // other geometry in the editor.
@@ -110,14 +106,12 @@ EngCalcs.lpnGeom = (function () {
 		return { side: side, x: side === 'right' ? centerX - halfW : centerX + halfW };
 	}
 
-	// THE OTHER DIRECTION, and the one a data label uses now (ROADMAP Task 328). Above,
-	// the label box is the input and the leader's end is derived from it -- which is
-	// exactly why the leader angle would not hold still: the box's WIDTH is a screen-pixel
-	// quantity, so in world units it is proportional to 1/zoom, and a leader attached to
-	// the far edge slid by a whole box width as you zoomed. Here the ENDPOINT is the input
-	// (the user's own point, in map units) and the TEXT hangs off it, so the angle from
-	// anchor to endpoint is invariant by construction rather than by a rule anyone
-	// maintains.
+	// THE OTHER DIRECTION, and the one a data label uses. Above, the label box is the input
+	// and the leader's end is derived from it; here the ENDPOINT is the input (the user's own
+	// point, in map units) and the TEXT hangs off it. That ordering is what keeps the leader
+	// angle invariant under zoom: a box's WIDTH is a screen-pixel quantity, so in world units
+	// it is proportional to 1/zoom, and deriving the endpoint from it slides the leader by a
+	// whole box width as you zoom.
 	// Returns which side of the endpoint the box occupies: 'right' means it extends to the
 	// right (its left edge sits ON the endpoint), 'left' means it extends left. The text
 	// therefore always continues AWAY from the anchor, so the rule never runs through it.
@@ -176,11 +170,10 @@ EngCalcs.lpnGeom = (function () {
 	// (0 = a, 1 = b), or null if none of it is. Liang–Barsky, which is the standard answer and
 	// is exact -- no sampling, no stepping.
 	//
-	// Added 2026-08-15 for repeated link labels, where the alternative was tempting and wrong:
-	// testing each label's own point against the rectangle is O(number of labels), and the whole
-	// point of the cull is that a pipe a thousand view-widths long must not cost a thousand tests
-	// to draw four labels. Clipping the LINE first turns it into O(segments), after which the
-	// station indices in view are two divisions.
+	// Used to cull repeated link labels. Clip the LINE first, not each label's own point: point
+	// testing is O(number of labels), and the whole point of the cull is that a pipe a thousand
+	// view-widths long must not cost a thousand tests to draw four labels. Clipping is
+	// O(segments), after which the station indices in view are two divisions.
 	//
 	// A segment lying exactly along an edge counts as inside (the p === 0 branch keeps it when it
 	// is not strictly outside) -- for a cull, keeping a borderline label is the harmless direction.
@@ -202,16 +195,12 @@ EngCalcs.lpnGeom = (function () {
 	}
 
 	// The AXIS-ALIGNED BOUNDING BOX of a label that is drawn ROTATED, given where it would be
-	// unrotated. Added 2026-08-14 for the aligned-pipe-label collision defect (ROADMAP Task 329).
-	//
-	// **WHY THIS IS NEEDED AT ALL, because the answer is not "for tidiness".** An aligned pipe
-	// label is rendered `text-anchor: middle` and rotated about its own anchor, and it takes NO
-	// nudge — the GIS convention says a label lying along its pipe has already declared which pipe
-	// it belongs to, so it does not get moved. But the collision pass was still handing the
-	// relaxation an UNROTATED box at the label's UNALIGNED position. That box is a phantom in two
-	// directions at once: it shoves other labels away from a place where nothing is drawn, and the
-	// real rotated text sits somewhere else entirely, colliding with whatever is actually there
-	// and never being seen by the pass meant to prevent exactly that.
+	// unrotated. An aligned pipe label is rendered `text-anchor: middle`, rotated about its own
+	// anchor, and takes NO nudge (the GIS convention: a label lying along its pipe has already
+	// declared which pipe it belongs to). The collision pass must therefore be given THIS box --
+	// handing it the unrotated box at the unaligned position makes a phantom in two directions at
+	// once, shoving other labels away from where nothing is drawn while the real text collides
+	// unseen somewhere else.
 	//
 	// The rotation is about the ANCHOR (ax, ay), not about the box's own centre — that is what the
 	// SVG `rotate(a cx cy)` on the text element does, and a box rotated about the wrong point is
@@ -240,30 +229,28 @@ EngCalcs.lpnGeom = (function () {
 	// ---- Aligned (GIS-style) link labels ---------------------------------------------------
 	//
 	// Places a link's label ALONG the pipe rather than horizontally beside it, the way every GIS
-	// labels a road or a main. Tom, 2026-08-14: "start only with the GIS paradigm. We align the
-	// labels with pipes... and we make them disappear when we are zoomed out."
+	// labels a road or a main.
 	//
 	// THE CONSTRAINT THAT DECIDES THE MOST HERE IS NOT WHICH SIDE -- IT IS THAT TEXT MUST NEVER
 	// RENDER UPSIDE DOWN. A pipe drawn right-to-left has to be flipped 180 degrees to stay
 	// readable, and that flip SWAPS which side of the line is "the top". So the order is fixed:
-	// normalise the angle into (-90, 90] FIRST, then offset. Offsetting before flipping puts
-	// labels on westward pipes on the opposite side from their eastward neighbours, and the
-	// drawing reads as though the side were chosen at random -- which is the failure this
-	// function exists to prevent, not the failure of picking the "wrong" side.
+	// normalise the angle FIRST, then offset. Offsetting before flipping puts labels on westward
+	// pipes on the opposite side from their eastward neighbours, and the drawing reads as though
+	// the side were chosen at random.
 	//
-	// WHICH SIDE: `side` is +1 for the top (the default, and Tom's answer when forced to choose)
-	// and -1 for the bottom. Both are returned as CANDIDATES rather than one being computed as
-	// correct, because "the side with least congestion" is not a new algorithm -- it is
-	// runLabelCollisionAvoidance() being handed two positions instead of one.
+	// WHICH SIDE: `side` is +1 for the top (the default) and -1 for the bottom. Both are returned
+	// as CANDIDATES rather than one being computed as correct, because "the side with least
+	// congestion" is not a new algorithm -- it is runLabelCollisionAvoidance() being handed two
+	// positions instead of one.
 	//
-	// **WHERE THE FLIP HAPPENS IS `opts.bias`, AND THE DEFAULT OF 90 IS THE WORST PLACE FOR IT**
-	// (Tom, 2026-08-15: a "readability bias angle", default 110). The normalisation window is
-	// (bias - 180, bias], so at the natural-looking 90 the decision boundary sits exactly on
-	// VERTICAL -- which is where street mains, risers and property services actually are. Two
-	// parallel vertical pipes drawn in opposite directions then land either side of the knife
-	// edge and their labels read in opposite directions, for a difference of a tenth of a degree
-	// that nobody can see. Moving the doorway to 110 puts it 20 degrees past vertical, so the
-	// whole near-vertical cluster falls on one side of it and reads the same way.
+	// **WHERE THE FLIP HAPPENS IS `opts.bias`, AND 90 IS THE WORST PLACE FOR IT.** The
+	// normalisation window is (bias - 180, bias], so at the natural-looking 90 the decision
+	// boundary sits exactly on VERTICAL -- which is where street mains, risers and property
+	// services actually are. Two parallel vertical pipes drawn in opposite directions then land
+	// either side of the knife edge and their labels read in opposite directions, for a difference
+	// of a tenth of a degree that nobody can see. The shipped setting is 110, which puts the
+	// boundary 20 degrees past vertical so the whole near-vertical cluster falls on one side of it
+	// and reads the same way.
 	//
 	// The cost of moving it is that a pipe between 90 and `bias` renders text tilted past vertical
 	// (at 110, twenty degrees past), which is a head-tilt to read but never upside down. That is
@@ -323,11 +310,10 @@ EngCalcs.lpnGeom = (function () {
 	// on (looped-network.js alignedSideFor()): the label's own pipe is excluded by the caller, so
 	// what this measures is how close the candidate position comes to some OTHER pipe.
 	//
-	// This exists because staticObstacleBoxes() has never included LINKS -- it collects nodes and
-	// Text labels only -- so a data label has always been free to sit straight on top of a pipe, and
-	// aligning labels along pipes made that visible immediately (Tom's Elm Street screenshot,
-	// 2026-08-14). Distance to the line is the right measure rather than a bounding box: a diagonal
-	// pipe's box is mostly empty space, and boxing it would push labels away from clear ground.
+	// staticObstacleBoxes() collects nodes and Text labels only, never LINKS, so a data label is
+	// otherwise free to sit straight on top of a pipe. Distance to the line is the right measure
+	// rather than a bounding box: a diagonal pipe's box is mostly empty space, and boxing it would
+	// push labels away from clear ground.
 	function pointToSegmentDistance(px, py, ax, ay, bx, by) {
 		var vx = bx - ax, vy = by - ay, len2 = vx * vx + vy * vy, t;
 		if (!len2) { return Math.hypot(px - ax, py - ay); }
