@@ -156,7 +156,12 @@ EngCalcs.iconOpenTag = <?=json_encode(EC_ICON_OPEN_TAG)?>;</script>
 // sidebar). Task 286's requirement is that the notice be FINDABLE and that withdrawal be as easy as
 // consent; it never required a particular piece of furniture. What is not negotiable is that the
 // banner itself and the service worker below still render, which they do either way.
-function echoFooter($type, $nav = true, $legal = true) {
+// $devtools: the W3C validator badges, which only appear in DEBUG_MODE. A third flag rather than
+// a reading of the other two, because it is a different question -- Looped-Network.php is a
+// full-window map editor where anything below the canvas costs drawing room, and Tom found the
+// badges by scrolling a dev page and asked for them gone (2026-08-15). Every other page keeps them
+// exactly as before.
+function echoFooter($type, $nav = true, $legal = true, $devtools = true) {
 ?>
 <div class="left d-print-none">
 <?php
@@ -171,7 +176,7 @@ if ($nav) {
 // to reopen wherever the visitor happens to be standing.
 if ($legal && function_exists('echoConsentFooterLinks')) echoConsentFooterLinks();
 ?>
-<?php if (DEBUG_MODE === TRUE) : ?>
+<?php if (DEBUG_MODE === TRUE && $devtools) : ?>
 	<p>
 		<a href="http://validator.w3.org/check/referer">
 			<img

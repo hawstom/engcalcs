@@ -9370,8 +9370,8 @@ var EngCalcs = EngCalcs || {};
 	//
 	//   * It self-corrects. If a future change puts something tall back under the map, `below`
 	//     grows and the canvas shrinks to keep it reachable -- no constant to remember to revisit.
-	//   * It is a FLOOR, not just a cap. LPN_MAP_MIN keeps a usable canvas on a short screen even
-	//     if that reintroduces a little scrolling, because a 60px map is not a working map.
+	//   * It is a FLOOR, not just a cap. LPN_MAP_MIN keeps SOMETHING on screen when the window is
+	//     too short for a real canvas -- but see the constant itself for how low it goes and why.
 	//
 	// **THERE IS NO "MAP HEIGHT" SETTING ANY MORE** (Tom, 2026-08-14: "So Map height is now
 	// obsolete. Right?" -- yes). It existed so a user on a large monitor could grow the map beyond
@@ -9388,7 +9388,19 @@ var EngCalcs = EngCalcs || {};
 	//
 	// The two lang keys are PARKED, not deleted -- see lib/lang.ec.en.php. Restoring the row is
 	// cheap; recovering 27 translations is not. Rewrite the tip before reusing it: it is wrong.
-	var LPN_MAP_MIN = 240;
+	// **80, NOT 240** (Tom, 2026-08-15, on being shown that the floor is what stops the canvas
+	// re-centring and starts it cropping in a short window: *"Is there a good argument not to let it
+	// go to 80? I think I would like 80 better."*). There is not a good argument, and the one the
+	// old value rested on -- "a 60px map is not a working map" -- answers the wrong question. The
+	// floor does not decide whether the map is usable; the WINDOW does. All the floor decides is
+	// whether a window too short for a real canvas gets a small map that fits the page, or a bigger
+	// one that pushes the status strip off the bottom and makes the page scroll. A user in that
+	// window is going to resize it either way, and until they do, the honest thing is to keep the
+	// page whole.
+	//
+	// It is still a floor rather than zero, because zero would leave nothing to aim at and nothing
+	// to signal that the map is there at all.
+	var LPN_MAP_MIN = 80;
 	// How much ordinary page sits BELOW the canvas, in document flow. The popovers do not count:
 	// every one of them is position:fixed and display:none, so they occupy no flow at all -- which
 	// is why this measures the document rather than listing elements by id, a list that would go

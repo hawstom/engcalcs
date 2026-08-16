@@ -802,7 +802,10 @@ EngCalcs.pageConfig = {
 <?php echoCookieScript(); ?>
 </script>
 <?php
-echoFooter("EngCalcs", false, false); // no site-nav row and no legal row: both live in the Help menu
+echoFooter("EngCalcs", false, false, false); // no site-nav row, no legal row (both live in the Help
+// menu), and no W3C validator badges -- those only appear in DEBUG_MODE, but on a full-window map
+// editor anything below the canvas is drawing room, and in dev they were a scrollable strip under
+// the map (Tom, 2026-08-15).
 // and the examples gallery instead (Task 314). The consent BANNER and the service worker still
 // render -- those are not footer furniture, and echoFooter() emits them regardless.
 // Omit last closing tag is good practice

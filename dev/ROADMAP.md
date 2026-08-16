@@ -1849,6 +1849,17 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|363| **A shorter map floor, and no validator badges under the canvas — DONE 2026-08-15.**
+  - `LPN_MAP_MIN` 240 → **80** (Tom: *"Is there a good argument not to let it go to 80?"* — no).
+    The old value rested on "a 60px map is not a working map", which answers the wrong question: the
+    floor does not decide whether the map is usable, the WINDOW does. All it decides is whether a
+    too-short window gets a small map that fits the page or a bigger one that pushes the status
+    strip off the bottom. Not zero, because zero leaves nothing to aim at.
+  - `echoFooter()` takes a fourth flag, `$devtools`, and `Looped-Network.php` passes false. The W3C
+    validator badges only render in DEBUG_MODE, but on a full-window map editor anything below the
+    canvas is drawing room, and in dev they were a scrollable strip under the map. Every other page
+    keeps them.
+
 - 0|362| **CSS PIXELS ARE THE SIZING UNIT, CONFIRMED AND WRITTEN DOWN — decided 2026-08-15.** Tom
   after two rounds of argument and browser testing: *"This entire current phase of discussion is to
   confirm that we want CSS pixels. I agree that we do... My inclination is to keep and tweak what we

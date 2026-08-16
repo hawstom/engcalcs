@@ -114,18 +114,22 @@ console.log('\n--- a measurement that disagrees with itself cannot produce an ov
 	report(h <= 700 - SLACK, 'and still never taller when the scroll offset is the honest half', h);
 }
 
-console.log('\n--- the floor still holds, because a 60px map is not a map ---');
+console.log('\n--- the floor is a floor, and it is deliberately small ---');
 {
 	const h = scope({
 		vh: 400, scrollY: 0,
 		svg: { top: 300, bottom: 340, width: 1400, height: 40 },
 		body: { bottom: 900 }   // a lot of page below
 	});
-	report(h === MIN, 'a short window gets the floor, not a sliver', h);
-	// The floor is deliberately allowed to overflow — see LPN_MAP_MIN's own comment. The clamp
-	// above must not have quietly removed that, because a usable canvas on a small screen is worth
-	// a little scrolling and this is the one case where overflow is a decision rather than a bug.
-	report(h > 400 - 300, '...even though that means the page scrolls, which is the deliberate part');
+	report(h === MIN, 'a window with no room left gets the floor, not a sliver or a zero', h);
+	// **THE FLOOR NO LONGER FORCES A SCROLL, AND THAT IS THE CHANGE.** It was 240, on the argument
+	// that "a 60px map is not a working map" -- which answers the wrong question, as Tom pointed out
+	// on 2026-08-15: the floor does not decide whether the map is usable, the WINDOW does. All it
+	// decides is whether a too-short window gets a small map that fits the page, or a bigger one
+	// that pushes the status strip off the bottom and makes the page scroll. This asserts the
+	// constant stays small enough to be the former.
+	report(MIN <= 100, 'and it is small enough not to push the page into scrolling', MIN);
+	report(MIN > 0, '...but not zero, which would leave nothing to aim at');
 }
 
 // --- A RESIZE MUST NOT SLIDE THE DRAWING -------------------------------------

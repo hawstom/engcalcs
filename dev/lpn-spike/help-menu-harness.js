@@ -118,10 +118,16 @@ console.log('\n-- the Help menu rows --');
 console.log('\n-- the footer gives up its navigation and keeps its notice --');
 {
 	const hf = fs.readFileSync(path.join(root, 'lib/HeadersFooters.lib.php'), 'utf8');
-	report(/function echoFooter\(\$type, \$nav = true, \$legal = true\)/.test(hf),
-		'echoFooter takes $nav and $legal, both defaulting to the old behaviour');
-	report(/echoFooter\("EngCalcs", false, false\)/.test(page),
-		'and Looped-Network.php declines both rows');
+	report(/function echoFooter\(\$type, \$nav = true, \$legal = true, \$devtools = true\)/.test(hf),
+		'echoFooter takes $nav, $legal and $devtools, all defaulting to the old behaviour');
+	// $devtools joined them on 2026-08-15: the W3C validator badges only render in DEBUG_MODE, but
+	// on a full-window map editor anything below the canvas is drawing room, and Tom found them by
+	// scrolling a dev page. A third flag rather than a reading of the other two, because it is a
+	// different question -- and every other page keeps them.
+	report(/echoFooter\("EngCalcs", false, false, false\)/.test(page),
+		'and Looped-Network.php declines all three');
+	report(/DEBUG_MODE === TRUE && \$devtools/.test(hf),
+		'...with the badges gated on the flag as well as on DEBUG_MODE');
 	// **THE HALF THAT MUST NOT BE DROPPED.** Task 286 put the privacy/terms/cookie links and the
 	// consent banner in every footer on every page because "a privacy notice nobody can find is not
 	// notice", and Cookie settings must have something to reopen "wherever the visitor happens to
