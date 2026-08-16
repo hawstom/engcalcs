@@ -494,7 +494,20 @@ console.log('\n--- the measured constants are the ones that SHIP ---------------
 	// 8 directions x 2 radii + the current placement. Measured against a 4x denser ring, which was
 	// worth 0.64 of total score across 25 labels where one label-on-label overlap costs 1.0.
 	const cands = C.candidatesFor(LBL, 10, 25);
-	report(cands.length === 57, 'the candidate set is the measured one', cands.length);
+	// Tom's rule, 2026-08-16: multiples of 45 / 30 / 15 outward, orthogonals dropped -> 4 + 8 + 20.
+	report(cands.length === 33, 'the candidate set is 4 + 8 + 20 directions, plus home', cands.length);
+	report(JSON.stringify(C.RING_STEPS) === '[45,30,15]', '...from the angle steps Tom specified',
+		JSON.stringify(C.RING_STEPS));
+	report(C.anglesAt(45).length === 4 && C.anglesAt(30).length === 8 && C.anglesAt(15).length === 20,
+		'...and each step really yields 4, 8 and 20 non-orthogonal directions');
+	// BY CONSTRUCTION, not by accident: a direction on rings 1 and 2 both would be a multiple of 45
+	// AND 30, hence of 90, hence orthogonal, hence already dropped. They interleave rather than
+	// repeat. Asserted so nobody "fixes" the gap later.
+	report(C.anglesAt(45).every(a => C.anglesAt(30).indexOf(a) < 0),
+		'rings 1 and 2 share no direction -- they interleave, they do not nest');
+	report(C.anglesAt(45).every(a => C.anglesAt(15).indexOf(a) >= 0)
+		&& C.anglesAt(30).every(a => C.anglesAt(15).indexOf(a) >= 0),
+		'...while both are subsets of ring 3');
 	// And the page really does hand the module its own constants rather than falling through to the
 	// module defaults, which are a second set of numbers nobody measured.
 	// Through labelTuning(), which is the ONE place the shipped numbers and the ?debug=labels bench

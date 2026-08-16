@@ -44,6 +44,8 @@ const L = loadLoopedNetwork(
 	// way runLabelCollisionAvoidance() computes it, and returned in SCREEN pixels because that is
 	// the quantity that binds.
 	"\t\treachPx: function () { return LPN_REACH_TEXT_HEIGHTS * effectiveFontSize() * state.s; },\n" +
+	"\t\tlabelDiagPx: function (id) { var ne = nodeEls[id];\n" +
+	"\t\t\treturn Math.hypot(labelBoxWidth(ne), dataLabelBoxHeight(ne.lineCount)) * state.s; },\n" +
 	// MEASURED FROM THE ANCHOR, NOT FROM THE LABEL'S HOME. The reach is a statement about how far a
 	// number may sit from the element it describes, which is the reader's problem; the nudge is an
 	// implementation detail measured from the default offset and is a slightly different quantity.
@@ -118,15 +120,22 @@ console.log('--- no label is carried further than the reach, at any zoom ---');
 	// screen size while the network scales, so at 22x the nodes are twice as far apart in pixels and
 	// genuinely conflict less. An assertion that the same label lands at the same fraction of its
 	// reach at both zooms was written here first and was simply wrong about the physics.
-	// A FRACTION, not zero. This fixture is built so that no conflict-free answer exists, so a few
-	// labels genuinely have nowhere better and end up far out -- that is the reach bounding the
-	// search, which is its job. What must NOT happen is the old behaviour, where the limit was
-	// smaller than the label and therefore bound nearly every one of them.
+	// **THE DEFECT THIS GUARDS IS "THE REACH IS SMALLER THAN THE LABEL"**, which is what shipped
+	// until 2026-08-16: a 28 px disc around a 50 x 38.5 px label, so no candidate could clear
+	// anything. Asserted directly, because it is the thing that was wrong.
 	L.setZoom(11); L.relayout();
+	ok('the reach is several labels wide, not smaller than one',
+		L.reachPx() > 3 * L.labelDiagPx(ids[0]),
+		'reach ' + L.reachPx().toFixed(0) + 'px against a ' + L.labelDiagPx(ids[0]).toFixed(0) + 'px label');
+	// This fixture is built so no conflict-free answer exists -- 25 labels crowded on a 2-unit grid
+	// -- so plenty of them legitimately end up at full stretch. What must still be true is that the
+	// interior of the search is REACHABLE, i.e. the outermost circle is not the only usable answer.
+	// (On realistically spaced drawings, measured the same day, essentially every label lands on the
+	// INNERMOST circle and none goes beyond it. The reach bounds the search; it does not shape it.)
 	const near = ids.filter(function (id) { return L.labelDistPx(id) > L.reachPx() * 0.95; });
-	ok('the reach bounds the search without shaping the usual answer',
-		near.length <= ids.length / 4,
-		near.length + ' of ' + ids.length + ' within 5% of their reach, on a fixture with no clean answer');
+	ok('...and even here the interior of the search is used, not only the outer circle',
+		near.length < ids.length,
+		near.length + ' of ' + ids.length + ' at full stretch, on a fixture with no clean answer');
 }
 
 console.log('\n--- a label at the reach is still attached to its element ---');

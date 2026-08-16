@@ -769,11 +769,12 @@ var EngCalcs = EngCalcs || {};
 	// which is 5.7 text heights), so it lands where Tom put the floor: *"more than 5 * the label
 	// size."* The inner ring is a fifth of it -- roughly one label, the smallest step that can clear
 	// a neighbour. Both are adjustable live under ?debug=labels.
-	// `rings` is how many circles between them; `arc` is the target spacing BETWEEN candidates along
-	// a circle, which is what thins the near circles out (Tom: *"we will economize by omitting some
-	// of the angles on the nearer circle(s)"*). All four are live under ?debug=labels.
+	// **THE ANGLE STEP PER CIRCLE, INNERMOST FIRST -- and its LENGTH is how many circles there are.**
+	// Tom's rule, 2026-08-16: multiples of 45 on ring 1, of 30 on ring 2, of 15 on ring 3, which
+	// gives 4, 8 and 20 directions once the orthogonals are dropped. See js/lpn-collide.js for why
+	// rings 1 and 2 deliberately share no direction. Editable live under ?debug=labels.
 	var LPN_REACH_TEXT_HEIGHTS = 30, LPN_INNER_TEXT_HEIGHTS = 6,
-		LPN_RINGS = 4, LPN_ARC_TEXT_HEIGHTS = 7;
+		LPN_RING_STEPS = [45, 30, 15];
 	// **THE NEIGHBOUR CREDIT, `k`.** Goal 11: a candidate is credited for the openness of the
 	// directions AROUND it, so the pass prefers a placement with room beside it to an equally clear
 	// one hemmed in.
@@ -977,10 +978,16 @@ var EngCalcs = EngCalcs || {};
 	// Defaults live HERE and nowhere else, so the panel and the shipped page cannot disagree about
 	// what the shipped value is -- the panel starts by showing exactly what a visitor gets.
 	var labelTune = null;
+	// "45,30,15" -> [45, 30, 15]. A step that does not divide 360, or is not a multiple of 15, would
+	// put a leader off the shared grid, so it is refused rather than rounded.
+	function parseRingSteps(text) {
+		return String(text).split(',').map(function (x) { return parseFloat(x); })
+			.filter(function (v) { return isFinite(v) && v >= 15 && v <= 180 && v % 15 === 0 && 360 % v === 0; });
+	}
 	function labelTuning() {
 		if (!labelTune) {
 			labelTune = { reach: LPN_REACH_TEXT_HEIGHTS, inner: LPN_INNER_TEXT_HEIGHTS,
-				rings: LPN_RINGS, arc: LPN_ARC_TEXT_HEIGHTS, k: LPN_NEIGHBOUR_K,
+				steps: LPN_RING_STEPS.join(','), k: LPN_NEIGHBOUR_K,
 				fitRoom: FIT_LABEL_ROOM_TEXT_HEIGHTS };
 		}
 		return labelTune;
@@ -1025,6 +1032,20 @@ var EngCalcs = EngCalcs || {};
 			l.appendChild(i);
 			box.appendChild(l);
 		}
+		function textRow(label, get, set, hint) {
+			var l = document.createElement('label'), i = document.createElement('input');
+			l.setAttribute('style', 'display:flex;justify-content:space-between;gap:8px;align-items:center');
+			l.appendChild(document.createTextNode(label));
+			i.type = 'text'; i.value = get();
+			i.setAttribute('style', 'width:6em');
+			if (hint) { i.title = hint; }
+			i.addEventListener('change', function () {
+				if (parseRingSteps(i.value).length) { set(i.value); refreshLabelText(); }
+				else { i.value = get(); }
+			});
+			l.appendChild(i);
+			box.appendChild(l);
+		}
 		var h = document.createElement('div');
 		h.setAttribute('style', 'font-weight:bold;margin-bottom:4px');
 		h.textContent = 'label placement bench';
@@ -1033,10 +1054,9 @@ var EngCalcs = EngCalcs || {};
 			function (v) { t.reach = v; }, 1, 'How far out the furthest ring sits, in multiples of the current text size. One number for the whole map.');
 		row('inner ring (text heights)', function () { return t.inner; },
 			function (v) { t.inner = v; }, 0.5, 'The nearest circle. About one label wide is the smallest step that can clear a neighbour.');
-		row('circles', function () { return t.rings; },
-			function (v) { t.rings = v; }, 1, 'How many circles between the inner ring and the reach. Radii are geometric, so the near ones sit closer together.');
-		row('arc spacing (text heights)', function () { return t.arc; },
-			function (v) { t.arc = v; }, 0.5, 'Target gap BETWEEN candidates along a circle. Bigger thins the near circles out; every direction stays on the 15-degree grid.');
+		textRow('angle step per circle', function () { return t.steps; },
+			function (v) { t.steps = v; },
+			'One angular step per circle, innermost first, comma separated. How many you type is how many circles there are. 45,30,15 gives 4, 8 and 20 directions \u2014 orthogonal directions are always dropped.');
 		row('neighbour credit k', function () { return t.k; },
 			function (v) { t.k = v; }, 0.05, 'Goal 11. 0 turns the neighbourhood term off entirely.');
 		row('zoom-to-fit room (text heights)', function () { return t.fitRoom; },
@@ -1156,7 +1176,7 @@ var EngCalcs = EngCalcs || {};
 			before = obs.boxes.length,
 			placed = Collide.placeLabels(labels, obs, {
 				inner: t.inner * fs, outer: t.reach * fs,
-				rings: t.rings, arcTarget: t.arc * fs, k: t.k
+				steps: parseRingSteps(t.steps), k: t.k
 			});
 		placed.forEach(function (r) {
 			var h = holders[r.id];

@@ -226,46 +226,44 @@ EngCalcs.lpnCollide = (function () {
 		}
 		return out;   // 20 directions
 	}());
-	// **THE ANGLES THIN OUT ON THE NEAR CIRCLES, BECAUSE ARC LENGTH IS WHAT MATTERS.** Tom,
-	// 2026-08-16: *"I assume that we will economize by omitting some of the angles on the nearer
-	// circle(s)."* Right, and it is the arc that says by how much: at 15 degrees apart, two
-	// candidates on the innermost circle are a couple of pixels from each other and score almost
-	// identically, while on the outermost they are most of a label apart. Equal ANGULAR spacing
-	// therefore spends most of its candidates where they cannot tell each other apart.
+	// **A COARSER ANGLE STEP ON EVERY CIRCLE INWARD.** Tom, 2026-08-16, having asked to *"economize
+	// by omitting some of the angles on the nearer circle(s)"*, then designed the rule:
 	//
-	// So each circle takes the coarsest step whose arc is still under `arcTarget`, chosen from the
-	// steps that both divide 360 and keep every direction on the shared 15-degree grid without
-	// landing on an orthogonal: 15, 30, 60, 120. A near circle gets 3 or 6 directions, the outer
-	// ones get all 20, and the total is far below 20 per circle.
-	var RING_STEPS = [15, 30, 60, 120];
-	function angleStepFor(radius, arcTarget) {
-		var i, step, arc;
-		for (i = 0; i < RING_STEPS.length; i++) {
-			step = RING_STEPS[RING_STEPS.length - 1 - i];         // coarsest first
-			arc = radius * step * Math.PI / 180;
-			if (arc <= arcTarget) { return step; }
-		}
-		return 15;
-	}
-	function anglesAt(radius, arcTarget) {
-		var step = angleStepFor(radius, arcTarget), out = [], d;
-		for (d = 15; d < 360; d += step) {
+	//     ring 1  multiples of 45   ->   4 directions
+	//     ring 2  multiples of 30   ->   8 directions
+	//     ring 3  multiples of 15   ->  20 directions
+	//
+	// (Orthogonal directions are dropped throughout, which is what makes those counts 4/8/20 rather
+	// than 8/12/24.) It replaced a derivation that computed a step per circle from a target arc
+	// length; this gets the same answer from a rule a person can hold in their head. Measured at the
+	// shipped radii the arc between neighbours is 104 px on ring 1, 77-155 on ring 2 and 86-173 on
+	// ring 3 -- near enough constant, which was the whole aim.
+	//
+	// **RINGS 1 AND 2 SHARE NO DIRECTION**, and that is by construction, not by accident: a
+	// direction on both would be a multiple of 45 and of 30, hence of 90, and every multiple of 90
+	// is orthogonal and already excluded. So ring 1 falls exactly between ring 2's directions and
+	// the two interleave rather than repeat, which covers the plane better than nesting would. Both
+	// are subsets of ring 3. Worth knowing before anyone "fixes" the gap.
+	var RING_STEPS = [45, 30, 15];
+	function anglesAt(step) {
+		var out = [], d;
+		for (d = 0; d < 360; d += step) {
 			if (d % 90 !== 0) { out.push(d); }
 		}
 		return out;
 	}
-	// `rings` is how many circles, `inner`..`outer` the span. Radii are geometric so the near ones
-	// are close together, where most placements land.
-	function ringCandidates(anchor, inner, outer, rings, arcTarget) {
-		var out = [], radii = [], i, ri, ai, rad, angs, ringOf = [], base;
-		rings = rings > 0 ? Math.round(rings) : 4;
-		if (rings < 1) { rings = 1; }
+	// `steps` is one angular step per circle, innermost first; its LENGTH is how many circles there
+	// are. Radii are geometric from `inner` to `outer`, so the near ones sit closer together, where
+	// most placements land.
+	function ringCandidates(anchor, inner, outer, steps) {
+		var out = [], radii = [], i, ri, ai, rad, angs, ringOf = [], base, rings;
+		steps = (steps && steps.length) ? steps : RING_STEPS;
+		rings = steps.length;
 		if (!(outer > inner)) { outer = inner; }
 		base = rings > 1 ? Math.pow(outer / inner, 1 / (rings - 1)) : 1;
 		for (i = 0; i < rings; i++) { radii.push(inner * Math.pow(base, i)); }
-		if (!(arcTarget > 0)) { arcTarget = inner; }
 		for (ri = 0; ri < radii.length; ri++) {
-			angs = anglesAt(radii[ri], arcTarget);
+			angs = anglesAt(steps[ri]);
 			ringOf.push({ start: out.length, n: angs.length });
 			for (ai = 0; ai < angs.length; ai++) {
 				rad = angs[ai] * Math.PI / 180;
@@ -279,7 +277,7 @@ EngCalcs.lpnCollide = (function () {
 		}
 		// Neighbours are what the goal-11 term reads, and they are declared STRUCTURALLY: the two
 		// directions either side on the same circle, plus the NEAREST direction on each adjacent
-		// circle -- "nearest" because the circles no longer share an angle list.
+		// circle -- "nearest" because the circles deliberately do not share an angle list.
 		out.forEach(function (c) {
 			var me = ringOf[c._ri], n = me.n, list = [
 				me.start + (c._ai + 1) % n,
@@ -320,10 +318,10 @@ EngCalcs.lpnCollide = (function () {
 	// Every candidate a label will be scored at. `home` -- where it sits now -- is always in the set
 	// so that "leave it alone" is a placement the pass can choose rather than a case it has to
 	// special-case, and it carries the ring's two nearest directions as its neighbours.
-	function candidatesFor(lbl, inner, outer, rings, arcTarget) {
+	function candidatesFor(lbl, inner, outer, steps) {
 		var cands, i, best = [0, 1], bestD = [Infinity, Infinity], d;
 		if (lbl.dragged) { return rayCandidates(lbl.anchor, lbl.home); }
-		cands = ringCandidates(lbl.anchor, inner, outer, rings, arcTarget);
+		cands = ringCandidates(lbl.anchor, inner, outer, steps);
 		for (i = 0; i < cands.length; i++) {
 			d = Math.hypot(cands[i].x - lbl.home.x, cands[i].y - lbl.home.y);
 			if (d < bestD[0]) { bestD[1] = bestD[0]; best[1] = best[0]; bestD[0] = d; best[0] = i; }
@@ -581,8 +579,7 @@ EngCalcs.lpnCollide = (function () {
 		// reason a reader could see.
 		var inner = opts.inner > 0 ? opts.inner : 1,
 			outer = opts.outer > 0 ? opts.outer : inner * 5,
-			rings = opts.rings > 0 ? opts.rings : 4,
-			arcTarget = opts.arcTarget > 0 ? opts.arcTarget : inner,
+			steps = (opts.steps && opts.steps.length) ? opts.steps : RING_STEPS,
 			k = opts.k === undefined ? 0.25 : opts.k,
 			obs = { boxes: obstacles.boxes.slice(), segments: obstacles.segments.slice() },
 			order = labels.slice(), out = [], maxDiag = 0,
@@ -600,7 +597,7 @@ EngCalcs.lpnCollide = (function () {
 			return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
 		});
 		order.forEach(function (lbl) {
-			var cands = candidatesFor(lbl, inner, outer, rings, arcTarget), raw = [], eff, i, best = 0,
+			var cands = candidatesFor(lbl, inner, outer, steps), raw = [], eff, i, best = 0,
 				bandStart, bandBound, bestRaw = Infinity;
 			index.near(lbl.anchor.x, lbl.anchor.y, outer + Math.hypot(lbl.w, lbl.h), local);
 			// **RADIUS-ORDERED WITH AN EXACT LOWER-BOUND CUT-OFF, NOT A HEURISTIC.** Every candidate
@@ -658,6 +655,7 @@ EngCalcs.lpnCollide = (function () {
 		segmentsCross: segmentsCross,
 		candidatesFor: candidatesFor,
 		anglesAt: anglesAt,
+		RING_STEPS: RING_STEPS,
 		labelBoxAtEnd: labelBoxAtEnd,
 		obstaclesInReach: obstaclesInReach,
 		grid: grid,

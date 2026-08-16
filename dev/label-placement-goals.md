@@ -100,10 +100,18 @@ on a 5×5 grid one label-width apart, which is Net3's own situation and has no c
   the inner circle at 6 — one number for the whole map, not one per label (*"A single one is better,
   I think. I didn't specify per label."*).
 - **The near circles carry fewer directions than the far ones.** Tom: *"I assume that we will
-  economize by omitting some of the angles on the nearer circle(s)."* Right, and the arc says by how
-  much — at 15 degrees apart two candidates on the inner circle are a few pixels apart and score
-  alike. Each circle takes the coarsest step (15/30/60/120) whose arc is under the target, giving
-  6 / 12 / 20 / 20 directions outward: **59 candidates**, not 80.
+  economize by omitting some of the angles on the nearer circle(s)."* Right — at 15 degrees apart,
+  two candidates on the inner circle are a few pixels from each other and score alike. He then
+  supplied the rule: **ring 1 multiples of 45, ring 2 of 30, ring 3 of 15**, which after dropping
+  orthogonals is **4, 8 and 20 directions — 33 candidates including home.** Measured at the shipped
+  radii the arc between neighbours is 104 px / 77–155 px / 86–173 px, near enough constant, which is
+  what an earlier auto-derivation from a target arc had been computing the hard way.
+  - **Rings 1 and 2 share no direction, by construction:** a direction on both is a multiple of 45
+    and of 30, hence of 90, hence orthogonal, hence already dropped. They interleave rather than
+    nest, which samples the plane better. Both are subsets of ring 3. Do not "fix" the gap.
+  - Measured on realistically spaced drawings, **essentially every label lands on the INNERMOST
+    circle** and none goes beyond it — the reach bounds the search without shaping the answer.
+    220 labels cost ~50 ms sparse and ~95 ms crowded.
 - **All of it is adjustable live under `?debug=labels`** — reach, inner circle, number of circles,
   arc spacing, `k`, zoom-to-fit room, and every rank weight, with a readout of overlapping label
   pairs and mean travel.
