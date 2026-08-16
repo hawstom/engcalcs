@@ -511,7 +511,8 @@ US file made a round trip through two factors that are not exact inverses: **710
 - **The rule that makes this structural rather than a discipline: a number the user supplied and a
   number we computed are different kinds of thing, and must never occupy the same field.** Once
   they are separate there is no code path that writes to the user's field, so nobody has to
-  remember anything. Full design: ROADMAP Task 390.
+  remember anything. Full design: ROADMAP Task 390 and `dev/unit-paradigm-migration.md`, which maps what of
+  the old SI-always paradigm is still un-purged.
 - **This is testable and must be tested: import then export is BYTE-IDENTICAL for every value the
   user did not edit.** Not "within tolerance" — identical. That is also the acceptance criterion for
   Task 281 (`.inp` export), not an afterthought to it.

@@ -135,39 +135,28 @@ session of its own with nothing else in it.
   - Worth measuring before choosing: how many labels does the relaxation actually rescue on Net3,
     versus how many it merely moves?
 
-- 85|390| **Preserve a file's inputs VERBATIM, as strings. The input file is canonical.** Tom,
-  2026-08-16: *"We cannot verify that examples hold against unit factors; input files are canonical.
-  We must preserve the inputs verbatim as strings."* Our conversion factors can never validate a
-  user's input — the only correct property is that the numbers come back out unchanged.
-  - **ROOT CAUSE, and it is one line: `js/lpn-inp.js:89` does `parseFloat(tok)` and throws the text
-    away.** Everything downstream is trying to reconstruct a string that no longer exists, which is
-    why no choice of constant fixes it. Measured with the corrected exact factors: **36.7% of values
-    (7337/20000) still fail to round-trip bit-identically**, worse than the 26% before them.
-  - **THE RULE THAT MAKES IT STRUCTURAL: a number the user supplied and a number we computed are
-    different kinds of thing and must never occupy the same field.** `elev` currently holds both.
-    Separate them and there is no code path that writes to the user's field, so "preserve verbatim"
-    needs no discipline.
-  - Three changes, in dependency order: (1) keep `tok` beside the parsed value at the ONE place text
-    becomes number; (2) `docFromInp` stores the token verbatim, converting nothing — in the normal
-    case the file's unit IS the display unit; (3) convert only at the solver handoff, which
-    `linkLengthSI()` already does correctly and whose comment already states the rule.
-  - **A unit is a LABEL and a MAGNITUDE.** The label is a string, always carried verbatim. Only a
-    SOLVE needs the magnitude. So: recognized → display and solve; unrecognized and never computed
-    with → carry verbatim; **unrecognized and needed to solve → open, draw and display faithfully,
-    refuse only the solve, and name the unit.** Never reject the file, never guess.
-  - **Add the five EPANET flow units we lack: IMGD, AFD, LPM, CMH, CMD** (`u_imgd`, `u_afd`,
-    `u_lpm`, `u_cmh`, `u_cmd`). `.inp` `UNITS` is a CLOSED enumeration of ten, so this completes a
-    finite list. Fold into the queued sprint (47 → 52) rather than paying for a second 26-agent pass.
-  - **The string buys REPRESENTATION, not just value:** `710.0` stays `710.0`, `1.50` stays `1.50`,
-    `1e3` stays `1e3`. `parseFloat("710.0")` can only ever return to `710`.
-  - **Costs to plan for:** a document schema change needs migration for saved projects; and once a
-    field holds `"710"`, a missed read site does `"710" * 2` and JS obliges silently — the accessor
-    must be mandatory and checked, not conventional.
-  - **Acceptance: import then export is BYTE-IDENTICAL for every value the user did not edit.** Not
-    "within tolerance". This is also Task 281's criterion.
-  - Related: in this suite a unit's IDENTITY is currently its conversion factor — `js/Cookies.lib.js`
-    stores each select's option *value* — which is why correcting the factors on 2026-08-16 reset
-    returning visitors' unit choices. Carrying units by NAME fixes that too.
+- 85|390| **Finish the unit paradigm migration: a unit is a NAME, and a file's numbers are the
+  user's.** Tom, 2026-08-16: *"You are fighting against a deprecated but not purged paradigm where
+  everything was stored in browser and file as SI always... I don't think I authorized that. But it
+  was done."* Full diagnosis, measurements and dependency order: **`dev/unit-paradigm-migration.md`**.
+  - **The root, and everything else is a symptom: a unit's IDENTITY is still its conversion factor.**
+    `unitFactor()` is `parseFloat(select.value)`; identity is read as a factor in 22 places against
+    9 that read `data-unit`. Correcting the factors on 2026-08-16 silently reset returning visitors'
+    unit choices for exactly this reason.
+  - Order: (1) identity becomes the name, factor becomes a lookup; (2) the cookie follows; (3) keep
+    the TOKEN at `js/lpn-inp.js:89`, which still does `parseFloat(tok)`; (4) an unrecognized unit is
+    carried verbatim and only the SOLVE is refused — this is what stops adding the five missing
+    EPANET flow units being a workaround; (5) stop persisting derived values (a pump's `h0/a/b`)
+    beside the user's.
+  - **Already done:** the `lpn_` document (Task 263), `.inp` import VALUE fidelity (1908 harness
+    checks), exact coherent factors. **Value fidelity is solved; REPRESENTATION is not** — 243 of
+    2,608 tokens in EPA's Net1/2/3 still reformat (`220.0` → `220`).
+  - **No choice of constant can fix this**: 36.7% of a 20,000 sample fails to round-trip
+    bit-identically even with exact factors, worse than the 26% before them.
+  - The five new unit keys (`u_imgd`, `u_afd`, `u_lpm`, `u_cmh`, `u_cmd`) fold into the queued
+    sprint rather than paying for a second 26-agent pass.
+  - **Acceptance: import then export is BYTE-IDENTICAL for every value the user did not edit.** Also
+    Task 281's criterion.
 
 - 60|389| **Search and replace inputs across the network — WANTED, and no longer gated on network
   size.** Tom, 2026-08-16: *"I would like search and replace embraced more explicitly."* That
