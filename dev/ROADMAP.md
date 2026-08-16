@@ -93,15 +93,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
     is worth more here than a nicer design. HEC-RAS is USACE, also public domain. **Read epanetjs's
     LICENSE before taking anything** — if it is copyleft, take the idea and not the code.
   - The UX is the interesting part: the colouring, which variables, how many intervals, the break values, and whether the ramp is absolute or relative to the current timestep. EPANET's answer to the last is an absolute per-variable setting and is worth reading before we invent ours.
-- 95|379| **Replace the label relaxation with candidate-position scoring, which is the part that
-  can see open space.** Tom, 2026-08-15: *"There is lots of free space that is being 'wasted' while
-  bad conflicts persist. The relaxation needs to understand the concept of most-open space and
-  gravitate toward it."*
-  - **`dev/label-placement-goals.md` holds the spec.** §1 is Tom's ranked goal list, ruled
-    2026-08-16 and settled; §2 is the method. Read it — nothing else here restates it.
-  - The one thing to carry without opening it: `relax()` is a LOCAL method, so **no tuning of the
-    weights will fix this** — weights decide who yields, not where anyone goes.
-  - Then Task 343 (dropping lines by priority). Hiding is not a separate task (377, rejected).
 - 55|378| **[H] Give the seven harnesses a network some other way, and delete
   `drawExampleNetwork()`.** The 289-line code-drawn ring main lost its last user-facing caller when
   Task 375's follow-up removed the File > New "From examples" rows, but seven harnesses still build
@@ -113,18 +104,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
     `applySaved()` would also be testing the path a real user takes, which the code path never was.
   - The care needed is that those harnesses assert solved pressures and specific IDs. Migrate one
     first and diff its output against the current run before touching the other six.
-
-- 75|376| **Replace the label MASK RECT with a text halo, the way epanetjs does it.** 
-  - **It is one CSS declaration and it deletes an element.** `paint-order: stroke fill` with a white
-    stroke on the text draws exactly that: a halo that follows the glyphs and merges between close
-    characters. `--lpn-hair` already exists to size it in screen pixels.
-  - **What it deletes is the interesting part.** No mask rect means no mask element per label, no
-    `MASK_PAD`, no gap arithmetic to keep a mask off its own pipe (Task 367), no rotation to keep in
-    step with the text, no mask left behind when a label is hidden — Tom's *"mask without a label"*
-    class of defect stops existing rather than being fixed. Three of this file's tasks are mask
-    geometry.
-  - The one thing to check before committing: a halo over a dark backdrop reads differently from a
-    75%-white box, and the box was there for aerial photographs.
 
 - 10|391| **[H] Evaluate `// @ts-check` with JSDoc branded types — a joint decision, not a
   proposal.** Tom, 2026-08-16, on the unit paradigm work: *"this would be a little easier if JS were
@@ -203,7 +182,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   apiece. Each is either lost content to restore (as Task 290's six Rock Chute notes turned out to
   be) or debt to delete; only Tom can say which. Recorded so far only inside closed Task 290, where
   nothing re-scans it.
-
 
 - 60|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
@@ -518,7 +496,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   rewrite against live controls, not a code fix, so it needs a browser pass rather than static
   reading.
 
-
 - 25|281| **EPANET `.inp` EXPORT — the unbuilt half of Task 196.** Import shipped 2026-08-11; writing
   one did not, and it is the easier direction: `EngCalcs.lpnToInp()` (`js/lpn-epanet.js`) already
   writes a complete `.inp` for the engine toggle, and every element this page models is a strict
@@ -714,7 +691,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - Partly mitigated already: `zoomExtent()` now reserves the overlays' measured height so a fit
     never places content under them. That does not survive a pan, which is why this still exists.
 
-
 - 35|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
   and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves both shipped
   2026-08-14; phase 3, time, is the open one. The engine makes it a mapping-and-UI job rather than a
@@ -755,7 +731,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - **Courtesy note to OpenWaterAnalytics before launch**, in the register of
     `dev/outreach-owa-post.md` — a real question, not an announcement. The name is legally safe
     (EPANET is public domain) but names run on community norms, and the note is cheap insurance.
-
 
 - 40|244| **Standardize the distinguishing term, and put it in the navbar next to the language menu.**
   Tom, 2026-08-09, on epanet-js labelling itself "Open Source" while shipping FSL. `About.php` is
@@ -830,7 +805,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - **Intra-site path** — which calculator is the entry point and where people go next. The most
     expensive of the three, because a path needs an ordering the logs deliberately cannot express
     without a per-visit identifier we will not store.
-
 
 - 4|114| **Reservoir / detention routing calculator (Modified Puls) — full scope in
   `dev/detention-routing-scope.md`.** A time-stepping engine, which is the real departure from the

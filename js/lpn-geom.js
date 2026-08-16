@@ -202,18 +202,33 @@ EngCalcs.lpnGeom = (function () {
 	// Returns the same {x, y, w, h} shape the collision boxes use (x/y = top-left), so the caller
 	// can hand it straight to lpn-collide with `movable: false`.
 	function rotatedLabelBox(ax, ay, w, h, angleDeg, fontSize) {
-		// Unrotated geometry, in the aligned label's own convention: horizontally centred on the
-		// anchor, first line's baseline at the anchor. Same 0.85·fontSize ascent approximation
-		// labelBoxAt() uses above, for the same reason — no cross-browser metrics without layout.
-		var cx0 = ax, cy0 = ay - fontSize * 0.85 + h / 2,
+		var b = orientedLabelBox(ax, ay, w, h, 'middle', 'top', angleDeg, fontSize),
 			rad = angleDeg * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad),
-			dx = cx0 - ax, dy = cy0 - ay,
-			// The rotated centre.
-			cx = ax + dx * cos - dy * sin,
-			cy = ay + dx * sin + dy * cos,
 			halfW = (Math.abs(w * cos) + Math.abs(h * sin)) / 2,
 			halfH = (Math.abs(w * sin) + Math.abs(h * cos)) / 2;
-		return { x: cx - halfW, y: cy - halfH, w: halfW * 2, h: halfH * 2 };
+		return { x: b.cx - halfW, y: b.cy - halfH, w: halfW * 2, h: halfH * 2 };
+	}
+	// THE SAME BOX WITHOUT THROWING THE ANGLE AWAY: {cx, cy, w, h, a}, which is what
+	// lpn-collide's separating-axis tests take (ROADMAP Task 379). Prefer this to the AABB
+	// above wherever the consumer can handle an oriented box -- an aligned pipe label's AABB
+	// is 5.2x the label's own area at 45 degrees for a 100x12 label, and the ratio grows
+	// without limit with its length, so every one of those empty units is ground a label is
+	// kept out of for no reason.
+	//
+	// The rotation is about the ANCHOR (ax, ay), not about the box's own centre — that is what
+	// the SVG `rotate(a cx cy)` on the text element does, and a box turned about the wrong point
+	// is off by the distance between the two, which for a single-line label is most of its height.
+	// hAlign/vAlign say what the anchor MEANS, in labelBoxAt()'s own vocabulary.
+	function orientedLabelBox(ax, ay, w, h, hAlign, vAlign, angleDeg, fontSize) {
+		var b = labelBoxAt(ax, ay, w, h, hAlign, vAlign, fontSize),
+			cx0 = b.x + b.w / 2, cy0 = b.y + b.h / 2,
+			rad = (angleDeg || 0) * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad),
+			dx = cx0 - ax, dy = cy0 - ay;
+		return {
+			cx: ax + dx * cos - dy * sin,
+			cy: ay + dx * sin + dy * cos,
+			w: b.w, h: b.h, a: angleDeg || 0
+		};
 	}
 
 
@@ -336,6 +351,7 @@ EngCalcs.lpnGeom = (function () {
 		segmentRectRange: segmentRectRange,
 		alignedLabelAnchor: alignedLabelAnchor,
 		rotatedLabelBox: rotatedLabelBox,
+		orientedLabelBox: orientedLabelBox,
 		pointToSegmentDistance: pointToSegmentDistance,
 		pointToPolylineDistance: pointToPolylineDistance
 	};

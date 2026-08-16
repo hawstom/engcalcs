@@ -11,6 +11,8 @@ The full text of every closed task is in git and nowhere else, by Tom's ruling o
 Durable policy from these tasks lives in `CLAUDE.md` and in `dev/*.md`. Those are the current
 state; this is only a list of numbers that were once used.
 
+- 0|376| Label mask rect replaced by a text halo (paint-order stroke fill); the mask element, its pad, its rotation and its layer are gone
+- 0|379| Label relaxation replaced by candidate scoring: ranked goals, oriented boxes, a neighbourhood term, no cap and no failure condition
 - 0|337| Text label Bold and Rotation, with Match-pipe and Flip buttons. Rotation is a stored number, not a link to the pipe (Tom's call)
 - 0|346| REJECTED, twice — no extrema tie rule. A mark that vanishes once enough elements share it confuses users more than a shared mark. Do not re-propose.
 - 0|372| One shared popover placer: flips below/above, caps body height instead of clamping around, menubar clicks now dismiss

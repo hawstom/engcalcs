@@ -124,20 +124,22 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	report(/fsNow = effectiveFontSize\(\) \+ 'px'/.test(rlt),
 		'...from effectiveFontSize(), which is the same quantity refreshFontSizes() publishes');
 
-	// **A PIPE DOES NOT PUSH ITS OWN LABEL.** Tom, minutes after pipes became obstacles: "Pipe labels
-	// are fickle now. I see them and then I don't see them." A link's data label sits ON its pipe by
-	// design -- that is how you tell whose number it is -- so without an owner on the pipe segment
-	// every pipe threw its own label perpendicular off itself, to the nudge cap, on every pass.
-	// Asserted on the WIRING rather than the arithmetic: pushOffSegments() already honours `owner`
+	// **A PIPE IS NOT AN OBSTACLE TO ITS OWN LABEL.** Tom, minutes after pipes became obstacles:
+	// "Pipe labels are fickle now. I see them and then I don't see them." A link's data label sits ON
+	// its pipe by design -- that is how you tell whose number it is -- so without an owner on the
+	// pipe segment every pipe threw its own label perpendicular off itself on every pass.
+	// Asserted on the WIRING rather than the arithmetic: rawScore() already honours `owner`
 	// (collide-harness covers that), and what broke was that pipes were built without one.
-	report(/weight: LPN_COLLIDE_WEIGHT\.pipe, owner: le/.test(extract('currentLineObstacles')),
+	report(/kind: 'link', owner: linkLabelKey\(l\.id\)/.test(extract('staticObstacles')),
 		'a pipe segment carries its own link as owner');
-	report(/weight: LPN_COLLIDE_WEIGHT\.leader, owner: holder/.test(extract('currentLeaderSegments')),
+	// A LEADER CARRIES ITS OWNER TOO, and since Task 379 a data label's leader is not gathered at all
+	// -- the pass commits each one as it places the label it belongs to, so it cannot be forgotten
+	// and cannot disagree with where the label went. What staticObstacles() still gathers is the
+	// user's own Text label leaders, which nothing in the pass moves.
+	const collideSrc = require('fs').readFileSync(
+		require('path').resolve(__dirname, '../../js/lpn-collide.js'), 'utf8');
+	report(/segment\(lbl\.anchor\.x, lbl\.anchor\.y, c\.x, c\.y, 'leader', lbl\.id\)/.test(collideSrc),
 		'...and a leader still carries its own label, as it always did');
-	// Renamed to currentLeaderSegments() 2026-08-15 when leaders stopped being sampled into boxes
-	// and became segments, like the pipes. Same claim, same two points.
-	report(!/labelBoxWidth\(/.test(extract('currentLeaderSegments')),
-		'currentLeaderSegments() reads no width either -- same two points');
 	report(ADVERSE_FRAC > 0, 'the hysteresis fraction is still read out of the file', String(ADVERSE_FRAC));
 }
 

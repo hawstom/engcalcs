@@ -110,14 +110,14 @@ console.log('\n-- wiring: an aligned label no longer goes through the ordinary r
 	// either, and a movable box for it would be the same phantom this whole branch exists to stop.
 	report(/linkLabelStations\(l\)\.length > 1/.test(body),
 		'and so is a link whose label repeats along it');
-	report(/placeStationedLabels\(stationed, statics, fs\)/.test(body),
+	report(/placeStationedLabels\(stationed, obs, fs\)/.test(body),
 		'and both are handed to the station placer, which commits them as obstacles');
 	// The phantom is the thing that must never come back: a movable box for a label the renderer
 	// will not move. What guarantees that is the `return` — the diverted branch must leave before
 	// the addDataLabel call on the following line, not merely be written above it.
 	report(/stationed\.push\(l\);[\s\S]{0,80}?\breturn;/.test(body),
 		'the diverted branch RETURNS, so it cannot fall through into addDataLabel');
-	report(body.indexOf('linkLabelAligned(l)') < body.indexOf('addDataLabel(le, dataLabelOrigin'),
+	report(body.indexOf('linkLabelAligned(l)') < body.indexOf('addDataLabel(linkLabelKey(l.id)'),
 		'and it is tested before the ordinary path is reached');
 }
 
@@ -146,7 +146,10 @@ console.log('\n-- wiring: longest pipe first, so the placement order is stable -
 	const body = fn.slice(0, fn.indexOf('\n\tfunction ', 10));
 	report(/polylineLength/.test(body), 'pipes are measured');
 	report(/sort\(function \(a, b\) \{ return b\.len - a\.len; \}\)/.test(body), 'and sorted longest first');
-	report(/movable: false/.test(body), 'a placed aligned label is committed as an IMMOVABLE obstacle');
+	// IMMOVABLE IS NOW STRUCTURAL, not a flag: since Task 379 the obstacle list is a separate
+	// structure from the labels being placed, so a box in it has no way to move and nothing has to
+	// declare that it must not.
+	report(/obs\.boxes\.push\(bx\)/.test(body), 'a placed aligned label is committed as an obstacle');
 	report(/boxes\.forEach/.test(body), 'and EVERY station of a repeated chain is committed, not just its first');
 }
 
