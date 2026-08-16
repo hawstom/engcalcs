@@ -50,6 +50,26 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
+- 65|388| **The documentation is written as a transcript of revision, not as current state.** Tom,
+  2026-08-16: *"Is there any way we can drastically digest/abridge/compact our documentation? It
+  seems **very** wordy. Do we really need a record of every historical discussion and decision in
+  gory detail?"* Measured: `CLAUDE.md` 15k words, `dev/*.md` 255k, `js/looped-network.js` **47%
+  comment lines** (6,146 of 12,893). `ROADMAP.md` alone is 58k words — 71 open blocks (26k) and 308
+  closed ones (32k), against its own stated cap of ~15 lines and ≤5 when closed.
+  - **The root cause is one habit: a correction is APPENDED, never SUBSTITUTED.** `lpn-collide.js`
+    carries ~80 lines holding four successive positions on what a weight is, three of them retired.
+    The rule that fixes it is "when a decision is superseded, delete the superseded reasoning" —
+    keep the conclusion and the one rejected alternative that would otherwise be re-proposed.
+  - **Cheapest first, and the first is mechanical.** (a) Move all 308 closed blocks to
+    `dev/roadmap-closed-archive.md`, which already exists for this — halves the file with no
+    judgement calls. (b) Enforce the per-block cap in `roadmap_id_check.php` as an advisory; five
+    OPEN blocks are 1,100–1,600 words each. (c) In `CLAUDE.md`, replace every rule a script now
+    enforces with one line naming the script — Rules A–D are ~90 lines explaining what
+    `lang_syntax_validate.php` says better in its own error text.
+  - **Cost is paid by FREQUENCY, so rank by what gets loaded.** `CLAUDE.md` every session;
+    `ROADMAP.md` to answer almost any question; `looped-network.js` whenever it is edited; the
+    archive almost never. That order is the work order, and it is the opposite of size order.
+
 - 88|384| **[H] Colour coding, with a colour-ramp picker — the preparation Task 248 (extended-period
   simulation) actually needs.** Tom, 2026-08-15: *"I think that a major preparation for modeling
   across time is adding color coding, which requires a color ramp picker UX. EPANET and HEC-RAS,
