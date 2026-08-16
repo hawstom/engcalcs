@@ -151,41 +151,26 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 		'and a decorated segment is marked by the text engine, not by a badge element');
 }
 
-// ---- 4. a mark a crowd shares is not a finding (Task 346) ---------------
-// Run the REAL functions rather than reading them: the question is what comes out for a given set
-// of values, which a regex cannot answer. The limit is read out of the file so retuning it there
-// moves these assertions with it.
+// ---- 4. the extrema rule is the plain one -----------------------------------------------
+// Deliberately NO tie rule: a mark suppressed once enough elements share it has been proposed and
+// reverted twice. Asserting the plain behaviour is what stops it coming back a third time.
 {
 	let labelSettings = { markExtrema: true };
-	const TIE_DECL = (src.match(/var LPN_EXTREMA_TIE_MAX = \d+;/) || [''])[0];
-	eval(TIE_DECL + '\n' + extract('fieldExtrema') + '\n' + extract('decorationFor'));
-	const TIE_MAX = Number((TIE_DECL.match(/(\d+)/) || [])[1]);
-	report(TIE_MAX >= 1, 'the tie limit is read out of the file', String(TIE_MAX));
+	eval(extract('fieldExtrema') + '\n' + extract('decorationFor'));
 
 	let ex = fieldExtrema([1, 2, 3, 4, 5]);
 	report(decorationFor(ex, 5) === 'high' && decorationFor(ex, 1) === 'low', 'a unique high and low are marked');
 	report(decorationFor(ex, 3) === undefined, 'and nothing between them is');
 
-	// Elm Street's own shape. The zeroes lose the mark; the single largest demand keeps it, so
-	// suppressing one end never suppresses the other.
+	// Elm Street's own shape. Every zero IS the minimum and every one of them is marked; that is the
+	// rule, not a defect to be fixed here.
 	ex = fieldExtrema([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 12, 30, 45]);
-	report(ex.minHeld === 13, 'thirteen junctions tie at zero demand', String(ex.minHeld));
-	report(decorationFor(ex, 0) === undefined, 'so none of them is marked lowest');
-	report(decorationFor(ex, 45) === 'high', 'while the one highest demand still is');
+	report(decorationFor(ex, 0) === 'low', 'a value shared by many is still marked lowest');
+	report(decorationFor(ex, 45) === 'high', 'and the one highest demand is marked highest');
+	report(ex.minHeld === undefined, 'no tie count is computed at all');
 
-	// A SMALL tie survives -- "these are the ones" is still something to act on. Stated as the pair
-	// either side of the limit, because an off-by-one here is invisible on screen.
-	const at = [], over = [];
-	for (let i = 0; i < TIE_MAX; i++) { at.push(0); over.push(0); }
-	over.push(0);
-	report(decorationFor(fieldExtrema(at.concat([5, 6, 7])), 0) === 'low', 'a tie of exactly the limit is kept');
-	report(decorationFor(fieldExtrema(over.concat([5, 6, 7])), 0) === undefined, 'one past it is dropped');
-
-	// A LONE zero is still the minimum, which is why the rule counts rather than testing for zero:
-	// zero is an absence in a demand but a datum in an elevation.
-	report(decorationFor(fieldExtrema([0, 5, 10]), 0) === 'low', 'a single zero is still the lowest');
-
-	report(fieldExtrema([1, 2]) === null, 'fewer than three values is still no finding at all');
+	report(fieldExtrema([1, 2]) === null, 'fewer than three values is no finding at all');
+	report(decorationFor(fieldExtrema([5, 5, 5]), 5) === undefined, 'max === min is still refused');
 	labelSettings.markExtrema = false;
 	report(decorationFor(fieldExtrema([1, 2, 3]), 3) === undefined, 'and the Task 190 toggle still wins');
 }

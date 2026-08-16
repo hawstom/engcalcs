@@ -164,9 +164,9 @@ session of its own with nothing else in it.
   - The obvious first conditions are contains / equals on an ID, and greater-than / less-than on a
     numeric property (pressure, velocity, diameter, demand). The result wants to select and zoom to
     the element, not just list it.
-  - Interacts with Task 346 (an extrema mark shared by a dozen tied elements): both are ways of
-    asking "which elements are interesting", and a search that can answer "velocity > 5" makes the
-    mark's job smaller.
+  - This is the RIGHT answer to "which elements are interesting" — a query the user asked for beats
+    a mark the app decided to show. The extrema tie rule (Task 346) was rejected twice for that
+    reason; do not reopen it, build this instead.
 
 - 15|355| **Long labels and short pipes — WAIT AND TEST.** Tom, 2026-08-15, after the repeat and
   alignment work landed: *"I think we are good, to tell the truth. Nothing to do, I think."* So
