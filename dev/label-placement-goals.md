@@ -35,3 +35,30 @@ construction. Struck.
 this changes significantly if we implement halos on the text. But I suppose it wouldn't change our
 crazy placements."* Exactly so — a halo makes an overlap readable; it does not make a placement good,
 and every count in section 5 stays the measure.
+
+---
+
+## 10. Is preference implemented? No. (Tom, 2026-08-16)
+
+> *"My inclination earlier was to suggest that preference has to factor in outside of relax(). I
+> assume that's correct now... Now my understanding is 'preference is not implemented'. Is that
+> correct?"*
+
+**Correct on both counts.** It cannot live inside `relax()` — that function only ever looks at one
+pair of boxes at a time and asks "are these overlapping, and by how much"; it never has two
+candidate placements in hand to choose between, which is what a preference is a choice *among*. And
+it is not implemented anywhere else either. Today the pass tries to clear **every** overlap
+completely, and when it cannot, what you get is not a chosen compromise — it is wherever the last
+push happened to leave the label.
+
+**The nearest thing that exists, and it is worth knowing because it is the seed of Task 379:** the
+aligned-pipe-label search in `placeStationedLabels()` walks a fixed list of stations outward from
+the middle, takes the first one that is clear, and **falls back to the middle if none is**. The
+side-flip does the same with two candidates. That is a preference over *positions* — try these in
+this order — but there is still no preference over *conflicts*: the fallback accepts whatever
+overlap the middle happens to have, without ever asking whether some other blocked station would
+have been blocked by something cheaper.
+
+Scoring is exactly that missing step. A candidate's score is a sum of what it costs, so "a pipe is
+cheaper to overlap than a symbol" is one number in the table in section 4 rather than a behaviour
+that has to be arranged for.
