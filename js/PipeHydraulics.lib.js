@@ -1,13 +1,11 @@
-// Shared pipe-hydraulics constants and kernels (ROADMAP Task 213).
+// Shared pipe-hydraulics constants and kernels.
 //
 // Load this BEFORE any calculator script that uses it. Under Node it is pulled in
 // by require() from js/lpn-solver.js.
 //
-// Scope today is Hazen-Williams only. It is deliberately the first tenant of the
-// js/PipeHydraulics.lib.js extraction that js/lpn-solver.js defers -- the
-// Darcy-Weisbach and Manning kernels still live in duplicate in
-// js/branched-network.js and js/lpn-solver.js, and move here later under a
-// behavior-preserving diff.
+// Scope today is Hazen-Williams only. The Darcy-Weisbach and Manning kernels are
+// still duplicated in js/branched-network.js and js/lpn-solver.js; they belong
+// here, and moving them needs a behavior-preserving diff.
 
 var EngCalcs = EngCalcs || {};
 
@@ -22,15 +20,11 @@ var EngCalcs = EngCalcs || {};
 // turns the 4.727 into the SI coefficient below, 10.666829. The diameter exponent
 // is untouched by the conversion and stays 4.871.
 //
-// The suite used to carry a second pair -- coefficient 10.674400 with exponent
-// 4.8704, from the Wikipedia SI restatement -- in all three of hazen-williams.js,
-// branched-network.js and lpn-solver.js. Because the exponents differed too, the
-// disagreement was diameter-dependent rather than a constant offset: ours divided
-// by EPANET's ran 0.9989 at d = 50 mm through 1.0000 near 300 mm to 1.0011 at
-// d = 2 m, so at most 0.12% and far inside the uncertainty in C itself. EPANET's
-// form won (Tom, 2026-08-05) because it is the engine users check us against and
-// because .inp import (Task 196) would otherwise have to keep both sets alive
-// forever.
+// THIS IS THE SUITE'S ONLY HAZEN-WILLIAMS PAIR -- do not reintroduce a second one.
+// The common SI restatement (coefficient 10.674400, exponent 4.8704) disagrees
+// diameter-dependently rather than by a constant offset, by up to 0.12% over
+// 50 mm to 2 m. EPANET's form is used because it is the engine users check us
+// against, and because .inp import would otherwise have to keep both sets alive.
 //
 // Derived in code rather than typed so the trace back to 4.727 stays visible.
 EngCalcs.hwCoef = 4.727 * Math.pow(0.3048, 4.871) / Math.pow(0.3048 * 0.3048 * 0.3048, 1.852);

@@ -1,13 +1,10 @@
 // Looped Pipe Network -- optional solve through the REAL EPANET engine (ROADMAP Task 243).
 //
-// WHY THIS EXISTS, AND WHY IT IS OFF BY DEFAULT.
-// js/lpn-solver.js already agrees with EPANET to 0.0002 ft of head and 0.004 gpm of flow on
-// EPA's own Net1/Net2/Net3 (see dev/lpn-spike/). So this buys no correctness. It buys two
-// things Tom named on 2026-08-09: for some agencies "does it run the actual EPANET engine?"
-// is a yes/no procurement gate that no amount of mobile-and-26-languages substitutes for
-// (ROADMAP Task 222), and it is the door to tanks, valves, extended-period simulation and
-// .inp interop that we would otherwise hand-write. Task 248 walked through that door: TANKS
-// shipped 2026-08-14 and are written into [TANKS] below, and VALVES the same day into [VALVES].
+// WHY THIS EXISTS. js/lpn-solver.js already agrees with EPANET to 0.0002 ft of head and 0.004
+// gpm of flow on EPA's own Net1/Net2/Net3 (see dev/lpn-spike/), so this buys no correctness. It
+// buys two things: for some agencies "does it run the actual EPANET engine?" is a yes/no
+// procurement gate, and it is the door to tanks, valves, extended-period simulation and .inp
+// interop we would otherwise hand-write.
 //
 // VALVES ARE THE FIRST FEATURE THIS PAGE HAS THAT THE ENGINE TOGGLE DOES NOT MERELY ACCELERATE.
 // A throttle valve (TCV) is a minor loss and solves in either engine. A PRV, PSV or FCV switches
@@ -16,39 +13,22 @@
 // says, and js/lpn-solver.js refuses it by name if this module cannot be reached. See the note
 // on EngCalcs.lpnValveIsNative there for the reasoning and the measurement behind it.
 //
-// IT IS OFF BY DEFAULT, AND THE STATED REASON FOR THAT WAS WRONG. This paragraph used to read
-// "the native solve is synchronous and takes 0.4 ms at the 21-node target" against an EPANET
-// path that "is async and 678 KB", and concluded that native is faster. Half of that was
-// measured and half was inferred. Tom, 2026-08-14: "We've proceeded telling ourselves that our
-// engine is faster than the EPANET engine. But I haven't seen evidence of this in my browser
-// tests." He was right. dev/lpn-spike/engine-bench.js now measures both, and the finding is the
-// reverse of the claim:
+// THE NATIVE SOLVER IS THE DEFAULT, AND NOT FOR SPEED -- EPANET IS FASTER. Measured by
+// dev/lpn-spike/engine-bench.js:
 //
 //   21 nodes    native 0.43 ms    EPANET's actual SOLVE 0.05 ms     -- EPANET ~9x faster
 //   201 nodes   native 36.3 ms    EPANET's actual SOLVE 0.78 ms     -- EPANET ~46x faster
 //
-// The C engine beats a JavaScript dense Cholesky, which in hindsight was never going to go the
-// other way, and it degrades gracefully where ours is O(n^3).
-//
-// WHAT WAS ACTUALLY SLOW ON THIS PATH WAS THIS FILE, not the engine -- FIXED, Task 313. This
-// used to build a whole .inp and hand EPANET a fresh Project to PARSE on every single solve, on
-// a page that re-solves on every keystroke. lpnSolveEpanet() now keeps the Project open and
-// pushes edits through the toolkit's setters; see the long note above lpnSolveEpanet.
-//
-//   21 nodes    9.0 ms per solve before    0.4 ms after     -- ~20x
-//   201 nodes  18.9 ms per solve before    3.4 ms after     -- ~6x
-//
-// AND THE DIAGNOSIS ABOVE WAS ONLY HALF RIGHT, which is worth keeping as a caution about how
-// this file gets measured. The .inp parse was blamed for "1.2 ms of a 1.25 ms round trip", but
-// the real function cost 9-10 ms, because it also built a Workspace and instantiated the WASM
-// engine EVERY SOLVE -- 8 ms nobody had counted. The bench missed it by hoisting the Workspace
-// out of its own timing loop, so it measured a shape the shipped code never had. Measure the
-// exported function end to end before believing any decomposition of it.
-//
-// So the honest remaining cost of choosing EPANET is the ONE-TIME module load: 663 KB to fetch
-// (236 KB gzipped) and ~33 ms to import and instantiate in Node. That is a real cost for the
+// The C engine beats a JavaScript dense Cholesky and degrades gracefully where ours is O(n^3).
+// The honest cost of choosing EPANET is the ONE-TIME module load: 663 KB to fetch (236 KB
+// gzipped) and ~33 ms to import and instantiate in Node. That is a real cost for the
 // offline/low-bandwidth case this suite cares about, and it is the whole of the case for keeping
-// a native solver at all. It is not a speed argument, and must not be written up as one again.
+// a native solver at all. It is not a speed argument, and must not be written up as one.
+//
+// MEASURE THE EXPORTED FUNCTION END TO END before believing any decomposition of its cost. Two
+// separate benches of this file went wrong by hoisting setup out of their own timing loop, so
+// they measured a shape the shipped code never had and blamed the .inp parse for time that
+// belonged to WASM instantiation.
 //
 // LICENSING. js/vendor/epanet-js.js is epanet-js 0.9.0, MIT, (c) Luke Butler, wrapping
 // OWA-EPANET (also MIT). MIT is GPL-3-compatible, so this suite stays GPL v3+. The full
@@ -83,9 +63,8 @@
 		EN_VELOCITY = 9,
 		EN_HEADLOSS = 10,
 		EN_INITSTATUS = 4,
-		// Link properties a VALVE needs and a pipe does not (Task 248 phase 2 x Task 313).
-		// EN_DIAMETER is shared with a pipe but reached separately here, because setPipeData()
-		// is not valid on a valve index.
+		// Link properties a VALVE needs and a pipe does not. EN_DIAMETER is shared with a pipe
+		// but reached separately here, because setPipeData() is not valid on a valve index.
 		EN_DIAMETER = 0,
 		EN_INITSETTING = 5;
 
@@ -134,8 +113,7 @@
 				// LPS. That is NOT the rule for a pipe, whose diameter is in millimetres in the
 				// same file (see roughnessFor() and the [PIPES] writer below), and mixing the two
 				// up is the exact silent failure this file's header warns about: a 20 m tank
-				// written as 20000 still solves, it just holds a thousand times the water. Task
-				// 248, 2026-08-14.
+				// written as 20000 still solves, it just holds a thousand times the water.
 				//
 				// MinVol is written as 0 and no VolCurve is written, because this page has neither.
 				// 0 means "no separate minimum volume", which is EPANET's own default, not a
@@ -162,7 +140,7 @@
 				//
 				// TWO DIFFERENT UNIT TRAPS SIT ON ONE ROW, and neither one can be caught by
 				// comparing engines -- both produce a network that solves perfectly, just not the
-				// network the user drew (ROADMAP Task 248 phase 2, 2026-08-14):
+				// network the user drew:
 				//
 				//   DIAMETER is in the PIPE diameter unit -- MILLIMETRES under LPS. That is the
 				//   OPPOSITE of a tank's diameter twenty lines up, which is in metres. Same word,
@@ -200,19 +178,14 @@
 					// HEAD curve -- so three points sampled off our own curve round-trip it
 					// rather than approximating it, PROVIDED the first sample sits at Q = 0.
 					//
-					// THE FIRST POINT MUST BE THE SHUTOFF POINT. This is not a preference and it
-					// is not documented anywhere obvious; it was measured 2026-08-09 after Tom
-					// reported in the browser that "the EPANET engine gives me bigger losses than
-					// our engine, and the difference seems possibly to be entirely in the pump."
-					// He was exactly right. This code first sampled [0.25, 0.5, 0.75] of shutoff
-					// flow, and EPANET then fitted a DIFFERENT curve through them -- on a 30 m
-					// design-point pump it delivered 36.00 m of head where our own curve says
-					// 36.40 at the same flow, a 1.1% shortfall that reads as extra loss.
-					// Measured across four samplings: [0, .5, .9] and [0, .6, .95] reproduce our
-					// curve to 0.0000 m; [.25, .5, .75] is off by 0.40 m and [.1, .5, .9] by
-					// 1.60 m. Anything whose first point has Q > 0 is wrong.
-					// dev/lpn-spike/validate_epanet.js now carries a pump case so this cannot
-					// regress unnoticed -- its absence is why this shipped in the first place.
+					// THE FIRST POINT MUST BE THE SHUTOFF POINT (Q = 0). This is not a preference
+					// and it is not documented anywhere obvious; without it EPANET fits a DIFFERENT
+					// curve through the samples and the pump quietly delivers less head, which
+					// reads as extra loss. Measured across four samplings: [0, .5, .9] and
+					// [0, .6, .95] reproduce our curve to 0.0000 m; [.25, .5, .75] is off by
+					// 0.40 m and [.1, .5, .9] by 1.60 m. Anything whose first point has Q > 0 is
+					// wrong. dev/lpn-spike/validate_epanet.js carries a pump case so this cannot
+					// regress unnoticed.
 					var qMax = Math.pow(link.h0 / link.a, 1 / link.b),
 						pts = [0, 0.5, 0.9],
 						cname = 'C_' + link.id,
@@ -246,16 +219,15 @@
 		}
 
 		// MANNING IS THE ONE METHOD WHERE THE TWO ENGINES GENUINELY DISAGREE, by about 0.6%,
-		// and the user is told rather than left to notice. Measured 2026-08-09 over an 8x
-		// diameter range (0.1 m to 0.8 m): EPANET's Chezy-Manning head loss is 0.9939 to
-		// 0.9944 of ours, i.e. a near-constant factor, NOT the truncated 16/3 exponent that
-		// was the obvious first suspect -- that hypothesis predicts 0.9924 to 0.9993 and the
-		// data flatly refute it. Our resistance is the exact derivation from V = (1/n)R^(2/3)
-		// with R = d/4, giving 10.2936; EPANET's implies 10.231.
+		// and the user is told rather than left to notice. Measured over an 8x diameter range
+		// (0.1 m to 0.8 m): EPANET's Chezy-Manning head loss is 0.9939 to 0.9944 of ours, i.e. a
+		// near-constant factor, NOT a truncated 16/3 exponent (that hypothesis predicts 0.9924 to
+		// 0.9993 and the data refute it). Our resistance is the exact derivation from
+		// V = (1/n)R^(2/3) with R = d/4, giving 10.2936; EPANET's implies 10.231.
 		//
-		// WE DO NOT ADOPT EPANET'S NUMBER HERE, and that is the opposite of the Task 213 call
-		// on Hazen-Williams. Two reasons, both stronger than interop: ours is the exact form
-		// and EPANET's is rounded, and Manning's n is shared with Manning-Pipe-Flow,
+		// WE DO NOT ADOPT EPANET'S NUMBER HERE, unlike on Hazen-Williams. Two reasons, both
+		// stronger than interop: ours is the exact form and EPANET's is rounded, and Manning's n
+		// is shared with Manning-Pipe-Flow,
 		// Manning-Pipe-Head-Loss and Manning-Trap -- the calculators carrying the large
 		// majority of this suite's users. Matching EPANET on this page would make it disagree
 		// with those, which is a far worse outcome than a 0.6% delta on an opt-in toggle.
@@ -287,17 +259,14 @@
 
 	// Cached module promise -- the 664 KB import happens at most once per page.
 	//
-	// A FAILURE IS NOT CACHED, and that is the whole point of the catch below. Until 2026-08-14 this
-	// stored the promise unconditionally, so a single failed import -- being offline for one moment,
-	// a blocked request, a flaky connection -- was remembered FOREVER: every later call got the same
-	// rejected promise back, and EPANET stayed dead for the rest of the page's life even after the
-	// network returned. Nothing surfaced it, because the visible symptom is identical to "this
-	// network cannot be solved here", which is a message we legitimately print.
-	//
-	// It became urgent when the warm-up landed (warmEpanetEngine() in js/looped-network.js): warming
-	// the engine the moment a user picks an active valve makes the FIRST attempt happen much earlier
-	// and in worse conditions than a solve did, so caching that failure would have been a permanent
-	// penalty for being briefly offline at the wrong second.
+	// A FAILURE IS NOT CACHED, and that is the whole point of the catch below. Storing the promise
+	// unconditionally means a single failed import -- being offline for one moment, a blocked
+	// request, a flaky connection -- is remembered FOREVER: every later call gets the same rejected
+	// promise back and EPANET stays dead for the rest of the page's life even after the network
+	// returns. Nothing surfaces it, because the visible symptom is identical to "this network cannot
+	// be solved here", which is a message we legitimately print. warmEpanetEngine() in
+	// js/looped-network.js makes the first attempt happen early and in worse conditions than a solve
+	// would, so caching its failure would be a permanent penalty for being briefly offline.
 	var enginePromise = null;
 
 	EngCalcs.lpnEpanetLoad = function (url) {
@@ -311,9 +280,9 @@
 	};
 
 	// ------------------------------------------------------------------------------------------
-	// KEEPING THE PROJECT OPEN ACROSS SOLVES -- ROADMAP Task 313.
+	// KEEPING THE PROJECT OPEN ACROSS SOLVES.
 	//
-	// Measured 2026-08-14 by dev/lpn-spike/engine-bench.js, before this existed:
+	// Measured by dev/lpn-spike/engine-bench.js, before this existed:
 	//
 	//   21 nodes     our .inp writer 0.01 ms    engine PARSE 1.18 ms    engine SOLVE 0.05 ms
 	//   201 nodes    our .inp writer 0.26 ms    engine PARSE 1.68 ms    engine SOLVE 0.78 ms
@@ -342,8 +311,8 @@
 	// Nobody types those.
 	//
 	// UNITS ARE NOT IN THE SIGNATURE, ON PURPOSE. The model handed to this file is always SI
-	// (js/looped-network.js's assembleModel() is the edge that converts -- Task 255), so a unit
-	// switch arrives here as changed NUMBERS, and the value path is already right for it.
+	// (js/looped-network.js's assembleModel() is the edge that converts), so a unit switch arrives
+	// here as changed NUMBERS, and the value path is already right for it.
 	var session = null;
 
 	function isCurvedPump(link) {
@@ -394,7 +363,7 @@
 			// number beside it MEANS -- and, because lpnValveIsNative() sends the active types to
 			// a different engine entirely, it can change which engine is answering. Pushing a new
 			// type through a setter is not possible anyway: EPANET fixes a link's type when the
-			// file is read. Task 248 phase 2 x Task 313, 2026-08-14.
+			// file is read.
 			parts.push('l' + l.id + '\u0001' + l.type + '\u0001' + l.from + '\u0001' + l.to +
 				'\u0001' + (isCurvedPump(l) ? 'c' : 'p') +
 				'\u0001' + (l.type === 'valve' ? String(l.valveType || 'TCV').toUpperCase() : ''));
@@ -416,13 +385,10 @@
 	// long as the signature holds: the index of every node, link and pump curve, and the warnings
 	// lpnToInp produced (those depend only on the method and on which pumps have curves -- both of
 	// which are in the signature, so a cached warning list can never go stale under a value edit).
-	// THE WORKSPACE OUTLIVES THE PROJECT, and it is the second half of Task 313's win. A Workspace
-	// owns the instantiated WASM engine; a Project is one network inside it. The pre-313 code built
-	// a new Workspace and called loadModule() on EVERY solve, which measured 8-9 ms of the 9-10 ms
-	// a solve actually took -- five times more than the .inp parse everyone (this file included)
-	// had blamed. The old bench never saw it because it hoisted the Workspace out of its own timing
-	// loop, so the published "1.25 ms per solve" was measuring a shape the shipped code never had.
-	// Keeping it means even a TOPOLOGY click pays ~1.5 ms rather than ~10.
+	// THE WORKSPACE OUTLIVES THE PROJECT. A Workspace owns the instantiated WASM engine; a Project
+	// is one network inside it. Building a new Workspace and calling loadModule() per solve costs
+	// 8-9 ms of a ~10 ms solve -- five times more than the .inp parse. Keeping it means even a
+	// TOPOLOGY click pays ~1.5 ms rather than ~10.
 	var workspace = null, workspaceUrl;
 
 	function workspaceFor(mod, moduleUrl) {
@@ -499,10 +465,8 @@
 				// Curveless pump: a stand-in pipe whose geometry lpnToInp fixes from the method,
 				// and the method is in the signature. Only its status can change.
 			} else if (l.type === 'valve') {
-				// A VALVE IS NOT A PIPE AND setPipeData() IS NOT VALID ON ONE. This branch is the
-				// merge of Task 248 phase 2 into Task 313, and its absence was a real bug caught by
-				// validate_epanet.js on the merged tree after passing in both worktrees separately:
-				// a valve fell through to the pipe branch, so its SETTING was never pushed at all.
+				// A VALVE IS NOT A PIPE AND setPipeData() IS NOT VALID ON ONE. Without this branch
+				// a valve falls through to the pipe branch and its SETTING is never pushed at all.
 				//
 				// ORDER IS LOAD-BEARING, AND GETTING IT WRONG COSTS THE WHOLE VALVE. In EPANET a
 				// valve has THREE states, not two: closed, fully open, and ACTIVE (controlling to

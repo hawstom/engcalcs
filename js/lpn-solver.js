@@ -48,16 +48,12 @@ EngCalcs.lpnGradMin = 1e-6 * 0.3048 / 0.0283168466;
 // that is lpnGradMin above -- and it must not be used as one.
 EngCalcs.lpnQMin = 1e-8;
 
-// The Hazen-Williams constants used to be selectable here ('engcalcs' vs
-// 'epanet'), because the suite and EPANET disagreed by a few tenths of a percent.
-// Task 213 removed the disagreement: the whole suite is now on EPANET's pair, in
-// js/PipeHydraulics.lib.js, so there is nothing left to select between.
+// The Hazen-Williams constants are the whole suite's single pair (EPANET's), in
+// js/PipeHydraulics.lib.js. There is nothing to select between here.
 
 // Darcy-Weisbach friction factor, 3-regime Swamee-Jain. Identical to
-// EngCalcs.bpnDwFriction; kept as a private copy for now on purpose -- the shared
-// js/PipeHydraulics.lib.js extraction happens AFTER this page ships, so that a
-// behavior-preserving diff can be run against a calculator that already works.
-// See the scope doc, "Reuse".
+// EngCalcs.bpnDwFriction -- a private copy; change both together, or fold them into
+// js/PipeHydraulics.lib.js.
 EngCalcs.lpnDwFriction = function (q, d, e, visc) {
 	'use strict';
 	var a = Math.PI * d * d / 4,
@@ -122,14 +118,12 @@ EngCalcs.lpnResistance = function (link, method, visc) {
 
 // Dense Cholesky (LL^T) solve of A x = b for symmetric positive definite A.
 //
-// Dense on purpose, and now measured rather than estimated (dev/lpn-spike):
+// Dense on purpose. Measured (dev/lpn-spike):
 //   21 nodes  / 32 links   0.4 ms per solve,  5 iterations
 //   97 nodes  / 119 links  (EPANET Net3)     16 iterations
 //   201 nodes / 371 links  30 ms per solve,  11 iterations
-// The 200-node figure is headroom, not a target, and it is ~30 ms rather than the
-// "few milliseconds" first estimated -- that estimate counted one factorization and
-// forgot to multiply by the iteration count. It is still comfortably inside a
-// debounced edit, so the conclusion holds even though the arithmetic did not.
+// The 200-node figure is headroom, not a target, and is comfortably inside a
+// debounced edit.
 //
 // The sparse machinery this replaces (CSR, conjugate gradient, fill-reducing
 // ordering, cached symbolic factorization) is cut, not deferred. Everything routes
@@ -180,12 +174,12 @@ EngCalcs.lpnSolveSPD = function (A, b) {
 
 // A FIXED-HEAD node: one whose head is boundary data rather than an unknown.
 //
-// Two types qualify and they are the same thing to a steady-state solve (ROADMAP Task 248,
-// 2026-08-14). A reservoir is an inexhaustible source at a stated head. A TANK is a storage
-// vessel whose water surface is at a stated head AT THIS INSTANT -- and an instant is all a
-// steady-state solve has. EPANET does exactly this too: at t = 0 of an extended-period run it
-// solves the network with every tank held at its initial level, and only then integrates the
-// level forward. So a tank here is not an approximation of EPANET, it is EPANET's own t = 0.
+// Two types qualify and they are the same thing to a steady-state solve. A reservoir is an
+// inexhaustible source at a stated head. A TANK is a storage vessel whose water surface is at a
+// stated head AT THIS INSTANT -- and an instant is all a steady-state solve has. EPANET does
+// exactly this too: at t = 0 of an extended-period run it solves the network with every tank
+// held at its initial level, and only then integrates the level forward. So a tank here is not
+// an approximation of EPANET, it is EPANET's own t = 0.
 //
 // The DIFFERENCE between the two is entirely about time, which is why the tank carries level,
 // diameter and min/max fields this file never reads: they are what Task 248's extended-period
@@ -198,7 +192,7 @@ EngCalcs.lpnIsFixedHead = function (node) {
 };
 
 // ---------------------------------------------------------------------------
-// VALVES (ROADMAP Task 248 phase 2, 2026-08-14)
+// VALVES
 // ---------------------------------------------------------------------------
 //
 // A valve is a LINK with zero length. EPANET has five types and they split cleanly in two, along
@@ -214,11 +208,10 @@ EngCalcs.lpnIsFixedHead = function (node) {
 //           status has to be re-decided inside the iteration and the whole system re-formed when
 //           it changes. That is real numerics, not a coefficient.
 //
-// WE DO NOT WRITE THOSE NUMERICS, AND THAT IS A MEASUREMENT, NOT A SHRUG (ROADMAP Task 313,
-// 2026-08-14). This page ships a real EPANET engine that already implements status switching, and
-// dev/lpn-spike/engine-bench.js measured it at 0.05 ms against this file's 0.43 ms on the same
-// 21-node network -- EPANET is ~9x faster here and ~46x faster at 201 nodes. Writing a second,
-// slower implementation of a solved problem is the trade this project spent a day disproving.
+// WE DO NOT WRITE THOSE NUMERICS, AND THAT IS A MEASUREMENT, NOT A SHRUG. This page ships a real
+// EPANET engine that already implements status switching, and dev/lpn-spike/engine-bench.js
+// measured it at 0.05 ms against this file's 0.43 ms on the same 21-node network -- EPANET is ~9x
+// faster here and ~46x faster at 201 nodes.
 //
 // So an active valve routes the SOLVE to EPANET (see runSolve() in js/looped-network.js), and if
 // EPANET is unreachable -- offline, blocked module -- this file refuses with a diagnostic that
@@ -245,12 +238,12 @@ EngCalcs.lpnEpanetOnlyValves = function (model) {
 // places (the iteration and the report) and they must not diverge.
 //
 // A TCV'S LOSS IS ITS SETTING AND NOTHING ELSE, and that is EPANET's behaviour rather than a
-// simplification of it -- measured in js/vendor/epanet-js.js on 2026-08-11 and recorded in
-// js/lpn-inp.js: a TCV with setting 16 and minor loss 0 gives 8.00 ft, setting 12 with minor loss
-// 3 gives 6.00 ft (= 12/16 of it), and setting 0 with minor loss 16 gives exactly zero. EPANET
-// IGNORES the [VALVES] minor-loss column for a TCV. Adding the two -- the obvious reading of the
-// column heading -- put 10.6 m of phantom head into the first real model that had one. This page
-// therefore never offers a separate minor loss on a TCV: one number, both engines, same answer.
+// simplification of it -- measured against js/vendor/epanet-js.js: a TCV with setting 16 and minor
+// loss 0 gives 8.00 ft, setting 12 with minor loss 3 gives 6.00 ft (= 12/16 of it), and setting 0
+// with minor loss 16 gives exactly zero. EPANET IGNORES the [VALVES] minor-loss column for a TCV;
+// ADDING the two -- the obvious reading of the column heading -- puts ~10.6 m of phantom head into
+// a real model. This page therefore never offers a separate minor loss on a TCV: one number, both
+// engines, same answer.
 EngCalcs.lpnLinkK = function (link) {
 	if (link.type === 'valve' && (link.valveType || 'TCV').toUpperCase() === 'TCV') {
 		return link.setting || 0;
@@ -264,8 +257,8 @@ EngCalcs.lpnLinkK = function (link) {
 // specific and highlight the offending elements. The dominant real-world error is
 // 'unreachable': a pipe drawn near a junction but not snapped to it.
 //
-// `options.engine` NAMES THE ENGINE THE CALLER IS ABOUT TO USE, and it is opt-in on purpose
-// (Task 248 phase 2). Everything below is engine-independent except one check -- an active valve
+// `options.engine` NAMES THE ENGINE THE CALLER IS ABOUT TO USE, and it is opt-in on purpose.
+// Everything below is engine-independent except one check -- an active valve
 // is a perfectly valid network that this file alone cannot solve -- so that check fires only when
 // the caller has said 'native'. A caller that names no engine is asking "is this network sound?",
 // which is what the UI asks before it has chosen, and gets the engine-independent answer. The
@@ -660,21 +653,19 @@ EngCalcs.lpnReport = function (model, junctions, junctionIndex, byId, H, Q, meth
 		// Velocity is a SPEED, so it is never negative -- |Q|/A, matching EPANET, which reports
 		// signed flow and unsigned velocity from the same solve (verified against its own output
 		// in dev/lpn-spike/reference/ref_Net1-3.json, where negative flows carry positive
-		// velocities). Direction is already carried twice over: by the sign of the flow and by
-		// the arrow the map draws from it. A signed velocity added no information and made the
-		// two engines disagree -- EngCalcs.lpnSolveEpanet reads EN_VELOCITY, which is unsigned --
-		// while quietly breaking any "highest velocity" comparison, since a fast reverse flow
-		// sorted to the BOTTOM of the range.
+		// velocities). Keep it unsigned: EngCalcs.lpnSolveEpanet reads EN_VELOCITY, which is
+		// unsigned, so a signed velocity here makes the two engines disagree, and it breaks any
+		// "highest velocity" comparison by sorting a fast reverse flow to the BOTTOM of the range.
+		// Direction is already carried by the sign of the flow and by the arrow the map draws.
 		velocities[link.id] = link.diameter > 0
 			? Math.abs(Q[k]) / (Math.PI * link.diameter * link.diameter / 4)
 			: 0;
 		if (link.type === 'pump') {
 			// Sign convention: a pump's head loss is the negation of its head gain, so a working
-			// pump reports a NEGATIVE head loss. That is the whole story -- there is no separate
-			// head-gain quantity anywhere in this page (Tom, 2026-07-30: "I don't think we need a
-			// separate Head Gain. Negative head loss is fine."), and no floor/extrapolation check
-			// on the curve either: a pump has exactly the curve the user entered for it and does
-			// exactly what that curve says, including past its own zero-head flow.
+			// pump reports a NEGATIVE head loss. There is no separate head-gain quantity anywhere on
+			// this page, and no floor/extrapolation check on the curve either: a pump has exactly
+			// the curve the user entered for it and does exactly what that curve says, including
+			// past its own zero-head flow.
 			headlosses[link.id] = -(link.h0 - link.a * Math.pow(Math.max(Math.abs(Q[k]), EngCalcs.lpnQMin), link.b));
 		} else {
 			aq = Math.abs(Q[k]);

@@ -42,31 +42,20 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 	// n_blodgett, n_bathurst and n_pi -- see the note there.
 	var n_strickler = Math.pow(d50_in, 1 / 6) / 21.1;
 	if (n_in === 0) { n_in = n_strickler; }
-	// WHICH LOOP IS RUNNING IS A PROPERTY OF THE RADIOS, and is decided once, here (fixed
-	// 2026-08-13, found by dev/calc-spike/mtc-harness.js). It used to be inferred inside the loop
-	// by letting each `switch`'s default branch set `iterate_p = false`, and that had two
-	// consequences, both silent:
+	// WHICH LOOP IS RUNNING IS A PROPERTY OF THE RADIOS, and is decided ONCE, here -- never
+	// inferred inside the loop by letting a `switch`'s default branch clear `iterate_p`. Doing
+	// that couples the two iterations and fails silently in both directions:
 	//
-	//   1. **The rock switch's default killed the ROUGHNESS iteration too.** Pick Strickler (or
-	//      P&I, or B/B) and leave the rock size typed, and the loop ran exactly one pass. `v` is
-	//      computed near the top of the pass from the n of the PREVIOUS pass, and n is updated
-	//      near the bottom -- so the page put the new n in the roughness box and reported a
-	//      velocity, Q, Froude number and rock sizes computed from the n the user had typed. (NOT
-	//      the shear stress: tau = R S depends on geometry and slope alone.) On the MAIN FORM that
-	//      was transient -- the pass wrote the new n back into the box, so the next recalculation
-	//      healed it. In solveForY it PERSISTED, because that calls this function once per trial
-	//      depth and there is no next recalculation: asking for 60 cfs with B/B on returned a depth
-	//      carrying 66.97 cfs and reported success. Every
-	//      combination with a rock radio ALSO on was correct, which is why it survived: the rock
-	//      loop kept iterating and n converged as a side effect.
-	//   2. **The safety factor was applied to a d50 the user TYPED.** With no rock radio the
-	//      `else` branch did `d50_in = p.d50_safety * d50_calc` where d50_calc was simply the
-	//      typed value. The safety factor exists to scale a CALCULATED rock size; there is
-	//      nothing to scale when the user names the rock. The page rightly declines to write that
-	//      inflated number back into the form, so its only visible effect was the P&I range
-	//      check, which was testing 1.25x the rock the user asked for.
+	//   * `v` is computed near the TOP of a pass from the PREVIOUS pass's n, and n is updated near
+	//     the BOTTOM. So a loop cut to one pass reports v, Q and Froude from the n the user typed
+	//     while displaying the new n. (Not the shear stress: tau = R S is geometry and slope
+	//     alone.) On the main form the next recalculation heals it; in solveForY it does NOT,
+	//     because that calls this once per trial depth and gets no second pass.
+	//   * The safety factor must scale a CALCULATED rock size only. There is nothing to scale when
+	//     the user names the rock, and inflating a typed d50 corrupts the P&I range check.
 	//
 	// So: iterate while EITHER unknown is still moving, and stop only when BOTH have settled.
+	// dev/calc-spike/mtc-harness.js asserts this.
 	var n_iterating = (p.n_radio === 'bb' || p.n_radio === 'strickler' || p.n_radio === 'pi');
 	var d50_iterating = (p.d50_radio === 'isbash' || p.d50_radio === 'maynord' || p.d50_radio === 'searcy');
 	var iterate_p = true;
@@ -86,17 +75,12 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 		q = v * a;
 		froude = v * Math.sqrt(t / (g * a * Math.cos(Math.atan(p.s0))));
 		tau = rh * p.s0;
-		// RECOMPUTED EVERY PASS, from the CURRENT d50 (fixed 2026-08-14). It used to be computed
-		// once before the loop and never again, while its three siblings below were recomputed
-		// every pass -- so with Strickler (or B/B falling back to it) plus any rock method, the
-		// rock size converged against a FROZEN roughness and the loop never actually coupled. The
-		// symptom was that the converged answer depended on the starting guess: the same channel
-		// settled on 0.542 in from a typed 4 in, 0.376 in from 12 in and 0.298 in from 24 in.
-		// Tom, 2026-08-14: *"I assumed that people would play with numbers until they settle
-		// down."* -- a fair assumption for a tool driven by hand, and one worth retiring now that
-		// dev/calc-spike/mtc-harness.js can assert the answer no longer depends on where you start.
-		// Harmless where nothing moves: with no rock radio d50 is constant, so this is the same
-		// value every pass.
+		// RECOMPUTED EVERY PASS, from the CURRENT d50, exactly like its three siblings below.
+		// Hoisting it out of the loop freezes the roughness the rock size converges against, so
+		// the loop stops coupling and the converged answer depends on the starting guess (the
+		// same channel settling on 0.542 in from a typed 4 in but 0.298 in from 24 in).
+		// dev/calc-spike/mtc-harness.js asserts start-independence. Harmless where nothing moves:
+		// with no rock radio d50 is constant, so this is the same value every pass.
 		n_strickler = Math.pow(d50_in, 1 / 6) / 21.1;
 		n_blodgett = alpha_blodgett * Math.pow(da, 1 / 6) / (2.25 + 5.23 * Math.log10(da / d50_in));
 		n_bathurst = EngCalcs.Manning.bathurst_n(alpha_bathurst, g, t, da, d50_in, froude);
@@ -132,26 +116,25 @@ EngCalcs.Manning.mtc_iterate = function(p) {
 		d50_bottom = EngCalcs.Manning.mc_riprap_size(p.y, a, v, g, 1000, p.s0, c_isbash, p.sgrock);
 		d50_z1 = EngCalcs.Manning.mc_riprap_size(p.y, a, v, g, p.z1, p.s0, c_isbash, p.sgrock);
 		d50_z2 = EngCalcs.Manning.mc_riprap_size(p.y, a, v, g, p.z2, p.s0, c_isbash, p.sgrock);
-		// MAYNORD, RUFF & ABT (1989), corrected 2026-08-14 against Witheridge, "Background to Rock
-		// Sizing Equations" (Catchments & Creeks), Eq 14/17, verified by Tom against the source:
+		// MAYNORD, RUFF & ABT (1989), per Witheridge, "Background to Rock Sizing Equations"
+		// (Catchments & Creeks), Eq 14/17:
 		//
 		//     d50 = 0.031 sf (Ss-1)^-1.25 V^2.5 / y^0.25      [d50 m, V m/s, y m]
 		//
-		// Two things were wrong here and both were silent:
-		//   * THE EXPONENT ON (Ss-1) HAD LOST A DIGIT -- 0.25 where the source says 1.25. At the
-		//     default sg = 2.65 that made the rock 1.65x oversized (conservative, so nothing ever
-		//     looked wrong), and it under-responded to sgrock, which is a user-editable input.
-		//   * THE BEND FACTOR WAS APPLIED TO d50 AND INVERTED. The source adjusts the VELOCITY,
-		//     not the rock: a bend raises V, and d50 goes as V^2.5. Dividing d50 by 1.5 instead of
-		//     raising V multiplied the answer by 0.67 where it should be ~2, an error of about
-		//     4x IN THE UNSAFE DIRECTION -- the smallest rock exactly where a bend demands the
-		//     most. The page's own Isbash column disagreed with it in DIRECTION, which is what
-		//     gave it away (Isbash handles a bend through K, 1.2 -> 0.86, and correctly grows).
+		// TWO SILENT TRAPS, both of which have been walked into here before:
+		//   * THE EXPONENT ON (Ss-1) IS 1.25, not 0.25. At the default sg = 2.65 a lost digit
+		//     oversizes the rock 1.65x -- conservative, so nothing looks wrong -- while
+		//     under-responding to sgrock, which is a user-editable input.
+		//   * THE BEND FACTOR ADJUSTS THE VELOCITY, NOT d50. A bend raises V, and d50 goes as
+		//     V^2.5. Dividing d50 by the factor instead multiplies the answer by 0.67 where it
+		//     should be ~2 -- about 4x IN THE UNSAFE DIRECTION, the smallest rock exactly where a
+		//     bend demands the most. Cross-check against the Isbash column, which handles a bend
+		//     through K (1.2 -> 0.86) and correctly GROWS; a direction disagreement is the tell.
 		//
 		// 4/3, not Maynord's 1.5: Maynord's 1.5 is for NATURAL channels, and this calculator is
 		// mostly used on artificial ones. 4/3 is California Division of Highways (1970), cited in
 		// the same reference (Eq 18) -- and cited on the label too, since the column carries
-		// Maynord's name and this factor is not his. Tom's call, 2026-08-14.
+		// Maynord's name and this factor is not his.
 		//
 		// sf lives OUTSIDE this expression, as the page's own d50_safety input applied to
 		// d50_calc below, which is the same thing in a different place.
