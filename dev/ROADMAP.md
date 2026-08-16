@@ -320,7 +320,41 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops
   fitting on a screen.
 
-- 55|343| **Priority order for hiding label lines when they do not fit.** Provide an input in the labels box for persistence priority 1–10.
+- 25|343| **Priority order for hiding label lines when they do not fit.** Provide an input in the
+  labels box for persistence priority 1–10. Priority cut from 55 by Tom, 2026-08-16: *"It's not a
+  terrible idea. But I don't know what to do with it right now."*
+  - **Blocked on scope, not effort.** The input is ~20 lines beside the existing decimals spinner,
+    but a control storing a number nothing reads is worse than no control, and
+    `dev/label-placement-goals.md` §2 rules out a threshold inside the placement pass.
+  - **The open question: what triggers a drop?** (a) a residual-score threshold — the pass already
+    returns the per-label score one would read; (b) a count of overlapping neighbours; (c) a
+    map-width rule, like the one that already hides annotation wholesale. Answer that and the rest
+    is small.
+
+- 90|392| **The label candidate reach is smaller than the label, so the pass cannot clear anything.**
+  Tom, 2026-08-16, on a second bad placement: *"Are they going out far enough? We weren't rigorous
+  about that at all in our spec doc."* No. Measured: the search disc is 28 px in radius while a
+  3-line label at the default text size is **50 × 38.5 px**. Four of the seventeen candidates sit
+  inside the label's own footprint, so every candidate covers much the same ground.
+  - **How the number went wrong:** 28 px was measured as a LEGIBILITY CAP on how far a label may
+    stray (Tom on labels 85–301 px out: *"Far away... They should be on the opposite side of the
+    model"*), and under the old relaxation it was exactly that — `LPN_NUDGE_CAP_PX`, applied after
+    the fact. Task 379 reused the same number as the RADIUS OF THE ENTIRE SEARCH, a different
+    quantity.
+  - Proposal awaiting Tom's number: express reach in LABEL SIZES, `outer = hypot(w, h)` (≈ 63 px for
+    a 3-line label) — the smallest reach that can step off a conflict, still inside the 85 px he
+    objected to, and it scales with text size where a fixed 28 px does not.
+
+- 20|393| **Net3 still differs from EPANET by 0.49 ft after demand patterns are accounted for.**
+  Measured 2026-08-16 against EPA's own `dev/water-network-examples/Net3.rpt` at 0:00, 92 comparable
+  nodes: mean |ΔH| **15.93 ft as we solve it today → 0.49 ft** once each junction's pattern
+  multiplier is applied by hand. Worst residual 2.66 ft (1.6%) at node 123.
+  - The 15.9 ft is Task 248 and expected. **The 0.49 ft is not explained**, and the obvious suspects
+    were checked and cleared: link 330 is already imported closed (its status is in the `[PIPES]`
+    column, not `[STATUS]`), and `[DEMANDS]` is empty so there are no extra demand categories.
+  - Remaining suspects, untested: the pump curve fit for links 10 and 335, convergence tolerance,
+    and the report's own 2-decimal rounding. Fixed-head nodes 20/40/50 match exactly, which is what
+    says the comparison itself is sound.
 
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
   2026-08-14: *"Not mtext labels. Mtext Text objects."* The target is what you place with the Text
