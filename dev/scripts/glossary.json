@@ -1,6 +1,6 @@
 {
  "meta": {
-  "version": "1.30",
+  "version": "1.31",
   "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
   "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
   "language_codes": [
@@ -31,6 +31,13 @@
    "ur",
    "zh"
   ],
+  "anchor_languages": [
+   "es",
+   "pt",
+   "fr",
+   "tr"
+  ],
+  "anchor_languages_note": "The anchors are the languages a term's other renderings are CHECKED AGAINST, and a pre-sprint check verifies preferred_translation is populated for them first. Set to es, pt, fr, tr on 2026-08-16 (ROADMAP Task 214), replacing es, fr, ru, ar. These four are the Task 203 coverage cross's core languages and the measured top four by confirmed human reach (2026-08-03: es 186, pt 30, fr 23, tr 17); ru had 1 measured human and ar had 0, so anchoring on them meant checking against languages we cannot observe. Fill rates confirmed at the time of the change: es 86, pt 86, fr 87, tr 87 of 100 terms — pt and tr are as well populated as the anchors they replace, and better than ru (79) and ar (76). This says nothing about ru or ar translation QUALITY, which stays fully in scope: zero reach is a discovery gap, not low value. Anchor is a distinct notion from the wave-1 'anchor languages' cognate-clustering list in dev/translation-process.md, which is a retired build-out sequencing device and was deliberately NOT renumbered.",
   "confidence_notes": "Translations marked with (?) in comments need native-speaker review. am/bn/km/my/ps translations are AI-generated (2026-06) and benefit from native-speaker review before high-stakes use. New entries added 2026-06: rock chute, chute, unit discharge, median rock size (D50), gradation, porosity, specific gravity, ponding, junction loss, run-of-river, headworks. Pre-2026 Spanish translations were done by a non-native, non-engineer speaker — treat as a useful baseline but not authoritative. 2026-07-19: retroactively backfilled the Task 109 cross-language consistency audit (stages 1-5) into this glossary — corrected stale am/bg/hi/hr/ur values, appended per-stage confirmation notes to existing terms, and added the centroid, calculator, application (irrigation), and flow depth terms. 2026-07-20 (v1.10, polysemy/units-trap protocol): added a structured \"avoid\" array to trap terms (specific gravity, head family, riprap, penstock, chute, crown) that lists the wrong senses a translator must not produce; added a new root \"head\" term to close the gap where only compounds existed; the \"avoid\" arrays are the source of the derived trap-term watchlist (dev/scripts/list_trap_terms.php).",
   "bibliography": {
    "wmo-385": {
@@ -99,7 +106,7 @@
    }
   },
   "source_values": "wmo-385 (directly cited from WMO No. 385), wmo-385-indirect (inferred from WMO context), iate (cited from IATE), unterm (cited from UNTERM), human-pre2026 (pre-2026 human translation — see bibliography for per-language caveats), ai-generated (no authoritative citation)",
-  "last_updated": "2026-07-28"
+  "last_updated": "2026-08-16"
  },
  "terms": {
   "0": {
@@ -3605,6 +3612,45 @@
     "zh": "自有数值"
    },
    "source": "seeded for Task 248 Wave 0, 2026-08-14"
+  },
+  "94": {
+   "term": "EngCalcs (product name)",
+   "symbol": "",
+   "context": "The name of this suite. It is a proper noun and is never translated or transliterated in any language. What DOES change per language is how a case suffix, article or preposition attaches to it — Turkish and the other agglutinative languages have to suffix it directly.",
+   "avoid": [
+    "translating or transliterating the name itself into the local script when the language normally writes Latin brand names as-is",
+    "splitting it into two words (Eng Calcs) or lowercasing the internal C"
+   ],
+   "translation_notes": "[2026-08-16, ROADMAP Task 160] TURKISH SUFFIXATION FIXED AND STANDARDIZED: the accusative is EngCalcs'ı, never EngCalcs'i. lib/lang.ec.tr.php had shipped both forms — install_main_title, install_desktop_steps_html and install_cached_body wrote 'i while about_body_html wrote 'ı — so exactly one was wrong. Turkish four-way vowel harmony keys on the last vowel AS PRONOUNCED, not as spelled: a Turkish speaker says the name roughly [eŋ ˈkalks] (or [dʒalks] reading the c by Turkish orthography — the vowel is the same either way), so the final vowel is a back unrounded /a/, which takes -ı. The word-final consonant is voiceless s, which governs only d/t-type consonant assimilation and has no bearing on the suffix vowel. The apostrophe before the suffix is required: EngCalcs is a proper noun (TDK rule for case suffixes on proper nouns). By the same harmony, other cases are EngCalcs'a (dative), EngCalcs'ta (locative, t after voiceless s), EngCalcs'tan (ablative), EngCalcs'ın (genitive). Not wired into prefixToTermNames(), so this entry is a record rather than injected prompt context; wire 'install' and 'about' to it if this recurs.",
+   "translations": {
+    "am": "EngCalcs",
+    "ar": "EngCalcs",
+    "bg": "EngCalcs",
+    "bn": "EngCalcs",
+    "cs": "EngCalcs",
+    "de": "EngCalcs",
+    "es": "EngCalcs",
+    "fa": "EngCalcs",
+    "fr": "EngCalcs",
+    "he": "EngCalcs",
+    "hi": "EngCalcs",
+    "hr": "EngCalcs",
+    "id": "EngCalcs",
+    "it": "EngCalcs",
+    "km": "EngCalcs",
+    "my": "EngCalcs",
+    "ps": "EngCalcs",
+    "pt": "EngCalcs",
+    "ro": "EngCalcs",
+    "ru": "EngCalcs",
+    "sr": "EngCalcs",
+    "sw": "EngCalcs",
+    "tr": "EngCalcs",
+    "uk": "EngCalcs",
+    "ur": "EngCalcs",
+    "zh": "EngCalcs"
+   },
+   "source": "seeded for ROADMAP Task 160, 2026-08-16"
   }
  }
 }

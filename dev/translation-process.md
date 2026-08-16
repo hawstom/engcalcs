@@ -52,9 +52,14 @@ counts before anything paid launches.
     sequence ru, uk, bg, sr, hr, cs and id — all at 0–1 confirmed humans — ahead of zh (12) and
     he (10), which sit in wave 2. The operative priority set is the Task 203 cross's core languages
     **es, pt, fr, tr**, which are exactly the measured top four in order. Do not renumber the waves
-    to "fix" this; the lists still say something true about how to cluster a batch. See ROADMAP
-    Task 214, which also carries the one live defect this exposed — the glossary *anchors* (es, fr,
-    ru, ar) still name two languages we cannot observe.
+    to "fix" this; the lists still say something true about how to cluster a batch.
+  - **The GLOSSARY ANCHORS are a different list, and they are now `es`, `pt`, `fr`, `tr`**
+    (2026-08-16, ROADMAP Task 214, declared in `glossary.json` `meta.anchor_languages`). They were
+    es, fr, ru, ar; `ru` had one measured human and `ar` had zero, and an anchor is the language
+    other renderings get *checked against*, so two of the four could not be observed at all. This
+    is only about reference points — ru and ar translation quality stays fully in scope, since for
+    languages that size zero reach is a discovery gap, not low value. Do not confuse this list
+    with the "Wave 1 — anchors" cognate cluster above; that one is a retired build-out device.
 - **THE SEQUENCING RULE (build-phase only — Tom, 2026-07-21):** finish **all three
   waves of a calculator category — plus that category's holistic Opus consistency pass — before
   starting the next category.** Never interleave categories. (This was violated once, 2026-07-07,
@@ -168,7 +173,7 @@ section verbatim. Sequence recap:
 Run this on a calculator category when: (a) it's never had a post-Wave-0/item-90 complete
 re-translation, (b) a native reviewer flags a systemic issue that might recur elsewhere (the
 Bulgarian "irregular"-as-temporal-sense catch is the template case — it turned out to be a risk
-across all Slavic anchor languages, not just Bulgarian), or (c) enough English-source edits have
+across all Slavic wave-1 languages, not just Bulgarian), or (c) enough English-source edits have
 piled up since the last audit that drift is likely.
 
 Full end-to-end sequence per category (this is what item 85 executed for category 1 and is
@@ -177,7 +182,7 @@ executing for category 2 onward):
 1. **English-reform gate first, always.** Read the category's English strings fresh; fix
    colloquialisms, stacked modifiers, compressed abbreviations, double negatives (prefer positive
    phrasing — a standing directive) *before* translating anything. Wave 1 (next step) is also
-   interactive on this front: anchor-language translators/reviewers surfacing "this doesn't
+   interactive on this front: wave-1 translators/reviewers surfacing "this doesn't
    translate" is expected and should trigger small English edits, not be worked around with more
    intent notes. **English freezes after wave 1** — waves 2–3 translate against a stable source.
 2. **Key consolidation check** (item-90-style): is any label in this category a duplicate of one
@@ -185,7 +190,7 @@ executing for category 2 onward):
    live in *different* categories — so judgment calls about ownership need visibility across the
    whole suite, not just the category being audited. Don't defer this into the per-category loop
    silently; if you find a cross-category duplicate, say so before merging.
-3. **Wave 1** (anchor languages) — **complete re-translation of every key in the category**, not
+3. **Wave 1** (the wave-1 cognate cluster) — **complete re-translation of every key in the category**, not
    the missing-delta. Existing strings predate reform/consolidation passes and are not assumed
    correct even where present. State both numbers (total keys, missing-delta) when proposing the
    sprint so this scope isn't mistaken for "almost done."
