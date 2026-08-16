@@ -423,17 +423,18 @@ html[lang="zh"] .ec-welcome {
    He is right, and the simplification deletes the whole bug: a fill has no width, so there is no
    map-unit-versus-screen-pixel question to get wrong -- which is what produced a mark bigger than
    the screen and then a full-page orange starburst, from the same three lines, twice.
+   RED, not the orange this started as (Tom: *"Red would be better. It looks orange or brown."*).
    Two quick blinks so it is noticed, then a long hold, then a fade back. NO `forwards`: when the
    animation ends the property reverts to whatever the stylesheet says, so the label returns to its
    normal colour on its own and nothing has to clean up after it. */
 .lpn-just-dragged { animation: lpn-just-dragged 45s ease-out; }
 @keyframes lpn-just-dragged {
-	0%   { fill: #e07000; }
+	0%   { fill: #d40000; }
 	4%   { fill: #000; }
-	8%   { fill: #e07000; }
+	8%   { fill: #d40000; }
 	12%  { fill: #000; }
-	16%  { fill: #e07000; }
-	70%  { fill: #e07000; }
+	16%  { fill: #d40000; }
+	70%  { fill: #d40000; }
 	100% { fill: #000; }
 }
 @media (prefers-reduced-motion: reduce) {

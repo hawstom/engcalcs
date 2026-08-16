@@ -75,7 +75,11 @@ EngCalcs.lpnCollide = (function () {
 	// So 0.5 for a node and 0.4 for a pipe are gone. The one number that is not 1 is `manual`, and
 	// it is not a fraction — it is a flag wearing a number, so that "practically immovable" falls
 	// out of the same formula instead of needing a second code path.
-	var WEIGHT = { pipe: 1, node: 1, label: 1, leader: 1, manual: 1000 };
+	// **pipe 0.5, and Tom moved it there himself after moving it to 1:** *"Nodes should be 1 and
+	// pipes should be less than 1."* Under insistence that reads directly -- a label must come
+	// entirely off a symbol, another label or a leader, and about half way off a pipe. It is the one
+	// obstacle a number can legitimately lie across, so it is the one obstacle that does not insist.
+	var WEIGHT = { pipe: 0.5, node: 1, label: 1, leader: 1, manual: 1000 };
 
 	// **LEADERS ARE SEGMENTS TOO, AND THE SAMPLER IS GONE** (Tom, 2026-08-15: *"Why not do segment
 	// testing on the leaders if it can be done?"*). It can, it is the same pushOffSegments() the

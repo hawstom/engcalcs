@@ -226,9 +226,15 @@ function lbl(x, y, w, h) {
 	// obstacle the answer is all of it. The fractions were trying to express a PREFERENCE -- which
 	// conflict to accept when they cannot all be avoided -- which is a property of the alternatives,
 	// not of the obstacle, and belongs to Task 379's score.
-	report(Collide.WEIGHT.pipe === 1 && Collide.WEIGHT.node === 1 && Collide.WEIGHT.leader === 1,
-		'every real obstacle insists on the whole overlap',
+	// Tom set these himself, in two steps: first "Pipes and nodes are both weight 1" against my
+	// fractions, then "Nodes should be 1 and pipes should be less than 1." Under insistence both
+	// readings are literal -- a label must come entirely off a symbol, another label or a leader,
+	// and about half way off a pipe, which is the one obstacle a number can legitimately lie across.
+	report(Collide.WEIGHT.node === 1 && Collide.WEIGHT.label === 1 && Collide.WEIGHT.leader === 1,
+		'a symbol, a label and a leader each insist on the whole overlap',
 		JSON.stringify(Collide.WEIGHT));
+	report(Collide.WEIGHT.pipe > 0 && Collide.WEIGHT.pipe < 1,
+		'...and a pipe, alone, insists on only part of it', 'pipe=' + Collide.WEIGHT.pipe);
 	report(Collide.WEIGHT.manual > 1,
 		'...and the one number that is not 1 is a flag wearing a number, not a fraction');
 }

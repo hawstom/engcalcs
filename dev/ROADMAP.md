@@ -1990,6 +1990,23 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|385| **The giant obstacle boxes were a stale measurement, not the rotated-box waste — DONE
+  2026-08-15.** Tom sent the same view twice: *"See the size of these boxes before and after I
+  drag."* In the first the green obstacle boxes around the aligned pipe labels were several times
+  the label; in the second, after a drag, they were tight around it.
+  - **It is a measurement-ordering bug and it is entirely separate from Task 379's AABB waste**,
+    which is what it looked like. `getBBox()` returns WORLD units and `noteMeasuredWidth()`
+    multiplies by the CURRENT scale to bank a pixel width, so both halves have to belong to the same
+    moment. A label's font-size is itself world units (`textSize / s`), so running
+    `refreshLabelText()` after a zoom but before `refreshFontSizes()` had updated the element
+    measured text drawn at the OLD scale and multiplied it by the NEW one — a banked width wrong by
+    exactly the zoom ratio, in the direction that makes boxes enormous when you zoom out.
+  - It healed on the next drag because a drag ends in a solve, which re-enters `refreshLabelText()`
+    with the two by then agreeing. **That is the same "any drag fixes it" signature Tom reported
+    weeks of symptoms under**, and it had been read as a relaxation problem every time.
+  - Fix: size the element for the current scale, then measure it. Asserted on ORDER in
+    `label-decor-harness.js`, since a headless harness cannot measure text.
+
 - 0|383| **Leaders are segments too, weights mean insistence, and the mark is in screen pixels —
   DONE 2026-08-15.** Four findings from one round of Tom looking at `?debug=boxes`.
   - **"Why not do segment testing on the leaders if it can be done?"** It can, it is the same

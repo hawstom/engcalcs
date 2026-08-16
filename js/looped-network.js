@@ -12258,7 +12258,9 @@ var EngCalcs = EngCalcs || {};
 	// element's decoration is judged against the same snapshot (Tom: ties all get marked, not just
 	// the first one found -- decorationFor() already does this per element).
 	function refreshLabelText() {
-		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link;
+		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
+			// One string, computed once for the whole pass -- see the measurement comment below.
+			fsNow = effectiveFontSize() + 'px';
 		// Every field below is rounded through the same displayRound()/per-field-decimals rule the
 		// label text itself uses (see the comment on displayRound()), so a tie in what's actually
 		// printed is always a tie in what gets decorated.
@@ -12371,6 +12373,20 @@ var EngCalcs = EngCalcs || {};
 			ne.lineCount = nRows.length;
 			nodeLines[n.id] = lines;
 			ne.lines = lines; // the FIELD lines, one per value, whatever shape they were drawn in
+			// **THE FONT SIZE MUST BE RIGHT FOR THIS SCALE BEFORE THE TAPE MEASURE COMES OUT.**
+			// (Tom, 2026-08-15, with two screenshots of the same view: *"See the size of these boxes
+			// before and after I drag."* The green obstacle boxes were several times the label in
+			// one and tight around it in the other.)
+			//
+			// getBBox() returns WORLD units, and noteMeasuredWidth() multiplies by the CURRENT scale
+			// to bank a pixel width. Both halves have to belong to the same moment. A label's
+			// font-size is itself in world units (textSize / s), so if this runs after a zoom but
+			// before refreshFontSizes() has updated the element, we measure text drawn at the OLD
+			// scale and multiply it by the NEW one -- and the banked pixel width is wrong by exactly
+			// the zoom ratio, in the direction that makes boxes enormous when you zoom out. It
+			// healed on the next drag only because a drag ends in a solve, which re-enters here with
+			// the sizes by then agreeing.
+			ne.text.style.fontSize = fsNow;
 			try { noteMeasuredWidth(ne, ne.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		doc.links.forEach(function (l) {
@@ -12412,6 +12428,9 @@ var EngCalcs = EngCalcs || {};
 			le.rowsSeq = (le.rowsSeq || 0) + 1;
 			linkLines[l.id] = lines;
 			le.lines = lines;
+			// Same reason as the node branch above: size it for this scale, then measure it.
+			le.text.style.fontSize = fsNow;
+			(le.repeats || []).forEach(function (r) { r.text.style.fontSize = fsNow; });
 			try { noteMeasuredWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is

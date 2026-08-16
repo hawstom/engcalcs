@@ -101,6 +101,26 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	// moving with the zoom again.
 	report(!/labelBoxWidth\(/.test(extract('updateDataLeader')),
 		'updateDataLeader() reads no width -- it draws A to the stored B');
+	// **SIZE IT FOR THIS SCALE, THEN MEASURE IT.** Tom, with two screenshots of the same view: "See
+	// the size of these boxes before and after I drag." getBBox() returns WORLD units and
+	// noteMeasuredWidth() multiplies by the CURRENT scale, so both halves must belong to the same
+	// moment -- and a label's font-size is itself world units (textSize / s). Run this after a zoom
+	// but before refreshFontSizes() has touched the element and you measure text drawn at the old
+	// scale, multiply by the new one, and bank a pixel width wrong by exactly the zoom ratio. It
+	// healed on the next drag only because a drag ends in a solve, which re-enters here.
+	//
+	// Asserted on ORDER, which is the whole of the bug: the assignment must precede the measurement
+	// in both branches. A harness cannot measure text, so it cannot catch this any other way.
+	const rlt = extract('refreshLabelText');
+	['ne', 'le'].forEach(function (v) {
+		const set = rlt.indexOf(v + '.text.style.fontSize = fsNow;');
+		const measure = rlt.indexOf('noteMeasuredWidth(' + v + ',');
+		report(set >= 0 && measure >= 0 && set < measure,
+			v + ' is sized for the current scale before it is measured', 'set@' + set + ' measure@' + measure);
+	});
+	report(/fsNow = effectiveFontSize\(\) \+ 'px'/.test(rlt),
+		'...from effectiveFontSize(), which is the same quantity refreshFontSizes() publishes');
+
 	// **A PIPE DOES NOT PUSH ITS OWN LABEL.** Tom, minutes after pipes became obstacles: "Pipe labels
 	// are fickle now. I see them and then I don't see them." A link's data label sits ON its pipe by
 	// design -- that is how you tell whose number it is -- so without an owner on the pipe segment
