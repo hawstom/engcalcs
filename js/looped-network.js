@@ -202,7 +202,18 @@ var EngCalcs = EngCalcs || {};
 	// n = 1 REPRODUCES TODAY EXACTLY. The stations are (i + 0.5)/n, so a single label lands at 0.5,
 	// which is LINK_LABEL_ALONG -- the whole existing single-label path, the arrow dodge and the
 	// aligned-label station search are untouched on any pipe shorter than a quarter of the view.
-	var LPN_LABEL_REPEAT_FRAC = 0.25;
+	// **HALF THE SMALLER MAP DIMENSION, NOT A QUARTER** (Tom, 2026-08-15, from the drawing: *"min/4
+	// is too small. Let's try min/2. On my PC, even that is smaller than max/4."*). His second
+	// sentence is the measurement that makes the first one safe: on a wide desktop map area, half
+	// the SMALLER dimension is still tighter than a quarter of the larger, so this is a smaller
+	// change than swapping the dimension would have been, and it moves in the direction the drawing
+	// asked for.
+	//
+	// He also offered the fancy version -- *"a setting for '% of minimum map dimension for label
+	// spacing' default 50%"* -- and it is not built, because a number nobody has yet wanted to
+	// change is a settings row that costs 26 translations. If a drawing turns up that wants a
+	// different spacing, that is the evidence for adding it.
+	var LPN_LABEL_REPEAT_FRAC = 0.5;
 	// **THE DIVISION IS UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN** (Tom, 2026-08-15, on being
 	// shown a cap of 12: *"Do you want only to draw the 4 that appear on the screen? That makes most
 	// sense. No cap on the division?"* — and he is right, it is the better shape). A cap on n is a
@@ -4231,6 +4242,8 @@ var EngCalcs = EngCalcs || {};
 		while (i) { h = (h * 33) ^ str.charCodeAt(--i); }
 		return (h >>> 0).toString(36);
 	}
+	// **WHAT COUNTS AS A CHANGE TO THE DOCUMENT.** This is what puts the asterisk on a tab, so
+	// anything included here is something the user will be asked to save.
 	function docSignature() {
 		var snap = serializeProject();
 		// The backdrop's data URL is megabytes and changes only when the image itself is replaced, so
@@ -4238,7 +4251,22 @@ var EngCalcs = EngCalcs || {};
 		// a multi-megabyte string walk on the solve debounce, several times a second while drawing.
 		var bd = snap.backdrop;
 		snap = Object.assign({}, snap, {
-			backdrop: bd ? { n: (bd.href || '').length, x: bd.x, y: bd.y, w: bd.width, h: bd.height, s: bd.s } : null
+			backdrop: bd ? { n: (bd.href || '').length, x: bd.x, y: bd.y, w: bd.width, h: bd.height, s: bd.s } : null,
+			// **THE VIEW IS SAVED BUT IS NOT AN EDIT** (Tom, 2026-08-15, reporting the consequence
+			// before anyone connected it: *"I revert, it autozooms and sets the asterisk, I revert,
+			// it autozooms and sets the asterisk... On reload, the current tab gets an asterisk...
+			// The gallery project gets an unwarranted asterisk."* All three, and the trap he could
+			// not get out of, are this one line.)
+			//
+			// Task 360 put the view into serializeProject() so a project reopens where it was left --
+			// which is right, and it accidentally made PANNING a modification. Every fit, every
+			// wheel notch, every restore then changed the signature, so a project could not be got
+			// to a clean state at all: reverting re-fitted, and the re-fit dirtied it again.
+			//
+			// Saved WITH the document, absent FROM the question "has this been edited". Same shape
+			// as the backdrop above: what is stored and what counts as a change are two lists, and
+			// this is where they differ.
+			view: null
 		});
 		return hash32(JSON.stringify(snap));
 	}
@@ -8077,9 +8105,25 @@ var EngCalcs = EngCalcs || {};
 			// there is never a state where drawing has nowhere to be saved. Registered directly
 			// rather than through newProject(), which repaints a UI that does not exist yet.
 			var firstId = newProjectId(), firstName = nextProjectName();
-			library.projects.push({ id: firstId, name: firstName, updated: Date.now() });
 			library.openId = firstId;
 			project.name = firstName; // the tab and the document have to agree from the first frame
+			// **AND IT IS BORN CLEAN, WHICH THIS BRANCH FORGOT** (Tom, 2026-08-15: *"The gallery
+			// project (initial project) gets an unwarranted asterisk. But revert is disabled."*).
+			//
+			// Dirtiness is `docSignature() !== entry.savedSig`, so an entry with NO savedSig is
+			// dirty from its first breath -- and an empty project has nothing to save. Every other
+			// way of making a project goes through stampProjectSaved(); this one registers the entry
+			// by hand, precisely to avoid repainting a UI that does not exist yet, and skipped the
+			// stamp along with it. The asterisk was then inescapable: Revert is for FILE projects, so
+			// the one control that clears an asterisk was disabled on the only project that had an
+			// unearned one.
+			//
+			// Stamped inline rather than by calling stampProjectSaved(), for the same reason the
+			// entry is pushed inline: that function ends in renderTabs(), and the tab strip is not
+			// wired yet. The name is set FIRST because the signature includes it.
+			library.projects.push({
+				id: firstId, name: firstName, updated: Date.now(), savedSig: docSignature()
+			});
 			saveIndex();
 		}
 		wireLabelsPopup();

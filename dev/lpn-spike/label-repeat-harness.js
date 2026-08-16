@@ -63,22 +63,27 @@ setUnitSet('us');
 L.buildLayers();
 L.seedDefaultInputs();
 
-// A 1000-unit view (the canvas is square at zoom 1, so VD = 1000 and the spacing is 250) with two
-// pipes: one well inside a quarter-view, one four times it.
+// A 1000-unit view (the canvas is square at zoom 1, so VD = 1000 and the spacing is 500) with two
+// pipes: one well inside a half-view, one twice it.
 L.setCanvas(1000, 1000);
 L.setZoom(1);
-const a = L.addNode('junction', 0, 0);
-const b = L.addNode('junction', 200, 0);        // short: 200 < 250
-const c = L.addNode('junction', 1200, 0);       // long: 1000 from b
+// THE LONG PIPE STARTS AT THE ORIGIN, so that all four of its stations sit inside the cull window
+// (the viewport plus a view-span each side) at zoom 1 and several still do at zoom 4. Hang the short
+// pipe off to one side rather than in line with it, or the fixture tests the cull instead of the
+// spacing -- which it silently did when the spacing changed from a quarter to a half.
+const a = L.addNode('junction', 0, -800);
+const b = L.addNode('junction', 400, -800);     // short: 400 < 500
+const bb = L.addNode('junction', 0, 0);
+const c = L.addNode('junction', 2000, 0);       // long: 2000, four spacings
 const short = L.addLink('pipe', a.id, b.id);
-const long = L.addLink('pipe', b.id, c.id);
+const long = L.addLink('pipe', bb.id, c.id);
 L.labelSettings().link.id = true;
 L.refreshLabelText();
 
 // ---- 1. n = 1 is the whole of today's behaviour, untouched -----------------------------------
 console.log('--- a pipe shorter than the spacing is exactly as it was ---');
 {
-	ok('the spacing is a quarter of the view', near(L.spacing(), 250), L.spacing());
+	ok('the spacing is half the view', near(L.spacing(), 500), L.spacing());
 	ok('the short pipe really is shorter than that', L.pipeLength(short.id) < L.spacing(),
 		L.pipeLength(short.id));
 	const st = L.stations(short);
@@ -93,7 +98,7 @@ console.log('--- a pipe shorter than the spacing is exactly as it was ---');
 console.log('\n--- a pipe longer than the spacing repeats along itself ---');
 {
 	const len = L.pipeLength(long.id), st = L.stations(long);
-	ok('the long pipe is four spacings long', near(len, 1000), len);
+	ok('the long pipe is four spacings long', near(len, 2000), len);
 	ok('...so it gets ceil(L / spacing) = 4 stations', st.length === 4, JSON.stringify(st));
 	// The spacing is what the spec asks for and the thing a reader actually perceives; the station
 	// numbers are only how it is expressed. Measured in world units, adjacent labels must be no
@@ -141,7 +146,7 @@ console.log('\n--- a pipe longer than the spacing repeats along itself ---');
 // ---- 3. The count re-derives on zoom, which is what makes it a rule ---------------------------
 console.log('\n--- the count follows the view, not the model ---');
 {
-	// Zoom IN 4x: the view is 250 units across, the spacing 62.5, and the same pipe wants 16.
+	// Zoom IN 4x: the view is 250 units across, the spacing 125, and the same pipe wants 16.
 	// Nothing about the network changed; the reader's distance did.
 	L.setZoom(4);
 	L.refreshLabelText();
@@ -159,7 +164,7 @@ console.log('\n--- the count follows the view, not the model ---');
 	// The window is the viewport plus a full view-span on each side, so panning by less than a
 	// screen never reaches a stretch that was never labelled.
 	ok('...every drawn station is inside the padded window',
-		dr.every(f => f * 1000 >= -1000 && f * 1000 <= 1500), JSON.stringify(dr));
+		dr.every(f => f * 2000 >= -1000 && f * 2000 <= 1500), JSON.stringify(dr));
 	// PANNING TO THE FAR END DRAWS THE FAR END'S LABELS, which is the half a count-based cap could
 	// never do: twelve labels spread over a pipe is not the same as the four you can see.
 	L.pan(-4400, 0);      // world x ~1100-1350 in view at zoom 4
@@ -169,14 +174,14 @@ console.log('\n--- the count follows the view, not the model ---');
 	ok('...and none of the ones it left behind', far.every(f => dr.indexOf(f) < 0));
 	L.pan(0, 0);
 
-	// Zoom OUT until the whole pipe is inside a quarter-view: back to one label, and the repeat
+	// Zoom OUT until the whole pipe is inside a half-view: back to one label, and the repeat
 	// elements are REMOVED rather than parked off-screen -- a stale repeat left in the layer is a
 	// label lying on a map that no longer wants it.
 	// Captured BEFORE they are dropped: asking the emptied list whether its members left the map
 	// is a question with no members in it, and it passes for a version that leaks every one of
 	// them into the layer forever. (It did. That is why this line reads the way it does.)
 	const dropped = L.linkEl(long.id).repeats.slice();
-	L.setZoom(0.2);     // 5000-unit view, spacing 1250, pipe 1000
+	L.setZoom(0.2);     // 5000-unit view, spacing 2500, pipe 2000
 	L.refreshLabelText();
 	ok('zooming out returns it to a single label', L.stations(long).length === 1);
 	ok('...and takes the repeat elements away with it', L.linkEl(long.id).repeats.length === 0);
@@ -194,15 +199,15 @@ console.log('\n--- VD = min(map width, map height) ---');
 	// instead of keeping a private convention -- see mapSpan() in js/looped-network.js, and note
 	// that one convention is what makes the rule sayable to a user in a single sentence.
 	//
-	// A tall narrow window is where the two differ most: 400 wide by 1600 tall repeats every 100
-	// units now rather than every 400, so a long north-south main carries more labels, measured
+	// A tall narrow window is where the two differ most: 400 wide by 1600 tall repeats every 200
+	// units now rather than every 800, so a long north-south main carries more labels, measured
 	// against the dimension that runs out first.
 	L.setCanvas(400, 1600);
 	L.setZoom(1);
 	ok('the view is taller than it is wide', L.visibleMapHeight() > L.visibleMapWidth(),
 		L.visibleMapWidth() + ' x ' + L.visibleMapHeight());
-	ok('...and the spacing is a quarter of the SMALLER of the two',
-		near(L.spacing(), 100), L.spacing());
+	ok('...and the spacing is half the SMALLER of the two',
+		near(L.spacing(), 200), L.spacing());
 }
 
 // ---- 4b. The station is fixed; the SIDE is not -------------------------------------------------

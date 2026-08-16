@@ -35,7 +35,7 @@ const L = loadLoopedNetwork(
 	"\t\tseedDefaultInputs: seedDefaultInputs, refreshLabelText: refreshLabelText,\n" +
 	"\t\tcurrentView: currentView, applyView: applyView, validView: validView,\n" +
 	"\t\tremember: rememberCurrentView, restoreOrFit: restoreViewOrFit,\n" +
-	"\t\tserialize: serializeProject, flip: flipStoredY,\n" +
+	"\t\tserialize: serializeProject, flip: flipStoredY, signature: docSignature,\n" +
 	"\t\tsetOpenId: function (id) { library.openId = id; },\n" +
 	"\t\tmarkSized: noteMapSized,\n" +
 	"\t\tcountLayouts: function (f) { var n = 0, real = onZoomChanged;\n" +
@@ -204,6 +204,64 @@ console.log('\n--- saved to file, in the Cartesian frame the rest of the file us
 }
 
 // ---- 5. Nothing is restored from a view that does not make sense -------------------------------
+// ---- 4b. Saving the view must not make PANNING an edit -----------------------------------------
+// Tom, 2026-08-15, reporting three symptoms that turned out to be one line: "I revert, it autozooms
+// and sets the asterisk, I revert, it autozooms and sets the asterisk. It's very hard for me to get
+// all tabs to a clean state so I can reload without a complaint... On reload, the current tab gets
+// an asterisk... The gallery project gets an unwarranted asterisk."
+//
+// Putting the view into serializeProject() (which is right -- a project should reopen where it was
+// left) accidentally put it into docSignature(), which is what decides whether a tab shows an
+// asterisk. Every fit, wheel notch and restore then counted as a modification, and the state was
+// INESCAPABLE: reverting re-fitted, and the re-fit dirtied the project again.
+//
+// What is STORED and what counts as a CHANGE are two different lists. The backdrop's data URL was
+// already on that seam; the view joins it.
+console.log('\n--- the view is saved with the document but is not an edit ---');
+{
+	L.setOpenId('P1');
+	L.setViewRaw(-300, -80, 3);
+	const before = L.signature();
+	L.setViewRaw(140, 260, 11);        // pan and zoom: a different view of the same network
+	ok('panning and zooming leaves the document signature untouched',
+		L.signature() === before, before + ' vs ' + L.signature());
+	// ...and the check that keeps this honest: the view really IS still in the saved file, so the
+	// exclusion is from the signature only and not from the record.
+	ok('...while the file still carries the view it was left at',
+		L.validView(L.serialize().view), JSON.stringify(L.serialize().view));
+	// An actual edit still registers, or the asterisk would have stopped meaning anything.
+	L.getDoc().nodes[0].elev = (L.getDoc().nodes[0].elev || 0) + 1;
+	ok('...and a real edit still changes it', L.signature() !== before);
+}
+
+// ---- 4c. Every way of making a project makes a CLEAN one ---------------------------------------
+// Tom, 2026-08-15: "The gallery project (initial project) gets an unwarranted asterisk. But revert
+// is disabled." Two facts that trap each other -- Revert is for FILE projects, so the one control
+// that clears an asterisk was disabled on the only project carrying an unearned one.
+//
+// Dirtiness is `docSignature() !== entry.savedSig`, so an entry with NO savedSig is dirty from its
+// first breath. Every path that makes a project goes through stampProjectSaved() EXCEPT the one in
+// init() that registers the first project by hand -- deliberately, to avoid repainting a UI that
+// does not exist yet -- and it skipped the stamp along with the repaint.
+console.log('\n--- a project is born clean, however it was born ---');
+{
+	const src = require('fs').readFileSync(
+		require('path').join(__dirname, '../../js/looped-network.js'), 'utf8');
+	const at = src.indexOf('var firstId = newProjectId()');
+	const branch = src.slice(at, at + 1400);
+	ok('the boot-registered first project records a saved signature',
+		/savedSig: docSignature\(\)/.test(branch), branch.slice(0, 120));
+	// The name is part of the signature, so it has to be set before the signature is taken or the
+	// entry is stamped against a document it does not describe.
+	ok('...taken after its name is set, since the name is part of the signature',
+		branch.indexOf('project.name = firstName') < branch.indexOf('savedSig: docSignature()'));
+	// And the reason it is inline rather than a call: stampProjectSaved() ends in renderTabs().
+	// Comments stripped: the code EXPLAINS why it does not call stampProjectSaved(), and a naive
+	// search finds the explanation and calls it a call. Third time this file's family has met that.
+	ok('...inline, because stampProjectSaved would repaint a tab strip that is not wired yet',
+		!/stampProjectSaved/.test(branch.replace(/^[ \t]*\/\/.*$/gm, '')));
+}
+
 console.log('\n--- a malformed or missing view falls back to fitting ---');
 {
 	ok('no view at all is not a view', !L.validView(null) && !L.validView(undefined));

@@ -50,6 +50,18 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
+- 80|372| **Settings and Labels popovers need a UX pass — they can open taller than the screen and
+  cover their own button.** Tom, 2026-08-15: *"Settings box opens, if its expanded options are too
+  long, too tall for the screen, and its top extends to cover its button. I think we need to focus
+  on optimizing the UX for Settings and Labels now or in a high-priority task."*
+  - Two separate faults in one report: the popover has no height cap and no scroll of its own, and
+  its placement can put it OVER the control that opened it — which is the one place a user is
+  guaranteed to be looking, and the one they will click again to dismiss it.
+  - The Notes popover already has the answer to half of it (`lpn-popover-body`, which scrolls);
+  Settings and Labels do not use it. Placement needs to flip below/above and clamp to the viewport.
+  - Worth doing as one pass over all the popovers rather than per box, since they share
+  `openPopupAt()` and will drift apart otherwise.
+
 - 90|354| **LOCAL MAP COORDINATES: a pipe VANISHES when you zoom in far on a model with real survey coordinates.** Tom,
   2026-08-15, on Elm Street: P11 gone, its five repeated labels still drawn along exactly where it
   should be, P9 beside it drawn normally.
@@ -1848,6 +1860,38 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|373| **The asterisk was appearing for two reasons, neither an edit — DONE 2026-08-15.** Tom:
+  *"I revert, it autozooms and sets the asterisk, I revert, it autozooms and sets the asterisk. It's
+  very hard for me to get all tabs to a clean state so I can reload without a complaint."* Then, on
+  being asked: *"Maybe not one cause. Cause 1 is zoom, I am almost certain. Cause 2 (gallery tab) I
+  don't know."* He was right on both counts.
+  - **CAUSE 1, THE VIEW.** Task 360 put the view into `serializeProject()` so a project reopens where
+    it was left — which is right — and `docSignature()` is built from `serializeProject()`, so
+    PANNING became a modification. The state was inescapable by construction: reverting re-fitted,
+    and the re-fit dirtied it again. **What is stored and what counts as a CHANGE are two lists**,
+    and the backdrop's data URL was already on that seam; the view joins it. Saved with the
+    document, absent from the question "has this been edited".
+  - **CAUSE 2, THE FIRST PROJECT.** Dirtiness is `docSignature() !== entry.savedSig`, so an entry
+    with NO `savedSig` is dirty from its first breath. Every path that makes a project stamps one
+    except `init()`'s, which registers the first project by hand to avoid repainting a UI that does
+    not exist yet — and skipped the stamp along with the repaint. Tom's own clue closed it: *"Asterisk
+    appears when I use the gallery. None before then."* Exactly — the flag is recomputed on
+    `saveToStorage()`, which for an untouched project first happens when you LEAVE it, and using the
+    gallery is what left it.
+  - Its Revert being disabled is correct and was the trap: Revert restores a FILE, so the one control
+    that clears an asterisk was unavailable on the only project with an unearned one.
+  - **"Save all is disabled when there are asterisks present" is probably the same story** — it is
+    gated on `dirtyFileCount() < 2`, which counts FILE projects only, and gallery examples are
+    browser projects that can never be file-saved. Worth re-checking now the spurious asterisks are
+    gone; if two genuinely dirty files still leave it disabled, that is a separate bug.
+
+- 0|374| **Aligned label spacing is half the smaller map dimension — DONE 2026-08-15.** Tom, from the
+  drawing: *"min/4 is too small. Let's try min/2. On my PC, even that is smaller than max/4."* That
+  second sentence is what makes the first safe: on a wide desktop map area half the smaller dimension
+  is still tighter than a quarter of the larger. His fancier option — *"a setting for '% of minimum
+  map dimension for label spacing' default 50%"* — is deliberately NOT built: a number nobody has
+  yet wanted to change is a settings row that costs 26 translations. Evidence first.
 
 - 0|371| **A Text label's mask became a white sheet over the map — DONE 2026-08-15, and it was a
   regression from Task 366 the same day.** Tom, on Net3: *"Something is wrong on Net3, and I don't
