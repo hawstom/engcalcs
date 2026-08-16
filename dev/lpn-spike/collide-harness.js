@@ -145,6 +145,86 @@ console.log('--- immovable obstacles ---');
 		'zero total weight does not produce NaN', JSON.stringify(a.ref.nudge));
 }
 
+
+// ---- pipes as segments --------------------------------------------------
+// Tom, 2026-08-15: "I see that pipes have no model/boxes. They need a model even if their weight is
+// lower than other things... These ideally would make some attempt to avoid these pipe conflicts if
+// it's not too hard to do. It's acceptable as is, but not preferable." WEIGHT.pipe was 0 and pipes
+// were absent from the pass entirely -- a call made in the repo, not by him.
+console.log('--- pushOffSegments ---');
+function lbl(x, y, w, h) {
+	return { ref: { nudge: { x: 0, y: 0 } }, owner: null, movable: true, weight: Collide.WEIGHT.label,
+		base: { x: x, y: y }, yOff: 0, w: w, h: h };
+}
+{
+	// A horizontal pipe straight through the middle of a label: the push must be VERTICAL and must
+	// clear it. Perpendicular, not axis-of-least-overlap -- see the comment in pushOffSegments().
+	const a = lbl(0, 0, 20, 6);
+	Collide.pushOffSegments([a], [{ ax: -100, ay: 3, bx: 100, by: 3, weight: 1 }]);
+	report(a.ref.nudge.x === 0, 'a horizontal pipe pushes straight up or down, never sideways',
+		JSON.stringify(a.ref.nudge));
+	report(Math.abs(a.ref.nudge.y) >= 3, '...far enough to clear the line', JSON.stringify(a.ref.nudge));
+}
+{
+	// THE CASE AN AXIS-ALIGNED PUSH GETS WRONG. A pipe at 30 degrees crossing a wide label: pushing
+	// along the smaller axis slides the label ALONG the pipe as often as off it, and it lands back
+	// on the line a little further down. The push has to be along the segment's normal.
+	const a = lbl(0, 0, 40, 6), ang = Math.PI / 6;
+	Collide.pushOffSegments([a], [{ ax: 20 - 100 * Math.cos(ang), ay: 3 - 100 * Math.sin(ang),
+		bx: 20 + 100 * Math.cos(ang), by: 3 + 100 * Math.sin(ang), weight: 1 }]);
+	const n = a.ref.nudge, along = n.x * Math.cos(ang) + n.y * Math.sin(ang);
+	report(Math.abs(along) < 1e-9, 'a diagonal pipe pushes perpendicular to itself, with no slide along it',
+		'along=' + along.toFixed(6) + ' of ' + Math.hypot(n.x, n.y).toFixed(3));
+}
+{
+	// A pipe that STOPS SHORT of the label must not push it. Without the segment-range test the
+	// infinite line through a stub of pipe on the far side of the map would move labels.
+	const a = lbl(0, 0, 20, 6);
+	Collide.pushOffSegments([a], [{ ax: -100, ay: 3, bx: -50, by: 3, weight: 1 }]);
+	report(a.ref.nudge.x === 0 && a.ref.nudge.y === 0,
+		'a pipe that stops short of the label leaves it alone', JSON.stringify(a.ref.nudge));
+}
+{
+	// An immovable label is not moved by a pipe either -- goal 4, and the same rule the box pass has.
+	const a = lbl(0, 0, 20, 6); a.movable = false; a.weight = Collide.WEIGHT.manual;
+	Collide.pushOffSegments([a], [{ ax: -100, ay: 3, bx: 100, by: 3, weight: 1 }]);
+	report(a.ref.nudge.x === 0 && a.ref.nudge.y === 0, 'a manually placed label is not moved by a pipe');
+}
+{
+	// THE SIDE IS KEPT. A label mostly above the line goes up; mostly below goes down. Choosing the
+	// nearer exit rather than a fixed direction is what stops a label being dragged across its own
+	// pipe to the wrong side of the drawing.
+	const up = lbl(0, 0, 20, 6), down = lbl(0, 0, 20, 6);
+	Collide.pushOffSegments([up], [{ ax: -100, ay: 5, bx: 100, by: 5, weight: 1 }]);
+	Collide.pushOffSegments([down], [{ ax: -100, ay: 1, bx: 100, by: 1, weight: 1 }]);
+	report(up.ref.nudge.y < 0 && down.ref.nudge.y > 0,
+		'each label leaves by the side it was already on',
+		JSON.stringify(up.ref.nudge) + ' / ' + JSON.stringify(down.ref.nudge));
+}
+{
+	// A PREFERENCE, NOT A PROHIBITION (WEIGHT.pipe 0.25). A pipe moves a label a quarter as
+	// insistently as another label would, so in a crowd the labels win and the number ends up lying
+	// across the line -- which is the behaviour the old "pipes are absent by design" comment claimed
+	// and the code did not have.
+	report(Collide.WEIGHT.pipe > 0, 'a pipe is no longer weightless');
+	report(Collide.WEIGHT.pipe < Collide.WEIGHT.node && Collide.WEIGHT.pipe < Collide.WEIGHT.label,
+		'...but pushes less than a node symbol or another label', 'pipe=' + Collide.WEIGHT.pipe);
+}
+{
+	// And it runs inside relax(), not merely as a function nobody calls -- pipes first, so a label
+	// stepped off a line is then judged against its neighbours where it ended up.
+	const a = lbl(0, 0, 20, 6);
+	let asked = 0;
+	Collide.relax([a], [], null, 4, function () { asked++; return [{ ax: -100, ay: 3, bx: 100, by: 3, weight: 1 }]; });
+	// Twice, not four times, and that is the right answer: the first iteration clears the label and
+	// the second finds nothing left to do, so the pass returns early. Asserting 4 would have been
+	// asserting that the convergence check is broken.
+	report(asked === 2, 'relax() asks for the pipes each iteration, and stops as soon as they settle',
+		'asked=' + asked);
+	report(Math.abs(a.ref.nudge.y) >= 3, '...and the label is off the pipe when it is done',
+		JSON.stringify(a.ref.nudge));
+}
+
 // ---- leader samples ----------------------------------------------------
 console.log('--- pushLeaderSamples ---');
 {

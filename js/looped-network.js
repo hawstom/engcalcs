@@ -350,12 +350,22 @@ var EngCalcs = EngCalcs || {};
 	// Final rendered offset from the anchor = the persisted drag offset (or default) PLUS this
 	// element's current collision-avoidance nudge (0,0 for a manually-dragged label -- see
 	// runLabelCollisionAvoidance() below, which only ever nudges labels still at their default).
+	// **A MANUALLY PLACED LABEL TAKES NO NUDGE, AND THAT IS ENFORCED HERE RATHER THAN ASSUMED.**
+	// The collision pass already refuses to move one, so this used to be true by construction --
+	// but only from the next pass onward. A label carrying an automatic nudge at the moment it
+	// becomes manual kept that nudge until something re-ran the pass, which is Tom's rule read
+	// backwards: *"Store the user's leader endpoint and hold it constant. If you extend it, don't
+	// overwrite it. Your extension is temporary."* Reading the nudge here is the last place the
+	// temporary extension could survive its element becoming manual, so it is the right place to
+	// say no. Caught by the leader-angle harness when pipes joined the pass, 2026-08-15.
 	function nodeLabelPos(n) {
-		var base = nodeLabelBase(n), ne = nodeEls[n.id], nudge = (ne && ne.nudge) || { x: 0, y: 0 };
+		var base = nodeLabelBase(n), ne = nodeEls[n.id],
+			nudge = (n.lx !== undefined) ? { x: 0, y: 0 } : ((ne && ne.nudge) || { x: 0, y: 0 });
 		return { x: base.x + nudge.x, y: base.y + nudge.y };
 	}
 	function linkLabelPos(l) {
-		var base = linkLabelBase(l), le = linkEls[l.id], nudge = (le && le.nudge) || { x: 0, y: 0 };
+		var base = linkLabelBase(l), le = linkEls[l.id],
+			nudge = (l.lx !== undefined) ? { x: 0, y: 0 } : ((le && le.nudge) || { x: 0, y: 0 });
 		return { x: base.x + nudge.x, y: base.y + nudge.y };
 	}
 	// The same quantity for one REPEAT of a chain: its own station's point plus the plain default
@@ -1026,6 +1036,21 @@ var EngCalcs = EngCalcs || {};
 		draw(leaders, '#d00');
 		draw(labels, '#00d');
 	}
+	// Every pipe centreline as plain segments, at the low pipe weight -- see pushOffSegments().
+	// Recomputed per iteration like the leaders, for no reason of its own (a pipe does not move
+	// while the pass runs); it costs one array build and keeps the two obstacle sources on the same
+	// contract, so a future vertex-drag-live-relayout cannot go stale.
+	function currentPipeSegments() {
+		var out = [];
+		doc.links.forEach(function (l) {
+			var pts = linkPointList(l), i;
+			for (i = 1; i < pts.length; i++) {
+				out.push({ ax: pts[i - 1].x, ay: pts[i - 1].y, bx: pts[i].x, by: pts[i].y,
+					weight: LPN_COLLIDE_WEIGHT.pipe });
+			}
+		});
+		return out;
+	}
 	function runLabelCollisionAvoidance() {
 		var fs = effectiveFontSize(), labels = [], stationed = [], statics = staticObstacleBoxes();
 		function addDataLabel(holder, base, manual, lineCount) {
@@ -1080,7 +1105,7 @@ var EngCalcs = EngCalcs || {};
 		placeStationedLabels(stationed, statics, fs);
 		// Leaders are rebuilt every iteration (they track their labels); node symbols and Text
 		// labels do not move, so they are built once above.
-		Collide.relax(labels, statics, currentLeaderBoxes, 4);
+		Collide.relax(labels, statics, currentLeaderBoxes, 4, currentPipeSegments);
 		capNudges(labels);
 		// After the cap, so what is drawn is where things actually ended up.
 		drawCollisionBoxes(labels, statics, currentLeaderBoxes());
@@ -9076,6 +9101,16 @@ var EngCalcs = EngCalcs || {};
 	// Pan and pinch are deliberately absent: they move the CAMERA, not the document, and
 	// saveUndoSnapshot() deep-clones `doc`. Undoing a pan is not a thing this stack is for.
 	var LABEL_DRAG_TYPES = { label: true, nodelbl: true, linklbl: true }, LABEL_DRAG_SLOP_PX = 3;
+	// The mark is DECORATION and lives entirely in CSS -- no timer, no cleanup, nothing to leak if
+	// the tab is switched or the element is rebuilt mid-fade. Removing and re-adding the class in
+	// two frames is the standard way to restart a CSS animation; without the reflow read between
+	// them the browser coalesces the two changes and nothing happens.
+	function markJustDragged(el2) {
+		if (!el2 || !el2.classList) { return; }
+		el2.classList.remove('lpn-just-dragged');
+		if (el2.getBoundingClientRect) { el2.getBoundingClientRect(); }
+		el2.classList.add('lpn-just-dragged');
+	}
 	function snapshotDragOnce() {
 		if (drag.snapped) { return; }
 		drag.snapped = true;
@@ -9110,6 +9145,14 @@ var EngCalcs = EngCalcs || {};
 		if (LABEL_DRAG_TYPES[drag.type] && !drag.committed) {
 			if (Math.hypot(p.x - drag.startX, p.y - drag.startY) < LABEL_DRAG_SLOP_PX) { return; }
 			drag.committed = true;
+			// **SAY SO, TEMPORARILY** (Tom, 2026-08-15, on his own accidental drag: *"It's all user
+			// error, and I don't know how to avoid it unless we do something like put a timed box or
+			// highlight on dragged labels for about a minute, maybe fading, maybe dashed, maybe
+			// animated so it's obviously temporary."*). The class drives a dashed outline that fades
+			// out on its own; re-adding it restarts the animation, so each drag re-announces.
+			markJustDragged(drag.type === 'nodelbl' ? (nodeEls[drag.id] && nodeEls[drag.id].text)
+				: drag.type === 'linklbl' ? (linkEls[drag.id] && linkEls[drag.id].text)
+				: (labelEls[drag.id] && labelEls[drag.id].text));
 		}
 		if (drag.type === 'pan') {
 			state.tx = drag.tx0 + (p.x - drag.startX); state.ty = drag.ty0 + (p.y - drag.startY);

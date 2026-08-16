@@ -1968,6 +1968,42 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|381| **Pipes are obstacles now, at a low weight — DONE 2026-08-15.** Tom: *"I see that pipes have
+  no model/boxes. They need a model even if their weight is lower than other things... These ideally
+  would make some attempt to avoid these pipe conflicts if it's not too hard to do. It's acceptable
+  as is, but not preferable."* This reverses a call made in the repo, not by him: `WEIGHT.pipe` was
+  0 and pipes were left out of the pass entirely, on the argument that a number sitting on a pipe
+  still reads. True of one number crossing one pipe; false in a dense network, where it is part of
+  why labels crowd the middle of a drawing while its margins sit empty.
+  - **As SEGMENTS, not sampled into boxes the way leaders are, because the arithmetic does not
+    survive sampling.** Net3 has 119 pipes; chopped at 3 screen pixels a zoomed-in drawing produces
+    thousands of boxes and the pass is labels x boxes x iterations. A segment test is exact and O(1)
+    per pair: project the box's half-extents onto the segment normal, compare with the centre's
+    distance from the line, push by the shortfall.
+  - **PERPENDICULAR, which is the part that matters.** A label lying across a pipe at 30 degrees
+    must step *off* the pipe; an axis-aligned push slides it *along* the pipe as often as off it and
+    it lands back on the line further down. Weight 0.25, so it is a preference — in a crowd the
+    labels win and the number lies across the line, which is the behaviour the old comment claimed.
+  - **It exposed a real ordering defect two functions away.** A label carrying an automatic nudge at
+    the moment it becomes manual kept that nudge until something re-ran the pass —Tom's rule read
+    backwards (*"If you extend it, don't overwrite it. Your extension is temporary."*).
+    `nodeLabelPos()`/`linkLabelPos()` now return no nudge for a manual label, which is the last
+    place the temporary extension could outlive its element becoming manual.
+
+- 0|382| **A label you have just placed says so, and then stops saying it — DONE 2026-08-15.** Tom,
+  after finding his own accidental drag: *"It's all user error, and I don't know how to avoid it
+  unless we do something like put a timed box or highlight on dragged labels for about a minute,
+  maybe fading, maybe dashed, maybe animated so it's obviously temporary."*
+  - A 45-second orange halo on the glyphs, held then fading, driven entirely by CSS: no timer, no
+    element, nothing to clean up if the tab is switched or the label rebuilt mid-fade, and re-adding
+    the class restarts it so each drag re-announces.
+  - **A halo rather than the dashed box he also offered**, and the reason is worth keeping: a dash
+    pattern on a text stroke follows the outline of every letter, so at label size it reads as noise
+    around the characters rather than a frame around the label. A real dashed frame needs a
+    rectangle per label, created and destroyed on a timer — a thing to leak. Same mechanism Task 376
+    proposes for masks.
+  - `prefers-reduced-motion` gets the mark without the fade.
+
 - 0|380| **A dragged label's stored endpoint is in map units, and that is CORRECT — closed
   2026-08-15 as not-a-defect, with one real fix falling out of it.** Tom ruled: *"A user-dragged
   label should remember only the map coordinates of its leader's endpoint. Nothing about the text

@@ -412,6 +412,33 @@ html[lang="zh"] .ec-welcome {
    looking at them (2026-08-15). A leader that cannot be seen is worse than none: the label it
    belongs to then reads as floating free of the network. */
 .lpn-leader { stroke: #000; stroke-width: var(--lpn-hair, 0.1); pointer-events: none; }
+/* A LABEL THE USER HAS JUST PLACED SAYS SO, AND THEN STOPS SAYING IT (Tom, 2026-08-15, after
+   discovering he had dragged a label without meaning to: "put a timed box or highlight on dragged
+   labels for about a minute, maybe fading, maybe dashed, maybe animated so it's obviously
+   temporary"). Dashed rather than solid, and fading rather than dismissed, so it reads as a
+   notification and never as part of the drawing -- there is no button to press and nothing to
+   clean up. 45 seconds, mostly held then fading over the last third, because a mark that fades
+   from the first instant is a mark you can miss by looking away.
+   Painted with a stroke on the text itself, so it needs no element of its own and cannot be left
+   behind by a relayout. */
+.lpn-just-dragged {
+	paint-order: stroke fill;
+	animation: lpn-just-dragged 45s linear forwards;
+}
+/* A HALO ON THE GLYPHS, NOT A DASHED BOX, and the choice is worth recording because Tom offered
+   both ("maybe fading, maybe dashed"). A dash pattern applied to a text stroke follows the outline
+   of every letter, so at this size it reads as noise around the characters rather than as a frame
+   around the label -- and a real dashed frame would need a rectangle element per label, created and
+   destroyed on a timer, which is a thing to leak. The halo needs no element, cannot be orphaned by
+   a relayout, and is the same mechanism Task 376 proposes for masks. */
+@keyframes lpn-just-dragged {
+	0%   { stroke: #e07000; stroke-width: 4px; stroke-opacity: 0.85; }
+	66%  { stroke: #e07000; stroke-width: 4px; stroke-opacity: 0.85; }
+	100% { stroke: #e07000; stroke-width: 4px; stroke-opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.lpn-just-dragged { animation: none; }
+}
 .lpn-draglbl { cursor: move; pointer-events: all; }
 /* Background mask behind a node/link/Text label (Task 146.01) so it stays legible over a backdrop
    image, another element, or a busy area of the map -- sized/positioned entirely from JS

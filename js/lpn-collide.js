@@ -59,7 +59,11 @@ EngCalcs.lpnCollide = (function () {
 	// A manually-dragged label is flagged immovable AND given a very large strength, so
 	// "practically immovable" falls out of the same formula instead of being a second code
 	// path.
-	var WEIGHT = { pipe: 0, node: 0.5, label: 1, leader: 1, manual: 1000 };
+	// pipe 0.25 since 2026-08-15 -- a mild preference, not a prohibition: a label steps off a line
+	// when there is somewhere to step and lies across it when there is not, which is the behaviour
+	// the old "pipes are absent by design" comment claimed and the code did not have. It is a SHARE
+	// of the shortfall rather than a ratio against another weight, because a pipe never moves.
+	var WEIGHT = { pipe: 0.25, node: 0.5, label: 1, leader: 1, manual: 1000 };
 
 	// A leader line is sampled into a chain of small boxes rather than intersected
 	// analytically -- the same overlap/push code then handles it with no second geometry
@@ -119,10 +123,16 @@ EngCalcs.lpnCollide = (function () {
 	// Mutates `ref.nudge` on the movable boxes and returns the number of iterations run --
 	// the caller has already zeroed every nudge, which is what makes the pass IDEMPOTENT:
 	// running it twice on an unchanged drawing gives the same answer as running it once.
-	function relax(labels, statics, leaderBoxesFn, iterations) {
-		var boxes, i, j, iter, moved, iters = iterations === undefined ? 4 : iterations;
+	function relax(labels, statics, leaderBoxesFn, iterations, segmentsFn) {
+		var boxes, segs, i, j, iter, moved, iters = iterations === undefined ? 4 : iterations;
 		for (iter = 0; iter < iters; iter++) {
 			moved = false;
+			// Pipes first, so a label that has been stepped off a line is then judged against its
+			// neighbours where it actually ended up. The reverse order lets a box be settled among
+			// labels and then shoved back into one of them by a pipe, with no iteration left to
+			// notice.
+			segs = segmentsFn ? segmentsFn() : null;
+			if (segs && segs.length && pushOffSegments(labels, segs)) { moved = true; }
 			// The label boxes are first in `boxes`, so an outer loop over just those, with
 			// the inner loop starting at i+1, visits every label-label pair exactly once and
 			// every label-obstacle pair exactly once, and never wastes a comparison on two
@@ -160,6 +170,74 @@ EngCalcs.lpnCollide = (function () {
 		return iters;
 	}
 
+	// **PIPES, AS SEGMENTS RATHER THAN AS SAMPLED BOXES** (Tom, 2026-08-15: *"I see that pipes have
+	// no model/boxes. They need a model even if their weight is lower than other things... These
+	// ideally would make some attempt to avoid these pipe conflicts if it's not too hard to do. It's
+	// acceptable as is, but not preferable."*)
+	//
+	// Reversing a call made here, not by him: WEIGHT.pipe was 0 and pipes were left out of the pass
+	// entirely, on the argument that "a number sitting on a pipe still reads perfectly well." True
+	// of one number crossing one pipe; false in a dense network, where it is part of why labels
+	// crowd the middle of a drawing while its margins sit empty.
+	//
+	// **NOT sampled into boxes the way a leader is, because the arithmetic does not survive it.**
+	// Net3 has 119 pipes; chopped at 3 screen pixels a zoomed-in drawing would produce thousands of
+	// boxes, and the pass is labels x boxes x iterations. A segment test is exact, is O(1) per
+	// pair, and needs nothing sampled: project the box's half-extents onto the segment's normal to
+	// get how far the box reaches that way, compare against the box centre's distance from the
+	// line, and push along the normal by the shortfall.
+	//
+	// PERPENDICULAR, not along the smaller axis. A label lying across a pipe at 30 degrees should
+	// step off the pipe, which is sideways from the pipe -- an axis-aligned push sends it along the
+	// pipe as often as off it, and it lands back on the line a little further down.
+	function pushOffSegments(labels, segments) {
+		var i, j, A, seg, At, cx, cy, dx, dy, len, nx, ny, reach, dist, gap, share, moved = false;
+		for (i = 0; i < labels.length; i++) {
+			A = labels[i];
+			if (!A.movable) { continue; }
+			At = boxTopLeft(A);
+			cx = At.x + A.w / 2; cy = At.y + A.h / 2;
+			for (j = 0; j < segments.length; j++) {
+				seg = segments[j];
+				dx = seg.bx - seg.ax; dy = seg.by - seg.ay;
+				len = Math.hypot(dx, dy);
+				if (len === 0) { continue; }
+				nx = -dy / len; ny = dx / len;
+				// How far this box reaches along the segment's normal: the support function of an
+				// axis-aligned box, which is why no rotation is needed here yet.
+				reach = Math.abs(A.w / 2 * nx) + Math.abs(A.h / 2 * ny);
+				dist = (cx - seg.ax) * nx + (cy - seg.ay) * ny;
+				if (Math.abs(dist) >= reach) { continue; }        // clear of the infinite line
+				// ...and the segment has to actually pass through the box, not merely lie on the
+				// line that does. Without this a label is pushed off a pipe that stops short of it.
+				if (!rangeHitsBox(seg, At, A)) { continue; }
+				gap = reach - Math.abs(dist);
+				share = (gap + 0.1) * (seg.weight === undefined ? WEIGHT.pipe : seg.weight);
+				if (share <= 0) { continue; }
+				moved = true;
+				// Away from the line, keeping the side the box is already on. A box sitting exactly
+				// on the centreline (dist 0) has no preferred side, so it takes the normal's.
+				if (dist < 0) { A.ref.nudge.x -= nx * share; A.ref.nudge.y -= ny * share; }
+				else { A.ref.nudge.x += nx * share; A.ref.nudge.y += ny * share; }
+			}
+		}
+		return moved;
+	}
+	// Liang-Barsky, inline rather than reaching into lpn-geom.js: this file is deliberately free of
+	// dependencies so a harness can load it alone.
+	function rangeHitsBox(seg, At, A) {
+		var dx = seg.bx - seg.ax, dy = seg.by - seg.ay, t0 = 0, t1 = 1, i, r,
+			p = [-dx, dx, -dy, dy],
+			q = [seg.ax - At.x, At.x + A.w - seg.ax, seg.ay - At.y, At.y + A.h - seg.ay];
+		for (i = 0; i < 4; i++) {
+			if (p[i] === 0) { if (q[i] < 0) { return false; } continue; }
+			r = q[i] / p[i];
+			if (p[i] < 0) { if (r > t1) { return false; } if (r > t0) { t0 = r; } }
+			else { if (r < t0) { return false; } if (r < t1) { t1 = r; } }
+		}
+		return true;
+	}
+
 	// Do two PLAIN rects {x, y, w, h} overlap? The same test relax() runs inline, exposed for
 	// callers that need to ASK rather than to push -- specifically the aligned-pipe-label station
 	// search, which cannot use the relaxation at all: an aligned label is not free to move in x and
@@ -180,6 +258,7 @@ EngCalcs.lpnCollide = (function () {
 		LEADER_SAMPLE_MAX: LEADER_SAMPLE_MAX,
 		LEADER_SAMPLE_HALF_PX: LEADER_SAMPLE_HALF_PX,
 		pushLeaderSamples: pushLeaderSamples,
+		pushOffSegments: pushOffSegments,
 		boxTopLeft: boxTopLeft,
 		relax: relax
 	};
