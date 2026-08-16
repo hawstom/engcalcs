@@ -191,6 +191,28 @@ define('EC_DEFAULT_UNIT_SET', (isset($clanguage) && $clanguage === 'en') ? 'us' 
  * re-derives all of them from these same definitions and fails the build on any
  * disagreement, so this comment is checked rather than merely asserted.
  *
+ * WHICH FOOT, AND WHY IT IS NOT THE SURVEY FOOT (Tom, 2026-08-16). The INTERNATIONAL
+ * foot, 0.3048 m exactly since 1959, is the right one and the choice is deliberate.
+ * The US SURVEY foot is 1200/3937 m = 0.30480060960122 m, 2 ppm larger, and NIST/NGS
+ * retired it for new work at the end of 2022. It survives only in state plane
+ * coordinates and land surveying -- i.e. in COORDINATES, never in a pipe diameter, a
+ * flow or a pressure head, which are international feet everywhere including EPANET's
+ * own MperFT = 0.3048. It cannot arise here at all, because lpn_ has no georeferencing:
+ * dev/looped-network-calculator-scope.md rules out coordinate reference systems,
+ * reprojection and datum handling outright. If georeferenced import is ever built, this
+ * is the paragraph to come back to -- it is the one place the survey foot could enter.
+ *
+ * WE DO NOT COPY EPANET'S CONSTANTS, and it is worth saying why, because "follow
+ * EPANET" is otherwise the obvious instinct. EPANET is not more precise than we were --
+ * its types.h carries 5-significant-figure constants of its own (GPMperCFS 448.831
+ * against an exact 448.83116883, PSIperFT 0.4333 against 0.4335275), so adopting them
+ * would import their rounding AND re-break internal coherence, since their gpm and
+ * their ft imply different feet. Exact is also independent of which EPANET version we
+ * happen to vendor. This costs us nothing at the interop seam: an .inp round trip is
+ * made lossless by passing the file's own number through when the display unit already
+ * matches, not by any choice of constant -- exact factors do NOT round-trip in doubles
+ * (150 * 0.3048 * (1/0.3048) === 149.99999999999997).
+ *
  * The exact definitions used:
  *     1 ft   = 0.3048 m                (exact, international foot)
  *     1 in   = 0.0254 m                (exact)
