@@ -339,5 +339,42 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 		'delete and select-popup are both inside the gated pointerup');
 }
 
+// ---- The target panel must hang off an element that is really in the DOM -------------------
+//
+// Tom, 2026-08-16: "The Background image Move destination selector is not visible on the screen."
+// It was anchored on #lpn_backdrop_menu, the "Background image…" BUTTON. Task 375's follow-up took
+// that button off the toolbar, so wireBackdropMenu() is now called with no argument and its
+// `if (into) { into.appendChild(menu); }` appends nothing. getElementById returned null and
+// getBoundingClientRect() threw while the ARGUMENT was being evaluated -- before openPanelAtAnchor()
+// could set display:block. So the panel never appeared at all, and Move dead-ended after its second
+// alert with nothing on screen and nothing in the status line.
+//
+// STRUCTURAL, not behavioural, and deliberately so: reproducing it needs the null, and a stub that
+// supplies a helpful fake element is exactly the stub that removes the coupling under test. The
+// invariant is that a panel anchor is STATIC MARKUP, which is a fact about two files and readable
+// from both. Generalised past the backdrop for the obvious reason -- the next panel to be anchored
+// on a JS-built element fails the same way, silently.
+{
+	const php = fs.readFileSync(path.join(__dirname, '../../Looped-Network.php'), 'utf8');
+	const fn = extract('showBackdropTargetPanel');
+	// Comments stripped, or this reads the paragraph ABOVE naming the very id it is banning --
+	// which is how the first draft of this check failed against the fix it was written for.
+	const code = fn.replace(/\/\/[^\n]*/g, '');
+
+	const anchorIds = (code.match(/getElementById\('(lpn_[a-z_0-9]+)'\)/g) || [])
+		.map(m => m.replace(/.*'(lpn_[a-z_0-9]+)'.*/, '$1'))
+		.filter(id => id !== 'lpn_backdrop_target_panel' && id !== 'lpn_backdrop_target_continue'
+			&& id !== 'lpn_backdrop_target_mode');
+	const notStatic = anchorIds.filter(id => !php.includes(`id="${id}"`));
+	report(notStatic.length === 0,
+		'every element it looks up is static markup in Looped-Network.php',
+		notStatic.length ? `built in JS, so it can be null: ${notStatic.join(', ')}` : anchorIds.join(', '));
+
+	// A missing anchor must be a MISPLACED panel, never an invisible one. The user can work with a
+	// panel in the wrong corner; they cannot work with one that never rendered.
+	report(/anchor \?/.test(code) && /openPanelAtAnchor/.test(fn),
+		'a missing anchor falls back to a rect rather than throwing');
+}
+
 console.log(`\n${checks - failures}/${checks} passed`);
 process.exit(failures ? 1 : 0);

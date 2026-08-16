@@ -219,7 +219,11 @@ console.log('\n-- every popover goes through the one placer, which is the whole 
 		'Settings');
 	report(/openPanelAtAnchor\(popup, anchor\.getBoundingClientRect\(\), !!level\)/.test(extract('openMenu')),
 		'the menus and their fly-outs');
-	report(/openPanelAtAnchor\(panel, menu\.getBoundingClientRect\(\)\)/.test(extract('showBackdropTargetPanel')),
+	// Matched on the PLACER, not on the anchor expression. This read `panel, menu.getBounding...`
+	// until 2026-08-16, when the anchor moved off the removed toolbar button and gained a fallback
+	// -- and the assertion failed for a fix rather than for a defect. Task 372's rule is that the
+	// panel goes through openPanelAtAnchor(); which rect it is handed is that panel's own business.
+	report(/openPanelAtAnchor\(panel,/.test(extract('showBackdropTargetPanel')),
 		'the backdrop-position panel');
 	report(/fitPanelToViewport\(popup\)/.test(extract('toggleNotesPopup')), 'the Notes box');
 	report(/fitPanelToViewport\(popup\)/.test(extract('openPopupAt')), 'and the property popup');

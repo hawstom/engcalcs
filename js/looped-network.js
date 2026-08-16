@@ -3882,10 +3882,19 @@ var EngCalcs = EngCalcs || {};
 	}
 	function showBackdropTargetPanel(refWorld) {
 		var panel = document.getElementById('lpn_backdrop_target_panel'),
-			menu = document.getElementById('lpn_backdrop_menu');
+			// ANCHORED ON THE MENUBAR, and it must stay something that is always in the DOM.
+			// This hung off #lpn_backdrop_menu until Task 375's follow-up took the Background image
+			// button off the toolbar: wireBackdropMenu() is now called with no argument and its
+			// `if (into) { into.appendChild(menu); }` appends nothing, so the id resolved to null and
+			// getBoundingClientRect() threw while evaluating the ARGUMENT -- before openPanelAtAnchor()
+			// could set display:block. The panel never appeared and Move dead-ended after its second
+			// alert with nothing on screen. Reported by Tom 2026-08-16.
+			anchor = document.getElementById('lpn_menubar');
 		// Placed and height-fitted by the one shared placer (Task 372), like every other panel that
-		// hangs off a control.
-		openPanelAtAnchor(panel, menu.getBoundingClientRect());
+		// hangs off a control. The fallback is a real rect, not a throw: a missing anchor is a
+		// misplaced panel, which the user can still use, where a throw is an invisible one.
+		openPanelAtAnchor(panel, anchor ? anchor.getBoundingClientRect()
+			: { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0 });
 		activeCancel = function () { panel.style.display = 'none'; setRegMode(false); };
 		document.getElementById('lpn_backdrop_target_continue').onclick = function () {
 			var mode = document.getElementById('lpn_backdrop_target_mode').value, pc = EngCalcs.pageConfig || {};
