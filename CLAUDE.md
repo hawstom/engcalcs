@@ -803,7 +803,8 @@ belongs to IS the budgeting decision.
 **Tier 1 — automated, seconds, free. `sh dev/scripts/check_all.sh` before every commit.**
 Sixteen checks: PHP and JS syntax, HTML balance on every page, the pageConfig PHP→JS bridge, tip
 markup via the helpers, language rules A–D, gloss pointers, layout tags, the coverage declaration, payload
-freshness, **roadmap ID uniqueness and closure** (priority 0 iff under `## Completed`), the lpn harnesses, the calculator harnesses (both counts derived from the glob, never
+freshness, **roadmap ID uniqueness and closure** (unique across ROADMAP.md and the closed archive;
+priority 0 means the block is in the archive and nowhere else), the lpn harnesses, the calculator harnesses (both counts derived from the glob, never
 typed — the lpn one read "12" while 15 were actually running), plus three advisory ones (key
 hygiene, size budget, English drift). Blocking failures exit 1. **This list used to live only in prose and in whoever remembered
 it** — a check nobody runs is indistinguishable from a check that does not exist, which is the same
@@ -1200,7 +1201,8 @@ Non-web files live in `dev/` (blocked from web access via `dev/.htaccess`):
 
 | Path | Purpose |
 |------|---------|
-| `dev/ROADMAP.md` | Prioritized improvement roadmap |
+| `dev/ROADMAP.md` | Prioritized improvement roadmap — OPEN tasks only |
+| `dev/roadmap-closed-archive.md` | Every closed task, one summary block each. Closing a task means summarizing it into here and deleting it from the roadmap |
 | `dev/cross-platform-planning.md` | CC/CP collaboration conventions |
 | `dev/scripts/` | CLI tools: parity checker, scaffold, translation driver, etc. |
 | `dev/calc-spike/` | Headless behavioural tests for the non-lpn calculators (Task 292). See its README |

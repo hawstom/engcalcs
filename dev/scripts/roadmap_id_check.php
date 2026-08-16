@@ -1,31 +1,41 @@
 <?php
 /**
- * Checks dev/ROADMAP.md's structural invariants: every task ID is unique, priority 0 means
- * completed, every Task number cited from CODE resolves, and every task in the archive still has a
- * stub in the roadmap.
+ * Checks the two roadmap files together: every task ID is unique across the pair, open work lives
+ * in ROADMAP.md and closed work in the archive, every Task number cited from CODE resolves, and no
+ * block runs past the length budget.
  *
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
  *
- * A task ID is a permanent handle — prose across ROADMAP.md, CLAUDE.md and dev/*.md cites tasks by
+ * TWO FILES, ONE NAMESPACE (Task 388, 2026-08-16). `dev/ROADMAP.md` holds only OPEN tasks;
+ * `dev/roadmap-closed-archive.md` holds every closed one as a summary block. Before this the
+ * roadmap kept a stub for each closed task AND the archive kept its narrative, so a closed task was
+ * written twice and the file had grown to 4,247 lines of which 2,295 were finished work.
+ *
+ * A task ID is a permanent handle — prose across both files, CLAUDE.md and dev/*.md cites tasks by
  * number, so two tasks sharing one makes every such reference ambiguous, silently. Six duplicates
  * had accumulated by 2026-08-14 and were renumbered then.
  *
- * Priority 0 is the file's ONLY signal for "closed", so it must not carry a second meaning. Tasks
- * 306 and 307 sat at 0 while BLOCKED on Task 248, which made every count of open work read them as
- * finished; Tasks 195 and 212 were genuinely done but had never been moved into `## Completed`,
- * the recurring half-close. Both shapes look identical from outside and both are caught here: a
- * priority-0 task belongs under `## Completed`, and nothing else does.
+ * Priority 0 is the only signal for "closed", so it must not carry a second meaning. Tasks 306 and
+ * 307 sat at 0 while BLOCKED on Task 248, which made every count of open work read them as
+ * finished; Tasks 195 and 212 were genuinely done but had never been moved. Both shapes look
+ * identical from outside and both are caught here.
  *
  * WHEN THIS FAILS:
  *   - duplicate ID: renumber the newer task to the next free ID, preferring a closed one, and grep
  *     `Task <id>` across dev/*.md and CLAUDE.md to move its references with it. Usually one member
  *     of a colliding pair has no references at all, and that is the one to move.
- *   - priority 0 outside `## Completed`: if it is done, MOVE the block (and compress it to <=5
- *     lines, archiving any narrative to `dev/roadmap-closed-archive.md`). If it is blocked or
- *     parked, it is not closed — give it a real priority, however low.
- *   - a non-zero priority inside `## Completed`: either the task reopened, in which case move it
- *     back out, or the close never set the priority.
+ *   - the SAME ID in both files: the task was closed by copying rather than moving, or an OPEN task
+ *     nested inside a parent's block travelled with the parent when the parent was archived. Decide
+ *     which file it belongs in and delete the other copy. (Task 184's block once carried three open
+ *     tasks inside it — 185, 192, 201 — and archiving the parent took all three out of the roadmap.)
+ *   - priority 0 in ROADMAP.md: if it is done, SUMMARIZE the block into the archive — what changed,
+ *     where it lives, the one finding a future reader could not re-derive — and delete it here. If
+ *     it is blocked or parked, it is not closed: give it a real priority, however low.
+ *   - a non-zero priority in the archive: either the task reopened, in which case move the block
+ *     back to ROADMAP.md, or the close never set the priority.
+ *   - a block past the length budget: see the LENGTH DISCIPLINE section at the top of ROADMAP.md.
+ *     Advisory by default because judgement decides what earns its lines; `--strict` fails on it.
  *
  * No exemption list, deliberately (Tom, 2026-08-14) — same principle as the translation exempt
  * list: never to quiet a number you don't want to fix.
@@ -33,71 +43,98 @@
  * Usage:
  *   php dev/scripts/roadmap_id_check.php            # exit 1 on any duplicate or misplaced task
  *   php dev/scripts/roadmap_id_check.php --verbose  # also report the next free ID
+ *   php dev/scripts/roadmap_id_check.php --strict   # also fail on an over-long block
  */
 
-$root = realpath(__DIR__ . '/../..');
-$path = $root . '/dev/ROADMAP.md';
+$root    = realpath(__DIR__ . '/../..');
+$openPath    = $root . '/dev/ROADMAP.md';
+$closedPath  = $root . '/dev/roadmap-closed-archive.md';
 $verbose = in_array('--verbose', $argv, true);
+$strict  = in_array('--strict', $argv, true);
 
-if (!is_readable($path)) {
-    fwrite(STDERR, "roadmap_id_check: cannot read $path\n");
-    exit(2);
+// The budget from ROADMAP.md's own LENGTH DISCIPLINE section: an open task caps at ~15 lines, and a
+// closed one is a summary at <=5. Both are given slack here so the check reports the outliers
+// rather than the merely wordy -- it is a tripwire on the 1,100-word block, not a formatter.
+$LIMIT = array('open' => 20, 'closed' => 14);
+
+$files = array('open' => $openPath, 'closed' => $closedPath);
+foreach ($files as $which => $p) {
+    if (!is_readable($p)) {
+        fwrite(STDERR, "roadmap_id_check: cannot read $p\n");
+        exit(2);
+    }
 }
 
-$lines = file($path, FILE_IGNORE_NEW_LINES);
-
 // A task line is `- <priority>|<id>| ...` at the very start of a line. IDs may be decimal
-// (146.06), so they are compared as strings — 146.6 and 146.06 are different tasks.
-$seen = array();
-$misplaced = array();   // priority 0 above the `## Completed` heading
-$unclosed = array();    // priority > 0 below it
-$inCompleted = false;
-foreach ($lines as $i => $line) {
-    if (preg_match('/^##\s+Completed\s*$/', $line)) {
-        $inCompleted = true;
-    }
-    if (!preg_match('/^- (\d+)\|([0-9.]+)\|/', $line, $m)) {
-        continue;
-    }
-    $id = $m[2];
-    // Trim the title down to something that fits one terminal line.
-    $title = trim(preg_replace('/^- \d+\|[0-9.]+\|(\[H\])?\s*/', '', $line));
-    $title = trim(str_replace('**', '', $title));
-    if (mb_strlen($title) > 60) {
-        $title = mb_substr($title, 0, 57) . '...';
-    }
-    $seen[$id][] = array('line' => $i + 1, 'priority' => $m[1], 'title' => $title);
+// (146.06), so they are compared as strings -- 146.6 and 146.06 are different tasks.
+$seen  = array();   // id => list of hits, across both files
+$wrongFile = array();
+$long  = array();
 
-    $entry = array('line' => $i + 1, 'id' => $id, 'priority' => $m[1], 'title' => $title);
-    if ($m[1] === '0' && !$inCompleted) {
-        $misplaced[] = $entry;
-    } elseif ($m[1] !== '0' && $inCompleted) {
-        $unclosed[] = $entry;
+foreach ($files as $which => $p) {
+    $lines = file($p, FILE_IGNORE_NEW_LINES);
+    $cur = null;
+    $emit = function ($cur) use (&$long, $LIMIT, $which) {
+        if ($cur !== null && $cur['n'] > $LIMIT[$which]) {
+            $long[] = $cur + array('which' => $which);
+        }
+    };
+    foreach ($lines as $i => $line) {
+        if (!preg_match('/^- (\d+)\|([0-9.]+)\|/', $line, $m)) {
+            if ($cur !== null) { $cur['n']++; }
+            continue;
+        }
+        $emit($cur);
+        $id = $m[2];
+        // Trim the title down to something that fits one terminal line.
+        $title = trim(preg_replace('/^- \d+\|[0-9.]+\|(\[H\])?\s*/', '', $line));
+        $title = trim(str_replace('**', '', $title));
+        if (mb_strlen($title) > 60) {
+            $title = mb_substr($title, 0, 57) . '...';
+        }
+        $hit = array('line' => $i + 1, 'id' => $id, 'priority' => $m[1], 'title' => $title, 'file' => $which);
+        $seen[$id][] = $hit;
+        $cur = $hit + array('n' => 1);
+
+        $closed = ($m[1] === '0');
+        if ($closed !== ($which === 'closed')) {
+            $wrongFile[] = $hit;
+        }
     }
+    $emit($cur);
 }
 
 if (!$seen) {
     fwrite(STDERR, "roadmap_id_check: no task lines matched — has the ROADMAP format changed?\n");
     exit(2);
 }
-if (!$inCompleted) {
-    // Never saw the heading, so every task counted as open and the placement half of this check
-    // silently measured nothing. That is a format change, not a pass.
-    fwrite(STDERR, "roadmap_id_check: no `## Completed` heading — has the ROADMAP format changed?\n");
-    exit(2);
+// Both files must actually have contributed, or half this check silently measured nothing.
+foreach (array('open', 'closed') as $which) {
+    $any = false;
+    foreach ($seen as $hits) {
+        foreach ($hits as $h) { if ($h['file'] === $which) { $any = true; break 2; } }
+    }
+    if (!$any) {
+        fwrite(STDERR, "roadmap_id_check: no task lines in the $which file — has the format changed?\n");
+        exit(2);
+    }
 }
 
 $failed = false;
 
 $dupes = array();
+$straddle = array();
 foreach ($seen as $id => $hits) {
-    if (count($hits) > 1) {
+    if (count($hits) < 2) { continue; }
+    $files_used = array_unique(array_column($hits, 'file'));
+    if (count($files_used) > 1) {
+        $straddle[$id] = $hits;
+    } else {
         $dupes[$id] = $hits;
     }
 }
-
-// Sort numerically so any report reads in task order.
 uksort($dupes, function ($a, $b) { return $a <=> $b; });
+uksort($straddle, function ($a, $b) { return $a <=> $b; });
 
 if ($dupes) {
     echo "DUPLICATE ROADMAP IDS (" . count($dupes) . "):\n";
@@ -105,42 +142,49 @@ if ($dupes) {
         echo "\n  Task $id is used " . count($hits) . " times:\n";
         foreach ($hits as $h) {
             $state = $h['priority'] === '0' ? 'closed' : 'OPEN (prio ' . $h['priority'] . ')';
-            printf("    line %-6d %-16s %s\n", $h['line'], $state, $h['title']);
+            printf("    %-7s line %-6d %-16s %s\n", $h['file'], $h['line'], $state, $h['title']);
         }
     }
-    echo "\nAn ID is a permanent handle: prose across ROADMAP.md, CLAUDE.md and dev/*.md cites\n";
-    echo "tasks by number, and a shared number makes every one of those references ambiguous.\n";
+    echo "\nAn ID is a permanent handle: prose across both roadmap files, CLAUDE.md and dev/*.md\n";
+    echo "cites tasks by number, and a shared number makes every one of those references ambiguous.\n";
     echo "Renumber the NEWER task (prefer a closed one) to the next free ID, and move any\n";
     echo "`Task <id>` references with it. A pair where one task is still OPEN is the urgent kind.\n";
     $failed = true;
 }
 
-if ($misplaced) {
-    if (!empty($failed)) { echo "\n"; }
-    echo "PRIORITY 0 OUTSIDE `## Completed` (" . count($misplaced) . "):\n\n";
-    foreach ($misplaced as $h) {
-        printf("    line %-6d Task %-8s %s\n", $h['line'], $h['id'], $h['title']);
+if ($straddle) {
+    if ($failed) { echo "\n"; }
+    echo "THE SAME ID IN BOTH FILES (" . count($straddle) . "):\n";
+    foreach ($straddle as $id => $hits) {
+        echo "\n  Task $id:\n";
+        foreach ($hits as $h) {
+            printf("    %-7s line %-6d prio %-4s %s\n", $h['file'], $h['line'], $h['priority'], $h['title']);
+        }
     }
-    echo "\nPriority 0 is the file's only signal for `closed`, so it must not mean anything else.\n";
-    echo "If the task is DONE, move the block under `## Completed` and compress it to <=5 lines,\n";
-    echo "archiving the narrative to dev/roadmap-closed-archive.md. If it is BLOCKED or parked, it\n";
-    echo "is not closed — give it a real priority, however low, so it still counts as open work.\n";
+    echo "\nA task lives in exactly one file: ROADMAP.md while it is open, the archive once closed.\n";
+    echo "Two copies means the close COPIED instead of moving, or an open task nested inside a\n";
+    echo "parent's block travelled with the parent into the archive. Keep one, delete the other.\n";
     $failed = true;
 }
 
-if ($unclosed) {
-    if (!empty($failed)) { echo "\n"; }
-    echo "NON-ZERO PRIORITY INSIDE `## Completed` (" . count($unclosed) . "):\n\n";
-    foreach ($unclosed as $h) {
-        printf("    line %-6d Task %-8s prio %-4s %s\n", $h['line'], $h['id'], $h['priority'], $h['title']);
+if ($wrongFile) {
+    if ($failed) { echo "\n"; }
+    echo "TASK IN THE WRONG FILE (" . count($wrongFile) . "):\n\n";
+    foreach ($wrongFile as $h) {
+        $want = $h['priority'] === '0' ? 'the archive' : 'ROADMAP.md';
+        printf("    %-7s line %-6d Task %-8s prio %-4s -> belongs in %s\n",
+               $h['file'], $h['line'], $h['id'], $h['priority'], $want);
     }
-    echo "\nEither the task reopened — in which case move the block back out — or the close set the\n";
-    echo "priority nowhere. Closing is both edits: priority to 0 AND the move.\n";
+    echo "\nPriority 0 is the only signal for `closed`, so it must not mean anything else.\n";
+    echo "DONE: summarize the block into dev/roadmap-closed-archive.md -- what changed, where it\n";
+    echo "lives, and any finding a future reader could not re-derive -- and delete it from the\n";
+    echo "roadmap. BLOCKED or parked: it is not closed, so give it a real priority, however low.\n";
+    echo "Reopened: move the block back to ROADMAP.md and give it a priority.\n";
     $failed = true;
 }
 
 // ---------------------------------------------------------------------------------------------
-// THIRD CHECK: does every "Task <n>" cited from CODE resolve to a real block?
+// Does every "Task <n>" cited from CODE resolve to a real block, in either file?
 //
 // A task ID is a permanent handle, and the whole value of citing one from a comment is that a
 // reader can go and find out WHY. A citation that resolves to nothing spends the reader's trust
@@ -153,13 +197,12 @@ if ($unclosed) {
 // in a comment while living in different namespaces. That is an easy mistake to repeat, which is
 // why it is now a check instead of a paragraph.
 //
-// CODE ONLY, deliberately. Prose in dev/*.md cites freely and sometimes speculatively, and the
-// archive quotes old prose verbatim; policing that would be noise. A comment in a shipped file is
-// a different promise.
+// CODE ONLY, deliberately. Prose in dev/*.md cites freely and sometimes speculatively; policing
+// that would be noise. A comment in a shipped file is a different promise.
 $citeFiles = array_merge(
-    glob(__DIR__ . '/../../js/*.js'),
-    glob(__DIR__ . '/../../lib/*.php'),
-    glob(__DIR__ . '/../../*.php')
+    glob($root . '/js/*.js'),
+    glob($root . '/lib/*.php'),
+    glob($root . '/*.php')
 );
 $dangling = array();
 foreach ($citeFiles as $f) {
@@ -167,11 +210,12 @@ foreach ($citeFiles as $f) {
     if (!preg_match_all('/\bTask (\d+(?:\.\d+)?)\b/', $src, $m)) { continue; }
     foreach (array_unique($m[1]) as $cited) {
         if (isset($seen[$cited])) { continue; }
-        $dangling[] = substr($f, strlen(__DIR__ . '/../../')) . '  ->  Task ' . $cited;
+        $dangling[] = substr($f, strlen($root) + 1) . '  ->  Task ' . $cited;
     }
 }
-if (!empty($dangling)) {
-    echo "\nCITED FROM CODE BUT NOT A ROADMAP TASK (" . count($dangling) . "):\n\n";
+if ($dangling) {
+    if ($failed) { echo "\n"; }
+    echo "CITED FROM CODE BUT NOT A ROADMAP TASK (" . count($dangling) . "):\n\n";
     foreach (array_unique($dangling) as $d) { echo "    $d\n"; }
     echo "\nA comment that cites a task number is a promise the reader can go and find out why.\n";
     echo "Either the block exists under a different ID, or the number is a SPRINT id rather than a\n";
@@ -181,56 +225,41 @@ if (!empty($dangling)) {
 }
 
 // ---------------------------------------------------------------------------------------------
-// FOURTH CHECK: does every task in the ARCHIVE still have a stub in ROADMAP.md?
-//
-// The archive is the LONG FORM of a closed task; the roadmap keeps a <=5-line stub pointing here.
-// So an ID in the archive with no line in ROADMAP.md means a task fell out of the file entirely --
-// and the way that happens is not carelessness, it is nesting: an OPEN task written inside a
-// parent's block travels with the parent when the parent is archived, and nothing about the move
-// says so.
-//
-// Found 2026-08-14 closing Task 184, whose 288-line block had THREE open tasks living inside it
-// (185 Match/Copy, 192 context menus, 201 scenario UI). Moving the parent silently took all three
-// out of the roadmap. Only 185 was noticed, and only because live code happened to cite it -- the
-// other two were recovered by diffing the ID list against git, which is not a thing anyone will
-// remember to do. This check finds all three in a second.
-//
-// It also catches the plainer mistake of archiving a task's narrative and forgetting the stub,
-// which leaves a closed task invisible to anyone reading the roadmap alone.
-$archivePath = $root . '/dev/roadmap-closed-archive.md';
-if (is_readable($archivePath)) {
-    $orphans = array();
-    foreach (file($archivePath, FILE_IGNORE_NEW_LINES) as $i => $line) {
-        if (!preg_match('/^- (\d+)\|([0-9.]+)\|/', $line, $m)) { continue; }
-        if (isset($seen[$m[2]])) { continue; }
-        $orphans[$m[2]] = $i + 1;
+// Block length. ROADMAP.md's own LENGTH DISCIPLINE section sets the budget and states the test:
+// would a competent person reading the short version DO SOMETHING DIFFERENT if this line were
+// there? A script cannot ask that, so this only reports the outliers and leaves the judgement to
+// whoever is editing. Advisory: expansion IS earned sometimes, and failing the build on prose
+// would push the next writer to split one long block into two short ones, which is worse.
+if ($long) {
+    if ($failed) { echo "\n"; }
+    usort($long, function ($a, $b) { return $b['n'] <=> $a['n']; });
+    echo ($strict ? 'OVER-LONG BLOCKS' : 'ADVISORY: over-long blocks') . ' (' . count($long) . "):\n\n";
+    foreach ($long as $h) {
+        printf("    %-7s line %-6d Task %-8s %3d lines (budget %d)  %s\n",
+               $h['file'], $h['line'], $h['id'], $h['n'], $LIMIT[$h['which']], $h['title']);
     }
-    if ($orphans) {
-        if (!empty($failed)) { echo "\n"; }
-        echo "IN THE ARCHIVE BUT NOT IN THE ROADMAP (" . count($orphans) . "):\n\n";
-        foreach ($orphans as $id => $ln) {
-            printf("    archive line %-6d Task %s\n", $ln, $id);
-        }
-        echo "\nThe archive is the long form of a task the roadmap still lists as a stub, so an ID\n";
-        echo "here and nowhere there means the task left the roadmap altogether. The usual cause is\n";
-        echo "NESTING: an open task written inside a parent's block travels with the parent when the\n";
-        echo "parent is archived. Move it back out to ROADMAP.md at its own priority -- or, if it is\n";
-        echo "genuinely closed, write its stub under `## Completed`.\n";
-        $failed = true;
-    }
+    echo "\nBudget: an open task ~15 lines, a closed summary <=5 (slack allowed above before this\n";
+    echo "reports). Past that the content is a dev/*.md document and the task is one line pointing\n";
+    echo "at it. Expansion is earned only by a decision with a real rejected alternative, a measured\n";
+    echo "number, a non-obvious blocker, or a correction of something recorded wrong here.\n";
+    if ($strict) { $failed = true; }
 }
 
-if (!empty($failed)) {
+if ($failed) {
     exit(1);
 }
 
-$max = 0;
-foreach (array_keys($seen) as $id) {
-    if ((int)$id > $max) { $max = (int)$id; }
+$nOpen = 0;
+$nClosed = 0;
+foreach ($seen as $hits) {
+    if ($hits[0]['file'] === 'open') { $nOpen++; } else { $nClosed++; }
 }
-
-echo "PASS: all " . count($seen) . " roadmap IDs are unique, and every priority-0 task is under `## Completed`.\n";
+echo "PASS: $nOpen open + $nClosed closed = " . count($seen) . " unique roadmap IDs, each in the right file.\n";
 if ($verbose) {
+    $max = 0;
+    foreach (array_keys($seen) as $id) {
+        if ((int)$id > $max) { $max = (int)$id; }
+    }
     echo "Highest ID in use: $max. Next free ID: " . ($max + 1) . ".\n";
     echo "Fetch and re-check before claiming it — another session may hold it already.\n";
 }
