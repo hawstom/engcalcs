@@ -83,14 +83,20 @@ EngCalcs.lpnCollide = (function () {
 	//   real obstacle that is ALL of it, pipes included: a number lying across a pipe is a number
 	//   the reader has to work at, so the pass should always try to clear it. Pipe = 1.
 	//
-	//   PREFERENCE = which conflict to ACCEPT when they cannot all be avoided. A pipe is the one
-	//   thing a number may legitimately end up lying across, so its preference is below a symbol's
-	//   or another label's. That is a comparison between two candidate PLACEMENTS, not a property of
-	//   the obstacle, and this pass never compares placements -- it only pushes pairs apart. **There
-	//   is nowhere here to put it.** It lives in Task 379's score, and is written down in section 4
-	//   of dev/label-placement-goals.md so it is not lost in the meantime.
+	//   LENIENCE = how much we are willing to TOLERATE this conflict when they cannot all be
+	//   avoided. Tom's word, 2026-08-16, replacing "preference", and it is the better one: a
+	//   preference sounds like a wish about where a label should go, while lenience says plainly
+	//   how forgiving we are about a particular kind of collision. A pipe is the MOST lenient thing
+	//   on the map -- a number lying across a line still reads -- and a node symbol among the
+	//   least. Note the direction, since it is the reverse of the number he first gave against
+	//   "preference": high lenience means easy to accept.
 	//
-	// Writing a preference into the weight field says something entirely different and wrong: it
+	//   It is a comparison between two candidate PLACEMENTS, not a property of the obstacle, and
+	//   this pass never compares placements -- it only pushes pairs apart. **There is nowhere here
+	//   to put it.** It lives in Task 379's score as a penalty, which is lenience inverted, and is
+	//   written down in section 4 of dev/label-placement-goals.md so it is not lost meanwhile.
+	//
+	// Writing a lenience into the weight field says something entirely different and wrong: it
 	// tells the pass to clear only part of the overlap ALWAYS, even when the label had somewhere
 	// perfectly good to go. That is what 0.4 and then 0.5 did, and it is why labels sat on pipes
 	// with open space beside them.

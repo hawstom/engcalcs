@@ -38,15 +38,22 @@ and every count in section 5 stays the measure.
 
 ---
 
-## 10. Is preference implemented? No. (Tom, 2026-08-16)
+## 10. Is lenience implemented? No. (Tom, 2026-08-16)
 
 > *"My inclination earlier was to suggest that preference has to factor in outside of relax(). I
 > assume that's correct now... Now my understanding is 'preference is not implemented'. Is that
 > correct?"*
 
+**The word is LENIENCE, not preference** — Tom's correction in the next breath, and it is the
+better one: a preference sounds like a wish about where a label should go, while lenience says
+plainly how forgiving we are about a particular kind of collision. **Mind the direction, because it
+is the reverse of the number he first gave**: a pipe is the MOST lenient obstacle on the map (a
+number lying across a line still reads) and a node symbol among the least, so high lenience means
+easy to accept. A score penalty is lenience inverted.
+
 **Correct on both counts.** It cannot live inside `relax()` — that function only ever looks at one
 pair of boxes at a time and asks "are these overlapping, and by how much"; it never has two
-candidate placements in hand to choose between, which is what a preference is a choice *among*. And
+candidate placements in hand to choose between, which is what a lenience ranking is applied *across*. And
 it is not implemented anywhere else either. Today the pass tries to clear **every** overlap
 completely, and when it cannot, what you get is not a chosen compromise — it is wherever the last
 push happened to leave the label.
@@ -55,7 +62,7 @@ push happened to leave the label.
 aligned-pipe-label search in `placeStationedLabels()` walks a fixed list of stations outward from
 the middle, takes the first one that is clear, and **falls back to the middle if none is**. The
 side-flip does the same with two candidates. That is a preference over *positions* — try these in
-this order — but there is still no preference over *conflicts*: the fallback accepts whatever
+this order — but there is still no LENIENCE over *conflicts*: the fallback accepts whatever
 overlap the middle happens to have, without ever asking whether some other blocked station would
 have been blocked by something cheaper.
 

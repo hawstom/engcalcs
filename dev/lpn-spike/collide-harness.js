@@ -226,12 +226,13 @@ function lbl(x, y, w, h) {
 	// obstacle the answer is all of it. The fractions were trying to express a PREFERENCE -- which
 	// conflict to accept when they cannot all be avoided -- which is a property of the alternatives,
 	// not of the obstacle, and belongs to Task 379's score.
-	// **A WEIGHT IS NOT A PREFERENCE, and this file may only assert the first.** Tom, after I put
+	// **A WEIGHT IS NOT A LENIENCE, and this file may only assert the first.** Tom, after I put
 	// his number in the wrong field twice: "pipe weight = 1. Pipe preference = less than 1. Why do
 	// you keep confusing them?" A weight says how much of an overlap must be gone -- all of it, for
-	// every real obstacle. A preference says which conflict to accept when they cannot all be
-	// avoided -- and that compares two candidate PLACEMENTS, which this pass never does. A
-	// preference written into a weight tells the pass to clear only part of an overlap always, even
+	// every real obstacle. A LENIENCE (Tom's word, and the better one) says how
+	// willing we are to tolerate a given conflict when they cannot all be avoided -- a comparison
+	// between two candidate PLACEMENTS, which this pass never makes. A lenience written into a
+	// weight tells the pass to clear only part of an overlap always, even
 	// with open space beside the label, which is what 0.4 and then 0.5 did.
 	report(Collide.WEIGHT.pipe === 1 && Collide.WEIGHT.node === 1 && Collide.WEIGHT.label === 1
 		&& Collide.WEIGHT.leader === 1,

@@ -2046,8 +2046,10 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     distance from the line, push by the shortfall.
   - **PERPENDICULAR, which is the part that matters.** A label lying across a pipe at 30 degrees
     must step *off* the pipe; an axis-aligned push slides it *along* the pipe as often as off it and
-    it lands back on the line further down. Weight 0.25, so it is a preference — in a crowd the
-    labels win and the number lies across the line, which is the behaviour the old comment claimed.
+    it lands back on the line further down. **The 0.25 weight in this entry was wrong and was
+    corrected the same day** — see the weight/LENIENCE split below: a weight says how much of an
+    overlap must go (all of it, pipes included), while how willing we are to tolerate a given
+    conflict is a comparison between placements and belongs to 379's score.
   - **It exposed a real ordering defect two functions away.** A label carrying an automatic nudge at
     the moment it becomes manual kept that nudge until something re-ran the pass —Tom's rule read
     backwards (*"If you extend it, don't overwrite it. Your extension is temporary."*).
