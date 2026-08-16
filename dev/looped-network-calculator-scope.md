@@ -775,3 +775,23 @@ After Phase 0 (one day). After Phase 0.5 (four days). After Phase 1, on instrume
 any shipped file except `lib/Menus.lib.php`, `sw.js`, and the two shared-code chores.** That property
 is what makes the project abortable, and it is a stated architectural constraint — the same way
 Task 145's "the core solve never depends on it" is.
+
+
+---
+
+## Project units (moved from CLAUDE.md, 2026-08-16)
+
+### `lpn_` only: there are no browser units, only PROJECT units
+
+A project records its own unit selection (`serializeProject().units`) and restores it on open, because
+declarative storage makes a bare number meaningless without them — *"imagine opening a 400 diameter
+pipe into an inch browser!"* Consequences, all deliberate:
+
+- **No "save these units as my defaults"** and no per-browser unit cookie for this page. A user who
+  wants preferred settings **saves an empty template project** and opens it — which also carries ID
+  prefixes, default inputs and map appearance. One mechanism instead of two.
+- Switching a unit reinterprets **that project**, and is persisted to it immediately.
+- A document written before this (`v` ≤ 2) holds SI and names no units; opening one offers a one-time
+  conversion (`offerUnitRestore()`), asks before rewriting anything, and defaults to No.
+- The other calculators are unaffected — they have no document, so a unit select there is exactly the
+  per-page control it always was.

@@ -357,3 +357,202 @@ standing tripwire.
   (needs `ANTHROPIC_API_KEY`).
 - `dev/scripts/glossary.json` — term glossary; `prefixToTermNames()` binding lives in
   `generate_translation_payloads.php`, not in the JSON itself.
+
+
+---
+
+# Sprint mechanics (moved from CLAUDE.md, 2026-08-16)
+
+`CLAUDE.md` keeps only the hard gates: authorization, Sonnet-only, announce the count,
+and the three scripts that must exit 0. The full procedure is here.
+
+Sprint **mechanics** live here. Sprint **sequencing** is in `dev/translation-process.md`; dated
+history is in `dev/translation-execution-log.md`.
+
+**Spawn one agent per language in parallel**, not one agent for all languages sequentially. Faster,
+better quality (fresh context per language), and a single language can be retried.
+
+**REQUIRED: explicit user authorization before launching any sprint.** A sprint spawns up to 26 paid
+agents. Always propose → confirm → launch. Never infer authorization from a general "proceed" or a
+question about paths.
+
+### Pre-sprint checklist (complete before proposing)
+
+0. **Wave 0, mechanized: the adversarial English pass.** One agent, English only, over the new and
+   changed strings. It does **not** ask "is this string good?" — a fluent English reader answers yes
+   to almost everything, which is why one Wave 0 that reviewed 226 keys and rewrote 51 still shipped
+   "Zoom to fit" and "Restore defaults". It asks **"list every plausible reading of this string; if
+   there is more than one, propose a rewrite."** Falsification, not review. Findings go to
+   `dev/english-friction/<sprint>.json` and route through the English/synonym/glossary rule above.
+   **`php dev/scripts/friction_check.php --sprint=<id>` must exit 0.**
+1. **`php dev/scripts/gloss_ref_check.php` must exit 0.**
+2. **Regenerate payloads** so the delta reflects current lang files:
+   `php dev/scripts/generate_translation_payloads.php`. **This is the orchestrating AI's job, never
+   the user's.** The launcher must then run `--check` immediately before spawning; it prints
+   `FRESH`/`STALE` and exits non-zero if any payload is older than its inputs. **A non-zero exit is a
+   hard stop.**
+3. **Verify `glossary.json` has `preferred_translation` populated** for the prefix's key terms,
+   especially for the anchor languages.
+4. **State the delta count and which calculators are affected** before asking for authorization.
+   **Delta zero means zero:** keys correctly byte-identical to English (symbols, eponyms, brand names,
+   cognates) live in `dev/scripts/translation_exempt_keys.json` and are not counted, though they are
+   still reported when missing or blank. Four scripts read that one list via `exempt_keys.inc.php`,
+   so a disagreement between their counts is a bug. **Add a key there only when identical-to-English
+   is permanently correct** — never to quiet a number you don't want to fix.
+5. **Note known quality risks** (new terms without glossary coverage, proper nouns).
+6. **Check for stale-but-present drift the delta cannot see:**
+   `php dev/scripts/detect_english_drift.php`. The delta finds only *missing* keys; this flags keys
+   whose *English changed* after a translation was written. `--json` emits the resync list.
+
+**Anchor languages are declared in `glossary.json`'s `meta.anchor_languages` — read that, not this
+line.** They are `es, pt, fr, tr`: the Task 203 core languages and the measured top four by confirmed
+human reach (es 186, pt 30, fr 23, tr 17). They replaced `es, fr, ru, ar` because an anchor is a
+reference point other renderings get checked against, and `ru` (1 measured human) and `ar` (0) cannot
+be observed. **This is about reference points only** — ru and ar translation quality stays fully in
+scope, and the standing "zero reach ≠ low value" rule holds; for a large language, zero reach is a
+discovery/SEO gap. Note `glossary.json`'s anchor list is distinct from the "Wave 1 — anchors" cognate
+cluster in `dev/translation-process.md`.
+
+### The coverage declaration: what we intend to translate
+
+`dev/scripts/translation_coverage.json`, read by four scripts via `coverage.inc.php`. It answers a
+different question from the exempt list, and **the two must never be merged**:
+
+- **exempt** — identical to English is *permanently correct*. The key is **finished**.
+- **out of scope** — a (calculator × language) cell we have decided not to translate yet. The key is
+  **not started**, and the cell can earn its way in at any time.
+
+Using the exempt list for an out-of-scope body is forbidden: it would put a permanent floor back
+under every outstanding-keys number.
+
+**The rule, entire: a cell is in scope iff the calculator is core OR the language is core.** That OR
+makes it a **cross** — every language gets the core calculators, every calculator gets the core
+languages. An AND would leave Manning Pipe Flow untranslated in 22 languages.
+
+- **Core calculators: `mpf`, `mtc`, `lpn`. Core languages: `es`, `pt`, `fr`, `tr`.** Roughly a
+  quarter of the cells and 98.2% of measured use. Adding a core *language* costs `16 − N` cells;
+  adding a core *calculator* costs a full 26 — which is why the frontier prefers languages.
+- **Identity strings are the floor and are never out of scope** — menu entry, `<title>`,
+  `*_main_desc`, every calculator, every language. A cell outside the cross means "body in English,
+  findable in the local language," which is what lets it earn its way in.
+- **Scope is consulted only about a GAP.** An already-translated key in an out-of-scope cell stays
+  translated and stays maintained. Nothing is ever deleted for being out of scope.
+- **A prefix not listed in `calculator_prefixes` is suite chrome and is always in scope**, so an
+  unclassified new prefix gets translated — the safe direction.
+- `--ignore-coverage` restores the raw full-parity view, which is how to ask "what would promoting
+  this cell cost?"
+- `php dev/scripts/coverage_selftest.php` asserts the cross, the floor, and the separation.
+
+### Launch
+
+1. **Announce the count before spawning**: "Starting N agents, one for each language."
+2. Spawn all agents in a single message with `run_in_background: true` and `model: "sonnet"`.
+3. Each agent receives: the payload JSON path, the target lang file path, and full instructions
+   including glossary terms, synonym notes, and all translation rules.
+
+**Model policy: Sonnet is mandatory for every translation agent, every batch size, every language, no
+exceptions. Haiku is fully deprecated for translation.** Evidence
+(`dev/translation-audit-rc-ip-2026-07.md`): Haiku mistranslated polysemous words in long prose and
+produced script contamination, escape leakage and truncation in low-resource languages even with full
+glossary and synonym injection. The former "short labels only" carve-out is **removed** — a wrong
+word in a 3-word label is just as wrong, and a standing exception is an easy trap to fall back into.
+
+**Every agent writes in ~50-key batches, saving each batch before translating the next. Mandatory,
+and it goes in the prompt.** A sprint can be killed at any moment by an account session limit nobody
+can see coming. An agent that composed everything in memory loses all of it; one that has been
+appending keeps what is on disk. Cost is ~10% of an agent's tokens, all tool-call overhead.
+
+**Batching is the throttle that works; the wave split is retired.** Splitting into waves of 5 did not
+prevent a limit (a later wave hit one anyway) and cost a verify/commit/report boundary each time — it
+buys probability, not protection. Batched appends bounded the damage instead: two languages each had
+100 keys safely on disk when a wave died. **Launch every language at once and rely on batching.** If
+a future sprint loses a whole language's work despite batching, that is new evidence — reopen the
+question then, and change one mechanism at a time.
+
+**HARD CONCURRENCY CAP: the harness allows 20 concurrent subagents** unless
+`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` is raised; the 21st call fails with "Concurrent subagent limit
+reached." A 26-language sprint therefore launches 20 immediately and queues 6, which the orchestrator
+starts as slots free. **This is a platform queue, not the retired wave split** — nobody waits for a
+boundary. **Say so in the proposal**: "26 agents, 20 at once and 6 as slots free."
+
+**Do not bundle an unauthorized mechanism into an authorized one.** Two mechanisms introduced in one
+sprint confound the experiment and neither can be judged. Propose each on its own.
+
+**Every translation agent gets a suggestion box, and it is part of its prompt.** Every agent must be
+asked to **file structured entries for any English string it had to guess at**; the orchestrator
+writes them into `dev/english-friction/<sprint>.json`. Structured, not prose — agents do volunteer
+real findings, and a paragraph at the end of a report is not a queue. **Nothing is dismissed
+silently:** an entry closes as `english`, `intent`, `glossary` or `dismissed` *with a reason*, or it
+escalates as `refer-to-human` and stays open until the human rules.
+
+### Post-sprint QA (mandatory, in order)
+
+0. **`php dev/scripts/friction_check.php --sprint=<id>` must exit 0** — every translator complaint
+   answered, every escalation ruled on. A sprint is not closed while an entry is `open` or
+   `refer-to-human`.
+1. **`php dev/scripts/lang_syntax_validate.php --lang=<codes>`** — clean of escape leakage, tag
+   imbalance and foreign-script findings.
+2. **Tag-parity check** of the sprinted keys against English (`<sub>/<sup>/<span>` sets must match).
+3. **Back-translation semantic check — mandatory, no "skip if no key" exception.** With
+   `ANTHROPIC_API_KEY`, run `backtranslate_check.php`. Without it (the common case), the
+   orchestrating AI performs the same check inline, at the same rigor.
+
+   **AND COMPARE THE LANGUAGES WITH EACH OTHER, not only each against the English.** This is the step
+   that reads the English. Cluster the renderings of one key by MEANING. If they agree, the English
+   licensed one reading. **If they SPLIT, the English licensed two, and the split is the finding** —
+   no single translation looks wrong on its own, and the English reads perfectly to an English
+   reader, which is exactly why nothing else catches it.
+
+   *Worked example:* "Own values" — the count of properties a scenario holds of its own — came back
+   as *its own* (13 languages), *custom/specific/exclusive* (7), and **CHANGED** (cs, hr, bg). The
+   first two are the same concept; the third is false, because a scenario's own value may be
+   identical to Base's. All three outliers had been forced off the literal calque by an unrelated
+   collision (in most European languages "own values" *is* the term for eigenvalues). **Being forced
+   off a calque forces a translator to choose a READING, so divergence in those forced choices
+   measures how many readings the source has.** A language that can calque never has to decide and
+   tells you nothing — so the languages that had to work hardest are the most informative, and a
+   term-centric sweep should read them first.
+4. **Glossary write-back — mandatory, not optional, no "later" exception.** Any confirmed terminology
+   decision this sprint produced — a wrong-term fix, a cross-key drift resolved, a new concept
+   translated for the first time — gets written into `glossary.json` (`translations[lang]` plus a
+   dated `translation_notes` entry) **before the sprint is considered closed.** This applies
+   identically to consistency-audit stages. Five audit stages once closed with zero write-back, so
+   every stage re-derived the same terminology judgments from scratch. A populated entry turns a
+   "re-read every sibling key and infer consistency" task into a one-line lookup for the next agent,
+   in the next category, in the next language pass.
+5. **`php dev/scripts/detect_english_drift.php --baseline-new`** — a sprint is not finished until you
+   run it. A key added and translated by a sprint stays `NEW` forever otherwise, because only
+   `--update` could baseline it and `--update` is refused while any drift is open. That deadlock made
+   a later English edit to such a key invisible to **both** tools at once: the payload delta sees a
+   translated key and reports zero, and the drift report files it under NEW rather than CHANGED. A
+   demonstrated case produced a delta of zero and no CHANGED flag with 26 stale translations behind
+   it. Use `--except=k1,k2` to hold back any key whose English you edited *after* the sprint;
+   baselining one you have since edited buries the staleness.
+
+**On retries:** if an agent hits a session limit, retry only that language — but **check
+`git status` first**, since a session-limit error can fire after the edit already landed. If quality
+issues are found later, fix the glossary and/or lang file directly; do not re-run the full sprint.
+
+### Quality scores are honest estimates, not aspirations
+
+`QUALITY` in `lib/Language.Settings.php` is this app's own weight in browser Accept-Language
+negotiation, and it must carry our best current estimate of defect risk. Update via
+`php dev/scripts/update_quality_score.php <lang> <quality>`, never by hand, in the same session as
+the finding.
+
+| Score | Tier |
+|---|---|
+| `1.0` | English (source) |
+| `0.95` | A **verified native-speaker review on file** (e.g. `dev/Bulgarian-engineer-feedback.md`). Never awarded on automated QA alone. |
+| `0.85` | AI-translated, independently back-translation-checked and cross-language-consistency-checked. Real QA, never confirmed by a native human. |
+| `0.65` | The low-resource tier (am/km/my/ps/sw). Gets *less* independent verification by design — the translating agent's own self-check only. Syntax cleanliness is not meaning-level confidence. |
+
+**Never log a language as "awaiting native review" as if resolution is coming.** No native speaker
+will realistically see such a flag. Native feedback is real only when a feedback file actually exists
+— that is a completed event, not a promise. If a holistic pass surfaces a concern it cannot verify,
+record it in the execution log; do not invent a "flagged, pending" limbo state.
+
+**In the 0.65 languages, engineering happens in English and the local tongue is a field register.**
+Aim for descriptive rendering, not standard-matching.
+
+---

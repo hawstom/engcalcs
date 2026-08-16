@@ -1,44 +1,32 @@
 <?php
 /**
  * Checks the two roadmap files together: every task ID is unique across the pair, open work lives
- * in ROADMAP.md and closed work in the archive, every Task number cited from CODE resolves, and no
+ * in ROADMAP.md and closed IDs in the ledger, every Task number cited from CODE resolves, and no
  * block runs past the length budget.
  *
  * Copyright 2009 Thomas Gail Haws
  * Licensed under GNU GPL v3.0 or later
  *
- * TWO FILES, ONE NAMESPACE (Task 388, 2026-08-16). `dev/ROADMAP.md` holds only OPEN tasks;
- * `dev/roadmap-closed-archive.md` holds every closed one as a summary block. Before this the
- * roadmap kept a stub for each closed task AND the archive kept its narrative, so a closed task was
- * written twice and the file had grown to 4,247 lines of which 2,295 were finished work.
+ * TWO FILES, ONE NAMESPACE. `dev/ROADMAP.md` holds only OPEN tasks; `dev/roadmap-closed-ids.md`
+ * holds one line per closed ID. A task ID is a permanent handle cited by number from code and from
+ * dev/*.md, so two tasks sharing one makes every such reference ambiguous, silently.
  *
- * A task ID is a permanent handle — prose across both files, CLAUDE.md and dev/*.md cites tasks by
- * number, so two tasks sharing one makes every such reference ambiguous, silently. Six duplicates
- * had accumulated by 2026-08-14 and were renumbered then.
- *
- * Priority 0 is the only signal for "closed", so it must not carry a second meaning. Tasks 306 and
- * 307 sat at 0 while BLOCKED on Task 248, which made every count of open work read them as
- * finished; Tasks 195 and 212 were genuinely done but had never been moved. Both shapes look
- * identical from outside and both are caught here.
+ * Priority 0 is the only signal for "closed", so it must not carry a second meaning: a BLOCKED task
+ * parked at 0 reads as finished from outside, and so does a done one never moved. Both are caught.
  *
  * WHEN THIS FAILS:
- *   - duplicate ID: renumber the newer task to the next free ID, preferring a closed one, and grep
- *     `Task <id>` across dev/*.md and CLAUDE.md to move its references with it. Usually one member
- *     of a colliding pair has no references at all, and that is the one to move.
- *   - the SAME ID in both files: the task was closed by copying rather than moving, or an OPEN task
- *     nested inside a parent's block travelled with the parent when the parent was archived. Decide
- *     which file it belongs in and delete the other copy. (Task 184's block once carried three open
- *     tasks inside it — 185, 192, 201 — and archiving the parent took all three out of the roadmap.)
- *   - priority 0 in ROADMAP.md: if it is done, SUMMARIZE the block into the archive — what changed,
- *     where it lives, the one finding a future reader could not re-derive — and delete it here. If
- *     it is blocked or parked, it is not closed: give it a real priority, however low.
- *   - a non-zero priority in the archive: either the task reopened, in which case move the block
- *     back to ROADMAP.md, or the close never set the priority.
- *   - a block past the length budget: see the LENGTH DISCIPLINE section at the top of ROADMAP.md.
- *     Advisory by default because judgement decides what earns its lines; `--strict` fails on it.
+ *   - duplicate ID: renumber the newer task to the next free ID and grep `Task <id>` across dev/*.md
+ *     and CLAUDE.md to move its references with it.
+ *   - the SAME ID in both files: closed by copying rather than moving, or an open sub-task travelled
+ *     with its parent. Keep one, delete the other.
+ *   - priority 0 in ROADMAP.md: if done, add a one-line entry to the ledger and delete the block —
+ *     the full text stays in git. If blocked or parked, it is not closed: give it a real priority.
+ *   - a non-zero priority in the ledger: the task reopened (move it back), or the close never set 0.
+ *   - a block past the length budget: see LENGTH DISCIPLINE at the top of ROADMAP.md. Advisory;
+ *     `--strict` fails on it.
  *
- * No exemption list, deliberately (Tom, 2026-08-14) — same principle as the translation exempt
- * list: never to quiet a number you don't want to fix.
+ * No exemption list, deliberately — same principle as the translation exempt list: never to quiet a
+ * number you don't want to fix.
  *
  * Usage:
  *   php dev/scripts/roadmap_id_check.php            # exit 1 on any duplicate or misplaced task
@@ -48,14 +36,14 @@
 
 $root    = realpath(__DIR__ . '/../..');
 $openPath    = $root . '/dev/ROADMAP.md';
-$closedPath  = $root . '/dev/roadmap-closed-archive.md';
+$closedPath  = $root . '/dev/roadmap-closed-ids.md';
 $verbose = in_array('--verbose', $argv, true);
 $strict  = in_array('--strict', $argv, true);
 
-// The budget from ROADMAP.md's own LENGTH DISCIPLINE section: an open task caps at ~15 lines, and a
-// closed one is a summary at <=5. Both are given slack here so the check reports the outliers
-// rather than the merely wordy -- it is a tripwire on the 1,100-word block, not a formatter.
-$LIMIT = array('open' => 20, 'closed' => 14);
+// The budget from ROADMAP.md's own LENGTH DISCIPLINE section: an open task caps at ~15 lines (slack
+// to 20, so this is a tripwire on the 1,100-word block, not a formatter). A closed entry is ONE
+// line in the ledger -- it is an index, not a record; the text lives in git.
+$LIMIT = array('open' => 20, 'closed' => 1);
 
 $files = array('open' => $openPath, 'closed' => $closedPath);
 foreach ($files as $which => $p) {
