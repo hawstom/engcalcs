@@ -183,7 +183,12 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
 3. Define `$arrayInputs` and `$arrayResults` referencing `$ec_lang['prefix_key']`.
    Declare each field's units as a **family name** (`'units' => 'distance_small'`), never an inline
    array.
-4. Add your language keys to all 27 `lib/lang.ec.??.php` files (English text as fallback).
+4. **Add your language keys to `lib/lang.ec.en.php` ONLY.** `lib/base.inc.php` requires
+   `lang.ec.en.php` and *then* the visitor's language, so an absent key already falls back to
+   English — an ABSENT key is the correct untranslated state. A key present-and-byte-identical in a
+   non-English file is a different thing: `lang_syntax_validate.php` flags it `identical-to-english`
+   and **that finding blocks the build** (its own docblock still says "warning-grade"; the docblock
+   is stale). Then regenerate the payloads so a future sprint picks the keys up.
 5. Write `EngCalcs.pageCalculator = function(objForm) { ... }` in the page's `<script>` block.
 6. Call `echoHeader`, `echoCalculatorForm`, `echoFeedback`, `echoFooter`.
 7. Add it to `lib/Menus.lib.php`.
