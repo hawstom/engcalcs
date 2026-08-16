@@ -406,7 +406,12 @@ html[lang="zh"] .ec-welcome {
    (.lpn-draglbl) is the drag/click target -- so it has no business in hit testing. (The extrema
    badge needed the same rule and no longer exists to need it: Task 333 made the mark a
    text-decoration inside the label's own text.) */
-.lpn-leader { stroke: #000; stroke-width: calc(0.125 * var(--lpn-sym, 1)); pointer-events: none; }
+/* ONE SCREEN PIXEL, via --lpn-hair, not a fraction of the symbol size. A leader is a rule pointing
+   at something, not a symbol, and scaling it off --lpn-sym made it 0.49px at the shipped symbol
+   size and 0.14px if you turned symbols down -- which is why Tom reported "no leaders" while
+   looking at them (2026-08-15). A leader that cannot be seen is worse than none: the label it
+   belongs to then reads as floating free of the network. */
+.lpn-leader { stroke: #000; stroke-width: var(--lpn-hair, 0.1); pointer-events: none; }
 .lpn-draglbl { cursor: move; pointer-events: all; }
 /* Background mask behind a node/link/Text label (Task 146.01) so it stays legible over a backdrop
    image, another element, or a busy area of the map -- sized/positioned entirely from JS

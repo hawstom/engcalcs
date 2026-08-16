@@ -979,7 +979,12 @@ var EngCalcs = EngCalcs || {};
 	// The cap is in SCREEN PIXELS because "too far to associate" is a fact about reading, not about
 	// the model, and it is comfortably above the leader threshold so anything approaching it is
 	// drawn with a leader rather than left floating.
-	var LPN_NUDGE_CAP_PX = 45;
+	// 28px, down from 45 (Tom, 2026-08-15: the labels *"are maintaining a screen (pixel) distance
+	// from their node, but it's too much"*). The default offset is about 11px, so 28 is two and a
+	// half times as far as an undisturbed label sits -- enough for the pass to do real work, close
+	// enough that the label still reads as belonging to its node. It stays above the ~18px at which
+	// a leader appears, so anything pushed near the cap is drawn with one.
+	var LPN_NUDGE_CAP_PX = 28;
 	function capNudges(labels) {
 		var cap = LPN_NUDGE_CAP_PX / (state.s || 1), i, n, d;
 		for (i = 0; i < labels.length; i++) {
@@ -2167,6 +2172,12 @@ var EngCalcs = EngCalcs || {};
 		var k = symbolFactor(), op = settings.symbolOpacity;
 		svg.style.setProperty('--lpn-sym', k);
 		svg.style.setProperty('--lpn-lw', linkStrokeWidth());
+		// ONE SCREEN PIXEL, in world units. Everything else here is scaled off the symbol size,
+		// which is right for things that ARE symbols and wrong for a hairline: a leader is a rule
+		// pointing at something, not a symbol, and at the shipped 7px symbol its old width worked
+		// out at 0.49px -- a line the browser renders as a grey smudge and Tom reported as "no
+		// leaders" while looking straight at them. Turn Symbol size down to 2 and it was 0.14px.
+		svg.style.setProperty('--lpn-hair', 1 / (state.s || 1));
 		// Symbols only, never labels or their masks (Tom, 2026-07-30: "symbols opacity would be a
 		// very nice setting during layout") -- the point is to see the backdrop THROUGH the network
 		// while placing it against an aerial or a plan, and fading the numbers at the same time
