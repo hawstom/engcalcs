@@ -50,6 +50,34 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
+- 75|376| **[H] Replace the label MASK RECT with a text halo, the way epanetjs does it.** Tom,
+  2026-08-15, reporting on their build: *"They have a very small hide/mask/patch buffer that follows
+  strokes of text and merges together where characters are close; this is very desirable instead of
+  a box."*
+  - **It is one CSS declaration and it deletes an element.** `paint-order: stroke fill` with a white
+    stroke on the text draws exactly that: a halo that follows the glyphs and merges between close
+    characters. `--lpn-hair` already exists to size it in screen pixels.
+  - **What it deletes is the interesting part.** No mask rect means no mask element per label, no
+    `MASK_PAD`, no gap arithmetic to keep a mask off its own pipe (Task 367), no rotation to keep in
+    step with the text, no mask left behind when a label is hidden — Tom's *"mask without a label"*
+    class of defect stops existing rather than being fixed. Three of this file's tasks are mask
+    geometry.
+  - The one thing to check before committing: a halo over a dark backdrop reads differently from a
+    75%-white box, and the box was there for aerial photographs.
+
+- 60|377| **[H] Do labels need to move at all? epanetjs does not drag them.** Tom, same message:
+  *"epanetjs does not autodrag junction labels; this may be a good idea. Where labels conflict, they
+  hide the one on the right; since they allow only one label, conflicts are much fewer... User cannot
+  drag labels, but this is not harmful."*
+  - The alternative to a relaxation is a RULE: on conflict, hide one, deterministically. It cannot
+    fling a label across the map (Task 371), needs no cap, no leader, and no nudge — and the whole
+    apparatus this suite has spent days on becomes one comparison.
+  - Against it: we deliberately allow several values per label, which multiplies conflicts, and
+    hiding a value is worse than moving it when the value is why the map is open. Task 343's
+    line-priority dropping is the same idea one level down and may be the better half of it.
+  - Worth measuring before choosing: how many labels does the relaxation actually rescue on Net3,
+    versus how many it merely moves?
+
 - 80|372| **Settings and Labels popovers need a UX pass — they can open taller than the screen and
   cover their own button.** Tom, 2026-08-15: *"Settings box opens, if its expanded options are too
   long, too tall for the screen, and its top extends to cover its button. I think we need to focus
@@ -1865,6 +1893,32 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|375| **Six of the seven automatic fits are gone — DONE 2026-08-15.** Tom went through the
+  enumerated list one at a time and rejected nearly all of it, which is the kind of review no check
+  could have performed:
+  - **Post-solve re-fit** — *"I am not a believer. I say it's illegal. A little overhang in this case
+    is okay now that views are saved."* It existed because `zoomExtent()` measures rendered label
+    text and a code-drawn network is fitted before its first solve has produced any, so labels
+    overflowed the map 300ms later. The cure was worse: a few pixels of overhang at the edge of a
+    view nobody had chosen, against the zoom jumping under the reader's hands. Removed, with
+    `fitAfterSolve` and `consumeFitAfterSolve` entirely.
+  - **Cleared network** — *"Why rezoom? To what? Who cares? Did you set some arbitrary initial
+    standard?"* Yes, and it was arbitrary: an empty drawing has no extent, so `bbox()` falls back to
+    an invented 0–10 square and the fit zoomed to nothing. The reader keeps the view they had.
+  - **Boot on an empty map** — *"Why is a zoom needed?"* It is not. Same invented square.
+  - **AND BOOT WAS ALSO A PLAIN BUG.** It called `zoomExtent()` outright rather than going through
+    `restoreViewOrFit()`, so **a reload ignored the document's saved view and re-fitted** — the one
+    path where a user most expects to return to where they were was the only path that would not.
+    `refreshAllFromDocument()` has always ended with the right call; boot has its own sequence and
+    never picked it up.
+  - **What remains is one case, reached from three places:** a document with no stored view has to be
+    given one, once. Every file written before views were saved, and every `.inp` import. The moment
+    such a document is saved it carries a view and never fits again.
+  - **Deferred sizing is not on this list and is not an extra fit** — it is the SAME fit, postponed
+    until the canvas has a real height instead of the 10000px curtain it is authored with. Without
+    it, a fit at boot divides the drawing into 10000px of height and the height ratio can never win,
+    which is the drastic zoom-in of Task 359.
 
 - 0|373| **The asterisk was appearing for two reasons, neither an edit — DONE 2026-08-15.** Tom:
   *"I revert, it autozooms and sets the asterisk, I revert, it autozooms and sets the asterisk. It's

@@ -2836,57 +2836,19 @@ var EngCalcs = EngCalcs || {};
 		return h + 8;   // its own height plus a little clear air
 	}
 
-	// "Fit once the labels are real." zoomExtent() sizes the view to the RENDERED label text
-	// (bbox() reads each label's measured width and line count), but a network created in code --
-	// drawExampleNetwork(), drawTestGrid(), a freshly opened file -- is fitted before its first
-	// solve has produced any label content, so the fit is to bare symbols and the labels then
-	// overflow the map when they appear 300 ms later. Setting this asks for one more fit as soon
-	// as the solve lands; consumeFitAfterSolve() below is called on every path out of a solve,
-	// including the async EPANET one, so it fires exactly once whichever engine answered.
-	var fitAfterSolve = false;
-	function consumeFitAfterSolve() {
-		if (!fitAfterSolve) { return; }
-		fitAfterSolve = false;
-		zoomExtent(true);   // nobody asked: the labels simply became real
-	}
-	// ---- ZOOM TO FIT, SOLVED RATHER THAN SEARCHED (2026-08-15) --------------------------------
+	// **THE POST-SOLVE RE-FIT IS GONE** (Tom, 2026-08-15: *"Post-solve re-fit: I am not a believer.
+	// I say it's illegal. A little overhang in this case is okay now that views are saved."*).
 	//
-	// Tom, on being told the previous version needed eight relayout passes to converge: *"!!! Is
-	// there any way to circumvent this? Can we think harder?"* There is, and the answer is that this
-	// was never an iterative problem. It only looked like one because the two kinds of thing being
-	// fitted were being measured in the same units.
+	// It existed because zoomExtent() measures RENDERED label text, and a network created in code is
+	// fitted before its first solve has produced any label content -- so the fit was to bare symbols
+	// and the labels overflowed the map when they appeared 300ms later. A second fit hid that.
 	//
-	// **THE STRUCTURE.** Everything on the map is one of exactly two things:
-	//
-	//   * GEOMETRY -- nodes, vertices, pipes. Fixed WORLD coordinates; its size on screen is `s`
-	//     times its size in the model.
-	//   * ANNOTATION -- every label and symbol. Anchored at a world point, but its own extent is a
-	//     fixed number of SCREEN PIXELS (Task 331), the same at every zoom.
-	//
-	// So the screen position of any drawn edge is `t + s*x +- px`, where `px` does not depend on
-	// `s`. The iteration existed because bbox() converted those pixels into world units -- where
-	// they DO depend on `s` -- and then solved for the `s` it had just assumed. Keep the two apart
-	// and the circularity is gone, because it was never in the problem, only in the representation.
-	//
-	// **THE SOLVE.** Fitting is then a two-variable feasibility question per axis:
-	//
-	//     t + s*xi - li >= padLo          (nothing sticks out of the left or top)
-	//     t + s*xj + rj <= span - padHi   (nothing sticks out of the right or bottom)
-	//
-	// For a given `s` those are satisfiable iff max(padLo + li - s*xi) <= min(span - padHi - rj -
-	// s*xj), which is one O(n) sweep. The left side is a max of straight lines and the right a min
-	// of straight lines, so their difference is CONVEX in `s` -- negative while the drawing is too
-	// small to fill the canvas, positive once it is too big, crossing zero exactly once. Bisection
-	// finds that crossing to machine precision.
-	//
-	// **IT LOOKS LIKE ITERATION AND IT IS NOTHING LIKE IT.** Sixty bisection steps are sixty
-	// arithmetic sweeps over a few hundred numbers: microseconds, no DOM, no re-layout, no tolerance
-	// to tune, no residue to apologise for. The eight passes this replaces each ran
-	// refreshLabelText() and the entire collision relaxation.
-	//
-	// The pixel extents are taken from the CURRENT rendered layout and multiplied by the current
-	// scale to turn world units back into pixels. That conversion is exact for any target scale
-	// precisely because the quantity is scale-invariant, which is the same fact the design rests on.
+	// It is illegal under the rule Tom set the same day: the view is saved data, and the app does not
+	// move saved data behind the user's back. The overhang it was hiding is a few pixels of label at
+	// the edge of a view nobody had chosen yet, on a drawing that has just appeared -- against a
+	// zoom that jumps under the reader's hands a third of a second after they arrive. The first is
+	// a blemish; the second is the map moving on its own.
+
 	var LPN_FIT_BISECTIONS = 60;
 	// One drawn thing: a world anchor, and how far its ink reaches from that anchor in SCREEN
 	// pixels. A reach may be NEGATIVE (ink that begins to the right of its own anchor); the
@@ -3088,9 +3050,22 @@ var EngCalcs = EngCalcs || {};
 	function restoreViewOrFit() {
 		var v = tabViews[library.openId] || pendingView;
 		pendingView = null;
-		if (!validView(v)) { zoomExtent(true); return; }   // no stored view: establish one
-		if (!mapSized) { pendingRestore = v; fitWhenSized = true; return; }
-		if (!applyView(v)) { zoomExtent(true); }
+		if (validView(v)) {
+			if (!mapSized) { pendingRestore = v; fitWhenSized = true; return; }
+			if (applyView(v)) { return; }
+		}
+		// Nothing to restore. **THE ONE AUTOMATIC FIT LEFT, AND WHY IT SURVIVES.** Tom, having had
+		// the other six removed: *"Overall refitting and re-baselining: I see it as vanishingly
+		// defensible."* Vanishingly, not entirely -- a document with no stored view has to be given
+		// one, and there is no other candidate. That is every file written before views were saved
+		// and every .inp ever imported. It happens ONCE per such document: the moment it is saved it
+		// carries a view, and this never runs for it again.
+		//
+		// An EMPTY drawing is not such a document. It has no extent, so bbox() falls back to an
+		// invented 0-10 square and the "fit" would be a zoom to nothing (Tom: *"Boot: Empty map? Why
+		// is a zoom needed?"*).
+		if (!doc.nodes.length) { return; }
+		zoomExtent(true);
 	}
 	// `auto` marks a fit NOBODY ASKED FOR: boot, a freshly drawn example, a document with no stored
 	// view, the deferred fit that runs once the canvas has a height. Those establish a view rather
@@ -8062,7 +8037,12 @@ var EngCalcs = EngCalcs || {};
 		setStatus('');
 		setMode('select');
 		refreshScenarioStatus();
-		zoomExtent(true);   // automatic: a cleared network has no view of its own to keep
+		// **NO FIT HERE** (Tom, 2026-08-15: *"Cleared network: Why rezoom? To what? Who cares? Did
+		// you set some arbitrary initial standard?"* — yes, and it was arbitrary). An empty drawing
+		// has no extent, so bbox() falls back to a 0-10 square and the "fit" was a zoom to an
+		// invented ten-unit box. The reader keeps the view they were looking at, which is the only
+		// answer that means anything: there is nothing to look at, and where they were is where
+		// they will start drawing.
 	}
 
 	function init() {
@@ -8251,7 +8231,13 @@ var EngCalcs = EngCalcs || {};
 		// pollLockedFiles() for why that decoupling was the whole answer to Tom's "why must there be
 		// limits at all?".
 		setInterval(pollLockedFiles, LPN_HEARTBEAT_MS);
-		zoomExtent(true);   // automatic: boot
+		// **BOOT GOES THROUGH THE SAME DOOR AS EVERY OTHER OPEN, AND DID NOT.** It called
+		// zoomExtent() outright, so a reload IGNORED the document's saved view and re-fitted --
+		// which is both the autozoom Tom has just outlawed and a plain bug: the one path where a
+		// user most expects to come back to where they were was the one path that would not.
+		// refreshAllFromDocument() has always ended in restoreViewOrFit(); boot has its own
+		// sequence and never picked that up.
+		restoreViewOrFit();
 		requestAnimationFrame(tick);
 	}
 
@@ -8711,7 +8697,6 @@ var EngCalcs = EngCalcs || {};
 		// data label is still a placeholder width. Fitting now is right for immediate feedback but
 		// leaves labels hanging outside the map a third of a second later, which is the second half
 		// of Task 254 ("it is not zoomed to fit after drawing. Some labels extend beyond the map").
-		fitAfterSolve = true;
 		setMode('select');
 	}
 
@@ -8746,8 +8731,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		updateEmptyHint();
-		zoomExtent(true);   // automatic: ditto, and see fitAfterSolve below
-		fitAfterSolve = true; // labels are still placeholders at this instant -- see consumeFitAfterSolve()
+		zoomExtent(true);   // automatic: a network drawn in code has no stored view to restore
 		setMode('select');
 	}
 
@@ -9765,7 +9749,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// The curtain is still right — see the markup comment for why 0 was worse — so the answer is
 	// that a fit asked for before the canvas has a real height is DEFERRED rather than answered
-	// wrongly. Same shape as fitAfterSolve() above: remember that one was wanted, and do it when the
+	// wrongly. Remember that one was wanted, and do it when the
 	// missing fact arrives.
 	var mapSized = false, fitWhenSized = false, autoFitWhenSized = false, pendingRestore = null;
 	// **AN AUTOMATIC FIT MOVES THE BASELINE, IT DOES NOT DIRTY THE PROJECT.** Only when the project
@@ -12438,7 +12422,6 @@ var EngCalcs = EngCalcs || {};
 			issues.forEach(function (issue) { logLpnDiag(issue.code); });
 			setStatus(issues.map(diagIssueText).join(' '));
 			refreshLabelText();
-			consumeFitAfterSolve();
 			return;
 		}
 		// AN ACTIVE VALVE ROUTES THE SOLVE TO EPANET, whatever the engine PREFERENCE says, and the
@@ -12537,15 +12520,13 @@ var EngCalcs = EngCalcs || {};
 				result.issues.forEach(function (issue) { logLpnDiag(issue.code); });
 				setStatus(result.issues.map(diagIssueText).join(' '));
 				refreshLabelText();
-				consumeFitAfterSolve();
-				return;
+					return;
 			}
 			// Not one of lpnDiagnose()'s pre-solve codes -- this is the solver itself giving up, and
 			// it belongs in the same histogram because to the user it is the same kind of dead end.
 			logLpnDiag('not-converged');
 			setStatus(pc.lpn_diag_not_converged || 'Did not converge.');
 			refreshLabelText();
-			consumeFitAfterSolve();
 			return;
 		}
 		lastSolveResult = result;
@@ -12555,7 +12536,6 @@ var EngCalcs = EngCalcs || {};
 		setStatus([valveRouteNote, manningNote ? (pc.lpn_engine_manning_note || '') : '']
 			.filter(function (t) { return !!t; }).join(' '));
 		refreshLabelText();
-		consumeFitAfterSolve();
 	}
 
 	// EPANET path. Async, so it needs a guard the synchronous path never did: this page solves

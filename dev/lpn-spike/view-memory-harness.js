@@ -234,6 +234,26 @@ console.log('\n--- moving the view is an edit, unless the app moved it ---');
 	const bare = (code.match(/[^a-zA-Z]zoomExtent\(\)/g) || []).length;
 	ok('every automatic fit says so, so none of them can dirty a project', bare === 0,
 		bare + ' bare zoomExtent() call(s) -- each one is a fit nobody asked for that would set an asterisk');
+	// **AND THERE ARE ALMOST NONE LEFT TO MARK** (Tom, 2026-08-15, going through the list one by one
+	// and rejecting nearly all of it: the post-solve re-fit "illegal"; the cleared network "Why
+	// rezoom? To what? Who cares?"; boot on an empty map "Why is a zoom needed?"; and overall,
+	// "refitting and re-baselining: I see it as vanishingly defensible"). Seven became two, both of
+	// them the same case: a document that has no stored view has to be given one, once.
+	const autos = (code.match(/zoomExtent\(true\)/g) || []).length;
+	ok('...and there are at most three of them left, all "this document has no view yet"',
+		autos <= 3, autos + ' automatic fit(s)');
+	// **BOOT MUST GO THROUGH restoreViewOrFit(), NOT STRAIGHT TO A FIT**, or a reload ignores the
+	// document's saved view -- the one path where a user most expects to come back to where they
+	// were was the one path that would not. It had its own sequence and never picked up the call
+	// that refreshAllFromDocument() has always ended with.
+	// Counted rather than sliced out of init(): a brace-matched slice of a 150-line function is
+	// fragile, and the first version of this check silently passed a mutant that had put the fit
+	// straight back. Both open paths -- refreshAllFromDocument() and boot -- must go through the
+	// same door, so the call appears at least twice, and the only fits left are the three counted
+	// above.
+	const doors = (code.match(/restoreViewOrFit\(\)/g) || []).length;
+	ok('both open paths restore the view rather than fitting outright', doors >= 3,
+		doors + ' call site(s): the function, refreshAllFromDocument, and boot');
 	ok('...and the button the user presses is NOT marked automatic, since that one is an edit',
 		/fn: zoomExtent\b/.test(code) && /addEventListener\('click', zoomExtent\)/.test(code));
 	ok('...with a re-baseline that only ever fires on an already-clean project',

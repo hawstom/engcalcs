@@ -28,7 +28,10 @@ const L = loadLoopedNetwork(
   "\t\tdrawExample: drawExampleNetwork, runSolve: runSolve, assembleModel: assembleModel,\n" +
   "\t\tsettings: function () { return settings; }, getDoc: function () { return doc; },\n" +
   "\t\tseedDefaultInputs: seedDefaultInputs, bbox: bbox, effective: effective,\n" +
-  "\t\tfitPending: function () { return fitAfterSolve; },\n" +
+  // fitPending is gone with the post-solve re-fit itself (2026-08-15). What is asserted in its
+  // place is the RULE that removed it: no fit may happen behind the user, so the source must
+  // contain no second one for the solve to trigger.
+
   "\t\tlinkLengthSI: linkLengthSI, rebuildSettingsFields: rebuildSettingsFields,\n" +
   // Task 263: the document stores DECLARED values, so a test that wants SI has to cross the
   // same boundary the solver does. Exported rather than re-derived here, or the test would
@@ -293,12 +296,17 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   ok('pipes are C = 130', pipes.every(p => L.effective(p, 'roughness') === 130));
 
   // ---- and it must actually solve, to numbers a reviewer accepts --------
-  // The second half of Task 254: the fit done inside drawExampleNetwork() happens before the
-  // debounced solve has produced any label text, so a re-fit must still be pending, and the solve
-  // must consume it exactly once.
-  ok('a re-fit is pending after drawing', L.fitPending() === true);
+  // **NO SECOND FIT WHEN THE SOLVE LANDS** (Tom, 2026-08-15: "Post-solve re-fit: I am not a
+  // believer. I say it's illegal. A little overhang in this case is okay now that views are
+  // saved."). Task 254 had added one because zoomExtent() measures rendered label text and a
+  // code-drawn network is fitted before its first solve has produced any -- so the labels
+  // overflowed the map when they appeared 300ms later, and a second fit hid it. The overhang is a
+  // few pixels at the edge of a view nobody chose yet; the cure was the zoom jumping under the
+  // reader's hands a third of a second after they arrive.
+  ok('nothing schedules a fit for the solve to run',
+    !/fitAfterSolve|consumeFitAfterSolve/.test(
+      require('fs').readFileSync(require('path').join(__dirname, '../../js/looped-network.js'), 'utf8')));
   L.runSolve();
-  ok('the solve consumed the pending re-fit', L.fitPending() === false);
   const model = L.assembleModel(), r = EngCalcs.lpnSolve(model, { tol: 1e-6 });
   ok('solves and converges', r.ok && r.converged === true);
 
