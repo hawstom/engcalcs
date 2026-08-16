@@ -13,8 +13,11 @@ echoHeader("EngCalcs", $html_title, "");
 echoCalculatorForm(
 	//Inputs
 	Array(
-		Array('name' => 'ws', 'type' => 'number', 'default' => Array('us' => '3', 'si' => '1'), 'units' => 'distance_medium', 'label' => $ec_lang['mi_waterSurfaceElevation']),
-		Array('name' => 's0', 'type' => 'number', 'default' => '0.001', 'units' => 'slope', 'label' => $ec_lang['mtc_channel_slope']),
+		// These two travel with the seeded cross-section in js/manning-irregular.js -- the seed now
+		// copies whatever the server rendered here rather than carrying its own copy, so a water
+		// surface changed on one side and not the other opens on a dry or a drowned channel.
+		Array('name' => 'ws', 'type' => 'number', 'default' => Array('us' => '6', 'si' => '2'), 'units' => 'distance_medium', 'label' => $ec_lang['mi_waterSurfaceElevation']),
+		Array('name' => 's0', 'type' => 'number', 'default' => '0.0025', 'units' => 'slope', 'label' => $ec_lang['mtc_channel_slope']),
 	),
 	//Results
 	Array(

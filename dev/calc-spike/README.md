@@ -64,5 +64,10 @@ Cheap — usually under an hour, and the pattern is in `mpf-harness.js`:
   Weir-Flow-Irregular) are run, but the results that live inside their dynamic rows are not:
   building the rows needs a richer DOM than `calc-page.js` has. The smoke harness prints them as
   it goes rather than passing them silently.
+  **That gap is not academic** — ROADMAP Task 233 was two user-visible defects on Manning-Irregular
+  (an English page opening in metric, a ⚠ Low velocity on arrival in both presets) sitting in it
+  the whole time this harness reported the page green. Where a row-table page needs a real
+  assertion, the cheap route is a browser: `node dev/browser-pass/mi-defaults.js` is the worked
+  example, and it is ~150 lines.
 - **Nothing here is a browser.** Layout, tips, printing and the sketches are checked only to the
   extent that generating them must not throw.
