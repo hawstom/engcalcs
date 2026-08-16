@@ -345,17 +345,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
     a 3-line label) — the smallest reach that can step off a conflict, still inside the 85 px he
     objected to, and it scales with text size where a fixed 28 px does not.
 
-- 20|393| **Net3 still differs from EPANET by 0.49 ft after demand patterns are accounted for.**
-  Measured 2026-08-16 against EPA's own `dev/water-network-examples/Net3.rpt` at 0:00, 92 comparable
-  nodes: mean |ΔH| **15.93 ft as we solve it today → 0.49 ft** once each junction's pattern
-  multiplier is applied by hand. Worst residual 2.66 ft (1.6%) at node 123.
-  - The 15.9 ft is Task 248 and expected. **The 0.49 ft is not explained**, and the obvious suspects
-    were checked and cleared: link 330 is already imported closed (its status is in the `[PIPES]`
-    column, not `[STATUS]`), and `[DEMANDS]` is empty so there are no extra demand categories.
-  - Remaining suspects, untested: the pump curve fit for links 10 and 335, convergence tolerance,
-    and the report's own 2-decimal rounding. Fixed-head nodes 20/40/50 match exactly, which is what
-    says the comparison itself is sound.
-
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
   2026-08-14: *"Not mtext labels. Mtext Text objects."* The target is what you place with the Text
   tool (`lb.text`, one centre-anchored `<text>`); generated data labels are out of scope.

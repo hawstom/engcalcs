@@ -10,10 +10,21 @@
 // already applied each junction's DEMAND PATTERN multiplier and we have not: pattern 1 starts at
 // 1.34, and for nodes 15/35/123/203 the base demand is 1 so the pattern IS the demand in gpm.
 //
-// Measured: mean |dH| over 92 comparable nodes goes 15.93 ft -> 0.49 ft when the multipliers are
-// applied by hand. The remainder is ROADMAP Task 393 and is NOT yet explained -- do not assume it
-// is rounding. Fixed-head nodes 20/40/50 match exactly either way, which is what says the
-// comparison itself is sound rather than accidentally self-consistent.
+// MEASURED: over 92 comparable nodes and 119 links, applying the multipliers by hand takes
+//   heads  mean |dH| 15.93 ft -> 0.00 ft (worst 0.01 ft)
+//   flows  mean      742.3 gpm -> 0.0 gpm (worst 0.3 gpm, against a 13,158 gpm largest flow)
+// So the SOLVER agrees with EPANET exactly and the whole visible difference is Task 248.
+//
+// **THE SELF-CHECK AT THE TOP IS THE POINT OF THIS FILE, NOT A FORMALITY.** The demand model below
+// is a reimplementation of what EPANET does at t=0, and it was wrong TWICE, each time producing a
+// confident wrong verdict about the solver:
+//   1. `if (!pats[id])` read pattern 2's leading 0 as 1818 -- a falsy test on a real zero.
+//   2. `line.replace(/;.*$/,'')` never stripped a trailing comment, because Net3.inp is CRLF and
+//      JavaScript's `.` does not match \r. Every junction with an empty pattern column silently
+//      took a multiplier of 1 instead of pattern 1's 1.34.
+// Both looked exactly like a solver disagreement -- 0.49 ft of head, 13% of flow. The report states
+// the demand it actually used at every node, so the model is checked against it before anything
+// below is believed. If that line does not read 92/92, believe nothing after it.
 
 const path = require('path');
 const fs = require('fs');
@@ -42,7 +53,9 @@ for (const line of inp.split('\n')) {
   for (const line of sec.split('\n')) {
     if (/^\s*;/.test(line) || !line.trim()) continue;
     const p = line.trim().split(/\s+/);
-    if (!pats[p[0]]) pats[p[0]] = parseFloat(p[1]);
+    // `in`, NOT a falsy test: pattern 2's first multiplier IS 0, and `if (!pats[id])` kept
+    // overwriting it until a non-zero line, reading 1818 for a demand of nothing.
+    if (!(p[0] in pats)) { pats[p[0]] = parseFloat(p[1]); }
   }
 }
 // junction -> pattern id (col 4), base demand (col 3)
@@ -51,7 +64,11 @@ const jpat = {};
   const sec = inp.split(/\[JUNCTIONS\]/)[1].split(/\[/)[0];
   for (const line of sec.split('\n')) {
     if (/^\s*;/.test(line) || !line.trim()) continue;
-    const p = line.replace(/;.*$/,'').trim().split(/\s+/);
+    // split(';'), NOT replace(/;.*$/,''). Net3.inp has CRLF line endings, and JavaScript's `.`
+    // does not match \r -- so `;.*$` never matched a trailing comment, every junction with an
+    // empty pattern column got ';' as its pattern id, and fell back to a multiplier of 1 instead
+    // of pattern 1's 1.34. It read as a solver disagreement.
+    const p = line.split(';')[0].trim().split(/\s+/);
     if (p.length >= 3) jpat[p[0]] = { base: parseFloat(p[2]), pat: p[3] || '1' };
   }
 }
@@ -63,7 +80,43 @@ for (const line of block.split('\n')) {
   if (p.length === 5 && /^[-.\d]+$/.test(p[1]) && /^[-.\d]+$/.test(p[2])) refHead[p[0]] = parseFloat(p[2]);
 }
 
+// Link flows at 0:00, GPM. Columns: ID, Flow, Velocity, Unit headloss, Status.
+const linkBlock = rpt.slice(rpt.indexOf('Link Results at 0:00 Hrs:'), rpt.indexOf('Node Results at 1:00 Hrs:'));
+const refFlow = {}, refStatus = {};
+for (const line of linkBlock.split('\n')) {
+  const p = line.trim().split(/\s+/);
+  if (p.length >= 4 && /^-?[.\d]+$/.test(p[1]) && /^-?[.\d]+$/.test(p[2])) {
+    refFlow[p[0]] = parseFloat(p[1]);
+    refStatus[p[0]] = p[4] || p[3];
+  }
+}
+
 const parsed = EngCalcs.lpnInpParse(inp);
+const TO_SI = EngCalcs.lpnInpFlowUnits[parsed.flowUnits].toSI;   // GPM -> m3/s, read not retyped
+// VALIDATE THE HARNESS BEFORE TRUSTING ITS VERDICT. The demand model here is a reimplementation of
+// what EPANET does at t=0, and a reimplementation that is quietly wrong makes every number below a
+// confident fiction -- which is exactly what happened on the first pass (a falsy test read pattern
+// 2's leading 0 as 1818). The report states the demand it actually used at every node, so the model
+// is checked against it directly.
+{
+  const refDemand = {};
+  for (const line of block.split('\n')) {
+    const p = line.trim().split(/\s+/);
+    if (p.length === 5 && /^-?[.\d]+$/.test(p[1]) && /^-?[.\d]+$/.test(p[2])) { refDemand[p[0]] = parseFloat(p[1]); }
+  }
+  let bad = 0, n = 0, worst = 0, worstId = null;
+  for (const id in jpat) {
+    if (refDemand[id] === undefined) continue;
+    const mult = pats[jpat[id].pat] === undefined ? 1 : pats[jpat[id].pat];
+    const d = Math.abs(jpat[id].base * mult - refDemand[id]);
+    n++;
+    if (d > 0.01) { bad++; if (d > worst) { worst = d; worstId = id; } }
+  }
+  console.log(`demand model vs the report: ${n - bad}/${n} junctions agree` +
+    (bad ? `  -- WORST ${worst.toFixed(1)} gpm at ${worstId}` : ''));
+  if (bad) { console.log('  the comparison below is NOT trustworthy until this reads 0 disagreements'); }
+}
+
 function run(applyPatterns) {
   const m = toSolverModel(parsed);
   if (applyPatterns) {
@@ -92,8 +145,33 @@ for (const [label, ap] of [
     n++; sum += dft;
     if (dft > worst) { worst = dft; worstId = nd.id; }
   }
-  console.log(`${label.padEnd(45)} n=${n}  mean |dH| ${(sum/n).toFixed(2)} ft   worst ${worst.toFixed(2)} ft at ${worstId}`);
+  let qn = 0, qsum = 0, qworst = 0, qworstId = null, biggest = 0;
+  for (const l of parsed.links) {
+    if (refFlow[l.id] === undefined) continue;
+    const mine = (r.flows[l.id] || 0) / TO_SI;            // m3/s -> GPM
+    const dq = Math.abs(mine - refFlow[l.id]);
+    qn++; qsum += dq; biggest = Math.max(biggest, Math.abs(refFlow[l.id]));
+    if (dq > qworst) { qworst = dq; qworstId = l.id; }
+  }
+  console.log(`${label.padEnd(30)} heads n=${n} mean ${(sum/n).toFixed(2)} ft worst ${worst.toFixed(2)} @${worstId}`);
+  console.log(`${' '.repeat(30)} flows n=${qn} mean ${(qsum/qn).toFixed(1)} gpm worst ${qworst.toFixed(1)} @${qworstId}  (largest flow in net ${biggest.toFixed(0)} gpm)`);
   runs[label] = r;
+}
+{
+  const r = runs['+ demand patterns at t=0'];
+  const rows = [];
+  for (const l of parsed.links) {
+    if (refFlow[l.id] === undefined) continue;
+    const mine = (r.flows[l.id] || 0) / TO_SI;
+    rows.push([l.id, l.type, refFlow[l.id], mine, Math.abs(mine - refFlow[l.id])]);
+  }
+  rows.sort((a, b) => b[4] - a[4]);
+  console.log('\n  worst flow disagreements, patterns applied (gpm):');
+  console.log('  link      type     EPANET        ours       diff');
+  for (const x of rows.slice(0, 12)) {
+    console.log('  ' + String(x[0]).padEnd(9) + String(x[1]).padEnd(8) +
+      x[2].toFixed(1).padStart(10) + x[3].toFixed(1).padStart(12) + x[4].toFixed(1).padStart(11));
+  }
 }
 console.log('\n  node      EPANET      ours(today)   ours(+patterns)');
 for (const id of ['10','15','20','35','40','50','60','101','103','105','123','203','237']) {
