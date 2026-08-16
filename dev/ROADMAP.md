@@ -135,6 +135,29 @@ session of its own with nothing else in it.
   - Worth measuring before choosing: how many labels does the relaxation actually rescue on Net3,
     versus how many it merely moves?
 
+- 75|390| **A unit is a LABEL and a MAGNITUDE — carry the label verbatim, and refuse to solve when we
+  lack the magnitude.** Tom, 2026-08-16, on whether adding the five missing flow units papers over
+  something: *"If a unit, recognized or unrecognized, comes along in a file, what do we do? We don't
+  convert it! We take it verbatim. It is a string... If we don't recognize the unit, we must say
+  something like 'This file has the following units that are not recognized. Please contact the
+  developers.'"* Three parts, and the third is the one that makes the other two honest.
+  - **(a) Pass-through on import.** Already briefed to the `looped-network.js` track; see the
+    invariant in CLAUDE.md. Better constants do NOT fix it — pass-through is the only fix.
+  - **(b) Add the five EPANET flow units we lack: IMGD, AFD, LPM, CMH, CMD.** The `.inp` `UNITS`
+    keyword is a CLOSED enumeration of ten, so this COMPLETES a finite list rather than working
+    around it. Needs `u_imgd`, `u_afd`, `u_lpm`, `u_cmh`, `u_cmd` — fold into the queued sprint
+    (47 → 52 keys) rather than paying for a second 26-agent pass later.
+  - **(c) THE UNKNOWN-UNIT PATH, which is what stops (b) being a workaround.** A unit we do not
+    recognize must still open, draw and display verbatim; only the SOLVE is refused, naming the
+    unit. "We don't recognize this unit" and "we cannot give you answers" are two different
+    messages and the user needs both. Never reject the file; never guess.
+  - **The cost that will otherwise be found halfway through: in this suite a unit's IDENTITY IS its
+    conversion factor.** `js/Cookies.lib.js` stores each select's option *value*, i.e. the number —
+    which is why correcting the factors on 2026-08-16 silently reset returning visitors' unit
+    choices to their defaults. Carrying a unit as a string means the document AND the cookie must
+    key on a unit NAME. That is the real work in this task, and it is worth doing for its own sake.
+  - Acceptance: import then export reproduces the file. That is also Task 281's criterion.
+
 - 60|389| **Search and replace inputs across the network — WANTED, and no longer gated on network
   size.** Tom, 2026-08-16: *"I would like search and replace embraced more explicitly."* That
   reverses this file's earlier position, which said find-and-replace was a big-network tool we
