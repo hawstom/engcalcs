@@ -424,6 +424,49 @@ console.log('\n--- cost ---');
 		perLabel.toFixed(2) + 'x the per-label cost at 4.5x the size');
 }
 
+console.log("\n--- the result carries the committed box and leader ---");
+// **THE BUG THIS EXISTS FOR, and it was invisible until Tom looked at the readout.** placeLabels()
+// works on a PRIVATE copy of the obstacle list (`obs = { boxes: obstacles.boxes.slice(), ... }`), so
+// a caller that noted the length beforehand and then read `obs.boxes.slice(before)` got an EMPTY
+// array. ?debug=boxes drew every obstacle and not one placed label; the tuning bench reported
+// "0 overlapping pairs" on a map with visible overlaps in it. Both looked like the pass working.
+//
+// So the pass hands its committed geometry back, and the two properties are asserted together: the
+// caller's list is untouched (which is WHY it cannot be read back from) and the result carries what
+// the caller needs.
+{
+	const two = [
+		{ id: 'a', anchor: { x: 0, y: 0 }, home: { x: 6, y: -6 }, w: 20, h: 8, yOff: -6 },
+		{ id: 'b', anchor: { x: 90, y: 0 }, home: { x: 96, y: -6 }, w: 20, h: 8, yOff: -6 }
+	];
+	const ob = { boxes: [C.box(45, 0, 6, 6, 0, 'symbol')], segments: [] };
+	const nB = ob.boxes.length, nS = ob.segments.length;
+	const res = C.placeLabels(two, ob, { inner: 10, outer: 50, k: 0.25 });
+
+	report(ob.boxes.length === nB && ob.segments.length === nS,
+		"the caller's obstacle list is NOT mutated -- which is why it cannot be read back from",
+		ob.boxes.length + ' boxes, ' + ob.segments.length + ' segments');
+	report(res.every(r => r.box && r.leader), 'every result carries its committed box and leader');
+	report(res.every(r => {
+		const lbl = two.find(l => l.id === r.id);
+		const want = C.labelBoxAtEnd(lbl, { x: r.x, y: r.y });
+		return near(r.box.cx, want.cx) && near(r.box.cy, want.cy)
+			&& near(r.leader.ax, lbl.anchor.x) && near(r.leader.bx, r.x);
+	}), '...the geometry at the placement it chose, not a stale one');
+	// The bench counts overlaps off exactly these, so 0 has to MEAN zero...
+	const pairs = res.reduce((n, a, i) =>
+		n + res.slice(i + 1).filter(b => C.boxOverlapDepth(a.box, b.box) > 0).length, 0);
+	report(pairs === 0, 'two labels this far apart report no overlap');
+	// ...and it must not be vacuous. Two labels pinned to the SAME point have to report one.
+	const tight = [
+		{ id: 'a', anchor: { x: 0, y: 0 }, home: { x: 0, y: 0 }, w: 20, h: 8, yOff: -6, dragged: true },
+		{ id: 'b', anchor: { x: 0, y: 0 }, home: { x: 0, y: 0 }, w: 20, h: 8, yOff: -6, dragged: true }
+	];
+	const res2 = C.placeLabels(tight, { boxes: [], segments: [] }, { inner: 10, outer: 50, k: 0 });
+	report(C.boxOverlapDepth(res2[0].box, res2[1].box) > 0,
+		'...while two pinned to the same point DO report one, so 0 is a measurement');
+}
+
 console.log("\n--- goal 3: an auto-placed label never sits on its own leader (Tom, 2026-08-16) ---");
 // THE DEFECT THIS SECTION EXISTS FOR. dataLabelOrigin() applied Geom.labelSideAtEnd()'s hysteresis
 // to every label. That rule keeps the PREVIOUS side inside a dead band either side of the anchor's

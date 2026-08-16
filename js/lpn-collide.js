@@ -635,8 +635,16 @@ EngCalcs.lpnCollide = (function () {
 				placedLeader = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
 			index.addBox(obs.boxes.push(placedBox) - 1);
 			index.addSegment(obs.segments.push(placedLeader) - 1);
+			// **THE COMMITTED BOX AND LEADER COME BACK WITH THE RESULT.** They are pushed onto a
+			// PRIVATE copy of the obstacle list above (`obs` is sliced from the caller's), so a
+			// caller that tried to read them off its own array got nothing -- which is exactly what
+			// happened: ?debug=boxes drew every obstacle and not one placed label, and the bench's
+			// overlap count read 0 on a map Tom could see overlaps in. Returning them is also the
+			// only way a caller can have them without recomputing labelBoxAtEnd(), and a recomputed
+			// box is a box that can drift from the one the pass actually used.
 			out.push({ id: lbl.id, x: c.x, y: c.y,
-				dx: c.x - lbl.home.x, dy: c.y - lbl.home.y, score: eff[best] });
+				dx: c.x - lbl.home.x, dy: c.y - lbl.home.y, score: eff[best],
+				box: placedBox, leader: placedLeader });
 		});
 		order.forEach(function (l) { delete l._diff; });
 		return out;

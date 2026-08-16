@@ -992,21 +992,32 @@ var EngCalcs = EngCalcs || {};
 		}
 		return labelTune;
 	}
-	function labelDebugReport(labels, obs, placed, before) {
-		drawCollisionBoxes(obs.boxes.slice(before), obs);
+	function labelDebugReport(labels, placed, obs) {
+		// The boxes the pass COMMITTED, straight off its own result -- see placeLabels(). Reading
+		// them off our obstacle list gave an empty array, because the pass works on a copy.
+		var boxes = placed.map(function (r) { return r.box; });
+		drawCollisionBoxes(boxes, obs, placed.map(function (r) { return r.leader; }));
 		if (!debugOn('labels')) { return; }
-		// The COUNTS, because "that looks better" is not a verdict. Overlapping label pairs is the
-		// one that matters (goal 2); mean travel is what it cost to get there.
-		var boxes = obs.boxes.slice(before), i, j, pairs = 0, travel = 0;
+		// THE COUNTS, because "that looks better" is not a verdict. Both of the top two goals are
+		// reported: text on text (goal 2) is the failure, and a rule drawn through a number
+		// (goal 3) is the one Tom keeps photographing.
+		var i, j, pairs = 0, onLeader = 0, travel = 0;
 		for (i = 0; i < boxes.length; i++) {
 			for (j = i + 1; j < boxes.length; j++) {
 				if (Collide.boxOverlapDepth(boxes[i], boxes[j]) > 0) { pairs++; }
+			}
+			for (j = 0; j < placed.length; j++) {
+				// Its own leader is excluded: it stops at the box's near edge by construction, so
+				// counting it would report the same constant on every drawing.
+				if (placed[j].id === placed[i].id) { continue; }
+				if (Collide.segmentInBoxFraction(placed[j].leader, boxes[i]) > 0) { onLeader++; }
 			}
 		}
 		placed.forEach(function (r) { travel += Math.hypot(r.dx, r.dy); });
 		var el2 = document.getElementById('lpn_label_bench_out');
 		if (el2) {
-			el2.textContent = labels.length + ' labels \u2022 ' + pairs + ' overlapping pairs \u2022 mean travel '
+			el2.textContent = labels.length + ' labels \u2022 ' + pairs + ' label-on-label \u2022 '
+				+ onLeader + ' label-on-leader \u2022 mean travel '
 				+ (placed.length ? (travel / placed.length * (state.s || 1)).toFixed(1) : '0') + ' px';
 		}
 	}
@@ -1111,7 +1122,7 @@ var EngCalcs = EngCalcs || {};
 	// The shipped ranks, copied once at load so "defaults" restores them after any amount of
 	// fiddling. Read from the module rather than restated, so it cannot drift from the real table.
 	var LPN_GOAL_WEIGHT_SHIPPED = JSON.parse(JSON.stringify(Collide.GOAL_WEIGHT));
-	function drawCollisionBoxes(placed, obs) {
+	function drawCollisionBoxes(placed, obs, leaders) {
 		if (!debugBoxLayer) { return; }
 		while (debugBoxLayer.firstChild) { debugBoxLayer.removeChild(debugBoxLayer.firstChild); }
 		if (!debugBoxesOn()) { return; }
@@ -1130,7 +1141,11 @@ var EngCalcs = EngCalcs || {};
 		// The three colours answer the three questions the pictures raise: what was placed (blue),
 		// what it had to go round (green), and which lines are obstacles (red).
 		draw(obs.boxes.filter(function (b) { return placed.indexOf(b) < 0; }), '#0a0');
-		obs.segments.forEach(function (seg) {
+		// The LEADERS the pass committed are drawn too. They live only on placeLabels()'s private
+		// copy of the obstacle list, so obs.segments here holds the static lines alone -- and the
+		// picture used to show every pipe as an obstacle and not one of the rules the labels were
+		// being scored against.
+		obs.segments.concat(leaders || []).forEach(function (seg) {
 			el('line', {
 				x1: seg.ax, y1: seg.ay, x2: seg.bx, y2: seg.by,
 				stroke: '#d00', 'stroke-width': 2 / state.s, 'stroke-opacity': 0.5,
@@ -1184,7 +1199,6 @@ var EngCalcs = EngCalcs || {};
 		// Every number the pass is steered by goes through ONE place, so ?debug=labels can override
 		// them live without a second code path deciding anything (see labelTuning()).
 		var t = labelTuning(),
-			before = obs.boxes.length,
 			placed = Collide.placeLabels(labels, obs, {
 				inner: t.inner * fs, outer: t.reach * fs,
 				steps: parseRingSteps(t.steps), k: t.k
@@ -1193,7 +1207,7 @@ var EngCalcs = EngCalcs || {};
 			var h = holders[r.id];
 			if (h) { h.nudge = { x: r.dx, y: r.dy }; }
 		});
-		labelDebugReport(labels, obs, placed, before);
+		labelDebugReport(labels, placed, obs);
 	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped.
