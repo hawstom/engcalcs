@@ -2677,12 +2677,98 @@ var EngCalcs = EngCalcs || {};
 	}
 	function labelVAlign(lb) { return (lb && lb.valign === 'top') ? 'hanging' : 'middle'; }
 	function textLabelHeight(lb) { return effectiveFontSize(lb && lb.sizeMult) * 1.2; }
+
+	// ---- Task 337: a Text label's own boldface and its own rotation ----
+	//
+	// ROTATION IS A STORED NUMBER, NOT A LIVE REFERENCE TO A PIPE (Tom, 2026-08-14: *"Rotation as
+	// number. Yes. It's just a helper/convenience, not a link. We can let them enter a number also
+	// or pick among 0, 30, 45, 60, 90"*). A Text label is a street name or a title block, not a
+	// property of one link, so it has no link to be slaved to and should not grow one. "Match a
+	// pipe" fills the box from the nearest pipe at the moment the user asks; from then on the
+	// label is independent of everything that happens to that pipe.
+	//
+	// THE NUMBER IS CARTESIAN -- counter-clockwise, y up -- because that is the frame the user
+	// reads an angle in, and mixing the two frames is what once shipped a page of upside-down
+	// labels (see settings.labelFlipLeftOfVertical). SVG rotates CLOCKWISE, so the render negates
+	// it, and that negation happens in textLabelSvgAngle() and nowhere else.
+	//
+	// Both properties are absent on every label written before this, so `undefined` must read as
+	// "0 degrees, not bold" -- which is what an old document opens as, unchanged.
+	function normalizeDeg(a) {
+		a = a % 360;
+		if (a > 180) { a -= 360; }
+		if (a <= -180) { a += 360; }
+		return a;
+	}
+	// The half-turn that reads left-to-right. Text pointing leftward is upside down, so a matched
+	// angle is turned 180 first; the flip button then undoes that when the automatic choice is the
+	// wrong one. Exactly +90 (straight up) is left alone -- a north-south name reads bottom to top
+	// on every map, the same convention alignedLabelAnchor() follows for pipe labels.
+	function readableAngle(a) {
+		a = normalizeDeg(a);
+		return (a > 90 || a <= -90) ? normalizeDeg(a + 180) : a;
+	}
+	function textLabelRotation(lb) {
+		var r = lb ? +lb.rot : 0;
+		return isFinite(r) ? normalizeDeg(r) : 0;
+	}
+	function textLabelSvgAngle(lb) { return -textLabelRotation(lb); }
+	function textLabelWeight(lb) { return (lb && lb.bold) ? 'bold' : 'normal'; }
+	function textLabelStyle(lb) {
+		return 'font-size:' + effectiveFontSize(lb && lb.sizeMult) + 'px;font-weight:' + textLabelWeight(lb);
+	}
+	// The mask has to carry the SAME transform about the SAME point as the text, or it stops
+	// covering it -- the identical rule layoutLinkLabelAt() follows for aligned pipe labels. The
+	// attribute is REMOVED rather than set to a zero rotation when the label is upright: a stale
+	// transform is invisible in the code and obvious on screen.
+	function applyTextLabelRotation(lb, le, px, py) {
+		var a = textLabelSvgAngle(lb),
+			t = a ? 'rotate(' + a.toFixed(3) + ' ' + px + ' ' + py + ')' : null;
+		[le.text, le.mask].forEach(function (e) {
+			if (!e) { return; }
+			if (t) { e.setAttribute('transform', t); } else { e.removeAttribute('transform'); }
+		});
+	}
+	// AXIS-ALIGNED bounding box of a rotated box, turned about the same point the SVG transform
+	// turns it about. An APPROXIMATION, said plainly: a 45-degree label claims more room than its
+	// glyphs occupy, so the collision pass keeps data labels a little further away from it than it
+	// strictly needs. The alternative is oriented-box collision in js/lpn-collide.js -- a much
+	// larger change, for a label the user placed deliberately and can move by hand.
+	function rotatedAabb(box, cx, cy, angleDeg) {
+		var rad = angleDeg * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad),
+			bx = box.x + box.w / 2 - cx, by = box.y + box.h / 2 - cy,
+			rx = cx + bx * cos - by * sin, ry = cy + bx * sin + by * cos,
+			halfW = (Math.abs(box.w * cos) + Math.abs(box.h * sin)) / 2,
+			halfH = (Math.abs(box.w * sin) + Math.abs(box.h * cos)) / 2;
+		return { x: rx - halfW, y: ry - halfH, w: halfW * 2, h: halfH * 2 };
+	}
+	// Cartesian angle of the pipe nearest a point, or null when the drawing has no pipes. The
+	// nearest SEGMENT, not the link's end-to-end direction: on a bent main the two differ, and the
+	// user is looking at the bend they put the label beside.
+	function nearestLinkAngle(px, py) {
+		var best = Infinity, ang = null;
+		doc.links.forEach(function (l) {
+			var pts = linkPointList(l), i, d;
+			for (i = 0; i + 1 < pts.length; i++) {
+				d = Geom.pointToSegmentDistance(px, py, pts[i].x, pts[i].y, pts[i + 1].x, pts[i + 1].y);
+				if (d < best) {
+					best = d;
+					// Negated on the way out: doc coordinates are screen-frame (y down) in memory,
+					// and lb.rot is Cartesian.
+					ang = -Math.atan2(pts[i + 1].y - pts[i].y, pts[i + 1].x - pts[i].x) * 180 / Math.PI;
+				}
+			}
+		});
+		return ang === null ? null : readableAngle(ang);
+	}
 	// The label's box, wherever its anchor puts it -- the ONE place the two properties above are
 	// turned into geometry, so the mask, the bounding box, the collision box and the leader
 	// attachment can never disagree about where the same label is.
 	function textLabelBox(lb, le, px, py) {
-		return Geom.labelBoxAt(px, py, textLabelWidth(le), textLabelHeight(lb),
-			labelHAlign(lb), labelVAlign(lb), effectiveFontSize(lb && lb.sizeMult));
+		var box = Geom.labelBoxAt(px, py, textLabelWidth(le), textLabelHeight(lb),
+				labelHAlign(lb), labelVAlign(lb), effectiveFontSize(lb && lb.sizeMult)),
+			a = textLabelSvgAngle(lb);
+		return a ? rotatedAabb(box, px, py, a) : box;
 	}
 	function buildLabelEls(lb) {
 		var an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: lb.x, y: lb.y },
@@ -2699,14 +2785,19 @@ var EngCalcs = EngCalcs || {};
 		text = el('text', {
 			x: px, y: py, 'class': 'lpn-lbl lpn-draglbl', 'text-anchor': labelHAlign(lb),
 			'dominant-baseline': labelVAlign(lb) === 'hanging' ? 'hanging' : 'central',
-			'data-lbl': lb.id, style: 'font-size:' + effectiveFontSize(lb.sizeMult) + 'px'
+			'data-lbl': lb.id, style: textLabelStyle(lb)
 		}, labelsLayer);
 		text.textContent = lb.text;
+		// MEASURED AFTER THE STYLE IS ON THE ELEMENT, which is the whole reason bold can be a
+		// style rather than a second measurement path: bold glyphs are wider, so a width taken
+		// before the weight was applied would size the mask and the collision box for the
+		// lighter text (Task 337).
 		var w = 10;
 		try { w = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
 		labelEls[lb.id] = { leader: leader, text: text, side: 'right', width: w, mask: mask };
 		noteTextWidth(labelEls[lb.id], w);
 		positionMaskRect(mask, px, py, w, textLabelHeight(lb), labelHAlign(lb), labelVAlign(lb));
+		applyTextLabelRotation(lb, labelEls[lb.id], px, py);
 		if (lb.anchorNode) { labelsByAnchor[lb.anchorNode].push(lb.id); }
 	}
 
@@ -2752,6 +2843,7 @@ var EngCalcs = EngCalcs || {};
 		if (!lb.anchorNode) {
 			le.text.setAttribute('x', lb.x); le.text.setAttribute('y', lb.y);
 			positionMaskRect(le.mask, lb.x, lb.y, textLabelWidth(le), maskH, hA, vA);
+			applyTextLabelRotation(lb, le, lb.x, lb.y);
 			return;
 		}
 		an = nodeById(lb.anchorNode); px = an.x + lb.x; py = an.y + lb.y;
@@ -2767,6 +2859,7 @@ var EngCalcs = EngCalcs || {};
 		le.leader.setAttribute('x2', att.x); le.leader.setAttribute('y2', box.y + box.h / 2);
 		le.text.setAttribute('x', px); le.text.setAttribute('y', py);
 		positionMaskRect(le.mask, px, py, textLabelWidth(le), maskH, hA, vA);
+		applyTextLabelRotation(lb, le, px, py);
 	}
 	// Double-click-to-reset for a Text label (Tom, 2026-07-30) -- only meaningful when anchored: an
 	// anchored Text's lb.x/lb.y is an offset from its node, same convention as a node/link label's,
@@ -11996,6 +12089,95 @@ var EngCalcs = EngCalcs || {};
 		alwaysLabel.textContent = (pc.lpn_field_show_always || 'Always show') + ' ';
 		alwaysLabel.appendChild(alwaysInput);
 		fields.appendChild(alwaysLabel);
+		fields.appendChild(document.createElement('br'));
+		// ---- Task 337: Bold, and rotation with its two convenience buttons ----
+		// TODO(lang): THESE FOUR LABELS ARE HARDCODED ENGLISH AND MUST NOT STAY THAT WAY. A
+		// 26-language sprint was frozen against a fixed key delta when this landed, so adding an
+		// $ec_lang key here would have silently corrupted it -- and referencing a key that does not
+		// exist yet fails the dangling-key check in dev/lpn-spike/popup-tips-harness.js, which is
+		// why there is no `pc.` lookup below to switch on later. The keys owed, with the English
+		// they should carry:
+		//     lpn_field_text_bold       'Bold'
+		//     lpn_field_text_rotation   'Rotation'
+		//     lpn_field_text_match_pipe 'Match pipe'
+		//     lpn_field_text_flip       'Flip'
+		// Once they exist in lib/lang.ec.*.php and in Looped-Network.php's pageConfig, replace each
+		// literal below with `pc.<key> || '<English>'` -- the house pattern every other field here
+		// already uses -- and delete this note.
+		//
+		// Redrawing after either property changes goes through ONE function, because bold and
+		// rotation both invalidate the same three things and in the same order: the measured width
+		// (bold glyphs are wider), then the geometry that is computed from it, then the visibility
+		// threshold that reads the geometry.
+		function relayoutThisLabel() {
+			var le = labelEls[labelId];
+			le.text.setAttribute('style', textLabelStyle(lb));
+			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
+			updateLabelGeometry(labelId);
+			applyLabelVisibility();
+			saveToStorage();
+		}
+		var boldLabel = document.createElement('label'), boldInput = document.createElement('input');
+		boldInput.type = 'checkbox';
+		boldInput.checked = !!lb.bold;
+		boldInput.addEventListener('change', function () {
+			saveUndoSnapshot();
+			lb.bold = boldInput.checked;
+			relayoutThisLabel();
+		});
+		boldLabel.textContent = 'Bold ';
+		boldLabel.appendChild(boldInput);
+		fields.appendChild(boldLabel);
+		fields.appendChild(document.createElement('br'));
+		// THE BOX IS THE CONTROL AND THE BUTTONS ONLY FILL IT (Tom, 2026-08-14). A control whose
+		// only input is "match a pipe" is unusable on a label nowhere near a pipe, and a preset is
+		// what people reach for nine times in ten -- so free numeric entry first, a preset list
+		// hanging off it, and the pipe as a convenience beside it.
+		var rotLabel = document.createElement('label'), rotInput = document.createElement('input'),
+			presets = document.createElement('datalist'), presetId = 'lpn_rot_presets';
+		presets.id = presetId;
+		[0, 30, 45, 60, 90, -30, -45, -60].forEach(function (d) {
+			var o = document.createElement('option');
+			o.value = String(d);
+			presets.appendChild(o);
+		});
+		rotInput.type = 'number'; rotInput.step = 'any'; rotInput.setAttribute('list', presetId);
+		rotInput.value = textLabelRotation(lb);
+		function setRotation(deg) {
+			var v = normalizeDeg(+deg);
+			if (!isFinite(v)) { rotInput.value = textLabelRotation(lb); return; }
+			if (v === textLabelRotation(lb)) { rotInput.value = v; return; }
+			saveUndoSnapshot();
+			lb.rot = v;
+			rotInput.value = v;
+			relayoutThisLabel();
+		}
+		rotInput.addEventListener('change', function () { setRotation(rotInput.value); });
+		rotLabel.textContent = 'Rotation ';
+		rotLabel.appendChild(rotInput);
+		rotLabel.appendChild(presets);
+		fields.appendChild(rotLabel);
+		var matchBtn = document.createElement('button');
+		matchBtn.type = 'button';
+		matchBtn.textContent = 'Match pipe';
+		matchBtn.addEventListener('click', function () {
+			// Read at the label's RENDERED point, which for an anchored label is its node plus its
+			// offset -- not lb.x/lb.y, which is the offset alone and would find the pipe nearest
+			// the map origin.
+			var a = nearestLinkAngle(an ? an.x + lb.x : lb.x, an ? an.y + lb.y : lb.y);
+			if (a === null) { return; }   // no pipes drawn: nothing to match, and nothing to say
+			setRotation(a);
+		});
+		fields.appendChild(matchBtn);
+		// +180 and nothing else. It exists because the readable normalisation in readableAngle()
+		// picks the half-turn that reads left to right, and on a near-vertical pipe either choice
+		// is defensible -- so the user gets the other one on request, rather than an automatic rule
+		// that is right most of the time and unarguable when it is not.
+		var flipBtn = document.createElement('button');
+		flipBtn.type = 'button';
+		flipBtn.textContent = 'Flip';
+		flipBtn.addEventListener('click', function () { setRotation(textLabelRotation(lb) + 180); });
+		fields.appendChild(flipBtn);
 		fields.appendChild(document.createElement('br'));
 		readonlyField(fields, pc.lpn_field_x || 'X', outwardX(an ? an.x + lb.x : lb.x));
 		readonlyField(fields, pc.lpn_field_y || 'Y', outwardY(an ? an.y + lb.y : lb.y));

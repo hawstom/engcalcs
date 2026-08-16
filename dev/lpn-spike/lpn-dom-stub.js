@@ -45,7 +45,18 @@ function mkEl(tag) {
     // make the Task 264 regression test below meaningless.
     contains(n) { if (n === this) { return true; } return this.children.some(c => c.contains && c.contains(n)); },
     getBoundingClientRect() { return { left: 0, top: 0, right: 1000, bottom: 500, width: 1000, height: 500 }; },
-    getBBox() { return { x: 0, y: 0, width: 10, height: 10 }; },
+    // WIDTH VARIES WITH FONT WEIGHT, and that is the one physical relationship this stub is
+    // required to know (Task 337). Bold glyphs are wider, so a constant width here would let a
+    // bold label be measured as though it were light -- mask, collision box and zoom-to-fit all
+    // sized for the wrong glyphs, with every assertion still passing. The exact ratio does not
+    // matter; only that it is not 1. Everything else about text metrics is still constant, so a
+    // harness must not read anything into the width of an unbolded label.
+    getBBox() { return { x: 0, y: 0, width: 10 * (this._isBold() ? 1.12 : 1), height: 10 }; },
+    _isBold() {
+      // Two write paths reach the same declaration: the style ATTRIBUTE (buildLabelEls / the
+      // popup) and the style OBJECT (anything setting .style.fontWeight). Read both.
+      return /bold/.test((this._styleAttr || '') + ' ' + (this.style.fontWeight || ''));
+    },
     getComputedTextLength() { return 10; },
     setPointerCapture() {}, releasePointerCapture() {},
     remove() { if (this.parentNode) { this.parentNode.removeChild(this); } },
