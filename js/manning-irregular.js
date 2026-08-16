@@ -115,7 +115,7 @@ EngCalcs.pageCalculator = function (objForm) {
 	document.getElementById('q_617').innerHTML = (this.Manning.q617c * objForm['q_617u'].value).toFixed(2);
 	var vCheckStatus = (minRegionVelocity === Infinity) ? ''
 		: (maxRegionVelocity > EngCalcs.VELOCITY_OK.max) ? 'high'
-		: (minRegionVelocity < 0.6) ? 'low'
+		: (minRegionVelocity < EngCalcs.VELOCITY_OK.min) ? 'low'
 		: 'ok';
 	this.writeVelocityCheck('v_check', vCheckStatus, {
 		ok: EngCalcs.pageConfig.mhp_vel_ok_short,
@@ -180,10 +180,44 @@ EngCalcs.pageCalculator = function (objForm) {
 		+ '</svg>';
 };
 
+// The seed a first-time visitor gets: a compound section with a main channel and a floodplain
+// on each side, which is the whole point of this calculator (three regions, three composite n).
+//
+// TWO THINGS ABOUT THE SEED COOKIE, both of which used to be wrong (ROADMAP Task 233).
+//
+// 1. IT MUST NOT NAME A UNIT. The cookie is POSITIONAL over the form's INPUTs and SELECTs, and an
+//    `s:<n>` slot sets a select BY ITS CONVERSION FACTOR. The old seed hard-coded one factor per
+//    select, and `1` is the SI option of every distance/flow/velocity family -- so the English
+//    page forced itself into metric on every first load, overwriting the correct US selects PHP
+//    had just rendered. An EMPTY `s:` slot keeps the slot count right and makes cookieToForm fall
+//    back to the server-rendered `option[selected]`, which is already the right preset. So the
+//    slots are built by WALKING THE FORM the server just rendered rather than by being typed out:
+//    add a field to the page and the seed follows it, instead of silently mis-aligning by one.
+// 2. THE SECTION ITSELF IS PER-PRESET. Station and elevation are read in whatever unit the page
+//    rendered in, so a metre-sized floodplain read as feet is a different channel -- and it was
+//    also a channel that opened on a ⚠ Low velocity in BOTH presets, which CLAUDE.md is explicit
+//    is worse than opening on a worked example. Each preset gets round numbers an engineer would
+//    type, chosen so every region lands inside EngCalcs.VELOCITY_OK (0.6-2.5 m/s):
+//      us  6 ft deep at 0.25%: overbanks 2.4 ft/s, main channel 6.7 ft/s, Q = 1425 cfs
+//      si  2 m  deep at 0.25%: overbanks 0.79 m/s, main channel 2.07 m/s, Q = 36.8 m3/s
+//    Verified by dev/browser-pass/mi-defaults.js, which drives the real page in both presets --
+//    the calc-spike smoke harness cannot see this page's results, because they live in rows it
+//    does not build.
 EngCalcs.pageCalculatorInitialize = function (objForm) {
-	this.cookieValue = 'i:,i:,i:1,s:1,i:0.001,s:1,s:1,s:1,s:1,s:9806,s:1,s:1,s:1,s:1,s:1,s:1,s:1'; // Up to points data.
+	'use strict';
+	var i, el, slots = [], elements = objForm.elements;
+	for (i = 0; i < elements.length; i = i + 1) {
+		el = elements[i];
+		// Same two tag names cookieToForm counts, in the same document order, so the slot count
+		// matches by construction. Buttons and the points textarea are not stored, as before.
+		if (el.tagName === 'INPUT') { slots.push('i:' + el.value); }
+		else if (el.tagName === 'SELECT') { slots.push('s:'); }
+	}
+	this.cookieValue = slots.join(',');
 	// Points data (user readable). Column order matches the v2 table layout: station, elevation, is_bank, n.
-	this.dataString = "0,1\n10,0.9,true,0.03\n12,0,false,0.03\n18,0,false,0.03\n20,0.9,true,0.03\n30,1,true,0.03";
+	this.dataString = (this.defaultUnitSet === 'us')
+		? "0,6\n30,3,true,0.04\n40,1,false,0.03\n60,1,false,0.03\n70,3,true,0.03\n100,6,true,0.04"
+		: "0,2\n10,1,true,0.04\n12,0.5,false,0.03\n18,0.5,false,0.03\n20,1,true,0.03\n30,2,true,0.04";
 	this.dataStringToCookieValue();
 	// Stamp the current format so this fresh seed isn't read back as a legacy (v1) cookie and migrated.
 	this.cookieValue = 'v' + (this.cookieFormatVersion || 1) + ',' + this.cookieValue;

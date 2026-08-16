@@ -268,25 +268,6 @@ session of its own with nothing else in it.
   nothing re-scans it.
 
 
-- 55|233| **Manning-Irregular opens in metric on English pages, and greets everyone with a warning.
-  One root cause, found 2026-08-08.** `js/manning-irregular.js:184` seeds a hard-coded cookie:
-  `'i:,i:,i:1,s:1,i:0.001,s:1,s:1,...'`. Each `s:<n>` sets a select **by its conversion factor**,
-  and `1` is always the SI option — so the seed forces every unit select to metric, overwriting the
-  US units PHP already rendered correctly. Verified: server-side the page renders `ft`, `cfs`,
-  `ft/sec`; in a browser it shows `m`, `m³/s`, `m/s`. It is the only page in the suite that hard-codes
-  select values this way.
-  Two visible symptoms, both from that line:
-  - **Wrong unit system.** Every other calculator opens in US for `en`; this one opens in SI.
-  - **Opens on a ⚠ Low velocity warning**, because the seeded section (`0,1 / 10,0.9 / …`, a ~30-unit
-    wide, 1-unit deep channel at s=0.001, n=0.03) is metric-scaled. CLAUDE.md is explicit that a page
-    greeting a first-time visitor with a warning is worse than one greeting them with a worked
-    example.
-  **Fix is per-preset seeding keyed off `EngCalcs.defaultUnitSet`** — the exact case the unit-families
-  doc warns about ("hard-coded metric seeds read under `us` produced a 100-inch pipe"). Needs the
-  positional cookie columns mapped to their selects, US geometry chosen, and both presets checked to
-  open on a *passing* design. **Not a quick fix — do not guess the column order.**
-  `dev/browser-pass/` can verify it: drive the page in both presets and read `v_check`.
-
 - 60|239| **The English-friction loop: mechanize Wave 0, and give every translator a suggestion box.**
   Built 2026-08-08 out of Tom's diagnosis after the 146.06 sprint. **The mechanism exists and is
   wired in; what remains is running it and measuring the yield** (see the open sub-items).
@@ -1989,6 +1970,14 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|233| **Manning-Irregular opened in metric on English pages and greeted everyone with a ⚠ — DONE
+  2026-08-16.** Its seed cookie is positional over the form's INPUTs and SELECTs, and each `s:<n>`
+  slot set a select BY ITS CONVERSION FACTOR (`1` = SI everywhere), overwriting the US selects PHP
+  had just rendered. Slots are now walked off the rendered form (empty `s:` keeps the server's
+  `option[selected]`) and the cross-section is per-preset, both opening ✓ inside `VELOCITY_OK`.
+  Asserted in a real browser by `dev/browser-pass/mi-defaults.js` — `calc-spike` structurally
+  cannot see this page's results, which is where the defect hid.
 
 - 0|385| **The giant obstacle boxes were a stale measurement, not the rotated-box waste — DONE
   2026-08-15.** Tom sent the same view twice: *"See the size of these boxes before and after I
