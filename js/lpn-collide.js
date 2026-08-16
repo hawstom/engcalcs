@@ -75,11 +75,26 @@ EngCalcs.lpnCollide = (function () {
 	// So 0.5 for a node and 0.4 for a pipe are gone. The one number that is not 1 is `manual`, and
 	// it is not a fraction — it is a flag wearing a number, so that "practically immovable" falls
 	// out of the same formula instead of needing a second code path.
-	// **pipe 0.5, and Tom moved it there himself after moving it to 1:** *"Nodes should be 1 and
-	// pipes should be less than 1."* Under insistence that reads directly -- a label must come
-	// entirely off a symbol, another label or a leader, and about half way off a pipe. It is the one
-	// obstacle a number can legitimately lie across, so it is the one obstacle that does not insist.
-	var WEIGHT = { pipe: 0.5, node: 1, label: 1, leader: 1, manual: 1000 };
+	// **WEIGHT AND PREFERENCE ARE TWO DIFFERENT QUANTITIES AND THIS FILE HOLDS ONLY ONE OF THEM.**
+	// Tom, 2026-08-15, after I put his number in the wrong one twice: *"pipe weight = 1. Pipe
+	// preference = less than 1. Why do you keep confusing them?"*
+	//
+	//   WEIGHT (this array) = how much of an overlap must be gone when the iteration ends. For every
+	//   real obstacle that is ALL of it, pipes included: a number lying across a pipe is a number
+	//   the reader has to work at, so the pass should always try to clear it. Pipe = 1.
+	//
+	//   PREFERENCE = which conflict to ACCEPT when they cannot all be avoided. A pipe is the one
+	//   thing a number may legitimately end up lying across, so its preference is below a symbol's
+	//   or another label's. That is a comparison between two candidate PLACEMENTS, not a property of
+	//   the obstacle, and this pass never compares placements -- it only pushes pairs apart. **There
+	//   is nowhere here to put it.** It lives in Task 379's score, and is written down in section 4
+	//   of dev/label-placement-goals.md so it is not lost in the meantime.
+	//
+	// Writing a preference into the weight field says something entirely different and wrong: it
+	// tells the pass to clear only part of the overlap ALWAYS, even when the label had somewhere
+	// perfectly good to go. That is what 0.4 and then 0.5 did, and it is why labels sat on pipes
+	// with open space beside them.
+	var WEIGHT = { pipe: 1, node: 1, label: 1, leader: 1, manual: 1000 };
 
 	// **LEADERS ARE SEGMENTS TOO, AND THE SAMPLER IS GONE** (Tom, 2026-08-15: *"Why not do segment
 	// testing on the leaders if it can be done?"*). It can, it is the same pushOffSegments() the
