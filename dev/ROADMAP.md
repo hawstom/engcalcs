@@ -50,6 +50,24 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
+- 92|380| **[H] A dragged data label stores a WORLD offset while its text is sized in PIXELS, so it
+  drifts away from its node as you zoom in.** Confirmed 2026-08-15 from a `?debug=boxes` screenshot:
+  node 105's label sat ~370 px from its node with almost nothing near it, and Tom asked the right
+  question — *"How can this node label have arrived here from its home position with so few
+  pushers?"*
+  - **It never was pushed there.** `capNudges()` limits every nudge to 28 SCREEN pixels at any zoom,
+    so a label 370 px out is one whose HOME is there. A node label's home is `n.x + n.lx`, and the
+    drag handler is the only code in the file that writes `n.lx`.
+  - So the drag was made once at a coarse zoom and every zoom since has multiplied it: 10× in gives
+    a 37 px drag as 370 px, with the text the same size it always was. It crosses the leader
+    threshold on the way and sprouts a line nobody asked for.
+  - **This is independent of Task 379 and no work on the placement algorithm touches it.**
+  - Confirm in one gesture: zoom OUT and the label walks back toward its node in exact proportion.
+  - Fix: store the drag as a pixel offset — a data label is furniture attached to an element, not a
+    place in the drawing. A Text label is the opposite and does not change. Migration converts at
+    the scale the document opens at, because the scale the drag was made at is not recorded.
+    Section 7 and 8 of `dev/label-placement-goals.md`; needs Tom's ruling on the storage frame first.
+
 - 95|379| **[H] Replace the label relaxation with candidate-position scoring, which is the part that
   can see open space.** Tom, 2026-08-15, on two Net3 screenshots with the bad cases arrowed in red:
   *"The 'AI' for conflict-avoidance is just not very good now. There are no gross problems, but it's

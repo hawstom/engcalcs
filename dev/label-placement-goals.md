@@ -233,3 +233,38 @@ of thing.
 
 **Not settled. This is the question to answer before Task 379 is built, because scoring bakes the
 answer into every candidate.**
+
+---
+
+## 8. CONFIRMED, from a screenshot: that label was never pushed there
+
+Tom, 2026-08-15, on a `?debug=boxes` capture of node 105 sitting ~370 px from its node at the end
+of a long red leader, with two green boxes anywhere near it: *"How can that be possible? How can
+this node label have arrived here from its home position with so few pushers?"*
+
+**It cannot, and it did not.** The relaxation cannot put a label more than `LPN_NUDGE_CAP_PX` = 28
+screen pixels from its home, at any zoom — `capNudges()` scales every nudge back along its own
+vector, and the cap is divided by `state.s`, so it is a genuine screen distance. A label 370 px out
+is a label whose **home is there**.
+
+A node label's home is `n.x + n.lx`, and **the only code in the file that writes `n.lx` is the drag
+handler** (line ~9127; the only other mentions are the y-flip on load). So:
+
+1. The label was dragged, once, at some earlier zoom.
+2. The drag stored a **world** offset — the gap in map units at the scale it was dragged at.
+3. Every zoom since has multiplied that gap on screen, because the text is sized in **pixels** while
+   the offset is in **map units**. Zoom in 10× and a 37 px drag becomes 370 px.
+
+This is section 7's open question, observed. **It is a defect on its own, independent of Task 379,
+and no amount of work on the placement algorithm touches it** — the pass is not involved.
+
+**The falsifiable prediction, which is how to confirm it in one gesture:** zoom OUT and the label
+walks back toward its node, in exact proportion to the zoom. Zoom in and it flies out again. A
+drag fixes it *at that zoom only*.
+
+**The fix, if Tom rules that way:** store a data label's drag as a pixel offset. It is furniture
+attached to an element, not a place in the drawing. Existing documents hold world offsets and would
+need a one-time conversion at load — the conversion is exact if we know the scale the drag was made
+at, and we do not, so the honest migration is to convert at the scale the document opens at and
+accept that a very old drag lands somewhere approximate. A Text label is the opposite case and does
+not change: it is content placed in the drawing and stays in map units.
