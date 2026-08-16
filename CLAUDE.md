@@ -89,6 +89,8 @@ anything else → false.
 | `js/lpn-geom.js` | `lpn_` pure geometry — arc-length, arrow dodge, leader attachment, label rects. No DOM |
 | `js/lpn-collide.js` | `lpn_` label collision avoidance as pure weighted-box relaxation. No DOM |
 | `js/lpn-solver.js` | Looped-network global gradient algorithm |
+| `js/lpn-epanet.js` | Bridge to the vendored EPANET engine |
+| `js/lpn-inp.js` | EPANET `.inp` import |
 | `js/looped-network.js` | `lpn_` map editor |
 | `css/engcalcs.css` | App-wide styles |
 
@@ -100,9 +102,17 @@ anything else → false.
 | `dev/roadmap-closed-ids.md` | One line per closed ID, so a cited `Task N` resolves. An index, not a record — the text is in git |
 | `dev/scripts/` | All CLI tools and checks |
 | `dev/scripts/glossary.json` | Engineering term glossary for translation prompts |
-| `dev/calc-spike/` | Headless behavioural tests for the non-lpn calculators |
+| `dev/calc-spike/` | Headless behavioural tests for the non-lpn calculators. `calc-page.js` is the scaffolding; `README.md` is the recipe for a new worked example |
 | `dev/lpn-spike/` | Headless tests for the lpn solver and map editor |
 | `dev/translation_payloads/` | Per-language JSON payloads for translation sprints |
+| `dev/language-strings.md` | Full rules for writing `$ec_lang` / `$ec_lang_syn` values |
+| `dev/translation-process.md` | Sprint SOP and full mechanics |
+| `dev/testing-notes.md` | What actually catches defects here |
+| `dev/cross-platform-planning.md` | Claude Code / Copilot collaboration conventions |
+| `dev/unit-families.md` | Unit-family design record and per-field rationale |
+| `dev/cookie-storage-inventory.md` | Everything stored on a visitor's device, and why |
+| `dev/scenario-seam-repair.md` | The `setProp()` write-seam incident and its guard |
+| `dev/positioning.md` | How `lpn_` is positioned against epanet-js; LibreEPANET.org |
 
 Paths to `lib/` inside `dev/scripts/*.php` use `__DIR__ . '/../../lib'`.
 
