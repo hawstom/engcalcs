@@ -1,6 +1,6 @@
 # EngCalcs — Architecture & Developer Guide
 
-**What this is:** a PHP/JS suite of hydraulic engineering calculators — 17 calculators, 27 languages. PHP
+**What this is:** a PHP/JS suite of hydraulic engineering calculators — 16 calculators, 27 languages. PHP
 delivers multi-linguality (language detection, switching, injecting localized strings); all
 computation runs client-side in JavaScript. No database, no authentication.
 
