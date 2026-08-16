@@ -311,5 +311,34 @@ console.log('\n--- a dragged label is one label ---');
 	delete long.lx; delete long.ly;
 }
 
+// ---- 6. What the spacing actually COMES OUT at, which is not what it is set to ----------------
+console.log('\n--- min/2 is the ceiling, not the spacing ---');
+{
+	// Tom, 2026-08-16: *"Are we sure it's min/2? It looks like less."* He is right, and this
+	// section is here so nobody has to measure it a second time. n = ceil(L/s) with even spacing at
+	// L/n means the REALIZED gap is in (s/2, s] -- never wider than promised, routinely narrower,
+	// and at its narrowest on a pipe barely longer than one spacing, which is the common case.
+	// ROADMAP Task 386 holds the three options; until one is chosen, this is the behaviour and it
+	// is asserted rather than left to be rediscovered from a screenshot.
+	L.setCanvas(1000, 1000);
+	L.setZoom(1);
+	L.refreshLabelText();
+	const s = L.spacing();
+	let worst = Infinity, worstAt = 0;
+	for (let len = s * 1.01; len <= s * 20; len += s / 40) {
+		const n = Math.ceil(len / s), realized = len / n;
+		if (realized > s + 1e-9) { ok('never wider than nominal at L = ' + len.toFixed(0), false, realized); }
+		if (realized < worst) { worst = realized; worstAt = len; }
+	}
+	ok('a gap is never wider than the nominal spacing', worst <= s + 1e-9);
+	ok('...but the narrowest is half of it', Math.abs(worst / s - 0.5) < 0.02,
+		(worst / s).toFixed(3) + ' x nominal at L = ' + worstAt.toFixed(0));
+	// And the first label sits half a realized gap from its node, so the node-to-label distance
+	// bottoms out at a QUARTER of the realized spacing's own worst case -- min/8 of the map.
+	const st = L.stations(long), len = L.pipeLength(long.id);
+	ok('the first station is half a realized gap in from the end',
+		near(st[0] * len, (len / st.length) / 2), st[0] * len);
+}
+
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);

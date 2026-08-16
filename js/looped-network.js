@@ -213,6 +213,13 @@ var EngCalcs = EngCalcs || {};
 	// spacing' default 50%"* -- and it is not built, because a number nobody has yet wanted to
 	// change is a settings row that costs 26 translations. If a drawing turns up that wants a
 	// different spacing, that is the evidence for adding it.
+	//
+	// **AND min/2 IS THE CEILING, NOT THE SPACING** (measured 2026-08-16, after Tom: *"Are we sure
+	// it's min/2? It looks like less."* — he is right). `linkLabelStations()` takes n = ceil(L/s)
+	// and then spaces at L/n, so what you actually see is anywhere in (s/2, s]: a pipe just longer
+	// than one spacing gets two labels at half of it, and over pipes of 1-2s the mean is 0.75 s.
+	// `ceil` is what guarantees a gap is never WIDER than the promise, and the two cannot both
+	// hold. ROADMAP Task 386 states the three options; this stays as it is until he picks one.
 	var LPN_LABEL_REPEAT_FRAC = 0.5;
 	// **THE DIVISION IS UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN** (Tom, 2026-08-15, on being
 	// shown a cap of 12: *"Do you want only to draw the 4 that appear on the screen? That makes most

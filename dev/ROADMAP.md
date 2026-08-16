@@ -50,6 +50,24 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
+- 70|386| **The repeated-label spacing really is less than min/2, and `ceil` is why.** Tom,
+  2026-08-16: *"Aligned pipe label distance: Are we sure it's min/2? It looks like less."* Measured,
+  and he is right: **min/2 is the ceiling, not the spacing.**
+  - `linkLabelStations()` takes `n = ceil(len / s)` and spaces at `len / n`, so the REALIZED spacing
+    is anywhere in `(s/2, s]`. A pipe just longer than one spacing gets two labels at half of it.
+    Over pipes of `1–2s` — the commonest repeating case — the mean is **0.75 s**; the worst is 0.50 s.
+    The first label also sits half a realized spacing from its node, so a node-to-label gap can be
+    as little as `min/8`.
+  - That is the design working as written: `ceil` guarantees a gap is **never larger** than promised,
+    and `label-repeat-harness.js` §2 asserts exactly that. Nominal and realized cannot both equal
+    `s` — the two goals conflict by arithmetic, so this is a choice, not a bug to fix quietly.
+  - **The choice, for Tom.** (a) Leave it: never a gap wider than min/2, often tighter. (b) `n =
+    max(1, round(len / s))`: realized lands in `(2s/3, 2s]`, centred on min/2, at the price of gaps
+    up to 1.5× the nominal on some pipes and one fewer label on any pipe under 1.5 s. (c) Raise
+    `LPN_LABEL_REPEAT_FRAC` and keep `ceil` — the same lever he already pulled once from 0.25.
+  - Note that he doubled the fraction on 2026-08-15 for this same reason (*"min/4 is too small"*),
+    which suggests the systematic undershoot is what he is seeing rather than the nominal value.
+
 - 88|384| **[H] Colour coding, with a colour-ramp picker — the preparation Task 248 (extended-period
   simulation) actually needs.** Tom, 2026-08-15: *"I think that a major preparation for modeling
   across time is adding color coding, which requires a color ramp picker UX. EPANET and HEC-RAS,

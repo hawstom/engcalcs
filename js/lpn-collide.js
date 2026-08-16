@@ -94,7 +94,14 @@ EngCalcs.lpnCollide = (function () {
 	//   It is a comparison between two candidate PLACEMENTS, not a property of the obstacle, and
 	//   this pass never compares placements -- it only pushes pairs apart. **There is nowhere here
 	//   to put it.** It lives in Task 379's score as a penalty, which is lenience inverted, and is
-	//   written down in section 4 of dev/label-placement-goals.md so it is not lost meanwhile.
+	//   written down in section 4.1 of dev/label-placement-goals.md so it is not lost meanwhile.
+	//
+	//   Tom's tentative values, 2026-08-16: *"labels=0, leaders = 0.2, nodes=0.6, links=1.0"*.
+	//   A leader being STRICTER than a node symbol is deliberate and is the row most likely to be
+	//   "fixed" by someone who has not read the reasoning: a symbol is a dot a number can sit
+	//   beside, a leader is a long line crossing the number's strokes at an arbitrary angle.
+	//   **Do not copy any of these four into WEIGHT.** They are the other quantity; a lenience in
+	//   the weight field is the 0.4-and-0.5 defect described above, wearing new numbers.
 	//
 	// Writing a lenience into the weight field says something entirely different and wrong: it
 	// tells the pass to clear only part of the overlap ALWAYS, even when the label had somewhere
