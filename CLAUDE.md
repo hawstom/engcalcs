@@ -21,6 +21,14 @@ here, and a docs gap that left this ambiguous is itself the bug to fix, not a re
   still applies (don't commit likely-secret files, review a broad `git add`, prefer a new commit
   over amending, never force-push or skip hooks without being asked). "Commit by default" answers
   *whether* to commit; it does not waive care about *what* gets committed.
+- **KEEP THE MESSAGE SHORT: a subject line and at most a short paragraph** (Tom, 2026-08-16:
+  *"The git commit messages are also far too long"*). Measured that day: the last 40 commits
+  averaged **294 words** against an all-time median of 108, so this is recent drift, not a
+  long-standing style. Budget: subject ≤ 60 characters, body ≤ ~60 words. Write what changed and
+  the ONE thing a future reader could not re-derive from the diff — not the reasoning, not the
+  rejected alternatives, not the quotes. Those belong in the code comment or the ROADMAP block,
+  where they are actually looked for. A message that reads like an essay is the same
+  append-don't-substitute habit as Task 388, in the one place nobody can edit it afterwards.
 - **Report the push state unabridged at the end of the work**, unprompted: the commit SHA and
   confirmation it is on `origin/master` (`git log --oneline origin/master..master` should be
   empty). Never tell Tom to `git pull` before verifying the push actually landed.

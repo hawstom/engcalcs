@@ -66,6 +66,13 @@ session of its own with nothing else in it.
     OPEN blocks are 1,100–1,600 words each. (c) In `CLAUDE.md`, replace every rule a script now
     enforces with one line naming the script — Rules A–D are ~90 lines explaining what
     `lang_syntax_validate.php` says better in its own error text.
+  - **Commit messages are the same habit and the rule is now in `CLAUDE.md`** — subject ≤ 60 chars,
+    body ≤ ~60 words. The last 40 commits averaged 294 words against an all-time median of 108, so
+    it is recent drift. **Rewriting the 986 EXISTING messages is not recommended and needs Tom's
+    ruling**: it rewrites every SHA, forces a push, breaks production's `git pull` (which then
+    needs a manual reset on the server), dangles **43 SHA citations** that `dev/*.md` and code
+    comments make, and saves no context at all — nothing ever loads a commit message.
+    `git log --oneline` is already the abridged view, and the subjects are already short.
   - **Cost is paid by FREQUENCY, so rank by what gets loaded.** `CLAUDE.md` every session;
     `ROADMAP.md` to answer almost any question; `looped-network.js` whenever it is edited; the
     archive almost never. That order is the work order, and it is the opposite of size order.
