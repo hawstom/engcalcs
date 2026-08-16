@@ -126,3 +126,110 @@ Not by eye, and not by "that looks about right" — the same standard as everywh
   is how the eleven-pixel leaders would have been caught in the first place.
 - **Idempotence**, which costs nothing to assert: running the pass twice must give bit-identical
   placements.
+
+---
+
+## 6. Tom's review of the boxes, 2026-08-15, and what each finding turned out to be
+
+He turned `?debug=boxes` on and came back with four things. Three are right, one is right about the
+symptom and wrong about the cause — and that one is the most useful of the four.
+
+### 6.1 "It's far too greedy or wasteful of free space" — RIGHT, and here is the mechanism
+
+Two properties of `relax()`, neither of them written down before:
+
+- **Each pair separates by the WHOLE overlap at once**, plus 0.1. Not a fraction, not a step
+  toward a solution. A label overlapping five things in one iteration receives five full
+  separations, added together, in that one iteration. That is what he meant by *"relax() is able to
+  move things a lot in one pass, which is not what I understood."* It is, and there is no reason it
+  should be — a fraction of the overlap per iteration is the usual form and is far calmer.
+- **Nothing ever pulls back.** Every term in the pass pushes apart; not one attracts. So a label
+  shoved aside on iteration 1 stays shoved on iteration 4 even if whatever crowded it has since
+  moved away. **There is no restoring force toward home, and no term at all for "this space is
+  free."** Between them, these two are the whole of "wasteful".
+
+### 6.2 "Labels with no conflict are left alone... reset them to home after every zoom inward"
+
+**The fix he proposes is already in force**, which is worth knowing before we spend anything on it.
+`runLabelCollisionAvoidance()` zeroes every nudge and re-derives all of them from scratch on every
+pass, and a zoom runs a full pass (`onZoomChanged` → `refreshFontSizes` → `relayoutLabels`). No
+label carries a nudge across a zoom.
+
+So the waste he is looking at is **not staleness** — it is 6.1, produced fresh at the scale he is
+looking at. That matters for the decision in front of us: the cheap fix is unavailable, because it
+is already done. What is left is the algorithm.
+
+### 6.3 "If boxes can only be orthogonal rectangles, they are inadequate; can they be rotated?"
+
+**Yes, and they should be.** Today an aligned pipe label — a long thin box at, say, 40° — is handed
+to the pass as its axis-aligned bounding box, which for a long diagonal label is close to **twice**
+the area of the label itself, all of it empty. The comment in `runLabelCollisionAvoidance()` calls
+that "generous, and generous is the right direction to err in for a legibility guard." That was a
+defensible call when the alternative was a second geometry path; it is not defensible as the reason
+a quarter of the map is unusable.
+
+The standard machinery is an **oriented box tested by the separating-axis theorem** — for two
+rectangles it is four axis projections, and it returns not just *whether* they overlap but the
+**minimum translation vector**, which is exactly the push the relaxation wants and exactly the
+penetration depth a score wants. It is perhaps thirty lines in `lpn-collide.js`, it is pure, and it
+is testable without a browser. An unrotated box is the same code with an angle of zero, so there is
+no second path.
+
+### 6.4 "Pipes have no model/boxes. They need a model even if their weight is lower"
+
+**Agreed, and this reverses a decision made here, not by him.** The current comment says pipes are
+"absent by design" because "a number sitting on a pipe still reads perfectly well." That is true of
+*one* number crossing *one* pipe and false in a dense network, where it is the reason labels sit in
+the middle of the drawing while the margins are empty — the pass literally cannot see the pipes.
+
+Sampled the same way leaders are, at a low weight, a pipe becomes a mild preference rather than a
+prohibition: a label steps off a line when there is somewhere to step, and lies across it when
+there is not. That is the behaviour we claimed to have and did not implement.
+
+---
+
+## 7. Map units or screen pixels — the question Tom reopened
+
+He is not persuaded by "the collision pass is about your eye, so use pixels", and his counter is
+better than the argument it answers:
+
+> *"Nothing gets saved in screen units. And nothing in screen units is immutable. If a user drags a
+> label, it now has fixed map units. Maybe user positioning is the decision-maker that tilts us
+> toward map units."*
+
+**The distinction that dissolves most of the disagreement is DECISION versus STORAGE**, and they do
+not have to match:
+
+- **Every decision is about the eye and belongs in pixels.** Do these two boxes overlap on screen?
+  Is that leader through that number? Is this label too far from its node to be attributable? None
+  of those change if the drawing's coordinates are feet instead of metres, and all of them change
+  with zoom. The leader-box defect was exactly a decision made in the wrong frame.
+- **Everything persisted is a fact about the drawing and belongs in map units** — node positions,
+  vertices, lengths. Not in dispute.
+- **A collision nudge is persisted NOWHERE.** It is recomputed from zero on every pass, at the
+  current scale. So it has no storage question at all, and the "nothing is saved in screen units"
+  argument does not reach it.
+
+**Which leaves exactly one genuinely open case: the drag.** And looking at it in that frame turns
+up something we should decide deliberately rather than inherit:
+
+- A dragged data label stores a **world** offset (`n.lx`, `n.ly`), while the text itself is sized in
+  **screen pixels**. So as you zoom in, the text stays the same size and the gap between the label
+  and its node grows in pixels — the label drifts away from what it names, and can cross the leader
+  threshold and sprout a line the user never asked for. Zoom out and it collapses onto its node.
+  **This is a candidate cause of some of the "far away" labels, independent of the relaxation**, and
+  it is the one part of the symptom a drag does *not* fix, because the drag is what set it.
+- The fix, if we want it, is to store a data label's drag as a **pixel** offset: it is furniture
+  attached to an element, not a location in the drawing.
+- **A Text label is the opposite case and should stay in map units.** It is content the user placed
+  *in the drawing* — a caption on a district, the way text works in AutoCAD. It should sit where
+  they put it and scale with the map, which is what it does now.
+
+So the proposal is not "pixels win" but: **decisions in pixels; the drawing in map units; furniture
+attached to an element in pixels; content placed in the drawing in map units.** The one change from
+today is the data-label drag offset, and it is the one Tom's own criterion — *"user positioning is
+the decision-maker"* — points at, once you notice that the user is positioning two different kinds
+of thing.
+
+**Not settled. This is the question to answer before Task 379 is built, because scoring bakes the
+answer into every candidate.**

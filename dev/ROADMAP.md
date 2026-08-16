@@ -89,6 +89,21 @@ session of its own with nothing else in it.
     algorithm.
   - **The default side is not sacred** (Tom: *"Jumping sides: Yes! Even epanetjs does this."*), so
     scoring is free to put a label anywhere around its anchor. That is how it uses open space.
+  - **Tom's review of the boxes (2026-08-15) added three requirements and killed one shortcut**, all
+    written up in section 6 of the goals file: boxes must be able to ROTATE (an aligned pipe label's
+    AABB is close to twice its own area, and that empty half is a quarter of the map on a diagonal
+    network — oriented boxes tested by the separating-axis theorem give both the overlap and the
+    push vector, ~30 lines, pure, and an unrotated box is the same code at angle zero); PIPES must
+    be obstacles at a low weight, reversing a call made here and not by him; and his own proposed
+    cheap fix — reset labels home on every zoom — **is already in force**, so the waste he is
+    looking at is produced fresh at that scale rather than left over from another one. Also
+    recorded: `relax()` separates by the WHOLE overlap per pair per iteration and has no restoring
+    force at all, which is the mechanism behind "far too greedy".
+  - **Section 7 holds the one question that must be answered before this is built**: map units or
+    pixels. Decisions in pixels and the drawing in map units is not in dispute; the live case is
+    the DRAG. A dragged data label stores a world offset while its text is sized in pixels, so it
+    drifts away from its node as you zoom in and can sprout a leader nobody asked for — the one
+    part of the symptom a drag does not fix, because the drag is what set it.
   - Order of work: 379 first, then 343 (dropping lines by priority), then 377 (hide) as the last
     resort. All three are the same decision — what to do when there is not room — taken at three
     different granularities.
