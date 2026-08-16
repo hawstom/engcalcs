@@ -212,7 +212,16 @@ importText(usInp, 'import-cases.inp');
 		JSON.stringify(pu.curvePoints));
 	// h0/a/b are SI and are what the solver reads. 220 ft of shutoff head is 67.06 m; a curve
 	// fitted from the DISPLAYED numbers instead would put 220 metres in here and be 3.3x wrong.
-	ok('...while the fitted curve the solver reads is SI', near(pu.h0, 220 * FT, 1e-6), pu.h0 + ' m');
+	//
+	// ASKED OF THE MODEL, NOT OF THE DOCUMENT (Task 390 step 5). The fitted triple is derived at
+	// the solver handoff now and is deliberately not stored, so reading pu.h0 would read undefined
+	// -- and the property under test was never "the link carries h0", it was "the solver is handed
+	// SI". The document is asserted to carry none of it, one line down.
+	const puModel = L.assembleModel().links.find(l => l.id === 'PU1');
+	ok('...while the fitted curve the solver reads is SI', near(puModel.h0, 220 * FT, 1e-6), puModel.h0 + ' m');
+	ok('...and the document stores no fitted curve at all',
+		pu.h0 === undefined && pu.a === undefined && pu.b === undefined,
+		JSON.stringify([pu.h0, pu.a, pu.b]));
 	ok('a pump gets a diameter even though no head loss uses one',
 		pu._diameter > 0, pu._diameter);
 

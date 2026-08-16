@@ -2066,39 +2066,56 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < doc.links.length; i++) { if (doc.links[i].id === id) { return doc.links[i]; } }
 		return null;
 	}
-	// Pump curve support (Task 146, 2026-07-30). A pump's curvePoints are 1-3 [Q,H] pairs in SI;
-	// curveRef, if set, names another pump link to copy points from (one hop only -- resolveCurvePoints
-	// never chases a chain, so a ref-to-a-ref can't create a cycle). recomputePumpCurve() re-fits
-	// h0/a/b (what js/lpn-solver.js actually reads) from whichever points are in effect.
+	// Pump curve support (Task 146, 2026-07-30). A pump's curvePoints are 1-3 [Q,H] pairs in the
+	// units on the strip; curveRef, if set, names another pump link to copy points from (one hop
+	// only -- resolveCurvePoints never chases a chain, so a ref-to-a-ref cannot create a cycle).
+	// pumpFit() below turns whichever points are in effect into the SI h0/a/b js/lpn-solver.js
+	// reads, and stores nothing.
 	function resolveCurvePoints(l) {
 		var base = l;
 		if (l.curveRef) { var ref = linkById(l.curveRef); if (ref && ref.type === 'pump') { base = ref; } }
 		return (base.curvePoints || []).filter(function (p) { return p && p[0] !== undefined && p[1] !== undefined; });
 	}
-	function recomputePumpCurve(l) {
+	// A PUMP'S FITTED CURVE IS DERIVED, SO IT IS NOT STORED (ROADMAP Task 390 step 5).
+	//
+	// h0/a/b are the SI coefficients of H = h0 - a Q^b that js/lpn-solver.js reads. curvePoints are
+	// the 1-3 [Q, H] pairs the USER typed, in the flow and head units on the strip. Those are two
+	// different kinds of number -- one we computed and one the user supplied -- and they used to sit
+	// side by side on the same link.
+	//
+	// That had the symptom this whole task is about: a REPAIR MECHANISM. Every unit switch had to
+	// re-run the fit across the document, because the same three points mean a different pump under
+	// l/s than under gpm, and a stored triple that nobody refreshed described a pump the user had
+	// never entered. The repair was correct and worked; needing one at all was the defect.
+	//
+	// Derived here, at the solver handoff, there is nothing to keep in step, nothing to migrate, and
+	// no field on a link that anything but the user writes. The cost is one three-point curve fit
+	// per pump per solve, at this suite's target scale of ~10-20 nodes.
+	function pumpFit(l) {
 		var pts = resolveCurvePoints(l);
 		if (pts.length === 0) {
 			// No curve entered yet: h0 = a = 0, so H = h0 - a Q^b is identically zero and the pump
 			// is simply a connection that neither adds nor loses head. The solver has its own
 			// gradient floor for this (see the pump branch of lpnAssemble), so a curveless pump
 			// behaves like a very short, very smooth pipe rather than dividing by zero.
-			l.h0 = 0; l.a = 0; l.b = 2;
-			return;
+			return { h0: 0, a: 0, b: 2 };
 		}
-		// h0/a/b are what js/lpn-solver.js reads, so they are SI -- but curvePoints are now what the
-		// user typed, in the flow and head units on the strip (Task 263). This is the pump's own
-		// crossing of the unit boundary, and it is why refreshPumpCurvesForUnits() has to re-run the
-		// fit when a unit changes: the same three points mean a different pump under l/s than gpm.
-		var curve = EngCalcs.lpnPumpFromCurve(pts.map(function (pt) {
+		// The pump's own crossing of the unit boundary, and it is one of the two sanctioned
+		// conversion sites (see toSI's block) rather than a third.
+		return EngCalcs.lpnPumpFromCurve(pts.map(function (pt) {
 			return [toSI(pt[0], 'lpn_u_flow'), toSI(pt[1], 'lpn_u_elevhead')];
 		}));
-		l.h0 = curve.h0; l.a = curve.a; l.b = curve.b;
 	}
-	// Editing one pump's points can change what OTHER pumps compute too (any referencing it via
-	// curveRef), so every curve edit recomputes the whole set rather than just the one link --
-	// cheap at this suite's target scale (~10-20 nodes, ROADMAP Task 146's own sizing decision).
-	function recomputeAllPumpCurves() {
-		doc.links.forEach(function (l) { if (l.type === 'pump') { recomputePumpCurve(l); } });
+	// A pre-Task-390 document carries h0/a/b written into its links. They are read by nothing now,
+	// and leaving them would leave a stale copy of a derived value sitting beside the points it was
+	// derived from -- the exact arrangement this step removed. Dropped on load rather than in a
+	// versioned migration step, because it changes no number the user can see and therefore has
+	// nothing to ask about.
+	function dropStoredPumpFit(links) {
+		(links || []).forEach(function (l) {
+			if (l.type !== 'pump') { return; }
+			delete l.h0; delete l.a; delete l.b;
+		});
 	}
 	function linkPoints(l) {
 		return Geom.polylinePointsAttr(linkPointList(l));
@@ -3834,10 +3851,9 @@ var EngCalcs = EngCalcs || {};
 			// there was a hidden curve... just squash the secrets"). An invisible default design
 			// point made a pump silently deliver head the user never entered, and then behave
 			// strangely once demand ran past that unseen curve. With no curve it adds and loses
-			// nothing until a real one is typed into its popup -- see recomputePumpCurve().
+			// nothing until a real one is typed into its popup -- see pumpFit().
 			l.curvePoints = [];
 			l.curveRef = null;
-			recomputePumpCurve(l);
 		}
 		bornInScenario(l);
 		doc.links.push(l);
@@ -4695,6 +4711,7 @@ var EngCalcs = EngCalcs || {};
 		baseScenario().overrides = {}; // Base is canon and has no overrides, by definition
 		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
+		dropStoredPumpFit(doc.links);
 		// Task 354. Not flipped by flipStoredY() above and must not be: the origin is stated in the
 		// FILE's Cartesian frame and outwardY()/inwardY() are written for exactly that -- flipping it
 		// here would put the sign in twice and move a survey model a couple of million units.
@@ -5026,7 +5043,6 @@ var EngCalcs = EngCalcs || {};
 		// confused."). Dead code in a one-time migration is worse than absent code: it reads as
 		// evidence that the case is real. When scenarios do ship, every v2 document will long since
 		// have been migrated or abandoned.
-		recomputeAllPumpCurves();
 		// Answered: the numbers are now in the units the strip names, so the document is current.
 		//
 		// A Ctrl-Z after this restores the NUMBERS but not the version, so the offer does not come
@@ -5482,15 +5498,10 @@ var EngCalcs = EngCalcs || {};
 					return [inpFlow(pt[0]), pt[1]];
 				});
 				out.curveRef = null;
-				// h0/a/b are what the solver reads and are SI, so they are fitted from SI points
-				// rather than the displayed ones -- the same split recomputePumpCurve() makes.
-				// The parser's own scale factors do that step, so no conversion constant lives here.
-				var fit = (l.curvePoints && l.curvePoints.length)
-					? EngCalcs.lpnPumpFromCurve(l.curvePoints.map(function (pt) {
-						return [pt[0] * parsed.scale.flow, pt[1] * parsed.scale.head];
-					}))
-					: { h0: 0, a: 0, b: 2 };
-				out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
+				// NO FITTED CURVE IS WRITTEN HERE (Task 390 step 5). An import used to fit h0/a/b
+				// from the file's own points and store the triple beside them; pumpFit() derives it
+				// at the solver handoff instead, so an imported pump carries exactly what the file
+				// stated and nothing of ours.
 			}
 			return carryInpTokens(l, out, LPN_INP_TOK_LINK);
 		});
@@ -8740,7 +8751,6 @@ var EngCalcs = EngCalcs || {};
 			[niceDefault('lpn_u_flow', 'gpm', 250, 0.015), niceDefault('lpn_u_elevhead', 'fth2o', 140, 42)],
 			[niceDefault('lpn_u_flow', 'gpm', 500, 0.030), niceDefault('lpn_u_elevhead', 'fth2o', 60, 18)]
 		];
-		recomputePumpCurve(pump);
 		// The ring. Demands and elevations both vary around it on purpose: equal demands at equal
 		// elevations would put the hydraulic divide exactly opposite the tie-in and make the answer
 		// look like symmetry rather than like a solve.
@@ -9677,7 +9687,7 @@ var EngCalcs = EngCalcs || {};
 	// switched. Scrub and ban this."*
 	//
 	// Conversion therefore happens in exactly TWO places and nowhere else:
-	//   1. HERE, at the solver handoff (assembleModel, recomputePumpCurve) -- declared value to SI.
+	//   1. HERE, at the solver handoff (assembleModel, pumpFit) -- declared value to SI.
 	//   2. On the way BACK, for solve RESULTS only (readonlyUnitField, numLine) -- SI to display.
 	// A number that is an input never passes through either on its way to the screen. If you find
 	// yourself adding a third conversion site, you are re-creating the banned behaviour.
@@ -11735,7 +11745,6 @@ var EngCalcs = EngCalcs || {};
 		refSelect.addEventListener('change', function () {
 			saveUndoSnapshot();
 			l.curveRef = refSelect.value || null;
-			recomputeAllPumpCurves();
 			scheduleSolve();
 			renderLinkFields(linkId); // rebuild: show/hide point rows, refresh the read-only result
 		});
@@ -11804,7 +11813,6 @@ var EngCalcs = EngCalcs || {};
 					// Both fields or neither -- a lone Q or lone H is not a point the curve fit can use.
 					l.curvePoints[pi] = (qv !== undefined && hv !== undefined) ? [qv, hv] : undefined;
 					l.curvePoints = l.curvePoints.filter(function (x) { return x; });
-					recomputeAllPumpCurves();
 					scheduleSolve();
 				}
 				qInput.addEventListener('change', commit);
@@ -12382,9 +12390,16 @@ var EngCalcs = EngCalcs || {};
 				// roughness (Hazen-Williams C) and k are dimensionless, so they cross this boundary
 				// unchanged -- the same reason they use rawLine() rather than numLine() on the map.
 				diameter: toSI(effective(l, 'diameter') || 0, 'lpn_u_diameter'), roughness: roughnessSI(l),
-				length: linkLengthSI(l), status: effective(l, 'status'), k: effective(l, 'k'),
-				h0: l.h0, a: l.a, b: l.b
+				length: linkLengthSI(l), status: effective(l, 'status'), k: effective(l, 'k')
 			};
+			// THE FITTED PUMP CURVE IS DERIVED HERE AND NOWHERE ELSE (Task 390 step 5). It used to
+			// be read off the link, where a stored copy had to be repaired on every unit switch.
+			// Only a pump gets one: js/lpn-solver.js and js/lpn-epanet.js both test the type first,
+			// so putting h0/a/b on a pipe only ever meant three undefined properties per link.
+			if (l.type === 'pump') {
+				var fit = pumpFit(l);
+				out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
+			}
 			if (l.type === 'valve') {
 				// THE SETTING CROSSES THIS BOUNDARY IN THE UNIT ITS TYPE NAMES, which is the whole
 				// reason a valve needs a line here at all. A pressure setting is a head in metres,
@@ -13084,9 +13099,12 @@ var EngCalcs = EngCalcs || {};
 	EngCalcs.pageCalculator = function (objForm) {
 		// A unit switch REINTERPRETS every input (Task 263), so it changes the physics rather than
 		// the display: the same three curve points mean a different pump under l/s than under gpm,
-		// and every solved head, pressure and velocity moves with them. Refit, then re-solve.
-		// This is the whole visible consequence of the ban, and it is deliberate.
-		recomputeAllPumpCurves();
+		// and every solved head, pressure and velocity moves with them. This is the whole visible
+		// consequence of the ban, and it is deliberate.
+		//
+		// A refit used to have to happen HERE, on every unit switch, because the fitted curve was
+		// stored on the link. It is derived at the solver handoff now (pumpFit), so re-solving is
+		// the whole of the response and there is nothing left to repair (Task 390 step 5).
 		scheduleSolve();
 		refreshMapStatus();   // a unit switch is exactly when this readout has to be right
 		// The project's units are part of the project (serializeProject), so a switch is a change to

@@ -62,23 +62,37 @@ back as `710`.
     `dataset.unit`, on `objForm['xu'].value`, and on an `<option>` whose value is a `$ec_units`
     lookup. The prose rule was already written and was violated in 22 places anyway.
 
-**Not done, in dependency order. Each item is blocked by the one above it:**
+- **The TOKEN is kept (step 3).** `mergeTok()` in `js/lpn-inp.js` puts the file's own text in a
+  separate `tok` bag on each record, keyed by field name; `carryInpTokens()` carries it onto the
+  document. `EngCalcs.lpnNumText(rec, key, value)` is the only reader and returns a string in every
+  branch, which is what keeps a token — a STRING — out of arithmetic. It stores a token only when
+  `String(value)` does not reproduce the text and only when the text still states that number, so a
+  converted, scaled or later-EDITED value drops its token by itself and no edit path has to clear
+  one. Curve points deliberately carry none: a pump curve is re-sampled on the way out.
+  `dev/lpn-spike/inp-token-harness.js`, 3792 checks; 134 fail if the token is dropped.
+- **An unrecognized unit is carried, and only the SOLVE is refused (step 4).** A unit is a LABEL and
+  a MAGNITUDE. `applyUnitSelections()` records a name it cannot install in `unresolvedUnits`;
+  `readUnitSelections()` writes that name back out verbatim so a save never rewrites the user's own
+  declaration; `unitLabel()` shows it; `runSolve()` refuses before `assembleModel()` and names it
+  (`lpn_unit_unknown`). The refusal is the work — `EngCalcs.unitFactor()` answers 1 for a name it
+  does not know, which is right for a page rendering and silently catastrophic for one solving.
+  - The five EPANET flow keywords that had no selector (IMGD, AFD, LPM, CMH, CMD) now do, in the
+    `flow_epanet` family. `.inp` `UNITS` is a **closed enumeration of ten**, so this completes a
+    finite list rather than working around it — and it landed *after* the refusal, because adding it
+    first would have been papering over. `dev/lpn-spike/unknown-unit-harness.js`, 94 checks.
+- **The pump curve is derived, not stored (step 5).** `pumpFit()` computes h0/a/b at the solver
+  handoff and writes nothing; `dropStoredPumpFit()` strips the stale triple out of a document
+  written before this. The old arrangement's symptom was a repair mechanism — every unit switch had
+  to re-run the fit across the document, or a stored triple described a pump nobody had entered.
+  `dev/lpn-spike/pump-derived-harness.js`, 25 checks.
 
-3. **The TOKEN is still discarded at `js/lpn-inp.js:89` (`parseFloat(tok)`).** Value fidelity is
-   solved; representation is not. Keep the exact characters beside the parsed number at the one
-   place text becomes number, and store the token.
-4. **An unrecognized unit has nowhere to live.** Step 1 unblocked this but did not do it: a name
-   can now be carried verbatim, and only the SOLVE need be refused — but nothing yet carries one.
-   `EngCalcs.unitFactor()` answers 1 for a name it has no factor for, which is right for a page
-   rendering and wrong for a page solving, so the refusal is the work left.
-   - The five EPANET flow keywords with no selector (IMGD, AFD, LPM, CMH, CMD) are the concrete
-     case. `.inp` `UNITS` is a **closed enumeration of ten**, so adding them completes a finite list
-     rather than working around it — but adding them *without* (4) would be papering over, which is
-     the objection Tom raised and it is correct.
-5. **Derived values are persisted beside user values.** A pump's `l.h0/a/b` are an SI curve fit
-   stored in the document next to the `curvePoints` the user typed, which is why
-   `refreshPumpCurvesForUnits()` must re-run the fit whenever a unit changes. A repair mechanism for
-   a value that should never have been stored. Derive at solve time.
+**Not done:**
+
+- **`elev` still holds both kinds of number** — a user's elevation and, for an imported reservoir,
+  EPANET's total head read a second way. Same confusion as `curvePoints`/`h0` was, one level down.
+- **Task 281 (`.inp` export) has not been written**, so the acceptance criterion below is asserted
+  against the parser and the document rather than against a written file. Everything it needs is in
+  place: `EngCalcs.lpnNumText()` is its one entry point for a number's text.
 
 ## The rule that makes it structural
 
