@@ -374,28 +374,6 @@ session of its own with nothing else in it.
     line**, so a multi-line Text cannot round-trip. Decide on export (Task 281) whether it becomes N
     labels or one flattened line, where the import (Task 332) can agree with it.
 
-- 66|337| **Text label properties: Bold, and Rotate-to-match-a-pipe with a flip toggle.** Tom,
-  2026-08-14: *"For text labels properties, it would be nice to allow Bold and Rotation to match a
-  pipe with a toggle to rotate opposite the initial result."*
-  - Bold is a per-label `lb.bold`, the sibling of the existing `lb.sizeMult`, and is the easy half.
-  - **Rotation should CAPTURE an angle, not hold a live reference to a pipe.** Matching "a pipe"
-    would need the Text label to know which link it belongs to — a relationship Text labels do not
-    have and should not grow, since a street name or a title block is not about one pipe. Take the
-    angle from the nearest link at the moment the user asks, store the NUMBER, and the label is then
-    independent of everything that happens to that pipe afterwards.
-  - **The flip toggle is then just +180°**, which is precisely why Tom asked for it in the same
-    breath: `alignedLabelAnchor()`'s readability normalisation picks the side that reads left-to-
-    right, and on a near-vertical pipe either choice is defensible. A capture-then-adjust control is
-    honest about that; an automatic rule that is right 70% of the time is not.
-  - **Tom confirmed the stored-number design and widened the input** (2026-08-14: *"Rotation as
-    number. Yes. It's just a helper/convenience, not a link. We can let them enter a number also or
-    pick among 0, 30, 45, 60, 90, etc also"*). So matching a pipe is a CONVENIENCE that fills the
-    box, and the box is the actual control: free numeric entry plus a short preset list. That
-    ordering matters — a control whose only input is "match a pipe" is unusable on a label near no
-    pipe, and a preset list is what people reach for nine times in ten.
-  - Same shape as the leader endpoint in Task 328: **capture the user's intent once as a number, then
-    stop deriving it.** Third place today that pattern has been the answer.
-
 - 55|338| **Say out loud that GEOMETRY IS NOT SCENARIO STATE.** Tom, 2026-08-14: *"For a scenario,
   dragging a node edits the base. Is this bad, good, or an oversight. The good thing is that it's
   obvious."*
