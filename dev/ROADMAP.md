@@ -568,11 +568,17 @@ session of its own with nothing else in it.
   size, each independently settable — and explicitly deferred it: "that's a lot… maybe later we
   give more fine-grained control and right now just a two-dimensional control." Build it when
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
-- 20|321| **`formmail.php` reads five `$_POST` keys with no `isset()`.** `name`, `email`, `subject`,
-  `message`, `more_message`. Under PHP 8 a bare POST emits *Undefined array key* warnings, and with
-  `display_errors` on anywhere they land in the response body. The header-injection guards on
-  name/email/subject are present and correct, so this is hygiene rather than a hole — but it is the
-  site's only mail path.
+- 30|387| **`dev/browser-pass/lib/env.js` silently tests the WRONG TREE from a git worktree, twice
+  over.** Found 2026-08-16 by the Task 233 agent, whose first post-fix run reported the identical
+  failures because it was reading another checkout's files.
+  - **Its port is a constant** (8899), so if another session already has a server bound, `php -S`
+    fails to bind *in silence* and the browser is answered by that other server.
+  - **Its docroot is the repository's PARENT**, which contains no `engcalcs/` at all when the
+    checkout is a worktree under `.claude/worktrees/`.
+  - Both faults are invisible from the output: the page loads, the assertions run, the results are
+    about somebody else's code. `mi-defaults.js` works around them by starting its own server on an
+    OS-assigned port over a temp docroot with a symlink; the fix belongs in `env.js` so `run.js`
+    gets it too.
 
 - 20|322| **Standing advisories worth converting rather than re-reading.** `check_all.sh` reports
   these every run and nobody can act on them.
@@ -1935,6 +1941,11 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|321| **`formmail.php` read five `$_POST` keys with no `isset()` — DONE, and the roadmap missed
+  it.** Fixed in 694131a alongside Task 319; each key now takes `isset() && is_string()` (the
+  `is_string` matters: `name[]=x` posts an array, and passing one to `preg_match()` is a TypeError,
+  not a warning). Closed here 2026-08-16 after finding the block still open at priority 20.
 
 - 0|354| **LOCAL MAP COORDINATES: a pipe VANISHED when you zoomed in on a survey model — DONE
   2026-08-16.** Elm Street is in state plane (x ~ 579,350, y ~ 1,304,070), where a float32's spacing
