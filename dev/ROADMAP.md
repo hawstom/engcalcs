@@ -8,18 +8,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 **`CHECK: YYYY-MM-DD` marks a task waiting on the calendar rather than on work** (Task 155's Search Console wait; Task 202's `zh` n=30). Tom asked 2026-08-05 whether dated tasks should always be priority 100. **No, and the date must never promote the task.** A `CHECK:` date is a **gate, not a deadline**: before it, the work is impossible (attempting it yields nothing); after it, the task simply becomes doable **at whatever priority it already had**. So Task 155 stays at 10 forever if a Search Console look is worth 10 — an arrived date means "you may now do this", never "do this next". *(CC's first draft of this paragraph said to raise the priority when the date arrives. That was wrong, and it smuggled promotion back in after arguing against it; Tom caught it: "Use the real priority, and don't let the date promote it." That is the rule.)* The one genuine exception is a task whose **value decays** — evidence that expires, a real external deadline. That is a change in worth, so change the priority and say why; it is not the date doing the work.
 
-## NEXT SESSION (updated 2026-08-15, and Tom works one arrow per `/clear`)
-
-**The 2026-08-15 batch has LANDED — Tasks 334, 332, 330, 340, 329, 349 and 350 are closed.**
-Aligned pipe labels now ship ON by Tom's verdict, long pipes repeat their label, and a Text label
-can be pinned with "Always show". Nothing in that batch is waiting on code.
+## NEXT SESSION (updated 2026-08-16, and Tom works one arrow per `/clear`)
 
 **The next arrow is a TRANSLATION SPRINT**, covering the whole labels era in one pass. The delta as
-of 2026-08-15 is **50 keys per language** (45 new, 5 whose English changed), all `lpn`, in all 26
-languages. Pre-sprint order is in CLAUDE.md: Wave 0 adversarial English pass →
-`friction_check.php` → `gloss_ref_check.php` → regenerate payloads → propose to Tom → launch.
-`$ec_lang_syn` entries are proposed as a diff and approved in that session, not before. Note the
-harness concurrency cap: 26 agents means 20 at once and 6 as slots free.
+of 2026-08-16 is **47 keys per language**, all `lpn`, in all 26 languages. Pre-sprint order is in
+`dev/translation-process.md`: Wave 0 adversarial English pass → `friction_check.php` →
+`gloss_ref_check.php` → regenerate payloads → propose to Tom → launch. `$ec_lang_syn` entries are
+proposed as a diff and approved in that session, not before. Note the harness concurrency cap:
+26 agents means 20 at once and 6 as slots free.
 
 **Then Task 248 (extended-period simulation)** — the LibreEPANET.org gate, and big enough to want a
 session of its own with nothing else in it.
@@ -50,32 +46,25 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
-- 65|388| **The documentation is written as a transcript of revision, not as current state.**
-  Tom, 2026-08-16: *"Do we really need a record of every historical discussion and decision in gory
-  detail?"* and, on the archive move: *"Summarize. That's the word."* Measured that day: `CLAUDE.md`
-  15k words, `dev/*.md` 255k, `js/looped-network.js` **47% comment lines** (6,146 of 12,893).
-  - **The root cause is one habit: a correction is APPENDED, never SUBSTITUTED.** `lpn-collide.js`
-    carries ~80 lines holding four successive positions on what a weight is, three of them retired.
-    The rule that fixes it is "when a decision is superseded, delete the superseded reasoning" —
-    keep the conclusion and the one rejected alternative that would otherwise be re-proposed.
-  - **DONE 2026-08-16: the roadmap half. 11,871 lines across the two files → 3,265, and nothing was
-    relocated verbatim.** All 308 closed tasks are SUMMARIES in `dev/roadmap-closed-archive.md`,
-    which was itself a transcript (7,624 lines of full original text) and is now a digest (1,587).
-    ROADMAP.md holds only open work. `roadmap_id_check.php` reads both files — an ID is unique across
-    the pair, priority 0 means archive and nowhere else — and now reports over-long blocks as an
-    advisory (`--strict` to fail). Five open blocks were summarized in the same pass and Task 207's
-    112-line design record became `dev/dilettante-path.md`.
-  - **STILL OPEN, in frequency order, because cost is paid by what gets LOADED.** (a) `CLAUDE.md`,
-    read every session: replace every rule a script now enforces with one line naming the script —
-    Rules A–D are ~90 lines explaining what `lang_syntax_validate.php` says better in its own error
-    text. (b) `js/looped-network.js` and its siblings, whenever edited. (c) ~30 open roadmap blocks
-    still over budget; the check names them in size order, so this is now a worklist rather than a
-    search.
-  - **Rewriting the 986 EXISTING commit messages is NOT recommended and needs Tom's ruling.** It
-    rewrites every SHA, forces a push, breaks production's `git pull`, dangles **43 SHA citations**
-    made by `dev/*.md` and code comments, and saves no context at all — nothing ever loads a commit
-    message, and `git log --oneline` is already the abridged view. The forward-looking rule (subject
-    ≤ 60 chars, body ≤ ~60 words) is in `CLAUDE.md` and applies from here on.
+- 60|388| **The documentation is written as a transcript of revision, not as current state.**
+  The habit is that a correction is APPENDED, never SUBSTITUTED. The rule: when a decision is
+  superseded, delete the superseded reasoning — keep the conclusion and the one rejected alternative
+  that would otherwise be re-proposed.
+  - **DONE, roadmap half (2026-08-16):** 11,871 lines across ROADMAP + archive → 3,265, then the
+    archive itself dropped to a 321-line ID ledger on Tom's ruling. Its text is in git.
+  - **DONE, CLAUDE.md (2026-08-16):** 1,213 lines / 100 KB → 560 / 36 KB (**36%**). Rules a script
+    enforces are now one table row naming the script. Deep reference moved to
+    `dev/language-strings.md`, `dev/testing-notes.md`, `dev/translation-process.md`.
+  - **DONE, commit messages (2026-08-16):** subject-only by default, ≤72 chars, body only when a
+    reader would act differently, ≤40 words. Measured: Tom's oldest 300 commits had no body 68% of
+    the time (median 84 words); the AI era wrote one on 99 of the last 100 (median 297 words).
+  - **STILL OPEN.** (a) `js/looped-network.js` at 47% comment lines — the sibling `js/lpn-*.js`
+    files were done 2026-08-16, but `looped-network.js` was held back because a concurrent track
+    owned it. (b) 31 open roadmap blocks over the 20-line budget; `roadmap_id_check.php` names them
+    in size order, so this is a worklist rather than a search.
+  - **Rewriting the 986 existing commit messages is NOT recommended** and needs Tom's ruling: it
+    rewrites every SHA, forces a push, breaks production's `git pull`, dangles 43 SHA citations in
+    `dev/*.md`, and saves no context — nothing ever loads a commit message.
 
 - 88|384| **[H] Colour coding, with a colour-ramp picker — the preparation Task 248 (extended-period
   simulation) actually needs.** Tom, 2026-08-15: *"I think that a major preparation for modeling
@@ -1363,32 +1352,6 @@ session of its own with nothing else in it.
     **Task 206**, now shipped; reaching them is still this item's own problem, so it is no longer
     blocked — only unstarted.
 
-- 69|214| **Realign the glossary anchor languages with measured reach.** Confirms and closes Tom's
-  2026-08-05 question, *"Confirm that our wave 1 translation language set is adjusted in light of our
-  usage reports."* Answer in two parts:
-  - **The priority set IS already adjusted — you did it yesterday.** Task 203's coverage cross names
-    core languages **es, pt, fr, tr**, which is exactly the measured top four in order (es 186,
-    pt 30, fr 23, tr 17 confirmed humans, 2026-08-03). Nothing to change there.
-  - **The wave lists in `dev/translation-process.md` are stale but nearly obsolete.** Wave 1 as
-    written (es pt fr it de ro ru uk bg sr hr cs tr id) would sequence ru, uk, bg, sr, hr, cs and id
-    — all at 0–1 measured humans — ahead of **zh (12) and he (10)**, which sit in wave 2. **Do not
-    renumber the waves.** They were a *build-out sequencing* device for cognate clustering, that
-    build-out is complete, and the cross supersedes them in maintenance. A one-line note saying so
-    was added to `dev/translation-process.md` on 2026-08-05, which is the whole fix.
-  - **The live defect is the anchors.** CLAUDE.md names glossary anchors **es, fr, ru, ar**. `ru` has
-    one measured human and `ar` has zero, while `pt` (30) and `tr` (17) are not anchors. An anchor is
-    a reference other languages are checked against — anchoring on two we cannot observe is strictly
-    weaker than anchoring on ones we can. **Align the anchors to the core four (es, pt, fr, tr)** in
-    CLAUDE.md's pre-sprint checklist and in `glossary.json`'s `preferred_translation` expectations.
-    The 2026-08-03 usage log already flagged this ("worth revisiting when the glossary is next
-    touched") and nothing tracked it.
-  - **This is not a reason to deprioritise ru or ar translation quality** — the standing "zero reach
-    ≠ low value" rule holds, and for a language that size zero reach is a discovery/SEO gap. It is
-    only a statement about which languages make useful *reference* points.
-  - **Do not promote `zh` to core yet.** It costs 14 cells, and the pre-registered n = 30 test on its
-    17% conversion anomaly is still outstanding (`dev/usage-data-log.md`). `he` (10 humans, 60%,
-    squarely in the band) is the cleaner next candidate, with no urgency.
-
 - 60|303| **Usage logging: the remaining lower-value questions.** Extracted from Task 200 when it
   closed 2026-08-14, so they survive the close rather than being buried in a DONE block nobody
   re-reads. All three are cheap and none of them decides anything on its own; take one when a
@@ -1638,20 +1601,6 @@ straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated s
 ## Translation Standardization (Glossary Project)
 
 ## Translation improvements
-
-- 66|160| **`lib/lang.ec.tr.php` disagrees with itself on vowel harmony for the app name.**
-  Extracted from Task 154 on close, 2026-07-28. Three keys write `EngCalcs'i`
-  (`install_main_title`, `install_desktop_steps_html`, `install_cached_body`) and one writes
-  `EngCalcs'ı`. Turkish picks the accusative suffix by the last vowel *as pronounced*, so exactly one
-  form is right and the file ships both. **CC deliberately did not guess** — choosing between them is
-  a native phonological judgment about how a Turkish speaker vocalizes "EngCalcs", and getting it
-  wrong would replace an inconsistency with a uniform error. **Low priority and low stakes:** it is a
-  one-character suffix on a proper noun, affecting only the Install page. Best resolved by whoever
-  next does verified tr work, or by the Task 159 sprint's tr agent as a ride-along question.
-  **Raised 5 -> 66 on 2026-08-05 (Tom).** Not blocked on a human: `tr` is now a core language
-  (Task 203) and a Sonnet tr agent can make the call, so this needs no decision from Tom. Raised
-  because it is cheap and CLOSABLE, not because it became important — it is still one character
-  on one page. Fold it into the next tr touch rather than spawning an agent for it alone.
 
 ## AI Efficiency Scripting (Overhead)
 

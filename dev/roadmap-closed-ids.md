@@ -11,6 +11,8 @@ The full text of every closed task is in git and nowhere else, by Tom's ruling o
 Durable policy from these tasks lives in `CLAUDE.md` and in `dev/*.md`. Those are the current
 state; this is only a list of numbers that were once used.
 
+- 0|214| Glossary anchor languages realigned to es, pt, fr, tr; declared in glossary.json meta.anchor_languages
+- 0|160| Turkish accusative on the app name settled as EngCalcs'ı (back unrounded final vowel); 3 keys fixed
 - 0|386| Repeated-label spacing was really under min/2
 - 0|321| formmail.php read five $_POST keys with no isset()
 - 0|354| A pipe VANISHED past ~47x zoom on a state-plane model
