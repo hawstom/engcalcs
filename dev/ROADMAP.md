@@ -136,21 +136,22 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   user's.** Tom, 2026-08-16: *"You are fighting against a deprecated but not purged paradigm where
   everything was stored in browser and file as SI always... I don't think I authorized that. But it
   was done."* Full diagnosis, measurements and dependency order: **`dev/unit-paradigm-migration.md`**.
-  - **DONE — steps (1) and (2), the root (2026-08-16).** An `<option>`'s value is the unit's NAME;
-    the factor is a lookup through `EngCalcs.unitFactors`, emitted out of `lib/Units.lib.php`.
-    `data-unit` is gone. Cookies and shared links store `ft`, and one written before this has its
-    old factor matched back to its unit rather than reset. Guarded by `unit_factor_check.php` §5.
-  - Remaining, in order: (3) keep the TOKEN at `js/lpn-inp.js:89`, which still does
-    `parseFloat(tok)`; (4) carry an unrecognized unit verbatim and refuse only the SOLVE — this is
-    what stops adding the five missing EPANET flow units being a workaround; (5) stop persisting
-    derived values (a pump's `h0/a/b`) beside the user's.
-  - **Already done besides:** the `lpn_` document (Task 263), `.inp` import VALUE fidelity (1908
-    harness checks), exact coherent factors. **Value fidelity is solved; REPRESENTATION is not** —
-    243 of 2,608 tokens in EPA's Net1/2/3 still reformat (`220.0` → `220`).
-  - **No choice of constant can fix this**: 36.7% of a 20,000 sample fails to round-trip
-    bit-identically even with exact factors, worse than the 26% before them.
-  - The five new unit keys (`u_imgd`, `u_afd`, `u_lpm`, `u_cmh`, `u_cmd`) fold into the queued
-    sprint rather than paying for a second 26-agent pass.
+  - **DONE — all five steps (2026-08-16).** (1)(2) an `<option>`'s value is the unit's NAME, the
+    factor a lookup through `EngCalcs.unitFactors`; `data-unit` is gone; guarded by
+    `unit_factor_check.php` §5. (3) the file's own TEXT is kept beside its value in a separate `tok`
+    bag, read only through `EngCalcs.lpnNumText()`, which returns a string in every branch so a
+    token can never reach arithmetic. (4) a unit we have no factor for is carried verbatim, shown,
+    saved back unchanged, and refuses only the SOLVE, by name — and only then did the five missing
+    EPANET flow keywords get a selector (`flow_epanet`). (5) a pump's `h0/a/b` are derived at the
+    solver handoff, so the unit-switch refit that repaired them is gone.
+  - **No choice of constant could have fixed this**: 36.7% of a 20,000 sample fails to round-trip
+    bit-identically even with exact factors, worse than the 26% before them. And 9.3% of EPA's own
+    tokens reformat under `parseFloat` however exact the arithmetic is.
+  - The five new unit keys (`u_imgd`, `u_afd`, `u_lpm`, `u_cmh`, `u_cmd`) and `lpn_unit_unknown` are
+    in `lang.ec.en.php` only — an absent key already falls back to English, and a present-and-
+    identical one fails `lang_syntax_validate.php`. They fold into the queued sprint.
+  - Still open, and each is its own confusion of the same kind: `elev` holds both a user's elevation
+    and an imported reservoir's total head.
   - **Acceptance: import then export is BYTE-IDENTICAL for every value the user did not edit.** Also
     Task 281's criterion.
 

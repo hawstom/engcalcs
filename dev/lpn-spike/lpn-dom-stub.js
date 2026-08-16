@@ -142,13 +142,24 @@ function u(name) {
   if (!(name in unitFactors)) { throw new Error('no $ec_units factor named ' + name); }
   return name;
 }
+// A FAMILY'S OPTION LIST, read out of lib/Units.lib.php for the same reason the factors are.
+// Every other select here is stubbed with a short plausible list, which is fine while the test is
+// about the SELECTED unit -- but lpn_u_flow's list is itself under test since Task 390 step 4: the
+// question is whether all ten EPANET flow keywords land on a unit this page offers, and a stub
+// holding two of them would answer that question for the stub rather than for the page.
+function familyUnits(family) {
+  const src = fs.readFileSync(ROOT + 'lib/Units.lib.php', 'utf8');
+  const m = new RegExp("'" + family + "'\\s*=>\\s*Array\\(([^)]*)\\)").exec(src);
+  if (!m) { throw new Error("lpn-dom-stub.js: no unit family '" + family + "' in lib/Units.lib.php"); }
+  return m[1].split(',').map((s) => s.trim().replace(/^'|'$/g, '')).filter(Boolean).map(u);
+}
 function setUnitSet(which) {
   const us = which === 'us';
   mkUnitSelect('lpn_u_length', 'distance_site', [u('m'), u('ft')], us ? 'ft' : 'm');
   mkUnitSelect('lpn_u_elevhead', 'total_head', [u('mh2o'), u('fth2o')], us ? 'fth2o' : 'mh2o');
   mkUnitSelect('lpn_u_pressure', 'partial_head', [u('mh2o'), u('kpa'), u('psi')], us ? 'psi' : 'mh2o');
   mkUnitSelect('lpn_u_diameter', 'distance_small', [u('mm'), u('in')], us ? 'in' : 'mm');
-  mkUnitSelect('lpn_u_flow', 'flow_node', [u('lps'), u('gpm')], us ? 'gpm' : 'lps');
+  mkUnitSelect('lpn_u_flow', 'flow_epanet', familyUnits('flow_epanet'), us ? 'gpm' : 'lps');
   mkUnitSelect('lpn_u_velocity', 'velocity', [u('mps'), u('ftps')], us ? 'ftps' : 'mps');
   mkUnitSelect('lpn_u_gradient', 'gradient', [u('gradePercent'), u('grade')], 'gradePercent');
   // Darcy-Weisbach roughness height e (ROADMAP Task 271) -- family `roughness`, which lib/Units.lib.php
@@ -164,8 +175,8 @@ function setUnitSet(which) {
 // EngCalcs.unitSets is emitted by echoUnitsRow() in the browser; unitSetName() compares the strip
 // against it, so the harness needs the real mapping, not a placeholder.
 const LPN_UNIT_PRESETS = {
-  us: { distance_site: 'ft', total_head: 'fth2o', partial_head: 'psi', distance_small: 'in', flow_node: 'gpm', velocity: 'ftps', gradient: 'gradePercent', roughness: 'ft' },
-  si: { distance_site: 'm', total_head: 'mh2o', partial_head: 'mh2o', distance_small: 'mm', flow_node: 'lps', velocity: 'mps', gradient: 'gradePercent', roughness: 'mm' }
+  us: { distance_site: 'ft', total_head: 'fth2o', partial_head: 'psi', distance_small: 'in', flow_epanet: 'gpm', velocity: 'ftps', gradient: 'gradePercent', roughness: 'ft' },
+  si: { distance_site: 'm', total_head: 'mh2o', partial_head: 'mh2o', distance_small: 'mm', flow_epanet: 'lps', velocity: 'mps', gradient: 'gradePercent', roughness: 'mm' }
 };
 
 global.document = {

@@ -2091,39 +2091,56 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < doc.links.length; i++) { if (doc.links[i].id === id) { return doc.links[i]; } }
 		return null;
 	}
-	// Pump curve support (Task 146, 2026-07-30). A pump's curvePoints are 1-3 [Q,H] pairs in SI;
-	// curveRef, if set, names another pump link to copy points from (one hop only -- resolveCurvePoints
-	// never chases a chain, so a ref-to-a-ref can't create a cycle). recomputePumpCurve() re-fits
-	// h0/a/b (what js/lpn-solver.js actually reads) from whichever points are in effect.
+	// Pump curve support (Task 146, 2026-07-30). A pump's curvePoints are 1-3 [Q,H] pairs in the
+	// units on the strip; curveRef, if set, names another pump link to copy points from (one hop
+	// only -- resolveCurvePoints never chases a chain, so a ref-to-a-ref cannot create a cycle).
+	// pumpFit() below turns whichever points are in effect into the SI h0/a/b js/lpn-solver.js
+	// reads, and stores nothing.
 	function resolveCurvePoints(l) {
 		var base = l;
 		if (l.curveRef) { var ref = linkById(l.curveRef); if (ref && ref.type === 'pump') { base = ref; } }
 		return (base.curvePoints || []).filter(function (p) { return p && p[0] !== undefined && p[1] !== undefined; });
 	}
-	function recomputePumpCurve(l) {
+	// A PUMP'S FITTED CURVE IS DERIVED, SO IT IS NOT STORED (ROADMAP Task 390 step 5).
+	//
+	// h0/a/b are the SI coefficients of H = h0 - a Q^b that js/lpn-solver.js reads. curvePoints are
+	// the 1-3 [Q, H] pairs the USER typed, in the flow and head units on the strip. Those are two
+	// different kinds of number -- one we computed and one the user supplied -- and they used to sit
+	// side by side on the same link.
+	//
+	// That had the symptom this whole task is about: a REPAIR MECHANISM. Every unit switch had to
+	// re-run the fit across the document, because the same three points mean a different pump under
+	// l/s than under gpm, and a stored triple that nobody refreshed described a pump the user had
+	// never entered. The repair was correct and worked; needing one at all was the defect.
+	//
+	// Derived here, at the solver handoff, there is nothing to keep in step, nothing to migrate, and
+	// no field on a link that anything but the user writes. The cost is one three-point curve fit
+	// per pump per solve, at this suite's target scale of ~10-20 nodes.
+	function pumpFit(l) {
 		var pts = resolveCurvePoints(l);
 		if (pts.length === 0) {
 			// No curve entered yet: h0 = a = 0, so H = h0 - a Q^b is identically zero and the pump
 			// is simply a connection that neither adds nor loses head. The solver has its own
 			// gradient floor for this (see the pump branch of lpnAssemble), so a curveless pump
 			// behaves like a very short, very smooth pipe rather than dividing by zero.
-			l.h0 = 0; l.a = 0; l.b = 2;
-			return;
+			return { h0: 0, a: 0, b: 2 };
 		}
-		// h0/a/b are what js/lpn-solver.js reads, so they are SI -- but curvePoints are now what the
-		// user typed, in the flow and head units on the strip (Task 263). This is the pump's own
-		// crossing of the unit boundary, and it is why refreshPumpCurvesForUnits() has to re-run the
-		// fit when a unit changes: the same three points mean a different pump under l/s than gpm.
-		var curve = EngCalcs.lpnPumpFromCurve(pts.map(function (pt) {
+		// The pump's own crossing of the unit boundary, and it is one of the two sanctioned
+		// conversion sites (see toSI's block) rather than a third.
+		return EngCalcs.lpnPumpFromCurve(pts.map(function (pt) {
 			return [toSI(pt[0], 'lpn_u_flow'), toSI(pt[1], 'lpn_u_elevhead')];
 		}));
-		l.h0 = curve.h0; l.a = curve.a; l.b = curve.b;
 	}
-	// Editing one pump's points can change what OTHER pumps compute too (any referencing it via
-	// curveRef), so every curve edit recomputes the whole set rather than just the one link --
-	// cheap at this suite's target scale (~10-20 nodes, ROADMAP Task 146's own sizing decision).
-	function recomputeAllPumpCurves() {
-		doc.links.forEach(function (l) { if (l.type === 'pump') { recomputePumpCurve(l); } });
+	// A pre-Task-390 document carries h0/a/b written into its links. They are read by nothing now,
+	// and leaving them would leave a stale copy of a derived value sitting beside the points it was
+	// derived from -- the exact arrangement this step removed. Dropped on load rather than in a
+	// versioned migration step, because it changes no number the user can see and therefore has
+	// nothing to ask about.
+	function dropStoredPumpFit(links) {
+		(links || []).forEach(function (l) {
+			if (l.type !== 'pump') { return; }
+			delete l.h0; delete l.a; delete l.b;
+		});
 	}
 	function linkPoints(l) {
 		return Geom.polylinePointsAttr(linkPointList(l));
@@ -4160,10 +4177,9 @@ var EngCalcs = EngCalcs || {};
 			// there was a hidden curve... just squash the secrets"). An invisible default design
 			// point made a pump silently deliver head the user never entered, and then behave
 			// strangely once demand ran past that unseen curve. With no curve it adds and loses
-			// nothing until a real one is typed into its popup -- see recomputePumpCurve().
+			// nothing until a real one is typed into its popup -- see pumpFit().
 			l.curvePoints = [];
 			l.curveRef = null;
-			recomputePumpCurve(l);
 		}
 		bornInScenario(l);
 		doc.links.push(l);
@@ -5021,6 +5037,7 @@ var EngCalcs = EngCalcs || {};
 		baseScenario().overrides = {}; // Base is canon and has no overrides, by definition
 		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
+		dropStoredPumpFit(doc.links);
 		// Task 354. Not flipped by flipStoredY() above and must not be: the origin is stated in the
 		// FILE's Cartesian frame and outwardY()/inwardY() are written for exactly that -- flipping it
 		// here would put the sign in twice and move a survey model a couple of million units.
@@ -5352,7 +5369,6 @@ var EngCalcs = EngCalcs || {};
 		// confused."). Dead code in a one-time migration is worse than absent code: it reads as
 		// evidence that the case is real. When scenarios do ship, every v2 document will long since
 		// have been migrated or abandoned.
-		recomputeAllPumpCurves();
 		// Answered: the numbers are now in the units the strip names, so the document is current.
 		//
 		// A Ctrl-Z after this restores the NUMBERS but not the version, so the offer does not come
@@ -5649,16 +5665,20 @@ var EngCalcs = EngCalcs || {};
 	// m/mm/m-of-water sets, so almost everything matches with no conversion at all. Only the flow
 	// unit can miss (this page offers six, EPANET names ten), and a miss is harmless: every number
 	// crosses through SI anyway, so the network is identical and only the label differs.
-	var LPN_INP_FLOW_UNIT = {
-		GPM: 'gpm', MGD: 'gpm', IMGD: 'gpm', CFS: 'ft3ps', AFD: 'ft3ps',
-		LPS: 'lps', LPM: 'lps', MLD: 'lps', CMH: 'lps', CMD: 'lps'
-	};
-	// The three keywords whose unit this page actually OFFERS, so the selector ends up showing the
-	// very unit the file was written in. Everything not listed here (MGD, IMGD, AFD, LPM, MLD, CMH,
-	// CMD) lands on a different selector unit and is the one thing an import genuinely has to
-	// convert. Written as its own table rather than derived by comparing strings, because the
+	// EVERY ONE OF EPANET'S TEN FLOW KEYWORDS NOW HAS A SELECTOR UNIT OF ITS OWN (Task 390 step 4).
+	// `.inp` [OPTIONS] UNITS is a closed enumeration, so the `flow_epanet` family completes a finite
+	// list rather than chasing one, and no import has to convert a flow to reach a unit this page
+	// can show. Written as its own table rather than derived by comparing strings, because the
 	// keyword and our unit key are spelled differently on purpose (CFS vs ft3ps).
-	var LPN_INP_FLOW_SAME = { GPM: 1, CFS: 1, LPS: 1 };
+	var LPN_INP_FLOW_UNIT = {
+		GPM: 'gpm', MGD: 'mgd', IMGD: 'imgd', CFS: 'ft3ps', AFD: 'afd',
+		LPS: 'lps', LPM: 'lpm', MLD: 'mld', CMH: 'cmh', CMD: 'cmd'
+	};
+	// The keywords whose unit the selector really shows, so the file's own number crosses untouched.
+	// ALL TEN since the flow_epanet family landed -- kept as a table rather than deleted, because it
+	// is the thing that would have to shrink again if a keyword ever lost its selector, and a table
+	// that happens to be full says that far more plainly than a `true` would.
+	var LPN_INP_FLOW_SAME = { GPM: 1, MGD: 1, IMGD: 1, CFS: 1, AFD: 1, LPS: 1, LPM: 1, MLD: 1, CMH: 1, CMD: 1 };
 	function inpUnitSelections(parsed) {
 		var us = parsed.unitSystem === 'us';
 		return {
@@ -5692,6 +5712,39 @@ var EngCalcs = EngCalcs || {};
 	 * (see LPN_INP_FLOW_SAME). There the units really do differ, so arithmetic is the honest
 	 * answer rather than a rounding error.
 	 */
+	// THE FILE'S OWN TEXT, carried onto the document beside the number it states (Task 390 step 3).
+	// js/lpn-inp.js keeps a `tok` bag on every record it parses, keyed by the PARSER's field names;
+	// the document spells several of those differently (a demand is `_demand`, a tank's vessel is
+	// `tankDiameter`), so this is the one place the two vocabularies meet.
+	//
+	// THE SINGLE TEST IS `parseFloat(text) === storedValue`. A field that was converted on the way
+	// in -- a flow in a keyword this page has no selector for, an emitter coefficient -- fails it
+	// and arrives with no token at all, so nothing downstream has to know which fields converted.
+	// Tokens for values NOT in `map` are simply not carried; a token is never invented.
+	function carryInpTokens(src, dst, map) {
+		var t = src && src.tok, out = null, k, dk;
+		if (!t) { return dst; }
+		for (k in t) {
+			if (!Object.prototype.hasOwnProperty.call(t, k)) { continue; }
+			dk = map[k];
+			if (!dk || parseFloat(t[k]) !== dst[dk]) { continue; }
+			(out || (out = {}))[dk] = t[k];
+		}
+		if (out) { dst.tok = out; }
+		return dst;
+	}
+	var LPN_INP_TOK_JUNCTION = { elev: 'elev', demand: '_demand', x: 'x', y: 'y' },
+		LPN_INP_TOK_RESERVOIR = { elev: 'elev', x: 'x', y: 'y' },
+		LPN_INP_TOK_TANK = {
+			elev: 'elev', level: '_level', minLevel: 'minLevel', maxLevel: 'maxLevel',
+			diameter: 'tankDiameter', x: 'x', y: 'y'
+		},
+		LPN_INP_TOK_LINK = {
+			length: '_length', diameter: '_diameter', roughness: '_roughness', k: '_k',
+			setting: '_setting'
+		},
+		LPN_INP_TOK_POINT = { x: 'x', y: 'y' };
+
 	function docFromInp(parsed, name) {
 		// A flow from the file, in the unit the flow selector is now showing. `parsed.scale.flow`
 		// is m3/s per one of the file's units, so the SI step is the parser's own constant and
@@ -5707,7 +5760,7 @@ var EngCalcs = EngCalcs || {};
 				// ground", and elevation already carries EPANET's total head. Writing the same
 				// number into both would look identical and silently sever the link the page keeps
 				// between them (see reservoirHead()).
-				return { id: n.id, type: 'reservoir', x: n.x, y: n.y, elev: n.elev };
+				return carryInpTokens(n, { id: n.id, type: 'reservoir', x: n.x, y: n.y, elev: n.elev }, LPN_INP_TOK_RESERVOIR);
 			}
 			if (n.type === 'tank') {
 				// A tank's four levels and its diameter are ALL in the Elevation/Head unit, because
@@ -5715,7 +5768,7 @@ var EngCalcs = EngCalcs || {};
 				// included, which is the one that surprises people (see js/lpn-epanet.js). Nothing
 				// here is blank-means-follow the way a reservoir's head is: EPANET states every one
 				// of them, so every one is written.
-				return {
+				return carryInpTokens(n, {
 					id: n.id, type: 'tank', x: n.x, y: n.y,
 					elev: n.elev,
 					// _level is scenario-overridable (leading underscore, read through effective())
@@ -5727,7 +5780,7 @@ var EngCalcs = EngCalcs || {};
 					minLevel: n.minLevel,
 					maxLevel: n.maxLevel,
 					tankDiameter: n.diameter
-				};
+				}, LPN_INP_TOK_TANK);
 			}
 			var j = {
 				id: n.id, type: 'junction', x: n.x, y: n.y,
@@ -5738,12 +5791,12 @@ var EngCalcs = EngCalcs || {};
 			// and never shown -- nothing in the UI edits an emitter yet, which is why the import
 			// report names every junction that has one.
 			if (n.emitter) { j._emitter = n.emitter; }   // base-write: import builds Base: an .inp arrives as one network with no scenarios
-			return j;
+			return carryInpTokens(n, j, LPN_INP_TOK_JUNCTION);
 		});
 		var links = parsed.links.map(function (l) {
 			var out = {
 				id: l.id, type: l.type, from: l.from, to: l.to,
-				verts: (l.verts || []).map(function (v) { return { x: v.x, y: v.y }; }),
+				verts: (l.verts || []).map(function (v) { return carryInpTokens(v, { x: v.x, y: v.y }, LPN_INP_TOK_POINT); }),
 				_diameter: l.diameter,
 				_roughness: l.roughness,
 				// LENGTH IS THE FILE'S OWN NUMBER, and lenAuto is OFF. An EPANET length is the real
@@ -5771,17 +5824,12 @@ var EngCalcs = EngCalcs || {};
 					return [inpFlow(pt[0]), pt[1]];
 				});
 				out.curveRef = null;
-				// h0/a/b are what the solver reads and are SI, so they are fitted from SI points
-				// rather than the displayed ones -- the same split recomputePumpCurve() makes.
-				// The parser's own scale factors do that step, so no conversion constant lives here.
-				var fit = (l.curvePoints && l.curvePoints.length)
-					? EngCalcs.lpnPumpFromCurve(l.curvePoints.map(function (pt) {
-						return [pt[0] * parsed.scale.flow, pt[1] * parsed.scale.head];
-					}))
-					: { h0: 0, a: 0, b: 2 };
-				out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
+				// NO FITTED CURVE IS WRITTEN HERE (Task 390 step 5). An import used to fit h0/a/b
+				// from the file's own points and store the triple beside them; pumpFit() derives it
+				// at the solver handoff instead, so an imported pump carries exactly what the file
+				// stated and nothing of ours.
 			}
-			return out;
+			return carryInpTokens(l, out, LPN_INP_TOK_LINK);
 		});
 		var nodeAt = {};
 		nodes.forEach(function (n) { nodeAt[n.id] = n; });
@@ -5807,7 +5855,10 @@ var EngCalcs = EngCalcs || {};
 			// An anchored label stores an OFFSET from its node, not a position (buildLabelEls'
 			// model); EPANET stores the absolute point, so the anchor is subtracted here.
 			var an = lb.anchorNode && nodeAt[lb.anchorNode] ? nodeAt[lb.anchorNode] : null;
-			return {
+			// An ANCHORED label stores an offset, so the file's text no longer states the number
+			// this record holds and carryInpTokens refuses it without being told. A free label
+			// stores the file's own point and keeps it.
+			return carryInpTokens(lb, {
 				id: mintTextId(), text: lb.text,
 				x: an ? lb.x - an.x : lb.x,
 				y: an ? lb.y - an.y : lb.y,
@@ -5817,7 +5868,7 @@ var EngCalcs = EngCalcs || {};
 				// the coordinate above is stored exactly as the file wrote it (Task 332). Not an
 				// "imported" flag: it is an alignment, and Task 342 makes it a user control.
 				align: 'left', valign: 'top'
-			};
+			}, LPN_INP_TOK_POINT);
 		});
 		// nextId must clear every id the file brought, or the next element drawn would collide with
 		// one. Only ids shaped like this page's own (prefix + number) can collide, so only those are
@@ -9026,7 +9077,6 @@ var EngCalcs = EngCalcs || {};
 			[niceDefault('lpn_u_flow', 'gpm', 250, 0.015), niceDefault('lpn_u_elevhead', 'fth2o', 140, 42)],
 			[niceDefault('lpn_u_flow', 'gpm', 500, 0.030), niceDefault('lpn_u_elevhead', 'fth2o', 60, 18)]
 		];
-		recomputePumpCurve(pump);
 		// The ring. Demands and elevations both vary around it on purpose: equal demands at equal
 		// elevations would put the hydraulic divide exactly opposite the tie-in and make the answer
 		// look like symmetry rather than like a solve.
@@ -9728,10 +9778,39 @@ var EngCalcs = EngCalcs || {};
 	// a number whose meaning depends on a table that may be re-derived, while 'in' will mean inches
 	// forever. Since Task 390 that is also what the <option>'s own value is, so this is no longer a
 	// document-only convention -- the key is a unit's identity everywhere in the suite.
+	//
+	// ---- A UNIT THIS PAGE DOES NOT OFFER (ROADMAP Task 390 step 4) -------------------------------
+	//
+	// A unit is a LABEL and a MAGNITUDE, and they have different requirements. The label is a
+	// string: always storable, always displayable, and always the user's. The magnitude is a factor,
+	// and ONLY A SOLVE NEEDS ONE. So a name we have no factor for has one honest outcome and it is
+	// neither of the two obvious ones: not "reject the document", and not "guess a factor".
+	//
+	//   open the file, draw it faithfully, keep the name verbatim -- and REFUSE TO SOLVE, saying
+	//   which unit and why.
+	//
+	// The refusal is the work. EngCalcs.unitFactor() answers 1 for a name it has no factor for,
+	// which is right for a page RENDERING (a label still draws) and silently catastrophic for a page
+	// SOLVING (every length in the network would be off by whatever that unit really is), and
+	// nothing about the number on screen would look wrong. Two different messages are owed, and
+	// they are different facts: "we do not know this unit" and "so we cannot give you answers".
+	//
+	// {selectName: unitName}. Written ONLY by applyUnitSelections(), which is the one place a
+	// document's units are installed, so this object always describes the open document and never a
+	// leftover of the last one.
+	var unresolvedUnits = {};
+	function unresolvedUnitNames() {
+		return LPN_UNIT_SELECTS.map(function (name) { return unresolvedUnits[name]; })
+			.filter(function (u, i, all) { return u && all.indexOf(u) === i; });
+	}
 	function readUnitSelections() {
 		var out = {};
 		LPN_UNIT_SELECTS.forEach(function (name) {
-			var k = unitKey(name);
+			// THE CARRIED NAME WINS. A selector that could not be set is showing some other unit,
+			// and writing that one back would rewrite the user's own declaration -- the exact
+			// failure this task exists to end, one level up from the numbers. The name goes back
+			// out as it came in, so a browser that later learns the unit reads a correct document.
+			var k = unresolvedUnits[name] || unitKey(name);
 			if (k) { out[name] = k; }
 		});
 		return out;
@@ -9739,9 +9818,16 @@ var EngCalcs = EngCalcs || {};
 	// Restores a project's own units WITHOUT going through EngCalcs.setUnits(): that helper calls
 	// submitForm(), which re-enters pageCalculator, which is exactly the code path that is calling
 	// this. The selects are set directly and the caller re-renders once, in its own order.
-	// A unit this browser does not offer (a family that changed) is skipped rather than forced --
-	// leaving the current selection is a wrong unit; setting a missing one is a broken select.
+	//
+	// A UNIT THIS BROWSER DOES NOT OFFER is not forced onto the select and not thrown away either:
+	// it is recorded in unresolvedUnits above, kept verbatim by readUnitSelections(), shown by
+	// unitLabel(), and it stops the solve. See the block on unresolvedUnits for why that trio and
+	// not a rejection.
 	function applyUnitSelections(units) {
+		// Cleared unconditionally, INCLUDING on the early return: this function is the one place a
+		// document's units are installed, so it owns the whole of that state. Clearing only in the
+		// matched branch would leave one document's unknown unit refusing to solve the next one.
+		unresolvedUnits = {};
 		if (!units) { return false; }
 		var changed = false;
 		LPN_UNIT_SELECTS.forEach(function (name) {
@@ -9758,13 +9844,20 @@ var EngCalcs = EngCalcs || {};
 					return;
 				}
 			}
+			unresolvedUnits[name] = want;
 		});
 		return changed;
 	}
 	// Task 390: the select's value IS the unit's key ('in'), and the factor is a lookup from it
 	// through EngCalcs.unitFactors -- lib/Units.lib.php's own table, emitted by echoHTMLHead().
 	function unitFactor(name) { return EngCalcs.unitFactor(unitEl(name)); }
-	function unitLabel(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : ''; }
+	// THE LABEL IS THE ONE PART OF AN UNKNOWN UNIT WE CAN ALWAYS HONOUR, so a readout shows the
+	// document's own name rather than the name of whatever unit the select fell back to. Every
+	// readout on the page comes through here, so that is one place rather than a rule.
+	function unitLabel(name) {
+		if (unresolvedUnits[name]) { return unresolvedUnits[name]; }
+		var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : '';
+	}
 	function unitKey(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].value : null; }
 	// The map label's one unit token -- see numLine()'s `suffix` for why the gradient gets one and
 	// nothing else does. Not translated: '%' is the same mark in all 27 languages, including RTL.
@@ -9920,7 +10013,7 @@ var EngCalcs = EngCalcs || {};
 	// switched. Scrub and ban this."*
 	//
 	// Conversion therefore happens in exactly TWO places and nowhere else:
-	//   1. HERE, at the solver handoff (assembleModel, recomputePumpCurve) -- declared value to SI.
+	//   1. HERE, at the solver handoff (assembleModel, pumpFit) -- declared value to SI.
 	//   2. On the way BACK, for solve RESULTS only (readonlyUnitField, numLine) -- SI to display.
 	// A number that is an input never passes through either on its way to the screen. If you find
 	// yourself adding a third conversion site, you are re-creating the banned behaviour.
@@ -12121,7 +12214,6 @@ var EngCalcs = EngCalcs || {};
 		refSelect.addEventListener('change', function () {
 			saveUndoSnapshot();
 			l.curveRef = refSelect.value || null;
-			recomputeAllPumpCurves();
 			scheduleSolve();
 			renderLinkFields(linkId); // rebuild: show/hide point rows, refresh the read-only result
 		});
@@ -12190,7 +12282,6 @@ var EngCalcs = EngCalcs || {};
 					// Both fields or neither -- a lone Q or lone H is not a point the curve fit can use.
 					l.curvePoints[pi] = (qv !== undefined && hv !== undefined) ? [qv, hv] : undefined;
 					l.curvePoints = l.curvePoints.filter(function (x) { return x; });
-					recomputeAllPumpCurves();
 					scheduleSolve();
 				}
 				qInput.addEventListener('change', commit);
@@ -12768,9 +12859,16 @@ var EngCalcs = EngCalcs || {};
 				// roughness (Hazen-Williams C) and k are dimensionless, so they cross this boundary
 				// unchanged -- the same reason they use rawLine() rather than numLine() on the map.
 				diameter: toSI(effective(l, 'diameter') || 0, 'lpn_u_diameter'), roughness: roughnessSI(l),
-				length: linkLengthSI(l), status: effective(l, 'status'), k: effective(l, 'k'),
-				h0: l.h0, a: l.a, b: l.b
+				length: linkLengthSI(l), status: effective(l, 'status'), k: effective(l, 'k')
 			};
+			// THE FITTED PUMP CURVE IS DERIVED HERE AND NOWHERE ELSE (Task 390 step 5). It used to
+			// be read off the link, where a stored copy had to be repaired on every unit switch.
+			// Only a pump gets one: js/lpn-solver.js and js/lpn-epanet.js both test the type first,
+			// so putting h0/a/b on a pipe only ever meant three undefined properties per link.
+			if (l.type === 'pump') {
+				var fit = pumpFit(l);
+				out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
+			}
 			if (l.type === 'valve') {
 				// THE SETTING CROSSES THIS BOUNDARY IN THE UNIT ITS TYPE NAMES, which is the whole
 				// reason a valve needs a line here at all. A pressure setting is a head in metres,
@@ -13285,6 +13383,20 @@ var EngCalcs = EngCalcs || {};
 		// and per-page-load dedupe, so the initial load solve and the every-keystroke debounce do
 		// not inflate it.
 		if (EngCalcs.maybeLogCalcUsage) { EngCalcs.maybeLogCalcUsage(); }
+		// A UNIT WE HAVE NO FACTOR FOR STOPS THE SOLVE AND NOTHING ELSE (Task 390 step 4). The
+		// drawing is already on screen and every number is already the user's own; what cannot be
+		// done is arithmetic, because EngCalcs.unitFactor() answers 1 for a name it does not know
+		// and a network solved through that would look perfectly ordinary and be wrong. Checked
+		// BEFORE assembleModel(), which is the first thing that would multiply by it.
+		var unknownUnits = unresolvedUnitNames();
+		if (unknownUnits.length) {
+			lastSolveResult = null;
+			setStatus(((EngCalcs.pageConfig || {}).lpn_unit_unknown ||
+				'This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be worked out until this page knows that unit, because there is no way to tell how big it is.')
+				.replace('{unit}', unknownUnits.join(', ')));
+			refreshLabelText();
+			return;
+		}
 		var model = assembleModel(), issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
 			lastSolveResult = null;
@@ -13459,9 +13571,12 @@ var EngCalcs = EngCalcs || {};
 	EngCalcs.pageCalculator = function (objForm) {
 		// A unit switch REINTERPRETS every input (Task 263), so it changes the physics rather than
 		// the display: the same three curve points mean a different pump under l/s than under gpm,
-		// and every solved head, pressure and velocity moves with them. Refit, then re-solve.
-		// This is the whole visible consequence of the ban, and it is deliberate.
-		recomputeAllPumpCurves();
+		// and every solved head, pressure and velocity moves with them. This is the whole visible
+		// consequence of the ban, and it is deliberate.
+		//
+		// A refit used to have to happen HERE, on every unit switch, because the fitted curve was
+		// stored on the link. It is derived at the solver handoff now (pumpFit), so re-solving is
+		// the whole of the response and there is nothing left to repair (Task 390 step 5).
 		scheduleSolve();
 		refreshMapStatus();   // a unit switch is exactly when this readout has to be right
 		// The project's units are part of the project (serializeProject), so a switch is a change to
