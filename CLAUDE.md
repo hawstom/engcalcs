@@ -500,8 +500,21 @@ US file made a round trip through two factors that are not exact inverses: **710
   the file, and `dev/lpn-spike/local-origin-harness.js` counts the call sites. Reversible, stored,
   and guarded — anything claiming to be an exception must be all three.
 - **Converting to SOLVE is not an exception**, because it does not touch the document.
-- **This is testable and must be tested:** import then export must reproduce the file. That is the
-  acceptance criterion for Task 281 (`.inp` export), not an afterthought to it.
+- **THE INPUT FILE IS CANONICAL, so nothing of ours can validate it.** Our conversion factors cannot
+  check a user's numbers — the only correct property is that they come back out unchanged. Phrasing
+  like "verify the examples still hold against the corrected factors" has the relationship backwards
+  and is the misunderstanding to watch for.
+- **Preserve the TOKEN, not the value.** `parseFloat()` at the point of reading a file throws away
+  the text, and no downstream code can reconstruct it: `710.0` can only ever come back as `710`,
+  and `1.50` as `1.5`. Keep the exact characters beside the parsed number at the one place text
+  becomes number, and store the token.
+- **The rule that makes this structural rather than a discipline: a number the user supplied and a
+  number we computed are different kinds of thing, and must never occupy the same field.** Once
+  they are separate there is no code path that writes to the user's field, so nobody has to
+  remember anything. Full design: ROADMAP Task 390.
+- **This is testable and must be tested: import then export is BYTE-IDENTICAL for every value the
+  user did not edit.** Not "within tolerance" — identical. That is also the acceptance criterion for
+  Task 281 (`.inp` export), not an afterthought to it.
 
 ### Changing a unit reinterprets the typed number; it does not convert it
 

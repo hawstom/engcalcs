@@ -135,28 +135,39 @@ session of its own with nothing else in it.
   - Worth measuring before choosing: how many labels does the relaxation actually rescue on Net3,
     versus how many it merely moves?
 
-- 75|390| **A unit is a LABEL and a MAGNITUDE — carry the label verbatim, and refuse to solve when we
-  lack the magnitude.** Tom, 2026-08-16, on whether adding the five missing flow units papers over
-  something: *"If a unit, recognized or unrecognized, comes along in a file, what do we do? We don't
-  convert it! We take it verbatim. It is a string... If we don't recognize the unit, we must say
-  something like 'This file has the following units that are not recognized. Please contact the
-  developers.'"* Three parts, and the third is the one that makes the other two honest.
-  - **(a) Pass-through on import.** Already briefed to the `looped-network.js` track; see the
-    invariant in CLAUDE.md. Better constants do NOT fix it — pass-through is the only fix.
-  - **(b) Add the five EPANET flow units we lack: IMGD, AFD, LPM, CMH, CMD.** The `.inp` `UNITS`
-    keyword is a CLOSED enumeration of ten, so this COMPLETES a finite list rather than working
-    around it. Needs `u_imgd`, `u_afd`, `u_lpm`, `u_cmh`, `u_cmd` — fold into the queued sprint
-    (47 → 52 keys) rather than paying for a second 26-agent pass later.
-  - **(c) THE UNKNOWN-UNIT PATH, which is what stops (b) being a workaround.** A unit we do not
-    recognize must still open, draw and display verbatim; only the SOLVE is refused, naming the
-    unit. "We don't recognize this unit" and "we cannot give you answers" are two different
-    messages and the user needs both. Never reject the file; never guess.
-  - **The cost that will otherwise be found halfway through: in this suite a unit's IDENTITY IS its
-    conversion factor.** `js/Cookies.lib.js` stores each select's option *value*, i.e. the number —
-    which is why correcting the factors on 2026-08-16 silently reset returning visitors' unit
-    choices to their defaults. Carrying a unit as a string means the document AND the cookie must
-    key on a unit NAME. That is the real work in this task, and it is worth doing for its own sake.
-  - Acceptance: import then export reproduces the file. That is also Task 281's criterion.
+- 85|390| **Preserve a file's inputs VERBATIM, as strings. The input file is canonical.** Tom,
+  2026-08-16: *"We cannot verify that examples hold against unit factors; input files are canonical.
+  We must preserve the inputs verbatim as strings."* Our conversion factors can never validate a
+  user's input — the only correct property is that the numbers come back out unchanged.
+  - **ROOT CAUSE, and it is one line: `js/lpn-inp.js:89` does `parseFloat(tok)` and throws the text
+    away.** Everything downstream is trying to reconstruct a string that no longer exists, which is
+    why no choice of constant fixes it. Measured with the corrected exact factors: **36.7% of values
+    (7337/20000) still fail to round-trip bit-identically**, worse than the 26% before them.
+  - **THE RULE THAT MAKES IT STRUCTURAL: a number the user supplied and a number we computed are
+    different kinds of thing and must never occupy the same field.** `elev` currently holds both.
+    Separate them and there is no code path that writes to the user's field, so "preserve verbatim"
+    needs no discipline.
+  - Three changes, in dependency order: (1) keep `tok` beside the parsed value at the ONE place text
+    becomes number; (2) `docFromInp` stores the token verbatim, converting nothing — in the normal
+    case the file's unit IS the display unit; (3) convert only at the solver handoff, which
+    `linkLengthSI()` already does correctly and whose comment already states the rule.
+  - **A unit is a LABEL and a MAGNITUDE.** The label is a string, always carried verbatim. Only a
+    SOLVE needs the magnitude. So: recognized → display and solve; unrecognized and never computed
+    with → carry verbatim; **unrecognized and needed to solve → open, draw and display faithfully,
+    refuse only the solve, and name the unit.** Never reject the file, never guess.
+  - **Add the five EPANET flow units we lack: IMGD, AFD, LPM, CMH, CMD** (`u_imgd`, `u_afd`,
+    `u_lpm`, `u_cmh`, `u_cmd`). `.inp` `UNITS` is a CLOSED enumeration of ten, so this completes a
+    finite list. Fold into the queued sprint (47 → 52) rather than paying for a second 26-agent pass.
+  - **The string buys REPRESENTATION, not just value:** `710.0` stays `710.0`, `1.50` stays `1.50`,
+    `1e3` stays `1e3`. `parseFloat("710.0")` can only ever return to `710`.
+  - **Costs to plan for:** a document schema change needs migration for saved projects; and once a
+    field holds `"710"`, a missed read site does `"710" * 2` and JS obliges silently — the accessor
+    must be mandatory and checked, not conventional.
+  - **Acceptance: import then export is BYTE-IDENTICAL for every value the user did not edit.** Not
+    "within tolerance". This is also Task 281's criterion.
+  - Related: in this suite a unit's IDENTITY is currently its conversion factor — `js/Cookies.lib.js`
+    stores each select's option *value* — which is why correcting the factors on 2026-08-16 reset
+    returning visitors' unit choices. Carrying units by NAME fixes that too.
 
 - 60|389| **Search and replace inputs across the network — WANTED, and no longer gated on network
   size.** Tom, 2026-08-16: *"I would like search and replace embraced more explicitly."* That
