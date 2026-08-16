@@ -158,6 +158,22 @@ session of its own with nothing else in it.
   - Worth measuring before choosing: how many labels does the relaxation actually rescue on Net3,
     versus how many it merely moves?
 
+- 60|389| **Search and replace inputs across the network — WANTED, and no longer gated on network
+  size.** Tom, 2026-08-16: *"I would like search and replace embraced more explicitly."* That
+  reverses this file's earlier position, which said find-and-replace was a big-network tool we
+  should not borrow for a design tool. The reversal is deliberate: a designer re-roughening every
+  PVC pipe, or bumping every 6-inch main to 8-inch after a fire-flow run, is doing DESIGN, not
+  management — the operation is just as native to 15 pipes as to 4,000.
+  - Pairs with Task 353 (find elements by searching): **353 is the query, 389 is the query plus a
+    write.** Build 353's selector first and let 389 reuse it rather than growing a second one.
+  - Must preview before it writes — "37 pipes will change" with the ability to cancel — and must be
+    one undo step, not 37.
+  - Goes through `setProp()` like every other property write, or it edits BASE from inside a
+    scenario. That seam has already produced five user-reachable defects; `scenario_seam_check.php`
+    guards it.
+  - Distinct from Task 185 (Match/Copy properties), which stays a click-source-then-click-targets
+    tool. Both ship; neither replaces the other.
+
 - 60|353| **Find elements by searching for them.** Tom, 2026-08-15. One text input, an "Elements to
   search" pull-down (all / junctions / pipes / …) and a Condition pull-down, roughly the shape of a
   Google Sheets filter. Start there rather than with a query language.
@@ -641,15 +657,10 @@ session of its own with nothing else in it.
   unique) and whether geometry is (it must not be — that is a move, not a property copy). This is
   the cheap 80% of Task 186 and should ship long before it.
 
-  **Kept and still liked (Tom, 2026-08-13): "Very nice idea. I love it."** With a sharp observation
-  about why EPANET does not have one: **EPANET/epanet-js would reach for SEARCH AND REPLACE instead,
-  because they are aimed at MANAGEMENT of a huge existing network, where we are aimed at DESIGN.**
-  Find-and-replace is the right tool when you have 4,000 pipes and need every PVC one re-roughened;
-  click-the-source-then-click-the-targets is the right tool when you are drawing 15 pipes and want
-  this one to look like that one. **Do not "improve" this into a search-and-replace** — that would
-  be borrowing a big-network tool for a small-network job and is the same scope gravity toward
-  EPANET that Task 146's scope doc warns about. If a find-and-replace is ever genuinely wanted, it
-  is a separate task with a separate justification, not this one grown up.
+  **Kept and still liked (Tom, 2026-08-13): "Very nice idea. I love it."** Keep it a click-source-
+  then-click-targets tool: that is the right shape when you are drawing 15 pipes and want this one
+  to look like that one. Do not grow it into a query tool — search-and-replace is now Task 389 and
+  is a better fit for its own job, so the two ship side by side rather than one becoming the other.
 
 - 8|186| **Table-paradigm editor with spreadsheet copy/paste (originated during Task 146).** Tom, 2026-07-30:
   "For the future a table-paradigm editor with spreadsheet-like copy and paste would be very cool."
