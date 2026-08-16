@@ -1249,13 +1249,21 @@ console.log('\n--- Settings panel stays in sync ---');
 
   // 4. ONE HOME for the concept. Four call sites was already enough for two of them to drift apart;
   // Task 276 added a fifth when applyWorldFile() started reading a world file's Cartesian C,F into
-  // the internal Y-down frame. Raising this number is fine when the new site is a real boundary --
-  // the point of the check is that a boundary never gets its own inline `-y` instead.
+  // the internal Y-down frame.
+  //
+  // **THE FIVE BOUNDARY SITES NOW GO THROUGH outwardY()/inwardY() INSTEAD** (Task 354): a boundary
+  // that needs the flip needs the local-origin shift too, and the two are one step. So cartesianY()
+  // is called exactly three times -- its own definition, and once inside each of those two -- and
+  // a fourth caller is the thing to catch, because it is a site that took the flip and skipped the
+  // shift. `dev/lpn-spike/local-origin-harness.js` counts the boundary sites themselves.
   {
-    const js = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+    // Comments stripped: the Task 354 block explains this rule at length, and a count that includes
+    // the prose goes up whenever a paragraph is edited -- which teaches people to raise the number
+    // without looking at what changed.
+    const js = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8').replace(/^\s*\/\/.*$/gm, '');
     const uses = (js.match(/cartesianY\(/g) || []).length;
-    ok('the flip has exactly one definition and every boundary goes through it', uses === 6,
-      uses + ' occurrences (1 definition + 5 boundary sites)');
+    ok('the flip has one definition and only the two origin converters call it', uses === 3,
+      uses + ' occurrences (1 definition + outwardY + inwardY)');
   }
 }
 

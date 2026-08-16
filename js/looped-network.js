@@ -1259,7 +1259,7 @@ var EngCalcs = EngCalcs || {};
 	// The document. nodes: Junction/Reservoir/Tank (point elements). links: Pipe/Pump (two
 	// endpoints + optional bend vertices). labels: Text elements with a leader to an
 	// anchor node, OR a free-floating text with anchorNode === null.
-	var doc = { nodes: [], links: [], labels: [] };
+	var doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
 
 	// The structural ID letters. These are LOOKUP KEYS into nextId and settings.idPrefixes, not the
 	// text an ID starts with -- that is settings.idPrefixes[key], which the user can change and
@@ -2026,6 +2026,48 @@ var EngCalcs = EngCalcs || {};
 	// Self-inverse on purpose: the same call converts both ways, so a display site and an entry site
 	// can never drift into disagreeing about which direction they are going.
 	function cartesianY(y) { return -y; }
+	// ---- ROADMAP Task 354: LOCAL MAP COORDINATES -------------------------------------------------
+	//
+	// Tom, 2026-08-15, on Elm Street: a pipe VANISHES when you zoom in, while its five repeated
+	// labels are still drawn along exactly where it should be. *"Local map coordinates: I agree.
+	// Log it high priority since it's a bug."*
+	//
+	// **THE LABELS BEING RIGHT WAS THE DIAGNOSIS**: the arithmetic is fine and the RASTERISER is
+	// what failed. Elm Street is in state plane, x ~ 579,350 and y ~ 1,304,070, where a float32 --
+	// which is what an SVG path coordinate becomes -- has a spacing of 0.0625 and 0.125 units
+	// respectively. A pipe's stroke is `linkWidth / scale` WORLD units, so at the scale he was
+	// looking at (a map 30 units wide, i.e. scale ~47) the 3 px stroke is 0.064 world units -- AT
+	// the quantum. Widening it to 20 px moved the failure three zoom steps further out and did not
+	// remove it, and at that point the 11 px text was 0.079 units and the glyphs went too. Every
+	// observation falls out of one number, and no stroke property touches the second half of it.
+	//
+	// **SO THE DOCUMENT STORES COORDINATES LOCAL TO AN ORIGIN, AND NOTHING DOWNSTREAM EVER SEES A
+	// BIG NUMBER.** The renderer, the bbox, the collision pass, the fit and the solver all work in
+	// local units; the origin is added back at the handful of places that face OUTWARD -- the
+	// coordinate readout, the property popups' X/Y, an .inp import, and the backdrop world file.
+	// That is ~5 sites. The alternative -- subtract an offset at every coordinate WRITE and leave
+	// the document's numbers huge -- is ~25 sites and leaves the file unreadable by the same
+	// arithmetic that broke the screen.
+	//
+	// THE ORIGIN IS IN THE FILE'S OWN FRAME, WHICH IS CARTESIAN (Task 274), while memory is Y-down.
+	// So the two conversions compose in one direction each and are NOT self-inverse the way
+	// cartesianY() is. That is why they are four named functions rather than one clever one: a site
+	// that needs the flip needs the shift too, and a reader should not have to work out which.
+	//
+	//     outward = origin + flip(internal)        internal = flip(outward - origin)
+	//
+	// **EVERY BOUNDARY GOES THROUGH THESE FOUR AND cartesianY() IS NO LONGER CALLED DIRECTLY
+	// ANYWHERE ELSE.** dev/lpn-spike/local-origin-harness.js counts the call sites, for the same
+	// reason the flip's own harness did: a sixth boundary added later without the shift is a
+	// coordinate wrong by half a million, and it looks perfectly ordinary in a diff.
+	function docOrigin() {
+		return (doc && doc.origin && isFinite(doc.origin.x) && isFinite(doc.origin.y))
+			? doc.origin : { x: 0, y: 0 };
+	}
+	function outwardX(x) { return x + docOrigin().x; }
+	function outwardY(y) { return cartesianY(y) + docOrigin().y; }
+	function inwardX(x) { return x - docOrigin().x; }
+	function inwardY(y) { return cartesianY(y - docOrigin().y); }
 	function screenToWorld(sx, sy) {
 		var r = svg.getBoundingClientRect();
 		return { x: (sx - r.left - state.tx) / state.s, y: (sy - r.top - state.ty) / state.s };
@@ -3359,8 +3401,8 @@ var EngCalcs = EngCalcs || {};
 		// is also the document's own convention -- but the INTERNAL frame is still Y-down, so the Y
 		// crosses the same boundary applySaved() crosses.
 		var cornerX = w.C - w.A / 2, cornerY = w.F - w.E / 2;
-		backdrop.tx = cornerX - backdrop.x * backdrop.s;
-		backdrop.ty = cartesianY(cornerY) - backdrop.y * backdrop.s;
+		backdrop.tx = inwardX(cornerX) - backdrop.x * backdrop.s;
+		backdrop.ty = inwardY(cornerY) - backdrop.y * backdrop.s;
 		applyBackdropTransform();
 		saveToStorage();
 	}
@@ -3530,7 +3572,7 @@ var EngCalcs = EngCalcs || {};
 				var parts = (txt || '').split(',').map(Number);
 				// The one ENTRY site (Task 274): what the user types is Cartesian, and positionTo()
 				// works in the internal Y-down frame.
-				if (txt && !isNaN(parts[0]) && !isNaN(parts[1])) { positionTo(refWorld, { x: parts[0], y: cartesianY(parts[1]) }); }
+				if (txt && !isNaN(parts[0]) && !isNaN(parts[1])) { positionTo(refWorld, { x: inwardX(parts[0]), y: inwardY(parts[1]) }); }
 				return;
 			}
 			// No further blocking dialog here -- the panel + Continue already made the transition
@@ -4127,7 +4169,10 @@ var EngCalcs = EngCalcs || {};
 	// nothing about units, which is why opening one runs the one-time restore offer below.
 	// 5 (Task 324, 2026-08-14): a scenario override is keyed by GROUP AND id ('n:20' / 'l:20')
 	// rather than by the bare id, because a node and a link may legally share one.
-	var LPN_STORAGE_VERSION = 6;
+	// 7 (Task 354, 2026-08-16): coordinates are LOCAL to a `doc.origin`, which the file carries in
+	// its own Cartesian frame. Every existing document migrates by having one computed for it, and
+	// the ones near zero get {0, 0} and are byte-identical afterwards.
+	var LPN_STORAGE_VERSION = 7;
 	// ---- ROADMAP Task 274, second half (Tom, 2026-08-11: "Eventually needs to be Cartesian. If we
 	// can do that now without causing trouble, let's do it.") ----
 	//
@@ -4169,6 +4214,81 @@ var EngCalcs = EngCalcs || {};
 		// does. The extent is a size, and sizes do not flip. Storing a screen-space translation
 		// instead would have put an unflipped convention into a file that is otherwise Cartesian.
 		if (o.view && typeof o.view.cy === 'number') { o.view.cy = -o.view.cy; }
+		return o;
+	}
+	// ---- Task 354: choosing and applying a document's local origin --------------------------------
+	//
+	// **THE THRESHOLD IS A MEASUREMENT, NOT A TASTE.** A float32's spacing at magnitude m is about
+	// m / 2^23. A pipe's stroke is `linkWidth / scale` world units, so the drawing survives while
+	// linkWidth / scale > m / 2^23 -- i.e. up to a working zoom of about 2^23 * linkWidth / m. At
+	// Elm Street's 1.3e6 that is scale 19 for a 3 px stroke, and the map he was looking at was at
+	// 47. At 1e4 it is scale 2,500, which is five times MAX_SCALE, so a document whose coordinates
+	// are under ten thousand has nothing to gain from a rebase and is left exactly as it was --
+	// including every example this repo ships (0 to ~5,000) and Net1/2/3 (0 to 100).
+	var LPN_ORIGIN_THRESHOLD = 1e4;
+	// Rounded so a human reading `origin` sees a number they could have typed, and so two documents
+	// covering the same survey area are likely to share one. It also means a small edit to a network
+	// never moves the origin: the rebase runs once, at the version step or at import, and the origin
+	// is then a fixed property of the document.
+	var LPN_ORIGIN_ROUND = 1e3;
+	// Every ABSOLUTE coordinate a stored document holds, in its own (Cartesian) frame. A visitor is
+	// called with {get, set} so one list serves both the bbox pass and the shift pass -- two lists
+	// that had to agree would be the thing that drifts, and a coordinate missed by the shift is a
+	// node half a million units from its pipe.
+	//
+	// WHAT IS DELIBERATELY NOT HERE: `n.lx`/`l.ly` and an ANCHORED label's x/y are OFFSETS from
+	// something else, and an offset does not move when the frame's origin does. `backdrop.x/y/width`
+	// are a size and an anchor within the image, not a place on the map; only `backdrop.tx/ty`, the
+	// image's world translation, is a position. `view.extent` is a size for the same reason its
+	// centre is a position.
+	function eachStoredPoint(o, visit) {
+		(o.nodes || []).forEach(function (n) { visit(n); });
+		(o.links || []).forEach(function (l) { (l.verts || []).forEach(function (v) { visit(v); }); });
+		(o.labels || []).forEach(function (lb) { if (!lb.anchorNode) { visit(lb); } });
+		if (o.backdrop && typeof o.backdrop.tx === 'number') {
+			visit({}, function () { return { x: o.backdrop.tx, y: o.backdrop.ty }; },
+				function (x, y) { o.backdrop.tx = x; o.backdrop.ty = y; });
+		}
+		if (o.view && typeof o.view.cx === 'number') {
+			visit({}, function () { return { x: o.view.cx, y: o.view.cy }; },
+				function (x, y) { o.view.cx = x; o.view.cy = y; });
+		}
+	}
+	// The origin this document SHOULD have, or null for "leave it alone". Uses the smallest x and y
+	// present rather than the centre, so local coordinates come out small and positive, which is
+	// what a person reading the raw JSON expects of a local grid.
+	function chooseOrigin(o) {
+		var minX = Infinity, minY = Infinity, maxAbs = 0;
+		eachStoredPoint(o, function (pt, get) {
+			var p = get ? get() : pt;
+			if (!isFinite(p.x) || !isFinite(p.y)) { return; }
+			if (p.x < minX) { minX = p.x; }
+			if (p.y < minY) { minY = p.y; }
+			maxAbs = Math.max(maxAbs, Math.abs(p.x), Math.abs(p.y));
+		});
+		if (!isFinite(minX) || !isFinite(minY) || maxAbs < LPN_ORIGIN_THRESHOLD) { return null; }
+		return {
+			x: Math.floor(minX / LPN_ORIGIN_ROUND) * LPN_ORIGIN_ROUND,
+			y: Math.floor(minY / LPN_ORIGIN_ROUND) * LPN_ORIGIN_ROUND
+		};
+	}
+	// Give a stored document an origin and make every coordinate in it local to that origin. The
+	// absolute position of everything is unchanged BY CONSTRUCTION -- origin + local is what every
+	// outward-facing site reports -- so this is invisible to the user, which is the whole reason it
+	// can run automatically on open rather than asking a question the way the v2 units offer does.
+	// Idempotent on a document that already has an origin: it returns without touching anything, so
+	// a document cannot be rebased twice into oblivion.
+	function rebaseDocument(o) {
+		if (o.origin) { return o; }
+		var org = chooseOrigin(o);
+		o.origin = org || { x: 0, y: 0 };
+		if (!org) { return o; }
+		eachStoredPoint(o, function (pt, get, set) {
+			var p = get ? get() : pt;
+			if (!isFinite(p.x) || !isFinite(p.y)) { return; }
+			if (set) { set(p.x - org.x, p.y - org.y); }
+			else { pt.x = p.x - org.x; pt.y = p.y - org.y; }
+		});
 		return o;
 	}
 	// The version at which inputs became declarative. A document below it holds SI numbers that have
@@ -4261,6 +4381,10 @@ var EngCalcs = EngCalcs || {};
 			format: LPN_FILE_FORMAT, app: LPN_FILE_APP,
 			v: openDocVersion, project: project, scenarios: scenarios,
 			nodes: doc.nodes, links: doc.links, labels: doc.labels, nextId: nextId,
+			// The frame every coordinate above is measured from (Task 354). Written unconditionally,
+			// including the {0, 0} an ordinary drawing has, because a file that omits it is a file
+			// whose reader has to guess -- and the guess is only right until somebody hand-edits one.
+			origin: docOrigin(),
 			labelSettings: labelSettings, backdrop: backdrop, settings: settings,
 			// Where the reader was looking. Not a reason to SAVE -- panning marks nothing dirty --
 			// but it rides along whenever something else does, so a file reopens where it was left.
@@ -4482,6 +4606,21 @@ var EngCalcs = EngCalcs || {};
 			}
 			saved.v = 6;
 		}
+		// ---- v6 -> v7: COORDINATES BECOME LOCAL TO doc.origin (Task 354) --------------------------
+		//
+		// A normal convert-and-stamp step, like v3 -> v4 and for the same reason: it asks the user
+		// nothing, because origin + local is the same absolute coordinate every outward-facing site
+		// was already reporting. Tom's rule -- "We always upgrade the file to the current format" --
+		// applies straightforwardly.
+		//
+		// **AN ALREADY-IMPORTED SURVEY MODEL IS REBASED ON OPEN, not left as it is.** Leaving it
+		// would exempt exactly the documents that have the bug, and the pipe that vanishes is not
+		// less broken for having been imported last week. A document whose coordinates are already
+		// small gets {0, 0} and is unchanged in every byte that matters.
+		if (saved.v === 6) {
+			rebaseDocument(saved);
+			saved.v = 7;
+		}
 		// **There is deliberately NO v2 -> v3 step here, and v2 is the ONLY version that lags.**
 		// Every other migration in this function converts the document and stamps it; this one
 		// cannot, because the conversion is the USER'S to authorise. So the document stays at v2
@@ -4549,6 +4688,11 @@ var EngCalcs = EngCalcs || {};
 		baseScenario().overrides = {}; // Base is canon and has no overrides, by definition
 		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
+		// Task 354. Not flipped by flipStoredY() above and must not be: the origin is stated in the
+		// FILE's Cartesian frame and outwardY()/inwardY() are written for exactly that -- flipping it
+		// here would put the sign in twice and move a survey model a couple of million units.
+		doc.origin = (saved.origin && isFinite(saved.origin.x) && isFinite(saved.origin.y))
+			? { x: saved.origin.x, y: saved.origin.y } : { x: 0, y: 0 };
 		// Consumed once, by the restoreViewOrFit() at the end of refreshAllFromDocument(). A file
 		// written before this existed has none, and gets a fit exactly as it always did.
 		pendingView = validView(saved.view) ? saved.view : null;
@@ -4946,7 +5090,7 @@ var EngCalcs = EngCalcs || {};
 		var id = newProjectId();
 		// Computed BEFORE the push below, or the project would be counted against itself.
 		var name = nextProjectName();
-		doc = { nodes: [], links: [], labels: [] };
+		doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
 		nextId = newNextId();
 		scenarios = defaultScenarios();
 		project = { name: name, activeScenario: 'base' };
@@ -5324,7 +5468,11 @@ var EngCalcs = EngCalcs || {};
 		nodes.forEach(function (n) { claim(n.id, LPN_ID_KEY[n.type] || 'J'); });
 		links.forEach(function (l) { claim(l.id, LPN_ID_KEY[l.type] || 'L'); });
 
-		return {
+		// **REBASED HERE, NOT BY THE MIGRATION CHAIN** (Task 354). An import is stamped at the
+		// current version and therefore walks no migration steps at all, so the one entry point real
+		// survey coordinates actually arrive through is the one that would have missed the origin.
+		// A file drawn near zero gets {0, 0} and nothing moves.
+		return rebaseDocument({
 			v: LPN_STORAGE_VERSION,
 			project: { name: name, activeScenario: 'base' },
 			scenarios: defaultScenarios(),
@@ -5345,7 +5493,7 @@ var EngCalcs = EngCalcs || {};
 			// enough that nobody looks for the cause.
 			settings: JSON.parse(JSON.stringify(settings)),
 			units: readUnitSelections()
-		};
+		});
 	}
 
 	// One sentence per thing an import could not keep. Written as whole sentences rather than
@@ -8078,7 +8226,7 @@ var EngCalcs = EngCalcs || {};
 	function deleteNetwork() {
 		var pc = EngCalcs.pageConfig || {};
 		if (!window.confirm(pc.lpn_confirm_delete_network || 'Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.')) { return; }
-		doc = { nodes: [], links: [], labels: [] };
+		doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
 		nextId = newNextId();
 		// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone
 		// (their overrides key element IDs that no longer exist). Preferences (settings/labelSettings)
@@ -8827,7 +8975,7 @@ var EngCalcs = EngCalcs || {};
 		if (coordsEl) {
 			svg.addEventListener('pointermove', function (e) {
 				var w = screenToWorld(e.clientX, e.clientY);
-				coordsEl.textContent = 'X: ' + w.x.toFixed(2) + '  Y: ' + cartesianY(w.y).toFixed(2);
+				coordsEl.textContent = 'X: ' + outwardX(w.x).toFixed(2) + '  Y: ' + outwardY(w.y).toFixed(2);
 			});
 		}
 		// Rubber-band line while drawing a pipe/pump (Tom, 2026-07-30) -- tracks the live pointer
@@ -11414,8 +11562,8 @@ var EngCalcs = EngCalcs || {};
 		}
 		activeField(fields, n);
 		pushHereButton(fields, n);
-		readonlyField(fields, pc.lpn_field_x || 'X', n.x);
-		readonlyField(fields, pc.lpn_field_y || 'Y', cartesianY(n.y));
+		readonlyField(fields, pc.lpn_field_x || 'X', outwardX(n.x));
+		readonlyField(fields, pc.lpn_field_y || 'Y', outwardY(n.y));
 		tipsIn(fields);
 	}
 	function openPopup(nodeId, sx, sy) {
@@ -11747,8 +11895,8 @@ var EngCalcs = EngCalcs || {};
 		alwaysLabel.appendChild(alwaysInput);
 		fields.appendChild(alwaysLabel);
 		fields.appendChild(document.createElement('br'));
-		readonlyField(fields, pc.lpn_field_x || 'X', an ? an.x + lb.x : lb.x);
-		readonlyField(fields, pc.lpn_field_y || 'Y', cartesianY(an ? an.y + lb.y : lb.y));
+		readonlyField(fields, pc.lpn_field_x || 'X', outwardX(an ? an.x + lb.x : lb.x));
+		readonlyField(fields, pc.lpn_field_y || 'Y', outwardY(an ? an.y + lb.y : lb.y));
 	}
 	function openLabelPopup(labelId, sx, sy) {
 		currentPopup = { kind: 'label', id: labelId };

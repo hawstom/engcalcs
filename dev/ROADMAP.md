@@ -209,59 +209,6 @@ session of its own with nothing else in it.
   menubar's own handlers call `stopPropagation()` to keep their menus from closing themselves — so
   the click never reaches the dismissal at all.
 
-- 90|354| **LOCAL MAP COORDINATES: a pipe VANISHES when you zoom in far on a model with real survey coordinates.** Tom,
-  2026-08-15, on Elm Street: P11 gone, its five repeated labels still drawn along exactly where it
-  should be, P9 beside it drawn normally.
-  - **The labels being right is the diagnosis.** They are positioned from the same coordinates the
-    polyline is, so the arithmetic is fine and what failed is the RASTERISER.
-  - **Elm Street is in state plane: x ≈ 579,350, y ≈ 1,304,070.** Float32 spacing at that magnitude
-    is 0.0625 world units. A pipe's stroke is `linkWidth / scale` world units (3 px at the shipped
-    default), so past **scale ≈ 48** the stroke is thinner than the coordinate resolution. Position
-    error measured the same way: 0.8 px at scale 10, 12 px at 200, 32 px at MAX_SCALE 500.
-  - **THE DESIGN IS DECIDED: LOCAL MAP COORDINATES** (Tom, 2026-08-15: *"Local map coordinates: I
-    agree. Log it high priority since it's a bug."*). Store a per-document `doc.origin` and keep
-    every coordinate in the document LOCAL to it, so nothing downstream — renderer, bbox, collision,
-    fit — ever sees a number with more digits than a float can hold. The origin is added back at the
-    handful of places that face outward: the property popup's X/Y, the coordinate readout, `.inp`
-    import and export, and the backdrop world file (Task 145). That is ~5 sites against ~25 for the
-    alternative, which was to subtract an offset at every coordinate WRITE and leave the document's
-    numbers huge.
-  - Cost of the chosen design, stated so it is not a surprise: it is a **schema change** (a new
-    `doc.origin`, defaulting to 0,0 for every existing document, and a decision about whether an
-    already-imported model gets rebased on open or stays as it is). It wants its own session and a
-    `/code-review`, because a missed boundary shows up as coordinates that are wrong by half a
-    million and nothing else.
-  - The rejected cheap fix, recorded so it is not proposed again: `vector-effect: non-scaling-stroke`
-    with pixel stroke widths would move the cliff from ~47x to a few hundred x and leave it there.
-    It treats one symptom — see the measurements below, where the LABELS fail on the same arithmetic
-    and no stroke property touches them.
-  - **THE EXPERIMENT WAS RUN AND IT CAME BACK AMBIGUOUS, WHICH IS ITSELF THE ANSWER** (Tom,
-    2026-08-15): *"20 works fine at the zoom shared. But any closer both pipes and the labels
-    disappear."* A wider stroke surviving longer says the stroke IS one term — cause (a) is real —
-    and the LABELS going too at the next zoom step says it is not the only one, because a label is
-    glyphs, not a stroked path. **So both causes are live and the fix is both**: pixel stroke widths
-    via `non-scaling-stroke` for (a), and a render origin for (b). Do (b) properly; (a) alone would
-    move the cliff without removing it.
-  - Tom's own reading, same message: *"(a) we need to try culling the pipe and (b) maybe we are
-    being hit by a rounding problem on the map size."* The second half is worth checking on its own
-    — `visibleMapWidth()` divides by `state.s`, and at scale 500 on 1.3e6 coordinates that quotient
-    is doing the same float arithmetic everything else here is.
-  - **AND IT IS NOT AN ABSURD ZOOM — THE ARITHMETIC PREDICTS THE ZOOM HE ACTUALLY SAW** (Tom,
-    2026-08-15: *"I notice that the map is still 30 wide. So this isn't a ridiculous zoom-in."*).
-    Float32 spacing is 0.0625 units at Elm Street's x (5.8e5) and **0.125 at its y (1.3e6)**. A map
-    30 units wide on a ~1400 px canvas is scale ≈ 47, so the 3 px pipe is 3/47 = **0.064 world
-    units — at the quantum**. Widening it to 20 px gives 0.43, comfortably above, which is exactly
-    why 20 worked at that zoom; three times closer (scale ≈ 140) puts 20 px back at 0.14 ≈ the
-    quantum and it fails again, and the 11 px text is 0.079 by then, which is when the labels went
-    too. Every observation he reported falls out of one number.
-  - **So the working limit on this model is about 47x, and on a model drawn near the origin it
-    would be about 11,000x.** The coordinates' magnitude is the whole of it, which is the argument
-    for the render origin over anything cheaper.
-  - Only affects models far from the origin. Our own examples sit at ~5,000 and Net1/2/3 at 0-100,
-    which is why this never showed until a real client model was imported — and it is exactly the
-    class of model LibreEPANET.org exists for, so it gates nothing formally but it should. **It is
-    the highest-priority open task in this file.**
-
 - 60|353| **Find elements by searching for them.** Tom, 2026-08-15. One text input, an "Elements to
   search" pull-down (all / junctions / pipes / …) and a Condition pull-down, roughly the shape of a
   Google Sheets filter. Start there rather than with a query language.
@@ -2007,6 +1954,23 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|354| **LOCAL MAP COORDINATES: a pipe VANISHED when you zoomed in on a survey model — DONE
+  2026-08-16.** Elm Street is in state plane (x ~ 579,350, y ~ 1,304,070), where a float32's spacing
+  is 0.0625/0.125 units; a pipe's stroke is `linkWidth / scale` world units, so past scale ~47 the
+  stroke was thinner than the coordinates could express. The labels being drawn correctly was the
+  diagnosis — the arithmetic was fine and the RASTERISER failed.
+  - **A document now stores coordinates LOCAL to `doc.origin`** (storage v7, rebased on open and on
+    `.inp` import; documents under 10,000 units get {0,0} and are untouched). The origin is added
+    back at five outward sites via `outwardX/outwardY/inwardX/inwardY`, the only callers of
+    `cartesianY()` left. `dev/lpn-spike/local-origin-harness.js` counts those sites, asserts
+    origin + local is the original coordinate for every stored point, and that offsets (`ly`, an
+    anchored label) are NOT shifted.
+  - `vector-effect: non-scaling-stroke` stays unbuilt on purpose: with the coordinates small, an
+    11 px glyph is expressible past 5,000x and MAX_SCALE is 500, so it has nothing left to buy.
+  - **A lagging v2 document is not rebased and cannot need it**: v2 predates `.inp` import (v3
+    shipped 2026-08-10, import 2026-08-11), so its coordinates can only have come from clicks on
+    this page. Confirm in a browser: open Elm Street and zoom past 47x.
 
 - 0|385| **The giant obstacle boxes were a stale measurement, not the rotated-box waste — DONE
   2026-08-15.** Tom sent the same view twice: *"See the size of these boxes before and after I

@@ -49,9 +49,14 @@ function saveToStorage() { saves++; }
 function cartesianY(y) { return -y; }              // copied intent, asserted against the real one below
 function alert(m) { alerts.push(m); }
 const EngCalcs = { pageConfig: {} };
+// Task 354: a world file states REAL-WORLD coordinates, so applyWorldFile() crosses the local-origin
+// boundary as well as the Y flip. The four converters are EXTRACTED rather than stubbed -- a stub
+// returning its argument would remove the shift, which is the one thing section 6 below is about.
+let doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
 
 eval([
 	'backdropPixelSize', 'setBackdropPixelSize', 'formatPixelSize',
+	'docOrigin', 'outwardX', 'outwardY', 'inwardX', 'inwardY',
 	'parseWorldFile', 'worldFileRepresentable', 'applyWorldFile', 'applyScaleEntry'
 ].map(extract).join('\n'));
 
@@ -120,6 +125,21 @@ p = cartesianOfPixel(0.5, 1.5);
 report(near(p.y, 1999.5), 'the next row DOWN is lower in Cartesian Y, because E is negative', p.y);
 p = cartesianOfPixel(2000.5, 0.5);
 report(near(p.x, 1000 + 2000 * 0.5), 'the far edge is iw pixels away at the file pixel size', p.x);
+
+// ...and the same file read into a document with a LOCAL ORIGIN (Task 354). The world file states
+// where the picture is in the real world; the map holds coordinates local to its origin. Get this
+// wrong and the backdrop lands half a million units from the network it is under -- and because the
+// network is drawn from the same shifted numbers, the only symptom is an empty screen.
+doc.origin = { x: 579000, y: 1304000 };
+freshBackdrop({ s: 7, tx: 123, ty: -45 });
+applyWorldFile(parseWorldFile(['0.5', '0', '0', '-0.5', String(579000 + 1000), String(1304000 + 2000)].join('\n')));
+p = cartesianOfPixel(0.5, 0.5);
+report(near(outwardX(p.x), 579000 + 1000) && near(p.y + doc.origin.y, 1304000 + 2000),
+	'a world file naming a survey coordinate still lands on that coordinate',
+	outwardX(p.x) + ', ' + (p.y + doc.origin.y));
+report(Math.abs(backdrop.tx) < 1e4 && Math.abs(backdrop.ty) < 1e4,
+	'...while what the renderer receives stays local', backdrop.tx + ', ' + backdrop.ty);
+doc.origin = { x: 0, y: 0 };
 
 // ---- 6. the one box that takes either form -----------------------------
 freshBackdrop();
