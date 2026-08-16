@@ -11,6 +11,8 @@ The full text of every closed task is in git and nowhere else, by Tom's ruling o
 Durable policy from these tasks lives in `CLAUDE.md` and in `dev/*.md`. Those are the current
 state; this is only a list of numbers that were once used.
 
+- 0|372| One shared popover placer: flips below/above, caps body height instead of clamping around, menubar clicks now dismiss
+- 0|346| Extrema mark dropped when more than LPN_EXTREMA_TIE_MAX (3) elements tie; a lone zero still marked
 - 0|214| Glossary anchor languages realigned to es, pt, fr, tr; declared in glossary.json meta.anchor_languages
 - 0|160| Turkish accusative on the app name settled as EngCalcs'ı (back unrounded final vowel); 3 keys fixed
 - 0|386| Repeated-label spacing was really under min/2

@@ -158,23 +158,6 @@ session of its own with nothing else in it.
   - Worth measuring before choosing: how many labels does the relaxation actually rescue on Net3,
     versus how many it merely moves?
 
-- 80|372| **Settings and Labels popovers need a UX pass — they can open taller than the screen and
-  cover their own button.** Tom, 2026-08-15: *"Settings box opens, if its expanded options are too
-  long, too tall for the screen, and its top extends to cover its button. I think we need to focus
-  on optimizing the UX for Settings and Labels now or in a high-priority task."*
-  - Two separate faults in one report: the popover has no height cap and no scroll of its own, and
-  its placement can put it OVER the control that opened it — which is the one place a user is
-  guaranteed to be looking, and the one they will click again to dismiss it.
-  - The Notes popover already has the answer to half of it (`lpn-popover-body`, which scrolls);
-  Settings and Labels do not use it. Placement needs to flip below/above and clamp to the viewport.
-  - Worth doing as one pass over all the popovers rather than per box, since they share
-  `openPopupAt()` and will drift apart otherwise.
-  - A third fault in the same family, Tom the same day: *"When Labels or Settings are open, clicking
-  in the top row of the menu bar does not close them. Clicking anywhere else outside them does close
-  them."* The dismissal handler in `wireTabs()` treats a menubar click as "inside", because the
-  menubar's own handlers call `stopPropagation()` to keep their menus from closing themselves — so
-  the click never reaches the dismissal at all.
-
 - 60|353| **Find elements by searching for them.** Tom, 2026-08-15. One text input, an "Elements to
   search" pull-down (all / junctions / pipes / …) and a Condition pull-down, roughly the shape of a
   Google Sheets filter. Start there rather than with a query language.
@@ -486,15 +469,6 @@ session of its own with nothing else in it.
 - 20|348| **Sub-categories and paging in the examples gallery.** The grid is `auto-fit`, so both
   arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops
   fitting on a screen.
-
-- 62|346| **An extrema mark shared by a dozen tied elements is noise.** Elm Street prints `Q=0.00`
-  on thirteen zero-demand junctions and a closed pipe, and every one of them is marked "lowest".
-  The existing guard only covers the degenerate case where max and min are the same value.
-  - Options, cheapest first: skip a mark when more than N elements tie for it; skip zero
-    specifically (a zero demand is "no demand", not "the smallest demand"); or mark only the
-    smallest NON-ZERO value.
-  - Found 2026-08-15 while pooling demand with flow (Task 333). Not fixed there because it is a
-    different question — what a mark MEANS, rather than which values it compares.
 
 - 55|343| **Priority order for hiding label lines when they do not fit.** The other half of Task
   333: with prefixes shipped, any SUBSET of a stack is self-describing, so dropping a line is now
