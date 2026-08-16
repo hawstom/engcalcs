@@ -28,7 +28,7 @@ var EngCalcs = EngCalcs || {};
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
 	var NS = 'http://www.w3.org/2000/svg';
-	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, maskLayer, labelsLayer;
+	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, maskLayer, labelsLayer, debugBoxLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
 	// Text size (Task 146 gear/settings panel, 2026-07-30; PARADIGM CHANGED 2026-08-14, Task 331).
 	// `settings.textSize` is now SCREEN PIXELS, full stop -- shared by a node's ID/pressure label, a
@@ -994,6 +994,38 @@ var EngCalcs = EngCalcs || {};
 			if (d > cap) { n.x *= cap / d; n.y *= cap / d; }
 		}
 	}
+	// **DRAW THE BOXES THE COLLISION PASS IS ACTUALLY REASONING ABOUT** (Tom, 2026-08-15: *"Would it
+	// be possible for you to depict these imaginary boxes temporarily?"*). Add `?debug=boxes` to the
+	// page URL and every box goes on screen in the colour of what it is; leave it off and this
+	// function is one comparison and a return.
+	//
+	// A URL PARAMETER RATHER THAN A CHECKBOX, deliberately: a settings checkbox is a translated
+	// string in 27 files and a permanent line in a panel, for a tool that exists to review one
+	// algorithm. The address bar costs nothing and disappears on the next reload.
+	function debugBoxesOn() {
+		return typeof location !== 'undefined' && /(\?|&)debug=boxes(&|$)/.test(location.search || '');
+	}
+	function drawCollisionBoxes(labels, statics, leaders) {
+		if (!debugBoxLayer) { return; }
+		while (debugBoxLayer.firstChild) { debugBoxLayer.removeChild(debugBoxLayer.firstChild); }
+		if (!debugBoxesOn()) { return; }
+		function draw(list, colour) {
+			list.forEach(function (b) {
+				var tl = Collide.boxTopLeft(b);
+				el('rect', {
+					x: tl.x, y: tl.y, width: Math.max(b.w, 0.0001), height: Math.max(b.h, 0.0001),
+					fill: 'none', stroke: colour, 'stroke-width': 1 / state.s,
+					'pointer-events': 'none'
+				}, debugBoxLayer);
+			});
+		}
+		// The three colours answer the three questions the pictures raise: what is being moved
+		// (blue), what it is being moved out of (green), and how fat the leaders are (red) -- which
+		// is the one that turned out to be wrong by an order of magnitude.
+		draw(statics, '#0a0');
+		draw(leaders, '#d00');
+		draw(labels, '#00d');
+	}
 	function runLabelCollisionAvoidance() {
 		var fs = effectiveFontSize(), labels = [], stationed = [], statics = staticObstacleBoxes();
 		function addDataLabel(holder, base, manual, lineCount) {
@@ -1050,6 +1082,8 @@ var EngCalcs = EngCalcs || {};
 		// labels do not move, so they are built once above.
 		Collide.relax(labels, statics, currentLeaderBoxes, 4);
 		capNudges(labels);
+		// After the cap, so what is drawn is where things actually ended up.
+		drawCollisionBoxes(labels, statics, currentLeaderBoxes());
 	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped.
@@ -8070,6 +8104,8 @@ var EngCalcs = EngCalcs || {};
 		// Topmost layer (after labelsLayer) so the rubber-band is never hidden under a node/link
 		// while drawing a pipe/pump (Tom, 2026-07-30).
 		rubberBandEl = el('line', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
+		// Above everything, and EMPTY unless ?debug=boxes is on the URL -- see drawCollisionBoxes().
+		debugBoxLayer = el('g', {}, world);
 		setTransform();
 		wireToolbar();
 		// The toolbar is built here, AFTER Calculators.lib.js's own DOMContentLoaded listener

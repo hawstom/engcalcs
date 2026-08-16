@@ -76,9 +76,22 @@ session of its own with nothing else in it.
     somewhere neither the solver nor anyone else chose, back inside the collision it had just
     solved, with nothing re-run afterwards. A capped label is at an arbitrary point on the line to an
     answer. Scoring has no equivalent problem: the candidates are all within reach to begin with.
-  - Order of work: 379 first, then 377 as its last resort, then 343 (dropping lines by priority)
-    as the resort before that. All three are the same decision — what to do when there is not
-    room — taken at three different granularities.
+  - **`dev/label-placement-goals.md` is the review document**, written 2026-08-15 because Tom asked
+    for one: *"only if we get straight on our goals and weights. Maybe you better list those."* It
+    states what a weight actually does (it decides who gives way, nothing else), the six goals in
+    priority order, every number that ships today with a keep/retire verdict, and the scoring terms
+    to argue about. Nothing in it is settled until he rules.
+  - **`?debug=boxes` on the page URL draws the boxes**, in the colour of what they are — blue for
+    what moves, green for what it must avoid, red for the leader samples. His idea (*"Would it be
+    possible for you to depict these imaginary boxes temporarily?"*), and it is how an 11-pixel
+    leader would have been caught the first time. A URL parameter rather than a checkbox: a
+    settings row is a translated string in 27 files, for a tool that exists to review one
+    algorithm.
+  - **The default side is not sacred** (Tom: *"Jumping sides: Yes! Even epanetjs does this."*), so
+    scoring is free to put a label anywhere around its anchor. That is how it uses open space.
+  - Order of work: 379 first, then 343 (dropping lines by priority), then 377 (hide) as the last
+    resort. All three are the same decision — what to do when there is not room — taken at three
+    different granularities.
 
 - 55|378| **[H] Give the seven harnesses a network some other way, and delete
   `drawExampleNetwork()`.** The 289-line code-drawn ring main lost its last user-facing caller when

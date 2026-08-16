@@ -27,8 +27,23 @@ EngCalcs.lpnCollide = (function () {
 	'use strict';
 
 	// Per-OBJECT repel strength -- how hard a given thing on the map pushes a label out of
-	// itself (Tom, 2026-07-30, restating the strengths he had already given after an
-	// earlier cut misread them as "node labels resist harder than link labels"):
+	// itself.
+	//
+	// **THE PROVENANCE LINE THAT USED TO BE HERE WAS WRONG AND IS REMOVED** (2026-08-15).
+	// It read "Tom, 2026-07-30, restating the strengths he had already given", and he says
+	// otherwise: *"Weights aren't mine, and I have never seen them before. And I don't know
+	// what weights mean and do."* Whatever was said in July, these four numbers and the
+	// share formula below them were chosen here, and a comment that hands them to him makes
+	// them harder to change than they should be -- which is the actual cost of a wrong
+	// attribution in a file nobody re-reads. They are ours, they are up for revision, and
+	// Task 379 revises them.
+	//
+	// What a weight DOES, since the comment never said: it decides who gives way. When two
+	// boxes overlap, each moves a share of the separation proportional to the OTHER one's
+	// weight -- so two labels at 1 and 1 split it evenly, a label at 1 pushed by a node at
+	// 0.5 does two thirds of the moving, and an immovable obstacle absorbs none of it. It
+	// is NOT a distance, a priority, or a radius; it never decides WHERE a label goes, only
+	// how much of a given shove each side absorbs:
 	//   pipe   0    -- a pipe never pushes a label at all. Pipe routes cross the whole
 	//                  drawing and a number sitting on one still reads perfectly well, so
 	//                  pipes are simply left out of the pass rather than added with a zero
