@@ -3928,6 +3928,50 @@ var EngCalcs = EngCalcs || {};
 		svg.addEventListener('pointerup', handler, true);
 		activeCancel = function () { svg.removeEventListener('pointerup', handler, true); setRegMode(false); };
 	}
+	// **SCALE ABOUT A FIXED POINT, the pure arithmetic.** Tom, 2026-08-16: *"Can we add a menu to
+	// scale from current so I can tweak it about a picked point? Click point. Enter scale from
+	// current."* An image point maps to the world as `W = t + s*L`, so holding P still while
+	// multiplying the scale by f gives `W' = P + f*(W - P)`, i.e. `s' = f*s` and
+	// `t' = P - f*(P - t)` -- the same formula zoomAbout() uses for the view.
+	//
+	// SEPARATE FROM THE PICKING, so it can be tested without a pointer: this is where the defect
+	// would be, and a click sequence is the part a harness cannot drive. P is in the internal
+	// (Y-down) world frame, which is what screenToWorld() returns, so no flip belongs here.
+	function scaleBackdropAbout(p, f) {
+		if (!backdrop || !(f > 0) || !isFinite(f)) { return false; }
+		backdrop.tx = p.x - f * (p.x - backdrop.tx);
+		backdrop.ty = p.y - f * (p.y - backdrop.ty);
+		backdrop.s = backdrop.s * f;
+		applyBackdropTransform();
+		saveToStorage();
+		return true;
+	}
+	// **RELATIVE, NOT ABSOLUTE, and that is the whole point of it.** "Scale by picking" sets an
+	// absolute scale from a measured distance and lets the image land where it lands; this one keeps
+	// the point under the cursor still and asks only how much bigger or smaller. It is the tool for
+	// the last 5% of fitting an aerial, once the bar scale has already got it roughly right.
+	function startBackdropScaleFrom() {
+		cancelActive();
+		var pc = EngCalcs.pageConfig || {};
+		setRegMode(true);
+		alert(pc.lpn_backdrop_scale_from_prompt1
+			|| 'Click the point on the background image that should stay where it is.');
+		var handler = function (e) {
+			svg.removeEventListener('pointerup', handler, true);
+			activeCancel = null; setRegMode(false);
+			var p = screenToWorld(e.clientX, e.clientY),
+				txt = prompt(pc.lpn_backdrop_scale_from_prompt2
+					|| 'Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.', '1');
+			if (txt === null) { return; }
+			var f = parseFloat(txt);
+			// A zero or negative factor would collapse or mirror the picture, and neither is a thing
+			// a user means by "scale". Refused rather than clamped, so nothing happens silently.
+			if (!(f > 0) || !isFinite(f)) { return; }
+			scaleBackdropAbout(p, f);
+		};
+		svg.addEventListener('pointerup', handler, true);
+		activeCancel = function () { svg.removeEventListener('pointerup', handler, true); setRegMode(false); };
+	}
 	// The typed half of Task 276. One box takes either form, because a user who has a world file and a
 	// user who has a number are asking for the same thing. Tom's wording, used verbatim: "Enter pixel
 	// size or paste the complete contents of the World File for the image" -- he wanted the paste
@@ -4067,6 +4111,7 @@ var EngCalcs = EngCalcs || {};
 		if (v === 'add') { cancelActive(); if (fileInput) { fileInput.click(); } }
 		else if (v === 'scale') { startBackdropScale(); }
 		else if (v === 'scale-entry') { startBackdropScaleEntry(); }
+		else if (v === 'scale-from') { startBackdropScaleFrom(); }
 		else if (v === 'position') { startBackdropPosition(); }
 		else if (v === 'remove') {
 			if (window.confirm(pc.lpn_backdrop_remove_confirm || 'Remove the background image?')) { removeBackdrop(); }
@@ -4092,6 +4137,7 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'image', label: pc.lpn_backdrop_add || 'Add', fn: function () { backdropAction('add'); } },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale by picking', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Scale by world file or by the size of one pixel on the map', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
+			{ icon: 'scale', label: pc.lpn_backdrop_scale_from || 'Scale from current size, about a point you pick', fn: function () { backdropAction('scale-from'); }, disabled: !backdrop },
 			{ icon: 'position', label: pc.lpn_backdrop_position || 'Move', fn: function () { backdropAction('position'); }, disabled: !backdrop },
 			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove', fn: function () { backdropAction('remove'); }, disabled: !backdrop }
 		]);

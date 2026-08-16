@@ -1737,6 +1737,12 @@ $ec_lang['lpn_backdrop_add']='Add';
 // behind lpn_backdrop_scale_entry. Do not re-add an ask.
 $ec_lang['lpn_backdrop_scale']='Scale by picking';
 $ec_lang['lpn_backdrop_scale_entry']='Scale by world file or by the size of one pixel on the map';
+// Scale FROM CURRENT, about a picked point (Tom, 2026-08-16). The relative sibling of the two
+// absolute scale commands above: it changes the size by a factor and holds one point still, which
+// is what the last stage of fitting an aerial photograph actually needs.
+$ec_lang['lpn_backdrop_scale_from']='Scale from current size, about a point you pick';
+$ec_lang['lpn_backdrop_scale_from_prompt1']='Click the point on the background image that should stay where it is.';
+$ec_lang['lpn_backdrop_scale_from_prompt2']='Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.';
 $ec_lang_syn['lpn_backdrop_scale_entry']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Enter the size of one pixel on the map, or paste the complete contents of the world file for the image';
 $ec_lang_syn['lpn_backdrop_scale_entry_prompt']='World (Map Coordinates or Georeference) File for the image | gloss: world file; runtime: units appended';

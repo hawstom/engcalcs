@@ -877,6 +877,9 @@
         "lpn_backdrop_add": "Add",
         "lpn_backdrop_scale": "Scale by picking",
         "lpn_backdrop_scale_entry": "Scale by world file or by the size of one pixel on the map",
+        "lpn_backdrop_scale_from": "Scale from current size, about a point you pick",
+        "lpn_backdrop_scale_from_prompt1": "Click the point on the background image that should stay where it is.",
+        "lpn_backdrop_scale_from_prompt2": "Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.",
         "lpn_backdrop_scale_entry_prompt": "Enter the size of one pixel on the map, or paste the complete contents of the world file for the image",
         "lpn_backdrop_scale_entry_bad": "Type one number for the size of one pixel on the map, or paste all six lines of a world file.",
         "lpn_backdrop_wld_bad": "This world file rotates, mirrors or unevenly stretches the picture. The map can only move a picture and resize it by the same amount in both directions, so the file was not used.",
@@ -988,7 +991,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 986,
+    "count": 989,
     "active_prefixes": [
         "about",
         "bpn",

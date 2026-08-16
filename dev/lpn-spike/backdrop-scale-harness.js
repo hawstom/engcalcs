@@ -55,7 +55,7 @@ const EngCalcs = { pageConfig: {} };
 let doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
 
 eval([
-	'backdropPixelSize', 'setBackdropPixelSize', 'formatPixelSize',
+	'backdropPixelSize', 'setBackdropPixelSize', 'formatPixelSize', 'scaleBackdropAbout',
 	'docOrigin', 'outwardX', 'outwardY', 'inwardX', 'inwardY',
 	'parseWorldFile', 'worldFileRepresentable', 'applyWorldFile', 'applyScaleEntry'
 ].map(extract).join('\n'));
@@ -196,7 +196,9 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 	report(barerows.length === rows.length - 1, 'and is otherwise the same rows', barerows.length);
 
 	const commands = rows.filter(r => !r.heading);
-	report(commands.length === 5, 'five commands: add, scale by picking, scale by entry, move, remove', commands.length);
+	report(commands.length === 6,
+		'six commands: add, scale by picking, scale by entry, scale from current, move, remove',
+		commands.length);
 	report(commands.every(r => typeof r.fn === 'function'), 'every command row is wired to a function');
 	// With no image, only Add can do anything.
 	report(commands[0].disabled !== true, 'Add works with no image present');
@@ -337,6 +339,64 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 	// covers both — which is why the fix is one line and not two.
 	report(/mode === 'delete'/.test(wire) && /mode === 'select' && t\.dataset\.node/.test(wire),
 		'delete and select-popup are both inside the gated pointerup');
+}
+
+// ---- Scale FROM CURRENT, about a picked point (Tom, 2026-08-16) ----------------------------
+//
+// *"Can we add a menu to scale from current so I can tweak it about a picked point? Click point.
+// Enter scale from current."* The arithmetic is separated from the picking precisely so it can be
+// checked here: a click sequence is the half a harness cannot drive, and the formula is the half
+// where a sign error hides. The property is simply that THE PICKED POINT DOES NOT MOVE, asserted
+// on the mapping itself rather than on tx/ty, which is what the user would actually notice.
+{
+	function worldOfImagePoint(px, py) {
+		const local = { x: backdrop.x + px * backdrop.width / backdrop.iw,
+			y: backdrop.y + py * backdrop.height / backdrop.ih };
+		return { x: backdrop.tx + backdrop.s * local.x, y: backdrop.ty + backdrop.s * local.y };
+	}
+	freshBackdrop({ s: 2.5, tx: 137, ty: -64 });
+	// The pixel that currently sits under the point the user is about to click.
+	const P = worldOfImagePoint(700, 450);
+	const before = { a: worldOfImagePoint(0, 0), b: worldOfImagePoint(2000, 1500), s: backdrop.s };
+	const okCall = scaleBackdropAbout({ x: P.x, y: P.y }, 1.25);
+	report(okCall === true, 'a positive factor is applied');
+	const after = { a: worldOfImagePoint(0, 0), b: worldOfImagePoint(2000, 1500) };
+	const P2 = worldOfImagePoint(700, 450);
+	report(near(P2.x, P.x) && near(P2.y, P.y),
+		'the picked point does not move -- which is the whole of the feature',
+		JSON.stringify(P) + ' -> ' + JSON.stringify(P2));
+	report(near(backdrop.s, before.s * 1.25), 'the scale is multiplied, not replaced', backdrop.s);
+	// ...and everything else really did move, or the check above passes for a picture that is
+	// simply frozen.
+	report(!near(after.a.x, before.a.x) && !near(after.b.x, before.b.x),
+		'...while the rest of the image did change size, so this is not a no-op');
+	// The distance from P to any other point scales by exactly the factor, which is the definition
+	// of scaling about P and catches a formula that merely happens to fix one point.
+	const d0 = Math.hypot(before.b.x - P.x, before.b.y - P.y);
+	const d1 = Math.hypot(after.b.x - P.x, after.b.y - P.y);
+	report(near(d1 / d0, 1.25), 'every distance from the picked point scales by the factor', (d1 / d0).toFixed(6));
+
+	// Shrinking is the same code, and 1.0 is a legitimate no-op rather than a refusal.
+	freshBackdrop({ s: 2.5, tx: 137, ty: -64 });
+	const Q = worldOfImagePoint(120, 90);
+	scaleBackdropAbout({ x: Q.x, y: Q.y }, 0.8);
+	const Q2 = worldOfImagePoint(120, 90);
+	report(near(Q2.x, Q.x) && near(Q2.y, Q.y) && near(backdrop.s, 2.0),
+		'shrinking holds the point too, and 0.8 really shrinks', backdrop.s);
+
+	// **REFUSED, NOT CLAMPED.** A zero factor collapses the picture to nothing and a negative one
+	// mirrors it; neither is anything a user means by "scale", so nothing happens at all.
+	freshBackdrop({ s: 2.5 });
+	const sBefore = backdrop.s;
+	report(scaleBackdropAbout({ x: 0, y: 0 }, 0) === false
+		&& scaleBackdropAbout({ x: 0, y: 0 }, -2) === false
+		&& scaleBackdropAbout({ x: 0, y: 0 }, NaN) === false
+		&& backdrop.s === sBefore,
+		'zero, negative and NaN factors are refused and change nothing');
+
+	// The MENU has to offer it, or the arithmetic above is unreachable.
+	report(/'scale-from'/.test(src) && /lpn_backdrop_scale_from\b/.test(src),
+		'the Background image menu offers it, and by a language key');
 }
 
 // ---- The target panel must hang off an element that is really in the DOM -------------------
