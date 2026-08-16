@@ -112,7 +112,7 @@ async function probe(browser, origin, lang) {
 		for (const n of names) {
 			const el = document.getElementsByName(n)[0];
 			if (!el) { continue; }
-			out.selects[n] = el.options[el.selectedIndex] ? el.options[el.selectedIndex].getAttribute('data-unit') : null;
+			out.selects[n] = el.options[el.selectedIndex] ? el.options[el.selectedIndex].value : null;
 			out.families[n] = el.getAttribute('data-family');
 		}
 		out.q = document.getElementById('q_617').innerHTML;

@@ -379,9 +379,7 @@ document.addEventListener('change', function (e) {
 	// Only a select the presets can see (data-family) is asked -- one with no family is
 	// invisible to the preset buttons and would be a bug to report a statistic about.
 	if (tag === 'select' && el.dataset && el.dataset.family) {
-		var opt = el.options[el.selectedIndex];
-		var unit = opt && opt.dataset ? opt.dataset.unit : '';
-		if (unit) EngCalcs.logSignal('units', el.dataset.family + ':' + unit);
+		if (el.value) EngCalcs.logSignal('units', el.dataset.family + ':' + el.value);
 	}
 }, true);
 
@@ -496,7 +494,11 @@ EngCalcs.loadFromUrl = function (objForm) {
 			// .length) instead of a form control when key collides with a reserved property
 			// name like "length" or "item" -- guard against assigning .value to that.
 			if (el !== undefined && el !== null && (el instanceof RadioNodeList || el.tagName)) {
-				el.value = value;
+				// A <select> goes through applySelectValue() so a link shared before Task 390 --
+				// which spells a unit as its conversion factor -- still opens on the unit its
+				// author chose rather than on the page default.
+				if (el.tagName === 'SELECT') { EngCalcs.applySelectValue(el, value); }
+				else { el.value = value; }
 				formLoaded = true;
 			}
 		});
@@ -643,25 +645,70 @@ EngCalcs.deleteSingleCalcRow = function () {
 	this.submitForm();
 };
 
+/**
+	* unitFactor() -- "number of that unit per SI unit" for a unit <select>, a unit NAME,
+	* or anything that has neither.
+	*
+	* Task 390: a unit's identity is its NAME. An option's value is 'ft', and the factor is
+	* looked up here from EngCalcs.unitFactors (emitted by echoHTMLHead() straight out of
+	* lib/Units.lib.php). Nothing in JS may retype a conversion constant; a second table that
+	* agrees today is a table that disagrees after the next derivation.
+	*
+	* Returns 1 for a missing select or an unknown name, which is the pre-existing behaviour
+	* of `parseFloat(undefined) || 1` at every call site and keeps a page rendering rather than
+	* filling with NaN. A unit we have no factor for is a REPRESENTABLE unit under this
+	* paradigm -- carrying its name is always possible; only the arithmetic is not.
+	*/
+EngCalcs.unitFactor = function (unit) {
+	'use strict';
+	var name = (unit && typeof unit === 'object') ? unit.value : unit,
+		table = this.unitFactors || {};
+	if (typeof name !== 'string' || !name) { return 1; }
+	return Object.prototype.hasOwnProperty.call(table, name) ? table[name] : 1;
+};
+
+/**
+	* applySelectValue() -- restore a stored <select> choice, from a cookie or a shared URL.
+	*
+	* Returns true if an option was selected. The one thing it does beyond `select.value = v`
+	* is the Task 390 migration: before the value became the unit's NAME it was the unit's
+	* conversion FACTOR, so a cookie or a link written earlier says "3.280841" where the page
+	* now offers "ft". Such a value is matched back to its unit through EngCalcs.unitFactors,
+	* within a relative tolerance, because the factors themselves were re-derived on
+	* 2026-08-16 and the stored number is a slightly different foot than any we now hold.
+	*
+	* Approximate matching is safe ONLY here and only for this: it reads a number the visitor
+	* never typed, in a field whose value is now a name, and its output is a NAME. It converts
+	* nothing. Once a page has been visited under the new format there is nothing left to match.
+	*/
+EngCalcs.applySelectValue = function (select, value) {
+	'use strict';
+	var i, err, want, best = null, bestErr = 1e-3;
+	if (!select || value === undefined || value === null || value === '') { return false; }
+	select.value = value;
+	// A <select> given a value no option carries goes to selectedIndex -1.
+	if (select.selectedIndex >= 0) { return true; }
+	want = parseFloat(value);
+	if (!isFinite(want) || want === 0) { return false; }
+	// Within ONE select the options are different units of the same quantity, so their
+	// factors are distinct and the nearest is unambiguous.
+	for (i = 0; i < select.options.length; i++) {
+		err = Math.abs(this.unitFactor(select.options[i].value) - want) / Math.abs(want);
+		if (err < bestErr) { bestErr = err; best = select.options[i]; }
+	}
+	if (best) { best.selected = true; return true; }
+	return false;
+};
+
 EngCalcs.readFormInput = function (objForm, name, hasUnits) {
 	'use strict';
-	var numUnitsFactor;
-	if (hasUnits === true) {
-		numUnitsFactor = objForm[name + 'u'].value;
-	} else {
-		numUnitsFactor = 1;
-	}
+	var numUnitsFactor = (hasUnits === true) ? this.unitFactor(objForm[name + 'u']) : 1;
 	this.var[name] = objForm[name].value / numUnitsFactor;
 };
 
 EngCalcs.writeFormResult = function (objForm, name, precision, hasUnits) {
 	'use strict';
-	var numUnitsFactor;
-	if (hasUnits === true) {
-		numUnitsFactor = objForm[name + 'u'].value;
-	} else {
-		numUnitsFactor = 1;
-	}
+	var numUnitsFactor = (hasUnits === true) ? this.unitFactor(objForm[name + 'u']) : 1;
 	document.getElementById(name).innerHTML = (this.var[name] * numUnitsFactor).toFixed(precision);
 };
 
@@ -842,7 +889,7 @@ EngCalcs.setUnits = function(unitSet) {
 	document.querySelectorAll('select[data-family]').forEach(function(select) {
 		var unit = preset[select.dataset.family];
 		if (!unit) { return; }
-		var option = select.querySelector('option[data-unit="' + unit + '"]');
+		var option = select.querySelector('option[value="' + unit + '"]');
 		if (option) { option.selected = true; }
 	});
 	this.submitForm();

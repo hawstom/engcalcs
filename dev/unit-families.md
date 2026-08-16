@@ -41,9 +41,10 @@ selects at once.
   field belongs to, so diameter and pipe length stop sharing a fate.
 - **Per-family lookup fixes defect 1** — a select is assigned the one unit its family names, so
   nothing can overwrite anything.
-- **Matching on a `data-unit` attribute rather than label text** removes a third hazard that is not
-  yet a live bug: today a translator editing `u_psi` silently breaks the preset buttons in that
-  language, with nothing to catch it.
+- **Matching on the option's own value — the unit's name — rather than on label text** removes a
+  third hazard that is not yet a live bug: today a translator editing `u_psi` silently breaks the
+  preset buttons in that language, with nothing to catch it. (Task 162 did this with a `data-unit`
+  attribute; Task 390 made the value itself the name, so the attribute was removed.)
 
 ---
 
@@ -199,14 +200,14 @@ the untranslated window costs almost nothing — and far less than a button that
 - `lib/Units.lib.php` — define `$ec_unit_families` (the named option lists) and rewrite
   `$ec_unit_sets` as `family → unit` maps.
 - `lib/Calculators.lib.php` — `echoUnitSelect()` accepts a family name as well as an inline array
-  (so pages migrate one at a time, not in a flag-day change), emits `data-family` on the `<select>`
-  and `data-unit` on each `<option>`.
-- `js/Calculators.lib.js` — `setUnits()` looks up the family and selects by `data-unit` instead of
-  matching translated label text.
+  (so pages migrate one at a time, not in a flag-day change) and emits `data-family` on the
+  `<select>`.
+- `js/Calculators.lib.js` — `setUnits()` looks up the family and selects by the option's value —
+  the unit's name — instead of matching translated label text.
 - The 15 calculator pages — replace inline unit arrays with family names.
 
-**Returning users are unaffected.** The cookie stores each select's option *value* (the conversion
-factor), not its index or label, so none of this disturbs saved settings. Only first-time visitors
+**Returning users are unaffected.** The cookie stores each select's option *value* — since Task 390
+the unit's name — not its index or label, so none of this disturbs saved settings. Only first-time visitors
 see a change — which is exactly the population Task 144 is about.
 
 ---

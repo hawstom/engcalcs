@@ -11,7 +11,7 @@
 //
 // TECHNIQUE is the same as popup-tips-harness.js: eval the REAL file against DOM stubs, injecting
 // a test-only export just before the DOMContentLoaded listener so init() never runs. The one
-// addition here is a REAL unit-select stub (options + selectedIndex + dataset.unit), because
+// addition here is a REAL unit-select stub (options + selectedIndex + the unit key as the option value), because
 // niceDefault()/unitKey() are exactly what this test is about -- popup-tips-harness.js stubs
 // querySelector to null, which silently pins every value to its SI branch.
 
@@ -570,14 +570,14 @@ console.log('\n--- Settings panel stays in sync ---');
   const savedSI = L.serializeProject();
   ok('the saved document records its units by KEY', savedSI.units.lpn_u_diameter === 'mm', JSON.stringify(savedSI.units));
   setUnitSet('us');
-  ok('a browser left in inches really is in inches', L.setUnitEl('lpn_u_diameter').options[L.setUnitEl('lpn_u_diameter').selectedIndex].dataset.unit === 'in');
+  ok('a browser left in inches really is in inches', L.setUnitEl('lpn_u_diameter').options[L.setUnitEl('lpn_u_diameter').selectedIndex].value === 'in');
   L.applyUnitSelections(savedSI.units);
   ok('opening that document puts the browser back in mm -- the 400 mm pipe stays 400 mm',
-    L.setUnitEl('lpn_u_diameter').options[L.setUnitEl('lpn_u_diameter').selectedIndex].dataset.unit === 'mm');
+    L.setUnitEl('lpn_u_diameter').options[L.setUnitEl('lpn_u_diameter').selectedIndex].value === 'mm');
   // A unit this browser does not offer is skipped, not forced: a wrong selection beats a broken one.
   L.applyUnitSelections({ lpn_u_diameter: 'furlong' });
   ok('an unknown unit is ignored rather than breaking the select',
-    L.setUnitEl('lpn_u_diameter').options[L.setUnitEl('lpn_u_diameter').selectedIndex].dataset.unit === 'mm');
+    L.setUnitEl('lpn_u_diameter').options[L.setUnitEl('lpn_u_diameter').selectedIndex].value === 'mm');
 
   // 5. MIGRATION. v2 documents hold SI and say nothing about units. migrateSaved must stamp and
   //    flag, and must NOT touch a single number -- the rewrite is the user's to authorise.
@@ -816,7 +816,7 @@ console.log('\n--- Settings panel stays in sync ---');
   ok('a blank project from the menu starts clean -- no asterisk',
     L.tabAsterisk(L.indexEntry(blankId)).show === false, 'dirty = ' + L.indexEntry(blankId).dirty);
   ok('...and it is in the unit system its row named',
-    L.setUnitEl('lpn_u_flow').options[L.setUnitEl('lpn_u_flow').selectedIndex].dataset.unit === 'gpm');
+    L.setUnitEl('lpn_u_flow').options[L.setUnitEl('lpn_u_flow').selectedIndex].value === 'gpm');
 
   // ...and it must EARN one. Anything else would make the mark meaningless in the other direction.
   L.addNode('junction', 10, 10);

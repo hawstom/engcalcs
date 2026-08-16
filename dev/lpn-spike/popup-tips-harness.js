@@ -113,7 +113,9 @@ global.requestAnimationFrame = f => setTimeout(f, 0);
 global.EngCalcs = {
   pageConfig: {},
   initTips: function (root) { global.__initTipsCalls.push(root); },
-  unitFactorFor: () => 1,
+  // This harness renders no unit <select> at all, so unitEl() hands the page a null and the real
+  // EngCalcs.unitFactor() would answer 1 too. Nothing here asserts a converted number.
+  unitFactor: () => 1,
   // js/Icons.lib.js in the browser; here they only need to not throw and to produce something
   // setLabel() can append -- see EngCalcs.setLabel in js/Calculators.lib.js for the real shape.
   iconEl: () => mkEl('g'),

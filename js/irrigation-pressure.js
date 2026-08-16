@@ -62,10 +62,10 @@ EngCalcs.christiansenF = function (n) {
 // on the last row, since that value anchors the whole result.
 EngCalcs.ipReadRows = function (objForm) {
 	'use strict';
-	var lengthu = objForm['lengthu'].value,
-		diameteru = objForm['diameteru'].value,
-		roughnessu = objForm['roughnessu'].value,
-		elevu = objForm['elevu'].value,
+	var lengthu = EngCalcs.unitFactor(objForm['lengthu']),
+		diameteru = EngCalcs.unitFactor(objForm['diameteru']),
+		roughnessu = EngCalcs.unitFactor(objForm['roughnessu']),
+		elevu = EngCalcs.unitFactor(objForm['elevu']),
 		rows = [],
 		i,
 		row,
@@ -265,20 +265,20 @@ EngCalcs.pageCalculator = function (objForm) {
 
 EngCalcs.ipWriteRows = function (objForm) {
 	'use strict';
-	var q_usu = objForm['q_usu'].value,
-		q_dsu = objForm['q_dsu'].value,
-		h_usu = objForm['h_usu'].value,
-		h_dsu = objForm['h_dsu'].value,
-		vu = objForm['vu'].value,
-		hvu = objForm['hvu'].value,
-		hfu = objForm['hfu'].value,
-		hmu = objForm['hmu'].value,
-		hlu = objForm['hlu'].value,
+	var q_usu = EngCalcs.unitFactor(objForm['q_usu']),
+		q_dsu = EngCalcs.unitFactor(objForm['q_dsu']),
+		h_usu = EngCalcs.unitFactor(objForm['h_usu']),
+		h_dsu = EngCalcs.unitFactor(objForm['h_dsu']),
+		vu = EngCalcs.unitFactor(objForm['vu']),
+		hvu = EngCalcs.unitFactor(objForm['hvu']),
+		hfu = EngCalcs.unitFactor(objForm['hfu']),
+		hmu = EngCalcs.unitFactor(objForm['hmu']),
+		hlu = EngCalcs.unitFactor(objForm['hlu']),
 		cfg = EngCalcs.pageConfig,
 		// Max. allowable pipe head (pressure rating) for the high-pressure flag. Blank => null,
 		// which disables only the high side of the inline pressure check.
 		hMaxRaw = objForm['h_max_allow'].value,
-		hMaxAllow = (hMaxRaw === '') ? null : +hMaxRaw / objForm['h_max_allowu'].value,
+		hMaxAllow = (hMaxRaw === '') ? null : +hMaxRaw / EngCalcs.unitFactor(objForm['h_max_allowu']),
 		// Inline pressure band: low = 0 (subatmospheric flag, unchanged); high = pipe rating.
 		pressureLabels = {
 			lowShort: cfg.ip_pressure_warn_short, lowTip: cfg.ip_pressure_warn,

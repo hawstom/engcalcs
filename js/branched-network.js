@@ -103,11 +103,11 @@ EngCalcs.bpnFriction = function (line, method, visc) {
 // line's parent pointer, and determines which lines are reachable from the source.
 EngCalcs.bpnReadRows = function (objForm) {
 	'use strict';
-	var lengthu = objForm['lengthu'].value,
-		diameteru = objForm['diameteru'].value,
-		roughnessu = objForm['roughnessu'].value,
-		demandu = objForm['demandu'].value,
-		elevu = objForm['elevu'].value,
+	var lengthu = EngCalcs.unitFactor(objForm['lengthu']),
+		diameteru = EngCalcs.unitFactor(objForm['diameteru']),
+		roughnessu = EngCalcs.unitFactor(objForm['roughnessu']),
+		demandu = EngCalcs.unitFactor(objForm['demandu']),
+		elevu = EngCalcs.unitFactor(objForm['elevu']),
 		// Global demand multiplier -- scales every line demand at once for a peak-hour or
 		// future-growth run. Blank or unusable => 1 (use demands as entered). An explicit 0
 		// is honored: it is the legitimate no-draw / static case.
@@ -353,7 +353,7 @@ EngCalcs.pageCalculator = function (objForm) {
 	// Max. allowable pipe head (pressure rating) for the high-pressure flag. Blank => null,
 	// which disables only the high side of the inline pressure check (low/subatmospheric stays on).
 	var hMaxRaw = objForm['h_max_allow'].value;
-	this.var.hMaxAllow = (hMaxRaw === '') ? null : +hMaxRaw / objForm['h_max_allowu'].value;
+	this.var.hMaxAllow = (hMaxRaw === '') ? null : +hMaxRaw / EngCalcs.unitFactor(objForm['h_max_allowu']);
 	// The method selector must never be blank. If anything (a layout-drift cookie bail,
 	// an old stored value) left it empty, fall back to the first method and fix the
 	// visible dropdown so it can't show an empty selection.
@@ -366,11 +366,12 @@ EngCalcs.pageCalculator = function (objForm) {
 	// flow and a head to count. One point -> flat reservoir head.
 	this.var.supplyPoints = [];
 	var h1Raw = objForm['h_source1'].value;
-	if (h1Raw !== '') { this.var.supplyPoints.push([0, +h1Raw / objForm['h_source1u'].value]); }
+	if (h1Raw !== '') { this.var.supplyPoints.push([0, +h1Raw / EngCalcs.unitFactor(objForm['h_source1u'])]); }
 	[2, 3].forEach(function (n) {
 		var qRaw = objForm['q_source' + n].value, hRaw = objForm['h_source' + n].value;
 		if (qRaw !== '' && hRaw !== '') {
-			this.var.supplyPoints.push([+qRaw / objForm['q_source' + n + 'u'].value, +hRaw / objForm['h_source' + n + 'u'].value]);
+			this.var.supplyPoints.push([+qRaw / EngCalcs.unitFactor(objForm['q_source' + n + 'u']),
+				+hRaw / EngCalcs.unitFactor(objForm['h_source' + n + 'u'])]);
 		}
 	}, this);
 	if (this.var.supplyPoints.length === 0) { this.var.supplyPoints = [[0, 0]]; }
@@ -408,10 +409,10 @@ EngCalcs.bpnUpdateMethodUI = function () {
 
 EngCalcs.bpnWriteRows = function (objForm) {
 	'use strict';
-	var q_lineu = objForm['q_lineu'].value,
-		vu = objForm['vu'].value,
-		hlu = objForm['hlu'].value,
-		p_downu = objForm['p_downu'].value,
+	var q_lineu = EngCalcs.unitFactor(objForm['q_lineu']),
+		vu = EngCalcs.unitFactor(objForm['vu']),
+		hlu = EngCalcs.unitFactor(objForm['hlu']),
+		p_downu = EngCalcs.unitFactor(objForm['p_downu']),
 		cfg = EngCalcs.pageConfig,
 		// Inline pressure band: low = 0 (subatmospheric flag, unchanged); high = the entered
 		// pipe rating (null when blank => high check off).
@@ -516,11 +517,11 @@ EngCalcs.bpnRenderSketch = function (objForm) {
 	roots.forEach(assignCol);
 
 	// Node list: a synthetic source node above the root line(s), then each reachable line.
-	var lengthu = objForm['lengthu'].value,
-		diameteru = objForm['diameteru'].value,
-		elevu = objForm['elevu'].value,
-		q_lineu = objForm['q_lineu'].value,
-		p_downu = objForm['p_downu'].value,
+	var lengthu = EngCalcs.unitFactor(objForm['lengthu']),
+		diameteru = EngCalcs.unitFactor(objForm['diameteru']),
+		elevu = EngCalcs.unitFactor(objForm['elevu']),
+		q_lineu = EngCalcs.unitFactor(objForm['q_lineu']),
+		p_downu = EngCalcs.unitFactor(objForm['p_downu']),
 		tog = this.bpnSketchToggles,
 		colors = this.bpnFieldColors,
 		nodes = [],

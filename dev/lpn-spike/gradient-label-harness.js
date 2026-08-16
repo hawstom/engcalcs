@@ -48,7 +48,7 @@ function ok(name, cond, extra) {
 function setGradientUnit(key) {
 	const sel = document.querySelector('select[name="lpn_u_gradient"]');
 	for (let i = 0; i < sel.options.length; i++) {
-		if (sel.options[i].dataset.unit === key) { sel.selectedIndex = i; return true; }
+		if (sel.options[i].value === key) { sel.selectedIndex = i; return true; }
 	}
 	return false;
 }

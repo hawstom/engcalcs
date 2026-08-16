@@ -97,8 +97,8 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
 byId.lpn_menu_popup.appendChild(byId.lpn_menu_list);
 byId.lpn_menu_popup2.appendChild(byId.lpn_menu_list2);
 
-// A unit <select> the way echoUnitSelect() renders one: option.value is "units per SI unit" and
-// option.dataset.unit is the family's key for that unit. unitEl() finds these by NAME, not id.
+// A unit <select> the way echoUnitSelect() renders one: option.value is the unit's KEY ('ft'),
+// and the factor is a lookup from it (Task 390). unitEl() finds these by NAME, not id.
 const unitSelects = {};
 // `family` is NOT decoration: echoUnitSelect() puts data-family on every real select, and Task
 // 265's unitSetName() reads it to ask whether the strip matches a preset. A stub without it makes
@@ -107,8 +107,8 @@ function mkUnitSelect(name, family, opts, chosen) {
   const s = mkEl('select');
   s.name = name;
   s.dataset.family = family;
-  s.options = opts.map(o => ({ value: String(o[1]), textContent: o[0], dataset: { unit: o[0] } }));
-  s.selectedIndex = opts.findIndex(o => o[0] === chosen);
+  s.options = opts.map(n => ({ value: n, textContent: n }));
+  s.selectedIndex = opts.indexOf(chosen);
   if (s.selectedIndex < 0) { throw new Error('no such unit ' + chosen + ' on ' + name); }
   Object.defineProperty(s, 'value', { get() { return this.options[this.selectedIndex].value; } });
   unitSelects[name] = s;
@@ -135,24 +135,27 @@ const unitFactors = (function () {
   }
   return out;
 }());
+// An option's value is the unit NAME (Task 390), so this returns the name -- but it still
+// checks the name against lib/Units.lib.php, which is the point: a select built here on a unit
+// the suite does not actually define would otherwise sit in the stub looking real.
 function u(name) {
   if (!(name in unitFactors)) { throw new Error('no $ec_units factor named ' + name); }
-  return unitFactors[name];
+  return name;
 }
 function setUnitSet(which) {
   const us = which === 'us';
-  mkUnitSelect('lpn_u_length', 'distance_site', [['m', u('m')], ['ft', u('ft')]], us ? 'ft' : 'm');
-  mkUnitSelect('lpn_u_elevhead', 'total_head', [['mh2o', u('mh2o')], ['fth2o', u('fth2o')]], us ? 'fth2o' : 'mh2o');
-  mkUnitSelect('lpn_u_pressure', 'partial_head', [['mh2o', u('mh2o')], ['kpa', u('kpa')], ['psi', u('psi')]], us ? 'psi' : 'mh2o');
-  mkUnitSelect('lpn_u_diameter', 'distance_small', [['mm', u('mm')], ['in', u('in')]], us ? 'in' : 'mm');
-  mkUnitSelect('lpn_u_flow', 'flow_node', [['lps', u('lps')], ['gpm', u('gpm')]], us ? 'gpm' : 'lps');
-  mkUnitSelect('lpn_u_velocity', 'velocity', [['mps', u('mps')], ['ftps', u('ftps')]], us ? 'ftps' : 'mps');
-  mkUnitSelect('lpn_u_gradient', 'gradient', [['gradePercent', u('gradePercent')], ['grade', u('grade')]], 'gradePercent');
+  mkUnitSelect('lpn_u_length', 'distance_site', [u('m'), u('ft')], us ? 'ft' : 'm');
+  mkUnitSelect('lpn_u_elevhead', 'total_head', [u('mh2o'), u('fth2o')], us ? 'fth2o' : 'mh2o');
+  mkUnitSelect('lpn_u_pressure', 'partial_head', [u('mh2o'), u('kpa'), u('psi')], us ? 'psi' : 'mh2o');
+  mkUnitSelect('lpn_u_diameter', 'distance_small', [u('mm'), u('in')], us ? 'in' : 'mm');
+  mkUnitSelect('lpn_u_flow', 'flow_node', [u('lps'), u('gpm')], us ? 'gpm' : 'lps');
+  mkUnitSelect('lpn_u_velocity', 'velocity', [u('mps'), u('ftps')], us ? 'ftps' : 'mps');
+  mkUnitSelect('lpn_u_gradient', 'gradient', [u('gradePercent'), u('grade')], 'gradePercent');
   // Darcy-Weisbach roughness height e (ROADMAP Task 271) -- family `roughness`, which lib/Units.lib.php
   // aliases to $u_distance (m/mm/ft/in), us => ft, si => mm. Conditional in the PAGE (shown only
   // under Darcy-Weisbach) but unconditional here: applyMethodUI() hides the row, and a stub that
   // withheld the select would make that hiding untestable.
-  mkUnitSelect('lpn_u_roughness', 'roughness', [['m', u('m')], ['mm', u('mm')], ['ft', u('ft')], ['in', u('in')]], us ? 'ft' : 'mm');
+  mkUnitSelect('lpn_u_roughness', 'roughness', [u('m'), u('mm'), u('ft'), u('in')], us ? 'ft' : 'mm');
   // The wrapper applyMethodUI() shows and hides. Created here so every harness has it, since it is
   // part of the units strip's markup rather than of any one test.
   ensure('lpn_u_roughness_row');
@@ -212,8 +215,17 @@ global.requestAnimationFrame = f => setTimeout(f, 0);
 // (see drawExampleNetwork()); the page emits them into pageConfig, so the harness must too, read
 // from the real lang file rather than restated here.
 global.EngCalcs = {
-  pageConfig: {}, initTips: () => {}, unitFactorFor: () => 1,
+  pageConfig: {}, initTips: () => {},
   unitSets: LPN_UNIT_PRESETS,
+  // Task 390: the browser gets this table from echoHTMLHead(), straight out of lib/Units.lib.php.
+  // Here it comes from the same file, read above -- NEVER a retyped set of constants, for exactly
+  // the reason spelled out at the top of that block.
+  unitFactors,
+  unitFactor: (u) => {
+    const name = (u && typeof u === 'object') ? u.value : u;
+    return (typeof name === 'string' && Object.prototype.hasOwnProperty.call(unitFactors, name))
+      ? unitFactors[name] : 1;
+  },
   iconEl: () => mkEl('g'),
   setLabel: (el, iconName, text) => { el.textContent = text; },
   // The REAL EngCalcs.setUnits (js/Calculators.lib.js) moves every unit select to a preset and then

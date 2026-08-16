@@ -14,10 +14,10 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 **Arrow 1 — Task 390, the unit paradigm migration (priority 85).** The largest live correctness
 work. Read `dev/unit-paradigm-migration.md` FIRST; it has the diagnosis, the measurements and the
-dependency order, and the steps must be done in that order because each blocks the next. Start at
-step 1 (a unit's identity becomes its NAME) — it is half-built already, since every `<option>`
-carries `data-unit`. Do not start at the five missing units; that is step 4 and is a workaround
-without step 1.
+dependency order, and the steps must be done in that order because each blocks the next.
+**Steps 1 and 2 landed 2026-08-16** — a unit's identity is now its name and the cookie stores one.
+Next is step 3, keeping the `.inp` TOKEN at `js/lpn-inp.js:89`. Step 4 (the five missing units) is
+now unblocked but is still the refusal-to-solve work, not just five new selector entries.
 
 **Arrow 2 — the TRANSLATION SPRINT.** Delta is now **51 keys per language** (47 lpn + the 4 Task 337
 text-label keys), all in all 26 languages. Pre-sprint order is in `dev/translation-process.md`:
@@ -172,18 +172,17 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   user's.** Tom, 2026-08-16: *"You are fighting against a deprecated but not purged paradigm where
   everything was stored in browser and file as SI always... I don't think I authorized that. But it
   was done."* Full diagnosis, measurements and dependency order: **`dev/unit-paradigm-migration.md`**.
-  - **The root, and everything else is a symptom: a unit's IDENTITY is still its conversion factor.**
-    `unitFactor()` is `parseFloat(select.value)`; identity is read as a factor in 22 places against
-    9 that read `data-unit`. Correcting the factors on 2026-08-16 silently reset returning visitors'
-    unit choices for exactly this reason.
-  - Order: (1) identity becomes the name, factor becomes a lookup; (2) the cookie follows; (3) keep
-    the TOKEN at `js/lpn-inp.js:89`, which still does `parseFloat(tok)`; (4) an unrecognized unit is
-    carried verbatim and only the SOLVE is refused — this is what stops adding the five missing
-    EPANET flow units being a workaround; (5) stop persisting derived values (a pump's `h0/a/b`)
-    beside the user's.
-  - **Already done:** the `lpn_` document (Task 263), `.inp` import VALUE fidelity (1908 harness
-    checks), exact coherent factors. **Value fidelity is solved; REPRESENTATION is not** — 243 of
-    2,608 tokens in EPA's Net1/2/3 still reformat (`220.0` → `220`).
+  - **DONE — steps (1) and (2), the root (2026-08-16).** An `<option>`'s value is the unit's NAME;
+    the factor is a lookup through `EngCalcs.unitFactors`, emitted out of `lib/Units.lib.php`.
+    `data-unit` is gone. Cookies and shared links store `ft`, and one written before this has its
+    old factor matched back to its unit rather than reset. Guarded by `unit_factor_check.php` §5.
+  - Remaining, in order: (3) keep the TOKEN at `js/lpn-inp.js:89`, which still does
+    `parseFloat(tok)`; (4) carry an unrecognized unit verbatim and refuse only the SOLVE — this is
+    what stops adding the five missing EPANET flow units being a workaround; (5) stop persisting
+    derived values (a pump's `h0/a/b`) beside the user's.
+  - **Already done besides:** the `lpn_` document (Task 263), `.inp` import VALUE fidelity (1908
+    harness checks), exact coherent factors. **Value fidelity is solved; REPRESENTATION is not** —
+    243 of 2,608 tokens in EPA's Net1/2/3 still reformat (`220.0` → `220`).
   - **No choice of constant can fix this**: 36.7% of a 20,000 sample fails to round-trip
     bit-identically even with exact factors, worse than the 26% before them.
   - The five new unit keys (`u_imgd`, `u_afd`, `u_lpm`, `u_cmh`, `u_cmd`) fold into the queued

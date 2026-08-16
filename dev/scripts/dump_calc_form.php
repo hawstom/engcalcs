@@ -59,6 +59,9 @@ $out = array(
     'lang'           => $lang === '' ? 'en' : $lang,
     'scripts'        => extract_scripts($html),
     'unitSets'       => extract_json_assign($html, 'EngCalcs.unitSets'),
+    // Task 390: a unit select's option value is the unit's NAME, so a harness that wants the
+    // conversion factor needs this table -- the same one echoHTMLHead() emits for the browser.
+    'unitFactors'    => extract_json_assign($html, 'EngCalcs.unitFactors'),
     'defaultUnitSet' => extract_string_assign($html, 'EngCalcs.defaultUnitSet'),
     'pageConfig'     => extract_page_config($html),
     'fields'         => extract_fields($html),
@@ -201,16 +204,16 @@ function extract_fields($html)
         $a = parse_attrs($sel[1]);
         $name = isset($a['name']) ? $a['name'] : (isset($a['id']) ? $a['id'] : null);
         if ($name === null) { continue; }
-        $options = array();   // unit key => option value (the conversion factor)
+        $options = array();   // option value => option value; since Task 390 a unit select's
+                              // value IS the unit key, so this map is the identity for one.
         $order = array();
         $selected = null;
         preg_match_all('/<option\b([^>]*)>/i', $sel[2], $om);
         foreach ($om[1] as $oattrs) {
             $oa = parse_attrs($oattrs);
             $val = isset($oa['value']) ? $oa['value'] : '';
-            $unit = isset($oa['data-unit']) ? $oa['data-unit'] : $val;
-            $options[$unit] = $val;
-            $order[] = $unit;
+            $options[$val] = $val;
+            $order[] = $val;
             if (isset($oa['selected'])) { $selected = $val; }
         }
         if ($selected === null && $order) { $selected = $options[$order[0]]; }

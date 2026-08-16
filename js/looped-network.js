@@ -9400,7 +9400,8 @@ var EngCalcs = EngCalcs || {};
 		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient'];
 	// {selectName: unitKey}, e.g. {lpn_u_diameter: 'in'}. Stored by KEY, never by factor: a factor is
 	// a number whose meaning depends on a table that may be re-derived, while 'in' will mean inches
-	// forever. Same reason the option carries data-unit at all.
+	// forever. Since Task 390 that is also what the <option>'s own value is, so this is no longer a
+	// document-only convention -- the key is a unit's identity everywhere in the suite.
 	function readUnitSelections() {
 		var out = {};
 		LPN_UNIT_SELECTS.forEach(function (name) {
@@ -9420,13 +9421,13 @@ var EngCalcs = EngCalcs || {};
 		LPN_UNIT_SELECTS.forEach(function (name) {
 			var want = units[name], sel = unitEl(name), i;
 			if (!want || !sel || !sel.options) { return; }
-			// Walked as `options` + `selectedIndex` rather than a querySelector on [data-unit],
+			// Walked as `options` + `selectedIndex` rather than a querySelector on [value],
 			// matching unitKey() two functions up. That is the idiom the rest of this file already
 			// reads a select with, and it is the one a harness can stub -- an attribute selector on
 			// a live <option> works only against a real DOM, so the check that this function does
 			// its job at all could not have been written.
 			for (i = 0; i < sel.options.length; i++) {
-				if (sel.options[i].dataset && sel.options[i].dataset.unit === want) {
+				if (sel.options[i].value === want) {
 					if (sel.selectedIndex !== i) { sel.selectedIndex = i; changed = true; }
 					return;
 				}
@@ -9434,9 +9435,11 @@ var EngCalcs = EngCalcs || {};
 		});
 		return changed;
 	}
-	function unitFactor(name) { var s = unitEl(name); return s ? parseFloat(s.value) : 1; }
+	// Task 390: the select's value IS the unit's key ('in'), and the factor is a lookup from it
+	// through EngCalcs.unitFactors -- lib/Units.lib.php's own table, emitted by echoHTMLHead().
+	function unitFactor(name) { return EngCalcs.unitFactor(unitEl(name)); }
 	function unitLabel(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : ''; }
-	function unitKey(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].dataset.unit : null; }
+	function unitKey(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].value : null; }
 	// The map label's one unit token -- see numLine()'s `suffix` for why the gradient gets one and
 	// nothing else does. Not translated: '%' is the same mark in all 27 languages, including RTL.
 	function gradientSuffix() { return unitKey('lpn_u_gradient') === 'gradePercent' ? '%' : ''; }

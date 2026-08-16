@@ -155,9 +155,11 @@ EngCalcs.cookieToForm = function (form) {
 				if (!form.getElementsByTagName("SELECT")[selectCounter]) { break; }
 				var savedSelect = form.getElementsByTagName("SELECT")[selectCounter];
 				savedSelect.value = '';
-				if (cookieVarSplit[1] !== undefined && cookieVarSplit[1] !== "") {
-					savedSelect.value = cookieVarSplit[1];
-				}
+				// Through applySelectValue() rather than a bare assignment: a cookie written
+				// before Task 390 holds the unit's conversion FACTOR where the option now
+				// carries its NAME, and that helper matches the old number back to the unit
+				// the visitor actually chose instead of silently resetting it.
+				EngCalcs.applySelectValue(savedSelect, cookieVarSplit[1]);
 				// A saved unit that this select no longer offers leaves selectedIndex at -1,
 				// which would silently break every calculation on the page. Fall back to the
 				// server-rendered default instead. Needed because unit option lists can change

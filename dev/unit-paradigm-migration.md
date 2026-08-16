@@ -49,29 +49,28 @@ back as `710`.
   pass after.
 - **The conversion factors themselves.** Exact, internally coherent, guarded by
   `dev/scripts/unit_factor_check.php`. This was necessary but is not what fixes the paradigm.
-- **The name already exists in the DOM.** `echoUnitSelect()` emits
-  `<option value="<factor>" data-unit="<name>">`. `data-unit` was added so unit presets could pick
-  an option — so the migration was *started* here and never finished.
+- **A unit's IDENTITY is its NAME (step 1), and the cookie follows (step 2).** `echoUnitSelect()`
+  emits `<option value="ft">`; the factor is a lookup through `EngCalcs.unitFactors`, which
+  `echoHTMLHead()` emits straight out of `lib/Units.lib.php` — one table, shared by PHP and JS,
+  never a second set of constants in a `.js` file. `data-unit` is gone, being the same string as
+  the value. The cookie and a shared URL now store `ft`.
+  - A cookie or link written before this holds the factor, so `EngCalcs.applySelectValue()` matches
+    an old number back to its unit within 1e-3 relative — wide enough to catch the pre-2026-08-16
+    feet (`3.2808`) that the re-derivation had already orphaned. It converts nothing; it reads a
+    number the visitor never typed and returns a NAME.
+  - **Guarded by `unit_factor_check.php` §5**, which fails the build on `data-unit`, on
+    `dataset.unit`, on `objForm['xu'].value`, and on an `<option>` whose value is a `$ec_units`
+    lookup. The prose rule was already written and was violated in 22 places anyway.
 
 **Not done, in dependency order. Each item is blocked by the one above it:**
 
-1. **A unit's IDENTITY is still its factor.** `unitFactor()` is `parseFloat(select.value)`, and
-   identity is read as a factor in **22** places against **9** that read `data-unit`. This is the
-   root, and everything below is a symptom.
-   - *Direct evidence:* correcting the factors on 2026-08-16 silently reset returning visitors' unit
-     choices, because `js/Cookies.lib.js` stores each select's option **value** — the number — and a
-     stored `3.2808` matched no option afterwards. `Cookies.lib.js:161` already handles the fallback
-     deliberately, so nothing broke; but a preference keyed on a physical constant is fragile by
-     construction.
-   - *Fix:* `value` becomes the unit name, the factor becomes a lookup, `data-unit` becomes
-     redundant. The cookie then stores `ft`, not `3.280839895013123`.
-2. **The cookie stores a factor.** Falls out of (1).
 3. **The TOKEN is still discarded at `js/lpn-inp.js:89` (`parseFloat(tok)`).** Value fidelity is
    solved; representation is not. Keep the exact characters beside the parsed number at the one
    place text becomes number, and store the token.
-4. **An unrecognized unit has nowhere to live.** With identity as a number, a unit we lack a factor
-   for cannot be represented at all — so import must either convert it or drop it. With identity as
-   a name it can be carried verbatim, and only the SOLVE need be refused. Blocked by (1).
+4. **An unrecognized unit has nowhere to live.** Step 1 unblocked this but did not do it: a name
+   can now be carried verbatim, and only the SOLVE need be refused — but nothing yet carries one.
+   `EngCalcs.unitFactor()` answers 1 for a name it has no factor for, which is right for a page
+   rendering and wrong for a page solving, so the refusal is the work left.
    - The five EPANET flow keywords with no selector (IMGD, AFD, LPM, CMH, CMD) are the concrete
      case. `.inp` `UNITS` is a **closed enumeration of ten**, so adding them completes a finite list
      rather than working around it — but adding them *without* (4) would be papering over, which is

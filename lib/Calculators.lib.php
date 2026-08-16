@@ -122,7 +122,7 @@ function inputHtml($name, $type, $default, $indent_string)
 // time, so word order and case agreement stay the translator's to decide.
 function solverControlHtml($onclick, $units = 'flow_channel')
 {
-    global $ec_lang, $ec_units;
+    global $ec_lang;
     $family = is_string($units) ? $units : '';
     $units = ecUnitOptions($units);
     $html = "\n" . '<span class="ec-solverline d-print-none">'
@@ -132,7 +132,7 @@ function solverControlHtml($onclick, $units = 'flow_channel')
         . ' <select id="solver_qu" data-family="' . htmlspecialchars($family) . '" onchange="EngCalcs.submitForm()">';
     $default = ecDefaultUnit($family);
     foreach ($units as $unit) {
-        $html .= '<option value="' . $ec_units[$unit] . '" data-unit="' . $unit . '"'
+        $html .= '<option value="' . $unit . '"'
             . ($unit === $default ? ' selected="selected"' : '') . '>' . $ec_lang['u_' . $unit] . '</option>';
     }
     $html .= '</select> <span id="solver_msg" class="ec-status-bad"></span></span>';
@@ -183,7 +183,7 @@ function ecDefaultUnit($family)
 
 function echoUnitSelect($name, $units, $indent_string)
 {
-    global $ec_units, $ec_lang;
+    global $ec_lang;
 
     $family = is_string($units) ? $units : '';
     $options = ecUnitOptions($units);
@@ -191,13 +191,18 @@ function echoUnitSelect($name, $units, $indent_string)
         return;
     }
 
-    // data-family lets a preset find this select; data-unit lets it pick an option
-    // without matching translated label text (which is both fragile across languages
-    // and the mechanism of the old overwrite bug).
+    // An option's VALUE IS THE UNIT'S NAME ('ft'), never its conversion factor (Task 390).
+    // A name is the unit's identity and will mean feet forever; a factor is a number whose
+    // meaning depends on a table that may be re-derived -- and when the table WAS re-derived
+    // on 2026-08-16, every returning visitor's stored unit choice matched no option and reset.
+    // The factor is a lookup from the name: EngCalcs.unitFactors, emitted by echoHTMLHead().
+    // data-family lets a preset find this select; the value lets it pick an option without
+    // matching translated label text (fragile across languages, and the mechanism of the old
+    // overwrite bug).
     echo "\n" . $indent_string . '<select name="' . $name . '" data-family="' . htmlspecialchars($family) . '" onchange="EngCalcs.submitForm()">';
     $default = ecDefaultUnit($family);
     foreach ($options as $unit) {
-        echo "\n" . $indent_string . "\t" . '<option value="' . $ec_units[$unit] . '" data-unit="' . $unit . '"'
+        echo "\n" . $indent_string . "\t" . '<option value="' . $unit . '"'
             . ($unit === $default ? ' selected="selected"' : '') . '>' . $ec_lang['u_' . $unit] . '</option>';
     }
     echo "\n$indent_string</select>";

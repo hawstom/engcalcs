@@ -131,7 +131,7 @@ function loadCalculator(pageName, opts) {
 		el.value = f.value === null ? '' : f.value;
 		if (f.tag === 'select') {
 			el._family = f.family;
-			el._options = f.options;   // unit key -> option value (the conversion factor)
+			el._options = f.options;   // unit key -> option value; identical since Task 390
 		}
 		if (f.tag === 'checkbox') { el.checked = !!f.checked; }
 		form[name] = el;
@@ -199,6 +199,10 @@ function loadCalculator(pageName, opts) {
 		throw new Error(`${pageName}: loading ${loaded.join(', ')} defined no EngCalcs.pageCalculator`);
 	}
 	EngCalcs.unitSets = dump.unitSets;
+	// Emitted inline by echoHTMLHead(), not by any .js file, so the sandbox does not pick it up
+	// with the scripts. Without it every EngCalcs.unitFactor() call answers 1 and every
+	// US-unit assertion on this page would quietly pass in metres.
+	EngCalcs.unitFactors = dump.unitFactors;
 	EngCalcs.pageConfig = Object.assign({}, EngCalcs.pageConfig, dump.pageConfig);
 
 	// --- the handle ---
@@ -218,8 +222,7 @@ function loadCalculator(pageName, opts) {
 
 		/** The unit-conversion factor currently selected for a field (display per SI). */
 		factor(name) {
-			const sel = form[name + 'u'];
-			return sel ? parseFloat(sel.value) : 1;
+			return EngCalcs.unitFactor(form[name + 'u']);
 		},
 
 		/** Applies a whole unit preset ('us' or 'si'), the way the page's own buttons do. */

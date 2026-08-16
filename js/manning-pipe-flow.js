@@ -96,10 +96,10 @@ EngCalcs.migrateCookie = function (cookieVars, fromVersion) {
 EngCalcs.solveForDd0 = function() {
 	'use strict';
 	var objForm = document.forms['formInput'];
-	var d0 = parseFloat(objForm['d0'].value) / parseFloat(objForm['d0u'].value);
+	var d0 = parseFloat(objForm['d0'].value) / EngCalcs.unitFactor(objForm['d0u']);
 	var n  = parseFloat(objForm['n'].value);
-	var sf = parseFloat(objForm['sf'].value) / parseFloat(objForm['sfu'].value);
-	var qu = parseFloat(document.getElementById('solver_qu').value);
+	var sf = parseFloat(objForm['sf'].value) / EngCalcs.unitFactor(objForm['sfu']);
+	var qu = EngCalcs.unitFactor(document.getElementById('solver_qu'));
 	var q_target = parseFloat(document.getElementById('solver_q').value) / qu;
 	var msgEl = document.getElementById('solver_msg');
 
@@ -129,7 +129,7 @@ EngCalcs.solveForDd0 = function() {
 		if (hi - lo < 1e-10) { break; }
 	}
 
-	var dd0u = parseFloat(objForm['dd0u'].value);
+	var dd0u = EngCalcs.unitFactor(objForm['dd0u']);
 	objForm['dd0'].value = parseFloat((mid * dd0u).toPrecision(6));
 	msgEl.textContent = '';
 	EngCalcs.submitForm();

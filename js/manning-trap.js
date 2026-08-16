@@ -49,7 +49,7 @@ EngCalcs.pageCalculator = function(objForm) {
 		objForm.n_in.value = this.var.n_in.toFixed(4);
 	}
 	if (this.var.d50_radio !== '') {
-		objForm.d50_in.value = (this.var.d50_in * objForm.d50_inu.value).toFixed(4);
+		objForm.d50_in.value = (this.var.d50_in * EngCalcs.unitFactor(objForm.d50_inu)).toFixed(4);
 	}
 	this.writeFormResult(objForm, 'a', precision = 4, hasUnits = true);
 	this.writeFormResult(objForm, 'pw', precision = 4, hasUnits = true);
@@ -146,18 +146,18 @@ EngCalcs.migrateCookie = function (cookieVars, fromVersion) {
 EngCalcs.solveForY = function() {
 	'use strict';
 	var objForm = document.forms['formInput'];
-	var b   = parseFloat(objForm['b'].value) / parseFloat(objForm['bu'].value);
+	var b   = parseFloat(objForm['b'].value) / EngCalcs.unitFactor(objForm['bu']);
 	var z1  = parseFloat(objForm['z1'].value);
 	var z2  = parseFloat(objForm['z2'].value);
-	var s0  = parseFloat(objForm['s0'].value) / parseFloat(objForm['s0u'].value);
+	var s0  = parseFloat(objForm['s0'].value) / EngCalcs.unitFactor(objForm['s0u']);
 	var n_radio = objForm.n_radio.value;
 	var n_in = parseFloat(objForm['n_in'].value);
 	var beta = parseFloat(objForm['beta'].value);
 	var sgrock = parseFloat(objForm['sgrock'].value);
 	var d50_radio = objForm.d50_radio.value;
-	var d50_in = parseFloat(objForm['d50_in'].value) / parseFloat(objForm['d50_inu'].value);
+	var d50_in = parseFloat(objForm['d50_in'].value) / EngCalcs.unitFactor(objForm['d50_inu']);
 	var d50_safety = parseFloat(objForm['d50_safety'].value);
-	var qu = parseFloat(document.getElementById('solver_qu').value);
+	var qu = EngCalcs.unitFactor(document.getElementById('solver_qu'));
 	var q_target = parseFloat(document.getElementById('solver_q').value) / qu;
 	var msgEl = document.getElementById('solver_msg');
 
@@ -195,13 +195,13 @@ EngCalcs.solveForY = function() {
 		return;
 	}
 
-	var yu = parseFloat(objForm['yu'].value);
+	var yu = EngCalcs.unitFactor(objForm['yu']);
 	objForm['y'].value = parseFloat((mid * yu).toPrecision(6));
 	if (n_radio !== '') {
 		objForm['n_in'].value = result.n_in.toFixed(4);
 	}
 	if (d50_radio !== '') {
-		objForm['d50_in'].value = (result.d50_in * parseFloat(objForm['d50_inu'].value)).toFixed(4);
+		objForm['d50_in'].value = (result.d50_in * EngCalcs.unitFactor(objForm['d50_inu'])).toFixed(4);
 	}
 	msgEl.textContent = '';
 	EngCalcs.submitForm();

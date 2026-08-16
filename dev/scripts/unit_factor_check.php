@@ -272,6 +272,66 @@ foreach ($groups as $label => $members) {
     }
 }
 
+// --- 5. Identity ------------------------------------------------------------------------------
+// A unit's IDENTITY IS ITS NAME (ROADMAP Task 390). A <select> option's value is 'ft', and the
+// factor is a lookup through EngCalcs.unitFactors. This section is here rather than in a script of
+// its own because it is the same subject one level up: sections 1-4 keep the factors right, and
+// this one keeps a factor from being used as a name in the first place.
+//
+// It exists because the prose rule had already been written down and was violated in 22 places
+// anyway, and because the failure is SILENT -- code that divides by a select's value still runs,
+// still shows numbers, and is only wrong in the digits nobody re-derives by hand.
+$identityBans = array(
+    array(
+        'pattern' => '/\bdata-unit\b|\bdataset\.unit\b/',
+        'why'     => "a unit's identity is the <option>'s VALUE now, not a data-unit attribute",
+        'fix'     => "read option.value (or select.value); echoUnitSelect() emits no data-unit",
+    ),
+    array(
+        // A form field whose name ends in 'u' is a unit select, by the suite's own naming, and
+        // reaching one THROUGH THE FORM is always a factor read -- every one of the 22 sites this
+        // was written for had this shape. A select read some other way (js/Cookies.lib.js reads
+        // one to STORE it, which is now correct by construction) is out of scope and left alone.
+        'pattern' => '/objForm(?:\[\s*[\'"][^\'"]*u[\'"]\s*\]|\.[A-Za-z0-9_]*u\b)\.value\b/',
+        'why'     => "this reads a unit select's value as though it were a conversion factor",
+        'fix'     => "EngCalcs.unitFactor(objForm['xu']) -- one lookup, one table, one definition",
+    ),
+    array(
+        'pattern' => '/<option value="\'\s*\.\s*\$ec_units\[/',
+        'why'     => "an <option>'s value must be the unit's name, never its factor",
+        'fix'     => "emit \$unit; the factor reaches JS as EngCalcs.unitFactors",
+    ),
+);
+$identityFiles = array_merge(
+    glob(__DIR__ . '/../../js/*.js'),
+    glob(__DIR__ . '/../../lib/*.php'),
+    glob(__DIR__ . '/../../*.php'),
+    glob(__DIR__ . '/../../dev/calc-spike/*.js'),
+    glob(__DIR__ . '/../../dev/lpn-spike/*.js')
+);
+$identityScanned = 0;
+foreach ($identityFiles as $path) {
+    $identityScanned++;
+    $lines = file($path, FILE_IGNORE_NEW_LINES);
+    $rel = str_replace(realpath(__DIR__ . '/../../') . '/', '', realpath($path));
+    foreach ($lines as $i => $line) {
+        // A comment may legitimately discuss the old form -- this file and the migration record do.
+        $trimmed = ltrim($line);
+        if (substr($trimmed, 0, 2) === '//' || substr($trimmed, 0, 1) === '*' || substr($trimmed, 0, 2) === '/*') { continue; }
+        foreach ($identityBans as $ban) {
+            if (preg_match($ban['pattern'], $line)) {
+                $fails[] = sprintf(
+                    "%s:%d -- %s.\n          Fix: %s.\n          %s",
+                    $rel, $i + 1, $ban['why'], $ban['fix'], trim($line)
+                );
+            }
+        }
+    }
+}
+if ($verbose) {
+    $notes[] = sprintf("  ok    %-28s %d files scanned", 'unit identity is a name', $identityScanned);
+}
+
 // ---------------------------------------------------------------------------------------------
 if ($notes) { echo implode("\n", $notes) . "\n"; }
 if ($fails) {

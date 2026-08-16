@@ -1,12 +1,12 @@
 EngCalcs.pageCalculator = function (objForm) {
 	'use strict';
-	this.Manning.s0 = objForm['s0'].value / objForm['s0u'].value;
+	this.Manning.s0 = objForm['s0'].value / EngCalcs.unitFactor(objForm['s0u']);
 	ws = objForm.ws.value;
 	var
 	hasUnits, precision,
 	// Use unary + to convert form values to numbers
 	// so when we add z1 and z2 they don't get concatenated.
-	ws = objForm['ws'].value / objForm['wsu'].value,
+	ws = objForm['ws'].value / EngCalcs.unitFactor(objForm['wsu']),
 	row,
 	station0,
 	station1,
@@ -37,16 +37,16 @@ EngCalcs.pageCalculator = function (objForm) {
 
 	for (var iStation=0; iStation < this.numCalcRows; iStation++) {
 		row = document.getElementById("CalcsBody").getElementsByTagName('tr')[iStation];
-		station1 = row.getElementsByTagName( 'input' )[0].value / objForm['stationu'].value;
+		station1 = row.getElementsByTagName( 'input' )[0].value / EngCalcs.unitFactor(objForm['stationu']);
 		arrStation.push(station1);
-		elev1 = row.getElementsByTagName('input')[1].value / objForm['elevationu'].value;
+		elev1 = row.getElementsByTagName('input')[1].value / EngCalcs.unitFactor(objForm['elevationu']);
 		arrElev.push(elev1);
 		d1=Math.max(ws-elev1,0);
 		// Output
 		// Point
 		// Bottom shear stress depends on y, so we report it for a point and don't store it with the section.
 		tau = d1 * this.Manning.s0;
-		document.getElementsByName('tau')[iStation].innerHTML = (tau * objForm['tauu'].value).toFixed(2);
+		document.getElementsByName('tau')[iStation].innerHTML = (tau * EngCalcs.unitFactor(objForm['tauu'])).toFixed(2);
 		// Do the calcs and output if this is not the first row
 		if(iStation > 0) {
 			this.Manning.n = document.getElementsByName('n')[iStation].value;
@@ -84,20 +84,20 @@ EngCalcs.pageCalculator = function (objForm) {
 			}
 			// Output
 			// Segment
-			document.getElementsByName('t')[iStation].innerHTML = (this.Manning.t * objForm['tu'].value).toFixed(2);
-			document.getElementsByName('pw')[iStation].innerHTML = (this.Manning.pw * objForm['pwu'].value).toFixed(2);
-			document.getElementsByName('a')[iStation].innerHTML = (this.Manning.a * objForm['au'].value).toFixed(2);
+			document.getElementsByName('t')[iStation].innerHTML = (this.Manning.t * EngCalcs.unitFactor(objForm['tu'])).toFixed(2);
+			document.getElementsByName('pw')[iStation].innerHTML = (this.Manning.pw * EngCalcs.unitFactor(objForm['pwu'])).toFixed(2);
+			document.getElementsByName('a')[iStation].innerHTML = (this.Manning.a * EngCalcs.unitFactor(objForm['au'])).toFixed(2);
 			// Region
 			if (this.Manning.isBank) {
 				this.Manning.closeRegion();
 				maxRegionVelocity = Math.max(maxRegionVelocity, this.Manning.v617);
 				minRegionVelocity = Math.min(minRegionVelocity, this.Manning.v617);
-				document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * objForm['rhu'].value).toFixed(2);
+				document.getElementsByName('rh')[iStation].innerHTML = (this.Manning.rh * EngCalcs.unitFactor(objForm['rhu'])).toFixed(2);
 				document.getElementsByName('n617')[iStation].innerHTML = this.Manning.n617.toFixed(2);
-				document.getElementsByName('v617')[iStation].innerHTML = (this.Manning.v617 * objForm['v617u'].value).toFixed(2);
-				document.getElementsByName('hv617')[iStation].innerHTML = (this.Manning.hv617 * objForm['hv617u'].value).toFixed(2);
+				document.getElementsByName('v617')[iStation].innerHTML = (this.Manning.v617 * EngCalcs.unitFactor(objForm['v617u'])).toFixed(2);
+				document.getElementsByName('hv617')[iStation].innerHTML = (this.Manning.hv617 * EngCalcs.unitFactor(objForm['hv617u'])).toFixed(2);
 				document.getElementsByName('fr617')[iStation].innerHTML = this.Manning.fr617.toFixed(2);
-				document.getElementsByName('q617')[iStation].innerHTML = (this.Manning.q617 * objForm['q617u'].value).toFixed(2);
+				document.getElementsByName('q617')[iStation].innerHTML = (this.Manning.q617 * EngCalcs.unitFactor(objForm['q617u'])).toFixed(2);
 			} else {
 				document.getElementsByName('rh')[iStation].innerHTML = '';
 				document.getElementsByName('n617')[iStation].innerHTML = '';
@@ -112,7 +112,7 @@ EngCalcs.pageCalculator = function (objForm) {
 		elev0=elev1;
 		d0=d1;
 	}
-	document.getElementById('q_617').innerHTML = (this.Manning.q617c * objForm['q_617u'].value).toFixed(2);
+	document.getElementById('q_617').innerHTML = (this.Manning.q617c * EngCalcs.unitFactor(objForm['q_617u'])).toFixed(2);
 	var vCheckStatus = (minRegionVelocity === Infinity) ? ''
 		: (maxRegionVelocity > EngCalcs.VELOCITY_OK.max) ? 'high'
 		: (minRegionVelocity < EngCalcs.VELOCITY_OK.min) ? 'low'
