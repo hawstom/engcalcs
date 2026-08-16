@@ -1865,9 +1865,19 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     every scale. **The first draft of that check used a flat `+4` tolerance — a WORLD constant — and
     failed at one zoom for a mask that was correct.** The same mistake the whole day has been about,
     made inside the guard against it.
-  - **NOT EXPLAINED YET: Tom's "A. Far away"** — two node labels sitting well away from any node,
-    with no leader drawn. Different symptom, possibly a consequence of the same stale obstacle, and
-    still open.
+  - **"A. FAR AWAY" IS EXPLAINED AND FIXED TOO**, and Tom's two follow-up clues are what did it:
+    *"They should be on the opposite side of the model"* and *"If I start to drag one, they all go
+    to their correct homes."* A drag re-runs `relayoutLabels()`, so the positions were simply STALE.
+    - **Measured on Net3, a model 37 × 31 units: a layout computed at scale 1 gives a MEDIAN nudge
+      of 43 world units and a worst of 68.** Larger than the model. At scale 20, where that drawing
+      is read, the median is 3.9. Every label is sized in screen pixels, so at a coarse scale it is
+      enormous in world units and the collision pass moves it correspondingly far — those nudges are
+      CORRECT for the scale that produced them and nonsense at any other.
+    - So the defect is displaying a layout at a scale it was not computed for. `relayoutLabels()`
+      now records `lastLayoutScale`, and `applyView()` asks **"does the layout belong to the scale
+      being displayed"** instead of "did this call change the scale". The old question answers "no"
+      for a view restored at a scale that merely matches the live transform, and self-heals nothing;
+      the new one covers any path that moves the transform without saying so.
 
 - 0|369| **The aligned-label flip was measured in the wrong FRAME — DONE 2026-08-15.** Tom, from a
   screenshot of Elm Street with upside-down labels, diagnosing it himself: *"Cartesian angles are

@@ -2990,7 +2990,6 @@ var EngCalcs = EngCalcs || {};
 		if (!validView(v) || !w || !h) { return false; }
 		sc = isFinite(v.s) ? v.s : Math.min(w / v.w, h / v.h);
 		sc = Math.max(MIN_SCALE, Math.min(MAX_SCALE, sc));
-		var zoomed = sc !== state.s;
 		state.s = sc;
 		state.tx = w / 2 - sc * v.cx;
 		state.ty = h / 2 - sc * v.cy;
@@ -3000,7 +2999,14 @@ var EngCalcs = EngCalcs || {};
 		// SCALE and on nothing else. Restoring a view at the scale already in force (switching to a
 		// tab and back, which is the commonest case there is) therefore costs one transform, where
 		// it used to cost a full relayout: over a second on Net3.
-		if (zoomed) { onZoomChanged(); }
+		//
+		// **COMPARED AGAINST THE SCALE THE LAYOUT WAS COMPUTED AT, NOT THE ONE WE ARRIVED WITH.**
+		// The first version asked "did the scale change in this call", which is the wrong question:
+		// it answers "no" for a view restored at a scale that merely MATCHES the live transform,
+		// while the labels on screen were laid out for some earlier one. Asking whether the layout
+		// belongs to the scale being displayed is the honest test, and it self-heals any path that
+		// changes the transform without saying so.
+		if (state.s !== lastLayoutScale) { onZoomChanged(); }
 		return true;
 	}
 	// Per TAB, in memory only, and deliberately not in the library index: this is where you were
@@ -12264,7 +12270,21 @@ var EngCalcs = EngCalcs || {};
 	//
 	// It costs nothing to be right: there are a handful of Text labels in a drawing, against
 	// hundreds of data labels, and this path does no measuring.
+	// **THE LAYOUT BELONGS TO A SCALE, AND THIS IS WHERE THAT IS RECORDED** (2026-08-15). Every label
+	// is sized in screen pixels, so at a coarse scale it is enormous in WORLD units and the collision
+	// pass moves it correspondingly far. Measured on Net3, a model 37 units across: a layout computed
+	// at scale 1 gives a MEDIAN nudge of 43 world units and a worst of 68 -- labels flung clean off
+	// the far side of the network. At scale 20, where that drawing is actually read, the median is
+	// 3.9.
+	//
+	// Those nudges are CORRECT for the scale that produced them and nonsense at any other, so
+	// displaying a layout at a scale it was not computed for is the whole of the defect Tom
+	// photographed: *"A. Far away... They should be on the opposite side of the model... If I start
+	// to drag one, they all go to their correct homes."* A drag re-runs this pass, which is why one
+	// gesture fixed every label at once.
+	var lastLayoutScale = null;
 	function relayoutLabels() {
+		lastLayoutScale = state.s;
 		runLabelCollisionAvoidance();
 		doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
 		doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });

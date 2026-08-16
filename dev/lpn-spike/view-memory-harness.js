@@ -42,7 +42,15 @@ const L = loadLoopedNetwork(
 	"\t\t\tonZoomChanged = function () { n++; return real.apply(null, arguments); };\n" +
 	"\t\t\ttry { f(); } finally { onZoomChanged = real; } return n; },\n" +
 	"\t\tview: function () { return { tx: state.tx, ty: state.ty, s: state.s }; },\n" +
-	"\t\tsetViewRaw: function (tx, ty, s) { state.tx = tx; state.ty = ty; state.s = s; setTransform(); },\n" +
+	// SETTING A SCALE RE-LAYS-OUT, because every real path that changes one does (zoomAbout and
+	// zoomExtent both end in onZoomChanged). Leaving it out puts the module in a state a browser
+	// cannot reach -- a transform at one scale over a layout computed for another -- which is
+	// exactly the state applyView() now checks for, so the harness would be testing its own lie.
+	"\t\tsetViewRaw: function (tx, ty, s) { state.tx = tx; state.ty = ty; state.s = s;\n" +
+	"\t\t\tsetTransform(); relayoutLabels(); },\n" +
+	// The one thing a harness needs that no real path does: move the transform WITHOUT laying out,
+	// so the mismatch the new rule exists to catch can be built on purpose.
+	"\t\tsetScaleOnly: function (s) { state.s = s; setTransform(); },\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h;\n" +
 	"\t\t\tsvg.getBoundingClientRect = function () { return { top: 0, bottom: h, width: w, height: h }; }; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -155,6 +163,23 @@ console.log('\n--- the per-tab memory ---');
 	L.setViewRaw(0, 0, 1.5);        // a different scale
 	layouts = L.countLayouts(function () { L.restoreOrFit(); });
 	ok('...and restoring one at a different scale still does', layouts === 1, layouts);
+
+	// **THE TEST IS AGAINST THE SCALE THE LAYOUT WAS COMPUTED AT, NOT THE ONE WE ARRIVED WITH**, and
+	// the difference is a real defect Tom photographed on Net3: node labels sitting on the far side
+	// of the model, all snapping home the moment he started to drag one. Every label is sized in
+	// screen pixels, so at a coarse scale it is enormous in world units and the collision pass moves
+	// it correspondingly far -- measured on Net3, a model 37 units across, a layout computed at
+	// scale 1 gives a MEDIAN nudge of 43 units. Those nudges are correct for that scale and nonsense
+	// at any other, and a drag fixed everything because it re-ran the pass.
+	//
+	// Here: the transform is already at the target scale while the LAYOUT belongs to a different
+	// one. Asking "did this call change the scale" answers no and leaves the wrong layout on screen;
+	// asking "does the layout belong to the scale being displayed" answers yes, relayout.
+	L.setViewRaw(0, 0, 3);              // the layout now belongs to scale 3
+	L.setScaleOnly(7);                  // ...and something moves the transform without saying so
+	layouts = L.countLayouts(function () { L.applyView({ cx: 0, cy: 0, s: 7 }); });
+	ok('a view whose scale matches the TRANSFORM but not the LAYOUT still re-lays-out',
+		layouts === 1, layouts + ' -- asking "did this call change the scale" would answer 0 here');
 }
 
 // ---- 4. The file carries one too, in the file's own frame --------------------------------------
