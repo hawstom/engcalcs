@@ -819,3 +819,48 @@ html[lang="zh"] .ec-welcome {
    in the Help menu (ROADMAP Task 314). Same position epanet-js uses in its own arrival panel. */
 .lpn-examples-legal { margin: 1.1em 0 0; font-size: .78em; opacity: .7; }
 .lpn-examples-legal a { margin: 0 .5em; }
+
+/* ==== BEGIN: colour by value (ROADMAP Task 384) and the thematic map (Task 327) ==============
+   Appended as one block on purpose -- nothing above is reformatted, and the whole feature can be
+   read (or removed) in one place.
+
+   The element colours themselves are NOT here. They are written as inline styles by
+   refreshValueColors() in js/looped-network.js, because a value-driven colour is data, not a rule:
+   an inline style is what the stylesheet's own black loses to, and clearing it restores that black
+   exactly rather than needing a second rule to undo the first. */
+
+/* TASK 327's THEMATIC MODE, in one declaration. Two honest products: a DRAWING (dark linework and
+   labels -- what you plot) and a THEMATIC MAP (colour by one field, no labels -- what you read at
+   a glance across 97 nodes). EPANET's mistake is not having colour, it is having only the second
+   and making the first hard, so this is a MODE and never the default.
+   The labels are hidden by a CLASS ON THE SVG rather than by switching labelSettings off. That
+   distinction is the whole reason the mode is reversible: after switching the mode off, the user
+   gets back exactly the labels they had, and nothing they see afterwards is a state this code
+   wrote into their project. Flow arrows deliberately stay -- direction is not a number, and it is
+   the one annotation you still need at a glance. */
+.lpn-thematic .lpn-lbl,
+.lpn-thematic .lpn-lbl-mask,
+.lpn-thematic .lpn-leader { display: none; }
+
+/* The colour key. Its own overlay, created by colorLegendEl() in js/looped-network.js and placed
+   by applyColorLegendPosition() from settings.colorLegendPosition -- so top/bottom/left/right are
+   deliberately absent here, exactly as they are for #lpn_labels_legend. Two legends need two
+   corners; defaulting this one to the opposite corner from the labels legend is why. */
+.lpn-color-legend {
+	position: absolute;
+	font-size: 0.9em;
+	line-height: 1.4;
+	background: rgba(255, 255, 255, .85);
+	padding: 4px 8px;
+	pointer-events: none;
+}
+/* A swatch has to survive being white or very light on white paper, so it carries a hairline
+   border of its own -- otherwise the top band of the gray ramp is an invisible row. */
+.lpn-color-swatch {
+	display: inline-block;
+	flex: 0 0 auto;
+	width: 1.4em;
+	height: 0.85em;
+	border: 1px solid rgba(0, 0, 0, .45);
+}
+/* ==== END: colour by value ================================================================== */

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sr",
-        "expected_key_count": 962,
-        "delta_key_count": 51,
+        "expected_key_count": 980,
+        "delta_key_count": 69,
         "exempt_key_count": 17,
         "exempt_keys": [
             "calc_units_us",
@@ -379,7 +379,25 @@
         "lpn_settings_mask_labels": "Background mask behind labels",
         "lpn_settings_label_max_width": "Show labels when the view is smaller than (map units)",
         "lpn_settings_label_use_view": "Use current view",
-        "lpn_settings_label_always": "Always show labels"
+        "lpn_settings_label_always": "Always show labels",
+        "lpn_settings_colors": "Color by value",
+        "lpn_settings_color_node_field": "Color nodes by",
+        "lpn_settings_color_link_field": "Color pipes by",
+        "lpn_settings_color_ramp": "Color ramp",
+        "lpn_color_ramp_epanet": "Blue to red (EPANET)",
+        "lpn_color_ramp_viridis": "Purple to yellow (easier to tell apart)",
+        "lpn_color_ramp_gray": "Light to dark gray",
+        "lpn_settings_color_reverse": "Reverse the colors",
+        "lpn_color_none": "No color",
+        "lpn_settings_color_thematic": "Thematic map: colors only, no labels",
+        "lpn_settings_color_thematic_tip": "Hides every label so the colors are the whole map. Your label choices are kept, and turning this off brings them back.",
+        "lpn_settings_color_key_position": "Color key position",
+        "lpn_settings_color_breaks": "Break values",
+        "lpn_settings_color_breaks_note": "Leave these blank and the colors spread over whatever is on the map now. Type numbers, or press a button below, and the same number always means the same color.",
+        "lpn_settings_color_equal_intervals": "Equal intervals",
+        "lpn_settings_color_equal_counts": "Equal counts",
+        "lpn_settings_color_auto": "Automatic",
+        "lpn_settings_color_no_values": "There are no values to work from yet. Solve the network first."
     },
     "keys": {
         "lpn_field_text_bold": "Bold",
@@ -432,7 +450,25 @@
         "lpn_settings_mask_labels": "Background mask behind labels",
         "lpn_settings_label_max_width": "Show labels when the view is smaller than (map units)",
         "lpn_settings_label_use_view": "Use current view",
-        "lpn_settings_label_always": "Always show labels"
+        "lpn_settings_label_always": "Always show labels",
+        "lpn_settings_colors": "Color by value",
+        "lpn_settings_color_node_field": "Color nodes by",
+        "lpn_settings_color_link_field": "Color pipes by",
+        "lpn_settings_color_ramp": "Color ramp",
+        "lpn_color_ramp_epanet": "Blue to red (EPANET)",
+        "lpn_color_ramp_viridis": "Purple to yellow (easier to tell apart)",
+        "lpn_color_ramp_gray": "Light to dark gray",
+        "lpn_settings_color_reverse": "Reverse the colors",
+        "lpn_color_none": "No color",
+        "lpn_settings_color_thematic": "Thematic map: colors only, no labels",
+        "lpn_settings_color_thematic_tip": "Hides every label so the colors are the whole map. Your label choices are kept, and turning this off brings them back.",
+        "lpn_settings_color_key_position": "Color key position",
+        "lpn_settings_color_breaks": "Break values",
+        "lpn_settings_color_breaks_note": "Leave these blank and the colors spread over whatever is on the map now. Type numbers, or press a button below, and the same number always means the same color.",
+        "lpn_settings_color_equal_intervals": "Equal intervals",
+        "lpn_settings_color_equal_counts": "Equal counts",
+        "lpn_settings_color_auto": "Automatic",
+        "lpn_settings_color_no_values": "There are no values to work from yet. Solve the network first."
     },
     "key_context": {
         "lpn_field_text_bold": {
@@ -1248,6 +1284,294 @@
                     "key": "lpn_settings_symbol_opacity",
                     "value": "Непрозирност симбола (0 до 1)",
                     "english": "Symbol opacity (0 to 1)"
+                }
+            }
+        },
+        "lpn_settings_colors": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_node_field": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_link_field": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_ramp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_color_ramp_epanet": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_color_ramp_viridis": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_color_ramp_gray": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_reverse": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_color_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_thematic": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_thematic_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_key_position": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_breaks": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_breaks_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_equal_intervals": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_equal_counts": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_auto": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
+                }
+            }
+        },
+        "lpn_settings_color_no_values": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_legend_bottom_right",
+                    "value": "Доле десно",
+                    "english": "Bottom right"
+                },
+                "next_translated": {
+                    "key": "lpn_confirm_restore_defaults",
+                    "value": "Ресетовати сва подешавања (префиксе ID-а, почетне вредности, подешавања решавача, изглед мапе, положај легенде и видљиве ознаке) на њихове изворне вредности? Ваша мрежа се не мења. Подешавања припадају отвореном пројекту, па ваши други пројекти задржавају своја.",
+                    "english": "Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own."
                 }
             }
         }

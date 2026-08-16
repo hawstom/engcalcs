@@ -1798,7 +1798,7 @@ var EngCalcs = EngCalcs || {};
 			// Open/closed state of the settings panel's collapsible sections, persisted so a user
 			// who lives in Default inputs is not re-opening it every session. Default inputs starts
 			// OPEN because it is the mode-switching section above; the other two are set-once.
-			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, computation: false, files: false },
+			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, colors: false, computation: false, files: false },
 			// Map units -- the same units the drawing is in, so this number scales with the map and
 			// means 20 ft or 20 m according to the Length/Map declaration (Tom, 2026-08-09: map
 			// coordinates "follow length and elevation"; it is a size on the drawing, not a font
@@ -1854,7 +1854,32 @@ var EngCalcs = EngCalcs || {};
 			// LAST ENTRY. `mapHeight` used to follow this one and was removed 2026-08-14 -- see
 			// LPN_MAP_MIN for why. Same shape as `fileAutosaveSeconds` below: a saved document may
 			// still carry it, and applySaved() merges onto these defaults, so it rides along unread.
-			legendPosition: 'top-right' // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
+			legendPosition: 'top-right', // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
+			// ---- colour by value (Task 384) ----
+			// FLAT KEYS, not one nested `colors` object, and that is load-bearing: applySaved()
+			// merges a saved settings object onto these defaults with a TOP-LEVEL Object.assign and
+			// hand-lists the three nested objects it merges a level deeper. A fourth nested object
+			// would come back from an older save missing every key added after it was written. Flat
+			// keys pick up new defaults for free.
+			// OFF by default. The base drawing is black linework on purpose (css/engcalcs.css), and
+			// colouring is a mode the user enters, never the state they are handed -- Task 327's
+			// whole argument against EPANET is that it has only the coloured mode.
+			colorNodeField: '',   // '' = none, else a key of COLOR_NODE_FIELDS
+			colorLinkField: '',   // '' = none, else a key of COLOR_LINK_FIELDS
+			colorRamp: 'epanet',  // a key of COLOR_RAMPS
+			colorReverse: false,
+			// Task 327's thematic map: colour is the whole message, so the labels come off. One CSS
+			// class; it never touches labelSettings -- see applyThematicMode().
+			colorThematic: false,
+			// The colour key's own corner, separate from the labels legend's so the two do not
+			// stack on top of each other. Opposite default corner for the same reason.
+			colorLegendPosition: 'bottom-right',
+			// PINNED break values, keyed 'node.pressure' / 'link.velocity', each an array of up to
+			// four numbers IN THE DISPLAY UNIT. Empty/absent means automatic (equal intervals over
+			// whatever is on the map now) -- see effectiveBreaks(). A whole saved object replacing
+			// this one is correct: these are the user's numbers and a missing field simply reads as
+			// automatic, so it needs no per-key merge.
+			colorBreaks: {}
 			// `fileAutosaveSeconds` was removed by Task 211 along with autosave-to-file itself. A saved
 			// document may still carry one; applySaved() merges the save ONTO these defaults, so a
 			// stale key is simply carried along and never read, and needs no migration step.
@@ -2248,6 +2273,296 @@ var EngCalcs = EngCalcs || {};
 			updateArrow(l.id);
 			resizePumpSymbol(l.id);
 		});
+		refreshValueColors();
+	}
+
+	// ---- COLOUR BY VALUE (ROADMAP Task 384, and Task 327's thematic mode) -------------------
+	//
+	// **This is preparation for extended-period simulation (Task 248), not decoration.** Tom,
+	// 2026-08-15: *"numbers in animations or at very large scale are too overwhelming or crowded.
+	// Colors become a gradient map that is intuitive to analyze or review visually."* A number per
+	// element per timestep cannot be read as numbers; a colour can.
+	//
+	// **The base drawing spends no colour at all** (see css/engcalcs.css: every symbol went black
+	// on 2026-08-14 precisely so this could be built). So everything painted here MEANS something,
+	// and turning it off returns the map to a drawing.
+	//
+	// WHAT WAS COPIED FROM EPANET, and why copying beat inventing: EPANET 2.2 is US EPA work in the
+	// public domain, and a water engineer already knows its legend. Taken outright ---
+	//   * FOUR break boxes, five colour bands, values ascending, blanks allowed. Fewer values
+	//     simply means fewer bands; it is not an error state.
+	//   * The break values are STORED PER VARIABLE AND ARE ABSOLUTE -- a fixed number of psi, not a
+	//     percentile of whatever the current timestep happens to hold. That is what makes two
+	//     timesteps (and two networks) comparable by eye, which is the entire point under Task 248.
+	//   * "Equal intervals" and "Equal counts" are ONE-SHOT BUTTONS that read the values on screen
+	//     now and WRITE fixed numbers into those boxes. They are how the absolute numbers get
+	//     chosen; they are not a live mode.
+	//   * The default ramp is EPANET's own blue-cyan-green-yellow-red, and it is reversible.
+	// Our one addition to that dialog: leaving every box blank means AUTOMATIC -- equal intervals
+	// over the values presently on the map, recomputed each solve. EPANET has no such state, and it
+	// exists here because a break value is in the DISPLAY unit, so no shipped default could be
+	// right under both presets (25 psi and 25 m are not the same setting). Pressing either button
+	// converts automatic into pinned absolute numbers, which is the state to be in before Task 248.
+	//
+	// epanetjs was read and NOT copied: it is FSL-1.1-MIT (MIT only for the pre-fork Placemark
+	// code), whose field-of-use restriction is incompatible with this suite's GPL v3. The idea is
+	// free; its code is not usable here.
+	//
+	// COLOURING IS READ-ONLY with respect to the document. Nothing below writes an element
+	// property, so setProp() is not involved -- the values come from `lastSolveResult` and from
+	// effective(), and the only writes are to settings and to inline SVG style.
+	//
+	// Values are compared in DISPLAY units against break values the user typed, which is the same
+	// rule as everywhere else on this page: a stored number is what the user typed, and switching
+	// units REINTERPRETS it rather than converting it (see toSI()'s comment). So a break of 40 is
+	// 40 psi under the US preset and 40 m under SI, exactly like every other typed number here.
+	var COLOR_RAMPS = {
+		// EPANET's own five map colours, in its own order. Not softened: matching what the user
+		// already reads in EPANET is worth more here than a prettier ramp.
+		epanet: ['#0000ff', '#00ffff', '#00ff00', '#ffff00', '#ff0000'],
+		// Perceptually uniform and safe for the ~8% of men with red-green colour blindness, for
+		// whom the EPANET ramp's green/yellow/red end is three shades of one colour. Same reasoning
+		// the reservoir/junction symbols were separated by SHAPE under.
+		viridis: ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'],
+		// For a printed sheet and for photocopies. Light-to-dark reads as low-to-high with no key.
+		gray: ['#dddddd', '#aaaaaa', '#777777', '#444444', '#000000']
+	};
+	var COLOR_BANDS = 5;   // EPANET's five bands -- four break boxes
+	// Which fields can be coloured, and the unit each is read in. Node and link lists deliberately
+	// match EPANET's own View menu (elevation/demand/head/pressure; diameter/roughness/flow/
+	// velocity/head loss) so nobody has to learn a second vocabulary. The display NAME of each is
+	// taken from nodeFieldDefs()/linkFieldDefs(), the same strings the Labels popover and the map
+	// legend already use, so a colour key and a label key can never disagree about what a field is
+	// called.
+	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure' };
+	var COLOR_LINK_FIELDS = { diameter: 'lpn_u_diameter', roughness: '', flow: 'lpn_u_flow', velocity: 'lpn_u_velocity', headloss: 'lpn_u_elevhead', gradient: 'lpn_u_gradient' };
+	// The value a node/link is coloured by, IN THE DISPLAYED UNIT -- the same expressions
+	// refreshLabelText() prints, so the colour and the printed number can never describe different
+	// quantities. undefined means "this element has no such value" (no solve yet, or the field does
+	// not exist on this element type), and an undefined value is left BLACK rather than given the
+	// bottom colour: a pump has no velocity, and painting it dark blue would assert that it has a
+	// low one.
+	function colorNodeValue(n, field) {
+		if (field === 'elev') { return typeof n.elev === 'number' ? n.elev : undefined; }
+		if (field === 'demand') { return isFixedHeadNode(n) ? undefined : effective(n, 'demand'); }
+		if (field === 'head') {
+			if (isFixedHeadNode(n)) { return nodeFixedHead(n); }
+			return lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], 'lpn_u_elevhead') : undefined;
+		}
+		if (field === 'pressure') {
+			if (isFixedHeadNode(n)) { return toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure'); }
+			return lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], 'lpn_u_pressure') : undefined;
+		}
+		return undefined;
+	}
+	function colorLinkValue(l, field) {
+		if (field === 'diameter') { return l.type === 'pump' ? undefined : effective(l, 'diameter'); }
+		if (field === 'roughness') { return l.type === 'pipe' ? effective(l, 'roughness') : undefined; }
+		if (!lastSolveResult || lastSolveResult.flows[l.id] === undefined) { return undefined; }
+		if (field === 'flow') { return toDisplay(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow'); }
+		if (field === 'velocity') { return l.type === 'pump' ? undefined : toDisplay(lastSolveResult.velocities[l.id], 'lpn_u_velocity'); }
+		if (field === 'headloss') { return toDisplay(shownHeadloss(l, lastSolveResult.headlosses[l.id]), 'lpn_u_elevhead'); }
+		if (field === 'gradient') {
+			var len = linkLengthSI(l);
+			if (l.type === 'pump' || !len) { return undefined; }
+			return toDisplay(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / len, 'lpn_u_gradient');
+		}
+		return undefined;
+	}
+	function colorFieldOf(group) { return group === 'node' ? settings.colorNodeField : settings.colorLinkField; }
+	function colorValueOf(group, elem, field) {
+		return group === 'node' ? colorNodeValue(elem, field) : colorLinkValue(elem, field);
+	}
+	// Every value presently on the map for one field, finite only -- the input to both auto-break
+	// rules and to the buttons that pin them.
+	function colorValues(group, field) {
+		var src = group === 'node' ? doc.nodes : doc.links, out = [];
+		src.forEach(function (e) {
+			var v = colorValueOf(group, e, field);
+			if (typeof v === 'number' && isFinite(v)) { out.push(v); }
+		});
+		return out;
+	}
+	// Equal intervals over the observed range: COLOR_BANDS equal-width bands, so COLOR_BANDS-1
+	// breaks. EPANET's own "Equal Intervals" button, and also what an empty break list falls back
+	// to.
+	function equalIntervalBreaks(values) {
+		if (values.length < 2) { return []; }
+		var min = Math.min.apply(null, values), max = Math.max.apply(null, values), out = [], i;
+		if (!isFinite(min) || !isFinite(max) || max === min) { return []; }
+		for (i = 1; i < COLOR_BANDS; i++) { out.push(min + (max - min) * i / COLOR_BANDS); }
+		return out;
+	}
+	// Equal counts (EPANET's "Equal Quantiles"): roughly the same number of elements per band,
+	// which is what makes a skewed field -- a few long mains among many short services -- use its
+	// whole ramp instead of one colour plus four empty bands.
+	function equalCountBreaks(values) {
+		if (values.length < 2) { return []; }
+		var s = values.slice().sort(function (a, b) { return a - b; }), out = [], i, idx;
+		for (i = 1; i < COLOR_BANDS; i++) {
+			idx = Math.min(s.length - 1, Math.max(0, Math.round(i * s.length / COLOR_BANDS)));
+			out.push(s[idx]);
+		}
+		return out;
+	}
+	function colorBreakKey(group, field) { return group + '.' + field; }
+	// The break values the user PINNED, cleaned: numeric, ascending, at most COLOR_BANDS-1 of them.
+	// An empty result means automatic.
+	function pinnedBreaks(group, field) {
+		var stored = (settings.colorBreaks || {})[colorBreakKey(group, field)] || [];
+		var out = [];
+		stored.forEach(function (v) {
+			var x = (v === '' || v === null || v === undefined) ? NaN : +v;
+			if (isFinite(x)) { out.push(x); }
+		});
+		return out.sort(function (a, b) { return a - b; }).slice(0, COLOR_BANDS - 1);
+	}
+	function effectiveBreaks(group, field) {
+		var pinned = pinnedBreaks(group, field);
+		if (pinned.length) { return pinned; }
+		return equalIntervalBreaks(colorValues(group, field));
+	}
+	// Band index -> colour. With `n` bands the ramp's five stops are sampled evenly, so three bands
+	// take the ends and the middle rather than the first three stops -- otherwise dropping a break
+	// would silently drop the top of the ramp and a high value would stop reading as high.
+	function bandColor(bandIdx, bandCount) {
+		var cols = COLOR_RAMPS[settings.colorRamp] || COLOR_RAMPS.epanet;
+		if (settings.colorReverse) { cols = cols.slice().reverse(); }
+		if (bandCount <= 1) { return cols[cols.length - 1]; }
+		return cols[Math.round(bandIdx * (cols.length - 1) / (bandCount - 1))];
+	}
+	function colorForValue(v, breaks) {
+		if (typeof v !== 'number' || !isFinite(v)) { return ''; }
+		var i = 0;
+		while (i < breaks.length && v >= breaks[i]) { i++; }
+		return bandColor(i, breaks.length + 1);
+	}
+	// Paints one node. The junction DOT takes the colour as a fill; a reservoir or tank has no
+	// visible circle (css: fill:none -- the circle is the invisible hit target), so its overlay
+	// icon takes the colour through currentColor instead, which is the same channel its black is
+	// set through. Inline style, so clearing it restores the stylesheet's black exactly.
+	function paintNodeColor(id) {
+		var ne = nodeEls[id], n = nodeById(id);
+		if (!ne || !n) { return; }
+		var field = colorFieldOf('node');
+		var col = field ? colorForValue(colorNodeValue(n, field), effectiveBreaks('node', field)) : '';
+		if (isFixedHeadNode(n)) {
+			if (ne.symbol) { ne.symbol.style.color = col; }
+		} else {
+			ne.circle.style.fill = col;
+		}
+	}
+	function paintLinkColor(id) {
+		var le = linkEls[id], l = linkById(id);
+		if (!le || !l) { return; }
+		var field = colorFieldOf('link');
+		var col = field ? colorForValue(colorLinkValue(l, field), effectiveBreaks('link', field)) : '';
+		le.line.style.stroke = col;
+		// A pump's or valve's icon goes with its own line -- the two are one mark (css: the symbol
+		// and the polyline are both black by the same argument).
+		if (le.symbolSvg) { le.symbolSvg.style.color = col; }
+	}
+	// The one entry point. Cheap enough to call on every solve: it is two passes over the document
+	// setting one inline style each, no measurement and no layout.
+	function refreshValueColors() {
+		if (!svg) { return; }
+		applyThematicMode();
+		doc.nodes.forEach(function (n) { paintNodeColor(n.id); });
+		doc.links.forEach(function (l) { paintLinkColor(l.id); });
+		renderColorLegend();
+	}
+	// TASK 327: the THEMATIC map is a MODE, not a default. Two honest products -- a DRAWING (dark
+	// linework and labels, what you plot) and a THEMATIC MAP (colour by one field, no labels, what
+	// you read at a glance across 97 nodes). EPANET's mistake was having only the second and making
+	// the first hard; ours must not be the mirror of it.
+	//
+	// Implemented as ONE CLASS on the <svg> and a CSS rule, deliberately: label visibility has its
+	// own settings, its own collision solver and its own popover, and a mode that reached in and
+	// switched those off would be indistinguishable afterwards from the user having switched them
+	// off. Turning the mode off restores exactly the labels that were there.
+	function applyThematicMode() {
+		if (!svg || !svg.classList) { return; }
+		if (settings.colorThematic) { svg.classList.add('lpn-thematic'); }
+		else { svg.classList.remove('lpn-thematic'); }
+	}
+	// The colour key. Its own overlay div, created here rather than in Looped-Network.php, and its
+	// own corner setting: the labels legend rebuilds itself with innerHTML='' and would wipe any
+	// child of it, and stacking two legends in one corner puts each in the other's way.
+	// Held in a variable rather than re-found by id on every paint: this runs once per solve, and a
+	// handle is also what keeps the element the SAME element across rebuilds.
+	var colorLegendBox = null;
+	function colorLegendEl() {
+		if (colorLegendBox) { return colorLegendBox; }
+		var host = document.getElementById('lpn_labels_legend');
+		if (!host || !host.parentNode) { return null; }
+		colorLegendBox = document.createElement('div');
+		colorLegendBox.id = 'lpn_color_legend';
+		colorLegendBox.className = 'lpn-color-legend';
+		host.parentNode.appendChild(colorLegendBox);
+		return colorLegendBox;
+	}
+	// Field name for the legend heading, read out of the SAME defs the Labels popover uses.
+	function colorFieldLabel(group, field) {
+		var pc = EngCalcs.pageConfig || {}, defs = group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc), i;
+		for (i = 0; i < defs.length; i++) { if (defs[i][0] === field) { return defs[i][1]; } }
+		return field;
+	}
+	// 3 significant figures, then trailing zeros stripped. A break the user typed prints back as
+	// they typed it; an automatic one prints short enough to read in a corner overlay.
+	function colorNum(v) {
+		if (typeof v !== 'number' || !isFinite(v)) { return ''; }
+		var s = Math.abs(v) >= 1000 ? String(Math.round(v)) : String(+v.toPrecision(3));
+		return s;
+	}
+	function renderColorLegend() {
+		var box = colorLegendEl(); if (!box) { return; }
+		var pc = EngCalcs.pageConfig || {}, any = false;
+		box.innerHTML = '';
+		['node', 'link'].forEach(function (group) {
+			var field = colorFieldOf(group); if (!field) { return; }
+			var breaks = effectiveBreaks(group, field);
+			if (!breaks.length && colorValues(group, field).length === 0) { return; }
+			any = true;
+			var unitId = (group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS)[field];
+			var unit = unitId ? unitLabel(unitId) : (field === 'gradient' ? gradientSuffix() : '');
+			var h = document.createElement('div');
+			h.style.fontWeight = 'bold';
+			h.textContent = colorFieldLabel(group, field) + (unit ? ' (' + unit + ')' : '');
+			box.appendChild(h);
+			// TOP BAND FIRST. A legend reads high-at-the-top the way a thermometer does, and the
+			// map's own high values are the ones a reviewer is scanning for.
+			var i;
+			for (i = breaks.length; i >= 0; i--) {
+				var row = document.createElement('div'), sw = document.createElement('span'),
+					txt = document.createElement('span');
+				row.style.cssText = 'display:flex;gap:0.5em;align-items:center';
+				sw.className = 'lpn-color-swatch';
+				sw.style.background = bandColor(i, breaks.length + 1);
+				// Range text is built from glyphs, not words: '<', '≤' and an en dash are the
+				// same marks in all 27 languages and need no key. (An RTL reader gets them mirrored
+				// by the bidi algorithm, which is the correct rendering.)
+				if (i === 0) { txt.textContent = '< ' + colorNum(breaks[0]); }
+				else if (i === breaks.length) { txt.textContent = '≥ ' + colorNum(breaks[breaks.length - 1]); }
+				else { txt.textContent = colorNum(breaks[i - 1]) + ' – ' + colorNum(breaks[i]); }
+				row.appendChild(sw); row.appendChild(txt);
+				box.appendChild(row);
+			}
+			if (!pinnedBreaks(group, field).length) {
+				var note = document.createElement('div');
+				note.style.cssText = 'font-size:0.85em;opacity:0.75';
+				note.textContent = pc.lpn_settings_color_auto || 'Automatic';
+				box.appendChild(note);
+			}
+		});
+		box.style.display = any ? '' : 'none';
+		applyColorLegendPosition();
+	}
+	function applyColorLegendPosition() {
+		var box = colorLegendBox; if (!box) { return; }
+		var pos = LEGEND_POSITIONS[settings.colorLegendPosition] || LEGEND_POSITIONS['bottom-right'];
+		box.style.top = pos.top; box.style.bottom = pos.bottom;
+		box.style.left = pos.left; box.style.right = pos.right;
+		box.style.transform = pos.transform;
 	}
 	function buildNodeEls(n) {
 		var circle = el('circle', {
@@ -2320,6 +2635,7 @@ var EngCalcs = EngCalcs || {};
 		labelsByAnchor[n.id] = [];
 		positionNodeSymbol(n.id);
 		layoutNodeLabel(n.id);
+		paintNodeColor(n.id);   // a rebuilt element starts black; give it its colour immediately
 	}
 	function buildLinkEls(l) {
 		// AUDIT HALO (ROADMAP Task 184) -- a wider line UNDER the pipe, so what the user sees is an
@@ -2409,6 +2725,7 @@ var EngCalcs = EngCalcs || {};
 		};
 		if (symbolG) { resizePumpSymbol(l.id); positionPumpSymbol(l.id); }
 		layoutLinkLabel(l.id);
+		paintLinkColor(l.id);   // a rebuilt element starts black; give it its colour immediately
 	}
 	// Icon box size for a pump's map symbol, in world units -- same "relative to text" scaling as
 	// every other symbol (symbolFactor()). Confirmed right-sized as shipped (Tom, 2026-08-09: "the
@@ -10705,6 +11022,149 @@ var EngCalcs = EngCalcs || {};
 		// often" justification for keeping it loose did not survive contact with the section it
 		// obviously belongs to.
 		row(mapBody, pc.lpn_settings_legend_position || 'Legend position', legendSelect);
+		// ---- 4. Colour by value (Task 384) ----
+		// A SECTION OF THE SETTINGS PANEL, not a popup of its own. EPANET reaches its legend editor
+		// by right-clicking the legend, which is a gesture nothing else on this page uses and which
+		// has no keyboard equivalent; the settings panel is where every other map-appearance choice
+		// already lives, so this is one place to look instead of two.
+		var colBody = section('colors', pc.lpn_settings_colors || 'Color by value');
+		// Rebuilt in place after a break-value button writes numbers, so the boxes show what was
+		// just computed. Declared before the selects because their handlers call it.
+		function refreshColorSection() { rebuildSettingsFields(); }
+		function fieldSelect(group, defsMap) {
+			var sel = document.createElement('select'), cur = colorFieldOf(group);
+			var noneOpt = document.createElement('option');
+			noneOpt.value = ''; noneOpt.textContent = pc.lpn_color_none || 'No color';
+			if (!cur) { noneOpt.selected = true; }
+			sel.appendChild(noneOpt);
+			Object.keys(defsMap).forEach(function (key) {
+				var opt = document.createElement('option');
+				opt.value = key; opt.textContent = colorFieldLabel(group, key);
+				if (key === cur) { opt.selected = true; }
+				sel.appendChild(opt);
+			});
+			sel.addEventListener('change', function () {
+				if (group === 'node') { settings.colorNodeField = sel.value; }
+				else { settings.colorLinkField = sel.value; }
+				refreshValueColors(); saveToStorage(); refreshColorSection();
+			});
+			return sel;
+		}
+		row(colBody, pc.lpn_settings_color_node_field || 'Color nodes by', fieldSelect('node', COLOR_NODE_FIELDS));
+		row(colBody, pc.lpn_settings_color_link_field || 'Color pipes by', fieldSelect('link', COLOR_LINK_FIELDS));
+		var rampSelect = document.createElement('select');
+		[
+			['epanet', pc.lpn_color_ramp_epanet || 'Blue to red (EPANET)'],
+			['viridis', pc.lpn_color_ramp_viridis || 'Purple to yellow (easier to tell apart)'],
+			['gray', pc.lpn_color_ramp_gray || 'Light to dark gray']
+		].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			if (o[0] === settings.colorRamp) { opt.selected = true; }
+			rampSelect.appendChild(opt);
+		});
+		rampSelect.addEventListener('change', function () {
+			settings.colorRamp = rampSelect.value; refreshValueColors(); saveToStorage();
+		});
+		row(colBody, pc.lpn_settings_color_ramp || 'Color ramp', rampSelect);
+		var revInput = document.createElement('input');
+		revInput.type = 'checkbox'; revInput.checked = !!settings.colorReverse;
+		revInput.addEventListener('change', function () {
+			settings.colorReverse = revInput.checked; refreshValueColors(); saveToStorage();
+		});
+		row(colBody, pc.lpn_settings_color_reverse || 'Reverse the colors', revInput);
+		var themInput = document.createElement('input');
+		themInput.type = 'checkbox'; themInput.checked = !!settings.colorThematic;
+		themInput.addEventListener('change', function () {
+			settings.colorThematic = themInput.checked; refreshValueColors(); saveToStorage();
+		});
+		row(colBody, pc.lpn_settings_color_thematic || 'Thematic map: colors only, no labels', themInput,
+			pc.lpn_settings_color_thematic_tip);
+		var colLegendSelect = document.createElement('select');
+		[
+			['top-left', pc.lpn_settings_legend_top_left || 'Top left'],
+			['top-right', pc.lpn_settings_legend_top_right || 'Top right'],
+			['middle-left', pc.lpn_settings_legend_middle_left || 'Middle left'],
+			['middle-right', pc.lpn_settings_legend_middle_right || 'Middle right'],
+			['bottom-left', pc.lpn_settings_legend_bottom_left || 'Bottom left'],
+			['bottom-right', pc.lpn_settings_legend_bottom_right || 'Bottom right']
+		].forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			if (o[0] === settings.colorLegendPosition) { opt.selected = true; }
+			colLegendSelect.appendChild(opt);
+		});
+		colLegendSelect.addEventListener('change', function () {
+			settings.colorLegendPosition = colLegendSelect.value;
+			applyColorLegendPosition(); saveToStorage();
+		});
+		row(colBody, pc.lpn_settings_color_key_position || 'Color key position', colLegendSelect);
+		// THE BREAK EDITOR, one per coloured group -- EPANET's own dialog: four boxes, ascending,
+		// blanks allowed. A group with no field selected gets no boxes rather than four dead ones.
+		['node', 'link'].forEach(function (group) {
+			var field = colorFieldOf(group); if (!field) { return; }
+			var head = document.createElement('div');
+			head.style.cssText = 'margin-top:6px;font-weight:bold';
+			head.textContent = (pc.lpn_settings_color_breaks || 'Break values') + ': ' + colorFieldLabel(group, field);
+			colBody.appendChild(head);
+			note(colBody, pc.lpn_settings_color_breaks_note ||
+				'Leave these blank and the colors spread over whatever is on the map now. Type numbers, or press a button below, and the same number always means the same color.');
+			var pinned = pinnedBreaks(group, field), wrap = document.createElement('div'), i;
+			wrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap';
+			var boxes = [];
+			function writeBreaks() {
+				var vals = boxes.map(function (b) { return b.value; })
+					.filter(function (v) { return v !== '' && isFinite(+v); }).map(Number);
+				vals.sort(function (a, b) { return a - b; });
+				settings.colorBreaks = settings.colorBreaks || {};
+				settings.colorBreaks[colorBreakKey(group, field)] = vals;
+				refreshValueColors(); saveToStorage();
+			}
+			for (i = 0; i < COLOR_BANDS - 1; i++) {
+				var box = document.createElement('input');
+				box.type = 'number'; box.step = 'any';
+				box.style.width = '5em';
+				box.value = (pinned[i] === undefined) ? '' : pinned[i];
+				box.setAttribute('aria-label', (pc.lpn_settings_color_breaks || 'Break values') + ' ' + (i + 1));
+				box.addEventListener('change', writeBreaks);
+				boxes.push(box);
+				wrap.appendChild(box);
+			}
+			colBody.appendChild(wrap);
+			// EPANET's two auto-assign buttons, and they behave exactly as EPANET's do: they READ
+			// the values on the map right now and WRITE fixed numbers into the boxes above. They
+			// are not a live mode -- which is the whole point, because a break value that moved
+			// with the timestep would make two timesteps incomparable by eye.
+			var btnWrap = document.createElement('div');
+			btnWrap.style.marginTop = '4px';
+			function autoBtn(text, fn) {
+				var b = document.createElement('button');
+				b.type = 'button'; b.textContent = text; b.style.marginRight = '4px';
+				b.addEventListener('click', function () {
+					var vals = colorValues(group, field), out = fn(vals);
+					if (!out.length) {
+						alert(pc.lpn_settings_color_no_values || 'There are no values to work from yet. Solve the network first.');
+						return;
+					}
+					settings.colorBreaks = settings.colorBreaks || {};
+					settings.colorBreaks[colorBreakKey(group, field)] = out.map(function (v) { return +v.toPrecision(3); });
+					refreshValueColors(); saveToStorage(); refreshColorSection();
+				});
+				return b;
+			}
+			btnWrap.appendChild(autoBtn(pc.lpn_settings_color_equal_intervals || 'Equal intervals', equalIntervalBreaks));
+			btnWrap.appendChild(autoBtn(pc.lpn_settings_color_equal_counts || 'Equal counts', equalCountBreaks));
+			var clearBtn = document.createElement('button');
+			clearBtn.type = 'button';
+			clearBtn.textContent = pc.lpn_settings_color_auto || 'Automatic';
+			clearBtn.addEventListener('click', function () {
+				settings.colorBreaks = settings.colorBreaks || {};
+				delete settings.colorBreaks[colorBreakKey(group, field)];
+				refreshValueColors(); saveToStorage(); refreshColorSection();
+			});
+			btnWrap.appendChild(clearBtn);
+			colBody.appendChild(btnWrap);
+		});
 		// The "Saving to a file" section is GONE (Task 211). It held exactly one control -- how often
 		// the open project was written back to its file -- and nothing is written to a file on a timer
 		// any more, so there is no interval to set. Tom asked why the 60-180 s range existed at all;
@@ -12920,6 +13380,7 @@ var EngCalcs = EngCalcs || {};
 				result.issues.forEach(function (issue) { logLpnDiag(issue.code); });
 				setStatus(result.issues.map(diagIssueText).join(' '));
 				refreshLabelText();
+				refreshValueColors();   // Task 384: the colours came from results that no longer exist
 					return;
 			}
 			// Not one of lpnDiagnose()'s pre-solve codes -- this is the solver itself giving up, and
@@ -12927,6 +13388,7 @@ var EngCalcs = EngCalcs || {};
 			logLpnDiag('not-converged');
 			setStatus(pc.lpn_diag_not_converged || 'Did not converge.');
 			refreshLabelText();
+			refreshValueColors();
 			return;
 		}
 		lastSolveResult = result;
@@ -12936,6 +13398,7 @@ var EngCalcs = EngCalcs || {};
 		setStatus([valveRouteNote, manningNote ? (pc.lpn_engine_manning_note || '') : '']
 			.filter(function (t) { return !!t; }).join(' '));
 		refreshLabelText();
+		refreshValueColors();
 	}
 
 	// EPANET path. Async, so it needs a guard the synchronous path never did: this page solves

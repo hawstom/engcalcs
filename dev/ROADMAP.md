@@ -82,17 +82,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
     rewrites every SHA, forces a push, breaks production's `git pull`, dangles 43 SHA citations in
     `dev/*.md`, and saves no context — nothing ever loads a commit message.
 
-- 88|384| **Colour coding, with a colour-ramp picker — the preparation Task 248 (extended-period
-  simulation) actually needs.** Tom, 2026-08-15: *"I think that a major preparation for modeling
-  across time is adding color coding, which requires a color ramp picker UX. EPANET and HEC-RAS, both
-  public domain software both have solid color picker systems. I would think that you could borrow
-  something. epanetjs also has something, and maybe you can investigate whether it's libre."*
-  - **It is preparation, not decoration:** numbers in animations or at very large scale are too overwhelming or crowded. Colors become a gradient map that is intuitive to analyze or review visually. Colour is implemented by  every one of these programs. Color is a cheap alternative (depending on use case) to Tasks 379, 377 and 343.
-  - **Sources in order.** EPANET 2.2 is US EPA work in the **public domain**, so its ramp defaults and
-    interval-editing dialog can be copied outright, and matching what a water engineer already knows
-    is worth more here than a nicer design. HEC-RAS is USACE, also public domain. **Read epanetjs's
-    LICENSE before taking anything** — if it is copyleft, take the idea and not the code.
-  - The UX is the interesting part: the colouring, which variables, how many intervals, the break values, and whether the ramp is absolute or relative to the current timestep. EPANET's answer to the last is an absolute per-variable setting and is worth reading before we invent ours.
 - 95|379| **Replace the label relaxation with candidate-position scoring, which is the part that
   can see open space.** Tom, 2026-08-15: *"There is lots of free space that is being 'wasted' while
   bad conflicts persist. The relaxation needs to understand the concept of most-open space and
@@ -326,21 +315,11 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
     never syntax-checked. Given Task 318 lives entirely in `sw.js`, that is a gap worth one
     character of glob. **DONE 2026-08-14** — glob widened; the rest of this task stands.
 
-- 55|327| **A THEMATIC view: colour the network BY VALUE, as an explicit mode.** Tom, 2026-08-14, on
-  EPANET: *"it's practically an act of Congress to get a pipe to show as black while showing values
-  from the model on the map… this makes some sense if you consider a huge model zoomed far out where
-  you just want to see a bunch of colours indicating high and low values… in their paradigm, the map
-  seems to be a high level gradient view of the system."*
-  - **We do not have EPANET's problem, and that is the point.** Our pipes are already dark (`#557`),
-    and `lpnFieldColors` encodes **WHICH QUANTITY a number is**, not how much — a different axis
-    entirely. So the fix EPANET users want is our default, and what we lack is the thing their
-    default is good at.
-  - **So build the gradient view as a MODE, not as a default.** Two honest products: a DRAWING (dark
-    linework, labels, what you plot) and a THEMATIC MAP (colour ramp by a chosen field, no labels,
-    what you read at a glance across 97 nodes). EPANET's mistake is not having colour — it is having
-    only one mode and making the other one hard.
-  - Toggling it should be one control naming the field, not a colour picker. Pressure and velocity
-    are the two that matter; a ramp needs a legend, which the Labels panel already has a home for.
+- 55|327| **Give the THEMATIC view a one-click control.** The mode itself shipped with Task 384:
+  `settings.colorThematic` colours the network by a chosen field and drops every label, as the
+  `.lpn-thematic` class on the `<svg>`. What is left is the ergonomics Tom actually named.
+  - Today it is three rows inside Settings > Color by value. It should be **one control naming the
+    field**, reachable without opening a panel — pressure and velocity are the two that matter.
   - Connects to Task 253 (clean map for screenshots) — a thematic view with no labels IS the clean
     map, arrived at from the other side.
 

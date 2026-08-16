@@ -11,6 +11,7 @@ The full text of every closed task is in git and nowhere else, by Tom's ruling o
 Durable policy from these tasks lives in `CLAUDE.md` and in `dev/*.md`. Those are the current
 state; this is only a list of numbers that were once used.
 
+- 0|384| Colour by value: EPANET's four-break/five-band legend, per-variable absolute breaks, Equal intervals/Equal counts, three ramps, a thematic mode. epanetjs is FSL-1.1-MIT, so the idea only
 - 0|337| Text label Bold and Rotation, with Match-pipe and Flip buttons. Rotation is a stored number, not a link to the pipe (Tom's call)
 - 0|346| REJECTED, twice — no extrema tie rule. A mark that vanishes once enough elements share it confuses users more than a shared mark. Do not re-propose.
 - 0|372| One shared popover placer: flips below/above, caps body height instead of clamping around, menubar clicks now dismiss
