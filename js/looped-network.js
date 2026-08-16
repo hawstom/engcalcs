@@ -5366,6 +5366,39 @@ var EngCalcs = EngCalcs || {};
 	 * (see LPN_INP_FLOW_SAME). There the units really do differ, so arithmetic is the honest
 	 * answer rather than a rounding error.
 	 */
+	// THE FILE'S OWN TEXT, carried onto the document beside the number it states (Task 390 step 3).
+	// js/lpn-inp.js keeps a `tok` bag on every record it parses, keyed by the PARSER's field names;
+	// the document spells several of those differently (a demand is `_demand`, a tank's vessel is
+	// `tankDiameter`), so this is the one place the two vocabularies meet.
+	//
+	// THE SINGLE TEST IS `parseFloat(text) === storedValue`. A field that was converted on the way
+	// in -- a flow in a keyword this page has no selector for, an emitter coefficient -- fails it
+	// and arrives with no token at all, so nothing downstream has to know which fields converted.
+	// Tokens for values NOT in `map` are simply not carried; a token is never invented.
+	function carryInpTokens(src, dst, map) {
+		var t = src && src.tok, out = null, k, dk;
+		if (!t) { return dst; }
+		for (k in t) {
+			if (!Object.prototype.hasOwnProperty.call(t, k)) { continue; }
+			dk = map[k];
+			if (!dk || parseFloat(t[k]) !== dst[dk]) { continue; }
+			(out || (out = {}))[dk] = t[k];
+		}
+		if (out) { dst.tok = out; }
+		return dst;
+	}
+	var LPN_INP_TOK_JUNCTION = { elev: 'elev', demand: '_demand', x: 'x', y: 'y' },
+		LPN_INP_TOK_RESERVOIR = { elev: 'elev', x: 'x', y: 'y' },
+		LPN_INP_TOK_TANK = {
+			elev: 'elev', level: '_level', minLevel: 'minLevel', maxLevel: 'maxLevel',
+			diameter: 'tankDiameter', x: 'x', y: 'y'
+		},
+		LPN_INP_TOK_LINK = {
+			length: '_length', diameter: '_diameter', roughness: '_roughness', k: '_k',
+			setting: '_setting'
+		},
+		LPN_INP_TOK_POINT = { x: 'x', y: 'y' };
+
 	function docFromInp(parsed, name) {
 		// A flow from the file, in the unit the flow selector is now showing. `parsed.scale.flow`
 		// is m3/s per one of the file's units, so the SI step is the parser's own constant and
@@ -5381,7 +5414,7 @@ var EngCalcs = EngCalcs || {};
 				// ground", and elevation already carries EPANET's total head. Writing the same
 				// number into both would look identical and silently sever the link the page keeps
 				// between them (see reservoirHead()).
-				return { id: n.id, type: 'reservoir', x: n.x, y: n.y, elev: n.elev };
+				return carryInpTokens(n, { id: n.id, type: 'reservoir', x: n.x, y: n.y, elev: n.elev }, LPN_INP_TOK_RESERVOIR);
 			}
 			if (n.type === 'tank') {
 				// A tank's four levels and its diameter are ALL in the Elevation/Head unit, because
@@ -5389,7 +5422,7 @@ var EngCalcs = EngCalcs || {};
 				// included, which is the one that surprises people (see js/lpn-epanet.js). Nothing
 				// here is blank-means-follow the way a reservoir's head is: EPANET states every one
 				// of them, so every one is written.
-				return {
+				return carryInpTokens(n, {
 					id: n.id, type: 'tank', x: n.x, y: n.y,
 					elev: n.elev,
 					// _level is scenario-overridable (leading underscore, read through effective())
@@ -5401,7 +5434,7 @@ var EngCalcs = EngCalcs || {};
 					minLevel: n.minLevel,
 					maxLevel: n.maxLevel,
 					tankDiameter: n.diameter
-				};
+				}, LPN_INP_TOK_TANK);
 			}
 			var j = {
 				id: n.id, type: 'junction', x: n.x, y: n.y,
@@ -5412,12 +5445,12 @@ var EngCalcs = EngCalcs || {};
 			// and never shown -- nothing in the UI edits an emitter yet, which is why the import
 			// report names every junction that has one.
 			if (n.emitter) { j._emitter = n.emitter; }   // base-write: import builds Base: an .inp arrives as one network with no scenarios
-			return j;
+			return carryInpTokens(n, j, LPN_INP_TOK_JUNCTION);
 		});
 		var links = parsed.links.map(function (l) {
 			var out = {
 				id: l.id, type: l.type, from: l.from, to: l.to,
-				verts: (l.verts || []).map(function (v) { return { x: v.x, y: v.y }; }),
+				verts: (l.verts || []).map(function (v) { return carryInpTokens(v, { x: v.x, y: v.y }, LPN_INP_TOK_POINT); }),
 				_diameter: l.diameter,
 				_roughness: l.roughness,
 				// LENGTH IS THE FILE'S OWN NUMBER, and lenAuto is OFF. An EPANET length is the real
@@ -5455,7 +5488,7 @@ var EngCalcs = EngCalcs || {};
 					: { h0: 0, a: 0, b: 2 };
 				out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
 			}
-			return out;
+			return carryInpTokens(l, out, LPN_INP_TOK_LINK);
 		});
 		var nodeAt = {};
 		nodes.forEach(function (n) { nodeAt[n.id] = n; });
@@ -5481,7 +5514,10 @@ var EngCalcs = EngCalcs || {};
 			// An anchored label stores an OFFSET from its node, not a position (buildLabelEls'
 			// model); EPANET stores the absolute point, so the anchor is subtracted here.
 			var an = lb.anchorNode && nodeAt[lb.anchorNode] ? nodeAt[lb.anchorNode] : null;
-			return {
+			// An ANCHORED label stores an offset, so the file's text no longer states the number
+			// this record holds and carryInpTokens refuses it without being told. A free label
+			// stores the file's own point and keeps it.
+			return carryInpTokens(lb, {
 				id: mintTextId(), text: lb.text,
 				x: an ? lb.x - an.x : lb.x,
 				y: an ? lb.y - an.y : lb.y,
@@ -5491,7 +5527,7 @@ var EngCalcs = EngCalcs || {};
 				// the coordinate above is stored exactly as the file wrote it (Task 332). Not an
 				// "imported" flag: it is an alignment, and Task 342 makes it a user control.
 				align: 'left', valign: 'top'
-			};
+			}, LPN_INP_TOK_POINT);
 		});
 		// nextId must clear every id the file brought, or the next element drawn would collide with
 		// one. Only ids shaped like this page's own (prefix + number) can collide, so only those are

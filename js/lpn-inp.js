@@ -26,6 +26,9 @@
 // (x*f)/f is not an identity in doubles. Passing the token through untouched is the only way the
 // user's own numbers survive, and the page stores what the user typed (CLAUDE.md's unit rule).
 //
+// A number's TEXT is preserved alongside its value -- see mergeTok() and EngCalcs.lpnNumText()
+// below. `parseFloat` is exact and still loses `220.0`, `20.00` and `4530.`.
+//
 // `lengthUnit` names the length unit and the caller sets the Length/Map selector to match; the
 // other selectors follow `unitSystem` and `flowUnits`. The ONE quantity still normalised is an
 // emitter coefficient, which has no display unit on this page at all -- see the [EMITTERS] note.
@@ -99,6 +102,57 @@
 		var v = parseFloat(tok);
 		return isFinite(v) ? v : (fallback === undefined ? 0 : fallback);
 	}
+
+	// ---- THE TOKEN, KEPT BESIDE THE NUMBER (ROADMAP Task 390 step 3) ----------------------------
+	//
+	// A number's VALUE and its TEXT are two different facts about the file, and both of them are the
+	// user's. `parseFloat('710.0')` can only ever come back as `710`; across EPA's own Net1/Net2/Net3
+	// 243 of 2,608 numeric tokens (9.3%) are written in a form `String(parseFloat(t))` does not
+	// reproduce -- `220.0`, `20.00`, `4530.`. Value fidelity was fixed by passing the NUMBER through
+	// untouched; this is the other half.
+	//
+	// **A TOKEN IS A STRING AND MUST NEVER REACH ARITHMETIC.** `'710' * 2` is 1420 and `'710' + 1` is
+	// `'7101'`, and only one of those looks wrong. So a token never occupies the field its number
+	// occupies: every record carries a SEPARATE `tok` object keyed by field name, nothing reads it
+	// but EngCalcs.lpnNumText() below, and that function returns a string in every branch. This is
+	// CLAUDE.md's rule -- a number the user supplied and a number we computed must never share a
+	// field -- applied one level down, to the text and the number.
+	//
+	// Three conditions, and each one deletes a class of bug rather than warning about it:
+	//   1. `String(v) !== tok` -- nothing to remember when the plain rendering already matches, so an
+	//      ordinary file carries no `tok` object at all and only the 9.3% costs anything.
+	//   2. `parseFloat(tok) === v` -- the text must still SAY this number. A value that was scaled
+	//      (a demand times a multiplier), converted, or defaulted from a missing column fails this
+	//      and keeps no token, so no later reader can be handed the text of a different number.
+	//   3. the same test AGAIN at read time (lpnNumText), so a value the user later edited drops its
+	//      stale token by itself. No edit path has to remember to clear one, which is why this needs
+	//      nothing of setProp() or of the scenario-override machinery.
+	// SETS OR REMOVES -- never only sets. A field written twice (a [DEMANDS] category over a
+	// [JUNCTIONS] demand, a [STATUS] setting over a [VALVES] one) would otherwise keep the first
+	// row's text against the second row's number, which is the exact confusion this whole task is
+	// about. Making the function an assignment rather than an accumulation means no call site has
+	// to know it is the second one.
+	function mergeTok(rec, key, tok, v) {
+		if (typeof tok === 'string' && tok !== '' && String(v) !== tok && parseFloat(tok) === v) {
+			(rec.tok || (rec.tok = {}))[key] = tok;
+		} else if (rec.tok) {
+			delete rec.tok[key];
+		}
+		return v;
+	}
+
+	/**
+	 * The exact text a value must be written back as. Task 281's (`.inp` export) one entry point,
+	 * and dev/lpn-spike/inp-token-harness.js's.
+	 *
+	 * ALWAYS RETURNS A STRING. That is the whole containment: nothing that reads this can be
+	 * mistaken for a number, and nothing that reads the number can be handed a token.
+	 */
+	EngCalcs.lpnNumText = function (rec, key, value) {
+		var t = rec && rec.tok ? rec.tok[key] : undefined;
+		if (typeof t === 'string' && parseFloat(t) === value) { return t; }
+		return String(value);
+	};
 
 	/**
 	 * Read an EPANET `.inp` into an SI model plus a report of everything it could not keep.
@@ -180,7 +234,7 @@
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			if (!r[0]) { continue; }
-			addNode({
+			var jn = addNode({
 				id: r[0], type: 'junction', x: 0, y: 0,
 				elev: num(r[1]),
 				// The multiplier is dimensionless, so applying it here keeps the number in the
@@ -188,6 +242,11 @@
 				demand: num(r[2]) * demandMultiplier,
 				emitter: 0
 			});
+			mergeTok(jn, 'elev', r[1], jn.elev);
+			// Keeps no token when the multiplier is not 1: the text says the file's number and the
+			// field now holds a scaled one, so mergeTok's own second test refuses it. Nothing here
+			// has to know that -- see its comment.
+			mergeTok(jn, 'demand', r[2], jn.demand);
 			if (r[3]) { drop('demand-pattern', [r[0]], r[3]); }
 		}
 
@@ -200,7 +259,11 @@
 			// ground" -- so an imported reservoir gets elevation = head, which is the same fixed
 			// boundary condition and reads as zero pressure at the surface. Exactly what
 			// applySaved() already does for reservoirs written before they had an elevation.
-			addNode({ id: r[0], type: 'reservoir', x: 0, y: 0, elev: num(r[1]), head: num(r[1]) });
+			var rn = addNode({ id: r[0], type: 'reservoir', x: 0, y: 0, elev: num(r[1]), head: num(r[1]) });
+			// One token for one column, under the name the DOCUMENT stores it as. `head` is the same
+			// number read a second way and gets none -- two tokens for one column of text would be
+			// two chances to disagree.
+			mergeTok(rn, 'elev', r[1], rn.elev);
 			if (r[2]) { drop('head-pattern', [r[0]], r[2]); }
 		}
 
@@ -216,7 +279,7 @@
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			if (!r[0]) { continue; }
-			addNode({
+			var tn = addNode({
 				id: r[0], type: 'tank', x: 0, y: 0,
 				elev: num(r[1]),
 				level: num(r[2]),
@@ -225,8 +288,15 @@
 				diameter: num(r[5]),
 				// The solve reads `head`, and at the instant a steady-state solve describes, the
 				// water surface is the bottom plus the initial level. See EngCalcs.lpnIsFixedHead.
+				// DERIVED, so it gets no token: it is a number we computed, and the whole point of
+				// the split is that such a number never carries the user's text.
 				head: num(r[1]) + num(r[2])
 			});
+			mergeTok(tn, 'elev', r[1], tn.elev);
+			mergeTok(tn, 'level', r[2], tn.level);
+			mergeTok(tn, 'minLevel', r[3], tn.minLevel);
+			mergeTok(tn, 'maxLevel', r[4], tn.maxLevel);
+			mergeTok(tn, 'diameter', r[5], tn.diameter);
 			// A VOLUME CURVE makes the tank non-cylindrical, and this page holds only a diameter.
 			// The level -> head relationship a steady-state solve uses is unaffected (the surface is
 			// still Elev + InitLvl), so the imported network solves identically; what is lost is how
@@ -250,8 +320,13 @@
 			r = rows[i];
 			var dn = nodeIndex[r[0]];
 			if (!dn || dn.type !== 'junction') { continue; }
-			if (!zeroed[r[0]]) { dn.demand = 0; zeroed[r[0]] = true; multiDemand.push(r[0]); }
+			if (!zeroed[r[0]]) {
+				dn.demand = 0; zeroed[r[0]] = true; multiDemand.push(r[0]);
+			}
 			dn.demand += num(r[1]) * demandMultiplier;
+			// A single category that survives the sum keeps its own text. A second one lands on a
+			// total no single token states, and mergeTok drops it.
+			mergeTok(dn, 'demand', r[1], dn.demand);
 			if (r[2]) { drop('demand-pattern', [r[0]], r[2]); }
 		}
 		if (multiDemand.length) { drop('demand-categories', multiDemand); }
@@ -298,6 +373,10 @@
 				status: st === 'CLOSED' ? 'closed' : 'open',
 				verts: []
 			};
+			mergeTok(pipe, 'length', r[3], pipe.length);
+			mergeTok(pipe, 'diameter', r[4], pipe.diameter);
+			mergeTok(pipe, 'roughness', r[5], pipe.roughness);
+			mergeTok(pipe, 'k', r[6], pipe.k);
 			links.push(pipe); linkIndex[pipe.id] = pipe;
 		}
 
@@ -309,6 +388,13 @@
 			if (!r[0]) { continue; }
 			if (!curves[r[0]]) { curves[r[0]] = []; }
 			// File flow unit and file head unit, matching every other number here.
+			//
+			// NO TOKENS ON A CURVE POINT, and that is a decision rather than an omission. A pump
+			// curve does not survive as text in either direction: a curve of more than three points
+			// is sampled at its ends and middle on the way in, and js/lpn-epanet.js's [CURVES]
+			// writer re-samples our fitted curve at [0, 0.5, 0.9] q_max on the way out. There is no
+			// point at which the file's own text still describes what we would write, so keeping it
+			// would be keeping text for a number nobody will ever emit.
 			curves[r[0]].push([num(r[1]), num(r[2])]);
 		}
 
@@ -426,6 +512,12 @@
 					k: vtype === 'TCV' ? 0 : vloss
 				});
 			}
+			// A valve's diameter falls back to a plausible main when the column is blank, and a TCV's
+			// k is forced to zero -- both are numbers WE chose, so mergeTok refuses their columns'
+			// text on its own and neither case needs a branch here.
+			mergeTok(vlink, 'diameter', r[3], vlink.diameter);
+			mergeTok(vlink, 'k', r[6], vlink.k);
+			if (vlink.type === 'valve') { mergeTok(vlink, 'setting', r[5], vlink.setting); }
 			links.push(vlink); linkIndex[vlink.id] = vlink;
 		}
 		if (tcvIds.length) { drop('valve-tcv', tcvIds); }
@@ -449,6 +541,7 @@
 				// which this page has no element for, so that case still falls through to the
 				// report below.
 				sl.setting = +r[1];
+				mergeTok(sl, 'setting', r[1], sl.setting);
 			}
 			else { drop('link-setting', [r[0]], r[1]); }
 		}
@@ -457,12 +550,25 @@
 		rows = rawSections.COORDINATES || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
-			if (nodeIndex[r[0]]) { nodeIndex[r[0]].x = num(r[1]); nodeIndex[r[0]].y = num(r[2]); }
+			var cn = nodeIndex[r[0]];
+			if (cn) {
+				cn.x = num(r[1]); cn.y = num(r[2]);
+				mergeTok(cn, 'x', r[1], cn.x);
+				mergeTok(cn, 'y', r[2], cn.y);
+			}
 		}
 		rows = rawSections.VERTICES || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
-			if (linkIndex[r[0]]) { linkIndex[r[0]].verts.push({ x: num(r[1]), y: num(r[2]) }); }
+			// A VERTEX IS ITS OWN RECORD and carries its own `tok`, rather than the link carrying
+			// one bag for all of them: the bag is keyed by field name, and a link has as many x's
+			// as it has bends.
+			if (linkIndex[r[0]]) {
+				var vt = { x: num(r[1]), y: num(r[2]) };
+				mergeTok(vt, 'x', r[1], vt.x);
+				mergeTok(vt, 'y', r[2], vt.y);
+				linkIndex[r[0]].verts.push(vt);
+			}
 		}
 
 		var labels = [];
@@ -470,7 +576,10 @@
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			// x y "text" [anchor node]. The anchor is kept: this page has the same concept.
-			labels.push({ x: num(r[0]), y: num(r[1]), text: r[2] || '', anchorNode: r[3] || null });
+			var lb = { x: num(r[0]), y: num(r[1]), text: r[2] || '', anchorNode: r[3] || null };
+			mergeTok(lb, 'x', r[0], lb.x);
+			mergeTok(lb, 'y', r[1], lb.y);
+			labels.push(lb);
 		}
 
 		// A PUMP NEEDS A DIAMETER even though no head-loss term uses one. js/lpn-solver.js seeds
