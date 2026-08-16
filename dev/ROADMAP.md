@@ -10,17 +10,33 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## NEXT SESSION (updated 2026-08-16, and Tom works one arrow per `/clear`)
 
-**The next arrow is a TRANSLATION SPRINT**, covering the whole labels era in one pass. The delta as
-of 2026-08-16 is **47 keys per language**, all `lpn`, in all 26 languages. Pre-sprint order is in
-`dev/translation-process.md`: Wave 0 adversarial English pass → `friction_check.php` →
-`gloss_ref_check.php` → regenerate payloads → propose to Tom → launch. `$ec_lang_syn` entries are
-proposed as a diff and approved in that session, not before. Note the harness concurrency cap:
-26 agents means 20 at once and 6 as slots free.
+**Two arrows are ready. They do not conflict, but they want separate sessions.**
 
-**Then Task 248 (extended-period simulation)** — the LibreEPANET.org gate, and big enough to want a
-session of its own with nothing else in it.
+**Arrow 1 — Task 390, the unit paradigm migration (priority 85).** The largest live correctness
+work. Read `dev/unit-paradigm-migration.md` FIRST; it has the diagnosis, the measurements and the
+dependency order, and the steps must be done in that order because each blocks the next. Start at
+step 1 (a unit's identity becomes its NAME) — it is half-built already, since every `<option>`
+carries `data-unit`. Do not start at the five missing units; that is step 4 and is a workaround
+without step 1.
 
-*Delete this block once the sprint has landed; it is a handoff, not a standing plan.*
+**Arrow 2 — the TRANSLATION SPRINT.** Delta is now **51 keys per language** (47 lpn + the 4 Task 337
+text-label keys), all in all 26 languages. Pre-sprint order is in `dev/translation-process.md`:
+Wave 0 adversarial English pass → `friction_check.php` → `gloss_ref_check.php` → regenerate payloads
+→ propose to Tom → launch. `$ec_lang_syn` entries are proposed as a diff and approved in that
+session, not before. Harness cap: 26 agents means 20 at once and 6 as slots free.
+**Sequencing note:** Task 390 step 4 adds five more unit keys (`u_imgd`, `u_afd`, `u_lpm`, `u_cmh`,
+`u_cmd`). If 390 is likely to land soon, run the sprint AFTER it at 56 keys rather than paying for a
+second 26-agent pass.
+
+**Also open and unblocked:** Task 388's remainder — `js/looped-network.js` is still 46.9% comment
+lines with ~190 blocks of 10+ lines left. Mechanical, and a good filler for a session with spare
+room.
+
+**Tom's desk:** Tasks 379 (95), 384 (88), 376 (75), 377 (60) are all `[H]` and all label/colour
+work. Nothing above priority 66 moves without him, and 384 (colour ramps) is the real unblocker for
+Task 248 (extended-period simulation), because a time series cannot be read as text.
+
+*Delete this block once both arrows have landed; it is a handoff, not a standing plan.*
 
 ## LENGTH DISCIPLINE (Tom, 2026-08-05) — read this before writing a task
 
@@ -134,6 +150,23 @@ session of its own with nothing else in it.
     line-priority dropping is the same idea one level down and may be the better half of it.
   - Worth measuring before choosing: how many labels does the relaxation actually rescue on Net3,
     versus how many it merely moves?
+
+- 10|391| **[H] Evaluate `// @ts-check` with JSDoc branded types — a joint decision, not a
+  proposal.** Tom, 2026-08-16, on the unit paradigm work: *"this would be a little easier if JS were
+  a strongly typed language."* True for the half that cost the most: **which KIND of number is
+  this** is a type question, and Task 390's rule — a number the user supplied and a number we
+  computed must never occupy the same field — is exactly `UserValue<Feet>` vs `Computed<SI>`. Prose
+  is the weakest enforcement available for it. It would also catch `"710" * 2`, the standing hazard
+  in Task 390 step 3.
+  - **The honest limit, so this is not oversold: types would NOT have caught the worst defect here.**
+    `number * number` is well-typed and still loses 36.7% of round trips; four different feet were
+    all valid `number`s; `acft` at three significant figures type-checked fine. Floating-point
+    identity is invisible to every mainstream type system. Types shorten the diagnosis a lot and the
+    fix a little.
+  - **Cheap path if it is ever worth it: no file becomes `.ts`.** `// @ts-check` plus JSDoc
+    annotations gives branded types in place, and the Node harnesses already provide a
+    build-adjacent place to run a checker.
+  - Evaluate together before any of it — this is on the roadmap as a possibility, not a plan.
 
 - 85|390| **Finish the unit paradigm migration: a unit is a NAME, and a file's numbers are the
   user's.** Tom, 2026-08-16: *"You are fighting against a deprecated but not purged paradigm where
