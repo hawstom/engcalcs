@@ -415,37 +415,26 @@ html[lang="zh"] .ec-welcome {
 /* A LABEL THE USER HAS JUST PLACED SAYS SO, AND THEN STOPS SAYING IT (Tom, 2026-08-15, after
    discovering he had dragged a label without meaning to: "put a timed box or highlight on dragged
    labels for about a minute, maybe fading, maybe dashed, maybe animated so it's obviously
-   temporary"). Dashed rather than solid, and fading rather than dismissed, so it reads as a
-   notification and never as part of the drawing -- there is no button to press and nothing to
-   clean up. 45 seconds, mostly held then fading over the last third, because a mark that fades
-   from the first instant is a mark you can miss by looking away.
-   Painted with a stroke on the text itself, so it needs no element of its own and cannot be left
-   behind by a relayout. */
-.lpn-just-dragged {
-	paint-order: stroke fill;
-	/* **THE STROKE IS IN MAP UNITS AND MUST BE DIVIDED BY THE SCALE — the same arithmetic the
-	   leaders use, and the second attempt at this.** Everything in this layer sits under the world
-	   transform, so a bare `stroke-width: 4px` is 4 MAP units, which at a typical zoom is most of
-	   the window: Tom got "The mark is huge, bigger than the screen", and then, after a first fix
-	   that reached for `vector-effect: non-scaling-stroke`, a full-page orange starburst. So use the
-	   mechanism already proven on .lpn-leader rather than a second one: --lpn-hair is 1 / scale,
-	   published on the <svg> by refreshSymbolSizes() and inherited here, so 3 * hair is three
-	   screen pixels at any zoom. Third time this subject has bitten in one day; the lesson is to
-	   reuse the working conversion, never to invent a parallel one. */
-	stroke-width: calc(3 * var(--lpn-hair, 0.1));
-	animation: lpn-just-dragged 45s linear forwards;
-}
-/* A HALO ON THE GLYPHS, NOT A DASHED BOX, and the choice is worth recording because Tom offered
-   both ("maybe fading, maybe dashed"). A dash pattern applied to a text stroke follows the outline
-   of every letter, so at this size it reads as noise around the characters rather than as a frame
-   around the label -- and a real dashed frame would need a rectangle element per label, created and
-   destroyed on a timer, which is a thing to leak.
-   ONLY the opacity is animated: a keyframe that also restates the width would re-open the units
-   question in a second place. */
+   temporary"). It reads as a notification and never as part of the drawing -- there is no button to
+   press and nothing to clean up. */
+/* **THE TEXT ITSELF CHANGES COLOUR. NO STROKE, NO BOX, NO NEW OBJECT** (Tom, 2026-08-15, after two
+   wrong answers from me: "All we need is something simple like the leader or label changing color
+   or blinking temporarily. No new object is needed.")
+   He is right, and the simplification deletes the whole bug: a fill has no width, so there is no
+   map-unit-versus-screen-pixel question to get wrong -- which is what produced a mark bigger than
+   the screen and then a full-page orange starburst, from the same three lines, twice.
+   Two quick blinks so it is noticed, then a long hold, then a fade back. NO `forwards`: when the
+   animation ends the property reverts to whatever the stylesheet says, so the label returns to its
+   normal colour on its own and nothing has to clean up after it. */
+.lpn-just-dragged { animation: lpn-just-dragged 45s ease-out; }
 @keyframes lpn-just-dragged {
-	0%   { stroke: #e07000; stroke-opacity: 0.85; }
-	66%  { stroke: #e07000; stroke-opacity: 0.85; }
-	100% { stroke: #e07000; stroke-opacity: 0; }
+	0%   { fill: #e07000; }
+	4%   { fill: #000; }
+	8%   { fill: #e07000; }
+	12%  { fill: #000; }
+	16%  { fill: #e07000; }
+	70%  { fill: #e07000; }
+	100% { fill: #000; }
 }
 @media (prefers-reduced-motion: reduce) {
 	.lpn-just-dragged { animation: none; }
