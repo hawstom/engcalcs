@@ -57,7 +57,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
-	"\t\t\tmaskLayer = el('g', {}, world); labelsLayer = el('g', {}, world);\n" +
+	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); },\n"
 );
 
@@ -106,7 +106,6 @@ ok('no rot stored', lb.rot === undefined);
 ok('no bold stored', lb.bold === undefined);
 ok('no transform attribute on the text', transformOf(L.labelEl(lb.id).text) === null,
 	JSON.stringify(transformOf(L.labelEl(lb.id).text)));
-ok('no transform attribute on the mask', transformOf(L.labelEl(lb.id).mask) === null);
 ok('style declares normal weight',
 	/font-weight:normal/.test(L.labelEl(lb.id).text.getAttribute('style') || ''),
 	L.labelEl(lb.id).text.getAttribute('style'));
@@ -135,7 +134,7 @@ ok('style declares bold', /font-weight:bold/.test(L.labelEl(lb.id).text.getAttri
 ok('bold re-measures wider than light', L.labelEl(lb.id).width > lightWidth,
 	lightWidth + ' -> ' + L.labelEl(lb.id).width);
 
-console.log('\n3. Cartesian in, clockwise out -- the sign, and the mask that follows it');
+console.log('\n3. Cartesian in, clockwise out -- the sign');
 rotBox.value = '30'; fire(rotBox, 'change');
 ok('rotation is stored as the number typed', lb.rot === 30);
 const tt = transformOf(L.labelEl(lb.id).text);
@@ -143,9 +142,10 @@ ok('the SVG angle is the NEGATED Cartesian angle', tt && near(tt.a, -30, 1e-3),
 	tt && tt.a);
 ok('rotation is about the label point', tt && near(tt.x, 50) && near(tt.y, 20),
 	tt && (tt.x + ',' + tt.y));
-const mt = transformOf(L.labelEl(lb.id).mask);
-ok('the mask carries the same transform about the same point',
-	mt && tt && near(mt.a, tt.a) && near(mt.x, tt.x) && near(mt.y, tt.y));
+// THE HALO NEEDS NO ASSERTION OF ITS OWN HERE, and that is the point of Task 376: it is a stroke
+// on these very glyphs, so it turns with them. What used to stand here was a check that the
+// background RECT carried the same transform about the same point -- a rule someone had to keep,
+// with a way to get it wrong.
 
 console.log('\n4. The rotated box is bigger than the upright one, and reverts');
 const rotBoxGeom = L.textBox(lb.id);

@@ -73,33 +73,63 @@ Dropping lines (Task 343) and hiding are separate decisions, not a threshold ins
 
 ---
 
-## 3. Open — to be settled by measurement, not argument
+## 3. Settled by measurement
 
-- **How many candidates.** Start thin: eight compass positions at two radii plus the current
-  placement. Densify only if the neighbourhood term turns out to mean nothing at that spacing.
-  Tom, 2026-08-16, on a proposal to start at 48: *"Not so fast. Let's try it."*
-- **`k`**, the neighbour credit.
-- Whether goal 9 needs anything beyond the smoothing.
+All three were open questions and all three were measured, in
+`dev/lpn-spike/collide-harness.js`, on a deliberately over-constrained fixture: twenty-five labels
+on a 5×5 grid one label-width apart, which is Net3's own situation and has no conflict-free answer.
+
+- **The candidate set is the thin one, and it stayed thin.** Eight directions at two radii plus the
+  current placement — seventeen. Tom, on a proposal to start at 48: *"Not so fast. Let's try it."*
+  Measured: a ring four times as dense, scored with the same scorer, could improve the total by
+  **0.64 across all twenty-five labels** — where one label lying on another costs 1.0 on its own.
+  The extra 130 candidates per label buy about a twentieth of one avoided conflict each.
+- **`k` = 0.25, and it is not the value that was guessed.** The first draft shipped 0.5 on the
+  reasoning that more smoothing is more stability. Measured over four perturbation sizes, 0.25 is
+  the joint minimum of both quantities it was chosen on — 12 changed placements of 96 chances
+  against 20 at k = 0 and 30 at k = 0.5, and slightly less residual conflict as well. Past a point a
+  smoothed field has broad flat minima and the argmin inside one of them moves freely. The curve is
+  not monotone, because a perfect grid makes candidates tie in numbers; that is why this is a
+  measurement and not a trend to extrapolate.
+- **Goal 9 needs nothing beyond the smoothing.** At the shipped `k` a one-node perturbation moves
+  40% fewer labels than at k = 0, which is what "a small change nearby should not rearrange the whole
+  map" was asking for.
+
+**One thing that was not on the list and had to be measured anyway: the clock.** The pass re-runs on
+every frame of a drag. Scoring every candidate against every obstacle took **1.5 seconds** on 220
+labels, Net3's own count. A uniform grid over the obstacles, queried at each label's own reach,
+takes it to a few tens of milliseconds and — the part that matters — makes it linear where the
+relaxation was quadratic: the old code is faster at 220 labels and slower at 1000. The index hands
+its output through the same distance test the definition uses, because a 3×3 block of cells is three
+times the area of the circle it stands in for and feeding that straight to the scorer cost more than
+the index saved.
 
 ---
 
-## 4. What is being replaced, and the two things it leaves behind
+## 4. What was replaced, and where it lives now
 
-`relax()` is a **local** method: pairwise separation along the axis of smaller overlap, four passes.
-A label knows only what it is touching right now, so there is no term for open space and no
-candidate it did not stumble into. Weights there decide *who yields*, not *where anyone goes* —
-which is why no adjustment of them could have answered the original complaint about wasted space.
+`relax()` was a **local** method: pairwise separation along the axis of smaller overlap, four
+passes. A label knew only what it was touching right now, so there was no term for open space and no
+candidate it did not stumble into. Its weights decided *who yields*, not *where anyone goes* — which
+is why no adjustment of them could have answered the original complaint about wasted space.
 
-Two things the rewrite must handle:
+It is gone, and so are the two things it left behind:
 
-- **`capNudges()` is a defect that disappears with it.** It runs *after* the relaxation and scales an
+- **`capNudges()` was a defect and went with it.** It ran *after* the relaxation and scaled an
   over-long push back along its own vector, frequently landing the label back inside the collision
-  the pass had just solved, with nothing re-run. Scoring has no equivalent — its candidates are all
-  within reach by construction.
-- **Boxes must be able to ROTATE.** An aligned pipe label's axis-aligned bounding box is **5.2×** the
-  label's own area at 45° for a 100×12 px label, and the ratio grows without limit with length.
-  Oriented boxes via the separating-axis theorem give both the overlap and the push vector in about
-  30 lines, pure; an unrotated box is the same code at angle zero.
+  the pass had just solved, with nothing re-run. Scoring has no equivalent: its candidates are all
+  within reach by construction, so there is nothing to correct after the fact.
+- **Boxes ROTATE now.** An aligned pipe label's axis-aligned bounding box is **5.2×** the label's own
+  area at 45° for a 100×12 px label, and the ratio grows without limit with its length — every one of
+  those empty units was ground a neighbouring label was pushed out of for no reason. Oriented boxes
+  via the separating-axis theorem give both the overlap and the depth, and an unrotated box is the
+  same code at angle zero.
 
-`?debug=boxes` on the page URL draws every box the pass is reasoning about — blue for what moves,
-green for what it must avoid.
+The pieces: `js/lpn-collide.js` holds the goals as weights, the geometry, the candidate generators
+and the pass; `js/looped-network.js` holds the GATHERING — turning `doc`, the element handles and
+the current font size into boxes and segments; `dev/lpn-spike/collide-harness.js` tests the first
+without a browser.
+
+`?debug=boxes` on the page URL draws every box the pass is reasoning about — blue for what was
+placed, green for what it had to go round, red for the line obstacles. They are polygons, not rects,
+because the boxes turn.

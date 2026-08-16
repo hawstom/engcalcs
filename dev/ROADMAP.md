@@ -10,23 +10,29 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## NEXT SESSION (updated 2026-08-16, and Tom works one arrow per `/clear`)
 
-**Two arrows are ready. They do not conflict, but they want separate sessions.**
+**Task 390 is finished** (all five steps, 2026-08-16), and so are Tasks 376, 379 and 384. One arrow
+is ready.
 
-**Arrow 1 — Task 390, the unit paradigm migration (priority 85).** The largest live correctness
-work. Read `dev/unit-paradigm-migration.md` FIRST; it has the diagnosis, the measurements and the
-dependency order, and the steps must be done in that order because each blocks the next.
-**Steps 1 and 2 landed 2026-08-16** — a unit's identity is now its name and the cookie stores one.
-Next is step 3, keeping the `.inp` TOKEN at `js/lpn-inp.js:89`. Step 4 (the five missing units) is
-now unblocked but is still the refusal-to-solve work, not just five new selector entries.
+**Arrow 1 — the TRANSLATION SPRINT.** Delta is **75 keys per language**, all 26 languages: the 47
+lpn keys, the 4 Task 337 text-label keys, 18 from Task 384's colour ramp, and 6 from Task 390 step 4
+(`u_imgd`, `u_afd`, `u_lpm`, `u_cmh`, `u_cmd`, `lpn_unit_unknown`). Nothing further is queued behind
+it, so the sequencing note that held it back is discharged — this is the moment to run it.
+Pre-sprint order is in `dev/translation-process.md`: Wave 0 adversarial English pass →
+`friction_check.php` → `gloss_ref_check.php` → regenerate payloads → propose to Tom → launch.
+`$ec_lang_syn` entries are proposed as a diff and approved in that session, not before. Harness cap:
+26 agents means 20 at once and 6 as slots free.
 
-**Arrow 2 — the TRANSLATION SPRINT.** Delta is now **51 keys per language** (47 lpn + the 4 Task 337
-text-label keys), all in all 26 languages. Pre-sprint order is in `dev/translation-process.md`:
-Wave 0 adversarial English pass → `friction_check.php` → `gloss_ref_check.php` → regenerate payloads
-→ propose to Tom → launch. `$ec_lang_syn` entries are proposed as a diff and approved in that
-session, not before. Harness cap: 26 agents means 20 at once and 6 as slots free.
-**Sequencing note:** Task 390 step 4 adds five more unit keys (`u_imgd`, `u_afd`, `u_lpm`, `u_cmh`,
-`u_cmd`). If 390 is likely to land soon, run the sprint AFTER it at 56 keys rather than paying for a
-second 26-agent pass.
+**Fold into Wave 0:** `lpn_inp_drop_units` still says gallons per minute "were assumed". Task 390
+step 4 abolished that guess — all ten EPANET keywords are supported and an unknown unit now refuses
+the solve by name instead. Rewording it is an English change on a key already translated in 26
+languages, so it belongs in the sprint rather than as a quiet edit.
+
+**Blocked on a ruling, and it is one question:** Task 343 (dropping label lines by priority). The
+input is ~20 lines, but a control that stores a number nothing reads is worse than none, and
+`dev/label-placement-goals.md` §2 rules out a threshold inside the placement pass. **What triggers a
+drop** — a residual-score threshold, a count of overlapping neighbours, or a map-width rule like the
+one that already hides annotation wholesale? The scoring pass already returns the per-label score
+such a threshold would read.
 
 **Also open and unblocked:** Task 388's remainder — `js/looped-network.js` is still 46.9% comment
 lines with ~190 blocks of 10+ lines left. Mechanical, and a good filler for a session with spare
@@ -82,15 +88,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
     rewrites every SHA, forces a push, breaks production's `git pull`, dangles 43 SHA citations in
     `dev/*.md`, and saves no context — nothing ever loads a commit message.
 
-- 95|379| **Replace the label relaxation with candidate-position scoring, which is the part that
-  can see open space.** Tom, 2026-08-15: *"There is lots of free space that is being 'wasted' while
-  bad conflicts persist. The relaxation needs to understand the concept of most-open space and
-  gravitate toward it."*
-  - **`dev/label-placement-goals.md` holds the spec.** §1 is Tom's ranked goal list, ruled
-    2026-08-16 and settled; §2 is the method. Read it — nothing else here restates it.
-  - The one thing to carry without opening it: `relax()` is a LOCAL method, so **no tuning of the
-    weights will fix this** — weights decide who yields, not where anyone goes.
-  - Then Task 343 (dropping lines by priority). Hiding is not a separate task (377, rejected).
 - 55|378| **[H] Give the seven harnesses a network some other way, and delete
   `drawExampleNetwork()`.** The 289-line code-drawn ring main lost its last user-facing caller when
   Task 375's follow-up removed the File > New "From examples" rows, but seven harnesses still build
@@ -102,18 +99,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
     `applySaved()` would also be testing the path a real user takes, which the code path never was.
   - The care needed is that those harnesses assert solved pressures and specific IDs. Migrate one
     first and diff its output against the current run before touching the other six.
-
-- 75|376| **Replace the label MASK RECT with a text halo, the way epanetjs does it.** 
-  - **It is one CSS declaration and it deletes an element.** `paint-order: stroke fill` with a white
-    stroke on the text draws exactly that: a halo that follows the glyphs and merges between close
-    characters. `--lpn-hair` already exists to size it in screen pixels.
-  - **What it deletes is the interesting part.** No mask rect means no mask element per label, no
-    `MASK_PAD`, no gap arithmetic to keep a mask off its own pipe (Task 367), no rotation to keep in
-    step with the text, no mask left behind when a label is hidden — Tom's *"mask without a label"*
-    class of defect stops existing rather than being fixed. Three of this file's tasks are mask
-    geometry.
-  - The one thing to check before committing: a halo over a dark backdrop reads differently from a
-    75%-white box, and the box was there for aerial photographs.
 
 - 10|391| **[H] Evaluate `// @ts-check` with JSDoc branded types — a joint decision, not a
   proposal.** Tom, 2026-08-16, on the unit paradigm work: *"this would be a little easier if JS were
@@ -193,7 +178,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   apiece. Each is either lost content to restore (as Task 290's six Rock Chute notes turned out to
   be) or debt to delete; only Tom can say which. Recorded so far only inside closed Task 290, where
   nothing re-scans it.
-
 
 - 60|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
@@ -498,7 +482,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   rewrite against live controls, not a code fix, so it needs a browser pass rather than static
   reading.
 
-
 - 25|281| **EPANET `.inp` EXPORT — the unbuilt half of Task 196.** Import shipped 2026-08-11; writing
   one did not, and it is the easier direction: `EngCalcs.lpnToInp()` (`js/lpn-epanet.js`) already
   writes a complete `.inp` for the engine toggle, and every element this page models is a strict
@@ -694,7 +677,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - Partly mitigated already: `zoomExtent()` now reserves the overlays' measured height so a fit
     never places content under them. That does not survive a pan, which is why this still exists.
 
-
 - 35|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
   and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves both shipped
   2026-08-14; phase 3, time, is the open one. The engine makes it a mapping-and-UI job rather than a
@@ -735,7 +717,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - **Courtesy note to OpenWaterAnalytics before launch**, in the register of
     `dev/outreach-owa-post.md` — a real question, not an announcement. The name is legally safe
     (EPANET is public domain) but names run on community norms, and the note is cheap insurance.
-
 
 - 40|244| **Standardize the distinguishing term, and put it in the navbar next to the language menu.**
   Tom, 2026-08-09, on epanet-js labelling itself "Open Source" while shipping FSL. `About.php` is
@@ -810,7 +791,6 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - **Intra-site path** — which calculator is the entry point and where people go next. The most
     expensive of the three, because a path needs an ordering the logs deliberately cannot express
     without a per-visit identifier we will not store.
-
 
 - 4|114| **Reservoir / detention routing calculator (Modified Puls) — full scope in
   `dev/detention-routing-scope.md`.** A time-stepping engine, which is the real departure from the

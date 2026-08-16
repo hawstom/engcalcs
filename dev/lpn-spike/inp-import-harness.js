@@ -94,7 +94,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
-	"\t\t\tmaskLayer = el('g', {}, world); labelsLayer = el('g', {}, world);\n" +
+	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); },\n" +
 	"\t\tdocVersion: function () { return openDocVersion; },\n" +
 	// Read from the page rather than typed here: the assertion below is "the import writes a

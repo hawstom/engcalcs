@@ -5,7 +5,8 @@
 // THIS FILE USED TO BE TWICE THIS LONG, and the half that went is the point. Task 298 existed
 // because the extrema badge -- two rails and a chevron -- was drawn just past the END of a
 // decorated number, so a label's real right edge was further right than its <text> bbox. Four
-// consumers had to be taught that (leader attachment, collision boxes, mask rect, zoom-to-fit) and
+// consumers had to be taught that (leader attachment, collision boxes, the mask rect of the day,
+// zoom-to-fit) and
 // each got it wrong first; Tom found the last one on screen: "The extrema glyph is not accounted
 // for in the leader attachment. So it can overhang a steeply vertical leader when label is dragged
 // left."
@@ -65,13 +66,15 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	report(!/decorRight/.test(src), 'no consumer carries a badge reach any more');
 	report(!/applyExtremaTicks|measureDecorRight/.test(src), 'and the badge machinery is gone, not merely unused');
 
-	// All four consumers, by name. Missing one is exactly how the original defect survived: the
-	// leader was the visible symptom, but collision avoidance and zoom-to-fit read the same number.
-	// `layoutLinkLabelAt` rather than `layoutLinkLabel` since 2026-08-15: a long pipe now draws its
-	// label at several stations along itself (Tom's repeat spec), and the per-station renderer is
-	// where the width is read. Same consumer, new name — and every repeat measuring through the same
-	// function is what stops a chain drifting out of step with its own original.
-	for (const site of ['dataLabelOrigin', 'layoutNodeLabel', 'layoutLinkLabelAt', 'bbox']) {
+	// Every consumer, by name. Missing one is exactly how the original defect survived: the leader
+	// was the visible symptom, but collision avoidance and zoom-to-fit read the same number.
+	// THE TWO LAYOUT FUNCTIONS LEFT THIS LIST WITH TASK 376. They read the width for one thing only
+	// -- to size the background rect behind the text -- and the rect is gone: the halo that replaced
+	// it is a stroke on the glyphs, which is the label's width by construction and cannot be given
+	// the wrong one. What they still do is place the text through dataLabelOrigin(), which is on
+	// this list, so the property this section asserts is unchanged; there are simply two fewer
+	// places able to break it.
+	for (const site of ['dataLabelOrigin', 'bbox']) {
 		report(/labelBoxWidth\(/.test(extract(site)), `${site}() uses labelBoxWidth()`);
 	}
 	report(/w: labelBoxWidth\(holder\)/.test(extract('runLabelCollisionAvoidance')), 'collision boxes use labelBoxWidth()');
@@ -121,20 +124,22 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	report(/fsNow = effectiveFontSize\(\) \+ 'px'/.test(rlt),
 		'...from effectiveFontSize(), which is the same quantity refreshFontSizes() publishes');
 
-	// **A PIPE DOES NOT PUSH ITS OWN LABEL.** Tom, minutes after pipes became obstacles: "Pipe labels
-	// are fickle now. I see them and then I don't see them." A link's data label sits ON its pipe by
-	// design -- that is how you tell whose number it is -- so without an owner on the pipe segment
-	// every pipe threw its own label perpendicular off itself, to the nudge cap, on every pass.
-	// Asserted on the WIRING rather than the arithmetic: pushOffSegments() already honours `owner`
+	// **A PIPE IS NOT AN OBSTACLE TO ITS OWN LABEL.** Tom, minutes after pipes became obstacles:
+	// "Pipe labels are fickle now. I see them and then I don't see them." A link's data label sits ON
+	// its pipe by design -- that is how you tell whose number it is -- so without an owner on the
+	// pipe segment every pipe threw its own label perpendicular off itself on every pass.
+	// Asserted on the WIRING rather than the arithmetic: rawScore() already honours `owner`
 	// (collide-harness covers that), and what broke was that pipes were built without one.
-	report(/weight: LPN_COLLIDE_WEIGHT\.pipe, owner: le/.test(extract('currentLineObstacles')),
+	report(/kind: 'link', owner: linkLabelKey\(l\.id\)/.test(extract('staticObstacles')),
 		'a pipe segment carries its own link as owner');
-	report(/weight: LPN_COLLIDE_WEIGHT\.leader, owner: holder/.test(extract('currentLeaderSegments')),
+	// A LEADER CARRIES ITS OWNER TOO, and since Task 379 a data label's leader is not gathered at all
+	// -- the pass commits each one as it places the label it belongs to, so it cannot be forgotten
+	// and cannot disagree with where the label went. What staticObstacles() still gathers is the
+	// user's own Text label leaders, which nothing in the pass moves.
+	const collideSrc = require('fs').readFileSync(
+		require('path').resolve(__dirname, '../../js/lpn-collide.js'), 'utf8');
+	report(/segment\(lbl\.anchor\.x, lbl\.anchor\.y, c\.x, c\.y, 'leader', lbl\.id\)/.test(collideSrc),
 		'...and a leader still carries its own label, as it always did');
-	// Renamed to currentLeaderSegments() 2026-08-15 when leaders stopped being sampled into boxes
-	// and became segments, like the pipes. Same claim, same two points.
-	report(!/labelBoxWidth\(/.test(extract('currentLeaderSegments')),
-		'currentLeaderSegments() reads no width either -- same two points');
 	report(ADVERSE_FRAC > 0, 'the hysteresis fraction is still read out of the file', String(ADVERSE_FRAC));
 }
 

@@ -1,29 +1,28 @@
-// Task 293 — headless check of js/lpn-collide.js, the label collision relaxation.
-//
+// Label PLACEMENT, as pure arithmetic. Run with:
 //   node dev/lpn-spike/collide-harness.js
 //
-// This is the piece of the map editor a person genuinely cannot verify by looking at it.
-// "That label looks about right" is not a check on a four-iteration weighted relaxation:
-// the weights decide who yields to whom, and getting them backwards still produces a
-// drawing with no overlapping labels — just the wrong one, with the user's deliberately
-// dragged label shoved aside instead of the automatic one. That failure is invisible on a
-// screenshot and obvious in an assertion.
+// js/lpn-collide.js is values-in/values-out (ROADMAP Task 293), so everything below runs without a
+// browser and without the DOM stub. That is the point of the split: "that label looks about right"
+// is not a verification, and a screenshot cannot tell you whether the pass would have found a
+// better place.
 //
-// Like geom-harness.js this require()s the real module rather than brace-matching a copy
-// out of looped-network.js, so what passes here is what the page loads.
+// WHAT IS BEING TESTED IS A SEARCH, NOT A PHYSICS (Task 379). The old relaxation was a local method
+// -- push apart, four times -- so its tests were about who yielded. This pass scores candidate
+// placements and takes the best, so the properties that matter are different ones:
 //
-// What can actually be wrong here:
-//   * the weight SHARE formula — each box's share is proportional to the OTHER's strength,
-//     so an immovable obstacle must absorb none of the separation and a peer must take half;
-//   * a manually dragged label being moved at all (it must block, never yield);
-//   * a label colliding with its OWN leader, which would push it further away every
-//     iteration, forever — a slow drift nobody would trace back to here;
-//   * the smaller-overlap axis choice, which is what keeps a nudge short;
-//   * idempotence: the pass runs on every drag frame, so running it twice on an unchanged
-//     drawing must give the same answer as running it once (it did not, once — the old code
-//     accumulated drift on every frame of a drag).
+//   * the geometry underneath is exact (separating axis, segment-in-box, segment crossing),
+//   * the candidate SET obeys goals 1 and 7 by construction rather than by penalty,
+//   * the RANKING behaves like a ranking -- a higher goal outweighs a lower one at comparable
+//     severity, and a lower one still decides when the higher ones are equal,
+//   * the neighbour term does what goal 11 asks and buys the stability goal 9 asks for,
+//   * and the pass is idempotent, in range, and mutates none of its inputs.
+//
+// The last section MEASURES rather than asserts: `k` and the candidate count are the two things
+// dev/label-placement-goals.md §3 leaves open, to be settled by measurement and not by argument.
 
-const Collide = require('../../js/lpn-collide.js').lpnCollide;
+const fs = require('fs');
+const path = require('path');
+const { lpnCollide: C } = require('../../js/lpn-collide.js');
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -33,296 +32,393 @@ function report(ok, label, detail) {
 }
 function near(a, b, tol) { return Math.abs(a - b) <= (tol === undefined ? 1e-9 : tol); }
 
-// A movable label box: `ref` is the holder the editor writes the nudge onto.
-function label(x, y, w, h, opts) {
-	const o = opts || {};
-	return {
-		ref: { nudge: { x: 0, y: 0 }, tag: o.tag },
-		owner: null,
-		movable: !o.manual,
-		weight: o.manual ? Collide.WEIGHT.manual : Collide.WEIGHT.label,
-		base: { x: x, y: y }, yOff: 0, w: w, h: h
-	};
-}
-function obstacle(x, y, w, h, weight) {
-	return { ref: null, owner: null, movable: false, weight: weight, base: { x: x, y: y }, yOff: 0, w: w, h: h };
-}
-function overlaps(a, b) {
-	const A = Collide.boxTopLeft(a), B = Collide.boxTopLeft(b);
-	return Math.min(A.x + a.w, B.x + b.w) - Math.max(A.x, B.x) > 1e-9
-		&& Math.min(A.y + a.h, B.y + b.h) - Math.max(A.y, B.y) > 1e-9;
+// ---- 1. oriented boxes ------------------------------------------------------------------------
+console.log('--- the separating-axis theorem, which is what lets a box turn ---');
+{
+	const a = C.box(0, 0, 10, 4, 0);
+	report(C.boxOverlapDepth(a, C.box(100, 100, 10, 4, 0)) === 0, 'boxes far apart do not overlap');
+	report(C.boxOverlapDepth(a, C.box(10.01, 0, 10, 4, 0)) === 0, 'and neither do boxes just touching');
+	// Identical boxes: the shallowest way out is across the SHORT side, which is the height here.
+	report(near(C.boxOverlapDepth(a, a), 4), 'two identical boxes penetrate by their smaller dimension',
+		C.boxOverlapDepth(a, a));
+	report(near(C.boxOverlapDepth(a, C.box(6, 0, 10, 4, 0)), 4), 'a half-shifted pair, same answer');
+	report(near(C.boxOverlapDepth(a, C.box(0, 3, 10, 4, 0)), 1), 'a vertical shift penetrates by the leftover',
+		C.boxOverlapDepth(a, C.box(0, 3, 10, 4, 0)));
+	report(C.boxOverlapDepth(a, C.box(0, 4.01, 10, 4, 0)) === 0, '...and clears just past it');
+	report(near(C.boxOverlapDepth(a, C.box(6, 0, 10, 4, 0)), C.boxOverlapDepth(C.box(6, 0, 10, 4, 0), a)),
+		'the depth is symmetric, whichever box is asked first');
+
+	// **THE ROTATION IS THE WHOLE REASON THIS EXISTS.** A long thin label at 45 degrees and a second
+	// one beside it: their AABBs overlap heavily and the boxes themselves do not touch at all. Under
+	// the old axis-aligned pass the second label was pushed out of ground the first never occupied.
+	const diag = C.box(0, 0, 40, 6, 45);
+	const beside = C.box(18, -18, 40, 6, 45);
+	report(C.boxOverlapDepth(diag, beside) === 0, 'two parallel diagonal labels side by side are clear');
+	// ...while their AXIS-ALIGNED boxes do overlap, which is the defect this replaces. Written as the
+	// same call at angle zero rather than through a separate rect predicate, because that is exactly
+	// the claim being made: an unrotated box is this code at angle zero and nothing else is needed.
+	const side = Math.abs(40 * Math.SQRT1_2) + Math.abs(6 * Math.SQRT1_2);   // the AABB of `diag`
+	report(C.boxOverlapDepth(C.box(0, 0, side, side, 0), C.box(18, -18, side, side, 0)) > 0,
+		'...while their AXIS-ALIGNED boxes do overlap -- the defect this replaces');
+	report(C.boxOverlapDepth(diag, C.box(0, 0, 40, 6, -45)) > 0, 'and a crossing pair really does collide');
+	// A 90-degree turn is the same box with w and h swapped, which is the cheapest check that the
+	// axes are being built and not merely assumed.
+	report(near(C.boxOverlapDepth(C.box(0, 0, 10, 4, 90), C.box(0, 0, 4, 10, 0)), 4),
+		'a box turned 90 degrees equals the same box with its sides exchanged');
 }
 
-// ---- boxTopLeft --------------------------------------------------------
-console.log('--- boxTopLeft ---');
-const plain = obstacle(10, 20, 5, 5, Collide.WEIGHT.node);
-report(near(Collide.boxTopLeft(plain).x, 10) && near(Collide.boxTopLeft(plain).y, 20),
-	'an immovable box sits at its base');
-const nudged = label(10, 20, 5, 5);
-nudged.ref.nudge = { x: 3, y: -4 };
-nudged.yOff = -8;
-const tl = Collide.boxTopLeft(nudged);
-report(near(tl.x, 13) && near(tl.y, 8), 'base + live nudge + baseline offset', JSON.stringify(tl));
+console.log('\n--- a line through a box, and two lines crossing ---');
+{
+	const b = C.box(0, 0, 10, 4, 0);
+	report(near(C.segmentInBoxFraction({ ax: -20, ay: 0, bx: 20, by: 0 }, b), 10 / 40),
+		'a line straight through: the fraction inside is the box width over the line length');
+	report(C.segmentInBoxFraction({ ax: -20, ay: 10, bx: 20, by: 10 }, b) === 0, 'a line clear of it: nothing');
+	report(near(C.segmentInBoxFraction({ ax: 0, ay: 0, bx: 20, by: 0 }, b), 5 / 20),
+		'a line starting inside counts only the part that is inside');
+	report(near(C.segmentInBoxFraction({ ax: -2, ay: 0, bx: 2, by: 0 }, b), 1),
+		'a line wholly inside is all of it');
+	// Rotated: the same line and the same box, turned together, must give the same answer.
+	const rb = C.box(0, 0, 10, 4, 30), rad = 30 * Math.PI / 180;
+	const p = { ax: -20 * Math.cos(rad), ay: -20 * Math.sin(rad), bx: 20 * Math.cos(rad), by: 20 * Math.sin(rad) };
+	report(near(C.segmentInBoxFraction(p, rb), 10 / 40, 1e-9),
+		'turn the line and the box together and nothing changes -- the test is in the box frame');
+	report(C.segmentInBoxFraction({ ax: -20, ay: 0, bx: 20, by: 0 }, C.box(0, 0, 10, 4, 90)) > 0,
+		'a box turned across a line still catches it');
 
-// ---- two peer labels split the separation ------------------------------
-console.log('--- peer labels ---');
-{
-	// Identical 10x10 boxes offset by 6 in x and 8 in y: overlap is 4 in x, 2 in y, so the
-	// pass must move them apart along Y (the smaller overlap), not X.
-	const a = label(0, 0, 10, 10, { tag: 'a' }), b = label(6, 8, 10, 10, { tag: 'b' });
-	Collide.relax([a, b], [], null, 4);
-	report(near(a.ref.nudge.x, 0) && near(b.ref.nudge.x, 0), 'separates along the SMALLER overlap axis (y)',
-		`nudge.x a=${a.ref.nudge.x} b=${b.ref.nudge.x}`);
-	report(near(a.ref.nudge.y, -(2 + 0.1) / 2) && near(b.ref.nudge.y, (2 + 0.1) / 2),
-		'two peers split the separation 50/50', `a=${a.ref.nudge.y} b=${b.ref.nudge.y}`);
-	report(!overlaps(a, b), 'and they no longer overlap');
-}
-{
-	// Same boxes, overlap smaller in X this time.
-	const a = label(0, 0, 10, 10), b = label(8, 6, 10, 10);
-	Collide.relax([a, b], [], null, 4);
-	report(near(a.ref.nudge.x, -(2 + 0.1) / 2) && near(b.ref.nudge.x, (2 + 0.1) / 2),
-		'separates along x when x is the smaller overlap');
-	report(near(a.ref.nudge.y, 0) && near(b.ref.nudge.y, 0), 'and leaves y alone');
+	report(C.segmentsCross({ ax: 0, ay: 0, bx: 10, by: 0 }, { ax: 5, ay: -5, bx: 5, by: 5 }), 'two lines cross');
+	report(!C.segmentsCross({ ax: 0, ay: 0, bx: 10, by: 0 }, { ax: 5, ay: 1, bx: 5, by: 5 }), '...and stop short');
+	report(!C.segmentsCross({ ax: 0, ay: 0, bx: 10, by: 0 }, { ax: 0, ay: 2, bx: 10, by: 2 }), 'parallel lines never cross');
+	report(!C.segmentsCross({ ax: 0, ay: 0, bx: 0, by: 0 }, { ax: -1, ay: 0, bx: 1, by: 0 }),
+		'a zero-length segment answers false rather than NaN');
 }
 
-// ---- an immovable obstacle: weight means INSISTENCE ---------------------
-console.log('--- immovable obstacles ---');
+// ---- 2. the candidate set ---------------------------------------------------------------------
+console.log('\n--- the candidates, which is where two of the goals live ---');
+const LBL = { id: 'n:J1', anchor: { x: 0, y: 0 }, home: { x: 4, y: -4 }, w: 20, h: 8, yOff: -6 };
 {
-	// **THIS BLOCK USED TO ASSERT THE DEFECT.** It recorded, deliberately and in detail, that a
-	// label pushed by a node symbol at weight 0.5 moved only B/(A+B) = a THIRD of the way out per
-	// iteration and so was still resting on the symbol after all four -- "recorded rather than
-	// fixed (Task 293 is a lift-out, not a redesign)... whether that is worth another iteration or
-	// a different weight is Tom's call, not the harness's."
-	//
-	// He made the call by looking at the map: *"Node labels still not avoiding pipes at all."* The
-	// pass was not failing to push; it was pushing a fraction of the way and stopping. Against
-	// something that cannot move, a weight now means INSISTENCE -- how much of the overlap is gone
-	// when the iteration ends -- so 1 clears completely, in one pass, and a lower number leaves a
-	// predictable remainder instead of an asymptote.
-	const a = label(0, 0, 10, 10);
-	const node = obstacle(6, 8, 10, 10, Collide.WEIGHT.node);
-	Collide.relax([a], [node], null, 4);
-	report(a.ref.nudge.y < 0, 'pushed away from the obstacle, not into it');
-	report(!overlaps(a, node), 'a node symbol at weight 1 is cleared completely',
-		`nudge.y=${a.ref.nudge.y}`);
-	// ...and in ONE iteration, which is the difference from the old behaviour. The pass returns on
-	// the second because nothing moved in it.
-	const b = label(0, 0, 10, 10);
-	const iters = Collide.relax([b], [obstacle(6, 8, 10, 10, Collide.WEIGHT.node)], null, 4);
-	report(iters === 2, '...on the first pass, not asymptotically over four', `iters=${iters}`);
-	// A LOWER weight leaves a deliberate remainder. That is what makes the pipe's 0.4 a preference
-	// rather than a prohibition: the label steps most of the way off the line, and anything that
-	// insists more can push it back on.
-	const c = label(0, 0, 10, 10);
-	Collide.relax([c], [obstacle(6, 8, 10, 10, 0.5)], null, 1);
-	report(Math.abs(c.ref.nudge.y) > 0.5 && Math.abs(c.ref.nudge.y) < 2,
-		'a half-weight obstacle removes about half the overlap and leaves the rest',
-		`nudge.y=${c.ref.nudge.y}`);
-	report(Collide.insistence(1) === 1 && Collide.insistence(0) === 0 && Collide.insistence(1000) === 1,
-		'insistence passes 0 and 1 through and clamps a very heavy obstacle to "all of it"');
-	// AND THE SAME ON THE OTHER AXIS. The push takes whichever of x or y is the smaller overlap, so
-	// the two are separate branches -- a fixture that only ever overlaps vertically leaves half the
-	// change untested, which is exactly what the first mutation run found.
-	const d = label(0, 0, 10, 10);
-	const sideOn = obstacle(8, 6, 10, 10, Collide.WEIGHT.node);   // x overlap 2, y overlap 4
-	Collide.relax([d], [sideOn], null, 4);
-	report(d.ref.nudge.x < 0 && near(d.ref.nudge.y, 0),
-		'...and it clears sideways when x is the smaller overlap', JSON.stringify(d.ref.nudge));
-	report(!overlaps(d, sideOn), '...completely, on that axis too');
-}
-{
-	// A MANUALLY dragged label is immovable and weight 1000, so the automatic one absorbs
-	// essentially the whole separation. This is the case that is invisible on screen: both
-	// orderings end with no overlap, but only one respects the user's drag.
-	const auto = label(0, 0, 10, 10, { tag: 'auto' });
-	const manual = label(6, 8, 10, 10, { manual: true, tag: 'manual' });
-	Collide.relax([auto, manual], [], null, 4);
-	report(near(manual.ref.nudge.x, 0) && near(manual.ref.nudge.y, 0),
-		'a manually dragged label never moves', JSON.stringify(manual.ref.nudge));
-	report(auto.ref.nudge.y < 0 && !overlaps(auto, manual),
-		'the automatic label absorbs the whole separation', JSON.stringify(auto.ref.nudge));
-}
-{
-	// Two immovable boxes overlapping each other must be skipped, not spun on.
-	const a = obstacle(0, 0, 10, 10, Collide.WEIGHT.node);
-	const b = obstacle(2, 2, 10, 10, Collide.WEIGHT.label);
-	const iters = Collide.relax([], [a, b], null, 4);
-	report(iters === 1, 'nothing movable settles on the first iteration', `iters=${iters}`);
-}
-{
-	// Weight 0 on both sides would divide by zero; the pass must skip instead.
-	const a = label(0, 0, 10, 10); a.weight = 0;
-	const b = obstacle(2, 2, 10, 10, Collide.WEIGHT.pipe);
-	Collide.relax([a], [b], null, 4);
-	report(!Number.isNaN(a.ref.nudge.x) && !Number.isNaN(a.ref.nudge.y),
-		'zero total weight does not produce NaN', JSON.stringify(a.ref.nudge));
-}
-
-
-// ---- pipes as segments --------------------------------------------------
-// Tom, 2026-08-15: "I see that pipes have no model/boxes. They need a model even if their weight is
-// lower than other things... These ideally would make some attempt to avoid these pipe conflicts if
-// it's not too hard to do. It's acceptable as is, but not preferable." WEIGHT.pipe was 0 and pipes
-// were absent from the pass entirely -- a call made in the repo, not by him.
-console.log('--- pushOffSegments ---');
-function lbl(x, y, w, h) {
-	return { ref: { nudge: { x: 0, y: 0 } }, owner: null, movable: true, weight: Collide.WEIGHT.label,
-		base: { x: x, y: y }, yOff: 0, w: w, h: h };
-}
-{
-	// A horizontal pipe straight through the middle of a label: the push must be VERTICAL and must
-	// clear it. Perpendicular, not axis-of-least-overlap -- see the comment in pushOffSegments().
-	const a = lbl(0, 0, 20, 6);
-	Collide.pushOffSegments([a], [{ ax: -100, ay: 3, bx: 100, by: 3, weight: 1 }]);
-	report(a.ref.nudge.x === 0, 'a horizontal pipe pushes straight up or down, never sideways',
-		JSON.stringify(a.ref.nudge));
-	report(Math.abs(a.ref.nudge.y) >= 3, '...far enough to clear the line', JSON.stringify(a.ref.nudge));
-}
-{
-	// THE CASE AN AXIS-ALIGNED PUSH GETS WRONG. A pipe at 30 degrees crossing a wide label: pushing
-	// along the smaller axis slides the label ALONG the pipe as often as off it, and it lands back
-	// on the line a little further down. The push has to be along the segment's normal.
-	const a = lbl(0, 0, 40, 6), ang = Math.PI / 6;
-	Collide.pushOffSegments([a], [{ ax: 20 - 100 * Math.cos(ang), ay: 3 - 100 * Math.sin(ang),
-		bx: 20 + 100 * Math.cos(ang), by: 3 + 100 * Math.sin(ang), weight: 1 }]);
-	const n = a.ref.nudge, along = n.x * Math.cos(ang) + n.y * Math.sin(ang);
-	report(Math.abs(along) < 1e-9, 'a diagonal pipe pushes perpendicular to itself, with no slide along it',
-		'along=' + along.toFixed(6) + ' of ' + Math.hypot(n.x, n.y).toFixed(3));
-}
-{
-	// A pipe that STOPS SHORT of the label must not push it. Without the segment-range test the
-	// infinite line through a stub of pipe on the far side of the map would move labels.
-	const a = lbl(0, 0, 20, 6);
-	Collide.pushOffSegments([a], [{ ax: -100, ay: 3, bx: -50, by: 3, weight: 1 }]);
-	report(a.ref.nudge.x === 0 && a.ref.nudge.y === 0,
-		'a pipe that stops short of the label leaves it alone', JSON.stringify(a.ref.nudge));
-}
-{
-	// An immovable label is not moved by a pipe either -- goal 4, and the same rule the box pass has.
-	const a = lbl(0, 0, 20, 6); a.movable = false; a.weight = Collide.WEIGHT.manual;
-	Collide.pushOffSegments([a], [{ ax: -100, ay: 3, bx: 100, by: 3, weight: 1 }]);
-	report(a.ref.nudge.x === 0 && a.ref.nudge.y === 0, 'a manually placed label is not moved by a pipe');
-}
-{
-	// THE SIDE IS KEPT. A label mostly above the line goes up; mostly below goes down. Choosing the
-	// nearer exit rather than a fixed direction is what stops a label being dragged across its own
-	// pipe to the wrong side of the drawing.
-	const up = lbl(0, 0, 20, 6), down = lbl(0, 0, 20, 6);
-	Collide.pushOffSegments([up], [{ ax: -100, ay: 5, bx: 100, by: 5, weight: 1 }]);
-	Collide.pushOffSegments([down], [{ ax: -100, ay: 1, bx: 100, by: 1, weight: 1 }]);
-	report(up.ref.nudge.y < 0 && down.ref.nudge.y > 0,
-		'each label leaves by the side it was already on',
-		JSON.stringify(up.ref.nudge) + ' / ' + JSON.stringify(down.ref.nudge));
-}
-{
-	// A PREFERENCE, NOT A PROHIBITION (WEIGHT.pipe 0.25). A pipe moves a label a quarter as
-	// insistently as another label would, so in a crowd the labels win and the number ends up lying
-	// across the line -- which is the behaviour the old "pipes are absent by design" comment claimed
-	// and the code did not have.
-	// **AND IT IS A FULL-WEIGHT OBSTACLE, NOT A FRACTIONAL ONE** (Tom, 2026-08-15: *"Obviously you
-	// mistook pipe avoidance preference for weight... Pipes and nodes are both weight 1."*). Under
-	// insistence a weight answers "how much of this overlap must be gone", and for every real
-	// obstacle the answer is all of it. The fractions were trying to express a PREFERENCE -- which
-	// conflict to accept when they cannot all be avoided -- which is a property of the alternatives,
-	// not of the obstacle, and belongs to Task 379's score.
-	// **A WEIGHT IS NOT A LENIENCE, and this file may only assert the first.** Tom, after I put
-	// his number in the wrong field twice: "pipe weight = 1. Pipe preference = less than 1. Why do
-	// you keep confusing them?" A weight says how much of an overlap must be gone -- all of it, for
-	// every real obstacle. A LENIENCE (Tom's word, and the better one) says how
-	// willing we are to tolerate a given conflict when they cannot all be avoided -- a comparison
-	// between two candidate PLACEMENTS, which this pass never makes. A lenience written into a
-	// weight tells the pass to clear only part of an overlap always, even
-	// with open space beside the label, which is what 0.4 and then 0.5 did.
-	report(Collide.WEIGHT.pipe === 1 && Collide.WEIGHT.node === 1 && Collide.WEIGHT.label === 1
-		&& Collide.WEIGHT.leader === 1,
-		'every real obstacle insists on the whole overlap, pipes included',
-		JSON.stringify(Collide.WEIGHT));
-	report(Collide.WEIGHT.manual > 1,
-		'...and the only number that is not 1 is a flag wearing a number, not a fraction');
-	report(Collide.WEIGHT.manual > 1,
-		'...and the one number that is not 1 is a flag wearing a number, not a fraction');
-}
-{
-	// And it runs inside relax(), not merely as a function nobody calls -- pipes first, so a label
-	// stepped off a line is then judged against its neighbours where it ended up.
-	const a = lbl(0, 0, 20, 6);
-	let asked = 0;
-	Collide.relax([a], [], function () { asked++; return [{ ax: -100, ay: 3, bx: 100, by: 3, weight: 1 }]; }, 4);
-	// Twice, not four times, and that is the right answer: the first iteration clears the label and
-	// the second finds nothing left to do, so the pass returns early. Asserting 4 would have been
-	// asserting that the convergence check is broken.
-	report(asked === 2, 'relax() asks for the pipes each iteration, and stops as soon as they settle',
-		'asked=' + asked);
-	report(Math.abs(a.ref.nudge.y) >= 3, '...and the label is off the pipe when it is done',
-		JSON.stringify(a.ref.nudge));
-}
-
-// ---- leaders, as segments now -------------------------------------------
-// Tom, 2026-08-15: "Why not do segment testing on the leaders if it can be done?" It can, it is the
-// same pushOffSegments() the pipes use, and it deleted the sampler outright -- with it went three
-// constants that had been wrong in world units, a cap that existed only to bound a chain, and the
-// question of how fat a one-pixel line should be. It is PERPENDICULAR now too, so a label crossing
-// a diagonal leader steps off it instead of sliding along it.
-console.log('--- leaders as segments ---');
-{
-	// THE EXEMPTION THAT HAD TO SURVIVE THE REWRITE. A leader ends ON its own label's near edge by
-	// construction, so without this the label walks a little farther away every iteration, forever.
-	const a = lbl(0, 0, 10, 10);
-	Collide.relax([a], [], function () {
-		return [{ ax: -20, ay: 5, bx: Collide.boxTopLeft(a).x, by: 5,
-			weight: Collide.WEIGHT.leader, owner: a.ref }];
-	}, 4);
-	report(near(a.ref.nudge.x, 0) && near(a.ref.nudge.y, 0),
-		'a label is not pushed by its own leader', JSON.stringify(a.ref.nudge));
-}
-{
-	// Someone ELSE's leader does, and the exemption is by identity rather than by geometry.
-	const a = lbl(0, 0, 10, 10), other = { nudge: { x: 0, y: 0 } };
-	Collide.relax([a], [], function () {
-		return [{ ax: -20, ay: 5, bx: 5, by: 5, weight: Collide.WEIGHT.leader, owner: other }];
-	}, 4);
-	report(Math.hypot(a.ref.nudge.x, a.ref.nudge.y) > 1,
-		"another element's leader does push it", JSON.stringify(a.ref.nudge));
-}
-{
-	// The sampler is gone, not merely unused, and so are its constants.
-	report(Collide.pushLeaderSamples === undefined, 'pushLeaderSamples() is gone');
-	report(Collide.LEADER_SAMPLE_STEP_PX === undefined && Collide.LEADER_SAMPLE_MAX === undefined,
-		'...and so are the sampling constants');
-}
-
-// ---- convergence and idempotence ---------------------------------------
-console.log('--- convergence ---');
-{
-	// A settled drawing must stop immediately rather than burning all four passes.
-	const a = label(0, 0, 10, 10), b = label(100, 100, 10, 10);
-	const iters = Collide.relax([a, b], [], null, 4);
-	report(iters === 1, 'a drawing with no overlaps settles in one iteration', `iters=${iters}`);
-}
-{
-	// IDEMPOTENCE. The caller zeroes every nudge before each pass (runLabelCollisionAvoidance()
-	// does), so running the pass twice on an unchanged drawing must give the same answer.
-	const boxes = [label(0, 0, 10, 10), label(6, 8, 10, 10), label(9, 3, 10, 10)];
-	Collide.relax(boxes, [], null, 4);
-	const first = boxes.map(function (b) { return { x: b.ref.nudge.x, y: b.ref.nudge.y }; });
-	boxes.forEach(function (b) { b.ref.nudge = { x: 0, y: 0 }; });   // what the caller does each frame
-	Collide.relax(boxes, [], null, 4);
-	const second = boxes.map(function (b) { return { x: b.ref.nudge.x, y: b.ref.nudge.y }; });
-	const same = first.every(function (n, i) {
-		return near(n.x, second[i].x) && near(n.y, second[i].y);
+	const cands = C.candidatesFor(LBL, 10, 25);
+	report(cands.length === 17, 'eight directions at two radii, plus where it already is', cands.length);
+	// **GOAL 7 IS SATISFIED BY CONSTRUCTION, NOT BY A PENALTY.** Every ring angle is at least 10
+	// degrees off horizontal and off vertical, so an orthogonal leader is never proposed. Asserted
+	// on the angles the generator actually produces, not on the constant, so a "tidy-up" that
+	// rounds the ring back onto the compass points fails here.
+	const offAxis = cands.slice(0, 16).every(c => {
+		const deg = Math.abs(Math.atan2(c.y, c.x) * 180 / Math.PI);
+		return [0, 90, 180].every(o => Math.abs(deg - o) > 9.99);
 	});
-	report(same, 'running the pass twice from zeroed nudges gives the same answer',
-		JSON.stringify([first, second]));
+	report(offAxis, 'no candidate direction is horizontal or vertical (goal 7)');
+	report(cands.every(c => Math.hypot(c.x, c.y) <= 25 + 1e-9),
+		'every candidate is inside the reach, so there is nothing to cap afterwards');
+	report(cands[16].x === LBL.home.x && cands[16].y === LBL.home.y,
+		'"leave it where it is" is one of the candidates, not a special case');
+	report(cands.every(c => c.neighbours.length > 0 && c.neighbours.every(i => i >= 0 && i < cands.length)),
+		'every candidate has neighbours, and they are real indices');
+	// The ring's neighbours are DIRECTIONS, so the two either side and the same direction at the
+	// other radius -- never a distance test, which would give the outer ring fewer neighbours than
+	// the inner one purely because it is bigger.
+	report(cands[0].neighbours.length === 3 && cands[0].neighbours.indexOf(8) >= 0,
+		'a ring candidate is a neighbour of the same direction at the other radius');
+
+	// GOAL 1: a dragged label's candidates lie on the RAY through the endpoint the user gave it.
+	const dragged = Object.assign({}, LBL, { dragged: true, home: { x: 30, y: -40 } });
+	const ray = C.candidatesFor(dragged, 10, 25);
+	report(ray[0].x === 30 && ray[0].y === -40, 'the stored endpoint is the first candidate');
+	const cross = ray.every(c => near(c.x * -40 - c.y * 30, 0, 1e-9));
+	report(cross, 'and every other candidate is collinear with it -- stretched, never turned');
+	report(ray.every(c => Math.hypot(c.x, c.y) >= 50 - 1e-9), '...and never nearer than the user put it');
+	report(C.candidatesFor(Object.assign({}, LBL, { dragged: true, home: { x: 0, y: 0 } }), 10, 25).length === 1,
+		'a dragged label sitting on its own anchor has no ray, and does not produce NaN');
 }
+
+// ---- 3. the ranking ---------------------------------------------------------------------------
+console.log('\n--- rank sets magnitude, and that is the whole weight table ---');
 {
-	// Three mutually overlapping labels: the point of the iteration is that they end apart.
-	const a = label(0, 0, 10, 10), b = label(4, 4, 10, 10), c = label(8, 2, 10, 10);
-	Collide.relax([a, b, c], [], null, 8);
-	report(!overlaps(a, b) && !overlaps(b, c) && !overlaps(a, c),
-		'three overlapping labels all end up clear of each other',
-		JSON.stringify([a, b, c].map(function (x) { return x.ref.nudge; })));
+	const W = C.GOAL_WEIGHT;
+	report(W.labelLabel > W.labelLeader && W.labelLeader > W.labelSymbol &&
+		W.labelSymbol > W.leaderSymbol && W.leaderSymbol > W.labelLink &&
+		W.labelLink > W.leaderLink && W.leaderLink > W.distance,
+		'the weights descend in Tom\'s own goal order, 2 3 4 5 6 8 10');
+	// **"You can be on a pipe and maybe still win."** A candidate lying across a pipe beats one
+	// lying across another label, which is the sentence turned into arithmetic. If a future edit
+	// makes the ladder steep enough to silence the low goals, or flat enough to lose the order,
+	// this is where it shows.
+	const obs = {
+		boxes: [Object.assign({ kind: 'label' }, C.box(30, 0, 20, 8, 0))],
+		segments: [{ ax: -30, ay: 0, bx: -10, by: 0, kind: 'link' }]
+	};
+	const l = { id: 'n:J1', anchor: { x: 0, y: 0 }, home: { x: 0, y: 0 }, w: 20, h: 8, yOff: -4 };
+	const onPipe = C.rawScore(l, { x: -20, y: 0 }, obs, 40);
+	const onLabel = C.rawScore(l, { x: 30, y: 0 }, obs, 40);
+	report(onPipe > 0 && onLabel > onPipe, 'sitting on a pipe costs something, and less than sitting on a label',
+		onPipe.toFixed(4) + ' vs ' + onLabel.toFixed(4));
+	// And the bottom of the ladder still decides when everything above it is equal: two placements
+	// in empty space differ only by distance.
+	const near1 = C.rawScore(l, { x: 0, y: -12 }, { boxes: [], segments: [] }, 40);
+	const far1 = C.rawScore(l, { x: 0, y: -36 }, { boxes: [], segments: [] }, 40);
+	report(far1 > near1, 'with nothing in the way, the nearer placement wins on goal 10 alone',
+		near1.toFixed(4) + ' vs ' + far1.toFixed(4));
+	// A label's own pipe and its own leader are not obstacles to it -- a link label sits ON its pipe
+	// by design, which is how a reader tells whose number it is.
+	const own = { boxes: [], segments: [{ ax: -30, ay: 0, bx: 30, by: 0, kind: 'link', owner: 'l:P1' }] };
+	const mine = { id: 'l:P1', anchor: { x: 0, y: 0 }, home: { x: 0, y: 0 }, w: 20, h: 8, yOff: -4 };
+	const other = { id: 'l:P2', anchor: { x: 0, y: 0 }, home: { x: 0, y: 0 }, w: 20, h: 8, yOff: -4 };
+	report(C.rawScore(mine, { x: 10, y: 0 }, own, 40) < C.rawScore(other, { x: 10, y: 0 }, own, 40),
+		'a link label may sit on its OWN pipe, and pays for anyone else\'s');
+}
+
+console.log('\n--- the neighbourhood term (goal 11), which is not a rank ---');
+{
+	const raw = [1, 0, 0, 0];
+	const cands = [{ neighbours: [1] }, { neighbours: [0, 2] }, { neighbours: [1, 3] }, { neighbours: [2] }];
+	report(C.effectiveScores(raw, cands, 0).every((v, i) => v === raw[i]),
+		'k = 0 is the raw field, unchanged -- the term is switchable off');
+	const eff = C.effectiveScores(raw, cands, 0.5);
+	report(eff[1] > eff[2], 'a clear candidate NEXT TO a bad one loses to an equally clear one in the open',
+		eff.map(v => v.toFixed(3)).join(' / '));
+	// NOT CIRCULAR, and this is the assertion that says so: neighbours contribute their RAW scores,
+	// so the pass is one sweep and cannot feed on its own output.
+	const twice = C.effectiveScores(raw, cands, 0.5);
+	report(twice.every((v, i) => v === eff[i]), 'and it is one pass -- computing it again changes nothing');
+}
+
+// ---- 4. the pass ------------------------------------------------------------------------------
+// A CROWD, on purpose: twenty-five labels on a 5x5 grid one unit apart, each about a label's width
+// wide. That is Net3's own situation at its fit scale -- a problem with no conflict-free answer at
+// all -- and it has to be genuinely over-constrained or every property below holds for nothing.
+function crowd(shiftX) {
+	const labels = [], obs = { boxes: [], segments: [] };
+	for (let r = 0; r < 5; r++) {
+		for (let c = 0; c < 5; c++) {
+			const x = c * 10 + (r === 2 && c === 2 ? shiftX || 0 : 0), y = r * 10;
+			labels.push({
+				id: 'n:J' + (r * 5 + c), anchor: { x: x, y: y }, home: { x: x + 3, y: y - 3 },
+				w: 14, h: 5, yOff: -4
+			});
+			const b = C.box(x, y, 3, 3, 0); b.kind = 'symbol';
+			obs.boxes.push(b);
+			if (c > 0) { obs.segments.push({ ax: x - 10, ay: y, bx: x, by: y, kind: 'link' }); }
+		}
+	}
+	return { labels, obs };
+}
+console.log('\n--- the pass itself ---');
+{
+	const { labels, obs } = crowd(0);
+	const frozen = JSON.stringify({ labels, obs });
+	const a = C.placeLabels(labels, obs, { inner: 6, outer: 15, k: 0.5 });
+	report(JSON.stringify({ labels, obs }) === frozen,
+		'NOTHING IS MUTATED -- the caller\'s labels and obstacles come back untouched');
+	const b = C.placeLabels(labels, obs, { inner: 6, outer: 15, k: 0.5 });
+	report(JSON.stringify(a) === JSON.stringify(b),
+		'IDEMPOTENT to the bit: no carried state, so running it twice equals running it once');
+	report(a.length === 25, 'every label is placed -- there is no failure condition and nothing is skipped',
+		a.length);
+	// **NOTHING TO CAP.** The old relaxation could carry a label 301 screen pixels from its node,
+	// and the cap that fixed that frequently put it back inside the collision it had just left.
+	const byId = {};
+	labels.forEach(l => { byId[l.id] = l; });
+	report(a.every(r => Math.hypot(r.x - byId[r.id].anchor.x, r.y - byId[r.id].anchor.y) <= 15 + 1e-9),
+		'and every placement is within reach of its own anchor, by construction');
+	// Hardest first: the middle of a 5x5 grid is the most constrained place in it, and it must not
+	// be left to choose last out of what is left.
+	const order = a.map(r => r.id);
+	report(order.indexOf('n:J12') < order.indexOf('n:J0'),
+		'the most crowded label chooses before the one in the corner', order.slice(0, 5).join(' '));
+
+	// GOAL 1 END TO END: a dragged label in the middle of the crowd stays on its own ray.
+	const dl = crowd(0);
+	dl.labels[12].dragged = true;
+	dl.labels[12].home = { x: 20 + 12, y: 20 - 9 };
+	const res = C.placeLabels(dl.labels, dl.obs, { inner: 6, outer: 15, k: 0.5 })
+		.filter(r => r.id === 'n:J12')[0];
+	report(near((res.x - 20) * -9 - (res.y - 20) * 12, 0, 1e-6),
+		'a dragged label placed among 24 others is still on the line the user drew', res.x + ',' + res.y);
+	report(Math.hypot(res.x - 20, res.y - 20) >= 15 - 1e-9,
+		'...and is never pulled back nearer than the endpoint it was given');
+}
+
+console.log('\n--- the index agrees with the definition it stands in for ---');
+{
+	// **THE INDEX IS ONLY SAFE IF IT ANSWERS THE SAME QUESTION AS THE SCAN.** placeLabels() queries a
+	// uniform grid for what is in reach of each label; obstaclesInReach() is the same question asked
+	// of a plain list, and is the definition. A broad phase that quietly drops an obstacle produces a
+	// layout that looks fine and is wrong in one place nobody will find, so the two are compared
+	// here member by member, on the crowded fixture, for every label.
+	const { labels, obs } = crowd(0);
+	const outer = 15, maxDiag = Math.max.apply(null, labels.map(l => Math.hypot(l.w, l.h)));
+	const index = C.grid(outer + maxDiag, obs);
+	obs.boxes.forEach((b, i) => index.addBox(i));
+	obs.segments.forEach((g, i) => index.addSegment(i));
+	const scratch = { boxes: [], segments: [] };
+	let same = true, worst = '';
+	labels.forEach(l => {
+		const want = C.obstaclesInReach(l, obs, outer);
+		const got = index.near(l.anchor.x, l.anchor.y, outer + Math.hypot(l.w, l.h), scratch);
+		const key = o => JSON.stringify(o.cx !== undefined ? [o.cx, o.cy, o.w, o.h, o.a] : [o.ax, o.ay, o.bx, o.by]);
+		const a1 = want.boxes.map(key).sort().join('|'), b1 = got.boxes.map(key).sort().join('|');
+		const a2 = want.segments.map(key).sort().join('|'), b2 = got.segments.map(key).sort().join('|');
+		if (a1 !== b1 || a2 !== b2) { same = false; worst = l.id; }
+	});
+	report(same, 'every grid query returns exactly the obstacles the scan would have found', worst);
+	// AND NO DUPLICATES: an obstacle spanning two cells is found by more than one of the nine, and
+	// counting it twice would silently double one goal's weight. This is the check that says the
+	// visit stamp is doing its job -- without it the assertion above still passes, since a duplicate
+	// survives the sort-and-join comparison as a repeated member only if it is really repeated.
+	const got = index.near(labels[12].anchor.x, labels[12].anchor.y, outer + 15, scratch);
+	report(new Set(got.boxes).size === got.boxes.length && new Set(got.segments).size === got.segments.length,
+		'...and returns each of them exactly once');
+}
+
+// ---- 5. what is left open, and is settled by measurement -------------------------------------
+// dev/label-placement-goals.md §3 leaves `k` and the candidate count open ON PURPOSE, to be decided
+// by measurement rather than by argument. Tom, on a proposal to open with 48 candidates: *"Not so
+// fast. Let's try it."* So these PRINT rather than assert, except for the one property the numbers
+// are there to support.
+console.log('\n--- measurements: k, stability, and whether the thin set is enough ---');
+{
+	// GOAL 9, "a small change nearby should not rearrange the whole map", measured as: move one node
+	// by a fiftieth of the grid spacing and count how many of the 25 labels choose a different
+	// placement. The smoothing is expected to buy most of goal 9 for free, because the minimum of a
+	// smoothed field moves less under a small perturbation than the minimum of a raw one.
+	// Summed over four shift sizes rather than measured at one, because a single perturbation
+	// measures as much luck as stability.
+	const SHIFTS = [0.1, 0.2, 0.35, 0.5];
+	function churn(k) {
+		const base = crowd(0);
+		const A = C.placeLabels(base.labels, base.obs, { inner: 6, outer: 15, k: k });
+		const pos = {};
+		A.forEach(r => { pos[r.id] = r; });
+		return SHIFTS.reduce(function (sum, sh) {
+			const moved = crowd(sh);
+			const B = C.placeLabels(moved.labels, moved.obs, { inner: 6, outer: 15, k: k });
+			return sum + B.filter(r => r.id !== 'n:J12')
+				.filter(r => Math.hypot(r.x - pos[r.id].x, r.y - pos[r.id].y) > 1e-6).length;
+		}, 0);
+	}
+	const ks = [0, 0.1, 0.25, 0.5, 1, 2];
+	const churns = ks.map(churn);
+	console.log('       label placements that change when ONE node shifts, over four shift sizes (96 chances):');
+	ks.forEach((k, i) => console.log(`         k = ${k}:  ${churns[i]}`));
+	// **THE SHIPPED k IS THE ONE THAT MEASURED BEST, and it is not the one that was guessed.** The
+	// first draft shipped 0.5 on the reasoning that more smoothing is more stability; the numbers
+	// say the opposite past a point, because a heavily smoothed field has broad flat minima and the
+	// argmin inside one of them moves freely. So this asserts the shipped value against the two
+	// quantities it was chosen on, and a future retune has to beat both.
+	const SHIPPED = 0.25;
+	report(churns[ks.indexOf(SHIPPED)] <= churns[0],
+		'the shipped k is at least as stable as no neighbour term at all',
+		churns[0] + ' -> ' + churns[ks.indexOf(SHIPPED)]);
+	// And the total conflict the pass is left with, per k -- the other half of the trade, since a
+	// layout that never moves is easy to get by never moving.
+	function residual(k) {
+		const { labels, obs } = crowd(0);
+		const res = C.placeLabels(labels, obs, { inner: 6, outer: 15, k: k });
+		const byId = {};
+		labels.forEach(l => { byId[l.id] = l; });
+		const o = { boxes: obs.boxes.slice(), segments: obs.segments.slice() };
+		res.forEach(r => {
+			o.boxes.push(Object.assign({ kind: 'label', owner: r.id }, C.labelBoxAtEnd(byId[r.id], r)));
+		});
+		return res.reduce((s, r) => s + C.rawScore(byId[r.id], r, o, 15), 0);
+	}
+	const resid = ks.map(residual);
+	console.log('       total remaining conflict at that k (lower is better):');
+	ks.forEach((k, i) => console.log(`         k = ${k}:  ${resid[i].toFixed(3)}`));
+	report(resid[ks.indexOf(SHIPPED)] <= resid[0] + 1e-9,
+		'...and leaves no more conflict on the drawing than no neighbour term at all',
+		resid[0].toFixed(3) + ' -> ' + resid[ks.indexOf(SHIPPED)].toFixed(3));
+
+	// THE CANDIDATE COUNT. The thin set is 8 directions x 2 radii; the question §3 asks is whether
+	// the neighbourhood term means anything at that spacing, which it does not if a denser ring
+	// finds materially better places. Compared here by scoring the same crowd against a set four
+	// times as dense, using the module's own scorer so the comparison is like for like.
+	function bestOverDenser(mult) {
+		const { labels, obs } = crowd(0);
+		const res = C.placeLabels(labels, obs, { inner: 6, outer: 15, k: 0.5 });
+		const byId = {};
+		labels.forEach(l => { byId[l.id] = l; });
+		let gain = 0;
+		res.forEach(r => {
+			const l = byId[r.id], at = C.rawScore(l, r, obs, 15);
+			let best = at;
+			for (let i = 0; i < 8 * mult; i++) {
+				for (const rad of [6, 10.5, 15]) {
+					const t = (10 + i * 360 / (8 * mult)) * Math.PI / 180;
+					const s = C.rawScore(l, { x: l.anchor.x + rad * Math.cos(t), y: l.anchor.y + rad * Math.sin(t) }, obs, 15);
+					if (s < best) { best = s; }
+				}
+			}
+			gain += at - best;
+		});
+		return gain;
+	}
+	console.log('       score a 4x denser ring could have found, summed over 25 labels: ' +
+		bestOverDenser(4).toFixed(3) + '   (measured against the thin set actually shipped)');
+}
+
+// ---- 6. cost, because this runs on every frame of a drag -------------------------------------
+// **THE PASS IS RE-RUN WHENEVER A LABEL MOVES, SO ITS COST IS A FEATURE OF THE DRAG.** Measured on
+// whatever machine runs it, and the absolute numbers are not the assertion -- the SHAPE is. The
+// first draft scored every candidate against every obstacle and took 1.5 seconds on 220 labels,
+// which is Net3's own count; the uniform index took that to a few tens of milliseconds, and more to
+// the point made it linear. The relaxation this replaced was faster at 220 and slower at 1000, for
+// the same reason: it was quadratic and this is not.
+console.log('\n--- cost ---');
+{
+	function net(n) {
+		const labels = [], obs = { boxes: [], segments: [] }, side = Math.ceil(Math.sqrt(n));
+		for (let i = 0; i < n; i++) {
+			const x = (i % side) * 12, y = Math.floor(i / side) * 12;
+			labels.push({ id: 'n:J' + i, anchor: { x, y }, home: { x: x + 3, y: y - 3 }, w: 14, h: 5, yOff: -4 });
+			obs.boxes.push(C.box(x, y, 3, 3, 0, 'symbol'));
+			if (i % side > 0) { obs.segments.push(C.segment(x - 12, y, x, y, 'link')); }
+		}
+		return { labels, obs };
+	}
+	function msPerPass(n) {
+		const { labels, obs } = net(n);
+		for (let w = 0; w < 3; w++) { C.placeLabels(labels, obs, { inner: 6, outer: 15, k: 0.25 }); }
+		const t = process.hrtime.bigint();
+		for (let i = 0; i < 5; i++) { C.placeLabels(labels, obs, { inner: 6, outer: 15, k: 0.25 }); }
+		return Number(process.hrtime.bigint() - t) / 5 / 1e6;
+	}
+	const small = msPerPass(220), big = msPerPass(1000);
+	console.log(`       220 labels (Net3's own count): ${small.toFixed(1)} ms per pass`);
+	console.log(`       1000 labels:                   ${big.toFixed(1)} ms per pass`);
+	// THE ASSERTION IS THE SLOPE, not the clock, so it means the same thing on any machine. Linear
+	// work gives a flat cost per label; drop the index and the cost per label rises with the size of
+	// the drawing, which is the regression that matters and the only one a timing test can catch
+	// without being flaky.
+	const perLabel = (big / 1000) / (small / 220);
+	report(perLabel < 2, 'the cost per label barely grows from 220 labels to 1000 -- the pass is linear',
+		perLabel.toFixed(2) + 'x the per-label cost at 4.5x the size');
+}
+
+console.log('\n--- the measured constants are the ones that SHIP --------------------------------');
+// EVERY placeLabels() call above passes inner/outer/k explicitly, which is right for measuring but
+// leaves a hole: the numbers §3 of dev/label-placement-goals.md was written to justify are read from
+// js/looped-network.js, and nothing above ever reads them. Setting LPN_NEIGHBOUR_K to 0 left all
+// fifty checks green -- the measurement and the shipped value could drift apart silently, which is
+// the same shape as a stub that removes the coupling under test.
+{
+	const page = fs.readFileSync(path.join(__dirname, '../../js/looped-network.js'), 'utf8');
+	const constOf = (name) => {
+		const m = new RegExp(name + '\\s*=\\s*([0-9.]+)').exec(page);
+		return m ? parseFloat(m[1]) : null;
+	};
+	report(constOf('LPN_NEIGHBOUR_K') === 0.25,
+		'the page ships the measured k, not the 0.5 that was first guessed', constOf('LPN_NEIGHBOUR_K'));
+	report(constOf('LPN_INNER_FRAC') === 0.4,
+		'and the measured inner-ring fraction', constOf('LPN_INNER_FRAC'));
+	// 8 directions x 2 radii + the current placement. Measured against a 4x denser ring, which was
+	// worth 0.64 of total score across 25 labels where one label-on-label overlap costs 1.0.
+	const cands = C.candidatesFor(LBL, 10, 25);
+	report(cands.length === 17, 'the candidate set is still the thin one that was measured', cands.length);
+	// And the page really does hand the module its own constants rather than falling through to the
+	// module defaults, which are a second set of numbers nobody measured.
+	report(/k:\s*LPN_NEIGHBOUR_K/.test(page) && /inner:\s*outer \* LPN_INNER_FRAC/.test(page),
+		'the page passes them rather than relying on the module defaults');
 }
 
 console.log(`\n${checks - failures}/${checks} checks passed`);
-process.exit(failures ? 1 : 0);
+process.exit(failures === 0 ? 0 : 1);

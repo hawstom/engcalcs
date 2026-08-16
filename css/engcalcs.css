@@ -348,7 +348,7 @@ html[lang="zh"] .ec-welcome {
    arrow is a symbol by construction and an annotation by purpose: nobody drew it, it exists to be
    read, and zoomed out it is noise on top of a network you are trying to see the shape of. So:
 
-     HIDDEN  data labels, their masks and leaders (.lpn-datalbl-part), flow arrows
+     HIDDEN  data labels and their leaders (.lpn-datalbl-part), flow arrows
      KEPT    the network itself -- nodes, pipes, pumps, valves, tanks -- and the user's own Text
              labels, which are authored content: they typed the words and chose the spot, and
              vanishing them under a threshold that never mentions Text labels would read as a bug.
@@ -399,7 +399,28 @@ html[lang="zh"] .ec-welcome {
 /* No font-size here -- it must be set inline in world units at each text element (see the
    buildNodeEls/buildLabelEls comments in looped-network.js for why a screen-pixel-flavored
    CSS font-size is wrong inside this scaled SVG group). */
-.lpn-lbl { fill: #333; pointer-events: none; user-select: none; }
+/* THE LEGIBILITY BACKING IS A HALO ON THE GLYPHS, NOT A RECT BEHIND THEM (Task 376, the way
+   epanetjs does it). `paint-order: stroke fill` paints the stroke first and the fill on top, so a
+   white stroke reads as an outline that follows the letters and merges between close characters --
+   and it costs one declaration where the rect cost an element per label, a pad constant, a rotation
+   kept in step with the text, and a rect left behind whenever a label was hidden.
+   **WIDTH IS `em`, NOT --lpn-hair, AND THE DIFFERENCE MATTERS TWICE.** Both are screen-pixel
+   constants here -- the font-size on each label is itself a pixel size divided by the scale -- so
+   either one answers the defect the old world-unit pad had, where 0.4 world units reached 24px a
+   side at working zoom and turned every pipe a label lay along into pale grey. But `em` also stays
+   proportional to the LETTERING: a Text label at 3x gets a 3x halo instead of a hairline, and the
+   clearance arithmetic in alignedLabelPlacement(), which is written in fractions of the font size,
+   stays true at every text size rather than only at the shipped one.
+   0.2em is 0.1em of white outside the glyph (~1.1px at the shipped 11px), a little tighter than the
+   0.15-of-font-size pad the rect drew. Tighter on purpose: half the stroke falls INSIDE the glyph,
+   where the fill paints over it everywhere except in a counter -- the enclosed hole of an e or an
+   8 -- and a heavy halo closes those up. `stroke-linejoin: round` keeps a sharp corner from
+   throwing a spike. */
+.lpn-lbl {
+	fill: #333; pointer-events: none; user-select: none;
+	paint-order: stroke fill;
+	stroke: #fff; stroke-width: 0.2em; stroke-linejoin: round;
+}
 /* pointer-events:none, found 2026-07-30 while verifying popup placement: labelsLayer draws ABOVE the
    symbol layers, so a leader line crossing a node swallowed the click meant for that node and the
    property popup simply never opened. A leader is not a thing you can click -- a label's own text
@@ -441,18 +462,12 @@ html[lang="zh"] .ec-welcome {
 	.lpn-just-dragged { animation: none; }
 }
 .lpn-draglbl { cursor: move; pointer-events: all; }
-/* Background mask behind a node/link/Text label (Task 146.01) so it stays legible over a backdrop
-   image, another element, or a busy area of the map -- sized/positioned entirely from JS
-   (positionMaskRect() in looped-network.js); pointer-events:none so it never steals the drag/click
-   that .lpn-draglbl's text needs. */
-.lpn-lbl-mask { fill: rgba(255, 255, 255, 0.75); pointer-events: none; }
 /* Masking is switchable (Task 330, Tom 2026-08-14: "We want to be able to turn off and on
    background masking"). One class on the <svg>, written by applyMaskLabels() from the PROJECT's own
    setting -- masking is a property of how the sheet is meant to be read, not of the browser, so per
-   Task 263 it is saved with the project like units and ID prefixes. `display`, not the fill: a rect
-   painted transparent still has to be laid out and still sits in the layer, and "off" here means
-   the mask is not there at all. */
-.lpn-masks-off .lpn-lbl-mask { display: none; }
+   Task 263 it is saved with the project like units and ID prefixes. Since Task 376 "off" is
+   `stroke: none` on the text itself; there is no longer an element to hide. */
+.lpn-masks-off .lpn-lbl { stroke: none; }
 /* Pump curve entry inside the element property popup (Tom, 2026-07-30: "the table needs headings
    for Head and Flow"). Scoped rather than left to the suite's general results-table styling: this
    is a compact input grid inside a floating popup, not a page-width results table, so it must not
@@ -839,7 +854,6 @@ html[lang="zh"] .ec-welcome {
    wrote into their project. Flow arrows deliberately stay -- direction is not a number, and it is
    the one annotation you still need at a glance. */
 .lpn-thematic .lpn-lbl,
-.lpn-thematic .lpn-lbl-mask,
 .lpn-thematic .lpn-leader { display: none; }
 
 /* The colour key. Its own overlay, created by colorLegendEl() in js/looped-network.js and placed

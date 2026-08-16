@@ -133,16 +133,16 @@ EngCalcs.lpnGeom = (function () {
 	// Approximate vertical box of a left-anchored, top-down multi-line <text> (node/link
 	// labels): no exact ascent/descent metrics are available cross-browser without layout,
 	// so this uses a fraction of font size that reads right for the suite's actual label
-	// content (short numbers/letters, no descenders like "g"/"y"). Good enough for a mask
-	// rect and collision boxes; not meant to be pixel-exact.
+	// content (short numbers/letters, no descenders like "g"/"y"). Good enough for
+	// collision boxes; not meant to be pixel-exact.
 	function dataLabelBoxHeight(lineCount, fontSize, lineHeight) {
 		return fontSize * 1.1 + Math.max(0, lineCount - 1) * lineHeight;
 	}
 
 	// WHERE A LABEL'S BOX ACTUALLY IS, given the point it is anchored at and what that point
 	// MEANS to the text element -- i.e. its own text-anchor/dominant-baseline. This is the one
-	// place the anchor convention is interpreted, so a mask, a bounding box, a collision box and
-	// a leader attachment can never disagree about where the same label is (ROADMAP Task 332).
+	// place the anchor convention is interpreted, so a bounding box, a collision box and a leader
+	// attachment can never disagree about where the same label is (ROADMAP Task 332).
 	//
 	// hAlign is the SVG text-anchor vocabulary ('start' | 'middle' | 'end') and vAlign says what
 	// y is: 'middle' (dominant-baseline:central -- vertical centre), 'hanging' (y IS the top of
@@ -155,15 +155,6 @@ EngCalcs.lpnGeom = (function () {
 		var left = hAlign === 'middle' ? x - w / 2 : hAlign === 'end' ? x - w : x;
 		var top = vAlign === 'middle' ? y - h / 2 : vAlign === 'hanging' ? y : y - fontSize * 0.85;
 		return { x: left, y: top, w: w, h: h };
-	}
-
-	// Geometry of the background rect drawn behind a label so it stays legible over a
-	// backdrop image or another element -- sized from the SAME w/h the label's own
-	// geometry uses, so it never drifts out of sync with what it is supposed to cover.
-	// Nothing but padding on top of labelBoxAt() above.
-	function maskRect(x, y, w, h, hAlign, vAlign, fontSize, pad) {
-		var b = labelBoxAt(x, y, w, h, hAlign, vAlign, fontSize);
-		return { x: b.x - pad, y: b.y - pad, width: w + 2 * pad, height: h + 2 * pad };
 	}
 
 	// WHICH PART OF A SEGMENT IS INSIDE A RECTANGLE, as the parameter range [t0, t1] along it
@@ -211,18 +202,33 @@ EngCalcs.lpnGeom = (function () {
 	// Returns the same {x, y, w, h} shape the collision boxes use (x/y = top-left), so the caller
 	// can hand it straight to lpn-collide with `movable: false`.
 	function rotatedLabelBox(ax, ay, w, h, angleDeg, fontSize) {
-		// Unrotated geometry, in the aligned label's own convention: horizontally centred on the
-		// anchor, first line's baseline at the anchor. Same 0.85·fontSize ascent approximation
-		// maskRect() uses above, for the same reason — no cross-browser metrics without layout.
-		var cx0 = ax, cy0 = ay - fontSize * 0.85 + h / 2,
+		var b = orientedLabelBox(ax, ay, w, h, 'middle', 'top', angleDeg, fontSize),
 			rad = angleDeg * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad),
-			dx = cx0 - ax, dy = cy0 - ay,
-			// The rotated centre.
-			cx = ax + dx * cos - dy * sin,
-			cy = ay + dx * sin + dy * cos,
 			halfW = (Math.abs(w * cos) + Math.abs(h * sin)) / 2,
 			halfH = (Math.abs(w * sin) + Math.abs(h * cos)) / 2;
-		return { x: cx - halfW, y: cy - halfH, w: halfW * 2, h: halfH * 2 };
+		return { x: b.cx - halfW, y: b.cy - halfH, w: halfW * 2, h: halfH * 2 };
+	}
+	// THE SAME BOX WITHOUT THROWING THE ANGLE AWAY: {cx, cy, w, h, a}, which is what
+	// lpn-collide's separating-axis tests take (ROADMAP Task 379). Prefer this to the AABB
+	// above wherever the consumer can handle an oriented box -- an aligned pipe label's AABB
+	// is 5.2x the label's own area at 45 degrees for a 100x12 label, and the ratio grows
+	// without limit with its length, so every one of those empty units is ground a label is
+	// kept out of for no reason.
+	//
+	// The rotation is about the ANCHOR (ax, ay), not about the box's own centre — that is what
+	// the SVG `rotate(a cx cy)` on the text element does, and a box turned about the wrong point
+	// is off by the distance between the two, which for a single-line label is most of its height.
+	// hAlign/vAlign say what the anchor MEANS, in labelBoxAt()'s own vocabulary.
+	function orientedLabelBox(ax, ay, w, h, hAlign, vAlign, angleDeg, fontSize) {
+		var b = labelBoxAt(ax, ay, w, h, hAlign, vAlign, fontSize),
+			cx0 = b.x + b.w / 2, cy0 = b.y + b.h / 2,
+			rad = (angleDeg || 0) * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad),
+			dx = cx0 - ax, dy = cy0 - ay;
+		return {
+			cx: ax + dx * cos - dy * sin,
+			cy: ay + dx * sin + dy * cos,
+			w: b.w, h: b.h, a: angleDeg || 0
+		};
 	}
 
 
@@ -343,9 +349,9 @@ EngCalcs.lpnGeom = (function () {
 		dataLabelBoxHeight: dataLabelBoxHeight,
 		labelBoxAt: labelBoxAt,
 		segmentRectRange: segmentRectRange,
-		maskRect: maskRect,
 		alignedLabelAnchor: alignedLabelAnchor,
 		rotatedLabelBox: rotatedLabelBox,
+		orientedLabelBox: orientedLabelBox,
 		pointToSegmentDistance: pointToSegmentDistance,
 		pointToPolylineDistance: pointToPolylineDistance
 	};
