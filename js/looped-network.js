@@ -2856,36 +2856,40 @@ var EngCalcs = EngCalcs || {};
 	// did not mention it, and every project open ran a fit. That is WHY switching tabs re-zoomed --
 	// and no fit, however exact, is as good as simply putting the reader back where they were.
 	//
-	// **A VIEW IS A REGION OF THE DRAWING, NOT A NUMBER OF PIXELS PER FOOT** (Tom, 2026-08-15,
-	// disagreeing with the first version of this and being right: *"I don't think that AutoCAD opens
-	// a DWG file to a zoom dependent on my screen's pixels... If the drawing was 50% of the view, it
-	// opens at 50% of the view."*). AutoCAD stores VIEWCTR and VIEWSIZE — a centre and a HEIGHT IN
-	// DRAWING UNITS — and the pixels-per-unit falls out of whatever window you open it in.
+	// **A VIEW IS A CENTRE AND A SCALE, BECAUSE THAT IS HOW A RESIZE ALREADY BEHAVES** (Tom,
+	// 2026-08-15, deciding it by walking the use cases and finding the parallel: *"I think I just
+	// convinced myself to save and open scale, not extent, since that's how we resize. Both are
+	// okay, but we should be parallel."*).
 	//
-	// The first version stored a centre and a SCALE, which fixed half of it: a scale is
-	// screen-independent in position but not in size, so the same file opened on a 32-inch monitor
-	// showed the same drawing at the same physical size with more empty space around it, rather than
-	// the same VIEW filled out. Storing the world extent instead makes the whole thing a statement
-	// about the model:
+	// THIS REPLACED A WORLD EXTENT, WHICH HE HAD ASKED FOR THE DAY BEFORE, and the reversal is not
+	// churn -- it is the resize question being answered first. Shrinking the window keeps the SCALE
+	// and shows less of the drawing (us, and epanetjs). If closing and reopening at that window size
+	// instead re-fitted the model into it, the app would answer the same question two ways depending
+	// on whether the window changed while it was open. One behaviour, whichever route you take.
 	//
-	//   * same window  -> identical, to the last bit;
-	//   * bigger window -> the same part of the drawing, filling the same fraction of the view;
-	//   * a window that grew in one direction only -> `min` binds on the other, so nothing that was
-	//     visible is pushed off. That is the same rule zoomExtent() uses, which is why a saved fit
-	//     reopens as a fit.
+	// AND IT IS EXACT, WHICH THE EXTENT FORM WAS NOT. Tom: *"Cycling switch window and zoom to fit
+	// still produces a change on zoom to fit, meaning it's producing an imperceptible change on
+	// switch/refocus."* Restoring an extent recomputes the scale as min(W/w, H/h), so a canvas that
+	// is one pixel different -- which the height dead band permits -- comes back at a slightly
+	// different zoom. A stored scale is copied verbatim and cannot drift.
+	//
+	// The COST, stated because it is real: opening a big model on a phone shows a fragment at the
+	// desktop's magnification rather than the whole intended view, small. Tom's use case (b) is that
+	// this is the honest outcome -- "you see the area of the pipe change. You blink your eyes. Good.
+	// You should."
 	function currentView() {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0,
 			sc = state.s || 1;
 		if (!w || !h) { return null; }
-		// cx/cy: the world point in the middle. w/h: how much of the model is on screen, in world
-		// units. No pixel anywhere in the record.
-		return { cx: (w / 2 - state.tx) / sc, cy: (h / 2 - state.ty) / sc, w: w / sc, h: h / sc };
+		// cx/cy: the world point in the middle. s: pixels per world unit, the same number a resize
+		// holds constant.
+		return { cx: (w / 2 - state.tx) / sc, cy: (h / 2 - state.ty) / sc, s: sc };
 	}
 	function validView(v) {
 		if (!v || !isFinite(v.cx) || !isFinite(v.cy)) { return false; }
-		// v.s is the pre-2026-08-15 form -- a pixel scale. Still read, so a project saved in the
-		// hour that shape existed still reopens where it was left; never written.
+		// The w/h form is the world-extent record that existed for a few hours on 2026-08-15. Still
+		// read so nothing saved in that window opens wrong; never written.
 		if (isFinite(v.w) && isFinite(v.h) && v.w > 0 && v.h > 0) { return true; }
 		return isFinite(v.s) && v.s > 0;
 	}
@@ -2893,13 +2897,19 @@ var EngCalcs = EngCalcs || {};
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0, sc;
 		if (!validView(v) || !w || !h) { return false; }
-		sc = (isFinite(v.w) && v.w > 0) ? Math.min(w / v.w, h / v.h) : v.s;
+		sc = isFinite(v.s) ? v.s : Math.min(w / v.w, h / v.h);
 		sc = Math.max(MIN_SCALE, Math.min(MAX_SCALE, sc));
+		var zoomed = sc !== state.s;
 		state.s = sc;
 		state.tx = w / 2 - sc * v.cx;
 		state.ty = h / 2 - sc * v.cy;
 		setTransform();
-		onZoomChanged();
+		// **A PAN IS NOT A ZOOM, AND ONLY A ZOOM NEEDS A RE-LAYOUT.** Everything onZoomChanged()
+		// rebuilds -- font sizes, tspan spacing, label boxes, the collision pass -- depends on the
+		// SCALE and on nothing else. Restoring a view at the scale already in force (switching to a
+		// tab and back, which is the commonest case there is) therefore costs one transform, where
+		// it used to cost a full relayout: over a second on Net3.
+		if (zoomed) { onZoomChanged(); }
 		return true;
 	}
 	// Per TAB, in memory only, and deliberately not in the library index: this is where you were

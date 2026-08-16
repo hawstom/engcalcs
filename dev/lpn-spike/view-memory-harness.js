@@ -9,20 +9,24 @@
 // the reader back where they were. The fit is now the FALLBACK, for a project nobody has looked at
 // yet.
 //
-// THE ONE DESIGN DECISION WORTH TESTING IS THE STORED SHAPE, and it took two goes to get right.
-// A view is kept as a world CENTRE and a world EXTENT -- a region of the drawing. Not tx/ty, and
-// not a pixel scale either:
+// THE ONE DESIGN DECISION WORTH TESTING IS THE STORED SHAPE, and it took three goes.
 //
-//   * tx/ty are screen-space, so restoring them on a different-sized window puts the same CORNER
-//     back and shows a different part of the drawing.
-//   * a pixel SCALE is screen-independent in position but not in size: the same file on a bigger
-//     monitor would show the same drawing at the same physical size with more blank around it.
-//     Tom, 2026-08-15: "I don't think that AutoCAD opens a DWG file to a zoom dependent on my
-//     screen's pixels... If the drawing was 50% of the view, it opens at 50% of the view." He is
-//     right, and it is what AutoCAD stores: VIEWCTR and VIEWSIZE, a centre and a height in DRAWING
-//     UNITS. Section 2 is the difference between the two.
-//   * a centre is a world point, so it flips into the Cartesian file frame with every other
-//     coordinate instead of being a private convention inside a public format. Section 4.
+//   1. tx/ty and a scale. Wrong: a translation is screen-space, so restoring it on a different
+//      window puts the same CORNER back and shows a different part of the drawing.
+//   2. A centre and a world EXTENT -- AutoCAD's VIEWCTR/VIEWSIZE. Defensible, and what Tom asked
+//      for first: "if the drawing was 50% of the view, it opens at 50% of the view."
+//   3. A centre and a SCALE, which is what this file now tests. Tom settled it by walking the use
+//      cases: "I think I just convinced myself to save and open scale, not extent, since that's how
+//      we resize. Both are okay, but we should be parallel." Shrinking a window keeps the scale and
+//      shows less; if reopening at that size re-fitted instead, the app would answer one question
+//      two ways depending on whether the window changed while it was open.
+//
+//      It is also EXACT where the extent form was not: restoring an extent recomputes the scale
+//      from the canvas size, so a one-pixel difference comes back at a slightly different zoom --
+//      which Tom saw as "cycling switch window and zoom to fit still produces a change".
+//
+// A centre is a world point either way, so it flips into the Cartesian file frame with every other
+// coordinate instead of being a private convention inside a public format. Section 4.
 
 const { setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 
@@ -34,6 +38,9 @@ const L = loadLoopedNetwork(
 	"\t\tserialize: serializeProject, flip: flipStoredY,\n" +
 	"\t\tsetOpenId: function (id) { library.openId = id; },\n" +
 	"\t\tmarkSized: noteMapSized,\n" +
+	"\t\tcountLayouts: function (f) { var n = 0, real = onZoomChanged;\n" +
+	"\t\t\tonZoomChanged = function () { n++; return real.apply(null, arguments); };\n" +
+	"\t\t\ttry { f(); } finally { onZoomChanged = real; } return n; },\n" +
 	"\t\tview: function () { return { tx: state.tx, ty: state.ty, s: state.s }; },\n" +
 	"\t\tsetViewRaw: function (tx, ty, s) { state.tx = tx; state.ty = ty; state.s = s; setTransform(); },\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h;\n" +
@@ -73,10 +80,8 @@ console.log('--- centre and scale describe the same view as tx/ty and scale ---'
 	// The centre of a 1000x600 canvas, in world units, at scale 2.5.
 	ok('the centre is the world point under the middle of the canvas',
 		near(v.cx, (500 + 120) / 2.5) && near(v.cy, (300 - 45) / 2.5), JSON.stringify(v));
-	// The EXTENT, not the scale: how much of the model is on screen, in world units. A 1000x600
-	// canvas at 2.5 px per unit is showing 400 x 240 units of drawing.
-	ok('...and what it records is how much MODEL is on screen, not pixels per unit',
-		near(v.w, 1000 / 2.5) && near(v.h, 600 / 2.5) && v.s === undefined, JSON.stringify(v));
+	ok('...and the scale is recorded as it stands, not derived from the canvas',
+		v.s === 2.5 && v.w === undefined, JSON.stringify(v));
 	L.setViewRaw(0, 0, 1);
 	L.applyView(v);
 	ok('applying it puts the transform back exactly',
@@ -97,14 +102,11 @@ console.log('\n--- a remembered view is about the drawing, not about the window 
 	const after = L.currentView();
 	ok('the same world point is still under the middle of the canvas',
 		near(after.cx, v.cx) && near(after.cy, v.cy), JSON.stringify(after) + ' vs ' + JSON.stringify(v));
-	// AND THE SAME FRACTION OF THE WINDOW, which is the point of storing an extent rather than a
-	// scale. A 1.6x wider and 1.5x taller window shows the drawing 1.5x bigger (min binds on the
-	// tighter dimension), not the same size with more blank space around it -- which is what a
-	// stored pixel scale would have done, and what Tom objected to.
-	ok('...filling the same fraction of the view, so the pixel scale GREW past the stored 2.5',
-		L.view().s > 2.5, 'scale now ' + L.view().s.toFixed(4));
-	ok('...by the tighter of the two dimensions', near(L.view().s, Math.min(1600 / v.w, 900 / v.h)),
-		L.view().s + ' vs ' + Math.min(1600 / v.w, 900 / v.h));
+	// AT THE SAME SCALE, which is the point of storing one: the drawing is the same size on the
+	// bigger window and you simply see more of it. That is exactly what shrinking the window does
+	// while the page is open, and the parallel is the reason this shape was chosen.
+	ok('...at the same scale, so the drawing is the same size and you see more of it',
+		L.view().s === 2.5, 'scale now ' + L.view().s);
 	// The corner deliberately does NOT survive, which is the whole reason for storing a centre. If
 	// tx had been stored raw it would be unchanged here, and a third of the drawing would have
 	// slid off the left of the wider window.
@@ -127,8 +129,11 @@ console.log('\n--- the per-tab memory ---');
 	L.setOpenId('P1');
 	L.restoreOrFit();
 	const back = L.currentView();
-	ok('coming back to a tab restores the view it was left at',
-		near(back.cx, mine.cx, 1e-6) && near(back.cy, mine.cy, 1e-6) && near(back.w, mine.w, 1e-6),
+	// EXACT, not nearly: a stored scale is copied verbatim. The extent form recomputed it from the
+	// canvas and came back a hair different, which is what Tom saw when he switched tabs and then
+	// pressed Zoom to fit.
+	ok('coming back to a tab restores the view it was left at, exactly',
+		back.cx === mine.cx && back.cy === mine.cy && back.s === mine.s,
 		JSON.stringify(back) + ' vs ' + JSON.stringify(mine));
 	// A project nobody has looked at yet has nothing to restore, so it gets the fit -- which is the
 	// old behaviour, now the fallback rather than the rule.
@@ -136,6 +141,20 @@ console.log('\n--- the per-tab memory ---');
 	L.setViewRaw(0, 0, 0.4);
 	L.restoreOrFit();
 	ok('a tab with no remembered view is fitted instead', L.view().s !== 0.4, L.view().s);
+	// **RESTORING AT THE SCALE ALREADY IN FORCE COSTS NO RE-LAYOUT**, which is the commonest case
+	// there is -- switching to a tab and back. Everything onZoomChanged() rebuilds depends on the
+	// scale and nothing else, so a pure pan has nothing to rebuild. On Net3 the difference is over
+	// a second (Tom, 2026-08-15: "Net3 with labels showing takes over 1 second to render on tab
+	// refocus").
+	L.setOpenId('P1');
+	L.setViewRaw(-300, -80, 3);
+	L.remember();
+	L.setViewRaw(0, 0, 3);          // panned, same scale
+	var layouts = L.countLayouts(function () { L.restoreOrFit(); });
+	ok('restoring a view at the same scale re-lays-out nothing', layouts === 0, layouts);
+	L.setViewRaw(0, 0, 1.5);        // a different scale
+	layouts = L.countLayouts(function () { L.restoreOrFit(); });
+	ok('...and restoring one at a different scale still does', layouts === 1, layouts);
 }
 
 // ---- 4. The file carries one too, in the file's own frame --------------------------------------
@@ -146,8 +165,7 @@ console.log('\n--- saved to file, in the Cartesian frame the rest of the file us
 	const live = L.currentView();
 	const saved = L.serialize();
 	ok('a saved project carries its view', L.validView(saved.view), JSON.stringify(saved.view));
-	ok('...as an extent in drawing units', near(saved.view.w, live.w) && near(saved.view.h, live.h),
-		JSON.stringify(saved.view));
+	ok('...at the scale that was on screen', saved.view.s === live.s, JSON.stringify(saved.view));
 	// THE FLIP. The document is stored Cartesian (Task 274), so the view's centre -- being a world
 	// point -- is stored negated in y like every other y in the file. Storing tx/ty instead would
 	// have put an unflipped screen-space translation in a flipped file.

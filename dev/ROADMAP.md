@@ -1849,6 +1849,23 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|364| **A pan is not a zoom, so it no longer re-lays-out — DONE 2026-08-15.** Tom: *"Net3 with
+  labels showing takes over 1 second to render on tab refocus."* Restoring a remembered view ran
+  `onZoomChanged()` unconditionally, which rebuilds font sizes, tspan spacing, every label box and
+  the whole collision relaxation — all of which depend on the SCALE and nothing else. Switching to a
+  tab and back is the commonest case there is and almost always at the same scale, so it now costs
+  one transform. Asserted by counting re-layouts.
+
+- 0|365| **The W3C validator badges are deleted — DONE 2026-08-15.** Tom: *"Delete the block."* They
+  rendered only in DEBUG_MODE and had stopped being either true or usable: the badge claimed "Valid
+  XHTML 1.1" on an HTML5 suite, and `validator.w3.org/check/referer` asks the W3C to fetch the page
+  it was linked from, which it cannot do for a dev host that is not on the public internet.
+  **What remains, named so the gap is not invisible:** `html_balance_check.php` renders every page
+  and verifies tag balance, blocking, in `check_all.sh`. That is not a validator — it does not know
+  a `<p>` may not contain a `<div>` — and **nothing in the repo checks the CSS at all.** If either
+  matters, the answer is a real validator in `check_all.sh` (the W3C ships a jar and an API), not a
+  link on a page.
+
 - 0|363| **A shorter map floor, and no validator badges under the canvas — DONE 2026-08-15.**
   - `LPN_MAP_MIN` 240 → **80** (Tom: *"Is there a good argument not to let it go to 80?"* — no).
     The old value rested on "a 60px map is not a working map", which answers the wrong question: the
@@ -1927,7 +1944,19 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   - **In the file** (`serializeProject().view`), so a project reopens cold where it was left. It
     rides along with saves that happen anyway; panning is never itself a reason to save, and never
     marks a project dirty.
-  - **Stored as a world CENTRE and a world EXTENT — a REGION of the drawing — and it took two goes.**
+  - **FINAL SHAPE: a world CENTRE and a SCALE.** It took three goes and the last word is Tom's, on
+    2026-08-15, reached by walking the use cases: *"I think I just convinced myself to save and open
+    scale, not extent, since that's how we resize. Both are okay, but we should be parallel."*
+    Shrinking a window keeps the scale and shows less of the drawing; if reopening at that size
+    re-fitted instead, the app would answer one question two ways depending on whether the window
+    changed while it was open. **It is also EXACT** — restoring an extent recomputes the scale as
+    `min(W/w, H/h)`, so a canvas one pixel different (which the height dead band permits) comes back
+    at a slightly different zoom. That was Tom's *"cycling switch window and zoom to fit still
+    produces a change"*. A stored scale is copied verbatim. The cost, accepted: a big model opened
+    on a phone shows a fragment at the desktop's magnification rather than the whole view, small —
+    his case (b), *"you see the area of the pipe change. You blink your eyes. Good. You should."*
+    The `w`/`h` extent form is still READ so nothing saved during its few hours opens wrong.
+  - The extent reasoning, kept because it was right about the FIRST version:
     The first version stored a centre and a pixel SCALE, which Tom rejected on sight and on the
     right grounds: *"I don't think that AutoCAD opens a DWG file to a zoom dependent on my screen's
     pixels... If the drawing was 50% of the view, it opens at 50% of the view."* That is exactly

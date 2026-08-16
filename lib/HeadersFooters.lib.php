@@ -156,11 +156,10 @@ EngCalcs.iconOpenTag = <?=json_encode(EC_ICON_OPEN_TAG)?>;</script>
 // sidebar). Task 286's requirement is that the notice be FINDABLE and that withdrawal be as easy as
 // consent; it never required a particular piece of furniture. What is not negotiable is that the
 // banner itself and the service worker below still render, which they do either way.
-// $devtools: the W3C validator badges, which only appear in DEBUG_MODE. A third flag rather than
-// a reading of the other two, because it is a different question -- Looped-Network.php is a
-// full-window map editor where anything below the canvas costs drawing room, and Tom found the
-// badges by scrolling a dev page and asked for them gone (2026-08-15). Every other page keeps them
-// exactly as before.
+// $devtools existed for one hour on 2026-08-15, to keep the W3C validator badges off the map page.
+// Tom then deleted the badges outright, so the flag has nothing left to gate -- kept, unused and
+// accepted by every caller, only because removing a parameter from a function twenty pages call is
+// churn with no reader on the other side of it.
 function echoFooter($type, $nav = true, $legal = true, $devtools = true) {
 ?>
 <div class="left d-print-none">
@@ -176,30 +175,21 @@ if ($nav) {
 // to reopen wherever the visitor happens to be standing.
 if ($legal && function_exists('echoConsentFooterLinks')) echoConsentFooterLinks();
 ?>
-<?php if (DEBUG_MODE === TRUE && $devtools) : ?>
-	<p>
-		<a href="http://validator.w3.org/check/referer">
-			<img
-				src="/valid-xhtml11.gif"
-				alt="Valid XHTML 1.1!"
-				width="88"
-				height="31"
-				style="border:0;width:88px;height:31px"
-			/>
-		</a>
-		<a href="http://jigsaw.w3.org/css-validator/validator?uri=http://www.hawsedc.com/hawsedc.css">
-			<img
-				src="/valid-css.gif"
-				alt="Valid CSS!"
-				width="88"
-				height="31"
-				style="border:0;width:88px;height:31px"
-			/>
-		</a>
-		Click image buttons to check this page now with the
-		World Wide Web Consortium, source of the HTML standard.
-	</p>
-<?php endif; ?>
+<?php // THE W3C VALIDATOR BADGES WERE HERE AND ARE DELETED (Tom, 2026-08-15: "Delete the block.
+      // It would be nice to check the validity of our CSS and HTML, but I guess you probably do
+      // that in other ways.").
+      //
+      // They were gated on DEBUG_MODE, so only a dev host ever saw them -- but they had stopped
+      // being true and stopped being able to work. The badge claimed "Valid XHTML 1.1" on a suite
+      // that is HTML5, and validator.w3.org/check/referer asks the W3C to fetch the page it was
+      // linked from, which it cannot do for a host that is not on the public internet. A button
+      // that makes a false claim and could not act on it either way is worse than no button.
+      //
+      // WHAT ACTUALLY CHECKS THIS NOW, so the loss is named: dev/scripts/html_balance_check.php
+      // renders EVERY page and verifies its tag balance, blocking, on every run of check_all.sh.
+      // That is not a validator -- it does not know a <p> may not contain a <div>, and NOTHING in
+      // the repo checks the CSS at all. If either matters, the honest answer is a real validator in
+      // check_all.sh (the W3C offers a local jar and an API), not a link. ?>
 </div>
 <?php if (function_exists('echoConsentBanner')) echoConsentBanner(); ?>
 <script>

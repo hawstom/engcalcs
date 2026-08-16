@@ -120,14 +120,20 @@ console.log('\n-- the footer gives up its navigation and keeps its notice --');
 	const hf = fs.readFileSync(path.join(root, 'lib/HeadersFooters.lib.php'), 'utf8');
 	report(/function echoFooter\(\$type, \$nav = true, \$legal = true, \$devtools = true\)/.test(hf),
 		'echoFooter takes $nav, $legal and $devtools, all defaulting to the old behaviour');
-	// $devtools joined them on 2026-08-15: the W3C validator badges only render in DEBUG_MODE, but
-	// on a full-window map editor anything below the canvas is drawing room, and Tom found them by
-	// scrolling a dev page. A third flag rather than a reading of the other two, because it is a
-	// different question -- and every other page keeps them.
 	report(/echoFooter\("EngCalcs", false, false, false\)/.test(page),
 		'and Looped-Network.php declines all three');
-	report(/DEBUG_MODE === TRUE && \$devtools/.test(hf),
-		'...with the badges gated on the flag as well as on DEBUG_MODE');
+	// **THE W3C VALIDATOR BADGES ARE GONE FROM EVERY PAGE** (Tom, 2026-08-15: "Delete the block").
+	// They were gated on DEBUG_MODE, so only a dev host saw them, and they had stopped being either
+	// true or usable: the badge claimed "Valid XHTML 1.1" on an HTML5 suite, and
+	// validator.w3.org/check/referer asks the W3C to fetch the page it was linked from, which it
+	// cannot do for a host that is not on the public internet.
+	report(!/valid-xhtml11\.gif|jigsaw\.w3\.org/.test(hf),
+		'and the stale W3C badges are gone from the footer entirely');
+	// What is left in their place is worth naming, because deleting a check without saying what
+	// replaced it is how a gap becomes invisible: html_balance_check.php renders every page and
+	// verifies tag balance, blocking, in check_all.sh. Nothing checks the CSS.
+	report(fs.existsSync(path.join(root, 'dev/scripts/html_balance_check.php')),
+		'...with page markup still checked by html_balance_check.php');
 	// **THE HALF THAT MUST NOT BE DROPPED.** Task 286 put the privacy/terms/cookie links and the
 	// consent banner in every footer on every page because "a privacy notice nobody can find is not
 	// notice", and Cookie settings must have something to reopen "wherever the visitor happens to
