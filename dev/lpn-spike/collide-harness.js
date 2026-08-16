@@ -232,6 +232,38 @@ console.log('\n--- the pass itself ---');
 		'...and is never pulled back nearer than the endpoint it was given');
 }
 
+console.log('\n--- the index agrees with the definition it stands in for ---');
+{
+	// **THE INDEX IS ONLY SAFE IF IT ANSWERS THE SAME QUESTION AS THE SCAN.** placeLabels() queries a
+	// uniform grid for what is in reach of each label; obstaclesInReach() is the same question asked
+	// of a plain list, and is the definition. A broad phase that quietly drops an obstacle produces a
+	// layout that looks fine and is wrong in one place nobody will find, so the two are compared
+	// here member by member, on the crowded fixture, for every label.
+	const { labels, obs } = crowd(0);
+	const outer = 15, maxDiag = Math.max.apply(null, labels.map(l => Math.hypot(l.w, l.h)));
+	const index = C.grid(outer + maxDiag, obs);
+	obs.boxes.forEach((b, i) => index.addBox(i));
+	obs.segments.forEach((g, i) => index.addSegment(i));
+	const scratch = { boxes: [], segments: [] };
+	let same = true, worst = '';
+	labels.forEach(l => {
+		const want = C.obstaclesInReach(l, obs, outer);
+		const got = index.near(l.anchor.x, l.anchor.y, outer + Math.hypot(l.w, l.h), scratch);
+		const key = o => JSON.stringify(o.cx !== undefined ? [o.cx, o.cy, o.w, o.h, o.a] : [o.ax, o.ay, o.bx, o.by]);
+		const a1 = want.boxes.map(key).sort().join('|'), b1 = got.boxes.map(key).sort().join('|');
+		const a2 = want.segments.map(key).sort().join('|'), b2 = got.segments.map(key).sort().join('|');
+		if (a1 !== b1 || a2 !== b2) { same = false; worst = l.id; }
+	});
+	report(same, 'every grid query returns exactly the obstacles the scan would have found', worst);
+	// AND NO DUPLICATES: an obstacle spanning two cells is found by more than one of the nine, and
+	// counting it twice would silently double one goal's weight. This is the check that says the
+	// visit stamp is doing its job -- without it the assertion above still passes, since a duplicate
+	// survives the sort-and-join comparison as a repeated member only if it is really repeated.
+	const got = index.near(labels[12].anchor.x, labels[12].anchor.y, outer + 15, scratch);
+	report(new Set(got.boxes).size === got.boxes.length && new Set(got.segments).size === got.segments.length,
+		'...and returns each of them exactly once');
+}
+
 // ---- 5. what is left open, and is settled by measurement -------------------------------------
 // dev/label-placement-goals.md §3 leaves `k` and the candidate count open ON PURPOSE, to be decided
 // by measurement rather than by argument. Tom, on a proposal to open with 48 candidates: *"Not so

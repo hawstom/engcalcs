@@ -486,9 +486,11 @@ EngCalcs.lpnCollide = (function () {
 			}
 		};
 	}
-	// The same question asked of a plain list, for callers and harnesses that have no index. Kept
-	// because it is the DEFINITION the grid has to agree with -- collide-harness.js checks that the
-	// two return the same placements, which is the only thing that makes the index safe to trust.
+	// The same question asked of a plain list. Kept because it is the DEFINITION the grid has to
+	// agree with, and collide-harness.js compares the two member by member for every label on its
+	// crowded fixture -- which is the only thing that makes the index safe to trust. A broad phase
+	// that quietly drops an obstacle produces a layout that looks fine and is wrong in one place
+	// nobody will ever find.
 	function obstaclesInReach(lbl, obs, reach) {
 		var r = reach + Math.hypot(lbl.w, lbl.h),
 			out = { boxes: [], segments: [] }, i, o;
