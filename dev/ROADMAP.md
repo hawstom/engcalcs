@@ -1849,13 +1849,46 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|362| **CSS PIXELS ARE THE SIZING UNIT, CONFIRMED AND WRITTEN DOWN — decided 2026-08-15.** Tom
+  after two rounds of argument and browser testing: *"This entire current phase of discussion is to
+  confirm that we want CSS pixels. I agree that we do... My inclination is to keep and tweak what we
+  have (I like CSS pixel!) with the insight we've gained about min as our standard view
+  measurement."* The alternatives were live, argued for on both sides, and are recorded here so the
+  question is not reopened from scratch.
+  - **THE TRADE, in one line: you can have COMPOSITION-INVARIANT or LEGIBILITY-INVARIANT, not both.**
+    Sizes as a fraction of the map area keep text, symbols and network in the same relationship at
+    any window size — resizing becomes moving closer to the same poster — but legibility varies.
+    Sizes in CSS pixels keep a number readable at any window size, and the relationship changes.
+    Everything else in the debate is downstream of that sentence.
+  - **The number that settled it:** `min` map dimension is the HEIGHT on a desktop (~370 on a
+    1366×768 laptop, ~660 at 1080p, ~1010 at 1440p) and the WIDTH on a phone (~390). So a
+    fraction-of-view size renders the same stored label at 11px on a desktop and **6.6px on a
+    phone** — 40% smaller on the device that needs it biggest.
+  - **Field evidence, gathered by Tom in both programs:** EPANET preserves the visible REGION on
+    resize (the drawing shrinks) with symbols and labels at fixed pixel sizes; epanetjs preserves
+    the SCALE (nothing moves) with everything in CSS pixels — the signature of a web-mapping style
+    spec, where even `symbol-spacing` is in pixels, which makes it a library default rather than a
+    decision. **Neither scales annotation with the window.** We match epanetjs on resize and both on
+    annotation.
+  - **Rejected, with reasons, so they are not re-proposed:** sizes as a fraction of the SHEET (Tom:
+    *"I don't shrink text for smaller sheets. Text is in printed inches, which depends on print
+    scale"* — and the intuitive implementation is a sheet border at a scale with sizes in MAP UNITS,
+    which is precisely what Task 331 removed); reading `window.screen` (constant for a session, so
+    it behaves like a pixel with added unpredictability, and changes when a window moves monitors);
+    and my own recommendation to plan around export sizing, which argued from a feature that does
+    not exist and is not planned.
+  - The one thing NOT settled: whether a window resize should preserve the region (EPANET) or the
+    scale (us, epanetjs). Tom, deliberately not deciding: *"this action is VERY rare compared to
+    zooming, switching, and opening on same and other devices."*
+
 - 0|361| **"Map size" always names its dimension — DONE 2026-08-15.** Tom: *"One question is how
   transparent and pedantic to be about 'screen size'. I assume that we use, and possibly disclose,
   minimum or maximum or diagonal dimension. Being intentional and consistent about that... can only
   be a good thing."* The audit found **three conventions already in use and not one of them named**:
   `max` for the label repeat spacing, `min` for the fit and the restored view, and WIDTH ALONE for
   the label-visibility threshold.
-  - **AND THE STANDARD IS `min`** (Tom, same day, overruling my "consistency would be the wrong
+  - **AND THE STANDARD IS `min`** (see also Task 362, which confirms CSS pixels as the sizing unit
+    and records why) (Tom, same day, overruling my "consistency would be the wrong
     goal"): *"we can standardize on min."* Half my argument was right — the FIT has no choice, since
     "must all of it fit" is settled by the tighter side. The other two were wrong:
     - the THRESHOLD reads min now, and my defence of width was bad language as much as bad design.

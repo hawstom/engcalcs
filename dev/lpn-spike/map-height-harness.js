@@ -137,22 +137,26 @@ console.log('\n--- resizing the canvas keeps the view centre, and tiny changes a
 {
 	// A canvas whose rect follows whatever height is written to it, so applyMapHeight() can be run
 	// for real rather than inspected as text.
-	function fakeCanvas(h) {
-		var el = { _h: h, _w: 1400, attrs: {} };
+	function fakeCanvas(h, w) {
+		var el = { _h: h, _w: w || 1400, attrs: {} };
 		el.getBoundingClientRect = function () { return { top: 180, bottom: 180 + el._h, width: el._w, height: el._h }; };
 		el.setAttribute = function (k, v) { el.attrs[k] = v; if (k === 'height') { el._h = Number(v); } };
 		return el;
 	}
 	function run(env) {
-		var svg = fakeCanvas(env.h0), state = { tx: env.tx || 0, ty: env.ty || 0, s: 1 }, transforms = 0;
-		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'state', 'setTransform', 'pageSettled', 'LPN_MAP_HEIGHT_DEADBAND',
+		var svg = fakeCanvas(env.h0, env.canvasW), state = { tx: env.tx || 0, ty: env.ty || 0, s: 1 }, transforms = 0,
+			// The canvas box as of the previous call. Seeded to the starting box, which is what the
+			// page's own boot does: the first applyMapHeight() records it and re-centres nothing.
+			lastMapBox = env.lastBox === undefined ? { w: 1400, h: env.h0 } : env.lastBox;
+		var fn = new Function('window', 'document', 'svg', 'LPN_MAP_MIN', 'state', 'setTransform', 'pageSettled', 'LPN_MAP_HEIGHT_DEADBAND', 'lastMapBox', 'noteMapSized',
 			extract('flowBelowMap') + '\n' + extract('effectiveMapHeight') + '\n' +
 			extract('applyMapHeight') +
 			'\nreturn applyMapHeight();');
 		fn({ innerHeight: env.vh, pageYOffset: 0 },
 			{ documentElement: { scrollTop: 0 }, body: { getBoundingClientRect: function () { return { bottom: env.bodyBottom }; } } },
 			svg, MIN, state, function () { transforms++; }, function () { return true; },
-			Number((src.match(/var LPN_MAP_HEIGHT_DEADBAND = (\d+);/) || [])[1]));
+			Number((src.match(/var LPN_MAP_HEIGHT_DEADBAND = (\d+);/) || [])[1]), lastMapBox,
+			function () { /* the deferred-fit hook; nothing to defer in here */ });
 		return { h: svg._h, state: state, transforms: transforms };
 	}
 	// The canvas is 600 tall and the window has room for 682. Growing it by 82 must show 41 more at
@@ -175,6 +179,39 @@ console.log('\n--- resizing the canvas keeps the view centre, and tiny changes a
 	// is the integer just below it. Since Math.floor replaced Math.round the computed value is always
 	// a whole number, so this is now the only shape sub-pixel churn can take -- and it is exactly the
 	// shape that would otherwise rewrite the height on every resize and every tab return.
+	// A WIDTH-ONLY RESIZE MUST RE-CENTRE TOO, and it is the case the old code could not see at all
+	// (Tom: "left offset/margin is fixed when changing window width"). The canvas width is CSS, so
+	// by the time any handler of ours runs the browser has already applied it -- there is no delta
+	// left to observe unless the previous box was remembered. And the old code only looked when the
+	// HEIGHT changed, which a width drag never does.
+	{
+		var w0 = { w: 1400, h: 690 };
+		var wide = run({ vh: 900, h0: 690, bodyBottom: 900, lastBox: w0, canvasW: 1800 });
+		report(wide.state.tx === (1800 - 1400) / 2, 'a width-only resize re-centres the drawing',
+			'tx moved by ' + wide.state.tx + ', want ' + (1800 - 1400) / 2);
+	}
+	// AND IT MUST NOT DRIFT -- Tom: "very active resizing gradually pans the map until it disappears
+	// left." The cause is the same as the case above: a resize that is not OBSERVED is not corrected
+	// for, and the shortfall accumulates across a drag that fires dozens of events. Note that the
+	// arithmetic FORM is not the fix and this harness says so: re-deriving from a remembered world
+	// point is algebraically identical to adding half the delta, and mutating the code to the
+	// additive form fails nothing here. What fixes it is measuring against the box as of the last
+	// call, so every change is seen exactly once.
+	{
+		var box = { w: 1400, h: 690 }, st = { tx: 0, ty: 0, s: 1 }, i, r2;
+		for (i = 0; i < 20; i++) {
+			r2 = run({ vh: 900, h0: box.h, bodyBottom: 900, lastBox: box,
+				canvasW: (i % 2) ? 1400 : 1500, tx: st.tx, ty: st.ty });
+			st = r2.state; box = { w: (i % 2) ? 1400 : 1500, h: r2.h };
+		}
+		// The loop ENDS at the width it started from, so a drift-free implementation must end with
+		// the transform it started from -- exactly zero, not nearly. (The first draft of this check
+		// expected the other width and was simply wrong about which iteration was last; the code was
+		// right. Worth the note: a returns-to-origin assertion is the honest shape here, because it
+		// needs no arithmetic to predict and cannot be satisfied by a drift that happens to cancel.)
+		report(st.tx === 0, 'twenty resizes ending where they began leave no drift at all',
+			'tx = ' + st.tx + ' after 20 resizes');
+	}
 	var same = run({ vh: 900, h0: 688.4, bodyBottom: 900.4 });
 	report(same.h === 688.4 && same.transforms === 0 && same.state.ty === 0,
 		'a height that has not really changed is not even written', same.h + ' ty ' + same.state.ty);

@@ -849,6 +849,24 @@ from the *previous* iteration's n whenever a roughness radio was on and no rock 
 safety factor was being applied to a d50 the user had typed. Both lived in one loop-exit condition, and **three of every four radio
 combinations were correct**, which is why years of hand-checking never caught either.
 
+**A STUB THAT REMOVES THE COUPLING MAKES A HARNESS PASS FOR THE WRONG REASON (2026-08-15, three
+times in one day).** `dev/lpn-spike/lpn-dom-stub.js` returns a constant 10 from `getBBox()` — so a
+zoom-to-fit harness could not see that label widths shrink as you zoom in, which is the entire
+physics of the bug it was written for, and a one-pass fit looked perfectly convergent. The same day:
+a harness's own `setZoom()` set `state.s` without re-laying-out, a state no browser can be in; and
+another set only the canvas WIDTH, leaving the height undefined, which reads as zero and is smaller
+than every threshold, so nothing ever hid and every check passed. **When a harness passes and the
+browser still misbehaves, suspect the stub before the code**: ask which quantity the real thing
+varies that the stub holds constant. The fix is to teach the stub the one physical relationship
+under test (here: a screen-sized glyph run is `px/s` in world units), not to add more assertions.
+
+**IDEMPOTENCE IS THE CHEAPEST STRONG ASSERTION FOR ANYTHING THAT SETS A VIEW OR A LAYOUT (Tom,
+2026-08-15).** His test for zoom-to-fit was *"open, reload, or switch and then zoom extents. Ideally
+nothing happens"* — and it found a defect that start-independence testing had missed. Applying an
+operation twice must equal applying it once, to the last bit; anything that only nearly holds is a
+value walking a little further every time the user presses the button. It needs no reference data
+and no hand arithmetic.
+
 **AND THE HARNESS OVERSTATED IT, which is its own lesson (Tom, 2026-08-14, testing in a browser:
 *"a lag of one step in the triggers"*).** He was right, and his framing is the one to keep: **a
 trigger heals a stale OUTPUT; it cannot heal a wrong INPUT.** That single sentence separates the

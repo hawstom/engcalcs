@@ -9472,6 +9472,9 @@ var EngCalcs = EngCalcs || {};
 	// wrongly. Same shape as fitAfterSolve() above: remember that one was wanted, and do it when the
 	// missing fact arrives.
 	var mapSized = false, fitWhenSized = false, pendingRestore = null;
+	// The canvas box as it was when applyMapHeight() last finished. A resize is only observable by
+	// comparing against it: the WIDTH is CSS and changes before any handler of ours runs.
+	var lastMapBox = null;
 	function armMapSizing() {
 		if (mapSizingArmed) { return; }
 		mapSizingArmed = true;
@@ -9504,17 +9507,41 @@ var EngCalcs = EngCalcs || {};
 		// differently after fonts load, after a tab comes back, after a scrollbar appears -- and
 		// re-applying a height that differs by half a pixel would move the drawing for no reason a
 		// reader could name.
-		if (Math.abs(h - before.height) >= LPN_MAP_HEIGHT_DEADBAND) {
-			svg.setAttribute('height', h);
-			var after = svg.getBoundingClientRect(),
-				dw = after.width - before.width,
-				dh = after.height - before.height;
-			if (Math.abs(dw) > 0.5 || Math.abs(dh) > 0.5) {
-				state.tx += dw / 2; state.ty += dh / 2;
-				setTransform();
-			}
-			before = after;
+		if (Math.abs(h - before.height) >= LPN_MAP_HEIGHT_DEADBAND) { svg.setAttribute('height', h); }
+		// **RE-CENTRED FROM AN ANCHOR, NOT BY ACCUMULATING DELTAS**, and against the size at the END
+		// of the LAST call rather than the start of this one. Three of Tom's observations on
+		// 2026-08-15 were one design fault between them:
+		//
+		//   (1) *"left offset/margin is fixed when changing window width; arguably staying centered
+		//       would be better."* The width is CSS (`width="100%"`), so by the time a resize handler
+		//       runs the browser has already applied it and there is no delta left to observe --
+		//       and the old code only looked at all when the HEIGHT changed. Hence: remember the box
+		//       from last time.
+		//   (2) *"very active resizing gradually pans the map until it disappears left."* Same cause:
+		//       a resize that was not OBSERVED was not corrected for, and the shortfall accumulated
+		//       across a drag that fires dozens of events. **The anchor form is not what fixes this
+		//       -- a mutation test proved that, and the note is worth keeping.** `tx = W/2 - s*cx`
+		//       with `cx` from the old box is algebraically identical to `tx += (W - Wold)/2`; what
+		//       fixes the drift is that the baseline is now the box as of the LAST CALL, so every
+		//       change is seen exactly once. The absolute form is kept because it says what it means
+		//       and cannot be half-applied, not because it computes anything different.
+		//   (3) *"same view stays centered when changing height UNLESS height is less than ~100px,
+		//       at which point the map stops centering and starts cropping from the bottom."* That
+		//       one is LPN_MAP_MIN doing its job: past the floor the canvas stops shrinking, so
+		//       there is no size change to re-centre against and the page scrolls instead. Left
+		//       alone deliberately -- see the floor's own comment.
+		var now = svg.getBoundingClientRect(), sc = state.s || 1, cx, cy;
+		if (lastMapBox && (Math.abs(now.width - lastMapBox.w) > 0.5 ||
+				Math.abs(now.height - lastMapBox.h) > 0.5)) {
+			// The world point that was under the middle of the canvas BEFORE the resize.
+			cx = (lastMapBox.w / 2 - state.tx) / sc;
+			cy = (lastMapBox.h / 2 - state.ty) / sc;
+			state.tx = now.width / 2 - sc * cx;
+			state.ty = now.height / 2 - sc * cy;
+			setTransform();
 		}
+		lastMapBox = { w: now.width, h: now.height };
+		before = now;
 		// **IF IT STILL RUNS OFF THE BOTTOM, MEASURE ONCE MORE AND BELIEVE THE SECOND ANSWER.**
 		//
 		// Tom's staged report, 2026-08-15, is what this is for: *"(1) map bottom is about half-way
