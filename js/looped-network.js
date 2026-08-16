@@ -797,14 +797,14 @@ var EngCalcs = EngCalcs || {};
 	// collides with. Mirrors updateDataLeader()/updateLabelGeometry()'s own geometry, minus the
 	// side-flip hysteresis (which needs render state and cannot change the line by more than the
 	// label's own width).
-	function currentLeaderBoxes() {
-		var out = [];
+	function currentLeaderSegments(out) {
 		function dataLeader(holder, anchor, end) {
 			if (!holder || holder.empty) { return; }
 			if (Math.hypot(end.x - anchor.x, end.y - anchor.y) <= leaderThreshold()) { return; }
 			// The stored endpoint itself -- the same two world points updateDataLeader() draws
 			// between, with nothing derived from the box in either place (Task 328).
-			Collide.pushLeaderSamples(out, anchor.x, anchor.y, end.x, end.y, holder, 1 / state.s);
+			out.push({ ax: anchor.x, ay: anchor.y, bx: end.x, by: end.y,
+				weight: LPN_COLLIDE_WEIGHT.leader, owner: holder });
 		}
 		doc.nodes.forEach(function (n) { dataLeader(nodeEls[n.id], { x: n.x, y: n.y }, nodeLabelPos(n)); });
 		doc.links.forEach(function (l) {
@@ -817,10 +817,10 @@ var EngCalcs = EngCalcs || {};
 			// Through the label's own box, since lb.align may put it somewhere other than centred
 			// on its point (Task 332) -- the same box updateLabelGeometry() attaches the leader to.
 			var box = textLabelBox(lb, le, an.x + lb.x, an.y + lb.y), halfW = box.w / 2;
-			Collide.pushLeaderSamples(out, an.x, an.y,
-				Geom.leaderAttachX(box.x + halfW, halfW, an.x), box.y + box.h / 2, null, 1 / state.s);
+			out.push({ ax: an.x, ay: an.y,
+				bx: Geom.leaderAttachX(box.x + halfW, halfW, an.x), by: box.y + box.h / 2,
+				weight: LPN_COLLIDE_WEIGHT.leader, owner: null });
 		});
-		return out;
 	}
 	// Immovable, non-leader obstacles: node symbols (strength 0.5) and Text labels (strength 1,
 	// since a Text is a label the user placed deliberately -- a data label yields to it, never the
@@ -1015,7 +1015,7 @@ var EngCalcs = EngCalcs || {};
 	function debugBoxesOn() {
 		return typeof location !== 'undefined' && /(\?|&)debug=boxes(&|$)/.test(location.search || '');
 	}
-	function drawCollisionBoxes(labels, statics, leaders) {
+	function drawCollisionBoxes(labels, statics, segments) {
 		if (!debugBoxLayer) { return; }
 		while (debugBoxLayer.firstChild) { debugBoxLayer.removeChild(debugBoxLayer.firstChild); }
 		if (!debugBoxesOn()) { return; }
@@ -1030,17 +1030,23 @@ var EngCalcs = EngCalcs || {};
 			});
 		}
 		// The three colours answer the three questions the pictures raise: what is being moved
-		// (blue), what it is being moved out of (green), and how fat the leaders are (red) -- which
-		// is the one that turned out to be wrong by an order of magnitude.
+		// (blue), what it is being moved out of (green), and which lines are obstacles (red).
 		draw(statics, '#0a0');
-		draw(leaders, '#d00');
+		// LINES ARE DRAWN AS LINES since they stopped being sampled into boxes -- a chain of red
+		// squares along every pipe would bury the drawing it is meant to explain.
+		segments.forEach(function (seg) {
+			el('line', {
+				x1: seg.ax, y1: seg.ay, x2: seg.bx, y2: seg.by,
+				stroke: '#d00', 'stroke-width': 2 / state.s, 'stroke-opacity': 0.5,
+				'pointer-events': 'none'
+			}, debugBoxLayer);
+		});
 		draw(labels, '#00d');
 	}
-	// Every pipe centreline as plain segments, at the low pipe weight -- see pushOffSegments().
-	// Recomputed per iteration like the leaders, for no reason of its own (a pipe does not move
-	// while the pass runs); it costs one array build and keeps the two obstacle sources on the same
-	// contract, so a future vertex-drag-live-relayout cannot go stale.
-	function currentPipeSegments() {
+	// Pipes AND leaders, as one list of line obstacles -- see relax()'s segmentsFn. Every pipe
+	// centreline at the low pipe weight, then every drawn leader at full weight with its owner
+	// attached. Rebuilt per iteration because a leader follows its own label.
+	function currentLineObstacles() {
 		var out = [];
 		doc.links.forEach(function (l) {
 			var pts = linkPointList(l), i;
@@ -1049,6 +1055,7 @@ var EngCalcs = EngCalcs || {};
 					weight: LPN_COLLIDE_WEIGHT.pipe });
 			}
 		});
+		currentLeaderSegments(out);
 		return out;
 	}
 	function runLabelCollisionAvoidance() {
@@ -1105,10 +1112,10 @@ var EngCalcs = EngCalcs || {};
 		placeStationedLabels(stationed, statics, fs);
 		// Leaders are rebuilt every iteration (they track their labels); node symbols and Text
 		// labels do not move, so they are built once above.
-		Collide.relax(labels, statics, currentLeaderBoxes, 4, currentPipeSegments);
+		Collide.relax(labels, statics, currentLineObstacles, 4);
 		capNudges(labels);
 		// After the cap, so what is drawn is where things actually ended up.
-		drawCollisionBoxes(labels, statics, currentLeaderBoxes());
+		drawCollisionBoxes(labels, statics, currentLineObstacles());
 	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped.

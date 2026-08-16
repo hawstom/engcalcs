@@ -423,6 +423,13 @@ html[lang="zh"] .ec-welcome {
    behind by a relayout. */
 .lpn-just-dragged {
 	paint-order: stroke fill;
+	/* **SCREEN PIXELS, WHICH A BARE stroke-width IS NOT** (Tom, 2026-08-15: "The mark is huge,
+	   bigger than the screen"). Everything in this layer sits under the world transform, so a 4px
+	   stroke is 4 MAP units and becomes 4 x scale pixels on screen -- at Net3's zoom, most of the
+	   window. vector-effect keeps the stroke at 4 device-independent pixels whatever the transform
+	   does, which is what --lpn-hair achieves arithmetically for the leaders. Same standing bug
+	   class as the leader sample boxes, one layer down in CSS this time. */
+	vector-effect: non-scaling-stroke;
 	animation: lpn-just-dragged 45s linear forwards;
 }
 /* A HALO ON THE GLYPHS, NOT A DASHED BOX, and the choice is worth recording because Tom offered

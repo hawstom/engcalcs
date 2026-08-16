@@ -86,36 +86,50 @@ console.log('--- peer labels ---');
 	report(near(a.ref.nudge.y, 0) && near(b.ref.nudge.y, 0), 'and leaves y alone');
 }
 
-// ---- an immovable obstacle absorbs none of the push --------------------
+// ---- an immovable obstacle: weight means INSISTENCE ---------------------
 console.log('--- immovable obstacles ---');
 {
-	// A node SYMBOL is weight 0.5 against a label's 1, so the label takes only B/(A+B) =
-	// 0.5/1.5 = ONE THIRD of the separation per iteration, and the obstacle takes none
-	// because it cannot move. That is the documented intent ("worth stepping off, but not
-	// worth flinging a label across the map"), and its arithmetic consequence is that four
-	// iterations do not finish the job: each pass removes a third of what is left.
+	// **THIS BLOCK USED TO ASSERT THE DEFECT.** It recorded, deliberately and in detail, that a
+	// label pushed by a node symbol at weight 0.5 moved only B/(A+B) = a THIRD of the way out per
+	// iteration and so was still resting on the symbol after all four -- "recorded rather than
+	// fixed (Task 293 is a lift-out, not a redesign)... whether that is worth another iteration or
+	// a different weight is Tom's call, not the harness's."
 	//
-	// FINDING, recorded rather than fixed (Task 293 is a lift-out, not a redesign): against
-	// a half-strength obstacle the pass STOPS SHORT. From a 2-unit overlap it leaves about
-	// 0.3 — a label resting slightly on a node symbol. Nobody had seen this because nothing
-	// could measure it; whether 0.3 world units is worth another iteration or a different
-	// weight is Tom's call, not the harness's. What is asserted here is the real behaviour,
-	// so a future change to either number shows up as a diff instead of a surprise.
+	// He made the call by looking at the map: *"Node labels still not avoiding pipes at all."* The
+	// pass was not failing to push; it was pushing a fraction of the way and stopping. Against
+	// something that cannot move, a weight now means INSISTENCE -- how much of the overlap is gone
+	// when the iteration ends -- so 1 clears completely, in one pass, and a lower number leaves a
+	// predictable remainder instead of an asymptote.
 	const a = label(0, 0, 10, 10);
 	const node = obstacle(6, 8, 10, 10, Collide.WEIGHT.node);
-	const before = 2;                                  // y overlap at rest
 	Collide.relax([a], [node], null, 4);
 	report(a.ref.nudge.y < 0, 'pushed away from the obstacle, not into it');
-	report(near(a.ref.nudge.y, -1.6851851851851851, 1e-9),
-		'a half-strength obstacle is cleared by exactly a third per pass', `nudge.y=${a.ref.nudge.y}`);
-	report(overlaps(a, node) && before + a.ref.nudge.y < 0.4,
-		'four passes leave a small residual overlap on a node symbol (see note above)',
-		`residual=${(before + a.ref.nudge.y).toFixed(4)}`);
-	// Given enough passes it does converge — the weight slows it down, it does not stall.
+	report(!overlaps(a, node), 'a node symbol at weight 1 is cleared completely',
+		`nudge.y=${a.ref.nudge.y}`);
+	// ...and in ONE iteration, which is the difference from the old behaviour. The pass returns on
+	// the second because nothing moved in it.
 	const b = label(0, 0, 10, 10);
-	Collide.relax([b], [obstacle(6, 8, 10, 10, Collide.WEIGHT.node)], null, 40);
-	report(!overlaps(b, node), 'and it does clear completely given enough passes',
-		`nudge.y=${b.ref.nudge.y}`);
+	const iters = Collide.relax([b], [obstacle(6, 8, 10, 10, Collide.WEIGHT.node)], null, 4);
+	report(iters === 2, '...on the first pass, not asymptotically over four', `iters=${iters}`);
+	// A LOWER weight leaves a deliberate remainder. That is what makes the pipe's 0.4 a preference
+	// rather than a prohibition: the label steps most of the way off the line, and anything that
+	// insists more can push it back on.
+	const c = label(0, 0, 10, 10);
+	Collide.relax([c], [obstacle(6, 8, 10, 10, 0.5)], null, 1);
+	report(Math.abs(c.ref.nudge.y) > 0.5 && Math.abs(c.ref.nudge.y) < 2,
+		'a half-weight obstacle removes about half the overlap and leaves the rest',
+		`nudge.y=${c.ref.nudge.y}`);
+	report(Collide.insistence(1) === 1 && Collide.insistence(0) === 0 && Collide.insistence(1000) === 1,
+		'insistence passes 0 and 1 through and clamps a very heavy obstacle to "all of it"');
+	// AND THE SAME ON THE OTHER AXIS. The push takes whichever of x or y is the smaller overlap, so
+	// the two are separate branches -- a fixture that only ever overlaps vertically leaves half the
+	// change untested, which is exactly what the first mutation run found.
+	const d = label(0, 0, 10, 10);
+	const sideOn = obstacle(8, 6, 10, 10, Collide.WEIGHT.node);   // x overlap 2, y overlap 4
+	Collide.relax([d], [sideOn], null, 4);
+	report(d.ref.nudge.x < 0 && near(d.ref.nudge.y, 0),
+		'...and it clears sideways when x is the smaller overlap', JSON.stringify(d.ref.nudge));
+	report(!overlaps(d, sideOn), '...completely, on that axis too');
 }
 {
 	// A MANUALLY dragged label is immovable and weight 1000, so the automatic one absorbs
@@ -215,7 +229,7 @@ function lbl(x, y, w, h) {
 	// stepped off a line is then judged against its neighbours where it ended up.
 	const a = lbl(0, 0, 20, 6);
 	let asked = 0;
-	Collide.relax([a], [], null, 4, function () { asked++; return [{ ax: -100, ay: 3, bx: 100, by: 3, weight: 1 }]; });
+	Collide.relax([a], [], function () { asked++; return [{ ax: -100, ay: 3, bx: 100, by: 3, weight: 1 }]; }, 4);
 	// Twice, not four times, and that is the right answer: the first iteration clears the label and
 	// the second finds nothing left to do, so the pass returns early. Asserting 4 would have been
 	// asserting that the convergence check is broken.
@@ -225,92 +239,38 @@ function lbl(x, y, w, h) {
 		JSON.stringify(a.ref.nudge));
 }
 
-// ---- leader samples ----------------------------------------------------
-console.log('--- pushLeaderSamples ---');
+// ---- leaders, as segments now -------------------------------------------
+// Tom, 2026-08-15: "Why not do segment testing on the leaders if it can be done?" It can, it is the
+// same pushOffSegments() the pipes use, and it deleted the sampler outright -- with it went three
+// constants that had been wrong in world units, a cap that existed only to bound a chain, and the
+// question of how fat a one-pixel line should be. It is PERPENDICULAR now too, so a label crossing
+// a diagonal leader steps off it instead of sliding along it.
+console.log('--- leaders as segments ---');
 {
-	const out = [];
-	Collide.pushLeaderSamples(out, 0, 0, 10, 0, null);          // px omitted -> 1 world unit per pixel
-	// step 3 over a length of 10 -> 4 intervals -> 5 samples, ends inclusive.
-	report(out.length === 5, 'samples the whole line at the step', `n=${out.length}`);
-	report(near(Collide.boxTopLeft(out[0]).x, -Collide.LEADER_SAMPLE_HALF_PX), 'first sample is centred on the start');
-	report(near(Collide.boxTopLeft(out[out.length - 1]).x, 10 - Collide.LEADER_SAMPLE_HALF_PX),
-		'last sample is centred on the end');
-	report(out.every(function (b) { return b.weight === Collide.WEIGHT.leader && !b.movable; }),
-		'every sample is an immovable leader-weight box');
-	// The step must stay under a sample box's own width or the chain has gaps a label can sit in.
-	report(Collide.LEADER_SAMPLE_STEP_PX <= Collide.LEADER_SAMPLE_HALF_PX * 2,
-		'sample step is fine enough that boxes cannot slip between samples');
-}
-{
-	// THE UNITS, which is the whole point of the fix. The constants are SCREEN PIXELS and the
-	// caller passes world-units-per-pixel, so the same leader sampled at two zooms must produce
-	// the same number of boxes of the same SCREEN size -- and a different world size each time.
-	// Asserting a world figure would assert nothing: 0.3 world units is 11 screen pixels on Net3
-	// and a third of a pixel on the basic example, which is exactly how the old fixed constants
-	// managed to over-avoid one drawing and ignore another.
-	const zoomedIn = [], zoomedOut = [];
-	Collide.pushLeaderSamples(zoomedIn, 0, 0, 40, 0, null, 1);       // 40 world units = 40 px
-	Collide.pushLeaderSamples(zoomedOut, 0, 0, 400, 0, null, 10);    // 400 world units = 40 px
-	report(zoomedIn.length === zoomedOut.length,
-		'a leader of the same SCREEN length gets the same number of samples at any zoom',
-		`${zoomedIn.length} vs ${zoomedOut.length}`);
-	report(near(zoomedOut[0].w, zoomedIn[0].w * 10),
-		'...and each box is ten times the WORLD size when a pixel is ten times as wide',
-		`${zoomedIn[0].w} vs ${zoomedOut[0].w}`);
-	report(near(zoomedIn[0].w, Collide.LEADER_SAMPLE_HALF_PX * 2),
-		'...which is the pixel width the line is drawn at, not a world constant');
-}
-{
-	// A very long leader is capped rather than generating an unbounded chain. The cap has to sit
-	// well above a real one: a leader runs from a node to a label at most the nudge cap away, so
-	// 200 samples at 3px is 600px of leader -- longer than any that can occur.
-	const out = [];
-	Collide.pushLeaderSamples(out, 0, 0, 100000, 0, null);
-	report(out.length === Collide.LEADER_SAMPLE_MAX + 1, 'a long leader is capped', `n=${out.length}`);
-	report(Collide.LEADER_SAMPLE_MAX * Collide.LEADER_SAMPLE_STEP_PX > 500,
-		'...but not before any leader a drawing can actually produce');
-}
-{
-	// Zero-length leader still yields at least one sample and no NaN.
-	const out = [];
-	Collide.pushLeaderSamples(out, 4, 4, 4, 4, null);
-	report(out.length === 2 && !Number.isNaN(out[0].base.x), 'zero-length leader is safe', `n=${out.length}`);
-}
-
-// ---- a label never collides with its own leader ------------------------
-console.log('--- own-leader exemption ---');
-{
-	// The leader ends ON the label's near edge by construction, so without the exemption the
-	// label would be pushed a little farther away on every single iteration, forever.
-	const a = label(0, 0, 10, 10, { tag: 'owner' });
-	function ownLeader() {
-		const out = [];
-		Collide.pushLeaderSamples(out, -20, 5, Collide.boxTopLeft(a).x, 5, a.ref);
-		return out;
-	}
-	Collide.relax([a], [], ownLeader, 4);
+	// THE EXEMPTION THAT HAD TO SURVIVE THE REWRITE. A leader ends ON its own label's near edge by
+	// construction, so without this the label walks a little farther away every iteration, forever.
+	const a = lbl(0, 0, 10, 10);
+	Collide.relax([a], [], function () {
+		return [{ ax: -20, ay: 5, bx: Collide.boxTopLeft(a).x, by: 5,
+			weight: Collide.WEIGHT.leader, owner: a.ref }];
+	}, 4);
 	report(near(a.ref.nudge.x, 0) && near(a.ref.nudge.y, 0),
 		'a label is not pushed by its own leader', JSON.stringify(a.ref.nudge));
 }
 {
-	// Someone ELSE's leader does push it.
-	const a = label(0, 0, 10, 10, { tag: 'a' });
-	const other = { nudge: { x: 0, y: 0 }, tag: 'other' };
-	function foreignLeader() {
-		const out = [];
-		Collide.pushLeaderSamples(out, -20, 5, 5, 5, other);
-		return out;
-	}
-	Collide.relax([a], [], foreignLeader, 4);
-	report(a.ref.nudge.x !== 0 || a.ref.nudge.y !== 0,
+	// Someone ELSE's leader does, and the exemption is by identity rather than by geometry.
+	const a = lbl(0, 0, 10, 10), other = { nudge: { x: 0, y: 0 } };
+	Collide.relax([a], [], function () {
+		return [{ ax: -20, ay: 5, bx: 5, by: 5, weight: Collide.WEIGHT.leader, owner: other }];
+	}, 4);
+	report(Math.hypot(a.ref.nudge.x, a.ref.nudge.y) > 1,
 		"another element's leader does push it", JSON.stringify(a.ref.nudge));
 }
 {
-	// The leader function is rebuilt EVERY iteration, because a leader follows its own label.
-	let calls = 0;
-	const a = label(0, 0, 10, 10), b = label(6, 8, 10, 10);
-	Collide.relax([a, b], [], function () { calls++; return []; }, 4);
-	report(calls >= 2, 'leaders are recomputed per iteration, not once', `calls=${calls}`);
+	// The sampler is gone, not merely unused, and so are its constants.
+	report(Collide.pushLeaderSamples === undefined, 'pushLeaderSamples() is gone');
+	report(Collide.LEADER_SAMPLE_STEP_PX === undefined && Collide.LEADER_SAMPLE_MAX === undefined,
+		'...and so are the sampling constants');
 }
 
 // ---- convergence and idempotence ---------------------------------------

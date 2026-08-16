@@ -1968,6 +1968,31 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|383| **Leaders are segments too, weights mean insistence, and the mark is in screen pixels —
+  DONE 2026-08-15.** Four findings from one round of Tom looking at `?debug=boxes`.
+  - **"Why not do segment testing on the leaders if it can be done?"** It can, it is the same
+    `pushOffSegments()` the pipes use, and it is better in three ways at once: exact rather than a
+    chain of squares a box could slip between, O(1) per pair rather than one pair per 3 pixels of
+    line, and PERPENDICULAR, so a label crossing a diagonal leader steps off it instead of sliding
+    along it. It deleted the sampler, its three constants (wrong in world units until earlier the
+    same day), and the cap that existed only to bound a chain.
+  - **"Node labels still not avoiding pipes at all."** They were being pushed — a fraction of the
+    way, and then the pass stopped. The old formula gave the movable box a share proportional to
+    the obstacle's weight, which is right for two labels (half each, apart in one iteration) and
+    silently loses the remainder when the other side cannot move: a node at 0.5 cleared a third per
+    iteration and a pipe at 0.25 a fifth, so after four iterations a label was still on the line.
+    **The harness had ASSERTED this as correct behaviour** — "recorded rather than fixed... whether
+    that is worth another iteration or a different weight is Tom's call" — and he made the call by
+    looking at the map. Against something immovable a weight now means INSISTENCE: how much of the
+    overlap is gone when the iteration ends. Node raised 0.5 → 1 in the same change, because under
+    the new meaning 0.5 would say "end up half inside the symbol"; pipe 0.25 → 0.4.
+  - **"The mark is huge, bigger than the screen."** `stroke-width: 4px` inside the world transform
+    is 4 MAP units — at Net3's zoom, most of the window. `vector-effect: non-scaling-stroke` is the
+    fix, and it is the same standing bug class as the leader constants, one layer down in CSS.
+  - **"Pipe label boxes are not rotated."** Correct, and the overlay is being honest: the model
+    really does use the axis-aligned bounding box of a rotated label. That is Task 379's first
+    piece and the 5x waste — unchanged by this commit.
+
 - 0|381| **Pipes are obstacles now, at a low weight — DONE 2026-08-15.** Tom: *"I see that pipes have
   no model/boxes. They need a model even if their weight is lower than other things... These ideally
   would make some attempt to avoid these pipe conflicts if it's not too hard to do. It's acceptable

@@ -63,48 +63,42 @@ EngCalcs.lpnCollide = (function () {
 	// when there is somewhere to step and lies across it when there is not, which is the behaviour
 	// the old "pipes are absent by design" comment claimed and the code did not have. It is a SHARE
 	// of the shortfall rather than a ratio against another weight, because a pipe never moves.
-	var WEIGHT = { pipe: 0.25, node: 0.5, label: 1, leader: 1, manual: 1000 };
+	// **NODE RAISED FROM 0.5 TO 1 AT THE SAME TIME, and the two changes are one change.** Under the
+	// old formula 0.5 meant "clears a third of the way per iteration"; under insistence it would
+	// mean "ends up half inside the symbol", which is not what anyone wanted it to say. Goal 3 in
+	// dev/label-placement-goals.md is that a label may lie across a pipe and may not sit on a node
+	// symbol, so the symbol is 1 and the pipe is the low-but-not-zero 0.4 Tom asked for.
+	var WEIGHT = { pipe: 0.4, node: 1, label: 1, leader: 1, manual: 1000 };
 
-	// A leader line is sampled into a chain of small boxes rather than intersected
-	// analytically -- the same overlap/push code then handles it with no second geometry
-	// path. The step is well under a label box's smallest dimension, so a box cannot slip
-	// between two samples; the cap keeps a very long leader from generating an unbounded
-	// chain.
+	// **LEADERS ARE SEGMENTS TOO, AND THE SAMPLER IS GONE** (Tom, 2026-08-15: *"Why not do segment
+	// testing on the leaders if it can be done?"*). It can, it is the same pushOffSegments() the
+	// pipes use, and it is better in three ways at once: exact instead of a chain of squares that a
+	// box could in principle slip between, O(1) per pair instead of one pair per 3 pixels of line,
+	// and PERPENDICULAR -- a label crossing a diagonal leader now steps off it rather than sliding
+	// along it. It also deletes the three constants that had been wrong in world units, the cap that
+	// existed only to bound the chain, and the question of how fat a one-pixel line should be.
 	//
-	// **THESE ARE SCREEN PIXELS, AND THE CALLER CONVERTS** (fixed 2026-08-15, Tom: "Maybe map
-	// and pixels got mixed up somehow"). They were fixed WORLD numbers -- 0.5, 0.15, 60 --
-	// against label boxes that are px/scale, which is this whole subject's standing bug class
-	// and here it was doing real damage across the examples, whose extents run from 37 world
-	// units (Net3) to 1400 (Basic):
-	//   * On NET3 a 0.3-unit sample box is ~11 screen pixels across at its own fit scale, so
-	//     every leader behaved as an 11px-thick wall rather than the 1px line it is drawn as,
-	//     and labels were being shoved out of the way of nothing a reader can see.
-	//   * On the BASIC example the same box is a third of a pixel and the 60-sample cap covers
-	//     30 of 1400 units, so leaders effectively did not participate at all.
-	// One drawing was over-avoiding its leaders by an order of magnitude while another ignored
-	// them, from the same three constants.
-	var LEADER_SAMPLE_STEP_PX = 3, LEADER_SAMPLE_MAX = 200, LEADER_SAMPLE_HALF_PX = 2;
-
-	// `px` is world units per screen pixel (1 / scale). Omitted means 1, which is the identity
-	// the pure-geometry harness uses.
-	function pushLeaderSamples(out, ax, ay, bx, by, owner, px) {
-		var u = px === undefined ? 1 : px,
-			step = LEADER_SAMPLE_STEP_PX * u, half = LEADER_SAMPLE_HALF_PX * u,
-			len = Math.hypot(bx - ax, by - ay), i, t,
-			n = Math.min(LEADER_SAMPLE_MAX, Math.max(1, Math.ceil(len / step)));
-		for (i = 0; i <= n; i++) {
-			t = i / n;
-			out.push({
-				ref: null, owner: owner || null, movable: false, weight: WEIGHT.leader,
-				base: { x: ax + (bx - ax) * t - half, y: ay + (by - ay) * t - half },
-				yOff: 0, w: half * 2, h: half * 2
-			});
-		}
-	}
+	// The one thing that had to come with it is the OWNER exemption; see pushOffSegments().
 
 	// Top-left corner of a box at its CURRENT position: the persisted/default base, plus
 	// this element's live nudge (movable labels only), plus the box's own baseline-to-top
 	// offset.
+	// **WHAT A WEIGHT MEANS WHEN THE OTHER THING CANNOT MOVE** (rewritten 2026-08-15, after Tom:
+	// *"Node labels still not avoiding pipes at all."*)
+	//
+	// The original formula gave the movable box a share of the separation proportional to the other
+	// box's weight -- correct and self-evident for two labels, which move half each and are fully
+	// apart after one iteration. Against something IMMOVABLE it quietly loses the rest: a label
+	// pushed by a node symbol at 0.5 moved 0.5/1.5 = a THIRD of the way out per iteration, so after
+	// the four iterations it was still 20% inside the symbol; a pipe at 0.25 got 20% per iteration
+	// and cleared 59%, which on screen is a label sitting on the line exactly as before. **The pass
+	// was not failing to push. It was pushing a fraction of the way and stopping.**
+	//
+	// So for an immovable obstacle the weight now means INSISTENCE: how much of the overlap must be
+	// gone when this iteration ends. 1 clears completely, 0.4 leaves a little, 0 does nothing. It
+	// resolves in ONE iteration instead of asymptotically, and it makes the number mean something a
+	// person can predict from the value.
+	function insistence(w) { return w > 1 ? 1 : (w < 0 ? 0 : w); }
 	function boxTopLeft(b) {
 		var nx = b.ref ? b.ref.nudge.x : 0, ny = b.ref ? b.ref.nudge.y : 0;
 		return { x: b.base.x + nx, y: b.base.y + ny + b.yOff };
@@ -123,7 +117,11 @@ EngCalcs.lpnCollide = (function () {
 	// Mutates `ref.nudge` on the movable boxes and returns the number of iterations run --
 	// the caller has already zeroed every nudge, which is what makes the pass IDEMPOTENT:
 	// running it twice on an unchanged drawing gives the same answer as running it once.
-	function relax(labels, statics, leaderBoxesFn, iterations, segmentsFn) {
+	// `segmentsFn` is called ONCE PER ITERATION and returns every line obstacle -- pipes and
+	// leaders together, each with its own weight and, for a leader, its owner. Per iteration
+	// because a leader follows its own label: nudging the label moves the line, which changes what
+	// that line crosses. Pipes do not move and are rebuilt with them only to keep one contract.
+	function relax(labels, statics, segmentsFn, iterations) {
 		var boxes, segs, i, j, iter, moved, iters = iterations === undefined ? 4 : iterations;
 		for (iter = 0; iter < iters; iter++) {
 			moved = false;
@@ -137,7 +135,7 @@ EngCalcs.lpnCollide = (function () {
 			// the inner loop starting at i+1, visits every label-label pair exactly once and
 			// every label-obstacle pair exactly once, and never wastes a comparison on two
 			// obstacles (neither of which could move anyway).
-			boxes = labels.concat(statics, leaderBoxesFn ? leaderBoxesFn() : []);
+			boxes = labels.concat(statics);
 			for (i = 0; i < labels.length; i++) {
 				for (j = i + 1; j < boxes.length; j++) {
 					var A = boxes[i], B = boxes[j];
@@ -152,13 +150,19 @@ EngCalcs.lpnCollide = (function () {
 					// versa) -- a stronger object moves the other one more than it moves itself.
 					var wSum = A.weight + B.weight;
 					if (wSum <= 0) { continue; }
+					// Both movable: split the whole separation by weight, as before. Only one
+					// movable: it absorbs the whole separation, scaled by the obstacle's insistence
+					// -- see insistence() for why the old proportional share was wrong here.
+					var soloA = A.movable && !B.movable, soloB = B.movable && !A.movable;
 					if (overlapX < overlapY) {
-						var shareAx = (overlapX + 0.1) * B.weight / wSum, shareBx = (overlapX + 0.1) * A.weight / wSum;
+						var shareAx = soloA ? (overlapX + 0.1) * insistence(B.weight) : (overlapX + 0.1) * B.weight / wSum,
+							shareBx = soloB ? (overlapX + 0.1) * insistence(A.weight) : (overlapX + 0.1) * A.weight / wSum;
 						var dirX = (At.x + A.w / 2 <= Bt.x + B.w / 2) ? -1 : 1;
 						if (A.movable) { A.ref.nudge.x += dirX * shareAx; }
 						if (B.movable) { B.ref.nudge.x -= dirX * shareBx; }
 					} else {
-						var shareAy = (overlapY + 0.1) * B.weight / wSum, shareBy = (overlapY + 0.1) * A.weight / wSum;
+						var shareAy = soloA ? (overlapY + 0.1) * insistence(B.weight) : (overlapY + 0.1) * B.weight / wSum,
+							shareBy = soloB ? (overlapY + 0.1) * insistence(A.weight) : (overlapY + 0.1) * A.weight / wSum;
 						var dirY = (At.y + A.h / 2 <= Bt.y + B.h / 2) ? -1 : 1;
 						if (A.movable) { A.ref.nudge.y += dirY * shareAy; }
 						if (B.movable) { B.ref.nudge.y -= dirY * shareBy; }
@@ -199,6 +203,10 @@ EngCalcs.lpnCollide = (function () {
 			cx = At.x + A.w / 2; cy = At.y + A.h / 2;
 			for (j = 0; j < segments.length; j++) {
 				seg = segments[j];
+				// A label is never pushed by its OWN leader, which by construction ends on the
+				// label's near edge -- without this it would walk a little further away on every
+				// iteration, forever. Same exemption the sampled boxes carried.
+				if (seg.owner && seg.owner === A.ref) { continue; }
 				dx = seg.bx - seg.ax; dy = seg.by - seg.ay;
 				len = Math.hypot(dx, dy);
 				if (len === 0) { continue; }
@@ -212,7 +220,7 @@ EngCalcs.lpnCollide = (function () {
 				// line that does. Without this a label is pushed off a pipe that stops short of it.
 				if (!rangeHitsBox(seg, At, A)) { continue; }
 				gap = reach - Math.abs(dist);
-				share = (gap + 0.1) * (seg.weight === undefined ? WEIGHT.pipe : seg.weight);
+				share = (gap + 0.1) * insistence(seg.weight === undefined ? WEIGHT.pipe : seg.weight);
 				if (share <= 0) { continue; }
 				moved = true;
 				// Away from the line, keeping the side the box is already on. A box sitting exactly
@@ -254,11 +262,8 @@ EngCalcs.lpnCollide = (function () {
 	return {
 		WEIGHT: WEIGHT,
 		rectsOverlap: rectsOverlap,
-		LEADER_SAMPLE_STEP_PX: LEADER_SAMPLE_STEP_PX,
-		LEADER_SAMPLE_MAX: LEADER_SAMPLE_MAX,
-		LEADER_SAMPLE_HALF_PX: LEADER_SAMPLE_HALF_PX,
-		pushLeaderSamples: pushLeaderSamples,
 		pushOffSegments: pushOffSegments,
+		insistence: insistence,
 		boxTopLeft: boxTopLeft,
 		relax: relax
 	};

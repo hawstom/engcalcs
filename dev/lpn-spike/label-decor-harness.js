@@ -101,8 +101,10 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	// moving with the zoom again.
 	report(!/labelBoxWidth\(/.test(extract('updateDataLeader')),
 		'updateDataLeader() reads no width -- it draws A to the stored B');
-	report(!/labelBoxWidth\(/.test(extract('currentLeaderBoxes')),
-		'currentLeaderBoxes() reads no width either -- same two points');
+	// Renamed to currentLeaderSegments() 2026-08-15 when leaders stopped being sampled into boxes
+	// and became segments, like the pipes. Same claim, same two points.
+	report(!/labelBoxWidth\(/.test(extract('currentLeaderSegments')),
+		'currentLeaderSegments() reads no width either -- same two points');
 	report(ADVERSE_FRAC > 0, 'the hysteresis fraction is still read out of the file', String(ADVERSE_FRAC));
 }
 
