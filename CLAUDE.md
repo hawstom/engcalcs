@@ -376,6 +376,7 @@ own failure; this table is an index, not a duplicate of that text.
 | `sw_manifest_check.php` | The service worker precaches the URLs pages actually request (`?v=<filemtime>`). 22 of 25 entries were once unreachable and the offline promise was simply false |
 | `standalone_assets_check.php` | The suite ships its own assets — a parent-site CSS dependency broke a standalone deploy |
 | `scenario_seam_check.php` | Overridable properties go through `setProp()`, never a direct write that edits BASE from inside a scenario |
+| `unit_factor_check.php` | Every `$ec_units` factor re-derived from the exact definitions (`ft = 0.3048 m`, `gal = 3.785411784 L`, `lbf = 4.4482216152605 N`), **and factors for one quantity agreeing with each other** — the suite once shipped four different feet, and `ft3`/`ft3ps` were the same conversion 47 ppm apart. Reads `EngCalcs.G` out of the source rather than retyping it |
 | `lang_syntax_validate.php` | Rules A–D |
 | `lang_tag_parity_check.php --strict` | Markup matches English |
 | `gloss_ref_check.php` | Every `gloss:` resolves and is wired to its prefix |

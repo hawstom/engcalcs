@@ -34,7 +34,7 @@ EngCalcs.Manning.bathurst_n = function(alpha, g, t, da, d50, fr) {
 EngCalcs.Manning.mtc_iterate = function(p) {
 	'use strict';
 	var g = EngCalcs.G, c = 1.0, alpha_blodgett = 0.319, alpha_bathurst = 1.0,
-		max_err = 0.00001, ft_per_m = 3.28084;
+		max_err = 0.00001, ft_per_m = EngCalcs.FT_PER_M;
 	var i = 0;
 	var d50_in = p.d50_in, n_in = p.n_in;
 	if (d50_in === 0) { d50_in = 0.1 * p.y; }
