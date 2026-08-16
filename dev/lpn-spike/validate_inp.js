@@ -41,25 +41,40 @@ function report(ok, label, detail) {
 	console.log(`${ok ? '  ok  ' : ' FAIL '} ${label}${detail ? '   ' + detail : ''}`);
 }
 
-/** The parse result, as js/lpn-solver.js wants it: everything SI, lengths included. */
+/**
+ * The parse result, as js/lpn-solver.js wants it: everything SI.
+ *
+ * THE PARSER HANDS BACK THE FILE'S OWN UNITS, so this is where the SI conversion happens --
+ * `parsed.scale` states each one and nothing here retypes a constant. It used to be only `length`
+ * and the coordinates that arrived unconverted; everything now does, because a value normalised
+ * to SI on the way in and converted back for display cannot return the number the file stated
+ * (see the units note at the top of js/lpn-inp.js). A solver harness wants SI, so it pays the
+ * conversion; the page wants the user's own number, so it pays nothing.
+ */
 function toSolverModel(parsed) {
-	const lenSI = parsed.lengthUnit === 'ft' ? FT : 1;
+	const S = parsed.scale;
 	const nodes = parsed.nodes.map((n) => {
 		// A tank passes its vessel geometry through as well, because js/lpn-epanet.js writes it
 		// into [TANKS] and the native solver ignores it -- see EngCalcs.lpnIsFixedHead.
+		// EVERY LENGTH ON A TANK IS IN THE ELEVATION/HEAD UNIT, the vessel diameter included --
+		// unlike a pipe diameter, which is inches or millimetres.
 		if (n.type === 'tank') {
-			return { id: n.id, type: 'tank', elev: n.elev, head: n.head,
-				level: n.level, minLevel: n.minLevel, maxLevel: n.maxLevel, diameter: n.diameter };
+			return { id: n.id, type: 'tank', elev: n.elev * S.head, head: n.head * S.head,
+				level: n.level * S.head, minLevel: n.minLevel * S.head,
+				maxLevel: n.maxLevel * S.head, diameter: n.diameter * S.head };
 		}
 		return n.type === 'reservoir'
-			? { id: n.id, type: 'reservoir', elev: n.elev, head: n.head }
-			: { id: n.id, type: 'junction', elev: n.elev, demand: n.demand, emitter: n.emitter };
+			? { id: n.id, type: 'reservoir', elev: n.elev * S.head, head: n.head * S.head }
+			// `emitter` is the one quantity the parser already returns in SI -- it is derived, has
+			// no display unit, and is documented as the exception at [EMITTERS].
+			: { id: n.id, type: 'junction', elev: n.elev * S.head, demand: n.demand * S.flow,
+				emitter: n.emitter };
 	});
 	const links = parsed.links.map((l) => {
 		const out = {
 			id: l.id, type: l.type, from: l.from, to: l.to,
-			diameter: l.diameter, roughness: l.roughness,
-			length: (l.length || 0) * lenSI, status: l.status, k: l.k || 0
+			diameter: l.diameter * S.dia, roughness: l.roughness,
+			length: (l.length || 0) * S.len, status: l.status, k: l.k || 0
 		};
 		if (l.type === 'valve') {
 			// A VALVE'S SETTING IS PART OF THE MODEL, and forgetting it here is silent: the solver
@@ -69,11 +84,13 @@ function toSolverModel(parsed) {
 			// rather than as a pipe -- 3.2 cm of head and a 0.28 L/s flow error, small enough to
 			// look like tolerance.
 			out.valveType = l.valveType;
-			out.setting = l.setting;
+			// A setting is a pressure, a flow or a bare coefficient depending on the type, and the
+			// parser says which rather than making this file re-derive the type table.
+			out.setting = l.settingUnit ? l.setting * S[l.settingUnit] : l.setting;
 		}
 		if (l.type === 'pump') {
 			const fit = (l.curvePoints && l.curvePoints.length)
-				? EngCalcs.lpnPumpFromCurve(l.curvePoints)
+				? EngCalcs.lpnPumpFromCurve(l.curvePoints.map((pt) => [pt[0] * S.flow, pt[1] * S.head]))
 				: { h0: 0, a: 0, b: 2 };
 			out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
 		}

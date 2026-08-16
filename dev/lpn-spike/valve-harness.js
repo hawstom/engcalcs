@@ -187,19 +187,30 @@ console.log('\n--- a GPM (US) file ---');
 
 	ok('a TCV comes in as a valve, not as a pipe', byId.V1 && byId.V1.type === 'valve', byId.V1 && byId.V1.type);
 	ok('...with its type recorded', byId.V1 && byId.V1.valveType === 'TCV');
-	ok('...diameter in INCHES -> m (the pipe convention)', near(byId.V1.diameter, 10 * IN, 1e-9), byId.V1.diameter);
-	ok('...and NOT in feet', !near(byId.V1.diameter, 10 * FT, 1e-9));
+	// The reader converts nothing -- every number comes back in the file's own unit (see the units
+	// note at the top of js/lpn-inp.js), so the assertion about WHICH unit is now an assertion
+	// about which scale factor the value belongs with. A valve diameter follows the PIPE
+	// convention (inches here), not the tank/elevation one (feet).
+	ok('...diameter is the file token', byId.V1.diameter === 10, byId.V1.diameter);
+	ok('...in the pipe unit (inches), not feet', near(byId.V1.diameter * p.scale.dia, 10 * IN, 1e-9) &&
+		!near(byId.V1.diameter * p.scale.dia, 10 * FT, 1e-9), byId.V1.diameter * p.scale.dia);
 	ok('...its setting is dimensionless and untouched', byId.V1.setting === 8, byId.V1.setting);
 	ok('...its minor loss is dropped to 0, because EPANET ignores it on a TCV', byId.V1.k === 0, byId.V1.k);
 	ok('...and it has NO length, so no friction is smuggled in', byId.V1.length === 0, byId.V1.length);
 
 	ok('a PRV comes in as a valve', byId.V2 && byId.V2.type === 'valve' && byId.V2.valveType === 'PRV');
 	// 60 psi, not 60 metres. A factor of 1.42, and the network still solves either way.
-	ok('...its setting is a PRESSURE, psi -> m of water', near(byId.V2.setting, 60 * PSI_M, 1e-9), byId.V2.setting);
+	ok('...its setting is the file token', byId.V2.setting === 60, byId.V2.setting);
+	ok('...named as a PRESSURE, so 60 psi and not 60 m of water',
+		byId.V2.settingUnit === 'press' && near(byId.V2.setting * p.scale.press, 60 * PSI_M, 1e-9),
+		byId.V2.settingUnit + ' ' + byId.V2.setting * p.scale.press);
 	ok('...and it keeps its minor loss', byId.V2.k === 1.5, byId.V2.k);
 
 	ok('an FCV comes in as a valve', byId.V3 && byId.V3.type === 'valve' && byId.V3.valveType === 'FCV');
-	ok('...its setting is a FLOW, gpm -> m3/s', near(byId.V3.setting, 250 * GPM, 1e-12), byId.V3.setting);
+	ok('...its setting is the file token, named as a FLOW',
+		byId.V3.setting === 250 && byId.V3.settingUnit === 'flow', byId.V3.setting + ' ' + byId.V3.settingUnit);
+	ok('...so gpm -> m3/s is the caller\'s one multiplication',
+		near(byId.V3.setting * p.scale.flow, 250 * GPM, 1e-12), byId.V3.setting * p.scale.flow);
 
 	// Reported, not silent -- the module's whole contract. A TCV and an active valve are reported
 	// under DIFFERENT codes, because the second one changes which engine solves the network.
@@ -230,9 +241,12 @@ console.log('\n--- an LPS (SI) file, where the same three rows mean different nu
 	const p = EngCalcs.lpnInpParse(inp);
 	const byId = {};
 	p.links.forEach((l) => { byId[l.id] = l; });
-	ok('diameter in MILLIMETRES -> m', near(byId.V1.diameter, 250 * MM, 1e-12), byId.V1.diameter);
-	ok('a PRV setting in metres of water is already SI', near(byId.V2.setting, 40, 1e-12), byId.V2.setting);
-	ok('an FCV setting in L/s -> m3/s', near(byId.V3.setting, 15 * LPS, 1e-12), byId.V3.setting);
+	ok('diameter is the file token, in MILLIMETRES', byId.V1.diameter === 250, byId.V1.diameter);
+	ok('...which is m when scaled', near(byId.V1.diameter * p.scale.dia, 250 * MM, 1e-12), byId.V1.diameter * p.scale.dia);
+	ok('a PRV setting in metres of water is already SI',
+		byId.V2.setting === 40 && p.scale.press === 1, byId.V2.setting + ' x ' + p.scale.press);
+	ok('an FCV setting in L/s -> m3/s', near(byId.V3.setting * p.scale.flow, 15 * LPS, 1e-12),
+		byId.V3.setting * p.scale.flow);
 }
 
 // ---------------------------------------------------------------------------
@@ -249,7 +263,9 @@ console.log('\n--- model -> .inp -> model ---');
 	const v = back.links.filter((l) => l.id === 'V1')[0];
 	ok('V1 is still a valve', !!v && v.type === 'valve');
 	ok('...still a TCV', v && v.valveType === 'TCV');
-	ok('...same diameter', near(v.diameter, 0.25, 1e-9), v.diameter);
+	// The writer emits LPS, so the file's pipe-diameter unit is the millimetre and the reader
+	// hands that back unconverted; `scale.dia` closes the loop back to the model's metres.
+	ok('...same diameter', near(v.diameter * back.scale.dia, 0.25, 1e-9), v.diameter * back.scale.dia);
 	ok('...same setting', near(v.setting, 8, 1e-9), v.setting);
 	// A GPV and a PBV are the two types this page still cannot hold, and they must arrive as
 	// reported pipes rather than as valves with a setting nobody can interpret.

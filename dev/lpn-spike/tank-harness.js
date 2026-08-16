@@ -98,13 +98,22 @@ console.log('\n--- a GPM (feet) file ---');
 	ok('parses', p.ok, p.error || '');
 	const tk = p.nodes.filter((n) => n.id === 'TK1')[0];
 	ok('the tank came in', !!tk && tk.type === 'tank');
-	ok('...bottom elevation in feet -> m', near(tk.elev, 200 * FT, 1e-9), tk.elev);
-	ok('...water level in feet -> m', near(tk.level, 15 * FT, 1e-9), tk.level);
-	ok('...lowest/highest in feet -> m', near(tk.minLevel, 2 * FT, 1e-9) && near(tk.maxLevel, 30 * FT, 1e-9));
-	// 60 ft across, NOT 60 inches. If this ever reads 1.524 the tank diameter has been put through
-	// the pipe-diameter conversion.
-	ok('...vessel diameter in feet -> m, not inches', near(tk.diameter, 60 * FT, 1e-9), tk.diameter);
-	ok('...water surface = bottom + level', near(tk.head, 215 * FT, 1e-9), tk.head);
+	// The reader converts nothing -- every number comes back in the file's own unit (see the units
+	// note at the top of js/lpn-inp.js), so these are exact rather than near.
+	ok('...bottom elevation is the file token, in feet', tk.elev === 200, tk.elev);
+	ok('...water level is the file token, in feet', tk.level === 15, tk.level);
+	ok('...lowest/highest are the file tokens', tk.minLevel === 2 && tk.maxLevel === 30);
+	ok('...vessel diameter is the file token', tk.diameter === 60, tk.diameter);
+	ok('...water surface = bottom + level', tk.head === 215, tk.head);
+	// THE ASSERTION THE SOLVE CANNOT MAKE, in its file-units form: a tank's five lengths are in
+	// the ELEVATION/HEAD unit and a pipe diameter is in the pipe unit, so the two scale by
+	// DIFFERENT factors. 60 ft across, never 60 inches -- if `scale.dia` ever gets applied here
+	// the vessel becomes 1.524 m and every head and flow in the model stays correct.
+	ok('...and a tank length scales by head, a pipe diameter by dia',
+		p.scale.head === FT && p.scale.dia === 0.0254 && p.scale.head !== p.scale.dia,
+		p.scale.head + ' vs ' + p.scale.dia);
+	ok('...so the vessel is 60 ft across, not 60 in',
+		near(tk.diameter * p.scale.head, 60 * FT, 1e-9), tk.diameter * p.scale.head);
 	ok('THE PIPE ON THE TANK SURVIVED', p.links.length === 1 && p.links[0].from === 'TK1',
 		p.links.length + ' link(s)');
 	ok('...and nothing was reported as dropped', p.dropped.length === 0, JSON.stringify(p.dropped));
@@ -129,7 +138,7 @@ console.log('\n--- a non-cylindrical tank ---');
 	const d = p.dropped.filter((x) => x.code === 'tank-volume-curve')[0];
 	ok('the volume curve is reported', !!d && d.ids.indexOf('TK1') >= 0, JSON.stringify(p.dropped));
 	ok('...but the tank is still imported, at the right level',
-		near(p.nodes.filter((n) => n.id === 'TK1')[0].head, 215 * 0.3048, 1e-9));
+		p.nodes.filter((n) => n.id === 'TK1')[0].head === 215);
 }
 
 // ---------------------------------------------------------------------------
