@@ -381,9 +381,27 @@ var EngCalcs = EngCalcs || {};
 	// dependency in one place if that ever changes again.
 	// holder.side persists across calls to carry the hysteresis, exactly as it did when this was
 	// the leader's attachment edge.
-	function dataLabelOrigin(holder, anchor, end) {
+	// **THE HYSTERESIS IS FOR A HAND ON A LABEL, AND FOR NOTHING ELSE.** Tom, 2026-08-16: *"we only
+	// have to check for violation on the nearest side. We have no reason to check the other side
+	// because we will never use it."*
+	//
+	// labelSideAtEnd() holds the PREVIOUS side inside a dead band either side of the anchor's
+	// vertical line, so it can leave the box on the anchor's side -- and then the leader runs the
+	// width of the text to reach its endpoint. That is the defect Tom photographed on 2026-08-16.
+	// It is the right behaviour while a user DRAGS: without it a label pulled just past the line
+	// flickers its text a full box-width from side to side.
+	//
+	// An auto-placed label is not dragged. Its endpoint is chosen by the placement pass from
+	// seventeen discrete candidates, so there is no continuous sweep across the line to damp, and
+	// nothing is gained by ever putting the box on the near side. Taking the nearest side
+	// unconditionally also makes js/lpn-collide.js's labelBoxAtEnd() correct by construction rather
+	// than by reproducing a render-time quirk -- the scorer and the renderer cannot disagree about
+	// a rule neither of them has.
+	function dataLabelOrigin(holder, anchor, end, dragged) {
 		var w = labelBoxWidth(holder);
-		holder.side = Geom.labelSideAtEnd(holder.side, end.x, anchor.x, w / 2, ADVERSE_FRAC);
+		holder.side = dragged
+			? Geom.labelSideAtEnd(holder.side, end.x, anchor.x, w / 2, ADVERSE_FRAC)
+			: (end.x >= anchor.x ? 'right' : 'left');
 		return { x: holder.side === 'right' ? end.x : end.x - w, y: end.y };
 	}
 	// Approximate vertical box of a left-anchored, top-down multi-line <text> (node/link labels):
@@ -405,7 +423,8 @@ var EngCalcs = EngCalcs || {};
 	// a nudge or a toggled field changing tw/lineCount both move this label).
 	function layoutNodeLabel(id) {
 		var n = nodeById(id), ne = nodeEls[id]; if (!ne) { return; }
-		var anchor = { x: n.x, y: n.y }, end = nodeLabelPos(n), org = dataLabelOrigin(ne, anchor, end);
+		var anchor = { x: n.x, y: n.y }, end = nodeLabelPos(n),
+			org = dataLabelOrigin(ne, anchor, end, labelIsDragged(n));
 		repositionMultilineText(ne.text, org.x, org.y);
 		updateDataLeader(ne, anchor, end);
 	}
@@ -665,7 +684,7 @@ var EngCalcs = EngCalcs || {};
 			mid = lone ? linkLabelMid(l) : linkLabelMid(l, along),
 			anchor = { x: mid.x, y: mid.y },
 			end = lone ? linkLabelPos(l) : { x: mid.x + d.x, y: mid.y + d.y },
-			org = dataLabelOrigin(isPrimary ? le : part, anchor, end);
+			org = dataLabelOrigin(isPrimary ? le : part, anchor, end, labelIsDragged(l));
 		repositionMultilineText(part.text, org.x, org.y);
 		if (isPrimary) { updateDataLeader(le, anchor, end); }
 	}

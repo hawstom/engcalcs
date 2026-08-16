@@ -394,6 +394,56 @@ console.log('\n--- cost ---');
 		perLabel.toFixed(2) + 'x the per-label cost at 4.5x the size');
 }
 
+console.log("\n--- goal 3: an auto-placed label never sits on its own leader (Tom, 2026-08-16) ---");
+// THE DEFECT THIS SECTION EXISTS FOR. dataLabelOrigin() applied Geom.labelSideAtEnd()'s hysteresis
+// to every label. That rule keeps the PREVIOUS side inside a dead band either side of the anchor's
+// vertical line, so an auto-placed label's box could be drawn back over its own node and the leader
+// then ran the width of the text to reach the endpoint. Tom: "we only have to check for violation
+// on the nearest side. We have no reason to check the other side because we will never use it."
+//
+// The fix is in the RENDERER, not here: the hysteresis is a flicker-damper for a hand on a label
+// and now applies only while dragging. This checks the real function out of js/looped-network.js,
+// because the claim is about that file and a restatement here would prove nothing.
+{
+	const geom = require('../../js/lpn-geom.js').lpnGeom;
+	const page = fs.readFileSync(path.join(__dirname, '../../js/looped-network.js'), 'utf8');
+	const at = page.search(/function dataLabelOrigin\s*\(/);
+	let i = page.indexOf('{', at), depth = 0, end = i;
+	for (; end < page.length; end++) {
+		if (page[end] === '{') { depth++; }
+		else if (page[end] === '}') { depth--; if (depth === 0) { end++; break; } }
+	}
+	const W = 40;
+	const Geom = geom, ADVERSE_FRAC = 0.75;
+	const labelBoxWidth = () => W;
+	const dataLabelOrigin = eval('(' + page.slice(at, end) + ')');
+
+	const anchor = { x: 0, y: 0 };
+	// Sweep both prior sides across the whole dead band and well past it.
+	let onNearSide = 0, swept = 0;
+	for (const prev of ['left', 'right']) {
+		for (let endX = -40; endX <= 40; endX += 0.5) {
+			const holder = { side: prev };
+			const org = dataLabelOrigin(holder, anchor, { x: endX, y: -20 }, false);
+			// The box spans [org.x, org.x + W]. The anchor must not be strictly inside it, or the
+			// leader crosses the text on its way to the endpoint.
+			swept++;
+			if (anchor.x > org.x + 1e-9 && anchor.x < org.x + W - 1e-9) { onNearSide++; }
+		}
+	}
+	report(onNearSide === 0, 'an auto-placed box never contains its own anchor, at any endpoint or prior side',
+		swept + ' swept');
+
+	// ...and the hysteresis is still there for a hand on a label, which is what it was for.
+	const held = { side: 'left' };
+	const dragged = dataLabelOrigin(held, anchor, { x: 6, y: -20 }, true);
+	report(held.side === 'left' && dragged.x === 6 - W,
+		'a DRAGGED label keeps the hysteresis -- it is what stops a flicker under the hand');
+	const auto = { side: 'left' };
+	dataLabelOrigin(auto, anchor, { x: 6, y: -20 }, false);
+	report(auto.side === 'right', '...and the same endpoint auto-placed takes the nearest side instead');
+}
+
 console.log('\n--- the measured constants are the ones that SHIP --------------------------------');
 // EVERY placeLabels() call above passes inner/outer/k explicitly, which is right for measuring but
 // leaves a hole: the numbers §3 of dev/label-placement-goals.md was written to justify are read from

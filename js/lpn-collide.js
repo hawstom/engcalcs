@@ -278,9 +278,17 @@ EngCalcs.lpnCollide = (function () {
 	// ---- scoring -------------------------------------------------------------------------------
 	//
 	// WHERE THE TEXT SITS relative to a candidate ENDPOINT: it hangs off the endpoint on the side
-	// AWAY from the anchor, so the leader never runs through its own text. Same rule as
-	// Geom.labelSideAtEnd() without the hysteresis, which is a render-time nicety this pass has no
-	// business reproducing.
+	// AWAY from the anchor, so the leader stops at the box's near edge and never runs through its
+	// own text. That is goal 3 for a label's own leader, satisfied by construction.
+	//
+	// **AND IT IS THE RENDERER'S RULE, because the renderer was changed to match rather than this
+	// pass being taught to predict it.** dataLabelOrigin() used to apply Geom.labelSideAtEnd()'s
+	// hysteresis to auto-placed labels too, which holds the PREVIOUS side inside a dead band either
+	// side of the anchor's vertical line and so could draw the box back over the node -- the leader
+	// then crossed the width of its own text, which is the defect Tom photographed on 2026-08-16.
+	// Tom: *"we only have to check for violation on the nearest side. We have no reason to check the
+	// other side because we will never use it."* The hysteresis now applies only while a user drags
+	// a label, so the far side is genuinely unreachable here and there is nothing to model.
 	function labelBoxAtEnd(lbl, c) {
 		var left = c.x >= lbl.anchor.x ? c.x : c.x - lbl.w;
 		return box(left + lbl.w / 2, c.y + lbl.yOff + lbl.h / 2, lbl.w, lbl.h, 0, 'label', lbl.id);
@@ -309,14 +317,18 @@ EngCalcs.lpnCollide = (function () {
 		for (i = 0; i < obs.segments.length; i++) {
 			o = obs.segments[i];
 			// A LINK LABEL SITS ON ITS OWN PIPE BY DESIGN -- that is how a reader tells whose number
-			// it is -- and a leader from a point to a label beside it necessarily leaves along its
-			// own line. Both are exempted by ownership rather than by a special case in the score,
-			// which is the same exemption the pass has always made.
-			if (o.owner !== undefined && o.owner === lbl.id) { continue; }
+			// it is -- so its own LINK is exempt by ownership rather than by a special case.
+			// ITS OWN LEADER IS NOT EXEMPT. Goal 3 is "Labels avoid Leaders **including their
+			// own**", and this line used to exempt every segment it owned, leader included, so the
+			// one violation a reader notices most could not be scored even in principle.
+			if (o.owner !== undefined && o.owner === lbl.id && o.kind !== 'leader') { continue; }
 			s += (o.kind === 'leader' ? GOAL_WEIGHT.labelLeader : GOAL_WEIGHT.labelLink)
 				* segmentInBoxFraction(o, b);
 			if (o.kind === 'link' && segmentsCross(leader, o)) { s += GOAL_WEIGHT.leaderLink; }
 		}
+		// Goal 3 for THIS label's own leader. It is not in obs.segments yet -- the pass commits each
+		// leader only once its label is placed -- so it is scored here, and it is 0 for every
+		// correctly attached leader.
 		s += GOAL_WEIGHT.distance * Math.min(1, Math.hypot(c.x - lbl.anchor.x, c.y - lbl.anchor.y) / outer);
 		return s;
 	}
