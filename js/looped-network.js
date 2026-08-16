@@ -9075,6 +9075,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// Pan and pinch are deliberately absent: they move the CAMERA, not the document, and
 	// saveUndoSnapshot() deep-clones `doc`. Undoing a pan is not a thing this stack is for.
+	var LABEL_DRAG_TYPES = { label: true, nodelbl: true, linklbl: true }, LABEL_DRAG_SLOP_PX = 3;
 	function snapshotDragOnce() {
 		if (drag.snapped) { return; }
 		drag.snapped = true;
@@ -9091,6 +9092,25 @@ var EngCalcs = EngCalcs || {};
 		}
 		var p = pointers.get(drag.pointerId);
 		if (!p) { return; }
+		// **A LABEL DRAG NEEDS A REAL MOVEMENT BEFORE IT COMMITS** (Tom, 2026-08-15: *"I accidentally
+		// dragged it? To there? OK. I reset it, and that fixed it. What a wild goose chase."*).
+		//
+		// The first pixel of movement used to make a label MANUAL for good, and the offset it stored
+		// was `nodeLabelPos()` -- the base PLUS the collision pass's current nudge. So a stray jiggle
+		// on a crowded label froze that label at wherever the automatic pass happened to have put it,
+		// permanently, and the pass then had one more immovable weight-1000 obstacle to work around.
+		// Tom's own statement of the rule: *"Store the user's leader endpoint and hold it constant.
+		// If you extend it, don't overwrite it. Your extension is temporary."* A nudge is our
+		// extension; it must not become his endpoint by accident.
+		//
+		// Three pointer-slop pixels. A deliberate drag clears it in the first frame and feels
+		// identical; a click that wobbles does not. Applies to the three LABEL drags only -- a node
+		// or vertex drag moves a thing that is already where the user put it, so there is nothing to
+		// freeze and no threshold needed.
+		if (LABEL_DRAG_TYPES[drag.type] && !drag.committed) {
+			if (Math.hypot(p.x - drag.startX, p.y - drag.startY) < LABEL_DRAG_SLOP_PX) { return; }
+			drag.committed = true;
+		}
 		if (drag.type === 'pan') {
 			state.tx = drag.tx0 + (p.x - drag.startX); state.ty = drag.ty0 + (p.y - drag.startY);
 			setTransform();

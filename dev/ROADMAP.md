@@ -50,23 +50,6 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
-- 92|380| **[H] A dragged data label stores a WORLD offset while its text is sized in PIXELS, so it
-  drifts away from its node as you zoom in.** Confirmed 2026-08-15 from a `?debug=boxes` screenshot:
-  node 105's label sat ~370 px from its node with almost nothing near it, and Tom asked the right
-  question — *"How can this node label have arrived here from its home position with so few
-  pushers?"*
-  - **It never was pushed there.** `capNudges()` limits every nudge to 28 SCREEN pixels at any zoom,
-    so a label 370 px out is one whose HOME is there. A node label's home is `n.x + n.lx`, and the
-    drag handler is the only code in the file that writes `n.lx`.
-  - So the drag was made once at a coarse zoom and every zoom since has multiplied it: 10× in gives
-    a 37 px drag as 370 px, with the text the same size it always was. It crosses the leader
-    threshold on the way and sprouts a line nobody asked for.
-  - **This is independent of Task 379 and no work on the placement algorithm touches it.**
-  - Confirm in one gesture: zoom OUT and the label walks back toward its node in exact proportion.
-  - Fix: store the drag as a pixel offset — a data label is furniture attached to an element, not a
-    place in the drawing. A Text label is the opposite and does not change. Migration converts at
-    the scale the document opens at, because the scale the drag was made at is not recorded.
-    Section 7 and 8 of `dev/label-placement-goals.md`; needs Tom's ruling on the storage frame first.
 
 - 95|379| **[H] Replace the label relaxation with candidate-position scoring, which is the part that
   can see open space.** Tom, 2026-08-15, on two Net3 screenshots with the bad cases arrowed in red:
@@ -111,7 +94,10 @@ session of its own with nothing else in it.
     written up in section 6 of the goals file: boxes must be able to ROTATE (an aligned pipe label's
     AABB is close to twice its own area, and that empty half is a quarter of the map on a diagonal
     network — oriented boxes tested by the separating-axis theorem give both the overlap and the
-    push vector, ~30 lines, pure, and an unrotated box is the same code at angle zero); PIPES must
+    push vector, ~30 lines, pure, and an unrotated box is the same code at angle zero — and the
+    waste is far bigger than this file first claimed: Tom, *"No. It's far more than twice."* For a
+    100x12 px label at 45 degrees the AABB is 5.2x the label's own area, and the ratio grows without
+    limit with length); PIPES must
     be obstacles at a low weight, reversing a call made here and not by him; and his own proposed
     cheap fix — reset labels home on every zoom — **is already in force**, so the waste he is
     looking at is produced fresh at that scale rather than left over from another one. Also
@@ -1981,6 +1967,21 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|380| **A dragged label's stored endpoint is in map units, and that is CORRECT — closed
+  2026-08-15 as not-a-defect, with one real fix falling out of it.** Tom ruled: *"A user-dragged
+  label should remember only the map coordinates of its leader's endpoint. Nothing about the text
+  itself is remembered. This behavior seems correct to me."* Five screenshots at four zooms show it
+  behaving that way. The 370px label that prompted this was one he had dragged by accident — *"What
+  a wild goose chase."* Section 7 of `dev/label-placement-goals.md` had proposed storing a pixel
+  offset instead; that is withdrawn.
+  - **What WAS a defect is the accident itself**, and his rule states it exactly: *"Store the user's
+    leader endpoint and hold it constant. If you extend it, don't overwrite it. Your extension is
+    temporary."* The collision nudge is our extension, and the drag seeded from `nodeLabelPos()` —
+    base PLUS the live nudge — so the first pixel of movement froze the label at wherever the
+    automatic pass had put it, permanently, and gave the pass one more immovable weight-1000
+    obstacle to work around. A 3px movement threshold on the three label drags fixes it; a
+    deliberate drag clears it in the first frame.
 
 - 0|375| **Six of the seven automatic fits are gone — DONE 2026-08-15.** Tom went through the
   enumerated list one at a time and rejected nearly all of it, which is the kind of review no check

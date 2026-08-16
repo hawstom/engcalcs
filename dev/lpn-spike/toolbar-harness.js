@@ -149,5 +149,34 @@ console.log('\n--- ...and the Text tool no longer stacks a second label on the f
 		/nearestNodeNearScreen\(e\.clientX/.test(branch) && /addText\(w\.x, w\.y, nearNode/.test(branch));
 }
 
+console.log('\n--- ...and a stray jiggle no longer freezes a label where the pass put it ---');
+{
+	// THE SAME FAMILY AS THE FAT-FINGER RULE ABOVE: an input the user did not mean to give, answered
+	// as though they had. The first pixel of movement used to make a label manual for good, storing
+	// the base PLUS the collision nudge -- so a wobble froze the label at wherever the automatic
+	// pass had put it, and handed the pass one more immovable weight-1000 obstacle. Tom, 2026-08-15:
+	// "I accidentally dragged it? To there? OK... What a wild goose chase."
+	//
+	// Asserted from the source: applyDrag() runs off real pointer events, but the guard is three
+	// statements and their SHAPE is what matters -- an early return before anything is written.
+	const d = fn('applyDrag');
+	ok('a label drag is gated on a movement threshold',
+		/LABEL_DRAG_TYPES\[drag\.type\] && !drag\.committed/.test(d));
+	ok('...which RETURNS rather than merely noting it, so nothing is stored below',
+		/< LABEL_DRAG_SLOP_PX\) \{ return; \}/.test(d));
+	ok('...and latches, so a drag that has started is never re-tested mid-gesture',
+		/drag\.committed = true;/.test(d));
+	// The gate must sit ABOVE every branch that writes, or it guards nothing. The pan branch is the
+	// first of them and is the marker for "top of the dispatch".
+	ok('...and it is above the first branch that writes anything',
+		d.indexOf('LABEL_DRAG_TYPES') < d.indexOf("drag.type === 'pan'"));
+	// THE THREE LABEL TYPES AND ONLY THOSE. A node or vertex drag moves a thing that is already
+	// where the user put it -- there is nothing to freeze -- and adding slop there would make the
+	// map feel sticky for no gain.
+	ok('the three label drags are gated',
+		/LABEL_DRAG_TYPES = \{ label: true, nodelbl: true, linklbl: true \}/.test(code));
+	ok('...at pointer slop, not a touch target', /LABEL_DRAG_SLOP_PX = 3\b/.test(code));
+}
+
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);
