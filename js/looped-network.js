@@ -1237,13 +1237,32 @@ var EngCalcs = EngCalcs || {};
 	// it, or a solve result not yet available). Returns null when fewer than 3 defined values exist
 	// (Tom, 2026-07-30) -- with only 1 or 2 members "the max" and "the min" aren't a finding, just
 	// the two ends of a trivial set (with 1, the same value would be both at once).
+	// **AND HOW MANY ELEMENTS HOLD EACH END** (ROADMAP Task 346, 2026-08-16). Elm Street prints
+	// Q=0.00 on thirteen zero-demand junctions and marks every one of them "lowest". The mark's job
+	// is to say WHICH element is interesting, and a chevron on thirteen places is a category rather
+	// than a finding -- it is the same objection the `< 3` rule above already makes at the other end
+	// of the set, applied to the extreme instead of to the population.
+	//
+	// Above this many, the end is simply not marked. Three, because two or three elements sharing
+	// the highest velocity IS a finding a reader can act on ("these are the ones"), and because a
+	// number small enough to state is easier to predict than a fraction of the population -- a
+	// fraction makes the same network mark or not mark depending on how many junctions were drawn
+	// around it, which is not something the reader can see.
+	var LPN_EXTREMA_TIE_MAX = 3;
 	function fieldExtrema(values) {
 		var defined = values.filter(function (v) { return typeof v === 'number'; });
 		if (defined.length < 3) { return null; }
-		return { min: Math.min.apply(null, defined), max: Math.max.apply(null, defined) };
+		var min = Math.min.apply(null, defined), max = Math.max.apply(null, defined), i,
+			minCount = 0, maxCount = 0;
+		for (i = 0; i < defined.length; i++) {
+			if (defined[i] === min) { minCount++; }
+			if (defined[i] === max) { maxCount++; }
+		}
+		return { min: min, max: max, minCount: minCount, maxCount: maxCount };
 	}
-	// 'high'/'low', not a boolean -- ties (2+ elements sharing the extreme) all get marked, not
-	// just the first found, since each element is judged independently against the same extrema.
+	// 'high'/'low', not a boolean -- a SMALL tie (2 or 3 elements sharing the extreme) all get
+	// marked, not just the first found, since each element is judged independently against the same
+	// extrema. A large tie is dropped by the rule above.
 	function decorationFor(extrema, value) {
 		// Task 190's global toggle is enforced HERE, not by suppressing the extrema themselves: the
 		// extrema objects stay computed and correct, so turning the marks back on needs no recompute
@@ -1251,8 +1270,8 @@ var EngCalcs = EngCalcs || {};
 		if (!labelSettings.markExtrema) { return undefined; }
 		if (!extrema || typeof value !== 'number') { return undefined; }
 		if (value === extrema.max && value === extrema.min) { return undefined; }
-		if (value === extrema.max) { return 'high'; }
-		if (value === extrema.min) { return 'low'; }
+		if (value === extrema.max) { return extrema.maxCount > LPN_EXTREMA_TIE_MAX ? undefined : 'high'; }
+		if (value === extrema.min) { return extrema.minCount > LPN_EXTREMA_TIE_MAX ? undefined : 'low'; }
 		return undefined;
 	}
 

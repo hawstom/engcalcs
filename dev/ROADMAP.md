@@ -622,15 +622,6 @@ session of its own with nothing else in it.
   arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops
   fitting on a screen.
 
-- 62|346| **An extrema mark shared by a dozen tied elements is noise.** Elm Street prints `Q=0.00`
-  on thirteen zero-demand junctions and a closed pipe, and every one of them is marked "lowest".
-  The existing guard only covers the degenerate case where max and min are the same value.
-  - Options, cheapest first: skip a mark when more than N elements tie for it; skip zero
-    specifically (a zero demand is "no demand", not "the smallest demand"); or mark only the
-    smallest NON-ZERO value.
-  - Found 2026-08-15 while pooling demand with flow (Task 333). Not fixed there because it is a
-    different question — what a mark MEANS, rather than which values it compares.
-
 - 55|343| **Priority order for hiding label lines when they do not fit.** The other half of Task
   333: with prefixes shipped, any SUBSET of a stack is self-describing, so dropping a line is now
   safe. Interacts with Task 331's visibility threshold and Task 329's aligned labels, where a
@@ -1941,6 +1932,16 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 ## Low Priority / Nice-to-Have
 
 ## Completed
+
+- 0|346| **An extrema mark shared by a dozen tied elements was noise — DONE 2026-08-16.**
+  `fieldExtrema()` now counts how many elements hold each end, and `decorationFor()` drops an end
+  held by more than `LPN_EXTREMA_TIE_MAX` = 3. Elm Street's thirteen zero-demand junctions lose the
+  "lowest" mark; two or three sharing a high keep it, because "these are the ones" is still a
+  finding. Asserted in `label-decor-harness.js` §4, which reads the limit out of the file.
+  - **The other two options were NOT taken, and the reason is worth keeping.** "Skip zero" and
+    "mark the smallest non-zero" both need to know what the FIELD means: zero demand is an absence,
+    but elevation zero is a datum and pressure zero is a reading. `decorationFor()` is field-blind
+    by design, and the tie rule fixes the reported case without teaching it about fields.
 
 - 0|321| **`formmail.php` read five `$_POST` keys with no `isset()` — DONE, and the roadmap missed
   it.** Fixed in 694131a alongside Task 319; each key now takes `isset() && is_string()` (the
