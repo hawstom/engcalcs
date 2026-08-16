@@ -159,21 +159,29 @@ importText(usInp, 'import-cases.inp');
 	ok('EPANET ids are kept exactly', nodes.map(n => n.id).join(',') === 'J1,J2,J3,J4,J5,J6,R1,R2',
 		nodes.map(n => n.id).join(','));
 
+	// **BIT-IDENTICAL, NOT "CLOSE".** An import must not rewrite the user's numbers, and a
+	// tolerance is exactly what hid this for months: the page normalised to SI in js/lpn-inp.js
+	// and converted back through lib/Units.lib.php's factors, storing 709.9913664 for a 710 ft
+	// elevation and 149.98747841154 for 150 gpm. Both tables are right to sixteen digits and
+	// their product still is not 1 -- and even with exactly-reciprocal factors, 35% of a random
+	// sample fails to return bit-identical, because (x*f)/f is not an identity in doubles. So the
+	// assertion is `===`. Anything looser cannot tell a pass-through from a good approximation,
+	// which is the only distinction here worth making.
 	const j2 = nodes.find(n => n.id === 'J2');
-	ok('elevation is the file number, in the file units', near(j2.elev, 95, 1e-9), j2.elev + ' ft');
-	ok('demand is the file number, in the file units', near(j2._demand, 120, 1e-6), j2._demand + ' gpm');
+	ok('elevation is the file number EXACTLY, in the file units', j2.elev === 95, j2.elev + ' ft');
+	ok('demand is the file number EXACTLY, in the file units', j2._demand === 120, j2._demand + ' gpm');
 
 	// [DEMANDS] REPLACES the [JUNCTIONS] column and its categories sum: J3 is 0 in [JUNCTIONS] with
 	// rows of 40 and 35, so 75 -- not 0, and not 75 + 0. Measured against the real engine; see the
 	// note in js/lpn-inp.js.
 	const j3 = nodes.find(n => n.id === 'J3');
 	ok('several demand categories add up into the one demand this page holds',
-		near(j3._demand, 75, 1e-6), j3._demand + ' gpm');
+		j3._demand === 75, j3._demand + ' gpm');
 
 	const p1 = links.find(l => l.id === 'P1');
-	ok('diameter arrives in inches, not metres', near(p1._diameter, 12, 1e-9), p1._diameter + ' in');
+	ok('diameter arrives in inches EXACTLY, not metres', p1._diameter === 12, p1._diameter + ' in');
 	ok('roughness crosses unchanged -- it is dimensionless', p1._roughness === 130, p1._roughness);
-	ok('length is the file length', near(p1._length, 1200, 1e-9), p1._length + ' ft');
+	ok('length is the file length', p1._length === 1200, p1._length + ' ft');
 	// The one that would be silent: linkGeomLength() would recompute 1200 ft as the 200 units
 	// between two symbols on a schematic, redesigning the network on the first edit.
 	ok('length is NOT auto -- an EPANET length is a real pipe, not a distance on the drawing',
@@ -183,7 +191,7 @@ importText(usInp, 'import-cases.inp');
 	ok('a closed pipe stays closed', p8._status === 'closed', p8._status);
 
 	const r2 = nodes.find(n => n.id === 'R2');
-	ok('a reservoir takes EPANET total head as its elevation', near(r2.elev, 260, 1e-9), r2.elev);
+	ok('a reservoir takes EPANET total head as its elevation, exactly', r2.elev === 260, r2.elev);
 	ok('...and is given NO head, so it goes on following that elevation',
 		r2._head === undefined, JSON.stringify(r2._head));
 
@@ -199,10 +207,9 @@ importText(usInp, 'import-cases.inp');
 		v1._setting === 12 && v1._k === 0, 'setting=' + v1._setting + ' k=' + v1._k);
 
 	const pu = links.find(l => l.id === 'PU1');
-	ok('the pump curve is stored in the units on the strip, like every other input',
-		pu.curvePoints.length === 3 && near(pu.curvePoints[0][1], 220, 1e-9) &&
-		near(pu.curvePoints[2][0], 1000, 1e-6),
-		JSON.stringify(pu.curvePoints.map(p => p.map(x => Math.round(x)))));
+	ok('the pump curve is stored in the units on the strip, exactly as written',
+		pu.curvePoints.length === 3 && pu.curvePoints[0][1] === 220 && pu.curvePoints[2][0] === 1000,
+		JSON.stringify(pu.curvePoints));
 	// h0/a/b are SI and are what the solver reads. 220 ft of shutoff head is 67.06 m; a curve
 	// fitted from the DISPLAYED numbers instead would put 220 metres in here and be 3.3x wrong.
 	ok('...while the fitted curve the solver reads is SI', near(pu.h0, 220 * FT, 1e-6), pu.h0 + ' m');

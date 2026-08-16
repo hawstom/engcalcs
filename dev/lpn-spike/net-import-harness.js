@@ -254,12 +254,13 @@ console.log('\n--- and the .inp reader then agrees about the network ---');
 	ok('it parses as a network', parsed.ok);
 	ok('2 junctions, 1 reservoir', parsed.nodes.length === 3, parsed.nodes.length);
 	ok('the valve became a pipe, so 3 links', parsed.links.length === 3, parsed.links.length);
-	// 12 in, converted to metres by the .inp reader -- the one number that proves the slot map put
-	// diameter and roughness in the right columns, since swapping them still solves.
+	// 12 in, in the file's OWN pipe-diameter unit -- the reader converts nothing, so a pass-through
+	// is exact (see the units note at the top of js/lpn-inp.js). The one number that proves the
+	// slot map put diameter and roughness in the right columns, since swapping them still solves.
 	const p1 = parsed.links.find((l) => l.id === 'P1');
 	ok('the pipe is 12 in and C = 130, not the other way round',
-		Math.abs(p1.diameter - 0.3048) < 1e-9 && p1.roughness === 130,
-		p1.diameter.toFixed(4) + ' m, C=' + p1.roughness);
+		p1.diameter === 12 && p1.roughness === 130,
+		p1.diameter + ' in, C=' + p1.roughness);
 	ok('the emitter came across', parsed.nodes.find((n) => n.id === 'J2').emitter > 0);
 	ok('the pump found its curve', parsed.links.find((l) => l.id === 'PU1').curvePoints.length === 3);
 	ok('the backdrop is reported as a name we do not have',

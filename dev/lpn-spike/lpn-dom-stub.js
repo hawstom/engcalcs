@@ -115,20 +115,44 @@ function mkUnitSelect(name, family, opts, chosen) {
   return s;
 }
 // Factors are "number of that unit per SI unit" -- lib/Units.lib.php's own convention.
+//
+// AND THEY ARE READ OUT OF lib/Units.lib.php, NEVER RETYPED. They used to be written here as
+// `1/FT`, `1/IN`, `1/GPM` -- the exact reciprocals of js/lpn-inp.js's own constants. That made the
+// stub's import round trip exactly 1.0 where the shipped page's was 0.99998784, so
+// inp-import-harness.js asserted "the file's number comes back unchanged" and passed while the
+// browser stored 709.9913664 for a 710 ft elevation. Textbook stub-removes-the-coupling: the one
+// quantity under test was the DIFFERENCE between two sets of constants, and the stub had only one
+// set. A third disagreeing set lived here too (psi 1.42233, kpa 9.80638), agreeing with neither.
+const unitFactors = (function () {
+  const src = fs.readFileSync(ROOT + 'lib/Units.lib.php', 'utf8');
+  const out = {};
+  for (const m of src.matchAll(/\$ec_units\['([a-zA-Z0-9_]+)'\]\s*=\s*([0-9.eE+-]+)\s*;/g)) {
+    out[m[1]] = parseFloat(m[2]);
+  }
+  if (!out.ft || !out.gpm) {
+    throw new Error('lpn-dom-stub.js: could not read $ec_units out of lib/Units.lib.php. ' +
+      'Point this reader at its new home -- do NOT hard-code the factors.');
+  }
+  return out;
+}());
+function u(name) {
+  if (!(name in unitFactors)) { throw new Error('no $ec_units factor named ' + name); }
+  return unitFactors[name];
+}
 function setUnitSet(which) {
   const us = which === 'us';
-  mkUnitSelect('lpn_u_length', 'distance_site', [['m', 1], ['ft', 1 / FT]], us ? 'ft' : 'm');
-  mkUnitSelect('lpn_u_elevhead', 'total_head', [['mh2o', 1], ['fth2o', 1 / FT]], us ? 'fth2o' : 'mh2o');
-  mkUnitSelect('lpn_u_pressure', 'partial_head', [['mh2o', 1], ['kpa', 9.80638], ['psi', 1.42233]], us ? 'psi' : 'mh2o');
-  mkUnitSelect('lpn_u_diameter', 'distance_small', [['mm', 1000], ['in', 1 / IN]], us ? 'in' : 'mm');
-  mkUnitSelect('lpn_u_flow', 'flow_node', [['lps', 1000], ['gpm', 1 / GPM]], us ? 'gpm' : 'lps');
-  mkUnitSelect('lpn_u_velocity', 'velocity', [['mps', 1], ['ftps', 1 / FT]], us ? 'ftps' : 'mps');
-  mkUnitSelect('lpn_u_gradient', 'gradient', [['gradePercent', 100], ['grade', 1]], 'gradePercent');
+  mkUnitSelect('lpn_u_length', 'distance_site', [['m', u('m')], ['ft', u('ft')]], us ? 'ft' : 'm');
+  mkUnitSelect('lpn_u_elevhead', 'total_head', [['mh2o', u('mh2o')], ['fth2o', u('fth2o')]], us ? 'fth2o' : 'mh2o');
+  mkUnitSelect('lpn_u_pressure', 'partial_head', [['mh2o', u('mh2o')], ['kpa', u('kpa')], ['psi', u('psi')]], us ? 'psi' : 'mh2o');
+  mkUnitSelect('lpn_u_diameter', 'distance_small', [['mm', u('mm')], ['in', u('in')]], us ? 'in' : 'mm');
+  mkUnitSelect('lpn_u_flow', 'flow_node', [['lps', u('lps')], ['gpm', u('gpm')]], us ? 'gpm' : 'lps');
+  mkUnitSelect('lpn_u_velocity', 'velocity', [['mps', u('mps')], ['ftps', u('ftps')]], us ? 'ftps' : 'mps');
+  mkUnitSelect('lpn_u_gradient', 'gradient', [['gradePercent', u('gradePercent')], ['grade', u('grade')]], 'gradePercent');
   // Darcy-Weisbach roughness height e (ROADMAP Task 271) -- family `roughness`, which lib/Units.lib.php
   // aliases to $u_distance (m/mm/ft/in), us => ft, si => mm. Conditional in the PAGE (shown only
   // under Darcy-Weisbach) but unconditional here: applyMethodUI() hides the row, and a stub that
   // withheld the select would make that hiding untestable.
-  mkUnitSelect('lpn_u_roughness', 'roughness', [['m', 1], ['mm', 1000], ['ft', 1 / FT], ['in', 1 / IN]], us ? 'ft' : 'mm');
+  mkUnitSelect('lpn_u_roughness', 'roughness', [['m', u('m')], ['mm', u('mm')], ['ft', u('ft')], ['in', u('in')]], us ? 'ft' : 'mm');
   // The wrapper applyMethodUI() shows and hides. Created here so every harness has it, since it is
   // part of the units strip's markup rather than of any one test.
   ensure('lpn_u_roughness_row');

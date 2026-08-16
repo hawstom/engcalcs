@@ -5412,6 +5412,12 @@ var EngCalcs = EngCalcs || {};
 		GPM: 'gpm', MGD: 'gpm', IMGD: 'gpm', CFS: 'ft3ps', AFD: 'ft3ps',
 		LPS: 'lps', LPM: 'lps', MLD: 'lps', CMH: 'lps', CMD: 'lps'
 	};
+	// The three keywords whose unit this page actually OFFERS, so the selector ends up showing the
+	// very unit the file was written in. Everything not listed here (MGD, IMGD, AFD, LPM, MLD, CMH,
+	// CMD) lands on a different selector unit and is the one thing an import genuinely has to
+	// convert. Written as its own table rather than derived by comparing strings, because the
+	// keyword and our unit key are spelled differently on purpose (CFS vs ft3ps).
+	var LPN_INP_FLOW_SAME = { GPM: 1, CFS: 1, LPS: 1 };
 	function inpUnitSelections(parsed) {
 		var us = parsed.unitSystem === 'us';
 		return {
@@ -5429,17 +5435,38 @@ var EngCalcs = EngCalcs || {};
 	/**
 	 * The parsed .inp as a saved document, ready for importProject().
 	 *
-	 * Must run with the units strip ALREADY on the file's units, because it converts through
-	 * toDisplay() -- one authority for the factors rather than a second table in here.
+	 * Must run with the units strip ALREADY on the file's units (inpUnitSelections above).
+	 *
+	 * **AN IMPORT MUST NOT REWRITE THE USER'S NUMBERS.** js/lpn-inp.js hands every quantity back
+	 * in the file's own unit, and inpUnitSelections() has just put the selector on that same unit,
+	 * so the number the file states is the number this document stores -- byte for byte, with no
+	 * arithmetic anywhere on the path. This used to store `toDisplay(<SI>, unit)`, converting to SI
+	 * in the parser and back out here through lib/Units.lib.php: a trip that is a no-op in
+	 * principle and is not one in doubles. It stored 709.9913664 for a 710 ft elevation and
+	 * 149.98747841154 for 150 gpm, and it does NOT go away with exact factors -- (x*f)/f is not an
+	 * identity, and 35% of a random sample fails to return bit-identical even when the two factors
+	 * are exact reciprocals. Pass-through is the fix; a better constant is not.
+	 *
+	 * The ONE thing that genuinely converts is a flow in a keyword this page has no selector for
+	 * (see LPN_INP_FLOW_SAME). There the units really do differ, so arithmetic is the honest
+	 * answer rather than a rounding error.
 	 */
 	function docFromInp(parsed, name) {
+		// A flow from the file, in the unit the flow selector is now showing. `parsed.scale.flow`
+		// is m3/s per one of the file's units, so the SI step is the parser's own constant and
+		// this file keeps no second copy of it.
+		var flowPassThrough = !!LPN_INP_FLOW_SAME[parsed.flowUnits];
+		function inpFlow(v) {
+			if (typeof v !== 'number') { return v; }
+			return flowPassThrough ? v : toDisplay(v * parsed.scale.flow, 'lpn_u_flow');
+		}
 		var nodes = parsed.nodes.map(function (n) {
 			if (n.type === 'reservoir') {
 				// No `_head` written, deliberately: a blank head means "the water surface is at the
 				// ground", and elevation already carries EPANET's total head. Writing the same
 				// number into both would look identical and silently sever the link the page keeps
 				// between them (see reservoirHead()).
-				return { id: n.id, type: 'reservoir', x: n.x, y: n.y, elev: toDisplay(n.elev, 'lpn_u_elevhead') };
+				return { id: n.id, type: 'reservoir', x: n.x, y: n.y, elev: n.elev };
 			}
 			if (n.type === 'tank') {
 				// A tank's four levels and its diameter are ALL in the Elevation/Head unit, because
@@ -5449,22 +5476,22 @@ var EngCalcs = EngCalcs || {};
 				// of them, so every one is written.
 				return {
 					id: n.id, type: 'tank', x: n.x, y: n.y,
-					elev: toDisplay(n.elev, 'lpn_u_elevhead'),
+					elev: n.elev,
 					// _level is scenario-overridable (leading underscore, read through effective())
 					// because "what if the tank is drawn down to 2 m" is a scenario, and the same
 					// treatment demand gets. The vessel's own geometry is not -- it sits beside
 					// elev, which is a plain property for the same reason: a scenario changes
 					// operating state, not what was built.
-					_level: toDisplay(n.level, 'lpn_u_elevhead'),
-					minLevel: toDisplay(n.minLevel, 'lpn_u_elevhead'),
-					maxLevel: toDisplay(n.maxLevel, 'lpn_u_elevhead'),
-					tankDiameter: toDisplay(n.diameter, 'lpn_u_elevhead')
+					_level: n.level,
+					minLevel: n.minLevel,
+					maxLevel: n.maxLevel,
+					tankDiameter: n.diameter
 				};
 			}
 			var j = {
 				id: n.id, type: 'junction', x: n.x, y: n.y,
-				elev: toDisplay(n.elev, 'lpn_u_elevhead'),
-				_demand: toDisplay(n.demand, 'lpn_u_flow')
+				elev: n.elev,
+				_demand: inpFlow(n.demand)
 			};
 			// Dimensionless in the solver's own terms (m3/s per m^gamma), so it is stored as parsed
 			// and never shown -- nothing in the UI edits an emitter yet, which is why the import
@@ -5476,7 +5503,7 @@ var EngCalcs = EngCalcs || {};
 			var out = {
 				id: l.id, type: l.type, from: l.from, to: l.to,
 				verts: (l.verts || []).map(function (v) { return { x: v.x, y: v.y }; }),
-				_diameter: toDisplay(l.diameter, 'lpn_u_diameter'),
+				_diameter: l.diameter,
 				_roughness: l.roughness,
 				// LENGTH IS THE FILE'S OWN NUMBER, and lenAuto is OFF. An EPANET length is the real
 				// pipe length, which is routinely nothing like the distance between two symbols on
@@ -5488,23 +5515,28 @@ var EngCalcs = EngCalcs || {};
 				_k: l.k || 0
 			};
 			if (l.type === 'valve') {
-				// The parser hands back SI in the unit the valve's TYPE names (js/lpn-inp.js's
-				// valveSettingSI), so each one goes back out through the matching display unit --
-				// and a throttle's loss coefficient through none at all, because it has none.
+				// A PRV/PSV setting is a pressure and an FCV's is a flow (js/lpn-inp.js's
+				// valveSettingUnit names which); a throttle's is dimensionless. The pressure is
+				// psi in a US file and metres of water in an SI one -- exactly what the pressure
+				// selector is showing -- so it crosses untouched, and only a flow can need the
+				// keyword conversion.
 				out.valveType = (l.valveType || 'TCV').toUpperCase();
-				out._setting = (out.valveType === 'PRV' || out.valveType === 'PSV')   // base-write: import builds Base: an .inp arrives as one network with no scenarios
-					? toDisplay(l.setting, 'lpn_u_pressure')
-					: (out.valveType === 'FCV' ? toDisplay(l.setting, 'lpn_u_flow') : (l.setting || 0));
+				out._setting = (out.valveType === 'FCV')   // base-write: import builds Base: an .inp arrives as one network with no scenarios
+					? inpFlow(l.setting)
+					: (l.setting || 0);
 			}
 			if (l.type === 'pump') {
 				out.curvePoints = (l.curvePoints || []).map(function (pt) {
-					return [toDisplay(pt[0], 'lpn_u_flow'), toDisplay(pt[1], 'lpn_u_elevhead')];
+					return [inpFlow(pt[0]), pt[1]];
 				});
 				out.curveRef = null;
-				// h0/a/b are what the solver reads and are SI, so they are fitted from the SI points
+				// h0/a/b are what the solver reads and are SI, so they are fitted from SI points
 				// rather than the displayed ones -- the same split recomputePumpCurve() makes.
+				// The parser's own scale factors do that step, so no conversion constant lives here.
 				var fit = (l.curvePoints && l.curvePoints.length)
-					? EngCalcs.lpnPumpFromCurve(l.curvePoints)
+					? EngCalcs.lpnPumpFromCurve(l.curvePoints.map(function (pt) {
+						return [pt[0] * parsed.scale.flow, pt[1] * parsed.scale.head];
+					}))
 					: { h0: 0, a: 0, b: 2 };
 				out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
 			}
@@ -5755,7 +5787,9 @@ var EngCalcs = EngCalcs || {};
 				alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.');
 				return;
 			}
-			// The units strip moves FIRST, because docFromInp() converts through it.
+			// The units strip moves FIRST. docFromInp() is written against the selector state --
+			// it stores the file's own numbers precisely BECAUSE the strip is already showing the
+			// file's own units -- so this ordering is the fix, not a formality.
 			applyUnitSelections(inpUnitSelections(parsed));
 			var name = String(file.name).replace(/\.inp$/i, '') || String(file.name);
 			var id = importProject(docFromInp(parsed, name));

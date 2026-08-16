@@ -14,11 +14,21 @@
 //
 // UNITS. An `.inp` names its flow unit, and that one keyword fixes every other unit in the file --
 // GPM means feet, inches, psi and gpm together; LPS means metres, millimetres, metres-of-water and
-// L/s together. This module normalises ALL of that to SI (m, m3/s, m of head) with two deliberate
-// exceptions, `length` and the map coordinates, which stay in the file's own length unit: the page
-// stores those declaratively and both of EPANET's length units, ft and m, are on our own
-// Length/Map selector, so passing them through untouched is exact where a round trip through SI
-// would not be. `lengthUnit` says which one, and the caller sets the selector to match.
+// L/s together.
+//
+// **EVERY NUMBER IS HANDED BACK IN THE FILE'S OWN UNIT, unconverted**, and `scale` says what one
+// of those units is in SI so a caller that wants SI can multiply. This is exactness, not
+// convenience: a value normalised to SI here and converted back for display by
+// lib/Units.lib.php's factors does NOT return the number the file stated. Both halves are correct
+// to sixteen digits and their product still is not exactly 1 -- 710 ft came back as
+// 709.9913664 and 150 gpm as 149.98747841154 while the two tables disagreed, and even with
+// exactly-reciprocal factors 35% of a random sample fails to return bit-identical, because
+// (x*f)/f is not an identity in doubles. Passing the token through untouched is the only way the
+// user's own numbers survive, and the page stores what the user typed (CLAUDE.md's unit rule).
+//
+// `lengthUnit` names the length unit and the caller sets the Length/Map selector to match; the
+// other selectors follow `unitSystem` and `flowUnits`. The ONE quantity still normalised is an
+// emitter coefficient, which has no display unit on this page at all -- see the [EMITTERS] note.
 //
 // This module is DOM-free and EngCalcs-free by design, so it can be tested in Node
 // (dev/lpn-spike/validate_inp.js) against EPA's own Net1/Net2/Net3 without a browser.
@@ -172,8 +182,10 @@
 			if (!r[0]) { continue; }
 			addNode({
 				id: r[0], type: 'junction', x: 0, y: 0,
-				elev: num(r[1]) * headSI,
-				demand: num(r[2]) * qSI * demandMultiplier,
+				elev: num(r[1]),
+				// The multiplier is dimensionless, so applying it here keeps the number in the
+				// file's own flow unit.
+				demand: num(r[2]) * demandMultiplier,
 				emitter: 0
 			});
 			if (r[3]) { drop('demand-pattern', [r[0]], r[3]); }
@@ -188,7 +200,7 @@
 			// ground" -- so an imported reservoir gets elevation = head, which is the same fixed
 			// boundary condition and reads as zero pressure at the surface. Exactly what
 			// applySaved() already does for reservoirs written before they had an elevation.
-			addNode({ id: r[0], type: 'reservoir', x: 0, y: 0, elev: num(r[1]) * headSI, head: num(r[1]) * headSI });
+			addNode({ id: r[0], type: 'reservoir', x: 0, y: 0, elev: num(r[1]), head: num(r[1]) });
 			if (r[2]) { drop('head-pattern', [r[0]], r[2]); }
 		}
 
@@ -206,14 +218,14 @@
 			if (!r[0]) { continue; }
 			addNode({
 				id: r[0], type: 'tank', x: 0, y: 0,
-				elev: num(r[1]) * headSI,
-				level: num(r[2]) * headSI,
-				minLevel: num(r[3]) * headSI,
-				maxLevel: num(r[4]) * headSI,
-				diameter: num(r[5]) * headSI,
+				elev: num(r[1]),
+				level: num(r[2]),
+				minLevel: num(r[3]),
+				maxLevel: num(r[4]),
+				diameter: num(r[5]),
 				// The solve reads `head`, and at the instant a steady-state solve describes, the
 				// water surface is the bottom plus the initial level. See EngCalcs.lpnIsFixedHead.
-				head: (num(r[1]) + num(r[2])) * headSI
+				head: num(r[1]) + num(r[2])
 			});
 			// A VOLUME CURVE makes the tank non-cylindrical, and this page holds only a diameter.
 			// The level -> head relationship a steady-state solve uses is unaffected (the surface is
@@ -239,14 +251,18 @@
 			var dn = nodeIndex[r[0]];
 			if (!dn || dn.type !== 'junction') { continue; }
 			if (!zeroed[r[0]]) { dn.demand = 0; zeroed[r[0]] = true; multiDemand.push(r[0]); }
-			dn.demand += num(r[1]) * qSI * demandMultiplier;
+			dn.demand += num(r[1]) * demandMultiplier;
 			if (r[2]) { drop('demand-pattern', [r[0]], r[2]); }
 		}
 		if (multiDemand.length) { drop('demand-categories', multiDemand); }
 
 		// ---- emitters ----
-		// EPANET states the coefficient per unit of PRESSURE (psi under US units, metres under SI);
-		// js/lpn-solver.js wants it per unit of HEAD in metres, with flow in m3/s. Both scales move.
+		// THE ONE QUANTITY STILL CONVERTED TO SI, and it is the exception that proves the rule: an
+		// emitter coefficient is a DERIVED quantity (flow per pressure^gamma), this page has no
+		// selector for it and never displays it, so there is no file unit for it to be returned in
+		// and no display round trip for a conversion to spoil. EPANET states it per unit of
+		// PRESSURE (psi under US units, metres under SI); js/lpn-solver.js wants it per unit of
+		// HEAD in metres, with flow in m3/s. Both scales move.
 		rows = rawSections.EMITTERS || [];
 		var emitterIds = [];
 		for (i = 0; i < rows.length; i++) {
@@ -276,7 +292,7 @@
 			var pipe = {
 				id: r[0], type: 'pipe', from: r[1], to: r[2],
 				length: num(r[3]),                    // stays in the FILE's length unit -- see header
-				diameter: num(r[4]) * diaSI,
+				diameter: num(r[4]),                  // stays in the FILE's pipe-diameter unit
 				roughness: num(r[5]),                 // dimensionless C for H-W; see headloss note
 				k: num(r[6]),
 				status: st === 'CLOSED' ? 'closed' : 'open',
@@ -292,7 +308,8 @@
 			r = rows[i];
 			if (!r[0]) { continue; }
 			if (!curves[r[0]]) { curves[r[0]] = []; }
-			curves[r[0]].push([num(r[1]) * qSI, num(r[2]) * headSI]);
+			// File flow unit and file head unit, matching every other number here.
+			curves[r[0]].push([num(r[1]), num(r[2])]);
 		}
 
 		rows = rawSections.PUMPS || [];
@@ -351,13 +368,14 @@
 		// as on the writing side (js/lpn-epanet.js): a PRV/PSV setting is a PRESSURE (psi in a US
 		// file, metres of water in an SI one), an FCV setting is a FLOW, a TCV setting is
 		// dimensionless. Reading a psi as a metre is a factor of 1.42 and the network still solves.
-		// One valve setting, in the file's units, to SI. Written as a function rather than inline
-		// because a [STATUS] line can override a valve's setting too, and the two call sites must
-		// convert identically.
-		function valveSettingSI(type, value) {
-			if (type === 'PRV' || type === 'PSV' || type === 'PBV') { return value * pressSI; }
-			if (type === 'FCV') { return value * qSI; }
-			return value;   // TCV is dimensionless; GPV's "setting" is a curve id we do not read.
+		// A setting is handed back exactly as the file wrote it, like everything else here, so
+		// there is no conversion function -- only a rule about which unit the number is IN, and
+		// `settingUnit` states it so a caller never has to re-derive the type table. A [STATUS]
+		// line can override a valve's setting, and reads the same way.
+		function valveSettingUnit(type) {
+			if (type === 'PRV' || type === 'PSV' || type === 'PBV') { return 'press'; }
+			if (type === 'FCV') { return 'flow'; }
+			return null;   // TCV is dimensionless; GPV's "setting" is a curve id we do not read.
 		}
 
 		rows = rawSections.VALVES || [];
@@ -366,7 +384,7 @@
 			r = rows[i];
 			if (!r[0]) { continue; }
 			var vtype = (r[4] || '').toUpperCase(),
-				vdia = num(r[3]) * diaSI,
+				vdia = num(r[3]),
 				setting = num(r[5]),
 				vloss = num(r[6]),
 				vlink;
@@ -379,7 +397,7 @@
 			var vcommon = {
 				id: r[0], from: r[1], to: r[2],
 				length: 0,
-				diameter: vdia || (us ? 8 * IN : 0.2),
+				diameter: vdia || (us ? 8 : 200),   // in the file's pipe-diameter unit: in or mm
 				roughness: 150,
 				status: (r[7] || '').toUpperCase() === 'CLOSED' ? 'closed' : 'open',
 				verts: []
@@ -395,7 +413,8 @@
 				vlink = Object.assign({}, vcommon, {
 					type: 'valve',
 					valveType: vtype || 'TCV',
-					setting: valveSettingSI(vtype, setting),
+					setting: setting,
+					settingUnit: valveSettingUnit(vtype),
 					// A TCV's loss is its SETTING ALONE. The [VALVES] minor-loss column is IGNORED
 					// for it, which is the opposite of what the section's own column heading
 					// suggests and was measured rather than assumed (js/vendor/epanet-js.js:
@@ -429,7 +448,7 @@
 				// same converter. For a PUMP a number is a speed multiplier,
 				// which this page has no element for, so that case still falls through to the
 				// report below.
-				sl.setting = valveSettingSI((sl.valveType || '').toUpperCase(), +r[1]);
+				sl.setting = +r[1];
 			}
 			else { drop('link-setting', [r[0]], r[1]); }
 		}
@@ -469,7 +488,7 @@
 					best = Math.max(best, o.diameter);
 				}
 			});
-			l.diameter = best || (us ? 8 * IN : 0.2);
+			l.diameter = best || (us ? 8 : 200);   // file pipe-diameter unit: in or mm
 		});
 
 		// A link whose end node never appeared is a broken file, not a cut feature. Left OUT rather
@@ -521,6 +540,10 @@
 			flowUnits: flowKey,
 			unitSystem: fu.system,
 			lengthUnit: us ? 'ft' : 'm',
+			// SI per ONE of the file's own units, for a caller that wants SI (the solver
+			// harnesses do; the page does not). Exported rather than re-derived, so nothing
+			// keeps a second copy of these constants.
+			scale: { len: lenSI, dia: diaSI, head: headSI, press: pressSI, flow: qSI },
 			headloss: headloss,
 			emitterExponent: emitterExponent,
 			nodes: nodes,
