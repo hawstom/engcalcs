@@ -1,7 +1,7 @@
 {
 	"format": "hawsedc-lpn",
 	"app": "https://hawsedc.com/engcalcs/Looped-Network.php",
-	"v": 4,
+	"v": 6,
 	"project": {
 		"name": "Net3",
 		"activeScenario": "base",
@@ -102,7 +102,9 @@
 			"x": 12.96,
 			"y": 21.31,
 			"elev": 42.99947712,
-			"_demand": 133.1888808294475
+			"_demand": 133.1888808294475,
+			"lx": -0.41152626362611144,
+			"ly": -0.2465717853845426
 		},
 		{
 			"id": "105",
@@ -110,7 +112,9 @@
 			"x": 16.97,
 			"y": 21.28,
 			"elev": 28.49965344,
-			"_demand": 135.35869968380115
+			"_demand": 135.35869968380115,
+			"lx": -0.047851051120407107,
+			"ly": -0.20228921909954778
 		},
 		{
 			"id": "107",
@@ -2384,18 +2388,26 @@
 		{
 			"id": "X1",
 			"text": "LAKE",
-			"x": 8.870551109313965,
-			"y": 29.12,
+			"x": 8.346014697041317,
+			"y": 30.116619183318033,
 			"anchorNode": null,
-			"sizeMult": 1
+			"sizeMult": 2
 		},
 		{
 			"id": "X2",
 			"text": "RIVER",
-			"x": 25.98126083612442,
+			"x": 26.92542637821519,
 			"y": 30.8,
 			"anchorNode": null,
-			"sizeMult": 1
+			"sizeMult": 2
+		},
+		{
+			"id": "X3",
+			"text": "Zoom in to see labels",
+			"x": 35.440246952096,
+			"y": 15.397639717135469,
+			"anchorNode": null,
+			"sizeMult": 4
 		}
 	],
 	"nextId": {
@@ -2405,7 +2417,7 @@
 		"L": 1,
 		"P": 1,
 		"V": 1,
-		"X": 3
+		"X": 4
 	},
 	"labelSettings": {
 		"node": {
@@ -2444,6 +2456,17 @@
 				"gradient": 4
 			}
 		},
+		"prefix": {
+			"node": {},
+			"link": {
+				"id": "L"
+			}
+		},
+		"suffix": {
+			"node": {},
+			"link": {}
+		},
+		"separator": " ",
 		"markExtrema": true
 	},
 	"backdrop": null,
@@ -2458,7 +2481,7 @@
 			"X": "X"
 		},
 		"emitterExponent": 0.5,
-		"tolerance": 1e-09,
+		"tolerance": 1e-9,
 		"engine": "epanet",
 		"defaults": {
 			"nodeElev": 0,
@@ -2478,14 +2501,24 @@
 			"computation": true,
 			"files": false
 		},
-		"textSize": 0.1,
-		"symbolScale": 1,
+		"textSize": 8,
+		"symbolSize": 8,
+		"linkWidth": 2,
 		"symbolOpacity": 1,
 		"backdropOpacity": 1,
-		"textSizeUnits": "map",
+		"labelMaxWidth": 17.4,
+		"alignPipeLabels": true,
+		"labelFlipLeftOfVertical": 20,
+		"maskLabels": true,
 		"legendPosition": "top-right",
+		"labelReadabilityBias": 110,
 		"mapHeight": 500,
 		"method": "hw"
+	},
+	"view": {
+		"cx": 26.177906156629238,
+		"cy": 15.584467902956321,
+		"s": 20.725763754739933
 	},
 	"units": {
 		"lpn_u_length": "ft",

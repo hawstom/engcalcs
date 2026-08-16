@@ -47,15 +47,17 @@
 			"ly": 22.764521529432386
 		},
 		{
-			"id": "J5",
+			"id": "J-H",
 			"type": "junction",
 			"x": 579280.492,
 			"y": 1304313.082,
 			"elev": 5077.93825152,
-			"_demand": 189.984139321284
+			"_demand": 189.984139321284,
+			"lx": 9.081912336638197,
+			"ly": 0.24549370841123164
 		},
 		{
-			"id": "J6",
+			"id": "J-RT",
 			"type": "junction",
 			"x": 579319.991,
 			"y": 1304467.0568,
@@ -63,7 +65,7 @@
 			"_demand": 189.984139321284
 		},
 		{
-			"id": "J7",
+			"id": "J-ROR",
 			"type": "junction",
 			"x": 579463.1298,
 			"y": 1304439.935,
@@ -119,7 +121,7 @@
 			"ly": -20.48451139545068
 		},
 		{
-			"id": "J-F",
+			"id": "J-F-FRAN",
 			"type": "junction",
 			"x": 579224.7073,
 			"y": 1304322.2521,
@@ -129,7 +131,7 @@
 			"ly": -11.924600028665736
 		},
 		{
-			"id": "J1",
+			"id": "JF-ELM",
 			"type": "junction",
 			"x": 579406.5809,
 			"y": 1304151.077,
@@ -204,7 +206,7 @@
 			"id": "6",
 			"type": "pipe",
 			"from": "J3",
-			"to": "J6",
+			"to": "J-RT",
 			"verts": [],
 			"_diameter": 3.9999919999999998,
 			"_roughness": 150,
@@ -217,7 +219,7 @@
 			"id": "7",
 			"type": "pipe",
 			"from": "J2",
-			"to": "J7",
+			"to": "J-ROR",
 			"verts": [],
 			"_diameter": 1.9999959999999999,
 			"_roughness": 150,
@@ -322,7 +324,7 @@
 		{
 			"id": "15",
 			"type": "pipe",
-			"from": "J1",
+			"from": "JF-ELM",
 			"to": "J2",
 			"verts": [
 				{
@@ -384,7 +386,7 @@
 			"id": "16",
 			"type": "pipe",
 			"from": "J13",
-			"to": "J-F",
+			"to": "J-F-FRAN",
 			"verts": [],
 			"_diameter": 5.999987999999999,
 			"_roughness": 150,
@@ -396,7 +398,7 @@
 		{
 			"id": "17",
 			"type": "pipe",
-			"from": "J5",
+			"from": "J-H",
 			"to": "J3",
 			"verts": [
 				{
@@ -414,7 +416,7 @@
 		{
 			"id": "19",
 			"type": "pipe",
-			"from": "J1",
+			"from": "JF-ELM",
 			"to": "J8",
 			"verts": [
 				{
@@ -518,82 +520,42 @@
 		{
 			"id": "X2",
 			"text": "RESTAURANT",
-			"x": 579326.5696173876,
-			"y": 1304504.9668355763,
+			"x": 579331.8187960775,
+			"y": 1304500.4675395563,
 			"anchorNode": null,
 			"sizeMult": 1
 		},
 		{
 			"id": "X3",
 			"text": "RETAIL/OFFICE/RESTAURANT",
-			"x": 579453.0892769544,
-			"y": 1304475.9072203515,
-			"anchorNode": null,
-			"sizeMult": 1
-		},
-		{
-			"id": "X4",
-			"text": "J-H",
-			"x": 579294.6725575054,
-			"y": 1304324.8490198976,
-			"anchorNode": null,
-			"sizeMult": 1
-		},
-		{
-			"id": "X5",
-			"text": "J-RT",
-			"x": 579336.6409276902,
-			"y": 1304487.786977791,
-			"anchorNode": null,
-			"sizeMult": 1
-		},
-		{
-			"id": "X6",
-			"text": "J-ROR",
-			"x": 579482.95733081,
-			"y": 1304460.368538718,
+			"x": 579457.5885729744,
+			"y": 1304467.6585109816,
 			"anchorNode": null,
 			"sizeMult": 1
 		},
 		{
 			"id": "X7",
 			"text": "SCENARIO 3: FIRE PLUS MAX DAY FLOW",
-			"x": 579340.4652651562,
-			"y": 1304220.1632868235,
+			"x": 579333.8520928175,
+			"y": 1304218.6936929706,
 			"anchorNode": null,
-			"sizeMult": 1.2
+			"sizeMult": 1.5
 		},
 		{
 			"id": "X8",
 			"text": "ELM STREET CENTER",
-			"x": 579341.8101724368,
-			"y": 1304261.1559488343,
+			"x": 579335.9317970247,
+			"y": 1304261.8907457609,
 			"anchorNode": null,
-			"sizeMult": 1.8
-		},
-		{
-			"id": "X9",
-			"text": "J-F-FRAN",
-			"x": 579253.611433328,
-			"y": 1304322.8533203516,
-			"anchorNode": null,
-			"sizeMult": 1
+			"sizeMult": 2
 		},
 		{
 			"id": "X13",
 			"text": "WATER SYSTEM HYDRAULIC ANALYSIS",
-			"x": 579340.7414336865,
-			"y": 1304240.387690281,
+			"x": 579333.3934644213,
+			"y": 1304238.918096428,
 			"anchorNode": null,
-			"sizeMult": 1.2
-		},
-		{
-			"id": "X14",
-			"text": "J-F-ELM",
-			"x": 579448.2644650023,
-			"y": 1304133.1440277451,
-			"anchorNode": null,
-			"sizeMult": 1
+			"sizeMult": 1.5
 		},
 		{
 			"id": "X15",
@@ -617,15 +579,15 @@
 			"x": 579128.8376429242,
 			"y": 1304288.5196841797,
 			"anchorNode": null,
-			"sizeMult": 1.2
+			"sizeMult": 1.5
 		},
 		{
 			"id": "X18",
 			"text": "ROAD",
-			"x": 579129.5402298535,
-			"y": 1304271.9003902012,
+			"x": 579130.27502678,
+			"y": 1304272.6351871279,
 			"anchorNode": null,
-			"sizeMult": 1.2
+			"sizeMult": 1.5
 		},
 		{
 			"id": "X19",
@@ -633,7 +595,7 @@
 			"x": 579217.9191207035,
 			"y": 1304138.275196465,
 			"anchorNode": null,
-			"sizeMult": 1.2
+			"sizeMult": 1.5
 		}
 	],
 	"nextId": {
@@ -747,8 +709,16 @@
 		"backdropOpacity": 1,
 		"labelMaxWidth": 1940,
 		"alignPipeLabels": true,
+		"labelFlipLeftOfVertical": 20,
+		"maskLabels": true,
 		"legendPosition": "top-right",
+		"labelReadabilityBias": 110,
 		"mapHeight": 800
+	},
+	"view": {
+		"cx": 579390.9803300607,
+		"cy": 1304253.3517097319,
+		"s": 1.3006046606905488
 	},
 	"units": {
 		"lpn_u_length": "ft",

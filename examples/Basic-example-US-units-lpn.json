@@ -292,6 +292,15 @@
 				"gradient": 4
 			}
 		},
+		"prefix": {
+			"node": {},
+			"link": {}
+		},
+		"suffix": {
+			"node": {},
+			"link": {}
+		},
+		"separator": " ",
 		"markExtrema": true
 	},
 	"backdrop": null,
@@ -306,7 +315,7 @@
 			"X": "X"
 		},
 		"emitterExponent": 0.5,
-		"tolerance": 1e-09,
+		"tolerance": 1e-9,
 		"engine": "epanet",
 		"defaults": {
 			"nodeElev": 0,
@@ -333,9 +342,17 @@
 		"backdropOpacity": 0.5,
 		"labelMaxWidth": 2650,
 		"alignPipeLabels": true,
+		"labelFlipLeftOfVertical": 20,
+		"maskLabels": true,
 		"legendPosition": "top-right",
+		"labelReadabilityBias": 110,
 		"mapHeight": 900,
 		"method": "hw"
+	},
+	"view": {
+		"cx": 4971.909293935584,
+		"cy": 4993.47310484674,
+		"s": 0.876714285714286
 	},
 	"units": {
 		"lpn_u_length": "ft",

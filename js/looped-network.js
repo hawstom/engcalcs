@@ -202,25 +202,22 @@ var EngCalcs = EngCalcs || {};
 	// n = 1 REPRODUCES TODAY EXACTLY. The stations are (i + 0.5)/n, so a single label lands at 0.5,
 	// which is LINK_LABEL_ALONG -- the whole existing single-label path, the arrow dodge and the
 	// aligned-label station search are untouched on any pipe shorter than a quarter of the view.
-	// **HALF THE SMALLER MAP DIMENSION, NOT A QUARTER** (Tom, 2026-08-15, from the drawing: *"min/4
-	// is too small. Let's try min/2. On my PC, even that is smaller than max/4."*). His second
-	// sentence is the measurement that makes the first one safe: on a wide desktop map area, half
-	// the SMALLER dimension is still tighter than a quarter of the larger, so this is a smaller
-	// change than swapping the dimension would have been, and it moves in the direction the drawing
-	// asked for.
+	// **THE NOMINAL IS A CEILING, NOT THE SPACING, so the number is raised rather than the rule
+	// changed** (Tom, 2026-08-16: *"Are we sure it's min/2? It looks like less."* -- measured, and
+	// he is right). `linkLabelStations()` takes n = ceil(L/s) and spaces at L/n, so what a reader
+	// actually sees is anywhere in (s/2, s]: a pipe barely longer than one spacing gets two labels
+	// at half of it, and over pipes of 1-2s the mean is 0.75 s. `ceil` is what guarantees a gap is
+	// never WIDER than the nominal, and nominal and realized cannot both equal s -- they conflict
+	// by arithmetic. Given the choice between keeping the guarantee and centring the realized
+	// spacing, Tom picked the guarantee and moved the number: *"(c) Try 0.75 * min"*. So the
+	// realized spacing is now (0.375, 0.75] x min, where it was (0.25, 0.5]. Third value: 0.25 in
+	// the first cut, 0.5 on 2026-08-15 (*"min/4 is too small"*), 0.75 here.
 	//
 	// He also offered the fancy version -- *"a setting for '% of minimum map dimension for label
 	// spacing' default 50%"* -- and it is not built, because a number nobody has yet wanted to
-	// change is a settings row that costs 26 translations. If a drawing turns up that wants a
-	// different spacing, that is the evidence for adding it.
-	//
-	// **AND min/2 IS THE CEILING, NOT THE SPACING** (measured 2026-08-16, after Tom: *"Are we sure
-	// it's min/2? It looks like less."* — he is right). `linkLabelStations()` takes n = ceil(L/s)
-	// and then spaces at L/n, so what you actually see is anywhere in (s/2, s]: a pipe just longer
-	// than one spacing gets two labels at half of it, and over pipes of 1-2s the mean is 0.75 s.
-	// `ceil` is what guarantees a gap is never WIDER than the promise, and the two cannot both
-	// hold. ROADMAP Task 386 states the three options; this stays as it is until he picks one.
-	var LPN_LABEL_REPEAT_FRAC = 0.5;
+	// change is a settings row that costs 26 translations. Three adjustments by hand is still not
+	// that evidence: each one moved a default everybody gets, not a preference one drawing needed.
+	var LPN_LABEL_REPEAT_FRAC = 0.75;
 	// **THE DIVISION IS UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN** (Tom, 2026-08-15, on being
 	// shown a cap of 12: *"Do you want only to draw the 4 that appear on the screen? That makes most
 	// sense. No cap on the division?"* — and he is right, it is the better shape). A cap on n is a
@@ -1237,32 +1234,13 @@ var EngCalcs = EngCalcs || {};
 	// it, or a solve result not yet available). Returns null when fewer than 3 defined values exist
 	// (Tom, 2026-07-30) -- with only 1 or 2 members "the max" and "the min" aren't a finding, just
 	// the two ends of a trivial set (with 1, the same value would be both at once).
-	// **AND HOW MANY ELEMENTS HOLD EACH END** (ROADMAP Task 346, 2026-08-16). Elm Street prints
-	// Q=0.00 on thirteen zero-demand junctions and marks every one of them "lowest". The mark's job
-	// is to say WHICH element is interesting, and a chevron on thirteen places is a category rather
-	// than a finding -- it is the same objection the `< 3` rule above already makes at the other end
-	// of the set, applied to the extreme instead of to the population.
-	//
-	// Above this many, the end is simply not marked. Three, because two or three elements sharing
-	// the highest velocity IS a finding a reader can act on ("these are the ones"), and because a
-	// number small enough to state is easier to predict than a fraction of the population -- a
-	// fraction makes the same network mark or not mark depending on how many junctions were drawn
-	// around it, which is not something the reader can see.
-	var LPN_EXTREMA_TIE_MAX = 3;
 	function fieldExtrema(values) {
 		var defined = values.filter(function (v) { return typeof v === 'number'; });
 		if (defined.length < 3) { return null; }
-		var min = Math.min.apply(null, defined), max = Math.max.apply(null, defined), i,
-			minCount = 0, maxCount = 0;
-		for (i = 0; i < defined.length; i++) {
-			if (defined[i] === min) { minCount++; }
-			if (defined[i] === max) { maxCount++; }
-		}
-		return { min: min, max: max, minCount: minCount, maxCount: maxCount };
+		return { min: Math.min.apply(null, defined), max: Math.max.apply(null, defined) };
 	}
-	// 'high'/'low', not a boolean -- a SMALL tie (2 or 3 elements sharing the extreme) all get
-	// marked, not just the first found, since each element is judged independently against the same
-	// extrema. A large tie is dropped by the rule above.
+	// 'high'/'low', not a boolean -- ties (2+ elements sharing the extreme) all get marked, not
+	// just the first found, since each element is judged independently against the same extrema.
 	function decorationFor(extrema, value) {
 		// Task 190's global toggle is enforced HERE, not by suppressing the extrema themselves: the
 		// extrema objects stay computed and correct, so turning the marks back on needs no recompute
@@ -1270,8 +1248,8 @@ var EngCalcs = EngCalcs || {};
 		if (!labelSettings.markExtrema) { return undefined; }
 		if (!extrema || typeof value !== 'number') { return undefined; }
 		if (value === extrema.max && value === extrema.min) { return undefined; }
-		if (value === extrema.max) { return extrema.maxCount > LPN_EXTREMA_TIE_MAX ? undefined : 'high'; }
-		if (value === extrema.min) { return extrema.minCount > LPN_EXTREMA_TIE_MAX ? undefined : 'low'; }
+		if (value === extrema.max) { return 'high'; }
+		if (value === extrema.min) { return 'low'; }
 		return undefined;
 	}
 

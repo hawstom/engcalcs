@@ -1,7 +1,7 @@
 {
 	"format": "hawsedc-lpn",
 	"app": "https://hawsedc.com/engcalcs/Looped-Network.php",
-	"v": 4,
+	"v": 6,
 	"project": {
 		"name": "Net2",
 		"activeScenario": "base",
@@ -833,27 +833,27 @@
 	"labels": [
 		{
 			"id": "X1",
-			"text": "Pump",
-			"x": 26.0421142578125,
-			"y": 6.1,
+			"text": "Pump Station",
+			"x": 27.629479101093995,
+			"y": 12.092128657710406,
 			"anchorNode": null,
-			"sizeMult": 1
-		},
-		{
-			"id": "X2",
-			"text": "Station",
-			"x": 26.4178466796875,
-			"y": 3.1,
-			"anchorNode": null,
-			"sizeMult": 1
+			"sizeMult": 2
 		},
 		{
 			"id": "X3",
 			"text": "Tank",
-			"x": 28.56922853946686,
-			"y": 76.52,
+			"x": 28.309298616374694,
+			"y": 76.00014015381566,
 			"anchorNode": null,
-			"sizeMult": 1
+			"sizeMult": 2
+		},
+		{
+			"id": "X6",
+			"text": "Zoom to see labels",
+			"x": 37.18522150935664,
+			"y": 16.77663019270581,
+			"anchorNode": null,
+			"sizeMult": 4
 		}
 	],
 	"nextId": {
@@ -863,7 +863,7 @@
 		"L": 1,
 		"P": 1,
 		"V": 1,
-		"X": 4
+		"X": 7
 	},
 	"labelSettings": {
 		"node": {
@@ -902,6 +902,15 @@
 				"gradient": 4
 			}
 		},
+		"prefix": {
+			"node": {},
+			"link": {}
+		},
+		"suffix": {
+			"node": {},
+			"link": {}
+		},
+		"separator": " ",
 		"markExtrema": true
 	},
 	"backdrop": null,
@@ -916,7 +925,7 @@
 			"X": "X"
 		},
 		"emitterExponent": 0.5,
-		"tolerance": 1e-09,
+		"tolerance": 1e-9,
 		"engine": "epanet",
 		"defaults": {
 			"nodeElev": 0,
@@ -936,14 +945,24 @@
 			"computation": true,
 			"files": false
 		},
-		"textSize": 0.5,
-		"symbolScale": 1,
+		"textSize": 8,
+		"symbolSize": 8,
+		"linkWidth": 2,
 		"symbolOpacity": 1,
 		"backdropOpacity": 1,
-		"textSizeUnits": "map",
+		"labelMaxWidth": 56.4,
+		"alignPipeLabels": true,
+		"labelFlipLeftOfVertical": 20,
+		"maskLabels": true,
 		"legendPosition": "top-right",
+		"labelReadabilityBias": 110,
 		"mapHeight": 500,
 		"method": "hw"
+	},
+	"view": {
+		"cx": 31.535502958579887,
+		"cy": 45.50000000000001,
+		"s": 8.144578313253012
 	},
 	"units": {
 		"lpn_u_length": "ft",

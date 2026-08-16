@@ -297,26 +297,26 @@
 		{
 			"id": "X1",
 			"text": "Source",
-			"x": 6.676049052918375,
-			"y": 86.00132896707797,
+			"x": 2.937838680748953,
+			"y": 70.63313077038146,
 			"anchorNode": null,
-			"sizeMult": 1
+			"sizeMult": 2
 		},
 		{
 			"id": "X2",
 			"text": "Pump",
-			"x": 16.244694686706623,
-			"y": 85.90004108003825,
+			"x": 15.2755290346627,
+			"y": 66.37827580315349,
 			"anchorNode": null,
-			"sizeMult": 1
+			"sizeMult": 2
 		},
 		{
 			"id": "X3",
 			"text": "Tank",
-			"x": 51.83593751898119,
-			"y": 94.94338958634147,
+			"x": 49.34379727086824,
+			"y": 95.3587462943603,
 			"anchorNode": null,
-			"sizeMult": 1
+			"sizeMult": 2
 		}
 	],
 	"nextId": {
@@ -365,6 +365,19 @@
 				"gradient": 4
 			}
 		},
+		"prefix": {
+			"node": {
+				"id": ""
+			},
+			"link": {
+				"id": ""
+			}
+		},
+		"suffix": {
+			"node": {},
+			"link": {}
+		},
+		"separator": " ",
 		"markExtrema": true
 	},
 	"backdrop": null,
@@ -379,7 +392,7 @@
 			"X": "X"
 		},
 		"emitterExponent": 0.5,
-		"tolerance": 1e-09,
+		"tolerance": 1e-9,
 		"engine": "epanet",
 		"defaults": {
 			"nodeElev": 0,
@@ -405,10 +418,18 @@
 		"symbolOpacity": 1,
 		"backdropOpacity": 1,
 		"labelMaxWidth": null,
-		"alignPipeLabels": false,
+		"alignPipeLabels": true,
+		"labelFlipLeftOfVertical": 20,
+		"maskLabels": true,
 		"legendPosition": "top-right",
+		"labelReadabilityBias": 110,
 		"mapHeight": 900,
 		"method": "hw"
+	},
+	"view": {
+		"cx": 37.91264639576522,
+		"cy": 51.179683260376024,
+		"s": 7.125547224888936
 	},
 	"units": {
 		"lpn_u_length": "ft",

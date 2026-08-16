@@ -3,7 +3,9 @@
 //
 // Tom's spec, 2026-08-15, verbatim: "Set VD = max(map width, map height) and L = pipe length.
 // Instead of putting 1 link label at midpoint of link, put n = ceiling(L/(0.25*VD)) with 0.25*VD
-// spacing (friendly spec: 'Link labels spacing = 25% of view size')."
+// spacing (friendly spec: 'Link labels spacing = 25% of view size')." VD became the SMALLER
+// dimension later the same day, and the fraction has since been 0.5 and then 0.75 -- so NOTHING
+// below is written in terms of either. See the fixture note above SP.
 //
 // THE ONE PROPERTY WORTH GUARDING ABOVE ALL OTHERS IS THAT n = 1 CHANGES NOTHING. Every pipe
 // shorter than a quarter of the view -- which is most pipes on most drawings -- must come out of
@@ -63,18 +65,32 @@ setUnitSet('us');
 L.buildLayers();
 L.seedDefaultInputs();
 
-// A 1000-unit view (the canvas is square at zoom 1, so VD = 1000 and the spacing is 500) with two
-// pipes: one well inside a half-view, one twice it.
+// A 1000-unit view (the canvas is square at zoom 1, so VD = 1000).
+//
+// **EVERY LENGTH BELOW IS A MULTIPLE OF THE SPACING THE PAGE ACTUALLY USES, never a typed number.**
+// LPN_LABEL_REPEAT_FRAC has been 0.25, then 0.5, then 0.75 in three days, and each time the typed
+// fixtures here failed for a reason that had nothing to do with what they were testing -- which
+// teaches whoever is next to edit the expected numbers until it goes green, and the fourth change
+// will land on assertions nobody read. Derived lengths make the whole file frac-independent: the
+// short pipe is shorter than one spacing and the long pipe is exactly four, whatever the fraction.
 L.setCanvas(1000, 1000);
 L.setZoom(1);
+const VIEW = 1000, SP = L.spacing(), FRAC = SP / VIEW;   // the page's own spacing, and the fraction behind it
+// The cull window is the viewport plus ONE FULL VIEW-SPAN on every side (drawnLinkLabelStations
+// passes mapSpan('max') as the pad), so at zoom 1 with no pan it is world x -1000..2000. Centring
+// the long pipe on the viewport centre puts its outermost station at 500 +/- 1.5 SP, which is
+// inside that window for any fraction up to 1.0 -- where starting it at the origin was inside only
+// while the fraction was 0.5 or less. Section 2 is about the SPACING and must not start failing
+// because the fixture drifted into testing the cull.
 // THE LONG PIPE STARTS AT THE ORIGIN, so that all four of its stations sit inside the cull window
 // (the viewport plus a view-span each side) at zoom 1 and several still do at zoom 4. Hang the short
 // pipe off to one side rather than in line with it, or the fixture tests the cull instead of the
 // spacing -- which it silently did when the spacing changed from a quarter to a half.
+const LEN = SP * 4, LX0 = VIEW / 2 - LEN / 2;       // long: exactly four spacings, centred on the view
 const a = L.addNode('junction', 0, -800);
-const b = L.addNode('junction', 400, -800);     // short: 400 < 500
-const bb = L.addNode('junction', 0, 0);
-const c = L.addNode('junction', 2000, 0);       // long: 2000, four spacings
+const b = L.addNode('junction', SP * 0.8, -800);   // short: inside one spacing
+const bb = L.addNode('junction', LX0, 0);
+const c = L.addNode('junction', LX0 + LEN, 0);
 const short = L.addLink('pipe', a.id, b.id);
 const long = L.addLink('pipe', bb.id, c.id);
 L.labelSettings().link.id = true;
@@ -83,7 +99,8 @@ L.refreshLabelText();
 // ---- 1. n = 1 is the whole of today's behaviour, untouched -----------------------------------
 console.log('--- a pipe shorter than the spacing is exactly as it was ---');
 {
-	ok('the spacing is half the view', near(L.spacing(), 500), L.spacing());
+	// The RULE, not the number: a fraction of the smaller map dimension, read off the page.
+	ok('the spacing is a fraction of the view', L.spacing() > 0 && L.spacing() < 1000, L.spacing());
 	ok('the short pipe really is shorter than that', L.pipeLength(short.id) < L.spacing(),
 		L.pipeLength(short.id));
 	const st = L.stations(short);
@@ -98,7 +115,7 @@ console.log('--- a pipe shorter than the spacing is exactly as it was ---');
 console.log('\n--- a pipe longer than the spacing repeats along itself ---');
 {
 	const len = L.pipeLength(long.id), st = L.stations(long);
-	ok('the long pipe is four spacings long', near(len, 2000), len);
+	ok('the long pipe is four spacings long', near(len, LEN), len);
 	ok('...so it gets ceil(L / spacing) = 4 stations', st.length === 4, JSON.stringify(st));
 	// The spacing is what the spec asks for and the thing a reader actually perceives; the station
 	// numbers are only how it is expressed. Measured in world units, adjacent labels must be no
@@ -146,7 +163,8 @@ console.log('\n--- a pipe longer than the spacing repeats along itself ---');
 // ---- 3. The count re-derives on zoom, which is what makes it a rule ---------------------------
 console.log('\n--- the count follows the view, not the model ---');
 {
-	// Zoom IN 4x: the view is 250 units across, the spacing 125, and the same pipe wants 16.
+	// Zoom IN 4x: the view is a quarter as wide in world units, so the spacing is a quarter of what
+	// it was and the same pipe wants 4 x 4 = 16 labels -- a ratio, so it holds at any fraction.
 	// Nothing about the network changed; the reader's distance did.
 	L.setZoom(4);
 	L.refreshLabelText();
@@ -163,8 +181,11 @@ console.log('\n--- the count follows the view, not the model ---');
 		L.linkEl(long.id).repeats.length === dr.length - 1, L.linkEl(long.id).repeats.length);
 	// The window is the viewport plus a full view-span on each side, so panning by less than a
 	// screen never reaches a stretch that was never labelled.
+	// At zoom 4 the view is 250 world units and the pad is another 250 on each side, so the window
+	// is world x -250..500. Written from those two facts rather than from typed bounds.
 	ok('...every drawn station is inside the padded window',
-		dr.every(f => f * 2000 >= -1000 && f * 2000 <= 1500), JSON.stringify(dr));
+		dr.every(f => LX0 + f * LEN >= -250 - 1e-9 && LX0 + f * LEN <= 500 + 1e-9),
+		JSON.stringify(dr.map(f => (LX0 + f * LEN).toFixed(0))));
 	// PANNING TO THE FAR END DRAWS THE FAR END'S LABELS, which is the half a count-based cap could
 	// never do: twelve labels spread over a pipe is not the same as the four you can see.
 	L.pan(-4400, 0);      // world x ~1100-1350 in view at zoom 4
@@ -181,7 +202,9 @@ console.log('\n--- the count follows the view, not the model ---');
 	// is a question with no members in it, and it passes for a version that leaks every one of
 	// them into the layer forever. (It did. That is why this line reads the way it does.)
 	const dropped = L.linkEl(long.id).repeats.slice();
-	L.setZoom(0.2);     // 5000-unit view, spacing 2500, pipe 2000
+	// A fifth of the zoom is five times the spacing, and the pipe is only four spacings long, so
+	// this returns it to one label whatever the fraction is.
+	L.setZoom(0.2);
 	L.refreshLabelText();
 	ok('zooming out returns it to a single label', L.stations(long).length === 1);
 	ok('...and takes the repeat elements away with it', L.linkEl(long.id).repeats.length === 0);
@@ -199,15 +222,15 @@ console.log('\n--- VD = min(map width, map height) ---');
 	// instead of keeping a private convention -- see mapSpan() in js/looped-network.js, and note
 	// that one convention is what makes the rule sayable to a user in a single sentence.
 	//
-	// A tall narrow window is where the two differ most: 400 wide by 1600 tall repeats every 200
-	// units now rather than every 800, so a long north-south main carries more labels, measured
-	// against the dimension that runs out first.
+	// A tall narrow window is where the two differ most: 400 wide by 1600 tall measures against the
+	// 400, not the 1600, so a long north-south main carries four times as many labels as it would
+	// under `max` -- measured against the dimension that runs out first.
 	L.setCanvas(400, 1600);
 	L.setZoom(1);
 	ok('the view is taller than it is wide', L.visibleMapHeight() > L.visibleMapWidth(),
 		L.visibleMapWidth() + ' x ' + L.visibleMapHeight());
-	ok('...and the spacing is half the SMALLER of the two',
-		near(L.spacing(), 200), L.spacing());
+	ok('...and the spacing is the same fraction of the SMALLER of the two',
+		near(L.spacing(), FRAC * 400), L.spacing() + ' vs ' + (FRAC * 400));
 }
 
 // ---- 4b. The station is fixed; the SIDE is not -------------------------------------------------

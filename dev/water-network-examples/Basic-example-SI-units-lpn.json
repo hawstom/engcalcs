@@ -235,7 +235,7 @@
 			"x": -62.866516699866224,
 			"y": 29.744382128753386,
 			"anchorNode": "R1",
-			"sizeMult": 1.5
+			"sizeMult": 2
 		},
 		{
 			"id": "X5",
@@ -243,15 +243,15 @@
 			"x": -108.13929914592245,
 			"y": -45.215287726381575,
 			"anchorNode": "J3",
-			"sizeMult": 1.5
+			"sizeMult": 2
 		},
 		{
 			"id": "X6",
 			"text": "Pipe vertex",
-			"x": 4602.720437143738,
-			"y": 4737.940644037533,
+			"x": 4587.747175111653,
+			"y": 4734.732087887801,
 			"anchorNode": null,
-			"sizeMult": 1
+			"sizeMult": 2
 		}
 	],
 	"nextId": {
@@ -300,6 +300,15 @@
 				"gradient": 4
 			}
 		},
+		"prefix": {
+			"node": {},
+			"link": {}
+		},
+		"suffix": {
+			"node": {},
+			"link": {}
+		},
+		"separator": " ",
 		"markExtrema": true
 	},
 	"backdrop": null,
@@ -314,7 +323,7 @@
 			"X": "X"
 		},
 		"emitterExponent": 0.5,
-		"tolerance": 1e-09,
+		"tolerance": 1e-9,
 		"engine": "epanet",
 		"defaults": {
 			"nodeElev": 0,
@@ -341,9 +350,17 @@
 		"backdropOpacity": 0.5,
 		"labelMaxWidth": 2650,
 		"alignPipeLabels": true,
+		"labelFlipLeftOfVertical": 20,
+		"maskLabels": true,
 		"legendPosition": "top-right",
+		"labelReadabilityBias": 110,
 		"mapHeight": 900,
 		"method": "hw"
+	},
+	"view": {
+		"cx": 4969.162995715256,
+		"cy": 4999.638822168858,
+		"s": 0.892142857142846
 	},
 	"units": {
 		"lpn_u_length": "m",
