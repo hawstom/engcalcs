@@ -40,13 +40,13 @@ const L = loadLoopedNetwork(
 	"\t\tsetZoom: function (s) { state.s = s; },\n" +
 	// Whether an element is still IN the drawing. Dropping a repeat from le.repeats is not the same
 	// as taking it off the map, and the difference is a label the user can see and cannot select.
-	"\t\tinLayers: function (e) { return labelsLayer.children.indexOf(e) >= 0 || maskLayer.children.indexOf(e) >= 0; },\n" +
+	"\t\tinLayers: function (e) { return labelsLayer.children.indexOf(e) >= 0; },\n" +
 	"\t\tvisibleMapWidth: visibleMapWidth, visibleMapHeight: visibleMapHeight,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
-	"\t\t\tmaskLayer = el('g', {}, world); labelsLayer = el('g', {}, world);\n" +
+	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); },\n"
 );
 
@@ -156,8 +156,7 @@ console.log('\n--- a pipe longer than the spacing repeats along itself ---');
 		le.repeats.map(r => r.along).join(' / '));
 	// But it IS generated annotation (Task 334), so it hides with everything else at low zoom.
 	ok('...while still being generated annotation, so it hides with the rest',
-		le.repeats.every(r => /lpn-annotation/.test(r.text.getAttribute('class') || '') &&
-			/lpn-annotation/.test(r.mask.getAttribute('class') || '')));
+		le.repeats.every(r => /lpn-annotation/.test(r.text.getAttribute('class') || '')));
 }
 
 // ---- 3. The count re-derives on zoom, which is what makes it a rule ---------------------------
@@ -209,7 +208,7 @@ console.log('\n--- the count follows the view, not the model ---');
 	ok('zooming out returns it to a single label', L.stations(long).length === 1);
 	ok('...and takes the repeat elements away with it', L.linkEl(long.id).repeats.length === 0);
 	ok('...removing them from the map, not merely forgetting them',
-		dropped.length > 0 && dropped.every(r => !L.inLayers(r.text) && !L.inLayers(r.mask)),
+		dropped.length > 0 && dropped.every(r => !L.inLayers(r.text)),
 		dropped.length + ' dropped');
 }
 

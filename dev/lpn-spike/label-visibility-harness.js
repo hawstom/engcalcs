@@ -1,4 +1,4 @@
-// What is GENERATED ANNOTATION, what hides when, and whether the mask is drawn at all. Run with:
+// What is GENERATED ANNOTATION, what hides when, and whether the halo is drawn at all. Run with:
 //   node dev/lpn-spike/label-visibility-harness.js
 //
 // Three ROADMAP tasks meet in one place here, and they meet because they are one question asked
@@ -9,7 +9,7 @@
 //             asserts the membership, both halves: every generated mark carries the class, and the
 //             user's own Text label -- authored content -- does not.
 //   Task 340  A Text label hides at a threshold scaled by ITS OWN size. Section 2.
-//   Task 330  Background masking is switchable, and the switch belongs to the project. Section 3.
+//   Task 330  The label halo is switchable, and the switch belongs to the project. Section 3.
 //
 // WHY SECTION 1 IS WORTH ITS LINES, since "does this element have a class" reads like a tautology:
 // the defect it replaces was invisible exactly because it was spread across two files. Task 331
@@ -30,9 +30,8 @@ const L = loadLoopedNetwork(
 	"\t\tseedDefaultInputs: seedDefaultInputs, refreshLabelText: refreshLabelText,\n" +
 	"\t\tapplyLabelVisibility: applyLabelVisibility, applyMaskLabels: applyMaskLabels,\n" +
 	"\t\trefreshFontSizes: refreshFontSizes, relayout: relayoutLabels,\n" +
-	"\t\tmaskRect: function (id) { var m = labelEls[id].mask;\n" +
-	"\t\t\treturn { x: +m.getAttribute('x'), y: +m.getAttribute('y'),\n" +
-	"\t\t\t\tw: +m.getAttribute('width'), h: +m.getAttribute('height') }; },\n" +
+	"\t\tleaderEnd: function (id) { var e = labelEls[id].leader;\n" +
+	"\t\t\treturn { x: +e.getAttribute('x2'), y: +e.getAttribute('y2') }; },\n" +
 	"\t\ttextBox: function (id) { var lb = labelById(id), le = labelEls[id],\n" +
 	"\t\t\tan = lb.anchorNode ? nodeById(lb.anchorNode) : null;\n" +
 	"\t\t\treturn textLabelBox(lb, le, an ? an.x + lb.x : lb.x, an ? an.y + lb.y : lb.y); },\n" +
@@ -56,7 +55,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
-	"\t\t\tmaskLayer = el('g', {}, world); labelsLayer = el('g', {}, world);\n" +
+	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); },\n"
 );
 
@@ -87,10 +86,8 @@ console.log('--- generated annotation carries the class, authored content does n
 {
 	const ne = L.nodeEl(a.id), le = L.linkEl(p.id);
 	ok('a node data label is annotation', isAnnotation(ne.text), classes(ne.text));
-	ok('...and so is its mask', isAnnotation(ne.mask), classes(ne.mask));
 	ok('...and its leader', isAnnotation(ne.leader), classes(ne.leader));
 	ok('a link data label is annotation', isAnnotation(le.text), classes(le.text));
-	ok('...and so is its mask', isAnnotation(le.mask), classes(le.mask));
 	ok('...and its leader', isAnnotation(le.leader), classes(le.leader));
 	// The arrow is the element that PROVED the line is "things we generated to be read" rather than
 	// "labels" (Tom, 2026-08-14: "Arrows also should hide at hideable zoom levels").
@@ -101,14 +98,13 @@ console.log('--- generated annotation carries the class, authored content does n
 	// annotation, however much it looks like one in the DOM.
 	const te = L.labelEl(note.id);
 	ok('a user Text label is NOT annotation', !isAnnotation(te.text), classes(te.text));
-	ok('...and neither is its mask', !isAnnotation(te.mask), classes(te.mask));
-	// The class is ADDED to whatever the element already had, never instead of it -- a mask that
-	// lost .lpn-lbl-mask would stop being painted, and a label that lost .lpn-draglbl would stop
-	// being draggable, both silently.
+	// The class is ADDED to whatever the element already had, never instead of it -- a label that
+	// lost .lpn-lbl would lose its halo (Task 376), and one that lost .lpn-draglbl would stop being
+	// draggable, both silently.
 	ok('the class is added to the element\'s own classes, not swapped for them',
 		/\blpn-lbl\b/.test(classes(ne.text)) && /\blpn-draglbl\b/.test(classes(ne.text)) &&
-		/\blpn-lbl-mask\b/.test(classes(ne.mask)) && /\blpn-leader\b/.test(classes(ne.leader)),
-		classes(ne.text) + ' / ' + classes(ne.mask) + ' / ' + classes(ne.leader));
+		/\blpn-leader\b/.test(classes(ne.leader)),
+		classes(ne.text) + ' / ' + classes(ne.leader));
 }
 
 // ---- 2. A Text label's own threshold, scaled by its own size (Task 340) ---------------------
@@ -137,10 +133,12 @@ console.log('\n--- a Text label hides on its own size-scaled threshold ---');
 	// the callouts are not. A 3x title survives to 3x the map width, and 1250 is well inside 3000.
 	ok('a 3x title block survives, because its threshold is 3x as wide',
 		!hidden(L.labelEl(title.id).text), 'sizeMult ' + title.sizeMult);
-	// Its mask and leader are part of the same assembly and must not be left hanging behind a
-	// label that went, nor blanked out from under one that stayed.
-	ok('...and its mask stays with it', !hidden(L.labelEl(title.id).mask));
-	ok('the vanished note took its mask with it', hidden(L.labelEl(note.id).mask));
+	// NOTHING IS LEFT BEHIND BY EITHER OF THEM, and since Task 376 that is true by construction
+	// rather than by a second hide call: the halo is a stroke on the glyphs, so it goes exactly when
+	// the text goes. The pair of assertions that used to stand here -- the mask stays with the label
+	// that stayed, the mask goes with the one that went -- were checking an element that no longer
+	// exists. Both of these labels are unanchored and so have no leader either; the anchored case
+	// is section 2b.
 
 	// Out past 3000 units wide and even the title goes. Without this the previous check passes for
 	// a rule that never hides a Text label at all -- which is exactly the Task 331 behaviour this
@@ -159,7 +157,6 @@ console.log('\n--- a Text label hides on its own size-scaled threshold ---');
 	L.applyLabelVisibility();
 	ok('a label marked Always show survives a zoom that hides everything else',
 		!hidden(L.labelEl(note.id).text) && hidden(L.labelEl(title.id).text));
-	ok('...and it takes its mask with it', !hidden(L.labelEl(note.id).mask));
 	ok('...while the generated annotation is still gone -- this exempts ONE label, not the rule',
 		L.svgHas('lpn-labels-hidden'));
 	note.alwaysShow = false;
@@ -174,65 +171,59 @@ console.log('\n--- a Text label hides on its own size-scaled threshold ---');
 }
 
 // ---- 3. Background masking is switchable, and it is the project's (Task 330) ----------------
-// ---- 2b. A TEXT LABEL'S MASK FOLLOWS THE ZOOM ------------------------------------------------
+// ---- 2b. A TEXT LABEL IS LAID OUT AT EVERY ZOOM ----------------------------------------------
 // **THE ONE THAT GOT AWAY.** relayoutLabels() laid out node and link labels and silently skipped
 // the user's own Text labels -- harmless only while something else positioned them on every zoom,
-// which refreshFontSizes() did until Task 366 stopped it re-measuring. A Text label's mask is sized
-// in WORLD units from a pixel width, so leaving it un-updated across a zoom leaves it at the size
-// it had at the old scale: zoom in and a caption's mask becomes a large 75%-white rectangle lying
-// over the network, and the pipes under it go pale. Tom photographed exactly that on Net3, which
-// has two Text labels -- "LAKE" and "RIVER" -- and marked the pale stretches "Nothing here" and
-// "Gray".
+// which refreshFontSizes() did until Task 366 stopped it re-measuring.
 //
-// The assertion is the invariant, not the symptom: the mask must always cover the box the label
-// actually occupies, at every scale.
-console.log('\n--- a Text label\'s mask tracks the zoom, or it becomes a white sheet over the map ---');
+// The SYMPTOM has changed and the COUPLING has not. It used to show as a mask: a Text label's
+// background rect was sized in world units from a pixel width, so zooming in left a caption's rect
+// at the old scale and it became a large 75%-white sheet over the network -- Tom photographed
+// exactly that on Net3, whose "LAKE" and "RIVER" captions he marked "Nothing here" and "Gray".
+// Task 376 deleted the rect (the halo is a stroke on the glyphs and cannot fall out of step with
+// them by construction), so the assertion moved to the other thing this pass computes from the same
+// pixel width: WHERE AN ANCHORED TEXT LABEL'S LEADER ATTACHES. It reaches the near edge of the
+// label's box, the box's width is banked in pixels and divided by the scale, and nothing else lays
+// it out -- so a zoom that skips this pass leaves the rule reaching for the box's old size.
+console.log('\n--- an anchored Text label is re-laid-out on every zoom, or its leader points nowhere ---');
 {
 	L.setSetting('labelMaxWidth', null);
-	L.setZoom(1);
-	L.refreshFontSizes();
-	function maskCoversBox(id) {
-		var m = L.maskRect(id), b = L.textBox(id);
-		// The mask is the box plus a halo on every side; it must contain the box and not wildly
-		// exceed it. THE ALLOWANCE IS RELATIVE TO THE BOX, and the first draft of this check made
-		// the very mistake it exists to catch: a flat "+4" is a WORLD constant, so it passed at one
-		// zoom and failed at another for a mask that was perfectly correct. The halo is 0.15 of the
-		// font size on each side and the box is 1.2 of it tall, so the total is a quarter of the
-		// box height at every scale -- half a box height is a generous ceiling that scales.
-		return m.x <= b.x && m.y <= b.y &&
-			m.x + m.w >= b.x + b.w && m.y + m.h >= b.y + b.h &&
-			m.w < b.w + b.h / 2 && m.h < b.h * 1.5;
+	// Anchored, because an unanchored Text has no leader and therefore nothing scale-dependent
+	// left to check: its x/y ARE its position. The defect this guards is in the anchored path.
+	const tag = L.addText(a.x + 30, a.y + 20, a.id);
+	function leaderIsOnTheBoxEdge(id) {
+		var e = L.leaderEnd(id), b = L.textBox(id);
+		// The near vertical edge, and the vertical centre -- Geom.leaderAttach()'s own answer, which
+		// is what updateLabelGeometry() draws. Tolerance is a fraction of the BOX, never a world
+		// constant: a flat allowance passes at one zoom and fails at another for geometry that is
+		// perfectly correct, which is the mistake the deleted version of this check first made.
+		var tol = b.h / 100,
+			nearX = Math.abs(e.x - b.x) < tol || Math.abs(e.x - (b.x + b.w)) < tol;
+		return nearX && Math.abs(e.y - (b.y + b.h / 2)) < tol;
 	}
-	ok('at the scale it was laid out, the mask covers its label', maskCoversBox(note.id),
-		JSON.stringify(L.maskRect(note.id)) + ' vs box ' + JSON.stringify(L.textBox(note.id)));
-	// TEN TIMES IN. Without the fix the mask keeps its old world size and is ten times too big.
-	L.setZoom(10);
-	L.refreshFontSizes();
-	ok('...and still covers it, and only it, ten times further in', maskCoversBox(note.id),
-		JSON.stringify(L.maskRect(note.id)) + ' vs box ' + JSON.stringify(L.textBox(note.id)));
-	// And back out, since a stale mask that is too SMALL leaves the text unbacked over a backdrop.
-	L.setZoom(0.25);
-	L.refreshFontSizes();
-	ok('...and coming back out', maskCoversBox(note.id),
-		JSON.stringify(L.maskRect(note.id)) + ' vs box ' + JSON.stringify(L.textBox(note.id)));
-	L.setZoom(1);
-	L.refreshFontSizes();
+	[1, 10, 0.25, 1].forEach(function (z) {
+		L.setZoom(z);
+		L.refreshFontSizes();
+		L.relayout();
+		ok('the leader lands on the label\'s own box edge at zoom ' + z, leaderIsOnTheBoxEdge(tag.id),
+			JSON.stringify(L.leaderEnd(tag.id)) + ' vs box ' + JSON.stringify(L.textBox(tag.id)));
+	});
 }
 
-console.log('\n--- the mask toggle ---');
+console.log('\n--- the halo toggle ---');
 {
 	L.setSetting('maskLabels', true);
 	L.applyMaskLabels();
-	ok('masking on is the drawing the page has always made', !L.svgHas('lpn-masks-off'));
+	ok('the halo on is the drawing the page has always made', !L.svgHas('lpn-masks-off'));
 	L.setSetting('maskLabels', false);
 	L.applyMaskLabels();
-	ok('masking off is one class on the <svg>, not a per-element edit', L.svgHas('lpn-masks-off'));
+	ok('the halo off is one class on the <svg>, not a per-element edit', L.svgHas('lpn-masks-off'));
 	// THE UPGRADE CASE, and the reason the test is `=== false` in the code rather than a truthiness
 	// test: every project saved before this task has no such key at all, and an absent setting must
-	// mask. A truthy test would silently restyle every drawing in the library on the day this ships.
+	// draw the halo. A truthy test would silently restyle every drawing in the library.
 	L.delSetting('maskLabels');
 	L.applyMaskLabels();
-	ok('a project saved before this setting existed still masks', !L.svgHas('lpn-masks-off'));
+	ok('a project saved before this setting existed still draws the halo', !L.svgHas('lpn-masks-off'));
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));

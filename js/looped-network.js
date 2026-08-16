@@ -28,7 +28,7 @@ var EngCalcs = EngCalcs || {};
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
 	var NS = 'http://www.w3.org/2000/svg';
-	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, maskLayer, labelsLayer, debugBoxLayer;
+	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, labelsLayer, debugBoxLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
 	// `settings.textSize` is SCREEN PIXELS, full stop -- shared by a node's ID/pressure label, a
 	// link's label, and a user-added Text label. It is returned in WORLD units (divided by the
@@ -96,7 +96,7 @@ var EngCalcs = EngCalcs || {};
 	var LPN_CALLOUT_ANGLE = 70;
 	function textFactor(mult) { return effectiveFontSize(mult) / LPN_BASE_TEXT_SIZE; }
 
-	// ---- Task 146.01: draggable node/link data labels (leader lines + collision avoidance + mask) ----
+	// ---- Task 146.01: draggable node/link data labels (leader lines + collision avoidance) ----
 	// A node/link's data label sits at a small fixed offset from its anchor (id/elev/demand/... text
 	// beside the symbol) unless the user drags it -- n.lx/n.ly (or l.lx/l.ly) then record that as an
 	// explicit offset, persisted with the element like any other property. undefined means "still at
@@ -380,57 +380,24 @@ var EngCalcs = EngCalcs || {};
 	// Approximate vertical box of a left-anchored, top-down multi-line <text> (node/link labels):
 	// no exact ascent/descent metrics available cross-browser without layout, so this uses a
 	// fraction of font size that reads right for the suite's actual label content (short numbers/
-	// letters, no descenders like "g"/"y"). Good enough for a mask rect and collision boxes; not
+	// letters, no descenders like "g"/"y"). Good enough for collision boxes; not
 	// meant to be pixel-exact.
 	function dataLabelBoxHeight(lineCount) {
 		return Geom.dataLabelBoxHeight(lineCount, effectiveFontSize(), effectiveLineHeight());
 	}
-	// Background mask (Task 146.01): a plain rect behind a label's text so it stays legible over a
-	// backdrop image, colored fill, or another element -- sized from the SAME w/h the label's own
-	// geometry uses (dataLabelBoxHeight() above for a node/link label, effectiveFontSize()*1.2 for a
-	// single-line Text label), so it never drifts out of sync with what it's supposed to cover.
-	// hAlign/vAlign describe what x/y MEAN for the label being masked, matching each label type's own
-	// text-anchor/dominant-baseline: 'start'/'top' for a node or link label (x = left edge, y = first
-	// line's baseline); 'middle'/'middle' for a Text label (x = center, y = vertical center).
-	// **THE PAD IS A FRACTION OF THE LETTERING, NOT A WORLD CONSTANT** (Tom, 2026-08-15, diagnosing
-	// a Net3 screenshot where most of the pipes had gone pale: *"I think that our labels are masking
-	// the pipe? Yes. That's it. Make the mask buffer smaller?"* — right, and the reason it was so
-	// large is worse than the number).
-	//
-	// It was `0.4` flat, in WORLD units, so in PIXELS it grew with the zoom: 0.4px at scale 1 and
-	// **24px on every side** at the scale that screenshot was taken at. An aligned label lies ALONG
-	// its pipe (Task 329), so a mask that wide covers the pipe for the label's whole length and
-	// well beyond it — and at 75% white the pipe underneath reads as pale grey with black gaps
-	// where no label happens to lie. Every symptom in the picture, from one world-unit constant.
-	//
-	// Masking a line that a label lies on is CORRECT and is what cartography does (a road name
-	// breaks the road it runs along). What was wrong is that the halo was not a halo. As a fraction
-	// of the font size it is a fixed number of pixels at every zoom — 1.65px at the shipped 11px
-	// lettering — because effectiveFontSize() is itself a pixel size divided by the scale.
-	var MASK_PAD_FRAC = 0.15;
-	function positionMaskRect(mask, x, y, w, h, hAlign, vAlign) {
-		var r = Geom.maskRect(x, y, w, h, hAlign, vAlign, effectiveFontSize(),
-			MASK_PAD_FRAC * effectiveFontSize());
-		mask.setAttribute('x', r.x);
-		mask.setAttribute('y', r.y);
-		mask.setAttribute('width', r.width);
-		mask.setAttribute('height', r.height);
-	}
-	// Final per-frame layout of one node's data label -- text position, its mask, and its leader (if
+	// LEGIBILITY BACKING IS A HALO ON THE GLYPHS AND LIVES ENTIRELY IN css/engcalcs.css (Task 376).
+	// There is nothing to position here: `paint-order: stroke fill` with a white stroke follows the
+	// letters, merges between close characters, rotates with the text because it IS the text, and
+	// disappears with it. The rect it replaced needed an element per label, a pad constant, a
+	// transform kept in step, and a hide call at every place a label could go empty.
+	// Final per-frame layout of one node's data label -- text position and its leader (if
 	// dragged/nudged past LABEL_LEADER_THRESHOLD). Called from buildNodeEls() (first layout),
 	// updateNode() (node moved), and refreshLabelText() (after every collision-avoidance pass, since
 	// a nudge or a toggled field changing tw/lineCount both move this label).
-	// A label with no fields toggled on (or a reservoir/pump with only type-inapplicable fields
-	// toggled) still gets an empty placeholder line pushed in refreshLabelText() so getBBox() never
-	// throws -- but rendering a mask/leader for genuinely empty content produced a small floating
-	// white "ghost" box near the node with nothing in it (Tom, 2026-07-30). ne.empty/le.empty (set
-	// in refreshLabelText(), BEFORE the placeholder is pushed) skips both here.
-	function hideMask(mask) { mask.setAttribute('width', 0); mask.setAttribute('height', 0); }
 	function layoutNodeLabel(id) {
 		var n = nodeById(id), ne = nodeEls[id]; if (!ne) { return; }
 		var anchor = { x: n.x, y: n.y }, end = nodeLabelPos(n), org = dataLabelOrigin(ne, anchor, end);
 		repositionMultilineText(ne.text, org.x, org.y);
-		if (ne.empty) { hideMask(ne.mask); } else { positionMaskRect(ne.mask, org.x, org.y, labelBoxWidth(ne), dataLabelBoxHeight(ne.lineCount), 'start', 'top'); }
 		updateDataLeader(ne, anchor, end);
 	}
 	// Same as layoutNodeLabel() above, for a link's data label -- anchor is the link's own mid-
@@ -530,15 +497,14 @@ var EngCalcs = EngCalcs || {};
 		var w = labelBoxWidth(le);
 		return w > 0 && Geom.polylineLength(linkPointList(l)) < w * SHORT_LINE_MULT;
 	}
-	// One label assembly, hidden together: text, mask, leader and any extrema badges. `visibility`
+	// One label assembly, hidden together: text, leader and any extrema badges. `visibility`
 	// rather than `display` for the same reason the map-width rule uses it (see css/engcalcs.css) --
 	// it composes with each part's own show/hide logic instead of overwriting it.
 	function setLabelAssemblyHidden(le, hidden) {
 		var v = hidden ? 'hidden' : '';
 		if (le.text) { le.text.style.visibility = v; }
-		if (le.mask) { le.mask.style.visibility = v; }
 		if (le.leader) { le.leader.style.visibility = v; }
-		(le.repeats || []).forEach(function (r) { r.text.style.visibility = v; r.mask.style.visibility = v; });
+		(le.repeats || []).forEach(function (r) { r.text.style.visibility = v; });
 	}
 	// The extra renderings of a long pipe's label (see linkLabelStations() above). Grown and shrunk
 	// in place rather than rebuilt, because the count changes on every zoom step and rebuilding a
@@ -554,11 +520,10 @@ var EngCalcs = EngCalcs || {};
 		if (!le.repeats) { le.repeats = []; }
 		while (le.repeats.length > n) {
 			var gone = le.repeats.pop();
-			gone.text.remove(); gone.mask.remove();
+			gone.text.remove();
 		}
 		while (le.repeats.length < n) {
 			le.repeats.push({
-				mask: annotationEl('rect', { 'class': 'lpn-lbl-mask' }, maskLayer),
 				// EVERY COPY IS PICKABLE, and that is Tom's call on 2026-08-15: *"The problem is
 				// that I can only drag one upstream label."* It carries the same `data-linklbl` and
 				// the same `.lpn-draglbl` as the original, so grabbing any of them drags THE label,
@@ -610,15 +575,19 @@ var EngCalcs = EngCalcs || {};
 			opt = {
 				// **THE GAP IS DERIVED FROM WHAT MUST BE CLEARED, NOT FROM A NODE'S RADIUS** (Tom,
 				// 2026-08-15, after the mask pad was already shrunk: *"aligned labels still mask
-				// their own pipes"*). It was `nodeRadius + 0.35 x fontSize`, and a node's radius has
+				// their own pipes"* -- the halo that replaced the mask has the same job to do here).
+				// It was `nodeRadius + 0.35 x fontSize`, and a node's radius has
 				// nothing to do with a label lying halfway along a pipe -- it was a stand-in for
 				// "some clearance", and it went out of step the moment anyone changed Symbol size.
 				//
-				// What actually has to clear the pipe is the bottom edge of the label's MASK. In the
-				// rotated frame the baseline sits `gap` above the pipe, the mask reaches
+				// What actually has to clear the pipe is the bottom edge of the label's own box. In
+				// the rotated frame the baseline sits `gap` above the pipe, the descender reaches
 				// `dataLabelBoxHeight(1) - 0.85 x fontSize` = 0.25 x fontSize below that baseline,
-				// and the halo adds MASK_PAD_FRAC more. So the mask's near edge clears the pipe's own
-				// half-width exactly when gap > halfWidth + 0.4 x fontSize, and 0.5 leaves a tenth of
+				// and the halo (0.2em, half of it outside the glyph) adds 0.1 x fontSize more --
+				// which is why that halo is sized in em rather than in screen pixels: this
+				// arithmetic is written in fractions of the font size and has to stay true at every
+				// text size. So the near edge clears the pipe's
+				// half-width exactly when gap > halfWidth + 0.35 x fontSize, and 0.5 leaves a sixth of
 				// a font size of air. Every term is a quantity the drawing really has, so this stays
 				// true when the text, the symbols or the pipe width change independently.
 				frac: 0, gap: settings.linkWidth / (2 * (state.s || 1)) + effectiveFontSize() * 0.5,
@@ -651,10 +620,10 @@ var EngCalcs = EngCalcs || {};
 		return { ax: mid.x + (a.x - dir.ax), ay: mid.y + (a.y - dir.ay), angle: a.angle,
 			side: a === candBot ? -1 : 1 };
 	}
-	// One rendering of a link's label, at one station. `part` is {text, mask} -- the link's own
-	// elements for the first station, a repeat's for the rest (see ensureLabelRepeats()). The two
-	// are laid out by the SAME code on purpose: a repeat that drifted from the original in angle,
-	// side or mask would read as a different label rather than the same one said again.
+	// One rendering of a link's label, at one station. `part` is {text} -- the link's own element
+	// for the first station, a repeat's for the rest (see ensureLabelRepeats()). The two are laid
+	// out by the SAME code on purpose: a repeat that drifted from the original in angle or side
+	// would read as a different label rather than the same one said again.
 	function layoutLinkLabelAt(l, le, part, along, isPrimary, single) {
 		if (!isPrimary) { syncRepeatText(le, part); part.along = along; }
 		if (linkLabelAligned(l)) {
@@ -666,12 +635,6 @@ var EngCalcs = EngCalcs || {};
 			part.text.setAttribute('text-anchor', 'middle');
 			part.text.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + a.ax + ' ' + a.ay + ')');
 			repositionMultilineText(part.text, a.ax, a.ay);
-			// The mask has to rotate WITH the text or it stops covering it -- it is sized from the
-			// same box, so the same transform about the same point is exactly right.
-			if (le.empty) { hideMask(part.mask); } else {
-				positionMaskRect(part.mask, a.ax, a.ay, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'middle', 'top');
-				part.mask.setAttribute('transform', 'rotate(' + a.angle.toFixed(3) + ' ' + a.ax + ' ' + a.ay + ')');
-			}
 			if (isPrimary && le.leader) { le.leader.style.display = 'none'; }
 			return;
 		}
@@ -680,7 +643,6 @@ var EngCalcs = EngCalcs || {};
 		// obvious on screen.
 		part.text.removeAttribute('transform');
 		part.text.setAttribute('text-anchor', 'start');
-		if (part.mask) { part.mask.removeAttribute('transform'); }
 		// THE LONE LABEL'S PATH IS UNTOUCHED, and the branch is here because its two halves must
 		// agree about WHICH POINT the label belongs to. linkLabelPos() is measured from the half-way
 		// point -- it has to be, since that is where a drag offset and a collision nudge are stored
@@ -695,7 +657,6 @@ var EngCalcs = EngCalcs || {};
 			end = lone ? linkLabelPos(l) : { x: mid.x + d.x, y: mid.y + d.y },
 			org = dataLabelOrigin(isPrimary ? le : part, anchor, end);
 		repositionMultilineText(part.text, org.x, org.y);
-		if (le.empty) { hideMask(part.mask); } else { positionMaskRect(part.mask, org.x, org.y, labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), 'start', 'top'); }
 		if (isPrimary) { updateDataLeader(le, anchor, end); }
 	}
 	function layoutLinkLabel(id) {
@@ -1134,7 +1095,7 @@ var EngCalcs = EngCalcs || {};
 	// It is now just the text, and that is the POINT of Task 333's extrema change rather than a
 	// simplification made in passing. This used to be max(text, badge reach), because the old
 	// chevron badge hung off the END of a decorated number and so stuck out past the <text>'s own
-	// bbox -- a fact four separate consumers (leader attachment, collision boxes, mask rect,
+	// bbox -- a fact four separate consumers (leader attachment, collision boxes, the label box,
 	// zoom-to-fit) each had to be taught, and each got wrong first (ROADMAP Task 298). An
 	// underline/overline is drawn INSIDE the glyph box by the text engine, so the text's bbox is
 	// the whole footprint again, by construction and for every consumer at once.
@@ -1949,7 +1910,7 @@ var EngCalcs = EngCalcs || {};
 	//
 	// THE FLIP LIVES AT THE USER BOUNDARY, NOT IN THE DOCUMENT. Internally `doc` stays Y-down,
 	// because that is SVG's own coordinate system and every drawing routine in this file -- text
-	// baselines, mask rects, extrema chevrons, the backdrop image, the reservoir tank, label
+	// baselines, extrema chevrons, the backdrop image, the reservoir tank, label
 	// collision boxes and leader side-flips -- is written natively against it. Flipping the world
 	// transform instead would mirror every glyph and every symbol, and each of the ~10 counter-flips
 	// that repairs fails SILENTLY and visually (one upside-down number nobody notices for a month).
@@ -2188,7 +2149,7 @@ var EngCalcs = EngCalcs || {};
 		return { w: 2 * RESERVOIR_HALF_W * k, h: 2 * RESERVOIR_HALF_H * k };
 	}
 	// The single scalar every OTHER consumer of node geometry reads -- clear-run insets, label
-	// mask/leader placement, hit-testing (the invisible-but-clickable circle under a reservoir
+	// leader placement, hit-testing (the invisible-but-clickable circle under a reservoir
 	// symbol), staticObstacleBoxes(), the zoom-extent bbox. A reservoir is no longer visually a
 	// circle, so this is the circumscribing radius (half its LONGER side) rather than a true
 	// radius -- generous rather than tight, so none of those consumers ever clips the wide/short
@@ -2225,7 +2186,7 @@ var EngCalcs = EngCalcs || {};
 		// out at 0.49px -- a line the browser renders as a grey smudge and Tom reported as "no
 		// leaders" while looking straight at them. Turn Symbol size down to 2 and it was 0.14px.
 		svg.style.setProperty('--lpn-hair', 1 / (state.s || 1));
-		// Symbols only, never labels or their masks (Tom, 2026-07-30: "symbols opacity would be a
+		// Symbols only, never labels (Tom, 2026-07-30: "symbols opacity would be a
 		// very nice setting during layout") -- the point is to see the backdrop THROUGH the network
 		// while placing it against an aerial or a plan, and fading the numbers at the same time
 		// would defeat the reason you are looking at both together.
@@ -2290,12 +2251,9 @@ var EngCalcs = EngCalcs || {};
 			}
 			nodesLayer.appendChild(symbol);
 		}
-		// Mask (Task 146.01) goes in the shared maskLayer, not here alongside the circle -- see
-		// maskLayer's declaration comment for why. Leader+text go in labelsLayer, the topmost
-		// layer, same reasoning: this label must never be covered by a LATER node/link's own
-		// symbol. Both mask and leader start effectively invisible (mask sized 0, leader hidden)
-		// until layoutNodeLabel() below positions them for real.
-		var mask = annotationEl('rect', { 'class': 'lpn-lbl-mask' }, maskLayer);
+		// Leader+text go in labelsLayer, the topmost layer, so this label is never covered by a
+		// LATER node/link's own symbol. The leader starts hidden until layoutNodeLabel() below
+		// positions it for real.
 		var leader = annotationEl('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
 		// font-size inline, NOT the .lpn-lbl CSS class's 11px: SVG font-size is interpreted in the
 		// local (world-unit) coordinate system, same as any other geometry under this scaled <g> --
@@ -2314,7 +2272,7 @@ var EngCalcs = EngCalcs || {};
 		var tw = 8;
 		try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
 		// twPx is banked below, once nodeEls[n.id] exists to bank it on.
-		nodeEls[n.id] = { circle: circle, symbol: symbol, text: text, tw: tw, mask: mask, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
+		nodeEls[n.id] = { circle: circle, symbol: symbol, text: text, tw: tw, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
 		noteMeasuredWidth(nodeEls[n.id], tw);
 		incidentLinks[n.id] = [];
 		labelsByAnchor[n.id] = [];
@@ -2363,9 +2321,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		// Link label (Task 146 Phase 2 label toggles): a multi-line <text>, same convention as a
 		// node's, positioned at the middle segment's midpoint -- content filled in by
-		// refreshLabelText(), not here (this only creates the element; it starts empty). Mask goes
-		// in maskLayer, leader+text in labelsLayer -- see maskLayer's declaration comment.
-		var mask = annotationEl('rect', { 'class': 'lpn-lbl-mask' }, maskLayer);
+		// refreshLabelText(), not here (this only creates the element; it starts empty).
 		var leader = annotationEl('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
 		var text = annotationEl('text', {
 			'class': 'lpn-lbl lpn-draglbl', 'data-linklbl': l.id, style: 'font-size:' + effectiveFontSize() + 'px'
@@ -2404,7 +2360,7 @@ var EngCalcs = EngCalcs || {};
 			} else { symbolG.remove(); symbolG = null; }
 		}
 		linkEls[l.id] = {
-			line: line, halo: halo, handles: handles, arrows: arrows, text: text, tw: 8, mask: mask, leader: leader,
+			line: line, halo: halo, handles: handles, arrows: arrows, text: text, tw: 8, leader: leader,
 			nudge: { x: 0, y: 0 }, lineCount: 1, symbolG: symbolG, symbolSvg: symbolSvg
 		};
 		if (symbolG) { resizePumpSymbol(l.id); positionPumpSymbol(l.id); }
@@ -2640,17 +2596,13 @@ var EngCalcs = EngCalcs || {};
 	function textLabelStyle(lb) {
 		return 'font-size:' + effectiveFontSize(lb && lb.sizeMult) + 'px;font-weight:' + textLabelWeight(lb);
 	}
-	// The mask has to carry the SAME transform about the SAME point as the text, or it stops
-	// covering it -- the identical rule layoutLinkLabelAt() follows for aligned pipe labels. The
-	// attribute is REMOVED rather than set to a zero rotation when the label is upright: a stale
+	// The attribute is REMOVED rather than set to a zero rotation when the label is upright: a stale
 	// transform is invisible in the code and obvious on screen.
 	function applyTextLabelRotation(lb, le, px, py) {
 		var a = textLabelSvgAngle(lb),
 			t = a ? 'rotate(' + a.toFixed(3) + ' ' + px + ' ' + py + ')' : null;
-		[le.text, le.mask].forEach(function (e) {
-			if (!e) { return; }
-			if (t) { e.setAttribute('transform', t); } else { e.removeAttribute('transform'); }
-		});
+		if (!le.text) { return; }
+		if (t) { le.text.setAttribute('transform', t); } else { le.text.removeAttribute('transform'); }
 	}
 	// AXIS-ALIGNED bounding box of a rotated box, turned about the same point the SVG transform
 	// turns it about. An APPROXIMATION, said plainly: a 45-degree label claims more room than its
@@ -2685,8 +2637,8 @@ var EngCalcs = EngCalcs || {};
 		return ang === null ? null : readableAngle(ang);
 	}
 	// The label's box, wherever its anchor puts it -- the ONE place the two properties above are
-	// turned into geometry, so the mask, the bounding box, the collision box and the leader
-	// attachment can never disagree about where the same label is.
+	// turned into geometry, so the bounding box, the collision box and the leader attachment can
+	// never disagree about where the same label is.
 	function textLabelBox(lb, le, px, py) {
 		var box = Geom.labelBoxAt(px, py, textLabelWidth(le), textLabelHeight(lb),
 				labelHAlign(lb), labelVAlign(lb), effectiveFontSize(lb && lb.sizeMult)),
@@ -2697,14 +2649,10 @@ var EngCalcs = EngCalcs || {};
 		var an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: lb.x, y: lb.y },
 			px = lb.anchorNode ? an.x + lb.x : lb.x,
 			py = lb.anchorNode ? an.y + lb.y : lb.y,
-			leader = null, text, mask;
+			leader = null, text;
 		if (lb.anchorNode) {
 			leader = el('line', { x1: an.x, y1: an.y, x2: px, y2: py, 'class': 'lpn-leader' }, labelsLayer);
 		}
-		// Mask (Task 146.01) goes in the shared maskLayer, not labelsLayer -- see maskLayer's
-		// declaration comment: every mask stays below every label's text regardless of type or
-		// creation order.
-		mask = el('rect', { 'class': 'lpn-lbl-mask' }, maskLayer);
 		text = el('text', {
 			x: px, y: py, 'class': 'lpn-lbl lpn-draglbl', 'text-anchor': labelHAlign(lb),
 			'dominant-baseline': labelVAlign(lb) === 'hanging' ? 'hanging' : 'central',
@@ -2713,20 +2661,19 @@ var EngCalcs = EngCalcs || {};
 		text.textContent = lb.text;
 		// MEASURED AFTER THE STYLE IS ON THE ELEMENT, which is the whole reason bold can be a
 		// style rather than a second measurement path: bold glyphs are wider, so a width taken
-		// before the weight was applied would size the mask and the collision box for the
-		// lighter text (Task 337).
+		// before the weight was applied would size the collision box for the lighter text
+		// (Task 337).
 		var w = 10;
 		try { w = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
-		labelEls[lb.id] = { leader: leader, text: text, side: 'right', width: w, mask: mask };
+		labelEls[lb.id] = { leader: leader, text: text, side: 'right', width: w };
 		noteTextWidth(labelEls[lb.id], w);
-		positionMaskRect(mask, px, py, w, textLabelHeight(lb), labelHAlign(lb), labelVAlign(lb));
 		applyTextLabelRotation(lb, labelEls[lb.id], px, py);
 		if (lb.anchorNode) { labelsByAnchor[lb.anchorNode].push(lb.id); }
 	}
 
 	function buildDom() {
 		var i;
-		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; maskLayer.innerHTML = ''; labelsLayer.innerHTML = '';
+		linksLayer.innerHTML = ''; nodesLayer.innerHTML = ''; labelsLayer.innerHTML = '';
 		nodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};
 		for (i = 0; i < doc.nodes.length; i++) { buildNodeEls(doc.nodes[i]); }
 		for (i = 0; i < doc.links.length; i++) {
@@ -2761,11 +2708,9 @@ var EngCalcs = EngCalcs || {};
 	// has to reach clear across the text).
 	var ADVERSE_FRAC = 0.75;
 	function updateLabelGeometry(id) {
-		var lb = labelById(id), le = labelEls[id], an, px, py, box, halfW, att,
-			maskH = textLabelHeight(lb), hA = labelHAlign(lb), vA = labelVAlign(lb);
+		var lb = labelById(id), le = labelEls[id], an, px, py, box, halfW, att;
 		if (!lb.anchorNode) {
 			le.text.setAttribute('x', lb.x); le.text.setAttribute('y', lb.y);
-			positionMaskRect(le.mask, lb.x, lb.y, textLabelWidth(le), maskH, hA, vA);
 			applyTextLabelRotation(lb, le, lb.x, lb.y);
 			return;
 		}
@@ -2781,7 +2726,6 @@ var EngCalcs = EngCalcs || {};
 		le.leader.setAttribute('x1', an.x); le.leader.setAttribute('y1', an.y);
 		le.leader.setAttribute('x2', att.x); le.leader.setAttribute('y2', box.y + box.h / 2);
 		le.text.setAttribute('x', px); le.text.setAttribute('y', py);
-		positionMaskRect(le.mask, px, py, textLabelWidth(le), maskH, hA, vA);
 		applyTextLabelRotation(lb, le, px, py);
 	}
 	// Double-click-to-reset for a Text label (Tom, 2026-07-30) -- only meaningful when anchored: an
@@ -2840,7 +2784,6 @@ var EngCalcs = EngCalcs || {};
 		linkEls[l.id].handles.forEach(function (h) { h.remove(); });
 		linkEls[l.id].arrows.forEach(function (a) { a.remove(); });
 		linkEls[l.id].text.remove();
-		linkEls[l.id].mask.remove();
 		linkEls[l.id].leader.remove();
 		if (linkEls[l.id].symbolG) { linkEls[l.id].symbolG.remove(); }
 		buildLinkEls(l);
@@ -3925,7 +3868,7 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < links.length; i++) { deleteLink(links[i]); }
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
-		nodeEls[id].mask.remove(); nodeEls[id].leader.remove();
+		nodeEls[id].leader.remove();
 		if (nodeEls[id].symbol) { nodeEls[id].symbol.remove(); }
 		delete nodeEls[id]; delete incidentLinks[id]; delete labelsByAnchor[id];
 		doc.nodes = doc.nodes.filter(function (n) { return n.id !== id; });
@@ -4130,11 +4073,11 @@ var EngCalcs = EngCalcs || {};
 		linkEls[id].handles.forEach(function (h) { h.remove(); });
 		linkEls[id].arrows.forEach(function (a) { a.remove(); });
 		linkEls[id].text.remove();
-		linkEls[id].mask.remove(); linkEls[id].leader.remove();
+		linkEls[id].leader.remove();
 		// Same reason the arrows are removed one line up: a repeat is a real element in a shared
 		// layer, so a deleted pipe would leave its extra labels floating over the map -- Tom's
 		// 2026-07-30 "when I delete a pipe, its orphaned labels are left behind", one more time.
-		(linkEls[id].repeats || []).forEach(function (r) { r.text.remove(); r.mask.remove(); });
+		(linkEls[id].repeats || []).forEach(function (r) { r.text.remove(); });
 		if (linkEls[id].symbolG) { linkEls[id].symbolG.remove(); }
 		// The extrema mark needs no line of its own here any more (Task 333): it is the
 		// text's own text-decoration, so removing the text removes it. It used to be a set of
@@ -4152,7 +4095,6 @@ var EngCalcs = EngCalcs || {};
 		var lb = labelById(id), le = labelEls[id];
 		if (le.leader) { le.leader.remove(); }
 		le.text.remove();
-		le.mask.remove();
 		delete labelEls[id];
 		if (lb.anchorNode) {
 			labelsByAnchor[lb.anchorNode] = labelsByAnchor[lb.anchorNode].filter(function (x) { return x !== id; });
@@ -8299,17 +8241,13 @@ var EngCalcs = EngCalcs || {};
 		// the .lpn-symbols rule in css/engcalcs.css.
 		linksLayer = el('g', { 'class': 'lpn-symbols' }, world);
 		nodesLayer = el('g', { 'class': 'lpn-symbols' }, world);
-		// Every label mask lives in this ONE shared layer (Task 146.01 draw-order fix, Tom,
-		// 2026-07-30), never appended alongside the element it masks: a mask is placed here
-		// regardless of whether it belongs to a node, a link, or a Text label, so ALL masks sit
-		// above ALL node/link symbols, and (since labelsLayer below holds every label's text) BELOW
-		// every label's text. Appending a mask into nodesLayer/linksLayer/labelsLayer the way the
-		// symbol next to it does was the original design, and it broke exactly the way Tom
-		// described: a later-built node's own elements sit later in that shared layer's DOM order,
-		// so its mask painted OVER an earlier node's already-placed label text if the two
-		// overlapped on screen -- draw order tracked creation order, not "masks behind everything,
-		// text on top" as intended.
-		maskLayer = el('g', {}, world);
+		// EVERY LABEL'S TEXT AND LEADER LIVES IN THIS ONE SHARED LAYER (Task 146.01 draw-order fix,
+		// Tom, 2026-07-30), never appended alongside the element it belongs to: a label goes here
+		// whether it belongs to a node, a link or a Text object, so ALL labels sit above ALL
+		// node/link symbols. Building each label into nodesLayer/linksLayer the way the symbol next
+		// to it does was the original design, and it broke exactly the way Tom described -- draw
+		// order tracked creation order, so a later-built node's symbol painted over an earlier
+		// node's already-placed label.
 		labelsLayer = el('g', {}, world);
 		// Topmost layer (after labelsLayer) so the rubber-band is never hidden under a node/link
 		// while drawing a pipe/pump (Tom, 2026-07-30).
@@ -10157,8 +10095,8 @@ var EngCalcs = EngCalcs || {};
 	// what shows it. An arrow is a symbol by construction and an annotation by purpose: nobody drew
 	// it, it exists to be read, and zoomed out it is noise over the network whose shape you are
 	// trying to see. A node/link data label is the same kind of thing, so suppressing either costs
-	// the user nothing they authored. Each label's mask and leader are built through
-	// annotationEl() beside it, so the three pieces of one assembly hide together, the arrow hides
+	// the user nothing they authored. Each label's leader is built through
+	// annotationEl() beside it, so both pieces of one assembly hide together, the arrow hides
 	// with them, and the network itself never does. Full rule in css/engcalcs.css by the selector.
 	//
 	// visibility rather than display, so this composes with the leader's own show/hide logic instead
@@ -10200,13 +10138,13 @@ var EngCalcs = EngCalcs || {};
 			// silently changes which label is permanent whenever somebody resizes another one.
 			var mult = +lb.sizeMult > 0 ? +lb.sizeMult : 1,
 				gone = on && !lb.alwaysShow && vw > lim * mult;
-			[le.text, le.mask, le.leader].forEach(function (e) {
+			[le.text, le.leader].forEach(function (e) {
 				if (e && e.classList) { e.classList.toggle('lpn-lbl-hidden', gone); }
 			});
 		});
 	}
 	// Task 330. A saved setting that is merely absent (any project written before this) reads as
-	// undefined and must mask -- `=== false` rather than a truthiness test, so an old document is
+	// undefined and must draw the halo -- `=== false` rather than a truthiness test, so an old document is
 	// not silently restyled by an upgrade.
 	function applyMaskLabels() {
 		if (svg) { svg.classList.toggle('lpn-masks-off', settings.maskLabels === false); }
@@ -12642,7 +12580,10 @@ var EngCalcs = EngCalcs || {};
 			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, extrema.head, nd.head))); }
 			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, extrema.pressure, nd.pressure))); }
 			if (ls.node.elev) { lines.push(affix('node', 'elev', rawLine(n.elev, extrema.elev, nd.elev))); }
-			ne.empty = lines.length === 0; // captured BEFORE the placeholder below -- see hideMask()'s comment
+			// EMPTY IS CAPTURED BEFORE THE PLACEHOLDER BELOW: a label with no fields toggled on still gets
+			// an empty line pushed so getBBox() never throws, and everything downstream (the leader, the
+			// collision box) must know it is really empty rather than really one blank line.
+			ne.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); } // keep an empty tspan so getBBox() doesn't throw
 			// x here is a placeholder -- layoutNodeLabel() below (after collision avoidance) sets the
 			// real, final x/y on both the <text> and its tspans via repositionMultilineText().
@@ -12712,7 +12653,7 @@ var EngCalcs = EngCalcs || {};
 			try { noteMeasuredWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
-		// laid out for real (text/mask/leader) at its final, possibly-nudged position. The extrema
+		// laid out for real (text and leader) at its final, possibly-nudged position. The extrema
 		// marks need no third pass of their own any more (Task 333): they are text-decoration on the
 		// tspans set above, so they move with the text whatever moves it.
 		relayoutLabels();
@@ -12765,20 +12706,19 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	// The layout half of refreshLabelText(), without rebuilding any text: re-run collision
-	// avoidance, then place every label (text, mask, leader) and its extrema ticks at the resulting
+	// avoidance, then place every label (text and leader) and its extrema ticks at the resulting
 	// position. Split out so a DRAG can call it on every frame (Tom, 2026-07-30: "collisions aren't
 	// recalculated after drag; leaders stay unchanged") -- moving one label changes what every other
 	// label collides with, but none of the NUMBERS change while dragging, so rebuilding all the
 	// tspans 60 times a second would be pure waste. Safe to call repeatedly because the collision
 	// pass is idempotent (see addDataLabel()). Ticks reuse the lines cached by the last full
 	// refreshLabelText().
-	// **ALL THREE KINDS OF LABEL, THE USER'S OWN TEXT LABELS INCLUDED.** A Text label's MASK is
-	// sized in world units from a pixel width, so leaving it un-laid-out across a zoom keeps it at
-	// the old scale: zoom in far enough and a "LAKE" caption's mask becomes a large 75%-white
-	// rectangle lying over the network, and the pipes under it go pale grey. Nothing else lays
-	// them out -- refreshFontSizes() stopped doing so when the zoom path stopped re-measuring
-	// (Task 366). It costs nothing to be right: a drawing holds a handful of Text labels against
-	// hundreds of data labels, and this path does no measuring.
+	// **ALL THREE KINDS OF LABEL, THE USER'S OWN TEXT LABELS INCLUDED.** A Text label's leader and
+	// its collision box are both derived from a pixel width, so leaving it un-laid-out across a zoom
+	// leaves them at the old scale. Nothing else lays them out -- refreshFontSizes() stopped doing
+	// so when the zoom path stopped re-measuring (Task 366). It costs nothing to be right: a drawing
+	// holds a handful of Text labels against hundreds of data labels, and this path does no
+	// measuring.
 	//
 	// **THE LAYOUT BELONGS TO A SCALE, AND THIS IS WHERE THAT IS RECORDED.** Every label is sized
 	// in screen pixels, so at a coarse scale it is enormous in WORLD units and the collision pass

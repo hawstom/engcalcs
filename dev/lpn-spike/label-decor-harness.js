@@ -5,7 +5,8 @@
 // THIS FILE USED TO BE TWICE THIS LONG, and the half that went is the point. Task 298 existed
 // because the extrema badge -- two rails and a chevron -- was drawn just past the END of a
 // decorated number, so a label's real right edge was further right than its <text> bbox. Four
-// consumers had to be taught that (leader attachment, collision boxes, mask rect, zoom-to-fit) and
+// consumers had to be taught that (leader attachment, collision boxes, the mask rect of the day,
+// zoom-to-fit) and
 // each got it wrong first; Tom found the last one on screen: "The extrema glyph is not accounted
 // for in the leader attachment. So it can overhang a steeply vertical leader when label is dragged
 // left."
@@ -65,13 +66,15 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	report(!/decorRight/.test(src), 'no consumer carries a badge reach any more');
 	report(!/applyExtremaTicks|measureDecorRight/.test(src), 'and the badge machinery is gone, not merely unused');
 
-	// All four consumers, by name. Missing one is exactly how the original defect survived: the
-	// leader was the visible symptom, but collision avoidance and zoom-to-fit read the same number.
-	// `layoutLinkLabelAt` rather than `layoutLinkLabel` since 2026-08-15: a long pipe now draws its
-	// label at several stations along itself (Tom's repeat spec), and the per-station renderer is
-	// where the width is read. Same consumer, new name — and every repeat measuring through the same
-	// function is what stops a chain drifting out of step with its own original.
-	for (const site of ['dataLabelOrigin', 'layoutNodeLabel', 'layoutLinkLabelAt', 'bbox']) {
+	// Every consumer, by name. Missing one is exactly how the original defect survived: the leader
+	// was the visible symptom, but collision avoidance and zoom-to-fit read the same number.
+	// THE TWO LAYOUT FUNCTIONS LEFT THIS LIST WITH TASK 376. They read the width for one thing only
+	// -- to size the background rect behind the text -- and the rect is gone: the halo that replaced
+	// it is a stroke on the glyphs, which is the label's width by construction and cannot be given
+	// the wrong one. What they still do is place the text through dataLabelOrigin(), which is on
+	// this list, so the property this section asserts is unchanged; there are simply two fewer
+	// places able to break it.
+	for (const site of ['dataLabelOrigin', 'bbox']) {
 		report(/labelBoxWidth\(/.test(extract(site)), `${site}() uses labelBoxWidth()`);
 	}
 	report(/w: labelBoxWidth\(holder\)/.test(extract('runLabelCollisionAvoidance')), 'collision boxes use labelBoxWidth()');

@@ -33,7 +33,7 @@ const L = loadLoopedNetwork(
 	// the stale cache. Same shape as every other stub-lies-to-the-harness bug this file has met.
 	"\t\tsetBox: function (id, tw) { linkEls[id].tw = tw; linkEls[id].twPx = tw * state.s; },\n" +
 	"\t\tvis: function (id) { var e = linkEls[id];\n" +
-	"\t\t\treturn { text: e.text.style.visibility, mask: e.mask.style.visibility,\n" +
+	"\t\t\treturn { text: e.text.style.visibility,\n" +
 	"\t\t\t\tleader: e.leader.style.visibility,\n" +
 	"\t\t\t\tmarked: Array.prototype.filter.call(e.text.childNodes, function (t) {\n" +
 	"\t\t\t\t\treturn t.getAttribute('text-decoration'); }).length }; },\n" +
@@ -43,7 +43,7 @@ const L = loadLoopedNetwork(
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
 	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
-	"\t\t\tmaskLayer = el('g', {}, world); labelsLayer = el('g', {}, world);\n" +
+	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); },\n"
 );
 
@@ -102,8 +102,8 @@ console.log('=== a pipe shorter than its own label carries none ===');
 
 layoutAt(TW);
 ok('the short stub is suppressed', L.hiddenShort(stub.id));
-ok('...text, mask and leader all hidden together',
-	L.vis(stub.id).text === 'hidden' && L.vis(stub.id).mask === 'hidden' && L.vis(stub.id).leader === 'hidden',
+ok('...text and leader hidden together',
+	L.vis(stub.id).text === 'hidden' && L.vis(stub.id).leader === 'hidden',
 	JSON.stringify(L.vis(stub.id)));
 // The mark rides INSIDE the text now, so hiding the text hides it by construction -- there is no
 // separate element left to forget, which is what the old ticks === 0 assertion was guarding.
