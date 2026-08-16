@@ -794,7 +794,7 @@ var EngCalcs = EngCalcs || {};
 			if (Math.hypot(end.x - anchor.x, end.y - anchor.y) <= leaderThreshold()) { return; }
 			// The stored endpoint itself -- the same two world points updateDataLeader() draws
 			// between, with nothing derived from the box in either place (Task 328).
-			Collide.pushLeaderSamples(out, anchor.x, anchor.y, end.x, end.y, holder);
+			Collide.pushLeaderSamples(out, anchor.x, anchor.y, end.x, end.y, holder, 1 / state.s);
 		}
 		doc.nodes.forEach(function (n) { dataLeader(nodeEls[n.id], { x: n.x, y: n.y }, nodeLabelPos(n)); });
 		doc.links.forEach(function (l) {
@@ -808,7 +808,7 @@ var EngCalcs = EngCalcs || {};
 			// on its point (Task 332) -- the same box updateLabelGeometry() attaches the leader to.
 			var box = textLabelBox(lb, le, an.x + lb.x, an.y + lb.y), halfW = box.w / 2;
 			Collide.pushLeaderSamples(out, an.x, an.y,
-				Geom.leaderAttachX(box.x + halfW, halfW, an.x), box.y + box.h / 2, null);
+				Geom.leaderAttachX(box.x + halfW, halfW, an.x), box.y + box.h / 2, null, 1 / state.s);
 		});
 		return out;
 	}

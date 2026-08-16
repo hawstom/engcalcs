@@ -149,24 +149,46 @@ console.log('--- immovable obstacles ---');
 console.log('--- pushLeaderSamples ---');
 {
 	const out = [];
-	Collide.pushLeaderSamples(out, 0, 0, 10, 0, null);
-	// step 0.5 over a length of 10 -> 20 intervals -> 21 samples, ends inclusive.
-	report(out.length === 21, 'samples the whole line at the fixed step', `n=${out.length}`);
-	report(near(Collide.boxTopLeft(out[0]).x, -Collide.LEADER_SAMPLE_HALF), 'first sample is centred on the start');
-	report(near(Collide.boxTopLeft(out[out.length - 1]).x, 10 - Collide.LEADER_SAMPLE_HALF),
+	Collide.pushLeaderSamples(out, 0, 0, 10, 0, null);          // px omitted -> 1 world unit per pixel
+	// step 3 over a length of 10 -> 4 intervals -> 5 samples, ends inclusive.
+	report(out.length === 5, 'samples the whole line at the step', `n=${out.length}`);
+	report(near(Collide.boxTopLeft(out[0]).x, -Collide.LEADER_SAMPLE_HALF_PX), 'first sample is centred on the start');
+	report(near(Collide.boxTopLeft(out[out.length - 1]).x, 10 - Collide.LEADER_SAMPLE_HALF_PX),
 		'last sample is centred on the end');
 	report(out.every(function (b) { return b.weight === Collide.WEIGHT.leader && !b.movable; }),
 		'every sample is an immovable leader-weight box');
-	// The step must stay under a label box's smallest dimension or a box could slip between
-	// two samples unseen.
-	report(Collide.LEADER_SAMPLE_STEP <= 2 * Collide.LEADER_SAMPLE_HALF * 2,
+	// The step must stay under a sample box's own width or the chain has gaps a label can sit in.
+	report(Collide.LEADER_SAMPLE_STEP_PX <= Collide.LEADER_SAMPLE_HALF_PX * 2,
 		'sample step is fine enough that boxes cannot slip between samples');
 }
 {
-	// A very long leader is capped rather than generating an unbounded chain.
+	// THE UNITS, which is the whole point of the fix. The constants are SCREEN PIXELS and the
+	// caller passes world-units-per-pixel, so the same leader sampled at two zooms must produce
+	// the same number of boxes of the same SCREEN size -- and a different world size each time.
+	// Asserting a world figure would assert nothing: 0.3 world units is 11 screen pixels on Net3
+	// and a third of a pixel on the basic example, which is exactly how the old fixed constants
+	// managed to over-avoid one drawing and ignore another.
+	const zoomedIn = [], zoomedOut = [];
+	Collide.pushLeaderSamples(zoomedIn, 0, 0, 40, 0, null, 1);       // 40 world units = 40 px
+	Collide.pushLeaderSamples(zoomedOut, 0, 0, 400, 0, null, 10);    // 400 world units = 40 px
+	report(zoomedIn.length === zoomedOut.length,
+		'a leader of the same SCREEN length gets the same number of samples at any zoom',
+		`${zoomedIn.length} vs ${zoomedOut.length}`);
+	report(near(zoomedOut[0].w, zoomedIn[0].w * 10),
+		'...and each box is ten times the WORLD size when a pixel is ten times as wide',
+		`${zoomedIn[0].w} vs ${zoomedOut[0].w}`);
+	report(near(zoomedIn[0].w, Collide.LEADER_SAMPLE_HALF_PX * 2),
+		'...which is the pixel width the line is drawn at, not a world constant');
+}
+{
+	// A very long leader is capped rather than generating an unbounded chain. The cap has to sit
+	// well above a real one: a leader runs from a node to a label at most the nudge cap away, so
+	// 200 samples at 3px is 600px of leader -- longer than any that can occur.
 	const out = [];
 	Collide.pushLeaderSamples(out, 0, 0, 100000, 0, null);
 	report(out.length === Collide.LEADER_SAMPLE_MAX + 1, 'a long leader is capped', `n=${out.length}`);
+	report(Collide.LEADER_SAMPLE_MAX * Collide.LEADER_SAMPLE_STEP_PX > 500,
+		'...but not before any leader a drawing can actually produce');
 }
 {
 	// Zero-length leader still yields at least one sample and no NaN.

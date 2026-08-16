@@ -51,17 +51,34 @@ EngCalcs.lpnCollide = (function () {
 	// path. The step is well under a label box's smallest dimension, so a box cannot slip
 	// between two samples; the cap keeps a very long leader from generating an unbounded
 	// chain.
-	var LEADER_SAMPLE_STEP = 0.5, LEADER_SAMPLE_MAX = 60, LEADER_SAMPLE_HALF = 0.15;
+	//
+	// **THESE ARE SCREEN PIXELS, AND THE CALLER CONVERTS** (fixed 2026-08-15, Tom: "Maybe map
+	// and pixels got mixed up somehow"). They were fixed WORLD numbers -- 0.5, 0.15, 60 --
+	// against label boxes that are px/scale, which is this whole subject's standing bug class
+	// and here it was doing real damage across the examples, whose extents run from 37 world
+	// units (Net3) to 1400 (Basic):
+	//   * On NET3 a 0.3-unit sample box is ~11 screen pixels across at its own fit scale, so
+	//     every leader behaved as an 11px-thick wall rather than the 1px line it is drawn as,
+	//     and labels were being shoved out of the way of nothing a reader can see.
+	//   * On the BASIC example the same box is a third of a pixel and the 60-sample cap covers
+	//     30 of 1400 units, so leaders effectively did not participate at all.
+	// One drawing was over-avoiding its leaders by an order of magnitude while another ignored
+	// them, from the same three constants.
+	var LEADER_SAMPLE_STEP_PX = 3, LEADER_SAMPLE_MAX = 200, LEADER_SAMPLE_HALF_PX = 2;
 
-	function pushLeaderSamples(out, ax, ay, bx, by, owner) {
-		var len = Math.hypot(bx - ax, by - ay), i, t,
-			n = Math.min(LEADER_SAMPLE_MAX, Math.max(1, Math.ceil(len / LEADER_SAMPLE_STEP)));
+	// `px` is world units per screen pixel (1 / scale). Omitted means 1, which is the identity
+	// the pure-geometry harness uses.
+	function pushLeaderSamples(out, ax, ay, bx, by, owner, px) {
+		var u = px === undefined ? 1 : px,
+			step = LEADER_SAMPLE_STEP_PX * u, half = LEADER_SAMPLE_HALF_PX * u,
+			len = Math.hypot(bx - ax, by - ay), i, t,
+			n = Math.min(LEADER_SAMPLE_MAX, Math.max(1, Math.ceil(len / step)));
 		for (i = 0; i <= n; i++) {
 			t = i / n;
 			out.push({
 				ref: null, owner: owner || null, movable: false, weight: WEIGHT.leader,
-				base: { x: ax + (bx - ax) * t - LEADER_SAMPLE_HALF, y: ay + (by - ay) * t - LEADER_SAMPLE_HALF },
-				yOff: 0, w: LEADER_SAMPLE_HALF * 2, h: LEADER_SAMPLE_HALF * 2
+				base: { x: ax + (bx - ax) * t - half, y: ay + (by - ay) * t - half },
+				yOff: 0, w: half * 2, h: half * 2
 			});
 		}
 	}
@@ -144,9 +161,9 @@ EngCalcs.lpnCollide = (function () {
 	return {
 		WEIGHT: WEIGHT,
 		rectsOverlap: rectsOverlap,
-		LEADER_SAMPLE_STEP: LEADER_SAMPLE_STEP,
+		LEADER_SAMPLE_STEP_PX: LEADER_SAMPLE_STEP_PX,
 		LEADER_SAMPLE_MAX: LEADER_SAMPLE_MAX,
-		LEADER_SAMPLE_HALF: LEADER_SAMPLE_HALF,
+		LEADER_SAMPLE_HALF_PX: LEADER_SAMPLE_HALF_PX,
 		pushLeaderSamples: pushLeaderSamples,
 		boxTopLeft: boxTopLeft,
 		relax: relax

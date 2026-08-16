@@ -50,6 +50,36 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
+- 95|379| **[H] Replace the label relaxation with candidate-position scoring, which is the part that
+  can see open space.** Tom, 2026-08-15, on two Net3 screenshots with the bad cases arrowed in red:
+  *"The 'AI' for conflict-avoidance is just not very good now. There are no gross problems, but it's
+  making bad decisions... There is lots of free space that is being 'wasted' while bad conflicts
+  persist. The relaxation needs to understand the concept of most-open space and gravitate toward
+  it. Where did you get this relaxation algorithm?"*
+  - **It came from here, and it is a LOCAL method — that is the whole diagnosis.** `relax()` is
+    pairwise separation: every overlapping pair pushes apart along the axis of smaller overlap, four
+    times over. A label knows only what it is touching *right now* and moves the least distance out
+    of it. There is no term in it for open space, no candidate it did not stumble into, and no way
+    to prefer a clear region two label-widths away over a cramped one half a width away. **It cannot
+    gravitate toward anything, and no tuning of the weights will give it that** — the weights decide
+    who yields, not where anyone goes.
+  - **The standard answer in cartographic point labelling is candidate scoring**, and it is
+    genuinely simpler than what is here: generate N placements per label (the eight compass
+    positions at two or three radii, plus the current one), score each by overlap area against
+    everything already placed, plus a small penalty for distance from the anchor and for the less
+    preferred compass positions, take the best, mark it occupied, move on. Open space wins by
+    construction because an empty candidate scores zero overlap. It is deterministic, idempotent,
+    bounded by definition, and it composes with Task 377 — if the best candidate still overlaps, hide
+    the label rather than place it badly.
+  - **`capNudges()` is a defect in the meantime and disappears with the rewrite.** It runs AFTER the
+    relaxation, scaling an over-long nudge back along its own vector — which can drop the label
+    somewhere neither the solver nor anyone else chose, back inside the collision it had just
+    solved, with nothing re-run afterwards. A capped label is at an arbitrary point on the line to an
+    answer. Scoring has no equivalent problem: the candidates are all within reach to begin with.
+  - Order of work: 379 first, then 377 as its last resort, then 343 (dropping lines by priority)
+    as the resort before that. All three are the same decision — what to do when there is not
+    room — taken at three different granularities.
+
 - 55|378| **[H] Give the seven harnesses a network some other way, and delete
   `drawExampleNetwork()`.** The 289-line code-drawn ring main lost its last user-facing caller when
   Task 375's follow-up removed the File > New "From examples" rows, but seven harnesses still build
