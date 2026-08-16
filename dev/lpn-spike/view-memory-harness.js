@@ -204,34 +204,40 @@ console.log('\n--- saved to file, in the Cartesian frame the rest of the file us
 }
 
 // ---- 5. Nothing is restored from a view that does not make sense -------------------------------
-// ---- 4b. Saving the view must not make PANNING an edit -----------------------------------------
-// Tom, 2026-08-15, reporting three symptoms that turned out to be one line: "I revert, it autozooms
-// and sets the asterisk, I revert, it autozooms and sets the asterisk. It's very hard for me to get
-// all tabs to a clean state so I can reload without a complaint... On reload, the current tab gets
-// an asterisk... The gallery project gets an unwarranted asterisk."
+// ---- 4b. Moving the view IS an edit; moving it automatically is not ---------------------------
+// Tom, 2026-08-15, on being shown a fix that dropped the view from the dirty signature: "AutoCAD
+// registers a zoom or pan as a change. But there are no automatic zooms or pans. The paradigm
+// mistake in our code right now is probably a holdover from zooming to fit on every open... In a
+// nutshell, our current paradigm forbids autozooms or refits. Could you be hacking at this from the
+// wrong direction?"
 //
-// Putting the view into serializeProject() (which is right -- a project should reopen where it was
-// left) accidentally put it into docSignature(), which is what decides whether a tab shows an
-// asterisk. Every fit, wheel notch and restore then counted as a modification, and the state was
-// INESCAPABLE: reverting re-fitted, and the re-fit dirtied the project again.
-//
-// What is STORED and what counts as a CHANGE are two different lists. The backdrop's data URL was
-// already on that seam; the view joins it.
-console.log('\n--- the view is saved with the document but is not an edit ---');
+// He was. Excluding the view would have made a DELIBERATE pan unsaveable in order to excuse an
+// AUTOMATIC one. The view stays in the signature, exactly as it stays in the file; what changed is
+// that an automatic fit re-baselines a clean project instead of dirtying it. A fit that establishes
+// a view the document never had is not a change to it.
+console.log('\n--- moving the view is an edit, unless the app moved it ---');
 {
 	L.setOpenId('P1');
 	L.setViewRaw(-300, -80, 3);
 	const before = L.signature();
 	L.setViewRaw(140, 260, 11);        // pan and zoom: a different view of the same network
-	ok('panning and zooming leaves the document signature untouched',
-		L.signature() === before, before + ' vs ' + L.signature());
-	// ...and the check that keeps this honest: the view really IS still in the saved file, so the
-	// exclusion is from the signature only and not from the record.
-	ok('...while the file still carries the view it was left at',
+	ok('panning and zooming DOES change the document signature, as in AutoCAD',
+		L.signature() !== before, before + ' vs ' + L.signature());
+	ok('...and the file carries the view, which is why it counts',
 		L.validView(L.serialize().view), JSON.stringify(L.serialize().view));
-	// An actual edit still registers, or the asterisk would have stopped meaning anything.
-	L.getDoc().nodes[0].elev = (L.getDoc().nodes[0].elev || 0) + 1;
-	ok('...and a real edit still changes it', L.signature() !== before);
+	// The half that fixes Tom's trap: every automatic fit is marked as such at its call site, so it
+	// can re-baseline rather than dirty. If one is ever added without the flag, the inescapable
+	// asterisk comes straight back -- revert re-fits, the re-fit dirties, repeat.
+	const src = require('fs').readFileSync(
+		require('path').join(__dirname, '../../js/looped-network.js'), 'utf8');
+	const code = src.replace(/^[ \t]*\/\/.*$/gm, '');
+	const bare = (code.match(/[^a-zA-Z]zoomExtent\(\)/g) || []).length;
+	ok('every automatic fit says so, so none of them can dirty a project', bare === 0,
+		bare + ' bare zoomExtent() call(s) -- each one is a fit nobody asked for that would set an asterisk');
+	ok('...and the button the user presses is NOT marked automatic, since that one is an edit',
+		/fn: zoomExtent\b/.test(code) && /addEventListener\('click', zoomExtent\)/.test(code));
+	ok('...with a re-baseline that only ever fires on an already-clean project',
+		/function rebaseSignatureIfClean/.test(code) && /if \(e && !e\.dirty\)/.test(code));
 }
 
 // ---- 4c. Every way of making a project makes a CLEAN one ---------------------------------------

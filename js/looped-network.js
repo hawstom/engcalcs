@@ -2836,7 +2836,7 @@ var EngCalcs = EngCalcs || {};
 	function consumeFitAfterSolve() {
 		if (!fitAfterSolve) { return; }
 		fitAfterSolve = false;
-		zoomExtent();
+		zoomExtent(true);   // nobody asked: the labels simply became real
 	}
 	// ---- ZOOM TO FIT, SOLVED RATHER THAN SEARCHED (2026-08-15) --------------------------------
 	//
@@ -3077,12 +3077,17 @@ var EngCalcs = EngCalcs || {};
 	function restoreViewOrFit() {
 		var v = tabViews[library.openId] || pendingView;
 		pendingView = null;
-		if (!validView(v)) { zoomExtent(); return; }
+		if (!validView(v)) { zoomExtent(true); return; }   // no stored view: establish one
 		if (!mapSized) { pendingRestore = v; fitWhenSized = true; return; }
-		if (!applyView(v)) { zoomExtent(); }
+		if (!applyView(v)) { zoomExtent(true); }
 	}
-	function zoomExtent() {
-		if (!mapSized) { fitWhenSized = true; return; }
+	// `auto` marks a fit NOBODY ASKED FOR: boot, a freshly drawn example, a document with no stored
+	// view, the deferred fit that runs once the canvas has a height. Those establish a view rather
+	// than changing one, so they re-baseline a clean project instead of dirtying it. A fit the user
+	// pressed the button for is an edit like any other -- Tom, 2026-08-15: *"AutoCAD registers a
+	// zoom or pan as a change. But there are no automatic zooms or pans."*
+	function zoomExtent(auto) {
+		if (!mapSized) { fitWhenSized = true; autoFitWhenSized = autoFitWhenSized || !!auto; return; }
 		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it (Tom, 2026-08-09:
 		// "it seems unforgivable to have a persistent message overwriting our map... maybe what we
 		// really need to do is make Zoom to Fit account for this top margin"). The mode hint sits
@@ -3127,6 +3132,7 @@ var EngCalcs = EngCalcs || {};
 			prev = s;
 		}
 		apply(s);
+		if (auto) { rebaseSignatureIfClean(); }
 	}
 
 	// ---- backdrop image (Task 146 Phase 2, ported from dev/lpn-spike/canvas-spike.html) ----
@@ -4252,21 +4258,20 @@ var EngCalcs = EngCalcs || {};
 		var bd = snap.backdrop;
 		snap = Object.assign({}, snap, {
 			backdrop: bd ? { n: (bd.href || '').length, x: bd.x, y: bd.y, w: bd.width, h: bd.height, s: bd.s } : null,
-			// **THE VIEW IS SAVED BUT IS NOT AN EDIT** (Tom, 2026-08-15, reporting the consequence
-			// before anyone connected it: *"I revert, it autozooms and sets the asterisk, I revert,
-			// it autozooms and sets the asterisk... On reload, the current tab gets an asterisk...
-			// The gallery project gets an unwarranted asterisk."* All three, and the trap he could
-			// not get out of, are this one line.)
+			// **THE VIEW IS PART OF THE DOCUMENT AND MOVING IT IS AN EDIT** -- and getting here took
+			// a wrong turn worth recording. My first fix for Tom's inescapable asterisk was to drop
+			// the view from this signature. He rejected the direction and named the real fault:
+			// *"AutoCAD registers a zoom or pan as a change. But there are no automatic zooms or
+			// pans. The paradigm mistake in our code right now is probably a holdover from zooming
+			// to fit on every open... In a nutshell, our current paradigm forbids autozooms or
+			// refits. Could you be hacking at this from the wrong direction?"*
 			//
-			// Task 360 put the view into serializeProject() so a project reopens where it was left --
-			// which is right, and it accidentally made PANNING a modification. Every fit, every
-			// wheel notch, every restore then changed the signature, so a project could not be got
-			// to a clean state at all: reverting re-fitted, and the re-fit dirtied it again.
-			//
-			// Saved WITH the document, absent FROM the question "has this been edited". Same shape
-			// as the backdrop above: what is stored and what counts as a change are two lists, and
-			// this is where they differ.
-			view: null
+			// He was right. Excluding the view would have made a deliberate pan unsaveable in order
+			// to excuse an automatic one. The view stays in the signature, exactly as it stays in
+			// the file, and what changed instead is that an AUTOMATIC fit re-baselines the clean
+			// signature rather than dirtying the project -- see zoomExtent()'s `auto` argument. A
+			// fit that establishes a view the document never had is not a change to it.
+			view: snap.view
 		});
 		return hash32(JSON.stringify(snap));
 	}
@@ -7567,7 +7572,13 @@ var EngCalcs = EngCalcs || {};
 			// teaches no one it is there, and its absence reads as a missing feature rather than as a
 			// state. Every sibling here -- Save, Revert -- greys out instead, and consistency inside
 			// one short menu is worth more than the one row of clutter this costs.
-			{ icon: 'saveall', label: pc.lpn_file_saveall || 'Save all', fn: saveAllFiles, disabled: dirtyFileCount() < 2 },
+			// **< 1, NOT < 2** (Tom, 2026-08-15: *"Save all should be gated on dirtyFileCount() < 1.
+			// What was the purpose of 2? Indefensible, I think."* -- it was, and no reason for it was
+			// ever written down). The old rule reasoned that with one dirty file Save all is merely
+			// Save, which is true and is not a reason to grey out the row a user has just decided to
+			// press: they are telling the app "make everything safe", and the answer "there is only
+			// one, use the other button" is a refusal to do something it can plainly do.
+			{ icon: 'saveall', label: pc.lpn_file_saveall || 'Save all', fn: saveAllFiles, disabled: dirtyFileCount() < 1 },
 			// Only offered when there is something to revert TO and something to revert FROM.
 			// Reachable in READ-ONLY on purpose (Tom, 2026-08-05: "Revert is not an option"). Revert
 			// re-reads the file and throws your edits away -- which is exactly what somebody locked
@@ -8040,7 +8051,7 @@ var EngCalcs = EngCalcs || {};
 		setStatus('');
 		setMode('select');
 		refreshScenarioStatus();
-		zoomExtent();
+		zoomExtent(true);   // automatic: a cleared network has no view of its own to keep
 	}
 
 	function init() {
@@ -8229,7 +8240,7 @@ var EngCalcs = EngCalcs || {};
 		// pollLockedFiles() for why that decoupling was the whole answer to Tom's "why must there be
 		// limits at all?".
 		setInterval(pollLockedFiles, LPN_HEARTBEAT_MS);
-		zoomExtent();
+		zoomExtent(true);   // automatic: boot
 		requestAnimationFrame(tick);
 	}
 
@@ -8683,7 +8694,7 @@ var EngCalcs = EngCalcs || {};
 		buildDom();   // every element above was built at its pre-shift position
 		updateEmptyHint();
 		saveToStorage();
-		zoomExtent();
+		zoomExtent(true);   // automatic: a network drawn in code has no stored view
 		// ...and again once the labels exist. zoomExtent() measures the RENDERED label text, and at
 		// this instant there is none: the solve is 300 ms behind on the debounce, so every node's
 		// data label is still a placeholder width. Fitting now is right for immediate feedback but
@@ -8724,7 +8735,7 @@ var EngCalcs = EngCalcs || {};
 			}
 		}
 		updateEmptyHint();
-		zoomExtent();
+		zoomExtent(true);   // automatic: ditto, and see fitAfterSolve below
 		fitAfterSolve = true; // labels are still placeholders at this instant -- see consumeFitAfterSolve()
 		setMode('select');
 	}
@@ -9745,7 +9756,18 @@ var EngCalcs = EngCalcs || {};
 	// that a fit asked for before the canvas has a real height is DEFERRED rather than answered
 	// wrongly. Same shape as fitAfterSolve() above: remember that one was wanted, and do it when the
 	// missing fact arrives.
-	var mapSized = false, fitWhenSized = false, pendingRestore = null;
+	var mapSized = false, fitWhenSized = false, autoFitWhenSized = false, pendingRestore = null;
+	// **AN AUTOMATIC FIT MOVES THE BASELINE, IT DOES NOT DIRTY THE PROJECT.** Only when the project
+	// is already clean: if there are real unsaved edits, the asterisk stays, because the fit is not
+	// what put it there and clearing it would lose them silently.
+	//
+	// For a FILE project this claims the file contains a view it does not. That is deliberate and
+	// cheap: the view in question is one the app chose, not one the user did, so losing it on close
+	// costs nothing and prompting for it would be asking about a decision they never made.
+	function rebaseSignatureIfClean() {
+		var e = indexEntry(library.openId);
+		if (e && !e.dirty) { e.savedSig = docSignature(); saveIndex(); }
+	}
 	// The canvas box as it was when applyMapHeight() last finished. A resize is only observable by
 	// comparing against it: the WIDTH is CSS and changes before any handler of ours runs.
 	var lastMapBox = null;
@@ -9760,10 +9782,12 @@ var EngCalcs = EngCalcs || {};
 		mapSized = true;
 		if (!fitWhenSized) { return; }
 		fitWhenSized = false;
+		var wasAuto = autoFitWhenSized;
+		autoFitWhenSized = false;
 		var v = pendingRestore;
 		pendingRestore = null;
 		if (validView(v) && applyView(v)) { return; }
-		zoomExtent();
+		zoomExtent(wasAuto);
 	}
 	function applyMapHeight(secondPass) {
 		if (!svg) { return; }
@@ -10376,7 +10400,7 @@ var EngCalcs = EngCalcs || {};
 			settings.maskLabels = maskInput.checked;
 			applyMaskLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_mask_labels || 'Background patch behind labels', maskInput);
+		row(mapBody, pc.lpn_settings_mask_labels || 'Background mask behind labels', maskInput);
 		// ---- Scale-dependent label visibility ----
 		// THE CONTROL IS A CAPTURE BUTTON, NOT JUST A NUMBER, AND THAT IS THE WHOLE USABILITY OF IT.
 		// The threshold is a width in model length units, and no default is meaningful across

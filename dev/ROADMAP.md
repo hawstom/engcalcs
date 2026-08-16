@@ -61,6 +61,11 @@ session of its own with nothing else in it.
   Settings and Labels do not use it. Placement needs to flip below/above and clamp to the viewport.
   - Worth doing as one pass over all the popovers rather than per box, since they share
   `openPopupAt()` and will drift apart otherwise.
+  - A third fault in the same family, Tom the same day: *"When Labels or Settings are open, clicking
+  in the top row of the menu bar does not close them. Clicking anywhere else outside them does close
+  them."* The dismissal handler in `wireTabs()` treats a menubar click as "inside", because the
+  menubar's own handlers call `stopPropagation()` to keep their menus from closing themselves — so
+  the click never reaches the dismissal at all.
 
 - 90|354| **LOCAL MAP COORDINATES: a pipe VANISHES when you zoom in far on a model with real survey coordinates.** Tom,
   2026-08-15, on Elm Street: P11 gone, its five repeated labels still drawn along exactly where it
@@ -1866,12 +1871,22 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
   very hard for me to get all tabs to a clean state so I can reload without a complaint."* Then, on
   being asked: *"Maybe not one cause. Cause 1 is zoom, I am almost certain. Cause 2 (gallery tab) I
   don't know."* He was right on both counts.
-  - **CAUSE 1, THE VIEW.** Task 360 put the view into `serializeProject()` so a project reopens where
-    it was left — which is right — and `docSignature()` is built from `serializeProject()`, so
-    PANNING became a modification. The state was inescapable by construction: reverting re-fitted,
-    and the re-fit dirtied it again. **What is stored and what counts as a CHANGE are two lists**,
-    and the backdrop's data URL was already on that seam; the view joins it. Saved with the
-    document, absent from the question "has this been edited".
+  - **CAUSE 1, THE VIEW — AND MY FIRST FIX WAS AIMED THE WRONG WAY.** Task 360 put the view into
+    `serializeProject()`, and `docSignature()` is built from it, so panning became a modification and
+    the state was inescapable: reverting re-fitted, and the re-fit dirtied it again. I dropped the
+    view from the signature. Tom rejected the direction and named the actual fault: *"AutoCAD
+    registers a zoom or pan as a change. But there are no automatic zooms or pans. The paradigm
+    mistake in our code right now is probably a holdover from zooming to fit on every open... In a
+    nutshell, our current paradigm forbids autozooms or refits. Could you be hacking at this from the
+    wrong direction?"*
+    - He was right. Excluding the view would have made a DELIBERATE pan unsaveable in order to
+      excuse an AUTOMATIC one. **The view stays in the signature, exactly as it stays in the file.**
+    - What changed instead: `zoomExtent(auto)`. All seven fits nobody asked for — boot, a cleared
+      network, a code-drawn example, the post-solve re-fit, a document with no stored view, the
+      deferred fit once the canvas has a height — re-baseline a CLEAN project rather than dirtying
+      it. A fit that establishes a view the document never had is not a change to it, and if the
+      project is genuinely dirty the asterisk stays, because the fit is not what put it there.
+    - The user's own Zoom to fit is deliberately NOT marked automatic: that one is an edit.
   - **CAUSE 2, THE FIRST PROJECT.** Dirtiness is `docSignature() !== entry.savedSig`, so an entry
     with NO `savedSig` is dirty from its first breath. Every path that makes a project stamps one
     except `init()`'s, which registers the first project by hand to avoid repainting a UI that does
@@ -1881,10 +1896,11 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     gallery is what left it.
   - Its Revert being disabled is correct and was the trap: Revert restores a FILE, so the one control
     that clears an asterisk was unavailable on the only project with an unearned one.
-  - **"Save all is disabled when there are asterisks present" is probably the same story** — it is
-    gated on `dirtyFileCount() < 2`, which counts FILE projects only, and gallery examples are
-    browser projects that can never be file-saved. Worth re-checking now the spurious asterisks are
-    gone; if two genuinely dirty files still leave it disabled, that is a separate bug.
+  - **Save all is gated on `< 1` now, not `< 2`** (Tom: *"What was the purpose of 2? Indefensible,
+    I think."* — it was, and no reason was ever written down). The old rule reasoned that with one
+    dirty file Save all is merely Save, which is true and is not a reason to grey out a row someone
+    has just decided to press. It still counts FILE projects only, which is why gallery examples —
+    browser projects that can never be file-saved — do not enable it.
 
 - 0|374| **Aligned label spacing is half the smaller map dimension — DONE 2026-08-15.** Tom, from the
   drawing: *"min/4 is too small. Let's try min/2. On my PC, even that is smaller than max/4."* That
