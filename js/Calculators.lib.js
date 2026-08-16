@@ -726,6 +726,13 @@ EngCalcs.inlineRangeWarnHtml = function (valueSI, lowSI, highSI, labels) {
 // will enter.
 EngCalcs.G = 9.806;
 
+// Feet per metre, exactly 1/0.3048. THE ONLY definition -- do not reintroduce a local `ft_per_m`.
+// The international foot is exact by definition, so there is no reason to carry a rounded one: the
+// suite shipped FOUR different feet in $ec_units (3.280800, 3.280788, 3.280841, 3.280854) plus a
+// fifth here at 3.28084, and a length, an area and a volume that disagree cannot tie out.
+// dev/scripts/unit_factor_check.php holds $ec_units to this same value.
+EngCalcs.FT_PER_M = 1 / 0.3048;
+
 // The velocity band every calculator's check is measured against. ONE definition -- do not
 // re-inline these literals into a calculator, or a missed one disagrees silently.
 //

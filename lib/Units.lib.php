@@ -181,46 +181,87 @@ $ec_unit_sets['si'] = Array(
 define('EC_DEFAULT_UNIT_SET', (isset($clanguage) && $clanguage === 'en') ? 'us' : 'si');
 
 /**
+ * CONVERSION FACTORS
  *
- * The value of each unit is the number of that unit
- * in the standard SI unit for that quantity.
+ * The value of each unit is the number of that unit in the standard SI unit for
+ * that quantity. Multiply an SI value by it to DISPLAY; divide to STORE.
  *
+ * EVERY FACTOR BELOW IS DERIVED FROM THE EXACT DEFINITIONS, AT FULL DOUBLE
+ * PRECISION -- never from a rounded intermediate. dev/scripts/unit_factor_check.php
+ * re-derives all of them from these same definitions and fails the build on any
+ * disagreement, so this comment is checked rather than merely asserted.
+ *
+ * The exact definitions used:
+ *     1 ft   = 0.3048 m                (exact, international foot)
+ *     1 in   = 0.0254 m                (exact)
+ *     1 gal  = 3.785411784 L           (exact, US liquid gallon)
+ *     1 lbf  = 4.4482216152605 N       (exact)
+ *     1 acre = 43560 ft^2              (exact)
+ *     1 hp   = 745.6998715822702 W     (mechanical horsepower, 550 ft.lbf/s)
+ *     1 m H2O = 1000 * EngCalcs.G Pa   (see the pressure note below)
+ *
+ * WHY FULL PRECISION MATTERS, since a round trip in ONE unit hides the problem.
+ * 1000 gpm stored and redisplayed is 1000 gpm whatever the factor is. The damage
+ * is cross-unit: a length in ft, an area in ft^2 and a velocity in ft/s computed
+ * from independently-rounded factors stop tying out in the 5th digit; acft at 3
+ * significant figures was wrong by 354 ppm, which shows in the 4th DISPLAYED digit;
+ * and EPANET uses exact factors, so our .inp import/export and the
+ * validate_epanet.js engine comparison drifted against it -- a spurious mismatch,
+ * or worse a real one masked. The suite previously contained FOUR different feet
+ * (ft 3.2808, ft3ps 3.280788, ft3 3.280841, ft2 3.280854); ft3 and ft3ps are the
+ * same conversion and were 47 ppm apart.
+ *
+ * PRESSURE USES THE SUITE'S OWN g, NOT 9.80665. A metre of water column is
+ * converted with EngCalcs.G = 9.806 (js/Calculators.lib.js -- the single definition
+ * of standard gravity for the whole suite, deliberately 9.806). So pa, kpa, npm2,
+ * bar, psf and psi are ALL derived from 1 m H2O = 1000 * 9.806 = 9806 Pa and agree
+ * with one another exactly. Do not "correct" these to 9.80665 in isolation: that
+ * would put the PHP display factors and the JS physics on two different gravities,
+ * which is worse than either constant on its own.
  */
 $ec_units['m']=1;
 $ec_units['mm']=1000;
-$ec_units['ft']=3.2808;
-$ec_units['in']=39.37;
+$ec_units['ft']=3.280839895013123;              // 1/0.3048
+$ec_units['in']=39.370078740157480;             // 1/0.0254
 
 $ec_units['mps']=1;
-$ec_units['ftps']=3.2808;
+$ec_units['ftps']=3.280839895013123;            // 1/0.3048
 
 $ec_units['m3ps']=1;
 $ec_units['lps']=1000;
-$ec_units['ft3ps']=35.313;
-$ec_units['gpm']=15849;
-$ec_units['mgd']=22.822;
-$ec_units['mld']=86.4;
+$ec_units['ft3ps']=35.314666721488585;          // 1/0.3048^3
+$ec_units['gpm']=15850.323141488905;            // 60/0.003785411784
+$ec_units['mgd']=22.824465323744022;            // 86400/(1e6*0.003785411784)
+$ec_units['mld']=86.4;                          // 86400/1000 -- exact
 
 $ec_units['m2']=1;
 $ec_units['mm2']=1000000;
-$ec_units['ft2']=10.764;
-$ec_units['in2']=1550;
+$ec_units['ft2']=10.763910416709722;            // 1/0.3048^2
+$ec_units['in2']=1550.0031000062002;            // 1/0.0254^2
 
 $ec_units['m3']=1;
-$ec_units['ft3']=35.3147;
-$ec_units['acft']=0.000811;
+$ec_units['ft3']=35.314666721488585;            // 1/0.3048^3 -- same conversion as ft3ps
+$ec_units['acft']=0.00081071319378991241;       // 1/(43560*0.3048^3)
 
 $ec_units['mh2o']=1;
 $ec_units['mmh2o']=1000;
-$ec_units['fth2o']=3.2808;
-$ec_units['inh2o']=39.37;
-$ec_units['pa']=9806;
-$ec_units['kpa']=9.806;
-$ec_units['npm2']=9806;
-$ec_units['bar']=0.09806;      // 1 m H2O = 0.09806 bar
-$ec_units['kgfcm2']=0.1;       // 1 kgf/cm2 = 10 m H2O (Asia pressure norm; Task 134)
-$ec_units['psf']=204.82;
-$ec_units['psi']=1.4223;
+$ec_units['fth2o']=3.280839895013123;           // 1/0.3048
+$ec_units['inh2o']=39.370078740157480;          // 1/0.0254
+// The six below all come from 1 m H2O = 1000 * 9.806 Pa = 9806 Pa exactly.
+$ec_units['pa']=9806;                           // 1000*9.806
+$ec_units['kpa']=9.806;                         // 9806/1000
+$ec_units['npm2']=9806;                         // N/m^2 is Pa
+$ec_units['bar']=0.09806;                       // 9806/1e5
+$ec_units['psf']=204.80256809027017;            // 9806/(4.4482216152605/0.3048^2)
+$ec_units['psi']=1.4222400561824318;            // 9806/(4.4482216152605/0.0254^2)
+// DELIBERATE EXCEPTION, not a rounding slip (Task 134). Exactly, 1 kgf/cm2 =
+// 98066.5 Pa = 10.00068 m H2O against our g, so the exact factor would be
+// 0.099993372. The unit exists ONLY as the Asian field convention "1 kgf/cm2 =
+// 10 m of water", and a user reading a 10 m head expects 1.00 -- so the round
+// number IS the unit as it is used. Cost: 66 ppm against the exact definition,
+// invisible at every digit the suite displays. Named in unit_factor_check.php's
+// exception list with this reason; never widen a tolerance to swallow it.
+$ec_units['kgfcm2']=0.1;
 
 $ec_units['grade']=1;
 $ec_units['gradePercent']=100;
@@ -230,15 +271,15 @@ $ec_units['depthPercent']=100;
 
 $ec_units['kw']=0.001;
 $ec_units['mw']=0.000001;
-$ec_units['hp']=0.001341;
+$ec_units['hp']=0.0013410220895950279;          // 1/745.6998715822702
 
 $ec_units['kwh_yr']=1.0;
 $ec_units['mwh_yr']=0.001;
 
-$ec_units['lph']=3600000;    // L/hr per m³/s
-$ec_units['gph']=951019;     // US gal/hr per m³/s
-$ec_units['mmph']=3600000;   // mm/hr per m/s (precipitation rate)
-$ec_units['inph']=141732;    // in/hr per m/s
+$ec_units['lph']=3600000;                       // L/hr per m3/s -- exact
+$ec_units['gph']=951019.38848933426;            // 3600/0.003785411784
+$ec_units['mmph']=3600000;                      // mm/hr per m/s -- exact
+$ec_units['inph']=141732.28346456692;           // 3600/0.0254
 
-$ec_units['m2ps']=1;         // m²/s (unit discharge, SI base)
-$ec_units['ft2ps']=10.7639;  // cfs/ft = ft²/s per m²/s (1 m²/s = 3.28084² ft²/s)
+$ec_units['m2ps']=1;                            // m2/s (unit discharge, SI base)
+$ec_units['ft2ps']=10.763910416709722;          // 1/0.3048^2 -- same conversion as ft2
