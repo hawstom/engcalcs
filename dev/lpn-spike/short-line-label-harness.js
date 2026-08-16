@@ -27,7 +27,11 @@ const L = loadLoopedNetwork(
 	"\t\tsetZoom: function (s) { state.s = s; },\n" +
 	"\t\tsetLabelMaxWidth: function (w) { settings.labelMaxWidth = w; applyLabelVisibility(); },\n" +
 	"\t\tglobalHide: function () { return svg.classList.contains('lpn-labels-hidden'); },\n" +
-	"\t\tsetBox: function (id, tw) { linkEls[id].tw = tw; },\n" +
+	// BOTH FIELDS, since 2026-08-15. A label's measured width is banked in PIXELS and divided by the
+	// scale on read (labelBoxWidth), so writing only `tw` writes the field the code stopped reading
+	// -- the harness would impose a width nothing consulted and every check here would answer from
+	// the stale cache. Same shape as every other stub-lies-to-the-harness bug this file has met.
+	"\t\tsetBox: function (id, tw) { linkEls[id].tw = tw; linkEls[id].twPx = tw * state.s; },\n" +
 	"\t\tvis: function (id) { var e = linkEls[id];\n" +
 	"\t\t\treturn { text: e.text.style.visibility, mask: e.mask.style.visibility,\n" +
 	"\t\t\t\tleader: e.leader.style.visibility,\n" +
@@ -80,6 +84,11 @@ L.refreshLabelText();
 
 // The label is 10 world units wide at this zoom -- wider than the stub, far narrower than the main.
 const TW = 10;
+// NOTE ON WHAT layoutAt() NOW SIMULATES. The page banks a label's width in pixels and divides by
+// the scale, so in a browser a "zoom" changes the world width without any re-measurement at all.
+// Imposing a world width here and letting setBox convert it at the CURRENT scale reproduces the
+// same arithmetic from the other end, and keeps this file's one variable ("how wide is the label,
+// in world units") the one it has always had.
 // One number to simulate a zoom, because since Task 333 the label's footprint IS its text: the
 // extrema mark is the number's own text-decoration and adds nothing beside it. This used to have to
 // scale a second quantity (the badge's reach) in step, or labelBoxWidth() stayed pinned at the

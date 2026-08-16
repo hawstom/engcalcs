@@ -405,9 +405,25 @@ var EngCalcs = EngCalcs || {};
 	// hAlign/vAlign describe what x/y MEAN for the label being masked, matching each label type's own
 	// text-anchor/dominant-baseline: 'start'/'top' for a node or link label (x = left edge, y = first
 	// line's baseline); 'middle'/'middle' for a Text label (x = center, y = vertical center).
-	var MASK_PAD = 0.4;
+	// **THE PAD IS A FRACTION OF THE LETTERING, NOT A WORLD CONSTANT** (Tom, 2026-08-15, diagnosing
+	// a Net3 screenshot where most of the pipes had gone pale: *"I think that our labels are masking
+	// the pipe? Yes. That's it. Make the mask buffer smaller?"* — right, and the reason it was so
+	// large is worse than the number).
+	//
+	// It was `0.4` flat, in WORLD units, so in PIXELS it grew with the zoom: 0.4px at scale 1 and
+	// **24px on every side** at the scale that screenshot was taken at. An aligned label lies ALONG
+	// its pipe (Task 329), so a mask that wide covers the pipe for the label's whole length and
+	// well beyond it — and at 75% white the pipe underneath reads as pale grey with black gaps
+	// where no label happens to lie. Every symptom in the picture, from one world-unit constant.
+	//
+	// Masking a line that a label lies on is CORRECT and is what cartography does (a road name
+	// breaks the road it runs along). What was wrong is that the halo was not a halo. As a fraction
+	// of the font size it is a fixed number of pixels at every zoom — 1.65px at the shipped 11px
+	// lettering — because effectiveFontSize() is itself a pixel size divided by the scale.
+	var MASK_PAD_FRAC = 0.15;
 	function positionMaskRect(mask, x, y, w, h, hAlign, vAlign) {
-		var r = Geom.maskRect(x, y, w, h, hAlign, vAlign, effectiveFontSize(), MASK_PAD);
+		var r = Geom.maskRect(x, y, w, h, hAlign, vAlign, effectiveFontSize(),
+			MASK_PAD_FRAC * effectiveFontSize());
 		mask.setAttribute('x', r.x);
 		mask.setAttribute('y', r.y);
 		mask.setAttribute('width', r.width);
@@ -1000,7 +1016,12 @@ var EngCalcs = EngCalcs || {};
 		while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
 		rows.forEach(function (row, i) {
 			row.forEach(function (seg, j) {
-				var tspan = el('tspan', j === 0 ? { x: x, dy: i === 0 ? 0 : effectiveLineHeight() } : {}, textEl);
+				// **dy IN `em`, NOT IN WORLD UNITS.** An em is resolved against the element's own
+				// font-size, so line spacing follows a zoom by itself and the tspans never have to
+				// be rebuilt for one. In world units this attribute was stale the instant the scale
+				// changed, which is why every zoom used to run the whole of refreshLabelText().
+				// 1.2 is effectiveLineHeight()'s own multiple of the font size, in one place now.
+				var tspan = el('tspan', j === 0 ? { x: x, dy: i === 0 ? 0 : '1.2em' } : {}, textEl);
 				if (seg.decoration) {
 					tspan.setAttribute('text-decoration', seg.decoration === 'high' ? 'overline' : 'underline');
 					tspan.setAttribute('class', seg.decoration === 'high' ? 'lpn-max' : 'lpn-min');
@@ -1019,7 +1040,28 @@ var EngCalcs = EngCalcs || {};
 	// underline/overline is drawn INSIDE the glyph box by the text engine, so the text's bbox is
 	// the whole footprint again, by construction and for every consumer at once.
 	function labelBoxWidth(holder) {
+		// **MEASURED ONCE PER CONTENT CHANGE, RESCALED ARITHMETICALLY EVER AFTER.** A label's width
+		// in PIXELS does not change with the zoom (Task 331), so its width in WORLD units is just
+		// that pixel figure divided by the scale -- and every getBBox() saved is a forced synchronous
+		// layout not performed. Net3 has ~220 labels; re-measuring them on every wheel notch was a
+		// quarter of a second per notch (Tom, 2026-08-15).
+		if (holder.twPx) { return holder.twPx / (state.s || 1); }
 		return holder.tw || 0;
+	}
+	// The other half of the pair: call this instead of writing `.tw` from a getBBox() result, and the
+	// pixel figure is banked at the same time. `worldWidth` is what getBBox() just returned.
+	function noteMeasuredWidth(holder, worldWidth) {
+		holder.tw = worldWidth;
+		holder.twPx = worldWidth * (state.s || 1);
+	}
+	// Text labels keep their measured width on `.width` rather than `.tw` -- same rule, same reason.
+	function textLabelWidth(le) {
+		if (le && le.widthPx) { return le.widthPx / (state.s || 1); }
+		return (le && le.width) || 0;
+	}
+	function noteTextWidth(le, worldWidth) {
+		le.width = worldWidth;
+		le.widthPx = worldWidth * (state.s || 1);
 	}
 	// Repositions an already-built multi-line label (drag/geometry updates) without touching its
 	// content -- setMultilineText() gives each ROW's first tspan its own explicit x (needed for the
@@ -2113,7 +2155,9 @@ var EngCalcs = EngCalcs || {};
 		text.textContent = n.id;
 		var tw = 8;
 		try { tw = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
+		// twPx is banked below, once nodeEls[n.id] exists to bank it on.
 		nodeEls[n.id] = { circle: circle, symbol: symbol, text: text, tw: tw, mask: mask, leader: leader, nudge: { x: 0, y: 0 }, lineCount: 1 };
+		noteMeasuredWidth(nodeEls[n.id], tw);
 		incidentLinks[n.id] = [];
 		labelsByAnchor[n.id] = [];
 		positionNodeSymbol(n.id);
@@ -2402,7 +2446,7 @@ var EngCalcs = EngCalcs || {};
 	// turned into geometry, so the mask, the bounding box, the collision box and the leader
 	// attachment can never disagree about where the same label is.
 	function textLabelBox(lb, le, px, py) {
-		return Geom.labelBoxAt(px, py, le.width, textLabelHeight(lb),
+		return Geom.labelBoxAt(px, py, textLabelWidth(le), textLabelHeight(lb),
 			labelHAlign(lb), labelVAlign(lb), effectiveFontSize(lb && lb.sizeMult));
 	}
 	function buildLabelEls(lb) {
@@ -2426,6 +2470,7 @@ var EngCalcs = EngCalcs || {};
 		var w = 10;
 		try { w = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
 		labelEls[lb.id] = { leader: leader, text: text, side: 'right', width: w, mask: mask };
+		noteTextWidth(labelEls[lb.id], w);
 		positionMaskRect(mask, px, py, w, textLabelHeight(lb), labelHAlign(lb), labelVAlign(lb));
 		if (lb.anchorNode) { labelsByAnchor[lb.anchorNode].push(lb.id); }
 	}
@@ -2471,7 +2516,7 @@ var EngCalcs = EngCalcs || {};
 			maskH = textLabelHeight(lb), hA = labelHAlign(lb), vA = labelVAlign(lb);
 		if (!lb.anchorNode) {
 			le.text.setAttribute('x', lb.x); le.text.setAttribute('y', lb.y);
-			positionMaskRect(le.mask, lb.x, lb.y, le.width, maskH, hA, vA);
+			positionMaskRect(le.mask, lb.x, lb.y, textLabelWidth(le), maskH, hA, vA);
 			return;
 		}
 		an = nodeById(lb.anchorNode); px = an.x + lb.x; py = an.y + lb.y;
@@ -2486,7 +2531,7 @@ var EngCalcs = EngCalcs || {};
 		le.leader.setAttribute('x1', an.x); le.leader.setAttribute('y1', an.y);
 		le.leader.setAttribute('x2', att.x); le.leader.setAttribute('y2', box.y + box.h / 2);
 		le.text.setAttribute('x', px); le.text.setAttribute('y', py);
-		positionMaskRect(le.mask, px, py, le.width, maskH, hA, vA);
+		positionMaskRect(le.mask, px, py, textLabelWidth(le), maskH, hA, vA);
 	}
 	// Double-click-to-reset for a Text label (Tom, 2026-07-30) -- only meaningful when anchored: an
 	// anchored Text's lb.x/lb.y is an offset from its node, same convention as a node/link label's,
@@ -8368,11 +8413,11 @@ var EngCalcs = EngCalcs || {};
 			var le = labelEls[lb.id];
 			le.text.textContent = lb.text;
 			le.text.style.fontSize = effectiveFontSize(lb.sizeMult) + 'px';
-			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measure can throw; stale width stands */ }
+			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measure can throw; stale width stands */ }
 			if (anchorNode && side) {
 				var an = nodeById(anchorNode),
 					gap = nodeRadius(an) + effectiveFontSize(sizeMult) * 0.5;
-				lb.x = (side === 'left' ? -1 : 1) * (le.width / 2 + gap);
+				lb.x = (side === 'left' ? -1 : 1) * (textLabelWidth(le) / 2 + gap);
 				// And the RISE that makes the leader slope. The leader is drawn from the node to the
 				// label's near edge, which sits exactly `gap` away horizontally -- the text width
 				// cancels out -- so the leader vector is (gap, lb.y) and its angle is set entirely
@@ -9599,31 +9644,41 @@ var EngCalcs = EngCalcs || {};
 	// needed both when the user edits Text size directly and whenever state.s changes
 	// (zoomAbout()/zoomExtent() call onZoomChanged() below), since a pixel size is by definition
 	// state.s-dependent while every other geometry in this file is left to the SVG's own transform.
-	// The user's own Text labels only. Split out of refreshFontSizes() because they survive a zoom
-	// that hides every generated label (Task 340: a Text label has its own size-scaled threshold),
-	// so the zoom fast path below still has to resize them -- and there are a handful of them, not
-	// one per element.
+	// The user's own Text labels only: re-apply the font size AND re-measure. Called where a Text
+	// label's content or size really changed. The zoom path does not use it -- it sets font sizes
+	// without measuring, because a measured width is banked in pixels and rescaled on read.
 	function refreshTextLabelSizes() {
 		Object.keys(labelEls).forEach(function (id) {
 			var le = labelEls[id], lb = labelById(id);
 			le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
-			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
+			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
 			updateLabelGeometry(id);
 		});
 	}
+	// **A ZOOM CHANGES SIZES, NOT CONTENT** (2026-08-15). This used to end in refreshLabelText(),
+	// which recomposes every node's and every link's text, rebuilds its tspans and re-measures each
+	// one with getBBox() -- ~220 forced synchronous layouts on Net3, per wheel notch, to redraw
+	// glyphs that had not changed. Tom measured the result: a quarter of a second per scroll zoom.
+	//
+	// Nothing about the CONTENT depends on the scale. Two things did, and both are now gone:
+	//   * the tspan `dy` spacing, which is expressed in `em` and follows the font-size by itself;
+	//   * each label's measured width, which is banked in PIXELS and divided by the scale on read
+	//     (labelBoxWidth / textLabelWidth).
+	// So a zoom sets font sizes, republishes the symbol custom properties, and re-lays-out. The
+	// content path is left for the things that actually change content: a solve, a toggle, an edit.
 	function refreshFontSizes() {
 		var fs = effectiveFontSize() + 'px';
 		Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
 		Object.keys(linkEls).forEach(function (id) {
 			linkEls[id].text.style.fontSize = fs;
-			// A repeat is the same label, so it is the same size -- and its line SPACING comes from
-			// the tspan dy values, which is why refreshLabelText() below has to run after this
-			// rather than the other way round.
 			(linkEls[id].repeats || []).forEach(function (r) { r.text.style.fontSize = fs; });
 		});
-		refreshTextLabelSizes();
+		Object.keys(labelEls).forEach(function (id) {
+			var le = labelEls[id], lb = labelById(id);
+			le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
+		});
 		refreshSymbolSizes(); // publishes --lpn-sym / --lpn-lw, both of which are state.s-dependent too
-		refreshLabelText(); // recomputes multi-line tspan dy spacing and extrema tick positions at the new size
+		relayoutLabels();     // positions only: no recompose, no re-measure
 	}
 	// Called from zoomAbout()/zoomExtent(). NO LONGER CONDITIONAL (Task 331): with text, symbols and
 	// pipe width all specified in screen pixels, every one of them is state.s-dependent, so a zoom
@@ -11296,7 +11351,7 @@ var EngCalcs = EngCalcs || {};
 			lb.text = input.value;
 			var le = labelEls[labelId];
 			le.text.textContent = lb.text;
-			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
+			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
 			updateLabelGeometry(labelId);
 			saveToStorage();
 		});
@@ -11317,7 +11372,7 @@ var EngCalcs = EngCalcs || {};
 			lb.sizeMult = v;
 			var le = labelEls[labelId];
 			le.text.style.fontSize = effectiveFontSize(lb.sizeMult) + 'px';
-			try { le.width = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
+			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
 			updateLabelGeometry(labelId);
 			applyLabelVisibility();   // the size IS this label's own hide threshold (Task 340)
 			saveToStorage();
@@ -11974,7 +12029,7 @@ var EngCalcs = EngCalcs || {};
 			ne.lineCount = nRows.length;
 			nodeLines[n.id] = lines;
 			ne.lines = lines; // the FIELD lines, one per value, whatever shape they were drawn in
-			try { ne.tw = ne.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
+			try { noteMeasuredWidth(ne, ne.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
@@ -12015,7 +12070,7 @@ var EngCalcs = EngCalcs || {};
 			le.rowsSeq = (le.rowsSeq || 0) + 1;
 			linkLines[l.id] = lines;
 			le.lines = lines;
-			try { le.tw = le.text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
+			try { noteMeasuredWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
 		// laid out for real (text/mask/leader) at its final, possibly-nudged position. The extrema

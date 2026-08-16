@@ -33,6 +33,8 @@ const L = loadLoopedNetwork(
 	// The canvas is authored 10000px tall and only becomes real when applyMapHeight() sizes it.
 	// A harness that never calls that has to say so, exactly as the page does.
 	"\t\tmarkSized: noteMapSized, isSized: function () { return mapSized; },\n" +
+	"\t\tnodeEl: function (id) { return nodeEls[id]; }, linkEl: function (id) { return linkEls[id]; },\n" +
+	"\t\tboxWidth: labelBoxWidth,\n" +
 	"\t\tscale: function () { return state.s; },\n" +
 	// How many times a fit re-lays-out. This is the number the whole redesign is about, so it is
 	// measured rather than described: the version before it spent eight, one per convergence pass.
@@ -232,6 +234,36 @@ console.log('\n--- an overlay reserves its space before it has any text in it --
 	// the "zoomed in" a reader notices.
 	ok('...and NOT the several percent larger that reserving nothing would give',
 		s0 / s1 < 1.02, (s0 / s1).toFixed(4));
+}
+
+// ---- 3b. A ZOOM DOES NOT MEASURE ANYTHING --------------------------------------------------
+// Tom, 2026-08-15, with numbers: "Net3 with labels showing takes over 1 second to render on tab
+// refocus. It takes 3/4 second to zoom to fit. Scroll zooms are about 1/4 second each."
+//
+// The cost was getBBox(): a zoom ran refreshLabelText(), which recomposes every node's and every
+// link's text, rebuilds its tspans and re-measures each one -- ~220 forced synchronous layouts per
+// wheel notch, to redraw glyphs that had not changed. Nothing about the CONTENT depends on the
+// scale. The two things that did are gone: tspan `dy` is in `em` and follows the font-size by
+// itself, and a measured width is banked in PIXELS and divided by the scale on read.
+console.log('\n--- a zoom re-measures nothing ---');
+{
+	let measures = 0;
+	const doc2 = L.getDoc();
+	[...doc2.nodes, ...doc2.links].forEach(function (x) {
+		const el = (L.nodeEl && L.nodeEl(x.id)) || (L.linkEl && L.linkEl(x.id));
+		if (!el || !el.text || el.text._counted) { return; }
+		const real = el.text.getBBox;
+		el.text._counted = true;
+		el.text.getBBox = function () { measures++; return real.apply(this, arguments); };
+	});
+	L.setZoom(2.5);
+	ok('zooming measures no label at all', measures === 0, measures + ' getBBox call(s)');
+	// And the width still tracks the scale, or the saving would be a lie told by a stale number.
+	const le = L.linkEl(doc2.links[0].id);
+	const wAt2 = L.boxWidth(le);
+	L.setZoom(5);
+	ok('...yet the world width still halves when the scale doubles',
+		Math.abs(L.boxWidth(le) * 2 - wAt2) < 1e-9, wAt2 + ' -> ' + L.boxWidth(le));
 }
 
 // ---- 4. "Screen size" always says WHICH dimension ---------------------------------------------

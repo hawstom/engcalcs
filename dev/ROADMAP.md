@@ -1849,6 +1849,31 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|366| **A zoom no longer measures or recomposes anything — DONE 2026-08-15.** Tom's numbers:
+  *"Net3 with labels showing takes over 1 second to render on tab refocus. It takes 3/4 second to
+  zoom to fit. Scroll zooms are about 1/4 second each."* Every zoom ran `refreshLabelText()`, which
+  recomposes every node's and every link's text, rebuilds its tspans and re-measures each one with
+  `getBBox()` — **~220 forced synchronous layouts per wheel notch, to redraw glyphs that had not
+  changed.** Nothing about the CONTENT depends on the scale; two things did, and both are gone:
+  - **tspan `dy` is `1.2em`**, resolved against the element's own font-size, so line spacing follows
+    a zoom by itself. In world units it was stale the instant the scale changed, which is the whole
+    reason the content path had to run.
+  - **a measured width is banked in PIXELS** (`labelBoxWidth`, `textLabelWidth`) and divided by the
+    scale on read. A label's pixel width does not change with the zoom (Task 331), so the world
+    width is arithmetic. Measurement now happens only when content does.
+  A zoom sets font sizes, republishes the symbol properties, and re-lays-out positions. Asserted by
+  counting `getBBox()` calls during a zoom: zero.
+
+- 0|367| **The label mask was eating the pipes — DONE 2026-08-15.** Tom, from a Net3 screenshot where
+  most pipes had gone pale grey with black gaps: *"I think that our labels are masking the pipe?
+  Yes. That's it. Make the mask buffer smaller?"* Right, and the reason was worse than the number:
+  `MASK_PAD` was **0.4 in WORLD units**, so in pixels it grew with the zoom — 0.4px at scale 1 and
+  **~24px on every side** at the scale of that screenshot. An aligned label lies ALONG its pipe
+  (Task 329), so a mask that wide covered the pipe for the label's whole length and beyond, and at
+  75% white the pipe under it reads as pale grey. Now `0.15 × effectiveFontSize()`, which is a fixed
+  1.65px at the shipped lettering because the font size is itself pixels over the scale. Masking a
+  line a label lies on stays — that is what cartography does — but a halo has to be a halo.
+
 - 0|364| **A pan is not a zoom, so it no longer re-lays-out — DONE 2026-08-15.** Tom: *"Net3 with
   labels showing takes over 1 second to render on tab refocus."* Restoring a remembered view ran
   `onZoomChanged()` unconditionally, which rebuilds font sizes, tspan spacing, every label box and
