@@ -1057,8 +1057,15 @@ var EngCalcs = EngCalcs || {};
 		textRow('angle step per circle', function () { return t.steps; },
 			function (v) { t.steps = v; },
 			'One angular step per circle, innermost first, comma separated. How many you type is how many circles there are. 45,30,15 gives 4, 8 and 20 directions \u2014 orthogonal directions are always dropped.');
-		row('neighbour credit k', function () { return t.k; },
-			function (v) { t.k = v; }, 0.05, 'Goal 11. 0 turns the neighbourhood term off entirely.');
+		// LABELLED, not just named. Tom, 2026-08-16: *"Is k the coefficient on the neighbors? I may
+		// need a word or two of labeling."* It is, so the panel says so and shows the formula rather
+		// than making anyone infer it from a single letter.
+		row('elbow room (k)', function () { return t.k; },
+			function (v) { t.k = v; }, 0.05,
+			'Goal 11, the coefficient on the neighbours. A spot is scored as itself PLUS k times the '
+			+ 'average score of the spots around it, so a spot with room beside it beats an equally '
+			+ 'clear one hemmed in. 0 = judge every spot alone. 1 = its surroundings matter as much '
+			+ 'as the spot itself.');
 		row('zoom-to-fit room (text heights)', function () { return t.fitRoom; },
 			function (v) { t.fitRoom = v; }, 1, 'Extra room left on Zoom to fit\u2019s FIRST pass, before labels are placed. Bigger = the first pass sits further out, so labels land more comfortably at the final zoom. Press Zoom to fit to see it.');
 		var g = document.createElement('div');
@@ -1069,6 +1076,10 @@ var EngCalcs = EngCalcs || {};
 			row(key, function () { return Collide.GOAL_WEIGHT[key]; },
 				function (v) { Collide.GOAL_WEIGHT[key] = v; }, 0.01);
 		});
+		var eq = document.createElement('div');
+		eq.setAttribute('style', 'margin-top:2px;opacity:.7;font-size:11px');
+		eq.textContent = 'score = spot + k \u00d7 mean(neighbours)';
+		box.appendChild(eq);
 		var out = document.createElement('div');
 		out.id = 'lpn_label_bench_out';
 		out.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
