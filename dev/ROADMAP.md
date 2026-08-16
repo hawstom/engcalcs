@@ -1860,9 +1860,13 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     Every map ever printed reads a north-south name bottom-to-top. Measured: at the mirrored value
     every one of them read down; at the corrected one every one reads up.
   - **The parameter changed, not just its value**, because a number that can be read in two frames
-    will be. `settings.labelFlipPastVertical` (degrees past vertical, default **20**, clamp 0–45)
-    has no frame to get wrong; the renderer's `bias` is `90 − that`, so his 110 Cartesian is 20 past
-    vertical is a bias of 70. The control reads *"Flip labels past this many degrees from vertical"*.
+    will be. `settings.labelFlipLeftOfVertical` (default **20**, clamp 0–45) has no frame to get
+    wrong; the renderer's `bias` is `90 − that`, so his 110 Cartesian is 20 left of vertical is a
+    bias of 70. The control reads *"Degrees left of vertical before labels flip"*.
+  - **"LEFT OF", NOT "PAST"** — Tom again, an hour later: *"'Past' can be misread. We better say
+    'left of' or more pedantically 'CCW of'. But I think that 'left of' is humanly intuitive. Up
+    always wins. Left of the up vertical."* Past WHAT, in WHICH direction, is the same ambiguity
+    that produced the mirror; "left" names a direction anyone can point at on their own screen.
   - **And the bias setting turned out to be innocent of the ORIGINAL complaint**: measured across
     Elm Street, 90, 110 and 135 give byte-identical results, because its bearings cluster at ~78°
     and ~−10° and nothing lands near any of those doorways. The defect was the sign, not the size.
@@ -1885,7 +1889,8 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     popup, no way to tell a suppressed duplicate from a missed click. The Text tool had no guard, so
     a near-miss stacked a **second label on top of the first**.
   - Both now switch to Select and open what is already there, within `NODE_SNAP_PX` (14 screen px,
-    so the catch is finger-sized at every zoom). `dev/lpn-spike/toolbar-harness.js`.
+    so the catch is the same POINTER SLOP at every zoom — not a touch target; see CLAUDE.md on why a
+    phone must not be reasoned from here). `dev/lpn-spike/toolbar-harness.js`.
 
 - 0|368| **One order for the element types, in all three places — DONE 2026-08-15.** Tom: *"Let's
   change to Junction, Reservoir, Tank, Pipe, Pump, Valve. That's reasonable and follows both our

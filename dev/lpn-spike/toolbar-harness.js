@@ -98,10 +98,13 @@ console.log('\n--- a tap that lands on a node opens it instead of doing nothing 
 	const snap = L.snapPx();
 	// The geometry the rule turns on: within the snap radius in SCREEN pixels, not world units.
 	ok('a node is found under a tap on top of it', L.nearest(100, 100, snap) === n);
-	ok('...and under a tap a few pixels off, which is the fat finger', !!L.nearest(100 + snap - 2, 100, snap));
+	ok('...and under a click a few pixels off, which is the miss being caught', !!L.nearest(100 + snap - 2, 100, snap));
 	ok('...but not one well clear of it', !L.nearest(100 + snap + 6, 100, snap));
 	// Screen pixels, so zooming OUT widens the world-space catch and zooming in narrows it. That is
-	// the right behaviour for a finger, whose size does not change with the zoom.
+	// the right behaviour for POINTER SLOP, which is a property of the hand and the mouse and does
+	// not change with the zoom. (Not "finger-sized": this app is a desktop map editor. Tom,
+	// 2026-08-15: "Don't forget to keep telling yourself 'A phone is almost impossible for this
+	// app.'" A touch target would be 44px, which here would swallow every neighbouring node.)
 	L.setZoom(4);
 	ok('the catch is a screen distance, so it shrinks in world units as you zoom in',
 		!L.nearest(100 * 4 + snap + 6, 100 * 4, snap) && !!L.nearest(100 * 4 + 2, 100 * 4, snap));

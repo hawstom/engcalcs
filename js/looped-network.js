@@ -475,21 +475,22 @@ var EngCalcs = EngCalcs || {};
 	// has said otherwise. See ROADMAP Task 329.
 	// Clamped where it is READ, not where it is written, so a document carrying a wild number from
 	// some future edit still draws something readable rather than upside-down text.
-	var LPN_FLIP_PAST_MIN = 0, LPN_FLIP_PAST_MAX = 45;
-	function labelFlipPastVertical() {
-		var d = +settings.labelFlipPastVertical;
+	var LPN_FLIP_LEFT_MIN = 0, LPN_FLIP_LEFT_MAX = 45;
+	function labelFlipLeftOfVertical() {
+		var d = +settings.labelFlipLeftOfVertical;
 		if (!isFinite(d)) { return 20; }
-		return Math.max(LPN_FLIP_PAST_MIN, Math.min(LPN_FLIP_PAST_MAX, d));
+		return Math.max(LPN_FLIP_LEFT_MIN, Math.min(LPN_FLIP_LEFT_MAX, d));
 	}
 	// The renderer wants the top of its readable window, in the SVG frame where y is down and angles
-	// run clockwise. A label may lean `d` degrees PAST VERTICAL the way a map reads -- so the window
-	// is (-(90 + d), 90 - d], and `90 - d` is what alignedLabelAnchor() calls `bias`.
+	// run clockwise. A label's reading direction may lean `d` degrees LEFT of straight up -- so the
+	// window is (-(90 + d), 90 - d], and `90 - d` is what alignedLabelAnchor() calls `bias`. At
+	// angle -90 the text runs straight up the screen; at -(90 + d) it runs up and to the left.
 	//
 	// **THE SIGN IS THE ENTIRE BUG THIS FIXES.** With d = 0 the window is (-90, 90], which keeps a
 	// pipe drawn at +80 reading TOP-TO-BOTTOM; every map ever printed reads a north-south name
 	// bottom-to-top. A positive d moves the doorway the other way, so near-vertical pipes land at
 	// about -100 and read upward as a family.
-	function labelReadabilityBias() { return 90 - labelFlipPastVertical(); }
+	function labelReadabilityBias() { return 90 - labelFlipLeftOfVertical(); }
 	function linkLabelAligned(l) {
 		return !!settings.alignPipeLabels && l.lx === undefined && l.ly === undefined;
 	}
@@ -624,7 +625,7 @@ var EngCalcs = EngCalcs || {};
 				fontSize: effectiveFontSize(), lineHeight: effectiveLineHeight(),
 				nLines: le.lineCount || 1,
 				// Where the 180-degree readability flip happens (Task 351), converted from the
-				// "degrees past vertical" the user sets -- see labelReadabilityBias().
+				// "degrees left of vertical" the user sets -- see labelReadabilityBias().
 				bias: labelReadabilityBias()
 			},
 			// Both candidates come from the same call, which is why alignedLabelAnchor() returns
@@ -1738,7 +1739,18 @@ var EngCalcs = EngCalcs || {};
 			// aligned-vs-horizontal on a real drawing rather than have the judgement made for him,
 			// and his verdict was *"Ship with it on. Very much earns its keep."*
 			alignPipeLabels: true,
-			// **HOW FAR PAST VERTICAL A LABEL MAY LEAN BEFORE IT TURNS 180 DEGREES**, in degrees.
+			// **HOW FAR LEFT OF VERTICAL A LABEL MAY LEAN BEFORE IT TURNS 180 DEGREES**, in degrees.
+			//
+			// "LEFT OF", NOT "PAST" (Tom, 2026-08-15: *"'Past' can be misread. We better say 'left
+			// of' or more pedantically 'CCW of'. But I think that 'left of' is humanly intuitive. Up
+			// always wins. Left of the up vertical."*). Past what, and in which direction, is exactly
+			// the ambiguity that produced the mirrored value in the first place; "left" names a
+			// direction anybody can point at on their own screen.
+			//
+			// What it means precisely: a label reads along a direction, and the reading direction is
+			// allowed to lean this many degrees ANTICLOCKWISE of straight up before the label turns
+			// 180 degrees to stay readable. Up always wins -- a near-vertical name reads bottom to
+			// top, as it does on every map.
 			//
 			// THIS REPLACED `labelReadabilityBias`, WHICH WAS THE SAME NUMBER MEASURED IN THE WRONG
 			// FRAME, and the mismatch is the whole story (Tom, 2026-08-15, diagnosing it from a
@@ -1750,10 +1762,10 @@ var EngCalcs = EngCalcs || {};
 			// every near-vertical pipe on Elm Street rendered reading TOP-TO-BOTTOM. Cartography
 			// reads a north-south name bottom-to-top, so the whole street looked upside down.
 			//
-			// Stated as "degrees past vertical" it has no frame to get wrong, which is why the
+			// Stated as "degrees left of vertical" it has no frame to get wrong, which is why the
 			// parameter changed rather than just its value. 20 is his 110 said the other way.
 			// A project carrying the old key gets this default; the key existed for one day.
-			labelFlipPastVertical: 20,
+			labelFlipLeftOfVertical: 20,
 			// Draw the pale background patch behind every label (ROADMAP Task 330). ON, which is
 			// what the page has always done and what keeps a label legible over a backdrop image --
 			// the control exists because a clean drawing with no backdrop reads better without the
@@ -10253,16 +10265,16 @@ var EngCalcs = EngCalcs || {};
 		// north-south mains wants the doorway well clear of vertical, and a diagonal transmission
 		// main barely cares.
 		var biasInput = document.createElement('input');
-		biasInput.type = 'number'; biasInput.step = '5'; biasInput.min = LPN_FLIP_PAST_MIN; biasInput.max = LPN_FLIP_PAST_MAX;
-		biasInput.value = labelFlipPastVertical();
+		biasInput.type = 'number'; biasInput.step = '5'; biasInput.min = LPN_FLIP_LEFT_MIN; biasInput.max = LPN_FLIP_LEFT_MAX;
+		biasInput.value = labelFlipLeftOfVertical();
 		biasInput.addEventListener('change', function () {
 			var v = +biasInput.value;
-			if (!isFinite(v)) { biasInput.value = labelFlipPastVertical(); return; }
-			settings.labelFlipPastVertical = Math.max(LPN_FLIP_PAST_MIN, Math.min(LPN_FLIP_PAST_MAX, v));
-			biasInput.value = settings.labelFlipPastVertical;
+			if (!isFinite(v)) { biasInput.value = labelFlipLeftOfVertical(); return; }
+			settings.labelFlipLeftOfVertical = Math.max(LPN_FLIP_LEFT_MIN, Math.min(LPN_FLIP_LEFT_MAX, v));
+			biasInput.value = settings.labelFlipLeftOfVertical;
 			relayoutLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_readability_bias || 'Flip labels past this many degrees from vertical', biasInput);
+		row(mapBody, pc.lpn_settings_readability_bias || 'Degrees left of vertical before labels flip', biasInput);
 		// Task 330, and it ships ON because that is what the page has always drawn -- a label over a
 		// backdrop image is unreadable without it, and an upgrade must not restyle anyone's drawing.
 		var maskInput = document.createElement('input');

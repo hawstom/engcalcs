@@ -860,6 +860,18 @@ browser still misbehaves, suspect the stub before the code**: ask which quantity
 varies that the stub holds constant. The fix is to teach the stub the one physical relationship
 under test (here: a screen-sized glyph run is `px/s` in world units), not to add more assertions.
 
+**A PHONE IS ALMOST IMPOSSIBLE FOR THE `lpn_` MAP EDITOR, SO STOP REASONING FROM ONE (Tom,
+2026-08-15).** *"Don't forget to keep telling yourself 'A phone is almost impossible for this
+app.'"* It is a full-window drawing surface with a menu bar, a toolbar, a tab strip and a property
+popup; the other 19 calculators are a form and an answer and are perfectly usable on a phone, but
+this page is not, and the positioning record already demotes the phone. The trap is that a phone
+makes a rhetorically strong argument — touch targets, thumb reach, small screens — and it keeps
+turning up in reasoning about a page nobody will use that way. Twice in one day: a 44px touch
+target justifying a hit radius that would swallow neighbouring nodes, and a phone's screen width
+carrying an argument about sizing units. **Say "pointer slop" when you mean the hand-and-mouse
+tolerance, and check whether a phone is really the case you are designing for before it decides
+anything.** It is legitimate evidence for the SUITE; it is not evidence for this page.
+
 **IDEMPOTENCE IS THE CHEAPEST STRONG ASSERTION FOR ANYTHING THAT SETS A VIEW OR A LAYOUT (Tom,
 2026-08-15).** His test for zoom-to-fit was *"open, reload, or switch and then zoom extents. Ideally
 nothing happens"* — and it found a defect that start-independence testing had missed. Applying an
