@@ -1849,6 +1849,44 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|369| **The aligned-label flip was measured in the wrong FRAME — DONE 2026-08-15.** Tom, from a
+  screenshot of Elm Street with upside-down labels, diagnosing it himself: *"Cartesian angles are
+  from the x axis counter-clockwise. You and I spoke different languages about the meaning of
+  'angle'."* Exactly that. He asked for a 110-degree tolerance in CARTESIAN terms (counter-clockwise,
+  y up); the renderer works in SVG's frame, where y is DOWN and the same arithmetic runs CLOCKWISE,
+  so it arrived MIRRORED — the tolerance landed on the wrong side of vertical.
+  - **The consequence was a whole street reading the wrong way.** All eleven of Elm Street's
+    near-vertical pipes rendered at +74° to +80°, and a `rotate(+a)` label reads TOP-TO-BOTTOM.
+    Every map ever printed reads a north-south name bottom-to-top. Measured: at the mirrored value
+    every one of them read down; at the corrected one every one reads up.
+  - **The parameter changed, not just its value**, because a number that can be read in two frames
+    will be. `settings.labelFlipPastVertical` (degrees past vertical, default **20**, clamp 0–45)
+    has no frame to get wrong; the renderer's `bias` is `90 − that`, so his 110 Cartesian is 20 past
+    vertical is a bias of 70. The control reads *"Flip labels past this many degrees from vertical"*.
+  - **And the bias setting turned out to be innocent of the ORIGINAL complaint**: measured across
+    Elm Street, 90, 110 and 135 give byte-identical results, because its bearings cluster at ~78°
+    and ~−10° and nothing lands near any of those doorways. The defect was the sign, not the size.
+  - Guarded in two places, because the two halves fail differently: `geom-harness.js` checks the
+    geometry against real Elm Street bearings, and `label-repeat-harness.js` checks the WIRING
+    through `settings` — flipping the sign in `labelReadabilityBias()` is invisible to the first.
+
+- 0|370| **The toolbar carries Save and Save as; the fat-finger tap opens what is there — DONE
+  2026-08-15.** Tom: *"Let's remove New project and Background image from the toolbar and add Save
+  and (since our paradigm often makes it the only choice) Save as…"* New project is once per
+  project and a background image is once per project at most; saving is every few minutes. Save As
+  earns its own slot because on this page it is frequently the only thing Save can mean — a browser
+  project has no file, and a read-only project cannot write back to one. Both removed commands stay
+  in the menus, and `wireBackdropMenu()` is still called with no container so the file picker keeps
+  its listener.
+  - **The two add tools answered the same gesture two different wrong ways, and Tom named the second
+    one from the outside**: *"Actually I think it's schizophrenic. Maybe no-op for the elements and
+    double-insert for the text? That would explain my experience."* Exactly right. The node tools
+    already refused to place a node on an existing one and then **did nothing at all** — no node, no
+    popup, no way to tell a suppressed duplicate from a missed click. The Text tool had no guard, so
+    a near-miss stacked a **second label on top of the first**.
+  - Both now switch to Select and open what is already there, within `NODE_SNAP_PX` (14 screen px,
+    so the catch is finger-sized at every zoom). `dev/lpn-spike/toolbar-harness.js`.
+
 - 0|368| **One order for the element types, in all three places — DONE 2026-08-15.** Tom: *"Let's
   change to Junction, Reservoir, Tank, Pipe, Pump, Valve. That's reasonable and follows both our
   examples,"* then *"Settings ID list should follow menu order."* Nodes then links, each in the

@@ -252,6 +252,41 @@ console.log('\n--- a chain cannot slide, but it can change sides ---');
 	L.relayout();
 }
 
+// ---- 4c. A NEAR-VERTICAL PIPE READS BOTTOM-TO-TOP, AT THE SHIPPED SETTING ----------------------
+// The geometry of the flip is geom-harness.js's; what this checks is the WIRING, which is where the
+// bug lived. Tom, from a screenshot of Elm Street: "The wrong labels are oriented wrong (upside
+// down)... Cartesian angles are from the x axis counter-clockwise. You and I spoke different
+// languages about the meaning of 'angle'." He asked for the tolerance in Cartesian degrees
+// (counter-clockwise, y up); the renderer works in SVG's frame, where y is down and the same
+// arithmetic runs clockwise, so the number arrived MIRRORED and every near-vertical pipe read
+// top-to-bottom. A rotate(+a) label reads top-to-bottom, so the requirement is a NEGATIVE angle --
+// and asserting it here, through settings rather than through an explicit bias argument, is what
+// would have caught the mirror.
+console.log('\n--- a near-vertical pipe reads the way a map reads ---');
+{
+	const top = L.addNode('junction', 900, 0);
+	const bot = L.addNode('junction', 920, 400);      // 87 degrees: Elm Street's own cluster
+	const vert = L.addLink('pipe', top.id, bot.id);
+	L.setSetting('alignPipeLabels', true);
+	L.refreshLabelText();
+	const a = L.placement(vert, L.linkEl(vert.id), 0.5);
+	ok('it reads bottom-to-top, not top-to-bottom', a.angle < -20, a.angle.toFixed(1) + '°');
+	ok('...and no further past vertical than the setting allows', a.angle >= -110 - 1e-9,
+		a.angle.toFixed(1) + '°');
+	// The same pipe drawn the other way must land on the same answer, or the drawing reads as
+	// though the direction were chosen at random.
+	const flipped = L.addLink('pipe', bot.id, top.id);
+	L.refreshLabelText();
+	ok('...and the same pipe drawn upward agrees with it',
+		Math.abs(L.placement(flipped, L.linkEl(flipped.id), 0.5).angle - a.angle) < 1e-9);
+	L.getDoc().links.pop();
+	L.getDoc().links.pop();
+	L.getDoc().nodes.pop();
+	L.getDoc().nodes.pop();
+	L.setSetting('alignPipeLabels', false);
+	L.relayout();
+}
+
 // ---- 5. A label the user placed by hand is never copied ---------------------------------------
 console.log('\n--- a dragged label is one label ---');
 {

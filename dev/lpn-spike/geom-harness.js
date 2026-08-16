@@ -234,51 +234,55 @@ report(c5 && near(c5.t1 - c5.t0, 100 / 120), 'a line along the top edge is kept,
 	report(worstAngle <= 90 + 1e-9, 'aligned: text is never upside down at any pipe bearing',
 		`max |angle| = ${worstAngle.toFixed(1)}°`);
 
-	// -- THE READABILITY BIAS: where the flip happens (Task 351, Tom 2026-08-15)
+	// -- WHICH WAY A NEAR-VERTICAL LABEL READS (Task 351, and the frame bug that followed it)
 	//
-	// THE DEFECT THE NUMBER FIXES IS A KNIFE EDGE ON VERTICAL. The window is (bias - 180, bias],
-	// so at 90 the decision boundary sits exactly where most water mains are drawn -- and two
-	// parallel vertical pipes drawn in opposite directions land either side of it and read in
-	// opposite directions, over a difference of a tenth of a degree. These four checks are the
-	// before and after of exactly that pair.
+	// **EVERY MAP EVER PRINTED READS A NORTH-SOUTH NAME BOTTOM-TO-TOP**, and for a day this page
+	// read them top-to-bottom. Tom, from a screenshot of Elm Street: "The wrong labels are oriented
+	// wrong (upside down)... Cartesian angles are from the x axis counter-clockwise. You and I spoke
+	// different languages about the meaning of 'angle'."
+	//
+	// He asked for a tolerance of 110 degrees in CARTESIAN terms -- counter-clockwise, y up. The
+	// renderer works in SVG's frame, where y is DOWN and the same arithmetic runs CLOCKWISE, so the
+	// number came out MIRRORED: the tolerance landed on the wrong side of vertical and all eleven of
+	// Elm Street's near-vertical pipes rendered reading downward. The setting is now expressed as
+	// "degrees past vertical", which has no frame to get wrong; `bias` here is 90 minus that, so his
+	// 20 degrees past vertical is a bias of 70.
+	//
+	// A rotate(+a) label reads top-to-bottom and a rotate(-a) label reads bottom-to-top, so the
+	// requirement is simply that a near-vertical pipe comes out NEGATIVE.
 	{
-		// TWO DIFFERENT PIPES, not one pipe drawn twice -- that distinction is the whole point, and
-		// the first draft of this check got it wrong. A pipe and its own reverse always agree (the
-		// direction-invariance check below guarantees it). These two lean a tenth of a degree to
-		// OPPOSITE sides of vertical, so they are genuinely different bearings, and at bias 90 they
-		// sit either side of the doorway.
-		const leanA = { x: 0.1, y: -100 };   // a hair west of straight up  (deg -89.94)
-		const leanB = { x: 0.1, y: 100 };    // a hair west of straight down (deg +89.94)
-		const a90 = Geom.alignedLabelAnchor(0, 0, leanA.x, leanA.y, Object.assign({ bias: 90 }, O));
-		const b90 = Geom.alignedLabelAnchor(0, 0, leanB.x, leanB.y, Object.assign({ bias: 90 }, O));
-		report(Math.abs(a90.angle - b90.angle) > 170,
-			'bias 90: two pipes a tenth of a degree apart read in OPPOSITE directions -- the defect',
-			`${a90.angle.toFixed(2)}° vs ${b90.angle.toFixed(2)}°`);
-		const a110 = Geom.alignedLabelAnchor(0, 0, leanA.x, leanA.y, Object.assign({ bias: 110 }, O));
-		const b110 = Geom.alignedLabelAnchor(0, 0, leanB.x, leanB.y, Object.assign({ bias: 110 }, O));
-		report(Math.abs(a110.angle - b110.angle) < 1,
-			'bias 110: the same two pipes read the same way',
-			`${a110.angle.toFixed(2)}° vs ${b110.angle.toFixed(2)}°`);
-		// The window really is (bias - 180, bias], so the worst tilt a label can take is the bias
-		// itself -- 20 degrees past vertical at the default. A head-tilt, never upside down.
-		let worst = 0;
-		for (let deg = -180; deg < 180; deg += 1) {
-			const r = Math.PI * deg / 180;
-			const a = Geom.alignedLabelAnchor(0, 0, 100 * Math.cos(r), 100 * Math.sin(r),
-				Object.assign({ bias: 110 }, O));
-			worst = Math.max(worst, Math.abs(a.angle));
+		function angleAt(deg, bias) {
+			var r = Math.PI * deg / 180;
+			return Geom.alignedLabelAnchor(0, 0, 100 * Math.cos(r), 100 * Math.sin(r),
+				Object.assign({ bias: bias }, O)).angle;
 		}
-		report(worst <= 110 + 1e-9, 'bias 110: no label is ever tilted further than the bias itself',
-			`max |angle| = ${worst.toFixed(1)}°`);
-		// A horizontal pipe must stay horizontal at every legal bias, or the setting has broken the
-		// commonest case in the drawing while fixing the second commonest.
-		let horizOk = true;
-		for (let b = 90; b <= 135; b += 5) {
-			const e = Geom.alignedLabelAnchor(0, 0, 100, 0, Object.assign({ bias: b }, O));
-			const w = Geom.alignedLabelAnchor(0, 0, -100, 0, Object.assign({ bias: b }, O));
-			if (Math.abs(e.angle) > 1e-9 || Math.abs(w.angle) > 1e-9) { horizOk = false; }
+		// Elm Street's real cluster, both directions of drawing: 74 to 80 and their reverses.
+		var street = [74, 78, 80.5, -100.3, -106, -99.5];
+		report(street.every(function (d) { return angleAt(d, 70) < -20; }),
+			'at the shipped setting, every near-vertical pipe reads BOTTOM-TO-TOP',
+			street.map(function (d) { return d + '->' + angleAt(d, 70).toFixed(0); }).join(' '));
+		// The defect, kept as a measurement rather than a memory: the mirrored value did the
+		// opposite, on the same pipes.
+		report(street.every(function (d) { return angleAt(d, 110) > 20; }),
+			'...and the mirrored setting made every one of them read top-to-bottom -- the bug',
+			street.map(function (d) { return d + '->' + angleAt(d, 110).toFixed(0); }).join(' '));
+		// A pipe drawn one way and the same pipe drawn the other must still agree, which is what
+		// the flip is FOR and what no choice of tolerance may break.
+		report(Math.abs(angleAt(74, 70) - angleAt(74 - 180, 70)) < 1e-9,
+			'a pipe and its own reverse still agree, whatever the tolerance');
+		// Horizontal is untouched at every legal setting: it is the commonest case in any drawing
+		// and it must not be traded away to fix the vertical one.
+		var horizOk = true;
+		for (var d = 0; d <= 45; d += 5) {
+			if (Math.abs(angleAt(0, 90 - d)) > 1e-9 || Math.abs(angleAt(180, 90 - d)) > 1e-9) { horizOk = false; }
 		}
-		report(horizOk, 'an east-west pipe reads horizontally at every bias in range');
+		report(horizOk, 'an east-west pipe still reads horizontally at every setting in range');
+		// And nothing is ever more than a head-tilt from upright: the window is 180 wide wherever it
+		// sits, so the worst tilt is 90 plus the tolerance.
+		var worst = 0;
+		for (var g = -180; g < 180; g += 1) { worst = Math.max(worst, Math.abs(angleAt(g, 70))); }
+		report(worst <= 110 + 1e-9, 'no label leans further than vertical plus the tolerance',
+			'max |angle| = ' + worst.toFixed(1) + '°');
 	}
 
 	// -- THE ONE THAT MATTERS: drawing direction must not change the result

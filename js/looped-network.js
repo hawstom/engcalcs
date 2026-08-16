@@ -475,12 +475,21 @@ var EngCalcs = EngCalcs || {};
 	// has said otherwise. See ROADMAP Task 329.
 	// Clamped where it is READ, not where it is written, so a document carrying a wild number from
 	// some future edit still draws something readable rather than upside-down text.
-	var LPN_BIAS_MIN = 90, LPN_BIAS_MAX = 135;
-	function labelReadabilityBias() {
-		var b = +settings.labelReadabilityBias;
-		if (!isFinite(b)) { return 110; }
-		return Math.max(LPN_BIAS_MIN, Math.min(LPN_BIAS_MAX, b));
+	var LPN_FLIP_PAST_MIN = 0, LPN_FLIP_PAST_MAX = 45;
+	function labelFlipPastVertical() {
+		var d = +settings.labelFlipPastVertical;
+		if (!isFinite(d)) { return 20; }
+		return Math.max(LPN_FLIP_PAST_MIN, Math.min(LPN_FLIP_PAST_MAX, d));
 	}
+	// The renderer wants the top of its readable window, in the SVG frame where y is down and angles
+	// run clockwise. A label may lean `d` degrees PAST VERTICAL the way a map reads -- so the window
+	// is (-(90 + d), 90 - d], and `90 - d` is what alignedLabelAnchor() calls `bias`.
+	//
+	// **THE SIGN IS THE ENTIRE BUG THIS FIXES.** With d = 0 the window is (-90, 90], which keeps a
+	// pipe drawn at +80 reading TOP-TO-BOTTOM; every map ever printed reads a north-south name
+	// bottom-to-top. A positive d moves the doorway the other way, so near-vertical pipes land at
+	// about -100 and read upward as a family.
+	function labelReadabilityBias() { return 90 - labelFlipPastVertical(); }
 	function linkLabelAligned(l) {
 		return !!settings.alignPipeLabels && l.lx === undefined && l.ly === undefined;
 	}
@@ -614,8 +623,8 @@ var EngCalcs = EngCalcs || {};
 				frac: 0, gap: nodeRadius({ type: 'junction' }) + effectiveFontSize() * 0.35,
 				fontSize: effectiveFontSize(), lineHeight: effectiveLineHeight(),
 				nLines: le.lineCount || 1,
-				// Where the 180-degree readability flip happens (Task 351). See
-				// alignedLabelAnchor() for why 90 is the worst possible place for it.
+				// Where the 180-degree readability flip happens (Task 351), converted from the
+				// "degrees past vertical" the user sets -- see labelReadabilityBias().
 				bias: labelReadabilityBias()
 			},
 			// Both candidates come from the same call, which is why alignedLabelAnchor() returns
@@ -1729,13 +1738,22 @@ var EngCalcs = EngCalcs || {};
 			// aligned-vs-horizontal on a real drawing rather than have the judgement made for him,
 			// and his verdict was *"Ship with it on. Very much earns its keep."*
 			alignPipeLabels: true,
-			// The angle at which an aligned label turns 180 degrees to stay readable, in degrees
-			// (Tom, 2026-08-15). The window is (bias - 180, bias], so 90 puts the decision boundary
-			// exactly on vertical -- where most mains are -- and two parallel vertical pipes drawn
-			// in opposite directions get labels reading opposite ways. 110 moves that doorway past
-			// the crowd. Clamped to 90..135 by labelReadabilityBias(): below 90 the window excludes
-			// horizontal, and well past 135 the text is more upside down than not.
-			labelReadabilityBias: 110,
+			// **HOW FAR PAST VERTICAL A LABEL MAY LEAN BEFORE IT TURNS 180 DEGREES**, in degrees.
+			//
+			// THIS REPLACED `labelReadabilityBias`, WHICH WAS THE SAME NUMBER MEASURED IN THE WRONG
+			// FRAME, and the mismatch is the whole story (Tom, 2026-08-15, diagnosing it from a
+			// screenshot of upside-down labels: *"Cartesian angles are from the x axis
+			// counter-clockwise. You and I spoke different languages about the meaning of
+			// 'angle'."*). He asked for 110 in CARTESIAN degrees -- counter-clockwise, y up. The
+			// renderer works in SVG's frame, where y is DOWN and the same arithmetic runs CLOCKWISE,
+			// so 110 came out mirrored: the tolerance was applied to the wrong side of vertical and
+			// every near-vertical pipe on Elm Street rendered reading TOP-TO-BOTTOM. Cartography
+			// reads a north-south name bottom-to-top, so the whole street looked upside down.
+			//
+			// Stated as "degrees past vertical" it has no frame to get wrong, which is why the
+			// parameter changed rather than just its value. 20 is his 110 said the other way.
+			// A project carrying the old key gets this default; the key existed for one day.
+			labelFlipPastVertical: 20,
 			// Draw the pale background patch behind every label (ROADMAP Task 330). ON, which is
 			// what the page has always done and what keeps a label legible over a backdrop image --
 			// the control exists because a clean drawing with no backdrop reads better without the
@@ -1874,6 +1892,22 @@ var EngCalcs = EngCalcs || {};
 	// world-unit tolerance at 10% zoom would be visually huge, and a loose one at 500% zoom would
 	// be invisible.
 	var NODE_SNAP_PX = 14;
+	// The Text-label sibling of nearestNodeNearScreen(), added 2026-08-15 for the fat-finger rule.
+	// Measured to the label's ANCHOR POINT rather than its box, and at the same NODE_SNAP_PX: "very
+	// near where you just put something" is Tom's own framing, and an anchor distance cannot make a
+	// large title block into a no-go zone the way its bounding box would.
+	function nearestLabelNearScreen(clientX, clientY, pxTolerance) {
+		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, lb, an, px, py, dPx;
+		for (i = 0; i < doc.labels.length; i++) {
+			lb = doc.labels[i];
+			an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
+			px = an ? an.x + lb.x : lb.x;
+			py = an ? an.y + lb.y : lb.y;
+			dPx = Math.hypot(px - w.x, py - w.y) * state.s;
+			if (dPx <= bestPx) { best = lb; bestPx = dPx; }
+		}
+		return best;
+	}
 	function nearestNodeNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, n, dPx;
 		for (i = 0; i < doc.nodes.length; i++) {
@@ -3415,6 +3449,12 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove', fn: function () { backdropAction('remove'); }, disabled: !backdrop }
 		]);
 	}
+	// `into` is optional as of 2026-08-15. The toolbar button is GONE (Tom: *"remove New project and
+	// Background image from the toolbar"*) and Insert ▸ Background image is the only door -- but the
+	// FILE INPUT's change handler still has to be attached, and it lived in here. Called with no
+	// argument, this wires the picker and builds no button. Dropping the whole call would have left
+	// the menu row opening a file dialog whose result nothing listened for: a picker that silently
+	// does nothing, which is the worst kind of broken.
 	function wireBackdropMenu(into) {
 		var pc = EngCalcs.pageConfig || {}, menu = document.createElement('button');
 		menu.type = 'button';
@@ -3455,7 +3495,7 @@ var EngCalcs = EngCalcs || {};
 			};
 			reader.readAsDataURL(img);
 		});
-		into.appendChild(menu);
+		if (into) { into.appendChild(menu); }
 	}
 
 	// ---- pan / zoom / pinch / drag ----
@@ -8132,22 +8172,35 @@ var EngCalcs = EngCalcs || {};
 		// fit -- which is what a toolbar is for. "Clear project" is gone entirely; its replacement,
 		// Edit -> Delete network, is a menu command because it is rare and destructive, and those two
 		// properties together are the definition of something that does NOT belong on a toolbar.
+		// **THE TWO COMMANDS ON THIS TOOLBAR ARE SAVE AND SAVE AS** (Tom, 2026-08-15: *"I'm thinking
+		// optimal UX. Let's remove New project and Background image from the toolbar and add Save
+		// and (since our paradigm often makes it the only choice) Save as…"*).
+		//
+		// A toolbar slot is the most expensive space on the page and it should hold what a person
+		// does OFTEN. New project is once per project, and Background image is once per project at
+		// most and never at all for the majority who have no aerial to hang the network on; both are
+		// still in the menus, which is where a once-per-project command belongs. Saving is the thing
+		// you do every few minutes, forever.
+		//
+		// AND SAVE AS IS NOT A SECOND-CLASS TWIN HERE, which is why it earns its own slot rather than
+		// hiding behind Save: a browser project has no file yet and a read-only project cannot write
+		// back to one, so on this page Save As is frequently the ONLY thing Save can mean. Both
+		// buttons, always, so the one that will work is on screen.
 		var fileGroup = group();
-		// **"New project", not "Draw example network"** (Task 264, Tom 2026-08-10). The button is in
-		// the same place and does the more general thing: it opens File > New project, whose first
-		// row is Blank project and whose others are the examples. A toolbar button that could only
-		// ever produce the example was the narrowest possible use of the most prominent slot, and it
-		// read as "open a sample" to a user who wanted to start work.
-		var newBtn = document.createElement('button');
-		newBtn.type = 'button';
-		setLabel(newBtn, 'new', pc.lpn_file_new || 'New project…');
-		// stopPropagation for the same reason every menubar item does it (see buildMenuBar): without
-		// it this click carries on to the document dismissal in wireTabs(), which sees a click
-		// outside #lpn_menu_popup and closes the menu that was just opened.
-		newBtn.addEventListener('click', function (e) { e.stopPropagation(); openNewProjectMenu(e.currentTarget); });
-		newBtn.dataset.edits = '1';
-		fileGroup.appendChild(newBtn);
-		wireBackdropMenu(fileGroup);
+		var saveBtn = document.createElement('button');
+		saveBtn.type = 'button';
+		setLabel(saveBtn, 'save', pc.lpn_file_save || 'Save');
+		if (pc.lpn_file_save_tip) { saveBtn.title = pc.lpn_file_save_tip; }
+		saveBtn.addEventListener('click', function () { saveCurrent(); });
+		fileGroup.appendChild(saveBtn);
+		// The picker still needs its listener even though its button has gone -- see wireBackdropMenu().
+		wireBackdropMenu();
+		var saveAsBtn = document.createElement('button');
+		saveAsBtn.type = 'button';
+		setLabel(saveAsBtn, 'saveas', pc.lpn_file_saveas || 'Save as…');
+		if (pc.lpn_file_saveas_tip) { saveAsBtn.title = pc.lpn_file_saveas_tip; }
+		saveAsBtn.addEventListener('click', function () { saveAs(); });
+		fileGroup.appendChild(saveAsBtn);
 
 		// `data-edits` is VESTIGIAL since Task 211 and nothing reads it. It marked the controls that
 		// read-only used to disable -- back when read-only took editing away. It no longer does:
@@ -8722,13 +8775,50 @@ var EngCalcs = EngCalcs || {};
 			if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
 				// Snap-on-create: a click within NODE_SNAP_PX of an existing node reuses it instead
 				// of creating a new, overlapping one -- see nearestNodeNearScreen()'s comment.
-				if (!nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX)) {
+				var onNode = nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
+				if (onNode) {
+					// **A MISS THAT LANDS ON WHAT YOU JUST PLACED OPENS IT** (Tom, 2026-08-15: *"If
+					// they click very near to the same location they just added something, it puts
+					// them in Select/edit mode and opens that element. This will remove a major 'fat
+					// finger' issue."*).
+					//
+					// THE OLD BEHAVIOUR WAS WORSE THAN HE KNEW: this branch already refused to place
+					// a second node on top of an existing one, and then did NOTHING AT ALL. The user
+					// taps, nothing appears, nothing opens, and there is no way to tell a
+					// suppressed duplicate from a click the page missed. Silence is the one response
+					// that teaches nothing.
+					//
+					// Guessing what they meant is safe here precisely because the alternative was
+					// nothing: at worst they wanted a node 14 pixels away, and the popup they get
+					// tells them exactly where the existing one is. Switching to Select is Tom's
+					// call and the right one -- placing a node ON a node is not a thing anyone does
+					// twice on purpose, so the tap is far likelier to be the end of the add spree
+					// than the middle of it.
+					setMode('select');
+					openPopup(onNode.id, e.clientX, e.clientY);
+				} else {
 					saveUndoSnapshot();
 					logLpnFirstAction('element');
 					addNode(mode.slice('add-'.length), w.x, w.y);
 				}
 			}
 			else if (mode === 'add-text') {
+				// **THE OTHER HALF OF THE FAT-FINGER RULE, AND TOM NAMED IT FROM THE OUTSIDE**
+				// (2026-08-15, on being told the node tools answered a near-miss with silence:
+				// *"Well, that sheds some light. Actually I think it's schizophrenic. Maybe no-op
+				// for the elements and double-insert for the text? That would explain my
+				// experience."*). Exactly right: this branch had no such guard at all, so a tap on
+				// the Text you had just placed made a SECOND one directly on top of it -- two labels
+				// where one was wanted, the top one dragging away to reveal the other later.
+				//
+				// Two tools, two different wrong answers to the same gesture. Now both open what is
+				// already there. The node branch above has the argument for switching to Select.
+				var onLabel = nearestLabelNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
+				if (onLabel) {
+					setMode('select');
+					openLabelPopup(onLabel.id, e.clientX, e.clientY);
+					return;
+				}
 				saveUndoSnapshot();
 				// Snap to a nearby node the same way add-pipe/add-pump do (Tom, 2026-07-30: "I
 				// thought we programmed a leader for it if placed near a node... now it's gone" --
@@ -10163,16 +10253,16 @@ var EngCalcs = EngCalcs || {};
 		// north-south mains wants the doorway well clear of vertical, and a diagonal transmission
 		// main barely cares.
 		var biasInput = document.createElement('input');
-		biasInput.type = 'number'; biasInput.step = '5'; biasInput.min = LPN_BIAS_MIN; biasInput.max = LPN_BIAS_MAX;
-		biasInput.value = labelReadabilityBias();
+		biasInput.type = 'number'; biasInput.step = '5'; biasInput.min = LPN_FLIP_PAST_MIN; biasInput.max = LPN_FLIP_PAST_MAX;
+		biasInput.value = labelFlipPastVertical();
 		biasInput.addEventListener('change', function () {
 			var v = +biasInput.value;
-			if (!isFinite(v)) { biasInput.value = labelReadabilityBias(); return; }
-			settings.labelReadabilityBias = Math.max(LPN_BIAS_MIN, Math.min(LPN_BIAS_MAX, v));
-			biasInput.value = settings.labelReadabilityBias;
+			if (!isFinite(v)) { biasInput.value = labelFlipPastVertical(); return; }
+			settings.labelFlipPastVertical = Math.max(LPN_FLIP_PAST_MIN, Math.min(LPN_FLIP_PAST_MAX, v));
+			biasInput.value = settings.labelFlipPastVertical;
 			relayoutLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_readability_bias || 'Flip labels to stay readable past (degrees)', biasInput);
+		row(mapBody, pc.lpn_settings_readability_bias || 'Flip labels past this many degrees from vertical', biasInput);
 		// Task 330, and it ships ON because that is what the page has always drawn -- a label over a
 		// backdrop image is unreadable without it, and an upgrade must not restyle anyone's drawing.
 		var maskInput = document.createElement('input');
