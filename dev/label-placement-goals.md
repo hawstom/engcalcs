@@ -22,13 +22,26 @@ Definitions:
 4. **Labels avoid Symbols.**
 5. **Leaders avoid Symbols.**
 6. **Labels avoid Links.**
-7. **Leaders avoid orthogonality** (horizontality and verticality). They try to be 10 degrees away
-   from orthogonal.
-8. **Leaders avoid Links.**
-9. **Labels leave padding for later.** A small change nearby should not rearrange the whole map.
-10. **Labels minimize distance.**
-11. **Labels seek the direction of least congestion.** Directions with the lowest sum aggregate
-    candidate score are preferred.
+7. **Leaders avoid Links.**
+8. **Labels minimize distance.**
+
+Tom trimmed the list on 2026-08-16. Four goals came off, and each for a reason worth keeping:
+
+- **Leaders avoid orthogonality** — folded into the candidate ANGLES. *"Constrain leader angles to
+  be at multiples of 15 degrees and not orthogonal. In other words, we don't check oddball angles,
+  so we don't look ugly."* An ugly angle is never proposed, so nothing scores it.
+- **Leaders agree in angle with each other** — proposed and rejected the same day, for the same
+  reason: the 15-degree grid already prevents disagreement finer than 15 degrees.
+- **Labels leave padding for later** — *"redundant with scoring its neighbors."*
+- **Labels seek the direction of least congestion** — *"covered by including the neighbors in the
+  calculation."* It is the neighbourhood term, not a rank.
+- **A label needing no leader at all** was proposed as a bonus and refused outright: *"Don't reward
+  'no leader'."*
+
+**On distance, which is rank 8 and easy to get wrong.** It is not a proxy for association — a
+leader does that job. Tom, on a claim that distance only matters because leaders look busy:
+*"Wrong. Distance covers a lot of sins. Let it be the proxy; it's easy. Measure it any way you want,
+but be consistent, and short wins, but it's a weak ranker."*
 
 **Deliberately NOT a goal:** keeping auto-placed labels at their initial position or side.
 
@@ -79,11 +92,26 @@ All three were open questions and all three were measured, in
 `dev/lpn-spike/collide-harness.js`, on a deliberately over-constrained fixture: twenty-five labels
 on a 5×5 grid one label-width apart, which is Net3's own situation and has no conflict-free answer.
 
-- **The candidate set is the thin one, and it stayed thin.** Eight directions at two radii plus the
-  current placement — seventeen. Tom, on a proposal to start at 48: *"Not so fast. Let's try it."*
-  Measured: a ring four times as dense, scored with the same scorer, could improve the total by
-  **0.64 across all twenty-five labels** — where one label lying on another costs 1.0 on its own.
-  The extra 130 candidates per label buy about a twentieth of one avoided conflict each.
+- **The reach was far too small and is now set in TEXT HEIGHTS.** It was 28 screen pixels, and a
+  3-line label at the default text size is 50 × 38.5 px — the whole search disc fitted inside the
+  label, and four of its seventeen candidates sat within the label's own footprint. No candidate
+  could clear anything. Tom: *"There is no such thing [as a legibility cap], or lets say it's more
+  than 5 * the label size. Leaders work. That's what they are for."* Now **30 text heights**, with
+  the inner circle at 6 — one number for the whole map, not one per label (*"A single one is better,
+  I think. I didn't specify per label."*).
+- **The near circles carry fewer directions than the far ones.** Tom: *"I assume that we will
+  economize by omitting some of the angles on the nearer circle(s)."* Right, and the arc says by how
+  much — at 15 degrees apart two candidates on the inner circle are a few pixels apart and score
+  alike. Each circle takes the coarsest step (15/30/60/120) whose arc is under the target, giving
+  6 / 12 / 20 / 20 directions outward: **59 candidates**, not 80.
+- **All of it is adjustable live under `?debug=labels`** — reach, inner circle, number of circles,
+  arc spacing, `k`, zoom-to-fit room, and every rank weight, with a readout of overlapping label
+  pairs and mean travel.
+- **`k` = 0.25, measured against the OLD 17-candidate set, and the measurement no longer holds.**
+  With the reach at 30 text heights the same sweep makes k = 0 best on both quantities — the
+  neighbourhood term appears to have been compensating for a candidate set too small to reach open
+  space. **The shipped value is unchanged pending Tom's ruling**, because goal 11 is his; the sweep
+  is printed by `collide-harness.js` every run. Original measurement follows.
 - **`k` = 0.25, and it is not the value that was guessed.** The first draft shipped 0.5 on the
   reasoning that more smoothing is more stability. Measured over four perturbation sizes, 0.25 is
   the joint minimum of both quantities it was chosen on — 12 changed placements of 96 chances

@@ -748,14 +748,32 @@ var EngCalcs = EngCalcs || {};
 	// temporary."* The extension is the nudge, which is transient (re-derived from scratch on every
 	// pass, never written into n.lx/l.ly), so it is neither undo-tracked nor persisted.
 	//
-	// THE REACH IS IN SCREEN PIXELS, because "too far to associate with its element" is a fact about
-	// reading rather than about the model. 28px was measured: on Net3 the old relaxation's MEDIAN
-	// node label sat 85 screen pixels from its node and the worst 301, on a 1400px canvas, and Tom's
-	// verdict on the two he pointed at was *"Far away... They should be on the opposite side of the
-	// model."* The inner ring at 0.4 of it is about 11px, which is where an undisturbed label
-	// already sits. Nothing is capped afterwards -- the candidates are all within reach by
-	// construction, which is what retired capNudges() and the collisions it used to re-create.
-	var LPN_LABEL_REACH_PX = 28, LPN_INNER_FRAC = 0.4;
+	// **THE REACH IS A MULTIPLE OF THE LABEL'S OWN SIZE, NOT A PIXEL COUNT** (Tom, 2026-08-16).
+	// It was 28 screen pixels, and a 3-line label at the default text size is 50 x 38.5 px -- so the
+	// whole search disc fitted INSIDE the label and four of its seventeen candidates sat within the
+	// label's own footprint. The pass could shuffle a label but never move it clear of anything.
+	//
+	// 28 px had been justified as a legibility cap, on the reasoning that a distant label cannot be
+	// associated with its element. Tom rejected that reasoning: *"There is no such thing, or lets
+	// say it's more than 5 * the label size. Leaders work. That's what they are for. This is not a
+	// thing and too many leaders is a thing. Distance miserliness is solely a function of leaders
+	// looking too busy and ugly, especially when they vary in angle."* The busy-and-ugly half is
+	// answered by the 15-degree angle grid in js/lpn-collide.js, not by keeping labels near.
+	//
+	// **MEASURED IN TEXT HEIGHTS, AND ONE NUMBER FOR THE WHOLE MAP.** Tom asked for the control in
+	// exactly those terms (*"in terms of text size per settings; text heights"*) and then ruled out
+	// a per-label reach: *"A single one is better, I think. I didn't specify per label."* Text
+	// heights make it scale with the lettering, which is what a fixed pixel count could not do.
+	//
+	// 30 text heights is about five times a typical 3-line label's diagonal (63 px at textSize 11,
+	// which is 5.7 text heights), so it lands where Tom put the floor: *"more than 5 * the label
+	// size."* The inner ring is a fifth of it -- roughly one label, the smallest step that can clear
+	// a neighbour. Both are adjustable live under ?debug=labels.
+	// `rings` is how many circles between them; `arc` is the target spacing BETWEEN candidates along
+	// a circle, which is what thins the near circles out (Tom: *"we will economize by omitting some
+	// of the angles on the nearer circle(s)"*). All four are live under ?debug=labels.
+	var LPN_REACH_TEXT_HEIGHTS = 30, LPN_INNER_TEXT_HEIGHTS = 6,
+		LPN_RINGS = 4, LPN_ARC_TEXT_HEIGHTS = 7;
 	// **THE NEIGHBOUR CREDIT, `k`.** Goal 11: a candidate is credited for the openness of the
 	// directions AROUND it, so the pass prefers a placement with room beside it to an equally clear
 	// one hemmed in.
@@ -770,7 +788,6 @@ var EngCalcs = EngCalcs || {};
 	// The curve is not monotone (that fixture is a perfect grid, so candidates tie in numbers), which
 	// is exactly why this is a measurement and not a trend to extrapolate.
 	var LPN_NEIGHBOUR_K = 0.25;
-	function labelReachOuter() { return LPN_LABEL_REACH_PX / (state.s || 1); }
 	// A label's own identity in the placement pass, namespaced because a node and a link may mint
 	// the same number under different prefixes and ownership is compared by this string.
 	function nodeLabelKey(id) { return 'n:' + id; }
@@ -932,6 +949,137 @@ var EngCalcs = EngCalcs || {};
 	function debugBoxesOn() {
 		return typeof location !== 'undefined' && /(\?|&)debug=boxes(&|$)/.test(location.search || '');
 	}
+	// ---- ?debug=labels : a bench for the placement pass (Tom, 2026-08-16) -----------------------
+	//
+	// *"It might be good for you to give me a dev control panel for this so that I can play with
+	// radius (in terms of text size per settings; text heights), rank scores, and any other
+	// judgments that could affect this. I would like to ensure that it's really working and be able
+	// to push buttons as I test."*
+	//
+	// A URL PARAMETER AND NOT A SETTINGS SECTION, for the same reason ?debug=boxes is one: a panel
+	// in Settings is a translated string in 27 files and a permanent line in a UI, for a tool whose
+	// whole purpose is to review one algorithm before its numbers are fixed. `?debug=labels` turns
+	// it on, `?debug=labels,boxes` turns both on, and neither ships to anybody who does not type it.
+	//
+	// **REACH IS SHOWN IN LABEL HEIGHTS, WHICH IS THE UNIT TOM ASKED FOR AND THE UNIT THAT MEANS
+	// SOMETHING.** It used to be 28 SCREEN PIXELS, which turned out to be smaller than a label, so
+	// no candidate could ever clear a conflict. A pixel count also silently changes meaning when the
+	// text size does. Everything here is a multiple of the label's own size and nothing is absolute.
+	//
+	// The weights are the RANKS. Editing them is how to find out whether the order in
+	// dev/label-placement-goals.md is really the order Tom wants -- they are written straight into
+	// Collide.GOAL_WEIGHT, which is the one table the scorer reads.
+	function debugOn(name) {
+		if (typeof location === 'undefined') { return false; }
+		var m = /(?:\?|&)debug=([^&]*)/.exec(location.search || '');
+		return !!m && m[1].split(',').indexOf(name) >= 0;
+	}
+	// Defaults live HERE and nowhere else, so the panel and the shipped page cannot disagree about
+	// what the shipped value is -- the panel starts by showing exactly what a visitor gets.
+	var labelTune = null;
+	function labelTuning() {
+		if (!labelTune) {
+			labelTune = { reach: LPN_REACH_TEXT_HEIGHTS, inner: LPN_INNER_TEXT_HEIGHTS,
+				rings: LPN_RINGS, arc: LPN_ARC_TEXT_HEIGHTS, k: LPN_NEIGHBOUR_K,
+				fitRoom: FIT_LABEL_ROOM_TEXT_HEIGHTS };
+		}
+		return labelTune;
+	}
+	function labelDebugReport(labels, obs, placed, before) {
+		drawCollisionBoxes(obs.boxes.slice(before), obs);
+		if (!debugOn('labels')) { return; }
+		// The COUNTS, because "that looks better" is not a verdict. Overlapping label pairs is the
+		// one that matters (goal 2); mean travel is what it cost to get there.
+		var boxes = obs.boxes.slice(before), i, j, pairs = 0, travel = 0;
+		for (i = 0; i < boxes.length; i++) {
+			for (j = i + 1; j < boxes.length; j++) {
+				if (Collide.boxOverlapDepth(boxes[i], boxes[j]) > 0) { pairs++; }
+			}
+		}
+		placed.forEach(function (r) { travel += Math.hypot(r.dx, r.dy); });
+		var el2 = document.getElementById('lpn_label_bench_out');
+		if (el2) {
+			el2.textContent = labels.length + ' labels \u2022 ' + pairs + ' overlapping pairs \u2022 mean travel '
+				+ (placed.length ? (travel / placed.length * (state.s || 1)).toFixed(1) : '0') + ' px';
+		}
+	}
+	function buildLabelBench() {
+		if (!debugOn('labels') || document.getElementById('lpn_label_bench')) { return; }
+		var t = labelTuning(), box = document.createElement('div');
+		box.id = 'lpn_label_bench';
+		box.className = 'd-print-none';
+		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:#fff;'
+			+ 'border:1px solid #333;padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px rgba(0,0,0,.3);'
+			+ 'max-height:70vh;overflow:auto');
+		function row(label, get, set, step, hint) {
+			var l = document.createElement('label'), i = document.createElement('input');
+			l.setAttribute('style', 'display:flex;justify-content:space-between;gap:8px;align-items:center');
+			l.appendChild(document.createTextNode(label));
+			i.type = 'number'; i.step = String(step); i.value = String(get());
+			i.setAttribute('style', 'width:6em');
+			if (hint) { i.title = hint; }
+			i.addEventListener('change', function () {
+				var v = parseFloat(i.value);
+				if (isFinite(v)) { set(v); refreshLabelText(); }
+			});
+			l.appendChild(i);
+			box.appendChild(l);
+		}
+		var h = document.createElement('div');
+		h.setAttribute('style', 'font-weight:bold;margin-bottom:4px');
+		h.textContent = 'label placement bench';
+		box.appendChild(h);
+		row('reach (text heights)', function () { return t.reach; },
+			function (v) { t.reach = v; }, 1, 'How far out the furthest ring sits, in multiples of the current text size. One number for the whole map.');
+		row('inner ring (text heights)', function () { return t.inner; },
+			function (v) { t.inner = v; }, 0.5, 'The nearest circle. About one label wide is the smallest step that can clear a neighbour.');
+		row('circles', function () { return t.rings; },
+			function (v) { t.rings = v; }, 1, 'How many circles between the inner ring and the reach. Radii are geometric, so the near ones sit closer together.');
+		row('arc spacing (text heights)', function () { return t.arc; },
+			function (v) { t.arc = v; }, 0.5, 'Target gap BETWEEN candidates along a circle. Bigger thins the near circles out; every direction stays on the 15-degree grid.');
+		row('neighbour credit k', function () { return t.k; },
+			function (v) { t.k = v; }, 0.05, 'Goal 11. 0 turns the neighbourhood term off entirely.');
+		row('zoom-to-fit room (text heights)', function () { return t.fitRoom; },
+			function (v) { t.fitRoom = v; }, 1, 'Extra room left on Zoom to fit\u2019s FIRST pass, before labels are placed. Bigger = the first pass sits further out, so labels land more comfortably at the final zoom. Press Zoom to fit to see it.');
+		var g = document.createElement('div');
+		g.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
+		g.textContent = 'rank weights';
+		box.appendChild(g);
+		Object.keys(Collide.GOAL_WEIGHT).forEach(function (key) {
+			row(key, function () { return Collide.GOAL_WEIGHT[key]; },
+				function (v) { Collide.GOAL_WEIGHT[key] = v; }, 0.01);
+		});
+		var out = document.createElement('div');
+		out.id = 'lpn_label_bench_out';
+		out.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
+		box.appendChild(out);
+		var btns = document.createElement('div');
+		btns.setAttribute('style', 'margin-top:6px;display:flex;gap:6px');
+		function btn(text, fn) {
+			var b = document.createElement('button');
+			b.type = 'button'; b.textContent = text;
+			b.addEventListener('click', fn);
+			btns.appendChild(b);
+		}
+		btn('re-run', function () { refreshLabelText(); });
+		// The fit room only shows itself on a fit, so the bench offers one rather than making Tom
+		// hunt for the menu item between every adjustment.
+		btn('zoom to fit', zoomExtent);   // by reference, exactly as the toolbar button wires it
+		btn('defaults', function () {
+			labelTune = null;
+			Object.keys(LPN_GOAL_WEIGHT_SHIPPED).forEach(function (key) {
+				Collide.GOAL_WEIGHT[key] = LPN_GOAL_WEIGHT_SHIPPED[key];
+			});
+			document.getElementById('lpn_label_bench').remove();
+			buildLabelBench();
+			refreshLabelText();
+		});
+		box.appendChild(btns);
+		document.body.appendChild(box);
+	}
+	// The shipped ranks, copied once at load so "defaults" restores them after any amount of
+	// fiddling. Read from the module rather than restated, so it cannot drift from the real table.
+	var LPN_GOAL_WEIGHT_SHIPPED = JSON.parse(JSON.stringify(Collide.GOAL_WEIGHT));
 	function drawCollisionBoxes(placed, obs) {
 		if (!debugBoxLayer) { return; }
 		while (debugBoxLayer.firstChild) { debugBoxLayer.removeChild(debugBoxLayer.firstChild); }
@@ -962,7 +1110,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function runLabelCollisionAvoidance() {
 		var fs = effectiveFontSize(), labels = [], stationed = [], obs = staticObstacles(),
-			outer = labelReachOuter(), holders = {};
+			holders = {};
 		function addDataLabel(key, holder, anchor, home, dragged, lineCount) {
 			// Every nudge is cleared and re-derived from scratch on every pass, dragged or not, so
 			// the pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer
@@ -1002,15 +1150,19 @@ var EngCalcs = EngCalcs || {};
 		// Stationed labels first: they have already spent their freedom, so everyone else should see
 		// where they are before choosing.
 		placeStationedLabels(stationed, obs, fs);
-		var before = obs.boxes.length,
+		// Every number the pass is steered by goes through ONE place, so ?debug=labels can override
+		// them live without a second code path deciding anything (see labelTuning()).
+		var t = labelTuning(),
+			before = obs.boxes.length,
 			placed = Collide.placeLabels(labels, obs, {
-				inner: outer * LPN_INNER_FRAC, outer: outer, k: LPN_NEIGHBOUR_K
+				inner: t.inner * fs, outer: t.reach * fs,
+				rings: t.rings, arcTarget: t.arc * fs, k: t.k
 			});
 		placed.forEach(function (r) {
 			var h = holders[r.id];
 			if (h) { h.nudge = { x: r.dx, y: r.dy }; }
 		});
-		drawCollisionBoxes(obs.boxes.slice(before), obs);
+		labelDebugReport(labels, obs, placed, before);
 	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped.
@@ -3241,14 +3393,14 @@ var EngCalcs = EngCalcs || {};
 	// be answered for the scale being tested, or the fit reserves room for labels that will not be
 	// there (or crops ones that will). They are booleans, so they cannot be solved for directly;
 	// zoomExtent() settles them by re-solving, which costs arithmetic and nothing else.
-	function fitItems(atScale) {
+	function fitItems(atScale, modelOnly) {
 		var out = [], sc = state.s || 1,
 			lim = settings.labelMaxWidth,
 			// The same MIN question the threshold itself asks (see mapSpan()), but asked about the
 			// scale being considered rather than the one in force.
 			mapW = Math.min(svg && svg.clientWidth ? svg.clientWidth : 0,
 				svg && svg.clientHeight ? svg.clientHeight : 0) / (atScale || 1),
-			ignoreDataLabels = typeof lim === 'number' && lim > 0 && mapW > lim;
+			ignoreDataLabels = modelOnly || (typeof lim === 'number' && lim > 0 && mapW > lim);
 		function boxFor(x, y, bx, by, bw, bh) {
 			fitItem(out, x, y, (x - bx) * sc, (bx + bw - x) * sc, (y - by) * sc, (by + bh - y) * sc);
 		}
@@ -3280,8 +3432,14 @@ var EngCalcs = EngCalcs || {};
 			var rad = nodeRadius(n) * sc + 1, ne = nodeEls[n.id] || {};
 			fitItem(out, n.x, n.y, rad, rad, rad, rad);
 			if (ignoreDataLabels || !ne.text || ne.empty) { return; }
+			// **THE SIDE COMES FROM THE MODEL, NOT FROM ne.side.** ne.side is render state left over
+			// from the last layout, so a fit arriving from a 0.02x view saw labels banked on the
+			// opposite side from one arriving at 1x and landed 24 px away in tx -- the exact
+			// dependence the paragraph above exists to remove, hiding in the one line that still
+			// read the drawing. Derived here the way dataLabelOrigin() derives it for an
+			// auto-placed label, from the HOME position, which is a model quantity.
 			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n),
-				lx = (ne.side === 'left') ? base.x - tw : base.x;
+				lx = (base.x >= n.x) ? base.x : base.x - tw;
 			boxFor(n.x, n.y, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
 		});
 		doc.links.forEach(function (l) {
@@ -3443,6 +3601,13 @@ var EngCalcs = EngCalcs || {};
 	// than changing one, so they re-baseline a clean project instead of dirtying it. A fit the user
 	// pressed the button for is an edit like any other -- Tom, 2026-08-15: *"AutoCAD registers a
 	// zoom or pan as a change. But there are no automatic zooms or pans."*
+	// Room left for the labels on the FIRST of zoomExtent()'s two passes, in text heights. Tom,
+	// 2026-08-16: *"likely 6 (or whatever) text heights of padding will be zoomed out a little much
+	// for most models. When we adjust zoom after placing all labels, they will fit just a little
+	// better, and so we can leave them alone."* Exactly so -- the first pass is deliberately a touch
+	// generous, so the labels it lays out are comfortable at the tighter scale the second pass
+	// picks, and nothing has to be recomputed to check.
+	var FIT_LABEL_ROOM_TEXT_HEIGHTS = 6;
 	function zoomExtent(auto) {
 		if (!mapSized) { fitWhenSized = true; autoFitWhenSized = autoFitWhenSized || !!auto; return; }
 		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it (Tom, 2026-08-09:
@@ -3461,10 +3626,11 @@ var EngCalcs = EngCalcs || {};
 		var r = svg.getBoundingClientRect(), pad = 16,
 			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
 			padBottom = Math.max(pad, overlayReserve('lpn_map_footer'));
-		var items, s = state.s, prev = 0, k;
-		function solve() {
-			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, pad, pad),
-				fitScaleFor(items, 'y', 't', 'b', r.height, padTop, padBottom));
+		var items, s;
+		function solve(extra) {
+			var e = extra || 0;
+			return Math.min(fitScaleFor(items, 'x', 'l', 'r', r.width, pad + e, pad + e),
+				fitScaleFor(items, 'y', 't', 'b', r.height, padTop + e, padBottom + e));
 		}
 		function apply(v) {
 			state.s = v;
@@ -3473,21 +3639,30 @@ var EngCalcs = EngCalcs || {};
 			setTransform();
 			onZoomChanged();
 		}
-		// **NO RE-LAYOUT IN THE LOOP, BECAUSE THERE IS NOTHING LEFT FOR ONE TO TELL US.** With the
-		// item list built from the model rather than from the drawn positions, the only thing still
-		// depending on the scale is a handful of BOOLEANS -- which labels are drawn at all. Those
-		// are settled by re-asking the same arithmetic, which costs a few array sweeps and touches
-		// neither the DOM nor the layout. Two rounds on every real drawing; four is a stop, not an
-		// expectation.
+		// **TWO SOLVES, NOT A CONVERGENCE LOOP.** Tom, 2026-08-16: *"we zoom to that, calculate
+		// labels once, then zoom again without recalculating."*
 		//
-		// The single re-layout at the end is apply()'s, and it is the one that was always needed:
-		// the labels have to be redrawn at the new scale.
-		for (k = 0; k < 4; k++) {
-			items = fitItems(s);
-			s = solve();
-			if (s === prev) { break; }
-			prev = s;
-		}
+		//   1. fit the MODEL ALONE, with six text heights of extra room, so the answer cannot depend
+		//      on the view we arrived from and the labels get somewhere comfortable to land.
+		//   2. work out the labels ONCE, at that scale.
+		//   3. fit again to the model plus those label boxes, without recomputing them.
+		//
+		// It replaced an iterate-until-stable loop, which was not deterministic: it seeded from
+		// state.s, so arriving from a 0.02x view -- where a label is 550 world units of lettering --
+		// gave a different answer from arriving at 1x, and no number of rounds fixed that because
+		// the starting point was the problem.
+		//
+		// The rejected alternative was Tom's own first suggestion, a flat padding of about six text
+		// heights: *"Is that too sloppy? It might cause trouble on small maps."* It is, and for that
+		// reason -- a fixed pad is most of a small map and nothing on a large one.
+		//
+		// What this deliberately accepts: the labels are laid out for step 1's scale, not step 3's,
+		// so a label can end fractionally outside the padding. A stable, predictable fit is worth
+		// more than chasing a fixed point that moves as you approach it.
+		items = fitItems(state.s, true);
+		s = solve(labelTuning().fitRoom * settings.textSize);
+		items = fitItems(s);
+		s = solve();
 		apply(s);
 		if (auto) { rebaseSignatureIfClean(); }
 	}
@@ -8595,6 +8770,7 @@ var EngCalcs = EngCalcs || {};
 		debugBoxLayer = el('g', {}, world);
 		setTransform();
 		wireToolbar();
+		buildLabelBench();   // no-op unless ?debug=labels is on the URL
 		// The toolbar is built here, AFTER Calculators.lib.js's own DOMContentLoaded listener
 		// already ran EngCalcs.initTips(document) once (script load order puts that listener
 		// first) -- so a button's .ec-help[title] tip (Select, Labels) would otherwise never get

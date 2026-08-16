@@ -38,7 +38,12 @@ const L = loadLoopedNetwork(
 	// constant getBBox() these labels come out under half a world unit wide on a two-unit grid,
 	// which is no crowd at all and would make every check below pass for nothing.
 	"\t\tsetLabelPx: function (id, px) { nodeEls[id].twPx = px; },\n" +
-	"\t\treachPx: function () { return LPN_LABEL_REACH_PX; },\n" +
+	// THE REACH IS 30 TEXT HEIGHTS NOW (Tom, 2026-08-16), not a fixed 28 screen pixels -- the old
+	// constant was SMALLER THAN THE LABEL, so no candidate could ever clear a conflict. ONE number
+	// for the whole map, not one per label: *"A single one is better, I think."* Computed here the
+	// way runLabelCollisionAvoidance() computes it, and returned in SCREEN pixels because that is
+	// the quantity that binds.
+	"\t\treachPx: function () { return LPN_REACH_TEXT_HEIGHTS * effectiveFontSize() * state.s; },\n" +
 	// MEASURED FROM THE ANCHOR, NOT FROM THE LABEL'S HOME. The reach is a statement about how far a
 	// number may sit from the element it describes, which is the reader's problem; the nudge is an
 	// implementation detail measured from the default offset and is a slightly different quantity.
@@ -87,27 +92,41 @@ L.relayout();
 
 console.log('--- no label is carried further than the reach, at any zoom ---');
 {
-	const reach = L.reachPx();
 	[8, 22, 60, 150].forEach(function (s) {
 		L.setZoom(s);
 		L.relayout();
-		const worst = ids.reduce(function (m, id) { return Math.max(m, L.labelDistPx(id)); }, 0);
-		ok('at scale ' + s + ', the furthest label is within the reach', worst <= reach + 1e-6,
-			worst.toFixed(0) + 'px against a ' + reach + 'px reach');
+		let over = 0, worstRatio = 0;
+		ids.forEach(function (id) {
+			const r = L.labelDistPx(id) / L.reachPx();
+			if (r > 1 + 1e-6) { over++; }
+			worstRatio = Math.max(worstRatio, r);
+		});
+		ok('at scale ' + s + ', every label is within ITS OWN reach', over === 0,
+			'worst ' + (worstRatio * 100).toFixed(0) + '% of its reach');
 	});
 	// THE REACH IS A SCREEN DISTANCE, and the proof is that it binds at the SAME NUMBER OF PIXELS at
 	// two different zooms -- which means a different world distance each time. Asserting a world
 	// figure would assert nothing: the same world distance is a hair at one scale and half the
 	// canvas at another, which is the trap this whole subject is made of.
-	function worstPx(s) {
-		L.setZoom(s);
-		L.relayout();
-		return ids.reduce(function (m, id) { return Math.max(m, L.labelDistPx(id)); }, 0);
-	}
-	const a11 = worstPx(11), a22 = worstPx(22);
-	ok('...and it BINDS, at both zooms, so the checks above are not vacuous',
-		Math.abs(a11 - reach) < 0.01 && Math.abs(a22 - reach) < 0.01,
-		a11.toFixed(1) + 'px at 11x, ' + a22.toFixed(1) + 'px at 22x, reach ' + reach);
+	// **AND THE REACH IS NOT SUPPOSED TO BIND ANY MORE**, which is the whole of Tom's 2026-08-16
+	// ruling: *"Leaders work. That's what they are for. This is not a thing."* At five label sizes
+	// the limit exists only to keep the search finite, and a label that ends up near it is a label
+	// that had nowhere better -- not a label that was clipped. So what is asserted is the ABSENCE of
+	// clipping: nothing sits at the limit merely because the limit is there.
+	//
+	// Placements legitimately DIFFER between zooms and that is not a defect: labels are a constant
+	// screen size while the network scales, so at 22x the nodes are twice as far apart in pixels and
+	// genuinely conflict less. An assertion that the same label lands at the same fraction of its
+	// reach at both zooms was written here first and was simply wrong about the physics.
+	// A FRACTION, not zero. This fixture is built so that no conflict-free answer exists, so a few
+	// labels genuinely have nowhere better and end up far out -- that is the reach bounding the
+	// search, which is its job. What must NOT happen is the old behaviour, where the limit was
+	// smaller than the label and therefore bound nearly every one of them.
+	L.setZoom(11); L.relayout();
+	const near = ids.filter(function (id) { return L.labelDistPx(id) > L.reachPx() * 0.95; });
+	ok('the reach bounds the search without shaping the usual answer',
+		near.length <= ids.length / 4,
+		near.length + ' of ' + ids.length + ' within 5% of their reach, on a fixture with no clean answer');
 }
 
 console.log('\n--- a label at the reach is still attached to its element ---');
@@ -118,7 +137,7 @@ console.log('\n--- a label at the reach is still attached to its element ---');
 	L.setZoom(22);
 	ok('the reach is comfortably above the distance at which a leader appears',
 		L.reachPx() > L.leaderThresholdPx() * 1.2,
-		'reach ' + L.reachPx() + 'px, leader appears past ' + L.leaderThresholdPx().toFixed(0) + 'px');
+		'reach ' + L.reachPx().toFixed(0) + 'px, leader appears past ' + L.leaderThresholdPx().toFixed(0) + 'px');
 	// And that relationship must hold at every zoom, since both are pixel quantities derived
 	// differently -- one a constant, the other from the font and symbol sizes.
 	let holds = true;
@@ -142,10 +161,13 @@ console.log('\n--- the limit is a property of the candidates, not a correction a
 	const after = ids.map(function (id) { return L.labelDistPx(id); });
 	ok('running the pass again moves nothing -- it is idempotent, with no correction stage',
 		before.every(function (v, i) { return Math.abs(v - after[i]) < 1e-9; }));
-	const atReach = after.filter(function (v) { return Math.abs(v - L.reachPx()) < L.reachPx() * 0.01; });
-	ok('several labels really are out at the reach, so this section is not vacuous',
-		atReach.length > 0, atReach.length + ' of ' + ids.length + ' at the reach');
-	ok('...and not one is beyond it', after.every(function (v) { return v <= L.reachPx() * 1.0001; }),
+	// NON-VACUITY, restated for a reach that no longer binds: the section is worth reading only if
+	// the pass MOVED something. It used to be "several labels are out at the cap", which cannot be
+	// true any more and would fail forever if left.
+	const moved = after.filter(function (v) { return v > 1e-6; });
+	ok('the pass really moved labels, so this section is not vacuous',
+		moved.length > 0, moved.length + ' of ' + ids.length + ' moved');
+	ok('...and not one is beyond its reach', after.every(function (v) { return v <= L.reachPx() * 1.0001; }),
 		Math.max.apply(null, after).toFixed(2) + 'px');
 	// The source says it too: a limit that is applied afterwards leaves a function behind. Matched
 	// on the CALL, so the one mention left -- the comment recording why it went -- does not count as

@@ -147,7 +147,7 @@ console.log('--- the fit does not depend on the view it started from ---');
 		fromOne + ' vs ' + view());
 	L.setZoom(0.02);
 	L.zoomExtent();
-	ok('...and so does fitting from a 0.02x view', same(view(), fromOne), view());
+	ok('...and so does fitting from a 0.02x view', same(view(), fromOne), fromOne + ' vs ' + view());
 	// The residue is worth measuring rather than merely bounding, and worth stating in PIXELS --
 	// the unit the reader actually has. A relative scale difference of d puts the far edge of a
 	// 1400px canvas d*1400 pixels from where the other pass put it.

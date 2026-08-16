@@ -209,37 +209,95 @@ EngCalcs.lpnCollide = (function () {
 
 	// ---- candidates ----------------------------------------------------------------------------
 	//
-	// **THE ANGLES ARE OFF-ORTHOGONAL BY CONSTRUCTION (goal 7).** Eight of them, 45 degrees apart,
-	// with the whole ring turned 10 degrees so that none of them is horizontal or vertical -- every
-	// one lands 10 or 35 degrees off an axis, which is what Tom asked for (*"They try to be 10
-	// degrees away from orthogonal"*) without a penalty term and without a placement that has to be
-	// rejected after it is proposed.
+	// **THE ANGLE SET IS THE WHOLE OF THE "LEADERS LOOK BUSY" PROBLEM.** Tom, 2026-08-16, asked to
+	// drop a leaders-agree-in-angle score term in favour of constraining the angles we ever propose:
+	// *"constrain leader angles to be at multiples of 15 degrees and not orthogonal. In other words,
+	// we don't check oddball angles, so we don't look ugly."*
 	//
-	// **DELIBERATELY THIN: eight directions at two radii, plus where the label already is.** Tom, on
-	// a proposal to open with 48 candidates: *"Not so fast. Let's try it."* Densify only on a
-	// measurement, never on an argument.
-	var RING_ANGLES = [10, 55, 100, 145, 190, 235, 280, 325];
-	// Neighbours are what goal 11 reads, so they are declared STRUCTURALLY rather than by a distance
-	// test: a ring candidate's neighbours are the two directions either side of it and the same
-	// direction at the other radius. A distance test would give the outer ring fewer neighbours than
-	// the inner one purely because it is bigger, and "the direction of least congestion" would then
-	// mean something different at each radius.
-	function ringCandidates(anchor, inner, outer) {
-		var out = [], radii = [inner, outer], ri, ai, n = RING_ANGLES.length, rad;
+	// So every leader on the map lands on a shared 15-degree grid and none is horizontal or
+	// vertical. Two goals collapse into this one list and stop being scored at all: the old goal 7
+	// (leaders avoid orthogonality) is satisfied because an orthogonal direction is never generated,
+	// and a leaders-agree-in-angle term is unnecessary because they cannot disagree by less than 15
+	// degrees or land at an oddball angle in the first place.
+	var RING_ANGLES = (function () {
+		var out = [], d;
+		for (d = 15; d < 360; d += 15) {
+			if (d % 90 !== 0) { out.push(d); }
+		}
+		return out;   // 20 directions
+	}());
+	// **THE ANGLES THIN OUT ON THE NEAR CIRCLES, BECAUSE ARC LENGTH IS WHAT MATTERS.** Tom,
+	// 2026-08-16: *"I assume that we will economize by omitting some of the angles on the nearer
+	// circle(s)."* Right, and it is the arc that says by how much: at 15 degrees apart, two
+	// candidates on the innermost circle are a couple of pixels from each other and score almost
+	// identically, while on the outermost they are most of a label apart. Equal ANGULAR spacing
+	// therefore spends most of its candidates where they cannot tell each other apart.
+	//
+	// So each circle takes the coarsest step whose arc is still under `arcTarget`, chosen from the
+	// steps that both divide 360 and keep every direction on the shared 15-degree grid without
+	// landing on an orthogonal: 15, 30, 60, 120. A near circle gets 3 or 6 directions, the outer
+	// ones get all 20, and the total is far below 20 per circle.
+	var RING_STEPS = [15, 30, 60, 120];
+	function angleStepFor(radius, arcTarget) {
+		var i, step, arc;
+		for (i = 0; i < RING_STEPS.length; i++) {
+			step = RING_STEPS[RING_STEPS.length - 1 - i];         // coarsest first
+			arc = radius * step * Math.PI / 180;
+			if (arc <= arcTarget) { return step; }
+		}
+		return 15;
+	}
+	function anglesAt(radius, arcTarget) {
+		var step = angleStepFor(radius, arcTarget), out = [], d;
+		for (d = 15; d < 360; d += step) {
+			if (d % 90 !== 0) { out.push(d); }
+		}
+		return out;
+	}
+	// `rings` is how many circles, `inner`..`outer` the span. Radii are geometric so the near ones
+	// are close together, where most placements land.
+	function ringCandidates(anchor, inner, outer, rings, arcTarget) {
+		var out = [], radii = [], i, ri, ai, rad, angs, ringOf = [], base;
+		rings = rings > 0 ? Math.round(rings) : 4;
+		if (rings < 1) { rings = 1; }
+		if (!(outer > inner)) { outer = inner; }
+		base = rings > 1 ? Math.pow(outer / inner, 1 / (rings - 1)) : 1;
+		for (i = 0; i < rings; i++) { radii.push(inner * Math.pow(base, i)); }
+		if (!(arcTarget > 0)) { arcTarget = inner; }
 		for (ri = 0; ri < radii.length; ri++) {
-			for (ai = 0; ai < n; ai++) {
-				rad = RING_ANGLES[ai] * Math.PI / 180;
+			angs = anglesAt(radii[ri], arcTarget);
+			ringOf.push({ start: out.length, n: angs.length });
+			for (ai = 0; ai < angs.length; ai++) {
+				rad = angs[ai] * Math.PI / 180;
 				out.push({
 					x: anchor.x + radii[ri] * Math.cos(rad),
 					y: anchor.y + radii[ri] * Math.sin(rad),
-					neighbours: [
-						ri * n + (ai + 1) % n,
-						ri * n + (ai + n - 1) % n,
-						(1 - ri) * n + ai
-					]
+					radiusFrac: outer > 0 ? radii[ri] / outer : 0,
+					_ri: ri, _ai: ai
 				});
 			}
 		}
+		// Neighbours are what the goal-11 term reads, and they are declared STRUCTURALLY: the two
+		// directions either side on the same circle, plus the NEAREST direction on each adjacent
+		// circle -- "nearest" because the circles no longer share an angle list.
+		out.forEach(function (c) {
+			var me = ringOf[c._ri], n = me.n, list = [
+				me.start + (c._ai + 1) % n,
+				me.start + (c._ai + n - 1) % n
+			], deg = Math.atan2(c.y - anchor.y, c.x - anchor.x);
+			[c._ri - 1, c._ri + 1].forEach(function (rj) {
+				if (rj < 0 || rj >= ringOf.length) { return; }
+				var r2 = ringOf[rj], best = r2.start, bestD = Infinity, j, d2, a2;
+				for (j = 0; j < r2.n; j++) {
+					a2 = Math.atan2(out[r2.start + j].y - anchor.y, out[r2.start + j].x - anchor.x);
+					d2 = Math.abs(Math.atan2(Math.sin(a2 - deg), Math.cos(a2 - deg)));
+					if (d2 < bestD) { bestD = d2; best = r2.start + j; }
+				}
+				list.push(best);
+			});
+			c.neighbours = list;
+			delete c._ri; delete c._ai;
+		});
 		return out;
 	}
 	// A DRAGGED LABEL'S CANDIDATES LIE ON A RAY, NOT ON A RING (goal 1). The user placed the
@@ -262,10 +320,10 @@ EngCalcs.lpnCollide = (function () {
 	// Every candidate a label will be scored at. `home` -- where it sits now -- is always in the set
 	// so that "leave it alone" is a placement the pass can choose rather than a case it has to
 	// special-case, and it carries the ring's two nearest directions as its neighbours.
-	function candidatesFor(lbl, inner, outer) {
+	function candidatesFor(lbl, inner, outer, rings, arcTarget) {
 		var cands, i, best = [0, 1], bestD = [Infinity, Infinity], d;
 		if (lbl.dragged) { return rayCandidates(lbl.anchor, lbl.home); }
-		cands = ringCandidates(lbl.anchor, inner, outer);
+		cands = ringCandidates(lbl.anchor, inner, outer, rings, arcTarget);
 		for (i = 0; i < cands.length; i++) {
 			d = Math.hypot(cands[i].x - lbl.home.x, cands[i].y - lbl.home.y);
 			if (d < bestD[0]) { bestD[1] = bestD[0]; best[1] = best[0]; bestD[0] = d; best[0] = i; }
@@ -426,6 +484,12 @@ EngCalcs.lpnCollide = (function () {
 	// matters more than it looks: a pass that scribbles on its inputs cannot be run twice on the
 	// same data to check that it agrees with itself, which is the cheapest strong assertion there is.
 	function grid(cell, obs) {
+		// A ZERO OR NON-FINITE CELL IS FATAL, NOT MERELY WRONG: span() divides by it, so Math.floor
+		// gives +/-Infinity and the fill loop never terminates. The reach became a function of the
+		// labels themselves (Tom's 5-label-sizes ruling), so an EMPTY label set now yields 0 here
+		// where the old fixed-pixel reach could not -- a drawing with no labels at all crashed the
+		// pass. Guarded at the seam rather than at each caller.
+		if (!(cell > 0) || !isFinite(cell)) { cell = 1; }
 		var cells = new Map(), stamp = 0, bStamp = [], sStamp = [];
 		function key(i, j) { return i * 4294967296 + j; }
 		function put(list, i, j, idx) {
@@ -510,8 +574,15 @@ EngCalcs.lpnCollide = (function () {
 	}
 	function placeLabels(labels, obstacles, opts) {
 		opts = opts || {};
+		// **ONE REACH FOR THE WHOLE PASS, NOT ONE PER LABEL.** Tom, 2026-08-16: *"A single one is
+		// better, I think. I didn't specify per label."* The caller sets it from the text size, so
+		// it already scales with the lettering; deriving it from each label's own box as well would
+		// give a four-line label a bigger world to search than a two-line one beside it, for no
+		// reason a reader could see.
 		var inner = opts.inner > 0 ? opts.inner : 1,
-			outer = opts.outer > 0 ? opts.outer : inner * 2.5,
+			outer = opts.outer > 0 ? opts.outer : inner * 5,
+			rings = opts.rings > 0 ? opts.rings : 4,
+			arcTarget = opts.arcTarget > 0 ? opts.arcTarget : inner,
 			k = opts.k === undefined ? 0.25 : opts.k,
 			obs = { boxes: obstacles.boxes.slice(), segments: obstacles.segments.slice() },
 			order = labels.slice(), out = [], maxDiag = 0,
@@ -529,9 +600,35 @@ EngCalcs.lpnCollide = (function () {
 			return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
 		});
 		order.forEach(function (lbl) {
-			var cands = candidatesFor(lbl, inner, outer), raw = [], eff, i, best = 0;
+			var cands = candidatesFor(lbl, inner, outer, rings, arcTarget), raw = [], eff, i, best = 0,
+				bandStart, bandBound, bestRaw = Infinity;
 			index.near(lbl.anchor.x, lbl.anchor.y, outer + Math.hypot(lbl.w, lbl.h), local);
-			for (i = 0; i < cands.length; i++) { raw.push(rawScore(lbl, cands[i], local, outer)); }
+			// **RADIUS-ORDERED WITH AN EXACT LOWER-BOUND CUT-OFF, NOT A HEURISTIC.** Every candidate
+			// at radius r pays at least GOAL_WEIGHT.distance * min(1, r/outer) and every other term
+			// is non-negative, so once the best score found so far is below that bound, nothing at r
+			// or beyond can win and the rest of the rings need not be scored at all. The answer is
+			// identical to scoring all of them; only the work differs.
+			//
+			// It matters because the reach is now five label-diagonals (Tom, 2026-08-16), and most
+			// labels on a real drawing are not in conflict: their first ring scores near zero and
+			// the outer rings are never touched. A label that IS boxed in pays the full price, which
+			// is the one that deserves it.
+			for (i = 0; i < cands.length; i++) {
+				bandStart = cands[i].radiusFrac;
+				if (bandStart !== undefined && bandStart !== bandBound) {
+					bandBound = bandStart;
+					if (bestRaw <= GOAL_WEIGHT.distance * Math.min(1, bandStart)) { break; }
+				}
+				raw.push(rawScore(lbl, cands[i], local, outer));
+				if (raw[i] < bestRaw) { bestRaw = raw[i]; }
+			}
+			// `home` is always scored: it is the last candidate and carries no radiusFrac, so a cut
+			// above must not be allowed to drop it -- "leave it alone" has to stay reachable.
+			while (raw.length < cands.length) {
+				i = raw.length;
+				if (cands[i].radiusFrac === undefined) { raw.push(rawScore(lbl, cands[i], local, outer)); }
+				else { raw.push(Infinity); }
+			}
 			eff = effectiveScores(raw, cands, k);
 			for (i = 1; i < eff.length; i++) { if (eff[i] < eff[best]) { best = i; } }
 			var c = cands[best];
@@ -560,6 +657,7 @@ EngCalcs.lpnCollide = (function () {
 		segmentInBoxFraction: segmentInBoxFraction,
 		segmentsCross: segmentsCross,
 		candidatesFor: candidatesFor,
+		anglesAt: anglesAt,
 		labelBoxAtEnd: labelBoxAtEnd,
 		obstaclesInReach: obstaclesInReach,
 		grid: grid,
