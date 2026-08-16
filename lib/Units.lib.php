@@ -63,6 +63,17 @@ $ec_unit_families = Array(
     'flow_emitter'     => Array('lph', 'gph'),
     'flow_supply'      => Array('m3ps', 'lps', 'mld', 'ft3ps', 'gpm', 'mgd', 'lph', 'gph'),
     'flow_node'        => Array('lps', 'm3ps', 'gpm', 'ft3ps', 'lph', 'gph'),
+    // --- The EPANET flow enumeration, and nothing else (ROADMAP Task 390 step 4). ---
+    // An `.inp` file's [OPTIONS] UNITS keyword is a CLOSED SET OF TEN, and the keyword fixes every
+    // other unit in the file. Listing all ten is therefore completing a finite list, not chasing
+    // one: after this there is no eleventh, so lpn_ never again has to convert an imported flow to
+    // reach a unit it offers, and no imported document can name a flow unit this page lacks.
+    // Its own family rather than an addition to flow_node, because thirteen options on the two
+    // bpn_ row tables that share that family would be a worse control for no gain -- nobody types
+    // acre-feet per day into a branched-network demand row. lph/gph are carried across anyway so a
+    // browser holding one in its cookie still resolves it.
+    'flow_epanet'      => Array('lps', 'm3ps', 'gpm', 'ft3ps', 'mgd', 'imgd', 'afd',
+                                'lpm', 'mld', 'cmh', 'cmd', 'lph', 'gph'),
     'flow_total'       => Array('lps', 'm3ps', 'gpm', 'ft3ps', 'mld', 'mgd', 'lph', 'gph'),
 
     // --- Everything else. ---
@@ -109,6 +120,7 @@ $ec_unit_sets['us'] = Array(
     'flow_emitter'     => 'gph',
     'flow_supply'      => 'gpm',
     'flow_node'        => 'gpm',
+    'flow_epanet'      => 'gpm',
     'flow_total'       => 'gpm',
     'flow_area'        => 'ft2',
     'land_area'        => 'ft2',
@@ -140,6 +152,7 @@ $ec_unit_sets['si'] = Array(
     'flow_emitter'     => 'lph',
     'flow_supply'      => 'lps',
     'flow_node'        => 'lps',
+    'flow_epanet'      => 'lps',
     'flow_total'       => 'lps',
     'flow_area'        => 'm2',
     'land_area'        => 'm2',
@@ -255,6 +268,15 @@ $ec_units['ft3ps']=35.314666721488585;          // 1/0.3048^3
 $ec_units['gpm']=15850.323141488905;            // 60/0.003785411784
 $ec_units['mgd']=22.824465323744022;            // 86400/(1e6*0.003785411784)
 $ec_units['mld']=86.4;                          // 86400/1000 -- exact
+// The five EPANET flow keywords that had no selector until Task 390 step 4. IMGD is the only one
+// that brings a new base constant with it: the IMPERIAL gallon, 4.54609 L exactly, which is a
+// different gallon from the US one every other flow unit here is built on. It has no sibling to
+// disagree with, so unit_factor_check.php checks it against its definition and no coherence group.
+$ec_units['imgd']=19.005343053041184;           // 86400/(1e6*0.00454609) -- imperial gallon
+$ec_units['afd']=70.045619943448429;            // 86400/(43560*0.3048^3) -- acre-foot per day
+$ec_units['lpm']=60000;                         // 60*1000 -- exact
+$ec_units['cmh']=3600;                          // exact
+$ec_units['cmd']=86400;                         // exact
 
 $ec_units['m2']=1;
 $ec_units['mm2']=1000000;

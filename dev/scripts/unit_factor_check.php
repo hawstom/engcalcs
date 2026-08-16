@@ -48,6 +48,10 @@ $verbose = in_array('--verbose', $argv, true);
 $FT   = 0.3048;                 // m per international foot        (exact)
 $IN   = 0.0254;                 // m per inch                      (exact)
 $GAL  = 0.003785411784;         // m^3 per US liquid gallon        (exact, 3.785411784 L)
+// A DIFFERENT GALLON, and the only unit in the suite that uses it. EPANET's IMGD keyword is
+// imperial million gallons per day; reading it as US gallons is a 20% error on every flow in the
+// file, which is exactly the kind of mistake a table of exact definitions exists to make loud.
+$IMPGAL = 0.00454609;           // m^3 per imperial gallon         (exact, 4.54609 L)
 $LBF  = 4.4482216152605;        // N per pound-force               (exact)
 $ACRE = 43560 * $FT * $FT;      // m^2 per acre                    (exact, 43560 ft^2)
 $HP   = 745.6998715822702;      // W per mechanical horsepower     (550 ft.lbf/s)
@@ -81,6 +85,11 @@ $expected = array(
     'mgd' => 86400 / (1e6 * $GAL),
     'mld' => 86.4,                              // 86400 s/day / 1000 m^3 per ML -- exact
     'lph' => 3.6e6, 'gph' => 3600 / $GAL,
+    // The five EPANET flow keywords (Task 390 step 4). `.inp` [OPTIONS] UNITS is a closed set of
+    // ten and these complete it.
+    'imgd' => 86400 / (1e6 * $IMPGAL),
+    'afd' => 86400 / ($ACRE * $FT),             // an acre-foot per day
+    'lpm' => 60000.0, 'cmh' => 3600.0, 'cmd' => 86400.0,
     // area
     'm2' => 1.0, 'mm2' => 1e6,
     'ft2' => 1 / ($FT * $FT), 'in2' => 1 / ($IN * $IN),
@@ -136,6 +145,9 @@ $groups = array(
         'ft3'   => function ($v) { return pow(1 / $v, 1 / 3); },
         'ft3ps' => function ($v) { return pow(1 / $v, 1 / 3); },
         'acft'  => function ($v) { return pow(1 / (43560 * $v), 1 / 3); },
+        // An acre-foot per day is the acre-foot again, so it belongs to the foot rather than to
+        // any flow group -- and it is the reason afd needs no gallon at all.
+        'afd'   => function ($v) { return pow(86400 / (43560 * $v), 1 / 3); },
     ),
     'the inch (m per in)' => array(
         'in'   => function ($v) { return 1 / $v; },

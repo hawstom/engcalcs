@@ -47,6 +47,11 @@ $ec_lang['u_m3ps']='m^3/s';
 $ec_lang_syn['u_m3ps']='';
 $ec_lang['u_mgd']='MGD';
 $ec_lang_syn['u_mgd']='';
+$ec_lang['u_imgd']='IMGD';
+$ec_lang['u_afd']='ac-ft/d';
+$ec_lang['u_lpm']='L/min';
+$ec_lang['u_cmh']='m^3/hr';
+$ec_lang['u_cmd']='m^3/d';
 $ec_lang['u_mh2o']='m H2O';
 $ec_lang_syn['u_mh2o']='';
 $ec_lang['u_mld']='ML/d';
@@ -1847,6 +1852,7 @@ $ec_lang_syn['lpn_engine_failed']='';
 // the EPANET solver anyway, because it holds a valve the built-in solver does not work out. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because these valves open and close on their own:';
+$ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be worked out until this page knows that unit, because there is no way to tell how big it is.';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.';
 $ec_lang_syn['lpn_engine_manning_note']='';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';

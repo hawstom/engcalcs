@@ -21,6 +21,11 @@
         "u_m2": "m^2",
         "u_m3ps": "m^3\/s",
         "u_mgd": "MGD",
+        "u_imgd": "IMGD",
+        "u_afd": "ac-ft\/d",
+        "u_lpm": "L\/min",
+        "u_cmh": "m^3\/hr",
+        "u_cmd": "m^3\/d",
         "u_mh2o": "m H2O",
         "u_mld": "ML\/d",
         "u_m": "m",
@@ -938,6 +943,7 @@
         "lpn_engine_loading": "Loading the EPANET solver…",
         "lpn_engine_failed": "The EPANET solver could not be loaded. Showing the built-in solver instead.",
         "lpn_engine_valve_route": "Solved with the EPANET solver, because these valves open and close on their own:",
+        "lpn_unit_unknown": "This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be worked out until this page knows that unit, because there is no way to tell how big it is.",
         "lpn_engine_manning_note": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.",
         "lpn_settings_text_size": "Text size (pixels)",
         "lpn_settings_symbol_size": "Symbol size (pixels)",
@@ -964,7 +970,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 962,
+    "count": 968,
     "active_prefixes": [
         "about",
         "bpn",

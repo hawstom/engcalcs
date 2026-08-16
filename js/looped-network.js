@@ -5323,16 +5323,20 @@ var EngCalcs = EngCalcs || {};
 	// m/mm/m-of-water sets, so almost everything matches with no conversion at all. Only the flow
 	// unit can miss (this page offers six, EPANET names ten), and a miss is harmless: every number
 	// crosses through SI anyway, so the network is identical and only the label differs.
-	var LPN_INP_FLOW_UNIT = {
-		GPM: 'gpm', MGD: 'gpm', IMGD: 'gpm', CFS: 'ft3ps', AFD: 'ft3ps',
-		LPS: 'lps', LPM: 'lps', MLD: 'lps', CMH: 'lps', CMD: 'lps'
-	};
-	// The three keywords whose unit this page actually OFFERS, so the selector ends up showing the
-	// very unit the file was written in. Everything not listed here (MGD, IMGD, AFD, LPM, MLD, CMH,
-	// CMD) lands on a different selector unit and is the one thing an import genuinely has to
-	// convert. Written as its own table rather than derived by comparing strings, because the
+	// EVERY ONE OF EPANET'S TEN FLOW KEYWORDS NOW HAS A SELECTOR UNIT OF ITS OWN (Task 390 step 4).
+	// `.inp` [OPTIONS] UNITS is a closed enumeration, so the `flow_epanet` family completes a finite
+	// list rather than chasing one, and no import has to convert a flow to reach a unit this page
+	// can show. Written as its own table rather than derived by comparing strings, because the
 	// keyword and our unit key are spelled differently on purpose (CFS vs ft3ps).
-	var LPN_INP_FLOW_SAME = { GPM: 1, CFS: 1, LPS: 1 };
+	var LPN_INP_FLOW_UNIT = {
+		GPM: 'gpm', MGD: 'mgd', IMGD: 'imgd', CFS: 'ft3ps', AFD: 'afd',
+		LPS: 'lps', LPM: 'lpm', MLD: 'mld', CMH: 'cmh', CMD: 'cmd'
+	};
+	// The keywords whose unit the selector really shows, so the file's own number crosses untouched.
+	// ALL TEN since the flow_epanet family landed -- kept as a table rather than deleted, because it
+	// is the thing that would have to shrink again if a keyword ever lost its selector, and a table
+	// that happens to be full says that far more plainly than a `true` would.
+	var LPN_INP_FLOW_SAME = { GPM: 1, MGD: 1, IMGD: 1, CFS: 1, AFD: 1, LPS: 1, LPM: 1, MLD: 1, CMH: 1, CMD: 1 };
 	function inpUnitSelections(parsed) {
 		var us = parsed.unitSystem === 'us';
 		return {
@@ -9438,10 +9442,39 @@ var EngCalcs = EngCalcs || {};
 	// a number whose meaning depends on a table that may be re-derived, while 'in' will mean inches
 	// forever. Since Task 390 that is also what the <option>'s own value is, so this is no longer a
 	// document-only convention -- the key is a unit's identity everywhere in the suite.
+	//
+	// ---- A UNIT THIS PAGE DOES NOT OFFER (ROADMAP Task 390 step 4) -------------------------------
+	//
+	// A unit is a LABEL and a MAGNITUDE, and they have different requirements. The label is a
+	// string: always storable, always displayable, and always the user's. The magnitude is a factor,
+	// and ONLY A SOLVE NEEDS ONE. So a name we have no factor for has one honest outcome and it is
+	// neither of the two obvious ones: not "reject the document", and not "guess a factor".
+	//
+	//   open the file, draw it faithfully, keep the name verbatim -- and REFUSE TO SOLVE, saying
+	//   which unit and why.
+	//
+	// The refusal is the work. EngCalcs.unitFactor() answers 1 for a name it has no factor for,
+	// which is right for a page RENDERING (a label still draws) and silently catastrophic for a page
+	// SOLVING (every length in the network would be off by whatever that unit really is), and
+	// nothing about the number on screen would look wrong. Two different messages are owed, and
+	// they are different facts: "we do not know this unit" and "so we cannot give you answers".
+	//
+	// {selectName: unitName}. Written ONLY by applyUnitSelections(), which is the one place a
+	// document's units are installed, so this object always describes the open document and never a
+	// leftover of the last one.
+	var unresolvedUnits = {};
+	function unresolvedUnitNames() {
+		return LPN_UNIT_SELECTS.map(function (name) { return unresolvedUnits[name]; })
+			.filter(function (u, i, all) { return u && all.indexOf(u) === i; });
+	}
 	function readUnitSelections() {
 		var out = {};
 		LPN_UNIT_SELECTS.forEach(function (name) {
-			var k = unitKey(name);
+			// THE CARRIED NAME WINS. A selector that could not be set is showing some other unit,
+			// and writing that one back would rewrite the user's own declaration -- the exact
+			// failure this task exists to end, one level up from the numbers. The name goes back
+			// out as it came in, so a browser that later learns the unit reads a correct document.
+			var k = unresolvedUnits[name] || unitKey(name);
 			if (k) { out[name] = k; }
 		});
 		return out;
@@ -9449,9 +9482,16 @@ var EngCalcs = EngCalcs || {};
 	// Restores a project's own units WITHOUT going through EngCalcs.setUnits(): that helper calls
 	// submitForm(), which re-enters pageCalculator, which is exactly the code path that is calling
 	// this. The selects are set directly and the caller re-renders once, in its own order.
-	// A unit this browser does not offer (a family that changed) is skipped rather than forced --
-	// leaving the current selection is a wrong unit; setting a missing one is a broken select.
+	//
+	// A UNIT THIS BROWSER DOES NOT OFFER is not forced onto the select and not thrown away either:
+	// it is recorded in unresolvedUnits above, kept verbatim by readUnitSelections(), shown by
+	// unitLabel(), and it stops the solve. See the block on unresolvedUnits for why that trio and
+	// not a rejection.
 	function applyUnitSelections(units) {
+		// Cleared unconditionally, INCLUDING on the early return: this function is the one place a
+		// document's units are installed, so it owns the whole of that state. Clearing only in the
+		// matched branch would leave one document's unknown unit refusing to solve the next one.
+		unresolvedUnits = {};
 		if (!units) { return false; }
 		var changed = false;
 		LPN_UNIT_SELECTS.forEach(function (name) {
@@ -9468,13 +9508,20 @@ var EngCalcs = EngCalcs || {};
 					return;
 				}
 			}
+			unresolvedUnits[name] = want;
 		});
 		return changed;
 	}
 	// Task 390: the select's value IS the unit's key ('in'), and the factor is a lookup from it
 	// through EngCalcs.unitFactors -- lib/Units.lib.php's own table, emitted by echoHTMLHead().
 	function unitFactor(name) { return EngCalcs.unitFactor(unitEl(name)); }
-	function unitLabel(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : ''; }
+	// THE LABEL IS THE ONE PART OF AN UNKNOWN UNIT WE CAN ALWAYS HONOUR, so a readout shows the
+	// document's own name rather than the name of whatever unit the select fell back to. Every
+	// readout on the page comes through here, so that is one place rather than a rule.
+	function unitLabel(name) {
+		if (unresolvedUnits[name]) { return unresolvedUnits[name]; }
+		var s = unitEl(name); return s ? s.options[s.selectedIndex].textContent : '';
+	}
 	function unitKey(name) { var s = unitEl(name); return s ? s.options[s.selectedIndex].value : null; }
 	// The map label's one unit token -- see numLine()'s `suffix` for why the gradient gets one and
 	// nothing else does. Not translated: '%' is the same mark in all 27 languages, including RTL.
@@ -12852,6 +12899,20 @@ var EngCalcs = EngCalcs || {};
 		// and per-page-load dedupe, so the initial load solve and the every-keystroke debounce do
 		// not inflate it.
 		if (EngCalcs.maybeLogCalcUsage) { EngCalcs.maybeLogCalcUsage(); }
+		// A UNIT WE HAVE NO FACTOR FOR STOPS THE SOLVE AND NOTHING ELSE (Task 390 step 4). The
+		// drawing is already on screen and every number is already the user's own; what cannot be
+		// done is arithmetic, because EngCalcs.unitFactor() answers 1 for a name it does not know
+		// and a network solved through that would look perfectly ordinary and be wrong. Checked
+		// BEFORE assembleModel(), which is the first thing that would multiply by it.
+		var unknownUnits = unresolvedUnitNames();
+		if (unknownUnits.length) {
+			lastSolveResult = null;
+			setStatus(((EngCalcs.pageConfig || {}).lpn_unit_unknown ||
+				'This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be worked out until this page knows that unit, because there is no way to tell how big it is.')
+				.replace('{unit}', unknownUnits.join(', ')));
+			refreshLabelText();
+			return;
+		}
 		var model = assembleModel(), issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
 			lastSolveResult = null;
