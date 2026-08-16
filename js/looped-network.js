@@ -8697,50 +8697,37 @@ var EngCalcs = EngCalcs || {};
 	// otherwise whatever tool (e.g. Delete) was active before stays active after, which reads as
 	// the example accidentally being deletable on the very next click.
 	//
-	// REWRITTEN 2026-08-09 (ROADMAP Task 254). What it replaced and why, so it is not walked back:
+	// TOPOLOGY. A five-junction ring fed at one point, not the two parallel pipes between one pair
+	// of junctions that a solver is equally happy with: only the ring shows flow leaving the tie-in
+	// BOTH ways and meeting at a hydraulic divide (between J3 and J4, where flow reverses and head
+	// loss crosses zero), which is the whole reason looped networks need a solver.
 	//
-	// TOPOLOGY. The old example was two parallel pipes between ONE pair of junctions. That is a
-	// loop topologically and satisfies the solver, but it is not what a water system looks like,
-	// and the calculator is named Looped Pipe Network. A five-junction ring fed at one point is
-	// the smallest thing a practitioner recognises as a ring main, and it shows the one behaviour
-	// the parallel pair cannot: flow leaves the tie-in BOTH ways round the ring and meets at a
-	// hydraulic divide (here between J3 and J4, where the flow reverses and head loss crosses
-	// zero). That divide is the whole reason looped networks need a solver at all.
+	// SCALE. A real network a user brings is on the order of 1000 m (3000 ft) across, and at that
+	// size the default 2.5-unit text is invisible. So the geometry and settings.textSize are set
+	// TOGETHER (see the comment on that line): what matters is the RATIO between linework and
+	// lettering, not either one alone.
 	//
-	// SCALE. The old example spanned 45 x 20 map units -- a plot, not a project. Tom, 2026-08-09:
-	// a real network a user brings is "on the order of 1000 m (3000 ft)" across, and at that size
-	// the default 2.5-unit text is invisible. So this sets BOTH the geometry and settings.textSize
-	// together (see the comment on that line): they are one decision, not two, because what was
-	// wrong was the RATIO between linework and lettering, not either one alone.
+	// UNITS AND PLACEMENT. ONE drawing serves both presets: laid out once in map units, with no
+	// US/SI coordinate scaling. Only the real SI quantities (elevation, demand, diameter, pump
+	// curve) go through niceDefault().
 	//
-	// UNITS AND PLACEMENT. ONE drawing serves both unit presets: the layout below is laid out once,
-	// in map units, with no US/SI coordinate scaling. Only the real SI quantities (elevation,
-	// demand, diameter, pump curve) go through niceDefault().
-	//
-	// **Map coordinates are NOT unitless -- they FOLLOW the Length/Map declaration** (Tom,
-	// 2026-08-09, correcting his own earlier "map coordinates are unitless": *"The truth is that
-	// they follow length and elevation."*). So this one drawing is a 1400 **ft** ring for a US
-	// visitor and a 1400 **m** ring for a metric one -- the metric network is physically ~3.3x
-	// larger, not the same system in other units. **That is accepted deliberately, not overlooked:**
-	// both sizes are realistic systems, both solve to sensible pressures (checked in
+	// **Map coordinates are NOT unitless -- they FOLLOW the Length/Map declaration.** So this one
+	// drawing is a 1400 **ft** ring for a US visitor and a 1400 **m** ring for a metric one; the
+	// metric network is physically ~3.3x larger, not the same system in other units. **Accepted
+	// deliberately:** both are realistic systems, both solve to sensible pressures (checked in
 	// dev/lpn-spike/example-network-harness.js), and with no backdrop registered there is nothing
 	// on screen for the difference to contradict. Revisit if the example ever ships with a
-	// background image, where a scale that means two different things would be visible and wrong.
+	// background image, where a scale meaning two different things would be visible and wrong.
 	//
-	// Anchored at 5000,5000 rather than at the origin (Tom, 2026-08-09: "center it or anchor it
-	// around 5000,5000"), so the example lands in positive coordinates that look like a survey or
-	// state-plane grid rather than like a sketch that starts at 0,0. Extent 1400 x 700, centre
-	// exactly 5000,5000.
-	// **NOTHING IN THE APP CALLS THIS ANY MORE** (Tom, 2026-08-15: *"Code-drawn: Remove the feature.
-	// I thought we already had removed it."*). The File > New rows that reached it are gone; the
-	// gallery ships this same ring main as Basic-example-US/SI-units-lpn.json, with a description
-	// and a thumbnail, and opening a FILE cannot need a zoom-to-fit because a file carries a view.
+	// Anchored at 5000,5000 rather than the origin, so it lands in positive coordinates that look
+	// like a survey or state-plane grid. Extent 1400 x 700, centre exactly 5000,5000.
 	//
-	// It stays for now as the fixture SEVEN harnesses build their network from -- closed-link,
-	// gradient-label, id-prefix, friction-method, label-affix, readout-sign and example-network all
-	// export it and solve it. Retiring it means giving those a network some other way, which is
-	// ROADMAP Task 378 and is not a five-minute edit. Said plainly rather than left to be
-	// rediscovered: this is 289 lines shipped to every visitor for the benefit of the test suite.
+	// **NOTHING IN THE APP CALLS THIS.** The gallery ships the same ring main as
+	// Basic-example-US/SI-units-lpn.json. It stays as the fixture SEVEN harnesses build their
+	// network from -- closed-link, gradient-label, id-prefix, friction-method, label-affix,
+	// readout-sign and example-network all export it and solve it. Retiring it means giving those
+	// a network some other way (ROADMAP Task 378). Said plainly: this is 289 lines shipped to
+	// every visitor for the benefit of the test suite.
 	function drawExampleNetwork(system) {
 		if (doc.nodes.length > 0) {
 			var pc = EngCalcs.pageConfig || {};
@@ -9978,61 +9965,25 @@ var EngCalcs = EngCalcs || {};
 		'bottom-left': { top: '', bottom: '4px', left: '4px', right: '', transform: '' },
 		'bottom-right': { top: '', bottom: '4px', left: '', right: '4px', transform: '' }
 	};
-	// Map height (settings panel): a user on a large monitor can size the map up from the original
-	// fixed 500px, and since 2026-08-14 the default is 800.
+	// THE RULE IS "THE PAGE MUST NOT NEED SCROLLING". The canvas height is MEASURED: fill the
+	// window exactly, minus whatever is genuinely above and below the canvas in normal flow.
 	//
-	// **THE RULE IS "THE PAGE MUST NOT NEED SCROLLING", NOT "72% OF THE VIEWPORT".** The old cap was
-	// a flat 0.72 x innerHeight, defended here as the invariant that prevents a real trap Tom hit on
-	// a phone (2026-07-31: "a phone can get stuck on the canvas when it fills the screen... I
-	// recovered safely by reloading the page"). The trap is real and the mechanism is exactly as
-	// described: #lpn_canvas carries `touch-action: none` so the app can own pan/zoom, which means
-	// every touch landing on the canvas is swallowed and CANNOT scroll the page. With a canvas
-	// taller than the viewport and CONTENT BELOW IT, there is no reachable page left to touch.
+	// The trap it exists to avoid: #lpn_canvas carries `touch-action: none` so the app can own
+	// pan/zoom, so every touch landing on the canvas is swallowed and CANNOT scroll the page. A
+	// canvas taller than the viewport with content below it leaves no reachable page to touch.
+	// The rejected alternative is a flat fraction of innerHeight (it was 0.72): that reserves a
+	// strip of viewport in case something is out of reach, where measuring leaves nothing out of
+	// reach, and it self-corrects if a future change puts something tall back under the map.
 	//
-	// But 0.72 was never the invariant -- it was a hedge sized for a page that then carried a
-	// feedback line, six Notes and a ten-link site footer. Tom, 2026-08-14: *"I don't understand.
-	// There is nothing below the epanetjs map. There's no need to scroll if the page is not
-	// scrollable."* He is right, and the correction matters: the trap is being unable to REACH
-	// content that exists, so the honest fix is to leave nothing out of reach rather than to
-	// reserve a strip of viewport in case something is. Task 314 moved the Notes into Help and
-	// dropped the site-nav row, so what remains below the canvas is one line of legal links.
-	//
-	// So the cap is now MEASURED: fill the window exactly, minus whatever is genuinely above and
-	// below the canvas in normal flow. The page then fits and never needs to scroll, which is the
-	// same place epanetjs is standing. Two properties worth keeping in mind if this is edited:
-	//
-	//   * It self-corrects. If a future change puts something tall back under the map, `below`
-	//     grows and the canvas shrinks to keep it reachable -- no constant to remember to revisit.
-	//   * It is a FLOOR, not just a cap. LPN_MAP_MIN keeps SOMETHING on screen when the window is
-	//     too short for a real canvas -- but see the constant itself for how low it goes and why.
-	//
-	// **THERE IS NO "MAP HEIGHT" SETTING ANY MORE** (Tom, 2026-08-14: "So Map height is now
-	// obsolete. Right?" -- yes). It existed so a user on a large monitor could grow the map beyond
-	// the original fixed 500px, and that is what this function now does by itself, on every screen,
-	// without being asked. What the control could still do was make the map SHORTER than the
-	// window, and once the page below the map was down to nothing there was nothing to shorten it
-	// FOR. Its tip had also become false in 27 languages -- it promised "part of the page is always
-	// left to scroll", which is precisely the behaviour this replaced -- so keeping the row meant
-	// paying for a reworded tip and a 26-language resync to describe a control with no use case.
-	//
-	// A document written before this still carries `settings.mapHeight`; applySaved() merges saved
-	// settings ONTO the defaults, so the stale key rides along unread and needs no migration. Same
-	// shape as `fileAutosaveSeconds`, retired by Task 211.
-	//
-	// The two lang keys are PARKED, not deleted -- see lib/lang.ec.en.php. Restoring the row is
-	// cheap; recovering 27 translations is not. Rewrite the tip before reusing it: it is wrong.
-	// **80, NOT 240** (Tom, 2026-08-15, on being shown that the floor is what stops the canvas
-	// re-centring and starts it cropping in a short window: *"Is there a good argument not to let it
-	// go to 80? I think I would like 80 better."*). There is not a good argument, and the one the
-	// old value rested on -- "a 60px map is not a working map" -- answers the wrong question. The
-	// floor does not decide whether the map is usable; the WINDOW does. All the floor decides is
-	// whether a window too short for a real canvas gets a small map that fits the page, or a bigger
-	// one that pushes the status strip off the bottom and makes the page scroll. A user in that
-	// window is going to resize it either way, and until they do, the honest thing is to keep the
-	// page whole.
-	//
-	// It is still a floor rather than zero, because zero would leave nothing to aim at and nothing
-	// to signal that the map is there at all.
+	// THERE IS NO "MAP HEIGHT" SETTING -- this function does on every screen what the control was
+	// for. Its two lang keys are PARKED, not deleted (see lib/lang.ec.en.php); the tip is wrong
+	// and must be rewritten before the row is ever restored. A document carrying the stale
+	// `settings.mapHeight` needs no migration: applySaved() merges saved settings onto the
+	// defaults, so it rides along unread.
+	// A FLOOR, not just a cap: something stays on screen when the window is too short for a real
+	// canvas. The floor does not decide whether the map is usable -- the WINDOW does. All it
+	// decides is whether such a window gets a small map that fits the page or a bigger one that
+	// pushes the status strip off the bottom. Not zero, which would leave nothing to aim at.
 	var LPN_MAP_MIN = 80;
 	// How much ordinary page sits BELOW the canvas, in document flow. The popovers do not count:
 	// every one of them is position:fixed and display:none, so they occupy no flow at all -- which
