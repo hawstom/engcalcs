@@ -722,11 +722,8 @@ $ec_lang['lpn_file_new']='নতুন প্রকল্প…';
 // rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='খালি প্রকল্প, US একক (gpm)';
 $ec_lang['lpn_new_blank_si']='খালি প্রকল্প, SI একক (l/s)';
-$ec_lang['lpn_new_from_examples']='উদাহরণ থেকে';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
-$ec_lang['lpn_new_example_us']='মৌলিক নেটওয়ার্ক, US একক (gpm)';
-$ec_lang['lpn_new_example_si']='মৌলিক নেটওয়ার্ক, SI একক (l/s)';
 $ec_lang['lpn_file_open']='খুলুন…';
 $ec_lang['lpn_file_save']='সংরক্ষণ করুন';
 $ec_lang['lpn_file_saveas']='নতুন নামে সংরক্ষণ করুন…';

@@ -722,11 +722,8 @@ $ec_lang['lpn_file_new']='Proyek baru…';
 // rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Proyek kosong, satuan AS (gpm)';
 $ec_lang['lpn_new_blank_si']='Proyek kosong, satuan SI (l/s)';
-$ec_lang['lpn_new_from_examples']='Dari contoh';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
-$ec_lang['lpn_new_example_us']='Jaringan dasar, satuan AS (gpm)';
-$ec_lang['lpn_new_example_si']='Jaringan dasar, satuan SI (l/s)';
 $ec_lang['lpn_file_open']='Buka…';
 $ec_lang['lpn_file_save']='Simpan';
 $ec_lang['lpn_file_saveas']='Simpan sebagai…';

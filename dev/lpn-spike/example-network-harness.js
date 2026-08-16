@@ -49,7 +49,7 @@ const L = loadLoopedNetwork(
   "\t\tapplySaved: applySaved, restorePending: function () { return pendingV2Restore; },\n" +
   "\t\tnewProject: newProject, offerUnitRestore: offerUnitRestore,\n" +
   "\t\ttabAsterisk: tabAsterisk, indexEntry: indexEntry, openId: function () { return library.openId; },\n" +
-  "\t\tnewProjectFromExample: newProjectFromExample, saveToStorage: saveToStorage,\n" +
+  "\t\tsaveToStorage: saveToStorage,\n" +
   "\t\tnewBlankProject: newBlankProject, refreshMapStatus: refreshMapStatus,\n" +
   "\t\tunitSetLabel: unitSetLabel,\n" +
   // Task 277. The gesture is driven through the REAL pointer handlers below; applyDrag() is
@@ -733,9 +733,13 @@ console.log('\n--- Settings panel stays in sync ---');
   const labels = byId.lpn_menu_list2.children
     .map(c => (c.children && c.children[1] && c.children[1].textContent) || '')
     .filter(Boolean);
-  ok('...carrying the real options', 
-    labels.indexOf(PC.lpn_new_blank_us) >= 0 && labels.indexOf(PC.lpn_new_blank_si) >= 0 && labels.indexOf(PC.lpn_new_example_us) >= 0 &&
-    labels.indexOf(PC.lpn_new_example_si) >= 0, labels.join(' | '));
+  // TWO ROWS NOW, NOT FOUR. The "From examples" pair was removed 2026-08-15 (Tom: "Code-drawn:
+  // Remove the feature."), so the fly-out offers a blank project in either unit system and nothing
+  // else. Asserted as an EXACT set rather than as two present-checks: the point of the edit was
+  // that the other two are gone, and a present-check cannot see a row come back.
+  ok('...carrying the real options, and only those',
+    labels.length === 2 && labels.indexOf(PC.lpn_new_blank_us) >= 0 && labels.indexOf(PC.lpn_new_blank_si) >= 0,
+    labels.join(' | '));
   ok('...and the parent list is untouched, so File is still File',
     byId.lpn_menu_list.children.length > 3);
   ok('the row stops its own click, so the dismissal cannot reach past it', clicked.stopped);
@@ -821,19 +825,11 @@ console.log('\n--- Settings panel stays in sync ---');
   ok('...faint, because it lives only in this browser',
     L.tabAsterisk(L.indexEntry(blankId)).faded === true);
 
-  // The example arrives by the user choosing it from a menu and is two clicks to recreate, so it is
-  // not unsaved work either.
-  L.newProjectFromExample('us');
-  const exId = L.openId();
-  ok('a project made from an example starts clean too',
-    L.tabAsterisk(L.indexEntry(exId)).show === false, 'dirty = ' + L.indexEntry(exId).dirty);
-  ok('...even though it is full of network', L.getDoc().links.length > 0);
-  // THROUGH THE REAL ENTRY POINT, not L.drawExample() directly: newProjectFromExample() is where the
-  // chosen system lives, and this is the only assertion that proves it reaches the title block. The
-  // direct-call tests above pass the system by hand, so dropping the argument here survives them.
-  ok('...and its title block names the system the menu row committed to',
-    L.getDoc().labels.some(t => t.text === L.unitSetLabel('us')),
-    L.getDoc().labels.map(t => t.text).join(' | '));
+  // THE EXAMPLE'S OWN CLEAN-START ASSERTIONS ARE GONE WITH THE FEATURE (2026-08-15). There used to
+  // be four here, all about newProjectFromExample(): that a project full of network still opened
+  // without an asterisk, and that the menu row's chosen unit system reached the title block. The
+  // gallery answers the first (an opened FILE is stamped saved by importProject) and the direct
+  // L.drawExample(system) tests above answer the second.
 }
 
 

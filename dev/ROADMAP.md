@@ -50,6 +50,18 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
+- 55|378| **[H] Give the seven harnesses a network some other way, and delete
+  `drawExampleNetwork()`.** The 289-line code-drawn ring main lost its last user-facing caller when
+  Task 375's follow-up removed the File > New "From examples" rows, but seven harnesses still build
+  their network from it — closed-link, gradient-label, id-prefix, friction-method, label-affix,
+  readout-sign and example-network. So it ships to every visitor as dead weight for the benefit of
+  the test suite, which is worth saying out loud rather than leaving to be rediscovered.
+  - **The obvious replacement is the gallery file it was copied into.** `examples/Basic-example-US-
+    units-lpn.json` is the same network; a fixture that reads it through `acceptImportedText()` +
+    `applySaved()` would also be testing the path a real user takes, which the code path never was.
+  - The care needed is that those harnesses assert solved pressures and specific IDs. Migrate one
+    first and diff its output against the current run before touching the other six.
+
 - 75|376| **[H] Replace the label MASK RECT with a text halo, the way epanetjs does it.** Tom,
   2026-08-15, reporting on their build: *"They have a very small hide/mask/patch buffer that follows
   strokes of text and merges together where characters are close; this is very desirable instead of

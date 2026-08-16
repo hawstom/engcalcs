@@ -723,11 +723,8 @@ $ec_lang['lpn_file_new']='ပရောဂျက်အသစ်…';
 // rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='ပရောဂျက် ဗလာ၊ US ယူနစ် (gpm)';
 $ec_lang['lpn_new_blank_si']='ပရောဂျက် ဗလာ၊ SI ယူနစ် (l/s)';
-$ec_lang['lpn_new_from_examples']='ဥပမာများမှ';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
-$ec_lang['lpn_new_example_us']='အခြေခံကွန်ရက်၊ US ယူနစ် (gpm)';
-$ec_lang['lpn_new_example_si']='အခြေခံကွန်ရက်၊ SI ယူနစ် (l/s)';
 $ec_lang['lpn_file_open']='ဖွင့်ရန်…';
 $ec_lang['lpn_file_save']='သိမ်းရန်';
 $ec_lang['lpn_file_saveas']='တခြားအမည်ဖြင့် သိမ်းရန်…';

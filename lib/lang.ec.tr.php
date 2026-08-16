@@ -735,11 +735,8 @@ $ec_lang['lpn_file_new']='Yeni proje…';
 // rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Boş proje, ABD birimleri (gpm)';
 $ec_lang['lpn_new_blank_si']='Boş proje, SI birimleri (l/s)';
-$ec_lang['lpn_new_from_examples']='Örneklerden';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
-$ec_lang['lpn_new_example_us']='Temel şebeke, ABD birimleri (gpm)';
-$ec_lang['lpn_new_example_si']='Temel şebeke, SI birimleri (l/s)';
 $ec_lang['lpn_file_open']='Aç…';
 $ec_lang['lpn_file_save']='Kaydet';
 $ec_lang['lpn_file_saveas']='Farklı kaydet…';

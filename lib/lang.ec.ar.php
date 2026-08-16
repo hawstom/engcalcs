@@ -723,11 +723,8 @@ $ec_lang['lpn_file_new']='مشروع جديد…';
 // rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='مشروع فارغ، وحدات أمريكية (gpm)';
 $ec_lang['lpn_new_blank_si']='مشروع فارغ، وحدات النظام الدولي (l/s)';
-$ec_lang['lpn_new_from_examples']='من الأمثلة';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
-$ec_lang['lpn_new_example_us']='شبكة أساسية، وحدات أمريكية (gpm)';
-$ec_lang['lpn_new_example_si']='شبكة أساسية، وحدات النظام الدولي (l/s)';
 $ec_lang['lpn_file_open']='فتح…';
 $ec_lang['lpn_file_save']='حفظ';
 $ec_lang['lpn_file_saveas']='حفظ باسم…';

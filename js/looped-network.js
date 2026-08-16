@@ -7072,7 +7072,7 @@ var EngCalcs = EngCalcs || {};
 	// plain view. The mark was the thing that was wrong.
 	//
 	// What makes this work is that a freshly created project now gets a BASELINE (see
-	// stampProjectSaved(), called by newProject and newProjectFromExample): `savedSig` is recorded
+	// stampProjectSaved(), called by newBlankProject and by the gallery): `savedSig` is recorded
 	// at birth, so `dirty` is false until the user actually changes something. The faint asterisk
 	// then means what the bold one means -- there is work here that is in no file -- and appears at
 	// the first edit, which is the first moment there is anything to lose.
@@ -7410,15 +7410,13 @@ var EngCalcs = EngCalcs || {};
 			// the fly-out is a template list, which is the shape File > New has in every application
 			// that has one.
 			{ icon: 'new', label: pc.lpn_new_blank_us || 'Blank project, US units (gpm)', fn: function () { newBlankProject('us'); } },
-			{ icon: 'new', label: pc.lpn_new_blank_si || 'Blank project, SI units (l/s)', fn: function () { newBlankProject('si'); } },
-			{ separator: true },
-			{ heading: true, label: pc.lpn_new_from_examples || 'From examples' },
-			// The flow unit is IN THE LABEL, not merely implied by "US"/"SI" (Tom, 2026-08-10: "it's
-			// important in this situation to show them what our preset flow units are"). gpm and l/s are
-			// the concrete thing a water engineer recognises at a glance; the system name alone is a
-			// category they have to translate into units themselves.
-			{ icon: 'example', label: pc.lpn_new_example_us || 'Basic network, US units (gpm)', fn: function () { newProjectFromExample('us'); } },
-			{ icon: 'example', label: pc.lpn_new_example_si || 'Basic network, SI units (l/s)', fn: function () { newProjectFromExample('si'); } }
+			{ icon: 'new', label: pc.lpn_new_blank_si || 'Blank project, SI units (l/s)', fn: function () { newBlankProject('si'); } }
+			// **NO "FROM EXAMPLES" ROWS HERE** (Tom, 2026-08-15: *"Code-drawn: Remove the feature."*).
+			// This fly-out used to carry two more rows that built the basic ring main in code. The
+			// GALLERY ships the identical network as two files, with a description and a thumbnail
+			// the code rows could never have -- so the second route was a duplicate that could only
+			// drift, and it was the last caller of an automatic zoom-to-fit on content the user did
+			// not open.
 		];
 	}
 	// The TOOLBAR route opens these as a pull-down under the button, not as a fly-out: there is no
@@ -7448,16 +7446,6 @@ var EngCalcs = EngCalcs || {};
 		// project dirty, so stamping first would leave a brand-new empty tab wearing an asterisk --
 		// the very defect the baseline exists to remove.
 		stampProjectSaved(newProjectWithUnits(system));
-		renderTabs();
-	}
-	function newProjectFromExample(system) {
-		logLpnFirstAction('example');
-		var id = newProjectWithUnits(system);
-		drawExampleNetwork(system);
-		// The example is not the user's unsaved work either -- it arrived by their choosing it from a
-		// menu, and it is two clicks to get back. So it starts clean, exactly as a blank project
-		// does, and earns its asterisk at the first edit.
-		stampProjectSaved(id);
 		renderTabs();
 	}
 	function openFileMenu(anchor) {
@@ -8410,6 +8398,16 @@ var EngCalcs = EngCalcs || {};
 	// around 5000,5000"), so the example lands in positive coordinates that look like a survey or
 	// state-plane grid rather than like a sketch that starts at 0,0. Extent 1400 x 700, centre
 	// exactly 5000,5000.
+	// **NOTHING IN THE APP CALLS THIS ANY MORE** (Tom, 2026-08-15: *"Code-drawn: Remove the feature.
+	// I thought we already had removed it."*). The File > New rows that reached it are gone; the
+	// gallery ships this same ring main as Basic-example-US/SI-units-lpn.json, with a description
+	// and a thumbnail, and opening a FILE cannot need a zoom-to-fit because a file carries a view.
+	//
+	// It stays for now as the fixture SEVEN harnesses build their network from -- closed-link,
+	// gradient-label, id-prefix, friction-method, label-affix, readout-sign and example-network all
+	// export it and solve it. Retiring it means giving those a network some other way, which is
+	// ROADMAP Task 378 and is not a five-minute edit. Said plainly rather than left to be
+	// rediscovered: this is 289 lines shipped to every visitor for the benefit of the test suite.
 	function drawExampleNetwork(system) {
 		if (doc.nodes.length > 0) {
 			var pc = EngCalcs.pageConfig || {};

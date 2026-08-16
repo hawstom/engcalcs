@@ -669,9 +669,6 @@
         "lpn_file_new": "New project…",
         "lpn_new_blank_us": "Blank project, US units (gpm)",
         "lpn_new_blank_si": "Blank project, SI units (l\/s)",
-        "lpn_new_from_examples": "From examples",
-        "lpn_new_example_us": "Basic network, US units (gpm)",
-        "lpn_new_example_si": "Basic network, SI units (l\/s)",
         "lpn_file_open": "Open…",
         "lpn_file_save": "Save",
         "lpn_file_saveas": "Save as…",
@@ -963,7 +960,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 961,
+    "count": 958,
     "active_prefixes": [
         "about",
         "bpn",
