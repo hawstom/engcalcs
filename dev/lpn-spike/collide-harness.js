@@ -52,9 +52,12 @@ console.log('--- the separating-axis theorem, which is what lets a box turn ---'
 	const diag = C.box(0, 0, 40, 6, 45);
 	const beside = C.box(18, -18, 40, 6, 45);
 	report(C.boxOverlapDepth(diag, beside) === 0, 'two parallel diagonal labels side by side are clear');
-	const aabbA = { x: -16.3, y: -16.3, w: 32.5, h: 32.5 };   // the AABB of `diag`, near enough
-	const aabbB = { x: 1.7, y: -34.3, w: 32.5, h: 32.5 };
-	report(C.rectsOverlap(aabbA, aabbB), '...while their AXIS-ALIGNED boxes do overlap -- the defect this replaces');
+	// ...while their AXIS-ALIGNED boxes do overlap, which is the defect this replaces. Written as the
+	// same call at angle zero rather than through a separate rect predicate, because that is exactly
+	// the claim being made: an unrotated box is this code at angle zero and nothing else is needed.
+	const side = Math.abs(40 * Math.SQRT1_2) + Math.abs(6 * Math.SQRT1_2);   // the AABB of `diag`
+	report(C.boxOverlapDepth(C.box(0, 0, side, side, 0), C.box(18, -18, side, side, 0)) > 0,
+		'...while their AXIS-ALIGNED boxes do overlap -- the defect this replaces');
 	report(C.boxOverlapDepth(diag, C.box(0, 0, 40, 6, -45)) > 0, 'and a crossing pair really does collide');
 	// A 90-degree turn is the same box with w and h swapped, which is the cheapest check that the
 	// axes are being built and not merely assumed.

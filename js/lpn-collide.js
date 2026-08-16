@@ -207,16 +207,6 @@ EngCalcs.lpnCollide = (function () {
 		return ((d1 > 0) !== (d2 > 0)) && ((d3 > 0) !== (d4 > 0));
 	}
 
-	// Do two PLAIN rects {x, y, w, h} overlap? Exposed for callers that need to ASK rather than to
-	// score -- specifically the aligned-pipe-label station search, which has one degree of freedom
-	// (where along its own pipe) and picks a station by trying and testing. Shared so the two never
-	// disagree about what "clear" means.
-	function rectsOverlap(a, b, pad) {
-		var p = pad || 0;
-		return Math.min(a.x + a.w, b.x + b.w) - Math.max(a.x, b.x) > -p
-			&& Math.min(a.y + a.h, b.y + b.h) - Math.max(a.y, b.y) > -p;
-	}
-
 	// ---- candidates ----------------------------------------------------------------------------
 	//
 	// **THE ANGLES ARE OFF-ORTHOGONAL BY CONSTRUCTION (goal 7).** Eight of them, 45 degrees apart,
@@ -557,7 +547,6 @@ EngCalcs.lpnCollide = (function () {
 		boxOverlapDepth: boxOverlapDepth,
 		segmentInBoxFraction: segmentInBoxFraction,
 		segmentsCross: segmentsCross,
-		rectsOverlap: rectsOverlap,
 		candidatesFor: candidatesFor,
 		labelBoxAtEnd: labelBoxAtEnd,
 		obstaclesInReach: obstaclesInReach,

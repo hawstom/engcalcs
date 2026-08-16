@@ -89,14 +89,27 @@ console.log('\n-- rotatedLabelBox: a diagonal label is wider AND taller than eit
 	report(b.w >= 10 * Math.cos(Math.PI / 4), 'the AABB never under-claims');
 }
 
-console.log('\n-- rectsOverlap, shared with the relaxation so the two agree on "clear" --');
+console.log('\n-- the clearance test the station search shares with the placement pass --');
 {
-	const a = { x: 0, y: 0, w: 10, h: 10 };
-	report(Collide.rectsOverlap(a, { x: 5, y: 5, w: 10, h: 10 }), 'plainly overlapping');
-	report(!Collide.rectsOverlap(a, { x: 11, y: 0, w: 10, h: 10 }), 'plainly clear');
-	report(!Collide.rectsOverlap(a, { x: 10, y: 0, w: 10, h: 10 }), 'exactly touching is not overlapping');
-	report(Collide.rectsOverlap(a, { x: 11, y: 0, w: 10, h: 10 }, 2), 'a pad makes near neighbours count as crowded');
-	report(!Collide.rectsOverlap(a, { x: 11, y: 0, w: 10, h: 10 }, 0.5), 'a pad smaller than the gap does not');
+	// The station search asks "is this box clear?" and the placement pass asks "how deep is the
+	// overlap?" -- one predicate underneath both, so a station the search calls clear is never one
+	// the placement pass then treats as collided. Shared since Task 379 as boxOverlapDepth(), which
+	// also made the test ORIENTED: an aligned label's box turns with its pipe, and the axis-aligned
+	// box around a diagonal one claims up to 5.2x its own area.
+	const a = Collide.box(5, 5, 10, 10, 0);
+	report(Collide.boxOverlapDepth(a, Collide.box(10, 10, 10, 10, 0)) > 0, 'plainly overlapping');
+	report(Collide.boxOverlapDepth(a, Collide.box(16, 5, 10, 10, 0)) === 0, 'plainly clear');
+	report(Collide.boxOverlapDepth(a, Collide.box(15, 5, 10, 10, 0)) === 0, 'exactly touching is not overlapping');
+	// The pad the search adds is a grown box, which is how boxIsClear() applies it -- boxes that
+	// merely come close still read as crowded on the page.
+	report(Collide.boxOverlapDepth(Collide.box(5, 5, 14, 14, 0), Collide.box(16, 5, 10, 10, 0)) > 0,
+		'a pad makes near neighbours count as crowded');
+	report(Collide.boxOverlapDepth(Collide.box(5, 5, 11, 11, 0), Collide.box(16, 5, 10, 10, 0)) === 0,
+		'a pad smaller than the gap does not');
+	// AND THE ROTATION IS THE POINT: two labels lying along parallel diagonal pipes are clear of
+	// each other, where their axis-aligned boxes overlap heavily.
+	report(Collide.boxOverlapDepth(Collide.box(0, 0, 40, 6, 45), Collide.box(18, -18, 40, 6, 45)) === 0,
+		'two labels on parallel diagonal pipes are clear, which an axis-aligned test denied');
 }
 
 console.log('\n-- wiring: an aligned label no longer goes through the ordinary relaxation --');
