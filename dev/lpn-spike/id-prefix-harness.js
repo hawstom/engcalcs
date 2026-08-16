@@ -151,5 +151,52 @@ L.applyToAll('J');
 ok('the drawing is untouched', doc.nodes.map(n => n.id).join(',') === before, doc.nodes.map(n => n.id).join(','));
 answer = true;
 
+// ---- THE THREE LISTS OF ELEMENT TYPES AGREE ON THEIR ORDER -------------------------------------
+// Tom, 2026-08-15: "Menu and toolbar order: Let's change to Junction, Reservoir, Tank, Pipe, Pump,
+// Valve. That's reasonable and follows both our examples." Then, a minute later: "Settings ID list
+// should follow menu order."
+//
+// THE ORDER IS WRITTEN OUT THREE TIMES -- the Insert menu, the toolbar, and the ID-prefix rows in
+// Settings -- and nothing but this connects them. They had already drifted apart before he asked:
+// the menu and toolbar led with Reservoir and buried Junction and Pipe in the middle, while the
+// prefix rows ran R, T, J, P, V, L, which is no order at all. Three hand-written lists in two files
+// is exactly the shape that goes stale the next time somebody adds an element type.
+//
+// Nodes then links, each in the order you build them: junctions, the sources that feed them, the
+// pipe that joins them, the two things you put ON a pipe. Text last, being the only tool that adds
+// nothing hydraulic -- and absent from the prefix rows entirely, since a text element's ID is
+// unreachable from every screen in the app (see the comment on that list).
+{
+	const fs = require('fs');
+	const path = require('path');
+	const src = fs.readFileSync(path.join(__dirname, '../../js/looped-network.js'), 'utf8');
+	const WANT = ['junction', 'reservoir', 'tank', 'pipe', 'pump', 'valve'];
+	function orderIn(fnName, re) {
+		const at = src.indexOf(fnName);
+		const chunk = src.slice(at, at + 3000);
+		const out = [];
+		let m;
+		const rx = new RegExp(re, 'g');
+		while ((m = rx.exec(chunk))) { if (WANT.indexOf(m[1]) >= 0 && out.indexOf(m[1]) < 0) { out.push(m[1]); } }
+		return out;
+	}
+	const menu = orderIn('function openInsertMenu', "icon: '([a-z]+)'");
+	const toolbar = orderIn("addGroup.dataset.edits", "mode: 'add-([a-z]+)'");
+	// The prefix rows name their type through the reused Add-tool label key, not through an icon.
+	const prefixes = orderIn("var idBody = section('idPrefixes'", "lpn_tool_add_([a-z]+)");
+	ok('the Insert menu is in the agreed order: ' + WANT.join(', '),
+		menu.join(',') === WANT.join(','), menu.join(','));
+	ok('the toolbar matches it', toolbar.join(',') === WANT.join(','), toolbar.join(','));
+	ok('and so do the ID-prefix rows in Settings', prefixes.join(',') === WANT.join(','),
+		prefixes.join(','));
+	// A VALVE IS A LINK and has been since Task 248 phase 2 -- its own prefix, its own counter, keyed
+	// V beside the pipe's L and the pump's P. Tom asked whether it needed one; it already had one,
+	// and this is what says so.
+	ok('a valve has its own ID prefix and counter, like every other link',
+		/valve: 'V'/.test(src) && /idPrefixes: \{[^}]*V: 'V'/.test(src) && /V: 1/.test(src));
+	ok('...and a pipe keys off L, so a link ID starts at L by default',
+		/pipe: 'L'/.test(src) && /idPrefixes: \{[^}]*L: 'L'/.test(src));
+}
+
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);

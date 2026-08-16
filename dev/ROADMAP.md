@@ -1849,6 +1849,18 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|368| **One order for the element types, in all three places — DONE 2026-08-15.** Tom: *"Let's
+  change to Junction, Reservoir, Tank, Pipe, Pump, Valve. That's reasonable and follows both our
+  examples,"* then *"Settings ID list should follow menu order."* Nodes then links, each in the
+  order you build them; Text last, being the only tool that adds nothing hydraulic.
+  - The order was written out three times — the Insert menu, the toolbar, and the ID-prefix rows —
+    and had already drifted: menu and toolbar led with Reservoir and buried Junction and Pipe in the
+    middle, while the prefix rows ran R, T, J, P, V, L, which is no order at all.
+    `id-prefix-harness.js` now reads all three out of the source and fails if they disagree.
+  - **Both of Tom's guesses about valves were already true**: a valve is a LINK with its own prefix
+    (`V`) and its own counter since Task 248 phase 2, and a pipe keys off `L`, so a link ID already
+    starts at L by default. Asserted rather than assumed, since the question will recur.
+
 - 0|366| **A zoom no longer measures or recomposes anything — DONE 2026-08-15.** Tom's numbers:
   *"Net3 with labels showing takes over 1 second to render on tab refocus. It takes 3/4 second to
   zoom to fit. Scroll zooms are about 1/4 second each."* Every zoom ran `refreshLabelText()`, which

@@ -7476,13 +7476,23 @@ var EngCalcs = EngCalcs || {};
 	}
 	function openInsertMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
+		// **NODES THEN LINKS, EACH IN THE ORDER YOU BUILD THEM** (Tom, 2026-08-15: *"Let's change to
+		// Junction, Reservoir, Tank, Pipe, Pump, Valve. That's reasonable and follows both our
+		// examples."*). The old order put reservoirs and tanks first and buried the junction and the
+		// pipe -- the two tools that account for nearly every click -- in the middle of the row.
+		// This one reads as the sentence a person draws in: junctions, then the sources that feed
+		// them, then the pipe that joins them, then the two things you put ON a pipe. Text stays
+		// last, being the only tool that adds nothing hydraulic.
+		//
+		// THE SAME ORDER APPEARS IN THREE PLACES and they must agree: this menu, the toolbar, and
+		// the ID-prefix rows in Settings.
 		openMenu(anchor, [
+			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', fn: function () { setMode('add-junction'); } },
 			{ icon: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', fn: function () { setMode('add-reservoir'); } },
 			{ icon: 'tank', label: pc.lpn_tool_add_tank || 'Tank', fn: function () { setMode('add-tank'); } },
+			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
 			{ icon: 'pump', label: pc.lpn_tool_add_pump || 'Pump', fn: function () { setMode('add-pump'); } },
 			{ icon: 'valve', label: pc.lpn_tool_add_valve || 'Valve', fn: function () { setMode('add-valve'); } },
-			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', fn: function () { setMode('add-junction'); } },
-			{ icon: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', fn: function () { setMode('add-pipe'); } },
 			{ icon: 'text', label: pc.lpn_tool_add_text || 'Text', fn: function () { setMode('add-text'); } },
 			{ separator: true }
 		].concat(backdropRows(true)).concat([
@@ -8147,13 +8157,15 @@ var EngCalcs = EngCalcs || {};
 		// that needs that question (a review mode, a locked scenario) can use without re-deriving it.
 		var addGroup = group();
 		addGroup.dataset.edits = '1';
+		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Text -- the same order as the Insert menu and
+		// the ID-prefix rows. See openInsertMenu() for why that order.
 		[
+			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
 			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
 			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank' },
+			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe' },
 			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump' },
 			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve' },
-			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
-			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe' },
 			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
@@ -9950,11 +9962,16 @@ var EngCalcs = EngCalcs || {};
 		// both stay -- IDs must still be generated and unique -- so this removes the control, not
 		// the concept. Restore the row (one array entry) if Task 146.05's element browser ever
 		// lists text elements the way EPANET's own Browser does.
+		// Same order as the Insert menu and the toolbar -- see openInsertMenu(). A valve has had its
+		// own prefix and its own counter since Task 248 phase 2; it is a LINK, like a pipe and a
+		// pump, and the three of them are keyed L, P and V.
 		[
-			['R', pc.lpn_tool_add_reservoir || 'Reservoir'], ['T', pc.lpn_tool_add_tank || 'Tank'],
 			['J', pc.lpn_tool_add_junction || 'Junction'],
-			['P', pc.lpn_tool_add_pump || 'Pump'], ['V', pc.lpn_tool_add_valve || 'Valve'],
-			['L', pc.lpn_tool_add_pipe || 'Pipe']
+			['R', pc.lpn_tool_add_reservoir || 'Reservoir'],
+			['T', pc.lpn_tool_add_tank || 'Tank'],
+			['L', pc.lpn_tool_add_pipe || 'Pipe'],
+			['P', pc.lpn_tool_add_pump || 'Pump'],
+			['V', pc.lpn_tool_add_valve || 'Valve']
 		].forEach(function (f) {
 			var key = f[0], input = document.createElement('input'), wrap = document.createElement('span');
 			input.type = 'text'; input.size = 4; input.value = settings.idPrefixes[key];
