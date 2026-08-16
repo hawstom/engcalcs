@@ -1234,13 +1234,24 @@ var EngCalcs = EngCalcs || {};
 	// it, or a solve result not yet available). Returns null when fewer than 3 defined values exist
 	// (Tom, 2026-07-30) -- with only 1 or 2 members "the max" and "the min" aren't a finding, just
 	// the two ends of a trivial set (with 1, the same value would be both at once).
+	// A CROWD IS NOT A FINDING, so each end also carries how many elements hold it (Task 346).
+	// Elm Street prints Q=0.00 on thirteen zero-demand junctions and marked every one of them
+	// "lowest". Counting is what decorationFor() needs to refuse that; the alternatives on the
+	// roadmap -- skip zero, or mark the smallest non-zero -- both need to know what the FIELD means,
+	// and zero is an absence in a demand but a datum in an elevation and a reading in a pressure.
 	function fieldExtrema(values) {
 		var defined = values.filter(function (v) { return typeof v === 'number'; });
 		if (defined.length < 3) { return null; }
-		return { min: Math.min.apply(null, defined), max: Math.max.apply(null, defined) };
+		var min = Math.min.apply(null, defined), max = Math.max.apply(null, defined);
+		var held = function (v) { return defined.filter(function (x) { return x === v; }).length; };
+		return { min: min, max: max, minHeld: held(min), maxHeld: held(max) };
 	}
-	// 'high'/'low', not a boolean -- ties (2+ elements sharing the extreme) all get marked, not
-	// just the first found, since each element is judged independently against the same extrema.
+	// Two or three elements sharing an end is still "these are the ones", which a reader can act on;
+	// a dozen is a category wearing a chevron.
+	var LPN_EXTREMA_TIE_MAX = 3;
+	// 'high'/'low', not a boolean -- a small tie has every member marked, not just the first found,
+	// since each element is judged independently against the same extrema. A tie past
+	// LPN_EXTREMA_TIE_MAX is dropped for both of them at once.
 	function decorationFor(extrema, value) {
 		// Task 190's global toggle is enforced HERE, not by suppressing the extrema themselves: the
 		// extrema objects stay computed and correct, so turning the marks back on needs no recompute
@@ -1248,8 +1259,8 @@ var EngCalcs = EngCalcs || {};
 		if (!labelSettings.markExtrema) { return undefined; }
 		if (!extrema || typeof value !== 'number') { return undefined; }
 		if (value === extrema.max && value === extrema.min) { return undefined; }
-		if (value === extrema.max) { return 'high'; }
-		if (value === extrema.min) { return 'low'; }
+		if (value === extrema.max) { return extrema.maxHeld > LPN_EXTREMA_TIE_MAX ? undefined : 'high'; }
+		if (value === extrema.min) { return extrema.minHeld > LPN_EXTREMA_TIE_MAX ? undefined : 'low'; }
 		return undefined;
 	}
 
@@ -3552,13 +3563,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function showBackdropTargetPanel(refWorld) {
 		var panel = document.getElementById('lpn_backdrop_target_panel'),
-			menu = document.getElementById('lpn_backdrop_menu'), r = menu.getBoundingClientRect();
-		panel.style.left = r.left + 'px'; panel.style.top = (r.bottom + 4) + 'px'; panel.style.display = 'block';
-		// Clamp into the viewport, same as openPopupAt()/toggleLabelsPopup() -- measured after
-		// display:block since size is unknown while display:none.
-		var pr = panel.getBoundingClientRect();
-		panel.style.left = Math.max(4, Math.min(r.left, window.innerWidth - pr.width - 4)) + 'px';
-		panel.style.top = Math.max(4, Math.min(r.bottom + 4, window.innerHeight - pr.height - 4)) + 'px';
+			menu = document.getElementById('lpn_backdrop_menu');
+		// Placed and height-fitted by the one shared placer (Task 372), like every other panel that
+		// hangs off a control.
+		openPanelAtAnchor(panel, menu.getBoundingClientRect());
 		activeCancel = function () { panel.style.display = 'none'; setRegMode(false); };
 		document.getElementById('lpn_backdrop_target_continue').onclick = function () {
 			var mode = document.getElementById('lpn_backdrop_target_mode').value, pc = EngCalcs.pageConfig || {};
@@ -7406,12 +7414,20 @@ var EngCalcs = EngCalcs || {};
 	// are currently seeing the other menus while Labels persists." The property popup (#lpn_popup) is
 	// deliberately NOT in this list: it has its own currentPopup machinery and its own dismissal.
 	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup', 'lpn_notes_popup'];
+	// The control that opened the popover now showing -- the toolbar button, or the menu-bar item.
+	// Same job openMenuAnchor does for the menus, and needed for the same reason: the click that
+	// OPENED a popover must not also be read as a click away from it. Task 372 -- until then the
+	// dismissal exempted the whole menu bar and the whole toolbar instead, which was a blunt way of
+	// protecting these two buttons and cost Tom the thing he reported: "When Labels or Settings are
+	// open, clicking in the top row of the menu bar does not close them."
+	var viewPopoverAnchor = null;
 	function closeViewPopovers(except) {
 		VIEW_POPOVERS.forEach(function (id) {
 			if (id === except) { return; }
 			var el = document.getElementById(id);
 			if (el) { el.style.display = 'none'; }
 		});
+		if (!except) { viewPopoverAnchor = null; }
 	}
 	// Which control opened the menu that is showing, so a second click on the SAME control closes it
 	// instead of rebuilding it (Tom, 2026-08-04: the vertical-tabs icon "doesn't toggle"). The
@@ -7559,21 +7575,11 @@ var EngCalcs = EngCalcs || {};
 			}
 			list.appendChild(b);
 		});
-		// Same position-from-the-anchor-rect-then-clamp dance the property popovers use. A fly-out
-		// goes BESIDE its row (right edge, top aligned) rather than below it, which is what makes it
-		// read as a branch of the parent instead of a replacement for it.
-		var rect = anchor.getBoundingClientRect();
-		var wantLeft = level ? rect.right : rect.left;
-		var wantTop = level ? rect.top : rect.bottom;
-		popup.style.left = wantLeft + 'px';
-		popup.style.top = wantTop + 'px';
-		popup.style.display = 'block';
-		var pr = popup.getBoundingClientRect();
-		// A fly-out with no room to its right flips to the LEFT of the parent row rather than being
-		// clamped on top of it -- the clamp alone would slide it back over the words it branches from.
-		if (level && wantLeft + pr.width > window.innerWidth - 4) { wantLeft = rect.left - pr.width; }
-		popup.style.left = Math.max(4, Math.min(wantLeft, window.innerWidth - pr.width - 4)) + 'px';
-		popup.style.top = Math.max(4, Math.min(wantTop, window.innerHeight - pr.height - 4)) + 'px';
+		// Placed by the one shared placer (Task 372). A fly-out goes BESIDE its row (right edge, top
+		// aligned) rather than below it, which is what makes it read as a branch of the parent
+		// instead of a replacement for it; a top-level menu hangs under its menu-bar button and,
+		// like every other panel here, gives up height rather than covering that button.
+		openPanelAtAnchor(popup, anchor.getBoundingClientRect(), !!level);
 		// Rows are built fresh on every open, so their tips are new DOM every time and need arming --
 		// this is exactly the case ROADMAP Task 173 added initTips(root) for (a tooltip built after
 		// page load is dead on touch without it).
@@ -7933,9 +7939,10 @@ var EngCalcs = EngCalcs || {};
 		closeMenu();
 		closeViewPopovers();
 		popup.style.display = 'block';
+		var h = fitPanelToViewport(popup);
 		var pr = popup.getBoundingClientRect();
-		popup.style.left = Math.max(4, (window.innerWidth - pr.width) / 2) + 'px';
-		popup.style.top = Math.max(4, (window.innerHeight - pr.height) / 2) + 'px';
+		popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - pr.width) / 2) + 'px';
+		popup.style.top = Math.max(POPUP_EDGE, (window.innerHeight - h) / 2) + 'px';
 	}
 	function wireNotesPopup() {
 		var x = document.getElementById('lpn_notes_close');
@@ -8172,10 +8179,22 @@ var EngCalcs = EngCalcs || {};
 				var el = document.getElementById(id);
 				return el && el.style.display === 'block' && el.contains(e.target);
 			});
-			// The menu bar and the toolbar own their own opening logic; a click there must not be
-			// read as "clicked away" before that logic runs.
-			var onChrome = e.target.closest && e.target.closest('#lpn_menubar, #lpn_toolbar, #lpn_menu_popup');
-			if (!inside && !onChrome) { closeViewPopovers(); }
+			// TWO EXEMPTIONS, AND NO MORE THAN TWO (Task 372). The button that opened the popover,
+			// because its own handler has already run and closing here would undo it; and a click on
+			// a MENU ROW, because rows are what open Labels, Settings and the Notes from the View and
+			// Help menus, and the row is not inside the popover it just opened.
+			//
+			// What is deliberately NOT exempt any more is the menu bar and the toolbar at large.
+			// Exempting them was a blunt way of protecting the one button above, and it bought Tom's
+			// report: clicking the top row of the menu bar left the panels open while clicking
+			// anywhere else closed them. The menu-bar ITEMS never reach this handler at all -- they
+			// stopPropagation so opening a menu does not immediately dismiss it -- so the exemption
+			// was only ever covering the bar's empty space and the toolbar's other buttons, which are
+			// exactly the clicks a user means as "away".
+			var onOpener = viewPopoverAnchor && (e.target === viewPopoverAnchor ||
+				(viewPopoverAnchor.contains && viewPopoverAnchor.contains(e.target)));
+			var inMenu = e.target.closest && e.target.closest('#lpn_menu_popup, #lpn_menu_popup2');
+			if (!inside && !onOpener && !inMenu) { closeViewPopovers(); }
 		});
 		// The hidden picker lives in the page, not in a popup body that gets replaced wholesale --
 		// the same reason lpn_backdrop_file does. Cleared after every pick so re-choosing the SAME
@@ -9843,21 +9862,17 @@ var EngCalcs = EngCalcs || {};
 	}
 	function toggleLabelsPopup(evt) {
 		var popup = document.getElementById('lpn_labels_popup');
-		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+		if (popup.style.display === 'block') { popup.style.display = 'none'; viewPopoverAnchor = null; return; }
 		// ONE PULL-DOWN AT A TIME. Tom, 2026-08-13: "When I click Settings then Labels, Labels opens
 		// beneath Settings. I expect Settings to close." openMenu() has always closed these; they
-		// never closed each other, because the document-level dismissal deliberately treats a click
-		// anywhere on #lpn_toolbar as chrome and leaves them alone -- so the opener is the only place
-		// that can do it.
+		// never closed each other, because the document-level dismissal cannot tell the click that
+		// opened this one from a click away from that one -- so the opener is the only place that
+		// can do it. (Since Task 372 the dismissal knows the OPENER by name rather than exempting
+		// the whole toolbar, but this is still the only code that runs on the way in.)
 		closeMenu();
 		closeViewPopovers('lpn_labels_popup');
-		var r = evt.currentTarget.getBoundingClientRect();
-		popup.style.left = r.left + 'px'; popup.style.top = r.bottom + 'px'; popup.style.display = 'block';
-		// Clamp into the viewport same as openPopupAt() -- measured after display:block since size
-		// is unknown while display:none.
-		var pr = popup.getBoundingClientRect();
-		popup.style.left = Math.max(4, Math.min(r.left, window.innerWidth - pr.width - 4)) + 'px';
-		popup.style.top = Math.max(4, Math.min(r.bottom, window.innerHeight - pr.height - 4)) + 'px';
+		viewPopoverAnchor = evt.currentTarget;
+		openPanelAtAnchor(popup, evt.currentTarget.getBoundingClientRect());
 	}
 
 	// ---- gear/settings popover (Task 146 Phase 2, 2026-07-30) ----
@@ -10929,7 +10944,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function toggleSettingsPopup(evt) {
 		var popup = document.getElementById('lpn_settings_popup');
-		if (popup.style.display === 'block') { popup.style.display = 'none'; return; }
+		if (popup.style.display === 'block') { popup.style.display = 'none'; viewPopoverAnchor = null; return; }
 		// One pull-down at a time -- see the same two lines in toggleLabelsPopup().
 		closeMenu();
 		closeViewPopovers('lpn_settings_popup');
@@ -10943,11 +10958,8 @@ var EngCalcs = EngCalcs || {};
 		// `settings` rather than a copy of it, so no future writer can desync it either. Cheap:
 		// this is ~30 form controls, built only when the user actually opens the panel.
 		rebuildSettingsFields();
-		var r = evt.currentTarget.getBoundingClientRect();
-		popup.style.left = r.left + 'px'; popup.style.top = r.bottom + 'px'; popup.style.display = 'block';
-		var pr = popup.getBoundingClientRect();
-		popup.style.left = Math.max(4, Math.min(r.left, window.innerWidth - pr.width - 4)) + 'px';
-		popup.style.top = Math.max(4, Math.min(r.bottom, window.innerHeight - pr.height - 4)) + 'px';
+		viewPopoverAnchor = evt.currentTarget;
+		openPanelAtAnchor(popup, evt.currentTarget.getBoundingClientRect());
 	}
 
 	// ---- minimal property popup ----
@@ -11290,6 +11302,101 @@ var EngCalcs = EngCalcs || {};
 			top: Math.max(POPUP_EDGE, Math.min(top, vh - h - POPUP_EDGE))
 		};
 	}
+	// WHERE A PULL-DOWN GOES, given the rect of the control that opened it (Task 372). Pure, so the
+	// one rule every popover on this page obeys can be asserted without a browser.
+	//
+	// **IT MAY NEVER COVER ITS OWN BUTTON.** Tom, 2026-08-15: "Settings box opens, if its expanded
+	// options are too long, too tall for the screen, and its top extends to cover its button." That
+	// was a clamp doing exactly what it had been told: the panel was placed at the button's bottom
+	// edge and then pulled back up by `vh - h`, and once h is most of the viewport that pull-back
+	// lands on top of the anchor -- the one place the user is looking, and the control they will
+	// click to dismiss it. So height is not something to clamp AROUND; it is something to give up.
+	// The panel takes whichever side of the anchor has more room and, if it does not fit there, is
+	// CAPPED to that room and scrolls inside itself.
+	//
+	// Only the horizontal axis is still clamped, because sliding sideways never hides the anchor.
+	// `maxHeight` is null when the natural height fitted -- callers must then leave the panel's
+	// height alone rather than pinning it to what they measured, or a panel whose contents change
+	// (Settings rebuilds its fields on every open) would be frozen at the size it had last time.
+	function panelPlacement(ar, w, h, vw, vh) {
+		var below = vh - ar.bottom - POPUP_EDGE, above = ar.top - POPUP_EDGE;
+		// Below is the default and stays the default whenever it is no worse than above: a pull-down
+		// that flips upward to gain a few pixels reads as a different control.
+		var useBelow = (h <= below) || (below >= above);
+		var room = Math.max(useBelow ? below : above, 0);
+		var height = Math.min(h, room);
+		return {
+			side: useBelow ? 'below' : 'above',
+			left: Math.max(POPUP_EDGE, Math.min(ar.left, vw - w - POPUP_EDGE)),
+			top: useBelow ? ar.bottom : ar.top - height,
+			maxHeight: height < h ? height : null
+		};
+	}
+	// Cap a panel to `avail` pixels, putting the scrollbar on its BODY rather than on the panel.
+	// That distinction is the whole reason .lpn-popover-body exists (see the CSS): #lpn_popup's
+	// close button is absolutely positioned in the panel's own corner, so a scrolling panel would
+	// scroll the way out of itself off the top. A panel with no body wrapper -- the menus -- scrolls
+	// itself, which is right there because it is nothing but rows.
+	//
+	// `naturalH` is passed in rather than re-measured: the caller has just measured it uncapped, and
+	// measuring again after a style write is what turns one layout pass into three.
+	function capPanelHeight(panel, body, avail, naturalH) {
+		panel.style.maxHeight = avail + 'px';
+		if (body) {
+			var chrome = naturalH - body.getBoundingClientRect().height;
+			body.style.maxHeight = Math.max(0, avail - chrome) + 'px';
+		} else {
+			panel.style.overflowY = 'auto';
+		}
+	}
+	// Undo any previous cap BEFORE measuring. A panel is opened many times and the viewport it was
+	// last capped for is not the one it is being opened in; measuring a still-capped panel would
+	// ratchet it smaller on every open and never let it grow back.
+	function resetPanelHeight(panel, body) {
+		panel.style.maxHeight = ''; panel.style.overflowY = '';
+		if (body) { body.style.maxHeight = ''; }
+	}
+	function panelBody(panel) {
+		return panel.querySelector ? panel.querySelector('.lpn-popover-body') : null;
+	}
+	// THE ONE ENTRY POINT for every panel that hangs off a control: Labels, Settings, the menus and
+	// their fly-outs, and the backdrop-position panel. One pass over all of them rather than a fix
+	// per box (Task 372) -- they were four copies of the same six lines and had already drifted.
+	// `ar` is the anchor's rect; `beside` is the fly-out case, which sits at the anchor's right edge
+	// and top rather than under it, so it is allowed to share the anchor's rows.
+	function openPanelAtAnchor(panel, ar, beside) {
+		var body = panelBody(panel), r, at;
+		panel.style.display = 'block';
+		resetPanelHeight(panel, body);
+		r = panel.getBoundingClientRect();
+		if (beside) {
+			// A fly-out with no room to its right flips to the LEFT of the parent row rather than
+			// being clamped on top of it -- the clamp alone would slide it back over the words it
+			// branches from. Its VERTICAL rule is the viewport, not the anchor.
+			var h = fitPanelToViewport(panel);
+			var wantLeft = (ar.right + r.width > window.innerWidth - POPUP_EDGE) ? ar.left - r.width : ar.right;
+			panel.style.left = Math.max(POPUP_EDGE, Math.min(wantLeft, window.innerWidth - r.width - POPUP_EDGE)) + 'px';
+			panel.style.top = Math.max(POPUP_EDGE, Math.min(ar.top, window.innerHeight - h - POPUP_EDGE)) + 'px';
+			return null;
+		}
+		at = panelPlacement(ar, r.width, r.height, window.innerWidth, window.innerHeight);
+		if (at.maxHeight != null) { capPanelHeight(panel, body, at.maxHeight, r.height); }
+		panel.style.left = at.left + 'px';
+		panel.style.top = at.top + 'px';
+		return at;
+	}
+	// For the panels that are NOT hung off a control -- the property popup (opened at a point on the
+	// map, or wherever the user dragged it) and the Notes box (centred). There is no anchor to
+	// avoid, so the cap is simply the viewport. Returns the height to place with, which is the
+	// capped one; the caller must use it rather than its own earlier measurement.
+	function fitPanelToViewport(panel) {
+		var body = panelBody(panel), avail = window.innerHeight - 2 * POPUP_EDGE, h;
+		resetPanelHeight(panel, body);
+		h = panel.getBoundingClientRect().height;
+		if (h <= avail) { return h; }
+		capPanelHeight(panel, body, avail, h);
+		return avail;
+	}
 	// WHERE THE PROPERTY POPUP OPENS, once the user has moved it: exactly where they left it.
 	// EPANET's own property window behaves this way and Tom asked for it by name (2026-08-15:
 	// "EPANET has an element properties box. But it is draggable... Our UX suffers because our
@@ -11300,13 +11407,17 @@ var EngCalcs = EngCalcs || {};
 	// popup sat.
 	var popupUserPos = null;
 	function openPopupAt(sx, sy) {
-		var popup = document.getElementById('lpn_popup'), r, at;
+		var popup = document.getElementById('lpn_popup'), r, h, at;
 		if (popupUserPos) { sx = popupUserPos.left; sy = popupUserPos.top; }
 		popup.style.left = sx + 'px'; popup.style.top = sy + 'px'; popup.style.display = 'block';
 		// Clamp into the viewport (Tom, tall/phone mode: the popup opened partly off-screen).
 		// Measured after display:block since an element's size isn't known while display:none.
+		// The HEIGHT is capped first (Task 372) and the clamp is then given the capped height: an
+		// element with many properties can be taller than the window, and clamping such a box only
+		// ever chooses which end of it to lose.
+		h = fitPanelToViewport(popup);
 		r = popup.getBoundingClientRect();
-		at = clampPanel(sx, sy, r.width, r.height, window.innerWidth, window.innerHeight);
+		at = clampPanel(sx, sy, r.width, h, window.innerWidth, window.innerHeight);
 		popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
 		EngCalcs.initTips(popup);
 	}
