@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 958,
-        "delta_key_count": 47,
+        "expected_key_count": 962,
+        "delta_key_count": 51,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -330,6 +330,10 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_field_text_bold": "Bold",
+        "lpn_field_text_rotation": "Rotation",
+        "lpn_field_text_match_pipe": "Match pipe",
+        "lpn_field_text_flip": "Flip",
         "lpn_examples_heading": "Open an example",
         "lpn_examples_sub": "Each one opens as your own copy. Change it, save it, or start over.",
         "lpn_examples_open": "Open",
@@ -379,6 +383,10 @@
         "lpn_settings_label_always": "Always show labels"
     },
     "keys": {
+        "lpn_field_text_bold": "Bold",
+        "lpn_field_text_rotation": "Rotation",
+        "lpn_field_text_match_pipe": "Match pipe",
+        "lpn_field_text_flip": "Flip",
         "lpn_examples_heading": "Open an example",
         "lpn_examples_sub": "Each one opens as your own copy. Change it, save it, or start over.",
         "lpn_examples_open": "Open",
@@ -428,6 +436,70 @@
         "lpn_settings_label_always": "Always show labels"
     },
     "key_context": {
+        "lpn_field_text_bold": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_text",
+                    "value": "စာသား",
+                    "english": "Text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_elev",
+                    "value": "အမြင့်",
+                    "english": "Elevation"
+                }
+            }
+        },
+        "lpn_field_text_rotation": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_text",
+                    "value": "စာသား",
+                    "english": "Text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_elev",
+                    "value": "အမြင့်",
+                    "english": "Elevation"
+                }
+            }
+        },
+        "lpn_field_text_match_pipe": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_text",
+                    "value": "စာသား",
+                    "english": "Text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_elev",
+                    "value": "အမြင့်",
+                    "english": "Elevation"
+                }
+            }
+        },
+        "lpn_field_text_flip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_text",
+                    "value": "စာသား",
+                    "english": "Text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_elev",
+                    "value": "အမြင့်",
+                    "english": "Elevation"
+                }
+            }
+        },
         "lpn_examples_heading": {
             "reason": "missing",
             "current_value": null,

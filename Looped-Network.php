@@ -422,6 +422,10 @@ EngCalcs.pageConfig = {
             echo "\t" . $k . ': ' . json_encode($v) . ",\n";
         } ?>
 	lpn_new_text: <?=json_encode($ec_lang['lpn_new_text'])?>,
+	lpn_field_text_bold: <?=json_encode($ec_lang['lpn_field_text_bold'])?>,
+	lpn_field_text_rotation: <?=json_encode($ec_lang['lpn_field_text_rotation'])?>,
+	lpn_field_text_match_pipe: <?=json_encode($ec_lang['lpn_field_text_match_pipe'])?>,
+	lpn_field_text_flip: <?=json_encode($ec_lang['lpn_field_text_flip'])?>,
 	lpn_field_elev: <?=json_encode($ec_lang['lpn_field_elev'])?>,
 	lpn_field_elev_tip: <?=json_encode($ec_lang['lpn_field_elev_tip'])?>,
 	lpn_field_head: <?=json_encode($ec_lang['lpn_field_head'])?>,

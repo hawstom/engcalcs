@@ -589,6 +589,10 @@
         "lpn_tool_delete": "Delete",
         "lpn_tool_zoom_extent": "Zoom to fit",
         "lpn_new_text": "Text",
+        "lpn_field_text_bold": "Bold",
+        "lpn_field_text_rotation": "Rotation",
+        "lpn_field_text_match_pipe": "Match pipe",
+        "lpn_field_text_flip": "Flip",
         "lpn_field_elev": "Elevation",
         "lpn_field_elev_tip": "Ground or pipe level at this node. Measure it from any zero you like, as long as every node uses the same one.",
         "lpn_field_head": "Head",
@@ -960,7 +964,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 958,
+    "count": 962,
     "active_prefixes": [
         "about",
         "bpn",

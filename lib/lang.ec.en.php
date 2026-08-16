@@ -1138,6 +1138,10 @@ $ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
 $ec_lang_syn['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
 $ec_lang['lpn_new_text']='Text';
 $ec_lang_syn['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
+$ec_lang['lpn_field_text_bold']='Bold';
+$ec_lang['lpn_field_text_rotation']='Rotation';
+$ec_lang['lpn_field_text_match_pipe']='Match pipe';
+$ec_lang['lpn_field_text_flip']='Flip';
 $ec_lang['lpn_field_elev']='Elevation';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy

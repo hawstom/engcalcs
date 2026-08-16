@@ -11951,20 +11951,6 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(alwaysLabel);
 		fields.appendChild(document.createElement('br'));
 		// ---- Task 337: Bold, and rotation with its two convenience buttons ----
-		// TODO(lang): THESE FOUR LABELS ARE HARDCODED ENGLISH AND MUST NOT STAY THAT WAY. A
-		// 26-language sprint was frozen against a fixed key delta when this landed, so adding an
-		// $ec_lang key here would have silently corrupted it -- and referencing a key that does not
-		// exist yet fails the dangling-key check in dev/lpn-spike/popup-tips-harness.js, which is
-		// why there is no `pc.` lookup below to switch on later. The keys owed, with the English
-		// they should carry:
-		//     lpn_field_text_bold       'Bold'
-		//     lpn_field_text_rotation   'Rotation'
-		//     lpn_field_text_match_pipe 'Match pipe'
-		//     lpn_field_text_flip       'Flip'
-		// Once they exist in lib/lang.ec.*.php and in Looped-Network.php's pageConfig, replace each
-		// literal below with `pc.<key> || '<English>'` -- the house pattern every other field here
-		// already uses -- and delete this note.
-		//
 		// Redrawing after either property changes goes through ONE function, because bold and
 		// rotation both invalidate the same three things and in the same order: the measured width
 		// (bold glyphs are wider), then the geometry that is computed from it, then the visibility
@@ -11985,7 +11971,7 @@ var EngCalcs = EngCalcs || {};
 			lb.bold = boldInput.checked;
 			relayoutThisLabel();
 		});
-		boldLabel.textContent = 'Bold ';
+		boldLabel.textContent = (pc.lpn_field_text_bold || 'Bold') + ' ';
 		boldLabel.appendChild(boldInput);
 		fields.appendChild(boldLabel);
 		fields.appendChild(document.createElement('br'));
@@ -12013,13 +11999,13 @@ var EngCalcs = EngCalcs || {};
 			relayoutThisLabel();
 		}
 		rotInput.addEventListener('change', function () { setRotation(rotInput.value); });
-		rotLabel.textContent = 'Rotation ';
+		rotLabel.textContent = (pc.lpn_field_text_rotation || 'Rotation') + ' ';
 		rotLabel.appendChild(rotInput);
 		rotLabel.appendChild(presets);
 		fields.appendChild(rotLabel);
 		var matchBtn = document.createElement('button');
 		matchBtn.type = 'button';
-		matchBtn.textContent = 'Match pipe';
+		matchBtn.textContent = pc.lpn_field_text_match_pipe || 'Match pipe';
 		matchBtn.addEventListener('click', function () {
 			// Read at the label's RENDERED point, which for an anchored label is its node plus its
 			// offset -- not lb.x/lb.y, which is the offset alone and would find the pipe nearest
@@ -12035,7 +12021,7 @@ var EngCalcs = EngCalcs || {};
 		// that is right most of the time and unarguable when it is not.
 		var flipBtn = document.createElement('button');
 		flipBtn.type = 'button';
-		flipBtn.textContent = 'Flip';
+		flipBtn.textContent = pc.lpn_field_text_flip || 'Flip';
 		flipBtn.addEventListener('click', function () { setRotation(textLabelRotation(lb) + 180); });
 		fields.appendChild(flipBtn);
 		fields.appendChild(document.createElement('br'));
