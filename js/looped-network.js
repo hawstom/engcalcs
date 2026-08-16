@@ -12252,10 +12252,23 @@ var EngCalcs = EngCalcs || {};
 	// tspans 60 times a second would be pure waste. Safe to call repeatedly because the collision
 	// pass is idempotent (see addDataLabel()). Ticks reuse the lines cached by the last full
 	// refreshLabelText().
+	// **ALL THREE KINDS OF LABEL, AND THE THIRD WAS MISSING** (2026-08-15). This function laid out
+	// node and link data labels and silently skipped the user's own Text labels, which was harmless
+	// only for as long as something ELSE laid those out on every zoom -- refreshFontSizes() did,
+	// through refreshTextLabelSizes(). The moment the zoom path stopped re-measuring (Task 366),
+	// nothing positioned a Text label at all, and a Text label's MASK is sized in world units from
+	// a pixel width: leave it un-updated across a zoom and it keeps the size it had at the old
+	// scale. Zoom in far enough and a "LAKE" caption's mask becomes a large 75%-white rectangle
+	// lying over the network -- pipes under it go pale grey, which is exactly what Tom photographed
+	// on Net3 ("Nothing here", "Gray").
+	//
+	// It costs nothing to be right: there are a handful of Text labels in a drawing, against
+	// hundreds of data labels, and this path does no measuring.
 	function relayoutLabels() {
 		runLabelCollisionAvoidance();
 		doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
 		doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
+		doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
 	}
 	function runSolve() {
 		// Autosave piggybacks on the same debounce as the solve, not a separate timer -- one

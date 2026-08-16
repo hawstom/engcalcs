@@ -1849,6 +1849,26 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
 
 ## Completed
 
+- 0|371| **A Text label's mask became a white sheet over the map — DONE 2026-08-15, and it was a
+  regression from Task 366 the same day.** Tom, on Net3: *"Something is wrong on Net3, and I don't
+  know what yet... A. Far away. B. Nothing here. C. Gray."*
+  - `relayoutLabels()` laid out node and link data labels and **silently skipped the user's own Text
+    labels**. That was harmless only while something else positioned them on every zoom — and
+    `refreshFontSizes()` did, until Task 366 stopped it re-measuring in the name of speed.
+  - A Text label's MASK is sized in WORLD units from a pixel width, so an un-updated one keeps the
+    size it had at the previous scale. Zoom in and a caption's mask becomes a large 75%-white
+    rectangle lying across the network; the pipes under it read pale grey. **Net3 has exactly two
+    Text labels, "LAKE" and "RIVER"**, which is why the symptom looked like two regions rather than
+    a general fault.
+  - The fix is one line in `relayoutLabels()`, which now does what its name says. Guarded by an
+    invariant rather than by the symptom: the mask must cover the label's box, and not much more, at
+    every scale. **The first draft of that check used a flat `+4` tolerance — a WORLD constant — and
+    failed at one zoom for a mask that was correct.** The same mistake the whole day has been about,
+    made inside the guard against it.
+  - **NOT EXPLAINED YET: Tom's "A. Far away"** — two node labels sitting well away from any node,
+    with no leader drawn. Different symptom, possibly a consequence of the same stale obstacle, and
+    still open.
+
 - 0|369| **The aligned-label flip was measured in the wrong FRAME — DONE 2026-08-15.** Tom, from a
   screenshot of Elm Street with upside-down labels, diagnosing it himself: *"Cartesian angles are
   from the x axis counter-clockwise. You and I spoke different languages about the meaning of

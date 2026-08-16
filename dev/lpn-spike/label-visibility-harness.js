@@ -29,6 +29,13 @@ const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, addNode: addNode, addLink: addLink, addText: addText,\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, refreshLabelText: refreshLabelText,\n" +
 	"\t\tapplyLabelVisibility: applyLabelVisibility, applyMaskLabels: applyMaskLabels,\n" +
+	"\t\trefreshFontSizes: refreshFontSizes, relayout: relayoutLabels,\n" +
+	"\t\tmaskRect: function (id) { var m = labelEls[id].mask;\n" +
+	"\t\t\treturn { x: +m.getAttribute('x'), y: +m.getAttribute('y'),\n" +
+	"\t\t\t\tw: +m.getAttribute('width'), h: +m.getAttribute('height') }; },\n" +
+	"\t\ttextBox: function (id) { var lb = labelById(id), le = labelEls[id],\n" +
+	"\t\t\tan = lb.anchorNode ? nodeById(lb.anchorNode) : null;\n" +
+	"\t\t\treturn textLabelBox(lb, le, an ? an.x + lb.x : lb.x, an ? an.y + lb.y : lb.y); },\n" +
 	"\t\tsetSetting: function (k, v) { settings[k] = v; },\n" +
 	"\t\tdelSetting: function (k) { delete settings[k]; },\n" +
 	// The two knobs the rules actually read: how wide the map is on screen, and the zoom that turns
@@ -167,6 +174,51 @@ console.log('\n--- a Text label hides on its own size-scaled threshold ---');
 }
 
 // ---- 3. Background masking is switchable, and it is the project's (Task 330) ----------------
+// ---- 2b. A TEXT LABEL'S MASK FOLLOWS THE ZOOM ------------------------------------------------
+// **THE ONE THAT GOT AWAY.** relayoutLabels() laid out node and link labels and silently skipped
+// the user's own Text labels -- harmless only while something else positioned them on every zoom,
+// which refreshFontSizes() did until Task 366 stopped it re-measuring. A Text label's mask is sized
+// in WORLD units from a pixel width, so leaving it un-updated across a zoom leaves it at the size
+// it had at the old scale: zoom in and a caption's mask becomes a large 75%-white rectangle lying
+// over the network, and the pipes under it go pale. Tom photographed exactly that on Net3, which
+// has two Text labels -- "LAKE" and "RIVER" -- and marked the pale stretches "Nothing here" and
+// "Gray".
+//
+// The assertion is the invariant, not the symptom: the mask must always cover the box the label
+// actually occupies, at every scale.
+console.log('\n--- a Text label\'s mask tracks the zoom, or it becomes a white sheet over the map ---');
+{
+	L.setSetting('labelMaxWidth', null);
+	L.setZoom(1);
+	L.refreshFontSizes();
+	function maskCoversBox(id) {
+		var m = L.maskRect(id), b = L.textBox(id);
+		// The mask is the box plus a halo on every side; it must contain the box and not wildly
+		// exceed it. THE ALLOWANCE IS RELATIVE TO THE BOX, and the first draft of this check made
+		// the very mistake it exists to catch: a flat "+4" is a WORLD constant, so it passed at one
+		// zoom and failed at another for a mask that was perfectly correct. The halo is 0.15 of the
+		// font size on each side and the box is 1.2 of it tall, so the total is a quarter of the
+		// box height at every scale -- half a box height is a generous ceiling that scales.
+		return m.x <= b.x && m.y <= b.y &&
+			m.x + m.w >= b.x + b.w && m.y + m.h >= b.y + b.h &&
+			m.w < b.w + b.h / 2 && m.h < b.h * 1.5;
+	}
+	ok('at the scale it was laid out, the mask covers its label', maskCoversBox(note.id),
+		JSON.stringify(L.maskRect(note.id)) + ' vs box ' + JSON.stringify(L.textBox(note.id)));
+	// TEN TIMES IN. Without the fix the mask keeps its old world size and is ten times too big.
+	L.setZoom(10);
+	L.refreshFontSizes();
+	ok('...and still covers it, and only it, ten times further in', maskCoversBox(note.id),
+		JSON.stringify(L.maskRect(note.id)) + ' vs box ' + JSON.stringify(L.textBox(note.id)));
+	// And back out, since a stale mask that is too SMALL leaves the text unbacked over a backdrop.
+	L.setZoom(0.25);
+	L.refreshFontSizes();
+	ok('...and coming back out', maskCoversBox(note.id),
+		JSON.stringify(L.maskRect(note.id)) + ' vs box ' + JSON.stringify(L.textBox(note.id)));
+	L.setZoom(1);
+	L.refreshFontSizes();
+}
+
 console.log('\n--- the mask toggle ---');
 {
 	L.setSetting('maskLabels', true);
