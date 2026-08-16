@@ -472,6 +472,37 @@ divide to store. Full per-field rationale: `dev/unit-families.md`.
   no family and is therefore **invisible to the preset buttons**. Never leave a new one that way — 32
   row-table selects were nearly shipped ignoring the presets.
 
+### ONLY THE USER TOUCHES A FILE'S NUMBERS (Tom, 2026-08-16 — absolute)
+
+**A number that came from a file is the user's. We display it, we solve from a COPY, and we write
+back exactly what came in.** We never rewrite it, and never round it, in the document.
+
+This is the same rule as "a calculator stores what the user typed", extended to imported files —
+and the `.inp` importer was precisely the third conversion site that rule warns about. It stored
+every value as `toDisplay(<SI>, <unit>)` after `js/lpn-inp.js` had already normalised to SI, so a
+US file made a round trip through two factors that are not exact inverses: **710 ft was stored as
+709.9913664 and 150 gpm as 149.98747841154.**
+
+- **Better constants do NOT fix this and it is a mistake to try.** Exact factors still fail in
+  doubles — `150 * 0.3048 * (1/0.3048) === 149.99999999999997`, and 26% of a 20,000-value sample
+  failed to round-trip bit-identically. **Pass-through is the only fix:** when the display unit
+  already equals the unit the file states, the file's own number goes straight through untouched.
+- **A unit is a LABEL and a MAGNITUDE, and they have different requirements.** The label is a
+  string — always storable and displayable verbatim. The magnitude is a factor, and only a *solve*
+  needs it. So an unrecognized unit has three outcomes, and the third is the one to get right:
+  recognized → display and solve; unrecognized but never computed with → carry it verbatim, no
+  problem; **unrecognized and needed for a solve → open the file, draw it faithfully, refuse to
+  solve, and say exactly which unit and why.** Never reject the file, never guess. "We don't
+  recognize this unit" is a different message from "we cannot give you answers"; say both.
+- **The one legitimate exception is the coordinate origin shift**, and it shows the shape a real
+  exception must have: `doc.origin` makes coordinates local so float32 rasterising cannot lose a
+  pipe at x ≈ 579,350; the absolute position is unchanged by construction, the origin is stored in
+  the file, and `dev/lpn-spike/local-origin-harness.js` counts the call sites. Reversible, stored,
+  and guarded — anything claiming to be an exception must be all three.
+- **Converting to SOLVE is not an exception**, because it does not touch the document.
+- **This is testable and must be tested:** import then export must reproduce the file. That is the
+  acceptance criterion for Task 281 (`.inp` export), not an afterthought to it.
+
 ### Changing a unit reinterprets the typed number; it does not convert it
 
 1 becomes 1 ft instead of 1 m. Long-standing, deliberate, reviewed and kept. Do not "fix" it.
