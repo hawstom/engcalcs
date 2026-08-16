@@ -19,7 +19,8 @@
 // transmission main alike. Section 2 measures that against the actual map size; section 3 checks
 // it re-derives on zoom, since that is the difference between a rule and a setting.
 //
-// VD IS THE SMALLER MAP DIMENSION as of 2026-08-15 (it was the larger for a day). Section 4.
+// VD IS THE SMALLER MAP DIMENSION as of 2026-08-15 (it was the larger until Tom settled the house
+// standard on min). Section 4.
 
 const { setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 

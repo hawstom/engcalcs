@@ -1735,7 +1735,7 @@ var EngCalcs = EngCalcs || {};
 			// settings panel captures it from the current view instead of asking anyone to guess.
 			labelMaxWidth: null,
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
-			// (ROADMAP Task 329). ON since 2026-08-15: it shipped OFF for one day so Tom could judge
+			// (ROADMAP Task 329). ON since 2026-08-15: it shipped OFF just long enough for Tom to judge
 			// aligned-vs-horizontal on a real drawing rather than have the judgement made for him,
 			// and his verdict was *"Ship with it on. Very much earns its keep."*
 			alignPipeLabels: true,
@@ -1764,7 +1764,7 @@ var EngCalcs = EngCalcs || {};
 			//
 			// Stated as "degrees left of vertical" it has no frame to get wrong, which is why the
 			// parameter changed rather than just its value. 20 is his 110 said the other way.
-			// A project carrying the old key gets this default; the key existed for one day.
+			// A project carrying the old key gets this default; the old key never survived a review.
 			labelFlipLeftOfVertical: 20,
 			// Draw the pale background patch behind every label (ROADMAP Task 330). ON, which is
 			// what the page has always done and what keeps a label legible over a backdrop image --
@@ -2979,7 +2979,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function validView(v) {
 		if (!v || !isFinite(v.cx) || !isFinite(v.cy)) { return false; }
-		// The w/h form is the world-extent record that existed for a few hours on 2026-08-15. Still
+		// The w/h form is the world-extent record that stood between two rounds of review. Still
 		// read so nothing saved in that window opens wrong; never written.
 		if (isFinite(v.w) && isFinite(v.h) && v.w > 0 && v.h > 0) { return true; }
 		return isFinite(v.s) && v.s > 0;
@@ -5318,7 +5318,7 @@ var EngCalcs = EngCalcs || {};
 	// a line height, both measured in WORLD units -- quantities a SCREEN-PIXEL-sized label does not
 	// have at any particular zoom. So the same file imported from two different views wrote two
 	// different sets of label coordinates, and the difference was saved. Fitting the view first was
-	// tried and reverted the same hour: zoomExtent() derives its scale from bbox(), which measures the
+	// tried and reverted immediately: zoomExtent() derives its scale from bbox(), which measures the
 	// rendered label text, so fit-then-convert is circular -- it reduces the dependence while reading
 	// as though it had removed it.
 	//

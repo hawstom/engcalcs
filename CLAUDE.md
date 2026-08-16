@@ -860,6 +860,17 @@ browser still misbehaves, suspect the stub before the code**: ask which quantity
 varies that the stub holds constant. The fix is to teach the stub the one physical relationship
 under test (here: a screen-sized glyph run is `px/s` in world units), not to add more assertions.
 
+**WRITE ORDER, NOT ELAPSED TIME — YOU DO NOT HAVE A CLOCK (Tom, 2026-08-15).** *"When you say
+'yesterday' or 'this morning' or 'an hour', usually the real time frame was an order of magnitude
+smaller."* Correct, and it had already leaked into permanent records: "it shipped OFF for one day",
+"the key existed for one day", "reverted the same hour", "an hour later". Every one of those was
+inferred from the position of a message in a conversation, not measured — the environment supplies
+a DATE and nothing finer, and a session can cover in twenty minutes what reads like a week.
+**A fabricated duration is worse than no duration**, because a later reader uses it: "it stood for
+months" and "it stood for one review" justify very different amounts of caution about changing it.
+Say what you actually know — *before it shipped*, *between two rounds of review*, *in the next
+message*, *the same day* (the date is real) — and never how long something took.
+
 **A PHONE IS ALMOST IMPOSSIBLE FOR THE `lpn_` MAP EDITOR, SO STOP REASONING FROM ONE (Tom,
 2026-08-15).** *"Don't forget to keep telling yourself 'A phone is almost impossible for this
 app.'"* It is a full-window drawing surface with a menu bar, a toolbar, a tab strip and a property

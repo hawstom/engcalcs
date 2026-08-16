@@ -236,7 +236,8 @@ report(c5 && near(c5.t1 - c5.t0, 100 / 120), 'a line along the top edge is kept,
 
 	// -- WHICH WAY A NEAR-VERTICAL LABEL READS (Task 351, and the frame bug that followed it)
 	//
-	// **EVERY MAP EVER PRINTED READS A NORTH-SOUTH NAME BOTTOM-TO-TOP**, and for a day this page
+	// **EVERY MAP EVER PRINTED READS A NORTH-SOUTH NAME BOTTOM-TO-TOP**, and between two rounds of
+	// review this page
 	// read them top-to-bottom. Tom, from a screenshot of Elm Street: "The wrong labels are oriented
 	// wrong (upside down)... Cartesian angles are from the x axis counter-clockwise. You and I spoke
 	// different languages about the meaning of 'angle'."

@@ -1863,7 +1863,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     will be. `settings.labelFlipLeftOfVertical` (default **20**, clamp 0–45) has no frame to get
     wrong; the renderer's `bias` is `90 − that`, so his 110 Cartesian is 20 left of vertical is a
     bias of 70. The control reads *"Degrees left of vertical before labels flip"*.
-  - **"LEFT OF", NOT "PAST"** — Tom again, an hour later: *"'Past' can be misread. We better say
+  - **"LEFT OF", NOT "PAST"** — Tom again, in the next message: *"'Past' can be misread. We better say
     'left of' or more pedantically 'CCW of'. But I think that 'left of' is humanly intuitive. Up
     always wins. Left of the up vertical."* Past WHAT, in WHICH direction, is the same ambiguity
     that produced the mirror; "left" names a direction anyone can point at on their own screen.
@@ -2005,7 +2005,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
       control now reads **"Show labels when the view is smaller than (map units)"**.
     - the REPEAT spacing was the one genuinely free choice — *"fuzzy and can use whatever"* — so it
       joins the standard instead of keeping a private convention nobody could have guessed. It had
-      been `max` for a day.
+      been `max` for one round of review.
     One convention is what makes the rule sayable to a user in a single sentence, which was the half
     of the question that was about disclosure rather than arithmetic. `max`, `diag` and the single
     axes stay named and available; the cull window still uses `max` on purpose, and says so.
@@ -2035,7 +2035,7 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     produces a change"*. A stored scale is copied verbatim. The cost, accepted: a big model opened
     on a phone shows a fragment at the desktop's magnification rather than the whole view, small —
     his case (b), *"you see the area of the pipe change. You blink your eyes. Good. You should."*
-    The `w`/`h` extent form is still READ so nothing saved during its few hours opens wrong.
+    The `w`/`h` extent form is still READ so nothing saved while it stood opens wrong.
   - The extent reasoning, kept because it was right about the FIRST version:
     The first version stored a centre and a pixel SCALE, which Tom rejected on sight and on the
     right grounds: *"I don't think that AutoCAD opens a DWG file to a zoom dependent on my screen's
