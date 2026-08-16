@@ -220,9 +220,17 @@ function lbl(x, y, w, h) {
 	// insistently as another label would, so in a crowd the labels win and the number ends up lying
 	// across the line -- which is the behaviour the old "pipes are absent by design" comment claimed
 	// and the code did not have.
-	report(Collide.WEIGHT.pipe > 0, 'a pipe is no longer weightless');
-	report(Collide.WEIGHT.pipe < Collide.WEIGHT.node && Collide.WEIGHT.pipe < Collide.WEIGHT.label,
-		'...but pushes less than a node symbol or another label', 'pipe=' + Collide.WEIGHT.pipe);
+	// **AND IT IS A FULL-WEIGHT OBSTACLE, NOT A FRACTIONAL ONE** (Tom, 2026-08-15: *"Obviously you
+	// mistook pipe avoidance preference for weight... Pipes and nodes are both weight 1."*). Under
+	// insistence a weight answers "how much of this overlap must be gone", and for every real
+	// obstacle the answer is all of it. The fractions were trying to express a PREFERENCE -- which
+	// conflict to accept when they cannot all be avoided -- which is a property of the alternatives,
+	// not of the obstacle, and belongs to Task 379's score.
+	report(Collide.WEIGHT.pipe === 1 && Collide.WEIGHT.node === 1 && Collide.WEIGHT.leader === 1,
+		'every real obstacle insists on the whole overlap',
+		JSON.stringify(Collide.WEIGHT));
+	report(Collide.WEIGHT.manual > 1,
+		'...and the one number that is not 1 is a flag wearing a number, not a fraction');
 }
 {
 	// And it runs inside relax(), not merely as a function nobody calls -- pipes first, so a label

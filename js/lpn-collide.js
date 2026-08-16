@@ -59,16 +59,23 @@ EngCalcs.lpnCollide = (function () {
 	// A manually-dragged label is flagged immovable AND given a very large strength, so
 	// "practically immovable" falls out of the same formula instead of being a second code
 	// path.
-	// pipe 0.25 since 2026-08-15 -- a mild preference, not a prohibition: a label steps off a line
-	// when there is somewhere to step and lies across it when there is not, which is the behaviour
-	// the old "pipes are absent by design" comment claimed and the code did not have. It is a SHARE
-	// of the shortfall rather than a ratio against another weight, because a pipe never moves.
-	// **NODE RAISED FROM 0.5 TO 1 AT THE SAME TIME, and the two changes are one change.** Under the
-	// old formula 0.5 meant "clears a third of the way per iteration"; under insistence it would
-	// mean "ends up half inside the symbol", which is not what anyone wanted it to say. Goal 3 in
-	// dev/label-placement-goals.md is that a label may lie across a pipe and may not sit on a node
-	// symbol, so the symbol is 1 and the pipe is the low-but-not-zero 0.4 Tom asked for.
-	var WEIGHT = { pipe: 0.4, node: 1, label: 1, leader: 1, manual: 1000 };
+	// **EVERY OBSTACLE IS 1, AND TOM IS RIGHT THAT THE FRACTIONS WERE A CATEGORY ERROR** (2026-08-15:
+	// *"Obviously you mistook pipe avoidance preference for weight. Right? Are you still mistaking
+	// that? Pipes and nodes are both weight 1. Is there really any place for preference as in 'move
+	// this way if you must'?"*)
+	//
+	// No, there is not — not here. Under insistence a weight answers "how much of this overlap must
+	// be gone", and the honest answer for every real obstacle is "all of it": a number sitting on a
+	// pipe, on a symbol, or on a leader is a number the reader has to work at. What the fractions
+	// were really trying to express is a PREFERENCE — which conflict to accept when they cannot all
+	// be avoided — and a per-obstacle multiplier cannot express that. It is a property of the
+	// alternatives, not of the obstacle: it needs a placement to compare against another placement,
+	// which is Task 379's score and nothing this pass can hold.
+	//
+	// So 0.5 for a node and 0.4 for a pipe are gone. The one number that is not 1 is `manual`, and
+	// it is not a fraction — it is a flag wearing a number, so that "practically immovable" falls
+	// out of the same formula instead of needing a second code path.
+	var WEIGHT = { pipe: 1, node: 1, label: 1, leader: 1, manual: 1000 };
 
 	// **LEADERS ARE SEGMENTS TOO, AND THE SAMPLER IS GONE** (Tom, 2026-08-15: *"Why not do segment
 	// testing on the leaders if it can be done?"*). It can, it is the same pushOffSegments() the

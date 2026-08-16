@@ -1049,10 +1049,17 @@ var EngCalcs = EngCalcs || {};
 	function currentLineObstacles() {
 		var out = [];
 		doc.links.forEach(function (l) {
-			var pts = linkPointList(l), i;
+			var pts = linkPointList(l), i, le = linkEls[l.id];
 			for (i = 1; i < pts.length; i++) {
+				// **OWNED BY ITS OWN LINK, exactly as a leader is owned by its own label** (fixed
+				// 2026-08-15 the moment pipes started pushing; Tom: *"Pipe labels are fickle now. I
+				// see them and then I don't see them."*). A link's data label sits ON its pipe by
+				// design -- that is how you tell whose number it is -- so without this exemption
+				// every pipe shoved its own label perpendicular off itself, to the nudge cap, on
+				// every pass. The labels were not flickering: they were being thrown sideways and
+				// then judged for visibility somewhere they never belong.
 				out.push({ ax: pts[i - 1].x, ay: pts[i - 1].y, bx: pts[i].x, by: pts[i].y,
-					weight: LPN_COLLIDE_WEIGHT.pipe });
+					weight: LPN_COLLIDE_WEIGHT.pipe, owner: le });
 			}
 		});
 		currentLeaderSegments(out);

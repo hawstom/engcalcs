@@ -50,6 +50,28 @@ session of its own with nothing else in it.
 
 ## Calculator Improvements
 
+- 88|384| **[H] Colour coding, with a colour-ramp picker — the preparation Task 248 (extended-period
+  simulation) actually needs.** Tom, 2026-08-15: *"I think that a major preparation for modeling
+  across time is adding color coding, which requires a color ramp picker UX. EPANET and HEC-RAS,
+  both public domain software both have solid color picker systems. I would think that you could
+  borrow something. epanetjs also has something, and maybe you can investigate whether it's libre."*
+  - **Why it is preparation and not decoration:** a time series has to be READ somehow, and a number
+    per element per timestep cannot be. Colour is how every one of these programs shows a field
+    changing — pressure, velocity, chlorine, age — and it is the only readout that survives a
+    network being redrawn 24 times. Building EPS first and colour after would ship a simulation
+    nobody can see.
+  - It also relieves the label problem this file is full of: a map coloured by pressure needs far
+    fewer numbers on it, which is the cheapest possible answer to "there is not room for all these
+    labels" (Tasks 379, 377, 343).
+  - **Sources, in the order worth checking.** EPANET 2.2 is US EPA work in the **public domain** —
+    its ramp defaults and its interval-editing dialog can be copied outright, and matching what a
+    water engineer already knows is worth more here than a nicer design. HEC-RAS is USACE, also
+    public domain. **epanetjs must be checked before anything is taken** — read its LICENSE rather
+    than assuming, and if it is copyleft, take the IDEA and not the code.
+  - The UX is the interesting part, not the colouring: which variable, how many intervals, the
+    break values, and whether the ramp is absolute or relative to the current timestep — EPANET's
+    answer to the last one is a per-variable setting and is worth reading before we invent ours.
+
 
 - 95|379| **[H] Replace the label relaxation with candidate-position scoring, which is the part that
   can see open space.** Tom, 2026-08-15, on two Net3 screenshots with the bad cases arrowed in red:

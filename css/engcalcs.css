@@ -423,25 +423,29 @@ html[lang="zh"] .ec-welcome {
    behind by a relayout. */
 .lpn-just-dragged {
 	paint-order: stroke fill;
-	/* **SCREEN PIXELS, WHICH A BARE stroke-width IS NOT** (Tom, 2026-08-15: "The mark is huge,
-	   bigger than the screen"). Everything in this layer sits under the world transform, so a 4px
-	   stroke is 4 MAP units and becomes 4 x scale pixels on screen -- at Net3's zoom, most of the
-	   window. vector-effect keeps the stroke at 4 device-independent pixels whatever the transform
-	   does, which is what --lpn-hair achieves arithmetically for the leaders. Same standing bug
-	   class as the leader sample boxes, one layer down in CSS this time. */
-	vector-effect: non-scaling-stroke;
+	/* **THE STROKE IS IN MAP UNITS AND MUST BE DIVIDED BY THE SCALE — the same arithmetic the
+	   leaders use, and the second attempt at this.** Everything in this layer sits under the world
+	   transform, so a bare `stroke-width: 4px` is 4 MAP units, which at a typical zoom is most of
+	   the window: Tom got "The mark is huge, bigger than the screen", and then, after a first fix
+	   that reached for `vector-effect: non-scaling-stroke`, a full-page orange starburst. So use the
+	   mechanism already proven on .lpn-leader rather than a second one: --lpn-hair is 1 / scale,
+	   published on the <svg> by refreshSymbolSizes() and inherited here, so 3 * hair is three
+	   screen pixels at any zoom. Third time this subject has bitten in one day; the lesson is to
+	   reuse the working conversion, never to invent a parallel one. */
+	stroke-width: calc(3 * var(--lpn-hair, 0.1));
 	animation: lpn-just-dragged 45s linear forwards;
 }
 /* A HALO ON THE GLYPHS, NOT A DASHED BOX, and the choice is worth recording because Tom offered
    both ("maybe fading, maybe dashed"). A dash pattern applied to a text stroke follows the outline
    of every letter, so at this size it reads as noise around the characters rather than as a frame
    around the label -- and a real dashed frame would need a rectangle element per label, created and
-   destroyed on a timer, which is a thing to leak. The halo needs no element, cannot be orphaned by
-   a relayout, and is the same mechanism Task 376 proposes for masks. */
+   destroyed on a timer, which is a thing to leak.
+   ONLY the opacity is animated: a keyframe that also restates the width would re-open the units
+   question in a second place. */
 @keyframes lpn-just-dragged {
-	0%   { stroke: #e07000; stroke-width: 4px; stroke-opacity: 0.85; }
-	66%  { stroke: #e07000; stroke-width: 4px; stroke-opacity: 0.85; }
-	100% { stroke: #e07000; stroke-width: 4px; stroke-opacity: 0; }
+	0%   { stroke: #e07000; stroke-opacity: 0.85; }
+	66%  { stroke: #e07000; stroke-opacity: 0.85; }
+	100% { stroke: #e07000; stroke-opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) {
 	.lpn-just-dragged { animation: none; }
