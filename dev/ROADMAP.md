@@ -1865,7 +1865,24 @@ These tasks reduce the AI token cost of routine maintenance by replacing repeate
     every scale. **The first draft of that check used a flat `+4` tolerance — a WORLD constant — and
     failed at one zoom for a mask that was correct.** The same mistake the whole day has been about,
     made inside the guard against it.
-  - **"A. FAR AWAY" IS EXPLAINED AND FIXED TOO**, and Tom's two follow-up clues are what did it:
+  - **"A. FAR AWAY" TOOK THREE GUESSES, AND THE THIRD ONE MEASURED IT.** The first two — a stale
+    layout, then a layout shown at the wrong scale — were real defects and both are fixed below, but
+    neither was the cause: Tom, after each, *"Immediate problem is not solved."*
+    - **Nothing was broken.** The relaxation was doing exactly what it is asked to. In a network
+      whose nodes sit about a label's width apart — every real distribution model at its own fit
+      scale — the only arrangement with no overlaps at all IS far-flung. **An unbounded solver in an
+      over-constrained problem does not fail; it wanders, and it reports success.**
+    - **Measured on Net3 at the scale zoom-to-fit gives it: the MEDIAN node label was pushed 85
+      screen pixels from its node, and the worst 301** — on a 1400px canvas, most of the way across
+      the drawing. That is Tom's "opposite side of the model", and it is a live computation, not a
+      stale one.
+    - The fix is a range, not a rule change: past `LPN_NUDGE_CAP_PX` (45px) the push is scaled back
+      **along its own direction**, keeping the direction the relaxation chose and discarding only
+      the distance. A reader can follow a label that overlaps its neighbour and cannot follow one
+      carried across the map. The cap sits above the leader threshold, so anything near it is drawn
+      with a leader instead of floating — which is the half of the symptom that made it hard to read
+      as a nudge at all. `dev/lpn-spike/nudge-cap-harness.js`.
+  - The two earlier fixes, both real and both kept:
     *"They should be on the opposite side of the model"* and *"If I start to drag one, they all go
     to their correct homes."* A drag re-runs `relayoutLabels()`, so the positions were simply STALE.
     - **Measured on Net3, a model 37 × 31 units: a layout computed at scale 1 gives a MEDIAN nudge

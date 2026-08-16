@@ -621,7 +621,20 @@ var EngCalcs = EngCalcs || {};
 		var mid = linkLabelMid(l, along),
 			dir = linkDirectionAt(l, mid),
 			opt = {
-				frac: 0, gap: nodeRadius({ type: 'junction' }) + effectiveFontSize() * 0.35,
+				// **THE GAP IS DERIVED FROM WHAT MUST BE CLEARED, NOT FROM A NODE'S RADIUS** (Tom,
+				// 2026-08-15, after the mask pad was already shrunk: *"aligned labels still mask
+				// their own pipes"*). It was `nodeRadius + 0.35 x fontSize`, and a node's radius has
+				// nothing to do with a label lying halfway along a pipe -- it was a stand-in for
+				// "some clearance", and it went out of step the moment anyone changed Symbol size.
+				//
+				// What actually has to clear the pipe is the bottom edge of the label's MASK. In the
+				// rotated frame the baseline sits `gap` above the pipe, the mask reaches
+				// `dataLabelBoxHeight(1) - 0.85 x fontSize` = 0.25 x fontSize below that baseline,
+				// and the halo adds MASK_PAD_FRAC more. So the mask's near edge clears the pipe's own
+				// half-width exactly when gap > halfWidth + 0.4 x fontSize, and 0.5 leaves a tenth of
+				// a font size of air. Every term is a quantity the drawing really has, so this stays
+				// true when the text, the symbols or the pipe width change independently.
+				frac: 0, gap: settings.linkWidth / (2 * (state.s || 1)) + effectiveFontSize() * 0.5,
 				fontSize: effectiveFontSize(), lineHeight: effectiveLineHeight(),
 				nLines: le.lineCount || 1,
 				// Where the 180-degree readability flip happens (Task 351), converted from the
@@ -936,6 +949,35 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
+	// **A LABEL PUSHED FAR ENOUGH IS WORSE THAN A LABEL THAT OVERLAPS** (Tom, 2026-08-15: *"A. Far
+	// away... They should be on the opposite side of the model."*).
+	//
+	// MEASURED, because the size of it is the argument. On Net3 at its own fit scale, the MEDIAN
+	// node label was pushed 85 pixels from its node and the worst 301 -- on a 1400px canvas, which
+	// is most of the way across the drawing. Nothing was broken: the relaxation was doing exactly
+	// what it is asked to do in a network whose nodes are a label's width apart, where the only
+	// overlap-free arrangement IS far-flung. An unbounded solver in an over-constrained problem does
+	// not fail, it wanders.
+	//
+	// A reader can follow a label that overlaps its neighbour. A reader cannot follow one that has
+	// been carried across the map, and a leader drawn that far is a line through everything else. So
+	// the pass keeps its freedom and loses its range: past the cap the push is scaled back along its
+	// own direction, which preserves the DIRECTION the relaxation chose -- the part that is
+	// genuinely informed -- and discards only the distance.
+	//
+	// The cap is in SCREEN PIXELS because "too far to associate" is a fact about reading, not about
+	// the model, and it is comfortably above the leader threshold so anything approaching it is
+	// drawn with a leader rather than left floating.
+	var LPN_NUDGE_CAP_PX = 45;
+	function capNudges(labels) {
+		var cap = LPN_NUDGE_CAP_PX / (state.s || 1), i, n, d;
+		for (i = 0; i < labels.length; i++) {
+			n = labels[i].ref && labels[i].ref.nudge;
+			if (!n) { continue; }
+			d = Math.hypot(n.x, n.y);
+			if (d > cap) { n.x *= cap / d; n.y *= cap / d; }
+		}
+	}
 	function runLabelCollisionAvoidance() {
 		var fs = effectiveFontSize(), labels = [], stationed = [], statics = staticObstacleBoxes();
 		function addDataLabel(holder, base, manual, lineCount) {
@@ -991,6 +1033,7 @@ var EngCalcs = EngCalcs || {};
 		// Leaders are rebuilt every iteration (they track their labels); node symbols and Text
 		// labels do not move, so they are built once above.
 		Collide.relax(labels, statics, currentLeaderBoxes, 4);
+		capNudges(labels);
 	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped.

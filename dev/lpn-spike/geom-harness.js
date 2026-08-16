@@ -286,6 +286,50 @@ report(c5 && near(c5.t1 - c5.t0, 100 / 120), 'a line along the top edge is kept,
 			'max |angle| = ' + worst.toFixed(1) + '°');
 	}
 
+	// -- AN ALIGNED LABEL'S MASK MUST NOT LIE ON ITS OWN PIPE
+	//
+	// Tom, 2026-08-15, after the mask halo had already been shrunk once: "aligned labels still mask
+	// their own pipes." The halo was not the whole story -- the GAP was. It used to be
+	// `nodeRadius + 0.35 x fontSize`, and a node's radius has nothing to do with a label lying
+	// halfway along a pipe: it was a stand-in for "some clearance" that went out of step the moment
+	// anyone changed Symbol size. What actually has to clear the pipe is the bottom edge of the
+	// MASK, which sits 0.25 x fontSize below the baseline (the box is 1.1 fontSizes tall and the
+	// baseline is 0.85 down from its top) plus the halo.
+	//
+	// Asserted across sizes that vary INDEPENDENTLY -- text, pipe width and scale -- because the old
+	// formula was correct at the shipped defaults and wrong as soon as one of them moved alone.
+	{
+		function maskClearsPipe(fs, linkWidthPx, scale) {
+			var gap = linkWidthPx / (2 * scale) + fs * 0.5,
+				pad = 0.15 * fs,
+				a = Geom.alignedLabelAnchor(0, 0, 100, 0, {
+					frac: 0, gap: gap, fontSize: fs, lineHeight: fs * 1.2, nLines: 1, side: 1, bias: 70
+				}),
+				// maskRect with vAlign 'top': the box top is an ascent above the baseline, and the
+				// halo grows it on every side.
+				top = a.y - 0.85 * fs - pad,
+				nearEdge = top + Geom.dataLabelBoxHeight(1, fs, fs * 1.2) + 2 * pad,
+				pipeEdge = -(linkWidthPx / (2 * scale));
+			return nearEdge < pipeEdge;
+		}
+		var cases = [[11, 3, 1], [11, 3, 20], [0.55, 3, 20], [2.2, 10, 5], [11, 20, 1], [4, 1, 0.3]];
+		report(cases.every(function (c) { return maskClearsPipe(c[0], c[1], c[2]); }),
+			'the mask clears the pipe at every combination of text, pipe width and scale',
+			cases.map(function (c) { return c.join('/') + (maskClearsPipe(c[0], c[1], c[2]) ? '' : ' FAILS'); }).join('  '));
+		// And the old formula, kept as the measurement that shows why it had to change: at a small
+		// symbol size the node radius shrinks, the gap shrinks with it, and the mask sits on the pipe.
+		function oldGapClears(fs, linkWidthPx, scale, symbolPx) {
+			var gap = (symbolPx / 2) / scale + fs * 0.35, pad = 0.15 * fs,
+				a = Geom.alignedLabelAnchor(0, 0, 100, 0, {
+					frac: 0, gap: gap, fontSize: fs, lineHeight: fs * 1.2, nLines: 1, side: 1, bias: 70
+				});
+			return (a.y - 0.85 * fs - pad) + Geom.dataLabelBoxHeight(1, fs, fs * 1.2) + 2 * pad < -(linkWidthPx / (2 * scale));
+		}
+		report(!oldGapClears(11, 3, 1, 2),
+			'...where the old node-radius formula did not, once Symbol size was turned down',
+			'symbol 2px: the mask sat on the pipe');
+	}
+
 	// -- THE ONE THAT MATTERS: drawing direction must not change the result
 	let maxDrift = 0;
 	for (let deg = -180; deg < 180; deg += 7) {
