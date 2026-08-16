@@ -68,56 +68,33 @@ session of its own with nothing else in it.
 
 - 88|384| **[H] Colour coding, with a colour-ramp picker — the preparation Task 248 (extended-period
   simulation) actually needs.** Tom, 2026-08-15: *"I think that a major preparation for modeling
-  across time is adding color coding, which requires a color ramp picker UX. EPANET and HEC-RAS,
-  both public domain software both have solid color picker systems. I would think that you could
-  borrow something. epanetjs also has something, and maybe you can investigate whether it's libre."*
-  - **Why it is preparation and not decoration:** a time series has to be READ somehow, and a number
-    per element per timestep cannot be. Colour is how every one of these programs shows a field
-    changing — pressure, velocity, chlorine, age — and it is the only readout that survives a
-    network being redrawn 24 times. Building EPS first and colour after would ship a simulation
-    nobody can see.
-  - It also relieves the label problem this file is full of: a map coloured by pressure needs far
-    fewer numbers on it, which is the cheapest possible answer to "there is not room for all these
-    labels" (Tasks 379, 377, 343).
-  - **Sources, in the order worth checking.** EPANET 2.2 is US EPA work in the **public domain** —
-    its ramp defaults and its interval-editing dialog can be copied outright, and matching what a
-    water engineer already knows is worth more here than a nicer design. HEC-RAS is USACE, also
-    public domain. **epanetjs must be checked before anything is taken** — read its LICENSE rather
-    than assuming, and if it is copyleft, take the IDEA and not the code.
-  - The UX is the interesting part, not the colouring: which variable, how many intervals, the
-    break values, and whether the ramp is absolute or relative to the current timestep — EPANET's
-    answer to the last one is a per-variable setting and is worth reading before we invent ours.
-
-
-- 95|379| **[H] Replace the label relaxation with candidate-position scoring, which is
-  the part that can see open space.** Tom, 2026-08-15: *"There is lots of free space that is being
-  'wasted' while bad conflicts persist. The relaxation needs to understand the concept of most-open
-  space and gravitate toward it."* **`dev/label-placement-goals.md` is the review document** — the
-  six goals in priority order, every shipped number with a keep/retire verdict, §6 Tom's box review,
-  §7 the map-units-or-pixels question. Nothing in it is settled until he rules.
-  - **The diagnosis: `relax()` is a LOCAL method.** Pairwise separation along the axis of smaller
-    overlap, four passes; a label knows only what it is touching now. There is no term for open
-    space and no candidate it did not stumble into, so **no tuning of the weights will give it that**
-    — weights decide who yields, not where anyone goes.
-  - **Candidate scoring is the standard cartographic answer and is simpler than what is here**:
-    generate N placements per label (eight compass positions at two or three radii, plus the
-    current one), score by overlap area against everything placed, plus small penalties for distance
-    from the anchor and for less preferred positions, take the best, mark it occupied. Open space
-    wins by construction. Deterministic, idempotent, bounded, and it composes with Task 377 — if the
-    best candidate still overlaps, hide the label rather than place it badly.
-  - **`capNudges()` is a defect in the meantime and disappears with the rewrite**: it runs after the
-    relaxation and can drop a label back inside the collision it had just solved, with nothing
-    re-run. Scoring has no equivalent — its candidates are all within reach to begin with.
-  - **Boxes must be able to ROTATE.** An aligned pipe label's AABB is **5.2x** the label's own area
-    at 45° for a 100x12 px label, and the ratio grows without limit with length. Oriented boxes via
-    the separating-axis theorem give both the overlap and the push vector in ~30 lines, pure, and an
-    unrotated box is the same code at angle zero.
-  - **`?debug=boxes` draws the boxes** in the colour of what they are. A URL parameter rather than a
-    settings row, which would be a translated string in 27 files for a tool that reviews one
-    algorithm. The default side is not sacred — scoring may put a label anywhere around its anchor.
+  across time is adding color coding, which requires a color ramp picker UX. EPANET and HEC-RAS, both
+  public domain software both have solid color picker systems. I would think that you could borrow
+  something. epanetjs also has something, and maybe you can investigate whether it's libre."*
+  - **It is preparation, not decoration:** a number per element per timestep cannot be read as
+    numbers. Colour is how every one of these programs shows a field changing, and it is the only
+    readout that survives a network being redrawn 24 times. EPS first and colour after would ship a
+    simulation nobody can see. It also relieves the label problem — a map coloured by pressure needs
+    far fewer numbers on it, which is the cheapest answer to Tasks 379, 377 and 343.
+  - **Sources in order.** EPANET 2.2 is US EPA work in the **public domain**, so its ramp defaults and
+    interval-editing dialog can be copied outright, and matching what a water engineer already knows
+    is worth more here than a nicer design. HEC-RAS is USACE, also public domain. **Read epanetjs's
+    LICENSE before taking anything** — if it is copyleft, take the idea and not the code.
+  - The UX is the interesting part, not the colouring: which variable, how many intervals, the break
+    values, and whether the ramp is absolute or relative to the current timestep. EPANET's answer to
+    the last is a per-variable setting and is worth reading before we invent ours.
+- 95|379| **[H] Replace the label relaxation with candidate-position scoring, which is the part that
+  can see open space.** Tom, 2026-08-15: *"There is lots of free space that is being 'wasted' while
+  bad conflicts persist. The relaxation needs to understand the concept of most-open space and
+  gravitate toward it."*
+  - **`dev/label-placement-goals.md` is the review document and holds the design** — six goals in
+    priority order, every shipped number with a keep/retire verdict, §6 Tom's box review, §7 the
+    map-units-or-pixels question, §8 the replacement algorithm. **Nothing in it is settled until he
+    rules.**
+  - The one thing to carry without opening it: `relax()` is a LOCAL method, so **no tuning of the
+    weights will fix this** — weights decide who yields, not where anyone goes.
   - Order of work: 379, then 343 (dropping lines by priority), then 377 (hide) as the last resort.
     All three are the same decision — what to do when there is not room — at three granularities.
-
 - 55|378| **[H] Give the seven harnesses a network some other way, and delete
   `drawExampleNetwork()`.** The 289-line code-drawn ring main lost its last user-facing caller when
   Task 375's follow-up removed the File > New "From examples" rows, but seven harnesses still build
@@ -198,55 +175,23 @@ session of its own with nothing else in it.
   nothing re-scans it.
 
 
-- 60|239| **The English-friction loop: mechanize Wave 0, and give every translator a suggestion box.**
-  Built 2026-08-08 out of Tom's diagnosis after the 146.06 sprint. **The mechanism exists and is
-  wired in; what remains is running it and measuring the yield** (see the open sub-items).
-  - **The finding that started it: `lpn_` HAD a Wave 0 and it did not work.** Task 193 reviewed all
-    226 English keys and rewrote 51, and the sprint still shipped "Zoom to fit", "Map display and
-    sizes" and "Restore defaults" — all three caught later by Tom reading the *Spanish*. **Wave 0
-    was not skipped; Wave 0 was not falsifiable.** A review asks "is this string good?", and read
-    alone in English by a fluent reader all three answer yes. Fluency resolves ambiguity
-    automatically and invisibly, which makes a fluent English reader structurally blind to exactly
-    this class. That is why the fix is a different *question*, not more diligence.
-  - **Wave 0 mechanized** = an adversarial pass that asks "list every plausible reading; more than
-    one means rewrite." One agent, English only, changed strings only — against 4–26 translation
-    agents, so the cost is noise. Now checklist item 0 in CLAUDE.md.
-  - **Wave 1 made structural.** It was always "intended to feed back to English" and never did,
-    because "feeds back" had no artifact and no gate. Both waves now write to one file per sprint,
-    `dev/english-friction/<sprint>.json`, and `dev/scripts/friction_check.php` fails while anything
-    is unanswered — blocking sprint *launch* on wave-0 findings and sprint *close* on translator
-    findings. Verified in all three states: pass, open, malformed.
-  - **The ombudsman rule (Tom).** Every translator, every wave, files grievances; the sprint ends by
-    resolving them or referring them to the human. `refer-to-human` deliberately does NOT close the
-    gate — escalating is not resolving, and an escalation that silently closed would rebuild the
-    exact hole this replaces. A closed entry must carry a `resolution` or the log is malformed.
-  - **The routing rule** that tells you where a finding goes, now in CLAUDE.md: *does an English
-    reader also stumble?* Yes → fix the English (one edit, all 27 languages). No, but a translator
-    can't recover the concept → `$ec_lang_intent`. Recurs across labels → glossary.
-  - **`$ec_lang_intent` restored to its original design.** Tom: *"CC has misunderstood _intent from
-    the beginning. _intent is not for me or for you to describe anything. It is for synonyms or
-    alternate expressions."* Two accreted rules were retired: "intent is reserved for
-    jargon/transliteration risk" (which made every *plain* label ineligible for the one channel that
-    would have fixed it — and all three of this sprint's worst labels were plain), and **Task 132's
-    standing pre-authorization for AI to trim intents into `gloss:` pointers**, which was deleting
-    the synonym payload that is the channel's whole purpose. There are now no standing carve-outs on
-    intent. The AI bar stays as-is for now (Tom: *"I agree for now. Maybe we lift it later"*), with
-    the working pattern recorded: AI proposes a diff, human approves, then AI writes.
-  - **Positive guidance over negative.** Tom: *"we do ourselves a disservice by relying on 'Avoid'
-    instead of providing the correct intent."* `avoid` is now for genuine polysemy traps only, never
-    a substitute for saying plainly what a label means.
-  - **Shipped alongside:** `lpn_settings_map_display` → "Map appearance" (tr needed no change — it
-    had already chosen *görünümü*, "appearance", unprompted); intents written for `calc_defaults`,
-    `lpn_tool_zoom_extent`, `lpn_settings_map_display`; `lpn_settings_restore_btn` merged into the
-    incumbent `calc_defaults` (26 languages vs 4), retiring 4 translations.
+- 60|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
+  mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
+  English pass asking *"list every plausible reading; more than one means rewrite"*, both waves
+  writing to `dev/english-friction/<sprint>.json`, with `friction_check.php` blocking sprint *launch*
+  on wave-0 findings and sprint *close* on translator findings.
+  - **Why it exists: `lpn_` HAD a Wave 0 and it did not work.** Task 193 reviewed all 226 English keys
+    and rewrote 51, and the sprint still shipped "Zoom to fit", "Map display and sizes" and "Restore
+    defaults" — all three caught later by Tom reading the *Spanish*. Wave 0 was not skipped; it was
+    not falsifiable. A fluent reader resolves ambiguity automatically and invisibly, so the fix had to
+    be a different QUESTION, not more diligence.
+  - **`refer-to-human` deliberately does NOT close the gate.** Escalating is not resolving, and an
+    escalation that silently closed would rebuild the exact hole this replaces.
   - **OPEN — run the adversarial Wave 0 over all 226 `lpn_` keys.** Task 193 already reviewed them,
     so whatever this finds *on top of* a completed review is a direct measurement of the yield, and
-    tells Tom whether the pass earns a permanent place. Tom, on making it standing: *"I lean to yes,
-    but let's try it."*
-  - **OPEN — add the suggestion-box instruction to the standard agent prompt template**, so it is
-    not re-typed per sprint and cannot be forgotten.
-
-
+    tells Tom whether the pass earns a permanent place. Tom: *"I lean to yes, but let's try it."*
+  - **OPEN — add the suggestion-box instruction to the standard agent prompt template**, so it is not
+    re-typed per sprint and cannot be forgotten.
 - 30|234| **Canal Seepage must prove its worth or go (Tom, 2026-08-08: "in my crosshairs").** After
   Task 232 removed `Irrigation.php`, `cs_` is the remaining page Tom is not proud of — his standing
   position is that it was AI momentum rather than a real need, and it is already under a
@@ -270,113 +215,14 @@ session of its own with nothing else in it.
   works but produces something the reader can't page through or reflow. Whoever picks this up
   should figure out what "printable" should even mean per calculator type (a two-column input/
   result form vs. a map/canvas page are different problems) before building anything.
-- 25|144| **Diagnose the Hazen-Williams conversion leak.** Per the 2026-07-27 usage snapshot
-  (`dev/usage-data-log.md`), HW draws 580 confirmed-human views — the suite's second-biggest genuine
-  front door, at 18% human-of-reach vs Darcy-Weisbach's 4% — but only 11% of those humans ever
-  calculate, against a 51–67% band on six comparable pages (and DW's 37% on a structurally identical
-  page). That is ~517 lost humans per period, roughly 5× more than exist on every page below
-  Manning-Trap combined, making it the largest single UX prize in the suite. Instrumentation is
-  shared and identical across pages, so this is real behavior, not a measurement artifact. Traffic is
-  well-targeted, which deepens the puzzle: per Tom, English users dominate and search "Hazen Williams"
-  by name, so these are people who wanted *this* calculator. Cause unknown — worth checking whether
-  the default inputs read as "already answered" (suppressing the user-triggered recalc that `used`
-  requires), whether the form's units/roughness defaults mismatch what a searcher arrives with, or
-  whether the page answers the question without interaction. Do not guess a fix; instrument or
-  observe first.
-  **Tom's leading hypothesis (2026-07-27) — the page may be too small for the job.** People searching
-  "Hazen-Williams" may simply not be satisfied by a *single-line* calculator. They arrive with a
-  *network* to solve and find one pipe segment. What they may actually be hoping for is `bpn_`
-  (branched networks — Task 137, now shipped) or, against all their fears, a **simple Hardy Cross
-  looped-network calculator** — the Phase 3 idea in Task 137, envisioned as following the Google Maps
-  mashup (Phase 2). On this reading HW is not broken at all; it is just **not enough for their needs**,
-  and the 89% who leave are being driven yet again to EPANET or (gasp) WATERCAD. Two things follow.
-  First, it makes the Task 138 HW→BPN link a partial test of the hypothesis, and cheap to observe:
-  if BPN's human count climbs while HW's conversion stays flat, the leak is scope, not usability.
-  Second, it reframes Phase 3 from "conditional, uncommitted" toward **evidence-backed** — 517 lost
-  humans per period is exactly the "or users ask" trigger that gate was waiting for, arriving as
-  behavior rather than as a request. **Phase 3 is now Task 146** (extracted from 137's closed block
-  2026-07-27); a confirmed finding here promotes it. Weigh this against the mundane usability causes above before
-  committing; a scope explanation is more flattering to the suite than a defect explanation, which is
-  precisely why it deserves evidence and not assumption.
-  **CC analysis 2026-07-28 (source read, no fix attempted — task is below the priority cutoff).**
-  Tom raised five candidate causes; four die on one filter. **`Hazen-Williams.php`,
-  `Darcy-Weisbach.php` and `Manning-Pipe-Head-Loss.php` are structurally near-identical** — verified
-  by reading all three: same inputs (`q`=1, `d`=1, `l`=1000, `km`=2.0, `egl1`=0), same SI-first unit
-  lists, same EGL/HGL result rows, same tips. They differ only in the roughness input (C vs e+ν vs n)
-  and DW's extra Reynolds/regime/f rows. **Anything identical across pages cannot explain why HW sits
-  at 11% while its twins sit at 37% and 58%.** That kills, as *page-design* explanations: (1)
-  pressure-vs-head — every head field on all three already offers psi/kPa/bar/mH2O, so pressure is
-  available today and the elevation gap is shared; (3) EGL-vs-HGL input; (4) too much on the page.
-  Questions (2) top-down-vs-bottom-up and (5) US defaults survive **only as audience-composition
-  differences, not page differences** — the same metric-first defaults hurt more if HW's audience
-  skews more US than DW's. Note `MPF` converts at **67% with those identical metric defaults**, which
-  is strong evidence they are not independently fatal. Separately: the `in` unit set already maps to
-  in/gpm/psi/ft²/ftps, so "US defaults" needs no new unit work — only a decision about the *initial*
-  selection, which today is simply the first entry in each `units` array.
-  **The task's measurement claim is a non sequitur and should not be relied on.** "Instrumentation is
-  shared and identical across pages, so this is real behavior, not a measurement artifact" — identical
-  instrumentation does not imply identical *traffic composition*. Read what the two tiers actually
-  require (`js/Calculators.lib.js`): **`human` = JS executed + session ≥10s old. Nothing else.**
-  `used` = a *user-triggered recalculation* ≥10s after load. So any visitor that renders JS and dwells
-  but never types — a JS-rendering AI/preview crawler, or **a person reading the page for reference** —
-  inflates `human` and deflates `%used` simultaneously. **HW is precisely the page with the anomalous
-  numerator: 18% human-of-reach against 3–5% for its structural twins.** One traffic-composition cause
-  explains both anomalies at once; no UX fix would ever move it.
-  **Sixth hypothesis, not previously on the list, and it fits the data better than the others:
-  "Hazen-Williams" names a *formula*, not a task.** People search it to look up the **equation or the
-  C coefficient**, not necessarily to compute — and the page links out to a C-value table. Those
-  visits are *satisfied*, not lost, and would be miscounted as a leak by construction. (DW is also a
-  formula name but draws 4% human-of-reach, i.e. it is not pulling that reference crowd at scale.)
-  **Cheapest decisive next step, and it is observation not guessing:** pull the **HW page's own query
-  export** from Search Console — the same source that produced the sewer-slope query data in Task 151.
-  If the queries are `hazen williams c values` / `formula` / `equation`, this is reference demand and
-  the right response is to put a C-value table *on the page* (turning a bounce into a satisfied visit,
-  possibly into a calculation) — not a network solver. If they are `hazen williams calculator` /
-  `pipe pressure loss calculator`, it is a real UX leak and Task 146 gets its evidence. **Do not
-  promote Task 146 on the strength of the 11% number alone** — that number does not yet distinguish
-  the two.
-  **Tom's correction, 2026-07-28 — the three pages do not share an audience, so the "identical pages"
-  filter above is weaker than CC presented it.** Tom's domain model: **`mphl_` is a storm drain and
-  culvert calculator, `hw_` is a waterline calculator, and `dw_` is what engineers outside the US
-  use.** That is correct, and it changes the weighting: identical page design does not license
-  expecting identical conversion, because the same default can be neutral for one audience and
-  disqualifying for another. CC's filter was valid only in its narrow form — *any* explanation must
-  run through an audience difference — but CC ranked the audience-difference survivors (Tom's Q2 and
-  Q5) as weak when this domain model makes them the **leading** candidates.
-  **Why HW is the page where SI-first defaults cost the most.** Hazen-Williams is empirical,
-  water-only, and its user base is unusually unit-monolingual: US municipal water distribution (AWWA)
-  and **NFPA 13 fire-sprinkler hydraulics, which mandates Hazen-Williams by name**, both work
-  natively and almost exclusively in **gpm, psi, inches, feet**. So the arriving visitor's expected
-  input set is the `in` unit set, and the page opens on `m3ps`/`m`/`mh2o`. Worse than the units is the
-  **scale**: the default q = 1 m³/s is **15,850 gpm** through a 1 m (39") main — a city transmission
-  line — when a typical arrival wants a 6" main at 400 gpm. Every field is wrong *and* off by a
-  factor of ~40. A DW visitor, being metric already, changes numbers; an HW visitor must change four
-  unit dropdowns *and* four numbers before the page says anything true. The `C` default of 100 ("old
-  pipe") compounds it — new-main practice is 130–140, NFPA wants 120 (steel) or 150 (CPVC).
-  **A page difference CC missed by comparing HW only to DW/MPHL and not to the pages that convert:
-  `Manning-Pipe-Flow.php` and `Manning-Trap.php` are the only two calculators in the suite with an
-  inverse solver** (`solverControlHtml`), and they are the two highest converters (67%, 61%). HW, DW,
-  MPHL, IP and Orifice have none. This is Tom's Q2 (top-down vs bottom-up) as a concrete, checkable
-  asymmetry: a waterline designer's actual job is *sizing* — given flow, length and allowable loss,
-  find the diameter — which matches the suite's own design-not-analysis principle, and HW offers only
-  the forward direction. **It is not a complete explanation** — MI/MPHL/WFS/WFI convert at 51–59%
-  with no solver — but it is the one structural difference between HW and the 67% page, and it was
-  absent from the five hypotheses.
-  **Q3 (EGL-vs-HGL input) is now Task 167**, extracted 2026-07-28 — the "identical pages" filter that
-  dismissed it does not survive Tom's correction that the three pages have different audiences.
-  **What to ask the query export, given the domain model.** Segment HW's queries for: (a) fire
-  protection (`sprinkler`, `NFPA`, `fire flow`, `friction loss psi`) — a large US audience with rigid
-  unit expectations; (b) unit words (`gpm`, `psi`, `inch`) — direct confirmation of Q5; (c) sizing
-  intent (`pipe size for`, `water main sizing`) — direct confirmation of Q2; (d) `c factor` /
-  `c value` — the reference-lookup reading, which Tom does not buy and which this export can settle
-  either way; (e) Spanish/Portuguese (`pérdida de carga`, `perda de carga`) — Hazen-Williams is also
-  standard practice in Latin America, so a non-US metric segment may be present and would argue
-  *against* flipping defaults wholesale.
-  **Cheap candidate intervention, if the export supports Q5:** default `Hazen-Williams.php` to the
-  `in` unit set with a realistic waterline scale (e.g. 6", 400 gpm, 1000 ft, C = 130). This needs
-  **no new translation** — the unit sets already exist and defaults are numbers — making it the
-  cheapest testable change on the board. Do not ship it before the export; per-page default divergence
-  is a real cost and (e) could argue against it.
+- 25|144| **Diagnose the Hazen-Williams conversion leak — full record in `dev/hazen-williams-leak.md`.**
+  HW draws 580 confirmed humans (18% human-of-reach, the suite'''s second-biggest front door) but only
+  11% of them calculate, against a 51–67% band on six comparable pages — ~517 lost humans per period.
+  - **Do not guess a fix.** The decisive step is one observation: pull the HW page'''s own Search
+    Console query export and segment it (the doc says exactly how). Reference-lookup queries mean a
+    C-value table on the page; calculator queries mean a real UX leak.
+  - **Do not promote Task 146 on the 11% number alone** — it does not yet distinguish a leak from
+    satisfied reference demand, because `human` counts anyone who dwells 10 s without typing.
 - 50|228| **A share affordance at the moment someone names a calculation.** Extracted from Task 215
   when it closed 2026-08-08 — 215 built the *measurement*; this is the unbuilt feature that
   measurement was always pointing at.
@@ -405,26 +251,20 @@ session of its own with nothing else in it.
   out of single digits, and let the clicks-vs-sends split pick which lever this pulls.
 
 - 15|202| **`zh` converts at ~15% where its peers convert at 50–75% — PARKED until n=30, with a
-  pre-registered threshold.** Everything cheap has been eliminated; what remains is a decision that
-  data will make for free.
-  - **Not bots.** The arrival-pattern check (built for exactly this) shows `zh` at 13 views over 6
-    days, burst 1 — more human-shaped than `es` at 8 days, burst 2. **The bot hypothesis was CC's**,
-    argued as more likely than a defect, and it was wrong.
-  - **Not missing strings.** `lang_parity_check --lang=zh` reports 159 missing, every one of them
-    `lpn_` (English-only by design). All `mpf_` keys present, unit tokens translated,
-    `EC_DEFAULT_UNIT_SET` correctly gives `zh` SI.
-  - **Not a wrong promise in search.** `mpf_main_title` = 免费在线曼宁管流计算器 — unambiguously a
-    calculator. And Tom read the page, and back-translated it, and found nothing.
+  pre-registered threshold.** Everything cheap has been eliminated: **not bots** (arrival pattern is
+  more human-shaped than `es`), **not missing strings** (`lang_parity_check` reports only `lpn_`
+  gaps; all `mpf_` keys present, unit tokens translated, `EC_DEFAULT_UNIT_SET` correctly SI), **not a
+  wrong promise in search** (`mpf_main_title` = 免费在线曼宁管流计算器, unambiguously a calculator, and
+  Tom read and back-translated the page and found nothing). The bot hypothesis was CC's, argued as
+  more likely than a defect, and it was wrong.
   - **PRE-REGISTERED TEST — this is the point of the entry.** The original finding's weakness was the
-    look-elsewhere effect: `zh` was the worst of 11 languages, so its raw p-value overstated the
-    case. Naming it in advance removes that penalty. Against the peer rate p = 0.60: at n = 30,
-    **real if using ≤ 13, noise if using ≥ 16** (expected 18 if `zh` behaves like its peers, 4–5 if
-    it is truly ~15%). Earlier checkpoints: n = 20 → real if ≤ 7; n = 25 → real if ≤ 10.
-  - **Priority 15 on purpose.** Not because it stopped mattering — a genuine 15% on a language we
-    have already paid to translate would matter a lot — but because **no amount of work now improves
-    the answer**, and the log accrues at zero cost. Re-read it when `zh` passes 30 views.
+    look-elsewhere effect: `zh` was the worst of 11 languages, so its raw p-value overstated the case.
+    Naming the threshold in advance removes that penalty. Against the peer rate p = 0.60: at n = 30,
+    **real if using ≤ 13, noise if using ≥ 16** (expected 18 if `zh` behaves like its peers, 4–5 if it
+    is truly ~15%). Earlier checkpoints: n = 20 → real if ≤ 7; n = 25 → real if ≤ 10.
+  - **Priority 15 on purpose** — not because it stopped mattering, but because **no amount of work now
+    improves the answer** and the log accrues at zero cost. Re-read when `zh` passes 30 views.
   - **Do not re-score `zh`'s QUALITY in either direction before then.**
-
 - 5|181| **Per-element symbol sizing (originated during Task 146).** Task 180 shipped one overall
   `settings.symbolScale` multiplier ("Symbol size (relative to text)") covering node radius, pipe
   width, pump/vertex/arrow marks and stroke widths together. Tom, 2026-07-30, named the
@@ -492,38 +332,24 @@ session of its own with nothing else in it.
   rotated label has the least room.
 
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
-  2026-08-14, correcting my first reading: *"Not mtext labels. Mtext Text objects."* So the target
-  is the thing you place with the Text tool (`lb.text`, one centre-anchored `<text>`), and node/link
-  data labels are explicitly out of scope — those are generated, one value per line, and already
-  multi-line.
-  - **Rung 1, explicit line breaks — half a day, and it is the whole of what most drawings use.**
-    `\n` in `lb.text`, rendered through `setMultilineText()`, edited in a `<textarea>` (the backdrop
-    world-file field already is one). Centre the block on `lb.y` so a ONE-line label renders
-    pixel-identically to today — that is the whole migration.
-  - **JUSTIFICATION IS A USER CONTROL AND BELONGS HERE, NOT IN TASK 332** (Tom, 2026-08-15:
-    *"text alignment is very interesting to a user, especially if we allow paragraph text. But maybe
-    we wrap alignment selection in with the paragraph text task."* — and he is right that a two-line
-    note makes it visible where a one-line callout hides it). So: `lb.align` gets its row in the
-    Text label's property popup here, left/centre/right.
-  - **`lb.align` ALREADY EXISTS — Task 332 shipped it 2026-08-15, storage and renderer both**, plus
-    `lb.valign` for the other axis (together they are AutoCAD's MTEXT attachment point, which is why
-    the pair is the right shape). `Geom.labelBoxAt()` is the one place either is interpreted. So all
-    this task owes alignment is the row in the popup; nothing about it has to be migrated.
-  - Ship centre as the default either way: it is what every existing label already is, so no drawing
+  2026-08-14: *"Not mtext labels. Mtext Text objects."* The target is what you place with the Text
+  tool (`lb.text`, one centre-anchored `<text>`); generated data labels are out of scope.
+  - **Rung 1, explicit line breaks — the whole of what most drawings use.** `\n` in `lb.text`, via
+    `setMultilineText()`, edited in a `<textarea>`. Centre the block on `lb.y` so a ONE-line label
+    renders pixel-identically to today; that is the whole migration.
+  - **Justification belongs HERE, not in Task 332** (Tom, 2026-08-15: *"text alignment is very
+    interesting to a user, especially if we allow paragraph text."*). All this task owes it is a row
+    in the Text label's property popup — **`lb.align`/`lb.valign` already exist**, shipped by Task
+    332 and interpreted in the one place `Geom.labelBoxAt()`. Default centre, so no existing drawing
     changes shape on upgrade.
-  - **Rung 2, a wrap WIDTH — about a day, and it is what actually makes it MTEXT.** AutoCAD's
-    defining feature is the width box, not the line breaks. SVG does not wrap, so it needs a
-    per-label width plus a greedy re-wrap on every font-size change; the wrap itself is pure and
-    belongs in `js/lpn-geom.js` with a harness. Defer until asked — rung 1 covers the common case
-    and a width handle is more UI than it looks.
-  - **Rung 3, per-run rich text — the expensive one, and worth declining.** Bold/italic/colour
-    WITHIN one label means tspan runs, a markup format in the saved document, and an editor for it.
-    `foreignObject` is the tempting shortcut and is a trap: HTML-in-SVG breaks the export and print
-    fidelity Tasks 175/253 exist for. Per-LABEL Bold (Task 337, already higher) buys most of it.
-  - **THE CONSTRAINT NOBODY WILL THINK OF UNTIL IT BITES: EPANET `[LABELS]` is ONE quoted string
-    per line.** A multi-line Text cannot round-trip. Decide on export (Task 281) whether it becomes
-    N labels or one line with the breaks flattened to spaces, and say so where the import (Task 332)
-    can agree with it.
+  - **Rung 2, a wrap WIDTH, is what actually makes it MTEXT** — AutoCAD's defining feature is the
+    width box, not the line breaks. SVG does not wrap, so it needs a per-label width plus a greedy
+    re-wrap on every font-size change, pure and belonging in `js/lpn-geom.js`. Defer.
+  - **Rung 3, per-run rich text, is worth declining** — tspan runs, a saved markup format, and an
+    editor for it. `foreignObject` is a trap: HTML-in-SVG breaks export and print fidelity.
+  - **THE CONSTRAINT NOBODY WILL THINK OF UNTIL IT BITES: EPANET `[LABELS]` is ONE quoted string per
+    line**, so a multi-line Text cannot round-trip. Decide on export (Task 281) whether it becomes N
+    labels or one flattened line, where the import (Task 332) can agree with it.
 
 - 66|337| **Text label properties: Bold, and Rotate-to-match-a-pipe with a flip toggle.** Tom,
   2026-08-14: *"For text labels properties, it would be nice to allow Bold and Rotation to match a
@@ -562,88 +388,57 @@ session of its own with nothing else in it.
   - The line to state: **a scenario is a set of HYDRAULIC differences. The drawing is the network's,
     not the scenario's.**
 
-- 60|325| **A successful import can render INVISIBLE, and the sizing paradigm is why.** Tom, 2026-08-14,
-  after Net3 imported correctly and showed nothing: *"the text size for Net3.inp was so small (0.2)
-  that nothing was visible even though the import was successful."* An import that works and looks
-  broken is worse than one that fails, because there is nothing to act on.
-  - **The cause is that `settings.textSize` is in MAP UNITS while every model has its own coordinate
-    scale.** Measured: Net1 spans 60x80 units, Net3 spans **37x31**, and a real survey model in state
-    plane spans tens of thousands. `docFromInp()` copies the CURRENT settings into the new document,
-    so whatever text size the last project needed is inherited by a model it means nothing for.
-    There is no size that is right for all three, and no warning when it is wrong.
-  - **PARTLY CLOSED 2026-08-14**: the import now derives a starting size from the model's extent,
-    and `effectiveFontSize()`/`symbolFactor()` carry a floor in device pixels, so a correct drawing
-    can no longer be invisible. What remains here is superseded by Task 326 — lowered 88 -> 60.
-  - **Fix the import first**: derive an initial text size from the model's own extent (roughly
-    1/40th of the diagonal reads about right across Net1, Net3 and a state-plane model), so any
-    imported network is legible on arrival. Cheap, contained, and it removes the failure mode where
-    a correct import looks like a broken one.
-  - **THE REAL QUESTION IS THE PARADIGM, and Tom has asked for fresh thinking rather than a copy of
-    EPANET.** Today `symbolFactor() = textFactor() x symbolScale`: symbols are DERIVED from the text
-    size, with a multiplier to pull them apart. He wants them independent: *"I found myself wanting
-    to control symbol size and text size independently instead of having them linked."*
-    - The link was not arbitrary -- it exists so a drawing scales as one thing when the text grows,
-      which is right for a 20-node design sketch and wrong for a 97-node imported model where the
-      symbols carry the topology and the labels are secondary.
-    - **`textSizeUnits` already offers 'map' vs 'screen'**, and screen units are scale-independent by
-      construction. That may be the better DEFAULT for an imported model, and it is worth asking
-      whether the map/screen choice and the size are really two settings or one.
-    - Worth weighing before building: at 97 nodes the labels are the clutter, so what a large model
-      wants may not be smaller text but FEWER labels -- which is the Labels panel, already built.
-      Tom's own "maintenance / GIS-style viewing" note points the same way.
+- 60|325| **The sizing PARADIGM: symbol size and text size should be independent.** Tom, 2026-08-14:
+  *"I found myself wanting to control symbol size and text size independently instead of having them
+  linked."* Today `symbolFactor() = textFactor() × symbolScale`, so symbols are DERIVED from the text
+  size with a multiplier to pull them apart.
+  - **The link was not arbitrary** — a drawing scales as one thing when the text grows, which is
+    right for a 20-node design sketch and wrong for a 97-node imported model where the symbols carry
+    the topology and the labels are secondary. Tom has asked for fresh thinking here rather than a
+    copy of EPANET.
+  - **`textSizeUnits` already offers 'map' vs 'screen'**, and screen units are scale-independent by
+    construction. That may be the better DEFAULT for an imported model, and it is worth asking
+    whether the map/screen choice and the size are really two settings or one.
+  - **What a large model may want is not smaller text but FEWER labels** — at 97 nodes the labels
+    are the clutter, and the Labels panel is already built. Weigh that before building anything.
+  - **The invisible-import half is CLOSED 2026-08-14** (why the priority dropped 88 → 60):
+    `settings.textSize` is in MAP UNITS while every model has its own scale — Net1 spans 60×80 units,
+    Net3 spans 37×31, a state-plane model tens of thousands — and `docFromInp()` copied the current
+    settings into the new document. Import now derives a size from the model's extent, and
+    `effectiveFontSize()`/`symbolFactor()` carry a device-pixel floor.
   - Related and unfiled until Tom rules: a toggle for label background masking, and search within a
     large model.
-
-- 5|192| **Right-click / long-press context-menu system (originated during Task 146).** Raised by Tom,
-  2026-07-30, when "Create scenario geometry variant" (Task 184) was proposed as a right-click
-  action: the calculator has **no right-click capability at all today**, so that action cannot
-  quietly introduce one. Tom: *"if we add right-click, it should be built out robustly. It's a habit
-  that, once taught or discovered, we should leverage."* Hence a task of its own, and hence 146.08
-  ships its command on the toolbar/menu path only — this is not a blocker for it.
-
-  **PARKED at 5, 2026-08-13 (Tom: "I am not currently seeing the need for this").** Not declined —
-  the reasoning below is still sound, and the day something wants a context menu it should be built
-  the robust way this task describes rather than smuggled in. But nothing currently wants one: the
-  action that raised it (Task 184's scenario variant) is itself parked, so this is a mechanism with
-  no live caller. Do not build it on the strength of "every app has right-click."
+- 5|192| **Right-click / long-press context-menu system. PARKED at 5, 2026-08-13** (Tom: *"I am not
+  currently seeing the need for this"*). Not declined — the day something wants a context menu it
+  should be built the robust way described here rather than smuggled in. But the action that raised
+  it (Task 184's scenario variant) is itself parked, so this is a mechanism with no live caller. Do
+  not build it on the strength of "every app has right-click." Tom, 2026-07-30, when it was raised:
+  *"if we add right-click, it should be built out robustly. It's a habit that, once taught or
+  discovered, we should leverage."*
   - **Every clickable class gets a menu** — node, link, vertex, label, backdrop, empty canvas. A menu
     missing on some objects is exactly what teaches users to stop trying.
-  - **Long-press is the touch equivalent, and every item stays reachable without it.** This page runs
-    on phones; a right-click-only action is an action that does not exist for half the users. That is
-    the real reason for Tom's two entry paths — reachability, not redundancy.
-  - **Do not hijack right-click inside form fields.** Suppress the native menu only where we replace
-    it; the popup's text inputs must keep native copy/paste.
-  - **Disable-with-reason rather than hide**, where practical, so the vocabulary stays learnable.
-  - Menu contents are contextual to the clicked object (and later to the selection, if multi-select
-    lands). Escape closes.
-- 15|201| **Scenario UI — build what Task 184 decided (originated during Task 146).** Created 2026-08-03 while
-  closing 146.08. Task 184 settled the delta model and 146.08 shipped the storage for it, but
-  **nothing in the app can create, name, or switch a scenario**, and there is no write path for an
-  override — `setOverride()` deliberately does not exist yet (`effective(el, prop)` is a pure
-  passthrough while Base is the only scenario, which is what makes a missed call site fail loudly
-  instead of silently). Until this lands, every scenario-dependent feature is unobservable, which is
-  exactly why the two bullets below could not be built inside 146.08.
-  - **The scenario selector**, plus create / rename / delete. Base is a row in the same array, so the
-    selector needs no special case — see Task 184.
+  - **Long-press is the touch equivalent, and every item stays reachable without it.** That is the
+    reason for two entry paths — reachability, not redundancy.
+  - **Do not hijack right-click inside form fields**; the popup's text inputs must keep native
+    copy/paste. **Disable-with-reason rather than hide**, so the vocabulary stays learnable.
+- 15|201| **Scenario UI — build what Task 184 decided.** 184 settled the delta model and 146.08
+  shipped the storage, but **nothing in the app can create, name or switch a scenario**, and there is
+  no write path for an override: `setOverride()` deliberately does not exist yet, so `effective(el,
+  prop)` stays a pure passthrough while Base is the only scenario — which is what makes a missed call
+  site fail loudly instead of silently. Until this lands, every scenario-dependent feature is
+  unobservable.
+  - **The scenario selector**, plus create / rename / delete. Base is a row in the same array, so it
+    needs no special case. **Its home is decided: scenario tabs along the BOTTOM strip** (Task 211),
+    mirroring project tabs on top — so a tab strip, not a dropdown. 211 reserves the space.
   - **`setOverride(el, prop, value)` and its un-set**, honouring `LPN_OVERRIDABLE`. The key's presence
     IS the override marker, including when the value equals Base's; deleting the key is the undo.
   - **The status-bar override count**, a sum of key counts across the active scenario.
-  - **INHERITED FROM 146.08** (moved here 2026-08-03, verbatim, because both are unobservable with
-    Base as the only scenario):
-    - **"Create scenario geometry variant"** — the toolbar/menu command specified in Task 184. Task
-      192 owns the right-click path; the toolbar/menu path belongs here.
-    - **The "Compare with base ID" field** — the string group key specified in Task 184;
-      simultaneously the report table's row key, the halo grouping, and the cleanup handle.
-  - **Do not start before Task 195.** Tom set 195 to priority 90 on 2026-08-03; this sits at the same
-    priority as its own decision record (184) deliberately, so the two move together.
-  - **The selector's home is now decided: scenario tabs along the BOTTOM strip** (Task 211,
-    2026-08-04), mirroring project tabs on top — the conventional file-tabs-top / part-tabs-bottom
-    split. 211 reserves the space; this task builds the contents. That settles "the scenario
-    selector" above as a tab strip rather than a dropdown.
-  - **The first drag inside a non-Base scenario needs its one-time notice** (Task 184's
-    "ambient state, not modal" decision). Note `setNotice()` now exists in `js/looped-network.js` —
-    built for Task 193's delete narration — so the status-bar half of that is already available.
-
+  - **Inherited from 146.08, both unobservable with Base as the only scenario:** the "Create scenario
+    geometry variant" toolbar/menu command (Task 192 owns the right-click path), and the "Compare
+    with base ID" field — simultaneously the report table's row key, the halo grouping and the
+    cleanup handle.
+  - **The first drag inside a non-Base scenario needs its one-time notice** (Task 184's "ambient
+    state, not modal" decision). `setNotice()` already exists, so the status-bar half is available.
 - 35|185| **Match/Copy properties tool (originated during Task 146).** Tom, 2026-07-30: "In the absence of the
   table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
   labels) say what properties to copy, top shows (or initial click gives) the Source object then you
@@ -719,142 +514,93 @@ session of its own with nothing else in it.
   reading.
 
 
-- 25|281| **EPANET `.inp` EXPORT — the unbuilt half of Task 196.** Import shipped 2026-08-11;
-  writing an `.inp` did not. It is the much easier direction and most of it already exists:
-  `EngCalcs.lpnToInp()` (js/lpn-epanet.js, Task 243) writes a complete `.inp` for the EPANET engine
-  toggle today, and every element this page models is a strict subset of what `.inp` can express,
-  so nothing needs a lossy projection.
-  - **What is actually missing is small:** a File menu row and a download, plus deciding whether
-    the file is written in the PROJECT's units (which is what a user would expect back) rather than
-    the LPS the engine adapter hard-codes for its own convenience, and whether coordinates,
-    vertices and text labels go out as `[COORDINATES]`/`[VERTICES]`/`[LABELS]` (they should — the
-    drawing is most of the value, and dropping it makes the export a downgrade).
-  - **Round-trip is the test to write:** export a project, re-import it, and assert the same
-    document comes back. `dev/lpn-spike/inp-import-harness.js` is the natural home.
-  - **A pump with no curve is the one thing that cannot round-trip** — `lpnToInp()` already turns
-    it into a short, wide, smooth pipe and warns, because EPANET has no such element.
-  - **`.inp` ONLY. Never write a `.net`** (Tom asked the question directly, 2026-08-11: *"maybe we
-    export only .inp?"* — yes, and he checked it independently the same day: *"Gemini agrees on all
-    counts. TL;DR: inp is the industry standard format."*). `.inp` is documented, is text, is opened natively by EPANET, and is
-    read by every other tool in this space. `.net` is an undocumented binary serialization of one
-    program's internal object graph; `js/lpn-net.js` reads it as a courtesy to users whose Save
-    button makes one, and emitting it would be a different thing entirely — shipping a format we
-    reverse-engineered, as though we knew it was right.
+- 25|281| **EPANET `.inp` EXPORT — the unbuilt half of Task 196.** Import shipped 2026-08-11; writing
+  one did not, and it is the easier direction: `EngCalcs.lpnToInp()` (`js/lpn-epanet.js`) already
+  writes a complete `.inp` for the engine toggle, and every element this page models is a strict
+  subset of `.inp`.
+  - **What is missing is small:** a File menu row and a download, plus two decisions — whether the
+    file is written in the PROJECT's units (what a user expects back) rather than the LPS the engine
+    adapter hard-codes, and whether coordinates, vertices and text labels go out as
+    `[COORDINATES]`/`[VERTICES]`/`[LABELS]`. They should — the drawing is most of the value.
   - **A LABEL'S EXPORTED POINT IS ITS UPPER-LEFT CORNER, not its centre.** EPANET's `[LABELS]`
-    coordinates mean the corner (its own documentation says so, and the import corrects for it —
-    see `reanchorImportedLabels()`), while this page anchors text at the centre. The export has to
-    apply the same shift in reverse or every label comes back half its own width to the right.
-
-- 30|283| **Map label legibility: prefixes instead of colours, pipe-aligned link labels, and an
-  auto-hide rule.** Tom, 2026-08-11, after studying how epanet-js does it. Four separable pieces;
-  they are one task because they are one question — how do the numbers on the map read — but any of
-  them can ship alone.
-
-  1. **Label PREFIXES, not units, and not colours alone.** epanet-js suffixes every label with its
-     unit and offers no way to turn that off. Tom: *"I personally don't see the need for units on a
-     map when they are endlessly redundant. But we could offer that."* His preference is the other
-     end of the label: a prefix, `P=` or `Pressure=`, `Q=` or `Flow=`, set in a **Settings > Label
-     prefixes** section — so a user picks between nothing, a short symbol, or a full word.
-     - **This is also the answer to a limit we already chose not to have.** epanet-js shows ONE
-       field at a time; `lpn_` shows several at once and Tom wants to keep that. Several fields at
-       once is what makes them need telling apart, and today that job is done entirely by COLOUR
-       (`lpnFieldColors` plus the checkbox legend). A prefix does it better: it survives a
-       screenshot, a black-and-white print, and a colour-blind reader, none of which a hue does.
-       **Keep the legend either way** (`Q` Flow, `P` Pressure, …) — a prefix still has to be
-       introduced once.
-     - Optional units-as-suffix stays available as a setting for anyone who wants epanet-js's
-       behaviour; it is just not the default.
-  2. **Link labels drawn ALONG the pipe.** epanet-js sets a pipe's label on the pipe itself, rotated
-     to its bearing, repeated from zero to several times per segment at a hard-coded view-based
-     spacing whenever it fits. Two observations from Tom, both worth keeping:
-     - **Which SIDE it picks is not decipherable** — not always top, not always left or right as
-       seen from the high-head node, not the least congested side. *"I suppose we could choose
-       anything we want, but I wonder why they aren't always top."* So: choose deliberately, and
-       "always top" is the candidate to beat.
-     - **Their flip rule has no readability bias.** Text is rotated to avoid being upside-down, with
-       the decision angle at exactly 90 degrees. A bias (flip only past ~100 degrees, say) keeps a
-       near-vertical run of labels from alternating direction pipe by pipe.
-  3. **Auto-hide text that does not fit, as a rule we state rather than inherit.** epanet-js's
-     labels are a constant on-screen size — which `lpn_` already offers as `textSizeUnits:
-     'screen'` — and it hides what will not fit. We have no such rule at any size. Tom's proposal,
-     and he leans to it being **two separate toggles**: *"Auto-hide map-sized text"* (or no toggle
-     and the answer is always no) and *"Auto-hide screen-sized text"* (or no toggle and the answer
-     is always yes). The asymmetry is the point: map-sized text shrinks with the drawing and its
-     absence would be surprising, screen-sized text stays put and collides.
-     - epanet-js hides NODE labels at a single zoom threshold, all of them together, and it looks
-       hard-coded. That is a cruder rule than per-label fit, and worth beating rather than copying.
-  4. **Flow direction arrows stay.** epanet-js has none. Tom: *"I like that we do."* Recorded so a
-     future tidy-up does not quietly remove them in the name of matching.
-
-  **Node labels need no work here** — Tom's reading is that epanet-js orients and places them much
-  as `lpn_` already does. This task is about link labels, prefixes, and the hiding rule.
-
+    coordinates mean the corner (its own documentation says so, and `reanchorImportedLabels()`
+    corrects for it on import) while this page anchors text at the centre. Apply the same shift in
+    reverse or every label comes back half its own width to the right.
+  - **Round-trip is the test to write** — export, re-import, assert the same document;
+    `dev/lpn-spike/inp-import-harness.js` is the natural home. **A pump with no curve is the one
+    thing that cannot round-trip**, and `lpnToInp()` already substitutes a pipe and warns.
+  - **`.inp` ONLY. Never write a `.net`.** Tom asked directly, 2026-08-11 (*"maybe we export only
+    .inp?"*) and checked it independently the same day (*"Gemini agrees on all counts. TL;DR: inp is
+    the industry standard format."*). `.net` is an undocumented binary serialization of one program's
+    object graph; `js/lpn-net.js` reads it as a courtesy, and emitting it would mean shipping a
+    format we reverse-engineered as though we knew it was right.
+- 30|283| **Map label legibility: what remains is the AUTO-HIDE rule.** Tom, 2026-08-11, after
+  studying epanet-js. Label prefixes (`labelPrefixFor()`) and pipe-aligned link labels
+  (`alignedLabelAnchor()`) both shipped under Tasks 333 and 329; two pieces are left.
+  - **Auto-hide text that does not fit, as a rule we STATE rather than inherit.** Tom leans to two
+    separate toggles — *"Auto-hide map-sized text"* (or no toggle, and the answer is always no) and
+    *"Auto-hide screen-sized text"* (or no toggle, and the answer is always yes). The asymmetry is
+    the point: map-sized text shrinks with the drawing and its absence would be surprising,
+    screen-sized text stays put and collides. epanet-js hides NODE labels at one zoom threshold, all
+    together and apparently hard-coded — cruder than per-label fit, so beat it rather than copy it.
+    Interacts with Tasks 379, 377 and 343, which are the same question at other granularities.
+  - **Units as an optional suffix**, for anyone who wants epanet-js's behaviour. Not the default —
+    Tom: *"I personally don't see the need for units on a map when they are endlessly redundant. But
+    we could offer that."*
+  - **Flow direction arrows stay.** epanet-js has none; Tom: *"I like that we do."* Recorded so a
+    future tidy-up does not quietly remove them in the name of matching.
 - 25|284| **Settings panel: an index pane on the left, content on the right, nothing collapsing.**
   Tom, 2026-08-11, from epanet-js: *"the Settings box has a left 'index' pane and a right 'content'
   pane. When you click a heading in the left pane, the right pane scrolls to your desired heading.
   And the right pane never collapses. This is a very conventional web paradigm."*
   - **Headings AND sub-headings in both panes**, and in the right pane the current heading and
-    sub-heading **stick to the top** rather than scrolling away — so there is always a heading at
-    the top of the content, with its sub-heading under it where one applies.
-  - **This RETIRES the collapsible sections, and that is a real consequence, not a detail.**
-    `settings.sectionsOpen` (`idPrefixes`, `defaults`, `mapDisplay`, `computation`, `files`) exists
-    to persist which accordion sections a user left open; with a content pane that never collapses
-    there is nothing for it to remember. Decide whether it becomes a scroll position, or is simply
-    dropped and left as a stale key the way `fileAutosaveSeconds` was.
-  - **Check it against a narrow screen before committing.** Two panes side by side is conventional
-    on a desktop and is exactly the layout that fails on a narrow one. The index probably has to
-    collapse to a drop-down under a breakpoint — fine, but it means the design is two designs and
-    should be scoped as two.
-  - **DO NOT justify that with "this page is used on phones". WE DO NOT KNOW THAT** (Tom,
-    2026-08-11: *"we don't know whether anybody uses this on a phone"*). The first draft of this
-    task asserted it as fact; it is an assumption, and Task 285 is the reason it is still one. The
-    narrow-screen case stands on its own — a layout that breaks when the window is small is worth
-    avoiding whether or not anyone has yet opened it that way — and that is the whole argument.
-
-- 45|286|[H] **EU cookie/ePrivacy compliance, and a privacy page this site did not have.**
-  **Phase 1, `privacy.php` and `terms.php` all shipped 2026-08-12; `dev/cookie-storage-inventory.md`
-  is the record** — every cookie, every `localStorage` key, every log, and which ones fail the test.
-  The rules a change must respect are in CLAUDE.md, not here.
-  - **What is still OPEN:** translating the ten `consent_*`/`privacy_link`/`terms_link` keys, which
-    exist in English precisely so they ride a sprint rather than paying for one. Plus Task 287.
+    sub-heading **stick to the top** rather than scrolling away.
+  - **This RETIRES the collapsible sections, and that is a real consequence.** `settings.sectionsOpen`
+    (`idPrefixes`, `defaults`, `mapDisplay`, `computation`, `files`) exists to persist which accordion
+    sections a user left open; with a pane that never collapses there is nothing for it to remember.
+    Decide whether it becomes a scroll position or is dropped and left stale the way
+    `fileAutosaveSeconds` was.
+  - **Check it against a narrow screen before committing.** Two panes side by side is conventional on
+    a desktop and is exactly the layout that fails on a narrow one; the index probably has to collapse
+    to a drop-down under a breakpoint, which means the design is two designs and should be scoped as
+    two. **Do not justify that with "this page is used on phones" — we do not know that** (Tom,
+    2026-08-11: *"we don't know whether anybody uses this on a phone"*; Task 285 is why it is still an
+    assumption). The narrow-screen case stands on its own.
+- 45|286|[H] **EU cookie/ePrivacy compliance.** Phase 1, `privacy.php` and `terms.php` all shipped
+  2026-08-12; `dev/cookie-storage-inventory.md` is the record and CLAUDE.md holds the rules a change
+  must respect. **What is still OPEN: translating the ten `consent_*`/`privacy_link`/`terms_link`
+  keys**, which exist in English precisely so they ride a sprint rather than paying for one. Plus
+  Task 287.
   - **Two shapes worth carrying forward.** *Lazy sessions were the work, not the banner* —
     `session_start()` at the top of `base.inc.php` wrote `PHPSESSID` before anything could ask
     anything, and no banner fixes that from the outside. And *when a per-purpose test taints
     something, separate the purposes rather than defending the mixture*: `PHPSESSID`'s
-    service-related half moved to `ec_language`, leaving the session one purpose and one honest answer.
-  - **Consented and unconsented rows are two buckets and are never summed** — consent governs
-    STORAGE, and storage is what de-duplication needs, not counting. Summing turns every count into a
-    mixture of people and page loads.
-  - **The trigger is ePrivacy Art 5(3), not GDPR**, tested *per purpose* and covering `localStorage`
-    as much as cookies. **There is no official EU template**, contrary to a reasonable first
-    impression; Art 13/14 specify content, not a form. Not legal advice and not from a lawyer.
-  - **Tom overruled engineering around the banner** and the grounds are better than the argument they
-    replaced: the user-side cost is already sunk, and avoiding it buys a permanently uncertain
+    service-related half moved to `ec_language`, leaving the session one purpose and one honest
+    answer.
+  - **The trigger is ePrivacy Art 5(3), not GDPR**, tested per purpose and covering `localStorage` as
+    much as cookies. **There is no official EU template**, contrary to a reasonable first impression;
+    Art 13/14 specify content, not a form. Not legal advice and not from a lawyer.
+  - **Tom overruled engineering around the banner**, and the grounds are better than the argument
+    they replaced: the user-side cost is already sunk, and avoiding it buys a permanently uncertain
     compliance posture plus permanently degraded numbers, against one click. So the counters keep
     their per-visitor de-duplication.
-
 - 20|285| **We do not know what devices anybody uses this on, and several decisions have quietly
-  assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."* He
-  is right, and it is worth being precise about why: `log-human-view.php` and `log-calc-event.php`
-  record **page and language and nothing else**. There is no device signal anywhere in this
-  project's instrumentation, so every touch-target, breakpoint and two-pane-layout argument ever
-  made here has rested on a guess.
-  - **This is not a small guess.** "Touch-friendly" is load-bearing in CLAUDE.md's own conventions
-    (the whole-label `.ec-help` tap-target rule exists for it), Task 284's layout hinges on it, and
-    `lpn_`'s map editor was designed around finger-precision limits. All of that may well be right.
-    None of it is measured.
+  assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."*
+  `log-human-view.php` and `log-calc-event.php` record **page and language and nothing else**, so
+  there is no device signal anywhere in this project's instrumentation — every touch-target,
+  breakpoint and two-pane-layout argument ever made here has rested on a guess.
+  - **Not a small guess.** "Touch-friendly" is load-bearing in the suite's own conventions (the
+    whole-label `.ec-help` tap-target rule exists for it) and Task 284's layout hinges on it. All of
+    it may well be right; none of it is measured.
   - **The cheapest honest signal is a COARSE one, and it should stay coarse.** A full user-agent
-    string is fingerprinting-grade data on a suite that already offers a logging opt-out (Task 210)
-    and takes that seriously. One bucket per event — `pointer: coarse|fine` from a media query, or a
-    viewport-width band — answers "does anyone use this on a phone" without identifying anybody, and
-    is a one-field addition to the existing beacon.
-  - **Decide what the answer would CHANGE before collecting it.** If the answer is "almost nobody",
-    the honest consequence is to stop paying for phone-shaped compromises on `lpn_` specifically —
-    which is a real design freedom, not a disappointment. If it is "a third of them", several
-    open tasks get a lot more urgent. Either way it is worth more than the guess it replaces.
-  - Add the reading to `dev/usage-data-log.md` as its own tier when it exists, not folded into
-    reach/shopping/using — it answers a different question from all three.
-
+    string is fingerprinting-grade data on a suite that offers a logging opt-out and takes it
+    seriously. One bucket per event — `pointer: coarse|fine` from a media query, or a viewport-width
+    band — answers the question without identifying anybody, and is a one-field addition to the
+    existing beacon.
+  - **Decide what the answer would CHANGE before collecting it.** "Almost nobody" means we stop
+    paying for phone-shaped compromises on `lpn_` specifically, which is a real design freedom rather
+    than a disappointment; "a third of them" makes several open tasks much more urgent.
+  - Add the reading to `dev/usage-data-log.md` as its own tier, not folded into reach/shopping/using.
 - 15|282| **Offer to attach the backdrop an imported `.inp` names.** An `.inp` (and a `.net`) stores
   only a PATH to its background picture, never the picture. The import reports the file name and
   tells the user to add it with Map, Backdrop; it could instead offer a picker right there, seeded
@@ -868,85 +614,37 @@ session of its own with nothing else in it.
     is strictly better than the two-point scale gesture a human would otherwise perform by eye.
 
 - 5|146.09| **Map insets for congested areas of a drawing (Task 146 child).** Very low priority.
-- 15|178| **Cheap filmstrip-GIF recipe for Help-menu docs (handoff, 2026-07-30).** A proof of
-  concept (drag-a-label-and-reset, add/drag/delete-a-vertex) showed this is genuinely cheap to
-  produce once set up — the fiddly part is precise SVG click targeting, not GIF assembly. Recipe,
-  so a future session doesn't re-derive it:
-  1. **Dev server: `hawsedc.local` is Tom's own reliable local dev server** — use it directly
-     (`http://hawsedc.local/engcalcs/<page>.php`) rather than guessing a docroot/port. In a sandboxed
-     agent container, `hawsedc.local` may not resolve via `/etc/hosts` (it can point at a docker
-     gateway IP unreachable from inside the sandbox) — if so, launch Chromium with
-     `--host-resolver-rules=MAP hawsedc.local 127.0.0.1` (confirmed `127.0.0.1` reaches the real
-     Apache vhost by Host header via `curl -H "Host: hawsedc.local"`) rather than editing
-     `/etc/hosts`, which needs root this environment doesn't have non-interactively.
-  2. **Drive it with Playwright + headless Chromium**, not a hand-rolled CDP client — `npm install
-     playwright` then `npx playwright install chromium` (no `--with-deps`; that needs
-     passwordless `sudo`, which this environment doesn't have — the plain chromium download works
-     without it and was already cached at `~/.cache/ms-playwright` in this container).
-  3. **Click targeting is the real difficulty, not GIF assembly.** A bounding-box CENTER on a
-     multi-line `<text>` or a thin polyline routinely misses the actual painted pixels (an
-     inter-line gap, or empty space beside a 0.5-world-unit stroke) — `elementFromPoint()` then
-     returns some unrelated element (or the page background) and the click silently no-ops. Use
-     `element.getPointAtLength(totalLength * frac)` transformed through `getScreenCTM()` for a
-     point GUARANTEED to be on a path's own paint (pipes, links); for a multi-line label, a point at
-     `(bboxCenterX, bboxTop + smallOffset)` (first line's own baseline) is far more reliable than the
-     vertical center. Verify blind — don't assume a `dblclick()`/drag "worked" from lack of a thrown
-     error; re-read the actual DOM/bounding-box state after the action (this is what caught the
-     label-reset click landing on the wrong element in the first POC pass).
-  4. **GIF assembly, pure JS, no native deps:** `gifencoder`/the `canvas` package need `node-gyp` +
-     system `cairo` and failed to build in this container (no passwordless `sudo` for
-     `--with-deps`-style system installs). `npm install omggif pngjs quantize` instead — decode
-     screenshots with `pngjs`, build ONE shared color palette across all frames with `quantize` (a
-     per-frame palette flickers colors frame to frame), write frames with `omggif`'s `GifWriter`.
-     Delay unit is centiseconds (`100`-`200` for a 1-2s/frame filmstrip, not a smooth-video rate).
-  5. **Screenshot the canvas element directly** (`page.locator('#lpn_canvas').screenshot()`), not
-     the full viewport — the page's own chrome (toolbar, unit row) pushes the SVG below the fold at
-     a normal viewport height, and a full-page screenshot then needs cropping anyway.
-  Proof-of-concept GIFs and the driver script are not committed (they lived in the session
-  scratchpad); this task is the recipe so the ~30 minutes of trial-and-error solving steps 1 and 3
-  isn't repeated. A real Help-menu asset (e.g. the add-pipe/add-junction workflow) is still to be
-  built from this recipe, not just the two POC demos.
+- 15|178| **Build a real filmstrip-GIF Help asset from `dev/filmstrip-gif-recipe.md`** (e.g. the
+  add-pipe / add-junction workflow). A 2026-07-30 proof of concept showed this is cheap once set up;
+  the recipe records the ~30 minutes of trial and error, of which the hard part is precise SVG click
+  targeting, not GIF assembly. The POC GIFs were never committed.
 - 11|145| **Google Maps elevation/length helper — MOVED from `bpn_` to `lpn_` (Tom, 2026-07-28).**
-  Was "Google Maps elevation/length helper for `bpn_`", extracted from Task 137 "Phase 2" on
-  2026-07-27. Tom's reason for the move, recorded because it is a genuine prioritization signal and
-  not a technicality: he cannot get excited about the mashup on the branched calculator, and would
-  rather break it in on the map-centric page — which is where it belongs, since that page already
-  has a view layer, coordinates, and a reason to know where things are. **`bpn_` therefore has no map
-  phase at all now**; nothing should go looking for one.
-  An isolated map mashup that pulls pipe lengths and node elevations into the network, in a
-  **separate lazy-loaded window**, keeping the hard architectural constraint from the original spec —
-  **the core solve never depends on it**, so the whole feature can be aborted at zero cost if it
-  proves infeasible or the API terms turn hostile. That constraint matters *more* here, not less.
-  Feasibility-gated: investigate cost, key management, and terms of service before building. Note it
-  is no longer a prerequisite for Task 146 in either direction — Task 146 is now how we get the map
-  expertise, rather than something waiting on it.
-
-  **Demoted from foundation to one backdrop type among several (Tom, 2026-07-28).** Tom's own read:
-  the mashup is very cool and gets cooler with time, but its importance is unproven — and in real
-  practice a network is drawn over a plan sheet, a CAD export, or a local aerial, essentially **never**
-  over a Google map or Google aerial. So Task 146 builds a **projection-free user-supplied backdrop**
-  first (see its Backdrop note), and this task adds tiles as a *pre-registered* backdrop later. That
-  ordering also means the offline PWA case keeps working, which a tile-dependent design would break.
-
-  **Two real problems this task must solve, neither of which the projection-free backdrop has:**
-  1. **Projection.** Tiles are Web Mercator; a plan sheet is State Plane, UTM, or a site grid.
-     Mixing them means an actual coordinate transformation, not a scale factor. **Do not let Web
-     Mercator become the document's coordinate system** — the document stays flat Cartesian, and
-     georeferencing is a property of the *backdrop layer*, not of the network.
-  2. **Web Mercator distances are not ground distances.** Scale error is `1/cos(latitude)`: ~15% at
-     40°, ~30% at 50°, and unbounded toward the poles. A pipe length measured naively off a tiled
-     backdrop is therefore *wrong by more than most engineering tolerances*, silently, and in a way
-     that looks perfectly reasonable on screen. Any length derived from tiles must be corrected, or
-     computed geodesically from lat/lng rather than from screen geometry. This is the strongest
-     argument for the existing rule that **`len` is stored and overridable, never derived**.
-
+  An isolated map mashup that pulls pipe lengths and node elevations into the network, in a separate
+  lazy-loaded window. **`bpn_` therefore has no map phase at all now**; nothing should go looking for
+  one. Feasibility-gated: investigate cost, key management and terms of service before building.
+  - **The core solve never depends on it**, so the whole feature can be aborted at zero cost if it
+    proves infeasible or the API terms turn hostile. That constraint matters more here, not less.
+  - **Demoted from foundation to one backdrop type among several.** Tom's read: the mashup is very
+    cool, but its importance is unproven — in practice a network is drawn over a plan sheet, a CAD
+    export or a local aerial, essentially **never** over a Google map. So `lpn_` built the
+    projection-free backdrop first and this adds tiles as a *pre-registered* one later, which also
+    keeps the offline PWA case working.
+  - **Two problems the projection-free backdrop does not have.** (1) Tiles are Web Mercator; a plan
+    sheet is State Plane, UTM or a site grid, so mixing them is a coordinate transformation, not a
+    scale factor — **do not let Web Mercator become the document's coordinate system**;
+    georeferencing is a property of the backdrop layer, not of the network. (2) **Web Mercator
+    distances are not ground distances**: scale error is `1/cos(latitude)`, ~15% at 40°, ~30% at 50°,
+    unbounded toward the poles. A pipe length measured naively off a tiled backdrop is wrong by more
+    than most engineering tolerances, silently, and looks perfectly reasonable on screen. Correct it,
+    or compute geodesically from lat/lng. This is the strongest argument for the existing rule that
+    **`len` is stored and overridable, never derived.**
 - 20|221| **Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.** Delete
   `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,
   `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is
   useful for about a year; after that it is archaeology in a user-facing Notes list.
 
-- 40|222| **Position `lpn_` against epanet-js — do not lead with "free EPANET in the
-  browser."** **The research and the live ordering are in `dev/positioning.md`** (§3 the order, §4
+- 40|222| **Position `lpn_` against epanet-js — do not lead with "free EPANET in the browser."**
+  **The research and the live ordering are in `dev/positioning.md`** (§3 the order, §4
   screenshot-not-printing, §6 the LibreEPANET gate); this block is not the place to read or edit
   them. Priority dropped 85 → 40 because the thinking is no longer the bottleneck.
   - **What is left as WORK is the content residual from Task 250: `About.php` never names EPANET**,
@@ -954,19 +652,15 @@ session of its own with nothing else in it.
     `about_body_html`, translated into 26 languages, so it needs its own drift-aware pass.
   - **Two rulings that govern any copy written here.** *Lead with invitation, not comparison* — state
     our own licence, do not narrate theirs, which voluntarily extends Task 296's trademark ban to
-    competitors we legally could name. And *design, not management*: the annotated, publishable map
-    is the differentiator and it is already built.
-  - **The engine claim is a QUALIFICATION, not a headline** (Tom, 2026-08-09, overruling a broader
-    version of this task): for some agencies "does it run the actual EPANET engine?" is a yes/no gate
-    that decides whether we are evaluated at all. Say it prominently and make it checkable; just do
-    not spend the blog/video headline on it. Do not relitigate.
-  - **Mobile is demoted and does not appear in a headline, tagline, or list of reasons** (Tom,
-    2026-08-14: *"phone is a dead end… I don't want to tout it"*). We keep caring — the touch-trap
-    cap stays, phone regressions are still bugs — but the claim is not made.
-
-
-
-
+    competitors we legally could name. And *design, not management*: the annotated, publishable map is
+    the differentiator and it is already built.
+  - **The engine claim is a QUALIFICATION, not a headline** (Tom, 2026-08-09): for some agencies "does
+    it run the actual EPANET engine?" is a yes/no gate deciding whether we are evaluated at all. Say
+    it prominently and make it checkable; just do not spend the blog or video headline on it. Do not
+    relitigate.
+  - **Mobile is demoted and does not appear in a headline, tagline or list of reasons** (Tom,
+    2026-08-14: *"phone is a dead end… I don't want to tout it"*). We keep caring — the touch-trap cap
+    stays, phone regressions are still bugs — but the claim is not made.
 - 35|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
   for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
   where it explains why "Select all" is absent. Wants a rubber-band select and one property sheet
@@ -984,45 +678,26 @@ session of its own with nothing else in it.
     same item twice.
   - Changing `menu_more`'s English makes 26 translations stale — a resync, not a new key.
 
-- 40|257|[H] **[HUMAN] Find or build the example PROJECTS (plural) for lpn.** **Reassigned to Tom,
-  2026-08-11, at his own request: *"Let's change this task to a human assignment to create or find
-  some EPANET examples."*** What is wanted is the CHOICE of networks — which ones teach something,
-  which ones look like the work our users do — and that is a judgement call, not a build. Handing
-  over the files is enough; the wiring is a small job once they exist.
-  - Original framing, kept because it still holds. Tom, 2026-08-09, while Task 254 was in flight:
-    *"some example projects would also be nice, but that's another task for another day, and I
-    suppose it's up to me to prepare those. Maybe I can get something from EPANET, I hope."* He then
-    found the source: <https://github.com/OpenWaterAnalytics/EPANET/tree/dev/example-networks>.
+- 40|257|[H] **[HUMAN] Find or build the example PROJECTS (plural) for lpn.** Reassigned to Tom at
+  his own request, 2026-08-11: *"Let's change this task to a human assignment to create or find some
+  EPANET examples."* What is wanted is the CHOICE of networks — which ones teach something, which
+  ones look like the work our users do. Handing over the files is enough; the wiring is a small job
+  once they exist.
   - **Distinct from Task 254**, which is the one-click *drawing* example a first-time visitor makes
-    from an empty canvas. This is a LIBRARY of openable projects — Net1/Net2/Net3 and friends —
-    which is a Projects/tabs feature, not a toolbar button.
-  - **THE BLOCKER IS GONE (Task 196, 2026-08-11).** This used to say "we deliberately have no
-    `.inp` importer" and asked whether to bake examples into our own JSON or build a real reader.
-    Option (b) happened: File > Import EPANET file (.inp) ships, and it has been run over EPA's
-    Net1/Net2/Net3 and three real production models. So an example project is now literally an
-    `.inp` file we choose, import, and save — no converter, no decision left.
-  - **Net1/Net2/Net3 import but do not solve as themselves**, because all three are built on TANKS,
-    which this page cuts. They are a poor first choice for that reason, not a good one. A network
-    with reservoirs, pipes and a pump is what shows this calculator doing its job.
-  - **We already have Net1/Net2/Net3 in the repo** as `dev/lpn-spike/reference/` fixtures, so the
-    first example costs no download and no network access.
-  - **Licensing is clean** — OWA-EPANET is MIT, so its example networks can ship under GPL v3+.
-  - **Backdrops, 2026-08-11.** Tom first supplied three `.wmf` files; **a browser cannot display
-    WMF at all**, so those still need converting to SVG or PNG (Inkscape opens a `.wmf` and saves
-    SVG directly). He then found the missing `utility-map-estrellas.bmp`, and **BMP is a format
-    browsers do read**, so the Estrellas model is the one that can be shown on its own backdrop
-    today, start to finish — and that makes it the natural first example project.
-    - **His colleague appears to have moved from WMF to BMP, which is good news for us**: it makes
-      every future model he collects usable without a conversion step.
-    - **BMP arrives ENORMOUS, and that is now handled** — the one he sent is 640 x 782 and 1.5 MB,
-      because BMP is uncompressed. `downscaleImage()` used to pass an under-cap image through
-      untouched, so it would have gone into localStorage as a ~1.96 MB data URI out of a ~5 MB
-      budget; it now re-encodes and keeps whichever is smaller, which makes that picture ~67 KB.
-    - Still loose: `20069-WP-Backdrop.wmf` matches none of the three models' `[BACKDROP] FILE`
-      paths, so it appears to belong to a fourth model we do not have.
+    from an empty canvas. This is a LIBRARY of openable projects — a Projects/tabs feature.
+  - **The blocker is gone.** File > Import EPANET file (.inp) shipped 2026-08-11 (Task 196), so an
+    example project is now literally an `.inp` we choose, import and save — no converter, no decision
+    left. Net1/Net2/Net3 are already in the repo as `dev/lpn-spike/reference/` fixtures, and
+    OWA-EPANET is MIT, so they can ship under GPL v3+. Source for more:
+    <https://github.com/OpenWaterAnalytics/EPANET/tree/dev/example-networks>.
   - **These are ANALYSIS networks and this suite is a DESIGN tool.** They will make the map look
-    serious, but do not let them quietly redefine what the calculator is for.
-
+    serious, but do not let them quietly redefine what the calculator is for — a network with
+    reservoirs, pipes and a pump is what shows this calculator doing its job.
+  - **Backdrops:** a browser cannot display WMF at all, so Tom's three `.wmf` files still need
+    converting (Inkscape opens one and saves SVG). BMP it does read, which makes
+    `utility-map-estrellas.bmp` and the Estrellas model the natural first example.
+    `20069-WP-Backdrop.wmf` matches none of the three models' `[BACKDROP] FILE` paths, so it appears
+    to belong to a fourth model we do not have.
 - 30|253| **A clean-map view: hide canvas chrome for screenshots.** Tom, 2026-08-09, wants it
   under the View menu and in the toolbar's View area. **Scope it as "clean map", not "print".**
   His own framing: *"The only thing I care for it to hide at the moment (for map screenshots) is
@@ -1035,136 +710,34 @@ session of its own with nothing else in it.
     never places content under them. That does not survive a pan, which is why this still exists.
 
 
-- 35|248| **What the EPANET toggle actually unlocks: tanks, valves, extended-period simulation.**
-  Task 243 shipped the engine and the toggle. The engine makes each of these a mapping-and-UI job
-  rather than a numerical one, which is the entire reason it was worth vendoring.
-
-  **PHASE 2, VALVES: DONE 2026-08-14.** Five EPANET valve types, and the phase turned on a
-  decision that Task 313 had made the day before rather than on any numerics of our own.
-  - **TCV works in BOTH engines and cost no numerics.** A throttle valve is a minor loss on a
-    zero-length link, which `js/lpn-solver.js` already computed for every pipe. `EngCalcs.lpnLinkK`
-    is the one place that says a TCV's loss is its SETTING and not its `k` — EPANET ignores the
-    [VALVES] minor-loss column for a TCV, measured 2026-08-11, so the page offers no `k` box on one.
-  - **PRV / PSV / FCV solve through EPANET ONLY, and that is a measurement, not a shortfall.**
-    Their status is re-decided inside the iteration; writing that a second time would have been
-    slower code (Task 313: EPANET 0.05 ms against our 0.43 ms at 21 nodes) for a solved problem.
-  - **A network holding one is ROUTED to EPANET automatically, and the status bar says so.** The
-    stored `engine` setting is NOT rewritten — the setting is a preference, the routing is a fact
-    about this network, so deleting the valve puts the page straight back on the chosen engine.
-    Silent routing was the alternative and was rejected: a user who ticked "built-in solver" and
-    got a different one has been lied to.
-  - **Offline, the native engine refuses BY NAME.** `valve-needs-epanet` carries the valve ids into
-    `lpn_diag_valve_needs_epanet`, which is the whole reason this page writes its own diagnostics
-    instead of surfacing EPANET's numbered errors. A second diagnostic, `valve-on-fixed-head`,
-    catches EPANET's own placement rule (input error 219) for BOTH engines, because it is a fact
-    about the drawing rather than about who solves it.
-  - **PBV and GPV are still substituted with a reported open pipe.** A GPV's behaviour is a
-    head-loss CURVE and a PBV's a fixed pressure drop, and this page has no element for either.
-    Offering a GPV in the type list with nowhere to enter its curve would be a control that does
-    nothing.
-  - **THE SETTING IS THE TRAP, and it is narrower and sharper than the tank diameter was.** A
-    valve's setting is a PRESSURE (PRV/PSV), a FLOW (FCV) or a bare LOSS COEFFICIENT (TCV) — three
-    quantities in one column — while its DIAMETER follows the PIPE convention (millimetres), the
-    opposite of the tank diameter three sections earlier in the same file. `valve-harness.js` was
-    mutation-tested against four deliberate breaks and **corrected its own premise**: the diameter
-    turns out to be visible to `validate_epanet.js` after all (a TCV's loss is k V²/2g, so velocity
-    carries it), but an ACTIVE valve's setting is invisible to every engine comparison there can
-    be — those types never reach the comparison, because the native solver refuses them by design.
-  - `lpn_notes_2_def` no longer says control valves are unmodelled; it says which engine works them
-    out. 20 English keys are new or edited and need a translation sprint.
-  - **THE MERGE INTO TASK 313 WAS BROKEN, AND ONLY THE MERGED TREE COULD SHOW IT.** Valves and the
-    persistent EPANET session were built in separate worktrees the same afternoon; each was green in
-    its own. Together, `pushValues()` had no valve case, so a valve fell through to the pipe branch —
-    where `setPipeData()` is not valid on a valve index — and the setting was never pushed at all.
-    - **The ORDER inside the fix is load-bearing and is the durable finding. A valve has THREE
-      states in EPANET, not two:** closed, fully open, and ACTIVE. Writing `EN_INITSTATUS = OPEN`
-      puts it fully open with its setting IGNORED, because "open" means something different for a
-      valve than for a pipe, where it only means not closed; `EN_INITSETTING` is what restores
-      active. So status is written BEFORE setting, and the shared status line skips valves. Written
-      the other way the network solved with the valve wide open: **exactly one k V²/2g of missing
-      head, 0.271 m, with flows still agreeing to 2e-10 m³/s** — a plausible number in a plausible
-      place.
-    - `signatureOf()` also had to learn `valveType`: EPANET fixes a link's type when the file is
-      read, and the setting means a different quantity per type, so a retype must reopen.
-    - `session-harness.js` gained a setting edit, a retype and a closure. The closure needed a
-      network that SURVIVES it — the shared TCV case is a series run, so closing the valve isolates
-      the demand and tests the diagnostic instead of the push.
-    - **This is the whole case for the merge rule in CLAUDE.md**: a check that passed in two
-      worktrees separately has not been run on the thing that ships.
-
-  **PHASE 1, TANKS: DONE 2026-08-14.** A third node type, in both engines, in the `.inp` reader and
-  writer, on the map, in the popup and in the settings. Phase 3 (extended-period) is still open, so
-  the gate on Tasks 306/307 has NOT cleared.
-  - **A tank is a fixed head at its water surface, and that is not a simplification** — it is what
-    EPANET solves at t = 0 of an extended-period run, before it integrates any level forward.
-    `EngCalcs.lpnIsFixedHead` is the one place the equivalence with a reservoir is declared; the
-    difference between the two types is entirely about what happens NEXT, which is phase 3.
-    `cases.tankCase` runs both engines over a two-tank network and they agree to 1.1e-5 m.
-  - **The bigger payoff was the IMPORTER, and it was not the reason the phase was scoped.** Until
-    now `.inp` import dropped every tank *and every link touching one* — honest handling of a
-    missing element, but it meant a municipal model arrived missing whole branches, and tanks are in
-    the majority of real models. EPA's own Net1/Net2/Net3 all have them.
-  - **THE DIAMETER IS THE TRAP AND NO SOLVE CAN SEE IT.** In an `.inp` a PIPE diameter is in
-    millimetres and a TANK diameter is in metres — same word, two units, three sections apart in one
-    file. Writing `diameter * 1000` on purpose leaves `validate_epanet.js` green to the last digit,
-    because a steady-state solve never reads a tank diameter. `dev/lpn-spike/tank-harness.js` exists
-    for exactly that class and round-trips the text; it was mutation-tested against that break
-    before being trusted. Do not let `cases.tankCase` stand in for it.
-  - **Text's ID letter moved from `T` to `X`** so EPANET's tanks can be T1, T2. A text element's ID
-    is unreachable from every screen, so nothing a user can see changed; old documents are not
-    migrated and do not need to be, because `mintId()` now refuses to reissue an id that is taken.
-  - `lpn_notes_1_def` says out loud that a tank is held at its level and neither runs down nor
-    fills. A tank that never empties is not a tank anybody has met, so leaving that unsaid would
-    have been the dishonest part of shipping this phase.
-
-  **RAISED 20 → 60 on 2026-08-14, and it is now a GATE, not just a feature.** Tom's ruling is that
-  the LibreEPANET.org launch (Tasks 306 and 307) waits until these three ship: they are exactly what
-  Task 296 relied on when it refused *"web clone of EPANET"*, so they are the whole of the honesty
-  case for the name. **Nothing else is missing** — there is no node-count limit and the gate must
-  never be described as one (`dev/positioning.md` §6).
-
-  **THEN LOWERED 60 → 35 THE SAME DAY, and the reversal is the instructive part.** Tom: *"I have got
-  distracted… I erred in pushing LibreEPANET.org at the expense of scenarios."* The gate is still a
-  gate — nothing about the honesty case changed — but **a gate on a launch nobody is waiting for is
-  not urgent work.** Phase 1 (tanks) shipped; phases 2 and 3 continue behind Task 184. Read this
-  pair of moves together the next time a positioning task and a user-facing one compete: the ruling
-  that survived contact was the one with a named user behind it.
-
-  Two things this does NOT mean:
-  - **It is not a doubt about our right to the name.** Tom, 2026-08-14: *"we have no less technical
-    authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
-    all public domain."* The gate is about sequencing only.
-  - **The old "do NOT start until someone asks" instruction is retired by this raise.** Someone has
-    now asked, and it is Tom. (Task 243's conclusion that the toggle was the cheap 90% and these are
-    the expensive 10% remains true as a *cost* estimate — it is the priority that changed, not the
-    arithmetic.)
-
-- 1|306| **LibreEPANET.org: the rebranded site variant. BLOCKED on Task 248.** Tom bought
-  the domain 2026-08-14; it 302-redirects to `Looped-Network.php?lang=en` until the gate clears.
-  Rationale, the name ruling and the gate are in `dev/positioning.md` §6. Priority 1, not 0: 0 means
-  completed and this is blocked. Tom's spec: EPANET engine on by default, a custom navbar without
-  HawsEDC and the Hydraulics menu, no page title/description, Notes moved under More, and navbar +
-  lpn menus + map filling the tab.
-  **It is a VARIANT, not a fork — do not start by copying the page.** Costed 2026-08-14:
-  - **The cheapest hosting answer avoids the path refactor entirely.** 112 hardcoded `/engcalcs/`
-    paths, plus `sw.js` and `manifest.json` scoped there; a vhost with `Alias /engcalcs` at this
-    directory and a rewrite of `/` to `Looped-Network.php` resolves every asset unchanged. Prefer
-    that over an `EC_BASE` refactor. `echoHeader()`'s `"normal"` branch already gives a chrome-free
-    header.
-  - **`CANONICAL_ORIGIN` is hardcoded and must NOT be derived from `HTTP_HOST`.** A second domain
-    needs a host → variant WHITELIST, or it reintroduces the canonical-poisoning hole that constant
-    exists to prevent.
-  - **Two consequences to ANSWER, not discover.** The 678 KB engine is lazily imported *because* it
-    is off by default, so on-by-default makes every visit pay it — which cuts against the
-    low-bandwidth case. And `lpn_settings_engine_epanet_tip` currently argues *against* EPANET, which
-    on a LibreEPANET page is the page arguing with itself; it is translated into 26 languages, so it
-    is a resync, not a free edit.
-  - **A full-viewport map is a JS change** (`effectiveMapHeight()`, no CSS height rule exists), and
-    its `innerHeight * 0.72` cap is load-bearing: `#lpn_canvas` has `touch-action:none`, so a canvas
-    taller than the viewport swallows every touch. Answer that trap; do not delete the cap.
-  - **Treat any parent-site dependency as this task's problem by default** — a different domain is
-    exactly the condition that exposes them, as `/hawsedc.css` did in August 2026.
-
+- 35|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
+  and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves both shipped
+  2026-08-14; phase 3, time, is the open one. The engine makes it a mapping-and-UI job rather than a
+  numerical one, which is the entire reason it was worth vendoring.
+  - **Task 384 (colour coding with a ramp picker) is preparation for this, not decoration** — a
+    number per element per timestep cannot be read any other way.
+  - **Still substituted with a reported open pipe: PBV and GPV.** A GPV's behaviour is a head-loss
+    CURVE and a PBV's a fixed pressure drop, and this page has no element for either.
+  - **A valve has THREE states in EPANET, not two:** closed, fully open, and ACTIVE. `EN_INITSTATUS =
+    OPEN` opens it fully with its setting IGNORED; `EN_INITSETTING` is what restores active, so
+    status is written BEFORE setting. Written the other way a network solves with the valve wide
+    open — exactly one k V²/2g of missing head, with flows still agreeing to 2e-10 m³/s.
+  - **The gate is about sequencing only, not about our right to the name.** Tom, 2026-08-14: *"we
+    have no less technical authority to call ourselves EPANET, more moral authority, and all the
+    legal authority since it's all public domain."* There is no node-count limit and the gate must
+    never be described as one (`dev/positioning.md` §6).
+  - **Raised 20 → 60 then lowered 60 → 35 the same day; the reversal is the instructive part.** Tom:
+    *"I have got distracted… I erred in pushing LibreEPANET.org at the expense of scenarios."* A gate
+    on a launch nobody is waiting for is not urgent work, and the ruling that survived contact was
+    the one with a named user behind it.
+- 1|306| **LibreEPANET.org: the rebranded site variant. BLOCKED on Task 248.** Tom bought the domain
+  2026-08-14; it 302-redirects to `Looped-Network.php?lang=en` until the gate clears. Priority 1, not
+  0: 0 means completed and this is blocked.
+  - Tom's spec: EPANET engine on by default, a custom navbar without HawsEDC and the Hydraulics menu,
+    no page title or description, Notes moved under More, and navbar + lpn menus + map filling the tab.
+  - **It is a VARIANT, not a fork — do not start by copying the page.** The name ruling and the gate
+    are in `dev/positioning.md` §6; the build costing, including the hosting answer that avoids the
+    112-path refactor and the `CANONICAL_ORIGIN` whitelist trap, is §6.1.
 - 1|307|[H] **LibreEPANET.org front-door copy. BLOCKED on Task 248.** Holds the approved register so
   the wording is not re-derived later. Tom, 2026-08-14: **"Join us in building LibreEPANET, for the
   community and by the community, today."** Or some such — the *shape* is the ruling, not the exact
@@ -1202,141 +775,45 @@ session of its own with nothing else in it.
   fits the irrigation/rural-water audience. Below Task 184 (scenarios), which epanet-js charges for
   and Tom therefore wants raised.
 
-- 30|217| **A suite-owned, multilingual Manning's n table, built from primary sources.** Raised by
-  Tom, 2026-08-05, and accepted as mid-priority with a caution: *"No collision, but I am not into
-  ownership/maintenance. If there is any viable way to outsource, I prefer it. But if we can add
-  multilingual value with an n table, I'm game. Let's just be careful and intentional."*
+- 30|217| **A suite-owned, multilingual Manning's n table, built from primary sources.** Tom,
+  2026-08-05: *"No collision, but I am not into ownership/maintenance. If there is any viable way to
+  outsource, I prefer it. But if we can add multilingual value with an n table, I'm game. Let's just
+  be careful and intentional."*
   - **The case.** `Manning-Pipe-Flow.php` and `Manning-Trap.php` both send the roughness input off
-    site to `engineeringtoolbox.com/mannings-roughness-d_799.html` — English only, ours to lose, and
-    on the two calculators that carry the great majority of our humans. Every one of those users
-    needs an n value; it is the single most-needed reference in the suite. In 26 languages it is a
-    genuine search front door rather than a leak, and it is content nobody else is publishing
-    multilingually.
-  - **Gate it on Task 216's number**, which is what that beacon exists to produce. Build the
-    instrument first.
-  - **The maintenance worry is the real design constraint, and it has an answer: freeze it.** An n
-    table sourced from primary references (Chow 1959; USGS WSP 2339 / Arcement & Schneider; FHWA
-    HDS-5) is *static data* — those values have not moved in decades and will not. Build it once,
-    cite each row, and it needs no ongoing ownership. What creates maintenance is editorial
-    ambition: photographs, user submissions, regional variants, a "suggest a value" form. Ship none
-    of that.
-  - **Translation cost is the honest cost**, not maintenance: a table of material names is a lot of
-    short strings. Scope it against the Task 203 cross before committing — the core four (es, pt,
-    fr, tr) plus identity strings may be the whole sensible first version.
-  - **Careful about the citation boundary.** Reproducing a published table verbatim is a copyright
-    question; a table of physical constants compiled from multiple cited primary sources is not.
-    Compile and cite, do not copy one source's layout and selection.
-  - **THE CURRENTLY LINKED TABLE IS THE COVERAGE BENCHMARK — Tom, 2026-08-05:** *"I would want to
-    confirm that our table is similar to the one I selected long ago to link."* Right, and this is
-    the acceptance criterion for the whole task, so do it FIRST rather than at review time. The
-    `engineeringtoolbox.com/mannings-roughness-d_799.html` link was a deliberate editorial choice
-    that has served users for years; it is the de facto spec for what a visitor arriving at this
-    reference expects to find. Concretely:
-    - **Match its COVERAGE**, material for material. A visitor who has clicked that link before and
-      cannot find their material on ours has been given a worse page, however well cited ours is.
-      Inventory it, and treat anything it covers that we do not as a gap to close or to justify.
-    - **CROSS-CHECK the values, do not copy them.** These two obligations point in opposite
-      directions and both must hold: same coverage (so users find their material), independent
-      primary sourcing (so we are not reproducing someone's table). Compile ours from Chow / USGS /
-      HDS-5, then compare against the linked table row by row.
-    - **A DISAGREEMENT IS A FINDING, not a number to quietly overwrite.** Where our primary sources
-      and the linked table differ, investigate and record which is right and why, in the task or in
-      `dev/`. That divergence log is genuinely useful content — it is the kind of thing a careful
-      engineer wants and neither table currently offers — and it is also the honest justification
-      for publishing our own at all.
-    - **If the tables come out essentially identical, that is a legitimate reason NOT to build it.**
-      Say so out loud rather than proceeding on sunk scoping effort. The case for our own table rests
-      on multilingual reach and on owning the reference, not on the existing one being wrong; if
-      Task 216's beacon shows the non-English click volume is thin, identical content plus no reach
-      argument means the honest answer is to keep the link.
-
+    site to `engineeringtoolbox.com/mannings-roughness-d_799.html` — English only, ours to lose, on
+    the two calculators carrying the great majority of our humans. In 26 languages it is a search
+    front door rather than a leak. **Gate it on Task 216's number**; build the instrument first.
+  - **The maintenance worry has an answer: freeze it.** Chow 1959, USGS WSP 2339 and FHWA HDS-5 are
+    static data that have not moved in decades. What creates maintenance is editorial ambition —
+    photographs, user submissions, regional variants, a "suggest a value" form. Ship none of that.
+    **The honest cost is TRANSLATION**: a lot of short material names, so scope it against Task 203.
+  - **DO THE COVERAGE COMPARISON FIRST, not at review time** (Tom: *"I would want to confirm that our
+    table is similar to the one I selected long ago to link."*). Two obligations that point in
+    opposite directions and both must hold: match the linked table's COVERAGE material for material,
+    but CROSS-CHECK its values against primary sources rather than copying them — reproducing a
+    published table verbatim is a copyright question, compiling from cited primaries is not. **A
+    disagreement is a finding to record, not a number to quietly overwrite.**
+  - **If the tables come out essentially identical, that is a legitimate reason NOT to build it.** The
+    case rests on multilingual reach and on owning the reference, not on the existing one being wrong.
 - 30|218| **Find advisors and proteges — a standing, nagged commitment, not a task that completes.**
-  Raised by Tom, 2026-08-05: *"I still need help knowing where to try to connect with advisors and
-  proteges; this is not my strength. r/civilengineering is mostly frivolous talk."* He is right about
-  the subreddit — it is a venting-and-memes room and the people he wants are not posting there.
-  - **Tom's explicit standing instruction, 2026-08-05:** *"This is not my strength or passion. I'll
-    want you to hold my hand and push me to 'eat my veggies.' I may have to get in my car and go to
-    lunch. I will need pushing."* **So the nagging is authorized and requested.** Whoever picks up
-    this roadmap should raise this item unprompted when it has gone quiet, propose ONE concrete next
-    action with a name and a date attached, and not accept a vague "sometime". A generic "you should
-    network more" is worthless; "email this chapter's faculty advisor this week" is the unit of work.
-  - **The pattern that works:** go where people are already doing the specific work these
-    calculators serve, not where the profession socializes.
-  - **ADVISORS AND PROTEGES ARE TWO DIFFERENT LISTS AND NO VENUE SERVES BOTH — Tom said plainly on
-    2026-08-05 that he did not understand this item, and conflating the two is probably why.** An
-    *advisor* here means someone with numerical/hydraulic depth who will answer a hard question six
-    months from now; that is a peer relationship, earned by asking good technical questions in a
-    developer community, and OWA is where it lives. A *protege* means someone learning to build
-    tools like these, who needs a person willing to teach; that only ever comes from a room with
-    students in it — EWB chapters, a classroom, a practitioner network. **Never plan one action
-    hoping it produces both.** Every concrete next action proposed under this task must say which of
-    the two it is aimed at.
-  - **Set expectations honestly, or this item keeps disappointing.** A good OWA post yields two or
-    three technically serious people who now know the project exists. It does not yield a mentor,
-    and it will not yield a protege at all. That is still worth having — but "I posted and nothing
-    happened" is the predictable failure mode if the expected return was never stated.
-  - **For advisors (numerical / hydraulic depth):**
-    - **Open Water Analytics** — the EPANET / WNTR open-source community. Highest-fit venue on this
-      list: these are exactly the people who know why 4.727 vs 0.849 matters, and Task 213 gives a
-      concrete, well-posed opening contribution to lead with rather than an introduction.
-      **VERIFIED LIVE 2026-08-05, with the entry point corrected:** `OpenWaterAnalytics/EPANET` on
-      GitHub is active (405 stars, 249 forks, 42 open issues, 4 open PRs, documented contribution
-      path). The **old Discourse forum at `community.wateranalytics.org` no longer answers on
-      HTTPS** (it times out entirely) and repo-level Discussions are **disabled**
-      (`has_discussions: false`). The live venue is **org-level GitHub Discussions**,
-      `https://github.com/orgs/OpenWaterAnalytics/discussions`, category **Q&A**. An earlier version
-      of this task said "forum", and then "repo Discussions"; both were wrong.
-      **A POST IS DRAFTED AND READY TO SEND: `dev/outreach-owa-post.md`** (2026-08-05), with the
-      venue facts, the exact title and body, and what to do with a reply. Tom sends it; there is no
-      account on this machine and no automated path, deliberately.
-      **But temper the expectation — it is a QUIET room.** Org Discussions holds roughly eight
-      threads in total. The codebase is active (last push 2026-07-23, 46 open issues, 405 stars) and
-      the maintainers are real, but the discussion surface is not busy: a reply may take weeks or
-      may never come, and **that is the expected case rather than a failure**. The activity is in
-      Issues, where this question does not belong. So: worth one evening, not a substitute for the
-      other venues, and **it must not block Task 213** — the EPANET source is public and readable if
-      no answer arrives.
-    - **ASCE EWRI** Hydraulics & Waterways technical committees, and the **Arizona Section** locally.
-      Committee work is where senior people are actually reachable; conference floors are not.
-    - **epanet-js's founding partners — Optimatics, Affinity Water, AtkinsRéalis. DEFERRED, not
-      dropped** (Tom raised it 2026-08-14; recorded in `dev/positioning.md` §7). Each put $50,000
-      into epanet-js.
-      - **The honest angle, if ever taken:** not "switch to us" but a governance argument a funder
-        can act on — they paid so that a free EPANET in the browser would *exist*, and a licence
-        that cannot be revoked serves that goal more durably than one that is FSL today. A point
-        about permanence, not about features.
-      - **Why it waits, and why it ranks below everything above it:** they are sunk-cost sponsors of
-        a competitor, so a cold approach is low-yield and risks reading as poaching — against the
-        invitation-not-comparison rule. And we have nothing distinct to show them until the Task 248
-        gate clears. **Revisit then, not before.**
+  Tom, 2026-08-05: *"I still need help knowing where to try to connect with advisors and proteges;
+  this is not my strength. r/civilengineering is mostly frivolous talk."* And the same day: *"This is
+  not my strength or passion. I'll want you to hold my hand and push me to 'eat my veggies.' I may
+  have to get in my car and go to lunch. I will need pushing."* **So the nagging is authorized and
+  requested.** Raise this unprompted when it has gone quiet and propose ONE concrete action with a
+  name and a date — "email this chapter's faculty advisor this week", never "you should network more".
+  - **ADVISORS AND PROTEGES ARE TWO DIFFERENT LISTS AND NO VENUE SERVES BOTH**, and conflating them
+    is probably why Tom said he did not understand this item. Every proposed action must say which of
+    the two it is aimed at. **Venues, expected returns, and what is still unverified:
+    `dev/outreach-venues.md`.**
   - **ACTION LOG.**
-    - **2026-08-05 — OWA Q&A post SENT** (advisor side). Text and venue facts:
-      `dev/outreach-owa-post.md`. Quiet room; silence is the expected case for weeks.
-    - **2026-08-05 — EWB-ASU contact form SUBMITTED** (protege side), same day, at Tom's own
-      insistence. Submission NOT confirmed — *"I think it's submitted. The form acts a little
-      weird."* **CHECK: 2026-08-19.** If silent by then, the backstop is email, not a drive: **Jared
-      Schoepf, `jjschoep@asu.edu`** — listed publicly in the Fulton Schools directory, and he
-      directs **EPICS** (Engineering Projects in Community Service), a for-credit program of
-      community-project student teams. That is a larger and more durable protege pool than one club,
-      and a faculty contact persists across years while student officers turn over every May.
-      Tom offered to hand-deliver a folded note to the Student Services Building; **advised against**
-      — a paper note to a student-org office is the likeliest of the three to be lost.
-  - **For proteges, and for mission fit:**
-    - **Engineers Without Borders USA student chapters** — the strongest single match. Students who
-      need free tools, work in exactly the low-resource-language regions this suite translates for,
-      and want mentoring. Chapters have faculty advisors, so one contact reaches a cohort per year.
-    - **RWSN (Rural Water Supply Network)** and the **SuSanA forum** — large, active practitioner
-      communities in rural water supply and sanitation, heavily non-English, doing gravity-fed pipe
-      networks, canal seepage and well work. The calculator list reads like their daily problems.
-    - **A guest lecture or evening section at ASU or Mesa CC.** Proteges self-identify in a classroom
-      in a way they never do online.
-  - **Verify each venue is still live before acting** — these were named from knowledge, not checked
-    against the current web.
-  - **The unglamorous prerequisite:** the best pool is the several thousand humans already using the
-    suite, and until 2026-08-07 we could neither see nor reach any of them. Seeing them was
-    **Task 206**, now shipped; reaching them is still this item's own problem, so it is no longer
-    blocked — only unstarted.
-
+    - 2026-08-05 — OWA Q&A post SENT (advisor side); text and venue facts in
+      `dev/outreach-owa-post.md`. Quiet room — weeks of silence is the expected case, not a failure.
+    - 2026-08-05 — EWB-ASU contact form SUBMITTED (protege side). Submission not confirmed; Tom:
+      *"I think it's submitted. The form acts a little weird."* **CHECK: 2026-08-19.** If silent by
+      then the backstop is email, not a drive: **Jared Schoepf, `jjschoep@asu.edu`**, who directs
+      EPICS — a larger and more durable protege pool than one club, and a faculty contact persists
+      across years while student officers turn over every May.
 - 60|303| **Usage logging: the remaining lower-value questions.** Extracted from Task 200 when it
   closed 2026-08-14, so they survive the close rather than being buried in a DONE block nobody
   re-reads. All three are cheap and none of them decides anything on its own; take one when a
@@ -1350,73 +827,25 @@ session of its own with nothing else in it.
     without a per-visit identifier we will not store.
 
 
-- 4|114| **Reservoir / detention routing calculator (Modified Puls).** Re-scoped 2026-07-23 (Tom):
-  the original "check-dam *spillway sizing*" framing collapsed — a spillway is a weir (`wfs_`/`wfi_`)
-  plus rock lining (`rc_`) plus freeboard arithmetic, i.e. no new engine and largely subsumed by
-  existing calculators. The genuinely distinct, in-authority calculator is **storage-indication
-  (Modified Puls) reservoir routing** — a *time-stepping* engine, not a steady-state weir; time is
-  the real departure from the weir/orifice calcs. Scope: (a) a **composite outlet** stage-discharge
-  curve from **multiple orifices + weirs** (reuses `or_` and `wfs_` device equations, summed by
-  stage); (b) a **stage-storage** curve (user input / simple geometry); (c) **Modified Puls routing**
-  of an inflow hydrograph through it (build the 2S/Δt+O vs O curve once, table-lookup per step — no
-  per-step iteration). **Inflow is a deliberate punt-ladder, NOT rainfall-runoff:** user-table (bring
-  your own hydrograph), SCS dimensionless UH, and SCS triangular — the synthetic options are *shape
-  generators from a user-supplied peak Qp and time-to-peak Tp*, so the tool never does hydrology.
-  **Explicitly NO curve number / rainfall / area / runoff-volume** — CN is rainfall→runoff-volume,
-  the punted hydrology; the SCS input set is exactly **{Qpeak, Tp, peak-factor shape}** — two numbers
-  that scale the dimensionless UH plus a shape selector. **Take Tp (time-to-peak) or lag directly, not
-  Tc** — the Tc→Tp conversion embeds its own SCS assumption (Tp≈0.67·Tc) a user could swallow
-  unknowingly; taking Tp keeps the tool a pure shape-scaler. **Plot inflow AND routed outflow, plus each outlet
-  component's own hydrograph** — layers: inflow · total routed outflow · per-device discharge (each
-  orifice, each weir), all **checkbox-toggleable** (same toggle-layers UX as Task 137's sketch). Shows
-  *when each device kicks in* (e.g. the emergency weir waking up as stage tops its crest); mark peak
-  attenuation, ideally max stage. For a router the hydrograph plot *is* the primary result, distinct
-  from Task 137's topology-only sanity sketch.
-  **Hydrology is explicitly out of scope** — computing the design peak (Rational Method, TR-55,
-  PMP/PMF, regional regression, StreamStats) is truly hard, empirical, and regional; the user brings
-  Qp/Tc, the same boundary Tom has deliberately kept for his whole career (he has intentionally never
-  shipped a Rational Method calc). This is a clean modular boundary, not a flaw. **Inflow philosophy
-  (Tom, 2026-07-23): prefer "bring-your-own-*flood*" over "bring-your-own-*peak*."** Routing is
-  governed by flood *volume and duration*, not peak — so the user-table (full hydrograph) is the
-  *preferred* path, and the synthetic peak-based options get concise, non-pedantic guidance: a full
-  hydrograph beats a peak; a synthesized one also fixes a duration/volume that must match the storm;
-  and **test several durations** (critical-duration warning — the storm that drives the highest stage
-  is often not the highest-peak storm). SCS may well be the global default (used widely incl. India),
-  but its US-calibrated **peak factor 484** / Type II rainfall are not region-neutral — **expose the
-  peak factor** with a one-line note so arid/flat (≈300) or steep (≈600) watersheds adjust. The
-  design principle that resolves Tom's career-long reluctance: **the tool holds no opinion about
-  storms** — it routes the flood the local engineer brings and flags its own assumptions, so it never
-  has to model Indian-monsoon or African-convective floods it has no intuition for. **Candidate
-  peak-factor reference link** (for the SCS tip, English-only note per link+tip convention): Learn
-  Hydrology Studio "NRCS Unit Hydrograph Peak Factors"
-  (learn.hydrologystudio.com/hydrology-studio/knowledge-base/nrcs-unit-hydrograph-peak-factors/) as
-  the readable primary, HEC-HMS Technical Reference "SCS Unit Hydrograph Model" (USACE) as the
-  authoritative alternate; Wanielista et al. "Revisit of NRCS Unit Hydrograph Procedures" for spec-time
-  depth on the 3/8–5/8 volume-split assumption behind PRF 484. **Audience is broader
-  than the original NGO framing** — detention-pond/stormwater routing is mainstream civil practice;
-  paid tools (HydroCAD, PondPack) dominate, honest free web routers are rare. **Daunting (Tom's word),
-  bigger than Task 137 — do 137 first.** No internet mashup for hydrology. Candidate prefix
-  `rr_`/`route_`/`cd_` — not yet claimed. Full spec: TBD when Tom is ready.
-
-**Candidates backlog — researched, deprioritized (well-served, no clear gap found):**
-- **Chlorination dosing for small/community water systems** — well-served; multiple free calculators
-  exist, including one CAWST itself publishes ("Chlorine Dose Calculator: Batch Chlorination," tied
-  to the Modified Horrocks Test) — the sector's own reference org already ships this.
-- **Pond/reservoir evaporation loss** — saturated; 6+ free calculators found, several using the
-  FAO-56 Penman-Monteith standard. Demand is real but generic (farms/pools broadly), not specifically
-  low-resource/humanitarian.
+- 4|114| **Reservoir / detention routing calculator (Modified Puls) — full scope in
+  `dev/detention-routing-scope.md`.** A time-stepping engine, which is the real departure from the
+  suite's steady-state weir and orifice calculators. **Hydrology stays out of scope** — the user
+  brings the flood, the tool routes it; do not add a Rational Method or a curve number. Daunting
+  (Tom's word) and bigger than Task 137 — do 137 first.
 
 ## Energy for Water
 
-Tom, 2026-07-14: "I have lifelong focus on water and energy development for humanity... we can dip
+Tom, 2026-07-14: *"I have lifelong focus on water and energy development for humanity... we can dip
 our toe into energy (including heat), which is a strong interest of mine (instead of, say,
-structural)." Tom is a civil engineer — this is not scope creep from the hydraulic-calculator
-identity, it's a second, equally central professional focus, so it gets its own section rather than
-being folded into "New Calculators" as stretch/candidate material. The suite already has one
-foundational calculator here: `mhp_` (Micro-Hydro Power) — everything below either extends that
-anchor or opens the *consumption* side (using energy to move/treat/purify water) rather than only
-the *generation* side `mhp_` already covers. Same 4-axis prioritization framework as the New
-Calculators section above; see that section's header for the methodology and honest-caveat note.
+structural)."* Not scope creep — a second, equally central professional focus, which is why it gets
+its own section. `mhp_` (Micro-Hydro Power) is the anchor; everything below either extends it or
+opens the *consumption* side. Same 4-axis scoring as New Calculators.
+
+**Candidates backlog.** *Biogas digester sizing* — well-served, 7+ free calculators including several
+for the small fixed-dome design (KENPRO, ITCPH). *Solar still (basin-type) sizing* — a real gap, but
+weak adoption: the literature is mostly 1970s–80s IRC/Practical Action, and yields are low against
+SODIS or biosand. *Passive/evaporative cooling* — not yet run through the 4-axis pass; it belongs
+here rather than under water conveyance because evaporative cooling consumes water.
 
 - 2|116| **Solar water pumping sizing.** Sizes a solar-PV-powered pump system for irrigation or
   domestic supply: hydraulic power required (`P_h = ρgQH`, same physics already used throughout
@@ -1444,168 +873,72 @@ Calculators section above; see that section's header for the methodology and hon
   because the audience fit is narrower than the water-focused candidates above (site-dependent on
   perennial-stream availability, and it's a power calculator, not a water one, so it sits one step
   further from the suite's hydraulic-engineering core). Candidate prefix `phk_` — not yet claimed.
-- 1|118| **Solar water pasteurization / SODIS exposure calculator.** Two closely related low-cost
-  heat/UV water-treatment methods — SODIS (WHO/EAWAG-endorsed: clear PET bottles, 6 hr sunny/2 days
-  cloudy exposure, <30 NTU turbidity ceiling) and solar pasteurization (heat to the WAPI 65°C
-  threshold via solar cooker/collector, `Q = mcΔT` + collector efficiency). **Research finding,
-  2026-07-14, downgraded from the original proposal**: a real availability gap exists (no public
-  calculator tool found, only academic models and the standard rule-of-thumb from SKAT/EAWAG
-  manuals) — but the value-add of building a calculator is thin, because field workers already solve
-  this with the simple heuristic itself; a calculator risks over-engineering a problem that doesn't
-  need one. Kept on the roadmap rather than cut, since the underlying mission fit (safe drinking
-  water via heat) is exactly Tom's stated interest — but if built, it needs to add real value beyond
-  the rule of thumb (e.g. genuinely combining site-specific insolation/cloud-cover/turbidity into a
-  more precise output) to be worth the build. **Safety-critical numeric defaults**: turbidity
-  threshold, exposure-time table, and collector-efficiency values must cite actual WHO/EAWAG/CAWST
-  primary sources before shipping, not placeholders — a wrong default could tell someone unsafe water
-  is safe. Candidate prefix `swt_`.
-
-**Candidates backlog — researched, deprioritized (well-served or weak adoption):**
-- **Biogas digester sizing** — well-served; 7+ free calculators found, several specifically for the
-  small/household fixed-dome design common in low-resource deployments (KENPRO, ITCPH).
-- **Solar still (basin-type) sizing** — a real gap exists (no calculator found), but weak real-world
-  adoption signal: search surfaces mostly 1970s–80s IRC/Practical Action literature, suggesting this
-  is a legacy/niche technology rather than an active field practice; production rates (liters/day per
-  m²) are low compared to SODIS/biosand filtration.
-
-**Candidates backlog — not yet researched:**
-- **Passive/evaporative cooling calculator** — direct answer to Tom's original "shading/temperature
-  management" framing; evaporative cooling is inherently a water-consuming thermal process, so it
-  belongs in this section rather than as a stretch off the water-conveyance identity. Not yet run
-  through the 4-axis research pass.
+- 1|118| **Solar water pasteurization / SODIS exposure calculator.** SODIS (WHO/EAWAG-endorsed: clear
+  PET bottles, 6 hr sunny / 2 days cloudy, <30 NTU turbidity ceiling) and solar pasteurization (heat
+  to the WAPI 65°C threshold, `Q = mcΔT` plus collector efficiency). Candidate prefix `swt_`.
+  - **Downgraded from the original proposal, 2026-07-14.** A real availability gap exists — no public
+    calculator found, only academic models and the rule of thumb from SKAT/EAWAG manuals — but the
+    value-add is thin, because field workers already solve this with the heuristic itself. Kept
+    because the mission fit is exactly Tom's stated interest; **if built it must beat the rule of
+    thumb**, e.g. by combining site-specific insolation, cloud cover and turbidity.
+  - **Safety-critical defaults:** the turbidity threshold, exposure-time table and collector
+    efficiencies must cite WHO/EAWAG/CAWST primary sources before shipping, never placeholders — a
+    wrong default could tell someone unsafe water is safe.
 
 ## Discoverability (Search Reach)
+
+Evidence base for this whole section: the 2026-07-27 Google Search Console query export — cluster
+table, CTRs and the two smaller findings are in `dev/usage-data-log.md`. The headline: **Manning is
+won and needs nothing** (position 1, 25% CTR), while the comparable sewer-slope cluster converts at 1%.
 
 - 60|269| **ASU Engineers Without Borders answered, and asked to meet.** Tom, 2026-08-10 — a human
   reply to outreach, and he has replied gratefully. This is the first real conversation this suite's
   mission has earned; prepare for the meeting and record what comes of it. Not a search-reach task,
   but it lives here because it is the same goal reached by a better road.
 
-Evidence base for this whole section: the 2026-07-27 Google Search Console export (`dev/Queries.csv`,
-999 queries, 5,621 impressions, 565 clicks — a temporary file, not committed; the numbers below are
-the durable record). Aggregate by cluster:
-
-| Cluster | Queries | Impressions | Clicks | CTR |
-|---|---|---|---|---|
-| Manning | 196 | 1,468 | 366 | **25%** |
-| Sewer / drainage | 188 | 1,007 | 11 | **1.1%** |
-| Slope / grade / fall | 169 | 946 | 5 | **0.5%** |
-| Hazen-Williams | 54 | 305 | 16 | 5% |
-| Channel / trapezoid | 51 | 377 | 18 | 5% |
-| Darcy / friction factor | 41 | 128 | 1 | 0.8% |
-| Weir | 19 | 91 | 6 | 7% |
-| Culvert | 11 | 66 | 2 | 3% |
-| Peaking factor / Harmon | 11 | 62 | 1 | 1.6% |
-| Orifice | 11 | 21 | 0 | 0% |
-
-The headline: **Manning is won and needs nothing** (position 1, 25% CTR). The sewer-slope cluster is
-comparable in size and converts at 1%. Two smaller findings worth keeping: 55 queries are
-LLM-retrieval-shaped (`… source`, `… authoritative source`, `… engineering reference`, `… pdf`), all
-circling one question — *is Manning valid for full/pressurized pipe, and is R = D/4?* — 118
-impressions, zero clicks; and one query was `"kikokotoo" -site:reddit.com …`, the Swahili word taken
-straight from `lib/lang.ec.sw.php`, i.e. an agent searching our own translated string.
-
 - 10|155|[H] **Deploy and verify the Task 149 search-index fix — deployed, awaiting Search Console
-  confirmation.** Extracted from 149 on close, 2026-07-28, rather than left as a to-do inside a
-  closed block. **Steps 1–5 are done and verified live 2026-07-28; only step 6 is open, and it is a
-  calendar wait rather than work** — which is why the priority dropped 50 → 10. Do not close this
-  until step 6 actually reports, and do not re-verify 1–5 by hand: the evidence is recorded below.
-  Status:
-  1. ~~Upload `../sitemap.xml` to the site root~~ — **DONE 2026-07-28**, verified live: 200, 66 KB,
-     543 `<loc>` entries, `sewslope.php` and `peakfact.php` both present. Regenerate with
-     `php dev/scripts/generate_sitemap.php` whenever pages or languages change, then re-upload.
-  2. ~~Add `Sitemap: https://hawsedc.com/sitemap.xml` to the live `robots.txt`~~ — **DONE
-     2026-07-28**, verified live. (That file is at the site root and is **not** in the local `../`
-     copy; it carries a long `Disallow:` list for `/hawsedc/phpGedView/` that a locally-rebuilt file
-     would drop, so it must be edited in place.)
-  3. ~~Submit the sitemap in Google Search Console~~ — **DONE 2026-07-28** (Tom).
-  4. ~~Push the app code to production~~ — **DONE 2026-07-28** (commit `190c28f`, pulled on the
-     server). Verified live across all 20 sitemap pages: every one returns 200 with 28 tags
-     (27 languages + `x-default`) and a canonical matching the requested URL, no exceptions. Edge
-     cases confirmed in production, not just locally: `?name=My Job 123` renders in the `<title>` but
-     is stripped from the canonical, so bookmark labels mint no indexable variants; `?lang=zz`
-     consolidates to `en`; `/engcalcs/index.php` collapses to `/engcalcs/`; a bare URL with
-     `Accept-Language: ar` self-canonicalises to `?lang=ar` and renders `<html lang="ar" dir="rtl">`.
-     **The reciprocity Google requires holds** — the `es` page lists `hreflang="es"` pointing at
-     itself, and the `ar` page links back to `es`.
-  5. ~~One canonical origin~~ — **DONE 2026-07-28.** Search Console reports on `https://hawsedc.com`,
-     matching `CANONICAL_ORIGIN` in `lib/config.inc.php`, so no constant change was needed; Tom added
-     a 301 at the parent-site root `.htaccess` (server-side, not in this repo). **The motive was not
-     SEO** — the canonical tag already handles Google. It is that `lib/Language.lib.php` sets
-     `ec_language`/`ec_blang` with `'secure' => true` and browsers reject `Secure` cookies over plain
-     http, so with all four of http/https × www/non-www answering 200, **a visitor arriving on
-     `http://` lost language persistence entirely** — picked Spanish, got English again next visit.
-     That bug is now closed as a side effect: http visitors land on https before the app ever tries
-     to set the cookie. Both hazards flagged beforehand were **resolved empirically rather than by
-     reasoning**, and the evidence is worth keeping:
-     - `https://hawsedc.com/…` returns **200, not a redirect** → `%{HTTPS}` is read correctly here
-       and the host does *not* terminate SSL at a proxy, so no infinite loop. The
-       `X-Forwarded-Proto` companion condition is belt-and-braces on this host, not load-bearing.
-     - `http://` and `www` both redirect **into `/engcalcs/`** → `engcalcs/.htaccess` does **not**
-       shadow the parent rewrite. That is the confirmation the rule about subdirectory `.htaccess`
-       overriding a parent's mod_rewrite only when it defines rewrite directives of its own; the
-       engcalcs file has only `Redirect 301` (mod_alias) and `FilesMatch`, and the parent rule
-       reaches through. **Anyone adding a `RewriteRule` to `engcalcs/.htaccess` later will silently
-       break the origin 301 for every calculator** — add `RewriteOptions inherit` there if that day
-       comes.
-     - The double fault (`http://www.…`) resolves in **one hop**, and `?lang=es&name=Job+7` survives
-       intact. Site root, `sewslope.php` and `robots.txt` redirect too, so the parent site is
-       covered, not only the calculators.
-     HSTS deliberately **not** bundled in: browsers cache the policy for its full max-age and it
-     cannot be recalled. A separate, deliberate decision if ever wanted.
-  6. **CHECK: 2026-09-01.** (Date set 2026-08-05 at Tom's request — five weeks after the 2026-07-28
-     deploy, which is inside Google's usual window for a sitemap plus hreflang change to show. If it
-     is still ambiguous then, re-date it rather than closing it.)
-     **Remaining — verify in Search Console, no sooner than a few weeks out.** This is the only open
-     step and it is a wait, not work: `site:hawsedc.com inurl:lang=es` should start returning
-     results, and the Task 149 diagnostic query `calculo de canales trapezoidal online` (position
-     2.8, 0% CTR) should begin converting. That query is the cleanest single tell, because it already
-     ranks — only the snippet language was wrong. **If it does not move**, the next suspects are
-     Google's own hreflang report in Search Console (it names reciprocity failures explicitly) and
-     whether the `?lang=xx` URLs are being indexed at all versus indexed-and-not-ranked; those are
-     different problems with different fixes, so read the report before assuming either.
-  **Task 150 (meta descriptions) is unblocked by this.** It was sequenced behind 149 on the reasoning
-  that descriptions on unindexed URLs buy nothing; the URLs are no longer unindexed.
-
+  confirmation.** Steps 1–5 (sitemap uploaded, `robots.txt` Sitemap line, sitemap submitted in
+  Search Console, code pushed, one canonical origin) were all done and verified live 2026-07-28 — do
+  not re-verify them by hand. Only the wait is left, which is why the priority dropped 50 → 10.
+  - **CHECK: 2026-09-01.** `site:hawsedc.com inurl:lang=es` should start returning results, and the
+    Task 149 diagnostic query `calculo de canales trapezoidal online` (position 2.8, 0% CTR) should
+    begin converting — the cleanest single tell, because it already ranks and only the snippet
+    language was wrong. **If it has not moved**, read Google's own hreflang report (it names
+    reciprocity failures explicitly) and check whether the `?lang=xx` URLs are indexed at all versus
+    indexed-and-not-ranked; those are different problems with different fixes. If still ambiguous,
+    re-date rather than close.
+  - **The origin 301 lives in the PARENT site's `.htaccess`, and `engcalcs/.htaccess` reaches
+    through it only because that file defines no rewrite directives of its own.** Anyone adding a
+    `RewriteRule` there later will silently break the 301 for every calculator — add
+    `RewriteOptions inherit` if that day comes.
+  - Its motive was not SEO: `lib/Language.lib.php` sets its cookies `'secure' => true`, so a visitor
+    arriving on plain `http://` lost language persistence entirely. HSTS was deliberately NOT bundled
+    in — browsers cache the policy for its full max-age and it cannot be recalled.
+  - **Task 150 (meta descriptions) is unblocked by this** — it was sequenced behind 149 on the
+    reasoning that descriptions on unindexed URLs buy nothing.
 - 12|158| **`sewslope.php` and `peakfact.php` are English-only while the sewer-slope demand is not.**
-  Extracted from Task 151 on close, 2026-07-28 — the one part of that task deliberately left undone.
-  The query export shows real non-English demand for exactly the content `sewslope.php` already has:
-  `pendiente mínima tubería pvc sanitaria`, `kanalizasyon eğim tablosu`, `tabela de inclinação de
-  esgoto`. **Task 151 half-mitigated this** by adding mm diameters and mm/m + percent slope columns:
-  a metric engineer in any language can now read the *numbers*, which is most of what a lookup table
-  is for. What remains untranslated is the prose (introduction, cleansing-velocity basis, headings).
-  **This is a different project from the engcalcs translation pipeline, which is why it was not done
-  inline.** These are parent-site pages: no `$ec_lang`, no language switcher, no payload generator,
-  no drift tripwire — none of the machinery a sprint depends on. Decide the shape *first*, and the
-  cheap options are real ones: three static translated copies (es/tr/pt, matching the observed
-  demand) may beat building any language infrastructure for two documents.
-  **Do not assume this is worth doing** — verify the demand is still there and weigh it against
-  Task 151's finding that these queries already *rank*; the CTR problem may be snippet quality (now
-  fixed) rather than language.
-
-## Translation Standardization (Glossary Project)
-
-## Translation improvements
-
-## AI Efficiency Scripting (Overhead)
-
-These tasks reduce the AI token cost of routine maintenance by replacing repeated AI judgment with deterministic scripts. Copilot owns execution (all tagged `[CP]`); Claude Code specs any script whose output feeds back into translation quality work.
-
-## CSS Standardization Follow-up
-
-## Low Priority / Nice-to-Have
+  The query export shows real non-English demand for content `sewslope.php` already has (`pendiente
+  mínima tubería pvc sanitaria`, `kanalizasyon eğim tablosu`, `tabela de inclinação de esgoto`).
+  Task 151 half-mitigated it with mm diameters and mm/m + percent slope columns, so a metric engineer
+  in any language can read the *numbers*; the prose is what remains.
+  - **These are PARENT-SITE pages** — no `$ec_lang`, no language switcher, no payload generator, no
+    drift tripwire. Decide the shape first: three static translated copies (es/tr/pt) may beat
+    building language infrastructure for two documents.
+  - **Do not assume this is worth doing.** Task 151 found these queries already *rank*, so the CTR
+    problem may be snippet quality (now fixed) rather than language.
 
 ## New Calculators (Mission Expansion)
 
-No candidate is open. **Score any new candidate on four axes before proposing it** (Tom,
-2026-07-14): availability (a genuine gap raises priority, a saturated market lowers it even for
-strong mission fit), technology emergence, field/NGO demand, and real search evidence. A 2026-07-14
-research pass overturned intuitions in both directions — rainwater harvesting was saturated, while
-VIP latrine sizing, handpump selection and check dams were genuine gaps. Every "no calculator found"
-verdict is a web-search signal, not a verified global negative.
+No candidate is open. **Score any new candidate on four axes before proposing it** (Tom, 2026-07-14):
+availability (a genuine gap raises priority, a saturated market lowers it even for strong mission
+fit), technology emergence, field/NGO demand, and real search evidence. A 2026-07-14 pass overturned
+intuitions both ways — rainwater harvesting was saturated; VIP latrine sizing, handpump selection and
+check dams were genuine gaps. Every "no calculator found" verdict is a web-search signal, not a
+verified global negative. Researched and deprioritized as well-served: **chlorination dosing** (CAWST
+itself publishes one) and **pond/reservoir evaporation** (6+ free, several using FAO-56).
 
 ## Completed
 
-**Closed tasks live in `dev/roadmap-closed-archive.md`**, one summary block each, newest first — 308
-of them as of 2026-08-16. This file holds only open work. `roadmap_id_check.php` reads both: an ID is
-unique across the pair, and priority 0 means the block is in the archive and nowhere else.
+**Closed IDs live in `dev/roadmap-closed-ids.md`**, one line each so a cited `Task N` still resolves;
+the text stays in git. `roadmap_id_check.php` reads both files: an ID is unique across the pair, and
+priority 0 means the block is in the ledger and nowhere else.

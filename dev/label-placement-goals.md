@@ -313,3 +313,33 @@ Scoring is exactly that missing step. A candidate's score is a sum of what it co
 cheaper to overlap than a symbol" is one number in the table in §4.1 rather than a behaviour that
 has to be arranged for. **His tentative numbers are now in that table** and are what Task 379
 should be built against.
+
+## §8 The replacement algorithm, moved here from ROADMAP Task 379 (2026-08-16)
+
+**The diagnosis: `relax()` is a LOCAL method.** Pairwise separation along the axis of smaller
+overlap, four passes; a label knows only what it is touching now. There is no term for open space
+and no candidate it did not stumble into, so **no tuning of the weights will give it that** —
+weights decide who yields, not where anyone goes.
+
+**Candidate scoring is the standard cartographic answer and is simpler than what is here.** Generate
+N placements per label (eight compass positions at two or three radii, plus the current one), score
+by overlap area against everything already placed plus small penalties for distance from the anchor
+and for less preferred positions, take the best, mark it occupied. Open space wins by construction.
+Deterministic, idempotent, bounded — and it composes with Task 377: if the best candidate still
+overlaps, hide the label rather than place it badly.
+
+**`capNudges()` is a defect in the meantime and disappears with the rewrite.** It runs after the
+relaxation and can drop a label back inside the collision it had just solved, with nothing re-run.
+Scoring has no equivalent, because its candidates are all within reach to begin with.
+
+**Boxes must be able to ROTATE.** An aligned pipe label's axis-aligned bounding box is **5.2×** the
+label's own area at 45° for a 100×12 px label, and the ratio grows without limit with length.
+Oriented boxes via the separating-axis theorem give both the overlap and the push vector in about 30
+lines, pure, and an unrotated box is the same code at angle zero.
+
+**`?debug=boxes` draws the boxes** in the colour of what they are. A URL parameter rather than a
+settings row, which would be a translated string in 27 files for a tool that reviews one algorithm.
+The default side is not sacred — scoring may put a label anywhere around its anchor.
+
+**Order of work: 379, then 343 (dropping lines by priority), then 377 (hide) as the last resort.**
+All three are the same decision — what to do when there is not room — at three granularities.

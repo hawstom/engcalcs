@@ -177,3 +177,26 @@ Revisit when the gate clears.
 | ROADMAP Task 222 | Original 2026-08-05 research; the EPANET-as-qualification-gate ruling. |
 | ROADMAP Task 244 | The navbar term for the licence distinction. |
 | ROADMAP Task 296 | Trademarks out of titles; "with the EPANET engine", never "EPANET-powered". |
+
+## §6.1 LibreEPANET.org build costing (moved from ROADMAP Task 306, 2026-08-16)
+
+Costed 2026-08-14. **It is a VARIANT, not a fork — do not start by copying the page.**
+
+- **The cheapest hosting answer avoids the path refactor entirely.** There are 112 hardcoded
+  `/engcalcs/` paths, plus `sw.js` and `manifest.json` scoped there. A vhost with `Alias /engcalcs`
+  pointing at this directory, and a rewrite of `/` to `Looped-Network.php`, resolves every asset
+  unchanged. Prefer that over an `EC_BASE` refactor. `echoHeader()`'s `"normal"` branch already gives
+  a chrome-free header.
+- **`CANONICAL_ORIGIN` is hardcoded and must NOT be derived from `HTTP_HOST`.** A second domain needs
+  a host → variant WHITELIST, or it reintroduces the canonical-poisoning hole that constant exists to
+  prevent.
+- **Two consequences to ANSWER, not discover.** The 678 KB engine is lazily imported *because* it is
+  off by default, so on-by-default makes every visit pay for it — which cuts against the
+  low-bandwidth case. And `lpn_settings_engine_epanet_tip` currently argues *against* EPANET, which on
+  a LibreEPANET page is the page arguing with itself; it is translated into 26 languages, so it is a
+  resync, not a free edit.
+- **A full-viewport map is a JS change** (`effectiveMapHeight()`; no CSS height rule exists), and its
+  `innerHeight * 0.72` cap is load-bearing: `#lpn_canvas` has `touch-action:none`, so a canvas taller
+  than the viewport swallows every touch. Answer that trap; do not delete the cap.
+- **Treat any parent-site dependency as this task's problem by default** — a different domain is
+  exactly the condition that exposes them, as `/hawsedc.css` did.

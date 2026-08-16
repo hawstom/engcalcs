@@ -304,3 +304,33 @@ table, which stays as it was read.
 - **These counters cannot tell us what DEVICE anyone used** — see ROADMAP Task 285. `log-human-view.php`
   records page and language and nothing else, so every statement anywhere in this project about
   phone or tablet use of `lpn_` is an assumption, not a measurement.
+
+## Search Console query export, 2026-07-27 — the evidence base for ROADMAP's Discoverability section
+
+Moved here from `dev/ROADMAP.md` 2026-08-16. Source: `dev/Queries.csv` — 999 queries, 5,621
+impressions, 565 clicks. That file was temporary and is not committed; the numbers below are the
+durable record.
+
+| Cluster | Queries | Impressions | Clicks | CTR |
+|---|---|---|---|---|
+| Manning | 196 | 1,468 | 366 | **25%** |
+| Sewer / drainage | 188 | 1,007 | 11 | **1.1%** |
+| Slope / grade / fall | 169 | 946 | 5 | **0.5%** |
+| Hazen-Williams | 54 | 305 | 16 | 5% |
+| Channel / trapezoid | 51 | 377 | 18 | 5% |
+| Darcy / friction factor | 41 | 128 | 1 | 0.8% |
+| Weir | 19 | 91 | 6 | 7% |
+| Culvert | 11 | 66 | 2 | 3% |
+| Peaking factor / Harmon | 11 | 62 | 1 | 1.6% |
+| Orifice | 11 | 21 | 0 | 0% |
+
+**The headline: Manning is won and needs nothing** — position 1, 25% CTR. The sewer-slope cluster is
+comparable in size and converts at 1%.
+
+Two smaller findings worth keeping:
+
+- **55 queries are LLM-retrieval-shaped** (`… source`, `… authoritative source`, `… engineering
+  reference`, `… pdf`), all circling one question — *is Manning valid for full/pressurized pipe, and
+  is R = D/4?* — for 118 impressions and **zero clicks**.
+- One query was `"kikokotoo" -site:reddit.com …`, the Swahili word taken straight from
+  `lib/lang.ec.sw.php` — i.e. an agent searching our own translated string.
