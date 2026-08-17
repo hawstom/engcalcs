@@ -10,31 +10,20 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 ## NEXT SESSION (updated 2026-08-17)
 
-**Overnight run of 2026-08-17 finished the two arrows that were queued.** Nothing is blocked.
+**All four overnight `$ec_lang_syn` entries are written**, with Tom's edits applied (`lpn_examples_open`'s
+avoid-clause corrected to imperative-vs-adjective; `lpn_labels_col_after` dropped "Behind", added
+"Postfix"). **Task 404 is closed** (not too eager). **Task 400 is reframed and lowered 60→15**,
+parked for real-world feedback from Mary rather than scheduled. Backdrop menu reorder (Move above
+Scale) and the destination-point-chooser anchor (now the picked point, not the menubar) are done.
 
-**Sprint 397 is CLOSED and clean** — 85 new keys plus 8 resyncs in all 26 languages, zero delta,
-zero drift, glossary write-back done (4 terms), 69 friction entries all answered. What it cost the
-build was three harness checks that were asserting on English WORDING rather than on the thing under
-test; all three now match a language key or a handler.
+**New this session, not yet triaged by priority against the rest of the backlog:** Tasks 406 (per-line
+label box model), 407[H] (Text scenario overrides — Tom called it very important, needs a scope
+decision before building), 408 (leader snap-angle option), 409/410 (Profiles, Animation — both parked
+behind Task 248). The most-open-angle brainstorm (`dev/most-open-angle-brainstorm.md`, folded into
+Task 400) still needs a literature-comparison pass Tom asked for and this session didn't do.
 
-**Waiting on Tom, and only Tom:**
-
-- **Four `$ec_lang_syn` entries are drafted and unwritten** — `lpn_examples_open`, `lpn_help_fix`,
-  `lpn_labels_col_before` and `lpn_labels_col_after`. The array needs his written approval in the
-  session that writes it, and the last two must be approved together or the pair goes out of
-  parallel. Proposed text is in each entry's `resolution` in
-  `dev/english-friction/397-labels-colour-units.json`. Three more languages independently confirmed
-  `lpn_help_fix` during the sprint.
-- **Task 404** — is the conflict shed still too eager? Two causes were found and fixed; judge the
-  result before anything else is tuned.
-- **Task 400 may not be "finish the algorithm".** Tom, 2026-08-17: *"Phases 1 and 2 are good enough
-  for GIS mode or management mode. Phase 3 may be helpful for report mode."* That reframes it as a
-  slower pass invoked deliberately for a clean sheet, which changes both its scope and its priority.
-  Not rewritten unilaterally.
-
-**Next by priority:** Task 405 (resync the four strings this sprint earned), then 398's successor
-work under 404, then 403 (the stub's font-size blindness, attempted twice and reverted twice — read
-its block before starting, everything needed is recorded there).
+**Next by priority:** Task 405 (resync the four strings sprint 397 earned), then 403 (the stub's
+font-size blindness, attempted twice and reverted twice — read its block before starting).
 
 *Delete this block once it stops being true; it is a handoff, not a standing plan.*
 
@@ -165,6 +154,26 @@ its block before starting, everything needed is recorded there).
   nothing is scheduled. `linkLabelTooShort()` still hides a short pipe's label all-or-nothing; if
   that ever reads wrong in practice Task 399 now covers it — the label sheds values instead of
   vanishing whole, and `linkLabelTooShort()` becomes the last rung rather than the only one.
+  - **Shedding itself confirmed compact/stingy and liked, 2026-08-17** — Tom's word, reviewing
+    production at commit `22db1f9` after Task 404 closed. See Task 404's close note.
+
+- 40|406| **Stacked-label box model: one box per LINE, not one box for the whole stack.** Tom,
+  2026-08-17. Today's label box is a single rect around every shown line together; per-line boxes
+  would let collision/conflict logic reason about individual lines rather than the whole stack, which
+  matters once shedding drops some lines and keeps others (Task 399).
+
+- 45|408| **Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.**
+  Tom, 2026-08-17. A toggle or picker for the increment, not a forced snap — free dragging must stay
+  available for whoever wants it.
+  - **Open question, same day: magnet-style (soft pull toward the nearest increment, override-able by
+    continuing to drag past it) instead of constrained (hard-locks to the grid of angles) snapping.**
+    Tom named this as the more modern UX but flagged he does not know what's available to build it
+    with. Not researched yet — this repo has no drag/snap library today (`js/looped-network.js`'s own
+    pointer handlers do all dragging by hand), so the real choice is between a small hand-rolled
+    magnet threshold (a few lines: snap only within N° of an increment, free otherwise) versus pulling
+    in a library, which needs its own evaluation against this codebase's no-dependencies-shipped-to-
+    visitors norm (`js/vendor/` today holds only the EPANET engine). Decide the mechanism before
+    scoping the toggle above.
 
 - 15|294|[H] **Decide the 7 remaining dead language keys, one each.** `menu_main_list`,
   `menu_main_language`, `mi_d50in`, `mpf_spreadheet_notice` (key name is misspelled too),
@@ -314,12 +323,6 @@ its block before starting, everything needed is recorded there).
   arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops
   fitting on a screen.
 
-- 40|404| **Is the shed still too eager?** Two causes were found and fixed 2026-08-17 — a 0.35
-  font-size pad inflating every conflict test, and link labels shedding for node labels that had been
-  dropped. On the example that took shedding from 4 links to 2. Re-judge before touching anything
-  else; the remaining lever is whether a node label should be made to try its other side before any
-  link label gives up a value.
-
 - 70|405| **Resync four English strings the sprint itself earned.** Sprint 397 closed at zero drift and
   zero delta; these four were edited AFTER that baseline, so `detect_english_drift.php` now flags them
   and 26 translations render the superseded text. Small, well-defined resync — one agent per language
@@ -356,13 +359,24 @@ its block before starting, everything needed is recorded there).
     setting. Decide whether the offset should be recomputed or expressed differently BEFORE landing
     the stub fix, or the stub fix simply turns four assertions red.
 
-- 60|400| **Phase 3 — bounded local search on the residue.** Wagner & Wolff's three optimum-preserving
-  reduction rules on an explicit conflict graph, then a bounded chain search, in QGIS PAL's shape.
-  Survey: `dev/label-placement-algorithms.md`. Needs Tasks 398 and 399.
+- 15|400| **Phase 3 — bounded local search on the residue. LOWERED 60→15, Tom 2026-08-17: "Phases 1
+  and 2 are good enough for GIS mode or management mode. Phase 3 may be helpful for report mode."**
+  Risk:reward has gone up as priority went down — Phases 1–2 already serve shoppers well. Parked for
+  real-world feedback from Tom's colleague Mary (Philippines) rather than scheduled work; not a
+  `CHECK:` date, an event gate.
+  - Wagner & Wolff's three optimum-preserving reduction rules on an explicit conflict graph, then a
+    bounded chain search, in QGIS PAL's shape. Survey: `dev/label-placement-algorithms.md`. Needs
+    Tasks 398 and 399.
   - **The view-independent conflict graph is the gate, not a loose end.** The rules are defined on
     it, and today the graph differs at every zoom and every pan.
   - Straight-top as a third candidate position belongs here: measured (arXiv 2407.11996) as
     preferred over Imhof's top-right.
+  - **A relaxation/nudge pass may belong in the strategy** (Tom, 2026-08-17) — check whether the
+    literature sequences it relative to the reduction rules above. Of limited value until labels
+    start in generally open territory (outward from congestion), so it follows rather than precedes
+    the rest of Phase 3.
+  - **"Most-open angle(s)" brainstorm — needs a literature pass before scoping.** Tom's own draft,
+    unfiled and not yet checked against the survey: `dev/most-open-angle-brainstorm.md`.
 
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
   2026-08-14: *"Not mtext labels. Mtext Text objects."* The target is what you place with the Text
@@ -398,6 +412,20 @@ its block before starting, everything needed is recorded there).
     is a sentence in the scenario UI or Help — not a mechanism.
   - The line to state: **a scenario is a set of HYDRAULIC differences. The drawing is the network's,
     not the scenario's.**
+
+- 70|407|[H] **A Text element edited or moved inside a non-Base scenario must become a scenario
+  override — it does not today.** Tom, 2026-08-17, "very important": the opposite of Task 338's
+  ruling, on purpose. 338's reasoning is about NETWORK geometry — two scenarios must overlay
+  identically or a side-by-side reading breaks. A Text element is annotation, not topology; nothing
+  requires it to look the same across scenarios, and a caption written for one scenario ("Fire flow
+  case: 1,850 gpm here") is specific to that scenario by nature.
+  - **`LPN_OVERRIDABLE` has no `text` group today** (`node`/`link` only, `js/looped-network.js`
+    ~line 2063), and `elGroup()` classifies anything without `.from` as `node` — so a Text element's
+    position write currently falls through to the same Base-only path node dragging uses. Needs its
+    own group (position, and whatever else Text carries — content, angle) routed through
+    `setOverride()`/`effective()` rather than a direct `_x`/`_y` write.
+  - **Scope with Tom before building**: does EVERY Text property become overridable, or only
+    position + content, leaving angle/style Base-wide? Undecided.
 
 - 60|325| **The sizing PARADIGM: symbol size and text size should be independent.** Tom, 2026-08-14:
   *"I found myself wanting to control symbol size and text size independently instead of having them
@@ -739,6 +767,19 @@ its block before starting, everything needed is recorded there).
     *"I have got distracted… I erred in pushing LibreEPANET.org at the expense of scenarios."* A gate
     on a launch nobody is waiting for is not urgent work, and the ruling that survived contact was
     the one with a named user behind it.
+
+- 10|409| **Profiles: a link-length elevation profile along a path, for time-step results.**
+  Tom, 2026-08-17. Constantly desirable, not blocking — fit in whenever there is time, same tier as
+  Task 327 (thematic coloring). Drawn on LINK LENGTHS, not map distance. Needs a start-node/end-node/
+  path-selection interface; Tom's suggestion is a Google Maps Directions shape — a suggested path
+  plus runner-up alternatives, user fine-tunes it, the app reacts to new constraints with new
+  suggestions, and the profile view opens and updates live as the path is refined rather than only
+  after it is finalized. Worth checking whether Google Earth/GIS tooling has literature, a library, or
+  an API for this before building path-suggestion from scratch. Depends on Task 248 (time steps).
+- 10|410| **Animation: a time-frame slider (time display, play, pause, speed) once Task 248 lands.**
+  Tom, 2026-08-17, naming the EPANET/HEC-RAS convention as the shape to copy. Same "constantly
+  desirable, fit in when there's time" tier as Tasks 327 and 409.
+
 - 1|306| **LibreEPANET.org: the rebranded site variant. BLOCKED on Task 248.** Tom bought the domain
   2026-08-14; it 302-redirects to `Looped-Network.php?lang=en` until the gate clears. Priority 1, not
   0: 0 means completed and this is blocked.
