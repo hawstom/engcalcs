@@ -944,8 +944,6 @@
         "lpn_push_base_only": "This action changes the drawing itself, so it can only be done in {base}. Switch to {base} and try again.",
         "lpn_field_active": "Part of this network",
         "lpn_field_active_tip": "Clear this box to leave the element on the drawing but out of the network: it is drawn grey and the solver ignores it. In a scenario this is how a proposed pipe is switched on and off.",
-        "lpn_scenario_base_wide": "Same in all scenarios",
-        "lpn_scenario_base_wide_tip": "This belongs to the drawing, so every scenario shows it the same way. A scenario holds its own water values, not its own drawing. Change it once here and every scenario follows.",
         "lpn_settings_emitter_exponent": "Emitter exponent",
         "lpn_settings_computation": "Computation",
         "lpn_settings_tolerance": "Convergence tolerance",
@@ -1000,7 +998,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 998,
+    "count": 996,
     "active_prefixes": [
         "about",
         "bpn",

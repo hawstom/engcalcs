@@ -426,50 +426,18 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     line**, so a multi-line Text cannot round-trip. Decide on export (Task 281) whether it becomes N
     labels or one flattened line, where the import (Task 332) can agree with it.
 
-- 55|338| **Say out loud that GEOMETRY IS NOT SCENARIO STATE.** Tom, 2026-08-14: *"For a scenario,
-  dragging a node edits the base. Is this bad, good, or an oversight. The good thing is that it's
-  obvious."*
-  - **GOOD, and deliberate rather than lucky.** `x`/`y` are not in `LPN_OVERRIDABLE`, so a drag is a
-    Base write by construction. The reason it is right: **two scenarios of one network must LOOK the
-    same, or you cannot compare them.** If geometry were overridable, switching scenarios would move
-    the map under the reader — the one thing that makes a side-by-side reading impossible — and every
-    scenario would carry a private copy of a drawing nobody meant to fork. Label offsets (`lx`/`ly`)
-    are in the same category for the same reason.
-  - **It is not an oversight, but it IS undocumented**, and Tom's *"the good thing is that it's
-    obvious"* is the whole argument for leaving the behaviour alone and only saying so.
-  - **The saying-so moved to Task 412**, which found the general form of the same problem: every
-    Base-wide property is announced by an absence today, not just geometry. Do the wording there.
-
-- 90|407| **A Text element's CONTENT and PRESENCE become scenario-overridable; its position does
-  not.** Tom, 2026-08-17, "very important". Scope settled 2026-08-17 and no longer [H].
-  - **The rule is the existing one, not a new one.** `LPN_OVERRIDABLE` is a whitelist because
-    properties are deliberately NOT handled equally — membership overrides, identity does not. So
-    Text gets exactly **`text` and `active`**, and position / size multiplier / anchor node stay
-    Base-owned like a node's x/y (Task 338's reasoning, which applies to annotation for the weaker
-    but sufficient reason that a note jumping around as you flip scenarios is unreadable).
-  - **`active` is what answers "can a scenario have its own new Text".** It can, with no second
-    mechanism: the note lives in Base switched off, and one scenario switches it on. That is
-    already how a proposed loop works.
-  - **Text is a THIRD GROUP and today's code cannot see it.** `elGroup()` tells a link from a node
-    by `from !== undefined` and returns `'node'` for everything else, so a label would key as
-    `n:<id>` and collide with a junction of the same id — Task 324's bug verbatim, which measured
-    7 / 35 / 72 such collisions in Net1 / Net2 / Net3. **`ovKeyFor()` grows a third prefix first.**
-  - **`renderLabelFields()` writes `lb.text = input.value` directly** (`js/looped-network.js`
-    ~13485), bypassing `setProp()` — the exact write seam `scenario_seam_check.php` guards. Route it
-    before anything else here is safe, and extend that check to the new group.
-
-- 65|412| **A Base-wide property must SAY it is Base-wide.** Tom, 2026-08-17: *"How do they know,
-  other than trial and error, that position applies to all?"* Today they cannot. `overrideMarker()`
-  renders an "Only in this scenario" checkbox on overridable rows and **nothing at all** on the
-  others — so the signal is an *absence*, and an absence cannot be told from an oversight.
-  - Fix: inside a non-Base scenario only, give the non-overridable row a static, non-interactive
-    marker in the same slot ("Same in all scenarios" + tip). Presence-vs-presence instead of
-    presence-vs-absence. One `else` branch in `overrideMarker()`; 2 new English keys.
-  - **The "noise" objection in that function's comment does not apply** — it argues against a
-    permanently-unticked box in **Base**, where there is no scenario to belong to. This is a
-    different row in a different state.
-  - Carries the sentence Task 338 owes: **a scenario is a set of hydraulic differences; the drawing
-    is the network's, not the scenario's.** Do 338's Help wording here or not at all.
+- 15|412|[H] **Should a Base-wide property say so in the popup? Tom is not sold.** He asked
+  *"How do they know, other than trial and error, that position applies to all?"* (2026-08-17) and
+  then answered it himself: **the Walkthrough is the home for this, if it stays short — humans are
+  slow readers.** So this task is only the in-popup half, and it is his call, not a build.
+  - **A working implementation exists in git at `33b5c0f`** — `baseWideMarker()`, static text plus
+    tip, one marker per group rather than per row — built before he ruled and reverted after. Do not
+    rebuild it from scratch; retrieve it if the answer is yes.
+  - His own framing against it: *"Absence of checkmark is better than no signal."* An unticked box
+    on an overridable row already carries the meaning; a non-overridable row has no box to be
+    unticked, which is the gap, and he judged the gap smaller than the added clutter.
+  - Task 338 was deleted with this ruling (Tom: *"I also think 338 is ineffective"*). Its content —
+    geometry is Base-owned and deliberately so — is a code comment at `LPN_OVERRIDABLE` already.
 
 - 60|325| **The sizing PARADIGM: symbol size and text size should be independent.** Tom, 2026-08-14:
   *"I found myself wanting to control symbol size and text size independently instead of having them

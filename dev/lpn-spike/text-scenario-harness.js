@@ -270,37 +270,10 @@ console.log('\n--- the drawing does not fork ---');
 }
 
 // ---------------------------------------------------------------------------
-// 5. THE POPUP SAYS WHICH IS WHICH (Task 412)
+// 5. THE POPUP ROW STILL EDITS THROUGH THE SEAM
 // ---------------------------------------------------------------------------
-// A Base-wide row used to be announced by an ABSENCE -- no box, no words -- and an absence cannot be
-// told from an oversight. Presence against presence instead, and only inside a scenario, where
-// there is a scenario to belong to.
-console.log('\n--- a Base-wide row says so ---');
+console.log('\n--- the Text popup edits through the seam ---');
 {
-	const BASEWIDE = 'Same in all scenarios';
-	L.switchScenario(scn.id);
-	L.renderLabelFields(lb.id);
-	const inScn = fieldsText();
-	ok('inside a scenario the Text popup carries the static Base-wide marker',
-		inScn.indexOf(BASEWIDE) >= 0);
-	ok('...and the two scenario properties carry a real box each',
-		inScn.indexOf('Only in this scenario') >= 0 && checkboxes().length >= 3, checkboxes().length);
-
-	L.switchScenario('base');
-	L.renderLabelFields(lb.id);
-	const inBase = fieldsText();
-	ok('in Base there is no Base-wide marker -- there is no scenario to belong to',
-		inBase.indexOf(BASEWIDE) < 0);
-	ok('...and no override box either', inBase.indexOf('Only in this scenario') < 0);
-
-	// The node popup asks Tom's own question: "how do they know position applies to all?"
-	L.switchScenario(scn.id);
-	L.renderNodeFields(j1.id);
-	ok('a junction popup says its position is Base-wide too', fieldsText().indexOf(BASEWIDE) >= 0);
-	L.switchScenario('base');
-	L.renderNodeFields(j1.id);
-	ok('...and says nothing in Base', fieldsText().indexOf(BASEWIDE) < 0);
-
 	// THE ROW STILL EDITS. The marker is presentation; the seam is what matters, so the words are
 	// typed the way a user types them and the override is read back through the model.
 	L.switchScenario(scn.id);

@@ -1863,11 +1863,9 @@ $ec_lang['lpn_field_active_tip']='Clear this box to leave the element on the dra
 // states are read the same way. Before this, a Base-wide row was announced by an ABSENCE, and an
 // absence cannot be told from an oversight (Tom, 2026-08-17: "How do they know, other than trial
 // and error, that position applies to all?"). Static text, never a permanently-unticked box.
-$ec_lang['lpn_scenario_base_wide']='Same in all scenarios';
 // Carries the sentence Task 338 owes: the drawing belongs to the network, not to the scenario.
 // A scenario is a set of water values; two scenarios of one network must look the same, or you
 // cannot compare them.
-$ec_lang['lpn_scenario_base_wide_tip']='This belongs to the drawing, so every scenario shows it the same way. A scenario holds its own water values, not its own drawing. Change it once here and every scenario follows.';
 $ec_lang['lpn_settings_emitter_exponent']='Emitter exponent';
 // The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
 // two rows under it decide is the arithmetic the user gets, and "solver" names the internals.

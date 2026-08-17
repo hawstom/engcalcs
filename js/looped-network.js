@@ -12738,29 +12738,14 @@ var EngCalcs = EngCalcs || {};
 		scheduleSolve();
 		saveToStorage();
 	}
-	// A BASE-WIDE ROW SAYS SO, INSTEAD OF SAYING NOTHING (ROADMAP Task 412). Tom, 2026-08-17: *"How
-	// do they know, other than trial and error, that position applies to all?"* They could not: the
-	// tick appeared on an overridable row and NOTHING appeared on the others, so the signal was an
-	// ABSENCE -- and an absence cannot be told from an oversight, a bug, or a row nobody finished.
-	// Presence against presence instead, so the two states are read the same way.
-	// Static and non-interactive: there is no box, because there is nothing here to decide. It
-	// carries the sentence Task 338 owes -- a scenario is a set of hydraulic differences, and the
-	// drawing belongs to the network rather than to the scenario.
-	function baseWideMarker(fields, pc) {
-		var note = document.createElement('span');
-		note.className = 'lpn-ov-marker';
-		setFieldLabel(note, pc.lpn_scenario_base_wide || 'Same in all scenarios', pc.lpn_scenario_base_wide_tip);
-		fields.appendChild(note);
-		fields.appendChild(document.createElement('br'));
-	}
 	function overrideMarker(fields, el, prop, format) {
 		var pc = EngCalcs.pageConfig || {};
 		// Nothing at all in Base: there is no scenario to belong to, and a permanently-unticked box
-		// on every row of every popup would be noise the overwhelming majority of the time. That
-		// argument is about BASE and still holds there; inside a scenario the row is in a different
-		// state and gets the static marker above instead.
-		if (!el || inBaseScenario()) { return; }
-		if (!isOverridable(el, prop)) { baseWideMarker(fields, pc); return; }
+		// on every row of every popup would be noise the overwhelming majority of the time. A
+		// non-overridable row gets nothing either -- Tom, 2026-08-17, was not sold on announcing it
+		// here, and routed discoverability to the Walkthrough instead. A working in-popup marker is
+		// in git at 33b5c0f if that is ever reconsidered.
+		if (!el || inBaseScenario() || !isOverridable(el, prop)) { return; }
 		var label = document.createElement('label'), box = document.createElement('input'),
 			text = document.createElement('span'), on = hasOverride(el, prop);
 		label.className = 'lpn-ov-marker';
@@ -13320,9 +13305,6 @@ var EngCalcs = EngCalcs || {};
 		pushHereButton(fields, n);
 		readonlyField(fields, pc.lpn_field_x || 'X', outwardX(n.x));
 		readonlyField(fields, pc.lpn_field_y || 'Y', outwardY(n.y));
-		// Tom's question verbatim (Task 412): *"How do they know, other than trial and error, that
-		// position applies to all?"* One marker for the pair, since X and Y are one concept.
-		overrideMarker(fields, n, 'y');
 		tipsIn(fields);
 	}
 	function openPopup(nodeId, sx, sy) {
@@ -13736,11 +13718,6 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 		readonlyField(fields, pc.lpn_field_x || 'X', outwardX(an ? an.x + lb.x : lb.x));
 		readonlyField(fields, pc.lpn_field_y || 'Y', outwardY(an ? an.y + lb.y : lb.y));
-		// ONE marker for the whole group above it, not one per row (Task 412). X and Y are a single
-		// concept shown as two rows, and the size, weight and angle beside them belong to the same
-		// answer -- the drawing. Repeating the sentence five times is the noise this function's own
-		// comment warns about; saying it once, at the end of the rows it covers, is not.
-		overrideMarker(fields, lb, 'y');
 		tipsIn(fields);
 	}
 	function openLabelPopup(labelId, sx, sy) {
