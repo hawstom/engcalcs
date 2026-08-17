@@ -1200,7 +1200,12 @@ console.log('\n--- Settings panel stays in sync ---');
       L.renderNodeFields(id);
       const rows = byId.lpn_popup_fields.children.filter(c => c.tagName === 'LABEL');
       for (const r of rows) {
-        if ((r.textContent || '').trim() !== PCX.lpn_field_y) { continue; }
+        // **startsWith, not equality, because textContent INCLUDES DESCENDANTS.** A readonly row is
+        // a <label> whose own text is the field name with the value in a <span> inside it, so in a
+        // real DOM `label.textContent` has always been "Y-5200.00" and never "Y". The equality test
+        // was reading a stub that stored textContent as a plain property; it stopped being true the
+        // moment the stub started behaving like a DOM (Task 403).
+        if (!(r.textContent || '').trim().startsWith(PCX.lpn_field_y)) { continue; }
         const span = (r.children || []).find(c => c.tagName === 'SPAN');
         return span ? parseFloat(span.textContent) : NaN;
       }

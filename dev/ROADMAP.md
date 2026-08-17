@@ -320,53 +320,33 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops
   fitting on a screen.
 
-- 90|397| **Label priority column, the local feature context, and the width bank.** Phase 0 of the
-  2026-08-16 label paradigm — pure state, UI and measurement, no placement behaviour change. Spec:
-  `dev/label-placement-goals.md` §2.2 and §3.3. Supersedes Task 343.
-  - `labelSettings.priority` as a map PARALLEL to `decimals`, never nested into the boolean maps —
-    those are merged key-by-key out of localStorage and a shape change reinterprets every saved
-    network. Defaults are Tom's two lists.
-  - **One column, two axes, and that is deliberate:** a link number orders ROWS inside one label, a
-    node number orders LABELS against each other. Both read "lower means this field matters more".
-    The comparison DIRECTIONS are compiled in, not offered — see §2.2's table.
-  - **The local feature context is one record per node holding BOTH the scale-invariant geometry
-    (incident-link bearings, most-open side) AND the stable model data the drop comparator reads**
-    (Tom, 2026-08-16). Invalidated by a model edit or a solve and by nothing else, so it survives
-    every zoom, pan and drag frame — where today the neighbour means it carries would be recomputed
-    sixty times a second.
-  - The width bank: per-tspan `getComputedTextLength()` beside the existing `noteMeasuredWidth()`
-    call, so any prefix of a label's row costs a sum rather than a re-measure. Phase 2 needs it.
-
-- 70|401| **`flips under pan` is not measured, and it is the one that must read 0.**
-  `drawnLinkLabelStations()` culls to the view rect, `placeStationedLabels()` builds obstacles from
-  the result, and those obstacles now decide node DROPS — so labels can appear and disappear as the
-  user scrolls. Been/Daiches/Yap's requirement is that a labelling be a function of scale alone.
-  - `flips under zoom` shipped with Task 398 and is the model: re-run the pass, diff the signature.
-    Pan needs the same, translating the view rect only.
-  - The structural fix is to derive the drop-relevant obstacle set from `linkLabelStations()` (the
-    full list, bounded) rather than the drawn one. Measure first; the count may be zero in practice.
-
 - 40|404| **Is the shed still too eager?** Two causes were found and fixed 2026-08-17 — a 0.35
   font-size pad inflating every conflict test, and link labels shedding for node labels that had been
   dropped. On the example that took shedding from 4 links to 2. Re-judge before touching anything
   else; the remaining lever is whether a node label should be made to try its other side before any
   link label gives up a value.
 
-- 60|403| **The headless stub does not know that text width follows FONT SIZE, and that gap has now
-  cost three rounds of "the harness passes and the browser does nothing".** `getBBox()` returns
+- 60|403| **The headless stub does not know that text width follows FONT SIZE.** `getBBox()` returns
   characters × a constant, so a label's world width is the same at every zoom — where a real label's
-  font size IS a world quantity (`textSize / state.s`). It removes the entire relationship between a
-  label and the pipe it must fit on, which is the relationship the whole fitting cascade is about.
-  - **Attempted 2026-08-16 and reverted**, because a faithful stub is not a one-liner: font size
-    arrives by three different write paths (the `style` attribute string, `.style.fontSize`, and a
-    bare attribute), and `textContent` in the stub does not clear child tspans the way a real DOM
-    does — so labels were being measured on stale placeholder text. Both are worth fixing; they are
-    a task, not a side quest.
-  - **It exposed a real ordering bug in `drawExampleNetwork()` worth its own look:** the two
-    anchored callouts compute `lb.x` from a width measured BEFORE the final text layout, so with
-    accurate metrics they no longer clear their own nodes. Today's stub hides it by measuring
-    everything too small in the same direction.
-  - Until then, no absolute rate the harness reports is trustworthy — only ORDER and MINIMALITY.
+  font size IS a world quantity (`textSize / state.s`). That removes the entire relationship between
+  a label and the pipe it must fit on, which is what every fitting rule is about, and it has now cost
+  three rounds of "the harness passes and the browser does nothing".
+  - **Attempted twice and reverted twice.** Everything needed is known; what is missing is a session
+    with room to finish it. The four things a working version must handle, each found the hard way:
+    (1) font size arrives by THREE write paths — the `style` attribute string set at build time,
+    `.style.fontSize` set on every refresh, and a bare `font-size` attribute; (2) the style OBJECT
+    must win, because it is written later and in a real DOM they are one declaration; (3) setting
+    `textContent` must clear child nodes and must read back INCLUDING descendants, or labels are
+    measured on stale placeholder text (`example-network-harness.js`'s `popupY` was relying on the
+    non-DOM behaviour and needed `startsWith`); (4) `firstChild` must return the text node so the
+    standard `while (firstChild) removeChild(firstChild)` teardown can clear it.
+  - **It exposes a real defect in `drawExampleNetwork()`'s two anchored callouts, and that is the
+    prize.** They derive `lb.x` from a width measured at whatever `settings.textSize` is current, and
+    are then asserted against a width measured at a different one — 18.6 world units at draw time
+    against 81.7 at assert time in the harness's returning-visitor fixture. A Text label's world
+    width is 1/zoom and its screen size follows `textSize`, so no fixed `lb.x` can clear it at every
+    setting. Decide whether the offset should be recomputed or expressed differently BEFORE landing
+    the stub fix, or the stub fix simply turns four assertions red.
 
 - 60|400| **Phase 3 — bounded local search on the residue.** Wagner & Wolff's three optimum-preserving
   reduction rules on an explicit conflict graph, then a bounded chain search, in QGIS PAL's shape.

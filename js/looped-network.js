@@ -1441,18 +1441,48 @@ var EngCalcs = EngCalcs || {};
 	// and this calls the pass.
 	var labelFlipProbing = false;
 	function labelFlipCount() {
+		return labelFlipProbe(function (f) { state.s = state.s * f; }, [0.9, 1.1],
+			function (s0) { state.s = s0.s; });
+	}
+	// **AND THE SAME QUESTION FOR A PAN, WHICH MUST ANSWER ZERO** (ROADMAP Task 401). Zoom is
+	// allowed to change a labelling -- what fits really does depend on scale. A PAN is not: the same
+	// drawing scrolled sideways is the same drawing, and Been, Daiches & Yap state it as the
+	// requirement that a labelling be a function of scale ALONE.
+	//
+	// We fail it by construction today. `drawnLinkLabelStations()` culls a repeated label's stations
+	// to the current view rectangle, `placeStationedLabels()` builds obstacles from what survives,
+	// and those obstacles decide where node labels go -- and, since Task 398, whether they are
+	// dropped at all. So this readout is a correctness assertion wearing a readout's clothes: any
+	// number but 0 means a label appears or moves because the user scrolled.
+	//
+	// A whole view-width is deliberate rather than a nudge. A one-pixel pan would move the cull
+	// boundary past almost nothing; the failure this is looking for is a station leaving the view.
+	function labelPanFlipCount() {
+		var w = (svg && svg.getBoundingClientRect) ? svg.getBoundingClientRect().width : 1000;
+		return labelFlipProbe(function (f) { state.tx = state.tx + f * w; }, [-0.5, 0.5],
+			function (s0) { state.tx = s0.tx; });
+	}
+	// The shared machinery: perturb the VIEW, re-run the pass, count what moved, put it back.
+	//
+	// **THE RE-ENTRANCY GUARD IS LOAD-BEARING, not defensive** -- labelDebugReport() is called BY the
+	// pass and this calls the pass. And the restore is what makes it safe to run inside a render: the
+	// pass is idempotent and re-derives every nudge from scratch, so three runs and a restore leave
+	// the drawing exactly as they found it.
+	function labelFlipProbe(perturb, steps, restore) {
 		if (labelFlipProbing) { return null; }
 		labelFlipProbing = true;
 		try {
-			var s0 = state.s, base = labelPlacementSignature(), worst = 0;
-			[0.9, 1.1].forEach(function (f) {
-				state.s = s0 * f;
+			var saved = { s: state.s, tx: state.tx, ty: state.ty },
+				base = labelPlacementSignature(), worst = 0;
+			steps.forEach(function (f) {
+				restore(saved);
+				perturb(f);
 				runLabelCollisionAvoidance();
 				var now = labelPlacementSignature(), n = 0;
 				Object.keys(base).forEach(function (k) { if (base[k] !== now[k]) { n++; } });
 				worst = Math.max(worst, n);
 			});
-			state.s = s0;
+			restore(saved);
 			runLabelCollisionAvoidance();
 			return worst;
 		} finally { labelFlipProbing = false; }
@@ -1514,10 +1544,11 @@ var EngCalcs = EngCalcs || {};
 		drawn.forEach(function (r) { travel += Math.hypot(r.dx, r.dy); });
 		var el2 = document.getElementById('lpn_label_bench_out');
 		if (el2) {
-			var flips = labelFlipCount();
+			var flips = labelFlipCount(), panFlips = labelPanFlipCount();
 			el2.textContent = dropped + ' dropped \u2022 ' + shedVals + ' values shed \u2022 '
 				+ hidShort + ' hid (short) \u2022 ' + hidCrowd + ' hid (crowded) \u2022 '
 				+ (flips === null ? '' : flips + ' flips under zoom \u2022 ')
+				+ (panFlips === null ? '' : panFlips + ' flips under pan \u2022 ')
 				+ labels.length + ' labels \u2022 ' + pairs + ' label-on-label \u2022 '
 				+ onLeader + ' label-on-leader \u2022 mean travel '
 				+ (drawn.length ? (travel / drawn.length * (state.s || 1)).toFixed(1) : '0') + ' px';

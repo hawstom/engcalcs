@@ -473,17 +473,19 @@ half its labels scores perfectly on overlap pairs and on travel.
 | **dropped** (nodes, links) | the cost of a first-fit that gives up too easily |
 | **shed** (values removed) | the Phase 2 quality number |
 | **flips under zoom** | pop-in / pop-out — the failure mode dropping introduces |
-| **flips under pan** | **must read 0.** A correctness assertion wearing a readout's clothes |
+| **flips under pan** | **must read 0**, and measured 0. A correctness assertion wearing a readout's clothes |
 | label-on-label pairs | goal 2, the failure a reader sees |
 | label-on-leader | goal 3, the one Tom keeps photographing |
 | mean travel | goal 8 |
 
-**"Flips under pan" must be zero and is not today.** `drawnLinkLabelStations()` culls to the current
-view rectangle and `placeStationedLabels()` builds obstacles from the result, so every node label's
-placement depends on where the user has scrolled to. It is currently invisible because pan perturbs
-*positions*. Once it perturbs *visibility*, labels appear and disappear as you scroll — which is
-exactly the property Been, Daiches & Yap say an interactive labelling must have (the labelling is a
-function of scale alone, never of pan). §3.3's local feature context is the structural answer.
+**"Flips under pan" is zero, and it was worth measuring rather than fearing.** The mechanism is
+real — `drawnLinkLabelStations()` culls a repeated label's stations to the current view rectangle,
+`placeStationedLabels()` builds obstacles from what survives, and those obstacles reach node
+placement, which since Task 398 decides whether a node label is DROPPED. So the code can in
+principle violate the Been/Daiches/Yap requirement that a labelling be a function of scale alone.
+Measured on the example network, Net2 and Net3 (2026-08-17): **0 on all three.** The readout stays as
+a standing tripwire rather than being deleted, because the mechanism has not gone away — only its
+effect on these drawings has been checked.
 
 ---
 
