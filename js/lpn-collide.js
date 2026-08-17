@@ -723,13 +723,21 @@ EngCalcs.lpnCollide = (function () {
 		});
 		order.forEach(function (lbl) {
 			var sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home],
-				chosen = null, chosenBox = null, i, c, b;
+				chosen = null, chosenBox = null, i, c, b, verdict,
+				fallback = null, fallbackBox = null;
 			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
 			for (i = 0; i < sides.length; i++) {
 				c = sides[i];
 				b = labelBoxAtEnd(lbl, c);
-				if (lbl.dragged || boxClearOf(b, local, pad, lbl.id)) { chosen = c; chosenBox = b; break; }
+				verdict = lbl.dragged ? 'clear' : boxClearOf(b, local, pad, lbl.id);
+				if (verdict === 'clear') { chosen = c; chosenBox = b; break; }
+				// **A SIDE HELD ONLY BY SOMETHING THIS LABEL OUTRANKS IS KEPT AS A FALLBACK, not
+				// taken immediately.** A genuinely clear side on the other hand is still better, so
+				// the preferred-side-first order has to finish before this is used. Dropping while
+				// such a side existed is the ranking working backwards.
+				if (verdict === 'yielding' && !fallback) { fallback = c; fallbackBox = b; }
 			}
+			if (!chosen && fallback) { chosen = fallback; chosenBox = fallbackBox; }
 			if (!chosen) {
 				// **DROPPED: NOTHING IS COMMITTED.** A label nobody can see is not an obstacle, so it
 				// must not go into the index -- otherwise it keeps ground clear for a label that is
@@ -763,20 +771,33 @@ EngCalcs.lpnCollide = (function () {
 	// detection for label-over-label.
 	//
 	// A label never blocks itself: `owner` carries the ownership placeLabels() already established.
+	// Returns 'clear', 'yielding' (everything in the way is an obstacle the caller marked as one this
+	// label OUTRANKS), or 'blocked'.
+	//
+	// **THE MIDDLE ANSWER IS WHAT STOPS A NODE LABEL LOSING TO A PIPE LABEL.** `o.yields` is set by
+	// the caller, which is the only party that knows the ranking -- this file must not learn what a
+	// link is. Tom, 2026-08-17, on a node with no label beside one with: *"There's no reason why this
+	// node must be hidden except that it may conflict with the link. But the node is supposed to have
+	// preference."* Exactly so: a position occupied only by things this label outranks is a position
+	// it may take, and dropping instead would be the ranking working backwards.
 	function boxClearOf(b, obs, pad, ownerId) {
-		var grown = pad > 0 ? box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a) : b, i, o;
+		var grown = pad > 0 ? box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a) : b, i, o,
+			yielding = false;
 		for (i = 0; i < obs.boxes.length; i++) {
 			o = obs.boxes[i];
 			if (o.owner !== undefined && o.owner === ownerId) { continue; }
-			if (boxOverlapDepth(grown, o) > 0) { return false; }
+			if (boxOverlapDepth(grown, o) > 0) {
+				if (!o.yields) { return 'blocked'; }
+				yielding = true;
+			}
 		}
 		for (i = 0; i < obs.segments.length; i++) {
 			o = obs.segments[i];
 			if (o.kind !== 'leader') { continue; }   // a Link is a soft obstacle -- see above
 			if (o.owner !== undefined && o.owner === ownerId) { continue; }
-			if (segmentInBoxFraction(o, grown) > 0) { return false; }
+			if (segmentInBoxFraction(o, grown) > 0) { return 'blocked'; }
 		}
-		return true;
+		return yielding ? 'yielding' : 'clear';
 	}
 
 	return {

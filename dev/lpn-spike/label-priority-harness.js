@@ -329,6 +329,36 @@ const dr = Collide.placeLabelsFirstFit(dragged, wall, {});
 eq(dr[0].dropped, false, 'a dragged label survives a wall of obstacles');
 eq(dr[0].side, 0, 'a dragged label does not jump sides');
 
+// **A NODE LABEL NEVER LOSES ITS PLACE TO SOMETHING IT OUTRANKS.** `yields` is how the caller says
+// "this obstacle is a link label and the node outranks it" without this module learning what a link
+// is. Blocked on both sides by yielding boxes, the label must still be PLACED -- dropping there is
+// the ranking running backwards, and it is what put a bare node on Tom's drawing beside a labelled
+// one (2026-08-17).
+{
+	const boxed = function (yields) {
+		return { boxes: [
+			Collide.box(20 + 20, -20 + 6, 40, 12, 0, 'label', 'x1'),
+			Collide.box(-20 - 20, -20 + 6, 40, 12, 0, 'label', 'x2')
+		].map(function (b) { b.yields = yields; return b; }), segments: [] };
+	};
+	const lbl = function () {
+		return [{ id: 'n', anchor: { x: 0, y: 0 }, home: { x: 20, y: -20 }, dragged: false,
+			priority: 0, w: 40, h: 12, yOff: 0,
+			sides: [{ x: 20, y: -20 }, { x: -20, y: -20 }] }];
+	};
+	const soft = Collide.placeLabelsFirstFit(lbl(), boxed(true), {});
+	eq(soft[0].dropped, false, 'both sides held only by yielding boxes: the label is placed anyway');
+	eq(soft[0].side, 0, '...and it takes its PREFERRED side, not an arbitrary one');
+	const hard = Collide.placeLabelsFirstFit(lbl(), boxed(false), {});
+	eq(hard[0].dropped, true, 'both sides held by boxes it does NOT outrank: it drops');
+	// A CLEAR side still beats a yielding one -- the fallback must not short-circuit the search.
+	const mixed = { boxes: [Collide.box(40, -14, 40, 12, 0, 'label', 'x1')], segments: [] };
+	mixed.boxes[0].yields = true;
+	const pick = Collide.placeLabelsFirstFit(lbl(), mixed, {});
+	eq(pick[0].dropped, false, 'a label with one blocked side and one clear side is placed');
+	eq(pick[0].side, 1, '...on the CLEAR side, not on the one it could have taken by rank');
+}
+
 // A LINK IS A SOFT OBSTACLE AND A LEADER IS A HARD ONE. This is the rank ladder read as a partition,
 // and it is the thing a future "treat every obstacle alike" tidy-up would silently break.
 const onPipe = Collide.placeLabelsFirstFit(

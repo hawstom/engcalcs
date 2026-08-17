@@ -141,6 +141,13 @@ that field is toggled on.**
 | 3 | elevation | most like its neighbours' | elevation is a smooth spatial field, so a node sitting at its neighbours' height is readable off theirs (Tom, 2026-08-16 — this row was drafted as "least extreme" and corrected) |
 | 4 | head | most like its neighbours' | same, and for the same reason: a head equal to its neighbours' is recoverable by eye from theirs |
 
+**A node label is never dropped for a link label.** A position held only by things it outranks is a
+position it may take — `yields` on the obstacle box is how the caller tells the placer that, without
+`lpn-collide.js` learning what a link is. A clear side still beats a held one, so the preferred-side
+order finishes before the fallback is used. Tom, 2026-08-17, on a bare node beside a labelled one:
+*"There's no reason why this node must be hidden except that it may conflict with the link. But the
+node is supposed to have preference."*
+
 **Between the two classes: LINKS PLACE FIRST, NODES SURVIVE FIRST** (Tom, 2026-08-16: *"node-outranks-
 link is about dropping things. For placement, links have priority. But if there's no fit, the link
 goes away."*). The two priority columns order within their own class; this is what orders across
@@ -332,9 +339,14 @@ mechanism alongside the graceful one left two doors to the same situation and a 
 them apart (Tom, 2026-08-17: *"I am sometimes observing the repair happening, which is confusing."*).
 If a node label still cannot fit once link labels have shed, it drops — which is what §2.1 says.
 
-**Status:** both conditions have shipped. What is not settled is how AGGRESSIVE the conflict rule
-should be — a link label currently sheds for any node label it touches, including one that was
-dropped, and that is deliberately eager so a blocked node label cannot deadlock. ROADMAP Task 404.
+**A SHED IS TESTED ON REAL OVERLAP, WITH NO PADDING.** The aligned-label slider's clearance
+(`LPN_ALIGNED_PAD_FRAC`, 0.35 of a font size) was reused here and should not have been: it grows the
+box on every side, so two labels counted as conflicting while still 0.7 of a font size apart — most
+of a character of imaginary text on every pair. That margin is right for SLIDING a label along its
+pipe, where it costs nothing; it is wrong for taking a number off the drawing. A shed is paid for in
+information, so it wants a real overlap and nothing else.
+
+**Status:** both conditions have shipped.
 
 **A repeated chain sheds as one link, never per station.** A chain's whole justification is *the same
 name said again*; if one station sheds and the next does not, it stops reading as one repeated name.

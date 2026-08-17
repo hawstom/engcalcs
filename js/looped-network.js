@@ -621,10 +621,23 @@ var EngCalcs = EngCalcs || {};
 	// is what makes the node/link ruling work at all: the link gives up VALUES so the node label can
 	// have its place, instead of the whole link label being taken away.
 	function shedAlignedForConflicts(fsNow, fs) {
-		var obs = staticObstacles(), pad = fs * LPN_ALIGNED_PAD_FRAC;
+		// **NO PAD HERE, AND THE ANSWER TO "did you throw in a fudge factor" IS THAT I HAD.**
+		// LPN_ALIGNED_PAD_FRAC is 0.35 of a font size and it grows the box on EVERY side, so testing
+		// with it meant two labels were called conflicting while still 0.7 of a font size apart --
+		// most of a character of imaginary text between them, on every pair. That is a reasonable
+		// margin for SLIDING a label along its pipe, which is what it was written for and where it
+		// costs nothing; it is not a reasonable one for taking a number off the drawing. A shed is
+		// paid for in information, so it wants real overlap and nothing else. (Tom, 2026-08-17: *"It's
+		// shedding nicely, but too aggressively. Did you throw in a fudge factor?"* Yes.)
+		var obs = staticObstacles(), pad = 0;
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
-			if (!ne || ne.empty) { return; }
+			// **A DROPPED NODE LABEL IS NO LONGER SEEDED, because it can no longer be dropped by a
+			// link.** Seeding one was a deadlock-breaker: while a link label could push a node label
+			// off the drawing, the node needed ground reserved or the pair would stay stuck. Now
+			// `yields` means a node label takes that ground itself, so reserving it as well costs
+			// link labels values for a label that is not drawn and never needed the help.
+			if (!ne || ne.empty || ne.hiddenDropped) { return; }
 			// **THE SAME BOX THE PLACEMENT PASS BUILDS, hung on the same side.** A node label's text
 			// extends AWAY from its node, so a label placed on the left occupies the ground to the
 			// left of its endpoint -- which is Collide.labelBoxAtEnd()'s rule. Building it always to
@@ -1335,7 +1348,14 @@ var EngCalcs = EngCalcs || {};
 			// **STAMPED WITH THE LINK THAT OWNS IT** (Task 398). A node label that cannot fit is
 			// allowed to take a link label's ground, and this is how the repair pass tells a link
 			// label -- which it may remove -- from a node label or a symbol, which it may not.
-			boxes.forEach(function (bx) { bx.kind = 'label'; bx.linkOwner = l.id; obs.boxes.push(bx); });
+			// **`yields` IS THE NODE-OUTRANKS-LINK RULING, EXPRESSED WHERE THE PLACER CAN READ IT.** A
+			// node label offered no clear side may take one held only by link labels rather than
+			// drop -- see boxClearOf(). Without this a node vanished because a pipe label happened to
+			// be there, which is the ranking running backwards (Tom, 2026-08-17).
+			boxes.forEach(function (bx) {
+				bx.kind = 'label'; bx.linkOwner = l.id; bx.yields = true;
+				obs.boxes.push(bx);
+			});
 		});
 	}
 	// **DRAW THE BOXES THE PLACEMENT PASS IS ACTUALLY REASONING ABOUT** (Tom, 2026-08-15: *"Would it

@@ -346,15 +346,11 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - The structural fix is to derive the drop-relevant obstacle set from `linkLabelStations()` (the
     full list, bounded) rather than the drawn one. Measure first; the count may be zero in practice.
 
-- 75|404| **The conflict shed is eager, and nobody has decided how eager it should be.** A link label
-  gives up values for ANY node label it touches, a dropped one included — deliberately, so a blocked
-  node label cannot deadlock the pair. Tom, 2026-08-17: *"It seems to be shedding too aggressive[ly]."*
-  - Judge it AFTER the unshed fix, not before: the picture that prompted this was a zoomed-out view
-    whose labels could not recover on the way back in, so most of what looked like over-shedding was
-    the ratchet.
-  - The levers, cheapest first: the pad (`LPN_ALIGNED_PAD_FRAC`, 0.35 of a font size); whether a
-    DROPPED node label should be an obstacle at all; and whether a node label should be asked to try
-    its other side before any link label gives up a value.
+- 40|404| **Is the shed still too eager?** Two causes were found and fixed 2026-08-17 — a 0.35
+  font-size pad inflating every conflict test, and link labels shedding for node labels that had been
+  dropped. On the example that took shedding from 4 links to 2. Re-judge before touching anything
+  else; the remaining lever is whether a node label should be made to try its other side before any
+  link label gives up a value.
 
 - 60|403| **The headless stub does not know that text width follows FONT SIZE, and that gap has now
   cost three rounds of "the harness passes and the browser does nothing".** `getBBox()` returns
