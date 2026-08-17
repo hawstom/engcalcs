@@ -1,6 +1,6 @@
 {
  "meta": {
-  "version": "1.31",
+  "version": "1.32",
   "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
   "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
   "language_codes": [
@@ -3651,6 +3651,54 @@
     "zh": "EngCalcs"
    },
    "source": "seeded for ROADMAP Task 160, 2026-08-16"
+  },
+  "colour ramp": {
+   "term": "colour ramp",
+   "symbol": "",
+   "avoid": [
+    "the word for a GRADIENT (es gradiente, fr gradient, de Gefaelle, it gradiente, pt gradiente). In this suite 'gradient' is a HYDRAULIC QUANTITY -- lpn_result_gradient is the head loss gradient, a label field printed on every pipe -- so a colour 'gradient' collides with a number on the same map.",
+    "the word for SCALE (es escala, fr echelle, de Massstab). 'Scale' is taken twice on this page already: the map's own scale, and the Scale tool that resizes a background image.",
+    "the word for a physical RAMP or slope. A rock chute in this suite really is a ramp (the rc_ calculator), so the physical sense is live in the product."
+   ],
+   "context": "The ordered set of colours a range of values is painted onto: blue to red, purple to yellow, light to dark grey. English also calls this a colour scheme, and the shipped label was changed to 'Color scheme' in Wave 0 for exactly the reasons above. Render it as a NAMED SET OF COLOURS -- not a slope, not a scale.",
+   "translation_notes": "[2026-08-17, sprint 397] Added after Wave 0 rewrote 'Color ramp' to 'Color scheme'. The gradient trap is the sharp one and is specific to this suite rather than general: most software may safely say colour gradient, and here it cannot, because the head loss gradient is a labelled quantity on the same map.",
+   "translations": {},
+   "source": "sprint 397-labels-colour-units, 2026-08-17"
+  },
+  "colour band limit": {
+   "term": "colour band limit",
+   "symbol": "",
+   "avoid": [
+    "the word for a BREAK, BREAKAGE or BURST (es rotura, fr rupture, de Bruch, pt ruptura, ru razryv). A pipe break is a real event in water distribution and this control has nothing to do with one. The English label was 'Break values' and Wave 0 rewrote it for this reason.",
+    "the word for a PAUSE or an INTERVAL IN TIME."
+   ],
+   "context": "The value at which one colour band ends and the next begins; five bands have four limits. GIS usually calls these break values or class breaks. Render the idea as a BOUNDARY BETWEEN CLASSES, never as a fracture.",
+   "translation_notes": "[2026-08-17, sprint 397] Added alongside 'colour ramp'; both come out of the colour-by-value settings block. The English is now 'Color band limits'.",
+   "translations": {},
+   "source": "sprint 397-labels-colour-units, 2026-08-17"
+  },
+  "equal intervals / equal counts": {
+   "term": "equal intervals / equal counts",
+   "symbol": "",
+   "avoid": [
+    "translating 'counts' as a TALLY OF EVENTS -- it means how many elements fall in each colour band.",
+    "translating 'intervals' as intervals IN TIME."
+   ],
+   "context": "The two ways of choosing colour band limits automatically. EQUAL INTERVALS divides the value range into bands of the same width. EQUAL COUNTS puts the same number of elements in each band, which is what statistics calls quantile classification. They are the standard short names on those two buttons and are deliberately terse: the panel has no room for a description.",
+   "translation_notes": "[2026-08-17, sprint 397] Raised by the Bengali agent, which correctly identified 'equal counts' as quantile classification and asked whether to render the method or the words. Render the METHOD -- a literal reading of 'equal counts' says nothing.",
+   "translations": {},
+   "source": "sprint 397-labels-colour-units, 2026-08-17"
+  },
+  "fire flow": {
+   "term": "fire flow",
+   "symbol": "",
+   "avoid": [
+    "a term meaning the flow OF a fire, or a firefighting operation. This is a DESIGN REQUIREMENT, not an event."
+   ],
+   "context": "The flow a water distribution system must be able to supply for firefighting, at a stated residual pressure, usually checked on top of maximum day demand. It is a number a designer sizes pipes against.",
+   "translation_notes": "[2026-08-17, sprint 397] Raised by the Bulgarian agent, which found that this suite's standing Bulgarian decision to use vodno kolichestvo for flow collides with the term Bulgarian fire-protection engineers actually use (debit za pozharogasene). Recorded so the choice is made once rather than per string. Where a language's fire-protection field has its own settled term, prefer it: a designer reading a fire-flow figure reads it as a fire-protection engineer.",
+   "translations": {},
+   "source": "sprint 397-labels-colour-units, 2026-08-17"
   }
  }
 }

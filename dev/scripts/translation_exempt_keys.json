@@ -122,6 +122,26 @@
    "languages": "*",
    "reason": "D -- diameter symbol."
   },
+  "lpn_ex_net1_title": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "EPANET Net1 -- the sample network's own name, as EPANET itself calls it."
+  },
+  "lpn_ex_net2_title": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "EPANET Net2 -- the sample network's own name, as EPANET itself calls it."
+  },
+  "lpn_ex_net3_title": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "EPANET Net3 -- the sample network's own name, as EPANET itself calls it."
+  },
+  "lpn_ex_elm_street_title": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "Elm Street Center -- a proper place name for the example site, not translated."
+  },
   "ip_hf": {
    "category": "symbol",
    "languages": "*",
@@ -342,6 +362,11 @@
     "fr"
    ],
    "reason": "'Fraction' is the correct French word, spelled identically. Surfaced only when Task 163 taught the validator to read double-quoted assignments -- this key had never been checked. Not global: es fraccion, it frazione, pt fracao, ro fractie, de Anteil all genuinely differ."
+  },
+  "u_imgd": {
+   "category": "abbreviation",
+   "languages": "*",
+   "reason": "IMGD -- imperial million gallons per day. Sibling of u_mgd ('MGD'), which needs no entry because ecIsUniversalKey() auto-exempts a u_ key whose English has no run of four letters. IMGD has exactly four, so it falls off that heuristic by one character while meaning the same kind of thing. Several languages do render it (Mgal imp/dia, Mgal imp/j, Mgal imp/Tag) and exemption does not stop them -- it only says that keeping the Latin abbreviation, as many scripts do for unit symbols, is a legitimate answer rather than an untranslated string."
   }
  }
 }

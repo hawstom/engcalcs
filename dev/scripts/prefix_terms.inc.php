@@ -71,6 +71,11 @@ function prefixToTermNames(): array
             // 'world file' added 2026-08-13 (Task 297): it appears in five of that sprint's nine new
             // keys, and its 'world' is a coordinate space, not the planet -- a false friend nothing
             // else would have guarded against.
+            // Added 2026-08-17 (sprint 397-labels-colour-units). All four come out of the
+            // colour-by-value block, and two of them carry traps this suite creates for itself:
+            // 'gradient' is a HYDRAULIC quantity printed on every pipe, so a colour ramp must not
+            // become a colour gradient, and a 'break' is something a water main does.
+            'colour ramp', 'colour band limit', 'equal intervals / equal counts', 'fire flow',
             'background image', 'world file', 'pump curve', 'project (saved network)', 'scenario',
             'zoom to extents', 'default (setting)', 'upstream', 'downstream',
             // Added 2026-08-14 (Task 248 Wave 0). 'tank' and 'valve' are new ELEMENT TYPES, and

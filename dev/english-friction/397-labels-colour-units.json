@@ -547,6 +547,318 @@
 			],
 			"disposition": "english",
 			"resolution": "Rewritten to 'The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.' The orchestrator's brief for this key was WRONG and the correction is recorded here rather than silently: it said Task 390 had abolished the gallons-per-minute guess, quoting the ROADMAP. It has not. js/lpn-inp.js:213 still does `if (!fu) { drop('unknown-flow-units', ...); fu = FLOW_UNITS.GPM; }`. What Task 390 abolished is a different guess, in a different place: lpn_unit_unknown covers a unit the PAGE does not offer and really does refuse the solve by name. The first rewrite tried to honour both and produced a three-clause sentence whose middle clause ('all ten of the flow units EPANET uses are read exactly as the file writes them') is true, irrelevant here, and would have made 26 translators guess at what it was for. The shipped wording states only what the code does."
+		},
+		{
+			"key": "lpn_settings_readability_bias",
+			"source": "translator",
+			"lang": "de",
+			"complaint": "'Degrees left of vertical before a label is turned around' does not say what 'turned around' means -- rotated to a new angle, or flipped through 180 degrees -- and only one of those is right.",
+			"readings": [
+				"flipped through 180 degrees so the text is not upside down (intended)",
+				"rotated by some amount (false)"
+			],
+			"disposition": "english",
+			"resolution": "ENGLISH REWRITTEN to name the turn explicitly. **Five languages raised this independently -- de, tr, it, he and bn -- which under this project's own rule is an English-source signal rather than five translation problems.** 'Turned around' is genuinely two-way in English: rotated to some other angle, or flipped through 180 degrees. Only the second is what the setting does. The fix also makes it parallel with lpn_field_text_flip, which Wave 0 had already rewritten from 'Flip' to 'Turn 180' -- the two strings describe the same operation and now use the same words for it."
+		},
+		{
+			"key": "lpn_settings_readability_bias",
+			"source": "translator",
+			"lang": "tr",
+			"complaint": "'Degrees left of vertical before a label is turned around' does not say what 'turned around' means -- rotated to a new angle, or flipped through 180 degrees -- and only one of those is right.",
+			"readings": [
+				"flipped through 180 degrees so the text is not upside down (intended)",
+				"rotated by some amount (false)"
+			],
+			"disposition": "english",
+			"resolution": "ENGLISH REWRITTEN to name the turn explicitly. **Five languages raised this independently -- de, tr, it, he and bn -- which under this project's own rule is an English-source signal rather than five translation problems.** 'Turned around' is genuinely two-way in English: rotated to some other angle, or flipped through 180 degrees. Only the second is what the setting does. The fix also makes it parallel with lpn_field_text_flip, which Wave 0 had already rewritten from 'Flip' to 'Turn 180' -- the two strings describe the same operation and now use the same words for it."
+		},
+		{
+			"key": "lpn_settings_readability_bias",
+			"source": "translator",
+			"lang": "it",
+			"complaint": "'Degrees left of vertical before a label is turned around' does not say what 'turned around' means -- rotated to a new angle, or flipped through 180 degrees -- and only one of those is right.",
+			"readings": [
+				"flipped through 180 degrees so the text is not upside down (intended)",
+				"rotated by some amount (false)"
+			],
+			"disposition": "english",
+			"resolution": "ENGLISH REWRITTEN to name the turn explicitly. **Five languages raised this independently -- de, tr, it, he and bn -- which under this project's own rule is an English-source signal rather than five translation problems.** 'Turned around' is genuinely two-way in English: rotated to some other angle, or flipped through 180 degrees. Only the second is what the setting does. The fix also makes it parallel with lpn_field_text_flip, which Wave 0 had already rewritten from 'Flip' to 'Turn 180' -- the two strings describe the same operation and now use the same words for it."
+		},
+		{
+			"key": "lpn_settings_readability_bias",
+			"source": "translator",
+			"lang": "he",
+			"complaint": "'Degrees left of vertical before a label is turned around' does not say what 'turned around' means -- rotated to a new angle, or flipped through 180 degrees -- and only one of those is right.",
+			"readings": [
+				"flipped through 180 degrees so the text is not upside down (intended)",
+				"rotated by some amount (false)"
+			],
+			"disposition": "english",
+			"resolution": "ENGLISH REWRITTEN to name the turn explicitly. **Five languages raised this independently -- de, tr, it, he and bn -- which under this project's own rule is an English-source signal rather than five translation problems.** 'Turned around' is genuinely two-way in English: rotated to some other angle, or flipped through 180 degrees. Only the second is what the setting does. The fix also makes it parallel with lpn_field_text_flip, which Wave 0 had already rewritten from 'Flip' to 'Turn 180' -- the two strings describe the same operation and now use the same words for it."
+		},
+		{
+			"key": "lpn_settings_readability_bias",
+			"source": "translator",
+			"lang": "bn",
+			"complaint": "'Degrees left of vertical before a label is turned around' does not say what 'turned around' means -- rotated to a new angle, or flipped through 180 degrees -- and only one of those is right.",
+			"readings": [
+				"flipped through 180 degrees so the text is not upside down (intended)",
+				"rotated by some amount (false)"
+			],
+			"disposition": "english",
+			"resolution": "ENGLISH REWRITTEN to name the turn explicitly. **Five languages raised this independently -- de, tr, it, he and bn -- which under this project's own rule is an English-source signal rather than five translation problems.** 'Turned around' is genuinely two-way in English: rotated to some other angle, or flipped through 180 degrees. Only the second is what the setting does. The fix also makes it parallel with lpn_field_text_flip, which Wave 0 had already rewritten from 'Flip' to 'Turn 180' -- the two strings describe the same operation and now use the same words for it."
+		},
+		{
+			"key": "lpn_field_text_match_pipe",
+			"source": "translator",
+			"lang": "it",
+			"complaint": "'Match pipe angle' does not say whether it is a one-time action or a toggle that keeps following the pipe; the verb chosen differs between the two.",
+			"readings": [
+				"a button that sets the angle once (intended)",
+				"a checkbox that keeps the text following the pipe (false)"
+			],
+			"disposition": "english",
+			"resolution": "ENGLISH REWRITTEN to an imperative. **Three languages raised it independently -- it, uk and bg.** The control is a BUTTON that sets the angle once, not a checkbox that keeps following the pipe, and 'Match pipe angle' reads equally well as either. It sits beside 'Turn 180', which is already an imperative, so the pair now reads as two buttons rather than a button and a toggle."
+		},
+		{
+			"key": "lpn_field_text_match_pipe",
+			"source": "translator",
+			"lang": "uk",
+			"complaint": "'Match pipe angle' does not say whether it is a one-time action or a toggle that keeps following the pipe; the verb chosen differs between the two.",
+			"readings": [
+				"a button that sets the angle once (intended)",
+				"a checkbox that keeps the text following the pipe (false)"
+			],
+			"disposition": "english",
+			"resolution": "ENGLISH REWRITTEN to an imperative. **Three languages raised it independently -- it, uk and bg.** The control is a BUTTON that sets the angle once, not a checkbox that keeps following the pipe, and 'Match pipe angle' reads equally well as either. It sits beside 'Turn 180', which is already an imperative, so the pair now reads as two buttons rather than a button and a toggle."
+		},
+		{
+			"key": "lpn_field_text_match_pipe",
+			"source": "translator",
+			"lang": "bg",
+			"complaint": "'Match pipe angle' does not say whether it is a one-time action or a toggle that keeps following the pipe; the verb chosen differs between the two.",
+			"readings": [
+				"a button that sets the angle once (intended)",
+				"a checkbox that keeps the text following the pipe (false)"
+			],
+			"disposition": "english",
+			"resolution": "ENGLISH REWRITTEN to an imperative. **Three languages raised it independently -- it, uk and bg.** The control is a BUTTON that sets the angle once, not a checkbox that keeps following the pipe, and 'Match pipe angle' reads equally well as either. It sits beside 'Turn 180', which is already an imperative, so the pair now reads as two buttons rather than a button and a toggle."
+		},
+		{
+			"key": "lpn_examples_size",
+			"source": "translator",
+			"lang": "es",
+			"complaint": "'{nodes} junctions, {links} pipes' -- the placeholder is named nodes but the word is junctions, and the file's own glossary uses those as different things, so it is unclear which the count is.",
+			"readings": [
+				"every node, of any type (what the code counts)",
+				"junctions only (what the words say)"
+			],
+			"disposition": "english",
+			"resolution": "ENGLISH REWRITTEN, and the agents found something worse than an ambiguity: the string was FACTUALLY WRONG. `{nodes}` is `count($doc['nodes'])` in generate_examples.php -- every node, junctions and reservoirs and tanks alike -- and `{links}` is every link including pumps and valves. Net3's card therefore announced '97 junctions' for a network with 92 junctions, 2 reservoirs and 3 tanks. Reworded to '{nodes} nodes, {links} links', which is what the numbers are. Two translators asking 'which does this count?' is how a wrong number on the front page of the gallery was found."
+		},
+		{
+			"key": "lpn_examples_size",
+			"source": "translator",
+			"lang": "cs",
+			"complaint": "'{nodes} junctions, {links} pipes' -- the placeholder is named nodes but the word is junctions, and the file's own glossary uses those as different things, so it is unclear which the count is.",
+			"readings": [
+				"every node, of any type (what the code counts)",
+				"junctions only (what the words say)"
+			],
+			"disposition": "english",
+			"resolution": "ENGLISH REWRITTEN, and the agents found something worse than an ambiguity: the string was FACTUALLY WRONG. `{nodes}` is `count($doc['nodes'])` in generate_examples.php -- every node, junctions and reservoirs and tanks alike -- and `{links}` is every link including pumps and valves. Net3's card therefore announced '97 junctions' for a network with 92 junctions, 2 reservoirs and 3 tanks. Reworded to '{nodes} nodes, {links} links', which is what the numbers are. Two translators asking 'which does this count?' is how a wrong number on the front page of the gallery was found."
+		},
+		{
+			"key": "lpn_ex_net3_desc",
+			"source": "translator",
+			"lang": null,
+			"complaint": "Found while resolving the lpn_examples_size entries above: the description says '97 junctions, two tanks and a river source'. Net3 has 92 junctions, 3 tanks and 2 reservoirs.",
+			"readings": [
+				"92 junctions, three tanks, two sources (the network)",
+				"97 junctions, two tanks, one source (what it said)"
+			],
+			"disposition": "english",
+			"resolution": "ENGLISH CORRECTED to the counts in the file. Wrong on all three figures, and it had been translated into 26 languages in that state. Nothing in the build could have caught it -- no check compares prose against a network -- so it took a translator asking what a neighbouring number meant."
+		},
+		{
+			"key": "lpn_help_fix",
+			"source": "translator",
+			"lang": "tr",
+			"complaint": "'Fix something' is a bare imperative with the vaguest possible object, and its register (menu heading? button? troubleshooting link?) has to be guessed.",
+			"readings": [
+				"an invitation to report a mistake to us (intended)",
+				"troubleshooting help for the reader to apply"
+			],
+			"disposition": "intent",
+			"resolution": "CONFIRMS the Wave 0 entry for this key, from three more languages independently. English is kept: Tom chose this wording deliberately on 2026-08-14 because the verb invites the small correction people actually send, where 'Contribute' reads as a request for money or code. The proposed $ec_lang_syn entry in that Wave 0 entry is now supported by four findings rather than one, and still awaits his written approval."
+		},
+		{
+			"key": "lpn_help_fix",
+			"source": "translator",
+			"lang": "cs",
+			"complaint": "'Fix something' is a bare imperative with the vaguest possible object, and its register (menu heading? button? troubleshooting link?) has to be guessed.",
+			"readings": [
+				"an invitation to report a mistake to us (intended)",
+				"troubleshooting help for the reader to apply"
+			],
+			"disposition": "intent",
+			"resolution": "CONFIRMS the Wave 0 entry for this key, from three more languages independently. English is kept: Tom chose this wording deliberately on 2026-08-14 because the verb invites the small correction people actually send, where 'Contribute' reads as a request for money or code. The proposed $ec_lang_syn entry in that Wave 0 entry is now supported by four findings rather than one, and still awaits his written approval."
+		},
+		{
+			"key": "lpn_help_fix",
+			"source": "translator",
+			"lang": "uk",
+			"complaint": "'Fix something' is a bare imperative with the vaguest possible object, and its register (menu heading? button? troubleshooting link?) has to be guessed.",
+			"readings": [
+				"an invitation to report a mistake to us (intended)",
+				"troubleshooting help for the reader to apply"
+			],
+			"disposition": "intent",
+			"resolution": "CONFIRMS the Wave 0 entry for this key, from three more languages independently. English is kept: Tom chose this wording deliberately on 2026-08-14 because the verb invites the small correction people actually send, where 'Contribute' reads as a request for money or code. The proposed $ec_lang_syn entry in that Wave 0 entry is now supported by four findings rather than one, and still awaits his written approval."
+		},
+		{
+			"key": "lpn_scenario_base_value",
+			"source": "translator",
+			"lang": "de",
+			"complaint": "The English gained the word 'scenario' ('Base:' to 'Base scenario: {value}') while the sibling key lpn_scenario_base is still the bare word, so it is unclear whether this is a terminology change or added clarity.",
+			"readings": [
+				"added clarity; the sibling stays bare because its context supplies the noun",
+				"a terminology change that the sibling should follow"
+			],
+			"disposition": "dismissed",
+			"resolution": "Added clarity, deliberately, and the sibling is correct as it stands. lpn_scenario_base labels the dropdown that lists scenarios, where the surrounding control supplies the noun; this key is a standalone readout that can appear with no such context. Both German and Arabic resolved it the same way -- spelling out the noun here, leaving the sibling bare -- which is the intended reading. No English change."
+		},
+		{
+			"key": "lpn_scenario_base_value",
+			"source": "translator",
+			"lang": "ar",
+			"complaint": "The English gained the word 'scenario' ('Base:' to 'Base scenario: {value}') while the sibling key lpn_scenario_base is still the bare word, so it is unclear whether this is a terminology change or added clarity.",
+			"readings": [
+				"added clarity; the sibling stays bare because its context supplies the noun",
+				"a terminology change that the sibling should follow"
+			],
+			"disposition": "dismissed",
+			"resolution": "Added clarity, deliberately, and the sibling is correct as it stands. lpn_scenario_base labels the dropdown that lists scenarios, where the surrounding control supplies the noun; this key is a standalone readout that can appear with no such context. Both German and Arabic resolved it the same way -- spelling out the noun here, leaving the sibling bare -- which is the intended reading. No English change."
+		},
+		{
+			"key": "lpn_settings_symbol_size",
+			"source": "translator",
+			"lang": "tr",
+			"complaint": "The label says 'Symbol size (pixels)' but the code comment above the setting says symbols are sized as a multiple of the text size, so the two contradict each other.",
+			"readings": [
+				"pixels, as the label says",
+				"a multiple of the text size, as the comment says"
+			],
+			"disposition": "dismissed",
+			"resolution": "The label is right and the comment is history, not a contradiction. js/looped-network.js:2965 says 'SCREEN PIXELS and INDEPENDENT OF THE TEXT since 2026-08-14 (Task 331)', and the sentence the agent read is the one immediately after it explaining what WENT AWAY -- settings.symbolScale, the old relative-to-text multiplier. A good catch that cost nothing: reading the comment above a string is exactly right, and here the comment records a superseded design on purpose."
+		},
+		{
+			"key": "u_imgd",
+			"source": "translator",
+			"lang": "fr",
+			"complaint": "IMGD is a unit abbreviation with no established form in this language, and the syntax validator flags it as untranslated when it is left alone -- no French abbreviation exists and it sits in the same dropdown as the already-translated US MGD.",
+			"readings": [
+				"render it with a local qualifier",
+				"keep the Latin abbreviation as unit symbols usually are"
+			],
+			"disposition": "dismissed",
+			"resolution": "Both answers are legitimate and the flag was a tooling accident, now fixed. ecIsUniversalKey() auto-exempts a u_ key whose English has no run of four letters, which covers MGD, gpm and psi; IMGD has exactly four and fell off that heuristic by one character. An explicit entry was added to translation_exempt_keys.json (languages '*'), so keeping the Latin abbreviation is allowed. It does not undo the languages that chose to render it -- es, fr, de, it, cs, ru, sr, bg, ar and zh all did, and those readings stand."
+		},
+		{
+			"key": "u_imgd",
+			"source": "translator",
+			"lang": "ar",
+			"complaint": "IMGD is a unit abbreviation with no established form in this language, and the syntax validator flags it as untranslated when it is left alone -- no natural Arabic rendering exists and the validator forced a change.",
+			"readings": [
+				"render it with a local qualifier",
+				"keep the Latin abbreviation as unit symbols usually are"
+			],
+			"disposition": "dismissed",
+			"resolution": "Both answers are legitimate and the flag was a tooling accident, now fixed. ecIsUniversalKey() auto-exempts a u_ key whose English has no run of four letters, which covers MGD, gpm and psi; IMGD has exactly four and fell off that heuristic by one character. An explicit entry was added to translation_exempt_keys.json (languages '*'), so keeping the Latin abbreviation is allowed. It does not undo the languages that chose to render it -- es, fr, de, it, cs, ru, sr, bg, ar and zh all did, and those readings stand."
+		},
+		{
+			"key": "lpn_ex_net1_title",
+			"source": "translator",
+			"lang": "fr",
+			"complaint": "A proper noun (EPANET's own sample-network name) has no French form, but the validator flags any byte-identical value.",
+			"readings": [
+				"keep it identical, matching every other language",
+				"invent a French wrapper to satisfy the checker"
+			],
+			"disposition": "dismissed",
+			"resolution": "Keep it identical -- the agent chose correctly and refused to invent a decorative variant. The four example titles were already on the exempt list as category 'brand'; the finding that actually needed fixing beside them was u_imgd, above."
+		},
+		{
+			"key": "lpn_settings_color_equal_counts",
+			"source": "translator",
+			"lang": "bn",
+			"complaint": "'Equal counts' is terse GIS jargon for quantile classification and carries no tip in this delta, so it is unclear whether to render the statistical method or the literal words.",
+			"readings": [
+				"quantile classification: each colour band holds the same number of elements",
+				"the literal words, with no domain meaning"
+			],
+			"disposition": "glossary",
+			"resolution": "Valid, and the pair 'Equal intervals' / 'Equal counts' is exactly the kind of term the glossary exists for -- it recurs, it is a named method, and the literal words are a plausible wrong answer. Recorded as a glossary term in this sprint's write-back rather than as an English change: the labels are the standard short names a GIS user expects on those two buttons, and lengthening them would push the pair out of the panel."
+		},
+		{
+			"key": "lpn_field_closed",
+			"source": "translator",
+			"lang": "hr",
+			"complaint": "English changed 'Closed' to 'Shut' to dodge the 'closed conduit' collision; unclear whether the bare Croatian adjective carries the same risk and should be lengthened to match.",
+			"readings": [
+				"keep the bare adjective, low collision risk in Croatian",
+				"lengthen it to name the flow explicitly"
+			],
+			"disposition": "dismissed",
+			"resolution": "Keeping the bare adjective is right. The English change was made because 'closed' collides with 'closed conduit' IN ENGLISH; it is not a licence to lengthen every rendering. Where a language's own trap term is phrased differently -- Croatian uses cjevovod rather than the bare adjective -- the collision does not arise and the short word is better on a checkbox. The agent reasoned this out correctly and asked anyway, which is the right instinct."
+		},
+		{
+			"key": "lpn_settings_engine_epanet_tip",
+			"source": "translator",
+			"lang": "hr",
+			"complaint": "The new English reverses the old guidance rather than rewording it -- the previous text said the built-in solver was faster and to leave EPANET off; the new text says there is no speed difference at this size.",
+			"readings": [
+				"rewrite fully to match the new claims",
+				"keep the old speed recommendation"
+			],
+			"disposition": "dismissed",
+			"resolution": "Rewrite fully -- the reversal is deliberate and the old claim was false. dev/lpn-spike/engine-bench.js measured it on 2026-08-14: EPANET is faster at every size, by more as the network grows. The comment that used to assert the opposite was written from an unmeasured assumption. Flagging a claim that looks like it changed direction is exactly what this channel is for."
+		},
+		{
+			"key": "lpn_ex_elm_street_desc",
+			"source": "translator",
+			"lang": "bg",
+			"complaint": "'Fire flow' has no glossary preferred_translation, and the suite-wide Bulgarian decision to use vodno kolichestvo for flow collides with the term Bulgarian fire-protection engineers actually use.",
+			"readings": [
+				"stay consistent with the suite-wide flow term",
+				"use the term the fire-protection field uses"
+			],
+			"disposition": "glossary",
+			"resolution": "Recorded as a glossary term ('fire flow') in this sprint's write-back so the next sprint does not re-derive it. The agent chose consistency with the standing suite-wide decision, which is the right default when the two conflict and no native reviewer has ruled; the note that a domain term may differ is preserved with the term so a Bulgarian reviewer can settle it in one place rather than in one string."
+		},
+		{
+			"key": "lpn_labels_col_before",
+			"source": "translator",
+			"lang": "uk",
+			"complaint": "'Before' and 'After' as bare column headings rely entirely on table position for their meaning; nothing in the strings says they mean text before and after the value rather than an order in time.",
+			"readings": [
+				"prefix and suffix text columns (intended)",
+				"a sequence or a history"
+			],
+			"disposition": "intent",
+			"resolution": "CONFIRMS the two Wave 0 entries for this pair from a third party. English is kept for the width reason recorded there -- the headings sit in a 3.5em column built from LPN_LABEL_AFFIX_W and cannot grow -- and the boxes beneath carry the prefix/suffix tips as their titles. The proposed $ec_lang_syn entries in those Wave 0 entries still await Tom's written approval, and must be approved together or the pair goes out of parallel."
+		},
+		{
+			"key": "lpn_engine_ready_valve",
+			"source": "translator",
+			"lang": "sw",
+			"complaint": "The sentence pairs a present state ('is on this device now') with a future one ('will work offline') about the same fact, and reads at first as two separate claims.",
+			"readings": [
+				"one fact and its consequence",
+				"two separate claims"
+			],
+			"disposition": "dismissed",
+			"resolution": "One fact and its consequence, and the English is doing that on purpose: the present half is what just happened, the future half is why the user should care. A single reading of it is available and the agent found it. Recorded rather than dismissed silently because it is the only complaint filed against this string and a second one would change the answer."
 		}
 	]
 }
