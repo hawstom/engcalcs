@@ -11,6 +11,7 @@ The full text of every closed task is in git and nowhere else, by Tom's ruling o
 Durable policy from these tasks lives in `CLAUDE.md` and in `dev/*.md`. Those are the current
 state; this is only a list of numbers that were once used.
 
+- 0|387| `dev/browser-pass` silently tested the WRONG TREE from a worktree (constant port 8899, docroot `REPO/..`). Fixed 2026-08-17: OS-assigned port, docroot from `git rev-parse --show-toplevel` via a mkdtemp symlink, and a random per-run sentinel fetched back before the browser launches — the readiness probe is the sentinel, not the page. `mi-defaults.js`'s private copies deleted. The stale specs it exposed are Task 414; the general lessons are in `dev/testing-notes.md`.
 - 0|404| Is the shed still too eager? NO — Tom, 2026-08-17, judging from production at commit `22db1f9`: at most a little more padding than necessary in some cases. The two 2026-08-17 causes fixed (font-size pad, link labels shedding for dropped node labels) stand as the result.
 - 0|401| flips under pan MEASURED at 0 on the example, Net2 and Net3 — the view-rect station cull can reach node placement in principle but does not move a label in practice. The ?debug=labels readout stays as a standing tripwire
 - 0|397| Phase 0: the Labels-box priority column (one column, two axes, directions compiled in), and the local feature context — one per-node record of scale-invariant bearings plus the rounded model values the drop comparator reads, built at the one seam whose lifetime already matched
