@@ -4802,19 +4802,22 @@ var EngCalcs = EngCalcs || {};
 	}
 	function showBackdropTargetPanel(refWorld) {
 		var panel = document.getElementById('lpn_backdrop_target_panel'),
-			// ANCHORED ON THE MENUBAR, and it must stay something that is always in the DOM.
-			// This hung off #lpn_backdrop_menu until Task 375's follow-up took the Background image
-			// button off the toolbar: wireBackdropMenu() is now called with no argument and its
-			// `if (into) { into.appendChild(menu); }` appends nothing, so the id resolved to null and
-			// getBoundingClientRect() threw while evaluating the ARGUMENT -- before openPanelAtAnchor()
-			// could set display:block. The panel never appeared and Move dead-ended after its second
-			// alert with nothing on screen. Reported by Tom 2026-08-16.
-			anchor = document.getElementById('lpn_menubar');
+			// ANCHORED ON THE POINT THE USER PICKED (Tom, 2026-08-17), not the menubar -- the chooser
+			// asks "where should THAT point go", so it belongs next to the point being asked about.
+			// A zero-size rect at the point's screen location gives openPanelAtAnchor() the same shape
+			// it expects from a real getBoundingClientRect(), and its own viewport clamp keeps the
+			// panel on screen even when the point is near an edge.
+			//
+			// Previously anchored on #lpn_menubar; that was itself a fix (Task, 2026-08-16) for a worse
+			// bug where the menubar anchor could be missing from the DOM entirely (Background image
+			// moved off the toolbar by Task 375's follow-up) and getBoundingClientRect() threw before
+			// openPanelAtAnchor() could show the panel. The point-anchor below can never be missing --
+			// it is computed, not looked up -- so that failure mode cannot recur here.
+			pt = worldToScreen(refWorld.x, refWorld.y),
+			anchorRect = { top: pt.y, bottom: pt.y, left: pt.x, right: pt.x, width: 0, height: 0 };
 		// Placed and height-fitted by the one shared placer (Task 372), like every other panel that
-		// hangs off a control. The fallback is a real rect, not a throw: a missing anchor is a
-		// misplaced panel, which the user can still use, where a throw is an invisible one.
-		openPanelAtAnchor(panel, anchor ? anchor.getBoundingClientRect()
-			: { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0 });
+		// hangs off a control.
+		openPanelAtAnchor(panel, anchorRect);
 		activeCancel = function () { panel.style.display = 'none'; setRegMode(false); };
 		document.getElementById('lpn_backdrop_target_continue').onclick = function () {
 			var mode = document.getElementById('lpn_backdrop_target_mode').value, pc = EngCalcs.pageConfig || {};
@@ -4883,10 +4886,10 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		return (withHeading ? [{ heading: true, label: pc.lpn_backdrop_menu || 'Background image…' }] : []).concat([
 			{ icon: 'image', label: pc.lpn_backdrop_add || 'Add', fn: function () { backdropAction('add'); } },
+			{ icon: 'position', label: pc.lpn_backdrop_position || 'Move', fn: function () { backdropAction('position'); }, disabled: !backdrop },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale by picking', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Scale by world file or by the size of one pixel on the map', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale_from || 'Scale from current size, around a point you pick', fn: function () { backdropAction('scale-from'); }, disabled: !backdrop },
-			{ icon: 'position', label: pc.lpn_backdrop_position || 'Move', fn: function () { backdropAction('position'); }, disabled: !backdrop },
 			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove', fn: function () { backdropAction('remove'); }, disabled: !backdrop }
 		]);
 	}
