@@ -12053,7 +12053,7 @@ var EngCalcs = EngCalcs || {};
 			biasInput.value = settings.labelFlipLeftOfVertical;
 			relayoutLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_readability_bias || 'Degrees left of vertical before a label is turned around', biasInput);
+		row(mapBody, pc.lpn_settings_readability_bias || 'Degrees left of vertical before a label turns 180\u00b0 to stay readable', biasInput);
 		// Task 330, and it ships ON because that is what the page has always drawn -- a label over a
 		// backdrop image is unreadable without it, and an upgrade must not restyle anyone's drawing.
 		var maskInput = document.createElement('input');
@@ -13588,7 +13588,7 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(rotLabel);
 		var matchBtn = document.createElement('button');
 		matchBtn.type = 'button';
-		matchBtn.textContent = pc.lpn_field_text_match_pipe || 'Match pipe angle';
+		matchBtn.textContent = pc.lpn_field_text_match_pipe || 'Set to pipe angle';
 		matchBtn.addEventListener('click', function () {
 			// Read at the label's RENDERED point, which for an anchored label is its node plus its
 			// offset -- not lb.x/lb.y, which is the offset alone and would find the pipe nearest

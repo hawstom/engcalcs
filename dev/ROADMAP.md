@@ -327,6 +327,20 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   else; the remaining lever is whether a node label should be made to try its other side before any
   link label gives up a value.
 
+- 70|405| **Resync four English strings the sprint itself earned.** Sprint 397 closed at zero drift and
+  zero delta; these four were edited AFTER that baseline, so `detect_english_drift.php` now flags them
+  and 26 translations render the superseded text. Small, well-defined resync — one agent per language
+  over four keys, or fold into the next sprint.
+  - `lpn_settings_readability_bias` — **five languages raised it independently** (de, tr, it, he, bn),
+    which is this project's own threshold for an English-source defect. "Turned around" is rotated-to-
+    an-angle or flipped-180 in English, and only the second is what the setting does.
+  - `lpn_field_text_match_pipe` — three languages (it, uk, bg). It is a button that sets the angle once,
+    and "Match pipe angle" reads equally well as a toggle that keeps following.
+  - `lpn_examples_size` and `lpn_ex_net3_desc` — **both were factually wrong**, found by two agents
+    asking what a number counted. `{nodes}` is every node, not junctions; Net3 has 92 junctions, 3
+    tanks and 2 reservoirs, not "97 junctions, two tanks and a river source". Nothing in the build
+    compares prose against a network, so only a reader could have caught these.
+
 - 60|403| **The headless stub does not know that text width follows FONT SIZE.** `getBBox()` returns
   characters × a constant, so a label's world width is the same at every zoom — where a real label's
   font size IS a world quantity (`textSize / state.s`). That removes the entire relationship between
