@@ -8,42 +8,35 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 **`CHECK: YYYY-MM-DD` marks a task waiting on the calendar rather than on work** (Task 155's Search Console wait; Task 202's `zh` n=30). Tom asked 2026-08-05 whether dated tasks should always be priority 100. **No, and the date must never promote the task.** A `CHECK:` date is a **gate, not a deadline**: before it, the work is impossible (attempting it yields nothing); after it, the task simply becomes doable **at whatever priority it already had**. So Task 155 stays at 10 forever if a Search Console look is worth 10 — an arrived date means "you may now do this", never "do this next". *(CC's first draft of this paragraph said to raise the priority when the date arrives. That was wrong, and it smuggled promotion back in after arguing against it; Tom caught it: "Use the real priority, and don't let the date promote it." That is the rule.)* The one genuine exception is a task whose **value decays** — evidence that expires, a real external deadline. That is a change in worth, so change the priority and say why; it is not the date doing the work.
 
-## NEXT SESSION (updated 2026-08-16, and Tom works one arrow per `/clear`)
+## NEXT SESSION (updated 2026-08-17)
 
-**Task 390 is finished** (all five steps, 2026-08-16), and so are Tasks 376, 379 and 384. One arrow
-is ready.
+**Overnight run of 2026-08-17 finished the two arrows that were queued.** Nothing is blocked.
 
-**Arrow 1 — the TRANSLATION SPRINT.** Delta is **75 keys per language**, all 26 languages: the 47
-lpn keys, the 4 Task 337 text-label keys, 18 from Task 384's colour ramp, and 6 from Task 390 step 4
-(`u_imgd`, `u_afd`, `u_lpm`, `u_cmh`, `u_cmd`, `lpn_unit_unknown`). Nothing further is queued behind
-it, so the sequencing note that held it back is discharged — this is the moment to run it.
-Pre-sprint order is in `dev/translation-process.md`: Wave 0 adversarial English pass →
-`friction_check.php` → `gloss_ref_check.php` → regenerate payloads → propose to Tom → launch.
-`$ec_lang_syn` entries are proposed as a diff and approved in that session, not before. Harness cap:
-26 agents means 20 at once and 6 as slots free.
+**Sprint 397 is CLOSED and clean** — 85 new keys plus 8 resyncs in all 26 languages, zero delta,
+zero drift, glossary write-back done (4 terms), 69 friction entries all answered. What it cost the
+build was three harness checks that were asserting on English WORDING rather than on the thing under
+test; all three now match a language key or a handler.
 
-**This block's claim about `lpn_inp_drop_units` was WRONG and misled a Wave 0 brief on 2026-08-17.**
-It said Task 390 abolished the gallons-per-minute guess. It did not: `js/lpn-inp.js:213` still falls
-back to `FLOW_UNITS.GPM` when the `[OPTIONS] UNITS` keyword is unrecognised. What Task 390 abolished
-is a *different* guess in a different place — `lpn_unit_unknown`, for a unit the PAGE does not offer,
-which really does refuse the solve by name. The key has been reworded to state what the code does.
+**Waiting on Tom, and only Tom:**
 
-**Arrow 2 — the LABEL PARADIGM, Tasks 397–400**, unblocked 2026-08-16 by Tom's phases. Start at 397
-(the priority column, the local feature context, the width bank); 398 and 399 both need it and 399
-can ship first. Spec is `dev/label-placement-goals.md`; the standards survey behind it is
-`dev/label-placement-algorithms.md`. Task 343's old open question — what triggers a drop — is
-answered and the task is closed: first-fit drops whoever arrives at a full space, so the trigger is
-the priority ORDER, never a threshold inside the pass.
+- **Four `$ec_lang_syn` entries are drafted and unwritten** — `lpn_examples_open`, `lpn_help_fix`,
+  `lpn_labels_col_before` and `lpn_labels_col_after`. The array needs his written approval in the
+  session that writes it, and the last two must be approved together or the pair goes out of
+  parallel. Proposed text is in each entry's `resolution` in
+  `dev/english-friction/397-labels-colour-units.json`. Three more languages independently confirmed
+  `lpn_help_fix` during the sprint.
+- **Task 404** — is the conflict shed still too eager? Two causes were found and fixed; judge the
+  result before anything else is tuned.
+- **Task 400 may not be "finish the algorithm".** Tom, 2026-08-17: *"Phases 1 and 2 are good enough
+  for GIS mode or management mode. Phase 3 may be helpful for report mode."* That reframes it as a
+  slower pass invoked deliberately for a clean sheet, which changes both its scope and its priority.
+  Not rewritten unilaterally.
 
-**Also open and unblocked:** Task 388's remainder — `js/looped-network.js` is still 46.9% comment
-lines with ~190 blocks of 10+ lines left. Mechanical, and a good filler for a session with spare
-room.
+**Next by priority:** Task 405 (resync the four strings this sprint earned), then 398's successor
+work under 404, then 403 (the stub's font-size blindness, attempted twice and reverted twice — read
+its block before starting, everything needed is recorded there).
 
-**Tom's desk:** Tasks 379 (95), 384 (88), 376 (75), 377 (60) are all `[H]` and all label/colour
-work. Nothing above priority 66 moves without him, and 384 (colour ramps) is the real unblocker for
-Task 248 (extended-period simulation), because a time series cannot be read as text.
-
-*Delete this block once both arrows have landed; it is a handoff, not a standing plan.*
+*Delete this block once it stops being true; it is a handoff, not a standing plan.*
 
 ## LENGTH DISCIPLINE (Tom, 2026-08-05) — read this before writing a task
 
