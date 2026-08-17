@@ -121,22 +121,19 @@ font-size blindness, attempted twice and reverted twice — read its block befor
   user's.** Tom, 2026-08-16: *"You are fighting against a deprecated but not purged paradigm where
   everything was stored in browser and file as SI always... I don't think I authorized that. But it
   was done."* Full diagnosis, measurements and dependency order: **`dev/unit-paradigm-migration.md`**.
-  - **DONE — all five steps (2026-08-16).** (1)(2) an `<option>`'s value is the unit's NAME, the
-    factor a lookup through `EngCalcs.unitFactors`; `data-unit` is gone; guarded by
-    `unit_factor_check.php` §5. (3) the file's own TEXT is kept beside its value in a separate `tok`
-    bag, read only through `EngCalcs.lpnNumText()`, which returns a string in every branch so a
-    token can never reach arithmetic. (4) a unit we have no factor for is carried verbatim, shown,
-    saved back unchanged, and refuses only the SOLVE, by name — and only then did the five missing
-    EPANET flow keywords get a selector (`flow_epanet`). (5) a pump's `h0/a/b` are derived at the
-    solver handoff, so the unit-switch refit that repaired them is gone.
+  - **DONE — all five steps (2026-08-16):** an `<option>`'s value is the unit's NAME and the factor a
+    lookup through `EngCalcs.unitFactors`; `data-unit` is gone (guarded by `unit_factor_check.php`
+    §5); a file's own TEXT rides beside its value in a
+    `tok` bag read only through `EngCalcs.lpnNumText()`, which returns a string in every branch; an
+    unknown unit is carried verbatim, saved back unchanged, and refuses only the SOLVE, by name (the
+    five missing EPANET flow keywords got a `flow_epanet` selector); a pump's `h0/a/b` are derived at
+    the solver handoff, so the unit-switch refit is gone.
   - **No choice of constant could have fixed this**: 36.7% of a 20,000 sample fails to round-trip
-    bit-identically even with exact factors, worse than the 26% before them. And 9.3% of EPA's own
+    bit-identically even with exact factors, worse than the 26% before them; 9.3% of EPA's own
     tokens reformat under `parseFloat` however exact the arithmetic is.
   - The five new unit keys (`u_imgd`, `u_afd`, `u_lpm`, `u_cmh`, `u_cmd`) and `lpn_unit_unknown` are
-    in `lang.ec.en.php` only — an absent key already falls back to English, and a present-and-
-    identical one fails `lang_syntax_validate.php`. They fold into the queued sprint.
-  - Still open, and each is its own confusion of the same kind: `elev` holds both a user's elevation
-    and an imported reservoir's total head.
+    in `lang.ec.en.php` only, and fold into the queued sprint.
+  - **Still open:** `elev` holds both a user's elevation and an imported reservoir's total head.
   - **Acceptance: import then export is BYTE-IDENTICAL for every value the user did not edit.** Also
     Task 281's criterion.
 
@@ -355,32 +352,28 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     compares prose against a network, so only a reader could have caught these.
 
 - 60|403| **The headless stub does not know that text width follows FONT SIZE.** `getBBox()` returns
-  characters × a constant, so a label's world width is the same at every zoom — where a real label's
-  font size IS a world quantity (`textSize / state.s`). That removes the entire relationship between
-  a label and the pipe it must fit on, which is what every fitting rule is about, and it has now cost
-  three rounds of "the harness passes and the browser does nothing".
-  - **Attempted twice and reverted twice.** Everything needed is known; what is missing is a session
-    with room to finish it. The four things a working version must handle, each found the hard way:
-    (1) font size arrives by THREE write paths — the `style` attribute string set at build time,
-    `.style.fontSize` set on every refresh, and a bare `font-size` attribute; (2) the style OBJECT
-    must win, because it is written later and in a real DOM they are one declaration; (3) setting
-    `textContent` must clear child nodes and must read back INCLUDING descendants, or labels are
-    measured on stale placeholder text (`example-network-harness.js`'s `popupY` was relying on the
-    non-DOM behaviour and needed `startsWith`); (4) `firstChild` must return the text node so the
-    standard `while (firstChild) removeChild(firstChild)` teardown can clear it.
+  characters × a constant, so a label's world width is the same at every zoom, where a real label's
+  font size IS a world quantity (`textSize / state.s`). That removes the whole relationship every
+  fitting rule is about, and has cost three rounds of "harness passes, browser does nothing".
+  - **Attempted twice and reverted twice.** Four things a working version must handle, each found the
+    hard way: (1) font size arrives by THREE write paths — the `style` attribute string set at build
+    time, `.style.fontSize` set on every refresh, and a bare `font-size` attribute; (2) the style
+    OBJECT must win, being written later and one declaration in a real DOM; (3) setting `textContent`
+    must clear child nodes and read back INCLUDING descendants, or labels are measured on stale
+    placeholder text (`example-network-harness.js`'s `popupY` relied on the non-DOM behaviour and
+    needed `startsWith`); (4) `firstChild` must return the text node so the standard
+    `while (firstChild) removeChild(firstChild)` teardown can clear it.
   - **It exposes a real defect in `drawExampleNetwork()`'s two anchored callouts, and that is the
-    prize.** They derive `lb.x` from a width measured at whatever `settings.textSize` is current, and
-    are then asserted against a width measured at a different one — 18.6 world units at draw time
-    against 81.7 at assert time in the harness's returning-visitor fixture. A Text label's world
-    width is 1/zoom and its screen size follows `textSize`, so no fixed `lb.x` can clear it at every
-    setting. Decide whether the offset should be recomputed or expressed differently BEFORE landing
-    the stub fix, or the stub fix simply turns four assertions red.
+    prize.** `lb.x` derives from a width measured at whatever `settings.textSize` is current, then is
+    asserted against one measured at another — 18.6 world units at draw time against 81.7 at assert
+    time in the returning-visitor fixture. A Text label's world width is 1/zoom and its screen size
+    follows `textSize`, so no fixed `lb.x` clears every setting; decide whether the offset is
+    recomputed or expressed differently BEFORE landing the stub fix, or four assertions turn red.
 
 - 15|400| **Phase 3 — bounded local search on the residue. LOWERED 60→15, Tom 2026-08-17: "Phases 1
   and 2 are good enough for GIS mode or management mode. Phase 3 may be helpful for report mode."**
-  Risk:reward has gone up as priority went down — Phases 1–2 already serve shoppers well. Parked for
-  real-world feedback from Tom's colleague Mary (Philippines) rather than scheduled work; not a
-  `CHECK:` date, an event gate.
+  Parked for real-world feedback from Tom's colleague Mary (Philippines) rather than scheduled work;
+  an event gate, not a `CHECK:` date.
   - Wagner & Wolff's three optimum-preserving reduction rules on an explicit conflict graph, then a
     bounded chain search, in QGIS PAL's shape. Survey: `dev/label-placement-algorithms.md`. Needs
     Tasks 398 and 399.
@@ -388,14 +381,12 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     it, and today the graph differs at every zoom and every pan.
   - Straight-top as a third candidate position belongs here: measured (arXiv 2407.11996) as
     preferred over Imhof's top-right.
-  - **A relaxation/nudge pass may belong in the strategy** (Tom, 2026-08-17) — check whether the
-    literature sequences it relative to the reduction rules above. Of limited value until labels
-    start in generally open territory (outward from congestion), so it follows rather than precedes
-    the rest of Phase 3.
-  - **"Most-open angle(s)" does NOT belong to this task** — literature pass done 2026-08-17, see
-    `dev/most-open-angle-brainstorm.md` and Task 411. It is candidate *generation*, orthogonal to the
-    reduction rules, and it is the "start in open territory" precondition the relaxation bullet above
-    already assumes — so recording it here had the dependency backwards.
+  - **A relaxation/nudge pass may belong in the strategy** (Tom, 2026-08-17) — check how the
+    literature sequences it against the reduction rules. Of limited value until labels start in open
+    territory, so it follows rather than precedes the rest of Phase 3.
+  - **"Most-open angle(s)" is Task 411, not this task** — candidate *generation*, orthogonal to the
+    reduction rules, and the "start in open territory" precondition the relaxation bullet assumes.
+    Literature pass done 2026-08-17: `dev/most-open-angle-brainstorm.md`.
 
 - 40|411| **Most-open angle: pick each label's home direction from its own surroundings instead of a
   fixed top-right.** Tom's idea, checked against the survey 2026-08-17 —
@@ -801,25 +792,23 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     never places content under them. That does not survive a pan, which is why this still exists.
 
 - 35|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
-  and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves both shipped
-  2026-08-14; phase 3, time, is the open one. The engine makes it a mapping-and-UI job rather than a
-  numerical one, which is the entire reason it was worth vendoring.
+  and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves shipped 2026-08-14;
+  time is the open one, and the engine makes it a mapping-and-UI job rather than a numerical one.
   - **Task 384 (colour coding with a ramp picker) is preparation for this, not decoration** — a
     number per element per timestep cannot be read any other way.
   - **Still substituted with a reported open pipe: PBV and GPV.** A GPV's behaviour is a head-loss
     CURVE and a PBV's a fixed pressure drop, and this page has no element for either.
   - **A valve has THREE states in EPANET, not two:** closed, fully open, and ACTIVE. `EN_INITSTATUS =
-    OPEN` opens it fully with its setting IGNORED; `EN_INITSETTING` is what restores active, so
-    status is written BEFORE setting. Written the other way a network solves with the valve wide
-    open — exactly one k V²/2g of missing head, with flows still agreeing to 2e-10 m³/s.
-  - **The gate is about sequencing only, not about our right to the name.** Tom, 2026-08-14: *"we
-    have no less technical authority to call ourselves EPANET, more moral authority, and all the
-    legal authority since it's all public domain."* There is no node-count limit and the gate must
-    never be described as one (`dev/positioning.md` §6).
-  - **Raised 20 → 60 then lowered 60 → 35 the same day; the reversal is the instructive part.** Tom:
-    *"I have got distracted… I erred in pushing LibreEPANET.org at the expense of scenarios."* A gate
-    on a launch nobody is waiting for is not urgent work, and the ruling that survived contact was
-    the one with a named user behind it.
+    OPEN` opens it fully with its setting IGNORED; `EN_INITSETTING` restores active, so status is
+    written BEFORE setting. Written the other way a network solves with the valve wide open — exactly
+    one k V²/2g of missing head, with flows still agreeing to 2e-10 m³/s.
+  - **The gate is about sequencing only, not our right to the name.** Tom, 2026-08-14: *"we have no
+    less technical authority to call ourselves EPANET, more moral authority, and all the legal
+    authority since it's all public domain."* No node-count limit; never describe the gate as one
+    (`dev/positioning.md` §6).
+  - **Raised 20 → 60 then lowered 60 → 35 the same day.** Tom: *"I have got distracted… I erred in
+    pushing LibreEPANET.org at the expense of scenarios."* A gate on a launch nobody is waiting for
+    is not urgent work.
 
 - 10|409| **Profiles: a link-length elevation profile along a path, for time-step results.**
   Tom, 2026-08-17. Constantly desirable, not blocking — fit in whenever there is time, same tier as
