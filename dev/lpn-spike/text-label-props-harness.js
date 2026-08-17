@@ -116,9 +116,18 @@ let fieldsEl = L.popupFields();
 let checks = descendants(fieldsEl, c => c.type === 'checkbox');
 let numbers = descendants(fieldsEl, c => c.type === 'number');
 let buttons = descendants(fieldsEl, c => c._tag === 'button');
-// Order matters only for picking the right control out of the tree: alwaysShow ships before bold,
-// the size box before the rotation box.
-const boldBox = checks[1], rotBox = numbers[1], matchBtn = buttons[0], flipBtn = buttons[1];
+// THE BOLD BOX IS FOUND BY ITS OWN LABEL, not by its position in the popup. It used to be checks[1]
+// and Task 407 added a third checkbox above it (a Text label's `active`), which silently made this
+// harness drive the wrong control -- a positional pick is a claim about every future row, not about
+// the row under test. The number boxes stay positional: size then rotation, and nothing has ever
+// sat between them.
+function checkboxLabelled(key, fallback) {
+	const want = (EngCalcs.pageConfig && EngCalcs.pageConfig[key]) || fallback;
+	return descendants(fieldsEl, c => c.type === 'checkbox' && c.parentNode
+		&& String(c.parentNode.textContent || '').indexOf(want) >= 0)[0];
+}
+const boldBox = checkboxLabelled('lpn_field_text_bold', 'Bold text'),
+	rotBox = numbers[1], matchBtn = buttons[0], flipBtn = buttons[1];
 ok('a bold checkbox exists', !!boldBox);
 ok('a rotation number box exists', !!rotBox);
 ok('the rotation box offers presets', rotBox && rotBox.getAttribute('list') === 'lpn_rot_presets');

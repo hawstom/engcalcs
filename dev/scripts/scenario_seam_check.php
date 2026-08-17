@@ -55,6 +55,70 @@ if (count($props) < 3) {
     exit(1);
 }
 
+// ---- 1b. Every GROUP in the whitelist must be one elGroup() can actually return ----------------
+//
+// Added with the Text label group (Task 407), because the failure it guards is the one that had
+// already happened once. elGroup() told a link from a node and called EVERYTHING ELSE a node, so a
+// label keyed as 'n:<id>' and collided with a junction of the same id -- Task 324's bug, which
+// measured 7 / 35 / 72 colliding ids in Net1 / Net2 / Net3. Widening LPN_OVERRIDABLE is one line
+// and forgetting the classifier is free, and nothing downstream complains: the overrides are
+// written, read back by the wrong element, and every screen looks right.
+//
+// So the two are checked against each other. The group names are parsed from the whitelist and
+// each must appear as a returned string literal in elGroup(); the reverse is not required, since a
+// group may legitimately be classified before it has any overridable property.
+preg_match_all('/^\t\t(\w+)\s*:\s*\{/m', $m[1], $gm);
+$groups = $gm[1];
+if (count($groups) < 2) {
+    fwrite(STDERR, "FAIL: parsed " . count($groups) . " group(s) from LPN_OVERRIDABLE. The parse has drifted;\n");
+    fwrite(STDERR, "node and link have both been there since Task 184, so fewer than two cannot be right.\n");
+    exit(1);
+}
+if (!preg_match('/function elGroup\(el\) \{(.*?)\n\t\}/s', $src, $eg)) {
+    fwrite(STDERR, "FAIL: could not find elGroup() in js/looped-network.js. It is the one place an\n");
+    fwrite(STDERR, "element's group is decided, and this check cannot verify the whitelist without it.\n");
+    exit(1);
+}
+$missing = [];
+foreach ($groups as $g) {
+    if (strpos($eg[1], "'" . $g . "'") === false) { $missing[] = $g; }
+}
+if ($missing) {
+    fwrite(STDERR, "FAIL: LPN_OVERRIDABLE names group(s) elGroup() never returns: " . implode(', ', $missing) . "\n\n");
+    fwrite(STDERR, "Every element of such a group is therefore classified as something else -- in practice\n");
+    fwrite(STDERR, "as a node -- so its overrides are keyed 'n:<id>' and collide with a node of the same id\n");
+    fwrite(STDERR, "(Task 324). Teach elGroup() to recognise the group BY SOMETHING IT HAS, never by\n");
+    fwrite(STDERR, "'neither of the others', and give ovKeyFor() its prefix.\n");
+    exit(1);
+}
+
+// ---- 1c. The key format is spelled in ovKeyFor() and nowhere else ------------------------------
+//
+// ovKey()/ovKeyFor()'s own comment claims this ("every read, write, count, rename and purge goes
+// through ovKey()/ovKeyFor() and none of them spells 'n:', 'l:' or 'x:' itself"). It is worth a
+// line of check rather than a line of prose: a second copy of the format is free to agree with the
+// current one and drift the day a group is added, which is exactly when it would be written.
+//
+// TWO LINES ARE EXEMPT AND NAMED, rather than the check being loosened until they pass:
+// nodeLabelKey()/linkLabelKey() are the LABEL PLACEMENT pass's own identity strings (js/lpn-collide.js
+// compares ownership by them) and merely happen to be spelled the same way. They index no override
+// map and never meet one. Naming them here keeps the rule absolute everywhere else.
+$exemptFns = ['function nodeLabelKey', 'function linkLabelKey', 'function ovKeyFor'];
+$prefixLines = [];
+foreach (explode("\n", $src) as $i => $line) {
+    if (preg_match('/^\s*(\/\/|\*|\/\*)/', $line)) { continue; }
+    $exempt = false;
+    foreach ($exemptFns as $fn) { if (strpos($line, $fn) !== false) { $exempt = true; break; } }
+    if ($exempt) { continue; }
+    if (preg_match("/'(?:n|l|x):'/", $line)) { $prefixLines[] = ($i + 1) . ': ' . trim($line); }
+}
+if ($prefixLines) {
+    fwrite(STDERR, "FAIL: the override key format is spelled outside ovKeyFor():\n");
+    foreach ($prefixLines as $p) { fwrite(STDERR, "  js/looped-network.js:$p\n"); }
+    fwrite(STDERR, "\nOne seam, one spelling. Call ovKey(el) or ovKeyFor(group, id) instead.\n");
+    exit(1);
+}
+
 // ---- 2. Find every direct write to one of them -------------------------------------------------
 $lines = explode("\n", $src);
 $pattern = '/(?<![\w.])([A-Za-z_$][\w$]*)\._(' . implode('|', array_map('preg_quote', $props)) . ')\s*=(?!=)/';
@@ -70,8 +134,8 @@ foreach ($lines as $i => $line) {
     }
 }
 
-printf("Scenario write seam — %d overridable propert(ies) parsed from LPN_OVERRIDABLE: %s\n",
-    count($props), implode(', ', $props));
+printf("Scenario write seam — %d group(s) (%s) and %d overridable propert(ies) parsed from LPN_OVERRIDABLE: %s\n",
+    count($groups), implode(', ', $groups), count($props), implode(', ', $props));
 printf("  %d approved base-write(s), %d unmarked direct write(s)\n\n", $approved, count($bad));
 
 if ($bad) {

@@ -212,7 +212,7 @@ byId.lpn_toolbar.querySelectorAll = () => [];
     const low2 = d2.labels.filter(t => !t.anchorNode).reduce((a, b) => (a.y > b.y ? a : b));
     const gap2 = Math.min(...ring2) - (low2.y + dts * low2.sizeMult / 2);
     ok('...and still clears it when drawn AT the default text size',
-      gap2 > 15 && gap2 < 80, gap2.toFixed(1) + ' units, lowest line "' + low2.text + '"');
+      gap2 > 15 && gap2 < 80, gap2.toFixed(1) + ' units, lowest line "' + low2._text + '"');
   }
   // TEXT SIZE IS THE SHIPPED DEFAULT AND THE EXAMPLE MUST NOT TOUCH IT. Tom, 2026-08-09: ship a
   // default that suits the example, and "anything other is on the user, not us." So the stored 2.5
@@ -235,7 +235,7 @@ byId.lpn_toolbar.querySelectorAll = () => [];
 
   // ---- annotations, all composed from already-translated strings ----
   const PC = EngCalcs.pageConfig;
-  const texts = doc.labels.map(t => t.text);
+  const texts = doc.labels.map(t => t._text);
   ok('five Text annotations were placed', doc.labels.length === 5, doc.labels.length);
   ok('title block uses the real brand and menu strings',
     texts.includes(PC.menu_brand) && texts.includes(PC.lpn_main_menu));
@@ -263,11 +263,11 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // must clear its node horizontally, which is a property of the MEASURED width, not of a constant.
   doc.labels.filter(t => t.anchorNode).forEach(t => {
     const halfW = L.labelWidth(t.id) / 2;
-    ok('"' + t.text + '" sits entirely to one side of its anchor',
+    ok('"' + t._text + '" sits entirely to one side of its anchor',
       Math.abs(t.x) > halfW,
       'offset ' + t.x.toFixed(1) + ' vs half-width ' + halfW.toFixed(1));
     // ...and the side the leader is drawn for must agree with the side the label is actually on.
-    ok('..."' + t.text + '" leader is drawn on the matching side',
+    ok('..."' + t._text + '" leader is drawn on the matching side',
       L.labelSide(t.id) === (t.x < 0 ? 'left' : 'right'), L.labelSide(t.id));
     // LEADER ANGLE. The leader runs from the node to the label's near edge, which sits exactly
     // `gap` away horizontally -- the text width cancels -- so the slope is atan(|dy| / gap) and
@@ -276,9 +276,9 @@ byId.lpn_toolbar.querySelectorAll = () => [];
     // not deliver. Tom, 2026-08-09: "Leaders don't look great horizontal."
     const gap = Math.abs(t.x) - halfW;
     const deg = Math.atan2(Math.abs(t.y), gap) * 180 / Math.PI;
-    ok('..."' + t.text + '" leader rises at the shared callout angle, not flat',
+    ok('..."' + t._text + '" leader rises at the shared callout angle, not flat',
       near(deg, 70, 0.5), deg.toFixed(1) + ' degrees');
-    ok('..."' + t.text + '" leader rises (label is above its node, not level)', t.y < 0,
+    ok('..."' + t._text + '" leader rises (label is above its node, not level)', t.y < 0,
       't.y = ' + t.y.toFixed(1));
   });
 
@@ -329,7 +329,7 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // minimum, because a second system that quietly stole the network low would make this callout a
   // lie while every other assertion still passed.
   const minId = Object.keys(press).reduce((a, b) => (press[a] <= press[b] ? a : b));
-  const callout = doc.labels.find(t => t.text === PC.bpn_p_min);
+  const callout = doc.labels.find(t => t._text === PC.bpn_p_min);
   ok('the "Lowest pressure" callout is on the actual minimum-pressure junction',
     callout && callout.anchorNode === minId,
     'callout on ' + (callout && callout.anchorNode) + ', minimum at ' + minId);
@@ -389,7 +389,7 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // a title that falls outside it gets clipped by the fit (which is Task 254's second complaint).
   const b = L.bbox();
   ok('bbox encloses every node, both systems', nodes.every(n => n.x >= b.minx && n.x <= b.maxx && n.y >= b.miny && n.y <= b.maxy));
-  const title = doc.labels.find(t => t.text === PC.menu_brand);
+  const title = doc.labels.find(t => t._text === PC.menu_brand);
   // The CURRENT text size, not the default -- this run deliberately seeds a returning visitor's
   // stored 2.5, and bbox() must track whatever size the labels are actually rendered at.
   const titleHalfH = s.textSize * title.sizeMult / 2;   // dominant-baseline:central

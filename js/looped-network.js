@@ -2067,7 +2067,16 @@ var EngCalcs = EngCalcs || {};
 		// `setting` is a VALVE's setting (Task 248 phase 2). It belongs here for the same reason
 		// demand does: "what if the pressure reducing valve is set to 50 psi" is an operating
 		// question, which is what a scenario asks, where the valve's diameter is what was built.
-		link: { diameter: true, roughness: true, k: true, status: true, length: true, setting: true, active: true }
+		link: { diameter: true, roughness: true, k: true, status: true, length: true, setting: true, active: true },
+		// A TEXT LABEL IS A THIRD GROUP (Task 407), and it gets exactly two properties. `text` is what
+		// the note SAYS and `active` is whether it is there at all -- together they answer "this
+		// scenario has its own note" with no second mechanism, because the note lives in Base switched
+		// off and one scenario switches it on, exactly as a proposed loop does.
+		// Its POSITION, its size multiplier, its anchor node and its alignment are deliberately absent
+		// and stay Base-owned, for Task 338's reason applied to annotation: two scenarios of one
+		// network must LOOK the same or you cannot compare them, and a note that jumps around the map
+		// as the reader flips scenarios is unreadable.
+		label: { text: true, active: true }
 	};
 
 	// The one resolver seam. Solver, renderer, labels and popups read element properties through
@@ -2097,7 +2106,19 @@ var EngCalcs = EngCalcs || {};
 	// A LINK IS TOLD FROM A NODE BY `from`, not by a list of type names: another element type
 	// (a valve) can arrive at any time, and a hardcoded type list would silently classify it as a
 	// node and quietly refuse every override on it.
-	function elGroup(el) { return (el && el.from !== undefined) ? 'link' : 'node'; }
+	//
+	// EVERY GROUP IS RECOGNISED BY SOMETHING IT HAS, never by "neither of the others" (Task 407). A
+	// Text label carries no `from`, so the old two-way test called it a node and keyed it 'n:<id>' --
+	// which is Task 324's collision verbatim, since a label X1 and a junction X1 are both legal here
+	// and a label's `active` would have switched a junction out of the solve. `_text` is the property
+	// only a label has, and every label has one: addText() and the .inp importer both write it, and
+	// migrateSaved() supplies it (as '' if need be) for every label ever saved.
+	function elGroup(el) {
+		if (!el) { return 'node'; }
+		if (el.from !== undefined) { return 'link'; }
+		if (el._text !== undefined) { return 'label'; }
+		return 'node';
+	}
 	// THE OVERRIDE MAP'S KEY, and it carries the element's GROUP because an id alone does not
 	// identify an element (ROADMAP Task 324). EPANET keeps nodes and links in SEPARATE namespaces,
 	// so a junction 20 and a pipe 20 are both legal and both ordinary -- re-measured 2026-08-14 on
@@ -2108,9 +2129,12 @@ var EngCalcs = EngCalcs || {};
 	// junction off silently dropped an unrelated pipe out of the solve.
 	//
 	// ONE SEAM, so the format is stated once: every read, write, count, rename and purge goes
-	// through ovKey()/ovKeyFor() and none of them spells 'n:' or 'l:' itself.
+	// through ovKey()/ovKeyFor() and none of them spells 'n:', 'l:' or 'x:' itself.
+	// 'x:' is the Text label's prefix (Task 407), matching the 'X' its ids are minted under.
 	function ovKey(el) { return ovKeyFor(elGroup(el), el && el.id); }
-	function ovKeyFor(group, id) { return (group === 'link' ? 'l:' : 'n:') + id; }
+	// One line on purpose: dev/scripts/scenario_seam_check.php exempts this function BY NAME from the
+	// rule that nothing else spells a key prefix, and it reads the source a line at a time.
+	function ovKeyFor(group, id) { return (group === 'link' ? 'l:' : group === 'label' ? 'x:' : 'n:') + id; }
 	function isOverridable(el, prop) { return !!(LPN_OVERRIDABLE[elGroup(el)] || {})[prop]; }
 	function inBaseScenario() { return !!activeScenario().isBase; }
 	function hasOverride(el, prop) {
@@ -3832,7 +3856,7 @@ var EngCalcs = EngCalcs || {};
 			'dominant-baseline': labelVAlign(lb) === 'hanging' ? 'hanging' : 'central',
 			'data-lbl': lb.id, style: textLabelStyle(lb)
 		}, labelsLayer);
-		text.textContent = lb.text;
+		text.textContent = effective(lb, 'text');
 		// MEASURED AFTER THE STYLE IS ON THE ELEMENT, which is the whole reason bold can be a
 		// style rather than a second measurement path: bold glyphs are wider, so a width taken
 		// before the weight was applied would size the collision box for the lighter text
@@ -3843,6 +3867,20 @@ var EngCalcs = EngCalcs || {};
 		noteTextWidth(labelEls[lb.id], w);
 		applyTextLabelRotation(lb, labelEls[lb.id], px, py);
 		if (lb.anchorNode) { labelsByAnchor[lb.anchorNode].push(lb.id); }
+	}
+	// ONE function for "this label's CONTENT changed", because the three steps after it are always
+	// the same three and always in this order: push the words into the element that already exists
+	// (a second buildLabelEls() would orphan the first one in the DOM), re-measure -- the width sizes
+	// the mask, the collision box and zoom-to-fit -- then re-run the geometry computed from it and
+	// the visibility threshold computed from the geometry. Reads through effective(), so switching
+	// scenarios and editing the text are the same code path (Task 407).
+	function refreshLabelContent(id) {
+		var lb = labelById(id), le = labelEls[id];
+		if (!lb || !le) { return; }
+		le.text.textContent = effective(lb, 'text');
+		try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
+		updateLabelGeometry(id);
+		applyLabelVisibility();
 	}
 
 	function buildDom() {
@@ -5115,10 +5153,17 @@ var EngCalcs = EngCalcs || {};
 	// the label still appears exactly where the user tapped, not snapped onto the node itself.
 	function addText(x, y, anchorNode) {
 		var id = mintId('X'), an = anchorNode ? nodeById(anchorNode) : null;
+		// `_text` underscored, like every other overridable property (Task 184/146.08 step 2, Task
+		// 407): a call site that reads lb.text without going through effective() gets undefined
+		// immediately rather than reading Base while a scenario says something else.
 		var lb = an
-			? { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x - an.x, y: y - an.y, anchorNode: anchorNode, sizeMult: 1 }
-			: { id: id, text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null, sizeMult: 1 };
+			? { id: id, _text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x - an.x, y: y - an.y, anchorNode: anchorNode, sizeMult: 1 }
+			: { id: id, _text: EngCalcs.pageConfig.lpn_new_text || 'Text', x: x, y: y, anchorNode: null, sizeMult: 1 };
 		doc.labels.push(lb);
+		// Drawn inside a scenario, a Text is born in Base switched off and switched on here -- the
+		// same membership rule addNode()/addLink() follow, and what makes "this scenario has its own
+		// note" need no second mechanism (Task 407).
+		bornInScenario(lb);
 		buildLabelEls(lb);
 		// A newly-added Text was never actually persisted (Task 146 Phase 1 gap, found while
 		// wiring the text-edit popup, 2026-07-30) -- addNode()/addLink() reach saveToStorage()
@@ -5141,8 +5186,12 @@ var EngCalcs = EngCalcs || {};
 	// that is work in documents the user is not looking at.
 	// A node carries its incident links with it either way: a link to a node that is not there is
 	// the "dangling-link" diagnostic, and leaving one behind would trade a delete for an error.
+	// `kind` IS THE OVERRIDE GROUP -- 'node', 'link' or, since Task 407, 'label'. A Text is deleted
+	// by the same rule as everything else because it now has scenario values to lose: destroying it
+	// from inside a scenario would take another scenario's note with it.
 	function deleteElement(kind, id) {
-		var pc = EngCalcs.pageConfig || {}, el = kind === 'node' ? nodeById(id) : linkById(id);
+		var pc = EngCalcs.pageConfig || {},
+			el = kind === 'node' ? nodeById(id) : kind === 'label' ? labelById(id) : linkById(id);
 		// One guard for both branches. A delete gesture can name an element that is already gone --
 		// a cascade beat it to it, or a second tap landed on the same handle -- and the Base branch
 		// would otherwise walk an incidentLinks entry that no longer exists.
@@ -5169,7 +5218,9 @@ var EngCalcs = EngCalcs || {};
 		keys.forEach(function (k) { lost += overrideCountForElement(k); });
 		if (lost && !window.confirm((pc.lpn_delete_drops_overrides || 'Deleting this also throws away {n} values your scenarios hold for it. Continue?').replace('{n}', lost))) { return; }
 		saveUndoSnapshot();
-		if (kind === 'node') { deleteNode(id); } else { deleteLink(id); }
+		if (kind === 'node') { deleteNode(id); }
+		else if (kind === 'label') { deleteLabelById(id); }
+		else { deleteLink(id); }
 		refreshScenarioStatus();
 	}
 	function deleteNode(id) {
@@ -5409,6 +5460,7 @@ var EngCalcs = EngCalcs || {};
 			labelsByAnchor[lb.anchorNode] = labelsByAnchor[lb.anchorNode].filter(function (x) { return x !== id; });
 		}
 		doc.labels = doc.labels.filter(function (x) { return x.id !== id; });
+		purgeOverrides(ovKeyFor('label', id));   // see deleteNode(): a real deletion takes them with it
 		if (currentPopup && currentPopup.kind === 'label' && currentPopup.id === id) { closePopup(); }
 	}
 
@@ -5430,7 +5482,9 @@ var EngCalcs = EngCalcs || {};
 	// 7 (Task 354, 2026-08-16): coordinates are LOCAL to a `doc.origin`, which the file carries in
 	// its own Cartesian frame. Every existing document migrates by having one computed for it, and
 	// the ones near zero get {0, 0} and are byte-identical afterwards.
-	var LPN_STORAGE_VERSION = 7;
+	// 8 (Task 407, 2026-08-17): a Text label's words are stored as `_text`, the underscored spelling
+	// every overridable property uses, because what a note SAYS is now a scenario value.
+	var LPN_STORAGE_VERSION = 8;
 	// ---- ROADMAP Task 274, second half (Tom, 2026-08-11: "Eventually needs to be Cartesian. If we
 	// can do that now without causing trouble, let's do it.") ----
 	//
@@ -5777,7 +5831,29 @@ var EngCalcs = EngCalcs || {};
 		});
 		return { moved: moved, dropped: dropped, ambiguous: both };
 	}
+	// v7 -> v8's rename, split out because it is the one migration step that must ALSO run outside
+	// the version chain (see migrateSaved()). A label's words move to `_text`, the spelling every
+	// overridable property is stored under, and a label that somehow carries neither is given '' --
+	// not left absent, because `_text` is what elGroup() recognises a label BY, and a label it
+	// cannot recognise keys as 'n:<id>' and collides with a junction of the same id (Task 324).
+	function renameLabelText(saved) {
+		(saved.labels || []).forEach(function (lb) {
+			if (!lb) { return; }
+			if (Object.prototype.hasOwnProperty.call(lb, 'text')) {
+				lb._text = lb.text;   // base-write: a migration rewrites a SAVED document, before any scenario reads it
+				delete lb.text;
+			}
+			if (lb._text === undefined) { lb._text = ''; }   // base-write: same -- the stored shape, not a live edit
+		});
+	}
 	function migrateSaved(saved) {
+		// RUN ON EVERY DOCUMENT, NOT ONLY AS THE v7 -> v8 STEP, and v2 is the whole reason. A v2
+		// document deliberately lags at v2 until the user answers its units question, so it reaches
+		// no later step in this chain -- and a lagging document must still show its notes and must
+		// still key its labels apart from its junctions. This step is safe to run unconditionally
+		// where the others are not, because it reinterprets nothing: it is a storage SPELLING, with
+		// no unit, coordinate or number question attached, and it is idempotent.
+		renameLabelText(saved);
 		if (saved.v === 1) {
 			// The single autosaved network becomes the project's Base. Its name is left blank, not
 			// set to "Untitled": that word is UI, and the UI localizes it (see `project` above).
@@ -5878,6 +5954,15 @@ var EngCalcs = EngCalcs || {};
 		if (saved.v === 6) {
 			rebaseDocument(saved);
 			saved.v = 7;
+		}
+		// ---- v7 -> v8: A TEXT LABEL'S WORDS BECOME `_text` (Task 407) ------------------------------
+		//
+		// The rename itself already ran at the top of this function, unconditionally, for the reason
+		// stated there. What the VERSION buys is the other direction: a v8 document opened by an older
+		// page would draw every note blank, and prepareDocument() refuses a document newer than the
+		// page rather than half-reading it. So the stamp is the guard, not the rename.
+		if (saved.v === 7) {
+			saved.v = 8;
 		}
 		// **There is deliberately NO v2 -> v3 step here, and v2 is the ONLY version that lags.**
 		// Every other migration in this function converts the document and stamps it; this one
@@ -6776,7 +6861,7 @@ var EngCalcs = EngCalcs || {};
 			// this record holds and carryInpTokens refuses it without being told. A free label
 			// stores the file's own point and keeps it.
 			return carryInpTokens(lb, {
-				id: mintTextId(), text: lb.text,
+				id: mintTextId(), _text: lb.text,
 				x: an ? lb.x - an.x : lb.x,
 				y: an ? lb.y - an.y : lb.y,
 				anchorNode: an ? lb.anchorNode : null,
@@ -10104,13 +10189,13 @@ var EngCalcs = EngCalcs || {};
 		function annotate(x, y, anchorNode, text, sizeMult, side) {
 			if (!text) { return null; }   // key missing from pageConfig: draw nothing, never "Text"
 			var lb = addText(x, y, anchorNode);
-			lb.text = text;
+			setProp(lb, 'text', text);   // the one write seam, as every property editor does
 			lb.sizeMult = sizeMult;
 			// Same two steps the text/size fields in renderLabelFields() take after an edit: push the
 			// new content into the existing element and re-measure, rather than rebuilding it (a
 			// second buildLabelEls() would leave the first element orphaned in the DOM).
 			var le = labelEls[lb.id];
-			le.text.textContent = lb.text;
+			le.text.textContent = effective(lb, 'text');
 			le.text.style.fontSize = effectiveFontSize(lb.sizeMult) + 'px';
 			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measure can throw; stale width stands */ }
 			if (anchorNode && side) {
@@ -10489,7 +10574,7 @@ var EngCalcs = EngCalcs || {};
 				if (t.dataset.node) { deleteElement('node', t.dataset.node); }
 				else if (t.classList.contains('lpn-vhandle')) { saveUndoSnapshot(); removeVertex(t.dataset.link, +t.dataset.vidx); }
 				else if (t.dataset.link !== undefined) { deleteElement('link', t.dataset.link); }
-				else if (t.dataset.lbl !== undefined) { saveUndoSnapshot(); deleteLabelById(t.dataset.lbl); }
+				else if (t.dataset.lbl !== undefined) { deleteElement('label', t.dataset.lbl); }
 			} else if (mode === 'select' && t.dataset.node) {
 				openPopup(t.dataset.node, e.clientX, e.clientY);
 			} else if (mode === 'select' && t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')) {
@@ -11626,8 +11711,11 @@ var EngCalcs = EngCalcs || {};
 			// the automatic version is the wrong shape: "the biggest one survives" makes a legend or
 			// a north arrow compete on font size for a property it should just declare, and it
 			// silently changes which label is permanent whenever somebody resizes another one.
+			// A label switched OFF in this scenario is not there at all, and that beats every other
+			// rule here -- including "Always show this label", which is an answer to the zoom
+			// threshold and says nothing about membership (Task 407).
 			var mult = +lb.sizeMult > 0 ? +lb.sizeMult : 1,
-				gone = on && !lb.alwaysShow && vw > lim * mult;
+				gone = !isActive(lb) || (on && !lb.alwaysShow && vw > lim * mult);
 			[le.text, le.leader].forEach(function (e) {
 				if (e && e.classList) { e.classList.toggle('lpn-lbl-hidden', gone); }
 			});
@@ -12639,17 +12727,40 @@ var EngCalcs = EngCalcs || {};
 	// halo), re-solve, re-count the status bar, persist. One seam, so a new field cannot forget a
 	// third of it.
 	function afterPropertyEdit(el) {
-		if (elGroup(el) === 'link') { rebuildLink(el); } else if (nodeEls[el.id]) { updateNode(el.id); }
+		var group = elGroup(el);
+		if (group === 'link') { rebuildLink(el); }
+		// A Text label's redraw is its content, its measured width and its visibility -- the same
+		// three whether the words changed or the label was switched off (Task 407).
+		else if (group === 'label') { refreshLabelContent(el.id); }
+		else if (nodeEls[el.id]) { updateNode(el.id); }
 		refreshScenarioMarks();
 		refreshScenarioStatus();
 		scheduleSolve();
 		saveToStorage();
 	}
+	// A BASE-WIDE ROW SAYS SO, INSTEAD OF SAYING NOTHING (ROADMAP Task 412). Tom, 2026-08-17: *"How
+	// do they know, other than trial and error, that position applies to all?"* They could not: the
+	// tick appeared on an overridable row and NOTHING appeared on the others, so the signal was an
+	// ABSENCE -- and an absence cannot be told from an oversight, a bug, or a row nobody finished.
+	// Presence against presence instead, so the two states are read the same way.
+	// Static and non-interactive: there is no box, because there is nothing here to decide. It
+	// carries the sentence Task 338 owes -- a scenario is a set of hydraulic differences, and the
+	// drawing belongs to the network rather than to the scenario.
+	function baseWideMarker(fields, pc) {
+		var note = document.createElement('span');
+		note.className = 'lpn-ov-marker';
+		setFieldLabel(note, pc.lpn_scenario_base_wide || 'Same in all scenarios', pc.lpn_scenario_base_wide_tip);
+		fields.appendChild(note);
+		fields.appendChild(document.createElement('br'));
+	}
 	function overrideMarker(fields, el, prop, format) {
 		var pc = EngCalcs.pageConfig || {};
 		// Nothing at all in Base: there is no scenario to belong to, and a permanently-unticked box
-		// on every row of every popup would be noise the overwhelming majority of the time.
-		if (!el || inBaseScenario() || !isOverridable(el, prop)) { return; }
+		// on every row of every popup would be noise the overwhelming majority of the time. That
+		// argument is about BASE and still holds there; inside a scenario the row is in a different
+		// state and gets the static marker above instead.
+		if (!el || inBaseScenario()) { return; }
+		if (!isOverridable(el, prop)) { baseWideMarker(fields, pc); return; }
 		var label = document.createElement('label'), box = document.createElement('input'),
 			text = document.createElement('span'), on = hasOverride(el, prop);
 		label.className = 'lpn-ov-marker';
@@ -13209,6 +13320,9 @@ var EngCalcs = EngCalcs || {};
 		pushHereButton(fields, n);
 		readonlyField(fields, pc.lpn_field_x || 'X', outwardX(n.x));
 		readonlyField(fields, pc.lpn_field_y || 'Y', outwardY(n.y));
+		// Tom's question verbatim (Task 412): *"How do they know, other than trial and error, that
+		// position applies to all?"* One marker for the pair, since X and Y are one concept.
+		overrideMarker(fields, n, 'y');
 		tipsIn(fields);
 	}
 	function openPopup(nodeId, sx, sy) {
@@ -13484,21 +13598,28 @@ var EngCalcs = EngCalcs || {};
 			an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
 		title.textContent = pc.lpn_tool_add_text || 'Text';
 		clearFields(fields);
-		input.type = 'text'; input.value = lb.text;
+		// WHAT THE NOTE SAYS IS OVERRIDABLE (Task 407), so this row reads through effective() and
+		// writes through setProp() like every other property editor on the page. Writing lb._text
+		// here would edit Base from inside a scenario -- under every other scenario at once, and
+		// with the right words still on screen, which is the whole reason the seam exists.
+		input.type = 'text'; input.value = effective(lb, 'text');
 		input.addEventListener('change', function () {
-			if (input.value === lb.text) { return; }
+			if (input.value === effective(lb, 'text')) { return; }
 			saveUndoSnapshot();
-			lb.text = input.value;
-			var le = labelEls[labelId];
-			le.text.textContent = lb.text;
-			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
-			updateLabelGeometry(labelId);
-			saveToStorage();
+			setProp(lb, 'text', input.value);
+			afterPropertyEdit(lb);
 		});
 		label.textContent = (pc.lpn_tool_add_text || 'Text') + ' ';
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
+		overrideMarker(fields, lb, 'text');
+		// PRESENCE, in the same row and the same words a node or a link uses (Task 407). Switched off
+		// in Base is how a note is parked; switched on in one scenario is how that scenario gets a
+		// note of its own, with no second mechanism and no second element set.
+		// It sits directly under the text so the popup's TWO scenario properties are together, above
+		// everything that belongs to the drawing.
+		activeField(fields, lb);
 		// Task 146.03: per-label size multiplier, stacked on top of the shared settings.textSize
 		// (effectiveFontSize(lb.sizeMult) in buildLabelEls/refreshFontSizes above).
 		var sizeLabel = document.createElement('label'), sizeInput = document.createElement('input');
@@ -13615,6 +13736,12 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(document.createElement('br'));
 		readonlyField(fields, pc.lpn_field_x || 'X', outwardX(an ? an.x + lb.x : lb.x));
 		readonlyField(fields, pc.lpn_field_y || 'Y', outwardY(an ? an.y + lb.y : lb.y));
+		// ONE marker for the whole group above it, not one per row (Task 412). X and Y are a single
+		// concept shown as two rows, and the size, weight and angle beside them belong to the same
+		// answer -- the drawing. Repeating the sentence five times is the noise this function's own
+		// comment warns about; saying it once, at the end of the rows it covers, is not.
+		overrideMarker(fields, lb, 'y');
+		tipsIn(fields);
 	}
 	function openLabelPopup(labelId, sx, sy) {
 		currentPopup = { kind: 'label', id: labelId };
