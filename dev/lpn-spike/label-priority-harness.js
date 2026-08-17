@@ -101,12 +101,13 @@ function orderOf(map) {
 const def = L.defaultLabelSettings();
 
 // Tom, 2026-08-16, verbatim: "Link (drop last first): q flow, v velocity, H head loss, s gradient,
-// d diameter, C roughness, Km local losses" -- plus `id` at the head, which never sheds because it
-// is the key every other number on the label is attributed by, and `length` placed with the other
-// inputs before roughness on his ruling the same day.
+// d diameter, C roughness, Km local losses" -- with `length` placed among the inputs before
+// roughness, and `id` LAST so it sheds first. The id rank reversed on 2026-08-16: it shipped as
+// never-shed on the Maplex key-number argument, and Tom overruled it because a link label lies along
+// its own pipe, so the drawing already says which pipe the numbers belong to.
 eq(orderOf(def.priority.link),
-	['id', 'flow', 'velocity', 'headloss', 'gradient', 'diameter', 'length', 'roughness', 'km'],
-	'link shed order is Tom\'s list, id first and km last');
+	['flow', 'velocity', 'headloss', 'gradient', 'diameter', 'length', 'roughness', 'km', 'id'],
+	'link shed order is Tom\'s list, flow kept longest and id shed first');
 
 // Tom's node list read LAST FIRST, which is how he wrote it: "use last first if on".
 eq(orderOf(def.priority.node), ['demand', 'pressure', 'elev', 'head'],
@@ -117,7 +118,9 @@ ok(orderOf(def.priority.node).length !== orderOf(def.priority.link).length,
 	'node and link priority maps are separate lists');
 ok(def.priority.node.id === undefined,
 	'a node ID carries no rank: an ID is never the reason one label beats another');
-eq(def.priority.link.id, 0, 'a link ID is rank 0 and never sheds');
+ok(def.priority.link.id === Math.max.apply(null, Object.keys(def.priority.link).map(function (k) {
+	return def.priority.link[k];
+})), 'a link ID is the LAST rank, so it is the first value shed');
 
 // Every ranked field is a real field, and every numeric field is ranked. A rank on a field that
 // does not exist is invisible; a field with no rank is undefined in a comparator, which is not a

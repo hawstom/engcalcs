@@ -2218,16 +2218,23 @@ var EngCalcs = EngCalcs || {};
 			// localStorage, and a shape change there silently reinterprets every already-saved
 			// network's toggles.
 			//
-			// Link order is Tom's, 2026-08-16: id, flow, velocity, headloss, gradient, diameter,
-			// length, roughness, km -- so the minor-loss coefficient goes first and the flow survives
-			// longest. `id` is rank 0 and NEVER sheds: it is the key by which every other number on
-			// the label is attributed, which is what Maplex calls the key-number and puts at the very
-			// bottom of its own fitting cascade. `length` sits with the other inputs, before
-			// roughness, on Tom's ruling the same day.
+			// Link order is Tom's, 2026-08-16: flow, velocity, headloss, gradient, diameter, length,
+			// roughness -- so the flow survives longest. `length` sits with the other inputs, before
+			// roughness, on his ruling the same day.
+			//
+			// **`id` IS RANK 9 AND SHEDS FIRST, WHICH REVERSES THE FIRST DRAFT.** It shipped at rank
+			// 0, never-shed, on the Maplex reasoning that an ID is the key by which every other
+			// number on the label is attributed. Tom asked the right question -- *"What does priority
+			// 0 mean for ID? Did we forget it? Make it 9 (first to drop)?"* -- and he is right for a
+			// reason specific to LINK labels: a link label lies ALONG its own pipe, so the drawing
+			// already says which pipe the numbers belong to. The ID is the one value on that label
+			// whose job the label's own position is already doing. (This is the argument that does
+			// NOT carry to node labels, which is why no node ID rank exists at all.) One number to
+			// change back if it reads wrong on a real drawing.
 			priority: {
 				node: { demand: 1, pressure: 2, elev: 3, head: 4 },
-				link: { id: 0, flow: 1, velocity: 2, headloss: 3, gradient: 4,
-					diameter: 5, length: 6, roughness: 7, km: 8 }
+				link: { flow: 1, velocity: 2, headloss: 3, gradient: 4,
+					diameter: 5, length: 6, roughness: 7, km: 8, id: 9 }
 			},
 			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
 			// Global, not per field: the mark answers one network-wide question per field, and Tom
@@ -10631,7 +10638,15 @@ var EngCalcs = EngCalcs || {};
 	// The reserved width of one trailing numeric column, and the gap before it. Both are read by the
 	// spinner and by the spacer that stands in for a missing one, so the two cannot drift apart --
 	// which they had, the old spacer carrying the width and not the margin.
-	var LPN_LABEL_COL_W = '4.5em', LPN_LABEL_COL_GAP = '6px';
+	// **BORDER-BOX IS WHAT MAKES THE HEADINGS LINE UP, AND ITS ABSENCE IS WHY THEY DID NOT.** An
+	// <input> is content-box by default, so a declared width of 3.5em renders 3.5em PLUS its padding
+	// and border -- perhaps 8px wider. The heading spans were exactly their declared width, so each
+	// control sat wider than its own heading and the flex spacer at the left absorbed the whole
+	// difference: every heading slid right, the LEFTMOST by the sum of all four errors and the
+	// rightmost by only one. That is exactly the pattern Tom reported -- "Before is worst and
+	// Priority is almost good" -- and it is the signature of accumulated box-model drift rather than
+	// of a wrong width anywhere.
+	var LPN_LABEL_COL_W = '4.5em', LPN_LABEL_COL_GAP = '6px', LPN_LABEL_AFFIX_W = '3.5em';
 	function labelColumnSpacer() {
 		var spacer = document.createElement('span');
 		spacer.style.width = LPN_LABEL_COL_W;
@@ -10659,7 +10674,7 @@ var EngCalcs = EngCalcs || {};
 		box.value = spec.value;
 		box.className = 'ec-spin';
 		box.style.width = LPN_LABEL_COL_W; box.style.marginLeft = LPN_LABEL_COL_GAP;
-		box.style.flex = '0 0 auto';
+		box.style.flex = '0 0 auto'; box.style.boxSizing = 'border-box';
 		box.title = spec.title;
 		box.setAttribute('aria-label', spec.title);
 		box.addEventListener('change', function () {
@@ -10692,7 +10707,8 @@ var EngCalcs = EngCalcs || {};
 		box.value = spec.value;
 		box.title = spec.title;
 		box.setAttribute('aria-label', spec.title);
-		box.style.width = '3.5em'; box.style.flex = '0 0 auto';
+		box.style.width = LPN_LABEL_AFFIX_W; box.style.flex = '0 0 auto';
+		box.style.boxSizing = 'border-box';
 		box.addEventListener('input', function () { spec.onChange(box.value); saveToStorage(); refreshLabelText(); });
 		return box;
 	}
@@ -10805,8 +10821,8 @@ var EngCalcs = EngCalcs || {};
 			row.style.fontSize = '0.85em'; row.style.opacity = '0.75';
 			lead.style.flex = '1 1 auto';
 			row.appendChild(lead);
-			[[pc.lpn_labels_col_before || 'Before', '3.5em'],
-				[pc.lpn_labels_col_after || 'After', '3.5em'],
+			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W],
+				[pc.lpn_labels_col_after || 'After', LPN_LABEL_AFFIX_W],
 				[pc.lpn_labels_col_decimals || 'Decimals', LPN_LABEL_COL_W],
 				[pc.lpn_labels_priority || 'Priority', LPN_LABEL_COL_W]
 			].forEach(function (h, i) {

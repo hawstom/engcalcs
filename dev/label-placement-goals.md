@@ -119,12 +119,17 @@ model and the conflict graph.
 
 **Link — the keep order; a label that will not fit sheds from the END.**
 
-`id` → `flow` → `velocity` → `headloss` → `gradient` → `diameter` → `length` → `roughness` → `km`
+`flow` → `velocity` → `headloss` → `gradient` → `diameter` → `length` → `roughness` → `km` → `id`
 
-So the minor-loss coefficient goes first and the flow survives longest. `id` is rank 0 and never
-sheds: it is the key by which every other number on the label is attributed, which is what Maplex
-calls the key-number and puts at the bottom of its own cascade. `length` sits with the other inputs,
-before roughness (Tom, 2026-08-16).
+So the flow survives longest and `length` sits with the other inputs, before roughness (Tom,
+2026-08-16).
+
+**`id` sheds FIRST, and this reverses the first draft.** It shipped never-shed, on the Maplex
+key-number argument that an ID is what every other number on the label is attributed by. Tom
+overruled it the same day, and he is right for a reason specific to link labels: **a link label lies
+along its own pipe, so the drawing already says which pipe the numbers belong to.** The ID is the one
+value on that label whose job the label's own position is already doing. The argument does not carry
+to node labels, which is why no node ID rank exists at all.
 
 **Node — which whole label gives up its place. Applied in this order, each clause active only when
 that field is toggled on.**
