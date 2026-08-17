@@ -1,10 +1,9 @@
-# "Most-open angle(s)" — Tom's brainstorm, 2026-08-16, unfiled
+# "Most-open angle(s)" — Tom's brainstorm, checked against the literature
 
-Recorded verbatim on request. **Not yet checked against the literature** — Tom asked explicitly that
-this be engaged with the label-placement survey (`dev/label-placement-algorithms.md`) before it is
-scoped as work; that comparison has not been done. Tom's own framing, 2026-08-17: he anchored to the
-literature first (the Task 400 rewrite) rather than include this in instructions, and still wants it
-engaged with the literature rather than built from first principles.
+Tom's idea, recorded 2026-08-16; the literature pass he asked for was run 2026-08-17 against
+`dev/label-placement-algorithms.md`. **Verdict: it composes with the survey's recommended shape
+rather than competing with it, it is partly known and partly not, and it is NOT gated on Task 400
+Phase 3.** That last point is the one that changes what we would do.
 
 ## Definitions
 
@@ -24,9 +23,85 @@ its tracking radius. A label placer would then prefer the direction with the lea
 around that anchor, rather than trying fixed candidate positions (top-right, straight-top, …) and
 testing each for conflicts after the fact.
 
-## Open question for the literature pass
+---
 
-Whether this is a known technique (angular-sector / clearance-direction heuristics show up in some
-point-labeling literature) or a genuinely different framing from the reduction-rule-plus-search
-shape `dev/label-placement-algorithms.md` currently recommends, and whether it composes with that
-shape (e.g., as the candidate-generation step) or competes with it.
+## What the literature pass found
+
+### It is candidate GENERATION, and the survey's shape is candidate SELECTION
+
+Wagner–Wolff's three rules and QGIS PAL's `reduce()`/`chainSearch()` are defined **over a candidate
+set**; nothing in them says where candidates come from. Every method the survey cites simply inherits
+the 8-position model (TR, T, TL, L, BL, B, BR, R) by convention. So this idea occupies a slot the
+recommended shape leaves empty: it replaces a fixed, anchor-independent candidate set with an
+anchor-specific one. **The two are orthogonal and both can ship.** It is not an alternative to Phase
+3, and framing it as one would be a mistake.
+
+### Partly known — and the closest published relatives are these three
+
+- **ESRI Maplex's stated order of operations is this policy verbatim**: *first attempt to place in
+  an area of free space*; only if overlap is unavoidable, *choose the location with the lowest total
+  feature weight*. ESRI does not publish the search, so we get the policy and not the mechanism —
+  but the policy is the industry default, not a novelty.
+- **Luboschik, Schumann & Cords, *Particle-Based Labeling* (IEEE TVCG 14(6), 2008)** is the nearest
+  published *mechanism*: fill the image with conflict particles where labels must not go, then place
+  by raster query. Same instinct — read the occupancy around the anchor, place into the gap — done in
+  raster space rather than angular space, and reported real-time.
+- **Angular reasoning is already standard for LINE features** (Mapnik's `max-char-angle-delta`,
+  default 22.5°), just not for point anchors.
+
+**What the survey does not contain**: an angular-sector free-direction heuristic for point features,
+named and evaluated as such. Tom's specific formulation — combine incident link bearings with
+obstacle bearings inside a per-anchor radius to get a preferred direction — is not in the cited
+literature.
+
+### The part that is genuinely ours, and why it is stronger here than in cartography
+
+A cartographic point is **bare**. A network junction is not: every node knows the bearing of every
+pipe meeting it, for free, before any obstacle search runs. Tom's term (a) is information generic
+PFLP does not have, which is the real reason the inherited 8-position model is a poor fit for this
+drawing and not merely an unexamined default. That is a legitimate argument that our problem is not
+generic PFLP, and it is the strongest single point in the brainstorm.
+
+### The constraint the pass surfaces: obstacle choice decides view-independence
+
+Been, Daiches & Yap (*Dynamic Map Labeling*, IEEE TVCG 12(5), 2006) require a labelling not to churn
+under pan and zoom, and Task 400 already names the view-independent conflict graph as its gate.
+
+- Tom's **tracking radius is world-space by construction** (a mean distance along incident links), so
+  it is view-independent and *better behaved than the relaxation it would feed*.
+- But the **obstacle set as written is not.** "Text and fixed/user labels" have screen-dependent
+  extents — a Text label's world width is 1/zoom, the same fact Task 403 is about — so including
+  their boxes makes the chosen angle a function of zoom.
+- **Fix: score openness against view-independent obstacles only** (node positions, link vertices,
+  Text *anchors* — not label boxes). Label boxes stay where they belong, in the conflict/collision
+  pass downstream.
+
+### Openness alone would fight Imhof, so it picks the sector and preference breaks the tie
+
+Imhof's TR > R > T > B > L exists for typographic reasons (ascenders read as closer), and arXiv
+2407.11996 measured user preference as T > B > R > TR. A pure openness rule ignores all of that and
+will cheerfully put a label bottom-left because bottom-left happened to be emptiest. The reconcilable
+form — and again it is what Maplex describes — is **openness selects the sector, positional
+preference orders candidates within it**: one score, not one rule.
+
+### Tom's point 2 needs no research: it is standard, and we already do it
+
+MapLibre's CollisionIndex is a uniform GridIndex profiled to 30 px cells; `grid()` in
+`js/lpn-collide.js` is the same structure sized to the query radius. The square-vs-circle radius
+shortcut is likewise standard practice for the same profiling reason. **Point 2 is confirmed, not
+open.**
+
+## What this changes
+
+- **It is not gated on Phase 3, and its priority need not follow Task 400's lowered 15.** Phase 1
+  (priority-ordered first-fit) is shipped, and its home position is the fixed
+  `DEFAULT_LABEL_OFFSET = {x: 2, y: -2}`. Swapping that one constant for a per-anchor open direction
+  is a small, independently testable change against already-shipped code — a much cheaper experiment
+  than the conflict graph.
+- **It supplies the precondition Task 400's relaxation note already assumes.** That note says a
+  nudge pass is "of limited value until labels start in generally open territory (outward from
+  congestion)." Most-open-angle *is* that starting step, so recording it as a Phase 3 sub-bullet had
+  the dependency backwards.
+- **Open question left for a build, not for more reading**: how many sectors. The literature's
+  candidate counts are 8, then 6, then 4; a continuous angle has no published evaluation for point
+  features and would need its own measurement here.

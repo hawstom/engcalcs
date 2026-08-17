@@ -16,13 +16,14 @@ avoid-clause corrected to imperative-vs-adjective; `lpn_labels_col_after` droppe
 parked for real-world feedback from Mary rather than scheduled. Backdrop menu reorder (Move above
 Scale) and the destination-point-chooser anchor (now the picked point, not the menubar) are done.
 
-**New this session, not yet triaged by priority against the rest of the backlog:** Tasks 406 (per-line
-label box model), 407[H] (Text scenario overrides — Tom called it very important, needs a scope
-decision before building), 408 (leader snap-angle option), 409/410 (Profiles, Animation — both parked
-behind Task 248). The most-open-angle brainstorm (`dev/most-open-angle-brainstorm.md`, folded into
-Task 400) still needs a literature-comparison pass Tom asked for and this session didn't do.
+**Task 407 is scoped and promoted to 90, the top of the board** (Text overrides `text` + `active`,
+never position). It spawned **412** (a Base-wide property must say so — every one of them is
+announced by an absence today). The most-open-angle literature pass is **done** and split out as
+**411**; it is not gated on Phase 3. Dependency management is reopened as **413** — Task 83's own
+"revisit if a real local dependency is introduced" condition fired when Bootstrap and epanet-js were
+vendored.
 
-**Next by priority:** Task 405 (resync the four strings sprint 397 earned), then 403 (the stub's
+**Next by priority:** 407, then 405 (resync the four strings sprint 397 earned), then 403 (the stub's
 font-size blindness, attempted twice and reverted twice — read its block before starting).
 
 *Delete this block once it stops being true; it is a handoff, not a standing plan.*
@@ -99,6 +100,22 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     annotations gives branded types in place, and the Node harnesses already provide a
     build-adjacent place to run a checker.
   - Evaluate together before any of it — this is on the roadmap as a possibility, not a plan.
+
+- 65|413| **Adopt real dependency management. Task 83's own closing condition has fired.** 83 was
+  closed stale 2026-07-05 on the finding that Bootstrap came from `cdn.jsdelivr.net` and nothing was
+  vendored — *"revisit if a real local dependency is introduced later."* Two now are:
+  `js/vendor/epanet-js.js` (663 KB) and `js/vendor/bootstrap.bundle.min.js` (79 KB) plus
+  `css/vendor/bootstrap.min.css`, loaded on **every page** by `HeadersFooters.lib.php`.
+  - **There is no no-dependencies norm to protect; there is a habit.** The ROADMAP itself asserted
+    one at Task 408 (*"`js/vendor/` today holds only the EPANET engine"*) and both halves are wrong.
+  - **The three constraints the habit was really protecting, which any manifest must survive:**
+    (1) **no build step** — `git pull` *is* the deploy and `filemtime()` cache-busting only works
+    because the served file is the source file; (2) GPL-v3 compatibility; (3) nothing fetched from a
+    CDN at runtime, which is also what makes the offline service worker possible. A manifest that
+    records and verifies *vendored copies* clears all three; a bundler or node_modules-at-runtime
+    workflow clears none.
+  - Deliverable is **`dev/dependency-management.md`** — policy, recommendation, and whether a PHP
+    framework is in scope at all — before any manifest file is committed.
 
 - 85|390| **Finish the unit paradigm migration: a unit is a NAME, and a file's numbers are the
   user's.** Tom, 2026-08-16: *"You are fighting against a deprecated but not purged paradigm where
@@ -375,8 +392,28 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     literature sequences it relative to the reduction rules above. Of limited value until labels
     start in generally open territory (outward from congestion), so it follows rather than precedes
     the rest of Phase 3.
-  - **"Most-open angle(s)" brainstorm — needs a literature pass before scoping.** Tom's own draft,
-    unfiled and not yet checked against the survey: `dev/most-open-angle-brainstorm.md`.
+  - **"Most-open angle(s)" does NOT belong to this task** — literature pass done 2026-08-17, see
+    `dev/most-open-angle-brainstorm.md` and Task 411. It is candidate *generation*, orthogonal to the
+    reduction rules, and it is the "start in open territory" precondition the relaxation bullet above
+    already assumes — so recording it here had the dependency backwards.
+
+- 40|411| **Most-open angle: pick each label's home direction from its own surroundings instead of a
+  fixed top-right.** Tom's idea, checked against the survey 2026-08-17 —
+  `dev/most-open-angle-brainstorm.md` has the full comparison. Split out of Task 400 because it is
+  **not gated on Phase 3**: it changes Phase 1's `DEFAULT_LABEL_OFFSET`, which is already shipped, so
+  it is a far cheaper experiment than the conflict graph.
+  - **The part that is ours and not the literature's:** a cartographic point is bare, but every
+    junction already knows the bearing of every pipe meeting it, free. That is why the inherited
+    8-position model is a poor fit here, rather than merely an unexamined default.
+  - **Score view-independent obstacles only** — node positions, link vertices, Text *anchors*. A
+    label BOX is 1/zoom wide (the Task 403 fact), so including boxes makes the chosen angle a
+    function of zoom and breaks Been–Daiches–Yap stability.
+  - **Openness picks the sector; Imhof/user preference orders candidates within it.** One score, not
+    one rule, or it will happily choose bottom-left because bottom-left was emptiest.
+  - Tom's grid-of-regions and square-radius shortcut need no research: both are standard (MapLibre's
+    30 px CollisionIndex) and `grid()` in `js/lpn-collide.js` is already that structure.
+  - Open for a build, not more reading: **how many sectors.** Published candidate counts are 8, 6, 4;
+    a continuous angle has no published evaluation for point features.
 
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
   2026-08-14: *"Not mtext labels. Mtext Text objects."* The target is what you place with the Text
@@ -408,24 +445,40 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     scenario would carry a private copy of a drawing nobody meant to fork. Label offsets (`lx`/`ly`)
     are in the same category for the same reason.
   - **It is not an oversight, but it IS undocumented**, and Tom's *"the good thing is that it's
-    obvious"* is the whole argument for leaving the behaviour alone and only saying so. The work here
-    is a sentence in the scenario UI or Help — not a mechanism.
-  - The line to state: **a scenario is a set of HYDRAULIC differences. The drawing is the network's,
-    not the scenario's.**
+    obvious"* is the whole argument for leaving the behaviour alone and only saying so.
+  - **The saying-so moved to Task 412**, which found the general form of the same problem: every
+    Base-wide property is announced by an absence today, not just geometry. Do the wording there.
 
-- 70|407|[H] **A Text element edited or moved inside a non-Base scenario must become a scenario
-  override — it does not today.** Tom, 2026-08-17, "very important": the opposite of Task 338's
-  ruling, on purpose. 338's reasoning is about NETWORK geometry — two scenarios must overlay
-  identically or a side-by-side reading breaks. A Text element is annotation, not topology; nothing
-  requires it to look the same across scenarios, and a caption written for one scenario ("Fire flow
-  case: 1,850 gpm here") is specific to that scenario by nature.
-  - **`LPN_OVERRIDABLE` has no `text` group today** (`node`/`link` only, `js/looped-network.js`
-    ~line 2063), and `elGroup()` classifies anything without `.from` as `node` — so a Text element's
-    position write currently falls through to the same Base-only path node dragging uses. Needs its
-    own group (position, and whatever else Text carries — content, angle) routed through
-    `setOverride()`/`effective()` rather than a direct `_x`/`_y` write.
-  - **Scope with Tom before building**: does EVERY Text property become overridable, or only
-    position + content, leaving angle/style Base-wide? Undecided.
+- 90|407| **A Text element's CONTENT and PRESENCE become scenario-overridable; its position does
+  not.** Tom, 2026-08-17, "very important". Scope settled 2026-08-17 and no longer [H].
+  - **The rule is the existing one, not a new one.** `LPN_OVERRIDABLE` is a whitelist because
+    properties are deliberately NOT handled equally — membership overrides, identity does not. So
+    Text gets exactly **`text` and `active`**, and position / size multiplier / anchor node stay
+    Base-owned like a node's x/y (Task 338's reasoning, which applies to annotation for the weaker
+    but sufficient reason that a note jumping around as you flip scenarios is unreadable).
+  - **`active` is what answers "can a scenario have its own new Text".** It can, with no second
+    mechanism: the note lives in Base switched off, and one scenario switches it on. That is
+    already how a proposed loop works.
+  - **Text is a THIRD GROUP and today's code cannot see it.** `elGroup()` tells a link from a node
+    by `from !== undefined` and returns `'node'` for everything else, so a label would key as
+    `n:<id>` and collide with a junction of the same id — Task 324's bug verbatim, which measured
+    7 / 35 / 72 such collisions in Net1 / Net2 / Net3. **`ovKeyFor()` grows a third prefix first.**
+  - **`renderLabelFields()` writes `lb.text = input.value` directly** (`js/looped-network.js`
+    ~13485), bypassing `setProp()` — the exact write seam `scenario_seam_check.php` guards. Route it
+    before anything else here is safe, and extend that check to the new group.
+
+- 65|412| **A Base-wide property must SAY it is Base-wide.** Tom, 2026-08-17: *"How do they know,
+  other than trial and error, that position applies to all?"* Today they cannot. `overrideMarker()`
+  renders an "Only in this scenario" checkbox on overridable rows and **nothing at all** on the
+  others — so the signal is an *absence*, and an absence cannot be told from an oversight.
+  - Fix: inside a non-Base scenario only, give the non-overridable row a static, non-interactive
+    marker in the same slot ("Same in all scenarios" + tip). Presence-vs-presence instead of
+    presence-vs-absence. One `else` branch in `overrideMarker()`; 2 new English keys.
+  - **The "noise" objection in that function's comment does not apply** — it argues against a
+    permanently-unticked box in **Base**, where there is no scenario to belong to. This is a
+    different row in a different state.
+  - Carries the sentence Task 338 owes: **a scenario is a set of hydraulic differences; the drawing
+    is the network's, not the scenario's.** Do 338's Help wording here or not at all.
 
 - 60|325| **The sizing PARADIGM: symbol size and text size should be independent.** Tom, 2026-08-14:
   *"I found myself wanting to control symbol size and text size independently instead of having them

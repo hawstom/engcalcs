@@ -2048,9 +2048,11 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// Overridable-property whitelist -- cheap to widen, expensive to narrow (Task 184). The line is
-	// MEMBERSHIP is overridable, IDENTITY is not: a link's from/to and a node's x/y/verts are
+	// MEMBERSHIP is overridable, IDENTITY is not: a node's x/y and a link's from/to and `verts` (its
+	// intermediate bend points -- the drawn shape of the pipe, nothing to do with water levels) are
 	// Base-owned and never override (a node cannot be in two places at once in one rendered map),
-	// and so are id and type. Junction `elev` is survey data, not a design variable.
+	// and so are id and type. Junction `elev` is survey data, not a design variable. A tank's `level`
+	// and a reservoir's `head` are the opposite case and ARE overridable -- see the note below.
 	// `active` is an ordinary boolean here and is how topology varies: a proposed loop lives in Base
 	// inactive and a scenario overrides it active. Nothing sets `active` yet -- effective() treats
 	// its absence as true.
