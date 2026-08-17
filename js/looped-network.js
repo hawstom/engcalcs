@@ -2129,12 +2129,14 @@ var EngCalcs = EngCalcs || {};
 	// junction off silently dropped an unrelated pipe out of the solve.
 	//
 	// ONE SEAM, so the format is stated once: every read, write, count, rename and purge goes
-	// through ovKey()/ovKeyFor() and none of them spells 'n:', 'l:' or 'x:' itself.
-	// 'x:' is the Text label's prefix (Task 407), matching the 'X' its ids are minted under.
+	// through ovKey()/ovKeyFor() and none of them spells 'n:', 'l:' or 't:' itself.
+	// 't:' is the Text label's prefix -- t for text. It is an INTERNAL namespace tag and deliberately
+	// not tied to settings.idPrefixes, which the user can change at will; a key format that moved
+	// when a preference moved would strand every override already written under the old one.
 	function ovKey(el) { return ovKeyFor(elGroup(el), el && el.id); }
 	// One line on purpose: dev/scripts/scenario_seam_check.php exempts this function BY NAME from the
 	// rule that nothing else spells a key prefix, and it reads the source a line at a time.
-	function ovKeyFor(group, id) { return (group === 'link' ? 'l:' : group === 'label' ? 'x:' : 'n:') + id; }
+	function ovKeyFor(group, id) { return (group === 'link' ? 'l:' : group === 'label' ? 't:' : 'n:') + id; }
 	function isOverridable(el, prop) { return !!(LPN_OVERRIDABLE[elGroup(el)] || {})[prop]; }
 	function inBaseScenario() { return !!activeScenario().isBase; }
 	function hasOverride(el, prop) {
@@ -8997,6 +8999,12 @@ var EngCalcs = EngCalcs || {};
 		if (e.key !== 'Escape') { return; }
 		closeMenu();
 		closeViewPopovers();
+		// The element PROPERTY popup too (Tom, 2026-08-17: *"Can the element properties box and other
+		// boxes have an Escape key close action?"*). It was the one box on the page that Escape did
+		// not reach, and it is the box people open most. Field values are already committed on
+		// `change`, which fires on blur before this handler runs, so dismissing cannot lose a typed
+		// number -- the same contract every other box here has.
+		closePopup();
 	});
 	// File > New project (ROADMAP Task 264, Tom 2026-08-10). A second popup off the same anchor
 	// rather than a hover-out submenu: the menu machinery here is one flat popover, hover submenus are

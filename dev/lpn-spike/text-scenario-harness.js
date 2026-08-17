@@ -42,7 +42,7 @@ const L = loadLoopedNetwork(
 	"\t\teffective: effective, setProp: setProp, hasOverride: hasOverride, baseValue: baseValue,\n" +
 	"\t\tclearOverride: clearOverride, isOverridable: isOverridable, isActive: isActive,\n" +
 	// The key format is read through the page's own seam, never spelled here: a harness that wrote
-	// 'x:' + id would be a second copy of the format, free to agree with a page that had changed.
+	// 't:' + id would be a second copy of the format, free to agree with a page that had changed.
 	"\t\tovKey: ovKey, ovKeyFor: ovKeyFor, elGroup: elGroup,\n" +
 	"\t\tcreateScenario: createScenario, switchScenario: switchScenario,\n" +
 	"\t\tactiveScenario: activeScenario, overrideCount: function () { return overrideCount(activeScenario()); },\n" +

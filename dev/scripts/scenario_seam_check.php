@@ -95,7 +95,7 @@ if ($missing) {
 // ---- 1c. The key format is spelled in ovKeyFor() and nowhere else ------------------------------
 //
 // ovKey()/ovKeyFor()'s own comment claims this ("every read, write, count, rename and purge goes
-// through ovKey()/ovKeyFor() and none of them spells 'n:', 'l:' or 'x:' itself"). It is worth a
+// through ovKey()/ovKeyFor() and none of them spells 'n:', 'l:' or 't:' itself"). It is worth a
 // line of check rather than a line of prose: a second copy of the format is free to agree with the
 // current one and drift the day a group is added, which is exactly when it would be written.
 //
@@ -110,7 +110,7 @@ foreach (explode("\n", $src) as $i => $line) {
     $exempt = false;
     foreach ($exemptFns as $fn) { if (strpos($line, $fn) !== false) { $exempt = true; break; } }
     if ($exempt) { continue; }
-    if (preg_match("/'(?:n|l|x):'/", $line)) { $prefixLines[] = ($i + 1) . ': ' . trim($line); }
+    if (preg_match("/'(?:n|l|t):'/", $line)) { $prefixLines[] = ($i + 1) . ': ' . trim($line); }
 }
 if ($prefixLines) {
     fwrite(STDERR, "FAIL: the override key format is spelled outside ovKeyFor():\n");

@@ -388,23 +388,25 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     reduction rules, and the "start in open territory" precondition the relaxation bullet assumes.
     Literature pass done 2026-08-17: `dev/most-open-angle-brainstorm.md`.
 
-- 40|411| **Most-open angle: pick each label's home direction from its own surroundings instead of a
-  fixed top-right.** Tom's idea, checked against the survey 2026-08-17 —
-  `dev/most-open-angle-brainstorm.md` has the comparison. Split out of Task 400 because it is **not
-  gated on Phase 3**: it changes Phase 1's `DEFAULT_LABEL_OFFSET`, already shipped.
-  - **SECTORS PRUNE, RASTER REFINES** (Tom's synthesis, 2026-08-17, and the reason this is worth
-    building): score angular sectors first, discard the bad ones, and sample only inside what
-    survives. **A bad sector cannot be escaped by local search** — nudging and chain search move a
-    label within the region it starts in — so raster effort spent in a blocked direction could never
-    have paid.
-  - **The part that is ours and not the literature's:** a cartographic point is bare, but every
-    junction already knows the bearing of every pipe meeting it, free.
-  - **Score view-independent obstacles only** — node positions, link vertices, Text *anchors*. A
-    label BOX is 1/zoom wide (the Task 403 fact), so boxes would make the angle a function of zoom.
-  - **Openness wins; Imhof preference breaks a true tie only** (Tom, 2026-08-17: *"if it's emptiest,
-    what else could beat that?"*). The real caution is churn, not direction: use hysteresis so a
-    label does not flip for a hair's difference.
-  - Open for a build, not more reading: **how many sectors.** Published candidate counts are 8, 6, 4.
+- 40|411| **Most-open angle: an angular table that lets the placer SKIP a candidate without
+  re-examining the model.** Tom's idea, checked against the survey and re-scoped by him 2026-08-17.
+  Design: `dev/most-open-angle-brainstorm.md`. Not gated on Phase 3.
+  - **The four positions stay FIXED and CARDINAL** — TR, TL, BR, BL, tried in that order, each
+    contained entirely within its quadrant so an orthogonal link can arrive without crossing the
+    label. Four, not the literature's eight; knowing the link bearings is what earns the reduction.
+  - **Off-orthogonal tolerance is the tunable that decides whether this works**: 30° impractical,
+    15° maybe, **5–10° almost essential** (Tom's estimate). Ship it on the tester panel (Task 416),
+    do not freeze a guess.
+  - **The table is a REJECTION test, not a generator.** For TR, ask for any dirty angle in 10°–80°;
+    if there is one, skip. A table lookup, not a geometry query — that is the whole saving.
+  - **Sectors are exact arcs, not 45° wedges.** Incident bearings are known exactly; bucketing
+    throws away precision we were handed free, and a 183° opening is one arc, not four wedges.
+  - **Raster only after the four are exhausted**, inside the open sector — probably POLAR, since a
+    sector is bounded by two angles and a radius and a rectangular grid would sample a square and
+    discard most of it.
+  - **Labels advertising their open arcs so neighbours are drawn toward them** (Tom: *"Nudge me!
+    Join me! I have all the space in the world!"*) is attraction added to a model that only repels
+    today. Not in the survey — search before building.
 
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
   2026-08-14: *"Not mtext labels. Mtext Text objects."* The target is what you place with the Text
@@ -711,10 +713,42 @@ font-size blindness, attempted twice and reverted twice — read its block befor
   - **Mobile is demoted and does not appear in a headline, tagline or list of reasons** (Tom,
     2026-08-14: *"phone is a dead end… I don't want to tout it"*). We keep caring — the touch-trap cap
     stays, phone regressions are still bugs — but the claim is not made.
+- 45|415| **A `selected` property on elements, and SUBJECT-THEN-VERB Delete.** Tom, 2026-08-17.
+  Today's Delete is verb-then-subject; he wants select-first, act-second, which is what every CAD and
+  GIS editor does and what makes multi-select possible at all.
+  - **The `selected` property is the whole foundation** — Task 266 (lasso) and every step below are
+    cheap once it exists and impossible until it does. Build it first, on its own, with single
+    selection only, and ship Delete on top of it.
+  - Tom's own progression, in his order: Ctrl-click to add → lasso → **lasso then filter**, or
+    *"filter what you select because the Filter box is open."* That last is the interesting one and
+    it converges with Task 353 (element search) — check them against each other before designing.
+  - **Not overridable, and not stored.** Selection is view state, not document state: it must not
+    enter `serializeProject()`, and by Task 407's line it is neither membership nor identity.
+
+- 30|416| **The tester control panel: move it, prune it, and make it the request channel.** Tom,
+  2026-08-17: *"I am not using it much because it seems like mostly noise."* Today it is
+  `?debug=labels`, built by `buildLabelBench()`.
+  - **Move to the LEFT edge**, away from Settings and Labels on the right — it is a different kind of
+    thing and sitting beside them is why it reads as more of the same.
+  - **Prune the obsolete numbers.** A bench for an algorithm that has since been replaced is noise
+    that makes the live controls harder to find.
+  - **Its real job is a channel for "please try this and tell me what you see" requests**, one tweak
+    at a time, rather than a permanent exhaustive dashboard. Task 411's off-orthogonal tolerance is
+    the next thing that belongs on it.
+  - **Untranslated title, deliberately** — it is a tester surface, never shown to a visitor, and a
+    translated string for it would be 26 wasted translations.
+
+- 25|417| **Long-press on an element should enter Edit mode, exactly as a click does.** Tom,
+  2026-08-17. The guard that switches to Edit mode on click does not fire when a long press begins a
+  drag, so a touch user who presses and drags is editing an element the page does not think is
+  selected for editing. Same guard, second trigger. See Task 192 for why long-press is the touch
+  equivalent generally.
+
 - 35|266| **Multi-select (lasso) plus edit-all-selected, as EPANET has.** Tom, 2026-08-10: *"very nice
   for bigger models."* Today's selection model is single-element — `openEditMenu()` already says so
   where it explains why "Select all" is absent. Wants a rubber-band select and one property sheet
-  that writes a value to every selected element.
+  that writes a value to every selected element. **Blocked on Task 415's `selected` property**, which
+  is the foundation this was always missing.
 
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.

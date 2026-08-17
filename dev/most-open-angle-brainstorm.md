@@ -19,9 +19,11 @@ Phase 3.** That last point is the one that changes what we would do.
 
 The local-context data for a node or a fixed/user label/text could determine its **most-open
 angle(s)**, combining (a) the angles of its connecting links and (b) the angles to obstacles within
-its tracking radius. A label placer would then prefer the direction with the least competition
-around that anchor, rather than trying fixed candidate positions (top-right, straight-top, …) and
-testing each for conflicts after the fact.
+its tracking radius.
+
+*(The draft continued "rather than trying fixed candidate positions and testing each for conflicts
+after the fact." Tom superseded that on 2026-08-17: the fixed positions stay, and the open-angle
+table is what lets a placer skip one without re-examining the model. The settled design is below.)*
 
 ---
 
@@ -32,9 +34,12 @@ testing each for conflicts after the fact.
 Wagner–Wolff's three rules and QGIS PAL's `reduce()`/`chainSearch()` are defined **over a candidate
 set**; nothing in them says where candidates come from. Every method the survey cites simply inherits
 the 8-position model (TR, T, TL, L, BL, B, BR, R) by convention. So this idea occupies a slot the
-recommended shape leaves empty: it replaces a fixed, anchor-independent candidate set with an
-anchor-specific one. **The two are orthogonal and both can ship.** It is not an alternative to Phase
-3, and framing it as one would be a mistake.
+recommended shape leaves empty. **The two are orthogonal and both can ship.** It is not an
+alternative to Phase 3, and framing it as one would be a mistake.
+
+It does **not** replace the fixed candidate positions, though — see "the four positions stay fixed"
+below, which is the settled design. It prunes them, and it generates candidates only after they run
+out.
 
 ### Partly known — and the closest published relatives are these three
 
@@ -80,8 +85,8 @@ sector step is what puts labels in open territory for it.
 
 A cartographic point is **bare**. A network junction is not: every node knows the bearing of every
 pipe meeting it, for free, before any obstacle search runs. Tom's term (a) is information generic
-PFLP does not have, which is the real reason the inherited 8-position model is a poor fit for this
-drawing and not merely an unexamined default. That is a legitimate argument that our problem is not
+PFLP does not have, and it is what earns us **four** candidate positions where the literature
+inherits eight — a reduction we can afford precisely because we know where the links are. That is a legitimate argument that our problem is not
 generic PFLP, and it is the strongest single point in the brainstorm.
 
 ### The constraint the pass surfaces: obstacle choice decides view-independence
@@ -98,22 +103,67 @@ under pan and zoom, and Task 400 already names the view-independent conflict gra
   Text *anchors* — not label boxes). Label boxes stay where they belong, in the conflict/collision
   pass downstream.
 
-### Openness WINS. Imhof is a tie-break with a small weight, and nothing more
+### The four positions stay FIXED and CARDINAL; openness is a fast SKIP test
 
-An earlier draft of this file argued that a pure openness rule "will cheerfully put a label
-bottom-left because bottom-left happened to be emptiest," as though that were a defect. **Tom,
-2026-08-17: *"I disagree strongly… if it's emptiest, what else could beat that?"* He is right, and
-the earlier framing overstated the case.** Imhof's TR > R > T > B > L and arXiv 2407.11996's
-measured T > B > R > TR describe preference **among positions that are otherwise equally good** —
-they are typographic and habitual, not legibility-critical. An empty direction beats a preferred
-crowded one every time, and no cartographic source claims otherwise.
+An earlier draft of this file, and of Task 411, said the idea was to "pick each label's home
+direction from its own surroundings instead of a fixed top-right." **Tom, 2026-08-17: *"I disagree
+strongly about the place of most-open-angle in this step. These quadrants are cardinal and
+fixed."*** He is right, and the corrected design is cheaper as well as better:
 
-**The one real caution, and it is NOT about direction preference:** a drawing whose labels sit in
-different directions for reasons a reader cannot see looks arbitrary. That argues for **hysteresis,
-not for a preference weight** — do not flip a label's direction for a hair's difference in openness;
-do flip it for a real one. A visible reason is what makes varied placement read as considered rather
-than random, and "this side was open" is visible. So: **openness decides; preference breaks a true
-tie; a threshold stops churn.**
+1. **Four initial positions, in a fixed order: top-right, top-left, bottom-right, bottom-left.**
+   Four, not the literature's eight — our narrower business earns the reduction. Top-first is
+   Imhof's ascender argument; right-first is convention.
+2. **Each position sits ENTIRELY INSIDE its quadrant.** That is the load-bearing constraint: it
+   leaves an orthogonal link room to arrive without crossing the label.
+3. **A link is never exactly orthogonal, so the quadrant must hold a tolerance.** Tom's estimate:
+   30° is not practical, 15° may be, **5–10° is almost essential.** Expose it on the tester panel
+   (Task 416) rather than freezing a guess.
+4. **The open-angle table is consulted as a REJECTION test, not as a generator.** For the top-right
+   candidate, ask the table for any dirty angle between 10° and 80°; if there is one, skip that
+   candidate outright. This is a table lookup, not a geometry query — *"this saves us from looking at
+   our model again at this moment."*
+5. **Raster only after all four are exhausted**, inside the most-open sector.
+
+**Openness wins over preference where they conflict** (Tom: *"if it's emptiest, what else could beat
+that?"*) — Imhof's order is the fixed *attempt* order among four legal candidates, not a weight that
+argues against an emptier direction later. The earlier draft's worry about "cheerfully choosing
+bottom-left" was misplaced; the real risk is churn, which is answered by hysteresis, not preference.
+
+### Exact sectors, not fixed wedges — and labels that advertise their space
+
+Tom, 2026-08-17: *"Our focused cartographic business (nodes and links) lets us do better than 'say, 8
+wedges of 45°'… We must (and can!) avail ourselves of the exact, say, 183 (Or 266!) degree fully open
+sector that generation gives us."*
+
+Right, and it follows from what makes our case special: incident link bearings are **exact** and
+known before any search. Quantising them into 45° buckets throws away precision we were handed for
+free, and a 183° opening bucketed to wedges reads as "four wedges clear" when the truth is a single
+continuous arc with room to spare. Keep sectors as **arcs (start, end)**, merged.
+
+**The cooperative idea, recorded because it is a real mechanism and not just a turn of phrase:**
+*"we can boast to our neighbors about our open sectors. Nudge me! In fact, join me! I have all the
+space in the world!"* A label that knows it has a wide open arc can advertise it, so a crowded
+neighbour is drawn toward the space rather than each label solving alone. That is attraction added to
+a model that today only repels, and it is the piece most likely to fix a jam that pure repulsion
+cannot. **Unverified against the literature** — the survey's methods are all repulsion/conflict
+based. Worth a search before building.
+
+### The raster, and the oblique-axes trick
+
+Open question Tom named and did not resolve: *"how we weed or seed a raster to be in our
+most-open-sector; might it be polar after all instead of rectangular? Might it use a temporary
+coordinate system that makes math simple given its bounding axes x-temp and y-temp?"*
+
+A sector is naturally polar — bounded by two angles and a radius — so a polar sample grid needs no
+rejection step at all, where a rectangular one samples a square and throws most of it away. That
+alone probably decides it.
+
+**On the trick's provenance, which Tom asked about:** *"This trick of 'define your own non-orthogonal
+axes to simplify calculations' was taught to me in college. I never learned whether it was standard
+or an invention of that professor."* **It is entirely standard** — a change of basis to an oblique
+(affine) coordinate system. It is how oriented bounding boxes and rotating calipers work in
+computational geometry, how isoparametric elements work in finite-element analysis, and how
+crystallographers handle non-cubic lattices. The professor was teaching the standard tool.
 
 ### Tom's point 2 needs no research: it is standard, and we already do it
 

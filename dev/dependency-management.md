@@ -50,6 +50,25 @@ place.
    - **Our own outbound licence is revisable and is Tom's alone.** Nothing here depends on staying
      GPL v3; relicensing is a separate decision, and vendoring permissive code keeps it open.
    `epanet-js.LICENSE` ships with the code, as MIT requires of a redistribution.
+
+   **Why GPL and not public domain — Tom's own reasoning, 2026-08-17, and it settles the question:**
+   *"If 'you have nothing to fear', then GPL becomes Public Domain. The reason GPL exists is that we
+   are afraid that the powerful can steal our ideas, and we are trying to establish our own slice of
+   heaven."* GPL is **defensive**, not restrictive for its own sake, and the fear is well founded —
+   public domain lets a well-resourced party take this work, close it, outrank it and leave the
+   original unfindable. So GPL v3 stays.
+
+   **The refinement he proposed, and it is worth doing:** publish that *more lenient terms are
+   available on request*. This is standard practice (dual licensing / a stated exception policy) and
+   costs nothing:
+   - It is **available only to a sole copyright holder**, which he is — `Copyright 2009 Thomas Gail
+     Haws` throughout. Before advertising it, confirm no third-party copyleft has been vendored and
+     that no outside contributor holds copyright in the tree; AI-assisted commits are authored by
+     Tom and do not cloud that.
+   - It keeps the default defensive while letting the mission win the cases that matter — an NGO, a
+     ministry or a university that cannot use copyleft gets a yes instead of a silence.
+   - One sentence on `privacy.php`/`terms.php` or the footer, plus an address to ask at. **Do not
+     write the sentence without Tom** — it is a legal offer in his name, not repo prose.
 3. **Nothing third-party at runtime.** Confirmed above.
 
 ---
@@ -137,23 +156,13 @@ it buys a Composer install step in a `git pull` deploy for nothing visible.
 **When this answer changes:** the suite gains a database, user accounts, or server-side state. Any
 one of those makes a framework the right call, and this section gets rewritten, not appended to.
 
-### A different LANGUAGE: the same answer, harder
+### A different LANGUAGE: no, and not close
 
-Tom, 2026-08-17, noted he had also meant *language*, not only framework — and added that there are
-*"lots of possibilities that may not be wise to consider for very long."* Agreed, so this is short.
-
-A rewrite in Node, Python or Go would buy one real thing — **one language instead of two**, since
-all computation is already JavaScript and PHP exists only to deliver multilinguality. That is a
-genuine simplification and the honest case for it.
-
-It loses more. PHP's decisive advantage here is not the language, it is that **shared hosting runs
-`.php` with no process to supervise, no port, no restart, and a `git pull` deploy.** Every
-alternative needs a long-running process, which changes hosting, deployment, and what happens at
-3 a.m. when it stops. Against that: 27 language files, 16 calculators and a 14,000-line map editor
-would all be re-delivered for no user-visible gain, and the suite's actual defect history is in
-units, translations and label placement — **not one entry of it is attributable to PHP.**
-
-**So: no, and it is not close.** Worth revisiting only if hosting changes for some other reason.
+Tom also meant *language*, not only framework, and asked to keep it short. The case for a rewrite is
+real — one language instead of two, since all computation is already JavaScript. What kills it is
+that PHP's advantage here is not the language: **shared hosting runs `.php` with no process to
+supervise, no port, no restart, and a `git pull` deploy.** Every alternative needs a long-running
+process. Revisit only if hosting changes for some other reason.
 
 ---
 
