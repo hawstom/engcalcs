@@ -39,6 +39,7 @@ const L = loadLoopedNetwork(
 	"\t\tlabelSettings: function () { return labelSettings; },\n" +
 	"\t\tlinkEls: function () { return linkEls; },\n" +
 	"\t\ttooShort: function (l) { return linkLabelTooShort(l, linkEls[l.id]); },\n" +
+	"\t\tsettings: function () { return settings; },\n" +
 	"\t\tpipeLength: function (l) { return Geom.polylineLength(linkPointList(l)); },\n" +
 	"\t\tlabelWidth: function (l) { return labelBoxWidth(linkEls[l.id]); },\n" +
 	"\t\ttspanText: function (id) { return linkEls[id].text.children.map(function (t) { return t.textContent; }); },\n" +
@@ -59,6 +60,12 @@ L.runSolve();
 const doc = L.getDoc(), ls = L.labelSettings();
 // Everything on, which is the crowded case the cascade exists for.
 Object.keys(ls.link).forEach(function (k) { ls.link[k] = true; });
+// **THE TWO STOPPING CONDITIONS ARE TESTED SEPARATELY, AND THAT IS THE POINT OF THIS LINE.** With
+// pipe-aligned labels ON, the CONFLICT shed also fires and every count below would be the sum of two
+// causes -- so a length cascade that had stopped working would still look busy. Off, a link label is
+// a free participant that can MOVE, so shedAlignedForConflicts() skips it entirely and what remains
+// is the length rule alone. Section 2 turns it back on and tests the other half.
+L.settings().alignPipeLabels = false;
 L.refreshLabelText();
 
 const READING_ORDER = ['id', 'diameter', 'length', 'roughness', 'km',
@@ -151,5 +158,97 @@ L.refreshLabelText();
 L.refreshLabelText();
 eq(fieldsOn(target.id), once, 'shedding is idempotent across repeated refreshes');
 
-console.log('label-shed-harness: ' + checks + ' checks passed  (cascade: '
-	+ seen.map(function (s) { return s.fields.length; }).join(' -> ') + ' values)');
+// ---- 2. the CONFLICT shed: what a reader actually meets -----------------------------------------
+//
+// The length rule only fires when a label is wider than its own pipe, which on a normal drawing it
+// never is (45-84% measured on this fixture). Tom, 2026-08-16: "I cannot detect a single instance of
+// shed. It's always all or nothing." He was right, and this is the half that answers it.
+L.settings().alignPipeLabels = true;
+setLength(1);   // every pipe back to full length, so nothing below is a LENGTH shed
+Object.keys(ls.link).forEach(function (k) { ls.link[k] = true; });
+
+// **THE FIXTURE HAS TO BE BUILT, because the drawn example does not have this conflict.** Two pipe
+// labels only fight when two pipes run close together, and the six-pipe example is too open. So one
+// long pipe is laid alongside another long one: both keep their full length (no length shed is
+// possible) and their labels land on top of each other. That isolates the conflict rule exactly the
+// way turning alignment off isolated the length rule.
+const pipes = doc.links.filter(function (l) { return l.type === 'pipe'; })
+	.map(function (l) { return { l: l, len: L.pipeLength(l) }; })
+	.sort(function (a, b) { return b.len - a.len; });
+const keepPipe = pipes[0].l, movePipe = pipes[1].l;
+function nodeOf(id) { return doc.nodes.filter(function (n) { return n.id === id; })[0]; }
+const ka = nodeOf(keepPipe.from), kb = nodeOf(keepPipe.to);
+const ma = nodeOf(movePipe.from), mb = nodeOf(movePipe.to);
+// A small perpendicular offset: close enough that the two labels overlap, far enough that the pipes
+// are still two pipes.
+const ux = kb.x - ka.x, uy = kb.y - ka.y, ulen = Math.hypot(ux, uy) || 1;
+const off = 2;
+ma.x = ka.x - uy / ulen * off; ma.y = ka.y + ux / ulen * off;
+mb.x = kb.x - uy / ulen * off; mb.y = kb.y + ux / ulen * off;
+L.refreshLabelText();
+
+const shedNow = doc.links.filter(function (l) {
+	const h = L.linkEls()[l.id];
+	return h && h.shedCount > 0 && !h.hiddenShort;
+});
+ok(shedNow.length > 0, 'two pipes laid alongside each other shed on CONFLICT, at full length');
+ok(L.linkEls()[keepPipe.id].shedCount === 0 || L.linkEls()[movePipe.id].shedCount === 0,
+	'the longer pipe keeps its values -- longest first, so it is placed before the other arrives');
+ok(shedNow.length < doc.links.length, 'and an uncrowded label elsewhere keeps everything');
+
+// WHAT WENT IS STILL THE WORST-RANKED. The conflict shed and the length shed must agree about
+// order, or the same label would drop different values for the two reasons.
+shedNow.forEach(function (l) {
+	const h = L.linkEls()[l.id];
+	const kept = h.lines.map(function (x) { return x.field; });
+	const all = h.allLines.map(function (x) { return x.field; });
+	const gone = all.filter(function (k) { return kept.indexOf(k) < 0; });
+	gone.forEach(function (g) {
+		kept.forEach(function (k) {
+			ok(ls.priority.link[g] > ls.priority.link[k],
+				l.id + ': shed ' + g + ' (' + ls.priority.link[g] + ') while keeping ' + k +
+				' (' + ls.priority.link[k] + ')');
+		});
+	});
+	ok(kept.length >= 1, l.id + ' keeps at least one value -- shedding is not hiding');
+});
+
+// NOT A RATCHET. Every shed is measured from the FULL value list, never from what survived last
+// time, so repeated refreshes settle rather than eating the label one value per repaint. This is the
+// assertion that a "cache the last shed" optimisation would break, and it would break it invisibly
+// on a page that repaints on every solve.
+const settled = doc.links.map(function (l) { return (L.linkEls()[l.id].lines || []).length; });
+L.refreshLabelText();
+L.refreshLabelText();
+eq(doc.links.map(function (l) { return (L.linkEls()[l.id].lines || []).length; }), settled,
+	'the conflict shed settles instead of ratcheting');
+
+// AND IT RECOVERS. A shed is a response to the CURRENT drawing, never a permanent mark on the label:
+// give the map less to fit and less is shed.
+//
+// The assertion is on the TOTAL, not on each label, and the difference is a real finding rather than
+// a weakened test. With only two fields showing, this fixture's pump P1 still sheds one -- its label
+// is short but its pipe is short too, and it genuinely collides. "Every label recovers completely"
+// is therefore false on a crowded drawing and always will be; what must hold is that shedding tracks
+// the crowd.
+function totalShed() {
+	return doc.links.reduce(function (n, l) {
+		const h = L.linkEls()[l.id];
+		return n + ((h && h.shedCount) || 0);
+	}, 0);
+}
+const shedWithNine = totalShed();
+Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'id' || k === 'flow'); });
+L.refreshLabelText();
+const shedWithTwo = totalShed();
+ok(shedWithTwo < shedWithNine,
+	'less to fit means less shed (' + shedWithNine + ' -> ' + shedWithTwo + ')');
+doc.links.forEach(function (l) {
+	const h = L.linkEls()[l.id];
+	if (!h || h.empty) { return; }
+	ok(h.lines.length >= 1, l.id + ' still says something -- shedding never empties a label');
+});
+
+console.log('label-shed-harness: ' + checks + ' checks passed  (length cascade: '
+	+ seen.map(function (s) { return s.fields.length; }).join(' -> ') + ' values; '
+	+ shedNow.length + ' of ' + doc.links.length + ' links shed on conflict)');

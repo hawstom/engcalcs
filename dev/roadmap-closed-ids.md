@@ -11,6 +11,8 @@ The full text of every closed task is in git and nowhere else, by Tom's ruling o
 Durable policy from these tasks lives in `CLAUDE.md` and in `dev/*.md`. Those are the current
 state; this is only a list of numbers that were once used.
 
+- 0|399| Phase 2: a link label sheds values by the user's priority instead of vanishing whole — on its own pipe's length AND on conflict with another pipe's label. linkLabelTooShort() is now the cascade's last rung
+- 0|402| NOT A DEFECT — the drifted Net2/Net3 numbers came from Tom editing already-corrupt local copies, not from the app. Corpus restored from git and verified: 1908 pass-through checks reproduce every number from EPANET's own .inp
 - 0|398| Phase 1: node labels by priority-ordered first-fit, two sides and a drop, replacing the ring for auto-placed nodes. Links place first but yield to a node that has nowhere else to go
 - 0|392| Label candidate reach was 28 px, smaller than the label itself. Now 30 text heights with the inner ring at 6, and the number is a multiple of the lettering rather than an absolute
 - 0|343| SUPERSEDED by Task 397. Its open question — what triggers a drop — was answered by Tom's 2026-08-16 phases: first-fit drops whoever arrives at a full space, so the trigger is the priority ORDER, never a threshold

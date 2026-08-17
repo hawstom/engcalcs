@@ -114,7 +114,12 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	//
 	// Asserted on ORDER, which is the whole of the bug: the assignment must precede the measurement
 	// in both branches. A harness cannot measure text, so it cannot catch this any other way.
-	const rlt = extract('refreshLabelText');
+	// The two branches now live in different functions: a NODE label is still built inline in
+	// refreshLabelText(), a LINK label moved into renderLinkLabel() when the shed cascade needed one
+	// place to build both the full label and every candidate (Task 399). The invariant is unchanged
+	// and so is this test -- it just has to look where the code is. Searching both sources rather
+	// than naming which is which keeps it true through the next move as well.
+	const rlt = extract('refreshLabelText') + '\n' + extract('renderLinkLabel');
 	['ne', 'le'].forEach(function (v) {
 		const set = rlt.indexOf(v + '.text.style.fontSize = fsNow;');
 		const measure = rlt.indexOf('noteMeasuredWidth(' + v + ',');

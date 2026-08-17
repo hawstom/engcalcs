@@ -538,22 +538,29 @@ var EngCalcs = EngCalcs || {};
 	// conflict test already consume. That collapses Tom's two "it does not fit" problems -- too long
 	// for its pipe, and in conflict with a neighbour -- into one cascade with two stopping conditions.
 	//
-	// Returns the set of field-line indices to KEEP, as a lookup. Sheds one value at a time, worst
-	// rank first, and stops the moment the label fits: a MINIMAL shed, because every value removed
-	// beyond the first that fits is information taken from the reader for nothing.
-	function shedToWidth(le, lines, maxWidth) {
-		var keep = {}, order = [], i;
-		for (i = 0; i < lines.length; i++) { keep[i] = true; }
-		if (!(maxWidth > 0) || lines.length < 2) { return keep; }
-		// Worst rank first. A line with no field (the empty placeholder) and one with no rank both
-		// sort last and so are shed first -- there is nothing to say about a value nobody ranked.
+	// **THE SHED IS MEASURED THE SAME WAY THE HIDE RULE IS, AND THAT IS THE WHOLE FIX.**
+	//
+	// The first cut banked a width per tspan (getComputedTextLength) and answered "how wide without
+	// these values" as a sum, so no candidate had to be drawn. It measured correctly under the
+	// headless stub and produced NOTHING in a real browser -- Tom, 2026-08-16: *"I cannot detect a
+	// single instance of shed. It's always all or nothing."* The failure mode is the silent one: if
+	// those per-tspan numbers come back zero or unavailable, every subset "fits", nothing is ever
+	// shed, and the terminal rung then hides the label whole -- which is exactly the all-or-nothing
+	// behaviour the cascade was built to replace. A second measurement path is a second thing that
+	// can be wrong, and this one was wrong invisibly.
+	//
+	// So there is only ONE measurement now: draw the candidate and call getBBox(), which is the same
+	// number `linkLabelTooShort()` has always used and which is demonstrably right in the browser --
+	// labels do hide. Redrawing costs a forced layout per step, but only a label that does NOT fit
+	// pays it, and it pays at most one step per value. A label that fits pays one comparison.
+	//
+	// Worst rank first. A line with no field (the empty placeholder) and one with no rank both sort
+	// last and so go first -- there is nothing to say about a value nobody ranked.
+	function shedOrder(lines) {
+		var order = [], i;
 		for (i = 0; i < lines.length; i++) { order.push(i); }
 		order.sort(function (a, b) { return linkFieldRank(lines[b].field) - linkFieldRank(lines[a].field); });
-		for (i = 0; i < order.length - 1; i++) {   // never shed the last survivor here; that is the drop
-			if (labelWidthKeeping(le, keep) <= maxWidth) { break; }
-			delete keep[order[i]];
-		}
-		return keep;
+		return order;
 	}
 	// A field's shed rank, from the user's own Priority column. An unranked or unnamed field sorts
 	// worst, so it goes first -- Infinity rather than a large number, because a large number is a
@@ -561,6 +568,81 @@ var EngCalcs = EngCalcs || {};
 	function linkFieldRank(field) {
 		var r = field && labelSettings.priority.link[field];
 		return typeof r === 'number' ? r : Infinity;
+	}
+	// **THE ONE PLACE A LINK LABEL'S GLYPHS ARE BUILT** (Task 399). The full label and every shed
+	// candidate go through this, so they cannot disagree about the row shape, the font size, the
+	// measurement, or the stamp that keeps a repeated chain in step. Before this existed the shed
+	// path had its own copy of all four, which is how a shed label could keep the tspans of the
+	// label it used to be.
+	//
+	// `fsNow` is the font size string for the CURRENT scale, and it is applied BEFORE the tape
+	// measure comes out: getBBox() returns world units, so measuring text still drawn at the
+	// previous scale and banking it against this one is wrong by exactly the zoom step.
+	function renderLinkLabel(le, l, lines, fsNow) {
+		var rows = composeRows(lines, labelIsDragged(l));
+		setMultilineText(le.text, linkLabelBase(l).x, rows);
+		le.text.style.fontSize = fsNow;
+		(le.repeats || []).forEach(function (r) { r.text.style.fontSize = fsNow; });
+		try { noteMeasuredWidth(le, le.text.getBBox().width); }
+		catch (err) { /* pre-layout measurement can throw; the stale tw stands */ }
+		le.rows = rows;
+		le.rowsSeq = (le.rowsSeq || 0) + 1;
+		le.lineCount = rows.length;
+		le.lines = lines;
+		return rows;
+	}
+	// A stationed label sheds until it stops colliding, longest pipe first.
+	//
+	// **LONGEST FIRST, for the same reason placeStationedLabels() uses that order**: whoever is
+	// placed first keeps its content, and a long pipe has the most room to give up later while still
+	// reading as "this pipe". It also makes the pass stable -- the order depends on nothing the user
+	// can change by clicking.
+	//
+	// **A NODE LABEL IS NOT AN OBSTACLE HERE, AND THAT IS THE DIFFERENCE BETWEEN SHEDDING A LITTLE
+	// AND SHEDDING EVERYWHERE.** The first cut seeded every node label at its resting offset, on the
+	// reasoning that links yield to nodes (§2.2). Measured, that shed a value from 3 of the 7 links
+	// on the default example -- including a pump's head loss, which `readout-sign-harness.js` caught
+	// by name. The reasoning was wrong at this stage: a node label at rest has not been PLACED yet,
+	// and the whole of Phase 1 is that it will move out of the way. Giving up a number for a
+	// collision that is about to be solved by someone else moving is premature.
+	//
+	// So the node/link contest stays where it already is: the placement pass moves the node, and if
+	// the node truly has nowhere to go, nodeRepairAgainstLinks() takes the link label away. This pass
+	// answers only the conflict nothing else can solve -- two labels both nailed to their own pipes.
+	function shedAlignedForConflicts(fsNow, fs) {
+		var obs = staticObstacles(), pad = fs * LPN_ALIGNED_PAD_FRAC;
+		doc.links.map(function (l) {
+			return { l: l, len: Geom.polylineLength(linkPointList(l)) };
+		}).sort(function (a, b) { return b.len - a.len; }).forEach(function (rec) {
+			var l = rec.l, le = linkEls[l.id];
+			if (!le || le.empty || labelIsDragged(l)) { return; }
+			// Only a label bound to its pipe is in this pass. A free-floating link label is a
+			// participant in the candidate pass and can MOVE, so it has somewhere to go that is not
+			// giving up a number.
+			if (!linkLabelAligned(l) && linkLabelStations(l).length < 2) { return; }
+			if (linkLabelTooShort(l, le)) { return; }   // already hidden; nothing to shed for
+			var all = le.allLines || le.lines, order = shedOrder(all),
+				gone = all.length - le.lines.length;
+			function boxNow() {
+				return stationedLabelBox(l, le, le.alignedAlong === undefined ? 0.5 : le.alignedAlong,
+					labelBoxWidth(le), dataLabelBoxHeight(le.lineCount), fs);
+			}
+			while (gone < order.length - 1 && !boxIsClear(boxNow(), obs, pad)) {
+				gone++;
+				renderLinkLabel(le, l, keptLines(all, shedKeepSet(all, order, gone)), fsNow);
+			}
+			le.shedCount = all.length - le.lines.length;
+			var b = boxNow();
+			b.kind = 'label'; b.linkOwner = l.id;
+			obs.boxes.push(b);
+		});
+	}
+	// The keep-set after `gone` sheds: the first `gone` entries of the worst-first order are out.
+	function shedKeepSet(lines, order, gone) {
+		var keep = {}, i;
+		for (i = 0; i < lines.length; i++) { keep[i] = true; }
+		for (i = 0; i < gone && i < order.length; i++) { delete keep[order[i]]; }
+		return keep;
 	}
 	// The lines that survive, in READING order -- the shed decides WHICH values go, never the order
 	// the rest are printed in. A reader's eye learns the order of a label; reshuffling the survivors
@@ -1232,7 +1314,13 @@ var EngCalcs = EngCalcs || {};
 			dropped = placed.length - drawn.length,
 			yielded = doc.links.filter(function (l) {
 				var le = linkEls[l.id]; return le && le.hiddenYielded;
-			}).length;
+			}).length,
+			// Task 399's quality number. Reported as VALUES removed rather than labels affected,
+			// because one label down to its last value and eight labels down by one are very
+			// different pictures and the label count cannot tell them apart.
+			shedVals = doc.links.reduce(function (n, l) {
+				var le = linkEls[l.id]; return n + ((le && le.shedCount) || 0);
+			}, 0);
 		drawCollisionBoxes(boxes, obs, placed.map(function (r) { return r.leader; }).filter(Boolean));
 		if (!debugOn('labels')) { return; }
 		// THE COUNTS, because "that looks better" is not a verdict.
@@ -1259,7 +1347,8 @@ var EngCalcs = EngCalcs || {};
 		var el2 = document.getElementById('lpn_label_bench_out');
 		if (el2) {
 			var flips = labelFlipCount();
-			el2.textContent = dropped + ' dropped \u2022 ' + yielded + ' links yielded \u2022 '
+			el2.textContent = dropped + ' dropped \u2022 ' + shedVals + ' values shed \u2022 '
+				+ yielded + ' links yielded \u2022 '
 				+ (flips === null ? '' : flips + ' flips under zoom \u2022 ')
 				+ labels.length + ' labels \u2022 ' + pairs + ' label-on-label \u2022 '
 				+ onLeader + ' label-on-leader \u2022 mean travel '
@@ -1654,46 +1743,6 @@ var EngCalcs = EngCalcs || {};
 		// quarter of a second per notch (Tom, 2026-08-15).
 		if (holder.twPx) { return holder.twPx / (state.s || 1); }
 		return holder.tw || 0;
-	}
-	// **THE WIDTH OF ANY SUBSET OF A LABEL, WITHOUT MEASURING THE SUBSET** (ROADMAP Task 399).
-	//
-	// Phase 2 asks what a link label would be if it shed its lowest-ranked values. Measuring each
-	// candidate would mean rebuilding the text and forcing a synchronous layout once per value per
-	// label -- on Net3's 119 links that is hundreds of forced layouts per refresh, which is precisely
-	// the cost `noteMeasuredWidth()` above exists to avoid. So the SEGMENTS are measured once, and
-	// every subset after that is a sum.
-	//
-	// **THE SHED IS NOT A PREFIX OF THE ROW, WHICH IS WHY THIS IS A SUM AND NOT A RUNNING TOTAL.**
-	// Values are drawn in reading order (id, diameter, length, ...) and shed in PRIORITY order (km
-	// first, flow last). Those two orders disagree, so what survives is an arbitrary subset of the
-	// row and the arithmetic has to be able to add up any of them.
-	//
-	// Banked in PIXELS, like `twPx`, so a zoom is a division rather than a re-measure.
-	function noteSegmentWidths(holder, owners) {
-		var px = [], i, kids = holder.text ? holder.text.childNodes : [];
-		for (i = 0; i < kids.length; i++) {
-			// getComputedTextLength() is per-tspan and needs no extra layout beyond the one the
-			// getBBox() beside this call already forced.
-			try { px.push(kids[i].getComputedTextLength() * (state.s || 1)); }
-			catch (err) { px.push(0); }   // pre-layout; a zero segment simply cannot argue for a shed
-		}
-		holder.segWpx = px;
-		holder.segOwner = owners;
-	}
-	// The world-unit width of the label if only `keep` (a set of field-line indices) survived. The
-	// separators are counted BETWEEN survivors, not carried along with the values they used to
-	// separate -- shedding a middle value must not leave two separators against each other.
-	function labelWidthKeeping(holder, keep) {
-		var px = holder.segWpx, own = holder.segOwner, i, sum = 0, sepW = 0, sepN = 0, seen = {};
-		if (!px || !own) { return labelBoxWidth(holder); }
-		for (i = 0; i < px.length && i < own.length; i++) {
-			if (own[i] < 0) { sepW = Math.max(sepW, px[i]); continue; }
-			if (!keep[own[i]]) { continue; }
-			sum += px[i];
-			if (!seen[own[i]]) { seen[own[i]] = true; sepN++; }
-		}
-		sum += sepW * Math.max(0, sepN - 1);
-		return sum / (state.s || 1);
 	}
 	// The other half of the pair: call this instead of writing `.tw` from a getBBox() result, and the
 	// pixel figure is banked at the same time. `worldWidth` is what getBBox() just returned.
@@ -14131,49 +14180,58 @@ var EngCalcs = EngCalcs || {};
 			}
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
-			// **BUILT IN FULL, MEASURED, THEN SHED AND REBUILT** (Task 399). The order is forced: a
-			// shed is a decision about WIDTH, and nothing can measure a label that has not been
-			// drawn. So the full label is rendered once to bank its per-segment widths, the cascade
-			// then answers every "what if" as arithmetic, and the text is rebuilt only if something
-			// actually went. A drawing where nothing sheds pays one extra comparison per link.
-			var owners = [], lRows = composeRows(lines, labelIsDragged(l), owners), shed = 0;
-			setMultilineText(le.text, linkLabelBase(l).x, lRows);
-			// Size it for THIS scale before the tape measure comes out -- see the node branch.
-			le.text.style.fontSize = fsNow;
-			(le.repeats || []).forEach(function (r) { r.text.style.fontSize = fsNow; });
-			try { noteMeasuredWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
-			noteSegmentWidths(le, owners);
+			// **DRAW IT, MEASURE IT, AND IF IT DOES NOT FIT, DROP A VALUE AND DO IT AGAIN.** One
+			// measurement path, and it is getBBox() -- see shedOrder() for why the arithmetic
+			// shortcut this replaced produced nothing in a real browser.
+			//
+			// `renderLinkLabel()` is the single place a link label's glyphs are built, so the full
+			// label and every shed candidate go through identical code and cannot disagree about
+			// anything but their content. The rowsSeq stamp lives there too: **it must move when a
+			// SHED changes the content**, or every repeat of a shed label keeps the tspans of the
+			// label it used to be, and a chain that says different things at different stations is
+			// exactly what the chain convention exists to prevent.
+			var allLines = lines;
+			renderLinkLabel(le, l, lines, fsNow);
 			// **A DRAGGED LABEL NEVER SHEDS**, the same hedge and the same reasoning that exempts it
 			// from the short-pipe rule: dragging a label off a stub is exactly what you do when you
 			// want that number on the sheet, so the gesture that reveals the intent is one the user
 			// already makes.
-			if (!labelIsDragged(l) && !le.empty) {
+			if (!labelIsDragged(l) && !le.empty && lines.length > 1) {
 				var room = Geom.polylineLength(linkPointList(l)) / SHORT_LINE_MULT,
-					keep = shedToWidth(le, lines, room),
-					kept = keptLines(lines, keep);
-				if (kept.length && kept.length < lines.length) {
-					shed = lines.length - kept.length;
-					lines = kept;
-					owners = [];
-					lRows = composeRows(lines, labelIsDragged(l), owners);
-					setMultilineText(le.text, linkLabelBase(l).x, lRows);
-					try { noteMeasuredWidth(le, le.text.getBBox().width); } catch (err) { /* as above */ }
-					noteSegmentWidths(le, owners);
+					order = shedOrder(lines), gone = 0, kept = lines;
+				// Stops at the FIRST content that fits -- a minimal shed. `gone < order.length - 1`
+				// keeps one value alive: dropping the last one is not a shed, it is the hide, and
+				// linkLabelTooShort() owns that decision.
+				while (gone < order.length - 1 && labelBoxWidth(le) > room) {
+					gone++;
+					kept = keptLines(lines, shedKeepSet(lines, order, gone));
+					renderLinkLabel(le, l, kept, fsNow);
 				}
+				lines = kept;
 			}
-			le.shedCount = shed;
-			le.lineCount = lRows.length;
-			// Kept so a repeat can be rendered from the same rows without composing them twice, and
-			// stamped so a layout pass (which runs on every drag frame) only rebuilds a repeat's
-			// tspans when the content really changed. See syncRepeatText(). **The stamp must move
-			// when a SHED changes the content too**, or every repeat of a shed label keeps the tspans
-			// of the label it used to be -- and a chain that says different things at different
-			// stations is exactly what the chain convention exists to prevent.
-			le.rows = lRows;
-			le.rowsSeq = (le.rowsSeq || 0) + 1;
-			linkLines[l.id] = lines;
-			le.lines = lines;
+			// The FULL list is kept beside the drawn one, so a later pass can shed FURTHER without
+			// re-deriving what this link has -- and, more importantly, so every shed is measured from
+			// the whole label rather than from whatever survived last time, which would ratchet a
+			// label down and never let it recover.
+			le.allLines = allLines;
+			// DERIVED, never tracked: how many values this label is not showing is a fact about the
+			// two lists, and a counter incremented alongside them is a third thing that can disagree.
+			le.shedCount = allLines.length - le.lines.length;
+			linkLines[l.id] = le.lines;
 		});
+		// **CONTENT DECISIONS HERE, POSITION DECISIONS IN THE COLLISION PASS** (Task 399, Tom
+		// 2026-08-16: *"I cannot detect a single instance of shed. It's always all or nothing."*).
+		//
+		// He was right, and the length-driven cascade above could never have satisfied him: it only
+		// fires when a label is wider than its own pipe, which measured 45-84% on a normal drawing.
+		// The shed a reader actually meets is the CROWDING one, and this is it.
+		//
+		// It runs HERE and not in placeStationedLabels() because of the clock. That pass runs on
+		// every frame of a drag, and shedding means rebuilding glyphs and forcing a layout; this
+		// function runs when the CONTENT changes -- a solve, a toggle, a unit switch -- which is
+		// exactly the lifetime a content decision wants. It also gives the two passes a clean split
+		// worth stating: what a label SAYS is settled here, where it GOES is settled there.
+		shedAlignedForConflicts(fsNow, effectiveFontSize());
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
 		// laid out for real (text and leader) at its final, possibly-nudged position. The extrema
 		// marks need no third pass of their own any more (Task 333): they are text-decoration on the
