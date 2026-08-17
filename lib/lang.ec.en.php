@@ -1708,6 +1708,12 @@ $ec_lang['lpn_labels_suffix_tip']='Text printed after this value on the map';
 $ec_lang['lpn_labels_suffix_gradient_tip']='Text printed after the head loss gradient on the map. Do not type a percent sign here. It is added for you when the units are percent.';
 $ec_lang['lpn_labels_separator']='Separator';
 $ec_lang['lpn_labels_separator_tip']='Text between one value and the next on a label. A space by default.';
+// The priority column in the Labels box (ROADMAP Task 397). Both tips say "1 matters most", because
+// that one sentence is what the two columns share; what differs is WHAT the number orders, and each
+// tip says which. Kept plain and short: these sit on a small box in a crowded row.
+$ec_lang['lpn_labels_priority']='Priority';
+$ec_lang['lpn_labels_priority_link_tip']='Order the values are dropped in when a label does not fit. 1 is kept longest.';
+$ec_lang['lpn_labels_priority_node_tip']='Which value decides who gives up a crowded spot. 1 decides first. A node showing a low demand gives up its label before one showing a high demand.';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Background image…';
 $ec_lang['lpn_backdrop_add']='Add';

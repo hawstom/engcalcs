@@ -789,6 +789,141 @@ var EngCalcs = EngCalcs || {};
 	// The curve is not monotone (that fixture is a perfect grid, so candidates tie in numbers), which
 	// is exactly why this is a measurement and not a trend to extrapolate.
 	var LPN_NEIGHBOUR_K = 0.25;
+	// **WHICH NODE LABEL GIVES UP A CONTESTED SPOT: THE DIRECTIONS, COMPILED IN** (ROADMAP Task 397,
+	// Tom 2026-08-16; dev/label-placement-goals.md §2.2). The ORDER these are consulted in is the
+	// user's, and lives in labelSettings.priority.node. The DIRECTION of each comparison is not, and
+	// deliberately has no control: there is only one direction a cartographer would ever ask for in
+	// each row, so offering four would be four controls per row that a user must reason through to
+	// arrive back at the only sensible setting.
+	//
+	// Three different rules, and the difference between them is a fact about each QUANTITY:
+	//
+	//   'low'      demand -- a zero-demand junction's label is genuinely uninformative, not merely
+	//              mid-range, so the smallest number is the one to lose. This is why Tom wrote
+	//              "lowest" here and something else for the rest.
+	//   'extreme'  pressure -- the interesting pressures are the ENDS of the network's range, so
+	//              what drops is the value nearest the middle of it. Read against fieldExtrema().
+	//   'like'     elevation and head -- both vary SMOOTHLY across a drawing, so a node sitting at
+	//              its neighbours' value is readable off theirs and is the redundant one. Read
+	//              against the neighbours' mean, which is why the local feature context has to know
+	//              the topology and not just this node (§3.3).
+	//
+	// (Elevation was drafted as 'extreme' and corrected to 'like' by Tom on 2026-08-16. The two
+	// disagree most on a flat network with one hill, which is the case the rule exists for.)
+	var LPN_NODE_DROP_RULE = { demand: 'low', pressure: 'extreme', elev: 'like', head: 'like' };
+	// The two directions a node label may take, as bearings, DERIVED from the resting offset rather
+	// than restated as numbers: -45 degrees is up-and-right, which is where DEFAULT_LABEL_OFFSET
+	// already puts an untouched label and which is Imhof's own first choice for a left-to-right
+	// script. The other is its mirror. Written as a function so it cannot fall out of step with the
+	// offset the renderer actually uses.
+	function nodeLabelSideBearings() {
+		var d = DEFAULT_LABEL_OFFSET, deg = Math.atan2(d.y, d.x) * 180 / Math.PI;
+		return [deg, 180 - deg];   // preferred first: right, then left
+	}
+
+	// ---- the local feature context (ROADMAP Task 397; dev/label-placement-goals.md §3.3) --------
+	//
+	// **ONE RECORD PER NODE, HOLDING EVERYTHING A PLACEMENT OR DROP DECISION NEEDS THAT DOES NOT
+	// DEPEND ON THE VIEW** (Tom, 2026-08-16). That sentence is the whole design and the whole
+	// justification: it is invalidated by a model edit or a solve and by NOTHING ELSE -- not a zoom,
+	// not a pan, not a frame of a drag -- so it is built once and read sixty times a second, where
+	// the quantities in it would otherwise be recomputed sixty times a second.
+	//
+	// It deliberately carries two kinds of thing, and they live together because they are invalidated
+	// together. Splitting them would be two caches with one lifetime and two chances to forget one.
+	//
+	//   GEOMETRY, AS BEARINGS. The direction of each incident link at this node, and the resulting
+	//   most-open side. Angles, not distances -- see lpn-geom.js's own note: everything measured in
+	//   world distance here is 1/zoom, so a side chosen from one flips as the user scrolls.
+	//
+	//   MODEL DATA, AS THE ROUNDED VALUES THAT ARE ACTUALLY PRINTED. The inputs to the §2.2 drop
+	//   comparator. Rounded rather than raw, so the rank agrees with the number on screen and cannot
+	//   be reordered by float noise a reader cannot see.
+	//
+	// The NEIGHBOUR MEANS are why this has to be a structure rather than a few inline expressions:
+	// they are a read of the network's topology, not of one node, and they are what the 'like' rules
+	// in LPN_NODE_DROP_RULE compare against.
+	//
+	// **THE LIFETIME IS A SEAM, NOT A STAMP.** The obvious design is a dirty flag bumped by every
+	// edit path; it was rejected because a flag has a dozen places that must remember to set it and
+	// exactly one symptom when one forgets -- a stale ranking, which looks like a taste problem
+	// rather than a bug. refreshLabelText() already runs on every model change, every solve and
+	// every unit switch, and is already NOT called by a zoom, a pan or a drag frame. That is
+	// precisely the required lifetime, so the context is built there and there is nothing to
+	// invalidate.
+	var nodeContext = null;
+	// `vals` is a map of id -> rounded display value, already in the units the label prints. Returns
+	// the mean over this node's NEIGHBOURS (the far end of each incident link), or undefined where a
+	// node has no neighbour carrying that value -- undefined being a real answer meaning "there is
+	// nothing to be like", which the comparator treats as maximally unlike.
+	function neighbourMean(id, vals) {
+		var ids = incidentLinks[id] || [], sum = 0, n = 0, i, l, other, v;
+		for (i = 0; i < ids.length; i++) {
+			l = linkById(ids[i]); if (!l) { continue; }
+			other = l.from === id ? l.to : l.from;
+			v = vals[other];
+			if (typeof v === 'number' && isFinite(v)) { sum += v; n++; }
+		}
+		return n ? sum / n : undefined;
+	}
+	// One walk over the nodes producing BOTH shapes the callers need: `by` for a lookup at one node
+	// and `list` for fieldExtrema(), which wants a bare array. See refreshLabelText()'s note on why
+	// the two must come from the same walk and the same rounding.
+	function nodeValueMap(fn) {
+		var by = {}, list = [];
+		doc.nodes.forEach(function (n) { var v = fn(n); by[n.id] = v; list.push(v); });
+		return { by: by, list: list };
+	}
+	// The bearings of this node's incident links, measured AT THE NODE -- from the node to the next
+	// point along each pipe (its first vertex, not its far end). That is the same local reading of a
+	// bent pipe that linkDirectionAt() already establishes as the correct one: a pipe that leaves
+	// eastward and turns north occupies the east of this node, whatever its other end is doing.
+	function incidentBearings(n) {
+		var ids = incidentLinks[n.id] || [], out = [], i, l, pts, next;
+		for (i = 0; i < ids.length; i++) {
+			l = linkById(ids[i]); if (!l) { continue; }
+			pts = linkPointList(l);
+			next = (l.from === n.id) ? pts[1] : pts[pts.length - 2];
+			if (!next) { continue; }
+			// A zero-length link has no direction and must not contribute a spurious bearing of 0,
+			// which would read as "east is occupied" at a node where nothing is.
+			if (next.x === n.x && next.y === n.y) { continue; }
+			out.push(Math.atan2(next.y - n.y, next.x - n.x) * 180 / Math.PI);
+		}
+		return out;
+	}
+	// Build the whole context. Cheap enough to do outright -- one pass over the nodes and one over
+	// each node's own incident list -- and it is done once per model change, not once per frame.
+	function buildNodeContext(nodeVal) {
+		var out = {}, sides = nodeLabelSideBearings(),
+			nbrElev = {}, nbrHead = {};
+		doc.nodes.forEach(function (n) {
+			nbrElev[n.id] = neighbourMean(n.id, nodeVal.elev.by);
+			nbrHead[n.id] = neighbourMean(n.id, nodeVal.head.by);
+		});
+		doc.nodes.forEach(function (n) {
+			var bearings = incidentBearings(n);
+			out[n.id] = {
+				bearings: bearings,
+				// An INDEX into nodeLabelSideBearings(), not a point: a point would be a world
+				// coordinate and would need recomputing at every zoom, which is the whole thing this
+				// record exists to avoid.
+				openSide: Geom.mostOpenDirection(bearings, sides, LPN_SIDE_SWITCH_MARGIN),
+				demand: nodeVal.demand.by[n.id],
+				pressure: nodeVal.pressure.by[n.id],
+				elev: nodeVal.elev.by[n.id],
+				head: nodeVal.head.by[n.id],
+				nbrElev: nbrElev[n.id],
+				nbrHead: nbrHead[n.id]
+			};
+		});
+		return out;
+	}
+	// The reader. Everything downstream comes through here, so there is exactly one place that knows
+	// whether the cache is warm -- and a caller that forgets to check cannot exist.
+	function nodeContextFor(id) {
+		return (nodeContext && nodeContext[id]) || null;
+	}
 	// A label's own identity in the placement pass, namespaced because a node and a link may mint
 	// the same number under different prefixes and ownership is compared by this string.
 	function nodeLabelKey(id) { return 'n:' + id; }
@@ -1848,6 +1983,42 @@ var EngCalcs = EngCalcs || {};
 			prefix: { node: {}, link: {} },
 			suffix: { node: {}, link: {} },
 			separator: ' ',
+			// **LABEL PRIORITY -- WHICH IS NOT A WEIGHT, AND THE DISTINCTION IS THE WHOLE POINT**
+			// (ROADMAP Task 397; dev/label-placement-goals.md §2.2 and §3.1). ESRI Maplex keeps three
+			// numbers apart and we used to have only one of them: LABEL PRIORITY is the order labels
+			// are ATTEMPTED in, LABEL WEIGHT is how much a placed label resists being pushed out, and
+			// FEATURE WEIGHT is how much a map feature resists being COVERED. Collide.GOAL_WEIGHT is a
+			// feature-weight table and only that. This is the missing first number. Do not merge them.
+			//
+			// **ONE COLUMN, TWO AXES, ON PURPOSE.** Both read "lower means this field matters more",
+			// but a LINK number orders ROWS INSIDE one label (a label that will not fit sheds from the
+			// end) while a NODE number orders LABELS AGAINST EACH OTHER (which whole label gives up a
+			// contested spot). They share a control because they share that one sentence; they are
+			// different quantities and §2.2's table is where that is written down.
+			//
+			// **THE ORDER IS THE USER'S. THE DIRECTION IS NOT.** Tom's own list says LOWEST for
+			// demand, LEAST EXTREME for pressure, and MOST LIKE THE NEIGHBOURS for elevation and head
+			// -- because there is only one direction a cartographer would ever ask for in each row. A
+			// per-row max/min/least-extreme picker was considered and declined (2026-08-16): four
+			// controls per row that a user must reason through to arrive back at the only sensible
+			// setting. LPN_NODE_DROP_RULE below is that compiled table.
+			//
+			// PARALLEL to decimals/prefix/suffix rather than nested into the boolean maps, for the
+			// reason the decimals comment above gives in full: those maps are merged key-by-key out of
+			// localStorage, and a shape change there silently reinterprets every already-saved
+			// network's toggles.
+			//
+			// Link order is Tom's, 2026-08-16: id, flow, velocity, headloss, gradient, diameter,
+			// length, roughness, km -- so the minor-loss coefficient goes first and the flow survives
+			// longest. `id` is rank 0 and NEVER sheds: it is the key by which every other number on
+			// the label is attributed, which is what Maplex calls the key-number and puts at the very
+			// bottom of its own fitting cascade. `length` sits with the other inputs, before
+			// roughness, on Tom's ruling the same day.
+			priority: {
+				node: { demand: 1, pressure: 2, elev: 3, head: 4 },
+				link: { id: 0, flow: 1, velocity: 2, headloss: 3, gradient: 4,
+					diameter: 5, length: 6, roughness: 7, km: 8 }
+			},
 			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
 			// Global, not per field: the mark answers one network-wide question per field, and Tom
 			// described it as a single toggle. Lives here with its siblings and NOT in `settings`
@@ -5253,6 +5424,14 @@ var EngCalcs = EngCalcs || {};
 		Object.assign(labelSettings.prefix.link, savedPre.link || {});
 		Object.assign(labelSettings.suffix.node, savedSuf.node || {});
 		Object.assign(labelSettings.suffix.link, savedSuf.link || {});
+		// Task 397's priorities, merged one level deeper for exactly the reason the block above
+		// gives. This one carries real shipped defaults rather than shipping empty like the affixes,
+		// so the merge is doing genuine work from day one: a document saved before a field existed
+		// must come back with that field at its default rank, not at undefined -- and undefined in a
+		// sort comparator is not a mild defect, it is a non-total order.
+		var savedPri = savedLS.priority || {};
+		Object.assign(labelSettings.priority.node, savedPri.node || {});
+		Object.assign(labelSettings.priority.link, savedPri.link || {});
 		// A bare string, so it takes the same guarded assignment markExtrema does. An EMPTY string
 		// is a real setting ("Q12.5", no gap) and must survive this, which is why the test is on the
 		// type and not on truthiness.
@@ -10206,9 +10385,11 @@ var EngCalcs = EngCalcs || {};
 	// SAME row as the checkbox because decimal places are a property of that one field -- the Labels
 	// popover is already the per-field row list, which is why this lives here and not in Settings
 	// (page-wide preferences). `affix` (Task 333) is the same bargain for the prefix/suffix boxes.
-	// The row is a flex line so those three controls form COLUMNS down the panel: the field names
+	// `priority` (Task 397) is the fourth column and the same bargain again: {value, max, title,
+	// onChange}, or null for a field that does not participate.
+	// The row is a flex line so those controls form COLUMNS down the panel: the field names
 	// are of wildly different lengths, and boxes that stagger with them are unreadable as a set.
-	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt) {
+	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, priority) {
 		var row = document.createElement('div'), label = document.createElement('label'),
 			input = document.createElement('input'), span = document.createElement('span');
 		row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '6px';
@@ -10221,47 +10402,72 @@ var EngCalcs = EngCalcs || {};
 		label.style.flex = '1 1 auto';
 		row.appendChild(label);
 		if (affixOpt) { row.appendChild(affixBox(affixOpt.prefix)); row.appendChild(affixBox(affixOpt.suffix)); }
-		// A ROW WITH NO DECIMALS STILL RESERVES THE COLUMN (Tom, 2026-08-15: "Can you make their
-		// inputs align with the others?"). ID is the only such row, and without this its two boxes
-		// slide right by the width of the spinner every other row has, which reads as a different
-		// kind of row rather than as the same row missing one control.
-		if (affixOpt && !decimals) {
-			var spacer = document.createElement('span');
-			spacer.style.width = '4.5em'; spacer.style.flex = '0 0 auto';
-			row.appendChild(spacer);
-		}
-		if (decimals) {
-			var pc = EngCalcs.pageConfig || {}, dec = document.createElement('input');
-			// Upper bound 32, not a defensible-looking 4 (Tom, 2026-07-30): "possibly some absurd limit
-			// like 32 instead of a debatable limit like 4." A limit low enough to argue about is a
-			// limit someone will hit and resent; one nobody will ever reach needs no argument. 32 is
-			// safely inside toFixed()'s own 0-100 range and comfortably past the ~17 significant digits
-			// a double actually carries, so the only thing beyond ~15 decimals is float noise -- which
-			// is the user's business, not ours to forbid. Zero stays the floor: negative decimals have
-			// no meaning here (rounding to tens would be a different feature).
-			dec.type = 'number'; dec.min = '0'; dec.max = '32'; dec.step = '1';
-			dec.value = decimals.value;
-			// .ec-spin restores the native up/down arrows, which css/engcalcs.css strips suite-wide --
-			// see that file's comment: right for a physical quantity, wrong for a small bounded integer
-			// like this one, where clicking the arrows is the natural gesture. Width allows for them.
-			dec.className = 'ec-spin';
-			dec.style.width = '4.5em'; dec.style.marginLeft = '6px';
-			dec.title = pc.lpn_labels_decimals_tip || 'Decimal places shown for this label';
-			dec.addEventListener('change', function () {
-				// Clamped rather than rejected: a spinner held down runs past its own max, and silently
-				// snapping back to the nearest legal value reads better than an alert for a field where
-				// every out-of-range value has an obvious intended meaning.
-				var v = Math.round(+dec.value);
-				if (!isFinite(v)) { v = decimals.value; }
-				v = Math.max(0, Math.min(32, v));
-				dec.value = v;
-				decimals.onChange(v);
-				saveToStorage();
-				refreshLabelText();
+		// **EVERY TRAILING COLUMN IS RESERVED WHETHER OR NOT THIS ROW USES IT** (Tom, 2026-08-15:
+		// "Can you make their inputs align with the others?"). Written as a LIST rather than as a
+		// spacer bolted beside one control, because the one-off version only handled the single case
+		// that existed at the time -- affixes but no decimals -- and adding Task 397's priority column
+		// beside it would have staggered every row that has one control but not the other. Now the
+		// rule is structural: same slots, same order, on every field row.
+		//
+		// Only field rows (the ones with affixes) participate. The whole-panel options below -- the
+		// extrema toggle, the separator -- are not a field list and have no columns to line up with.
+		if (affixOpt) {
+			[decimals, priority].forEach(function (spec) {
+				row.appendChild(spec ? labelNumberBox(spec) : labelColumnSpacer());
 			});
-			row.appendChild(dec);
 		}
 		container.appendChild(row);
+	}
+	// The reserved width of one trailing numeric column, and the gap before it. Both are read by the
+	// spinner and by the spacer that stands in for a missing one, so the two cannot drift apart --
+	// which they had, the old spacer carrying the width and not the margin.
+	var LPN_LABEL_COL_W = '4.5em', LPN_LABEL_COL_GAP = '6px';
+	function labelColumnSpacer() {
+		var spacer = document.createElement('span');
+		spacer.style.width = LPN_LABEL_COL_W;
+		spacer.style.marginLeft = LPN_LABEL_COL_GAP;
+		spacer.style.flex = '0 0 auto';
+		return spacer;
+	}
+	// One small bounded-integer spinner in a Labels row. `spec` is {value, max, title, onChange}.
+	//
+	// Shared by the decimals column (Task 189) and the priority column (Task 397) because they are
+	// the same control with a different bound and a different tip -- and because a second hand-rolled
+	// copy is how the two would come to differ in clamping, in width, or in whether they save.
+	//
+	// Decimals bound 32, not a defensible-looking 4 (Tom, 2026-07-30): "possibly some absurd limit
+	// like 32 instead of a debatable limit like 4." A limit low enough to argue about is a limit
+	// someone will hit and resent; one nobody will ever reach needs no argument. Zero stays the floor
+	// in both columns: a negative rank and a negative decimal place are equally meaningless here.
+	//
+	// .ec-spin restores the native up/down arrows, which css/engcalcs.css strips suite-wide -- see
+	// that file's comment: right for a physical quantity, wrong for a small bounded integer like
+	// this, where clicking the arrows is the natural gesture. Width allows for them.
+	function labelNumberBox(spec) {
+		var box = document.createElement('input');
+		box.type = 'number'; box.min = '0'; box.max = String(spec.max); box.step = '1';
+		box.value = spec.value;
+		box.className = 'ec-spin';
+		box.style.width = LPN_LABEL_COL_W; box.style.marginLeft = LPN_LABEL_COL_GAP;
+		box.style.flex = '0 0 auto';
+		box.title = spec.title;
+		box.setAttribute('aria-label', spec.title);
+		box.addEventListener('change', function () {
+			// Clamped rather than rejected: a spinner held down runs past its own max, and silently
+			// snapping back to the nearest legal value reads better than an alert for a field where
+			// every out-of-range value has an obvious intended meaning.
+			var v = Math.round(+box.value);
+			if (!isFinite(v)) { v = spec.value; }
+			v = Math.max(0, Math.min(spec.max, v));
+			box.value = v;
+			// The spec's own value moves with it, so a SECOND bad entry falls back to what the user
+			// last really chose rather than to what the panel opened on.
+			spec.value = v;
+			spec.onChange(v);
+			saveToStorage();
+			refreshLabelText();
+		});
+		return box;
 	}
 	// One prefix or suffix box. `spec` is {value, placeholder, title, onChange}. The VALUE shown is
 	// always the EFFECTIVE one (labelPrefixFor() resolves an unset field to its default), so the box
@@ -10322,7 +10528,31 @@ var EngCalcs = EngCalcs || {};
 		function decimalsFor(group, key) {
 			var map = labelSettings.decimals[group];
 			if (typeof map[key] !== 'number') { return null; }
-			return { value: map[key], onChange: function (v) { map[key] = v; } };
+			return {
+				value: map[key], max: 32,
+				title: pc.lpn_labels_decimals_tip || 'Decimal places shown for this label',
+				onChange: function (v) { map[key] = v; }
+			};
+		}
+		// **THE SAME GATE AS decimalsFor(), AND THE SAME REASON: THE MAP IS THE LIST.** A field gets a
+		// priority spinner exactly when labelSettings.priority carries an entry for it, so a node's ID
+		// row (which orders nothing -- an ID is never the reason a label is dropped) is skipped
+		// without a second list of participants to keep in step with the first.
+		//
+		// The two tips differ because the two columns order different things -- rows inside one label
+		// on a link, whole labels against each other on a node. See defaultLabelSettings().
+		//
+		// Bound 99: a rank only has to be distinguishable, and the map ships nine of them. High enough
+		// that nobody meets it, low enough to stay one glance wide in a 4.5em box.
+		function priorityFor(group, key) {
+			var map = labelSettings.priority[group];
+			if (typeof map[key] !== 'number') { return null; }
+			return {
+				value: map[key], max: 99,
+				title: (group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) ||
+					'Which value matters most. 1 comes first.',
+				onChange: function (v) { map[key] = v; }
+			};
 		}
 		// The prefix/suffix pair for one row. Both boxes show the EFFECTIVE text (so an untouched
 		// row still displays the default the map is printing) and write into labelSettings, which
@@ -10353,11 +10583,13 @@ var EngCalcs = EngCalcs || {};
 		}
 		nodeFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(nodeBox, f[1], labelSettings.node[f[0]],
-				function (v) { labelSettings.node[f[0]] = v; }, decimalsFor('node', f[0]), affixFor('node', f[0]));
+				function (v) { labelSettings.node[f[0]] = v; }, decimalsFor('node', f[0]),
+				affixFor('node', f[0]), priorityFor('node', f[0]));
 		});
 		linkFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(linkBox, f[1], labelSettings.link[f[0]],
-				function (v) { labelSettings.link[f[0]] = v; }, decimalsFor('link', f[0]), affixFor('link', f[0]));
+				function (v) { labelSettings.link[f[0]] = v; }, decimalsFor('link', f[0]),
+				affixFor('link', f[0]), priorityFor('link', f[0]));
 		});
 		// Options applying to every field at once, below both field lists rather than on any one row:
 		// Task 190's high/low mark, and Task 333's one blanket separator (Tom, 2026-08-15: "One
@@ -13294,27 +13526,47 @@ var EngCalcs = EngCalcs || {};
 		//
 		// So: two pools, on purpose. If a future reader is about to merge them for tidiness, this is
 		// the note saying it was tried, and `dev/lpn-spike/label-affix-harness.js` asserts the split.
-		var extrema = {
-			// Elevation and pressure now include reservoirs -- a reservoir has a real elevation of
-			// its own, and a real pressure (head minus that elevation) whenever its head has been
-			// raised above it. Demand still excludes them: a reservoir supplies whatever the network
-			// draws rather than demanding an amount.
-			// INPUTS use plainRound() -- they are already in the displayed unit (Task 263), the same
-			// treatment length/roughness/km have always had. Only solve RESULTS still come out of the
-			// solver in SI and go through displayRound().
-			elev: fieldExtrema(doc.nodes.map(function (n) { return plainRound(n.elev, nd.elev); })),
-			demand: fieldExtrema(doc.nodes.map(function (n) { return !isFixedHeadNode(n) ? plainRound(effective(n, 'demand'), nd.demand) : undefined; })),
-			head: fieldExtrema(doc.nodes.map(function (n) {
+		// **THE NODE FIELDS ARE COMPUTED ONCE AND READ TWICE**, by the extrema ticks below and by the
+		// local feature context's drop ranking (Task 397). They used to be an anonymous array inside
+		// fieldExtrema()'s own argument, which is fine when min and max are all anyone wants and no
+		// use at all to a comparator that needs the value AT a node. `nodeValueMap()` keeps both
+		// shapes from one walk -- and, more importantly, keeps the two consumers reading the SAME
+		// rounded number, so a label's printed value, its high/low tick and its rank can never
+		// disagree.
+		//
+		// Elevation and pressure include reservoirs -- a reservoir has a real elevation of its own,
+		// and a real pressure (head minus that elevation) whenever its head has been raised above it.
+		// Demand still excludes them: a reservoir supplies whatever the network draws rather than
+		// demanding an amount.
+		// INPUTS use plainRound() -- they are already in the displayed unit (Task 263), the same
+		// treatment length/roughness/km have always had. Only solve RESULTS still come out of the
+		// solver in SI and go through displayRound().
+		var nodeVal = {
+			elev: nodeValueMap(function (n) { return plainRound(n.elev, nd.elev); }),
+			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(effective(n, 'demand'), nd.demand) : undefined; }),
+			head: nodeValueMap(function (n) {
 				// Head is an INPUT on a reservoir or tank and a RESULT on a junction, so the two
 				// halves of this one field cross the boundary differently. Both end up in
 				// Elevation/Head units, which is what makes them comparable for the extrema tick.
 				if (isFixedHeadNode(n)) { return plainRound(nodeFixedHead(n), nd.head); }
 				return lastSolveResult ? displayRound(lastSolveResult.heads[n.id], 'lpn_u_elevhead', nd.head) : undefined;
-			})),
-			pressure: fieldExtrema(doc.nodes.map(function (n) {
+			}),
+			pressure: nodeValueMap(function (n) {
 				if (isFixedHeadNode(n)) { return displayRound(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure', nd.pressure); }
 				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], 'lpn_u_pressure', nd.pressure) : undefined;
-			})),
+			})
+		};
+		// **BUILT HERE AND NOWHERE ELSE**, because this is already the one function that runs on every
+		// model change, every solve and every unit switch -- the exact set of events that invalidates
+		// it -- and is NOT called by a zoom, a pan or a drag frame, which are exactly the events that
+		// must not. Hanging it off a seam that already has the right lifetime is what keeps the stamp
+		// from having to be bumped by hand at a dozen call sites, each a chance to forget.
+		nodeContext = buildNodeContext(nodeVal);
+		var extrema = {
+			elev: fieldExtrema(nodeVal.elev.list),
+			demand: fieldExtrema(nodeVal.demand.list),
+			head: fieldExtrema(nodeVal.head.list),
+			pressure: fieldExtrema(nodeVal.pressure.list),
 			diameter: fieldExtrema(doc.links.map(function (l) { return l.type !== 'pump' ? plainRound(effective(l, 'diameter'), ld.diameter) : undefined; })),
 			// PIPE-ONLY, not merely not-a-pump (Task 248 phase 2). A valve has no length by
 			// definition and no roughness to speak of, so including it would drag the low end of

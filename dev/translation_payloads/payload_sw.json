@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 989,
-        "delta_key_count": 78,
+        "expected_key_count": 992,
+        "delta_key_count": 81,
         "exempt_key_count": 17,
         "exempt_keys": [
             "calc_units_us",
@@ -403,6 +403,9 @@
         "lpn_labels_suffix_gradient_tip": "Text printed after the head loss gradient on the map. Do not type a percent sign here. It is added for you when the units are percent.",
         "lpn_labels_separator": "Separator",
         "lpn_labels_separator_tip": "Text between one value and the next on a label. A space by default.",
+        "lpn_labels_priority": "Priority",
+        "lpn_labels_priority_link_tip": "Order the values are dropped in when a label does not fit. 1 is kept longest.",
+        "lpn_labels_priority_node_tip": "Which value decides who gives up a crowded spot. 1 decides first. A node showing a low demand gives up its label before one showing a high demand.",
         "lpn_backdrop_scale_from": "Scale from current size, about a point you pick",
         "lpn_backdrop_scale_from_prompt1": "Click the point on the background image that should stay where it is.",
         "lpn_backdrop_scale_from_prompt2": "Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.",
@@ -483,6 +486,9 @@
         "lpn_labels_suffix_gradient_tip": "Text printed after the head loss gradient on the map. Do not type a percent sign here. It is added for you when the units are percent.",
         "lpn_labels_separator": "Separator",
         "lpn_labels_separator_tip": "Text between one value and the next on a label. A space by default.",
+        "lpn_labels_priority": "Priority",
+        "lpn_labels_priority_link_tip": "Order the values are dropped in when a label does not fit. 1 is kept longest.",
+        "lpn_labels_priority_node_tip": "Which value decides who gives up a crowded spot. 1 decides first. A node showing a low demand gives up its label before one showing a high demand.",
         "lpn_backdrop_scale_from": "Scale from current size, about a point you pick",
         "lpn_backdrop_scale_from_prompt1": "Click the point on the background image that should stay where it is.",
         "lpn_backdrop_scale_from_prompt2": "Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.",
@@ -1283,6 +1289,54 @@
             }
         },
         "lpn_labels_separator_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "Weka alama thamani za juu na za chini kabisa",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_field_id",
+                    "value": "Kitambulisho",
+                    "english": "ID"
+                }
+            }
+        },
+        "lpn_labels_priority": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "Weka alama thamani za juu na za chini kabisa",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_field_id",
+                    "value": "Kitambulisho",
+                    "english": "ID"
+                }
+            }
+        },
+        "lpn_labels_priority_link_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "Weka alama thamani za juu na za chini kabisa",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_field_id",
+                    "value": "Kitambulisho",
+                    "english": "ID"
+                }
+            }
+        },
+        "lpn_labels_priority_node_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

@@ -312,6 +312,54 @@ EngCalcs.lpnGeom = (function () {
 	}
 
 
+	// ---- local feature context: which way is open (ROADMAP Task 397) --------------------------
+	//
+	// **BEARINGS ARE SCALE-INVARIANT. DISTANCES ARE NOT. THAT IS THE WHOLE REASON THIS IS ANGLES.**
+	// Every label dimension in this editor is a pixel figure divided by the zoom (a label's width in
+	// world units is 1/scale), while the pipes are in world units and do not move. So an "openness"
+	// measured as a world distance is a different number at every zoom, and a label picking its side
+	// from one changes side as the user scrolls the wheel -- for a reason no reader can see. Measured
+	// as an angle, the answer moves only when the network's SHAPE moves, which is the only thing that
+	// should move it.
+	//
+	// `deg` is a compass-free bearing in degrees, the same convention atan2(dy, dx) returns and the
+	// same y-down sense as everything else here.
+
+	// The absolute difference between two bearings, wrapped into [0, 180].
+	function angularGap(aDeg, bDeg) {
+		var d = Math.abs(aDeg - bDeg) % 360;
+		return d > 180 ? 360 - d : d;
+	}
+	// HOW OPEN ONE DIRECTION IS: the angle to the nearest occupied bearing, in degrees, so bigger is
+	// clearer. With nothing occupied it is 180 -- the most open a direction can be -- rather than
+	// Infinity, so callers can compare, sum and average it without special cases.
+	function directionOpenness(occupiedDegs, dirDeg) {
+		var best = 180, i, d;
+		if (!occupiedDegs) { return best; }
+		for (i = 0; i < occupiedDegs.length; i++) {
+			d = angularGap(dirDeg, occupiedDegs[i]);
+			if (d < best) { best = d; }
+		}
+		return best;
+	}
+	// WHICH OF THE OFFERED DIRECTIONS IS MOST OPEN -- returned as an index into `dirDegs`, so the
+	// caller keeps ownership of what those directions mean.
+	//
+	// **THE FIRST DIRECTION IS THE INCUMBENT AND WINS EVERY TIE AND EVERY NARROW CONTEST.** `margin`
+	// is how much better a challenger must be, as a ratio, exactly as LPN_SIDE_SWITCH_MARGIN already
+	// requires of a pipe label's other side. A drawing whose labels sit one side of some nodes and
+	// the other side of others, for differences no reader can perceive, is worse than one that is
+	// occasionally tight: consistency IS legibility here. Pass margin 1 for a plain argmax.
+	function mostOpenDirection(occupiedDegs, dirDegs, margin) {
+		var best = 0, bestOpen = directionOpenness(occupiedDegs, dirDegs[0]), i, open;
+		margin = margin > 0 ? margin : 1;
+		for (i = 1; i < dirDegs.length; i++) {
+			open = directionOpenness(occupiedDegs, dirDegs[i]);
+			if (open > bestOpen * margin) { bestOpen = open; best = i; }
+		}
+		return best;
+	}
+
 	// Shortest distance from a point to a polyline. Used to pick which SIDE of a pipe a label goes
 	// on (looped-network.js alignedSideFor()): the label's own pipe is excluded by the caller, so
 	// what this measures is how close the candidate position comes to some OTHER pipe.
@@ -353,7 +401,10 @@ EngCalcs.lpnGeom = (function () {
 		rotatedLabelBox: rotatedLabelBox,
 		orientedLabelBox: orientedLabelBox,
 		pointToSegmentDistance: pointToSegmentDistance,
-		pointToPolylineDistance: pointToPolylineDistance
+		pointToPolylineDistance: pointToPolylineDistance,
+		angularGap: angularGap,
+		directionOpenness: directionOpenness,
+		mostOpenDirection: mostOpenDirection
 	};
 }());
 

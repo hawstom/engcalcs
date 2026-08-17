@@ -11,6 +11,8 @@ The full text of every closed task is in git and nowhere else, by Tom's ruling o
 Durable policy from these tasks lives in `CLAUDE.md` and in `dev/*.md`. Those are the current
 state; this is only a list of numbers that were once used.
 
+- 0|392| Label candidate reach was 28 px, smaller than the label itself. Now 30 text heights with the inner ring at 6, and the number is a multiple of the lettering rather than an absolute
+- 0|343| SUPERSEDED by Task 397. Its open question — what triggers a drop — was answered by Tom's 2026-08-16 phases: first-fit drops whoever arrives at a full space, so the trigger is the priority ORDER, never a threshold
 - 0|384| Colour by value: EPANET's four-break/five-band legend, per-variable absolute breaks, Equal intervals/Equal counts, three ramps, a thematic mode. epanetjs is FSL-1.1-MIT, so the idea only
 - 0|376| Label mask rect replaced by a text halo (paint-order stroke fill); the mask element, its pad, its rotation and its layer are gone
 - 0|379| Label relaxation replaced by candidate scoring: ranked goals, oriented boxes, a neighbourhood term, no cap and no failure condition

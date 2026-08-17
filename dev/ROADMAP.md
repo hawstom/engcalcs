@@ -27,12 +27,12 @@ step 4 abolished that guess — all ten EPANET keywords are supported and an unk
 the solve by name instead. Rewording it is an English change on a key already translated in 26
 languages, so it belongs in the sprint rather than as a quiet edit.
 
-**Blocked on a ruling, and it is one question:** Task 343 (dropping label lines by priority). The
-input is ~20 lines, but a control that stores a number nothing reads is worse than none, and
-`dev/label-placement-goals.md` §2 rules out a threshold inside the placement pass. **What triggers a
-drop** — a residual-score threshold, a count of overlapping neighbours, or a map-width rule like the
-one that already hides annotation wholesale? The scoring pass already returns the per-label score
-such a threshold would read.
+**Arrow 2 — the LABEL PARADIGM, Tasks 397–400**, unblocked 2026-08-16 by Tom's phases. Start at 397
+(the priority column, the local feature context, the width bank); 398 and 399 both need it and 399
+can ship first. Spec is `dev/label-placement-goals.md`; the standards survey behind it is
+`dev/label-placement-algorithms.md`. Task 343's old open question — what triggers a drop — is
+answered and the task is closed: first-fit drops whoever arrives at a full space, so the trigger is
+the priority ORDER, never a threshold inside the pass.
 
 **Also open and unblocked:** Task 388's remainder — `js/looped-network.js` is still 46.9% comment
 lines with ~190 blocks of 10+ lines left. Mechanical, and a good filler for a session with spare
@@ -169,8 +169,8 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
 - 15|355| **Long labels and short pipes — WAIT AND TEST.** Tom, 2026-08-15, after the repeat and
   alignment work landed: *"I think we are good, to tell the truth. Nothing to do, I think."* So
   nothing is scheduled. `linkLabelTooShort()` still hides a short pipe's label all-or-nothing; if
-  that ever reads wrong in practice the candidates are Task 343's line-priority drop, shrinking the
-  label, letting it overrun, or a leader. Reopen on evidence, not on tidiness.
+  that ever reads wrong in practice Task 399 now covers it — the label sheds values instead of
+  vanishing whole, and `linkLabelTooShort()` becomes the last rung rather than the only one.
 
 - 15|294|[H] **Decide the 7 remaining dead language keys, one each.** `menu_main_list`,
   `menu_main_language`, `mi_d50in`, `mpf_spreadheet_notice` (key name is misspelled too),
@@ -320,30 +320,56 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   arrive without a rewrite. Deliberately not built at six examples; worth doing when the wall stops
   fitting on a screen.
 
-- 25|343| **Priority order for hiding label lines when they do not fit.** Provide an input in the
-  labels box for persistence priority 1–10. Priority cut from 55 by Tom, 2026-08-16: *"It's not a
-  terrible idea. But I don't know what to do with it right now."*
-  - **Blocked on scope, not effort.** The input is ~20 lines beside the existing decimals spinner,
-    but a control storing a number nothing reads is worse than no control, and
-    `dev/label-placement-goals.md` §2 rules out a threshold inside the placement pass.
-  - **The open question: what triggers a drop?** (a) a residual-score threshold — the pass already
-    returns the per-label score one would read; (b) a count of overlapping neighbours; (c) a
-    map-width rule, like the one that already hides annotation wholesale. Answer that and the rest
-    is small.
+- 90|397| **Label priority column, the local feature context, and the width bank.** Phase 0 of the
+  2026-08-16 label paradigm — pure state, UI and measurement, no placement behaviour change. Spec:
+  `dev/label-placement-goals.md` §2.2 and §3.3. Supersedes Task 343.
+  - `labelSettings.priority` as a map PARALLEL to `decimals`, never nested into the boolean maps —
+    those are merged key-by-key out of localStorage and a shape change reinterprets every saved
+    network. Defaults are Tom's two lists.
+  - **One column, two axes, and that is deliberate:** a link number orders ROWS inside one label, a
+    node number orders LABELS against each other. Both read "lower means this field matters more".
+    The comparison DIRECTIONS are compiled in, not offered — see §2.2's table.
+  - **The local feature context is one record per node holding BOTH the scale-invariant geometry
+    (incident-link bearings, most-open side) AND the stable model data the drop comparator reads**
+    (Tom, 2026-08-16). Invalidated by a model edit or a solve and by nothing else, so it survives
+    every zoom, pan and drag frame — where today the neighbour means it carries would be recomputed
+    sixty times a second.
+  - The width bank: per-tspan `getComputedTextLength()` beside the existing `noteMeasuredWidth()`
+    call, so any prefix of a label's row costs a sum rather than a re-measure. Phase 2 needs it.
 
-- 90|392| **The label candidate reach is smaller than the label, so the pass cannot clear anything.**
-  Tom, 2026-08-16, on a second bad placement: *"Are they going out far enough? We weren't rigorous
-  about that at all in our spec doc."* No. Measured: the search disc is 28 px in radius while a
-  3-line label at the default text size is **50 × 38.5 px**. Four of the seventeen candidates sit
-  inside the label's own footprint, so every candidate covers much the same ground.
-  - **How the number went wrong:** 28 px was measured as a LEGIBILITY CAP on how far a label may
-    stray (Tom on labels 85–301 px out: *"Far away... They should be on the opposite side of the
-    model"*), and under the old relaxation it was exactly that — `LPN_NUDGE_CAP_PX`, applied after
-    the fact. Task 379 reused the same number as the RADIUS OF THE ENTIRE SEARCH, a different
-    quantity.
-  - Proposal awaiting Tom's number: express reach in LABEL SIZES, `outer = hypot(w, h)` (≈ 63 px for
-    a 3-line label) — the smallest reach that can step off a conflict, still inside the 85 px he
-    objected to, and it scales with text size where a fixed 28 px does not.
+- 85|398| **Phase 1 — node labels by first-fit, with a drop.** `dev/label-placement-goals.md` §2.1.
+  Most-open side, jump to the other side on conflict, drop by priority. Needs Task 397.
+  - **Ships behind a `?debug=labels` switch (`node placement: ring | first-fit`), not as a
+    replacement.** The ring stays for free link and dragged labels regardless, so the switch is one
+    branch and no dead code — and Tom can see both.
+  - **A node label goes from 33 candidates to 2, so expect a visibly emptier drawing** until Task
+    400 lands. The bench must gain its `dropped` readout IN THIS TASK: without it, a layout that
+    drops half its labels scores perfectly on every number the bench prints today.
+  - **`flips under pan` must read 0 and does not today** — `drawnLinkLabelStations()` culls to the
+    view rect and those obstacles reach node placement, so after this task labels appear and
+    disappear as you scroll. Fix it here or write down that we accepted it.
+  - Worth a `/code-review`: cross-cutting, and it changes logic nobody can confirm by using the page.
+
+- 80|399| **Phase 2 — link labels shed values instead of vanishing whole.**
+  `dev/label-placement-goals.md` §3.5. Needs Task 397; deliberately independent of Task 398, so it
+  can ship first. It has no downside — it strictly improves on today's all-or-nothing hide.
+  - An undragged link label is ONE inline row, so shedding a trailing value reduces its WIDTH, which
+    is the quantity both `linkLabelTooShort()` and the conflict test already consume. Too-long-for-
+    its-pipe and in-conflict become one cascade with two stopping conditions.
+  - **A chain sheds as one link, never per station, and off the FULL station list** — deriving
+    content from the drawn list would change a pipe's printed values as the user scrolls.
+  - **THIS is where node-outranks-link becomes safe to switch on** (Tom, 2026-08-16). Today
+    `placeStationedLabels()` commits link labels first and nodes go round them; the new ruling
+    reverses that. Do not flip the order before this task ships — a link label that can only choose
+    its station and its side has nothing to yield WITH, so it would just be run over.
+
+- 60|400| **Phase 3 — bounded local search on the residue.** Wagner & Wolff's three optimum-preserving
+  reduction rules on an explicit conflict graph, then a bounded chain search, in QGIS PAL's shape.
+  Survey: `dev/label-placement-algorithms.md`. Needs Tasks 398 and 399.
+  - **The view-independent conflict graph is the gate, not a loose end.** The rules are defined on
+    it, and today the graph differs at every zoom and every pan.
+  - Straight-top as a third candidate position belongs here: measured (arXiv 2407.11996) as
+    preferred over Imhof's top-right.
 
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
   2026-08-14: *"Not mtext labels. Mtext Text objects."* The target is what you place with the Text
@@ -534,7 +560,7 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
     the point: map-sized text shrinks with the drawing and its absence would be surprising,
     screen-sized text stays put and collides. epanet-js hides NODE labels at one zoom threshold, all
     together and apparently hard-coded — cruder than per-label fit, so beat it rather than copy it.
-    Interacts with Tasks 379, 377 and 343, which are the same question at other granularities.
+    Interacts with Tasks 379, 377 and 399, which are the same question at other granularities.
   - **Units as an optional suffix**, for anyone who wants epanet-js's behaviour. Not the default —
     Tom: *"I personally don't see the need for units on a map when they are endlessly redundant. But
     we could offer that."*
