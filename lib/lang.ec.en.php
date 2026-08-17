@@ -1192,6 +1192,7 @@ $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start b
 $ec_lang['lpn_examples_heading']='Open an example';
 $ec_lang['lpn_examples_sub']='Each one opens as your own copy. Change it, save it, or open a fresh copy and start again.';
 $ec_lang['lpn_examples_open']='Open';
+$ec_lang_syn['lpn_examples_open']='Open, Open this example, Load, Load this example, Start with this one | layout: button; avoid: open as an adjective/state (something already open), not the imperative verb';
 $ec_lang['lpn_examples_menu']='Open example…';
 $ec_lang['lpn_examples_blank']='Or start with a blank map';
 $ec_lang['lpn_examples_size']='{nodes} nodes, {links} links';
@@ -1202,6 +1203,7 @@ $ec_lang['lpn_examples_loading']='Loading examples…';
 // like a request for money or code, which is what "Contribute" reads as to most visitors. It opens
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Fix something';
+$ec_lang_syn['lpn_help_fix']='Fix something, Report a mistake, Tell us what is wrong, Send a correction, Suggest a fix | avoid: fix as fasten or attach; avoid: fix as prepare';
 $ec_lang['lpn_help_notes']='Notes on this page';
 $ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it with File, Save as.';
 // Each example's own card text. These live here, and NOT in the examples folder's own JSON, for one
@@ -1720,7 +1722,9 @@ $ec_lang['lpn_labels_priority_node_tip']='Priority for deciding whose label is d
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='Before';
+$ec_lang_syn['lpn_labels_col_before']='Before, In front, In front of the value, Prefix, Leading text | avoid: before in the sense of earlier in time';
 $ec_lang['lpn_labels_col_after']='After';
+$ec_lang_syn['lpn_labels_col_after']='After, Suffix, Trailing text, Postfix | avoid: after in the sense of later in time';
 $ec_lang['lpn_labels_col_decimals']='Decimals';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Background image…';

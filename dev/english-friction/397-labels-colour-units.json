@@ -75,7 +75,7 @@
 				"open, as opposed to shut -- the pipe state"
 			],
 			"disposition": "intent",
-			"resolution": "English kept: 'Open' on a card button is correct and an English reader does not stumble. PROPOSED $ec_lang_syn entry, AWAITING TOM'S WRITTEN APPROVAL -- not written: $ec_lang_syn['lpn_examples_open']='Open, Open this example, Load, Load this example, Start with this one | layout: button; avoid: open as the opposite of shut, as a pipe is open'. Every phrase passes the substitution test."
+			"resolution": "WRITTEN 2026-08-17, Tom approved with one correction: the ambiguity is imperative-verb vs. adjective/participle, not 'opposite of shut' -- 'Open' is always the opposite of shut in either reading. $ec_lang_syn['lpn_examples_open']='Open, Open this example, Load, Load this example, Start with this one | layout: button; avoid: open as an adjective/state (something already open), not the imperative verb'."
 		},
 		{
 			"key": "lpn_examples_menu",
@@ -127,7 +127,7 @@
 				"arrange or prepare something"
 			],
 			"disposition": "intent",
-			"resolution": "English kept: Tom chose this wording deliberately on 2026-08-14 (recorded above the key) because the verb invites the small correction people actually send, where 'Contribute' reads as a request for money or code. PROPOSED $ec_lang_syn entry, AWAITING TOM'S WRITTEN APPROVAL -- not written: $ec_lang_syn['lpn_help_fix']='Fix something, Report a mistake, Tell us what is wrong, Send a correction, Suggest a fix | avoid: fix as fasten or attach; avoid: fix as prepare'. Every phrase could stand on the menu row."
+			"resolution": "WRITTEN 2026-08-17, Tom approved as drafted. $ec_lang_syn['lpn_help_fix']='Fix something, Report a mistake, Tell us what is wrong, Send a correction, Suggest a fix | avoid: fix as fasten or attach; avoid: fix as prepare'."
 		},
 		{
 			"key": "lpn_help_notes",
@@ -317,7 +317,7 @@
 				"earlier in time"
 			],
 			"disposition": "intent",
-			"resolution": "English kept. The heading sits in a 3.5em column built from LPN_LABEL_AFFIX_W and shares the row with three other headings, so it cannot grow; and the box beneath it carries lpn_labels_prefix_tip as its title, which states the positional sense. PROPOSED $ec_lang_syn entry, AWAITING TOM'S WRITTEN APPROVAL -- not written: $ec_lang_syn['lpn_labels_col_before']='Before, In front, In front of the value, Prefix, Leading text | layout: column heading; avoid: before in the sense of earlier in time'."
+			"resolution": "WRITTEN 2026-08-17, Tom approved as drafted (paired with lpn_labels_col_after). $ec_lang_syn['lpn_labels_col_before']='Before, In front, In front of the value, Prefix, Leading text | avoid: before in the sense of earlier in time'. The 'layout: column heading' tag drafted here was dropped post-write: layout_tag_check.php only recognizes a literal <th>, and this heading is a JS-built flex-row span (columnHeadings() in js/looped-network.js), not a <table>."
 		},
 		{
 			"key": "lpn_labels_col_after",
@@ -329,7 +329,7 @@
 				"later in time"
 			],
 			"disposition": "intent",
-			"resolution": "English kept for the same width reason as its sibling, and the box carries lpn_labels_suffix_tip. PROPOSED $ec_lang_syn entry, AWAITING TOM'S WRITTEN APPROVAL -- not written: $ec_lang_syn['lpn_labels_col_after']='After, Behind, Behind the value, Suffix, Trailing text | layout: column heading; avoid: after in the sense of later in time'. The two entries must be approved together or the pair goes out of parallel."
+			"resolution": "WRITTEN 2026-08-17, Tom approved with one edit: dropped 'Behind'/'Behind the value' (behind can mean hidden, obscured, subordinate) and added 'Postfix' to parallel 'Prefix' on the sibling entry. $ec_lang_syn['lpn_labels_col_after']='After, Suffix, Trailing text, Postfix | avoid: after in the sense of later in time'. Same 'layout: column heading' tag drop as the sibling entry, same reason."
 		},
 		{
 			"key": "lpn_labels_col_decimals",
