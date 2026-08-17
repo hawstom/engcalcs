@@ -874,7 +874,10 @@
         "lpn_labels_separator_tip": "Text between one value and the next on a label. A space by default.",
         "lpn_labels_priority": "Priority",
         "lpn_labels_priority_link_tip": "Order the values are dropped in when a label does not fit. 1 is kept longest.",
-        "lpn_labels_priority_node_tip": "Which value decides who gives up a crowded spot. 1 decides first. A node showing a low demand gives up its label before one showing a high demand.",
+        "lpn_labels_priority_node_tip": "Priority for deciding whose label is dropped first when the map is crowded: lowest demand, least extreme pressure, or most neighbour-like elevation or head. 1 decides first.",
+        "lpn_labels_col_before": "Before",
+        "lpn_labels_col_after": "After",
+        "lpn_labels_col_decimals": "Decimals",
         "lpn_field_id": "ID",
         "lpn_backdrop_menu": "Background image…",
         "lpn_backdrop_add": "Add",
@@ -994,7 +997,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 992,
+    "count": 995,
     "active_prefixes": [
         "about",
         "bpn",

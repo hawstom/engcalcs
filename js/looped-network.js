@@ -423,6 +423,12 @@ var EngCalcs = EngCalcs || {};
 	// a nudge or a toggled field changing tw/lineCount both move this label).
 	function layoutNodeLabel(id) {
 		var n = nodeById(id), ne = nodeEls[id]; if (!ne) { return; }
+		// **A DROPPED LABEL IS HIDDEN, NOT MOVED** (Task 398). Set before anything is placed, and
+		// through the same visibility seam a too-short link label uses, so a node and a link that
+		// both lose their labels lose them the same way. `visibility` rather than `display` for the
+		// reason setLabelAssemblyHidden() gives: the element keeps its box, so nothing downstream
+		// has to re-measure a thing that is merely invisible.
+		setLabelAssemblyHidden(ne, !!ne.hiddenDropped);
 		var anchor = { x: n.x, y: n.y }, end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, labelIsDragged(n));
 		repositionMultilineText(ne.text, org.x, org.y);
@@ -691,8 +697,11 @@ var EngCalcs = EngCalcs || {};
 	function layoutLinkLabel(id) {
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE anything is placed, so every station obeys it.
+		// `hiddenYielded` is Task 398's: this label gave its ground to a node label that had nowhere
+		// else to go. Same visibility seam as the too-short rule, because to a reader they are the
+		// same event -- the label is not there.
 		le.hiddenShort = linkLabelTooShort(l, le);
-		setLabelAssemblyHidden(le, le.hiddenShort);
+		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenYielded);
 		var single = linkLabelStations(l).length === 1,
 			stations = single ? [le.alignedAlong] : drawnLinkLabelStations(l), i;
 		ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
@@ -1071,7 +1080,10 @@ var EngCalcs = EngCalcs || {};
 			}
 			// Committed as obstacles for everyone placed after -- including the node and Text
 			// labels the candidate pass is about to place.
-			boxes.forEach(function (bx) { bx.kind = 'label'; obs.boxes.push(bx); });
+			// **STAMPED WITH THE LINK THAT OWNS IT** (Task 398). A node label that cannot fit is
+			// allowed to take a link label's ground, and this is how the repair pass tells a link
+			// label -- which it may remove -- from a node label or a symbol, which it may not.
+			boxes.forEach(function (bx) { bx.kind = 'label'; bx.linkOwner = l.id; obs.boxes.push(bx); });
 		});
 	}
 	// **DRAW THE BOXES THE PLACEMENT PASS IS ACTUALLY REASONING ABOUT** (Tom, 2026-08-15: *"Would it
@@ -1127,33 +1139,88 @@ var EngCalcs = EngCalcs || {};
 		}
 		return labelTune;
 	}
+	// **DOES THE DRAWING HOLD STILL WHEN THE USER TOUCHES THE WHEEL?** (Task 398; §5.) This is the
+	// failure mode dropping introduces and the one nothing else here watches: a label that pops in
+	// and out over a zoom step is worse than one that sits slightly tight, and it is invisible in a
+	// single screenshot. Been, Daiches & Yap's first two desiderata for interactive labelling are
+	// exactly this, and every published engine pays real attention to it.
+	//
+	// Measured rather than reasoned about: re-run the whole pass at 0.9x and 1.1x and count the
+	// labels that changed side or changed visibility. The pass is idempotent and re-derives every
+	// nudge from scratch, so running it three times and putting the scale back leaves the drawing
+	// exactly as it found it -- which is the property that makes this safe to do inside a render.
+	//
+	// The re-entrancy guard is load-bearing, not defensive: labelDebugReport() is called BY the pass,
+	// and this calls the pass.
+	var labelFlipProbing = false;
+	function labelFlipCount() {
+		if (labelFlipProbing) { return null; }
+		labelFlipProbing = true;
+		try {
+			var s0 = state.s, base = labelPlacementSignature(), worst = 0;
+			[0.9, 1.1].forEach(function (f) {
+				state.s = s0 * f;
+				runLabelCollisionAvoidance();
+				var now = labelPlacementSignature(), n = 0;
+				Object.keys(base).forEach(function (k) { if (base[k] !== now[k]) { n++; } });
+				worst = Math.max(worst, n);
+			});
+			state.s = s0;
+			runLabelCollisionAvoidance();
+			return worst;
+		} finally { labelFlipProbing = false; }
+	}
+	// Visibility and side, per node label -- the two things a reader would notice moving.
+	function labelPlacementSignature() {
+		var out = {};
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id];
+			if (!ne || ne.empty) { return; }
+			out[n.id] = (ne.hiddenDropped ? 'x' : '') + (ne.placedSide === undefined ? '?' : ne.placedSide);
+		});
+		return out;
+	}
 	function labelDebugReport(labels, placed, obs) {
 		// The boxes the pass COMMITTED, straight off its own result -- see placeLabels(). Reading
 		// them off our obstacle list gave an empty array, because the pass works on a copy.
-		var boxes = placed.map(function (r) { return r.box; });
-		drawCollisionBoxes(boxes, obs, placed.map(function (r) { return r.leader; }));
+		// A DROPPED LABEL COMMITTED NO BOX, so every count below is over what was actually drawn.
+		var drawn = placed.filter(function (r) { return r.box; }),
+			boxes = drawn.map(function (r) { return r.box; }),
+			dropped = placed.length - drawn.length,
+			yielded = doc.links.filter(function (l) {
+				var le = linkEls[l.id]; return le && le.hiddenYielded;
+			}).length;
+		drawCollisionBoxes(boxes, obs, placed.map(function (r) { return r.leader; }).filter(Boolean));
 		if (!debugOn('labels')) { return; }
-		// THE COUNTS, because "that looks better" is not a verdict. Both of the top two goals are
-		// reported: text on text (goal 2) is the failure, and a rule drawn through a number
-		// (goal 3) is the one Tom keeps photographing.
+		// THE COUNTS, because "that looks better" is not a verdict.
+		//
+		// **DROPPED IS REPORTED FIRST, AND THE ORDER IS THE ARGUMENT** (Task 398). Every other number
+		// here can be improved by dropping more: a layout that hides half its labels scores a perfect
+		// zero on label-on-label and on travel. Reading them without the drop count in front would
+		// make the first-fit look like an improvement on the readout while looking worse on screen,
+		// which is precisely the trap this panel exists to avoid.
 		var i, j, pairs = 0, onLeader = 0, travel = 0;
 		for (i = 0; i < boxes.length; i++) {
 			for (j = i + 1; j < boxes.length; j++) {
 				if (Collide.boxOverlapDepth(boxes[i], boxes[j]) > 0) { pairs++; }
 			}
-			for (j = 0; j < placed.length; j++) {
+			for (j = 0; j < drawn.length; j++) {
 				// Its own leader is excluded: it stops at the box's near edge by construction, so
-				// counting it would report the same constant on every drawing.
-				if (placed[j].id === placed[i].id) { continue; }
-				if (Collide.segmentInBoxFraction(placed[j].leader, boxes[i]) > 0) { onLeader++; }
+				// counting it would report the same constant on every drawing. A first-fit label
+				// draws no leader at all, so it contributes nothing here either.
+				if (drawn[j].id === drawn[i].id || !drawn[j].leader) { continue; }
+				if (Collide.segmentInBoxFraction(drawn[j].leader, boxes[i]) > 0) { onLeader++; }
 			}
 		}
-		placed.forEach(function (r) { travel += Math.hypot(r.dx, r.dy); });
+		drawn.forEach(function (r) { travel += Math.hypot(r.dx, r.dy); });
 		var el2 = document.getElementById('lpn_label_bench_out');
 		if (el2) {
-			el2.textContent = labels.length + ' labels \u2022 ' + pairs + ' label-on-label \u2022 '
+			var flips = labelFlipCount();
+			el2.textContent = dropped + ' dropped \u2022 ' + yielded + ' links yielded \u2022 '
+				+ (flips === null ? '' : flips + ' flips under zoom \u2022 ')
+				+ labels.length + ' labels \u2022 ' + pairs + ' label-on-label \u2022 '
 				+ onLeader + ' label-on-leader \u2022 mean travel '
-				+ (placed.length ? (travel / placed.length * (state.s || 1)).toFixed(1) : '0') + ' px';
+				+ (drawn.length ? (travel / drawn.length * (state.s || 1)).toFixed(1) : '0') + ' px';
 		}
 	}
 	function buildLabelBench() {
@@ -1289,9 +1356,59 @@ var EngCalcs = EngCalcs || {};
 		});
 		draw(placed, '#00d');
 	}
+	// **WHICH NODE LABEL SURVIVES A CROWD, AS ONE NUMBER** (Task 398; §2.2). Lower places earlier and
+	// therefore survives; the caller of placeLabelsFirstFit() sorts on it and the pass itself never
+	// compares two labels.
+	//
+	// The user's priority column gives the ORDER the criteria are consulted in. LPN_NODE_DROP_RULE
+	// gives each criterion's DIRECTION, which is not settable. A criterion counts only when its
+	// field is actually toggled on -- ranking on a number the reader cannot see would be arbitrary
+	// from their side of the screen.
+	//
+	// Every criterion is turned into "how much would this label be missed", higher being safer, and
+	// they are combined by RANK rather than by value: the first criterion that separates two nodes
+	// decides, and the rest are never consulted. That is Tom's list read literally ("use last first
+	// if on"), and it is why this is a lexicographic key and not a weighted sum -- a sum would let a
+	// large elevation difference outvote a demand, which is not what "in this order" means.
+	function nodeDropKey(n) {
+		var ctx = nodeContextFor(n.id), ls = labelSettings, out = [];
+		if (!ctx) { return [0]; }
+		Object.keys(LPN_NODE_DROP_RULE)
+			.filter(function (f) { return ls.node[f] && typeof ls.priority.node[f] === 'number'; })
+			.sort(function (a, b) { return ls.priority.node[a] - ls.priority.node[b]; })
+			.forEach(function (f) { out.push(-nodeFieldSalience(f, ctx)); });
+		return out;
+	}
+	// How much one field's value at one node is worth SHOWING, in that field's own units, higher
+	// meaning more worth keeping. Undefined -- no solve yet, or nothing to be like -- scores 0
+	// rather than being skipped, so the key stays the same length at every node and a missing value
+	// never silently promotes the next criterion at one node and not at its neighbour.
+	function nodeFieldSalience(field, ctx) {
+		var v = ctx[field], rule = LPN_NODE_DROP_RULE[field], mid, nbr;
+		if (typeof v !== 'number' || !isFinite(v)) { return 0; }
+		if (rule === 'low') { return v; }
+		if (rule === 'extreme') {
+			// Distance from the middle of the network's own range for this field, so "extreme" means
+			// extreme ON THIS DRAWING rather than against an absolute nobody declared.
+			mid = nodeFieldMid[field];
+			return (typeof mid === 'number') ? Math.abs(v - mid) : 0;
+		}
+		// 'like': what is worth showing is how much this node DIFFERS from its neighbours, so a node
+		// sitting at their value is the redundant one and drops first.
+		nbr = ctx[field === 'elev' ? 'nbrElev' : 'nbrHead'];
+		return (typeof nbr === 'number' && isFinite(nbr)) ? Math.abs(v - nbr) : 0;
+	}
+	// The midpoint of each 'extreme' field's range, filled from the same fieldExtrema() the high/low
+	// ticks read, so "least extreme" and "gets the low tick" cannot disagree about the same drawing.
+	var nodeFieldMid = {};
+	function compareDropKeys(a, b) {
+		var i, n = Math.min(a.length, b.length);
+		for (i = 0; i < n; i++) { if (a[i] !== b[i]) { return a[i] - b[i]; } }
+		return 0;
+	}
 	function runLabelCollisionAvoidance() {
-		var fs = effectiveFontSize(), labels = [], stationed = [], obs = staticObstacles(),
-			holders = {};
+		var fs = effectiveFontSize(), labels = [], nodeLabels = [], stationed = [],
+			obs = staticObstacles(), holders = {};
 		function addDataLabel(key, holder, anchor, home, dragged, lineCount) {
 			// Every nudge is cleared and re-derived from scratch on every pass, dragged or not, so
 			// the pass is IDEMPOTENT: running it twice on an unchanged drawing gives the same answer
@@ -1306,13 +1423,43 @@ var EngCalcs = EngCalcs || {};
 				w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount), yOff: -fs * 0.85
 			});
 		}
+		// One auto-placed node label, as a first-fit participant. Its two candidate ENDPOINTS come
+		// straight off the resting offset, mirrored, with the most open one first -- the openness
+		// having been decided in the local feature context, from bearings, so it does not move when
+		// the user zooms. `sides` is the whole candidate set; there is no ring and no home.
+		function addNodeFirstFit(n, ne) {
+			var d = defaultLabelOffset(), ctx = nodeContextFor(n.id),
+				right = { x: n.x + d.x, y: n.y + d.y },
+				left = { x: n.x - d.x, y: n.y + d.y },
+				sides = (ctx && ctx.openSide === 1) ? [left, right] : [right, left];
+			ne.nudge = { x: 0, y: 0 };
+			ne.nudgeManual = false;
+			if (ne.empty) { return; }
+			holders[nodeLabelKey(n.id)] = ne;
+			nodeLabels.push({
+				id: nodeLabelKey(n.id), anchor: { x: n.x, y: n.y }, home: nodeLabelBase(n),
+				dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
+				w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85
+			});
+		}
+		// **NODE LABELS TAKE THE FIRST-FIT NOW, NOT THE RING** (Task 398). A dragged one is the
+		// exception and keeps the ring: goal 1 gives it candidates along the ray through its own
+		// stored endpoint, it is never dropped, and it never jumps sides -- the user put it there.
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
-			addDataLabel(nodeLabelKey(n.id), ne, { x: n.x, y: n.y }, nodeLabelBase(n),
-				n.lx !== undefined, ne.lineCount);
+			ne.hiddenDropped = false;
+			if (n.lx !== undefined) {
+				addDataLabel(nodeLabelKey(n.id), ne, { x: n.x, y: n.y }, nodeLabelBase(n), true, ne.lineCount);
+				return;
+			}
+			addNodeFirstFit(n, ne);
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
+			// Cleared every pass, exactly as the nudge is, so the pass stays idempotent: a label that
+			// yielded last time must be back in contention this time, or one crowded moment would
+			// hide a label permanently.
+			le.hiddenYielded = false;
 			// A label nobody can see is not an obstacle. Skipping it here also clears its nudge, so
 			// zooming back in restores it where it belongs rather than where it was last pushed.
 			if (linkLabelTooShort(l, le)) { le.nudge = { x: 0, y: 0 }; return; }
@@ -1328,21 +1475,84 @@ var EngCalcs = EngCalcs || {};
 			addDataLabel(linkLabelKey(l.id), le, linkLabelMid(l), linkLabelBase(l),
 				l.lx !== undefined, le.lineCount);
 		});
-		// Stationed labels first: they have already spent their freedom, so everyone else should see
-		// where they are before choosing.
+		// **LINKS PLACE FIRST, NODES SURVIVE FIRST** (Tom, 2026-08-16), and those are two different
+		// orders answering two different questions -- exactly the split ESRI Maplex draws between
+		// label priority and what is left unplaced. A link label is bound to its own pipe and has the
+		// fewest choices, so it chooses while it still can; but when something has to go, it is the
+		// link, which is what nodeRepairAgainstLinks() below delivers.
 		placeStationedLabels(stationed, obs, fs);
-		// Every number the pass is steered by goes through ONE place, so ?debug=labels can override
-		// them live without a second code path deciding anything (see labelTuning()).
+		// The lexicographic drop key becomes an ORDINAL here, so js/lpn-collide.js sees one number
+		// and never has to know what a demand is. Ties break on id, so the order is total and stable
+		// -- an unstable order would rearrange the drawing for reasons nobody could see.
+		nodeLabels.sort(function (a, b) {
+			var c = compareDropKeys(a.dropKey, b.dropKey);
+			return c !== 0 ? c : (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
+		});
+		nodeLabels.forEach(function (l, i) { l.priority = i; delete l.dropKey; });
+		var pad = fs * LPN_ALIGNED_PAD_FRAC,
+			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
+		nodeRepairAgainstLinks(nodeLabels, nodePlaced, obs, pad);
+		// Every number the ring pass is steered by goes through ONE place, so ?debug=labels can
+		// override them live without a second code path deciding anything (see labelTuning()). It
+		// now serves free link labels and DRAGGED labels of either kind -- see addNodeFirstFit().
 		var t = labelTuning(),
 			placed = Collide.placeLabels(labels, obs, {
 				inner: t.inner * fs, outer: t.reach * fs,
 				steps: parseRingSteps(t.steps), k: t.k
 			});
-		placed.forEach(function (r) {
+		placed.concat(nodePlaced).forEach(function (r) {
 			var h = holders[r.id];
-			if (h) { h.nudge = { x: r.dx, y: r.dy }; }
+			if (!h) { return; }
+			h.nudge = { x: r.dx, y: r.dy };
+			h.placedSide = r.side;
+			if (r.dropped) { h.hiddenDropped = true; }
 		});
-		labelDebugReport(labels, placed, obs);
+		labelDebugReport(labels.concat(nodeLabels), placed.concat(nodePlaced), obs);
+	}
+	// **THE REPAIR: A NODE NEVER LOSES TO A LINK.** First-fit places link labels first because they
+	// have the least freedom, so a node label can be boxed in by one and dropped -- which is the
+	// wrong casualty under Tom's ruling that links yield to nodes. This is the second pass that puts
+	// that right, and it is why the design is place-then-repair rather than one ordering: no single
+	// order can satisfy "links choose first" and "nodes survive first" at once.
+	//
+	// For each dropped node, re-test its sides ignoring LINK-LABEL boxes. If a side comes clear, the
+	// link labels it overlaps go away and the node takes the spot. In Phase 2 they will shed a value
+	// instead of vanishing; here they have nothing to shed, which is Tom's own reading -- *"if
+	// there's no fit, the link goes away."*
+	//
+	// A node still blocked by another NODE label, or by a symbol, stays dropped: that contest was
+	// already settled by the priority order and re-opening it here would undo it.
+	function nodeRepairAgainstLinks(nodeLabels, nodePlaced, obs, pad) {
+		var byId = {}, i;
+		nodeLabels.forEach(function (l) { byId[l.id] = l; });
+		for (i = 0; i < nodePlaced.length; i++) {
+			var r = nodePlaced[i]; if (!r.dropped) { continue; }
+			var lbl = byId[r.id]; if (!lbl) { continue; }
+			for (var s = 0; s < lbl.sides.length; s++) {
+				var b = Collide.labelBoxAtEnd(lbl, lbl.sides[s]),
+					blockers = [], blocked = false;
+				obs.boxes.forEach(function (o) {
+					if (Collide.boxOverlapDepth(b, o) <= 0) { return; }
+					// A link label is identified by the ownership placeStationedLabels() stamps on
+					// it. Anything else -- a node label, a symbol, a user Text object -- is a
+					// blocker this pass has no authority to remove.
+					if (o.linkOwner) { blockers.push(o); } else { blocked = true; }
+				});
+				if (blocked || !blockers.length) { continue; }
+				blockers.forEach(function (o) {
+					var le = linkEls[o.linkOwner];
+					if (le) { le.hiddenYielded = true; }
+					// Removed from the obstacle list too, or a later node would still go round a
+					// label that is no longer drawn.
+					obs.boxes.splice(obs.boxes.indexOf(o), 1);
+				});
+				r.dropped = false; r.side = s; r.box = b;
+				r.x = lbl.sides[s].x; r.y = lbl.sides[s].y;
+				r.dx = r.x - lbl.home.x; r.dy = r.y - lbl.home.y;
+				obs.boxes.push(b);
+				break;
+			}
+		}
 	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped.
@@ -10581,11 +10791,44 @@ var EngCalcs = EngCalcs || {};
 				}
 			};
 		}
+		// **THE COLUMNS NEED NAMING NOW THAT THERE ARE FOUR OF THEM** (Tom, 2026-08-16: "We need
+		// column headings now"). Three unlabelled boxes were inferable from their contents -- a
+		// letter, a letter, a small integer; four are not, because the two integers look alike and
+		// mean entirely different things.
+		//
+		// Built from the same LPN_LABEL_COL_W/GAP the boxes use, so a heading cannot drift off its
+		// column. The name column is a flex spacer rather than a heading of its own: it is the row's
+		// subject, not a column of values.
+		function columnHeadings(box) {
+			var row = document.createElement('div'), lead = document.createElement('span');
+			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = '6px';
+			row.style.fontSize = '0.85em'; row.style.opacity = '0.75';
+			lead.style.flex = '1 1 auto';
+			row.appendChild(lead);
+			[[pc.lpn_labels_col_before || 'Before', '3.5em'],
+				[pc.lpn_labels_col_after || 'After', '3.5em'],
+				[pc.lpn_labels_col_decimals || 'Decimals', LPN_LABEL_COL_W],
+				[pc.lpn_labels_priority || 'Priority', LPN_LABEL_COL_W]
+			].forEach(function (h, i) {
+				var cell = document.createElement('span');
+				cell.textContent = h[0];
+				cell.style.width = h[1]; cell.style.flex = '0 0 auto';
+				cell.style.textAlign = 'center';
+				// The affix boxes take the row's own 6px gap; the two numeric columns carry their own
+				// margin as well, so their headings must match or they sit half a gap left of the box
+				// they name.
+				if (i >= 2) { cell.style.marginLeft = LPN_LABEL_COL_GAP; }
+				row.appendChild(cell);
+			});
+			box.appendChild(row);
+		}
+		columnHeadings(nodeBox);
 		nodeFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(nodeBox, f[1], labelSettings.node[f[0]],
 				function (v) { labelSettings.node[f[0]] = v; }, decimalsFor('node', f[0]),
 				affixFor('node', f[0]), priorityFor('node', f[0]));
 		});
+		columnHeadings(linkBox);
 		linkFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(linkBox, f[1], labelSettings.link[f[0]],
 				function (v) { labelSettings.link[f[0]] = v; }, decimalsFor('link', f[0]),
@@ -13562,6 +13805,15 @@ var EngCalcs = EngCalcs || {};
 		// must not. Hanging it off a seam that already has the right lifetime is what keeps the stamp
 		// from having to be bumped by hand at a dozen call sites, each a chance to forget.
 		nodeContext = buildNodeContext(nodeVal);
+		// The midpoint of each 'extreme' field's range, for nodeFieldSalience(). Read off the same
+		// values the high/low ticks use, so "least extreme" and "gets the low tick" can never
+		// disagree about the same drawing.
+		nodeFieldMid = {};
+		Object.keys(LPN_NODE_DROP_RULE).forEach(function (f) {
+			if (LPN_NODE_DROP_RULE[f] !== 'extreme') { return; }
+			var e = fieldExtrema(nodeVal[f].list);
+			if (e && isFinite(e.min) && isFinite(e.max)) { nodeFieldMid[f] = (e.min + e.max) / 2; }
+		});
 		var extrema = {
 			elev: fieldExtrema(nodeVal.elev.list),
 			demand: fieldExtrema(nodeVal.demand.list),

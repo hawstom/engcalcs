@@ -20,8 +20,14 @@
 //     the list IS its weight -- see GOAL_WEIGHT below. Tom: *"The ranking includes the lenience. See
 //     that pipes are low ranked? That means they factor least in the score. You can be on a pipe and
 //     maybe still win."*
-//   * **THERE IS NO FAILURE CONDITION.** The best candidate wins; nothing declares defeat. Hiding
-//     and dropping lines are separate decisions, not a threshold in here.
+//   * **PLACEMENT HAS TWO OUTCOMES, AND WHICH ONE IS AVAILABLE DEPENDS ON THE PASS.** In the SCORER
+//     (placeLabels) the best candidate always wins and nothing declares defeat -- a ladder with a
+//     finite top always places something, so the worst placement on a drawing is indistinguishable
+//     from a merely tight one and no threshold read off the score could separate them. In the
+//     FIRST-FIT (placeLabelsFirstFit, Task 398) a position is clear or it is not, so "neither side
+//     is clear" is a fact rather than a judgement, and a label can be DROPPED. That is why dropping
+//     is expressible there and not here, and why the old blanket ruling -- "there is no failure
+//     condition, and do not invent one" -- now reads as a statement about the scorer alone.
 //
 // Everything is values in, values out. The caller builds the labels and the obstacles -- that is
 // where `doc`, the SVG handles and the current font size live -- and this file does the geometry.
@@ -650,8 +656,133 @@ EngCalcs.lpnCollide = (function () {
 		return out;
 	}
 
+	// ---- Phase 1: priority-ordered first-fit, with a drop (ROADMAP Task 398) --------------------
+	//
+	// **THIS IS THE BEGINNING OF THE STANDARD PIPELINE, AND placeLabels() ABOVE IS ITS END.** QGIS
+	// PAL's shape is candidates -> costs -> obstacles -> conflicts -> a fast first approximation
+	// (`init_sol_falp`) -> a bounded search. We built the search first and had no first
+	// approximation at all, which is why a crowded drawing cost the same as an empty one and why
+	// nothing could ever be left unlabelled. This is that first approximation. Tom's Phase 1, and
+	// MapLibre's whole per-frame algorithm, are the same thing under different names.
+	//
+	// Two positions, not thirty-three: the label goes at the most open side of its node, jumps to
+	// the other side if that side is taken, and is dropped if neither is free.
+	//
+	// **THERE IS A DROP NOW, AND THE OLD RULING THAT THERE COULD NOT BE ONE IS REVERSED.** It read:
+	// "there is no failure condition, and do not invent one." That was right while every label was
+	// scored on a ladder with a finite top -- such a ladder always places something, so the worst
+	// placement on the drawing is indistinguishable from a merely tight one and no threshold read
+	// off the score can separate them. A first-fit has no score to threshold: a position is clear or
+	// it is not, and "neither side is clear" is a fact rather than a judgement. That is what makes
+	// dropping expressible here and not there.
+	//
+	// **THE ORDER IS THE DROP RULE.** Read globally, "drop the node with the lowest demand" sounds
+	// like a search over the whole drawing. It is not one, and building it as one would be a mistake:
+	// place in rank order and whoever arrives at a full space is by construction the worse-ranked of
+	// the pair. So the caller sorts, and this function never compares two labels' importance at all.
+	//
+	// `labels[i]` carries `sides` -- an array of candidate ENDPOINTS, best first, which the caller
+	// builds from the local feature context -- and `priority`, already resolved to a number.
+	// **The caller keeps ownership of both**, because deciding which side is open needs the network's
+	// topology and deciding which label matters needs to know what a demand is, and this file is not
+	// allowed to know either. It is the same purity line placeLabels() draws.
+	function placeLabelsFirstFit(labels, obstacles, opts) {
+		opts = opts || {};
+		var pad = opts.pad > 0 ? opts.pad : 0,
+			obs = { boxes: obstacles.boxes.slice(), segments: obstacles.segments.slice() },
+			order = labels.slice(), out = [], maxReach = 0,
+			local = { boxes: [], segments: [] }, index;
+		// **THE QUERY IS CENTRED ON THE ANCHOR, BUT THE BOX HANGS OFF THE ENDPOINT, AND THE REACH
+		// MUST COVER BOTH.** Getting this wrong is silent and looks like a taste problem: the pass
+		// simply never sees the obstacle, calls the side clear, and commits an overlap. It was wrong
+		// here first -- reach was the label's own diagonal, which does not even span the resting
+		// offset -- and `dev/lpn-spike/label-priority-harness.js`'s soundness assertion is what
+		// found it. So: furthest candidate endpoint, plus the label's full diagonal beyond it, plus
+		// the pad. Erring wide costs a few tests; erring narrow drops the assertion's whole point.
+		labels.forEach(function (l) {
+			var far = 0, i, s = l.sides && l.sides.length ? l.sides : [l.home];
+			for (i = 0; i < s.length; i++) {
+				far = Math.max(far, Math.hypot(s[i].x - l.anchor.x, s[i].y - l.anchor.y));
+			}
+			l._reach = far + Math.hypot(l.w, l.h) + pad;
+			maxReach = Math.max(maxReach, l._reach);
+		});
+		index = grid(maxReach, obs);
+		obs.boxes.forEach(function (b, i) { index.addBox(i); });
+		obs.segments.forEach(function (g, i) { index.addSegment(i); });
+		// **PRIORITY FIRST, DIFFICULTY ONLY AS A TIEBREAK, AND THAT IS A REVERSAL.** While nothing
+		// could be dropped, difficulty was the sort key on the reasoning that a junction in a thicket
+		// should choose while there are still candidates left -- Tom: "high order junctions are more
+		// difficult, not more important." Still true, and still the tiebreak. But once a drop is
+		// possible the order decides the VICTIM, so it cannot be a congestion heuristic alone.
+		// Dragged labels are placed before all of them and are never dropped: the user put them there.
+		order.sort(function (a, b) {
+			if (!!b.dragged !== !!a.dragged) { return b.dragged ? 1 : -1; }
+			if ((a.priority || 0) !== (b.priority || 0)) { return (a.priority || 0) - (b.priority || 0); }
+			return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
+		});
+		order.forEach(function (lbl) {
+			var sides = lbl.sides && lbl.sides.length ? lbl.sides : [lbl.home],
+				chosen = null, chosenBox = null, i, c, b;
+			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
+			for (i = 0; i < sides.length; i++) {
+				c = sides[i];
+				b = labelBoxAtEnd(lbl, c);
+				if (lbl.dragged || boxClearOf(b, local, pad, lbl.id)) { chosen = c; chosenBox = b; break; }
+			}
+			if (!chosen) {
+				// **DROPPED: NOTHING IS COMMITTED.** A label nobody can see is not an obstacle, so it
+				// must not go into the index -- otherwise it keeps ground clear for a label that is
+				// not drawn, and the drawing ends up emptier than the conflict warranted.
+				out.push({ id: lbl.id, x: lbl.home.x, y: lbl.home.y, dx: 0, dy: 0,
+					dropped: true, side: -1, box: null, leader: null });
+				return;
+			}
+			index.addBox(obs.boxes.push(chosenBox) - 1);
+			out.push({ id: lbl.id, x: chosen.x, y: chosen.y,
+				dx: chosen.x - lbl.home.x, dy: chosen.y - lbl.home.y,
+				dropped: false, side: sides.indexOf(chosen), box: chosenBox, leader: null });
+		});
+		// **THE INPUTS COME BACK EXACTLY AS THEY WENT IN.** placeLabels() makes the same promise, and
+		// for the same reason: a pass that scribbles on its arguments cannot be run twice on one
+		// drawing to check that it agrees with itself, which is the cheapest strong assertion there
+		// is -- and it is asserted.
+		labels.forEach(function (l) { delete l._reach; });
+		return out;
+	}
+	// **CLEAR MEANS CLEAR OF THE HARD OBSTACLES, AND THE RANKS SAY WHICH THOSE ARE.** A first-fit has
+	// no score, so the goal ladder cannot be read as magnitudes here -- but it still says everything
+	// needed, as a partition. Labels, Symbols and Leaders (goals 2, 3, 4, 5) block a position; Links
+	// (goals 6 and 7) and distance (goal 8) do not.
+	//
+	// That is not a convenience. It preserves Tom's own ruling -- "See that pipes are low ranked?
+	// That means they factor least in the score. You can be on a pipe and maybe still win" -- where
+	// treating every obstacle alike would silently promote pipes to blockers and empty the drawing.
+	// It is independently right for a second reason: a haloed number over a pipe is already legible,
+	// and every published engine draws that same line, halos for label-over-linework and collision
+	// detection for label-over-label.
+	//
+	// A label never blocks itself: `owner` carries the ownership placeLabels() already established.
+	function boxClearOf(b, obs, pad, ownerId) {
+		var grown = pad > 0 ? box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a) : b, i, o;
+		for (i = 0; i < obs.boxes.length; i++) {
+			o = obs.boxes[i];
+			if (o.owner !== undefined && o.owner === ownerId) { continue; }
+			if (boxOverlapDepth(grown, o) > 0) { return false; }
+		}
+		for (i = 0; i < obs.segments.length; i++) {
+			o = obs.segments[i];
+			if (o.kind !== 'leader') { continue; }   // a Link is a soft obstacle -- see above
+			if (o.owner !== undefined && o.owner === ownerId) { continue; }
+			if (segmentInBoxFraction(o, grown) > 0) { return false; }
+		}
+		return true;
+	}
+
 	return {
 		GOAL_WEIGHT: GOAL_WEIGHT,
+		placeLabelsFirstFit: placeLabelsFirstFit,
+		boxClearOf: boxClearOf,
 		RING_ANGLES: RING_ANGLES,
 		RAY_STRETCH: RAY_STRETCH,
 		box: box,

@@ -229,3 +229,114 @@ if (junction) {
 }
 
 console.log('label-priority-harness: ' + checks + ' checks passed');
+
+// ---- 4. Phase 1: the first-fit really is a first-fit (ROADMAP Task 398) --------------------------
+//
+// The pure pass, driven directly, because the page cannot show what it refused to do. Everything
+// here is values in and values out -- no DOM, no doc.
+const Collide = require(ROOT + 'js/lpn-collide.js').lpnCollide;
+
+function ff(n, spacing, obstacles) {
+	// n labels in a row `spacing` apart, each offered right-then-left at +-20, boxes 40x12.
+	const labels = [];
+	for (let i = 0; i < n; i++) {
+		const x = i * spacing;
+		labels.push({
+			id: 'n' + i, anchor: { x: x, y: 0 }, home: { x: x + 20, y: -20 },
+			dragged: false, priority: i, w: 40, h: 12, yOff: 0,
+			sides: [{ x: x + 20, y: -20 }, { x: x - 20, y: -20 }]
+		});
+	}
+	return { labels: labels, out: Collide.placeLabelsFirstFit(labels, obstacles || { boxes: [], segments: [] }, {}) };
+}
+
+// Wide apart: everybody gets their preferred side and nothing is dropped.
+let r = ff(5, 400);
+eq(r.out.filter(function (o) { return o.dropped; }).length, 0, 'an uncrowded row drops nothing');
+eq(r.out.map(function (o) { return o.side; }), [0, 0, 0, 0, 0], 'an uncrowded row keeps the preferred side');
+
+// Every placement is one of the two offered ENDPOINTS, to the bit. This is the assertion that says
+// the pass really has two candidates and is not quietly searching.
+// Spacing 12 against a 40-wide box: tight enough that neither side can hold everyone, which is what
+// makes the drop reachable at all. (At 45 the boxes clear each other and nothing drops -- worth
+// knowing, because a "crowded" fixture that is not crowded asserts nothing.)
+r = ff(12, 12);
+r.out.forEach(function (o) {
+	if (o.dropped) { return; }
+	const lbl = r.labels.filter(function (l) { return l.id === o.id; })[0];
+	ok(lbl.sides.some(function (s) { return s.x === o.x && s.y === o.y; }),
+		'placement ' + o.id + ' is exactly one of its two sides');
+});
+
+// Crowd it and something has to give -- and what gives is the WORSE PRIORITY. The strong form, not
+// the vacuous one: for a dropped label, EVERY side must really have been occupied, and every
+// occupier must outrank it. "The dropped one had a worse rank" would be true by construction and
+// would test nothing.
+const placedBoxes = r.out.filter(function (o) { return o.box; });
+ok(r.out.some(function (o) { return o.dropped; }), 'a crowded row drops something');
+r.out.filter(function (o) { return o.dropped; }).forEach(function (d) {
+	const lbl = r.labels.filter(function (l) { return l.id === d.id; })[0];
+	lbl.sides.forEach(function (s, si) {
+		const b = Collide.labelBoxAtEnd(lbl, s);
+		const hits = placedBoxes.filter(function (p) { return Collide.boxOverlapDepth(b, p.box) > 0; });
+		ok(hits.length > 0, d.id + ' side ' + si + ' was really occupied when it was refused');
+		// **A BETTER-RANKED LABEL MUST BE AMONG THE OCCUPIERS -- not all of them.** The stronger
+		// form ("every occupier outranks it") is FALSE, and the reason is worth knowing rather than
+		// asserting away: placement runs in rank order, so a label is refused by whoever is already
+		// down, and labels placed AFTERWARDS may end up overlapping the side it was refused. That
+		// is inherent to a first approximation and is exactly what a repair phase exists to mop up
+		// (Task 400). It is not a wrong drop -- the later label sits at its own node, not in the
+		// spot this one wanted -- but the final picture cannot be read as if order did not exist.
+		ok(hits.some(function (h) {
+			const other = r.labels.filter(function (l) { return l.id === h.id; })[0];
+			return other.priority < lbl.priority;
+		}), d.id + ' was refused by a label that outranks it');
+	});
+});
+
+// SOUNDNESS: nothing that was placed overlaps anything else that was placed. This is what earns the
+// right to drop at all -- a pass that drops AND still overlaps has given up nothing for nothing.
+for (let i = 0; i < placedBoxes.length; i++) {
+	for (let j = i + 1; j < placedBoxes.length; j++) {
+		eq(Collide.boxOverlapDepth(placedBoxes[i].box, placedBoxes[j].box), 0,
+			'placed labels do not overlap: ' + placedBoxes[i].id + ' vs ' + placedBoxes[j].id);
+	}
+}
+
+// IDEMPOTENT AND NON-MUTATING, the same two properties placeLabels() carries. A pass that scribbles
+// on its inputs cannot be run twice on the same data to check that it agrees with itself, which is
+// the cheapest strong assertion there is.
+const again = Collide.placeLabelsFirstFit(r.labels, { boxes: [], segments: [] }, {});
+eq(JSON.stringify(again), JSON.stringify(r.out), 'the first-fit is idempotent');
+
+// MONOTONE IN CROWDING: more room can never drop more labels.
+let prev = Infinity;
+[10, 12, 20, 45, 400].forEach(function (sp) {
+	const d = ff(12, sp).out.filter(function (o) { return o.dropped; }).length;
+	ok(d <= prev, 'drop count does not rise as spacing grows (' + sp + ': ' + d + ')');
+	prev = d;
+});
+
+// A DRAGGED LABEL IS NEVER DROPPED AND NEVER JUMPS. The user put it there; goal 1 outranks all of
+// this. Placed inside a wall of obstacles it would otherwise lose to.
+const wall = { boxes: [Collide.box(0, 0, 400, 400, 0, 'label', 'other')], segments: [] };
+const dragged = [{ id: 'd', anchor: { x: 0, y: 0 }, home: { x: 20, y: -20 }, dragged: true,
+	priority: 99, w: 40, h: 12, yOff: 0, sides: [{ x: 20, y: -20 }, { x: -20, y: -20 }] }];
+const dr = Collide.placeLabelsFirstFit(dragged, wall, {});
+eq(dr[0].dropped, false, 'a dragged label survives a wall of obstacles');
+eq(dr[0].side, 0, 'a dragged label does not jump sides');
+
+// A LINK IS A SOFT OBSTACLE AND A LEADER IS A HARD ONE. This is the rank ladder read as a partition,
+// and it is the thing a future "treat every obstacle alike" tidy-up would silently break.
+const onPipe = Collide.placeLabelsFirstFit(
+	[{ id: 'a', anchor: { x: 0, y: 0 }, home: { x: 20, y: -20 }, dragged: false, priority: 0,
+		w: 40, h: 12, yOff: 0, sides: [{ x: 20, y: -20 }, { x: -20, y: -20 }] }],
+	{ boxes: [], segments: [{ ax: -200, ay: -20, bx: 200, by: -20, kind: 'link' }] }, {});
+eq(onPipe[0].dropped, false, 'a label may sit on a pipe and still win');
+const onLeader = Collide.placeLabelsFirstFit(
+	[{ id: 'a', anchor: { x: 0, y: 0 }, home: { x: 20, y: -20 }, dragged: false, priority: 0,
+		w: 40, h: 12, yOff: 0, sides: [{ x: 20, y: -20 }, { x: -20, y: -20 }] }],
+	{ boxes: [], segments: [{ ax: -200, ay: -20, bx: 200, by: -20, kind: 'leader' }] }, {});
+eq(onLeader[0].dropped, true, 'a label may not sit on a leader');
+
+console.log('label-priority-harness: phase 1 section passed');

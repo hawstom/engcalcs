@@ -1713,7 +1713,15 @@ $ec_lang['lpn_labels_separator_tip']='Text between one value and the next on a l
 // tip says which. Kept plain and short: these sit on a small box in a crowded row.
 $ec_lang['lpn_labels_priority']='Priority';
 $ec_lang['lpn_labels_priority_link_tip']='Order the values are dropped in when a label does not fit. 1 is kept longest.';
-$ec_lang['lpn_labels_priority_node_tip']='Which value decides who gives up a crowded spot. 1 decides first. A node showing a low demand gives up its label before one showing a high demand.';
+// NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
+// learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
+// value and this box is on a node row, so it reads as demand here.
+$ec_lang['lpn_labels_priority_node_tip']='Priority for deciding whose label is dropped first when the map is crowded: lowest demand, least extreme pressure, or most neighbour-like elevation or head. 1 decides first.';
+// Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
+// the row's own field name is the wide column beside them.
+$ec_lang['lpn_labels_col_before']='Before';
+$ec_lang['lpn_labels_col_after']='After';
+$ec_lang['lpn_labels_col_decimals']='Decimals';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Background image…';
 $ec_lang['lpn_backdrop_add']='Add';

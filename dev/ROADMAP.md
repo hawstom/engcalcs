@@ -337,21 +337,17 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - The width bank: per-tspan `getComputedTextLength()` beside the existing `noteMeasuredWidth()`
     call, so any prefix of a label's row costs a sum rather than a re-measure. Phase 2 needs it.
 
-- 85|398| **Phase 1 — node labels by first-fit, with a drop.** `dev/label-placement-goals.md` §2.1.
-  Most-open side, jump to the other side on conflict, drop by priority. Needs Task 397.
-  - **Ships behind a `?debug=labels` switch (`node placement: ring | first-fit`), not as a
-    replacement.** The ring stays for free link and dragged labels regardless, so the switch is one
-    branch and no dead code — and Tom can see both.
-  - **A node label goes from 33 candidates to 2, so expect a visibly emptier drawing** until Task
-    400 lands. The bench must gain its `dropped` readout IN THIS TASK: without it, a layout that
-    drops half its labels scores perfectly on every number the bench prints today.
-  - **`flips under pan` must read 0 and does not today** — `drawnLinkLabelStations()` culls to the
-    view rect and those obstacles reach node placement, so after this task labels appear and
-    disappear as you scroll. Fix it here or write down that we accepted it.
-  - Worth a `/code-review`: cross-cutting, and it changes logic nobody can confirm by using the page.
+- 70|401| **`flips under pan` is not measured, and it is the one that must read 0.**
+  `drawnLinkLabelStations()` culls to the view rect, `placeStationedLabels()` builds obstacles from
+  the result, and those obstacles now decide node DROPS — so labels can appear and disappear as the
+  user scrolls. Been/Daiches/Yap's requirement is that a labelling be a function of scale alone.
+  - `flips under zoom` shipped with Task 398 and is the model: re-run the pass, diff the signature.
+    Pan needs the same, translating the view rect only.
+  - The structural fix is to derive the drop-relevant obstacle set from `linkLabelStations()` (the
+    full list, bounded) rather than the drawn one. Measure first; the count may be zero in practice.
 
 - 80|399| **Phase 2 — link labels shed values instead of vanishing whole.**
-  `dev/label-placement-goals.md` §3.5. Needs Task 397; deliberately independent of Task 398, so it
+  `dev/label-placement-goals.md` §3.5. Needs Task 397. Task 398 has landed, so this is next: it
   can ship first. It has no downside — it strictly improves on today's all-or-nothing hide.
   - An undragged link label is ONE inline row, so shedding a trailing value reduces its WIDTH, which
     is the quantity both `linkLabelTooShort()` and the conflict test already consume. Too-long-for-

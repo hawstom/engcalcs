@@ -44,22 +44,29 @@ Three more that §2 onward depends on:
 | **CSS** | browser screen | css pixel ("pixel") | upper left | right | down | — | — |
 | **Model** | project | length | as defined | right | up | world | drawing (user) |
 | **Image** | file | pixel | upper left | right | down | model | insert, adjust |
-| **View** | window, layout | css pixel | *(unsettled)* | right | down | model | view change, labeling |
+| **View** | window, layout | css pixel | upper left corner of the map canvas | right | down | model | view change, labeling |
 | **Paper** | sheet, print | length (SI or other) | lower left of paper or printable area | right | up | — | printing |
+
+**Where the View sits in the code**, since the table's own row cannot say it: the origin is the map
+canvas's upper-left corner — `getBoundingClientRect().left/top` on the `<svg>`, so it is the CSS
+origin shifted by wherever the canvas has landed in the page. The Model origin then sits at
+`(state.tx, state.ty)` inside it, and `state.s` is the View-per-Model scale. `screenToWorld()` is the
+one place that arithmetic is written, and `world.setAttribute('transform', translate(tx,ty)
+scale(s))` is the one place it is applied.
 
 ### Scale and placement
 
-- Every symbol/text category has independent scale-dependent placement decisions.
+- Every symbol/text object or category has independent scale-dependent placement decisions.
 - **Visibility:** there may be a scale (px per length) below which a thing is best not drawn.
 - **Fit:** when visible, it may need to be placed or adjusted.
 
 ### Conventions
 
 - **Symbols are placed at their map location and never adjusted.**
-- **Point labels are placed above and to the right of the point symbol.** This agrees with Imhof's
+- **Point labels are placed initially above and to the right of the point symbol.** This agrees with Imhof's
   own ordering for left-to-right scripts, and `DEFAULT_LABEL_OFFSET = {x: 2, y: -2}` already
   implements it.
-- **Line labels are placed above, alongside the line.**
+- **Line labels are placed initially above, alongside the line.**
 
 ---
 
@@ -73,7 +80,7 @@ Three more that §2 onward depends on:
 5. **Leaders avoid Symbols.**
 6. **Labels avoid Links.**
 7. **Leaders avoid Links.**
-8. **Labels minimize distance.**
+8. **Labels minimize distance and consequentially minimize need for leaders.**
 
 Four goals came off the list on 2026-08-16, each for a reason worth keeping:
 
@@ -85,8 +92,6 @@ Four goals came off the list on 2026-08-16, each for a reason worth keeping:
 - **Labels leave padding for later** — *"redundant with scoring its neighbors."*
 - **Labels seek the direction of least congestion** — *"covered by including the neighbors in the
   calculation."* It is the neighbourhood term, not a rank.
-- **A label needing no leader at all** was proposed as a bonus and refused outright: *"Don't reward
-  'no leader'."*
 
 **On distance, which is rank 8 and easy to get wrong.** It is not a proxy for association — a leader
 does that job. Tom, on a claim that distance only matters because leaders look busy: *"Wrong.
@@ -131,18 +136,25 @@ that field is toggled on.**
 | 3 | elevation | most like its neighbours' | elevation is a smooth spatial field, so a node sitting at its neighbours' height is readable off theirs (Tom, 2026-08-16 — this row was drafted as "least extreme" and corrected) |
 | 4 | head | most like its neighbours' | same, and for the same reason: a head equal to its neighbours' is recoverable by eye from theirs |
 
-**Between the two classes, NODE LABELS OUTRANK LINK LABELS** (Tom, 2026-08-16: *"I'm going to say we
-start with node. That's pretty safe. Links yield to nodes once we are at that phase."*). The two
-priority columns each order within their own class; this is the one number that orders across them.
+**Between the two classes: LINKS PLACE FIRST, NODES SURVIVE FIRST** (Tom, 2026-08-16: *"node-outranks-
+link is about dropping things. For placement, links have priority. But if there's no fit, the link
+goes away."*). The two priority columns order within their own class; this is what orders across
+them, and it is deliberately **two different orders for two different questions** — which is exactly
+the distinction ESRI Maplex draws between *label priority* (who is attempted first) and what
+ultimately gets left unplaced. They are not the same question and nothing requires them to agree.
 
-**That reverses what ships today, and the reversal is the work, not a detail.**
-`placeStationedLabels()` runs *before* the candidate pass, so an aligned link label is committed as
-an obstacle and every node label goes round it — links win. The reason was sound and does not
-survive the change: a label bound to a pipe has spent its freedom, so it should choose while it still
-can. Under the new ruling it is the *node* that chooses first and the link that yields, which is
-exactly what Phase 2 gives the link the means to do — it can shed values where it previously had
-only its station and its side. **So the order may not flip until Phase 2 exists**, or a link label
-with nothing left to give would simply be run over.
+- **Attempt order: links, then nodes.** A link label has the fewest degrees of freedom — it is bound
+  to its own pipe — so it should choose while it still can. That is also what ships today, so this
+  half is not a change.
+- **Survival order: nodes, then links.** When something must go, it is the link. A node label names a
+  place; a link label names a thing whose identity the drawing already shows.
+
+**So the pass has a REPAIR STEP, and that is the structural consequence.** It is not enough to place
+links and then place nodes: a node boxed in by a link label would drop, which is the wrong one. When
+a node label finds no fit, the link label blocking it yields — it sheds a value in Phase 2, and in
+Phase 1, where it has nothing to shed, it goes away whole — and the node is retried. Place, then
+repair, is QGIS PAL's own shape (`init_sol_falp` then a bounded search), arrived at here from the
+requirement rather than from the literature.
 
 **Within a class the ORDER is the user's — that is what the priority column sets. The DIRECTION is
 not.** There is
@@ -288,18 +300,43 @@ keeps the halo proportional to the lettering at every text size, which is what
 
 ### 3.7 Leaders
 
-A leader attaches at the **vertical centre of the FIRST text line**, on the box side facing the
-anchor, through a short horizontal landing whose length is a stated multiple of the stroke width, and
-is suppressed entirely below a leader tolerance (`leaderThreshold()`, which is ESRI's leader
-tolerance under another name).
+A leader attaches at the **vertical centre of the NEAREST text line** — the top line when the anchor
+is above the label, the bottom line when it is below — on the box side facing the anchor, through a
+short horizontal landing, and is suppressed entirely below a leader tolerance (`leaderThreshold()`,
+which is ESRI's leader tolerance under another name).
 
-That is the ASME/ISO convention — ASME Y14.2 §4.9.3 puts the horizontal portion at the centre of the
-height of the first or last letter of the note, and ISO 128-22 gives the landing a fixed 20 × line
-width. **"Nearest corner" is QGIS behaviour, not a drafting standard**, and attaching at the box's
+**NEAREST, not first, and that is a correction of an earlier reading of the standard** (Tom,
+2026-08-16: *"those rules about attachment at the top line of text seem to penalize leaders that are
+directly above… I suppose we could pretend that the first text line is the first text line that the
+leader encounters"*). He is right, and the standard agrees with him rather than with the earlier
+draft: ASME Y14.2 §4.9.3 says the horizontal portion meets the centre of the height of the **first or
+last** letter of the note, and AutoCAD's own leader styles enumerate *middle of top line* and *middle
+of bottom line* as siblings. A rule that always took the top line would drag a leader coming from
+below straight up through its own text — the one thing the whole convention exists to prevent.
+**"Nearest corner" is still QGIS behaviour and not a drafting standard**, and attaching at the box's
 vertical centre — which is what shipped before — points at the middle row of a five-line label rather
 than at the label.
 
+**The landing is ONE TEXT HEIGHT, not ISO's 20 × line width.** Tom, 2026-08-16: *"a landing is
+wasteful, but pretty… 20 * line width seems like a lot of landing when text size is 12 px or so. I
+say we'd be wiser to make landing about one text height."* The arithmetic supports him — our leader
+is drawn at a hairline, so 20 × line width lands near 20 px against 12 px text, more than one and a
+half times the lettering. It is also inside the standard rather than a departure from it: ISO 128-22
+gives the length as 20 × line width **or adapted to the length of the instruction**, and one text
+height is that second form. Expressed in `em` for the reason the halo is (§3.6): it must stay right
+at every text size.
+
+He also asked that we *"follow the standard first and see what happens."* The way to honour that is
+to make the landing length a number in one place, so the ISO figure can be tried against this one
+without a rewrite.
+
 The collision pass must model whatever the renderer draws, or it scores a leader that does not exist.
+
+**Phase 1 needs none of this.** Both of its candidate positions sit at the resting offset, well
+inside `leaderThreshold()`, so an auto-placed node label never draws a leader at all — Tom,
+2026-08-16: *"I want to test Phase 1 and 2 without Phase 3, meaning with no leader scheme."* Leaders
+remain only where the user dragged a label there. This section is therefore Phase 3 work, and
+recording it now is what keeps it from being re-derived from the standard a third time.
 
 ---
 
