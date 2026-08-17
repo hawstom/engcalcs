@@ -33,6 +33,7 @@ const L = loadLoopedNetwork(
 	"\t\t\treturn a.style.display === 'none' ? null : a.getAttribute('transform'); }); },\n" +
 	"\t\tsegAngles: function (id) { return segmentMidpoints(linkById(id)).map(function (m) { return m.angle; }); },\n" +
 	"\t\tsymbolFactor: symbolFactor, arrowFactor: arrowFactor,\n" +
+	"\t\tsettings: function () { return settings; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
@@ -83,6 +84,13 @@ ok('...and has a pump, whose head loss is genuinely negative',
 // ---- 1. The MAP LABEL ---------------------------------------------------------------------
 const ls = L.labelSettings();
 Object.keys(ls.link).forEach(function (k) { ls.link[k] = (k === 'flow' || k === 'headloss'); });
+// **PIPE-ALIGNED LABELS OFF, so this file tests the SIGN and not the layout** (Task 399). With them
+// on, a label bound to its pipe sheds values when it collides with a node label, and on this fixture
+// the pump's head loss is exactly what goes -- head loss is rank 3 and flow is rank 1, so the shed
+// is doing what Tom's priority table tells it to. The assertions below are about what a negative
+// number MEANS, and a layout rule quietly removing the number under test would make them fail for a
+// reason that has nothing to do with signs.
+L.settings().alignPipeLabels = false;
 L.refreshLabelText();
 
 // Since Task 333 a label line reads "<prefix><separator><number>", so the sign and the magnitude

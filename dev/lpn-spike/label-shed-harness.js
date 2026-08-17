@@ -224,6 +224,27 @@ const shedNow = doc.links.filter(function (l) {
 	return h && h.shedCount > 0 && !h.hiddenShort;
 });
 ok(shedNow.length > 0, 'two pipes laid alongside each other shed on CONFLICT, at full length');
+
+// **A LINK LABEL SHEDS FOR A NODE LABEL RATHER THAN BEING HIDDEN WHOLE.** This is the case Tom
+// photographed: long pipe labels lying across the node labels at each end, none of them shedding,
+// and others vanishing entirely. Both symptoms were the same fault -- the shed pass could not see
+// node labels, so the only thing left to resolve the conflict was nodeRepairAgainstLinks(), which
+// takes a link label away whole. Asserted as the RATIO: shedding must be the common answer and
+// hiding-whole the rare one.
+{
+	const yielded = doc.links.filter(function (l) {
+		const h = L.linkEls()[l.id];
+		return h && h.hiddenYielded;
+	});
+	ok(yielded.length <= shedNow.length,
+		'hiding a link label whole is rarer than shedding one (' + yielded.length
+		+ ' hidden vs ' + shedNow.length + ' shed)');
+	yielded.forEach(function (l) {
+		const h = L.linkEls()[l.id];
+		ok((h.allLines || h.lines).length - h.lines.length > 0 || (h.allLines || h.lines).length <= 1,
+			l.id + ' was only hidden whole after it had already shed what it could');
+	});
+}
 ok(L.linkEls()[keepPipe.id].shedCount === 0 || L.linkEls()[movePipe.id].shedCount === 0,
 	'the longer pipe keeps its values -- longest first, so it is placed before the other arrives');
 ok(shedNow.length < doc.links.length, 'and an uncrowded label elsewhere keeps everything');

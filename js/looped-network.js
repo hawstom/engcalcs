@@ -598,19 +598,47 @@ var EngCalcs = EngCalcs || {};
 	// reading as "this pipe". It also makes the pass stable -- the order depends on nothing the user
 	// can change by clicking.
 	//
-	// **A NODE LABEL IS NOT AN OBSTACLE HERE, AND THAT IS THE DIFFERENCE BETWEEN SHEDDING A LITTLE
-	// AND SHEDDING EVERYWHERE.** The first cut seeded every node label at its resting offset, on the
-	// reasoning that links yield to nodes (§2.2). Measured, that shed a value from 3 of the 7 links
-	// on the default example -- including a pump's head loss, which `readout-sign-harness.js` caught
-	// by name. The reasoning was wrong at this stage: a node label at rest has not been PLACED yet,
-	// and the whole of Phase 1 is that it will move out of the way. Giving up a number for a
-	// collision that is about to be solved by someone else moving is premature.
+	// **NODE LABELS ARE OBSTACLES HERE, AT THE POSITIONS THEY WERE ACTUALLY PLACED AT.** This is the
+	// conflict a reader meets most and it was the one the pass could not see: a pipe label running
+	// the length of its own pipe collides with the node labels at each end, not with another pipe
+	// label. Tom's photograph of it, 2026-08-16, is what named this -- two long link labels sitting
+	// across the node labels above and below them, neither shedding a thing.
 	//
-	// So the node/link contest stays where it already is: the placement pass moves the node, and if
-	// the node truly has nowhere to go, nodeRepairAgainstLinks() takes the link label away. This pass
-	// answers only the conflict nothing else can solve -- two labels both nailed to their own pipes.
+	// **PLACED, not resting, and the distinction is the whole reason an earlier cut had to be
+	// reverted.** Seeding node labels at their resting offset shed a value from 3 of 7 links on the
+	// default example, including a pump's head loss (`readout-sign-harness.js` caught that by name),
+	// because it gave up numbers for collisions Phase 1 was about to solve by MOVING the node label.
+	// nodeLabelPos() carries the nudge the placement pass last chose, so what is scored here is where
+	// the node label really is. On the very first pass that nudge is zero and this reads the resting
+	// position; it converges on the next refresh, which is the right trade for a content decision.
+	//
+	// **A NODE LABEL THAT WAS DROPPED LAST PASS IS SEEDED TOO, AND SKIPPING IT WAS A STABLE BAD
+	// STATE.** The reasoning for skipping sounded right -- it is not drawn, so why should a link
+	// label pay for it -- but it locks in the worst outcome: the link label never sheds, so the spot
+	// stays blocked, so the node label stays dropped, so nothing ever changes. Seeding it at the
+	// position it WANTS lets the link label give up a value, and on the next pass the node label
+	// fits and both are drawn. That is the whole of "links yield to nodes", and it is also what
+	// keeps nodeRepairAgainstLinks() -- which hides a link label WHOLE -- as the rare last resort it
+	// was meant to be rather than the common case Tom photographed.
 	function shedAlignedForConflicts(fsNow, fs) {
 		var obs = staticObstacles(), pad = fs * LPN_ALIGNED_PAD_FRAC;
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id];
+			if (!ne || ne.empty) { return; }
+			// **THE SAME BOX THE PLACEMENT PASS BUILDS, hung on the same side.** A node label's text
+			// extends AWAY from its node, so a label placed on the left occupies the ground to the
+			// left of its endpoint -- which is Collide.labelBoxAtEnd()'s rule. Building it always to
+			// the right put every left-placed node label's box on the wrong side of its own node, so
+			// a link label was tested against ground nothing occupied and cleared a conflict that was
+			// really there. That is why link labels kept being hidden whole by the repair instead of
+			// shedding: the shed pass could not see what the repair could.
+			var at = nodeLabelPos(n),
+				w = labelBoxWidth(ne), h = dataLabelBoxHeight(ne.lineCount),
+				b = Collide.boxFromRect({ x: at.x >= n.x ? at.x : at.x - w,
+					y: at.y - fs * 0.85, w: w, h: h });
+			b.kind = 'label';
+			obs.boxes.push(b);
+		});
 		doc.links.map(function (l) {
 			return { l: l, len: Geom.polylineLength(linkPointList(l)) };
 		}).sort(function (a, b) { return b.len - a.len; }).forEach(function (rec) {
