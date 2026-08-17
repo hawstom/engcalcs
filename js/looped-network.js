@@ -618,8 +618,8 @@ var EngCalcs = EngCalcs || {};
 	// stays blocked, so the node label stays dropped, so nothing ever changes. Seeding it at the
 	// position it WANTS lets the link label give up a value, and on the next pass the node label
 	// fits and both are drawn. That is the whole of "links yield to nodes", and it is also what
-	// keeps nodeRepairAgainstLinks() -- which hides a link label WHOLE -- as the rare last resort it
-	// was meant to be rather than the common case Tom photographed.
+	// is what makes the node/link ruling work at all: the link gives up VALUES so the node label can
+	// have its place, instead of the whole link label being taken away.
 	function shedAlignedForConflicts(fsNow, fs) {
 		var obs = staticObstacles(), pad = fs * LPN_ALIGNED_PAD_FRAC;
 		doc.nodes.forEach(function (n) {
@@ -667,6 +667,59 @@ var EngCalcs = EngCalcs || {};
 			b.kind = 'label'; b.linkOwner = l.id;
 			obs.boxes.push(b);
 		});
+	}
+	// **THE LENGTH CASCADE, FOR ONE LINK, ALWAYS STARTING FROM THE FULL VALUE LIST.** Returns the
+	// lines that survive and leaves the label rendered at them.
+	//
+	// Starting from FULL every time is what makes it possible to UNSHED. Shedding down from wherever
+	// the label happens to be is a ratchet: a label that lost four values while the map was zoomed
+	// out could never get them back, which is exactly what Tom photographed -- the same drawing at
+	// two zooms, every link label still down to its flow at the closer one.
+	//
+	// Stops at the FIRST content that fits, so the shed is minimal. `gone < order.length - 1` keeps
+	// one value alive: dropping the last one is not a shed, it is the hide, and linkLabelTooShort()
+	// owns that decision.
+	//
+	// **THE BAND BETWEEN SHEDDING AND HIDING IS THE CASCADE ITSELF, not a fudge factor.** Both rules
+	// measure the same two quantities, and that is correct: a label sheds while its run exceeds its
+	// segment, and hides only if even its best single value still does.
+	function shedToSegment(le, l, allLines, fsNow) {
+		var room = linkLabelRoom(l, le.alignedAlong),
+			order = shedOrder(allLines), gone = 0, kept = allLines;
+		renderLinkLabel(le, l, allLines, fsNow);
+		while (gone < order.length - 1 && linkLabelRunLength(le) > room) {
+			gone++;
+			kept = keptLines(allLines, shedKeepSet(allLines, order, gone));
+			renderLinkLabel(le, l, kept, fsNow);
+		}
+		return kept;
+	}
+	// **RE-DECIDE EVERY LINK LABEL'S CONTENT AT THE CURRENT ZOOM** (Tom, 2026-08-17: *"In some cases
+	// (or all?) it's failing to unshed."*).
+	//
+	// A shed is a decision about a RATIO -- the label's run against its segment -- and a label's run
+	// in world units is its pixel width divided by the scale. So the decision changes with the zoom
+	// and with nothing else the drawing does. Putting it only in refreshLabelText() was wrong for
+	// exactly that reason: that function runs on a solve, a toggle, a unit switch, and NOT on a zoom
+	// (Task 366 deliberately stopped a zoom from recomposing anything, because re-measuring 220
+	// labels per wheel notch cost a quarter of a second). So every shed was frozen at whatever zoom
+	// it was first computed at.
+	//
+	// **THE CHEAP CASE COSTS NOTHING, which is what makes this affordable to run on a zoom.** A label
+	// already showing everything, whose banked pixel width still fits at this scale, needs no render
+	// and no measurement -- linkLabelRunLength() is a division. Only a label that IS shed, or one
+	// that no longer fits, pays for a re-render, and paying there is the whole point.
+	function reshedLinkLabels(fsNow, fs) {
+		doc.links.forEach(function (l) {
+			var le = linkEls[l.id];
+			if (!le || le.empty || labelIsDragged(l)) { return; }
+			var all = le.allLines;
+			if (!all || all.length < 2) { return; }
+			if (!le.shedCount && linkLabelRunLength(le) <= linkLabelRoom(l, le.alignedAlong)) { return; }
+			le.lines = shedToSegment(le, l, all, fsNow);
+			le.shedCount = all.length - le.lines.length;
+		});
+		shedAlignedForConflicts(fsNow, fs);
 	}
 	// The keep-set after `gone` sheds: the first `gone` entries of the worst-first order are out.
 	function shedKeepSet(lines, order, gone) {
@@ -899,11 +952,8 @@ var EngCalcs = EngCalcs || {};
 	function layoutLinkLabel(id) {
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE anything is placed, so every station obeys it.
-		// `hiddenYielded` is Task 398's: this label gave its ground to a node label that had nowhere
-		// else to go. Same visibility seam as the too-short rule, because to a reader they are the
-		// same event -- the label is not there.
 		le.hiddenShort = linkLabelTooShort(l, le);
-		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenYielded);
+		setLabelAssemblyHidden(le, le.hiddenShort);
 		var single = linkLabelStations(l).length === 1,
 			stations = single ? [le.alignedAlong] : drawnLinkLabelStations(l), i;
 		ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
@@ -1389,9 +1439,6 @@ var EngCalcs = EngCalcs || {};
 		var drawn = placed.filter(function (r) { return r.box; }),
 			boxes = drawn.map(function (r) { return r.box; }),
 			dropped = placed.length - drawn.length,
-			yielded = doc.links.filter(function (l) {
-				var le = linkEls[l.id]; return le && le.hiddenYielded;
-			}).length,
 			// Task 399's quality number. Reported as VALUES removed rather than labels affected,
 			// because one label down to its last value and eight labels down by one are very
 			// different pictures and the label count cannot tell them apart.
@@ -1425,7 +1472,6 @@ var EngCalcs = EngCalcs || {};
 		if (el2) {
 			var flips = labelFlipCount();
 			el2.textContent = dropped + ' dropped \u2022 ' + shedVals + ' values shed \u2022 '
-				+ yielded + ' links yielded \u2022 '
 				+ (flips === null ? '' : flips + ' flips under zoom \u2022 ')
 				+ labels.length + ' labels \u2022 ' + pairs + ' label-on-label \u2022 '
 				+ onLeader + ' label-on-leader \u2022 mean travel '
@@ -1665,10 +1711,6 @@ var EngCalcs = EngCalcs || {};
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
-			// Cleared every pass, exactly as the nudge is, so the pass stays idempotent: a label that
-			// yielded last time must be back in contention this time, or one crowded moment would
-			// hide a label permanently.
-			le.hiddenYielded = false;
 			// A label nobody can see is not an obstacle. Skipping it here also clears its nudge, so
 			// zooming back in restores it where it belongs rather than where it was last pushed.
 			if (linkLabelTooShort(l, le)) { le.nudge = { x: 0, y: 0 }; return; }
@@ -1688,7 +1730,8 @@ var EngCalcs = EngCalcs || {};
 		// orders answering two different questions -- exactly the split ESRI Maplex draws between
 		// label priority and what is left unplaced. A link label is bound to its own pipe and has the
 		// fewest choices, so it chooses while it still can; but when something has to go, it is the
-		// link, which is what nodeRepairAgainstLinks() below delivers.
+		// link -- and it yields by SHEDDING values in shedAlignedForConflicts(), which has already run by
+	// the time this pass places anything.
 		placeStationedLabels(stationed, obs, fs);
 		// The lexicographic drop key becomes an ORDINAL here, so js/lpn-collide.js sees one number
 		// and never has to know what a demand is. Ties break on id, so the order is total and stable
@@ -1698,9 +1741,17 @@ var EngCalcs = EngCalcs || {};
 			return c !== 0 ? c : (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
 		});
 		nodeLabels.forEach(function (l, i) { l.priority = i; delete l.dropKey; });
+		// **NO REPAIR PASS ANY MORE, AND ITS REMOVAL IS THE POINT.** A node label that found neither
+		// side clear used to take a blocking link label's ground and hide it WHOLE. That existed
+		// because Phase 1 shipped before Phase 2, so a link label had nothing to yield WITH. Now it
+		// does: shedAlignedForConflicts() makes the link label give up values for the node label
+		// before the placement pass ever runs, which is the graceful form of the same ruling. What
+		// was left was a second, cruder mechanism reaching the same situation by another door -- and
+		// a reader cannot tell the two apart. Tom, 2026-08-17: *"I am sometimes observing the repair
+		// happening, which is confusing."* If a node label still cannot fit once link labels have
+		// shed, it drops, which is what Phase 1 says happens.
 		var pad = fs * LPN_ALIGNED_PAD_FRAC,
 			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
-		nodeRepairAgainstLinks(nodeLabels, nodePlaced, obs, pad);
 		// Every number the ring pass is steered by goes through ONE place, so ?debug=labels can
 		// override them live without a second code path deciding anything (see labelTuning()). It
 		// now serves free link labels and DRAGGED labels of either kind -- see addNodeFirstFit().
@@ -1717,51 +1768,6 @@ var EngCalcs = EngCalcs || {};
 			if (r.dropped) { h.hiddenDropped = true; }
 		});
 		labelDebugReport(labels.concat(nodeLabels), placed.concat(nodePlaced), obs);
-	}
-	// **THE REPAIR: A NODE NEVER LOSES TO A LINK.** First-fit places link labels first because they
-	// have the least freedom, so a node label can be boxed in by one and dropped -- which is the
-	// wrong casualty under Tom's ruling that links yield to nodes. This is the second pass that puts
-	// that right, and it is why the design is place-then-repair rather than one ordering: no single
-	// order can satisfy "links choose first" and "nodes survive first" at once.
-	//
-	// For each dropped node, re-test its sides ignoring LINK-LABEL boxes. If a side comes clear, the
-	// link labels it overlaps go away and the node takes the spot. In Phase 2 they will shed a value
-	// instead of vanishing; here they have nothing to shed, which is Tom's own reading -- *"if
-	// there's no fit, the link goes away."*
-	//
-	// A node still blocked by another NODE label, or by a symbol, stays dropped: that contest was
-	// already settled by the priority order and re-opening it here would undo it.
-	function nodeRepairAgainstLinks(nodeLabels, nodePlaced, obs, pad) {
-		var byId = {}, i;
-		nodeLabels.forEach(function (l) { byId[l.id] = l; });
-		for (i = 0; i < nodePlaced.length; i++) {
-			var r = nodePlaced[i]; if (!r.dropped) { continue; }
-			var lbl = byId[r.id]; if (!lbl) { continue; }
-			for (var s = 0; s < lbl.sides.length; s++) {
-				var b = Collide.labelBoxAtEnd(lbl, lbl.sides[s]),
-					blockers = [], blocked = false;
-				obs.boxes.forEach(function (o) {
-					if (Collide.boxOverlapDepth(b, o) <= 0) { return; }
-					// A link label is identified by the ownership placeStationedLabels() stamps on
-					// it. Anything else -- a node label, a symbol, a user Text object -- is a
-					// blocker this pass has no authority to remove.
-					if (o.linkOwner) { blockers.push(o); } else { blocked = true; }
-				});
-				if (blocked || !blockers.length) { continue; }
-				blockers.forEach(function (o) {
-					var le = linkEls[o.linkOwner];
-					if (le) { le.hiddenYielded = true; }
-					// Removed from the obstacle list too, or a later node would still go round a
-					// label that is no longer drawn.
-					obs.boxes.splice(obs.boxes.indexOf(o), 1);
-				});
-				r.dropped = false; r.side = s; r.box = b;
-				r.x = lbl.sides[s].x; r.y = lbl.sides[s].y;
-				r.dx = r.x - lbl.home.x; r.dy = r.y - lbl.home.y;
-				obs.boxes.push(b);
-				break;
-			}
-		}
 	}
 	// Rebuilds a <text> element's tspans from scratch -- simplest correct approach given the line
 	// count changes every time a label toggle is flipped.
@@ -11579,6 +11585,22 @@ var EngCalcs = EngCalcs || {};
 		// width and therefore nothing about the threshold -- but buildDom-time elements created
 		// inside refreshLabelText() have no visibility class yet.
 		applyLabelVisibility();
+		scheduleReshed();
+	}
+	// **DEBOUNCED, because a wheel is a burst and a re-shed re-renders text.** Task 366 took
+	// recomposition out of the zoom path for a measured reason -- re-measuring every label on every
+	// notch cost a quarter of a second -- and this puts a much smaller part of it back. One pass per
+	// gesture rather than one per notch is what keeps that bargain: the intermediate zooms of a
+	// wheel spin are never looked at, only the one it stops on.
+	var reshedTimer = null;
+	function scheduleReshed() {
+		if (reshedTimer) { clearTimeout(reshedTimer); }
+		reshedTimer = setTimeout(function () {
+			reshedTimer = null;
+			if (dataLabelsHidden) { return; }   // nothing drawn, nothing to decide
+			reshedLinkLabels(effectiveFontSize() + 'px', effectiveFontSize());
+			relayoutLabels();
+		}, 120);
 	}
 	// ID-prefix validation, same illegal-character set as validateNewId() (no spaces/quotes) plus
 	// non-empty -- a prefix becomes the leading substring of every future auto-generated ID for that
@@ -14274,25 +14296,7 @@ var EngCalcs = EngCalcs || {};
 			// want that number on the sheet, so the gesture that reveals the intent is one the user
 			// already makes.
 			if (!labelIsDragged(l) && !le.empty && lines.length > 1) {
-				var room = linkLabelRoom(l, le.alignedAlong),
-					order = shedOrder(lines), gone = 0, kept = lines;
-				// Stops at the FIRST content that fits -- a minimal shed. `gone < order.length - 1`
-				// keeps one value alive: dropping the last one is not a shed, it is the hide, and
-				// linkLabelTooShort() owns that decision.
-				//
-				// **THE BAND BETWEEN SHEDDING AND HIDING IS THE CASCADE ITSELF, not a fudge factor.**
-				// Both rules now measure the same two quantities, and that is correct: a label sheds
-				// while it is too long for its segment, and hides only if even its best single value
-				// is too long. The earlier draft put a 0.76 fraction between them to manufacture a
-				// band, on an invented claim that real pipes are either comfortably long or hopelessly
-				// short. Tom: *"No. Where did you get that idea? That's far from the truth, especially
-				// when lots of values are on display."* He is right and there was no evidence for it.
-				while (gone < order.length - 1 && linkLabelRunLength(le) > room) {
-					gone++;
-					kept = keptLines(lines, shedKeepSet(lines, order, gone));
-					renderLinkLabel(le, l, kept, fsNow);
-				}
-				lines = kept;
+				lines = shedToSegment(le, l, lines, fsNow);
 			}
 			// The FULL list is kept beside the drawn one, so a later pass can shed FURTHER without
 			// re-deriving what this link has -- and, more importantly, so every shed is measured from

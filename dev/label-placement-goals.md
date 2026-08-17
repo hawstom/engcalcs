@@ -317,10 +317,24 @@ information taken from the reader for nothing, and nothing on screen says it hap
 
 A dragged label never sheds, for the same reason it never jumps: the user placed it.
 
-**Status:** the length-driven condition has shipped. The conflict-driven one has not, and the blocker
-is an ordering rather than the arithmetic — the collision pass can decide a shed cheaply (the width
-of any subset is a sum over banked segment widths, no re-render), but the text can only be rebuilt in
-`refreshLabelText()`, which runs *before* it. ROADMAP Task 399.
+**A SHED IS A DECISION ABOUT A RATIO, SO IT BELONGS TO THE ZOOM.** A label's run in world units is
+its pixel width over the scale; its segment is a fixed world length. So what fits changes with the
+zoom and with nothing else the drawing does — and a shed decided at one zoom and never revisited is
+a ratchet. Every re-evaluation therefore starts from the FULL value list, never from what survived
+last time, and the zoom path re-runs it (debounced, so a wheel spin costs one pass and not one per
+notch). Recomputing from full is what makes UNSHEDDING possible at all.
+
+**There is no repair pass, and its removal is part of the design rather than a tidy-up.** Phase 1
+shipped before Phase 2, so a node label with nowhere to go took a blocking link label's ground and
+hid it whole — the link had nothing to yield *with*. Now it has: the link label sheds values for the
+node label before placement runs, which is the graceful form of the same ruling. Keeping the crude
+mechanism alongside the graceful one left two doors to the same situation and a reader could not tell
+them apart (Tom, 2026-08-17: *"I am sometimes observing the repair happening, which is confusing."*).
+If a node label still cannot fit once link labels have shed, it drops — which is what §2.1 says.
+
+**Status:** both conditions have shipped. What is not settled is how AGGRESSIVE the conflict rule
+should be — a link label currently sheds for any node label it touches, including one that was
+dropped, and that is deliberately eager so a blocked node label cannot deadlock. ROADMAP Task 404.
 
 **A repeated chain sheds as one link, never per station.** A chain's whole justification is *the same
 name said again*; if one station sheds and the next does not, it stops reading as one repeated name.
