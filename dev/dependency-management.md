@@ -184,9 +184,10 @@ people run it. "Is there a newer upstream version?" is a separate advisory scrip
 
 What depends on it:
 
-- **Collapse** — 28 `data-bs-toggle` sites: the show/hide row links in `lib/Calculators.lib.php`,
-  the related-calculators line on nine pages, the navbar toggler.
-- **Dropdown** — the calculator, "more" and language menus in `lib/Menus.lib.php`.
+- **Collapse** — 65 `data-bs-toggle="collapse"` sites across 11 files: the show/hide row links in
+  `lib/Calculators.lib.php`, the related-calculators line, the navbar toggler.
+- **Dropdown** — 15 `data-bs-toggle="dropdown"` sites: the calculator, "more" and language menus in
+  `lib/Menus.lib.php`.
 - **Tooltip** — `js/Calculators.lib.js:39` and `js/looped-network.js:12610`: the `.ec-help`
   tap-triggered tooltip mechanism the whole labels-and-tips convention is built on, touch
   accessibility included.
