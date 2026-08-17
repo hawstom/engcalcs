@@ -10,7 +10,7 @@
 // else's. Two tabs of one context would share the token and see no contention at all.
 
 const { INIT_SCRIPT } = require('./pickers');
-const { PAGE } = require('./env');
+const { pageUrl } = require('./env');
 
 class Session {
 	constructor(context, page, name) {
@@ -42,7 +42,7 @@ class Session {
 
 	// ---- navigation -------------------------------------------------------
 	async goto() {
-		await this.page.goto(PAGE, { waitUntil: 'load' });
+		await this.page.goto(pageUrl(), { waitUntil: 'load' });
 		await this.settle();
 	}
 	async reload() {
