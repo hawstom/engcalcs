@@ -277,12 +277,27 @@ shed trailing values (per §2.2's link order) → drop the label
 ```
 
 **The shed step is our own extension to that cascade, not a cartographic standard.** It is available
-to us because an undragged link label is one inline row, so shedding a trailing value reduces its
-WIDTH — and width is exactly the quantity both the short-pipe rule and the conflict test already
-consume. The two "it does not fit" problems are therefore one cascade with two stopping conditions,
-and `linkLabelTooShort()` becomes its terminal rung rather than a separate all-or-nothing hide.
+to us because an undragged link label is one inline row, so shedding a value reduces its WIDTH — and
+width is exactly the quantity both the short-pipe rule and the conflict test already consume. The two
+"it does not fit" problems are therefore one cascade with two stopping conditions, and
+`linkLabelTooShort()` becomes its terminal rung rather than a separate all-or-nothing hide.
+
+**"Trailing" means trailing in the PRIORITY order, not in the row.** Values are drawn in reading
+order (id, diameter, length, roughness, km, flow, …) and shed worst-rank-first, and those two orders
+disagree — so what survives is an arbitrary *subset* of the row, never a prefix of it. Any arithmetic
+that assumes a prefix is wrong in a way that still looks sensible, which is why the width bank sums
+segments rather than running a total. Survivors keep reading order: a reader's eye learns a label's
+order, and reshuffling what is left would make every shed look like a different kind of label.
+
+**The shed is minimal.** It stops at the first subset that fits. Every value removed past that is
+information taken from the reader for nothing, and nothing on screen says it happened.
 
 A dragged label never sheds, for the same reason it never jumps: the user placed it.
+
+**Status:** the length-driven condition has shipped. The conflict-driven one has not, and the blocker
+is an ordering rather than the arithmetic — the collision pass can decide a shed cheaply (the width
+of any subset is a sum over banked segment widths, no re-render), but the text can only be rebuilt in
+`refreshLabelText()`, which runs *before* it. ROADMAP Task 399.
 
 **A repeated chain sheds as one link, never per station.** A chain's whole justification is *the same
 name said again*; if one station sheds and the next does not, it stops reading as one repeated name.

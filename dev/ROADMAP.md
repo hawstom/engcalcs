@@ -346,18 +346,21 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - The structural fix is to derive the drop-relevant obstacle set from `linkLabelStations()` (the
     full list, bounded) rather than the drawn one. Measure first; the count may be zero in practice.
 
-- 80|399| **Phase 2 — link labels shed values instead of vanishing whole.**
-  `dev/label-placement-goals.md` §3.5. Needs Task 397. Task 398 has landed, so this is next: it
-  can ship first. It has no downside — it strictly improves on today's all-or-nothing hide.
-  - An undragged link label is ONE inline row, so shedding a trailing value reduces its WIDTH, which
-    is the quantity both `linkLabelTooShort()` and the conflict test already consume. Too-long-for-
-    its-pipe and in-conflict become one cascade with two stopping conditions.
+- 65|399| **Phase 2 remainder — shed on CONFLICT, not only on pipe length.** The length-driven half
+  shipped 2026-08-16: `shedToWidth()` sheds by the user's priority until the label fits its own
+  pipe, `linkLabelTooShort()` is now the terminal rung rather than the only one, and
+  `dev/lpn-spike/label-shed-harness.js` measures the cascade (9 → 6 → 3 → 2 → 1 values as a pipe is
+  squeezed). What is left is the second stopping condition.
+  - **The blocker is an ordering, not the arithmetic.** `labelWidthKeeping()` already answers "how
+    wide would it be without these values" without re-rendering, so the collision pass can decide a
+    shed cheaply. But the TEXT can only be rebuilt in `refreshLabelText()`, which runs *before* the
+    collision pass — so acting on the decision needs either a second refresh pass or a way to
+    re-render one label in place. Decide that before writing anything.
+  - **Then `nodeRepairAgainstLinks()` sheds instead of hiding.** Task 398 ships it hiding the link
+    label whole, which is Tom's own reading for Phase 1 (*"if there's no fit, the link goes away"*)
+    but is cruder than it needs to be once shedding exists.
   - **A chain sheds as one link, never per station, and off the FULL station list** — deriving
     content from the drawn list would change a pipe's printed values as the user scrolls.
-  - **THIS is where node-outranks-link becomes safe to switch on** (Tom, 2026-08-16). Today
-    `placeStationedLabels()` commits link labels first and nodes go round them; the new ruling
-    reverses that. Do not flip the order before this task ships — a link label that can only choose
-    its station and its side has nothing to yield WITH, so it would just be run over.
 
 - 60|400| **Phase 3 — bounded local search on the residue.** Wagner & Wolff's three optimum-preserving
   reduction rules on an explicit conflict graph, then a bounded chain search, in QGIS PAL's shape.

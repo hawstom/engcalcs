@@ -405,12 +405,26 @@ console.log('\n--- cost ---');
 		}
 		return { labels, obs };
 	}
+	// **THE BEST RUN, NOT THE MEAN, AND THAT IS WHAT MAKES A WALL-CLOCK CHECK SAFE TO BLOCK ON.**
+	// This runs inside check_all.sh alongside fifty other harnesses, so any single timing can be
+	// stretched arbitrarily by whatever else the machine is doing -- and it was: the slope measured
+	// 2.26 under load and 1.01, 1.00 and 0.82 moments later on the same code, failing a BLOCKING
+	// check for no reason in the code at all. A flaky blocking check is worse than no check, because
+	// the fix people reach for is to stop believing it.
+	//
+	// Contention can only ever make a timing LONGER, never shorter, so the minimum over several
+	// batches is the closest thing to the machine's real cost and is the standard way to benchmark
+	// under load. The assertion is a ratio of two such minima, so it stays a statement about the
+	// ALGORITHM rather than about the afternoon.
 	function msPerPass(n) {
-		const { labels, obs } = net(n);
+		const { labels, obs } = net(n), best = [];
 		for (let w = 0; w < 3; w++) { C.placeLabels(labels, obs, { inner: 6, outer: 15, k: 0.25 }); }
-		const t = process.hrtime.bigint();
-		for (let i = 0; i < 5; i++) { C.placeLabels(labels, obs, { inner: 6, outer: 15, k: 0.25 }); }
-		return Number(process.hrtime.bigint() - t) / 5 / 1e6;
+		for (let b = 0; b < 5; b++) {
+			const t = process.hrtime.bigint();
+			for (let i = 0; i < 3; i++) { C.placeLabels(labels, obs, { inner: 6, outer: 15, k: 0.25 }); }
+			best.push(Number(process.hrtime.bigint() - t) / 3 / 1e6);
+		}
+		return Math.min.apply(null, best);
 	}
 	const small = msPerPass(220), big = msPerPass(1000);
 	console.log(`       220 labels (Net3's own count): ${small.toFixed(1)} ms per pass`);

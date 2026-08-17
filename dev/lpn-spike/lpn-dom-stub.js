@@ -45,19 +45,39 @@ function mkEl(tag) {
     // make the Task 264 regression test below meaningless.
     contains(n) { if (n === this) { return true; } return this.children.some(c => c.contains && c.contains(n)); },
     getBoundingClientRect() { return { left: 0, top: 0, right: 1000, bottom: 500, width: 1000, height: 500 }; },
-    // WIDTH VARIES WITH FONT WEIGHT, and that is the one physical relationship this stub is
-    // required to know (Task 337). Bold glyphs are wider, so a constant width here would let a
-    // bold label be measured as though it were light -- mask, collision box and zoom-to-fit all
-    // sized for the wrong glyphs, with every assertion still passing. The exact ratio does not
-    // matter; only that it is not 1. Everything else about text metrics is still constant, so a
-    // harness must not read anything into the width of an unbolded label.
-    getBBox() { return { x: 0, y: 0, width: 10 * (this._isBold() ? 1.12 : 1), height: 10 }; },
+    // WIDTH VARIES WITH FONT WEIGHT AND WITH HOW MANY CHARACTERS THERE ARE, and those are the two
+    // physical relationships this stub is required to know.
+    //
+    // Weight (Task 337): bold glyphs are wider, so a constant width would let a bold label be
+    // measured as though it were light -- collision box and zoom-to-fit sized for the wrong glyphs,
+    // with every assertion still passing. The exact ratio does not matter; only that it is not 1.
+    //
+    // CONTENT (Task 399): a label that sheds a value must come out NARROWER, and a stub returning a
+    // constant makes the whole fitting cascade untestable while looking fine -- the harness would be
+    // asserting that shedding changes nothing, and passing. This is the stub failure CLAUDE.md warns
+    // about by name: ask which quantity the real thing varies that the stub holds constant.
+    //
+    // CHAR_W is a nominal advance per character. It is not a real font metric and nothing may read a
+    // precise width off it; what a harness may rely on is only that width RISES with characters and
+    // FALLS when characters go.
+    getBBox() { return { x: 0, y: 0, width: this._textWidth(), height: 10 }; },
+    _textLength() {
+      // A <text> owns its tspans' characters; a tspan owns its own.
+      if (this.children.length) {
+        return this.children.reduce((n, c) => n + (c._textLength ? c._textLength() : 0), 0);
+      }
+      return (this.textContent || '').length;
+    },
+    _textWidth() {
+      const n = this._textLength();
+      return (n ? n * CHAR_W : 10) * (this._isBold() ? 1.12 : 1);
+    },
     _isBold() {
       // Two write paths reach the same declaration: the style ATTRIBUTE (buildLabelEls / the
       // popup) and the style OBJECT (anything setting .style.fontWeight). Read both.
       return /bold/.test((this._styleAttr || '') + ' ' + (this.style.fontWeight || ''));
     },
-    getComputedTextLength() { return 10; },
+    getComputedTextLength() { return this._textWidth(); },
     setPointerCapture() {}, releasePointerCapture() {},
     remove() { if (this.parentNode) { this.parentNode.removeChild(this); } },
     focus() {}, select() {}, click() {}
@@ -71,6 +91,10 @@ function mkEl(tag) {
   Object.defineProperty(el, 'firstChild', { get() { return this.children[0] || null; } });
   return el;
 }
+
+// Nominal glyph advance for the stub's text metrics -- see getBBox() above. A number, not a
+// measurement: what matters is that it is positive and constant, so width tracks character count.
+const CHAR_W = 6;
 
 const byId = {};
 function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id; } return byId[id]; }

@@ -525,6 +525,49 @@ var EngCalcs = EngCalcs || {};
 	// want that number on the sheet -- it is authored, and this stops applying. So there is an escape
 	// hatch, it needs no setting, and the gesture that reveals the intent is the one a user already
 	// makes. Double-clicking the label sends it home and the rule resumes.
+	// **THE FITTING CASCADE (ROADMAP Task 399; dev/label-placement-goals.md §3.5).**
+	//
+	// ESRI Maplex's named cascade for a label that will not fit is stack -> overrun -> reduce font ->
+	// abbreviate -> key-number. We have none of the middle rungs: an undragged link label is already
+	// ONE inline row, we do not shrink type, and we have no abbreviation dictionary. So ours is two
+	// rungs -- **shed trailing values, then drop the label** -- and the shed step is our own
+	// extension to that cascade rather than a cartographic standard. Say so wherever it is described.
+	//
+	// It is cheap only because an unstacked link label is one row: shedding a value reduces its
+	// WIDTH, monotonically, and width is exactly the quantity both the short-pipe rule and the
+	// conflict test already consume. That collapses Tom's two "it does not fit" problems -- too long
+	// for its pipe, and in conflict with a neighbour -- into one cascade with two stopping conditions.
+	//
+	// Returns the set of field-line indices to KEEP, as a lookup. Sheds one value at a time, worst
+	// rank first, and stops the moment the label fits: a MINIMAL shed, because every value removed
+	// beyond the first that fits is information taken from the reader for nothing.
+	function shedToWidth(le, lines, maxWidth) {
+		var keep = {}, order = [], i;
+		for (i = 0; i < lines.length; i++) { keep[i] = true; }
+		if (!(maxWidth > 0) || lines.length < 2) { return keep; }
+		// Worst rank first. A line with no field (the empty placeholder) and one with no rank both
+		// sort last and so are shed first -- there is nothing to say about a value nobody ranked.
+		for (i = 0; i < lines.length; i++) { order.push(i); }
+		order.sort(function (a, b) { return linkFieldRank(lines[b].field) - linkFieldRank(lines[a].field); });
+		for (i = 0; i < order.length - 1; i++) {   // never shed the last survivor here; that is the drop
+			if (labelWidthKeeping(le, keep) <= maxWidth) { break; }
+			delete keep[order[i]];
+		}
+		return keep;
+	}
+	// A field's shed rank, from the user's own Priority column. An unranked or unnamed field sorts
+	// worst, so it goes first -- Infinity rather than a large number, because a large number is a
+	// rank someone could type.
+	function linkFieldRank(field) {
+		var r = field && labelSettings.priority.link[field];
+		return typeof r === 'number' ? r : Infinity;
+	}
+	// The lines that survive, in READING order -- the shed decides WHICH values go, never the order
+	// the rest are printed in. A reader's eye learns the order of a label; reshuffling the survivors
+	// would make every shed look like a different kind of label.
+	function keptLines(lines, keep) {
+		return lines.filter(function (line, i) { return keep[i]; });
+	}
 	var SHORT_LINE_MULT = 1;
 	function linkLabelTooShort(l, le) {
 		if (!le || le.empty) { return false; }
@@ -1611,6 +1654,46 @@ var EngCalcs = EngCalcs || {};
 		// quarter of a second per notch (Tom, 2026-08-15).
 		if (holder.twPx) { return holder.twPx / (state.s || 1); }
 		return holder.tw || 0;
+	}
+	// **THE WIDTH OF ANY SUBSET OF A LABEL, WITHOUT MEASURING THE SUBSET** (ROADMAP Task 399).
+	//
+	// Phase 2 asks what a link label would be if it shed its lowest-ranked values. Measuring each
+	// candidate would mean rebuilding the text and forcing a synchronous layout once per value per
+	// label -- on Net3's 119 links that is hundreds of forced layouts per refresh, which is precisely
+	// the cost `noteMeasuredWidth()` above exists to avoid. So the SEGMENTS are measured once, and
+	// every subset after that is a sum.
+	//
+	// **THE SHED IS NOT A PREFIX OF THE ROW, WHICH IS WHY THIS IS A SUM AND NOT A RUNNING TOTAL.**
+	// Values are drawn in reading order (id, diameter, length, ...) and shed in PRIORITY order (km
+	// first, flow last). Those two orders disagree, so what survives is an arbitrary subset of the
+	// row and the arithmetic has to be able to add up any of them.
+	//
+	// Banked in PIXELS, like `twPx`, so a zoom is a division rather than a re-measure.
+	function noteSegmentWidths(holder, owners) {
+		var px = [], i, kids = holder.text ? holder.text.childNodes : [];
+		for (i = 0; i < kids.length; i++) {
+			// getComputedTextLength() is per-tspan and needs no extra layout beyond the one the
+			// getBBox() beside this call already forced.
+			try { px.push(kids[i].getComputedTextLength() * (state.s || 1)); }
+			catch (err) { px.push(0); }   // pre-layout; a zero segment simply cannot argue for a shed
+		}
+		holder.segWpx = px;
+		holder.segOwner = owners;
+	}
+	// The world-unit width of the label if only `keep` (a set of field-line indices) survived. The
+	// separators are counted BETWEEN survivors, not carried along with the values they used to
+	// separate -- shedding a middle value must not leave two separators against each other.
+	function labelWidthKeeping(holder, keep) {
+		var px = holder.segWpx, own = holder.segOwner, i, sum = 0, sepW = 0, sepN = 0, seen = {};
+		if (!px || !own) { return labelBoxWidth(holder); }
+		for (i = 0; i < px.length && i < own.length; i++) {
+			if (own[i] < 0) { sepW = Math.max(sepW, px[i]); continue; }
+			if (!keep[own[i]]) { continue; }
+			sum += px[i];
+			if (!seen[own[i]]) { seen[own[i]] = true; sepN++; }
+		}
+		sum += sepW * Math.max(0, sepN - 1);
+		return sum / (state.s || 1);
 	}
 	// The other half of the pair: call this instead of writing `.tw` from a getBBox() result, and the
 	// pixel figure is banked at the same time. `worldWidth` is what getBBox() just returned.
@@ -13679,6 +13762,10 @@ var EngCalcs = EngCalcs || {};
 	// harness) means by "what does this label say".
 	function affix(group, field, line) {
 		var p = labelPrefixFor(group, field), s = labelSuffixFor(group, field);
+		// The field NAME rides along (Task 399). Everything downstream that has to rank a line --
+		// the shed cascade -- needs to know which quantity it is, and by the time the lines reach
+		// composeRows() they are indistinguishable strings.
+		line.field = field;
 		line.parts = [];
 		if (p) { line.parts.push({ text: p }); }
 		line.parts.push({ text: line.text, decoration: line.decoration });
@@ -13711,12 +13798,27 @@ var EngCalcs = EngCalcs || {};
 	//
 	// The separator is its own SEGMENT rather than being appended to the value before it, so that an
 	// extrema mark underlines the number alone and never the punctuation after it.
-	function composeRows(lines, stacked) {
-		if (stacked || lines.length < 2) { return lines.map(segmentsOf); }
+	// `owners`, when supplied, is filled with one entry per DRAWN SEGMENT saying which field line it
+	// came from (-1 for a separator, which belongs to no field). It is produced HERE rather than by a
+	// parallel function that walks the same lines a second time, because the two would drift the
+	// moment either shape changed -- and the failure would be a label whose measured width belongs to
+	// different values than the ones on screen, which is invisible until something sheds the wrong
+	// one. Segments come out in exactly the order setMultilineText() creates tspans.
+	function composeRows(lines, stacked, owners) {
+		function own(i, n) { if (owners) { while (n-- > 0) { owners.push(i); } } }
+		if (stacked || lines.length < 2) {
+			return lines.map(function (line, i) {
+				var segs = segmentsOf(line);
+				own(i, segs.length);
+				return segs;
+			});
+		}
 		var sep = labelSeparator(), row = [];
 		lines.forEach(function (line, i) {
-			if (i) { row.push({ text: sep }); }
-			row = row.concat(segmentsOf(line));
+			var segs = segmentsOf(line);
+			if (i) { row.push({ text: sep }); own(-1, 1); }
+			own(i, segs.length);
+			row = row.concat(segs);
 		});
 		return [row];
 	}
@@ -13953,20 +14055,48 @@ var EngCalcs = EngCalcs || {};
 			}
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
-			var lRows = composeRows(lines, labelIsDragged(l));
+			// **BUILT IN FULL, MEASURED, THEN SHED AND REBUILT** (Task 399). The order is forced: a
+			// shed is a decision about WIDTH, and nothing can measure a label that has not been
+			// drawn. So the full label is rendered once to bank its per-segment widths, the cascade
+			// then answers every "what if" as arithmetic, and the text is rebuilt only if something
+			// actually went. A drawing where nothing sheds pays one extra comparison per link.
+			var owners = [], lRows = composeRows(lines, labelIsDragged(l), owners), shed = 0;
 			setMultilineText(le.text, linkLabelBase(l).x, lRows);
+			// Size it for THIS scale before the tape measure comes out -- see the node branch.
+			le.text.style.fontSize = fsNow;
+			(le.repeats || []).forEach(function (r) { r.text.style.fontSize = fsNow; });
+			try { noteMeasuredWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
+			noteSegmentWidths(le, owners);
+			// **A DRAGGED LABEL NEVER SHEDS**, the same hedge and the same reasoning that exempts it
+			// from the short-pipe rule: dragging a label off a stub is exactly what you do when you
+			// want that number on the sheet, so the gesture that reveals the intent is one the user
+			// already makes.
+			if (!labelIsDragged(l) && !le.empty) {
+				var room = Geom.polylineLength(linkPointList(l)) / SHORT_LINE_MULT,
+					keep = shedToWidth(le, lines, room),
+					kept = keptLines(lines, keep);
+				if (kept.length && kept.length < lines.length) {
+					shed = lines.length - kept.length;
+					lines = kept;
+					owners = [];
+					lRows = composeRows(lines, labelIsDragged(l), owners);
+					setMultilineText(le.text, linkLabelBase(l).x, lRows);
+					try { noteMeasuredWidth(le, le.text.getBBox().width); } catch (err) { /* as above */ }
+					noteSegmentWidths(le, owners);
+				}
+			}
+			le.shedCount = shed;
 			le.lineCount = lRows.length;
 			// Kept so a repeat can be rendered from the same rows without composing them twice, and
 			// stamped so a layout pass (which runs on every drag frame) only rebuilds a repeat's
-			// tspans when the content really changed. See syncRepeatText().
+			// tspans when the content really changed. See syncRepeatText(). **The stamp must move
+			// when a SHED changes the content too**, or every repeat of a shed label keeps the tspans
+			// of the label it used to be -- and a chain that says different things at different
+			// stations is exactly what the chain convention exists to prevent.
 			le.rows = lRows;
 			le.rowsSeq = (le.rowsSeq || 0) + 1;
 			linkLines[l.id] = lines;
 			le.lines = lines;
-			// Same reason as the node branch above: size it for this scale, then measure it.
-			le.text.style.fontSize = fsNow;
-			(le.repeats || []).forEach(function (r) { r.text.style.fontSize = fsNow; });
-			try { noteMeasuredWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 		});
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
 		// laid out for real (text and leader) at its final, possibly-nudged position. The extrema
