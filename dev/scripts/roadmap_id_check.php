@@ -68,6 +68,17 @@ foreach ($files as $which => $p) {
         }
     };
     foreach ($lines as $i => $line) {
+        // A BLOCK ENDS AT A HEADING, not only at the next bullet. Without this the LAST task in a
+        // section swallows every trailing line of that section and of the ones after it, and gets
+        // reported over budget for prose belonging to no task at all -- Task 158 was reported at 26
+        // lines against its own 11, having absorbed `## New Calculators` and `## Completed`. The
+        // failure is one-directional and quiet: it only ever inflates, so the fix is to stop
+        // counting rather than to subtract anything.
+        if (preg_match('/^#{1,6}\s/', $line)) {
+            $emit($cur);
+            $cur = null;
+            continue;
+        }
         if (!preg_match('/^- (\d+)\|([0-9.]+)\|/', $line, $m)) {
             if ($cur !== null) { $cur['n']++; }
             continue;
