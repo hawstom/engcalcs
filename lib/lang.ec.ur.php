@@ -796,7 +796,7 @@ $ec_lang['lpn_inp_drop_eps']='یہ فائل ایک ایسی سمولیشن بی�
 $ec_lang['lpn_inp_drop_quality']='پانی کے معیار، کیمیائی رد عمل، اور پمپ توانائی کی ترتیبات شامل نہیں کی گئیں۔ یہ صفحہ صرف بہاؤ اور دباؤ حل کرتا ہے۔';
 $ec_lang['lpn_inp_drop_backdrop']='یہ فائل ایک پس منظر کی تصویر کا نام دیتی ہے لیکن خود تصویر شامل نہیں کرتی۔ اسے خود فائل، پس منظر کی تصویر، تصویر شامل کریں سے شامل کریں۔';
 $ec_lang['lpn_inp_drop_dangling']='یہ پائپ ایک ایسے جنکشن کا نام لیتے ہیں جو فائل میں نہیں ہے، اس لیے یہ شامل نہیں کیے گئے۔';
-$ec_lang['lpn_inp_drop_units']='اس فائل میں بہاؤ کے یونٹس پہچانے نہیں گئے، اس لیے گیلن فی منٹ فرض کیا گیا۔ جوابات استعمال کرنے سے پہلے ہر عدد چیک کریں۔';
+$ec_lang['lpn_inp_drop_units']='اس فائل میں بتایا گیا بہاؤ کا یونٹ ایسا نہیں جسے یہ صفحہ جانتا ہے، اس لیے ہر عدد کو گیلن فی منٹ کے طور پر پڑھا گیا۔ جوابات استعمال کرنے سے پہلے ہر عدد چیک کریں۔';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
 // that is the part a user cannot see for themselves.
@@ -1063,8 +1063,8 @@ $ec_lang['lpn_backdrop_remove']='ہٹائیں';
 $ec_lang['lpn_backdrop_remove_confirm']='پس منظر کی تصویر ہٹائیں؟';
 $ec_lang['lpn_backdrop_scale_prompt1']='پس منظر کی تصویر پر دو پوائنٹس پر کلک کریں، جیسے بار سکیل کے دو سرے۔ پھر ان کے درمیان اصل فاصلہ ٹائپ کریں۔';
 $ec_lang['lpn_backdrop_scale_prompt2']='دونوں پوائنٹس کے درمیان اصل فاصلہ';
-$ec_lang['lpn_backdrop_position_prompt1']='پس منظر کی تصویر پر کوئی بھی پوائنٹ پر کلک کریں۔ یہ وہ پوائنٹ ہے جسے آپ منتقل کریں گے۔';
-$ec_lang['lpn_backdrop_position_prompt2']='منتخب کریں کہ وہ پوائنٹ کہاں جانا چاہیے، پھر جاری رکھیں پر کلک کریں۔';
+$ec_lang['lpn_backdrop_position_prompt1']='منتقلی کے لیے بنیادی پوائنٹ (تصویر پر) پر کلک کریں۔';
+$ec_lang['lpn_backdrop_position_prompt2']='منزل کے پوائنٹ کا طریقہ منتخب کریں، پھر جاری رکھیں پر کلک کریں۔';
 $ec_lang['lpn_backdrop_target_label']='اس پوائنٹ کو یہاں منتقل کریں:';
 $ec_lang['lpn_backdrop_target_node']='ایک نوڈ';
 $ec_lang['lpn_backdrop_target_free']='نقشے پر کوئی بھی پوائنٹ';
@@ -1099,7 +1099,7 @@ $ec_lang['lpn_scenario_delete']='منظرنامہ حذف کریں';
 $ec_lang['lpn_scenario_delete_confirm']='منظرنامہ {name} حذف کریں، اور وہ {n} قدریں جو صرف اسی سے تعلق رکھتی ہیں؟ ڈرائنگ خود تبدیل نہیں ہوتی۔';
 $ec_lang['lpn_scenario_override']='صرف اسی منظرنامے میں';
 $ec_lang['lpn_scenario_override_tip']='نشان لگا ہونے کا مطلب ہے کہ یہ قدر صرف اسی منظرنامے سے تعلق رکھتی ہے، چاہے یہ بنیاد جیسی ہی قدر ہو۔ دوبارہ بنیاد کی قدر استعمال کرنے کے لیے نشان ہٹا دیں۔';
-$ec_lang['lpn_scenario_base_value']='بنیاد: {value}';
+$ec_lang['lpn_scenario_base_value']='بنیادی منظرنامہ: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id}، {scenario} میں نیٹ ورک سے باہر ہے۔ یہ اب بھی ڈرائنگ میں، اور آپ کے دیگر منظرناموں میں موجود ہے۔';
 $ec_lang['lpn_scenario_push_btn']='بنیاد کی قدریں تمام منظرناموں پر لاگو کریں';
 $ec_lang['lpn_scenario_push_tip']='ہر منظرنامہ ان خصوصیات کے لیے بنیاد کی قدر پر واپس چلا جاتا ہے جن کے لیبل ابھی دکھائے جا رہے ہیں۔ وہ قدریں جو صرف انہی منظرناموں سے تعلق رکھتی ہیں، ضائع کر دی جاتی ہیں۔';
@@ -1118,16 +1118,16 @@ $ec_lang['lpn_settings_computation']='حساب کتاب';
 $ec_lang['lpn_settings_tolerance']='ہم آہنگی کی رواداری';
 $ec_lang['lpn_settings_tolerance_tip']='حل کار کو رکنے سے پہلے کتنا قریب پہنچنا ہوتا ہے۔ چھوٹا عدد زیادہ درست ہوتا ہے اور زیادہ وقت لیتا ہے۔';
 $ec_lang['lpn_settings_engine_epanet']='EPANET حل کار سے حل کریں';
-$ec_lang['lpn_settings_engine_epanet_tip']='US EPA کا EPANET حل کار آپ کے براؤزر میں چلاتا ہے۔ بلٹ ان حل کار وہی جوابات دیتا ہے اور تیز تر ہے، اس لیے اسے بند رکھیں جب تک آپ کو خود EPANET کی ضرورت نہ ہو۔';
+$ec_lang['lpn_settings_engine_epanet_tip']='US EPA کا EPANET حل کار یہاں آپ کے براؤزر میں چلتا ہے۔ دونوں حل کار ایک جیسے جواب دیتے ہیں، اور اتنے سائز کے نیٹ ورک پر آپ کو رفتار میں کوئی فرق محسوس نہیں ہوگا۔ اسے پہلی بار آن کرنے پر تقریباً 650 KB ڈاؤن لوڈ ہوتا ہے اور پھر اس آلے پر محفوظ رہتا ہے۔';
 $ec_lang['lpn_engine_loading']='EPANET حل کار لوڈ ہو رہا ہے…';
 $ec_lang['lpn_engine_failed']='EPANET حل کار لوڈ نہیں ہو سکا۔ اس کی بجائے بلٹ ان حل کار دکھایا جا رہا ہے۔';
 $ec_lang['lpn_engine_valve_route']='EPANET حل کار سے حل کیا گیا، کیونکہ یہ والوز خود بخود کھلتے اور بند ہوتے ہیں:';
 $ec_lang['lpn_engine_manning_note']='نوٹ: مانیننگ کھردرا پن کے ساتھ، EPANET بلٹ ان حل کار سے تقریباً 0.6% کم دباؤ نقصان کا حساب لگاتا ہے۔';
-$ec_lang['lpn_settings_text_size']='متن کا سائز';
+$ec_lang['lpn_settings_text_size']='متن کا سائز (پکسلز)';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
-$ec_lang['lpn_settings_symbol_size']='علامت کا سائز (متن کے نسبت)';
+$ec_lang['lpn_settings_symbol_size']='علامت کا سائز (پکسلز)';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='علامت کی دھندلاہٹ (0 سے 1)';
@@ -1149,3 +1149,100 @@ $ec_lang['lpn_settings_legend_bottom_right']='نیچے دائیں';
 $ec_lang['lpn_confirm_restore_defaults']='تمام ترتیبات (ID سابقے، ابتدائی قدریں، حل کار کی ترتیبات، نقشے کی ظاہری شکل، کلید کی جگہ، اور نظر آنے والے لیبلز) کو اصل قدروں پر ری سیٹ کریں؟ آپ کا نیٹ ورک تبدیل نہیں ہوتا۔ ترتیبات کھلے پراجیکٹ سے تعلق رکھتی ہیں، اس لیے آپ کے دوسرے پراجیکٹس اپنی اپنی ترتیبات رکھتے ہیں۔';
 $ec_lang['lpn_settings_wipe_btn']='اس صفحے پر سب کچھ مٹا دیں';
 $ec_lang['lpn_confirm_wipe']='اس صفحے کے لیے محفوظ سب کچھ حذف کریں — ہر پراجیکٹ، ہر پس منظر کی تصویر، تمام ترتیبات، اور آپ کے یونٹ کے انتخاب — اور صفحے کو اس طرح دوبارہ لوڈ کریں جیسے ایک بالکل نیا وزیٹر دیکھے گا؟ یہ عمل واپس نہیں لیا جا سکتا۔';
+
+// Units (added later, kept with unit block conventions)
+$ec_lang['u_imgd']='IMGD';
+$ec_lang['u_afd']='ac-ft/d';
+$ec_lang['u_lpm']='L/min';
+$ec_lang['u_cmh']='m^3/hr';
+$ec_lang['u_cmd']='m^3/d';
+
+// Text label element
+$ec_lang['lpn_field_text_bold']='موٹا متن';
+$ec_lang['lpn_field_text_rotation']='زاویہ (ڈگری)';
+$ec_lang['lpn_field_text_match_pipe']='پائپ کے زاویے سے ملائیں';
+$ec_lang['lpn_field_text_flip']='180° گھمائیں';
+
+// Example networks
+$ec_lang['lpn_examples_heading']='مثال کھولیں';
+$ec_lang['lpn_examples_sub']='ہر مثال آپ کی اپنی کاپی کے طور پر کھلتی ہے۔ اسے تبدیل کریں، محفوظ کریں، یا نئی کاپی کھول کر دوبارہ شروع کریں۔';
+$ec_lang['lpn_examples_open']='کھولیں';
+$ec_lang['lpn_examples_menu']='مثال کھولیں…';
+$ec_lang['lpn_examples_blank']='یا خالی نقشے سے شروع کریں';
+$ec_lang['lpn_examples_size']='{nodes} جنکشن، {links} پائپ';
+$ec_lang['lpn_examples_failed']='مثالیں لوڈ نہیں ہو سکیں۔ ڈرائنگ شروع کرنے کے لیے فائل، نیا پراجیکٹ استعمال کریں۔';
+$ec_lang['lpn_examples_loading']='مثالیں لوڈ ہو رہی ہیں…';
+$ec_lang['lpn_help_fix']='کچھ ٹھیک کریں';
+$ec_lang['lpn_help_notes']='اس صفحے سے متعلق نوٹس';
+$ec_lang['lpn_status_example_opened']='{name} کھل گیا۔ یہ آپ کی کاپی ہے: اسے فائل، محفوظ کریں بطور سے محفوظ کریں۔';
+$ec_lang['lpn_ex_basic_si_title']='بنیادی نیٹ ورک، L/s (SI)';
+$ec_lang['lpn_ex_basic_si_desc']='یہاں سے شروع کریں۔ ایک ریزروائر، ایک پمپ اور ایک چھوٹا لوپ: سب سے چھوٹا انتظام جو پھر بھی پانی کے نیٹ ورک کے طور پر کام کرتا ہے۔ لیٹر فی سیکنڈ، میٹر اور ملی میٹر کے ساتھ۔';
+$ec_lang['lpn_ex_basic_us_title']='بنیادی نیٹ ورک، gpm (US)';
+$ec_lang['lpn_ex_basic_us_desc']='وہی ابتدائی نیٹ ورک گیلن فی منٹ میں، فٹ اور انچ کے ساتھ۔';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1';
+$ec_lang['lpn_ex_net1_desc']='EPANET کے اپنے تین نمونہ نیٹ ورکس میں سب سے چھوٹا: ایک ریزروائر، ایک پمپ اور ایک لوپ۔';
+$ec_lang['lpn_ex_net2_title']='EPANET Net2';
+$ec_lang['lpn_ex_net2_desc']='EPANET کے نمونوں میں سے ایک، ٹینک والا برانچڈ تقسیمی نظام۔';
+$ec_lang['lpn_ex_net3_title']='EPANET Net3';
+$ec_lang['lpn_ex_net3_desc']='EPANET کا بڑا نمونہ: 97 جنکشن، دو ٹینک اور ایک دریا کا ذریعہ۔ حقیقی سائز کا ماڈل نقشے پر کیسا نظر آتا ہے یہ دیکھنے کے لیے کھولنے کے قابل۔';
+$ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
+$ec_lang['lpn_ex_elm_street_desc']='ایک تجارتی سائٹ، جسے زیادہ سے زیادہ روزانہ طلب کے ساتھ آگ بجھانے کے بہاؤ کے لیے، ایک لمحے کے وقت پر حل کیا گیا، سائٹ پلان پر بنایا گیا ہے۔';
+
+$ec_lang['lpn_inp_report_label_anchor']='متن لیبلز اسی طرح رکھے جاتے ہیں جیسے EPANET رکھتا ہے، ان کے اوپری بائیں کونے سے۔';
+
+$ec_lang['lpn_engine_fetching']='EPANET حل کار حاصل کیا جا رہا ہے۔ یہ ایک بار ڈاؤن لوڈ ہوتا ہے اور پھر اس آلے پر محفوظ رہتا ہے، اس لیے بعد میں یہ آف لائن کام کرتا ہے۔';
+$ec_lang['lpn_engine_ready']='EPANET حل کار اب اس آلے پر موجود ہے، اور آف لائن کام کرتا ہے۔';
+$ec_lang['lpn_engine_fetching_valve']='EPANET حل کار حاصل کیا جا رہا ہے، تاکہ یہ والو ابھی اور بعد میں آف لائن حل کیا جا سکے۔';
+$ec_lang['lpn_engine_ready_valve']='EPANET حل کار اب اس آلے پر موجود ہے۔ وہ والوز جو خود بخود کھلتے اور بند ہوتے ہیں آف لائن کام کریں گے۔';
+$ec_lang['lpn_engine_unavailable']='EPANET حل کار حاصل نہیں ہو سکا، جو خود بخود کھلنے اور بند ہونے والے والوز کو حل کرتا ہے۔ ایک بار انٹرنیٹ سے جڑیں اور یہ اس کے بعد اس آلے پر محفوظ رہتا ہے۔';
+
+$ec_lang['lpn_field_show_always']='یہ لیبل ہمیشہ دکھائیں';
+$ec_lang['lpn_settings_apply_to_all']='سب پر لاگو کریں';
+$ec_lang['lpn_settings_apply_to_all_tip']='اس قسم کا ہر عنصر جو پہلے سے بنا ہوا ہے اسے اس متن سے شروع ہونے والا ID ملتا ہے۔ ہر ایک اپنا نمبر برقرار رکھتا ہے۔ جو ID نمبر پر ختم نہیں ہوتا اسے چھوڑ دیا جاتا ہے۔';
+$ec_lang['lpn_confirm_apply_prefix']='{n} عناصر کا نام تبدیل کریں تاکہ ان کے IDs {prefix} سے شروع ہوں؟ ہر ایک اپنا نمبر برقرار رکھتا ہے۔';
+$ec_lang['lpn_prefix_applied']='{n} عناصر کا نام تبدیل ہو گیا۔ {skipped} دیگر کو چھوڑ دیا گیا۔';
+$ec_lang['lpn_labels_prefix_tip']='وہ متن جو نقشے پر اس قدر سے پہلے دکھایا جاتا ہے';
+$ec_lang['lpn_labels_prefix_id_tip']='وہ متن جو نقشے پر ID سے پہلے دکھایا جاتا ہے۔ اسے خالی چھوڑ دیں تو ID اپنے طور پر دکھایا جاتا ہے، اسی حرف سے شروع ہو کر جو اسے دیا گیا تھا، جیسے J1 یا L1۔';
+$ec_lang['lpn_labels_suffix_tip']='وہ متن جو نقشے پر اس قدر کے بعد دکھایا جاتا ہے';
+$ec_lang['lpn_labels_suffix_gradient_tip']='وہ متن جو نقشے پر دباؤ نقصان کے ڈھلوان کے بعد دکھایا جاتا ہے۔ یہاں فیصد کا نشان ٹائپ نہ کریں۔ جب یونٹس فیصد ہوں تو یہ خودبخود شامل ہو جاتا ہے۔';
+$ec_lang['lpn_labels_separator']='قدروں کے درمیان متن';
+$ec_lang['lpn_labels_separator_tip']='لیبل پر ایک قدر اور اگلی قدر کے درمیان متن۔ پہلے سے مقررہ طور پر ایک خالی جگہ۔';
+$ec_lang['lpn_labels_priority']='ترجیح';
+$ec_lang['lpn_labels_priority_link_tip']='وہ ترتیب جس میں قدریں ہٹائی جاتی ہیں جب لیبل جگہ میں نہ آئے۔ 1 سب سے آخر تک برقرار رہتا ہے۔';
+$ec_lang['lpn_labels_priority_node_tip']='یہ فیصلہ کرنے کی ترجیح کہ نقشہ بھرا ہونے پر کس کا لیبل پہلے ہٹایا جائے: سب سے کم طلب، حد کے درمیان کے قریب ترین دباؤ، یا پڑوسی نوڈز کے قریب ترین بلندی یا ہیڈ۔ 1 پہلے فیصلہ کرتا ہے۔';
+$ec_lang['lpn_labels_col_before']='پہلے';
+$ec_lang['lpn_labels_col_after']='بعد';
+$ec_lang['lpn_labels_col_decimals']='اعشاریہ';
+
+$ec_lang['lpn_backdrop_scale_from']='موجودہ سائز سے، آپ کے چنے ہوئے پوائنٹ کے گرد پیمانہ کریں';
+$ec_lang['lpn_backdrop_scale_from_prompt1']='پس منظر کی تصویر پر وہ پوائنٹ کلک کریں جو اپنی جگہ پر رہنا چاہیے۔';
+$ec_lang['lpn_backdrop_scale_from_prompt2']='اس کے موجودہ سائز سے پیمانہ کریں۔ 1 اسے وہی رکھتا ہے، 1.1 اسے 10% بڑا کرتا ہے، 0.9 اسے 10% چھوٹا کرتا ہے۔';
+$ec_lang['lpn_backdrop_busy']='پس منظر کی تصویر ایڈجسٹ کی جا رہی ہے۔';
+
+$ec_lang['lpn_unit_unknown']='یہ ڈرائنگ ایک ایسے یونٹ کا ذکر کرتی ہے جو یہ صفحہ فراہم نہیں کرتا: {unit}۔ ہر چیز بالکل اسی طرح رکھی اور دکھائی گئی ہے جیسے وہ آئی تھی، اور کچھ بھی تبدیل نہیں کیا گیا۔ جب تک یہ صفحہ اس یونٹ کو نہیں جانتا کوئی جواب نہیں دیا جا سکتا، کیونکہ یہ بتانے کا کوئی طریقہ نہیں کہ یہ کتنا بڑا ہے۔';
+
+$ec_lang['lpn_settings_link_width']='پائپ لائن کی موٹائی (پکسلز)';
+$ec_lang['lpn_settings_align_labels']='پائپ لیبلز کو پائپوں کے ساتھ سیدھا کریں';
+$ec_lang['lpn_settings_readability_bias']='عمودی سے کتنے درجے بائیں طرف ہونے پر لیبل الٹا دیا جاتا ہے';
+$ec_lang['lpn_settings_mask_labels']='لیبلز کے پیچھے ٹھوس پس منظر';
+$ec_lang['lpn_settings_label_max_width']='جب منظر اس سے تنگ ہو تو لیبلز دکھائیں (نقشے کے یونٹس)';
+$ec_lang['lpn_settings_label_use_view']='موجودہ منظر استعمال کریں';
+$ec_lang['lpn_settings_label_always']='لیبلز ہمیشہ دکھائیں';
+$ec_lang['lpn_settings_colors']='قدر کے مطابق رنگ';
+$ec_lang['lpn_settings_color_node_field']='نوڈ کا رنگ';
+$ec_lang['lpn_settings_color_link_field']='پائپ کا رنگ';
+$ec_lang['lpn_settings_color_ramp']='رنگ سکیم';
+$ec_lang['lpn_color_ramp_epanet']='نیلے سے سرخ (EPANET)';
+$ec_lang['lpn_color_ramp_viridis']='جامنی سے پیلا (ایک رنگ کو دوسرے سے پہچاننا آسان)';
+$ec_lang['lpn_color_ramp_gray']='ہلکے سے گہرے سرمئی';
+$ec_lang['lpn_settings_color_reverse']='رنگوں کی ترتیب الٹ دیں';
+$ec_lang['lpn_color_none']='کوئی رنگ نہیں';
+$ec_lang['lpn_settings_color_thematic']='موضوعاتی نقشہ: صرف رنگ، کوئی لیبل نہیں';
+$ec_lang['lpn_settings_color_thematic_tip']='ہر لیبل چھپا دیتا ہے تاکہ نقشے پر صرف رنگ رہ جائیں۔ آپ کے لیبل کے انتخاب محفوظ رہتے ہیں، اور اسے بند کرنے سے وہ واپس آ جاتے ہیں۔';
+$ec_lang['lpn_settings_color_key_position']='رنگ کی کلید کی جگہ';
+$ec_lang['lpn_settings_color_breaks']='رنگ کے بینڈ کی حدیں';
+$ec_lang['lpn_settings_color_breaks_note']='انہیں خالی چھوڑ دیں تو رنگ نقشے پر موجود قدروں کے مطابق پھیلائے جاتے ہیں۔ نمبر ٹائپ کریں، یا نیچے کوئی بٹن دبائیں، تو ایک ہی نمبر ہمیشہ ایک ہی رنگ ظاہر کرے گا۔';
+$ec_lang['lpn_settings_color_equal_intervals']='مساوی وقفے';
+$ec_lang['lpn_settings_color_equal_counts']='مساوی تعداد';
+$ec_lang['lpn_settings_color_auto']='خودکار';
+$ec_lang['lpn_settings_color_no_values']='ابھی کام کرنے کے لیے کوئی قدریں نہیں ہیں۔ پہلے نیٹ ورک حل کریں۔';
