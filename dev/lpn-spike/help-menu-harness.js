@@ -111,7 +111,10 @@ console.log('\n-- the Help menu rows --');
 	// About last, where every other Help menu in the world puts it.
 	report(body.indexOf('about_main_menu') > body.indexOf('lpn_help_fix'), 'About is last');
 	// Notes is the one row that does not leave the page, so it must NOT be an ext().
-	report(/label: pc\.lpn_help_notes \|\| 'Notes', fn: toggleNotesPopup/.test(body),
+	// Matched on the KEY and the handler, never on the fallback English between them: Wave 0
+	// renamed that fallback to 'Notes on this page' (2026-08-17) and a literal match turned red
+	// for a wording change, which is not what this check is about.
+	report(/label: pc\.lpn_help_notes \|\| '[^']*', fn: toggleNotesPopup/.test(body),
 		'Notes reveals in place rather than opening a tab');
 }
 

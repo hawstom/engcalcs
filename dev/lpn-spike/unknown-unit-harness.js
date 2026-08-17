@@ -86,7 +86,12 @@ ok('the refusal names the unit', refusal.indexOf('furlong_per_fortnight') >= 0, 
 // and that answers are therefore impossible. Asserted as two separate ideas rather than as one
 // exact string, so rewording the message does not fail this and dropping half of it does.
 ok('the refusal says the drawing is intact', /kept|shown|came in|unchanged/i.test(refusal), JSON.stringify(refusal));
-ok('the refusal says no answers can be given', /no answers|cannot|can not/i.test(refusal), JSON.stringify(refusal));
+// The alternation has to be as wide as the IDEA, or the check quietly becomes an exact-string test
+// wearing an idea's clothes -- which is what it was: Wave 0 reworded "No answers can be worked out"
+// to "Nothing can be solved" (2026-08-17), a change this file's own comment says must not fail it,
+// and it failed.
+ok('the refusal says no answers can be given',
+	/no answers|nothing can be (solved|worked)|cannot|can not|unable/i.test(refusal), JSON.stringify(refusal));
 ok('nothing was solved', L.getDoc().nodes.length === 2);
 
 // The refusal is not sticky: install a unit we do know and the page works again.

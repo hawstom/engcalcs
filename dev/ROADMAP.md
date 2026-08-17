@@ -22,10 +22,11 @@ Pre-sprint order is in `dev/translation-process.md`: Wave 0 adversarial English 
 `$ec_lang_syn` entries are proposed as a diff and approved in that session, not before. Harness cap:
 26 agents means 20 at once and 6 as slots free.
 
-**Fold into Wave 0:** `lpn_inp_drop_units` still says gallons per minute "were assumed". Task 390
-step 4 abolished that guess — all ten EPANET keywords are supported and an unknown unit now refuses
-the solve by name instead. Rewording it is an English change on a key already translated in 26
-languages, so it belongs in the sprint rather than as a quiet edit.
+**This block's claim about `lpn_inp_drop_units` was WRONG and misled a Wave 0 brief on 2026-08-17.**
+It said Task 390 abolished the gallons-per-minute guess. It did not: `js/lpn-inp.js:213` still falls
+back to `FLOW_UNITS.GPM` when the `[OPTIONS] UNITS` keyword is unrecognised. What Task 390 abolished
+is a *different* guess in a different place — `lpn_unit_unknown`, for a unit the PAGE does not offer,
+which really does refuse the solve by name. The key has been reworded to state what the code does.
 
 **Arrow 2 — the LABEL PARADIGM, Tasks 397–400**, unblocked 2026-08-16 by Tom's phases. Start at 397
 (the priority column, the local feature context, the width bank); 398 and 399 both need it and 399

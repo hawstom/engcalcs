@@ -326,7 +326,13 @@ console.log('== settings section ==');
 	const t = allText(panel);
 	ok('it offers the ramp choices', /EPANET/.test(t), t.slice(0, 200));
 	ok('it offers both auto-assign buttons', /Equal intervals/.test(t) && /Equal counts/.test(t));
-	ok('it offers the break editor for a chosen field', /Break values/.test(t));
+	// Asserted through the LANGUAGE KEY, not the English words. Wave 0 renamed this heading from
+	// "Break values" to "Color band limits" (2026-08-17) and a literal match turned red for a
+	// deliberate wording change -- which is a test measuring the wrong thing: what matters is that
+	// the break editor is rendered, not what it happens to be called this month.
+	ok('it offers the break editor for a chosen field',
+		t.indexOf(global.EngCalcs.pageConfig.lpn_settings_color_breaks) >= 0,
+		global.EngCalcs.pageConfig.lpn_settings_color_breaks);
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILURE(S)');

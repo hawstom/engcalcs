@@ -4623,7 +4623,7 @@ var EngCalcs = EngCalcs || {};
 		regModeBar.id = 'lpn_regmode_bar';
 		regModeBar.className = 'lpn-regmode-bar';
 		var txt = document.createElement('span');
-		txt.textContent = pc.lpn_backdrop_busy || 'Setting the background image.';
+		txt.textContent = pc.lpn_backdrop_busy || 'Adjusting the background image.';
 		var btn = document.createElement('button');
 		btn.type = 'button';
 		btn.textContent = pc.lpn_cancel || 'Cancel';
@@ -4885,7 +4885,7 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'image', label: pc.lpn_backdrop_add || 'Add', fn: function () { backdropAction('add'); } },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale || 'Scale by picking', fn: function () { backdropAction('scale'); }, disabled: !backdrop },
 			{ icon: 'scale', label: pc.lpn_backdrop_scale_entry || 'Scale by world file or by the size of one pixel on the map', fn: function () { backdropAction('scale-entry'); }, disabled: !backdrop },
-			{ icon: 'scale', label: pc.lpn_backdrop_scale_from || 'Scale from current size, about a point you pick', fn: function () { backdropAction('scale-from'); }, disabled: !backdrop },
+			{ icon: 'scale', label: pc.lpn_backdrop_scale_from || 'Scale from current size, around a point you pick', fn: function () { backdropAction('scale-from'); }, disabled: !backdrop },
 			{ icon: 'position', label: pc.lpn_backdrop_position || 'Move', fn: function () { backdropAction('position'); }, disabled: !backdrop },
 			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove', fn: function () { backdropAction('remove'); }, disabled: !backdrop }
 		]);
@@ -6863,7 +6863,7 @@ var EngCalcs = EngCalcs || {};
 			case 'energy': return pc.lpn_inp_drop_quality || 'Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.';
 			case 'backdrop-not-embedded': return pc.lpn_inp_drop_backdrop || 'This file names a background picture but does not contain it. Add the picture yourself with Map, Backdrop.';
 			case 'dangling-link': return pc.lpn_inp_drop_dangling || 'These pipes name a junction that is not in the file, so they were left out.';
-			case 'unknown-flow-units': return pc.lpn_inp_drop_units || 'The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before using the results.';
+			case 'unknown-flow-units': return pc.lpn_inp_drop_units || 'This file names a flow unit that EPANET does not have. All ten of the flow units EPANET uses are read exactly as the file writes them; this one could not be, so the file was read as gallons per minute. Check every number before you use the answers.';
 			default: return code;
 		}
 	}
@@ -9174,7 +9174,7 @@ var EngCalcs = EngCalcs || {};
 			// at all -- the notes are still in this document, hidden, and this reveals them. See the
 			// comment on #lpn_notes_popup in Looped-Network.php for why the markup stayed in the
 			// page rather than becoming a JS string.
-			{ icon: 'help', label: pc.lpn_help_notes || 'Notes', fn: toggleNotesPopup },
+			{ icon: 'help', label: pc.lpn_help_notes || 'Notes on this page', fn: toggleNotesPopup },
 			{ separator: true },
 			// **A VERB, not a noun** (Tom, 2026-08-14, choosing it over "Contribute": both were a
 			// downgrade for the old page-bottom invitation, and this one is the least of them).
@@ -11142,13 +11142,13 @@ var EngCalcs = EngCalcs || {};
 				prefix: {
 					value: labelPrefixFor(group, key),
 					title: (key === 'id' ? pc.lpn_labels_prefix_id_tip : pc.lpn_labels_prefix_tip) ||
-						'Text printed before this value on the map',
+						'Text shown before this value on the map',
 					onChange: function (v) { labelSettings.prefix[group][key] = v; }
 				},
 				suffix: {
 					value: labelSuffixFor(group, key),
 					title: (key === 'gradient' ? pc.lpn_labels_suffix_gradient_tip : pc.lpn_labels_suffix_tip) ||
-						'Text printed after this value on the map',
+						'Text shown after this value on the map',
 					onChange: function (v) { labelSettings.suffix[group][key] = v; }
 				}
 			};
@@ -11205,7 +11205,7 @@ var EngCalcs = EngCalcs || {};
 				labelSettings.markExtrema, function (v) { labelSettings.markExtrema = v; });
 			var sepRow = document.createElement('div'), sepLabel = document.createElement('span');
 			sepRow.style.display = 'flex'; sepRow.style.alignItems = 'center'; sepRow.style.gap = '6px';
-			sepLabel.textContent = pc.lpn_labels_separator || 'Separator';
+			sepLabel.textContent = pc.lpn_labels_separator || 'Text between values';
 			sepLabel.style.flex = '1 1 auto';
 			sepRow.appendChild(sepLabel);
 			sepRow.appendChild(affixBox({
@@ -12029,7 +12029,7 @@ var EngCalcs = EngCalcs || {};
 			if (+lwInput.value > 0) { settings.linkWidth = +lwInput.value; refreshSymbolSizes(); saveToStorage(); }
 			else { lwInput.value = settings.linkWidth; }
 		});
-		row(mapBody, pc.lpn_settings_link_width || 'Pipe width (pixels)', lwInput);
+		row(mapBody, pc.lpn_settings_link_width || 'Pipe line thickness (pixels)', lwInput);
 		// Task 329, and it ships OFF: aligned-vs-horizontal is a visual judgement, and turning it on
 		// by default would be making that judgement for the user rather than offering it to them.
 		var alignInput = document.createElement('input');
@@ -12053,7 +12053,7 @@ var EngCalcs = EngCalcs || {};
 			biasInput.value = settings.labelFlipLeftOfVertical;
 			relayoutLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_readability_bias || 'Degrees left of vertical before labels flip', biasInput);
+		row(mapBody, pc.lpn_settings_readability_bias || 'Degrees left of vertical before a label is turned around', biasInput);
 		// Task 330, and it ships ON because that is what the page has always drawn -- a label over a
 		// backdrop image is unreadable without it, and an upgrade must not restyle anyone's drawing.
 		var maskInput = document.createElement('input');
@@ -12062,7 +12062,7 @@ var EngCalcs = EngCalcs || {};
 			settings.maskLabels = maskInput.checked;
 			applyMaskLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_mask_labels || 'Background mask behind labels', maskInput);
+		row(mapBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput);
 		// ---- Scale-dependent label visibility ----
 		// THE CONTROL IS A CAPTURE BUTTON, NOT JUST A NUMBER, AND THAT IS THE WHOLE USABILITY OF IT.
 		// The threshold is a width in model length units, and no default is meaningful across
@@ -12100,7 +12100,7 @@ var EngCalcs = EngCalcs || {};
 		lmwWrap.appendChild(lmwInput);
 		lmwWrap.appendChild(document.createTextNode(' '));
 		lmwWrap.appendChild(lmwBtn);
-		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when the view is smaller than (map units)', lmwWrap);
+		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when the view is narrower than this (map units)', lmwWrap);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
@@ -12172,12 +12172,12 @@ var EngCalcs = EngCalcs || {};
 			});
 			return sel;
 		}
-		row(colBody, pc.lpn_settings_color_node_field || 'Color nodes by', fieldSelect('node', COLOR_NODE_FIELDS));
-		row(colBody, pc.lpn_settings_color_link_field || 'Color pipes by', fieldSelect('link', COLOR_LINK_FIELDS));
+		row(colBody, pc.lpn_settings_color_node_field || 'Node color', fieldSelect('node', COLOR_NODE_FIELDS));
+		row(colBody, pc.lpn_settings_color_link_field || 'Pipe color', fieldSelect('link', COLOR_LINK_FIELDS));
 		var rampSelect = document.createElement('select');
 		[
 			['epanet', pc.lpn_color_ramp_epanet || 'Blue to red (EPANET)'],
-			['viridis', pc.lpn_color_ramp_viridis || 'Purple to yellow (easier to tell apart)'],
+			['viridis', pc.lpn_color_ramp_viridis || 'Purple to yellow (easier to tell one color from the next)'],
 			['gray', pc.lpn_color_ramp_gray || 'Light to dark gray']
 		].forEach(function (o) {
 			var opt = document.createElement('option');
@@ -12188,13 +12188,13 @@ var EngCalcs = EngCalcs || {};
 		rampSelect.addEventListener('change', function () {
 			settings.colorRamp = rampSelect.value; refreshValueColors(); saveToStorage();
 		});
-		row(colBody, pc.lpn_settings_color_ramp || 'Color ramp', rampSelect);
+		row(colBody, pc.lpn_settings_color_ramp || 'Color scheme', rampSelect);
 		var revInput = document.createElement('input');
 		revInput.type = 'checkbox'; revInput.checked = !!settings.colorReverse;
 		revInput.addEventListener('change', function () {
 			settings.colorReverse = revInput.checked; refreshValueColors(); saveToStorage();
 		});
-		row(colBody, pc.lpn_settings_color_reverse || 'Reverse the colors', revInput);
+		row(colBody, pc.lpn_settings_color_reverse || 'Reverse the color order', revInput);
 		var themInput = document.createElement('input');
 		themInput.type = 'checkbox'; themInput.checked = !!settings.colorThematic;
 		themInput.addEventListener('change', function () {
@@ -12220,17 +12220,17 @@ var EngCalcs = EngCalcs || {};
 			settings.colorLegendPosition = colLegendSelect.value;
 			applyColorLegendPosition(); saveToStorage();
 		});
-		row(colBody, pc.lpn_settings_color_key_position || 'Color key position', colLegendSelect);
+		row(colBody, pc.lpn_settings_color_key_position || 'Color legend position', colLegendSelect);
 		// THE BREAK EDITOR, one per coloured group -- EPANET's own dialog: four boxes, ascending,
 		// blanks allowed. A group with no field selected gets no boxes rather than four dead ones.
 		['node', 'link'].forEach(function (group) {
 			var field = colorFieldOf(group); if (!field) { return; }
 			var head = document.createElement('div');
 			head.style.cssText = 'margin-top:6px;font-weight:bold';
-			head.textContent = (pc.lpn_settings_color_breaks || 'Break values') + ': ' + colorFieldLabel(group, field);
+			head.textContent = (pc.lpn_settings_color_breaks || 'Color band limits') + ': ' + colorFieldLabel(group, field);
 			colBody.appendChild(head);
 			note(colBody, pc.lpn_settings_color_breaks_note ||
-				'Leave these blank and the colors spread over whatever is on the map now. Type numbers, or press a button below, and the same number always means the same color.');
+				'Leave these blank and the colors are spread across the values now on the map. Type numbers, or press a button below, and the same number always means the same color.');
 			var pinned = pinnedBreaks(group, field), wrap = document.createElement('div'), i;
 			wrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap';
 			var boxes = [];
@@ -12247,7 +12247,7 @@ var EngCalcs = EngCalcs || {};
 				box.type = 'number'; box.step = 'any';
 				box.style.width = '5em';
 				box.value = (pinned[i] === undefined) ? '' : pinned[i];
-				box.setAttribute('aria-label', (pc.lpn_settings_color_breaks || 'Break values') + ' ' + (i + 1));
+				box.setAttribute('aria-label', (pc.lpn_settings_color_breaks || 'Color band limits') + ' ' + (i + 1));
 				box.addEventListener('change', writeBreaks);
 				boxes.push(box);
 				wrap.appendChild(box);
@@ -13097,7 +13097,7 @@ var EngCalcs = EngCalcs || {};
 			});
 		} while (dropped && plan.length);
 		if (!plan.length) {
-			setNotice((pc.lpn_prefix_applied || 'Renamed {n} elements. {skipped} were left alone.')
+			setNotice((pc.lpn_prefix_applied || 'Renamed {n} elements. {skipped} others were left alone.')
 				.replace('{n}', '0').replace('{skipped}', String(skipped)));
 			return;
 		}
@@ -13119,7 +13119,7 @@ var EngCalcs = EngCalcs || {};
 		refreshLabelText();
 		scheduleSolve();
 		saveToStorage();
-		setNotice((pc.lpn_prefix_applied || 'Renamed {n} elements. {skipped} were left alone.')
+		setNotice((pc.lpn_prefix_applied || 'Renamed {n} elements. {skipped} others were left alone.')
 			.replace('{n}', String(plan.length)).replace('{skipped}', String(skipped)));
 	}
 	function renderNodeFields(nodeId) {
@@ -13529,7 +13529,7 @@ var EngCalcs = EngCalcs || {};
 			applyLabelVisibility();
 			saveToStorage();
 		});
-		alwaysLabel.textContent = (pc.lpn_field_show_always || 'Always show') + ' ';
+		alwaysLabel.textContent = (pc.lpn_field_show_always || 'Always show this label') + ' ';
 		alwaysLabel.appendChild(alwaysInput);
 		fields.appendChild(alwaysLabel);
 		fields.appendChild(document.createElement('br'));
@@ -13554,7 +13554,7 @@ var EngCalcs = EngCalcs || {};
 			lb.bold = boldInput.checked;
 			relayoutThisLabel();
 		});
-		boldLabel.textContent = (pc.lpn_field_text_bold || 'Bold') + ' ';
+		boldLabel.textContent = (pc.lpn_field_text_bold || 'Bold text') + ' ';
 		boldLabel.appendChild(boldInput);
 		fields.appendChild(boldLabel);
 		fields.appendChild(document.createElement('br'));
@@ -13582,13 +13582,13 @@ var EngCalcs = EngCalcs || {};
 			relayoutThisLabel();
 		}
 		rotInput.addEventListener('change', function () { setRotation(rotInput.value); });
-		rotLabel.textContent = (pc.lpn_field_text_rotation || 'Rotation') + ' ';
+		rotLabel.textContent = (pc.lpn_field_text_rotation || 'Angle (degrees)') + ' ';
 		rotLabel.appendChild(rotInput);
 		rotLabel.appendChild(presets);
 		fields.appendChild(rotLabel);
 		var matchBtn = document.createElement('button');
 		matchBtn.type = 'button';
-		matchBtn.textContent = pc.lpn_field_text_match_pipe || 'Match pipe';
+		matchBtn.textContent = pc.lpn_field_text_match_pipe || 'Match pipe angle';
 		matchBtn.addEventListener('click', function () {
 			// Read at the label's RENDERED point, which for an anchored label is its node plus its
 			// offset -- not lb.x/lb.y, which is the offset alone and would find the pipe nearest
@@ -13604,7 +13604,7 @@ var EngCalcs = EngCalcs || {};
 		// that is right most of the time and unarguable when it is not.
 		var flipBtn = document.createElement('button');
 		flipBtn.type = 'button';
-		flipBtn.textContent = pc.lpn_field_text_flip || 'Flip';
+		flipBtn.textContent = pc.lpn_field_text_flip || 'Turn 180°';
 		flipBtn.addEventListener('click', function () { setRotation(textLabelRotation(lb) + 180); });
 		fields.appendChild(flipBtn);
 		fields.appendChild(document.createElement('br'));
@@ -14510,7 +14510,7 @@ var EngCalcs = EngCalcs || {};
 		if (unknownUnits.length) {
 			lastSolveResult = null;
 			setStatus(((EngCalcs.pageConfig || {}).lpn_unit_unknown ||
-				'This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be worked out until this page knows that unit, because there is no way to tell how big it is.')
+				'This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be given until this page knows that unit, because there is no way to tell how big it is.')
 				.replace('{unit}', unknownUnits.join(', ')));
 			refreshLabelText();
 			return;
@@ -14593,7 +14593,7 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc['lpn_engine_ready' + suffix] || 'The EPANET solver is on this device now, and works offline.');
 		}, function () {
 			epanetWarmState = 'unavailable';
-			setNotice(pc.lpn_engine_unavailable || 'Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.');
+			setNotice(pc.lpn_engine_unavailable || 'Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.');
 		});
 	}
 	// Warm if the document ALREADY holds a valve only EPANET can solve -- opening a saved project or

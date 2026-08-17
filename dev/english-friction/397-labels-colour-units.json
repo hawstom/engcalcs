@@ -1,0 +1,552 @@
+{
+	"sprint": "397-labels-colour-units",
+	"entries": [
+		{
+			"key": "lpn_field_text_bold",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "A bare adjective on a checkbox. \"Bold\" is the typographic weight in software and \"brave, daring\" in ordinary English, and nothing in the string says which. A translator sees one word with no object.",
+			"readings": [
+				"heavy typeface weight for this label (intended)",
+				"brave, daring, forceful"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Bold text'. Naming the object forces the typographic sense and costs one word on a checkbox that has room for it."
+		},
+		{
+			"key": "lpn_field_text_rotation",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "\"Rotation\" on a number box says neither the unit nor whether the number is an ABSOLUTE angle or an amount to turn BY. The code stores an absolute angle (textLabelRotation), and the Flip button adds 180 to it, so the relative reading is false.",
+			"readings": [
+				"the absolute angle the text sits at, in degrees (intended)",
+				"how much to turn the text by, relative to where it is",
+				"a rotation as a repeating cycle or a rota"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Angle (degrees)'. 'Angle' can only be absolute, and the unit is now stated rather than left to the preset list (0, 30, 45, 60, 90) to imply."
+		},
+		{
+			"key": "lpn_field_text_match_pipe",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "A bare imperative made of a noun/verb ambiguity plus an unstated object. WHAT is matched is never said -- the button copies the nearest pipe's ANGLE into the rotation box and nothing else.",
+			"readings": [
+				"set this label's angle to the nearest pipe's angle (intended)",
+				"a pipe that matches, as a noun phrase",
+				"make this label match the pipe in some other way (colour, size, position)"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Match pipe angle'. One word names the quantity, which also removes the noun reading: 'match pipe angle' cannot be parsed as a noun phrase the way 'match pipe' can."
+		},
+		{
+			"key": "lpn_field_text_flip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "\"Flip\" is the classic graphics polysemy and the WRONG sense is the commoner one: in every drawing program flip means MIRROR. This button adds 180 degrees to the rotation -- a half turn, not a mirror image. A translator has no way to know that from the word.",
+			"readings": [
+				"turn the text a half turn so it reads the other way (intended)",
+				"mirror the text left-to-right or top-to-bottom (false)",
+				"toggle a switch"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Turn 180°'. The number states exactly what happens, and there is no longer an ambiguous verb to mistranslate -- the 252 sprint lesson that deleting an ambiguous word beats choosing a better one."
+		},
+		{
+			"key": "lpn_field_show_always",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "\"Always show\" has no object, and its own sibling in the settings panel (lpn_settings_label_always) says 'Always show labels' for a related but different control. A translator seeing the two together cannot tell whether this one means the same thing.",
+			"readings": [
+				"keep THIS label on screen at every zoom level (intended)",
+				"always show labels in general, as the settings switch does",
+				"always show this element"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Always show this label'. It is a per-label checkbox in the label popup; naming 'this label' separates it from the global setting that shares the wording."
+		},
+		{
+			"key": "lpn_examples_open",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "A bare 'Open' on a gallery card. English does not distinguish the imperative from the adjective, and this page uses the adjective sense of open for PIPE STATE -- lpn_field_closed_tip says 'you can open it again at any time'. So the wrong sense is live on the same page.",
+			"readings": [
+				"open this example project (intended)",
+				"open, as opposed to shut -- the pipe state"
+			],
+			"disposition": "intent",
+			"resolution": "English kept: 'Open' on a card button is correct and an English reader does not stumble. PROPOSED $ec_lang_syn entry, AWAITING TOM'S WRITTEN APPROVAL -- not written: $ec_lang_syn['lpn_examples_open']='Open, Open this example, Load, Load this example, Start with this one | layout: button; avoid: open as the opposite of shut, as a pipe is open'. Every phrase passes the substitution test."
+		},
+		{
+			"key": "lpn_examples_menu",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "Spells its trailing ellipsis as three periods while every sibling menu item and progress string in the file uses the single ellipsis character (lpn_backdrop_menu 'Background image…', lpn_engine_loading 'Loading the EPANET solver…', 8 keys in all). Translators copy source punctuation, so the split propagates into 26 files.",
+			"readings": [
+				"a menu item that opens a chooser -- the standard ellipsis convention (intended)",
+				"a literal run of three periods, which some scripts render differently"
+			],
+			"disposition": "english",
+			"resolution": "Both this key and lpn_examples_loading changed from '...' to '…', matching the eight keys already using the character. Not a meaning defect; a parity defect that is free to fix before the sprint and expensive after."
+		},
+		{
+			"key": "lpn_examples_sub",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'or start over' names no object and is idiomatic. Worse, the page offers two different fresh starts nearby -- 'Or start with a blank map' (lpn_examples_blank) is one of them -- so even an English reader cannot tell whether starting over means a blank map or another clean copy of this example.",
+			"readings": [
+				"open another clean copy of this example and begin again (intended)",
+				"start from a blank map instead",
+				"undo your changes in place"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Each one opens as your own copy. Change it, save it, or open a fresh copy and start again.' The object is now stated, and it no longer competes with the blank-map line below it."
+		},
+		{
+			"key": "lpn_examples_failed",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Use File, New project to start a drawing' writes a menu path as a bare comma list. 'File' can be read as the verb, and the comma can be read as a list of two things rather than a path through a menu.",
+			"readings": [
+				"the New project command inside the File menu (intended)",
+				"file something, and a new project",
+				"a list: a file, and a new project"
+			],
+			"disposition": "dismissed",
+			"resolution": "Real, but not fixed here. The bare comma-path is an established convention carrying six already-translated keys (lpn_empty_hint, lpn_status_example_opened, lpn_status_imported, lpn_net_bad_file, lpn_inp_drop_backdrop, lpn_notes_3_def), and changing one of them would leave the set non-parallel in 27 languages for no user gain. Translators also have the localized menu labels in the same payload, which anchors the reading. A change to 'the File menu, New project' is worth one full-suite pass, not a single-key edit inside a sprint."
+		},
+		{
+			"key": "lpn_help_fix",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Fix' carries at least four everyday senses and this is a bare imperative with the vaguest possible object. The row opens contact.php -- the user is not fixing anything, they are TELLING US about something to fix -- so even the intended reading is a step removed from what the words say.",
+			"readings": [
+				"tell us about something that is wrong so we can fix it (intended)",
+				"repair something yourself",
+				"fasten or attach something",
+				"arrange or prepare something"
+			],
+			"disposition": "intent",
+			"resolution": "English kept: Tom chose this wording deliberately on 2026-08-14 (recorded above the key) because the verb invites the small correction people actually send, where 'Contribute' reads as a request for money or code. PROPOSED $ec_lang_syn entry, AWAITING TOM'S WRITTEN APPROVAL -- not written: $ec_lang_syn['lpn_help_fix']='Fix something, Report a mistake, Tell us what is wrong, Send a correction, Suggest a fix | avoid: fix as fasten or attach; avoid: fix as prepare'. Every phrase could stand on the menu row."
+		},
+		{
+			"key": "lpn_help_notes",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Notes' alone in a Help menu. It opens a panel of notes ABOUT WHAT THIS PAGE MODELS (steady state, what is not modeled, pump curve, planned additions) -- not a place the user writes anything. Several wrong readings are ordinary English and one of them (notes the user takes) is a plausible feature on a drawing page.",
+			"readings": [
+				"notes about this calculator and what it models (intended)",
+				"notes the user writes and keeps with the project",
+				"musical notes",
+				"banknotes"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Notes on this page'. It sits in a pull-down, which sizes to its own widest row, so the extra words cost no width (CLAUDE.md: a row inside a pull-down is not a nav item)."
+		},
+		{
+			"key": "lpn_ex_basic_si_title",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "Writes the litre symbol lowercase ('l/s') while the suite's own unit tokens write it capital -- u_lps is 'L/s' and u_lpm is 'L/min'. A translator matching the sibling unit tokens and a translator copying this title produce two different symbols for one unit.",
+			"readings": [
+				"litres per second, the same unit u_lps names (intended)",
+				"some other unit whose symbol is lowercase l"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Basic network, L/s (SI)', matching u_lps and u_lpm. A symbol is not a word, and the suite must spell it one way."
+		},
+		{
+			"key": "lpn_ex_basic_si_desc",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'the least a working water network can be' is an English idiom with an elided noun. Read literally it says the network does the least it can do, which is a claim about performance rather than about size.",
+			"readings": [
+				"the smallest arrangement that still counts as a working water network (intended)",
+				"the minimum a water network is able to do"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'the smallest arrangement that still works as a water network'. The elided noun is now written out and the sentence no longer depends on the idiom."
+		},
+		{
+			"key": "lpn_ex_net3_desc",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'to see how a real-sized model reads' uses the intransitive 'reads' -- an English collocation meaning 'how it appears to a reader'. Translated literally it becomes the model doing the reading, which is nonsense, and there is no cue in the sentence to prevent that.",
+			"readings": [
+				"how a real-sized model looks on screen (intended)",
+				"how a real-sized model reads something",
+				"how to read a real-sized model"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Worth opening to see how a real-sized model looks on the map.' The idiom is replaced by a plain verb; nothing about the meaning changes for an English reader."
+		},
+		{
+			"key": "lpn_ex_elm_street_desc",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'fire flow plus maximum day design snapshot' is a five-word noun stack with no function words in it. 'plus' can be an arithmetic operator or a loose 'and also'; 'design snapshot' can be a snapshot of the design or a single design instant; and it is genuinely unclear whether 'design' modifies 'snapshot' or the whole condition. An English engineer recovers it from domain knowledge; nothing in the words does.",
+			"readings": [
+				"a network solved for fire flow ADDED TO maximum day demand, at one instant (intended)",
+				"fire flow, and separately a maximum-day design, in one snapshot",
+				"a snapshot of the design for the maximum day, plus fire flow shown alongside"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.' 'on top of' states the addition, 'at one moment in time' states what a snapshot is, and the noun stack is gone."
+		},
+		{
+			"key": "lpn_engine_fetching_valve",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'worked out' is a British idiom for 'computed' and it is the page's SECOND word for a concept that already has a first one: lpn_engine_valve_route says 'Solved with the EPANET solver' and lpn_settings_color_no_values says 'Solve the network first'. This is the exact defect sprint 252 recorded -- two nouns for one concept invites two different renderings, and here the alternative senses of 'work out' (exercise, turn out well, resolve a dispute) are all more common than the intended one.",
+			"readings": [
+				"computed, solved (intended)",
+				"resolved, sorted out",
+				"exercised",
+				"turned out well in the end"
+			],
+			"disposition": "english",
+			"resolution": "Three in-sprint keys moved onto the page's own verb: lpn_engine_fetching_valve '...so this valve can be solved now and offline later'; lpn_engine_unavailable '...which is what solves valves that open and close on their own'; lpn_unit_unknown 'No answers can be given until this page knows that unit...'. NOT changed, because it is outside this sprint's 85 keys and would drift with no sprint to resync it: lpn_inp_drop_tcv still says 'Either solver can work them out.' It should be picked up by the next sprint that touches the import report."
+		},
+		{
+			"key": "lpn_settings_apply_to_all",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Apply to all' names neither what is applied nor what all is. The scope actually differs from the widest reading: it renames only elements OF THIS KIND that are already drawn, not every element and not every project.",
+			"readings": [
+				"give every already-drawn element of this kind an ID with this prefix (intended)",
+				"apply to every element of every kind",
+				"apply to all my projects"
+			],
+			"disposition": "dismissed",
+			"resolution": "Raised and kept as is. Its own tip, lpn_settings_apply_to_all_tip, is in the same sprint payload and states the object and the scope in full, and it is attached to the control the user is looking at. The button sits beside a text box in a settings row, where 'Apply to those already drawn' would set the row width for a phrase the tip already carries. Reconsider if the tip is ever dropped."
+		},
+		{
+			"key": "lpn_settings_apply_to_all_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Give every element of this kind that is already drawn an ID starting with this text' separates the verb from its second object by an eight-word relative clause. An English reader reaches 'drawn an ID' and has to go back to the start of the sentence -- which is the test for fixing the English rather than the translation.",
+			"readings": [
+				"every already-drawn element of this kind receives such an ID (intended)",
+				"for a moment, 'drawn an ID' reads as a compound -- the garden path this sentence walks the reader into"
+			],
+			"disposition": "english",
+			"resolution": "Recast to put the subject first: 'Every element of this kind that is already drawn gets an ID starting with this text.' Same claim, no discontinuous object. The following two sentences are unchanged."
+		},
+		{
+			"key": "lpn_prefix_applied",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'{skipped} were left alone' gives a placeholder as a bare subject. {skipped} is a COUNT, but the sentence would read identically if it were a list of IDs, and 'were' is the plural a list would also take. A translator choosing agreement, a classifier or a case ending has to guess which, and half the target languages need that decision.",
+			"readings": [
+				"that many other elements were left alone -- a number (intended)",
+				"these named elements were left alone -- a list"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Renamed {n} elements. {skipped} others were left alone.' The head noun 'others' makes the placeholder a quantity of something and gives every language a noun to agree with. Placeholders preserved exactly."
+		},
+		{
+			"key": "lpn_labels_prefix_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Text printed before this value' -- 'printed' means put on paper in most languages that will translate it, and this text goes on a screen. It also has a past reading: text that was printed earlier.",
+			"readings": [
+				"text drawn before this value on the map (intended)",
+				"text put on paper before this value",
+				"text that was printed at an earlier time"
+			],
+			"disposition": "english",
+			"resolution": "'printed' changed to 'shown' in all four sibling tips at once, keeping them parallel: lpn_labels_prefix_tip, lpn_labels_suffix_tip, lpn_labels_prefix_id_tip and lpn_labels_suffix_gradient_tip. 'shown' is also the verb the rest of the label settings already use ('Show labels when...')."
+		},
+		{
+			"key": "lpn_labels_prefix_id_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Leave this blank to use the automatic ID prefixes, such as J1 and L1' is factually confused in English: J1 and L1 are whole IDs, not prefixes -- the prefixes are J and L. And 'prefix' means two different things within this one settings box, the label prefix this row edits and the ID prefix set elsewhere, which this sentence puts in the same breath.",
+			"readings": [
+				"leave it blank and the ID prints on its own, already starting with its own letter (intended)",
+				"leave it blank and some automatic text J1/L1 is prefixed to the ID"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Text shown before the ID on the map. Leave this blank and the ID is shown on its own, starting with the letter it was given, such as J1 or L1.' It no longer calls a whole ID a prefix, and the word prefix now appears once in the box with one meaning."
+		},
+		{
+			"key": "lpn_labels_separator",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Separator' is a piece of physical equipment in this industry -- an oil/water separator, a grit separator. On a hydraulics page a translator has a real, wrong technical term available, and a settings row label gives no cue against it.",
+			"readings": [
+				"the text put between one value and the next in a label (intended)",
+				"a separator vessel, a device that separates fluids"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Text between values'. It is a full-width row label with room for three words, and the phrase matches its own tip ('Text between one value and the next on a label'). The physical term is no longer reachable."
+		},
+		{
+			"key": "lpn_labels_priority_link_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "The tip opens with 'Order the values are dropped in' -- 'Order' at the start of a sentence in a tooltip reads first as an IMPERATIVE VERB ('order the values'), and the reduced relative with its stranded preposition is the second reading, not the first. An English reader re-reads this one.",
+			"readings": [
+				"the sequence in which values are dropped (intended)",
+				"an instruction: put the values in order",
+				"the values are dropped in an order, which you are being told to set"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'The order in which values are dropped when a label does not fit. 1 is kept longest.' The article kills the imperative reading and the preposition is no longer stranded. Second sentence unchanged, so it stays parallel with the node tip."
+		},
+		{
+			"key": "lpn_labels_priority_node_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'most neighbour-like elevation or head' is a coined compound adjective that cannot be looked up, and 'least extreme pressure' does not say what it is extreme against. The code (nodeFieldSalience, LPN_NODE_DROP_RULE) is specific: pressure is measured against the middle of THIS drawing's own range, and elevation/head against the mean of the neighbouring nodes.",
+			"readings": [
+				"elevation or head closest to that of the neighbouring nodes (intended)",
+				"elevation or head most like a neighbour in some unstated way",
+				"the most neighbourly elevation"
+			],
+			"disposition": "english",
+			"resolution": "The three rules are now written out as the code implements them: 'the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to that of the neighbouring nodes.' Tom's framing and his closing sentence ('1 decides first') are untouched; only the two opaque compounds were expanded. This tip is the ONLY place a user can learn these rules, which is why it must not be guessable-only."
+		},
+		{
+			"key": "lpn_labels_col_before",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "A one-word column heading with no object, over a box that holds text printed in FRONT OF a value. 'Before' is temporal first in most languages and positional second, and the temporal reading is available here because labels also appear and disappear.",
+			"readings": [
+				"positioned in front of the value (intended)",
+				"earlier in time"
+			],
+			"disposition": "intent",
+			"resolution": "English kept. The heading sits in a 3.5em column built from LPN_LABEL_AFFIX_W and shares the row with three other headings, so it cannot grow; and the box beneath it carries lpn_labels_prefix_tip as its title, which states the positional sense. PROPOSED $ec_lang_syn entry, AWAITING TOM'S WRITTEN APPROVAL -- not written: $ec_lang_syn['lpn_labels_col_before']='Before, In front, In front of the value, Prefix, Leading text | layout: column heading; avoid: before in the sense of earlier in time'."
+		},
+		{
+			"key": "lpn_labels_col_after",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "The sibling of lpn_labels_col_before and the same defect: a bare 'After' over a box holding text printed behind a value, with the temporal reading available and commoner.",
+			"readings": [
+				"positioned behind the value (intended)",
+				"later in time"
+			],
+			"disposition": "intent",
+			"resolution": "English kept for the same width reason as its sibling, and the box carries lpn_labels_suffix_tip. PROPOSED $ec_lang_syn entry, AWAITING TOM'S WRITTEN APPROVAL -- not written: $ec_lang_syn['lpn_labels_col_after']='After, Behind, Behind the value, Suffix, Trailing text | layout: column heading; avoid: after in the sense of later in time'. The two entries must be approved together or the pair goes out of parallel."
+		},
+		{
+			"key": "lpn_labels_col_decimals",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Decimals' can name decimal PLACES or decimal NUMBERS, and the column holds a small integer that could plausibly be either.",
+			"readings": [
+				"how many digits after the decimal point (intended)",
+				"decimal numbers, as opposed to whole numbers"
+			],
+			"disposition": "dismissed",
+			"resolution": "Raised and kept. The box under this heading carries lpn_labels_decimals_tip ('Decimal places shown for this label') as its title, in the same payload, and the heading is fixed at LPN_LABEL_COL_W beside three siblings. 'Decimal places' does not fit and 'Places' alone would be worse."
+		},
+		{
+			"key": "lpn_backdrop_scale_from",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'about a point you pick' -- 'about' meaning 'centred on' is a formal geometric sense that most translators will meet as 'concerning' or 'approximately'. 'Approximately a point you pick' is both a plausible reading and nonsense, which is how it will read once rendered.",
+			"readings": [
+				"centred on a point you pick, holding that point still (intended)",
+				"concerning a point you pick",
+				"approximately at a point you pick"
+			],
+			"disposition": "english",
+			"resolution": "'about' changed to 'around' -- 'Scale from current size, around a point you pick'. 'around' carries the centred-on sense in ordinary English and has no 'concerning' reading. The sibling verb 'Scale' is kept so the three backdrop scale commands stay parallel."
+		},
+		{
+			"key": "lpn_backdrop_busy",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Setting the background image' collides with the page's own vocabulary: this page has a Settings panel, project settings and calculator settings, so 'Setting' reads as the noun first. As a status bar shown WHILE a scale or move is waiting for a click, it also reads as 'installing' or 'assigning' rather than 'in the middle of adjusting'.",
+			"readings": [
+				"busy adjusting the background image right now (intended)",
+				"a setting that belongs to the background image",
+				"installing or assigning a background image"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Adjusting the background image.' A verb with no noun homograph on this page, and it is true of both the scale and the move that raise it."
+		},
+		{
+			"key": "lpn_settings_link_width",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "THE WORST COLLISION IN THIS BATCH. 'Pipe width' on a water-network page is the physical pipe -- diameter -- and this control sets the THICKNESS OF THE DRAWN LINE. The '(pixels)' is the only cue, and a translator working from a key list will read the noun phrase before the parenthetical.",
+			"readings": [
+				"how thick the pipe is drawn on the map, in screen pixels (intended)",
+				"the physical width or diameter of the pipe (false, and the page has a real Diameter field)"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Pipe line thickness (pixels)'. 'line' names the drawn object rather than the physical one, which is the same distinction the sibling rows make with 'Text size' and 'Symbol size'."
+		},
+		{
+			"key": "lpn_settings_readability_bias",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'before labels flip' carries the same mirror-versus-half-turn ambiguity as the Flip button, and it is compressed to the point that the reader must supply both the subject of 'flip' and the thing being measured. The mirror reading would describe behaviour the page does not have.",
+			"readings": [
+				"a label leaning further left of vertical than this is turned a half turn so it reads left to right (intended)",
+				"labels are mirrored past this angle (false)",
+				"the labels swap places"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Degrees left of vertical before a label is turned around'. Minimal touch: only the ambiguous verb was replaced, and the singular 'a label' says the rule applies per label. Matched to lpn_field_text_flip's 'Turn 180°', so one concept has one verb."
+		},
+		{
+			"key": "lpn_settings_mask_labels",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'mask' is on the standing watch list and both its senses are live here: the software sense (a mask that hides) and the physical sense (a covering). Worse, the English is ambiguous about the DIRECTION -- 'background mask behind labels' could mask the background or mask the labels. What it actually draws is an opaque patch of the map background beneath the label text.",
+			"readings": [
+				"a solid patch of background painted behind label text so it stays readable over an image (intended)",
+				"a mask applied to the labels themselves",
+				"the background is masked out"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Solid background behind labels'. 'Solid' says what the patch looks like, 'behind labels' says where it goes, and the word mask is gone rather than guarded."
+		},
+		{
+			"key": "lpn_settings_label_max_width",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'when the view is smaller than (map units)' -- the comparison has no second term in the sentence at all; the number lives in the box beside it and the parenthetical is stranded where the compared value should be. 'smaller' also does not say smaller in what dimension, and the code compares the view's MINIMUM SPAN, a width.",
+			"readings": [
+				"when the view spans less than this many map units across (intended)",
+				"when the view window is physically smaller on screen",
+				"when the map drawing is smaller"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Show labels when the view is narrower than this (map units)'. 'this' supplies the missing second term and points at the box; 'narrower' names the dimension the code measures."
+		},
+		{
+			"key": "lpn_settings_color_node_field",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Color nodes by' is a sentence fragment ending in a stranded preposition, completed by the <select> that follows it. Several target languages cannot end a phrase that way at all and must either invent a completion or reorder around a widget they cannot see. It is also 'Color' as a verb, the noun/verb pair named in the standing watch list.",
+			"readings": [
+				"the value that decides each node's colour (intended)",
+				"an instruction to colour the nodes",
+				"colour, of nodes, by something"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to the complete noun phrase 'Node color'. The row renders as a label plus a select, so 'Node color: [Pressure]' reads correctly, nothing is stranded, and the section heading above it ('Color by value') still carries the verb sense for anyone who wants it."
+		},
+		{
+			"key": "lpn_settings_color_link_field",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "Same defect as its sibling: 'Color pipes by' is a fragment ending in a preposition, waiting on a widget the translator cannot see.",
+			"readings": [
+				"the value that decides each pipe's colour (intended)",
+				"an instruction to colour the pipes"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Pipe color', in step with 'Node color'. The pair must move together or the two rows stop being parallel."
+		},
+		{
+			"key": "lpn_settings_color_ramp",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'ramp' is on the standing watch list and its physical sense is real on this page -- a ramp is a structure, and the suite next door has a Rock Chute calculator. 'Color ramp' is also cartographic jargon whose plain meaning ('a sloping colour') is not recoverable from the words.",
+			"readings": [
+				"the sequence of colours used, from low value to high (intended)",
+				"a physical ramp, a slope or incline",
+				"a gradual increase in colour"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Color scheme'. Deliberately NOT 'Color scale' -- 'scale' is already taken twice on this page by the map scale and the three backdrop scale commands, and swapping one collision for another is not a fix. 'Scheme' is ordinary and its options ('Blue to red', 'Purple to yellow') define it on sight."
+		},
+		{
+			"key": "lpn_color_ramp_viridis",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'easier to tell apart' is a comparative with no stated basis, and there are two candidates: easier than the other schemes in the list, or easier to distinguish one colour of THIS scheme from the next. The second is the true one -- it is why the scheme exists -- and the first would be a claim we are not making about the EPANET scheme people came here for.",
+			"readings": [
+				"its own steps are easier to tell one from another (intended)",
+				"easier to tell apart than the other schemes offered",
+				"easier for colour-blind readers, unstated"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Purple to yellow (easier to tell one color from the next)'. The basis is now inside the string, so no translator has to guess what it is being compared with."
+		},
+		{
+			"key": "lpn_settings_color_reverse",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Reverse the colors' most plainly means INVERT each colour -- blue becomes orange. What the checkbox does is flip the ORDER of the scheme, so the high end gets the colour the low end had; each colour is unchanged.",
+			"readings": [
+				"reverse the order the colours are assigned in (intended)",
+				"invert each colour to its opposite (false)",
+				"undo the colouring"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Reverse the color order'. One noun states which thing is reversed, and the inversion reading disappears."
+		},
+		{
+			"key": "lpn_settings_color_key_position",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'key' is on the standing watch list and this page uses TWO nouns for one concept: lpn_settings_legend_position says 'Legend position' for the symbol legend and this one says 'key' for the colour one. That is exactly the split sprint 252 found in twenty-odd languages, and 'key' additionally offers a lock key, a keyboard key and a database key.",
+			"readings": [
+				"where the colour legend box sits on the map (intended)",
+				"the position of a keyboard or lock key",
+				"a key value or index"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Color legend position', which uses the same noun as the existing 'Legend position' and lets the qualifier carry the difference -- the rule recorded in glossary.json's 'solver' entry after sprint 252. The one-noun-two-qualifiers shape also stops the two rows drifting onto different words in 26 files."
+		},
+		{
+			"key": "lpn_settings_color_breaks",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'Break values' on a WATER NETWORK page. A pipe break is a real and common event in this domain, so a translator can land on 'values at which the pipe breaks' -- a plausible engineering reading of an ordinary English phrase. The intended sense is the cartographic class break, the boundary between two colour bands.",
+			"readings": [
+				"the boundaries between one colour band and the next (intended)",
+				"values at which a pipe breaks or fails (false, and dangerous)",
+				"values to be broken up or split"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Color band limits'. It names the thing the numbers bound (the colour bands, four of them, COLOR_BANDS) and removes the failure reading entirely. The string is also used as the boxes' aria-label with an index appended, which still reads correctly ('Color band limits 1')."
+		},
+		{
+			"key": "lpn_settings_color_breaks_note",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'the colors spread over whatever is on the map now' reads spatially first -- colours spreading ACROSS the map -- when the meaning is that the colour range is stretched over the range of VALUES currently present. 'whatever is on the map now' is also vague about whether it means the elements or their values.",
+			"readings": [
+				"the colour range is stretched across whatever range of values is on the map at this moment (intended)",
+				"the colours spread out over the map area",
+				"the colours cover the elements currently drawn"
+			],
+			"disposition": "english",
+			"resolution": "First sentence rewritten to 'Leave these blank and the colors are spread across the values now on the map.' 'the values' names what is being spanned; the second sentence, which carries the contrast, is unchanged."
+		},
+		{
+			"key": "lpn_settings_color_thematic_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "'so the colors are the whole map' is a figure of speech. Rendered literally it asserts an identity between colours and a map, which is not a sentence in most languages.",
+			"readings": [
+				"with the labels hidden, colour is all that is left carrying information (intended)",
+				"the colours literally become the map",
+				"the colours cover the whole map area"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'Hides every label so that only the colors are left on the map.' Plain, and it keeps the point of the setting. The reassurance sentence after it is unchanged."
+		},
+		{
+			"key": "lpn_inp_drop_units",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "Says gallons per minute 'were assumed' after a failure to recognise the flow units. That framing is stale: js/lpn-inp.js's FLOW_UNITS now carries all ten EPANET flow keywords (CFS, GPM, MGD, IMGD, AFD, LPS, LPM, MLD, CMH, CMD), so this message can now only fire for a keyword EPANET itself does not define. As written it tells a user with an ordinary EPANET file that their units may not have been understood, which is no longer true of any such file.",
+			"readings": [
+				"the file names a flow unit that is not one of EPANET's ten, so it could not be read (intended, current)",
+				"our importer does not understand this file's ordinary EPANET units (stale, and now false)"
+			],
+			"disposition": "english",
+			"resolution": "Rewritten to 'The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.' The orchestrator's brief for this key was WRONG and the correction is recorded here rather than silently: it said Task 390 had abolished the gallons-per-minute guess, quoting the ROADMAP. It has not. js/lpn-inp.js:213 still does `if (!fu) { drop('unknown-flow-units', ...); fu = FLOW_UNITS.GPM; }`. What Task 390 abolished is a different guess, in a different place: lpn_unit_unknown covers a unit the PAGE does not offer and really does refuse the solve by name. The first rewrite tried to honour both and produced a three-clause sentence whose middle clause ('all ten of the flow units EPANET uses are read exactly as the file writes them') is true, irrelevant here, and would have made 26 translators guess at what it was for. The shipped wording states only what the code does."
+		}
+	]
+}

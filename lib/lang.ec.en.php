@@ -1143,10 +1143,10 @@ $ec_lang['lpn_tool_zoom_extent']='Zoom to fit';
 $ec_lang_syn['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing fits in the window; show everything at once (zoom to extents, fit to window, show all). | avoid: adjusting the zoom by an amount';
 $ec_lang['lpn_new_text']='Text';
 $ec_lang_syn['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
-$ec_lang['lpn_field_text_bold']='Bold';
-$ec_lang['lpn_field_text_rotation']='Rotation';
-$ec_lang['lpn_field_text_match_pipe']='Match pipe';
-$ec_lang['lpn_field_text_flip']='Flip';
+$ec_lang['lpn_field_text_bold']='Bold text';
+$ec_lang['lpn_field_text_rotation']='Angle (degrees)';
+$ec_lang['lpn_field_text_match_pipe']='Match pipe angle';
+$ec_lang['lpn_field_text_flip']='Turn 180°';
 $ec_lang['lpn_field_elev']='Elevation';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
@@ -1190,19 +1190,19 @@ $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start b
 // the gallery is new: it is the fallback sentence if the manifest cannot be fetched, and deleting
 // a key translated into 26 languages to get it back a week later is the expensive direction.
 $ec_lang['lpn_examples_heading']='Open an example';
-$ec_lang['lpn_examples_sub']='Each one opens as your own copy. Change it, save it, or start over.';
+$ec_lang['lpn_examples_sub']='Each one opens as your own copy. Change it, save it, or open a fresh copy and start again.';
 $ec_lang['lpn_examples_open']='Open';
-$ec_lang['lpn_examples_menu']='Open example...';
+$ec_lang['lpn_examples_menu']='Open example…';
 $ec_lang['lpn_examples_blank']='Or start with a blank map';
 $ec_lang['lpn_examples_size']='{nodes} junctions, {links} pipes';
 $ec_lang['lpn_examples_failed']='The examples could not be loaded. Use File, New project to start a drawing.';
-$ec_lang['lpn_examples_loading']='Loading examples...';
+$ec_lang['lpn_examples_loading']='Loading examples…';
 // Two new Help rows (Tom, 2026-08-14). "Fix something" is a VERB, which is the point: it invites
 // the small correction people actually send -- a wrong word, a bad number -- rather than sounding
 // like a request for money or code, which is what "Contribute" reads as to most visitors. It opens
 // contact.php, the same place the old page-bottom invitation went.
 $ec_lang['lpn_help_fix']='Fix something';
-$ec_lang['lpn_help_notes']='Notes';
+$ec_lang['lpn_help_notes']='Notes on this page';
 $ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it with File, Save as.';
 // Each example's own card text. These live here, and NOT in the examples folder's own JSON, for one
 // reason: a string that is not in a lang file is a string no translator will ever see. The manifest
@@ -1212,8 +1212,8 @@ $ec_lang['lpn_status_example_opened']='Opened {name}. It is your copy: save it w
 // EPANET and clarity"). EPANET identifies a whole unit system by its flow unit -- its [OPTIONS]
 // setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
 // the name of the system, and the length units as detail that follows from it.
-$ec_lang['lpn_ex_basic_si_title']='Basic network, l/s (SI)';
-$ec_lang['lpn_ex_basic_si_desc']='Start here. A reservoir, a pump and a small loop: the least a working water network can be. Litres per second, with metres and millimetres.';
+$ec_lang['lpn_ex_basic_si_title']='Basic network, L/s (SI)';
+$ec_lang['lpn_ex_basic_si_desc']='Start here. A reservoir, a pump and a small loop: the smallest arrangement that still works as a water network. Litres per second, with metres and millimetres.';
 $ec_lang['lpn_ex_basic_us_title']='Basic network, gpm (US)';
 $ec_lang['lpn_ex_basic_us_desc']='The same starting network in gallons per minute, with feet and inches.';
 $ec_lang['lpn_ex_net1_title']='EPANET Net1';
@@ -1221,9 +1221,9 @@ $ec_lang['lpn_ex_net1_desc']='The smallest of EPANET\'s own three sample network
 $ec_lang['lpn_ex_net2_title']='EPANET Net2';
 $ec_lang['lpn_ex_net2_desc']='A branched distribution system with a tank, from EPANET\'s samples.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
-$ec_lang['lpn_ex_net3_desc']='EPANET\'s large sample: 97 junctions, two tanks and a river source. Worth opening to see how a real-sized model reads.';
+$ec_lang['lpn_ex_net3_desc']='EPANET\'s large sample: 97 junctions, two tanks and a river source. Worth opening to see how a real-sized model looks on the map.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
-$ec_lang['lpn_ex_elm_street_desc']='A commercial site\'s fire flow plus maximum day design snapshot, drawn over a site plan.';
+$ec_lang['lpn_ex_elm_street_desc']='A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
 $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
@@ -1392,7 +1392,7 @@ $ec_lang['lpn_inp_drop_eps']='This file describes a simulation that runs over a 
 $ec_lang['lpn_inp_drop_quality']='Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.';
 $ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
 $ec_lang['lpn_inp_drop_dangling']='These pipes name a junction that is not in the file, so they were left out.';
-$ec_lang['lpn_inp_drop_units']='The flow units in this file were not recognised, so gallons per minute were assumed. Check every number before you use the answers.';
+$ec_lang['lpn_inp_drop_units']='The flow unit named in this file is not one this page knows, so every number was read as gallons per minute. Check every number before you use the answers.';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
 // that is the part a user cannot see for themselves.
@@ -1595,9 +1595,9 @@ $ec_lang['lpn_diag_unreachable']='These nodes have no path to a reservoir:';
 // chose the solver.
 $ec_lang['lpn_engine_fetching']='Getting the EPANET solver. It is downloaded once and then kept on this device, so it works offline afterwards.';
 $ec_lang['lpn_engine_ready']='The EPANET solver is on this device now, and works offline.';
-$ec_lang['lpn_engine_fetching_valve']='Getting the EPANET solver, so this valve can be worked out now and offline later.';
+$ec_lang['lpn_engine_fetching_valve']='Getting the EPANET solver, so this valve can be solved now and offline later.';
 $ec_lang['lpn_engine_ready_valve']='The EPANET solver is on this device now. Valves that open and close on their own will work offline.';
-$ec_lang['lpn_engine_unavailable']='Could not get the EPANET solver, which is what works out valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.';
+$ec_lang['lpn_engine_unavailable']='Could not get the EPANET solver, which is what solves valves that open and close on their own. Connect to the internet once and it is kept on this device from then on.';
 $ec_lang['lpn_diag_valve_needs_epanet']='These valves open and close on their own, and only the EPANET solver can compute them. The EPANET solver could not be loaded, so these results are missing:';
 $ec_lang['lpn_diag_valve_on_fixed_head']='These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between the valve and the reservoir or tank:';
 $ec_lang['lpn_diag_not_converged']='No solution was found. Check for values that are impossible in real life, such as a diameter of zero.';
@@ -1689,7 +1689,7 @@ $ec_lang['lpn_field_closed_tip']='Shut this pipe so no water can pass through it
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Size multiplier';
-$ec_lang['lpn_field_show_always']='Always show';
+$ec_lang['lpn_field_show_always']='Always show this label';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
@@ -1699,24 +1699,24 @@ $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
 $ec_lang['lpn_settings_apply_to_all']='Apply to all';
-$ec_lang['lpn_settings_apply_to_all_tip']='Give every element of this kind that is already drawn an ID starting with this text. Each one keeps its number. An ID that does not end in a number is left alone.';
+$ec_lang['lpn_settings_apply_to_all_tip']='Every element of this kind that is already drawn gets an ID starting with this text. Each one keeps its number. An ID that does not end in a number is left alone.';
 $ec_lang['lpn_confirm_apply_prefix']='Rename {n} elements so their IDs start with {prefix}? Each one keeps its number.';
-$ec_lang['lpn_prefix_applied']='Renamed {n} elements. {skipped} were left alone.';
-$ec_lang['lpn_labels_prefix_tip']='Text printed before this value on the map';
-$ec_lang['lpn_labels_prefix_id_tip']='Text printed before the ID on the map. Leave this blank to use the automatic ID prefixes, such as J1 and L1.';
-$ec_lang['lpn_labels_suffix_tip']='Text printed after this value on the map';
-$ec_lang['lpn_labels_suffix_gradient_tip']='Text printed after the head loss gradient on the map. Do not type a percent sign here. It is added for you when the units are percent.';
-$ec_lang['lpn_labels_separator']='Separator';
+$ec_lang['lpn_prefix_applied']='Renamed {n} elements. {skipped} others were left alone.';
+$ec_lang['lpn_labels_prefix_tip']='Text shown before this value on the map';
+$ec_lang['lpn_labels_prefix_id_tip']='Text shown before the ID on the map. Leave this blank and the ID is shown on its own, starting with the letter it was given, such as J1 or L1.';
+$ec_lang['lpn_labels_suffix_tip']='Text shown after this value on the map';
+$ec_lang['lpn_labels_suffix_gradient_tip']='Text shown after the head loss gradient on the map. Do not type a percent sign here. It is added for you when the units are percent.';
+$ec_lang['lpn_labels_separator']='Text between values';
 $ec_lang['lpn_labels_separator_tip']='Text between one value and the next on a label. A space by default.';
 // The priority column in the Labels box (ROADMAP Task 397). Both tips say "1 matters most", because
 // that one sentence is what the two columns share; what differs is WHAT the number orders, and each
 // tip says which. Kept plain and short: these sit on a small box in a crowded row.
 $ec_lang['lpn_labels_priority']='Priority';
-$ec_lang['lpn_labels_priority_link_tip']='Order the values are dropped in when a label does not fit. 1 is kept longest.';
+$ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped when a label does not fit. 1 is kept longest.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
-$ec_lang['lpn_labels_priority_node_tip']='Priority for deciding whose label is dropped first when the map is crowded: lowest demand, least extreme pressure, or most neighbour-like elevation or head. 1 decides first.';
+$ec_lang['lpn_labels_priority_node_tip']='Priority for deciding whose label is dropped first when the map is crowded: the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to that of the neighbouring nodes. 1 decides first.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='Before';
@@ -1754,7 +1754,7 @@ $ec_lang['lpn_backdrop_scale_entry']='Scale by world file or by the size of one 
 // Scale FROM CURRENT, about a picked point (Tom, 2026-08-16). The relative sibling of the two
 // absolute scale commands above: it changes the size by a factor and holds one point still, which
 // is what the last stage of fitting an aerial photograph actually needs.
-$ec_lang['lpn_backdrop_scale_from']='Scale from current size, about a point you pick';
+$ec_lang['lpn_backdrop_scale_from']='Scale from current size, around a point you pick';
 $ec_lang['lpn_backdrop_scale_from_prompt1']='Click the point on the background image that should stay where it is.';
 $ec_lang['lpn_backdrop_scale_from_prompt2']='Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.';
 $ec_lang_syn['lpn_backdrop_scale_entry']='World (Map Coordinates or Georeference) File for the image | gloss: world file';
@@ -1778,7 +1778,7 @@ $ec_lang['lpn_backdrop_position_prompt1']='Click the base point (on the image) f
 $ec_lang['lpn_backdrop_position_prompt2']='Choose the method for the destination point, then click Continue.';
 // The standing "you are in the middle of something" bar, shown while a background-image scale or
 // move is waiting for a click. It carries the only visible way out of that state.
-$ec_lang['lpn_backdrop_busy']='Setting the background image.';
+$ec_lang['lpn_backdrop_busy']='Adjusting the background image.';
 $ec_lang['lpn_backdrop_target_label']='Move that point to:';
 $ec_lang['lpn_backdrop_target_node']='A node';
 $ec_lang['lpn_backdrop_target_free']='Any point on the map';
@@ -1879,7 +1879,7 @@ $ec_lang_syn['lpn_engine_failed']='';
 // the EPANET solver anyway, because it holds a valve the built-in solver does not work out. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because these valves open and close on their own:';
-$ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be worked out until this page knows that unit, because there is no way to tell how big it is.';
+$ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be given until this page knows that unit, because there is no way to tell how big it is.';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.';
 $ec_lang_syn['lpn_engine_manning_note']='';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';
@@ -1887,11 +1887,11 @@ $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Symbol size (pixels)';
-$ec_lang['lpn_settings_link_width']='Pipe width (pixels)';
+$ec_lang['lpn_settings_link_width']='Pipe line thickness (pixels)';
 $ec_lang['lpn_settings_align_labels']='Align pipe labels with pipes';
-$ec_lang['lpn_settings_readability_bias']='Degrees left of vertical before labels flip';
-$ec_lang['lpn_settings_mask_labels']='Background mask behind labels';
-$ec_lang['lpn_settings_label_max_width']='Show labels when the view is smaller than (map units)';
+$ec_lang['lpn_settings_readability_bias']='Degrees left of vertical before a label is turned around';
+$ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
+$ec_lang['lpn_settings_label_max_width']='Show labels when the view is narrower than this (map units)';
 $ec_lang['lpn_settings_label_use_view']='Use current view';
 $ec_lang['lpn_settings_label_always']='Always show labels';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
@@ -1925,19 +1925,19 @@ $ec_lang['lpn_settings_legend_middle_right']='Middle right';
 $ec_lang['lpn_settings_legend_bottom_left']='Bottom left';
 $ec_lang['lpn_settings_legend_bottom_right']='Bottom right';
 $ec_lang['lpn_settings_colors']='Color by value';
-$ec_lang['lpn_settings_color_node_field']='Color nodes by';
-$ec_lang['lpn_settings_color_link_field']='Color pipes by';
-$ec_lang['lpn_settings_color_ramp']='Color ramp';
+$ec_lang['lpn_settings_color_node_field']='Node color';
+$ec_lang['lpn_settings_color_link_field']='Pipe color';
+$ec_lang['lpn_settings_color_ramp']='Color scheme';
 $ec_lang['lpn_color_ramp_epanet']='Blue to red (EPANET)';
-$ec_lang['lpn_color_ramp_viridis']='Purple to yellow (easier to tell apart)';
+$ec_lang['lpn_color_ramp_viridis']='Purple to yellow (easier to tell one color from the next)';
 $ec_lang['lpn_color_ramp_gray']='Light to dark gray';
-$ec_lang['lpn_settings_color_reverse']='Reverse the colors';
+$ec_lang['lpn_settings_color_reverse']='Reverse the color order';
 $ec_lang['lpn_color_none']='No color';
 $ec_lang['lpn_settings_color_thematic']='Thematic map: colors only, no labels';
-$ec_lang['lpn_settings_color_thematic_tip']='Hides every label so the colors are the whole map. Your label choices are kept, and turning this off brings them back.';
-$ec_lang['lpn_settings_color_key_position']='Color key position';
-$ec_lang['lpn_settings_color_breaks']='Break values';
-$ec_lang['lpn_settings_color_breaks_note']='Leave these blank and the colors spread over whatever is on the map now. Type numbers, or press a button below, and the same number always means the same color.';
+$ec_lang['lpn_settings_color_thematic_tip']='Hides every label so that only the colors are left on the map. Your label choices are kept, and turning this off brings them back.';
+$ec_lang['lpn_settings_color_key_position']='Color legend position';
+$ec_lang['lpn_settings_color_breaks']='Color band limits';
+$ec_lang['lpn_settings_color_breaks_note']='Leave these blank and the colors are spread across the values now on the map. Type numbers, or press a button below, and the same number always means the same color.';
 $ec_lang['lpn_settings_color_equal_intervals']='Equal intervals';
 $ec_lang['lpn_settings_color_equal_counts']='Equal counts';
 $ec_lang['lpn_settings_color_auto']='Automatic';
