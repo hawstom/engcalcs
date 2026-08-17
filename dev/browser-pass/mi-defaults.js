@@ -23,65 +23,12 @@
 // Copyright 2009 Thomas Gail Haws
 // Licensed under GNU GPL v3.0 or later
 
-// IT STARTS ITS OWN SERVER, ON A PORT IT PROVED WAS FREE, ROOTED AT THIS CHECKOUT. Sharing
-// lib/env.js's would have been shorter and would have tested the wrong tree twice over: its port
-// is a constant, so a server another session left running answers instead and `php -S` fails to
-// bind in silence; and its docroot is derived as REPO/.., which is the repository's PARENT and
-// therefore has no `engcalcs/` at all when the checkout is a git worktree. Both faults are
-// invisible -- the page loads, the assertions run, and they describe somebody else's files.
-const fs = require('fs');
-const os = require('os');
-const net = require('net');
-const path = require('path');
-const { spawn } = require('child_process');
-const { findChromium } = require('./lib/env');
-
-const REPO = path.resolve(__dirname, '..', '..');
-
-/** A port nothing is listening on, asked of the OS rather than guessed. */
-function freePort() {
-	return new Promise((resolve, reject) => {
-		const srv = net.createServer();
-		srv.on('error', reject);
-		srv.listen(0, '127.0.0.1', () => {
-			const p = srv.address().port;
-			srv.close(() => resolve(p));
-		});
-	});
-}
-
-// The pages ask for /engcalcs/js/... absolutely, so the docroot must have an `engcalcs` in it.
-// A symlink into this checkout gives that without copying the tree or assuming where it sits.
-function makeDocroot() {
-	const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'mi-defaults-'));
-	fs.symlinkSync(REPO, path.join(dir, 'engcalcs'), 'dir');
-	return dir;
-}
-
-async function startServer(port, docroot) {
-	const proc = spawn('php', ['-d', 'pcre.jit=0', '-d', 'display_errors=0',
-		'-S', `127.0.0.1:${port}`, '-t', docroot], { cwd: docroot, stdio: ['ignore', 'ignore', 'pipe'] });
-	const errors = [];
-	proc.stderr.on('data', (d) => errors.push(String(d)));
-	const deadline = Date.now() + 15000;
-	while (Date.now() < deadline) {
-		try {
-			const res = await fetch(`http://127.0.0.1:${port}/engcalcs/Manning-Irregular.php`, { method: 'HEAD' });
-			if (res.status === 200) { return proc; }
-		} catch (err) { /* not up yet */ }
-		await new Promise(r => setTimeout(r, 150));
-	}
-	proc.kill();
-	throw new Error(`PHP server did not come up on port ${port}\n${errors.join('')}`);
-}
-
-async function launchBrowser(playwright) {
-	const executablePath = findChromium();
-	if (!executablePath) {
-		throw new Error('No Chromium found. Set CHROME_PATH, or run: npx playwright install chromium');
-	}
-	return playwright.chromium.launch({ executablePath });
-}
+// IT STARTS ITS OWN SERVER, ON AN OS-ASSIGNED PORT, ROOTED AT THIS CHECKOUT AND PROVED TO BE OURS
+// BEFORE ANY ASSERTION RUNS -- all of which now lives in lib/env.js, where run.js gets it too
+// (ROADMAP Task 387). This file used to carry its own copy because env.js bound a constant port
+// under the repository's PARENT as docroot; the reason for the duplication is gone, and one
+// mechanism is the point.
+const { REPO, startServer, stopServer, launchBrowser } = require('./lib/env');
 
 // The unit each select must be showing on arrival, per preset. Read from the page's own
 // data-family + EngCalcs.unitSets at runtime rather than typed here, so this cannot drift from
@@ -135,12 +82,11 @@ async function probe(browser, origin, lang) {
 		console.error('playwright-core is not installed. From dev/browser-pass:  npm install');
 		process.exit(2);
 	}
-	const port = await freePort();
-	const docroot = makeDocroot();
-	const origin = `http://127.0.0.1:${port}`;
-	const server = await startServer(port, docroot);
-	const browser = await launchBrowser(playwright);
-	console.log(`=== Manning-Irregular, first visit, both presets (${REPO}) ===`);
+	// Throws loudly if the server is not provably serving THIS checkout; nothing below it runs.
+	const server = await startServer();
+	const origin = server.origin;
+	const browser = await launchBrowser(playwright, { secureContext: false });
+	console.log(`=== Manning-Irregular, first visit, both presets (${REPO}) === ${origin}`);
 	try {
 		for (const [preset, lang] of [['us', 'en'], ['si', 'es']]) {
 			console.log(`\n--- ${preset} (lang=${lang}) ---`);
@@ -170,8 +116,7 @@ async function probe(browser, origin, lang) {
 		console.log(`\n FAIL  threw\n${err && err.stack ? err.stack : err}`);
 	} finally {
 		await browser.close();
-		server.kill();
-		fs.rmSync(docroot, { recursive: true, force: true });
+		stopServer();
 	}
 	console.log(`\n${checks - failures}/${checks} checks passed.\n`);
 	process.exit(failures ? 1 : 0);

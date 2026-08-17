@@ -6,7 +6,7 @@
 // browsers' own rendering, which is the lower risk and stays on the human list.
 
 const { Session } = require('../lib/session');
-const { PAGE } = require('../lib/env');
+const { pageUrl } = require('../lib/env');
 
 exports.title = '11. The fallback path — a browser with no File System Access API';
 
@@ -24,7 +24,7 @@ exports.run = async function ({ browser, report }) {
 	page.on('dialog', async (d) => { a.dialogs.push({ type: d.type(), message: d.message() }); await d.accept(); });
 
 	try {
-		await page.goto(PAGE, { waitUntil: 'load' });
+		await page.goto(pageUrl(), { waitUntil: 'load' });
 		await a.settle();
 		report.eq(await page.evaluate(() => typeof window.showSaveFilePicker), 'undefined',
 			'set up: this browser has no File System Access API');

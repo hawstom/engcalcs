@@ -67,12 +67,18 @@ arrival in *both* presets) sat behind exactly that gap. It opens the page on a f
 `en` and in `es` and asserts every unit select matches the preset the page rendered in, and that
 the verdict cell is not a caution.
 
-It starts **its own** PHP server, on a port it asked the OS for, rooted at a temporary directory
-holding a symlink to this checkout. `lib/env.js` cannot be reused for that: its port is a constant,
-so a server another session left running answers instead while `php -S` fails to bind in silence,
-and its docroot is the repository's parent — which contains no `engcalcs/` when the checkout is a
-git worktree. Both faults let the whole pass run green against somebody else's files, and one of
-them did.
+It uses `lib/env.js` like everything else in here. It once carried its own server because `env.js`
+bound a constant port 8899 under the repository's *parent* as docroot — which contains no
+`engcalcs/` when the checkout is a git worktree, and which let a server another session had left on
+8899 answer the readiness probe while our own `php -S` failed to bind in silence. Both faults let a
+whole pass run green against somebody else's files, and one of them did.
+
+**That is fixed in `lib/env.js` and the rule now holds for every runner in here** (ROADMAP Task
+387): the port is asked of the OS, the docroot is a temp directory symlinked to the repo root as
+`git rev-parse --show-toplevel` reports it, and a random per-run **sentinel** written into that temp
+docroot is fetched back and compared before the browser is launched. Only our own server can serve
+it. A mismatch throws, naming the port, the docroot and what answered instead — the failure that
+used to be silent is now the loudest thing in the run.
 
 ## What is left for Tom — one box
 

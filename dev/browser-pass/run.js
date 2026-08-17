@@ -15,7 +15,7 @@
 //   anything visual: banner colours, the Save-all flicker, the stray scrollbar, print layout
 
 const path = require('path');
-const { startServer, launchBrowser, clearLockRecords } = require('./lib/env');
+const { REPO, startServer, stopServer, launchBrowser, clearLockRecords } = require('./lib/env');
 
 const SPECS = ['boot', 'menu', 'files', 'reload', 'locking', 'missing', 'fallback', 'degrade', 'saveas'];
 
@@ -51,9 +51,11 @@ const report = {
 	const specs = wanted.length ? wanted : SPECS;
 
 	clearLockRecords();
+	// If this throws, nothing below it runs — which is the point. A server that is not provably
+	// ours makes every check below a statement about somebody else's tree (ROADMAP Task 387).
 	const server = await startServer();
 	const browser = await launchBrowser(playwright);
-	console.log('=== lpn_ browser pass ===');
+	console.log(`=== lpn_ browser pass === ${server.origin}  (${REPO})`);
 
 	try {
 		for (const name of specs) {
@@ -67,7 +69,7 @@ const report = {
 		console.log(`\n FAIL  ${current}: threw\n${err && err.stack ? err.stack : err}`);
 	} finally {
 		await browser.close();
-		server.proc.kill();
+		stopServer();
 	}
 
 	console.log(`\n${checks - failures}/${checks} checks passed${skipped ? `, ${skipped} left to the human list` : ''}.\n`);
