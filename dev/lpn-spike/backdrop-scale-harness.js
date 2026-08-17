@@ -434,10 +434,12 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 		'every element it looks up is static markup in Looped-Network.php',
 		notStatic.length ? `built in JS, so it can be null: ${notStatic.join(', ')}` : anchorIds.join(', '));
 
-	// A missing anchor must be a MISPLACED panel, never an invisible one. The user can work with a
-	// panel in the wrong corner; they cannot work with one that never rendered.
-	report(/anchor \?/.test(code) && /openPanelAtAnchor/.test(fn),
-		'a missing anchor falls back to a rect rather than throwing');
+	// The anchor is now COMPUTED from the picked point rather than looked up, which retires the
+	// missing-anchor case outright instead of falling back from it: a rect built out of
+	// worldToScreen() cannot be null, so there is nothing left to guard against. Assert the
+	// construction, because a future edit that reintroduces a lookup here reintroduces the bug.
+	report(/worldToScreen\(/.test(code) && /openPanelAtAnchor\(panel, anchorRect\)/.test(code),
+		'the panel is anchored on a computed rect, so the anchor can never be missing');
 }
 
 // ---- every backdrop edit is undoable (Task 145 follow-up) ---------------------------------------
