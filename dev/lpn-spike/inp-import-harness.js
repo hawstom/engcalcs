@@ -241,8 +241,8 @@ importText(usInp, 'import-cases.inp');
 	// what a left-aligned block looks like -- and is exactly the evidence in Tom's own files that
 	// settled this (Estrellas' two lines are 31 and 25 characters and their stored x values differ
 	// by 0.98 map units, where centring would put them ~85 apart).
-	const t1 = labels.find(l => l.text === 'Import test network');
-	const t2 = labels.find(l => l.text.indexOf('considerably longer') >= 0);
+	const t1 = labels.find(l => l._text === 'Import test network');
+	const t2 = labels.find(l => l._text.indexOf('considerably longer') >= 0);
 	const w1 = L.labelWidth(t1.id), w2 = L.labelWidth(t2.id);
 	ok('the longer line really does measure wider -- otherwise the next check is vacuous',
 		w2 > w1 * 1.5, w1.toFixed(1) + ' vs ' + w2.toFixed(1));

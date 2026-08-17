@@ -144,9 +144,14 @@ console.log('\n--- a drawing near zero pays nothing ---');
 // ---- 3. The version step, and the round trip through storage ---------------------------------
 console.log('\n--- opening and saving a survey document ---');
 {
-	ok('the storage version is 7', L.storageVersion() === 7, L.storageVersion());
+	// NOT PINNED TO A LITERAL. v7 is where local origins arrived, and the document must come out at
+	// whatever the page's CURRENT version is -- a migration that stops early is the defect here, and
+	// a hardcoded number would report every later version bump (v8, Task 407) as this task breaking.
+	ok('the storage version is at least v7, where local origins arrived', L.storageVersion() >= 7,
+		L.storageVersion());
 	const migrated = L.migrateSaved(surveyDoc(6));
-	ok('a v6 document migrates to v7', migrated.v === 7, migrated.v);
+	ok('a v6 document migrates all the way to the current version',
+		migrated.v === L.storageVersion(), migrated.v + ' vs ' + L.storageVersion());
 	ok('...by being rebased on open', migrated.origin.x === 579000 && migrated.origin.y === 1304000,
 		JSON.stringify(migrated.origin));
 
