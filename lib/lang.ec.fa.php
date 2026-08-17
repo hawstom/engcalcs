@@ -24,6 +24,11 @@ $ec_lang['u_lps']='L/s';
 $ec_lang['u_m2']='m^2';
 $ec_lang['u_m3ps']='m^3/s';
 $ec_lang['u_mgd']='MGD';
+$ec_lang['u_imgd']='IMGD';
+$ec_lang['u_afd']='ac-ft/d';
+$ec_lang['u_lpm']='L/min';
+$ec_lang['u_cmh']='m^3/hr';
+$ec_lang['u_cmd']='m^3/d';
 $ec_lang['u_mh2o']='m H2O';
 $ec_lang['u_mld']='ML/d';
 $ec_lang['u_m']='m';
@@ -617,28 +622,103 @@ $ec_lang['lpn_title_units']='واحدهای {units}';
 $ec_lang['lpn_tool_select']='انتخاب';
 $ec_lang['lpn_tool_add_junction']='گره';
 $ec_lang['lpn_tool_add_reservoir']='مخزن';
+// A TANK is a separate element from a reservoir (ROADMAP Task 248, 2026-08-14), not a
+// reservoir with a level typed into it. A reservoir never runs down; a tank does. A
+// steady-state solve cannot tell them apart, which is exactly why the two need different
+// names on screen -- the difference is in what happens next, not in this instant.
+$ec_lang['lpn_tool_add_tank']='تانک';
 $ec_lang['lpn_tool_add_pipe']='لوله';
 $ec_lang['lpn_tool_add_pump']='پمپ';
+// A VALVE is a LINK, like a pipe and a pump -- it sits in the line between two nodes, not on a
+// node (ROADMAP Task 248 phase 2, 2026-08-14). Four types are offered and the page names each one
+// by what it does as well as by the abbreviation an engineer already knows, because the letters
+// alone teach nobody and the words alone are longer than a modeller wants to read every time.
+$ec_lang['lpn_tool_add_valve']='شیر';
 $ec_lang['lpn_tool_add_text']='متن';
 $ec_lang['lpn_tool_delete']='حذف';
 $ec_lang['lpn_tool_zoom_extent']='نمایش کل نقشه';
 $ec_lang['lpn_new_text']='متن';
+$ec_lang['lpn_field_text_bold']='متن پررنگ';
+$ec_lang['lpn_field_text_rotation']='زاویه (درجه)';
+$ec_lang['lpn_field_text_match_pipe']='هم‌راستا با زاویه لوله';
+$ec_lang['lpn_field_text_flip']='چرخش 180 درجه';
 $ec_lang['lpn_field_elev']='تراز';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
 // what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
 // protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
 // entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='تراز زمین یا لوله در این گره. آن را از هر مبدأ صفری که می‌خواهید اندازه بگیرید، به شرط آنکه همه گره‌ها یک مبدأ داشته باشند.';
-// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
-// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
-// string is what shows in that empty box.
+// A reservoir carries an elevation AND a head. Leaving the head blank means "the water surface is
+// at the reservoir's own elevation"; the placeholder string is what shows in that empty box.
+// This USED to read "so it doubles as a tank" (Tom, 2026-07-30), which was true only while there
+// was no tank. Since Task 248 there is one, and the two are different elements: a reservoir's level
+// never moves, a tank's does. Raising a reservoir's head is still a legitimate thing to do -- it is
+// just not how you model storage any more.
 $ec_lang['lpn_field_head']='هد';
 // 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
 // outright that it is a height and not a pressure, which is the exact confusion the glossary's
 // avoid list guards against.
 $ec_lang['lpn_field_head_tip']='تراز سطح آب در مخزن، به‌صورت ارتفاع، نه فشار. برای قرار دادن سطح آب در تراز مخزن، آن را خالی بگذارید.';
+// ---- Tank fields (Task 248) ----
+// EVERY ONE OF THESE IS A HEIGHT IN THE ELEVATION/HEAD UNIT, the tank diameter included, and each
+// tip says so in words a reader can act on. The diameter is the one that catches people: it is a
+// distance across the ground of the same order as the elevations beside it, so reading it in the
+// pipe-diameter unit would put a 15 m tank on screen as 15000. Same reason the three levels say
+// "measured up from the tank bottom" rather than leaving the datum to be guessed -- EPANET measures
+// a tank level from the vessel floor, not from the same zero the elevations use.
+$ec_lang['lpn_tank_elev_tip']='تراز کف تانک. عمق‌های آب در تانک از همین‌جا به‌بالا اندازه‌گیری می‌شوند.';
+$ec_lang['lpn_field_tank_level']='عمق آب';
+$ec_lang['lpn_field_tank_level_tip']='عمق آب ایستاده در تانک، اندازه‌گیری‌شده از کف تانک به‌بالا. سطح آب برابر است با تراز کف تانک به‌علاوه این عمق.';
+$ec_lang['lpn_field_tank_minlevel']='کمترین عمق آب';
+$ec_lang['lpn_field_tank_minlevel_tip']='عمق آبی که در آن تانک خالی در نظر گرفته می‌شود، اندازه‌گیری‌شده از کف تانک به‌بالا.';
+$ec_lang['lpn_field_tank_maxlevel']='بیشترین عمق آب';
+$ec_lang['lpn_field_tank_maxlevel_tip']='عمق آبی که در آن تانک پر در نظر گرفته می‌شود، اندازه‌گیری‌شده از کف تانک به‌بالا.';
+$ec_lang['lpn_field_tank_diameter']='قطر تانک';
+$ec_lang['lpn_field_tank_diameter_tip']='عرض تانک از یک طرف تا طرف دیگر. واحد آن مانند واحد تراز است، نه واحد قطر لوله. همین مقدار تعیین می‌کند که هر عمق مشخص چقدر آب در خود جای می‌دهد.';
+// 'head' is a documented trap term in glossary.json. This tip names it as a level, which is the
+// same guard lpn_field_head_tip carries for the reservoir.
+$ec_lang['lpn_tank_head_tip']='تراز سطح آب در تانک: تراز کف تانک به‌علاوه عمق آب. این همان تراز است که حل‌کننده برای تانک به‌کار می‌برد.';
 $ec_lang['lpn_close']='بستن';
 $ec_lang['lpn_empty_hint']='از منوی فایل، پروژه جدید را برای باز کردن یک نمونه به کار ببرید. یا کار را با افزودن یک مخزن، گره، و لوله از نوار ابزار شروع کنید.';
+// The examples gallery (ROADMAP Task 314). lpn_empty_hint above is no longer rendered by the page
+// -- the empty canvas shows the gallery instead -- but the key is KEPT rather than deleted while
+// the gallery is new: it is the fallback sentence if the manifest cannot be fetched, and deleting
+// a key translated into 26 languages to get it back a week later is the expensive direction.
+$ec_lang['lpn_examples_heading']='باز کردن یک نمونه';
+$ec_lang['lpn_examples_sub']='هر نمونه به‌صورت نسخهٔ شخصی شما باز می‌شود. آن را تغییر دهید، ذخیره کنید، یا نسخهٔ تازه‌ای باز کرده و دوباره شروع کنید.';
+$ec_lang['lpn_examples_open']='باز کردن';
+$ec_lang['lpn_examples_menu']='باز کردن نمونه…';
+$ec_lang['lpn_examples_blank']='یا با یک نقشهٔ خالی شروع کنید';
+$ec_lang['lpn_examples_size']='{nodes} گره، {links} لوله';
+$ec_lang['lpn_examples_failed']='نمونه‌ها بارگیری نشدند. برای شروع یک ترسیم تازه، از منوی فایل، پروژهٔ جدید را انتخاب کنید.';
+$ec_lang['lpn_examples_loading']='در حال بارگیری نمونه‌ها…';
+// Two new Help rows (Tom, 2026-08-14). "Fix something" is a VERB, which is the point: it invites
+// the small correction people actually send -- a wrong word, a bad number -- rather than sounding
+// like a request for money or code, which is what "Contribute" reads as to most visitors. It opens
+// contact.php, the same place the old page-bottom invitation went.
+$ec_lang['lpn_help_fix']='رفع یک مشکل';
+$ec_lang['lpn_help_notes']='یادداشت‌های این صفحه';
+$ec_lang['lpn_status_example_opened']='{name} باز شد. این نسخهٔ شماست: با فایل، ذخیره به‌عنوان، آن را ذخیره کنید.';
+// Each example's own card text. These live here, and NOT in the examples folder's own JSON, for one
+// reason: a string that is not in a lang file is a string no translator will ever see. The manifest
+// carries the English as a fallback for an example that has no keys yet, so a new example still
+// shows up in English the moment its file is dropped in.
+// FLOW UNIT FIRST in each description (Tom, 2026-08-14: "list flow units first for two reasons:
+// EPANET and clarity"). EPANET identifies a whole unit system by its flow unit -- its [OPTIONS]
+// setting is literally GPM or LPS, never "US" or "SI" -- so a water engineer reads the flow unit as
+// the name of the system, and the length units as detail that follows from it.
+$ec_lang['lpn_ex_basic_si_title']='شبکهٔ پایه، L/s (SI)';
+$ec_lang['lpn_ex_basic_si_desc']='از اینجا شروع کنید. یک مخزن، یک پمپ و یک حلقهٔ کوچک: کوچک‌ترین آرایشی که همچنان به‌عنوان یک شبکهٔ آب کار می‌کند. لیتر بر ثانیه، با متر و میلی‌متر.';
+$ec_lang['lpn_ex_basic_us_title']='شبکهٔ پایه، gpm (US)';
+$ec_lang['lpn_ex_basic_us_desc']='همان شبکهٔ آغازین، بر حسب گالن بر دقیقه، با فوت و اینچ.';
+$ec_lang['lpn_ex_net1_title']='EPANET Net1';
+$ec_lang['lpn_ex_net1_desc']='کوچک‌ترین شبکهٔ نمونهٔ EPANET از میان سه شبکه: یک مخزن، یک پمپ و یک حلقهٔ تکی.';
+$ec_lang['lpn_ex_net2_title']='EPANET Net2';
+$ec_lang['lpn_ex_net2_desc']='یک شبکهٔ توزیع انشعابی با یک تانک، از نمونه‌های EPANET.';
+$ec_lang['lpn_ex_net3_title']='EPANET Net3';
+$ec_lang['lpn_ex_net3_desc']='بزرگ‌ترین نمونهٔ EPANET: 97 گره، دو تانک و یک منبع رودخانه‌ای. ارزش باز کردن دارد تا ببینید یک مدل با اندازهٔ واقعی روی نقشه چگونه به نظر می‌رسد.';
+$ec_lang['lpn_ex_elm_street_title']='مرکز خیابان اِلم';
+$ec_lang['lpn_ex_elm_street_desc']='یک سایت تجاری که برای جریان آتش‌نشانی به‌علاوهٔ حداکثر مصرف روزانه، در یک لحظهٔ زمانی مشخص و روی نقشهٔ سایت رسم و حل شده است.';
 $ec_lang['lpn_tool_undo']='واگرد';
 $ec_lang['lpn_confirm_example']='این کار نمونه را به شبکه‌ای که هم‌اکنون دارید اضافه می‌کند. ادامه می‌دهید؟';
 $ec_lang['lpn_field_diameter']='قطر';
@@ -698,7 +778,21 @@ $ec_lang['lpn_menu_view']='نما';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='تنظیمات';
+// Moved out of the suite-wide More menu, 2026-08-13 (Tom: "the walkthrough is a little
+// incongruous... Should it go in the lpn menu instead?"). It should, for two reasons the More menu
+// could not satisfy. The post is entirely about THIS calculator, so beside About/Install/Contact
+// the plural read as "guides to the calculators" and overstated it; here it needs no qualifier.
+// And every other menu-bar item acts on the project, while this one leaves the site -- unremarkable
+// as a row inside Help, out of place as a sixth document verb.
 $ec_lang['lpn_menu_help']='راهنما';
+// PLURAL is literally true and is not aspirational (Tom, 2026-08-13): the single post contains
+// three use-case walkthroughs of this calculator. So the row links straight to the post; no blog
+// label page is needed to make the plural honest.
+//
+// The post is in English and the label does NOT say so (Tom, 2026-08-13): "I am inclined to take my
+// chances with automatic browser translators and not flag it as English." Browser translation is
+// good enough on a blog page, and a permanent "(in English)" cost more, constantly, than the
+// occasional reader who meets it untranslated.
 $ec_lang['lpn_help_walkthroughs']='راهنماهای گام‌به‌گام';
 // Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
 // this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
@@ -765,9 +859,15 @@ $ec_lang['lpn_net_bad_file']='این شبیه یک فایل net. از EPANET ا�
 $ec_lang['lpn_inp_report_heading']='{file} وارد شد';
 $ec_lang['lpn_inp_report_counts']='{nodes} گره، مخزن و تانک، {links} لوله، پمپ و شیر، در واحدهای {units}.';
 $ec_lang['lpn_inp_report_clean']='همه‌چیز از فایل منتقل شد. چیزی جا نماند.';
+$ec_lang['lpn_inp_report_label_anchor']='برچسب‌های متنی همان‌گونه که EPANET قرار می‌دهد، از گوشهٔ بالا-چپ آن‌ها، جای‌گذاری می‌شوند.';
 $ec_lang['lpn_inp_report_lead']='این صفحه همه‌چیزی را که EPANET دارد در خود نگه نمی‌دارد. آنچه هنگام ورود تغییر کرد این است:';
 $ec_lang['lpn_inp_drop_headloss']='این فایل از فرمول هیزن-ویلیامز استفاده نمی‌کند. این صفحه هیزن-ویلیامز را محاسبه می‌کند، پس اعداد زبری لوله دقیقاً همان‌طور که نوشته شده بودند نگه داشته شدند، اما نتایج اینجا با نتایج EPANET یکسان نخواهد بود.';
+$ec_lang['lpn_inp_drop_tank_curve']='این تانک‌ها دیواره‌های صاف ندارند: فایل شکل آن‌ها را به‌صورت یک منحنی می‌دهد. آن‌ها به‌صورت تانک‌های گرد وارد شدند، هر یک با قطری که در فایل نوشته شده. سطح آب هنوز همان است که فایل تعیین می‌کند، پس پاسخ‌ها مطابقت دارند؛ فقط شکل ساده‌سازی شده است.';
+// Three outcomes a valve in a file can meet, one string each (Task 248 phase 2). Only the last is
+// a loss; the first two are reported because the reader deserves to know which engine is now
+// working out their network, not because anything was thrown away.
 $ec_lang['lpn_inp_drop_tcv']='این شیرهای خفه‌کننده به‌صورت شیر خفه‌کننده وارد شدند و همان افتی را که فایل به آن‌ها می‌دهد، حفظ می‌کنند. هر دو حل‌کننده می‌توانند آن‌ها را حل کنند.';
+$ec_lang['lpn_inp_drop_valve_active']='این شیرها فشار یا دبی را کنترل می‌کنند، و با تغییر آب خودشان باز و بسته می‌شوند. هیچ‌چیز از آن‌ها در هنگام ورود از دست نرفت، و این صفحه آن‌ها را با حل‌کننده EPANET حل می‌کند، و همین حل‌کننده را به‌طور خودکار برای این شبکه روشن می‌کند.';
 $ec_lang['lpn_inp_drop_valve']='این شیرها با یک منحنی یا یک افت فشار ثابت توصیف می‌شوند، و این صفحه چنین المانی ندارد. آن‌ها به‌صورت لوله باز وارد شدند، پس شبکه هنوز به هم پیوسته است، اما دیگر چیزی فشار یا دبی را در آنجا نگه نمی‌دارد.';
 $ec_lang['lpn_inp_drop_cv']='در EPANET این لوله‌ها فقط اجازه عبور آب در یک جهت را می‌دهند. آن‌ها به‌صورت لوله معمولی وارد شدند، پس اکنون ممکن است آب در هر دو جهت از آن‌ها عبور کند.';
 $ec_lang['lpn_inp_drop_demands']='این گره‌ها بیش از یک مصرف داشتند. مصرف‌ها با هم جمع شدند تا یک مصرف واحد که این صفحه نگه می‌دارد به دست آید.';
@@ -782,7 +882,7 @@ $ec_lang['lpn_inp_drop_eps']='این فایل شبیه‌سازی‌ای را ت
 $ec_lang['lpn_inp_drop_quality']='کیفیت آب، واکنش شیمیایی و تنظیمات انرژی پمپ حذف شدند. این صفحه فقط دبی و فشار را حل می‌کند.';
 $ec_lang['lpn_inp_drop_backdrop']='این فایل نام یک تصویر پس‌زمینه را می‌برد اما خود تصویر را ندارد. آن را خودتان با فایل، تصویر پس‌زمینه، افزودن تصویر اضافه کنید.';
 $ec_lang['lpn_inp_drop_dangling']='این لوله‌ها گرهی را نام می‌برند که در فایل نیست، پس حذف شدند.';
-$ec_lang['lpn_inp_drop_units']='واحدهای دبی در این فایل شناخته نشدند، پس گالن بر دقیقه در نظر گرفته شد. پیش از استفاده از نتایج، هر عدد را بررسی کنید.';
+$ec_lang['lpn_inp_drop_units']='واحد دبی نام‌برده‌شده در این فایل، واحدی نیست که این صفحه بشناسد، پس هر عدد به‌صورت گالن بر دقیقه خوانده شد. پیش از استفاده از پاسخ‌ها، هر عدد را بررسی کنید.';
 // {name} is a project name; word order is the translator's to choose. Says where the user landed,
 // the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
 // that is the part a user cannot see for themselves.
@@ -937,8 +1037,17 @@ $ec_lang['lpn_status_closed_opened']='{closed} بسته شد. اکنون {opened
 $ec_lang['lpn_status_closed_empty']='{closed} بسته شد. یک پروژه خالی جدید آغاز شد.';
 $ec_lang['lpn_storage_full']='ذخیره نشد. حافظه مرورگر پر یا در دسترس نیست، پس تغییرات اخیر شما با بستن این برگه از دست می‌روند.';
 $ec_lang['lpn_notes_1_term']='حالت پایدار';
+// A TANK IS HELD AT ITS LEVEL, and the note says so out loud (Task 248). This is the honest
+// limit of a steady-state tool with a tank in it: the tank is a correct fixed water level for
+// the instant being solved -- which is exactly what EPANET solves at time zero -- but the level
+// does not fall as water is drawn from it. A reader who is not told that will reasonably assume
+// otherwise, because a tank that never empties is not a tank anybody has met.
 $ec_lang['lpn_notes_1_def']='یک مجموعه مصرف را در هر بار حل می‌کند، با استفاده از همان الگوریتم گرادیان سراسری که EPANET به کار می‌برد. این ابزار چگونگی تغییر شبکه در طول زمان را مدل نمی‌کند. یک تانک در ترازی که به آن می‌دهید نگه داشته می‌شود: در یک حل، هرگز خالی نمی‌شود و هرگز پر نمی‌شود.';
 $ec_lang['lpn_notes_2_term']='مدل‌سازی نشده';
+// VALVES LEFT THIS NOTE ON 2026-08-14 (Task 248 phase 2), and what replaces the old sentence is
+// the honest half of it: the valves are all modeled now, but the three that open and close on
+// their own are solved by the EPANET solver and not by the built-in solver. That is a real
+// thing for a reader to know -- it is why such a network needs the engine downloaded once.
 $ec_lang['lpn_notes_2_def']='کیفیت آب و مصرف‌هایی که در طول روز تغییر می‌کنند مدل نمی‌شوند. وضعیت شیرها این‌گونه است: شیر خفه‌کننده در هر دو حل‌کننده کار می‌کند، و شیرهایی که خودشان باز و بسته می‌شوند (PRV، PSV، FCV) با حل‌کننده EPANET حل می‌شوند، که این صفحه هرگاه شبکه‌تان یکی از آن‌ها را داشته باشد، خودش آن را روشن می‌کند.';
 $ec_lang['lpn_notes_3_term']='ذخیره پروژه‌ها';
 $ec_lang['lpn_notes_3_def']='هر پروژه یک برگه است، و هر برگه در حین کار در این مرورگر ذخیره می‌شود. پاک کردن داده‌های مرورگر همه آن‌ها را حذف می‌کند، پس کارتان را در فایلی نگه دارید: فایل، ذخیره به‌نام. یک ستاره روی برگه یعنی تغییراتی دارد که در فایلی نیستند. تا وقتی نخواهید، هیچ‌چیز در فایلی نوشته نمی‌شود. در برخی مرورگرها یک پروژه به فایلی که در آن ذخیره می‌کنید متصل می‌شود، و از آن پس فایل، ذخیره روی همان فایل می‌نویسد؛ در برخی دیگر هیچ اتصالی ممکن نیست، پس ذخیره غیرفعال است و فقط ذخیره به‌نام در دسترس است. وقتی فایل یک پروژه روی یک درایو مشترک نگه داشته می‌شود، این صفحه به شما می‌گوید اگر همکاری هم‌اکنون آن را باز دارد، تا دو نفر روی کار یکدیگر ننویسند.';
@@ -959,6 +1068,27 @@ $ec_lang['lpn_id_taken']='آن شناسه از قبل استفاده شده اس
 $ec_lang['lpn_diag_no_fixed_head']='یک مخزن یا یک تانک اضافه کنید. پیش از آنکه شبکه قابل حل باشد، به دست‌کم یک تراز آب شناخته‌شده نیاز است.';
 $ec_lang['lpn_diag_dangling_link']='یک لوله یا پمپ به گره‌ای متصل است که دیگر وجود ندارد:';
 $ec_lang['lpn_diag_unreachable']='این گره‌ها هیچ مسیری به یک مخزن ندارند:';
+// BOTH OF THESE NAME THE VALVES. The page ends each one with a list of IDs, which is the reason
+// this calculator writes its own messages instead of showing EPANET\'s numbered errors: a person
+// looking at a drawing can act on \'V3\' and can do nothing at all with \'error 110\'.
+// ---- Warming the EPANET solver (Tom, 2026-08-14) ----
+// The 664 KB solver is fetched the moment a network first needs it -- when an active valve type is
+// chosen, when the solver is switched on, or when a project arrives already holding one -- because
+// that is the moment the user is still online. These three say what is happening in plain terms,
+// and the point of all three is the SECOND half of each sentence: the fetch happens once and then
+// the network works offline. A message that only said "downloading" would explain the wait without
+// explaining why it is worth it.
+// TWO PAIRS, because the same fetch has two reasons and one message cannot be true of both.
+// Tom turned the solver ON and was told about VALVES he had not created (2026-08-14). The valve
+// pair is right when a valve triggered the fetch; the plain pair is right when the user simply
+// chose the solver.
+$ec_lang['lpn_engine_fetching']='در حال دریافت حل‌کنندهٔ EPANET. یک‌بار دانلود می‌شود و سپس روی این دستگاه نگه داشته می‌شود، پس از آن بدون اینترنت هم کار می‌کند.';
+$ec_lang['lpn_engine_ready']='حل‌کنندهٔ EPANET اکنون روی این دستگاه است و بدون اینترنت هم کار می‌کند.';
+$ec_lang['lpn_engine_fetching_valve']='در حال دریافت حل‌کنندهٔ EPANET، تا این شیر اکنون و بعداً بدون اینترنت هم حل شود.';
+$ec_lang['lpn_engine_ready_valve']='حل‌کنندهٔ EPANET اکنون روی این دستگاه است. شیرهایی که خودشان باز و بسته می‌شوند بدون اینترنت هم کار خواهند کرد.';
+$ec_lang['lpn_engine_unavailable']='دریافت حل‌کنندهٔ EPANET ممکن نشد، که برای حل شیرهایی که خودشان باز و بسته می‌شوند لازم است. یک‌بار به اینترنت وصل شوید تا از آن پس روی این دستگاه نگه داشته شود.';
+$ec_lang['lpn_diag_valve_needs_epanet']='این شیرها خودشان باز و بسته می‌شوند، و فقط حل‌کننده EPANET می‌تواند آن‌ها را محاسبه کند. حل‌کننده EPANET بارگذاری نشد، پس این نتایج موجود نیستند:';
+$ec_lang['lpn_diag_valve_on_fixed_head']='این شیرها مستقیم به یک مخزن یا تانک وصل شده‌اند، که تراز آب را در آنجا از پیش تعیین کرده است، پس چیزی برای کنترل شیر باقی نمی‌ماند. یک لوله کوتاه بین شیر و مخزن یا تانک بگذارید:';
 $ec_lang['lpn_diag_not_converged']='هیچ راه‌حلی یافت نشد. مقادیری را بررسی کنید که در واقعیت ممکن نیستند، مانند قطر صفر.';
 $ec_lang['lpn_field_roughness']='زبری';
 // Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
@@ -970,6 +1100,28 @@ $ec_lang['lpn_field_length_tip']='طول لوله. وقتی خودکار روش�
 // Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
 // values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
 // Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
+// ---- Valve fields (Task 248 phase 2) ----
+// THE SETTING IS A DIFFERENT QUANTITY FOR EACH TYPE, which is why there are three labels here and
+// not one "Setting". A pressure, a flow and a bare loss coefficient are not the same number in
+// different units, and one shared label would have to be vague enough to cover all three.
+$ec_lang['lpn_field_valve_type']='نوع شیر';
+$ec_lang['lpn_field_valve_type_tip']='شیر چه کاری انجام می‌دهد. شیر خفه‌کننده یک افت ثابت را حفظ می‌کند. سه نوع دیگر یک فشار یا یک دبی را حفظ می‌کنند، و با تغییر آب کاملاً باز می‌شوند، بسته می‌شوند، یا نیمه‌باز می‌مانند. تغییر نوع، عدد تنظیم زیر را از نو آغاز می‌کند، زیرا فشار همان دبی نیست و هیچ‌کدام ضریب افت نیستند.';
+// THE ENGLISH IS ELLIPTICAL ON PURPOSE -- the noun "valve" is dropped because the dropdown above
+// already says "Valve type" -- so a translator meets a bare modifier with no head noun, and
+// "throttle" alone pulls hard toward a car accelerator. Each _syn supplies the noun plus alternates
+// (Wave 0, sprint 316; wording approved by Tom 2026-08-14, who rejected "pressure holding" for PSV).
+$ec_lang['lpn_valve_type_tcv']='خفه‌کننده (TCV)';
+$ec_lang['lpn_valve_type_prv']='کاهنده فشار (PRV)';
+$ec_lang['lpn_valve_type_psv']='نگهدارنده فشار (PSV)';
+$ec_lang['lpn_valve_type_fcv']='کنترل دبی (FCV)';
+$ec_lang['lpn_field_valve_setting_pressure']='تنظیم فشار';
+$ec_lang['lpn_field_valve_setting_pressure_tip']='فشاری که شیر حفظ می‌کند. شیر کاهنده فشار، فشار سمت پایین‌دست خود را در این مقدار یا کمتر نگه می‌دارد. شیر نگهدارنده فشار، فشار سمت بالادست خود را در این مقدار یا بیشتر نگه می‌دارد.';
+$ec_lang['lpn_field_valve_setting_flow']='تنظیم دبی';
+$ec_lang['lpn_field_valve_setting_flow_tip']='بیشترین آبی که شیر عبور می‌دهد. وقتی آب کمتر از این مقدار بخواهد عبور کند، شیر کاملاً باز می‌ماند و هیچ افتی اضافه نمی‌کند.';
+$ec_lang['lpn_field_valve_setting_loss']='ضریب افت';
+$ec_lang['lpn_field_valve_setting_loss_tip']='شیر خفه‌کننده چه مقدار هد را حذف می‌کند، به‌صورت مضربی از هد سرعت. برای شیری که کاملاً باز است، ۰ را وارد کنید. همین یک عدد، کل افت یک شیر خفه‌کننده را بیان می‌کند.';
+$ec_lang['lpn_field_valve_diameter_tip']='عرض روزنه عبور آب از شیر. سرعت آب عبوری از شیر از روی همین عرض محاسبه می‌شود، و افت از همان سرعت به‌دست می‌آید.';
+$ec_lang['lpn_field_valve_km_tip']='افت ناشی از بدنه شیر، هنگامی که شیر کاملاً باز است، علاوه بر هرچه تنظیم شیر حذف می‌کند. این افت به‌صورت مضربی از هد سرعت شمرده می‌شود. برای نادیده گرفتن آن، ۰ را وارد کنید.';
 $ec_lang['lpn_field_km']='ضریب افت موضعی، k';
 $ec_lang['lpn_field_km_tip']='افت ناشی از خم‌ها، شیرها، و اتصالات روی این لوله، به‌صورت ضریبی از هد سرعت. برای یک لوله ساده و مستقیم، ۰ را وارد کنید.';
 // Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
@@ -993,8 +1145,10 @@ $ec_lang['lpn_mode_select']='حالت: انتخاب. برای دیدن یا تغ
 $ec_lang['lpn_mode_delete']='حالت: حذف. برای برداشتن یک المان، آن را کلیک کنید.';
 $ec_lang['lpn_mode_add_junction']='حالت: افزودن گره. برای گذاشتن یک گره، نقشه را کلیک کنید. برای تغییر یا جابه‌جایی المان‌ها و برچسب‌ها، به حالت انتخاب بروید.';
 $ec_lang['lpn_mode_add_reservoir']='حالت: افزودن مخزن. برای گذاشتن یک مخزن، نقشه را کلیک کنید. برای تغییر یا جابه‌جایی المان‌ها و برچسب‌ها، به حالت انتخاب بروید.';
+$ec_lang['lpn_mode_add_tank']='حالت: افزودن تانک. برای گذاشتن یک تانک، نقشه را کلیک کنید. برای تغییر یا جابه‌جایی المان‌ها و برچسب‌ها، به حالت انتخاب بروید.';
 $ec_lang['lpn_mode_add_pipe']='حالت: افزودن لوله. یک گره را کلیک کنید، سپس گره دیگری را، تا به هم متصل شوند. برای تغییر یا جابه‌جایی المان‌ها و برچسب‌ها، به حالت انتخاب بروید.';
 $ec_lang['lpn_mode_add_pump']='حالت: افزودن پمپ. یک گره را کلیک کنید، سپس گره دیگری را، تا به هم متصل شوند. برای تغییر یا جابه‌جایی المان‌ها و برچسب‌ها، به حالت انتخاب بروید.';
+$ec_lang['lpn_mode_add_valve']='حالت: افزودن شیر. یک گره و سپس گره دیگر را کلیک کنید تا به هم وصل شوند. برای تغییر یا جابه‌جایی المان‌ها و برچسب‌ها، به حالت انتخاب بروید.';
 // Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
 // sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='حالت: افزودن متن. برای گذاشتن یک برچسب متنی، نقشه را کلیک کنید. برای پیوند دادن متن به یک گره، نزدیک آن کلیک کنید. برای تغییر یا جابه‌جایی المان‌ها و برچسب‌ها، به حالت انتخاب بروید.';
@@ -1006,23 +1160,88 @@ $ec_lang['lpn_mode_add_text']='حالت: افزودن متن. برای گذاش�
 $ec_lang['lpn_tip_select']='از این حالت برای تغییر، جابه‌جایی، و کشیدن چیزها روی نقشه استفاده کنید.';
 $ec_lang['lpn_tip_labels_draggable']='می‌توانید یک برچسب را برای جابه‌جایی بکشید. برای بازگرداندن یک برچسب به جای خودکارش، آن را دوبار کلیک کنید.';
 $ec_lang['lpn_field_auto']='خودکار';
+$ec_lang['lpn_method_switch_confirm']='تغییر روش اصطکاک، اعداد زبری را که پیش‌تر روی لوله‌های شما تایپ شده‌اند تغییر نمی‌دهد، و زبری یک روش برای روش دیگر بی‌معنی است. پس از این کار، هر لوله را بررسی کنید. با این حال تغییر داده شود؟';
+// "Shut", not "Closed" (Tom, 2026-08-14: *"We change in English to ... good catch!"*). Wave 0 found
+// that "closed" is a live polysemy INSIDE hydraulics -- a CLOSED CONDUIT is a full, pressurised pipe
+// as opposed to an open channel, and every pipe on this page is one, so the wrong reading is not
+// obviously wrong to a translator. Fixing the English fixes all 27 languages and needs no _syn.
+// Chosen over Tom's other candidates for reasons worth keeping: "Blocked" and "Plugged" imply a
+// FAULT rather than a state the user chose; "Off" is vague on a pipe; "No flow" names the RESULT, on
+// a page where flow is a computed output. And this label's own tip already said "Shut this pipe so
+// no water can pass through it" -- the English had already picked the word, in the sentence beside it.
+$ec_lang['lpn_field_closed']='بسته';
+$ec_lang['lpn_field_closed_tip']='این لوله را ببندید تا هیچ آبی از آن عبور نکند. لوله روی نقشه باقی می‌ماند و همه اعدادش را نگه می‌دارد، و می‌توانید هر زمان دوباره آن را باز کنید.';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='ضریب اندازه';
+$ec_lang['lpn_field_show_always']='همیشه این برچسب را نشان بده';
 $ec_lang['lpn_tool_labels']='برچسب‌ها';
 $ec_lang['lpn_labels_heading_node']='برچسب‌های گره';
 $ec_lang['lpn_labels_heading_link']='برچسب‌های اتصال';
 $ec_lang['lpn_labels_decimals_tip']='تعداد ارقام اعشار نشان‌داده‌شده برای این برچسب';
 $ec_lang['lpn_labels_mark_extrema']='علامت‌گذاری بیشترین و کمترین مقدار';
+// "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the elements
+// you draw from now on, and this is the way to say "I meant the ones already here". {n} and
+// {skipped} are whole numbers; {prefix} is the text the user typed.
+$ec_lang['lpn_settings_apply_to_all']='اعمال بر همه';
+$ec_lang['lpn_settings_apply_to_all_tip']='هر المان از این نوع که از قبل رسم شده، شناسه‌ای می‌گیرد که با این متن شروع می‌شود. هر یک شمارهٔ خودش را نگه می‌دارد. شناسه‌ای که به عددی ختم نشود دست‌نخورده می‌ماند.';
+$ec_lang['lpn_confirm_apply_prefix']='{n} المان تغییر نام یابد تا شناسهٔ آن‌ها با {prefix} شروع شود؟ هر یک شمارهٔ خودش را نگه می‌دارد.';
+$ec_lang['lpn_prefix_applied']='{n} المان تغییر نام یافت. {skipped} مورد دیگر دست‌نخورده ماند.';
+$ec_lang['lpn_labels_prefix_tip']='متنی که پیش از این مقدار روی نقشه نشان داده می‌شود';
+$ec_lang['lpn_labels_prefix_id_tip']='متنی که پیش از شناسه روی نقشه نشان داده می‌شود. این را خالی بگذارید تا شناسه به‌تنهایی، با همان حرفی که به آن داده شده، مانند J1 یا L1، نشان داده شود.';
+$ec_lang['lpn_labels_suffix_tip']='متنی که پس از این مقدار روی نقشه نشان داده می‌شود';
+$ec_lang['lpn_labels_suffix_gradient_tip']='متنی که پس از گرادیان افت هد روی نقشه نشان داده می‌شود. علامت درصد را اینجا ننویسید. وقتی واحد درصد باشد، خودش اضافه می‌شود.';
+$ec_lang['lpn_labels_separator']='متن میان مقادیر';
+$ec_lang['lpn_labels_separator_tip']='متن میان یک مقدار و مقدار بعدی در یک برچسب. به‌طور پیش‌فرض یک فاصله.';
+// The priority column in the Labels box (ROADMAP Task 397). Both tips say "1 matters most", because
+// that one sentence is what the two columns share; what differs is WHAT the number orders, and each
+// tip says which. Kept plain and short: these sit on a small box in a crowded row.
+$ec_lang['lpn_labels_priority']='اولویت';
+$ec_lang['lpn_labels_priority_link_tip']='ترتیب حذف مقادیر هنگامی که برچسب جا نمی‌شود. عدد 1 بیشترین مدت نگه داشته می‌شود.';
+// NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
+// learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
+// value and this box is on a node row, so it reads as demand here.
+$ec_lang['lpn_labels_priority_node_tip']='اولویت برای تصمیم‌گیری اینکه وقتی نقشه شلوغ است برچسب کدام گره نخست حذف شود: کمترین مصرف، فشاری که به میانهٔ بازه نزدیک‌تر است، یا تراز یا هدی که به گره‌های همسایه نزدیک‌تر است. عدد 1 نخست تصمیم‌گیری می‌کند.';
+// Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
+// the row's own field name is the wide column beside them.
+$ec_lang['lpn_labels_col_before']='پیش';
+$ec_lang['lpn_labels_col_after']='پس';
+$ec_lang['lpn_labels_col_decimals']='اعشار';
 $ec_lang['lpn_field_id']='شناسه';
 $ec_lang['lpn_backdrop_menu']='تصویر پس‌زمینه…';
 $ec_lang['lpn_backdrop_add']='افزودن';
-// Bare imperative-noun verbs (RESYNC 2026-08-13): the toolbar now prints "Background image…" as a
-// heading directly above these commands, so the object no longer needs repeating in each label.
-// The former "Scale image" / "Position image" naming (Tom, 2026-08-04) is superseded by that
-// heading change; matches the other bare-verb siblings (افزودن / جابه‌جایی / حذف).
+// BARE VERBS, and they are only correct because BOTH doors now print a "Background image" heading
+// over them (backdropRows() in js/looped-network.js). The 2026-08-04 ruling that made these
+// "Scale image"/"Position image" was right about the defect -- a bare verb orphans in the Insert
+// menu, where nothing above it says what is being scaled -- and wrong about the cheapest fix: the
+// object belongs in ONE heading, not repeated in five labels. Never restore a bare verb here
+// without checking the heading is still rendered.
+// Two ways to set the same number, so both say which one they are (Task 276). Picking is the coarse
+// step -- Tom, 2026-08-10: "mouse (and hand!!!) picking is never precise" -- and the other is the
+// correction. The second label NAMES the World File rather than saying "by typing", because the
+// World File was "hidden and hard to discover" (Tom, 2026-08-13) and a menu is where it gets found.
+// "The size of one pixel ON THE MAP", in all three, and NOT "pixel size" (Task 297 Wave 0). "Pixel
+// size" reads just as easily as the image's pixel DIMENSIONS -- a property of the file -- as it does
+// the distance one pixel covers, which is the only thing the code wants. Tom, 2026-08-13, chose the
+// qualifier: "'map' is better than real world or real" -- the reader is looking at a map, so the
+// frame they are being asked about is the one already in front of them.
+// The longer label costs nothing since Task 276 made this control a menu button rather than a
+// <select>, so a row label no longer sets the collapsed width.
+// "world file" stays LOWERCASE. Title Case reads as a brand and invites a translator to leave it in
+// English; the concept carries its own glossary.json entry instead.
+//
+// There are NO lpn_backdrop_wld_ask/_none/_choose keys (Tom, 2026-08-13): "We don't ask for world
+// file... We ask for a paste of World File contents." The dialog that opened a second file picker is
+// gone; the two doors that remain both take the CONTENTS -- the multi-select picker and the textarea
+// behind lpn_backdrop_scale_entry. Do not re-add an ask.
 $ec_lang['lpn_backdrop_scale']='مقیاس‌گذاری با انتخاب';
 $ec_lang['lpn_backdrop_scale_entry']='مقیاس‌گذاری با فایل مرجع‌گذاری یا اندازه هر پیکسل روی نقشه';
+// Scale FROM CURRENT, about a picked point (Tom, 2026-08-16). The relative sibling of the two
+// absolute scale commands above: it changes the size by a factor and holds one point still, which
+// is what the last stage of fitting an aerial photograph actually needs.
+$ec_lang['lpn_backdrop_scale_from']='مقیاس‌گذاری از اندازهٔ فعلی، حول نقطه‌ای که انتخاب می‌کنید';
+$ec_lang['lpn_backdrop_scale_from_prompt1']='نقطه‌ای از تصویر پس‌زمینه را کلیک کنید که باید همان‌جا بماند.';
+$ec_lang['lpn_backdrop_scale_from_prompt2']='از اندازهٔ فعلی مقیاس‌گذاری کنید. عدد 1 اندازه را همان نگه می‌دارد، 1.1 آن را 10% بزرگ‌تر می‌کند، 0.9 آن را 10% کوچک‌تر می‌کند.';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='اندازه یک پیکسل روی نقشه را وارد کنید، یا کل محتوای فایل مرجع‌گذاری تصویر را اینجا جای‌گذاری کنید';
 $ec_lang['lpn_backdrop_scale_entry_bad']='یک عدد برای اندازه یک پیکسل روی نقشه تایپ کنید، یا هر شش خط یک فایل مرجع‌گذاری را جای‌گذاری کنید.';
 $ec_lang['lpn_backdrop_wld_bad']='این فایل مرجع‌گذاری، تصویر را می‌چرخاند، آینه می‌کند یا به‌طور نامتقارن می‌کشد. نقشه فقط می‌تواند تصویر را جابه‌جا کند و آن را به یک نسبت یکسان در هر دو جهت تغییر اندازه دهد، بنابراین این فایل استفاده نشد.';
@@ -1032,8 +1251,15 @@ $ec_lang['lpn_backdrop_remove']='حذف';
 $ec_lang['lpn_backdrop_remove_confirm']='تصویر پس‌زمینه حذف شود؟';
 $ec_lang['lpn_backdrop_scale_prompt1']='دو نقطه را روی تصویر پس‌زمینه کلیک کنید، مانند دو سر یک مقیاس خط‌کشی. سپس فاصله واقعی میان آن‌ها را تایپ کنید.';
 $ec_lang['lpn_backdrop_scale_prompt2']='فاصله واقعی میان دو نقطه';
-$ec_lang['lpn_backdrop_position_prompt1']='هر نقطه‌ای را روی تصویر پس‌زمینه کلیک کنید. این همان نقطه‌ای است که جابه‌جا خواهید کرد.';
-$ec_lang['lpn_backdrop_position_prompt2']='انتخاب کنید آن نقطه کجا برود، سپس ادامه را کلیک کنید.';
+// Tom's own wording, 2026-08-16. "Base point" is the drafting term and it is what the second step
+// then has a destination FOR; "any point on the background image" did not say that the two steps are
+// one move. The second names the panel it is about to show, so the alert and the panel read as one
+// step rather than two.
+$ec_lang['lpn_backdrop_position_prompt1']='نقطهٔ مبنا (روی تصویر) را برای جابه‌جایی کلیک کنید.';
+$ec_lang['lpn_backdrop_position_prompt2']='روشی برای نقطهٔ مقصد انتخاب کنید، سپس ادامه را کلیک کنید.';
+// The standing "you are in the middle of something" bar, shown while a background-image scale or
+// move is waiting for a click. It carries the only visible way out of that state.
+$ec_lang['lpn_backdrop_busy']='در حال تنظیم تصویر پس‌زمینه.';
 $ec_lang['lpn_backdrop_target_label']='آن نقطه را به اینجا ببر:';
 $ec_lang['lpn_backdrop_target_node']='یک گره';
 $ec_lang['lpn_backdrop_target_free']='هر نقطه‌ای روی نقشه';
@@ -1056,80 +1282,25 @@ $ec_lang['lpn_push_elements']='گره‌ها و لوله‌ها:';
 $ec_lang['lpn_push_none_displayed']='اکنون هیچ مقدار آغازینی به‌صورت برچسب نمایش داده نمی‌شود، پس چیزی برای اعمال نیست. برچسب‌های ویژگی‌های دلخواه را در پنل برچسب‌ها روشن کنید، سپس دوباره تلاش کنید.';
 $ec_lang['lpn_push_nothing']='هیچ المان موجودی هیچ‌کدام از این ویژگی‌ها را ندارد.';
 $ec_lang['lpn_push_no_change']='همه المان‌ها از قبل این مقادیر را دارند، پس چیزی تغییر نمی‌کند.';
-$ec_lang['lpn_settings_emitter_exponent']='توان آب‌پاش';
-// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
-// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
-$ec_lang['lpn_settings_computation']='محاسبه';
-$ec_lang['lpn_settings_tolerance']='حد همگرایی';
-$ec_lang['lpn_settings_tolerance_tip']='حل‌کننده باید تا چه حد نزدیک شود تا متوقف شود. عدد کوچک‌تر دقیق‌تر است و زمان بیشتری می‌برد.';
-$ec_lang['lpn_settings_engine_epanet']='حل با حل‌کننده EPANET';
-$ec_lang['lpn_settings_engine_epanet_tip']='حل‌کننده EPANET از آژانس حفاظت محیط‌زیست آمریکا (US EPA) را همین‌جا در مرورگرتان اجرا می‌کند. حل‌کننده داخلی همان پاسخ‌ها را می‌دهد و سریع‌تر است، پس این را خاموش نگه دارید مگر آنکه خود EPANET را نیاز داشته باشید.';
-$ec_lang['lpn_engine_loading']='در حال بارگذاری حل‌کننده EPANET…';
-$ec_lang['lpn_engine_failed']='حل‌کننده EPANET بارگذاری نشد. به‌جای آن حل‌کننده داخلی نمایش داده می‌شود.';
-$ec_lang['lpn_engine_manning_note']='توجه: با زبری مانینگ، EPANET افت هد را حدود ۰٫۶ درصد کمتر از حل‌کننده داخلی محاسبه می‌کند.';
-$ec_lang['lpn_settings_text_size']='اندازه متن';
-// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
-// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
-// everything on the map is and symbols follow the text into map-vs-screen units automatically.
-$ec_lang['lpn_settings_symbol_size']='اندازه نماد (نسبت به متن)';
-// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
-// through the network while you place nodes on top of it (Tom, 2026-07-30).
-$ec_lang['lpn_settings_symbol_opacity']='تیرگی نماد (۰ تا ۱)';
-// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
-// network drawn over it (Tom, 2026-07-30).
-$ec_lang['lpn_settings_backdrop_opacity']='تیرگی تصویر پس‌زمینه (۰ تا ۱)';
-$ec_lang['lpn_settings_map_display']='ظاهر نقشه';
-$ec_lang['lpn_settings_map_height_px']='ارتفاع نقشه (پیکسل صفحه)';
-// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
-// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
-$ec_lang['lpn_settings_map_height_tip']='در صفحه‌های کوچک، نقشه کوتاه‌تر از این کشیده می‌شود، تا همیشه بخشی از صفحه برای پیمایش بماند.';
-$ec_lang['lpn_settings_legend_position']='جای‌گاه راهنمای نقشه';
-$ec_lang['lpn_settings_legend_top_left']='بالا چپ';
-$ec_lang['lpn_settings_legend_top_right']='بالا راست';
-$ec_lang['lpn_settings_legend_middle_left']='وسط چپ';
-$ec_lang['lpn_settings_legend_middle_right']='وسط راست';
-$ec_lang['lpn_settings_legend_bottom_left']='پایین چپ';
-$ec_lang['lpn_settings_legend_bottom_right']='پایین راست';
-$ec_lang['lpn_confirm_restore_defaults']='همه تنظیمات (پیشوندهای شناسه، مقادیر آغازین، تنظیمات حل‌کننده، ظاهر نقشه، جای‌گاه راهنما، و برچسب‌های نمایان) به مقادیر اصلی خود بازنشانی شوند؟ شبکه شما تغییری نمی‌کند. تنظیمات متعلق به پروژه باز است، پس پروژه‌های دیگرتان تنظیمات خودشان را نگه می‌دارند.';
-$ec_lang['lpn_settings_wipe_btn']='پاک کردن همه‌چیز در این صفحه';
-$ec_lang['lpn_confirm_wipe']='همه‌چیز ذخیره‌شده برای این صفحه — هر پروژه، هر تصویر پس‌زمینه، همه تنظیمات، و انتخاب واحدهایتان — حذف شود و صفحه دوباره طوری بارگذاری شود که انگار یک بازدیدکننده کاملاً تازه است؟ این کار قابل بازگشت نیست.';
-$ec_lang['lpn_tool_add_tank']='تانک';
-$ec_lang['lpn_tool_add_valve']='شیر';
-$ec_lang['lpn_tank_elev_tip']='تراز کف تانک. عمق‌های آب در تانک از همین‌جا به‌بالا اندازه‌گیری می‌شوند.';
-$ec_lang['lpn_field_tank_level']='عمق آب';
-$ec_lang['lpn_field_tank_level_tip']='عمق آب ایستاده در تانک، اندازه‌گیری‌شده از کف تانک به‌بالا. سطح آب برابر است با تراز کف تانک به‌علاوه این عمق.';
-$ec_lang['lpn_field_tank_minlevel']='کمترین عمق آب';
-$ec_lang['lpn_field_tank_minlevel_tip']='عمق آبی که در آن تانک خالی در نظر گرفته می‌شود، اندازه‌گیری‌شده از کف تانک به‌بالا.';
-$ec_lang['lpn_field_tank_maxlevel']='بیشترین عمق آب';
-$ec_lang['lpn_field_tank_maxlevel_tip']='عمق آبی که در آن تانک پر در نظر گرفته می‌شود، اندازه‌گیری‌شده از کف تانک به‌بالا.';
-$ec_lang['lpn_field_tank_diameter']='قطر تانک';
-$ec_lang['lpn_field_tank_diameter_tip']='عرض تانک از یک طرف تا طرف دیگر. واحد آن مانند واحد تراز است، نه واحد قطر لوله. همین مقدار تعیین می‌کند که هر عمق مشخص چقدر آب در خود جای می‌دهد.';
-$ec_lang['lpn_tank_head_tip']='تراز سطح آب در تانک: تراز کف تانک به‌علاوه عمق آب. این همان تراز است که حل‌کننده برای تانک به‌کار می‌برد.';
-$ec_lang['lpn_inp_drop_tank_curve']='این تانک‌ها دیواره‌های صاف ندارند: فایل شکل آن‌ها را به‌صورت یک منحنی می‌دهد. آن‌ها به‌صورت تانک‌های گرد وارد شدند، هر یک با قطری که در فایل نوشته شده. سطح آب هنوز همان است که فایل تعیین می‌کند، پس پاسخ‌ها مطابقت دارند؛ فقط شکل ساده‌سازی شده است.';
-$ec_lang['lpn_inp_drop_valve_active']='این شیرها فشار یا دبی را کنترل می‌کنند، و با تغییر آب خودشان باز و بسته می‌شوند. هیچ‌چیز از آن‌ها در هنگام ورود از دست نرفت، و این صفحه آن‌ها را با حل‌کننده EPANET حل می‌کند، و همین حل‌کننده را به‌طور خودکار برای این شبکه روشن می‌کند.';
-$ec_lang['lpn_diag_valve_needs_epanet']='این شیرها خودشان باز و بسته می‌شوند، و فقط حل‌کننده EPANET می‌تواند آن‌ها را محاسبه کند. حل‌کننده EPANET بارگذاری نشد، پس این نتایج موجود نیستند:';
-$ec_lang['lpn_diag_valve_on_fixed_head']='این شیرها مستقیم به یک مخزن یا تانک وصل شده‌اند، که تراز آب را در آنجا از پیش تعیین کرده است، پس چیزی برای کنترل شیر باقی نمی‌ماند. یک لوله کوتاه بین شیر و مخزن یا تانک بگذارید:';
-$ec_lang['lpn_field_valve_type']='نوع شیر';
-$ec_lang['lpn_field_valve_type_tip']='شیر چه کاری انجام می‌دهد. شیر خفه‌کننده یک افت ثابت را حفظ می‌کند. سه نوع دیگر یک فشار یا یک دبی را حفظ می‌کنند، و با تغییر آب کاملاً باز می‌شوند، بسته می‌شوند، یا نیمه‌باز می‌مانند. تغییر نوع، عدد تنظیم زیر را از نو آغاز می‌کند، زیرا فشار همان دبی نیست و هیچ‌کدام ضریب افت نیستند.';
-$ec_lang['lpn_valve_type_tcv']='خفه‌کننده (TCV)';
-$ec_lang['lpn_valve_type_prv']='کاهنده فشار (PRV)';
-$ec_lang['lpn_valve_type_psv']='نگهدارنده فشار (PSV)';
-$ec_lang['lpn_valve_type_fcv']='کنترل دبی (FCV)';
-$ec_lang['lpn_field_valve_setting_pressure']='تنظیم فشار';
-$ec_lang['lpn_field_valve_setting_pressure_tip']='فشاری که شیر حفظ می‌کند. شیر کاهنده فشار، فشار سمت پایین‌دست خود را در این مقدار یا کمتر نگه می‌دارد. شیر نگهدارنده فشار، فشار سمت بالادست خود را در این مقدار یا بیشتر نگه می‌دارد.';
-$ec_lang['lpn_field_valve_setting_flow']='تنظیم دبی';
-$ec_lang['lpn_field_valve_setting_flow_tip']='بیشترین آبی که شیر عبور می‌دهد. وقتی آب کمتر از این مقدار بخواهد عبور کند، شیر کاملاً باز می‌ماند و هیچ افتی اضافه نمی‌کند.';
-$ec_lang['lpn_field_valve_setting_loss']='ضریب افت';
-$ec_lang['lpn_field_valve_setting_loss_tip']='شیر خفه‌کننده چه مقدار هد را حذف می‌کند، به‌صورت مضربی از هد سرعت. برای شیری که کاملاً باز است، ۰ را وارد کنید. همین یک عدد، کل افت یک شیر خفه‌کننده را بیان می‌کند.';
-$ec_lang['lpn_field_valve_diameter_tip']='عرض روزنه عبور آب از شیر. سرعت آب عبوری از شیر از روی همین عرض محاسبه می‌شود، و افت از همان سرعت به‌دست می‌آید.';
-$ec_lang['lpn_field_valve_km_tip']='افت ناشی از بدنه شیر، هنگامی که شیر کاملاً باز است، علاوه بر هرچه تنظیم شیر حذف می‌کند. این افت به‌صورت مضربی از هد سرعت شمرده می‌شود. برای نادیده گرفتن آن، ۰ را وارد کنید.';
-$ec_lang['lpn_mode_add_tank']='حالت: افزودن تانک. برای گذاشتن یک تانک، نقشه را کلیک کنید. برای تغییر یا جابه‌جایی المان‌ها و برچسب‌ها، به حالت انتخاب بروید.';
-$ec_lang['lpn_mode_add_valve']='حالت: افزودن شیر. یک گره و سپس گره دیگر را کلیک کنید تا به هم وصل شوند. برای تغییر یا جابه‌جایی المان‌ها و برچسب‌ها، به حالت انتخاب بروید.';
-$ec_lang['lpn_method_switch_confirm']='تغییر روش اصطکاک، اعداد زبری را که پیش‌تر روی لوله‌های شما تایپ شده‌اند تغییر نمی‌دهد، و زبری یک روش برای روش دیگر بی‌معنی است. پس از این کار، هر لوله را بررسی کنید. با این حال تغییر داده شود؟';
-$ec_lang['lpn_field_closed']='بسته';
-$ec_lang['lpn_field_closed_tip']='این لوله را ببندید تا هیچ آبی از آن عبور نکند. لوله روی نقشه باقی می‌ماند و همه اعدادش را نگه می‌دارد، و می‌توانید هر زمان دوباره آن را باز کنید.';
+// ---- Scenarios (ROADMAP Task 184) ----
+// A project holds one drawing and a list of scenarios. Base is the drawing itself; every other
+// scenario is nothing but a set of values of its own, laid over Base.
+// "Own values", not "overrides": the readout sits in an 11px status strip beside the units, and the
+// question it answers is how much of this scenario is its own rather than inherited.
 $ec_lang['lpn_scenario_label']='سناریو';
 $ec_lang['lpn_scenario_base']='پایه';
+// "Custom", not "Own" (Tom, 2026-08-14: *"I love 'custom'. 'Changed' is a little dangerous."*),
+// and the reason is a TRANSLATION reason rather than an English one -- which is why it is worth
+// a comment. "Own values" calques directly onto the standard term for EIGENVALUES in most of
+// Europe: es valores propios, pt valores proprios, de Eigenwerte, cs vlastni hodnota, hr vlastita
+// vrijednost, bg/ru/sr sobstveni. Ten languages in sprint 316 had to detect and route around that
+// independently, and three of them, forced off the calque, landed on "CHANGED values" -- which is
+// FALSE here, because a scenario's custom value may be identical to Base's (see
+// lpn_scenario_override_tip, and the assertion in dev/lpn-spike/scenario-harness.js).
+// "Custom" has no calque path into mathematics in any of them, so the trap does not exist to be
+// routed around, and it says ownership without implying difference. Seven languages had already
+// chosen exactly this family unprompted (fr personnalisees, it personalizzati, es exclusivos,
+// pt individuais, ar mukhassasa, fa ekhtesasi, ro specifice).
 $ec_lang['lpn_scenario_overrides']='مقادیر اختصاصی';
 $ec_lang['lpn_scenario_tip']='مجموعه مقادیری که ترسیم اکنون نشان می‌دهد و صفحه اکنون حل می‌کند. برای تعویض سناریوها، یا افزودن، تغییر نام، یا حذف یکی از آن‌ها، کلیک کنید.';
 $ec_lang['lpn_scenario_new']='سناریوی جدید…';
@@ -1140,7 +1311,12 @@ $ec_lang['lpn_scenario_delete']='حذف سناریو';
 $ec_lang['lpn_scenario_delete_confirm']='سناریوی {name} و {n} مقداری که تنها به آن تعلق دارند حذف شوند؟ خود ترسیم تغییر نمی‌کند.';
 $ec_lang['lpn_scenario_override']='فقط در این سناریو';
 $ec_lang['lpn_scenario_override_tip']='علامت‌دار بودن یعنی این مقدار تنها به این سناریو تعلق دارد، حتی اگر با عدد پایه یکسان باشد. برای استفاده دوباره از مقدار پایه، علامت را بردارید.';
-$ec_lang['lpn_scenario_base_value']='پایه: {value}';
+// "Base scenario", not bare "Base" -- an ENGLISH fix, so this needs no _syn either. This is the one
+// place the polysemy genuinely bites: here the word sits beside a NUMBER, in a field popup with no
+// scenario dropdown nearby to frame it, which is exactly the reading that invites "base amount".
+// The dropdown keeps the short name (lpn_scenario_base); only the exposed use is disambiguated.
+// Same label-versus-sentence distinction that decided the eigenvalue fixes in sprint 316.
+$ec_lang['lpn_scenario_base_value']='سناریوی پایه: {value}';
 $ec_lang['lpn_scenario_deactivated']='{id} در {scenario} از شبکه خارج است. هنوز در ترسیم، و در سایر سناریوهای شما هست.';
 $ec_lang['lpn_scenario_push_btn']='اعمال مقادیر پایه به همه سناریوها';
 $ec_lang['lpn_scenario_push_tip']='هر سناریو برای ویژگی‌هایی که برچسب‌هایشان اکنون نمایان است، به مقدار پایه بازمی‌گردد. مقادیری که تنها به آن سناریوها تعلق دارند دور ریخته می‌شوند.';
@@ -1152,4 +1328,87 @@ $ec_lang['lpn_delete_drops_overrides']='حذف این المان همچنین {n
 $ec_lang['lpn_push_base_only']='این عمل خود ترسیم را تغییر می‌دهد، پس فقط در {base} قابل انجام است. به {base} بروید و دوباره تلاش کنید.';
 $ec_lang['lpn_field_active']='بخشی از این شبکه';
 $ec_lang['lpn_field_active_tip']='برای این‌که المان روی ترسیم بماند ولی از شبکه خارج شود، این جعبه را خالی کنید: با رنگ خاکستری رسم می‌شود و حل‌کننده آن را نادیده می‌گیرد. در یک سناریو، به همین شکل یک لوله پیشنهادی روشن و خاموش می‌شود.';
+$ec_lang['lpn_settings_emitter_exponent']='توان آب‌پاش';
+// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
+// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
+$ec_lang['lpn_settings_computation']='محاسبه';
+$ec_lang['lpn_settings_tolerance']='حد همگرایی';
+$ec_lang['lpn_settings_tolerance_tip']='حل‌کننده باید تا چه حد نزدیک شود تا متوقف شود. عدد کوچک‌تر دقیق‌تر است و زمان بیشتری می‌برد.';
+$ec_lang['lpn_settings_engine_epanet']='حل با حل‌کننده EPANET';
+// "IS FASTER" WAS FALSE AND IS GONE (Tom, 2026-08-14: *"is our tip about 'faster' right? I
+// thought you proved that it's too close to call."* He is right, and it was my own measurement
+// that showed it). Task 313 timed both: at this page's 10-20 node target the built-in solver is
+// 0.30 ms against EPANET's 0.41 ms -- the same number to a person -- and at 201 nodes EPANET is
+// TEN TIMES faster, because ours is a dense O(n^3) Cholesky and EPANET is sparse. So the honest
+// trade is not speed at all: it is the one-time download, which is the thing a visitor on a slow
+// connection actually pays.
+$ec_lang['lpn_settings_engine_epanet_tip']='حل‌کنندهٔ EPANET را از آژانس حفاظت محیط‌زیست آمریکا (US EPA)، همین‌جا در مرورگرتان اجرا می‌کند. هر دو حل‌کننده پاسخ‌های یکسانی می‌دهند و در شبکه‌ای به این اندازه تفاوت سرعتی احساس نخواهید کرد. نخستین باری که این را روشن می‌کنید، حدود 650 کیلوبایت دانلود شده و سپس روی این دستگاه نگه داشته می‌شود.';
+$ec_lang['lpn_engine_loading']='در حال بارگذاری حل‌کننده EPANET…';
+$ec_lang['lpn_engine_failed']='حل‌کننده EPANET بارگذاری نشد. به‌جای آن حل‌کننده داخلی نمایش داده می‌شود.';
+// Said out loud, never silently: the user picked the built-in solver and this network was sent to
+// the EPANET solver anyway, because it holds a valve the built-in solver does not work out. The
+// setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_engine_valve_route']='با حل‌کننده EPANET حل شد، زیرا این شیرها خودشان باز و بسته می‌شوند:';
+$ec_lang['lpn_unit_unknown']='این ترسیم واحدی را بیان می‌کند که این صفحه ارائه نمی‌دهد: {unit}. همه‌چیز دقیقاً همان‌گونه که وارد شده نگه داشته و نشان داده می‌شود و چیزی تغییر نکرده است. تا وقتی این صفحه آن واحد را نشناسد، پاسخی داده نمی‌شود، زیرا راهی برای دانستن بزرگی آن وجود ندارد.';
+$ec_lang['lpn_engine_manning_note']='توجه: با زبری مانینگ، EPANET افت هد را حدود ۰٫۶ درصد کمتر از حل‌کننده داخلی محاسبه می‌کند.';
+$ec_lang['lpn_settings_text_size']='اندازهٔ متن (پیکسل)';
+// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
+// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
+// everything on the map is and symbols follow the text into map-vs-screen units automatically.
+$ec_lang['lpn_settings_symbol_size']='اندازهٔ نماد (پیکسل)';
+$ec_lang['lpn_settings_link_width']='ضخامت خط لوله (پیکسل)';
+$ec_lang['lpn_settings_align_labels']='هم‌راستاسازی برچسب‌های لوله با لوله‌ها';
+$ec_lang['lpn_settings_readability_bias']='درجه‌های چپِ عمود پیش از آنکه برچسب برگردانده شود';
+$ec_lang['lpn_settings_mask_labels']='پس‌زمینهٔ توپر پشت برچسب‌ها';
+$ec_lang['lpn_settings_label_max_width']='وقتی نما از این باریک‌تر است برچسب‌ها را نشان بده (واحد نقشه)';
+$ec_lang['lpn_settings_label_use_view']='استفاده از نمای فعلی';
+$ec_lang['lpn_settings_label_always']='همیشه برچسب‌ها را نشان بده';
+// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
+// through the network while you place nodes on top of it (Tom, 2026-07-30).
+$ec_lang['lpn_settings_symbol_opacity']='تیرگی نماد (۰ تا ۱)';
+// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
+// network drawn over it (Tom, 2026-07-30).
+$ec_lang['lpn_settings_backdrop_opacity']='تیرگی تصویر پس‌زمینه (۰ تا ۱)';
+$ec_lang['lpn_settings_map_display']='ظاهر نقشه';
+// PARKED 2026-08-14, not deleted. The "Map height" settings row was removed when the map learned
+// to fill the window by itself (Tom: "So Map height is now obsolete. Right?" -- yes; see
+// LPN_MAP_MIN in js/looped-network.js). Nothing renders these two keys now, so key_hygiene_check
+// will list them; that is expected and they are kept on purpose, because restoring a settings row
+// is cheap and recovering 27 translations is not.
+//
+// **IF THE ROW EVER COMES BACK, REWRITE THE TIP FIRST -- it is now FALSE in all 27 languages.** It
+// promises "part of the page is always left to scroll", which is the exact behaviour the fit-the-
+// window change removed. Reusing it as-is would ship a confident wrong explanation everywhere at
+// once, which is worse than having no tip at all.
+$ec_lang['lpn_settings_map_height_px']='ارتفاع نقشه (پیکسل صفحه)';
+// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
+// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
+$ec_lang['lpn_settings_map_height_tip']='در صفحه‌های کوچک، نقشه کوتاه‌تر از این کشیده می‌شود، تا همیشه بخشی از صفحه برای پیمایش بماند.';
+$ec_lang['lpn_settings_legend_position']='جای‌گاه راهنمای نقشه';
+$ec_lang['lpn_settings_legend_top_left']='بالا چپ';
+$ec_lang['lpn_settings_legend_top_right']='بالا راست';
+$ec_lang['lpn_settings_legend_middle_left']='وسط چپ';
+$ec_lang['lpn_settings_legend_middle_right']='وسط راست';
+$ec_lang['lpn_settings_legend_bottom_left']='پایین چپ';
+$ec_lang['lpn_settings_legend_bottom_right']='پایین راست';
+$ec_lang['lpn_settings_colors']='رنگ بر اساس مقدار';
+$ec_lang['lpn_settings_color_node_field']='رنگ گره';
+$ec_lang['lpn_settings_color_link_field']='رنگ لوله';
+$ec_lang['lpn_settings_color_ramp']='طرح رنگ';
+$ec_lang['lpn_color_ramp_epanet']='آبی به قرمز (EPANET)';
+$ec_lang['lpn_color_ramp_viridis']='بنفش به زرد (تشخیص آسان‌تر رنگ‌ها از یکدیگر)';
+$ec_lang['lpn_color_ramp_gray']='خاکستری روشن به تیره';
+$ec_lang['lpn_settings_color_reverse']='برعکس کردن ترتیب رنگ‌ها';
+$ec_lang['lpn_color_none']='بدون رنگ';
+$ec_lang['lpn_settings_color_thematic']='نقشهٔ موضوعی: فقط رنگ، بدون برچسب';
+$ec_lang['lpn_settings_color_thematic_tip']='همهٔ برچسب‌ها را پنهان می‌کند تا فقط رنگ‌ها روی نقشه بمانند. انتخاب‌های برچسب شما نگه داشته می‌شوند و با خاموش کردن این گزینه، بازمی‌گردند.';
+$ec_lang['lpn_settings_color_key_position']='موقعیت راهنمای رنگ';
+$ec_lang['lpn_settings_color_breaks']='حدود باندهای رنگ';
+$ec_lang['lpn_settings_color_breaks_note']='این‌ها را خالی بگذارید تا رنگ‌ها بر اساس مقادیر موجود روی نقشه پخش شوند. عدد وارد کنید، یا یکی از دکمه‌های زیر را بزنید، تا همیشه یک عدد به یک رنگ یکسان باشد.';
+$ec_lang['lpn_settings_color_equal_intervals']='بازه‌های مساوی';
+$ec_lang['lpn_settings_color_equal_counts']='شمار مساوی';
+$ec_lang['lpn_settings_color_auto']='خودکار';
+$ec_lang['lpn_settings_color_no_values']='هنوز مقداری برای کار وجود ندارد. ابتدا شبکه را حل کنید.';
+$ec_lang['lpn_confirm_restore_defaults']='همه تنظیمات (پیشوندهای شناسه، مقادیر آغازین، تنظیمات حل‌کننده، ظاهر نقشه، جای‌گاه راهنما، و برچسب‌های نمایان) به مقادیر اصلی خود بازنشانی شوند؟ شبکه شما تغییری نمی‌کند. تنظیمات متعلق به پروژه باز است، پس پروژه‌های دیگرتان تنظیمات خودشان را نگه می‌دارند.';
+$ec_lang['lpn_settings_wipe_btn']='پاک کردن همه‌چیز در این صفحه';
+$ec_lang['lpn_confirm_wipe']='همه‌چیز ذخیره‌شده برای این صفحه — هر پروژه، هر تصویر پس‌زمینه، همه تنظیمات، و انتخاب واحدهایتان — حذف شود و صفحه دوباره طوری بارگذاری شود که انگار یک بازدیدکننده کاملاً تازه است؟ این کار قابل بازگشت نیست.';
