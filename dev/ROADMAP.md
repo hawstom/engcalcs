@@ -346,16 +346,21 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - The structural fix is to derive the drop-relevant obstacle set from `linkLabelStations()` (the
     full list, bounded) rather than the drawn one. Measure first; the count may be zero in practice.
 
-- 45|403| **How often does the conflict shed actually fire on a real drawing? Nobody knows.** Both
-  stopping conditions ship (Task 399), and `?debug=labels` now reports `values shed` — but the
-  headless stub cannot answer the question, because it models text width as characters × a constant
-  and ignores font size entirely, so a label's world width does not shrink when you zoom in. Every
-  absolute rate it reports is fiction; only the ORDER and the MINIMALITY are real there.
-  - Read the bench on Net3 at a few zooms before tuning anything. If it never fires, the candidate
-    knob is the length rule's `room` (a label is allowed the pipe's whole length today, and a label
-    running end to end is already too long); if it fires everywhere, the candidate is the pad.
-  - **Teaching the stub about font size would make the harness able to answer this** and is probably
-    the cheaper fix than another round of guessing.
+- 60|403| **The headless stub does not know that text width follows FONT SIZE, and that gap has now
+  cost three rounds of "the harness passes and the browser does nothing".** `getBBox()` returns
+  characters × a constant, so a label's world width is the same at every zoom — where a real label's
+  font size IS a world quantity (`textSize / state.s`). It removes the entire relationship between a
+  label and the pipe it must fit on, which is the relationship the whole fitting cascade is about.
+  - **Attempted 2026-08-16 and reverted**, because a faithful stub is not a one-liner: font size
+    arrives by three different write paths (the `style` attribute string, `.style.fontSize`, and a
+    bare attribute), and `textContent` in the stub does not clear child tspans the way a real DOM
+    does — so labels were being measured on stale placeholder text. Both are worth fixing; they are
+    a task, not a side quest.
+  - **It exposed a real ordering bug in `drawExampleNetwork()` worth its own look:** the two
+    anchored callouts compute `lb.x` from a width measured BEFORE the final text layout, so with
+    accurate metrics they no longer clear their own nodes. Today's stub hides it by measuring
+    everything too small in the same direction.
+  - Until then, no absolute rate the harness reports is trustworthy — only ORDER and MINIMALITY.
 
 - 60|400| **Phase 3 — bounded local search on the residue.** Wagner & Wolff's three optimum-preserving
   reduction rules on an explicit conflict graph, then a bounded chain search, in QGIS PAL's shape.

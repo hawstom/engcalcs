@@ -650,6 +650,23 @@ var EngCalcs = EngCalcs || {};
 	function keptLines(lines, keep) {
 		return lines.filter(function (line, i) { return keep[i]; });
 	}
+	// **THE SHED STARTS BEFORE THE HIDE DOES, AND WITHOUT THAT GAP THE CASCADE IS INVISIBLE.**
+	//
+	// Tom, twice: *"I cannot detect a single instance of shed. It's always all or nothing."* Read the
+	// two conditions side by side and that is exactly what the code said. The shed fired at
+	// `width > length` and linkLabelTooShort() hides at `length < width` -- **the same comparison**.
+	// So the only band in which a reader could ever SEE a shed was: too wide at N values, narrow
+	// enough at one. On a real drawing a pipe is usually either comfortably long (shows everything)
+	// or hopelessly short (hides), and that band is nearly empty. The cascade could work perfectly
+	// and still never appear.
+	//
+	// So the shed aims at the room a label can actually USE, not at the whole pipe. That number is
+	// not invented for this: linkLabelMid() already clamps a label's station to 0.12-0.88 of the
+	// pipe, so the usable middle is 0.76 of it, and a label wider than that is running under the
+	// symbols at one or both ends whatever station it takes. Hiding stays at the full length, so
+	// there is now a real band -- 76% to 100% of the pipe -- where a label sheds rather than
+	// vanishes, which is the behaviour the cascade was built for.
+	var LPN_LABEL_FIT_FRAC = 0.88 - 0.12;
 	var SHORT_LINE_MULT = 1;
 	function linkLabelTooShort(l, le) {
 		if (!le || le.empty) { return false; }
@@ -14197,7 +14214,7 @@ var EngCalcs = EngCalcs || {};
 			// want that number on the sheet, so the gesture that reveals the intent is one the user
 			// already makes.
 			if (!labelIsDragged(l) && !le.empty && lines.length > 1) {
-				var room = Geom.polylineLength(linkPointList(l)) / SHORT_LINE_MULT,
+				var room = Geom.polylineLength(linkPointList(l)) * LPN_LABEL_FIT_FRAC,
 					order = shedOrder(lines), gone = 0, kept = lines;
 				// Stops at the FIRST content that fits -- a minimal shed. `gone < order.length - 1`
 				// keeps one value alive: dropping the last one is not a shed, it is the hide, and

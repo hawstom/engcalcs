@@ -41,6 +41,7 @@ const L = loadLoopedNetwork(
 	"\t\ttooShort: function (l) { return linkLabelTooShort(l, linkEls[l.id]); },\n" +
 	"\t\tsettings: function () { return settings; },\n" +
 	"\t\tpipeLength: function (l) { return Geom.polylineLength(linkPointList(l)); },\n" +
+	"\t\tfitFrac: function () { return LPN_LABEL_FIT_FRAC; },\n" +
 	"\t\tlabelWidth: function (l) { return labelBoxWidth(linkEls[l.id]); },\n" +
 	"\t\ttspanText: function (id) { return linkEls[id].text.children.map(function (t) { return t.textContent; }); },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
@@ -86,13 +87,18 @@ function setLength(frac) {
 	return fieldsOn(target.id);
 }
 
-// At full length nothing sheds -- the cascade must not fire on a label that already fits.
-eq(setLength(1), READING_ORDER, 'a pipe with room keeps every value');
+// A pipe with room to spare keeps every value -- the cascade must not fire on a label that fits.
+// The baseline is 2x the drawn length, not 1x: since the shed aims at the USABLE middle of a pipe
+// (LPN_LABEL_FIT_FRAC, 0.76) rather than its whole length, a nine-value label on this fixture's
+// as-drawn pipe is already over that line. That is the point of the fraction -- it opens a band
+// between shedding and hiding where a reader can see the cascade at all -- so the "roomy" case has
+// to be genuinely roomy.
+eq(setLength(2), READING_ORDER, 'a pipe with room to spare keeps every value');
 eq(L.linkEls()[target.id].shedCount, 0, 'and reports no shed');
 
 // Squeeze it and watch the cascade. Each step must be a SUBSET of the last: shedding is monotone in
 // room, so a shorter pipe can never bring a value back.
-const steps = [0.6, 0.45, 0.3, 0.2, 0.1];
+const steps = [1.2, 0.9, 0.6, 0.3, 0.1];
 let prev = READING_ORDER;
 const seen = [];
 steps.forEach(function (f) {
@@ -120,8 +126,20 @@ ok(seen[seen.length - 1].fields.length < READING_ORDER.length, 'a short pipe rea
 
 // THE SHED IS MINIMAL: at every step, putting back the best-ranked value that was shed would make
 // the label wider than its pipe. Anything less than that is information given away for free.
-ok(L.labelWidth(target) <= L.pipeLength(target) || L.tooShort(target),
-	'what survives either fits the pipe or has reached the terminal rung');
+ok(L.labelWidth(target) <= L.pipeLength(target) * L.fitFrac() || L.tooShort(target),
+	'what survives either fits the pipe\'s usable middle or has reached the terminal rung');
+
+// **THE SHED FIRES BEFORE THE HIDE DOES, and that gap is the whole reason a reader ever sees one.**
+// While the two thresholds were the same comparison, the only pipes that could show a shed were the
+// ones narrow enough for exactly one value -- which is why Tom could not find a single instance.
+// Asserted as a real band: there must be a length at which the label has shed AND is still drawn.
+let sawVisibleShed = false;
+[1.6, 1.4, 1.2, 1.0, 0.8, 0.6, 0.45, 0.3].forEach(function (f) {
+	setLength(f);
+	const h = L.linkEls()[target.id];
+	if (h.shedCount > 0 && !L.tooShort(target)) { sawVisibleShed = true; }
+});
+ok(sawVisibleShed, 'there is a range of pipe lengths where the label sheds and is still SHOWN');
 
 // THE TERMINAL RUNG. Squeezed far enough, even the single best value cannot fit, and the old
 // all-or-nothing hide takes over -- now as the LAST step of a cascade rather than the only step.
