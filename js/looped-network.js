@@ -656,7 +656,12 @@ var EngCalcs = EngCalcs || {};
 			return { l: l, len: Geom.polylineLength(linkPointList(l)) };
 		}).sort(function (a, b) { return b.len - a.len; }).forEach(function (rec) {
 			var l = rec.l, le = linkEls[l.id];
-			if (!le || le.empty || labelIsDragged(l)) { return; }
+			if (!le) { return; }
+			// Cleared every pass, exactly as the nudge is, so the pass stays idempotent: a label
+			// hidden by one crowded moment must be back in contention the next time, or the drawing
+			// only ever loses labels.
+			le.hiddenCrowded = false;
+			if (le.empty || labelIsDragged(l)) { return; }
 			// Only a label bound to its pipe is in this pass. A free-floating link label is a
 			// participant in the candidate pass and can MOVE, so it has somewhere to go that is not
 			// giving up a number.
@@ -676,8 +681,18 @@ var EngCalcs = EngCalcs || {};
 				renderLinkLabel(le, l, keptLines(all, shedKeepSet(all, order, gone)), fsNow);
 			}
 			le.shedCount = all.length - le.lines.length;
+			// **SHED OUT AND STILL IN THE WAY MEANS HIDE** (Tom, 2026-08-17: *"Fully shedded links
+			// need to hide if they are still in conflict."*). The cascade's last rung was written as
+			// the SHORT-SEGMENT rule alone, so a label that had given up everything but its best
+			// value and still overlapped a neighbour simply stayed there and overlapped it. The
+			// cascade has two entrances and it needs the same exit for both.
+			le.hiddenCrowded = !boxIsClear(boxNow(), obs, pad);
+			// **AND A HIDDEN LABEL IS NOT AN OBSTACLE.** It is not drawn, so reserving its ground
+			// would make the next label shed for something nobody can see -- and on a crowded map
+			// that cascades, each hidden label crowding out the next.
+			if (le.hiddenCrowded) { return; }
 			var b = boxNow();
-			b.kind = 'label'; b.linkOwner = l.id;
+			b.kind = 'label'; b.linkOwner = l.id; b.yields = true;
 			obs.boxes.push(b);
 		});
 	}
@@ -966,7 +981,7 @@ var EngCalcs = EngCalcs || {};
 		var l = linkById(id), le = linkEls[id]; if (!le) { return; }
 		// Set BEFORE anything is placed, so every station obeys it.
 		le.hiddenShort = linkLabelTooShort(l, le);
-		setLabelAssemblyHidden(le, le.hiddenShort);
+		setLabelAssemblyHidden(le, le.hiddenShort || !!le.hiddenCrowded);
 		var single = linkLabelStations(l).length === 1,
 			stations = single ? [le.alignedAlong] : drawnLinkLabelStations(l), i;
 		ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
@@ -1464,7 +1479,16 @@ var EngCalcs = EngCalcs || {};
 			// different pictures and the label count cannot tell them apart.
 			shedVals = doc.links.reduce(function (n, l) {
 				var le = linkEls[l.id]; return n + ((le && le.shedCount) || 0);
-			}, 0);
+			}, 0),
+			// The cascade's two exits, counted apart: a label too long for its own segment even at
+			// one value, and one that fits but has nowhere uncrowded to sit. They look identical on
+			// screen and want completely different fixes.
+			hidShort = doc.links.filter(function (l) {
+				var le = linkEls[l.id]; return le && le.hiddenShort;
+			}).length,
+			hidCrowd = doc.links.filter(function (l) {
+				var le = linkEls[l.id]; return le && le.hiddenCrowded && !le.hiddenShort;
+			}).length;
 		drawCollisionBoxes(boxes, obs, placed.map(function (r) { return r.leader; }).filter(Boolean));
 		if (!debugOn('labels')) { return; }
 		// THE COUNTS, because "that looks better" is not a verdict.
@@ -1492,6 +1516,7 @@ var EngCalcs = EngCalcs || {};
 		if (el2) {
 			var flips = labelFlipCount();
 			el2.textContent = dropped + ' dropped \u2022 ' + shedVals + ' values shed \u2022 '
+				+ hidShort + ' hid (short) \u2022 ' + hidCrowd + ' hid (crowded) \u2022 '
 				+ (flips === null ? '' : flips + ' flips under zoom \u2022 ')
 				+ labels.length + ' labels \u2022 ' + pairs + ' label-on-label \u2022 '
 				+ onLeader + ' label-on-leader \u2022 mean travel '

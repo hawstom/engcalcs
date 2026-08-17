@@ -280,8 +280,20 @@ reduce font → abbreviate → key-number, in the listed order. We have none of 
 is:
 
 ```
-shed trailing values (per §2.2's link order) → drop the label
+shed trailing values (per §2.2's link order) → hide the label
 ```
+
+**THE CASCADE HAS TWO ENTRANCES AND NEEDS THE SAME EXIT FOR BOTH.** A label enters it because it is
+too long for its segment, or because it conflicts with a neighbour — and for a long time only the
+first had a way out. A label that had given up everything but its best value and still overlapped
+something simply stayed there and overlapped it, which is the one outcome the whole pass exists to
+prevent. Tom, 2026-08-17: *"Fully shedded links need to hide if they are still in conflict."* So both
+exits are the hide, and `?debug=labels` counts them separately — they look identical on screen and
+want completely different fixes.
+
+**A hidden label is not an obstacle.** It is not drawn, so reserving its ground would make the next
+label shed for something nobody can see — and on a crowded drawing that cascades, each hidden label
+crowding out the one after it.
 
 **The shed step is our own extension to that cascade, not a cartographic standard.** It is available
 to us because an undragged link label is one inline row, so shedding a value shortens its RUN — the

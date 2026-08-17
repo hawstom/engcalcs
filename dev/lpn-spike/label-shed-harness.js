@@ -225,6 +225,36 @@ const shedNow = doc.links.filter(function (l) {
 });
 ok(shedNow.length > 0, 'two pipes laid alongside each other shed on CONFLICT, at full length');
 
+// **SHED OUT AND STILL IN THE WAY MEANS HIDE.** The cascade has two entrances -- too long for its
+// segment, and in conflict -- and until now only the first had an exit. A label that gave up
+// everything but its best value and STILL overlapped a neighbour simply stayed there and overlapped
+// it, which is the one outcome the whole pass exists to prevent (Tom, 2026-08-17).
+{
+	// THREE coincident pipes, not two, and the reason is a real property rather than a fixture
+	// detail: an aligned label picks a SIDE of its line, so two labels on one line simply sit above
+	// and below it and never conflict at all. The third has nowhere left to go.
+	const third = pipes[2].l;
+	const ta = nodeOf(third.from), tb = nodeOf(third.to);
+	[[ma, mb], [ta, tb]].forEach(function (pair) {
+		pair[0].x = ka.x; pair[0].y = ka.y;
+		pair[1].x = kb.x; pair[1].y = kb.y;
+	});
+	L.refreshLabelText();
+	const three = [keepPipe, movePipe, third].map(function (l) { return L.linkEls()[l.id]; });
+	const hidden = three.filter(function (h) { return h.hiddenCrowded; });
+	ok(hidden.length > 0,
+		'three labels on one line: the one with nowhere left to go hides once it has nothing to shed');
+	hidden.forEach(function (h) {
+		eq(h.lines.length, 1, 'it hid only after shedding down to its single best value');
+	});
+	ok(hidden.length < three.length,
+		'and the ones that DO have a side keep their labels -- hiding is the last rung, not the rule');
+	// A hidden label is not an obstacle: it is not drawn, and reserving its ground would make the
+	// next label shed for something nobody can see.
+	ok(three.filter(function (h) { return !h.hiddenCrowded; }).length >= 2,
+		'the two that fit both keep theirs, so a hidden label crowded nobody out');
+}
+
 // **A LINK LABEL SHEDS FOR A NODE LABEL RATHER THAN BEING HIDDEN WHOLE.** This is the case Tom
 // photographed: long pipe labels lying across the node labels at each end, none of them shedding,
 // and others vanishing entirely. Both symptoms were the same fault -- the shed pass could not see
