@@ -390,21 +390,21 @@ font-size blindness, attempted twice and reverted twice — read its block befor
 
 - 40|411| **Most-open angle: pick each label's home direction from its own surroundings instead of a
   fixed top-right.** Tom's idea, checked against the survey 2026-08-17 —
-  `dev/most-open-angle-brainstorm.md` has the full comparison. Split out of Task 400 because it is
-  **not gated on Phase 3**: it changes Phase 1's `DEFAULT_LABEL_OFFSET`, which is already shipped, so
-  it is a far cheaper experiment than the conflict graph.
+  `dev/most-open-angle-brainstorm.md` has the comparison. Split out of Task 400 because it is **not
+  gated on Phase 3**: it changes Phase 1's `DEFAULT_LABEL_OFFSET`, already shipped.
+  - **SECTORS PRUNE, RASTER REFINES** (Tom's synthesis, 2026-08-17, and the reason this is worth
+    building): score angular sectors first, discard the bad ones, and sample only inside what
+    survives. **A bad sector cannot be escaped by local search** — nudging and chain search move a
+    label within the region it starts in — so raster effort spent in a blocked direction could never
+    have paid.
   - **The part that is ours and not the literature's:** a cartographic point is bare, but every
-    junction already knows the bearing of every pipe meeting it, free. That is why the inherited
-    8-position model is a poor fit here, rather than merely an unexamined default.
+    junction already knows the bearing of every pipe meeting it, free.
   - **Score view-independent obstacles only** — node positions, link vertices, Text *anchors*. A
-    label BOX is 1/zoom wide (the Task 403 fact), so including boxes makes the chosen angle a
-    function of zoom and breaks Been–Daiches–Yap stability.
-  - **Openness picks the sector; Imhof/user preference orders candidates within it.** One score, not
-    one rule, or it will happily choose bottom-left because bottom-left was emptiest.
-  - Tom's grid-of-regions and square-radius shortcut need no research: both are standard (MapLibre's
-    30 px CollisionIndex) and `grid()` in `js/lpn-collide.js` is already that structure.
-  - Open for a build, not more reading: **how many sectors.** Published candidate counts are 8, 6, 4;
-    a continuous angle has no published evaluation for point features.
+    label BOX is 1/zoom wide (the Task 403 fact), so boxes would make the angle a function of zoom.
+  - **Openness wins; Imhof preference breaks a true tie only** (Tom, 2026-08-17: *"if it's emptiest,
+    what else could beat that?"*). The real caution is churn, not direction: use hysteresis so a
+    label does not flip for a hair's difference.
+  - Open for a build, not more reading: **how many sectors.** Published candidate counts are 8, 6, 4.
 
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
   2026-08-14: *"Not mtext labels. Mtext Text objects."* The target is what you place with the Text

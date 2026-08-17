@@ -54,6 +54,28 @@ named and evaluated as such. Tom's specific formulation — combine incident lin
 obstacle bearings inside a per-anchor radius to get a preferred direction — is not in the cited
 literature.
 
+### THE SYNTHESIS, and it is better than either source on its own
+
+Tom, 2026-08-17, on being shown Luboschik's raster method: *"Raster is a viable option for candidate
+generation and selection. But… we know something the general case doesn't know, that angle matters a
+lot here. So whether unrelated candidate obstacles get swept up in our angle determination or not,
+we do need to identify good and bad angular sectors, because no amount of nudging etc will get us
+out of the bad ones, and there's no need to waste time on raster points there either. The combined
+insight/rule may be to spend time only on raster points in good directions/angles."*
+
+**Sectors PRUNE; raster REFINES inside what survives.** The two are a pipeline, not a choice:
+
+1. Score angular sectors at the anchor from incident link bearings and nearby obstacle bearings.
+   Cheap, view-independent, and it is the step that uses what we know and cartography does not.
+2. Discard the bad sectors outright. **A bad sector cannot be escaped by local search** — relaxation,
+   nudging and chain search all move a label *within* the region they start in, so effort spent
+   raster-sampling a blocked direction is effort that could never have paid.
+3. Raster/particle-sample only inside the surviving sectors for the exact position.
+
+This also answers the Task 400 relaxation note properly: a nudge pass is not "of limited value until
+labels start in open territory" — it is **downstream of sector selection by construction**, and the
+sector step is what puts labels in open territory for it.
+
 ### The part that is genuinely ours, and why it is stronger here than in cartography
 
 A cartographic point is **bare**. A network junction is not: every node knows the bearing of every
@@ -76,13 +98,22 @@ under pan and zoom, and Task 400 already names the view-independent conflict gra
   Text *anchors* — not label boxes). Label boxes stay where they belong, in the conflict/collision
   pass downstream.
 
-### Openness alone would fight Imhof, so it picks the sector and preference breaks the tie
+### Openness WINS. Imhof is a tie-break with a small weight, and nothing more
 
-Imhof's TR > R > T > B > L exists for typographic reasons (ascenders read as closer), and arXiv
-2407.11996 measured user preference as T > B > R > TR. A pure openness rule ignores all of that and
-will cheerfully put a label bottom-left because bottom-left happened to be emptiest. The reconcilable
-form — and again it is what Maplex describes — is **openness selects the sector, positional
-preference orders candidates within it**: one score, not one rule.
+An earlier draft of this file argued that a pure openness rule "will cheerfully put a label
+bottom-left because bottom-left happened to be emptiest," as though that were a defect. **Tom,
+2026-08-17: *"I disagree strongly… if it's emptiest, what else could beat that?"* He is right, and
+the earlier framing overstated the case.** Imhof's TR > R > T > B > L and arXiv 2407.11996's
+measured T > B > R > TR describe preference **among positions that are otherwise equally good** —
+they are typographic and habitual, not legibility-critical. An empty direction beats a preferred
+crowded one every time, and no cartographic source claims otherwise.
+
+**The one real caution, and it is NOT about direction preference:** a drawing whose labels sit in
+different directions for reasons a reader cannot see looks arbitrary. That argues for **hysteresis,
+not for a preference weight** — do not flip a label's direction for a hair's difference in openness;
+do flip it for a real one. A visible reason is what makes varied placement read as considered rather
+than random, and "this side was open" is visible. So: **openness decides; preference breaks a true
+tie; a threshold stops churn.**
 
 ### Tom's point 2 needs no research: it is standard, and we already do it
 

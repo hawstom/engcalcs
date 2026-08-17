@@ -4,8 +4,9 @@ Policy for third-party code in EngCalcs. ROADMAP Task 413.
 
 Two JavaScript packages are vendored and shipped; no PHP dependency exists. Adopt `npm` as a
 **development-time acquisition and integrity tool whose committed output is a file in
-`js/vendor/`** — never a runtime resolver, never a bundler. Composer is out of scope. A PHP
-framework is not a serious proposition for this codebase. Bootstrap earns its place.
+`js/vendor/`** — never a runtime resolver, never a bundler. Composer is out of scope. Neither a PHP
+framework nor a change of language is a serious proposition for this codebase. Bootstrap earns its
+place.
 
 ---
 
@@ -35,8 +36,20 @@ framework is not a serious proposition for this codebase. Bootstrap earns its pl
    source file**. `sw.php` generates the service worker at request time for the same reason —
    `git pull` does not preserve mtimes — and `dev/scripts/sw_manifest_check.php` renders real pages
    and diffs their asset URLs against the worker's. All three assume source-is-served.
-2. **GPL v3 compatibility.** Both packages are MIT, which is compatible. `epanet-js.LICENSE` ships
-   with the code, as MIT requires of a redistribution.
+2. **Inbound-licence compatibility with our OUTBOUND choice, which is a separate question.** Both
+   packages are MIT, which is compatible with anything. Stated carelessly this constraint reads as
+   "GPL is the goal"; Tom, 2026-08-17, pushed back — *"an argument could be made that GPL is more
+   restrictive and thus less free than public domain or possibly other licenses."* That is correct
+   and it is why the constraint is phrased inbound-only. The practical shape:
+   - **Permissive inbound (MIT / BSD-2/3 / Apache-2.0 / public domain / CC0) is safe under any
+     outbound licence we might ever pick**, so in practice this constraint costs us nothing and
+     forecloses nothing. It is nearly vacuous, deliberately.
+   - **What it actually excludes is inbound copyleft STRICTER than ours** — AGPL above all, which
+     would reach the whole site. Also GPLv2-only, which is incompatible with GPLv3 in both
+     directions.
+   - **Our own outbound licence is revisable and is Tom's alone.** Nothing here depends on staying
+     GPL v3; relicensing is a separate decision, and vendoring permissive code keeps it open.
+   `epanet-js.LICENSE` ships with the code, as MIT requires of a redistribution.
 3. **Nothing third-party at runtime.** Confirmed above.
 
 ---
@@ -123,6 +136,24 @@ it buys a Composer install step in a `git pull` deploy for nothing visible.
 
 **When this answer changes:** the suite gains a database, user accounts, or server-side state. Any
 one of those makes a framework the right call, and this section gets rewritten, not appended to.
+
+### A different LANGUAGE: the same answer, harder
+
+Tom, 2026-08-17, noted he had also meant *language*, not only framework — and added that there are
+*"lots of possibilities that may not be wise to consider for very long."* Agreed, so this is short.
+
+A rewrite in Node, Python or Go would buy one real thing — **one language instead of two**, since
+all computation is already JavaScript and PHP exists only to deliver multilinguality. That is a
+genuine simplification and the honest case for it.
+
+It loses more. PHP's decisive advantage here is not the language, it is that **shared hosting runs
+`.php` with no process to supervise, no port, no restart, and a `git pull` deploy.** Every
+alternative needs a long-running process, which changes hosting, deployment, and what happens at
+3 a.m. when it stops. Against that: 27 language files, 16 calculators and a 14,000-line map editor
+would all be re-delivered for no user-visible gain, and the suite's actual defect history is in
+units, translations and label placement — **not one entry of it is attributable to PHP.**
+
+**So: no, and it is not close.** Worth revisiting only if hosting changes for some other reason.
 
 ---
 
