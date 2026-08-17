@@ -304,6 +304,24 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     about somebody else's code. `mi-defaults.js` works around them by starting its own server on an
     OS-assigned port over a temp docroot with a symlink; the fix belongs in `env.js` so `run.js`
     gets it too.
+  - **DONE 2026-08-17.** OS-assigned port, docroot from `git rev-parse --show-toplevel` via a
+    `mkdtemp` symlink, and a **random per-run sentinel fetched back before the browser launches** —
+    the readiness probe is the sentinel, not the page, because a 200 for the page only proves
+    *something* is listening. `mi-defaults.js`'s private copies deleted; one mechanism. Verified with
+    a decoy bound to 8899: pre-fix served another checkout's README and reported success anyway,
+    post-fix 10/10 unaffected, and a forced collision now aborts loudly with "the run is void".
+
+- 50|414| **The `dev/browser-pass/` specs are stale and have been since Task 264.** Task 387's fix
+  let `run.js` reach the real page for the first time in who knows how long; it gets 15/17 and stops.
+  `Session.drawExample()` drives 27 references across 8 spec files, and Task 264 **retired the
+  "Draw example network" toolbar button** — examples moved to `File ▸ New project…` / `Open
+  example…` (recorded at `lib/lang.ec.en.php:1325` and `js/looped-network.js:9139`).
+  - **The repair needs a product judgement, not a rename:** which of the new flows is the
+    behaviour-preserving substitute for what `drawExample()` set up — *an edit made, no file
+    written, tab dirty*. Decide that once, in `lib/session.js`, and the 8 specs follow.
+  - **The specs were probably never re-run against a correct tree since Task 264** (2026-08-10),
+    which is the measure of what the wrong-tree bug actually cost: not a wrong answer, but a suite
+    reporting on somebody else's files. A green test nobody can trust is worse than a red one.
 
 - 20|322| **Standing advisories worth converting rather than re-reading.** `check_all.sh` reports
   these every run and nobody can act on them.

@@ -8,6 +8,20 @@ Copyright 2009 Thomas Gail Haws. GNU GPL v3 or later.
 **Minimize Tom's browser passes.** They are slow and fatiguing. Write a harness in `dev/lpn-spike/`
 or `dev/calc-spike/` and reserve his time for what genuinely needs a real browser.
 
+- **A TEST THAT CAN REPORT ON THE WRONG TREE IS WORSE THAN NO TEST**, because it is green and
+  trusted. `dev/browser-pass/lib/env.js` bound a constant port and derived its docroot as `REPO/..`,
+  so from a worktree it silently served *another checkout* — and the specs went stale for a whole
+  task cycle with nobody able to see it. The fix that generalizes: **prove the server is yours before
+  asserting anything.** A readiness probe that only checks "did the page load" proves something is
+  listening, not that it is you; fetch back a random per-run sentinel instead. Ask an OS-assigned
+  port, and derive the repo root from `git rev-parse --show-toplevel` — a `../` hop is wrong in a
+  worktree by construction.
+- **AN MTIME-KEYED FRESHNESS CHECK IS UNRELIABLE IN A WORKTREE**, and it will fail spuriously for
+  every isolated agent. `git worktree add` writes every file at checkout time in arbitrary order, so
+  `generate_translation_payloads.php --check` reported all 26 payloads stale over a **36 ms** spread
+  with `git diff` empty. Same root cause as `filemtime` on production after a `git pull`. Diagnose it
+  by diffing content before regenerating anything, and never "fix" it by regenerating in a worktree —
+  that commits a no-op churn under a misleading message.
 - **A STUB THAT REMOVES THE COUPLING MAKES A HARNESS PASS FOR THE WRONG REASON.**
   `dev/lpn-spike/lpn-dom-stub.js` returns a constant 10 from `getBBox()`, so a zoom-to-fit harness
   could not see that label widths shrink as you zoom — the entire physics of the bug it was written
