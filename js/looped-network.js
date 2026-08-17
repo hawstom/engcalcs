@@ -620,7 +620,10 @@ var EngCalcs = EngCalcs || {};
 			// participant in the candidate pass and can MOVE, so it has somewhere to go that is not
 			// giving up a number.
 			if (!linkLabelAligned(l) && linkLabelStations(l).length < 2) { return; }
-			if (linkLabelTooShort(l, le)) { return; }   // already hidden; nothing to shed for
+			// NOT skipped when the label is already too long for its segment. An earlier draft
+			// returned here "because it is hidden anyway", which had it backwards: a label that does
+			// not fit is the one with the most to gain from shedding, and skipping it is how a
+			// cascade turns back into the all-or-nothing hide it replaced.
 			var all = le.allLines || le.lines, order = shedOrder(all),
 				gone = all.length - le.lines.length;
 			function boxNow() {
@@ -666,13 +669,42 @@ var EngCalcs = EngCalcs || {};
 	// symbols at one or both ends whatever station it takes. Hiding stays at the full length, so
 	// there is now a real band -- 76% to 100% of the pipe -- where a label sheds rather than
 	// vanishes, which is the behaviour the cascade was built for.
-	var LPN_LABEL_FIT_FRAC = 0.88 - 0.12;
+	// **THE ROOM A LINK LABEL HAS IS ITS SEGMENT'S LENGTH, NOT ITS PIPE'S** (Tom, 2026-08-16:
+	// *"'segment length', not 'pipe length'"*). An aligned label is rotated to the angle of the one
+	// segment it sits on, so a bent pipe's other segments are not room it can use: a 1000-unit main
+	// with a bend 60 units from its end offers a label at that station 60 units, not 1000. Measuring
+	// against the whole polyline says it fits, and it is drawn straight through the bend and off the
+	// pipe -- and it never sheds, because by that measure it was never too long.
+	//
+	// **AND THE QUANTITY BEING COMPARED IS A LENGTH ALONG THE PIPE, NOT A "WIDTH".** Tom, same day:
+	// *"Width is meaningless here in intuitive terms."* He is right, and the word was hiding the
+	// mistake: a label lying along a pipe has a RUN measured in the pipe's own direction, and what it
+	// must fit inside is a length in that same direction. Calling it width invites the reader to
+	// picture the perpendicular dimension, which is not the constraint at all.
+	//
+	// **THE ROOM IS THE SEGMENT LENGTH, AND NOTHING IS SUBTRACTED FROM IT.** Taking a node's radius
+	// off each end was tried and is wrong: an aligned label is offset PERPENDICULAR to its pipe, so
+	// it passes above a node symbol rather than through it, and on a short pipe the two radii ate
+	// the whole segment and no label could ever return (`short-line-label-harness.js` caught that by
+	// name -- a 5-unit stub whose label fits at 2 units still had no room). Whether a label crowds a
+	// symbol is a collision question and the collision pass owns it; this rule answers only "does
+	// the text fit on the piece of pipe it is lying on".
+	function linkLabelRoom(l, along) {
+		return Geom.segmentAtFraction(linkPointList(l),
+			along === undefined ? LINK_LABEL_ALONG : along).length;
+	}
+	// The label's own extent ALONG the pipe. Same number labelBoxWidth() returns -- an unrotated
+	// text's advance -- named for what it means once the text is turned to lie on its segment.
+	function linkLabelRunLength(le) { return labelBoxWidth(le); }
 	var SHORT_LINE_MULT = 1;
 	function linkLabelTooShort(l, le) {
 		if (!le || le.empty) { return false; }
 		if (l.lx !== undefined || l.ly !== undefined) { return false; }
-		var w = labelBoxWidth(le);
-		return w > 0 && Geom.polylineLength(linkPointList(l)) < w * SHORT_LINE_MULT;
+		// SEGMENT, not polyline -- see linkLabelRoom(). This rule and the shed cascade have to be
+		// asking about the same room, or a label sheds to fit something it is then hidden for
+		// missing.
+		var run = linkLabelRunLength(le);
+		return run > 0 && linkLabelRoom(l, le.alignedAlong) < run * SHORT_LINE_MULT;
 	}
 	// One label assembly, hidden together: text, leader and any extrema badges. `visibility`
 	// rather than `display` for the same reason the map-width rule uses it (see css/engcalcs.css) --
@@ -14214,12 +14246,20 @@ var EngCalcs = EngCalcs || {};
 			// want that number on the sheet, so the gesture that reveals the intent is one the user
 			// already makes.
 			if (!labelIsDragged(l) && !le.empty && lines.length > 1) {
-				var room = Geom.polylineLength(linkPointList(l)) * LPN_LABEL_FIT_FRAC,
+				var room = linkLabelRoom(l, le.alignedAlong),
 					order = shedOrder(lines), gone = 0, kept = lines;
 				// Stops at the FIRST content that fits -- a minimal shed. `gone < order.length - 1`
 				// keeps one value alive: dropping the last one is not a shed, it is the hide, and
 				// linkLabelTooShort() owns that decision.
-				while (gone < order.length - 1 && labelBoxWidth(le) > room) {
+				//
+				// **THE BAND BETWEEN SHEDDING AND HIDING IS THE CASCADE ITSELF, not a fudge factor.**
+				// Both rules now measure the same two quantities, and that is correct: a label sheds
+				// while it is too long for its segment, and hides only if even its best single value
+				// is too long. The earlier draft put a 0.76 fraction between them to manufacture a
+				// band, on an invented claim that real pipes are either comfortably long or hopelessly
+				// short. Tom: *"No. Where did you get that idea? That's far from the truth, especially
+				// when lots of values are on display."* He is right and there was no evidence for it.
+				while (gone < order.length - 1 && linkLabelRunLength(le) > room) {
 					gone++;
 					kept = keptLines(lines, shedKeepSet(lines, order, gone));
 					renderLinkLabel(le, l, kept, fsNow);

@@ -60,6 +60,35 @@ EngCalcs.lpnGeom = (function () {
 		return { x: pts[0].x, y: pts[0].y, dist: 0, total: total };
 	}
 
+	// WHICH SEGMENT a fraction along the polyline lands on, and HOW LONG THAT SEGMENT IS.
+	//
+	// **A LABEL LYING ALONG A PIPE SITS ON ONE SEGMENT, NOT ON THE POLYLINE.** It is rotated to that
+	// segment's own angle, so the room it has is that segment's length -- and on a bent pipe the two
+	// numbers are nothing like each other. A 1000-unit main with a bend 60 units from its end gives a
+	// label at that station 60 units of room, not 1000. Measuring against the polyline says it fits,
+	// and it is drawn straight through the bend and off the pipe.
+	//
+	// Returns { index, length, total }. `index` is the segment's own index, so a caller can tell
+	// whether either end of it is a real NODE (index 0 starts at one, index pts.length-2 ends at one)
+	// or merely a vertex, which needs no symbol clearance.
+	function segmentAtFraction(pts, f) {
+		var segs = [], total = 0, i, d, want, run = 0;
+		for (i = 0; i < pts.length - 1; i++) {
+			d = Math.hypot(pts[i + 1].x - pts[i].x, pts[i + 1].y - pts[i].y);
+			segs.push(d); total += d;
+		}
+		if (!segs.length) { return { index: 0, length: 0, total: 0 }; }
+		if (!(total > 0)) { return { index: 0, length: 0, total: 0 }; }
+		want = f * total;
+		for (i = 0; i < segs.length; i++) {
+			if (run + segs[i] >= want || i === segs.length - 1) {
+				return { index: i, length: segs[i], total: total };
+			}
+			run += segs[i];
+		}
+		return { index: 0, length: segs[0], total: total };
+	}
+
 	// Place something at `along` (a fraction) on the polyline, then step it clear of any
 	// obstacle it would land on top of -- `obstacleDists` are along-distances in the same
 	// space `pointAlongPolyline().dist` reports (the editor passes flow-arrow positions).
@@ -390,6 +419,7 @@ EngCalcs.lpnGeom = (function () {
 		polylineLength: polylineLength,
 		polylinePointsAttr: polylinePointsAttr,
 		pointAlongPolyline: pointAlongPolyline,
+		segmentAtFraction: segmentAtFraction,
 		dodgeAlongPolyline: dodgeAlongPolyline,
 		leaderAttachX: leaderAttachX,
 		leaderAttach: leaderAttach,

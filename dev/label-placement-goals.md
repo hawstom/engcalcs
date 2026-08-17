@@ -277,10 +277,33 @@ shed trailing values (per §2.2's link order) → drop the label
 ```
 
 **The shed step is our own extension to that cascade, not a cartographic standard.** It is available
-to us because an undragged link label is one inline row, so shedding a value reduces its WIDTH — and
-width is exactly the quantity both the short-pipe rule and the conflict test already consume. The two
-"it does not fit" problems are therefore one cascade with two stopping conditions, and
-`linkLabelTooShort()` becomes its terminal rung rather than a separate all-or-nothing hide.
+to us because an undragged link label is one inline row, so shedding a value shortens its RUN — the
+extent it occupies along the pipe — and that run is exactly what both the short-segment rule and the
+conflict test consume. The two "it does not fit" problems are therefore one cascade with two stopping
+conditions, and `linkLabelTooShort()` becomes its terminal rung rather than a separate
+all-or-nothing hide.
+
+**Say RUN LENGTH, not width, and SEGMENT, not pipe.** Both corrections are Tom's, 2026-08-16, and
+both were hiding a mistake rather than merely reading badly.
+
+- *"Width is meaningless here in intuitive terms."* A label lying along a pipe has a run measured in
+  the pipe's own direction, and what it must fit inside is a length in that same direction. "Width"
+  invites the reader to picture the perpendicular dimension, which is not the constraint at all.
+- *"'segment length', not 'pipe length'."* **This one was a real defect.** An aligned label is
+  rotated to the angle of the ONE segment it sits on, so the rest of a bent pipe is not room it can
+  use. The rule measured against the whole polyline, so a label near a bend was judged against a
+  length it could never occupy: on the shipped example, a 767-unit pipe offering its label a 300-unit
+  segment was told it had 767, and a 354-unit label therefore never shed. **Nothing is subtracted
+  from the segment either** — taking a node's radius off each end was tried and is wrong, because an
+  aligned label passes above a symbol rather than through it, and on a short stub the two radii ate
+  the whole segment so no label could return.
+
+**The band between shedding and hiding is the cascade itself, not a fudge factor.** Both rules
+measure the same two quantities, which is correct: a label sheds while its run exceeds its segment,
+and hides only if even its best single value still does. A 0.76 fraction was briefly inserted between
+them to manufacture a band, justified by an invented claim that real pipes are either comfortably
+long or hopelessly short. Tom: *"No. Where did you get that idea? That's far from the truth,
+especially when lots of values are on display."* There was no evidence for it and it is gone.
 
 **"Trailing" means trailing in the PRIORITY order, not in the row.** Values are drawn in reading
 order (id, diameter, length, roughness, km, flow, …) and shed worst-rank-first, and those two orders
