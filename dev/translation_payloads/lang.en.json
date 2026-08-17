@@ -895,8 +895,9 @@
         "lpn_backdrop_remove_confirm": "Remove the background image?",
         "lpn_backdrop_scale_prompt1": "Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.",
         "lpn_backdrop_scale_prompt2": "Real distance between the two points",
-        "lpn_backdrop_position_prompt1": "Click any point on the background image. This is the point you will move.",
-        "lpn_backdrop_position_prompt2": "Choose where that point should go, then click Continue.",
+        "lpn_backdrop_position_prompt1": "Click the base point (on the image) for the move.",
+        "lpn_backdrop_position_prompt2": "Choose the method for the destination point, then click Continue.",
+        "lpn_backdrop_busy": "Setting the background image.",
         "lpn_backdrop_target_label": "Move that point to:",
         "lpn_backdrop_target_node": "A node",
         "lpn_backdrop_target_free": "Any point on the map",
@@ -997,7 +998,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 995,
+    "count": 996,
     "active_prefixes": [
         "about",
         "bpn",

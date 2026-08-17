@@ -711,6 +711,7 @@ EngCalcs.pageConfig = {
 	lpn_backdrop_scale_prompt2: <?=json_encode($ec_lang['lpn_backdrop_scale_prompt2'])?>,
 	lpn_backdrop_position_prompt1: <?=json_encode($ec_lang['lpn_backdrop_position_prompt1'])?>,
 	lpn_backdrop_position_prompt2: <?=json_encode($ec_lang['lpn_backdrop_position_prompt2'])?>,
+	lpn_backdrop_busy: <?=json_encode($ec_lang['lpn_backdrop_busy'])?>,
 	lpn_backdrop_target_label: <?=json_encode($ec_lang['lpn_backdrop_target_label'])?>,
 	lpn_backdrop_target_node: <?=json_encode($ec_lang['lpn_backdrop_target_node'])?>,
 	lpn_backdrop_target_free: <?=json_encode($ec_lang['lpn_backdrop_target_free'])?>,

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "sw",
-        "expected_key_count": 995,
-        "delta_key_count": 84,
+        "expected_key_count": 996,
+        "delta_key_count": 85,
         "exempt_key_count": 17,
         "exempt_keys": [
             "calc_units_us",
@@ -412,6 +412,7 @@
         "lpn_backdrop_scale_from": "Scale from current size, about a point you pick",
         "lpn_backdrop_scale_from_prompt1": "Click the point on the background image that should stay where it is.",
         "lpn_backdrop_scale_from_prompt2": "Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.",
+        "lpn_backdrop_busy": "Setting the background image.",
         "lpn_unit_unknown": "This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be worked out until this page knows that unit, because there is no way to tell how big it is.",
         "lpn_settings_link_width": "Pipe width (pixels)",
         "lpn_settings_align_labels": "Align pipe labels with pipes",
@@ -498,6 +499,7 @@
         "lpn_backdrop_scale_from": "Scale from current size, about a point you pick",
         "lpn_backdrop_scale_from_prompt1": "Click the point on the background image that should stay where it is.",
         "lpn_backdrop_scale_from_prompt2": "Scale from its current size. 1 keeps it the same, 1.1 makes it 10% bigger, 0.9 makes it 10% smaller.",
+        "lpn_backdrop_busy": "Setting the background image.",
         "lpn_unit_unknown": "This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be worked out until this page knows that unit, because there is no way to tell how big it is.",
         "lpn_settings_link_width": "Pipe width (pixels)",
         "lpn_settings_align_labels": "Align pipe labels with pipes",
@@ -1451,6 +1453,22 @@
                     "key": "lpn_backdrop_scale_entry_prompt",
                     "value": "Andika ukubwa wa pikseli moja kwenye ramani, au bandika maudhui yote ya faili la kuratibu za picha",
                     "english": "Enter the size of one pixel on the map, or paste the complete contents of the world file for the image"
+                }
+            }
+        },
+        "lpn_backdrop_busy": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_backdrop_position_prompt2",
+                    "value": "Chagua mahali kituo hicho kinapaswa kwenda, kisha bofya Endelea.",
+                    "english": "Choose the method for the destination point, then click Continue."
+                },
+                "next_translated": {
+                    "key": "lpn_backdrop_target_label",
+                    "value": "Hamisha kituo hicho kwenda:",
+                    "english": "Move that point to:"
                 }
             }
         },

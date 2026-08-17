@@ -43,9 +43,13 @@ function near(a, b, tol) { return Math.abs(a - b) <= (tol === undefined ? 1e-9 :
 
 // ---- the seams these functions touch, and nothing more ------------------
 let backdrop = null;
-let transforms = 0, saves = 0, alerts = [];
+let transforms = 0, saves = 0, snaps = 0, alerts = [];
 function applyBackdropTransform() { transforms++; }
 function saveToStorage() { saves++; }
+// Task 145 follow-up (Tom, 2026-08-16: "Background image edits should be added to the undo stack").
+// Counted rather than ignored: an edit that does not snapshot is silently un-undoable, and the only
+// way to notice is to try it in a browser and remember what the picture looked like before.
+function saveUndoSnapshot() { snaps++; }
 function cartesianY(y) { return -y; }              // copied intent, asserted against the real one below
 function alert(m) { alerts.push(m); }
 const EngCalcs = { pageConfig: {} };
@@ -434,6 +438,45 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 	// panel in the wrong corner; they cannot work with one that never rendered.
 	report(/anchor \?/.test(code) && /openPanelAtAnchor/.test(fn),
 		'a missing anchor falls back to a rect rather than throwing');
+}
+
+// ---- every backdrop edit is undoable (Task 145 follow-up) ---------------------------------------
+//
+// ONE snapshot per edit, taken BEFORE the change. Two would make Ctrl+Z a no-op on the first press;
+// none would lose the previous placement outright. The count is the assertion because "it looked
+// right" cannot distinguish those three cases.
+{
+	freshBackdrop();
+	snaps = 0;
+	setBackdropPixelSize(0.05);
+	report(snaps === 1, 'setting the pixel size snapshots exactly once', snaps);
+
+	freshBackdrop();
+	snaps = 0;
+	scaleBackdropAbout({ x: 10, y: 10 }, 2);
+	report(snaps === 1, 'scaling about a point snapshots exactly once', snaps);
+
+	freshBackdrop();
+	snaps = 0;
+	applyWorldFile({ A: 0.5, D: 0, B: 0, E: -0.5, C: 100, F: 200, ok: true });
+	report(snaps === 1, 'applying a world file snapshots exactly once', snaps);
+
+	// A REFUSED EDIT MUST NOT SNAPSHOT. An undo stack that grows on rejected input makes the first
+	// Ctrl+Z do nothing, which reads as "undo is broken" rather than as "that edit never happened".
+	freshBackdrop();
+	snaps = 0;
+	setBackdropPixelSize(0);
+	setBackdropPixelSize(-3);
+	scaleBackdropAbout({ x: 0, y: 0 }, 0);
+	scaleBackdropAbout({ x: 0, y: 0 }, Infinity);
+	report(snaps === 0, 'a rejected edit leaves the undo stack alone', snaps);
+
+	backdrop = null;
+	snaps = 0;
+	setBackdropPixelSize(0.05);
+	applyWorldFile({ A: 0.5, D: 0, B: 0, E: -0.5, C: 100, F: 200, ok: true });
+	scaleBackdropAbout({ x: 0, y: 0 }, 2);
+	report(snaps === 0, 'an edit with no image at all snapshots nothing', snaps);
 }
 
 console.log(`\n${checks - failures}/${checks} passed`);

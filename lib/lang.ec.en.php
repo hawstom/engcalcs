@@ -1770,8 +1770,15 @@ $ec_lang['lpn_backdrop_remove']='Remove';
 $ec_lang['lpn_backdrop_remove_confirm']='Remove the background image?';
 $ec_lang['lpn_backdrop_scale_prompt1']='Click two points on the background image, such as the two ends of a bar scale. Then type the real distance between them.';
 $ec_lang['lpn_backdrop_scale_prompt2']='Real distance between the two points';
-$ec_lang['lpn_backdrop_position_prompt1']='Click any point on the background image. This is the point you will move.';
-$ec_lang['lpn_backdrop_position_prompt2']='Choose where that point should go, then click Continue.';
+// Tom's own wording, 2026-08-16. "Base point" is the drafting term and it is what the second step
+// then has a destination FOR; "any point on the background image" did not say that the two steps are
+// one move. The second names the panel it is about to show, so the alert and the panel read as one
+// step rather than two.
+$ec_lang['lpn_backdrop_position_prompt1']='Click the base point (on the image) for the move.';
+$ec_lang['lpn_backdrop_position_prompt2']='Choose the method for the destination point, then click Continue.';
+// The standing "you are in the middle of something" bar, shown while a background-image scale or
+// move is waiting for a click. It carries the only visible way out of that state.
+$ec_lang['lpn_backdrop_busy']='Setting the background image.';
 $ec_lang['lpn_backdrop_target_label']='Move that point to:';
 $ec_lang['lpn_backdrop_target_node']='A node';
 $ec_lang['lpn_backdrop_target_free']='Any point on the map';

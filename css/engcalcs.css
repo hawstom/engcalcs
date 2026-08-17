@@ -445,22 +445,46 @@ html[lang="zh"] .ec-welcome {
    map-unit-versus-screen-pixel question to get wrong -- which is what produced a mark bigger than
    the screen and then a full-page orange starburst, from the same three lines, twice.
    RED, not the orange this started as (Tom: *"Red would be better. It looks orange or brown."*).
-   Two quick blinks so it is noticed, then a long hold, then a fade back. NO `forwards`: when the
-   animation ends the property reverts to whatever the stylesheet says, so the label returns to its
-   normal colour on its own and nothing has to clean up after it. */
+   Two quick blinks so it is noticed, then a fade that starts AT ONCE and runs the rest of the way.
+   NO `forwards`: when the animation ends the property reverts to whatever the stylesheet says, so
+   the label returns to its normal colour on its own and nothing has to clean up after it.
+
+   **THE HOLD IS GONE, AND ITS ABSENCE IS THE POINT** (Tom, 2026-08-16: *"Start the long fade
+   immediately. Start appears to be delayed through about half the duration."*). It held full red
+   from 16% to 70% -- 24 of the 45 seconds -- and only then began to fade. A mark that does not
+   change for half its life reads as a mark that is stuck, so the fade was doing none of the work it
+   exists to do: saying "this is temporary" while you look at it.
+
+   The fade segment is LINEAR while the blinks keep the default easing. A per-keyframe
+   animation-timing-function governs the segment that STARTS at that keyframe, so this is the one
+   place to say it. Linear matters here: eased, most of the colour change happens in the first few
+   seconds and the tail is a long crawl through near-black, which is a hold by another name. */
 .lpn-just-dragged { animation: lpn-just-dragged 45s ease-out; }
 @keyframes lpn-just-dragged {
 	0%   { fill: #d40000; }
 	4%   { fill: #000; }
 	8%   { fill: #d40000; }
 	12%  { fill: #000; }
-	16%  { fill: #d40000; }
-	70%  { fill: #d40000; }
+	16%  { fill: #d40000; animation-timing-function: linear; }
 	100% { fill: #000; }
 }
 @media (prefers-reduced-motion: reduce) {
 	.lpn-just-dragged { animation: none; }
 }
+/* The "you are in the middle of placing the background image" bar (ROADMAP Task 145 follow-up, Tom
+   2026-08-16). Fixed to the bottom of the viewport rather than placed near the canvas: while a
+   registration sequence runs, every normal interaction on the canvas is suppressed, so the message
+   has to be somewhere the eye lands no matter where the user was clicking. High z-index for the same
+   reason -- it must outrank the panels the sequence itself puts on screen. */
+.lpn-regmode-bar {
+	position: fixed; left: 50%; transform: translateX(-50%); bottom: 1em;
+	z-index: 3000; display: flex; align-items: center; gap: 0.75em;
+	padding: 0.5em 0.9em; border-radius: 4px;
+	background: #222; color: #fff; font-size: 0.95em;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+.lpn-regmode-bar button { font: inherit; padding: 0.15em 0.7em; cursor: pointer; }
+@media print { .lpn-regmode-bar { display: none; } }
 .lpn-draglbl { cursor: move; pointer-events: all; }
 /* Masking is switchable (Task 330, Tom 2026-08-14: "We want to be able to turn off and on
    background masking"). One class on the <svg>, written by applyMaskLabels() from the PROJECT's own

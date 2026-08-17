@@ -337,6 +337,23 @@ Task 248 (extended-period simulation), because a time series cannot be read as t
   - The width bank: per-tspan `getComputedTextLength()` beside the existing `noteMeasuredWidth()`
     call, so any prefix of a label's row costs a sum rather than a re-measure. Phase 2 needs it.
 
+- 95|402| **SOMETHING IN A REAL EDITING SESSION RE-CONVERTS EVERY TYPED NUMBER, AND IT IS NOT THE
+  IMPORT.** Tom opened Net2 and Net3, added a background image to each, and saved: 392 numbers came
+  back changed — every elevation, demand, diameter, length and roughness — each by its own unit's
+  round-trip error (50 ft → 49.999392, ×0.99998784; 12 in → 11.999976; −694.4 gpm → −694.34203).
+  Caught by `inp-passthrough-harness.js`, repaired in place 2026-08-16 (the numbers restored from
+  git, the backdrops kept), so the corpus is clean — **but the cause is still live.**
+  - **This is the Task 390 rule being broken**: a number that came from a file is the user's. It is
+    the exact signature CLAUDE.md already records (710 ft → 709.9913664).
+  - **NOT reproducible headlessly.** Open+save, open+solve+save, and open+unit-switch-and-back+save
+    are all byte-clean on the same file. The only other thing that session did was add a backdrop,
+    and the only structural difference in the saved file is a no-op `origin: {x:0,y:0}` — every
+    coordinate is unchanged. So the trigger is some other action; **ask Tom what he did** before
+    hunting further.
+  - Whatever it is, one harness assertion should exist afterwards: open every file in
+    `dev/water-network-examples/`, perform the triggering action, save, and demand the numbers come
+    back identical.
+
 - 70|401| **`flips under pan` is not measured, and it is the one that must read 0.**
   `drawnLinkLabelStations()` culls to the view rect, `placeStationedLabels()` builds obstacles from
   the result, and those obstacles now decide node DROPS — so labels can appear and disappear as the

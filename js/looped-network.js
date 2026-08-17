@@ -4203,6 +4203,7 @@ var EngCalcs = EngCalcs || {};
 		applyBackdropTransform();
 	}
 	function removeBackdrop() {
+		saveUndoSnapshot();
 		backdrop = null; backdropImg = null;
 		backdropLayer.innerHTML = '';
 		saveToStorage();
@@ -4281,6 +4282,10 @@ var EngCalcs = EngCalcs || {};
 	function addBackdropFromDataUrl(dataUrl, done) {
 		logLpnFirstAction('backdrop');
 		downscaleImage(dataUrl, BACKDROP_MAX_SIDE, function (href, iw, ih) {
+			// Snapshotted INSIDE the callback, not beside the call: downscaleImage() is asynchronous,
+			// so a snapshot taken before it would record a state the user could have changed while
+			// the image was decoding.
+			saveUndoSnapshot();
 			var p = initialBackdropPlacement(iw, ih);
 			backdrop = { href: href, iw: iw, ih: ih, x: 0, y: 0, width: p.width, height: p.height, tx: p.tx, ty: p.ty, s: 1 };
 			buildBackdropImg();
@@ -4304,6 +4309,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setBackdropPixelSize(p) {
 		if (!backdrop || !(p > 0) || !backdrop.width || !backdrop.iw) { return; }
+		saveUndoSnapshot();
 		backdrop.s = p * backdrop.iw / backdrop.width;
 		applyBackdropTransform();
 		saveToStorage();
@@ -4335,6 +4341,7 @@ var EngCalcs = EngCalcs || {};
 	// it would leave the image correctly sized in the wrong place.
 	function applyWorldFile(w) {
 		if (!backdrop || !backdrop.width || !backdrop.iw) { return; }
+		saveUndoSnapshot();
 		backdrop.s = w.A * backdrop.iw / backdrop.width;
 		// C,F name the pixel CENTRE, so the image's top-left CORNER is half a pixel out in each
 		// direction; -E/2 is positive because E is negative. Both are Cartesian, which since Task 274
@@ -4373,6 +4380,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setRegMode(v) {
 		regMode = v;
+		showRegModeBar(v);
 		if (v) {
 			nudgeCursor();
 			if (!cursorNudgeTimer) { cursorNudgeTimer = setInterval(nudgeCursor, 200); }
@@ -4381,6 +4389,45 @@ var EngCalcs = EngCalcs || {};
 			if (cursorNudgeTimer) { clearInterval(cursorNudgeTimer); cursorNudgeTimer = null; }
 		}
 	}
+	// **THE ONLY VISIBLE WAY OUT OF A REGISTRATION SEQUENCE** (Tom, 2026-08-16: *"There needs to be a
+	// way to Cancel from Image moving and scaling. I try Esc. I try invoking other buttons. But
+	// nothing Cancels it."*).
+	//
+	// Escape already worked and still does. That was not enough, and the reason is worth keeping:
+	// **regMode suppresses every normal interaction on the canvas, so the page looks broken rather
+	// than busy** -- clicks do nothing, drags do nothing, and nothing on screen says why or for how
+	// long. An invisible keystroke is not an affordance for a state the user cannot see they are in.
+	// It is also swallowable: with focus inside the target panel's <select>, Escape closes the select
+	// and never reaches the document.
+	//
+	// So the bar does two jobs at once, and the first is the more important: it SAYS the mode is on.
+	// Cancel is then just the obvious button on it. Built in JS rather than in Looped-Network.php
+	// because it has no place in the page until a sequence starts, and torn down the same way.
+	var regModeBar = null;
+	function showRegModeBar(on) {
+		var pc = EngCalcs.pageConfig || {};
+		if (!on) {
+			if (regModeBar) { regModeBar.remove(); regModeBar = null; }
+			return;
+		}
+		if (regModeBar) { return; }
+		regModeBar = document.createElement('div');
+		regModeBar.id = 'lpn_regmode_bar';
+		regModeBar.className = 'lpn-regmode-bar';
+		var txt = document.createElement('span');
+		txt.textContent = pc.lpn_backdrop_busy || 'Setting the background image.';
+		var btn = document.createElement('button');
+		btn.type = 'button';
+		btn.textContent = pc.lpn_cancel || 'Cancel';
+		// A plain click, not a pointerup: the canvas listens on pointerup in the CAPTURE phase while
+		// a sequence is running, and a pointer event starting on this button would otherwise be read
+		// as the registration click the sequence is waiting for -- cancelling and picking a point in
+		// the same gesture.
+		btn.addEventListener('click', function (e) { e.preventDefault(); e.stopPropagation(); cancelActive(); });
+		regModeBar.appendChild(txt);
+		regModeBar.appendChild(btn);
+		document.body.appendChild(regModeBar);
+	}
 	function setNodeCursorAllowed(v) { svg.classList.toggle('regmode-node', v); }
 	// Single mutual-exclusion point: every sequence below registers a teardown function here, and
 	// every entry point calls cancelActive() first, so re-picking the same action mid-sequence tears
@@ -4388,11 +4435,17 @@ var EngCalcs = EngCalcs || {};
 	var activeCancel = null;
 	function cancelActive() {
 		if (activeCancel) { var c = activeCancel; activeCancel = null; c(); }
+		// Belt and braces: every registered teardown calls setRegMode(false), which takes the bar
+		// down -- but a bar left on screen would be a Cancel button for nothing, which is worse than
+		// no button at all. One line here means no future teardown can leave one behind.
+		showRegModeBar(false);
 	}
 	// Escape is the one dedicated "get me out" affordance -- without it, the only way to abandon a
 	// Scale/Position sequence is to re-open the dropdown and pick something else, which isn't
 	// discoverable as a cancel action, and regMode blanks all normal interaction in the meantime.
-	document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { cancelActive(); } });
+	// CAPTURE phase, so a focused <select> in the target panel cannot swallow the key before the
+	// document sees it -- which is one of the ways Escape looked dead while being wired.
+	document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { cancelActive(); } }, true);
 
 	function startBackdropScale() {
 		cancelActive();
@@ -4407,7 +4460,7 @@ var EngCalcs = EngCalcs || {};
 				var pxDist = Math.hypot(clicks[1].x - clicks[0].x, clicks[1].y - clicks[0].y);
 				var promptText = (pc.lpn_backdrop_scale_prompt2 || 'Real distance between the two points') + ' (' + unitLabel('lpn_u_length') + '):';
 				var real = +prompt(promptText, '');
-				if (real > 0) { backdrop.s = real / pxDist; applyBackdropTransform(); saveToStorage(); }
+				if (real > 0) { saveUndoSnapshot(); backdrop.s = real / pxDist; applyBackdropTransform(); saveToStorage(); }
 			}
 		};
 		svg.addEventListener('pointerup', handler, true);
@@ -4424,6 +4477,7 @@ var EngCalcs = EngCalcs || {};
 	// (Y-down) world frame, which is what screenToWorld() returns, so no flip belongs here.
 	function scaleBackdropAbout(p, f) {
 		if (!backdrop || !(f > 0) || !isFinite(f)) { return false; }
+		saveUndoSnapshot();
 		backdrop.tx = p.x - f * (p.x - backdrop.tx);
 		backdrop.ty = p.y - f * (p.y - backdrop.ty);
 		backdrop.s = backdrop.s * f;
@@ -4513,6 +4567,7 @@ var EngCalcs = EngCalcs || {};
 	// ask and Chromium-only -- so a world file is always user-supplied, never discovered. That fact is
 	// what made the deleted dialog's "No world file found" a report of a search that never ran.
 	function positionTo(refWorld, target) {
+		saveUndoSnapshot();
 		backdrop.tx += target.x - refWorld.x; backdrop.ty += target.y - refWorld.y;
 		applyBackdropTransform();
 		saveToStorage();
@@ -13494,7 +13549,18 @@ var EngCalcs = EngCalcs || {};
 	// overrides the deletion had purged.
 	function saveUndoSnapshot() {
 		markEdited(); // one seam, because every real mutation snapshots before it changes anything
-		undoStack.push(JSON.parse(JSON.stringify({ doc: doc, scenarios: scenarios, active: project.activeScenario })));
+		undoStack.push({
+			state: JSON.parse(JSON.stringify({ doc: doc, scenarios: scenarios, active: project.activeScenario })),
+			// **THE BACKDROP IS SHALLOW-COPIED, AND THAT IS NOT A SHORTCUT** (Tom, 2026-08-16:
+			// "Background image edits should be added to the undo stack"). Its `href` is a base64
+			// data URI -- 1.7 MB on Net2 and 2.5 MB on Net3 -- so deep-cloning it into every one of
+			// twenty snapshots would cost fifty megabytes to make a Move undoable. A shallow copy
+			// duplicates the ten numbers that a scale or a move actually changes and SHARES the one
+			// string, which is free and safe because strings are immutable in JavaScript. Nothing can
+			// edit an image through a shared reference; the only thing that replaces one is loading a
+			// new file, which assigns a whole new object.
+			backdrop: backdrop ? Object.assign({}, backdrop) : null
+		});
 		if (undoStack.length > UNDO_LIMIT) { undoStack.shift(); }
 	}
 	// Switching projects drops the undo history (Task 146.08). The stack holds snapshots of the
@@ -13504,11 +13570,21 @@ var EngCalcs = EngCalcs || {};
 	function undo() {
 		if (undoStack.length === 0) { return; }
 		var snap = undoStack.pop();
-		doc = snap.doc;
-		scenarios = snap.scenarios;
+		doc = snap.state.doc;
+		scenarios = snap.state.scenarios;
+		// The backdrop rides in the same snapshot rather than in a stack of its own: a Move that
+		// nudged the image and a Move that nudged a node are the same kind of event to the person
+		// pressing Ctrl+Z, and two stacks would make the order of undos depend on which kind each one
+		// was. buildDom() below redraws it.
+		backdrop = snap.backdrop;
+		// buildDom() rebuilds the node/link/label layers only, so the image has to be redrawn here.
+		// A removed backdrop must also clear the layer, or an undone Remove would leave the picture
+		// on screen with no object behind it.
+		if (backdrop) { buildBackdropImg(); }
+		else { backdropImg = null; backdropLayer.innerHTML = ''; }
 		// Restored too, because a snapshot taken in one scenario and undone from another would
 		// otherwise leave the map showing a scenario the restored values were never about.
-		if (scenarios.some(function (s) { return s.id === snap.active; })) { project.activeScenario = snap.active; }
+		if (scenarios.some(function (s) { return s.id === snap.state.active; })) { project.activeScenario = snap.state.active; }
 		recountNextId();
 		closePopup(); // whatever it referenced may no longer exist post-undo (e.g. undoing an Add)
 		buildDom();
