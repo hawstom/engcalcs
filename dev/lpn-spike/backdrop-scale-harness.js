@@ -331,14 +331,19 @@ report(formatPixelSize(0) === '', 'no image, no prefill');
 		'Position still clears regMode in that handler, before the tool sees the event');
 
 	// The fix: the tap's START is gated, so the click that ends registration can never complete one.
-	report(/svg\.addEventListener\('pointerdown', function \(e\) \{\s*\n\s*if \(regMode\) \{ downPt = null; return; \}/.test(src),
+	// **THE GUARD IS ALLOWED COMPANY.** Task 145's placement tool gates the same seams on the same
+	// principle, so these lines now read `if (regMode || georefActive())`. The property under test is
+	// "the tap's START is gated on regMode", which either spelling states; a regex that insisted on
+	// the exact original characters was testing the punctuation instead.
+	report(/svg\.addEventListener\('pointerdown', function \(e\) \{\s*\n\s*if \(regMode( \|\| georefActive\(\))?\) \{ downPt = null; return; \}/.test(src),
 		'a tap cannot BEGIN while a registration is pending');
 
 	// And the three paths that were already right stay right — a tool must not act at any point in
 	// the sequence, not just at its end.
 	const wire = extract('wirePointerEvents');
-	report((wire.match(/if \(regMode\)/g) || []).length >= 4,
-		'every pointer path in wirePointerEvents() checks regMode', `${(wire.match(/if \(regMode\)/g) || []).length} gates`);
+	const gates = /if \(regMode( \|\| georefActive\(\))?\)/g;
+	report((wire.match(gates) || []).length >= 4,
+		'every pointer path in wirePointerEvents() checks regMode', `${(wire.match(gates) || []).length} gates`);
 	// The delete branch and the select-popup branch both live in that one pointerup, so one gate
 	// covers both — which is why the fix is one line and not two.
 	report(/mode === 'delete'/.test(wire) && /mode === 'select' && t\.dataset\.node/.test(wire),

@@ -1344,6 +1344,29 @@ $ec_lang['lpn_menu_view']='View';
 $ec_lang['lpn_basemap_show']='Show street map';
 $ec_lang['lpn_basemap_hide']='Hide street map';
 $ec_lang['lpn_basemap_tip']='Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.';
+// ROADMAP Task 145's placement tool. THE PAIR OF NOUNS IS 'world map' and 'XY grid' -- 'world map'
+// because lpn_new_geo_us has said it in 27 languages since the first slice, and inventing a second
+// name for a thing already named is how a UI ends up with two.
+$ec_lang['lpn_geomap']='World map';
+$ec_lang['lpn_xymap']='XY grid';
+$ec_lang['lpn_georef_menu']='Put this project on the world map…';
+$ec_lang['lpn_georef_tip']='Move a drawing made on the XY grid onto real ground, so it sits on the street map at its true size. Every number you typed stays as it is — only the X and Y become a longitude and a latitude.';
+$ec_lang['lpn_georef_intro']='Put this project on the world map? Your grid already says how big one drawing unit is, so the model will land at its true size on the ground. Pipe lengths, diameters, elevations and demands are not touched. You can move, resize and turn the model as much as you like, and nothing is final until you press Finish.';
+$ec_lang['lpn_georef_carry']='Pan and zoom the map to your site. The model follows the middle of the map. Then press Drop it here.';
+$ec_lang['lpn_georef_adjust']='Drag the model to move it, a corner to resize it, the round handle above it to turn it. Or type the two numbers.';
+$ec_lang['lpn_georef_drop']='Drop it here';
+$ec_lang['lpn_georef_finish']='Finish';
+$ec_lang['lpn_georef_cancel']='Cancel';
+$ec_lang['lpn_georef_scale']='One drawing unit is';
+$ec_lang['lpn_georef_scale_tip']='How far one unit of your drawing reaches on the ground. Your grid already declares this, so the number here starts out right; change it only if the drawing was never at full size.';
+$ec_lang['lpn_georef_rotation']='Turn, degrees counter-clockwise';
+$ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model, counter-clockwise, so that its north points north.';
+$ec_lang['lpn_georef_confirm']='Place the model here for good? You can still drag single nodes afterwards, but the drawing stops being an XY grid. To get the grid back, close this project without saving.';
+$ec_lang['lpn_georef_done']='The model is on the world map. Drag any node to move it closer to where it really is.';
+$ec_lang['lpn_georef_on_map']='This project is already on the world map.';
+$ec_lang['lpn_georef_empty']='Draw or open a network first. There is nothing to place yet.';
+$ec_lang['lpn_georef_unavailable']='The placement tool did not load. Reload the page and try again.';
+
 $ec_lang['lpn_clean_map']='Clean map';
 $ec_lang['lpn_clean_map_off']='Show map readouts';
 $ec_lang['lpn_clean_map_tip']='Hide the mode line and the coordinate readout so a screenshot shows only the map. Nothing else changes, and nothing is saved.';

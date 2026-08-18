@@ -246,8 +246,16 @@ console.log('\n--- one home for the concept ---');
 	const count = re => (js.match(re) || []).length;
 	// The outward pair gained one site each per AXIS with the basemap (Task 145): refreshBasemap()
 	// asks what lon/lat window is on screen, and the two screen corners are two calls per axis.
-	ok('outwardX has one definition and seven call sites', count(/outwardX\(/g) === 8, count(/outwardX\(/g));
-	ok('outwardY has one definition and seven call sites', count(/outwardY\(/g) === 8, count(/outwardY\(/g));
+	//
+	// **TASK 145's PLACEMENT TOOL IS THE LARGEST SINGLE ADDITION and it is the guard working, not
+	// the guard being worked around.** Every one of its sites is a real boundary: georefCapture()
+	// reads the document outward, georefWrite() and georefCancel() write it back inward,
+	// georefWorldOf() turns a mapped lon/lat into a world point, and georefCarryTransform(),
+	// georefPointerDown(), georefPointerSrc() and the move branch of georefApplyDrag() each convert a
+	// pointer or a view centre. A tool that skipped the shift at any one of them would place a State
+	// Plane model half a million units off the coast of Africa and draw it without complaint.
+	ok('outwardX has one definition and twelve call sites', count(/outwardX\(/g) === 13, count(/outwardX\(/g));
+	ok('outwardY has one definition and twelve call sites', count(/outwardY\(/g) === 13, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -255,8 +263,8 @@ console.log('\n--- one home for the concept ---');
 	// from its own longitude and latitude, so basemapTileList() adds one x site and two y sites (a
 	// box needs its north edge and its south). Skipping the shift there would draw the street map
 	// half a million units away from the network it is supposed to be under.
-	ok('inwardX has one definition and four call sites', count(/inwardX\(/g) === 5, count(/inwardX\(/g));
-	ok('inwardY has one definition and five call sites', count(/inwardY\(/g) === 6, count(/inwardY\(/g));
+	ok('inwardX has one definition and nine call sites', count(/inwardX\(/g) === 10, count(/inwardX\(/g));
+	ok('inwardY has one definition and ten call sites', count(/inwardY\(/g) === 11, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

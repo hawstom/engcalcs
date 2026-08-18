@@ -248,6 +248,27 @@ echoHeader("EngCalcs", $html_title, "");
 		      // measured by overlayReserve(), which is the point -- a transient must not change the
 		      // fit, or every save would re-zoom the map. ?>
 		<div id="lpn_map_notice" class="d-print-none" role="status" style="display:none;position:absolute;top:4px;left:4px;z-index:5;max-width:60%;font-size:11px;background:#fffbe6;border:1px solid #a80;padding:2px 6px;pointer-events:none"></div>
+		<?php // THE PLACEMENT BAR (ROADMAP Task 145). Top-CENTRE of the map, not the top-left stack:
+		      // it is a modal-for-the-duration control rather than a readout, and it must not cover
+		      // the mode hint or the solver's diagnostic. pointer-events on -- unlike every other
+		      // overlay here, this one is buttons.
+		      //
+		      // STATIC MARKUP, filled and shown by georefRefreshBar() in looped-network.js, for the
+		      // same reason #lpn_backdrop_target_panel is static: the strings are language keys and
+		      // PHP is where those live. ?>
+		<div id="lpn_georef_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:6;max-width:92%;font-size:12px;background:#fff;border:1px solid #05a;padding:6px 10px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+			<div id="lpn_georef_hint" style="margin-bottom:4px"></div>
+			<span id="lpn_georef_numbers" style="display:none">
+				<label><?=ecTipLabel($ec_lang['lpn_georef_scale'], $ec_lang['lpn_georef_scale_tip'])?>
+					<input type="number" id="lpn_georef_scale_in" step="any" style="width:7em">
+					<span id="lpn_georef_unit"></span></label>
+				<label><?=ecTipLabel($ec_lang['lpn_georef_rotation'], $ec_lang['lpn_georef_rotation_tip'])?>
+					<input type="number" id="lpn_georef_rot_in" step="any" style="width:5em"></label>
+			</span>
+			<button type="button" id="lpn_georef_drop"><?=$ec_lang['lpn_georef_drop']?></button>
+			<button type="button" id="lpn_georef_finish"><?=$ec_lang['lpn_georef_finish']?></button>
+			<button type="button" id="lpn_georef_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
+		</div>
 		<?php // Deliberately NOT d-print-none (Tom, 2026-07-30) -- the Labels popover itself is
 		      // toolbar chrome and is hidden on print like the rest of #lpn_toolbar, so the color key
 		      // for whichever fields are toggled on needs a separate, always-visible home to survive
@@ -738,6 +759,16 @@ EngCalcs.pageConfig = {
 	lpn_clean_map: <?=json_encode($ec_lang['lpn_clean_map'])?>,
 	lpn_clean_map_off: <?=json_encode($ec_lang['lpn_clean_map_off'])?>,
 	lpn_clean_map_tip: <?=json_encode($ec_lang['lpn_clean_map_tip'])?>,
+	lpn_georef_menu: <?=json_encode($ec_lang['lpn_georef_menu'])?>,
+	lpn_georef_tip: <?=json_encode($ec_lang['lpn_georef_tip'])?>,
+	lpn_georef_intro: <?=json_encode($ec_lang['lpn_georef_intro'])?>,
+	lpn_georef_carry: <?=json_encode($ec_lang['lpn_georef_carry'])?>,
+	lpn_georef_adjust: <?=json_encode($ec_lang['lpn_georef_adjust'])?>,
+	lpn_georef_confirm: <?=json_encode($ec_lang['lpn_georef_confirm'])?>,
+	lpn_georef_done: <?=json_encode($ec_lang['lpn_georef_done'])?>,
+	lpn_georef_on_map: <?=json_encode($ec_lang['lpn_georef_on_map'])?>,
+	lpn_georef_empty: <?=json_encode($ec_lang['lpn_georef_empty'])?>,
+	lpn_georef_unavailable: <?=json_encode($ec_lang['lpn_georef_unavailable'])?>,
 	lpn_menu_settings: <?=json_encode($ec_lang['lpn_menu_settings'])?>,
 	lpn_menu_help: <?=json_encode($ec_lang['lpn_menu_help'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
@@ -1006,6 +1037,7 @@ EngCalcs.pageConfig = {
 <script src="/engcalcs/js/lpn-geom.js?v=<?=filemtime(__DIR__.'/js/lpn-geom.js')?>"></script>
 <script src="/engcalcs/js/lpn-collide.js?v=<?=filemtime(__DIR__.'/js/lpn-collide.js')?>"></script>
 <script src="/engcalcs/js/lpn-profile.js?v=<?=filemtime(__DIR__.'/js/lpn-profile.js')?>"></script>
+<script src="/engcalcs/js/lpn-georef.js?v=<?=filemtime(__DIR__.'/js/lpn-georef.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

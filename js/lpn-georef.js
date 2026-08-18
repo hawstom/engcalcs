@@ -28,10 +28,15 @@
 // here mutates its argument, because the wizard's preview re-derives from the committed
 // transform on every pointer move and a mutating helper would compound the drag.
 
-var EngCalcs = EngCalcs || {};
-
-(function () {
+// **THE ROOT-OBJECT FORM, MATCHING js/lpn-patterns.js.** `var EngCalcs = EngCalcs || {}` is
+// module-LOCAL under Node's `require`, so a harness that loaded this file and then read
+// `EngCalcs.lpnGeorefToLonLat` off the global got undefined -- and looped-network.js's own guard for
+// "the placement tool did not load" then fired in every headless test of it. Taking the root
+// explicitly makes the browser's global and a harness's pre-built EngCalcs the same object.
+(function (root) {
 	'use strict';
+
+	var EngCalcs = root.EngCalcs = root.EngCalcs || {};
 
 	// ---- the projection ------------------------------------------------------------------
 	//
@@ -245,8 +250,7 @@ var EngCalcs = EngCalcs || {};
 	EngCalcs.lpnGeorefWithRotation = withRotation;
 	EngCalcs.lpnGeorefBounds = bounds;
 	EngCalcs.lpnGeorefMetersPerUnitFromExtent = metersPerUnitFromExtent;
-}());
 
-if (typeof module !== 'undefined' && module.exports) {
-	module.exports = EngCalcs;
-}
+	if (typeof module !== 'undefined' && module.exports) { module.exports = EngCalcs; }
+
+}(typeof globalThis !== 'undefined' ? globalThis : this));

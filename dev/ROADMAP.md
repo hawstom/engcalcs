@@ -270,6 +270,9 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     asking what a number counted. `{nodes}` is every node, not junctions; Net3 has 92 junctions, 3
     tanks and 2 reservoirs, not "97 junctions, two tanks and a river source". Nothing in the build
     compares prose against a network, so only a reader could have caught these.
+  - **BLOCKED ON TOM'S AUTHORIZATION, not on work.** It is a translation sprint, and a sprint spawns
+    paid agents; CLAUDE.md forbids inferring that from a general "proceed". The English is already
+    edited, so the whole remaining task is the 26 renderings.
 
 - 15|400| **Phase 3 — bounded local search on the residue. LOWERED 60→15, Tom 2026-08-17: "Phases 1
   and 2 are good enough for GIS mode or management mode. Phase 3 may be helpful for report mode."**
@@ -459,6 +462,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     default in a geographic project and off by a View row. Registration without a projection seam:
     each tile is placed at ITS OWN lon/lat rectangle, so the box is 1 : cos(lat) rather than square,
     and the only error left is the chord across one tile — measured at 0.025 px at zoom 12.
+  - **DONE, slice 3: the placement tool** (2026-08-18). File > Put this project on the world map…
+    carries an XY-grid model onto the map as one picture, drops it, and lets it be moved, resized and
+    turned before Finish. The scale is READ, not asked for — a grid project already declares that one
+    unit is one Length/Map unit, so a declared 1000 ft lands at a measured 1000.015 ft. Terms decided:
+    **world map** and **XY grid**. Everything, including the proposed `$ec_lang_syn` diff awaiting
+    Tom: **`dev/georeferencing.md`**.
   - **NEXT: the projection seam, and it is its own task-sized piece of work.** Examined and judged
     too large to land with the tiles: the document's coordinates reach the renderer as the node
     OBJECTS (184 `.x` reads, 172 `.y`, 23 `screenToWorld()`), and the cheap version — an internal
@@ -469,6 +478,13 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Web Mercator must NOT become the document's coordinate system**, and its distances are not
     ground distances: the scale error is `1/cos(latitude)` — ~15% at 40°, ~30% at 50°. This is the
     strongest argument for the standing rule that **`len` is stored and overridable, never derived.**
+- 25|436| **Placement tool follow-ups (Task 145's tool, `dev/georeferencing.md` §5).** Three known
+  limits, none of them urgent: a BACKGROUND IMAGE is not carried onto the map, so a site plan behind a
+  placed model ends up in the wrong place; the two-control-point path (`lpnGeorefFromTwoPoints`, built
+  and tested) has no interface, and is the accurate route for a user who has real coordinates for two
+  points on their drawing; and Finish is not undoable — Cancel is the way back during placement, and
+  after Finish it is closing without saving.
+
 - 20|221| **Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.** Delete
   `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,
   `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is
@@ -537,17 +553,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     same item twice.
   - Changing `menu_more`'s English makes 26 translations stale — a resync, not a new key.
 
-- 95|253| **A clean-map view: hide canvas chrome for screenshots.** Tom, 2026-08-09, wants it
-  under the View menu and in the toolbar's View area. **Scope it as "clean map", not "print".**
-  His own framing: *"The only thing I care for it to hide at the moment (for map screenshots) is
-  the Mode status line... what a true printable version should look like is debatable, which is
-  why I prefer just a nice map for a screenshot until we create report tables."* So: one toggle
-  that hides `#lpn_mode_hint` (and arguably `#lpn_coords`), nothing else, no print stylesheet
-  work, no decisions about what a report contains. Task 175 already holds the real
-  printable-version question — do not merge them, and do not let this grow into it.
-  - Partly mitigated already: `zoomExtent()` now reserves the overlays' measured height so a fit
-    never places content under them. That does not survive a pan, which is why this still exists.
-
 - 35|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
   and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves shipped 2026-08-14;
   PBV and GPV 2026-08-17. Time is the open one, and the engine makes it a mapping-and-UI job rather
@@ -575,7 +580,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Our Find already IS the goto search (Task 420); what is missing is its place on that strip.
   - Tom on EPANET's own arrangement, as the thing NOT to copy: settings split among View > Options,
     Project > Defaults and View > Legend > Modify, "have always been confusing".
-  - Don't copy the epanetjs left pane. 
+  - Don't copy the epanetjs left pane.
+  - epanetjs does not put Settings here. And we will not put our Labels box here. Those will stay separate from the panes.
 
 - 60|433| **Profile: fit and finish.** Tom, 2026-08-18: *"Amazing. Now we just need a good UI."* The
   drawing is right (Task 409); what is missing is everything around it.
@@ -631,25 +637,34 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - He notes the current width *"reminds me of the two-pane paradigm"* — which is Task 284, and is
     the direction he wants anyway; this is the narrow version until that lands.
 
-- 65|430| **`.inp` export converts inputs. Never convert inputs unless requested by user.** Tom, 2026-08-18: *"A round trip
-  survives to very close results. Not identical... I notice that the inputs have been converted. As far as I know, that is a no-no."*
-  - The writer passes a value through untouched only when the project's unit and the file's unit have
-    the SAME FACTOR; otherwise it converts and says so. So a project working in units the file's flow
-    keyword does not name gets arithmetic it might not need.
-  - **Look at whether the file's own unit system can follow the PROJECT** rather than the project
-    being converted into a fixed one — `[OPTIONS] Units` has ten keywords and the project may already
-    be in one of them. Byte-identity is already proven for a file re-exported in its own units
-    (Task 281); this is about the other case.
-  - But this all may be a distraction when Net3 is in standard EPANET US units. No conversion should have happened. So it was a bug.
-  - **RAISED 40 -> 65 on that last line.** It reframes the task: not "which units should we write"
-    but "the pass-through did not fire on a file that should have hit it". There is a reproducible
-    case — export the Net3 the gallery ships and read the numbers back. Start by asking which of the
-    seven project selectors did not match the file's unit, because the writer passes through only
-    when the FACTORS are equal and one mismatched selector converts that whole quantity.
-
+- 45|430| **`.inp` export: NOTHING IS CONVERTED, and the round trip differs by FORMATTING only.**
+  Full diagnosis, with counts: **`dev/inp-export-conversion-bug.md`**. LOWERED 65 → 45 on it.
+  - Tom, 2026-08-18: *"I notice that the inputs have been converted. As far as I know, that is a
+    no-no."* **Measured: no unit converted.** All five converters were in pass-through for the
+    shipped Net3 (`fth2o` vs `ft` are different NAMES with the identical factor, so the factor test
+    did exactly its job). 1,191 of 1,225 tokens are already character-identical and **none of the 34
+    differences has a different VALUE** — `9.00`→`9`, `4530.`→`4530`, `.1`→`0.1`, `220.0`→`220`.
+  - **The real cause is a stale committed artifact, not code:** every gallery example JSON carries
+    ZERO token bags (Net3 0/216, Net1 0/24, Net2 0/76, Elm Street 0/37) because they were authored
+    before Task 390 step 3. `serializeProject()` does preserve `tok`. Fix is to backfill the bags and
+    regenerate `examples/`; the diff then drops 34 → 2.
+  - The last 2 are the pump curve id (`1`→`C_10`), which needs `docFromInp()` to carry it.
+  - **`[OPTIONS] Units` following the project is a distraction — that bullet is dropped.** Byte
+    identity is already proven for all ten keywords.
+  - If Tom measured "not identical" by RUNNING the exported file, the cause was Task 423 (patterns
+    were not written or applied), which is now closed.
+  - Harness `dev/lpn-spike/inp-roundtrip-net3-harness.js` prints every difference; it is known-failing
+    behind an `EXPECT_CLEAN` flag until the backfill lands.
 - 40|432| **A window scrollbar should not exist on this page.** Tom, 2026-08-18: *"Our bottom controls
   bar should be the hard bottom of the page."* The map is a full-window drawing surface; anything
   that scrolls the WINDOW moves the whole application.
+  - **A CSS fix landed 2026-08-18 and is UNVERIFIED in a browser.** The overflow was the `form`'s
+    `margin-bottom: 1px`, which collapses out of body's box and into the document's scroll height —
+    no measurement inside `flowBelowMap()` can ever see it. Now zeroed, and `html` is
+    `overflow: hidden`, both scoped by `html:has(#lpn_canvas)` so the other 15 calculators still
+    scroll. **Deliberate cost:** below `LPN_MAP_MIN` (80px) what used to be scroll-reachable is now
+    clipped, so on a very short window `#lpn_map_footer` is unreachable. That is what "hard bottom"
+    means, but it is a real change.
 
 - 35|431| **The examples gallery reappears when switching to an empty project tab.** Tom, 2026-08-18:
   *"For some reason the gallery appears sometimes when I switch to an empty project tab."* It should
@@ -659,26 +674,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 35|435| **The Labels panel's column headings sit too far right.** Tom, 2026-08-18: still misaligned
   after the earlier pass. A CSS fix in `.lpn-labels-*`; the columns are the decimals, priority and
   affix spinners.
-
-- 70|423| **WIRE THE PATTERN MODEL IN: the reading is built and nothing consumes it.** `js/lpn-patterns.js`
-  and the `.inp` reader landed 2026-08-18 (Tasks 248.01/02/03 data model). Three edits make Net3
-  match EPANET at t=0, and none of them could be made in the same pass because another track owned
-  the files.
-  - `Looped-Network.php`: a `<script src="js/lpn-patterns.js?v=<?=filemtime()?>">` tag **before**
-    `lpn-inp.js`. Without it the importer degrades to the old report, deliberately and audibly.
-  - `js/looped-network.js`: `docFromInp()` carries `parsed.patterns`, `parsed.defaultPattern`,
-    `parsed.times` and `parsed.controls` onto the document; `assembleModel()` multiplies each
-    junction's demand by its multiplier at the chosen time.
-  - **`[OPTIONS] Pattern` IS THE DEFAULT DEMAND PATTERN, and resolving without it is the trap.** A
-    junction with a blank pattern column does not have "no pattern" — it has that one. Net3 names
-    `Pattern 1`, so ignoring it leaves nearly every junction 34% low with every number on screen
-    looking reasonable. Resolve as `node.demandPattern || parsed.defaultPattern`, and do NOT write it
-    onto the junction: the file never stated it there.
-  - Measured, against the engine: with patterns and that default applied, EPANET's own t=0 demand at
-    all 92 Net3 junctions equals base × the resolved multiplier, worst error under 1e-4 gpm.
-  - `demand-pattern` and `extended-period` stay in the drop report until a run consumes them —
-    removing `extended-period` early turns `validate_inp.js` red, because it would compare our
-    unpatterned t=0 against EPANET's patterned one.
+  - **A CSS fix landed 2026-08-18 and is UNVERIFIED in a browser.** The cause was a font size, not a
+    width: Bootstrap's Reboot makes controls inherit `1rem` while `columnHeadings()` sets the heading
+    row to `0.85em`, so every heading was ~15% narrower than the control it names and the leftmost
+    flex item absorbed the whole shortfall (~38px at "Before", ~11px at "Priority"). The panel is now
+    anchored at `1rem` with the four column widths restated in `rem`. Look at both the Node and Link
+    lists, including the node ID row, which uses two spacers instead of spinners.
 
 - 45|248.01| **Time settings (Task 248 child) — the smallest of the four and the one everything else
   reads.** Duration, hydraulic time step, pattern time step, pattern start time, report time step,
