@@ -419,11 +419,12 @@ worth roughly ten a human must remember**, and this file's unexecutable half is 
 
 ### What the free tier does NOT cover
 
-- **Only `mpf` and `mtc` have a worked-example test of their math.** Every other calculator is checked
-  for running, for not emitting NaN, and for opening on a passing design — real coverage of
-  catastrophic failure, none at all of a wrong coefficient. **"The harnesses pass" is not "the math is
-  right" for anything but those two.** Add a worked example for the page you are editing; it is under
-  an hour.
+- **Nine calculators have a worked-example test of their math, and six do not.** Anchored against the
+  source method: `mpf`, `mtc`, `dw`, `hw`, `or`, `odt`, `ws`, `mphl`, `mhp`, plus `rc` partially (its
+  Robinson coefficients are unverified — the paper is paywalled and the free copy is a page scan).
+  **No math anchor at all: `mi`, `wi`, `ip`, `bpn`, `cs`.** For those, "the harnesses pass" still
+  means running and not emitting NaN, and says nothing about a wrong coefficient. Add a worked example
+  for the page you are editing; it is under an hour, and `dev/calc-spike/README.md` is the recipe.
 - **Row-table calculators** (Branched-Network, Irrigation-Pressure, Manning-Irregular,
   Weir-Flow-Irregular) run, but the results inside their dynamic rows do not — building the rows needs
   a richer DOM than `calc-page.js` has. The smoke harness names them as it goes.

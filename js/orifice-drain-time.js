@@ -63,6 +63,11 @@ EngCalcs.pageCalculator = function(objForm) {
 	} else {
 		this.var.h1    = 0;
 		this.var.q_max = 0;
+		// **EVERY RESULT CELL IS ZEROED, AND a_ending IS ONE OF THEM.** It was the one omission here,
+		// so on a refused design writeFormResult() multiplied `undefined` by a unit factor and showed
+		// the visitor a literal `NaN` in the ending-pond-area cell while all six neighbours read
+		// 0.000. Found by dev/calc-spike/or-harness.js, which now asserts all seven together.
+		this.var.a_ending = 0;
 		this.var.vol   = 0;
 		this.var.t_sec = 0;
 		this.var.t_min = 0;

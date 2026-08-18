@@ -161,8 +161,8 @@ if [ -n "$ADVISORY" ]; then
 fi
 echo "All blocking checks pass."
 echo ""
-echo "Not covered here, and worth knowing: only mpf and mtc have a worked-example test of their"
-echo "math -- the other calculators are checked for running, not for being right -- and nothing"
+echo "Not covered here, and worth knowing: mi, wi, ip, bpn and cs have no worked-example test of"
+echo "their math -- they are checked for running, not for being right -- and nothing"
 echo "above reads code for design or logic errors. /code-review covers that, is billed, and only a"
 echo "human can start it."
 exit 0
