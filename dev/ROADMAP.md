@@ -548,29 +548,32 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     describe the gate as one (`dev/positioning.md` §6). Tom, 2026-08-14: *"we have no less technical
     authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
     all public domain."*
-- 75|434| **THREE PANES AND A TOGGLE FOR EACH, which is the shape every reader expects.** Tom,
-  2026-08-18, describing epanet-js: a LEFT pane (network review; pane not needed or planned at this time), a RIGHT pane (asset (our properties box is acceptable) + map
-  visibility/style tabs (pane or box is okay; pane is predictable and easily toggleable, but I hate to just be a copycat, though good is good), and a **resizable BOTTOM pane** carrying tabs — the profile and tabular
-  editors for Junctions, Pipes, Pumps, Valves, etc with every column sortable. Toggle buttons for the
-  three sit at the right edge of the toolbar, beside a goto-by-ID search.
-  - **This is the frame Tasks 284, 427, 433 and 146.04 all keep reaching for separately.** Decide it
-    once, or each of them invents a different container.
-  - Our Find already IS the goto search (Task 420); what is missing is its place on that strip.
-  - Tom on EPANET's own arrangement, as the thing NOT to copy: settings split among View > Options,
-    Project > Defaults and View > Legend > Modify, "have always been confusing".
-  - Don't copy the epanetjs left pane.
-  - epanetjs does not put Settings here. And we will not put our Labels box here. Those will stay separate from the panes.
+- 45|434| **The BOTTOM pane shipped 2026-08-18; what is left of this task is the RIGHT one, and Tom
+  has not settled it.** `#lpn_pane` is docked below the canvas in normal flow, resizable by its top
+  grip, remembering height/open/tab per browser in `lpn_pane`. Tabs: **Profile** (moved out of its
+  floating popup, and now full-height) and **Junctions** (sortable, editing through `setProp()`).
+  Find and the pane toggle sit in a new right-edge toolbar group. Harness
+  `dev/lpn-spike/pane-harness.js` (57) and `dev/browser-pass/specs/profile.js`.
+  - **The pane is in normal FLOW, and that is the whole mechanism.** `flowBelowMap()` measures
+    `body.bottom - svg.bottom`, so the map gives up exactly the pane's height *by measurement* — the
+    pane never writes a canvas height and never touches `serializeProject()`.
+  - **NO LEFT PANE, ever** (Tom: "Don't copy the epanetjs left pane"). **Settings and the Labels box
+    stay separate pull-downs** and the harness asserts they are not tabs.
+  - **OPEN: the RIGHT pane** — asset properties plus map visibility/style tabs. Tom: our properties
+    box "is acceptable", a pane is "predictable and easily toggleable, but I hate to just be a
+    copycat, though good is good". That is not a decision yet, and Tasks 427 and 284 are the two that
+    want it. The tab registry leaves room.
+  - **OPEN, and it needs Tom:** the toolbar toggle opens the pane on whatever tab you left it on, so
+    it does not mean "profile". If Task 433's *"reached from a toolbar button"* meant one button per
+    tab, that is a per-tab toggle set rather than one pane toggle. Likewise Find is a button opening a
+    a floating panel, not a live type-an-ID box sitting IN the toolbar strip.
+  - Pipes/Pumps/Valves tabs are a few lines each in the registry, and are not built.
 
-- 60|433| **Profile: fit and finish.** Tom, 2026-08-18: *"Amazing. Now we just need a good UI."* The
-  drawing is right (Task 409); what is missing is everything around it.
-  - **DONE 2026-08-18: the path is shown on the map** — a wide translucent orange stroke along each
-    link of the route with a ring on every stop, in its own layer above the links and below the
-    nodes, drawn from the same `path` object the chart is. Not a restyling of the links: that would
-    fight the value ramp, the closed-link dash and the selection mark.
+- 50|433| **Profile: the last piece is the CHOOSER.** Tom, 2026-08-18: *"Amazing. Now we just need a
+  good UI."* Two of the three are done — the route is drawn on the map, and the panel is now the
+  full-height Profile tab of Task 434's bottom pane.
   - **The chooser should be the Google Maps gesture EPANET uses:** click the starting node, hover
     along the path, click to add a waypoint, double-click to end. Not two pull-downs.
-  - **It is too small** — a proof of concept. It belongs in the resizable bottom pane of Task 434,
-    above the bottom bar, reached from a toolbar button.
 
 - 55|427| **Colour by value: one dropdown is not the idiom.** Tom, 2026-08-18: he sees the beauty of
   one control, "but it's not the expectation". EPANET and epanet-js both give NODES and LINKS a
