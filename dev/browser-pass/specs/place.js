@@ -307,4 +307,59 @@ exports.run = async function ({ browser, report }) {
 	} finally {
 		await a.close();
 	}
+
+	// ---- and again with the bottom pane open (Task 434) -----------------------------------------
+	// The pane is in normal flow below the canvas, so opening it changes the canvas's height and its
+	// position on the screen — and every number in this tool is a screen coordinate that has been
+	// through `screenToWorld()`. A fresh profile, because a project that has been through Finish is
+	// a GeoMap one and a new XY tab made after it inherits the geographic view (see section 1).
+	const b = await Session.open(browser, 'B');
+	try {
+		await b.page.route(/tile\.openstreetmap\.org/, (route) => route.abort());
+		await b.goto();
+		await b.dismissGallery();
+		await b.toolbarClick('Bottom panel');
+		await b.settle(600);
+		const paneOpen = await b.page.evaluate(() =>
+			document.getElementById('lpn_pane').style.display !== 'none');
+		report.ok(paneOpen, 'set up: the bottom pane is open, so the canvas is shorter and lower');
+
+		await drawL(b);
+		await b.menuClick(ROW);
+		await b.settle(700);
+		await wheelIn(b, 24);
+		const ghostB = await body(b), canvasB = await canvasRect(b);
+		report.ok(ghostB && ghostB.w > 0 && ghostB.h > 0 &&
+			ghostB.cy > canvasB.y && ghostB.cy < canvasB.y + canvasB.h,
+		'the ghost box is on the shortened canvas, not behind the pane',
+		ghostB && `centre ${ghostB.cy.toFixed(0)} in a canvas of ${canvasB.y.toFixed(0)}..${(canvasB.y + canvasB.h).toFixed(0)}`);
+
+		await b.page.click('#lpn_georef_drop');
+		await b.settle(500);
+		const handsB = await b.page.evaluate(() => [...document.querySelectorAll('.lpn-georef-handle')].map(h => {
+			const r = h.getBoundingClientRect();
+			const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+			return { self: hit === h, size: r.width };
+		}));
+		report.eq(handsB.length, 5, 'the handles are all there with the pane open');
+		report.ok(handsB.every(h => h.self && Math.abs(h.size - 18) < 1.5),
+			'...and still hit-testable at their own centres', handsB[0] && handsB[0].size.toFixed(1) + ' px');
+
+		const g0 = await body(b);
+		await b.page.mouse.move(g0.cx, g0.cy);
+		await b.page.mouse.down();
+		await b.page.mouse.move(g0.cx - 50, g0.cy - 30, { steps: 8 });
+		await b.page.mouse.up();
+		await b.settle(400);
+		const g1 = await body(b);
+		report.ok(Math.abs(g1.cx - g0.cx + 50) < 2 && Math.abs(g1.cy - g0.cy + 30) < 2,
+			'...and a body drag still lands where the pointer went, with the canvas offset by the pane',
+			`moved ${(g1.cx - g0.cx).toFixed(1)}, ${(g1.cy - g0.cy).toFixed(1)} for a -50, -30 drag`);
+
+		await b.page.click('#lpn_georef_cancel');
+		await b.settle(600);
+		report.eq(b.errors.length, 0, 'no uncaught JavaScript with the pane open', b.errors[0] || '');
+	} finally {
+		await b.close();
+	}
 };

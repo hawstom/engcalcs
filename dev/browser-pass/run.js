@@ -12,7 +12,9 @@
 //   §1  the native picker's user-activation handshake — the riskiest single guess in the build
 //   §6  a permission that is genuinely 'prompt' or 'denied' — OPFS is always granted
 //   §11 Firefox and Safari
-//   anything visual: banner colours, the Save-all flicker, the stray scrollbar, print layout
+//   anything visual: banner colours, the Save-all flicker, print layout
+// (The stray scrollbar was on that list and has come off it: specs/noscroll.js measures the geometry
+//  under it, which is a number rather than a picture.)
 
 const path = require('path');
 const { REPO, startServer, stopServer, launchBrowser, clearLockRecords } = require('./lib/env');
