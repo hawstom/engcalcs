@@ -10230,25 +10230,50 @@ var EngCalcs = EngCalcs || {};
 		// and a close armed by the parent must not fire in that gap.
 		var subPopup = document.getElementById('lpn_menu_popup2');
 		if (subPopup) { subPopup.addEventListener('mouseenter', cancelSubClose); }
+		// **A GESTURE THAT BEGAN INSIDE A BOX NEVER DISMISSES IT** (Tom, 2026-08-18).
+		//
+		// The report, and it is a real one for anybody who selects text the way most people do: you
+		// drag right-to-left across a value to highlight it -- because starting at the left edge
+		// needs a precise click -- and the button comes up a little past the box. The `click` event
+		// then fires on the nearest COMMON ANCESTOR of where the pointer went down and where it came
+		// up, which for that gesture is <body>. Every "is this click inside the popover" test below
+		// is asking about <body>, answers no, and the box closes while you are typing into it.
+		//
+		// So the dismissal asks about where the gesture STARTED, not where the click was reported.
+		// That is Tom's own second suggestion ("a mousedown that is inside a box cannot result in the
+		// box being closed") and it is the right one: an X on the box would answer this box only, and
+		// leave every other input near a left edge with the same defect -- and the boxes on this page
+		// are menus, which close by clicking away. Menus with an X are a different design and would
+		// have to be all of them.
+		//
+		// CAPTURE PHASE, so it records the target even when a handler stops propagation -- the menu
+		// rows and the toolbar buttons all do. Cleared on the click it belongs to, so a stale target
+		// can never keep a box open later.
+		var gestureStart = null;
+		document.addEventListener('pointerdown', function (e) { gestureStart = e.target; }, true);
 		document.addEventListener('click', function (e) {
+			// The element to reason about: where the gesture began if we saw it, else the click's
+			// own target. Read once, and consumed -- the next click gets its own answer.
+			var from = gestureStart || e.target;
+			gestureStart = null;
 			var popup = document.getElementById('lpn_menu_popup');
 			var sub = document.getElementById('lpn_menu_popup2');
 			// `onAnchor` is belt, not the fix: a control that opens a menu should stop this click
 			// itself. But "the click that opened it must not also close it" is a rule worth holding
 			// in one place, because getting it wrong looks like the feature simply not working --
 			// no error, no menu, twice now.
-			var onAnchor = openMenuAnchor && (e.target === openMenuAnchor ||
-				(openMenuAnchor.contains && openMenuAnchor.contains(e.target)));
+			var onAnchor = openMenuAnchor && (from === openMenuAnchor ||
+				(openMenuAnchor.contains && openMenuAnchor.contains(from)));
 			// A click in the FLY-OUT is a click in the menu. Without this the submenu's own rows
 			// would dismiss the pull-down under them mid-click.
-			var inSub = sub && sub.style.display === 'block' && sub.contains(e.target);
-			if (popup && popup.style.display === 'block' && !popup.contains(e.target) && !inSub && !onAnchor) { closeMenu(); }
+			var inSub = sub && sub.style.display === 'block' && sub.contains(from);
+			if (popup && popup.style.display === 'block' && !popup.contains(from) && !inSub && !onAnchor) { closeMenu(); }
 			// A click inside ANY of them leaves ALL of them alone: the popovers hold live controls
 			// (unit selects, checkboxes, number fields), and closing one because the pointer went
 			// down in another would be worse than leaving both open.
 			var inside = VIEW_POPOVERS.some(function (id) {
 				var el = document.getElementById(id);
-				return el && el.style.display === 'block' && el.contains(e.target);
+				return el && el.style.display === 'block' && el.contains(from);
 			});
 			// TWO EXEMPTIONS, AND NO MORE THAN TWO (Task 372). The button that opened the popover,
 			// because its own handler has already run and closing here would undo it; and a click on
@@ -10262,9 +10287,9 @@ var EngCalcs = EngCalcs || {};
 			// stopPropagation so opening a menu does not immediately dismiss it -- so the exemption
 			// was only ever covering the bar's empty space and the toolbar's other buttons, which are
 			// exactly the clicks a user means as "away".
-			var onOpener = viewPopoverAnchor && (e.target === viewPopoverAnchor ||
-				(viewPopoverAnchor.contains && viewPopoverAnchor.contains(e.target)));
-			var inMenu = e.target.closest && e.target.closest('#lpn_menu_popup, #lpn_menu_popup2');
+			var onOpener = viewPopoverAnchor && (from === viewPopoverAnchor ||
+				(viewPopoverAnchor.contains && viewPopoverAnchor.contains(from)));
+			var inMenu = from.closest && from.closest('#lpn_menu_popup, #lpn_menu_popup2');
 			if (!inside && !onOpener && !inMenu) { closeViewPopovers(); }
 		});
 		// The hidden picker lives in the page, not in a popup body that gets replaced wholesale --

@@ -44,6 +44,60 @@ exports.run = async function ({ browser, report }) {
 			box && JSON.stringify(box));
 		report.ok(box && box.w > 100 && box.h > 60, 'and it has real size', box && (box.w + 'x' + box.h));
 
+		// **A DRAG THAT STARTS IN THE VALUE BOX AND ENDS OUTSIDE MUST NOT CLOSE THE PANEL.**
+		// Tom, 2026-08-18: he drags right-to-left across the value to select it -- because starting
+		// at the left edge needs a precise click -- and the button comes up past the box. The `click`
+		// that follows is reported on the nearest COMMON ANCESTOR of down and up, which is <body>,
+		// so every "is this inside the popover" test said no and the box vanished mid-edit.
+		//
+		// **THIS IS A BROWSER-ONLY FACT.** Nothing headless synthesises a click target from two
+		// different pointer positions, so no harness in this repo could express the gesture at all.
+		{
+			// **THE SPEC PROVES THE GESTURE BEFORE IT JUDGES THE RESULT.** Two earlier versions of
+			// this check passed with the fix REMOVED: one released off-screen and one ran later in
+			// the sequence, and in both the browser fired no click at all -- so "the panel is still
+			// open" was true for a reason that had nothing to do with the code. The click target is
+			// therefore recorded and asserted to be outside the panel, and this block runs FIRST,
+			// before any other interaction with the page. If the gesture ever stops posing the
+			// question, this fails rather than flattering the code.
+			const box = await a.page.evaluate(() => {
+				window.__clicks = [];
+				document.addEventListener('click', function (e) {
+					var p = document.getElementById('lpn_find_popup');
+					window.__clicks.push({ tag: e.target.tagName, inPanel: !!(p && p.contains(e.target)) });
+				}, true);
+				const i = document.querySelector('#lpn_find_popup input[type=text]');
+				const r = i.getBoundingClientRect();
+				return { x: r.x, y: r.y, w: r.width, h: r.height };
+			});
+			// Start inside, near the right edge, and release OUTSIDE the panel to the left -- Tom's
+			// own direction, and the reason the panel sits close to the window edge matters: the
+			// release point has to be a real on-screen point outside the box, or the browser fires
+			// no click at all and the spec passes without ever posing the question.
+			const panel = await a.page.evaluate(() => {
+				const r = document.getElementById('lpn_find_popup').getBoundingClientRect();
+				return { x: r.x, y: r.y, w: r.width, h: r.height };
+			});
+			// Released well clear of the panel, over open canvas. The DIRECTION is not what the
+			// defect turns on -- the click is reported on the common ancestor either way -- and a
+			// release point that is merely a few pixels outside can land on nothing at all, which
+			// is how the first version of this check ended up vacuous.
+			const releaseAt = panel.x + panel.w + 200;
+			await a.page.mouse.move(box.x + box.w - 6, box.y + box.h / 2);
+			await a.page.mouse.down();
+			await a.page.mouse.move(releaseAt, box.y + box.h / 2, { steps: 8 });
+			await a.page.mouse.up();
+			await a.settle(120);
+			const after = await a.page.evaluate(() => ({
+				clicks: window.__clicks,
+				open: document.getElementById('lpn_find_popup').style.display === 'block'
+			}));
+			report.ok(after.clicks.length > 0 && after.clicks.every(c => !c.inPanel),
+				'the gesture really does report its click OUTSIDE the panel -- the question is posed',
+				JSON.stringify(after.clicks));
+			report.ok(after.open, 'selecting text by dragging out of the box leaves the box open');
+		}
+
 		// The three pull-downs and the value box are the whole control surface.
 		const controls = await a.page.evaluate(() => {
 			const p = document.getElementById('lpn_find_popup');
@@ -92,6 +146,15 @@ exports.run = async function ({ browser, report }) {
 		const stillOpen = await a.page.evaluate(() =>
 			document.getElementById('lpn_find_popup').style.display === 'block');
 		report.ok(stillOpen, 'choosing the row again re-opens it rather than toggling it shut');
+
+		// A click that both starts AND ends away from the panel still closes it -- the fix must not
+		// have turned the dismissal off.
+		await a.page.mouse.click(12, 400);
+		await a.settle(120);
+		const dismissed = await a.page.evaluate(() =>
+			document.getElementById('lpn_find_popup').style.display !== 'block');
+		report.ok(dismissed, '...while a real click away still dismisses it');
+		await a.menuClick('Find', 'edit');
 
 		// Escape is how a pull-down goes away, and this is one.
 		await a.page.keyboard.press('Escape');
