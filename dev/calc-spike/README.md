@@ -22,6 +22,7 @@ Three files now do:
 | `calc-page.js` | The scaffolding. Renders a real page, builds a headless form from it, loads the page's own scripts, runs `EngCalcs.pageCalculator`. Not a test itself. |
 | `all-calcs-smoke-harness.js` | **Every** calculator, on its factory defaults, in both unit presets: it runs, it writes no NaN/Infinity/undefined, and it opens on a passing design. |
 | `mpf-harness.js`, `mtc-harness.js` | The two **core** calculators' actual math, against published anchors and hand-computed worked examples. |
+| `dw-`, `hw-`, `or-`, `ws-`, `mphl-`, `mhp-`, `rc-harness.js` | Seven more calculators' math, each against the source method its own page names. Every one of them lists at the top of the file the mutations that were made to prove it bites. |
 
 ## The design decision that matters: nothing about the form is restated here
 
@@ -57,9 +58,19 @@ Cheap — usually under an hour, and the pattern is in `mpf-harness.js`:
 
 ## Known gaps, stated rather than hidden
 
-- **Only mpf and mtc have worked examples.** Everything else is covered for *running*, not for
-  *being right*. That is deliberate — the value is concentrated, and a calculator nobody has
-  edited in two years is not where a regression appears. Test what is being edited.
+- **Nine calculators now have a math anchor** — `mpf`, `mtc`, `dw`, `hw`, `or`, `odt`, `ws`,
+  `mphl`, `mhp` — and `rc` has a partial one. What each is anchored AGAINST is stated at the top
+  of its own harness; the short version is Colebrook-White for `dw`, EPANET's 4.727 equation for
+  `hw`, a numerical integration of its own defining integral for `odt`, the critical-flow result
+  for `ws`, the Manning equation in both its customary forms for `mphl`, and P = eta rho g Q H
+  for `mhp`.
+- **`rc` (Rock Chute) is the honest exception.** Its five Robinson, Rice & Kadavy (1998)
+  coefficients are NOT verified — the paper is paywalled and the reachable copy is a page-image
+  scan. `rc-harness.js` anchors everything around them (Manning, continuity, the geometry
+  multiples, the exponents, and the join between the two published branches) and says so at the
+  top. A worked example from the paper or an NRCS design aid is what would close it.
+- **Still no math anchor at all:** `mi`, `wi`, `ip`, `bpn`, `cs` — the four row-table
+  calculators (see below) plus Canal Seepage.
 - **Row-table calculators** (Branched-Network, Irrigation-Pressure, Manning-Irregular,
   Weir-Flow-Irregular) are run, but the results that live inside their dynamic rows are not:
   building the rows needs a richer DOM than `calc-page.js` has. The smoke harness prints them as
