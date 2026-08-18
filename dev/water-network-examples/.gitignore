@@ -27,3 +27,12 @@
 !Net3-lpn.json
 !Elm-Street-Center-lpn.json
 !examples.json
+
+# **THE EPA REFERENCE FILES ARE NOT HERE, AND THAT IS DELIBERATE.** Net1.inp, Net2.inp, Net3.inp and
+# Net3.rpt are EPA's own public-domain examples, and the tracked copies live in
+# `dev/lpn-spike/reference/`, which has no default-deny to fight. Whitelisting them here as well
+# would put a second tracked copy of the same fixture in the repo, free to drift from the first.
+#
+# Copies of them may still sit in this directory untracked; nothing reads those. A harness that
+# needs one reads `dev/lpn-spike/reference/`. Getting this wrong is invisible in the main working
+# directory and fails 70 harnesses in a fresh clone or a git worktree, which is how it was found.

@@ -5,7 +5,7 @@
 // gap has a number instead of an impression. Tom, 2026-08-16: "I am checking Net3 against EPANET. I
 // find significant differences." He was right, and this says how much of it is which.
 //
-// dev/water-network-examples/Net3.rpt is an EXTENDED-PERIOD run, so 0:00 is the only block we can be
+// dev/lpn-spike/reference/Net3.rpt is an EXTENDED-PERIOD run, so 0:00 is the only block we can be
 // compared against at all -- we solve one steady state (ROADMAP Task 248). At 0:00 EPANET has
 // already applied each junction's DEMAND PATTERN multiplier and we have not: pattern 1 starts at
 // 1.34, and for nodes 15/35/123/203 the base demand is 1 so the pattern IS the demand in gpm.
@@ -39,8 +39,8 @@ let i = vi.indexOf('{', at), d = 0, end = i;
 for (; end < vi.length; end++) { if (vi[end]==='{') d++; else if (vi[end]==='}') { d--; if(!d){end++;break;} } }
 const toSolverModel = eval('(' + vi.slice(at, end) + ')');
 
-const inp = fs.readFileSync(path.join(ROOT, 'dev/water-network-examples/Net3.inp'), 'utf8');
-const rpt = fs.readFileSync(path.join(ROOT, 'dev/water-network-examples/Net3.rpt'), 'utf8');
+const inp = fs.readFileSync(path.join(ROOT, 'dev/lpn-spike/reference/Net3.inp'), 'utf8');
+const rpt = fs.readFileSync(path.join(ROOT, 'dev/lpn-spike/reference/Net3.rpt'), 'utf8');
 
 // pattern id -> first multiplier
 const pats = {};
