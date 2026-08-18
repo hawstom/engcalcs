@@ -52,7 +52,7 @@ const L = loadLoopedNetwork(
 	// The junctions tab, driven the way the user drives it: sort by clicking a heading, type in a
 	// cell, read what the table says.
 	"\t\tsortJunctions: sortJunctions, renderJunctions: renderJunctions,\n" +
-	"\t\tjunctionOrder: function () { return junctionSorted().map(function (n) { return n.id; }); },\n" +
+	"\t\tjunctionOrder: function () { return junctionRowsInOrder().map(function (n) { return n.id; }); },\n" +
 	"\t\tjunctionCells: function () { return junctionCells; },\n" +
 	// The scenario machinery through its own doors -- createScenario()/switchScenario(), never a
 	// hand-built scenario object, or the seam under test would be tested against a shape the page
@@ -287,6 +287,18 @@ console.log('\n--- the Junctions tab ---');
 	cellsB.elev.value = '12.5';
 	cellsB.elev._listeners.change[0]();
 	report(b.elev === 12.5, 'typing in an elevation cell edits the elevation', String(b.elev));
+
+	// **AN EDIT MUST NOT MOVE THE ROW.** Sorted by elevation, b was in the middle; setting it to
+	// 12.5 does not re-sort, because the sort was a gesture the user made once and a table that
+	// re-orders itself under a typing hand is unusable.
+	const orderNow = L.junctionOrder().join(',');
+	L.renderJunctions();
+	report(L.junctionOrder().join(',') === orderNow, 'editing a value does not re-sort the table',
+		orderNow + '  →  ' + L.junctionOrder().join(','));
+	L.sortJunctions('id');
+	L.sortJunctions('elev');   // a fresh column always sorts ascending
+	report(L.junctionOrder()[0] === b.id, '...and clicking a heading does re-sort it, lowest first',
+		L.junctionOrder().join(','));
 
 	// **A SOLVE MUST NOT TAKE THE CELL AWAY FROM THE TYPIST.** renderJunctions() runs on every
 	// solve, which is 300 ms after every keystroke.

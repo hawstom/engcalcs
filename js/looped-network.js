@@ -5902,7 +5902,7 @@ var EngCalcs = EngCalcs || {};
 			tip: 'lpn_pane_tab_junctions_tip',
 			// A rebuild on entry, because the tab may have been away for a whole editing session;
 			// a refill afterwards, because renderJunctions() decides that for itself.
-			show: function () { junctionSig = ''; renderJunctions(); },
+			show: function () { junctionSig = ''; junctionOrderIds = null; renderJunctions(); },
 			refresh: renderJunctions
 		}
 	];
@@ -6050,6 +6050,10 @@ var EngCalcs = EngCalcs || {};
 				});
 			});
 		}
+		// **A SHORTER WINDOW LOWERS THE CEILING.** The clamp is re-run on a resize, or a pane that
+		// was a third of a tall window becomes the whole of a short one -- and the map would be at
+		// its floor with no way to see that the pane is what took it.
+		window.addEventListener('resize', function () { if (paneState.open) { applyPaneLayout(); } });
 		// The tabs are built after init()'s own EngCalcs.initTips(document) has run, so their tips
 		// need wiring here or a tap on one does nothing (ROADMAP Task 173's gap, again).
 		if (EngCalcs.initTips) { EngCalcs.initTips(pane); }
@@ -6076,7 +6080,7 @@ var EngCalcs = EngCalcs || {};
 	// the map labels and the colour ramp use, so a table cell and the label beside the symbol can
 	// never disagree.
 	var junctionSort = { col: 'id', dir: 1 };
-	var junctionCells = null, junctionSig = '';
+	var junctionCells = null, junctionSig = '', junctionOrderIds = null;
 	// The unit-bearing headings are rebuilt from these, so a unit switch re-labels the table for the
 	// same reason it re-renders the popup. `result` marks a column the solver owns.
 	var JUNCTION_COLS = [
@@ -6101,9 +6105,9 @@ var EngCalcs = EngCalcs || {};
 	// **A BLANK IS LAST IN BOTH DIRECTIONS.** Sorting descending to find the biggest demand must not
 	// hand back a screenful of junctions that have no demand at all -- an empty cell is the absence
 	// of a value, not the smallest one, so it is ranked outside the direction rather than inside it.
-	function junctionSorted() {
+	function junctionSorted(nodes) {
 		var col = junctionSort.col, dir = junctionSort.dir;
-		return junctionNodes().slice().sort(function (a, b) {
+		return nodes.slice().sort(function (a, b) {
 			var va = junctionValue(a, col), vb = junctionValue(b, col),
 				pa = junctionPresent(va), pb = junctionPresent(vb);
 			if (pa !== pb) { return pa ? -1 : 1; }
@@ -6112,6 +6116,22 @@ var EngCalcs = EngCalcs || {};
 			return String(va).localeCompare(String(vb), undefined, { numeric: true }) * dir;
 		});
 	}
+	// **A SORT IS A GESTURE, NOT A LIVE RULE.** The order is fixed when a heading is clicked and
+	// then held: an edit that changes a demand must not make its row jump somewhere else in the
+	// table, and a solve lands 300 ms after every keystroke, so a live re-sort would move rows out
+	// from under the hand that is typing in them. New junctions join in the current sort, deleted
+	// ones drop out, and everything else stays where the reader last saw it.
+	function junctionRowsInOrder() {
+		var pool = {}, out = [];
+		junctionNodes().forEach(function (n) { pool[n.id] = n; });
+		(junctionOrderIds || []).forEach(function (id) {
+			if (pool[id]) { out.push(pool[id]); delete pool[id]; }
+		});
+		junctionSorted(Object.keys(pool).map(function (id) { return pool[id]; }))
+			.forEach(function (n) { out.push(n); });
+		junctionOrderIds = out.map(function (n) { return n.id; });
+		return out;
+	}
 	function junctionNumText(v) {
 		return (typeof v === 'number' && isFinite(v)) ? String(+v.toFixed(6)) : '';
 	}
@@ -6119,18 +6139,17 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, text = pc[c.label] || c.key;
 		return c.unit ? text + ' (' + unitLabel(c.unit()) + ')' : text;
 	}
-	// What the table would have to be REBUILT for, as opposed to merely refilled: the rows present,
-	// the order they are in, and the headings. A solve changes none of those, and a solve is what
-	// happens 300 ms after every keystroke -- so a rebuild on every one would take the cell the user
-	// is typing in out from under them.
+	// What the table would have to be REBUILT for, as opposed to merely refilled: which rows are
+	// present, the order they are in, and the headings (which carry the units). A solve changes none
+	// of those, and a solve is what happens 300 ms after every keystroke -- so a rebuild on every one
+	// would take the cell the user is typing in out from under them.
 	function junctionSignature(rows) {
-		return rows.map(function (n) { return n.id; }).join('') + '|' +
-			junctionSort.col + junctionSort.dir + '|' +
-			JUNCTION_COLS.map(junctionHeadingText).join('');
+		return rows.map(function (n) { return n.id; }).join('|') + '||' +
+			JUNCTION_COLS.map(junctionHeadingText).join('|');
 	}
 	function renderJunctions() {
 		var host = document.getElementById('lpn_pane_junctions'), pc = EngCalcs.pageConfig || {},
-			rows = junctionSorted(), sig = junctionSignature(rows), table, thead, tr, tbody, note;
+			rows = junctionRowsInOrder(), sig = junctionSignature(rows), table, thead, tr, tbody, note;
 		if (!host) { return; }
 		if (sig === junctionSig && junctionCells) { refillJunctions(rows); return; }
 		junctionSig = sig;
@@ -6171,6 +6190,7 @@ var EngCalcs = EngCalcs || {};
 	function sortJunctions(col) {
 		junctionSort.dir = (junctionSort.col === col) ? -junctionSort.dir : 1;
 		junctionSort.col = col;
+		junctionOrderIds = null;   // the click is the whole of what re-orders the table
 		renderJunctions();
 	}
 	function junctionRow(n) {
