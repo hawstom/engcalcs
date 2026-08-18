@@ -66,7 +66,7 @@ function mkEl(id, written) {
 		id: id,
 		value: '',
 		_innerHTML: '',
-		textContent: '',
+		_text: '',
 		className: '',
 		style: {},
 		dataset: {},
@@ -89,6 +89,19 @@ function mkEl(id, written) {
 		closest() { return null; },
 		focus() {}, select() {}, click() {}
 	};
+	// **AN ELEMENT OWNS ITS CHILDREN'S TEXT, AND A STUB THAT FORGETS THAT LIES QUIETLY.** Assigning
+	// textContent REPLACES the children; reading it walks them. setLabel() builds a button as an
+	// <svg> plus a text node, so a plain string property reads back "" for every button on the page
+	// that has an icon -- which is all of them -- and every check of what a button SAYS silently
+	// passes on the empty string. Mirrors the same relationship dev/lpn-spike/lpn-dom-stub.js models.
+	Object.defineProperty(el, 'textContent', {
+		get() {
+			if (!el.children.length) { return el._text; }
+			return el.children.map(c => (c && typeof c.textContent === 'string') ? c.textContent : '').join('');
+		},
+		set(v) { el._text = String(v == null ? '' : v); el.children.length = 0; },
+		enumerable: true, configurable: true
+	});
 	// innerHTML is tracked, not stored plainly, so a harness can ask afterwards which cells the
 	// calculator actually WROTE. That is what makes a suite-wide smoke test possible without a
 	// per-page list of result names: the page tells you what its outputs are by writing them.
@@ -163,6 +176,12 @@ function loadCalculator(pageName, opts) {
 		querySelectorAll() { return []; },
 		addEventListener() {},
 		createElement(tag) { return mkEl(tag, null); },
+		// **A TEXT NODE IS A NODE.** setLabel() builds `icon + text` by appending one, so a stub
+		// without this throws the moment any button changes its own label -- which the Copy link
+		// button does on every success, swapping in a tick for 1.5 s. Modelled as an element with a
+		// tag no markup has, so anything walking children can still read it and nothing mistakes it
+		// for a real tag.
+		createTextNode(text) { const n = mkEl('#text', null); n.textContent = String(text); return n; },
 		cookie: '',
 		body: mkEl('body', null),
 		documentElement: mkEl('html', null),

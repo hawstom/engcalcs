@@ -5311,7 +5311,7 @@ var EngCalcs = EngCalcs || {};
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
 		if (!ll) {
-			setNotice(pc.lpn_goto_bad || 'That is not one latitude and one longitude. Try 38.106 -122.569, with a space between them.');
+			setNotice(pc.lpn_goto_bad || 'That is not one latitude and one longitude. Try 38 -122, with a space between them.');
 			return;
 		}
 		var w = (svg && svg.clientWidth) || 1000, want = w / GOTO_SPAN_DEG;

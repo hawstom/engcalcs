@@ -2,7 +2,7 @@
 //
 //   node dev/calc-spike/share-link-harness.js
 //
-// Not about a calculator's math. It is about what EngCalcs.copyShareLink() does when the clipboard
+// Not about a calculator's math. It is about what EngCalcs.copyLink() does when the clipboard
 // is not there -- which is the whole design of the control, and the half a browser pass on a
 // working laptop never exercises. navigator.clipboard is absent over plain http, missing in older
 // browsers, and present-but-rejecting where the browser does not consider the call user-initiated;
@@ -25,18 +25,22 @@ const r = makeReporter('share control (Task 228)');
 const page = loadCalculator('Manning-Pipe-Flow.php');
 const EngCalcs = page.EngCalcs;
 
-const btn = page.document.getElementById('ec_share_btn');
-const status = page.document.getElementById('ec_share_status');
-const box = page.document.getElementById('ec_share_url');
+const btn = page.document.getElementById('ec-copy-link-btn');
+const status = page.document.getElementById('ec-copy-link-btn');
+const box = page.document.getElementById('ec-copy-link-url');
 
 r.section('the control is on the page at all');
 
-r.ok(btn && status && box, 'button, status line and url box all render');
+// **THE BUTTON IS THE STATUS LINE.** The navbar carries no separate span: the confirmation and the
+// fallback instruction both swap the button's own label, the same slot the tick uses. There is no
+// `status` element to find, and looking for one was how this harness first described a control that
+// lived in the form rather than the navbar.
+r.ok(btn && box, 'button and url box both render');
 
 // The two outcome strings arrive on data- attributes in the real page (see the comment in
 // lib/Calculators.lib.php); the element bag does not carry attributes, so set them here.
-btn.dataset.copied = 'COPIED';
-btn.dataset.manual = 'COPY THIS';
+btn.dataset.copiedText = 'COPIED';
+btn.dataset.manualText = 'COPY THIS';
 
 // Capture instead of sending, exactly as repeat-visit-harness.js does.
 let signals = [];
@@ -57,9 +61,9 @@ const url = page.sandbox.location.href;
 	reset();
 	let written = null;
 	page.sandbox.navigator.clipboard = { writeText(t) { written = t; return Promise.resolve(); } };
-	await EngCalcs.copyShareLink();
+	await EngCalcs.copyLink();
 	r.eq(written, url, 'the current URL is what goes to the clipboard');
-	r.eq(status.textContent, 'COPIED', 'the status line says it was copied');
+	r.eq(btn.textContent, 'COPIED', 'the button itself says it was copied');
 	r.eq(box.hidden, true, 'the url box stays out of the way');
 	r.eq(signals.join(), 'share|copy', 'one share row, detail copy');
 
@@ -67,17 +71,17 @@ const url = page.sandbox.location.href;
 
 	reset();
 	delete page.sandbox.navigator.clipboard;
-	await EngCalcs.copyShareLink();
+	await EngCalcs.copyLink();
 	r.eq(box.hidden, false, 'the url box appears');
 	r.eq(box.value, url, '...carrying the link to be copied by hand');
-	r.eq(status.textContent, 'COPY THIS', '...and the status line asks for that');
+	r.eq(btn.textContent, 'COPY THIS', '...and the button asks for that');
 	r.eq(signals.join(), 'share|manual', 'the row still lands, marked manual');
 
 	r.section('a clipboard object with no writeText is the same case');
 
 	reset();
 	page.sandbox.navigator.clipboard = {};
-	await EngCalcs.copyShareLink();
+	await EngCalcs.copyLink();
 	r.eq(box.hidden, false, 'falls back rather than throwing on the missing method');
 	r.eq(signals.join(), 'share|manual', 'and is counted as manual');
 
@@ -85,16 +89,16 @@ const url = page.sandbox.location.href;
 
 	reset();
 	page.sandbox.navigator.clipboard = { writeText() { return Promise.reject(new Error('denied')); } };
-	await EngCalcs.copyShareLink();
+	await EngCalcs.copyLink();
 	r.eq(box.hidden, false, 'a rejected promise falls back too -- the case a laptop never shows');
-	r.eq(status.textContent, 'COPY THIS', '...with the same visible instruction');
+	r.eq(btn.textContent, 'COPY THIS', '...with the same visible instruction');
 	r.eq(signals.join(), 'share|manual', 'and the same manual row');
 
 	r.section('writeText that throws synchronously');
 
 	reset();
 	page.sandbox.navigator.clipboard = { writeText() { throw new Error('boom'); } };
-	await EngCalcs.copyShareLink();
+	await EngCalcs.copyLink();
 	r.eq(box.hidden, false, 'a throwing implementation still ends with a usable link');
 	r.eq(signals.join(), 'share|manual', 'and is still counted');
 

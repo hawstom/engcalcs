@@ -534,52 +534,6 @@ document.addEventListener('DOMContentLoaded', function () {
 //
 // Returns a promise so the harness can wait for the clipboard's own answer rather than for a
 // stub's; nothing in the page uses the return value.
-EngCalcs.copyShareLink = function () {
-	'use strict';
-	var btn = document.getElementById('ec_share_btn');
-	if (!btn) return Promise.resolve();
-	var status = document.getElementById('ec_share_status');
-	var box = document.getElementById('ec_share_url');
-	var self = this;
-	// Refreshed first so the link carries the form as it stands. A context with no History API
-	// cannot maintain the URL at all, so there is nothing to refresh and location.href is still
-	// the honest answer.
-	if (typeof this.updateUrl === 'function' && window.history && window.history.replaceState) {
-		this.updateUrl();
-	}
-	var url = window.location.href;
-	function manual() {
-		if (box) {
-			box.value = url;
-			box.hidden = false;
-			box.focus();
-			box.select();
-		}
-		if (status) status.textContent = (btn.dataset && btn.dataset.manual) || '';
-		self.logSignal('share', 'manual');
-	}
-	function copied() {
-		if (box) box.hidden = true;
-		if (status) status.textContent = (btn.dataset && btn.dataset.copied) || '';
-		self.logSignal('share', 'copy');
-	}
-	var clip = navigator.clipboard;
-	if (!clip || typeof clip.writeText !== 'function') {
-		manual();
-		return Promise.resolve();
-	}
-	try {
-		return Promise.resolve(clip.writeText(url)).then(copied, manual);
-	} catch (e) {
-		manual();
-		return Promise.resolve();
-	}
-};
-
-document.addEventListener('DOMContentLoaded', function () {
-	var btn = document.getElementById('ec_share_btn');
-	if (btn) btn.addEventListener('click', function () { EngCalcs.copyShareLink(); });
-});
 
 EngCalcs.calcAndSave = function (objForm) {
 	'use strict';
@@ -620,19 +574,55 @@ EngCalcs.setLabel = function (el, iconName, text) {
 // (constant history.replaceState churn was noise, especially for dynamic-row calculators).
 EngCalcs.copyLink = function () {
 	'use strict';
-	this.updateUrl();
+	// **THE ONE SHARE CONTROL, and it lives in the navbar beside the name** (ROADMAP Task 228). The
+	// name field and this button are one gesture: type what this calculation IS, then take the link
+	// that carries it. A second copy of this under the Printable Title shipped for one day and was
+	// removed -- that field names the printed SHEET, which is a different intention (Tom: *"this is
+	// just plain not needed"*).
+	//
+	// **THERE IS NO SILENT PATH, which is what the removed duplicate got right and this did not.**
+	// It used to `return` on a browser with no clipboard permission, so the button did nothing at
+	// all and said nothing about it -- and a promise rejection (the common case: a page without a
+	// secure context, or permission refused) was not caught either. Every failing route now reveals
+	// the link in a focused, selected box, because a control that looks like it worked and did not
+	// is worse than one that says "copy this yourself".
+	// Refreshed first, so the link carries the form as it stands -- but only where there IS a URL to
+	// maintain. A context with no History API cannot hold one, and location.href is then already the
+	// honest answer; calling updateUrl() there reaches for page furniture that need not exist.
+	if (typeof this.updateUrl === 'function' && window.history && window.history.replaceState) {
+		this.updateUrl();
+	}
 	var btn = document.getElementById('ec-copy-link-btn');
-	if (!btn || !navigator.clipboard || !navigator.clipboard.writeText) { return; }
-	var self = this;
-	navigator.clipboard.writeText(window.location.href).then(function () {
-		// setLabel, NOT textContent: assigning textContent destroys the button's <svg> on the
-		// first click and never restores it -- it reads text back but cannot read an element back.
+	if (!btn) { return Promise.resolve(); }
+	var box = document.getElementById('ec-copy-link-url');
+	var self = this, url = window.location.href;
+	// **THE WORDS GO ON THE BUTTON, not on a new status line.** The navbar strip is the tightest
+	// space on the page and Tom has just ruled that even the toolbar is too wordy, so the button the
+	// user just pressed is where the answer belongs -- the same slot the tick uses on success.
+	function say(text) {
+		var original = btn.textContent;
+		self.setLabel(btn, 'link', text || original);
+		setTimeout(function () { self.setLabel(btn, 'link', original); }, 6000);
+	}
+	function manual() {
+		if (box) { box.value = url; box.hidden = false; box.focus(); box.select(); }
+		say((btn.dataset && btn.dataset.manualText) || '');
+		self.logSignal('share', 'manual');
+	}
+	function copied() {
+		if (box) { box.hidden = true; }
+		// setLabel, NOT textContent: assigning textContent destroys the button's <svg> on the first
+		// click and never restores it -- it reads text back but cannot read an element back.
 		var originalText = btn.textContent;
 		self.setLabel(btn, 'check', btn.dataset.copiedText || originalText);
 		setTimeout(function () { self.setLabel(btn, 'link', originalText); }, 1500);
-	});
+		self.logSignal('share', 'copy');
+	}
+	var clip = navigator.clipboard;
+	if (!clip || typeof clip.writeText !== 'function') { manual(); return Promise.resolve(); }
+	try { return Promise.resolve(clip.writeText(url)).then(copied, manual); }
+	catch (e) { manual(); return Promise.resolve(); }
 };
-
 EngCalcs.readCookieAndCalc = function (objForm) {
 	'use strict';
 	// Dynamic row tables (reach/point tables) start empty in the raw HTML -- only

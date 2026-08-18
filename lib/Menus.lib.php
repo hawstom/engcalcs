@@ -166,7 +166,14 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 				<?php // Just the word: copyLink() swaps the icon to a tick for the 1.5s this shows,
 				      // so the confirm state keeps an icon without one being baked into the text. ?>
 				data-copied-text="<?=htmlspecialchars($ec_lang['calc_copy_link_done'], ENT_QUOTES, 'UTF-8')?>"
+				data-manual-text="<?=htmlspecialchars($ec_lang['template_share_manual'], ENT_QUOTES, 'UTF-8')?>"
 				onclick="EngCalcs.copyLink()"><?=ecIcon('link')?><?=$ec_lang['calc_copy_link']?></button>
+			<?php // THE FALLBACK, for every browser that refuses the clipboard: no secure context, no
+			      // permission, or a rejected promise. Hidden until it is needed, then filled, focused
+			      // and selected so Ctrl-C alone is enough. Without it the button did nothing at all
+			      // and said nothing about it, which is the one outcome worse than asking the user to
+			      // copy the text themselves. ?>
+			<input id="ec-copy-link-url" type="text" readonly hidden class="form-control form-control-sm" style="width:22em" aria-label="<?=htmlspecialchars($ec_lang['template_share_manual'], ENT_QUOTES, 'UTF-8')?>">
 		</form>
 <?php endif; ?>
 		<ul class="navbar-nav ms-auto">

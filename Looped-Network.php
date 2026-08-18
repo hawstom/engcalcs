@@ -2,7 +2,11 @@
 require_once('lib/base.inc.php');
 $html_title = $ec_lang['lpn_main_title'];
 $html_desc = $ec_lang['lpn_main_desc'];
-echoHeader("EngCalcs", $html_title, "");
+// **NO "Save this calculation" BOX ON THIS PAGE** (Tom, 2026-08-18). The fourth argument hides it.
+// That box names a calculation and puts the name in the URL, which is exactly right for a
+// form-and-an-answer page and meaningless here: an lpn project is saved to a FILE or to the browser
+// library, and File > Save is the control that does it.
+echoHeader("EngCalcs", $html_title, "", false);
 ?>
 <h2 id="ec-page-desc"><?=$ec_lang['lpn_main_desc']?></h2>
 <script>

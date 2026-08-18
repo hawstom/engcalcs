@@ -1354,12 +1354,12 @@ $ec_lang['lpn_xymap']='XY';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
 $ec_lang['lpn_georef_menu']='Convert to lat/lon…';
-$ec_lang['lpn_georef_tip']='Flat Earth to Round Earth. Put a drawing made on the XY grid onto real ground, so it sits on the street map where it belongs. Every number you typed stays as it is — only the X and Y become a longitude and a latitude.';
-$ec_lang['lpn_georef_intro']='Convert this XY project to a geographic project? Your project has been placed at the centre of the current world. Zoom to your location and move, resize, and turn the model as much as you like. When you are ready to start adjusting elements, press Finish.';
+$ec_lang['lpn_georef_tip']='Local to World. Put a drawing made on the XY grid onto geographic coordinates, so it sits on the street map where it belongs. Every number you typed stays as it is — only the X and Y become a longitude and a latitude.';
+$ec_lang['lpn_georef_intro']='Convert this XY project to a geographic project? Your project has been placed at the centre of a world map. Zoom to your location and move, resize, and turn the model as much as you like. When you are ready to start adjusting elements, press Finish.';
 $ec_lang['lpn_georef_adjust']='Drag the model to move it, a corner to resize it, the round handle above it to turn it. Or type the two numbers.';
 $ec_lang['lpn_georef_step1']='Step 1 of 2 — detached';
 $ec_lang['lpn_georef_step2']='Step 2 of 2 — attached';
-$ec_lang['lpn_georef_step1_hint']='Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is the right place and the right size, then press Drop it here.';
+$ec_lang['lpn_georef_step1_hint']='Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is roughly the right place and roughly the right size, then press Drop it here.';
 $ec_lang['lpn_georef_detach']='Pick it up again';
 $ec_lang['lpn_georef_size_prompt']='About how wide is the site, across the whole project?';
 $ec_lang['lpn_georef_drop']='Drop it here';
@@ -1375,9 +1375,9 @@ $ec_lang['lpn_georef_on_map']='This project is already on lat/lon.';
 $ec_lang['lpn_georef_empty']='Draw or open a network first. There is nothing to place yet.';
 $ec_lang['lpn_georef_unavailable']='The placement tool did not load. Reload the page and try again.';
 $ec_lang['lpn_goto_menu']='Go to a latitude and longitude…';
-$ec_lang['lpn_goto_tip']='Move the map to a place you already have coordinates for. Latitude first, then longitude, the way a map gives them, with a space between them: 38.106 -122.569';
+$ec_lang['lpn_goto_tip']='Move the map to a place you already have coordinates for. Latitude first, then longitude, the way a map gives them, with a space between them: 38 -122';
 $ec_lang['lpn_goto_prompt']='Latitude and longitude, in that order';
-$ec_lang['lpn_goto_bad']='That is not one latitude and one longitude. Try 38.106 -122.569, with a space between them.';
+$ec_lang['lpn_goto_bad']='That is not one latitude and one longitude. Try 38 -122, with a space between them.';
 $ec_lang['lpn_georef_goto']='Go to…';
 
 // ---- The bottom pane (ROADMAP Task 434) ----

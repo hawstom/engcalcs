@@ -28,9 +28,9 @@ const PAGE = 'Manning-Pipe-Flow.php?ec_nolog=1';
 
 async function shareState(a) {
 	return a.page.evaluate(() => {
-		const box = document.getElementById('ec_share_url');
+		const box = document.getElementById('ec-copy-link-url');
 		return {
-			status: document.getElementById('ec_share_status').textContent,
+			status: document.getElementById('ec-copy-link-btn').textContent,
 			hidden: box.hidden,
 			value: box.value,
 			focused: document.activeElement === box,
@@ -53,34 +53,37 @@ exports.run = async function ({ browser, report }) {
 		await a.goto(PAGE);
 
 		const where = await a.page.evaluate(() => {
-			const row = document.getElementById('ec_share_row');
-			if (!row) { return null; }
-			const r = row.getBoundingClientRect();
-			const sub = document.getElementById('printable_subtitle').getBoundingClientRect();
-			const units = document.getElementById('ec_units_row');
-			return {
-				visible: r.width > 0 && r.height > 0,
-				top: r.top, subBottom: sub.bottom,
-				aboveUnits: units ? r.bottom <= units.getBoundingClientRect().top + 1 : null,
-				printNone: row.classList.contains('d-print-none'),
-				label: document.getElementById('ec_share_btn').textContent.trim()
-			};
+			const btn = document.getElementById('ec-copy-link-btn');
+			if (!btn) { return null; }
+			const r = btn.getBoundingClientRect();
+			return { visible: r.width > 0 && r.height > 0, label: btn.textContent.trim() };
 		});
-		report.ok(!!where && where.visible, 'an ordinary calculator carries the share control', where && where.label);
-		report.ok(where && where.top >= where.subBottom - 1,
-			'...directly under the Printable Subtitle, where a calculation gets its name',
-			where && `row starts at ${where.top.toFixed(0)}, subtitle ends at ${where.subBottom.toFixed(0)}`);
+		report.ok(where && where.visible, 'the copy-link control is on the page and visible',
+			where && where.label);
+
+		// **BESIDE THE NAME FIELD IN THE NAVBAR** — which is where it has always been, and the reason
+		// Task 228's second copy under the Printable Subtitle was removed on 2026-08-18. Naming the
+		// calculation and taking its link are one gesture; the Printable Title names the printed
+		// SHEET, which is a different intention.
+		const beside = await a.page.evaluate(() => {
+			const n = document.getElementById('ec_calc_name'), b = document.getElementById('ec-copy-link-btn');
+			if (!n || !b) { return null; }
+			const rn = n.getBoundingClientRect(), rb = b.getBoundingClientRect();
+			return { sameRow: Math.abs(rn.top - rb.top) < 12, after: rb.left > rn.left };
+		});
+		report.ok(beside && beside.sameRow && beside.after,
+			'...in the navbar, on the same row as and after the name field', JSON.stringify(beside));
 		report.ok(await a.page.evaluate(() =>
-			document.getElementById('ec_share_url').hidden), 'the url box starts hidden — the button is the control');
+			document.getElementById('ec-copy-link-url').hidden), 'the url box starts hidden — the button is the control');
 
 		// The link is whatever updateUrl() has put in the address bar: the whole form, plus the name.
 		await a.page.fill('#printable_title', 'Outfall B');
 		await a.page.dispatchEvent('#printable_title', 'change');
 		await a.settle(400);
-		await a.page.click('#ec_share_btn');
+		await a.page.click('#ec-copy-link-btn');
 		await a.settle(400);
 		let s = await shareState(a);
-		report.has(s.status, 'copied', 'clicking it says the link was copied');
+		report.has(s.status, 'Copied!', 'clicking it says the link was copied');
 		report.ok(s.hidden, '...and does NOT show the url box, because there was nothing to fall back to');
 		const copied = await a.page.evaluate(() => navigator.clipboard.readText()).catch(() => null);
 		report.ok(copied !== null && copied === a.page.url(),
@@ -92,9 +95,12 @@ exports.run = async function ({ browser, report }) {
 
 		// ---- print -------------------------------------------------------------------------------
 		await a.page.emulateMedia({ media: 'print' });
-		report.eq(await a.page.evaluate(() =>
-			getComputedStyle(document.getElementById('ec_share_row')).display), 'none',
-		'the row is not on the printed sheet — a paper copy cannot be clicked');
+		// The navbar as a whole is what leaves the printed sheet, not this control on its own —
+		// asserting the button's own display would be asserting an implementation detail of Bootstrap.
+		report.ok(await a.page.evaluate(() => {
+			const nav = document.querySelector('nav.navbar');
+			return !nav || getComputedStyle(nav).display === 'none';
+		}), 'the navbar carrying it is not on the printed sheet');
 		report.ok(await a.page.evaluate(() =>
 			getComputedStyle(document.getElementById('printable_subtitle')).display !== 'none'),
 		'...while the subtitle it sits under still prints, so this is the row and not the block');
@@ -124,7 +130,7 @@ exports.run = async function ({ browser, report }) {
 	try {
 		await page.goto(pageUrl(PAGE), { waitUntil: 'load' });
 		await b.settle();
-		await page.click('#ec_share_btn');
+		await page.click('#ec-copy-link-btn');
 		await b.settle(400);
 		const s = await shareState(b);
 		report.ok(!s.hidden, 'a clipboard that refuses reveals the url box instead of failing silently');

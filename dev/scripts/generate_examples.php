@@ -5,7 +5,7 @@
  *   php dev/scripts/generate_examples.php            # write examples/ from dev/water-network-examples/
  *   php dev/scripts/generate_examples.php --check    # exit 1 if the served copy is stale
  *
- * ROADMAP Task 314. Reads every whitelisted saved project out of dev/water-network-examples/ and
+ * ROADMAP Task 314. Reads every published saved project out of dev/water-network-examples/ and
  * writes, into the web-served examples/ directory:
  *
  *   examples/<Name>-lpn.json   a byte copy of the project, which is what the gallery opens
@@ -44,19 +44,24 @@ $outDir = $root . '/examples';
 $metaFile = $srcDir . '/examples.json';
 $check = in_array('--check', $argv, true);
 
-/* The whitelist in the source folder's .gitignore IS the publication decision (see that file and
- * ROADMAP Task 314). Reading it here rather than globbing *.json means this script publishes
- * exactly what git publishes -- one list, not two that can disagree. A client model dropped into
- * that folder to test the .inp importer is invisible to both. */
-function whitelistedExamples($srcDir) {
+/* **examples.json IS THE PUBLICATION DECISION** (ROADMAP Task 314). It names every example, and a
+ * project file sitting in that folder without an entry here is not published -- which is how a
+ * client model dropped in to test the `.inp` importer stays invisible.
+ *
+ * This list used to be read out of the folder's `.gitignore`, which opened with `*` and whitelisted
+ * six names. Tom removed that deny on 2026-08-18 ("the reaction was unjustified from the beginning
+ * ... merely let your scripts monitor for changes"), and the coupling went with it: a `.gitignore`
+ * was answering a question about the GALLERY, and the answer went away when the file did. One list,
+ * in the file whose whole purpose is per-example metadata. `dev/scripts/example_folder_check.php`
+ * is the watch that replaced the deny. */
+function publishedExamples($srcDir, $metaFile) {
 	$out = array();
-	$gi = $srcDir . '/.gitignore';
-	if (!is_file($gi)) { return $out; }
-	foreach (file($gi, FILE_IGNORE_NEW_LINES) as $line) {
-		$line = trim($line);
-		if ($line === '' || $line[0] !== '!') { continue; }
-		$name = substr($line, 1);
-		if (substr($name, -5) !== '.json' || $name === 'examples.json') { continue; }
+	if (!is_file($metaFile)) { return $out; }
+	$meta = json_decode(file_get_contents($metaFile), true);
+	if (!is_array($meta)) { return $out; }
+	foreach ($meta as $name => $rec) {
+		if ($name === '' || $name[0] === '_' || !is_array($rec)) { continue; }   // _note, _order
+		if (substr($name, -5) !== '.json') { continue; }
 		if (is_file($srcDir . '/' . $name)) { $out[] = $name; }
 	}
 	sort($out);
@@ -156,9 +161,9 @@ $meta = is_file($metaFile)
 require_once __DIR__ . '/lang_parse.inc.php';
 $en = ecLangValues(file_get_contents($root . '/lib/lang.ec.en.php'));
 
-$files = whitelistedExamples($srcDir);
+$files = publishedExamples($srcDir, $metaFile);
 if (!$files) {
-	fwrite(STDERR, "No whitelisted examples found in $srcDir\n");
+	fwrite(STDERR, "No published examples found -- examples.json names none that exist in $srcDir\n");
 	exit(1);
 }
 
@@ -258,7 +263,7 @@ if (!is_dir($outDir) && !mkdir($outDir, 0755, true)) {
 }
 foreach ($written as $file => $content) { file_put_contents($outDir . '/' . $file, $content); }
 /* Anything the generator no longer produces is removed, so a renamed or retired example does not
- * linger on the server being served to visitors after it has left the whitelist. */
+ * linger on the server being served to visitors after it has left examples.json. */
 foreach (glob($outDir . '/*') as $p) {
 	$base = basename($p);
 	if ($base !== '.htaccess' && !isset($written[$base])) { unlink($p); echo "  removed $base\n"; }
