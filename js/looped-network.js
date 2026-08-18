@@ -6767,6 +6767,49 @@ var EngCalcs = EngCalcs || {};
 	// Takes the name rather than reading the open project, so the copy branch in saveAs() can route
 	// through it instead of spelling the convention out a second time. Two copies of a filename
 	// convention is how they drift -- they had already drifted once by the time this was written.
+	// **EXPORT AN `.inp` (ROADMAP Task 281).** The writer lives in js/lpn-inp.js beside the reader;
+	// this is only the way in and the way out -- the document, the units it is written in, and a
+	// download.
+	//
+	// It reports what could not be said in EPANET's language rather than saying it wrongly, using
+	// the SAME notice channel the importer uses for the reverse direction. A file that quietly loses
+	// a pump curve is the failure this whole module exists to prevent, in both directions.
+	function exportInpFile() {
+		var pcX = EngCalcs.pageConfig || {}, out;
+		saveToStorage();   // export what is on screen, including edits not yet saved
+		out = EngCalcs.lpnExportInp(serializeProject(), {
+			// The scenario the user is looking at, through the one resolver -- so an export from
+			// inside a scenario writes that scenario's numbers and not Base's.
+			effective: effective,
+			// A label's box, so its centre anchor can be shifted to the upper-left corner EPANET
+			// means by a [LABELS] point. Measured, never assumed: see reanchorImportedLabels().
+			labelSize: function (lb) {
+				var le = labelEls[lb.id];
+				return le ? { w: textLabelWidth(le), h: textLabelHeight(lb) } : null;
+			}
+		});
+		if (!out || !out.ok) {
+			setNotice((pcX.lpn_inp_export_refused || 'This project cannot be written as an EPANET file: {detail}')
+				.replace('{detail}', (out && out.detail) || '?'));
+			return;
+		}
+		var blob = new Blob([out.inp], { type: 'text/plain' }),
+			url = URL.createObjectURL(blob), a = document.createElement('a');
+		a.href = url;
+		a.download = safeFileName(projectDisplayName(project)) + '.inp';
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		setTimeout(function () { URL.revokeObjectURL(url); }, 10000);
+		// EXPORTING IS NOT SAVING. No stampProjectSaved() here, deliberately: an `.inp` cannot hold
+		// this document (scenarios, text sizes, a backdrop image), so a project that has only been
+		// exported still has unsaved changes and must keep saying so.
+		setNotice((pcX.lpn_status_inp_exported || 'Exported {file}.').replace('{file}', a.download) +
+			(out.differences && out.differences.length
+				? ' ' + (pcX.lpn_inp_export_differences || '{n} things could not be written in EPANET\'s language.')
+					.replace('{n}', String(out.differences.length))
+				: ''));
+	}
 	function projectFileName(name) {
 		return safeFileName(name === undefined ? projectDisplayName(project) : name) + LPN_FILE_SUFFIX + '.json';
 	}
@@ -9135,7 +9178,12 @@ var EngCalcs = EngCalcs || {};
 			// Save that writes back. An .inp has none of that and never will, so hiding it behind
 			// the same word would promise a round trip we cannot make. Import says what it is.
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file (.inp)…',
-			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile }
+			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
+			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
+			// file we hand over, not one this page keeps writing to -- the same reason Import is a
+			// separate row from Open rather than a second file type on it.
+			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file (.inp)…',
+			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile }
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the

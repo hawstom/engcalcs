@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1039,
-        "delta_key_count": 43,
+        "expected_key_count": 1044,
+        "delta_key_count": 48,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -396,6 +396,11 @@
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
         "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
+        "lpn_file_export_inp": "Export EPANET file…",
+        "lpn_file_export_inp_tip": "Write this network as an EPANET .inp file and download it. Numbers you typed are written exactly as you typed them. Anything EPANET has no way to say is listed for you afterwards.",
+        "lpn_status_inp_exported": "Exported {file}.",
+        "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
+        "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -441,6 +446,11 @@
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
         "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
+        "lpn_file_export_inp": "Export EPANET file…",
+        "lpn_file_export_inp_tip": "Write this network as an EPANET .inp file and download it. Numbers you typed are written exactly as you typed them. Anything EPANET has no way to say is listed for you afterwards.",
+        "lpn_status_inp_exported": "Exported {file}.",
+        "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
+        "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -978,6 +988,86 @@
                     "key": "lpn_file_open",
                     "value": "ဖွင့်ရန်…",
                     "english": "Open…"
+                }
+            }
+        },
+        "lpn_file_export_inp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "EPANET ဖိုင်တစ်ခု (.inp စာသားဖိုင် သို့မဟုတ် EPANET က သိမ်းဆည်းသော .net ဖိုင်) မှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး ဤဘရောက်ဇာတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။ ဤစာမျက်နှာသည် EPANET ဖိုင်ပြန်ရေး၍မရပါ၊ သို့ဖြစ်၍ သင့်အလုပ်ကို ဆက်ထားရန် ဖိုင် > တခြားအမည်ဖြင့် သိမ်းရန် ကို အသုံးပြုပါ။",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "ထိုဖိုင်ကို EPANET ကွန်ရက်ဖိုင်တစ်ခုအဖြစ် ဖတ်၍မရပါ။",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_file_export_inp_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "EPANET ဖိုင်တစ်ခု (.inp စာသားဖိုင် သို့မဟုတ် EPANET က သိမ်းဆည်းသော .net ဖိုင်) မှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး ဤဘရောက်ဇာတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။ ဤစာမျက်နှာသည် EPANET ဖိုင်ပြန်ရေး၍မရပါ၊ သို့ဖြစ်၍ သင့်အလုပ်ကို ဆက်ထားရန် ဖိုင် > တခြားအမည်ဖြင့် သိမ်းရန် ကို အသုံးပြုပါ။",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "ထိုဖိုင်ကို EPANET ကွန်ရက်ဖိုင်တစ်ခုအဖြစ် ဖတ်၍မရပါ။",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_status_inp_exported": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "EPANET ဖိုင်တစ်ခု (.inp စာသားဖိုင် သို့မဟုတ် EPANET က သိမ်းဆည်းသော .net ဖိုင်) မှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး ဤဘရောက်ဇာတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။ ဤစာမျက်နှာသည် EPANET ဖိုင်ပြန်ရေး၍မရပါ၊ သို့ဖြစ်၍ သင့်အလုပ်ကို ဆက်ထားရန် ဖိုင် > တခြားအမည်ဖြင့် သိမ်းရန် ကို အသုံးပြုပါ။",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "ထိုဖိုင်ကို EPANET ကွန်ရက်ဖိုင်တစ်ခုအဖြစ် ဖတ်၍မရပါ။",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_inp_export_differences": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "EPANET ဖိုင်တစ်ခု (.inp စာသားဖိုင် သို့မဟုတ် EPANET က သိမ်းဆည်းသော .net ဖိုင်) မှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး ဤဘရောက်ဇာတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။ ဤစာမျက်နှာသည် EPANET ဖိုင်ပြန်ရေး၍မရပါ၊ သို့ဖြစ်၍ သင့်အလုပ်ကို ဆက်ထားရန် ဖိုင် > တခြားအမည်ဖြင့် သိမ်းရန် ကို အသုံးပြုပါ။",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "ထိုဖိုင်ကို EPANET ကွန်ရက်ဖိုင်တစ်ခုအဖြစ် ဖတ်၍မရပါ။",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_inp_export_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "EPANET ဖိုင်တစ်ခု (.inp စာသားဖိုင် သို့မဟုတ် EPANET က သိမ်းဆည်းသော .net ဖိုင်) မှ ကွန်ရက်တစ်ခုကို ဖတ်ယူပြီး ဤဘရောက်ဇာတွင် ပရောဂျက်အသစ်တစ်ခုအဖြစ် သိမ်းဆည်းသည်။ ဤစာမျက်နှာသည် EPANET ဖိုင်ပြန်ရေး၍မရပါ၊ သို့ဖြစ်၍ သင့်အလုပ်ကို ဆက်ထားရန် ဖိုင် > တခြားအမည်ဖြင့် သိမ်းရန် ကို အသုံးပြုပါ။",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "ထိုဖိုင်ကို EPANET ကွန်ရက်ဖိုင်တစ်ခုအဖြစ် ဖတ်၍မရပါ။",
+                    "english": "That file could not be read as an EPANET network file."
                 }
             }
         },

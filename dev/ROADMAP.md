@@ -384,26 +384,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   rewrite against live controls, not a code fix, so it needs a browser pass rather than static
   reading.
 
-- 25|281| **EPANET `.inp` EXPORT — the unbuilt half of Task 196.** Import shipped 2026-08-11; writing
-  one did not, and it is the easier direction: `EngCalcs.lpnToInp()` (`js/lpn-epanet.js`) already
-  writes a complete `.inp` for the engine toggle, and every element this page models is a strict
-  subset of `.inp`.
-  - **What is missing is small:** a File menu row and a download, plus two decisions — whether the
-    file is written in the PROJECT's units (what a user expects back) rather than the LPS the engine
-    adapter hard-codes, and whether coordinates, vertices and text labels go out as
-    `[COORDINATES]`/`[VERTICES]`/`[LABELS]`. They should — the drawing is most of the value.
-  - **A LABEL'S EXPORTED POINT IS ITS UPPER-LEFT CORNER, not its centre.** EPANET's `[LABELS]`
-    coordinates mean the corner (its own documentation says so, and `reanchorImportedLabels()`
-    corrects for it on import) while this page anchors text at the centre. Apply the same shift in
-    reverse or every label comes back half its own width to the right.
-  - **Round-trip is the test to write** — export, re-import, assert the same document;
-    `dev/lpn-spike/inp-import-harness.js` is the natural home. **A pump with no curve is the one
-    thing that cannot round-trip**, and `lpnToInp()` already substitutes a pipe and warns.
-  - **`.inp` ONLY. Never write a `.net`.** Tom asked directly, 2026-08-11 (*"maybe we export only
-    .inp?"*) and checked it independently the same day (*"Gemini agrees on all counts. TL;DR: inp is
-    the industry standard format."*). `.net` is an undocumented binary serialization of one program's
-    object graph; `js/lpn-net.js` reads it as a courtesy, and emitting it would mean shipping a
-    format we reverse-engineered as though we knew it was right.
 - 30|283| **Map label legibility: what remains is the AUTO-HIDE rule.** Tom, 2026-08-11, after
   studying epanet-js. Label prefixes (`labelPrefixFor()`) and pipe-aligned link labels
   (`alignedLabelAnchor()`) both shipped under Tasks 333 and 329; two pieces are left.
@@ -524,6 +504,26 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - The fix is a rule about the status line, not about this one message: a notice the user's ACTION
     produced should outlive a diagnostic the document produces, or be shown somewhere that is not
     the same one line.
+
+- 90|422| **SPLIT THE UNIT SELECTORS: one group serving INPUTS, one serving RESULTS.** Tom,
+  2026-08-18, after finding that switching the flow unit on Net3 turned 6,104 gpm into 1,338 cfs:
+  *"Splitting the inputs is much more satisfactory... The group serving results can be changed
+  without fanfare. The group serving inputs simply gets a warning."*
+  - **The cause is the standing rule working as written, not a conversion bug.** Measured: junction
+    15's stored demand is `1` before and after the switch; what changed is the project's recorded
+    unit, so that `1` means 1 cfs instead of 1 gpm — 449× the water — and the solve honours it.
+    Factors are correct (12,698 gpm IS 28.29 cfs); `unit_factor_check.php` already guards them.
+  - **A results unit is pure display and changes with no fanfare.** An input unit is a model change
+    wearing a display control's clothes, and gets a warning naming the inputs it serves, with two
+    buttons: **Reinterpret** (the default, and what the standing rule says) and **Convert**.
+  - **The shared quantities are the whole difficulty**, and they are why this is a split and not a
+    label: flow serves demands AND solved flows; elevation/head serves elevations AND heads;
+    pressure serves a PRV setting AND solved pressures. Each of those becomes TWO selectors.
+    Diameter, length and roughness are inputs only; velocity and gradient are results only.
+  - **No conversion without an explicit control** (Tom): the ban on silent conversion stands, and
+    Convert exists only as a button somebody presses.
+  - Ships with the project's stored `units` gaining the results group, so a saved file still says
+    what its numbers mean.
 
 - 55|418| **The first project of a first visit is marked dirty with nobody having touched it**, so its
   tab wears a permanent asterisk. Found by the Task 414 browser-pass repair, 2026-08-17, and it is

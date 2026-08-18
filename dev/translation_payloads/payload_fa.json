@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 1039,
-        "delta_key_count": 43,
+        "expected_key_count": 1044,
+        "delta_key_count": 48,
         "exempt_key_count": 17,
         "exempt_keys": [
             "u_imgd",
@@ -390,6 +390,11 @@
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
         "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
+        "lpn_file_export_inp": "Export EPANET file…",
+        "lpn_file_export_inp_tip": "Write this network as an EPANET .inp file and download it. Numbers you typed are written exactly as you typed them. Anything EPANET has no way to say is listed for you afterwards.",
+        "lpn_status_inp_exported": "Exported {file}.",
+        "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
+        "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -435,6 +440,11 @@
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
         "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
+        "lpn_file_export_inp": "Export EPANET file…",
+        "lpn_file_export_inp_tip": "Write this network as an EPANET .inp file and download it. Numbers you typed are written exactly as you typed them. Anything EPANET has no way to say is listed for you afterwards.",
+        "lpn_status_inp_exported": "Exported {file}.",
+        "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
+        "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -972,6 +982,86 @@
                     "key": "lpn_file_open",
                     "value": "باز کردن…",
                     "english": "Open…"
+                }
+            }
+        },
+        "lpn_file_export_inp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "یک شبکه را از یک فایل EPANET، چه فایل متنی inp. و چه فایل net. که EPANET ذخیره می‌کند، بخوانید و آن را در این مرورگر به‌صورت پروژه جدید ذخیره کنید. این صفحه نمی‌تواند فایل EPANET را دوباره بنویسد، پس برای نگه داشتن کارتان از منوی فایل، ذخیره به‌نام استفاده کنید.",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "آن فایل به‌عنوان فایل شبکه EPANET خوانده نشد.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_file_export_inp_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "یک شبکه را از یک فایل EPANET، چه فایل متنی inp. و چه فایل net. که EPANET ذخیره می‌کند، بخوانید و آن را در این مرورگر به‌صورت پروژه جدید ذخیره کنید. این صفحه نمی‌تواند فایل EPANET را دوباره بنویسد، پس برای نگه داشتن کارتان از منوی فایل، ذخیره به‌نام استفاده کنید.",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "آن فایل به‌عنوان فایل شبکه EPANET خوانده نشد.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_status_inp_exported": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "یک شبکه را از یک فایل EPANET، چه فایل متنی inp. و چه فایل net. که EPANET ذخیره می‌کند، بخوانید و آن را در این مرورگر به‌صورت پروژه جدید ذخیره کنید. این صفحه نمی‌تواند فایل EPANET را دوباره بنویسد، پس برای نگه داشتن کارتان از منوی فایل، ذخیره به‌نام استفاده کنید.",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "آن فایل به‌عنوان فایل شبکه EPANET خوانده نشد.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_inp_export_differences": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "یک شبکه را از یک فایل EPANET، چه فایل متنی inp. و چه فایل net. که EPANET ذخیره می‌کند، بخوانید و آن را در این مرورگر به‌صورت پروژه جدید ذخیره کنید. این صفحه نمی‌تواند فایل EPANET را دوباره بنویسد، پس برای نگه داشتن کارتان از منوی فایل، ذخیره به‌نام استفاده کنید.",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "آن فایل به‌عنوان فایل شبکه EPANET خوانده نشد.",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_inp_export_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "یک شبکه را از یک فایل EPANET، چه فایل متنی inp. و چه فایل net. که EPANET ذخیره می‌کند، بخوانید و آن را در این مرورگر به‌صورت پروژه جدید ذخیره کنید. این صفحه نمی‌تواند فایل EPANET را دوباره بنویسد، پس برای نگه داشتن کارتان از منوی فایل، ذخیره به‌نام استفاده کنید.",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "آن فایل به‌عنوان فایل شبکه EPANET خوانده نشد.",
+                    "english": "That file could not be read as an EPANET network file."
                 }
             }
         },

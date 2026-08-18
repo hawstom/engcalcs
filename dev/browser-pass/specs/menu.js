@@ -12,7 +12,7 @@ exports.title = '3. The File menu';
 // (Open example… joined it, under Open rather than under New). Recent files are absent because there
 // are none yet; that row group appears only when a file has been opened.
 const EXPECTED = ['New project…', 'Open…', 'Open example…', 'Import EPANET file…',
-	'Save', 'Save as…', 'Save all', 'Revert', 'Close'];
+	'Export EPANET file…', 'Save', 'Save as…', 'Save all', 'Revert', 'Close'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');

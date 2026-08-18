@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 1039,
-        "delta_key_count": 43,
+        "expected_key_count": 1044,
+        "delta_key_count": 48,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -391,6 +391,11 @@
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
         "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
+        "lpn_file_export_inp": "Export EPANET file…",
+        "lpn_file_export_inp_tip": "Write this network as an EPANET .inp file and download it. Numbers you typed are written exactly as you typed them. Anything EPANET has no way to say is listed for you afterwards.",
+        "lpn_status_inp_exported": "Exported {file}.",
+        "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
+        "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -436,6 +441,11 @@
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
         "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
+        "lpn_file_export_inp": "Export EPANET file…",
+        "lpn_file_export_inp_tip": "Write this network as an EPANET .inp file and download it. Numbers you typed are written exactly as you typed them. Anything EPANET has no way to say is listed for you afterwards.",
+        "lpn_status_inp_exported": "Exported {file}.",
+        "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
+        "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -973,6 +983,86 @@
                     "key": "lpn_file_open",
                     "value": "打开…",
                     "english": "Open…"
+                }
+            }
+        },
+        "lpn_file_export_inp": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "从 EPANET 文件（.inp 文本文件或 EPANET 保存的 .net 文件）中读取管网，并将其作为新项目保存在本浏览器中。本页面尚不能写回 EPANET 文件，因此请使用\"文件\"、\"另存为\"来保留您的成果。",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "该文件无法作为 EPANET 管网文件读取。",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_file_export_inp_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "从 EPANET 文件（.inp 文本文件或 EPANET 保存的 .net 文件）中读取管网，并将其作为新项目保存在本浏览器中。本页面尚不能写回 EPANET 文件，因此请使用\"文件\"、\"另存为\"来保留您的成果。",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "该文件无法作为 EPANET 管网文件读取。",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_status_inp_exported": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "从 EPANET 文件（.inp 文本文件或 EPANET 保存的 .net 文件）中读取管网，并将其作为新项目保存在本浏览器中。本页面尚不能写回 EPANET 文件，因此请使用\"文件\"、\"另存为\"来保留您的成果。",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "该文件无法作为 EPANET 管网文件读取。",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_inp_export_differences": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "从 EPANET 文件（.inp 文本文件或 EPANET 保存的 .net 文件）中读取管网，并将其作为新项目保存在本浏览器中。本页面尚不能写回 EPANET 文件，因此请使用\"文件\"、\"另存为\"来保留您的成果。",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "该文件无法作为 EPANET 管网文件读取。",
+                    "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_inp_export_refused": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_inp_tip",
+                    "value": "从 EPANET 文件（.inp 文本文件或 EPANET 保存的 .net 文件）中读取管网，并将其作为新项目保存在本浏览器中。本页面尚不能写回 EPANET 文件，因此请使用\"文件\"、\"另存为\"来保留您的成果。",
+                    "english": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_bad_file",
+                    "value": "该文件无法作为 EPANET 管网文件读取。",
+                    "english": "That file could not be read as an EPANET network file."
                 }
             }
         },

@@ -1433,6 +1433,15 @@ $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add 
 $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_inp']='Import EPANET file…';
 $ec_lang['lpn_file_import_inp_tip']='Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work.';
+// The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
+// keeps no handle on an `.inp` and never writes back to one.
+$ec_lang['lpn_file_export_inp']='Export EPANET file…';
+$ec_lang['lpn_file_export_inp_tip']='Write this network as an EPANET .inp file and download it. Numbers you typed are written exactly as you typed them. Anything EPANET has no way to say is listed for you afterwards.';
+$ec_lang['lpn_status_inp_exported']='Exported {file}.';
+// {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
+// the failure this whole feature exists to prevent.
+$ec_lang['lpn_inp_export_differences']='{n} things could not be written in EPANET\'s language.';
+$ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
 // the way out named here always works, so keep the instruction in the message rather than leaving

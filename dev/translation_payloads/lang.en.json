@@ -732,6 +732,11 @@
         "lpn_dialog_ok": "OK",
         "lpn_file_import_inp": "Import EPANET file…",
         "lpn_file_import_inp_tip": "Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work.",
+        "lpn_file_export_inp": "Export EPANET file…",
+        "lpn_file_export_inp_tip": "Write this network as an EPANET .inp file and download it. Numbers you typed are written exactly as you typed them. Anything EPANET has no way to say is listed for you afterwards.",
+        "lpn_status_inp_exported": "Exported {file}.",
+        "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
+        "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
         "lpn_inp_bad_file": "That file could not be read as an EPANET network file.",
         "lpn_net_bad_file": "This looks like an EPANET .net file, but this page could not read it. Open it in EPANET and use the File, Export, Network command there to save it as an .inp file, then import that.",
         "lpn_inp_report_heading": "Imported {file}",
@@ -1041,7 +1046,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 1039,
+    "count": 1044,
     "active_prefixes": [
         "about",
         "bpn",
