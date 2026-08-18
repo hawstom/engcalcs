@@ -21,8 +21,8 @@
 // georefDrawFrame() sizes them `GEOREF_HANDLE_PX / state.s`, and in the place stage nothing redraws
 // the frame when the view changes — only georefCarryTick() does, and that is the carry stage. Zoom
 // in six notches after Drop and an 18 px handle renders at 33 px; zoom out and it vanishes. Measured
-// 18.40 -> 32.60 px over 6 notches (1.1^6 = 1.77). No knowingly-red spec was added — see the note at
-// the top of specs/boot.js for the house rule.
+// 18.31 -> 32.44 px over 6 notches, a ratio of 1.772 against the zoom's own 1.1^6 = 1.772. No
+// knowingly-red spec was added — see the note at the top of specs/boot.js for the house rule.
 
 const { Session } = require('../lib/session');
 
