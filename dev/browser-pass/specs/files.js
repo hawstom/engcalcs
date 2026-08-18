@@ -10,14 +10,17 @@ const { Session } = require('../lib/session');
 
 exports.title = '1 & 5. First save, save again, save as, and opening';
 
-const FILE1 = 'Project1-lpn-hawsedc-engcalcs.json';
-const FILE2 = 'Second-lpn-hawsedc-engcalcs.json';
+// The suffix is `-lpn`, four characters, since Task 315 — the 30-character `-lpn-hawsedc-engcalcs`
+// it used to be is still READ (projectNameFromFileName) but is never written again. FILE1 is spelt
+// the way the page itself would suggest it, because the check below is that it does.
+const FILE1 = 'Project1-lpn.json';
+const FILE2 = 'Second-lpn.json';
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
 	try {
 		await a.goto();
-		await a.drawExample();
+		await a.makeEdit();
 
 		// --- the training panel ---------------------------------------------
 		await a.menuClick('Save');
@@ -33,7 +36,7 @@ exports.run = async function ({ browser, report }) {
 
 		const calls = await a.pickerCalls();
 		report.eq(calls.length, 1, 'Continue reaches the file dialog');
-		report.eq(calls[0] && calls[0].suggestedName, FILE1, 'suggested name is <project>-lpn-hawsedc-engcalcs.json');
+		report.eq(calls[0] && calls[0].suggestedName, FILE1, 'suggested name is <project>-lpn.json');
 
 		const text1 = await a.readFile(FILE1);
 		report.ok(!!text1, 'the file exists on disk');
@@ -46,7 +49,7 @@ exports.run = async function ({ browser, report }) {
 		// --- save again ------------------------------------------------------
 		const before = await a.statFile(FILE1);
 		await a.page.waitForTimeout(1100);   // filesystem timestamps are second-grained
-		await a.drawExample();               // something new to save
+		await a.makeEdit();               // something new to save
 		await a.menuClick('Save');
 		report.eq((await a.pickerCalls()).length, 1, 'Save again asks nothing — no panel, no dialog, no second file');
 		const after = await a.statFile(FILE1);

@@ -15,13 +15,13 @@ const { Session } = require('../lib/session');
 
 exports.title = '8. Reload keeps the file, and keeps what it knew about the file';
 
-const FILE = 'Reload-lpn-hawsedc-engcalcs.json';
+const FILE = 'Reload-lpn.json';
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
 	try {
 		await a.goto();
-		await a.drawExample();
+		await a.makeEdit();
 		await a.queuePick(FILE);
 		await a.menuClick('Save');
 		await a.answerTrainingPanel('TGH');
@@ -38,7 +38,7 @@ exports.run = async function ({ browser, report }) {
 		// Save must go back to the ORIGINAL file. The symptom of a dropped handle was Save quietly
 		// behaving as Save as, offering a name with "(copy)" in it.
 		const callsBefore = (await a.pickerCalls()).length;
-		await a.drawExample();
+		await a.makeEdit();
 		await a.menuClick('Save');
 		report.eq((await a.pickerCalls()).length, callsBefore, 'Save after a reload opens no picker');
 		report.eq((await a.listFiles()).length, 1, 'and writes the original file rather than making a copy');
@@ -54,7 +54,7 @@ exports.run = async function ({ browser, report }) {
 		theirs.project.name = 'Theirs';
 		await a.writeFile(FILE, JSON.stringify(theirs, null, '\t'));
 
-		await a.drawExample();
+		await a.makeEdit();
 		await a.menuClick('Save');
 		const banner = await a.banner();
 		report.ok(!!banner, 'Save refuses when the file moved on while we were away');
@@ -68,7 +68,7 @@ exports.run = async function ({ browser, report }) {
 		// three times, and the reason it is the guarantee rather than the lock.
 		await a.blockBroker();
 		await a.bannerClick('Hide this message');
-		await a.drawExample();
+		await a.makeEdit();
 		await a.menuClick('Save');
 		const offline = await a.banner();
 		report.ok(!!offline && offline.text.indexOf('saved to this file') >= 0,

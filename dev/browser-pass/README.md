@@ -3,7 +3,7 @@
 ```
 cd dev/browser-pass
 npm install          # once — playwright-core; the Chromium binary is already cached
-node run.js          # everything — 138 checks, about a minute
+node run.js          # everything — 139 checks, about a minute and a half
 node run.js locking  # one section
 ```
 
@@ -17,8 +17,8 @@ without my working through the test punch list?"*
 
 Mostly, yes. `dev/lpn-file-lock-test-punchlist.md` is 78 checks over two browser profiles, and it has
 been run by hand three times in three days. Everything below drives **the real page** in a real
-Chromium against **the real `lpn-lock.php`** on a real PHP server, and re-runs in about twenty
-seconds.
+Chromium against **the real `lpn-lock.php`** on a real PHP server, and re-runs in about a minute and
+a half.
 
 It found four defects in its first hour, three of which no human pass would ever have found:
 
@@ -128,3 +128,19 @@ breaks the pass loudly, in one place.
 
 Before adding a check here, ask whether it needs a browser at all — logic that can be sliced out
 belongs in `dev/lpn-spike/handle-restore-harness.js`, which runs in a second.
+
+**And that is exactly how it failed anyway** (ROADMAP Task 414). The vocabulary held; what went stale
+was one sentence's MEANING. `Session.drawExample()` clicked a toolbar button that Task 264 retired,
+so the suite stopped at 15 of its checks and stayed there — the other 124 were neither passing nor
+failing, they were unrun, and nobody noticed because nobody ran it. Two lessons, both cheap:
+
+- **A setup helper must verify that its setup happened.** `Session.makeEdit()` — the substitute, one
+  ordinary junction placed on the map, chosen because it is what the retired button really was: *an
+  edit made, no file written, this tab dirty* — counts the nodes before and after and throws when the
+  click lands on nothing. Neither of the flows examples moved to is that sentence: `Open example…`
+  lands a SAVED project in a NEW tab, and `New project…` an empty clean one (that is
+  `Session.newProject()`).
+- **A check that cannot fail is worse than one that does.** Two specs asserted the tab was dirty after
+  an edit, on a first-visit project that arrives dirty before any edit — see the note at the top of
+  `specs/boot.js`, which is a live page defect. They now assert which asterisk it wears, which is a
+  fact that can be wrong.

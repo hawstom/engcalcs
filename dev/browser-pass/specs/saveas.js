@@ -12,14 +12,14 @@ const { Session } = require('../lib/session');
 
 exports.title = '6. Save as, asked of the file actually chosen';
 
-const MINE = 'Mine-lpn-hawsedc-engcalcs.json';
-const OTHER = 'Other-lpn-hawsedc-engcalcs.json';
+const MINE = 'Mine-lpn.json';
+const OTHER = 'Other-lpn.json';
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
 	try {
 		await a.goto();
-		await a.drawExample();
+		await a.makeEdit();
 		await a.queuePick(MINE);
 		await a.menuClick('Save');
 		await a.answerTrainingPanel('TGH');
@@ -27,8 +27,8 @@ exports.run = async function ({ browser, report }) {
 
 		// A second project, in a second file, in the same browser. This is the "a different project
 		// of ours" case — the one the confirm has to be able to name.
-		await a.menuClick('New project');
-		await a.drawExample();
+		await a.newProject();
+		await a.makeEdit();
 		await a.queuePick(OTHER);
 		await a.menuClick('Save as…');
 		await a.settle(400);
@@ -37,8 +37,8 @@ exports.run = async function ({ browser, report }) {
 
 		// --- onto a file holding a DIFFERENT project ---------------------------
 		// Back to the first project, and try to save it over the second's file.
-		await a.menuClick('New project');
-		await a.drawExample();
+		await a.newProject();
+		await a.makeEdit();
 		await a.answerConfirmsWith(false);              // read the warning, back out
 		const beforeBytes = await a.readFile(OTHER);
 		await a.queuePick(OTHER);
@@ -65,10 +65,10 @@ exports.run = async function ({ browser, report }) {
 		// --- and the guard must not become "Save as sometimes does nothing" --------
 		await a.answerConfirmsWith(true);
 		const dialogsBefore = a.dialogs.length;
-		await a.queuePick('Brand-new-lpn-hawsedc-engcalcs.json');
+		await a.queuePick('Brand-new-lpn.json');
 		await a.menuClick('Save as…');
 		report.eq(a.dialogs.length, dialogsBefore, 'Save as onto a brand-new file asks nothing');
-		report.ok(!!(await a.readFile('Brand-new-lpn-hawsedc-engcalcs.json')), 'and writes it');
+		report.ok(!!(await a.readFile('Brand-new-lpn.json')), 'and writes it');
 
 		// A file that is not one of ours at all — somebody's unrelated JSON. Their business.
 		await a.writeFile('notes.json', '{"hello":"world"}');

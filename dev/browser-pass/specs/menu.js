@@ -8,7 +8,11 @@ const { Session } = require('../lib/session');
 
 exports.title = '3. The File menu';
 
-const EXPECTED = ['New project', 'Open…', 'Save', 'Save as…', 'Save all', 'Revert', 'Close'];
+// The list as it stands after Task 264 (New project… became a fly-out of templates) and Task 314
+// (Open example… joined it, under Open rather than under New). Recent files are absent because there
+// are none yet; that row group appears only when a file has been opened.
+const EXPECTED = ['New project…', 'Open…', 'Open example…', 'Import EPANET file…',
+	'Save', 'Save as…', 'Save all', 'Revert', 'Close'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -25,14 +29,23 @@ exports.run = async function ({ browser, report }) {
 		report.ok(by('Revert').disabled, 'Revert is greyed with no file to revert to');
 		report.ok(!by('Save').disabled, 'Save is live — this browser can connect to a file');
 		report.ok(!by('Save as…').disabled, 'Save as is always live');
-		report.ok(!by('New project').disabled && !by('Open…').disabled && !by('Close').disabled,
+		report.ok(!by('New project…').disabled && !by('Open…').disabled && !by('Close').disabled,
 			'New, Open and Close are always live');
+		report.ok(by('New project…').submenu, 'New project… leads to a fly-out of templates, not straight to a blank one',
+			'Task 264: the row that used to make a project on the spot now offers the ways of starting one');
 
 		// Nothing is written behind your back. The punch list asks for a two-minute wait; the same
 		// fact is provable in a second by checking that no file exists at all after an edit.
-		await a.drawExample();
+		await a.makeEdit();
 		report.eq((await a.listFiles()).length, 0, 'drawing does not create a file — nothing is written unasked');
-		report.ok(await a.currentTabDirty(), 'and the tab wears its asterisk');
+		// **NOT "the tab wears its asterisk"**, which is what this line used to say and could not fail:
+		// a first visit's project arrives dirty before anything is edited (see specs/boot.js), so an
+		// asterisk after an edit proves nothing here. What IS falsifiable is WHICH asterisk: faint
+		// means "this lives only in the browser", full strength means "changes the file does not have",
+		// and this project is in no file at all.
+		const star = await a.currentTabStar();
+		report.ok(star && star.faded, 'and the asterisk it wears is the faint, browser-only one',
+			JSON.stringify(star));
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {
 		await a.close();

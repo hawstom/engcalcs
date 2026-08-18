@@ -13,13 +13,13 @@ const { Session } = require('../lib/session');
 
 exports.title = '9. No server, a broken server, and the difference between them';
 
-const FILE = 'Degrade-lpn-hawsedc-engcalcs.json';
+const FILE = 'Degrade-lpn.json';
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
 	try {
 		await a.goto();
-		await a.drawExample();
+		await a.makeEdit();
 		await a.queuePick(FILE);
 		await a.menuClick('Save');
 		await a.answerTrainingPanel('TGH');
@@ -28,7 +28,7 @@ exports.run = async function ({ browser, report }) {
 
 		// --- not there at all ---------------------------------------------------
 		await a.blockBroker();
-		await a.drawExample();
+		await a.makeEdit();
 		await a.menuClick('Save');
 		let b = await a.waitBanner();
 		report.ok(!!b, 'an unreachable broker is reported');
@@ -38,7 +38,7 @@ exports.run = async function ({ browser, report }) {
 
 		// --- there, and broken ---------------------------------------------------
 		await a.brokerReplies(500, { ok: false, error: 'storage' });
-		await a.drawExample();
+		await a.makeEdit();
 		await a.menuClick('Save');
 		b = await a.waitBanner();
 		report.ok(b && /setup fault on the server/.test(b.text || ''),
@@ -50,7 +50,7 @@ exports.run = async function ({ browser, report }) {
 
 		// --- there, and out of room ------------------------------------------------
 		await a.brokerReplies(503, { ok: false, error: 'full' });
-		await a.drawExample();
+		await a.makeEdit();
 		await a.menuClick('Save');
 		b = await a.waitBanner();
 		report.ok(b && /run out of room/.test(b.text || ''), 'a full lock directory says so, in its own words',
@@ -64,14 +64,14 @@ exports.run = async function ({ browser, report }) {
 		// fault anybody can act on (Tom, 2026-08-03, unsure which way this should go — this is the
 		// call as built, so a future change to it is a decision rather than a drift).
 		await a.blockBroker();
-		await a.drawExample();
+		await a.makeEdit();
 		await a.menuClick('Save');
 		b = await a.waitBanner();
 		report.ok(b && !(b.buttons || []).includes('Hide this message'),
 			'online but refused: the warning cannot be dismissed', b ? b.buttons.join(' / ') : '');
 
 		await a.context.setOffline(true);
-		await a.drawExample();
+		await a.makeEdit();
 		await a.menuClick('Save');
 		b = await a.waitBanner();
 		report.ok(b && (b.buttons || []).includes('Hide this message'),
@@ -83,9 +83,9 @@ exports.run = async function ({ browser, report }) {
 		// --- and none of it takes the calculator away -------------------------------
 		await a.blockBroker();
 		const before = (await a.tabs()).length;
-		await a.drawExample();
+		await a.makeEdit();
 		report.ok(await a.currentTabDirty(), 'editing still works with no broker at all');
-		await a.menuClick('New project');
+		await a.newProject();
 		report.eq((await a.tabs()).length, before + 1, 'and so does everything else — a lock outage is not an outage');
 		await a.unblockBroker();
 

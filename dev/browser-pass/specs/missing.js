@@ -13,13 +13,13 @@ const { Session } = require('../lib/session');
 
 exports.title = '10. The file goes missing under us';
 
-const FILE = 'Missing-lpn-hawsedc-engcalcs.json';
+const FILE = 'Missing-lpn.json';
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
 	try {
 		await a.goto();
-		await a.drawExample();
+		await a.makeEdit();
 		await a.queuePick(FILE);
 		await a.menuClick('Save');
 		await a.answerTrainingPanel('TGH');
@@ -30,7 +30,7 @@ exports.run = async function ({ browser, report }) {
 		await a.removeFile(FILE);
 		report.eq(await a.readFile(FILE), null, 'the file is gone');
 
-		await a.drawExample();
+		await a.makeEdit();
 		await a.menuClick('Save');
 		await a.settle(400);
 
@@ -58,7 +58,7 @@ exports.run = async function ({ browser, report }) {
 		// It silently fails to save." — and the page must now catch it by READING THE FILE BACK,
 		// because everything up to and including close() can resolve without a byte landing.
 		await a.sabotageWrites(true);
-		await a.queuePick('Sabotaged-lpn-hawsedc-engcalcs.json');
+		await a.queuePick('Sabotaged-lpn.json');
 		await a.menuClick('Save as…');
 		await a.settle(400);
 
@@ -72,10 +72,10 @@ exports.run = async function ({ browser, report }) {
 		// The way back out, which is the half of §10 that was never testable before: the banner's
 		// button is a picker, and choosing a file must make saving work again.
 		await a.sabotageWrites(false);
-		await a.queuePick('Relinked-lpn-hawsedc-engcalcs.json');
+		await a.queuePick('Relinked-lpn.json');
 		await a.bannerClick('Choose the file again');
 		await a.settle(500);
-		report.ok(!!(await a.readFile('Relinked-lpn-hawsedc-engcalcs.json')),
+		report.ok(!!(await a.readFile('Relinked-lpn.json')),
 			'"Choose the file again" picks a file and the save lands there');
 		report.ok(await a.banner() === null, 'and the banner clears');
 		report.ok(!(await a.currentTabDirty()), 'and the asterisk goes out, honestly this time');
@@ -86,11 +86,11 @@ exports.run = async function ({ browser, report }) {
 		// back metadata the browser already knew. **Resolving is not proof.** So the guard reads a
 		// byte, and this handle is the only way to prove it does.
 		await a.phantomFiles(true);
-		await a.queuePick('Phantom-lpn-hawsedc-engcalcs.json');
+		await a.queuePick('Phantom-lpn.json');
 		await a.menuClick('Save as…');
 		await a.settle(400);
 		await a.phantomFiles(false);
-		await a.drawExample();
+		await a.makeEdit();
 		await a.menuClick('Save');
 		await a.settle(400);
 
