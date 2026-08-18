@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ps",
-        "expected_key_count": 1044,
-        "delta_key_count": 48,
+        "expected_key_count": 1052,
+        "delta_key_count": 56,
         "exempt_key_count": 21,
         "exempt_keys": [
             "u_imgd",
@@ -371,6 +371,14 @@
         "lpn_field_text_valign_bottom": "Bottom",
         "lpn_examples_welcome": "Welcome to your Water Supply Network software, with the EPANET core",
         "lpn_examples_close": "Close",
+        "lpn_units_warn_title": "This unit decides what your numbers mean",
+        "lpn_units_warn_body": "{unit} is the unit of what you enter for: {list}. Reinterpret leaves every number as it is and reads it in the new unit. Convert rewrites every one of those numbers so the network stays the same size.",
+        "lpn_units_reinterpret": "Reinterpret (change what they mean)",
+        "lpn_units_convert": "Convert them all",
+        "lpn_status_reinterpreted": "{n} values now mean {unit}. Nothing was rewritten.",
+        "lpn_status_converted": "{n} values were rewritten into {unit}.",
+        "lpn_units_group_inputs": "Units of what you enter",
+        "lpn_units_group_results": "Units of the answers",
         "lpn_basemap_show": "Show street map",
         "lpn_basemap_hide": "Hide street map",
         "lpn_basemap_tip": "Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.",
@@ -421,6 +429,14 @@
         "lpn_field_text_valign_bottom": "Bottom",
         "lpn_examples_welcome": "Welcome to your Water Supply Network software, with the EPANET core",
         "lpn_examples_close": "Close",
+        "lpn_units_warn_title": "This unit decides what your numbers mean",
+        "lpn_units_warn_body": "{unit} is the unit of what you enter for: {list}. Reinterpret leaves every number as it is and reads it in the new unit. Convert rewrites every one of those numbers so the network stays the same size.",
+        "lpn_units_reinterpret": "Reinterpret (change what they mean)",
+        "lpn_units_convert": "Convert them all",
+        "lpn_status_reinterpreted": "{n} values now mean {unit}. Nothing was rewritten.",
+        "lpn_status_converted": "{n} values were rewritten into {unit}.",
+        "lpn_units_group_inputs": "Units of what you enter",
+        "lpn_units_group_results": "Units of the answers",
         "lpn_basemap_show": "Show street map",
         "lpn_basemap_hide": "Hide street map",
         "lpn_basemap_tip": "Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.",
@@ -618,6 +634,134 @@
                     "key": "lpn_examples_size",
                     "value": "{nodes} جنکشنونه، {links} پایپونه",
                     "english": "{nodes} nodes, {links} links"
+                }
+            }
+        },
+        "lpn_units_warn_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "په دې نقطه کې د شبکې نه اخیستل شوی بهاو. د دې ځای ته د بهاو ننوتلو لپاره منفي عدد ولیکئ.",
+                    "english": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_units_length",
+                    "value": "اوږدوالی او د نقشې همغږي",
+                    "english": "Length and map coordinates"
+                }
+            }
+        },
+        "lpn_units_warn_body": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "په دې نقطه کې د شبکې نه اخیستل شوی بهاو. د دې ځای ته د بهاو ننوتلو لپاره منفي عدد ولیکئ.",
+                    "english": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_units_length",
+                    "value": "اوږدوالی او د نقشې همغږي",
+                    "english": "Length and map coordinates"
+                }
+            }
+        },
+        "lpn_units_reinterpret": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "په دې نقطه کې د شبکې نه اخیستل شوی بهاو. د دې ځای ته د بهاو ننوتلو لپاره منفي عدد ولیکئ.",
+                    "english": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_units_length",
+                    "value": "اوږدوالی او د نقشې همغږي",
+                    "english": "Length and map coordinates"
+                }
+            }
+        },
+        "lpn_units_convert": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "په دې نقطه کې د شبکې نه اخیستل شوی بهاو. د دې ځای ته د بهاو ننوتلو لپاره منفي عدد ولیکئ.",
+                    "english": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_units_length",
+                    "value": "اوږدوالی او د نقشې همغږي",
+                    "english": "Length and map coordinates"
+                }
+            }
+        },
+        "lpn_status_reinterpreted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "په دې نقطه کې د شبکې نه اخیستل شوی بهاو. د دې ځای ته د بهاو ننوتلو لپاره منفي عدد ولیکئ.",
+                    "english": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_units_length",
+                    "value": "اوږدوالی او د نقشې همغږي",
+                    "english": "Length and map coordinates"
+                }
+            }
+        },
+        "lpn_status_converted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "په دې نقطه کې د شبکې نه اخیستل شوی بهاو. د دې ځای ته د بهاو ننوتلو لپاره منفي عدد ولیکئ.",
+                    "english": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_units_length",
+                    "value": "اوږدوالی او د نقشې همغږي",
+                    "english": "Length and map coordinates"
+                }
+            }
+        },
+        "lpn_units_group_inputs": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "په دې نقطه کې د شبکې نه اخیستل شوی بهاو. د دې ځای ته د بهاو ننوتلو لپاره منفي عدد ولیکئ.",
+                    "english": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_units_length",
+                    "value": "اوږدوالی او د نقشې همغږي",
+                    "english": "Length and map coordinates"
+                }
+            }
+        },
+        "lpn_units_group_results": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "په دې نقطه کې د شبکې نه اخیستل شوی بهاو. د دې ځای ته د بهاو ننوتلو لپاره منفي عدد ولیکئ.",
+                    "english": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_units_length",
+                    "value": "اوږدوالی او د نقشې همغږي",
+                    "english": "Length and map coordinates"
                 }
             }
         },

@@ -651,6 +651,14 @@
         "lpn_confirm_example": "This adds the example to the network you already have. Continue?",
         "lpn_field_diameter": "Diameter",
         "lpn_demand_tip": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here.",
+        "lpn_units_warn_title": "This unit decides what your numbers mean",
+        "lpn_units_warn_body": "{unit} is the unit of what you enter for: {list}. Reinterpret leaves every number as it is and reads it in the new unit. Convert rewrites every one of those numbers so the network stays the same size.",
+        "lpn_units_reinterpret": "Reinterpret (change what they mean)",
+        "lpn_units_convert": "Convert them all",
+        "lpn_status_reinterpreted": "{n} values now mean {unit}. Nothing was rewritten.",
+        "lpn_status_converted": "{n} values were rewritten into {unit}.",
+        "lpn_units_group_inputs": "Units of what you enter",
+        "lpn_units_group_results": "Units of the answers",
         "lpn_units_length": "Length and map coordinates",
         "lpn_units_elevhead": "Elevation and head",
         "lpn_units_pressure": "Pressure",
@@ -1046,7 +1054,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 1044,
+    "count": 1052,
     "active_prefixes": [
         "about",
         "bpn",

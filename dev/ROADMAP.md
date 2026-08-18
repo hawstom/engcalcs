@@ -505,26 +505,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     produced should outlive a diagnostic the document produces, or be shown somewhere that is not
     the same one line.
 
-- 90|422| **SPLIT THE UNIT SELECTORS: one group serving INPUTS, one serving RESULTS.** Tom,
-  2026-08-18, after finding that switching the flow unit on Net3 turned 6,104 gpm into 1,338 cfs:
-  *"Splitting the inputs is much more satisfactory... The group serving results can be changed
-  without fanfare. The group serving inputs simply gets a warning."*
-  - **The cause is the standing rule working as written, not a conversion bug.** Measured: junction
-    15's stored demand is `1` before and after the switch; what changed is the project's recorded
-    unit, so that `1` means 1 cfs instead of 1 gpm — 449× the water — and the solve honours it.
-    Factors are correct (12,698 gpm IS 28.29 cfs); `unit_factor_check.php` already guards them.
-  - **A results unit is pure display and changes with no fanfare.** An input unit is a model change
-    wearing a display control's clothes, and gets a warning naming the inputs it serves, with two
-    buttons: **Reinterpret** (the default, and what the standing rule says) and **Convert**.
-  - **The shared quantities are the whole difficulty**, and they are why this is a split and not a
-    label: flow serves demands AND solved flows; elevation/head serves elevations AND heads;
-    pressure serves a PRV setting AND solved pressures. Each of those becomes TWO selectors.
-    Diameter, length and roughness are inputs only; velocity and gradient are results only.
-  - **No conversion without an explicit control** (Tom): the ban on silent conversion stands, and
-    Convert exists only as a button somebody presses.
-  - Ships with the project's stored `units` gaining the results group, so a saved file still says
-    what its numbers mean.
-
 - 55|418| **The first project of a first visit is marked dirty with nobody having touched it**, so its
   tab wears a permanent asterisk. Found by the Task 414 browser-pass repair, 2026-08-17, and it is
   Tom's 2026-08-15 "the initial project gets an unwarranted asterisk" -- the stamp was moved and is

@@ -924,3 +924,9 @@ html[lang="zh"] .ec-welcome {
 	border: 1px solid rgba(0, 0, 0, .45);
 }
 /* ==== END: colour by value ================================================================== */
+
+/* The units strip is TWO GROUPS since Task 422: what you enter, and how answers are read. The
+   heading is what makes the split legible, so it is quiet but not decorative -- without it the row
+   reads as one long list with three quantities inexplicably repeated. */
+.lpn-units-group { display: block; }
+.lpn-units-head { display: inline-block; min-width: 11em; font-weight: 600; opacity: .8; }

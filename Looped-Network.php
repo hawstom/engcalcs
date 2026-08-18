@@ -85,15 +85,32 @@ echoHeader("EngCalcs", $html_title, "");
 	      // this select is shown only under Darcy-Weisbach. It is server-rendered like every other
 	      // one so it keeps its unit family and is visible to the us/si preset buttons; hiding it
 	      // is a display decision made later, in applyMethodUI(). ?>
+	<?php // **TWO GROUPS, AND THE HEADINGS ARE THE POINT** (ROADMAP Task 422, Tom 2026-08-18). The
+	      // top row decides what the numbers in the DOCUMENT mean -- changing one is a model change,
+	      // and js/looped-network.js asks before it happens. The bottom row is pure display: the
+	      // solve is untouched, so it changes with no fanfare.
+	      //
+	      // Three quantities appear in BOTH rows because they genuinely serve both sides. That is a
+	      // duplication on purpose, not one to be tidied away: a demand and a solved flow are two
+	      // different numbers that happen to share a dimension. ?>
 	<div class="d-print-none" id="lpn_units_strip">
+		<div id="lpn_units_inputs" class="lpn-units-group">
+		<span class="lpn-units-head"><?=$ec_lang['lpn_units_group_inputs']?></span>
 		<?=$ec_lang['lpn_units_length']?> <?php echoUnitSelect('lpn_u_length', 'distance_site', ''); ?>
+		<?=$ec_lang['lpn_field_diameter']?> <?php echoUnitSelect('lpn_u_diameter', 'distance_small', ''); ?>
 		<?=$ec_lang['lpn_units_elevhead']?> <?php echoUnitSelect('lpn_u_elevhead', 'total_head', ''); ?>
 		<?=$ec_lang['lpn_units_pressure']?> <?php echoUnitSelect('lpn_u_pressure', 'partial_head', ''); ?>
-		<?=$ec_lang['lpn_field_diameter']?> <?php echoUnitSelect('lpn_u_diameter', 'distance_small', ''); ?>
 		<?=$ec_lang['lpn_units_flow']?> <?php echoUnitSelect('lpn_u_flow', 'flow_epanet', ''); ?>
+		<span id="lpn_u_roughness_row"><?=$ec_lang['lpn_field_roughness']?> <?php echoUnitSelect('lpn_u_roughness', 'roughness', ''); ?></span>
+		</div>
+		<div id="lpn_units_results" class="lpn-units-group">
+		<span class="lpn-units-head"><?=$ec_lang['lpn_units_group_results']?></span>
+		<?=$ec_lang['lpn_result_head']?> <?php echoUnitSelect('lpn_u_r_elevhead', 'total_head', ''); ?>
+		<?=$ec_lang['lpn_result_pressure']?> <?php echoUnitSelect('lpn_u_r_pressure', 'partial_head', ''); ?>
+		<?=$ec_lang['lpn_result_flow']?> <?php echoUnitSelect('lpn_u_r_flow', 'flow_epanet', ''); ?>
 		<?=$ec_lang['lpn_units_velocity']?> <?php echoUnitSelect('lpn_u_velocity', 'velocity', ''); ?>
 		<?=$ec_lang['lpn_result_gradient']?> <?php echoUnitSelect('lpn_u_gradient', 'gradient', ''); ?>
-		<span id="lpn_u_roughness_row"><?=$ec_lang['lpn_field_roughness']?> <?php echoUnitSelect('lpn_u_roughness', 'roughness', ''); ?></span>
+		</div>
 	</div><?php // #lpn_units_strip ?>
 	</div><?php // the flex wrapper ?>
 	</div><?php // #lpn_units_block -- the node rebuildSettingsFields() adopts into the panel ?>
@@ -478,6 +495,14 @@ EngCalcs.pageConfig = {
 	lpn_field_valve_setting_drop_tip: <?=json_encode($ec_lang['lpn_field_valve_setting_drop_tip'])?>,
 	lpn_inp_drop_gpv_curve: <?=json_encode($ec_lang['lpn_inp_drop_gpv_curve'])?>,
 	lpn_gpv_curve_note: <?=json_encode($ec_lang['lpn_gpv_curve_note'])?>,
+	lpn_units_group_inputs: <?=json_encode($ec_lang['lpn_units_group_inputs'])?>,
+	lpn_units_group_results: <?=json_encode($ec_lang['lpn_units_group_results'])?>,
+	lpn_units_warn_title: <?=json_encode($ec_lang['lpn_units_warn_title'])?>,
+	lpn_units_warn_body: <?=json_encode($ec_lang['lpn_units_warn_body'])?>,
+	lpn_units_reinterpret: <?=json_encode($ec_lang['lpn_units_reinterpret'])?>,
+	lpn_units_convert: <?=json_encode($ec_lang['lpn_units_convert'])?>,
+	lpn_status_reinterpreted: <?=json_encode($ec_lang['lpn_status_reinterpreted'])?>,
+	lpn_status_converted: <?=json_encode($ec_lang['lpn_status_converted'])?>,
 	lpn_file_export_inp: <?=json_encode($ec_lang['lpn_file_export_inp'])?>,
 	lpn_file_export_inp_tip: <?=json_encode($ec_lang['lpn_file_export_inp_tip'])?>,
 	lpn_status_inp_exported: <?=json_encode($ec_lang['lpn_status_inp_exported'])?>,

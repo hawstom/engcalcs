@@ -266,6 +266,13 @@ function setUnitSet(which) {
   mkUnitSelect('lpn_u_pressure', 'partial_head', [u('mh2o'), u('kpa'), u('psi')], us ? 'psi' : 'mh2o');
   mkUnitSelect('lpn_u_diameter', 'distance_small', [u('mm'), u('in')], us ? 'in' : 'mm');
   mkUnitSelect('lpn_u_flow', 'flow_epanet', familyUnits('flow_epanet'), us ? 'gpm' : 'lps');
+  // The RESULT half of the strip (Task 422). Three quantities serve both sides, so the page shows
+  // each twice -- once deciding what typed numbers MEAN, once deciding how answers are READ. A stub
+  // without them makes every result fall back to its input twin, which is the correct default and
+  // therefore hides any test of the split.
+  mkUnitSelect('lpn_u_r_elevhead', 'total_head', [u('mh2o'), u('fth2o')], us ? 'fth2o' : 'mh2o');
+  mkUnitSelect('lpn_u_r_pressure', 'partial_head', [u('mh2o'), u('kpa'), u('psi')], us ? 'psi' : 'mh2o');
+  mkUnitSelect('lpn_u_r_flow', 'flow_epanet', familyUnits('flow_epanet'), us ? 'gpm' : 'lps');
   mkUnitSelect('lpn_u_velocity', 'velocity', [u('mps'), u('ftps')], us ? 'ftps' : 'mps');
   mkUnitSelect('lpn_u_gradient', 'gradient', [u('gradePercent'), u('grade')], 'gradePercent');
   // Darcy-Weisbach roughness height e (ROADMAP Task 271) -- family `roughness`, which lib/Units.lib.php

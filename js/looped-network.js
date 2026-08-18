@@ -2619,7 +2619,7 @@ var EngCalcs = EngCalcs || {};
 	// A TANK always has one: EPANET states a tank's elevation, and its level is measured from it.
 	function fixedHeadPressure(n) {
 		if (n.type !== 'tank' && typeof n.elev !== 'number') { return undefined; }
-		return toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure');
+		return toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), resultUnit('pressure'));
 	}
 	function isFixedHeadNode(n) { return !!n && (n.type === 'reservoir' || n.type === 'tank'); }
 	function linkById(id) {
@@ -2852,8 +2852,12 @@ var EngCalcs = EngCalcs || {};
 	// menu so nobody has to learn a second vocabulary. Display NAMES come from
 	// nodeFieldDefs()/linkFieldDefs(), the strings the Labels popover and the map legend use, so a
 	// colour key and a label key can never disagree about what a field is called.
-	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure' };
-	var COLOR_LINK_FIELDS = { diameter: 'lpn_u_diameter', roughness: '', flow: 'lpn_u_flow', velocity: 'lpn_u_velocity', headloss: 'lpn_u_elevhead', gradient: 'lpn_u_gradient' };
+	// INPUT units for the typed fields, RESULT units for the solved ones (Task 422). `elev`, `demand`
+	// and `diameter` are what the user entered; everything else came out of the solver.
+	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow',
+		head: 'lpn_u_r_elevhead', pressure: 'lpn_u_r_pressure' };
+	var COLOR_LINK_FIELDS = { diameter: 'lpn_u_diameter', roughness: '', flow: 'lpn_u_r_flow',
+		velocity: 'lpn_u_velocity', headloss: 'lpn_u_r_elevhead', gradient: 'lpn_u_gradient' };
 	// The value a node/link is coloured by, IN THE DISPLAYED UNIT -- the same expressions
 	// refreshLabelText() prints, so the colour and the printed number can never describe different
 	// quantities. undefined means "this element has no such value" (no solve yet, or the field does
@@ -2864,12 +2868,13 @@ var EngCalcs = EngCalcs || {};
 		if (field === 'elev') { return typeof n.elev === 'number' ? n.elev : undefined; }
 		if (field === 'demand') { return isFixedHeadNode(n) ? undefined : effective(n, 'demand'); }
 		if (field === 'head') {
-			if (isFixedHeadNode(n)) { return nodeFixedHead(n); }
-			return lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], 'lpn_u_elevhead') : undefined;
+			// Derived from typed numbers, so it crosses into the RESULT unit like every other head.
+			if (isFixedHeadNode(n)) { return toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead')); }
+			return lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined;
 		}
 		if (field === 'pressure') {
 			if (isFixedHeadNode(n)) { return fixedHeadPressure(n); }
-			return lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], 'lpn_u_pressure') : undefined;
+			return lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined;
 		}
 		return undefined;
 	}
@@ -2877,9 +2882,9 @@ var EngCalcs = EngCalcs || {};
 		if (field === 'diameter') { return l.type === 'pump' ? undefined : effective(l, 'diameter'); }
 		if (field === 'roughness') { return l.type === 'pipe' ? effective(l, 'roughness') : undefined; }
 		if (!lastSolveResult || lastSolveResult.flows[l.id] === undefined) { return undefined; }
-		if (field === 'flow') { return toDisplay(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow'); }
+		if (field === 'flow') { return toDisplay(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow')); }
 		if (field === 'velocity') { return l.type === 'pump' ? undefined : toDisplay(lastSolveResult.velocities[l.id], 'lpn_u_velocity'); }
-		if (field === 'headloss') { return toDisplay(shownHeadloss(l, lastSolveResult.headlosses[l.id]), 'lpn_u_elevhead'); }
+		if (field === 'headloss') { return toDisplay(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead')); }
 		if (field === 'gradient') {
 			var len = linkLengthSI(l);
 			if (l.type === 'pump' || !len) { return undefined; }
@@ -9744,6 +9749,7 @@ var EngCalcs = EngCalcs || {};
 		wirePointerEvents();
 		wirePopup();
 		wireFindPopup();
+		wireUnitGroups();
 		var opening = initLibrary();
 		if (opening) {
 			applySaved(opening);
@@ -10707,8 +10713,60 @@ var EngCalcs = EngCalcs || {};
 	function unitEl(name) { return document.querySelector('select[name="' + name + '"]'); }
 	// The seven selectors this page owns, in one list, so reading and restoring a project's units
 	// cannot drift out of step with each other or with Looped-Network.php's units strip.
+	// ---- INPUT UNITS AND RESULT UNITS ARE TWO GROUPS (ROADMAP Task 422) --------------------------
+	//
+	// Tom, 2026-08-18, having watched a flow unit switch turn 6,104 gpm into 1,338 cfs on Net3:
+	// *"split (duplicate) units selectors into a group serving inputs and a group serving results.
+	// The group serving results can be changed without fanfare. The group serving inputs simply gets
+	// a warning... Splitting the inputs is much more satisfactory."*
+	//
+	// **THE TWO GROUPS DO DIFFERENT KINDS OF WORK, and that is the whole justification.** A RESULT
+	// unit is pure display: the solve is unchanged and 6,104 gpm really is 13.60 cfs, so it may be
+	// changed with no fanfare at all. An INPUT unit decides what the numbers in the document MEAN --
+	// changing it is a model change wearing a display control's clothes, which is why it is the one
+	// that asks.
+	//
+	// Three quantities serve both sides and are therefore DUPLICATED: flow (a demand and a solved
+	// flow), elevation/head (an elevation and a solved head), pressure (a valve setting and a solved
+	// pressure). Diameter, length and roughness are inputs only; velocity and gradient are results
+	// only, and keep their names because they were never anything else.
+	//
+	// **THE INPUT GROUP KEEPS THE ORIGINAL KEY NAMES**, so every project ever saved still says what
+	// its numbers mean and nothing migrates. The result keys are additive and default to their input
+	// twin, so a file written before today opens reading results exactly as it did.
 	var LPN_UNIT_SELECTS = ['lpn_u_length', 'lpn_u_elevhead', 'lpn_u_pressure', 'lpn_u_diameter',
-		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient'];
+		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient',
+		'lpn_u_r_elevhead', 'lpn_u_r_pressure', 'lpn_u_r_flow'];
+	// The INPUT selectors, in strip order. `lpn_u_roughness` is here although it is rendered in its
+	// own span and shown only under Darcy-Weisbach -- it decides what a typed roughness means, so it
+	// belongs to this group whatever its visibility.
+	var LPN_INPUT_SELECTS = ['lpn_u_length', 'lpn_u_diameter', 'lpn_u_roughness',
+		'lpn_u_elevhead', 'lpn_u_pressure', 'lpn_u_flow'];
+	// A RESULT's unit, by quantity. **Every conversion of a SOLVED number goes through this**, so a
+	// site that reads results in an input unit is a site that did not call it -- which is greppable,
+	// where a bare string is not.
+	var LPN_RESULT_UNIT = {
+		elevhead: 'lpn_u_r_elevhead', pressure: 'lpn_u_r_pressure', flow: 'lpn_u_r_flow',
+		velocity: 'lpn_u_velocity', gradient: 'lpn_u_gradient'
+	};
+	// Result key -> the input key it duplicates. Read by BOTH fallbacks below.
+	var LPN_RESULT_TWIN = {
+		lpn_u_r_elevhead: 'lpn_u_elevhead',
+		lpn_u_r_pressure: 'lpn_u_pressure',
+		lpn_u_r_flow: 'lpn_u_flow'
+	};
+	// **A MISSING RESULT SELECT FALLS BACK TO ITS INPUT TWIN.** The twin rule is stated twice on
+	// purpose, at the two moments it can be needed: fillResultUnitDefaults() covers a FILE written
+	// before the split, and this covers a PAGE without the selects -- every harness stub, and the
+	// brief moment during boot before the strip is adopted. Without it a result reads through a
+	// select that is not there, `unitFactor()` answers 1, and a flow prints in m3/s: a silent,
+	// plausible, hundredfold-wrong number.
+	function resultUnit(q) {
+		var name = LPN_RESULT_UNIT[q];
+		if (!name) { return name; }
+		if (unitEl(name)) { return name; }
+		return LPN_RESULT_TWIN[name] || name;
+	}
 	// {selectName: unitKey}, e.g. {lpn_u_diameter: 'in'}. Stored by KEY, never by factor: a factor is
 	// a number whose meaning depends on a table that may be re-derived, while 'in' will mean inches
 	// forever. Since Task 390 that is also the <option>'s own value -- a unit's identity is its NAME
@@ -10754,7 +10812,21 @@ var EngCalcs = EngCalcs || {};
 	// recorded in unresolvedUnits, kept verbatim by readUnitSelections(), shown by unitLabel(), and
 	// it stops the solve.
 
+	// **A RESULT UNIT DEFAULTS TO ITS INPUT TWIN** (Task 422). Every project saved before the split
+	// records one flow unit, one head unit, one pressure unit -- the input ones, since those are what
+	// the numbers were in. Opening such a file must read its results exactly as it always did, so a
+	// missing result key is not a gap to fill with a preference: it is the input key, said once.
+	function fillResultUnitDefaults(units) {
+		var name;
+		if (!units) { return units; }
+		for (name in LPN_RESULT_TWIN) {
+			if (!Object.prototype.hasOwnProperty.call(LPN_RESULT_TWIN, name)) { continue; }
+			if (!units[name] && units[LPN_RESULT_TWIN[name]]) { units[name] = units[LPN_RESULT_TWIN[name]]; }
+		}
+		return units;
+	}
 	function applyUnitSelections(units) {
+		fillResultUnitDefaults(units);
 		// Cleared unconditionally, INCLUDING on the early return: this function is the one place a
 		// document's units are installed, so it owns the whole of that state. Clearing only in the
 		// matched branch would leave one document's unknown unit refusing to solve the next one.
@@ -10778,6 +10850,202 @@ var EngCalcs = EngCalcs || {};
 			unresolvedUnits[name] = want;
 		});
 		return changed;
+	}
+	// ---- CHANGING AN INPUT UNIT ASKS FIRST (ROADMAP Task 422) ------------------------------------
+	//
+	// A RESULT unit is pure display and changes with no fanfare. An INPUT unit decides what the
+	// numbers in the document MEAN, so it gets the question Tom asked for: reinterpret them, or
+	// convert them.
+	//
+	// **REINTERPRET IS THE DEFAULT AND THE STANDING RULE** ("1 becomes 1 ft instead of 1 m"); Convert
+	// exists only because he asked for a control, and only as a button somebody presses. Nothing here
+	// converts anything on its own.
+	//
+	// **THE QUESTION IS ASKED IN THE CAPTURE PHASE, before the select's own inline onchange.** Every
+	// unit select carries `onchange="EngCalcs.submitForm()"` from echoUnitSelect(), which re-enters
+	// the page. Stopping the event at the document, on the way DOWN, is what lets the choice be made
+	// before anything acts on it -- and lets the select be put back if the user cancels.
+	var unitPrev = {};
+	function rememberUnitSelections() {
+		LPN_INPUT_SELECTS.forEach(function (n) {
+			var k = unitKey(n);
+			if (k) { unitPrev[n] = k; }
+		});
+	}
+	// Which typed fields an input unit decides the meaning of. Named rather than described, because
+	// the question names them to the user -- and because this list IS the conversion's scope.
+	function unitServes(name) {
+		var pc = EngCalcs.pageConfig || {};
+		if (name === 'lpn_u_length') { return [pc.lpn_field_length || 'Length']; }
+		if (name === 'lpn_u_diameter') { return [pc.lpn_field_diameter || 'Diameter']; }
+		if (name === 'lpn_u_roughness') { return [roughnessLabel()]; }
+		if (name === 'lpn_u_elevhead') {
+			return [pc.lpn_field_elev || 'Elevation', pc.lpn_field_head || 'Head',
+				pc.lpn_field_tank_level || 'Water level', pc.lpn_field_tank_diameter || 'Tank diameter',
+				pc.lpn_pump_point1 ? (pc.lpn_result_head || 'Head') + ' (pump curve)' : 'pump curve'];
+		}
+		if (name === 'lpn_u_pressure') { return [pc.lpn_field_valve_setting_pressure || 'Pressure setting']; }
+		if (name === 'lpn_u_flow') {
+			return [pc.bpn_demand || 'Demand', pc.lpn_field_valve_setting_flow || 'Flow setting',
+				(pc.lpn_result_flow || 'Flow') + ' (pump curve)'];
+		}
+		return [];
+	}
+	// **CONVERT: rewrite every stored number that unit decides, INCLUDING SCENARIO OVERRIDES.** An
+	// override is a value in the same unit as the property it overrides, so a conversion that missed
+	// them would leave one scenario describing a different network from the others -- silently, and
+	// only inside that scenario.
+	//
+	// `k` is the multiplier: a value means v in the OLD unit, so its number in the new one is
+	// v * fNew / fOld, both factors being units per SI.
+	function convertUnitValues(name, k) {
+		var n = 0;
+		function conv(obj, prop) {
+			if (!obj || typeof obj[prop] !== 'number') { return; }
+			obj[prop] = obj[prop] * k;
+			n++;
+		}
+		function convOverrides(prop) {
+			scenarios.forEach(function (sc) {
+				var key;
+				for (key in sc.overrides) {
+					if (!Object.prototype.hasOwnProperty.call(sc.overrides, key)) { continue; }
+					conv(sc.overrides[key], prop);
+				}
+			});
+		}
+		if (name === 'lpn_u_length') {
+			doc.links.forEach(function (l) { conv(l, '_length'); });
+			convOverrides('length');
+		} else if (name === 'lpn_u_diameter') {
+			doc.links.forEach(function (l) { conv(l, '_diameter'); });
+			convOverrides('diameter');
+		} else if (name === 'lpn_u_roughness') {
+			// ONLY under Darcy-Weisbach, where roughness is a LENGTH. Hazen-Williams C and Manning's
+			// n are dimensionless, and multiplying either would be inventing a different pipe.
+			if (frictionMethod() === 'dw') {
+				doc.links.forEach(function (l) { conv(l, '_roughness'); });
+				convOverrides('roughness');
+			}
+		} else if (name === 'lpn_u_elevhead') {
+			doc.nodes.forEach(function (nd) {
+				conv(nd, 'elev'); conv(nd, '_level'); conv(nd, 'minLevel');
+				conv(nd, 'maxLevel'); conv(nd, 'tankDiameter'); conv(nd, '_head');
+			});
+			convOverrides('level'); convOverrides('head');
+			// A curve point is [flow, head]; this unit owns the second.
+			doc.links.forEach(function (l) {
+				(l.curvePoints || []).forEach(function (pt) {
+					if (pt && typeof pt[1] === 'number') { pt[1] = pt[1] * k; n++; }
+				});
+			});
+		} else if (name === 'lpn_u_pressure') {
+			doc.links.forEach(function (l) {
+				if (l.type !== 'valve') { return; }
+				var t = String(l.valveType || 'TCV').toUpperCase();
+				if (t === 'PRV' || t === 'PSV' || t === 'PBV') { conv(l, '_setting'); }
+			});
+			// An override on `setting` belongs to whichever valve carries it, and only a pressure
+			// valve's is a pressure -- so the element decides, not the property name.
+			scenarios.forEach(function (sc) {
+				doc.links.forEach(function (l) {
+					var t = String(l.valveType || 'TCV').toUpperCase(), ov;
+					if (l.type !== 'valve' || (t !== 'PRV' && t !== 'PSV' && t !== 'PBV')) { return; }
+					ov = sc.overrides[ovKey(l)];
+					conv(ov, 'setting');
+				});
+			});
+		} else if (name === 'lpn_u_flow') {
+			doc.nodes.forEach(function (nd) { conv(nd, '_demand'); });
+			convOverrides('demand');
+			doc.links.forEach(function (l) {
+				if (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'FCV') { conv(l, '_setting'); }
+				(l.curvePoints || []).forEach(function (pt) {
+					if (pt && typeof pt[0] === 'number') { pt[0] = pt[0] * k; n++; }
+				});
+			});
+			scenarios.forEach(function (sc) {
+				doc.links.forEach(function (l) {
+					if (l.type !== 'valve' || String(l.valveType || '').toUpperCase() !== 'FCV') { return; }
+					conv(sc.overrides[ovKey(l)], 'setting');
+				});
+			});
+		}
+		return n;
+	}
+	// How many stored numbers this unit decides, without touching any of them -- so the notice after
+	// Reinterpret can say how much meaning just changed.
+	function countUnitValues(name) {
+		var before = JSON.stringify([doc, scenarios]), n = convertUnitValues(name, 1);
+		// convertUnitValues with k = 1 multiplies by one: it counts and changes nothing. Asserted
+		// rather than assumed, because "the counter is also the mutator" is a trap.
+		if (JSON.stringify([doc, scenarios]) !== before) { setNotice('unit count mutated the document'); }
+		return n;
+	}
+	function onInputUnitChange(sel, name) {
+		var pc = EngCalcs.pageConfig || {}, from = unitPrev[name], to = unitKey(name);
+		if (!from || !to || from === to) { rememberUnitSelections(); return; }
+		// Put it back until the question is answered. Nothing acts on the new unit before then.
+		applyOneUnit(name, from);
+		openDialog(function (body) {
+			var h = document.createElement('div'), p2 = document.createElement('div');
+			h.style.fontWeight = 'bold';
+			h.textContent = pc.lpn_units_warn_title || 'This unit decides what your numbers mean';
+			p2.textContent = String(pc.lpn_units_warn_body || '')
+				.replace('{unit}', unitLabelFor(sel, to))
+				.replace('{list}', unitServes(name).join(', '));
+			body.appendChild(h); body.appendChild(p2);
+		}, [
+			{ label: pc.lpn_units_reinterpret || 'Reinterpret (change what they mean)', fn: function () {
+				var n = countUnitValues(name);
+				applyOneUnit(name, to);
+				rememberUnitSelections();
+				afterUnitChange();
+				setNotice(String(pc.lpn_status_reinterpreted || '{n} values now mean {unit}. Nothing was rewritten.')
+					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
+			} },
+			{ label: pc.lpn_units_convert || 'Convert them all', fn: function () {
+				var fOld = EngCalcs.unitFactors[from], fNew = EngCalcs.unitFactors[to], n;
+				saveUndoSnapshot();
+				applyOneUnit(name, to);
+				n = (fOld && fNew) ? convertUnitValues(name, fNew / fOld) : 0;
+				rememberUnitSelections();
+				afterUnitChange();
+				setNotice(String(pc.lpn_status_converted || '{n} values were rewritten into {unit}.')
+					.replace('{n}', String(n)).replace('{unit}', unitLabel(name)));
+			} }
+		]);
+	}
+	function applyOneUnit(name, key) {
+		var sel = unitEl(name), i;
+		if (!sel || !sel.options) { return; }
+		for (i = 0; i < sel.options.length; i++) {
+			if (sel.options[i].value === key) { sel.selectedIndex = i; return; }
+		}
+	}
+	function unitLabelFor(sel, key) {
+		var i;
+		if (!sel || !sel.options) { return key; }
+		for (i = 0; i < sel.options.length; i++) {
+			if (sel.options[i].value === key) { return sel.options[i].textContent; }
+		}
+		return key;
+	}
+	// One redraw for either answer: the document's numbers or their meaning changed, so everything
+	// derived from them is stale -- the labels, the solve, and what is on disk.
+	function afterUnitChange() {
+		refreshAllFromDocument();
+		saveToStorage();
+	}
+	function wireUnitGroups() {
+		rememberUnitSelections();
+		document.addEventListener('change', function (e) {
+			var t = e.target, name = t && t.name;
+			if (!name || LPN_INPUT_SELECTS.indexOf(name) < 0) { return; }
+			if (e.stopPropagation) { e.stopPropagation(); }
+			if (e.preventDefault) { e.preventDefault(); }
+			onInputUnitChange(t, name);
+		}, true);
 	}
 	// Task 390: the select's value IS the unit's key ('in'), and the factor is a lookup from it
 	// through EngCalcs.unitFactors -- lib/Units.lib.php's own table, emitted by echoHTMLHead().
@@ -12990,7 +13258,7 @@ var EngCalcs = EngCalcs || {};
 				function () { return n.tankDiameter; },
 				function (v) { n.tankDiameter = v; updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_field_tank_diameter_tip);
-			readonlyUnitField(fields, pc.lpn_result_head || 'Head', 'lpn_u_elevhead',
+			readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'),
 				toSI(nodeFixedHead(n), 'lpn_u_elevhead'), pc.lpn_tank_head_tip);
 		} else if (n.type === 'reservoir') {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
@@ -13016,7 +13284,7 @@ var EngCalcs = EngCalcs || {};
 			// **OMITTED ENTIRELY WHEN THE GROUND IS UNKNOWN** (Task 390): an imported reservoir has a
 			// head and no elevation, and a pressure row reading 0 asserts what the file never said.
 			if (typeof n.elev === 'number') {
-				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure',
+				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'),
 					toSI(reservoirHead(n) - n.elev, 'lpn_u_elevhead'));
 			}
 		} else {
@@ -13031,9 +13299,9 @@ var EngCalcs = EngCalcs || {};
 				function (v) { setProp(n, 'demand', v); updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_demand_tip, { el: n, prop: 'demand' });
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
-				readonlyUnitField(fields, pc.lpn_result_head || 'Head', 'lpn_u_elevhead', lastSolveResult.heads[nodeId],
+				readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
 					pc.lpn_result_head_tip);
-				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure', lastSolveResult.pressures[nodeId]);
+				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', resultUnit('pressure'), lastSolveResult.pressures[nodeId]);
 			}
 		}
 		activeField(fields, n);
@@ -13200,17 +13468,17 @@ var EngCalcs = EngCalcs || {};
 		activeField(fields, l);
 		pushHereButton(fields, l);
 		if (lastSolveResult && lastSolveResult.flows[linkId] !== undefined) {
-			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', 'lpn_u_flow', shownFlow(lastSolveResult.flows[linkId]));
+			readonlyUnitField(fields, pc.lpn_result_flow || 'Flow', resultUnit('flow'), shownFlow(lastSolveResult.flows[linkId]));
 			// A pump has no diameter (Tom, 2026-07-30: "how can a pump have a velocity if it has no
 			// diameter?") -- js/lpn-solver.js can only compute velocity = Q/area from a real
 			// diameter, so a pump's stored velocity is always the fallback 0, which reads as "no
 			// flow" and is actively misleading. Velocity is a pipe-only result.
 			if (l.type !== 'pump') {
-				readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', 'lpn_u_velocity', lastSolveResult.velocities[linkId]);
+				readonlyUnitField(fields, pc.lpn_result_velocity || 'Velocity', resultUnit('velocity'), lastSolveResult.velocities[linkId]);
 			}
 			// Head loss, for a pump too: lpn-solver.js reports a pump's contribution as a NEGATIVE
 			// head loss, which is the whole of how a head gain is expressed on this page.
-			readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', 'lpn_u_elevhead', shownHeadloss(l, lastSolveResult.headlosses[linkId]));
+			readonlyUnitField(fields, pc.lpn_result_headloss || 'Head loss', resultUnit('elevhead'), shownHeadloss(l, lastSolveResult.headlosses[linkId]));
 			// Gradient is per unit of pipe LENGTH, so it is a pipe-only result -- a pump has no
 			// length to spread its head over. linkLengthSI(), not the declared length: see Task 255.
 			if (l.type !== 'pump' && linkLengthSI(l)) {
@@ -14075,15 +14343,16 @@ var EngCalcs = EngCalcs || {};
 			elev: nodeValueMap(function (n) { return plainRound(n.elev, nd.elev); }),
 			demand: nodeValueMap(function (n) { return !isFixedHeadNode(n) ? plainRound(effective(n, 'demand'), nd.demand) : undefined; }),
 			head: nodeValueMap(function (n) {
-				// Head is an INPUT on a reservoir or tank and a RESULT on a junction, so the two
-				// halves of this one field cross the boundary differently. Both end up in
-				// Elevation/Head units, which is what makes them comparable for the extrema tick.
-				if (isFixedHeadNode(n)) { return plainRound(nodeFixedHead(n), nd.head); }
-				return lastSolveResult ? displayRound(lastSolveResult.heads[n.id], 'lpn_u_elevhead', nd.head) : undefined;
+				// Head is DERIVED on a reservoir or tank and SOLVED on a junction, so the two halves
+				// of this one field reach the RESULT unit by different roads -- one across the input
+				// boundary, one straight from SI. Both must end there, or the extrema tick would be
+				// comparing two quantities (Task 422).
+				if (isFixedHeadNode(n)) { return displayRound(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'), nd.head); }
+				return lastSolveResult ? displayRound(lastSolveResult.heads[n.id], resultUnit('elevhead'), nd.head) : undefined;
 			}),
 			pressure: nodeValueMap(function (n) {
-				if (isFixedHeadNode(n)) { return displayRound(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure', nd.pressure); }
-				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], 'lpn_u_pressure', nd.pressure) : undefined;
+				if (isFixedHeadNode(n)) { return displayRound(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), resultUnit('pressure'), nd.pressure); }
+				return lastSolveResult ? displayRound(lastSolveResult.pressures[n.id], resultUnit('pressure'), nd.pressure) : undefined;
 			})
 		};
 		// **BUILT HERE AND NOWHERE ELSE**, because this is already the one function that runs on every
@@ -14114,14 +14383,14 @@ var EngCalcs = EngCalcs || {};
 			// Both dimensionless, so they use rawLine()/plainRound() like Length, not displayRound().
 			roughness: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'roughness'), ld.roughness) : undefined; })),
 			km: fieldExtrema(doc.links.map(function (l) { return l.type === 'pipe' ? plainRound(effective(l, 'k') || 0, ld.km) : undefined; })),
-			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow', ld.flow) : undefined; })),
-			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], 'lpn_u_velocity', ld.velocity) : undefined; })),
+			flow: fieldExtrema(doc.links.map(function (l) { return lastSolveResult ? displayRound(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), ld.flow) : undefined; })),
+			velocity: fieldExtrema(doc.links.map(function (l) { return (l.type !== 'pump' && lastSolveResult) ? displayRound(lastSolveResult.velocities[l.id], resultUnit('velocity'), ld.velocity) : undefined; })),
 			// One head-loss bucket for every link type, pumps included: a pump reports a negative
 			// head loss (Tom, 2026-07-30), so it lands at the min end of this same range rather
 			// than needing a field of its own.
 			headloss: fieldExtrema(doc.links.map(function (l) {
 				if (!lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
-				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]), 'lpn_u_elevhead', ld.headloss);
+				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), ld.headloss);
 			})),
 			// Head loss GRADIENT (Task 177): headloss/length as a dimensionless ratio, reusing
 			// mpf_/mphl_'s grade/gradePercent OPTIONS but its own 'gradient' family so it can default
@@ -14137,7 +14406,7 @@ var EngCalcs = EngCalcs || {};
 			gradient: fieldExtrema(doc.links.map(function (l) {
 				var len = linkLengthSI(l);
 				if (l.type === 'pump' || !len || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
-				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / len, 'lpn_u_gradient', ld.gradient);
+				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / len, resultUnit('gradient'), ld.gradient);
 			}))
 		};
 		var nodeLines = {}, linkLines = {};
@@ -14155,12 +14424,17 @@ var EngCalcs = EngCalcs || {};
 			// two halves of each field agree with the extrema computed above. A TANK's pressure is
 			// the depth of water standing in it, which is the same head-minus-elevation subtraction
 			// a reservoir makes -- see nodeFixedHead().
+			// **HEAD IS A RESULT COLUMN, so a fixed head is read in the RESULT unit too** (Task 422).
+			// A tank's or reservoir's head is DERIVED from typed numbers, so it arrives in the INPUT
+			// elevation unit and has to cross; a junction's comes from the solver in SI. Two sources,
+			// one column, and if they did not both end in the result unit the same map label would
+			// print two different quantities under one heading.
 			var headVal = isFixedHeadNode(n)
-				? nodeFixedHead(n)
-				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], 'lpn_u_elevhead') : undefined);
+				? toDisplay(toSI(nodeFixedHead(n), 'lpn_u_elevhead'), resultUnit('elevhead'))
+				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], resultUnit('elevhead')) : undefined);
 			var pressVal = isFixedHeadNode(n)
 				? fixedHeadPressure(n)
-				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], 'lpn_u_pressure') : undefined);
+				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], resultUnit('pressure')) : undefined);
 			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, extrema.head, nd.head))); }
 			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, extrema.pressure, nd.pressure))); }
 			// An elevation nobody stated prints nothing, exactly as an unsolved pressure does -- an
@@ -14207,14 +14481,14 @@ var EngCalcs = EngCalcs || {};
 				if (ls.link.diameter) { lines.push(affix('link', 'diameter', rawLine(effective(l, 'diameter'), extrema.diameter, ld.diameter))); }
 			}
 			if (lastSolveResult && lastSolveResult.flows[l.id] !== undefined) {
-				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), 'lpn_u_flow', extrema.flow, ld.flow))); }
+				if (ls.link.flow) { lines.push(affix('link', 'flow', numLine(shownFlow(lastSolveResult.flows[l.id]), resultUnit('flow'), extrema.flow, ld.flow))); }
 				// Velocity is meaningless for a pump (no diameter -- see renderLinkFields() above).
-				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], 'lpn_u_velocity', extrema.velocity, ld.velocity))); }
-				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), 'lpn_u_elevhead', extrema.headloss, ld.headloss))); }
+				if (ls.link.velocity && l.type !== 'pump') { lines.push(affix('link', 'velocity', numLine(lastSolveResult.velocities[l.id], resultUnit('velocity'), extrema.velocity, ld.velocity))); }
+				if (ls.link.headloss) { lines.push(affix('link', 'headloss', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]), resultUnit('elevhead'), extrema.headloss, ld.headloss))); }
 				// The '%' is read from the SELECT, not assumed: this family offers rise/run too, and
 				// a "%" on a ratio would be a lie rather than a redundancy. Blank in that form --
 				// there is no token for a bare ratio that is shorter than the ambiguity it fixes.
-				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), 'lpn_u_gradient', extrema.gradient, ld.gradient, gradientSuffix()))); }
+				if (ls.link.gradient && l.type !== 'pump' && linkLengthSI(l)) { lines.push(affix('link', 'gradient', numLine(shownHeadloss(l, lastSolveResult.headlosses[l.id]) / linkLengthSI(l), resultUnit('gradient'), extrema.gradient, ld.gradient, gradientSuffix()))); }
 			}
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }

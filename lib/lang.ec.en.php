@@ -1260,6 +1260,21 @@ $ec_lang['lpn_tool_undo']='Undo';
 $ec_lang['lpn_confirm_example']='This adds the example to the network you already have. Continue?';
 $ec_lang['lpn_field_diameter']='Diameter';
 $ec_lang['lpn_demand_tip']='Flow taken out of the network at this node. Enter a negative number for flow put into the network here.';
+// **THE UNITS STRIP IS TWO GROUPS** (Task 422). The first decides what the numbers in the document
+// MEAN, so changing one is a model change and the page asks first; the second is how results are
+// read, and changes with no fanfare. Three quantities appear in both because they serve both sides.
+// The question an INPUT unit change asks. Tom's own shape, 2026-08-18: name the quantity, say what
+// the two answers DO, and mark Convert as the unusual one. {unit} is a unit name, {list} the field
+// names that unit serves.
+$ec_lang['lpn_units_warn_title']='This unit decides what your numbers mean';
+$ec_lang['lpn_units_warn_body']='{unit} is the unit of what you enter for: {list}. Reinterpret leaves every number as it is and reads it in the new unit. Convert rewrites every one of those numbers so the network stays the same size.';
+$ec_lang['lpn_units_reinterpret']='Reinterpret (change what they mean)';
+$ec_lang['lpn_units_convert']='Convert them all';
+// {n} is a whole number.
+$ec_lang['lpn_status_reinterpreted']='{n} values now mean {unit}. Nothing was rewritten.';
+$ec_lang['lpn_status_converted']='{n} values were rewritten into {unit}.';
+$ec_lang['lpn_units_group_inputs']='Units of what you enter';
+$ec_lang['lpn_units_group_results']='Units of the answers';
 $ec_lang['lpn_units_length']='Length and map coordinates';
 $ec_lang_syn['lpn_units_length']='Pipe lengths and map coordinates';
 $ec_lang['lpn_units_elevhead']='Elevation and head';
