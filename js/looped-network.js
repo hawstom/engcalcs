@@ -2991,6 +2991,18 @@ var EngCalcs = EngCalcs || {};
 		if (n.type === 'tank') { return (n.elev || 0) + (effective(n, 'level') || 0); }
 		return reservoirHead(n);
 	}
+	// **A PRESSURE IS A HEAD ABOVE A GROUND, so a node with no ground has no pressure** (Task 390).
+	// An imported reservoir is exactly that case: an `.inp` states a total head and says nothing
+	// about the elevation under it. The old answer was zero -- arrived at by treating a missing
+	// elevation as 0 -- and zero is a claim, not an absence. undefined is the same "no such value"
+	// every other unavailable reading uses (a pump has no velocity), so labels skip it, the colour
+	// ramp leaves the node black, and the popup shows nothing.
+	//
+	// A TANK always has one: EPANET states a tank's elevation, and its level is measured from it.
+	function fixedHeadPressure(n) {
+		if (n.type !== 'tank' && typeof n.elev !== 'number') { return undefined; }
+		return toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure');
+	}
 	function isFixedHeadNode(n) { return !!n && (n.type === 'reservoir' || n.type === 'tank'); }
 	function linkById(id) {
 		var i;
@@ -3273,7 +3285,7 @@ var EngCalcs = EngCalcs || {};
 			return lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], 'lpn_u_elevhead') : undefined;
 		}
 		if (field === 'pressure') {
-			if (isFixedHeadNode(n)) { return toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure'); }
+			if (isFixedHeadNode(n)) { return fixedHeadPressure(n); }
 			return lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], 'lpn_u_pressure') : undefined;
 		}
 		return undefined;
@@ -6601,13 +6613,14 @@ var EngCalcs = EngCalcs || {};
 		// Consumed once, by the restoreViewOrFit() at the end of refreshAllFromDocument(). A file
 		// written before this existed has none, and gets a fit exactly as it always did.
 		pendingView = validView(saved.view) ? saved.view : null;
-		// Reservoirs written before they had an elevation (2026-07-30) carry only a head. Giving
-		// such a reservoir an elevation EQUAL to its head keeps the old network solving and reading
-		// exactly as it did -- same fixed head, and a pressure of zero at the water surface --
-		// rather than silently reinterpreting the whole thing as a tank standing on datum.
-		doc.nodes.forEach(function (n) {
-			if (n.type === 'reservoir' && n.elev === undefined) { n.elev = n._head || 0; }
-		});
+		// **A RESERVOIR WITH NO ELEVATION KEEPS HAVING NO ELEVATION** (Task 390). This used to
+		// back-fill one equal to the head, so an old document read as a water surface sitting on
+		// its own ground and a pressure of exactly zero. That was a number nobody typed, written
+		// into a field labelled as the user's -- and it is also what an imported `.inp` produces,
+		// since EPANET states a head and says nothing whatever about the ground. The solve is
+		// unchanged either way: reservoirHead() reads the head, and falls back to the elevation
+		// only when the head is blank. What changes is that an unknown ground is now SHOWN as
+		// unknown rather than asserted as zero pressure.
 		nextId = saved.nextId || newNextId();
 		// Object.assign onto the current defaults, not saved.x || defaults() -- a plain "||" swaps in
 		// a saved object wholesale, so a preference added AFTER a user's last save (e.g. Task 146.03's
@@ -7296,7 +7309,7 @@ var EngCalcs = EngCalcs || {};
 		return dst;
 	}
 	var LPN_INP_TOK_JUNCTION = { elev: 'elev', demand: '_demand', x: 'x', y: 'y' },
-		LPN_INP_TOK_RESERVOIR = { elev: 'elev', x: 'x', y: 'y' },
+		LPN_INP_TOK_RESERVOIR = { head: '_head', x: 'x', y: 'y' },
 		LPN_INP_TOK_TANK = {
 			elev: 'elev', level: '_level', minLevel: 'minLevel', maxLevel: 'maxLevel',
 			diameter: 'tankDiameter', x: 'x', y: 'y'
@@ -7318,11 +7331,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		var nodes = parsed.nodes.map(function (n) {
 			if (n.type === 'reservoir') {
-				// No `_head` written, deliberately: a blank head means "the water surface is at the
-				// ground", and elevation already carries EPANET's total head. Writing the same
-				// number into both would look identical and silently sever the link the page keeps
-				// between them (see reservoirHead()).
-				return carryInpTokens(n, { id: n.id, type: 'reservoir', x: n.x, y: n.y, elev: n.elev }, LPN_INP_TOK_RESERVOIR);
+				// THE FILE'S NUMBER IS A HEAD, so it becomes `_head` and no elevation is invented
+				// for it (Task 390). See the note in js/lpn-inp.js for why the old elevation=head
+				// write was a claim the file never made.
+				return carryInpTokens(n, { id: n.id, type: 'reservoir', x: n.x, y: n.y, _head: n.head }, LPN_INP_TOK_RESERVOIR);
 			}
 			if (n.type === 'tank') {
 				// A tank's four levels and its diameter are ALL in the Elevation/Head unit, because
@@ -13873,8 +13885,14 @@ var EngCalcs = EngCalcs || {};
 			// something else entirely (psi against ft of water). So it crosses to SI and back. This
 			// is a conversion between two units the user chose, not a conversion of an input on a
 			// unit change -- the number they typed is untouched.
-			readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure',
-				toSI(reservoirHead(n) - (n.elev || 0), 'lpn_u_elevhead'));
+			//
+			// **AND IT IS OMITTED ENTIRELY WHEN THE GROUND IS UNKNOWN** (Task 390): an imported
+			// reservoir has a head and no elevation, and a pressure row reading 0 there would be
+			// this page asserting something the file never said. See fixedHeadPressure().
+			if (typeof n.elev === 'number') {
+				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure',
+					toSI(reservoirHead(n) - n.elev, 'lpn_u_elevhead'));
+			}
 		} else {
 			unitNumberField(fields, pc.lpn_field_elev || 'Elevation', 'lpn_u_elevhead',
 				function () { return n.elev; }, function (v) { n.elev = v; updateNode(nodeId); },
@@ -15041,11 +15059,13 @@ var EngCalcs = EngCalcs || {};
 				? nodeFixedHead(n)
 				: (lastSolveResult ? toDisplay(lastSolveResult.heads[n.id], 'lpn_u_elevhead') : undefined);
 			var pressVal = isFixedHeadNode(n)
-				? toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), 'lpn_u_pressure')
+				? fixedHeadPressure(n)
 				: (lastSolveResult ? toDisplay(lastSolveResult.pressures[n.id], 'lpn_u_pressure') : undefined);
 			if (ls.node.head && headVal !== undefined) { lines.push(affix('node', 'head', rawLine(headVal, extrema.head, nd.head))); }
 			if (ls.node.pressure && pressVal !== undefined) { lines.push(affix('node', 'pressure', rawLine(pressVal, extrema.pressure, nd.pressure))); }
-			if (ls.node.elev) { lines.push(affix('node', 'elev', rawLine(n.elev, extrema.elev, nd.elev))); }
+			// An elevation nobody stated prints nothing, exactly as an unsolved pressure does -- an
+			// imported reservoir has none (Task 390) and rawLine() would have thrown on it.
+			if (ls.node.elev && typeof n.elev === 'number') { lines.push(affix('node', 'elev', rawLine(n.elev, extrema.elev, nd.elev))); }
 			// EMPTY IS CAPTURED BEFORE THE PLACEHOLDER BELOW: a label with no fields toggled on still gets
 			// an empty line pushed so getBBox() never throws, and everything downstream (the leader, the
 			// collision box) must know it is really empty rather than really one blank line.

@@ -108,7 +108,9 @@ function checkParsed(inpPath) {
 	// [id, section, {column: field}] -- exactly the columns js/lpn-inp.js stores verbatim.
 	const NODE_COLS = {
 		JUNCTIONS: { 1: 'elev', 2: 'demand' },
-		RESERVOIRS: { 1: 'elev' },
+		// A reservoir's one column is a total HEAD, and since Task 390 it is stored as one -- no
+		// ground elevation is invented from it.
+		RESERVOIRS: { 1: 'head' },
 		TANKS: { 1: 'elev', 2: 'level', 3: 'minLevel', 4: 'maxLevel', 5: 'diameter' },
 		COORDINATES: { 1: 'x', 2: 'y' }
 	};

@@ -254,16 +254,20 @@
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			if (!r[0]) { continue; }
-			// EPANET's reservoir carries a TOTAL HEAD and no separate elevation. This page's
-			// reservoir carries both, with a blank head meaning "the water surface is at the
-			// ground" -- so an imported reservoir gets elevation = head, which is the same fixed
-			// boundary condition and reads as zero pressure at the surface. Exactly what
-			// applySaved() already does for reservoirs written before they had an elevation.
-			var rn = addNode({ id: r[0], type: 'reservoir', x: 0, y: 0, elev: num(r[1]), head: num(r[1]) });
-			// One token for one column, under the name the DOCUMENT stores it as. `head` is the same
-			// number read a second way and gets none -- two tokens for one column of text would be
-			// two chances to disagree.
-			mergeTok(rn, 'elev', r[1], rn.elev);
+			// **EPANET's reservoir column is a TOTAL HEAD, so it lands in HEAD and nowhere else**
+			// (ROADMAP Task 390's last open item). It used to be written into the elevation as
+			// well, on the reasoning that a reservoir's water surface sits at its ground -- which
+			// is a fact about a reservoir somebody DREW, not one this file states. An `.inp` says
+			// where the water surface is and says nothing whatever about the ground, so writing a
+			// ground elevation from it put a number the user never supplied into a field labelled
+			// as theirs. The solve is identical either way: reservoirHead() reads the head.
+			//
+			// What follows from it is that an imported reservoir has NO elevation, so its pressure
+			// is not knowable and is shown as blank rather than as zero. That is the honest reading
+			// of the file, and it is the shape this whole task is about: one field, one meaning.
+			var rn = addNode({ id: r[0], type: 'reservoir', x: 0, y: 0, head: num(r[1]) });
+			// One token for one column, under the name the DOCUMENT stores it as.
+			mergeTok(rn, 'head', r[1], rn.head);
 			if (r[2]) { drop('head-pattern', [r[0]], r[2]); }
 		}
 

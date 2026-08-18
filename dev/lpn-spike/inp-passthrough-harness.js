@@ -108,7 +108,10 @@ function checkModel(inpPath) {
 	(sec.RESERVOIRS || []).forEach((r) => {
 		const n = node[r[0]];
 		if (!n) { return; }
-		ok(tag + 'R ' + r[0] + ' head is the file token', n.elev === +r[1], n.elev + ' vs ' + r[1]);
+		// **THE COLUMN IS A HEAD AND IT LANDS IN THE HEAD** (Task 390). It used to land in `elev`
+		// too, which invented a ground elevation the file never states.
+		ok(tag + 'R ' + r[0] + ' head is the file token', n._head === +r[1], n._head + ' vs ' + r[1]);
+		ok(tag + 'R ' + r[0] + ' is given no ground elevation', n.elev === undefined, String(n.elev));
 	});
 	(sec.TANKS || []).forEach((r) => {
 		const n = node[r[0]];
@@ -160,7 +163,7 @@ const before = fails;
 	got.nodes.forEach((n) => { gotNode[n.id] = n; });
 	const gotLink = {};
 	got.links.forEach((l) => { gotLink[l.id] = l; });
-	['elev', '_demand', '_level', 'minLevel', 'maxLevel', 'tankDiameter'].forEach((k) => {
+	['elev', '_head', '_demand', '_level', 'minLevel', 'maxLevel', 'tankDiameter'].forEach((k) => {
 		want.nodes.forEach((n) => {
 			if (!(k in n) || !gotNode[n.id]) { return; }
 			ok(json + ' ' + n.id + '.' + k, gotNode[n.id][k] === n[k], gotNode[n.id][k] + ' vs ' + n[k]);

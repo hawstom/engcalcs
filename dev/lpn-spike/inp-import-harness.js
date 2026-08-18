@@ -41,31 +41,15 @@ global.FileReader = function () {
 };
 global.alert = global.window.alert = function (m) { lastAlert = m; };
 
-// TEXT MEASUREMENT THAT TRACKS THE TEXT, for this harness only.
+// TEXT MEASUREMENT: THE SHARED STUB NOW DOES THIS ITSELF (Task 403).
 //
-// The shared stub returns a constant getBBox().width, which is fine for every other harness and
-// useless for this one: EPANET anchors a label at its upper-left corner and this page anchors at
-// the centre, so an import moves each label by HALF ITS OWN WIDTH. With every string the same
-// width, the test that two differently-sized labels come out sharing a left edge could only ever
-// agree with itself.
-//
-// Patched here rather than in lpn-dom-stub.js deliberately. A width that varies changes the
-// example network's measured callout offsets, and example-network-harness.js asserts those against
-// numbers taken at the constant width -- so widening the stub for everyone would break a passing
-// harness in order to test this one. 0.55 em per character is a fair mean for Arial; only the fact
-// that a longer string measures wider actually matters here.
-const createNS = global.document.createElementNS;
-global.document.createElementNS = function (ns, tag) {
-	const el = createNS(ns, tag);
-	if (tag === 'text') {
-		el.getBBox = function () {
-			const fs = parseFloat(String(this._styleAttr || '').replace(/^[\s\S]*font-size:\s*/, '')) ||
-				parseFloat(this.style.fontSize) || 10;
-			return { x: 0, y: 0, width: (this.textContent || '').length * 0.55 * fs, height: fs * 1.2 };
-		};
-	}
-	return el;
-};
+// This harness used to patch getBBox() locally, because EPANET anchors a label at its upper-left
+// corner and this page anchors at the centre -- so an import moves each label by HALF ITS OWN
+// WIDTH, and with every string measuring the same the test could only agree with itself. The stub
+// has measured by character count for a while, and since Task 403 it also scales with font size,
+// which is the relationship that was actually missing. The local patch's stated reason for
+// existing -- that a varying width would break example-network-harness.js's callout assertions --
+// is also gone: those offsets no longer derive from a measured width at all.
 
 const L = loadLoopedNetwork(
 	"\t\timportInp: importInpFromFile, getDoc: function () { return doc; },\n" +
@@ -190,10 +174,14 @@ importText(usInp, 'import-cases.inp');
 	const p8 = links.find(l => l.id === 'P8');
 	ok('a closed pipe stays closed', p8._status === 'closed', p8._status);
 
+	// **AN EPANET RESERVOIR STATES A HEAD AND SAYS NOTHING ABOUT THE GROUND** (Task 390). The
+	// number lands in the head, exactly, and NO elevation is invented from it -- the old import
+	// wrote it into both, which put a number the file never stated into a field labelled as the
+	// user's. A reservoir with no elevation has no knowable pressure, which is the honest reading.
 	const r2 = nodes.find(n => n.id === 'R2');
-	ok('a reservoir takes EPANET total head as its elevation, exactly', r2.elev === 260, r2.elev);
-	ok('...and is given NO head, so it goes on following that elevation',
-		r2._head === undefined, JSON.stringify(r2._head));
+	ok('a reservoir takes EPANET total head as its HEAD, exactly', r2._head === 260, r2._head);
+	ok('...and is given NO ground elevation, because the file states none',
+		r2.elev === undefined, JSON.stringify(r2.elev));
 
 	// The TCV. It used to arrive as a zero-length PIPE carrying the same loss -- exact hydraulics
 	// under the wrong element name -- and since Task 248 phase 2 it arrives as a valve. Its whole

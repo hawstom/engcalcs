@@ -759,14 +759,14 @@
 			"type": "reservoir",
 			"x": 24.15,
 			"y": 31.06,
-			"elev": 220
+			"_head": 220
 		},
 		{
 			"id": "Lake",
 			"type": "reservoir",
 			"x": 8,
 			"y": 27.53,
-			"elev": 167
+			"_head": 167
 		},
 		{
 			"id": "1",
