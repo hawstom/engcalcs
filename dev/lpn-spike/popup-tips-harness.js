@@ -73,7 +73,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_backdrop_file', 'lpn_backdrop_menu', 'lpn_backdrop_target_continue',
   'lpn_backdrop_target_mode', 'lpn_backdrop_target_panel', 'lpn_canvas', 'lpn_coords',
   'lpn_empty_hint', 'lpn_labels_legend', 'lpn_labels_link_fields', 'lpn_labels_node_fields',
-  'lpn_labels_options', 'lpn_labels_popup', 'lpn_labels_popup_close', 'lpn_mode_hint',
+  'lpn_labels_options', 'lpn_labels_popup', 'lpn_labels_popup_close', 'lpn_mode_hint', 'lpn_map_notice',
   'lpn_popup', 'lpn_popup_close', 'lpn_popup_fields', 'lpn_popup_title', 'lpn_projects_btn',
   'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close', 'lpn_settings_fields',
   'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar'
@@ -401,34 +401,45 @@ ok('wipeAllStorage removes every project key', localStorage.getItem('lpn_project
 ok('wipeAllStorage leaves unrelated keys alone', localStorage.getItem('unrelated_key') === 'keep me');
 ok('wipeAllStorage expires the suite unit cookie', expired === 1, 'expireCookie calls=' + expired);
 
-// --- 12. status bar: notice vs diagnostic ------------------------------
-// The bar has two writers. runSolve() rewrites it on a 300ms debounce after EVERY mutation,
-// including the empty string on a clean solve -- so a naive setStatus() notice is wiped just after
-// it appears. These checks pin the split down.
+// --- 12. two message kinds, two homes -----------------------------------
+// A DIAGNOSTIC is a standing statement about the network and lives in the page (#lpn_status).
+// A NOTICE reports a completed action, lives on the canvas (#lpn_map_notice) covering the mode
+// hint, and expires. They used to share one bar, which forced an arbitration rule between two
+// writers with different lifetimes -- runSolve() rewrites the diagnostic on a 300ms debounce after
+// EVERY mutation, including the empty string on a clean solve, so a notice in the same element was
+// wiped just after it appeared. What these checks now pin down is that NEITHER CAN TOUCH THE OTHER.
+//
+// The move out of the page flow is the reason the split exists at all (Tom, 2026-08-17): saving a
+// project grew a line above the canvas and pushed the map off the bottom of the screen.
 const bar = byId.lpn_status;
+const notice = byId.lpn_map_notice;
 L.setStatus('');
-ok('empty status with no notice blanks the bar', bar.textContent === '');
+ok('an empty diagnostic blanks the bar', bar.textContent === '');
 
 L.setNotice('Deleted A. Now showing B.');
-ok('setNotice shows immediately', bar.textContent === 'Deleted A. Now showing B.');
+ok('setNotice shows immediately', notice.textContent === 'Deleted A. Now showing B.');
+ok('...on the canvas, NOT in the page bar', bar.textContent === '', JSON.stringify(bar.textContent));
+ok('...and the canvas notice is visible', notice.style.display === 'block', notice.style.display);
+
 L.setStatus('');                       // <- this is what runSolve() does on a clean solve
-ok('a CLEAN SOLVE does not wipe the notice', bar.textContent === 'Deleted A. Now showing B.',
-   JSON.stringify(bar.textContent));
-L.setStatus('');
-ok('...and still does not on a second clean solve', bar.textContent === 'Deleted A. Now showing B.');
+ok('a CLEAN SOLVE does not wipe the notice', notice.textContent === 'Deleted A. Now showing B.',
+   JSON.stringify(notice.textContent));
 
 L.setStatus('Add a reservoir.');       // <- a real diagnostic
-ok('a real diagnostic outranks the notice while it is live', bar.textContent === 'Add a reservoir.');
-L.setStatus('');
+ok('a diagnostic goes to the page bar', bar.textContent === 'Add a reservoir.');
 // Fixed 2026-08-09 (ROADMAP Task 225 punch list §4, Tom 2026-08-06): a diagnostic used to DISCARD
 // the notice outright -- "nodes have no path to a reservoir" ate "Closed X. Now showing Y." for
-// good, the instant the freshly-opened project's own solve produced a diagnostic. The notice must
-// only be OUTRANKED while the diagnostic is live, and resurface once it clears.
-ok('...and the notice resurfaces once the diagnostic clears', bar.textContent === 'Deleted A. Now showing B.',
-   JSON.stringify(bar.textContent));
+// good, the instant the freshly-opened project's own solve produced a diagnostic. Separate slots
+// dissolve that: both are simply on screen at once.
+ok('...and the notice is untouched beside it', notice.textContent === 'Deleted A. Now showing B.',
+   JSON.stringify(notice.textContent));
+L.setStatus('');
+ok('clearing the diagnostic leaves the notice alone', notice.textContent === 'Deleted A. Now showing B.');
+ok('...and does not resurrect it into the bar', bar.textContent === '');
 
 L.setNotice('');
-ok('setNotice("") clears the bar', bar.textContent === '');
+ok('setNotice("") clears the canvas notice', notice.textContent === '');
+ok('...and hides it', notice.style.display === 'none', notice.style.display);
 
 // --- 13. deleting the OPEN project narrates where you landed ------------
 // Tom, 2026-07-31: no warning beforehand; say afterwards where you landed.
@@ -447,11 +458,11 @@ seedLibrary([{ id: 'p1', name: 'Fire flow test', updated: 10 },
 L.discardProject('p1');
 ok('deleting the open project opens a survivor', L.getLibrary().openId === 'p2');
 ok('...and names BOTH projects in the status bar',
-   bar.textContent.indexOf('Fire flow test') >= 0 && bar.textContent.indexOf('Water main study') >= 0,
-   JSON.stringify(bar.textContent));
+   notice.textContent.indexOf('Fire flow test') >= 0 && notice.textContent.indexOf('Water main study') >= 0,
+   JSON.stringify(notice.textContent));
 ok('...with the placeholders substituted',
-   bar.textContent.indexOf('{deleted}') < 0 && bar.textContent.indexOf('{opened}') < 0,
-   JSON.stringify(bar.textContent));
+   notice.textContent.indexOf('{deleted}') < 0 && notice.textContent.indexOf('{opened}') < 0,
+   JSON.stringify(notice.textContent));
 
 // TAB-STRIP POSITION wins, not recency -- fixed 2026-08-09 (ROADMAP Task 225 punch list §4): every
 // tab strip in the world lands on the neighbor that slides into the closed tab's spot (next
@@ -463,8 +474,8 @@ seedLibrary([{ id: 'q1', name: 'Open one', updated: 5 },
 L.discardProject('q2');
 ok('the tab to the RIGHT is the one opened, not the most recently updated', L.getLibrary().openId === 'q3',
    L.getLibrary().openId);
-ok('...and it is the one named', bar.textContent.indexOf('Newer') >= 0,
-   JSON.stringify(bar.textContent));
+ok('...and it is the one named', notice.textContent.indexOf('Newer') >= 0,
+   JSON.stringify(notice.textContent));
 
 // closing the RIGHTMOST tab lands on its new rightmost neighbor (the one to its left)
 seedLibrary([{ id: 'v1', name: 'Left', updated: 1 },
@@ -478,8 +489,8 @@ seedLibrary([{ id: 'r1', name: 'Only project', updated: 1 }], 'r1');
 L.discardProject('r1');
 ok('deleting the last project leaves something open', !!L.getLibrary().openId);
 ok('...and says a new empty project was started',
-   bar.textContent.indexOf('Only project') >= 0 && bar.textContent.indexOf('{') < 0,
-   JSON.stringify(bar.textContent));
+   notice.textContent.indexOf('Only project') >= 0 && notice.textContent.indexOf('{') < 0,
+   JSON.stringify(notice.textContent));
 
 // deleting a NON-open project must not narrate or navigate
 seedLibrary([{ id: 's1', name: 'Keep me open', updated: 9 },
@@ -487,7 +498,7 @@ seedLibrary([{ id: 's1', name: 'Keep me open', updated: 9 },
 L.setNotice('');
 L.discardProject('s2');
 ok('deleting a non-open project does not switch projects', L.getLibrary().openId === 's1');
-ok('...and posts no notice', bar.textContent === '', JSON.stringify(bar.textContent));
+ok('...and posts no notice', notice.textContent === '', JSON.stringify(notice.textContent));
 
 console.log(fails ? '\n' + fails + ' FAILURES' : '\nall green');
 process.exit(fails ? 1 : 0);

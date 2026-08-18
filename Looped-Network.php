@@ -202,6 +202,18 @@ echoHeader("EngCalcs", $html_title, "");
 		      // legend or the bottom-left coordinate tracker. Updated by setMode() in
 		      // looped-network.js. ?>
 		<div id="lpn_mode_hint" class="d-print-none" style="position:absolute;top:4px;left:4px;font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px;pointer-events:none"></div>
+		<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
+		      // saving a project put a line of text above the canvas and "moves the map down past the
+		      // bottom of the screen" -- then answered his own question, "maybe covering or replacing
+		      // the mode status temporarily"). Same move the mode hint itself made, for the same
+		      // reason: a readout that comes and goes must not be in the page's FLOW, because
+		      // everything below it moves when it arrives.
+		      // It COVERS the mode hint rather than writing into it, so nothing has to coordinate:
+		      // updateModeHint() keeps the hint underneath correct and the notice's expiry simply
+		      // uncovers it. Same top-left origin, higher z-index, opaque background. It is not
+		      // measured by overlayReserve(), which is the point -- a transient must not change the
+		      // fit, or every save would re-zoom the map. ?>
+		<div id="lpn_map_notice" class="d-print-none" role="status" style="display:none;position:absolute;top:4px;left:4px;z-index:5;max-width:60%;font-size:11px;background:#fffbe6;border:1px solid #a80;padding:2px 6px;pointer-events:none"></div>
 		<?php // Deliberately NOT d-print-none (Tom, 2026-07-30) -- the Labels popover itself is
 		      // toolbar chrome and is hidden on print like the rest of #lpn_toolbar, so the color key
 		      // for whichever fields are toggled on needs a separate, always-visible home to survive

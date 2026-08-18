@@ -26,7 +26,7 @@ const L = loadLoopedNetwork(
 	"\t\tscenarios: function () { return scenarios; }, ovKeyFor: ovKeyFor,\n" +
 	"\t\tapplyToAll: applyIdPrefixToAll, addNode: addNode, addLink: addLink,\n" +
 	"\t\tapplyNodeRename: applyNodeRename,\n" +
-	"\t\tnotice: function () { return statusNotice; },\n" +
+	"\t\tnotice: function () { return document.getElementById('lpn_map_notice').textContent; },\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +

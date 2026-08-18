@@ -6612,9 +6612,8 @@ var EngCalcs = EngCalcs || {};
 		clearUndo();
 		saveToStorage();
 		refreshAllFromDocument();
-		// After refreshAllFromDocument(), which itself calls setStatus('') -- see the notice/
-		// diagnostic split at setStatus(). Says where the user landed, the same way discardProject()
-		// does: a project appearing on screen that was not there a moment ago wants narration.
+		// Says where the user landed, the same way discardProject() does: a project appearing on
+		// screen that was not there a moment ago wants narration.
 		setNotice((pc.lpn_status_imported || 'Opened {name} from a file, and added it to this browser as a new project.')
 			.replace('{name}', projectDisplayName(project)));
 		return id;
@@ -8643,8 +8642,6 @@ var EngCalcs = EngCalcs || {};
 				if (d) { applySaved(d); }
 				clearUndo();
 				refreshAllFromDocument();
-				// After refreshAllFromDocument(), which itself calls setStatus('') -- see the
-				// notice/diagnostic split at setStatus().
 				setNotice((pc.lpn_status_closed_opened || 'Closed {closed}. Now showing {opened}.')
 					.replace('{closed}', goneName)
 					.replace('{opened}', projectDisplayName(landed)));
@@ -14071,39 +14068,45 @@ var EngCalcs = EngCalcs || {};
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between them:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
-	// The status bar has two writers with different lifetimes, and a naive setStatus() call loses to
-	// the other one every time. runSolve() owns the bar for DIAGNOSTICS and rewrites it on a 300ms
-	// debounce after every mutation -- including the empty string on a clean solve. So a one-shot
-	// notice ("here is what just happened") set by a command would be wiped ~300ms later, which is
-	// exactly long enough for the user not to see it.
+	// DIAGNOSTICS AND NOTICES ARE DIFFERENT KINDS OF MESSAGE AND NOW HAVE DIFFERENT HOMES.
+	// A DIAGNOSTIC is a standing statement about the network as it is ("Add a reservoir"): it is true
+	// until the model changes, so it belongs in the page, in #lpn_status, where it can be as long as
+	// it needs. A NOTICE reports a completed action ("Saved X."): it is true for a moment, so it
+	// belongs on the canvas, covering the mode hint, and expires -- see the markup comment on
+	// #lpn_map_notice for why a transient must not sit in the page's flow.
 	//
-	// Rule: a real (non-empty) status TEMPORARILY OUTRANKS a notice -- a live diagnostic like "Add a
-	// reservoir" is shown in preference to a report of a completed action, but the notice is not
-	// thrown away to make room for it. An EMPTY status falls back to the notice, so as soon as the
-	// diagnostic clears (or its own timer expires), the notice reappears rather than having been
-	// silently eaten (punch list §4, Tom 2026-08-06: closing a tab's "Closed X. Now showing Y." was
-	// overwritten and gone for good the instant the freshly-opened project's own solve produced a
-	// diagnostic). A timer expires the notice either way, so the bar does not keep narrating an
-	// action from a minute ago once it does resurface.
-	var statusNotice = '', statusNoticeTimer = null;
+	// They used to SHARE #lpn_status, which forced an outranking rule between two writers with
+	// different lifetimes (runSolve() rewrites the diagnostic on a 300ms debounce after every
+	// mutation, so a notice put in the same element was wiped just slowly enough for the user not to
+	// see it). Separate slots dissolve that: both can be on screen at once, neither can eat the
+	// other, and nothing has to arbitrate. The expiry timer stays, because the bar should not still
+	// be narrating an action from a minute ago.
+	var statusNoticeTimer = null;
 	var STATUS_NOTICE_MS = 8000;
-	function clearNotice() {
-		statusNotice = '';
-		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
+	function showNotice(text) {
+		var el = document.getElementById('lpn_map_notice');
+		if (!el) { return; }
+		el.textContent = text || '';
+		el.style.display = text ? 'block' : 'none';
 	}
+	function setNotice(text) {
+		if (statusNoticeTimer) { clearTimeout(statusNoticeTimer); statusNoticeTimer = null; }
+		showNotice(text);
+		if (text) {
+			statusNoticeTimer = setTimeout(function () {
+				statusNoticeTimer = null;
+				showNotice('');
+			}, STATUS_NOTICE_MS);
+		}
+	}
+	// **NO applyMapHeight() HERE**, tempting as it is: a diagnostic arriving does move where the
+	// canvas starts, but a diagnostic arrives BECAUSE OF THE MODEL, and the bottom of the map does
+	// not depend on the model (Tom, 2026-08-15). dev/lpn-spike/map-height-harness.js enforces that
+	// every applyMapHeight() caller is an environment event, and it caught this on the first run.
 	function setStatus(text) {
 		var el = document.getElementById('lpn_status');
 		if (!el) { return; }
-		if (text) { el.textContent = text; return; }
-		el.textContent = statusNotice || '';
-	}
-	function setNotice(text) {
-		clearNotice();
-		statusNotice = text || '';
-		if (statusNotice) {
-			statusNoticeTimer = setTimeout(function () { clearNotice(); setStatus(''); }, STATUS_NOTICE_MS);
-		}
-		setStatus('');
+		el.textContent = text || '';
 	}
 	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
 	// extrema and decoration must compare on this, not the raw SI value. Two series links carrying
