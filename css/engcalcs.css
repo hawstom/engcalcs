@@ -379,6 +379,19 @@ html[lang="zh"] .ec-welcome {
    overridden and mid-pipe-draw shows the pending ring -- that one is about what your next click
    does, and it is the more urgent of the two. */
 .lpn-node.lpn-override { stroke: #e8a33d; stroke-width: calc(0.5 * var(--lpn-sym, 1)); }
+/* SELECTED: the subject of the next command (ROADMAP Task 415, setSelection() in
+   js/looped-network.js). Blue, and it is not spending the map's colour budget on the model: red
+   says condition, amber says override, and both are statements about the DOCUMENT, while this one
+   is a statement about the VIEW and disappears the moment you click elsewhere. Blue is what every
+   editor uses for it, so it needs no legend.
+   A pipe wears the mark on its halo -- the same wider line underneath that the override uses -- so
+   it composes with the closed-link dashes and the pump's own colour rather than replacing them.
+   Both rules sit AFTER their .lpn-override twin (selection is the thing you are acting on now) and
+   BEFORE .lpn-node-pending (mid-pipe-draw is about what your next click does, which is more
+   urgent still). */
+.lpn-link-halo.lpn-selected { stroke: #1976d2; stroke-width: calc(2.857 * var(--lpn-lw, 0.7)); }
+.lpn-node.lpn-selected { stroke: #1976d2; stroke-width: calc(0.5 * var(--lpn-sym, 1)); }
+.lpn-lbl.lpn-selected { fill: #1976d2; }
 /* NOT IN THIS NETWORK: drawn, but out of the model (see isActive() in js/looped-network.js). Faded
    rather than hidden, because the whole point of the inactive/active pair is to see both at once --
    "with the new loop vs. without" wants the proposal visible beside the network it would join. */

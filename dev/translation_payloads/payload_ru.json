@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 997,
-        "delta_key_count": 1,
+        "expected_key_count": 998,
+        "delta_key_count": 2,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -358,10 +358,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_examples_close": "Close"
+        "lpn_examples_close": "Close",
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
     },
     "keys": {
-        "lpn_examples_close": "Close"
+        "lpn_examples_close": "Close",
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
     },
     "key_context": {
         "lpn_examples_close": {
@@ -377,6 +379,22 @@
                     "key": "lpn_examples_size",
                     "value": "{nodes} узлов, {links} труб",
                     "english": "{nodes} nodes, {links} links"
+                }
+            }
+        },
+        "lpn_select_first": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_delete",
+                    "value": "Режим: Удаление. Щёлкните элемент, чтобы удалить его.",
+                    "english": "Mode: Delete. Click an element to remove it."
+                },
+                "next_translated": {
+                    "key": "lpn_mode_add_junction",
+                    "value": "Режим: Добавление узла. Щёлкните карту, чтобы разместить узел. Переключитесь в режим «Выбор», чтобы изменять или перемещать элементы и подписи.",
+                    "english": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels."
                 }
             }
         }

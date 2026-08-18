@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 997,
-        "delta_key_count": 1,
+        "expected_key_count": 998,
+        "delta_key_count": 2,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -363,10 +363,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_examples_close": "Close"
+        "lpn_examples_close": "Close",
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
     },
     "keys": {
-        "lpn_examples_close": "Close"
+        "lpn_examples_close": "Close",
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
     },
     "key_context": {
         "lpn_examples_close": {
@@ -382,6 +384,22 @@
                     "key": "lpn_examples_size",
                     "value": "ဆက်စပ်နေရာ {nodes} ခု၊ ပိုက်လိုင်း {links} ခု",
                     "english": "{nodes} nodes, {links} links"
+                }
+            }
+        },
+        "lpn_select_first": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_delete",
+                    "value": "မုဒ် - ဖျက်ရန်။ အစိတ်အပိုင်းတစ်ခုကို ဖယ်ရှားရန် နှိပ်ပါ။",
+                    "english": "Mode: Delete. Click an element to remove it."
+                },
+                "next_translated": {
+                    "key": "lpn_mode_add_junction",
+                    "value": "မုဒ် - ဆက်စပ်နေရာ ထည့်ရန်။ ဆက်စပ်နေရာတစ်ခု ထားရန် မြေပုံကို နှိပ်ပါ။ အစိတ်အပိုင်းများနှင့် အညွှန်းများကို ပြောင်းလဲရန် (သို့) ရွှေ့ရန် ရွေးချယ်ရန် မုဒ်သို့ ပြောင်းပါ။",
+                    "english": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels."
                 }
             }
         }

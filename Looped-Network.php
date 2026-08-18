@@ -507,6 +507,7 @@ EngCalcs.pageConfig = {
 	lpn_pump_point3: <?=json_encode($ec_lang['lpn_pump_point3'])?>,
 	lpn_mode_select: <?=json_encode($ec_lang['lpn_mode_select'])?>,
 	lpn_mode_delete: <?=json_encode($ec_lang['lpn_mode_delete'])?>,
+	lpn_select_first: <?=json_encode($ec_lang['lpn_select_first'])?>,
 	lpn_mode_add_junction: <?=json_encode($ec_lang['lpn_mode_add_junction'])?>,
 	lpn_mode_add_reservoir: <?=json_encode($ec_lang['lpn_mode_add_reservoir'])?>,
 	lpn_mode_add_tank: <?=json_encode($ec_lang['lpn_mode_add_tank'])?>,

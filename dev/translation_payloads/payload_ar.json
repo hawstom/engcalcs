@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ar",
-        "expected_key_count": 997,
-        "delta_key_count": 1,
+        "expected_key_count": 998,
+        "delta_key_count": 2,
         "exempt_key_count": 16,
         "exempt_keys": [
             "calc_units_us",
@@ -356,10 +356,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_examples_close": "Close"
+        "lpn_examples_close": "Close",
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
     },
     "keys": {
-        "lpn_examples_close": "Close"
+        "lpn_examples_close": "Close",
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
     },
     "key_context": {
         "lpn_examples_close": {
@@ -375,6 +377,22 @@
                     "key": "lpn_examples_size",
                     "value": "{nodes} ملتقى، {links} أنبوب",
                     "english": "{nodes} nodes, {links} links"
+                }
+            }
+        },
+        "lpn_select_first": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_delete",
+                    "value": "الوضع: حذف. انقر عنصراً لإزالته.",
+                    "english": "Mode: Delete. Click an element to remove it."
+                },
+                "next_translated": {
+                    "key": "lpn_mode_add_junction",
+                    "value": "الوضع: إضافة ملتقى. انقر على الخريطة لوضع ملتقى. انتقل إلى وضع التحديد لتغيير العناصر والتسميات أو تحريكها.",
+                    "english": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels."
                 }
             }
         }

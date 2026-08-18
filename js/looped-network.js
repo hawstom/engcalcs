@@ -3900,6 +3900,9 @@ var EngCalcs = EngCalcs || {};
 			updateLabelGeometry(doc.labels[i].id);
 		}
 		refreshLabelText();
+		// The selection mark rides on elements this function has just replaced (Task 415) -- and an
+		// id that survives a rebuild is the same element, while one that does not is gone.
+		refreshSelection();
 		// Every element here is brand new and therefore carries no visibility class, so the current
 		// threshold has to be re-applied to it (Task 340's per-Text-label half in particular -- the
 		// one class on the <svg> would survive a rebuild, a class on a discarded <text> does not).
@@ -5023,6 +5026,109 @@ var EngCalcs = EngCalcs || {};
 		if (rubberBandEl) { rubberBandEl.style.display = id ? '' : 'none'; }
 	}
 
+	// ---- SELECTION: subject, then verb (ROADMAP Task 415) ----
+	//
+	// Every CAD and GIS editor is select-first, act-second, and this page was the other way round:
+	// you picked the Delete tool and then clicked a thing. Verb-then-subject cannot grow a
+	// multi-select -- there is nowhere to put the second subject -- which is why Task 266 (lasso)
+	// was blocked on this and why the foundation ships alone, with SINGLE selection only.
+	//
+	// **SELECTION IS VIEW STATE AND LIVES NOWHERE NEAR THE DOCUMENT.** It is one variable here plus
+	// a CSS class on the drawn element -- deliberately NOT a key on the node/link/label object.
+	// serializeProject() hands out doc.nodes/doc.links/doc.labels BY REFERENCE, so a `selected` key
+	// written onto an element would be saved into the file, into every undo snapshot and into the
+	// dirty-signature hash: opening a project would restore somebody else's highlight, and merely
+	// clicking a pipe would mark the project modified.
+	//
+	// **AND IT MUST NEVER GO THROUGH setProp().** That is the write seam for OVERRIDABLE properties
+	// (dev/scenario-seam-repair.md): inside a scenario setProp() writes an override, and in Base it
+	// writes the element. Selection is neither membership nor identity (Task 407's line), so a
+	// `selected` override would mean "this element is highlighted in the Fire-flow scenario", stored
+	// in the document, and a click in Base would edit BASE under every scenario at once. There is no
+	// selection branch in setProp() and there must not be one; nothing below writes an element.
+	var selection = null;   // {kind:'node'|'link'|'label', id} -- one, or none. See Task 266 for many.
+	function selectionExists(sel) {
+		if (!sel) { return false; }
+		if (sel.kind === 'node') { return !!nodeById(sel.id); }
+		if (sel.kind === 'link') { return !!linkById(sel.id); }
+		return !!labelById(sel.id);
+	}
+	// The ONE element each kind wears the mark on. A link wears it on its HALO -- the wider line
+	// already drawn underneath every pipe for the scenario mark -- so the highlight composes with
+	// the pipe's own dashes, colour and symbols instead of competing with them, exactly as the
+	// override mark does.
+	function selectionMarkEl(sel) {
+		if (!sel) { return null; }
+		if (sel.kind === 'node') { return nodeEls[sel.id] && nodeEls[sel.id].circle; }
+		if (sel.kind === 'link') { return linkEls[sel.id] && (linkEls[sel.id].halo || linkEls[sel.id].line); }
+		return labelEls[sel.id] && labelEls[sel.id].text;
+	}
+	function paintSelection(sel, on) {
+		var el2 = selectionMarkEl(sel);
+		if (el2 && el2.classList) { el2.classList[on ? 'add' : 'remove']('lpn-selected'); }
+	}
+	function isSelected(kind, id) { return !!selection && selection.kind === kind && selection.id === id; }
+	function selectedRef() { return selection ? { kind: selection.kind, id: selection.id } : null; }
+	// SINGLE selection: setting one clears the previous. Task 266 adds a second call shape here
+	// (add-to-selection) and turns the variable into a list; nothing outside this block reads it,
+	// which is what makes that a local change.
+	function setSelection(kind, id) {
+		paintSelection(selection, false);
+		selection = (kind && id) ? { kind: kind, id: id } : null;
+		if (!selectionExists(selection)) { selection = null; }
+		paintSelection(selection, true);
+	}
+	function clearSelection() { setSelection(null, null); }
+	// buildDom() throws every element away and builds new ones, which carry no classes -- so the
+	// mark has to be re-applied, and a selection naming something the rebuild no longer contains
+	// (an undo of an Add, a project opened in this tab) has to go.
+	function refreshSelection() {
+		if (!selectionExists(selection)) { selection = null; }
+		paintSelection(selection, true);
+	}
+	// THE ONE PLACE A HIT ELEMENT BECOMES A SUBJECT. Every drawn thing on this map belongs to an
+	// element, and the parts are selected as the whole: a node's own data label IS that node, a
+	// pipe's label and its vertex handles ARE that pipe. Anything else -- bare canvas, the backdrop
+	// -- is "nothing", and selects nothing, which is how a click on empty space clears.
+	function selectFromHit(t) {
+		var d = (t && t.dataset) || {};
+		if (d.node) { setSelection('node', d.node); }
+		else if (d.nodelbl !== undefined) { setSelection('node', d.nodelbl); }
+		else if (d.linklbl !== undefined) { setSelection('link', d.linklbl); }
+		else if (d.link !== undefined) { setSelection('link', d.link); }
+		else if (d.lbl !== undefined) { setSelection('label', d.lbl); }
+		else { clearSelection(); }
+	}
+	// The VERB. Reads the subject once, drops it, then deletes -- deleteElement() may cascade,
+	// confirm, or (inside a scenario) deactivate rather than destroy, and none of those should find
+	// a selection still pointing at what they are working on.
+	function deleteSelection() {
+		var sel = selectedRef();
+		if (!sel) { return false; }
+		clearSelection();
+		deleteElement(sel.kind, sel.id);
+		return true;
+	}
+	// A typed Delete/Backspace belongs to whatever field has focus, always. Without this, editing an
+	// element's ID in the property popup and hitting Backspace would delete the element.
+	function keyboardIsTyping() {
+		var ae = document.activeElement, tag = ae && ae.tagName;
+		if (!tag) { return false; }
+		return tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || ae.isContentEditable === true;
+	}
+	document.addEventListener('keydown', function (e) {
+		if (e.key !== 'Delete' && e.key !== 'Backspace') { return; }
+		if (keyboardIsTyping()) { return; }
+		if (!selection) {
+			// Only for Delete. Backspace with nothing selected is a browser gesture people press by
+			// habit and answering it with a notice would be noise on a page they are only reading.
+			if (e.key === 'Delete') { setNotice((EngCalcs.pageConfig || {}).lpn_select_first || 'Nothing is selected. Tap an element on the map, then press Delete.'); }
+			return;
+		}
+		if (e.preventDefault) { e.preventDefault(); }
+		deleteSelection();
+	});
+
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
 	// each is a whole sentence rather than "Mode:" + the tool's own label composed at render time.
 	var MODE_HINT_KEYS = {
@@ -5227,6 +5333,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function deleteNode(id) {
 		var links = incidentLinks[id].slice(), i;
+		if (isSelected('node', id)) { clearSelection(); }   // see deleteLink()
 		for (i = 0; i < links.length; i++) { deleteLink(links[i]); }
 		labelsByAnchor[id].slice().forEach(function (lid) { deleteLabelById(lid); });
 		nodeEls[id].circle.remove(); nodeEls[id].text.remove();
@@ -5436,6 +5543,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function deleteLink(id) {
 		var l = linkById(id);
+		if (isSelected('link', id)) { clearSelection(); }   // Task 415: the subject may be deleted by a cascade, not only by its own verb
 		linkEls[id].line.remove();
 		if (linkEls[id].halo) { linkEls[id].halo.remove(); }
 		linkEls[id].handles.forEach(function (h) { h.remove(); });
@@ -5461,6 +5569,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function deleteLabelById(id) {
 		var lb = labelById(id), le = labelEls[id];
+		if (isSelected('label', id)) { clearSelection(); }   // see deleteLink()
 		if (le.leader) { le.leader.remove(); }
 		le.text.remove();
 		delete labelEls[id];
@@ -6026,6 +6135,10 @@ var EngCalcs = EngCalcs || {};
 		// doc.nodes/links/labels below are assigned BY REFERENCE from it, so a copy here would only
 		// double the memory and create a second thing to keep in step.
 		if (saved.v >= LPN_CARTESIAN_VERSION) { flipStoredY(saved); }
+		// A different document is a different set of elements, and ids repeat across projects (every
+		// project has a J1). Dropping the selection here rather than letting refreshSelection() prune
+		// it is what stops the highlight from landing on the new project's J1 (Task 415).
+		clearSelection();
 		// Project/scenario container. Rebuilt from defaults and merged, for the same reason the
 		// labelSettings and settings blocks below spell out: a key added after this save was written
 		// must come back at its default, not as undefined.
@@ -9209,11 +9322,15 @@ var EngCalcs = EngCalcs || {};
 		openMenu(anchor, [
 			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', fn: undo },
 			{ separator: true },
-			// Select all -> Delete is the paradigmatic route and this page cannot offer it yet: the
-			// selection model is single-element. Until multi-select exists, this named command IS
-			// that route, and it is the honest way to say so -- a greyed-out "Select all" would be a
-			// promise with nothing behind it.
-			{ icon: 'del', label: pc.lpn_tool_delete || 'Delete', fn: function () { setMode(mode === 'delete' ? 'select' : 'delete'); } },
+			// SUBJECT, THEN VERB (Task 415): with something selected this row deletes it, which is
+			// what Delete means in every editor. With nothing selected it still toggles the Delete
+			// TOOL -- the verb-then-subject path, kept because it is the only way to delete on a
+			// touch screen with no keyboard, and because a repeated delete spree is genuinely
+			// quicker with it. Task 266 turns the selected case into "and everything else selected".
+			{ icon: 'del', label: pc.lpn_tool_delete || 'Delete', fn: function () {
+				if (deleteSelection()) { return; }
+				setMode(mode === 'delete' ? 'select' : 'delete');
+			} },
 			{ icon: 'delnetwork', label: pc.lpn_edit_delete_network || 'Delete network', fn: deleteNetwork }
 		]);
 	}
@@ -10399,6 +10516,15 @@ var EngCalcs = EngCalcs || {};
 			if (mode.indexOf('add-') === 0) { return; } // handled on click below, not drag
 			if (mode === 'delete') { return; }
 			// 'select' mode
+			// **TOUCHING SOMETHING SELECTS IT, DOWN-STROKE, BEFORE ANY DRAG DECISION** (Task 415),
+			// and touching nothing clears -- selectFromHit() reads "nothing" out of a hit that names
+			// no element, which is how a click on empty space clears the selection.
+			//
+			// DOWN, not on the tap, and that is the whole reason this is one line and not five in
+			// the tap handler: a drag never becomes a tap (it fails the 4px threshold), so a user
+			// who nudged J2 and then pressed Delete would otherwise have deleted whatever was
+			// selected before -- an element they were not looking at.
+			selectFromHit(t);
 			if (t.dataset.node) {
 				var n = nodeById(t.dataset.node), w0 = screenToWorld(e.clientX, e.clientY);
 				drag = { type: 'node', id: t.dataset.node, offX: n.x - w0.x, offY: n.y - w0.y };
@@ -10508,6 +10634,10 @@ var EngCalcs = EngCalcs || {};
 			// user-requested action only.
 			// Undo covers Add too, not just Delete (Tom) -- snapshot before every mutation so
 			// "Undo" stays honest about what it does rather than needing a narrower name.
+			// Selection is NOT set here (Task 415) -- the pointerDOWN handler above already did it,
+			// for every select-mode press, tap and drag alike. A second call here would be dead
+			// code that looks load-bearing: removing it changes no behaviour, which is exactly the
+			// kind of line a later reader keeps out of caution.
 			if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
 				// Snap-on-create: a click within NODE_SNAP_PX of an existing node reuses it instead
 				// of creating a new, overlapping one -- see nearestNodeNearScreen()'s comment.
