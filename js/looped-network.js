@@ -1,80 +1,54 @@
-// looped-network.js — Task 146 Phase 1 (Looped Pipe Network, Map Interface, prefix lpn_)
+// looped-network.js — Looped Pipe Network, Map Interface (prefix lpn_, ROADMAP Task 146)
 //
-// The SVG canvas mechanics below are a direct port of the technology validated in
-// dev/lpn-spike/canvas-spike.html (13 rounds of on-device iteration + an Opus review —
-// see dev/lpn-spike/phase0-acceptance.md for the full record of what was tried and why).
-// This first pass ports the canvas engine and just enough toolbar to create the five
-// element types from an empty canvas. Hydraulic property fields, unit-aware popups, the
-// solver wire-up, diagnostics, autosave and undo are a following pass (ROADMAP Task 146
-// Phase 1 continues).
-//
-// Pump is a LINK type here, not a node type, even though the ROADMAP phrasing lists it
-// alongside Junction/Reservoir as if it were a fifth point element: js/lpn-solver.js's
-// own model treats a pump exactly like EPANET does, as a link carrying a curve
-// (link.type === 'pump'), not a node. The toolbar mirrors that: Add Pipe and Add Pump both
-// work by clicking a from-node then a to-node; Junction/Reservoir/Text place with one click.
+// Pump is a LINK type here, not a node type: js/lpn-solver.js models a pump exactly like EPANET
+// does, as a link carrying a curve (link.type === 'pump'). The toolbar mirrors that — Add Pipe and
+// Add Pump both click a from-node then a to-node; Junction/Reservoir/Text place with one click.
 
 var EngCalcs = EngCalcs || {};
 
 (function () {
 	'use strict';
 
-	// The pure halves of this file, lifted out so they can be run without a browser
-	// (ROADMAP Task 293). Geom is polyline/leader/label-box arithmetic; Collide is the
-	// label relaxation. Both are values-in/values-out and know nothing about `doc`, the
-	// SVG handles, or the settings below -- resolving those stays this file's job.
-	// Their <script> tags precede this one in Looped-Network.php; the harnesses in
-	// dev/lpn-spike/ require them directly.
+	// The pure halves of this file, runnable without a browser: Geom is polyline/leader/label-box
+	// arithmetic, Collide is the label relaxation. Both are values-in/values-out and know nothing
+	// about `doc`, the SVG handles or the settings below. Their <script> tags precede this one in
+	// Looped-Network.php; the harnesses in dev/lpn-spike/ require them directly.
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
 	var NS = 'http://www.w3.org/2000/svg';
 	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, labelsLayer, debugBoxLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
 	// `settings.textSize` is SCREEN PIXELS, full stop -- shared by a node's ID/pressure label, a
-	// link's label, and a user-added Text label. It is returned in WORLD units (divided by the
-	// current scale) because everything in this file is drawn in world coordinates; the division is
-	// what holds the on-screen size constant as you zoom, so it must be re-applied whenever state.s
-	// changes (refreshFontSizes(), from onZoomChanged()) rather than once at build time like every
-	// other geometry here.
+	// link's label, and a user-added Text label. Returned in WORLD units (divided by the current
+	// scale) because everything here is drawn in world coordinates, so the division must be
+	// re-applied whenever state.s changes (refreshFontSizes(), from onZoomChanged()) rather than
+	// once at build time like every other geometry.
 	//
 	// **DO NOT REINTRODUCE MAP-UNIT TEXT SIZING.** Text and symbols are furniture of the VIEW, not
-	// features of the model -- the GIS paradigm, and what every GIS does. A label is 11 px because
-	// 11 px is legible; the map underneath is 400 ft or 4 miles wide and the lettering does not
-	// care. A world-unit size is a size whose legibility depends on how far you happen to be zoomed
-	// out, and no floor, warning or better default fixes that: Net3's map-unit text at 0.2 units is
-	// a fraction of a pixel, so a correct network imports and shows nothing. What replaces it is
-	// not a size setting at all but `settings.labelMaxWidth`, which decides whether a label is
-	// drawn at this zoom rather than drawing it too small to read.
+	// features of the model. A world-unit size is a size whose legibility depends on how far you are
+	// zoomed out, and no floor, warning or better default fixes that: Net3's map-unit text at 0.2
+	// units is a fraction of a pixel, so a correct network imports and shows nothing.
+	// `settings.labelMaxWidth` replaces it, deciding whether a label is drawn at this zoom.
 	//
-	// Screen-pixel floors went with it: a pixel is a pixel at every zoom, so there is nothing left
-	// to floor.
-	//
-	// mult: a Text label's own per-label size multiplier (lb.sizeMult, default 1), stacked on top
-	// of the shared settings.textSize -- node/link labels never pass one.
+	// mult: a Text label's own per-label size multiplier (lb.sizeMult, default 1), stacked on the
+	// shared settings.textSize -- node/link labels never pass one.
+
 	function effectiveFontSize(mult) {
 		return (settings.textSize / (state.s || 1)) * (mult || 1);
 	}
 	function effectiveLineHeight() { return effectiveFontSize() * 1.2; }
-	// Everything on the map that is drawn at a fixed world size relative to the LETTERING was drawn
-	// against THIS size, so it is expressed as "base dimension x textFactor()". Used by the extrema
-	// badges, the leader threshold and the default label offset. It no longer feeds symbolFactor():
-	// symbols have had their own pixel size since Task 331, which is the decoupling Tom asked for.
-	// This number's only job is to say what size those fixed world dimensions were drawn for, so
-	// that they scale together with the text.
+	// Everything on the map drawn at a fixed world size relative to the LETTERING was drawn against
+	// THIS size, so it is expressed as "base dimension x textFactor()" -- the extrema badges, the
+	// leader threshold, the default label offset. It does NOT feed symbolFactor(): symbols have
+	// their own pixel size (Task 331).
 	var LPN_BASE_TEXT_SIZE = 2.5;
 
 	// ---- Map-interface instrumentation (ROADMAP Task 200) ----
-	// Two questions, and between them they name exactly where this page loses people: which of the
-	// four ways INTO a network a visitor reaches for first, and which of the solver's pre-solve
-	// complaints they hit most. The first-action histogram is also the first evidence that bears on
-	// the empty-canvas decision (closed 2026-07-29, commit 7428ff0: a new project opens on
-	// placeholder text rather than a worked example) -- which was made with no data at all, and
-	// which this will either vindicate or overturn.
-	//
-	// FIRST means first: only one row per page load, so the counts are a histogram of opening moves
-	// rather than of total activity. "Nothing" is not logged and does not need to be -- it is the
-	// Looped-Network human-view rows that carry no first: row at all, which log/lang-log-stats.sh
-	// reports as the residual.
+	// Which of the four ways INTO a network a visitor reaches for first, and which pre-solve
+	// complaint they hit most. FIRST means first: only one row per page load, so the counts are a
+	// histogram of opening moves rather than of total activity. "Nothing" is not logged -- it is the
+	// Looped-Network human-view rows carrying no first: row, which log/lang-log-stats.sh reports as
+	// the residual.
 	var lpnFirstActionLogged = false;
 	function logLpnFirstAction(what) {
 		if (lpnFirstActionLogged) { return; }
@@ -88,52 +62,39 @@ var EngCalcs = EngCalcs || {};
 		if (EngCalcs.logSignal) { EngCalcs.logSignal('lpn', 'diag:' + code); }
 	}
 	// Leader slope for the example network's anchored callouts, degrees above horizontal.
-	// 70, not the 60 Tom named on 2026-08-09, because he named it while approving the J3 callout he
-	// was looking at -- and that one measures ~70 (a 60-unit rise over a 22.2-unit gap). He asked
-	// for "60 degrees LIKE you make the 'lowest pressure' text"; the two halves of that sentence
-	// disagree, so this keeps the appearance he approved rather than the number he estimated from
-	// it. One constant to change if a true 60 turns out to read better.
+	// 70, not 60: the J3 callout Tom approved measures ~70 (a 60-unit rise over a 22.2-unit gap),
+	// so this keeps the appearance he approved rather than the number he estimated from it.
 	var LPN_CALLOUT_ANGLE = 70;
 	function textFactor(mult) { return effectiveFontSize(mult) / LPN_BASE_TEXT_SIZE; }
 
 	// ---- Task 146.01: draggable node/link data labels (leader lines + collision avoidance) ----
-	// A node/link's data label sits at a small fixed offset from its anchor (id/elev/demand/... text
-	// beside the symbol) unless the user drags it -- n.lx/n.ly (or l.lx/l.ly) then record that as an
-	// explicit offset, persisted with the element like any other property. undefined means "still at
-	// the default" so an old saved network (no lx/ly at all) renders identically to before this task.
+	// A node/link's data label sits at a small fixed offset from its anchor unless the user drags it
+	// -- n.lx/n.ly (or l.lx/l.ly) then record that as an explicit offset, persisted with the element.
+	// undefined means "still at the default".
 	//
 	// **WHAT lx/ly LOCATE IS THE LEADER'S ENDPOINT -- point B -- NOT THE TEXT.** The leader angle is
-	// sacred, and storing the text corner instead cannot hold it: B would be recomputed every
-	// render as one edge of the text box, a box whose width is a SCREEN-PIXEL quantity and
-	// therefore ~1/zoom in world units, so B slides by a whole box width as you zoom whenever the
-	// text hangs on the far side, and the angle A->B slides with it.
+	// sacred, and storing the text corner cannot hold it: B would be recomputed every render as one
+	// edge of a box whose width is a SCREEN-PIXEL quantity, ~1/zoom in world units, so B slides by a
+	// whole box width as you zoom whenever the text hangs on the far side.
 	//
-	// B is stored and the TEXT hangs off it (dataLabelOrigin()). The two are different kinds of
-	// fact and that is the whole design: the endpoint is a fact about the DRAWING -- the user's,
-	// world units, sacred -- while which side the text sits on is a fact about LEGIBILITY, ours,
-	// and free to flip. One number cannot be both.
+	// B is stored and the TEXT hangs off it (dataLabelOrigin()). The endpoint is a fact about the
+	// DRAWING -- the user's, world units, sacred -- while which side the text sits on is a fact
+	// about LEGIBILITY, ours, and free to flip. One number cannot be both.
 	//
-	// A save written before this reads its lx/ly as B: exact for a label that hung to the RIGHT of
-	// its anchor (there B already was the box origin), shifted by one box width for a left-hanging
-	// one. Not migrated, because the old width is unrecoverable -- it depended on the zoom the
-	// label was last rendered at, which is precisely the defect.
-	// Scaled with the symbols, not fixed (Tom, 2026-07-30): the offset exists to clear the node or
-	// pipe the label belongs to, so at 2x symbols a fixed +2,-2 would start the label inside its own
-	// node. A label the user has DRAGGED keeps the exact offset they dropped it at (n.lx/n.ly are
-	// absolute world units) -- only the resting position follows the size.
+	// The default offset SCALES with the symbols: it exists to clear the node or pipe the label
+	// belongs to, so at 2x symbols a fixed +2,-2 would start the label inside its own node. A DRAGGED
+	// label keeps the exact offset it was dropped at (n.lx/n.ly are absolute world units).
+
 	var DEFAULT_LABEL_OFFSET = { x: 2, y: -2 };
 	function defaultLabelOffset() {
 		var k = symbolFactor();
 		return { x: DEFAULT_LABEL_OFFSET.x * k, y: DEFAULT_LABEL_OFFSET.y * k };
 	}
-	// Past this distance between the anchor point and the label's rendered position (drag OR
-	// automatic collision-avoidance nudge -- whichever pushed it there), a leader line is drawn so
-	// the label still reads as belonging to its anchor. Comfortably above the default offset's own
-	// resting distance (hypot(2,2) ~= 2.8) so an untouched label never shows one -- which is only
-	// true if it scales with that offset, hence textFactor() (Tom, 2026-07-30: "leader toggle
-	// decision distance isn't scaling, I think"). Text rather than symbol factor: what the threshold
-	// is really protecting is the reader's ability to tie a number back to its element by proximity,
-	// and that judgment is made at the scale of the text.
+	// Past this distance between the anchor and the label's rendered position (drag or nudge), a
+	// leader line is drawn. Comfortably above the default offset's resting distance (hypot(2,2)
+	// ~= 2.8) so an untouched label never shows one -- true only if it scales with that offset,
+	// hence textFactor(). Text rather than symbol factor: the threshold protects the reader's
+	// ability to tie a number back to its element, a judgment made at the scale of the text.
 	var LABEL_LEADER_THRESHOLD = 4;
 	function leaderThreshold() { return LABEL_LEADER_THRESHOLD * Math.max(textFactor(), symbolFactor()); }
 	function nodeLabelBase(n) {
@@ -153,20 +114,14 @@ var EngCalcs = EngCalcs || {};
 	function pointAlongLink(l, f) {
 		return Geom.pointAlongPolyline(linkPointList(l), f);
 	}
-	// A link's label anchors at the halfway point OF THE WHOLE PIPE, measured along its length
-	// (Tom, 2026-07-30: "link label is placing within last segment instead of overall length. Not
-	// good."). The old version took the midpoint of the middle SEGMENT, which on a bent pipe with an
-	// even segment count is nowhere near halfway along the pipe -- on a two-segment link it landed
-	// in the middle of the second leg.
+	// A link's label anchors at the halfway point OF THE WHOLE PIPE, measured along its length --
+	// not the midpoint of the middle SEGMENT, which on a bent pipe is nowhere near halfway.
 	var LINK_LABEL_ALONG = 0.5;
-	// ...then stepped away from any flow arrow it would land on top of ("but don't conflict with an
-	// arrow"). Arrows sit at ARROW_ALONG of each SEGMENT, so on some geometries the two coincide.
-	// The label moves along the pipe rather than off it, keeping it on the thing it labels, and is
-	// clamped well inside the ends so it never crowds a node.
-	// `along` overrides the default half-way station. Only the aligned-label station search passes
-	// it: an aligned label that collides with another aligned label cannot be nudged sideways (it
-	// would leave its pipe), so it SLIDES, which is what a GIS does with a road name. The arrow
-	// dodge still applies at whatever station is asked for.
+	// ...then stepped away from any flow arrow it would land on top of (arrows sit at ARROW_ALONG of
+	// each SEGMENT, so on some geometries the two coincide). The label moves ALONG the pipe rather
+	// than off it, clamped well inside the ends so it never crowds a node.
+	// `along` overrides the half-way station, passed only by the aligned-label station search: an
+	// aligned label cannot be nudged sideways without leaving its pipe, so it SLIDES.
 	function linkLabelMid(l, along) {
 		var clear = (ARROW_NOMINAL_LEN * arrowFactor()) * 1.5;
 		return Geom.dodgeAlongPolyline(linkPointList(l), along === undefined ? LINK_LABEL_ALONG : along,
@@ -174,40 +129,30 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- A LONG PIPE CARRIES ITS LABEL SEVERAL TIMES --------------------------------------------
 	//
-	// The other half of the GIS convention Task 329 brought in. A road name is not written once in
-	// the middle of a highway; it is repeated along it, so whatever piece of the line you are
-	// looking at names itself without your eye having to travel.
+	// The GIS convention: a road name is repeated along the highway, so whatever piece of the line
+	// you are looking at names itself without your eye having to travel.
 	//
-	// THE SPACING IS IN VIEW UNITS, NOT MODEL UNITS, AND THAT IS THE WHOLE DESIGN. A fraction of
-	// the view means "about this many labels across the screen" on every network ever drawn -- a
-	// 400 ft subdivision and a 40 mile transmission main read the same way, and neither needs a
-	// number typed by anybody. The count re-derives on every zoom: a zoom runs refreshFontSizes(),
-	// which ends in refreshLabelText().
+	// THE SPACING IS IN VIEW UNITS, NOT MODEL UNITS, AND THAT IS THE WHOLE DESIGN. A fraction of the
+	// view means "about this many labels across the screen" on every network ever drawn -- a 400 ft
+	// subdivision and a 40 mile transmission main read the same way, and neither needs a number typed
+	// by anybody. The count re-derives on every zoom.
 	//
 	// n = 1 REPRODUCES A SINGLE CENTRED LABEL EXACTLY. Stations are (i + 0.5)/n, so one label lands
-	// at 0.5 = LINK_LABEL_ALONG; the single-label path, the arrow dodge and the aligned-label
-	// station search are untouched on any pipe shorter than one spacing.
+	// at 0.5 = LINK_LABEL_ALONG and every pipe shorter than one spacing is untouched.
 	//
-	// **THIS NUMBER IS A CEILING ON THE GAP, NOT THE GAP.** `linkLabelStations()` takes
-	// n = ceil(L/s) and spaces at L/n, so what a reader SEES is anywhere in (s/2, s] -- a pipe
-	// barely longer than one spacing gets two labels at half of it, and over pipes of 1-2s the mean
-	// is 0.75 s. `ceil` is what guarantees a gap is never WIDER than the nominal; nominal and
-	// realized cannot both equal s, they conflict by arithmetic. The guarantee was kept and the
-	// number raised instead, so realized spacing is (0.375, 0.75] x min.
+	// **THIS NUMBER IS A CEILING ON THE GAP, NOT THE GAP.** `linkLabelStations()` takes n = ceil(L/s)
+	// and spaces at L/n, so what a reader SEES is anywhere in (s/2, s] and over pipes of 1-2s the
+	// mean is 0.75 s. `ceil` guarantees a gap is never WIDER than the nominal; nominal and realized
+	// cannot both equal s. Realized spacing is therefore (0.375, 0.75] x min.
 	//
-	// The rejected alternative is a settings row ("% of minimum map dimension for label spacing").
-	// Not built: a number nobody has yet wanted to change costs 26 translations, and the three
-	// adjustments so far each moved a default everybody gets, not a preference one drawing needed.
+	// Not a settings row: a number nobody has wanted to change costs 26 translations, and every
+	// adjustment so far moved a default everybody gets, not a preference one drawing needed.
 	var LPN_LABEL_REPEAT_FRAC = 0.75;
-	// **THE DIVISION IS UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN.** A cap on n would be a cap
-	// on the SPACING, so a very long pipe zoomed into would silently stop obeying the rule; a cap
-	// on the drawing is just not building elements nobody can see. So n is exactly ceil(L/s) at
-	// every zoom, and drawnLinkLabelStations() below keeps only the stations near the window.
-	//
-	// A LAST-RESORT GUARD, not a rule: a pipe that folds back and forth INSIDE the window can
-	// legitimately have many stations in view, and a pathological one could have thousands. This
-	// bounds the DOM without ever being reached by an ordinary drawing (a straight pipe crossing the
-	// padded window has at most about 13).
+	// **THE DIVISION IS UNCAPPED; WHAT IS BOUNDED IS WHAT GETS DRAWN.** A cap on n is a cap on the
+	// SPACING, so a very long pipe zoomed into would silently stop obeying the rule.
+	// A LAST-RESORT GUARD, not a rule: a pipe folding back and forth INSIDE the window can
+	// legitimately have thousands of stations in view. An ordinary drawing never reaches it (a
+	// straight pipe crossing the padded window has at most about 13).
 	var LPN_LABEL_DRAWN_MAX = 40;
 	function visibleMapHeight() {
 		var h = svg && svg.clientHeight ? svg.clientHeight : 0;
@@ -215,22 +160,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- "SCREEN SIZE": SAY WHICH DIMENSION, EVERY TIME -----------------------------------------
 	//
-	// **THE STANDARD IS `min` EVERYWHERE**, because it is the only convention that is ever FORCED:
-	// "must all of it be visible" is settled by the tighter dimension, by arithmetic rather than by
-	// taste, so the fit and a restored view have no choice. The label-visibility threshold and the
-	// label repeat spacing are both free, and they join the standard rather than keeping private
-	// conventions nobody could have guessed -- the page once ran all three at once (`max` for the
-	// repeat, `min` for the fit, WIDTH ALONE for visibility) with nothing naming any of them.
-	//
-	// One convention is what makes the rule sayable to a user in one sentence. `max`, `diag` and
-	// the single axes stay available and named, so a call site that genuinely needs one must say so.
+	// **THE STANDARD IS `min` EVERYWHERE**, the only convention ever FORCED: "must all of it be
+	// visible" is settled by the tighter dimension, by arithmetic rather than taste. `max`, `diag`
+	// and the single axes stay available and named, so a call site that needs one must say so.
 	//
 	// A "field of view" is how much you can SEE, so a control reading on this says "smaller than",
-	// never "narrower than" -- the latter invokes literal width and mismeasures the metaphor.
-	//
-	// AND IT IS NOT THE SCREEN. It is the map area -- the canvas, narrower than the window and much
-	// shorter. Wording shown to a user should say map, not screen, or it promises a relationship to
-	// the display that does not exist.
+	// never "narrower than". AND IT IS NOT THE SCREEN -- it is the map area, narrower than the
+	// window and much shorter, so wording shown to a user says map, not screen.
+
 	function mapSpan(which) {
 		var w = visibleMapWidth(), h = visibleMapHeight();
 		if (which === 'w') { return w; }
@@ -240,9 +177,7 @@ var EngCalcs = EngCalcs || {};
 		return Math.max(w, h);   // 'max' -- available, named, and no longer the house style
 	}
 	function labelRepeatSpacing() {
-		// MIN, the house standard. Tom's original spec said max and he later called this one "fuzzy
-		// and can use whatever" -- so it takes the standard rather than keeping a private rule.
-		// Practically it means a wide, short window repeats labels a little more often, measured
+		// MIN, the house standard: a wide, short window repeats labels a little more often, measured
 		// against the dimension that runs out first.
 		return LPN_LABEL_REPEAT_FRAC * mapSpan('min');
 	}
@@ -258,14 +193,10 @@ var EngCalcs = EngCalcs || {};
 			x1: (w - state.tx) / s + pad, y1: (h - state.ty) / s + pad
 		};
 	}
-	// THE SPEC'S n, in full: every station this pipe's label belongs at, whether or not any of them
-	// is on screen. Always at least one entry, and exactly one unless the pipe is longer than the
-	// spacing -- in which case the stations are (i + 0.5)/n, which puts a lone label back at the
-	// half-way point and leaves every short pipe exactly as it was.
-	//
-	// A MANUALLY DRAGGED LABEL IS NEVER REPEATED. The user put that label in that spot; copying it
-	// to five other spots is not what they asked for, and l.lx/l.ly can only describe one of them.
-	// (Task 329's aligned path already opts out of alignment for the same reason.)
+	// Every station this pipe's label belongs at, on screen or not. Always at least one entry, and
+	// exactly one unless the pipe is longer than the spacing.
+	// A MANUALLY DRAGGED LABEL IS NEVER REPEATED: the user put that label in that spot, and
+	// l.lx/l.ly can only describe one of them.
 	function linkLabelStations(l) {
 		var s = labelRepeatSpacing(), len = Geom.polylineLength(linkPointList(l)), n, i, out = [];
 		if (labelIsDragged(l) || !(s > 0) || !(len > s)) { return [LINK_LABEL_ALONG]; }
@@ -274,10 +205,9 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	// ...and the ones actually worth building elements for. Derived from the POLYLINE rather than
-	// from each station's own position, so the cost is proportional to what is drawn instead of to
-	// how long the pipe is: a segment whose bounding box misses the window contributes no stations,
-	// and one that meets it contributes the index range its along-distances cover. A pipe a thousand
-	// view-widths long therefore costs the same as a short one.
+	// from each station's own position, so the cost is proportional to what is DRAWN rather than to
+	// how long the pipe is: a segment whose bounding box misses the window contributes no stations.
+	// A pipe a thousand view-widths long therefore costs the same as a short one.
 	function drawnLinkLabelStations(l) {
 		var all = linkLabelStations(l);
 		// An ordinary single-label pipe is never culled. Its <text> is the link's own element and
@@ -315,22 +245,16 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Final rendered offset from the anchor = the persisted drag offset (or default) PLUS this
 	// element's current placement nudge.
-	// **A MANUALLY PLACED LABEL MOVES ONLY ALONG ITS OWN LEADER, AND THAT IS GUARANTEED WHERE THE
-	// NUDGE IS COMPUTED, NOT HERE.** Tom's rule is *"Store the user's leader endpoint and hold it
-	// constant. If you extend it, don't overwrite it. Your extension is temporary."* -- so goal 1
-	// of dev/label-placement-goals.md gives a dragged label candidates on the RAY through its
-	// stored endpoint and nowhere else: it can be pushed further out at the same angle and can
-	// never be moved sideways or nearer. This used to read the nudge as zero for such a label,
-	// because the relaxation it fronted could push in any direction at all and there was no other
-	// way to hold the angle. Scoring holds the angle by construction, so the extension Tom
-	// described is now available. It stays temporary: every nudge is re-derived from scratch on
-	// every pass and none is ever written into n.lx/n.ly.
-	// A nudge computed for a label that was AUTO-placed is meaningless the instant that label
-	// becomes dragged, and the other way round -- it was searched for on a different candidate set.
-	// The pass stamps which kind it was solving (holder.nudgeManual) and this refuses the nudge
-	// until the pass has caught up. Every gesture that sets lx/ly re-runs the pass immediately, so
-	// this fires only in the window between, which is precisely where the old "a manual label takes
-	// no nudge" rule was really earning its keep.
+	// **A MANUALLY PLACED LABEL MOVES ONLY ALONG ITS OWN LEADER, GUARANTEED WHERE THE NUDGE IS
+	// COMPUTED, NOT HERE.** Goal 1 of dev/label-placement-goals.md gives a dragged label candidates
+	// on the RAY through its stored endpoint and nowhere else: pushed further out at the same angle,
+	// never sideways or nearer. Every nudge is re-derived from scratch on every pass and none is
+	// written into n.lx/n.ly.
+	// A nudge computed for an AUTO-placed label is meaningless the instant that label becomes
+	// dragged, and the other way round -- it was searched for on a different candidate set. The pass
+	// stamps which kind it was solving (holder.nudgeManual) and this refuses the nudge until the
+	// pass has caught up.
+
 	function placementNudge(holder, manual) {
 		return (holder && holder.nudge && !!holder.nudgeManual === !!manual)
 			? holder.nudge : { x: 0, y: 0 };
@@ -353,50 +277,38 @@ var EngCalcs = EngCalcs || {};
 	// node center or the link's mid-segment point; pos is the label's final rendered position
 	// (base offset + nudge). `holder` is nodeEls[id]/linkEls[id] (needs .leader, .tw, and a
 	// persistent .side to track across calls -- same role as a Text label's le.side).
-	// Same side-flip hysteresis as a Text label's leader (updateLabelGeometry() below, ADVERSE_FRAC):
-	// a data label is left-anchored (box is [pos.x, pos.x+tw], not centered like a Text label), so
-	// the "offset from anchor" this compares against trigger is the BOX CENTER's offset
-	// (pos.x + tw/2 - anchor.x) -- the exact analog of a Text label's lb.x, which IS its box
-	// center's offset since Text is text-anchor:middle. Tom, 2026-07-30: "leaders need to jump
-	// following the same rule as the Text leaders" -- without this a data label dragged to the left
-	// of its anchor drew its leader to the label's LEFT edge, running the line straight through the
-	// text instead of attaching to the near (right) edge.
+	// Same side-flip hysteresis as a Text label's leader (updateLabelGeometry(), ADVERSE_FRAC): a
+	// data label is left-anchored (box is [pos.x, pos.x+tw], not centered like a Text label), so the
+	// offset compared against trigger is the BOX CENTER's (pos.x + tw/2 - anchor.x) -- the analog of
+	// a Text label's lb.x, which IS its box center's offset since Text is text-anchor:middle.
 	function updateDataLeader(holder, anchor, end) {
 		if (!holder.leader) { return; }
 		if (holder.empty) { holder.leader.style.display = 'none'; return; }
 		var d = Math.hypot(end.x - anchor.x, end.y - anchor.y);
 		if (d <= leaderThreshold()) { holder.leader.style.display = 'none'; return; }
-		// A -> B, both world points, nothing derived. This line is the whole of Task 328: the
-		// endpoint used to be computed here from the label box, so it moved when the box's
-		// pixel width did, and the angle moved with it.
+		// A -> B, both world points, nothing derived: an endpoint computed from the label box would
+		// move when the box's pixel width did, and the angle with it (Task 328).
 		holder.leader.style.display = '';
 		holder.leader.setAttribute('x1', anchor.x); holder.leader.setAttribute('y1', anchor.y);
 		holder.leader.setAttribute('x2', end.x); holder.leader.setAttribute('y2', end.y);
 	}
 	// WHERE THE TEXT GOES, given the endpoint the user placed. The box hangs off B on whichever
-	// side keeps it from lying across its own leader, which is a fact about legibility and is
-	// therefore allowed to move with the zoom -- unlike B itself. labelBoxWidth() rather than tw
-	// directly, because the box is a concept several places share; since Task 333 the two are equal
-	// (the extrema mark no longer hangs past the digits), and this call is what keeps the
-	// dependency in one place if that ever changes again.
-	// holder.side persists across calls to carry the hysteresis, exactly as it did when this was
-	// the leader's attachment edge.
+	// side keeps it from lying across its own leader -- a fact about legibility, and therefore
+	// allowed to move with the zoom, unlike B itself. labelBoxWidth() rather than tw directly, so
+	// the box concept stays in one place (since Task 333 the two are equal).
+	//
 	// **THE HYSTERESIS IS FOR A HAND ON A LABEL, AND FOR NOTHING ELSE.** Tom, 2026-08-16: *"we only
 	// have to check for violation on the nearest side. We have no reason to check the other side
-	// because we will never use it."*
+	// because we will never use it."* labelSideAtEnd() holds the PREVIOUS side (in holder.side)
+	// inside a dead band either side of the anchor's vertical line, which can leave the box on the
+	// anchor's side with the leader running the width of the text to reach its endpoint. That is
+	// right while a user DRAGS -- without it a label pulled just past the line flickers a full
+	// box-width from side to side -- and wrong otherwise.
 	//
-	// labelSideAtEnd() holds the PREVIOUS side inside a dead band either side of the anchor's
-	// vertical line, so it can leave the box on the anchor's side -- and then the leader runs the
-	// width of the text to reach its endpoint. That is the defect Tom photographed on 2026-08-16.
-	// It is the right behaviour while a user DRAGS: without it a label pulled just past the line
-	// flickers its text a full box-width from side to side.
-	//
-	// An auto-placed label is not dragged. Its endpoint is chosen by the placement pass from
-	// seventeen discrete candidates, so there is no continuous sweep across the line to damp, and
-	// nothing is gained by ever putting the box on the near side. Taking the nearest side
-	// unconditionally also makes js/lpn-collide.js's labelBoxAtEnd() correct by construction rather
-	// than by reproducing a render-time quirk -- the scorer and the renderer cannot disagree about
-	// a rule neither of them has.
+	// An auto-placed label is not dragged: its endpoint comes from seventeen discrete candidates, so
+	// there is no continuous sweep to damp. Taking the nearest side unconditionally also makes
+	// js/lpn-collide.js's labelBoxAtEnd() correct by construction rather than by reproducing a
+	// render-time quirk -- the scorer and the renderer cannot disagree about a rule neither has.
 	function dataLabelOrigin(holder, anchor, end, dragged) {
 		var w = labelBoxWidth(holder);
 		holder.side = dragged
@@ -404,43 +316,34 @@ var EngCalcs = EngCalcs || {};
 			: (end.x >= anchor.x ? 'right' : 'left');
 		return { x: holder.side === 'right' ? end.x : end.x - w, y: end.y };
 	}
-	// Approximate vertical box of a left-anchored, top-down multi-line <text> (node/link labels):
-	// no exact ascent/descent metrics available cross-browser without layout, so this uses a
-	// fraction of font size that reads right for the suite's actual label content (short numbers/
-	// letters, no descenders like "g"/"y"). Good enough for collision boxes; not
-	// meant to be pixel-exact.
+	// Approximate vertical box of a left-anchored, top-down multi-line <text> (node/link labels).
+	// No exact ascent/descent metrics cross-browser without layout, so this uses a fraction of font
+	// size tuned to the suite's actual label content (short numbers/letters, no descenders). Good
+	// enough for collision boxes; not pixel-exact.
 	function dataLabelBoxHeight(lineCount) {
 		return Geom.dataLabelBoxHeight(lineCount, effectiveFontSize(), effectiveLineHeight());
 	}
 	// LEGIBILITY BACKING IS A HALO ON THE GLYPHS AND LIVES ENTIRELY IN css/engcalcs.css (Task 376).
-	// There is nothing to position here: `paint-order: stroke fill` with a white stroke follows the
-	// letters, merges between close characters, rotates with the text because it IS the text, and
-	// disappears with it. The rect it replaced needed an element per label, a pad constant, a
-	// transform kept in step, and a hide call at every place a label could go empty.
-	// Final per-frame layout of one node's data label -- text position and its leader (if
-	// dragged/nudged past LABEL_LEADER_THRESHOLD). Called from buildNodeEls() (first layout),
-	// updateNode() (node moved), and refreshLabelText() (after every collision-avoidance pass, since
-	// a nudge or a toggled field changing tw/lineCount both move this label).
+	// NOT a rect: that needs an element per label, a pad constant, a transform kept in step, and a
+	// hide call at every place a label could go empty.
+	// Final per-frame layout of one node's data label -- text position and its leader. Called from
+	// buildNodeEls(), updateNode() and refreshLabelText().
 	function layoutNodeLabel(id) {
 		var n = nodeById(id), ne = nodeEls[id]; if (!ne) { return; }
-		// **A DROPPED LABEL IS HIDDEN, NOT MOVED** (Task 398). Set before anything is placed, and
-		// through the same visibility seam a too-short link label uses, so a node and a link that
-		// both lose their labels lose them the same way. `visibility` rather than `display` for the
-		// reason setLabelAssemblyHidden() gives: the element keeps its box, so nothing downstream
-		// has to re-measure a thing that is merely invisible.
+		// **A DROPPED LABEL IS HIDDEN, NOT MOVED** (Task 398). Set before anything is placed, through
+		// the same visibility seam a too-short link label uses. `visibility` rather than `display`:
+		// the element keeps its box, so nothing downstream re-measures what is merely invisible.
 		setLabelAssemblyHidden(ne, !!ne.hiddenDropped);
 		var anchor = { x: n.x, y: n.y }, end = nodeLabelPos(n),
 			org = dataLabelOrigin(ne, anchor, end, labelIsDragged(n));
 		repositionMultilineText(ne.text, org.x, org.y);
 		updateDataLeader(ne, anchor, end);
 	}
-	// Same as layoutNodeLabel() above, for a link's data label -- anchor is the link's own mid-
-	// segment point (linkLabelMid()), which itself moves whenever a vertex/endpoint drags.
+	// Same as layoutNodeLabel(), for a link's data label -- anchor is linkLabelMid(), which moves
+	// whenever a vertex or endpoint drags.
 	// Local direction of the pipe AT the label's own point, not end-to-end: on a bent pipe the
 	// straight line between endpoints can lie at a completely different angle from the piece of pipe
-	// the label is actually sitting on, which is the difference between a label that reads as
-	// attached and one that reads as loose. Falls back to the endpoints for a link with no usable
-	// segment (all-coincident points), where any angle is as good as any other.
+	// the label sits on. Falls back to the endpoints for an all-coincident link.
 	function linkDirectionAt(l, at) {
 		var pts = linkPointList(l), best = null, bestD = Infinity, i, ax, ay, bx, by, t, px, py, d;
 		for (i = 0; i + 1 < pts.length; i++) {
@@ -458,43 +361,33 @@ var EngCalcs = EngCalcs || {};
 		return a && b ? { ax: a.x, ay: a.y, bx: b.x, by: b.y } : { ax: 0, ay: 0, bx: 1, by: 0 };
 	}
 	// TRUE when this link's label should be drawn ALONG the pipe (the GIS way) rather than
-	// horizontally beside it. A DRAGGED label always opts out: the user placed it, and rotating what
-	// they positioned by hand would overrule a deliberate act -- alignment is what we do when nobody
-	// has said otherwise. See ROADMAP Task 329.
-	// Clamped where it is READ, not where it is written, so a document carrying a wild number from
-	// some future edit still draws something readable rather than upside-down text.
+	// horizontally beside it. A DRAGGED label always opts out: alignment is what we do when nobody
+	// has said otherwise (Task 329).
+	// Clamped where it is READ, not written, so a document carrying a wild number from some future
+	// edit still draws something readable rather than upside-down text.
 	var LPN_FLIP_LEFT_MIN = 0, LPN_FLIP_LEFT_MAX = 45;
 	function labelFlipLeftOfVertical() {
 		var d = +settings.labelFlipLeftOfVertical;
 		if (!isFinite(d)) { return 20; }
 		return Math.max(LPN_FLIP_LEFT_MIN, Math.min(LPN_FLIP_LEFT_MAX, d));
 	}
-	// The renderer wants the top of its readable window, in the SVG frame where y is down and angles
-	// run clockwise. A label's reading direction may lean `d` degrees LEFT of straight up -- so the
-	// window is (-(90 + d), 90 - d], and `90 - d` is what alignedLabelAnchor() calls `bias`. At
-	// angle -90 the text runs straight up the screen; at -(90 + d) it runs up and to the left.
+	// The top of the readable window, in the SVG frame where y is down and angles run clockwise. A
+	// label's reading direction may lean `d` degrees LEFT of straight up, so the window is
+	// (-(90 + d), 90 - d] and `90 - d` is what alignedLabelAnchor() calls `bias`.
 	//
-	// **THE SIGN IS THE ENTIRE BUG THIS FIXES.** With d = 0 the window is (-90, 90], which keeps a
-	// pipe drawn at +80 reading TOP-TO-BOTTOM; every map ever printed reads a north-south name
-	// bottom-to-top. A positive d moves the doorway the other way, so near-vertical pipes land at
-	// about -100 and read upward as a family.
+	// **THE SIGN MATTERS.** With d = 0 the window is (-90, 90], which keeps a pipe drawn at +80
+	// reading TOP-TO-BOTTOM; every map ever printed reads a north-south name bottom-to-top. A
+	// positive d moves the doorway the other way.
+
 	function labelReadabilityBias() { return 90 - labelFlipLeftOfVertical(); }
 	function linkLabelAligned(l) {
 		return !!settings.alignPipeLabels && l.lx === undefined && l.ly === undefined;
 	}
-	// WHICH SIDE OF THE PIPE. Tom's two answers turn out to be one: prefer the top, and take the
-	// other side when the top is congested (2026-08-14, on seeing a label lying across the pipe
-	// below it -- *"Other side of pipe would have been very nice here"*). Congestion is measured as
-	// distance to the nearest OTHER link, because that is what the picture showed and because
-	// a link's own centreline has never been an obstacle to its own label: a data label has always
-	// been free to sit straight on its pipe, and aligning labels along pipes is what made it
-	// visible.
-	//
-	// A margin before switching, so the top stays the default rather than becoming "whichever side
-	// won by a hair". A drawing whose labels sit above some pipes and below others for reasons no
-	// reader can see is worse than one that is occasionally tight -- consistency IS legibility here,
-	// which is the same argument that makes the readability flip non-negotiable in
-	// alignedLabelAnchor(). So the bottom has to be clearly better, not merely better.
+	// WHICH SIDE OF THE PIPE: prefer the top, and take the other side when the top is congested.
+	// Congestion is distance to the nearest OTHER link -- a link's own centreline is not an obstacle
+	// to its own label. A MARGIN before switching, so the top stays the default rather than
+	// "whichever side won by a hair": labels sitting above some pipes and below others for reasons
+	// no reader can see are worse than an occasionally tight drawing.
 	var LPN_SIDE_SWITCH_MARGIN = 1.35;
 	function alignedSideFor(l, top, bottom) {
 		var clearTop = Infinity, clearBot = Infinity;
@@ -508,54 +401,33 @@ var EngCalcs = EngCalcs || {};
 		});
 		return clearBot > clearTop * LPN_SIDE_SWITCH_MARGIN ? -1 : 1;
 	}
-	// A PIPE TOO SHORT TO CARRY ITS OWN LABEL DOES NOT CARRY ONE (Tom, 2026-08-14: "if a line is too
-	// short, its label must disappear even if the map is closer than the all-disappear limit"). The
-	// map-width threshold answers "is this drawing being read or surveyed"; it cannot answer "is
-	// there room on THIS pipe", so a dense corner of a network at a readable zoom still fills with
-	// numbers belonging to stubs a few pixels long.
-	// The test is the label against the pipe, and it needs no setting because it is already in the
-	// right frame: labelBoxWidth() is derived from getBBox(), so it is a screen-pixel quantity
-	// expressed in world units (~1/zoom), while the pipe's length is a fixed world number. Zooming
-	// in shrinks the label relative to the pipe and the label comes back, at exactly the zoom where
+	// A PIPE TOO SHORT TO CARRY ITS OWN LABEL DOES NOT CARRY ONE. The map-width threshold cannot
+	// answer "is there room on THIS pipe", so a dense corner of a network at a readable zoom still
+	// fills with numbers belonging to stubs a few pixels long.
+	// The test needs no setting because it is already in the right frame: labelBoxWidth() derives
+	// from getBBox(), a screen-pixel quantity expressed in world units (~1/zoom), while the pipe's
+	// length is a fixed world number -- so zooming in brings the label back at exactly the zoom where
 	// it fits. The same comparison in pixels on both sides would be zoom-invariant and useless.
-	// A DRAGGED LABEL IS EXEMPT, and that is Tom's own hedge on the rule, minutes after asking for it
-	// (2026-08-14: "could we soften that as 'if not dragged' to give the user the ability to keep
-	// short pipe labels from hiding?"). It makes the rule an automatic-placement rule rather than a
-	// censor: the moment someone drags a label off a stub -- which is exactly what you do when you
-	// want that number on the sheet -- it is authored, and this stops applying. So there is an escape
-	// hatch, it needs no setting, and the gesture that reveals the intent is the one a user already
-	// makes. Double-clicking the label sends it home and the rule resumes.
+	// A DRAGGED LABEL IS EXEMPT, which makes this an automatic-placement rule rather than a censor.
+	// Double-clicking the label sends it home and the rule resumes.
 	// **THE FITTING CASCADE (ROADMAP Task 399; dev/label-placement-goals.md §3.5).**
 	//
 	// ESRI Maplex's named cascade for a label that will not fit is stack -> overrun -> reduce font ->
-	// abbreviate -> key-number. We have none of the middle rungs: an undragged link label is already
-	// ONE inline row, we do not shrink type, and we have no abbreviation dictionary. So ours is two
-	// rungs -- **shed trailing values, then drop the label** -- and the shed step is our own
-	// extension to that cascade rather than a cartographic standard. Say so wherever it is described.
+	// abbreviate -> key-number. We have none of the middle rungs, so ours is two rungs -- **shed
+	// trailing values, then drop the label** -- and the shed step is our own extension rather than a
+	// cartographic standard. Say so wherever it is described. It is cheap only because an unstacked
+	// link label is one row: shedding a value reduces its WIDTH monotonically, which is exactly the
+	// quantity both the short-pipe rule and the conflict test already consume.
 	//
-	// It is cheap only because an unstacked link label is one row: shedding a value reduces its
-	// WIDTH, monotonically, and width is exactly the quantity both the short-pipe rule and the
-	// conflict test already consume. That collapses Tom's two "it does not fit" problems -- too long
-	// for its pipe, and in conflict with a neighbour -- into one cascade with two stopping conditions.
+	// **THE SHED IS MEASURED THE SAME WAY THE HIDE RULE IS: ONE MEASUREMENT, getBBox().** Do not
+	// reintroduce a banked per-tspan width (getComputedTextLength) summed to answer "how wide without
+	// these values". It measures correctly under the headless stub, produces NOTHING in a real
+	// browser, and fails SILENTLY: if those numbers come back zero every subset "fits", nothing is
+	// shed, and the terminal rung hides the label whole. Redrawing costs a forced layout per step,
+	// but only a label that does NOT fit pays it, at most one step per value.
 	//
-	// **THE SHED IS MEASURED THE SAME WAY THE HIDE RULE IS, AND THAT IS THE WHOLE FIX.**
-	//
-	// The first cut banked a width per tspan (getComputedTextLength) and answered "how wide without
-	// these values" as a sum, so no candidate had to be drawn. It measured correctly under the
-	// headless stub and produced NOTHING in a real browser -- Tom, 2026-08-16: *"I cannot detect a
-	// single instance of shed. It's always all or nothing."* The failure mode is the silent one: if
-	// those per-tspan numbers come back zero or unavailable, every subset "fits", nothing is ever
-	// shed, and the terminal rung then hides the label whole -- which is exactly the all-or-nothing
-	// behaviour the cascade was built to replace. A second measurement path is a second thing that
-	// can be wrong, and this one was wrong invisibly.
-	//
-	// So there is only ONE measurement now: draw the candidate and call getBBox(), which is the same
-	// number `linkLabelTooShort()` has always used and which is demonstrably right in the browser --
-	// labels do hide. Redrawing costs a forced layout per step, but only a label that does NOT fit
-	// pays it, and it pays at most one step per value. A label that fits pays one comparison.
-	//
-	// Worst rank first. A line with no field (the empty placeholder) and one with no rank both sort
-	// last and so go first -- there is nothing to say about a value nobody ranked.
+	// Worst rank first. A line with no field and one with no rank both sort last and so go first.
+
 	function shedOrder(lines) {
 		var order = [], i;
 		for (i = 0; i < lines.length; i++) { order.push(i); }
@@ -571,13 +443,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	// **THE ONE PLACE A LINK LABEL'S GLYPHS ARE BUILT** (Task 399). The full label and every shed
 	// candidate go through this, so they cannot disagree about the row shape, the font size, the
-	// measurement, or the stamp that keeps a repeated chain in step. Before this existed the shed
-	// path had its own copy of all four, which is how a shed label could keep the tspans of the
-	// label it used to be.
-	//
-	// `fsNow` is the font size string for the CURRENT scale, and it is applied BEFORE the tape
-	// measure comes out: getBBox() returns world units, so measuring text still drawn at the
-	// previous scale and banking it against this one is wrong by exactly the zoom step.
+	// measurement, or the stamp that keeps a repeated chain in step.
+	// `fsNow` is the font size for the CURRENT scale and is applied BEFORE the tape measure comes
+	// out: getBBox() returns world units, so measuring text drawn at the previous scale and banking
+	// it against this one is wrong by exactly the zoom step.
 	function renderLinkLabel(le, l, lines, fsNow) {
 		var rows = composeRows(lines, labelIsDragged(l));
 		setMultilineText(le.text, linkLabelBase(l).x, rows);
@@ -592,60 +461,35 @@ var EngCalcs = EngCalcs || {};
 		le.lines = lines;
 		return rows;
 	}
-	// A stationed label sheds until it stops colliding, longest pipe first.
+	// A stationed label sheds until it stops colliding, LONGEST PIPE FIRST: whoever is placed first
+	// keeps its content, and a long pipe has the most room to give up later while still reading as
+	// "this pipe". It also makes the pass stable.
 	//
-	// **LONGEST FIRST, for the same reason placeStationedLabels() uses that order**: whoever is
-	// placed first keeps its content, and a long pipe has the most room to give up later while still
-	// reading as "this pipe". It also makes the pass stable -- the order depends on nothing the user
-	// can change by clicking.
+	// **NODE LABELS ARE OBSTACLES HERE, AT THE POSITIONS THEY WERE ACTUALLY PLACED AT** -- the
+	// conflict a reader meets most is a pipe label running the length of its own pipe colliding with
+	// the node labels at each end, not with another pipe label.
 	//
-	// **NODE LABELS ARE OBSTACLES HERE, AT THE POSITIONS THEY WERE ACTUALLY PLACED AT.** This is the
-	// conflict a reader meets most and it was the one the pass could not see: a pipe label running
-	// the length of its own pipe collides with the node labels at each end, not with another pipe
-	// label. Tom's photograph of it, 2026-08-16, is what named this -- two long link labels sitting
-	// across the node labels above and below them, neither shedding a thing.
-	//
-	// **PLACED, not resting, and the distinction is the whole reason an earlier cut had to be
-	// reverted.** Seeding node labels at their resting offset shed a value from 3 of 7 links on the
-	// default example, including a pump's head loss (`readout-sign-harness.js` caught that by name),
-	// because it gave up numbers for collisions Phase 1 was about to solve by MOVING the node label.
-	// nodeLabelPos() carries the nudge the placement pass last chose, so what is scored here is where
-	// the node label really is. On the very first pass that nudge is zero and this reads the resting
-	// position; it converges on the next refresh, which is the right trade for a content decision.
-	//
-	// **A NODE LABEL THAT WAS DROPPED LAST PASS IS SEEDED TOO, AND SKIPPING IT WAS A STABLE BAD
-	// STATE.** The reasoning for skipping sounded right -- it is not drawn, so why should a link
-	// label pay for it -- but it locks in the worst outcome: the link label never sheds, so the spot
-	// stays blocked, so the node label stays dropped, so nothing ever changes. Seeding it at the
-	// position it WANTS lets the link label give up a value, and on the next pass the node label
-	// fits and both are drawn. That is the whole of "links yield to nodes", and it is also what
-	// is what makes the node/link ruling work at all: the link gives up VALUES so the node label can
-	// have its place, instead of the whole link label being taken away.
+	// **PLACED, not resting.** Seeding node labels at their RESTING offset sheds a value from 3 of 7
+	// links on the default example, including a pump's head loss (`readout-sign-harness.js` catches
+	// that by name), because it gives up numbers for collisions the placement pass is about to solve
+	// by MOVING the node label. On the very first pass that nudge is zero and this reads the resting
+	// position; it converges on the next refresh.
 	function shedAlignedForConflicts(fsNow, fs) {
-		// **NO PAD HERE, AND THE ANSWER TO "did you throw in a fudge factor" IS THAT I HAD.**
-		// LPN_ALIGNED_PAD_FRAC is 0.35 of a font size and it grows the box on EVERY side, so testing
-		// with it meant two labels were called conflicting while still 0.7 of a font size apart --
-		// most of a character of imaginary text between them, on every pair. That is a reasonable
-		// margin for SLIDING a label along its pipe, which is what it was written for and where it
-		// costs nothing; it is not a reasonable one for taking a number off the drawing. A shed is
-		// paid for in information, so it wants real overlap and nothing else. (Tom, 2026-08-17: *"It's
-		// shedding nicely, but too aggressively. Did you throw in a fudge factor?"* Yes.)
+		// **NO PAD HERE.** LPN_ALIGNED_PAD_FRAC is 0.35 of a font size and grows the box on EVERY
+		// side, so testing with it calls two labels conflicting while 0.7 of a font size apart -- a
+		// reasonable margin for SLIDING a label along its pipe, and not for taking a number off the
+		// drawing. A shed is paid for in information, so it wants real overlap.
 		var obs = staticObstacles(), pad = 0;
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id];
-			// **A DROPPED NODE LABEL IS NO LONGER SEEDED, because it can no longer be dropped by a
-			// link.** Seeding one was a deadlock-breaker: while a link label could push a node label
-			// off the drawing, the node needed ground reserved or the pair would stay stuck. Now
+			// **A DROPPED NODE LABEL IS NOT SEEDED, because it can no longer be dropped by a link.**
 			// `yields` means a node label takes that ground itself, so reserving it as well costs
-			// link labels values for a label that is not drawn and never needed the help.
+			// link labels values for a label that is not drawn.
 			if (!ne || ne.empty || ne.hiddenDropped) { return; }
 			// **THE SAME BOX THE PLACEMENT PASS BUILDS, hung on the same side.** A node label's text
-			// extends AWAY from its node, so a label placed on the left occupies the ground to the
-			// left of its endpoint -- which is Collide.labelBoxAtEnd()'s rule. Building it always to
-			// the right put every left-placed node label's box on the wrong side of its own node, so
-			// a link label was tested against ground nothing occupied and cleared a conflict that was
-			// really there. That is why link labels kept being hidden whole by the repair instead of
-			// shedding: the shed pass could not see what the repair could.
+			// extends AWAY from its node, so one placed on the left occupies the ground left of its
+			// endpoint -- Collide.labelBoxAtEnd()'s rule. Building it always to the right tests a
+			// link label against ground nothing occupies, clearing a conflict that is really there.
 			var at = nodeLabelPos(n),
 				w = labelBoxWidth(ne), h = dataLabelBoxHeight(ne.lineCount),
 				b = Collide.boxFromRect({ x: at.x >= n.x ? at.x : at.x - w,
@@ -667,10 +511,9 @@ var EngCalcs = EngCalcs || {};
 			// participant in the candidate pass and can MOVE, so it has somewhere to go that is not
 			// giving up a number.
 			if (!linkLabelAligned(l) && linkLabelStations(l).length < 2) { return; }
-			// NOT skipped when the label is already too long for its segment. An earlier draft
-			// returned here "because it is hidden anyway", which had it backwards: a label that does
-			// not fit is the one with the most to gain from shedding, and skipping it is how a
-			// cascade turns back into the all-or-nothing hide it replaced.
+			// NOT skipped when the label is already too long for its segment. A label that does not
+			// fit is the one with the most to gain from shedding; skipping it is how a cascade turns
+			// back into the all-or-nothing hide it replaced.
 			var all = le.allLines || le.lines, order = shedOrder(all),
 				gone = all.length - le.lines.length;
 			function boxNow() {
@@ -682,11 +525,9 @@ var EngCalcs = EngCalcs || {};
 				renderLinkLabel(le, l, keptLines(all, shedKeepSet(all, order, gone)), fsNow);
 			}
 			le.shedCount = all.length - le.lines.length;
-			// **SHED OUT AND STILL IN THE WAY MEANS HIDE** (Tom, 2026-08-17: *"Fully shedded links
-			// need to hide if they are still in conflict."*). The cascade's last rung was written as
-			// the SHORT-SEGMENT rule alone, so a label that had given up everything but its best
-			// value and still overlapped a neighbour simply stayed there and overlapped it. The
-			// cascade has two entrances and it needs the same exit for both.
+			// **SHED OUT AND STILL IN THE WAY MEANS HIDE.** The cascade has two entrances -- too long
+			// for its segment, and in conflict with a neighbour -- and needs the same exit for both,
+			// or a label that gave up everything but its best value stays and overlaps.
 			le.hiddenCrowded = !boxIsClear(boxNow(), obs, pad);
 			// **AND A HIDDEN LABEL IS NOT AN OBSTACLE.** It is not drawn, so reserving its ground
 			// would make the next label shed for something nobody can see -- and on a crowded map
@@ -697,21 +538,16 @@ var EngCalcs = EngCalcs || {};
 			obs.boxes.push(b);
 		});
 	}
-	// **THE LENGTH CASCADE, FOR ONE LINK, ALWAYS STARTING FROM THE FULL VALUE LIST.** Returns the
-	// lines that survive and leaves the label rendered at them.
-	//
-	// Starting from FULL every time is what makes it possible to UNSHED. Shedding down from wherever
-	// the label happens to be is a ratchet: a label that lost four values while the map was zoomed
-	// out could never get them back, which is exactly what Tom photographed -- the same drawing at
-	// two zooms, every link label still down to its flow at the closer one.
+	// **THE LENGTH CASCADE, FOR ONE LINK, ALWAYS STARTING FROM THE FULL VALUE LIST.** Starting from
+	// FULL every time is what makes it possible to UNSHED: shedding down from wherever the label
+	// happens to be is a ratchet, and a label that lost four values while zoomed out could never get
+	// them back.
 	//
 	// Stops at the FIRST content that fits, so the shed is minimal. `gone < order.length - 1` keeps
-	// one value alive: dropping the last one is not a shed, it is the hide, and linkLabelTooShort()
-	// owns that decision.
-	//
-	// **THE BAND BETWEEN SHEDDING AND HIDING IS THE CASCADE ITSELF, not a fudge factor.** Both rules
-	// measure the same two quantities, and that is correct: a label sheds while its run exceeds its
-	// segment, and hides only if even its best single value still does.
+	// one value alive: dropping the last is not a shed but the hide, which linkLabelTooShort() owns.
+	// **THE BAND BETWEEN SHEDDING AND HIDING IS THE CASCADE ITSELF, not a fudge factor** -- a label
+	// sheds while its run exceeds its segment, and hides only if even its best single value does.
+
 	function shedToSegment(le, l, allLines, fsNow) {
 		var room = linkLabelRoom(l, le.alignedAlong),
 			order = shedOrder(allLines), gone = 0, kept = allLines;
@@ -723,21 +559,16 @@ var EngCalcs = EngCalcs || {};
 		}
 		return kept;
 	}
-	// **RE-DECIDE EVERY LINK LABEL'S CONTENT AT THE CURRENT ZOOM** (Tom, 2026-08-17: *"In some cases
-	// (or all?) it's failing to unshed."*).
+	// **RE-DECIDE EVERY LINK LABEL'S CONTENT AT THE CURRENT ZOOM.** A shed is a decision about a
+	// RATIO -- the label's run against its segment -- and a label's run in world units is its pixel
+	// width divided by the scale, so the decision changes with the zoom and nothing else. It cannot
+	// live only in refreshLabelText(), which runs on a solve, a toggle, a unit switch and NOT on a
+	// zoom (Task 366 stopped a zoom recomposing anything, because re-measuring 220 labels per wheel
+	// notch cost a quarter of a second) -- that freezes every shed at the zoom it was first computed.
 	//
-	// A shed is a decision about a RATIO -- the label's run against its segment -- and a label's run
-	// in world units is its pixel width divided by the scale. So the decision changes with the zoom
-	// and with nothing else the drawing does. Putting it only in refreshLabelText() was wrong for
-	// exactly that reason: that function runs on a solve, a toggle, a unit switch, and NOT on a zoom
-	// (Task 366 deliberately stopped a zoom from recomposing anything, because re-measuring 220
-	// labels per wheel notch cost a quarter of a second). So every shed was frozen at whatever zoom
-	// it was first computed at.
-	//
-	// **THE CHEAP CASE COSTS NOTHING, which is what makes this affordable to run on a zoom.** A label
-	// already showing everything, whose banked pixel width still fits at this scale, needs no render
-	// and no measurement -- linkLabelRunLength() is a division. Only a label that IS shed, or one
-	// that no longer fits, pays for a re-render, and paying there is the whole point.
+	// **THE CHEAP CASE COSTS NOTHING**, which is what makes this affordable on a zoom: a label
+	// already showing everything, whose banked pixel width still fits, needs no render and no
+	// measurement -- linkLabelRunLength() is a division.
 	function reshedLinkLabels(fsNow, fs) {
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id];
@@ -763,42 +594,27 @@ var EngCalcs = EngCalcs || {};
 	function keptLines(lines, keep) {
 		return lines.filter(function (line, i) { return keep[i]; });
 	}
-	// **THE SHED STARTS BEFORE THE HIDE DOES, AND WITHOUT THAT GAP THE CASCADE IS INVISIBLE.**
+	// **THE SHED STARTS BEFORE THE HIDE DOES, AND WITHOUT THAT GAP THE CASCADE IS INVISIBLE.** If
+	// the shed fires at `width > length` and linkLabelTooShort() hides at `length < width` -- the
+	// same comparison -- the only band in which a reader could SEE a shed is too wide at N values and
+	// narrow enough at one, and on a real drawing a pipe is usually either comfortably long or
+	// hopelessly short. So the shed aims at the room a label can USE: linkLabelMid() clamps a
+	// label's station to 0.12-0.88 of the pipe, so the usable middle is 0.76 of it. Hiding stays at
+	// the full length, leaving a real 76%-100% band where a label sheds rather than vanishes.
 	//
-	// Tom, twice: *"I cannot detect a single instance of shed. It's always all or nothing."* Read the
-	// two conditions side by side and that is exactly what the code said. The shed fired at
-	// `width > length` and linkLabelTooShort() hides at `length < width` -- **the same comparison**.
-	// So the only band in which a reader could ever SEE a shed was: too wide at N values, narrow
-	// enough at one. On a real drawing a pipe is usually either comfortably long (shows everything)
-	// or hopelessly short (hides), and that band is nearly empty. The cascade could work perfectly
-	// and still never appear.
+	// **THE ROOM A LINK LABEL HAS IS ITS SEGMENT'S LENGTH, NOT ITS PIPE'S.** An aligned label is
+	// rotated to the angle of the one segment it sits on: a 1000-unit main with a bend 60 units from
+	// its end offers a label at that station 60 units, not 1000. Measured against the whole polyline
+	// it "fits", is drawn straight through the bend and off the pipe, and never sheds.
 	//
-	// So the shed aims at the room a label can actually USE, not at the whole pipe. That number is
-	// not invented for this: linkLabelMid() already clamps a label's station to 0.12-0.88 of the
-	// pipe, so the usable middle is 0.76 of it, and a label wider than that is running under the
-	// symbols at one or both ends whatever station it takes. Hiding stays at the full length, so
-	// there is now a real band -- 76% to 100% of the pipe -- where a label sheds rather than
-	// vanishes, which is the behaviour the cascade was built for.
-	// **THE ROOM A LINK LABEL HAS IS ITS SEGMENT'S LENGTH, NOT ITS PIPE'S** (Tom, 2026-08-16:
-	// *"'segment length', not 'pipe length'"*). An aligned label is rotated to the angle of the one
-	// segment it sits on, so a bent pipe's other segments are not room it can use: a 1000-unit main
-	// with a bend 60 units from its end offers a label at that station 60 units, not 1000. Measuring
-	// against the whole polyline says it fits, and it is drawn straight through the bend and off the
-	// pipe -- and it never sheds, because by that measure it was never too long.
+	// **AND THE QUANTITY COMPARED IS A LENGTH ALONG THE PIPE, NOT A "WIDTH".** A label lying along a
+	// pipe has a RUN in the pipe's own direction; "width" invites the perpendicular dimension.
 	//
-	// **AND THE QUANTITY BEING COMPARED IS A LENGTH ALONG THE PIPE, NOT A "WIDTH".** Tom, same day:
-	// *"Width is meaningless here in intuitive terms."* He is right, and the word was hiding the
-	// mistake: a label lying along a pipe has a RUN measured in the pipe's own direction, and what it
-	// must fit inside is a length in that same direction. Calling it width invites the reader to
-	// picture the perpendicular dimension, which is not the constraint at all.
-	//
-	// **THE ROOM IS THE SEGMENT LENGTH, AND NOTHING IS SUBTRACTED FROM IT.** Taking a node's radius
-	// off each end was tried and is wrong: an aligned label is offset PERPENDICULAR to its pipe, so
-	// it passes above a node symbol rather than through it, and on a short pipe the two radii ate
-	// the whole segment and no label could ever return (`short-line-label-harness.js` caught that by
-	// name -- a 5-unit stub whose label fits at 2 units still had no room). Whether a label crowds a
-	// symbol is a collision question and the collision pass owns it; this rule answers only "does
-	// the text fit on the piece of pipe it is lying on".
+	// **NOTHING IS SUBTRACTED FROM THE SEGMENT LENGTH.** An aligned label is offset PERPENDICULAR to
+	// its pipe, so it passes above a node symbol rather than through it, and taking a node's radius
+	// off each end lets the two radii eat a short segment whole so no label can ever return
+	// (`short-line-label-harness.js` catches that by name). Whether a label crowds a symbol is the
+	// collision pass's question.
 	function linkLabelRoom(l, along) {
 		return Geom.segmentAtFraction(linkPointList(l),
 			along === undefined ? LINK_LABEL_ALONG : along).length;
@@ -825,16 +641,11 @@ var EngCalcs = EngCalcs || {};
 		if (le.leader) { le.leader.style.visibility = v; }
 		(le.repeats || []).forEach(function (r) { r.text.style.visibility = v; });
 	}
-	// The extra renderings of a long pipe's label (see linkLabelStations() above). Grown and shrunk
-	// in place rather than rebuilt, because the count changes on every zoom step and rebuilding a
-	// chain of elements per frame is how a map editor gets slow.
-	//
-	// A REPEAT IS NOT A SECOND LABEL. It carries neither `data-linklbl` nor `.lpn-draglbl`, so it is
-	// invisible to hit testing and cannot be dragged, renamed or reset -- there is still exactly one
-	// label per link as far as every interaction in this file is concerned, and the repeats are
-	// pixels. It does carry the annotation class (Task 334), so it hides with everything else
-	// generated. `side` is its own leader-hysteresis state, unused while unaligned repeats draw no
-	// leader, kept so dataLabelOrigin() has somewhere to write.
+	// The extra renderings of a long pipe's label. Grown and shrunk IN PLACE rather than rebuilt:
+	// the count changes on every zoom step, and rebuilding a chain of elements per frame is how a
+	// map editor gets slow. Each repeat carries the annotation class (Task 334), so it hides with
+	// everything else generated; `side` is its own leader-hysteresis state, kept so
+	// dataLabelOrigin() has somewhere to write.
 	function ensureLabelRepeats(le, n, linkId) {
 		if (!le.repeats) { le.repeats = []; }
 		while (le.repeats.length > n) {
@@ -843,18 +654,13 @@ var EngCalcs = EngCalcs || {};
 		}
 		while (le.repeats.length < n) {
 			le.repeats.push({
-				// EVERY COPY IS PICKABLE, and that is Tom's call on 2026-08-15: *"The problem is
-				// that I can only drag one upstream label."* It carries the same `data-linklbl` and
-				// the same `.lpn-draglbl` as the original, so grabbing any of them drags THE label,
-				// opens THE link's properties, and double-click sends it home -- there is no magic
-				// copy to learn. The alternative he offered, making the draggable one the UPSTREAM
-				// label, was rejected on one fact he could not have known: upstream is a SOLVE
-				// RESULT, so a reversing flow would move the drag target to the other end of the
-				// pipe when an unrelated demand changed. A target that moves for invisible reasons
-				// is not learnable.
-				// `data-repeat` is how a pointerdown finds WHICH copy was grabbed, which is what
-				// lets the chain collapse to exactly where the user took hold of it instead of
-				// jumping to the half-way point first.
+				// EVERY COPY IS PICKABLE -- same `data-linklbl` and `.lpn-draglbl` as the original,
+				// so grabbing any of them drags THE label and there is no magic copy to learn. NOT
+				// "only the UPSTREAM label is draggable": upstream is a SOLVE RESULT, so a reversing
+				// flow would move the drag target to the other end of the pipe when an unrelated
+				// demand changed.
+				// `data-repeat` is how a pointerdown finds WHICH copy was grabbed, so the chain
+				// collapses where the user took hold of it instead of at the half-way point.
 				text: annotationEl('text', {
 					'class': 'lpn-lbl lpn-draglbl', 'data-linklbl': linkId,
 					'data-repeat': le.repeats.length,
@@ -872,43 +678,29 @@ var EngCalcs = EngCalcs || {};
 		setMultilineText(part.text, 0, le.rows);
 		part.seq = le.rowsSeq;
 	}
-	// WHERE AN ALIGNED LINK LABEL ACTUALLY LANDS: {ax, ay, angle}. Extracted from layoutLinkLabel()
-	// on 2026-08-14 because it now has TWO callers, and the reason it needed two is the whole bug.
+	// WHERE AN ALIGNED LINK LABEL ACTUALLY LANDS: {ax, ay, angle}. ALIGNED means text-anchor middle,
+	// rotated about its own anchor, no leader and no nudge -- a label lying along the pipe already
+	// says which pipe it belongs to by its ORIENTATION.
 	//
-	// ALIGNED means: text-anchor middle, rotated about its own anchor, no leader and no nudge. A
-	// leader would be redundant by construction -- a label lying along the pipe already says which
-	// pipe it belongs to by its ORIENTATION, which is the whole economy of the GIS convention and
-	// the reason it survives on maps carrying thousands of labels.
-	//
-	// **"No nudge" was read as "not the collision pass's business", and that was the defect.** A
-	// label that does not MOVE is still an OBSTACLE, and this one is an obstacle at a rotated
-	// position that only this function can compute. While it was inlined in the layout function,
-	// the collision pass had no way to ask where the label was, so it used the unaligned position
-	// and the unrotated box -- see runLabelCollisionAvoidance(). Anything that needs to know where
-	// an aligned label is must come through here; a second copy of this arithmetic would drift from
-	// the drawing the moment either side changed, and drift here is invisible in code and obvious
-	// on screen.
+	// **"No nudge" does NOT mean "not the collision pass's business".** A label that does not MOVE is
+	// still an OBSTACLE, at a rotated position only this function can compute, so anything needing to
+	// know where an aligned label is must come through here.
 	function alignedLabelPlacement(l, le, along, force) {
 		var mid = linkLabelMid(l, along),
 			dir = linkDirectionAt(l, mid),
 			opt = {
-				// **THE GAP IS DERIVED FROM WHAT MUST BE CLEARED, NOT FROM A NODE'S RADIUS** (Tom,
-				// 2026-08-15, after the mask pad was already shrunk: *"aligned labels still mask
-				// their own pipes"* -- the halo that replaced the mask has the same job to do here).
-				// It was `nodeRadius + 0.35 x fontSize`, and a node's radius has
-				// nothing to do with a label lying halfway along a pipe -- it was a stand-in for
-				// "some clearance", and it went out of step the moment anyone changed Symbol size.
+				// **THE GAP IS DERIVED FROM WHAT MUST BE CLEARED, NOT FROM A NODE'S RADIUS.** A
+				// node's radius has nothing to do with a label lying halfway along a pipe; it is a
+				// stand-in for "some clearance" that goes out of step the moment Symbol size changes.
 				//
-				// What actually has to clear the pipe is the bottom edge of the label's own box. In
-				// the rotated frame the baseline sits `gap` above the pipe, the descender reaches
+				// What has to clear the pipe is the bottom edge of the label's own box. In the
+				// rotated frame the baseline sits `gap` above the pipe, the descender reaches
 				// `dataLabelBoxHeight(1) - 0.85 x fontSize` = 0.25 x fontSize below that baseline,
 				// and the halo (0.2em, half of it outside the glyph) adds 0.1 x fontSize more --
-				// which is why that halo is sized in em rather than in screen pixels: this
-				// arithmetic is written in fractions of the font size and has to stay true at every
-				// text size. So the near edge clears the pipe's
-				// half-width exactly when gap > halfWidth + 0.35 x fontSize, and 0.5 leaves a sixth of
-				// a font size of air. Every term is a quantity the drawing really has, so this stays
-				// true when the text, the symbols or the pipe width change independently.
+				// which is why that halo is sized in em rather than screen pixels: this arithmetic
+				// is in fractions of the font size and has to stay true at every text size. So the
+				// near edge clears the pipe's half-width exactly when gap > halfWidth + 0.35 x
+				// fontSize, and 0.5 leaves a sixth of a font size of air.
 				frac: 0, gap: settings.linkWidth / (2 * (state.s || 1)) + effectiveFontSize() * 0.5,
 				fontSize: effectiveFontSize(), lineHeight: effectiveLineHeight(),
 				nLines: le.lineCount || 1,
@@ -929,10 +721,8 @@ var EngCalcs = EngCalcs || {};
 			botPt = { x: mid.x + (candBot.x - dir.ax), y: mid.y + (candBot.y - dir.ay) },
 			// `force` overrides the clearance choice: -1 bottom, 1 top. The station search cannot
 			// slide a repeated chain (its even spacing IS the reading), so flipping a single link
-			// of it to the other side of its pipe is the one degree of freedom it has left --
-			// Tom, 2026-08-15: *"That applies to station, but I assume that side can still be
-			// nudged?"* It can, and this is where. Left undefined, the clearance rule decides as
-			// it always has.
+			// of it to the other side of its pipe is the one degree of freedom left. Left
+			// undefined, the clearance rule decides.
 			a = (force === -1 || (force !== 1 && alignedSideFor(l, topPt, botPt) < 0)) ? candBot : candTop;
 		// alignedLabelAnchor() offsets from a point ALONG the segment it is given; we want it
 		// offset from the label's own dodged mid-point, so pass frac 0 and re-base here.
@@ -957,18 +747,15 @@ var EngCalcs = EngCalcs || {};
 			if (isPrimary && le.leader) { le.leader.style.display = 'none'; }
 			return;
 		}
-		// Unaligned: exactly as before, and the transforms are CLEARED rather than left behind --
-		// a stale rotate on an element that is no longer aligned is invisible in the code and
-		// obvious on screen.
+		// Unaligned: the transform is CLEARED rather than left behind -- a stale rotate on an
+		// element that is no longer aligned is invisible in the code and obvious on screen.
 		part.text.removeAttribute('transform');
 		part.text.setAttribute('text-anchor', 'start');
-		// THE LONE LABEL'S PATH IS UNTOUCHED, and the branch is here because its two halves must
-		// agree about WHICH POINT the label belongs to. linkLabelPos() is measured from the half-way
-		// point -- it has to be, since that is where a drag offset and a collision nudge are stored
-		// -- so a label rendered at any other station would draw its leader to a place it is not.
-		// A chain therefore takes the plain default offset from its OWN station, and neither a drag
-		// nor a nudge applies to it: a dragged label is never repeated (linkLabelStations()), and a
-		// chain does not move, it obstructs (see placeStationedLabels()).
+		// The branch is here because its two halves must agree about WHICH POINT the label belongs
+		// to. linkLabelPos() is measured from the half-way point, where a drag offset and a collision
+		// nudge are stored, so a label rendered at any other station draws its leader to a place it
+		// is not. A chain therefore takes the plain default offset from its OWN station, with neither
+		// drag nor nudge: a dragged label is never repeated, and a chain does not move, it obstructs.
 		var d = defaultLabelOffset(),
 			lone = isPrimary && single,
 			mid = lone ? linkLabelMid(l) : linkLabelMid(l, along),
@@ -986,13 +773,11 @@ var EngCalcs = EngCalcs || {};
 		var single = linkLabelStations(l).length === 1,
 			stations = single ? [le.alignedAlong] : drawnLinkLabelStations(l), i;
 		ensureLabelRepeats(le, Math.max(0, stations.length - 1), id);
-		// The link's own elements take the FIRST DRAWN station, not a fixed one. With every copy
-		// pickable that costs nothing -- they are interchangeable -- and it means a chain whose
-		// first stations are off-screen still renders through the element bbox() and the popup
-		// know about, rather than parking it somewhere nobody is looking.
-		// For n = 1 the station is le.alignedAlong, which is what the aligned SEARCH settled on
-		// (undefined until it has run, which falls back to the half-way default): a lone label may
-		// slide to dodge a neighbour, a chain may not, since even spacing IS the reading.
+		// The link's own elements take the FIRST DRAWN station, not a fixed one: with every copy
+		// pickable they are interchangeable, and a chain whose first stations are off-screen still
+		// renders through the element bbox() and the popup know about.
+		// For n = 1 the station is le.alignedAlong, what the aligned SEARCH settled on: a lone label
+		// may slide to dodge a neighbour, a chain may not, since even spacing IS the reading.
 		if (!stations.length) { setLabelAssemblyHidden(le, true); return; }
 		// The side each station settled on, decided in placeStationedLabels() where the obstacles
 		// are known and carried here by index. Undefined means "whatever the clearance rule says",
@@ -1005,11 +790,10 @@ var EngCalcs = EngCalcs || {};
 			layoutLinkLabelAt(l, le, le.repeats[i - 1], stations[i], false, false);
 		}
 	}
-	// Double-click-to-reset (Tom, 2026-07-30): clears a manually-dragged label's offset entirely
-	// (n.lx/n.ly back to undefined), so it falls back to DEFAULT_LABEL_OFFSET and the leader --
-	// which only shows past LABEL_LEADER_THRESHOLD -- disappears with it. A discrete, deliberate
-	// action like Delete/Add, so it gets its own undo snapshot (a drag itself does not -- see the
-	// comment on the 'label' drag case in applyDrag()).
+	// Double-click-to-reset: clears a manually-dragged label's offset entirely (n.lx/n.ly back to
+	// undefined), so it falls back to DEFAULT_LABEL_OFFSET and the leader -- which only shows past
+	// LABEL_LEADER_THRESHOLD -- disappears with it. A discrete, deliberate action like Delete/Add,
+	// so it gets its own undo snapshot (a drag itself does not -- see applyDrag()'s 'label' case).
 	function resetNodeLabelHome(id) {
 		var n = nodeById(id); if (!n || n.lx === undefined) { return; }
 		saveUndoSnapshot();
@@ -1024,41 +808,32 @@ var EngCalcs = EngCalcs || {};
 		layoutLinkLabel(id);
 		scheduleSolve();
 	}
-	// AUTOMATIC LABEL PLACEMENT (Task 146.01, rewritten as candidate scoring by Task 379). Each
-	// auto-placed data label proposes a set of candidate positions, every one is scored against
-	// everything already on the drawing, and the best wins. The goals, their order, the scoring and
-	// the candidate sets are in js/lpn-collide.js and dev/label-placement-goals.md; **what stays
-	// here is the GATHERING** -- turning `doc`, the element handles and the current font size into
-	// plain boxes and segments. That split is what lets the placement be tested without a browser.
+	// AUTOMATIC LABEL PLACEMENT (Task 379). Each auto-placed data label proposes candidate positions,
+	// every one is scored against everything already on the drawing, and the best wins. The goals,
+	// their order, the scoring and the candidate sets are in js/lpn-collide.js and
+	// dev/label-placement-goals.md; **what stays here is the GATHERING** -- turning `doc`, the element
+	// handles and the current font size into plain boxes and segments, which is what lets the
+	// placement be tested without a browser.
 	//
 	// A MANUALLY DRAGGED LABEL (n.lx/l.lx defined) keeps the endpoint the user gave it: its
-	// candidates lie on the RAY through that endpoint, so it can only be pushed further out along
-	// the same line, never sideways and never nearer. Tom's own rule -- *"Store the user's leader
-	// endpoint and hold it constant. If you extend it, don't overwrite it. Your extension is
-	// temporary."* The extension is the nudge, which is transient (re-derived from scratch on every
-	// pass, never written into n.lx/l.ly), so it is neither undo-tracked nor persisted.
+	// candidates lie on the RAY through that endpoint, pushed further out along the same line, never
+	// sideways and never nearer. The nudge is our transient extension -- re-derived from scratch on
+	// every pass, never written into n.lx/l.ly -- so it is neither undo-tracked nor persisted.
 	//
-	// **THE REACH IS A MULTIPLE OF THE LABEL'S OWN SIZE, NOT A PIXEL COUNT** (Tom, 2026-08-16).
-	// It was 28 screen pixels, and a 3-line label at the default text size is 50 x 38.5 px -- so the
-	// whole search disc fitted INSIDE the label and four of its seventeen candidates sat within the
-	// label's own footprint. The pass could shuffle a label but never move it clear of anything.
+	// **THE REACH IS A MULTIPLE OF THE LABEL'S OWN SIZE, NOT A PIXEL COUNT.** At 28 screen pixels a
+	// 3-line label at the default text size is 50 x 38.5 px, so the whole search disc fits INSIDE the
+	// label and four of its seventeen candidates sit within the label's own footprint.
 	//
-	// 28 px had been justified as a legibility cap, on the reasoning that a distant label cannot be
-	// associated with its element. Tom rejected that reasoning: *"There is no such thing, or lets
-	// say it's more than 5 * the label size. Leaders work. That's what they are for. This is not a
-	// thing and too many leaders is a thing. Distance miserliness is solely a function of leaders
-	// looking too busy and ugly, especially when they vary in angle."* The busy-and-ugly half is
-	// answered by the 15-degree angle grid in js/lpn-collide.js, not by keeping labels near.
+	// A short reach is NOT a legibility cap. Tom, 2026-08-16: *"Leaders work. That's what they are
+	// for. This is not a thing and too many leaders is a thing. Distance miserliness is solely a
+	// function of leaders looking too busy and ugly, especially when they vary in angle."* The
+	// busy-and-ugly half is answered by the 15-degree angle grid in js/lpn-collide.js.
 	//
-	// **MEASURED IN TEXT HEIGHTS, AND ONE NUMBER FOR THE WHOLE MAP.** Tom asked for the control in
-	// exactly those terms (*"in terms of text size per settings; text heights"*) and then ruled out
-	// a per-label reach: *"A single one is better, I think. I didn't specify per label."* Text
-	// heights make it scale with the lettering, which is what a fixed pixel count could not do.
-	//
-	// 30 text heights is about five times a typical 3-line label's diagonal (63 px at textSize 11,
-	// which is 5.7 text heights), so it lands where Tom put the floor: *"more than 5 * the label
-	// size."* The inner ring is a fifth of it -- roughly one label, the smallest step that can clear
-	// a neighbour. Both are adjustable live under ?debug=labels.
+	// **MEASURED IN TEXT HEIGHTS, AND ONE NUMBER FOR THE WHOLE MAP** -- not per label, so it scales
+	// with the lettering as a fixed pixel count cannot. 30 text heights is about five times a typical
+	// 3-line label's diagonal (63 px at textSize 11, which is 5.7 text heights); the inner ring is a
+	// fifth of it, roughly one label. Both adjustable live under ?debug=labels.
+
 	// **THE ANGLE STEP PER CIRCLE, INNERMOST FIRST -- and its LENGTH is how many circles there are.**
 	// Tom's rule, 2026-08-16: multiples of 45 on ring 1, of 30 on ring 2, of 15 on ring 3, which
 	// gives 4, 8 and 20 directions once the orthogonals are dropped. See js/lpn-collide.js for why
@@ -1069,15 +844,13 @@ var EngCalcs = EngCalcs || {};
 	// directions AROUND it, so the pass prefers a placement with room beside it to an equally clear
 	// one hemmed in.
 	//
-	// **0.25 IS MEASURED, AND IT IS NOT THE VALUE THAT WAS GUESSED.** dev/lpn-spike/collide-harness.js
-	// runs its over-constrained 5x5 fixture at six values of k and reports two numbers: how many
-	// placements change when one node is nudged (goal 9's stability) and how much conflict is left
-	// on the drawing. 0.25 is the joint minimum of both -- 12 changed placements of 96 chances
-	// against 20 at k = 0, and slightly less residual conflict as well. The first draft shipped 0.5
-	// on the reasoning that more smoothing is more stability; it measured 30. Past a point a
-	// smoothed field has broad flat minima, and the argmin inside one of them moves freely.
-	// The curve is not monotone (that fixture is a perfect grid, so candidates tie in numbers), which
-	// is exactly why this is a measurement and not a trend to extrapolate.
+	// **0.25 IS MEASURED.** dev/lpn-spike/collide-harness.js runs its over-constrained 5x5 fixture at
+	// six values of k and reports how many placements change when one node is nudged (goal 9's
+	// stability) and how much conflict is left. 0.25 is the joint minimum of both -- 12 changed
+	// placements of 96 chances, against 20 at k = 0 and 30 at k = 0.5. More smoothing is NOT more
+	// stability: past a point a smoothed field has broad flat minima and the argmin inside one moves
+	// freely. The curve is not monotone (the fixture is a perfect grid, so candidates tie), which is
+	// why this is a measurement and not a trend to extrapolate.
 	var LPN_NEIGHBOUR_K = 0.25;
 	// **WHICH NODE LABEL GIVES UP A CONTESTED SPOT: THE DIRECTIONS, COMPILED IN** (ROADMAP Task 397,
 	// Tom 2026-08-16; dev/label-placement-goals.md §2.2). The ORDER these are consulted in is the
@@ -1089,23 +862,19 @@ var EngCalcs = EngCalcs || {};
 	// Three different rules, and the difference between them is a fact about each QUANTITY:
 	//
 	//   'low'      demand -- a zero-demand junction's label is genuinely uninformative, not merely
-	//              mid-range, so the smallest number is the one to lose. This is why Tom wrote
-	//              "lowest" here and something else for the rest.
+	//              mid-range, so the smallest number is the one to lose.
 	//   'extreme'  pressure -- the interesting pressures are the ENDS of the network's range, so
 	//              what drops is the value nearest the middle of it. Read against fieldExtrema().
 	//   'like'     elevation and head -- both vary SMOOTHLY across a drawing, so a node sitting at
 	//              its neighbours' value is readable off theirs and is the redundant one. Read
 	//              against the neighbours' mean, which is why the local feature context has to know
-	//              the topology and not just this node (§3.3).
-	//
-	// (Elevation was drafted as 'extreme' and corrected to 'like' by Tom on 2026-08-16. The two
-	// disagree most on a flat network with one hill, which is the case the rule exists for.)
+	//              the topology and not just this node (§3.3). Elevation is 'like', NOT 'extreme';
+	//              the two disagree most on a flat network with one hill, the case the rule is for.
 	var LPN_NODE_DROP_RULE = { demand: 'low', pressure: 'extreme', elev: 'like', head: 'like' };
 	// The two directions a node label may take, as bearings, DERIVED from the resting offset rather
-	// than restated as numbers: -45 degrees is up-and-right, which is where DEFAULT_LABEL_OFFSET
-	// already puts an untouched label and which is Imhof's own first choice for a left-to-right
-	// script. The other is its mirror. Written as a function so it cannot fall out of step with the
-	// offset the renderer actually uses.
+	// than restated as numbers: -45 degrees is up-and-right, where DEFAULT_LABEL_OFFSET already puts
+	// an untouched label and Imhof's first choice for a left-to-right script. The other is its
+	// mirror. A function, so it cannot fall out of step with the offset the renderer uses.
 	function nodeLabelSideBearings() {
 		var d = DEFAULT_LABEL_OFFSET, deg = Math.atan2(d.y, d.x) * 180 / Math.PI;
 		return [deg, 180 - deg];   // preferred first: right, then left
@@ -1114,10 +883,9 @@ var EngCalcs = EngCalcs || {};
 	// ---- the local feature context (ROADMAP Task 397; dev/label-placement-goals.md §3.3) --------
 	//
 	// **ONE RECORD PER NODE, HOLDING EVERYTHING A PLACEMENT OR DROP DECISION NEEDS THAT DOES NOT
-	// DEPEND ON THE VIEW** (Tom, 2026-08-16). That sentence is the whole design and the whole
-	// justification: it is invalidated by a model edit or a solve and by NOTHING ELSE -- not a zoom,
-	// not a pan, not a frame of a drag -- so it is built once and read sixty times a second, where
-	// the quantities in it would otherwise be recomputed sixty times a second.
+	// DEPEND ON THE VIEW.** It is invalidated by a model edit or a solve and by NOTHING ELSE -- not a
+	// zoom, not a pan, not a frame of a drag -- so it is built once and read sixty times a second.
+
 	//
 	// It deliberately carries two kinds of thing, and they live together because they are invalidated
 	// together. Splitting them would be two caches with one lifetime and two chances to forget one.
@@ -1134,13 +902,11 @@ var EngCalcs = EngCalcs || {};
 	// they are a read of the network's topology, not of one node, and they are what the 'like' rules
 	// in LPN_NODE_DROP_RULE compare against.
 	//
-	// **THE LIFETIME IS A SEAM, NOT A STAMP.** The obvious design is a dirty flag bumped by every
-	// edit path; it was rejected because a flag has a dozen places that must remember to set it and
-	// exactly one symptom when one forgets -- a stale ranking, which looks like a taste problem
-	// rather than a bug. refreshLabelText() already runs on every model change, every solve and
-	// every unit switch, and is already NOT called by a zoom, a pan or a drag frame. That is
-	// precisely the required lifetime, so the context is built there and there is nothing to
-	// invalidate.
+	// **THE LIFETIME IS A SEAM, NOT A STAMP.** Not a dirty flag: a flag has a dozen places that must
+	// remember to set it and exactly one symptom when one forgets -- a stale ranking, which looks
+	// like a taste problem rather than a bug. refreshLabelText() runs on every model change, every
+	// solve and every unit switch, and NOT on a zoom, a pan or a drag frame -- precisely the required
+	// lifetime -- so the context is built there and there is nothing to invalidate.
 	var nodeContext = null;
 	// `vals` is a map of id -> rounded display value, already in the units the label prints. Returns
 	// the mean over this node's NEIGHBOURS (the far end of each incident link), or undefined where a
@@ -1182,8 +948,8 @@ var EngCalcs = EngCalcs || {};
 		}
 		return out;
 	}
-	// Build the whole context. Cheap enough to do outright -- one pass over the nodes and one over
-	// each node's own incident list -- and it is done once per model change, not once per frame.
+	// Build the whole context: one pass over the nodes and one over each node's incident list, once
+	// per model change rather than once per frame.
 	function buildNodeContext(nodeVal) {
 		var out = {}, sides = nodeLabelSideBearings(),
 			nbrElev = {}, nbrHead = {};
@@ -1195,10 +961,8 @@ var EngCalcs = EngCalcs || {};
 			var bearings = incidentBearings(n);
 			out[n.id] = {
 				bearings: bearings,
-				// The angular table Task 411's corner rejection reads (Collide.openArcs). It belongs
-				// HERE, beside the bearings it is derived from, for this record's whole reason: it
-				// is a function of the model, not of the view, so it is computed once per model
-				// change rather than once per frame.
+				// The angular table Task 411's corner rejection reads (Collide.openArcs). A function
+				// of the model, not of the view, so it is computed once per model change.
 				arcs: Collide.openArcs(bearings),
 				// An INDEX into nodeLabelSideBearings(), not a point: a point would be a world
 				// coordinate and would need recomputing at every zoom, which is the whole thing this
@@ -1214,8 +978,8 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
-	// The reader. Everything downstream comes through here, so there is exactly one place that knows
-	// whether the cache is warm -- and a caller that forgets to check cannot exist.
+	// The reader: one place knows whether the cache is warm, so a caller that forgets to check
+	// cannot exist.
 	function nodeContextFor(id) {
 		return (nodeContext && nodeContext[id]) || null;
 	}
@@ -1224,10 +988,9 @@ var EngCalcs = EngCalcs || {};
 	function nodeLabelKey(id) { return 'n:' + id; }
 	function linkLabelKey(id) { return 'l:' + id; }
 	// Every obstacle the pass must go round, as ONE structure: oriented boxes and line segments.
-	// Pipes are segments rather than boxes because the arithmetic does not survive sampling -- Net3
-	// has 119 pipes, and chopped at three screen pixels a zoomed-in drawing would produce thousands
-	// of boxes to test every candidate against. A diagonal pipe's bounding box is also mostly empty
-	// space, and boxing it would push labels away from clear ground.
+	// Pipes are SEGMENTS rather than boxes -- Net3 has 119 pipes, and chopped at three screen pixels
+	// a zoomed-in drawing produces thousands of boxes to test every candidate against. A diagonal
+	// pipe's bounding box is also mostly empty space, so boxing it pushes labels off clear ground.
 	function staticObstacles() {
 		var out = { boxes: [], segments: [] };
 		doc.nodes.forEach(function (n) {
@@ -1267,32 +1030,27 @@ var EngCalcs = EngCalcs || {};
 		});
 		return out;
 	}
-	// The stations an aligned label will try, in order, as fractions along its own pipe. Half-way
-	// first -- that is where it belongs and where it stays in an uncrowded drawing -- then
-	// progressively farther out, alternating sides so the label does not drift consistently one
-	// way along every pipe it is pushed on. Stops well short of the ends: a label sitting on top of
-	// a junction is a worse picture than two labels a little close together, and dodgeAlongPolyline
-	// clamps to 0.12/0.88 anyway.
+	// The stations an aligned label will try, as fractions along its own pipe. Half-way first, then
+	// progressively farther out, alternating sides so the label does not drift consistently one way
+	// along every pipe it is pushed on. Stops well short of the ends: a label sitting on top of a
+	// junction is a worse picture than two labels a little close together.
 	var LPN_ALIGNED_STATIONS = [0.5, 0.36, 0.64, 0.25, 0.75];
 	// A little air between neighbours, in world units scaled off the font -- boxes that merely
 	// touch still read as crowded.
 	var LPN_ALIGNED_PAD_FRAC = 0.35;
 	// **ALIGNED LABELS RESOLVE AMONG THEMSELVES BY SLIDING, NOT BY BEING PLACED.**
 	//
-	// A label bound to a pipe has one degree of freedom -- WHERE ALONG THE PIPE -- so it slides,
-	// which is what every GIS does with a road name and why the convention scales. Sideways is not
-	// available: moving perpendicular means leaving the line, and a rotated label off its own pipe
-	// is no longer saying which pipe it belongs to, which was the entire justification for dropping
-	// its leader. So it is not a participant in the candidate pass; it is an OBSTACLE that
-	// everything else goes round, committed here rather than scored there.
+	// A label bound to a pipe has one degree of freedom -- WHERE ALONG THE PIPE -- so it slides, as
+	// every GIS does with a road name. Sideways is not available: moving perpendicular means leaving
+	// the line, and a rotated label off its own pipe no longer says which pipe it belongs to, which
+	// is the entire justification for dropping its leader. So it is not a participant in the
+	// candidate pass; it is an OBSTACLE everything else goes round, committed here not scored there.
 	//
-	// LONGEST PIPE FIRST is deliberate. Whoever is placed first gets the middle, and a long pipe has
-	// the most room to give up later while still reading as "this pipe"; a short pipe has almost no
-	// usable stations, so making it choose last is making it choose from nothing. It also makes the
-	// pass STABLE -- the order does not depend on anything the user can change by clicking.
-	// Does this box have the map to itself? Oriented, since Task 379: an aligned label's box turns
-	// with its pipe, and the axis-aligned box around a diagonal one is up to 5.2x its own area, all
-	// of it ground the label does not occupy.
+	// LONGEST PIPE FIRST: whoever is placed first gets the middle, and a long pipe has the most room
+	// to give up later while still reading as "this pipe". It also makes the pass STABLE -- the
+	// order does not depend on anything the user can change by clicking.
+	// Does this box have the map to itself? Oriented, since an aligned label's box turns with its
+	// pipe and the axis-aligned box around a diagonal one is up to 5.2x its own area.
 	function boxIsClear(b, obs, pad) {
 		var grown = Collide.box(b.cx, b.cy, b.w + 2 * pad, b.h + 2 * pad, b.a);
 		return !obs.boxes.some(function (o) { return Collide.boxOverlapDepth(grown, o) > 0; });
@@ -1305,11 +1063,10 @@ var EngCalcs = EngCalcs || {};
 		var mid = linkLabelMid(l, along), d = defaultLabelOffset();
 		return Collide.boxFromRect({ x: mid.x + d.x, y: mid.y + d.y - fs * 0.85, w: w, h: h });
 	}
-	// **A REPEATED CHAIN IS IN THE SAME CATEGORY AS AN ALIGNED LABEL, AND FOR THE SAME REASON**
-	// (extended 2026-08-15 for Tom's repeat spec). Both have spent their freedom: an aligned label
-	// gave up sideways movement by lying on its pipe, and a chain gave up its station by being
-	// evenly spaced -- move one link of the chain and the regular spacing that makes it read as one
-	// repeated name is gone.
+	// **A REPEATED CHAIN IS IN THE SAME CATEGORY AS AN ALIGNED LABEL.** Both have spent their
+	// freedom: an aligned label gave up sideways movement by lying on its pipe, a chain gave up its
+	// station by being evenly spaced -- move one link of the chain and the regular spacing that makes
+	// it read as one repeated name is gone.
 	function placeStationedLabels(list, obs, fs) {
 		var pad = fs * LPN_ALIGNED_PAD_FRAC;
 		list.map(function (l) {
@@ -1317,11 +1074,11 @@ var EngCalcs = EngCalcs || {};
 		}).sort(function (a, b) { return b.len - a.len; }).forEach(function (rec) {
 			var l = rec.l, le = linkEls[l.id];
 			if (!le || le.empty) { if (le) { le.alignedAlong = undefined; } return; }
-			// The boxes are for the stations that are actually DRAWN, so the indices here line up
-			// with layoutLinkLabel()'s -- that is what lets le.stationSides carry a decision made
-			// here into the render. Whether this is a lone label or a chain is decided by the FULL
-			// station list, though: a chain whose other links are off-screen is still a chain and
-			// must not start sliding.
+			// The boxes are for the stations actually DRAWN, so the indices line up with
+			// layoutLinkLabel()'s and le.stationSides can carry a decision made here into the render.
+			// Lone-label-or-chain is decided by the FULL station list, though: a chain whose other
+			// links are off-screen is still a chain and must not start sliding.
+
 			var w = labelBoxWidth(le), h = dataLabelBoxHeight(le.lineCount),
 				full = linkLabelStations(l),
 				stations = full.length === 1 ? full : drawnLinkLabelStations(l), boxes = [],
@@ -1343,10 +1100,9 @@ var EngCalcs = EngCalcs || {};
 				boxes.push(bestBox);
 			} else {
 				// A chain's stations are fixed by the spacing rule, so there is nothing to search
-				// ALONG. What is still free is the SIDE of the pipe each link of the chain sits on
-				// (Tom: "I assume that side can still be nudged?"). Each station keeps the side the
-				// clearance rule chose unless that box is blocked and the other side is not -- so a
-				// chain can step round an obstacle without ever losing its even spacing.
+				// ALONG. What is still free is the SIDE of the pipe each link sits on: each station
+				// keeps the side the clearance rule chose unless that box is blocked and the other
+				// side is not, so a chain can step round an obstacle without losing its spacing.
 				le.alignedAlong = undefined;
 				le.stationSides = [];
 				for (i = 0; i < stations.length; i++) {
@@ -1364,52 +1120,39 @@ var EngCalcs = EngCalcs || {};
 					boxes.push(b);
 				}
 			}
-			// Committed as obstacles for everyone placed after -- including the node and Text
-			// labels the candidate pass is about to place.
-			// **STAMPED WITH THE LINK THAT OWNS IT** (Task 398). A node label that cannot fit is
-			// allowed to take a link label's ground, and this is how the repair pass tells a link
-			// label -- which it may remove -- from a node label or a symbol, which it may not.
-			// **`yields` IS THE NODE-OUTRANKS-LINK RULING, EXPRESSED WHERE THE PLACER CAN READ IT.** A
+			// Committed as obstacles for everyone placed after, including the node and Text labels
+			// the candidate pass is about to place. **STAMPED WITH THE LINK THAT OWNS IT** (Task
+			// 398), which tells a link label -- removable -- from a node label or symbol, which is
+			// not. **`yields` IS THE NODE-OUTRANKS-LINK RULING, WHERE THE PLACER CAN READ IT:** a
 			// node label offered no clear side may take one held only by link labels rather than
-			// drop -- see boxClearOf(). Without this a node vanished because a pipe label happened to
-			// be there, which is the ranking running backwards (Tom, 2026-08-17).
+			// drop (boxClearOf()), or a node vanishes because a pipe label happened to be there.
+
 			boxes.forEach(function (bx) {
 				bx.kind = 'label'; bx.linkOwner = l.id; bx.yields = true;
 				obs.boxes.push(bx);
 			});
 		});
 	}
-	// **DRAW THE BOXES THE PLACEMENT PASS IS ACTUALLY REASONING ABOUT** (Tom, 2026-08-15: *"Would it
-	// be possible for you to depict these imaginary boxes temporarily?"*). Add `?debug=boxes` to the
+	// **DRAW THE BOXES THE PLACEMENT PASS IS ACTUALLY REASONING ABOUT.** Add `?debug=boxes` to the
 	// page URL and every box goes on screen in the colour of what it is; leave it off and this
 	// function is one comparison and a return.
 	//
-	// A URL PARAMETER RATHER THAN A CHECKBOX, deliberately: a settings checkbox is a translated
-	// string in 27 files and a permanent line in a panel, for a tool that exists to review one
-	// algorithm. The address bar costs nothing and disappears on the next reload.
+	// A URL PARAMETER RATHER THAN A CHECKBOX: a settings checkbox is a translated string in 27 files
+	// and a permanent line in a panel, for a tool that exists to review one algorithm.
 	function debugBoxesOn() {
 		return typeof location !== 'undefined' && /(\?|&)debug=boxes(&|$)/.test(location.search || '');
 	}
-	// ---- ?debug=labels : a bench for the placement pass (Tom, 2026-08-16) -----------------------
+	// ---- ?debug=labels : a bench for the placement pass -----------------------------------------
 	//
-	// *"It might be good for you to give me a dev control panel for this so that I can play with
-	// radius (in terms of text size per settings; text heights), rank scores, and any other
-	// judgments that could affect this. I would like to ensure that it's really working and be able
-	// to push buttons as I test."*
+	// A URL PARAMETER AND NOT A SETTINGS SECTION, for the same reason ?debug=boxes is one.
+	// `?debug=labels` turns it on, `?debug=labels,boxes` turns both on, and neither ships to
+	// anybody who does not type it.
 	//
-	// A URL PARAMETER AND NOT A SETTINGS SECTION, for the same reason ?debug=boxes is one: a panel
-	// in Settings is a translated string in 27 files and a permanent line in a UI, for a tool whose
-	// whole purpose is to review one algorithm before its numbers are fixed. `?debug=labels` turns
-	// it on, `?debug=labels,boxes` turns both on, and neither ships to anybody who does not type it.
+	// **REACH IS SHOWN IN LABEL HEIGHTS.** Everything here is a multiple of the label's own size and
+	// nothing is absolute -- a pixel count silently changes meaning when the text size does.
 	//
-	// **REACH IS SHOWN IN LABEL HEIGHTS, WHICH IS THE UNIT TOM ASKED FOR AND THE UNIT THAT MEANS
-	// SOMETHING.** It used to be 28 SCREEN PIXELS, which turned out to be smaller than a label, so
-	// no candidate could ever clear a conflict. A pixel count also silently changes meaning when the
-	// text size does. Everything here is a multiple of the label's own size and nothing is absolute.
-	//
-	// The weights are the RANKS. Editing them is how to find out whether the order in
-	// dev/label-placement-goals.md is really the order Tom wants -- they are written straight into
-	// Collide.GOAL_WEIGHT, which is the one table the scorer reads.
+	// The weights are the RANKS, written straight into Collide.GOAL_WEIGHT, the one table the scorer
+	// reads; editing them tests whether the order in dev/label-placement-goals.md is the right one.
 	function debugOn(name) {
 		if (typeof location === 'undefined') { return false; }
 		var m = /(?:\?|&)debug=([^&]*)/.exec(location.search || '');
@@ -1432,19 +1175,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		return labelTune;
 	}
-	// **DOES THE DRAWING HOLD STILL WHEN THE USER TOUCHES THE WHEEL?** (Task 398; §5.) This is the
-	// failure mode dropping introduces and the one nothing else here watches: a label that pops in
-	// and out over a zoom step is worse than one that sits slightly tight, and it is invisible in a
-	// single screenshot. Been, Daiches & Yap's first two desiderata for interactive labelling are
-	// exactly this, and every published engine pays real attention to it.
-	//
-	// Measured rather than reasoned about: re-run the whole pass at 0.9x and 1.1x and count the
-	// labels that changed side or changed visibility. The pass is idempotent and re-derives every
-	// nudge from scratch, so running it three times and putting the scale back leaves the drawing
-	// exactly as it found it -- which is the property that makes this safe to do inside a render.
-	//
-	// The re-entrancy guard is load-bearing, not defensive: labelDebugReport() is called BY the pass,
-	// and this calls the pass.
+	// **DOES THE DRAWING HOLD STILL WHEN THE USER TOUCHES THE WHEEL?** (Task 398; §5.) A label that
+	// pops in and out over a zoom step is worse than one that sits slightly tight, and it is
+	// invisible in a single screenshot -- Been, Daiches & Yap's first two desiderata. Measured rather
+	// than reasoned about: re-run the pass at 0.9x and 1.1x and count what changed side or visibility.
+
 	var labelFlipProbing = false;
 	function labelFlipCount() {
 		return labelFlipProbe(function (f) { state.s = state.s * f; }, [0.9, 1.1],
@@ -1455,25 +1190,23 @@ var EngCalcs = EngCalcs || {};
 	// drawing scrolled sideways is the same drawing, and Been, Daiches & Yap state it as the
 	// requirement that a labelling be a function of scale ALONE.
 	//
-	// We fail it by construction today. `drawnLinkLabelStations()` culls a repeated label's stations
-	// to the current view rectangle, `placeStationedLabels()` builds obstacles from what survives,
-	// and those obstacles decide where node labels go -- and, since Task 398, whether they are
-	// dropped at all. So this readout is a correctness assertion wearing a readout's clothes: any
-	// number but 0 means a label appears or moves because the user scrolled.
+	// We fail it by construction: `drawnLinkLabelStations()` culls a repeated label's stations to the
+	// current view rectangle, `placeStationedLabels()` builds obstacles from what survives, and those
+	// obstacles decide where node labels go and whether they are dropped. So this readout is a
+	// correctness assertion: any number but 0 means a label appears or moves because the user
+	// scrolled.
 	//
-	// A whole view-width is deliberate rather than a nudge. A one-pixel pan would move the cull
-	// boundary past almost nothing; the failure this is looking for is a station leaving the view.
+	// A whole view-width, not a nudge: a one-pixel pan moves the cull boundary past almost nothing,
+	// and the failure this looks for is a station leaving the view.
 	function labelPanFlipCount() {
 		var w = (svg && svg.getBoundingClientRect) ? svg.getBoundingClientRect().width : 1000;
 		return labelFlipProbe(function (f) { state.tx = state.tx + f * w; }, [-0.5, 0.5],
 			function (s0) { state.tx = s0.tx; });
 	}
 	// The shared machinery: perturb the VIEW, re-run the pass, count what moved, put it back.
-	//
 	// **THE RE-ENTRANCY GUARD IS LOAD-BEARING, not defensive** -- labelDebugReport() is called BY the
-	// pass and this calls the pass. And the restore is what makes it safe to run inside a render: the
-	// pass is idempotent and re-derives every nudge from scratch, so three runs and a restore leave
-	// the drawing exactly as they found it.
+	// pass and this calls the pass. The restore is what makes it safe inside a render: the pass is
+	// idempotent, so three runs and a restore leave the drawing exactly as they found it.
 	function labelFlipProbe(perturb, steps, restore) {
 		if (labelFlipProbing) { return null; }
 		labelFlipProbing = true;
@@ -1505,15 +1238,13 @@ var EngCalcs = EngCalcs || {};
 	}
 	function labelDebugReport(labels, placed, obs) {
 		// The boxes the pass COMMITTED, straight off its own result -- see placeLabels(). Reading
-		// them off our obstacle list gave an empty array, because the pass works on a copy.
+		// them off our obstacle list gives an empty array, because the pass works on a copy.
 		// A DROPPED LABEL COMMITTED NO BOX, so every count below is over what was actually drawn.
 		var drawn = placed.filter(function (r) { return r.box; }),
-			// **THE PICTURE AND THE COUNTS BOTH USE THE STAIRCASE** (Task 406). A stacked label
-			// reserves one box per LINE, and drawing the block instead showed a shape the pass is no
-			// longer reasoning about -- exactly the mistake the rects-to-polygons note below warns
-			// against. Tom, 2026-08-17: *"?debug=boxes still shows one box, not a layer cake."*
-			// `r.boxes` is what the pass committed; `r.box` is the one-box fallback for a caller
-			// that supplied no per-line widths.
+			// **THE PICTURE AND THE COUNTS BOTH USE THE STAIRCASE** (Task 406): a stacked label
+			// reserves one box per LINE, and drawing the block instead shows a shape the pass is no
+			// longer reasoning about. `r.boxes` is what the pass committed; `r.box` is the one-box
+			// fallback for a caller that supplied no per-line widths.
 			lineBoxesOf = function (r) { return (r.boxes && r.boxes.length) ? r.boxes : [r.box]; },
 			lineBoxes = drawn.reduce(function (out, r) { return out.concat(lineBoxesOf(r)); }, []),
 			dropped = placed.length - drawn.length,
@@ -1535,16 +1266,11 @@ var EngCalcs = EngCalcs || {};
 		drawCollisionBoxes(lineBoxes, obs, placed.map(function (r) { return r.leader; }).filter(Boolean));
 		if (!debugOn('labels')) { return; }
 		// THE COUNTS, because "that looks better" is not a verdict.
-		//
-		// **DROPPED IS REPORTED FIRST, AND THE ORDER IS THE ARGUMENT** (Task 398). Every other number
-		// here can be improved by dropping more: a layout that hides half its labels scores a perfect
-		// zero on label-on-label and on travel. Reading them without the drop count in front would
-		// make the first-fit look like an improvement on the readout while looking worse on screen,
-		// which is precisely the trap this panel exists to avoid.
+		// **DROPPED IS REPORTED FIRST, AND THE ORDER IS THE ARGUMENT** (Task 398): every other number
+		// here can be improved by dropping more, and a layout that hides half its labels scores a
+		// perfect zero on label-on-label and on travel.
 		// **THE UNIT OF BOTH COUNTS STAYS THE LABEL, while the geometry becomes the staircase**
-		// (Task 406). Two labels conflict when any of their rows do; counting overlapping ROWS
-		// instead would change what the number means without saying so, and every reading taken
-		// before today would silently stop being comparable.
+		// (Task 406). Two labels conflict when any of their rows do.
 		function anyRowOverlaps(a, b) {
 			var A = lineBoxesOf(a), B = lineBoxesOf(b), x, y;
 			for (x = 0; x < A.length; x++) {
@@ -1588,14 +1314,11 @@ var EngCalcs = EngCalcs || {};
 		var t = labelTuning(), box = document.createElement('div');
 		box.id = 'lpn_label_bench';
 		box.className = 'd-print-none';
-		// LOWER LEFT (Tom, 2026-08-17), away from Settings and Labels, which live top-right.
-		//
-		// **THE WIDTH IS CAPPED, and that is not cosmetic.** The readout line grew long, and with
-		// nothing to stop it the panel took most of the window: a fixed box with no width sizes to
-		// its widest child, and a monospace report line has no wrap opportunities a browser will
-		// take on its own. So: a max-width, and `overflow-wrap:anywhere` on the readout, which is
-		// what breaks a long unbroken token rather than widening the box. Tom, 2026-08-17: "the box
-		// got super wide because the report line got long and it didn't wrap."
+		// LOWER LEFT, away from Settings and Labels, which live top-right.
+		// **THE WIDTH IS CAPPED, and that is not cosmetic.** A fixed box with no width sizes to its
+		// widest child, and a monospace report line has no wrap opportunities a browser will take, so
+		// an unbounded panel takes most of the window. Hence a max-width plus
+		// `overflow-wrap:anywhere` on the readout, which breaks the long token instead.
 		box.setAttribute('style', 'position:fixed;left:8px;bottom:8px;z-index:35;background:#fff;'
 			+ 'border:1px solid #333;padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px rgba(0,0,0,.3);'
 			+ 'max-height:70vh;max-width:min(26em,45vw);overflow:auto');
@@ -1638,9 +1361,8 @@ var EngCalcs = EngCalcs || {};
 		textRow('angle step per circle', function () { return t.steps; },
 			function (v) { t.steps = v; },
 			'One angular step per circle, innermost first, comma separated. How many you type is how many circles there are. 45,30,15 gives 4, 8 and 20 directions \u2014 orthogonal directions are always dropped.');
-		// LABELLED, not just named. Tom, 2026-08-16: *"Is k the coefficient on the neighbors? I may
-		// need a word or two of labeling."* It is, so the panel says so and shows the formula rather
-		// than making anyone infer it from a single letter.
+		// LABELLED, not just named: the panel says what k is and shows the formula rather than
+		// making anyone infer it from a single letter.
 		row('elbow room (k)', function () { return t.k; },
 			function (v) { t.k = v; }, 0.05,
 			'Goal 11, the coefficient on the neighbours. A spot is scored as itself PLUS k times the '
@@ -1661,11 +1383,10 @@ var EngCalcs = EngCalcs || {};
 		eq.setAttribute('style', 'margin-top:2px;opacity:.7;font-size:11px');
 		eq.textContent = 'score = spot + k \u00d7 mean(neighbours)';
 		box.appendChild(eq);
-		// THE OFF-ORTHOGONAL TOLERANCE IS THE TUNABLE TASK 411 REFUSED TO GUESS. Tom's own estimate
-		// was 30 degrees impractical, 15 maybe, 5-10 almost essential -- a range, not an answer, and
-		// the only way to close it is to look at a real map at several values. Generic over the
-		// table for the same reason the rank weights are: a knob added in lpn-collide.js appears
-		// here without this function being touched.
+		// THE OFF-ORTHOGONAL TOLERANCE IS THE TUNABLE TASK 411 REFUSED TO GUESS. Tom's estimate was
+		// 30 degrees impractical, 15 maybe, 5-10 almost essential -- a range, not an answer, closable
+		// only by looking at a real map at several values. Generic over the table, like the rank
+		// weights: a knob added in lpn-collide.js appears here untouched.
 		var at = document.createElement('div');
 		at.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
 		at.textContent = 'corner angles (degrees)';
@@ -1691,8 +1412,7 @@ var EngCalcs = EngCalcs || {};
 			btns.appendChild(b);
 		}
 		btn('re-run', function () { refreshLabelText(); });
-		// The fit room only shows itself on a fit, so the bench offers one rather than making Tom
-		// hunt for the menu item between every adjustment.
+		// The fit room only shows itself on a fit, so the bench offers one.
 		btn('zoom to fit', zoomExtent);   // by reference, exactly as the toolbar button wires it
 		btn('defaults', function () {
 			labelTune = null;
@@ -1717,9 +1437,8 @@ var EngCalcs = EngCalcs || {};
 		if (!debugBoxLayer) { return; }
 		while (debugBoxLayer.firstChild) { debugBoxLayer.removeChild(debugBoxLayer.firstChild); }
 		if (!debugBoxesOn()) { return; }
-		// POLYGONS, NOT RECTS, because the boxes turn now (Task 379). A rect could only ever draw
-		// the axis-aligned approximation -- the very thing the oriented boxes replaced -- so the
-		// picture would show a shape the pass is no longer reasoning about.
+		// POLYGONS, NOT RECTS, because the boxes turn (Task 379): a rect could only draw the
+		// axis-aligned approximation, a shape the pass is no longer reasoning about.
 		function draw(list, colour) {
 			list.forEach(function (b) {
 				el('polygon', {
@@ -1733,9 +1452,7 @@ var EngCalcs = EngCalcs || {};
 		// what it had to go round (green), and which lines are obstacles (red).
 		draw(obs.boxes.filter(function (b) { return placed.indexOf(b) < 0; }), '#0a0');
 		// The LEADERS the pass committed are drawn too. They live only on placeLabels()'s private
-		// copy of the obstacle list, so obs.segments here holds the static lines alone -- and the
-		// picture used to show every pipe as an obstacle and not one of the rules the labels were
-		// being scored against.
+		// copy of the obstacle list, so obs.segments here holds the static lines alone.
 		obs.segments.concat(leaders || []).forEach(function (seg) {
 			el('line', {
 				x1: seg.ax, y1: seg.ay, x2: seg.bx, y2: seg.by,
@@ -1751,14 +1468,12 @@ var EngCalcs = EngCalcs || {};
 	//
 	// The user's priority column gives the ORDER the criteria are consulted in. LPN_NODE_DROP_RULE
 	// gives each criterion's DIRECTION, which is not settable. A criterion counts only when its
-	// field is actually toggled on -- ranking on a number the reader cannot see would be arbitrary
-	// from their side of the screen.
+	// field is toggled on -- ranking on a number the reader cannot see would be arbitrary.
 	//
-	// Every criterion is turned into "how much would this label be missed", higher being safer, and
-	// they are combined by RANK rather than by value: the first criterion that separates two nodes
-	// decides, and the rest are never consulted. That is Tom's list read literally ("use last first
-	// if on"), and it is why this is a lexicographic key and not a weighted sum -- a sum would let a
-	// large elevation difference outvote a demand, which is not what "in this order" means.
+	// Every criterion becomes "how much would this label be missed", higher being safer, combined by
+	// RANK rather than by value: the first criterion that separates two nodes decides. Lexicographic,
+	// NOT a weighted sum -- a sum lets a large elevation difference outvote a demand, which is not
+	// what "in this order" means.
 	function nodeDropKey(n) {
 		var ctx = nodeContextFor(n.id), ls = labelSettings, out = [];
 		if (!ctx) { return [0]; }
@@ -1815,11 +1530,9 @@ var EngCalcs = EngCalcs || {};
 		}
 		// One auto-placed node label, as a first-fit participant. Its candidate ENDPOINTS are the
 		// four fixed corners TR, TL, BR, BL (Task 411), with the ones a pipe arrives through skipped
-		// by table lookup and a polar raster behind them for a node boxed in on all four. Both the
-		// corners and the table come from bearings, decided in the local feature context, so they do
-		// not move when the user zooms. `sides` is the whole candidate set; there is no ring and no
-		// home. This replaced a two-point left/right set chosen by ctx.openSide, which could only
-		// ever move a label to the OTHER side of the same horizontal line.
+		// by table lookup and a polar raster behind them for a node boxed in on all four. Both come
+		// from bearings in the local feature context, so they do not move when the user zooms.
+		// `sides` is the whole candidate set; there is no ring and no home.
 		function addNodeFirstFit(n, ne) {
 			var d = defaultLabelOffset(), ctx = nodeContextFor(n.id),
 				sides = Collide.cardinalSides({ x: n.x, y: n.y }, d,
@@ -1852,24 +1565,21 @@ var EngCalcs = EngCalcs || {};
 			// A label nobody can see is not an obstacle. Skipping it here also clears its nudge, so
 			// zooming back in restores it where it belongs rather than where it was last pushed.
 			if (linkLabelTooShort(l, le)) { le.nudge = { x: 0, y: 0 }; return; }
-			// **AN ALIGNED LABEL OR A REPEATED CHAIN DOES NOT MOVE, BUT IT IS STILL IN THE WAY**
-			// (fixed 2026-08-14, Tom: "This conflict between pipe labels could and should have been
-			// avoided"). It goes to placeStationedLabels(), which commits it as an obstacle at the
-			// placement the drawing really uses, rotated as it is really drawn. The nudge is cleared
-			// for it too: a nudge is measured from the half-way point, and a chain is not drawn
-			// there.
+			// **AN ALIGNED LABEL OR A REPEATED CHAIN DOES NOT MOVE, BUT IT IS STILL IN THE WAY.** It
+			// goes to placeStationedLabels(), which commits it as an obstacle at the placement the
+			// drawing really uses, rotated as it is really drawn. The nudge is cleared for it too: a
+			// nudge is measured from the half-way point, and a chain is not drawn there.
 			if (linkLabelAligned(l) || linkLabelStations(l).length > 1) {
 				stationed.push(l); le.nudge = { x: 0, y: 0 }; return;
 			}
 			addDataLabel(linkLabelKey(l.id), le, linkLabelMid(l), linkLabelBase(l),
 				l.lx !== undefined, le.lineCount);
 		});
-		// **LINKS PLACE FIRST, NODES SURVIVE FIRST** (Tom, 2026-08-16), and those are two different
-		// orders answering two different questions -- exactly the split ESRI Maplex draws between
-		// label priority and what is left unplaced. A link label is bound to its own pipe and has the
-		// fewest choices, so it chooses while it still can; but when something has to go, it is the
-		// link -- and it yields by SHEDDING values in shedAlignedForConflicts(), which has already run by
-	// the time this pass places anything.
+		// **LINKS PLACE FIRST, NODES SURVIVE FIRST** -- two different orders answering two different
+		// questions, exactly the split ESRI Maplex draws between label priority and what is left
+		// unplaced. A link label is bound to its pipe and has the fewest choices, so it chooses while
+		// it can; when something has to go it is the link, yielding by SHEDDING values in
+		// shedAlignedForConflicts(), which has already run by the time this pass places anything.
 		placeStationedLabels(stationed, obs, fs);
 		// The lexicographic drop key becomes an ORDINAL here, so js/lpn-collide.js sees one number
 		// and never has to know what a demand is. Ties break on id, so the order is total and stable
@@ -1879,15 +1589,11 @@ var EngCalcs = EngCalcs || {};
 			return c !== 0 ? c : (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
 		});
 		nodeLabels.forEach(function (l, i) { l.priority = i; delete l.dropKey; });
-		// **NO REPAIR PASS ANY MORE, AND ITS REMOVAL IS THE POINT.** A node label that found neither
-		// side clear used to take a blocking link label's ground and hide it WHOLE. That existed
-		// because Phase 1 shipped before Phase 2, so a link label had nothing to yield WITH. Now it
-		// does: shedAlignedForConflicts() makes the link label give up values for the node label
-		// before the placement pass ever runs, which is the graceful form of the same ruling. What
-		// was left was a second, cruder mechanism reaching the same situation by another door -- and
-		// a reader cannot tell the two apart. Tom, 2026-08-17: *"I am sometimes observing the repair
-		// happening, which is confusing."* If a node label still cannot fit once link labels have
-		// shed, it drops, which is what Phase 1 says happens.
+		// **NO REPAIR PASS: a node label never takes a blocking link label's ground and hides it
+		// WHOLE.** shedAlignedForConflicts() makes the link label give up VALUES for the node label
+		// before this pass runs, which is the graceful form of the same ruling; a repair on top is a
+		// second, cruder mechanism reaching the same situation by another door, and a reader cannot
+		// tell the two apart. If a node label still cannot fit once link labels have shed, it drops.
 		var pad = fs * LPN_ALIGNED_PAD_FRAC,
 			nodePlaced = Collide.placeLabelsFirstFit(nodeLabels, obs, { pad: pad });
 		// Every number the ring pass is steered by goes through ONE place, so ?debug=labels can
@@ -1916,15 +1622,13 @@ var EngCalcs = EngCalcs || {};
 	// idiom; every later segment in a row carries NO x, which is what makes it flow inline after
 	// its predecessor.
 	//
-	// THE EXTREMA MARK IS THE SEGMENT'S OWN text-decoration, never a separate badge, and the reason
-	// is structural rather than a matter of taste. A badge hung off the end of a number has to be
-	// POSITIONED: measure the digits (getComputedTextLength()), know which row they are on, inherit
-	// the label's transform, and be torn down and rebuilt whenever any of that moves. Every one of
-	// those was a real bug -- orphaned glyphs beside a rotated label, a badge left behind by a
-	// deleted pipe, a footprint four other things measured wrongly. A text-decoration is drawn by
-	// the text engine at the exact extent of the characters it marks, at any rotation, in any row,
-	// for free. It is unambiguous only because each value carries a PREFIX naming its quantity and
-	// the values sit on one line; on a bare number in a stack of bare numbers it was not.
+	// THE EXTREMA MARK IS THE SEGMENT'S OWN text-decoration, never a separate badge. A badge hung off
+	// the end of a number has to be POSITIONED: measure the digits, know which row they are on,
+	// inherit the label's transform, and be rebuilt whenever any of that moves -- orphaned glyphs
+	// beside a rotated label, a badge left behind by a deleted pipe, a footprint four other things
+	// measured wrongly. A text-decoration is drawn by the text engine at the exact extent of the
+	// characters it marks, at any rotation, in any row, for free. It is unambiguous only because each
+	// value carries a PREFIX naming its quantity and the values sit on one line.
 	//
 	// Set as a presentation ATTRIBUTE rather than only a class: text-decoration on a tspan is SVG
 	// 1.1, and an attribute needs no stylesheet to have loaded. The class rides along for anyone
@@ -1938,11 +1642,10 @@ var EngCalcs = EngCalcs || {};
 		while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
 		rows.forEach(function (row, i) {
 			row.forEach(function (seg, j) {
-				// **dy IN `em`, NOT IN WORLD UNITS.** An em is resolved against the element's own
-				// font-size, so line spacing follows a zoom by itself and the tspans never have to
-				// be rebuilt for one. In world units this attribute was stale the instant the scale
-				// changed, which is why every zoom used to run the whole of refreshLabelText().
-				// 1.2 is effectiveLineHeight()'s own multiple of the font size, in one place now.
+				// **dy IN `em`, NOT IN WORLD UNITS.** An em resolves against the element's own
+				// font-size, so line spacing follows a zoom by itself and the tspans never have to be
+				// rebuilt for one; in world units the attribute is stale the instant the scale
+				// changes. 1.2 is effectiveLineHeight()'s own multiple of the font size.
 				var tspan = el('tspan', j === 0 ? { x: x, dy: i === 0 ? (firstDy ? firstDy + 'em' : 0) : '1.2em' } : {}, textEl);
 				if (seg.decoration) {
 					tspan.setAttribute('text-decoration', seg.decoration === 'high' ? 'overline' : 'underline');
@@ -1952,21 +1655,17 @@ var EngCalcs = EngCalcs || {};
 			});
 		});
 	}
-	// The width every consumer of a data label's box should use. `holder` is nodeEls[id]/linkEls[id].
-	//
-	// It is now just the text, and that is the POINT of Task 333's extrema change rather than a
-	// simplification made in passing. This used to be max(text, badge reach), because the old
-	// chevron badge hung off the END of a decorated number and so stuck out past the <text>'s own
-	// bbox -- a fact four separate consumers (leader attachment, collision boxes, the label box,
-	// zoom-to-fit) each had to be taught, and each got wrong first (ROADMAP Task 298). An
-	// underline/overline is drawn INSIDE the glyph box by the text engine, so the text's bbox is
-	// the whole footprint again, by construction and for every consumer at once.
+	// The width every consumer of a data label's box should use. Just the text -- the POINT of Task
+	// 333's extrema change. A badge hanging off the END of a decorated number sticks out past the
+	// <text>'s own bbox, a fact four separate consumers had to be taught and each got wrong first
+	// (Task 298). An underline/overline is drawn INSIDE the glyph box, so the text's bbox is the
+	// whole footprint by construction.
 	function labelBoxWidth(holder) {
 		// **MEASURED ONCE PER CONTENT CHANGE, RESCALED ARITHMETICALLY EVER AFTER.** A label's width
-		// in PIXELS does not change with the zoom (Task 331), so its width in WORLD units is just
-		// that pixel figure divided by the scale -- and every getBBox() saved is a forced synchronous
-		// layout not performed. Net3 has ~220 labels; re-measuring them on every wheel notch was a
-		// quarter of a second per notch (Tom, 2026-08-15).
+		// in PIXELS does not change with the zoom (Task 331), so its width in WORLD units is that
+		// pixel figure divided by the scale, and every getBBox() saved is a forced synchronous layout
+		// not performed. Net3 has ~220 labels; re-measuring on every wheel notch cost a quarter of a
+		// second per notch.
 		if (holder.twPx) { return holder.twPx / (state.s || 1); }
 		return holder.tw || 0;
 	}
@@ -1975,9 +1674,8 @@ var EngCalcs = EngCalcs || {};
 	// row. This measures each row so the placement pass can reason about the real footprint.
 	//
 	// A ROW is a tspan carrying its own `x`, plus every tspan after it that does not -- exactly
-	// setMultilineText()'s idiom, where the absent x is what makes a segment flow inline after its
-	// predecessor. Read that structure rather than the `rows` array so the measurement can never
-	// describe a shape other than the one in the DOM.
+	// setMultilineText()'s idiom. Read that structure rather than the `rows` array so the
+	// measurement can never describe a shape other than the one in the DOM.
 	//
 	// Banked in PIXELS beside the world figure for the same reason `tw`/`twPx` are: a label's width
 	// in pixels does not change with the zoom, so re-measuring on every wheel notch is a forced
@@ -2020,15 +1718,11 @@ var EngCalcs = EngCalcs || {};
 		le.width = worldWidth;
 		le.widthPx = worldWidth * (state.s || 1);
 	}
-	// Repositions an already-built multi-line label (drag/geometry updates) without touching its
-	// content -- setMultilineText() gives each ROW's first tspan its own explicit x (needed for the
-	// multi-line stacking idiom), so moving the parent <text>'s x/y alone would leave old tspans
-	// stranded at the previous position; every row's x must move with it.
-	//
-	// ONLY the tspans that already HAVE an x are moved. Since Task 333 a row can hold several
-	// segments, and every segment after the first deliberately carries no x -- that absence is what
-	// makes it flow inline after its predecessor. Writing an x onto those would stack the whole
-	// line on top of itself at one point.
+	// Repositions an already-built multi-line label without touching its content. setMultilineText()
+	// gives each ROW's first tspan its own explicit x, so moving the parent <text>'s x/y alone leaves
+	// old tspans stranded; every row's x must move with it. ONLY the tspans that already HAVE an x
+	// are moved -- every later segment in a row carries none, which is what makes it flow inline, and
+	// writing an x onto those stacks the whole line on top of itself.
 	function repositionMultilineText(textEl, x, y) {
 		textEl.setAttribute('x', x); textEl.setAttribute('y', y);
 		var i, child;
@@ -2041,15 +1735,11 @@ var EngCalcs = EngCalcs || {};
 			if (child.nodeType === 1 && child.getAttribute('x') != null) { child.setAttribute('x', x); }
 		}
 	}
-	// Network-wide max/min of a field's values, skipping undefined (element types that don't carry
-	// it, or a solve result not yet available). Returns null when fewer than 3 defined values exist
-	// (Tom, 2026-07-30) -- with only 1 or 2 members "the max" and "the min" aren't a finding, just
-	// the two ends of a trivial set (with 1, the same value would be both at once).
+	// Network-wide max/min of a field's values, skipping undefined. null when fewer than 3 defined
+	// values exist -- with 1 or 2 members "the max" and "the min" are not a finding.
 	// DO NOT ADD A TIE RULE HERE. Suppressing the mark when many elements share an end has been
-	// proposed and reverted twice (Tom, 2026-08-15 and again 2026-08-16): it costs code and comment
-	// for a cosmetic gain, and a mark that vanishes once enough elements agree is MORE confusing to
-	// a user than a shared mark, because nothing on screen explains why it went. The rule is the
-	// plain one -- an element holding the extreme value is marked, however many others do too.
+	// proposed and reverted twice: a mark that vanishes once enough elements agree is MORE confusing
+	// than a shared mark, because nothing on screen explains why it went.
 	function fieldExtrema(values) {
 		var defined = values.filter(function (v) { return typeof v === 'number'; });
 		if (defined.length < 3) { return null; }
@@ -2074,29 +1764,19 @@ var EngCalcs = EngCalcs || {};
 	// anchor node, OR a free-floating text with anchorNode === null.
 	var doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
 
-	// The structural ID letters. These are LOOKUP KEYS into nextId and settings.idPrefixes, not the
-	// text an ID starts with -- that is settings.idPrefixes[key], which the user can change and
-	// which merely defaults to the key itself.
-	//
-	// TEXT MOVED FROM 'T' TO 'X' WHEN TANKS ARRIVED (Task 248, 2026-08-14), because EPANET's tanks
-	// are T1, T2 and a reader of the map should see that. Text was the one element that could give
-	// the letter up for free: its ID is unreachable from every screen in the app (the settings row
-	// for it was removed in Task 146 for exactly that reason), so nothing a user can see changed.
-	// An OLD document is not migrated and does not need to be -- its text elements keep their T3
-	// ids, recountNextId() counts them against the tank counter, and mintId() refuses to reissue an
-	// id that is already taken. So the worst case is a first tank numbered T4, never a collision.
-	// V is the valve (Task 248 phase 2, 2026-08-14) -- EPANET's own default letter for one, so an
-	// imported V1 keeps its name and a drawn one reads the way a modeller expects.
+	// The structural ID letters: LOOKUP KEYS into nextId and settings.idPrefixes, not the text an ID
+	// starts with -- that is settings.idPrefixes[key], which the user can change.
+	// Text is 'X', not 'T', because EPANET's tanks are T1, T2. An OLD document is not migrated -- its
+	// text elements keep their T3 ids and mintId() refuses to reissue a taken id, so the worst case
+	// is a first tank numbered T4, never a collision.
+	// V is the valve -- EPANET's own default letter, so an imported V1 keeps its name.
 	var LPN_ID_KEY = { junction: 'J', reservoir: 'R', tank: 'T', pipe: 'L', pump: 'P', valve: 'V', text: 'X' };
 	function newNextId() { return { J: 1, R: 1, T: 1, L: 1, P: 1, V: 1, X: 1 }; }
 	var nextId = newNextId();
-	// Re-derive the counters from the ids actually present. Matches against the CURRENT
-	// settings.idPrefixes, not a hardcoded single-uppercase-letter regex (Task 146 gear panel,
-	// 2026-07-30) -- a customized prefix can be any non-empty, space/quote-free string
-	// (validatePrefix()), not necessarily one letter. Known limitation, not worth guarding further:
-	// an element created under a PRIOR prefix (before the user renamed it mid-session) won't be
-	// matched here after a prefix rename, so a counter could under-count for that letter. Starting
-	// at 1 per key is already the safe floor, and mintId() below is the actual guarantee.
+	// Re-derive the counters from the ids actually present, matching against the CURRENT
+	// settings.idPrefixes, not a hardcoded single-letter regex -- a customized prefix can be any
+	// non-empty, space/quote-free string. Known limitation: an element created under a PRIOR prefix
+	// is not matched after a rename, so a counter can under-count. mintId() is the real guarantee.
 	function recountNextId() {
 		nextId = newNextId();
 		doc.nodes.concat(doc.links, doc.labels).forEach(function (x) {
@@ -2118,19 +1798,13 @@ var EngCalcs = EngCalcs || {};
 		return id;
 	}
 
-	// ---- Project / scenario container (ROADMAP Task 184, shipped by 146.08) ----
-	// A save is a PROJECT: one network (doc above) plus a list of SCENARIOS. Base is canon and has
-	// no overrides; every other scenario is nothing but a collection of overrides. Base is a row in
-	// the same array, flagged isBase -- so the (future) scenario selector has no special case, and
-	// because nothing carries a parent pointer a scenario-of-a-scenario is UNREPRESENTABLE rather
-	// than merely discouraged. That structural asymmetry is the model, not a convention.
-	// Shipped with Base as the only scenario and NO scenario UI: the container has to exist from day
-	// one so scenarios are purely additive later and there is never a second storage migration.
-	// Like settings/backdrop and unlike doc, these are not undo-snapshotted. That costs nothing
-	// today (Base's overrides are permanently empty, so nothing here can change under an undo);
-	// whether an override edit joins the undo stack is a real question for the scenario-UI build,
-	// and Task 184 already answers it "yes, one document, one undo stack" -- so expect this to move
-	// into the snapshot then, which is a one-line change while the map is still empty.
+	// ---- Project / scenario container (ROADMAP Task 184) ----
+	// A save is a PROJECT: one network (doc above) plus a list of SCENARIOS. Base is canon and has no
+	// overrides; every other scenario is nothing but a collection of overrides, and is a row in the
+	// same array flagged isBase -- so the selector has no special case, and because nothing carries a
+	// parent pointer a scenario-of-a-scenario is UNREPRESENTABLE rather than discouraged.
+	// Like settings/backdrop and unlike doc, these are not undo-snapshotted. Task 184 answers "does
+	// an override edit join the undo stack" with yes, so expect this to move into the snapshot.
 	function defaultScenarios() {
 		// name 'Base' is the shape Task 184 documents; display code should key off isBase and render
 		// its own localized word, never echo this string, so the stored data stays language-free.
@@ -2142,32 +1816,24 @@ var EngCalcs = EngCalcs || {};
 	var project = { name: '', activeScenario: 'base' };
 	// ---- GRID OR GEOGRAPHIC, DECLARED BEFORE ANYTHING IS DRAWN (ROADMAP Task 145) ---------------
 	//
-	// Tom, 2026-08-17: *"a project has to declare from the start whether it's on grid map or
-	// geographical map, just as it must declare units before drawing anything. In a way, geo is just
-	// another unit (degrees), but it's of course much more complex than that, and the map is no
-	// longer unitless."*
+	// **IT IS CHOSEN AT CREATION AND IS NOT A TOGGLE.** Every coordinate means something different
+	// under the two: a grid project's x/y are canvas units whose meaning the user declared (1 unit IS
+	// 1 ft or 1 m -- see lengthField()), a geographic project's are a position on the Earth. A
+	// project that changed its mind mid-drawing would have to reinterpret every node, vertex, label
+	// and backdrop registration at once, and there is no correct answer for what a bare x of 120
+	// becomes. Converting is a deliberate georeferencing operation. Scope: dev/geographic-projects.md.
 	//
-	// **IT IS CHOSEN AT CREATION AND IS NOT A TOGGLE.** Every coordinate in the document means
-	// something different under the two: a grid project's x/y are canvas units whose meaning the
-	// user declared (1 unit IS 1 ft or 1 m -- see lengthField()), a geographic project's are a
-	// position on the Earth. A project that changed its mind mid-drawing would have to reinterpret
-	// every node, vertex, label and backdrop registration at once, and there is no correct answer
-	// for what a bare x of 120 becomes. Converting an existing project is a deliberate,
-	// georeferencing operation, never a switch. Full scope: dev/geographic-projects.md.
-	//
-	// **THE CHOICE IS THE MENU ROW, NOT A DIALOG** -- the same ruling File > New's unit rows already
-	// follow: "make the choice the menu item... a dialog confirming it would be asking a question
-	// they just answered."
+	// **THE CHOICE IS THE MENU ROW, NOT A DIALOG** -- the ruling File > New's unit rows follow: a
+	// dialog confirming it would be asking a question they just answered.
 	//
 	// Stored as an additive key on the project, ABSENT meaning grid. Old readers ignore it and every
 	// document ever saved is a grid project, so nothing migrates and no version is owed.
 	var LPN_COORDS_GEO = 'geo';
 	function isGeoProject() { return !!project && project.coords === LPN_COORDS_GEO; }
-	// x is a LONGITUDE and y is a LATITUDE, in that order -- the order this page's x/y already run in,
-	// and the opposite of the "lat, long" a person says out loud.
-	// Six decimals is ~0.11 m at the equator and less everywhere else -- finer than any pipe is
-	// placed, and coarse enough to read. Two decimals (readonlyField()'s default) would be ~1.1 km
-	// and would show every node in a site at the same coordinate.
+	// x is a LONGITUDE and y is a LATITUDE, in that order -- this page's own x/y order, and the
+	// opposite of the "lat, long" a person says out loud.
+	// Six decimals is ~0.11 m at the equator, finer than any pipe is placed and coarse enough to
+	// read. Two decimals (readonlyField()'s default) is ~1.1 km, one coordinate for a whole site.
 	function coordText(v) { return isGeoProject() ? v.toFixed(6) : v.toFixed(2); }
 	function baseScenario() {
 		for (var i = 0; i < scenarios.length; i++) { if (scenarios[i].isBase) { return scenarios[i]; } }
@@ -2187,36 +1853,29 @@ var EngCalcs = EngCalcs || {};
 	// `active` is an ordinary boolean here and is how topology varies: a proposed loop lives in Base
 	// inactive and a scenario overrides it active. Nothing sets `active` yet -- effective() treats
 	// its absence as true.
-	// `status` is this file's existing name for the open/closed state (Task 146.07 will surface it);
-	// `length` is the escape valve for "same drawing, different length", since a drag recomputes
-	// Base's auto length for every scenario.
-	// `level` joined the node list when the scenario UI landed (Task 184): a tank's starting water
-	// level is a design variable in exactly the way a reservoir's head is, and the two sit in the
-	// same popup a row apart. Widening is the cheap direction, per the note above.
+	// `status` is this file's name for the open/closed state; `length` is the escape valve for "same
+	// drawing, different length", since a drag recomputes Base's auto length for every scenario.
+	// `level` is a design variable in exactly the way a reservoir's head is.
 	var LPN_OVERRIDABLE = {
 		node: { demand: true, emitter: true, head: true, level: true, active: true },
 		// `setting` is a VALVE's setting (Task 248 phase 2). It belongs here for the same reason
 		// demand does: "what if the pressure reducing valve is set to 50 psi" is an operating
 		// question, which is what a scenario asks, where the valve's diameter is what was built.
 		link: { diameter: true, roughness: true, k: true, status: true, length: true, setting: true, active: true },
-		// A TEXT LABEL IS A THIRD GROUP (Task 407), and it gets exactly two properties. `text` is what
-		// the note SAYS and `active` is whether it is there at all -- together they answer "this
-		// scenario has its own note" with no second mechanism, because the note lives in Base switched
-		// off and one scenario switches it on, exactly as a proposed loop does.
-		// Its POSITION, its size multiplier, its anchor node and its alignment are deliberately absent
-		// and stay Base-owned, for Task 338's reason applied to annotation: two scenarios of one
-		// network must LOOK the same or you cannot compare them, and a note that jumps around the map
-		// as the reader flips scenarios is unreadable.
+		// A TEXT LABEL IS A THIRD GROUP (Task 407) with exactly two properties: `text` is what the
+		// note SAYS and `active` whether it is there at all, which together answer "this scenario has
+		// its own note" with no second mechanism.
+		// Its POSITION, size multiplier, anchor node and alignment stay Base-owned: two scenarios of
+		// one network must LOOK the same or you cannot compare them.
+
 		label: { text: true, active: true }
 	};
 
 	// The one resolver seam. Solver, renderer, labels and popups read element properties through
-	// this, so that adding scenarios later changes only what this function finds -- not its callers.
-	// Every lookup falls through to the element today, because Base's overrides are empty.
-	// `prop` is always the PLAIN public name (the override map's documented shape, Task 184); the
-	// element itself stores the same property underscored (`el._diameter`, Task 184/146.08 step 2) so
-	// that a call site that forgets to route through effective() reads undefined immediately, rather
-	// than silently working today and breaking invisibly once a second scenario exists.
+	// this, so adding scenarios changes only what this function finds, not its callers.
+	// `prop` is always the PLAIN public name; the element stores the same property UNDERSCORED, so a
+	// call site that forgets to route through effective() reads undefined immediately rather than
+	// working today and breaking invisibly once a second scenario exists.
 	function effective(el, prop) {
 		if (!el) { return undefined; }
 		var ov = activeScenario().overrides[ovKey(el)];
@@ -2227,7 +1886,7 @@ var EngCalcs = EngCalcs || {};
 		if (prop === 'active' && el['_' + prop] === undefined) { return true; }
 		return el['_' + prop];
 	}
-	// ---- the write side (ROADMAP Task 184's scenario UI, 2026-08-14) ----
+	// ---- the write side (ROADMAP Task 184's scenario UI) ----
 	// THE MARKER IS THE KEY'S PRESENCE, and it records INTENT at edit time -- never a diff. Writing
 	// overrides[ovKey(el)][prop] says "I set this deliberately, here"; deleting it is the undo. Both hold
 	// when the value equals Base's, because a diff cannot tell "I chose this number for this
@@ -2239,11 +1898,10 @@ var EngCalcs = EngCalcs || {};
 	// node and quietly refuse every override on it.
 	//
 	// EVERY GROUP IS RECOGNISED BY SOMETHING IT HAS, never by "neither of the others" (Task 407). A
-	// Text label carries no `from`, so the old two-way test called it a node and keyed it 'n:<id>' --
-	// which is Task 324's collision verbatim, since a label X1 and a junction X1 are both legal here
-	// and a label's `active` would have switched a junction out of the solve. `_text` is the property
-	// only a label has, and every label has one: addText() and the .inp importer both write it, and
-	// migrateSaved() supplies it (as '' if need be) for every label ever saved.
+	// Text label carries no `from`, so a two-way test calls it a node and keys it 'n:<id>' -- Task
+	// 324's collision verbatim, since a label X1 and a junction X1 are both legal and a label's
+	// `active` would switch a junction out of the solve. `_text` is the property only a label has,
+	// and every label has one: addText(), the .inp importer and migrateSaved() all supply it.
 	function elGroup(el) {
 		if (!el) { return 'node'; }
 		if (el.from !== undefined) { return 'link'; }
@@ -2252,12 +1910,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	// THE OVERRIDE MAP'S KEY, and it carries the element's GROUP because an id alone does not
 	// identify an element (ROADMAP Task 324). EPANET keeps nodes and links in SEPARATE namespaces,
-	// so a junction 20 and a pipe 20 are both legal and both ordinary -- re-measured 2026-08-14 on
-	// the files in dev/epanet-models/: Net1 has 7 ids that name both a node and a link, Net2 has 35,
-	// Net3 has 72. Keyed by the bare id, a demand typed on junction 20 was read back by pipe 20:
-	// the halo Tom saw ("a remote pipe changed to orange along with the node") was the harmless
-	// half, and `active` -- which is on BOTH groups -- was the dangerous one, because switching a
-	// junction off silently dropped an unrelated pipe out of the solve.
+	// so a junction 20 and a pipe 20 are both legal and both ordinary -- measured on the files in
+	// dev/epanet-models/: Net1 has 7 ids that name both a node and a link, Net2 has 35, Net3 has 72.
+	// Keyed by the bare id, a demand typed on junction 20 is read back by pipe 20, and `active` --
+	// on BOTH groups -- silently drops an unrelated pipe out of the solve.
 	//
 	// ONE SEAM, so the format is stated once: every read, write, count, rename and purge goes
 	// through ovKey()/ovKeyFor() and none of them spells 'n:', 'l:' or 't:' itself.
@@ -2284,28 +1940,19 @@ var EngCalcs = EngCalcs || {};
 		if (!el || !isOverridable(el, prop) || inBaseScenario()) { return; }
 		var scn = activeScenario(), key = ovKey(el);
 		if (!scn.overrides[key]) { scn.overrides[key] = {}; }
-		// UNDEFINED BECOMES NULL, and the asymmetry is the point. In Base, `undefined` is a perfectly
-		// good way to say "no head typed" -- it means the same thing as the key being absent. In an
-		// override map absence means something ELSE entirely: "inherit Base". So a blank-capable
-		// field (a reservoir head cleared inside a scenario) stored as undefined said "inherit"
-		// rather than "deliberately blank" -- and worse, JSON.stringify DROPS an undefined value, so
-		// the override evaporated on the next save, undo snapshot or file write, all three of which
-		// round-trip through it.
-		//
-		// Fixed at the seam rather than at the call site, so every future blank-capable field is
-		// covered without anyone remembering: null survives JSON, and every existing consumer
-		// already handles it -- reservoirHead() tests undefined/null/'', formatPropValue() returns
-		// '', and unitNumberFieldBlank's own setter tests all three.
+		// UNDEFINED BECOMES NULL. In Base `undefined` says "no head typed"; in an override map
+		// absence means "inherit Base", so a blank-capable field stored as undefined says "inherit"
+		// rather than "deliberately blank" -- and JSON.stringify DROPS an undefined value, so the
+		// override evaporates on the next save, undo snapshot or file write. At the SEAM rather than
+		// the call site, so every future blank-capable field is covered without anyone remembering.
 		scn.overrides[key][prop] = (value === undefined) ? null : value;
 	}
 	function clearOverride(el, prop) {
 		var scn = activeScenario(), key = ovKey(el), ov = scn.overrides[key];
 		if (!ov) { return; }
 		delete ov[prop];
-		// An empty map is dropped rather than left behind: the override COUNT is a sum of key
-		// counts, and an element with an empty object still occupying the map would otherwise
-		// read to any future reader as "this element is touched here", which is exactly the claim
-		// the marker exists to make precisely.
+		// An empty map is dropped rather than left behind: an element with an empty object still in
+		// the map reads as "this element is touched here", the claim the marker exists to make.
 		if (!Object.keys(ov).length) { delete scn.overrides[key]; }
 	}
 	// THE ONE WRITE SEAM every property editor goes through. In Base it writes the element (which
@@ -2322,10 +1969,10 @@ var EngCalcs = EngCalcs || {};
 		return total;
 	}
 	// Every scenario's overrides on one element -- what a Base-side deletion is about to destroy,
-	// which is why it is counted before the confirm rather than after it.
-	// TAKES A KEY, not an id: the caller is the one that knows whether it is holding a node or a
-	// link, and an id on its own cannot say (Task 324). Passing the bare id here counted -- and
-	// purged -- whichever element of the pair the map happened to have.
+	// counted before the confirm rather than after it.
+	// TAKES A KEY, not an id: only the caller knows whether it holds a node or a link (Task 324), and
+	// a bare id counts -- and purges -- whichever of the pair the map happened to have.
+
 	function overrideCountForElement(key) {
 		var total = 0;
 		scenarios.forEach(function (s) {
@@ -2339,9 +1986,8 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// ---- the scenario selector, and its "what am I working on right now" readout ----
-	// The count is the half that makes the question answerable at a glance (Task 184), and it is
-	// only cheap to compute because a scenario IS its overrides -- there is no second document to
-	// diff against.
+	// The count is only cheap to compute because a scenario IS its overrides -- there is no second
+	// document to diff against.
 	function scenarioDisplayName(s) {
 		var pc = EngCalcs.pageConfig || {};
 		// Base's stored name is the language-free literal 'Base' (defaultScenarios()); the word on
@@ -2465,10 +2111,7 @@ var EngCalcs = EngCalcs || {};
 		openMenu(anchor, rows);
 	}
 	// THE SELECTOR AND THE READOUT ARE ONE CONTROL, in the map's bottom status strip beside the
-	// units. Task 184 asks for both -- "what am I working on right now", answered at a glance, and
-	// a way to switch -- and a readout you can click is one thing to find rather than two. It sits
-	// in the strip because that is where this page already answers continuous questions about the
-	// state of the map (units, friction method, cursor position).
+	// units -- where this page already answers continuous questions about the state of the map.
 	function wireScenarioButton() {
 		var btn = document.getElementById('lpn_scenario_btn');
 		if (!btn) { return; }
@@ -2481,10 +2124,9 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// The property list BOTH pushes share -- the Settings panel's "apply starting values to every
-	// element" and the scenario menu's "apply Base values to every scenario". Lifted out of
-	// rebuildSettingsFields() when the second one arrived, rather than copied: the two must agree
-	// about which properties exist, which elements physically carry them, and what each is called,
-	// and a second copy of that list is a second thing to keep in step.
+	// element" and the scenario menu's "apply Base values to every scenario". Shared, not copied:
+	// the two must agree about which properties exist, which elements carry them, and what each is
+	// called.
 	// `applies` is what keeps a push physical rather than blindly per-field: a reservoir has no
 	// demand, and a pump has no diameter/roughness/km, so neither is counted or touched.
 	function pushSpecList() {
@@ -2499,44 +2141,34 @@ var EngCalcs = EngCalcs || {};
 				applies: function (n) { return !isFixedHeadNode(n); }, get: function (n) { return effective(n, 'demand'); }, set: function (n, v) { n._demand = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'diameter', group: 'link', field: 'diameter', prop: 'diameter', label: pc.lpn_field_diameter || 'Diameter',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'diameter'); }, set: function (l, v) { l._diameter = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
-			// PIPE-ONLY, not merely not-a-pump (Task 248 phase 2, carried into this shared list when
-			// Task 184 lifted it out of rebuildSettingsFields): a valve is a zero-length link, so no
-			// friction formula ever reads its roughness. Offering a default for it would be a
-			// control with no effect.
+			// PIPE-ONLY, not merely not-a-pump: a valve is a zero-length link, so no friction formula
+			// ever reads its roughness, and a default for it would be a control with no effect.
 			{ key: 'roughness', group: 'link', field: 'roughness', prop: 'roughness', label: roughnessLabel(),
 				applies: function (l) { return l.type === 'pipe'; }, get: function (l) { return effective(l, 'roughness'); }, set: function (l, v) { l._roughness = v; } },   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 			{ key: 'k', group: 'link', field: 'km', prop: 'k', label: pc.lpn_field_km || 'Minor (local) loss coefficient, k',
 				applies: function (l) { return l.type !== 'pump'; }, get: function (l) { return effective(l, 'k'); }, set: function (l, v) { l._k = v; } }   // base-write: pushSpecList: the documented Base-level push, refused outside Base
 		];
 	}
-	// **THE DANGEROUS ACTION** (Task 184, and it stays -- Tom, 2026-07-30: "still needed for good
-	// UX"). Base-side, it forces the displayed properties onto every scenario, ignoring their
-	// markers. In the delta model "forcing Base's value onto a scenario" IS clearing that
-	// scenario's override: the value then follows Base, and no stale marker is left claiming an
-	// intent the user has just overruled. Writing Base's number in as a fresh override would leave
-	// every scenario permanently pinned to today's Base value, which is the opposite of what a
-	// push is for.
+	// **THE DANGEROUS ACTION** (Task 184). Base-side, it forces the displayed properties onto every
+	// scenario, ignoring their markers. In the delta model "forcing Base's value onto a scenario" IS
+	// clearing that scenario's override, so the value follows Base and no stale marker claims an
+	// intent the user has overruled. Writing Base's number in as a fresh override would pin every
+	// scenario permanently to today's Base value, the opposite of what a push is for.
 	//
 	// SCOPED BY THE DISPLAYED LABELS, the same filter the Settings push uses: the Labels panel is
-	// already a per-property checkbox list and is already on screen, so the user's own current view
-	// defines the blast radius and this needs no property picker of its own.
-	// `only` (ROADMAP Task 317, Tom 2026-08-14: "I assume that Apply Base values to all scenarios
-	// will be fine-grained; each property or element -- maybe start only with the element level")
-	// narrows the same action to ONE element. It is a parameter rather than a second function on
-	// purpose: the counting, the naming, the finger-wag and the undo snapshot are already right
-	// here, and a fork of them would drift silently -- nothing about a wrong count is visible until
-	// somebody has already lost values by trusting it.
-	// The element-scoped push is the SAFE and COMMON case ("I corrected P-12 in Base and want that
-	// one correction everywhere"), which is why it lives in the element's own popup while the
-	// all-elements version stays in the scenario menu where it is deliberately harder to reach.
+	// already a per-property checkbox list and already on screen, so the user's own current view
+	// defines the blast radius and this needs no property picker.
+	// `only` (Task 317) narrows the same action to ONE element -- a parameter rather than a second
+	// function, because the counting, the naming, the warning and the undo snapshot are already
+	// here and a fork of them drifts silently. The element-scoped push is the SAFE and COMMON case,
+	// which is why it lives in the element's own popup while the all-elements version stays in the
+	// scenario menu where it is deliberately harder to reach.
 	function pushBaseToScenarios(only) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!inBaseScenario()) { return; }
 		var key = only ? ovKey(only) : null, group = only ? elGroup(only) : null;
-		// Scoped to ONE element, the other group's properties are not merely absent -- they are
-		// nonsense. A node has no diameter, so counting one would produce a confirm naming
-		// properties this element cannot hold, and "nothing displayed" would be reported when the
-		// user is looking at three displayed labels.
+		// Scoped to ONE element, the other group's properties are nonsense: a node has no diameter,
+		// so counting one produces a confirm naming properties this element cannot hold.
 		var active = pushSpecList().filter(function (s) {
 			return s.prop && labelSettings[s.group][s.field] && (!group || s.group === group);
 		});
@@ -2547,9 +2179,8 @@ var EngCalcs = EngCalcs || {};
 		// Counted, not estimated: how many overrides would actually be discarded. Zero says so in
 		// its own words, because "nothing to push" and "pushed nothing" look identical afterwards.
 		var hits = 0, touched = 0;
-		// The one place the scope is applied, to both the count and the delete below -- they read
-		// the same list, so a confirm can never promise a different blast radius from the one that
-		// happens.
+		// The one place the scope is applied, to both the count and the delete -- so a confirm can
+		// never promise a different blast radius from the one that happens.
 		function scopedKeys(s) { return key ? (s.overrides[key] ? [key] : []) : Object.keys(s.overrides); }
 		scenarios.forEach(function (s) {
 			if (s.isBase) { return; }
@@ -2565,11 +2196,8 @@ var EngCalcs = EngCalcs || {};
 			if (any) { touched++; }
 		});
 		if (!hits) { alert(pc.lpn_scenario_push_none || 'No scenario has its own value for any of these properties, so nothing would change.'); return; }
-		// NAMES the properties as well as counting them, exactly as the Settings push does -- a
-		// bare count leaves the user guessing which properties, and this action is not one to guess at.
-		// NAMES THE ELEMENT when the push is scoped to one, reusing lpn_field_id ("ID") rather than
-		// minting a key: it is a whole label meaning exactly this, which is the reuse rule, and a
-		// scoped confirm that did not say WHICH element would be the one thing worth saying missing.
+		// NAMES the properties as well as counting them, and NAMES THE ELEMENT when scoped to one --
+		// reusing lpn_field_id ("ID") rather than minting a key, per the whole-label reuse rule.
 		var msg = (pc.lpn_scenario_push_confirm || 'Make every scenario use the Base values for these properties? Values those scenarios hold of their own are discarded. You can undo this.')
 			+ (only ? '\n\n' + (pc.lpn_field_id || 'ID') + ': ' + only.id : '')
 			+ '\n\n' + (pc.lpn_push_properties || 'Properties:') + ' ' + active.map(function (s) { return s.label; }).join(', ')
@@ -2587,167 +2215,123 @@ var EngCalcs = EngCalcs || {};
 		applyScenarioChange();
 	}
 
-	// Map label toggles (Task 146 Phase 2) -- a VIEW preference, not network content, so it is
-	// deliberately NOT part of the undo-snapshotted `doc` and is untouched by clearNetwork()/undo().
-	// Defaults reproduce exactly what Phase 1 already showed (node ID+pressure, nothing on links),
-	// so shipping this is a visual no-op until a user opts in.
+	// Map label toggles -- a VIEW preference, not network content, so it is deliberately NOT part of
+	// the undo-snapshotted `doc` and is untouched by clearNetwork()/undo().
 	function defaultLabelSettings() {
-		// Node defaults ID/Demand/Pressure/Elevation, link defaults ID/Flow/Velocity (Tom, 2026-07-30,
-		// after using the Labels panel for the first time) -- the previous defaults (node: ID+Pressure
-		// only; link: nothing) reproduced the original hardcoded pre-panel behavior, but that was never
-		// a considered choice about what's actually useful to see on first load.
 		return {
 			node: { id: true, elev: true, demand: true, head: false, pressure: true },
-			// Every INPUT property a link carries is offered, not just the ones a result depends on
-			// (Tom, 2026-07-30: "add all input properties to the Labels choices") -- roughness and
-			// the minor-loss coefficient are typed per pipe and are exactly the numbers you want to
-			// see spread across a drawing when checking someone's model. Off by default, like the
-			// other inputs: turning every one on by default would bury the results.
+			// Every INPUT property a link carries is offered, not just the ones a result depends on:
+			// roughness and the minor-loss coefficient are typed per pipe and are exactly the numbers
+			// you want spread across a drawing when checking someone's model. Off by default --
+			// turning every one on would bury the results.
+
 			link: { id: true, diameter: false, length: false, roughness: false, km: false, flow: true, velocity: true, headloss: false, gradient: false },
-			// Per-field decimal places (ROADMAP Task 189, Tom 2026-07-30). Kept in a PARALLEL map
-			// rather than turning each field's boolean into an object: the boolean maps are read on
-			// every label rebuild and merged key-by-key out of localStorage, and a shape change there
-			// would silently reinterpret every already-saved network's toggles. 2 everywhere is the
-			// single hardcoded value this replaces, so shipping it is a visual no-op. Non-numeric
-			// fields (ID) have no entry -- there is nothing to round.
-			// Three fields depart from 2 (Tom, 2026-07-30), each for a reason about the QUANTITY, not
-			// about taste:
-			//   roughness 0 -- this page is Hazen-Williams only (assembleModel() hardcodes method:'hw'),
-			//     and a C-factor is a dimensionless integer by convention: 100, 130, 140. Nobody writes
-			//     C = 130.00. REVISIT IF A FRICTION-METHOD SELECTOR IS EVER ADDED: Darcy-Weisbach's
-			//     roughness is a HEIGHT (0.00015 m), which prints as "0" at 0 decimals. See
-			//     renderLinkFields()'s own note about the same pending change.
-			//   diameter 0 -- inches and millimetres are both whole-number standards in this trade
-			//     (6 in, 150 mm); a fractional diameter is the exception, and the user can raise it.
+			// Per-field decimal places (Task 189). A PARALLEL map, not a boolean-turned-object: the
+			// boolean maps are merged key-by-key out of localStorage, and a shape change there
+			// silently reinterprets every already-saved network's toggles. Non-numeric fields (ID)
+			// have no entry. Three fields depart from the default 2, each for a reason about the
+			// QUANTITY:
+			//   roughness 0 -- this page is Hazen-Williams only (assembleModel() hardcodes method:'hw')
+			//     and a C-factor is a dimensionless integer: 100, 130, 140. REVISIT IF A
+			//     FRICTION-METHOD SELECTOR IS EVER ADDED -- Darcy-Weisbach's roughness is a HEIGHT
+			//     (0.00015 m), which prints as "0" at 0 decimals.
+			//   diameter 0 -- inches and millimetres are both whole-number standards in this trade.
 			//   gradient 4 -- the only field whose unit family offers two forms differing by 100x
-			//     (gradePercent and plain rise/run). 2 decimals is fine as a percent and useless as a
-			//     ratio, where a typical pipe gradient is 0.0043; 4 covers both.
+			//     (gradePercent and plain rise/run). 2 decimals is useless as a ratio, where a typical
+			//     pipe gradient is 0.0043; 4 covers both.
+
 			decimals: {
 				node: { demand: 2, head: 2, pressure: 2, elev: 2 },
 				link: { diameter: 0, length: 2, roughness: 0, km: 2, flow: 2, velocity: 2, headloss: 2, gradient: 4 }
 			},
-			// Per-field PREFIX and SUFFIX text (ROADMAP Task 333, Tom 2026-08-15), and the one
-			// blanket separator that sits between either of them and the number.
+			// Per-field PREFIX and SUFFIX text (Task 333), plus one blanket separator between either
+			// of them and the number.
 			//
 			// EMPTY IS NOT THE SAME AS UNSET, which is why these maps ship EMPTY rather than
-			// pre-filled with the defaults. A field with no entry here uses labelDefaultPrefix()
-			// below, which is allowed to be dynamic -- roughness prints C, n or e depending on the
-			// friction method currently selected, and a stored 'C' could not follow that. Typing an
-			// empty box stores an empty string, which is a real answer meaning "no prefix" and is
-			// honoured. So: undefined -> ask the default; '' -> print nothing.
+			// pre-filled. A field with no entry uses labelDefaultPrefix(), which is allowed to be
+			// dynamic -- roughness prints C, n or e depending on the friction method selected, and a
+			// stored 'C' could not follow that. So: undefined -> ask the default; '' -> print nothing.
 			//
-			// The separator is blanket, per Tom: "One blanket separator and individual prefixes and
-			// postfixes, of course." It goes BETWEEN VALUES on a one-line label ('Q=120 V=3.1'),
-			// which is what he asked for a day later; ', ' and ' | ' are the other two he named. A
-			// prefix's own punctuation is part of the prefix string, so the defaults carry '='.
+			// The separator is blanket and goes BETWEEN VALUES on a one-line label ('Q=120 V=3.1').
+			// A prefix's own punctuation is part of the prefix string, so the defaults carry '='.
+
 			prefix: { node: {}, link: {} },
 			suffix: { node: {}, link: {} },
 			separator: ' ',
-			// **LABEL PRIORITY -- WHICH IS NOT A WEIGHT, AND THE DISTINCTION IS THE WHOLE POINT**
-			// (ROADMAP Task 397; dev/label-placement-goals.md §2.2 and §3.1). ESRI Maplex keeps three
-			// numbers apart and we used to have only one of them: LABEL PRIORITY is the order labels
+			// **LABEL PRIORITY -- WHICH IS NOT A WEIGHT** (Task 397; dev/label-placement-goals.md
+			// §2.2, §3.1). ESRI Maplex keeps three numbers apart: LABEL PRIORITY is the order labels
 			// are ATTEMPTED in, LABEL WEIGHT is how much a placed label resists being pushed out, and
 			// FEATURE WEIGHT is how much a map feature resists being COVERED. Collide.GOAL_WEIGHT is a
-			// feature-weight table and only that. This is the missing first number. Do not merge them.
+			// feature-weight table and only that. This is the first number. Do not merge them.
 			//
 			// **ONE COLUMN, TWO AXES, ON PURPOSE.** Both read "lower means this field matters more",
 			// but a LINK number orders ROWS INSIDE one label (a label that will not fit sheds from the
 			// end) while a NODE number orders LABELS AGAINST EACH OTHER (which whole label gives up a
-			// contested spot). They share a control because they share that one sentence; they are
-			// different quantities and §2.2's table is where that is written down.
+			// contested spot).
 			//
-			// **THE ORDER IS THE USER'S. THE DIRECTION IS NOT.** Tom's own list says LOWEST for
-			// demand, LEAST EXTREME for pressure, and MOST LIKE THE NEIGHBOURS for elevation and head
-			// -- because there is only one direction a cartographer would ever ask for in each row. A
-			// per-row max/min/least-extreme picker was considered and declined (2026-08-16): four
-			// controls per row that a user must reason through to arrive back at the only sensible
-			// setting. LPN_NODE_DROP_RULE below is that compiled table.
+			// **THE ORDER IS THE USER'S. THE DIRECTION IS NOT** -- LPN_NODE_DROP_RULE is that compiled
+			// table. A per-row max/min/least-extreme picker was declined: four controls per row that a
+			// user must reason through to arrive back at the only sensible setting.
 			//
 			// PARALLEL to decimals/prefix/suffix rather than nested into the boolean maps, for the
-			// reason the decimals comment above gives in full: those maps are merged key-by-key out of
-			// localStorage, and a shape change there silently reinterprets every already-saved
-			// network's toggles.
+			// reason the decimals comment gives.
 			//
-			// Link order is Tom's, 2026-08-16: flow, velocity, headloss, gradient, diameter, length,
-			// roughness -- so the flow survives longest. `length` sits with the other inputs, before
-			// roughness, on his ruling the same day.
-			//
-			// **`id` IS RANK 9 AND SHEDS FIRST, WHICH REVERSES THE FIRST DRAFT.** It shipped at rank
-			// 0, never-shed, on the Maplex reasoning that an ID is the key by which every other
-			// number on the label is attributed. Tom asked the right question -- *"What does priority
-			// 0 mean for ID? Did we forget it? Make it 9 (first to drop)?"* -- and he is right for a
-			// reason specific to LINK labels: a link label lies ALONG its own pipe, so the drawing
-			// already says which pipe the numbers belong to. The ID is the one value on that label
-			// whose job the label's own position is already doing. (This is the argument that does
-			// NOT carry to node labels, which is why no node ID rank exists at all.) One number to
-			// change back if it reads wrong on a real drawing.
+			// Link order puts the flow first so it survives longest. **`id` IS RANK 9 AND SHEDS
+			// FIRST**, not rank 0 never-shed: a link label lies ALONG its own pipe, so the drawing
+			// already says which pipe the numbers belong to and the ID is the one value whose job the
+			// label's own position is doing. That argument does NOT carry to node labels, which is why
+			// no node ID rank exists.
 			priority: {
 				node: { demand: 1, pressure: 2, elev: 3, head: 4 },
 				link: { flow: 1, velocity: 2, headloss: 3, gradient: 4,
 					diameter: 5, length: 6, roughness: 7, km: 8, id: 9 }
 			},
 			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
-			// Global, not per field: the mark answers one network-wide question per field, and Tom
-			// described it as a single toggle. Lives here with its siblings and NOT in `settings`
-			// because a label mark is a property of a label -- and, like the rest of labelSettings,
-			// is a view preference deliberately kept out of the undo-snapshotted `doc`.
+			// Global, not per field. Here rather than in `settings` because a label mark is a property
+			// of a label -- and, like the rest of labelSettings, a view preference kept out of `doc`.
 			markExtrema: true
 		};
 	}
 	var labelSettings = defaultLabelSettings();
 
-	// Gear/settings panel (Task 146 Phase 2, 2026-07-30) -- like labelSettings, a VIEW/preference
-	// object, not network content: persisted to localStorage as a sibling key, deliberately NOT part
-	// of the undo-snapshotted `doc`, and untouched by clearNetwork() ("New" clears the network, not
-	// your preferences). Every default below reproduces EXACTLY the fixed behavior that shipped
-	// before this panel existed, so adding it is a visual/behavioral no-op until a user opens it.
+	// Gear/settings panel -- like labelSettings, a VIEW/preference object, not network content:
+	// persisted to localStorage as a sibling key, deliberately NOT part of the undo-snapshotted
+	// `doc`, and untouched by clearNetwork() ("New" clears the network, not your preferences).
 	function defaultSettings() {
 		return {
 			// Keyed by the same structural letters nextId already uses (LPN_ID_KEY) -- changing a
 			// prefix only affects IDs generated AFTER the change; existing element IDs are never
 			// live-renamed by a settings edit.
 			idPrefixes: { J: 'J', R: 'R', T: 'T', L: 'L', P: 'P', V: 'V', X: 'X' },
-			// Matches js/lpn-solver.js's own default -- see assembleModel(). No UI edits this since
-			// 2026-07-30: nothing can create an emitter yet, so the control was a no-op (ROADMAP
-			// Task 191, and the longer note in rebuildSettingsFields()).
+			// Matches js/lpn-solver.js's own default -- see assembleModel(). No UI edits this:
+			// nothing can create an emitter yet, so the control was a no-op (Task 191).
 			emitterExponent: 0.5,
 			tolerance: 1e-9, // matches js/lpn-solver.js's own default relative-flow-change tol -- see runSolve()
 			// 'native' (js/lpn-solver.js) or 'epanet' (the real EPANET engine as WASM,
 			// js/lpn-epanet.js). The two agree to 1e-5..1e-3 m of head
 			// (dev/lpn-spike/validate_epanet.js).
 			//
-			// NATIVE IS THE DEFAULT, BUT NOT BECAUSE IT IS FASTER -- it is not. This comment used
-			// to assert that it was, on the strength of a measured 0.4 ms native solve and an
-			// UNMEASURED assumption about the other side. dev/lpn-spike/engine-bench.js measured
-			// it on 2026-08-14: EPANET's own solve is ~0.05 ms at this page's target and ~0.78 ms
-			// at 201 nodes, where ours is 0.43 ms and 36 ms. EPANET wins at every size, by more as
-			// the network grows.
+			// NATIVE IS THE DEFAULT, BUT NOT BECAUSE IT IS FASTER -- it is not.
+			// dev/lpn-spike/engine-bench.js: EPANET's own solve is ~0.05 ms at this page's target and
+			// ~0.78 ms at 201 nodes, where ours is 0.43 ms and 36 ms. EPANET wins at every size, by
+			// more as the network grows.
 			//
-			// The real and only cost of EPANET is the ONE-TIME 663 KB module load, which is a
-			// genuine cost on a slow connection and is why the default has not moved yet. See
-			// ROADMAP Task 313 -- the per-solve gap that remains is our own .inp round trip, not
-			// the engine.
+			// The real and only cost of EPANET is the ONE-TIME 663 KB module load, a genuine cost on
+			// a slow connection and why the default has not moved. See Task 313 -- the per-solve gap
+			// that remains is our own .inp round trip, not the engine.
 			engine: 'native',
-			// Default input values for NEWLY created elements (Tom, 2026-07-30). Generalizes what
-			// used to be a lone `kmDefault`: the workflow Tom described is "mostly 8-inch, 0 demand,
-			// 150 roughness, K=2, elevation 826" decided BEFORE drawing, and then switched mid-draw
-			// ("OK, now all the 8 inch pipes") -- so these are a mode the user re-enters, not a
-			// one-time setup. Same "future, not retroactive" rule as idPrefixes: changing one never
-			// touches an element that already exists.
-			// Values are null here and seeded by seedDefaultInputs() at init() instead of being
-			// written literally, because the unit-set-dependent ones go through niceDefault(), which
-			// reads the units strip out of the DOM -- and `var settings = defaultSettings()` below
-			// runs at module scope, before DOMContentLoaded, where every lookup would silently fall
-			// back to SI. Seeding after the DOM exists is what makes a US visitor's diameter default
-			// read 4 in rather than 0.1 m.
+			// Default input values for NEWLY created elements -- a mode the user re-enters mid-draw
+			// ("OK, now all the 8 inch pipes"), not a one-time setup. Same "future, not retroactive"
+			// rule as idPrefixes: changing one never touches an element that already exists.
+			// Values are null here and seeded by seedDefaultInputs() at init(), because the
+			// unit-set-dependent ones go through niceDefault(), which reads the units strip out of the
+			// DOM -- and `var settings = defaultSettings()` runs at module scope, before
+			// DOMContentLoaded, where every lookup would silently fall back to SI.
 			// NO reservoir head default, deliberately: reservoirHead() treats a blank head as "same
-			// as the elevation" and keeps the two linked as the reservoir moves. Writing this same
+			// as the elevation" and keeps the two linked as the reservoir moves. Writing the same
 			// number into head would look identical on screen while silently severing that link.
-			// nodeElev covers junctions AND reservoirs (Tom, 2026-07-30). Note this drops the old
-			// asymmetry where a new reservoir sat 100 ft above a new junction: a from-scratch
-			// reservoir now has no head until the user gives it one, which is the same "squash the
-			// secrets" call already made for the pump curve in addLink() -- no invisible driving
-			// head the user never entered. Change this one number if that trade reads wrong.
+			// nodeElev covers junctions AND reservoirs: a from-scratch reservoir has no head until
+			// the user gives it one -- no invisible driving head nobody entered.
 			defaults: { nodeElev: null, demand: null, diameter: null, roughness: null, k: null,
 				// Tank geometry (Task 248). Null here and filled by seedDefaultInputs(), same as
 				// every other row -- which is also what migrates a document saved before tanks
@@ -2757,34 +2341,25 @@ var EngCalcs = EngCalcs || {};
 			// who lives in Default inputs is not re-opening it every session. Default inputs starts
 			// OPEN because it is the mode-switching section above; the other two are set-once.
 			sectionsOpen: { idPrefixes: false, defaults: true, mapDisplay: false, colors: false, computation: false, files: false },
-			// Map units -- the same units the drawing is in, so this number scales with the map and
-			// means 20 ft or 20 m according to the Length/Map declaration (Tom, 2026-08-09: map
-			// coordinates "follow length and elevation"; it is a size on the drawing, not a font
-			// point size). 20 replaces the original 2.5, which was the old fixed LABEL_FONT_SIZE
-			// constant carried over unexamined: 2.5 suits a drawing a few dozen units across, and
-			// nobody draws a water system at that size -- at the scale real work arrives in it
-			// renders as a hairline.
-			// THIS ONLY REACHES A FIRST-TIME VISITOR. loadFromStorage() merges a saved settings
-			// object ON TOP of these defaults, so anyone who used the page before this changed
-			// keeps their stored 2.5 forever. That is why drawExampleNetwork() also sets 20
-			// explicitly -- raising the default alone left Tom looking at the old size.
-			// SCREEN PIXELS since Task 331 (2026-08-14) -- see effectiveFontSize() above for why
-			// map units went away entirely. 11 px is a legible small label at any zoom, and unlike
-			// the 20 map units it replaces it means the same thing on every network ever imported.
+			// SCREEN PIXELS since Task 331 -- see effectiveFontSize() for why map units went away.
+			// 11 px is a legible small label at any zoom and means the same thing on every network
+			// ever imported.
+			// A DEFAULT ONLY REACHES A FIRST-TIME VISITOR: loadFromStorage() merges a saved settings
+			// object ON TOP of these, so anyone who used the page earlier keeps their stored value.
+			// That is why drawExampleNetwork() sets the size explicitly too.
 			textSize: 11,
 			// Junction dot DIAMETER in screen pixels; every other symbol is drawn against it.
 			// 7 keeps a dot readable next to 11 px lettering without swallowing it.
 			symbolSize: 7,
-			// Pipe stroke in screen pixels, independent of both (Tom: "decouple label, link, and
-			// node size"). 2 is a line that reads as a pipe rather than a hairline or a road.
+			// Pipe stroke in screen pixels, independent of both -- label, link and node size are
+			// deliberately decoupled. 2 reads as a pipe rather than a hairline or a road.
 			linkWidth: 2,
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
 			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
-			// Labels are drawn only when the visible map is at most this many LENGTH UNITS wide
-			// (Tom, 2026-08-14: "you specify zoom threshold in terms of how many units wide the map
-			// is"). null = always draw, which is the pre-Task-331 behaviour and the right default
-			// because no single number is meaningful across networks 400 ft and 40 miles wide. The
-			// settings panel captures it from the current view instead of asking anyone to guess.
+			// Labels are drawn only when the visible map is at most this many LENGTH UNITS wide.
+			// null = always draw, the right default because no single number is meaningful across
+			// networks 400 ft and 40 miles wide. The settings panel captures it from the current
+			// view instead of asking anyone to guess.
 			labelMaxWidth: null,
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
@@ -2795,33 +2370,24 @@ var EngCalcs = EngCalcs || {};
 			// ANTICLOCKWISE of straight up before the label turns 180 degrees to stay readable. Up
 			// always wins -- a near-vertical name reads bottom to top, as on every map.
 			//
-			// **"LEFT OF", NOT "PAST", AND NEVER A BARE ANGLE.** Past what, and in which direction,
-			// is the ambiguity that shipped this number mirrored: it was once stated as a CARTESIAN
-			// bearing (counter-clockwise, y up) while the renderer works in SVG's frame, where y is
-			// DOWN and the same arithmetic runs CLOCKWISE. The tolerance landed on the wrong side of
-			// vertical and every near-vertical pipe rendered reading top-to-bottom. Phrased as
-			// "degrees left of vertical" there is no frame left to get wrong, which is why the
-			// PARAMETER changed and not just its value.
-			// A project carrying the old key gets this default; the old key never survived a review.
+			// **"LEFT OF", NOT "PAST", AND NEVER A BARE ANGLE.** Stated as a CARTESIAN bearing
+			// (counter-clockwise, y up) while the renderer works in SVG's frame -- y DOWN, the same
+			// arithmetic CLOCKWISE -- the tolerance lands on the wrong side of vertical and every
+			// near-vertical pipe reads top-to-bottom. "Degrees left of vertical" leaves no frame to
+			// get wrong. A project carrying the old key gets this default.
 			labelFlipLeftOfVertical: 20,
 			// Draw the pale background patch behind every label (ROADMAP Task 330). ON, which is
 			// what the page has always done and what keeps a label legible over a backdrop image --
 			// the control exists because a clean drawing with no backdrop reads better without the
 			// patches, which is a judgement about the sheet and therefore the user's to make.
 			maskLabels: true,
-			// LAST ENTRY. `mapHeight` used to follow this one and was removed 2026-08-14 -- see
-			// LPN_MAP_MIN for why. Same shape as `fileAutosaveSeconds` below: a saved document may
-			// still carry it, and applySaved() merges onto these defaults, so it rides along unread.
 			legendPosition: 'top-right', // one of LEGEND_POSITIONS' keys below -- matches the original hardcoded CSS
 			// ---- colour by value (Task 384) ----
-			// FLAT KEYS, not one nested `colors` object, and that is load-bearing: applySaved()
-			// merges a saved settings object onto these defaults with a TOP-LEVEL Object.assign and
-			// hand-lists the three nested objects it merges a level deeper. A fourth nested object
-			// would come back from an older save missing every key added after it was written. Flat
-			// keys pick up new defaults for free.
-			// OFF by default. The base drawing is black linework on purpose (css/engcalcs.css), and
-			// colouring is a mode the user enters, never the state they are handed -- Task 327's
-			// whole argument against EPANET is that it has only the coloured mode.
+			// FLAT KEYS, not one nested `colors` object: applySaved() merges with a TOP-LEVEL
+			// Object.assign and hand-lists the three nested objects it merges a level deeper, so a
+			// fourth would come back from an older save missing every key added after it was written.
+			// OFF by default. The base drawing is black linework on purpose, and colouring is a mode
+			// the user enters, never the state they are handed.
 			colorNodeField: '',   // '' = none, else a key of COLOR_NODE_FIELDS
 			colorLinkField: '',   // '' = none, else a key of COLOR_LINK_FIELDS
 			colorRamp: 'epanet',  // a key of COLOR_RAMPS
@@ -2835,12 +2401,11 @@ var EngCalcs = EngCalcs || {};
 			// PINNED break values, keyed 'node.pressure' / 'link.velocity', each an array of up to
 			// four numbers IN THE DISPLAY UNIT. Empty/absent means automatic (equal intervals over
 			// whatever is on the map now) -- see effectiveBreaks(). A whole saved object replacing
-			// this one is correct: these are the user's numbers and a missing field simply reads as
+			// this one is correct: these are the user's numbers and a missing field reads as
 			// automatic, so it needs no per-key merge.
 			colorBreaks: {}
-			// `fileAutosaveSeconds` was removed by Task 211 along with autosave-to-file itself. A saved
-			// document may still carry one; applySaved() merges the save ONTO these defaults, so a
-			// stale key is simply carried along and never read, and needs no migration step.
+			// A save may still carry keys since removed (`fileAutosaveSeconds`, `mapHeight`).
+			// applySaved() merges the save ONTO these defaults, so a stale key rides along unread.
 		};
 	}
 	var settings = defaultSettings();
@@ -2858,44 +2423,30 @@ var EngCalcs = EngCalcs || {};
 		fill('k', 2);
 		// A TANK'S FOUR NUMBERS ARE ALL VERTICAL DISTANCES IN THE ELEVATION/HEAD UNIT, the vessel
 		// diameter included -- EPANET's own convention, and the one that catches people out, since
-		// a PIPE diameter two rows up is in inches or millimetres. Numbers chosen to describe an
-		// ordinary municipal storage tank -- roughly 15 m across and 9 m tall, sitting about
-		// two-thirds full -- so that a tank dropped on the map without being opened is a plausible
-		// design rather than a shape that has to be fixed before the network will read sensibly.
+		// a PIPE diameter two rows up is in inches or millimetres. The numbers describe an ordinary
+		// municipal storage tank, roughly 15 m across and 9 m tall, about two-thirds full.
 		fill('tankLevel', niceDefault('lpn_u_elevhead', 'fth2o', 20, 6));
 		fill('tankMinLevel', 0);
 		fill('tankMaxLevel', niceDefault('lpn_u_elevhead', 'fth2o', 30, 9));
 		fill('tankDiameter', niceDefault('lpn_u_elevhead', 'fth2o', 50, 15));
 	}
 
-	// User-supplied backdrop image (Task 146 Phase 2), ported from dev/lpn-spike/canvas-spike.html
-	// (see phase0-acceptance.md rounds 4/5/8-10 for the validated interaction design). Deliberately
-	// NOT part of `doc`/the undo-snapshotted document: saveUndoSnapshot() deep-clones doc via
-	// JSON.parse(JSON.stringify(doc)) on every discrete mutation, keeping up to 20 snapshots -- a
-	// multi-hundred-KB-to-multi-MB embedded data URI in there would multiply badly. Still persisted
-	// to localStorage as a sibling key (see saveToStorage()/loadFromStorage() below), just not
-	// undo-tracked.
+	// User-supplied backdrop image. Deliberately NOT part of `doc`/the undo-snapshotted document:
+	// saveUndoSnapshot() deep-clones doc via JSON.parse(JSON.stringify(doc)) on every discrete
+	// mutation and keeps up to 20 snapshots -- a multi-hundred-KB-to-multi-MB embedded data URI in
+	// there would multiply badly. Still persisted to localStorage as a sibling key.
 	var backdrop = null; // { href, iw, ih, x, y, width, height, tx, ty, s } | null
 	// Set by applySaved() when the document just read was written before Task 263 (v2, SI numbers);
 	// consumed once by offerUnitRestore() at the tail of refreshAllFromDocument().
 	var pendingV2Restore = false;
 
-	// THERE ARE NO PER-FIELD LABEL COLOURS ANY MORE (ROADMAP Task 333, Tom 2026-08-15: "No more
-	// label colors"). Every data label draws in the map's one text colour and says which quantity
-	// it is with a PREFIX instead (labelPrefixFor() below).
+	// THERE ARE NO PER-FIELD LABEL COLOURS (Task 333). Every data label draws in the map's one text
+	// colour and says which quantity it is with a PREFIX instead (labelPrefixFor()). Colour is a
+	// budget, saved for MEANING (Task 327's colour-by-value view), not spent on identity; a prefix
+	// also survives greyscale, a printed sheet and a colour-blind reader.
 	//
-	// The trade is the same one that turned pumps and reservoirs black: colour is a budget, and it
-	// is being saved for MEANING (Task 327's colour-by-value view), not spent on identity. A prefix
-	// also survives greyscale, a printed sheet and a colour-blind reader -- none of which the old
-	// colour key did, and the key itself was only ever readable beside the legend, so a number on a
-	// map handed to someone else was unattributed either way.
-	//
-	// What used to be encoded in the palette and now has to live somewhere else:
-	//   - demand and flow shared one colour because both are a flow rate, Q. They now share the
-	//     PREFIX 'Q' by default, which says it out loud instead of asking the reader to match hues.
-	//   - There is still no separate head-GAIN field (Tom, 2026-07-30: "I don't think we need a
-	//     separate Head Gain. Negative head loss is fine."): a pump reports a negative head loss,
-	//     under the same label, prefix and extrema bucket as every other link.
+	// There is no separate head-GAIN field: a pump reports a negative head loss, under the same
+	// label, prefix and extrema bucket as every other link.
 
 	function el(tag, attrs, parent) {
 		var e = document.createElementNS(NS, tag), k;
@@ -2903,19 +2454,13 @@ var EngCalcs = EngCalcs || {};
 		if (parent) { parent.appendChild(e); }
 		return e;
 	}
-	// GENERATED ANNOTATION, DECLARED WHERE IT IS BUILT (ROADMAP Task 334). Membership in "things
-	// we generated to be read" is a fact about WHY an element exists, which only the code creating
-	// it knows -- so it is declared here rather than remembered as a selector list in the
-	// stylesheet by someone editing an unrelated feature months later. That list is exactly how
-	// the extrema badge was missed in Task 331 and caught by Tom on screen the same day.
+	// GENERATED ANNOTATION, DECLARED WHERE IT IS BUILT (Task 334). Membership in "things we generated
+	// to be read" is a fact only the code creating the element knows, so it is declared here rather
+	// than remembered as a selector list in the stylesheet. One class, one rule.
 	//
-	// One class, one rule (`.lpn-labels-hidden .lpn-annotation` in css/engcalcs.css). Every future
-	// mark that annotates a label -- a units suffix, a warning glyph, a thematic swatch -- is
-	// covered by being built through this instead of by an edit somewhere else.
-	//
-	// NOT annotation: the network itself (nodes, pipes, pumps, valves, tanks) and the user's own
-	// Text labels, which are authored content. A Text label's own scale threshold is its size
-	// ratio, handled per label in applyLabelVisibility() (Task 340), not by this class.
+	// NOT annotation: the network itself and the user's own Text labels, which are authored content.
+	// A Text label's own scale threshold is its size ratio, handled per label in
+	// applyLabelVisibility() (Task 340).
 	function annotationEl(tag, attrs, parent) {
 		var e = el(tag, attrs, parent), cls = e.getAttribute('class');
 		e.setAttribute('class', (cls ? cls + ' ' : '') + 'lpn-annotation');
@@ -2926,17 +2471,11 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- ROADMAP Task 274: the user works in CARTESIAN coordinates (Y increases upward) ----
 	//
-	// Tom, 2026-08-10: *"EPANET uses normal cartesian coordinates, where up and right are positive.
-	// But we have the opposite like a graphic arts software. We need to fix this. Cartesian is
-	// engineering."*
-	//
 	// THE FLIP LIVES AT THE USER BOUNDARY, NOT IN THE DOCUMENT. Internally `doc` stays Y-down,
-	// because that is SVG's own coordinate system and every drawing routine in this file -- text
-	// baselines, extrema chevrons, the backdrop image, the reservoir tank, label
-	// collision boxes and leader side-flips -- is written natively against it. Flipping the world
-	// transform instead would mirror every glyph and every symbol, and each of the ~10 counter-flips
-	// that repairs fails SILENTLY and visually (one upside-down number nobody notices for a month).
-	// This way there is one negation, in one place, and it cannot mirror anything.
+	// SVG's own coordinate system, which every drawing routine in this file is written natively
+	// against. Flipping the world transform instead mirrors every glyph and every symbol, and each
+	// of the ~10 counter-flips that repairs fails SILENTLY and visually. This way there is one
+	// negation, in one place, and it cannot mirror anything.
 	//
 	// The stored FILE is Cartesian from v4 (see LPN_CARTESIAN_VERSION and flipStoredY); memory stays
 	// Y-down. So this negation is also what serialization crosses, and a backdrop world file's E
@@ -2952,16 +2491,15 @@ var EngCalcs = EngCalcs || {};
 	// has a spacing of 0.0625 and 0.125 units. A pipe's stroke is `linkWidth / scale` WORLD units,
 	// so on a map 30 units wide (scale ~47) a 3 px stroke is 0.064 world units, AT the quantum.
 	// Widening the stroke does not fix it: at 20 px the failure moves three zoom steps out and the
-	// 11 px text is then 0.079 units, so the glyphs go too. The labels rendering correctly while
-	// the line disappeared is what identified it -- the arithmetic was never wrong.
+	// 11 px text is then 0.079 units, so the glyphs go too.
 	//
 	// **SO THE DOCUMENT STORES COORDINATES LOCAL TO AN ORIGIN, AND NOTHING DOWNSTREAM EVER SEES A
 	// BIG NUMBER.** The renderer, the bbox, the collision pass, the fit and the solver all work in
-	// local units; the origin is added back at the handful of places that face OUTWARD -- the
-	// coordinate readout, the property popups' X/Y, an .inp import, and the backdrop world file.
-	// That is ~5 sites. The alternative -- subtract an offset at every coordinate WRITE and leave
-	// the document's numbers huge -- is ~25 sites and leaves the file unreadable by the same
-	// arithmetic that broke the screen.
+	// local units; the origin is added back at the ~5 places that face OUTWARD -- the coordinate
+	// readout, the property popups' X/Y, an .inp import, the backdrop world file. Subtracting an
+	// offset at every coordinate WRITE instead is ~25 sites and leaves the file unreadable by the
+	// same arithmetic that broke the screen.
+
 	//
 	// THE ORIGIN IS IN THE FILE'S OWN FRAME, WHICH IS CARTESIAN (Task 274), while memory is Y-down.
 	// So the two conversions compose in one direction each and are NOT self-inverse the way
@@ -2991,18 +2529,15 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < doc.nodes.length; i++) { if (doc.nodes[i].id === id) { return doc.nodes[i]; } }
 		return null;
 	}
-	// Snap-on-create (scope doc): "a click within N screen pixels of an existing node reuses it
-	// rather than creating a new one." The scope doc names this as the real fix for diagnostic #2
-	// ("a pipe drawn near a junction but not snapped to it" -- the dominant map-editor user error),
-	// so it belongs on node-hit-testing itself, not on Text labels. N is in SCREEN pixels, not world
-	// units, so the tap target stays a constant physical size regardless of zoom level -- a tight
-	// world-unit tolerance at 10% zoom would be visually huge, and a loose one at 500% zoom would
-	// be invisible.
+	// Snap-on-create: a click within N SCREEN pixels of an existing node reuses it rather than
+	// creating a new one -- the real fix for "a pipe drawn near a junction but not snapped to it",
+	// the dominant map-editor user error. Screen pixels, not world units, so the tap target stays a
+	// constant physical size: a tight world tolerance at 10% zoom is visually huge, a loose one at
+	// 500% zoom invisible.
 	var NODE_SNAP_PX = 14;
-	// The Text-label sibling of nearestNodeNearScreen(), added 2026-08-15 for the fat-finger rule.
-	// Measured to the label's ANCHOR POINT rather than its box, and at the same NODE_SNAP_PX: "very
-	// near where you just put something" is Tom's own framing, and an anchor distance cannot make a
-	// large title block into a no-go zone the way its bounding box would.
+	// The Text-label sibling of nearestNodeNearScreen(). Measured to the label's ANCHOR POINT rather
+	// than its box, and at the same NODE_SNAP_PX: an anchor distance cannot make a large title block
+	// into a no-go zone the way its bounding box would.
 	function nearestLabelNearScreen(clientX, clientY, pxTolerance) {
 		var w = screenToWorld(clientX, clientY), best = null, bestPx = pxTolerance, i, lb, an, px, py, dPx;
 		for (i = 0; i < doc.labels.length; i++) {
@@ -3024,31 +2559,28 @@ var EngCalcs = EngCalcs || {};
 		}
 		return best;
 	}
-	// A reservoir's effective fixed head: whatever the user typed, or -- when that field is blank --
-	// its own elevation (Tom, 2026-07-30). Blank is stored as undefined rather than as a copy of the
-	// elevation, so the two stay linked: moving the reservoir's elevation moves its water surface
-	// with it until the user takes control by typing a head. Every consumer (the solver model, the
-	// map labels, the popup) goes through this one function so "blank means elevation" is stated
-	// once instead of being re-derived at each call site.
+	// A reservoir's effective fixed head: whatever the user typed, or -- when blank -- its own
+	// elevation. Blank is stored as undefined rather than as a copy of the elevation, so the two
+	// stay linked: moving the elevation moves the water surface with it until the user takes control
+	// by typing a head. Every consumer goes through this one function.
 	function reservoirHead(n) {
 		var h = effective(n, 'head');
 		return (h === undefined || h === null || h === '') ? (n.elev || 0) : h;
 	}
 	// The water surface at ANY fixed-head node, in the Elevation/Head display unit. A tank's is
-	// derived rather than stored -- bottom elevation plus the level standing in the vessel -- which
-	// is why there is no blank-means-follow rule for it: both halves are always real numbers.
-	// Everything that draws, labels, solves or reports a fixed head goes through here, so the two
-	// types' different arithmetic is stated once (Task 248).
+	// derived -- bottom elevation plus the level standing in the vessel -- which is why there is no
+	// blank-means-follow rule for it: both halves are always real numbers. Everything that draws,
+	// labels, solves or reports a fixed head goes through here (Task 248).
 	function nodeFixedHead(n) {
 		if (n.type === 'tank') { return (n.elev || 0) + (effective(n, 'level') || 0); }
 		return reservoirHead(n);
 	}
 	// **A PRESSURE IS A HEAD ABOVE A GROUND, so a node with no ground has no pressure** (Task 390).
 	// An imported reservoir is exactly that case: an `.inp` states a total head and says nothing
-	// about the elevation under it. The old answer was zero -- arrived at by treating a missing
-	// elevation as 0 -- and zero is a claim, not an absence. undefined is the same "no such value"
-	// every other unavailable reading uses (a pump has no velocity), so labels skip it, the colour
-	// ramp leaves the node black, and the popup shows nothing.
+	// about the elevation under it. NOT zero -- zero is a claim, not an absence. undefined is the
+	// same "no such value" every other unavailable reading uses (a pump has no velocity), so labels
+	// skip it, the colour ramp leaves the node black, and the popup shows nothing.
+
 	//
 	// A TANK always has one: EPANET states a tank's elevation, and its level is measured from it.
 	function fixedHeadPressure(n) {
@@ -3061,11 +2593,9 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < doc.links.length; i++) { if (doc.links[i].id === id) { return doc.links[i]; } }
 		return null;
 	}
-	// Pump curve support (Task 146, 2026-07-30). A pump's curvePoints are 1-3 [Q,H] pairs in the
-	// units on the strip; curveRef, if set, names another pump link to copy points from (one hop
-	// only -- resolveCurvePoints never chases a chain, so a ref-to-a-ref cannot create a cycle).
-	// pumpFit() below turns whichever points are in effect into the SI h0/a/b js/lpn-solver.js
-	// reads, and stores nothing.
+	// A pump's curvePoints are 1-3 [Q,H] pairs in the units on the strip; curveRef, if set, names
+	// another pump link to copy points from (one hop only -- this never chases a chain, so a
+	// ref-to-a-ref cannot create a cycle).
 	function resolveCurvePoints(l) {
 		var base = l;
 		if (l.curveRef) { var ref = linkById(l.curveRef); if (ref && ref.type === 'pump') { base = ref; } }
@@ -3074,18 +2604,15 @@ var EngCalcs = EngCalcs || {};
 	// A PUMP'S FITTED CURVE IS DERIVED, SO IT IS NOT STORED (ROADMAP Task 390 step 5).
 	//
 	// h0/a/b are the SI coefficients of H = h0 - a Q^b that js/lpn-solver.js reads. curvePoints are
-	// the 1-3 [Q, H] pairs the USER typed, in the flow and head units on the strip. Those are two
-	// different kinds of number -- one we computed and one the user supplied -- and they used to sit
-	// side by side on the same link.
+	// the 1-3 [Q, H] pairs the USER typed, in the flow and head units on the strip -- one number we
+	// computed and one the user supplied, which must never sit side by side on the same link.
+	// Storing both needs a REPAIR MECHANISM: every unit switch has to re-run the fit across the
+	// document, because the same three points mean a different pump under l/s than under gpm, and a
+	// stored triple nobody refreshed describes a pump the user never entered.
 	//
-	// That had the symptom this whole task is about: a REPAIR MECHANISM. Every unit switch had to
-	// re-run the fit across the document, because the same three points mean a different pump under
-	// l/s than under gpm, and a stored triple that nobody refreshed described a pump the user had
-	// never entered. The repair was correct and worked; needing one at all was the defect.
-	//
-	// Derived here, at the solver handoff, there is nothing to keep in step, nothing to migrate, and
-	// no field on a link that anything but the user writes. The cost is one three-point curve fit
-	// per pump per solve, at this suite's target scale of ~10-20 nodes.
+	// Derived at the solver handoff there is nothing to keep in step, nothing to migrate, and no
+	// field on a link that anything but the user writes. The cost is one three-point curve fit per
+	// pump per solve, at this suite's target scale of ~10-20 nodes.
 	function pumpFit(l) {
 		var pts = resolveCurvePoints(l);
 		if (pts.length === 0) {
@@ -3101,11 +2628,9 @@ var EngCalcs = EngCalcs || {};
 			return [toSI(pt[0], 'lpn_u_flow'), toSI(pt[1], 'lpn_u_elevhead')];
 		}));
 	}
-	// A pre-Task-390 document carries h0/a/b written into its links. They are read by nothing now,
-	// and leaving them would leave a stale copy of a derived value sitting beside the points it was
-	// derived from -- the exact arrangement this step removed. Dropped on load rather than in a
-	// versioned migration step, because it changes no number the user can see and therefore has
-	// nothing to ask about.
+	// A pre-Task-390 document carries h0/a/b written into its links -- read by nothing now, and a
+	// stale copy of a derived value beside the points it came from. Dropped on load rather than in a
+	// versioned migration step, because it changes no number the user can see.
 	function dropStoredPumpFit(links) {
 		(links || []).forEach(function (l) {
 			if (l.type !== 'pump') { return; }
@@ -3115,21 +2640,15 @@ var EngCalcs = EngCalcs || {};
 	function linkPoints(l) {
 		return Geom.polylinePointsAttr(linkPointList(l));
 	}
-	// Schematic polyline distance in map/world units -- NOT a real ground length (that needs
-	// the backdrop registration's scale, which is Phase 2). Good enough as the "auto" default
-	// the CLAUDE.md/scope-doc "len is stored and overridable, never derived" rule calls for:
-	// a real number to start from rather than a blank field, with lenAuto tracking whether the
-	// user has taken control (per the Auto Length design note in the scope doc).
+	// Schematic polyline distance in map/world units -- NOT a real ground length. `len` is stored and
+	// overridable, never derived; this is only what the Auto checkbox fills it with, and lenAuto
+	// tracks whether the user has taken control.
 	// **IN A GEOGRAPHIC PROJECT THE DRAWN LENGTH IS A GEODESIC ONE** (Task 145). hypot() on degrees
 	// is not a distance: a degree of longitude is not a degree of latitude, and neither is a metre.
-	//
-	// This is still only ever an OFFER. `len` is stored and overridable, and this is what the Auto
-	// checkbox fills it with -- the user asked for the drawn length, and on a geographic project the
-	// drawn length is the one on the Earth. Nothing here writes `len` behind their back.
-	//
-	// The result crosses METRES -> the project's length unit, which is a conversion of a DERIVED
-	// value and not of a number anybody typed. Getting that wrong is the silent one: a 1200 ft pipe
-	// would come back as 366 and look like a units bug in the solver.
+	// The result crosses METRES -> the project's length unit, a conversion of a DERIVED value and not
+	// of a number anybody typed. Getting that wrong is silent: a 1200 ft pipe comes back as 366 and
+	// looks like a units bug in the solver.
+
 	function linkGeomLength(l) {
 		var pts = linkPointList(l);
 		if (!isGeoProject()) { return Geom.polylineLength(pts); }
@@ -3147,20 +2666,12 @@ var EngCalcs = EngCalcs || {};
 	// by applyLabelVisibility(); read by onZoomChanged() and bbox().
 	var dataLabelsHidden = false;
 
-	// Symbol size. SCREEN PIXELS and INDEPENDENT OF THE TEXT since 2026-08-14 (Task 331). Tom:
-	// *"decouple label, link, and node size (in pixels? EPANET is fuzzy about that and epanet-js
-	// seems to have it hard coded)"* -- and, the day before, *"I found myself wanting to control
-	// symbol size and text size independently instead of having them linked."*
-	//
-	// `settings.symbolSize` is the DIAMETER OF A JUNCTION DOT in screen pixels, which is the one
-	// dimension on this map a person can actually picture. Everything else on the drawing that has a
-	// fixed shape -- reservoir, tank, pump, valve, vertex handle, arrow chevron, node outline -- was
-	// drawn against JUNCTION_R and follows from it, so there is still exactly one number to turn.
-	//
-	// What went away is `settings.symbolScale`, the old "relative to text" multiplier. It existed
-	// because symbols inherited the text's map-vs-screen units and could not have had their own; with
-	// both in pixels that coupling buys nothing and costs the user a mental division every time they
-	// want a bigger dot. Link width is likewise its own setting now -- see linkStrokeWidth() below.
+	// Symbol size. SCREEN PIXELS and INDEPENDENT OF THE TEXT (Task 331). `settings.symbolSize` is the
+	// DIAMETER OF A JUNCTION DOT, the one dimension on this map a person can picture; everything else
+	// with a fixed shape is drawn against JUNCTION_R and follows from it, so there is exactly one
+	// number to turn. NOT a "relative to text" multiplier -- with both in pixels that costs the user
+	// a mental division every time they want a bigger dot. Link width is its own setting too.
+
 	function symbolFactor() {
 		return (settings.symbolSize / 2) / JUNCTION_R / (state.s || 1);
 	}
@@ -3171,12 +2682,8 @@ var EngCalcs = EngCalcs || {};
 	function linkStrokeWidth() {
 		return settings.linkWidth / (state.s || 1);
 	}
-	// Junction radius. 1.6 -> 0.72 earlier on 2026-08-09 ("about twice as large" next to text),
-	// then 0.9 the same day once the node became a stroke-less solid dot: with the 1-unit ring
-	// gone, 0.72 alone was too small to see, and 0.9 puts the WHOLE dot at 1.8 units -- one cap
-	// height of the 2.5-unit base font, which is the "no larger than 1 text height" Tom asked
-	// for. Total size fell 2.44 -> 1.8 even though the radius went up, because the ring was
-	// adding 0.5 all round. One-line change if he wants it nudged either way.
+	// Junction radius. 0.9 puts the WHOLE dot at 1.8 units -- one cap height of the 2.5-unit base
+	// font, which is the "no larger than 1 text height" rule for a stroke-less solid dot.
 	var JUNCTION_R = 0.9;
 	// The reservoir has its own width and height rather than being a scaled junction box: EPANET's
 	// icon is wide, not tall and square, so a uniform shrink would narrow it too.
@@ -3184,26 +2691,19 @@ var EngCalcs = EngCalcs || {};
 	// **IF THE SHARED PATH IN lib/Icons.lib.php CHANGES, REDO THE DIVISION BELOW -- DO NOT JUST
 	// SCALE THIS NUMBER BY THE REQUESTED PERCENTAGE.** This map box stretches that path with
 	// preserveAspectRatio="none", so the visible wall width is (path fraction) x (box width), and
-	// changing the path silently changes what a percentage of "this box" means. The worked example:
-	// asked for 80% of the rendered width, while the shared path had just been widened,
-	//   old wall width   = (path fraction 12/24 = 0.5) x (box width 2 x 3.3 = 6.6) = 3.3
-	//   target           = 3.3 x 0.8 = 2.64
+	// changing the path silently changes what a percentage of "this box" means. Worked example, for
+	// 80% of the rendered width after the shared path was widened:
+	//   old wall width    = (path fraction 12/24 = 0.5) x (box width 2 x 3.3 = 6.6) = 3.3
+	//   target            = 3.3 x 0.8 = 2.64
 	//   new path fraction = 18/24 = 0.75
 	//   new box width     = 2.64 / 0.75 = 3.52  ->  half-width 1.76
-	// A naive 3.3 x 0.8 would have landed 20% WIDER, not narrower. The current value is a further
-	// plain 1.76 x 0.8 = 1.408, with the path unchanged, so no division was owed that time.
-	// Half-height 1.1 is half of the original 2.2.
-	//
-	// One-line change either way (this and Icons.lib.php's path); explicitly an experiment, not a
-	// settled number -- but skip the division and the two surfaces'
-	// shared path will fight each other.
+	// A naive 3.3 x 0.8 lands 20% WIDER, not narrower.
 	var RESERVOIR_HALF_W = 1.408;
 	var RESERVOIR_HALF_H = 1.1;
-	// A TANK is the reservoir's mirror image in proportion, deliberately (Task 248): narrower than
-	// it is tall, where the reservoir is wider than it is tall. Together with the domed roof in
-	// lib/Icons.lib.php that is the second of the two cues separating the two symbols, and it is
-	// the one that still works in a thumbnail. Area is kept close to the reservoir's so neither
-	// dominates a drawing containing both. Both numbers are one-line changes.
+	// A TANK is the reservoir's mirror image in proportion (Task 248): narrower than it is tall,
+	// where the reservoir is wider than it is tall. With the domed roof in lib/Icons.lib.php that is
+	// the second of two cues separating the symbols, and the one that still works in a thumbnail.
+	// Area is kept close to the reservoir's so neither dominates a drawing containing both.
 	var TANK_HALF_W = 1.0;
 	var TANK_HALF_H = 1.45;
 	// The drawn box for a node that has an overlay symbol. Sized per TYPE, not per node -- so the
@@ -3214,21 +2714,18 @@ var EngCalcs = EngCalcs || {};
 		return { w: 2 * RESERVOIR_HALF_W * k, h: 2 * RESERVOIR_HALF_H * k };
 	}
 	// The single scalar every OTHER consumer of node geometry reads -- clear-run insets, label
-	// leader placement, hit-testing (the invisible-but-clickable circle under a reservoir
-	// symbol), staticObstacles(), the zoom-extent bbox. A reservoir is no longer visually a
-	// circle, so this is the circumscribing radius (half its LONGER side) rather than a true
-	// radius -- generous rather than tight, so none of those consumers ever clips the wide/short
-	// tank short on any one side (ROADMAP Task 146.10 and its 2026-08-09 follow-up).
+	// leader placement, hit-testing, staticObstacles(), the zoom-extent bbox. A reservoir is not
+	// visually a circle, so this is the CIRCUMSCRIBING radius (half its longer side): generous
+	// rather than tight, so no consumer clips the wide/short tank on any one side.
 	function nodeRadius(n) {
 		if (n.type === 'reservoir' || n.type === 'tank') { var s = nodeSymbolSize(n); return Math.max(s.w, s.h) / 2; }
 		return JUNCTION_R * symbolFactor();
 	}
-	// Positions/sizes a node's overlay symbol (the reservoir basin and the tank -- see
-	// buildNodeEls()). Only those two ever have one (`ne.symbol` is null for a junction, which draws
-	// as the plain circle above with no overlay), so this sizes to nodeSymbolSize() -- an independent
-	// width/height per type, not nodeRadius()'s single circumscribing scalar; see buildNodeEls() for the
-	// `preserveAspectRatio="none"` that makes the icon actually stretch to that box instead of
-	// being letterboxed inside it.
+	// Positions/sizes a node's overlay symbol -- the reservoir basin and the tank, the only two that
+	// have one (`ne.symbol` is null for a junction). Sizes to nodeSymbolSize(), an independent
+	// width/height per type, not nodeRadius()'s single circumscribing scalar; buildNodeEls() sets the
+	// `preserveAspectRatio="none"` that stretches the icon to that box instead of letterboxing it.
+
 	function positionNodeSymbol(id) {
 		var n = nodeById(id), ne = nodeEls[id];
 		if (!ne || !ne.symbol) { return; }
@@ -3245,23 +2742,19 @@ var EngCalcs = EngCalcs || {};
 		var k = symbolFactor(), op = settings.symbolOpacity;
 		svg.style.setProperty('--lpn-sym', k);
 		svg.style.setProperty('--lpn-lw', linkStrokeWidth());
-		// ONE SCREEN PIXEL, in world units. Everything else here is scaled off the symbol size,
-		// which is right for things that ARE symbols and wrong for a hairline: a leader is a rule
-		// pointing at something, not a symbol, and at the shipped 7px symbol its old width worked
-		// out at 0.49px -- a line the browser renders as a grey smudge and Tom reported as "no
-		// leaders" while looking straight at them. Turn Symbol size down to 2 and it was 0.14px.
+		// ONE SCREEN PIXEL, in world units. A leader is a rule pointing at something, not a symbol,
+		// so it must NOT scale off the symbol size: at the shipped 7px symbol that worked out at
+		// 0.49px, which the browser renders as a grey smudge, and at Symbol size 2 it was 0.14px.
 		svg.style.setProperty('--lpn-hair', 1 / (state.s || 1));
-		// Symbols only, never labels (Tom, 2026-07-30: "symbols opacity would be a
-		// very nice setting during layout") -- the point is to see the backdrop THROUGH the network
-		// while placing it against an aerial or a plan, and fading the numbers at the same time
-		// would defeat the reason you are looking at both together.
+		// Symbols only, never labels: the point is to see the backdrop THROUGH the network while
+		// placing it against an aerial or a plan, and fading the numbers at the same time defeats
+		// the reason you are looking at both together.
 		svg.style.setProperty('--lpn-opacity', (op === undefined || op === null) ? 1 : op);
-		// Backdrop fade, the other half of the same idea (Tom, 2026-07-30: "my backdrop is busy and
-		// dark… I can't see my pipes and flow arrows"). Fading the REFERENCE material rather than
-		// thickening the drawing is the standard move in every CAD and GIS tool (AutoCAD's image
-		// fade, a QGIS layer's transparency) for exactly this situation, and unlike a heavier stroke
-		// it changes nothing about the network itself -- so a drawing tuned against a busy aerial
-		// still prints and reads correctly on white.
+		// Backdrop fade, the other half of the same idea. Fading the REFERENCE material rather than
+		// thickening the drawing is the standard move in every CAD and GIS tool, and unlike a
+		// heavier stroke it changes nothing about the network -- so a drawing tuned against a busy
+		// aerial still prints and reads correctly on white.
+
 		var bop = settings.backdropOpacity;
 		svg.style.setProperty('--lpn-backdrop-opacity', (bop === undefined || bop === null) ? 1 : bop);
 		doc.nodes.forEach(function (n) {
@@ -3279,17 +2772,15 @@ var EngCalcs = EngCalcs || {};
 
 	// ---- COLOUR BY VALUE (ROADMAP Task 384, and Task 327's thematic mode) -------------------
 	//
-	// **This is preparation for extended-period simulation (Task 248), not decoration.** Tom,
-	// 2026-08-15: *"numbers in animations or at very large scale are too overwhelming or crowded.
-	// Colors become a gradient map that is intuitive to analyze or review visually."* A number per
+	// **This is preparation for extended-period simulation (Task 248), not decoration.** A number per
 	// element per timestep cannot be read as numbers; a colour can.
 	//
-	// **The base drawing spends no colour at all** (see css/engcalcs.css: every symbol went black
-	// on 2026-08-14 precisely so this could be built). So everything painted here MEANS something,
-	// and turning it off returns the map to a drawing.
+	// **The base drawing spends no colour at all** (css/engcalcs.css: every symbol is black
+	// precisely so this could be built). Everything painted here MEANS something, and turning it off
+	// returns the map to a drawing.
 	//
-	// WHAT WAS COPIED FROM EPANET, and why copying beat inventing: EPANET 2.2 is US EPA work in the
-	// public domain, and a water engineer already knows its legend. Taken outright ---
+	// COPIED FROM EPANET, because EPANET 2.2 is US EPA work in the public domain and a water
+	// engineer already knows its legend. Taken outright ---
 	//   * FOUR break boxes, five colour bands, values ascending, blanks allowed. Fewer values
 	//     simply means fewer bands; it is not an error state.
 	//   * The break values are STORED PER VARIABLE AND ARE ABSOLUTE -- a fixed number of psi, not a
@@ -3299,24 +2790,18 @@ var EngCalcs = EngCalcs || {};
 	//     now and WRITE fixed numbers into those boxes. They are how the absolute numbers get
 	//     chosen; they are not a live mode.
 	//   * The default ramp is EPANET's own blue-cyan-green-yellow-red, and it is reversible.
-	// Our one addition to that dialog: leaving every box blank means AUTOMATIC -- equal intervals
-	// over the values presently on the map, recomputed each solve. EPANET has no such state, and it
-	// exists here because a break value is in the DISPLAY unit, so no shipped default could be
-	// right under both presets (25 psi and 25 m are not the same setting). Pressing either button
-	// converts automatic into pinned absolute numbers, which is the state to be in before Task 248.
+	// Our one addition: leaving every box blank means AUTOMATIC -- equal intervals over the values
+	// presently on the map, recomputed each solve. EPANET has no such state; it exists here because
+	// a break value is in the DISPLAY unit, so no shipped default could be right under both presets
+	// (25 psi and 25 m are not the same setting). Either button converts automatic into pinned
+	// absolute numbers, which is the state to be in before Task 248.
 	//
-	// epanetjs was read and NOT copied: it is FSL-1.1-MIT (MIT only for the pre-fork Placemark
-	// code), whose field-of-use restriction is incompatible with this suite's GPL v3. The idea is
-	// free; its code is not usable here.
+	// epanetjs was read and NOT copied: FSL-1.1-MIT (MIT only for the pre-fork Placemark code),
+	// whose field-of-use restriction is incompatible with this suite's GPL v3.
 	//
-	// COLOURING IS READ-ONLY with respect to the document. Nothing below writes an element
-	// property, so setProp() is not involved -- the values come from `lastSolveResult` and from
-	// effective(), and the only writes are to settings and to inline SVG style.
-	//
-	// Values are compared in DISPLAY units against break values the user typed, which is the same
-	// rule as everywhere else on this page: a stored number is what the user typed, and switching
-	// units REINTERPRETS it rather than converting it (see toSI()'s comment). So a break of 40 is
-	// 40 psi under the US preset and 40 m under SI, exactly like every other typed number here.
+	// COLOURING IS READ-ONLY with respect to the document -- nothing below writes an element
+	// property, so setProp() is not involved. Values are compared in DISPLAY units against break
+	// values the user typed, so a break of 40 is 40 psi under the US preset and 40 m under SI.
 	var COLOR_RAMPS = {
 		// EPANET's own five map colours, in its own order. Not softened: matching what the user
 		// already reads in EPANET is worth more here than a prettier ramp.
@@ -3329,12 +2814,10 @@ var EngCalcs = EngCalcs || {};
 		gray: ['#dddddd', '#aaaaaa', '#777777', '#444444', '#000000']
 	};
 	var COLOR_BANDS = 5;   // EPANET's five bands -- four break boxes
-	// Which fields can be coloured, and the unit each is read in. Node and link lists deliberately
-	// match EPANET's own View menu (elevation/demand/head/pressure; diameter/roughness/flow/
-	// velocity/head loss) so nobody has to learn a second vocabulary. The display NAME of each is
-	// taken from nodeFieldDefs()/linkFieldDefs(), the same strings the Labels popover and the map
-	// legend already use, so a colour key and a label key can never disagree about what a field is
-	// called.
+	// Which fields can be coloured, and the unit each is read in. The lists match EPANET's own View
+	// menu so nobody has to learn a second vocabulary. Display NAMES come from
+	// nodeFieldDefs()/linkFieldDefs(), the strings the Labels popover and the map legend use, so a
+	// colour key and a label key can never disagree about what a field is called.
 	var COLOR_NODE_FIELDS = { elev: 'lpn_u_elevhead', demand: 'lpn_u_flow', head: 'lpn_u_elevhead', pressure: 'lpn_u_pressure' };
 	var COLOR_LINK_FIELDS = { diameter: 'lpn_u_diameter', roughness: '', flow: 'lpn_u_flow', velocity: 'lpn_u_velocity', headloss: 'lpn_u_elevhead', gradient: 'lpn_u_gradient' };
 	// The value a node/link is coloured by, IN THE DISPLAYED UNIT -- the same expressions
@@ -3474,13 +2957,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	// TASK 327: the THEMATIC map is a MODE, not a default. Two honest products -- a DRAWING (dark
 	// linework and labels, what you plot) and a THEMATIC MAP (colour by one field, no labels, what
-	// you read at a glance across 97 nodes). EPANET's mistake was having only the second and making
-	// the first hard; ours must not be the mirror of it.
-	//
-	// Implemented as ONE CLASS on the <svg> and a CSS rule, deliberately: label visibility has its
-	// own settings, its own collision solver and its own popover, and a mode that reached in and
-	// switched those off would be indistinguishable afterwards from the user having switched them
-	// off. Turning the mode off restores exactly the labels that were there.
+	// you read at a glance across 97 nodes). ONE CLASS on the <svg> and a CSS rule: a mode that
+	// reached in and switched the label settings off would be indistinguishable afterwards from the
+	// user having switched them off.
+
 	function applyThematicMode() {
 		if (!svg || !svg.classList) { return; }
 		if (settings.colorThematic) { svg.classList.add('lpn-thematic'); }
@@ -3570,35 +3050,23 @@ var EngCalcs = EngCalcs || {};
 			cx: n.x, cy: n.y, r: nodeRadius(n),
 			'class': 'lpn-node lpn-node-' + n.type, 'data-node': n.id
 		}, nodesLayer);
-		// Reservoir renders as an open-top tank, not a circle (ROADMAP Task 146.10, Task 231 icon
-		// set): a reservoir and a junction were the SAME mark, told apart only by size and colour,
-		// which collapses to one mark in greyscale and for a red-green colour-blind reader (~8% of
-		// men). `circle` above is untouched and stays the real hit target -- same radius, same
-		// data-node, same click/drag/hit-test path as before. This is a second, non-interactive
-		// element laid on top of it, built from the exact path data the toolbar's reservoir icon
-		// uses (buildMapIconSvg() below) -- never a redrawn copy of that shape.
-		// A TANK gets the same treatment on the same path (Task 248): its own icon over the same
-		// invisible-but-clickable circle, so every consumer of node geometry keeps reading one
-		// scalar radius and nothing else in the file had to learn about a third node type.
+		// Reservoir renders as an open-top tank, not a circle: told apart from a junction only by
+		// size and colour it collapses to one mark in greyscale and for a red-green colour-blind
+		// reader (~8% of men). `circle` above stays the real hit target; this is a second,
+		// non-interactive element over it, built from the exact path the toolbar icon uses
+		// (buildMapIconSvg()), never a redrawn copy. A TANK takes the identical path (Task 248), so
+		// every consumer of node geometry still reads one scalar radius.
 		var symbol = (n.type === 'reservoir' || n.type === 'tank')
 			? buildMapIconSvg(n.type, 'lpn-node-symbol lpn-node-symbol-' + n.type)
 			: null;
 		if (symbol) {
-			// The nested <svg>'s viewBox is square (0 0 24 24, same as every icon) but the box it's
-			// placed into is not (nodeSymbolSize() -- wide and short for a reservoir, narrow and
-			// tall for a tank). Default preserveAspectRatio
-			// ("xMidYMid meet") would keep the icon square and letterbox it inside that box; "none"
-			// is what actually stretches the tank horizontally and squashes it vertically to fill
-			// the box, which is the whole point of giving it an independent width/height.
+			// The nested <svg>'s viewBox is square (0 0 24 24) but the box it is placed into is not.
+			// Default preserveAspectRatio ("xMidYMid meet") letterboxes the square icon inside that
+			// box; "none" stretches it to fill, which is the point of the independent width/height.
 			symbol.setAttribute('preserveAspectRatio', 'none');
-			// Backdrop matches the tank's own silhouette in lib/Icons.lib.php's reservoir path (the
-			// (3,4)-(21,20) box `M3 4v16h18V4` traces) -- same box, so the opaque patch never peeks
-			// out past the tank's own outline nor leaves a sliver of it uncovered. It stretches
-			// along with the rest of the icon's content since it lives in the same viewBox. Keep
-			// this in sync with that path's own x-coordinates if it's ever widened/narrowed again.
-			// A tank's silhouette is domed, so its patch is that same path rather than a rect -- a
-			// rect to the top of the dome would leave its corners standing outside the outline and
-			// a pipe would appear to stop short of the tank instead of running behind it.
+			// The opaque backdrop matches the symbol's own silhouette from lib/Icons.lib.php -- KEEP
+			// IT IN SYNC with that path. A rect over a domed tank leaves its corners outside the
+			// outline and a pipe appears to stop short of the tank instead of running behind it.
 			if (n.type === 'tank') {
 				prependSymbolBackdrop(symbol, 'path', { d: 'M5 6q7-3.5 14 0v14H5z' }, 'lpn-node-symbol-backdrop');
 			} else {
@@ -3611,15 +3079,12 @@ var EngCalcs = EngCalcs || {};
 		// positions it for real.
 		var leader = annotationEl('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
 		// font-size inline, NOT the .lpn-lbl CSS class's 11px: SVG font-size is interpreted in the
-		// local (world-unit) coordinate system, same as any other geometry under this scaled <g> --
-		// an "11-unit" font is enormous next to nodes spaced 10-40 units apart, which is what was
-		// actually causing the zoom-extent overflow (not a missing bbox term -- the geometry itself
-		// was oversized). Matches the spike's own convention. Same effectiveFontSize() as a user Text
-		// label (Tom, 2026-07-30: no reason for these to differ) -- the two are still visually
-		// distinguishable by position (node ID sits fixed at the node) and role, not by size.
-		// lpn-draglbl (Task 146.01): draggable off its default offset, same pointer-events:all/
-		// cursor:move convention as a Text label -- data-nodelbl (not data-node, already claimed by
-		// the circle above) is this label's own drag/hit-test key.
+		// local (world-unit) coordinate system, so an "11-unit" font is enormous next to nodes spaced
+		// 10-40 units apart. Same effectiveFontSize() as a user Text label -- the two are told apart
+		// by position and role, not size.
+		// lpn-draglbl: draggable off its default offset. data-nodelbl (not data-node, claimed by the
+		// circle above) is this label's own drag/hit-test key.
+
 		var text = annotationEl('text', {
 			'class': 'lpn-lbl lpn-draglbl', 'data-nodelbl': n.id, style: 'font-size:' + effectiveFontSize() + 'px'
 		}, labelsLayer);
@@ -3636,12 +3101,10 @@ var EngCalcs = EngCalcs || {};
 		paintNodeColor(n.id);   // a rebuilt element starts black; give it its colour immediately
 	}
 	function buildLinkEls(l) {
-		// AUDIT HALO (ROADMAP Task 184) -- a wider line UNDER the pipe, so what the user sees is an
-		// outline around it and never a fill: the pipe keeps its own colour, its dashes and every
-		// future result-driven styling, and the halo composes with all of them instead of competing.
-		// Built for every link and hidden by CSS until refreshScenarioMarks() marks it, which keeps
-		// it out of the per-frame path entirely -- toggling a class is cheaper than creating and
-		// destroying an element on every scenario switch.
+		// AUDIT HALO (Task 184) -- a wider line UNDER the pipe, so it reads as an outline and never a
+		// fill: the pipe keeps its own colour, dashes and result-driven styling and the halo composes
+		// with all of them. Built for every link and hidden by CSS until refreshScenarioMarks() marks
+		// it, so toggling a class replaces creating and destroying an element per scenario switch.
 		var halo = el('polyline', {
 			points: linkPoints(l), fill: 'none', 'class': 'lpn-link-halo'
 		}, linksLayer);
@@ -3661,13 +3124,11 @@ var EngCalcs = EngCalcs || {};
 				'class': 'lpn-vhandle', 'data-link': l.id, 'data-vidx': i
 			}, linksLayer));
 		}
-		// Flow-direction arrows (Tom, 2026-07-30, matching EPANET): an open chevron ">" per
-		// POLYLINE SEGMENT, not just one at the overall midpoint (Tom asked for this once the
-		// single-arrow version looked good) -- a bent pipe gets one arrow on each straight run.
-		// Not a filled triangle -- that read as absorbed into the pipe's own color. Hidden until
-		// a solve result exists. Points +x by default, protruding to +-1.2 world units above/
-		// below the line -- well past the pipe's own 0.5-unit stroke width. Positioned/rotated
-		// entirely via `transform` in updateArrow() below, never via its own x/y/points.
+		// Flow-direction arrows, matching EPANET: an open chevron ">" per POLYLINE SEGMENT, so a bent
+		// pipe gets one arrow on each straight run. NOT a filled triangle -- that reads as absorbed
+		// into the pipe's own colour. Hidden until a solve result exists. Points +x by default,
+		// protruding to +-1.2 world units; positioned and rotated entirely via `transform` in
+		// updateArrow(), never via its own x/y/points.
 		var segCount = l.verts.length + 1, arrows = [], j;
 		for (j = 0; j < segCount; j++) {
 			arrows.push(annotationEl('polyline', {
@@ -3675,39 +3136,27 @@ var EngCalcs = EngCalcs || {};
 				'class': 'lpn-arrow', 'data-link': l.id, style: 'display:none'
 			}, linksLayer));
 		}
-		// Link label (Task 146 Phase 2 label toggles): a multi-line <text>, same convention as a
-		// node's, positioned at the middle segment's midpoint -- content filled in by
-		// refreshLabelText(), not here (this only creates the element; it starts empty).
+		// Link label: a multi-line <text>, same convention as a node's. Content is filled in by
+		// refreshLabelText(); this only creates the element, empty.
 		var leader = annotationEl('line', { 'class': 'lpn-leader', style: 'display:none' }, labelsLayer);
 		var text = annotationEl('text', {
 			'class': 'lpn-lbl lpn-draglbl', 'data-linklbl': l.id, style: 'font-size:' + effectiveFontSize() + 'px'
 		}, labelsLayer);
-		// A pump is a LINK, not a node (see the file header), so it had no symbol at all -- just a
-		// line in its own colour. ROADMAP Task 146.10: casing + tangent discharge tail, the same
-		// path data the toolbar's pump icon uses, rotated to point at the `to` node -- see
-		// positionPumpSymbol() for the rotate/flip rule. symbolG is the rotate/flip pivot (drawn in
-		// nodesLayer, same layer as node symbols, so a pump reads on top of every pipe it crosses);
-		// symbolSvg inside it is the icon box itself, non-interactive -- clicking/dragging a pump
-		// still goes through `line` above, unchanged.
-		// A VALVE takes the identical path (Task 248 phase 2) -- its own icon, on the same rotate/
-		// flip pivot, over the same interactive polyline. Nothing else in this file had to learn
-		// about a third link type to draw it.
+		// A pump is a LINK, not a node, and gets casing + tangent discharge tail from the same path
+		// data the toolbar icon uses, rotated to point at the `to` node (positionPumpSymbol() has the
+		// rotate/flip rule). symbolG is the pivot, drawn in nodesLayer so a pump reads on top of every
+		// pipe it crosses; symbolSvg inside it is non-interactive, so clicking or dragging a pump
+		// still goes through `line`. A VALVE takes the identical path (Task 248 phase 2).
 		var symbolG = null, symbolSvg = null;
 		if (l.type === 'pump' || l.type === 'valve') {
 			symbolG = el('g', { 'class': 'lpn-link-symbol lpn-link-symbol-' + l.type }, nodesLayer);
 			symbolSvg = buildMapIconSvg(l.type, '');
 			if (symbolSvg) {
 				symbolG.appendChild(symbolSvg);
-				// Backdrop matches the casing circle in lib/Icons.lib.php's pump path
-				// (`<circle cx="9.8" cy="12.5" r="5"/>`) -- round, not the icon's own square box, so
-				// it occludes exactly the casing's footprint rather than plastering a rectangle over
-				// the pipe on both sides of it. The thin discharge tail gets no backdrop of its own;
-				// a stroke-width line crossing a pipe reads as two lines crossing, not as seeing
-				// through a symbol.
-				// A VALVE'S backdrop is the bowtie itself, traced from lib/Icons.lib.php's own two
-				// triangles -- a rectangle over its bounding box would blank out the pipe on both
-				// sides of the waist, where the bowtie is at its thinnest and the pipe should still
-				// be visible running through it.
+				// The backdrop traces the SYMBOL, never its bounding box: a rectangle would blank out
+				// the pipe on both sides of a pump's casing or a valve's waist, where the pipe should
+				// still be visible running through. The pump's thin discharge tail gets no backdrop --
+				// a line crossing a pipe reads as two lines crossing.
 				if (l.type === 'valve') {
 					prependSymbolBackdrop(symbolSvg, 'path', { d: 'M4 5v14l8-7zM20 5v14l-8-7z' }, 'lpn-link-symbol-backdrop');
 				} else {
@@ -3723,9 +3172,8 @@ var EngCalcs = EngCalcs || {};
 		layoutLinkLabel(l.id);
 		paintLinkColor(l.id);   // a rebuilt element starts black; give it its colour immediately
 	}
-	// Icon box size for a pump's map symbol, in world units -- same "relative to text" scaling as
-	// every other symbol (symbolFactor()). Confirmed right-sized as shipped (Tom, 2026-08-09: "the
-	// pump icon is literally the same size as text, as advertised") -- leave this one alone.
+	// Icon box size for a pump's map symbol, in world units -- same symbolFactor() scaling as every
+	// other symbol. Confirmed right-sized on screen; leave this one alone.
 	function pumpSymbolSize() { return 4 * symbolFactor(); }
 	function resizePumpSymbol(id) {
 		var le = linkEls[id];
@@ -3734,13 +3182,12 @@ var EngCalcs = EngCalcs || {};
 		le.symbolSvg.setAttribute('x', -half); le.symbolSvg.setAttribute('y', -half);
 		le.symbolSvg.setAttribute('width', size); le.symbolSvg.setAttribute('height', size);
 	}
-	// ROADMAP Task 146.10's pump-orientation rule, verified over all 25 angles at 15-degree steps:
-	// always rotate to point the discharge at the `to` node, and flip vertically first whenever the
-	// pipe runs west (dx < 0) -- otherwise the tail swings under the casing for every westward pump.
-	// The boundary is on dx, never dy: at dx=0 the tail lands horizontal and either variant is right.
-	// Positioned from the link's own from/to nodes only (ignoring verts, same as the spec) -- a
-	// pump is drawn straight in practice, and the pivot is the icon's own box centre, not its
-	// casing's, which only shifts where the mark sits, never the flip/rotate logic itself.
+	// The pump-orientation rule, verified over all 25 angles at 15-degree steps: rotate to point the
+	// discharge at the `to` node, and flip vertically first whenever the pipe runs west (dx < 0), or
+	// the tail swings under the casing for every westward pump. The boundary is on dx, never dy: at
+	// dx = 0 the tail lands horizontal and either variant is right. Positioned from the link's own
+	// from/to nodes only, ignoring verts.
+
 	function positionPumpSymbol(id) {
 		var l = linkById(id), le = linkEls[id];
 		if (!le || !le.symbolG) { return; }
@@ -3759,14 +3206,11 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < pts.length - 1; i++) {
 			a = pts[i]; b = pts[i + 1];
 			len = Math.hypot(b.x - a.x, b.y - a.y);
-			// CLEAR RUN (Tom, 2026-07-30: "exclude the two endpoint node or vertex radii"). Each
-			// segment's usable span starts at the EDGE of whatever symbol sits at its ends, not at
-			// that symbol's center: a node circle (radius by type -- a reservoir is visibly larger
-			// than a junction) at the two outer ends, a vertex handle at every interior joint. The
-			// centerline is what the geometry is made of; the clear run is what the eye actually
-			// reads as pipe, and it is what an arrow should be centered in and measured against.
-			// Asymmetric on purpose: a pipe from a reservoir to a junction has a bigger bite taken
-			// out of its reservoir end, so splitting one combined inset evenly would be wrong.
+			// CLEAR RUN. Each segment's usable span starts at the EDGE of whatever symbol sits at its
+			// ends, not at that symbol's centre: a node circle at the two outer ends, a vertex handle
+			// at every interior joint. The centerline is what the geometry is made of; the clear run
+			// is what the eye reads as pipe. Asymmetric on purpose -- a pipe from a reservoir to a
+			// junction has a bigger bite out of its reservoir end.
 			ia = (i === 0) ? nodeRadius(pts[0]) : vr;
 			ib = (i === pts.length - 2) ? nodeRadius(pts[pts.length - 1]) : vr;
 			clearLen = len - ia - ib;
@@ -3793,26 +3237,19 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	// Where the flow arrow sits along its segment, as a fraction measured FROM THE UPSTREAM END.
-	// The label is anchored at the segment midpoint, so anything other than 0.5 separates the two
-	// (Tom, 2026-07-30: "flow arrows are colliding with pipe labels… maybe arrow at 30% from low
-	// head and label at 50%?"), and an off-centre arrow makes the POSITION carry the flow direction
-	// too, redundantly with the chevron, which helps at small symbol sizes.
-	// Moved 0.3 -> 0.7 on 2026-08-03 (Tom: "more intuitive for the flow arrow to be downstream of
-	// midpoint"). Same distance from the label, same redundancy, but the arrow now sits where the
-	// water is going rather than where it came from -- it reads as leading the flow instead of
-	// trailing it. Everything else follows the constant: flow < 0 mirrors it to 1 - ARROW_ALONG,
-	// and linkLabelMid()'s collision test measures against arrowAlongDistances(), which derives
-	// from this same value, so the label keeps clear of the arrow's new position automatically.
+	// The label is anchored at the segment midpoint, so anything other than 0.5 separates the two,
+	// and an off-centre arrow makes the POSITION carry the flow direction redundantly with the
+	// chevron, which helps at small symbol sizes. DOWNSTREAM of the midpoint, so it reads as leading
+	// the flow rather than trailing it. Everything else follows the constant: flow < 0 mirrors it to
+	// 1 - ARROW_ALONG, and linkLabelMid()'s collision test derives from the same value.
 	var ARROW_ALONG = 0.7;
 	// Nominal chevron length along the pipe: the polyline spans -0.8..0.8 in its own coordinates
 	// before symbolFactor() scales it.
 	var ARROW_NOMINAL_LEN = 1.6;
-	// The arrow is drawn at 75% of every other symbol (Tom, 2026-08-14: "make the flow arrow about
-	// 75% as large as it is relative to the other symbols"). It is a direction mark on a pipe, not
-	// an element of the network like a node or a pump, so it should read as the smallest thing on
-	// the drawing. Everything that measures the arrow goes through arrowFactor() -- the fit test
-	// ("is this run long enough to hold one"), the label's dodge clearance, and the drawing itself
-	// -- or a 75% arrow would still reserve 100% of the space.
+	// The arrow is drawn at 75% of every other symbol: it is a direction mark on a pipe, not an
+	// element of the network, so it reads as the smallest thing on the drawing. Everything that
+	// measures the arrow goes through arrowFactor() -- the fit test, the label's dodge clearance and
+	// the drawing itself -- or a 75% arrow would still reserve 100% of the space.
 	var ARROW_SIZE_MULT = 0.75;
 	function arrowFactor() { return symbolFactor() * ARROW_SIZE_MULT; }
 	// Along-the-whole-pipe distance of every arrow that is actually DRAWN on this link -- the same
@@ -3825,10 +3262,9 @@ var EngCalcs = EngCalcs || {};
 		if (flow === undefined) { return out; }
 		for (i = 0; i < mids.length; i++) {
 			// Measured within the CLEAR RUN, then shifted back into whole-centerline distance by
-			// insetA -- `run` still accumulates full segment lengths because that is the space
-			// pointAlongLink()/linkLabelMid() compare against. Must stay in step with updateArrow()
-			// below: these two compute the same arrow position for different consumers, and a
-			// divergence would let the label dodge a phantom.
+			// insetA -- `run` accumulates full segment lengths because that is the space
+			// pointAlongLink()/linkLabelMid() compare against. MUST STAY IN STEP WITH updateArrow():
+			// a divergence lets the label dodge a phantom.
 			if (mids[i].clearLen >= minLen) {
 				t = flow < 0 ? 1 - ARROW_ALONG : ARROW_ALONG;
 				out.push(run + mids[i].insetA + mids[i].clearLen * t);
@@ -3848,19 +3284,17 @@ var EngCalcs = EngCalcs || {};
 			k = arrowFactor(), minLen = ARROW_NOMINAL_LEN * k * 2, i;
 		for (i = 0; i < le.arrows.length; i++) {
 			if (!mids[i] || flow === undefined) { le.arrows[i].style.display = 'none'; continue; }
-			// A segment with no room for the arrow shows none (Tom, 2026-07-30: "toggle off flow
-			// arrows if they don't fit between vertices") -- a chevron longer than the run it sits
-			// on overhangs both vertices and reads as a mark on the network rather than on that
-			// pipe. Twice the chevron's own length is the shortest run that still leaves visible
-			// pipe on each side of it. Measured against the CLEAR run, not the centerline, so a
-			// short pipe between two big symbols now correctly shows nothing instead of an arrow
-			// buried under a reservoir.
+			// A segment with no room for the arrow shows none: a chevron longer than its run
+			// overhangs both vertices and reads as a mark on the network rather than on that pipe.
+			// Twice the chevron's own length is the shortest run that still leaves visible pipe on
+			// each side. Measured against the CLEAR run, not the centerline, so a short pipe between
+			// two big symbols shows nothing instead of an arrow buried under a reservoir.
 			if (mids[i].clearLen < minLen) { le.arrows[i].style.display = 'none'; continue; }
 			var angle = mids[i].angle + (flow < 0 ? 180 : 0);
-			// ARROW_ALONG measured from the UPSTREAM end, WITHIN THE CLEAR RUN (sx,sy -> ex,ey): at
-			// positive flow that is the run's own start, at negative flow its end. Interpolating the
-			// raw centerline instead put the 30% mark inside the upstream symbol on short pipes --
-			// worst exactly where space is tightest.
+			// ARROW_ALONG measured from the UPSTREAM end, WITHIN THE CLEAR RUN (sx,sy -> ex,ey).
+			// Interpolating the raw centerline instead puts the mark inside the upstream symbol on
+			// short pipes -- worst exactly where space is tightest.
+
 			var t = flow < 0 ? 1 - ARROW_ALONG : ARROW_ALONG,
 				px = mids[i].sx + (mids[i].ex - mids[i].sx) * t,
 				py = mids[i].sy + (mids[i].ey - mids[i].sy) * t;
@@ -3871,42 +3305,26 @@ var EngCalcs = EngCalcs || {};
 			le.arrows[i].style.display = '';
 		}
 	}
-	// THE SIGN OF Q IS A FACT ABOUT THE DRAWING ORDER, NOT ABOUT THE WATER (Tom, 2026-08-14: "pipe
-	// flows are still displaying as negative... Q being negative is a simple oversight"). The solver
-	// signs every flow against the link's own from->to direction, which is whichever end the user
-	// happened to click first -- so "-38.75 gpm" tells a reader nothing except that they drew this
-	// pipe backwards. Direction is already carried by the arrow, which is drawn FROM the same sign
-	// (updateArrow above), so a magnitude on the readout loses nothing.
-	// The solve itself keeps the sign: it is the model's truth, EPANET reports it the same way, and
-	// validate_epanet.js compares the two. This is a display rule and lives only here.
-	// The precedent is already in js/lpn-solver.js, on velocity: |Q|/A, "direction is already
-	// carried twice over", and a signed value "quietly breaking any highest-velocity comparison,
-	// since a fast reverse flow sorted to the BOTTOM of the range". Every word of that applies to
-	// flow, which is why the extrema badges read these functions too.
+	// THE SIGN OF Q IS A FACT ABOUT THE DRAWING ORDER, NOT ABOUT THE WATER. The solver signs flow
+	// against the link's own from->to direction, whichever end the user clicked first. Direction is
+	// already carried by the arrow, drawn FROM the same sign, and a signed value quietly breaks any
+	// highest-value comparison, since a fast reverse flow sorts to the BOTTOM of the range -- which
+	// is why the extrema badges read these functions too.
+	// The SOLVE keeps the sign: it is the model's truth and EPANET reports it the same way. This is
+	// a display rule and lives only here.
 	function shownFlow(q) { return typeof q === 'number' ? Math.abs(q) : q; }
 	// Head loss is a LOSS, so it is a magnitude on a pipe or a valve for the same reason -- except
-	// on a PUMP, where the negative sign is not an accident of drawing order but the entire way this
-	// page expresses a head GAIN (Tom, 2026-07-30: "I don't think we need a separate Head Gain.
-	// Negative head loss is fine."). So the type decides, and a pump keeps its sign.
+	// on a PUMP, where the negative sign is not an accident of drawing order but the whole way this
+	// page expresses a head GAIN. The type decides, and a pump keeps its sign.
 	function shownHeadloss(l, h) { return (l && l.type === 'pump') || typeof h !== 'number' ? h : Math.abs(h); }
 	// ---- A TEXT LABEL'S ATTACHMENT POINT (ROADMAP Task 332) --------------------------------
-	//
 	// `lb.x`/`lb.y` is a POINT; `lb.align`/`lb.valign` say which corner or edge of the text that
-	// point is. Together they are AutoCAD's MTEXT attachment point, which is why they are stored
-	// this way rather than as a flag: EPANET anchors a [LABELS] point at the text's TOP-LEFT and
-	// we have always anchored at the centre, and that difference is an ALIGNMENT, not a
-	// provenance (Tom, 2026-08-15 -- *"text alignment is very interesting to a user"*). Written
-	// as an "imported" boolean it would have to be migrated the moment Task 342 turns alignment
-	// into a control; written as `lb.align`, that task only adds the row in the popup.
-	//
-	// THE POINT OF STORING IT IS THAT NOTHING IS CONVERTED. reanchorImportedLabels() used to
-	// translate EPANET's corner into our centre by measuring the label in WORLD units -- a
-	// quantity a SCREEN-PIXEL-sized label does not have at any particular zoom -- so the same
-	// file imported from two different views wrote two different sets of coordinates, and the
-	// difference was saved. Rendering at EPANET's own anchor is exact at every zoom and involves
-	// no arithmetic at all.
-	//
-	// Default is centre in both axes, so every label that already exists renders unchanged.
+	// point is -- AutoCAD's MTEXT attachment point. EPANET anchors a [LABELS] point at the text's
+	// TOP-LEFT and we anchor at the centre, and that difference is an ALIGNMENT, not a provenance.
+	// THE POINT OF STORING IT IS THAT NOTHING IS CONVERTED: translating EPANET's corner into our
+	// centre means measuring the label in WORLD units, which a SCREEN-PIXEL-sized label does not have
+	// at any particular zoom, so the same file imported from two views writes two different sets of
+	// coordinates. Default is centre in both axes, so existing labels render unchanged.
 	function labelHAlign(lb) {
 		var a = lb && lb.align;
 		return a === 'left' ? 'start' : a === 'right' ? 'end' : 'middle';
@@ -3914,23 +3332,15 @@ var EngCalcs = EngCalcs || {};
 	function labelVAlign(lb) { return (lb && lb.valign === 'top') ? 'hanging' : 'middle'; }
 
 	// ---- MTEXT rung 1: a Text object is LINES (ROADMAP Task 342) --------------------------------
-	//
-	// Tom, 2026-08-14: *"Not mtext labels. Mtext Text objects."* This is what you place with the
-	// Text tool, and explicit line breaks are the whole of what most drawings use -- a title block,
-	// a north note, a street name over two lines. Generated data labels are NOT in scope and get
-	// their line structure from the fields they print.
-	//
+	// Explicit line breaks are the whole of what most drawings use. Generated data labels are NOT in
+	// scope and get their line structure from the fields they print.
 	// **A NEWLINE IS THE STORED FORM, and the property is still one string.** `_text` stays a single
-	// overridable value, so a scenario's override of a three-line note is still one override, the
-	// file format is unchanged, and nothing downstream had to learn about a list.
-	//
-	// Rung 2 (a wrap WIDTH, which is what actually makes it MTEXT) is deliberately not here. SVG
-	// does not wrap, so it needs a per-label width plus a greedy re-wrap on every font-size change
-	// -- pure geometry, and it belongs in js/lpn-geom.js when it comes.
-	//
-	// **THE EXPORT CONSTRAINT, so it is not discovered at export time: EPANET's [LABELS] is ONE
-	// quoted string per line**, so a multi-line Text cannot round-trip through an `.inp`. Task 281
-	// decides whether it goes out as N labels or one flattened line.
+	// overridable value, so a scenario's override of a three-line note is still one override.
+	// Rung 2 (a wrap WIDTH, which is what actually makes it MTEXT) is deliberately not here: SVG does
+	// not wrap, so it needs a per-label width plus a greedy re-wrap on every font-size change -- pure
+	// geometry, belonging in js/lpn-geom.js.
+	// **THE EXPORT CONSTRAINT: EPANET's [LABELS] is ONE quoted string per line**, so a multi-line
+	// Text cannot round-trip through an `.inp`. Task 281 decides N labels or one flattened line.
 	function textLabelLines(lb) {
 		var t = effective(lb, 'text');
 		return String(t === undefined || t === null ? '' : t).split('\n');
@@ -3960,20 +3370,16 @@ var EngCalcs = EngCalcs || {};
 
 	// ---- Task 337: a Text label's own boldface and its own rotation ----
 	//
-	// ROTATION IS A STORED NUMBER, NOT A LIVE REFERENCE TO A PIPE (Tom, 2026-08-14: *"Rotation as
-	// number. Yes. It's just a helper/convenience, not a link. We can let them enter a number also
-	// or pick among 0, 30, 45, 60, 90"*). A Text label is a street name or a title block, not a
-	// property of one link, so it has no link to be slaved to and should not grow one. "Match a
-	// pipe" fills the box from the nearest pipe at the moment the user asks; from then on the
-	// label is independent of everything that happens to that pipe.
+	// ROTATION IS A STORED NUMBER, NOT A LIVE REFERENCE TO A PIPE. A Text label is a street name or
+	// a title block, not a property of one link, so it has no link to be slaved to. "Match a pipe"
+	// fills the box from the nearest pipe at the moment the user asks; from then on the label is
+	// independent of everything that happens to that pipe.
+
 	//
-	// THE NUMBER IS CARTESIAN -- counter-clockwise, y up -- because that is the frame the user
-	// reads an angle in, and mixing the two frames is what once shipped a page of upside-down
-	// labels (see settings.labelFlipLeftOfVertical). SVG rotates CLOCKWISE, so the render negates
-	// it, and that negation happens in textLabelSvgAngle() and nowhere else.
-	//
-	// Both properties are absent on every label written before this, so `undefined` must read as
-	// "0 degrees, not bold" -- which is what an old document opens as, unchanged.
+	// THE NUMBER IS CARTESIAN -- counter-clockwise, y up -- the frame the user reads an angle in.
+	// Mixing the two frames is what once shipped a page of upside-down labels. SVG rotates
+	// CLOCKWISE, so the render negates it, in textLabelSvgAngle() and nowhere else.
+	// Both properties are absent on older labels, so `undefined` must read as "0 degrees, not bold".
 	function normalizeDeg(a) {
 		a = a % 360;
 		if (a > 180) { a -= 360; }
@@ -4006,10 +3412,11 @@ var EngCalcs = EngCalcs || {};
 		if (t) { le.text.setAttribute('transform', t); } else { le.text.removeAttribute('transform'); }
 	}
 	// AXIS-ALIGNED bounding box of a rotated box, turned about the same point the SVG transform
-	// turns it about. An APPROXIMATION, said plainly: a 45-degree label claims more room than its
-	// glyphs occupy, so the collision pass keeps data labels a little further away from it than it
-	// strictly needs. The alternative is oriented-box collision in js/lpn-collide.js -- a much
-	// larger change, for a label the user placed deliberately and can move by hand.
+	// turns it about. An APPROXIMATION: a 45-degree label claims more room than its glyphs occupy,
+	// so the collision pass keeps data labels a little further from it than it strictly needs. The
+	// alternative is oriented-box collision in js/lpn-collide.js -- a much larger change, for a
+	// label the user placed deliberately and can move by hand.
+
 	function rotatedAabb(box, cx, cy, angleDeg) {
 		var rad = angleDeg * Math.PI / 180, cos = Math.cos(rad), sin = Math.sin(rad),
 			bx = box.x + box.w / 2 - cx, by = box.y + box.h / 2 - cy,
@@ -4060,10 +3467,8 @@ var EngCalcs = EngCalcs || {};
 			'data-lbl': lb.id, style: textLabelStyle(lb)
 		}, labelsLayer);
 		setTextLabelContent(text, lb, px);
-		// MEASURED AFTER THE STYLE IS ON THE ELEMENT, which is the whole reason bold can be a
-		// style rather than a second measurement path: bold glyphs are wider, so a width taken
-		// before the weight was applied would size the collision box for the lighter text
-		// (Task 337).
+		// MEASURED AFTER THE STYLE IS ON THE ELEMENT: bold glyphs are wider, so a width taken before
+		// the weight was applied sizes the collision box for the lighter text (Task 337).
 		var w = 10;
 		try { w = text.getBBox().width; } catch (err) { /* pre-layout measurement can throw; fallback stands */ }
 		labelEls[lb.id] = { leader: leader, text: text, side: 'right', width: w };
@@ -4071,12 +3476,11 @@ var EngCalcs = EngCalcs || {};
 		applyTextLabelRotation(lb, labelEls[lb.id], px, py);
 		if (lb.anchorNode) { labelsByAnchor[lb.anchorNode].push(lb.id); }
 	}
-	// ONE function for "this label's CONTENT changed", because the three steps after it are always
-	// the same three and always in this order: push the words into the element that already exists
-	// (a second buildLabelEls() would orphan the first one in the DOM), re-measure -- the width sizes
-	// the mask, the collision box and zoom-to-fit -- then re-run the geometry computed from it and
-	// the visibility threshold computed from the geometry. Reads through effective(), so switching
-	// scenarios and editing the text are the same code path (Task 407).
+	// ONE function for "this label's CONTENT changed", and the three steps are always in this order:
+	// push the words into the element that already exists (a second buildLabelEls() orphans the
+	// first in the DOM), re-measure (the width sizes the mask, the collision box and zoom-to-fit),
+	// then re-run the geometry and the visibility threshold computed from it. Reads through
+	// effective(), so switching scenarios and editing the text are one code path (Task 407).
 	function refreshLabelContent(id) {
 		var lb = labelById(id), le = labelEls[id];
 		if (!lb || !le) { return; }
@@ -4126,11 +3530,9 @@ var EngCalcs = EngCalcs || {};
 		positionPumpSymbol(id);
 	}
 
-	// Same leader math as the spike: text is always text-anchor:middle and tracks the drag
-	// point continuously (never jumps); only the leader's attachment edge flips, at 75% of
-	// the label's own width past the anchor's vertical line (Tom: 50-100% acceptable, 0% =
-	// near edge at the line, 100% = far edge at the line -- flipping later means the leader
-	// has to reach clear across the text).
+	// The text tracks the drag point continuously and never jumps; only the leader's attachment edge
+	// flips, at 75% of the label's own width past the anchor's vertical line. 0% = near edge at the
+	// line, 100% = far edge at the line -- flipping later means the leader reaches across the text.
 	var ADVERSE_FRAC = 0.75;
 	function updateLabelGeometry(id) {
 		var lb = labelById(id), le = labelEls[id], an, px, py, box, halfW, att;
@@ -4143,10 +3545,9 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		an = nodeById(lb.anchorNode); px = an.x + lb.x; py = an.y + lb.y;
-		// THE LEADER ATTACHES TO THE BOX, NOT TO THE ANCHOR POINT. It used to read px straight as
-		// the box centre, which was true only while every Text label was centred; with lb.align in
-		// the document the two are different numbers, and the leader would otherwise reach for a
-		// place the text is not. Centred labels get identical geometry to before, by construction.
+		// THE LEADER ATTACHES TO THE BOX, NOT TO THE ANCHOR POINT. Reading px as the box centre is
+		// true only while every Text label is centred; with lb.align in the document the two are
+		// different numbers and the leader reaches for a place the text is not.
 		box = textLabelBox(lb, le, px, py);
 		halfW = box.w / 2;
 		att = Geom.leaderAttach(le.side, box.x + halfW, halfW, an.x, ADVERSE_FRAC);
@@ -4156,11 +3557,9 @@ var EngCalcs = EngCalcs || {};
 		repositionMultilineText(le.text, px, py);
 		applyTextLabelRotation(lb, le, px, py);
 	}
-	// Double-click-to-reset for a Text label (Tom, 2026-07-30) -- only meaningful when anchored: an
-	// anchored Text's lb.x/lb.y is an offset from its node, same convention as a node/link label's,
-	// so "home" is the same DEFAULT_LABEL_OFFSET they use. A free-floating Text (no anchorNode) has
-	// no anchor to offset from -- lb.x/lb.y already ARE its absolute position, so there is no
-	// "default" to reset to, and this is a no-op.
+	// Double-click-to-reset for a Text label -- only meaningful when anchored, where lb.x/lb.y is an
+	// offset from its node and "home" is DEFAULT_LABEL_OFFSET. A free-floating Text's lb.x/lb.y ARE
+	// its absolute position, so there is no default to reset to and this is a no-op.
 	function resetTextLabelHome(id) {
 		var lb = labelById(id);
 		if (!lb || !lb.anchorNode) { return; }
@@ -4249,32 +3648,25 @@ var EngCalcs = EngCalcs || {};
 				tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1,
 				nlx = ne.text ? +ne.text.getAttribute('x') : n.x + 2, nly = ne.text ? +ne.text.getAttribute('y') : n.y - 2;
 			inc(n.x - r, n.y - r); inc(n.x + r, n.y + r);
-			// **A LABEL THAT IS NOT DRAWN RESERVES NO ROOM** (Tom, 2026-08-15: *"Zoom to Fit is
-			// giving me unexpected padding even with all labels off at that zoom."* — it was
-			// reserving space for every hidden label). Zoom-to-fit is a question about what is on
-			// the screen, so it has to ask the same question the renderer just answered.
-			//
-			// It settles at the state the user could SEE when they pressed the button, which is the
-			// honest reading of "fit this". Fitting can zoom in far enough to bring the labels back,
-			// and then they are outside the box that was fitted -- accepted deliberately, because
-			// the alternative is a fit that re-decides its own inputs and never converges.
+			// **A LABEL THAT IS NOT DRAWN RESERVES NO ROOM.** Zoom-to-fit is a question about what is
+			// on the screen, so it asks the same question the renderer just answered, and settles at
+			// the state the user could SEE when they pressed the button. Fitting can zoom in far
+			// enough to bring the labels back, putting them outside the box that was fitted --
+			// accepted deliberately, because the alternative never converges.
 			if (ignoreDataLabels) { continue; }
-			// "J1"-style id/data label beside the circle -- extended downward per extra toggled-on
-			// line (Task 146 Phase 2 label toggles), since multi-line labels grow toward +y (dy>0).
-			// Read from the label's OWN rendered x/y (Task 146.01), not a hardcoded n.x+2/n.y-2--
-			// a dragged-away or collision-nudged label can sit well outside that default offset.
+			// The id/data label beside the circle, extended downward per extra line. Read from the
+			// label's OWN rendered x/y, not a hardcoded offset -- a dragged-away or collision-nudged
+			// label can sit well outside the default one.
 			inc(nlx, nly - 2); inc(nlx + tw, nly + 0.6 + (lc - 1) * effectiveLineHeight());
 		}
 		for (i = 0; i < doc.labels.length; i++) {
 			var lb = doc.labels[i], le = labelEls[lb.id] || { width: 10 },
 				an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: 0, y: 0 },
 				px = lb.anchorNode ? an.x + lb.x : lb.x, py = lb.anchorNode ? an.y + lb.y : lb.y,
-				// The label's OWN box, at its OWN anchor (Task 332) -- px/py is not necessarily
-				// its centre any more. The height is the label's own rendered height rather than
-				// a constant: this was a hardcoded 2, correct only while the text size was 2.5,
-				// and at the shipped default a title at sizeMult 2 is 40 units tall while bbox()
-				// reserved 4, so zoom-to-fit clipped it. Found 2026-08-09 adding the example's
-				// title block (Task 254).
+				// The label's OWN box, at its OWN anchor (Task 332) -- px/py is not necessarily its
+				// centre. The height is the label's own rendered height, never a constant: a
+				// hardcoded 2 is right only at text size 2.5, and at the shipped default a title at
+				// sizeMult 2 is 40 units tall, so zoom-to-fit clips it.
 				lbox = textLabelBox(lb, le, px, py);
 			// Same rule for an authored label, which has its OWN threshold (Task 340): a note that
 			// has vanished at this zoom is not part of what is being fitted, while a title block
@@ -4289,18 +3681,13 @@ var EngCalcs = EngCalcs || {};
 				inc(v.x - 0.65, v.y - 0.65); inc(v.x + 0.65, v.y + 0.65);
 			}
 			var l = doc.links[i], lle = linkEls[l.id];
-			// A REPEATED CHAIN CONTRIBUTES NOTHING HERE, ON PURPOSE. Its labels lie along the pipe,
-			// whose own points are already counted above -- and reading their rendered positions
-			// would make zoom-to-fit depend on the view it started from, because how many of them
-			// exist and which are drawn are both functions of the current zoom. That circularity is
-			// the Task 332 defect wearing different clothes; the cheapest way not to have it is not
-			// to ask. A lone label still counts: it sits off to the side of its pipe and nothing
-			// else in this loop knows where.
-			// ALIGNED rather than "is it a chain": a chain's station count is a function of the
-			// current zoom, and bbox() feeding zoom-dependent numbers into the fit is what made the
-			// fit depend on the view it started from. Aligned is a SETTING, and an aligned label
-			// lies along its pipe, whose own points are already counted -- so this is both the same
-			// exclusion and a deterministic one.
+			// AN ALIGNED LABEL CONTRIBUTES NOTHING HERE, ON PURPOSE: it lies along its pipe, whose
+			// own points are already counted, and reading its rendered position would make
+			// zoom-to-fit depend on the view it started from. Tested on ALIGNED rather than "is it a
+			// chain" because a chain's station count is itself a function of the current zoom, so
+			// that test would feed a zoom-dependent number into the fit. A lone unaligned label still
+			// counts: it sits off to the side of its pipe and nothing else in this loop knows where.
+
 			if (lle && (ignoreDataLabels || linkLabelAligned(l))) { continue; }
 			if (lle) {
 				var lx = +lle.text.getAttribute('x'), ly = +lle.text.getAttribute('y'),
@@ -4310,26 +3697,15 @@ var EngCalcs = EngCalcs || {};
 		}
 		return { minx: minx, maxx: maxx, miny: miny, maxy: maxy };
 	}
-	// Height an absolutely-positioned canvas overlay occupies, measured rather than guessed --
-	// #lpn_mode_hint and #lpn_map_footer are both 11px text whose height depends on the font that
-	// actually rendered, and either can wrap to two lines (the mode hint in several languages, the
-	// footer on a narrow window). Returns 0 for an absent or empty overlay, so a hidden readout
-	// costs no margin. Measured on the footer WRAPPER, not on the coordinate box inside it: the
-	// wrapper is what actually occupies the bottom of the canvas once the strip wraps.
-	// **THE RESERVE MUST NOT DEPEND ON WHETHER THE OVERLAY HAS BEEN FILLED IN YET** (Tom, 2026-08-15,
-	// guessing the cause from the outside and getting it right: *"Switching tabs still changes the
-	// zoom. Could it be affected by the Mode string?"* — it could, and it was).
-	//
-	// This used to return 0 for an element with no text, and both overlays it is asked about are
-	// EMPTY IN THE MARKUP and filled by JS: `#lpn_mode_hint` by updateModeHint(), `#lpn_map_footer`
-	// by refreshMapStatus(). So a fit that happened before those ran reserved nothing, took the
-	// ~25px back as drawing room, and came out ZOOMED IN relative to every later fit — which is
-	// exactly the pair of symptoms reported: the project open at reload zooms in, and switching to
-	// it later gives a different answer.
-	//
-	// Both of these overlays are permanent furniture; neither is ever legitimately blank once the
-	// page is running. So an empty one is not "no overlay", it is "not filled in yet", and the
-	// honest reserve is the space it is ABOUT to take: one line of its own font.
+	// Height an absolutely-positioned canvas overlay occupies, MEASURED rather than guessed: both
+	// #lpn_mode_hint and #lpn_map_footer are 11px text whose height depends on the font that
+	// rendered, and either can wrap to two lines. Measured on the footer WRAPPER, not the coordinate
+	// box inside it.
+	// **THE RESERVE MUST NOT DEPEND ON WHETHER THE OVERLAY HAS BEEN FILLED IN YET.** Both are EMPTY
+	// IN THE MARKUP and filled by JS, so returning 0 for an element with no text makes a fit that
+	// runs before those do reserve nothing, take the ~25px back as drawing room, and come out ZOOMED
+	// IN relative to every later fit. An empty one is "not filled in yet", so the honest reserve is
+	// one line of its own font.
 	function overlayReserve(id) {
 		var e = document.getElementById(id);
 		if (!e) { return 0; }
@@ -4347,18 +3723,12 @@ var EngCalcs = EngCalcs || {};
 		return h + 8;   // its own height plus a little clear air
 	}
 
-	// **THE POST-SOLVE RE-FIT IS GONE** (Tom, 2026-08-15: *"Post-solve re-fit: I am not a believer.
-	// I say it's illegal. A little overhang in this case is okay now that views are saved."*).
-	//
-	// It existed because zoomExtent() measures RENDERED label text, and a network created in code is
-	// fitted before its first solve has produced any label content -- so the fit was to bare symbols
-	// and the labels overflowed the map when they appeared 300ms later. A second fit hid that.
-	//
-	// It is illegal under the rule Tom set the same day: the view is saved data, and the app does not
-	// move saved data behind the user's back. The overhang it was hiding is a few pixels of label at
-	// the edge of a view nobody had chosen yet, on a drawing that has just appeared -- against a
-	// zoom that jumps under the reader's hands a third of a second after they arrive. The first is
-	// a blemish; the second is the map moving on its own.
+	// **THERE IS NO POST-SOLVE RE-FIT, and re-adding one is illegal.** The view is saved data and the
+	// app does not move saved data behind the user's back. It is tempting because zoomExtent()
+	// measures RENDERED label text, so a network created in code is fitted before its first solve
+	// has produced any label content and the labels overflow when they appear 300ms later. That
+	// overhang is a blemish; a zoom that jumps under the reader's hands a third of a second after
+	// they arrive is the map moving on its own.
 
 	var LPN_FIT_BISECTIONS = 60;
 	// One drawn thing: a world anchor, and how far its ink reaches from that anchor in SCREEN
@@ -4367,12 +3737,10 @@ var EngCalcs = EngCalcs || {};
 	function fitItem(out, x, y, l, r, t, b) {
 		if (isFinite(x) && isFinite(y)) { out.push({ x: x, y: y, l: l, r: r, t: t, b: b }); }
 	}
-	// `atScale` is the scale being CONSIDERED, which is not the same as the one currently in force.
-	// Two of the rules about what gets drawn are thresholds -- the map-width one that hides all
-	// annotation, and the per-pipe one that hides a label longer than its own pipe -- and both must
-	// be answered for the scale being tested, or the fit reserves room for labels that will not be
-	// there (or crops ones that will). They are booleans, so they cannot be solved for directly;
-	// zoomExtent() settles them by re-solving, which costs arithmetic and nothing else.
+	// `atScale` is the scale being CONSIDERED, not the one currently in force. Two rules about what
+	// gets drawn are thresholds -- the map-width one that hides all annotation, and the per-pipe one
+	// that hides a label longer than its own pipe -- and both must be answered for the scale being
+	// TESTED, or the fit reserves room for labels that will not be there.
 	function fitItems(atScale, modelOnly) {
 		var out = [], sc = state.s || 1,
 			lim = settings.labelMaxWidth,
@@ -4384,40 +3752,30 @@ var EngCalcs = EngCalcs || {};
 		function boxFor(x, y, bx, by, bw, bh) {
 			fitItem(out, x, y, (x - bx) * sc, (bx + bw - x) * sc, (y - by) * sc, (by + bh - y) * sc);
 		}
-		// **EVERY QUANTITY IN HERE MUST BE px/s, OR IT IS NOT SCALE-INVARIANT AFTER ALL.** This is
-		// the one trap in the whole approach and it caught me first time: the old bbox() carried
-		// world-unit fudges (a bare `- 2` above the baseline, a `+ 0.6` below it, `+ 0.2` of air
-		// round a node), and multiplying a WORLD constant by the scale produces a pixel figure that
-		// changes with the zoom -- reintroducing, in miniature, the exact dependence this design
-		// exists to remove. Everything below is now built from effectiveFontSize(), nodeRadius() and
-		// symbolFactor(), all of which are a pixel size divided by the scale, so the multiplication
-		// gives the pixel size straight back. Any constant added here belongs in PIXELS.
+		// **EVERY QUANTITY IN HERE MUST BE px/s, OR IT IS NOT SCALE-INVARIANT AFTER ALL.** Multiplying
+		// a WORLD constant by the scale produces a pixel figure that changes with the zoom,
+		// reintroducing the exact dependence this design removes. Everything below is built from
+		// effectiveFontSize(), nodeRadius() and symbolFactor(), all a pixel size divided by the
+		// scale, so the multiplication gives the pixel size straight back. ANY CONSTANT ADDED HERE
+		// BELONGS IN PIXELS.
 		var ascent = effectiveFontSize() * 0.85;
-		// **BUILT FROM THE MODEL, NEVER FROM THE RENDERED POSITION** -- and this is what makes a fit
-		// IDEMPOTENT, which is the property Tom went looking for: *"a simple test is to open,
-		// reload, or switch and then zoom extents. Ideally nothing happens."*
-		//
-		// Reading each label's drawn x/y looks more accurate and is the thing that ruined it. Those
-		// positions carry the collision pass's NUDGE and the arrow DODGE, both of which are computed
-		// in world units against pipes whose length in pixels changes with the zoom -- so the fit's
-		// input moved every time the fit moved the view, and pressing Zoom to fit twice gave two
-		// answers. Using the label's HOME position instead (anchor + its own stored offset) leaves
-		// nothing in the list that depends on the scale, so the second press has nothing left to
-		// change.
-		//
-		// What that costs is a label the relaxation pushed outward by a few pixels being a few
-		// pixels closer to the edge than the arithmetic thinks. The fit already reserves 16px, and a
-		// nudge is small compared with that -- a fair price for an answer that holds still.
+		// **BUILT FROM THE MODEL, NEVER FROM THE RENDERED POSITION** -- what makes a fit IDEMPOTENT:
+		// open, reload or switch, then zoom extents, and nothing happens. Reading each label's drawn
+		// x/y looks more accurate and ruins it: those positions carry the collision pass's NUDGE and
+		// the arrow DODGE, computed in world units against pipes whose length in pixels changes with
+		// the zoom, so the fit's input moves every time the fit moves the view. The label's HOME
+		// position depends on nothing scale-related. The cost is a nudged label sitting a few pixels
+		// closer to the edge than the arithmetic thinks, against 16px of reserve.
+
+
 		doc.nodes.forEach(function (n) {
 			var rad = nodeRadius(n) * sc + 1, ne = nodeEls[n.id] || {};
 			fitItem(out, n.x, n.y, rad, rad, rad, rad);
 			if (ignoreDataLabels || !ne.text || ne.empty) { return; }
 			// **THE SIDE COMES FROM THE MODEL, NOT FROM ne.side.** ne.side is render state left over
-			// from the last layout, so a fit arriving from a 0.02x view saw labels banked on the
-			// opposite side from one arriving at 1x and landed 24 px away in tx -- the exact
-			// dependence the paragraph above exists to remove, hiding in the one line that still
-			// read the drawing. Derived here the way dataLabelOrigin() derives it for an
-			// auto-placed label, from the HOME position, which is a model quantity.
+			// from the last layout, so a fit arriving from a 0.02x view sees labels banked on the
+			// opposite side from one arriving at 1x and lands 24 px away in tx. Derived here the way
+			// dataLabelOrigin() derives it for an auto-placed label, from the HOME position.
 			var tw = labelBoxWidth(ne) || 8, lc = ne.lineCount || 1, base = nodeLabelBase(n),
 				lx = (base.x >= n.x) ? base.x : base.x - tw;
 			boxFor(n.x, n.y, lx, base.y - ascent, tw, dataLabelBoxHeight(lc));
@@ -4428,13 +3786,11 @@ var EngCalcs = EngCalcs || {};
 				v = l.verts[j];
 				fitItem(out, v.x, v.y, vr, vr, vr, vr);
 			}
-			// An ALIGNED label lies along its pipe, whose own points are already here, and so do a
-			// repeated chain's copies. Counting them again would add a term that moves with the
-			// zoom, which is the whole thing this design removes.
+			// An ALIGNED label lies along its pipe, whose own points are already here, as do a
+			// repeated chain's copies. Counting them adds a term that moves with the zoom.
 			if (!le || !le.text || le.empty || ignoreDataLabels || linkLabelAligned(l)) { return; }
 			// The UNDODGED midpoint, for the same reason: the arrow dodge slides the label along the
-			// pipe by a world distance derived from the arrow's pixel size, so it moves with the
-			// zoom. It also never leaves the pipe, whose own points are already in this list.
+			// pipe by a world distance derived from the arrow's pixel size.
 			var pts = linkPointList(l), mid = Geom.pointAlongPolyline(pts, LINK_LABEL_ALONG),
 				d = defaultLabelOffset(),
 				tw = labelBoxWidth(le) || 8, lc = le.lineCount || 1,
@@ -4486,24 +3842,16 @@ var EngCalcs = EngCalcs || {};
 		return lo;
 	}
 	// ---- REMEMBERING WHERE YOU WERE: in memory per tab, and saved to the file --------------------
-	//
 	// No fit, however exact, is as good as putting the reader back where they were.
 	//
 	// **A VIEW IS A CENTRE AND A SCALE, NOT A WORLD EXTENT**, for two independent reasons:
-	//
 	//   * IT MATCHES RESIZE. Shrinking the window keeps the SCALE and shows less of the drawing (us,
-	//     and epanetjs). If reopening at that window size instead re-fitted the model into it, the
-	//     app would answer one question two ways depending on whether the window changed while it
-	//     was open.
+	//     and epanetjs); re-fitting into the new window answers one question two ways.
 	//   * IT IS EXACT. Restoring an extent recomputes the scale as min(W/w, H/h), so a canvas one
-	//     pixel different -- which the height dead band permits -- comes back at a slightly
-	//     different zoom, and cycling switch-window then zoom-to-fit visibly moves. A stored scale
+	//     pixel different comes back at a slightly different zoom and visibly moves. A stored scale
 	//     is copied verbatim and cannot drift.
-	//
-	// The COST, stated because it is real: opening a big model on a phone shows a fragment at the
-	// desktop's magnification rather than the whole intended view, small. Tom's use case (b) is that
-	// this is the honest outcome -- "you see the area of the pipe change. You blink your eyes. Good.
-	// You should."
+	// The COST is real: opening a big model on a phone shows a fragment at the desktop's
+	// magnification rather than the whole intended view, small.
 	function currentView() {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0,
@@ -4532,16 +3880,15 @@ var EngCalcs = EngCalcs || {};
 		setTransform();
 		// **A PAN IS NOT A ZOOM, AND ONLY A ZOOM NEEDS A RE-LAYOUT.** Everything onZoomChanged()
 		// rebuilds -- font sizes, tspan spacing, label boxes, the collision pass -- depends on the
-		// SCALE and on nothing else. Restoring a view at the scale already in force (switching to a
-		// tab and back, which is the commonest case there is) therefore costs one transform, where
-		// it used to cost a full relayout: over a second on Net3.
+		// SCALE alone. Restoring a view at the scale already in force (switching to a tab and back,
+		// the commonest case) costs one transform instead of a full relayout: over a second on Net3.
 		//
 		// **COMPARED AGAINST THE SCALE THE LAYOUT WAS COMPUTED AT, NOT THE ONE WE ARRIVED WITH.**
-		// The first version asked "did the scale change in this call", which is the wrong question:
-		// it answers "no" for a view restored at a scale that merely MATCHES the live transform,
-		// while the labels on screen were laid out for some earlier one. Asking whether the layout
-		// belongs to the scale being displayed is the honest test, and it self-heals any path that
+		// "Did the scale change in this call" answers "no" for a view restored at a scale that merely
+		// MATCHES the live transform while the labels on screen were laid out for an earlier one.
+		// Asking whether the layout belongs to the scale being displayed self-heals any path that
 		// changes the transform without saying so.
+
 		if (state.s !== lastLayoutScale) { onZoomChanged(); }
 		return true;
 	}
@@ -4563,46 +3910,31 @@ var EngCalcs = EngCalcs || {};
 			if (!mapSized) { pendingRestore = v; fitWhenSized = true; return; }
 			if (applyView(v)) { return; }
 		}
-		// Nothing to restore. **THE ONE AUTOMATIC FIT LEFT, AND WHY IT SURVIVES.** Tom, having had
-		// the other six removed: *"Overall refitting and re-baselining: I see it as vanishingly
-		// defensible."* Vanishingly, not entirely -- a document with no stored view has to be given
-		// one, and there is no other candidate. That is every file written before views were saved
-		// and every .inp ever imported. It happens ONCE per such document: the moment it is saved it
-		// carries a view, and this never runs for it again.
+		// Nothing to restore. **THE ONE AUTOMATIC FIT LEFT**: a document with no stored view has to
+		// be given one and there is no other candidate -- every file written before views were saved,
+		// and every .inp imported. It happens ONCE per such document; the moment it is saved it
+		// carries a view.
 		//
 		// An EMPTY drawing is not such a document. It has no extent, so bbox() falls back to an
-		// invented 0-10 square and the "fit" would be a zoom to nothing (Tom: *"Boot: Empty map? Why
-		// is a zoom needed?"*).
+		// invented 0-10 square and the "fit" would be a zoom to nothing.
 		if (!doc.nodes.length) { return; }
 		zoomExtent(true);
 	}
 	// `auto` marks a fit NOBODY ASKED FOR: boot, a freshly drawn example, a document with no stored
-	// view, the deferred fit that runs once the canvas has a height. Those establish a view rather
-	// than changing one, so they re-baseline a clean project instead of dirtying it. A fit the user
-	// pressed the button for is an edit like any other -- Tom, 2026-08-15: *"AutoCAD registers a
-	// zoom or pan as a change. But there are no automatic zooms or pans."*
-	// Room left for the labels on the FIRST of zoomExtent()'s two passes, in text heights. Tom,
-	// 2026-08-16: *"likely 6 (or whatever) text heights of padding will be zoomed out a little much
-	// for most models. When we adjust zoom after placing all labels, they will fit just a little
-	// better, and so we can leave them alone."* Exactly so -- the first pass is deliberately a touch
-	// generous, so the labels it lays out are comfortable at the tighter scale the second pass
-	// picks, and nothing has to be recomputed to check.
+	// view, the deferred fit once the canvas has a height. Those establish a view rather than
+	// changing one, so they re-baseline a clean project instead of dirtying it.
+	// Room left for the labels on the FIRST of zoomExtent()'s two passes, in text heights -- a touch
+	// generous, so the labels it lays out are comfortable at the tighter scale the second pass picks.
 	var FIT_LABEL_ROOM_TEXT_HEIGHTS = 6;
 	function zoomExtent(auto) {
 		if (!mapSized) { fitWhenSized = true; autoFitWhenSized = autoFitWhenSized || !!auto; return; }
-		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it (Tom, 2026-08-09:
-		// "it seems unforgivable to have a persistent message overwriting our map... maybe what we
-		// really need to do is make Zoom to Fit account for this top margin"). The mode hint sits
+		// ASYMMETRIC PADDING, because the canvas has permanent furniture on it: the mode hint sits
 		// top-left and the coordinate readout bottom-left, both inside the SVG's box, so a fit that
-		// pads all four sides equally deliberately places drawing content underneath them. It is
-		// the fit that is wrong here, not the overlays: they are live state, which is why they live
-		// on the canvas at all.
+		// pads all four sides equally places drawing content underneath them.
 		//
-		// NOTE WHAT THIS DOES AND DOES NOT FIX. It guarantees nothing is under an overlay
-		// IMMEDIATELY AFTER a fit. The user can still pan or zoom content back under one, because
-		// the overlays are screen-fixed and the drawing is not. A guarantee would need the
-		// overlays moved out of the canvas entirely -- see ROADMAP Task 253 for that argument and
-		// the screenshot case that is the real reason to want it.
+		// It guarantees nothing is under an overlay IMMEDIATELY AFTER a fit, and nothing more -- the
+		// user can still pan or zoom content back under one, because the overlays are screen-fixed
+		// and the drawing is not. A guarantee needs the overlays out of the canvas (Task 253).
 		var r = svg.getBoundingClientRect(), pad = 16,
 			padTop = Math.max(pad, overlayReserve('lpn_mode_hint')),
 			padBottom = Math.max(pad, overlayReserve('lpn_map_footer'));
@@ -4619,26 +3951,17 @@ var EngCalcs = EngCalcs || {};
 			setTransform();
 			onZoomChanged();
 		}
-		// **TWO SOLVES, NOT A CONVERGENCE LOOP.** Tom, 2026-08-16: *"we zoom to that, calculate
-		// labels once, then zoom again without recalculating."*
-		//
+		// **TWO SOLVES, NOT A CONVERGENCE LOOP.**
 		//   1. fit the MODEL ALONE, with six text heights of extra room, so the answer cannot depend
 		//      on the view we arrived from and the labels get somewhere comfortable to land.
 		//   2. work out the labels ONCE, at that scale.
 		//   3. fit again to the model plus those label boxes, without recomputing them.
-		//
-		// It replaced an iterate-until-stable loop, which was not deterministic: it seeded from
-		// state.s, so arriving from a 0.02x view -- where a label is 550 world units of lettering --
-		// gave a different answer from arriving at 1x, and no number of rounds fixed that because
-		// the starting point was the problem.
-		//
-		// The rejected alternative was Tom's own first suggestion, a flat padding of about six text
-		// heights: *"Is that too sloppy? It might cause trouble on small maps."* It is, and for that
-		// reason -- a fixed pad is most of a small map and nothing on a large one.
-		//
-		// What this deliberately accepts: the labels are laid out for step 1's scale, not step 3's,
-		// so a label can end fractionally outside the padding. A stable, predictable fit is worth
-		// more than chasing a fixed point that moves as you approach it.
+		// NOT an iterate-until-stable loop: it seeds from state.s, so arriving from a 0.02x view --
+		// where a label is 550 world units of lettering -- gives a different answer from arriving at
+		// 1x. NOT a flat pad of ~6 text heights either: a fixed pad is most of a small map and
+		// nothing on a large one. Deliberately accepted: the labels are laid out for step 1's scale,
+		// so a label can end fractionally outside the padding.
+
 		items = fitItems(state.s, true);
 		s = solve(labelTuning().fitRoom * settings.textSize);
 		items = fitItems(s);
@@ -4672,25 +3995,14 @@ var EngCalcs = EngCalcs || {};
 		backdropLayer.innerHTML = '';
 		saveToStorage();
 	}
-	// Cap the longest side at 1600px before storing (scope doc: "a scanned plan can be large, so
-	// downscale on import and record the original dimensions") -- nothing else in this feature bounds
-	// the localStorage footprint of a phone photo or a large scanned plan. PNG output, not JPEG: a
-	// scanned plan's thin lines are exactly what a lossy re-encode would blur; size is bounded by
-	// this cap instead.
+	// Cap the longest side at 1600px before storing -- nothing else here bounds the localStorage
+	// footprint of a phone photo or a large scanned plan.
 	var BACKDROP_MAX_SIDE = 1600;
-	// RE-ENCODE EVEN WHEN NOTHING IS RESIZED, AND KEEP WHICHEVER IS SMALLER.
-	//
-	// The cap alone does not bound the footprint, because an UNCOMPRESSED format can be enormous at
-	// a perfectly ordinary pixel size. Tom's colleague exports utility maps as Windows BMP, and the
-	// one he sent (2026-08-11) is 640 x 782 -- comfortably under the cap, so the old code stored it
-	// exactly as it arrived: 1.5 MB, which is ~1.96 MB once base64 makes it a data URI, out of a
-	// localStorage budget of about 5 MB for every project this browser holds. Re-encoded as PNG the
-	// same picture is ~67 KB. That is 22x, on a file that needed no resizing at all.
-	//
-	// Whichever-is-smaller rather than always-PNG, because always-PNG is wrong in the other
-	// direction: re-encoding a photographic JPEG as lossless PNG typically INFLATES it several
-	// times over. Comparing the two lengths needs no format table, no sniffing, and no list of
-	// exceptions to get out of date -- it just asks the question that actually matters.
+	// RE-ENCODE EVEN WHEN NOTHING IS RESIZED, AND KEEP WHICHEVER IS SMALLER. The cap alone does not
+	// bound the footprint: a 640 x 782 Windows BMP is comfortably under it and 1.5 MB, ~1.96 MB once
+	// base64 makes it a data URI, out of a ~5 MB localStorage budget for every project this browser
+	// holds; as PNG the same picture is ~67 KB. Whichever-is-smaller rather than always-PNG, because
+	// re-encoding a photographic JPEG as lossless PNG typically INFLATES it several times over.
 	function downscaleImage(dataUrl, maxSide, cb) {
 		var img = new Image();
 		img.onload = function () {
@@ -4705,12 +4017,11 @@ var EngCalcs = EngCalcs || {};
 			if (scale === 1 && dataUrl.length <= out.length) { out = dataUrl; }
 			cb(out, img.width, img.height);
 		};
-		// A FILE THE BROWSER CANNOT DECODE MUST SAY SO. What we can accept is not a list we choose --
-		// it is whatever this browser's own image decoder handles, and the picker cannot know that.
-		// TIFF is the one that bites: no major browser decodes it, yet the OS reports it as
-		// image/tiff, so it sailed through the type filter, failed here, and -- with only an onload
-		// handler -- did NOTHING AT ALL. No image, no message, no way to tell that from a picture
-		// placed somewhere off screen, which is the other half of Tom's "I cannot find the image".
+		// A FILE THE BROWSER CANNOT DECODE MUST SAY SO. What we can accept is whatever this browser's
+		// own image decoder handles, which the picker cannot know. TIFF is the one that bites: no
+		// major browser decodes it, yet the OS reports it as image/tiff, so it passes the type filter
+		// and fails here -- with only an onload handler that is no image, no message, and no way to
+		// tell it from a picture placed off screen.
 		img.onerror = function () {
 			var pc = EngCalcs.pageConfig || {};
 			alert(pc.lpn_backdrop_unreadable || 'This picture cannot be shown by your web browser. Save it as a PNG or JPEG picture and add it again.');
@@ -4718,19 +4029,11 @@ var EngCalcs = EngCalcs || {};
 		img.src = dataUrl;
 	}
 	// Initial placement, SIZE AND POSITION TOGETHER: the new image's longer side roughly matches the
-	// current network's own bbox extent (a fixed default when the network is empty), aspect-ratio-
-	// preserved, CENTRED ON THAT BBOX -- Scale/Position are how the user then registers it precisely.
-	// An explicit open question in the Phase 0 acceptance doc ("no way to *position* a freshly loaded
-	// backdrop relative to a grid already on screen... decide in Phase 2, not now") -- the spike's own
-	// arbitrary fixed 40x30 wasn't ported.
-	//
-	// THE CENTRING IS THE HALF THAT WAS MISSING, and without it the size was no help (Tom,
-	// 2026-08-14: "I added a background image to an existing model, and I cannot find the image").
-	// The image landed at tx/ty = 0, i.e. the world ORIGIN, which is nowhere near a network imported
-	// with real survey or state-plane coordinates -- a correctly-sized picture, hundreds of thousands
-	// of units off screen, with the only controls that could move it (Scale, Move) needing you to
-	// click on the thing you cannot see. Sizing a picture to a model you are not putting it on top of
-	// is a fit in one dimension only; the pair is what makes it "at least visible".
+	// network's bbox extent, aspect ratio preserved, CENTRED ON THAT BBOX. THE CENTRING IS NOT
+	// OPTIONAL -- landing at tx/ty = 0 is nowhere near a network imported with survey or state-plane
+	// coordinates, leaving a correctly-sized picture hundreds of thousands of units off screen with
+	// the only controls that could move it needing you to click the thing you cannot see.
+
 	function initialBackdropPlacement(iw, ih) {
 		var b = bbox(), extent = Math.max(b.maxx - b.minx, b.maxy - b.miny, 1),
 			target = doc.nodes.length > 0 ? extent : 40, longer = Math.max(iw, ih), scale = target / longer,
@@ -4761,12 +4064,12 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// ---- pixel size, typed rather than picked (Task 276) ----
-	// Tom, 2026-08-10: "mouse (and hand!!!) picking is never precise". Picking stays as the coarse
-	// step; this is the correction. `backdrop.s` scales the PLACEMENT BOX, not the image's own
-	// pixels, so the number a user actually thinks in -- ground distance per ORIGINAL image pixel --
-	// is one conversion away from it. `downscaleImage()` reports the original iw/ih rather than the
-	// downscaled canvas size, which is what makes this hold for a big image that was shrunk on the
-	// way in; do not "tidy" that callback into passing canvas.width.
+	// Picking is the coarse step; this is the correction. `backdrop.s` scales the PLACEMENT BOX, not
+	// the image's own pixels, so the number a user thinks in -- ground distance per ORIGINAL image
+	// pixel -- is one conversion away. `downscaleImage()` reports the ORIGINAL iw/ih rather than the
+	// downscaled canvas size, which is what makes this hold for a big image shrunk on the way in; do
+	// not "tidy" that callback into passing canvas.width.
+
 	function backdropPixelSize() {
 		if (!backdrop || !backdrop.width || !backdrop.iw) { return 0; }
 		return backdrop.s * backdrop.width / backdrop.iw;
@@ -4829,12 +4132,11 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// ---- backdrop registration wizard (regMode gate, Scale, Position) ----
-	// While a Scale/Position click sequence is pending, normal interaction (node drag, tap-to-open-
-	// popup, vertex insert) is suppressed entirely -- otherwise a click meant for registration also
-	// starts a node drag or opens a popup underneath it, since both listen on the same pointer
-	// events. Ported verbatim from the spike, validated through 8 rounds of Tom's on-device
-	// iteration (phase0-acceptance.md rounds 4/5/8-10), including the regmode-node cursor gate and
-	// the periodic cursor-reassert workaround for a real Chrome cursor-caching quirk found there.
+	// While a Scale/Position click sequence is pending, normal interaction (node drag,
+	// tap-to-open-popup, vertex insert) is suppressed entirely -- otherwise a click meant for
+	// registration also starts a node drag or opens a popup underneath it, since both listen on the
+	// same pointer events. The periodic cursor reassert below works around a real Chrome
+	// cursor-caching quirk.
 	var regMode = false;
 	var cursorNudgeTimer = null;
 	function nudgeCursor() {
@@ -4853,20 +4155,10 @@ var EngCalcs = EngCalcs || {};
 			if (cursorNudgeTimer) { clearInterval(cursorNudgeTimer); cursorNudgeTimer = null; }
 		}
 	}
-	// **THE ONLY VISIBLE WAY OUT OF A REGISTRATION SEQUENCE** (Tom, 2026-08-16: *"There needs to be a
-	// way to Cancel from Image moving and scaling. I try Esc. I try invoking other buttons. But
-	// nothing Cancels it."*).
-	//
-	// Escape already worked and still does. That was not enough, and the reason is worth keeping:
-	// **regMode suppresses every normal interaction on the canvas, so the page looks broken rather
-	// than busy** -- clicks do nothing, drags do nothing, and nothing on screen says why or for how
-	// long. An invisible keystroke is not an affordance for a state the user cannot see they are in.
-	// It is also swallowable: with focus inside the target panel's <select>, Escape closes the select
-	// and never reaches the document.
-	//
-	// So the bar does two jobs at once, and the first is the more important: it SAYS the mode is on.
-	// Cancel is then just the obvious button on it. Built in JS rather than in Looped-Network.php
-	// because it has no place in the page until a sequence starts, and torn down the same way.
+	// **THE ONLY VISIBLE WAY OUT OF A REGISTRATION SEQUENCE.** Escape works too and is not enough:
+	// regMode suppresses every normal interaction on the canvas, so the page looks broken rather than
+	// busy, and an invisible keystroke is not an affordance for a state the user cannot see they are
+	// in. The bar's first job is to SAY the mode is on; Cancel is then the obvious button on it.
 	var regModeBar = null;
 	function showRegModeBar(on) {
 		var pc = EngCalcs.pageConfig || {};
@@ -4904,11 +4196,8 @@ var EngCalcs = EngCalcs || {};
 		// no button at all. One line here means no future teardown can leave one behind.
 		showRegModeBar(false);
 	}
-	// Escape is the one dedicated "get me out" affordance -- without it, the only way to abandon a
-	// Scale/Position sequence is to re-open the dropdown and pick something else, which isn't
-	// discoverable as a cancel action, and regMode blanks all normal interaction in the meantime.
 	// CAPTURE phase, so a focused <select> in the target panel cannot swallow the key before the
-	// document sees it -- which is one of the ways Escape looked dead while being wired.
+	// document sees it -- one of the ways Escape looks dead while being wired.
 	document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { cancelActive(); } }, true);
 
 	function startBackdropScale() {
@@ -4930,15 +4219,11 @@ var EngCalcs = EngCalcs || {};
 		svg.addEventListener('pointerup', handler, true);
 		activeCancel = function () { svg.removeEventListener('pointerup', handler, true); setRegMode(false); };
 	}
-	// **SCALE ABOUT A FIXED POINT, the pure arithmetic.** Tom, 2026-08-16: *"Can we add a menu to
-	// scale from current so I can tweak it about a picked point? Click point. Enter scale from
-	// current."* An image point maps to the world as `W = t + s*L`, so holding P still while
-	// multiplying the scale by f gives `W' = P + f*(W - P)`, i.e. `s' = f*s` and
-	// `t' = P - f*(P - t)` -- the same formula zoomAbout() uses for the view.
-	//
-	// SEPARATE FROM THE PICKING, so it can be tested without a pointer: this is where the defect
-	// would be, and a click sequence is the part a harness cannot drive. P is in the internal
-	// (Y-down) world frame, which is what screenToWorld() returns, so no flip belongs here.
+	// **SCALE ABOUT A FIXED POINT, the pure arithmetic.** An image point maps to the world as
+	// `W = t + s*L`, so holding P still while multiplying the scale by f gives `W' = P + f*(W - P)`,
+	// i.e. `s' = f*s` and `t' = P - f*(P - t)` -- the same formula zoomAbout() uses for the view.
+	// SEPARATE FROM THE PICKING so it can be tested without a pointer. P is in the internal (Y-down)
+	// world frame, which is what screenToWorld() returns, so no flip belongs here.
 	function scaleBackdropAbout(p, f) {
 		if (!backdrop || !(f > 0) || !isFinite(f)) { return false; }
 		saveUndoSnapshot();
@@ -4949,10 +4234,9 @@ var EngCalcs = EngCalcs || {};
 		saveToStorage();
 		return true;
 	}
-	// **RELATIVE, NOT ABSOLUTE, and that is the whole point of it.** "Scale by picking" sets an
-	// absolute scale from a measured distance and lets the image land where it lands; this one keeps
-	// the point under the cursor still and asks only how much bigger or smaller. It is the tool for
-	// the last 5% of fitting an aerial, once the bar scale has already got it roughly right.
+	// **RELATIVE, NOT ABSOLUTE.** "Scale by picking" sets an absolute scale from a measured distance
+	// and lets the image land where it lands; this keeps the point under the cursor still and asks
+	// only how much bigger or smaller -- the tool for the last 5% of fitting an aerial.
 	function startBackdropScaleFrom() {
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
@@ -4975,11 +4259,10 @@ var EngCalcs = EngCalcs || {};
 		svg.addEventListener('pointerup', handler, true);
 		activeCancel = function () { svg.removeEventListener('pointerup', handler, true); setRegMode(false); };
 	}
-	// The typed half of Task 276. One box takes either form, because a user who has a world file and a
-	// user who has a number are asking for the same thing. Tom's wording, used verbatim: "Enter pixel
-	// size or paste the complete contents of the World File for the image" -- he wanted the paste
-	// spelled out rather than left to be discovered ("I don't like the paste unless it's very clear;
-	// it could get confusing").
+	// The typed half of Task 276. One box takes either form, because a user who has a world file and
+	// a user who has a number are asking for the same thing -- and the label spells the paste out
+	// rather than leaving it to be discovered.
+
 	function startBackdropScaleEntry() {
 		cancelActive();
 		if (!backdrop) { return; }
@@ -5017,31 +4300,20 @@ var EngCalcs = EngCalcs || {};
 		}
 		alert(pc.lpn_backdrop_scale_entry_bad || 'Type one number for the size of one pixel on the map, or paste all six lines of a world file.');
 	}
-	// WE NEVER ASK FOR A WORLD FILE AS A FILE (Tom, 2026-08-13): "We don't ask for world file...
-	// We ask for a paste of World File contents." An offerWorldFile() dialog used to open a SECOND
-	// file picker the moment an image landed, and it is gone -- along with its three language keys
-	// (lpn_backdrop_wld_ask/_none/_choose) and the hidden #lpn_backdrop_wld_file input.
-	//
-	// Nothing is lost, because both surviving doors already take the file's CONTENTS:
-	//   - pick the image and its sidecar together in the one picker (readWorldFile, below), and
-	//   - Background image > "Scale by world file or by the size of one pixel on the map", whose
-	//     textarea accepts those same six lines pasted.
-	// A sidecar still cannot be auto-detected in ANY browser -- a file picker returns the files the
-	// user picked and nothing about their folder, and showDirectoryPicker is a far larger permission
-	// ask and Chromium-only -- so a world file is always user-supplied, never discovered. That fact is
-	// what made the deleted dialog's "No world file found" a report of a search that never ran.
+	// WE NEVER ASK FOR A WORLD FILE AS A FILE -- we ask for a paste of its CONTENTS, or for the image
+	// and its sidecar picked together in the one picker (readWorldFile). A sidecar cannot be
+	// auto-detected in ANY browser: a file picker returns the files the user picked and nothing about
+	// their folder, so "No world file found" would report a search that never ran.
 	function positionTo(refWorld, target) {
 		saveUndoSnapshot();
 		backdrop.tx += target.x - refWorld.x; backdrop.ty += target.y - refWorld.y;
 		applyBackdropTransform();
 		saveToStorage();
 	}
-	// Per the spike's exact sequence: (a) click Backdrop > Position, (b) alert asking for a reference
-	// point, (c) user clicks it, (d) alert announcing the target-mode step, (e) a floating panel
-	// (mirroring #lpn_labels_popup's static-PHP-plus-JS-clamped-position pattern) offering
-	// Node/Free point/Coords, (f) Continue. Each step registers its own activeCancel so an
-	// interruption at any point tears down cleanly instead of leaving orphaned listeners or regMode
-	// stuck on.
+	// The sequence: Backdrop > Position, an alert asking for a reference point, the user clicks it,
+	// an alert announcing the target-mode step, a floating panel offering Node/Free point/Coords,
+	// Continue. Each step registers its own activeCancel so an interruption at any point tears down
+	// cleanly instead of leaving orphaned listeners or regMode stuck on.
 	function startBackdropPosition() {
 		cancelActive();
 		var pc = EngCalcs.pageConfig || {};
@@ -5058,17 +4330,11 @@ var EngCalcs = EngCalcs || {};
 	}
 	function showBackdropTargetPanel(refWorld) {
 		var panel = document.getElementById('lpn_backdrop_target_panel'),
-			// ANCHORED ON THE POINT THE USER PICKED (Tom, 2026-08-17), not the menubar -- the chooser
-			// asks "where should THAT point go", so it belongs next to the point being asked about.
-			// A zero-size rect at the point's screen location gives openPanelAtAnchor() the same shape
-			// it expects from a real getBoundingClientRect(), and its own viewport clamp keeps the
-			// panel on screen even when the point is near an edge.
-			//
-			// Previously anchored on #lpn_menubar; that was itself a fix (Task, 2026-08-16) for a worse
-			// bug where the menubar anchor could be missing from the DOM entirely (Background image
-			// moved off the toolbar by Task 375's follow-up) and getBoundingClientRect() threw before
-			// openPanelAtAnchor() could show the panel. The point-anchor below can never be missing --
-			// it is computed, not looked up -- so that failure mode cannot recur here.
+			// ANCHORED ON THE POINT THE USER PICKED, not the menubar -- the chooser asks "where should
+			// THAT point go", so it belongs next to the point being asked about. A zero-size rect at
+			// the point's screen location gives openPanelAtAnchor() the shape it expects from a real
+			// getBoundingClientRect(), and its viewport clamp keeps the panel on screen near an edge.
+			// A computed anchor can also never be missing from the DOM, which a looked-up one was.
 			pt = worldToScreen(refWorld.x, refWorld.y),
 			anchorRect = { top: pt.y, bottom: pt.y, left: pt.x, right: pt.x, width: 0, height: 0 };
 		// Placed and height-fitted by the one shared placer (Task 372), like every other panel that
@@ -5107,11 +4373,9 @@ var EngCalcs = EngCalcs || {};
 			activeCancel = function () { svg.removeEventListener('pointerup', handler2, true); setNodeCursorAllowed(false); setRegMode(false); };
 		};
 	}
-	// The five backdrop commands, in ONE implementation with two doors: the toolbar's button and the
-	// Insert > Background image submenu (Tom, 2026-08-04: "In EPANET, Backdrop has its submenu, so
-	// that's what the paradigm calls us to do... Can we duplicate the toolbar item into the pull-down
-	// menu?" -- yes, and duplication between a menu and a toolbar is the correct relationship, not
-	// something to clean up).
+	// The five backdrop commands, in ONE implementation with two doors: the toolbar button and the
+	// Insert > Background image submenu. Duplication between a menu and a toolbar is the correct
+	// relationship, not something to clean up.
 	function backdropAction(v) {
 		var pc = EngCalcs.pageConfig || {};
 		var fileInput = document.getElementById('lpn_backdrop_file');
@@ -5124,20 +4388,11 @@ var EngCalcs = EngCalcs || {};
 			if (window.confirm(pc.lpn_backdrop_remove_confirm || 'Remove the background image?')) { removeBackdrop(); }
 		}
 	}
-	// The rows themselves, built fresh on every open so `disabled` is simply read from the current
-	// state -- which is why the old updateBackdropMenuState() machinery is gone rather than kept as a
-	// no-op. The COMMANDS are shared verbatim by both doors, so the two can no longer drift apart.
-	//
-	// The HEADING is what lets these be bare verbs. Tom, 2026-08-04, was right that "Scale"/"Position"
-	// orphan in the Insert menu, "where nothing above them says what is being scaled" -- so something
-	// does, and the object moves out of five labels into one word.
-	//
-	// But it belongs to ONE door, not both (Tom, 2026-08-13: "remove the top wording from the
-	// Background image menu. It's unnecessarily redundant"). Off the toolbar button the heading
-	// repeats the button you just clicked, which reads as a stutter; spliced into Insert it is the
-	// only thing in sight that says what Add/Move/Remove act on. So `withHeading` is passed by the
-	// Insert door alone. Do not "simplify" it back to always-on or always-off -- each door has been
-	// ruled on separately, and the two rulings disagree for good reasons.
+	// Rows built fresh on every open, so `disabled` is read from the current state, and the COMMANDS
+	// are shared verbatim by both doors. The HEADING is what lets these be bare verbs and belongs to
+	// ONE door: off the toolbar button it repeats the button you just clicked, while spliced into
+	// Insert it is the only thing saying what Add/Move/Remove act on. Do NOT "simplify" `withHeading`
+	// back to always-on or always-off.
 	function backdropRows(withHeading) {
 		var pc = EngCalcs.pageConfig || {};
 		return (withHeading ? [{ heading: true, label: pc.lpn_backdrop_menu || 'Background image…' }] : []).concat([
@@ -5149,21 +4404,18 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'del', label: pc.lpn_backdrop_remove || 'Remove', fn: function () { backdropAction('remove'); }, disabled: !backdrop }
 		]);
 	}
-	// `into` is optional as of 2026-08-15. The toolbar button is GONE (Tom: *"remove New project and
-	// Background image from the toolbar"*) and Insert ▸ Background image is the only door -- but the
-	// FILE INPUT's change handler still has to be attached, and it lived in here. Called with no
-	// argument, this wires the picker and builds no button. Dropping the whole call would have left
-	// the menu row opening a file dialog whose result nothing listened for: a picker that silently
-	// does nothing, which is the worst kind of broken.
+	// `into` is optional. The toolbar button is gone and Insert > Background image is the only door,
+	// but the FILE INPUT's change handler still has to be attached and it lives here. Called with no
+	// argument this wires the picker and builds no button; dropping the call leaves the menu row
+	// opening a file dialog whose result nothing listens for.
 	function wireBackdropMenu(into) {
 		var pc = EngCalcs.pageConfig || {}, menu = document.createElement('button');
 		menu.type = 'button';
-		// A BUTTON, not a <select> (Tom, 2026-08-13). A select is as wide as its widest option, so
-		// "Scale by world file or by the size of one pixel on the map" set the width of a control that spends all its time
-		// reading "Background image…" -- and the longer a command's name got, the more toolbar it
-		// cost, which is a bad trade to have wired into the widget. A menu button is as wide as its
-		// own label and nothing else. The id stays: showBackdropTargetPanel() positions the target
-		// panel off this element's rect.
+		// A BUTTON, not a <select>. A select is as wide as its widest option, so the longest command
+		// name sets the width of a control that spends all its time reading "Background image…" -- the
+		// longer a command's name gets, the more toolbar it costs. A menu button is as wide as its own
+		// label and nothing else.
+
 		menu.id = 'lpn_backdrop_menu';
 		setLabel(menu, 'image', pc.lpn_backdrop_menu || 'Background image…');
 		// stopPropagation for the same reason every menubar item does it -- see buildMenuBar().
@@ -5238,25 +4490,20 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// ---- SELECTION: subject, then verb (ROADMAP Task 415) ----
+	// Every CAD and GIS editor is select-first, act-second. Verb-then-subject cannot grow a
+	// multi-select -- there is nowhere to put the second subject -- which is why Task 266 (lasso) was
+	// blocked on this. SINGLE selection only for now.
 	//
-	// Every CAD and GIS editor is select-first, act-second, and this page was the other way round:
-	// you picked the Delete tool and then clicked a thing. Verb-then-subject cannot grow a
-	// multi-select -- there is nowhere to put the second subject -- which is why Task 266 (lasso)
-	// was blocked on this and why the foundation ships alone, with SINGLE selection only.
-	//
-	// **SELECTION IS VIEW STATE AND LIVES NOWHERE NEAR THE DOCUMENT.** It is one variable here plus
-	// a CSS class on the drawn element -- deliberately NOT a key on the node/link/label object.
+	// **SELECTION IS VIEW STATE AND LIVES NOWHERE NEAR THE DOCUMENT.** One variable here plus a CSS
+	// class on the drawn element, deliberately NOT a key on the node/link/label object:
 	// serializeProject() hands out doc.nodes/doc.links/doc.labels BY REFERENCE, so a `selected` key
-	// written onto an element would be saved into the file, into every undo snapshot and into the
-	// dirty-signature hash: opening a project would restore somebody else's highlight, and merely
-	// clicking a pipe would mark the project modified.
+	// would be saved into the file, into every undo snapshot and into the dirty-signature hash --
+	// opening a project would restore somebody else's highlight and clicking a pipe would mark the
+	// project modified.
 	//
-	// **AND IT MUST NEVER GO THROUGH setProp().** That is the write seam for OVERRIDABLE properties
-	// (dev/scenario-seam-repair.md): inside a scenario setProp() writes an override, and in Base it
-	// writes the element. Selection is neither membership nor identity (Task 407's line), so a
-	// `selected` override would mean "this element is highlighted in the Fire-flow scenario", stored
-	// in the document, and a click in Base would edit BASE under every scenario at once. There is no
-	// selection branch in setProp() and there must not be one; nothing below writes an element.
+	// **AND IT MUST NEVER GO THROUGH setProp().** Selection is neither membership nor identity (Task
+	// 407's line), so a `selected` override would mean "highlighted in the Fire-flow scenario",
+	// stored in the document, and a click in Base would edit BASE under every scenario at once.
 	var selection = null;   // {kind:'node'|'link'|'label', id} -- one, or none. See Task 266 for many.
 	function selectionExists(sel) {
 		if (!sel) { return false; }
@@ -5341,23 +4588,15 @@ var EngCalcs = EngCalcs || {};
 	});
 
 	// ---- FIND: an ID lookup and a condition, in ONE panel (ROADMAP Tasks 420 and 353) ----
-	//
-	// EPANET's Map Finder answers "where is node 259?" with a radio group, an ID box and the list of
-	// links meeting there. Task 353 wants the larger question -- "which pipes are under 8 inches?"
-	// -- which nothing else in this field offers (EPANET's Network Table and epanet-js's Data Tables
-	// are listings with no filter). They are the same panel with a different condition, so this is
-	// ONE control: two commands in the same menu, differing only in the operator, would be a
-	// vocabulary to learn instead of a tool to use.
-	//
+	// An ID lookup (EPANET's Map Finder) and a condition ("which pipes are under 8 inches?") are the
+	// same panel with a different operator, so this is ONE control: two menu commands differing only
+	// in the operator would be a vocabulary to learn instead of a tool to use.
 	// **THE VALUES SEARCHED ARE THE VALUES PRINTED ON THE MAP.** colorValueOf() is the accessor the
-	// colour ramp and the map labels already read, in the DISPLAYED unit -- so "Diameter is greater
-	// than 8" means the 8 you can read on the drawing. A second accessor here would be a second
-	// answer to "what is this pipe's diameter", which is how a query tool starts disagreeing with
-	// the drawing it queries.
-	//
-	// **READ-ONLY BY CONSTRUCTION.** It selects and it moves the view; nothing below writes an
-	// element. Task 389 (search and replace) is this query plus a write, and its write goes through
-	// setProp() -- which is why the query half is worth shipping on its own first.
+	// colour ramp and the map labels already read, in the DISPLAYED unit; a second accessor is a
+	// second answer to "what is this pipe's diameter".
+	// **READ-ONLY BY CONSTRUCTION.** It selects and moves the view; nothing below writes an element.
+	// Task 389 (search and replace) is this query plus a write through setProp().
+
 	var findState = { scope: 'all', prop: 'id', op: 'contains', value: '' };
 	var findResults = [];
 	// Scope names REUSE the Insert tools' labels (CLAUDE.md's concept-level reuse): a junction is a
@@ -5629,15 +4868,11 @@ var EngCalcs = EngCalcs || {};
 	// `anchorEl` is the CONTROL to hang the panel under -- the menu-bar item, passed in by the row
 	// that opens it.
 	//
-	// **IT CANNOT BE READ FROM openMenuAnchor, AND THAT COST A SHIPPED FEATURE.** A menu row's action
-	// runs after the menu has closed, and closeMenu() nulls openMenuAnchor -- so the first cut found
-	// no anchor, skipped the positioning, and left a `position: fixed` panel with no `left` or `top`
-	// at its STATIC position, 1,200 px down the document. It was display:block, fully built, and
-	// completely invisible. Tom, 2026-08-17: *"It's in the menu, where I expected. But it doesn't
-	// bring up anything."*
-	//
-	// So: the anchor is passed, and a missing anchor CENTRES the panel rather than leaving it
-	// unpositioned. There is no path out of this function that does not place the box.
+	// **IT CANNOT BE READ FROM openMenuAnchor.** A menu row's action runs after the menu has closed
+	// and closeMenu() nulls openMenuAnchor, leaving a `position: fixed` panel with no `left` or `top`
+	// at its STATIC position 1,200 px down the document -- display:block, fully built and completely
+	// invisible. A missing anchor CENTRES the panel instead; there is no path out of this function
+	// that does not place the box.
 	function toggleFindPopup(anchorEl) {
 		var popup = document.getElementById('lpn_find_popup'), input;
 		if (!popup) { return; }
@@ -5674,40 +4909,26 @@ var EngCalcs = EngCalcs || {};
 		el.textContent = key ? (pc[key] || '') : '';
 	}
 	function setMode(newMode) {
-		// Read-only no longer restricts the TOOLS (Tom, 2026-08-04, reconfirmed 2026-08-05: "if you
-		// open a project read-only, you should be able to do with it anything you want, but you can't
-		// save it to file"). The single enforcement point is writeOpenProjectToFile(), plus a disabled
-		// Save in the File menu. Everything else is ordinary editing on a document that simply has
-		// nowhere of its own to go yet -- Save as is the way out, exactly as for a browser project.
+		// Read-only does NOT restrict the TOOLS: open a project read-only and you can do anything
+		// with it except save it to file. The single enforcement point is writeOpenProjectToFile(),
+		// plus a disabled Save in the File menu; Save as is the way out.
 		mode = newMode; setPendingLinkFrom(null);
 		if (setModeUI) { setModeUI(); }
 		updateModeHint();
 	}
 
 	function addNode(type, x, y) {
-		// key is the structural nextId/settings.idPrefixes lookup letter; the ID's actual leading
-		// text is settings.idPrefixes[key] (customizable via the gear/settings panel, Task 146 Phase
-		// 2) -- defaults to the key itself, so this reproduces the original hardcoded J1/R1 behavior
-		// until a user changes it.
+		// key is the structural nextId/settings.idPrefixes lookup letter; the ID's actual leading text
+		// is settings.idPrefixes[key], customizable in the settings panel and defaulting to the key.
 		var id = mintId(LPN_ID_KEY[type] || 'J');
-		// Both node types carry an elevation. A reservoir ALSO carries a head -- the fixed-head
-		// boundary condition js/lpn-solver.js solves against -- and that head is left blank by
-		// default, meaning "same as the elevation" (Tom, 2026-07-30: a reservoir with both fields
-		// is also a tank; the head "can default to Elevation and literally auto-fill from elevation
-		// if blank"). So a plain reservoir is a water surface at its own ground elevation, and
-		// typing a head turns it into a tank of that depth, with the difference reported as the
-		// pressure there. See reservoirHead() for the one place that resolution happens.
-		// Both node types now take the SAME settings.defaults.nodeElev (Tom, 2026-07-30) -- see the
-		// note on settings.defaults for why the old reservoir-sits-100-ft-higher asymmetry went away.
-		// A reservoir still gets no `head` key at all, which is what keeps it following its elevation.
-		//
-		// A TANK (Task 248, 2026-08-14) is the third node type and it is NOT a reservoir with a
-		// head typed into it, even though a steady-state solve cannot tell the two apart. What
-		// separates them is what happens next: a reservoir's level never moves, a tank's does.
-		// Its `elev` is the BOTTOM of the vessel and its level is measured up from there, which is
-		// EPANET's own convention and the reason the popup shows the water surface as a computed
-		// row rather than as a second editable field -- two editable numbers that must agree is
-		// exactly the "hidden curve" trap Tom named on the pump.
+		// Both node types carry an elevation and take the same settings.defaults.nodeElev. A
+		// reservoir ALSO carries a head, left blank by default meaning "same as the elevation" -- it
+		// gets no `head` key at all, which is what keeps it following its elevation.
+		// A TANK is NOT a reservoir with a head typed into it, even though a steady-state solve
+		// cannot tell them apart: a reservoir's level never moves, a tank's does. Its `elev` is the
+		// BOTTOM of the vessel and its level is measured up from there (EPANET's convention), which
+		// is why the popup shows the water surface as a computed row -- two editable numbers that
+		// must agree is the "hidden curve" trap.
 		var n;
 		if (type === 'reservoir') {
 			n = { id: id, type: type, x: x, y: y, elev: settings.defaults.nodeElev };
@@ -5740,11 +4961,10 @@ var EngCalcs = EngCalcs || {};
 		};
 		l._length = linkGeomLength(l);   // base-write: construction: a link is born in Base before any scenario can override it
 		if (type === 'valve') {
-			// A VALVE IS A ZERO-LENGTH LINK, and that is exact rather than a small number standing
-			// in for one: EngCalcs.lpnResistance returns r = 0 for a zero-length link, so the
-			// friction term vanishes and what is left is the pure local loss a valve is. lenAuto is
-			// off, or linkGeomLength() would give it the drawn distance between its two nodes and
-			// quietly add pipe friction to it.
+			// A VALVE IS A ZERO-LENGTH LINK, exactly rather than a small number standing in for one:
+			// EngCalcs.lpnResistance returns r = 0, so the friction term vanishes and what is left is
+			// the pure local loss a valve is. lenAuto is OFF, or linkGeomLength() gives it the drawn
+			// distance between its nodes and quietly adds pipe friction.
 			l._length = 0;   // base-write: construction: a valve is born with zero length in Base
 			l.lenAuto = false;
 			// TCV IS THE DEFAULT TYPE, deliberately: it is the one type both engines solve, so a
@@ -5754,16 +4974,13 @@ var EngCalcs = EngCalcs || {};
 			l._setting = defaultValveSetting('TCV');   // base-write: construction: a valve is born with its type default in Base
 		}
 		if (type === 'pump') {
-			// Pump curve entry (Task 146, 2026-07-30): l.curvePoints holds 1-3 [Q,H] pairs in SI,
-			// fitted to h0/a/b by EngCalcs.lpnPumpFromCurve (see its own comment for the 1/2/3-point
-			// forms -- same math bpn_'s supply curve uses). l.curveRef, when set, names another
-			// pump link whose curvePoints this one copies instead of using its own -- so several
-			// identical pumps in one network need the curve entered only once.
-			// A brand-new pump has NO curve at all (Tom, 2026-07-30: "the entire issue was that
-			// there was a hidden curve... just squash the secrets"). An invisible default design
-			// point made a pump silently deliver head the user never entered, and then behave
-			// strangely once demand ran past that unseen curve. With no curve it adds and loses
-			// nothing until a real one is typed into its popup -- see pumpFit().
+			// l.curvePoints holds 1-3 [Q,H] pairs, fitted to h0/a/b by EngCalcs.lpnPumpFromCurve.
+			// l.curveRef, when set, names another pump link whose curvePoints this one copies, so
+			// several identical pumps need the curve entered only once.
+			// A brand-new pump has NO curve at all. An invisible default design point makes a pump
+			// silently deliver head the user never entered, then behave strangely once demand runs
+			// past that unseen curve. With no curve it adds and loses nothing -- see pumpFit().
+
 			l.curvePoints = [];
 			l.curveRef = null;
 		}
@@ -5774,13 +4991,11 @@ var EngCalcs = EngCalcs || {};
 		scheduleSolve();
 		return l;
 	}
-	// A NEW VALVE'S SETTING, per type -- and it has to be per type, because the setting is a
-	// different QUANTITY for each one (see js/lpn-epanet.js): a pressure for a PRV or PSV, a flow
-	// for an FCV, a dimensionless loss coefficient for a TCV. Carrying one number across a type
-	// change would read 60 psi as a loss coefficient of 60, which is not a valve anybody built.
-	// So changeValveType() re-seeds through here, and says so in the popup rather than silently.
-	// Numbers chosen so a valve dropped on a network is a plausible design on arrival: a district
-	// PRV holding 60 psi (40 m), a 250 gpm (15 l/s) flow limit, and a throttle at k = 2.
+	// A NEW VALVE'S SETTING, PER TYPE, because the setting is a different QUANTITY for each one (see
+	// js/lpn-epanet.js): a pressure for a PRV or PSV, a flow for an FCV, a dimensionless loss
+	// coefficient for a TCV. Carrying one number across a type change reads 60 psi as a loss
+	// coefficient of 60. Numbers chosen so a valve dropped on a network is a plausible design on
+	// arrival: a district PRV holding 60 psi (40 m), a 250 gpm (15 l/s) limit, a throttle at k = 2.
 	function defaultValveSetting(type) {
 		if (type === 'PRV' || type === 'PSV') { return niceDefault('lpn_u_pressure', 'psi', 60, 40); }
 		// A pressure DROP, so it opens on a small one rather than on a supply pressure: 60 psi of
@@ -5815,9 +5030,8 @@ var EngCalcs = EngCalcs || {};
 		return lb;
 	}
 	// ---- drawing and deleting inside a scenario (ROADMAP Task 184) ----
-	// DRAWING: the app silently creates the element in BASE as inactive and overrides it active
-	// here. The user gets ordinary drawing; the model keeps ONE id space and ONE element set, which
-	// is what makes "membership is overridable, identity is not" feel like no rule at all.
+	// DRAWING: the app silently creates the element in BASE as inactive and overrides it active here,
+	// so the user gets ordinary drawing while the model keeps ONE id space and ONE element set.
 	function bornInScenario(el) {
 		if (inBaseScenario()) { return; }
 		el._active = false;   // base-write: born inactive in Base, then overridden active here -- the whole membership design
@@ -5828,10 +5042,10 @@ var EngCalcs = EngCalcs || {};
 	// takes every scenario's overrides on that element with it -- confirmed with a count, because
 	// that is work in documents the user is not looking at.
 	// A node carries its incident links with it either way: a link to a node that is not there is
-	// the "dangling-link" diagnostic, and leaving one behind would trade a delete for an error.
-	// `kind` IS THE OVERRIDE GROUP -- 'node', 'link' or, since Task 407, 'label'. A Text is deleted
-	// by the same rule as everything else because it now has scenario values to lose: destroying it
-	// from inside a scenario would take another scenario's note with it.
+	// the "dangling-link" diagnostic, so leaving one behind trades a delete for an error.
+	// `kind` IS THE OVERRIDE GROUP -- 'node', 'link' or 'label'. A Text follows the same rule because
+	// it has scenario values to lose.
+
 	function deleteElement(kind, id) {
 		var pc = EngCalcs.pageConfig || {},
 			el = kind === 'node' ? nodeById(id) : kind === 'label' ? labelById(id) : linkById(id);
@@ -5886,29 +5100,15 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- The examples gallery (ROADMAP Task 314) ---------------------------------------------
 	//
-	// **A GALLERY IS A UNIVERSE OF WORKING EXAMPLES**, and it stands where a placeholder sentence
-	// used to. Tom, 2026-08-14, overruling the objection that every other calculator in this suite
-	// lands a visitor IN a worked example so a gallery costs them: *"A gallery is a universe of
-	// working examples. The tension is small-minded. This is not a two-minute calculator."* He is
-	// right, and the error was treating a rule about CALCULATORS as a rule about this page. "Open
-	// on a worked example" earns its keep where a visitor can read the whole tool in one screen; a
-	// network editor is not that, and the thing a visitor needs first is the RANGE of what can be
-	// built, which one example cannot show.
+	// **A GALLERY IS A UNIVERSE OF WORKING EXAMPLES.** The suite's "open on a worked example" rule is
+	// about CALCULATORS; a network editor is not one, and what a visitor needs first is the RANGE of
+	// what can be built. AN EXAMPLE IS A FILE, not a function -- the shelf is
+	// dev/water-network-examples/, published to examples/ by dev/scripts/generate_examples.php.
 	//
-	// AN EXAMPLE IS A FILE, not a function. The two built-in examples are ~290 lines of drawing
-	// code (drawExampleNetwork()), which cannot carry a description or a thumbnail, cannot be
-	// authored by anyone who is not editing this file, and does not scale to a screen full of them.
-	// The shelf is dev/water-network-examples/, published to examples/ by
-	// dev/scripts/generate_examples.php together with a manifest and generated thumbnails.
-	//
-	// **OPENING ONE GIVES YOU A DOCUMENT YOU OWN.** Tom, on what HEC-RAS got right without ever
-	// saying it: *"They were your copies because you downloaded and installed them."* Ours are
-	// served rather than installed, so the equivalent is that an example lands as an ordinary new
-	// project the user may Save As -- never a read-only view of a file on our server, and never
-	// something that writes back. That is why this goes through acceptImportedText() and
-	// importProject(), the very same pair the upload path uses, rather than a loader of its own:
-	// a second import path would drift from the first, and the first is the one with the version
-	// migration, the structural repair and the storage-quota handling already in it.
+	// **OPENING ONE GIVES YOU A DOCUMENT YOU OWN** -- an ordinary new project the user may Save As,
+	// never a read-only view of a file on our server. Hence acceptImportedText() and importProject(),
+	// the same pair the upload path uses: a second import path would drift from the first, which is
+	// the one carrying the version migration, the structural repair and the quota handling.
 	var examplesManifest = null, examplesState = 'idle';
 	function examplesPane() { return document.getElementById('lpn_examples_pane'); }
 	// Cards are built from the manifest, which is FETCHED -- so this cannot be rendered by PHP, and
@@ -5934,28 +5134,23 @@ var EngCalcs = EngCalcs || {};
 		pane.appendChild(elh('p', { 'class': 'lpn-examples-welcome' }, pc.lpn_examples_welcome || ''));
 		pane.appendChild(elh('h2', { 'class': 'lpn-examples-h' }, pc.lpn_examples_heading || ''));
 		pane.appendChild(elh('p', { 'class': 'lpn-examples-sub' }, pc.lpn_examples_sub || ''));
-		// **THE WAY OUT IS ABOVE THE WALL, NOT BELOW IT** (Tom, 2026-08-14: "The link at the bottom
-		// should be at the top"). Nothing here guarantees the cards fit the map's height -- the
-		// count grows, the map height is a user setting, and a phone is short -- so anything placed
-		// after the grid is the first thing to fall off the bottom. A visitor who wants to draw
-		// their own network would then have to scroll a wall of examples to find out they need not
-		// look at it. Put it where it is always seen and the fit question stops mattering for it.
-		// TWO WORDINGS FOR ONE EXIT, chosen by how the wall was opened. Arriving on an empty canvas,
-		// "Or start with a blank map" is the offer. Opened from File > Open example… the user already
-		// has a drawing, so that wording reads as "throw it away" and they will not press the only
-		// control that leaves -- Tom, 2026-08-17: *"I can't back out of the gallery even when other
-		// projects are open. Everything is locked and I am forced to open an example."* Closing has
-		// never touched a project in either case; only the wording was wrong.
+		// **THE WAY OUT IS ABOVE THE WALL, NOT BELOW IT.** Nothing guarantees the cards fit the map's
+		// height -- the count grows and the map height is a user setting -- so anything after the
+		// grid is the first thing to fall off the bottom, and a visitor who wants to draw their own
+		// network would have to scroll a wall of examples to find that out.
+		// TWO WORDINGS FOR ONE EXIT, chosen by how the wall was opened. On an empty canvas, "Or start
+		// with a blank map" is the offer. Opened from File > Open example… the user already has a
+		// drawing, so that wording reads as "throw it away" and they will not press the only control
+		// that leaves. Closing never touches a project either way.
 		var blank = elh('button', { type: 'button', 'class': 'lpn-examples-blank' },
 			(galleryForced ? pc.lpn_examples_close : pc.lpn_examples_blank) || '');
 		blank.addEventListener('click', function () { hideExamplesGallery(); });
 		pane.appendChild(blank);
 		var grid = elh('div', { 'class': 'lpn-examples-grid' });
 		examplesManifest.forEach(function (ex) {
-			// A BUTTON, not a div with a click handler: the whole card is the target, it reaches
-			// the keyboard for free, and it announces itself to a screen reader as something that
-			// can be activated. This page is used on touch screens where a small "Open" affordance
-			// inside a big picture is the wrong hit area.
+			// A BUTTON, not a div with a click handler: the whole card is the target, it reaches the
+			// keyboard for free, and it announces itself to a screen reader. A small "Open"
+			// affordance inside a big picture is the wrong hit area on a touch screen.
 			var card = elh('button', { type: 'button', 'class': 'lpn-example-card' });
 			if (ex.thumb) {
 				// <img> rather than inlined markup: it is cacheable, it cannot collide with the
@@ -5964,12 +5159,10 @@ var EngCalcs = EngCalcs || {};
 					'class': 'lpn-example-thumb', src: 'examples/' + ex.thumb, alt: '', loading: 'lazy'
 				}));
 			}
-			// **THE TRANSLATED STRING WINS; THE MANIFEST'S ENGLISH IS THE FALLBACK.** The card text
-			// lives in lib/lang.ec.*.php like every other string on this page -- a string kept only
-			// in the examples folder's own JSON would be one no translator ever sees, which would
-			// have left six permanently-English cards on a page that ships in 27 languages. The
-			// manifest still carries the English so a newly dropped-in example is a usable card
-			// before anybody has written its keys.
+			// **THE TRANSLATED STRING WINS; THE MANIFEST'S ENGLISH IS THE FALLBACK.** Card text lives
+			// in lib/lang.ec.*.php like every other string here -- a string kept only in the examples
+			// folder's JSON is one no translator ever sees. The manifest still carries the English so
+			// a newly dropped-in example is a usable card before anybody has written its keys.
 			card.appendChild(elh('span', { 'class': 'lpn-example-title' },
 				(ex.titleKey && pc[ex.titleKey]) || ex.title || ex.file));
 			card.appendChild(elh('span', { 'class': 'lpn-example-desc' },
@@ -5981,12 +5174,10 @@ var EngCalcs = EngCalcs || {};
 			grid.appendChild(card);
 		});
 		pane.appendChild(grid);
-		// The legal row, in the gallery as well as in the Help menu -- this page has no footer to
-		// carry it, and the gallery is what a first-time visitor actually looks at. epanet-js puts
-		// its own Terms and Privacy in exactly this position, in the sidebar of the panel it shows
-		// on arrival. Built here rather than rendered by PHP because the whole pane is; the strings
-		// are the SUITE's existing keys, so this costs no translation and cannot word itself
-		// differently from the same links on every other page.
+		// The legal row, in the gallery as well as in the Help menu -- this page has no footer, and
+		// the gallery is what a first-time visitor looks at. epanet-js puts its own Terms and Privacy
+		// in exactly this position. Built here rather than in PHP because the whole pane is; the
+		// strings are the SUITE's existing keys, so this costs no translation.
 		var legal = elh('p', { 'class': 'lpn-examples-legal' });
 		[[pc.privacy_link || 'Privacy notice', 'privacy.php'],
 			[pc.terms_link || 'Terms of use', 'terms.php']].forEach(function (pair) {
@@ -6000,14 +5191,10 @@ var EngCalcs = EngCalcs || {};
 			pc.consent_settings_link || 'Cookie settings'));
 		pane.appendChild(legal);
 	}
-	// Dismissed for THIS project only, and not persisted. The gallery's whole job is to appear on
-	// an empty canvas; a visitor who dismissed it once a month ago and now has an empty drawing in
-	// front of them is exactly who it is for. `galleryDismissed` resets whenever a project opens.
-	//
-	// `galleryForced` is the File > Open example… route: the user asked for the wall while a
-	// network was already on screen, so "show it when the canvas is empty" is not the rule any
-	// more. Two flags rather than one tri-state because they answer different questions and both
-	// can be true -- "has this visitor waved the gallery away" and "did they just ask for it".
+	// Dismissed for THIS project only, and not persisted -- the gallery's job is to appear on an
+	// empty canvas, and a visitor with an empty drawing in front of them is who it is for.
+	// `galleryForced` is the File > Open example… route, where the canvas is not empty. Two flags
+	// rather than one tri-state because they answer different questions and both can be true.
 	var galleryDismissed = false, galleryForced = false;
 	function showExamplesOverlay() {
 		galleryForced = true;
@@ -6094,10 +5281,9 @@ var EngCalcs = EngCalcs || {};
 		// 2026-07-30 "when I delete a pipe, its orphaned labels are left behind", one more time.
 		(linkEls[id].repeats || []).forEach(function (r) { r.text.remove(); });
 		if (linkEls[id].symbolG) { linkEls[id].symbolG.remove(); }
-		// The extrema mark needs no line of its own here any more (Task 333): it is the
-		// text's own text-decoration, so removing the text removes it. It used to be a set of
-		// separate elements that this had to hunt down, and forgetting to was Tom's 2026-07-30
-		// "when I delete a pipe, its orphaned labels are left behind".
+		// The extrema mark needs no line of its own (Task 333): it is the text's own
+		// text-decoration, so removing the text removes it. As separate elements it had to be hunted
+		// down here, and forgetting left orphaned labels behind a deleted pipe.
 		delete linkEls[id];
 		incidentLinks[l.from] = incidentLinks[l.from].filter(function (x) { return x !== id; });
 		incidentLinks[l.to] = incidentLinks[l.to].filter(function (x) { return x !== id; });
@@ -6121,51 +5307,37 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// ---- Project library storage (Task 146.08 step 3) ----
-	// ONE localStorage key per project (`lpn_project_<id>`) plus a small index (`lpn_index`), rather
-	// than one blob holding everything. Two reasons, both from the ROADMAP:
-	//   - autosave rewrites only the OPEN project, so typing in a small network does not re-serialize
-	//     every other network you own on every keystroke; and
-	//   - one large backdrop image cannot take the whole library down with a single quota error. A
-	//     project that will not fit fails alone, and the others stay readable.
-	// The index carries only what a project LIST needs (id, name, updated). It is a cache, not the
-	// authority: `project.name` inside the project document is the source of truth, and
-	// adoptOrphans() below rebuilds an index entry for any project key the index has lost.
-	// 3 (Task 263, 2026-08-10): inputs are stored AS DECLARED rather than in SI, and the document
-	// records the unit selection it was written under. A v2 document holds SI numbers and says
-	// nothing about units, which is why opening one runs the one-time restore offer below.
-	// 5 (Task 324, 2026-08-14): a scenario override is keyed by GROUP AND id ('n:20' / 'l:20')
-	// rather than by the bare id, because a node and a link may legally share one.
-	// 7 (Task 354, 2026-08-16): coordinates are LOCAL to a `doc.origin`, which the file carries in
-	// its own Cartesian frame. Every existing document migrates by having one computed for it, and
-	// the ones near zero get {0, 0} and are byte-identical afterwards.
-	// 8 (Task 407, 2026-08-17): a Text label's words are stored as `_text`, the underscored spelling
-	// every overridable property uses, because what a note SAYS is now a scenario value.
+	// ONE localStorage key per project (`lpn_project_<id>`) plus a small index (`lpn_index`), never
+	// one blob holding everything: autosave then rewrites only the OPEN project, and one large
+	// backdrop image cannot take the whole library down with a single quota error.
+	// The index carries only what a project LIST needs (id, name, updated). It is a CACHE, not the
+	// authority -- `project.name` inside the project document is the source of truth, and
+	// adoptOrphans() rebuilds an index entry for any project key the index has lost.
+
+	// 3 (Task 263): inputs are stored AS DECLARED rather than in SI, and the document records the
+	// unit selection it was written under. A v2 document holds SI numbers and says nothing about
+	// units, which is why opening one runs the one-time restore offer below.
+	// 5 (Task 324): a scenario override is keyed by GROUP AND id ('n:20' / 'l:20'), because a node
+	// and a link may legally share one.
+	// 7 (Task 354): coordinates are LOCAL to a `doc.origin`, which the file carries in its own
+	// Cartesian frame. Documents near zero get {0, 0} and are byte-identical afterwards.
+	// 8 (Task 407): a Text label's words are stored as `_text`, because what a note SAYS is now a
+	// scenario value.
 	var LPN_STORAGE_VERSION = 8;
-	// ---- ROADMAP Task 274, second half (Tom, 2026-08-11: "Eventually needs to be Cartesian. If we
-	// can do that now without causing trouble, let's do it.") ----
+	// ---- ROADMAP Task 274, second half ----
 	//
 	// From v4 the FILE stores Cartesian Y (up is positive), matching what the user sees and what
-	// EPANET uses. `doc` in memory stays Y-down, which is SVG's own system and what every drawing
-	// routine here is written against -- so the sign flips at the storage boundary, in exactly two
-	// functions: serializeProject() on the way out and applySaved() on the way in.
-	//
-	// A v3 document is MIGRATED on open, like every other version step in migrateSaved(): converted
-	// and stamped. "Let's not worry about doing anything with existing projects" (Tom) is satisfied
-	// by the conversion being invisible and automatic, not by leaving old files behind -- the first
-	// cut did leave them behind, and Tom caught it ("We always upgrade the file to the current
-	// format. Right?").
-	//
-	// V2 IS THE ONE VERSION THAT LAGS, and only because the units question it carries is the user's
-	// to answer. It keeps Y-down storage, correctly, since the read and write gates below key off the
-	// same number -- and it picks up Cartesian for free the moment the units question is answered,
-	// because stampDocAnswered() moves it to LPN_STORAGE_VERSION. That is why the two questions can
-	// share one version number after all: the coordinate change needs no answer from anybody, so it
-	// rides on a bump rather than needing one of its own.
+	// EPANET uses. `doc` in memory stays Y-down, SVG's own system, so the sign flips at the storage
+	// boundary in exactly two functions: serializeProject() out and applySaved() in. A v3 document is
+	// MIGRATED on open like every other version step -- we always upgrade a file to the current
+	// format. V2 IS THE ONE VERSION THAT LAGS, only because the units question it carries is the
+	// user's to answer; it keeps Y-down storage and picks up Cartesian when that is answered.
 	var LPN_CARTESIAN_VERSION = 4;
 	// The six Y-bearing fields, and no others. Offsets (`ly`, a Text label's `y`, `backdrop.ty`) are
-	// VECTORS and negate exactly like positions do -- a vector in a flipped frame flips with it.
-	// `backdrop.y`/`height` are NOT here: the image is anchored by its top-left corner, and "extends
-	// downward on screen" is the same visual fact in both frames, so only the anchor's sign moves.
+	// VECTORS and negate exactly like positions do. `backdrop.y`/`height` are NOT here: the image is
+	// anchored by its top-left corner and "extends downward on screen" is the same visual fact in
+	// both frames, so only the anchor's sign moves.
+
 	function flipStoredY(o) {
 		(o.nodes || []).forEach(function (n) {
 			if (typeof n.y === 'number') { n.y = -n.y; }
@@ -6177,38 +5349,33 @@ var EngCalcs = EngCalcs || {};
 		});
 		(o.labels || []).forEach(function (lb) { if (typeof lb.y === 'number') { lb.y = -lb.y; } });
 		if (o.backdrop && typeof o.backdrop.ty === 'number') { o.backdrop.ty = -o.backdrop.ty; }
-		// The saved VIEW is a world REGION -- a centre point and an extent in drawing units (see
-		// currentView()) -- so its centre's y belongs in this list for the same reason every other y
-		// does. The extent is a size, and sizes do not flip. Storing a screen-space translation
-		// instead would have put an unflipped convention into a file that is otherwise Cartesian.
+		// The saved VIEW is a world REGION -- a centre point and an extent in drawing units -- so its
+		// centre's y belongs here like every other y. The extent is a size, and sizes do not flip.
+		// A screen-space translation would put an unflipped convention into a Cartesian file.
 		if (o.view && typeof o.view.cy === 'number') { o.view.cy = -o.view.cy; }
 		return o;
 	}
 	// ---- Task 354: choosing and applying a document's local origin --------------------------------
 	//
 	// **THE THRESHOLD IS A MEASUREMENT, NOT A TASTE.** A float32's spacing at magnitude m is about
-	// m / 2^23. A pipe's stroke is `linkWidth / scale` world units, so the drawing survives while
-	// linkWidth / scale > m / 2^23 -- i.e. up to a working zoom of about 2^23 * linkWidth / m. At
-	// Elm Street's 1.3e6 that is scale 19 for a 3 px stroke, and the map he was looking at was at
-	// 47. At 1e4 it is scale 2,500, which is five times MAX_SCALE, so a document whose coordinates
-	// are under ten thousand has nothing to gain from a rebase and is left exactly as it was --
-	// including every example this repo ships (0 to ~5,000) and Net1/2/3 (0 to 100).
+	// m / 2^23, and a pipe's stroke is `linkWidth / scale` world units, so the drawing survives up to
+	// a working zoom of about 2^23 * linkWidth / m. At 1.3e6 that is scale 19 for a 3 px stroke,
+	// against a real map at 47. At 1e4 it is scale 2,500, five times MAX_SCALE, so a document under
+	// ten thousand has nothing to gain from a rebase -- including every example this repo ships
+	// (0 to ~5,000) and Net1/2/3 (0 to 100).
 	var LPN_ORIGIN_THRESHOLD = 1e4;
 	// Rounded so a human reading `origin` sees a number they could have typed, and so two documents
-	// covering the same survey area are likely to share one. It also means a small edit to a network
-	// never moves the origin: the rebase runs once, at the version step or at import, and the origin
-	// is then a fixed property of the document.
+	// over the same survey area are likely to share one. A small edit therefore never moves the
+	// origin: the rebase runs once, and the origin is then a fixed property of the document.
 	var LPN_ORIGIN_ROUND = 1e3;
 	// Every ABSOLUTE coordinate a stored document holds, in its own (Cartesian) frame. A visitor is
-	// called with {get, set} so one list serves both the bbox pass and the shift pass -- two lists
-	// that had to agree would be the thing that drifts, and a coordinate missed by the shift is a
-	// node half a million units from its pipe.
+	// called with {get, set} so ONE list serves both the bbox pass and the shift pass -- two lists
+	// that had to agree would drift, and a coordinate missed by the shift is a node half a million
+	// units from its pipe.
 	//
-	// WHAT IS DELIBERATELY NOT HERE: `n.lx`/`l.ly` and an ANCHORED label's x/y are OFFSETS from
-	// something else, and an offset does not move when the frame's origin does. `backdrop.x/y/width`
-	// are a size and an anchor within the image, not a place on the map; only `backdrop.tx/ty`, the
-	// image's world translation, is a position. `view.extent` is a size for the same reason its
-	// centre is a position.
+	// DELIBERATELY NOT HERE: `n.lx`/`l.ly` and an ANCHORED label's x/y are OFFSETS, and an offset
+	// does not move when the frame's origin does. `backdrop.x/y/width` are a size and an anchor
+	// within the image; only `backdrop.tx/ty` is a position. `view.extent` is a size.
 	function eachStoredPoint(o, visit) {
 		(o.nodes || []).forEach(function (n) { visit(n); });
 		(o.links || []).forEach(function (l) { (l.verts || []).forEach(function (v) { visit(v); }); });
@@ -6240,12 +5407,10 @@ var EngCalcs = EngCalcs || {};
 			y: Math.floor(minY / LPN_ORIGIN_ROUND) * LPN_ORIGIN_ROUND
 		};
 	}
-	// Give a stored document an origin and make every coordinate in it local to that origin. The
-	// absolute position of everything is unchanged BY CONSTRUCTION -- origin + local is what every
-	// outward-facing site reports -- so this is invisible to the user, which is the whole reason it
-	// can run automatically on open rather than asking a question the way the v2 units offer does.
-	// Idempotent on a document that already has an origin: it returns without touching anything, so
-	// a document cannot be rebased twice into oblivion.
+	// Give a stored document an origin and make every coordinate local to it. Absolute positions are
+	// unchanged BY CONSTRUCTION -- origin + local is what every outward-facing site reports -- so
+	// this is invisible and can run automatically on open, unlike the v2 units offer.
+	// Idempotent on a document that already has an origin, so it cannot be rebased twice.
 	function rebaseDocument(o) {
 		if (o.origin) { return o; }
 		var org = chooseOrigin(o);
@@ -6260,23 +5425,22 @@ var EngCalcs = EngCalcs || {};
 		return o;
 	}
 	// The version at which inputs became declarative. A document below it holds SI numbers that have
-	// not been ruled on, and that is the ONLY thing the restore offer keys off (Tom, 2026-08-10:
-	// "The project receives no version number, right? Isn't that absence enough to trigger the offer
-	// again?" -- yes, and a second flag beside it was one mechanism too many).
+	// not been ruled on, and that version alone is the ONLY thing the restore offer keys off -- a
+	// second flag beside it is one mechanism too many.
 	var LPN_DECLARATIVE_VERSION = 3;
-	// The version of the document currently open, which is NOT always LPN_STORAGE_VERSION.
-	// serializeProject() writes THIS rather than the constant, so a project whose numbers have not
-	// been ruled on saves as v2 and is asked again next time. Moving it forward is what "answered"
-	// means: Convert does it, "Never ask again" does it, and Close deliberately does not.
+	// The version of the document currently open, NOT always LPN_STORAGE_VERSION. serializeProject()
+	// writes THIS rather than the constant, so a project whose numbers have not been ruled on saves
+	// as v2 and is asked again. Moving it forward is what "answered" means: Convert does it, "Never
+	// ask again" does it, Close deliberately does not.
 	var openDocVersion = LPN_STORAGE_VERSION;
 	var LPN_LEGACY_KEY = 'lpn_document';   // the pre-library single-document key (v1 and v2 alike)
 	var LPN_INDEX_KEY = 'lpn_index';
 	var LPN_PROJECT_PREFIX = 'lpn_project_';
 	var library = { v: LPN_STORAGE_VERSION, openId: null, projects: [] };
 	// True once a write has failed (quota, private mode). Autosave stays best-effort -- it must never
-	// throw into a mouse handler -- but with a LIBRARY the old silent swallow is no longer honest:
-	// a user with several projects and a full quota would go on drawing into a document that is not
-	// being saved. setStorageError() surfaces it in the status bar instead.
+	// throw into a mouse handler -- but a silent swallow is not honest with a LIBRARY: a user with a
+	// full quota would go on drawing into a document that is not being saved. setStorageError()
+	// surfaces it in the status bar.
 	var storageError = false;
 	function setStorageError(on) {
 		var pc = EngCalcs.pageConfig || {};
@@ -6285,16 +5449,14 @@ var EngCalcs = EngCalcs || {};
 		if (on) { setStatus(pc.lpn_storage_full || 'Not saved. Browser storage is full or unavailable, so your recent changes will be lost when you close this tab.'); }
 	}
 	function projectKey(id) { return LPN_PROJECT_PREFIX + id; }
-	// The full reset behind "?lpn_wipe=1" and the Wipe memory button. Now that a library exists it
-	// must clear EVERY project key plus the index, not just the old single document -- a wipe that
-	// left ten project keys behind would repopulate the library on the next load via adoptOrphans()
-	// and read as the wipe having silently failed. Collected before deleting: removing while
-	// iterating localStorage by index skips entries.
+	// The full reset behind "?lpn_wipe=1" and the Wipe memory button. Clears EVERY project key plus
+	// the index: a wipe leaving ten project keys behind repopulates the library on the next load via
+	// adoptOrphans() and reads as the wipe having silently failed. Collected before deleting --
+	// removing while iterating localStorage by index skips entries.
 	function wipeAllStorage() {
-		// The identity (initials + opaque token) is part of "everything this page remembers about me"
-		// and was missing here until 2026-08-04, when Tom noticed Clear/Wipe did not make the page
-		// behave as a first-time visitor: the file training panel stayed suppressed and the old
-		// initials were still being sent to the lock broker.
+		// The identity (initials + opaque token) is part of "everything this page remembers about
+		// me". Without it Clear/Wipe leaves the file training panel suppressed and the old initials
+		// still going to the lock broker.
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
@@ -6303,14 +5465,12 @@ var EngCalcs = EngCalcs || {};
 			}
 			doomed.forEach(function (k) { localStorage.removeItem(k); });
 		} catch (err) { /* private mode -- nothing to remove */ }
-		// ALSO expire the suite unit cookie, or the promise this button makes is not kept
-		// (found 2026-07-31 while checking whether Tom's "returns to a new machine state" wording
-		// was true). Looped-Network.php calls echoCookieScript(), and echoUnitSelect() hardcodes
-		// onchange="EngCalcs.submitForm()", so the seven unit dropdowns ARE saved to a cookie and
-		// ARE restored on load. Without this, "reloads the page exactly as a first-time visitor
-		// sees it" was false: a returning visitor who had switched to SI came back to SI.
-		// (An older comment in clearNetwork() calls this "a cookie this page never uses" -- that
-		// was true when it was written and has not been for some time; corrected there too.)
+		// ALSO expire the suite unit cookie, or the promise this button makes is not kept.
+		// Looped-Network.php calls echoCookieScript() and echoUnitSelect() hardcodes
+		// onchange="EngCalcs.submitForm()", so the unit dropdowns ARE saved to a cookie and ARE
+		// restored on load -- without this a returning visitor who had switched to SI comes back
+		// to SI, and "exactly as a first-time visitor sees it" is false.
+
 		try { if (EngCalcs.expireCookie) { EngCalcs.expireCookie(); } } catch (err) { /* non-fatal */ }
 	}
 	// The whole-page reset, behind one confirm. Extracted from the Settings button's inline handler
@@ -6327,22 +5487,18 @@ var EngCalcs = EngCalcs || {};
 	function newProjectId() {
 		return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 	}
-	// **WHAT THIS DOCUMENT IS, WRITTEN INSIDE THE DOCUMENT** (ROADMAP Task 315, 2026-08-14). Until
-	// this landed there was NO format identifier in the file at all: `v` is a version number, but
-	// nothing said what it was a version OF. So a saved project was identifiable only by its
-	// filename -- which is precisely the thing a person renames -- and that is the real defect the
-	// 30-character `-lpn-hawsedc-engcalcs` suffix was compensating for. Two additive keys fix it at
-	// the layer that survives a rename, a re-download and a mail attachment.
+	// **WHAT THIS DOCUMENT IS, WRITTEN INSIDE THE DOCUMENT** (Task 315). `v` is a version number and
+	// nothing said what it was a version OF, so a saved project was identifiable only by its filename
+	// -- the thing a person renames. Two additive keys fix it at the layer that survives a rename, a
+	// re-download and a mail attachment.
 	//
-	// `app` is a URL rather than a product name on purpose: the product name is unsettled (Task 315
-	// again, and LibreEPANET.org is unlaunched), and a URL is the one identifier that stays useful
-	// to somebody who finds this file knowing nothing. Old readers ignore unknown keys, so nothing
-	// needs to migrate and no version bump is owed.
+	// `app` is a URL rather than a product name: the product name is unsettled, and a URL stays
+	// useful to somebody who finds this file knowing nothing. Old readers ignore unknown keys.
 	var LPN_FILE_FORMAT = 'hawsedc-lpn';
-	// Matches CANONICAL_ORIGIN in lib/config.inc.php (no `www`). Hardcoded rather than derived from
-	// location.origin on purpose: a file saved from a dev host would otherwise record the dev host
-	// forever, and this key exists to tell a stranger where the format lives, not to log where one
-	// particular save happened.
+	// Matches CANONICAL_ORIGIN in lib/config.inc.php (no `www`). HARDCODED, not derived from
+	// location.origin: a file saved from a dev host would record the dev host forever, and this key
+	// says where the format lives, not where one save happened.
+
 	var LPN_FILE_APP = 'https://hawsedc.com/engcalcs/Looped-Network.php';
 	function serializeProject() {
 		var out = {
@@ -6391,16 +5547,13 @@ var EngCalcs = EngCalcs || {};
 	}
 	function saveIndex() { return writeJSON(LPN_INDEX_KEY, library); }
 	// ---- "differs from the file", the only thing the asterisk may mean ----
-	// The flag used to be set by saveToStorage(), on the reasoning that every mutation funnels
-	// through there. It does -- but so does a great deal that is NOT a mutation, and runSolve() calls
-	// saveToStorage() unconditionally on a debounce. So merely OPENING a file, or switching to a tab,
-	// scheduled a solve, which wrote storage, which raised the asterisk on a project identical to the
-	// file it came from (Tom, 2026-08-04: "On opening a file on https, it immediately says it is
-	// modified. This must be a mistake." It was).
+	// NOT a flag set by saveToStorage(): a great deal that is not a mutation funnels through there
+	// too, and runSolve() calls it unconditionally on a debounce -- so merely opening a file or
+	// switching to a tab raises the asterisk on a project identical to the file it came from.
 	//
-	// A signature answers the real question instead of a proxy for it: dirty means the document is
-	// not what the file holds. That also makes edit-then-undo-back correctly clean, which no
-	// call-site-counting scheme ever manages.
+	// A signature answers the real question: dirty means the document is not what the file holds.
+	// That also makes edit-then-undo-back correctly clean, which no call-site count manages.
+
 	function hash32(str) {
 		var h = 5381, i = str.length;
 		while (i) { h = (h * 33) ^ str.charCodeAt(--i); }
@@ -6416,19 +5569,11 @@ var EngCalcs = EngCalcs || {};
 		var bd = snap.backdrop;
 		snap = Object.assign({}, snap, {
 			backdrop: bd ? { n: (bd.href || '').length, x: bd.x, y: bd.y, w: bd.width, h: bd.height, s: bd.s } : null,
-			// **THE VIEW IS PART OF THE DOCUMENT AND MOVING IT IS AN EDIT** -- and getting here took
-			// a wrong turn worth recording. My first fix for Tom's inescapable asterisk was to drop
-			// the view from this signature. He rejected the direction and named the real fault:
-			// *"AutoCAD registers a zoom or pan as a change. But there are no automatic zooms or
-			// pans. The paradigm mistake in our code right now is probably a holdover from zooming
-			// to fit on every open... In a nutshell, our current paradigm forbids autozooms or
-			// refits. Could you be hacking at this from the wrong direction?"*
-			//
-			// He was right. Excluding the view would have made a deliberate pan unsaveable in order
-			// to excuse an automatic one. The view stays in the signature, exactly as it stays in
-			// the file, and what changed instead is that an AUTOMATIC fit re-baselines the clean
-			// signature rather than dirtying the project -- see zoomExtent()'s `auto` argument. A
-			// fit that establishes a view the document never had is not a change to it.
+			// **THE VIEW IS PART OF THE DOCUMENT AND MOVING IT IS AN EDIT.** Do NOT drop the view
+			// from this signature to quiet a stray asterisk: that makes a deliberate pan unsaveable
+			// in order to excuse an automatic one. The paradigm forbids automatic zooms and refits,
+			// and an AUTOMATIC fit re-baselines the clean signature rather than dirtying the project
+			// -- see zoomExtent()'s `auto` argument.
 			view: snap.view
 		});
 		return hash32(JSON.stringify(snap));
@@ -6443,12 +5588,10 @@ var EngCalcs = EngCalcs || {};
 		if (entry) {
 			entry.name = project.name;
 			entry.updated = Date.now();
-			// Recomputed here because this is still the one seam every change passes through -- what
-			// changed is what it decides. `savedSig` is set only by a successful file write, so a
-			// project that has never been written to a file has none and is always dirty, which is
-			// exactly right: a browser project is in no file at all.
-			//
-			// The strip is redrawn only when the answer CHANGES. This runs on every pointer move of a
+			// Recomputed here because this is the one seam every change passes through. `savedSig` is
+			// set only by a successful file write, so a project never written to a file has none and
+			// is always dirty -- exactly right, since a browser project is in no file at all.
+			// The strip is redrawn only when the answer CHANGES: this runs on every pointer move of a
 			// drag, and a full tab re-render per frame would be visible.
 			var nowDirty = docSignature() !== entry.savedSig;
 			if (nowDirty !== !!entry.dirty) { entry.dirty = nowDirty; renderTabs(); }
@@ -6456,19 +5599,12 @@ var EngCalcs = EngCalcs || {};
 		saveIndex();
 	}
 	// Versioned per the scope doc's schema rules: v > CURRENT refuses to load and says so, never
-	// silently drops unknown fields; v < CURRENT runs an ordered migration chain.
-	// v1 -> v2 (Task 184/146.08, 2026-07-30) is a pure WRAP, with no data loss and nothing to
-	// reinterpret: the same nodes/links/labels/nextId/labelSettings/backdrop/settings keys sit
-	// alongside a new `project` and a `scenarios` array holding Base and nothing else. A v1 save
-	// therefore migrates by supplying two defaults, which is exactly what migrateSaved() does below
-	// -- and it is why the container had to ship before scenarios rather than after.
-	// Ordered, one step per version, each taking the object from v(n) to v(n+1). A save older than
-	// the newest migration therefore walks the whole chain rather than needing a special case per
-	// starting version.
-	// The v4 -> v5 override re-keying, split out so the rule above sits beside the step that runs it
-	// and the harness can drive it on its own. Returns a small report -- how many keys were re-keyed
-	// and how many were dropped -- because a migration that guesses silently is worse than one that
-	// states its rule, and nothing else in the document afterwards can say what it did.
+	// silently drops unknown fields; v < CURRENT runs an ordered migration chain, one step per
+	// version, so an old save walks the whole chain rather than needing a case per starting version.
+	// v1 -> v2 is a pure WRAP with no data loss, migrating by supplying two defaults.
+	// The v4 -> v5 override re-keying is split out so the harness can drive it, and returns how many
+	// keys were re-keyed and how many dropped: a migration that guesses silently is worse than one
+	// that states its rule, and nothing in the document afterwards can say what it did.
 	function migrateOverrideKeys(saved) {
 		var nodeIds = {}, linkIds = {}, moved = 0, dropped = 0, both = 0;
 		(saved.nodes || []).forEach(function (n) { if (n && n.id !== undefined) { nodeIds[n.id] = true; } });
@@ -6568,23 +5704,18 @@ var EngCalcs = EngCalcs || {};
 		}
 		// ---- v5 -> v6: sizes become SCREEN PIXELS (Task 331) --------------------------------------
 		//
-		// THE OLD VALUES ARE DISCARDED RATHER THAN CONVERTED, AND THAT IS THE HONEST ANSWER RATHER
-		// THAN THE LAZY ONE. A v5 `textSize` in 'map' units is a WORLD size; the pixels it rendered
-		// at depended on the zoom the reader happened to be at, so there is no scale factor to apply
-		// -- the same stored 20 was a banner headline on one screen and invisible on another. That
-		// ambiguity IS the defect this task removes, and inventing a conversion factor would carry it
-		// forward wearing a number that looks authoritative.
+		// THE OLD VALUES ARE DISCARDED RATHER THAN CONVERTED. A v5 `textSize` in 'map' units is a
+		// WORLD size whose rendered pixels depended on the reader's zoom, so there is no scale factor
+		// to apply -- the same stored 20 was a banner headline on one screen and invisible on
+		// another. Inventing a conversion carries that ambiguity forward wearing an authoritative
+		// number. A v5 document written with textSizeUnits:'screen' COULD be carried across unchanged
+		// and deliberately is not: two classes of reopened document behaving differently for an
+		// invisible reason is worse than one sentence to explain.
 		//
-		// A v5 document written with textSizeUnits:'screen' *could* be carried across unchanged, and
-		// deliberately is not. Splitting the migration by a flag would mean two classes of reopened
-		// document behaving differently for a reason invisible to the person looking at them; every
-		// v5 document opens at the new defaults, which is one sentence to explain and is what the
-		// paradigm is FOR. Nothing about the network is touched -- only how it is drawn.
-		//
-		// The stale keys are deleted rather than left to be ignored, because settings is serialized
-		// whole: leaving them would write textSizeUnits back out of every future save of a document
-		// that has not had one since v5, and a key that reads as live but is never consulted is the
-		// kind of thing that gets 'restored' by a well-meaning future edit.
+		// The stale keys are DELETED rather than ignored, because settings is serialized whole:
+		// leaving them writes textSizeUnits back out of every future save, and a key that reads as
+		// live but is never consulted gets 'restored' by a well-meaning future edit.
+
 		if (saved.v === 5) {
 			if (saved.settings) {
 				var d = defaultSettings();
@@ -6597,16 +5728,12 @@ var EngCalcs = EngCalcs || {};
 			saved.v = 6;
 		}
 		// ---- v6 -> v7: COORDINATES BECOME LOCAL TO doc.origin (Task 354) --------------------------
-		//
-		// A normal convert-and-stamp step, like v3 -> v4 and for the same reason: it asks the user
-		// nothing, because origin + local is the same absolute coordinate every outward-facing site
-		// was already reporting. Tom's rule -- "We always upgrade the file to the current format" --
-		// applies straightforwardly.
-		//
-		// **AN ALREADY-IMPORTED SURVEY MODEL IS REBASED ON OPEN, not left as it is.** Leaving it
-		// would exempt exactly the documents that have the bug, and the pipe that vanishes is not
-		// less broken for having been imported last week. A document whose coordinates are already
+		// A normal convert-and-stamp step: it asks the user nothing, because origin + local is the
+		// same absolute coordinate every outward-facing site already reported.
+		// **AN ALREADY-IMPORTED SURVEY MODEL IS REBASED ON OPEN, not left as it is** -- leaving it
+		// exempts exactly the documents that have the bug. A document whose coordinates are already
 		// small gets {0, 0} and is unchanged in every byte that matters.
+
 		if (saved.v === 6) {
 			rebaseDocument(saved);
 			saved.v = 7;
@@ -6621,21 +5748,15 @@ var EngCalcs = EngCalcs || {};
 			saved.v = 8;
 		}
 		// **There is deliberately NO v2 -> v3 step here, and v2 is the ONLY version that lags.**
-		// Every other migration in this function converts the document and stamps it; this one
-		// cannot, because the conversion is the USER'S to authorise. So the document stays at v2
-		// until they answer, and the missing stamp IS the pending question. An earlier cut stamped v3
-		// on sight and carried a separate `unitsUnconfirmed` flag beside it; Tom removed the flag by
-		// asking why the version alone was not enough (2026-08-10). It is, and serializeProject()
-		// writes `openDocVersion` so a v2 document saves back as v2.
-		// A v2 document therefore keeps Y-down storage too -- correctly, since applySaved() and
-		// serializeProject() both gate on the same version -- and picks up Cartesian for free the
-		// moment the units question is answered, because stampDocAnswered() moves it to
-		// LPN_STORAGE_VERSION.
-		// A LAGGING v2 DOCUMENT THEREFORE NEVER REACHES THE v4 -> v5 STEP EITHER, and that is safe
-		// rather than lucky: v2 predates the scenario UI entirely, so no v2 document can carry an
-		// override at all (applyV2Restore() records the same fact and declines to scale them for the
-		// same reason). Adding a re-keying pass for a case that cannot occur would be dead code in a
-		// one-time migration -- which reads as evidence the case is real, and is worse than absent.
+		// Every other migration converts and stamps; this one cannot, because the conversion is the
+		// USER'S to authorise. The document stays at v2 until they answer, and THE MISSING STAMP IS
+		// THE PENDING QUESTION -- no separate `unitsUnconfirmed` flag, the version alone is enough.
+		// serializeProject() writes `openDocVersion` so a v2 document saves back as v2, keeps Y-down
+		// storage, and picks up Cartesian the moment the units question is answered.
+		// A LAGGING v2 DOCUMENT THEREFORE NEVER REACHES THE v4 -> v5 STEP either, which is safe
+		// rather than lucky: v2 predates the scenario UI, so no v2 document can carry an override at
+		// all. A re-keying pass for a case that cannot occur is dead code that reads as evidence the
+		// case is real.
 		return saved;
 	}
 	// Version-checks one already-parsed document and runs it up to the current version. Returns null
@@ -6700,30 +5821,24 @@ var EngCalcs = EngCalcs || {};
 		// Consumed once, by the restoreViewOrFit() at the end of refreshAllFromDocument(). A file
 		// written before this existed has none, and gets a fit exactly as it always did.
 		pendingView = validView(saved.view) ? saved.view : null;
-		// **A RESERVOIR WITH NO ELEVATION KEEPS HAVING NO ELEVATION** (Task 390). This used to
-		// back-fill one equal to the head, so an old document read as a water surface sitting on
-		// its own ground and a pressure of exactly zero. That was a number nobody typed, written
-		// into a field labelled as the user's -- and it is also what an imported `.inp` produces,
-		// since EPANET states a head and says nothing whatever about the ground. The solve is
-		// unchanged either way: reservoirHead() reads the head, and falls back to the elevation
-		// only when the head is blank. What changes is that an unknown ground is now SHOWN as
-		// unknown rather than asserted as zero pressure.
+		// **A RESERVOIR WITH NO ELEVATION KEEPS HAVING NO ELEVATION** (Task 390). Back-filling one
+		// equal to the head writes a number nobody typed into a field labelled as the user's, and
+		// reads as a water surface sitting on its own ground at exactly zero pressure -- which is
+		// also what an imported `.inp` produces, since EPANET states a head and says nothing about
+		// the ground. The solve is unchanged either way.
 		nextId = saved.nextId || newNextId();
-		// Object.assign onto the current defaults, not saved.x || defaults() -- a plain "||" swaps in
-		// a saved object wholesale, so a preference added AFTER a user's last save (e.g. Task 146.03's
-		// mapHeight) is simply missing from it and reads as undefined rather than falling back to its
-		// default. That bug is what made the map render at the browser's tiny intrinsic SVG height the
-		// first time mapHeight shipped -- svg.setAttribute('height', undefined) is not the same as
-		// leaving the attribute at its default. Merging keeps every OLD saved value while still
-		// picking up any NEW default key that didn't exist when the save was written.
-		// Merged one level DEEPER than the comment above describes, because labelSettings is nested
-		// ({node:{...}, link:{...}}): a top-level Object.assign swaps in the saved `link` object
-		// whole, so a toggle added after that save (gradient, and every future one) would come back
-		// undefined instead of at its default. Same reasoning, applied per sub-object.
-		// Groups named explicitly rather than looped over Object.keys(labelSettings): since Task
-		// 189/190 the object is no longer uniformly two flat sub-objects -- `decimals` is nested one
-		// level deeper and `markExtrema` is a bare boolean, which Object.assign() onto a primitive
-		// would have silently discarded (it boxes the boolean and throws the result away).
+		// Object.assign onto the current defaults, NOT `saved.x || defaults()` -- a plain "||" swaps
+		// in a saved object wholesale, so a preference added AFTER a user's last save is missing from
+		// it and reads as undefined rather than falling back to its default. Merging keeps every OLD
+		// saved value while picking up any NEW default key that did not exist when the save was
+		// written.
+		// Merged one level DEEPER, because labelSettings is nested ({node:{...}, link:{...}}): a
+		// top-level Object.assign swaps in the saved `link` object whole, so a toggle added after
+		// that save comes back undefined instead of at its default.
+		// Groups named explicitly rather than looped over Object.keys(labelSettings): the object is
+		// no longer uniformly two flat sub-objects -- `decimals` is nested a level deeper and
+		// `markExtrema` is a bare boolean, which Object.assign() onto a primitive silently discards.
+
 		labelSettings = defaultLabelSettings();
 		var savedLS = saved.labelSettings || {}, savedDec = savedLS.decimals || {};
 		Object.assign(labelSettings.node, savedLS.node || {});
@@ -6738,11 +5853,9 @@ var EngCalcs = EngCalcs || {};
 		Object.assign(labelSettings.prefix.link, savedPre.link || {});
 		Object.assign(labelSettings.suffix.node, savedSuf.node || {});
 		Object.assign(labelSettings.suffix.link, savedSuf.link || {});
-		// Task 397's priorities, merged one level deeper for exactly the reason the block above
-		// gives. This one carries real shipped defaults rather than shipping empty like the affixes,
-		// so the merge is doing genuine work from day one: a document saved before a field existed
-		// must come back with that field at its default rank, not at undefined -- and undefined in a
-		// sort comparator is not a mild defect, it is a non-total order.
+		// Task 397's priorities, merged one level deeper for the reason the block above gives. This
+		// one carries real shipped defaults, so a document saved before a field existed must come
+		// back at that field's default RANK: undefined in a sort comparator is a non-total order.
 		var savedPri = savedLS.priority || {};
 		Object.assign(labelSettings.priority.node, savedPri.node || {});
 		Object.assign(labelSettings.priority.link, savedPri.link || {});
@@ -6752,11 +5865,10 @@ var EngCalcs = EngCalcs || {};
 		if (typeof savedLS.separator === 'string') { labelSettings.separator = savedLS.separator; }
 		if (typeof savedLS.markExtrema === 'boolean') { labelSettings.markExtrema = savedLS.markExtrema; }
 		backdrop = saved.backdrop || null;
-		// Same one-level-deeper merge the labelSettings block above documents, and for the same
-		// reason: `defaults` and `sectionsOpen` are nested objects, so a top-level Object.assign
-		// swaps the saved one in whole and any default added AFTER that save comes back undefined
-		// instead of at its default. Assigning the nested objects separately keeps every OLD saved
-		// value while still picking up NEW keys (which seedDefaultInputs() then fills).
+		// Same one-level-deeper merge the labelSettings block documents: `defaults` and
+		// `sectionsOpen` are nested, so a top-level Object.assign swaps the saved one in whole and
+		// any default added AFTER that save comes back undefined. Assigning the nested objects
+		// separately keeps every OLD value while picking up NEW keys.
 		var savedSettings = Object.assign({}, saved.settings || {});
 		var savedDefaults = savedSettings.defaults || {}, savedSections = savedSettings.sectionsOpen || {};
 		// idPrefixes joined this list when tanks arrived (Task 248): a document saved before then
@@ -6786,33 +5898,27 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// ---- the project library ----
-	// Since Task 211 a project's name is real, stored data from the moment it is created -- "Project 3"
-	// is assigned by newProject(), not substituted at display time the way the old "Untitled" fallback
-	// was. The fallback below is therefore a can't-happen path kept only so a hand-edited or truncated
-	// index cannot render a nameless tab; initLibrary() names every blank it finds on sight.
+	// A project's name is real, stored data from the moment it is created -- assigned by
+	// newProject(), never substituted at display time. The fallback below is a can't-happen path kept
+	// so a hand-edited index cannot render a nameless tab; initLibrary() names every blank on sight.
 	function projectDisplayName(p) {
 		return (p && p.name) ? p.name : nextProjectName();
 	}
-	// "Project 3", where 3 is the LOWEST number not currently in use -- so closing Project 2 makes the
-	// next new project Project 2 again. A counter that only ever went up would reach "Project 47" in an
-	// afternoon and read as a leak (Tom, 2026-08-04). Same convention as Book1 / Untitled-1.
-	//
-	// The pattern is derived from the localized template rather than hardcoded, so a page running in
-	// Spanish recognises its own "Proyecto 3" as numbered and does not start again at 1.
+	// "Project 3", where 3 is the LOWEST number not in use -- so closing Project 2 makes the next new
+	// project Project 2 again. A counter that only went up would reach "Project 47" in an afternoon
+	// and read as a leak. The pattern is derived from the LOCALIZED template rather than hardcoded,
+	// so a page running in Spanish recognises its own "Proyecto 3" as numbered.
 	function nextProjectName() {
 		var pc = EngCalcs.pageConfig || {}, tpl = pc.lpn_project_numbered || 'Project{n}', used = {};
-		// No space in the template -- "Project1", like Google Sheets' "Sheet1" (Tom, 2026-08-05).
-		// That is a convention call, but it also makes the save round-trip LOSSLESS: safeFileName()
-		// has no space to collapse, so a saved project comes back named exactly what it was, and the
-		// numbering bug cannot recur by that route at all. Do not reintroduce the space without
-		// re-reading the scan below.
+		// No space in the template -- "Project1", like Google Sheets' "Sheet1". It also makes the
+		// save round-trip LOSSLESS: safeFileName() has no space to collapse. Do not reintroduce the
+		// space without re-reading the scan below.
 		//
-		// Match the WORD, then the FIRST INTEGER after it, whatever sits between (Tom, 2026-08-05).
-		// The old pattern demanded the template exactly -- '^Project (\d+)$'. But saving renames a
-		// project after its file, and safeFileName() collapses the space, so "Project 1" came back
-		// as "Project-1", stopped matching, and 1 read as free: the next new project was ALSO
-		// "Project 1". Anchored at the start so somebody else's "Notes on Project 3" is not counted,
-		// and deliberately loose after the word so any future separator is already handled.
+		// Match the WORD, then the FIRST INTEGER after it, whatever sits between. Demanding the
+		// template exactly ('^Project (\d+)$') fails because saving renames a project after its file
+		// and safeFileName() collapses the space, so "Project 1" comes back as "Project-1", stops
+		// matching, and 1 reads as free -- the next new project is ALSO "Project 1". Anchored at the
+		// start so somebody else's "Notes on Project 3" is not counted.
 		var head = tpl.split('{n}')[0].trim();
 		var rx = new RegExp('^' + head.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\D*(\\d+)');
 		library.projects.forEach(function (p) {
@@ -6824,23 +5930,21 @@ var EngCalcs = EngCalcs || {};
 		return tpl.replace('{n}', n);
 	}
 	// Every project the library knows about is a TAB (Task 211) -- there is no separate open/closed
-	// state, and closing a tab is what removes a project. These three read that state.
+	// state, and closing a tab is what removes a project.
 	//
-	// `entry.fileName` is what makes a project a FILE project, and it is stored in the index rather
-	// than only in the session's handle Map on purpose: the handle itself is kept in IndexedDB and
-	// usually comes back (Task 212), but it can fail to -- permission withdrawn, private browsing, a
-	// project last opened before that store existed -- and then we still know the tab came from
-	// `Elm-Street.json` even though we cannot write to it. Keeping the name means the tab keeps its
-	// identity instead of silently demoting itself to a browser project, which would be a lie about
-	// where the work is.
+	// `entry.fileName` is what makes a project a FILE project, and it is stored in the INDEX rather
+	// than only in the session's handle Map: the handle lives in IndexedDB and usually comes back,
+	// but permission withdrawn or private browsing can lose it, and then we still know the tab came
+	// from `Elm-Street.json` even though we cannot write to it. Without the name the tab silently
+	// demotes itself to a browser project, which is a lie about where the work is.
 	function isFileProject(entry) { return !!(entry && entry.fileName); }
 	function handleFor(id) { return fileHandles.get(id) || null; }
 	// True only when we can actually WRITE without asking again.
 	function isLinked(id) { return !!handleFor(id); }
-	// The index is a cache and is repaired from the real project keys, never trusted blindly: a
-	// quota failure can land a project document while the index write that follows it fails, and a
-	// project the user can no longer SEE is indistinguishable from one that was lost. Scanning the
-	// prefix is cheap (localStorage is synchronous and small) and makes the library self-healing.
+	// The index is a cache, repaired from the real project keys and never trusted blindly: a quota
+	// failure can land a project document while the index write after it fails, and a project the
+	// user can no longer SEE is indistinguishable from one that was lost. Scanning the prefix is
+	// cheap and makes the library self-healing.
 	function adoptOrphans() {
 		var i, key, doc2, id, changed = false;
 		try {
@@ -6864,9 +5968,9 @@ var EngCalcs = EngCalcs || {};
 		return changed || library.projects.length !== before;
 	}
 	// One-time move of the pre-library single document into the library. A MOVE, not a copy: the
-	// legacy key is removed only AFTER the project key has been written and read back successfully,
-	// so a quota failure mid-migration leaves the original exactly where it was. Copying instead
-	// would double a multi-megabyte backdrop, which is the one thing most likely to hit quota here.
+	// legacy key is removed only AFTER the project key is written and read back, so a quota failure
+	// mid-migration leaves the original where it was. A copy would double a multi-megabyte backdrop,
+	// the one thing most likely to hit quota here.
 	function migrateLegacy() {
 		var saved = readDocument(LPN_LEGACY_KEY);
 		if (!saved) { return null; }
@@ -6887,20 +5991,18 @@ var EngCalcs = EngCalcs || {};
 			library.openId = saved.openId || null;
 		}
 		var repaired = adoptOrphans();
-		// No index and no projects: either a first visit, or a preview user whose only network is
-		// still under the old single-document key.
+		// No index and no projects: a first visit, or a user whose only network is still under the
+		// old single-document key.
 		//
-		// **`openId` has to go with them** (fixed 2026-08-06, found by the browser pass). adoptOrphans()
-		// drops an index entry whose document is missing -- and a brand-new project has no document
-		// until its first edit, so arriving and reloading before touching anything dropped the only
-		// project while `openId` went on pointing at it. init() then saw a truthy `openId`, decided a
-		// project was already open, and registered none: an empty tab strip for the rest of the
-		// session, with edits saving under an id no index entry knew about.
+		// **`openId` has to go with them.** adoptOrphans() drops an index entry whose document is
+		// missing, and a brand-new project has no document until its first edit -- so arriving and
+		// reloading before touching anything drops the only project while `openId` still points at
+		// it. init() then sees a truthy `openId`, decides a project is open and registers none: an
+		// empty tab strip for the session, with edits saving under an id no index entry knows about.
 		if (!library.projects.length) { library.openId = null; return migrateLegacy(); }
 		// Name every blank on sight (Task 211). Projects created before names were real data all
-		// rendered as the same word "Untitled" -- Tom found four identically-named tabs in the library
-		// and could not tell them apart. A tab strip makes that fatal rather than merely untidy, so
-		// blanks are given a number ONCE, here, and become ordinary renameable names from then on.
+		// render as the same word "Untitled" -- four identically-named tabs nobody can tell apart,
+		// which a tab strip makes fatal rather than untidy. Blanks are given a number ONCE, here.
 		library.projects.forEach(function (p) {
 			if (p.name) { return; }
 			p.name = nextProjectName();
@@ -6927,16 +6029,14 @@ var EngCalcs = EngCalcs || {};
 		rebuildSettingsFields();
 		rebuildLabelsFields();
 		applyLegendPosition();
-		// **NO applyMapHeight() HERE. THE BOTTOM OF THE MAP DOES NOT DEPEND ON THE MODEL** (Tom,
-		// 2026-08-15, stating it as a rule: *"Bottom of map should not depend on the model."*). The
-		// canvas height is a fact about the WINDOW and the page's own chrome; opening a different
-		// project cannot change it, so re-deriving it on every open could only ever produce the same
-		// answer or a wrong one -- and it was producing wrong ones, because this runs in the middle
-		// of a rebuild, with the tab strip and the status row mid-flight.
+		// **NO applyMapHeight() HERE. THE BOTTOM OF THE MAP DOES NOT DEPEND ON THE MODEL.** The canvas
+		// height is a fact about the WINDOW and the page's chrome, so re-deriving it on every open
+		// can only produce the same answer or a wrong one -- and it produces wrong ones, because this
+		// runs mid-rebuild with the tab strip and the status row in flight.
 		//
-		// The one document-driven thing that CAN legitimately change it is the tab strip's own
-		// height, when enough projects are open to wrap it onto another line. That is chrome, not
-		// model, and renderTabs() re-measures for exactly that reason.
+		// The one document-driven thing that CAN change it is the tab strip's own height, when enough
+		// projects are open to wrap it onto another line. That is chrome, and renderTabs() re-measures.
+
 		refreshFontSizes();
 		refreshSymbolSizes();
 		renderLabelsLegend();
@@ -6963,23 +6063,16 @@ var EngCalcs = EngCalcs || {};
 		// user can now see.
 		offerUnitRestore();
 	}
-	// ---- one-time restore of a pre-Task-263 project (Tom's design, 2026-08-10) ----
+	// ---- one-time restore of a pre-Task-263 project ----
 	//
-	// A v2 document stored SI. Under declarative storage those same numbers now MEAN what they say,
-	// so a US project's 0.2032 m pipe would read as a 0.2032 inch pipe. Multiplying every input by
-	// the factor currently on the strip puts it back to the 8 the user typed -- and the strip is the
-	// best evidence there is, because the unit selection is cookie-persisted per browser, so a
-	// returning user is almost always looking at the units they drew in.
+	// A v2 document stored SI. Under declarative storage those numbers MEAN what they say, so a US
+	// project's 0.2032 m pipe reads as a 0.2032 inch pipe. Multiplying every input by the factor on
+	// the strip puts it back to the 8 the user typed.
 	//
-	// **Almost always is not always, so it ASKS, and No is the default** (Tom). Getting this wrong
-	// silently would rewrite somebody's whole network by a factor of 39.37. The dialog shows real
-	// diameters out of THIS project, before and after, because that is the one thing that lets a
-	// user recognise their own work: "0.2032 -> 8" is checkable at a glance in a way that no
-	// explanation of storage models ever will be.
-	//
-	// Diameters are the evidence field on purpose. Elevations and demands can legitimately be
-	// round-ish in either system, but a pipe is bought in a catalogue size, so a converted one is
-	// conspicuous.
+	// **Almost always is not always, so it ASKS, and No is the default** -- getting this wrong
+	// silently rewrites somebody's whole network by 39.37x. The dialog shows real DIAMETERS out of
+	// THIS project, before and after: elevations and demands can be round-ish in either system, but
+	// a pipe is bought in a catalogue size, so a converted one is conspicuous.
 	function v2RestoreEvidence() {
 		var f = unitFactor('lpn_u_diameter'), counts = {}, out = [];
 		doc.links.forEach(function (l) {
@@ -7004,10 +6097,9 @@ var EngCalcs = EngCalcs || {};
 		}
 		saveUndoSnapshot(); // one Ctrl-Z undoes the whole migration
 		// ELEMENTS ONLY, and no override is scaled -- deliberately, not by omission. A v2 document
-		// predates the scenario UI (Task 184), so nothing could ever have written an override into
-		// one: the container shipped with Base as the only scenario and no write path at all. If a
-		// v2 file ever turns up carrying overrides it was hand-edited, and guessing at its units
-		// would be worse than leaving the numbers it states alone.
+		// predates the scenario UI, so nothing could have written an override into one. If a v2 file
+		// turns up carrying overrides it was hand-edited, and guessing at its units would be worse
+		// than leaving the numbers it states alone.
 		doc.nodes.forEach(function (n) {
 			scale(n, 'elev', hf);
 			scale(n, '_head', hf);
@@ -7023,20 +6115,12 @@ var EngCalcs = EngCalcs || {};
 				if (typeof pt[1] === 'number') { pt[1] = pt[1] * hf; }
 			});
 		});
-		// SCENARIO OVERRIDES ARE DELIBERATELY NOT TOUCHED, because no v2 document can contain one.
-		// The scenario machinery exists in the data model (defaultScenarios/effective/overrides) but
-		// nothing in the UI has ever created a scenario -- there is no command, no lang key, and
-		// `scenarios` is always exactly one empty Base. The first version of this migration scaled
-		// them anyway and its comment claimed that omitting them would leave a scenario "39x out
-		// from its Base"; that was wrong, and Tom caught it ("Scenarios: they don't exist yet. I am
-		// confused."). Dead code in a one-time migration is worse than absent code: it reads as
-		// evidence that the case is real. When scenarios do ship, every v2 document will long since
-		// have been migrated or abandoned.
+		// SCENARIO OVERRIDES ARE DELIBERATELY NOT TOUCHED, because no v2 document can contain one --
+		// v2 predates any UI that could create a scenario. Dead code in a one-time migration is worse
+		// than absent code: it reads as evidence the case is real.
 		// Answered: the numbers are now in the units the strip names, so the document is current.
-		//
 		// A Ctrl-Z after this restores the NUMBERS but not the version, so the offer does not come
-		// back. That is deliberate rather than an oversight -- undoing a conversion you just asked
-		// for is the same verdict as "Never ask again", reached by a different route.
+		// back -- undoing a conversion you just asked for is the same verdict as "Never ask again".
 		stampDocAnswered();
 		refreshAllFromDocument();
 	}
@@ -7049,10 +6133,11 @@ var EngCalcs = EngCalcs || {};
 		if (!pendingV2Restore) { return; }
 		pendingV2Restore = false;   // shown at most once per open; the persistent flag decides the rest
 		var pc = EngCalcs.pageConfig || {};
-		// Nothing to restore: with the base SI unit selected the factor is 1, so the stored number
-		// and the declared number are the same number and there is no question to ask. An empty
-		// project has no evidence and nothing to fix either. Both cases are SETTLED, not deferred,
-		// so the flag is cleared -- the offer must not reappear for a project it can do nothing for.
+		// Nothing to restore: with the base SI unit selected the factor is 1, so the stored and
+		// declared numbers are the same and there is no question to ask; an empty project has no
+		// evidence either. Both cases are SETTLED, not deferred, so the flag is cleared -- the offer
+		// must not reappear for a project it can do nothing for.
+
 		var rows = v2RestoreEvidence();
 		if (!rows.length || unitFactor('lpn_u_diameter') === 1) { stampDocAnswered(); return; }
 		openDialog(function (body) {
@@ -7065,12 +6150,10 @@ var EngCalcs = EngCalcs || {};
 			p2.textContent = rows.join(', ');
 			body.appendChild(p2);
 		}, [
-			// THREE answers, because there are three (Tom, 2026-08-10: "Third button: invent it").
-			// Convert and Never both STAMP the version, which is what "answered" means here. Close
-			// deliberately does not: its own label -- "so that I can check the current units first"
-			// -- is a promise that the offer comes back, and it does, because the document is still
-			// below LPN_DECLARATIVE_VERSION. Close still saves, so the units the project was opened
-			// under are recorded even while its numbers stay unruled.
+			// THREE answers. Convert and Never both STAMP the version, which is what "answered"
+			// means. Close deliberately does not: its label promises the offer comes back, and it
+			// does, because the document is still below LPN_DECLARATIVE_VERSION. Close still SAVES,
+			// so the units the project was opened under are recorded while its numbers stay unruled.
 			{ label: pc.lpn_v2_restore_yes || 'Convert', fn: applyV2Restore },
 			{ label: pc.lpn_v2_restore_never || 'No. Never ask again.', fn: stampDocAnswered },
 			{ label: pc.lpn_v2_restore_no || 'Close so that I can check the current units first', fn: function () { saveToStorage(); } }
@@ -7090,10 +6173,9 @@ var EngCalcs = EngCalcs || {};
 		refreshAllFromDocument();
 		return true;
 	}
-	// A new project inherits the CURRENT project's settings and label choices rather than starting
-	// at factory defaults. This is what preserves the behavior Tom set up before the library existed
-	// -- "New" clears the network, not your preferences -- now that preferences live per project.
-	// The workflow it protects is his own: set 8-inch/150/K=2 defaults, then draw.
+	// A new project inherits the CURRENT project's settings and label choices rather than factory
+	// defaults: "New" clears the network, not your preferences, now that preferences live per
+	// project. The workflow it protects is set 8-inch/150/K=2 defaults, then draw.
 	function newProject(coords) {
 		saveToStorage();
 		flushOutgoingFile();
@@ -7113,9 +6195,9 @@ var EngCalcs = EngCalcs || {};
 		labelSettings = inheritedLabels;
 		backdrop = null;
 		// A project created now is written by the current code, so its numbers are declarative and
-		// its version is current. Without this it would inherit openDocVersion from whatever project
-		// was open -- and a new project made while a v2 one was on screen would save as v2 and be
-		// offered a conversion it does not need.
+		// its version is current. Without this it inherits openDocVersion from whatever project was
+		// open, so a new project made while a v2 one is on screen saves as v2 and is offered a
+		// conversion it does not need.
 		openDocVersion = LPN_STORAGE_VERSION;
 		library.projects.push({ id: id, name: name, updated: Date.now() });
 		library.openId = id;
@@ -7139,11 +6221,10 @@ var EngCalcs = EngCalcs || {};
 		saveIndex();
 		renderTabs();
 	}
-	// "Save as new project" -- Task 184's project-level copy, and the conventional reading of the
-	// words (Tom, 2026-07-31: "New project" sounds like this, not like starting empty). Duplicates
-	// the WHOLE project -- network, scenarios, overrides, backdrop and preferences together -- and
-	// opens the copy, leaving the original on disk untouched. Task 184 wants copy at the PROJECT
-	// level precisely because that is where a self-contained duplicate is what the user means.
+	// "Save as new project" -- Task 184's project-level copy. Duplicates the WHOLE project (network,
+	// scenarios, overrides, backdrop and preferences) and opens the copy, leaving the original
+	// untouched. Copy is at the PROJECT level because that is where a self-contained duplicate is
+	// what the user means.
 	function saveProjectAs(name) {
 		saveToStorage();
 		flushOutgoingFile();
@@ -7160,9 +6241,8 @@ var EngCalcs = EngCalcs || {};
 		library.openId = id;
 		project.name = name;
 		// The in-memory document has to take the COPY's document id too, or the next saveToStorage()
-		// would write the original's id back over the copy -- and the two would then fight over one
-		// lock, which is the very thing the fresh id above exists to prevent. (Latent since Task 195
-		// Phase 2 step 2; reachable now that Duplicate is a first-class tab-menu action.)
+		// writes the original's id back over the copy and the two fight over one lock -- the thing
+		// the fresh id above exists to prevent.
 		project.docId = copy.project.docId;
 		saveIndex();
 		clearUndo();
@@ -7170,12 +6250,11 @@ var EngCalcs = EngCalcs || {};
 		return id;
 	}
 	// ---- Export / import a project as a file (ROADMAP Task 195 Phase 1) ----
-	// Everything above this line lives in localStorage and nowhere else, which a browser-data clear
-	// wipes, which Safari evicts after roughly 7 unused days, and which private mode never persists
-	// at all. These two functions are the way out of that -- a backup and hand-off of OUR format,
-	// deliberately not EPANET `.inp` interop (Tom confirmed 2026-07-29 that interop is not wanted).
-	// The stored shape is already exactly right for this: serializeProject() returns one
-	// self-contained object per project, backdrop included, so the file IS the stored document.
+	// Everything above this line lives in localStorage alone, which a browser-data clear wipes,
+	// Safari evicts after roughly 7 unused days, and private mode never persists. These two
+	// functions are the way out: a backup and hand-off of OUR format, deliberately not `.inp`.
+	// serializeProject() returns one self-contained object per project, backdrop included, so the
+	// file IS the stored document.
 	function safeFileName(name) {
 		// Filesystem-illegal characters and control characters out; whitespace and dash runs
 		// collapsed. Deliberately NOT a strip-to-ASCII, which would empty the filename of any
@@ -7191,25 +6270,18 @@ var EngCalcs = EngCalcs || {};
 	// open one in an editor to see what is in it; the cost is a few percent on a small network,
 	// and on a big one the backdrop's data URL dominates the size no matter what we do here.
 	function projectFileText() { return JSON.stringify(serializeProject(), null, '\t'); }
-	// Project name FIRST (Tom offered both orders, 2026-08-03). In an alphabetical folder listing a
-	// common prefix makes every file look identical and pushes the one distinguishing part off the
-	// end of the column; engineers scan these by project.
+	// Project name FIRST: in an alphabetical folder listing a common prefix makes every file look
+	// identical and pushes the distinguishing part off the end of the column.
 	//
-	// **THE SUFFIX IS `-lpn`, AND IT IS NO LONGER THE THING THAT IDENTIFIES THE FILE** (ROADMAP Task
-	// 315, ratified by Tom 2026-08-14). It used to read `-lpn-hawsedc-engcalcs` -- 30 characters on
-	// every file -- and it was that long for one reason: nothing INSIDE the document said what
-	// format it was, so the whole burden of "findable a year later in a forgotten folder" sat on the
-	// name. serializeProject() now writes `format`/`app`, which is strictly more durable than any
-	// filename scheme, because a file in a forgotten folder is exactly the file somebody renamed.
-	// With that carried inside, the suffix only has to disambiguate at a glance, and four characters
-	// do that.
+	// **THE SUFFIX IS `-lpn`, AND IT IS NOT WHAT IDENTIFIES THE FILE** (Task 315).
+	// serializeProject() writes `format`/`app` inside the document, which is strictly more durable
+	// than any filename scheme, because a file in a forgotten folder is exactly the file somebody
+	// renamed. With that carried inside, the suffix only has to disambiguate at a glance.
 	//
-	// Deliberately still `.json`: no generation-1 extension yet. The schema is moving weekly
-	// (scenarios, valves, extended-period queued) and the product name is unsettled, so an extension
-	// would encode a name that does not exist yet -- and a web page cannot deliver the only real
-	// payoff of one (OS double-click association and a file-manager icon). The trigger that starts
-	// that clock is written up in Task 315; until it fires, reading stays permissive and writing
-	// stays boring.
+	// Deliberately still `.json`: the schema is moving and the product name is unsettled, so an
+	// extension would encode a name that does not exist yet -- and a web page cannot deliver the
+	// only real payoff of one (OS double-click association and a file-manager icon). Task 315 has
+	// the trigger that starts that clock.
 	var LPN_FILE_SUFFIX = '-lpn';
 	// Every file written before 2026-08-14 wears this. It is READ FOREVER -- see
 	// projectNameFromFileName(), where stripping it in the wrong order silently renames a project.
@@ -7245,14 +6317,12 @@ var EngCalcs = EngCalcs || {};
 		setNotice((pcDl.lpn_status_downloaded || 'Downloaded {file}. This browser cannot connect to a file, so this project stays marked as not saved to a file.')
 			.replace('{file}', projectFileName()));
 	}
-	// Lands an imported document as a NEW project, never over the open one (the ROADMAP is explicit
-	// about this, and it is what makes import safe to try). Written and verified BEFORE anything
-	// switches, for the same reason saveProjectAs() is: an imported file carrying a backdrop is the
-	// one thing here big enough to fail on quota, and a failed import must leave the user exactly
-	// where they were. The second save, after applySaved(), rewrites the key with the STRUCTURALLY
-	// REPAIRED document -- the missing-Base, dangling-activeScenario, reservoir-elevation and
-	// merge-onto-current-defaults fixes applySaved() performs -- so an imported file is stored in
-	// exactly the state a document that had always lived here would be.
+	// Lands an imported document as a NEW project, never over the open one, which is what makes
+	// import safe to try. Written and verified BEFORE anything switches: an imported file carrying a
+	// backdrop is big enough to fail on quota, and a failed import must leave the user where they
+	// were. The second save, after applySaved(), rewrites the key with the STRUCTURALLY REPAIRED
+	// document.
+
 	function importProject(saved) {
 		var pc = EngCalcs.pageConfig || {};
 		saveToStorage(); // flush the outgoing project before switching away from it
@@ -7294,14 +6364,10 @@ var EngCalcs = EngCalcs || {};
 			var saved = acceptImportedText(ev.target.result);
 			if (!saved) { return; }
 			var upId = importProject(saved);
-			// **An uploaded project arrives SAVED, not modified** (Tom, 2026-08-10: "when you open a
-			// file, it comes in immediately modified/asterisked. Fix that."). The same baseline the
-			// download path records, for the same reason: a file the user just handed us off their
-			// own disk is not unsaved work.
-			//
-			// It stays a BROWSER project and the star still comes back on the first edit (faint,
-			// because this browser genuinely cannot write back to that file). What changed is only
-			// that "unsaved" now starts false, which is the truth.
+			// **An uploaded project arrives SAVED, not modified** -- the same baseline the download
+			// path records, because a file the user just handed us off their own disk is not unsaved
+			// work. It stays a BROWSER project and the star still comes back on the first edit,
+			// faint, because this browser cannot write back to that file.
 			if (upId) { stampProjectSaved(upId); }
 			// Every time, not just the first: this is the fact that explains why the tab is named
 			// after the project rather than the file, and why Save cannot go back where this came from.
@@ -7314,26 +6380,18 @@ var EngCalcs = EngCalcs || {};
 
 	// ---- EPANET .inp import (ROADMAP Task 196) ----
 	//
-	// A DIFFERENT ACT FROM File > Open, and kept apart from it on purpose. Open is about OUR
-	// documents: it carries a docId, a lock, a live file handle, and a Save that goes back where it
-	// came from. An `.inp` has none of that -- it is somebody else's format, and writing our JSON
-	// back into it would be a lie. So an import lands as a new BROWSER project, named after the
-	// file, and Save as is the way to give it a home.
+	// A DIFFERENT ACT FROM File > Open. Open is about OUR documents: a docId, a lock, a live file
+	// handle, and a Save that goes back where it came from. An `.inp` has none of that, so an import
+	// lands as a new BROWSER project named after the file, and Save as gives it a home.
 	//
-	// The reading itself is js/lpn-inp.js, which is DOM-free and validated against the real EPANET
-	// engine (dev/lpn-spike/validate_inp.js). Everything here is the other half: turning its SI
-	// model into a document in the units the file was written in, and telling the user what the
-	// import could not keep.
+	// The reading itself is js/lpn-inp.js, DOM-free and validated against the real EPANET engine
+	// (dev/lpn-spike/validate_inp.js). Everything here is the other half.
 
-	// Which unit each selector should show for an imported file. The file's own units where this
-	// page offers them -- EPANET's two systems are exactly the ft/in/psi/ft-of-water and
-	// m/mm/m-of-water sets, so almost everything matches with no conversion at all. Only the flow
-	// unit can miss (this page offers six, EPANET names ten), and a miss is harmless: every number
-	// crosses through SI anyway, so the network is identical and only the label differs.
-	// EVERY ONE OF EPANET'S TEN FLOW KEYWORDS NOW HAS A SELECTOR UNIT OF ITS OWN (Task 390 step 4).
-	// `.inp` [OPTIONS] UNITS is a closed enumeration, so the `flow_epanet` family completes a finite
-	// list rather than chasing one, and no import has to convert a flow to reach a unit this page
-	// can show. Written as its own table rather than derived by comparing strings, because the
+	// Which unit each selector should show for an imported file: the file's own. EPANET's two systems
+	// are exactly the ft/in/psi/ft-of-water and m/mm/m-of-water sets, so everything matches with no
+	// conversion at all, and EVERY ONE OF EPANET'S TEN FLOW KEYWORDS HAS A SELECTOR UNIT OF ITS OWN
+	// (Task 390 step 4) -- `.inp` [OPTIONS] UNITS is a closed enumeration, so `flow_epanet` completes
+	// a finite list rather than chasing one. A table rather than a string comparison, because the
 	// keyword and our unit key are spelled differently on purpose (CFS vs ft3ps).
 	var LPN_INP_FLOW_UNIT = {
 		GPM: 'gpm', MGD: 'mgd', IMGD: 'imgd', CFS: 'ft3ps', AFD: 'afd',
@@ -7341,8 +6399,7 @@ var EngCalcs = EngCalcs || {};
 	};
 	// The keywords whose unit the selector really shows, so the file's own number crosses untouched.
 	// ALL TEN since the flow_epanet family landed -- kept as a table rather than deleted, because it
-	// is the thing that would have to shrink again if a keyword ever lost its selector, and a table
-	// that happens to be full says that far more plainly than a `true` would.
+	// would have to shrink again if a keyword ever lost its selector.
 	var LPN_INP_FLOW_SAME = { GPM: 1, MGD: 1, IMGD: 1, CFS: 1, AFD: 1, LPS: 1, LPM: 1, MLD: 1, CMH: 1, CMD: 1 };
 	function inpUnitSelections(parsed) {
 		var us = parsed.unitSystem === 'us';
@@ -7378,14 +6435,13 @@ var EngCalcs = EngCalcs || {};
 	 * answer rather than a rounding error.
 	 */
 	// THE FILE'S OWN TEXT, carried onto the document beside the number it states (Task 390 step 3).
-	// js/lpn-inp.js keeps a `tok` bag on every record it parses, keyed by the PARSER's field names;
-	// the document spells several of those differently (a demand is `_demand`, a tank's vessel is
-	// `tankDiameter`), so this is the one place the two vocabularies meet.
+	// js/lpn-inp.js keeps a `tok` bag keyed by the PARSER's field names; the document spells several
+	// differently (`_demand`, `tankDiameter`), so this is where the two vocabularies meet.
 	//
-	// THE SINGLE TEST IS `parseFloat(text) === storedValue`. A field that was converted on the way
-	// in -- a flow in a keyword this page has no selector for, an emitter coefficient -- fails it
-	// and arrives with no token at all, so nothing downstream has to know which fields converted.
-	// Tokens for values NOT in `map` are simply not carried; a token is never invented.
+	// THE SINGLE TEST IS `parseFloat(text) === storedValue`. A field converted on the way in fails it
+	// and arrives with no token at all, so nothing downstream has to know which fields converted. A
+	// token is never invented.
+
 	function carryInpTokens(src, dst, map) {
 		var t = src && src.tok, out = null, k, dk;
 		if (!t) { return dst; }
@@ -7427,19 +6483,17 @@ var EngCalcs = EngCalcs || {};
 				return carryInpTokens(n, { id: n.id, type: 'reservoir', x: n.x, y: n.y, _head: n.head }, LPN_INP_TOK_RESERVOIR);
 			}
 			if (n.type === 'tank') {
-				// A tank's four levels and its diameter are ALL in the Elevation/Head unit, because
-				// they are all vertical distances measured on the same staff -- the diameter
-				// included, which is the one that surprises people (see js/lpn-epanet.js). Nothing
-				// here is blank-means-follow the way a reservoir's head is: EPANET states every one
-				// of them, so every one is written.
+				// A tank's four levels and its diameter are ALL in the Elevation/Head unit -- all
+				// vertical distances on the same staff, the diameter included, which is the one that
+				// surprises people. Nothing here is blank-means-follow the way a reservoir's head is:
+				// EPANET states every one, so every one is written.
 				return carryInpTokens(n, {
 					id: n.id, type: 'tank', x: n.x, y: n.y,
 					elev: n.elev,
 					// _level is scenario-overridable (leading underscore, read through effective())
-					// because "what if the tank is drawn down to 2 m" is a scenario, and the same
-					// treatment demand gets. The vessel's own geometry is not -- it sits beside
-					// elev, which is a plain property for the same reason: a scenario changes
-					// operating state, not what was built.
+					// because "what if the tank is drawn down to 2 m" is a scenario. The vessel's own
+					// geometry is not, sitting beside elev: a scenario changes operating state, not
+					// what was built.
 					_level: n.level,
 					minLevel: n.minLevel,
 					maxLevel: n.maxLevel,
@@ -7464,20 +6518,20 @@ var EngCalcs = EngCalcs || {};
 				_diameter: l.diameter,
 				_roughness: l.roughness,
 				// LENGTH IS THE FILE'S OWN NUMBER, and lenAuto is OFF. An EPANET length is the real
-				// pipe length, which is routinely nothing like the distance between two symbols on
-				// a schematic; letting linkGeomLength() recompute it on the first edit would quietly
-				// redesign the network. Auto stays available in the popup for anyone who wants it.
+				// pipe length, routinely nothing like the distance between two symbols on a
+				// schematic, so letting linkGeomLength() recompute it on the first edit would
+				// quietly redesign the network. Auto stays available in the popup.
 				_length: l.length,
 				lenAuto: false,
 				_status: l.status,
 				_k: l.k || 0
 			};
 			if (l.type === 'valve') {
-				// A PRV/PSV setting is a pressure and an FCV's is a flow (js/lpn-inp.js's
-				// valveSettingUnit names which); a throttle's is dimensionless. The pressure is
-				// psi in a US file and metres of water in an SI one -- exactly what the pressure
-				// selector is showing -- so it crosses untouched, and only a flow can need the
-				// keyword conversion.
+				// A PRV/PSV setting is a pressure and an FCV's a flow (js/lpn-inp.js's
+				// valveSettingUnit names which); a throttle's is dimensionless. The pressure is psi
+				// in a US file and metres of water in an SI one -- exactly what the pressure selector
+				// shows -- so it crosses untouched, and only a flow can need the keyword conversion.
+
 				out.valveType = (l.valveType || 'TCV').toUpperCase();
 				out._setting = (out.valveType === 'FCV')   // base-write: import builds Base: an .inp arrives as one network with no scenarios
 					? inpFlow(l.setting)
@@ -7488,23 +6542,19 @@ var EngCalcs = EngCalcs || {};
 					return [inpFlow(pt[0]), pt[1]];
 				});
 				out.curveRef = null;
-				// NO FITTED CURVE IS WRITTEN HERE (Task 390 step 5). An import used to fit h0/a/b
-				// from the file's own points and store the triple beside them; pumpFit() derives it
-				// at the solver handoff instead, so an imported pump carries exactly what the file
-				// stated and nothing of ours.
+				// NO FITTED CURVE IS WRITTEN HERE (Task 390 step 5). pumpFit() derives h0/a/b at the
+				// solver handoff, so an imported pump carries exactly what the file stated and
+				// nothing of ours.
 			}
 			return carryInpTokens(l, out, LPN_INP_TOK_LINK);
 		});
 		var nodeAt = {};
 		nodes.forEach(function (n) { nodeAt[n.id] = n; });
-		// A TEXT ELEMENT'S ID IS MINTED HERE AND MUST NOT COLLIDE WITH ONE THE FILE BROUGHT.
-		//
-		// This used to read 'T' + (i + 1), which was safe only while nothing else in the app used
-		// the letter T -- and Task 248 gave it to tanks, which are T1, T2 in EPANET's own default
-		// naming. An imported file with a tank T1 and a label would then have produced two elements
-		// sharing an id, which allIds() treats as one: the rename validator would refuse a free
-		// name and accept a taken one. So the prefix follows the text element's own key ('X') and
-		// the number walks past anything already claimed.
+		// A TEXT ELEMENT'S ID IS MINTED HERE AND MUST NOT COLLIDE WITH ONE THE FILE BROUGHT. NOT
+		// 'T' + (i + 1): tanks are T1, T2 in EPANET's own default naming, so an imported file with a
+		// tank T1 and a label produces two elements sharing an id, which allIds() treats as one --
+		// the rename validator then refuses a free name and accepts a taken one. The prefix follows
+		// the text element's own key ('X') and the number walks past anything already claimed.
 		var takenIds = {};
 		nodes.forEach(function (n) { takenIds[n.id] = 1; });
 		links.forEach(function (l) { takenIds[l.id] = 1; });
@@ -7549,9 +6599,9 @@ var EngCalcs = EngCalcs || {};
 		links.forEach(function (l) { claim(l.id, LPN_ID_KEY[l.type] || 'L'); });
 
 		// **REBASED HERE, NOT BY THE MIGRATION CHAIN** (Task 354). An import is stamped at the
-		// current version and therefore walks no migration steps at all, so the one entry point real
-		// survey coordinates actually arrive through is the one that would have missed the origin.
-		// A file drawn near zero gets {0, 0} and nothing moves.
+		// current version and walks no migration steps, so the one entry point real survey
+		// coordinates arrive through is the one that would miss the origin. A file drawn near zero
+		// gets {0, 0} and nothing moves.
 		return rebaseDocument({
 			v: LPN_STORAGE_VERSION,
 			project: { name: name, activeScenario: 'base' },
@@ -7559,18 +6609,11 @@ var EngCalcs = EngCalcs || {};
 			nodes: nodes, links: links, labels: labels, nextId: next,
 			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
 			backdrop: null,   // an .inp names an image file; it never carries one. See the report.
-			// SETTINGS ARE INHERITED WHOLE, and since Task 331 that needs no asterisk. An import
-			// used to override `textSize` with a fortieth of the model's diagonal, because text was
-			// sized in MAP UNITS and a file whose coordinates we had never seen could therefore
-			// arrive unreadable -- which is exactly what Tom hit with Net3, a correct network whose
-			// labels rendered at 0.2 units, a fraction of a pixel.
-			//
-			// Pixel sizing deletes the problem rather than estimating around it: 11 px is 11 px
-			// whether the file is in feet, metres or State Plane coordinates, so there is nothing
-			// left to guess and importTextSize() is gone. That heuristic was written on 2026-08-14
-			// and removed the same week by the paradigm that made it unnecessary -- worth noting,
-			// because a plausible estimate is the most expensive kind of workaround: it works well
-			// enough that nobody looks for the cause.
+			// SETTINGS ARE INHERITED WHOLE. Do NOT reintroduce a `textSize` estimate from the model's
+			// diagonal: that existed only because text was sized in MAP UNITS, and pixel sizing
+			// deletes the problem rather than estimating around it -- 11 px is 11 px whether the file
+			// is in feet, metres or State Plane coordinates. A plausible estimate is the most
+			// expensive kind of workaround: it works well enough that nobody looks for the cause.
 			settings: JSON.parse(JSON.stringify(settings)),
 			units: readUnitSelections()
 		});
@@ -7586,16 +6629,14 @@ var EngCalcs = EngCalcs || {};
 			// 'tanks' and 'links-on-tanks' are gone (Task 248): tanks are imported now, so neither
 			// case can be reported. The lang keys are retired with them.
 			case 'tank-volume-curve': return pc.lpn_inp_drop_tank_curve || 'These tanks have a volume curve, so they are not straight-sided. They were brought in as round tanks of the stated diameter. The water level in them is the level the file gives, so the results match; only the shape is simplified.';
-			// 'valve-tcv-as-pipe' is gone (Task 248 phase 2): a throttle valve is a valve now, so
-			// there is no substitution left to report. The remaining three say which of the three
-			// outcomes a valve met -- kept and solvable here, kept but needing the EPANET engine,
-			// or turned back into a pipe.
+			// 'valve-tcv-as-pipe' is gone (Task 248 phase 2): a throttle valve is a valve, so there
+			// is no substitution to report. The remaining three say which outcome a valve met -- kept
+			// and solvable here, kept but needing the EPANET engine, or turned back into a pipe.
 			case 'valve-tcv': return pc.lpn_inp_drop_tcv || 'These throttle valves came in as throttle valves, with the same loss the file gives them. Either solver can compute them.';
 			case 'valve-active': return pc.lpn_inp_drop_valve_active || 'These valves control pressure or flow, and they open and close on their own as the water moves. They came in whole, and this page solves them with the EPANET engine, which it switches to on its own for this network.';
-			// 'valve-dropped' IS NO LONGER EMITTED (Task 248, 2026-08-17): PBV and GPV are real
-			// elements now and arrive as themselves. The case is kept so an older saved report --
-			// or a document imported before today and re-reported -- still renders a sentence
-			// rather than a blank; the key is a candidate for deletion once nothing can produce it.
+			// 'valve-dropped' IS NO LONGER EMITTED (Task 248): PBV and GPV are real elements and
+			// arrive as themselves. The case is kept so an older saved report still renders a
+			// sentence rather than a blank; delete the key once nothing can produce it.
 			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves are described by a curve or by a fixed pressure drop, and this page has no such element. They came in as open pipes, so the network is still connected but nothing is controlling it.';
 			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
 			case 'check-valve': return pc.lpn_inp_drop_cv || 'These pipes only let water flow one way in EPANET. They came in as ordinary pipes, so water may now flow either way through them.';
@@ -7650,11 +6691,10 @@ var EngCalcs = EngCalcs || {};
 				.replace('{links}', parsed.links.length)
 				.replace('{units}', parsed.flowUnits);
 			body.appendChild(sum);
-			// The one place an anchor mode is worth mentioning, and only to someone whose file
-			// actually had labels in it (Task 332). It is deliberately NOT a setting: an anchor mode
-			// is not a preference anybody can hold an opinion about before they have seen it, and
-			// this report already exists to say what is different about the file you just opened --
-			// so it reaches the person who cares at the moment they care, for one string.
+			// The one place an anchor mode is worth mentioning, and only to someone whose file had
+			// labels in it (Task 332). Deliberately NOT a setting: nobody can hold an opinion about
+			// an anchor mode before seeing it, and this report already says what is different about
+			// the file you just opened.
 			if (parsed.labels && parsed.labels.length) {
 				var anchorNote = document.createElement('p');
 				anchorNote.style.margin = '0 0 8px';
@@ -7693,26 +6733,22 @@ var EngCalcs = EngCalcs || {};
 	// stored X values 0.98 map units apart. Centre-anchored they would sit ~85 units apart at that
 	// drawing's scale; left-anchored they share an edge, which is what a title block IS.
 	//
-	// **DO NOT CONVERT THE POINT INTO OUR CENTRE ANCHOR.** That is ill-posed: it moves the label by
-	// half its own width and half a line height in WORLD units -- quantities a SCREEN-PIXEL-sized
-	// label does not have at any particular zoom -- so the same file imported from two views writes
-	// two different sets of coordinates and the difference is saved. Fitting the view first does
-	// not rescue it: zoomExtent() derives its scale from bbox(), which measures the rendered label
-	// text, so fit-then-convert is circular. Storing EPANET's own point and rendering from
-	// lb.align/lb.valign is exact at every zoom and involves no arithmetic at all.
+	// **DO NOT CONVERT THE POINT INTO OUR CENTRE ANCHOR.** It moves the label by half its own width
+	// and half a line height in WORLD units -- quantities a SCREEN-PIXEL-sized label does not have at
+	// any particular zoom -- so the same file imported from two views writes two different sets of
+	// coordinates and the difference is saved. Fitting the view first is circular: zoomExtent()
+	// derives its scale from bbox(), which measures the rendered label text.
 
 	// BOTH of EPANET's file formats, decided by the CONTENT rather than the extension.
 	//
-	// `.inp` is the documented text interchange format; `.net` is what EPANET's Windows UI saves
-	// when you press Save, and is an undocumented binary. Tom's answer on 2026-08-11, the day after
-	// `.inp` import shipped, settled it: every model he actually has is a `.net`, because that is
-	// what the Save button makes. Telling a user to go and find File > Export > Network first is a
-	// step most of them do not know exists.
+	// `.inp` is the documented text interchange format; `.net` is the undocumented binary EPANET's
+	// Windows UI saves when you press Save, and is therefore what a real user's models are. Telling
+	// them to find File > Export > Network first is a step most do not know exists.
 	//
-	// Sniffed, not guessed from the name: a file renamed `.inp` that is really binary would
-	// otherwise be read as text and produce nonsense, and the reverse is just as easy to do. So
-	// every file is read as BYTES, checked for the `.net` magic, converted if it has it, and
-	// decoded as UTF-8 text if it does not.
+	// SNIFFED, not guessed from the name: a file renamed `.inp` that is really binary would be read
+	// as text and produce nonsense. Every file is read as BYTES, checked for the `.net` magic,
+	// converted if it has it, decoded as UTF-8 text if not.
+
 	function inpTextFromBytes(buffer, fileName) {
 		var pc = EngCalcs.pageConfig || {}, bytes = new Uint8Array(buffer);
 		if (!EngCalcs.lpnLooksLikeNet || !EngCalcs.lpnLooksLikeNet(bytes)) {
@@ -7770,32 +6806,18 @@ var EngCalcs = EngCalcs || {};
 
 	// ---- Live file handles ----
 	// Download hands you a copy; this makes the FILE the thing you are working in.
-	// `showSaveFilePicker` / `showOpenFilePicker` return a real `FileSystemFileHandle`.
-	//
-	// **localStorage remains the authority; a file link is additive.** The rejected alternative was
-	// to rework the project library into a thin cache over real files, and browser support decides
-	// it: the API is Chromium-only, so such a cache would have no story for Firefox and Safari
-	// except keeping the localStorage path anyway -- two authorities, and every bug twice. Keeping
-	// localStorage authoritative also keeps every quota-safe-write, adoptOrphans() and
-	// migrate-on-read guarantee working untouched, and lets a user unlink and still have their
-	// project.
-	//
-	// **NOTHING IS WRITTEN TO A FILE EXCEPT WHEN THE USER ASKS.** No autosave timer: a program that
-	// saves your file behind your back takes away your right to walk away from a session, because
-	// the ordinary Save / Discard / Cancel conversation is only possible if the file has not
-	// already been overwritten by the time you reach it. The crash net is localStorage, written on
-	// every edit regardless. Deliberately NOT a sibling .bak file -- a second artifact in the
-	// engineer's folder that we cannot reliably clean up and they would have to explain.
-	//
-	// This Map is **the live connections for this page**; the handles themselves outlive it in
-	// IndexedDB (Task 212), and restoreHandlesOnBoot() refills this Map on the way back in. Where
-	// that fails, `entry.fileName` still outlives the handle, so a reloaded tab keeps its identity
-	// and says what it needs (lpn_file_needs_reopen) instead of silently demoting itself to a browser
-	// project.
-	//
-	// async/await rather than this file's usual ES5 idiom: every one of these calls is a promise, and
-	// the .then() version of acquire-write-close-recover is markedly harder to read. The syntax costs
-	// nothing here -- it is older than the File System Access API this code path requires.
+	// **localStorage remains the authority; a file link is additive.** NOT a thin cache over real
+	// files: the API is Chromium-only, so such a cache keeps the localStorage path anyway for Firefox
+	// and Safari -- two authorities, and every bug twice.
+	// **NOTHING IS WRITTEN TO A FILE EXCEPT WHEN THE USER ASKS.** No autosave timer: the ordinary
+	// Save / Discard / Cancel conversation is only possible if the file has not already been
+	// overwritten. The crash net is localStorage, written on every edit. Deliberately NOT a sibling
+	// .bak -- a second artifact we cannot reliably clean up.
+	// This Map is the live connections FOR THIS PAGE; the handles outlive it in IndexedDB (Task 212)
+	// and restoreHandlesOnBoot() refills it. Where that fails `entry.fileName` still outlives the
+	// handle, so a reloaded tab keeps its identity and says what it needs (lpn_file_needs_reopen).
+
+
 	var fileHandles = new Map(); // project id -> FileSystemFileHandle, live for this page
 
 	// ---- Handles that outlive the page (ROADMAP Task 212) ----
@@ -7805,10 +6827,6 @@ var EngCalcs = EngCalcs || {};
 	// The PERMISSION does not travel with it: on the way back queryPermission() answers 'granted'
 	// (reconnect silently), 'prompt' (one click, and the click is the user gesture the API demands)
 	// or 'denied'.
-	//
-	// Before this, every reload dropped every connection and the only route back was Save as or
-	// opening the file again -- which Tom hit on every single reload while testing, three times in
-	// one evening. Everything else about a reloaded file project was a workaround for this.
 	var LPN_IDB_NAME = 'engcalcs-lpn';
 	var LPN_IDB_STORE = 'handles';
 	// Task 258: the recent-files list. A SECOND store rather than more rows in `handles`, because
@@ -7865,15 +6883,11 @@ var EngCalcs = EngCalcs || {};
 
 	// ---- Recent files (ROADMAP Task 258) ----
 	//
-	// Deferred out of Task 212 ("Still deferred: Open Recent") and asked for again by Tom
-	// 2026-08-10. The list is FILES, not projects: a project you closed was discarded on purpose and
-	// there is nothing left of it to reopen, whereas the file it was saved to is still on the disk
-	// and is exactly what somebody means by "the thing I was working on yesterday".
+	// The list is FILES, not projects: a project you closed was discarded on purpose and there is
+	// nothing left of it to reopen, whereas the file it was saved to is still on the disk.
 	//
-	// Stored as ONE record holding the whole array, not a row per file. The array is short and is
-	// always read and written whole (dedupe and cap both need to see all of it), so a keyed store
-	// would have bought nothing but a second round of key management. A FileSystemFileHandle is
-	// structured-cloneable, and so is an array of them.
+	// ONE record holding the whole array, not a row per file: the array is short and is always read
+	// and written whole (dedupe and cap both need to see all of it).
 	var LPN_RECENT_MAX = 8;
 	var recentFiles = [];   // [{handle, name, at}], most recent first; mirrors the store
 	function loadRecentFiles() {
@@ -7942,12 +6956,11 @@ var EngCalcs = EngCalcs || {};
 	}
 	// Same honesty rule setStorageError() follows: a user who thinks they are editing a file must be
 	// told the moment they are not. Cleared by the next write that succeeds.
-	// A failed write is reported in the BANNER, not the status line, and carries the way out with it
-	// (Tom, 2026-08-03: "Local file not found. Please select project file."). A status message that
-	// tells someone to go and find a menu item is a worse answer than a button that does it.
-	// Distinct from setFileError (the file is GONE) -- this one means the file is very much there and
-	// is not ours any more. Same banner slot, different sentence, because the recovery differs: a
-	// missing file wants relinking, a changed file wants Save as or Revert.
+	// A failed write is reported in the BANNER, not the status line, and carries the way out with it:
+	// a status message telling someone to find a menu item is worse than a button that does it.
+	// Distinct from setFileError (the file is GONE) -- this one means the file is there and is not
+	// ours any more. A missing file wants relinking, a changed file wants Save as or Revert.
+
 	var fileChangedFlag = false;
 	function setFileChangedElsewhere(on) {
 		var pc = EngCalcs.pageConfig || {};
@@ -7984,17 +6997,14 @@ var EngCalcs = EngCalcs || {};
 		fileError = true;
 		setFileMissing(true);
 	}
-	// What the file looked like the last time we read or wrote it, per project id. This is the whole
-	// basis of the freshness check below: not a lock, not a name, but "is the file still the one I
-	// last saw?". A number we own, so a broker outage cannot weaken it.
-	//
-	// **It outlives the page, in the index beside `fileName`** (fixed 2026-08-05, found by Tom:
-	// "Still doesn't work with broker blocked. Save is apparently allowed as normal."). Held only in
-	// this Map, the stamp died on every reload, and Task 212 then re-stamped the file on the way back
-	// in -- so a reload silently ADOPTED whatever a colleague had written since as our own baseline,
-	// and the next Save wrote our older copy straight over their work with nothing said. A reload is
-	// the one moment this check most needs to survive, because it is the moment the page has been
-	// away and the file has had time to change.
+	// What the file looked like the last time we read or wrote it, per project id -- the whole basis
+	// of the freshness check below: not a lock, not a name, but "is the file still the one I last
+	// saw?". A number we own, so a broker outage cannot weaken it.
+	// **It outlives the page, in the index beside `fileName`.** Held only in a session Map the stamp
+	// dies on every reload and Task 212 re-stamps the file on the way in, so a reload silently ADOPTS
+	// whatever a colleague wrote since as our own baseline and the next Save writes our older copy
+	// over their work. A reload is the moment this check most needs to survive.
+
 	var fileStamps = new Map();
 	function knownStamp(id) {
 		if (fileStamps.has(id)) { return fileStamps.get(id); }
@@ -8018,29 +7028,18 @@ var EngCalcs = EngCalcs || {};
 		}
 		return stamp;
 	}
-	// **Is the file we were connected to still there at all?**
+	// **Is the file we were connected to still there at all?** `fileChangedUnderneath` asks "is this
+	// still the same file?"; this asks "is there a file here at all?".
 	//
-	// **SAVE MUST NEVER CREATE A FILE.** A handle whose file has been moved or deleted does not
-	// fail on write: `createWritable()` RECREATES it at the old path, so the bytes land, the
-	// read-back matches, and every other check is satisfied while the user edits a file they did
-	// not choose, with a second copy of their project where the first one used to be. (OPFS behaves
-	// the same way, so the browser pass can test this rather than skip it.) Creating files is
-	// Save as's job, and Save as asks.
+	// **SAVE MUST NEVER CREATE A FILE.** A handle whose file has been moved or deleted does not fail
+	// on write: `createWritable()` RECREATES it at the old path, so the bytes land, the read-back
+	// matches, and every other check is satisfied while the user edits a file they did not choose.
+	// Deliberately independent of `knownStamp()`: a missing baseline is a reason to be MORE careful,
+	// so a transient read error refuses a save.
 	//
-	// Deliberately independent of `knownStamp()`: a missing baseline is a reason to be MORE
-	// careful, not less. A transient read error therefore refuses a save -- with a banner and a
-	// picker to fix it -- which is the right way round for a page whose worst failure mode is
-	// believing it has saved.
-	//
-	// The pair asks two different questions: `fileChangedUnderneath` is "is this still the same
-	// file?", and this is "is there a file here at all?".
-	//
-	// **`getFile()` SUCCEEDING IS NOT PROOF THE FILE IS THERE.** It hands back a File object built
-	// from what the browser already knows -- name, size, lastModified -- and on Windows it can do
-	// that for a path with nothing at it any more. The error surfaces only when something reads the
-	// BYTES. So read a byte: one byte off a slice is a real disk touch and costs nothing next to
-	// the hundreds of kilobytes a save writes. Same reason `fileChangedUnderneath()` cannot be
-	// trusted to notice on its own -- it compares metadata that may be as stale as this.
+	// **`getFile()` SUCCEEDING IS NOT PROOF THE FILE IS THERE.** It hands back a File built from what
+	// the browser already knows -- name, size, lastModified -- and on Windows it can do that for a
+	// path with nothing at it. The error surfaces only when something reads the BYTES, so read one.
 	async function fileVanished(id, handle) {
 		if (!handle || !handle.getFile) { return false; }
 		try {
@@ -8081,13 +7080,10 @@ var EngCalcs = EngCalcs || {};
 					lockUnavailable = false;
 					setLockUnavailable(false);
 				}
-				// **The onset was missing, only the recovery was here** (found by the browser pass,
-				// 2026-08-06). This block would clear the "locking is not working" banner when the
-				// broker came back, but nothing raised it when the broker went away DURING a session
-				// -- so a Save that could not check the lock went through in silence, at the exact
-				// moment the risk is real: writing to a shared file with nothing coordinating you.
-				// The write itself is still allowed (the freshness check is the guarantee, not the
-				// lock), but it must not be quiet about it.
+				// RAISE the "locking is not working" banner as well as clearing it. Without the
+				// onset, a Save that could not check the lock goes through in silence at the exact
+				// moment the risk is real. The write is still allowed -- the freshness check is the
+				// guarantee, not the lock -- but it must not be quiet about it.
 				if (!lockNow || !lockNow.ok) {
 					lockErrorCode = (lockNow && lockNow.error) || '';
 					lockUnavailable = true;
@@ -8124,15 +7120,13 @@ var EngCalcs = EngCalcs || {};
 			var writable = await handle.createWritable();
 			await writable.write(text);
 			await writable.close();
-			// **A WRITE IS NOT A SAVE UNTIL YOU CAN READ IT BACK** (Tom, 2026-08-06, on a file he had
-			// moved in Explorer: *"It neither complains nor creates a new file. It silently fails to
-			// save."*). Everything above can resolve without a byte reaching the disk the user is
-			// looking at -- a handle whose file has been moved or deleted, a revoked permission, a
-			// sync client holding the path. So the file is read back and its SIZE compared with what
-			// we just wrote. Cheap, because the stamp has to be re-read here anyway.
+			// **A WRITE IS NOT A SAVE UNTIL YOU CAN READ IT BACK.** Everything above can resolve
+			// without a byte reaching the disk the user is looking at -- a moved or deleted file, a
+			// revoked permission, a sync client holding the path. So the file is read back and its
+			// SIZE compared with what we wrote; cheap, because the stamp is re-read here anyway.
 			//
-			// Byte length, not `text.length`: the file is UTF-8, and a project with any non-ASCII in
-			// a label would fail this check forever if it were compared in characters.
+			// BYTE length, not `text.length`: the file is UTF-8, and a project with any non-ASCII in
+			// a label would fail this check forever if compared in characters.
 			lastSaveAt = Date.now();
 			var stamped = await stampFile(id, handle);
 			var wroteBytes = new Blob([text]).size;
@@ -8170,13 +7164,11 @@ var EngCalcs = EngCalcs || {};
 		setFileError(false);
 		syncReadOnlyToOpenProject();
 	}
-	// Shown once per browser, before the first file picker ever opens (Tom, 2026-08-03). Built as a
-	// PANEL with its own Continue button rather than a confirm() or alert(), for a hard technical
-	// reason as well as a readability one: showSaveFilePicker() requires a live user activation, and
-	// Chrome's transient activation expires after a few seconds -- long enough to read three
-	// sentences and no longer. A blocking dialog would therefore work for a fast reader and throw
-	// "must be handling a user gesture" for a careful one. Continue is a fresh click, so it always
-	// has an activation of its own.
+	// Shown once per browser, before the first file picker ever opens. A PANEL with its own Continue
+	// button rather than a confirm() or alert(), for a hard technical reason: showSaveFilePicker()
+	// requires a live user activation and Chrome's transient activation expires after a few seconds,
+	// so a blocking dialog works for a fast reader and throws "must be handling a user gesture" for a
+	// careful one. Continue is a fresh click with an activation of its own.
 	var pendingFileAction = null;
 	function requireFileIdentity(action) {
 		if (loadIdentity()) { return true; }
@@ -8224,31 +7216,20 @@ var EngCalcs = EngCalcs || {};
 		]);
 		if (input) { input.focus(); }
 	}
-	// A file project's project NAME is its file's base name -- one name, not two (Task 211,
-	// Amendment 2). Task 195 had a Rename that renamed the project and a Save that wrote the file,
-	// each correct alone and a permanent trap together: Tom renamed a project, pressed Save, and it
-	// silently wrote the old file name. With the two fused, Rename on a file project IS Save As.
+	// A file project's project NAME is its file's base name -- one name, not two (Task 211). A Rename
+	// that renames the project and a Save that writes the file are each correct alone and a permanent
+	// trap together: rename, press Save, and it silently writes the old file name.
 	//
-	// **WHY A BAD STRIP HERE IS EXPENSIVE, AND IT IS NOT COSMETIC** (Task 315). saveCurrent() below
-	// treats a filename differing from the SUGGESTED one as a DELIBERATE RENAME
-	// (`if (handle.name !== suggested) { project.name = ... }`). Before 2026-08-14 a legacy file's
-	// name and its suggestion were identical, so that branch stayed asleep; now they differ BY
-	// CONSTRUCTION -- the suggestion carries `-lpn`, the file on disk carries the long form -- so
-	// the branch fires on every re-save of every pre-existing file, and whatever this function
-	// returns becomes what the user's project is called from then on.
+	// **WHY A BAD STRIP HERE IS EXPENSIVE.** saveCurrent() treats a filename differing from the
+	// SUGGESTED one as a DELIBERATE RENAME, and since Task 315 a legacy file's name and its
+	// suggestion differ BY CONSTRUCTION, so that branch fires on every re-save of every pre-existing
+	// file and whatever this returns becomes what the project is called from then on.
 	//
-	// **Task 315 predicted the wrong hazard, and the correction is worth keeping.** It said the rule
-	// was "longest suffix first", reasoning that `-lpn` matches INSIDE `-lpn-hawsedc-engcalcs`.
-	// Measured 2026-08-14: with `$`-ANCHORED strips, which is what this has always used, order is
-	// harmless -- `/-lpn$/` simply does not match a string ending in `engcalcs`, so either order
-	// gives the right answer. Longest-first only matters if someone drops the anchors. The defect
-	// that IS real is applying BOTH strips in sequence, which is what the obvious chained-replace
-	// implementation does; see below. dev/lpn-spike/file-naming-harness.js pins both.
-	//
-	// EXACTLY ONE suffix is stripped, never both in sequence. A project a user genuinely named
-	// `Z-lpn` was written by the old code as `Z-lpn-lpn-hawsedc-engcalcs.json`; strip the long form
-	// and then also the short one and it re-opens as `Z`, having quietly lost a character the user
-	// typed. Chaining two replaces reads as the obvious implementation and is wrong for that case.
+	// **EXACTLY ONE suffix is stripped, never both in sequence** -- the chained-replace
+	// implementation reads as obvious and is wrong. A project genuinely named `Z-lpn` was written as
+	// `Z-lpn-lpn-hawsedc-engcalcs.json`; stripping both re-opens it as `Z`, a character short. ORDER
+	// is harmless while the strips stay `$`-ANCHORED. dev/lpn-spike/file-naming-harness.js pins both.
+
 	function projectNameFromFileName(fname) {
 		var s = String(fname).replace(/\.json$/i, ''), lower = s.toLowerCase();
 		if (lower.slice(-LPN_FILE_SUFFIX_LEGACY.length) === LPN_FILE_SUFFIX_LEGACY) {
@@ -8265,16 +7246,13 @@ var EngCalcs = EngCalcs || {};
 		// routed rather than left to fall through, so no future caller can make Save mean "download".
 		if (!fileApiAvailable()) { await saveAs(); return; }
 		if (!requireFileIdentity('save')) { return; }
-		// Two different "we have no file we may write" cases, one answer. READ-ONLY: somebody else has
-		// it, and their file is newer than ours, so Save As is the only honest destination -- there is
-		// deliberately no "the file is free now, save over it?" offer (Tom, 2026-08-04: that would
-		// overwrite a colleague's changes). NO LIVE HANDLE: a browser project that has never been
-		// saved, or a file project whose page has been reloaded since -- a browser does not keep
-		// permission to a file across a page load.
-		// Read-only: Save does nothing at all. It is disabled in the File menu and this is the belt to
-		// that brace. It deliberately does NOT fall through to Save as -- Tom, 2026-08-05: "Save is
-		// disabled as it should be" -- because a Save that silently becomes a different command is
-		// how someone ends up with a file they did not mean to create.
+		// Two "we have no file we may write" cases, one answer. READ-ONLY: somebody else has it and
+		// their file is newer, so Save As is the only honest destination -- deliberately no "the file
+		// is free now, save over it?" offer, which would overwrite a colleague's changes. NO LIVE
+		// HANDLE: a browser project never saved, or a file project whose page has been reloaded.
+		// Read-only: Save does nothing at all, and deliberately does NOT fall through to Save as -- a
+		// Save that silently becomes a different command is how someone ends up with a file they did
+		// not mean to create.
 		if (readOnly) { return; }
 		if (!isLinked(library.openId)) { await saveAs(); return; }
 		saveToStorage();
@@ -8303,17 +7281,13 @@ var EngCalcs = EngCalcs || {};
 		if (startAt && startAt !== library.openId) { openProject(startAt); }
 		renderTabs();
 	}
-	// What is in the file we are about to write over? Two independent answers, because they have
-	// very different reliability:
-	//
+	// What is in the file we are about to write over? Two independent answers, with very different
+	// reliability:
 	//   .heldBy  -- somebody has it open. Needs the broker, so it is ABSENT whenever the broker is.
 	//   .foreign -- the file already holds a DIFFERENT project of ours. Needs nothing but the file.
-	//
-	// Tom's 2026-08-05 retest is why the second exists. The first version of this guard asked only
-	// the broker, so on a server whose lock directory was not writable it answered "no collision" to
-	// everything and Save as sailed over a colleague's file exactly as before -- the fix reproduced
-	// the bug it was written for. A guard against destroying somebody's work must not depend on a
-	// server being up. The file itself is always there to be read.
+	// A guard against destroying somebody's work MUST NOT depend on a server being up: asking only
+	// the broker means a server whose lock directory is not writable answers "no collision" to
+	// everything. The file itself is always there to be read.
 	async function inspectSaveTarget(handle) {
 		var pc = EngCalcs.pageConfig || {};
 		var out = { foreign: false, name: '', heldBy: '', stale: false };
@@ -8325,13 +7299,11 @@ var EngCalcs = EngCalcs || {};
 		try { parsed = JSON.parse(text); } catch (err) { return out; }
 		docId = parsed && parsed.project && parsed.project.docId;
 		if (!docId) { return out; }                 // not one of ours; the user's business
-		// **The freshness check belongs on THIS path too** (fixed 2026-08-06 -- Tom, twice: "Still
-		// doesn't work with broker blocked. Save is apparently allowed as normal."). Save as is not a
-		// lesser write: read-only routes Save straight here, and so does a tab that lost its handle,
-		// so "our own file" is exactly the file a colleague is most likely to have moved on. The
-		// exemption below said any file carrying our own docId was safe to overwrite -- which is true
-		// of the file we last wrote and false of the file somebody else has written since. Needs the
-		// broker for nothing: it is the same stamp comparison writeOpenProjectToFile() makes.
+		// **The freshness check belongs on THIS path too.** Save as is not a lesser write: read-only
+		// routes Save straight here, and so does a tab that lost its handle, so "our own file" is
+		// exactly the file a colleague is most likely to have moved on. Exempting any file carrying
+		// our own docId is true of the file we last wrote and false of one somebody else has written
+		// since. Needs the broker for nothing -- the same stamp comparison as writeOpenProjectToFile().
 		var owner = projectWithDocId(docId), base = owner ? knownStamp(owner) : '';
 		out.stale = !!(base && stamp && stamp !== base);
 		out.name = (parsed.project && parsed.project.name) || '';
@@ -8365,20 +7337,15 @@ var EngCalcs = EngCalcs || {};
 		try { handle = await window.showSaveFilePicker({ suggestedName: suggested, types: fileTypes() }); }
 		catch (err) { return; } // the user cancelled the picker -- not an error
 		// **NEVER WRITE OVER A FILE SOMEBODY ELSE HAS OPEN** -- asked of the file actually chosen in
-		// the picker, which is the only question that matters.
+		// the picker, which is the only question that matters. NOT `readOnly &&
+		// wasHandle.isSameEntry(handle)`: that runs only when THIS tab is the locked-out one, so an
+		// ordinary editable project can overwrite anything, and it compares against this project's
+		// own previous handle, so it protects only the file you were already locked out of.
 		//
-		// The previous guard (`readOnly && wasHandle.isSameEntry(handle)`) was wrong twice and Tom's
-		// 2026-08-05 browser pass destroyed a colleague's file through both holes: it ran only when
-		// THIS tab was the locked-out one, so an ordinary editable project could overwrite anything;
-		// and it compared against this project's own previous handle, so it could only ever protect
-		// the single file you were already locked out of.
-		//
-		// Identity is the `docId` INSIDE the target file, never its name -- Tom overwrote
-		// `Project2.json` from a project called `Project1`, and a same-name copy in another folder is
-		// perfectly legitimate. So read the file we are about to clobber, and if it is one of ours
-		// and somebody is holding it, refuse. A file that is empty, unreadable, or not one of our
-		// projects has no docId and no lock: the user has chosen to overwrite something unrelated,
-		// which is their business.
+		// Identity is the `docId` INSIDE the target file, never its name -- a same-name copy in
+		// another folder is perfectly legitimate. Read the file we are about to clobber, and if it is
+		// one of ours and somebody is holding it, refuse. A file that is empty, unreadable or not one
+		// of ours has no docId and no lock: overwriting something unrelated is the user's business.
 		var target = await inspectSaveTarget(handle);
 		if (target.heldBy) {
 			// Somebody is in it right now. Not negotiable.
@@ -8423,15 +7390,12 @@ var EngCalcs = EngCalcs || {};
 		await stampFile(id, handle); // adopt whatever is there now; the very next write is ours
 		setFileChangedElsewhere(false); // a different file; the old warning does not follow us
 		entry.fileName = handle.name;
-		// **Saving must not RENAME the project** unless the user actually chose a different name in
-		// the picker (found 2026-08-05 while verifying Tom's "Project1" change). A project called
-		// "Main St. / Phase 2" is offered the filename "Main-St.-Phase-2-..." -- because a filesystem
-		// cannot hold "/" -- and blindly reading the name back off the file imported those
-		// substitutions into the project name, silently. The user never asked to be renamed; they
-		// asked to be saved.
-		//
-		// So: if the file is the one we suggested, the name is unchanged. Only a filename the user
-		// actually typed becomes the new project name, which is what makes Save-as-rename still work.
+		// **Saving must not RENAME the project** unless the user chose a different name in the picker.
+		// A project called "Main St. / Phase 2" is offered "Main-St.-Phase-2-..." because a filesystem
+		// cannot hold "/", and reading the name back off the file imports those substitutions into
+		// the project name silently. If the file is the one we suggested the name is unchanged; only
+		// a filename the user typed becomes the new project name, which keeps Save-as-rename working.
+
 		if (handle.name !== suggested) { project.name = projectNameFromFileName(handle.name); }
 		entry.name = project.name;
 		saveToStorage();
@@ -8479,25 +7443,13 @@ var EngCalcs = EngCalcs || {};
 	async function openFromFile() {
 		var pc = EngCalcs.pageConfig || {};
 		if (!fileApiAvailable()) {
-			// **Say what this open really is, before it happens** (Tom, 2026-08-04). Without the File
-			// System Access API there is no handle, so the browser hands us the file's CONTENTS and
-			// nothing else: no way to write back, no way to lock it, no way even to know it is the
-			// same file next time. That is an upload, not an open, and a user who is not told will
-			// reasonably expect Save to go back where it came from.
+			// **Say what this open really is, before it happens.** Without the File System Access API
+			// there is no handle, so the browser hands us the file's CONTENTS and nothing else: no
+			// way to write back, no way to lock it, no way to know it is the same file next time.
 			//
-			// **Shown EVERY time, not once per browser** (fixed 2026-08-04 -- Tom: "Any other
-			// explanation does not fire"). The first version stored a once-per-browser flag AND wrote
-			// that flag before the dialog had proved it appeared, so a single missed or dismissed
-			// showing silenced it permanently with no way back. Two lessons, both worth keeping:
-			//
-			//   - Never spend a shown-once token before the thing it guards has actually happened.
-			//   - "Once per browser" is the wrong default for a fact that CHANGES WHAT A COMMAND
-			//     MEANS. This one changes what Save does. Opening a file is not a frequent act, and
-			//     one extra click on it is a far smaller cost than a user who never learns that their
-			//     work cannot go back where it came from.
-			//
-			// Task 209's snooze system is the right long-term home for this: shown by default, with
-			// a way to say "I know" that is the USER's to give rather than ours to assume.
+			// **Shown EVERY time, not once per browser.** Never spend a shown-once token before the
+			// thing it guards has happened, and "once per browser" is the wrong default for a fact
+			// that CHANGES WHAT A COMMAND MEANS. Task 209's snooze system is the long-term home.
 			openDialog(function (body) {
 				[pc.lpn_file_upload_explain].forEach(function (txt) {
 					if (!txt) { return; }
@@ -8535,16 +7487,12 @@ var EngCalcs = EngCalcs || {};
 		// sprang read-only on the user afterwards; Tom's AutoCAD instinct -- and Word's, and Excel's --
 		// is that this is a QUESTION asked at the moment of opening, with both real answers on it.
 		var docId = (saved.project && saved.project.docId) || null;
-		// **The same file must not become two tabs** (Tom, 2026-08-05: "It does open two live tabs
-		// both claiming the same file"). Two tabs over one file is a merge conflict with yourself:
-		// both wear the file's name, both think they own it, and whichever you Save last silently
-		// wins. Every other document program answers this the same way -- opening what is already
-		// open just brings it forward -- so this does too.
+		// **The same file must not become two tabs.** Two tabs over one file is a merge conflict with
+		// yourself: both wear the file's name, both think they own it, and whichever you Save last
+		// silently wins. Opening what is already open brings it forward, as every document program does.
 		//
-		// Identity is the `docId` INSIDE the file, never the name: the same reason Save as reads the
-		// file it is about to clobber. A copy saved under a new name is a different document and
-		// legitimately opens as its own tab, which is exactly what the docId says and the name does
-		// not.
+		// Identity is the `docId` INSIDE the file, never the name -- a copy saved under a new name is
+		// a different document and legitimately opens as its own tab.
 		var already = docId ? projectWithDocId(docId) : null;
 		if (already) { adoptAlreadyOpen(already, handle); return; }
 		var r = docId ? await postLock('check', docId) : null;
@@ -8603,31 +7551,23 @@ var EngCalcs = EngCalcs || {};
 		if (hrs < 48) { return (pc.lpn_ago_hours || '{n} hours').replace('{n}', hrs); }
 		return (pc.lpn_ago_days || '{n} days').replace('{n}', Math.max(2, Math.round(hrs / 24)));
 	}
-	// The stale-claim conversation.
+	// The stale-claim conversation. THREE choices, in the order a decent colleague tries them: Cancel
+	// and go ask FIRST, break it last, and the prose enumeration and the button row in the SAME
+	// order. No "Create a copy": read-only allows every edit, so open-read-only-then-Save-as IS one.
 	//
-	// THREE choices, in the order a decent colleague tries them: Cancel and go ask is FIRST because
-	// it is the hoped-for outcome, not a way out of the dialog; break it is last and blunt. The
-	// prose enumeration and the button row are in the same order -- a numbered list that disagrees
-	// with the buttons beneath it makes the reader re-derive the mapping every time. No "Create a
-	// copy": read-only allows every edit, so open-read-only-then-Save-as IS making a copy, and one
-	// fewer button is one fewer thing to weigh in a dialog already asking for a judgment.
+	// **Breaking a lock is not overwriting a file**, structurally rather than by promise:
+	// writeOpenProjectToFile() checks the bytes on disk before every write.
 	//
-	// **Breaking a lock is not overwriting a file**, and that is structural rather than a promise:
-	// writeOpenProjectToFile() checks the bytes on disk before every write. It is what allows the
-	// break button to exist at all.
-	//
-	// **"{name} has this file open." on its own is not enough to decide anything.** The dialog asks
-	// the reader to judge a claim -- wait, look read-only, or break it -- and that judgment is
-	// entirely about time: how long since they touched it, and how much of that is unsaved. So each
-	// case below says the most it truthfully can:
-	//
-	//   unsaved work   -- the one that matters most: interrupting them costs them that work.
+	// **"{name} has this file open." on its own is not enough to decide anything.** The judgment is
+	// entirely about time, so each case says the most it truthfully can:
+	//   unsaved work   -- matters most: interrupting them costs them that work.
 	//   all saved      -- safest to break; nothing of theirs is at risk.
 	//   nothing edited -- they may only have it open; `lastActivity` says whether anyone is home.
 	//   no numbers     -- an old record, or a broker that answered without them.
-	//
-	// `lastActivity` is the broker's own clock in SECONDS (it is `time()`); editedAt/savedAt are the
-	// holder's clock in milliseconds. Mixing the two units silently turns "5 minutes" into "7 weeks".
+	// `lastActivity` is the broker's own clock in SECONDS (`time()`); editedAt/savedAt are the
+	// holder's clock in MILLISECONDS. Mixing the two silently turns "5 minutes" into "7 weeks".
+
+
 	function lockHeadingText(who, info) {
 		var pc = EngCalcs.pageConfig || {}, now = Date.now();
 		var editedAt = (info && info.editedAt) || 0, savedAt = (info && info.savedAt) || 0;
@@ -8686,15 +7626,12 @@ var EngCalcs = EngCalcs || {};
 		return null;
 	}
 	// Opening a file this browser already has open: come forward, and take the connection with you.
+	// **Re-opening the file is a legitimate way to reconnect** -- the fallback the needs-reopen banner
+	// names -- so the fresh handle is adopted even though the tab already existed.
 	//
-	// **Re-opening the file is a legitimate way to reconnect** -- it is the fallback the needs-reopen
-	// banner names -- so the fresh handle is adopted even though the tab already existed. That is what
-	// keeps this from being merely a refusal.
-	//
-	// The unsaved-changes case gets its own sentence because the two are genuinely different
-	// situations: somebody who re-opens a file expecting the version on disk needs to be told they are
-	// looking at their own newer edits instead, and pointed at Revert. Neither case throws anything
-	// away -- this function does not touch the document at all.
+	// The unsaved-changes case gets its own sentence: somebody re-opening a file expecting the version
+	// on disk needs to be told they are looking at their own newer edits, and pointed at Revert.
+	// Neither case throws anything away; this function does not touch the document.
 	function adoptAlreadyOpen(id, handle) {
 		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id);
 		if (handle) {
@@ -8770,13 +7707,11 @@ var EngCalcs = EngCalcs || {};
 
 	// ---- Project locks (ROADMAP Task 195 Phase 2) ----
 	// Coordinates "who is editing this file right now" for a team sharing project files off a
-	// network share, against lpn-lock.php. See that file for the record format and the four actions.
+	// network share, against lpn-lock.php -- see that file for the record format and the four actions.
 	//
-	// **It fails OPEN.** If the broker cannot be reached -- offline, a deploy hiccup, the endpoint
-	// missing entirely -- editing continues normally and nothing is read-only. Locking is a courtesy
-	// layer over an in-office honor system, so failing closed would let an unreachable server take
-	// away a calculator that has always worked without one. That trade is the whole reason this is
-	// safe to ship on a page that must keep working offline.
+	// **It fails OPEN.** If the broker cannot be reached, editing continues normally and nothing is
+	// read-only. Locking is a courtesy layer over an in-office honor system, and failing closed would
+	// let an unreachable server take away a calculator that has always worked without one.
 	var LPN_LOCK_URL = '/engcalcs/lpn-lock.php';
 	var LPN_IDENTITY_KEY = 'lpn_identity';
 	// The document id is baked into the FILE, not into our per-browser project id: two people
@@ -8848,12 +7783,10 @@ var EngCalcs = EngCalcs || {};
 			return null;
 		} catch (err) { return null; }
 	}
-	// **Locks are per TAB, not per current project** (Task 211). Every project in the library is an
-	// open tab, so a file project keeps its lock while you work in a different tab -- releasing on
-	// every tab switch would let a colleague take a file out from under unsaved work you are two
-	// clicks away from. Both maps are session state and are deliberately NOT in the index: a lock we
-	// hold and a read-only decision we made are facts about this browser session, and a reload starts
-	// both again from what the server actually says.
+	// **Locks are per TAB, not per current project** (Task 211): a file project keeps its lock while
+	// you work in a different tab, because releasing on every tab switch would let a colleague take a
+	// file out from under unsaved work. Both maps are session state and deliberately NOT in the index
+	// -- a reload starts both again from what the server actually says.
 	// Wall-clock ms of the last real edit and the last successful file write on the OPEN project.
 	// Reported to the broker so a colleague sees "last edit 3 hours ago, 20 minutes after their last
 	// save" rather than a heartbeat time that says nothing about whether work is at risk.
@@ -8894,16 +7827,14 @@ var EngCalcs = EngCalcs || {};
 			btn.addEventListener('click', fn);
 			banner.appendChild(btn);
 		}
-		// One action, and it is the only one there can be: keep your work as a file of your own. There
-		// is no Take over (withdrawn 2026-08-04 -- it wrote a copy older than the file over the top of
-		// it) and no "the file is free now, save over it" (refused by Tom for the same physics: the
-		// file on disk has moved on since we read it).
-		// **Revert is the other real exit, and it was missing from both banners** (Tom, 2026-08-06:
-		// "No revert offered, only Save as"). Save as keeps your work in a file of your own; Revert
-		// says "fine, theirs wins" and re-reads the file. Both are honest answers to being locked out
-		// or overtaken, and offering only the first makes a new file the price of giving in. It writes
-		// nothing, so it is safe in read-only; it is offered only when there is something to revert
-		// FROM (unsaved changes) and something to revert TO (a live connection).
+		// One action: keep your work as a file of your own. NO Take over (it wrote a copy older than
+		// the file over the top of it) and no "the file is free now, save over it" -- same physics,
+		// the file on disk has moved on since we read it.
+		// **Revert is the other real exit.** Save as keeps your work in a file of your own; Revert
+		// says "fine, theirs wins" and re-reads the file. Offering only the first makes a new file the
+		// price of giving in. It writes nothing, so it is safe in read-only, and is offered only when
+		// there is something to revert FROM (unsaved changes) and TO (a live connection).
+
 		function offerRevert() {
 			var e = indexEntry(library.openId);
 			if (!(isLinked(library.openId) && e && e.dirty)) { return; }
@@ -9057,15 +7988,12 @@ var EngCalcs = EngCalcs || {};
 		// pre-save re-check exists for, and the same read-only state answers it.
 		enterReadOnly(lockHolderName(r));
 	}
-	// The heartbeat, on its OWN fixed timer (Task 211). Task 195 piggybacked this on the file-autosave
-	// tick, which is why one user-facing number ended up governing the write interval, the heartbeat
-	// AND the how-long-until-takeover threshold at once -- and why that number had to be clamped to
-	// 60-180 s. With autosave gone the coupling goes too: this is 60 s, always, and no longer anybody's
-	// setting.
+	// The heartbeat, on its OWN fixed timer: 60 s, always, and nobody's setting. Piggybacking it on
+	// an autosave tick is how one user-facing number ends up governing the write interval, the
+	// heartbeat AND the how-long-until-takeover threshold at once.
 	//
-	// It refreshes every lock we hold (one per open file tab), and it keeps the one promise a
-	// could-not-lock warning makes. It deliberately does NOT poll a tab the user opened read-only:
-	// read-only is read-only, and nothing promotes a tab behind the user's back.
+	// It refreshes every lock we hold (one per open file tab), and deliberately does NOT poll a tab
+	// the user opened read-only: nothing promotes a tab behind the user's back.
 	var lockUnavailable = false;
 	// Which flavour of "no locking" we are in, so the banner can say something a person can act on.
 	// 'storage' is a server SETUP fault (the lock directory is not writable by the web server user)
@@ -9117,21 +8045,14 @@ var EngCalcs = EngCalcs || {};
 		}
 		heldLocks.delete(pid);
 	}
-	// **A RELOAD MUST NOT DROP YOUR CLAIM** (Tom, 2026-08-05: "Across reloads, minimizes, browser
-	// closes, and computer restarts, you still have your lock until you Close the file").
-	//
-	// beforeunload hands every lock back -- correct, the page really is going -- but nothing took
-	// them up again on the way back in, so a reload quietly un-held every file. The docId lives in
-	// localStorage beside the project, so this needs no file handle and works even though the handle
-	// itself died with the page (that is Task 212's problem, and a different one).
-	//
-	// Being refused here is a normal outcome, not an error: somebody took the file while we were
-	// gone, so that tab becomes read-only and says whose it is.
+	// **A RELOAD MUST NOT DROP YOUR CLAIM** -- across reloads, minimizes, browser closes and reboots
+	// you still hold your lock until you Close the file. beforeunload hands every lock back, so
+	// something has to take them up again on the way in. The docId lives in localStorage beside the
+	// project, so this needs no file handle. Being refused here is a normal outcome, not an error.
 	// Put back the connections that died with the last page. Runs BEFORE the needs-reopen banner is
-	// painted, so a file we can silently reconnect never flashes a warning about itself.
-	//
-	// A handle whose project has since been closed is dropped rather than restored -- otherwise the
-	// store would grow forever, and closing a project would not really let go of its file.
+	// painted, so a file we can silently reconnect never flashes a warning about itself. A handle
+	// whose project has since been closed is DROPPED rather than restored, or the store grows forever
+	// and closing a project never really lets go of its file.
 	async function restoreHandlesOnBoot() {
 		var handles = await recallHandles();
 		var keys = await recallHandleKeys();
@@ -9184,26 +8105,16 @@ var EngCalcs = EngCalcs || {};
 		renderTabs();
 		acquireLockForOpenProject();
 	}
-	// **A reload should cost the user nothing** (Tom, 2026-08-05: "I should get nothing, or a prompt
-	// for single-click permission to reconnect"). Task 212 got as far as one click on a banner, which
-	// is neither.
+	// **A reload should cost the user nothing.** queryPermission() answers 'prompt' after a reload
+	// even where the browser still remembers the grant: the grant goes DORMANT rather than away, and
+	// requestPermission() revives a dormant grant WITHOUT showing anything -- provided it is called
+	// with a live user activation. Boot has no activation, which is why restoreHandlesOnBoot() must
+	// not ask; the FIRST gesture the user makes on the page is one. Where the grant really is gone
+	// the browser shows its own permission bubble, a truthful one-click prompt.
 	//
-	// queryPermission() answers 'prompt' after a reload even where the browser still remembers the
-	// grant: the grant goes DORMANT rather than away, and requestPermission() revives a dormant grant
-	// WITHOUT showing anything -- provided it is called with a live user activation. Boot has no
-	// activation, which is why restoreHandlesOnBoot() must not ask. But the banner's button is not the
-	// only activation available: the FIRST gesture the user makes on the page is one too, and spending
-	// it here makes the ordinary case silent -- the banner is gone before it can be read.
-	//
-	// Where the grant really is gone, the browser shows its own permission bubble, which is exactly
-	// the one-click prompt asked for, and a truthful one: we are asking for write access to somebody's
-	// file, and that is a question the browser gets to put in its own words.
-	//
-	// Once per project, never more: one activation is one request, and a queue of permission bubbles
-	// on a single click would be worse than the banner ever was. The listener stays (rather than
-	// removing itself on first fire) so that switching to a second reloaded file tab gets its own
-	// attempt on the next gesture, instead of being stranded by whichever tab happened to be on
-	// screen when the page came back.
+	// Once per project, never more: a queue of permission bubbles on a single click would be worse
+	// than the banner. The listener STAYS rather than removing itself on first fire, so a second
+	// reloaded file tab gets its own attempt on the next gesture.
 	var reconnectTried = new Set();
 	function armPendingReconnect() {
 		if (armPendingReconnect.armed) { return; }
@@ -9258,12 +8169,9 @@ var EngCalcs = EngCalcs || {};
 		saveIndex();
 	}
 	// **Close IS the removal, and there is no Delete** (Task 211). Once every tab wears an asterisk
-	// whenever it holds something that is not in a file, "close without saving" already IS "delete",
-	// and a second verb for it was a distinction with nothing behind it. So this is the old
-	// deleteProject() with the confirm lifted out: closeTab() below asks the question, in the words
-	// the situation deserves, and this does the work.
-	//
-	// Removes the document first, then the index entry: the reverse order can leave a document with
+	// whenever it holds something that is not in a file, "close without saving" already IS "delete".
+	// closeTab() asks the question; this does the work.
+	// Removes the document FIRST, then the index entry: the reverse order can leave a document with
 	// no entry, which adoptOrphans() would helpfully resurrect on the next load.
 	function discardProject(id) {
 		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id),
@@ -9285,15 +8193,13 @@ var EngCalcs = EngCalcs || {};
 		library.projects = library.projects.filter(function (p) { return p.id !== id; });
 		if (id === library.openId) {
 			library.openId = null;
-			// Deleting the OPEN project has to leave something open. The tab that slides into the
-			// closed one's spot -- the next one rightward, or the new last tab if it was the
-			// rightmost -- is the best guess at "what I meant to look at next"; with no survivors at
-			// all, a fresh empty project -- never a blank screen with no project.
-			// Tom, 2026-07-31, on whether it should instead always land on a clean Untitled: no,
-			// because newProject() pushes a real persisted row, so deleting 1 of 5 would leave 5
-			// rows and read as a failed delete. He also ruled out warning BEFOREHAND -- the fix is
-			// to say afterwards where you landed, since the alarm is "a network I did not ask for
-			// just appeared", and that is answered by narration, not by a different landing spot.
+			// Deleting the OPEN project has to leave something open: the tab that slides into the
+			// closed one's spot, or a fresh empty project with no survivors -- never a blank screen
+			// with no project. NOT always a clean Untitled: newProject() pushes a real persisted row,
+			// so deleting 1 of 5 would leave 5 rows and read as a failed delete. And no warning
+			// BEFOREHAND -- the alarm is "a network I did not ask for just appeared", which is
+			// answered by saying afterwards where you landed.
+
 			var rest = library.projects, landIndex = Math.min(closedIndex, rest.length - 1);
 			if (rest.length) {
 				var landed = rest[landIndex];
@@ -9333,26 +8239,15 @@ var EngCalcs = EngCalcs || {};
 		var head = Math.max(4, LPN_TAB_NAME_MAX - tail - 1);
 		return name.slice(0, head) + '…' + name.slice(name.length - tail);
 	}
-	// **THE ASTERISK DECIDES** -- the one rule the whole close/discard story falls out of. A browser
-	// project is in no file at all, so it always wears one, faded, because it describes a standing
-	// condition rather than something to go and do. A file project wears a full-strength one only
-	// while it holds changes its file does not.
+	// **ONE RULE: the asterisk follows `dirty`, and the fade says whether the project lives in a file
+	// or only in this browser.** Bold means "changes not in the file"; faint means "this lives only
+	// in the browser". The whole close/discard story falls out of them.
 	//
-	// A bold asterisk means "changes not in the file"; a faint one means "this lives only in the
-	// browser". They are different facts and both are worth saying.
-	//
-	// **ONE RULE: the asterisk follows `dirty`, and the fade says whether the project lives in a
-	// file or only in this browser.** A browser project does NOT wear a standing asterisk. The
-	// rejected alternative -- a faint asterisk on any browser project never exported -- made a
-	// project created a moment ago, containing nothing anybody would miss, claim unsaved work;
-	// closeTab() then had to special-case it back out (`projectIsEmpty`) to avoid a pointless
-	// prompt, so the mark and the behaviour disagreed in plain view.
-	//
-	// What makes this work is that a freshly created project gets a BASELINE (stampProjectSaved(),
-	// called by newBlankProject and by the gallery): `savedSig` is recorded at birth, so `dirty` is
-	// false until the user changes something. The faint asterisk then means what the bold one means
-	// -- there is work here that is in no file -- and appears at the first edit, the first moment
-	// there is anything to lose.
+	// A browser project does NOT wear a STANDING asterisk: a faint asterisk on any browser project
+	// never exported makes a project created a moment ago, containing nothing anybody would miss,
+	// claim unsaved work -- and closeTab() then needs a special case to avoid a pointless prompt.
+	// A freshly created project gets a BASELINE (stampProjectSaved()), so `dirty` is false until the
+	// user changes something and the faint asterisk appears at the first edit.
 	function tabAsterisk(entry) {
 		return { show: !!(entry && entry.dirty), faded: !isFileProject(entry) };
 	}
@@ -9451,12 +8346,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- menus ----
 	// One popover for all three menus (File, a tab's own, the overflow list). They differ only in
-	// their rows, so three popovers would have been three copies of the same positioning and dismissal.
-	// The three view popovers (Labels, Settings, Units). They are peers of the menus, so opening a
-	// menu closes them and a click anywhere outside them closes them -- Tom, 2026-08-04: "Can the
-	// Labels form go away when user clicks away or at least when another menu item is selected? We
-	// are currently seeing the other menus while Labels persists." The property popup (#lpn_popup) is
-	// deliberately NOT in this list: it has its own currentPopup machinery and its own dismissal.
+	// their rows, so three popovers would be three copies of the positioning and dismissal.
+	// The three view popovers (Labels, Settings, Units) are peers of the menus, so opening a menu
+	// closes them and a click anywhere outside closes them. The property popup (#lpn_popup) is
+	// deliberately NOT in this list: it has its own currentPopup machinery and dismissal.
 	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup', 'lpn_notes_popup', 'lpn_find_popup'];
 	// The control that opened the popover now showing -- the toolbar button, or the menu-bar item.
 	// Same job openMenuAnchor does for the menus, and needed for the same reason: the click that
@@ -9480,49 +8373,35 @@ var EngCalcs = EngCalcs || {};
 	var openMenuAnchor = null;
 
 	// ---- Icons (ROADMAP Task 231) ----
-	// Prefix, never replacement: every control keeps its word, and the icon rides in front of it.
-	// Icon-only was rejected suite-wide -- it saves no translation work (the label stays) and spends
-	// first-time comprehension, which is the audience a web calculator exists for.
-	//
-	// GEOMETRY IS NOT DEFINED HERE. It lives once in lib/Icons.lib.php and arrives as
-	// EngCalcs.icons; the wrapper attributes arrive as EngCalcs.iconOpenTag, so stroke weight and
-	// viewBox are one decision shared with PHP's ecIcon() rather than two that drift. Redrawing a
-	// path here would be a second icon pretending to be the first.
-	//
-	// The first pass used emoji and Tom's review killed it (2026-08-08) on the two icons that carry
-	// the most meaning: a reservoir is an open-top tank and a pump is a circle with a tangent tail,
-	// and Unicode has neither. Those are the shapes this canvas already draws, so the icon that
-	// teaches the notation beats an approximate glyph -- and unlike emoji, these inherit the row's
-	// colour, so a disabled row greys its icon with no extra rule.
-	// Both helpers live in js/Calculators.lib.js so every page in the suite builds an icon the same
-	// way; these are just local names for them. setLabel() is the ONLY way a control here gets an
-	// icon + word, so no call site can quietly grow a second convention -- which is exactly how the
-	// toolbar's Settings popover shipped without its warning triangle (Tom, 2026-08-08: "I see it on
-	// the pull-down menu Settings, but not on the toolbar Settings"). Two render sites, one missed.
+	// Prefix, never replacement: every control keeps its word and the icon rides in front of it.
+	// Icon-only was rejected suite-wide -- it saves no translation work and spends comprehension.
+	// GEOMETRY IS NOT DEFINED HERE. It lives once in lib/Icons.lib.php and arrives as EngCalcs.icons;
+	// the wrapper attributes arrive as EngCalcs.iconOpenTag, so stroke weight and viewBox are one
+	// decision shared with PHP's ecIcon(). NOT emoji: a reservoir is an open-top tank and a pump is a
+	// circle with a tangent tail, and Unicode has neither; these also inherit the row's colour, so a
+	// disabled row greys its icon with no extra rule.
+	// setLabel() is the ONLY way a control here gets an icon + word, so no call site can quietly grow
+	// a second convention -- which is how the toolbar's Settings popover once shipped without its
+	// warning triangle. Two render sites, one missed.
 	function iconEl(name) { return EngCalcs.iconEl(name); }
 	function setLabel(el, iconName, text) { EngCalcs.setLabel(el, iconName, text); }
-	// A map symbol (ROADMAP Task 146.10 -- real element symbols from this same icon set) is the
-	// SAME markup iconEl() builds for a toolbar button, just re-homed onto the canvas: strip the
-	// button-sizing 'ec-icon' class (its CSS width/height:1.05em would fight the explicit
-	// world-unit x/y/width/height the caller sets) and give it the caller's own class instead.
-	// Everything else -- paths, stroke weight, the currentColor hookup -- stays exactly what
-	// iconEl() already built, so a map symbol and its toolbar icon are never two drawings of one
-	// shape.
+	// A map symbol is the SAME markup iconEl() builds for a toolbar button, re-homed onto the canvas:
+	// strip the button-sizing 'ec-icon' class, whose CSS width/height:1.05em would fight the explicit
+	// world-unit x/y/width/height the caller sets. Everything else stays what iconEl() built, so a
+	// map symbol and its toolbar icon are never two drawings of one shape.
 	function buildMapIconSvg(name, cls) {
 		var svgEl = iconEl(name);
 		if (!svgEl) { return null; }
 		svgEl.setAttribute('class', cls);
 		return svgEl;
 	}
-	// A toolbar icon is drawn stroke-only, fill:none (Icons.lib.php's EC_ICON_OPEN_TAG) -- correct
-	// for a button, where nothing is ever behind it, but on the map a pipe can run right through
-	// the open/translucent parts of a reservoir tank or a pump casing and show through (Tom,
-	// 2026-08-09: "they should be opaque so that they hide the pipes under/through them"). This
-	// prepends one opaque shape as the FIRST child of an icon built by buildMapIconSvg(), so it
-	// paints underneath the icon's own (unmodified) linework rather than replacing any of it --
-	// the shared paths from lib/Icons.lib.php are still never redrawn, this only adds an occlusion
-	// backing behind them. Filled with --lpn-map-bg (css/engcalcs.css), matching the canvas's own
-	// background, so the patch reads as "the icon is opaque," not as a colored blob.
+	// A toolbar icon is drawn stroke-only, fill:none -- correct for a button, where nothing is behind
+	// it, but on the map a pipe runs right through the open parts of a reservoir tank or pump casing.
+	// This prepends ONE opaque shape as the FIRST child of a buildMapIconSvg() icon, so it paints
+	// underneath the icon's own unmodified linework: the shared paths from lib/Icons.lib.php are
+	// still never redrawn. Filled with --lpn-map-bg, matching the canvas background, so the patch
+	// reads as "the icon is opaque" and not as a coloured blob.
+
 	function prependSymbolBackdrop(svgEl, tag, attrs, cls) {
 		if (!svgEl) { return; }
 		var b = el(tag, attrs, null);
@@ -9530,13 +8409,11 @@ var EngCalcs = EngCalcs || {};
 		svgEl.insertBefore(b, svgEl.firstChild);
 	}
 
-	// TWO LEVELS (Task 264 rework, Tom 2026-08-10). Level 0 is a pull-down under its menubar or
-	// toolbar button; level 1 is a FLY-OUT beside the row that opened it, with the parent still on
-	// screen. The first cut replaced the parent's contents in the one popup, which is what Tom
-	// rejected: "the universal convention is for that to be a fly-out submenu of New rather than a
-	// visually disconnected replacement." He is right, and the disconnection is also what hid the
-	// dismissal bug -- a menu that legitimately swaps its own contents looks exactly like one that
-	// has been closed.
+	// TWO LEVELS (Task 264). Level 0 is a pull-down under its menubar or toolbar button; level 1 is a
+	// FLY-OUT beside the row that opened it, with the parent still on screen -- the universal
+	// convention, and NOT a replacement of the parent's contents in the one popup. The disconnection
+	// also hides a dismissal bug: a menu that legitimately swaps its contents looks exactly like one
+	// that has been closed.
 	function menuEls(level) {
 		return level
 			? { popup: document.getElementById('lpn_menu_popup2'), list: document.getElementById('lpn_menu_list2') }
@@ -9674,27 +8551,21 @@ var EngCalcs = EngCalcs || {};
 		var hint = document.getElementById('lpn_empty_hint');
 		if (hint && hint.style.display === 'block') { hideExamplesGallery(); }
 	});
-	// File > New project (ROADMAP Task 264, Tom 2026-08-10). A second popup off the same anchor
-	// rather than a hover-out submenu: the menu machinery here is one flat popover, hover submenus are
-	// a poor bargain on the touch screens this page is used on, and one extra click on a command used
-	// once per project is not a cost worth new machinery.
+	// File > New project (Task 264). A second popup off the same anchor rather than a hover-out
+	// submenu: the menu machinery here is one flat popover, and hover submenus are a poor bargain on
+	// a touch screen.
 	//
-	// **Each example COMMITS TO A UNIT SYSTEM; it does not adapt to yours.** That is the whole point of
-	// the rework. Every water-network example published anywhere -- EPANET's included -- is a US
-	// example or an SI example, never one drawing that rewrites itself, and a user who opens "Basic US
-	// units" and sees inches has been told the truth by the name they clicked. It also removes the only
-	// thing in this page that needed inputs to convert when a unit changed, which is what unblocks
-	// Task 263.
+	// **Each example COMMITS TO A UNIT SYSTEM; it does not adapt to yours.** Every water-network
+	// example published anywhere, EPANET's included, is a US example or an SI example, never one
+	// drawing that rewrites itself. It also removes the only thing on this page that needed inputs to
+	// convert when a unit changed, which is what unblocks Task 263.
 	function newProjectRows() {
 		var pc = EngCalcs.pageConfig || {};
 		return [
-			// **A BLANK PROJECT COMMITS TO A UNIT SYSTEM TOO** (Tom, 2026-08-10: "to act more like
-			// other software, let's just have 'Blank project, US units (gpm)' and 'Blank project, SI
-			// units (l/s)'"). The single "Blank project" row inherited whatever units happened to be
-			// on the strip, which is the one thing left on this page that decided a project's units
-			// by accident -- and since Task 263 a project's units are part of the project. With this
-			// the fly-out is a template list, which is the shape File > New has in every application
-			// that has one.
+			// **A BLANK PROJECT COMMITS TO A UNIT SYSTEM TOO.** A single "Blank project" row inherits
+			// whatever units happen to be on the strip, which decides a project's units by accident --
+			// and since Task 263 a project's units are part of the project. The fly-out is a template
+			// list, the shape File > New has in every application that has one.
 			{ icon: 'new', label: pc.lpn_new_blank_us || 'Blank project, US units (gpm)', fn: function () { newBlankProject('us'); } },
 			{ icon: 'new', label: pc.lpn_new_blank_si || 'Blank project, SI units (l/s)', fn: function () { newBlankProject('si'); } },
 			// **TWO MORE ROWS, NOT A CHECKBOX ON THE FIRST TWO** (Task 145). Grid-or-geographic is
@@ -9716,17 +8587,12 @@ var EngCalcs = EngCalcs || {};
 	// The TOOLBAR route opens these as a pull-down under the button, not as a fly-out: there is no
 	// parent row for it to branch from. Same rows either way, built once.
 	function openNewProjectMenu(anchor) { openMenu(anchor, newProjectRows()); }
-	// Blank project, then the units, then the drawing -- in that order, and the order is the design.
-	// setUnits() moves the whole units strip to the preset and calls submitForm(), which re-enters
-	// EngCalcs.pageCalculator; doing it on a project that is still empty means nothing is on screen to
-	// be re-rendered against the new units. drawExampleNetwork() then reads those selects through
-	// niceDefault() and lands on one branch deterministically, instead of on whatever the visitor
-	// happened to have set.
-	//
-	// This ASKS FOR NOTHING. Tom's first sketch had a permission dialog ("Set project units to match
-	// example network?"), and then answered it himself with the better version: make the choice the
-	// menu item. The user has already said which system they want by which row they clicked, so a
-	// dialog confirming it would be asking a question they just answered.
+	// Blank project, then the units, then the drawing -- the order is the design. setUnits() moves the
+	// whole strip to the preset and re-enters EngCalcs.pageCalculator; doing it while the project is
+	// still empty means nothing is on screen to be re-rendered against the new units.
+	// This ASKS FOR NOTHING. The choice IS the menu item: the user has already said which system they
+	// want by which row they clicked.
+
 	// Blank project, then the units, then whatever content -- and the order is the design. setUnits()
 	// moves the whole strip to the preset and re-enters EngCalcs.pageCalculator; doing it while the
 	// project is still empty means nothing is on screen to be re-rendered against the new units.
@@ -9745,17 +8611,13 @@ var EngCalcs = EngCalcs || {};
 	function openFileMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {}, id = library.openId, entry = indexEntry(id);
 		var linked = isLinked(id), api = fileApiAvailable();
-		// **RECENT FILES GO LAST, BELOW EVERYTHING** (Tom, 2026-08-15: *"File, Save needs to be more
-		// handy. It appears after Recents. Put Recents last."*). This block used to sit directly
-		// under Open…, on the argument that thirty years of File menus put it there -- and the
-		// argument was answered by using the menu: a recents list grows, and every row it grows
-		// pushes SAVE further down a menu that Save is the most-used row of. A convention about
-		// where a list goes does not outrank the cost it imposes on the command above it.
+		// **RECENT FILES GO LAST, BELOW EVERYTHING.** Not under Open… where thirty years of File
+		// menus put it: a recents list grows, and every row it grows pushes SAVE further down a menu
+		// Save is the most-used row of.
 		//
-		// Still ABSENT when there are none -- an empty "Recent files" heading over nothing teaches
-		// the user only that the feature does not work yet. They cannot appear at all without the
-		// File System Access API, because a browser with no handle to keep has nothing to remember:
-		// there, opening a file is an upload and there is no way back to it.
+		// ABSENT when there are none -- an empty "Recent files" heading teaches the user only that
+		// the feature does not work. They cannot appear at all without the File System Access API,
+		// because a browser with no handle to keep has nothing to remember.
 		var recentRows = [];
 		if (api && recentFiles.length) {
 			recentRows.push({ separator: true });
@@ -9777,13 +8639,10 @@ var EngCalcs = EngCalcs || {};
 			// extra click and every other way to start is finally reachable from the same place.
 			{ icon: 'new', label: pc.lpn_file_new || 'New project…', submenu: newProjectRows },
 			{ icon: 'open', label: pc.lpn_file_open || 'Open…', fn: openFromFile },
-			// **UNDER OPEN, NOT UNDER NEW** (ROADMAP Tasks 305 and 314). Tom: *"currently we are
-			// using New to 'open' examples, which is linguistically confusing"*, and on a proposed
-			// reword of the old placeholder, *"Saying it differently doesn't change the lie."* New
-			// creates something that did not exist; Open retrieves something that does. An example
-			// exists. The row placed under New was right when there were two of them and is wrong
-			// now that there is a library. Opening one drops a COPY into a new tab, which is what
-			// keeps the word honest -- see openExample().
+			// **UNDER OPEN, NOT UNDER NEW** (Tasks 305 and 314). New creates something that did not
+			// exist; Open retrieves something that does, and an example exists. Opening one drops a
+			// COPY into a new tab, which is what keeps the word honest -- see openExample().
+
 			{ icon: 'open', label: pc.lpn_examples_menu || 'Open example…',
 				fn: function () { galleryDismissed = false; loadExamplesManifest(); showExamplesOverlay(); } },
 			// A SEPARATE ROW FROM Open…, not a second file type on it (Task 196). Open means one of
@@ -9794,28 +8653,17 @@ var EngCalcs = EngCalcs || {};
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile }
 		].concat([
 			{ separator: true },
-			// **The menu says Save and Save as… in every browser** (Tom, 2026-08-04, overruling the
-			// first version: *"'Download a copy' is a mistake, and the menu item we want is
-			// 'Save as...'"*). He is right twice. A paradigm we are ADOPTING has two names for
-			// writing a file, and this page already spends "copy" on Duplicate -- a third word for a
-			// third thing nobody asked for is exactly the invention we are trying to stop doing. And
-			// where there is no File System Access API, what the browser does IS a Save As: it writes
-			// a new file and picks the location itself.
-			//
-			// What the fallback genuinely cannot do -- connect to that file -- is said AFTER the
-			// act, by lpn_status_downloaded, and shown continuously by an asterisk that never clears.
-			// That answers Tom's original complaint ("when I save again, I get a second copy") at the
-			// moment it arises, without a menu label carrying the caveat forever.
-			// DISABLED on a read-only project, not merely rerouted (Tom, 2026-08-04: "On Open
-			// read-only, File, Save is not disabled. Read only is read only."). saveCurrent() still
-			// routes to Save as if it is ever reached another way, but a live Save row on a project
-			// that can never be saved is the menu telling a lie about what it will do.
-			// **Save is DISABLED where no connection is possible** (Tom, 2026-08-04). Save means
-			// "write to the connected file"; with no connection there is no file for it to write to,
-			// and a Save that quietly produced a download instead was the command doing something
-			// other than its name. Save as is then the only way out, which is the truth of that
-			// browser stated as a menu rather than as a caveat.
-			//
+			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
+			// paradigm we are ADOPTING has two names for writing a file, this page already spends
+			// "copy" on Duplicate, and where there is no File System Access API what the browser does
+			// IS a Save As. What the fallback cannot do -- connect to that file -- is said AFTER the
+			// act by lpn_status_downloaded and by an asterisk that never clears.
+
+			// DISABLED on a read-only project, not merely rerouted: saveCurrent() still routes to
+			// Save as if reached another way, but a live Save row on a project that can never be
+			// saved is the menu telling a lie. **Save is DISABLED where no connection is possible**
+			// for the same reason -- a Save that quietly produced a download would be the command
+			// doing something other than its name.
 			// No tip on the disabled row: a disabled button fires no mouse events, so its title never
 			// appears. The explanation lives on Save as, which IS reachable.
 			{
@@ -9834,18 +8682,13 @@ var EngCalcs = EngCalcs || {};
 				tip: api ? pc.lpn_file_saveas_tip : pc.lpn_file_saveas_tip_download,
 				fn: saveAs
 			},
-			// **Present always, disabled when it would do nothing** (fixed 2026-08-05, Tom: "Save all
-			// is not present"). It used to be HIDDEN below two dirty file projects, which is how a
-			// command that exists became a command nobody can find: a row that appears and disappears
-			// teaches no one it is there, and its absence reads as a missing feature rather than as a
-			// state. Every sibling here -- Save, Revert -- greys out instead, and consistency inside
-			// one short menu is worth more than the one row of clutter this costs.
-			// **< 1, NOT < 2** (Tom, 2026-08-15: *"Save all should be gated on dirtyFileCount() < 1.
-			// What was the purpose of 2? Indefensible, I think."* -- it was, and no reason for it was
-			// ever written down). The old rule reasoned that with one dirty file Save all is merely
-			// Save, which is true and is not a reason to grey out the row a user has just decided to
-			// press: they are telling the app "make everything safe", and the answer "there is only
-			// one, use the other button" is a refusal to do something it can plainly do.
+			// **Present always, disabled when it would do nothing.** A row that appears and
+			// disappears teaches no one it is there, and its absence reads as a missing feature
+			// rather than as a state. Every sibling here -- Save, Revert -- greys out instead.
+			// **< 1, NOT < 2.** With one dirty file Save all is merely Save, which is not a reason to
+			// grey out the row a user has just decided to press: they are telling the app "make
+			// everything safe", and "there is only one, use the other button" is a refusal to do
+			// something it can plainly do.
 			{ icon: 'saveall', label: pc.lpn_file_saveall || 'Save all', fn: saveAllFiles, disabled: dirtyFileCount() < 1 },
 			// Only offered when there is something to revert TO and something to revert FROM.
 			// Reachable in READ-ONLY on purpose (Tom, 2026-08-05: "Revert is not an option"). Revert
@@ -9858,17 +8701,11 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'close', label: pc.lpn_file_close || 'Close', fn: function () { closeTab(id); } }
 		], recentRows));
 	}
-	// ---- The menu bar (ROADMAP Task 211, 2026-08-04) ----
-	// Every command on this page is reachable from here. The toolbar below is the high-use subset,
-	// which is the conventional relationship between the two -- so a command appearing in both is
-	// correct, not duplication to be cleaned up.
-	//
-	// The names are the ones desktop applications have used for thirty years (File, Edit, Insert,
-	// View, Settings). Adopting a paradigm only pays if it is adopted whole: a menu bar with clever
-	// names of our own would cost the user exactly what a menu bar is supposed to save them.
-	//
-	// Rows are data, not markup, so moving a command between menus is a one-line change. That is
-	// deliberate -- where each command belongs is a judgement Tom will want to revise after seeing it.
+	// ---- The menu bar (ROADMAP Task 211) ----
+	// Every command on this page is reachable from here; the toolbar is the high-use subset, so a
+	// command appearing in both is correct, not duplication to be cleaned up. The names are the ones
+	// desktop applications have used for thirty years: adopting a paradigm only pays if it is adopted
+	// whole. Rows are data, not markup, so moving a command between menus is a one-line change.
 	function openEditMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
@@ -9892,16 +8729,14 @@ var EngCalcs = EngCalcs || {};
 	}
 	function openInsertMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
-		// **NODES THEN LINKS, EACH IN THE ORDER YOU BUILD THEM** (Tom, 2026-08-15: *"Let's change to
-		// Junction, Reservoir, Tank, Pipe, Pump, Valve. That's reasonable and follows both our
-		// examples."*). The old order put reservoirs and tanks first and buried the junction and the
-		// pipe -- the two tools that account for nearly every click -- in the middle of the row.
-		// This one reads as the sentence a person draws in: junctions, then the sources that feed
-		// them, then the pipe that joins them, then the two things you put ON a pipe. Text stays
+		// **NODES THEN LINKS, EACH IN THE ORDER YOU BUILD THEM**: Junction, Reservoir, Tank, Pipe,
+		// Pump, Valve. It reads as the sentence a person draws in -- junctions, then the sources that
+		// feed them, then the pipe that joins them, then the two things you put ON a pipe. Text stays
 		// last, being the only tool that adds nothing hydraulic.
 		//
 		// THE SAME ORDER APPEARS IN THREE PLACES and they must agree: this menu, the toolbar, and
 		// the ID-prefix rows in Settings.
+
 		openMenu(anchor, [
 			{ icon: 'junction', label: pc.lpn_tool_add_junction || 'Junction', fn: function () { setMode('add-junction'); } },
 			{ icon: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', fn: function () { setMode('add-reservoir'); } },
@@ -9913,39 +8748,31 @@ var EngCalcs = EngCalcs || {};
 			{ separator: true }
 		].concat(backdropRows(true)).concat([
 			{ separator: true },
-			// "Draw example network" is GONE from here (Task 264, Tom 2026-08-10). Insert adds an element
-			// to the drawing you are in; an example is a whole network, and dropping one on top of your
-			// work was never an insert. It is now File > New project > From examples, which is also what
-			// lets each example commit to a unit system instead of adapting to yours.
-			// Dev-only, and last, and still wearing its bracketed label so it reads as
-			// not-a-real-feature (Tom, 2026-07-30, on the label). Deliberately NOT translated: it is
-			// scaffolding for measuring how ~100 links performs, and it goes when that question is
-			// settled -- see drawTestGrid(). Putting a throwaway through 26 languages would be worse
-			// than leaving it in English.
+			// "Draw example network" does NOT belong here: Insert adds an element to the drawing you
+			// are in, and an example is a whole network. It is File > New project > From examples,
+			// which is also what lets each example commit to a unit system.
+			// Dev-only, last, and wearing a bracketed label so it reads as not-a-real-feature.
+			// Deliberately NOT translated: scaffolding for measuring how ~100 links performs, and it
+			// goes when that question is settled -- putting a throwaway through 26 languages would be
+			// worse than leaving it in English.
 			{ icon: 'devtest', label: '[dev] Draw large test network', fn: drawTestGrid }
 		]));
 	}
-	// The walkthroughs live on Tom's blog, not on this site, so this row is the one menu action in
-	// the whole bar that leaves the page -- which is exactly why it is in Help and not a sixth
-	// menu-bar button beside File/Edit/Insert/View/Settings, all of which act on the project.
+	// The walkthroughs live on Tom's blog, so this is the one menu action in the bar that leaves the
+	// page -- which is why it is in Help and not a sixth menu-bar button beside
+	// File/Edit/Insert/View/Settings, all of which act on the project.
 	//
-	// A NEW TAB, never a navigation: somebody reaching for a guide is mid-drawing, and taking the
-	// map away to show them how to draw it is the wrong trade. noopener because the blog is not ours
-	// to trust with a window handle.
-	//
-	// Plural is literal -- the one post contains three use-case walkthroughs -- so it links straight
-	// there rather than to a blog label page (Tom, 2026-08-13).
+	// A NEW TAB, never a navigation: somebody reaching for a guide is mid-drawing. noopener because
+	// the blog is not ours to trust with a window handle. Plural is literal -- the one post contains
+	// three use-case walkthroughs -- so it links straight there rather than to a blog label page.
 	var LPN_WALKTHROUGHS_URL = 'https://tomsthird.blogspot.com/2026/08/hawsedc-free-unlimited-online-looped.html';
-	// About and Contact are DELIBERATE REPEATS of the suite's own More menu (Tom, 2026-08-13: "We can
-	// repeat About and Contact in this new Help menu"). Duplication is the right call because the two
-	// menus serve different moments: the navbar is for somebody choosing a calculator, this is for
-	// somebody already inside one who wants to know who wrote it or how to complain. Both reuse the
+	// About and Contact are DELIBERATE REPEATS of the suite's own More menu: the navbar is for
+	// somebody choosing a calculator, this is for somebody already inside one. Both reuse the
 	// existing keys, so they cost no new translation and cannot drift from the navbar's wording.
 	//
 	// EVERY row here opens a NEW TAB, including the two internal pages, and that is not stylistic:
 	// the beforeunload guard in init() prompts whenever a file project is dirty, so navigating this
-	// tab to About.php would meet a browser "Leave site?" dialog mid-edit. The rule for this menu is
-	// that it never takes your map away.
+	// tab to About.php would meet a browser "Leave site?" dialog mid-edit.
 	function openHelpMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
@@ -9958,34 +8785,21 @@ var EngCalcs = EngCalcs || {};
 			// page rather than becoming a JS string.
 			{ icon: 'help', label: pc.lpn_help_notes || 'Notes on this page', fn: toggleNotesPopup },
 			{ separator: true },
-			// **A VERB, not a noun** (Tom, 2026-08-14, choosing it over "Contribute": both were a
-			// downgrade for the old page-bottom invitation, and this one is the least of them).
-			// "Contribute" reads as money or code to most visitors; the reports Tom actually gets
-			// are a wrong word or a bad number, and "Fix something" is what invites those. The old
-			// template_feedback prose moved to contact.php, so the invitation still exists in
-			// words -- it is now read by somebody who has already decided to write.
-			//
-			// It REPLACES the Contact row rather than joining it, and that is deliberate: both go to
-			// contact.php, and echoFeedback()'s own history in lib/Calculators.lib.php records what
-			// happens when two links to one destination sit near each other -- "two collapsible
-			// links to one destination halve each other's weight rather than doubling the
-			// invitation" -- which is why echoHelpWanted() was absorbed into template_feedback in
-			// the first place. The 2026-08-13 note calling Contact a deliberate repeat of the
-			// navbar described it as being for somebody inside a calculator "who wants to know who
-			// wrote it or how to complain"; About answers the first and this answers the second, in
-			// a verb. Contact keeps its own place in the suite navbar for the other moment.
+			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
+			// reports actually received are a wrong word or a bad number, and "Fix something" invites
+			// those. It REPLACES the Contact row rather than joining it: both go to contact.php, and
+			// two links to one destination halve each other's weight rather than doubling the
+			// invitation (echoFeedback() in lib/Calculators.lib.php).
+
 			{ icon: 'mail', label: pc.lpn_help_fix || 'Fix something', fn: ext('contact.php') },
 			{ separator: true },
-			// **THE LEGAL ROW LIVES HERE BECAUSE THIS PAGE HAS NO FOOTER** (2026-08-14). Task 286
-			// required the notice to be FINDABLE and withdrawal to be as easy as consent; it never
-			// required a particular piece of furniture, and a footer under a full-window map editor
-			// is furniture this page cannot afford. Checked against epanet-js at Tom's suggestion:
-			// their splash panel carries "Terms and conditions" and "Privacy policy" in its own
-			// sidebar, not in a page footer. Same answer, arrived at independently.
-			//
-			// Also mirrored in the examples gallery, which is what a first-time visitor actually
-			// sees -- again as epanet-js does it. Two placements, because the gallery is absent
-			// once you have a network and the menu is absent until you open it.
+			// **THE LEGAL ROW LIVES HERE BECAUSE THIS PAGE HAS NO FOOTER.** Task 286 requires the
+			// notice to be FINDABLE and withdrawal to be as easy as consent; it never required a
+			// particular piece of furniture. epanet-js reaches the same answer, carrying the legal
+			// links in its splash panel's sidebar. Also mirrored in the examples gallery, which is
+			// what a first-time visitor sees: the gallery is absent once you have a network and the
+			// menu is absent until you open it.
+
 			{ icon: 'info', label: pc.privacy_link || 'Privacy notice', fn: ext('privacy.php') },
 			{ icon: 'info', label: pc.terms_link || 'Terms of use', fn: ext('terms.php') },
 			// NOT ext(): this reopens the banner in place. window.ecReopenConsent is exported by
@@ -10132,21 +8946,12 @@ var EngCalcs = EngCalcs || {};
 	function closeTab(id) {
 		var pc = EngCalcs.pageConfig || {}, entry = indexEntry(id);
 		if (!entry) { return; }
-		// A browser-only project always carries the (faded) asterisk -- see tabAsterisk() -- because
-		// it is in no file at all, not because anyone touched it. An untouched "+"-created project is
-		// exactly that: nothing drawn, nothing to lose, so the "gone for good" prompt below would be
-		// pure noise (punch list §4, Tom 2026-08-06).
-		// THE ASTERISK DECIDES, and now it decides alone. The second clause here used to read
-		// `|| (!isFileProject(entry) && projectIsEmpty(id))` -- a special case that closed an empty
-		// browser project silently DESPITE its asterisk, because under the old rule every browser
-		// project wore one from birth. That is the disagreement Tom named ("a blank project with
-		// asterisk closes without confirmation, which is bad"): the mark said one thing and the
-		// behaviour did another, and the special case existed only to paper over a mark that should
-		// never have been there. With baselines the asterisk is right, so the exception is gone and
-		// the rule is literally true again.
+		// THE ASTERISK DECIDES, alone. Do NOT add back a `!isFileProject(entry) && projectIsEmpty(id)`
+		// clause: it closes an empty browser project silently DESPITE its asterisk, so the mark says
+		// one thing and the behaviour does another. With baselines the asterisk is right.
 		//
-		// Consequence, deliberate: a project you drew and then emptied is dirty, so closing it now
-		// asks. It did not before. Asking about work somebody did is the safer side to err on.
+		// Consequence, deliberate: a project you drew and then emptied is dirty, so closing it asks.
+		// Asking about work somebody did is the safer side to err on.
 		if (!tabAsterisk(entry).show) { discardProject(id); renderTabs(); return; }
 		// A read-only project is offered Save as for the same reason its File menu is (Tom,
 		// 2026-08-04: "this situation cannot allow Save. It must offer Save as..."). Treated exactly
@@ -10168,14 +8973,10 @@ var EngCalcs = EngCalcs || {};
 					if (id !== library.openId) { switchToTab(id); }
 					var downloaded = !fileApiAvailable();
 					if (mustSaveAs) { await saveAs(); } else { await saveCurrent(); }
-					// Close ONLY if the save really landed. A cancelled file picker or a failed write
-					// must leave the project exactly where it was rather than discarding it on the
-					// strength of having asked.
-					//
-					// The fallback is the one exception, and it has to be: a download can never clear
-					// the asterisk, because there is no handle to write back through. Refusing to
-					// close there would trap the user in a prompt whose first button can never
-					// satisfy it. The file IS in their downloads, which is what they asked for.
+					// Close ONLY if the save really landed: a cancelled picker or a failed write must
+					// leave the project where it was. The fallback is the one exception, and has to
+					// be -- a download can never clear the asterisk, so refusing to close would trap
+					// the user in a prompt whose first button can never satisfy it.
 					var after = indexEntry(id);
 					if (downloaded || (after && !tabAsterisk(after).show)) { discardProject(id); renderTabs(); }
 				}
@@ -10250,18 +9051,12 @@ var EngCalcs = EngCalcs || {};
 				var el = document.getElementById(id);
 				return el && el.style.display === 'block' && el.contains(e.target);
 			});
-			// TWO EXEMPTIONS, AND NO MORE THAN TWO (Task 372). The button that opened the popover,
-			// because its own handler has already run and closing here would undo it; and a click on
-			// a MENU ROW, because rows are what open Labels, Settings and the Notes from the View and
-			// Help menus, and the row is not inside the popover it just opened.
-			//
-			// What is deliberately NOT exempt any more is the menu bar and the toolbar at large.
-			// Exempting them was a blunt way of protecting the one button above, and it bought Tom's
-			// report: clicking the top row of the menu bar left the panels open while clicking
-			// anywhere else closed them. The menu-bar ITEMS never reach this handler at all -- they
-			// stopPropagation so opening a menu does not immediately dismiss it -- so the exemption
-			// was only ever covering the bar's empty space and the toolbar's other buttons, which are
-			// exactly the clicks a user means as "away".
+			// TWO EXEMPTIONS, AND NO MORE THAN TWO (Task 372): the button that opened the popover,
+			// whose own handler has already run; and a click on a MENU ROW, because rows open Labels,
+			// Settings and the Notes and are not inside the popover they opened. The menu bar and
+			// toolbar at large are NOT exempt -- the menu-bar ITEMS never reach this handler (they
+			// stopPropagation), so exempting them only covers the bar's empty space and the toolbar's
+			// other buttons, which are exactly the clicks a user means as "away".
 			var onOpener = viewPopoverAnchor && (e.target === viewPopoverAnchor ||
 				(viewPopoverAnchor.contains && viewPopoverAnchor.contains(e.target)));
 			var inMenu = e.target.closest && e.target.closest('#lpn_menu_popup, #lpn_menu_popup2');
@@ -10289,51 +9084,38 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 
-	// A dedicated button, not a repurposed "Restore Defaults" (Tom asked "do we dare"): that
-	// button's suite-wide behavior (EngCalcs.resetToDefaults) expires the page cookie and reloads,
-	// which wouldn't touch localStorage at all -- unifying the two is a real design question logged
-	// in the scope doc, not resolved here.
-	// CORRECTION 2026-07-31: this comment used to say "a cookie this page never uses". It does use
-	// one -- Looped-Network.php calls echoCookieScript(), and the units strip's selects carry
-	// echoUnitSelect()'s hardcoded onchange="EngCalcs.submitForm()", so the unit choices round-trip
-	// through the suite cookie like any other page. wipeAllStorage() now expires it.
-	// **"Clear project" is gone; this is "Delete network"** (Task 211, Tom 2026-08-04). His own
-	// diagnosis: clearing a project was a vestige of the single-project debut of this page -- with
-	// tabs, "empty this project" is not a thing anyone needs, because starting a new tab and closing
-	// the old one is the same act in fewer ideas. What survives is the narrower thing the workflow
-	// actually wants: duplicate a project, delete its DRAWING, keep everything else.
-	//
-	// So the BACKGROUND IMAGE now survives too, where "Clear project" wiped it. That is the point of
-	// the rename: a backdrop is not part of the network, and the workflow this command exists for --
-	// a second scheme on the same site -- wants the site plan to stay. "Remove image" in the backdrop
-	// menu is still there for the other case.
-	//
-	// The paradigmatic route is Edit -> Select all -> Delete, which this page cannot offer yet: the
+	// A dedicated button, not a repurposed "Restore Defaults": that button's suite-wide behaviour
+	// (EngCalcs.resetToDefaults) expires the page cookie and reloads, which would not touch
+	// localStorage at all. Unifying the two is a real design question logged in the scope doc.
+	// This page DOES use the suite cookie -- Looped-Network.php calls echoCookieScript() and the
+	// units strip's selects carry echoUnitSelect()'s onchange="EngCalcs.submitForm()", so unit
+	// choices round-trip through it like any other page. wipeAllStorage() expires it.
+
+	// **"Delete network", not "Clear project"** (Task 211). With tabs, "empty this project" is not a
+	// thing anyone needs; what the workflow wants is narrower: duplicate a project, delete its
+	// DRAWING, keep everything else. So the BACKGROUND IMAGE survives -- a backdrop is not part of
+	// the network, and a second scheme on the same site wants the site plan to stay.
+	// The paradigmatic route is Edit -> Select all -> Delete, which this page cannot offer while the
 	// selection model is single-element. Until multi-select exists, this named command IS that route.
 	function deleteNetwork() {
 		var pc = EngCalcs.pageConfig || {};
 		if (!window.confirm(pc.lpn_confirm_delete_network || 'Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.')) { return; }
 		doc = { nodes: [], links: [], labels: [], origin: { x: 0, y: 0 } };
 		nextId = newNextId();
-		// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone
-		// (their overrides key element IDs that no longer exist). Preferences (settings/labelSettings)
-		// still survive, as below.
+		// Empties the PROJECT, so the container resets with the network: scenarios back to Base alone,
+		// since their overrides key element IDs that no longer exist. Preferences survive.
 		//
-		// **The NAME and the docId survive too** (changed by Task 211). They used to be wiped, which
-		// was defensible when a project was a row in a list and indefensible now that it is a tab:
-		// emptying the drawing would have left the tab you are looking at nameless, and a file project
-		// would have quietly become a different document to the lock broker. Clearing the canvas is
-		// not the same act as throwing the project away -- that is Close, and it asks first.
+		// **The NAME and the docId survive too** (Task 211). Wiping them leaves the tab you are
+		// looking at nameless, and makes a file project a different document to the lock broker.
+		// Clearing the canvas is not the same act as throwing the project away -- that is Close.
 		scenarios = defaultScenarios();
 		// **`coords` SURVIVES, like the name and the docId.** Emptying the drawing is not a change of
 		// what kind of document this is -- and it is the one property that cannot be re-chosen later.
 		project = { name: project.name, docId: project.docId, coords: project.coords, activeScenario: 'base' };
 		// The backdrop is deliberately NOT removed -- see the note above the function.
-		// saveToStorage(), not removeItem() (fixed 2026-07-30, found while verifying the gear/settings
-		// panel): labelSettings/settings are preferences, not network content, and are meant to survive
-		// "New / Clear" -- removeItem() wiped them out of localStorage too, leaving them intact only in
-		// memory until some later, unrelated mutation happened to call saveToStorage() again. Saving the
-		// now-blank doc immediately keeps storage and memory in sync at every point, not just eventually.
+		// saveToStorage(), NOT removeItem(): labelSettings/settings are preferences, not network
+		// content, and must survive "New / Clear". removeItem() wipes them out of localStorage too,
+		// leaving them intact only in memory until some later unrelated mutation saves again.
 		saveToStorage();
 		lastSolveResult = null;
 		closePopup();
@@ -10342,21 +9124,16 @@ var EngCalcs = EngCalcs || {};
 		setStatus('');
 		setMode('select');
 		refreshScenarioStatus();
-		// **NO FIT HERE** (Tom, 2026-08-15: *"Cleared network: Why rezoom? To what? Who cares? Did
-		// you set some arbitrary initial standard?"* — yes, and it was arbitrary). An empty drawing
-		// has no extent, so bbox() falls back to a 0-10 square and the "fit" was a zoom to an
-		// invented ten-unit box. The reader keeps the view they were looking at, which is the only
-		// answer that means anything: there is nothing to look at, and where they were is where
-		// they will start drawing.
+		// **NO FIT HERE.** An empty drawing has no extent, so bbox() falls back to a 0-10 square and
+		// the "fit" is a zoom to an invented ten-unit box. The reader keeps the view they were
+		// looking at: there is nothing to look at, and where they were is where they will draw.
 	}
 
 	function init() {
-		// True first-visit reset (Tom, 2026-07-30): wipes the ONE localStorage key that carries
-		// everything -- network, backdrop, and settings/labelSettings preferences alike -- so the
-		// page loads exactly as a brand-new visitor would see it. Strictly more destructive than
-		// New/Clear (clearNetwork(), content only) or Restore defaults (rebuildSettingsFields()'s
-		// button, preferences only). Also reachable via "?lpn_wipe=1" in the URL for a scripted
-		// reset with no click needed.
+		// True first-visit reset: wipes everything -- network, backdrop, settings and labelSettings
+		// alike -- so the page loads exactly as a brand-new visitor sees it. Strictly more
+		// destructive than New/Clear (content only) or Restore defaults (preferences only). Also
+		// reachable via "?lpn_wipe=1" for a scripted reset.
 		try {
 			if (/[?&]lpn_wipe=1(&|$)/.test(window.location.search)) {
 				wipeAllStorage();
@@ -10372,13 +9149,10 @@ var EngCalcs = EngCalcs || {};
 		// the .lpn-symbols rule in css/engcalcs.css.
 		linksLayer = el('g', { 'class': 'lpn-symbols' }, world);
 		nodesLayer = el('g', { 'class': 'lpn-symbols' }, world);
-		// EVERY LABEL'S TEXT AND LEADER LIVES IN THIS ONE SHARED LAYER (Task 146.01 draw-order fix,
-		// Tom, 2026-07-30), never appended alongside the element it belongs to: a label goes here
-		// whether it belongs to a node, a link or a Text object, so ALL labels sit above ALL
-		// node/link symbols. Building each label into nodesLayer/linksLayer the way the symbol next
-		// to it does was the original design, and it broke exactly the way Tom described -- draw
-		// order tracked creation order, so a later-built node's symbol painted over an earlier
-		// node's already-placed label.
+		// EVERY LABEL'S TEXT AND LEADER LIVES IN THIS ONE SHARED LAYER, never appended alongside the
+		// element it belongs to, so ALL labels sit above ALL node/link symbols. Building each label
+		// into nodesLayer/linksLayer makes draw order track creation order, so a later-built node's
+		// symbol paints over an earlier node's already-placed label.
 		labelsLayer = el('g', {}, world);
 		// Topmost layer (after labelsLayer) so the rubber-band is never hidden under a node/link
 		// while drawing a pipe/pump (Tom, 2026-07-30).
@@ -10402,31 +9176,22 @@ var EngCalcs = EngCalcs || {};
 			buildDom(); scheduleSolve();
 			if (backdrop) { buildBackdropImg(); }
 		} else if (!indexEntry(library.openId)) {
-			// **`!indexEntry()`, not `!library.openId`** (fixed 2026-08-06): an id pointing at a
-			// project that is no longer in the library is not an open project, and treating it as one
-			// is how the page ended up with no tab at all. The question this branch is really asking
-			// is "is there a project open?", and only the index can answer that.
-			//
+			// **`!indexEntry()`, not `!library.openId`**: an id pointing at a project no longer in the
+			// library is not an open project, and treating it as one leaves the page with no tab at
+			// all. Only the index can answer "is there a project open?".
 			// First visit, or nothing readable: the library always has exactly one open project, so
-			// there is never a state where drawing has nowhere to be saved. Registered directly
-			// rather than through newProject(), which repaints a UI that does not exist yet.
+			// drawing never has nowhere to be saved. Registered directly rather than through
+			// newProject(), which repaints a UI that does not exist yet.
 			var firstId = newProjectId(), firstName = nextProjectName();
 			library.openId = firstId;
 			project.name = firstName; // the tab and the document have to agree from the first frame
-			// **AND IT IS BORN CLEAN, WHICH THIS BRANCH FORGOT** (Tom, 2026-08-15: *"The gallery
-			// project (initial project) gets an unwarranted asterisk. But revert is disabled."*).
+			// **AND IT IS BORN CLEAN.** Dirtiness is `docSignature() !== entry.savedSig`, so an entry
+			// with NO savedSig is dirty from its first breath -- and the asterisk is then inescapable,
+			// because Revert is for FILE projects and would be disabled on it.
 			//
-			// Dirtiness is `docSignature() !== entry.savedSig`, so an entry with NO savedSig is
-			// dirty from its first breath -- and an empty project has nothing to save. Every other
-			// way of making a project goes through stampProjectSaved(); this one registers the entry
-			// by hand, precisely to avoid repainting a UI that does not exist yet, and skipped the
-			// stamp along with it. The asterisk was then inescapable: Revert is for FILE projects, so
-			// the one control that clears an asterisk was disabled on the only project that had an
-			// unearned one.
-			//
-			// Stamped inline rather than by calling stampProjectSaved(), for the same reason the
-			// entry is pushed inline: that function ends in renderTabs(), and the tab strip is not
-			// wired yet. The name is set FIRST because the signature includes it.
+			// Stamped inline rather than by calling stampProjectSaved(), for the same reason the entry
+			// is pushed inline: that function ends in renderTabs(), and the tab strip is not wired
+			// yet. The name is set FIRST because the signature includes it.
 			library.projects.push({
 				id: firstId, name: firstName, updated: Date.now(), savedSig: docSignature()
 			});
@@ -10454,13 +9219,12 @@ var EngCalcs = EngCalcs || {};
 		updateEmptyHint();
 		updateModeHint(); // initial mode is 'select', set before setMode() ever runs -- render it now
 		renderTabs();
-		// **The banner has to be painted on the BOOT path too** (fixed 2026-08-05, found by Tom: "It
-		// doesn't say anything. When? Where would it say this?"). refreshAllFromDocument() ends with
-		// this call, but it is shared by openProject() and newProject() only -- boot never ran it. So
-		// the one situation the needs-reopen banner exists for, a page load that dropped the file
-		// handle, was the one situation in which it could not appear.
+		// **The banner has to be painted on the BOOT path too.** refreshAllFromDocument() ends with
+		// this call but is shared by openProject() and newProject() only, so the one situation the
+		// needs-reopen banner exists for -- a page load that dropped the file handle -- is the one
+		// situation in which it cannot appear.
 		// Order matters: reconnect first so the banner is painted against the truth, and take the
-		// locks back last so a file we just reconnected is locked under the handle we actually have.
+		// locks back last so a file we just reconnected is locked under the handle we have.
 		restoreHandlesOnBoot().then(function () {
 			syncReadOnlyToOpenProject();
 			return reacquireLocksOnBoot();
@@ -10475,21 +9239,17 @@ var EngCalcs = EngCalcs || {};
 		// browsers fire only one of the two, and re-applying a height twice is free.
 		window.addEventListener('resize', applyMapHeight);
 		window.addEventListener('orientationchange', applyMapHeight);
-		// COMING BACK TO THE TAB RE-MEASURES (Tom, 2026-08-15: *"Zoom changes for Net3 when I go to
-		// another tab and then return."*). Nothing here changes state.s, so a "zoom change" on
-		// return can only be the CANVAS changing size under a transform that did not -- i.e. a
-		// height applied while the tab was hidden and the rects were unreliable. The guard in
-		// applyMapHeight() stops the bad value being stored; this re-runs the measurement once the
-		// page is visible and the numbers mean something again.
+		// COMING BACK TO THE TAB RE-MEASURES. Nothing here changes state.s, so a "zoom change" on
+		// return can only be the CANVAS changing size under a transform that did not -- a height
+		// applied while the tab was hidden and the rects were unreliable. applyMapHeight()'s guard
+		// stops the bad value being stored; this re-measures once the page is visible.
 		document.addEventListener('visibilitychange', function () {
 			if (!document.hidden) { applyMapHeight(); }
 		});
 		// **AND AGAIN ONCE THE PAGE HAS ACTUALLY FINISHED ASSEMBLING ITSELF.** init() runs at
-		// DOMContentLoaded, which is before stylesheets finish applying, before the webfonts land,
-		// and before the site navbar above the canvas has settled to its real height -- so the first
-		// measurement is taken of a page that is still moving. That is stages 1 and 2 of Tom's
-		// report, and no amount of arithmetic fixes a measurement of the wrong thing: the answer is
-		// to measure again when there is something stable to measure.
+		// DOMContentLoaded -- before stylesheets finish applying, before the webfonts land, and
+		// before the navbar above the canvas has settled -- so the first measurement is of a page
+		// still moving. No arithmetic fixes a measurement of the wrong thing.
 		window.addEventListener('load', armMapSizing);
 		if (document.fonts && document.fonts.ready && document.fonts.ready.then) {
 			document.fonts.ready.then(function () { applyMapHeight(); });
@@ -10502,27 +9262,22 @@ var EngCalcs = EngCalcs || {};
 		// map at all. Two seconds is long enough that it never beats a real `load`, and short enough
 		// that a broken one is not a dead page.
 		window.setTimeout(armMapSizing, 2000);
-		// **Nothing is flushed to a file on the way out any more** (Task 211). The locks ARE handed
-		// back, so a colleague is never left waiting on a browser that has gone; `visibilitychange` ->
-		// hidden is the one that actually fires on mobile, and `beforeunload` is the desktop net.
-		// releaseLock() uses sendBeacon precisely because a fetch() started during unload may never
-		// leave.
-		// **A LOCK IS NOT RELEASED BECAUSE YOU LOOKED AWAY** (Tom, 2026-08-05: "If minimizing loses
-		// the lock, then the lock is useless"). This listener used to release every lock on
-		// `visibilitychange -> hidden`, which fires on an ordinary TAB SWITCH -- so a colleague who
-		// glanced at their email came back holding nothing, silently. That was the intermittent
-		// "B opened A's file with no dialog", and CC's first fix (release, then re-acquire on
-		// `visible`) only narrowed the window instead of closing it.
+		// **Nothing is flushed to a file on the way out** (Task 211). The locks ARE handed back, so a
+		// colleague is never left waiting on a browser that has gone; `visibilitychange` -> hidden is
+		// the one that actually fires on mobile, and `beforeunload` is the desktop net. releaseLock()
+		// uses sendBeacon because a fetch() started during unload may never leave.
+		// **A LOCK IS NOT RELEASED BECAUSE YOU LOOKED AWAY.** Releasing on `visibilitychange ->
+		// hidden` fires on an ordinary TAB SWITCH, so a colleague who glanced at their email comes
+		// back holding nothing, silently. Release-then-reacquire-on-`visible` only narrows the window.
 		//
-		// The AutoCAD model instead: the claim stands until you Close the file. What makes a
-		// generous claim safe is NOT the lock's liveness but the freshness check in
-		// writeOpenProjectToFile() -- a stale claim cannot cause an overwrite, so it is free to
-		// outlive a minimise, a reload, or a reboot.
-		// The browser's own "leave site?" prompt, and ONLY for a file project with unsaved changes.
-		// A browser project is NOT a reason to prompt here: it lives in localStorage and survives the
-		// browser closing perfectly well. It is only CLOSING ITS TAB that ends it, and closeTab() asks
-		// that question itself, in words that fit it. Prompting on every page close for something that
-		// is not at risk would teach people to click through the one prompt that matters.
+		// The AutoCAD model instead: the claim stands until you Close the file. What makes a generous
+		// claim safe is NOT the lock's liveness but the freshness check in writeOpenProjectToFile() --
+		// a stale claim cannot cause an overwrite, so it is free to outlive a minimise or a reboot.
+
+		// The browser's own "leave site?" prompt, and ONLY for a file project with unsaved changes. A
+		// browser project is NOT at risk -- it lives in localStorage and survives the browser closing;
+		// only CLOSING ITS TAB ends it, and closeTab() asks that question itself. Prompting on every
+		// page close teaches people to click through the one prompt that matters.
 		window.addEventListener('beforeunload', function (e) {
 			releaseAllLocks();
 			var unsaved = library.projects.some(function (p) { return isFileProject(p) && p.dirty; });
@@ -10535,12 +9290,10 @@ var EngCalcs = EngCalcs || {};
 		// pollLockedFiles() for why that decoupling was the whole answer to Tom's "why must there be
 		// limits at all?".
 		setInterval(pollLockedFiles, LPN_HEARTBEAT_MS);
-		// **BOOT GOES THROUGH THE SAME DOOR AS EVERY OTHER OPEN, AND DID NOT.** It called
-		// zoomExtent() outright, so a reload IGNORED the document's saved view and re-fitted --
-		// which is both the autozoom Tom has just outlawed and a plain bug: the one path where a
-		// user most expects to come back to where they were was the one path that would not.
-		// refreshAllFromDocument() has always ended in restoreViewOrFit(); boot has its own
-		// sequence and never picked that up.
+		// **BOOT GOES THROUGH THE SAME DOOR AS EVERY OTHER OPEN.** Calling zoomExtent() outright here
+		// makes a reload IGNORE the document's saved view and re-fit -- an outlawed autozoom, and the
+		// one path where a user most expects to come back to where they were. refreshAllFromDocument()
+		// ends in restoreViewOrFit(); boot has its own sequence and has to pick that up too.
 		restoreViewOrFit();
 		requestAnimationFrame(tick);
 	}
@@ -10579,30 +9332,18 @@ var EngCalcs = EngCalcs || {};
 			into.appendChild(btn);
 		}
 
-		// Four groups, in the classic File/Edit/Insert/View order (Tom, 2026-07-30): File (New,
-		// then Draw Example -- as though it were "Open a sample"), Add/Insert (Reservoir first,
-		// then in the same order the example network builds: Pump, Junction, Pipe), Edit (Select,
-		// Delete, Undo -- Select first for safety, per Tom's own correction of an earlier order),
-		// View (Zoom Extent).
-		// The File/menu commands moved OUT of the toolbar and into the menu bar above it (Task 211).
-		// What is left here is the high-use subset -- the drawing tools, Select/Delete/Undo, Zoom to
-		// fit -- which is what a toolbar is for. "Clear project" is gone entirely; its replacement,
-		// Edit -> Delete network, is a menu command because it is rare and destructive, and those two
-		// properties together are the definition of something that does NOT belong on a toolbar.
-		// **THE TWO COMMANDS ON THIS TOOLBAR ARE SAVE AND SAVE AS** (Tom, 2026-08-15: *"I'm thinking
-		// optimal UX. Let's remove New project and Background image from the toolbar and add Save
-		// and (since our paradigm often makes it the only choice) Save as…"*).
+		// The File commands live in the menu bar, not here (Task 211). What is left is the high-use
+		// subset -- the drawing tools, Select/Delete/Undo, Zoom to fit. Edit > Delete network is a
+		// menu command because it is rare and destructive, and those two properties together are the
+		// definition of something that does NOT belong on a toolbar.
+		// **THE TWO COMMANDS ON THIS TOOLBAR ARE SAVE AND SAVE AS.** A toolbar slot is the most
+		// expensive space on the page and should hold what a person does OFTEN. New project is once
+		// per project and Background image never at all for the majority with no aerial; both belong
+		// in the menus. Saving is the thing you do every few minutes, forever.
 		//
-		// A toolbar slot is the most expensive space on the page and it should hold what a person
-		// does OFTEN. New project is once per project, and Background image is once per project at
-		// most and never at all for the majority who have no aerial to hang the network on; both are
-		// still in the menus, which is where a once-per-project command belongs. Saving is the thing
-		// you do every few minutes, forever.
-		//
-		// AND SAVE AS IS NOT A SECOND-CLASS TWIN HERE, which is why it earns its own slot rather than
-		// hiding behind Save: a browser project has no file yet and a read-only project cannot write
-		// back to one, so on this page Save As is frequently the ONLY thing Save can mean. Both
-		// buttons, always, so the one that will work is on screen.
+		// SAVE AS IS NOT A SECOND-CLASS TWIN: a browser project has no file yet and a read-only
+		// project cannot write back to one, so on this page Save As is frequently the ONLY thing Save
+		// can mean. Both buttons, always, so the one that will work is on screen.
 		var fileGroup = group();
 		var saveBtn = document.createElement('button');
 		saveBtn.type = 'button';
@@ -10619,12 +9360,11 @@ var EngCalcs = EngCalcs || {};
 		saveAsBtn.addEventListener('click', function () { saveAs(); });
 		fileGroup.appendChild(saveAsBtn);
 
-		// `data-edits` is VESTIGIAL since Task 211 and nothing reads it. It marked the controls that
-		// read-only used to disable -- back when read-only took editing away. It no longer does:
-		// read-only now means only that you cannot save over somebody else's file, exactly as in Word,
-		// and Save routes to Save As instead. The attributes are left in place because they are a
-		// correct, maintained answer to "does this control change the network", which the next feature
-		// that needs that question (a review mode, a locked scenario) can use without re-deriving it.
+		// `data-edits` is VESTIGIAL since Task 211 and nothing reads it: read-only now means only that
+		// you cannot save over somebody else's file, exactly as in Word. The attributes stay because
+		// they are a correct, maintained answer to "does this control change the network", which the
+		// next feature needing that question can use without re-deriving it.
+
 		var addGroup = group();
 		addGroup.dataset.edits = '1';
 		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Text -- the same order as the Insert menu and
@@ -10673,97 +9413,74 @@ var EngCalcs = EngCalcs || {};
 		// space is scarcest. See openInsertMenu().
 	}
 
-	// A small RING MAIN: one reservoir, one pump (a link, per the header comment above), and a
-	// closed loop of five junctions with varied demands and elevations. Exercises every element
-	// type except Text, a fixed head, both link types, and vertex editing in one click. Confirms
-	// before clobbering an existing network, and always leaves the toolbar back on Select --
-	// otherwise whatever tool (e.g. Delete) was active before stays active after, which reads as
-	// the example accidentally being deletable on the very next click.
+	// A small RING MAIN: one reservoir, one pump (a LINK), and a closed loop of five junctions with
+	// varied demands and elevations. Exercises every element type except Text, a fixed head, both
+	// link types and vertex editing in one click. Always leaves the toolbar back on Select, or
+	// whatever tool was active before (e.g. Delete) reads as the example being deletable on the very
+	// next click.
 	//
-	// TOPOLOGY. A five-junction ring fed at one point, not the two parallel pipes between one pair
-	// of junctions that a solver is equally happy with: only the ring shows flow leaving the tie-in
-	// BOTH ways and meeting at a hydraulic divide (between J3 and J4, where flow reverses and head
-	// loss crosses zero), which is the whole reason looped networks need a solver.
-	//
-	// SCALE. A real network a user brings is on the order of 1000 m (3000 ft) across, and at that
-	// size the default 2.5-unit text is invisible. So the geometry and settings.textSize are set
-	// TOGETHER (see the comment on that line): what matters is the RATIO between linework and
-	// lettering, not either one alone.
+	// TOPOLOGY. A five-junction ring fed at one point, not two parallel pipes between one pair of
+	// junctions: only the ring shows flow leaving the tie-in BOTH ways and meeting at a hydraulic
+	// divide (between J3 and J4, where flow reverses and head loss crosses zero), which is the whole
+	// reason looped networks need a solver.
 	//
 	// UNITS AND PLACEMENT. ONE drawing serves both presets: laid out once in map units, with no
-	// US/SI coordinate scaling. Only the real SI quantities (elevation, demand, diameter, pump
-	// curve) go through niceDefault().
+	// US/SI coordinate scaling. Only the real SI quantities go through niceDefault().
 	//
 	// **Map coordinates are NOT unitless -- they FOLLOW the Length/Map declaration.** So this one
-	// drawing is a 1400 **ft** ring for a US visitor and a 1400 **m** ring for a metric one; the
-	// metric network is physically ~3.3x larger, not the same system in other units. **Accepted
-	// deliberately:** both are realistic systems, both solve to sensible pressures (checked in
-	// dev/lpn-spike/example-network-harness.js), and with no backdrop registered there is nothing
-	// on screen for the difference to contradict. Revisit if the example ever ships with a
-	// background image, where a scale meaning two different things would be visible and wrong.
+	// drawing is a 1400 **ft** ring for a US visitor and a 1400 **m** ring for a metric one, the
+	// metric network being physically ~3.3x larger. **Accepted deliberately:** both are realistic
+	// systems, both solve to sensible pressures (dev/lpn-spike/example-network-harness.js), and with
+	// no backdrop registered there is nothing on screen for the difference to contradict. Revisit if
+	// the example ever ships with a background image.
 	//
 	// Anchored at 5000,5000 rather than the origin, so it lands in positive coordinates that look
 	// like a survey or state-plane grid. Extent 1400 x 700, centre exactly 5000,5000.
 	//
 	// **NOTHING IN THE APP CALLS THIS.** The gallery ships the same ring main as
-	// Basic-example-US/SI-units-lpn.json. It stays as the fixture SEVEN harnesses build their
-	// network from -- closed-link, gradient-label, id-prefix, friction-method, label-affix,
-	// readout-sign and example-network all export it and solve it. Retiring it means giving those
-	// a network some other way (ROADMAP Task 378). Said plainly: this is 289 lines shipped to
-	// every visitor for the benefit of the test suite.
+	// Basic-example-US/SI-units-lpn.json. It stays as the fixture SEVEN harnesses build their network
+	// from -- closed-link, gradient-label, id-prefix, friction-method, label-affix, readout-sign and
+	// example-network. Retiring it means giving those a network some other way (Task 378).
 	function drawExampleNetwork(system) {
 		if (doc.nodes.length > 0) {
 			var pc = EngCalcs.pageConfig || {};
 			if (!window.confirm(pc.lpn_confirm_example || 'This adds the example to the network you already have. Continue?')) { return; }
 		}
 		saveUndoSnapshot();
-		// THE EXAMPLE FORCES HAZEN-WILLIAMS (ROADMAP Task 271), for the same reason it forces its
-		// units. Its pipe roughness is 130 -- an HW C. newProject() INHERITS settings from the
-		// project you were in, so once the friction method became switchable, a visitor sitting on
-		// Manning who chose Example got a ring main whose every pipe carried n = 130: a roughness
-		// four orders of magnitude out, converging happily to nonsense, with nothing on screen to
-		// say why. Tom's rule for units is exactly the rule here -- *"We never create an example
-		// based on the current units... We should force the units we want and label thusly."*
+		// THE EXAMPLE FORCES HAZEN-WILLIAMS (Task 271), for the same reason it forces its units. Its
+		// pipe roughness is 130 -- an HW C -- and newProject() INHERITS settings from the project you
+		// were in, so a visitor sitting on Manning would get a ring main whose every pipe carried
+		// n = 130: a roughness four orders of magnitude out, converging happily to nonsense.
 		//
-		// This is the one place the method is set without asking, and it is safe precisely because
-		// it is not a switch: the network is being CREATED at this instant, so there are no
-		// already-typed roughness numbers for it to invalidate. Contrast the settings-panel select,
-		// which must confirm.
+		// This is the one place the method is set without asking, and it is safe precisely because it
+		// is not a switch: the network is being CREATED at this instant, so there are no
+		// already-typed roughness numbers for it to invalidate. The settings-panel select must confirm.
+
 		settings.method = 'hw';
 		applyMethodUI();
-		// THIS FUNCTION DELIBERATELY DOES NOT TOUCH settings.textSize. It did, briefly, because
-		// raising defaultSettings().textSize to 20 reaches only a first-time visitor -- a returning
-		// one carries their stored value through loadFromStorage()'s
-		// `Object.assign(defaultSettings(), savedSettings)`. Tom, 2026-08-09, chose the shipped
-		// default as the whole answer: *"How about we circumvent the settings and doc issue by just
-		// shipping with an initial default text size that works for our example network, namely 20?
-		// ... Anything other is on the user, not us."* A visitor who has changed their text size has
-		// expressed a preference, and an example is not a reason to overrule it. It also keeps
-		// `settings` out of a function whose undo snapshot cannot restore it.
-		// The reservoir sits at 50 ft / 15 m, in among the junctions it feeds (45-62 ft) rather
-		// than perched above them (Tom, 2026-07-30). A source high above the network makes the
-		// example a gravity system that would work with the pump deleted -- the pump's contribution
-		// is invisible because the elevation is doing the work. Level with the network, the pump is
-		// the only reason there is pressure anywhere, which is the point of including one. Its head
-		// is left blank, so the water surface is the reservoir's own ground elevation.
+		// THIS FUNCTION DELIBERATELY DOES NOT TOUCH settings.textSize. A visitor who has changed
+		// their text size has expressed a preference, and an example is not a reason to overrule it.
+		// The shipped default is the whole answer. It also keeps `settings` out of a function whose
+		// undo snapshot cannot restore it.
+		// The reservoir sits at 50 ft / 15 m, in among the junctions it feeds (45-62 ft) rather than
+		// perched above them: a source high above the network makes the example a gravity system that
+		// would work with the pump deleted. Level with the network, the pump is the only reason there
+		// is pressure anywhere. Its head is left blank, so the water surface is its ground elevation.
 		var r = addNode('reservoir', 4300, 5000);
 		r.elev = niceDefault('lpn_u_elevhead', 'fth2o', 50, 15);
 		// J1 is the tie-in: no demand of its own, it is where the pump discharges into the ring.
 		var j1 = addNode('junction', 4500, 5000);
 		j1.elev = niceDefault('lpn_u_elevhead', 'fth2o', 45, 14); j1._demand = 0;   // base-write: the example network is drawn into a fresh project, always Base
 		// The example's pump gets a curve explicitly, as document content the user can see and edit
-		// in its popup -- addLink() no longer invents one (see its comment). Everything else in this
-		// example is pre-filled the same way (elevations, demands, diameters), so a worked pump
-		// curve belongs here rather than hiding inside every pump anyone ever draws.
-		// THREE points, not one (Tom, 2026-07-30: "1-point is not very readable, and not good for
-		// our Example even if it's legal"). A single design point is legal and is EPANET's own rule,
-		// but it DERIVES the shutoff head and maximum flow from that one number, so the example
-		// would again show a pump doing things the visible numbers don't explain. Three points is
-		// how a manufacturer publishes a curve and how a user will read one off a datasheet: a
-		// shutoff head at zero flow, a duty point, and a run-out point.
-		// The duty point is the ring's total demand (250 gpm / 15 L/s) at 140 ft / 42 m, chosen so
-		// the network settles at 52-63 psi (365-422 kPa) -- distribution pressures a reviewer reads
-		// as normal, rather than numbers that merely converge.
+		// in its popup -- addLink() invents none. Everything else here is pre-filled the same way.
+		// THREE points, not one. A single design point is legal and is EPANET's own rule, but it
+		// DERIVES the shutoff head and maximum flow from that one number, so the example would show a
+		// pump doing things the visible numbers do not explain. Three is how a manufacturer publishes
+		// a curve: shutoff head at zero flow, a duty point, and a run-out point.
+		// The duty point is the ring's total demand (250 gpm / 15 L/s) at 140 ft / 42 m, chosen so the
+		// network settles at 52-63 psi (365-422 kPa) -- distribution pressures a reviewer reads as
+		// normal, rather than numbers that merely converge.
+
 		var pump = addLink('pump', r.id, j1.id);
 		pump.curvePoints = [
 			[0, niceDefault('lpn_u_elevhead', 'fth2o', 165, 50)],
@@ -10812,30 +9529,25 @@ var EngCalcs = EngCalcs || {};
 			pipe._length = linkGeomLength(pipe);   // base-write: the example network is drawn into a fresh project, always Base
 			rebuildLink(pipe);
 		}
-		// ---- a SECOND, SEPARATE system (Tom, 2026-08-09) ----
-		// *"It still would be nice to demonstrate that separated systems are acceptable. A separate
-		// simple reservoir, pipe, and demand isn't a bad demonstration."* Nothing else on the page
-		// says this is allowed, and a user who assumes one drawing means one connected network will
-		// never try it -- yet the solver handles disjoint components natively, needing only that
-		// each has its own fixed head (lpnDiagnose's `unreachable` check is per component).
+		// ---- a SECOND, SEPARATE system ----
+		// Nothing else on the page says disjoint components are allowed, and a user who assumes one
+		// drawing means one connected network will never try it -- yet the solver handles them
+		// natively, needing only that each has its own fixed head (lpnDiagnose's `unreachable` check
+		// is per component).
 		//
 		// It is a GRAVITY system, and that is the contrast worth drawing: a tank uphill at 200 ft /
-		// 60 m feeding one demand, with no pump anywhere in it. Beside a ring main that only has
-		// pressure because a pump gives it some, the two together say more than either alone.
-		// (This does not undo the 2026-07-30 decision to keep the RING's reservoir level with its
-		// network -- that exists so the ring's pump is visibly load-bearing, and it still is.)
+		// 60 m feeding one demand, with no pump anywhere in it, beside a ring main that only has
+		// pressure because a pump gives it some.
 		//
-		// Its elevations are chosen so it stays ABOVE the ring's minimum pressure, deliberately: the
-		// "Lowest pressure" callout below is pinned to a ring junction, and a separate system that
-		// quietly stole the network minimum would make that callout a lie. The harness asserts it.
+		// Its elevations keep it ABOVE the ring's minimum pressure deliberately: the "Lowest
+		// pressure" callout is pinned to a ring junction, and a separate system that quietly stole
+		// the network minimum would make that callout a lie. The harness asserts it.
 		//
-		// DRAWN INSIDE THE RING, not below it (Tom, 2026-08-09: *"Drawing the separate system
-		// outside our main loop effectively changes the scale of the project too much. We must draw
-		// the separate system inside our main loop so that our text doesn't look too small."*). The
-		// ring's interior is empty space the fit is already paying for, so a system placed there is
-		// free; the same system slung underneath added ~350 units of height and shrank everything at
-		// zoom-to-fit. Placed low-centre and kept clear of J1's multi-line data label, which grows
-		// down and to the right into the interior from the tie-in at 4500,5000.
+		// DRAWN INSIDE THE RING, not below it. The ring's interior is empty space the fit is already
+		// paying for, so a system placed there is free; the same system slung underneath added ~350
+		// units of height and shrank everything at zoom-to-fit. Placed low-centre and kept clear of
+		// J1's multi-line data label, which grows down and right into the interior from the tie-in.
+
 		var r2 = addNode('reservoir', 4900, 5080);
 		r2.elev = niceDefault('lpn_u_elevhead', 'fth2o', 200, 60);
 		var j6 = addNode('junction', 5320, 5080);
@@ -10847,39 +9559,30 @@ var EngCalcs = EngCalcs || {};
 		sep._length = linkGeomLength(sep);   // base-write: the example network is drawn into a fresh project, always Base
 		rebuildLink(sep);
 
-		// ---- annotations (Tom, 2026-08-09) ----
-		// A title block and two callouts, so the demonstration also demonstrates the Text element
-		// itself and its per-label size multiplier -- the fifth element type, otherwise unused here.
+		// ---- annotations ----
+		// A title block and two callouts, so the demonstration also demonstrates the Text element and
+		// its per-label size multiplier.
 		//
-		// EVERY STRING IS ONE THAT ALREADY EXISTS AND IS ALREADY TRANSLATED, which was Tom's own
-		// constraint ("to minimize translation load, we can compose it from existing lang strings").
-		// `menu_brand` is suite chrome, so it is translated in all 26 languages; `lpn_main_menu` and
-		// `lpn_tool_add_reservoir` are this page's own; `bpn_p_min` ("Lowest pressure") belongs to
-		// the sibling branched-network calculator and is translated wherever lpn_ is. Net cost: zero
-		// new keys.
+		// EVERY STRING IS ONE THAT ALREADY EXISTS AND IS ALREADY TRANSLATED. Net cost: zero new keys.
 		//
-		// WHOLE LABELS ONLY -- never a clause cut out of a longer string. Tom asked for a callout
-		// carrying "Double-click a pipe to add or remove a vertex", and that text exists ONLY as the
-		// third sentence of `lpn_mode_select`. Splicing it out is exactly the fragment composition
-		// CLAUDE.md bans (it breaks in gendered, word-order and RTL languages), so it is NOT done
-		// here; it would need a key of its own. Same reason there is no velocity callout: there is
-		// no "Highest velocity" string to borrow, only the bare word "Velocity".
+		// WHOLE LABELS ONLY -- never a clause cut out of a longer string. "Double-click a pipe to add
+		// or remove a vertex" exists ONLY as the third sentence of `lpn_mode_select`, and splicing it
+		// out is the fragment composition CLAUDE.md bans (it breaks in gendered, word-order and RTL
+		// languages); it would need a key of its own. Same reason there is no velocity callout: there
+		// is no "Highest velocity" string to borrow, only the bare word "Velocity".
+
 		var pcx = EngCalcs.pageConfig || {};
-		// side: 'left' | 'right', for an ANCHORED annotation only -- which side of its node the
-		// whole label sits on. It is not a nicety.
-		//
-		// A callout must sit ENTIRELY to one side of its node, or the leader is a stub emerging from
-		// under the middle of the words -- Tom's verdict on the first cut was exact: "centered over
-		// their anchor so that their leaders look worst of all possible positions."
+		// side: 'left' | 'right', for an ANCHORED annotation only -- which side of its node the whole
+		// label sits on. A callout must sit ENTIRELY to one side, or the leader is a stub emerging
+		// from under the middle of the words.
 		//
 		// **THE OFFSET IS THE LABEL'S NEAR EDGE, NOT ITS CENTRE, so the text width cancels and
-		// nothing is measured** (Task 403). It used to centre the label and push the centre out by
-		// half a MEASURED width -- correct at the instant it was drawn and stale ever after, because
-		// a label's world width follows the font size (textSize / scale). Change the text size and
-		// every callout's stored offset described a width the label no longer has. `lb.align` says
-		// which edge the point is, so a right-side callout is start-anchored at +gap and a left-side
-		// one end-anchored at -gap: entirely to one side by construction, at every size, forever.
-		// The property has existed since Task 332 and is interpreted in one place, Geom.labelBoxAt().
+		// nothing is measured** (Task 403). Centring the label and pushing the centre out by half a
+		// MEASURED width is correct at the instant it is drawn and stale ever after, because a
+		// label's world width follows the font size (textSize / scale). `lb.align` says which edge
+		// the point is, so a right-side callout is start-anchored at +gap and a left-side one
+		// end-anchored at -gap: entirely to one side by construction, at every size.
+
 		function annotate(x, y, anchorNode, text, sizeMult, side) {
 			if (!text) { return null; }   // key missing from pageConfig: draw nothing, never "Text"
 			var lb = addText(x, y, anchorNode);
@@ -10898,57 +9601,46 @@ var EngCalcs = EngCalcs || {};
 				// The near edge is the anchored edge, so the label is on the side its gap is on.
 				lb.align = (side === 'left') ? 'right' : 'left';
 				lb.x = (side === 'left' ? -1 : 1) * gap;
-				// And the RISE that makes the leader slope. The leader is drawn from the node to the
-				// label's near edge, which is now lb.x itself, so the leader vector is (gap, lb.y)
-				// and its angle is set entirely by this line. Tom, 2026-08-09: "Leaders don't look great horizontal. Ideal angle
-				// is 60 degrees like you make the 'lowest pressure' text."
+				// And the RISE that makes the leader slope. The leader runs from the node to the
+				// label's near edge, which is lb.x itself, so the leader vector is (gap, lb.y) and
+				// its angle is set entirely by this line -- horizontal leaders do not look good.
 				// A FIXED dy would NOT hold the angle across the two callouts: nodeRadius() is
 				// JUNCTION_R for a junction but half the tank's longer side for a reservoir, so the
-				// same rise over a different gap is a different slope. Deriving from the angle is
-				// what makes them match.
+				// same rise over a different gap is a different slope.
 				lb.y = -Math.tan(LPN_CALLOUT_ANGLE * Math.PI / 180) * gap;
 			}
 			updateLabelGeometry(lb.id);
 			return lb;
 		}
-		// Title block, centred on the drawing and just above it (labels are centred on their x, and
-		// -y is up). Two lines at different sizes rather than one, so the size multiplier is visibly
-		// doing something a reader can then go and change.
+		// Title block, centred on the drawing and just above it. Two lines at different sizes rather
+		// than one, so the size multiplier is visibly doing something a reader can go and change.
 		//
-		// TUCKED CLOSE TO THE RING ON PURPOSE. bbox() -- and therefore zoom-to-fit -- includes the
-		// title, so every unit of white space between it and the drawing is a unit the fit has to
-		// shrink everything else to accommodate. Tom, 2026-08-09, asked for the two lines 120 and 60
-		// units further south for exactly that reason.
+		// TUCKED CLOSE TO THE RING ON PURPOSE: bbox(), and therefore zoom-to-fit, includes the title,
+		// so every unit of white space between it and the drawing is a unit the fit has to shrink
+		// everything else to accommodate. Clearance to the ring top is ~35 units.
 		// The SECOND line anchors the block and the FIRST is DERIVED from it, stacked by their own
-		// half-heights plus a gap -- not moved by a flat amount. Tom asked for 120 and 60; 60 landed
-		// the second line at 4620, but a flat 120 would have OVERLAPPED the two by 5 units, because
-		// they are 40 and 30 units tall at the default text size. Deriving also keeps the block
-		// tight if the visitor's text size is not the default.
-		// Then back up 20 (4620 -> 4600): Tom, 2026-08-09, "I pushed too hard. Can you move them
-		// both up or move J2 down about 20?" -- and moving the TITLE is the right half of that
-		// choice. J2 is a ring vertex, and the ring's 1400 x 700 extent centred exactly on 5000,5000
-		// is a property worth more than 20 units of clearance; dropping J2 would make it 1400 x 680
-		// off-centre. The title block has no such constraint. Clearance from the second line's
-		// bottom edge to the ring top is now ~35 units.
-		// 4600 -> 4572 when the units line was added below the anchor: the block grew downward by
-		// (30 + 20)/2 + 8 = 33 units at the SHIPPED text size, so the whole thing moves up by
-		// enough to hand the ring back the ~35 units of clearance Tom asked for. Sized against the
-		// shipped default deliberately, not against this session's textSize -- see the harness note
-		// on the default-size gap check, which is the assertion that would otherwise not notice.
+		// half-heights plus a gap -- never moved by a flat amount, which OVERLAPS them by 5 units at
+		// the default text size (they are 40 and 30 units tall). Deriving also keeps the block tight
+		// if the visitor's text size is not the default.
+		// The anchor is 4572, not 4600: the units line added below it grew the block downward by
+		// (30 + 20)/2 + 8 = 33 units at the SHIPPED text size, so the whole thing moves up to hand
+		// the ring back that clearance. Sized against the SHIPPED default deliberately, not against
+		// this session's textSize -- see the harness's default-size gap check. Moving J2 instead is
+		// wrong: the ring's 1400 x 700 extent centred exactly on 5000,5000 is worth more than 20
+		// units of clearance.
+
 		var titleY = 4572;
 		annotate(5000, titleY - (effectiveFontSize(2) + effectiveFontSize(1.5)) / 2 - 8, null, pcx.menu_brand, 2);
 		annotate(5000, titleY, null, pcx.lpn_main_menu, 1.5);
-		// THIRD LINE: what the example is drawn in (Tom, 2026-08-10 -- "I do like having the units as
-		// a title text on the example projects. And I don't see that."). He was not misunderstanding;
-		// it was not there. It belongs here and not on the browser tab (see unitSetLabel()) because
-		// this drawing is the one thing on the page that leaves the page: a screenshot of the example
-		// carries no status strip, and Task 264 made each example COMMIT to a unit system, so the
-		// drawing should say which one it committed to.
+		// THIRD LINE: what the example is drawn in. Here and not on the browser tab (see
+		// unitSetLabel()) because this drawing is the one thing on the page that leaves the page -- a
+		// screenshot carries no status strip, and each example COMMITS to a unit system.
 		//
-		// Stacked DOWNWARD from the anchor line, mirroring how the first line is derived upward from
-		// it -- by the two lines' own half-heights plus the same 8-unit gap, never a flat offset, so
-		// the block stays tight at any text size. It lands between the title and the ring, which had
-		// ~35 units of clearance; a 1.0-size line is 20 tall at the default, so the ring keeps room.
+		// Stacked DOWNWARD from the anchor line, mirroring how the first is derived upward -- by the
+		// two lines' own half-heights plus the same 8-unit gap, never a flat offset, so the block
+		// stays tight at any text size. A 1.0-size line is 20 tall at the default, inside the ~35
+		// units of clearance to the ring.
+
 		annotate(5000, titleY + (effectiveFontSize(1.5) + effectiveFontSize(1)) / 2 + 8, null, unitSetLabel(system), 1);
 		// Anchored callouts: the offset is from the node, and the label follows if the node moves.
 		// The reservoir is the drawing's far-left node and its own data label sits to the upper
@@ -11083,13 +9775,9 @@ var EngCalcs = EngCalcs || {};
 			if (mode === 'delete') { return; }
 			// 'select' mode
 			// **TOUCHING SOMETHING SELECTS IT, DOWN-STROKE, BEFORE ANY DRAG DECISION** (Task 415),
-			// and touching nothing clears -- selectFromHit() reads "nothing" out of a hit that names
-			// no element, which is how a click on empty space clears the selection.
-			//
-			// DOWN, not on the tap, and that is the whole reason this is one line and not five in
-			// the tap handler: a drag never becomes a tap (it fails the 4px threshold), so a user
-			// who nudged J2 and then pressed Delete would otherwise have deleted whatever was
-			// selected before -- an element they were not looking at.
+			// and touching nothing clears. DOWN, not on the tap: a drag never becomes a tap (it fails
+			// the 4px threshold), so a user who nudged J2 and then pressed Delete would otherwise
+			// delete whatever was selected before -- an element they were not looking at.
 			selectFromHit(t);
 			if (t.dataset.node) {
 				var n = nodeById(t.dataset.node), w0 = screenToWorld(e.clientX, e.clientY);
@@ -11173,16 +9861,12 @@ var EngCalcs = EngCalcs || {};
 		// Add-* and Delete tools act on a plain click (tap without drag), same threshold as
 		// the spike's tap-vs-drag detection.
 		var downPt = null;
-		// THE CLICK THAT ENDS A REGISTRATION IS NOT A TAP FOR A TOOL (Tom, 2026-08-14: "When moving a
-		// background image, node select and delete needs to be disabled"). Every other pointer path
-		// already checked regMode, and the pointerup below checks it too -- but the LAST click of a
-		// Scale/Position sequence clears regMode in a CAPTURE-phase listener (startBackdropPosition(),
-		// handler2), and the tool's own pointerup runs afterwards, in the bubble phase of that same
-		// event, by which time the flag it depends on is already false. So picking a node as the
-		// target of a Move also opened that node's popup -- or, with the Delete tool active, DELETED
-		// the node you had just aimed at.
-		// Gating the tap's START, not its end, is what makes this hold: the pointerdown happens while
-		// regMode is unambiguously still on, and a tap with no beginning cannot be completed.
+		// THE CLICK THAT ENDS A REGISTRATION IS NOT A TAP FOR A TOOL. The LAST click of a
+		// Scale/Position sequence clears regMode in a CAPTURE-phase listener, and the tool's own
+		// pointerup runs afterwards in the bubble phase of the same event, by which time the flag it
+		// depends on is false -- so picking a node as the target of a Move also opens that node's
+		// popup, or with the Delete tool active DELETES it. Gating the tap's START, not its end, is
+		// what makes this hold: the pointerdown happens while regMode is unambiguously still on.
 		svg.addEventListener('pointerdown', function (e) {
 			if (regMode) { downPt = null; return; }
 			downPt = { x: e.clientX, y: e.clientY };
@@ -11195,37 +9879,23 @@ var EngCalcs = EngCalcs || {};
 			// target to the capturing element (svg itself) on desktop Chrome, so e.target here
 			// is never the actual node/link/label clicked -- see phase0-acceptance.md round 2.
 			var w = screenToWorld(e.clientX, e.clientY), t = resolveLabelHit(document.elementFromPoint(e.clientX, e.clientY));
-			// No zoomExtent() after placing an element (Tom): rescaling the whole view on every
-			// click while building a network is disorienting. Zoom Extent stays an explicit,
-			// user-requested action only.
-			// Undo covers Add too, not just Delete (Tom) -- snapshot before every mutation so
-			// "Undo" stays honest about what it does rather than needing a narrower name.
-			// Selection is NOT set here (Task 415) -- the pointerDOWN handler above already did it,
-			// for every select-mode press, tap and drag alike. A second call here would be dead
-			// code that looks load-bearing: removing it changes no behaviour, which is exactly the
-			// kind of line a later reader keeps out of caution.
+			// No zoomExtent() after placing an element: rescaling the whole view on every click while
+			// building a network is disorienting. Zoom Extent stays user-requested only.
+			// Undo covers Add too, not just Delete -- snapshot before every mutation so "Undo" stays
+			// honest about what it does.
+			// Selection is NOT set here (Task 415) -- the pointerDOWN handler already did it, for
+			// every select-mode press, tap and drag alike.
 			if (mode === 'add-junction' || mode === 'add-reservoir' || mode === 'add-tank') {
 				// Snap-on-create: a click within NODE_SNAP_PX of an existing node reuses it instead
 				// of creating a new, overlapping one -- see nearestNodeNearScreen()'s comment.
 				var onNode = nearestNodeNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
 				if (onNode) {
-					// **A MISS THAT LANDS ON WHAT YOU JUST PLACED OPENS IT** (Tom, 2026-08-15: *"If
-					// they click very near to the same location they just added something, it puts
-					// them in Select/edit mode and opens that element. This will remove a major 'fat
-					// finger' issue."*).
-					//
-					// THE OLD BEHAVIOUR WAS WORSE THAN HE KNEW: this branch already refused to place
-					// a second node on top of an existing one, and then did NOTHING AT ALL. The user
-					// taps, nothing appears, nothing opens, and there is no way to tell a
-					// suppressed duplicate from a click the page missed. Silence is the one response
-					// that teaches nothing.
-					//
-					// Guessing what they meant is safe here precisely because the alternative was
-					// nothing: at worst they wanted a node 14 pixels away, and the popup they get
-					// tells them exactly where the existing one is. Switching to Select is Tom's
-					// call and the right one -- placing a node ON a node is not a thing anyone does
-					// twice on purpose, so the tap is far likelier to be the end of the add spree
-					// than the middle of it.
+					// **A MISS THAT LANDS ON WHAT YOU JUST PLACED OPENS IT**, and switches to Select.
+					// Refusing to place a second node on top of an existing one and then doing
+					// NOTHING AT ALL is worse: the user taps, nothing appears, nothing opens, and
+					// there is no way to tell a suppressed duplicate from a click the page missed.
+					// Guessing is safe here because the alternative was nothing -- at worst they
+					// wanted a node 14 pixels away, and the popup says where the existing one is.
 					setMode('select');
 					openPopup(onNode.id, e.clientX, e.clientY);
 				} else {
@@ -11235,16 +9905,10 @@ var EngCalcs = EngCalcs || {};
 				}
 			}
 			else if (mode === 'add-text') {
-				// **THE OTHER HALF OF THE FAT-FINGER RULE, AND TOM NAMED IT FROM THE OUTSIDE**
-				// (2026-08-15, on being told the node tools answered a near-miss with silence:
-				// *"Well, that sheds some light. Actually I think it's schizophrenic. Maybe no-op
-				// for the elements and double-insert for the text? That would explain my
-				// experience."*). Exactly right: this branch had no such guard at all, so a tap on
-				// the Text you had just placed made a SECOND one directly on top of it -- two labels
-				// where one was wanted, the top one dragging away to reveal the other later.
-				//
-				// Two tools, two different wrong answers to the same gesture. Now both open what is
-				// already there. The node branch above has the argument for switching to Select.
+				// **THE OTHER HALF OF THE FAT-FINGER RULE.** Without a guard here, a tap on the Text
+				// you had just placed makes a SECOND one directly on top of it -- two labels where
+				// one was wanted, the top one dragging away to reveal the other later. Both tools now
+				// open what is already there; the node branch above has the argument for Select.
 				var onLabel = nearestLabelNearScreen(e.clientX, e.clientY, NODE_SNAP_PX);
 				if (onLabel) {
 					setMode('select');
@@ -11279,13 +9943,12 @@ var EngCalcs = EngCalcs || {};
 					}
 				} else { setPendingLinkFrom(null); }
 			} else if (mode === 'delete') {
-				// One-step undo (Tom: lost a pipe's data to an accidental delete) -- snapshot the
-				// whole document just before any destructive action, not inside the delete
-				// functions themselves, so a cascade (deleting a node also deletes its links)
+				// One-step undo: snapshot the whole document just before any destructive action, NOT
+				// inside the delete functions, so a cascade (deleting a node also deletes its links)
 				// captures one clean "before" state rather than a partial one.
 				// deleteElement() owns the snapshot for the two real elements: inside a scenario the
-				// gesture is not a deletion at all but an `active` override, and in Base it may have
-				// to ask first -- neither of which a snapshot taken out here could know about.
+				// gesture is an `active` override rather than a deletion, and in Base it may have to
+				// ask first -- neither of which a snapshot taken out here could know about.
 				if (t.dataset.node) { deleteElement('node', t.dataset.node); }
 				else if (t.classList.contains('lpn-vhandle')) { saveUndoSnapshot(); removeVertex(t.dataset.link, +t.dataset.vidx); }
 				else if (t.dataset.link !== undefined) { deleteElement('link', t.dataset.link); }
@@ -11345,23 +10008,19 @@ var EngCalcs = EngCalcs || {};
 
 	// ---- ROADMAP Task 277: a move is undoable ----
 	//
-	// Until this, NO drag handler snapshotted. The consequence was not "Undo skips the drag" -- it
-	// was worse: Undo reverted the last DISCRETE act instead, leaving the drag in place and taking
-	// back something the user did earlier. Tom, 2026-08-10: "277 is an ugly bug."
+	// A drag handler that does not snapshot is worse than "Undo skips the drag": Undo reverts the
+	// last DISCRETE act instead, leaving the drag in place and taking back something earlier.
 	//
-	// LAZILY, on the first frame that actually moves something -- not on pointerdown. Every click in
-	// select mode opens a drag record (that is how a click can become a drag), so snapshotting at
-	// pointerdown would push a document copy for every tap that merely opened a popup: the stack
-	// would fill with 20 identical states and Undo would appear to do nothing, which is the same
-	// complaint from the other side. applyDrag() only runs once the pointer has actually moved, so
-	// this fires exactly when there is a change to take back.
+	// LAZILY, on the first frame that actually moves something -- NOT on pointerdown. Every click in
+	// select mode opens a drag record (that is how a click becomes a drag), so snapshotting at
+	// pointerdown pushes a document copy for every tap that merely opened a popup, and the stack
+	// fills with 20 identical states. applyDrag() runs only once the pointer has actually moved.
 	//
-	// ONCE PER GESTURE, via drag.snapped, so a 200-frame drag costs one snapshot and one Undo
-	// returns the whole gesture rather than one frame of it. `drag` is replaced wholesale on each
-	// pointerdown, so the flag resets itself and cannot leak into the next drag.
+	// ONCE PER GESTURE, via drag.snapped, so a 200-frame drag costs one snapshot. `drag` is replaced
+	// wholesale on each pointerdown, so the flag resets itself.
 	//
-	// Pan and pinch are deliberately absent: they move the CAMERA, not the document, and
-	// saveUndoSnapshot() deep-clones `doc`. Undoing a pan is not a thing this stack is for.
+	// Pan and pinch are deliberately absent: they move the CAMERA, not the document.
+
 	var LABEL_DRAG_TYPES = { label: true, nodelbl: true, linklbl: true }, LABEL_DRAG_SLOP_PX = 3;
 	// The mark is DECORATION and lives entirely in CSS -- no timer, no cleanup, nothing to leak if
 	// the tab is switched or the element is rebuilt mid-fade. Removing and re-adding the class in
@@ -11389,21 +10048,16 @@ var EngCalcs = EngCalcs || {};
 		}
 		var p = pointers.get(drag.pointerId);
 		if (!p) { return; }
-		// **A LABEL DRAG NEEDS A REAL MOVEMENT BEFORE IT COMMITS** (Tom, 2026-08-15: *"I accidentally
-		// dragged it? To there? OK. I reset it, and that fixed it. What a wild goose chase."*).
+		// **A LABEL DRAG NEEDS A REAL MOVEMENT BEFORE IT COMMITS.** If the first pixel makes a label
+		// MANUAL for good, a stray jiggle on a crowded label freezes it at wherever the automatic
+		// pass happened to have put it -- the stored offset is `nodeLabelPos()`, the base PLUS the
+		// collision pass's current nudge -- and the pass then has one more immovable obstacle to work
+		// around. The rule: *"Store the user's leader endpoint and hold it constant. If you extend
+		// it, don't overwrite it. Your extension is temporary."* A nudge is our extension.
 		//
-		// The first pixel of movement used to make a label MANUAL for good, and the offset it stored
-		// was `nodeLabelPos()` -- the base PLUS the collision pass's current nudge. So a stray jiggle
-		// on a crowded label froze that label at wherever the automatic pass happened to have put it,
-		// permanently, and the pass then had one more immovable weight-1000 obstacle to work around.
-		// Tom's own statement of the rule: *"Store the user's leader endpoint and hold it constant.
-		// If you extend it, don't overwrite it. Your extension is temporary."* A nudge is our
-		// extension; it must not become his endpoint by accident.
-		//
-		// Three pointer-slop pixels. A deliberate drag clears it in the first frame and feels
-		// identical; a click that wobbles does not. Applies to the three LABEL drags only -- a node
-		// or vertex drag moves a thing that is already where the user put it, so there is nothing to
-		// freeze and no threshold needed.
+		// Three pointer-slop pixels. Applies to the three LABEL drags only -- a node or vertex drag
+		// moves a thing already where the user put it, so there is nothing to freeze.
+
 		if (LABEL_DRAG_TYPES[drag.type] && !drag.committed) {
 			if (Math.hypot(p.x - drag.startX, p.y - drag.startY) < LABEL_DRAG_SLOP_PX) { return; }
 			drag.committed = true;
@@ -11469,20 +10123,13 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// ---- units ----
-	// Every stored value is SI (CLAUDE.md's schema rule) -- the units strip's <select> options
-	// carry the "number of that unit per SI unit" factor directly as their `value` (the same
-	// mechanism echoUnitSelect()/EngCalcs.setUnits() already use suite-wide), so reading it back
-	// needs no separate JS-side unit table. Multiply SI by the factor to display; divide a typed
-	// value by the factor to store it back as SI.
 	// Looked up by element id, not by unit family: Length/Map and Elevation/Head both draw their
-	// option list from a distance-flavored family (distance_site / total_head) but must stay
-	// independently selectable (Tom, 2026-07-30) -- Length/Map is a declarative label with no
-	// real conversion (see lengthField() below), Elevation/Head is a real SI-converted quantity,
-	// and conflating them under one shared control was confusing once seen in practice.
-	// x/y positions are deliberately NOT run through this at all: they're schematic map/canvas
-	// coordinates with no established real-world scale until Task 145's backdrop registration.
-	// By [name=], not getElementById: echoUnitSelect() (lib/Calculators.lib.php) emits name=
-	// only, never id= -- these names double as the lookup key here.
+	// option list from a distance-flavoured family (distance_site / total_head) but must stay
+	// independently selectable -- Length/Map is a declarative label with no real conversion (see
+	// lengthField()), Elevation/Head is a real SI-converted quantity.
+	// x/y positions are deliberately NOT run through this: they are schematic map coordinates with
+	// no established real-world scale until Task 145's backdrop registration.
+	// By [name=], not getElementById: echoUnitSelect() emits name= only, never id=.
 	function unitEl(name) { return document.querySelector('select[name="' + name + '"]'); }
 	// The seven selectors this page owns, in one list, so reading and restoring a project's units
 	// cannot drift out of step with each other or with Looped-Network.php's units strip.
@@ -11490,28 +10137,25 @@ var EngCalcs = EngCalcs || {};
 		'lpn_u_flow', 'lpn_u_velocity', 'lpn_u_gradient'];
 	// {selectName: unitKey}, e.g. {lpn_u_diameter: 'in'}. Stored by KEY, never by factor: a factor is
 	// a number whose meaning depends on a table that may be re-derived, while 'in' will mean inches
-	// forever. Since Task 390 that is also what the <option>'s own value is, so this is no longer a
-	// document-only convention -- the key is a unit's identity everywhere in the suite.
+	// forever. Since Task 390 that is also the <option>'s own value -- a unit's identity is its NAME
+	// everywhere in the suite.
 	//
 	// ---- A UNIT THIS PAGE DOES NOT OFFER (ROADMAP Task 390 step 4) -------------------------------
 	//
-	// A unit is a LABEL and a MAGNITUDE, and they have different requirements. The label is a
-	// string: always storable, always displayable, and always the user's. The magnitude is a factor,
-	// and ONLY A SOLVE NEEDS ONE. So a name we have no factor for has one honest outcome and it is
-	// neither of the two obvious ones: not "reject the document", and not "guess a factor".
+	// A unit is a LABEL and a MAGNITUDE. The label is a string: always storable, always displayable,
+	// always the user's. The magnitude is a factor, and ONLY A SOLVE NEEDS ONE. So a name we have no
+	// factor for is neither rejected nor guessed at:
 	//
 	//   open the file, draw it faithfully, keep the name verbatim -- and REFUSE TO SOLVE, saying
 	//   which unit and why.
 	//
-	// The refusal is the work. EngCalcs.unitFactor() answers 1 for a name it has no factor for,
-	// which is right for a page RENDERING (a label still draws) and silently catastrophic for a page
-	// SOLVING (every length in the network would be off by whatever that unit really is), and
-	// nothing about the number on screen would look wrong. Two different messages are owed, and
-	// they are different facts: "we do not know this unit" and "so we cannot give you answers".
+	// The refusal is the work. EngCalcs.unitFactor() answers 1 for a name it has no factor for, which
+	// is right for RENDERING and silently catastrophic for SOLVING -- every length off by whatever
+	// that unit really is, with nothing on screen looking wrong. Two messages are owed, and they are
+	// different facts: "we do not know this unit" and "so we cannot give you answers".
 	//
-	// {selectName: unitName}. Written ONLY by applyUnitSelections(), which is the one place a
-	// document's units are installed, so this object always describes the open document and never a
-	// leftover of the last one.
+	// Written ONLY by applyUnitSelections(), the one place a document's units are installed, so this
+	// always describes the open document and never a leftover of the last one.
 	var unresolvedUnits = {};
 	function unresolvedUnitNames() {
 		return LPN_UNIT_SELECTS.map(function (name) { return unresolvedUnits[name]; })
@@ -11530,13 +10174,12 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	// Restores a project's own units WITHOUT going through EngCalcs.setUnits(): that helper calls
-	// submitForm(), which re-enters pageCalculator, which is exactly the code path that is calling
-	// this. The selects are set directly and the caller re-renders once, in its own order.
-	//
-	// A UNIT THIS BROWSER DOES NOT OFFER is not forced onto the select and not thrown away either:
-	// it is recorded in unresolvedUnits above, kept verbatim by readUnitSelections(), shown by
-	// unitLabel(), and it stops the solve. See the block on unresolvedUnits for why that trio and
-	// not a rejection.
+	// submitForm(), which re-enters pageCalculator -- the code path calling this. The selects are set
+	// directly and the caller re-renders once, in its own order.
+	// A UNIT THIS BROWSER DOES NOT OFFER is neither forced onto the select nor thrown away: it is
+	// recorded in unresolvedUnits, kept verbatim by readUnitSelections(), shown by unitLabel(), and
+	// it stops the solve.
+
 	function applyUnitSelections(units) {
 		// Cleared unconditionally, INCLUDING on the early return: this function is the one place a
 		// document's units are installed, so it owns the whole of that state. Clearing only in the
@@ -11592,15 +10235,14 @@ var EngCalcs = EngCalcs || {};
 	// ---- ROUGHNESS IS THREE DIFFERENT QUANTITIES WEARING ONE FIELD (ROADMAP Task 271) ----
 	//
 	// Manning n and Hazen-Williams C are dimensionless; Darcy-Weisbach roughness height e is a
-	// LENGTH. bpn_ solved this years ago with one column whose symbol and units follow the method
-	// (bpnUpdateMethodUI()), and this is deliberately the same design rather than a second one:
-	// three separate fields would mean three stored properties, three defaults, and a document that
+	// LENGTH. One column whose symbol and units follow the method, exactly as bpn_ does it: three
+	// separate fields would mean three stored properties, three defaults, and a document that
 	// remembers two numbers nobody can see.
 	//
-	// The symbols n / C / e are NOT translated and match bpn_'s exactly. CLAUDE.md's `symbol` rule:
-	// a variable letter keeps its letters in every language. Using "e" rather than the prettier
-	// Greek epsilon is a consistency call -- the same quantity must not be called two things in two
-	// calculators of the same suite.
+	// The symbols n / C / e are NOT translated and match bpn_'s exactly -- a variable letter keeps
+	// its letters in every language, and the same quantity must not be called two things in two
+	// calculators of one suite.
+
 	function roughnessSymbol() {
 		var m = frictionMethod();
 		return m === 'manning' ? 'n' : m === 'dw' ? 'e' : 'C';
@@ -11650,30 +10292,21 @@ var EngCalcs = EngCalcs || {};
 		if (row) { row.style.display = frictionMethod() === 'dw' ? '' : 'none'; }
 	}
 	// The bottom-right map overlay: the few facts you need in order to read the numbers on the map at
-	// all. Map labels are bare numbers by design (Tom, 2026-07-30 -- "no units and no prefix"), which
-	// is right for the drawing and left a first-time visitor no way to tell gpm from l/s. They get US
-	// on an English page and SI on every other (EC_DEFAULT_UNIT_SET, from the language), and until
-	// now nothing on screen said which. Tom, 2026-08-10: "what units do they get, and is there a way
-	// they should know?"
+	// all. Map labels are bare numbers by design, which is right for the drawing and leaves a
+	// first-time visitor no way to tell gpm from l/s -- and the preset comes from the language
+	// (EC_DEFAULT_UNIT_SET), not from anything they chose.
 	//
-	// EVERY LABEL HERE IS BORROWED, no new keys: lpn_units_flow, lpn_units_pressure, bpn_method and
-	// bpn_method_hw/dw/manning all exist and are already translated in every language this page is.
-	// That is CLAUDE.md's concept-level reuse rule paying for itself -- this shipped at zero
-	// translation cost.
+	// EVERY LABEL HERE IS BORROWED, no new keys: this shipped at zero translation cost.
 	function refreshMapStatus() {
 		var el = document.getElementById('lpn_map_status'), pc = EngCalcs.pageConfig || {};
 		if (!el) { return; }
-		// A PIPE, not spaces (Tom, 2026-08-10). Three "Label: value" pairs run together are one
-		// undifferentiated string at 11px, and whitespace is the weakest divider there is.
+		// A PIPE, not spaces. Three "Label: value" pairs run together are one undifferentiated string
+		// at 11px, and whitespace is the weakest divider there is.
 		//
-		// This corrects the previous comment here, which refused a glyph on the grounds that "a
-		// bullet or pipe would need its own RTL thinking". That was overcautious and wrong about
-		// this glyph specifically: U+007C is BiDi class ON (Other Neutral) and is VERTICALLY
+		// A pipe needs no RTL thinking: U+007C is BiDi class ON (Other Neutral) and VERTICALLY
 		// SYMMETRIC, so it needs no mirrored counterpart and renders identically whichever direction
-		// the run around it takes -- the three pairs reorder in Arabic or Hebrew, as they should, and
-		// the dividers simply stay between them. The caution was right for a DIRECTIONAL glyph
-		// (an arrow, a guillemet, the fly-out's own U+25B8); it was never right for a pipe. And a
-		// pipe carries no language at all, which is Tom's reason for preferring it.
+		// the run takes -- the three pairs reorder in Arabic or Hebrew and the dividers stay between
+		// them. That caution IS right for a DIRECTIONAL glyph (an arrow, a guillemet, U+25B8).
 		el.textContent = [
 			(pc.lpn_units_flow || 'Flow') + ': ' + unitLabel('lpn_u_flow'),
 			(pc.lpn_units_pressure || 'Pressure') + ': ' + unitLabel('lpn_u_pressure'),
@@ -11682,61 +10315,52 @@ var EngCalcs = EngCalcs || {};
 	}
 	// "US Units" / "SI Units", for the example network's title block. `system` is the preset the
 	// caller just committed the project to, never a reading of the live strip: an example FORCES the
-	// units it wants and then says which it forced (Tom, 2026-08-10, cutting the derived version --
-	// *"We never create an example based on the current units, or we shouldn't. We should force the
-	// units we want and label thusly."* The derivation was answering a question nobody asks).
-	//
-	// Not on the browser tab: Task 265 put it there and Tom reversed it the same day -- the map's
-	// status strip already answers "what units am I in" continuously, where you are already looking.
-	// The title block is different because a screenshot of the example travels without that strip.
+	// units it wants and then says which it forced.
+	// NOT on the browser tab: the map's status strip already answers "what units am I in"
+	// continuously, where you are already looking. The title block is different because a screenshot
+	// of the example travels without that strip.
 	function unitSetLabel(system) {
 		var pc = EngCalcs.pageConfig || {};
 		return (pc.lpn_title_units || '{units} Units')
 			.replace('{units}', system === 'us' ? (pc.calc_units_us || 'US') : (pc.calc_units_si || 'SI'));
 	}
-	// Suite-wide convention (CLAUDE.md's Unit Sets section): a default is Array('us'=>x,'si'=>y),
-	// not one SI number that happens to convert to something ugly in the other system (Tom,
-	// 2026-07-30 -- the example network's plain-SI elevations read as non-round once shown in
-	// ft). usKey is the family's US unit ("in", "gpm", "fth2o", ...); usVal is a nice number IN
-	// THAT UNIT; siVal is a separately-chosen nice number in SI. Reads the CURRENTLY selected
-	// unit, not the page's original load-time default, so this stays correct even after the user
-	// switches units mid-session.
+	// Suite-wide convention (CLAUDE.md's Unit Sets section): a default is Array('us'=>x,'si'=>y), not
+	// one SI number that converts to something ugly in the other system. usKey is the family's US
+	// unit; usVal is a nice number IN THAT UNIT; siVal is a separately-chosen nice number in SI.
+	// Reads the CURRENTLY selected unit, so this stays correct after a mid-session unit switch.
 	function niceDefault(unitId, usKey, usVal, siVal) {
 		// DECLARATIVE since Task 263: what comes back is in the unit the strip is SHOWING.
 		//
-		// The two arguments are therefore asymmetric, and the asymmetry is in the existing call
-		// sites, not invented here. `usVal` is already a nice number IN usKey ("6" inches), so it is
-		// returned untouched. `siVal` is a nice number in the SI BASE unit (0.15 m, 0.015 m³/s) --
-		// which is not what the SI preset displays: it shows mm and l/s. So the SI branch scales to
-		// the selected unit and 0.15 m becomes 150 mm, 0.015 m³/s becomes 15 l/s.
+		// The two arguments are asymmetric. `usVal` is already a nice number IN usKey ("6" inches),
+		// so it is returned untouched. `siVal` is a nice number in the SI BASE unit (0.15 m,
+		// 0.015 m³/s), which is not what the SI preset displays -- it shows mm and l/s -- so the SI
+		// branch scales to the selected unit.
 		//
 		// Getting this wrong is silent and enormous: without the factor a 150 mm main is stored as
-		// 0.15 mm and the solve returns pressures around -1.3e10 kPa. That is exactly what the
-		// example-network harness caught the moment storage went declarative, which is the reason
-		// that harness exists.
+		// 0.15 mm and the solve returns pressures around -1.3e10 kPa. The example-network harness
+		// exists because of it.
 		return unitKey(unitId) === usKey ? usVal : siVal * unitFactor(unitId);
 	}
 
-	// ---- THE UNIT BOUNDARY (ROADMAP Task 263, Tom 2026-08-10) ----
+	// ---- THE UNIT BOUNDARY (ROADMAP Task 263) ----
 	//
 	// **Inputs are stored in the unit they were typed in, and NOTHING converts them.** Switching a
-	// unit select reinterprets the number (8 in becomes 8 mm), exactly as every other calculator in
-	// this suite behaves and exactly as EPANET behaves. The previous design stored SI and displayed
-	// the conversion, so a unit switch silently rewrote every number on the map; Tom banned it:
-	// *"a bad design decision was made without my knowledge to convert inputs when units are
-	// switched. Scrub and ban this."*
+	// unit select REINTERPRETS the number (8 in becomes 8 mm), exactly as every other calculator in
+	// this suite behaves and exactly as EPANET behaves. Storing SI and displaying the conversion
+	// means a unit switch silently rewrites every number on the map; Tom banned it: *"a bad design
+	// decision was made without my knowledge to convert inputs when units are switched. Scrub and
+	// ban this."*
 	//
 	// Conversion therefore happens in exactly TWO places and nowhere else:
 	//   1. HERE, at the solver handoff (assembleModel, pumpFit) -- declared value to SI.
 	//   2. On the way BACK, for solve RESULTS only (readonlyUnitField, numLine) -- SI to display.
-	// A number that is an input never passes through either on its way to the screen. If you find
-	// yourself adding a third conversion site, you are re-creating the banned behaviour.
+	// An INPUT never passes through either on its way to the screen. A third conversion site is the
+	// banned behaviour being re-created.
 	//
-	// **The project stores its own units** (see serializeProject/applyUnitSelections). It has to:
-	// declarative storage means a 400 written by a millimetre user is the number 400, and opening
-	// that file in an inch browser without restoring its units would read it as a 400 INCH pipe.
-	// Tom, 2026-08-10: *"it would be another disaster for projects not to be stored with their
-	// units."*
+	// **The project stores its own units.** Declarative storage means a 400 written by a millimetre
+	// user is the number 400, and opening that file in an inch browser without restoring its units
+	// reads it as a 400 INCH pipe.
+
 	function toSI(value, unitId) {
 		return (typeof value === 'number') ? value / unitFactor(unitId) : value;
 	}
@@ -11745,18 +10369,13 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// ---- label toggle popover (Task 146 Phase 2) ----
-	// Deliberately separate from #lpn_popup/currentPopup below: this is a static settings panel,
-	// not a per-element property sheet, and touching none of the rename/undo machinery keeps it
-	// zero-risk to the existing popup.
-	// `decimals` (Task 189) is optional: pass {value, onChange} to put a 0-4 spinner on this field's
-	// row, or omit it for a non-numeric field (ID) that has nothing to round. The spinner sits on the
-	// SAME row as the checkbox because decimal places are a property of that one field -- the Labels
-	// popover is already the per-field row list, which is why this lives here and not in Settings
-	// (page-wide preferences). `affix` (Task 333) is the same bargain for the prefix/suffix boxes.
-	// `priority` (Task 397) is the fourth column and the same bargain again: {value, max, title,
-	// onChange}, or null for a field that does not participate.
-	// The row is a flex line so those controls form COLUMNS down the panel: the field names
-	// are of wildly different lengths, and boxes that stagger with them are unreadable as a set.
+	// Deliberately separate from #lpn_popup/currentPopup: a static settings panel, not a per-element
+	// property sheet, touching none of the rename/undo machinery.
+	// `decimals` (Task 189), `affix` (Task 333) and `priority` (Task 397) are optional per-row
+	// controls, null for a field that does not participate. They sit on the SAME row as the checkbox
+	// because they are properties of that one field, which is why they are here and not in Settings.
+	// The row is a flex line so those controls form COLUMNS down the panel: the field names are of
+	// wildly different lengths, and boxes that stagger with them are unreadable as a set.
 	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, priority) {
 		var row = document.createElement('div'), label = document.createElement('label'),
 			input = document.createElement('input'), span = document.createElement('span');
@@ -11770,15 +10389,11 @@ var EngCalcs = EngCalcs || {};
 		label.style.flex = '1 1 auto';
 		row.appendChild(label);
 		if (affixOpt) { row.appendChild(affixBox(affixOpt.prefix)); row.appendChild(affixBox(affixOpt.suffix)); }
-		// **EVERY TRAILING COLUMN IS RESERVED WHETHER OR NOT THIS ROW USES IT** (Tom, 2026-08-15:
-		// "Can you make their inputs align with the others?"). Written as a LIST rather than as a
-		// spacer bolted beside one control, because the one-off version only handled the single case
-		// that existed at the time -- affixes but no decimals -- and adding Task 397's priority column
-		// beside it would have staggered every row that has one control but not the other. Now the
-		// rule is structural: same slots, same order, on every field row.
-		//
-		// Only field rows (the ones with affixes) participate. The whole-panel options below -- the
-		// extrema toggle, the separator -- are not a field list and have no columns to line up with.
+		// **EVERY TRAILING COLUMN IS RESERVED WHETHER OR NOT THIS ROW USES IT.** A LIST rather than a
+		// spacer bolted beside one control: a one-off spacer handles only the case that existed when
+		// it was written, and the next column staggers every row that has one control but not the
+		// other. Same slots, same order, on every field row.
+		// Only field rows participate; the whole-panel options below are not a field list.
 		if (affixOpt) {
 			[decimals, priority].forEach(function (spec) {
 				row.appendChild(spec ? labelNumberBox(spec) : labelColumnSpacer());
@@ -11789,14 +10404,12 @@ var EngCalcs = EngCalcs || {};
 	// The reserved width of one trailing numeric column, and the gap before it. Both are read by the
 	// spinner and by the spacer that stands in for a missing one, so the two cannot drift apart --
 	// which they had, the old spacer carrying the width and not the margin.
-	// **BORDER-BOX IS WHAT MAKES THE HEADINGS LINE UP, AND ITS ABSENCE IS WHY THEY DID NOT.** An
-	// <input> is content-box by default, so a declared width of 3.5em renders 3.5em PLUS its padding
-	// and border -- perhaps 8px wider. The heading spans were exactly their declared width, so each
-	// control sat wider than its own heading and the flex spacer at the left absorbed the whole
-	// difference: every heading slid right, the LEFTMOST by the sum of all four errors and the
-	// rightmost by only one. That is exactly the pattern Tom reported -- "Before is worst and
-	// Priority is almost good" -- and it is the signature of accumulated box-model drift rather than
-	// of a wrong width anywhere.
+	// **BORDER-BOX IS WHAT MAKES THE HEADINGS LINE UP.** An <input> is content-box by default, so a
+	// declared width of 3.5em renders 3.5em PLUS its padding and border. With heading spans at
+	// exactly their declared width, each control sits wider than its own heading and the flex spacer
+	// at the left absorbs the difference: every heading slides right, the LEFTMOST by the sum of all
+	// four errors and the rightmost by one. That signature -- worst at the left, almost right at the
+	// right -- is accumulated box-model drift, not a wrong width anywhere.
 	var LPN_LABEL_COL_W = '4.5em', LPN_LABEL_COL_GAP = '6px', LPN_LABEL_AFFIX_W = '3.5em';
 	function labelColumnSpacer() {
 		var spacer = document.createElement('span');
@@ -11806,19 +10419,15 @@ var EngCalcs = EngCalcs || {};
 		return spacer;
 	}
 	// One small bounded-integer spinner in a Labels row. `spec` is {value, max, title, onChange}.
+	// Shared by the decimals column (Task 189) and the priority column (Task 397): the same control
+	// with a different bound and tip, and a second hand-rolled copy is how the two would come to
+	// differ in clamping, in width, or in whether they save.
 	//
-	// Shared by the decimals column (Task 189) and the priority column (Task 397) because they are
-	// the same control with a different bound and a different tip -- and because a second hand-rolled
-	// copy is how the two would come to differ in clamping, in width, or in whether they save.
+	// Decimals bound 32, not a defensible-looking 4: a limit low enough to argue about is a limit
+	// someone will hit and resent. Zero is the floor in both columns.
 	//
-	// Decimals bound 32, not a defensible-looking 4 (Tom, 2026-07-30): "possibly some absurd limit
-	// like 32 instead of a debatable limit like 4." A limit low enough to argue about is a limit
-	// someone will hit and resent; one nobody will ever reach needs no argument. Zero stays the floor
-	// in both columns: a negative rank and a negative decimal place are equally meaningless here.
-	//
-	// .ec-spin restores the native up/down arrows, which css/engcalcs.css strips suite-wide -- see
-	// that file's comment: right for a physical quantity, wrong for a small bounded integer like
-	// this, where clicking the arrows is the natural gesture. Width allows for them.
+	// .ec-spin restores the native up/down arrows, which css/engcalcs.css strips suite-wide -- right
+	// for a physical quantity, wrong for a small bounded integer. Width allows for them.
 	function labelNumberBox(spec) {
 		var box = document.createElement('input');
 		box.type = 'number'; box.min = '0'; box.max = String(spec.max); box.step = '1';
@@ -11845,13 +10454,11 @@ var EngCalcs = EngCalcs || {};
 		});
 		return box;
 	}
-	// One prefix or suffix box. `spec` is {value, placeholder, title, onChange}. The VALUE shown is
-	// always the EFFECTIVE one (labelPrefixFor() resolves an unset field to its default), so the box
-	// reads as what the map is actually printing rather than as an empty box beside a label that
-	// visibly carries a letter. Typing into it stores whatever is there, empty string included --
-	// that is the user saying "none", and it is honoured (see defaultLabelSettings()).
-	// `input`, not `change`: a prefix is one or two characters and the map should follow the
-	// keystroke, the way the rest of this panel follows a click.
+	// One prefix or suffix box. The VALUE shown is always the EFFECTIVE one (labelPrefixFor()
+	// resolves an unset field to its default), so the box reads as what the map is printing rather
+	// than as an empty box beside a label that visibly carries a letter. Typing stores whatever is
+	// there, empty string included -- that is the user saying "none", and it is honoured.
+	// `input`, not `change`: a prefix is one or two characters and the map follows the keystroke.
 	function affixBox(spec) {
 		var box = document.createElement('input');
 		box.type = 'text';
@@ -11879,13 +10486,11 @@ var EngCalcs = EngCalcs || {};
 		return [
 			['id', pc.lpn_field_id || 'ID'], ['diameter', pc.lpn_field_diameter || 'Diameter'],
 			['length', pc.lpn_field_length || 'Length'],
-			// The two new inputs sit with the other inputs (after Length, before the solved
-			// results), rather than appended at the end -- inputs-then-results is the order the
-			// existing list already follows, and Tom left the placement open ("do something and we
-			// can change later"), so this follows the pattern already there.
+			// The two new inputs sit with the other inputs, after Length and before the solved
+			// results: inputs-then-results is the order the existing list follows.
 			// Carries the method's symbol like every other roughness label (Task 271) -- the Labels
-			// popover is the map's only legend, so "Roughness" alone would leave the map's numbers
-			// unattributed to a method.
+			// popover is the map's only legend, so "Roughness" alone leaves the numbers unattributed.
+
 			['roughness', roughnessLabel()], ['km', pc.lpn_field_km_short || 'Minor loss, k'],
 			['flow', pc.lpn_result_flow || 'Flow'],
 			['velocity', pc.lpn_result_velocity || 'Velocity'], ['headloss', pc.lpn_result_headloss || 'Head loss'],
@@ -11913,14 +10518,10 @@ var EngCalcs = EngCalcs || {};
 		}
 		// **THE SAME GATE AS decimalsFor(), AND THE SAME REASON: THE MAP IS THE LIST.** A field gets a
 		// priority spinner exactly when labelSettings.priority carries an entry for it, so a node's ID
-		// row (which orders nothing -- an ID is never the reason a label is dropped) is skipped
-		// without a second list of participants to keep in step with the first.
-		//
+		// row is skipped without a second list of participants to keep in step with the first.
 		// The two tips differ because the two columns order different things -- rows inside one label
-		// on a link, whole labels against each other on a node. See defaultLabelSettings().
-		//
-		// Bound 99: a rank only has to be distinguishable, and the map ships nine of them. High enough
-		// that nobody meets it, low enough to stay one glance wide in a 4.5em box.
+		// on a link, whole labels against each other on a node.
+		// Bound 99: high enough that nobody meets it, low enough to stay one glance wide.
 		function priorityFor(group, key) {
 			var map = labelSettings.priority[group];
 			if (typeof map[key] !== 'number') { return null; }
@@ -11934,14 +10535,12 @@ var EngCalcs = EngCalcs || {};
 		// The prefix/suffix pair for one row. Both boxes show the EFFECTIVE text (so an untouched
 		// row still displays the default the map is printing) and write into labelSettings, which
 		// is what makes them per-project and what carries them into a saved file.
-		// TWO ROWS GET THEIR OWN TIP, and both answer a question the user is going to ask AT THAT BOX:
-		//   * ID ships blank while every other row shows a letter, which looks like an omission until
-		//     you know an ID already begins with its own automatic prefix (J1, L1).
-		//   * The gradient prints a '%' nobody typed (Tom: "This may need a tip or something. 'No %
-		//     here. It is automatic.'").
-		// A tip and not a parenthetical in the row's LABEL, which was the other option Tom offered:
-		// those label strings are shared with renderLabelsLegend(), so a parenthetical would print
-		// on the map legend too, where it is noise on a printed sheet.
+		// TWO ROWS GET THEIR OWN TIP, both answering a question the user asks AT THAT BOX: ID ships
+		// blank while every other row shows a letter (an ID already begins with its own automatic
+		// prefix, J1, L1), and the gradient prints a '%' nobody typed.
+		// A tip, NOT a parenthetical in the row's LABEL: those label strings are shared with
+		// renderLabelsLegend(), so a parenthetical would print on the map legend too.
+
 		function affixFor(group, key) {
 			return {
 				prefix: {
@@ -11958,14 +10557,11 @@ var EngCalcs = EngCalcs || {};
 				}
 			};
 		}
-		// **THE COLUMNS NEED NAMING NOW THAT THERE ARE FOUR OF THEM** (Tom, 2026-08-16: "We need
-		// column headings now"). Three unlabelled boxes were inferable from their contents -- a
-		// letter, a letter, a small integer; four are not, because the two integers look alike and
-		// mean entirely different things.
-		//
-		// Built from the same LPN_LABEL_COL_W/GAP the boxes use, so a heading cannot drift off its
-		// column. The name column is a flex spacer rather than a heading of its own: it is the row's
-		// subject, not a column of values.
+		// **THE COLUMNS NEED NAMING NOW THAT THERE ARE FOUR OF THEM.** Three unlabelled boxes are
+		// inferable from their contents; four are not, because the two integers look alike and mean
+		// entirely different things. Built from the same LPN_LABEL_COL_W/GAP the boxes use, so a
+		// heading cannot drift off its column. The name column is a flex spacer, not a heading: it is
+		// the row's subject, not a column of values.
 		function columnHeadings(box) {
 			var row = document.createElement('div'), lead = document.createElement('span');
 			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = '6px';
@@ -12029,27 +10625,21 @@ var EngCalcs = EngCalcs || {};
 		// clicking away, by Escape, by its own toolbar button, or by opening another menu/panel.
 		rebuildLabelsFields();
 	}
-	// The key that survives printing (Tom, 2026-07-30): the Labels popover itself is toolbar
-	// chrome (d-print-none), so a legend that only lived there would vanish on a printed page --
-	// this renders into #lpn_labels_legend, which is NOT d-print-none, and is kept live by being
-	// called from refreshLabelText() (every toggle change, solve, and unit switch already calls
-	// that). Hidden entirely when no field is toggled on, so it costs nothing by default.
-	// Since Task 333 it keys on the PREFIX/SUFFIX rather than on a colour swatch, so a set the user
-	// has changed is still readable by someone else looking at the sheet -- and it now works in
-	// greyscale, which the colour key never did. A field with neither affix (diameter, length, ID)
-	// is listed with a blank key: it is identified on the map by its unit and by its position in
-	// the stack, which is the same order this list is in.
+	// The key that survives printing: the Labels popover is toolbar chrome (d-print-none), so a
+	// legend living only there vanishes on a printed page. This renders into #lpn_labels_legend,
+	// which is NOT d-print-none, kept live by refreshLabelText(). Hidden when no field is toggled on.
+	// Since Task 333 it keys on the PREFIX/SUFFIX rather than a colour swatch, so a set the user has
+	// changed is still readable by someone else looking at the sheet, and it works in greyscale. A
+	// field with neither affix is listed with a blank key: it is identified on the map by its unit
+	// and its position in the stack, which is the order this list is in.
 	function renderLabelsLegend() {
 		var box = document.getElementById('lpn_labels_legend'); if (!box) { return; }
 		var pc = EngCalcs.pageConfig || {}, any = false;
 		box.innerHTML = '';
-		// One field per line (Tom, 2026-07-30: the original horizontal row read poorly) -- matches
-		// the vertical, upper-right-corner overlay this now renders into.
-		// Nodes/Links headings, the same two the Labels popover already carries (Tom, 2026-07-30) --
-		// without them the legend is one undifferentiated color list, and several field names (ID,
-		// Head, Flow/Demand) read plausibly as either kind of element. The heading is only emitted
-		// when that group actually has a visible field, so a nodes-only or links-only legend does
-		// not grow a lone heading over nothing.
+		// One field per line, matching the vertical upper-right overlay this renders into.
+		// Nodes/Links headings, the same two the Labels popover carries: without them several field
+		// names (ID, Head, Flow/Demand) read plausibly as either kind of element. Emitted only when
+		// that group has a visible field, so a nodes-only legend does not grow a heading over nothing.
 		function addGroup(defs, fieldSettings, headingText) {
 			var shown = defs.filter(function (f) { return fieldSettings[f[0]]; });
 			if (shown.length === 0) { return; }
@@ -12093,14 +10683,13 @@ var EngCalcs = EngCalcs || {};
 		openPanelAtAnchor(popup, evt.currentTarget.getBoundingClientRect());
 	}
 
-	// ---- gear/settings popover (Task 146 Phase 2, 2026-07-30) ----
-	// Deliberately separate from #lpn_popup/currentPopup, same reasoning as the Labels popover above:
-	// a static settings panel, not a per-element property sheet.
-	// Six positions: Tom's own framing is {top, middle, bottom} x {left, right}, not an 8-way compass
-	// rose -- a stacked legend block has no meaningful top-center/bottom-center variant. Style deltas
-	// only (top/bottom/left/right/transform); applyLegendPosition() below clears the unused axis on
-	// each call so switching, say, top-right to bottom-left doesn't leave a stale `top` alongside the
-	// new `bottom`.
+	// ---- gear/settings popover (Task 146 Phase 2) ----
+	// Deliberately separate from #lpn_popup/currentPopup, same reasoning as the Labels popover: a
+	// static settings panel, not a per-element property sheet.
+	// Six positions, {top, middle, bottom} x {left, right}, not an 8-way compass rose -- a stacked
+	// legend block has no meaningful top-center variant. Style deltas only; applyLegendPosition()
+	// clears the unused axis on each call, so top-right to bottom-left leaves no stale `top`.
+
 	var LEGEND_POSITIONS = {
 		'top-left': { top: '4px', bottom: '', left: '4px', right: '', transform: '' },
 		'top-right': { top: '4px', bottom: '', left: '', right: '4px', transform: '' },
@@ -12109,25 +10698,21 @@ var EngCalcs = EngCalcs || {};
 		'bottom-left': { top: '', bottom: '4px', left: '4px', right: '', transform: '' },
 		'bottom-right': { top: '', bottom: '4px', left: '', right: '4px', transform: '' }
 	};
-	// THE RULE IS "THE PAGE MUST NOT NEED SCROLLING". The canvas height is MEASURED: fill the
-	// window exactly, minus whatever is genuinely above and below the canvas in normal flow.
+	// THE RULE IS "THE PAGE MUST NOT NEED SCROLLING". The canvas height is MEASURED: fill the window
+	// exactly, minus whatever is genuinely above and below the canvas in normal flow.
 	//
-	// The trap it exists to avoid: #lpn_canvas carries `touch-action: none` so the app can own
-	// pan/zoom, so every touch landing on the canvas is swallowed and CANNOT scroll the page. A
-	// canvas taller than the viewport with content below it leaves no reachable page to touch.
-	// The rejected alternative is a flat fraction of innerHeight (it was 0.72): that reserves a
-	// strip of viewport in case something is out of reach, where measuring leaves nothing out of
-	// reach, and it self-corrects if a future change puts something tall back under the map.
+	// The trap it avoids: #lpn_canvas carries `touch-action: none` so the app can own pan/zoom, so
+	// every touch landing on the canvas is swallowed and CANNOT scroll the page -- a canvas taller
+	// than the viewport with content below it leaves no reachable page to touch. NOT a flat fraction
+	// of innerHeight: that reserves a strip of viewport in case something is out of reach, where
+	// measuring leaves nothing out of reach and self-corrects if something tall returns.
 	//
-	// THERE IS NO "MAP HEIGHT" SETTING -- this function does on every screen what the control was
-	// for. Its two lang keys are PARKED, not deleted (see lib/lang.ec.en.php); the tip is wrong
+	// THERE IS NO "MAP HEIGHT" SETTING. Its two lang keys are PARKED, not deleted; the tip is wrong
 	// and must be rewritten before the row is ever restored. A document carrying the stale
-	// `settings.mapHeight` needs no migration: applySaved() merges saved settings onto the
-	// defaults, so it rides along unread.
+	// `settings.mapHeight` needs no migration -- applySaved() merges onto the defaults.
 	// A FLOOR, not just a cap: something stays on screen when the window is too short for a real
-	// canvas. The floor does not decide whether the map is usable -- the WINDOW does. All it
-	// decides is whether such a window gets a small map that fits the page or a bigger one that
-	// pushes the status strip off the bottom. Not zero, which would leave nothing to aim at.
+	// canvas. It decides only whether such a window gets a small map that fits the page or a bigger
+	// one that pushes the status strip off the bottom. Not zero, which leaves nothing to aim at.
 	var LPN_MAP_MIN = 80;
 	// How much ordinary page sits BELOW the canvas, in document flow. The popovers do not count:
 	// every one of them is position:fixed and display:none, so they occupy no flow at all -- which
@@ -12135,20 +10720,16 @@ var EngCalcs = EngCalcs || {};
 	// stale the first time somebody added one.
 	function flowBelowMap() {
 		if (!svg || !document.body) { return 0; }
-		// **MEASURED FROM THE BODY'S OWN BOX, NOT FROM scrollHeight** -- and the difference is the
-		// whole bug Tom photographed on 2026-08-14 ("The bottom still isn't at the bottom").
+		// **MEASURED FROM THE BODY'S OWN BOX, NOT FROM scrollHeight.** documentElement.scrollHeight
+		// NEVER REPORTS LESS THAN THE VIEWPORT, so the moment the page becomes shorter than the
+		// window -- precisely what this feature is for -- `scrollHeight - canvasBottom` stops
+		// measuring content below the canvas and starts measuring the EMPTY SPACE below it.
+		// Subtracting that is circular: with below = vh - above - H it collapses to room = H - 8, so
+		// every recompute shrinks the map by the slack and re-creates the gap it is closing.
 		//
-		// documentElement.scrollHeight NEVER REPORTS LESS THAN THE VIEWPORT. So the moment the page
-		// became shorter than the window -- which is precisely what this whole feature is trying to
-		// achieve -- `scrollHeight - canvasBottom` stopped measuring content below the canvas and
-		// started measuring the EMPTY SPACE below it. Subtracting that is circular: with
-		// below = vh - above - H, the formula collapses to room = H - 8, so every recompute simply
-		// shrank the map by the slack and re-created the gap it was trying to close. It could never
-		// converge, because the gap was its own input.
-		//
-		// body's rect is the CONTENT box: it is not clamped to the viewport, and position:fixed
-		// popovers are out of flow so they never inflate it. That is what makes it the honest
-		// measure of "what is actually under the map".
+		// body's rect is the CONTENT box: not clamped to the viewport, and position:fixed popovers
+		// are out of flow so they never inflate it.
+
 		var b = document.body.getBoundingClientRect(), s = svg.getBoundingClientRect();
 		var below = b.bottom - s.bottom;
 		return below > 0 ? below : 0;
@@ -12159,26 +10740,19 @@ var EngCalcs = EngCalcs || {};
 		var docEl = document.documentElement;
 		var rect = svg.getBoundingClientRect();
 		var above = rect.top + (window.pageYOffset || docEl.scrollTop || 0);
-		// **NO SLACK CONSTANT. FLOOR INSTEAD** (Tom, 2026-08-15: *"Slack: I don't really like it. But
-		// I can live with it only if you insist."* — I do not insist, because it was never the right
-		// tool). The slack existed so a sub-pixel layout rounding could not leave the page one
-		// stubborn pixel scrollable, and it was 8px, then 2. But the only way rounding can leave the
-		// page scrollable is by rounding UP, and the fix for that is to round DOWN: `floor` can never
-		// return more room than there is. A guard that cannot overshoot needs no margin for
-		// overshooting, so the wasted strip below the map is gone rather than merely smaller.
+		// **NO SLACK CONSTANT. FLOOR INSTEAD.** A slack constant exists so sub-pixel layout rounding
+		// cannot leave the page one stubborn pixel scrollable -- but the only way rounding can do
+		// that is by rounding UP, and the fix is to round DOWN. `floor` can never return more room
+		// than there is, so no margin for overshooting is owed and no strip below the map is wasted.
 		var room = Math.floor(vh - above - flowBelowMap());
-		// **A MAP TALLER THAN THE WINDOW IS NEVER THE RIGHT ANSWER, AND THE OLD FORMULA COULD
-		// PRODUCE ONE** (guard added 2026-08-15 after Tom hit an unrecoverable state: *"The bottom
-		// of the map overflowed the bottom of the screen. And status line is gone. Reload doesn't
-		// fix."*). Every term above is a measurement, and `above` in particular goes NEGATIVE if the
-		// rect and the scroll offset ever disagree -- at which point room exceeds the viewport, the
-		// map runs off the bottom, and #lpn_map_footer goes with it because it is pinned to the
-		// map's own bottom edge. Worse, that state feeds itself: an overflowing map makes the page
-		// scrollable, and the next resize measures a scrolled page.
+		// **A MAP TALLER THAN THE WINDOW IS NEVER THE RIGHT ANSWER.** Every term above is a
+		// measurement, and `above` goes NEGATIVE if the rect and the scroll offset ever disagree --
+		// at which point room exceeds the viewport, the map runs off the bottom, and #lpn_map_footer
+		// goes with it. That state feeds itself: an overflowing map makes the page scrollable, and
+		// the next resize measures a scrolled page.
 		//
 		// The clamp costs nothing in the healthy case -- with above and below both >= 0 the formula
-		// already yields at most vh - 8 -- so it bites only when an input was wrong, which is
-		// exactly when a floor and a ceiling earn their keep.
+		// already yields at most vh - 8 -- so it bites only when an input was wrong.
 		room = Math.min(room, Math.floor(vh));
 		return Math.max(LPN_MAP_MIN, room);
 	}
@@ -12189,36 +10763,26 @@ var EngCalcs = EngCalcs || {};
 	// Half the delta on each axis keeps the view CENTRE where it was, which is what every map
 	// application does and what makes a resize feel like a window changing rather than a pan.
 	var LPN_MAP_HEIGHT_DEADBAND = 1;
-	// **A HEIGHT IS NOT APPLIED UNTIL ONE CAN BE CALCULATED** (Tom, 2026-08-15). Everything this
-	// measures -- the site navbar above the canvas, the footer below it -- is still moving while the
-	// page loads: stylesheets are applying, webfonts are swapping, Bootstrap has not collapsed the
-	// nav. A number derived then is not a measurement, it is a guess with arithmetic in front of it,
-	// and applying it makes the user watch the map jump when the truth arrives.
-	//
-	// `readyState === 'complete'` is the browser's own answer to "has everything finished", so it is
-	// the gate. Before it, the canvas keeps the height="0" it is authored with and the space is
-	// simply blank. The failsafe below covers the one way this could strand the page: a subresource
-	// that never finishes, which would otherwise mean a map that never appears.
+	// **A HEIGHT IS NOT APPLIED UNTIL ONE CAN BE CALCULATED.** Everything this measures -- the navbar
+	// above the canvas, the footer below it -- is still moving while the page loads, so a number
+	// derived then is a guess with arithmetic in front of it and applying it makes the user watch the
+	// map jump when the truth arrives. `readyState === 'complete'` is the gate; before it the canvas
+	// keeps the height="0" it is authored with. The failsafe below covers a subresource that never
+	// finishes, which would otherwise mean a map that never appears.
 	var mapSizingArmed = false;
-	// **THE CANVAS IS 10000px TALL UNTIL IT IS SIZED, AND A FIT AGAINST THAT IS NONSENSE** (Tom,
-	// 2026-08-15: *"Reload still zooms the current tab in drastically. Did you use a markup map
-	// height of..."* — yes, 10000, and this is the price of it). zoomExtent() divides the available
-	// HEIGHT by the drawing's height and takes the smaller of that and the width ratio. With 10000
-	// of height available the height term never wins, so the drawing is fitted to WIDTH ALONE, which
-	// on anything taller than it is wide is a drastic zoom-in.
+	// **THE CANVAS IS 10000px TALL UNTIL IT IS SIZED, AND A FIT AGAINST THAT IS NONSENSE.**
+	// zoomExtent() divides the available HEIGHT by the drawing's height and takes the smaller of
+	// that and the width ratio; with 10000 of height available the height term never wins, so the
+	// drawing is fitted to WIDTH ALONE -- a drastic zoom-in on anything taller than it is wide.
 	//
-	// The curtain is still right — see the markup comment for why 0 was worse — so the answer is
-	// that a fit asked for before the canvas has a real height is DEFERRED rather than answered
-	// wrongly. Remember that one was wanted, and do it when the
-	// missing fact arrives.
+	// The curtain is still right (see the markup comment for why 0 was worse), so a fit asked for
+	// before the canvas has a real height is DEFERRED rather than answered wrongly.
 	var mapSized = false, fitWhenSized = false, autoFitWhenSized = false, pendingRestore = null;
-	// **AN AUTOMATIC FIT MOVES THE BASELINE, IT DOES NOT DIRTY THE PROJECT.** Only when the project
-	// is already clean: if there are real unsaved edits, the asterisk stays, because the fit is not
-	// what put it there and clearing it would lose them silently.
-	//
-	// For a FILE project this claims the file contains a view it does not. That is deliberate and
-	// cheap: the view in question is one the app chose, not one the user did, so losing it on close
-	// costs nothing and prompting for it would be asking about a decision they never made.
+	// **AN AUTOMATIC FIT MOVES THE BASELINE, IT DOES NOT DIRTY THE PROJECT** -- and only when the
+	// project is already clean, or the asterisk would clear real unsaved edits silently. For a FILE
+	// project this claims the file contains a view it does not, which is deliberate and cheap: the
+	// view is one the app chose, so losing it on close costs nothing and prompting for it would ask
+	// about a decision the user never made.
 	function rebaseSignatureIfClean() {
 		var e = indexEntry(library.openId);
 		if (e && !e.dirty) { e.savedSig = docSignature(); saveIndex(); }
@@ -12261,28 +10825,21 @@ var EngCalcs = EngCalcs || {};
 		// re-applying a height that differs by half a pixel would move the drawing for no reason a
 		// reader could name.
 		if (Math.abs(h - before.height) >= LPN_MAP_HEIGHT_DEADBAND) { svg.setAttribute('height', h); }
-		// **RE-CENTRED FROM AN ANCHOR, NOT BY ACCUMULATING DELTAS**, and against the size at the END
-		// of the LAST call rather than the start of this one. Three of Tom's observations on
-		// 2026-08-15 were one design fault between them:
+		// **RE-CENTRED FROM AN ANCHOR, AGAINST THE SIZE AT THE END OF THE LAST CALL** rather than the
+		// start of this one. The width is CSS (`width="100%"`), so by the time a resize handler runs
+		// the browser has applied it and there is no delta left to observe -- hence remembering the
+		// box from last time. A resize that is not OBSERVED is not corrected for, and the shortfall
+		// accumulates across a drag firing dozens of events until the map disappears left.
 		//
-		//   (1) *"left offset/margin is fixed when changing window width; arguably staying centered
-		//       would be better."* The width is CSS (`width="100%"`), so by the time a resize handler
-		//       runs the browser has already applied it and there is no delta left to observe --
-		//       and the old code only looked at all when the HEIGHT changed. Hence: remember the box
-		//       from last time.
-		//   (2) *"very active resizing gradually pans the map until it disappears left."* Same cause:
-		//       a resize that was not OBSERVED was not corrected for, and the shortfall accumulated
-		//       across a drag that fires dozens of events. **The anchor form is not what fixes this
-		//       -- a mutation test proved that, and the note is worth keeping.** `tx = W/2 - s*cx`
-		//       with `cx` from the old box is algebraically identical to `tx += (W - Wold)/2`; what
-		//       fixes the drift is that the baseline is now the box as of the LAST CALL, so every
-		//       change is seen exactly once. The absolute form is kept because it says what it means
-		//       and cannot be half-applied, not because it computes anything different.
-		//   (3) *"same view stays centered when changing height UNLESS height is less than ~100px,
-		//       at which point the map stops centering and starts cropping from the bottom."* That
-		//       one is LPN_MAP_MIN doing its job: past the floor the canvas stops shrinking, so
-		//       there is no size change to re-centre against and the page scrolls instead. Left
-		//       alone deliberately -- see the floor's own comment.
+		// **The anchor form is not what fixes the drift -- a mutation test proved that.**
+		// `tx = W/2 - s*cx` with `cx` from the old box is algebraically identical to
+		// `tx += (W - Wold)/2`; what fixes it is that the baseline is the box as of the LAST CALL, so
+		// every change is seen exactly once. The absolute form is kept because it says what it means
+		// and cannot be half-applied.
+		//
+		// Below LPN_MAP_MIN the map stops centring and crops from the bottom: past the floor the
+		// canvas stops shrinking, so there is no size change to re-centre against. Left alone.
+
 		var now = svg.getBoundingClientRect(), sc = state.s || 1, cx, cy;
 		if (lastMapBox && (Math.abs(now.width - lastMapBox.w) > 0.5 ||
 				Math.abs(now.height - lastMapBox.h) > 0.5)) {
@@ -12297,19 +10854,15 @@ var EngCalcs = EngCalcs || {};
 		before = now;
 		// **IF IT STILL RUNS OFF THE BOTTOM, MEASURE ONCE MORE AND BELIEVE THE SECOND ANSWER.**
 		//
-		// Tom's staged report, 2026-08-15, is what this is for: *"(1) map bottom is about half-way
-		// up from screen bottom and page is partway loaded. (2) map bottom is below screen bottom
-		// and page is finished loading."* Every term in the formula is a measurement of a page that
-		// is still assembling itself -- the site's own navbar above the canvas, and the footer below
-		// it, both change height as Bootstrap's CSS and the webfonts land. A height computed at
-		// stage 1 is simply the wrong answer by stage 2, and the clamp cannot save it: the clamp
-		// bounds the HEIGHT to the window, while what went wrong is WHERE THE MAP STARTS.
+		// Every term in the formula measures a page still assembling itself -- the navbar above the
+		// canvas and the footer below it both change height as Bootstrap's CSS and the webfonts land.
+		// A height computed partway through loading is the wrong answer once loading finishes, and
+		// the clamp cannot save it: the clamp bounds the HEIGHT to the window, while what went wrong
+		// is WHERE THE MAP STARTS.
 		//
-		// So: one bounded re-measure, never a loop (see the note on applyMapHeight above). By the
-		// time this runs the new height has been applied and the page has re-laid out around it, so
-		// `above` and `below` are finally being read from the arrangement the user is looking at.
-		// The floor is exempt because a canvas at LPN_MAP_MIN is allowed to overflow -- that
-		// overflow is a decision, and re-measuring would only re-derive the same number.
+		// One bounded re-measure, NEVER a loop. By the time this runs the new height has been applied
+		// and the page re-laid out around it. The floor is exempt because a canvas at LPN_MAP_MIN is
+		// allowed to overflow -- that overflow is a decision.
 		var vh = window.innerHeight || 800;
 		if (!secondPass && before.bottom > vh + 1 && before.height > LPN_MAP_MIN) {
 			applyMapHeight(true);
@@ -12325,14 +10878,12 @@ var EngCalcs = EngCalcs || {};
 		box.style.left = pos.left; box.style.right = pos.right;
 		box.style.transform = pos.transform;
 	}
-	// Re-applies the current effectiveFontSize() to every already-built text element and reflows
-	// whatever depends on it (multi-line spacing, extrema ticks, a Text label's own width/leader) --
-	// needed both when the user edits Text size directly and whenever state.s changes
-	// (zoomAbout()/zoomExtent() call onZoomChanged() below), since a pixel size is by definition
-	// state.s-dependent while every other geometry in this file is left to the SVG's own transform.
-	// The user's own Text labels only: re-apply the font size AND re-measure. Called where a Text
-	// label's content or size really changed. The zoom path does not use it -- it sets font sizes
-	// without measuring, because a measured width is banked in pixels and rescaled on read.
+	// Re-applies the current effectiveFontSize() to every already-built text element and reflows what
+	// depends on it -- needed when the user edits Text size and whenever state.s changes, since a
+	// pixel size is state.s-dependent while every other geometry here is left to the SVG's transform.
+	// The user's own Text labels only: re-apply the font size AND re-measure, where a Text label's
+	// content or size really changed. The ZOOM path does not use it -- it sets font sizes without
+	// measuring, because a measured width is banked in pixels and rescaled on read.
 	function refreshTextLabelSizes() {
 		Object.keys(labelEls).forEach(function (id) {
 			var le = labelEls[id], lb = labelById(id);
@@ -12341,17 +10892,16 @@ var EngCalcs = EngCalcs || {};
 			updateLabelGeometry(id);
 		});
 	}
-	// **A ZOOM CHANGES SIZES, NOT CONTENT** (2026-08-15). This used to end in refreshLabelText(),
-	// which recomposes every node's and every link's text, rebuilds its tspans and re-measures each
-	// one with getBBox() -- ~220 forced synchronous layouts on Net3, per wheel notch, to redraw
-	// glyphs that had not changed. Tom measured the result: a quarter of a second per scroll zoom.
+	// **A ZOOM CHANGES SIZES, NOT CONTENT.** Do NOT end this in refreshLabelText(), which recomposes
+	// every node's and link's text, rebuilds its tspans and re-measures each with getBBox() -- ~220
+	// forced synchronous layouts on Net3 per wheel notch, measured at a quarter of a second.
 	//
-	// Nothing about the CONTENT depends on the scale. Two things did, and both are now gone:
-	//   * the tspan `dy` spacing, which is expressed in `em` and follows the font-size by itself;
-	//   * each label's measured width, which is banked in PIXELS and divided by the scale on read
+	// Nothing about the CONTENT depends on the scale. The two things that did are handled elsewhere:
+	//   * the tspan `dy` spacing, expressed in `em`, which follows the font-size by itself;
+	//   * each label's measured width, banked in PIXELS and divided by the scale on read
 	//     (labelBoxWidth / textLabelWidth).
 	// So a zoom sets font sizes, republishes the symbol custom properties, and re-lays-out. The
-	// content path is left for the things that actually change content: a solve, a toggle, an edit.
+	// content path is left for what actually changes content: a solve, a toggle, an edit.
 	function refreshFontSizes() {
 		var fs = effectiveFontSize() + 'px';
 		Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
@@ -12366,45 +10916,35 @@ var EngCalcs = EngCalcs || {};
 		refreshSymbolSizes(); // publishes --lpn-sym / --lpn-lw, both of which are state.s-dependent too
 		relayoutLabels();     // positions only: no recompose, no re-measure
 	}
-	// Called from zoomAbout()/zoomExtent(). NO LONGER CONDITIONAL (Task 331): with text, symbols and
-	// pipe width all specified in screen pixels, every one of them is state.s-dependent, so a zoom
-	// always invalidates all three. The old 'map' fast path -- where text scaled for free via the
-	// SVG's own transform and this was a no-op -- went away with map-unit sizing itself.
-	// refreshFontSizes() calls refreshSymbolSizes(), which publishes --lpn-sym and --lpn-lw, so one
-	// call still covers the lot.
-	// Visible width of the map in MODEL LENGTH UNITS -- the quantity Tom named as the control:
-	// *"you specify zoom threshold in terms of how many units wide the map is"* (2026-08-14). It is
-	// the honest way to say "when should this be readable", because it is a statement about the
-	// DRAWING rather than about the viewport: 400 ft across means the same thing on a phone and on a
-	// 32-inch monitor, whereas a zoom factor or a pixels-per-foot ratio does not.
+	// Called from zoomAbout()/zoomExtent(), unconditionally: with text, symbols and pipe width all in
+	// screen pixels every one is state.s-dependent, so a zoom always invalidates all three.
+	// refreshFontSizes() calls refreshSymbolSizes(), which publishes --lpn-sym and --lpn-lw.
+	// Visible width of the map in MODEL LENGTH UNITS -- the honest way to say "when should this be
+	// readable", because it is a statement about the DRAWING rather than the viewport: 400 ft across
+	// means the same thing on a phone and on a 32-inch monitor, where a zoom factor or a
+	// pixels-per-foot ratio does not.
+
 	function visibleMapWidth() {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0;
 		return w / (state.s || 1);
 	}
 	// GENERATED ANNOTATION only -- the right line is annotation, not "labels", and the flow arrow is
 	// what shows it. An arrow is a symbol by construction and an annotation by purpose: nobody drew
-	// it, it exists to be read, and zoomed out it is noise over the network whose shape you are
-	// trying to see. A node/link data label is the same kind of thing, so suppressing either costs
-	// the user nothing they authored. Each label's leader is built through
-	// annotationEl() beside it, so both pieces of one assembly hide together, the arrow hides
-	// with them, and the network itself never does. Full rule in css/engcalcs.css by the selector.
+	// it, it exists to be read, and zoomed out it is noise over the network. Each label's leader is
+	// built through annotationEl() beside it, so both pieces of one assembly hide together, the
+	// arrow hides with them, and the network itself never does.
 	//
 	// visibility rather than display, so this composes with the leader's own show/hide logic instead
-	// of fighting it -- a leader that is display:none for its own reasons stays gone, and one that is
-	// visible is merely made invisible. One class on the <svg>, so a zoom step costs nothing per
-	// element however large the network is.
+	// of fighting it. One class on the <svg>, so a zoom step costs nothing per element.
 	//
-	// A TEXT LABEL GETS ITS OWN THRESHOLD, SCALED BY ITS OWN SIZE. A user typed those words and
-	// chose that spot, so it must not vanish under a threshold that never mentions Text labels --
-	// but exempting Text labels entirely is too blunt: a title block and a small note are both
-	// authored and do not deserve the same survival, exactly as sheet lettering works (the drawing
-	// title is legible from across the room, the callouts are not). So the threshold is
-	// `labelMaxWidth x lb.sizeMult`: a label at 3x survives to 3x the map width, one at 1x has
-	// exactly the data labels' threshold. It falls out of a property already in the document, so
-	// there is no new per-label setting.
+	// A TEXT LABEL GETS ITS OWN THRESHOLD, SCALED BY ITS OWN SIZE. Exempting Text labels entirely is
+	// too blunt: a title block and a small note are both authored and do not deserve the same
+	// survival, exactly as sheet lettering works. So the threshold is `labelMaxWidth x lb.sizeMult`
+	// -- a label at 3x survives to 3x the map width, one at 1x has the data labels' threshold -- and
+	// it falls out of a property already in the document, so there is no new per-label setting.
 	//
 	// Per label, so it cannot ride the one class on the <svg>: doc.labels is the user's own Text
-	// labels only (typically a handful), never the per-element data labels, so the loop is cheap.
+	// labels only, typically a handful, so the loop is cheap.
 	function applyLabelVisibility() {
 		var lim = settings.labelMaxWidth,
 			on = typeof lim === 'number' && lim > 0,
@@ -12420,15 +10960,12 @@ var EngCalcs = EngCalcs || {};
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id];
 			if (!le) { return; }
-			// AND ONE LABEL MAY OPT OUT ENTIRELY (Tom, 2026-08-15: *"Is it possible to have a 'Show
-			// always' checkbox in the text properties box? The non-customizable way to do this would
-			// be to show always the largest text, but we don't want to do that."*). He is right that
-			// the automatic version is the wrong shape: "the biggest one survives" makes a legend or
-			// a north arrow compete on font size for a property it should just declare, and it
+			// AND ONE LABEL MAY OPT OUT ENTIRELY. NOT "the biggest one survives": that makes a legend
+			// or a north arrow compete on font size for a property it should just declare, and it
 			// silently changes which label is permanent whenever somebody resizes another one.
 			// A label switched OFF in this scenario is not there at all, and that beats every other
-			// rule here -- including "Always show this label", which is an answer to the zoom
-			// threshold and says nothing about membership (Task 407).
+			// rule here -- including "Always show this label", which answers the zoom threshold and
+			// says nothing about membership (Task 407).
 			var mult = +lb.sizeMult > 0 ? +lb.sizeMult : 1,
 				gone = !isActive(lb) || (on && !lb.alwaysShow && vw > lim * mult);
 			[le.text, le.leader].forEach(function (e) {
@@ -12442,20 +10979,15 @@ var EngCalcs = EngCalcs || {};
 	function applyMaskLabels() {
 		if (svg) { svg.classList.toggle('lpn-masks-off', settings.maskLabels === false); }
 	}
-	// **A ZOOM STEP DOES NOT REBUILD LABELS NOBODY CAN SEE** (Tom, 2026-08-15: *"the Net3 example is
-	// a little sluggish to zoom even when labels are all hidden. Is recalc triggering on zoom and can
-	// be turned off? Maybe labels are being handled at all zoom levels."* — the second guess was the
-	// right one, and no, nothing hydraulic runs here: `scheduleSolve()` is never called from a zoom).
+	// **A ZOOM STEP DOES NOT REBUILD LABELS NOBODY CAN SEE.** The full path is refreshFontSizes() ->
+	// refreshLabelText(), which recomposes every node's and link's text, re-measures each with
+	// getBBox() and runs four iterations of the collision relaxation -- ~200 elements of work per
+	// wheel notch on Net3, to update text `.lpn-labels-hidden` is not drawing.
 	//
-	// The full path is refreshFontSizes() -> refreshLabelText(), which recomposes every node's and
-	// every link's text, re-measures each one with getBBox(), and then runs four iterations of the
-	// collision relaxation over the lot. On Net3 that is ~200 elements of work per wheel notch,
-	// every notch, to update text that `.lpn-labels-hidden` is not drawing.
-	//
-	// So when annotation is hidden and STAYS hidden, only two things still change with the zoom:
-	// the symbol/stroke custom properties, and the user's own Text labels, which have their own
-	// size-scaled threshold and may still be on screen. The transition in either direction takes
-	// the full path, so nothing comes back stale.
+	// So when annotation is hidden and STAYS hidden, only two things change with the zoom: the
+	// symbol/stroke custom properties, and the user's own Text labels, which have their own
+	// size-scaled threshold. The transition in either direction takes the full path, so nothing comes
+	// back stale. (Nothing hydraulic runs here either -- scheduleSolve() is never called from a zoom.)
 	function onZoomChanged() {
 		var wasHidden = dataLabelsHidden;
 		applyLabelVisibility();
@@ -12490,34 +11022,21 @@ var EngCalcs = EngCalcs || {};
 	// non-empty -- a prefix becomes the leading substring of every future auto-generated ID for that
 	// element type, so the same rules that keep a renamed ID EPANET-legal apply here too.
 	function validatePrefix(p) { return !!p && !/[\s'"]/.test(p); }
-	// Extracted from wireSettingsPopup() (Tom, 2026-07-30: "Restore defaults" button) so the field
-	// list can be rebuilt in place, showing the reset values, without re-wiring the close button.
-	// The panel outgrew a flat list once every input got a default (Tom, 2026-07-30), so it is now
-	// three collapsible sections plus a short always-visible tail.
-	// ACCORDION, NOT TABS: this is a narrow floating panel over a map, on a page used on phones.
-	// Tabs need horizontal room they do not have, truncate their labels when they do not get it,
-	// force a "which tab opens first" decision, and show only one group at a time. Sections stack
-	// vertically, work at any width, degrade to a plain scrolling list, and let two be open at once.
-	// Open/closed state lives in settings.sectionsOpen, so it survives both this rebuild and the
-	// session -- a user who lives in Default inputs is not re-opening it every time.
-	// ORDER is Tom's: the three groups first, then the uncollapsed rows, then Reset. The tail rows
-	// deliberately carry NO heading of their own rather than sitting under an "Other" that alone
-	// cannot collapse -- a heading that behaves unlike every other heading in the panel misrepresents
-	// the affordance. The old "Solver" heading is gone with them: km was never a solver setting (it
-	// is a default input) and tolerance was the only genuine one.
+	// Split out of wireSettingsPopup() so the field list can be rebuilt in place, showing the reset
+	// values, without re-wiring the close button. Three collapsible sections plus a short tail.
+	// ACCORDION, NOT TABS: a narrow floating panel over a map. Tabs need horizontal room they do not
+	// have, truncate their labels, force a "which tab opens first" decision, and show only one group
+	// at a time. Open/closed state lives in settings.sectionsOpen and survives the session.
+	// ORDER: the three groups, then the uncollapsed rows, then Reset. The tail rows carry NO heading
+	// rather than sitting under an "Other" that alone cannot collapse.
+
 	// ---- Page-title visibility (ROADMAP Task 289) ----
-	// THE FIRST SETTING ON THIS PAGE THAT IS NOT PART OF THE PROJECT, and the reason it is not:
-	// Task 263 made everything here project-scoped because a bare number is meaningless without
-	// the units it was typed in -- "imagine opening a 400 diameter pipe into an inch browser!"
-	// That reasoning does not reach this one. Whether the heading above the drawing is showing is
-	// not data about the network; it is about the window the person is sitting in front of, and
-	// carrying it inside a project file would mean a colleague opening your work inherits your
-	// screen preference. So it lives in localStorage, per browser, and serializeProject() must
-	// never learn about it.
-	//
-	// Tom, 2026-08-12, on the label: *"I say 'Saved in this calculator' even though it is
-	// literally in the browser; it affects only this calculator."* Right -- the user-facing
-	// distinction that matters is project vs everywhere-else, not localStorage vs a file.
+	// THE FIRST SETTING ON THIS PAGE THAT IS NOT PART OF THE PROJECT. Whether the heading above the
+	// drawing is showing is about the window the person is sitting in front of, and carrying it
+	// inside a project file would make a colleague opening your work inherit your screen preference.
+	// It lives in localStorage, per browser, and serializeProject() must never learn about it. The
+	// label says "Saved in this calculator": the distinction that matters is project vs
+	// everywhere-else, not localStorage vs a file.
 	var PAGE_TITLES_KEY = 'lpn_show_titles';
 	function pageTitlesShown() {
 		try { return localStorage.getItem(PAGE_TITLES_KEY) !== '0'; } catch (e) { return true; }
@@ -12597,23 +11116,19 @@ var EngCalcs = EngCalcs || {};
 			return body;
 		}
 		// Trailing zeros stripped rather than the popup's fixed toFixed(4): a default is a round
-		// number the user typed ("8", "150"), and showing it back as 8.0000 makes the panel look
-		// like a readout of a computed value instead of the field they set.
+		// number the user typed, and showing it back as 8.0000 makes the panel look like a readout.
 		// `+v` FIRST, and it is load-bearing: defaultSettings() leaves settings.defaults full of
 		// nulls until seedDefaultInputs() fills them, and any path that rebuilds this panel before
-		// that has run hands a null in here. The pre-Task-263 code multiplied by a unit factor on the
-		// way in, so `null * f` coerced to 0 and the null never surfaced; dropping the factor dropped
-		// the accidental coercion with it and this threw. Coerce on purpose now, rather than rely on
-		// arithmetic that is no longer there. (Caught by popup-tips-harness.js, which calls
-		// rebuildSettingsFields() directly -- exactly the unseeded path.)
+		// that has run hands a null in here. Coerce ON PURPOSE rather than relying on arithmetic
+		// (a unit factor once made `null * f` coerce to 0) that is no longer there. Caught by
+		// popup-tips-harness.js, which calls rebuildSettingsFields() directly.
+
 		function trimNum(v) { return String(+(+v).toFixed(6)); }
-		// Unit-bearing rows show and accept the value AS DECLARED, the same convention
-		// unitNumberField() uses in the element popup (Task 263) -- no factor either way. NO
-		// scheduleSolve(): changing a default alters nothing that already exists.
-		// EngCalcs.pageCalculator re-runs this whole rebuild on a unit switch, so the unit named in
-		// the label is always the one the number is in. A default therefore REINTERPRETS along with
-		// everything else -- a default diameter of 8 becomes 8 mm -- which is the point of the ban.
-		// unitId null means dimensionless (roughness, K) -- no unit in the label.
+		// Unit-bearing rows show and accept the value AS DECLARED, the convention unitNumberField()
+		// uses in the element popup (Task 263) -- no factor either way. NO scheduleSolve(): changing
+		// a default alters nothing that already exists. EngCalcs.pageCalculator re-runs this rebuild
+		// on a unit switch, so a default REINTERPRETS along with everything else -- a default diameter
+		// of 8 becomes 8 mm. unitId null means dimensionless (roughness, K).
 		function defaultRow(target, labelText, unitId, key, isValid) {
 			var input = document.createElement('input');
 			input.type = 'number'; input.step = 'any';
@@ -12628,32 +11143,23 @@ var EngCalcs = EngCalcs || {};
 		function any() { return true; }
 		function positive(v) { return v > 0; }
 		function nonNegative(v) { return v >= 0; }
-		// ---- 0. What this whole panel IS (Tom, 2026-08-10) ----
-		// Verified before writing it: every control below, plus the Units block adopted above and
-		// the Labels popover, is carried by serializeProject() (`settings`, `labelSettings`,
-		// `units`, `backdrop`). So the sentence is true of the panel entire, with no exceptions to
-		// hedge. It is the line that makes the New User checklist's template flow make sense --
-		// there is no "save as my defaults" here because saving the PROJECT is that (CLAUDE.md,
-		// "there are no browser units, only project units"), and nothing said so on screen.
-		// The one thing not carried is the map viewport: zoom and pan re-fit on load. That is not
-		// a setting and is not in this panel, so it does not qualify the claim.
+		// ---- 0. What this whole panel IS ----
+		// Every control below, plus the Units block above and the Labels popover, is carried by
+		// serializeProject(), so the sentence is true of the panel entire. There is no "save as my
+		// defaults" here because saving the PROJECT is that (CLAUDE.md: "there are no browser units,
+		// only project units"), and nothing said so on screen.
 		groupHeading(pc.lpn_settings_scope_project || 'Project settings');
 		// ---- 1. ID prefixes ----
 		var idBody = section('idPrefixes', pc.lpn_settings_id_prefixes || 'ID prefixes');
-		// Reuses the existing Add-tool labels (Junction/Reservoir/Pipe/Pump) per CLAUDE.md's
-		// concept-level label reuse rule -- these already name the element type, no new key needed.
-		// TEXT ('T') IS DELIBERATELY ABSENT (Tom, 2026-07-30, asking "User never sees Text ID... is
-		// this future-proof or YAGNI?"). Verified: openLabelPopup() renders Text/Size/X/Y with no ID
-		// field, text elements are not in the Labels popover's ID checkbox (node/link only), and no
-		// report lists them -- a text element's ID is unreachable from every screen in the app. So
-		// the row was not merely unused but VISIBLY inert: four rows here do something and a fifth
-		// did nothing, with no way to tell which from looking. settings.idPrefixes.T and nextId.T
-		// both stay -- IDs must still be generated and unique -- so this removes the control, not
-		// the concept. Restore the row (one array entry) if Task 146.05's element browser ever
-		// lists text elements the way EPANET's own Browser does.
-		// Same order as the Insert menu and the toolbar -- see openInsertMenu(). A valve has had its
-		// own prefix and its own counter since Task 248 phase 2; it is a LINK, like a pipe and a
-		// pump, and the three of them are keyed L, P and V.
+		// Reuses the existing Add-tool labels per CLAUDE.md's concept-level label reuse rule.
+		// TEXT IS DELIBERATELY ABSENT: a text element's ID is unreachable from every screen in the
+		// app -- openLabelPopup() renders Text/Size/X/Y with no ID field, text is not in the Labels
+		// popover's ID checkbox, and no report lists them -- so the row would be VISIBLY inert beside
+		// four that work. settings.idPrefixes.T and nextId.T both stay, since IDs must still be
+		// generated and unique; this removes the control, not the concept. Restore the row (one array
+		// entry) if an element browser ever lists text elements.
+		// Same order as the Insert menu and the toolbar. A valve is a LINK, like a pipe and a pump,
+		// and the three are keyed L, P and V.
 		[
 			['J', pc.lpn_tool_add_junction || 'Junction'],
 			['R', pc.lpn_tool_add_reservoir || 'Reservoir'],
@@ -12711,23 +11217,15 @@ var EngCalcs = EngCalcs || {};
 		// No Length row, deliberately (Tom, 2026-07-30): lenAuto derives a pipe's length from the
 		// drawn geometry, so any default here would be overwritten the moment the pipe is drawn.
 		defaultRow(defBody, pc.lpn_field_km || 'Minor (local) loss coefficient, k', null, 'k', nonNegative);
-		// ---- push defaults to existing elements (Tom, 2026-07-30) ----
-		// A HARD push, deliberately. The gentler "update only elements still holding the OLD
-		// default" was designed and then rejected: it cannot tell a deliberately-typed 6 from an
-		// untouched 6, so it is not non-destructive, it is SILENTLY destructive -- worse than an
-		// overwrite you watched happen. And in the case it exists for (Tom's "draw it all up, then
-		// think about numbers" crowd -- really an oops recovery) every element still holds the old
-		// default anyway, so it would degenerate into a hard push with extra machinery.
-		// SCOPED BY THE DISPLAYED LABELS, in Tom's words "only the displayed values will be pushed":
-		// the Labels panel is already a per-property checkbox list and is already on screen, so the
-		// user's own current view defines the blast radius and this tool needs no property picker of
-		// its own. That same mechanism is wanted by ROADMAP Task 185 (Match/Copy) and Task 184's
-		// push-to-scenarios, which is why it is worth reusing rather than inventing a third picker.
-		// Result fields (flow, velocity, pressure, head loss, gradient) have no default at all, so
+		// ---- push defaults to existing elements ----
+		// A HARD push, deliberately. "Update only elements still holding the OLD default" cannot tell
+		// a deliberately-typed 6 from an untouched 6, so it is SILENTLY destructive rather than
+		// non-destructive.
+		// SCOPED BY THE DISPLAYED LABELS: the Labels panel is already a per-property checkbox list on
+		// screen, so the user's own view defines the blast radius. Result fields have no default, so
 		// the effective filter is "displayed INTERSECT has-a-default".
-		// TASK 184 LANDED AND THIS STAYED A BASE-LEVEL ACTION, exactly as this note required: run
-		// inside a scenario it would mint an override on every element at once, which is never
-		// what anyone means by it. The guard is in the click handler below.
+		// A BASE-LEVEL ACTION: inside a scenario it would mint an override on every element at once.
+
 		var pushSpecs = pushSpecList();
 		note(defBody, pc.lpn_settings_push_note || 'Only the properties whose labels are showing right now are applied.');
 		var pushBtn = document.createElement('button');
@@ -12751,15 +11249,13 @@ var EngCalcs = EngCalcs || {};
 				alert(pc.lpn_push_none_displayed || 'No default input is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.');
 				return;
 			}
-			// TWO different counts, because "nothing to do" has two different causes and they need
-			// different messages (Tom, 2026-07-30 -- "no count if no change because already at that
-			// value"). `carriers` is how many elements the properties even apply to; `targets` is
-			// how many would ACTUALLY change. Reporting carriers would overstate the action --
-			// "Elements: 40" when 38 already hold the value reads as a much bigger swing than it is,
-			// and after a push the same button would still offer to change 40 things.
-			// Exact === is the right comparison, not an epsilon: a value that came from this default
-			// was assigned from this same number, so it is bit-identical. An epsilon here would
-			// instead start silently skipping elements a user had deliberately set very close by.
+			// TWO different counts, because "nothing to do" has two causes needing different
+			// messages. `carriers` is how many elements the properties apply to; `targets` is how
+			// many would ACTUALLY change. Reporting carriers overstates the action -- "Elements: 40"
+			// when 38 already hold the value.
+			// Exact ===, not an epsilon: a value that came from this default was assigned from this
+			// same number, so it is bit-identical, and an epsilon would silently skip elements a user
+			// had deliberately set very close by.
 			function counts(list, group) {
 				var carriers = 0, changing = 0;
 				list.forEach(function (el) {
@@ -12872,13 +11368,11 @@ var EngCalcs = EngCalcs || {};
 		});
 		row(mapBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput);
 		// ---- Scale-dependent label visibility ----
-		// THE CONTROL IS A CAPTURE BUTTON, NOT JUST A NUMBER, AND THAT IS THE WHOLE USABILITY OF IT.
-		// The threshold is a width in model length units, and no default is meaningful across
-		// networks that are 400 ft and 40 miles across -- so asking someone to type one blind asks
-		// them to predict a number they can only recognise by seeing it. Instead: zoom until the
-		// labels are as sparse as you want them, press the button, and the current view's width
-		// becomes the threshold. The number stays editable for anyone who does know what they want.
-		// Blank means always show, which is both the default and the pre-Task-331 behaviour.
+		// THE CONTROL IS A CAPTURE BUTTON, NOT JUST A NUMBER. The threshold is a width in model
+		// length units and no default is meaningful across networks 400 ft and 40 miles across, so
+		// typing one blind asks the user to predict a number they can only recognise by seeing it.
+		// Zoom until the labels are as sparse as you want, press the button, and the current view's
+		// width becomes the threshold. The number stays editable; blank means always show.
 		var lmwWrap = document.createElement('span');
 		var lmwInput = document.createElement('input');
 		lmwInput.type = 'number'; lmwInput.step = 'any'; lmwInput.min = '0';
@@ -13095,16 +11589,11 @@ var EngCalcs = EngCalcs || {};
 			btnWrap.appendChild(clearBtn);
 			colBody.appendChild(btnWrap);
 		});
-		// The "Saving to a file" section is GONE (Task 211). It held exactly one control -- how often
-		// the open project was written back to its file -- and nothing is written to a file on a timer
-		// any more, so there is no interval to set. Tom asked why the 60-180 s range existed at all;
-		// the honest answer was that one number was doing three jobs (write interval, lock heartbeat,
-		// and the how-long-before-a-colleague-may-take-over threshold), so the range was protecting a
-		// coupling rather than the user. Splitting those apart removed the setting instead of widening
-		// it, which is the better answer to the question he actually asked.
-		// ---- units (Tom, 2026-08-08) ----
-		// Last section before the panel's foot, because a unit system is set once and then left
-		// alone -- it belongs with the settings, but not above the ones people actually revisit.
+		// There is no "Saving to a file" section (Task 211): nothing is written to a file on a timer.
+		// Its 60-180 s range protected a coupling rather than the user -- one number doing three jobs
+		// (write interval, lock heartbeat, takeover threshold).
+		// ---- units ----
+		// Last section before the panel's foot, because a unit system is set once and left alone.
 		if (unitsBlock) {
 			var unitsBody = section('units', pc.lpn_view_units || 'Units');
 			// The "[Hide this line]" collapse link is a leftover from when this row was permanent
@@ -13114,27 +11603,20 @@ var EngCalcs = EngCalcs || {};
 			if (hideLink) { hideLink.parentNode.removeChild(hideLink); }
 			unitsBody.appendChild(unitsBlock);
 		}
-		// ---- computation (Tom, 2026-08-10) ----
-		// Tolerance and the EPANET engine toggle sat loose in the headingless tail, which was right
-		// while tolerance was the ONE genuine solver setting and a heading over a single row would
-		// have been ceremony. With two of them the tail had become an unnamed group of settings
-		// sitting among the panel's ACTIONS (Restore defaults, Clear calculator), and that is a
-		// different thing: a reader could not tell where the settings stopped. So they get the
-		// section every other group here has, and the tail goes back to holding only buttons.
-		//
-		// "Computation", not "Solver": the two rows are how the answer is computed and how close is
-		// close enough -- and "solver" is jargon for the internals, while what the user is choosing
-		// is the arithmetic they get.
+		// ---- computation ----
+		// Tolerance and the EPANET engine toggle get their own section rather than sitting loose in
+		// the tail among the panel's ACTIONS, where a reader cannot tell where the settings stop.
+		// "Computation", not "Solver": "solver" is jargon for the internals, while what the user is
+		// choosing is the arithmetic they get.
+
 		var compBody = section('computation', pc.lpn_settings_computation || 'Computation');
 		// ---- friction method (ROADMAP Task 271) ----
-		// FIRST row in Computation, above tolerance and the engine toggle, because it is the only
-		// one of the three that changes the ANSWER's physics rather than how precisely or by whose
-		// code it is reached. It lives under "Project settings" (the heading above) and not
-		// "Calculator settings": the method decides what every roughness number in this document
-		// MEANS, so it belongs to the document, exactly as the units do.
-		//
-		// Every label is borrowed from bpn_ -- bpn_method, bpn_method_hw/_dw/_manning are already
-		// translated everywhere this page is, so the control costs no new keys.
+		// FIRST row in Computation, above tolerance and the engine toggle: it is the only one of the
+		// three that changes the ANSWER's physics rather than how precisely or by whose code it is
+		// reached. Under "Project settings", not "Calculator settings" -- the method decides what
+		// every roughness number in this document MEANS, so it belongs to the document, as units do.
+		// Every label is borrowed from bpn_, so the control costs no new keys.
+
 		var methodSelect = document.createElement('select');
 		[
 			['hw', pc.bpn_method_hw || 'Hazen-Williams'],
@@ -13150,15 +11632,11 @@ var EngCalcs = EngCalcs || {};
 			var was = frictionMethod(), now = methodSelect.value;
 			if (was === now) { return; }
 			// SWITCHING METHOD DOES NOT CONVERT ANYTHING, and on a network that already has pipes
-			// that is worth saying out loud. C = 130 read as Manning n is not a rough answer, it is
-			// nonsense by four orders of magnitude -- and unlike a unit switch, nothing on screen
-			// changes to show it happened except one letter in a label. Tom, on this exact risk:
-			// "being unaware of those on a new project (model) is dangerous."
-			//
-			// This is the same principle as the suite-wide ban on converting inputs when units
-			// switch (CLAUDE.md, Unit Sets): the stored number is what the user typed. The
-			// difference is only that here we ASK first, because there is no unit strip to make the
-			// change self-evident afterwards.
+			// that is worth saying out loud: C = 130 read as Manning n is nonsense by four orders of
+			// magnitude, and unlike a unit switch nothing on screen changes except one letter in a
+			// label. Same principle as the suite-wide ban on converting inputs when units switch --
+			// the stored number is what the user typed -- except that here we ASK first, because
+			// there is no unit strip to make the change self-evident afterwards.
 			if (doc.links.some(function (l) { return l.type !== 'pump'; })) {
 				if (!confirm(pc.lpn_method_switch_confirm
 					|| 'Changing the friction method does not change the roughness numbers already typed on your pipes, and a roughness for one method is meaningless for another. Check every pipe after this. Change it anyway?')) {
@@ -13185,13 +11663,9 @@ var EngCalcs = EngCalcs || {};
 		// ---- Calculator settings (Task 289) ----
 		// Built HERE, before `tail`, purely for DOM order: headings and sections append to `fields`
 		// as they are called, and the actions in `tail` must stay last.
-		//
-		// TWO WORDS, NOT A SENTENCE, and no collapsible wrapper (Tom, 2026-08-12, correcting the
-		// first build). Scope is carried by two parallel headings -- "Project settings" above,
-		// "Calculator settings" here -- which say the same thing the prose notes said in a quarter
-		// of the space and let the reader compare them at a glance. The old wording buried the
-		// contrast in two sentences that had to be read to be told apart, and wrapped a single
-		// checkbox in a section that could collapse to hide one row.
+		// TWO WORDS, NOT A SENTENCE, and no collapsible wrapper. Scope is carried by two parallel
+		// headings -- "Project settings" above, "Calculator settings" here -- which the reader can
+		// compare at a glance, where prose buries the contrast in two sentences.
 		groupHeading(pc.lpn_settings_scope_calculator || 'Calculator settings');
 		var titlesInput = document.createElement('input');
 		titlesInput.type = 'checkbox';
@@ -13203,15 +11677,12 @@ var EngCalcs = EngCalcs || {};
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
 		fields.appendChild(tail);
-		// "Emitter exponent" was REMOVED from this panel 2026-07-30 (Tom asked "Do we have emitters?
-		// Do we do something with this?" -- the honest answer was no). js/lpn-solver.js implements
-		// emitters properly (qe = K*dH^n, with the matching Jacobian term and a guarded derivative at
-		// dH -> 0), but nothing in this app ever sets a junction's `emitter`, so the > 0 test never
-		// passes and the exponent adjusted nothing. It was also the most technical-looking control
-		// here -- the one a user is most likely to assume matters. settings.emitterExponent itself
-		// STAYS (assembleModel() passes it, and it is the value the feature will use); only the
-		// no-op control is gone. Restore this row when ROADMAP Task 191 lands -- the language key
-		// lpn_settings_emitter_exponent is deliberately left in lib/lang.ec.en.php for that.
+		// There is no "Emitter exponent" row. js/lpn-solver.js implements emitters properly
+		// (qe = K*dH^n, with the matching Jacobian term and a guarded derivative at dH -> 0), but
+		// nothing in this app sets a junction's `emitter`, so the exponent adjusts nothing -- and it
+		// is the most technical-looking control here, the one a user assumes matters.
+		// settings.emitterExponent itself STAYS (assembleModel() passes it). Restore the row when
+		// Task 191 lands; lpn_settings_emitter_exponent is left in lib/lang.ec.en.php for that.
 		var tolInput = document.createElement('input');
 		tolInput.type = 'number'; tolInput.step = 'any'; tolInput.value = settings.tolerance;
 		tolInput.addEventListener('change', function () {
@@ -13288,15 +11759,11 @@ var EngCalcs = EngCalcs || {};
 		// One pull-down at a time -- see the same two lines in toggleLabelsPopup().
 		closeMenu();
 		closeViewPopovers('lpn_settings_popup');
-		// REBUILD ON EVERY OPEN. The panel used to be built once, by wireSettingsPopup() at init,
-		// and then only rebuilt by the paths that happened to remember (Restore defaults, opening a
-		// project). Anything else that wrote to `settings` left the panel showing the value from
-		// page load -- Tom, 2026-08-09, found the example network drawing 20-unit text while the
-		// Text size box still read 2.5, and said correctly that this condition "should be
-		// impossible". It was possible for every setting, not just that one; a writer had to
-		// remember to repaint, and one did not. Rebuilding here makes the panel a VIEW of
-		// `settings` rather than a copy of it, so no future writer can desync it either. Cheap:
-		// this is ~30 form controls, built only when the user actually opens the panel.
+		// REBUILD ON EVERY OPEN. Built once at init and rebuilt only by the paths that remember, the
+		// panel shows the value from page load for every setting anything else wrote -- a writer has
+		// to remember to repaint, and one will not. Rebuilding here makes the panel a VIEW of
+		// `settings` rather than a copy, so no future writer can desync it. Cheap: ~30 form controls,
+		// built only when the user opens the panel.
 		rebuildSettingsFields();
 		viewPopoverAnchor = evt.currentTarget;
 		openPanelAtAnchor(popup, evt.currentTarget.getBoundingClientRect());
@@ -13311,18 +11778,13 @@ var EngCalcs = EngCalcs || {};
 		document.getElementById('lpn_popup').style.display = 'none';
 		currentPopup = null;
 	}
-	// DRAGGING THE PROPERTY POPUP (Tom, 2026-08-15). The grab surface is the popup's own CHROME --
-	// the padded band around the body, where `e.target` is the popup element itself -- and never a
-	// child. That is what makes this safe to add to a panel full of text inputs, spinners and
-	// checkboxes: a control is always a child, so a drag can never start on one, and no control had
-	// to be re-wired. It also needs no drag bar, no extra row of pixels, and no new string.
-	//
-	// Pointer events, not mouse events, so a touch drag works identically -- and with
-	// setPointerCapture the drag survives the pointer leaving the popup, which is the failure that
-	// makes hand-rolled drags feel broken at speed.
-	//
-	// Double-click the same chrome to send it home, the same gesture that resets a dragged map
-	// label. Without it a popup parked somewhere awkward could only be recovered by reloading.
+	// DRAGGING THE PROPERTY POPUP. The grab surface is the popup's own CHROME -- the padded band
+	// around the body, where `e.target` is the popup element itself -- and never a child, which is
+	// what makes it safe in a panel full of inputs: a control is always a child, so a drag can never
+	// start on one. It needs no drag bar and no new string.
+	// Pointer events, not mouse events, so a touch drag works identically, and setPointerCapture
+	// keeps the drag alive when the pointer leaves the popup.
+	// Double-click the same chrome to send it home, the gesture that resets a dragged map label.
 	function wirePopup() {
 		var popup = document.getElementById('lpn_popup');
 		document.getElementById('lpn_popup_close').addEventListener('click', closePopup);
@@ -13367,12 +11829,11 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- field labels, with an optional definitional tip (Task 193) ----
 	// CLAUDE.md's tip-only convention: .ec-help carries the title and wraps the label WORDS plus a
-	// nested .ec-tip "?" glyph, so the tap target is the whole name rather than one character. The
-	// tip is where a trap term (head, roughness, demand) gets its definition -- visible to the user
-	// AND, because it is translated with the label, an anchor for the 26-language sprint.
+	// nested .ec-tip "?" glyph, so the tap target is the whole name. The tip is where a trap term
+	// (head, roughness, demand) gets its definition.
 	// These labels are built long after DOMContentLoaded, so js/Calculators.lib.js's page-load pass
-	// cannot see them; initTips() has to be called on the container afterwards. See setFieldLabel's
-	// callers, each of which ends with tipsIn(fields).
+	// cannot see them -- initTips() has to be called on the container afterwards, which is why every
+	// setFieldLabel() caller ends with tipsIn(fields).
 	function setFieldLabel(label, text, tip) {
 		if (!tip) { label.textContent = text + ' '; return; }
 		var help = document.createElement('span'), glyph = document.createElement('span');
@@ -13387,19 +11848,11 @@ var EngCalcs = EngCalcs || {};
 	function tipsIn(root) {
 		if (EngCalcs && EngCalcs.initTips) { EngCalcs.initTips(root); }
 	}
-	// Hover/tap tip straight on a button: the button is already the click target, so no separate
-	// "?" glyph -- .ec-help is what makes the title reachable on touch (js/Calculators.lib.js only
-	// wires tap-triggered tooltips on .ec-help[title]).
-	//
-	// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all
-	// projects (Settings panel) -- get THREE tips, not one shared one. The first version shared a
-	// single key saying they had to be "used together" to reach a first-time-visitor state. That
-	// was FALSE, and Tom caught it (2026-07-31): settings live INSIDE each project document
-	// (serializeProject()), so deleting every project deletes every setting too. Delete all
-	// projects alone IS the full reset -- exactly what init()'s own comment already said, "strictly
-	// more destructive than New/Clear (content only) or Restore defaults (preferences only)".
-	// Three scoped tips cannot be wrong about each other; one shared tip had to describe all three
-	// and got it wrong. Cheaper key economy is not worth a false statement.
+	// Hover/tap tip straight on a button: the button is already the click target, so no separate "?"
+	// glyph -- .ec-help is what makes the title reachable on touch.
+	// The three reset controls -- Clear project, Restore all settings, Delete all projects -- get
+	// THREE tips, not one shared one. A shared tip has to describe all three and gets it wrong:
+	// settings live INSIDE each project document, so Delete all projects alone IS the full reset.
 	function helpTip(btn, text) {
 		if (!text) { return; }
 		btn.title = text;
@@ -13419,17 +11872,11 @@ var EngCalcs = EngCalcs || {};
 		fields.innerHTML = '';
 	}
 	// ---- the override marker (ROADMAP Task 184) ----
-	// EVERY EDIT IN A NON-BASE SCENARIO IS AN OVERRIDE, FULL STOP -- even when the typed value
-	// equals Base's. The tick records INTENT at edit time and is never computed by diffing, because
-	// a diff cannot tell "I chose this deliberately here" from "Base happens to agree with me
-	// today", and those two need opposite treatment the moment Base moves. Clearing the tick is the
-	// undo, and the field goes straight back to Base's value.
-	//
-	// Base's value is shown BESIDE the scenario's whenever the tick is set. That is the cheap fix
-	// for the one genuinely confusing case the delta model leaves (Task 184): you correct a
-	// diameter in Base, and a scenario that overrode it does not move. Seeing what you are
-	// diverging from, at the moment you can act on it, needs no change-tracking and no "Base
-	// changed since" bookkeeping.
+	// EVERY EDIT IN A NON-BASE SCENARIO IS AN OVERRIDE, FULL STOP -- even when the typed value equals
+	// Base's. The tick records INTENT at edit time and is never computed by diffing: a diff cannot
+	// tell "I chose this deliberately here" from "Base happens to agree today". Clearing it is undo.
+	// Base's value is shown BESIDE the scenario's whenever the tick is set -- the cheap fix for the
+	// one confusing case the delta model leaves, needing no change-tracking bookkeeping.
 	function formatPropValue(v) {
 		if (v === undefined || v === null || v === '') { return ''; }
 		// A boolean reads as a MARK, not as a word: "Base: ✓" beside a checkbox is exactly the box's
@@ -13489,16 +11936,12 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 	}
-	// Completes an ordinary value edit. The three field helpers below all used to end at
-	// scheduleSolve(), which is a THIRD of the job: afterPropertyEdit() also refreshes the audit
-	// halos, refreshes the "Custom values" count in the status strip, and saves. Its own comment
-	// says "one seam, so a new field cannot forget a third of it" -- and the ordinary edit path,
-	// the commonest action on the page, was simply never reaching it, so the count in the status
-	// strip was wrong in the common case (2026-08-14).
-	//
-	// Only when `ov` is present, deliberately: a row with no overridable property (X, Y, a read-only
-	// result) has no marks, no count and no override to save, and routing it here would rebuild the
-	// element for nothing. Those rows keep the plain scheduleSolve().
+	// Completes an ordinary value edit. Ending a field helper at scheduleSolve() alone is a THIRD of
+	// the job: this also refreshes the audit halos and the "Custom values" count, and saves.
+	// Only when `ov` is present: a row with no overridable property (X, Y, a read-only result) has no
+	// marks, no count and no override, so those rows keep the plain scheduleSolve().
+
+
 	function completeEdit(ov) {
 		if (ov && ov.el) { afterPropertyEdit(ov.el); } else { scheduleSolve(); }
 	}
@@ -13584,17 +12027,15 @@ var EngCalcs = EngCalcs || {};
 		input.type = 'number'; input.value = effective(l, 'length').toFixed(2);
 		input.addEventListener('change', function () {
 			setProp(l, 'length', +input.value);
-			// lenAuto IS BASE-OWNED and a scenario must not touch it. The Auto handler directly below
-			// already says why -- geometry is shared, because a node cannot be in two places at once
-			// in one rendered map -- and this line used to clear the flag unconditionally, so typing
-			// a length inside a scenario silently switched EVERY scenario, and Base, off Auto.
+			// lenAuto IS BASE-OWNED and a scenario must not touch it -- geometry is shared, because a
+			// node cannot be in two places at once in one rendered map. Clearing the flag
+			// unconditionally here switches EVERY scenario, and Base, off Auto.
 			//
-			// WHAT A SCENARIO WITH A LENGTH OVERRIDE ON AN AUTO LINK SHOWS, since the next reader
-			// will ask: the override wins. effective() finds the override before it ever reaches
-			// Base's auto-derived value, so the box shows the typed number and the solve uses it,
-			// while Base and every other scenario go on following the drawing. The Auto checkbox
-			// keeps showing Base's state, which is the truth about the link -- and unticking the
-			// override marker hands the value straight back to that.
+			// A SCENARIO WITH A LENGTH OVERRIDE ON AN AUTO LINK: the override wins. effective() finds
+			// it before Base's auto-derived value, so the box shows the typed number and the solve
+			// uses it, while Base and every other scenario go on following the drawing. The Auto
+			// checkbox keeps showing Base's state, and unticking the override marker returns to it.
+
 			if (inBaseScenario()) { l.lenAuto = false; auto.checked = false; }
 			refreshPopupIfOpen();
 			scheduleSolve();
@@ -13629,16 +12070,11 @@ var EngCalcs = EngCalcs || {};
 		var r = svg.getBoundingClientRect();
 		return { x: r.left + state.tx + wx * state.s, y: r.top + state.ty + wy * state.s };
 	}
-	// Where an element's property popup opens (Tom, 2026-07-30). NOT at the click point: on an
-	// orthogonal network -- which is most real ones -- a popup centred on the element covers the
-	// elements directly north and south of it, which are exactly the ones you are usually comparing
-	// it against. Instead it opens off to the RIGHT of that element's own data label, clear of it by
-	// about a node across ("roughly a node size to the right of the extrema location" -- Tom's own
-	// measure, from when a badge hung off the end of the digits; the label's own right edge is that
-	// same place now that the mark is inside the text). The popup then sits in the horizontal gap
-	// beside the element rather than on top of its neighbours, and its position still reads as
-	// belonging to the element because it lines up with that element's label.
-	// Falls back to the click point when the element has no rendered label to hang off.
+	// Where an element's property popup opens. NOT at the click point: on an orthogonal network a
+	// popup centred on the element covers the elements directly north and south of it, which are
+	// exactly the ones you are comparing it against. It opens off to the RIGHT of that element's own
+	// data label, clear by about a node across, so it sits in the horizontal gap beside the element
+	// and still reads as belonging to it. Falls back to the click point when there is no label.
 	function popupAnchorFor(holder, labelPos, gapUnits, fallbackX, fallbackY) {
 		if (!holder || labelPos === null) { return { x: fallbackX, y: fallbackY }; }
 		var fs = effectiveFontSize();
@@ -13661,19 +12097,16 @@ var EngCalcs = EngCalcs || {};
 	// WHERE A PULL-DOWN GOES, given the rect of the control that opened it (Task 372). Pure, so the
 	// one rule every popover on this page obeys can be asserted without a browser.
 	//
-	// **IT MAY NEVER COVER ITS OWN BUTTON.** Tom, 2026-08-15: "Settings box opens, if its expanded
-	// options are too long, too tall for the screen, and its top extends to cover its button." That
-	// was a clamp doing exactly what it had been told: the panel was placed at the button's bottom
-	// edge and then pulled back up by `vh - h`, and once h is most of the viewport that pull-back
-	// lands on top of the anchor -- the one place the user is looking, and the control they will
-	// click to dismiss it. So height is not something to clamp AROUND; it is something to give up.
-	// The panel takes whichever side of the anchor has more room and, if it does not fit there, is
-	// CAPPED to that room and scrolls inside itself.
+	// **IT MAY NEVER COVER ITS OWN BUTTON.** Placing the panel at the button's bottom edge and then
+	// pulling it back up by `vh - h` lands it on top of the anchor once h is most of the viewport --
+	// the one place the user is looking, and the control they will click to dismiss it. Height is not
+	// something to clamp AROUND; it is something to give up. The panel takes whichever side of the
+	// anchor has more room and, if it does not fit there, is CAPPED to that room and scrolls inside.
 	//
 	// Only the horizontal axis is still clamped, because sliding sideways never hides the anchor.
 	// `maxHeight` is null when the natural height fitted -- callers must then leave the panel's
 	// height alone rather than pinning it to what they measured, or a panel whose contents change
-	// (Settings rebuilds its fields on every open) would be frozen at the size it had last time.
+	// would be frozen at the size it had last time.
 	function panelPlacement(ar, w, h, vw, vh) {
 		var below = vh - ar.bottom - POPUP_EDGE, above = ar.top - POPUP_EDGE;
 		// Below is the default and stays the default whenever it is no worse than above: a pull-down
@@ -13688,14 +12121,12 @@ var EngCalcs = EngCalcs || {};
 			maxHeight: height < h ? height : null
 		};
 	}
-	// Cap a panel to `avail` pixels, putting the scrollbar on its BODY rather than on the panel.
-	// That distinction is the whole reason .lpn-popover-body exists (see the CSS): #lpn_popup's
-	// close button is absolutely positioned in the panel's own corner, so a scrolling panel would
-	// scroll the way out of itself off the top. A panel with no body wrapper -- the menus -- scrolls
-	// itself, which is right there because it is nothing but rows.
-	//
-	// `naturalH` is passed in rather than re-measured: the caller has just measured it uncapped, and
-	// measuring again after a style write is what turns one layout pass into three.
+	// Cap a panel to `avail` pixels, putting the scrollbar on its BODY rather than on the panel --
+	// the whole reason .lpn-popover-body exists: #lpn_popup's close button is absolutely positioned
+	// in the panel's own corner, so a scrolling panel scrolls the way out of itself off the top. A
+	// panel with no body wrapper (the menus) scrolls itself, being nothing but rows.
+	// `naturalH` is passed in rather than re-measured: measuring again after a style write turns one
+	// layout pass into three.
 	function capPanelHeight(panel, body, avail, naturalH) {
 		panel.style.maxHeight = avail + 'px';
 		if (body) {
@@ -13753,14 +12184,11 @@ var EngCalcs = EngCalcs || {};
 		capPanelHeight(panel, body, avail, h);
 		return avail;
 	}
-	// WHERE THE PROPERTY POPUP OPENS, once the user has moved it: exactly where they left it.
-	// EPANET's own property window behaves this way and Tom asked for it by name (2026-08-15:
-	// "EPANET has an element properties box. But it is draggable... Our UX suffers because our
-	// properties box is not draggable"). Null until the first drag, so the automatic placement
-	// beside the element (popupAnchorFor()) is what a user who has never dragged it still gets.
-	// Session-scoped on purpose: it is a transient view choice, not a project setting, and putting
-	// it in the document would mean a colleague opening your file inherits where your screen's
-	// popup sat.
+	// WHERE THE PROPERTY POPUP OPENS once the user has moved it: exactly where they left it, as
+	// EPANET's own property window does. Null until the first drag, so a user who has never dragged
+	// it still gets the automatic placement beside the element (popupAnchorFor()). Session-scoped: a
+	// transient view choice, not a project setting -- in the document, a colleague opening your file
+	// would inherit where your screen's popup sat.
 	var popupUserPos = null;
 	function openPopupAt(sx, sy) {
 		var popup = document.getElementById('lpn_popup'), r, h, at;
@@ -13803,14 +12231,12 @@ var EngCalcs = EngCalcs || {};
 		});
 		title.appendChild(input);
 	}
-	// AN OVERRIDE MAP IS KEYED BY ELEMENT ID, so a rename has to carry it (Task 184). Missing this
-	// is silent in the worst way: the scenario's values simply stop applying, the map falls back to
-	// Base, and the status bar still counts them -- there is nothing on screen that says a number
-	// went away. Renames are cheap and we own the path, which is the same reasoning the "compare
-	// with base ID" field records for following a rename.
+	// AN OVERRIDE MAP IS KEYED BY ELEMENT ID, so a rename has to carry it (Task 184). Missing this is
+	// silent in the worst way: the scenario's values stop applying, the map falls back to Base, and
+	// the status bar still counts them.
 	// The GROUP comes in with the ids because the key carries it (Task 324) -- and a rename is the
-	// one path where getting it wrong would be invisible twice over: it would strand the values
-	// under the old key AND hand them to whatever element of the other group answers to the new id.
+	// one path where getting it wrong is invisible twice over: it strands the values under the old
+	// key AND hands them to whatever element of the other group answers to the new id.
 	function renameOverrides(group, oldId, newId) {
 		var oldKey = ovKeyFor(group, oldId), newKey = ovKeyFor(group, newId);
 		scenarios.forEach(function (s) {
@@ -13861,30 +12287,27 @@ var EngCalcs = EngCalcs || {};
 		renderLinkFields(newId);
 		scheduleSolve();
 	}
-	// ---- "Apply to all": re-prefix every element of one kind (Tom, 2026-08-15) ----
+	// ---- "Apply to all": re-prefix every element of one kind ----
 	//
-	// An ID prefix has always been "future, not retroactive" -- change it and the next junction you
-	// draw is N1 while J1..J40 stay as they are. That is the right default (a rename is destructive
-	// and an id is referenced from six places), but it left no way at all to say "I meant all of
-	// them", which is what you want the day you inherit a model or decide mid-drawing.
+	// An ID prefix is "future, not retroactive" -- change it and the next junction you draw is N1
+	// while J1..J40 stay as they are. That is the right default, but it leaves no way to say "I meant
+	// all of them", which is what you want the day you inherit a model.
 	//
-	// WHAT IT WILL AND WILL NOT TOUCH, and the rule is deliberately conservative:
-	//   * An id ending in DIGITS keeps its digits and swaps its head: J12 -> N12. The number is the
-	//     thing the user knows the element by and the thing every note on their desk refers to.
+	// WHAT IT WILL AND WILL NOT TOUCH, deliberately conservative:
+	//   * An id ending in DIGITS keeps its digits and swaps its head: J12 -> N12. The number is what
+	//     the user knows the element by and what every note on their desk refers to.
 	//   * An id with no trailing number (an imported 'J-TF', a hand-typed 'Tank Farm') is LEFT
-	//     ALONE. There is no number to keep, so any rename would be an invention, and these are
-	//     exactly the ids somebody chose on purpose.
+	//     ALONE: any rename would be an invention, and these are ids somebody chose on purpose.
 	//   * A rename that would collide with an id NOT in this batch is skipped rather than resolved
 	//     by inventing a number.
 	// Both skips are counted and reported, because a silent partial rename is worse than none.
 	//
-	// THE TWO-PHASE RENAME (everything parks on a temporary id, then takes its real one) is
-	// INSURANCE, not a requirement today, and it is worth saying which. A batch is one element type
-	// with one prefix, so a member's target is `prefix + its own digits` -- which means any member
-	// holding another's target must already start with that prefix, and is therefore not moving at
-	// all. There is no cycle to break. It stays because it is four lines and it takes ORDERING out
-	// of the reasoning entirely: the day this grows an "apply all six prefixes at once" button,
-	// cycles become reachable, and the failure would be a corrupted drawing rather than a refusal.
+	// THE TWO-PHASE RENAME (park on a temporary id, then take the real one) is INSURANCE, not a
+	// requirement today: a batch is one element type with one prefix, so any member holding
+	// another's target already starts with that prefix and is not moving. It stays because it is
+	// four lines and takes ORDERING out of the reasoning -- the day this grows an "apply all six
+	// prefixes at once" button cycles become reachable, and the failure would be a corrupted drawing.
+
 	function elementsForIdKey(key) {
 		return doc.nodes.filter(function (n) { return (LPN_ID_KEY[n.type] || 'J') === key; })
 			.concat(doc.links.filter(function (l) { return (LPN_ID_KEY[l.type] || 'L') === key; }));
@@ -13901,13 +12324,12 @@ var EngCalcs = EngCalcs || {};
 			var want = prefix + m[2];
 			if (want !== x.id) { moving.push({ id: x.id, want: want, isNode: isNodeId(x.id) }); }
 		});
-		// WHICH TARGETS ARE ACTUALLY FREE, settled by iterating to a fixed point rather than in one
-		// pass. An id is free if nothing holds it, or if the thing holding it is itself moving away.
-		// The catch is that dropping one mover (because ITS target was blocked) re-occupies the id
-		// that mover was going to vacate, which can block a second mover -- so one pass can approve
-		// a rename that a later decision invalidates. Looping until nothing new is dropped is a few
-		// lines and removes the whole class; the alternative is an ordering rule that is right for
-		// the cases someone thought of.
+		// WHICH TARGETS ARE ACTUALLY FREE, settled by iterating to a FIXED POINT rather than in one
+		// pass. An id is free if nothing holds it, or if the thing holding it is itself moving away
+		// -- and dropping one mover (because ITS target was blocked) re-occupies the id that mover
+		// was going to vacate, which can block a second. One pass can therefore approve a rename a
+		// later decision invalidates; the alternative is an ordering rule right for the cases
+		// someone thought of.
 		var plan = moving, dropped;
 		do {
 			dropped = false;
@@ -13987,28 +12409,24 @@ var EngCalcs = EngCalcs || {};
 				function () { return n.elev; },
 				function (v) { n.elev = v; updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_field_elev_tip);
-			// Blank = follow the elevation, which is also what the placeholder shows -- so the field
-			// reads as already filled in with the elevation without pretending the user typed it.
-			// Clearing it hands the head back to the elevation; this is the tank/reservoir switch.
-			// Both setters re-render the popup: each of the two fields feeds the other's display --
-			// the elevation is the head's placeholder, and the pressure row below is the difference
-			// between them. That row is computed straight from the document (not from a solve
-			// result), so it can and should be right the moment either number is committed.
+			// Blank = follow the elevation, which is what the placeholder shows -- so the field reads
+			// as already filled in without pretending the user typed it. Clearing it hands the head
+			// back to the elevation. Both setters re-render the popup, because each field feeds the
+			// other's display: the elevation is the head's placeholder, and the pressure row is the
+			// difference between them, computed from the DOCUMENT rather than from a solve result.
+
 			unitNumberFieldBlank(fields, pc.lpn_field_head || 'Head', 'lpn_u_elevhead',
 				function () { return effective(n, 'head'); },
 				function (v) { setProp(n, 'head', v); updateNode(nodeId); refreshPopupIfOpen(); },
 				n.elev || 0, pc.lpn_field_head_tip, { el: n, prop: 'head' });
 			// No read-only Head row here (a junction gets one because its head is a solve RESULT) --
-			// the editable field above already shows this reservoir's head, typed or inherited.
-			// The one place two DISPLAY units meet: head and elevation are declared in the Elevation/
-			// Head unit, their difference is a pressure, and the Pressure selector may be showing
-			// something else entirely (psi against ft of water). So it crosses to SI and back. This
-			// is a conversion between two units the user chose, not a conversion of an input on a
-			// unit change -- the number they typed is untouched.
-			//
-			// **AND IT IS OMITTED ENTIRELY WHEN THE GROUND IS UNKNOWN** (Task 390): an imported
-			// reservoir has a head and no elevation, and a pressure row reading 0 there would be
-			// this page asserting something the file never said. See fixedHeadPressure().
+			// the editable field above shows this reservoir's head, typed or inherited.
+			// The one place two DISPLAY units meet: head and elevation are declared in the
+			// Elevation/Head unit, their difference is a pressure, and the Pressure selector may show
+			// something else (psi against ft of water), so it crosses to SI and back. That is a
+			// conversion between two units the USER chose, not of an input on a unit change.
+			// **OMITTED ENTIRELY WHEN THE GROUND IS UNKNOWN** (Task 390): an imported reservoir has a
+			// head and no elevation, and a pressure row reading 0 asserts what the file never said.
 			if (typeof n.elev === 'number') {
 				readonlyUnitField(fields, pc.lpn_result_pressure || 'Pressure', 'lpn_u_pressure',
 					toSI(reservoirHead(n) - n.elev, 'lpn_u_elevhead'));
@@ -14085,18 +12503,15 @@ var EngCalcs = EngCalcs || {};
 			pc.lpn_pump_curve_note || 'One, two, or three points — see "Pump curve" in the Notes below.');
 	}
 	// THE THREE-POINT CURVE TABLE, shared by the pump and by the GPV (Task 248). Both hold a curve
-	// that BELONGS TO THE ELEMENT and is named after it -- a pump's is (flow, head) and a general
-	// purpose valve's is (flow, head LOSS) -- so the only thing that differs is the second column's
-	// heading and its unit. Two copies of this markup would be two chances to disagree about what a
-	// curve point is.
+	// that belongs to the element -- a pump's is (flow, head), a general purpose valve's is (flow,
+	// head LOSS) -- so only the second column's heading and unit differ. Two copies of this markup
+	// would be two chances to disagree about what a curve point is.
 	//
-	// No factors since Task 263: a point is stored in the units its column heading names, so the
-	// table shows and accepts the number as typed.
+	// No factors since Task 263: a point is stored in the units its column heading names.
 	//
-	// A real <table> with real column headings (Tom, 2026-07-30) -- the rows were two unlabelled
-	// number boxes whose only clue as to which was which lived in a title= tooltip, invisible on
-	// touch. Flow first, matching both the [Q, H] storage order and the way a manufacturer's curve
-	// is read (a head AT a flow).
+	// A real <table> with real column HEADINGS: two unlabelled number boxes whose only clue lives in
+	// a title= tooltip are invisible on touch. Flow first, matching both the [Q, H] storage order and
+	// the way a manufacturer's curve is read (a head AT a flow).
 	function curvePointTable(fields, l, valueHeading, valueUnitId, note) {
 		var pc = EngCalcs.pageConfig || {};
 		if (!l.curvePoints || l.curvePoints.length === 0) { l.curvePoints = [[undefined, undefined]]; }
@@ -14183,13 +12598,11 @@ var EngCalcs = EngCalcs || {};
 				effective(l, 'roughness'),
 				function (v) { setProp(l, 'roughness', v); refreshPopupIfOpen(); }, roughnessTip(),
 				{ el: l, prop: 'roughness' });
-			// Minor (local) loss coefficient, k_m -- dimensionless, so no unit conversion (same as
-			// Roughness above). Defaults from settings.defaults.k at creation (addLink()); editable
-			// per-pipe here, same pattern as every other pipe property. Plain-text wording only
-			// (no <sub> markup) -- this popup's fields are built via textContent, and the suite's
-			// existing "k<sub>m</sub>" label (mphl_total_junction_k) is HTML-bearing, incompatible
-			// with that call site; CLAUDE.md's concept-level reuse rule is about wording, not
-			// forcing markup into a plain-text slot.
+			// Minor (local) loss coefficient, k_m -- dimensionless, so no unit conversion. Defaults
+			// from settings.defaults.k at creation. PLAIN-TEXT wording only, no <sub> markup: this
+			// popup's fields are built via textContent, and the suite's "k<sub>m</sub>" label
+			// (mphl_total_junction_k) is HTML-bearing. The concept-level reuse rule is about wording,
+			// not forcing markup into a plain-text slot.
 			numberFieldPlain(fields, pc.lpn_field_km || 'Minor (local) loss coefficient, k', effective(l, 'k') || 0,
 				function (v) { setProp(l, 'k', v); refreshPopupIfOpen(); }, pc.lpn_field_km_tip,
 				{ el: l, prop: 'k' });
@@ -14224,18 +12637,15 @@ var EngCalcs = EngCalcs || {};
 	// different label AND a different unit selector behind it (see js/lpn-epanet.js for the three
 	// conventions and why getting one wrong is silent). Rendering one "Setting" box in whatever
 	// unit happened to be last would be the trap this whole task is about.
-	// EVERY WRITE HERE GOES THROUGH setProp, AND EVERY ROW CARRIES ITS `ov`. Both halves were missing
-	// until 2026-08-14 and both were user-reachable: the setters wrote l._setting / l._diameter / l._k
-	// directly, which inside a scenario edits BASE under every other scenario at once -- the exact
-	// failure setProp's own comment predicts in words -- and with no `ov` a valve was the only
-	// element type in the page with no scenario marker on any row at all.
+	// EVERY WRITE HERE GOES THROUGH setProp, AND EVERY ROW CARRIES ITS `ov`. Writing l._setting /
+	// l._diameter / l._k directly edits BASE under every other scenario at once, and without `ov` a
+	// valve is the only element type in the page with no scenario marker on any row.
 	//
-	// HOW IT GOT THROUGH, because the mechanism matters more than the bug: valves (Task 248 phase 2)
-	// and scenarios (Task 184) were built in parallel worktrees the same day with DISJOINT FILE
-	// TERRITORY, exactly as CLAUDE.md requires -- and they still collided, because they shared a
-	// SEAM rather than a file. Neither harness could see it either: scenario-harness.js never says
-	// "valve" and valve-harness.js never says "scenario". The file rule protects files; nothing
-	// protected the seam. dev/scripts/scenario_seam_check.php does now.
+	// HOW IT GOT THROUGH, because the mechanism matters more than the bug: valves and scenarios were
+	// built in parallel worktrees with DISJOINT FILE TERRITORY, exactly as CLAUDE.md requires -- and
+	// still collided, because they shared a SEAM rather than a file. Neither harness could see it:
+	// scenario-harness.js never says "valve" and valve-harness.js never says "scenario".
+	// dev/scripts/scenario_seam_check.php guards the seam now.
 	function renderValveFields(fields, l, linkId) {
 		var pc = EngCalcs.pageConfig || {}, vt = (l.valveType || 'TCV').toUpperCase();
 		selectFieldPlain(fields, pc.lpn_field_valve_type || 'Valve type', [
@@ -14258,17 +12668,11 @@ var EngCalcs = EngCalcs || {};
 			// coefficient, and none of the three means anything as one of the other two -- 60 psi
 			// read as a loss coefficient of 60 is a valve nobody built. The tip on the setting
 			// field says this happens, so the change is not a surprise.
-			// BASE, and every scenario's override on `setting` is DROPPED with it. The brief that
-			// found the other seam defects flagged this line as a judgement call rather than
-			// guessing at it, and the answer follows from what is overridable and what is not:
-			// `valveType` is NOT in LPN_OVERRIDABLE, so a type change is Base-wide by construction.
-			// A setting that belongs to a type must therefore be Base-wide too.
-			//
-			// And the overrides have to go, which is the part that is easy to miss. The comment
-			// above says a number carried across a type change is "a valve nobody built" -- 60 psi
-			// read as a loss coefficient of 60. That is exactly as true of a scenario's override as
-			// of Base's own value, and the override would have SURVIVED, silently, as a stale
-			// pressure sitting under a valve that now wants a flow.
+			// BASE, and every scenario's override on `setting` is DROPPED with it. `valveType` is NOT
+			// in LPN_OVERRIDABLE, so a type change is Base-wide by construction, and a setting that
+			// belongs to a type must be Base-wide too. The overrides are the part easy to miss: 60 psi
+			// read as a loss coefficient of 60 is as wrong in a scenario as in Base, and an override
+			// would SURVIVE silently as a stale pressure under a valve that now wants a flow.
 			l._setting = defaultValveSetting(v);   // base-write: valveType is Base-owned, so the setting that belongs to it is too
 			scenarios.forEach(function (sc) {
 				var ovv = sc.overrides[ovKey(l)];
@@ -14277,14 +12681,12 @@ var EngCalcs = EngCalcs || {};
 			refreshPopupIfOpen();
 			scheduleSolve();
 		}, pc.lpn_field_valve_type_tip);
-		// **GPV AND PBV ARE IN THE LIST NOW** (Task 248, 2026-08-17). The old note here said a GPV
-		// could not be offered because "this page has no curve element outside the pump" -- and the
-		// answer turned out to be that it does not need one: a GPV's head-loss curve BELONGS TO THE
-		// VALVE and is named after it, which is Task 248.04's ruling for curves generally. So the
-		// pump's own three-point table serves it, reading (flow, head LOSS) instead of (flow, head).
-		//
+		// **GPV AND PBV ARE IN THE LIST** (Task 248). A GPV needs no separate curve element: its
+		// head-loss curve BELONGS TO THE VALVE and is named after it, which is Task 248.04's ruling
+		// for curves generally, so the pump's own three-point table serves it reading (flow, head
+		// LOSS) instead of (flow, head).
 		// Both are EPANET-only, like every other active type -- EngCalcs.lpnValveIsNative is the one
-		// place that line is drawn, and adding them there is the whole of what routing them costs.
+		// place that line is drawn.
 		if (vt === 'GPV') {
 			renderGpvCurve(fields, l, linkId);
 		} else if (vt === 'PBV') {
@@ -14347,13 +12749,11 @@ var EngCalcs = EngCalcs || {};
 		title.textContent = pc.lpn_tool_add_text || 'Text';
 		clearFields(fields);
 		// WHAT THE NOTE SAYS IS OVERRIDABLE (Task 407), so this row reads through effective() and
-		// writes through setProp() like every other property editor on the page. Writing lb._text
-		// here would edit Base from inside a scenario -- under every other scenario at once, and
-		// with the right words still on screen, which is the whole reason the seam exists.
-		// A TEXTAREA, because a Text object is lines now (Task 342). Three rows and full width: it
-		// has to LOOK like somewhere you may press Enter, or the capability is invisible. Enter
-		// types a newline here rather than committing, which is what a textarea does by itself and
-		// is the reason this is not an <input> with a key handler bolted on.
+		// writes through setProp(). Writing lb._text here edits Base from inside a scenario, under
+		// every other scenario at once, with the right words still on screen.
+		// A TEXTAREA, because a Text object is lines (Task 342). Three rows and full width: it has to
+		// LOOK like somewhere you may press Enter, or the capability is invisible. Enter types a
+		// newline rather than committing, which is what a textarea does by itself.
 		input.rows = 3;
 		input.style.width = '100%';
 		input.value = effective(lb, 'text');
@@ -14413,15 +12813,12 @@ var EngCalcs = EngCalcs || {};
 		alwaysLabel.appendChild(alwaysInput);
 		fields.appendChild(alwaysLabel);
 		fields.appendChild(document.createElement('br'));
-		// ---- Justification (Task 342, moved here from Task 332) ------------------------------
-		// Tom, 2026-08-15: *"text alignment is very interesting to a user, especially if we allow
-		// paragraph text."* `lb.align`/`lb.valign` have been in the document since Task 332 and are
-		// interpreted in ONE place (Geom.labelBoxAt via labelHAlign/labelVAlign); all this owes them
-		// is the row. Centre/middle stays the default, so no existing drawing changes shape.
-		//
-		// These say what the label's POINT MEANS -- which edge of the text sits on it -- and with
-		// several lines they also say how the lines line up with each other, which is the half that
-		// only starts to matter now.
+		// ---- Justification (Task 342) ------------------------------
+		// `lb.align`/`lb.valign` have been in the document since Task 332 and are interpreted in ONE
+		// place (Geom.labelBoxAt via labelHAlign/labelVAlign); all this owes them is the row.
+		// Centre/middle stays the default, so no existing drawing changes shape. They say what the
+		// label's POINT MEANS -- which edge of the text sits on it -- and, with several lines, how the
+		// lines line up with each other.
 		function alignRow(labelText, prop, options, dflt) {
 			selectFieldPlain(fields, labelText, options, (lb[prop] || dflt), function (v) {
 				if ((lb[prop] || dflt) === v) { return; }
@@ -14533,22 +12930,17 @@ var EngCalcs = EngCalcs || {};
 	// default), whose C-factor is dimensionless. Darcy-Weisbach's roughness HEIGHT does need
 	// units (the scope doc's roughness family is "DW only") -- revisit once a friction-method
 	// selector exists (matching bpn_'s own method switch) and this can be genuinely conditional.
-	// Open/Closed link state (ROADMAP Task 146.07). Tom, 2026-07-29: explicitly NOT a "valve" and
-	// NOT modelled by abusing the minor-loss coefficient -- a plain boolean, kept small.
-	//
-	// Everything under this checkbox already existed and was simply unreachable: `_status` is set to
-	// 'open' at addLink(), serialized with the project, listed in LPN_OVERRIDABLE, read by
-	// assembleModel() through effective(), honoured in four places by js/lpn-solver.js, and already
-	// parsed from an EPANET .inp by js/lpn-inp.js. This function is the whole feature.
+	// Open/Closed link state (Task 146.07): explicitly NOT a "valve" and NOT modelled by abusing the
+	// minor-loss coefficient -- a plain boolean.
 	//
 	// The checkbox says "Closed", not "Open", although 'open' is the stored default. The state worth
-	// SEEING is the exceptional one: a ticked box next to the word Closed reads as a deliberate act,
-	// where an unticked box next to "Open" would make every ordinary pipe look like something had
-	// been switched off. Same reason the map dashes closed links rather than styling open ones.
+	// SEEING is the exceptional one: a ticked box next to Closed reads as a deliberate act, where an
+	// unticked box next to "Open" would make every ordinary pipe look switched off. Same reason the
+	// map dashes closed links rather than styling open ones.
 	//
-	// Offered on pumps as well as pipes: the solver's status check is on the link, not the type, and
-	// EPANET can close a pump too. It sits OUTSIDE renderLinkFields' pipe/pump branch for that
-	// reason -- a pump renders a curve table instead of diameter/roughness, but still gets this.
+	// Offered on pumps as well as pipes -- the solver's status check is on the link, not the type,
+	// and EPANET can close a pump too -- so it sits OUTSIDE renderLinkFields' pipe/pump branch.
+
 	function closedField(fields, l, linkId) {
 		var pc = EngCalcs.pageConfig || {}, label = document.createElement('label'),
 			input = document.createElement('input');
@@ -14558,14 +12950,13 @@ var EngCalcs = EngCalcs || {};
 			saveUndoSnapshot();
 			setProp(l, 'status', input.checked ? 'closed' : 'open');
 			// rebuildLink() rather than a classList toggle: the dashed/solid state is applied in
-			// buildLinkEls(), so going through the one builder keeps a single source of truth for
-			// how a link is drawn. Then solve -- closing a pipe can isolate a node, which the
-			// solver's pre-solve diagnostics already name by id.
-			// afterPropertyEdit() rather than rebuildLink + scheduleSolve by hand. This row DREW an
-			// override marker and then never refreshed it, so ticking Closed inside a scenario left
-			// the marker beside it unticked -- the page contradicting itself in the same popup. The
-			// seam exists precisely so a field cannot forget a third of the job; this one was not
-			// reaching it. refreshPopupIfOpen() re-renders so the marker catches up.
+			// buildLinkEls(), so one builder stays the single source of truth for how a link is
+			// drawn. Then solve -- closing a pipe can isolate a node.
+			// afterPropertyEdit(), NOT rebuildLink + scheduleSolve by hand: a row that draws an
+			// override marker and never refreshes it leaves the marker unticked beside a ticked
+			// Closed box, the page contradicting itself in the same popup. refreshPopupIfOpen()
+			// re-renders so the marker catches up.
+
 			afterPropertyEdit(l);
 			refreshPopupIfOpen();
 		});
@@ -14688,14 +13079,12 @@ var EngCalcs = EngCalcs || {};
 		markEdited(); // one seam, because every real mutation snapshots before it changes anything
 		undoStack.push({
 			state: JSON.parse(JSON.stringify({ doc: doc, scenarios: scenarios, active: project.activeScenario })),
-			// **THE BACKDROP IS SHALLOW-COPIED, AND THAT IS NOT A SHORTCUT** (Tom, 2026-08-16:
-			// "Background image edits should be added to the undo stack"). Its `href` is a base64
-			// data URI -- 1.7 MB on Net2 and 2.5 MB on Net3 -- so deep-cloning it into every one of
-			// twenty snapshots would cost fifty megabytes to make a Move undoable. A shallow copy
-			// duplicates the ten numbers that a scale or a move actually changes and SHARES the one
-			// string, which is free and safe because strings are immutable in JavaScript. Nothing can
-			// edit an image through a shared reference; the only thing that replaces one is loading a
-			// new file, which assigns a whole new object.
+			// **THE BACKDROP IS SHALLOW-COPIED, AND THAT IS NOT A SHORTCUT.** Its `href` is a base64
+			// data URI -- 1.7 MB on Net2, 2.5 MB on Net3 -- so deep-cloning it into every one of
+			// twenty snapshots costs fifty megabytes to make a Move undoable. A shallow copy
+			// duplicates the ten numbers a scale or move changes and SHARES the one string, which is
+			// safe because strings are immutable: nothing can edit an image through a shared
+			// reference, and loading a new file assigns a whole new object.
 			backdrop: backdrop ? Object.assign({}, backdrop) : null
 		});
 		if (undoStack.length > UNDO_LIMIT) { undoStack.shift(); }
@@ -14734,33 +13123,27 @@ var EngCalcs = EngCalcs || {};
 	});
 
 	// ---- solve: EngCalcs.lpnSolve() (js/lpn-solver.js), debounced on every edit ----
-	// js/lpn-solver.js is a separate interface: its model shape (id/type/elev/demand/emitter/head for
-	// nodes; id/type/from/to/diameter/roughness/length/status/k/h0/a/b for links) is the solver's own
-	// API and is NOT renamed here. But doc.nodes/doc.links themselves now store every overridable
-	// property underscored (Task 184/146.08 step 2), so passing them through untouched would hand the
-	// solver a model with no demand/diameter/etc. at all. Every node/link is therefore rebuilt into a
-	// plain-keyed COPY, reading each overridable property through effective() -- this is also where a
-	// scenario's overrides take effect for the solver, once scenarios exist. Fields the solver reads
-	// that are NOT overridable (elev, from/to, h0/a/b, curve-derived) pass through unchanged.
-	// method is fixed to 'hw' for now (no friction-method selector yet -- see the numberFieldPlain()
-	// comment on Roughness). visc is fresh water at ~20C; not user-editable yet.
-	// A link's length in METRES, which is the only thing js/lpn-solver.js and js/lpn-epanet.js will
-	// accept ("EVERYTHING HERE IS SI: Q in m3/s, H and lengths in m. Callers convert at the edges").
+	// The solver's model shape is its own API and is NOT renamed here. doc.nodes/doc.links store
+	// every overridable property UNDERSCORED, so passing them through untouched hands the solver a
+	// model with no demand/diameter at all. Every node/link is rebuilt into a plain-keyed COPY,
+	// reading each overridable property through effective() -- which is also where a scenario's
+	// overrides take effect. Non-overridable fields (elev, from/to, curve-derived) pass through.
+	// visc is fresh water at ~20C; not user-editable yet.
+	// A link's length in METRES, the only thing js/lpn-solver.js and js/lpn-epanet.js accept.
 	// THIS FUNCTION IS THAT EDGE.
 	//
-	// Length is DECLARATIVE: one map unit IS one foot or one metre by declaration, with no
-	// conversion anywhere in the document, the popup or the labels. Hand that declared number to an
-	// SI solver and a pipe drawn and labelled 1000 ft solves as 1000 METRES while the elevation,
-	// head, demand and diameter around it are all converted -- head loss 3.281x too high, and
-	// 3.281 = 1 ft/m is the fingerprint. SI users are never affected, because there the factor is 1.
+	// Length is DECLARATIVE: one map unit IS one foot or one metre by declaration. Hand that declared
+	// number to an SI solver and a pipe drawn and labelled 1000 ft solves as 1000 METRES while the
+	// elevation, head, demand and diameter around it are all converted -- head loss 3.281x too high,
+	// and 3.281 = 1 ft/m is the fingerprint. SI users are never affected.
 	//
 	// **NEITHER ENGINE CAN CATCH THIS AND NEITHER CAN A SOLVER HARNESS.** validate.js and
 	// validate_epanet.js feed the SOLVER directly in SI, so they never cross this boundary, and the
-	// EPANET path reads the same model, so both engines are wrong together and agree perfectly. Any
+	// EPANET path reads the same model -- both engines are wrong together and agree perfectly. Any
 	// check of this must compare against a hand-computed US case, never against the other engine.
 	//
-	// Do NOT "fix" a future variant by making the map metric or by converting the stored length.
-	// The stored number stays declarative; only the handoff converts.
+	// Do NOT "fix" this by making the map metric or by converting the stored length. The stored
+	// number stays declarative; only the handoff converts.
 	function linkLengthSI(l) {
 		return effective(l, 'length') / unitFactor('lpn_u_length');
 	}
@@ -14824,12 +13207,11 @@ var EngCalcs = EngCalcs || {};
 				out.h0 = fit.h0; out.a = fit.a; out.b = fit.b;
 			}
 			if (l.type === 'valve') {
-				// THE SETTING CROSSES THIS BOUNDARY IN THE UNIT ITS TYPE NAMES, which is the whole
-				// reason a valve needs a line here at all. A pressure setting is a head in metres,
-				// a flow setting is m3/s, and a throttle's loss coefficient is dimensionless and
-				// must NOT be put through a converter -- feeding it to toSI('lpn_u_pressure') would
-				// divide a loss coefficient by 1.42 under the US preset and the network would still
-				// solve. Downstream, js/lpn-epanet.js converts each one again into EPANET's own
+				// THE SETTING CROSSES THIS BOUNDARY IN THE UNIT ITS TYPE NAMES, which is why a valve
+				// needs a line here at all. A pressure setting is a head in metres, a flow setting is
+				// m3/s, and a throttle's loss coefficient is dimensionless and must NOT go through a
+				// converter -- toSI('lpn_u_pressure') would divide it by 1.42 under the US preset and
+				// the network would still solve. js/lpn-epanet.js converts again into EPANET's own
 				// convention; this half only has to get it into SI.
 				out.valveType = (l.valveType || 'TCV').toUpperCase();
 				out.length = 0;
@@ -14856,19 +13238,16 @@ var EngCalcs = EngCalcs || {};
 		if (issue.code === 'valve-on-fixed-head') { return (pc.lpn_diag_valve_on_fixed_head || 'These valves are joined straight onto a reservoir or a tank, which already sets the water level there, so there is nothing left for the valve to control. Put a short pipe between them:') + ' ' + issue.ids.join(', '); }
 		return issue.code;
 	}
-	// DIAGNOSTICS AND NOTICES ARE DIFFERENT KINDS OF MESSAGE AND NOW HAVE DIFFERENT HOMES.
-	// A DIAGNOSTIC is a standing statement about the network as it is ("Add a reservoir"): it is true
-	// until the model changes, so it belongs in the page, in #lpn_status, where it can be as long as
-	// it needs. A NOTICE reports a completed action ("Saved X."): it is true for a moment, so it
-	// belongs on the canvas, covering the mode hint, and expires -- see the markup comment on
-	// #lpn_map_notice for why a transient must not sit in the page's flow.
+	// DIAGNOSTICS AND NOTICES ARE DIFFERENT KINDS OF MESSAGE AND HAVE DIFFERENT HOMES.
+	// A DIAGNOSTIC is a standing statement about the network as it is ("Add a reservoir"), true until
+	// the model changes, so it lives in the page in #lpn_status. A NOTICE reports a completed action
+	// ("Saved X."), true for a moment, so it lives on the canvas covering the mode hint and expires.
 	//
-	// They used to SHARE #lpn_status, which forced an outranking rule between two writers with
-	// different lifetimes (runSolve() rewrites the diagnostic on a 300ms debounce after every
-	// mutation, so a notice put in the same element was wiped just slowly enough for the user not to
-	// see it). Separate slots dissolve that: both can be on screen at once, neither can eat the
-	// other, and nothing has to arbitrate. The expiry timer stays, because the bar should not still
-	// be narrating an action from a minute ago.
+	// Sharing one element forces an outranking rule between two writers with different lifetimes:
+	// runSolve() rewrites the diagnostic on a 300ms debounce after every mutation, so a notice in the
+	// same element is wiped just slowly enough for the user not to see it. Separate slots dissolve
+	// that -- both can be on screen at once and nothing has to arbitrate.
+
 	var statusNoticeTimer = null;
 	var STATUS_NOTICE_MS = 8000;
 	function showNotice(text) {
@@ -14900,46 +13279,35 @@ var EngCalcs = EngCalcs || {};
 		el.style.display = text ? 'block' : 'none';
 	}
 	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
-	// extrema and decoration must compare on this, not the raw SI value. Two series links carrying
-	// what is physically the same flow can differ by solver roundoff far past the last printed
-	// decimal (continuity is satisfied to a tolerance, not bit-exact); comparing un-rounded SI values
-	// marked one as max and the other min even though both printed "100.00 gpm" -- a decoration the
-	// display can't justify. Rounding first is what fieldExtrema()'s "tie -> no decoration" rule is
-	// actually for.
-	// `decimals` (Task 189) is per field, from labelSettings.decimals, and MUST be fed through here
-	// rather than applied at print time: the whole point of this function is that the extrema and the
-	// printed text agree, so a field shown to 0 decimals has to have its extrema judged at 0 decimals
-	// too, or two links both printing "100" could still be marked max and min.
+	// extrema and decoration MUST compare on this, not the raw SI value. Two series links carrying
+	// physically the same flow differ by solver roundoff far past the last printed decimal
+	// (continuity is satisfied to a tolerance, not bit-exact), so comparing un-rounded SI values
+	// marks one max and the other min while both print "100.00 gpm".
+	// `decimals` is per field, from labelSettings.decimals, and MUST be fed through here rather than
+	// applied at print time, or two links both printing "100" could still be marked max and min.
 	// Above roughly 15 decimals, Math.pow(10, d) pushes the product past 2^53 and Math.round() becomes
-	// the identity, so displayRound() degrades to returning the value unrounded. That is harmless: the
-	// extrema/decoration invariant only requires that two labels printing the SAME text compare equal,
-	// and at that precision two labels printing the same text ARE bit-identical. Nothing to guard.
+	// the identity, so this degrades to returning the value unrounded. Harmless: at that precision
+	// two labels printing the same text ARE bit-identical.
 	function fieldDecimals(decimals) { return typeof decimals === 'number' ? decimals : 2; }
 	// ---- label prefixes and suffixes (ROADMAP Task 333) ----
 	//
-	// A prefix makes any SUBSET of a stacked label self-describing, which is the whole reason the
-	// per-field colours could go: a bare stack of numbers is only readable while all of it is
-	// present, because taking a line away leaves the reader no way to tell which quantity survived.
+	// A prefix makes any SUBSET of a stacked label self-describing, which is why the per-field
+	// colours could go: a bare stack of numbers is only readable while all of it is present.
 	//
 	// The default set: Q flow and demand, V velocity, S gradient, H head, P pressure, Z elevation,
 	// Hl head loss, km minor loss, C/n/e roughness, blank diameter, blank length, blank ID.
-	// Elevation is Z, not E: Z is the surveyor's and the hydraulic engineer's letter for a vertical
+	// Elevation is Z, not E: Z is the surveyor's and hydraulic engineer's letter for a vertical
 	// ordinate, and it does not collide with the E that Darcy-Weisbach roughness would want.
 	//
-	// A PREFIX ONLY HAS TO BE UNAMBIGUOUS IN ITS SLOT, not globally unique. A link's velocity line
-	// and a node's pressure line are different slots, so V and P doing double duty elsewhere costs
-	// no reader anything.
+	// A PREFIX ONLY HAS TO BE UNAMBIGUOUS IN ITS SLOT, not globally unique.
 	//
-	// BLANK FOR DIAMETER AND LENGTH IS DELIBERATE: those are the two a reader identifies from the
-	// magnitude and its unit, so a prefix would be noise on the fields with the least room.
-	//
-	// BLANK FOR ID, because the letter is already there: an ID is generated as
-	// settings.idPrefixes[key] + n, so a junction is literally named 'J12' and a prefix would print
-	// 'J J12'. The box still exists on that row for the user who renames their junctions to '12'.
+	// BLANK FOR DIAMETER AND LENGTH: those two are identified from the magnitude and its unit, so a
+	// prefix is noise on the fields with the least room. BLANK FOR ID because the letter is already
+	// there -- an ID is settings.idPrefixes[key] + n, so a prefix would print 'J J12'. The box still
+	// exists on that row for the user who renames their junctions to '12'.
 	//
 	// THE '=' IS PART OF THE PREFIX STRING, NOT A SEPARATOR THE PAGE ADDS. The prefix is printed
-	// exactly as typed, hard against the number, which is what lets someone type 'Q ', 'Q:' or
-	// nothing at all and get precisely that. The blanket separator is a different thing: it goes
+	// exactly as typed, hard against the number. The blanket separator is a different thing: it goes
 	// BETWEEN values, not between a prefix and its value.
 	var LPN_DEFAULT_LABEL_PREFIX = {
 		node: { id: '', demand: 'Q=', head: 'H=', pressure: 'P=', elev: 'Z=' },
@@ -14973,15 +13341,14 @@ var EngCalcs = EngCalcs || {};
 	// and never inside numLine()/rawLine(): the extrema comparison upstream of both works on the
 	// rounded NUMBER, so affixing afterwards is what guarantees a prefix can never change which
 	// value is marked highest or lowest.
-	// THE AFFIXES ARE THEIR OWN SEGMENTS, and that is what keeps an extrema mark the length of the
-	// NUMBER (Tom, 2026-08-15, of a mark spanning a whole line: "The underline needs to be only as
-	// long as the ID"). A mark that covers 'Q=749.94' starts at the label's left edge, which in a
-	// stacked label is exactly where the line above would be underlined -- so it reads as belonging
-	// to the wrong row. Marking '749.94' alone indents the mark past the prefix, which says which
-	// row it belongs to without any convention to learn.
+	// THE AFFIXES ARE THEIR OWN SEGMENTS, which keeps an extrema mark the length of the NUMBER. A
+	// mark covering 'Q=749.94' starts at the label's left edge -- in a stacked label exactly where
+	// the line above would be underlined -- so it reads as belonging to the wrong row. Marking
+	// '749.94' alone indents the mark past the prefix, which says which row it belongs to.
 	//
 	// `line.text` is still the whole thing, because that is what a reader of the code (and every
 	// harness) means by "what does this label say".
+
 	function affix(group, field, line) {
 		var p = labelPrefixFor(group, field), s = labelSuffixFor(group, field);
 		// The field NAME rides along (Task 399). Everything downstream that has to rank a line --
@@ -15003,29 +13370,23 @@ var EngCalcs = EngCalcs || {};
 	function labelIsDragged(x) { return x.lx !== undefined || x.ly !== undefined; }
 	// The field lines as ROWS OF SEGMENTS for setMultilineText().
 	//
-	// A LINK LABEL IS ONE LINE UNLESS DRAGGED; A NODE LABEL IS ALWAYS A STACK (Tom, 2026-08-15,
-	// after seeing both: "I think that either junction labels in home position should be multiline
-	// or it should be a project toggle. Probably just multiline.").
+	// A LINK LABEL IS ONE LINE UNLESS DRAGGED; A NODE LABEL IS ALWAYS A STACK. The asymmetry is
+	// geometry: a link label lies along a PIPE and competes with everything strung out around it, so
+	// one line is what buys it room, while a node label hangs off a POINT with open space above and
+	// below. A node also carries up to five fields against a link's typical two.
 	//
-	// The asymmetry is not a compromise, it is the geometry. A link label has to lie along a PIPE
-	// and compete with everything else strung out around that pipe, so one line is what buys it
-	// room -- which is the whole argument for concatenating in the first place. A node label hangs
-	// off a POINT with open space above and below it, where a stack is the more readable shape and
-	// costs nothing. And a node carries up to five fields against a link's typical two, so the
-	// one-line form is where it hurts most.
+	// A DRAGGED link label stacks too: it has been placed deliberately, the same reading of a drag
+	// that exempts it from the short-pipe rule and the collision nudge. Double-clicking sends it home
+	// and back to one line.
 	//
-	// A DRAGGED link label stacks too: it has been placed deliberately, in space its author chose,
-	// which is the same reading of a drag that exempts it from the short-pipe rule and from the
-	// collision nudge. Double-clicking sends it home and back to one line.
-	//
-	// The separator is its own SEGMENT rather than being appended to the value before it, so that an
-	// extrema mark underlines the number alone and never the punctuation after it.
+	// The separator is its own SEGMENT rather than appended to the value before it, so an extrema
+	// mark underlines the number alone and never the punctuation after it.
 	// `owners`, when supplied, is filled with one entry per DRAWN SEGMENT saying which field line it
-	// came from (-1 for a separator, which belongs to no field). It is produced HERE rather than by a
-	// parallel function that walks the same lines a second time, because the two would drift the
-	// moment either shape changed -- and the failure would be a label whose measured width belongs to
-	// different values than the ones on screen, which is invisible until something sheds the wrong
-	// one. Segments come out in exactly the order setMultilineText() creates tspans.
+	// came from (-1 for a separator). Produced HERE rather than by a parallel function walking the
+	// same lines again, because the two would drift and the failure -- a label whose measured width
+	// belongs to different values than the ones on screen -- is invisible until something sheds the
+	// wrong one. Segments come out in exactly the order setMultilineText() creates tspans.
+
 	function composeRows(lines, stacked, owners) {
 		function own(i, n) { if (owners) { while (n-- > 0) { owners.push(i); } } }
 		if (stacked || lines.length < 2) {
@@ -15056,18 +13417,13 @@ var EngCalcs = EngCalcs || {};
 		var p = Math.pow(10, fieldDecimals(decimals));
 		return Math.round(value * p) / p;
 	}
-	// One line of a numeric label field: the number alone, decorated
-	// with a high/low tick when it ties the network-wide max/min for that field
-	// (fieldExtrema()/decorationFor() above, drawn as the segment's own text-decoration). Whatever names the
-	// quantity is added afterwards by affix(), never here -- see its comment.
-	// `suffix` here is the UNIT-DERIVED one, not the user's: the head loss gradient's '%' (Tom,
-	// 2026-08-14: "we are omitting all other units as excessively redundant, I think that the % is
-	// crucial"). It stays automatic rather than becoming a default in labelSettings.suffix because
-	// it is read from the units strip on every rebuild -- this family also offers plain rise/run,
-	// where the same token would be a lie rather than a redundancy, and 0.43 is a plausible reading
-	// in BOTH forms. A static stored suffix could not follow that switch. The user's own suffix, if
-	// they set one, lands outside this one. Extrema compare the NUMBER, so neither affects which
-	// label gets a tick.
+	// One line of a numeric label field: the number alone, decorated with a high/low tick when it
+	// ties the network-wide max/min for that field. Whatever names the quantity is added afterwards
+	// by affix(), never here.
+	// `suffix` here is the UNIT-DERIVED one, not the user's: the head loss gradient's '%', read from
+	// the units strip on every rebuild rather than stored, because the family also offers plain
+	// rise/run where the same token would be a lie and 0.43 is plausible in BOTH forms. The user's
+	// own suffix lands outside this one, and extrema compare the NUMBER, so neither affects ticks.
 	function numLine(siValue, unitId, extrema, decimals, suffix) {
 		var displayValue = displayRound(siValue, unitId, decimals);
 		return { text: displayValue.toFixed(fieldDecimals(decimals)) + (suffix || ''), decoration: decorationFor(extrema, displayValue) };
@@ -15089,38 +13445,25 @@ var EngCalcs = EngCalcs || {};
 			// One string, computed once for the whole pass -- see the measurement comment below.
 			fsNow = effectiveFontSize() + 'px';
 		// Every field below is rounded through the same displayRound()/per-field-decimals rule the
-		// label text itself uses (see the comment on displayRound()), so a tie in what's actually
-		// printed is always a tie in what gets decorated.
+		// label text uses, so a tie in what is printed is always a tie in what gets decorated.
 		//
-		// ---- DEMAND AND FLOW ARE JUDGED SEPARATELY, and that has now been decided TWICE ----
+		// ---- DEMAND AND FLOW ARE JUDGED SEPARATELY, decided twice ----
 		//
-		// They print with the same prefix (a demand IS a flow -- the flow leaving the network at that
-		// point), so pooling them into one Q comparison looks obviously right, and it was tried on
-		// 2026-08-15 and reverted the same day. Two reasons, and the second is the one that decides:
+		// They print with the same prefix (a demand IS a flow), so pooling them into one Q comparison
+		// looks obviously right. **A pooled Q can only ever be answered by a link:** a source carries
+		// the sum of every demand downstream of it, so the top mark lands on a pump or a supply main
+		// every time and "which junction draws the most" stops being answerable at all. Consistency
+		// of the PREFIX is not worth losing a whole comparison.
 		//
-		//   * The report that prompted it was a misreading. Two "highest Q" marks on one drawing
-		//     turned out to be a junction's DEMAND and a pump's FLOW, not the pipe-versus-pump split
-		//     it looked like. Nothing was actually inconsistent.
-		//   * **A pooled Q can only ever be answered by a link.** A source carries the sum of every
-		//     demand downstream of it, so the top mark lands on a pump or a supply main every time
-		//     and "which junction draws the most" -- a question a designer genuinely asks -- stops
-		//     being answerable at all. Consistency of the PREFIX is not worth the loss of a whole
-		//     comparison.
-		//
-		// So: two pools, on purpose. If a future reader is about to merge them for tidiness, this is
-		// the note saying it was tried, and `dev/lpn-spike/label-affix-harness.js` asserts the split.
+		// `dev/lpn-spike/label-affix-harness.js` asserts the split.
 		// **THE NODE FIELDS ARE COMPUTED ONCE AND READ TWICE**, by the extrema ticks below and by the
-		// local feature context's drop ranking (Task 397). They used to be an anonymous array inside
-		// fieldExtrema()'s own argument, which is fine when min and max are all anyone wants and no
-		// use at all to a comparator that needs the value AT a node. `nodeValueMap()` keeps both
-		// shapes from one walk -- and, more importantly, keeps the two consumers reading the SAME
-		// rounded number, so a label's printed value, its high/low tick and its rank can never
-		// disagree.
+		// local feature context's drop ranking (Task 397). `nodeValueMap()` keeps both shapes from
+		// one walk, so the two consumers read the SAME rounded number and a label's printed value,
+		// its high/low tick and its rank can never disagree.
 		//
-		// Elevation and pressure include reservoirs -- a reservoir has a real elevation of its own,
-		// and a real pressure (head minus that elevation) whenever its head has been raised above it.
-		// Demand still excludes them: a reservoir supplies whatever the network draws rather than
-		// demanding an amount.
+		// Elevation and pressure include reservoirs -- a reservoir has a real elevation, and a real
+		// pressure whenever its head has been raised above it. Demand excludes them: a reservoir
+		// supplies whatever the network draws rather than demanding an amount.
 		// INPUTS use plainRound() -- they are already in the displayed unit (Task 263), the same
 		// treatment length/roughness/km have always had. Only solve RESULTS still come out of the
 		// solver in SI and go through displayRound().
@@ -15176,20 +13519,17 @@ var EngCalcs = EngCalcs || {};
 				if (!lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
 				return displayRound(shownHeadloss(l, lastSolveResult.headlosses[l.id]), 'lpn_u_elevhead', ld.headloss);
 			})),
-			// Head loss GRADIENT (ROADMAP Task 177, Tom agreed 2026-07-30): headloss/length as a
-			// dimensionless ratio, reusing the same grade/gradePercent OPTIONS as mpf_/mphl_'s own
-			// friction-slope 'slope' family, but its own 'gradient' family (lib/Units.lib.php) so it
-			// can default to gradePercent -- lpn_'s generic 2-decimal label formatter needs the %
-			// form to read as anything but "0.00" for a typical small pipe gradient; see that
-			// family's own comment. Not a per-1000-length form (EPANET's convention) by design,
-			// matching this suite's own established slope convention instead.
+			// Head loss GRADIENT (Task 177): headloss/length as a dimensionless ratio, reusing
+			// mpf_/mphl_'s grade/gradePercent OPTIONS but its own 'gradient' family so it can default
+			// to gradePercent -- the generic 2-decimal formatter needs the % form to read as anything
+			// but "0.00" for a typical small pipe gradient. NOT a per-1000-length form (EPANET's
+			// convention), matching this suite's own slope convention instead.
 			// linkLengthSI(), NOT effective(l,'length'). A gradient is dimensionless, so BOTH sides
-			// of the division must be in the same system, and the numerator is a solver head loss
-			// in metres. This line used to divide by the DECLARED length and carried a comment
-			// asserting that number "is already the real SI length the solver itself used" -- that
-			// belief was the Task 255 bug (see linkLengthSI()), and it made the gradient wrong by
-			// the same 3.281x in US units, on top of the head loss already being wrong.
+			// of the division must be in the same system, and the numerator is a solver head loss in
+			// metres. Dividing by the DECLARED length is the Task 255 bug and makes the gradient
+			// wrong by 3.281x in US units, on top of the head loss already being wrong.
 			// Pump-excluded, same as headloss.
+
 			gradient: fieldExtrema(doc.links.map(function (l) {
 				var len = linkLengthSI(l);
 				if (l.type === 'pump' || !len || !lastSolveResult || lastSolveResult.headlosses[l.id] === undefined) { return undefined; }
@@ -15235,18 +13575,12 @@ var EngCalcs = EngCalcs || {};
 			nodeLines[n.id] = lines;
 			ne.lines = lines; // the FIELD lines, one per value, whatever shape they were drawn in
 			// **THE FONT SIZE MUST BE RIGHT FOR THIS SCALE BEFORE THE TAPE MEASURE COMES OUT.**
-			// (Tom, 2026-08-15, with two screenshots of the same view: *"See the size of these boxes
-			// before and after I drag."* The green obstacle boxes were several times the label in
-			// one and tight around it in the other.)
-			//
-			// getBBox() returns WORLD units, and noteMeasuredWidth() multiplies by the CURRENT scale
-			// to bank a pixel width. Both halves have to belong to the same moment. A label's
-			// font-size is itself in world units (textSize / s), so if this runs after a zoom but
-			// before refreshFontSizes() has updated the element, we measure text drawn at the OLD
-			// scale and multiply it by the NEW one -- and the banked pixel width is wrong by exactly
-			// the zoom ratio, in the direction that makes boxes enormous when you zoom out. It
-			// healed on the next drag only because a drag ends in a solve, which re-enters here with
-			// the sizes by then agreeing.
+			// getBBox() returns WORLD units and noteMeasuredWidth() multiplies by the CURRENT scale
+			// to bank a pixel width, so both halves must belong to the same moment. A label's
+			// font-size is itself in world units (textSize / s), so running this after a zoom but
+			// before refreshFontSizes() has updated the element measures text drawn at the OLD scale
+			// and multiplies by the NEW one -- the banked pixel width is then wrong by exactly the
+			// zoom ratio, making obstacle boxes enormous when you zoom out.
 			ne.text.style.fontSize = fsNow;
 			try { noteMeasuredWidth(ne, ne.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 			noteRowWidths(ne);
@@ -15281,15 +13615,12 @@ var EngCalcs = EngCalcs || {};
 			le.empty = lines.length === 0;
 			if (lines.length === 0) { lines.push({ text: '' }); }
 			// **DRAW IT, MEASURE IT, AND IF IT DOES NOT FIT, DROP A VALUE AND DO IT AGAIN.** One
-			// measurement path, and it is getBBox() -- see shedOrder() for why the arithmetic
-			// shortcut this replaced produced nothing in a real browser.
+			// measurement path, getBBox() -- see shedOrder() for why an arithmetic shortcut produces
+			// nothing in a real browser.
 			//
-			// `renderLinkLabel()` is the single place a link label's glyphs are built, so the full
-			// label and every shed candidate go through identical code and cannot disagree about
-			// anything but their content. The rowsSeq stamp lives there too: **it must move when a
-			// SHED changes the content**, or every repeat of a shed label keeps the tspans of the
-			// label it used to be, and a chain that says different things at different stations is
-			// exactly what the chain convention exists to prevent.
+			// `renderLinkLabel()` is the single place a link label's glyphs are built. The rowsSeq
+			// stamp lives there too: **it must move when a SHED changes the content**, or every
+			// repeat of a shed label keeps the tspans of the label it used to be.
 			var allLines = lines;
 			renderLinkLabel(le, l, lines, fsNow);
 			// **A DRAGGED LABEL NEVER SHEDS**, the same hedge and the same reasoning that exempts it
@@ -15309,18 +13640,14 @@ var EngCalcs = EngCalcs || {};
 			le.shedCount = allLines.length - le.lines.length;
 			linkLines[l.id] = le.lines;
 		});
-		// **CONTENT DECISIONS HERE, POSITION DECISIONS IN THE COLLISION PASS** (Task 399, Tom
-		// 2026-08-16: *"I cannot detect a single instance of shed. It's always all or nothing."*).
+		// **CONTENT DECISIONS HERE, POSITION DECISIONS IN THE COLLISION PASS** (Task 399). The
+		// length-driven cascade above only fires when a label is wider than its own pipe, which
+		// measured 45-84% on a normal drawing; the shed a reader actually meets is the CROWDING one,
+		// and this is it.
 		//
-		// He was right, and the length-driven cascade above could never have satisfied him: it only
-		// fires when a label is wider than its own pipe, which measured 45-84% on a normal drawing.
-		// The shed a reader actually meets is the CROWDING one, and this is it.
-		//
-		// It runs HERE and not in placeStationedLabels() because of the clock. That pass runs on
-		// every frame of a drag, and shedding means rebuilding glyphs and forcing a layout; this
-		// function runs when the CONTENT changes -- a solve, a toggle, a unit switch -- which is
-		// exactly the lifetime a content decision wants. It also gives the two passes a clean split
-		// worth stating: what a label SAYS is settled here, where it GOES is settled there.
+		// It runs HERE and not in placeStationedLabels() because of the clock: that pass runs on every
+		// frame of a drag, and shedding means rebuilding glyphs and forcing a layout, while this
+		// function runs when the CONTENT changes -- a solve, a toggle, a unit switch.
 		shedAlignedForConflicts(fsNow, effectiveFontSize());
 		// Collision avoidance runs on the freshly measured tw/lineCount above, THEN every label is
 		// laid out for real (text and leader) at its final, possibly-nudged position. The extrema
@@ -15337,13 +13664,11 @@ var EngCalcs = EngCalcs || {};
 	}
 	// ---- audit halos, and the greying of inactive elements (ROADMAP Task 184) ----
 	// A halo marks an element carrying an override IN THE CURRENT SCENARIO, filtered by the same
-	// Labels-panel checkboxes the rest of the page uses as its property filter (Task 184; the same
-	// reuse the two pushes make). This is why the overrides REPORT is explicitly low priority --
-	// the halo puts the same information in the place the user is already looking.
-	//
-	// A property with no Labels checkbox (status, active, a tank's level) is ALWAYS shown: the
-	// filter can only hide what it is able to name, and silently dropping an override the panel has
-	// no row for would make the halos quietly incomplete rather than filtered.
+	// Labels-panel checkboxes the rest of the page uses as its property filter -- which is why the
+	// overrides REPORT is low priority.
+	// A property with no Labels checkbox (status, active, a tank's level) is ALWAYS shown: the filter
+	// can only hide what it can name, and dropping an override the panel has no row for would make
+	// the halos quietly incomplete rather than filtered.
 	var LPN_OVERRIDE_LABEL_FIELD = {
 		node: { demand: 'demand', head: null, level: null, emitter: null, active: null },
 		link: { diameter: 'diameter', roughness: 'roughness', k: 'km', length: 'length', status: null, active: null }
@@ -15375,29 +13700,23 @@ var EngCalcs = EngCalcs || {};
 			if (le.symbolG) { le.symbolG.classList.toggle('lpn-inactive', off); }
 		});
 	}
-	// The layout half of refreshLabelText(), without rebuilding any text: re-run collision
-	// avoidance, then place every label (text and leader) and its extrema ticks at the resulting
-	// position. Split out so a DRAG can call it on every frame (Tom, 2026-07-30: "collisions aren't
-	// recalculated after drag; leaders stay unchanged") -- moving one label changes what every other
-	// label collides with, but none of the NUMBERS change while dragging, so rebuilding all the
-	// tspans 60 times a second would be pure waste. Safe to call repeatedly because the collision
-	// pass is idempotent (see addDataLabel()). Ticks reuse the lines cached by the last full
+	// The layout half of refreshLabelText(), without rebuilding any text. Split out so a DRAG can
+	// call it on every frame: moving one label changes what every other label collides with, but
+	// none of the NUMBERS change while dragging. Safe to call repeatedly because the collision pass
+	// is idempotent (see addDataLabel()). Ticks reuse the lines cached by the last full
 	// refreshLabelText().
+
 	// **ALL THREE KINDS OF LABEL, THE USER'S OWN TEXT LABELS INCLUDED.** A Text label's leader and
 	// its collision box are both derived from a pixel width, so leaving it un-laid-out across a zoom
-	// leaves them at the old scale. Nothing else lays them out -- refreshFontSizes() stopped doing
-	// so when the zoom path stopped re-measuring (Task 366). It costs nothing to be right: a drawing
-	// holds a handful of Text labels against hundreds of data labels, and this path does no
-	// measuring.
+	// leaves them at the old scale, and nothing else lays them out. It costs nothing: a drawing holds
+	// a handful of Text labels against hundreds of data labels, and this path does no measuring.
 	//
-	// **THE LAYOUT BELONGS TO A SCALE, AND THIS IS WHERE THAT IS RECORDED.** Every label is sized
-	// in screen pixels, so at a coarse scale it is enormous in WORLD units and the collision pass
-	// moves it correspondingly far. Measured on Net3, a model 37 units across: a layout computed at
-	// scale 1 has a MEDIAN nudge of 43 world units and a worst of 68 -- labels flung clean off the
-	// far side of the network. At scale 20, where that drawing is actually read, the median is 3.9.
-	// Those nudges are CORRECT for the scale that produced them and nonsense at any other, so
-	// displaying a layout at a scale it was not computed for is the whole defect. A drag re-runs
-	// this pass, which is why one gesture puts every label right at once.
+	// **THE LAYOUT BELONGS TO A SCALE, AND THIS IS WHERE THAT IS RECORDED.** Every label is sized in
+	// screen pixels, so at a coarse scale it is enormous in WORLD units and the collision pass moves
+	// it correspondingly far. Measured on Net3, a model 37 units across: a layout computed at scale 1
+	// has a MEDIAN nudge of 43 world units and a worst of 68 -- labels flung clean off the far side
+	// of the network -- against a median of 3.9 at scale 20, where that drawing is read. Those nudges
+	// are CORRECT for the scale that produced them and nonsense at any other.
 	var lastLayoutScale = null;
 	function relayoutLabels() {
 		lastLayoutScale = state.s;
@@ -15412,19 +13731,13 @@ var EngCalcs = EngCalcs || {};
 		// too, or a reload would resurrect the stale pre-delete network).
 		saveToStorage();
 		if (doc.nodes.length === 0) { lastSolveResult = null; setStatus(''); return; }
-		// Usage logging, added 2026-08-03. Until now this page logged ZERO real usage: every other
-		// calculator reaches maybeLogCalcUsage() through calcAndSave() <- submitForm(), and on this
-		// page submitForm() fires ONLY from the seven unit dropdowns' hardcoded
-		// onchange="EngCalcs.submitForm()" and the US/SI preset buttons. Drawing a network and
-		// solving it goes scheduleSolve() -> runSolve() and never touches that path -- so the
-		// "used" column counted unit-strip changes, not networks solved, and was not measuring the
-		// same event as the other fifteen rows on the report.
-		// Placed here, after the non-empty check and BEFORE the diagnostics, on purpose: the other
-		// calculators log on interaction that triggers a recalculation, whether or not the result is
-		// usable, so the comparable event here is "the user has drawn something and we attempted to
-		// compute it" -- not "it converged". maybeLogCalcUsage() carries its own 10s-after-load gate
-		// and per-page-load dedupe, so the initial load solve and the every-keystroke debounce do
-		// not inflate it.
+		// Usage logging. Every other calculator reaches maybeLogCalcUsage() through calcAndSave() <-
+		// submitForm(), and on this page submitForm() fires ONLY from the unit dropdowns and the
+		// US/SI preset buttons -- drawing a network goes scheduleSolve() -> runSolve() and never
+		// touches that path, so without this the "used" column counts unit-strip changes.
+		// Placed after the non-empty check and BEFORE the diagnostics: the comparable event is "the
+		// user has drawn something and we attempted to compute it", not "it converged".
+		// maybeLogCalcUsage() carries its own 10s-after-load gate and per-page-load dedupe.
 		if (EngCalcs.maybeLogCalcUsage) { EngCalcs.maybeLogCalcUsage(); }
 		// A UNIT WE HAVE NO FACTOR FOR STOPS THE SOLVE AND NOTHING ELSE (Task 390 step 4). The
 		// drawing is already on screen and every number is already the user's own; what cannot be
@@ -15449,16 +13762,16 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		// AN ACTIVE VALVE ROUTES THE SOLVE TO EPANET, whatever the engine PREFERENCE says, and the
-		// status bar says so out loud (Task 248 phase 2, 2026-08-14).
+		// status bar says so out loud (Task 248 phase 2).
 		//
 		// The setting is a preference; the routing is a fact about THIS network. A PRV, PSV or FCV
 		// switches its own state during the solve and js/lpn-solver.js deliberately does not
-		// implement that -- EPANET already does, and measured ~9x faster than our own solver at the
-		// 21-node target (ROADMAP Task 313), so a second implementation would have been slower code
-		// for a solved problem. So the routing is automatic, because refusing to solve a network we
-		// can solve would be absurd, and it is VISIBLE, because a user who ticked "built-in solver"
-		// and silently got a different engine has been lied to. settings.engine is NOT rewritten:
-		// delete the valve and the page goes straight back to the engine the user chose.
+		// implement that -- EPANET already does, measured ~9x faster than our own solver at the
+		// 21-node target (Task 313). The routing is automatic, because refusing to solve a network we
+		// can solve would be absurd, and VISIBLE, because a user who ticked "built-in solver" and
+		// silently got a different engine has been lied to. settings.engine is NOT rewritten: delete
+		// the valve and the page goes back to the engine the user chose.
+
 		var epanetOnly = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [];
 		valveRouteNote = '';
 		if ((settings.engine === 'epanet' || epanetOnly.length > 0) && EngCalcs.lpnSolveEpanet) {
@@ -15476,30 +13789,23 @@ var EngCalcs = EngCalcs || {};
 	// user's choice; read by applySolveResult(), which owns the status bar after a successful solve.
 	var valveRouteNote = '';
 
-	// ---- Warming the EPANET engine (Tom, 2026-08-14) ----
+	// ---- Warming the EPANET engine ----
 	//
 	// js/vendor/epanet-js.js is 664 KB and is deliberately NOT precached by the service worker: it
-	// loads only for a visitor who actually needs it, because precaching it would multiply the
-	// install cost for exactly the low-bandwidth audience this suite exists for (ROADMAP Task 318).
-	// The cost of that decision was a real gap -- offline, a network holding a PRV, PSV or FCV could
-	// not be solved at all unless the engine happened to have been fetched at some earlier point.
+	// loads only for a visitor who needs it, because precaching multiplies the install cost for
+	// exactly the low-bandwidth audience this suite exists for (Task 318). The gap that leaves is
+	// that offline, a network holding a PRV, PSV or FCV cannot be solved at all.
 	//
-	// Tom's framing is what turned this from a copy problem into a fetch-timing one: *"Can we disable
-	// those elements unless the EPANET engine is on or alert and turn it on or some other gatekeeping
-	// late-loading?"* The engine only ever needs downloading ONCE. So fetch it at the first moment a
-	// network can only be solved by it -- when the user picks an active valve type, or turns the
-	// engine on -- because they are necessarily online then, having just loaded the page. After that
-	// one fetch the browser and the service worker both hold it, and the network solves offline for
-	// good.
+	// The engine only ever needs downloading ONCE, so fetch it at the first moment a network can only
+	// be solved by it -- when the user picks an active valve type, or turns the engine on -- because
+	// they are necessarily online then, having just loaded the page.
 	//
-	// IT IS NOT A GATE, and that is deliberate. A user who is offline right now may still build a
-	// PRV: refusing would block them from DESIGNING a network they intend to solve later, which is
-	// ordinary work. What changes is WHEN they are told -- at the moment they choose the type, while
-	// they can still act on it, instead of after a solve quietly refuses.
+	// IT IS NOT A GATE. A user who is offline right now may still build a PRV: refusing would block
+	// them from DESIGNING a network they intend to solve later. What changes is WHEN they are told --
+	// at the moment they choose the type, while they can still act on it.
 	//
-	// Waiting for the debounced solve to trigger the load would mostly work and is not enough: the
-	// gap between choosing a valve type and the solve firing is exactly where a phone drops its
-	// connection, and the solve's own failure message arrives after the user has moved on.
+	// Waiting for the debounced solve to trigger the load is not enough: the gap between choosing a
+	// valve type and the solve firing is exactly where a phone drops its connection.
 	var epanetWarmState = 'cold';   // cold | warming | ready | unavailable
 	// `why` is 'valve' or 'engine'. THE SAME FETCH HAS TWO REASONS and one message cannot be true of
 	// both: Tom turned the solver on and was told about valves he had not created (2026-08-14).
@@ -15605,27 +13911,21 @@ var EngCalcs = EngCalcs || {};
 		solveTimer = setTimeout(runSolve, 300);
 	}
 
-	// calcAndSave() calls this unconditionally -- from the units strip's own selects
-	// (echoUnitSelect() hardcodes onchange="EngCalcs.submitForm()") and from echoUnitsRow()'s
-	// US/SI preset buttons. A unit switch doesn't need a fresh solve (the underlying SI values
-	// didn't change) -- just re-render whatever's already cached in the new unit.
-	// **Required even though this page has nothing to initialise** (found 2026-08-06 driving the real
-	// page in headless Chromium, on a profile with no cookie -- i.e. every first-time visitor).
-	// `EngCalcs.readCookieAndCalc()` calls this unconditionally when `cookieToForm()` finds no cookie,
-	// so its absence threw a TypeError that aborted the rest of that function -- taking `loadFromUrl()`
-	// and the first `pageCalculator()` down with it. Every other calculator defines it, several as
-	// exactly this empty stub; only this page had not, because this page is built in JS rather than
-	// from `$arrayInputs` rows and never looked like it needed one.
+	// calcAndSave() calls this unconditionally, from the units strip's own selects and from
+	// echoUnitsRow()'s US/SI preset buttons.
+	// **Required even though this page has nothing to initialise.** `EngCalcs.readCookieAndCalc()`
+	// calls it unconditionally when `cookieToForm()` finds no cookie -- every first-time visitor --
+	// so its absence throws a TypeError that aborts the rest of that function, taking `loadFromUrl()`
+	// and the first `pageCalculator()` with it.
+
 	EngCalcs.pageCalculatorInitialize = function (objForm) {};
 	EngCalcs.pageCalculator = function (objForm) {
-		// A unit switch REINTERPRETS every input (Task 263), so it changes the physics rather than
-		// the display: the same three curve points mean a different pump under l/s than under gpm,
-		// and every solved head, pressure and velocity moves with them. This is the whole visible
-		// consequence of the ban, and it is deliberate.
-		//
-		// A refit used to have to happen HERE, on every unit switch, because the fitted curve was
-		// stored on the link. It is derived at the solver handoff now (pumpFit), so re-solving is
-		// the whole of the response and there is nothing left to repair (Task 390 step 5).
+		// A unit switch REINTERPRETS every input (Task 263), so it changes the physics rather than the
+		// display: the same three curve points mean a different pump under l/s than under gpm, and
+		// every solved head, pressure and velocity moves with them. Deliberate.
+		// No refit is owed here: the fitted curve is derived at the solver handoff (pumpFit), so
+		// re-solving is the whole of the response (Task 390 step 5).
+
 		scheduleSolve();
 		refreshMapStatus();   // a unit switch is exactly when this readout has to be right
 		// The project's units are part of the project (serializeProject), so a switch is a change to
