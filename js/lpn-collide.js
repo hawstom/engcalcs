@@ -337,6 +337,204 @@ EngCalcs.lpnCollide = (function () {
 		return cands;
 	}
 
+	// ---- the open-angle table: four cardinal corners, pruned by exact arcs (Task 411) -----------
+	//
+	// **THIS IS A REJECTION TEST, NOT A GENERATOR.** Tom, 2026-08-17: the four positions stay fixed
+	// and cardinal -- top-right, top-left, bottom-right, bottom-left, tried in that order -- and the
+	// table is what lets the placer SKIP one *"without looking at our model again at this moment."*
+	// So nothing below queries the network. It is handed the incident bearings once, turns them into
+	// arcs once, and every later question is answered against that little table.
+	//
+	// **WHY FOUR AND NOT EIGHT IS AN ANGULAR ARGUMENT.** A top-centre or bottom-centre label straddles
+	// the vertical and blocks nearly half the circle as seen from the anchor; a corner label kept
+	// entirely inside its own quadrant blocks only 70-80 degrees, so four of them still leave gaps for
+	// a link to arrive through. Adding the centres closes those gaps, which is what disqualifies them.
+	// Do not put them back. (Top-first is Imhof's ascender argument; right-first is convention.)
+	//
+	// **BEARINGS ARE y-DOWN, the sense atan2(dy, dx) returns**, so 0 is east, 90 is south, 270 north.
+	// The quadrant a corner occupies is therefore 270-360 for TOP-right, not 0-90. The ROADMAP block
+	// states the same test in y-up terms ("any dirty angle in 10-80 degrees for TR"); it is the same
+	// question, one quarter turn round.
+	var CORNERS = [
+		{ name: 'TR', sx: 1, sy: -1, q0: 270, q1: 360 },
+		{ name: 'TL', sx: -1, sy: -1, q0: 180, q1: 270 },
+		{ name: 'BR', sx: 1, sy: 1, q0: 0, q1: 90 },
+		{ name: 'BL', sx: -1, sy: 1, q0: 90, q1: 180 }
+	];
+	// **THE ONE TUNABLE, AND IT IS THE TUNABLE THAT DECIDES WHETHER ANY OF THIS WORKS.** A link is
+	// never exactly orthogonal, so a corner's quadrant has to be narrowed at both ends before it is
+	// asked whether anything arrives through it -- narrow by too little and every corner is rejected
+	// on links that miss it by a degree; by too much and nothing is ever rejected at all. Tom's
+	// estimate, 2026-08-17: 30 degrees is not practical, 15 may be, **5-10 is almost essential**.
+	//
+	// **THE DEFAULT BELOW IS PROVISIONAL AND AWAITS A MEASURED ANSWER FROM THE TESTER PANEL** (Task
+	// 416). It is a live, mutable table of numbers with exactly the shape of GOAL_WEIGHT above, for
+	// exactly the reason: the panel walks Object.keys() and builds a row per key, so a tunable added
+	// here needs no panel code at all. Read it through the object on every call -- never copy the
+	// number into a local at load time, or turning the knob would change nothing until a reload.
+	var ANGLE_TUNING = {
+		cornerTolerance: 8        // degrees shaved off EACH end of a corner's quadrant
+	};
+	function norm360(deg) {
+		var d = deg % 360;
+		return d < 0 ? d + 360 : d;
+	}
+	// THE TABLE. The open sectors at an anchor as EXACT ARCS -- the gaps between the incident
+	// bearings, in order round the circle -- because the bearings are known exactly and bucketing
+	// them into fixed wedges throws away precision we were handed free. A 183-degree opening is ONE
+	// arc here, not four wedges that each read "clear".
+	//
+	// { start, end } in degrees, start in [0, 360) and end > start, so an arc that crosses zero says
+	// so by running past 360 rather than by splitting in two. Nothing occupied is one arc of 360.
+	// A pure function of the bearings, so it is view-independent and safe to cache beside them.
+	function openArcs(bearings) {
+		var bs = [], out = [], i, b, prev = null, n;
+		for (i = 0; i < (bearings ? bearings.length : 0); i++) {
+			b = bearings[i];
+			if (typeof b === 'number' && isFinite(b)) { bs.push(norm360(b)); }
+		}
+		bs.sort(function (x, y) { return x - y; });
+		// TWO PIPES ON THE SAME BEARING BLOCK ONCE. Without this the pair yields a zero-width gap and
+		// a node with one direction on it yields no arc at all rather than the whole circle but a ray.
+		for (i = 0; i < bs.length; i++) {
+			if (prev === null || bs[i] - prev > 1e-9) { out.push(bs[i]); prev = bs[i]; }
+		}
+		bs = out;
+		n = bs.length;
+		if (!n) { return [{ start: 0, end: 360 }]; }
+		if (n === 1) { return [{ start: bs[0], end: bs[0] + 360 }]; }
+		out = [];
+		for (i = 0; i < n; i++) {
+			b = bs[(i + 1) % n];
+			out.push({ start: bs[i], end: bs[i] + (i + 1 < n ? b - bs[i] : b + 360 - bs[i]) });
+		}
+		return out;
+	}
+	// Does any ONE arc hold the whole range [a0, a1]? Asked in the arc's own frame, so the wrap is
+	// arithmetic rather than a case: how far a0 lies round from the arc's start, plus the range's own
+	// width, against the arc's width.
+	function arcHolds(arcs, a0, a1) {
+		var i, arc, d0, w = a1 - a0;
+		if (w <= 0) { return true; }
+		for (i = 0; i < (arcs ? arcs.length : 0); i++) {
+			arc = arcs[i];
+			d0 = norm360(a0 - arc.start);
+			if (d0 + w <= arc.end - arc.start + 1e-9) { return true; }
+		}
+		return false;
+	}
+	// THE LOOKUP THE PLACER MAKES, once per corner: is this corner's narrowed quadrant free of every
+	// incident bearing? One walk of an array with as many entries as the node has pipes -- two on
+	// most of a real network -- and no access to the model at all. That is the whole saving.
+	function cornerIsOpen(arcs, i, tol) {
+		var c = CORNERS[i];
+		tol = tol >= 0 ? tol : ANGLE_TUNING.cornerTolerance;
+		if (tol >= 45) { tol = 44.9; }   // a tolerance that eats its own quadrant rejects nothing
+		return arcHolds(arcs, c.q0 + tol, c.q1 - tol);
+	}
+	// The corners that survive, as indices into CORNERS, in the fixed attempt order.
+	function openCorners(arcs, tol) {
+		var out = [], i;
+		for (i = 0; i < CORNERS.length; i++) { if (cornerIsOpen(arcs, i, tol)) { out.push(i); } }
+		return out;
+	}
+	// The widest arc, for the raster to sample inside. A tie goes to the earlier one, which is the
+	// lower bearing, so the answer does not depend on the order the links were drawn in.
+	function widestArc(arcs) {
+		var best = null, i, w, bw = -1;
+		for (i = 0; i < (arcs ? arcs.length : 0); i++) {
+			w = arcs[i].end - arcs[i].start;
+			if (w > bw) { bw = w; best = arcs[i]; }
+		}
+		return best;
+	}
+	// **POLAR, NOT RECTANGULAR, AND THAT FOLLOWS FROM THE SHAPE OF WHAT IS BEING SAMPLED.** A sector
+	// is bounded by two angles and a radius, so a polar grid needs no rejection step at all, where a
+	// rectangular one samples a square and throws most of it away. Radii are geometric inner->outer
+	// for the reason ringCandidates() uses them: the near ones sit closer together, where placements
+	// land.
+	//
+	// Nearest radius first, and within a ring the angles nearest the arc's BISECTOR first, so a
+	// first-fit walking this list in order meets the most open direction at the shortest leader
+	// before anything else. Orthogonal directions are dropped throughout, exactly as the ring
+	// generator drops them: a horizontal or vertical leader is what the 15-degree grid exists to
+	// avoid, and a raster is not an excuse to reintroduce one.
+	function polarCandidates(anchor, arc, inner, outer, opts) {
+		opts = opts || {};
+		var step = opts.angleStep > 0 ? opts.angleStep : 15,
+			rings = opts.rings > 0 ? opts.rings : 3,
+			tol = opts.tol >= 0 ? opts.tol : ANGLE_TUNING.cornerTolerance,
+			max = opts.max > 0 ? opts.max : 24,
+			out = [], angs = [], radii = [], a, base, i, j, mid, lo, hi, rad;
+		if (!arc || !(inner > 0)) { return out; }
+		if (!(outer > inner)) { outer = inner; }
+		lo = arc.start + tol; hi = arc.end - tol;
+		if (!(hi > lo)) { return out; }
+		mid = (lo + hi) / 2;
+		for (a = Math.ceil(lo / step) * step; a <= hi + 1e-9; a += step) {
+			if (norm360(a) % 90 === 0) { continue; }
+			angs.push(a);
+		}
+		angs.sort(function (x, y) { return Math.abs(x - mid) - Math.abs(y - mid); });
+		base = rings > 1 ? Math.pow(outer / inner, 1 / (rings - 1)) : 1;
+		for (i = 0; i < rings; i++) { radii.push(inner * Math.pow(base, i)); }
+		for (i = 0; i < radii.length; i++) {
+			for (j = 0; j < angs.length; j++) {
+				if (out.length >= max) { return out; }
+				rad = angs[j] * Math.PI / 180;
+				out.push({
+					x: anchor.x + radii[i] * Math.cos(rad),
+					y: anchor.y + radii[i] * Math.sin(rad),
+					corner: -1, deg: norm360(angs[j])
+				});
+			}
+		}
+		return out;
+	}
+	/**
+	 * THE WHOLE PIPELINE, in the shape of the `sides` list placeLabelsFirstFit() consumes: the four
+	 * corners in their fixed order with the blocked ones dropped, then -- and only then -- a polar
+	 * raster inside the widest open arc.
+	 *
+	 *   anchor   {x, y}
+	 *   offset   {x, y}, the resting label offset; its MAGNITUDE is what the corners are built from,
+	 *            so a corner sits the same distance out whichever way the stored offset is signed.
+	 *   arcs     openArcs(bearings) -- the table, computed once per node and cached with the bearings
+	 *   opts     { tol, outer, raster, angleStep, rings, max }
+	 *
+	 * **RASTER ONLY AFTER THE FOUR ARE EXHAUSTED** is preserved by the ORDER, not by a second call:
+	 * the first-fit stops at the first clear side, so a raster point is reached only once all four
+	 * corners have been rejected here or found occupied there. Generating them costs no obstacle
+	 * query, which is why the ordering is enough.
+	 *
+	 * **PRUNING MUST NOT EMPTY THE SET.** A node with pipes into every quadrant rejects all four, and
+	 * returning nothing there would mean its label is never placed even where there is ample room
+	 * further out -- so the four come back in their fixed order as the last resort. Rejection is an
+	 * ordering and skipping device; it is not a veto on labelling a node.
+	 */
+	function cardinalSides(anchor, offset, arcs, opts) {
+		opts = opts || {};
+		var dx = Math.abs((offset && offset.x) || 0), dy = Math.abs((offset && offset.y) || 0),
+			tol = opts.tol >= 0 ? opts.tol : ANGLE_TUNING.cornerTolerance,
+			open = openCorners(arcs, tol), out = [], i,
+			home = Math.hypot(dx, dy), outer = opts.outer > 0 ? opts.outer : home * 3;
+		function endpointOf(k) {
+			var c = CORNERS[k];
+			return { x: anchor.x + c.sx * dx, y: anchor.y + c.sy * dy, corner: k, deg: null };
+		}
+		if (!open.length) {
+			for (i = 0; i < CORNERS.length; i++) { out.push(endpointOf(i)); }
+		} else {
+			for (i = 0; i < open.length; i++) { out.push(endpointOf(open[i])); }
+		}
+		if (opts.raster) {
+			polarCandidates(anchor, widestArc(arcs), home, outer, opts).forEach(function (p) {
+				out.push(p);
+			});
+		}
+		return out;
+	}
+
 	// ---- scoring -------------------------------------------------------------------------------
 	//
 	// WHERE THE TEXT SITS relative to a candidate ENDPOINT: it hangs off the endpoint on the side
@@ -802,6 +1000,15 @@ EngCalcs.lpnCollide = (function () {
 
 	return {
 		GOAL_WEIGHT: GOAL_WEIGHT,
+		ANGLE_TUNING: ANGLE_TUNING,
+		CORNERS: CORNERS,
+		openArcs: openArcs,
+		arcHolds: arcHolds,
+		cornerIsOpen: cornerIsOpen,
+		openCorners: openCorners,
+		widestArc: widestArc,
+		polarCandidates: polarCandidates,
+		cardinalSides: cardinalSides,
 		placeLabelsFirstFit: placeLabelsFirstFit,
 		boxClearOf: boxClearOf,
 		RING_ANGLES: RING_ANGLES,
