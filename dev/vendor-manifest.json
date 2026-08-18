@@ -1,0 +1,63 @@
+{
+  "_comment": [
+    "THE RECORD OF EVERY THIRD-PARTY FILE THIS SITE SHIPS. Policy: dev/dependency-management.md.",
+    "Verified by dev/scripts/vendor_integrity_check.php, which runs offline inside check_all.sh.",
+    "",
+    "'digest' is sha384, base64, of the file AS COMMITTED -- the same shape as an SRI hash, so a",
+    "package that publishes SRI hashes can be checked against them directly. It is integrity AT",
+    "REST; it is deliberately not an <integrity> attribute on the tag, because these files are",
+    "same-origin and a host that can serve different bytes can serve a different hash.",
+    "",
+    "'modifications' is the honest part. A vendored file that was edited and does not say so is how",
+    "an upgrade silently reverts a fix. Every deliberate change is listed, or the entry is a lie."
+  ],
+  "packages": [
+    {
+      "name": "bootstrap",
+      "version": "5.3.2",
+      "licence": "MIT",
+      "upstream": "https://www.npmjs.com/package/bootstrap",
+      "notes": "Digests below match the sha384 SRI hashes Bootstrap publishes for 5.3.2, so these are byte-identical to the upstream release.",
+      "files": [
+        {
+          "path": "css/vendor/bootstrap.min.css",
+          "from": "dist/css/bootstrap.min.css",
+          "digest": "T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN",
+          "modifications": []
+        },
+        {
+          "path": "js/vendor/bootstrap.bundle.min.js",
+          "from": "dist/js/bootstrap.bundle.min.js",
+          "digest": "C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL",
+          "modifications": []
+        }
+      ]
+    },
+    {
+      "name": "epanet-js",
+      "version": "0.9.0",
+      "licence": "MIT",
+      "upstream": "https://www.npmjs.com/package/epanet-js",
+      "notes": "The MIT TOOLKIT, not the epanetjs.com web app (FSL-1.1-MIT, a different thing). Wraps the OWA-EPANET engine, also MIT. epanet-js.LICENSE ships beside it, as MIT requires of a redistribution.",
+      "files": [
+        {
+          "path": "js/vendor/epanet-js.js",
+          "from": "dist/index.mjs",
+          "digest": "Ax2EvHTEwjQ0rZL3CxDLONCwladXnAlWiqFkNO+Ic7MPci6/9dg35eq0DWlemmUF",
+          "modifications": [
+            "Renamed .mjs -> .js: shared hosts that do not know .mjs send text/plain and browsers hard-refuse it. Removes the dependency on server MIME config.",
+            "One import specifier: './slim/index.mjs' -> './slim/index.js', forced by the rename."
+          ]
+        },
+        {
+          "path": "js/vendor/slim/index.js",
+          "from": "dist/slim/index.mjs",
+          "digest": "TjLCfqQYyElMLqz7im7TqU4EHl/TmQsmUUVshJ7VSIJutiPknH1OaT80Bx2PLrUl",
+          "modifications": [
+            "Renamed .mjs -> .js, as above."
+          ]
+        }
+      ]
+    }
+  ]
+}

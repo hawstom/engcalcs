@@ -5294,8 +5294,14 @@ var EngCalcs = EngCalcs || {};
 		// after the grid is the first thing to fall off the bottom. A visitor who wants to draw
 		// their own network would then have to scroll a wall of examples to find out they need not
 		// look at it. Put it where it is always seen and the fit question stops mattering for it.
+		// TWO WORDINGS FOR ONE EXIT, chosen by how the wall was opened. Arriving on an empty canvas,
+		// "Or start with a blank map" is the offer. Opened from File > Open example… the user already
+		// has a drawing, so that wording reads as "throw it away" and they will not press the only
+		// control that leaves -- Tom, 2026-08-17: *"I can't back out of the gallery even when other
+		// projects are open. Everything is locked and I am forced to open an example."* Closing has
+		// never touched a project in either case; only the wording was wrong.
 		var blank = elh('button', { type: 'button', 'class': 'lpn-examples-blank' },
-			pc.lpn_examples_blank || '');
+			(galleryForced ? pc.lpn_examples_close : pc.lpn_examples_blank) || '');
 		blank.addEventListener('click', function () { hideExamplesGallery(); });
 		pane.appendChild(blank);
 		var grid = elh('div', { 'class': 'lpn-examples-grid' });
@@ -9005,6 +9011,11 @@ var EngCalcs = EngCalcs || {};
 		// `change`, which fires on blur before this handler runs, so dismissing cannot lose a typed
 		// number -- the same contract every other box here has.
 		closePopup();
+		// ...and the examples wall, which was the ONE overlay Escape could not reach. Guarded on
+		// actually being visible: hideExamplesGallery() sets galleryDismissed, and setting that from
+		// a stray Escape would silently suppress the shop window a first-time visitor is meant to see.
+		var hint = document.getElementById('lpn_empty_hint');
+		if (hint && hint.style.display === 'block') { hideExamplesGallery(); }
 	});
 	// File > New project (ROADMAP Task 264, Tom 2026-08-10). A second popup off the same anchor
 	// rather than a hover-out submenu: the menu machinery here is one flat popover, hover submenus are

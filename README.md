@@ -190,15 +190,14 @@ access in the field. Details: [Install.php](Install.php).
 
 ## License
 
-EngCalcs is **Free/Libre Open Source Software (FLOSS)** — not "source available," not
-freeware-with-strings-attached. It's released under the
+EngCalcs is wholly copyrighted by Thomas Gail Haws on behalf of the global community. All past and
+ongoing work is offered to the public as **Free/Libre Open Source Software (FLOSS)** — not "source
+available," not freeware, trialware, or tiered-access — under the terms of the
 [GNU General Public License v3.0 or later](https://www.gnu.org/licenses/gpl-3.0.html) (full text:
 [LICENSE](LICENSE)): you may use, study, modify, and redistribute this code, for any purpose,
 including commercially — with the one condition that anything you build on it and distribute stays
-just as free for the next person. That copyleft condition is deliberate: it's what keeps this a
-shared commons rather than a one-way donation of code into a closed product, and it's part of why
-building a real contributor community (see [above](#join-the-community)) matters here, not just
-accepting occasional patches.
+just as free for the next person. While you are warmly invited to join in and build a beloved
+community of technical bodhisattvas, you are free to do your own thing under the same terms.
 
 Copyright © 2009–2026 Thomas Gail Haws.
 

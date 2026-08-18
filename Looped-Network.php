@@ -395,6 +395,7 @@ EngCalcs.pageConfig = {
 	lpn_examples_open: <?=json_encode($ec_lang['lpn_examples_open'])?>,
 	lpn_examples_menu: <?=json_encode($ec_lang['lpn_examples_menu'])?>,
 	lpn_examples_blank: <?=json_encode($ec_lang['lpn_examples_blank'])?>,
+	lpn_examples_close: <?=json_encode($ec_lang['lpn_examples_close'])?>,
 	lpn_examples_size: <?=json_encode($ec_lang['lpn_examples_size'])?>,
 	lpn_examples_failed: <?=json_encode($ec_lang['lpn_examples_failed'])?>,
 	lpn_examples_loading: <?=json_encode($ec_lang['lpn_examples_loading'])?>,

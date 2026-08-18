@@ -94,6 +94,10 @@ run_check "service worker precache"      blocking php dev/scripts/sw_manifest_ch
 # repo -- present on every machine anyone looks at, absent exactly where nobody looks until a deploy.
 # LibreEPANET.org (Task 306) is by definition a standalone deploy and would have hit the same wall.
 run_check "suite ships its own assets"   blocking php dev/scripts/standalone_assets_check.php
+# The vendored third-party files are what the manifest says they are, nothing ships undeclared, and
+# package.json agrees with what is committed. js/vendor/README.md documented all this in prose and
+# nothing checked it, so the record and the bytes were free to drift apart in silence (Task 413).
+run_check "vendored code integrity"      blocking php dev/scripts/vendor_integrity_check.php
 # Task 184 x Task 248. setProp() is the ONE write seam for an overridable property; a call site that
 # writes el._diameter directly edits BASE from inside a scenario, silently, under every other
 # scenario at once. That is not hypothetical -- the valve popup did it on five fields, and the two

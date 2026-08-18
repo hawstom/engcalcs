@@ -619,6 +619,7 @@
         "lpn_examples_open": "Open",
         "lpn_examples_menu": "Open example…",
         "lpn_examples_blank": "Or start with a blank map",
+        "lpn_examples_close": "Close",
         "lpn_examples_size": "{nodes} nodes, {links} links",
         "lpn_examples_failed": "The examples could not be loaded. Use File, New project to start a drawing.",
         "lpn_examples_loading": "Loading examples…",
@@ -998,7 +999,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 996,
+    "count": 997,
     "active_prefixes": [
         "about",
         "bpn",

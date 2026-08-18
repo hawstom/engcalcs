@@ -1195,6 +1195,11 @@ $ec_lang['lpn_examples_open']='Open';
 $ec_lang_syn['lpn_examples_open']='Open, Open this example, Load, Load this example, Start with this one | layout: button; avoid: open as an adjective/state (something already open), not the imperative verb';
 $ec_lang['lpn_examples_menu']='Open example…';
 $ec_lang['lpn_examples_blank']='Or start with a blank map';
+// The SAME exit, worded for the other way in. Opened from File the user already has work on
+// screen, so "start with a blank map" reads as "discard it" and they do not dare press the
+// only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
+// open an example"). Closing never touches a project either way.
+$ec_lang['lpn_examples_close']='Close';
 $ec_lang['lpn_examples_size']='{nodes} nodes, {links} links';
 $ec_lang['lpn_examples_failed']='The examples could not be loaded. Use File, New project to start a drawing.';
 $ec_lang['lpn_examples_loading']='Loading examples…';

@@ -2,6 +2,12 @@
 
 Policy for third-party code in EngCalcs. ROADMAP Task 413.
 
+**ADOPTED 2026-08-17** (Tom: *"I am 100% on-board"*). Shipped: `package.json` (private, no `scripts`
+key at all), a committed `package-lock.json`, `dev/vendor-manifest.json`, and
+`dev/scripts/vendor_integrity_check.php` wired into `check_all.sh` as blocking. Both Bootstrap
+digests were confirmed against the sha384 SRI hashes Bootstrap publishes for 5.3.2, so the vendored
+copies are provably the upstream release.
+
 Two JavaScript packages are vendored and shipped; no PHP dependency exists. Adopt `npm` as a
 **development-time acquisition and integrity tool whose committed output is a file in
 `js/vendor/`** — never a runtime resolver, never a bundler. Composer is out of scope. Neither a PHP

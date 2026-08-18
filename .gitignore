@@ -27,3 +27,10 @@ dev/browser-pass/package-lock.json
 # This line is kept anyway, as a net under the old name, in case a model is ever dropped back into
 # the path it lived in for the first half of August.
 dev/epanet-models/
+
+# Root npm is ACQUISITION ONLY -- there is no build and the site never reads node_modules.
+# package-lock.json IS committed, deliberately, and is the whole point: `npm ci` reproducing the
+# exact upstream tarball is what lets a future upgrade be VERIFIED rather than trusted. That is
+# also why the root lockfile is tracked where dev/browser-pass/'s is not -- that one installs a
+# tool, this one records what ships to visitors. See dev/dependency-management.md.
+/node_modules/
