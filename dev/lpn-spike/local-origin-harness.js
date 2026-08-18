@@ -254,8 +254,11 @@ console.log('\n--- one home for the concept ---');
 	// georefPointerDown(), georefPointerSrc() and the move branch of georefApplyDrag() each convert a
 	// pointer or a view centre. A tool that skipped the shift at any one of them would place a State
 	// Plane model half a million units off the coast of Africa and draw it without complaint.
-	ok('outwardX has one definition and twelve call sites', count(/outwardX\(/g) === 13, count(/outwardX\(/g));
-	ok('outwardY has one definition and twelve call sites', count(/outwardY\(/g) === 13, count(/outwardY\(/g));
+	// The two-step placement (detached/attached) added one more site to each pair: the settle that
+	// re-derives the document reads the model's anchor OUTWARD and plants it INWARD, which is the
+	// same boundary as every other one here.
+	ok('outwardX has one definition and thirteen call sites', count(/outwardX\(/g) === 14, count(/outwardX\(/g));
+	ok('outwardY has one definition and fourteen call sites', count(/outwardY\(/g) === 15, count(/outwardY\(/g));
 	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
 	// latitude the code states in WORLD terms have to be converted into the document's local frame
 	// like any other outside number, or a project with a local origin opens on the wrong continent.
@@ -266,8 +269,10 @@ console.log('\n--- one home for the concept ---');
 	// Go to latitude, longitude (Task 145) adds one site to each: a coordinate the USER pasted is an
 	// outside number like any other and has to be brought into the document's local frame, or typing
 	// a real coordinate into a State Plane project would travel half a million units.
-	ok('inwardX has one definition and ten call sites', count(/inwardX\(/g) === 11, count(/inwardX\(/g));
-	ok('inwardY has one definition and eleven call sites', count(/inwardY\(/g) === 12, count(/inwardY\(/g));
+	// ...and the placement tool's own whole-Earth opening view states a longitude and a latitude in
+	// WORLD terms, which is one more inward site on each axis.
+	ok('inwardX has one definition and thirteen call sites', count(/inwardX\(/g) === 14, count(/inwardX\(/g));
+	ok('inwardY has one definition and fourteen call sites', count(/inwardY\(/g) === 15, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

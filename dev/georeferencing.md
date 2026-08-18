@@ -42,48 +42,78 @@ lists alone would also do. AI must not write these without written permission in
 
 ## 2. What the tool does, in order
 
-1. **File > Convert to lat/lon…**, beside Import EPANET file, because both are
-   conversions. A confirm states what will and will not change. **Disabled, never hidden,** on a
-   project already on the map — it was hidden once and Tom could not find the command at all.
-2. **Carry.** The project becomes geographic, OSM tiles come on, the view goes to the geographic home
-   view, and the model is drawn as a dashed ghost box **pinned to the middle of the map at its true
-   ground size**. The user pans and zooms the map; the box rides along. Nothing is saved. A lat/lon
-   zooms out to the whole Earth (`minScale()`), and **Go to…** takes a pasted `lat, lon`.
-3. **Drop it here.** The box's position becomes the transform, every coordinate becomes a longitude
-   and a latitude, and the real network is drawn with corner handles, a body, and a rotate handle
-   above it.
-4. **Adjust.** Drag the body to move, a corner to resize about the opposite corner, the round handle
-   to turn. Or type the two numbers — "one drawing unit is ___ ft" and "turn ___ degrees
-   counter-clockwise" — which act about the model's centre.
+1. **File > Convert to lat/lon…**, beside Import EPANET file, because both are conversions. A
+   confirm states what will and will not change. **Disabled, never hidden,** on a project already on
+   the map — it was hidden once and Tom could not find the command at all.
+2. **Step 1, detached.** The project becomes geographic, OSM tiles come on, **the view goes to the
+   whole Earth**, and the model itself is drawn, centred, at 40% of the canvas. It then stays exactly
+   where it is ON THE SCREEN: the user pans and zooms the map underneath it, and nothing they do to
+   the map moves the model. **No handles in this step** — there is no gesture that could move it.
+   Zooming the map in shrinks the ground under the model, which is how its SCALE is found.
+   **Go to…** takes a pasted `lat, lon` and then asks roughly how wide the site is; that one answer
+   sets the scale outright.
+3. **Drop it here.** Step 2, attached: the model is on the ground, travels with the map, and grows
+   corner handles, a body and a rotate handle. **Pick it up again** returns to step 1.
+4. **Adjust.** Drag the body to move (by the pointer's own delta from wherever it was grabbed), a
+   corner to resize about the opposite corner, the round handle to turn. Or type the two numbers —
+   "one drawing unit is ___ ft" and "turn ___ degrees counter-clockwise" — which act about the
+   model's centre.
 5. **Finish** (confirmed) or **Cancel** (exact).
 
-## 3. The four decisions with a rejected alternative
+Labels and the solver are **off** for the whole of it, and come back on Finish or Cancel.
+
+## 3. The decisions with a rejected alternative
 
 - **The image-placement paradigm, not four menu commands.** Tom offered both and preferred this one.
   Insert/Move/Scale/Rotate as menu commands asks the user to name the operation before performing it,
   which is the hurdle he flagged in his own description of it.
-- **The scale is READ, not asked for.** A grid project already declares that one drawing unit is one
-  Length/Map unit (`lengthField()`, `dev/geographic-projects.md` §1), so the model lands at its true
-  ground size on the first frame — measured at 1000.015 ft for a declared 1000 ft. Tom's sketch asked
-  the user for a scale and to be reassured that approximate was fine; there was nothing to
-  approximate. The box remains, as an override for a drawing that was never at 1:1.
+- **THE SCALE IS ASKED FOR, NOT READ.** Tom, 2026-08-18: *"Your grid does not already say how big one
+  drawing unit is; these EPANET examples and many old systems are drawn on arbitrary 'schematic'
+  canvases. We must find both location and scale."* The build before this one read `lengthField()`
+  and asserted that one drawing unit was one Length/Map unit; on a schematic that lands a whole
+  system inside a few metres of pavement. Three ways in, all the user's: the zoom of the map behind a
+  detached model, Go to…'s width question (default 3000 ft / 1000 m), and the scale box in step 2.
+- **The two steps are NAMED and switchable.** *"there is an uncomfortable gray area between the
+  described modes… I need the map either to come along or to stay behind when I pan. And I need to be
+  able to control that."* The bar says "Step 1 of 2 — detached" / "Step 2 of 2 — attached" and
+  carries the button that swaps them.
+- **Detached costs one attribute per frame.** The drawing has its own group (`modelLayer`), so
+  holding it still while the view moves is the inverse of the view's own change — no coordinates
+  re-derived, no DOM rebuilt, no labels laid out. The document is re-derived from `georef.src` ONCE,
+  when the gesture settles (180 ms), which is also the only moment the tangent plane picks up a new
+  latitude.
+- **Handles are CLAMPED into the visible canvas, and a gesture is measured from the POINTER.**
+  *"When I zoom in close to check a spot on the model, I lose the rectangular controls off the edge
+  of the map… I am locked out."* Clamping was chosen over an all-numeric transform panel because it
+  keeps the one gesture the paradigm is made of; the numbers stay as the second way in. The clamp
+  respects the window, the placement bar and the coordinate readout, because a handle underneath a
+  piece of furniture is just as unreachable. It works only because a corner drag measures its scale
+  from where the pointer started rather than from the corner it belongs to — which is the same fix as
+  *"When I click the project to move it, it jumps (to bring its center to my mouse?)"*.
 - **Two control points is the math, not the interface.** `lpnGeorefFromTwoPoints` is exported and
   tested, and picking two survey points off a basemap is the *accurate* way to georeference. It is not
   the first-run interface because it requires the user to already know two positions on their own
-  drawing; dropping the whole model and nudging it is the gesture that needs nothing. The two-point
-  path is the natural home for a later "I have coordinates for these two hydrants".
+  drawing. It is the natural home for a later "I have coordinates for these two hydrants".
 - **Editing is locked while placing.** `georefActive()` gates the same seams `regMode` does. The
   transform re-derives every point from a held-aside source array by INDEX, so an element added
   mid-placement would shift every index after it. Panning still works, because looking at where you
   are putting the model is the whole activity.
 
-## 4. The properties the harness pins
+## 4. The properties the harnesses pin
 
-- **Cancel is exact, `===`, after a hundred adjustments.** Every preview re-derives from the source,
-  so nothing compounds. Same standard as an imported file's numbers, for the same reason.
+`dev/lpn-spike/georef-place-harness.js` (arithmetic through the page) and
+`dev/browser-pass/specs/place.js` (the gestures, in a real browser).
+
+- **Cancel is exact, `===`, after two steps and a hundred adjustments.** Every preview re-derives from
+  the source, so nothing compounds. Same standard as an imported file's numbers, for the same reason.
 - **Nothing but the coordinates moves.** Lengths, diameters, elevations, demands and the `lenAuto`
   flag are byte-identical across a placement. A pipe's `len` is stored and never derived, so resizing
   the picture cannot redesign the network.
+- **The model does not move on the screen in step 1** — not by a pixel of its centre, not by a pixel
+  of its height — while the map pans and zooms under it. Its width follows the map's own east-west
+  stretch when the placement travels in latitude, and by exactly that ratio: see §5.
+- **The width the user gives Go to… is the width the model has on the ground**, measured with the
+  real geodesic rather than with the transform's own arithmetic.
 - **Up the drawing is north.** The document stores y DOWN; `js/lpn-georef.js` is written for the
   outward Y-UP frame. A symmetric test network would never reveal a missing flip, so the harness uses
   an L-shaped one.
@@ -106,3 +136,15 @@ lists alone would also do. AI must not write these without written permission in
 - **The display is still unprojected**, stretched east-west by 1/cos(latitude) — 27% at 38°. The
   tiles share the stretch, so the map and the pipes agree. That is Task 145's remaining
   projection-seam work and is unchanged by this tool.
+- **A detached model changes WIDTH when the placement travels in latitude**, by the ratio of that
+  stretch at the two latitudes (9% for a pan from 20° to 31°). Its height and its centre do not move
+  at all. There is no way to hold both on an unprojected display without an anisotropic transform,
+  which `js/lpn-georef.js` refuses by design, so the latitude axis — the honest one — is the one
+  held. It settles into the picture the finished project will have, which is the alternative to a
+  jump at the moment of attaching.
+- **The conversion mutates the OPEN project.** Cancel is the only way back during placement, and
+  after Finish the route back is closing without saving — which puts the user's own XY file one
+  Save away from being overwritten by a lat/lon one. Tom asked on 2026-08-18 whether the conversion
+  should instead import into a NEW lat/lon project; the recommendation is yes, and it is his call
+  and not a change this tool has made. An `.inp` import already lands in a new tab, so the shape
+  exists (`importProject()`), and `saveProjectAs()` already duplicates a whole project.

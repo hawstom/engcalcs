@@ -257,6 +257,11 @@ echoHeader("EngCalcs", $html_title, "");
 		      // same reason #lpn_backdrop_target_panel is static: the strings are language keys and
 		      // PHP is where those live. ?>
 		<div id="lpn_georef_bar" class="d-print-none" style="display:none;position:absolute;top:4px;left:50%;transform:translateX(-50%);z-index:6;max-width:92%;font-size:12px;background:#fff;border:1px solid #05a;padding:6px 10px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
+			<?php // WHICH STEP YOU ARE IN, SAID OUT LOUD (Tom, 2026-08-18: "there is an uncomfortable
+			      // gray area between the described modes"). Filled by georefRefreshBar(); its text
+			      // and the Detach button's are English literals in looped-network.js until their
+			      // language keys exist, because a translation sprint owns lib/lang.ec.en.php. ?>
+			<div id="lpn_georef_step" style="margin-bottom:2px;font-weight:bold"></div>
 			<div id="lpn_georef_hint" style="margin-bottom:4px"></div>
 			<span id="lpn_georef_numbers" style="display:none">
 				<label><?=ecTipLabel($ec_lang['lpn_georef_scale'], $ec_lang['lpn_georef_scale_tip'])?>
@@ -267,6 +272,7 @@ echoHeader("EngCalcs", $html_title, "");
 			</span>
 			<button type="button" id="lpn_georef_goto"><?=$ec_lang['lpn_georef_goto']?></button>
 			<button type="button" id="lpn_georef_drop"><?=$ec_lang['lpn_georef_drop']?></button>
+			<button type="button" id="lpn_georef_detach"></button>
 			<button type="button" id="lpn_georef_finish"><?=$ec_lang['lpn_georef_finish']?></button>
 			<button type="button" id="lpn_georef_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
 		</div>

@@ -12,10 +12,11 @@
 //   2. **NOTHING BUT THE COORDINATES MOVES.** Lengths, diameters, elevations and demands are the
 //      user's numbers. Scaling the picture must not redesign the network, which is exactly what a
 //      derived length would do.
-//   3. **THE MODEL LANDS AT ITS TRUE GROUND SIZE**, because a grid project already declares that
-//      one drawing unit is one Length/Map unit. Measured with the real geodesic, not with the
-//      transform's own arithmetic -- a check that used the transform to grade itself would agree
-//      with itself no matter what the scale was.
+//   3. **THE SIZE THE USER GAVE IS THE SIZE ON THE GROUND.** A schematic drawing declares no scale
+//      at all (Tom, 2026-08-18), so the tool has to FIND one: Go to… asks how wide the site is, and
+//      the model must come out that wide. Measured with the real geodesic, not with the transform's
+//      own arithmetic -- a check that used the transform to grade itself would agree with itself no
+//      matter what the scale was.
 
 const { ROOT, byId, setUnitSet, loadLoopedNetwork, FT } = require('./lpn-dom-stub.js');
 
@@ -28,7 +29,8 @@ global.alert = global.window.alert = function () { };
 const L = loadLoopedNetwork(
 	"\t\tgetDoc: function () { return doc; }, getProject: function () { return project; },\n" +
 	"\t\taddNode: addNode, addLink: addLink,\n" +
-	"\t\tgeorefStart: georefStart, georefDrop: georefDrop,\n" +
+	"\t\tgeorefStart: georefStart, georefAttach: georefAttach, georefDetach: georefDetach,\n" +
+	"\t\tgeorefGoTo: georefGoTo, georefBounds: georefSrcBounds,\n" +
 	"\t\tgeorefFinish: georefFinish, georefCancel: georefCancel,\n" +
 	"\t\tgeorefState: function () { return georef; },\n" +
 	"\t\tgeorefSetTransform: georefSetTransform,\n" +
@@ -38,8 +40,11 @@ const L = loadLoopedNetwork(
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
 	"\t\t\tbackdropLayer = el('g', {}, world); gridLayer = el('g', {}, world);\n" +
-	"\t\t\tlinksLayer = el('g', {}, world); nodesLayer = el('g', {}, world);\n" +
-	"\t\t\tlabelsLayer = el('g', {}, world);\n" +
+	// The drawing's own group, exactly as init() builds it: holding the model still while the map
+	// moves is a transform on THIS, and a stub without it cannot see step 1 at all.
+	"\t\t\tmodelLayer = el('g', {}, world);\n" +
+	"\t\t\tlinksLayer = el('g', {}, modelLayer); nodesLayer = el('g', {}, modelLayer);\n" +
+	"\t\t\tlabelsLayer = el('g', {}, modelLayer);\n" +
 	"\t\t\trubberBandEl = el('line', {}, world); }, "
 );
 L.buildLayers();
@@ -77,32 +82,42 @@ const elevBefore = JSON.stringify(doc.nodes.map(n => [n.id, n.elev, n._demand]))
 // ---------------------------------------------------------------------------
 // 1. Start, carry, drop.
 // ---------------------------------------------------------------------------
-console.log('\n--- the model is carried onto the map and dropped ---');
+console.log('\n--- the model is detached on the screen, then attached to the ground ---');
 L.georefStart();
 {
 	const g = L.georefState();
-	ok('the tool is armed and carrying', !!g && g.stage === 'carry', g && g.stage);
+	ok('the tool opens in step 1, detached', !!g && g.step === 1, g && g.step);
 	ok('the project now says it is on the world map', L.getProject().coords === 'geo');
-	ok('...and the grid coordinates have NOT been touched yet',
-		JSON.stringify(doc.nodes.map(n => [n.id, n.x, n.y])) === before);
-	// The scale is a DECLARATION being read: one drawing unit is one foot.
-	ok('the scale is the grid\'s own declaration, not a guess',
-		Math.abs(g.mpu - FT) < 1e-12, g.mpu + ' m per unit (1 ft = ' + FT + ')');
-}
-
-L.georefDrop();
-{
-	const g = L.georefState();
-	ok('it is now placed and adjustable', !!g && g.stage === 'place', g && g.stage);
-	ok('every coordinate is now a plausible longitude and latitude',
+	// The model is drawn as ITSELF from the first frame, so its coordinates are already lon/lat --
+	// the old ghost-box stage, where the document still held grid numbers, is gone.
+	ok('...and every coordinate is already a plausible longitude and latitude',
 		doc.nodes.every(n => Math.abs(L.outwardX(n.x)) <= 180 && Math.abs(L.outwardY(n.y)) <= 90),
 		doc.nodes.map(n => L.outwardX(n.x).toFixed(4) + ',' + L.outwardY(n.y).toFixed(4)).join(' '));
+	ok('the model is held still on the screen, which it needs a frozen view to do',
+		!!g.frozen && isFinite(g.frozen.s), JSON.stringify(g && g.frozen));
+}
+
+// **THE SCALE IS ASKED FOR, NOT READ.** Go to… takes a coordinate and a rough width, and that width
+// is what the model must measure on the ground afterwards. 3000 ft across a drawing 1000 units wide
+// is 3 ft per unit, and nothing in the drawing said so.
+const SITE = { lat: 38.106067, lon: -122.5686103 };
+L.georefGoTo(SITE, 3000 * FT);
+{
+	const g = L.georefState();
+	ok('Go to… sets the scale from the width the user gave',
+		Math.abs(g.t.metersPerUnit - 3 * FT) < 1e-9, g.t.metersPerUnit + ' m per unit');
+}
+
+L.georefAttach();
+{
+	const g = L.georefState();
+	ok('Drop it here moves to step 2, attached', !!g && g.step === 2, g && g.step);
 }
 
 // ---------------------------------------------------------------------------
 // 2. The model is the right size on the ground, and its north is north.
 // ---------------------------------------------------------------------------
-console.log('\n--- and it is the size it says it is ---');
+console.log('\n--- and it is the size the user said it was ---');
 {
 	// js/lpn-geom.js publishes through module.exports, so the geodesic comes off the required
 	// module rather than off the page's global EngCalcs.
@@ -113,13 +128,13 @@ console.log('\n--- and it is the size it says it is ---');
 	}
 	const r = doc.nodes.find(n => n.id === R.id), a = doc.nodes.find(n => n.id === A.id),
 		b = doc.nodes.find(n => n.id === B.id);
-	// 1000 drawing units east, declared as feet.
+	// 1000 drawing units east, at the 3 ft per unit the user's own 3000 ft answer implies.
 	const east = ground(r, a) / FT;
-	ok('1000 units across the drawing is 1000 ft on the ground',
-		Math.abs(east - 1000) < 0.2, east.toFixed(3) + ' ft');
+	ok('1000 units across the drawing is the 3000 ft the user said it was',
+		Math.abs(east - 3000) < 0.6, east.toFixed(3) + ' ft');
 	const north = ground(a, b) / FT;
-	ok('800 units up the drawing is 800 ft on the ground',
-		Math.abs(north - 800) < 0.2, north.toFixed(3) + ' ft');
+	ok('800 units up the drawing is 2400 ft on the ground, at the same scale',
+		Math.abs(north - 2400) < 0.6, north.toFixed(3) + ' ft');
 	// **UP THE DRAWING IS NORTH.** The document stores y DOWN, so a tool that forgot the flip
 	// mirrors the whole network -- and a symmetric test network would never show it.
 	ok('up the drawing is NORTH, not south', L.outwardY(b.y) > L.outwardY(a.y),
@@ -151,7 +166,7 @@ console.log('\n--- a hundred adjustments, then Cancel puts back the exact number
 		L.georefSetTransform(t);
 	}
 	ok('a hundred adjustments left the tool armed and consistent',
-		!!L.georefState() && L.georefState().stage === 'place');
+		!!L.georefState() && L.georefState().step === 2);
 	ok('the scale really did change', Math.abs(L.georefState().t.metersPerUnit - FT) > FT,
 		L.georefState().t.metersPerUnit + ' m per unit');
 }
@@ -171,7 +186,7 @@ ok('and every other number too',
 // ---------------------------------------------------------------------------
 console.log('\n--- Finish commits, and the refusals are refusals ---');
 L.georefStart();
-L.georefDrop();
+L.georefAttach();
 const placed = JSON.stringify(doc.nodes.map(n => [n.id, n.x, n.y]));
 L.georefFinish();
 ok('Finish leaves no tool armed', L.georefState() === null);
