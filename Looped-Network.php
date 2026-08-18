@@ -172,7 +172,10 @@ echoHeader("EngCalcs", $html_title, "");
 		</select>
 		<button type="button" id="lpn_backdrop_target_continue"><?=$ec_lang['lpn_backdrop_continue']?></button>
 	</div>
-	<p id="lpn_status" class="ec-status-warn"></p>
+	<?php // #lpn_status USED TO BE HERE, a <p> in the page flow directly above the canvas, and that is
+	      // exactly what made the map move (Tom, 2026-08-17: "Does not have to be long to push the map
+	      // down. Anything does it."). It now lives on the canvas with the other live readouts --
+	      // see #lpn_map_overlay_tl below. Nothing between the tabs and the map. ?>
 	<div style="overflow-x:auto;position:relative">
 		<?php // **height="10000" IS A CURTAIN, NOT A GUESS, AND THE DIFFERENCE IS THE WHOLE POINT.**
 		      //
@@ -201,7 +204,21 @@ echoHeader("EngCalcs", $html_title, "");
 		      // "live" map state actually is). Top-left so it doesn't compete with the upper-right
 		      // legend or the bottom-left coordinate tracker. Updated by setMode() in
 		      // looped-network.js. ?>
-		<div id="lpn_mode_hint" class="d-print-none" style="position:absolute;top:4px;left:4px;font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px;pointer-events:none"></div>
+		<?php // THE TOP-LEFT STACK. A COLUMN, not a set of boxes at hand-computed offsets: the mode
+		      // hint wraps to two lines in several languages, so any second overlay placed at a
+		      // fixed `top` would sit on top of it there and nowhere else. Flex column, so each row
+		      // is placed by the one above it having been measured.
+		      // Only the mode hint is reserved against by zoomExtent() (overlayReserve). The
+		      // diagnostic is deliberately NOT, because a diagnostic appears BECAUSE OF THE MODEL
+		      // and the fit must not depend on the model -- the same rule that keeps
+		      // applyMapHeight() off this path (dev/lpn-spike/map-height-harness.js). ?>
+		<div id="lpn_map_overlay_tl" class="d-print-none" style="position:absolute;top:4px;left:4px;right:4px;display:flex;flex-direction:column;align-items:flex-start;gap:4px;pointer-events:none">
+			<div id="lpn_mode_hint" style="font-size:11px;background:rgba(255,255,255,.8);padding:2px 6px"></div>
+			<?php // The solver's standing diagnostic ("Add a reservoir"), true until the model
+			      // changes. Deliberately NOT d-print-none: if the drawing on screen has no answers,
+			      // a print of it should say why rather than look like a finished network. ?>
+			<p id="lpn_status" class="ec-status-warn" style="display:none;max-width:60%;margin:0;font-size:11px;padding:2px 6px;background:#fffbe6;border:1px solid #a80"></p>
+		</div>
 		<?php // ONE-SHOT NOTICES SIT ON THE MAP, IN THE MODE HINT'S SLOT, AND EXPIRE (Tom, 2026-08-17:
 		      // saving a project put a line of text above the canvas and "moves the map down past the
 		      // bottom of the screen" -- then answered his own question, "maybe covering or replacing

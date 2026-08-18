@@ -199,9 +199,12 @@ function build() {
 	pressKey('Delete');
 	const d = L.getDoc();
 	ok('nothing is deleted when nothing is selected', d.nodes.length === 3 && d.links.length === 2);
+	// The one-shot notice slot, NOT #lpn_status: "press Delete with nothing selected" is a report of
+	// what just happened, so it goes on the canvas and expires. #lpn_status carries standing
+	// diagnostics about the network and nothing else -- see the split at setStatus().
 	ok('...and the page says so rather than doing nothing silently',
-		(document.getElementById('lpn_status').textContent || '').length > 0,
-		JSON.stringify(document.getElementById('lpn_status').textContent));
+		(document.getElementById('lpn_map_notice').textContent || '').length > 0,
+		JSON.stringify(document.getElementById('lpn_map_notice').textContent));
 
 	// Backspace inside a field belongs to the field, always -- otherwise renaming an element in the
 	// property popup deletes the element.

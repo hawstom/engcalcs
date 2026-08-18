@@ -14237,6 +14237,9 @@ var EngCalcs = EngCalcs || {};
 		var el = document.getElementById('lpn_status');
 		if (!el) { return; }
 		el.textContent = text || '';
+		// Hidden when empty, or an empty amber box sits on the drawing saying nothing. It is an
+		// overlay now, so this changes what is COVERED, never what is laid out.
+		el.style.display = text ? 'block' : 'none';
 	}
 	// Rounds to the same number of decimals the label actually displays, in the DISPLAY unit --
 	// extrema and decoration must compare on this, not the raw SI value. Two series links carrying
