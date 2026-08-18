@@ -15,9 +15,15 @@
  *     correct on a light row, a hover row, and a greyed-out disabled row.
  *   - A stroked path stays legible at 14px. A colour emoji shrinks into a smudge.
  *
- * THE RULE THIS SET OBEYS: an icon is a PREFIX, never a replacement. Every control keeps its
- * word. Icon-only was rejected suite-wide — it saves no translation work (the label stays) and
- * spends first-time comprehension, which is the audience a web calculator exists for.
+ * THE RULE THIS SET OBEYS: an icon is a PREFIX, never a replacement — everywhere except the `lpn_`
+ * toolbar row. Icon-only saves no translation work (the label survives as the tip and the accessible
+ * name) and spends first-time comprehension, which is the audience a web calculator exists for, so
+ * it is never the default. The toolbar is the one place where the cost on the other side is real:
+ * Tom, 2026-08-18, "they are taking up too much room, and we have to move them into tips." A menu
+ * row is as wide as its longest label whatever it holds, so an icon there buys nothing; a nineteen-
+ * button strip is the only chrome on this suite that runs out of width. Plan: dev/toolbar-icons.md.
+ * The word is NOT deleted there, it moves — to the front of the title and to an aria-label, because
+ * a button whose only content is an aria-hidden svg has no accessible name at all.
  *
  * SINGLE SOURCE. The paths live here once. PHP-rendered chrome calls ecIcon(); JS-built chrome
  * (js/looped-network.js) reads the same array from EngCalcs.icons, printed by
@@ -196,6 +202,21 @@ $ec_icons = array(
 	// the frame growing to meet the drawing, with no lens to misread as plain "zoom in".
 	'zoom'       => '<path d="M3 9V3h6"/><path d="M21 9V3h-6"/><path d="M3 15v6h6"/><path d="M21 15v6h-6"/><path d="M9.5 9.5h5v5h-5z"/>',
 	'labels'     => '<path d="M20.6 13.4L13 21l-9-9V4h8z"/><circle cx="7.6" cy="7.6" r="1.5"/>',
+	// A LONG-SECTION, not a line chart (Tom, 2026-08-18: "a jagged profile arising from the
+	// baseline"). The difference is that the ground line is CLOSED down to the datum at both ends,
+	// so the mark is a body of earth with a surface on top — which is what a profile sheet actually
+	// draws. A chart would need axes; an open polyline would be a sparkline; either would say
+	// "graph" where this says "ground". No axes here for that reason, and no gridlines.
+	//
+	// Relief amplitudes are 6, 5, 9, 7 and 4 units, all at or above the 4-unit floor a 24-unit box
+	// can still show at 16px (0.67 px per unit — a 2-unit notch is one pixel and simply disappears).
+	// The surface runs 16 -> 10 -> 15 -> 6 -> 13 -> 9, so it climbs overall while still falling twice:
+	// a monotonic rise reads as a trend line, and a symmetric hump reads as a mountain.
+	// ONE path, filled AND stroked via fill-opacity rather than the set's usual patch-plus-outline
+	// pair. Every other translucent shape here needs two because its outline is open (the reservoir's
+	// walls, the tank's dome); this outline is closed and identical to its own patch, and two copies
+	// of one `d` is a drift waiting to happen.
+	'profile'    => '<path d="M3 20V16l4-6 3 5 4-9 3 7 4-4v11z" fill="currentColor" fill-opacity=".18"/>',
 	// A magnifying glass — the physical object, lens and handle. The note above 'zoom' explains why
 	// a lens was WRONG there: it reads as "make bigger", which zoom-to-extents does not do. Find is
 	// the command a magnifier has always meant, so it belongs here and nowhere else in this set.
@@ -206,6 +227,24 @@ $ec_icons = array(
 	// rather than as the pointer itself.
 	'select'     => '<path d="M6 3v14.5l3.8-3.6 2.9 6.3 2.6-1.2-2.8-6.1 4.5-.5z" fill="currentColor" stroke="none"/><path d="M15.5 4.2a5.5 5.5 0 0 1 4.3 4.4"/>',
 	'duplicate'  => '<path d="M9 9h12v12H9z"/><path d="M5 15H3V3h12v2"/>',
+
+	// ---- Panes (Task 434) ----
+	// A TWIN PAIR, and they are only ever read against each other, so the pair is the design rather
+	// than either icon (Tom, 2026-08-18: "Bottom pane and right pane can have twin partition-like
+	// icons at the extreme right"). One window frame, one partition, the docked pane shaded — the
+	// difference between them is which way the partition runs, which is the only difference between
+	// the two things themselves.
+	//
+	// The frame is 18x14 (x:3-21, y:5-19), landscape like the window it stands for; a square frame
+	// would make the two bands equally plausible and kill the cue. Each band is about 40% of its own
+	// axis, which is roughly what each pane really takes: bottom 6 of 14, right 7 of 18. Those are
+	// not the same number because what a reader weighs is the CLEAR band inside the strokes, and a
+	// 2-unit stroke eats twice as much from the short axis — 72 and 70 square units respectively,
+	// so the two shaded areas land within 3% of each other and the pair reads as balanced.
+	// The clear band is 4 units either way, which is the floor: at 16px that is under 3px, and a
+	// 3-unit band would close up into a doubled line.
+	'pane-bottom' => '<path d="M3 13h18v6H3z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 5h18v14H3z"/><path d="M3 13h18"/>',
+	'pane-right'  => '<path d="M14 5h7v14h-7z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 5h18v14H3z"/><path d="M14 5v14"/>',
 
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
