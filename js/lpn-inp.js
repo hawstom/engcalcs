@@ -677,4 +677,399 @@
 		};
 	};
 
+	// ============================================================================================
+	// WRITING an EPANET `.inp` (ROADMAP Task 281)
+	// ============================================================================================
+	//
+	// The reader's mirror, and it lives beside it on purpose: the two share the flow-unit table, the
+	// pressure constant and the token rule, and a writer keeping its own copies of those would be a
+	// second opinion about one file format.
+	//
+	// NOT js/lpn-epanet.js's lpnToInp(). That one writes LPS always, samples a pump curve at
+	// [0, 0.5, 0.9] q_max and preserves nothing, because the only thing that ever reads it is the
+	// engine, which hands its answers straight back. A file a HUMAN keeps has the opposite
+	// requirement: it comes back in the units they were working in, carrying their own numbers,
+	// character for character. Both writers therefore stay.
+	//
+	// THE ACCEPTANCE CRITERION IS BYTE IDENTITY, never tolerance: import then export reproduces every
+	// value the user did not edit as the characters the file stated
+	// (dev/lpn-spike/inp-export-harness.js). That is what EngCalcs.lpnNumText() above is for, and it
+	// is why nothing here formats a number.
+	//
+	// THE DOCUMENT IT READS is the SAVED shape -- what docFromInp() builds and serializeProject()
+	// writes. Coordinates are Cartesian (y up) and LOCAL to `doc.origin`, so the origin is added back
+	// here; this is one of the outward-facing sites Task 354 names. Overridable properties are read
+	// through `opts.effective`, so this file spells no scenario key and duplicates no resolver; with
+	// no resolver supplied it writes Base.
+	//
+	// THE ONE PLACE IT REACHES OUTSIDE ITSELF is EngCalcs.unitFactors, and only when the project's
+	// units are not a set EPANET can name. Everything else here is still DOM-free and testable in
+	// Node.
+
+	// EPANET's ten flow keywords as the unit NAMES this suite uses -- the exact inverse of
+	// LPN_INP_FLOW_UNIT in js/looped-network.js, which is the reading direction. That the two are
+	// inverses is asserted by dev/lpn-spike/inp-export-harness.js rather than left to inspection.
+	var FLOW_KEYWORD_UNIT = {
+		GPM: 'gpm', MGD: 'mgd', IMGD: 'imgd', CFS: 'ft3ps', AFD: 'afd',
+		LPS: 'lps', LPM: 'lpm', MLD: 'mld', CMH: 'cmh', CMD: 'cmd'
+	};
+	// The other units a keyword fixes, per system. `fth2o` and `ft` are the same magnitude, as are
+	// `mh2o` and `m`, which is why the comparison below is on FACTORS and never on names: an
+	// elevation in fth2o is ALREADY in EPANET's US length unit and must not be "converted" through a
+	// pair of factors whose product is not exactly 1.
+	var FILE_UNITS = {
+		us: { len: 'ft', dia: 'in', head: 'ft', press: 'psi' },
+		si: { len: 'm', dia: 'mm', head: 'm', press: 'mh2o' }
+	};
+
+	// The stand-in pipe a curveless pump becomes needs a roughness in the file's own formula, and
+	// "very smooth" is a different number in each. The same three js/lpn-epanet.js uses.
+	function roughStandIn(method) {
+		if (method === 'dw') { return '0.0000015'; }
+		if (method === 'manning') { return '0.008'; }
+		return '150';
+	}
+
+	/**
+	 * Write an EPANET `.inp` for a saved lpn_ document.
+	 *
+	 *   doc   the saved document shape (docFromInp / serializeProject)
+	 *   opts  .effective(el, prop)  scenario resolver; default is Base (`el['_' + prop]`)
+	 *         .labelSize(label)     {w, h} of the rendered label IN MAP UNITS, for the corner shift
+	 *         .title                [TITLE] text; default doc.project.name
+	 *
+	 * Returns { ok: true, inp: text, differences: [{code, ids, detail}] }, `differences` being the
+	 * export-side twin of the reader's `dropped`: everything this file cannot say, said out loud.
+	 * { ok: false, error, detail } is refusal, and there is exactly one cause -- a unit whose
+	 * magnitude this browser does not know, where a conversion is unavoidable. Per CLAUDE.md a unit
+	 * we cannot convert is NAMED and the operation refused, never guessed at.
+	 */
+	EngCalcs.lpnExportInp = function (doc, opts) {
+		opts = opts || {};
+		var eff = typeof opts.effective === 'function'
+			? opts.effective
+			: function (el, prop) { return el['_' + prop]; };
+		function isActive(el) {
+			var a = eff(el, 'active');
+			return a === undefined || a === null || a === true;
+		}
+		var differences = [], failure = null;
+		function diff(code, ids, detail) {
+			differences.push({ code: code, ids: ids || [], detail: detail === undefined ? null : detail });
+		}
+
+		var units = doc.units || {},
+			settings = doc.settings || {},
+			origin = (doc.origin && isFinite(doc.origin.x) && isFinite(doc.origin.y)) ? doc.origin : { x: 0, y: 0 };
+
+		// ---- which .inp unit set this project is written in ----
+		// The FLOW selector decides, because the flow keyword is the only unit an `.inp` states.
+		var flowUnit = units.lpn_u_flow, flowKey = null, kw;
+		for (kw in FLOW_KEYWORD_UNIT) {
+			if (FLOW_KEYWORD_UNIT[kw] === flowUnit) { flowKey = kw; break; }
+		}
+		if (!flowKey) {
+			// The three flow units this page offers that EPANET has no keyword for (m3ps, lph, gph).
+			// The file cannot name them, so the flows convert into the keyword of the same system and
+			// the user is told which. The alternative -- writing the number under a keyword that
+			// means something else -- is the silent corruption this module exists to prevent.
+			flowKey = (units.lpn_u_length === 'ft' || units.lpn_u_diameter === 'in') ? 'GPM' : 'LPS';
+			diff('flow-units-not-epanet', [], (flowUnit || '?') + ' -> ' + flowKey);
+		}
+		var sys = FLOW_UNITS[flowKey].system, fileU = FILE_UNITS[sys];
+
+		// A converter between two unit NAMES. `same` is the pass-through case, decided by the FACTORS
+		// being identical rather than the names being equal: nothing is multiplied, so the user's own
+		// token survives. Anything else really does convert, and says so once.
+		function converter(projUnit, fileUnit, what) {
+			var table = EngCalcs.unitFactors || {},
+				fp = Object.prototype.hasOwnProperty.call(table, projUnit) ? table[projUnit] : undefined,
+				ff = Object.prototype.hasOwnProperty.call(table, fileUnit) ? table[fileUnit] : undefined;
+			if (!projUnit || fp === undefined) {
+				if (!failure) { failure = { ok: false, error: 'unknown-unit', detail: projUnit || what }; }
+				return { same: true, mul: 1 };
+			}
+			if (ff === undefined || fp === ff) { return { same: true, mul: 1 }; }
+			diff('unit-converted', [], what + ': ' + projUnit + ' -> ' + fileUnit);
+			return { same: false, mul: ff / fp };
+		}
+		var cLen = converter(units.lpn_u_length, fileU.len, 'length'),
+			cDia = converter(units.lpn_u_diameter, fileU.dia, 'diameter'),
+			cHead = converter(units.lpn_u_elevhead, fileU.head, 'elevation'),
+			cPress = converter(units.lpn_u_pressure, fileU.press, 'pressure'),
+			cFlow = converter(units.lpn_u_flow, FLOW_KEYWORD_UNIT[flowKey], 'flow');
+		if (failure) { return failure; }
+
+		// ONE NUMBER, WRITTEN. `rec`/`key` name where the file's own text was kept, and lpnNumText()
+		// hands it back only while it still states this value -- so an edited number loses its token
+		// by itself, and a converted one never had a claim to it (`same` is false, the arithmetic
+		// moves the value, and the text no longer parses to it).
+		function n(c, rec, key, value) {
+			var v = (typeof value === 'number' && isFinite(value)) ? value : 0;
+			if (c.same) { return EngCalcs.lpnNumText(rec, key, v); }
+			return String(v * c.mul);
+		}
+		// A dimensionless number -- roughness C, minor loss k, a map coordinate. Same token rule.
+		var PLAIN = { same: true, mul: 1 };
+		function curveNum(c, v) { return c.same ? String(v) : String(v * c.mul); }
+
+		// Column-separated like EPANET's own writer, because the first thing anybody does with an
+		// exported file is read it.
+		function row(cells) {
+			var out = '', i;
+			for (i = 0; i < cells.length; i++) { out += (i ? '\t' : ' ') + String(cells[i]); }
+			return out;
+		}
+
+		var junctions = [], reservoirs = [], tanks = [], pipes = [], pumps = [], valves = [],
+			curves = [], emitters = [], statuses = [], coords = [], verts = [], labelRows = [],
+			nodeById = {}, omitted = {}, i, j, nd, lk, lb;
+
+		// ---- nodes ----
+		for (i = 0; i < (doc.nodes || []).length; i++) {
+			nd = doc.nodes[i];
+			nodeById[nd.id] = nd;
+			if (!isActive(nd)) { omitted[nd.id] = 1; continue; }
+			if (nd.type === 'reservoir') {
+				// A blank head means "the water surface follows the ground", which is a rule of this
+				// page and not of the file. EPANET states one number, so the rule is resolved here --
+				// exactly as reservoirHead() resolves it for the solver.
+				var rh = eff(nd, 'head');
+				if (rh === undefined || rh === null || rh === '') {
+					reservoirs.push(row([nd.id, n(cHead, nd, 'elev', nd.elev || 0)]));
+				} else {
+					reservoirs.push(row([nd.id, n(cHead, nd, '_head', rh)]));
+				}
+			} else if (nd.type === 'tank') {
+				// ID Elev InitLvl MinLvl MaxLvl Diam MinVol. Every one in the ELEVATION unit, the
+				// vessel diameter included -- which is NOT the unit a pipe diameter two sections down
+				// is in. MinVol 0 is EPANET's own "no separate minimum volume".
+				tanks.push(row([nd.id,
+					n(cHead, nd, 'elev', nd.elev || 0),
+					n(cHead, nd, '_level', eff(nd, 'level') || 0),
+					n(cHead, nd, 'minLevel', nd.minLevel || 0),
+					n(cHead, nd, 'maxLevel', nd.maxLevel || 0),
+					n(cHead, nd, 'tankDiameter', nd.tankDiameter || 0),
+					'0']));
+			} else {
+				junctions.push(row([nd.id,
+					n(cHead, nd, 'elev', nd.elev || 0),
+					n(cFlow, nd, '_demand', eff(nd, 'demand') || 0)]));
+				var em = eff(nd, 'emitter');
+				if (em > 0) {
+					// THE ONE QUANTITY THAT CANNOT COME BACK AS TEXT, and it is the same exception the
+					// reader documents at [EMITTERS]: the coefficient is held in the solver's own SI
+					// terms (m3/s per metre^gamma) because this page has no display unit for it, so
+					// the file's number was converted on the way in and converts back here. The VALUE
+					// returns; the characters need not.
+					emitters.push(row([nd.id, String(em *
+						Math.pow(sys === 'us' ? PSI_M : 1, settings.emitterExponent || 0.5) /
+						FLOW_UNITS[flowKey].toSI)]));
+				}
+			}
+			coords.push(row([nd.id,
+				n(PLAIN, nd, 'x', (nd.x || 0) + origin.x),
+				n(PLAIN, nd, 'y', (nd.y || 0) + origin.y)]));
+		}
+
+		// ---- links ----
+		for (i = 0; i < (doc.links || []).length; i++) {
+			lk = doc.links[i];
+			if (!isActive(lk)) { continue; }
+			if (omitted[lk.from] || omitted[lk.to]) {
+				// A link to a node this scenario switched off has nowhere to land, and EPANET rejects
+				// a file naming a node it does not contain.
+				diff('inactive-node-link', [lk.id]);
+				continue;
+			}
+			var status = eff(lk, 'status') === 'closed' ? 'Closed' : 'Open',
+				dia = n(cDia, lk, '_diameter', eff(lk, 'diameter') || 0);
+			if (lk.type === 'valve') {
+				var vt = (lk.valveType || 'TCV').toUpperCase(),
+					setting = eff(lk, 'setting') || 0,
+					settingText;
+				// A SETTING IS A DIFFERENT QUANTITY PER TYPE and there is no symptom when it goes out
+				// in the wrong one -- the same trap js/lpn-epanet.js's [VALVES] writer carries, and
+				// the reader's valveSettingUnit() states the type table.
+				if (vt === 'FCV') { settingText = n(cFlow, lk, '_setting', setting); }
+				else if (vt === 'PRV' || vt === 'PSV' || vt === 'PBV') { settingText = n(cPress, lk, '_setting', setting); }
+				else { settingText = n(PLAIN, lk, '_setting', setting); }
+				if (vt === 'GPV') {
+					var gpts = (lk.curvePoints || []).filter(function (q) {
+						return q && isFinite(q[0]) && isFinite(q[1]);
+					});
+					if (!gpts.length) {
+						// EPANET rejects a GPV naming a curve that is not there, so an empty one goes
+						// out as an open throttle and is reported -- which is what the reader does in
+						// the other direction.
+						diff('gpv-no-curve-as-open', [lk.id]);
+						vt = 'TCV';
+						settingText = '0';
+					} else {
+						var gname = 'G_' + lk.id;
+						for (j = 0; j < gpts.length; j++) {
+							curves.push(row([gname, curveNum(cFlow, gpts[j][0]), curveNum(cHead, gpts[j][1])]));
+						}
+						settingText = gname;
+					}
+				}
+				// A TCV's minor-loss column is IGNORED by EPANET (measured -- see EngCalcs.lpnLinkK),
+				// so writing anything but 0 there states a number the engine discards.
+				valves.push(row([lk.id, lk.from, lk.to, dia, vt, settingText,
+					vt === 'TCV' ? '0' : n(PLAIN, lk, '_k', eff(lk, 'k') || 0)]));
+				// A valve row has no status column; a closed one is stated in [STATUS].
+				if (status === 'Closed') { statuses.push(row([lk.id, 'Closed'])); }
+			} else if (lk.type === 'pump') {
+				var pts = (lk.curvePoints || []).filter(function (q) {
+					return q && isFinite(q[0]) && isFinite(q[1]);
+				});
+				if (pts.length) {
+					// THE POINTS GO OUT AS THE DOCUMENT HOLDS THEM, never re-sampled off a fitted
+					// curve the way the engine adapter does. An imported curve therefore comes back as
+					// the curve that arrived, and a curve typed here goes out as typed.
+					var cname = 'C_' + lk.id;
+					for (j = 0; j < pts.length; j++) {
+						curves.push(row([cname, curveNum(cFlow, pts[j][0]), curveNum(cHead, pts[j][1])]));
+					}
+					pumps.push(row([lk.id, lk.from, lk.to, 'HEAD ' + cname]));
+					if (status === 'Closed') { statuses.push(row([lk.id, 'Closed'])); }
+				} else {
+					// A PUMP WITH NO CURVE IS THE ONE ELEMENT THAT CANNOT ROUND-TRIP. It is this
+					// page's own idea -- a lossless connection, the state every freshly drawn pump is
+					// in -- and EPANET has no such element, so it goes out as a short, very wide, very
+					// smooth pipe whose head loss is below solver tolerance, and it is reported.
+					// Reading that file back gives a pipe, not a pump.
+					pipes.push(row([lk.id, lk.from, lk.to, '0.01', sys === 'us' ? '40' : '1000',
+						roughStandIn(settings.method), '0', status]));
+					diff('pump-no-curve-as-pipe', [lk.id]);
+				}
+			} else {
+				pipes.push(row([lk.id, lk.from, lk.to,
+					n(cLen, lk, '_length', eff(lk, 'length') || 0),
+					dia,
+					n(PLAIN, lk, '_roughness', eff(lk, 'roughness') || 0),
+					n(PLAIN, lk, '_k', eff(lk, 'k') || 0),
+					status]));
+			}
+			for (j = 0; j < (lk.verts || []).length; j++) {
+				verts.push(row([lk.id,
+					n(PLAIN, lk.verts[j], 'x', (lk.verts[j].x || 0) + origin.x),
+					n(PLAIN, lk.verts[j], 'y', (lk.verts[j].y || 0) + origin.y)]));
+			}
+		}
+
+		// ---- text labels ----
+		//
+		// **EPANET'S [LABELS] POINT IS THE LABEL'S UPPER-LEFT CORNER** -- its own documentation says
+		// so -- while this page anchors most text at its centre. The shift back is half the label's
+		// width and half its height IN MAP UNITS, which only the renderer can measure, so the caller
+		// supplies `opts.labelSize`. Without it a centred label would go out half its own width to the
+		// left of where it sits, so the point is written unshifted and the difference REPORTED rather
+		// than guessed at. A label that arrived from an `.inp` is already stored left/top (Task 332)
+		// and needs no shift, which is why an imported file round-trips with no measurer at all.
+		var unmeasured = [];
+		for (i = 0; i < (doc.labels || []).length; i++) {
+			lb = doc.labels[i];
+			if (!isActive(lb)) { continue; }
+			var anchor = lb.anchorNode ? nodeById[lb.anchorNode] : null,
+				px = (lb.x || 0) + (anchor ? (anchor.x || 0) : 0) + origin.x,
+				py = (lb.y || 0) + (anchor ? (anchor.y || 0) : 0) + origin.y,
+				// An anchored label is rendered from the side its offset points to and is vertically
+				// centred (labelHAlign/labelVAlign); a free one uses its own align/valign, which
+				// default to centre and middle.
+				hal = anchor ? (lb.x >= 0 ? 'left' : 'right') : (lb.align || 'center'),
+				val = anchor ? 'middle' : (lb.valign || 'middle'),
+				size = (typeof opts.labelSize === 'function') ? opts.labelSize(lb) : null;
+			if (hal !== 'left' || val !== 'top') {
+				if (size && isFinite(size.w) && isFinite(size.h)) {
+					if (hal === 'center') { px -= size.w / 2; } else if (hal === 'right') { px -= size.w; }
+					// Y IS CARTESIAN HERE, so the top edge is ABOVE the centre and this adds where a
+					// screen-frame version would subtract.
+					if (val === 'middle') { py += size.h / 2; } else if (val === 'bottom') { py += size.h; }
+				} else {
+					unmeasured.push(lb.id);
+				}
+			}
+			var et = eff(lb, 'text'),
+				text = String(et === undefined || et === null ? (lb._text || '') : et);
+			if (/[\r\n]/.test(text)) {
+				// **A MULTI-LINE LABEL CANNOT ROUND-TRIP**: [LABELS] is ONE quoted string per row and
+				// EPANET has no line break inside it. FLATTENED TO ONE LINE rather than split into N
+				// labels, because N labels need a line spacing in MAP units -- the same quantity a
+				// screen-pixel-sized label does not have, which is what makes the corner shift above
+				// need a measurer. One label with all the words in it loses the line breaks and
+				// nothing else; N labels invent positions and come back as separate notes somebody has
+				// to re-join.
+				diff('label-multiline-flattened', [lb.id]);
+				text = text.replace(/[\r\n]+/g, ' ');
+			}
+			if (text.indexOf('"') >= 0) {
+				// EPANET's quoting has no escape, so a quote inside the text would end the string.
+				diff('label-quote-replaced', [lb.id]);
+				text = text.replace(/"/g, "'");
+			}
+			labelRows.push(row([n(PLAIN, lb, 'x', px), n(PLAIN, lb, 'y', py), '"' + text + '"']
+				.concat(anchor ? [lb.anchorNode] : [])));
+		}
+		if (unmeasured.length) { diff('label-anchor-unmeasured', unmeasured); }
+
+		// ---- backdrop ----
+		//
+		// **ONLY AN IMAGE BACKDROP HAS ANYTHING AN `.inp` CAN SAY**, and even then not the picture:
+		// EPANET stores a PATH on somebody's disk and this page stores the image itself, so the
+		// placement goes out and the file name cannot. A TILE BASEMAP is not a file at all -- there is
+		// no path to write and inventing one would name a file that does not exist -- so it is
+		// reported and nothing is written. That is the seam shared with the tile-basemap track: this
+		// writer recognises an image by its `href` and writes [BACKDROP] for nothing else.
+		var backdrop = doc.backdrop, backdropRows = [];
+		if (backdrop && backdrop.href) {
+			// DIMENSIONS is lower-left x, lower-left y, upper-right x, upper-right y in map
+			// coordinates. `tx`/`ty` are the image's TOP-left corner in the stored Cartesian frame, so
+			// the bottom edge is ty - height.
+			var bx = (backdrop.tx || 0) + origin.x, by = (backdrop.ty || 0) + origin.y,
+				bw = (backdrop.width || 0) * (backdrop.s || 1),
+				bh = (backdrop.height || 0) * (backdrop.s || 1);
+			backdropRows.push(row(['DIMENSIONS', String(bx), String(by - bh), String(bx + bw), String(by)]));
+			diff('backdrop-image-not-named', []);
+		} else if (backdrop) {
+			diff('backdrop-not-a-file', [], backdrop.type || 'backdrop');
+		}
+
+		// ---- assembly ----
+		function section(name, rows) { return rows.length ? '[' + name + ']\n' + rows.join('\n') + '\n\n' : ''; }
+		var method = settings.method || 'hw',
+			headloss = { hw: 'H-W', dw: 'D-W', manning: 'C-M' }[method] || 'H-W';
+		if (method !== 'hw') {
+			// EPANET's D-W roughness is in millifeet (US) or millimetres (SI), and its C-M roughness
+			// is Manning's n. This page's roughness field is neither reliably -- it holds what the
+			// user typed in whatever the roughness selector shows. Written as stored, and said out
+			// loud, because converting it would be inventing a number.
+			diff('roughness-method', [], headloss);
+		}
+		var title = opts.title !== undefined ? opts.title : ((doc.project && doc.project.name) || '');
+		var inp = '[TITLE]\n' + String(title).replace(/[\r\n]+/g, ' ') + '\n\n' +
+			// [JUNCTIONS] is written even when empty: it is one of the three sections lpnInpParse()
+			// tests for to decide the text is an `.inp` at all.
+			'[JUNCTIONS]\n' + (junctions.length ? junctions.join('\n') + '\n' : '') + '\n' +
+			section('RESERVOIRS', reservoirs) +
+			section('TANKS', tanks) +
+			section('PIPES', pipes) +
+			section('PUMPS', pumps) +
+			section('VALVES', valves) +
+			section('EMITTERS', emitters) +
+			section('CURVES', curves) +
+			// After the links, because a [STATUS] row names a link that must already be declared.
+			section('STATUS', statuses) +
+			'[OPTIONS]\n' +
+			row(['Units', flowKey]) + '\n' +
+			row(['Headloss', headloss]) + '\n' +
+			row(['Emitter Exponent', String(settings.emitterExponent || 0.5)]) + '\n\n' +
+			section('COORDINATES', coords) +
+			section('VERTICES', verts) +
+			section('LABELS', labelRows) +
+			section('BACKDROP', backdropRows) +
+			'[END]\n';
+		return { ok: true, inp: inp, differences: differences };
+	};
+
 }(typeof globalThis !== 'undefined' ? globalThis : this));
