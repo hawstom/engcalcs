@@ -41,6 +41,16 @@
 
 	var EngCalcs = root.EngCalcs = root.EngCalcs || {};
 
+	// js/lpn-patterns.js owns what a pattern, a time setting and a control MEAN (ROADMAP Task 248);
+	// this file reads them out of the text. In the browser the page's script tags supply it. In
+	// Node a harness has no script tags, so it is pulled in here rather than left for every harness
+	// to remember -- forgetting it is silent, and the symptom is three sections quietly reported as
+	// unread.
+	if (typeof require === 'function' && typeof __dirname === 'string' &&
+		typeof EngCalcs.lpnTimesDefaults !== 'function') {
+		require(__dirname + '/lpn-patterns.js');
+	}
+
 	// Flow unit keyword -> {toSI: m3/s per unit, system: 'us'|'si'}. The `system` is what fixes
 	// every OTHER unit in the file; EPANET has no way to mix them.
 	var FLOW_UNITS = {
@@ -68,8 +78,11 @@
 	// Sections we read. Anything else in the file is either irrelevant to a steady-state hydraulic
 	// solve (report/times/graphics settings) or a cut feature, and the cut ones are named in
 	// REPORTABLE below so they are counted rather than skipped in silence.
+	// [PATTERNS], [TIMES] and [CONTROLS] LEFT THIS TABLE in Task 248: they are read now, into
+	// `patterns`, `times` and `controls` on the result. [RULES] stays -- rule-based controls are a
+	// language and are deliberately out of scope (see js/lpn-patterns.js's header).
 	var REPORTABLE = {
-		VALVES: 'valves', PATTERNS: 'patterns', CONTROLS: 'controls',
+		VALVES: 'valves',
 		RULES: 'rules', ENERGY: 'energy', QUALITY: 'quality', REACTIONS: 'reactions',
 		SOURCES: 'sources', MIXING: 'mixing'
 	};
@@ -199,7 +212,8 @@
 		}
 
 		// ---- [OPTIONS], first, because the flow unit fixes every other unit in the file ----
-		var flowKey = 'GPM', headloss = 'H-W', emitterExponent = 0.5, demandMultiplier = 1, rows, r;
+		var flowKey = 'GPM', headloss = 'H-W', emitterExponent = 0.5, demandMultiplier = 1,
+			defaultPattern = null, rows, r;
 		rows = rawSections.OPTIONS || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
@@ -208,6 +222,14 @@
 			else if (key === 'HEADLOSS' && r[1]) { headloss = r[1].toUpperCase(); }
 			else if (key === 'EMITTER' && r[2]) { emitterExponent = num(r[2], 0.5); }
 			else if (key === 'DEMAND' && r[2]) { demandMultiplier = num(r[2], 1); }
+			// **[OPTIONS] Pattern IS THE DEFAULT DEMAND PATTERN, AND IT IS THE EASIEST THING IN
+			// THIS FILE TO MISS.** A junction whose [JUNCTIONS] pattern column is BLANK does not
+			// have "no pattern" -- it has this one. Net3 says `Pattern 1`, and pattern 1 starts at
+			// 1.34, so a reader that treats a blank column as 1.00 is 34% low on nearly every
+			// demand in the network at t=0 while every number it can see looks reasonable. That is
+			// the second of the two bugs recorded in dev/lpn-spike/net3-vs-epanet-report.js's
+			// header, and it cost 13% of flow.
+			else if (key === 'PATTERN' && r[1]) { defaultPattern = r[1]; }
 		}
 		var fu = FLOW_UNITS[flowKey];
 		if (!fu) { drop('unknown-flow-units', [], flowKey); fu = FLOW_UNITS.GPM; flowKey = 'GPM'; }
@@ -225,6 +247,82 @@
 		// and the caller is told, loudly, that the results will not match the source until the
 		// friction-method control ships.
 		if (headloss !== 'H-W') { drop('headloss-formula', [], headloss); }
+
+		// ---- [PATTERNS] and [TIMES] (ROADMAP Tasks 248.01, 248.02) ----
+		//
+		// THE ARITHMETIC IS NOT HERE. js/lpn-patterns.js owns what a pattern MEANS -- the wrap, the
+		// pattern-start offset, the [TIMES] defaults, the four control sentences -- and this file
+		// owns only what the file SAYS. Two files, one subject, and the split is the same one
+		// lpn-geom.js draws: the pure half is testable without a file and the reading half without
+		// a browser.
+		//
+		// **A MISSING js/lpn-patterns.js DEGRADES, IT DOES NOT THROW.** The page loads its scripts
+		// in a fixed order and a forgotten tag would otherwise take the whole importer down for a
+		// section that is not even the point of the file. So the sections are reported as unread,
+		// exactly as they were before Task 248, and the reason is named in the report rather than
+		// left for somebody to notice.
+		var haveClock = typeof EngCalcs.lpnParseControl === 'function' &&
+			typeof EngCalcs.lpnTimesDefaults === 'function';
+		if (!haveClock) {
+			// Exactly the pre-Task-248 report, section by section, so a page that has not yet added
+			// the script tag behaves as it always did rather than telling every user about a
+			// section their file does not contain.
+			if (seen.PATTERNS) { drop('patterns', [], 'lpn-patterns.js not loaded'); }
+			if (seen.CONTROLS) { drop('controls', [], 'lpn-patterns.js not loaded'); }
+			if (seen.TIMES) { drop('extended-period', [], 'lpn-patterns.js not loaded'); }
+		}
+
+		var patterns = [], patternIndex = {}, times = null, controls = [];
+		rows = rawSections.PATTERNS || [];
+		for (i = 0; i < rows.length; i++) {
+			r = rows[i];
+			if (!r[0]) { continue; }
+			// **THE ID REPEATS AND THE MULTIPLIERS CONCATENATE.** Net3's pattern 1 is four lines of
+			// six values and is one 24-hour pattern, not four patterns of six; a reader that
+			// replaced instead of appending would keep only the last six hours of the day.
+			var pat = patternIndex[r[0]];
+			if (!pat) {
+				pat = { id: r[0], multipliers: [] };
+				patterns.push(pat); patternIndex[r[0]] = pat;
+			}
+			for (var pj = 1; pj < r.length; pj++) {
+				var pv = parseFloat(r[pj]);
+				if (!isFinite(pv)) { continue; }
+				// A multiplier's own text, keyed by its position in the CONCATENATED series -- so
+				// `m5` is the sixth value of the pattern however many lines it took to write. `.76`
+				// and `1.10` are both in Net3 and neither survives String(parseFloat()).
+				mergeTok(pat, 'm' + pat.multipliers.length, r[pj], pv);
+				pat.multipliers.push(pv);
+			}
+		}
+
+		// [TIMES] values are DURATIONS AND CLOCK TIMES, not plain numbers -- `24:00` is 86400
+		// seconds and parseFloat says 24 -- so mergeTok cannot hold their text and they keep their
+		// own `text` bag, read back through EngCalcs.lpnTimeText(). Same rule, different parser.
+		rows = rawSections.TIMES || [];
+		if (haveClock) {
+			times = EngCalcs.lpnTimesDefaults();
+			times.text = {};
+			for (i = 0; i < rows.length; i++) {
+				r = rows[i];
+				if (!r[0]) { continue; }
+				// EPANET's keywords are one or two words ('Duration', 'Pattern Timestep'), matched
+				// with the spaces squeezed out so 'PatternTimestep' and 'PATTERN TIMESTEP' agree.
+				var tk1 = (r[0] || '').toUpperCase(),
+					tk2 = tk1 + (r[1] || '').toUpperCase(),
+					twoWord = !!EngCalcs.lpnTimesKeys[tk2],
+					field = twoWord ? EngCalcs.lpnTimesKeys[tk2] : EngCalcs.lpnTimesKeys[tk1],
+					vals = twoWord ? r.slice(2) : r.slice(1),
+					secs;
+				// Quality Timestep, Report Start's siblings and Statistic all land here and are
+				// skipped: nothing on this page reads them (see lpnTimesDefaults).
+				if (!field) { continue; }
+				secs = EngCalcs.lpnParseTime(vals);
+				if (secs === null) { continue; }
+				times[field] = secs;
+				times.text[field] = vals.join(' ');
+			}
+		}
 
 		// ---- nodes ----
 		var nodes = [], nodeIndex = {};
@@ -247,6 +345,17 @@
 			// field now holds a scaled one, so mergeTok's own second test refuses it. Nothing here
 			// has to know that -- see its comment.
 			mergeTok(jn, 'demand', r[2], jn.demand);
+			// THE REFERENCE IS KEPT, and the difference is still REPORTED: the pattern is on the
+			// junction now, but no solve reads it yet (the solve is one moment, ROADMAP Task 248),
+			// so at t=0 this page still shows the base demand where EPANET shows the base demand
+			// times the pattern's first multiplier. That is a real difference until the run does,
+			// and the importer's contract is to name every one of them.
+			// null means "the column was blank", NOT "no pattern": the document-level
+			// `defaultPattern` above applies. The resolution is the CALLER's -- storing the default
+			// here would put a number the file never wrote on this junction into a field labelled
+			// as the file's, which is the confusion CLAUDE.md's number rule is about. Read it as
+			// `jn.demandPattern || parsed.defaultPattern`.
+			jn.demandPattern = r[3] || null;
 			if (r[3]) { drop('demand-pattern', [r[0]], r[3]); }
 		}
 
@@ -268,6 +377,7 @@
 			var rn = addNode({ id: r[0], type: 'reservoir', x: 0, y: 0, head: num(r[1]) });
 			// One token for one column, under the name the DOCUMENT stores it as.
 			mergeTok(rn, 'head', r[1], rn.head);
+			rn.headPattern = r[2] || null;
 			if (r[2]) { drop('head-pattern', [r[0]], r[2]); }
 		}
 
@@ -331,7 +441,11 @@
 			// A single category that survives the sum keeps its own text. A second one lands on a
 			// total no single token states, and mergeTok drops it.
 			mergeTok(dn, 'demand', r[1], dn.demand);
-			if (r[2]) { drop('demand-pattern', [r[0]], r[2]); }
+			// The LAST category's pattern wins, because this page holds one demand and therefore
+			// one pattern. Two categories on different patterns are two different daily shapes and
+			// no single one of them describes the sum -- which is what 'demand-categories' below
+			// already tells the user about the demand itself.
+			if (r[2]) { dn.demandPattern = r[2]; drop('demand-pattern', [r[0]], r[2]); }
 		}
 		if (multiDemand.length) { drop('demand-categories', multiDemand); }
 
@@ -430,10 +544,16 @@
 					// as a curveless pump (a lossless connection) and reported.
 					drop('pump-constant-power', [r[0]], r[j + 1]);
 					j++;
-				} else if (kw === 'SPEED' && num(r[j + 1], 1) !== 1) {
-					drop('pump-speed', [r[0]], r[j + 1]);
+				} else if (kw === 'SPEED') {
+					// Kept whatever it is, so a later reader need not re-tokenize the row; only a
+					// speed that is not 1 changes the answer, and only that is reported.
+					pump.speed = num(r[j + 1], 1);
+					if (pump.speed !== 1) { drop('pump-speed', [r[0]], r[j + 1]); }
 					j++;
 				} else if (kw === 'PATTERN') {
+					// A pump SCHEDULE: the multiplier series is a speed, not a demand, which is
+					// why js/lpn-patterns.js knows nothing about what a pattern is for.
+					pump.speedPattern = r[j + 1] || null;
 					drop('pump-pattern', [r[0]], r[j + 1]);
 					j++;
 				}
@@ -560,6 +680,47 @@
 			else { drop('link-setting', [r[0]], r[1]); }
 		}
 
+		// ---- [CONTROLS] (ROADMAP Task 248.03) ----
+		//
+		// The sentence shapes are parsed by js/lpn-patterns.js, which knows the grammar and nothing
+		// else. WHAT THIS FILE ADDS IS THE UNITS, and they are the trap: a multiplier is
+		// dimensionless, but a control's threshold and its setting are neither dimensionless nor
+		// the same as each other.
+		//
+		//   threshold  a TANK's is a water LEVEL above its own bottom, in the file's length unit;
+		//              a JUNCTION's is a PRESSURE. Told apart only by the node's TYPE. A reservoir
+		//              counts as a tank here, which is EPANET's own reading -- everything that is
+		//              not a junction is a level.
+		//   setting    whatever a number means on THAT link: valveSettingUnit() for a valve, a
+		//              dimensionless speed multiplier for a pump. Read from the same function the
+		//              [VALVES] rows and the [STATUS] overrides use, so there is one type table in
+		//              this file and not three.
+		//
+		// A control naming a link or a node the file does not contain is reported, not dropped in
+		// silence and not repaired -- the same treatment a dangling link gets.
+		rows = rawSections.CONTROLS || [];
+		if (haveClock) {
+			for (i = 0; i < rows.length; i++) {
+				var parsedCtl = EngCalcs.lpnParseControl(rows[i]);
+				if (!parsedCtl.ok) { drop('controls', [], parsedCtl.raw + ' (' + parsedCtl.error + ')'); continue; }
+				var ctl = parsedCtl.control, cLink = linkIndex[ctl.link];
+				if (!cLink) { drop('controls', [ctl.link], ctl.raw + ' (link not in file)'); continue; }
+				if (ctl.action.setting !== undefined) {
+					ctl.action.settingUnit = cLink.type === 'valve'
+						? valveSettingUnit((cLink.valveType || '').toUpperCase())
+						: null;
+				}
+				if (ctl.condition.kind === 'node') {
+					var cNode = nodeIndex[ctl.condition.node];
+					if (!cNode) { drop('controls', [ctl.condition.node], ctl.raw + ' (node not in file)'); continue; }
+					// 'head' and 'press' are keys of `scale` below, so a caller wanting SI
+					// multiplies by scale[unit] and never re-derives which is which.
+					ctl.condition.unit = cNode.type === 'junction' ? 'press' : 'head';
+				}
+				controls.push(ctl);
+			}
+		}
+
 		// ---- geometry ----
 		rows = rawSections.COORDINATES || [];
 		for (i = 0; i < rows.length; i++) {
@@ -632,12 +793,13 @@
 			if (name === 'VALVES') { return; }
 			if (seen[name]) { drop(REPORTABLE[name], [], seen[name]); }
 		});
-		// An extended-period run is a cut feature, and [TIMES] Duration is the only place it shows.
-		rows = rawSections.TIMES || [];
-		for (i = 0; i < rows.length; i++) {
-			if ((rows[i][0] || '').toUpperCase() === 'DURATION' && /[1-9]/.test(rows[i][1] || '')) {
-				drop('extended-period', [], rows[i][1]);
-			}
+		// **STILL REPORTED, AND ON PURPOSE.** [TIMES] is read now, but a solve is still one moment,
+		// so a file with a duration really does describe more than this page shows. The report goes
+		// when the RUN does, not when the reader does -- and it is what keeps
+		// dev/lpn-spike/validate_inp.js from comparing our t=0 against an EPANET t=0 that has
+		// already applied its patterns.
+		if (times && times.duration > 0) {
+			drop('extended-period', [], EngCalcs.lpnTimeText(times, 'duration', times.duration));
 		}
 
 		var backdrop = null;
@@ -669,6 +831,14 @@
 			scale: { len: lenSI, dia: diaSI, head: headSI, press: pressSI, flow: qSI },
 			headloss: headloss,
 			emitterExponent: emitterExponent,
+			// The clock (ROADMAP Task 248). `times` is null only when js/lpn-patterns.js was not
+			// loaded, which is reported above; `patterns` and `controls` are empty arrays for a
+			// file that states none, so a caller never has to test for absence.
+			patterns: patterns,
+			// The [OPTIONS] Pattern default, for every junction whose own column is blank.
+			defaultPattern: defaultPattern,
+			times: times,
+			controls: controls,
 			nodes: nodes,
 			links: links,
 			labels: labels,
