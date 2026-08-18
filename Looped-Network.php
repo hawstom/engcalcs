@@ -265,6 +265,7 @@ echoHeader("EngCalcs", $html_title, "");
 				<label><?=ecTipLabel($ec_lang['lpn_georef_rotation'], $ec_lang['lpn_georef_rotation_tip'])?>
 					<input type="number" id="lpn_georef_rot_in" step="any" style="width:5em"></label>
 			</span>
+			<button type="button" id="lpn_georef_goto"><?=$ec_lang['lpn_georef_goto']?></button>
 			<button type="button" id="lpn_georef_drop"><?=$ec_lang['lpn_georef_drop']?></button>
 			<button type="button" id="lpn_georef_finish"><?=$ec_lang['lpn_georef_finish']?></button>
 			<button type="button" id="lpn_georef_cancel"><?=$ec_lang['lpn_georef_cancel']?></button>
@@ -769,6 +770,10 @@ EngCalcs.pageConfig = {
 	lpn_georef_on_map: <?=json_encode($ec_lang['lpn_georef_on_map'])?>,
 	lpn_georef_empty: <?=json_encode($ec_lang['lpn_georef_empty'])?>,
 	lpn_georef_unavailable: <?=json_encode($ec_lang['lpn_georef_unavailable'])?>,
+	lpn_goto_menu: <?=json_encode($ec_lang['lpn_goto_menu'])?>,
+	lpn_goto_tip: <?=json_encode($ec_lang['lpn_goto_tip'])?>,
+	lpn_goto_prompt: <?=json_encode($ec_lang['lpn_goto_prompt'])?>,
+	lpn_goto_bad: <?=json_encode($ec_lang['lpn_goto_bad'])?>,
 	lpn_menu_settings: <?=json_encode($ec_lang['lpn_menu_settings'])?>,
 	lpn_menu_help: <?=json_encode($ec_lang['lpn_menu_help'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,

@@ -263,8 +263,11 @@ console.log('\n--- one home for the concept ---');
 	// from its own longitude and latitude, so basemapTileList() adds one x site and two y sites (a
 	// box needs its north edge and its south). Skipping the shift there would draw the street map
 	// half a million units away from the network it is supposed to be under.
-	ok('inwardX has one definition and nine call sites', count(/inwardX\(/g) === 10, count(/inwardX\(/g));
-	ok('inwardY has one definition and ten call sites', count(/inwardY\(/g) === 11, count(/inwardY\(/g));
+	// Go to latitude, longitude (Task 145) adds one site to each: a coordinate the USER pasted is an
+	// outside number like any other and has to be brought into the document's local frame, or typing
+	// a real coordinate into a State Plane project would travel half a million units.
+	ok('inwardX has one definition and ten call sites', count(/inwardX\(/g) === 11, count(/inwardX\(/g));
+	ok('inwardY has one definition and eleven call sites', count(/inwardY\(/g) === 12, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

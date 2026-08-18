@@ -1,4 +1,4 @@
-// Putting an XY-grid project on the world map, through the PAGE -- ROADMAP Task 145.
+// Converting an XY project to a GeoMap one, through the PAGE -- ROADMAP Task 145.
 //
 //   node dev/lpn-spike/georef-place-harness.js
 //
@@ -33,6 +33,7 @@ const L = loadLoopedNetwork(
 	"\t\tgeorefState: function () { return georef; },\n" +
 	"\t\tgeorefSetTransform: georefSetTransform,\n" +
 	"\t\tgeorefCentre: georefSrcCentre, georefCorners: georefCornersSrc,\n" +
+	"\t\tparseLatLon: parseLatLon,\n" +
 	"\t\toutwardX: outwardX, outwardY: outwardY,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -179,7 +180,35 @@ ok('...and the placed coordinates are the ones that survive',
 	JSON.stringify(doc.nodes.map(n => [n.id, n.x, n.y])) === placed);
 
 L.georefStart();
-ok('a project already on the world map is refused, not re-placed', L.georefState() === null);
+ok('a project already on the GeoMap is refused, not re-placed', L.georefState() === null);
+
+// ---------------------------------------------------------------------------
+// 6. The command stays FINDABLE, and the coordinate box takes what people paste.
+// ---------------------------------------------------------------------------
+// Tom, 2026-08-18: *"XY to World: I can't find it."* It had been HIDDEN on a project already on the
+// map, which says "there is no such command" rather than "not for this project". Both properties are
+// read out of the source, because neither is reachable from a headless document.
+console.log('\n--- the command is findable, and a coordinate is what a map gives you ---');
+{
+	const lnSrc = require('fs').readFileSync(ROOT + 'js/looped-network.js', 'utf8');
+	ok('the File-menu row is disabled, never hidden',
+		/label: pc\.lpn_georef_menu[\s\S]{0,200}?disabled: isGeoProject\(\) \|\| georefActive\(\)/.test(lnSrc) &&
+		!/hidden: isGeoProject\(\)[^\n]*lpn_georef_menu/.test(lnSrc));
+	ok('...and it sits beside Import EPANET file, the other conversion',
+		lnSrc.indexOf('pc.lpn_georef_menu') > lnSrc.indexOf('pc.lpn_file_import_inp') &&
+		lnSrc.indexOf('pc.lpn_georef_menu') < lnSrc.indexOf('pc.lpn_file_export_inp'));
+	// A GeoMap has to zoom out far enough to FIND a site, not just to look at one.
+	ok('a GeoMap zooms out to the whole Earth', /return Math\.max\(MIN_SCALE_GRID, w \/ 360\);/.test(lnSrc));
+}
+{
+	// LATITUDE FIRST, because that is the order every map on Earth hands you.
+	const p = L.parseLatLon('38.106067, -122.5686103');
+	ok('a pasted coordinate reads latitude first', !!p && p.lat === 38.106067 && p.lon === -122.5686103,
+		JSON.stringify(p));
+	ok('a space alone separates them too', !!L.parseLatLon('38.106 -122.569'));
+	ok('an out-of-range pair is refused', L.parseLatLon('938, -122') === null);
+	ok('prose is refused rather than half-read', L.parseLatLon('Petaluma') === null);
+}
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
 process.exit(fails ? 1 : 0);

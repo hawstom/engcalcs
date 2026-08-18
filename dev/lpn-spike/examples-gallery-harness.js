@@ -146,15 +146,23 @@ console.log('\n-- wiring: the gallery is reachable, dismissible, and under OPEN 
 	const newIdx = src.indexOf("pc.lpn_file_new ||");
 	report(exIdx > openIdx && openIdx > newIdx,
 		'and it sits under Open, not under New — New creates, Open retrieves');
-	// **PER PROJECT since Task 431.** One page-level flag could not answer a per-tab question, so the
-	// condition now reads `!galleryDismissedHere()`. The property is unchanged: the wall shows on a
-	// canvas with nothing in it, or when asked for, and never otherwise.
+	// **ASKED ONCE, ANSWERED FOR GOOD (Task 431).** The wall shows on an empty canvas or on demand,
+	// and the answer lives on `library` -- already stored, already saved by saveIndex() -- so a page
+	// reload does not re-ask. A per-page flag and then a per-project one both failed here; a
+	// per-project answer says yes to every new empty tab forever, which was Tom's second report.
 	report(/galleryForced \|\| \(empty && !galleryDismissedHere\(\)\)/.test(src),
 		'it shows on an empty canvas, or on demand');
-	// ...and the rule that removed the "sometimes": seeing content IS the dismissal, so a project
-	// that has ever had a network in it never shows the wall again, emptied or not.
-	report(/if \(!empty && library\.openId\) \{ galleryDismissedBy\[library\.openId\] = true; \}/.test(src),
-		'a project that has had content is dismissed for good');
+	report(/function galleryDismissedHere\(\) \{ return !!library\.galleryDismissed; \}/.test(src),
+		'the answer is stored with the library, so a reload does not re-ask');
+	report(/library\.galleryDismissed = true;\n\s*saveIndex\(\);/.test(src),
+		'...and it is persisted rather than only held in memory');
+	// Seeing content IS the answer: anyone with a network on screen has answered by drawing it.
+	report(/if \(!empty\) \{ dismissGalleryForGood\(\); \}/.test(src),
+		'a canvas with a network on it answers the question by itself');
+	// NO NEW STORAGE ITEM. The flag rides in the library object that is already written, so no
+	// sentence in consent_body becomes false and nobody has to be re-asked (EC_CONSENT_VERSION).
+	report(!/localStorage\.setItem\(\s*['"]lpn_gallery/.test(src),
+		'and it adds no storage item of its own');
 	report(/function hideExamplesGallery/.test(src), 'and there is a way out of it');
 	// A card must be a real button: the whole card is the hit area, it reaches the keyboard for
 	// free, and a screen reader announces it as activatable.

@@ -4781,7 +4781,18 @@ var EngCalcs = EngCalcs || {};
 	// GEO_MIN/GEO_MAX mean the same PHYSICAL span as the grid pair does in metres.
 	var MIN_SCALE_GRID = 0.05, MAX_SCALE_GRID = 500;
 	var DEG_PER_M = 1 / 111132;   // one degree of latitude in metres, near enough for a zoom bound
-	function minScale() { return isGeoProject() ? MIN_SCALE_GRID / DEG_PER_M : MIN_SCALE_GRID; }
+	// **A GEOGRAPHIC PROJECT ZOOMS OUT TO THE WHOLE EARTH, and it has to.** Tom, 2026-08-18:
+	// *"We need either the ability to zoom out to the globe or to search by name or to go to
+	// lat/lon."* The grid floor converted into degrees stopped at about 20 km across, which is fine
+	// for looking at a network and useless for FINDING one -- there is no way to get from California
+	// to Kenya by dragging a 20 km window. The floor is now the scale at which 360 degrees of
+	// longitude fit the canvas, which is the whole world and no further; past that the map only
+	// repeats itself.
+	function minScale() {
+		if (!isGeoProject()) { return MIN_SCALE_GRID; }
+		var w = (svg && svg.clientWidth) || 1000;
+		return Math.max(MIN_SCALE_GRID, w / 360);
+	}
 	function maxScale() { return isGeoProject() ? MAX_SCALE_GRID / DEG_PER_M : MAX_SCALE_GRID; }
 	var pointers = new Map();
 	var drag = null;
@@ -4795,21 +4806,20 @@ var EngCalcs = EngCalcs || {};
 		onZoomChanged();
 	}
 
-	// ---- GEOREFERENCING: PUTTING AN XY-GRID PROJECT ON THE WORLD MAP (ROADMAP Task 145) ----------
+	// ---- GEOREFERENCING: CONVERTING AN XY PROJECT TO A GEOMAP ONE (ROADMAP Task 145) ------------
 	//
-	// **THE TWO WORDS, DECIDED ONCE** (Tom, 2026-08-18, weighing "Flat Earth vs Round Earth",
-	// "geo vs xy", "GeoMap vs XY" and epanet-js's "Map-based vs Simple X-Y Grid").
+	// **THE TWO WORDS, TOM'S CHOICE, 2026-08-18.**
 	//
-	//   internally      `project.coords` is 'geo', or absent, which IS the xy grid
-	//   user-facing     **world map** and **XY grid**
+	//   internally      `project.coords` is 'geo', or absent, which IS the XY grid
+	//   user-facing     **GeoMap** and **XY**
 	//
-	// The user-facing pair is not a new invention: File > New has shipped "Blank project on a world
-	// map" in 27 languages since slice 1, so "world map" is the word already on the page and already
-	// translated, and inventing "GeoMap" now would mean two names for one thing. The Round Earth /
-	// Flat Earth pair Tom liked is the right INSTRUCTION and the wrong LABEL -- a control's label has
-	// to survive a reader who has never met the joke -- so it belongs in the synonym channel and in
-	// this tool's own explanation, where it teaches. `dev/georeferencing.md` carries the proposed
-	// `$ec_lang_syn` diff; that array is off-limits to AI without written permission per file.
+	// He offered four pairs and marked this one "(user-facing)". Flat Earth / Round Earth he called
+	// "fun and deeply meaningful and instructive", and it is -- it is the same distinction the trade
+	// draws between a plane survey and a geodetic one. It belongs in the TIPS and in `$ec_lang_syn`,
+	// not on the menu, because the menu is staid and professional. (An earlier pass here argued for
+	// "world map / XY grid" because `lpn_new_geo_us` already said "world map" in 27 languages. Tom
+	// overruled it; the four affected keys were re-worded rather than left to make a second name for
+	// one thing.)
 	//
 	// **THE PARADIGM IS THE IMAGE-PLACEMENT ONE, NOT A MENU OF COMMANDS** (Tom's option 3, his own
 	// preference): the whole model behaves like one picture being dropped onto the map, with corner
@@ -5040,6 +5050,7 @@ var EngCalcs = EngCalcs || {};
 			? (pc.lpn_georef_carry || 'Pan and zoom to your site. The model follows the middle of the map.')
 			: (pc.lpn_georef_adjust || 'Drag the model to move it, a corner to resize it, the top handle to turn it.');
 		georefBarEl('lpn_georef_drop').style.display = carrying ? '' : 'none';
+		if (georefBarEl('lpn_georef_goto')) { georefBarEl('lpn_georef_goto').style.display = carrying ? '' : 'none'; }
 		georefBarEl('lpn_georef_finish').style.display = carrying ? 'none' : '';
 		georefBarEl('lpn_georef_numbers').style.display = carrying ? 'none' : '';
 		if (!carrying && georef.t) {
@@ -5072,17 +5083,59 @@ var EngCalcs = EngCalcs || {};
 			var c = georefSrcCentre(), ll = EngCalcs.lpnGeorefToLonLat(georef.t, c.x, c.y);
 			georefSetTransform(EngCalcs.lpnGeorefWithRotation(georef.t, want - georef.t.rotDeg, ll));
 		});
+		// The placement bar carries it too, because the carry stage IS the moment somebody needs to
+		// travel: the model follows the middle of the map, so moving the map is the whole gesture.
+		var go = georefBarEl('lpn_georef_goto');
+		if (go) { go.addEventListener('click', goToLatLon); }
 		georefBarEl('lpn_georef_drop').addEventListener('click', georefDrop);
 		georefBarEl('lpn_georef_finish').addEventListener('click', georefFinish);
 		georefBarEl('lpn_georef_cancel').addEventListener('click', georefCancel);
 	}
 
 	// ---- the three stages ----------------------------------------------------------------------
+	// ---- GO TO A COORDINATE (Task 145) ---------------------------------------------------------
+	//
+	// Tom, 2026-08-18: *"We need either the ability to zoom out to the globe or to search by name or
+	// to go to lat/lon."* This is the third, and the zoom floor above is the first. The second --
+	// searching by PLACE NAME -- is Task 437 and is not built here on purpose: it needs a geocoder,
+	// which would be a SECOND third-party host on a page whose whole privacy claim is that the tile
+	// server is the only one. That is Tom's call, not a detail of this command.
+	//
+	// **IT ACCEPTS WHAT PEOPLE PASTE.** `38.106, -122.569` is what every map on Earth hands you, so
+	// that order -- LATITUDE FIRST -- is what this reads, whatever our internal x/y order is. A
+	// separator of comma, space or both, and a leading/trailing bracket, all pass.
+	function parseLatLon(text) {
+		var m = String(text || '').match(/(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)/);
+		if (!m) { return null; }
+		var lat = parseFloat(m[1]), lon = parseFloat(m[2]);
+		if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) { return null; }
+		return { lat: lat, lon: lon };
+	}
+	// About a kilometre across, which is a site rather than a city: arriving zoomed to the whole
+	// county would technically centre the view and leave you no better off than before.
+	var GOTO_SPAN_DEG = 0.01;
+	function goToLatLon() {
+		var pc = EngCalcs.pageConfig || {};
+		if (!isGeoProject()) { return; }
+		var v = window.prompt(pc.lpn_goto_prompt || 'Latitude, longitude', '');
+		if (v === null) { return; }
+		var ll = parseLatLon(v);
+		if (!ll) {
+			setNotice(pc.lpn_goto_bad || 'That is not a latitude and longitude. Try 38.106, -122.569.');
+			return;
+		}
+		var w = (svg && svg.clientWidth) || 1000, want = w / GOTO_SPAN_DEG;
+		// KEEP the zoom when it is already closer than a site: someone who has lined up on a street
+		// corner and then types a coordinate wants to travel, not to be zoomed back out.
+		applyView({ cx: inwardX(ll.lon), cy: inwardY(ll.lat), s: Math.max(state.s, Math.min(want, maxScale())) });
+		georefCarryTick();
+	}
+
 	function georefStart() {
 		var pc = EngCalcs.pageConfig || {};
 		if (georef) { return; }
 		if (isGeoProject()) {
-			setNotice(pc.lpn_georef_on_map || 'This project is already on the world map.');
+			setNotice(pc.lpn_georef_on_map || 'This is already a GeoMap project.');
 			return;
 		}
 		if (!doc.nodes.length) {
@@ -5093,7 +5146,7 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
-		if (!window.confirm(pc.lpn_georef_intro || 'Put this project on the world map?')) { return; }
+		if (!window.confirm(pc.lpn_georef_intro || 'Convert this XY project to a GeoMap project?')) { return; }
 		georef = {
 			stage: 'carry', src: georefCapture(), t: null,
 			mpu: georefMetersPerUnit(), rotDeg: 0,
@@ -5166,7 +5219,7 @@ var EngCalcs = EngCalcs || {};
 		if (v) { applyView(v); }
 		saveToStorage();
 		renderTabs();
-		setNotice(pc.lpn_georef_done || 'The model is on the world map. Drag any node to fine-tune it.');
+		setNotice(pc.lpn_georef_done || 'This is a GeoMap project now. Drag any node to fine-tune it.');
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -6513,27 +6566,36 @@ var EngCalcs = EngCalcs || {};
 	// empty canvas, and a visitor with an empty drawing in front of them is who it is for.
 	// `galleryForced` is the File > Open example… route, where the canvas is not empty. Two flags
 	// rather than one tri-state because they answer different questions and both can be true.
-	// **THE DISMISSAL IS PER PROJECT, NOT PER PAGE** (ROADMAP Task 431). Tom, 2026-08-18: *"For some
-	// reason the gallery appears sometimes when I switch to an empty project tab."* One page-level
-	// flag cannot answer a per-tab question: opening an example clears it for everybody, so the next
-	// empty tab focused gets the shop window again -- which is the "sometimes".
+	// **THE SHOP WINDOW IS FOR A FIRST VISIT, AND IT IS ANSWERED ONCE** (ROADMAP Task 431).
 	//
-	// The rule the flag now states is Tom's own: **the gallery is for a project that has NEVER had
-	// content.** So it is also set the moment a project is seen with something drawn in it, and
-	// emptying that project later does not bring the gallery back. Deleting your network is not a
-	// request for the catalogue.
+	// Two wrong answers were shipped before this one, and each looked right in the case it was
+	// written for. A single PAGE-level flag meant opening an example cleared it for everybody, so
+	// the next empty tab focused got the wall again. Keying it PER PROJECT fixed that and left
+	// Tom's real complaint standing: *"Still happens when I switch to each new project tab after
+	// page reload."* Of course it did -- every one of those tabs has genuinely never had content,
+	// so a per-project answer says yes to every one of them, forever.
 	//
-	// IN MEMORY, keyed by project id, exactly like `tabViews`: this is a fact about the browsing
-	// session, not about the document, and it buys nothing in a saved file. A reload does show the
-	// gallery again on a genuinely empty project, which is correct -- it has still never had content.
-	var galleryDismissedBy = {}, galleryForced = false;
-	function galleryDismissedHere() { return !!galleryDismissedBy[library.openId]; }
+	// The question the wall actually asks is **"is this person new here?"**, which is asked once and
+	// answered for good. So the flag lives on `library`, which is already in localStorage and
+	// already saved by saveIndex() -- **no new storage, so no new sentence in `consent_body`**,
+	// which is the expensive part of storing anything (CLAUDE.md, "What may be stored").
+	//
+	// It is set three ways, and the third is the one that makes it feel right: dismissing the wall,
+	// opening an example from it, and **simply being seen with a network on screen**. Anyone who has
+	// drawn or opened anything has answered the question by doing it.
+	var galleryForced = false;
+	function galleryDismissedHere() { return !!library.galleryDismissed; }
+	function dismissGalleryForGood() {
+		if (library.galleryDismissed) { return; }
+		library.galleryDismissed = true;
+		saveIndex();
+	}
 	function showExamplesOverlay() {
 		galleryForced = true;
 		updateEmptyHint();
 	}
 	function hideExamplesGallery() {
-		galleryDismissedBy[library.openId] = true;
+		dismissGalleryForGood();
 		galleryForced = false;
 		updateEmptyHint();
 	}
@@ -6595,8 +6657,8 @@ var EngCalcs = EngCalcs || {};
 		var hint = document.getElementById('lpn_empty_hint');
 		if (!hint) { return; }
 		var empty = doc.nodes.length === 0;
-		// **SEEING CONTENT IS THE DISMISSAL** (Task 431), so this is a write and not only a read.
-		if (!empty && library.openId) { galleryDismissedBy[library.openId] = true; }
+		// **SEEING CONTENT IS THE ANSWER** (Task 431), so this is a write and not only a read.
+		if (!empty) { dismissGalleryForGood(); }
 		var show = galleryForced || (empty && !galleryDismissedHere());
 		hint.style.display = show ? 'block' : 'none';
 		// Fetched only when it is first actually going to be seen. A returning user with a network
@@ -6925,7 +6987,7 @@ var EngCalcs = EngCalcs || {};
 	function saveToStorage() {
 		if (!library.openId) { return; }
 		// **A PLACEMENT IN PROGRESS IS NOT A DOCUMENT** (Task 145's georeferencing tool). While the
-		// model is being carried onto the world map the project already says `coords: geo` and its
+		// model is being carried onto the GeoMap the project already says `coords: geo` and its
 		// coordinates are still grid numbers -- a state that is correct on screen for the length of
 		// one gesture and nonsense in a file. georefFinish() and georefCancel() both save after
 		// resolving it, so nothing is lost by declining here.
@@ -10007,15 +10069,15 @@ var EngCalcs = EngCalcs || {};
 			// whatever units happen to be on the strip, which decides a project's units by accident --
 			// and since Task 263 a project's units are part of the project. The fly-out is a template
 			// list, the shape File > New has in every application that has one.
-			{ icon: 'new', label: pc.lpn_new_blank_us || 'Blank project, US units (gpm)', fn: function () { newBlankProject('us'); } },
-			{ icon: 'new', label: pc.lpn_new_blank_si || 'Blank project, SI units (l/s)', fn: function () { newBlankProject('si'); } },
+			{ icon: 'new', label: pc.lpn_new_blank_us || 'Blank XY project, US units (gpm)', fn: function () { newBlankProject('us'); } },
+			{ icon: 'new', label: pc.lpn_new_blank_si || 'Blank XY project, SI units (l/s)', fn: function () { newBlankProject('si'); } },
 			// **TWO MORE ROWS, NOT A CHECKBOX ON THE FIRST TWO** (Task 145). Grid-or-geographic is
 			// declared at creation for the same reason units are, so it is declared the same way: by
 			// which row you click. See LPN_COORDS_GEO for why it cannot be a toggle afterwards.
 			{ separator: true },
-			{ icon: 'globe', label: pc.lpn_new_geo_us || 'Blank project on a world map, US units (gpm)',
+			{ icon: 'globe', label: pc.lpn_new_geo_us || 'Blank GeoMap project, US units (gpm)',
 				fn: function () { newBlankProject('us', LPN_COORDS_GEO); } },
-			{ icon: 'globe', label: pc.lpn_new_geo_si || 'Blank project on a world map, SI units (l/s)',
+			{ icon: 'globe', label: pc.lpn_new_geo_si || 'Blank GeoMap project, SI units (l/s)',
 				fn: function () { newBlankProject('si', LPN_COORDS_GEO); } }
 			// **NO "FROM EXAMPLES" ROWS HERE** (Tom, 2026-08-15: *"Code-drawn: Remove the feature."*).
 			// This fly-out used to carry two more rows that built the basic ring main in code. The
@@ -10085,27 +10147,32 @@ var EngCalcs = EngCalcs || {};
 			// COPY into a new tab, which is what keeps the word honest -- see openExample().
 
 			{ icon: 'open', label: pc.lpn_examples_menu || 'Open example…',
-				fn: function () { delete galleryDismissedBy[library.openId]; loadExamplesManifest(); showExamplesOverlay(); } },
+				// Asking for the wall by name un-answers the question for this one showing, without
+				// re-arming it for every empty tab: showExamplesOverlay() sets galleryForced, and
+				// dismissing or opening anything answers it again.
+				fn: function () { loadExamplesManifest(); showExamplesOverlay(); } },
 			// A SEPARATE ROW FROM Open…, not a second file type on it (Task 196). Open means one of
 			// our own documents, with everything that comes with it -- a lock, a live file handle, a
 			// Save that writes back. An .inp has none of that and never will, so hiding it behind
 			// the same word would promise a round trip we cannot make. Import says what it is.
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file (.inp)…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
+			// **A CONVERSION, so it sits beside the other one** (Task 145). It changes what kind of
+			// document this is, permanently, exactly as Import does -- and GeoMap-or-XY cannot be a
+			// toggle afterwards, for the reasons LPN_COORDS_GEO records.
+			//
+			// **DISABLED, NEVER HIDDEN.** It was hidden on a project already on the map, and Tom then
+			// could not find the command at all -- a hidden row says "there is no such command",
+			// which is a different and false statement. Same rule the scenario rows follow: the
+			// vocabulary stays learnable.
+			{ icon: 'globe', label: pc.lpn_georef_menu || 'Convert XY project to GeoMap…',
+			  tip: isGeoProject() ? (pc.lpn_georef_on_map || pc.lpn_georef_tip) : pc.lpn_georef_tip,
+			  disabled: isGeoProject() || georefActive(), fn: georefStart },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
 			// separate row from Open rather than a second file type on it.
 			{ icon: 'save', label: pc.lpn_file_export_inp || 'Export EPANET file (.inp)…',
 			  tip: pc.lpn_file_export_inp_tip, fn: exportInpFile },
-			// **A CONVERSION, WHICH IS WHY IT IS IN THE FILE MENU AND NOT UNDER VIEW** (Task 145).
-			// It changes what kind of document this is, permanently, exactly as Import does -- and
-			// grid-or-world-map cannot be a toggle for the reasons LPN_COORDS_GEO records. Hidden on
-			// a project already on the map: there is nothing to convert, and a row that can only
-			// scold is worse than no row.
-			{ hidden: isGeoProject() || georefActive(), separator: true },
-			{ hidden: isGeoProject() || georefActive(), icon: 'globe',
-			  label: pc.lpn_georef_menu || 'Put this project on the world map…',
-			  tip: pc.lpn_georef_tip, fn: georefStart }
 		].concat([
 			{ separator: true },
 			// **The menu says Save and Save as… in every browser**, never "Download a copy": the
@@ -10312,6 +10379,11 @@ var EngCalcs = EngCalcs || {};
 			// The label states what the row will DO, because this menu has no checkmark column.
 			{
 				hidden: !isGeoProject(), separator: true
+			},
+			{
+				hidden: !isGeoProject(), icon: 'globe',
+				label: pc.lpn_goto_menu || 'Go to latitude, longitude…',
+				tip: pc.lpn_goto_tip, fn: goToLatLon
 			},
 			{
 				hidden: !isGeoProject(), icon: 'view',

@@ -1344,14 +1344,15 @@ $ec_lang['lpn_menu_view']='View';
 $ec_lang['lpn_basemap_show']='Show street map';
 $ec_lang['lpn_basemap_hide']='Hide street map';
 $ec_lang['lpn_basemap_tip']='Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.';
-// ROADMAP Task 145's placement tool. THE PAIR OF NOUNS IS 'world map' and 'XY grid' -- 'world map'
-// because lpn_new_geo_us has said it in 27 languages since the first slice, and inventing a second
-// name for a thing already named is how a UI ends up with two.
-$ec_lang['lpn_geomap']='World map';
-$ec_lang['lpn_xymap']='XY grid';
-$ec_lang['lpn_georef_menu']='Put this project on the world map…';
-$ec_lang['lpn_georef_tip']='Move a drawing made on the XY grid onto real ground, so it sits on the street map at its true size. Every number you typed stays as it is — only the X and Y become a longitude and a latitude.';
-$ec_lang['lpn_georef_intro']='Put this project on the world map? Your grid already says how big one drawing unit is, so the model will land at its true size on the ground. Pipe lengths, diameters, elevations and demands are not touched. You can move, resize and turn the model as much as you like, and nothing is final until you press Finish.';
+// ROADMAP Task 145's placement tool. **THE PAIR OF NOUNS IS 'GeoMap' and 'XY'** -- Tom's own choice
+// for a staid, professional menu, 2026-08-18. Flat Earth / Round Earth is the same distinction told
+// as the joke it has been for two thousand years; it is fun, meaningful and instructive, so it lives
+// in the tips and in $ec_lang_syn, where it teaches without being the label.
+$ec_lang['lpn_geomap']='GeoMap';
+$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_georef_menu']='Convert XY project to GeoMap…';
+$ec_lang['lpn_georef_tip']='Flat Earth to Round Earth. Move a drawing made on the XY grid onto real ground, so it sits on the street map at its true size. Every number you typed stays as it is — only the X and Y become a longitude and a latitude.';
+$ec_lang['lpn_georef_intro']='Convert this XY project to a GeoMap project? Your grid already says how big one drawing unit is, so the model will land at its true size on the ground. Pipe lengths, diameters, elevations and demands are not touched. You can move, resize and turn the model as much as you like, and nothing is final until you press Finish.';
 $ec_lang['lpn_georef_carry']='Pan and zoom the map to your site. The model follows the middle of the map. Then press Drop it here.';
 $ec_lang['lpn_georef_adjust']='Drag the model to move it, a corner to resize it, the round handle above it to turn it. Or type the two numbers.';
 $ec_lang['lpn_georef_drop']='Drop it here';
@@ -1361,11 +1362,16 @@ $ec_lang['lpn_georef_scale']='One drawing unit is';
 $ec_lang['lpn_georef_scale_tip']='How far one unit of your drawing reaches on the ground. Your grid already declares this, so the number here starts out right; change it only if the drawing was never at full size.';
 $ec_lang['lpn_georef_rotation']='Turn, degrees counter-clockwise';
 $ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model, counter-clockwise, so that its north points north.';
-$ec_lang['lpn_georef_confirm']='Place the model here for good? You can still drag single nodes afterwards, but the drawing stops being an XY grid. To get the grid back, close this project without saving.';
-$ec_lang['lpn_georef_done']='The model is on the world map. Drag any node to move it closer to where it really is.';
-$ec_lang['lpn_georef_on_map']='This project is already on the world map.';
+$ec_lang['lpn_georef_confirm']='Place the model here for good? You can still drag single nodes afterwards, but the drawing stops being an XY project. To get XY back, close this project without saving.';
+$ec_lang['lpn_georef_done']='This is a GeoMap project now. Drag any node to move it closer to where it really is.';
+$ec_lang['lpn_georef_on_map']='This is already a GeoMap project.';
 $ec_lang['lpn_georef_empty']='Draw or open a network first. There is nothing to place yet.';
 $ec_lang['lpn_georef_unavailable']='The placement tool did not load. Reload the page and try again.';
+$ec_lang['lpn_goto_menu']='Go to latitude, longitude…';
+$ec_lang['lpn_goto_tip']='Move the map to a place you already have coordinates for. Latitude first, then longitude, the way a map gives them: 38.106, -122.569.';
+$ec_lang['lpn_goto_prompt']='Latitude, longitude';
+$ec_lang['lpn_goto_bad']='That is not a latitude and longitude. Try 38.106, -122.569.';
+$ec_lang['lpn_georef_goto']='Go to…';
 
 $ec_lang['lpn_clean_map']='Clean map';
 $ec_lang['lpn_clean_map_off']='Show map readouts';
@@ -1461,15 +1467,15 @@ $ec_lang['lpn_file_new']='New project…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Blank project, US units (gpm)';
-$ec_lang['lpn_new_blank_si']='Blank project, SI units (l/s)';
+$ec_lang['lpn_new_blank_us']='Blank XY project, US units (gpm)';
+$ec_lang['lpn_new_blank_si']='Blank XY project, SI units (l/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 // The other half of the same fly-out (Task 145): a project is on a grid or on the world, and it says
 // which when it is made, exactly as it says its units. "On a world map" rather than "geographic" --
 // the plain phrase says what the coordinates ARE to somebody who has never met the word.
-$ec_lang['lpn_new_geo_us']='Blank project on a world map, US units (gpm)';
-$ec_lang['lpn_new_geo_si']='Blank project on a world map, SI units (l/s)';
+$ec_lang['lpn_new_geo_us']='Blank GeoMap project, US units (gpm)';
+$ec_lang['lpn_new_geo_si']='Blank GeoMap project, SI units (l/s)';
 $ec_lang['lpn_file_open']='Open…';
 $ec_lang['lpn_file_save']='Save';
 $ec_lang['lpn_file_saveas']='Save as…';

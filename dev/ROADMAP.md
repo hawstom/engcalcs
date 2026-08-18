@@ -485,6 +485,19 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   points on their drawing; and Finish is not undoable — Cancel is the way back during placement, and
   after Finish it is closing without saving.
 
+- 40|437| **[H] Search the GeoMap by place name — needs Tom's ruling, not a design.** Tom, 2026-08-18:
+  *"We need either the ability to zoom out to the globe or to search by name or to go to lat/lon."*
+  The first and third shipped the same day; this one is the only one that costs something.
+  - **It needs a GEOCODER, which would be a second third-party host.** `dev/geographic-projects.md`
+    §4 says the tile server is the only host this page talks to, and `dev/browser-pass/specs/
+    basemap.js` asserts it. Nominatim is the free option and its usage policy requires an identifying
+    User-Agent and no heavy use; a paid one means a key, which means a billing account.
+  - The privacy cost is real and specific: a search sends **what the user typed** to that host, where
+    a tile request only ever sends where they are looking.
+  - Cheaper alternatives that need no host, if the answer is no: paste a coordinate (built), paste an
+    OpenStreetMap or Google Maps URL and read the lat/lon out of it (no request at all), or import a
+    file that already carries coordinates.
+
 - 20|221| **Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.** Delete
   `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,
   `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is

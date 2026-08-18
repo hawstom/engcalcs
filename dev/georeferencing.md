@@ -1,4 +1,4 @@
-# Putting an XY-grid project on the world map (ROADMAP Task 145)
+# Converting an XY project to a GeoMap one (ROADMAP Task 145)
 
 `dev/geographic-projects.md` §1 already said this had to exist: *"Converting an existing project is a
 deliberate, separate operation (a georeferencing wizard — two known points, as the backdrop scale
@@ -17,41 +17,38 @@ Code: `js/lpn-georef.js` (pure math), the `georef*` section of `js/looped-networ
 | | |
 |---|---|
 | internally | `project.coords` is `'geo'`, or **absent**, which is the XY grid |
-| user-facing | **world map** and **XY grid** |
+| user-facing | **GeoMap** and **XY** |
 
-Tom, 2026-08-18, offered four candidate pairs and said of one: *"Flat Earth vs Round Earth (I really
-like this because it's both fun and deeply meaningful and instructive)."*
+Tom offered four candidate pairs on 2026-08-18 and marked one "(user-facing)": **GeoMap vs XY**.
+That is what the menus say. Of Flat Earth / Round Earth he said *"I really like this because it's
+both fun and deeply meaningful and instructive"* — and it is exactly the distinction the trade draws
+between a plane survey and a geodetic one. It goes in the **tips and the synonyms**, not on a control,
+because the menu is staid and professional.
 
-**"World map" wins because it is already shipped.** `lpn_new_geo_us` has read "Blank project on a
-world map" in 27 languages since Task 145 slice 1. Introducing `GeoMap` now would give one concept
-two names on one page, and would cost 26 retranslations to say what is already said.
+*(An earlier pass here argued for "world map / XY grid" on the grounds that `lpn_new_geo_us` had
+already shipped "world map" in 27 languages, and dressed that up as a worry that Flat Earth would be
+misread. Tom: "The joke is thousands of years old. Who hasn't heard of it?" He was right, the
+argument was invented, and the four affected keys were re-worded instead.)*
 
-**Flat Earth / Round Earth is the right instruction and the wrong label.** A control's label has to
-survive a reader who has never met the joke, and in several of our languages "flat earth" carries the
-conspiracy sense with no engineering sense beside it. It is genuinely the trade's own distinction
-though — plane surveying versus geodetic surveying — so it belongs where it teaches: in the synonym
-channel, and in the tool's own explanation.
-
-### Proposed `$ec_lang_syn` diff — AWAITING TOM'S APPROVAL, NOT WRITTEN
-
-`$ec_lang_syn` is off-limits to AI without written permission in the conversation, and "these could
-all be memorialized as synonyms" is a suggestion, not that permission. So the diff sits here:
+### `$ec_lang_syn` — the diff, awaiting Tom's approval
 
 ```php
-$ec_lang_syn['lpn_geomap']='Round Earth. A map of the real world, where a point is a longitude and a latitude on the globe (geographic, geo-referenced, world map, street map, lat/lon, WGS84, geodetic).';
-$ec_lang_syn['lpn_xymap']='Flat Earth. A plain drawing grid, where a point is an X and a Y with no place on the globe (grid, local coordinates, site grid, schematic, plane survey, Cartesian, X-Y).';
+$ec_lang_syn['lpn_geomap']='Round Earth. A map of the real world, where a point is a longitude and a latitude on the globe (geographic, geo-referenced, world map, street map, lat/lon, WGS84, geodetic survey).';
+$ec_lang_syn['lpn_xymap']='Flat Earth. A plain drawing grid, where a point is an X and a Y with no place on the globe (grid, local coordinates, site grid, schematic, plane survey, Cartesian).';
 ```
 
-Both pass the substitution test only loosely — they are longer than a label — so if Tom wants them
-they may want trimming to the parenthesised lists alone.
+Both are longer than a label, so they pass the substitution test only loosely; the parenthesised
+lists alone would also do. AI must not write these without written permission in the conversation.
 
 ## 2. What the tool does, in order
 
-1. **File > Put this project on the world map…** A confirm states what will and will not change.
-   Hidden on a project already on the map.
+1. **File > Convert XY project to GeoMap…**, beside Import EPANET file, because both are
+   conversions. A confirm states what will and will not change. **Disabled, never hidden,** on a
+   project already on the map — it was hidden once and Tom could not find the command at all.
 2. **Carry.** The project becomes geographic, OSM tiles come on, the view goes to the geographic home
    view, and the model is drawn as a dashed ghost box **pinned to the middle of the map at its true
-   ground size**. The user pans and zooms the world map; the box rides along. Nothing is saved.
+   ground size**. The user pans and zooms the map; the box rides along. Nothing is saved. A GeoMap
+   zooms out to the whole Earth (`minScale()`), and **Go to…** takes a pasted `lat, lon`.
 3. **Drop it here.** The box's position becomes the transform, every coordinate becomes a longitude
    and a latitude, and the real network is drawn with corner handles, a body, and a rotate handle
    above it.
@@ -90,7 +87,7 @@ they may want trimming to the parenthesised lists alone.
 - **Up the drawing is north.** The document stores y DOWN; `js/lpn-georef.js` is written for the
   outward Y-UP frame. A symmetric test network would never reveal a missing flip, so the harness uses
   an L-shaped one.
-- **A grid project already on the map is refused, not re-placed.**
+- **A project already on the map is refused, not re-placed.**
 
 ## 5. Known limits
 
@@ -102,6 +99,8 @@ they may want trimming to the parenthesised lists alone.
   a site plan behind a now-geographic model will be in the wrong place. `eachStoredPoint()` does visit
   the backdrop for `doc`-shaped objects, but the tool captures from the live `doc`, whose backdrop
   lives in a module variable outside it. Worth a task when somebody actually has both.
+- **There is no place-name search** — Task 437. It needs a geocoder, which is a SECOND third-party
+  host on a page whose privacy claim is that the tile server is the only one. Tom's call.
 - **Finish is not undoable.** Cancel is the way back during placement; after Finish the route back is
   closing the project without saving. The confirm says so.
 - **The display is still unprojected**, stretched east-west by 1/cos(latitude) — 27% at 38°. The
