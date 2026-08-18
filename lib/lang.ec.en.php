@@ -1313,6 +1313,12 @@ $ec_lang['lpn_tool_file']='File';
 $ec_lang['lpn_menu_edit']='Edit';
 $ec_lang['lpn_menu_insert']='Insert';
 $ec_lang['lpn_menu_view']='View';
+// The street map behind a geographic project (ROADMAP Task 145). Two keys rather than one, because
+// this menu has no checkmark column, so the row has to say what it will DO. "Street map" rather than
+// "basemap": a person who has never used GIS knows what a street map is.
+$ec_lang['lpn_basemap_show']='Show street map';
+$ec_lang['lpn_basemap_hide']='Hide street map';
+$ec_lang['lpn_basemap_tip']='Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Settings';

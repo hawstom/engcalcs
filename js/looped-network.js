@@ -2498,6 +2498,10 @@ var EngCalcs = EngCalcs || {};
 	}
 	function setTransform() {
 		world.setAttribute('transform', 'translate(' + state.tx + ',' + state.ty + ') scale(' + state.s + ')');
+		// THE ONE SEAM FOR "THE VIEW MOVED". Every pan and every zoom in this file goes through
+		// setTransform(), so the basemap has exactly one place to learn that the visible window
+		// changed -- rather than six call sites that each have to remember. Debounced inside.
+		scheduleBasemapRefresh();
 	}
 	// ---- ROADMAP Task 274: the user works in CARTESIAN coordinates (Y increases upward) ----
 	//
@@ -4074,6 +4078,168 @@ var EngCalcs = EngCalcs || {};
 		s = solve();
 		apply(s);
 		if (auto) { rebaseSignatureIfClean(); }
+	}
+
+	// ---- OPENSTREETMAP BASEMAP, FOR A GEOGRAPHIC PROJECT (ROADMAP Task 145) ----------------------
+	//
+	// Plain OSM RASTER tiles, hand-rolled, no library: an <image> per tile dropped into the SVG
+	// world layer that already exists. Deliberately NOT MapLibre GL, which is what epanet-js runs --
+	// a WebGL vector renderer would fight this SVG world for little gain at our scale, and it is a
+	// runtime code dependency the suite does not want. Tiles are DATA fetched at run time, which is
+	// a different thing from loading somebody else's JavaScript.
+	//
+	// **THE OFFLINE PROMISE IS UNTOUCHED.** Tiles are not app assets and must never join the service
+	// worker's precache manifest (dev/scripts/sw_manifest_check.php). With no network a geographic
+	// project still opens, still draws every pipe and still solves; the basemap is the only thing
+	// missing, and a missing <image> is a blank rectangle, not an error.
+	//
+	// **NOTHING IS CACHED ON THE VISITOR'S DEVICE BY US.** No localStorage, no IndexedDB, no
+	// Cache API: the browser's own HTTP cache is the whole story. Tile caching is both an OSM tile
+	// usage policy problem and a storage-consent problem (dev/cookie-storage-inventory.md), and
+	// declining to do it costs us nothing.
+	//
+	// **THIS IS NOT A BACKDROP IMAGE AND AN EXPORTER MUST SKIP IT.** `backdrop` above is a file the
+	// user supplied, and `[BACKDROP]` in an EPANET .inp names an image FILE. A tile basemap is not a
+	// file, has no href, and cannot be written as one -- it lives on `project.basemap`, never on
+	// `backdrop.href`, exactly so the two cannot be confused.
+	//
+	// **THE DISPLAY IS STILL UNPROJECTED, AND THE TILES ARE PLACED SO THAT THIS IS NOT A LIE.** A
+	// tile is a square in Web Mercator; this document is longitude/latitude drawn straight (see
+	// dev/geographic-projects.md section 3 -- Web Mercator must not become the document's coordinate
+	// system). So each tile is placed at ITS OWN lon/lat rectangle, which is exact on the x axis
+	// (Mercator x is linear in longitude) and computed by the inverse Mercator on the y axis, and
+	// the raster is stretched linearly inside that box (preserveAspectRatio="none"). The only error
+	// is the departure of the inverse Mercator from its own chord ACROSS ONE TILE: |f''|h^2/8, which
+	// at latitude 45 is 0.03 px at zoom 12 and falls as h^2. It is below a pixel for every zoom a
+	// network is drawn at, so the map and the pipes register.
+	// What it does NOT fix is that the whole drawing, basemap included, is stretched east-west by
+	// 1/cos(latitude) -- the standing limitation of an unprojected display. The honest fix is a
+	// projection seam at every point where a coordinate becomes a drawn position, which is its own
+	// piece of work; it is not needed to make the tiles line up.
+	var basemapLayer = null, basemapEls = {}, basemapTimer = null;
+	// The one provider, and the one URL. https, no key, no billing account, nothing to leak.
+	var LPN_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+	var LPN_TILE_PX = 256;
+	// OSM's own published maximum zoom. Asking for 20 gets a 404 per tile, so it is capped here.
+	var LPN_TILE_MAX_Z = 19;
+	// **A CEILING ON REQUESTS PER REFRESH, WHICH IS THE POLICY-RELEVANT NUMBER.** The tile usage
+	// policy forbids bulk downloading; a viewport is not bulk, but a bug that asked for a whole
+	// zoom level would be. Over budget, the zoom steps DOWN -- fewer, coarser tiles covering the
+	// same ground -- rather than the view being clipped.
+	var LPN_TILE_BUDGET = 192;
+	// The latitude Web Mercator is cut off at, and the reason a world map is square.
+	var LPN_MERC_MAX_LAT = 85.0511287798066;
+	function tileLon(x, z) { return x / Math.pow(2, z) * 360 - 180; }
+	function tileLat(y, z) {
+		var n = Math.PI * (1 - 2 * y / Math.pow(2, z));
+		return Math.atan(Math.sinh(n)) * 180 / Math.PI;
+	}
+	function lonToTileX(lon, z) { return (lon + 180) / 360 * Math.pow(2, z); }
+	function latToTileY(lat, z) {
+		var r = Math.max(-LPN_MERC_MAX_LAT, Math.min(LPN_MERC_MAX_LAT, lat)) * Math.PI / 180;
+		return (1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * Math.pow(2, z);
+	}
+	// `scale` is state.s: screen pixels per world unit, and a world unit here is a DEGREE OF
+	// LONGITUDE. A zoom level spreads 360 degrees over 256 * 2^z pixels, so matching the two picks
+	// the level whose native resolution is nearest what is on screen. Chosen on the longitude axis
+	// on purpose: that axis is drawn 1:1, and the latitude axis is the compressed one, so matching
+	// longitude means the raster is never magnified beyond its own pixels.
+	function tileZoomFor(scale) {
+		if (!(scale > 0)) { return 0; }
+		return Math.max(0, Math.min(LPN_TILE_MAX_Z,
+			Math.round(Math.log(scale * 360 / LPN_TILE_PX) / Math.LN2)));
+	}
+	// PURE, and the whole of the tile mathematics: a lon/lat window plus a scale in, the list of
+	// tiles and where each one goes out. No DOM, so dev/lpn-spike/basemap-harness.js can check every
+	// number in it. Positions come back in INTERNAL coordinates (origin-shifted, Y-down), which is
+	// what the world layer draws in.
+	function basemapTileList(lonMin, latMin, lonMax, latMax, scale) {
+		var z = tileZoomFor(scale), n, x0, x1, y0, y1, out, x, y, lonL, lonR, latT, latB, yT;
+		for (;;) {
+			n = Math.pow(2, z);
+			x0 = Math.max(0, Math.min(n - 1, Math.floor(lonToTileX(lonMin, z))));
+			x1 = Math.max(0, Math.min(n - 1, Math.floor(lonToTileX(lonMax, z))));
+			y0 = Math.max(0, Math.min(n - 1, Math.floor(latToTileY(latMax, z))));
+			y1 = Math.max(0, Math.min(n - 1, Math.floor(latToTileY(latMin, z))));
+			if (z === 0 || (x1 - x0 + 1) * (y1 - y0 + 1) <= LPN_TILE_BUDGET) { break; }
+			z--;
+		}
+		out = [];
+		for (x = x0; x <= x1; x++) {
+			for (y = y0; y <= y1; y++) {
+				lonL = tileLon(x, z); lonR = tileLon(x + 1, z);
+				latT = tileLat(y, z); latB = tileLat(y + 1, z);
+				yT = inwardY(latT);
+				out.push({
+					key: z + '/' + x + '/' + y, z: z, x: x, y: y,
+					url: LPN_TILE_URL.replace('{z}', z).replace('{x}', x).replace('{y}', y),
+					px: inwardX(lonL), py: yT, pw: lonR - lonL, ph: inwardY(latB) - yT
+				});
+			}
+		}
+		return { z: z, tiles: out };
+	}
+	// Stored on the PROJECT, beside `coords`, because both are declarations about what this document
+	// is rather than preferences about this browser -- and because serializeProject() writes the
+	// whole of `project`, so it rides along with no new plumbing. ABSENT means on: a geographic
+	// project is a statement that you want a map of the Earth behind you, and opening one onto grey
+	// nothing is the failure the roadmap block describes.
+	function basemapOn() { return isGeoProject() && project.basemap !== 'off'; }
+	function setBasemapOn(on) {
+		project.basemap = on ? 'osm' : 'off';
+		refreshBasemap();
+		refreshBasemapCredit();
+		saveToStorage();
+	}
+	// The attribution is REQUIRED by the OSM tile usage policy and is not dismissible: it appears
+	// whenever a tile can, and the only thing that removes it is turning the basemap off.
+	function refreshBasemapCredit() {
+		var c = document.getElementById('lpn_basemap_credit');
+		if (c) { c.style.display = basemapOn() ? 'block' : 'none'; }
+	}
+	// Debounced, for the same reason scheduleReshed() is: a wheel spin and a drag are bursts, and
+	// the intermediate frames are never looked at. The tiles already MOVE with the map for free --
+	// they are inside the world layer and its transform -- so what this defers is only recomputing
+	// WHICH tiles, never where the ones on screen are drawn.
+	function scheduleBasemapRefresh() {
+		if (!basemapLayer) { return; }
+		if (basemapTimer) { clearTimeout(basemapTimer); }
+		basemapTimer = setTimeout(function () { basemapTimer = null; refreshBasemap(); }, 120);
+	}
+	function refreshBasemap() {
+		if (!basemapLayer) { return; }
+		var k, r, tl, br, list, want;
+		if (!basemapOn() || !svg || !mapSized) {
+			basemapLayer.innerHTML = '';
+			basemapEls = {};
+			return;
+		}
+		r = svg.getBoundingClientRect();
+		tl = screenToWorld(r.left, r.top);
+		br = screenToWorld(r.right, r.bottom);
+		list = basemapTileList(outwardX(tl.x), outwardY(br.y), outwardX(br.x), outwardY(tl.y), state.s);
+		want = {};
+		list.tiles.forEach(function (t) {
+			want[t.key] = true;
+			if (basemapEls[t.key]) { return; }
+			// crossorigin=anonymous: no cookies and no credentials travel to the tile server, which
+			// is the cheapest privacy win available here. OSM's tile servers send
+			// Access-Control-Allow-Origin: *, so it costs nothing. The Referer is deliberately left
+			// alone -- the tile usage policy asks for a real one, and the browser sends it.
+			basemapEls[t.key] = el('image', {
+				href: t.url, x: t.px, y: t.py, width: t.pw, height: t.ph,
+				// The tile box is NOT square in this unprojected frame -- it is 1 : cos(latitude) --
+				// so the raster must stretch to fill it rather than be letterboxed.
+				preserveAspectRatio: 'none', crossorigin: 'anonymous',
+				'class': 'lpn-basemap-tile'
+			}, basemapLayer);
+		});
+		for (k in basemapEls) {
+			if (basemapEls.hasOwnProperty(k) && !want[k]) {
+				if (basemapEls[k].remove) { basemapEls[k].remove(); }
+				delete basemapEls[k];
+			}
+		}
 	}
 
 	// ---- backdrop image (Task 146 Phase 2, ported from dev/lpn-spike/canvas-spike.html) ----
@@ -6323,6 +6489,10 @@ var EngCalcs = EngCalcs || {};
 		backdropImg = null;
 		backdropLayer.innerHTML = '';
 		if (backdrop) { buildBackdropImg(); }
+		// Grid or geographic, and basemap on or off, both belong to the project -- so switching
+		// projects can turn the tiles and their attribution on or off (Task 145).
+		refreshBasemap();
+		refreshBasemapCredit();
 		lastSolveResult = null;
 		closePopup();
 		buildDom();
@@ -9156,7 +9326,19 @@ var EngCalcs = EngCalcs || {};
 			// The popover openers position themselves from evt.currentTarget, so a menu row hands them
 			// the menu-bar button it came from -- the popover then opens under "View", where the eye
 			// already is, rather than under a toolbar button that may not even be on screen.
-			{ icon: 'labels', label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } }
+			{ icon: 'labels', label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } },
+			// HIDDEN OUTSIDE A GEOGRAPHIC PROJECT, not disabled: a grid project's x/y are canvas
+			// units with no place on the Earth, so there is no street map that could go behind one.
+			// The label states what the row will DO, because this menu has no checkmark column.
+			{
+				hidden: !isGeoProject(), separator: true
+			},
+			{
+				hidden: !isGeoProject(), icon: 'view',
+				label: basemapOn() ? (pc.lpn_basemap_hide || 'Hide street map') : (pc.lpn_basemap_show || 'Show street map'),
+				tip: pc.lpn_basemap_tip,
+				fn: function () { setBasemapOn(!basemapOn()); }
+			}
 		]);
 	}
 	// openSettingsMenu() is GONE (Tom, 2026-08-08). Its three rows now live where they belong: Settings
@@ -9483,6 +9665,9 @@ var EngCalcs = EngCalcs || {};
 		} catch (err) { /* localStorage/history can throw (private mode) -- non-fatal, just skip the wipe */ }
 		svg = document.getElementById('lpn_canvas');
 		world = el('g', {}, svg);
+		// BELOW the user's own backdrop image: a registered plan sheet is the thing the person put
+		// there on purpose, and a street map is context behind it.
+		basemapLayer = el('g', { 'class': 'lpn-basemap' }, world);
 		backdropLayer = el('g', { 'class': 'lpn-backdrop' }, world);
 		gridLayer = el('g', {}, world);
 		// Classed so the symbol-opacity setting can fade both symbol layers as ONE drawing -- see
@@ -11140,6 +11325,9 @@ var EngCalcs = EngCalcs || {};
 	function noteMapSized() {
 		if (mapSized) { return; }
 		mapSized = true;
+		// The basemap needs a viewport to know which tiles are in it, so the first honest chance to
+		// draw one is here, not at init.
+		scheduleBasemapRefresh();
 		if (!fitWhenSized) { return; }
 		fitWhenSized = false;
 		var wasAuto = autoFitWhenSized;

@@ -167,6 +167,11 @@ Never call it "preview". Scope: `dev/looped-network-calculator-scope.md`; ROADMA
   `EngCalcs.lpnIsFixedHead` is the one place that equivalence is declared. A tank diameter is in the
   LENGTH unit while a pipe diameter is in millimetres; only `dev/lpn-spike/tank-harness.js` asserts
   that, because no solve ever reads it.
+- **A geographic project draws OpenStreetMap raster tiles behind it** — the only third-party request
+  the suite makes, never cached by us, never in the service worker's manifest, attribution required
+  on the map. It is `project.basemap`, never `backdrop.href`, and an `.inp` exporter must skip it.
+  The display is still unprojected; the tiles are placed per-tile in lon/lat so they register anyway.
+  `dev/geographic-projects.md`.
 - **Reads EPANET `.inp` files** (`js/lpn-inp.js`), importing the supported subset and reporting every
   difference — never rejecting, never dropping silently. Does not write one yet (Task 281).
 - **Do not reason about this page from a phone.** It is a full-window drawing surface with a menu

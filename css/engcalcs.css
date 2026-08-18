@@ -211,6 +211,12 @@ html[lang="zh"] .ec-welcome {
    image fade, QGIS layer transparency) is to knock the reference material back rather than thicken
    the drawing over it -- the drawing then still reads correctly on white and in print. */
 .lpn-backdrop { opacity: var(--lpn-backdrop-opacity, 1); }
+/* The OpenStreetMap tile layer (ROADMAP Task 145). pointer-events:none because it is scenery: every
+   pointer gesture on this page is resolved from the SVG's own coordinates and from the element under
+   the cursor, and a tile that could become an event target would sit between the user and every node
+   it happens to cover. It shares the backdrop's fade for the same reason the backdrop has one -- a
+   dense city map swallows a thin pipe. */
+.lpn-basemap { opacity: var(--lpn-backdrop-opacity, 1); pointer-events: none; }
 /* Symbol opacity, for laying the network out over a backdrop image: applied to the two whole
    layers that hold symbols, so nodes/pipes/arrows/vertex handles fade together as one drawing
    rather than each fading independently and showing where they overlap. Labels, masks and leaders
