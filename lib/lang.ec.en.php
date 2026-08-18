@@ -1380,6 +1380,10 @@ $ec_lang['lpn_georef_goto']='Go to…';
 $ec_lang['lpn_pane_toggle']='Bottom panel';
 $ec_lang['lpn_pane_toggle_tip']='Show or hide the panel below the map. It holds the profile.';
 $ec_lang['lpn_pane_resize']='Drag to make the panel taller or shorter';
+$ec_lang['lpn_pane_tab_junctions']='Junctions';
+$ec_lang['lpn_pane_tab_junctions_tip']='Every junction as a table you can sort and edit.';
+$ec_lang['lpn_pane_junctions_none']='This network has no junctions yet.';
+$ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
 
 $ec_lang['lpn_clean_map']='Clean map';
 $ec_lang['lpn_clean_map_off']='Show map readouts';

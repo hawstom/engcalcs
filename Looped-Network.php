@@ -369,8 +369,8 @@ echoHeader("EngCalcs", $html_title, "");
       // beside the drawing. ?>
 <div id="lpn_pane" class="d-print-none lpn-pane" style="display:none">
 	<?php // The drag handle is the pane's top EDGE, which is where a person aims. role="separator"
-	      // with an aria-label rather than a tip glyph: it is a grip, not a labelled control, and
-	      // .ec-help on it would put a "?" in the middle of the drag target. ?>
+	      // with an aria-label rather than a tip glyph: it is a grip, not a labelled control, and a
+	      // help glyph on it would put a character to miss in the middle of the drag target. ?>
 	<div id="lpn_pane_grip" class="lpn-pane-grip" role="separator" aria-orientation="horizontal"
 		title="<?=htmlspecialchars($ec_lang['lpn_pane_resize'])?>"
 		aria-label="<?=htmlspecialchars($ec_lang['lpn_pane_resize'])?>"></div>
@@ -387,6 +387,10 @@ echoHeader("EngCalcs", $html_title, "");
 		      // since the node lists and the chart both depend on the document. ?>
 		<div id="lpn_pane_profile" class="lpn-pane-panel lpn-profile-panel" role="tabpanel" aria-labelledby="lpn_pane_tab_profile">
 			<div class="lpn-profile-controls">
+				<?php // The tab says "Profile"; this says WHICH profile -- a route through the
+				      // network, not a section of one pipe. It is the panel's own title and stays
+				      // even when the tab strip grows. ?>
+				<div class="lpn-profile-heading"><?=$ec_lang['lpn_profile_title']?></div>
 				<div id="lpn_profile_form"></div>
 				<?php // The key is STATIC HTML, not JS: these three names never change with the
 				      // document, and a swatch beside each is the whole of what a legend has to be. ?>
@@ -399,6 +403,11 @@ echoHeader("EngCalcs", $html_title, "");
 			</div>
 			<div id="lpn_profile_chart"></div>
 		</div>
+		<?php // ---- Tab: Junctions (Task 434) ----
+		      // The document as a spreadsheet, built entirely in JS: the rows are the network and
+		      // the headings carry the current units. Every write goes through the same seam the
+		      // property popup uses -- setProp() for a demand -- see renderJunctions(). ?>
+		<div id="lpn_pane_junctions" class="lpn-pane-panel lpn-pane-scroll" role="tabpanel" aria-labelledby="lpn_pane_tab_junctions"></div>
 	</div>
 </div>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
@@ -617,6 +626,10 @@ EngCalcs.pageConfig = {
 	lpn_profile_axis_elev: <?=json_encode($ec_lang['lpn_profile_axis_elev'])?>,
 	lpn_pane_toggle: <?=json_encode($ec_lang['lpn_pane_toggle'])?>,
 	lpn_pane_toggle_tip: <?=json_encode($ec_lang['lpn_pane_toggle_tip'])?>,
+	lpn_pane_tab_junctions: <?=json_encode($ec_lang['lpn_pane_tab_junctions'])?>,
+	lpn_pane_tab_junctions_tip: <?=json_encode($ec_lang['lpn_pane_tab_junctions_tip'])?>,
+	lpn_pane_junctions_none: <?=json_encode($ec_lang['lpn_pane_junctions_none'])?>,
+	lpn_pane_sort_tip: <?=json_encode($ec_lang['lpn_pane_sort_tip'])?>,
 	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
 	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and

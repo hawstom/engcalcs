@@ -711,6 +711,13 @@
         "lpn_goto_prompt": "Latitude, longitude",
         "lpn_goto_bad": "That is not a latitude and longitude. Try 38.106, -122.569.",
         "lpn_georef_goto": "Go to…",
+        "lpn_pane_toggle": "Bottom panel",
+        "lpn_pane_toggle_tip": "Show or hide the panel below the map. It holds the profile.",
+        "lpn_pane_resize": "Drag to make the panel taller or shorter",
+        "lpn_pane_tab_junctions": "Junctions",
+        "lpn_pane_tab_junctions_tip": "Every junction as a table you can sort and edit.",
+        "lpn_pane_junctions_none": "This network has no junctions yet.",
+        "lpn_pane_sort_tip": "Sort by this column. Click again to reverse it.",
         "lpn_clean_map": "Clean map",
         "lpn_clean_map_off": "Show map readouts",
         "lpn_clean_map_tip": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Nothing else changes, and nothing is saved.",
@@ -1099,7 +1106,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 1097,
+    "count": 1104,
     "active_prefixes": [
         "about",
         "bpn",

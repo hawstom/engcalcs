@@ -5885,11 +5885,25 @@ var EngCalcs = EngCalcs || {};
 	// one, `hide` when it stops being -- a tab that draws on the MAP (the profile's route
 	// highlight) must clear that drawing when it is no longer the tab on show, or the map keeps a
 	// highlight belonging to something nobody can see.
+	// `show` runs on becoming the visible tab, `refresh` on every solve and every document change
+	// while it IS the visible one, `hide` on ceasing to be.
 	var paneTabs = [
 		{
 			id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
+			// profileSeedStops() first, because the document may have changed under an open panel:
+			// a stop whose node was deleted is cleared here rather than left to draw a route
+			// through a ghost.
 			show: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
+			refresh: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
 			hide: function () { drawProfilePath(null); }
+		},
+		{
+			id: 'junctions', panel: 'lpn_pane_junctions', label: 'lpn_pane_tab_junctions',
+			tip: 'lpn_pane_tab_junctions_tip',
+			// A rebuild on entry, because the tab may have been away for a whole editing session;
+			// a refill afterwards, because renderJunctions() decides that for itself.
+			show: function () { junctionSig = ''; renderJunctions(); },
+			refresh: renderJunctions
 		}
 	];
 	var paneState = { open: false, h: LPN_PANE_DEFAULT, tab: paneTabs[0].id };
@@ -5916,15 +5930,18 @@ var EngCalcs = EngCalcs || {};
 	}
 	// How tall the pane is allowed to be RIGHT NOW. The window is shared between the map and the
 	// pane, so the ceiling is what the two of them have between them, less the map's floor --
-	// measured, for the same reason the map's own height is. Before first layout there is nothing
-	// true to measure (the canvas is still wearing its 10000px curtain), so half the window stands
-	// in until there is.
+	// measured, for the same reason the map's own height is.
+	//
+	// **A CANVAS OF 0 OR OF 10000 IS NOT A MEASUREMENT**, it is the page before and during layout
+	// (the curtain -- see the markup note on height="10000"). Deriving a ceiling from either would
+	// pin the pane at its floor on the one pass where the user has not touched anything yet, so
+	// half the window stands in until there is something true to measure.
 	function paneMaxHeight() {
 		var vh = window.innerHeight || 800, body = document.getElementById('lpn_pane_body'),
 			map = svg ? svg.getBoundingClientRect().height : 0,
 			mine = body ? body.getBoundingClientRect().height : 0,
 			room = map + mine - LPN_PANE_MAP_MIN;
-		if (!(room > 0) || map > vh) { room = Math.floor(vh / 2); }
+		if (!(map > 0) || map > vh) { room = Math.floor(vh / 2); }
 		return Math.max(LPN_PANE_MIN, Math.min(room, Math.floor(vh * 0.8)));
 	}
 	function clampPaneHeight(h) {
@@ -6040,6 +6057,194 @@ var EngCalcs = EngCalcs || {};
 		applyPaneLayout();
 		if (paneState.open && activePaneTab().show) { activePaneTab().show(); }
 	}
+	// ---- Tab: JUNCTIONS, the first tabular editor (ROADMAP Task 434) --------------------------
+	//
+	// The same document the map shows, as a spreadsheet: one row per junction, every column
+	// sortable, the two typed values editable in place. It is the view for the questions a drawing
+	// answers badly -- "which node has no elevation", "who is at 12 psi", "is that demand really
+	// 1,500" -- and EPANET has had it since 2.0.
+	//
+	// **EVERY WRITE GOES THROUGH THE SAME SEAM THE PROPERTY POPUP USES**, which for a demand means
+	// setProp(): a direct write edits BASE from inside a scenario, silently, under every scenario at
+	// once (dev/scripts/scenario_seam_check.php, dev/scenario-seam-repair.md). An elevation is not
+	// overridable and is written as the popup writes it. Two editors of one property must not have
+	// two ideas of what editing it means, so the setters here are line-for-line the popup's.
+	//
+	// **A NUMBER HERE IS THE NUMBER THE USER TYPED**, in the unit the heading names -- no conversion
+	// in either direction, exactly as in the popup (Task 263). The two RESULT columns are the
+	// opposite kind of thing and are read-only: they come from the solve, through the same accessor
+	// the map labels and the colour ramp use, so a table cell and the label beside the symbol can
+	// never disagree.
+	var junctionSort = { col: 'id', dir: 1 };
+	var junctionCells = null, junctionSig = '';
+	// The unit-bearing headings are rebuilt from these, so a unit switch re-labels the table for the
+	// same reason it re-renders the popup. `result` marks a column the solver owns.
+	var JUNCTION_COLS = [
+		{ key: 'id', label: 'lpn_field_id' },
+		{ key: 'elev', label: 'lpn_field_elev', unit: function () { return 'lpn_u_elevhead'; } },
+		{ key: 'demand', label: 'bpn_demand', unit: function () { return 'lpn_u_flow'; } },
+		{ key: 'head', label: 'lpn_result_head', result: true, unit: function () { return resultUnit('elevhead'); } },
+		{ key: 'pressure', label: 'lpn_result_pressure', result: true, unit: function () { return resultUnit('pressure'); } }
+	];
+	function junctionNodes() {
+		return doc.nodes.filter(function (n) { return n.type === 'junction'; });
+	}
+	function junctionValue(n, col) {
+		if (col === 'id') { return n.id; }
+		if (col === 'elev') { return n.elev; }
+		if (col === 'demand') { return effective(n, 'demand'); }
+		return colorNodeValue(n, col);
+	}
+	function junctionPresent(v) {
+		return v !== undefined && v !== null && v !== '' && !(typeof v === 'number' && !isFinite(v));
+	}
+	// **A BLANK IS LAST IN BOTH DIRECTIONS.** Sorting descending to find the biggest demand must not
+	// hand back a screenful of junctions that have no demand at all -- an empty cell is the absence
+	// of a value, not the smallest one, so it is ranked outside the direction rather than inside it.
+	function junctionSorted() {
+		var col = junctionSort.col, dir = junctionSort.dir;
+		return junctionNodes().slice().sort(function (a, b) {
+			var va = junctionValue(a, col), vb = junctionValue(b, col),
+				pa = junctionPresent(va), pb = junctionPresent(vb);
+			if (pa !== pb) { return pa ? -1 : 1; }
+			if (!pa) { return String(a.id).localeCompare(String(b.id), undefined, { numeric: true }); }
+			if (typeof va === 'number' && typeof vb === 'number') { return (va - vb) * dir; }
+			return String(va).localeCompare(String(vb), undefined, { numeric: true }) * dir;
+		});
+	}
+	function junctionNumText(v) {
+		return (typeof v === 'number' && isFinite(v)) ? String(+v.toFixed(6)) : '';
+	}
+	function junctionHeadingText(c) {
+		var pc = EngCalcs.pageConfig || {}, text = pc[c.label] || c.key;
+		return c.unit ? text + ' (' + unitLabel(c.unit()) + ')' : text;
+	}
+	// What the table would have to be REBUILT for, as opposed to merely refilled: the rows present,
+	// the order they are in, and the headings. A solve changes none of those, and a solve is what
+	// happens 300 ms after every keystroke -- so a rebuild on every one would take the cell the user
+	// is typing in out from under them.
+	function junctionSignature(rows) {
+		return rows.map(function (n) { return n.id; }).join('') + '|' +
+			junctionSort.col + junctionSort.dir + '|' +
+			JUNCTION_COLS.map(junctionHeadingText).join('');
+	}
+	function renderJunctions() {
+		var host = document.getElementById('lpn_pane_junctions'), pc = EngCalcs.pageConfig || {},
+			rows = junctionSorted(), sig = junctionSignature(rows), table, thead, tr, tbody, note;
+		if (!host) { return; }
+		if (sig === junctionSig && junctionCells) { refillJunctions(rows); return; }
+		junctionSig = sig;
+		junctionCells = {};
+		host.innerHTML = '';
+		if (!rows.length) {
+			note = document.createElement('p');
+			note.textContent = pc.lpn_pane_junctions_none || 'This network has no junctions yet.';
+			host.appendChild(note);
+			return;
+		}
+		table = document.createElement('table');
+		table.className = 'lpn-pane-table';
+		thead = document.createElement('thead');
+		tr = document.createElement('tr');
+		JUNCTION_COLS.forEach(function (c) {
+			var th = document.createElement('th'), b = document.createElement('button');
+			b.type = 'button';
+			b.className = 'lpn-pane-sort';
+			// The arrow is on the sorted column only, and it is the whole of the sort UI: a heading
+			// that is a button already says it can be clicked.
+			b.textContent = junctionHeadingText(c) +
+				(junctionSort.col === c.key ? (junctionSort.dir > 0 ? ' ▲' : ' ▼') : '');
+			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
+			b.addEventListener('click', function () { sortJunctions(c.key); });
+			th.appendChild(b);
+			if (junctionSort.col === c.key) { th.setAttribute('aria-sort', junctionSort.dir > 0 ? 'ascending' : 'descending'); }
+			tr.appendChild(th);
+		});
+		thead.appendChild(tr);
+		table.appendChild(thead);
+		tbody = document.createElement('tbody');
+		rows.forEach(function (n) { tbody.appendChild(junctionRow(n)); });
+		table.appendChild(tbody);
+		host.appendChild(table);
+		if (EngCalcs.initTips) { EngCalcs.initTips(host); }
+	}
+	function sortJunctions(col) {
+		junctionSort.dir = (junctionSort.col === col) ? -junctionSort.dir : 1;
+		junctionSort.col = col;
+		renderJunctions();
+	}
+	function junctionRow(n) {
+		var tr = document.createElement('tr'), cells = {};
+		JUNCTION_COLS.forEach(function (c) {
+			var td = document.createElement('td'), btn, input;
+			if (c.key === 'id') {
+				// The ID is a way BACK TO THE MAP, not a text box: it selects the junction and pans
+				// to it, the same gesture a Find result row is. Renaming stays in the property
+				// popup, where the clash rules and the undo snapshot already live.
+				btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'lpn-pane-goto';
+				btn.textContent = n.id;
+				btn.addEventListener('click', function () { findGoTo('node', n.id); });
+				td.appendChild(btn);
+			} else if (c.result) {
+				td.className = 'lpn-pane-num';
+				cells[c.key] = td;
+			} else {
+				input = document.createElement('input');
+				input.type = 'number';
+				input.value = junctionNumText(junctionValue(n, c.key));
+				input.setAttribute('aria-label', junctionHeadingText(c) + ' ' + n.id);
+				input.addEventListener('change', function () {
+					junctionEdit(n, c.key, +input.value);
+				});
+				td.appendChild(input);
+				cells[c.key] = input;
+			}
+			tr.appendChild(td);
+		});
+		junctionCells[n.id] = cells;
+		return tr;
+	}
+	// The popup's setters, not a second pair. `+input.value` (so a cleared box reads 0) and
+	// updateNode() are both what unitNumberField() does; the demand goes through setProp() and ends
+	// in afterPropertyEdit(), which is what marks an override inside a scenario.
+	function junctionEdit(n, col, v) {
+		if (col === 'elev') {
+			n.elev = v;
+			updateNode(n.id);
+			scheduleSolve();
+			return;
+		}
+		setProp(n, 'demand', v);
+		updateNode(n.id);
+		afterPropertyEdit(n);
+		refreshPopupIfOpen();
+	}
+	// Refill, not rebuild: the results change on every solve and the typed values change when the
+	// map is edited, but the table itself is the same table. **A CELL THE USER IS IN IS LEFT
+	// ALONE** -- overwriting it mid-edit is the classic live-table defect, where half a typed number
+	// is replaced by the old one on the next tick.
+	function refillJunctions(rows) {
+		rows.forEach(function (n) {
+			var cells = junctionCells[n.id];
+			if (!cells) { return; }
+			JUNCTION_COLS.forEach(function (c) {
+				var target = cells[c.key], v;
+				if (!target) { return; }
+				v = junctionValue(n, c.key);
+				if (c.result) {
+					target.textContent = junctionPresent(v) ? String(plainRound(v, 2)) : '';
+				} else if (target !== activeElementSafe()) {
+					target.value = junctionNumText(v);
+				}
+			});
+		});
+	}
+	function activeElementSafe() {
+		try { return document.activeElement; } catch (e) { return null; }
+	}
+
 	// ---- the PROFILE panel (ROADMAP Task 409) ------------------------------
 	//
 	// Pick a start node and an end node; the app suggests the shortest route by LINK LENGTH; the
@@ -6107,11 +6312,13 @@ var EngCalcs = EngCalcs || {};
 			}, profilePathLayer);
 		});
 	}
-	// profileSeedStops() first, because the document may have changed under an open panel: a stop
-	// whose node was deleted is cleared here rather than left to draw a route through a ghost.
-	function refreshProfileIfOpen() {
-		if (!profileIsOpen()) { return; }
-		profileSeedStops(); rebuildProfileForm(); renderProfile();
+	// The pane follows the document without a listener of its own: every solve ends in a call to
+	// this, and every edit schedules a solve. A tab that is not on screen is not refreshed, and
+	// picks up whatever changed when it is next shown.
+	function refreshPaneIfOpen() {
+		var t = activePaneTab();
+		if (!paneIsOpen() || !t || !t.refresh) { return; }
+		t.refresh();
 	}
 	// A panel that opens on two empty pull-downs asks the user to do work before it can show them
 	// anything, so it opens on a real profile where it can: the selected node if there is one,
@@ -16003,7 +16210,7 @@ var EngCalcs = EngCalcs || {};
 				setStatus(result.issues.map(diagIssueText).join(' '));
 				refreshLabelText();
 				refreshValueColors();   // Task 384: the colours came from results that no longer exist
-				refreshProfileIfOpen(); // Task 409: and so did the grade line
+				refreshPaneIfOpen();    // Task 409: and so did the grade line and the result columns
 					return;
 			}
 			// Not one of lpnDiagnose()'s pre-solve codes -- this is the solver itself giving up, and
@@ -16012,7 +16219,7 @@ var EngCalcs = EngCalcs || {};
 			setStatus(pc.lpn_diag_not_converged || 'Did not converge.');
 			refreshLabelText();
 			refreshValueColors();
-			refreshProfileIfOpen();
+			refreshPaneIfOpen();
 			return;
 		}
 		lastSolveResult = result;
@@ -16029,9 +16236,9 @@ var EngCalcs = EngCalcs || {};
 			.filter(function (t) { return !!t; }).join(' '));
 		refreshLabelText();
 		refreshValueColors();
-		// **WHERE THE LIVE PROFILE HANGS** (Task 409). Every solve ends here, and every edit
-		// schedules a solve, so the profile follows the document without a listener of its own.
-		refreshProfileIfOpen();
+		// **WHERE THE LIVE PANE HANGS** (Tasks 409, 434). Every solve ends here and every edit
+		// schedules a solve, so the open tab follows the document with no listener of its own.
+		refreshPaneIfOpen();
 	}
 
 	// EPANET path. Async, so it needs a guard the synchronous path never did: this page solves
@@ -16089,9 +16296,9 @@ var EngCalcs = EngCalcs || {};
 		// persist -- otherwise closing the tab would lose which units the numbers are in.
 		saveToStorage();
 		refreshPopupIfOpen();
-		// The profile's axes carry their units in their titles and its stations are in the length
-		// unit, so a switch has to redraw it for exactly the reason the popup is rebuilt.
-		refreshProfileIfOpen();
+		// The pane's tabs carry their units in their headings and axis titles, so a switch has to
+		// redraw the open one for exactly the reason the popup is rebuilt.
+		refreshPaneIfOpen();
 		refreshLabelText();
 		// The Default inputs rows show their value in the CURRENT display unit and put that unit in
 		// their label, so a unit switch has to re-render them for the same reason the open popup
