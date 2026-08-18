@@ -566,15 +566,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
     all public domain."*
 - 75|434| **THREE PANES AND A TOGGLE FOR EACH, which is the shape every reader expects.** Tom,
-  2026-08-18, describing epanet-js: a LEFT pane (network review), a RIGHT pane (asset + map
-  visibility/style tabs), and a **resizable BOTTOM pane** carrying tabs — the profile and tabular
-  editors for Junctions, Pipes, Pumps, Valves with every column sortable. Toggle buttons for the
+  2026-08-18, describing epanet-js: a LEFT pane (network review; pane not needed or planned at this time), a RIGHT pane (asset (our properties box is acceptable) + map
+  visibility/style tabs (pane or box is okay; pane is predictable and easily toggleable, but I hate to just be a copycat, though good is good), and a **resizable BOTTOM pane** carrying tabs — the profile and tabular
+  editors for Junctions, Pipes, Pumps, Valves, etc with every column sortable. Toggle buttons for the
   three sit at the right edge of the toolbar, beside a goto-by-ID search.
   - **This is the frame Tasks 284, 427, 433 and 146.04 all keep reaching for separately.** Decide it
     once, or each of them invents a different container.
   - Our Find already IS the goto search (Task 420); what is missing is its place on that strip.
   - Tom on EPANET's own arrangement, as the thing NOT to copy: settings split among View > Options,
     Project > Defaults and View > Legend > Modify, "have always been confusing".
+  - Don't copy the epanetjs left pane. 
 
 - 60|433| **Profile: fit and finish.** Tom, 2026-08-18: *"Amazing. Now we just need a good UI."* The
   drawing is right (Task 409); what is missing is everything around it.
@@ -630,9 +631,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - He notes the current width *"reminds me of the two-pane paradigm"* — which is Task 284, and is
     the direction he wants anyway; this is the narrow version until that lands.
 
-- 40|430| **`.inp` export converts inputs it may not need to.** Tom, 2026-08-18: *"A round trip
-  survives to very close results. Not identical... I notice that the inputs have been converted.
-  Maybe that doesn't need to happen."*
+- 65|430| **`.inp` export converts inputs. Never convert inputs unless requested by user.** Tom, 2026-08-18: *"A round trip
+  survives to very close results. Not identical... I notice that the inputs have been converted. As far as I know, that is a no-no."*
   - The writer passes a value through untouched only when the project's unit and the file's unit have
     the SAME FACTOR; otherwise it converts and says so. So a project working in units the file's flow
     keyword does not name gets arithmetic it might not need.
@@ -640,6 +640,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     being converted into a fixed one — `[OPTIONS] Units` has ten keywords and the project may already
     be in one of them. Byte-identity is already proven for a file re-exported in its own units
     (Task 281); this is about the other case.
+  - But this all may be a distraction when Net3 is in standard EPANET US units. No conversion should have happened. So it was a bug.
+  - **RAISED 40 -> 65 on that last line.** It reframes the task: not "which units should we write"
+    but "the pass-through did not fire on a file that should have hit it". There is a reproducible
+    case — export the Net3 the gallery ships and read the numbers back. Start by asking which of the
+    seven project selectors did not match the file's unit, because the writer passes through only
+    when the FACTORS are equal and one mismatched selector converts that whole quantity.
 
 - 40|432| **A window scrollbar should not exist on this page.** Tom, 2026-08-18: *"Our bottom controls
   bar should be the hard bottom of the page."* The map is a full-window drawing surface; anything
