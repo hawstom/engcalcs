@@ -196,6 +196,10 @@ $ec_icons = array(
 	// the frame growing to meet the drawing, with no lens to misread as plain "zoom in".
 	'zoom'       => '<path d="M3 9V3h6"/><path d="M21 9V3h-6"/><path d="M3 15v6h6"/><path d="M21 15v6h-6"/><path d="M9.5 9.5h5v5h-5z"/>',
 	'labels'     => '<path d="M20.6 13.4L13 21l-9-9V4h8z"/><circle cx="7.6" cy="7.6" r="1.5"/>',
+	// A magnifying glass — the physical object, lens and handle. The note above 'zoom' explains why
+	// a lens was WRONG there: it reads as "make bigger", which zoom-to-extents does not do. Find is
+	// the command a magnifier has always meant, so it belongs here and nowhere else in this set.
+	'find'       => '<circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.4 15.4L21 21"/>',
 	'units'      => '<path d="M2 8h20v8H2z"/><path d="M6 8v4M10 8v3M14 8v4M18 8v3"/>',
 	// A solid pointer plus one click arc. Tom: "a mouse arrow and click circle fragment. Or maybe
 	// just a solid mouse arrow icon." Solid, because a hollow cursor reads as an outline shape

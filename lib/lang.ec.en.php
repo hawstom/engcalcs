@@ -1316,6 +1316,30 @@ $ec_lang_syn['lpn_help_walkthroughs']='Walkthroughs, Guided tours, Step-by-step 
 // keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Delete network';
 $ec_lang['lpn_confirm_delete_network']='Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone.';
+// Find (Tasks 420 and 353). One panel does both jobs: an exact ID lookup, which is what EPANET's
+// Map Finder does, and a condition on a value, which nothing else offers. "Find" is the word every
+// editor uses for it.
+$ec_lang['lpn_find_menu']='Find';
+$ec_lang['lpn_find_title']='Find elements';
+$ec_lang['lpn_find_scope']='Elements to search';
+$ec_lang['lpn_find_scope_all']='All elements';
+$ec_lang['lpn_find_property']='Property';
+$ec_lang['lpn_find_condition']='Condition';
+$ec_lang['lpn_find_value']='Value';
+$ec_lang['lpn_find_button']='Find';
+// The four conditions read as the middle of a sentence: "ID contains 12", "Pressure is less than
+// 20". Keep them lowercase and keep them verbs, so the three pull-downs read left to right.
+$ec_lang['lpn_find_op_contains']='contains';
+$ec_lang['lpn_find_op_equals']='is exactly';
+$ec_lang['lpn_find_op_gt']='is greater than';
+$ec_lang['lpn_find_op_lt']='is less than';
+// {n} is a whole number.
+$ec_lang['lpn_find_count']='{n} found. Click one to go to it.';
+$ec_lang['lpn_find_none']='Nothing matched.';
+// EPANET's Map Finder calls this "Adjacent Links". Said plainly here: the pipes, pumps and valves
+// that meet at the node you found.
+$ec_lang['lpn_find_adjacent']='Links here';
+$ec_lang['lpn_find_no_value']='Type what to look for.';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';

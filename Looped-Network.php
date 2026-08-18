@@ -330,6 +330,17 @@ echoHeader("EngCalcs", $html_title, "");
 	<div id="lpn_labels_options"></div>
 	</div>
 </div>
+<?php // Find panel (Tasks 420 and 353). A PULL-DOWN, not a modal dialog: EPANET's Map Finder is
+      // modeless for a reason -- you find something, look at the map, and search again without the
+      // panel ever taking the map away. Everything inside is built in JS (wireFindPopup()), because
+      // the property and condition lists depend on which kind of element you chose. ?>
+<div id="lpn_find_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:22rem">
+	<div class="lpn-popover-body">
+	<div style="font-weight:bold"><?=$ec_lang['lpn_find_title']?></div>
+	<div id="lpn_find_form"></div>
+	<div id="lpn_find_results"></div>
+	</div>
+</div>
 <?php // Gear/settings panel (Task 146 Phase 2, 2026-07-30): ID prefixes, solver emitter exponent
       // and convergence tolerance, text size (+ map-vs-screen units), legend position -- same
       // static-panel, non-#lpn_popup pattern as #lpn_labels_popup directly above. Fields are built
@@ -429,6 +440,21 @@ EngCalcs.pageConfig = {
 	lpn_examples_failed: <?=json_encode($ec_lang['lpn_examples_failed'])?>,
 	lpn_examples_loading: <?=json_encode($ec_lang['lpn_examples_loading'])?>,
 	lpn_status_example_opened: <?=json_encode($ec_lang['lpn_status_example_opened'])?>,
+	lpn_find_menu: <?=json_encode($ec_lang['lpn_find_menu'])?>,
+	lpn_find_scope: <?=json_encode($ec_lang['lpn_find_scope'])?>,
+	lpn_find_scope_all: <?=json_encode($ec_lang['lpn_find_scope_all'])?>,
+	lpn_find_property: <?=json_encode($ec_lang['lpn_find_property'])?>,
+	lpn_find_condition: <?=json_encode($ec_lang['lpn_find_condition'])?>,
+	lpn_find_value: <?=json_encode($ec_lang['lpn_find_value'])?>,
+	lpn_find_button: <?=json_encode($ec_lang['lpn_find_button'])?>,
+	lpn_find_op_contains: <?=json_encode($ec_lang['lpn_find_op_contains'])?>,
+	lpn_find_op_equals: <?=json_encode($ec_lang['lpn_find_op_equals'])?>,
+	lpn_find_op_gt: <?=json_encode($ec_lang['lpn_find_op_gt'])?>,
+	lpn_find_op_lt: <?=json_encode($ec_lang['lpn_find_op_lt'])?>,
+	lpn_find_count: <?=json_encode($ec_lang['lpn_find_count'])?>,
+	lpn_find_none: <?=json_encode($ec_lang['lpn_find_none'])?>,
+	lpn_find_adjacent: <?=json_encode($ec_lang['lpn_find_adjacent'])?>,
+	lpn_find_no_value: <?=json_encode($ec_lang['lpn_find_no_value'])?>,
 	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
 	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and

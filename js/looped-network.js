@@ -5165,6 +5165,313 @@ var EngCalcs = EngCalcs || {};
 		deleteSelection();
 	});
 
+	// ---- FIND: an ID lookup and a condition, in ONE panel (ROADMAP Tasks 420 and 353) ----
+	//
+	// EPANET's Map Finder answers "where is node 259?" with a radio group, an ID box and the list of
+	// links meeting there. Task 353 wants the larger question -- "which pipes are under 8 inches?"
+	// -- which nothing else in this field offers (EPANET's Network Table and epanet-js's Data Tables
+	// are listings with no filter). They are the same panel with a different condition, so this is
+	// ONE control: two commands in the same menu, differing only in the operator, would be a
+	// vocabulary to learn instead of a tool to use.
+	//
+	// **THE VALUES SEARCHED ARE THE VALUES PRINTED ON THE MAP.** colorValueOf() is the accessor the
+	// colour ramp and the map labels already read, in the DISPLAYED unit -- so "Diameter is greater
+	// than 8" means the 8 you can read on the drawing. A second accessor here would be a second
+	// answer to "what is this pipe's diameter", which is how a query tool starts disagreeing with
+	// the drawing it queries.
+	//
+	// **READ-ONLY BY CONSTRUCTION.** It selects and it moves the view; nothing below writes an
+	// element. Task 389 (search and replace) is this query plus a write, and its write goes through
+	// setProp() -- which is why the query half is worth shipping on its own first.
+	var findState = { scope: 'all', prop: 'id', op: 'contains', value: '' };
+	var findResults = [];
+	// Scope names REUSE the Insert tools' labels (CLAUDE.md's concept-level reuse): a junction is a
+	// Junction in both places, and re-keying seven plurals would buy nothing but 182 translations.
+	// The order is the Insert menu's order, which is also the toolbar's and Settings' -- three lists
+	// that must agree, now four.
+	function findScopeDefs() {
+		var pc = EngCalcs.pageConfig || {};
+		return [
+			{ key: 'all', label: pc.lpn_find_scope_all || 'All elements' },
+			{ key: 'junction', label: pc.lpn_tool_add_junction || 'Junction', group: 'node', type: 'junction' },
+			{ key: 'reservoir', label: pc.lpn_tool_add_reservoir || 'Reservoir', group: 'node', type: 'reservoir' },
+			{ key: 'tank', label: pc.lpn_tool_add_tank || 'Tank', group: 'node', type: 'tank' },
+			{ key: 'pipe', label: pc.lpn_tool_add_pipe || 'Pipe', group: 'link', type: 'pipe' },
+			{ key: 'pump', label: pc.lpn_tool_add_pump || 'Pump', group: 'link', type: 'pump' },
+			{ key: 'valve', label: pc.lpn_tool_add_valve || 'Valve', group: 'link', type: 'valve' },
+			{ key: 'text', label: pc.lpn_tool_add_text || 'Text', group: 'label' }
+		];
+	}
+	function findScopeDef(key) {
+		var defs = findScopeDefs(), i;
+		for (i = 0; i < defs.length; i++) { if (defs[i].key === key) { return defs[i]; } }
+		return defs[0];
+	}
+	function findCandidates() {
+		var d = findScopeDef(findState.scope), out = [];
+		function take(group, arr, type) {
+			(arr || []).forEach(function (e) {
+				if (type && e.type !== type) { return; }
+				out.push({ group: group, el: e });
+			});
+		}
+		if (d.key === 'all') {
+			take('node', doc.nodes); take('link', doc.links); take('label', doc.labels);
+			return out;
+		}
+		if (d.group === 'node') { take('node', doc.nodes, d.type); return out; }
+		if (d.group === 'link') { take('link', doc.links, d.type); return out; }
+		take('label', doc.labels);
+		return out;
+	}
+	// ID first, then the numeric fields THAT SCOPE ACTUALLY HAS. COLOR_NODE_FIELDS/COLOR_LINK_FIELDS
+	// are the declared list of "fields with a readable value" and nodeFieldDefs()/linkFieldDefs()
+	// supply the names, so a field cannot be searchable under a name the Labels panel spells
+	// differently. "All elements" offers ID alone, because it is the only property a junction, a
+	// pipe and a text label all have -- an honest answer rather than a menu of properties that
+	// silently match nothing.
+	function findPropDefs() {
+		var pc = EngCalcs.pageConfig || {}, d = findScopeDef(findState.scope),
+			out = [['id', pc.lpn_field_id || 'ID']], defs, allowed;
+		if (d.group === 'label') { out.push(['text', pc.lpn_tool_add_text || 'Text']); return out; }
+		if (d.key === 'all') { return out; }
+		defs = d.group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc);
+		allowed = d.group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS;
+		defs.forEach(function (f) { if (allowed[f[0]] !== undefined) { out.push(f); } });
+		return out;
+	}
+	function findPropIsText(prop) { return prop === 'id' || prop === 'text'; }
+	// Text gets contains/equals, a number gets equals/greater/less. Offering all four for both would
+	// mean "Pressure contains 2", which matches on the digits of a number and is never what anybody
+	// means.
+	function findOpDefs() {
+		var pc = EngCalcs.pageConfig || {};
+		if (findPropIsText(findState.prop)) {
+			return [['contains', pc.lpn_find_op_contains || 'contains'], ['equals', pc.lpn_find_op_equals || 'is exactly']];
+		}
+		return [['equals', pc.lpn_find_op_equals || 'is exactly'], ['gt', pc.lpn_find_op_gt || 'is greater than'],
+			['lt', pc.lpn_find_op_lt || 'is less than']];
+	}
+	// **A SCOPE CHANGE CAN TAKE THE QUERY WITH IT.** Pressure is not a property of a pipe, and a
+	// number's operators are not operators on an ID -- so both fall back to the first entry the new
+	// scope offers. Left alone, the panel would keep a query that cannot match anything and answer
+	// "nothing found" forever, which reads as a broken feature rather than a stale field. It runs
+	// from the pull-downs AND from the search itself, so no path can start a search from a state
+	// the pull-downs would have corrected.
+	function findNormalize() {
+		var props = findPropDefs(), ops;
+		if (!props.some(function (p) { return p[0] === findState.prop; })) { findState.prop = props[0][0]; }
+		ops = findOpDefs();
+		if (!ops.some(function (o) { return o[0] === findState.op; })) { findState.op = ops[0][0]; }
+	}
+	function findValueOf(cand, prop) {
+		if (prop === 'id') { return cand.el.id; }
+		if (prop === 'text') { return effective(cand.el, 'text'); }
+		if (cand.group === 'label') { return undefined; }
+		return colorValueOf(cand.group, cand.el, prop);
+	}
+	// An `equals` on a solved number cannot be an === : the value shown is the end of a float chain,
+	// and nobody types 12.000000000000002. Relative tolerance, absolute near zero.
+	function findNumEq(a, b) {
+		var scale = Math.max(Math.abs(a), Math.abs(b));
+		return Math.abs(a - b) <= (scale > 0 ? scale * 1e-9 : 1e-12);
+	}
+	function findMatches() {
+		var v = String(findState.value).trim(), lc = v.toLowerCase(), num = parseFloat(v), out = [];
+		if (v === '') { return out; }
+		findNormalize();
+		findCandidates().forEach(function (c) {
+			var val = findValueOf(c, findState.prop), s;
+			if (val === undefined || val === null || val === '') { return; }
+			if (typeof val === 'number' && !isFinite(val)) { return; }
+			if (findState.op === 'contains') {
+				s = String(val).toLowerCase();
+				if (s.indexOf(lc) >= 0) { out.push(c); }
+				return;
+			}
+			if (findState.op === 'equals') {
+				if (typeof val === 'number') {
+					if (isFinite(num) && findNumEq(val, num)) { out.push(c); }
+				} else if (String(val).toLowerCase() === lc) { out.push(c); }
+				return;
+			}
+			if (typeof val !== 'number' || !isFinite(num)) { return; }
+			if (findState.op === 'gt' && val > num) { out.push(c); }
+			if (findState.op === 'lt' && val < num) { out.push(c); }
+		});
+		return out;
+	}
+	// Where the map has to go to show this element. A link has no point of its own, so it is the
+	// midpoint of its ends -- good enough to put a pipe on screen, and it needs no vertex walk.
+	function findPointOf(cand) {
+		var a, b, lb, an;
+		if (cand.group === 'node') { return { x: cand.el.x, y: cand.el.y }; }
+		if (cand.group === 'link') {
+			a = nodeById(cand.el.from); b = nodeById(cand.el.to);
+			if (!a || !b) { return null; }
+			return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+		}
+		lb = cand.el; an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
+		return an ? { x: an.x + lb.x, y: an.y + lb.y } : { x: lb.x, y: lb.y };
+	}
+	// **A RESULT IS RE-RESOLVED BY ID, NEVER FOLLOWED BY REFERENCE.** The panel stays open across
+	// edits, an undo, and a project switch; a stored element object outlives all three and would
+	// pan the map to a node that no longer exists.
+	function findGoTo(group, id) {
+		var el = group === 'node' ? nodeById(id) : (group === 'link' ? linkById(id) : labelById(id)), p, v;
+		if (!el) { return; }
+		setSelection(group, id);
+		p = findPointOf({ group: group, el: el });
+		v = currentView();
+		// THE ZOOM IS LEFT ALONE, deliberately: a Find that also chose a scale would throw away the
+		// zoom the user set to read the drawing they are working on. It pans, and the selection mark
+		// says which one it is.
+		if (p && v) { applyView({ cx: p.x, cy: p.y, s: v.s }); }
+	}
+	function findFmt(v) {
+		if (typeof v !== 'number') { return String(v); }
+		return String(+v.toFixed(4));
+	}
+	function findSelect(parent, labelText, options, value, onChange) {
+		var wrap = document.createElement('div'), lab = document.createElement('label'),
+			sel = document.createElement('select');
+		wrap.style.margin = '4px 0';
+		lab.textContent = labelText;
+		lab.style.display = 'block';
+		options.forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			if (o[0] === value) { opt.selected = true; }
+			sel.appendChild(opt);
+		});
+		sel.addEventListener('change', function () { onChange(sel.value); });
+		lab.appendChild(sel);
+		wrap.appendChild(lab);
+		parent.appendChild(wrap);
+		return sel;
+	}
+	function rebuildFindForm() {
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_find_form'),
+			props, ops, valWrap, valLab, input, btn;
+		if (!box) { return; }
+		box.innerHTML = '';
+		findSelect(box, pc.lpn_find_scope || 'Elements to search', findScopeDefs().map(function (d) {
+			return [d.key, d.label];
+		}), findState.scope, function (v) {
+			findState.scope = v;
+			findNormalize();
+			rebuildFindForm(); renderFindResults(null);
+		});
+		props = findPropDefs();
+		findSelect(box, pc.lpn_find_property || 'Property', props, findState.prop, function (v) {
+			findState.prop = v;
+			findNormalize();
+			rebuildFindForm(); renderFindResults(null);
+		});
+		ops = findOpDefs();
+		findSelect(box, pc.lpn_find_condition || 'Condition', ops, findState.op, function (v) {
+			findState.op = v; renderFindResults(null);
+		});
+		valWrap = document.createElement('div');
+		valWrap.style.margin = '4px 0';
+		valLab = document.createElement('label');
+		valLab.textContent = pc.lpn_find_value || 'Value';
+		valLab.style.display = 'block';
+		input = document.createElement('input');
+		input.type = 'text';
+		input.value = findState.value;
+		input.style.width = '100%';
+		input.addEventListener('input', function () { findState.value = input.value; });
+		// Enter is what a person presses in a search box, and this panel has no other use for it.
+		input.addEventListener('keydown', function (e) {
+			if (e.key === 'Enter') { if (e.preventDefault) { e.preventDefault(); } runFind(); }
+		});
+		valLab.appendChild(input);
+		valWrap.appendChild(valLab);
+		box.appendChild(valWrap);
+		btn = document.createElement('button');
+		btn.type = 'button';
+		setLabel(btn, 'find', pc.lpn_find_button || 'Find');
+		btn.addEventListener('click', runFind);
+		box.appendChild(btn);
+	}
+	function runFind() {
+		var pc = EngCalcs.pageConfig || {};
+		if (String(findState.value).trim() === '') {
+			findResults = [];
+			renderFindResults(pc.lpn_find_no_value || 'Type what to look for.');
+			return;
+		}
+		findResults = findMatches();
+		renderFindResults(null);
+		// ONE HIT GOES STRAIGHT THERE. Typing a node's ID and being shown a list of one, to click,
+		// is EPANET's Map Finder with an extra step -- and an exact ID lookup is the commonest thing
+		// this panel will ever be asked to do.
+		if (findResults.length === 1) { findGoTo(findResults[0].group, findResults[0].el.id); }
+	}
+	function renderFindResults(message) {
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_find_results'), head;
+		if (!box) { return; }
+		box.innerHTML = '';
+		if (message) {
+			head = document.createElement('div');
+			head.textContent = message;
+			box.appendChild(head);
+			return;
+		}
+		if (!findResults.length) { return; }
+		head = document.createElement('div');
+		head.style.margin = '6px 0 2px';
+		head.textContent = String(pc.lpn_find_count || '{n} found. Click one to go to it.')
+			.replace('{n}', String(findResults.length));
+		box.appendChild(head);
+		var list = document.createElement('div');
+		// Bounded because the panel is a pull-down, not a report: a 4,000-pipe answer is a scroll
+		// bar either way, and Task 146.04's report tables are where a long list belongs.
+		list.style.maxHeight = '14em';
+		list.style.overflowY = 'auto';
+		findResults.forEach(function (c) {
+			var row = document.createElement('button'), val = findValueOf(c, findState.prop), adj;
+			row.type = 'button';
+			row.style.display = 'block';
+			row.style.width = '100%';
+			row.style.textAlign = 'left';
+			row.textContent = c.el.id + (findState.prop === 'id' ? '' : '  ' + findFmt(val));
+			// The Map Finder's "Adjacent Links" pane, said in one line under the node it belongs to:
+			// finding a junction and immediately wanting to know what meets there is the whole
+			// reason EPANET's dialog has that box.
+			if (c.group === 'node') {
+				adj = incidentLinks[c.el.id] || [];
+				if (adj.length) {
+					row.textContent += '  · ' + (pc.lpn_find_adjacent || 'Links here') + ': ' + adj.join(', ');
+				}
+			}
+			row.addEventListener('click', function () { findGoTo(c.group, c.el.id); });
+			list.appendChild(row);
+		});
+		box.appendChild(list);
+	}
+	function toggleFindPopup(evt) {
+		var popup = document.getElementById('lpn_find_popup'), anchor;
+		if (!popup) { return; }
+		if (popup.style.display === 'block') { popup.style.display = 'none'; viewPopoverAnchor = null; return; }
+		// Read BEFORE closeMenu(), which nulls openMenuAnchor -- the menu bar item that opened the
+		// Edit menu is the only thing left to hang this panel on once the row itself is gone.
+		anchor = (evt && evt.currentTarget) || openMenuAnchor;
+		closeMenu();
+		closeViewPopovers('lpn_find_popup');
+		rebuildFindForm();
+		renderFindResults(null);
+		viewPopoverAnchor = anchor;
+		if (anchor && anchor.getBoundingClientRect) {
+			openPanelAtAnchor(popup, anchor.getBoundingClientRect());
+		} else {
+			popup.style.display = 'block';
+		}
+		var input = popup.querySelector('input[type=text]');
+		if (input) { input.focus(); input.select(); }
+	}
+
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
 	// each is a whole sentence rather than "Mode:" + the tool's own label composed at render time.
 	var MODE_HINT_KEYS = {
@@ -8946,7 +9253,7 @@ var EngCalcs = EngCalcs || {};
 	// Labels form go away when user clicks away or at least when another menu item is selected? We
 	// are currently seeing the other menus while Labels persists." The property popup (#lpn_popup) is
 	// deliberately NOT in this list: it has its own currentPopup machinery and its own dismissal.
-	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup', 'lpn_notes_popup'];
+	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup', 'lpn_notes_popup', 'lpn_find_popup'];
 	// The control that opened the popover now showing -- the toolbar button, or the menu-bar item.
 	// Same job openMenuAnchor does for the menus, and needed for the same reason: the click that
 	// OPENED a popover must not also be read as a click away from it. Task 372 -- until then the
@@ -9354,6 +9661,10 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		openMenu(anchor, [
 			{ icon: 'undo', label: pc.lpn_tool_undo || 'Undo', fn: undo },
+			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
+			// menu is about; View holds the things that change how the map is drawn. Every editor
+			// puts Find in Edit for the same reason.
+			{ icon: 'find', label: pc.lpn_find_menu || 'Find', fn: function () { toggleFindPopup(null); } },
 			{ separator: true },
 			// SUBJECT, THEN VERB (Task 415): with something selected this row deletes it, which is
 			// what Delete means in every editor. With nothing selected it still toggles the Delete

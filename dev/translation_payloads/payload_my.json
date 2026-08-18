@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 999,
-        "delta_key_count": 3,
+        "expected_key_count": 1015,
+        "delta_key_count": 19,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -364,11 +364,43 @@
     },
     "keys_to_translate": {
         "lpn_examples_close": "Close",
+        "lpn_find_menu": "Find",
+        "lpn_find_title": "Find elements",
+        "lpn_find_scope": "Elements to search",
+        "lpn_find_scope_all": "All elements",
+        "lpn_find_property": "Property",
+        "lpn_find_condition": "Condition",
+        "lpn_find_value": "Value",
+        "lpn_find_button": "Find",
+        "lpn_find_op_contains": "contains",
+        "lpn_find_op_equals": "is exactly",
+        "lpn_find_op_gt": "is greater than",
+        "lpn_find_op_lt": "is less than",
+        "lpn_find_count": "{n} found. Click one to go to it.",
+        "lpn_find_none": "Nothing matched.",
+        "lpn_find_adjacent": "Links here",
+        "lpn_find_no_value": "Type what to look for.",
         "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
         "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "keys": {
         "lpn_examples_close": "Close",
+        "lpn_find_menu": "Find",
+        "lpn_find_title": "Find elements",
+        "lpn_find_scope": "Elements to search",
+        "lpn_find_scope_all": "All elements",
+        "lpn_find_property": "Property",
+        "lpn_find_condition": "Condition",
+        "lpn_find_value": "Value",
+        "lpn_find_button": "Find",
+        "lpn_find_op_contains": "contains",
+        "lpn_find_op_equals": "is exactly",
+        "lpn_find_op_gt": "is greater than",
+        "lpn_find_op_lt": "is less than",
+        "lpn_find_count": "{n} found. Click one to go to it.",
+        "lpn_find_none": "Nothing matched.",
+        "lpn_find_adjacent": "Links here",
+        "lpn_find_no_value": "Type what to look for.",
         "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
         "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
@@ -386,6 +418,262 @@
                     "key": "lpn_examples_size",
                     "value": "ဆက်စပ်နေရာ {nodes} ခု၊ ပိုက်လိုင်း {links} ခု",
                     "english": "{nodes} nodes, {links} links"
+                }
+            }
+        },
+        "lpn_find_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_scope": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_scope_all": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_property": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_condition": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_value": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_button": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_op_contains": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_op_equals": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_op_gt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_op_lt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_adjacent": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_no_value": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "ဤပရောဂျက်ရှိ နေရာ၊ ပိုက်လိုင်းနှင့် စာသားလေဘယ်လ်အားလုံးကို ဖျက်မလား။ နောက်ခံပုံ၊ ပရောဂျက်အမည်နှင့် သင်၏ဆက်တင်များကို ဆက်ထားပေးမည်။ ဤလုပ်ဆောင်ချက်ကို နောက်ပြန်ဖျက်၍မရပါ။",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "ယူနစ်များ",
+                    "english": "Units"
                 }
             }
         },
