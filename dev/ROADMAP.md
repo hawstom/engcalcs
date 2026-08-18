@@ -578,11 +578,15 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   time is the open one, and the engine makes it a mapping-and-UI job rather than a numerical one.
   - **Task 384 (colour coding with a ramp picker) is preparation for this, not decoration** — a
     number per element per timestep cannot be read any other way.
-  - **Two EPANET valve types we do not model are still substituted with a reported open pipe: PBV
-    (pressure-breaker valve — holds a fixed pressure DROP across itself) and GPV (general-purpose
-    valve — its head loss follows a user-supplied CURVE instead of a formula).** We have no element
-    for either, so an imported network containing one solves as if the valve were an open pipe, and
-    says so.
+  - **DONE 2026-08-17: PBV and GPV are real elements.** A PBV's setting is a pressure DROP; a GPV's
+    behaviour is a head-loss CURVE that belongs to the valve and is named after it (248.04's ruling,
+    which is what made the type buildable — the old note said we had "no curve element outside the
+    pump" and the answer was that a GPV needs no separate one). Both are EPANET-only. Two traps
+    found by building it: EPANET refuses `setLinkValue` on a GPV at all (error 207), so the warm path
+    skips it and its curve had to go into `signatureOf()` or an edited curve returned the previous
+    curve's answer; and a GPV with no curve cannot be written at all, so it degrades to an open
+    throttle and says so. Harness `dev/lpn-spike/pbv-gpv-harness.js` solves both through the real
+    engine.
   - **A valve has THREE states in EPANET, not two:** closed, fully open, and ACTIVE. `EN_INITSTATUS =
     OPEN` opens it fully with its setting IGNORED; `EN_INITSETTING` restores active, so status is
     written BEFORE setting. Written the other way a network solves with the valve wide open — exactly

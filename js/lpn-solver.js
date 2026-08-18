@@ -233,7 +233,7 @@ EngCalcs.lpnIsFixedHead = function (node) {
 // EPANET is unreachable -- offline, blocked module -- this file refuses with a diagnostic that
 // NAMES THE VALVES. That is the whole reason the diagnostics on this page are ours and not
 // EPANET's numeric error codes: "valve V3 needs the EPANET engine" beats "error 110".
-EngCalcs.lpnValveTypes = ['PRV', 'PSV', 'FCV', 'TCV', 'GPV'];
+EngCalcs.lpnValveTypes = ['PRV', 'PSV', 'FCV', 'TCV', 'PBV', 'GPV'];
 
 // The one place the native/EPANET-only line is drawn. A link that is not a valve is native.
 EngCalcs.lpnValveIsNative = function (link) {

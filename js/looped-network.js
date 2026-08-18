@@ -5783,7 +5783,12 @@ var EngCalcs = EngCalcs || {};
 	// PRV holding 60 psi (40 m), a 250 gpm (15 l/s) flow limit, and a throttle at k = 2.
 	function defaultValveSetting(type) {
 		if (type === 'PRV' || type === 'PSV') { return niceDefault('lpn_u_pressure', 'psi', 60, 40); }
+		// A pressure DROP, so it opens on a small one rather than on a supply pressure: 60 psi of
+		// deliberate loss is a valve nobody built.
+		if (type === 'PBV') { return niceDefault('lpn_u_pressure', 'psi', 10, 7); }
 		if (type === 'FCV') { return niceDefault('lpn_u_flow', 'gpm', 250, 0.015); }
+		// A GPV's behaviour is its CURVE; the setting is not a number the user ever types.
+		if (type === 'GPV') { return 0; }
 		return 2;
 	}
 	// anchorNode, if given, anchors the new Text to that node with a leader -- lb.x/lb.y become an
@@ -7587,7 +7592,12 @@ var EngCalcs = EngCalcs || {};
 			// or turned back into a pipe.
 			case 'valve-tcv': return pc.lpn_inp_drop_tcv || 'These throttle valves came in as throttle valves, with the same loss the file gives them. Either solver can compute them.';
 			case 'valve-active': return pc.lpn_inp_drop_valve_active || 'These valves control pressure or flow, and they open and close on their own as the water moves. They came in whole, and this page solves them with the EPANET engine, which it switches to on its own for this network.';
+			// 'valve-dropped' IS NO LONGER EMITTED (Task 248, 2026-08-17): PBV and GPV are real
+			// elements now and arrive as themselves. The case is kept so an older saved report --
+			// or a document imported before today and re-reported -- still renders a sentence
+			// rather than a blank; the key is a candidate for deletion once nothing can produce it.
 			case 'valve-dropped': return pc.lpn_inp_drop_valve || 'These valves are described by a curve or by a fixed pressure drop, and this page has no such element. They came in as open pipes, so the network is still connected but nothing is controlling it.';
+			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
 			case 'check-valve': return pc.lpn_inp_drop_cv || 'These pipes only let water flow one way in EPANET. They came in as ordinary pipes, so water may now flow either way through them.';
 			case 'demand-categories': return pc.lpn_inp_drop_demands || 'These junctions had more than one demand. The demands were added together into the one demand this page holds.';
 			case 'demand-pattern':
@@ -14071,36 +14081,50 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 
+		curvePointTable(fields, l, (pc.lpn_result_head || 'Head'), 'lpn_u_elevhead',
+			pc.lpn_pump_curve_note || 'One, two, or three points — see "Pump curve" in the Notes below.');
+	}
+	// THE THREE-POINT CURVE TABLE, shared by the pump and by the GPV (Task 248). Both hold a curve
+	// that BELONGS TO THE ELEMENT and is named after it -- a pump's is (flow, head) and a general
+	// purpose valve's is (flow, head LOSS) -- so the only thing that differs is the second column's
+	// heading and its unit. Two copies of this markup would be two chances to disagree about what a
+	// curve point is.
+	//
+	// No factors since Task 263: a point is stored in the units its column heading names, so the
+	// table shows and accepts the number as typed.
+	//
+	// A real <table> with real column headings (Tom, 2026-07-30) -- the rows were two unlabelled
+	// number boxes whose only clue as to which was which lived in a title= tooltip, invisible on
+	// touch. Flow first, matching both the [Q, H] storage order and the way a manufacturer's curve
+	// is read (a head AT a flow).
+	function curvePointTable(fields, l, valueHeading, valueUnitId, note) {
+		var pc = EngCalcs.pageConfig || {};
 		if (!l.curvePoints || l.curvePoints.length === 0) { l.curvePoints = [[undefined, undefined]]; }
 		var pointLabels = [
 			pc.lpn_pump_point1 || 'Point 1 (required)',
 			pc.lpn_pump_point2 || 'Point 2 (optional)',
 			pc.lpn_pump_point3 || 'Point 3 (optional)'
 		];
-		// No factors here since Task 263: a curve point is stored in the units its column heading
-		// names, so the table shows and accepts the number as typed.
-		// A real <table> with real column headings (Tom, 2026-07-30) -- the point rows were two
-		// unlabelled number boxes whose only clue as to which was which lived in a title= tooltip,
-		// invisible on touch. Flow first, then head, matching both the [Q,H] storage order and the
-		// way a manufacturer's curve is read (a head AT a flow).
 		var table = document.createElement('table'), thead = document.createElement('thead'),
 			hrow = document.createElement('tr'), tbody = document.createElement('tbody');
 		table.className = 'lpn-curve-table';
 		[ '', (pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
-			(pc.lpn_result_head || 'Head') + ' (' + unitLabel('lpn_u_elevhead') + ')' ].forEach(function (t) {
+			valueHeading + ' (' + unitLabel(valueUnitId) + ')' ].forEach(function (t) {
 			var th = document.createElement('th');
 			th.textContent = t;
 			hrow.appendChild(th);
 		});
 		thead.appendChild(hrow); table.appendChild(thead); table.appendChild(tbody);
 		fields.appendChild(table);
-		// One line pointing at the "Pump curve" note on the page, rather than the equation and its
-		// three fitting cases inline: this popup floats over the map and has to stay readable on a
-		// phone (Tom, 2026-07-30, weighing the two placements). See lpn_notes_5_def.
-		var curveNote = document.createElement('div');
-		curveNote.style.fontSize = '0.9em';
-		curveNote.textContent = pc.lpn_pump_curve_note || 'One, two, or three points — see "Pump curve" in the Notes below.';
-		fields.appendChild(curveNote);
+		// One line pointing at the Notes rather than the equation and its fitting cases inline: this
+		// popup floats over the map and has to stay readable on a phone (Tom, 2026-07-30, weighing
+		// the two placements). See lpn_notes_5_def.
+		if (note) {
+			var curveNote = document.createElement('div');
+			curveNote.style.fontSize = '0.9em';
+			curveNote.textContent = note;
+			fields.appendChild(curveNote);
+		}
 		var pi;
 		for (pi = 0; pi < 3; pi++) {
 			(function (pi) {
@@ -14118,7 +14142,7 @@ var EngCalcs = EngCalcs || {};
 					var qv = qInput.value === '' ? undefined : +qInput.value,
 						hv = hInput.value === '' ? undefined : +hInput.value;
 					saveUndoSnapshot();
-					// Both fields or neither -- a lone Q or lone H is not a point the curve fit can use.
+					// Both fields or neither -- a lone Q or lone H is not a point any curve can use.
 					l.curvePoints[pi] = (qv !== undefined && hv !== undefined) ? [qv, hv] : undefined;
 					l.curvePoints = l.curvePoints.filter(function (x) { return x; });
 					scheduleSolve();
@@ -14130,6 +14154,14 @@ var EngCalcs = EngCalcs || {};
 				tbody.appendChild(row);
 			})(pi);
 		}
+	}
+	// A GPV's own curve. Flow against HEAD LOSS -- the quantity a general purpose valve is defined
+	// by -- and no "pump curve" note, because none of that fitting applies: EPANET reads these
+	// points directly.
+	function renderGpvCurve(fields, l, linkId) {
+		var pc = EngCalcs.pageConfig || {};
+		curvePointTable(fields, l, (pc.lpn_result_headloss || 'Head loss'), 'lpn_u_elevhead',
+			pc.lpn_gpv_curve_note || 'Up to three points of flow and the head loss at that flow. With no points the valve is simply open.');
 	}
 	function renderLinkFields(linkId) {
 		var l = linkById(linkId), fields = document.getElementById('lpn_popup_fields'), pc = EngCalcs.pageConfig || {};
@@ -14210,7 +14242,9 @@ var EngCalcs = EngCalcs || {};
 			['TCV', pc.lpn_valve_type_tcv || 'Throttle (TCV)'],
 			['PRV', pc.lpn_valve_type_prv || 'Pressure reducing (PRV)'],
 			['PSV', pc.lpn_valve_type_psv || 'Pressure sustaining (PSV)'],
-			['FCV', pc.lpn_valve_type_fcv || 'Flow control (FCV)']
+			['FCV', pc.lpn_valve_type_fcv || 'Flow control (FCV)'],
+			['PBV', pc.lpn_valve_type_pbv || 'Pressure breaker (PBV)'],
+			['GPV', pc.lpn_valve_type_gpv || 'General purpose (GPV)']
 		], vt, function (v) {
 			if (v === vt) { return; }
 			saveUndoSnapshot();
@@ -14243,11 +14277,25 @@ var EngCalcs = EngCalcs || {};
 			refreshPopupIfOpen();
 			scheduleSolve();
 		}, pc.lpn_field_valve_type_tip);
-		// GPV IS ABSENT FROM THAT LIST ON PURPOSE. A general purpose valve's whole behaviour is a
-		// head-loss CURVE, and this page has no curve element outside the pump. Offering the type
-		// with nowhere to enter the curve would be a control that does nothing. An imported GPV is
-		// reported and comes in as an open pipe (js/lpn-inp.js).
-		if (vt === 'PRV' || vt === 'PSV') {
+		// **GPV AND PBV ARE IN THE LIST NOW** (Task 248, 2026-08-17). The old note here said a GPV
+		// could not be offered because "this page has no curve element outside the pump" -- and the
+		// answer turned out to be that it does not need one: a GPV's head-loss curve BELONGS TO THE
+		// VALVE and is named after it, which is Task 248.04's ruling for curves generally. So the
+		// pump's own three-point table serves it, reading (flow, head LOSS) instead of (flow, head).
+		//
+		// Both are EPANET-only, like every other active type -- EngCalcs.lpnValveIsNative is the one
+		// place that line is drawn, and adding them there is the whole of what routing them costs.
+		if (vt === 'GPV') {
+			renderGpvCurve(fields, l, linkId);
+		} else if (vt === 'PBV') {
+			// A PRESSURE DROP, not a pressure to hold: a PBV forces exactly this much loss across
+			// itself whichever way the water is going. Same unit as a PRV's setting, which is why
+			// they share the field and not the label.
+			unitNumberField(fields, pc.lpn_field_valve_setting_drop || 'Pressure drop', 'lpn_u_pressure',
+				function () { return effective(l, 'setting'); },
+				function (v) { setProp(l, 'setting', v); refreshPopupIfOpen(); },
+				pc.lpn_field_valve_setting_drop_tip, { el: l, prop: 'setting' });
+		} else if (vt === 'PRV' || vt === 'PSV') {
 			unitNumberField(fields, pc.lpn_field_valve_setting_pressure || 'Pressure setting', 'lpn_u_pressure',
 				function () { return effective(l, 'setting'); },
 				function (v) { setProp(l, 'setting', v); refreshPopupIfOpen(); },

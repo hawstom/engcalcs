@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 1027,
-        "delta_key_count": 31,
+        "expected_key_count": 1033,
+        "delta_key_count": 37,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -385,6 +385,12 @@
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
         "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
+        "lpn_valve_type_pbv": "Pressure breaker (PBV)",
+        "lpn_valve_type_gpv": "General purpose (GPV)",
+        "lpn_field_valve_setting_drop": "Pressure drop",
+        "lpn_field_valve_setting_drop_tip": "The pressure the valve takes away. A pressure breaker valve always removes exactly this much pressure, whichever way the water is going. It is a drop across the valve, not a pressure to hold.",
+        "lpn_inp_drop_gpv_curve": "This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.",
+        "lpn_gpv_curve_note": "Up to three points of flow and the head loss at that flow. With no points the valve is simply open.",
         "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
         "lpn_field_lon": "Longitude",
         "lpn_field_lat": "Latitude",
@@ -418,6 +424,12 @@
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
         "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
+        "lpn_valve_type_pbv": "Pressure breaker (PBV)",
+        "lpn_valve_type_gpv": "General purpose (GPV)",
+        "lpn_field_valve_setting_drop": "Pressure drop",
+        "lpn_field_valve_setting_drop_tip": "The pressure the valve takes away. A pressure breaker valve always removes exactly this much pressure, whichever way the water is going. It is a drop across the valve, not a pressure to hold.",
+        "lpn_inp_drop_gpv_curve": "This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.",
+        "lpn_gpv_curve_note": "Up to three points of flow and the head loss at that flow. With no points the valve is simply open.",
         "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
         "lpn_field_lon": "Longitude",
         "lpn_field_lat": "Latitude",
@@ -853,6 +865,102 @@
                     "key": "lpn_file_open",
                     "value": "打开…",
                     "english": "Open…"
+                }
+            }
+        },
+        "lpn_valve_type_pbv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_valve_type_fcv",
+                    "value": "流量控制（FCV）",
+                    "english": "Flow control (FCV)"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_setting_pressure",
+                    "value": "压力设定值",
+                    "english": "Pressure setting"
+                }
+            }
+        },
+        "lpn_valve_type_gpv": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_valve_type_fcv",
+                    "value": "流量控制（FCV）",
+                    "english": "Flow control (FCV)"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_setting_pressure",
+                    "value": "压力设定值",
+                    "english": "Pressure setting"
+                }
+            }
+        },
+        "lpn_field_valve_setting_drop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_valve_type_fcv",
+                    "value": "流量控制（FCV）",
+                    "english": "Flow control (FCV)"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_setting_pressure",
+                    "value": "压力设定值",
+                    "english": "Pressure setting"
+                }
+            }
+        },
+        "lpn_field_valve_setting_drop_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_valve_type_fcv",
+                    "value": "流量控制（FCV）",
+                    "english": "Flow control (FCV)"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_setting_pressure",
+                    "value": "压力设定值",
+                    "english": "Pressure setting"
+                }
+            }
+        },
+        "lpn_inp_drop_gpv_curve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_valve_type_fcv",
+                    "value": "流量控制（FCV）",
+                    "english": "Flow control (FCV)"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_setting_pressure",
+                    "value": "压力设定值",
+                    "english": "Pressure setting"
+                }
+            }
+        },
+        "lpn_gpv_curve_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_valve_type_fcv",
+                    "value": "流量控制（FCV）",
+                    "english": "Flow control (FCV)"
+                },
+                "next_translated": {
+                    "key": "lpn_field_valve_setting_pressure",
+                    "value": "压力设定值",
+                    "english": "Pressure setting"
                 }
             }
         },

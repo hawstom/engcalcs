@@ -847,6 +847,12 @@
         "lpn_valve_type_prv": "Pressure reducing (PRV)",
         "lpn_valve_type_psv": "Pressure sustaining (PSV)",
         "lpn_valve_type_fcv": "Flow control (FCV)",
+        "lpn_valve_type_pbv": "Pressure breaker (PBV)",
+        "lpn_valve_type_gpv": "General purpose (GPV)",
+        "lpn_field_valve_setting_drop": "Pressure drop",
+        "lpn_field_valve_setting_drop_tip": "The pressure the valve takes away. A pressure breaker valve always removes exactly this much pressure, whichever way the water is going. It is a drop across the valve, not a pressure to hold.",
+        "lpn_inp_drop_gpv_curve": "This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.",
+        "lpn_gpv_curve_note": "Up to three points of flow and the head loss at that flow. With no points the valve is simply open.",
         "lpn_field_valve_setting_pressure": "Pressure setting",
         "lpn_field_valve_setting_pressure_tip": "The pressure the valve keeps. A pressure reducing valve keeps the pressure on its downstream side at or below this value. A pressure sustaining valve keeps the pressure on its upstream side at or above this value.",
         "lpn_field_valve_setting_flow": "Flow setting",
@@ -1029,7 +1035,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 1027,
+    "count": 1033,
     "active_prefixes": [
         "about",
         "bpn",

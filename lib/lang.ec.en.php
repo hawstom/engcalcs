@@ -1688,6 +1688,15 @@ $ec_lang['lpn_valve_type_psv']='Pressure sustaining (PSV)';
 $ec_lang_syn['lpn_valve_type_psv']='Pressure sustaining valve (PSV), Pressure-supporting valve, Pressure-maintaining valve | gloss: valve';
 $ec_lang['lpn_valve_type_fcv']='Flow control (FCV)';
 $ec_lang_syn['lpn_valve_type_fcv']='Flow control valve (FCV), Flow-limiting valve, Maximum-flow valve | gloss: valve';
+// The two EPANET valve types this page used to substitute with an open pipe (Task 248, 2026-08-17).
+// Both keep EPANET's own name and initials, for the same reason the four above do: an engineer who
+// knows the model knows these letters, and a name of our own invention would make them look up ours.
+$ec_lang['lpn_valve_type_pbv']='Pressure breaker (PBV)';
+$ec_lang['lpn_valve_type_gpv']='General purpose (GPV)';
+$ec_lang['lpn_field_valve_setting_drop']='Pressure drop';
+$ec_lang['lpn_field_valve_setting_drop_tip']='The pressure the valve takes away. A pressure breaker valve always removes exactly this much pressure, whichever way the water is going. It is a drop across the valve, not a pressure to hold.';
+$ec_lang['lpn_inp_drop_gpv_curve']='This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
+$ec_lang['lpn_gpv_curve_note']='Up to three points of flow and the head loss at that flow. With no points the valve is simply open.';
 $ec_lang['lpn_field_valve_setting_pressure']='Pressure setting';
 $ec_lang['lpn_field_valve_setting_pressure_tip']='The pressure the valve keeps. A pressure reducing valve keeps the pressure on its downstream side at or below this value. A pressure sustaining valve keeps the pressure on its upstream side at or above this value.';
 $ec_lang['lpn_field_valve_setting_flow']='Flow setting';

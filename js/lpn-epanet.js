@@ -153,14 +153,42 @@
 				//   symptom at all:
 				//     PRV/PSV  a PRESSURE   -> LPS pressure unit is METRES of water, which is what
 				//                             this suite stores, so it passes through unscaled.
+				//     PBV      a PRESSURE DROP, the same unit as a PRV's setting and unscaled with it.
 				//     FCV      a FLOW       -> m3/s to L/s, x1000, same as a junction demand.
 				//     TCV      a LOSS COEFFICIENT, dimensionless, unscaled.
-				//   dev/lpn-spike/valve-harness.js round-trips all three through the text, because
+				//     GPV      a CURVE ID, not a number at all -- see below.
+				//   dev/lpn-spike/valve-harness.js round-trips them through the text, because
 				//   validate_epanet.js cannot: it compares two engines reading the SAME .inp, so a
 				//   setting written in the wrong unit is wrong identically on both sides.
 				var vt = (link.valveType || 'TCV').toUpperCase(),
 					setting = link.setting || 0;
 				if (vt === 'FCV') { setting = setting * 1000; }
+				// **A GPV'S "SETTING" IS THE NAME OF A HEAD-LOSS CURVE.** Its points are (flow,
+				// head loss) rather than a pump's (flow, head), and they belong to this valve --
+				// which is exactly the shape Task 248.04 says a curve should have here: owned by
+				// one element and named after it, with no separate curve library to manage.
+				//
+				// A GPV WITH NO POINTS CANNOT BE WRITTEN. EPANET rejects a GPV naming a curve that
+				// does not exist, so an empty one becomes a plain throttle at zero loss -- an open
+				// connection, reported, exactly as a pump with no curve does.
+				if (vt === 'GPV') {
+					var gpts = (link.curvePoints || []).filter(function (q) {
+						return q && q[0] !== undefined && q[1] !== undefined;
+					});
+					if (!gpts.length) {
+						warnings.push({ code: 'gpv-no-curve-as-open', ids: [link.id] });
+						vt = 'TCV';
+						setting = 0;
+					} else {
+						var gname = 'G_' + link.id, grows = [], gi;
+						for (gi = 0; gi < gpts.length; gi++) {
+							// m3/s -> L/s on the flow, head loss already in metres.
+							grows.push(' ' + gname + '  ' + (gpts[gi][0] * 1000) + '  ' + gpts[gi][1]);
+						}
+						curves.push(grows.join('\n'));
+						setting = gname;
+					}
+				}
 				valves.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  ' +
 					(link.diameter * 1000) + '  ' + vt + '  ' + setting + '  ' +
 					// A TCV's minor-loss column is IGNORED by EPANET (measured -- see
@@ -391,7 +419,17 @@
 			// file is read.
 			parts.push('l' + l.id + '\u0001' + l.type + '\u0001' + l.from + '\u0001' + l.to +
 				'\u0001' + (isCurvedPump(l) ? 'c' : 'p') +
-				'\u0001' + (l.type === 'valve' ? String(l.valveType || 'TCV').toUpperCase() : ''));
+				'\u0001' + (l.type === 'valve' ? String(l.valveType || 'TCV').toUpperCase() : '') +
+				// **A GPV'S CURVE IS IN THE SIGNATURE, AND IT HAS TO BE.** Every other valve's behaviour
+				// is a SETTING, which the warm path pushes through setLinkValue on every solve. A GPV's
+				// is a CURVE, and EPANET refuses to be controlled through the API at all for one (error
+				// 207, "attempt to control CV/GPV link"), so pushValues() deliberately skips it. Nothing
+				// else would then notice a curve the user edited, and the answer would silently be the
+				// PREVIOUS curve's -- exactly the stale answer this signature exists to make impossible.
+				// Measured before the fix: a curve steepened at every point still reported the old 6 m.
+				'\u0001' + (l.type === 'valve' && String(l.valveType || '').toUpperCase() === 'GPV'
+					? (l.curvePoints || []).map(function (q) { return q[0] + ',' + q[1]; }).join(';')
+					: ''));
 		}
 		// U+0001 between fields and U+0002 between records, because an id is user-typed: with a
 		// plain separator a node called "A|B" could forge another network's signature, and the
@@ -509,7 +547,15 @@
 				// the cold path and the warm path answer differently: diameter m -> MILLIMETRES
 				// (the pipe convention, the opposite of a tank's), and the setting means a
 				// different quantity per type, of which only FCV is scaled.
+				// **A GPV IS NOT CONTROLLABLE FROM THE API AT ALL, and EPANET says so by name:**
+				// error 207, "attempt to control CV/GPV link", thrown by setLinkValue on its status
+				// OR its setting. Its behaviour is entirely its curve, which arrived with the file
+				// and cannot be pushed through this warm path -- so a GPV whose curve changed needs
+				// a REBUILD, and signatureOf() carries its points for exactly that reason.
+				//
+				// Diameter is still pushed: it is a geometric property, not a control.
 				p.setLinkValue(idx, EN_DIAMETER, l.diameter * 1000);
+				if (String(l.valveType || 'TCV').toUpperCase() === 'GPV') { continue; }
 				p.setLinkValue(idx, EN_INITSTATUS, l.status === 'closed' ? 0 : 1);
 				if (l.status !== 'closed') {
 					p.setLinkValue(idx, EN_INITSETTING,

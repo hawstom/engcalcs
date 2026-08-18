@@ -277,12 +277,60 @@ console.log('\n--- model -> .inp -> model ---');
 		'[OPTIONS]', ' Units LPS', '', '[END]'
 	].join('\n'));
 	const g = gpv.links.filter((l) => l.id === 'V9')[0];
-	ok('a GPV comes in as a pipe, because its behaviour is a curve we have no element for',
-		!!g && g.type === 'pipe', g && g.type);
+	// **A GPV IS A VALVE NOW** (Task 248, 2026-08-17). It used to arrive as a pipe carrying the
+	// fully-open minor loss, with the control reported gone -- the honest answer while this page had
+	// nowhere to put a head-loss curve. It has one now: the curve belongs to the valve and is named
+	// after it, which is Task 248.04's ruling for curves generally.
+	ok('a GPV comes in as a VALVE', !!g && g.type === 'valve', g && g.type);
+	ok('...of its own type', g && g.valveType === 'GPV', g && g.valveType);
 	ok('...carrying the fully-open minor loss', g && g.k === 2.5, g && g.k);
-	ok('...and reported as dropped',
-		gpv.dropped.filter((d) => d.code === 'valve-dropped' && d.ids.indexOf('V9') >= 0).length === 1,
+	// The file names CURVE1 and does not contain it, so the valve arrives with no points and stands
+	// open -- reported, rather than silently becoming something else.
+	ok('...with no curve, since the file names one it does not contain',
+		g && Array.isArray(g.curvePoints) && g.curvePoints.length === 0, JSON.stringify(g && g.curvePoints));
+	ok('...and the missing curve is reported',
+		gpv.dropped.filter((d) => d.code === 'gpv-curve-missing' && d.ids.indexOf('V9') >= 0).length === 1,
 		JSON.stringify(gpv.dropped.map((d) => d.code)));
+	ok('...and it is NOT reported as a dropped valve any more',
+		gpv.dropped.filter((d) => d.code === 'valve-dropped').length === 0,
+		JSON.stringify(gpv.dropped.map((d) => d.code)));
+
+	// The curve the file DOES contain comes in on the valve, point for point.
+	const gpv2 = EngCalcs.lpnInpParse([
+		'[JUNCTIONS]', ' J1  0  5', ' J2  0  0', '',
+		'[RESERVOIRS]', ' R1  50', '',
+		'[PIPES]', ' L1  R1  J1  300  250  130  0  Open', '',
+		'[VALVES]', ' V9  J1  J2  200  GPV  CURVE1  2.5', '',
+		'[CURVES]', ' CURVE1  0  0', ' CURVE1  10  1.5', ' CURVE1  20  6', '',
+		'[OPTIONS]', ' Units LPS', '', '[END]'
+	].join('\n'));
+	const g2 = gpv2.links.filter((l) => l.id === 'V9')[0];
+	ok('a GPV whose curve IS in the file gets its points',
+		g2 && g2.curvePoints.length === 3, JSON.stringify(g2 && g2.curvePoints));
+	ok('...flow first, head loss second, in the file\'s own units',
+		g2 && g2.curvePoints[2][0] === 20 && g2.curvePoints[2][1] === 6,
+		JSON.stringify(g2 && g2.curvePoints[2]));
+
+	// A PBV: a fixed pressure DROP, which is a setting in the pressure unit like a PRV's.
+	const pbv = EngCalcs.lpnInpParse([
+		'[JUNCTIONS]', ' J1  0  5', ' J2  0  0', '',
+		'[RESERVOIRS]', ' R1  50', '',
+		'[PIPES]', ' L1  R1  J1  300  250  130  0  Open', '',
+		'[VALVES]', ' V8  J1  J2  200  PBV  7  1.5', '',
+		'[OPTIONS]', ' Units LPS', '', '[END]'
+	].join('\n'));
+	const pb = pbv.links.filter((l) => l.id === 'V8')[0];
+	ok('a PBV comes in as a valve of its own type',
+		pb && pb.type === 'valve' && pb.valveType === 'PBV', pb && (pb.type + '/' + pb.valveType));
+	ok('...with the pressure drop as its setting', pb && pb.setting === 7, pb && pb.setting);
+	ok('...declared to be in the PRESSURE unit, like a PRV\'s',
+		pb && pb.settingUnit === 'press', pb && pb.settingUnit);
+	ok('...and its fully-open minor loss', pb && pb.k === 1.5, pb && pb.k);
+
+	// Neither is native: both switch their own state inside the iteration, so both route to EPANET.
+	ok('both are EPANET-only, like every other active type',
+		!EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'PBV' }) &&
+		!EngCalcs.lpnValveIsNative({ type: 'valve', valveType: 'GPV' }));
 }
 
 // ---------------------------------------------------------------------------

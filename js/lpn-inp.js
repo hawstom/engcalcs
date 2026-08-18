@@ -465,11 +465,11 @@
 		function valveSettingUnit(type) {
 			if (type === 'PRV' || type === 'PSV' || type === 'PBV') { return 'press'; }
 			if (type === 'FCV') { return 'flow'; }
-			return null;   // TCV is dimensionless; GPV's "setting" is a curve id we do not read.
+			return null;   // TCV is dimensionless; a GPV's "setting" is a curve id, not a number.
 		}
 
 		rows = rawSections.VALVES || [];
-		var tcvIds = [], activeValveIds = [], unsupportedValveIds = [];
+		var tcvIds = [], activeValveIds = [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
 			if (!r[0]) { continue; }
@@ -492,18 +492,25 @@
 				status: (r[7] || '').toUpperCase() === 'CLOSED' ? 'closed' : 'open',
 				verts: []
 			};
-			if (vtype === 'PBV' || vtype === 'GPV') {
-				unsupportedValveIds.push(r[0]);
-				// The minor-loss column is the coefficient EPANET applies while such a valve sits
-				// fully open, so that is what the substitute pipe carries. The control is not
-				// substituted for; it is reported gone.
-				vlink = Object.assign({}, vcommon, { type: 'pipe', k: vloss });
-			} else {
+			// **PBV AND GPV ARE REAL ELEMENTS NOW** (Task 248). Both used to arrive as an open pipe
+			// carrying the minor-loss column, with the control reported gone. A PBV is a fixed
+			// pressure DROP -- a setting in the same unit as a PRV's -- and a GPV's head loss
+			// follows a CURVE, which this page can now hold because the curve belongs to the valve
+			// and is named after it (Task 248.04), exactly as a pump's does.
+			//
+			// **A GPV NAMING A CURVE THE FILE DOES NOT CONTAIN still arrives as a valve**, with no
+			// points. It solves as an open connection and js/lpn-epanet.js reports that, which is
+			// the same treatment a pump with no curve gets -- an honest empty element beats a pipe
+			// wearing the wrong name.
+			{
 				if (vtype === 'TCV') { tcvIds.push(r[0]); } else { activeValveIds.push(r[0]); }
+				// A GPV's sixth column is a curve NAME, so the points come out of [CURVES] under it
+				// and there is no numeric setting at all.
+				var gcurve = vtype === 'GPV' ? (curves[r[5]] || []) : null;
 				vlink = Object.assign({}, vcommon, {
 					type: 'valve',
 					valveType: vtype || 'TCV',
-					setting: setting,
+					setting: vtype === 'GPV' ? 0 : setting,
 					settingUnit: valveSettingUnit(vtype),
 					// A TCV's loss is its SETTING ALONE. The [VALVES] minor-loss column is IGNORED
 					// for it, which is the opposite of what the section's own column heading
@@ -515,6 +522,10 @@
 					// place that rule lives.
 					k: vtype === 'TCV' ? 0 : vloss
 				});
+				if (gcurve) {
+					vlink.curvePoints = gcurve.map(function (pt) { return [pt[0], pt[1]]; });
+					if (!gcurve.length && r[5]) { drop('gpv-curve-missing', [r[0]], r[5]); }
+				}
 			}
 			// A valve's diameter falls back to a plausible main when the column is blank, and a TCV's
 			// k is forced to zero -- both are numbers WE chose, so mergeTok refuses their columns'
@@ -526,7 +537,6 @@
 		}
 		if (tcvIds.length) { drop('valve-tcv', tcvIds); }
 		if (activeValveIds.length) { drop('valve-active', activeValveIds); }
-		if (unsupportedValveIds.length) { drop('valve-dropped', unsupportedValveIds); }
 
 		// ---- [STATUS] overrides ----
 		rows = rawSections.STATUS || [];
