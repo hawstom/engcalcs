@@ -377,6 +377,28 @@ echoHeader("EngCalcs", $html_title, "");
 	<div id="lpn_find_results"></div>
 	</div>
 </div>
+<?php // Profile panel (Task 409): the ground and the hydraulic grade line along one route through
+      // the network. Same standing-box pattern as the Find panel above -- modeless, draggable, with
+      // a close X -- because it is READ while the map is edited: the drawing redraws on every solve,
+      // which is what makes choosing a route feel like Google Directions rather than like running a
+      // report. Everything inside #lpn_profile_form and #lpn_profile_chart is built in JS, since
+      // the node lists and the chart both depend on the document. ?>
+<div id="lpn_profile_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem">
+	<button type="button" id="lpn_profile_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body">
+	<div style="font-weight:bold"><?=$ec_lang['lpn_profile_title']?></div>
+	<div id="lpn_profile_form"></div>
+	<div id="lpn_profile_chart"></div>
+	<?php // The key is STATIC HTML, not JS: these three names never change with the document, and a
+	      // swatch beside each is the whole of what a legend has to be. ?>
+	<div class="lpn-profile-key">
+		<span><i class="lpn-profile-key-ground"></i><?=$ec_lang['lpn_profile_ground']?></span>
+		<span><i class="lpn-profile-key-hgl"></i><?=$ec_lang['lpn_profile_hgl']?></span>
+		<span><i class="lpn-profile-key-band"></i><?=$ec_lang['lpn_result_pressure']?></span>
+	</div>
+	<div id="lpn_profile_note"></div>
+	</div>
+</div>
 <?php // Gear/settings panel (Task 146 Phase 2, 2026-07-30): ID prefixes, solver emitter exponent
       // and convergence tolerance, text size (+ map-vs-screen units), legend position -- same
       // static-panel, non-#lpn_popup pattern as #lpn_labels_popup directly above. Fields are built
@@ -526,6 +548,19 @@ EngCalcs.pageConfig = {
 	lpn_find_none: <?=json_encode($ec_lang['lpn_find_none'])?>,
 	lpn_find_adjacent: <?=json_encode($ec_lang['lpn_find_adjacent'])?>,
 	lpn_find_no_value: <?=json_encode($ec_lang['lpn_find_no_value'])?>,
+	lpn_profile_menu: <?=json_encode($ec_lang['lpn_profile_menu'])?>,
+	lpn_profile_tip: <?=json_encode($ec_lang['lpn_profile_tip'])?>,
+	lpn_profile_from: <?=json_encode($ec_lang['lpn_profile_from'])?>,
+	lpn_profile_to: <?=json_encode($ec_lang['lpn_profile_to'])?>,
+	lpn_profile_pick: <?=json_encode($ec_lang['lpn_profile_pick'])?>,
+	lpn_profile_through: <?=json_encode($ec_lang['lpn_profile_through'])?>,
+	lpn_profile_clear: <?=json_encode($ec_lang['lpn_profile_clear'])?>,
+	lpn_profile_choose: <?=json_encode($ec_lang['lpn_profile_choose'])?>,
+	lpn_profile_no_path: <?=json_encode($ec_lang['lpn_profile_no_path'])?>,
+	lpn_profile_no_solve: <?=json_encode($ec_lang['lpn_profile_no_solve'])?>,
+	lpn_profile_summary: <?=json_encode($ec_lang['lpn_profile_summary'])?>,
+	lpn_profile_axis_station: <?=json_encode($ec_lang['lpn_profile_axis_station'])?>,
+	lpn_profile_axis_elev: <?=json_encode($ec_lang['lpn_profile_axis_elev'])?>,
 	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
 	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and
@@ -961,6 +996,7 @@ EngCalcs.pageConfig = {
       // looped-network.js, which reads EngCalcs.lpnGeom/lpnCollide as it defines itself. ?>
 <script src="/engcalcs/js/lpn-geom.js?v=<?=filemtime(__DIR__.'/js/lpn-geom.js')?>"></script>
 <script src="/engcalcs/js/lpn-collide.js?v=<?=filemtime(__DIR__.'/js/lpn-collide.js')?>"></script>
+<script src="/engcalcs/js/lpn-profile.js?v=<?=filemtime(__DIR__.'/js/lpn-profile.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

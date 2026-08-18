@@ -1394,6 +1394,26 @@ $ec_lang['lpn_find_op_bottom']='Bottom n';
 // that meet at the node you found.
 $ec_lang['lpn_find_adjacent']='Links here';
 $ec_lang['lpn_find_no_value']='Type what to look for.';
+// ---- the profile view (ROADMAP Task 409) ------------------------------------------------------
+// A drawing of the ground and the hydraulic grade line along one chosen route through the network.
+// {u} is a unit name, {n} a count and {len} a length; they are substituted, not concatenated, so a
+// language that puts the unit somewhere else can.
+$ec_lang['lpn_profile_menu']='Profile';
+$ec_lang['lpn_profile_tip']='Draw the ground and the hydraulic grade line along a route through the network.';
+$ec_lang['lpn_profile_title']='Profile along a route';
+$ec_lang['lpn_profile_from']='From';
+$ec_lang['lpn_profile_to']='To';
+$ec_lang['lpn_profile_pick']='Click a node on the map to route through it';
+$ec_lang['lpn_profile_through']='Through';
+$ec_lang['lpn_profile_clear']='Clear';
+$ec_lang['lpn_profile_choose']='Choose a start node and an end node.';
+$ec_lang['lpn_profile_no_path']='These two nodes are not connected by any route.';
+$ec_lang['lpn_profile_no_solve']='No results yet, so only the ground line is drawn.';
+$ec_lang['lpn_profile_summary']='{n} nodes, {len} {u}';
+$ec_lang['lpn_profile_axis_station']='Distance along the route ({u})';
+$ec_lang['lpn_profile_axis_elev']='Elevation and head ({u})';
+$ec_lang['lpn_profile_ground']='Ground';
+$ec_lang['lpn_profile_hgl']='Hydraulic grade';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';

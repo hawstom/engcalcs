@@ -5403,6 +5403,337 @@ var EngCalcs = EngCalcs || {};
 		if (x) { x.addEventListener('click', closeFindPopup); }
 		makePanelDraggable(popup, function (pos) { findUserPos = pos; });
 	}
+	// ---- the PROFILE panel (ROADMAP Task 409) ------------------------------
+	//
+	// Pick a start node and an end node; the app suggests the shortest route by LINK LENGTH; the
+	// user nudges it by clicking a node the route must pass through. That is Google Directions'
+	// gesture, and it is deliberately the whole of the path editing there is. Every decision in
+	// this feature that has an exact answer -- the route, the stations, the axis -- is in
+	// js/lpn-profile.js, where a harness can hold it; what is here is the panel and the SVG.
+	//
+	// **THE VIEW UPDATES LIVE.** Everything below hangs off renderProfile(), and the callers are the
+	// panel's own controls, a waypoint click on the map, and applySolveResult() -- which runs after
+	// every solve, which runs 300 ms after every edit. So a path change, an elevation change and a
+	// diameter change all redraw by the same route, and there is no Refresh button to forget.
+	var profileState = { from: '', to: '', waypoints: [], pick: false };
+	var profileUserPos = null;
+	function profilePanel() { return document.getElementById('lpn_profile_popup'); }
+	function profileIsOpen() { var p = profilePanel(); return !!p && p.style.display === 'block'; }
+	function closeProfilePopup() { var p = profilePanel(); if (p) { p.style.display = 'none'; } }
+	// profileSeedStops() first, because the document may have changed under an open panel: a stop
+	// whose node was deleted is cleared here rather than left to draw a route through a ghost.
+	function refreshProfileIfOpen() {
+		if (!profileIsOpen()) { return; }
+		profileSeedStops(); rebuildProfileForm(); renderProfile();
+	}
+	// Same opening rules as the Find panel: OPEN, not toggle; a remembered position re-clamped
+	// against the current window; the menu-bar item passed in, because openMenuAnchor is already
+	// null by the time a menu row's action runs and a fixed panel with no left/top is invisible.
+	function openProfilePopup(anchorEl) {
+		var popup = profilePanel(), at, r, h;
+		if (!popup) { return; }
+		closeMenu();
+		profileSeedStops();
+		rebuildProfileForm();
+		if (profileUserPos) {
+			popup.style.display = 'block';
+			r = popup.getBoundingClientRect();
+			at = clampPanel(profileUserPos.left, profileUserPos.top, r.width, r.height,
+				window.innerWidth, window.innerHeight);
+			popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
+		} else if (anchorEl && anchorEl.getBoundingClientRect) {
+			openPanelAtAnchor(popup, anchorEl.getBoundingClientRect());
+		} else {
+			popup.style.display = 'block';
+			h = fitPanelToViewport(popup); r = popup.getBoundingClientRect();
+			popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
+			popup.style.top = Math.max(POPUP_EDGE, (window.innerHeight - h) / 2) + 'px';
+		}
+		renderProfile();
+	}
+	function wireProfilePopup() {
+		var popup = profilePanel(), x = document.getElementById('lpn_profile_close');
+		if (!popup) { return; }
+		if (x) { x.addEventListener('click', closeProfilePopup); }
+		makePanelDraggable(popup, function (pos) { profileUserPos = pos; });
+	}
+	// A panel that opens on two empty pull-downs asks the user to do work before it can show them
+	// anything, so it opens on a real profile where it can: the selected node if there is one,
+	// otherwise a fixed-head node (a profile FROM the source is the drawing an engineer starts
+	// with), and the node furthest from it through the network as the far end.
+	//
+	// Only ever fills a BLANK. A stop the user chose is never overwritten, and a stop whose node has
+	// since been deleted is cleared rather than left pointing at nothing.
+	function profileSeedStops() {
+		var graph = profileGraph(),
+			ids = doc.nodes.filter(profileNodeUsable).map(function (n) { return n.id; }),
+			best = -1, far, sel, fixed, i, p;
+		if (profileState.from && !nodeById(profileState.from)) { profileState.from = ''; }
+		if (profileState.to && !nodeById(profileState.to)) { profileState.to = ''; }
+		profileState.waypoints = profileState.waypoints.filter(function (id) { return !!nodeById(id); });
+		if (!ids.length) { return; }
+		if (!profileState.from) {
+			sel = (selection && selection.kind === 'node') ? selection.id : null;
+			fixed = doc.nodes.filter(function (n) { return isFixedHeadNode(n) && profileNodeUsable(n); })[0];
+			profileState.from = (sel && ids.indexOf(sel) >= 0) ? sel : (fixed ? fixed.id : ids[0]);
+		}
+		if (!profileState.to) {
+			for (i = 0; i < ids.length; i++) {
+				if (ids[i] === profileState.from) { continue; }
+				p = EngCalcs.lpnProfile.shortestPath(graph, profileState.from, ids[i]);
+				if (p && p.length > best) { best = p.length; far = ids[i]; }
+			}
+			profileState.to = far || '';
+		}
+	}
+	// An INACTIVE element is not in this scenario's network at all (Task 184), so it is not on any
+	// route through it either -- the same filter assembleModel() applies before solving, for the
+	// same reason. A CLOSED link stays in: it is on the ground and it is drawn, and the profile
+	// answers it with a break in the grade line.
+	function profileNodeUsable(n) { return isActive(n); }
+	function profileGraph() {
+		var live = {};
+		doc.nodes.forEach(function (n) { if (isActive(n)) { live[n.id] = true; } });
+		return EngCalcs.lpnProfile.buildGraph(doc.links.filter(function (l) {
+			return isActive(l) && live[l.from] && live[l.to];
+		}).map(function (l) {
+			// **THE SAME LENGTH THE SOLVER IS GIVEN**, in the strip's length unit: effective(l,
+			// 'length') is exactly the number linkLengthSI() converts to SI, so a hand-entered
+			// length and every vertex are already accounted for. The map distance between the two
+			// symbols is a different number and appears nowhere in this feature.
+			return { id: l.id, from: l.from, to: l.to, length: effective(l, 'length') || 0 };
+		}));
+	}
+	function profileStops() {
+		return [profileState.from].concat(profileState.waypoints, [profileState.to]);
+	}
+	function profilePath() {
+		if (!profileState.from || !profileState.to) { return null; }
+		return EngCalcs.lpnProfile.pathThrough(profileGraph(), profileStops());
+	}
+	// The document resolved into the plain maps js/lpn-profile.js reads -- and the ONE place this
+	// feature crosses units.
+	//
+	// **A GROUND ELEVATION AND A SOLVED HEAD ARE READ IN DIFFERENT UNITS** (Task 422): an elevation
+	// is a typed number in lpn_u_elevhead, a solved head comes back in resultUnit('elevhead'), and
+	// since that task the two can genuinely differ. They share ONE axis here, so the elevation
+	// crosses through SI into the RESULT unit rather than being assumed to agree with it. Assuming
+	// it would be silent and would look like a network with impossible pressures.
+	function profileData() {
+		var elev = {}, head = {}, length = {}, type = {}, closed = {};
+		doc.nodes.forEach(function (n) {
+			var h;
+			if (typeof n.elev === 'number') {
+				elev[n.id] = toDisplay(toSI(n.elev, 'lpn_u_elevhead'), resultUnit('elevhead'));
+			}
+			// colorNodeValue() is the accessor the map labels and the colour ramp already use, so
+			// the profile cannot disagree with the number printed beside the node.
+			h = colorNodeValue(n, 'head');
+			if (typeof h === 'number') { head[n.id] = h; }
+		});
+		doc.links.forEach(function (l) {
+			length[l.id] = effective(l, 'length') || 0;
+			type[l.id] = l.type;
+			if (effective(l, 'status') === 'closed') { closed[l.id] = true; }
+		});
+		return { elev: elev, head: head, length: length, type: type, closed: closed };
+	}
+	// The pressure at a node, in the pressure RESULT unit. It is in the hover text rather than on
+	// the axis because a pressure is not measured in the axis's unit -- the DRAWING shows it as the
+	// gap between the two lines, which needs no unit at all.
+	function profilePressureText(id) {
+		var pc = EngCalcs.pageConfig || {}, n = nodeById(id),
+			v = n ? colorNodeValue(n, 'pressure') : undefined;
+		if (typeof v !== 'number') { return ''; }
+		return (pc.lpn_result_pressure || 'Pressure') + ' ' + plainRound(v, 1) + ' ' + unitLabel(resultUnit('pressure'));
+	}
+
+	// ---- the panel's controls ---------------------------------------------
+	function profileNodeOptions() {
+		return doc.nodes.filter(profileNodeUsable).map(function (n) { return [n.id, n.id]; });
+	}
+	function rebuildProfileForm() {
+		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_profile_form'),
+			opts = profileNodeOptions(), row, lab, cb, chips, clr;
+		if (!box) { return; }
+		box.innerHTML = '';
+		findSelect(box, pc.lpn_profile_from || 'From', opts, profileState.from, function (v) {
+			profileState.from = v; renderProfile();
+		});
+		findSelect(box, pc.lpn_profile_to || 'To', opts, profileState.to, function (v) {
+			profileState.to = v; renderProfile();
+		});
+		// **ONE CHECKBOX IS THE WHOLE PATH EDITOR.** With it on, clicking a node on the map puts the
+		// route through that node, and clicking one already on the route takes it back out; with it
+		// off the map behaves exactly as it always does. There is no drag, no handle and no gesture
+		// to learn. If a richer editor is ever wanted it starts from a feature that already works.
+		row = document.createElement('div');
+		row.style.margin = '4px 0';
+		lab = document.createElement('label');
+		cb = document.createElement('input');
+		cb.type = 'checkbox';
+		cb.checked = !!profileState.pick;
+		cb.addEventListener('change', function () { profileState.pick = cb.checked; });
+		lab.appendChild(cb);
+		lab.appendChild(document.createTextNode(' ' + (pc.lpn_profile_pick || 'Click a node on the map to route through it')));
+		row.appendChild(lab);
+		box.appendChild(row);
+
+		chips = document.createElement('div');
+		chips.style.margin = '4px 0';
+		if (profileState.waypoints.length) {
+			chips.appendChild(document.createTextNode((pc.lpn_profile_through || 'Through') + ' '));
+			profileState.waypoints.forEach(function (id) {
+				var b = document.createElement('button');
+				b.type = 'button';
+				b.className = 'lpn-profile-chip';
+				b.textContent = id + ' ×';
+				b.addEventListener('click', function () { profileRemoveStop(id); });
+				chips.appendChild(b);
+			});
+			clr = document.createElement('button');
+			clr.type = 'button';
+			clr.textContent = pc.lpn_profile_clear || 'Clear';
+			clr.addEventListener('click', function () {
+				profileState.waypoints = []; rebuildProfileForm(); renderProfile();
+			});
+			chips.appendChild(clr);
+		}
+		box.appendChild(chips);
+	}
+	function profileRemoveStop(id) {
+		profileState.waypoints = profileState.waypoints.filter(function (w) { return w !== id; });
+		rebuildProfileForm(); renderProfile();
+	}
+	// A map click while the panel is picking. Returns true when it CONSUMED the click, so the
+	// property popup does not open on top of the drawing the user is building.
+	function profileClickNode(id) {
+		if (!profileIsOpen() || !profileState.pick || !id) { return false; }
+		if (!profileState.from) { profileState.from = id; }
+		else if (!profileState.to) { profileState.to = id; }
+		else if (profileState.waypoints.indexOf(id) >= 0) { profileRemoveStop(id); return true; }
+		else if (id === profileState.from || id === profileState.to) { return true; }
+		else {
+			profileState.waypoints = EngCalcs.lpnProfile.insertStop(
+				profileGraph(), profileStops(), id).slice(1, -1);
+		}
+		rebuildProfileForm(); renderProfile();
+		return true;
+	}
+
+	// ---- the drawing -------------------------------------------------------
+	//
+	// Plain SVG, built by hand in its own coordinate system: this is a CHART, and it shares no pan,
+	// zoom, symbol or style with the map.
+	var PROFILE_W = 560, PROFILE_H = 340,
+		PROFILE_BOX = { left: 58, top: 12, width: 486, height: 226 };
+	function profileText(parent, x, y, s, attrs) {
+		var t = el('text', attrs || {}, parent);
+		t.setAttribute('x', x); t.setAttribute('y', y);
+		t.appendChild(document.createTextNode(s));
+		return t;
+	}
+	function renderProfile() {
+		var pc = EngCalcs.pageConfig || {}, host = document.getElementById('lpn_profile_chart'),
+			note = document.getElementById('lpn_profile_note'),
+			path, data, series, values, yB, xB, box, svg, i;
+		if (!host) { return; }
+		host.innerHTML = '';
+		if (note) { note.textContent = ''; }
+		path = profilePath();
+		if (!path) {
+			if (note) {
+				note.textContent = (!profileState.from || !profileState.to)
+					? (pc.lpn_profile_choose || 'Choose a start node and an end node.')
+					: (pc.lpn_profile_no_path || 'These two nodes are not connected by any route.');
+			}
+			return;
+		}
+		data = profileData();
+		series = EngCalcs.lpnProfile.profileSeries(path, data);
+		values = [];
+		series.nodes.forEach(function (n) {
+			if (typeof n.ground === 'number') { values.push(n.ground); }
+			if (typeof n.head === 'number') { values.push(n.head); }
+		});
+		yB = EngCalcs.lpnProfile.axisBounds(values);
+		xB = EngCalcs.lpnProfile.stationBounds(series.length);
+		box = PROFILE_BOX;
+		svg = el('svg', { viewBox: '0 0 ' + PROFILE_W + ' ' + PROFILE_H, class: 'lpn-profile-svg' }, host);
+		function X(v) { return EngCalcs.lpnProfile.plotX(v, xB, box); }
+		function Y(v) { return EngCalcs.lpnProfile.plotY(v, yB, box); }
+
+		// The gridlines, and the reason the axis is rounded to a nice step at all: an axis truncated
+		// to the raw data would be labelled 690.4, 753.1, 815.8.
+		EngCalcs.lpnProfile.ticks(yB).forEach(function (v) {
+			el('line', { x1: box.left, y1: Y(v), x2: box.left + box.width, y2: Y(v), class: 'lpn-profile-grid' }, svg);
+			profileText(svg, box.left - 5, Y(v) + 3, String(plainRound(v, 2)), { class: 'lpn-profile-tick', 'text-anchor': 'end' });
+		});
+		EngCalcs.lpnProfile.ticks(xB).forEach(function (v) {
+			el('line', { x1: X(v), y1: box.top + box.height, x2: X(v), y2: box.top + box.height + 4, class: 'lpn-profile-axis' }, svg);
+			profileText(svg, X(v), box.top + box.height + 14, String(plainRound(v, 0)), { class: 'lpn-profile-tick', 'text-anchor': 'middle' });
+		});
+		el('rect', { x: box.left, y: box.top, width: box.width, height: box.height, class: 'lpn-profile-frame' }, svg);
+
+		// **THE PRESSURE IS THE GAP BETWEEN THE TWO LINES, so it is drawn as the gap** -- shaded
+		// where both lines exist and the grade line is unbroken, and nowhere else.
+		series.band.forEach(function (run) {
+			var pts = [];
+			for (i = 0; i < run.length; i++) { pts.push(X(run[i].x) + ',' + Y(run[i].head)); }
+			for (i = run.length - 1; i >= 0; i--) { pts.push(X(run[i].x) + ',' + Y(run[i].ground)); }
+			el('polygon', { points: pts.join(' '), class: 'lpn-profile-band' }, svg);
+		});
+		series.ground.forEach(function (run) {
+			el('polyline', { points: run.map(function (p) { return X(p.x) + ',' + Y(p.y); }).join(' '),
+				class: 'lpn-profile-ground' }, svg);
+		});
+		series.hgl.forEach(function (run) {
+			el('polyline', { points: run.map(function (p) { return X(p.x) + ',' + Y(p.y); }).join(' '),
+				class: 'lpn-profile-hgl' }, svg);
+		});
+
+		// The nodes along the bottom, every one named: the question a profile answers is "WHERE
+		// along this route does that happen", and a station with no name cannot answer it.
+		series.nodes.forEach(function (n) {
+			var x = X(n.station), t, ttl, parts, ptxt;
+			el('line', { x1: x, y1: box.top, x2: x, y2: box.top + box.height, class: 'lpn-profile-station' }, svg);
+			t = profileText(svg, 0, 0, n.id, { class: 'lpn-profile-nodeid', 'text-anchor': 'end' });
+			t.setAttribute('transform', 'translate(' + x + ',' + (box.top + box.height + 20) + ') rotate(-60)');
+			if (typeof n.ground === 'number') {
+				el('circle', { cx: x, cy: Y(n.ground), r: 2, class: 'lpn-profile-dot' }, svg);
+			}
+			// The hover text carries what the drawing cannot: the pressure, whose unit is not the
+			// axis's. A <title>, not a tooltip of our own -- it is the one every browser already has.
+			ttl = el('title', {}, svg);
+			parts = [n.id];
+			if (typeof n.ground === 'number') { parts.push(plainRound(n.ground, 2) + ' ' + unitLabel(resultUnit('elevhead'))); }
+			ptxt = profilePressureText(n.id);
+			if (ptxt) { parts.push(ptxt); }
+			ttl.appendChild(document.createTextNode(parts.join('   ')));
+		});
+
+		// Axis titles. The unit is SUBSTITUTED into the string rather than concatenated onto it, so
+		// a language that puts it somewhere else can.
+		profileText(svg, box.left + box.width / 2, PROFILE_H - 42,
+			String(pc.lpn_profile_axis_station || 'Distance along the path ({u})').replace('{u}', unitLabel('lpn_u_length')),
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' });
+		profileText(svg, 0, 0,
+			String(pc.lpn_profile_axis_elev || 'Elevation and head ({u})').replace('{u}', unitLabel(resultUnit('elevhead'))),
+			{ class: 'lpn-profile-axistitle', 'text-anchor': 'middle' })
+			.setAttribute('transform', 'translate(12,' + (box.top + box.height / 2) + ') rotate(-90)');
+
+		if (note) {
+			// **A PROFILE WITH NO SOLVE IS STILL A PROFILE.** The ground is the user's own typed
+			// numbers and is drawn whatever the solver did or did not manage; saying which half is
+			// missing beats an empty box.
+			note.textContent = series.hgl.length
+				? String(pc.lpn_profile_summary || '{n} nodes, {len} {u}')
+					.replace('{n}', String(series.nodes.length))
+					.replace('{len}', String(plainRound(series.length, 1)))
+					.replace('{u}', unitLabel('lpn_u_length'))
+				: (pc.lpn_profile_no_solve || 'No results yet, so only the ground line is drawn.');
+		}
+	}
 
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
 	// each is a whole sentence rather than "Mode:" + the tool's own label composed at render time.
@@ -9421,6 +9752,11 @@ var EngCalcs = EngCalcs || {};
 			// the menu-bar button it came from -- the popover then opens under "View", where the eye
 			// already is, rather than under a toolbar button that may not even be on screen.
 			{ icon: 'labels', label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } },
+			// The profile is a VIEW of the network (Task 409), not an edit of it, so it lives beside
+			// Labels rather than in Insert -- and it opens under the same menu-bar button for the
+			// same reason the label popover does.
+			{ icon: 'view', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
+				fn: function () { openProfilePopup(document.getElementById('lpn_menu_view')); } },
 			// HIDDEN OUTSIDE A GEOGRAPHIC PROJECT, not disabled: a grid project's x/y are canvas
 			// units with no place on the Earth, so there is no street map that could go behind one.
 			// The label states what the row will DO, because this menu has no checkmark column.
@@ -9790,6 +10126,7 @@ var EngCalcs = EngCalcs || {};
 		wirePointerEvents();
 		wirePopup();
 		wireFindPopup();
+		wireProfilePopup();
 		wireUnitGroups();
 		var opening = initLibrary();
 		if (opening) {
@@ -10602,6 +10939,11 @@ var EngCalcs = EngCalcs || {};
 				else if (t.classList.contains('lpn-vhandle')) { saveUndoSnapshot(); removeVertex(t.dataset.link, +t.dataset.vidx); }
 				else if (t.dataset.link !== undefined) { deleteElement('link', t.dataset.link); }
 				else if (t.dataset.lbl !== undefined) { deleteElement('label', t.dataset.lbl); }
+			} else if (mode === 'select' && t.dataset.node && profileClickNode(t.dataset.node)) {
+				// The profile panel is picking waypoints, and it took this click (Task 409). The
+				// property popup deliberately does NOT also open: the user is drawing a route, and
+				// a property sheet over the drawing is the opposite of what they asked for.
+				setSelection('node', t.dataset.node);
 			} else if (mode === 'select' && t.dataset.node) {
 				openPopup(t.dataset.node, e.clientX, e.clientY);
 			} else if (mode === 'select' && t.dataset.link !== undefined && !t.classList.contains('lpn-vhandle')) {
@@ -14801,6 +15143,7 @@ var EngCalcs = EngCalcs || {};
 				setStatus(result.issues.map(diagIssueText).join(' '));
 				refreshLabelText();
 				refreshValueColors();   // Task 384: the colours came from results that no longer exist
+				refreshProfileIfOpen(); // Task 409: and so did the grade line
 					return;
 			}
 			// Not one of lpnDiagnose()'s pre-solve codes -- this is the solver itself giving up, and
@@ -14809,6 +15152,7 @@ var EngCalcs = EngCalcs || {};
 			setStatus(pc.lpn_diag_not_converged || 'Did not converge.');
 			refreshLabelText();
 			refreshValueColors();
+			refreshProfileIfOpen();
 			return;
 		}
 		lastSolveResult = result;
@@ -14825,6 +15169,9 @@ var EngCalcs = EngCalcs || {};
 			.filter(function (t) { return !!t; }).join(' '));
 		refreshLabelText();
 		refreshValueColors();
+		// **WHERE THE LIVE PROFILE HANGS** (Task 409). Every solve ends here, and every edit
+		// schedules a solve, so the profile follows the document without a listener of its own.
+		refreshProfileIfOpen();
 	}
 
 	// EPANET path. Async, so it needs a guard the synchronous path never did: this page solves
@@ -14882,6 +15229,9 @@ var EngCalcs = EngCalcs || {};
 		// persist -- otherwise closing the tab would lose which units the numbers are in.
 		saveToStorage();
 		refreshPopupIfOpen();
+		// The profile's axes carry their units in their titles and its stations are in the length
+		// unit, so a switch has to redraw it for exactly the reason the popup is rebuilt.
+		refreshProfileIfOpen();
 		refreshLabelText();
 		// The Default inputs rows show their value in the CURRENT display unit and put that unit in
 		// their label, so a unit switch has to re-render them for the same reason the open popup
