@@ -32,6 +32,18 @@ exports.run = async function ({ browser, report }) {
 		report.ok(tabs[0].current, 'and it is the current tab');
 		report.has(tabs[0].title, 'Not saved to a file', 'a project with no file says so');
 
+		// **THE FIRST PROJECT ARRIVES WEARING AN ASTERISK, AND SHOULD NOT.** Not asserted here,
+		// because it is a defect in the page rather than in this spec and a knowingly-red check
+		// trains people to ignore red — but it is written down here because it makes every
+		// "the tab is dirty after an edit" check in this suite unfalsifiable on a first-visit
+		// project, and two of them were exactly that until Task 414.
+		//
+		// Measured: `lpn_index` is written at boot with a `savedSig` and no `dirty`, and within
+		// ~200ms, with no user action at all, the first autosave finds a different signature and
+		// sets `dirty: true` for good. boot() stamps the baseline inline (js/looped-network.js,
+		// "AND IT IS BORN CLEAN") and THEN runs seedDefaultInputs(), which fills settings.defaults —
+		// which docSignature() covers. It is Tom's 2026-08-15 "the initial project gets an
+		// unwarranted asterisk" with the stamp moved but still too early.
 		report.ok(await a.banner() === null, 'no banner on a clean first load',
 			'a page that greets a first-time visitor with a warning is worse than one that greets them with a worked example');
 

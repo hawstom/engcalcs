@@ -11,7 +11,9 @@ const { pageUrl } = require('../lib/env');
 exports.title = '11. The fallback path — a browser with no File System Access API';
 
 exports.run = async function ({ browser, report }) {
-	const context = await browser.newContext({ acceptDownloads: true });
+	// Same window size as Session.open() gives every other profile, and for the same reason: the
+	// consent banner is fixed to the bottom of the window and a short one puts it over the map.
+	const context = await browser.newContext({ acceptDownloads: true, viewport: Session.VIEWPORT });
 	// Before any page script runs, so the page has never seen the API. Deleting it later would leave
 	// whatever the page had already decided about itself.
 	await context.addInitScript(() => {
@@ -35,8 +37,12 @@ exports.run = async function ({ browser, report }) {
 			'a Save that quietly produced a download would be the command doing something other than its name');
 		report.ok(!by('Save as…').disabled, 'Save as… is enabled — it is the only way out, so it must be');
 
-		await a.drawExample();
-		report.ok(await a.currentTabDirty(), 'an edited project wears its asterisk');
+		await a.makeEdit();
+		// The faint asterisk, not merely "an" asterisk: a first visit's project arrives dirty before
+		// anything is edited (see specs/boot.js), so "it wears one after an edit" cannot fail here.
+		// Which one it wears can: faint means the work lives only in the browser.
+		const star = await a.currentTabStar();
+		report.ok(star && star.faded, 'an edited project wears the faint, browser-only asterisk', JSON.stringify(star));
 
 		// Save as here is a download. The page cannot write back to it, and says so — but the work IS
 		// in a file the user now has, and that is the fact the asterisk was refusing to admit
@@ -50,7 +56,7 @@ exports.run = async function ({ browser, report }) {
 			'and the asterisk CLEARS — the work is in a copy the user has',
 			'finding 13: it used to stay lit forever, because a fallback project can never be a "file project"');
 
-		await a.drawExample();
+		await a.makeEdit();
 		report.ok(await a.currentTabDirty(), 'a further edit lights it again — it tracks changes, it is not just switched off');
 
 		report.ok(await a.banner() === null, 'no lock banner ever appears on this path');

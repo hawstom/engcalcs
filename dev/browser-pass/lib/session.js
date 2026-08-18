@@ -22,8 +22,17 @@ class Session {
 		this._confirmAnswer = true;    // what the next confirm() should answer
 	}
 
+	// **A TALL WINDOW, and it is load-bearing rather than cosmetic.** The consent banner is
+	// `position: fixed; bottom: 0` and every session here is a fresh profile that has never answered
+	// it, so in a default 720-high window it lies across the map — and the map slides further under
+	// it every time a lock banner appears above. Clicks meant for the canvas then land on the banner
+	// and nothing happens, silently. Nothing is stubbed or hidden to fix that: the window is simply
+	// big enough for the page it is showing, which is also the window this page is designed for
+	// (a full-window drawing surface; see CLAUDE.md on not reasoning about it from a phone).
+	static VIEWPORT = { width: 1400, height: 1200 };
+
 	static async open(browser, name) {
-		const context = await browser.newContext();
+		const context = await browser.newContext({ viewport: Session.VIEWPORT });
 		await context.addInitScript(INIT_SCRIPT);
 		const page = await context.newPage();
 		const s = new Session(context, page, name);
@@ -65,30 +74,60 @@ class Session {
 	// Every row as the user sees it: its label, and whether it is greyed. Save all being PRESENT but
 	// disabled is a different fact from Save all being absent, and Tom read the second as a missing
 	// feature — so the pass has to be able to tell them apart.
+	// The label is what the row SAYS, with the fly-out arrow reported separately: "▸" is not part of
+	// any row's name, it is the mark that the row leads somewhere, and folding it into the text makes
+	// every spec that names the row carry a glyph it does not mean.
 	async menuRows(which = 'file') {
 		await this.openMenu(which);
 		const rows = await this.page.$$eval('#lpn_menu_list button.lpn-menu-row',
-			(els) => els.map(e => ({ label: e.textContent.trim(), disabled: e.disabled })));
+			(els) => els.map(e => {
+				const arrow = e.querySelector('.lpn-menu-arrow');
+				return {
+					label: (arrow ? e.textContent.replace(arrow.textContent, '') : e.textContent).trim(),
+					disabled: e.disabled,
+					submenu: !!arrow
+				};
+			}));
 		await this.closeMenu();
 		return rows;
 	}
 	async menuClick(label, which = 'file') {
 		await this.openMenu(which);
-		const rows = await this.page.$$('#lpn_menu_list button.lpn-menu-row');
+		await this._clickRow('#lpn_menu_list', label);
+		await this.settle();
+	}
+	// A row in the FLY-OUT (Task 264): "New project…" opens a second popup beside the first, and the
+	// command is in there. Two clicks in the page, one sentence in a spec.
+	async menuClickSub(parent, child, which = 'file') {
+		await this.openMenu(which);
+		await this._clickRow('#lpn_menu_list', parent);
+		await this.page.waitForSelector('#lpn_menu_popup2', { state: 'visible' });
+		await this._clickRow('#lpn_menu_list2', child);
+		await this.settle();
+	}
+	async _clickRow(listSel, label) {
+		const rows = await this.page.$$(`${listSel} button.lpn-menu-row`);
+		const seen = [];
 		for (const r of rows) {
-			if ((await r.textContent()).trim() === label) {
+			const text = (await r.evaluate((e) => {
+				const arrow = e.querySelector('.lpn-menu-arrow');
+				return (arrow ? e.textContent.replace(arrow.textContent, '') : e.textContent).trim();
+			}));
+			seen.push(text);
+			if (text === label) {
 				if (await r.isDisabled()) { throw new Error(`${this.name}: menu row "${label}" is disabled`); }
 				await r.click();
-				await this.settle();
 				return;
 			}
 		}
-		throw new Error(`${this.name}: no menu row "${label}"`);
+		throw new Error(`${this.name}: no menu row "${label}" in ${listSel} — rows are ${JSON.stringify(seen)}`);
 	}
 	async closeMenu() {
 		await this.page.evaluate(() => {
-			const p = document.getElementById('lpn_menu_popup');
-			if (p) { p.style.display = 'none'; }
+			['lpn_menu_popup', 'lpn_menu_popup2'].forEach((id) => {
+				const p = document.getElementById(id);
+				if (p) { p.style.display = 'none'; }
+			});
 		});
 	}
 
@@ -118,6 +157,9 @@ class Session {
 			label: (e.querySelector('.lpn-tab-name') || {}).textContent || '',
 			current: e.classList.contains('lpn-tab-current'),
 			star: !!e.querySelector('.lpn-tab-star'),
+			// A faint asterisk means "this project lives only in the browser"; a full-strength one
+			// means "there are changes the file does not have". Two different facts, one glyph.
+			faded: !!e.querySelector('.lpn-tab-star-faint'),
 			title: (e.querySelector('.lpn-tab-name') || {}).title || ''
 		})));
 	}
@@ -216,25 +258,105 @@ class Session {
 	}
 
 	// ---- editing the network ----------------------------------------------
-	// Enough of a change to make the project dirty and worth saving, without depending on the map's
-	// pointer geometry: the page's own example network is one toolbar click, is what a user would
-	// actually draw, and goes through the same edit path as drawing by hand.
-	async drawExample() {
-		const btns = await this.page.$$('#lpn_toolbar button');
-		for (const b of btns) {
-			if ((await b.textContent()).trim() === 'Draw example network') {
-				await b.click();
-				await this.settle(600);   // it schedules a solve
-				return;
+	// **The one thing every spec below needs: an edit made, no file written, this tab dirty.** It was
+	// the "Draw example network" toolbar button until Task 264 retired it, and the substitute is a
+	// judgement rather than a rename, because the two flows examples moved to are neither of them
+	// this:
+	//   * File ▸ Open example… lands a project that is SAVED (stampProjectSaved) in a NEW tab — no
+	//     asterisk, and a tab count every spec here measures;
+	//   * File ▸ New project… ▸ Blank project makes an empty, clean tab, which is `newProject()` below
+	//     and is a different sentence.
+	// So the substitute is the other thing the retired button was: one ordinary edit to the project
+	// in front of you. Placing a junction is the smallest such edit a user can make, it goes through
+	// the same addNode/undo/autosave path as any drawing, and it leaves the tab exactly as the button
+	// did.
+	//
+	// It VERIFIES that the node landed. The old helper threw when its button vanished, which is why
+	// Task 264 was noticed at all; this one can fail more quietly — a click that hits the examples
+	// gallery, or lands within NODE_SNAP_PX of a node already there, silently makes no edit and every
+	// assertion after it would then be about an unchanged project.
+	async makeEdit() {
+		await this.dismissGallery();
+		await this.toolbarClick('Junction');
+		const before = await this.nodeCount();
+		// **A CLEAR SPOT, MEASURED, not a counter**, and clear in both of the ways a spot can fail to
+		// be:
+		//   * something is ON TOP of the map there — the consent banner along the bottom of a fresh
+		//     profile's window is the one that bites, and the map moves under it whenever a lock
+		//     banner appears, so no fixed point is safe;
+		//   * a node is already within NODE_SNAP_PX (14), where the page deliberately opens that node
+		//     instead of placing one (the fat-finger rule) — and a profile that OPENED somebody
+		//     else's file inherits their nodes at their coordinates, which no counter here can know.
+		// Both are silent from out here, which is why the point is chosen by asking the page what is
+		// actually at it rather than by arithmetic.
+		const spot = await this.page.evaluate(() => {
+			const canvas = document.getElementById('lpn_canvas');
+			const r = canvas.getBoundingClientRect();
+			const taken = Array.from(canvas.querySelectorAll('.lpn-symbols > *'))
+				.map(e => e.getBoundingClientRect())
+				.map(b => ({ x: b.x + b.width / 2, y: b.y + b.height / 2 }));
+			for (let row = 0; row < 3; row++) {
+				for (let col = 0; col < 9; col++) {
+					const p = { x: r.x + r.width * (0.1 + col * 0.1), y: r.y + r.height * (0.25 + row * 0.25) };
+					if (!taken.every(t => Math.hypot(t.x - p.x, t.y - p.y) > 40)) { continue; }
+					const hit = document.elementFromPoint(p.x, p.y);
+					if (hit && canvas.contains(hit)) { return p; }
+				}
 			}
+			return null;
+		});
+		if (!spot) { throw new Error(`${this.name}: no clear spot left on the canvas to place a node`); }
+		await this.page.mouse.click(spot.x, spot.y);
+		await this.settle(400);   // it schedules a solve
+		// Back to Select, so a later click meant for something else cannot place a node.
+		await this.toolbarClick('Select');
+		const after = await this.nodeCount();
+		if (after <= before) {
+			throw new Error(`${this.name}: the edit did not land — ${before} nodes before, ${after} after`);
 		}
-		throw new Error(`${this.name}: no "Draw example network" button in the toolbar`);
+	}
+	// How many elements the map is drawing. Read from the DOM rather than the page's own `doc`, which
+	// is inside a closure — and the DOM is what the user is looking at anyway.
+	async nodeCount() {
+		return this.page.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-symbols > *').length);
+	}
+	async toolbarClick(label) {
+		const btns = await this.page.$$('#lpn_toolbar button');
+		const seen = [];
+		for (const b of btns) {
+			const t = (await b.textContent()).trim();
+			seen.push(t);
+			if (t === label) { await b.click(); return; }
+		}
+		throw new Error(`${this.name}: no "${label}" button in the toolbar — it holds ${JSON.stringify(seen)}`);
+	}
+	// The examples gallery covers an empty canvas, and its panel takes pointer events back from the
+	// transparent wrapper — so a click meant for the map lands on the wall. Waved away the way a user
+	// waves it away: the button that says so. Harmless when it is not showing.
+	async dismissGallery() {
+		const showing = await this.page.$eval('#lpn_empty_hint', (e) => e.style.display !== 'none').catch(() => false);
+		if (!showing) { return; }
+		const btn = await this.page.$('#lpn_examples_pane button.lpn-examples-blank');
+		if (btn) { await btn.click(); await this.settle(200); }
+	}
+	// File ▸ New project… ▸ Blank project — the act the single "New project" row used to be before
+	// Task 264 turned it into a fly-out of templates. US units unless a spec says otherwise, because
+	// a project's units are the project's since Task 263 and a spec should not inherit whatever the
+	// strip happened to hold.
+	async newProject(system = 'us') {
+		const label = system === 'si' ? 'Blank project, SI units (l/s)' : 'Blank project, US units (gpm)';
+		await this.menuClickSub('New project…', label);
 	}
 	// Is this project marked as having unsaved changes? The asterisk on its tab is the whole
 	// convention, so the pass reads exactly what the user reads.
 	async currentTabDirty() {
 		const t = (await this.tabs()).find(x => x.current);
 		return !!(t && t.star);
+	}
+	// `null` when there is no asterisk, otherwise which one it is.
+	async currentTabStar() {
+		const t = (await this.tabs()).find(x => x.current);
+		return (t && t.star) ? { faded: t.faded } : null;
 	}
 
 	async close() { await this.context.close(); }

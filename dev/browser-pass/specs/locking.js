@@ -13,12 +13,12 @@ const { Session, Share } = require('../lib/session');
 
 exports.title = '6 & 7. Locking, read-only, and the freshness guarantee, across two profiles';
 
-const FILE = 'Shared-lpn-hawsedc-engcalcs.json';
+const FILE = 'Shared-lpn.json';
 
 // Get a session to the point of having FILE saved and its identity established.
 async function saveNewFile(s, initials) {
 	await s.goto();
-	await s.drawExample();
+	await s.makeEdit();
 	await s.queuePick(FILE);
 	await s.menuClick('Save');
 	await s.answerTrainingPanel(initials);
@@ -36,7 +36,7 @@ exports.run = async function ({ browser, report }) {
 
 		// B needs an identity before it may touch a file at all, and gets it the same way A did.
 		await b.goto();
-		await b.queuePick('B-scratch-lpn-hawsedc-engcalcs.json');
+		await b.queuePick('B-scratch-lpn.json');
 		await b.menuClick('Save');
 		await b.answerTrainingPanel('BBB');
 		await b.settle(400);
@@ -66,7 +66,7 @@ exports.run = async function ({ browser, report }) {
 		const saveRow = rows.find(r => r.label === 'Save');
 		report.ok(saveRow && saveRow.disabled, 'Save is DISABLED in B — it does not silently become Save as');
 
-		await b.drawExample();
+		await b.makeEdit();
 		report.ok(await b.currentTabDirty(), 'B can still edit anything it likes — only the file is off limits');
 		report.eq(b.errors.length, 0, 'and editing read-only raises no errors');
 
@@ -102,9 +102,9 @@ exports.run = async function ({ browser, report }) {
 		report.eq(share.files.get(FILE), await a.readFile(FILE), 'B has written nothing to A\'s file');
 
 		// --- B saves its own copy ----------------------------------------------
-		await b.queuePick('B-copy-lpn-hawsedc-engcalcs.json');
+		await b.queuePick('B-copy-lpn.json');
 		await b.menuClick('Save as…');
-		const bCopy = JSON.parse(await b.readFile('B-copy-lpn-hawsedc-engcalcs.json'));
+		const bCopy = JSON.parse(await b.readFile('B-copy-lpn.json'));
 		const aDoc = JSON.parse(await a.readFile(FILE));
 		report.ok(!!bCopy, 'Save as… works from read-only');
 		report.ok(bCopy.project.docId !== aDoc.project.docId, 'and the copy has a docId of its own');
@@ -118,14 +118,14 @@ exports.run = async function ({ browser, report }) {
 		await b.dialogClick('Break their lock');
 		report.ok(await b.banner() === null, 'after breaking the lock B is editable');
 
-		await b.drawExample();
+		await b.makeEdit();
 		await b.menuClick('Save');
 		const bSaved = JSON.parse(await b.readFile(FILE));
 		report.ok(bSaved.project.name !== undefined, 'B saves over the file it took');
 
 		// A now holds a lock it lost and a file that has moved on. THIS is the case that matters.
 		await share.sync(b, a);
-		await a.drawExample();
+		await a.makeEdit();
 		await a.menuClick('Save');
 		const aBanner = await a.waitBanner();
 		report.ok(!!aBanner, 'A is stopped when it tries to save over B');
