@@ -82,6 +82,9 @@
 #                  ONLY (an analytics READ still needs consent), so the denominator for any repeat
 #                  rate is the consented rows, never all of them.
 #        lpn       detail = 'first:<example|element|backdrop|import>' or 'diag:<code>'.
+#        share     the share control under the Printable Title was used; detail = 'copy' (the
+#                  clipboard took the link) or 'manual' (no clipboard, so the link was shown to be
+#                  copied by hand). Says the control was USED — never that anyone opened the link.
 #      DEDUPED PER PAGE LOAD, IN THE PAGE'S OWN MEMORY — not per visit like the logs above, whose
 #      ec_seen digit is full at five bits (the consent banner promises "a single digit per page").
 #      So a visitor who reloads and clicks the same reference twice is two rows. Compare these
@@ -562,6 +565,34 @@ fi
 echo ""
 echo "--- Diagnostics met ---"
 awk -F'\t' '$5 == "lpn" && $6 ~ /^diag:/ {print $6}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn
+echo ""
+echo "=== Sharing a calculation (Task 228) ==="
+echo "    The control sits under the Printable Title, so the honest denominator is the people who"
+echo "    typed one -- naming a calculation is the declared intent this exists to serve. Both counts"
+echo "    below come from the consented bucket, so they are comparable with each other."
+echo "    'copy' means the clipboard took the link; 'manual' means the browser had no clipboard here"
+echo "    and the link was shown to be copied by hand. A large manual share is a browser-support"
+echo "    fact, not a failure -- but it is the number that says whether the fallback is load-bearing."
+echo "    NOT MEASURED, and cannot be from here: whether anybody opened a shared link. A shared URL"
+echo "    lands as an ordinary page view with a query string, and telling those apart would mean"
+echo "    storing something new."
+echo ""
+echo "--- Share control used ---"
+awk -F'\t' '$5 == "share" {print $6}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn
+SHARES=$(awk -F'\t' '$5 == "share"' "$SIGNAL_LOG" | wc -l)
+if [ -f "$TITLE_LOG" ]; then
+    NAMED=$(awk -F'\t' '$5 == "title"' "$TITLE_LOG" | wc -l)
+    if [ "$NAMED" -gt 0 ]; then
+        echo ""
+        printf "    %-32s %10d\n" "named a calculation" "$NAMED"
+        printf "    %-32s %10d\n" "  of those, shared it" "$SHARES"
+        echo "    The title rows are deduped per (visit, page, field) and these are deduped per page"
+        echo "    load, so read this as an order of magnitude, not a rate."
+    fi
+fi
+echo ""
+echo "--- Share control, by page ---"
+awk -F'\t' '$5 == "share" {print $2}' "$SIGNAL_LOG" | sort | uniq -c | sort -rn
 echo ""
 echo "--- Most recent 10 signal rows ---"
 tail -10 "$RAW_SIGNAL_LOG"

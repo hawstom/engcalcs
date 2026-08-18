@@ -319,7 +319,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // The four beacons above count PEOPLE. These count what those people then did: which reference
 // they went looking for, whether they touched the form at all, which units they landed on, whether
 // they had been here before, and where the map interface loses them. See lib/config.inc.php for
-// the five events and what each one decides.
+// the six events and what each one decides.
 //
 // DEDUPED IN THIS PAGE'S MEMORY AND NOWHERE ELSE. The other beacons dedupe per (visit, page)
 // against the ec_seen cookie, whose five bits are full: a sixth would make it two base-32 digits
@@ -518,6 +518,67 @@ document.addEventListener('DOMContentLoaded', function () {
 		this.classList.remove('is-invalid');
 		EngCalcs.updateUrl();
 	});
+});
+
+// ---- Share this calculation (ROADMAP Task 228) ----
+//
+// The control sits under the Printable Title (lib/Calculators.lib.php) because naming a
+// calculation is the moment somebody means to show it to another person. The link itself is
+// whatever updateUrl() has already put in the address bar: the whole form, plus the name.
+//
+// NEVER A SILENT FAILURE. navigator.clipboard is absent over plain http, in older browsers, and
+// inside some embedded views, and writeText() can reject even where it exists (permission, or a
+// call the browser does not consider user-initiated). Every one of those falls back to showing
+// the link, selected, so the visitor copies it themselves -- a control that looks like it worked
+// and did not is worse than one that says "copy this".
+//
+// Returns a promise so the harness can wait for the clipboard's own answer rather than for a
+// stub's; nothing in the page uses the return value.
+EngCalcs.copyShareLink = function () {
+	'use strict';
+	var btn = document.getElementById('ec_share_btn');
+	if (!btn) return Promise.resolve();
+	var status = document.getElementById('ec_share_status');
+	var box = document.getElementById('ec_share_url');
+	var self = this;
+	// Refreshed first so the link carries the form as it stands. A context with no History API
+	// cannot maintain the URL at all, so there is nothing to refresh and location.href is still
+	// the honest answer.
+	if (typeof this.updateUrl === 'function' && window.history && window.history.replaceState) {
+		this.updateUrl();
+	}
+	var url = window.location.href;
+	function manual() {
+		if (box) {
+			box.value = url;
+			box.hidden = false;
+			box.focus();
+			box.select();
+		}
+		if (status) status.textContent = (btn.dataset && btn.dataset.manual) || '';
+		self.logSignal('share', 'manual');
+	}
+	function copied() {
+		if (box) box.hidden = true;
+		if (status) status.textContent = (btn.dataset && btn.dataset.copied) || '';
+		self.logSignal('share', 'copy');
+	}
+	var clip = navigator.clipboard;
+	if (!clip || typeof clip.writeText !== 'function') {
+		manual();
+		return Promise.resolve();
+	}
+	try {
+		return Promise.resolve(clip.writeText(url)).then(copied, manual);
+	} catch (e) {
+		manual();
+		return Promise.resolve();
+	}
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+	var btn = document.getElementById('ec_share_btn');
+	if (btn) btn.addEventListener('click', function () { EngCalcs.copyShareLink(); });
 });
 
 EngCalcs.calcAndSave = function (objForm) {

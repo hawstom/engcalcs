@@ -127,7 +127,7 @@ page false**, not merely add a line to it.
 | `HUMAN_VIEW_LOG` | page, language, timestamp | Same |
 | `CALC_USAGE_LOG` | page, language, timestamp | Same |
 | `TITLE_LOG` | page title event | Same |
-| `SIGNAL_LOG` | page, language, event, short slug (a link's host+path, a unit token, a diagnostic code) | Same. The outbound row names a page we linked to, never anything the visitor typed |
+| `SIGNAL_LOG` | page, language, event, short slug (a link's host+path, a unit token, a diagnostic code, a share outcome) | Same. The outbound row names a page we linked to, never anything the visitor typed |
 | `CONTACT_SEND_LOG` + `formmail.php` | **name, email, message** | **Yes** |
 | `lpn-locks/*.json` | project id, **holder name/initials**, timestamps | **Yes, if initials identify a colleague** |
 
