@@ -24,8 +24,10 @@ exports.run = async function ({ browser, report }) {
 				selects: [...x.querySelectorAll('select')].map(s => s.name) })));
 
 		report.eq(strip.length, 2, 'the strip is two labelled groups');
-		report.ok(/enter/i.test(strip[0].head) && /answer/i.test(strip[1].head),
-			'...one for what you enter, one for the answers', strip.map(g => g.head).join(' | '));
+		// Matched on INPUT/RESULT rather than on the sentence, so the wording can be improved without
+		// the spec objecting -- it did, the day the headings became "Input units" / "Results units".
+		report.ok(/input/i.test(strip[0].head) && /result/i.test(strip[1].head),
+			'...one for the inputs, one for the results', strip.map(g => g.head).join(' | '));
 		// The three quantities that serve both sides appear on BOTH rows. That duplication is the
 		// whole shape of the task, so it is asserted rather than left to the eye.
 		['lpn_u_elevhead', 'lpn_u_pressure', 'lpn_u_flow'].forEach((n) => {

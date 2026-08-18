@@ -391,7 +391,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     we could offer that."*
   - **Flow direction arrows stay.** epanet-js has none; Tom: *"I like that we do."* Recorded so a
     future tidy-up does not quietly remove them in the name of matching.
-- 25|284| **Settings panel: an index pane on the left, content on the right, nothing collapsing.**
+- 60|284| **Settings panel: an index pane on the left, content on the right, nothing collapsing.**
+  **RAISED 25 -> 60 (Tom, 2026-08-18): everything EPANET keeps in View > Options and Project >
+  Defaults belongs under our Settings, in this two-pane index paradigm, replacing the collapse
+  paradigm entirely.** *"No need ever to collapse; just scroll/jump to your section."* That makes
+  this the container Time analysis needs, not a tidy-up. See Task 434 for the three-pane frame it
+  sits in.
   Tom, 2026-08-11, from epanet-js: *"the Settings box has a left 'index' pane and a right 'content'
   pane. When you click a heading in the left pane, the right pane scrolls to your desired heading.
   And the right pane never collapses. This is a very conventional web paradigm."*
@@ -560,6 +565,95 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     describe the gate as one (`dev/positioning.md` §6). Tom, 2026-08-14: *"we have no less technical
     authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
     all public domain."*
+- 75|434| **THREE PANES AND A TOGGLE FOR EACH, which is the shape every reader expects.** Tom,
+  2026-08-18, describing epanet-js: a LEFT pane (network review), a RIGHT pane (asset + map
+  visibility/style tabs), and a **resizable BOTTOM pane** carrying tabs — the profile and tabular
+  editors for Junctions, Pipes, Pumps, Valves with every column sortable. Toggle buttons for the
+  three sit at the right edge of the toolbar, beside a goto-by-ID search.
+  - **This is the frame Tasks 284, 427, 433 and 146.04 all keep reaching for separately.** Decide it
+    once, or each of them invents a different container.
+  - Our Find already IS the goto search (Task 420); what is missing is its place on that strip.
+  - Tom on EPANET's own arrangement, as the thing NOT to copy: settings split among View > Options,
+    Project > Defaults and View > Legend > Modify, "have always been confusing".
+
+- 60|433| **Profile: fit and finish.** Tom, 2026-08-18: *"Amazing. Now we just need a good UI."* The
+  drawing is right (Task 409); what is missing is everything around it.
+  - **The path is not shown on the map.** That is the first thing to fix — a route you cannot see is
+    a route you cannot check.
+  - **The chooser should be the Google Maps gesture EPANET uses:** click the starting node, hover
+    along the path, click to add a waypoint, double-click to end. Not two pull-downs.
+  - **It is too small** — a proof of concept. It belongs in the resizable bottom pane of Task 434,
+    above the bottom bar, reached from a toolbar button.
+
+- 55|427| **Colour by value: one dropdown is not the idiom.** Tom, 2026-08-18: he sees the beauty of
+  one control, "but it's not the expectation". EPANET and epanet-js both give NODES and LINKS a
+  dropdown each, in a right-side pane.
+  - **And once a field is chosen the picker is poorly documented** for anyone who opens the project
+    later. Candidate home: the bottom of the map, rightward, under or replacing the legend title.
+  - **Clicking the LEGEND should open Settings > Color by value.** The legend is where a reader is
+    already looking when they want to change it.
+
+- 50|429| **A ramp picker and a ranges picker, EPANET's shape.** Tom, 2026-08-18, on what he wants
+  next: a **Ramp** dropdown of dozens of single-line ramps in two categories, Continuous and
+  Divergent; above it a single **Ranges** dropdown choosing among 5 calculation modes and a number of
+  breaks, reading closed as e.g. `Ranges: 7 Pretty breaks`.
+  - *"If Classes isn't standard, I would call it Breaks, Tiers, or Quantity, and I would list it
+    first on the closed dropdown."*
+  - epanet-js also offers a single Label per symbology; **our Labels model is better and stays.**
+
+- 50|428| **Thematic mode must not hide TEXT.** Tom, 2026-08-18: *"Turning off Text on 'no labels' is
+  unexpected."* A Text object is a note the user placed, not a generated label, and the two are
+  already different things everywhere else (Tasks 342, 407).
+  - **And the right home for a blanket hide is the Labels box, as "Temporarily hide all"** — which
+    would leave Text visible, because Text is not a label. Unticking every field there is already an
+    adequate interface; the thematic mode should not be a second one.
+
+- 50|425| **The unit-change question, in Tom's own words.** He rewrote it 2026-08-18; use this
+  wording rather than paraphrasing it, and add the CANCEL the first cut lacked.
+  - Title: *This unit decides what your inputs mean*. Then *cfs is the unit of what you enter for*
+    and the field names **one per line**, not a comma list.
+  - Then *Options for units change*: **Non-destructive** — leaves every input as it is and
+    reinterprets it in the new unit. **Destructive** — rewrites every input with a mathematical
+    conversion so the physical characteristics of the network stay very close to the same within
+    conversion tolerances; loses the original inputs.
+  - Buttons: **Non-destructive · Destructive · Cancel**.
+  - **Open, and worth doing:** back the original inputs up before a Destructive change, or offer to.
+    An undo snapshot is already taken; whether that is enough is the question.
+
+- 45|426| **The SI and US preset buttons give no clue what they do.** Tom, 2026-08-18. They change
+  every unit at once, which under Task 422's rule is a reinterpretation of the whole document. Label
+  them *Non-destructive (doesn't rewrite inputs)* — or whatever wording Task 425 settles on, so the
+  two agree.
+
+- 45|424| **The units strip is too wide.** Tom, 2026-08-18: wrap each selector onto two lines (label
+  above control) plus the group heading, to hold the Settings box to a sensible width.
+  - He notes the current width *"reminds me of the two-pane paradigm"* — which is Task 284, and is
+    the direction he wants anyway; this is the narrow version until that lands.
+
+- 40|430| **`.inp` export converts inputs it may not need to.** Tom, 2026-08-18: *"A round trip
+  survives to very close results. Not identical... I notice that the inputs have been converted.
+  Maybe that doesn't need to happen."*
+  - The writer passes a value through untouched only when the project's unit and the file's unit have
+    the SAME FACTOR; otherwise it converts and says so. So a project working in units the file's flow
+    keyword does not name gets arithmetic it might not need.
+  - **Look at whether the file's own unit system can follow the PROJECT** rather than the project
+    being converted into a fixed one — `[OPTIONS] Units` has ten keywords and the project may already
+    be in one of them. Byte-identity is already proven for a file re-exported in its own units
+    (Task 281); this is about the other case.
+
+- 40|432| **A window scrollbar should not exist on this page.** Tom, 2026-08-18: *"Our bottom controls
+  bar should be the hard bottom of the page."* The map is a full-window drawing surface; anything
+  that scrolls the WINDOW moves the whole application.
+
+- 35|431| **The examples gallery reappears when switching to an empty project tab.** Tom, 2026-08-18:
+  *"For some reason the gallery appears sometimes when I switch to an empty project tab."* It should
+  appear for a project that has never had content, not every time an empty one is focused —
+  `galleryDismissed` is per-page, not per-project, which is the likely cause.
+
+- 35|435| **The Labels panel's column headings sit too far right.** Tom, 2026-08-18: still misaligned
+  after the earlier pass. A CSS fix in `.lpn-labels-*`; the columns are the decimals, priority and
+  affix spinners.
+
 - 70|423| **WIRE THE PATTERN MODEL IN: the reading is built and nothing consumes it.** `js/lpn-patterns.js`
   and the `.inp` reader landed 2026-08-18 (Tasks 248.01/02/03 data model). Three edits make Net3
   match EPANET at t=0, and none of them could be made in the same pass because another track owned

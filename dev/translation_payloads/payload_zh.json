@@ -375,8 +375,8 @@
         "lpn_status_reinterpreted": "{n} values now mean {unit}. Nothing was rewritten.",
         "lpn_status_converted": "{n} values were rewritten into {unit}.",
         "lpn_tool_color_tip": "Colour the network by one value, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.",
-        "lpn_units_group_inputs": "Units of what you enter",
-        "lpn_units_group_results": "Units of the answers",
+        "lpn_units_group_inputs": "Input units",
+        "lpn_units_group_results": "Results units",
         "lpn_basemap_show": "Show street map",
         "lpn_basemap_hide": "Hide street map",
         "lpn_basemap_tip": "Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.",
@@ -450,8 +450,8 @@
         "lpn_status_reinterpreted": "{n} values now mean {unit}. Nothing was rewritten.",
         "lpn_status_converted": "{n} values were rewritten into {unit}.",
         "lpn_tool_color_tip": "Colour the network by one value, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.",
-        "lpn_units_group_inputs": "Units of what you enter",
-        "lpn_units_group_results": "Units of the answers",
+        "lpn_units_group_inputs": "Input units",
+        "lpn_units_group_results": "Results units",
         "lpn_basemap_show": "Show street map",
         "lpn_basemap_hide": "Hide street map",
         "lpn_basemap_tip": "Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.",
@@ -1677,5 +1677,8 @@
             }
         }
     },
-    "key_syn": []
+    "key_syn": {
+        "lpn_units_group_inputs": "Units of inputs, or Units of what you enter",
+        "lpn_units_group_results": "Units of results, or Units of the answers"
+    }
 }

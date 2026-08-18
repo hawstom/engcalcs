@@ -1276,8 +1276,15 @@ $ec_lang['lpn_status_converted']='{n} values were rewritten into {unit}.';
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
 $ec_lang['lpn_tool_color_tip']='Colour the network by one value, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.';
-$ec_lang['lpn_units_group_inputs']='Units of what you enter';
-$ec_lang['lpn_units_group_results']='Units of the answers';
+// **THE NATURAL ENGLISH GOES ON THE CONTROL; the ultra-simple rendering goes to the translator**
+// (Tom, 2026-08-18: *"'Input units' and 'Results units'... both more natural than the ultra simple
+// English you used. While I like that you are thinking simple for translators, this should go in
+// _syn and the more natural in English."*). That is the routing rule stated on a real case: simple
+// English is for when an English reader would stumble, and here one would not.
+$ec_lang['lpn_units_group_inputs']='Input units';
+$ec_lang_syn['lpn_units_group_inputs']='Units of inputs, or Units of what you enter';
+$ec_lang['lpn_units_group_results']='Results units';
+$ec_lang_syn['lpn_units_group_results']='Units of results, or Units of the answers';
 $ec_lang['lpn_units_length']='Length and map coordinates';
 $ec_lang_syn['lpn_units_length']='Pipe lengths and map coordinates';
 $ec_lang['lpn_units_elevhead']='Elevation and head';
