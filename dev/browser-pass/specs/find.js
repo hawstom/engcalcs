@@ -1,0 +1,107 @@
+// §10 — Find (ROADMAP Tasks 420 and 353), and the one thing no headless harness can check.
+//
+// WHY THIS IS A BROWSER SPEC AND NOT A HARNESS. `dev/lpn-spike/find-harness.js` proves the query is
+// right: the scopes, the conditions, the units, the re-resolution of a stale result. Every one of
+// those passed while the feature was, in Tom's words, *"in the menu, where I expected. But it
+// doesn't bring up anything."*
+//
+// The panel was built, populated and `display: block` — at its STATIC position, 1,200 px down the
+// document, because a `position: fixed` box whose `left`/`top` are never set does not stay where you
+// think it does. There is no layout in the stub, so no harness in this repo could have seen it, and
+// no assertion about the query could have been affected by it.
+//
+// **So what this spec checks is not the search. It is that the box is on the screen.** That is the
+// class of defect a browser pass exists for.
+
+const { Session } = require('../lib/session');
+
+exports.title = '10. Find';
+
+exports.run = async function ({ browser, report }) {
+	const a = await Session.open(browser, 'A');
+	try {
+		await a.goto();
+
+		const rows = await a.menuRows('edit');
+		report.ok(rows.some(r => r.label === 'Find'), 'Edit carries a Find row');
+
+		// Something to find. makeEdit() places one junction at a spot it has measured to be clear.
+		await a.makeEdit();
+
+		await a.menuClick('Find', 'edit');
+		const box = await a.page.evaluate(() => {
+			const p = document.getElementById('lpn_find_popup');
+			if (!p) { return null; }
+			const r = p.getBoundingClientRect();
+			return { shown: p.style.display === 'block', x: r.x, y: r.y, w: r.width, h: r.height,
+				vw: window.innerWidth, vh: window.innerHeight };
+		});
+		report.ok(box && box.shown, 'the panel opens');
+		// **THE ASSERTION THAT WOULD HAVE CAUGHT IT.** Not "is it displayed" — it always was — but
+		// "is it where a person can see it".
+		report.ok(box && box.x >= 0 && box.y >= 0 && box.x + box.w <= box.vw && box.y + box.h <= box.vh,
+			'...fully inside the window, not at some static position down the page',
+			box && JSON.stringify(box));
+		report.ok(box && box.w > 100 && box.h > 60, 'and it has real size', box && (box.w + 'x' + box.h));
+
+		// The three pull-downs and the value box are the whole control surface.
+		const controls = await a.page.evaluate(() => {
+			const p = document.getElementById('lpn_find_popup');
+			return {
+				selects: p.querySelectorAll('select').length,
+				texts: p.querySelectorAll('input[type=text]').length,
+				buttons: p.querySelectorAll('button').length
+			};
+		});
+		report.eq(controls.selects, 3, 'three pull-downs: what to search, which property, which condition');
+		report.eq(controls.texts, 1, 'one value box');
+		report.ok(controls.buttons >= 1, 'and a Find button');
+
+		// A search that hits: the junction's own ID. One hit goes straight there, so the assertion is
+		// that the element ends up SELECTED — the mark a user reads.
+		const found = await a.page.evaluate(() => {
+			const p = document.getElementById('lpn_find_popup');
+			const input = p.querySelector('input[type=text]');
+			const id = document.querySelector('#lpn_canvas [data-node]').dataset.node;
+			input.value = id;
+			input.dispatchEvent(new Event('input', { bubbles: true }));
+			p.querySelector('button').click();
+			return { id: id, selected: !!document.querySelector('#lpn_canvas .lpn-selected'),
+				results: p.querySelector('#lpn_find_results').textContent };
+		});
+		report.ok(found.selected, 'finding an ID selects that element on the map', found.id);
+		report.ok(/1/.test(found.results), '...and the panel says how many matched', found.results.trim());
+
+		// A search that misses says so rather than saying nothing.
+		const missed = await a.page.evaluate(() => {
+			const p = document.getElementById('lpn_find_popup');
+			const input = p.querySelector('input[type=text]');
+			input.value = 'NOSUCHTHING';
+			input.dispatchEvent(new Event('input', { bubbles: true }));
+			p.querySelector('button').click();
+			return p.querySelector('#lpn_find_results').textContent.trim();
+		});
+		report.eq(missed, '', 'a search that matches nothing leaves the list empty');
+
+		// **THE MENU ROW ALWAYS OPENS; IT NEVER TOGGLES, and that is correct rather than a gap.**
+		// Opening any menu closes every view popover (Tom, 2026-08-13: "When I click Settings then
+		// Labels, Labels opens beneath Settings. I expect Settings to close"), so by the time the row
+		// fires, the panel is already shut and the row's job is unambiguous. Toggling belongs to a
+		// TOOLBAR button, which is how Labels and Settings get theirs.
+		await a.menuClick('Find', 'edit');
+		const stillOpen = await a.page.evaluate(() =>
+			document.getElementById('lpn_find_popup').style.display === 'block');
+		report.ok(stillOpen, 'choosing the row again re-opens it rather than toggling it shut');
+
+		// Escape is how a pull-down goes away, and this is one.
+		await a.page.keyboard.press('Escape');
+		await a.settle(100);
+		const closed = await a.page.evaluate(() =>
+			document.getElementById('lpn_find_popup').style.display !== 'block');
+		report.ok(closed, 'Escape dismisses it, like every other pull-down on this page');
+
+		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
+	} finally {
+		await a.close();
+	}
+};

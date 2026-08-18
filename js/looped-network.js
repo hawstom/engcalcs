@@ -5603,24 +5603,36 @@ var EngCalcs = EngCalcs || {};
 		});
 		box.appendChild(list);
 	}
-	function toggleFindPopup(evt) {
-		var popup = document.getElementById('lpn_find_popup'), anchor;
+	// `anchorEl` is the CONTROL to hang the panel under -- the menu-bar item, passed in by the row
+	// that opens it.
+	//
+	// **IT CANNOT BE READ FROM openMenuAnchor, AND THAT COST A SHIPPED FEATURE.** A menu row's action
+	// runs after the menu has closed, and closeMenu() nulls openMenuAnchor -- so the first cut found
+	// no anchor, skipped the positioning, and left a `position: fixed` panel with no `left` or `top`
+	// at its STATIC position, 1,200 px down the document. It was display:block, fully built, and
+	// completely invisible. Tom, 2026-08-17: *"It's in the menu, where I expected. But it doesn't
+	// bring up anything."*
+	//
+	// So: the anchor is passed, and a missing anchor CENTRES the panel rather than leaving it
+	// unpositioned. There is no path out of this function that does not place the box.
+	function toggleFindPopup(anchorEl) {
+		var popup = document.getElementById('lpn_find_popup'), input;
 		if (!popup) { return; }
 		if (popup.style.display === 'block') { popup.style.display = 'none'; viewPopoverAnchor = null; return; }
-		// Read BEFORE closeMenu(), which nulls openMenuAnchor -- the menu bar item that opened the
-		// Edit menu is the only thing left to hang this panel on once the row itself is gone.
-		anchor = (evt && evt.currentTarget) || openMenuAnchor;
 		closeMenu();
 		closeViewPopovers('lpn_find_popup');
 		rebuildFindForm();
 		renderFindResults(null);
-		viewPopoverAnchor = anchor;
-		if (anchor && anchor.getBoundingClientRect) {
-			openPanelAtAnchor(popup, anchor.getBoundingClientRect());
+		viewPopoverAnchor = anchorEl || null;
+		if (anchorEl && anchorEl.getBoundingClientRect) {
+			openPanelAtAnchor(popup, anchorEl.getBoundingClientRect());
 		} else {
 			popup.style.display = 'block';
+			var h = fitPanelToViewport(popup), r = popup.getBoundingClientRect();
+			popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
+			popup.style.top = Math.max(POPUP_EDGE, (window.innerHeight - h) / 2) + 'px';
 		}
-		var input = popup.querySelector('input[type=text]');
+		input = popup.querySelector('input[type=text]');
 		if (input) { input.focus(); input.select(); }
 	}
 
@@ -9827,7 +9839,7 @@ var EngCalcs = EngCalcs || {};
 			// Find sits with Undo and Delete because it acts on the ELEMENTS, which is what this
 			// menu is about; View holds the things that change how the map is drawn. Every editor
 			// puts Find in Edit for the same reason.
-			{ icon: 'find', label: pc.lpn_find_menu || 'Find', fn: function () { toggleFindPopup(null); } },
+			{ icon: 'find', label: pc.lpn_find_menu || 'Find', fn: function () { toggleFindPopup(anchor); } },
 			{ separator: true },
 			// SUBJECT, THEN VERB (Task 415): with something selected this row deletes it, which is
 			// what Delete means in every editor. With nothing selected it still toggles the Delete
