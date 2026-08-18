@@ -930,3 +930,30 @@ html[lang="zh"] .ec-welcome {
    reads as one long list with three quantities inexplicably repeated. */
 .lpn-units-group { display: block; }
 .lpn-units-head { display: inline-block; min-width: 11em; font-weight: 600; opacity: .8; }
+
+/* ==== The profile view (ROADMAP Task 409) ====================================================
+   A chart, not a map: it shares no symbol, scale or colour rule with the drawing. The suite's
+   sketch convention applies all the same -- black for what is built, blue for water -- so the
+   ground is a black line, the hydraulic grade line is blue, and the pressure between them is the
+   same blue at low opacity. No shading, no borders beyond the axis frame, no dimension lines. */
+.lpn-profile-svg { width: 100%; height: auto; max-width: 36rem; }
+.lpn-profile-frame { fill: none; stroke: #333; stroke-width: 1; }
+.lpn-profile-grid { stroke: #ddd; stroke-width: 1; }
+.lpn-profile-axis { stroke: #333; stroke-width: 1; }
+/* The vertical hairline at each node. Lighter than a gridline: it says WHERE a node is without
+   competing with the two lines the drawing is about. */
+.lpn-profile-station { stroke: #eee; stroke-width: 1; }
+.lpn-profile-ground { fill: none; stroke: #000; stroke-width: 1.5; }
+.lpn-profile-hgl { fill: none; stroke: #0645ad; stroke-width: 1.5; }
+.lpn-profile-band { fill: #0645ad; fill-opacity: .12; stroke: none; }
+.lpn-profile-dot { fill: #000; }
+.lpn-profile-tick { font-size: 10px; fill: #333; }
+.lpn-profile-nodeid { font-size: 10px; fill: #333; }
+.lpn-profile-axistitle { font-size: 11px; fill: #333; }
+/* The key, and the waypoint chips. Both are ordinary flow content under the chart. */
+.lpn-profile-key { display: flex; flex-wrap: wrap; gap: .1em 1em; font-size: .85em; margin: .2em 0; }
+.lpn-profile-key i { display: inline-block; width: 1.4em; height: .6em; margin-right: .35em; vertical-align: middle; }
+.lpn-profile-key-ground { border-top: 2px solid #000; }
+.lpn-profile-key-hgl { border-top: 2px solid #0645ad; }
+.lpn-profile-key-band { background: rgba(6, 69, 173, .12); border: 1px solid rgba(6, 69, 173, .35); }
+.lpn-profile-chip { margin: 0 .25em .15em 0; }

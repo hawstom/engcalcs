@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 1053,
-        "delta_key_count": 57,
+        "expected_key_count": 1069,
+        "delta_key_count": 73,
         "exempt_key_count": 29,
         "exempt_keys": [
             "calc_units_us",
@@ -409,6 +409,22 @@
         "lpn_find_op_bottom": "Bottom n",
         "lpn_find_adjacent": "Links here",
         "lpn_find_no_value": "Type what to look for.",
+        "lpn_profile_menu": "Profile",
+        "lpn_profile_tip": "Draw the ground and the hydraulic grade line along a route through the network.",
+        "lpn_profile_title": "Profile along a route",
+        "lpn_profile_from": "From",
+        "lpn_profile_to": "To",
+        "lpn_profile_pick": "Click a node on the map to route through it",
+        "lpn_profile_through": "Through",
+        "lpn_profile_clear": "Clear",
+        "lpn_profile_choose": "Choose a start node and an end node.",
+        "lpn_profile_no_path": "These two nodes are not connected by any route.",
+        "lpn_profile_no_solve": "No results yet, so only the ground line is drawn.",
+        "lpn_profile_summary": "{n} nodes, {len} {u}",
+        "lpn_profile_axis_station": "Distance along the route ({u})",
+        "lpn_profile_axis_elev": "Elevation and head ({u})",
+        "lpn_profile_ground": "Ground",
+        "lpn_profile_hgl": "Hydraulic grade",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
         "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
         "lpn_file_export_inp": "Export EPANET file…",
@@ -468,6 +484,22 @@
         "lpn_find_op_bottom": "Bottom n",
         "lpn_find_adjacent": "Links here",
         "lpn_find_no_value": "Type what to look for.",
+        "lpn_profile_menu": "Profile",
+        "lpn_profile_tip": "Draw the ground and the hydraulic grade line along a route through the network.",
+        "lpn_profile_title": "Profile along a route",
+        "lpn_profile_from": "From",
+        "lpn_profile_to": "To",
+        "lpn_profile_pick": "Click a node on the map to route through it",
+        "lpn_profile_through": "Through",
+        "lpn_profile_clear": "Clear",
+        "lpn_profile_choose": "Choose a start node and an end node.",
+        "lpn_profile_no_path": "These two nodes are not connected by any route.",
+        "lpn_profile_no_solve": "No results yet, so only the ground line is drawn.",
+        "lpn_profile_summary": "{n} nodes, {len} {u}",
+        "lpn_profile_axis_station": "Distance along the route ({u})",
+        "lpn_profile_axis_elev": "Elevation and head ({u})",
+        "lpn_profile_ground": "Ground",
+        "lpn_profile_hgl": "Hydraulic grade",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
         "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
         "lpn_file_export_inp": "Export EPANET file…",
@@ -1112,6 +1144,262 @@
             }
         },
         "lpn_find_no_value": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_from": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_to": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_pick": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_through": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_clear": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_choose": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_no_path": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_no_solve": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_summary": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_axis_station": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_axis_elev": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_ground": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Jeden Knoten, jedes Rohr und jede Textbeschriftung in diesem Projekt löschen? Das Hintergrundbild, der Projektname und Ihre Einstellungen bleiben erhalten. Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Einheiten",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_profile_hgl": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
