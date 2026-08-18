@@ -8,11 +8,13 @@ const { Session } = require('../lib/session');
 
 exports.title = '3. The File menu';
 
-// The list as it stands after Task 264 (New project… became a fly-out of templates) and Task 314
-// (Open example… joined it, under Open rather than under New). Recent files are absent because there
-// are none yet; that row group appears only when a file has been opened.
+// The list as it stands after Task 264 (New project… became a fly-out of templates), Task 314
+// (Open example… joined it, under Open rather than under New) and Task 145 (the placement tool sits
+// beside Import, because both are conversions). Recent files are absent because there are none yet;
+// that row group appears only when a file has been opened.
 const EXPECTED = ['New project…', 'Open…', 'Open example…', 'Import EPANET file…',
-	'Export EPANET file…', 'Save', 'Save as…', 'Save all', 'Revert', 'Close'];
+	'Convert XY project to GeoMap…', 'Export EPANET file…',
+	'Save', 'Save as…', 'Save all', 'Revert', 'Close'];
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
