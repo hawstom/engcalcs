@@ -489,6 +489,19 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Still feasibility-gated on the BASEMAP, not on the idea:** key management, terms of service,
     cost, and whether the offline PWA promise survives a tile dependency. Decide the provider before
     building anything that assumes one.
+  - **DONE 2026-08-18, slice 1:** the declaration (File > New, two rows, stored on the project and
+    never a toggle), degrees at every user boundary, a WGS84 geodesic length behind the Auto
+    checkbox, and a home view on the Net3 city. Two things only building it found: the zoom bounds
+    are in the DOCUMENT's units, so a degree-based document needed its own (a grid ceiling opened the
+    map 130 km across), and an empty project has no extent to fit, so it needed a home view at all.
+  - **NEXT: the basemap.** Plain OpenStreetMap raster tiles as one more backdrop layer — no key, no
+    billing, and `<image>` tiles drop into the SVG world layer we already have. Not MapLibre GL,
+    which is what epanet-js runs: a WebGL vector renderer would fight the SVG world for little gain
+    at our scale. Aerial imagery is the one thing OSM cannot give, and Esri World Imagery behind a
+    key is the second provider if that turns out to matter.
+  - **The display is UNPROJECTED until the tile layer lands**, so a map at 45° looks stretched
+    east-west by 1/cos(lat). Stated rather than hidden: the honest fix is a projection seam at the
+    point coordinates become drawn positions, which is what the tiles need anyway.
   - Full scope: **`dev/geographic-projects.md`**.
 - 20|221| **Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.** Delete
   `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,
