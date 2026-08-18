@@ -1378,7 +1378,7 @@ $ec_lang['lpn_georef_goto']='Go to…';
 // profile first, tables later. The toggle is on the toolbar because it is the strip a reader
 // scans for "what else can this page show me".
 $ec_lang['lpn_pane_toggle']='Bottom panel';
-$ec_lang['lpn_pane_toggle_tip']='Show or hide the panel below the map. It holds the profile.';
+$ec_lang['lpn_pane_toggle_tip']='Show or hide the panel below the map. It holds the profile and the junction table.';
 $ec_lang['lpn_pane_resize']='Drag to make the panel taller or shorter';
 $ec_lang['lpn_pane_tab_junctions']='Junctions';
 $ec_lang['lpn_pane_tab_junctions_tip']='Every junction as a table you can sort and edit.';
