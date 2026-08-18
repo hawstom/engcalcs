@@ -585,6 +585,7 @@ var EngCalcs = EngCalcs || {};
 		(le.repeats || []).forEach(function (r) { r.text.style.fontSize = fsNow; });
 		try { noteMeasuredWidth(le, le.text.getBBox().width); }
 		catch (err) { /* pre-layout measurement can throw; the stale tw stands */ }
+		noteRowWidths(le);
 		le.rows = rows;
 		le.rowsSeq = (le.rowsSeq || 0) + 1;
 		le.lineCount = rows.length;
@@ -1785,7 +1786,8 @@ var EngCalcs = EngCalcs || {};
 			holders[key] = holder;
 			labels.push({
 				id: key, anchor: anchor, home: home, dragged: !!dragged,
-				w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount), yOff: -fs * 0.85
+				w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount), yOff: -fs * 0.85,
+				lines: labelRowWidths(holder)
 			});
 		}
 		// One auto-placed node label, as a first-fit participant. Its candidate ENDPOINTS are the
@@ -1806,7 +1808,8 @@ var EngCalcs = EngCalcs || {};
 			nodeLabels.push({
 				id: nodeLabelKey(n.id), anchor: { x: n.x, y: n.y }, home: nodeLabelBase(n),
 				dragged: false, sides: sides, priority: 0, dropKey: nodeDropKey(n),
-				w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85
+				w: labelBoxWidth(ne), h: dataLabelBoxHeight(ne.lineCount), yOff: -fs * 0.85,
+				lines: labelRowWidths(ne)
 			});
 		}
 		// **NODE LABELS TAKE THE FIRST-FIT NOW, NOT THE RING** (Task 398). A dragged one is the
@@ -1943,6 +1946,41 @@ var EngCalcs = EngCalcs || {};
 		// quarter of a second per notch (Tom, 2026-08-15).
 		if (holder.twPx) { return holder.twPx / (state.s || 1); }
 		return holder.tw || 0;
+	}
+	// **PER-ROW WIDTHS: the staircase Task 406's boxes are cut from.** A stacked label's rows have
+	// different widths, and one box around all of them claims the empty ground beside every short
+	// row. This measures each row so the placement pass can reason about the real footprint.
+	//
+	// A ROW is a tspan carrying its own `x`, plus every tspan after it that does not -- exactly
+	// setMultilineText()'s idiom, where the absent x is what makes a segment flow inline after its
+	// predecessor. Read that structure rather than the `rows` array so the measurement can never
+	// describe a shape other than the one in the DOM.
+	//
+	// Banked in PIXELS beside the world figure for the same reason `tw`/`twPx` are: a label's width
+	// in pixels does not change with the zoom, so re-measuring on every wheel notch is a forced
+	// synchronous layout per label per notch, and Net3 has ~220 of them.
+	function noteRowWidths(holder) {
+		var t = holder && holder.text, out = [], i, c, w, hasX;
+		if (!t || !t.childNodes) { holder.rowW = null; holder.rowWPx = null; return; }
+		for (i = 0; i < t.childNodes.length; i++) {
+			c = t.childNodes[i];
+			if (c.nodeType !== 1 || !c.getAttribute) { continue; }
+			w = 0;
+			try { w = c.getComputedTextLength(); } catch (err) { w = 0; }
+			hasX = c.getAttribute('x') != null;
+			if (hasX || !out.length) { out.push(w); } else { out[out.length - 1] += w; }
+		}
+		holder.rowW = out;
+		holder.rowWPx = out.map(function (v) { return v * (state.s || 1); });
+	}
+	// null -- not an empty array -- when there is nothing to say, so a caller can hand it straight to
+	// js/lpn-collide.js, whose `lines` is optional and whose absence means "use the whole box".
+	function labelRowWidths(holder) {
+		var s = state.s || 1;
+		if (holder && holder.rowWPx && holder.rowWPx.length > 1) {
+			return holder.rowWPx.map(function (v) { return v / s; });
+		}
+		return null;
 	}
 	// The other half of the pair: call this instead of writing `.tw` from a getBBox() result, and the
 	// pixel figure is banked at the same time. `worldWidth` is what getBBox() just returned.
@@ -15034,6 +15072,7 @@ var EngCalcs = EngCalcs || {};
 			// the sizes by then agreeing.
 			ne.text.style.fontSize = fsNow;
 			try { noteMeasuredWidth(ne, ne.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
+			noteRowWidths(ne);
 		});
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }

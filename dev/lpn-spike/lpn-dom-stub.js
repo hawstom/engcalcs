@@ -68,8 +68,22 @@ function mkEl(tag) {
     getBBox() { return { x: 0, y: 0, width: this._textWidth(), height: 10 }; },
     _textLength() {
       // A <text> owns its tspans' characters; a tspan owns its own.
+      //
+      // **A STACK IS AS WIDE AS ITS WIDEST ROW, NOT AS WIDE AS ALL OF THEM LAID END TO END.** That
+      // is what a real getBBox() reports, and the sum this used to return made a three-row label
+      // three times too wide in every harness that measured one -- the stub failure CLAUDE.md
+      // names, where the quantity the real thing varies (which row is longest) was held constant.
+      // A ROW is a tspan with its own x plus every following tspan without one, exactly
+      // setMultilineText()'s idiom; a tspan's own length is still its characters.
       if (this.children.length) {
-        return this.children.reduce((n, c) => n + (c._textLength ? c._textLength() : 0), 0);
+        let widest = 0, row = 0, started = false;
+        for (const c of this.children) {
+          const n = c._textLength ? c._textLength() : 0;
+          const ownX = c.getAttribute && c.getAttribute('x') != null;
+          if (ownX || !started) { row = n; started = true; } else { row += n; }
+          if (row > widest) { widest = row; }
+        }
+        return widest;
       }
       return (this.textContent || '').length;
     },

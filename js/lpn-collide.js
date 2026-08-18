@@ -553,19 +553,57 @@ EngCalcs.lpnCollide = (function () {
 		var left = c.x >= lbl.anchor.x ? c.x : c.x - lbl.w;
 		return box(left + lbl.w / 2, c.y + lbl.yOff + lbl.h / 2, lbl.w, lbl.h, 0, 'label', lbl.id);
 	}
+	// **ONE BOX PER LINE, NOT ONE BOX FOR THE STACK** (ROADMAP Task 406).
+	//
+	// A stacked label is a STAIRCASE, not a rectangle. Its lines have different widths -- "J12"
+	// over "48.3 psi" over "0.5 L/s" -- and one box around all of them claims the empty ground to
+	// the right of every short line, which is exactly where a neighbour's label would otherwise fit.
+	// The block box was also unable to express the thing Task 399 creates: once shedding drops some
+	// lines and keeps others, the footprint is a different shape, not merely a shorter one.
+	//
+	// `lbl.lines` is an array of per-line WIDTHS, top to bottom, in the same units as `lbl.w`. When
+	// it is absent -- a Text object, a single-line label, any caller that has not measured its rows
+	// -- this returns the one whole box, so nothing changes for them by construction.
+	//
+	// The lines are anchored on the SAME EDGE the block is: a label to the right of its endpoint is
+	// start-aligned there, a label to the left is end-aligned, which is how the renderer's
+	// text-anchor works. Getting that backwards would make the staircase lean the wrong way and be
+	// nearly invisible on screen.
+	function labelLineBoxes(lbl, c) {
+		var whole = labelBoxAtEnd(lbl, c), n = lbl.lines && lbl.lines.length,
+			toRight = c.x >= lbl.anchor.x, top = whole.cy - lbl.h / 2, lh, out = [], i, w, left;
+		if (!n || n < 2) { return [whole]; }
+		lh = lbl.h / n;
+		for (i = 0; i < n; i++) {
+			w = lbl.lines[i] > 0 ? lbl.lines[i] : 0;
+			if (!w) { continue; }   // a blank row occupies no ground and must not claim any
+			left = toRight ? c.x : c.x - w;
+			out.push(box(left + w / 2, top + lh * (i + 0.5), w, lh, 0, 'label', lbl.id));
+		}
+		return out.length ? out : [whole];
+	}
 	// Every penalty is normalised into roughly [0, 1] before its goal weight is applied, so the
 	// ranks compare like with like: a box overlap is measured in the label's own heights, a line
 	// through a box as the fraction of that line inside it, and distance against the outer radius.
 	// Without that a term would be loud or quiet according to the units it happens to be in, and the
 	// ranking would say nothing.
+	// **THE WORST LINE, NOT THE SUM OF THE LINES** (Task 406). Every term here is normalised into
+	// roughly [0, 1] so the goal ranks compare like with like; summing over rows would make a
+	// three-line label's overlap score three times a one-line label's for the same collision, and
+	// the ranking would start describing the label's height instead of the conflict.
+	function worstOverLines(boxes, fn) {
+		var m = 0, i, v;
+		for (i = 0; i < boxes.length; i++) { v = fn(boxes[i]); if (v > m) { m = v; } }
+		return m;
+	}
 	function rawScore(lbl, c, obs, outer) {
-		var b = labelBoxAtEnd(lbl, c),
+		var lines = labelLineBoxes(lbl, c),
 			leader = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id),
 			s = 0, i, o, depth;
 		for (i = 0; i < obs.boxes.length; i++) {
 			o = obs.boxes[i];
 			if (o.owner !== undefined && o.owner === lbl.id) { continue; }
-			depth = boxOverlapDepth(b, o);
+			depth = worstOverLines(lines, function (lb) { return boxOverlapDepth(lb, o); });
 			if (depth > 0) {
 				s += (o.kind === 'symbol' ? GOAL_WEIGHT.labelSymbol : GOAL_WEIGHT.labelLabel)
 					* Math.min(1, depth / lbl.h);
@@ -583,7 +621,7 @@ EngCalcs.lpnCollide = (function () {
 			// one violation a reader notices most could not be scored even in principle.
 			if (o.owner !== undefined && o.owner === lbl.id && o.kind !== 'leader') { continue; }
 			s += (o.kind === 'leader' ? GOAL_WEIGHT.labelLeader : GOAL_WEIGHT.labelLink)
-				* segmentInBoxFraction(o, b);
+				* worstOverLines(lines, function (lb) { return segmentInBoxFraction(o, lb); });
 			if (o.kind === 'link' && segmentsCross(leader, o)) { s += GOAL_WEIGHT.leaderLink; }
 		}
 		// Goal 3 for THIS label's own leader. It is not in obs.segments yet -- the pass commits each
@@ -836,8 +874,11 @@ EngCalcs.lpnCollide = (function () {
 			// COMMITTED AS AN OBSTACLE FOR EVERYONE PLACED AFTER, box and leader both. Without the
 			// leader, goal 3 would be satisfied only against labels that happened to be dragged.
 			var placedBox = labelBoxAtEnd(lbl, c),
+				placedLines = labelLineBoxes(lbl, c),
 				placedLeader = segment(lbl.anchor.x, lbl.anchor.y, c.x, c.y, 'leader', lbl.id);
-			index.addBox(obs.boxes.push(placedBox) - 1);
+			// The STAIRCASE goes into the index, not the block (Task 406) -- what this label
+			// reserves is the ground its rows actually cover.
+			placedLines.forEach(function (pb) { index.addBox(obs.boxes.push(pb) - 1); });
 			index.addSegment(obs.segments.push(placedLeader) - 1);
 			// **THE COMMITTED BOX AND LEADER COME BACK WITH THE RESULT.** They are pushed onto a
 			// PRIVATE copy of the obstacle list above (`obs` is sliced from the caller's), so a
@@ -848,7 +889,7 @@ EngCalcs.lpnCollide = (function () {
 			// box is a box that can drift from the one the pass actually used.
 			out.push({ id: lbl.id, x: c.x, y: c.y,
 				dx: c.x - lbl.home.x, dy: c.y - lbl.home.y, score: eff[best],
-				box: placedBox, leader: placedLeader });
+				box: placedBox, boxes: placedLines, leader: placedLeader });
 		});
 		order.forEach(function (l) { delete l._diff; });
 		return out;
@@ -926,8 +967,10 @@ EngCalcs.lpnCollide = (function () {
 			index.near(lbl.anchor.x, lbl.anchor.y, lbl._reach, local);
 			for (i = 0; i < sides.length; i++) {
 				c = sides[i];
-				b = labelBoxAtEnd(lbl, c);
-				verdict = lbl.dragged ? 'clear' : boxClearOf(b, local, pad, lbl.id);
+				// The STAIRCASE, not the block (Task 406): asking about the block would call a side
+				// occupied because of ground the short rows never cover.
+				b = labelLineBoxes(lbl, c);
+				verdict = lbl.dragged ? 'clear' : boxesClearOf(b, local, pad, lbl.id);
 				if (verdict === 'clear') { chosen = c; chosenBox = b; break; }
 				// **A SIDE HELD ONLY BY SOMETHING THIS LABEL OUTRANKS IS KEPT AS A FALLBACK, not
 				// taken immediately.** A genuinely clear side on the other hand is still better, so
@@ -944,10 +987,15 @@ EngCalcs.lpnCollide = (function () {
 					dropped: true, side: -1, box: null, leader: null });
 				return;
 			}
-			index.addBox(obs.boxes.push(chosenBox) - 1);
+			// EVERY line box is committed, so the next label sees the staircase this one really
+			// occupies rather than a rectangle around it.
+			chosenBox.forEach(function (cb) { index.addBox(obs.boxes.push(cb) - 1); });
 			out.push({ id: lbl.id, x: chosen.x, y: chosen.y,
 				dx: chosen.x - lbl.home.x, dy: chosen.y - lbl.home.y,
-				dropped: false, side: sides.indexOf(chosen), box: chosenBox, leader: null });
+				dropped: false, side: sides.indexOf(chosen),
+				// `box` stays the ONE box a reader draws and counts (?debug=boxes, the bench's
+				// overlap count); `boxes` is what the pass actually reserved.
+				box: labelBoxAtEnd(lbl, chosen), boxes: chosenBox, leader: null });
 		});
 		// **THE INPUTS COME BACK EXACTLY AS THEY WENT IN.** placeLabels() makes the same promise, and
 		// for the same reason: a pass that scribbles on its arguments cannot be run twice on one
@@ -997,6 +1045,18 @@ EngCalcs.lpnCollide = (function () {
 		}
 		return yielding ? 'yielding' : 'clear';
 	}
+	// The same question asked of a STAIRCASE (Task 406): a stack of line boxes is clear only if
+	// every line is, and the worst answer any line gives is the answer -- 'blocked' beats
+	// 'yielding' beats 'clear', because one blocked row is a row of text sitting on something.
+	function boxesClearOf(boxes, obs, pad, ownerId) {
+		var worst = 'clear', i, v;
+		for (i = 0; i < boxes.length; i++) {
+			v = boxClearOf(boxes[i], obs, pad, ownerId);
+			if (v === 'blocked') { return 'blocked'; }
+			if (v === 'yielding') { worst = 'yielding'; }
+		}
+		return worst;
+	}
 
 	return {
 		GOAL_WEIGHT: GOAL_WEIGHT,
@@ -1011,6 +1071,8 @@ EngCalcs.lpnCollide = (function () {
 		cardinalSides: cardinalSides,
 		placeLabelsFirstFit: placeLabelsFirstFit,
 		boxClearOf: boxClearOf,
+		boxesClearOf: boxesClearOf,
+		labelLineBoxes: labelLineBoxes,
 		RING_ANGLES: RING_ANGLES,
 		RAY_STRETCH: RAY_STRETCH,
 		box: box,
