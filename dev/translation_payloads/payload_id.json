@@ -393,8 +393,8 @@
         "lpn_find_op_lt": "is less than",
         "lpn_find_count": "{n} found. Click one to go to it.",
         "lpn_find_none": "Nothing matched.",
-        "lpn_find_limit": "How many to list at each end",
-        "lpn_find_middle": "{n} more between these, not listed.",
+        "lpn_find_op_top": "Top n",
+        "lpn_find_op_bottom": "Bottom n",
         "lpn_find_adjacent": "Links here",
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
@@ -435,8 +435,8 @@
         "lpn_find_op_lt": "is less than",
         "lpn_find_count": "{n} found. Click one to go to it.",
         "lpn_find_none": "Nothing matched.",
-        "lpn_find_limit": "How many to list at each end",
-        "lpn_find_middle": "{n} more between these, not listed.",
+        "lpn_find_op_top": "Top n",
+        "lpn_find_op_bottom": "Bottom n",
         "lpn_find_adjacent": "Links here",
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
@@ -837,7 +837,7 @@
                 }
             }
         },
-        "lpn_find_limit": {
+        "lpn_find_op_top": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -853,7 +853,7 @@
                 }
             }
         },
-        "lpn_find_middle": {
+        "lpn_find_op_bottom": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

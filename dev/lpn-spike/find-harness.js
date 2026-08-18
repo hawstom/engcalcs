@@ -38,6 +38,11 @@ const L = loadLoopedNetwork(
 	"\t\t\treturn findMatches().map(function (c) { return c.group + ':' + c.el.id; });\n" +
 	"\t\t},\n" +
 	"\t\tfindState: function () { return findState; },\n" +
+	// The words, not the ids -- what a Text result actually shows.
+	"\t\tfindText: function (scope, prop, op, value) {\n" +
+	"\t\t\tfindState.scope = scope; findState.prop = prop; findState.op = op; findState.value = value;\n" +
+	"\t\t\treturn findMatches().map(function (c) { return effective(c.el, 'text'); });\n" +
+	"\t\t},\n" +
 	"\t\tnormalize: function (scope, prop, op) { findState.scope = scope; findState.prop = prop; findState.op = op;\n" +
 	"\t\tfindNormalize(); return findState.prop + '/' + findState.op; },\n" +
 	"\t\tpropKeys: function (scope) { findState.scope = scope; return findPropDefs().map(function (p) { return p[0]; }); },\n" +
@@ -46,7 +51,7 @@ const L = loadLoopedNetwork(
 	"\t\tgoTo: findGoTo, selectedRef: selectedRef,\n" +
 	"\t\tcontextLength: function (group, id) { var e = group === 'node' ? nodeById(id) : linkById(id);\n" +
 	"\t\t\treturn findContextLength(group, e); },\n" +
-	"\t\tsetLimit: function (n) { findState.limit = n; },\n" +
+
 	"\t\tadjacent: function (id) { return incidentLinks[id] || []; },\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
@@ -168,13 +173,26 @@ function build(unitSet) {
 	ok('...and not the link fields', L.propKeys('junction').indexOf('velocity') < 0);
 	ok('a link scope offers the link fields',
 		L.propKeys('pipe').indexOf('diameter') > 0 && L.propKeys('pipe').indexOf('pressure') < 0);
+	// LENGTH is searchable although it is not colourable: EPANET's View menu has no length in it
+	// because nobody colours a network by one, but "which pipes are longer than 500 ft" is a
+	// question people actually ask. Searching and colouring are different questions.
+	ok('...including the inputs a colour ramp has no use for',
+		L.propKeys('pipe').indexOf('length') > 0 && L.propKeys('pipe').indexOf('km') > 0,
+		JSON.stringify(L.propKeys('pipe')));
 	ok('the all-elements scope offers ID alone, the only property every kind has',
 		JSON.stringify(L.propKeys('all')) === JSON.stringify(['id']));
 	ok('a Text scope offers its words', L.propKeys('text').indexOf('text') > 0);
 	ok('a text property gets contains/equals and no number comparisons',
 		JSON.stringify(L.opKeys('all', 'id')) === JSON.stringify(['contains', 'equals']));
 	ok('a numeric property gets the number comparisons and no "contains"',
-		JSON.stringify(L.opKeys('pipe', 'diameter')) === JSON.stringify(['equals', 'gt', 'lt']));
+		JSON.stringify(L.opKeys('pipe', 'diameter')) === JSON.stringify(['equals', 'gt', 'lt', 'top', 'bottom']),
+		JSON.stringify(L.opKeys('pipe', 'diameter')));
+	ok('...including Top n and Bottom n, which are conditions and not a second input',
+		L.opKeys('pipe', 'diameter').indexOf('top') > 0 && L.opKeys('pipe', 'diameter').indexOf('bottom') > 0);
+	ok('a text property has no extremes -- there is no end to a list of words',
+		L.opKeys('all', 'id').indexOf('top') < 0, JSON.stringify(L.opKeys('all', 'id')));
+	ok('a Text label can be searched by its SIZE as well as its words',
+		L.propKeys('text').indexOf('sizeMult') > 0, JSON.stringify(L.propKeys('text')));
 
 	// The normalization itself, which is what the pull-downs call. A property the new scope does not
 	// have, and an operator the new property does not have, both have to go.
@@ -223,6 +241,72 @@ function build(unitSet) {
 	// Repeating a search must give the same order -- an unstable sort reads as an unreliable tool.
 	ok('the same search twice gives the same order',
 		JSON.stringify(L.find('pipe', 'diameter', 'gt', '0')) === JSON.stringify(desc));
+}
+
+// ---- 4c. Top n and Bottom n -----------------------------------------------------------------------
+// The Value box holds HOW MANY, so these need no second control -- and they need no value to match
+// against either, because they rank what is there rather than filtering it.
+{
+	console.log('\n--- the extremes ---');
+	setUnitSet('us');
+	L.reset();
+	L.setCanvas(800, 600);
+	const r = L.addNode('reservoir', 0, 0).id;
+	let prev = r;
+	const sizes = [4, 18, 6, 12, 8];
+	const ids = sizes.map((d, i) => {
+		const n = L.addNode('junction', 100 * (i + 1), 0).id;
+		const l = L.addLink('pipe', prev, n);
+		L.setProp(l, 'diameter', d);
+		prev = n;
+		return l.id;
+	});
+	L.buildDom();
+	const top2 = L.find('pipe', 'diameter', 'top', '2');
+	ok('Top 2 returns two pipes', top2.length === 2, JSON.stringify(top2));
+	ok('...the two biggest, biggest first',
+		JSON.stringify(top2) === JSON.stringify(['link:' + ids[sizes.indexOf(18)], 'link:' + ids[sizes.indexOf(12)]]),
+		JSON.stringify(top2));
+	const bot2 = L.find('pipe', 'diameter', 'bottom', '2');
+	ok('...and Bottom 2 the two smallest, smallest first',
+		JSON.stringify(bot2) === JSON.stringify(['link:' + ids[sizes.indexOf(4)], 'link:' + ids[sizes.indexOf(6)]]),
+		JSON.stringify(bot2));
+	ok('an empty count means ten, not none', L.find('pipe', 'diameter', 'top', '').length === 5,
+		String(L.find('pipe', 'diameter', 'top', '').length));
+	ok('...and so does a nonsense one', L.find('pipe', 'diameter', 'top', 'lots').length === 5);
+	ok('asking for more than there are returns them all',
+		L.find('pipe', 'diameter', 'top', '99').length === 5);
+}
+
+// ---- 4d. a text search reads alphabetically --------------------------------------------------------
+// Tom, 2026-08-18. For an ID search the string and the id are the same, so this only shows on a Text
+// label -- whose id the user cannot see at all, which is why ordering by it looked like no order.
+{
+	console.log('\n--- alphabetical ---');
+	L.reset();
+	L.setCanvas(800, 600);
+	// Deliberately created in an order that is NOT alphabetical, so an id-ordered list and a
+	// text-ordered one differ.
+	['Zone valve', 'Air release', 'Meter pit'].forEach(function (w, i) {
+		const t = L.addText(10 * (i + 1), 10, null);
+		L.setProp(t, 'text', w);
+		if (i === 0) { t.sizeMult = 3; } else { t.sizeMult = 1 + i * 0.5; }
+	});
+	L.buildDom();
+	const words = L.findText('text', 'text', 'contains', 'e');
+	ok('a text search comes back in alphabetical order of the words',
+		JSON.stringify(words) === JSON.stringify(['Air release', 'Meter pit', 'Zone valve']),
+		JSON.stringify(words));
+	// Size, with the same conditions as any other range value.
+	const biggest = L.findText('text', 'sizeMult', 'top', '1');
+	ok('Top 1 by size finds the biggest label', JSON.stringify(biggest) === JSON.stringify(['Zone valve']),
+		JSON.stringify(biggest));
+	// Sizes are 3, 1.5 and 2, so this threshold has to separate them rather than pass everything --
+	// and the answer comes back BIGGEST first, because "greater than" is a question about the big end.
+	ok('...and a range condition works on size too, biggest first',
+		JSON.stringify(L.findText('text', 'sizeMult', 'gt', '1.9')) ===
+			JSON.stringify(['Zone valve', 'Meter pit']),
+		JSON.stringify(L.findText('text', 'sizeMult', 'gt', '1.9')));
 }
 
 // ---- 5. going to a result: it selects, it pans, and it zooms to a MINIMUM ------------------------

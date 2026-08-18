@@ -5455,7 +5455,7 @@ var EngCalcs = EngCalcs || {};
 	// **READ-ONLY BY CONSTRUCTION.** It selects and it moves the view; nothing below writes an
 	// element. Task 389 (search and replace) is this query plus a write, and its write goes through
 	// setProp() -- which is why the query half is worth shipping on its own first.
-	var findState = { scope: 'all', prop: 'id', op: 'contains', value: '', limit: 10 };
+	var findState = { scope: 'all', prop: 'id', op: 'contains', value: '' };
 	var findResults = [];
 	// Scope names REUSE the Insert tools' labels (CLAUDE.md's concept-level reuse): a junction is a
 	// Junction in both places, and re-keying seven plurals would buy nothing but 182 translations.
@@ -5505,24 +5505,57 @@ var EngCalcs = EngCalcs || {};
 	function findPropDefs() {
 		var pc = EngCalcs.pageConfig || {}, d = findScopeDef(findState.scope),
 			out = [['id', pc.lpn_field_id || 'ID']], defs, allowed;
-		if (d.group === 'label') { out.push(['text', pc.lpn_tool_add_text || 'Text']); return out; }
+		if (d.group === 'label') {
+			out.push(['text', pc.lpn_tool_add_text || 'Text']);
+			// A Text label's own size multiplier, which is the one NUMBER it carries -- and the one
+			// worth a range condition (Tom, 2026-08-18: "Size would be very interesting to search
+			// on using the same Conditions as other range values"). "Which of my notes is set
+			// biggest" has no other answer on this page.
+			out.push(['sizeMult', pc.lpn_field_text_size || 'Size multiplier']);
+			return out;
+		}
 		if (d.key === 'all') { return out; }
 		defs = d.group === 'node' ? nodeFieldDefs(pc) : linkFieldDefs(pc);
 		allowed = d.group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS;
-		defs.forEach(function (f) { if (allowed[f[0]] !== undefined) { out.push(f); } });
+		defs.forEach(function (f) {
+			// **PLUS THE INPUTS A COLOUR RAMP HAS NO USE FOR.** COLOR_LINK_FIELDS is EPANET's View
+			// menu, which has no length in it because nobody colours a network by length -- but
+			// "which pipes are longer than 500 ft" is one of the most natural searches there is,
+			// and the number is right there on the pipe. Searching and colouring are different
+			// questions and this is where they part.
+			if (allowed[f[0]] !== undefined || FIND_EXTRA_LINK_FIELDS[f[0]]) { out.push(f); }
+		});
 		return out;
 	}
+	// Searchable, but not colourable -- see findPropDefs(). Read straight off the element through
+	// effective(), in the unit it is stored and displayed in, like everything else here.
+	var FIND_EXTRA_LINK_FIELDS = { length: true, km: true };
 	function findPropIsText(prop) { return prop === 'id' || prop === 'text'; }
 	// Text gets contains/equals, a number gets equals/greater/less. Offering all four for both would
 	// mean "Pressure contains 2", which matches on the digits of a number and is never what anybody
 	// means.
+	// **TOP n AND BOTTOM n ARE CONDITIONS, NOT A SEPARATE BOX** (Tom, 2026-08-18: *"We want the
+	// dropdown to include two more items, 'Top n' and 'Bottom n'. And we don't need a second input.
+	// The Value input will serve for n."*). A first cut put a "how many at each end" number beside
+	// the value and split every long list into two halves; that answered a question nobody asked,
+	// and it asked for a number on searches that had no ends. Asking for the extremes is a
+	// CONDITION on the same footing as "is greater than", and it reuses the box already there.
 	function findOpDefs() {
 		var pc = EngCalcs.pageConfig || {};
 		if (findPropIsText(findState.prop)) {
 			return [['contains', pc.lpn_find_op_contains || 'contains'], ['equals', pc.lpn_find_op_equals || 'is exactly']];
 		}
 		return [['equals', pc.lpn_find_op_equals || 'is exactly'], ['gt', pc.lpn_find_op_gt || 'is greater than'],
-			['lt', pc.lpn_find_op_lt || 'is less than']];
+			['lt', pc.lpn_find_op_lt || 'is less than'],
+			['top', pc.lpn_find_op_top || 'Top n'], ['bottom', pc.lpn_find_op_bottom || 'Bottom n']];
+	}
+	function findOpIsExtreme(op) { return op === 'top' || op === 'bottom'; }
+	// How many an extremes query returns. The Value box holds it, and a blank or nonsense entry
+	// means ten rather than none: "Top" with no number still says something, and answering it with
+	// an empty list would read as the search having failed.
+	function findExtremeCount() {
+		var n = parseInt(String(findState.value).trim(), 10);
+		return (isFinite(n) && n > 0) ? n : 10;
 	}
 	// **A SCOPE CHANGE CAN TAKE THE QUERY WITH IT.** Pressure is not a property of a pipe, and a
 	// number's operators are not operators on an ID -- so both fall back to the first entry the new
@@ -5549,7 +5582,13 @@ var EngCalcs = EngCalcs || {};
 	function findValueOf(cand, prop) {
 		if (prop === 'id') { return findLabelHasNoId(cand) ? undefined : cand.el.id; }
 		if (prop === 'text') { return effective(cand.el, 'text'); }
+		if (prop === 'sizeMult') { return cand.el.sizeMult || 1; }
 		if (cand.group === 'label') { return undefined; }
+		if (FIND_EXTRA_LINK_FIELDS[prop]) {
+			// `km` is stored as `k`; the label calls it km because that is the symbol on the page.
+			var v = effective(cand.el, prop === 'km' ? 'k' : prop);
+			return typeof v === 'number' ? v : undefined;
+		}
 		return colorValueOf(cand.group, cand.el, prop);
 	}
 	// An `equals` on a solved number cannot be an === : the value shown is the end of a float chain,
@@ -5560,8 +5599,17 @@ var EngCalcs = EngCalcs || {};
 	}
 	function findMatches() {
 		var v = String(findState.value).trim(), lc = v.toLowerCase(), num = parseFloat(v), out = [];
-		if (v === '') { return out; }
 		findNormalize();
+		// **AN EXTREMES QUERY NEEDS NO VALUE TO MATCH AGAINST** -- it ranks every element that has
+		// one and takes the end of the list. The Value box holds how many, and it may be blank.
+		if (findOpIsExtreme(findState.op)) {
+			findCandidates().forEach(function (c) {
+				var val = findValueOf(c, findState.prop);
+				if (typeof val === 'number' && isFinite(val)) { out.push(c); }
+			});
+			return findSortMatches(out).slice(0, findExtremeCount());
+		}
+		if (v === '') { return out; }
 		findCandidates().forEach(function (c) {
 			var val = findValueOf(c, findState.prop), s;
 			if (val === undefined || val === null || val === '') { return; }
@@ -5593,7 +5641,14 @@ var EngCalcs = EngCalcs || {};
 	// Ties break on id so the order is TOTAL and stable: an unstable sort rearranges the list between
 	// two identical searches, which reads as the tool being unreliable.
 	function findSortMatches(list) {
-		var desc = findState.op === 'gt', asc = findState.op === 'lt', prop = findState.prop;
+		var op = findState.op, prop = findState.prop,
+			desc = op === 'gt' || op === 'top',
+			asc = op === 'lt' || op === 'bottom',
+			// **A TEXT SEARCH IS SORTED BY THE TEXT, NOT BY THE ID** (Tom, 2026-08-18: *"Text
+			// searches should be in alphabetical order of text string."*). For an ID search those
+			// are the same string; for a Text label they are not, and its id is one the user cannot
+			// see at all -- so ordering by it would look like no order whatever.
+			text = findPropIsText(prop);
 		return list.sort(function (a, b) {
 			var va, vb;
 			if (desc || asc) {
@@ -5601,7 +5656,13 @@ var EngCalcs = EngCalcs || {};
 				if (typeof va === 'number' && typeof vb === 'number' && va !== vb) {
 					return desc ? vb - va : va - vb;
 				}
+			} else if (text) {
+				va = String(findValueOf(a, prop) === undefined ? '' : findValueOf(a, prop)).toLowerCase();
+				vb = String(findValueOf(b, prop) === undefined ? '' : findValueOf(b, prop)).toLowerCase();
+				if (va !== vb) { return va < vb ? -1 : 1; }
 			}
+			// Ties break on id so the order is TOTAL and stable: an unstable sort rearranges the
+			// list between two identical searches, which reads as the tool being unreliable.
 			return a.el.id < b.el.id ? -1 : (a.el.id > b.el.id ? 1 : 0);
 		});
 	}
@@ -5736,31 +5797,6 @@ var EngCalcs = EngCalcs || {};
 		valLab.appendChild(input);
 		valWrap.appendChild(valLab);
 		box.appendChild(valWrap);
-		// **HOW MANY TO LIST AT EACH END** (Tom, 2026-08-18: "top and bottom 10 (or n as entered)").
-		// A condition on a value can match most of the network, and a list of 300 answers a question
-		// nobody asked. The two ENDS are what a range query is about -- the biggest and the smallest
-		// -- so both are shown and the middle is counted rather than printed.
-		var limWrap = document.createElement('div'), limLab = document.createElement('label'),
-			limInput = document.createElement('input');
-		limWrap.style.margin = '4px 0';
-		limLab.textContent = pc.lpn_find_limit || 'How many to list at each end';
-		limLab.style.display = 'block';
-		limInput.type = 'number';
-		limInput.min = '1';
-		limInput.step = '1';
-		limInput.value = findState.limit;
-		limInput.style.width = '5em';
-		limInput.addEventListener('change', function () {
-			var n = parseInt(limInput.value, 10);
-			// A bad number falls back rather than emptying the list: 0 or -3 "at each end" would
-			// show nothing at all, which reads as the search having failed.
-			findState.limit = (isFinite(n) && n > 0) ? n : 10;
-			limInput.value = findState.limit;
-			renderFindResults(null);
-		});
-		limLab.appendChild(limInput);
-		limWrap.appendChild(limLab);
-		box.appendChild(limWrap);
 		btn = document.createElement('button');
 		btn.type = 'button';
 		setLabel(btn, 'find', pc.lpn_find_button || 'Find');
@@ -5769,7 +5805,9 @@ var EngCalcs = EngCalcs || {};
 	}
 	function runFind() {
 		var pc = EngCalcs.pageConfig || {};
-		if (String(findState.value).trim() === '') {
+		// An empty box is only a mistake when the query needs something to match against. Top n and
+		// Bottom n do not: they rank what is there, and a blank simply means the default ten.
+		if (String(findState.value).trim() === '' && !findOpIsExtreme(findState.op)) {
 			findResults = [];
 			renderFindResults(pc.lpn_find_no_value || 'Type what to look for.');
 			return;
@@ -5827,27 +5865,7 @@ var EngCalcs = EngCalcs || {};
 		// bar either way, and Task 146.04's report tables are where a long list belongs.
 		list.style.maxHeight = '14em';
 		list.style.overflowY = 'auto';
-		// THE TWO ENDS, AND A COUNT OF WHAT IS BETWEEN THEM. The list is already sorted most
-		// interesting first (findSortMatches), so "the first n and the last n" IS the top and bottom
-		// of the range. Only split when there is genuinely a middle to hide -- with 2n or fewer
-		// matches the whole list is shown and no gap row appears.
-		var lim = findState.limit > 0 ? findState.limit : 10, shown = findResults, hidden = 0;
-		if (findResults.length > 2 * lim) {
-			shown = findResults.slice(0, lim);
-			hidden = findResults.length - 2 * lim;
-		}
-		shown.forEach(function (c) { list.appendChild(findResultRow(c)); });
-		if (hidden) {
-			var gap = document.createElement('div');
-			gap.style.opacity = '.7';
-			gap.style.margin = '2px 0';
-			gap.textContent = String(pc.lpn_find_middle || '{n} more between these, not listed.')
-				.replace('{n}', String(hidden));
-			list.appendChild(gap);
-			findResults.slice(findResults.length - lim).forEach(function (c) {
-				list.appendChild(findResultRow(c));
-			});
-		}
+		findResults.forEach(function (c) { list.appendChild(findResultRow(c)); });
 		box.appendChild(list);
 	}
 	// `anchorEl` is the CONTROL to hang the panel under -- the menu-bar item, passed in by the row

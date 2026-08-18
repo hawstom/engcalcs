@@ -138,12 +138,13 @@ exports.run = async function ({ browser, report }) {
 		});
 		report.eq(missed, '', 'a search that matches nothing leaves the list empty');
 
-		// **THE TWO ENDS OF A LONG ANSWER, AND A COUNT OF THE MIDDLE** (Tom, 2026-08-18). Checked in
-		// a browser rather than in the harness because what is being verified is what a person SEES:
-		// two ends, a counted gap between them, and both ends still clickable.
+		// **TOP n AND BOTTOM n ARE CONDITIONS, AND THE VALUE BOX HOLDS n** (Tom, 2026-08-18). Checked
+		// in a browser because what is being verified is the control surface a person operates:
+		// three pull-downs and ONE box, with the extremes reachable from the condition list rather
+		// than from a second number field.
 		//
-		// The network comes from the dev-only "Draw large test network" row, which is the only way to
-		// get a hundred pipes onto this page without a hundred clicks.
+		// The network comes from the dev-only "Draw large test network" row, which is the only way
+		// to get a hundred pipes onto this page without a hundred clicks.
 		await a.menuClick('[dev] Draw large test network', 'insert');
 		await a.settle(500);
 		await a.menuClick('Find', 'edit');
@@ -155,27 +156,34 @@ exports.run = async function ({ browser, report }) {
 					sel.value = v;
 					sel.dispatchEvent(new Event('change', { bubbles: true }));
 				}
-				pick(0, 'pipe');        // scope
-				pick(1, 'length');      // a property every pipe has a value for
-				pick(2, 'gt');
-				const num = p.querySelector('input[type=number]');
-				num.value = '1';
-				num.dispatchEvent(new Event('change', { bubbles: true }));
+				pick(0, 'pipe');
+				pick(1, 'length');
+				pick(2, 'top');
 				const input = p.querySelector('input[type=text]');
-				input.value = '0';
+				input.value = '3';
 				input.dispatchEvent(new Event('input', { bubbles: true }));
 				p.querySelector('button').click();
 				const res = p.querySelector('#lpn_find_results');
-				return { text: res.textContent, rows: res.querySelectorAll('button').length,
-					props: [...p.querySelectorAll('select')[1].options].map(o => o.value) };
+				return {
+					text: res.textContent,
+					rows: [...res.querySelectorAll('button')].map(b => b.textContent),
+					numberBoxes: p.querySelectorAll('input[type=number]').length,
+					ops: [...p.querySelectorAll('select')[2].options].map(o => o.value),
+					props: [...p.querySelectorAll('select')[1].options].map(o => o.value)
+				};
 			});
-			report.ok(/found/.test(listed.text), 'a range search over a real network finds pipes',
-				listed.text.replace(/\s+/g, ' ').slice(0, 90));
-			// With the limit at 1: one row, a counted gap, one row. Never the whole list, and never
-			// a silent truncation -- the count is what makes hiding the middle honest.
-			report.eq(listed.rows, 2, 'with a limit of 1 the list shows exactly two rows -- the two ends');
-			report.ok(/more between these/.test(listed.text), '...and says how many it left out',
-				listed.text.replace(/\s+/g, ' ').slice(0, 120));
+			report.eq(listed.numberBoxes, 0, 'there is no second input -- the Value box holds n');
+			report.ok(listed.ops.indexOf('top') >= 0 && listed.ops.indexOf('bottom') >= 0,
+				'Top n and Bottom n are in the condition list', listed.ops.join(','));
+			report.eq(listed.rows.length, 3, 'Top 3 lists exactly three');
+			// **THE ORDERING IS NOT ASSERTED HERE, and that is deliberate.** Every pipe in the dev
+			// grid is the same length, so "biggest first" would be vacuously true of any order --
+			// the ordering is pinned against a controlled fixture in dev/lpn-spike/find-harness.js
+			// instead. What a browser is needed for is that each row PRINTS the value it was
+			// ranked by, which is what makes a top-n list readable at all.
+			const nums = listed.rows.map(t => parseFloat(t.split(/\s+/)[1]));
+			report.ok(nums.every(v => isFinite(v)),
+				'...each row shows the value it was ranked by', listed.rows.join(' | ').slice(0, 90));
 			report.ok(listed.props.indexOf('gradient') >= 0,
 				'head loss gradient is offered as a searchable property', listed.props.join(','));
 		}

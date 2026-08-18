@@ -1361,10 +1361,11 @@ $ec_lang['lpn_find_op_lt']='is less than';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} found. Click one to go to it.';
 $ec_lang['lpn_find_none']='Nothing matched.';
-// The two ENDS of a range are what a "greater than"/"less than" search is really about, so a long
-// answer shows the top few and the bottom few and counts what lies between. {n} is a whole number.
-$ec_lang['lpn_find_limit']='How many to list at each end';
-$ec_lang['lpn_find_middle']='{n} more between these, not listed.';
+// The two extremes, as conditions on the same footing as "is greater than" -- the Value box holds
+// how many. The literal n is Tom's own wording and is the shortest way to say that the number goes
+// in the box beside it.
+$ec_lang['lpn_find_op_top']='Top n';
+$ec_lang['lpn_find_op_bottom']='Bottom n';
 // EPANET's Map Finder calls this "Adjacent Links". Said plainly here: the pipes, pumps and valves
 // that meet at the node you found.
 $ec_lang['lpn_find_adjacent']='Links here';
