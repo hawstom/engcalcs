@@ -145,23 +145,6 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 					<a class="dropdown-item" href="Irrigation-Pressure.php" title="<?=$ec_lang['ip_main_desc']?>"><?=$ec_lang['ip_main_menu']?></a>
 				</div>
 			</li>
-			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle" id="dropdown-more" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<?=$ec_lang['menu_more']?>
-				</a>
-				<div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-more">
-					<a class="dropdown-item" href="About.php"><?=$ec_lang['about_main_menu']?></a>
-					<a class="dropdown-item" href="Install.php"><?=$ec_lang['install_main_menu']?></a>
-					<a class="dropdown-item" href="contact.php"><?=$ec_lang['contact_main_menu']?></a>
-					<?php // Walkthroughs USED TO BE HERE and was moved into the Looped Network page's own
-					      // Help menu on 2026-08-13 (Tom: "the walkthrough is a little incongruous").
-					      // The post covers that one calculator, so among these suite-wide items the
-					      // plural promised guides to all of them; and this was the only entry here that
-					      // left the site. It also carried a tip that no touch user could ever see -- a
-					      // bare <a title>, which matches no selector in js/Calculators.lib.js. Do not
-					      // re-add it: see lpn_menu_help / lpn_help_walkthroughs. ?>
-				</div>
-			</li>
 		</ul>
 <?php if ($show_name_field) : ?>
 		<button id="ec-install-btn" type="button" class="btn btn-sm btn-outline-primary ms-3" style="display:none" onclick="EngCalcs.installPWA()"><?=ecIcon('install')?><?=$ec_lang['install_main_menu']?></button>
@@ -187,6 +170,28 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 		</form>
 <?php endif; ?>
 		<ul class="navbar-nav ms-auto">
+			<?php // HELP sits in the right-hand strip, ahead of the language picker (Task 298).
+			      // The left list is the work -- one calculator menu; the right strip is the two things
+			      // that are about using the site rather than doing a calculation, and both read as
+			      // icon-plus-word. The key is still menu_more: the English value changed, which is a
+			      // translation resync, not a new key. ?>
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle active" id="dropdown-help" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+					<?=ecIcon('help')?><?=$ec_lang['menu_more']?>
+				</a>
+				<div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-help">
+					<a class="dropdown-item" href="About.php"><?=$ec_lang['about_main_menu']?></a>
+					<a class="dropdown-item" href="Install.php"><?=$ec_lang['install_main_menu']?></a>
+					<a class="dropdown-item" href="contact.php"><?=$ec_lang['contact_main_menu']?></a>
+					<?php // Walkthroughs USED TO BE HERE and was moved into the Looped Network page's own
+					      // Help menu on 2026-08-13 (Tom: "the walkthrough is a little incongruous").
+					      // The post covers that one calculator, so among these suite-wide items the
+					      // plural promised guides to all of them; and this was the only entry here that
+					      // left the site. It also carried a tip that no touch user could ever see -- a
+					      // bare <a title>, which matches no selector in js/Calculators.lib.js. Do not
+					      // re-add it: see lpn_menu_help / lpn_help_walkthroughs. ?>
+				</div>
+			</li>
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle active" id="dropdown-lang" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
 					<?=ecIcon('globe')?><?=$language_settings['LANGNAME']?>
