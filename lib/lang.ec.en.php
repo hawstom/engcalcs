@@ -1665,6 +1665,9 @@ $ec_lang['lpn_pump_point3']='Point 3 (optional)';
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='Mode: Select. Click an element or a label to see or change it. Drag to move a node, a vertex, or a label. Double-click a pipe to add or remove a vertex.';
 $ec_lang['lpn_mode_delete']='Mode: Delete. Click an element to remove it.';
+// One-shot notice when the Delete key is pressed with nothing picked (Task 415). It has to name the
+// gesture, because the whole point of the change is that the order is now subject, then verb.
+$ec_lang['lpn_select_first']='Nothing is picked. Click an element on the map first, then press Delete.';
 $ec_lang['lpn_mode_add_junction']='Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels.';
 $ec_lang['lpn_mode_add_reservoir']='Mode: Add Reservoir. Click the map to place a reservoir. Switch to Select mode to change or move elements and labels.';
 $ec_lang['lpn_mode_add_tank']='Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move elements and labels.';

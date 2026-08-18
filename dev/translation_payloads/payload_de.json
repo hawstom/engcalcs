@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 997,
-        "delta_key_count": 1,
+        "expected_key_count": 998,
+        "delta_key_count": 2,
         "exempt_key_count": 29,
         "exempt_keys": [
             "calc_units_us",
@@ -369,10 +369,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_examples_close": "Close"
+        "lpn_examples_close": "Close",
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
     },
     "keys": {
-        "lpn_examples_close": "Close"
+        "lpn_examples_close": "Close",
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
     },
     "key_context": {
         "lpn_examples_close": {
@@ -388,6 +390,22 @@
                     "key": "lpn_examples_size",
                     "value": "{nodes} Entnahmeknoten, {links} Rohre",
                     "english": "{nodes} nodes, {links} links"
+                }
+            }
+        },
+        "lpn_select_first": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_delete",
+                    "value": "Modus: Löschen. Klicken Sie auf ein Element, um es zu entfernen.",
+                    "english": "Mode: Delete. Click an element to remove it."
+                },
+                "next_translated": {
+                    "key": "lpn_mode_add_junction",
+                    "value": "Modus: Entnahmeknoten hinzufügen. Klicken Sie auf die Karte, um einen Entnahmeknoten zu platzieren. Wechseln Sie zum Modus Auswählen, um Elemente und Beschriftungen zu ändern oder zu verschieben.",
+                    "english": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels."
                 }
             }
         }

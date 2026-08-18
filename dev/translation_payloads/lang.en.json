@@ -841,6 +841,7 @@
         "lpn_pump_point3": "Point 3 (optional)",
         "lpn_mode_select": "Mode: Select. Click an element or a label to see or change it. Drag to move a node, a vertex, or a label. Double-click a pipe to add or remove a vertex.",
         "lpn_mode_delete": "Mode: Delete. Click an element to remove it.",
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
         "lpn_mode_add_junction": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels.",
         "lpn_mode_add_reservoir": "Mode: Add Reservoir. Click the map to place a reservoir. Switch to Select mode to change or move elements and labels.",
         "lpn_mode_add_tank": "Mode: Add Tank. Click the map to place a tank. Switch to Select mode to change or move elements and labels.",
@@ -999,7 +1000,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 997,
+    "count": 998,
     "active_prefixes": [
         "about",
         "bpn",

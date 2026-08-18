@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ur",
-        "expected_key_count": 997,
-        "delta_key_count": 1,
+        "expected_key_count": 998,
+        "delta_key_count": 2,
         "exempt_key_count": 20,
         "exempt_keys": [
             "u_imgd",
@@ -360,10 +360,12 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_examples_close": "Close"
+        "lpn_examples_close": "Close",
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
     },
     "keys": {
-        "lpn_examples_close": "Close"
+        "lpn_examples_close": "Close",
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
     },
     "key_context": {
         "lpn_examples_close": {
@@ -379,6 +381,22 @@
                     "key": "lpn_examples_size",
                     "value": "{nodes} جنکشن، {links} پائپ",
                     "english": "{nodes} nodes, {links} links"
+                }
+            }
+        },
+        "lpn_select_first": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_mode_delete",
+                    "value": "موڈ: حذف کریں۔ کسی عنصر کو ہٹانے کے لیے اس پر کلک کریں۔",
+                    "english": "Mode: Delete. Click an element to remove it."
+                },
+                "next_translated": {
+                    "key": "lpn_mode_add_junction",
+                    "value": "موڈ: جنکشن شامل کریں۔ جنکشن رکھنے کے لیے نقشے پر کلک کریں۔ عناصر اور لیبلز تبدیل یا منتقل کرنے کے لیے منتخب کریں موڈ پر جائیں۔",
+                    "english": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels."
                 }
             }
         }
