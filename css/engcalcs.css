@@ -525,7 +525,12 @@ html[lang="zh"] .ec-welcome {
 #lpn_toolbar button[aria-pressed="true"]::before { content: "\2713 "; }
 /* Three groups (Add / Delete-Undo-Select / Zoom-Example) -- a wider gap, not a line, separates
    them (Tom, 2026-07-30: a divider line was more than needed). */
+#lpn_toolbar { display: flex; flex-wrap: wrap; align-items: center; row-gap: 4px; }
 .lpn-toolbar-group { display: inline-flex; gap: 6px; margin-right: 14px; }
+/* The right-hand end of the strip: Find and the bottom-pane toggle (Task 434). Pushed there by an
+   auto margin rather than placed at a fixed offset, so it stays at the edge at every window width
+   and drops to its own line with the rest when the strip wraps. */
+.lpn-toolbar-end { margin-left: auto; margin-right: 0; }
 /* ---- Menu bar (ROADMAP Task 211) ----
    Above the toolbar, and holding every command on the page; the toolbar below is the high-use
    subset. Flat text buttons, because a menu bar that looks like a row of push-buttons reads as a
@@ -936,7 +941,11 @@ html[lang="zh"] .ec-welcome {
    sketch convention applies all the same -- black for what is built, blue for water -- so the
    ground is a black line, the hydraulic grade line is blue, and the pressure between them is the
    same blue at low opacity. No shading, no borders beyond the axis frame, no dimension lines. */
-.lpn-profile-svg { width: 100%; height: auto; max-width: 36rem; }
+/* The chart FILLS ITS TAB. Its viewBox does the fitting (preserveAspectRatio's default keeps the
+   drawing whole), so a taller pane is a bigger chart with no second layout to keep in step -- which
+   is the answer to Tom's "it is too small" (Task 433). The 36rem cap it wore as a popover is gone
+   with the popover. */
+.lpn-profile-svg { width: 100%; height: 100%; }
 .lpn-profile-frame { fill: none; stroke: #333; stroke-width: 1; }
 .lpn-profile-grid { stroke: #ddd; stroke-width: 1; }
 .lpn-profile-axis { stroke: #333; stroke-width: 1; }
@@ -957,6 +966,60 @@ html[lang="zh"] .ec-welcome {
 .lpn-profile-key-hgl { border-top: 2px solid #0645ad; }
 .lpn-profile-key-band { background: rgba(6, 69, 173, .12); border: 1px solid rgba(6, 69, 173, .35); }
 .lpn-profile-chip { margin: 0 .25em .15em 0; }
+
+/* ==== The bottom pane (ROADMAP Task 434) =====================================================
+   One resizable panel under the map, carrying a tab per thing that is read while the map is
+   edited. It is IN NORMAL FLOW below the canvas, which is the whole mechanism: applyMapHeight()
+   measures `body.bottom - svg.bottom`, so the pane's height is subtracted from the map's by
+   measurement and neither one has to be told about the other.
+
+   `flex: column` with the body carrying the only explicit height -- the grip and the tab strip
+   are whatever they need, and JS writes one number in one place. */
+.lpn-pane { display: flex; flex-direction: column; border-top: 1px solid #ccc; background: #fff; }
+/* The drag handle IS the top edge, which is where a hand aims. Tall enough to hit with a mouse
+   and a real amount of pointer slop; the ruled line inside says "grab me" without a glyph. */
+.lpn-pane-grip {
+	height: 8px; cursor: row-resize; background: #f2f2f2;
+	border-bottom: 1px solid #e0e0e0; touch-action: none;
+}
+.lpn-pane-grip::after {
+	content: ""; display: block; width: 3rem; height: 2px; margin: 3px auto 0;
+	background: #bbb;
+}
+.lpn-pane-grip:hover { background: #e8e8e8; }
+.lpn-pane-head { display: flex; align-items: stretch; gap: 4px; border-bottom: 1px solid #ddd; }
+.lpn-pane-tabs { display: flex; flex-wrap: wrap; gap: 2px; flex: 1 1 auto; min-width: 0; }
+/* A TAB, not a push-button: flat, with the selected one joined to the panel below it by having no
+   bottom border of its own. Same reasoning as the menu bar's flat items -- a row of raised
+   buttons here would read as a second toolbar. */
+.lpn-pane-tab {
+	background: none; border: 1px solid transparent; border-bottom: 0; font: inherit;
+	padding: 3px 12px; cursor: pointer;
+}
+.lpn-pane-tab:hover { background: #f2f2f2; }
+.lpn-pane-tab[aria-selected="true"] { background: #fff; border-color: #bbb; font-weight: bold; }
+.lpn-pane-x {
+	flex: 0 0 auto; width: 2.2rem; padding: 0; border: 0; background: transparent;
+	font-size: 18px; line-height: 1; color: #333; cursor: pointer;
+}
+.lpn-pane-x:hover, .lpn-pane-x:focus { background: #eee; color: #000; }
+/* The height JS writes lands here. Overflow is the panel's own business, never the page's: the
+   root is `overflow: hidden` on this page (Task 432), so anything that does not fit must scroll
+   INSIDE its tab. */
+.lpn-pane-body { overflow: hidden; }
+.lpn-pane-panel { display: none; height: 100%; box-sizing: border-box; padding: 6px 8px; }
+.lpn-pane-panel.on { display: flex; }
+/* The profile tab: its controls in a fixed left column, the chart taking everything else. A row
+   of controls ABOVE the chart would spend the pane's scarcest dimension -- its height -- on
+   things that are read once, leaving the drawing the same proof-of-concept size it had as a
+   popover. */
+.lpn-profile-panel { gap: 10px; align-items: stretch; }
+.lpn-profile-controls { flex: 0 0 15rem; overflow: auto; font-size: .9em; }
+#lpn_profile_chart { flex: 1 1 auto; min-width: 0; }
+@media (max-width: 40rem) {
+	.lpn-profile-panel { flex-direction: column; overflow: auto; }
+	.lpn-profile-controls { flex: 0 0 auto; }
+}
 
 /* ==== The Labels panel's column headings (ROADMAP Task 435) ==================================
    The four column headings must sit over the controls they name. They did not, and border-box

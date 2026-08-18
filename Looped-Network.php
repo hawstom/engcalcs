@@ -347,6 +347,60 @@ echoHeader("EngCalcs", $html_title, "");
 		<div id="lpn_basemap_credit" style="display:none;position:absolute;bottom:4px;right:4px;z-index:4;font-size:10px;line-height:1.4;background:rgba(255,255,255,.85);padding:1px 5px"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></div>
 	</div>
 </form>
+<?php // ---- THE BOTTOM PANE (ROADMAP Task 434) ----------------------------------------------------
+      //
+      // One resizable panel docked under the map, carrying a TAB for each thing that is read while
+      // the map is edited -- the profile now, the tabular editors (Junctions, Pipes, Pumps, Valves)
+      // next. Tom, 2026-08-18, naming the frame every one of Tasks 284, 427, 433 and 146.04 kept
+      // reaching for separately: decide the container once, or each of them invents a different one.
+      //
+      // **IN NORMAL FLOW, AND THAT IS THE WHOLE MECHANISM.** applyMapHeight() sizes the canvas from
+      // `body.bottom - svg.bottom`, so a block that really sits below the map is already subtracted
+      // from the map's height by measurement. Nothing here tells the canvas how tall to be; opening,
+      // closing or dragging the pane is an ENVIRONMENT event that asks it to measure again.
+      // A `position: fixed` overlay would have needed its height sent to the canvas by hand, which
+      // is a second source of truth for the one number Task 432 just finished making measured.
+      //
+      // OUTSIDE #formInput, unlike the map: the tab bodies hold ordinary inputs, and a stray Enter
+      // in one of them must not submit the calculator form.
+      //
+      // Settings and the Labels box are NOT tabs here and never will be (Tom, explicitly). Both are
+      // pull-downs hanging off their own toolbar buttons, and a setting is not something you read
+      // beside the drawing. ?>
+<div id="lpn_pane" class="d-print-none lpn-pane" style="display:none">
+	<?php // The drag handle is the pane's top EDGE, which is where a person aims. role="separator"
+	      // with an aria-label rather than a tip glyph: it is a grip, not a labelled control, and
+	      // .ec-help on it would put a "?" in the middle of the drag target. ?>
+	<div id="lpn_pane_grip" class="lpn-pane-grip" role="separator" aria-orientation="horizontal"
+		title="<?=htmlspecialchars($ec_lang['lpn_pane_resize'])?>"
+		aria-label="<?=htmlspecialchars($ec_lang['lpn_pane_resize'])?>"></div>
+	<div id="lpn_pane_head" class="lpn-pane-head">
+		<div id="lpn_pane_tabs" class="lpn-pane-tabs" role="tablist"></div>
+		<button type="button" id="lpn_pane_close" class="lpn-pane-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	</div>
+	<div id="lpn_pane_body" class="lpn-pane-body">
+		<?php // ---- Tab: Profile (Task 409, moved here by Task 433) ----
+		      // The ground and the hydraulic grade line along one route. It lives here rather than in
+		      // a floating box because it is READ WHILE THE MAP IS EDITED and it redraws on every
+		      // solve -- and because as a popup it was, in Tom's words, too small: a proof of
+		      // concept. Everything inside #lpn_profile_form and #lpn_profile_chart is built in JS,
+		      // since the node lists and the chart both depend on the document. ?>
+		<div id="lpn_pane_profile" class="lpn-pane-panel lpn-profile-panel" role="tabpanel" aria-labelledby="lpn_pane_tab_profile">
+			<div class="lpn-profile-controls">
+				<div id="lpn_profile_form"></div>
+				<?php // The key is STATIC HTML, not JS: these three names never change with the
+				      // document, and a swatch beside each is the whole of what a legend has to be. ?>
+				<div class="lpn-profile-key">
+					<span><i class="lpn-profile-key-ground"></i><?=$ec_lang['lpn_profile_ground']?></span>
+					<span><i class="lpn-profile-key-hgl"></i><?=$ec_lang['lpn_profile_hgl']?></span>
+					<span><i class="lpn-profile-key-band"></i><?=$ec_lang['lpn_result_pressure']?></span>
+				</div>
+				<div id="lpn_profile_note"></div>
+			</div>
+			<div id="lpn_profile_chart"></div>
+		</div>
+	</div>
+</div>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
       // (viewport-relative), but position:absolute is page-relative -- on a scrolled page those
       // are two different coordinate spaces, which was the actual cause of both the off-screen
@@ -397,28 +451,6 @@ echoHeader("EngCalcs", $html_title, "");
 	<div style="font-weight:bold"><?=$ec_lang['lpn_find_title']?></div>
 	<div id="lpn_find_form"></div>
 	<div id="lpn_find_results"></div>
-	</div>
-</div>
-<?php // Profile panel (Task 409): the ground and the hydraulic grade line along one route through
-      // the network. Same standing-box pattern as the Find panel above -- modeless, draggable, with
-      // a close X -- because it is READ while the map is edited: the drawing redraws on every solve,
-      // which is what makes choosing a route feel like Google Directions rather than like running a
-      // report. Everything inside #lpn_profile_form and #lpn_profile_chart is built in JS, since
-      // the node lists and the chart both depend on the document. ?>
-<div id="lpn_profile_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:40rem">
-	<button type="button" id="lpn_profile_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
-	<div class="lpn-popover-body">
-	<div style="font-weight:bold"><?=$ec_lang['lpn_profile_title']?></div>
-	<div id="lpn_profile_form"></div>
-	<div id="lpn_profile_chart"></div>
-	<?php // The key is STATIC HTML, not JS: these three names never change with the document, and a
-	      // swatch beside each is the whole of what a legend has to be. ?>
-	<div class="lpn-profile-key">
-		<span><i class="lpn-profile-key-ground"></i><?=$ec_lang['lpn_profile_ground']?></span>
-		<span><i class="lpn-profile-key-hgl"></i><?=$ec_lang['lpn_profile_hgl']?></span>
-		<span><i class="lpn-profile-key-band"></i><?=$ec_lang['lpn_result_pressure']?></span>
-	</div>
-	<div id="lpn_profile_note"></div>
 	</div>
 </div>
 <?php // Gear/settings panel (Task 146 Phase 2, 2026-07-30): ID prefixes, solver emitter exponent
@@ -583,6 +615,8 @@ EngCalcs.pageConfig = {
 	lpn_profile_summary: <?=json_encode($ec_lang['lpn_profile_summary'])?>,
 	lpn_profile_axis_station: <?=json_encode($ec_lang['lpn_profile_axis_station'])?>,
 	lpn_profile_axis_elev: <?=json_encode($ec_lang['lpn_profile_axis_elev'])?>,
+	lpn_pane_toggle: <?=json_encode($ec_lang['lpn_pane_toggle'])?>,
+	lpn_pane_toggle_tip: <?=json_encode($ec_lang['lpn_pane_toggle_tip'])?>,
 	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
 	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and

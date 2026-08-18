@@ -1373,6 +1373,14 @@ $ec_lang['lpn_goto_prompt']='Latitude, longitude';
 $ec_lang['lpn_goto_bad']='That is not a latitude and longitude. Try 38.106, -122.569.';
 $ec_lang['lpn_georef_goto']='Go to…';
 
+// ---- The bottom pane (ROADMAP Task 434) ----
+// One panel below the map, holding a tab for each thing that is read while the map is edited: the
+// profile first, tables later. The toggle is on the toolbar because it is the strip a reader
+// scans for "what else can this page show me".
+$ec_lang['lpn_pane_toggle']='Bottom panel';
+$ec_lang['lpn_pane_toggle_tip']='Show or hide the panel below the map. It holds the profile.';
+$ec_lang['lpn_pane_resize']='Drag to make the panel taller or shorter';
+
 $ec_lang['lpn_clean_map']='Clean map';
 $ec_lang['lpn_clean_map_off']='Show map readouts';
 $ec_lang['lpn_clean_map_tip']='Hide the mode line and the coordinate readout so a screenshot shows only the map. Nothing else changes, and nothing is saved.';
