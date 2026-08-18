@@ -957,3 +957,61 @@ html[lang="zh"] .ec-welcome {
 .lpn-profile-key-hgl { border-top: 2px solid #0645ad; }
 .lpn-profile-key-band { background: rgba(6, 69, 173, .12); border: 1px solid rgba(6, 69, 173, .35); }
 .lpn-profile-chip { margin: 0 .25em .15em 0; }
+
+/* ==== The Labels panel's column headings (ROADMAP Task 435) ==================================
+   The four column headings must sit over the controls they name. They did not, and border-box
+   (the earlier pass) was only half the cause: BOOTSTRAP'S REBOOT GIVES EVERY FORM CONTROL
+   `font-size: inherit`, so an <input> here resolves `em` against the body's 1rem, while
+   columnHeadings() draws its heading row at `font-size: 0.85em` and its cells resolve the SAME
+   declared `3.5em`/`4.5em` against 0.85rem. Each heading is then ~15% narrower than its control,
+   the leftmost flex spacer absorbs the whole shortfall, and every heading slides RIGHT -- worst at
+   the left, nearly right at the right, which is exactly the residual Tom reported.
+
+   So the widths are restated in `rem`, which is the same absolute length the controls already
+   render at (body font-size is Bootstrap's 1rem) and is immune to whatever font-size the row
+   carries. `!important` is not decoration: looped-network.js sets these widths inline.
+   The font-size anchor on the two containers is what makes the equality hold BY CONSTRUCTION
+   rather than by the body happening to be 1rem.
+
+   The selectors are the columns themselves: child 1 is the flexible name/spacer, children 2-5 are
+   Before, After, Decimals, Priority in both row types. `span:nth-child(2|3)` therefore matches only
+   a heading cell (a field row carries an <input> there), and `span:nth-child(4|5)` matches a
+   heading cell or the reserved-column spacer -- which needs the same treatment for the same reason
+   and lands on the same 4.5rem it already had. Keep in step with labelCheckbox() and
+   columnHeadings() in js/looped-network.js if a column is ever added. */
+#lpn_labels_node_fields,
+#lpn_labels_link_fields { font-size: 1rem; }
+#lpn_labels_node_fields > div > span:nth-child(2),
+#lpn_labels_node_fields > div > span:nth-child(3),
+#lpn_labels_link_fields > div > span:nth-child(2),
+#lpn_labels_link_fields > div > span:nth-child(3) { width: 3.5rem !important; }
+#lpn_labels_node_fields > div > span:nth-child(4),
+#lpn_labels_node_fields > div > span:nth-child(5),
+#lpn_labels_link_fields > div > span:nth-child(4),
+#lpn_labels_link_fields > div > span:nth-child(5) { width: 4.5rem !important; }
+
+/* ==== No window scrollbar on the map page (ROADMAP Task 432) =================================
+   Tom, 2026-08-18: *"Our bottom controls bar should be the hard bottom of the page."* This is a
+   full-window drawing surface; anything that scrolls the WINDOW moves the whole application, so
+   the window does not scroll at all and the map footer is the bottom of the world.
+
+   SCOPED BY WHAT ONLY THIS PAGE HAS. <body> carries no page class, and the other fifteen
+   calculators are a form and an answer and MUST keep scrolling normally -- so the scope is the map
+   canvas itself. A browser without `:has()` simply drops the rule and behaves as before, which is
+   the safe direction.
+
+   `overflow: hidden` on the root is what the viewport reads; body is left alone. The two lines
+   below do different jobs and both are wanted:
+     - applyMapHeight() already fits the canvas to the window, but it measures body's own box, and
+       a bottom margin on the last in-flow block collapses OUT of that box and into the document's
+       scroll height. That is one stubborn pixel this page can never see and never fix, and it is
+       enough for a scrollbar. Zeroing it removes the overflow rather than hiding it.
+     - `overflow: hidden` then guarantees the invariant instead of re-deriving it: it also kills the
+       scrollbar during load, while the canvas is still wearing its 10000px curtain.
+
+   THE COST, stated rather than discovered: below LPN_MAP_MIN the canvas is allowed to overflow on
+   purpose (a window too short for a real map), and what overflows is now clipped instead of
+   scrollable. That is the request. A panel that needs to scroll scrolls INSIDE itself --
+   .lpn-popover-body already does. */
+html:has(#lpn_canvas) form#formInput { margin-bottom: 0; }
+html:has(#lpn_canvas) { overflow: hidden; }
