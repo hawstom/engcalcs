@@ -482,26 +482,26 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   add-pipe / add-junction workflow). A 2026-07-30 proof of concept showed this is cheap once set up;
   the recipe records the ~30 minutes of trial and error, of which the hard part is precise SVG click
   targeting, not GIF assembly. The POC GIFs were never committed.
-- 11|145| **Google Maps elevation/length helper — MOVED from `bpn_` to `lpn_` (Tom, 2026-07-28).**
-  An isolated map mashup that pulls pipe lengths and node elevations into the network, in a separate
-  lazy-loaded window. **`bpn_` therefore has no map phase at all now**; nothing should go looking for
-  one. Feasibility-gated: investigate cost, key management and terms of service before building.
-  - **The core solve never depends on it**, so the whole feature can be aborted at zero cost if it
-    proves infeasible or the API terms turn hostile. That constraint matters more here, not less.
-  - **Demoted from foundation to one backdrop type among several.** Tom's read: the mashup is very
-    cool, but its importance is unproven — in practice a network is drawn over a plan sheet, a CAD
-    export or a local aerial, essentially **never** over a Google map. So `lpn_` built the
-    projection-free backdrop first and this adds tiles as a *pre-registered* one later, which also
-    keeps the offline PWA case working.
-  - **Two problems the projection-free backdrop does not have.** (1) Tiles are Web Mercator; a plan
-    sheet is State Plane, UTM or a site grid, so mixing them is a coordinate transformation, not a
-    scale factor — **do not let Web Mercator become the document's coordinate system**;
-    georeferencing is a property of the backdrop layer, not of the network. (2) **Web Mercator
-    distances are not ground distances**: scale error is `1/cos(latitude)`, ~15% at 40°, ~30% at 50°,
-    unbounded toward the poles. A pipe length measured naively off a tiled backdrop is wrong by more
-    than most engineering tolerances, silently, and looks perfectly reasonable on screen. Correct it,
-    or compute geodesically from lat/lng. This is the strongest argument for the existing rule that
-    **`len` is stored and overridable, never derived.**
+- 85|145| **GEOGRAPHIC PROJECTS: a project declares grid or geographic before anything is drawn, the
+  same way it declares units.** Tom, 2026-08-17: *"There's no reason not to dive into this. It's a
+  big task, and we can start now... In a way, geo is just another unit (degrees), but it's of course
+  much more complex than that, and the map is no longer unitless."* This REPLACES the old scope (an
+  isolated Google-Maps mashup window that pulled lengths and elevations in); the mashup is one
+  feature of a geographic project, not the project itself. `bpn_` still has no map phase.
+  - **THE DECLARATION IS AT CREATION AND IS NOT REVERSIBLE BY ACCIDENT** — epanet-js works this way
+    and it is right: every coordinate in the document means something different under the two, so a
+    project that changed its mind mid-drawing would have to reinterpret every node.
+  - **Web Mercator must NOT become the document's coordinate system.** Georeferencing is a property
+    of the backdrop layer; a plan sheet is State Plane, UTM or a site grid.
+  - **Web Mercator distances are not ground distances**: the scale error is `1/cos(latitude)` — ~15%
+    at 40°, ~30% at 50°, unbounded toward the poles. A pipe length read naively off a tiled backdrop
+    is wrong by more than any engineering tolerance, silently, and looks perfectly reasonable. Either
+    correct it or compute geodesically from lat/lng. It is the strongest argument for the standing
+    rule that **`len` is stored and overridable, never derived.**
+  - **Still feasibility-gated on the BASEMAP, not on the idea:** key management, terms of service,
+    cost, and whether the offline PWA promise survives a tile dependency. Decide the provider before
+    building anything that assumes one.
+  - Full scope: **`dev/geographic-projects.md`**.
 - 20|221| **Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.** Delete
   `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,
   `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is
@@ -612,15 +612,56 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Raised 20 → 60 then lowered 60 → 35 the same day.** Tom: *"I have got distracted… I erred in
     pushing LibreEPANET.org at the expense of scenarios."* A gate on a launch nobody is waiting for
     is not urgent work.
+  - **THE FOUR EPANET CONCEPTS IT NEEDS ARE NOW CHILDREN, not prose here** (Tom, 2026-08-17):
+    248.01 time settings, 248.02 patterns, 248.03 controls, 248.04 curves. Build them in that order —
+    each is testable on its own, and a pattern with no clock cannot be demonstrated at all.
 
-- 10|409| **Profiles: a link-length elevation profile along a path, for time-step results.**
-  Tom, 2026-08-17. Constantly desirable, not blocking — fit in whenever there is time, same tier as
-  Task 327 (thematic coloring). Drawn on LINK LENGTHS, not map distance. Needs a start-node/end-node/
-  path-selection interface; Tom's suggestion is a Google Maps Directions shape — a suggested path
-  plus runner-up alternatives, user fine-tunes it, the app reacts to new constraints with new
-  suggestions, and the profile view opens and updates live as the path is refined rather than only
-  after it is finalized. Worth checking whether Google Earth/GIS tooling has literature, a library, or
-  an API for this before building path-suggestion from scratch. Depends on Task 248 (time steps).
+- 55|409| **Profiles: an elevation/HGL profile along a chosen path. NOT gated on time steps.**
+  Tom, 2026-08-17: *"There's no reason these can't be done now."* The earlier block made it depend on
+  Task 248; it does not — a steady-state profile of ground, hydraulic grade and pressure along a path
+  is the drawing an engineer wants at t=0, and time steps later animate it rather than enable it.
+  - **Drawn on LINK LENGTHS, not on map distance.** The two differ by every vertex and by every
+    stored-not-derived `len`, and a profile plotted on map distance is a different pipe.
+  - **Path selection in the shape of Google Maps Directions** (Tom): a suggested path with runner-up
+    alternatives, the user fine-tunes it, the app re-suggests as constraints change, and the profile
+    view opens and updates LIVE as the path is refined rather than only when it is finalized.
+  - **Truncate the vertical axis — epanet-js does not, and that is the one thing to beat.** Tom,
+    2026-08-17: *"epanetjs has a great Google Maps path concept. It chokes at the last steps because
+    they don't truncate their profile bottom/min_value."* A profile whose axis starts at zero throws
+    away almost all of the relief that the drawing exists to show.
+- 45|248.01| **Time settings (Task 248 child) — the smallest of the four and the one everything else
+  reads.** Duration, hydraulic time step, pattern time step, pattern start time, report time step,
+  start clock time. EPANET's `[TIMES]`, which the importer already reports as dropped.
+  - Do this FIRST. A pattern with no clock to run against cannot be demonstrated, and a control with
+    no clock cannot be tested.
+
+- 45|248.02| **Patterns (Task 248 child) — a named multiplier series, and the boundary conditions
+  that read one.** Tom, 2026-08-17 named the uses, and they are wider than demand:
+  demands and supplies, **reservoir heads** (a river or source level that varies), **pump schedules**
+  (on/off or a speed multiplier), water-quality source concentrations, and **electricity pricing**.
+  - EPANET's `[PATTERNS]` is a list of multipliers per pattern time step; a junction, a reservoir, a
+    pump and a source each name one. The importer reports every one of these as dropped today
+    (`demand-pattern`, `head-pattern`), so the import side already knows where they attach.
+  - **Water quality is NOT in scope and cannot be scoped by Tom** — 2026-08-17: *"I don't know
+    anything about water quality modeling including diffusivity and bulk/wall reactions."* Build the
+    pattern mechanism so a WQ source could read one later; do not build WQ on the strength of it.
+
+- 40|248.03| **Controls (Task 248 child) — simple and rule-based.** Turning pumps, pipes and valves
+  on and off, and changing a setting, on tank level, on time, or on a node pressure. EPANET's
+  `[CONTROLS]` (simple) and `[RULES]` (rule-based).
+  - Simple controls first: they are four sentence shapes and they cover the great majority of real
+    models. Rule-based is a language, and it can wait for evidence that a user has one.
+  - The `active` property (Task 184/407) is already how a link is switched off in a scenario, so a
+    control writes through a mechanism that exists; what is new is that it fires from a CONDITION.
+
+- 25|248.04| **Curves (Task 248 child) — probably NEVER a separate interface.** Tom, 2026-08-17:
+  *"We may be able to avoid curves as a separate interface indefinitely by reporting them and
+  referring to them by the name of their owner node."* A pump curve is already edited on the pump
+  (`curvePoints`, `curveRef`), and a tank volume curve belongs to its tank.
+  - So this task is a REPORT and a NAME, not an editor: a curve is named for the element that owns
+    it, and a `[CURVES]` section is read and written under that name. Reopen the editor question
+    only if a real file arrives whose curve is shared in a way an owner name cannot express.
+
 - 10|410| **Animation: a time-frame slider (time display, play, pause, speed) once Task 248 lands.**
   Tom, 2026-08-17, naming the EPANET/HEC-RAS convention as the shape to copy. Same "constantly
   desirable, fit in when there's time" tier as Tasks 327 and 409.
