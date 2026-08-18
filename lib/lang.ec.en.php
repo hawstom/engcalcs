@@ -1889,7 +1889,14 @@ $ec_lang_syn['lpn_settings_engine_epanet']='';
 // TEN TIMES faster, because ours is a dense O(n^3) Cholesky and EPANET is sparse. So the honest
 // trade is not speed at all: it is the one-time download, which is the thing a visitor on a slow
 // connection actually pays.
-$ec_lang['lpn_settings_engine_epanet_tip']='Runs the EPANET solver from the US EPA, here in your browser. Both solvers give the same answers, and on a network this size you will not see a speed difference. The first time you turn this on, about 650 KB is downloaded and then kept on this device.';
+//
+// THE DISAGREEMENTS ARE NAMED HERE BECAUSE THIS IS THE CHECKBOX (Tom, 2026-08-17: "Just disclose
+// it, maybe at the checkbox location"). It used to claim "Both solvers give the same answers",
+// which is false in two measured places -- minor losses 0.08% (EPANET rounds g to 32.2 ft/s^2)
+// and Manning 0.6%. Both are also announced in the status line when a network actually contains
+// the thing, but a user deciding whether to TURN THE ENGINE ON is asking the question here, and
+// finding out afterwards is finding out too late.
+$ec_lang['lpn_settings_engine_epanet_tip']='Runs the EPANET solver from the US EPA, here in your browser. On a network this size you will not see a speed difference. The two solvers agree closely, but not exactly: EPANET rounds the value it uses for gravity, so its minor (local) losses come out about 0.08% lower than ours, and with Manning roughness its head loss comes out about 0.6% lower. The first time you turn this on, about 650 KB is downloaded and then kept on this device.';
 $ec_lang_syn['lpn_settings_engine_epanet_tip']='';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang_syn['lpn_engine_loading']='';

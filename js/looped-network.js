@@ -1564,9 +1564,17 @@ var EngCalcs = EngCalcs || {};
 		var t = labelTuning(), box = document.createElement('div');
 		box.id = 'lpn_label_bench';
 		box.className = 'd-print-none';
-		box.setAttribute('style', 'position:fixed;right:8px;bottom:8px;z-index:35;background:#fff;'
+		// LOWER LEFT (Tom, 2026-08-17), away from Settings and Labels, which live top-right.
+		//
+		// **THE WIDTH IS CAPPED, and that is not cosmetic.** The readout line grew long, and with
+		// nothing to stop it the panel took most of the window: a fixed box with no width sizes to
+		// its widest child, and a monospace report line has no wrap opportunities a browser will
+		// take on its own. So: a max-width, and `overflow-wrap:anywhere` on the readout, which is
+		// what breaks a long unbroken token rather than widening the box. Tom, 2026-08-17: "the box
+		// got super wide because the report line got long and it didn't wrap."
+		box.setAttribute('style', 'position:fixed;left:8px;bottom:8px;z-index:35;background:#fff;'
 			+ 'border:1px solid #333;padding:8px;font:12px/1.4 monospace;box-shadow:2px 2px 6px rgba(0,0,0,.3);'
-			+ 'max-height:70vh;overflow:auto');
+			+ 'max-height:70vh;max-width:min(26em,45vw);overflow:auto');
 		function row(label, get, set, step, hint) {
 			var l = document.createElement('label'), i = document.createElement('input');
 			l.setAttribute('style', 'display:flex;justify-content:space-between;gap:8px;align-items:center');
@@ -1647,7 +1655,8 @@ var EngCalcs = EngCalcs || {};
 		});
 		var out = document.createElement('div');
 		out.id = 'lpn_label_bench_out';
-		out.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
+		out.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px;'
+			+ 'overflow-wrap:anywhere;white-space:normal');
 		box.appendChild(out);
 		var btns = document.createElement('div');
 		btns.setAttribute('style', 'margin-top:6px;display:flex;gap:6px');
