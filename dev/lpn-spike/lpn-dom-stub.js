@@ -32,11 +32,17 @@ function mkEl(tag) {
       contains(c) { return this._s.has(c); },
       toggle(c, on) { if (on === undefined) { on = !this._s.has(c); } if (on) { this._s.add(c); } else { this._s.delete(c); } return on; }
     },
-    className: '', id: '', title: '', type: '', value: '', textContent: '', _innerHTML: '',
+    className: '', id: '', title: '', type: '', value: '', _text: '', _innerHTML: '',
     checked: false, placeholder: '', step: '', min: '', _listeners: {},
     appendChild(c) { this.children.push(c); c.parentNode = this; return c; },
     insertBefore(c) { this.children.unshift(c); c.parentNode = this; return c; },
-    removeChild(c) { const i = this.children.indexOf(c); if (i >= 0) { this.children.splice(i, 1); } return c; },
+    // Removing the TEXT NODE clears the text, which is the other half of firstChild seeing it: the
+    // standard `while (firstChild) removeChild(firstChild)` teardown would otherwise hand back the
+    // same synthetic node forever and never terminate.
+    removeChild(c) {
+      if (c && c.nodeType === 3 && c._owner === this) { this._text = ''; return c; }
+      const i = this.children.indexOf(c); if (i >= 0) { this.children.splice(i, 1); } return c;
+    },
     // 'style' must not clobber the style OBJECT -- el() passes style as an attribute string, and
     // the layout code then writes .style.display on the same element.
     setAttribute(k, v) { if (k === 'style') { this._styleAttr = v; return; } this[k] = v; },
@@ -85,11 +91,36 @@ function mkEl(tag) {
         }
         return widest;
       }
-      return (this.textContent || '').length;
+      return (this._text || '').length;
     },
+    // **WIDTH FOLLOWS FONT SIZE** (ROADMAP Task 403). A real label's font size IS a world quantity
+    // -- `textSize / state.s` -- so its world width changes with every zoom and every text-size
+    // change. A stub returning characters x a constant holds that relationship at 1 and removes the
+    // whole thing every fitting rule is about: three separate rounds ended in "the harness passes
+    // and the browser does nothing" because of it.
+    //
+    // CHAR_W is the nominal advance AT _BASE_FS, so a label drawn at the base size measures exactly
+    // what it always did and nothing calibrated against it moves.
     _textWidth() {
       const n = this._textLength();
-      return (n ? n * CHAR_W : 10) * (this._isBold() ? 1.12 : 1);
+      return (n ? n * CHAR_W : 10) * (this._isBold() ? 1.12 : 1) * (this._fontSize() / BASE_FS);
+    },
+    // **THE STYLE OBJECT WINS.** Three write paths reach this one declaration and they are not
+    // equals: the `style` ATTRIBUTE string is set once when the element is built, `.style.fontSize`
+    // is written on every refresh afterwards, and a bare `font-size` ATTRIBUTE is a presentation
+    // attribute that any CSS declaration outranks. In a real DOM the later write and the stronger
+    // origin are the same one, so: object, then attribute string, then presentation attribute.
+    _fontSize() {
+      const fromObj = this.style && this.style.fontSize;
+      if (fromObj) { return parseFloat(fromObj) || BASE_FS; }
+      const m = /font-size\s*:\s*([0-9.]+)/.exec(this._styleAttr || '');
+      if (m) { return parseFloat(m[1]) || BASE_FS; }
+      const attr = this['font-size'];
+      if (attr !== undefined && attr !== null && attr !== '') { return parseFloat(attr) || BASE_FS; }
+      // A tspan carries no size of its own -- it inherits its <text>'s, exactly as in a browser,
+      // and without this a multi-line label would measure every row at the base size.
+      if (this.parentNode && this.parentNode._fontSize) { return this.parentNode._fontSize(); }
+      return BASE_FS;
     },
     _isBold() {
       // Two write paths reach the same declaration: the style ATTRIBUTE (buildLabelEls / the
@@ -107,13 +138,45 @@ function mkEl(tag) {
   });
   // The label layout code walks childNodes (tspans), not children -- same array here.
   Object.defineProperty(el, 'childNodes', { get() { return this.children; } });
-  Object.defineProperty(el, 'firstChild', { get() { return this.children[0] || null; } });
+  // **firstChild MUST SEE THE TEXT NODE**, or the standard
+  // `while (el.firstChild) { el.removeChild(el.firstChild); }` teardown -- which setMultilineText()
+  // and setTextLabelContent() both use -- silently clears nothing on an element whose content was
+  // assigned as textContent, and the old words are measured as though they were still there.
+  Object.defineProperty(el, 'firstChild', {
+    get() {
+      if (this.children.length) { return this.children[0]; }
+      return this._text === '' || this._text === undefined || this._text === null
+        ? null : { nodeType: 3, textContent: this._text, _owner: this };
+    }
+  });
+  // **textContent IS AN ACCESSOR, NOT A FIELD** (Task 403). In a real DOM, assigning it REPLACES
+  // every child, and reading it returns the text of the whole subtree. As a plain data field it did
+  // neither: a label switched from three tspans back to one line kept the tspans and measured both,
+  // and reading it back gave only whatever had last been assigned. `startsWith` appeared in
+  // example-network-harness.js's popupY() to work around exactly that, and is no longer needed.
+  Object.defineProperty(el, 'textContent', {
+    get() {
+      // OWN TEXT FIRST, THEN THE DESCENDANTS. The common shape on this page is a <label> whose own
+      // words are the field name with the value in a <span> inside it -- `label.textContent` in a
+      // real DOM is "Y-5200.00", not "Y" and not "-5200.00", and both halves have callers.
+      return (this._text || '') +
+        this.children.map(c => (c.textContent === undefined ? '' : c.textContent)).join('');
+    },
+    set(v) {
+      this.children.length = 0;
+      this._text = v === undefined || v === null ? '' : String(v);
+    }
+  });
   return el;
 }
 
 // Nominal glyph advance for the stub's text metrics -- see getBBox() above. A number, not a
 // measurement: what matters is that it is positive and constant, so width tracks character count.
 const CHAR_W = 6;
+// The size CHAR_W is calibrated at: js/looped-network.js's shipped `settings.textSize`. A label
+// drawn at this size measures exactly what it did before width followed size, so every number a
+// harness had calibrated against the old stub still holds at the default.
+const BASE_FS = 11;
 
 const byId = {};
 function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id; } return byId[id]; }

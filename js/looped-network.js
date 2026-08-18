@@ -10751,18 +10751,18 @@ var EngCalcs = EngCalcs || {};
 		// side: 'left' | 'right', for an ANCHORED annotation only -- which side of its node the
 		// whole label sits on. It is not a nicety.
 		//
-		// A Text label is `text-anchor: middle`, so lb.x/lb.y put its CENTRE at that offset from the
-		// node, and updateLabelGeometry() runs the leader to the label's near EDGE (px ± halfW).
-		// Offset the centre by less than half the text width and that near edge lands INSIDE the
-		// text: the leader is then a short stub poking out from under the middle of the words, on
-		// whichever side the flip rule happened to pick. That is what the first cut did (offsets of
-		// 0 and 40 against labels a few hundred units wide) and Tom's verdict was exact -- "centered
-		// over their anchor so that their leaders look worst of all possible positions... A centered
-		// text looks better unanchored."
+		// A callout must sit ENTIRELY to one side of its node, or the leader is a stub emerging from
+		// under the middle of the words -- Tom's verdict on the first cut was exact: "centered over
+		// their anchor so that their leaders look worst of all possible positions."
 		//
-		// So the offset is MEASURED, not guessed: render the text, read its real width, then push
-		// the centre out by half that width plus a gap that clears the node symbol. The existing
-		// left/right flip in updateLabelGeometry() then resolves the side by itself from the sign.
+		// **THE OFFSET IS THE LABEL'S NEAR EDGE, NOT ITS CENTRE, so the text width cancels and
+		// nothing is measured** (Task 403). It used to centre the label and push the centre out by
+		// half a MEASURED width -- correct at the instant it was drawn and stale ever after, because
+		// a label's world width follows the font size (textSize / scale). Change the text size and
+		// every callout's stored offset described a width the label no longer has. `lb.align` says
+		// which edge the point is, so a right-side callout is start-anchored at +gap and a left-side
+		// one end-anchored at -gap: entirely to one side by construction, at every size, forever.
+		// The property has existed since Task 332 and is interpreted in one place, Geom.labelBoxAt().
 		function annotate(x, y, anchorNode, text, sizeMult, side) {
 			if (!text) { return null; }   // key missing from pageConfig: draw nothing, never "Text"
 			var lb = addText(x, y, anchorNode);
@@ -10772,17 +10772,18 @@ var EngCalcs = EngCalcs || {};
 			// new content into the existing element and re-measure, rather than rebuilding it (a
 			// second buildLabelEls() would leave the first element orphaned in the DOM).
 			var le = labelEls[lb.id];
-			le.text.textContent = effective(lb, 'text');
+			setTextLabelContent(le.text, lb, lb.x);
 			le.text.style.fontSize = effectiveFontSize(lb.sizeMult) + 'px';
 			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measure can throw; stale width stands */ }
 			if (anchorNode && side) {
 				var an = nodeById(anchorNode),
 					gap = nodeRadius(an) + effectiveFontSize(sizeMult) * 0.5;
-				lb.x = (side === 'left' ? -1 : 1) * (textLabelWidth(le) / 2 + gap);
+				// The near edge is the anchored edge, so the label is on the side its gap is on.
+				lb.align = (side === 'left') ? 'right' : 'left';
+				lb.x = (side === 'left' ? -1 : 1) * gap;
 				// And the RISE that makes the leader slope. The leader is drawn from the node to the
-				// label's near edge, which sits exactly `gap` away horizontally -- the text width
-				// cancels out -- so the leader vector is (gap, lb.y) and its angle is set entirely
-				// by this line. Tom, 2026-08-09: "Leaders don't look great horizontal. Ideal angle
+				// label's near edge, which is now lb.x itself, so the leader vector is (gap, lb.y)
+				// and its angle is set entirely by this line. Tom, 2026-08-09: "Leaders don't look great horizontal. Ideal angle
 				// is 60 degrees like you make the 'lowest pressure' text."
 				// A FIXED dy would NOT hold the angle across the two callouts: nodeRadius() is
 				// JUNCTION_R for a junction but half the tank's longer side for a reservoir, so the

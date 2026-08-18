@@ -256,25 +256,29 @@ byId.lpn_toolbar.querySelectorAll = () => [];
     && doc.labels.filter(t => t.sizeMult === 1.5).length === 3,
     doc.labels.map(t => t.sizeMult).join(','));
 
-  // ANCHOR ORIENTATION (Tom, 2026-08-09). An anchored Text is text-anchor:middle, so lb.x offsets
-  // its CENTRE and updateLabelGeometry() runs the leader to the near edge (px +/- halfW). If the
-  // offset is smaller than half the text width, that edge is inside the words and the leader is a
-  // stub emerging from the middle of them -- "the worst of all possible positions". The whole label
-  // must clear its node horizontally, which is a property of the MEASURED width, not of a constant.
+  // ANCHOR ORIENTATION (Tom, 2026-08-09). A callout must sit ENTIRELY to one side of its node, or
+  // the leader is a stub emerging from under the middle of the words -- "the worst of all possible
+  // positions".
+  //
+  // **THE OFFSET IS THE NEAR EDGE NOW, NOT THE CENTRE (Task 403), so no assertion here may mention
+  // the measured width.** It used to: the label was centred and pushed out by half a measured
+  // width, which is a number that goes stale the moment the text size changes, because a label's
+  // world width follows the font size. `lb.align` puts the anchored EDGE on lb.x instead, so
+  // "entirely to one side" is true by construction at every size, and what is left to assert is
+  // that the edge, the side and the slope all agree.
   doc.labels.filter(t => t.anchorNode).forEach(t => {
-    const halfW = L.labelWidth(t.id) / 2;
-    ok('"' + t._text + '" sits entirely to one side of its anchor',
-      Math.abs(t.x) > halfW,
-      'offset ' + t.x.toFixed(1) + ' vs half-width ' + halfW.toFixed(1));
+    ok('"' + t._text + '" is anchored by the edge that faces its node',
+      t.align === (t.x < 0 ? 'right' : 'left'), t.align + ' at offset ' + t.x.toFixed(1));
+    ok('..."' + t._text + '" clears the node rather than sitting on it', Math.abs(t.x) > 0,
+      'offset ' + t.x.toFixed(1));
     // ...and the side the leader is drawn for must agree with the side the label is actually on.
     ok('..."' + t._text + '" leader is drawn on the matching side',
       L.labelSide(t.id) === (t.x < 0 ? 'left' : 'right'), L.labelSide(t.id));
-    // LEADER ANGLE. The leader runs from the node to the label's near edge, which sits exactly
-    // `gap` away horizontally -- the text width cancels -- so the slope is atan(|dy| / gap) and
-    // `gap` is |t.x| minus half the width. Both callouts must come out at the SAME angle even
-    // though a reservoir's radius and a junction's differ, which is the thing a fixed dy could
-    // not deliver. Tom, 2026-08-09: "Leaders don't look great horizontal."
-    const gap = Math.abs(t.x) - halfW;
+    // LEADER ANGLE. The leader runs from the node to the label's near edge, which IS lb.x, so the
+    // slope is atan(|dy| / |dx|). Both callouts must come out at the SAME angle even though a
+    // reservoir's radius and a junction's differ, which is the thing a fixed dy could not deliver.
+    // Tom, 2026-08-09: "Leaders don't look great horizontal."
+    const gap = Math.abs(t.x);
     const deg = Math.atan2(Math.abs(t.y), gap) * 180 / Math.PI;
     ok('..."' + t._text + '" leader rises at the shared callout angle, not flat',
       near(deg, 70, 0.5), deg.toFixed(1) + ' degrees');
