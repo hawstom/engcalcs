@@ -1624,6 +1624,22 @@ var EngCalcs = EngCalcs || {};
 		eq.setAttribute('style', 'margin-top:2px;opacity:.7;font-size:11px');
 		eq.textContent = 'score = spot + k \u00d7 mean(neighbours)';
 		box.appendChild(eq);
+		// THE OFF-ORTHOGONAL TOLERANCE IS THE TUNABLE TASK 411 REFUSED TO GUESS. Tom's own estimate
+		// was 30 degrees impractical, 15 maybe, 5-10 almost essential -- a range, not an answer, and
+		// the only way to close it is to look at a real map at several values. Generic over the
+		// table for the same reason the rank weights are: a knob added in lpn-collide.js appears
+		// here without this function being touched.
+		var at = document.createElement('div');
+		at.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
+		at.textContent = 'corner angles (degrees)';
+		box.appendChild(at);
+		Object.keys(Collide.ANGLE_TUNING).forEach(function (key) {
+			row(key, function () { return Collide.ANGLE_TUNING[key]; },
+				function (v) { Collide.ANGLE_TUNING[key] = v; }, 1,
+				'Degrees trimmed off EACH end of a corner\u2019s quadrant before it is asked whether a '
+				+ 'pipe arrives through it. Bigger = a corner is rejected by a pipe further from '
+				+ 'orthogonal, so fewer corners survive and more labels fall through to the raster.');
+		});
 		var out = document.createElement('div');
 		out.id = 'lpn_label_bench_out';
 		out.setAttribute('style', 'margin-top:6px;border-top:1px solid #ccc;padding-top:4px');
@@ -1645,6 +1661,9 @@ var EngCalcs = EngCalcs || {};
 			Object.keys(LPN_GOAL_WEIGHT_SHIPPED).forEach(function (key) {
 				Collide.GOAL_WEIGHT[key] = LPN_GOAL_WEIGHT_SHIPPED[key];
 			});
+			Object.keys(LPN_ANGLE_TUNING_SHIPPED).forEach(function (key) {
+				Collide.ANGLE_TUNING[key] = LPN_ANGLE_TUNING_SHIPPED[key];
+			});
 			document.getElementById('lpn_label_bench').remove();
 			buildLabelBench();
 			refreshLabelText();
@@ -1655,6 +1674,7 @@ var EngCalcs = EngCalcs || {};
 	// The shipped ranks, copied once at load so "defaults" restores them after any amount of
 	// fiddling. Read from the module rather than restated, so it cannot drift from the real table.
 	var LPN_GOAL_WEIGHT_SHIPPED = JSON.parse(JSON.stringify(Collide.GOAL_WEIGHT));
+	var LPN_ANGLE_TUNING_SHIPPED = JSON.parse(JSON.stringify(Collide.ANGLE_TUNING));
 	function drawCollisionBoxes(placed, obs, leaders) {
 		if (!debugBoxLayer) { return; }
 		while (debugBoxLayer.firstChild) { debugBoxLayer.removeChild(debugBoxLayer.firstChild); }
