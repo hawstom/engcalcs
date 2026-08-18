@@ -244,8 +244,14 @@ function auditRecord(tag, rec) {
 		// id/type/from/to/status/text/valveType/settingUnit and friends are legitimately strings;
 		// what must never happen is a NUMERIC field holding one.
 		if (typeof v !== 'string') { return; }
+		// ID-BEARING FIELDS, which are exempt because an EPANET id is often written as a numeral --
+		// Net3's demand patterns are called 1 to 5. They are NAMES, and a name that looks like a
+		// number is still a name; the rule this check enforces is that a field holding a QUANTITY
+		// never holds text.
 		ok(tag + '.' + k + ' is not a number wearing a string',
-			!/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(v) || k === 'id' || k === 'from' || k === 'to',
+			!/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(v) ||
+			k === 'id' || k === 'from' || k === 'to' ||
+			k === 'demandPattern' || k === 'headPattern' || k === 'speedPattern',
 			k + ' = ' + JSON.stringify(v));
 	});
 }
