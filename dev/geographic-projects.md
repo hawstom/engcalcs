@@ -44,32 +44,76 @@ derived.** A geographic project may OFFER a geodesic length; it may not quietly 
 the backdrop LAYER, not of the network. A plan sheet is State Plane, UTM or a site grid, and a
 network drawn over one must keep those coordinates whatever basemap is switched on behind it.
 
-## 4. The basemap is the open decision, and it gates the build
+## 4. The basemap: plain OpenStreetMap raster tiles, and it is built
 
-Not the idea — the provider. Four things have to be answered together, because they trade against
-each other:
+**Decided and shipped:** OSM raster tiles, hand-rolled, no library. No key, no billing account,
+nothing to leak; the tiles are `<image>` elements in the SVG world layer that already exists.
+Explicitly **not MapLibre GL** (what epanet-js runs) — a WebGL vector renderer would fight the SVG
+world for little gain at our scale, and it is a runtime code dependency this suite does not want.
+Aerial imagery is the one thing OSM cannot give; Esri World Imagery behind a key is the second
+provider if that ever turns out to matter.
 
-| Question | Why it decides the build |
-|---|---|
-| Which tiles | Google needs a key, a billing account and ToS review; OSM needs neither but has a usage policy and no aerial imagery; Esri/Mapbox sit between |
-| Key management | A key in a static page is a key anybody can spend. A proxy is a server, and this suite has none |
-| Terms of service | Some providers forbid caching tiles at all, which collides directly with the PWA |
-| Offline | The suite's offline promise is real and tested (`sw_manifest_check.php`). A geographic project that is blank without a network is a different product on a field laptop |
+What follows from that choice, and is enforced in the code:
 
-**The aborting condition still applies:** the core solve never depends on any of this, so the feature
-can be dropped at zero cost if the terms turn hostile. That constraint matters more here, not less.
+- **Tiles are data, not code.** The no-runtime-CDN position is about somebody else's JavaScript.
+  `dev/browser-pass/specs/basemap.js` asserts the tile server is the only host the page talks to.
+- **Attribution is required, on the map, and not dismissible.** The exact string is
+  `© OpenStreetMap contributors`, linked to `https://www.openstreetmap.org/copyright`, in the
+  bottom-right corner. It is deliberately not a language key — it is the credit the licence asks
+  for, it names a project rather than describing a control, and it prints (the tiles are inside the
+  SVG, so they print too).
+- **The offline promise is untouched.** Tiles are not app assets and must never enter
+  `sw_manifest_check.php`'s manifest. With no network a geographic project still opens, still draws
+  and still solves; the basemap is the only thing missing.
+- **Nothing is cached on the device by us** — no localStorage, no IndexedDB, no Cache API, only the
+  browser's own HTTP cache. Caching tiles is both a tile-policy problem and a storage-consent
+  problem (`dev/cookie-storage-inventory.md`), and declining costs nothing.
+- **Policy compliance is a cap and a budget:** zoom 19 maximum (OSM's own), at most 192 tiles per
+  refresh with the zoom stepping DOWN rather than the view being clipped, one refresh per gesture
+  rather than one per wheel notch, and the browser's real `Referer`.
+- **On by default in a geographic project, off by a View-menu row**, stored as `project.basemap`.
+  Beside `coords`, because both are declarations about what the document is.
+- **`project.basemap` is NOT `backdrop.href`, and an `.inp` exporter must skip it.** `[BACKDROP]`
+  in an `.inp` names an image FILE; a tile basemap is not a file and has no href to write.
 
-## 5. What a first slice looks like
+## 5. Tiles over an unprojected drawing: why they still register
 
-Deliberately not the tiles. The tiles are the part that is gated; everything below is not, and it is
-most of the work:
+The display is still unprojected — longitude and latitude drawn straight — and §3 says Web Mercator
+must not become the document's coordinate system. So the tiles are unprojected to meet the drawing,
+rather than the drawing being projected to meet the tiles:
 
-1. **The declaration itself** — stored on the project, chosen at New, visible in the units strip,
-   and carried through save/open and the `.inp` round trip.
-2. **Coordinates that know what they are** — the readout, the property popup and the coordinate
-   entry all in degrees (and a sensible DMS/decimal choice), with `outwardX`/`outwardY`'s existing
-   boundary as the one place it happens.
-3. **Geodesic length as an OFFER** — a button on a pipe, never an automatic write, per §2.
-4. **Then** a tile layer as one more backdrop type, pre-registered rather than scale-gestured.
+**Each tile is placed at its own lon/lat rectangle.** That is exact on the x axis (Mercator x is
+linear in longitude) and computed by the inverse Mercator on the y axis, and the raster is then
+stretched linearly inside that box (`preserveAspectRatio="none"`, so the box is 1 : cos(latitude),
+not square). The only approximation left is the departure of the inverse Mercator from its own chord
+**across a single tile**: `|f''|h²/8`, measured in `dev/lpn-spike/basemap-harness.js` as **0.025 px
+at zoom 12 and 0.0015 px at zoom 16**, falling as `h²`. Sub-pixel at every zoom a network is drawn
+at, and the same measurement is 3.1 px at zoom 5, which is why it is measured rather than asserted.
 
-Steps 1–3 are testable headlessly and are worth having even if step 4 never ships.
+What this does NOT fix is that the whole drawing, basemap included, is stretched east-west by
+`1/cos(latitude)` — 27% at 38°. The map is consistent with the pipes; it is a plate-carrée view of
+both.
+
+## 6. The projection seam, and why it was not landed with the tiles
+
+**It was examined and judged too large for one pass.** Two things decided it, and both are facts
+about the code rather than caution:
+
+1. **The document's coordinates flow into the drawing pipeline as the node OBJECTS themselves.**
+   `linkPointList()` returns `nodeById()` results; label offsets `lx`/`ly` are in document units;
+   the collision pass, the leader geometry, `bbox()`, `zoomExtent()`, the drag write-back and the
+   backdrop-registration wizard all measure in the same units. `js/looped-network.js` is 14.5k lines
+   with **184 reads of `.x`, 172 of `.y`, 23 calls to `screenToWorld()` and 45 to `state.s`.** A
+   projected shadow would have to reach nearly all of them, and every site missed is wrong **only in
+   geographic mode and only away from the equator** — invisible in a diff and invisible in English.
+2. **The cheap version — making the INTERNAL frame Mercator and leaving the FILE in lon/lat — is
+   blocked by a shared seam, not by its own difficulty.** It would be a small change to
+   `inwardX`/`inwardY`/`outwardX`/`outwardY` plus serialization, but `js/lpn-inp.js` (import) and
+   the `.inp` exporter write and read `doc.nodes[].x` directly. Redefining what that field means in
+   memory changes those files' meaning silently. That is a sequencing problem: it can be done, but
+   not concurrently with `.inp` work.
+
+Neither the tiles nor the geodesic length needs the seam. What the seam buys is a conformal display
+— a city that looks like its own map rather than 27% wide — and it should be its own task, done
+after the `.inp` round trip has settled, with a `drawPos()` write seam and a call-site count guard of
+the same shape as `dev/lpn-spike/local-origin-harness.js`.

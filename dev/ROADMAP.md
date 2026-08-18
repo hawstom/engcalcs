@@ -471,21 +471,24 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   the recipe records the ~30 minutes of trial and error, of which the hard part is precise SVG click
   targeting, not GIF assembly. The POC GIFs were never committed.
 - 85|145| **GEOGRAPHIC PROJECTS: a project declares grid or geographic before anything is drawn, the
-  same way it declares units.** Scope, the three places "geo is just another unit" stops holding, and
-  the basemap decision: **`dev/geographic-projects.md`**.
-  - **DONE 2026-08-18, slice 1:** the declaration (two File > New rows, stored on the project, never
-    a toggle), degrees at every user boundary, a WGS84 geodesic length behind the Auto checkbox, and
-    a home view on the Net3 city. Two things only building it found: the zoom bounds are in the
-    DOCUMENT's units, so a degree-based document needs its own (the grid ceiling opened the map
-    130 km across), and an empty project has no extent to fit, so it needed a home view at all.
-  - **NEXT: the basemap — plain OpenStreetMap raster tiles as one more backdrop layer.** No key, no
-    billing, and `<image>` tiles drop into the SVG world layer that already exists. NOT MapLibre GL,
-    which is what epanet-js runs: a WebGL vector renderer would fight the SVG world for little gain
-    at our scale. Aerial imagery is the one thing OSM cannot give; Esri World Imagery behind a key is
-    the second provider if that turns out to matter.
-  - **The display is UNPROJECTED until then**, so a map at 45° looks stretched east-west by
-    1/cos(lat). The honest fix is a projection seam where coordinates become drawn positions, which
-    is what the tiles need anyway.
+  same way it declares units.** Scope, the three places "geo is just another unit" stops holding, the
+  basemap, and the projection seam: **`dev/geographic-projects.md`**.
+  - **DONE, slice 1:** the declaration (two File > New rows, stored on the project, never a toggle),
+    degrees at every user boundary, a WGS84 geodesic length behind the Auto checkbox, and a home view
+    on the Net3 city. Two things only building it found: the zoom bounds are in the DOCUMENT's units,
+    so a degree-based document needs its own (the grid ceiling opened the map 130 km across), and an
+    empty project has no extent to fit, so it needed a home view at all.
+  - **DONE, slice 2: the OpenStreetMap basemap.** Raster tiles, hand-rolled, no library, on by
+    default in a geographic project and off by a View row. Registration without a projection seam:
+    each tile is placed at ITS OWN lon/lat rectangle, so the box is 1 : cos(lat) rather than square,
+    and the only error left is the chord across one tile — measured at 0.025 px at zoom 12.
+  - **NEXT: the projection seam, and it is its own task-sized piece of work.** Examined and judged
+    too large to land with the tiles: the document's coordinates reach the renderer as the node
+    OBJECTS (184 `.x` reads, 172 `.y`, 23 `screenToWorld()`), and the cheap version — an internal
+    Mercator frame with a lon/lat file — redefines `doc.nodes[].x` under `js/lpn-inp.js` and the
+    `.inp` exporter, so it must be sequenced after them, not run beside them.
+  - **The display stays UNPROJECTED until then**, stretched east-west by 1/cos(lat) — 27% at 38°.
+    The basemap shares the stretch, so the map and the pipes agree; neither is conformal.
   - **Web Mercator must NOT become the document's coordinate system**, and its distances are not
     ground distances: the scale error is `1/cos(latitude)` — ~15% at 40°, ~30% at 50°. This is the
     strongest argument for the standing rule that **`len` is stored and overridable, never derived.**

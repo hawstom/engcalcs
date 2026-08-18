@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 1036,
-        "delta_key_count": 40,
+        "expected_key_count": 1039,
+        "delta_key_count": 43,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -368,6 +368,9 @@
         "lpn_field_text_valign_bottom": "Bottom",
         "lpn_examples_welcome": "Welcome to your Water Supply Network software, with the EPANET core",
         "lpn_examples_close": "Close",
+        "lpn_basemap_show": "Show street map",
+        "lpn_basemap_hide": "Hide street map",
+        "lpn_basemap_tip": "Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.",
         "lpn_find_menu": "Find",
         "lpn_find_title": "Find elements",
         "lpn_find_scope": "Elements to search",
@@ -410,6 +413,9 @@
         "lpn_field_text_valign_bottom": "Bottom",
         "lpn_examples_welcome": "Welcome to your Water Supply Network software, with the EPANET core",
         "lpn_examples_close": "Close",
+        "lpn_basemap_show": "Show street map",
+        "lpn_basemap_hide": "Hide street map",
+        "lpn_basemap_tip": "Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.",
         "lpn_find_menu": "Find",
         "lpn_find_title": "Find elements",
         "lpn_find_scope": "Elements to search",
@@ -599,6 +605,54 @@
                     "key": "lpn_examples_size",
                     "value": "{nodes} възела, {links} тръби",
                     "english": "{nodes} nodes, {links} links"
+                }
+            }
+        },
+        "lpn_basemap_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Изглед",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Настройки",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_basemap_hide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Изглед",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Настройки",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_basemap_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Изглед",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Настройки",
+                    "english": "Settings"
                 }
             }
         },

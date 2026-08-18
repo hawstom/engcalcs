@@ -291,6 +291,21 @@ echoHeader("EngCalcs", $html_title, "");
 			      // proportional font makes the whole readout jitter as they do. ?>
 			<div id="lpn_coords" style="font-family:monospace;background:rgba(255,255,255,.8);padding:2px 6px">X: --  Y: --</div>
 		</div>
+		<?php // THE OPENSTREETMAP ATTRIBUTION (ROADMAP Task 145). Required by the OSM tile usage
+		      // policy whenever a tile is on screen, and therefore NOT dismissible: the only thing
+		      // that removes it is View > Hide street map, which also removes the tiles.
+		      //
+		      // Deliberately NOT d-print-none, unlike every other overlay on this map: the tiles are
+		      // drawn inside the SVG and therefore DO print, so a printed sheet needs the credit on
+		      // it as much as the screen does.
+		      //
+		      // The credit text is NOT a language key. It is the wording the licence asks for, it
+		      // names a project rather than describing a control, and it must read the same on all
+		      // 27 languages of this page -- a translated legal credit is a different credit.
+		      //
+		      // Its own corner, not a cell of #lpn_map_footer: the footer is left-packed and hidden
+		      // on print, and this has to survive both. Shown and hidden by refreshBasemapCredit(). ?>
+		<div id="lpn_basemap_credit" style="display:none;position:absolute;bottom:4px;right:4px;z-index:4;font-size:10px;line-height:1.4;background:rgba(255,255,255,.85);padding:1px 5px"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></div>
 	</div>
 </form>
 <?php // position:fixed, not absolute: the popup is positioned from pointer-event clientX/clientY
@@ -651,6 +666,9 @@ EngCalcs.pageConfig = {
 	lpn_menu_edit: <?=json_encode($ec_lang['lpn_menu_edit'])?>,
 	lpn_menu_insert: <?=json_encode($ec_lang['lpn_menu_insert'])?>,
 	lpn_menu_view: <?=json_encode($ec_lang['lpn_menu_view'])?>,
+	lpn_basemap_show: <?=json_encode($ec_lang['lpn_basemap_show'])?>,
+	lpn_basemap_hide: <?=json_encode($ec_lang['lpn_basemap_hide'])?>,
+	lpn_basemap_tip: <?=json_encode($ec_lang['lpn_basemap_tip'])?>,
 	lpn_menu_settings: <?=json_encode($ec_lang['lpn_menu_settings'])?>,
 	lpn_menu_help: <?=json_encode($ec_lang['lpn_menu_help'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
