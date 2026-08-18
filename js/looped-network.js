@@ -7238,7 +7238,12 @@ var EngCalcs = EngCalcs || {};
 		// The identity (initials + opaque token) is part of "everything this page remembers about
 		// me". Without it Clear/Wipe leaves the file training panel suppressed and the old initials
 		// still going to the lock broker.
-		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY];
+		// **AND THE TWO PER-BROWSER PANEL PREFERENCES, because the confirm says "all settings".**
+		// `lpn_pane` (Task 434: is the bottom pane open, how tall, which tab) and `lpn_show_titles`
+		// are settings by any reading, and leaving them behind means the button's own sentence is
+		// false -- which is the whole thing this function exists to keep true.
+		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
+			LPN_PANE_KEY, PAGE_TITLES_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
