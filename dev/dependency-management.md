@@ -30,10 +30,12 @@ place.
   `privacy.php` asserts this and the offline service worker depends on it.
 - **No PHP dependency of any kind.** No `composer.json`, no PHP `vendor/`, no autoloader, no
   `require`/`include` outside `lib/`.
-- **No manifest, no lockfile, no CI.** The repo's only `package.json` is
-  `dev/browser-pass/package.json` (playwright-core), dev-only, with `node_modules/` and its
-  lockfile gitignored. `dev/lpn-spike/` deliberately runs with no `node_modules` at all.
-- Provenance is prose in `js/vendor/README.md`. It is good prose and nothing checks it.
+- **Manifest and lockfile now exist; still no CI.** Root `package.json` + committed
+  `package-lock.json` record what is vendored; `dev/browser-pass/package.json` (playwright-core) is
+  a separate, dev-only tool whose lockfile stays gitignored — it installs a tool, the root one
+  records what ships. `dev/lpn-spike/` deliberately runs with no `node_modules` at all.
+- Provenance is prose in `js/vendor/README.md` **and is now enforced** by
+  `dev/scripts/vendor_integrity_check.php` against `dev/vendor-manifest.json`.
 
 ## The three constraints, verified
 

@@ -101,22 +101,6 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     build-adjacent place to run a checker.
   - Evaluate together before any of it — this is on the roadmap as a possibility, not a plan.
 
-- 65|413| **Adopt real dependency management. Task 83's own closing condition has fired.** 83 was
-  closed stale 2026-07-05 on the finding that Bootstrap came from `cdn.jsdelivr.net` and nothing was
-  vendored — *"revisit if a real local dependency is introduced later."* Two now are:
-  `js/vendor/epanet-js.js` (663 KB) and `js/vendor/bootstrap.bundle.min.js` (79 KB) plus
-  `css/vendor/bootstrap.min.css`, loaded on **every page** by `HeadersFooters.lib.php`.
-  - **There is no no-dependencies norm to protect; there is a habit.** The ROADMAP itself asserted
-    one at Task 408 (*"`js/vendor/` today holds only the EPANET engine"*) and both halves are wrong.
-  - **The three constraints the habit was really protecting, which any manifest must survive:**
-    (1) **no build step** — `git pull` *is* the deploy and `filemtime()` cache-busting only works
-    because the served file is the source file; (2) GPL-v3 compatibility; (3) nothing fetched from a
-    CDN at runtime, which is also what makes the offline service worker possible. A manifest that
-    records and verifies *vendored copies* clears all three; a bundler or node_modules-at-runtime
-    workflow clears none.
-  - Deliverable is **`dev/dependency-management.md`** — policy, recommendation, and whether a PHP
-    framework is in scope at all — before any manifest file is committed.
-
 - 85|390| **Finish the unit paradigm migration: a unit is a NAME, and a file's numbers are the
   user's.** Tom, 2026-08-16: *"You are fighting against a deprecated but not purged paradigm where
   everything was stored in browser and file as SI always... I don't think I authorized that. But it
@@ -393,7 +377,10 @@ font-size blindness, attempted twice and reverted twice — read its block befor
   Design: `dev/most-open-angle-brainstorm.md`. Not gated on Phase 3.
   - **The four positions stay FIXED and CARDINAL** — TR, TL, BR, BL, tried in that order, each
     contained entirely within its quadrant so an orthogonal link can arrive without crossing the
-    label. Four, not the literature's eight; knowing the link bearings is what earns the reduction.
+    label. **Four, not eight, because a top-centre or bottom-centre label blocks nearly half the
+    circle** (Tom, 2026-08-17, correcting an earlier claim that link bearings were the reason). A
+    corner label kept inside its quadrant blocks only 70–80°, so four of them still leave gaps for
+    links to arrive through; the centres do not, which is what disqualifies them.
   - **Off-orthogonal tolerance is the tunable that decides whether this works**: 30° impractical,
     15° maybe, **5–10° almost essential** (Tom's estimate). Ship it on the tester panel (Task 416),
     do not freeze a guess.
@@ -735,6 +722,15 @@ font-size blindness, attempted twice and reverted twice — read its block befor
   - **Its real job is a channel for "please try this and tell me what you see" requests**, one tweak
     at a time, rather than a permanent exhaustive dashboard. Task 411's off-orthogonal tolerance is
     the next thing that belongs on it.
+  - **MUTE / SOLO PER PASS, and this is the part that makes testing possible at all** (Tom,
+    2026-08-17, a vocal arranger: *"how I isolate this variable from all other effects… maybe the
+    equivalent of 'mute' and 'solo' buttons for certain 'voices'"*). Placement today is several
+    passes stacked, and a change to one is judged through the others — which is why it feels blind.
+    The voices, from `js/lpn-collide.js` and the placement pass: initial offset, the ring/candidate
+    search, collision relaxation, aligned-label placement, the shed cascade, the zoom-threshold
+    auto-hide, leader drawing. Solo one and the drawing shows that pass alone.
+  - **Solo is worth more than mute here** and is the one to build first: with N passes, mute needs
+    2^N trials to isolate and solo needs N.
   - **Untranslated title, deliberately** — it is a tester surface, never shown to a visitor, and a
     translated string for it would be 26 wasted translations.
 

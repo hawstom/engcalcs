@@ -85,8 +85,8 @@ sector step is what puts labels in open territory for it.
 
 A cartographic point is **bare**. A network junction is not: every node knows the bearing of every
 pipe meeting it, for free, before any obstacle search runs. Tom's term (a) is information generic
-PFLP does not have, and it is what earns us **four** candidate positions where the literature
-inherits eight — a reduction we can afford precisely because we know where the links are. That is a legitimate argument that our problem is not
+PFLP does not have. (It is not, however, what earns the reduction to four candidates — that is the
+angular argument above, and conflating the two was an earlier error here.) That is a legitimate argument that our problem is not
 generic PFLP, and it is the strongest single point in the brainstorm.
 
 ### The constraint the pass surfaces: obstacle choice decides view-independence
@@ -111,8 +111,12 @@ strongly about the place of most-open-angle in this step. These quadrants are ca
 fixed."*** He is right, and the corrected design is cheaper as well as better:
 
 1. **Four initial positions, in a fixed order: top-right, top-left, bottom-right, bottom-left.**
-   Four, not the literature's eight — our narrower business earns the reduction. Top-first is
-   Imhof's ascender argument; right-first is convention.
+   **Why four and not eight is an ANGULAR argument, not a "we know our business" one** (Tom,
+   2026-08-17, correcting an earlier draft that credited the link bearings): a top-centre or
+   bottom-centre label straddles the vertical and **blocks nearly half the circle** as seen from the
+   anchor. A corner label kept inside its own quadrant blocks only **70–80°**. Four of those still
+   leave arrival gaps between them; adding the centres closes those gaps, which is what disqualifies
+   them. Top-first is Imhof's ascender argument; right-first is convention.
 2. **Each position sits ENTIRELY INSIDE its quadrant.** That is the load-bearing constraint: it
    leaves an orthogonal link room to arrive without crossing the label.
 3. **A link is never exactly orthogonal, so the quadrant must hold a tolerance.** Tom's estimate:
