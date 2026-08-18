@@ -560,19 +560,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     describe the gate as one (`dev/positioning.md` §6). Tom, 2026-08-14: *"we have no less technical
     authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
     all public domain."*
-- 55|409| **Profiles: an elevation/HGL profile along a chosen path. NOT gated on time steps.**
-  Tom, 2026-08-17: *"There's no reason these can't be done now."* The earlier block made it depend on
-  Task 248; it does not — a steady-state profile of ground, hydraulic grade and pressure along a path
-  is the drawing an engineer wants at t=0, and time steps later animate it rather than enable it.
-  - **Drawn on LINK LENGTHS, not on map distance.** The two differ by every vertex and by every
-    stored-not-derived `len`, and a profile plotted on map distance is a different pipe.
-  - **Path selection in the shape of Google Maps Directions** (Tom): a suggested path with runner-up
-    alternatives, the user fine-tunes it, the app re-suggests as constraints change, and the profile
-    view opens and updates LIVE as the path is refined rather than only when it is finalized.
-  - **Truncate the vertical axis — epanet-js does not, and that is the one thing to beat.** Tom,
-    2026-08-17: *"epanetjs has a great Google Maps path concept. It chokes at the last steps because
-    they don't truncate their profile bottom/min_value."* A profile whose axis starts at zero throws
-    away almost all of the relief that the drawing exists to show.
 - 70|423| **WIRE THE PATTERN MODEL IN: the reading is built and nothing consumes it.** `js/lpn-patterns.js`
   and the `.inp` reader landed 2026-08-18 (Tasks 248.01/02/03 data model). Three edits make Net3
   match EPANET at t=0, and none of them could be made in the same pass because another track owned
