@@ -248,5 +248,51 @@ function place(text, x, y) {
 		Math.abs(L.leader(lb2.id).y2 - (-8)) < 1e-9, JSON.stringify(L.leader(lb2.id)));
 }
 
+// ---- 9. a label on a leader justifies ITSELF -------------------------------------------------------
+// Tom, 2026-08-18: *"it's best to let the leader dragging functions handle justification... I am
+// only used to leaders acting automatically."* So an anchored label's alignment is DERIVED from
+// which side of its node it sits on, never stored -- which is also what makes it retroactive: a
+// document saved with a wrong justification cannot stay wrong, because nothing reads a stored one.
+{
+	console.log('\n--- an anchored label justifies itself ---');
+	L.reset(); L.setCanvas(800, 600);
+	const n = L.addNode('junction', 0, 0).id;
+	const lb = L.addAnchored(n, 60, -40);
+	L.setProp(lb, 'text', 'Lowest pressure');
+	L.buildDom();
+	ok('to the RIGHT of its node it is anchored by its left edge',
+		L.anchorAttrs(lb.id).h === 'start', JSON.stringify(L.anchorAttrs(lb.id)));
+	ok('...and its leader lands on that edge',
+		Math.abs(L.leader(lb.id).x2 - 60) < 1e-9, JSON.stringify(L.leader(lb.id)));
+
+	// Drag it across the node. Nothing is set: the sign of the offset changes, and everything else
+	// follows from it.
+	L.moveTo(lb.id, -60, -40);
+	ok('dragged to the LEFT it flips to its right edge, with nothing stored',
+		L.anchorAttrs(lb.id).h === 'end' && lb.align === undefined,
+		L.anchorAttrs(lb.id).h + ' align=' + lb.align);
+	ok('...and the leader follows to the new edge',
+		Math.abs(L.leader(lb.id).x2 - (-60)) < 1e-9, JSON.stringify(L.leader(lb.id)));
+
+	// **A STORED JUSTIFICATION IS IGNORED**, which is how every document already saved is repaired
+	// without a migration.
+	lb.align = 'left';
+	L.moveTo(lb.id, -60, -40);
+	ok('a stale stored justification cannot override where the label actually is',
+		L.anchorAttrs(lb.id).h === 'end', L.anchorAttrs(lb.id).h);
+	lb.valign = 'top';
+	L.moveTo(lb.id, -60, -40);
+	ok('...and neither can a stale vertical one -- a leader lands at the middle of the text',
+		L.anchorAttrs(lb.id).v === 'central', L.anchorAttrs(lb.id).v);
+
+	// A FREE label keeps its manual control: there is no leader to disagree with it.
+	const free = L.addText(200, 200, null);
+	L.setProp(free, 'text', 'Title block');
+	free.align = 'right';
+	L.buildDom();
+	ok('a free-floating label still honours a justification the user chose',
+		L.anchorAttrs(free.id).h === 'end', L.anchorAttrs(free.id).h);
+}
+
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');
 process.exit(fails === 0 ? 0 : 1);

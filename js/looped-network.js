@@ -1018,12 +1018,14 @@ var EngCalcs = EngCalcs || {};
 			b.kind = 'label';
 			out.boxes.push(b);
 			if (!an) { return; }
-			// Its leader, through the label's own box -- the same attachment updateLabelGeometry()
-			// draws, since lb.align may put the text somewhere other than centred on its point.
-			var box = textLabelBox(lb, le, px, py), halfW = box.w / 2;
-			out.segments.push({ ax: an.x, ay: an.y,
-				bx: Geom.leaderAttachX(box.x + halfW, halfW, an.x), by: box.y + box.h / 2,
-				kind: 'leader' });
+			// **THE OBSTACLE LEADER AND THE DRAWN LEADER ARE THE SAME SEGMENT, and they were not.**
+			// This computed an attachment from the box's width and vertical centre while
+			// updateLabelGeometry() drew one to the label's own point -- so the placement pass was
+			// avoiding a line that is not on the map, by up to half a label's width. Tom, 2026-08-18,
+			// on watching a callout move: *"The leader moves. But its box model doesn't."* Both sides
+			// now ask textLeaderEnd(), which is the only place the answer exists.
+			var end = textLeaderEnd(lb, le, px, py);
+			out.segments.push({ ax: an.x, ay: an.y, bx: end.x, by: end.y, kind: 'leader' });
 		});
 		doc.links.forEach(function (l) {
 			var pts = linkPointList(l), i;
@@ -3353,12 +3355,33 @@ var EngCalcs = EngCalcs || {};
 	// centre means measuring the label in WORLD units, which a SCREEN-PIXEL-sized label does not have
 	// at any particular zoom, so the same file imported from two views writes two different sets of
 	// coordinates. Default is centre in both axes, so existing labels render unchanged.
+	// **A LABEL ON A LEADER JUSTIFIES ITSELF, AND THE SIDE IS DERIVED, NEVER STORED** (Tom,
+	// 2026-08-18: *"I think it's best to let the leader dragging functions handle justification...
+	// I am only used to leaders acting automatically."*).
+	//
+	// That is the convention everywhere leaders exist: AutoCAD's multileader attaches its text on
+	// the side the leader arrives from and swaps as the leader crosses, and a GIS leader label sits
+	// on the side facing its feature. Nobody sets it by hand, because there is only one right answer
+	// and the drawing already knows it.
+	//
+	// **DERIVED FIXES EVERY DOCUMENT AT ONCE, which is the other half of why it is derived.** A
+	// STORED justification can be wrong -- it was, on every callout the example network drew, and it
+	// would have needed a migration to repair. A label whose alignment is a function of where it sits
+	// cannot be wrong: drag it across its node and the sign of lb.x flips, and with it the anchored
+	// edge, the box, the text-anchor and the leader's landing point, all from this one line.
+	//
+	// A FREE-FLOATING Text has no leader and no side, so it keeps the manual control Task 342 added.
 	function labelHAlign(lb) {
+		if (lb && lb.anchorNode) { return lb.x >= 0 ? 'start' : 'end'; }
 		var a = lb && lb.align;
 		return a === 'left' ? 'start' : a === 'right' ? 'end' : 'middle';
 	}
+	// The leader lands at the vertical MIDDLE of the text, which is what AutoCAD's default vertical
+	// attachment does and what this page has always drawn. Only a free-floating label offers a
+	// choice -- there is no leader to disagree with.
 	function labelVAlign(lb) {
 		if (!lb) { return 'middle'; }
+		if (lb.anchorNode) { return 'middle'; }
 		if (lb.valign === 'top') { return 'hanging'; }
 		if (lb.valign === 'bottom') { return 'bottom'; }
 		return 'middle';
@@ -3514,6 +3537,14 @@ var EngCalcs = EngCalcs || {};
 			a = textLabelSvgAngle(lb);
 		return a ? rotatedAabb(box, px, py, a) : box;
 	}
+	// **WHERE A TEXT LABEL'S LEADER ENDS -- the ONE definition.** An anchored label is edge-justified
+	// (labelHAlign()), so its anchored edge is its own point and the leader lands there: no width, no
+	// hysteresis, nothing that moves when the text does. Two call sites read this -- the drawn leader
+	// and the leader the placement pass treats as an obstacle -- and they disagreed until they both
+	// came here.
+	function textLeaderEnd(lb, le, px, py) {
+		return { x: px, y: py };
+	}
 	function buildLabelEls(lb) {
 		var an = lb.anchorNode ? nodeById(lb.anchorNode) : { x: lb.x, y: lb.y },
 			px = lb.anchorNode ? an.x + lb.x : lb.x,
@@ -3614,22 +3645,21 @@ var EngCalcs = EngCalcs || {};
 		//
 		// A CENTRED label has no such edge and keeps the older rule below -- still right for a label
 		// the user dragged, which is centred on wherever they dropped it.
-		if (lb.align === 'left' || lb.align === 'right') {
-			le.side = lb.align === 'left' ? 'right' : 'left';
-			le.leader.setAttribute('x1', an.x); le.leader.setAttribute('y1', an.y);
-			le.leader.setAttribute('x2', px); le.leader.setAttribute('y2', py);
-			repositionMultilineText(le.text, px, py);
-			applyTextLabelRotation(lb, le, px, py);
-			return;
-		}
-		// THE LEADER ATTACHES TO THE BOX, NOT TO THE ANCHOR POINT. Reading px as the box centre is
-		// true only while every Text label is centred; with lb.align in the document the two are
-		// different numbers and the leader reaches for a place the text is not.
-		halfW = box.w / 2;
-		att = Geom.leaderAttach(le.side, box.x + halfW, halfW, an.x, ADVERSE_FRAC);
-		le.side = att.side;
+		// **THE LEADER ENDS AT THE LABEL'S OWN POINT, AND NOTHING HERE READS A WIDTH.** An anchored
+		// label is edge-justified by labelHAlign(), so its anchored edge IS lb.x -- change the text,
+		// change the size, change the zoom, and the leader does not move. That is Tom's "hold it
+		// inviolate", and it is why the old flip-with-hysteresis rule is gone rather than kept for a
+		// case: with the side derived from the offset there is nothing left to flip, and hysteresis
+		// existed only to stop a centred label's attachment flickering as it crossed its node.
+		// **RE-DERIVED ON EVERY MOVE, which is what makes it automatic.** Dragging a label across
+		// its node changes the sign of lb.x and therefore the anchored edge, so the element's own
+		// text-anchor has to be rewritten here -- otherwise the leader crosses over and the words
+		// stay hanging off the wrong side of it.
+		applyTextLabelJustification(lb, le);
+		le.side = labelHAlign(lb) === 'start' ? 'right' : 'left';
+		var lend = textLeaderEnd(lb, le, px, py);
 		le.leader.setAttribute('x1', an.x); le.leader.setAttribute('y1', an.y);
-		le.leader.setAttribute('x2', att.x); le.leader.setAttribute('y2', box.y + box.h / 2);
+		le.leader.setAttribute('x2', lend.x); le.leader.setAttribute('y2', lend.y);
 		repositionMultilineText(le.text, px, py);
 		applyTextLabelRotation(lb, le, px, py);
 	}
@@ -9864,8 +9894,8 @@ var EngCalcs = EngCalcs || {};
 			if (anchorNode && side) {
 				var an = nodeById(anchorNode),
 					gap = nodeRadius(an) + effectiveFontSize(sizeMult) * 0.5;
-				// The near edge is the anchored edge, so the label is on the side its gap is on.
-				lb.align = (side === 'left') ? 'right' : 'left';
+				// The SIGN of the offset is the whole of it now: labelHAlign() derives the anchored
+				// edge from it, so there is nothing to store and nothing that can be stored wrong.
 				lb.x = (side === 'left' ? -1 : 1) * gap;
 				// And the RISE that makes the leader slope. The leader runs from the node to the
 				// label's near edge, which is lb.x itself, so the leader vector is (gap, lb.y) and
@@ -12487,9 +12517,14 @@ var EngCalcs = EngCalcs || {};
 	// A text input in place of the static title -- shared by both popups since the validation/
 	// cascading-reference-update logic (below) only differs in which maps get re-keyed.
 	function idField(currentId, onRename) {
-		var title = document.getElementById('lpn_popup_title'), input = document.createElement('input');
-		title.textContent = '';
+		var pc = EngCalcs.pageConfig || {},
+			title = document.getElementById('lpn_popup_title'), input = document.createElement('input');
+		// **THE BOX SAYS WHAT IT IS** (Tom, 2026-08-18: *"Why doesn't the ID input say ID before
+		// it?"*). It sits in the popup's title bar, where a bare text box holding "J12" reads as a
+		// heading somebody made editable rather than as the element's name.
+		title.textContent = (pc.lpn_field_id || 'ID') + ' ';
 		input.type = 'text'; input.value = currentId;
+		input.setAttribute('aria-label', pc.lpn_field_id || 'ID');
 		input.addEventListener('change', function () {
 			var newId = input.value, result = validateNewId(newId, currentId);
 			if (result !== true) { alert(result); input.value = currentId; return; }
@@ -13029,7 +13064,11 @@ var EngCalcs = EngCalcs || {};
 			setProp(lb, 'text', input.value);
 			afterPropertyEdit(lb);
 		});
-		label.textContent = (pc.lpn_tool_add_text || 'Text') + ' ';
+		// **NO VISIBLE LABEL ON THIS ROW: the popup's title already says "Text"** (Tom, 2026-08-18,
+		// with a screenshot of the word twice over). It reads as a mistake because it is one -- the
+		// title names the element and this is the element's own content, so the second word names
+		// nothing new. The name stays for a screen reader, where there is no title above it.
+		input.setAttribute('aria-label', pc.lpn_tool_add_text || 'Text');
 		label.appendChild(input);
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
@@ -13085,7 +13124,14 @@ var EngCalcs = EngCalcs || {};
 		// Centre/middle stays the default, so no existing drawing changes shape. They say what the
 		// label's POINT MEANS -- which edge of the text sits on it -- and, with several lines, how the
 		// lines line up with each other.
+		// **ONLY A FREE-FLOATING LABEL IS OFFERED THE CHOICE.** A label on a leader takes its
+		// justification from which side of its node it sits on (labelHAlign()), so a control here
+		// would be a setting the drawing overrules the moment you drag it -- which is worse than no
+		// control at all. Tom, 2026-08-18: *"should justification be disabled for text with leaders
+		// (associated text)? ... it's best to let the leader dragging functions handle
+		// justification."*
 		function alignRow(labelText, prop, options, dflt) {
+			if (lb.anchorNode) { return; }
 			selectFieldPlain(fields, labelText, options, (lb[prop] || dflt), function (v) {
 				if ((lb[prop] || dflt) === v) { return; }
 				saveUndoSnapshot();

@@ -267,8 +267,11 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   // "entirely to one side" is true by construction at every size, and what is left to assert is
   // that the edge, the side and the slope all agree.
   doc.labels.filter(t => t.anchorNode).forEach(t => {
-    ok('"' + t._text + '" is anchored by the edge that faces its node',
-      t.align === (t.x < 0 ? 'right' : 'left'), t.align + ' at offset ' + t.x.toFixed(1));
+    // **NOTHING IS STORED, and that is the assertion.** A label on a leader takes its justification
+    // from which side of its node it sits on (labelHAlign()), so a callout cannot carry one that
+    // disagrees with where it is -- which is what every one of them did while it was stored, and
+    // what would otherwise have needed a migration to repair.
+    ok('"' + t._text + '" stores no justification of its own', t.align === undefined, String(t.align));
     ok('..."' + t._text + '" clears the node rather than sitting on it', Math.abs(t.x) > 0,
       'offset ' + t.x.toFixed(1));
     // ...and the side the leader is drawn for must agree with the side the label is actually on.
