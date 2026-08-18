@@ -37,7 +37,7 @@ exports.run = async function ({ browser, report }) {
 
 		await a.goto();
 		await a.dismissGallery();
-		await a.menuClickSub('New project…', 'Blank project on a world map, US units (gpm)');
+		await a.newGeoProject();
 		await a.settle(900);
 
 		// ---- the tiles are there, and they are the right ones -------------------------------
@@ -149,7 +149,7 @@ exports.run = async function ({ browser, report }) {
 		report.eq(afterHide.credit, 'none', '...and the attribution goes with them');
 
 		// ---- a grid project is untouched by all of it -------------------------------------------
-		await a.menuClickSub('New project…', 'Blank project, US units (gpm)');
+		await a.newProject();
 		await a.settle(500);
 		const gridRows = (await a.menuRows('view')).map(r => r.label);
 		report.ok(!gridRows.some(l => /street map/i.test(l)),

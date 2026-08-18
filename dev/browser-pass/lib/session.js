@@ -20,6 +20,7 @@ class Session {
 		this.errors = [];              // uncaught page errors; any one of them fails the pass
 		this.dialogs = [];             // native alert()/confirm() text, in order
 		this._confirmAnswer = true;    // what the next confirm() should answer
+		this._promptAnswer = null;     // what the next prompt() should be typed into; null = Cancel
 	}
 
 	// **A TALL WINDOW, and it is load-bearing rather than cosmetic.** The consent banner is
@@ -44,14 +45,27 @@ class Session {
 		page.on('dialog', async (d) => {
 			s.dialogs.push({ type: d.type(), message: d.message() });
 			if (d.type() === 'confirm' && !s._confirmAnswer) { await d.dismiss(); return; }
+			// A PROMPT ACCEPTED WITH NO TEXT IS AN EMPTY STRING, not "the user typed nothing
+			// interesting" — Go to latitude, longitude reads what comes back and would refuse every
+			// time. `null` here means the spec has not said what to type, which for a prompt is the
+			// same as pressing Cancel and is the honest default.
+			if (d.type() === 'prompt') {
+				if (s._promptAnswer === null) { await d.dismiss(); return; }
+				await d.accept(s._promptAnswer);
+				s._promptAnswer = null;
+				return;
+			}
 			await d.accept();
 		});
 		return s;
 	}
 
 	// ---- navigation -------------------------------------------------------
-	async goto() {
-		await this.page.goto(pageUrl(), { waitUntil: 'load' });
+	// `rel` reaches another page of the suite — the share affordance is emitted by
+	// echoCalculatorForm() for every calculator, so proving it on `lpn_` alone would prove it on the
+	// one page that does not have a printable-title row.
+	async goto(rel) {
+		await this.page.goto(pageUrl(rel), { waitUntil: 'load' });
 		await this.settle();
 	}
 	async reload() {
@@ -166,6 +180,16 @@ class Session {
 	async status() {
 		return this.page.evaluate(() => (document.getElementById('lpn_status') || {}).textContent || '');
 	}
+	// **A NOTICE IS NOT THE STATUS LINE.** setNotice() writes #lpn_map_notice — the transient box over
+	// the map that says what the user's last ACTION did; setStatus() writes #lpn_status, the solve
+	// diagnostic. Reading the wrong one silently answers "" for every notice ever raised, and Task
+	// 421 is about exactly how easily these two are confused.
+	async notice() {
+		return this.page.evaluate(() => {
+			const e = document.getElementById('lpn_map_notice');
+			return (e && e.style.display !== 'none') ? (e.textContent || '') : '';
+		});
+	}
 
 	// Poll for a condition rather than sleeping a guessed amount. Opening a file reads the file AND
 	// asks the broker over the network, so "is the dialog up?" is a question with a variable answer
@@ -216,6 +240,9 @@ class Session {
 	// default here is Accept for the same reason, so a spec that means "the user said no" has to say
 	// so out loud.
 	answerConfirmsWith(yes) { this._confirmAnswer = !!yes; }
+	// What the next prompt() should have typed into it. Consumed by the one prompt that follows, so
+	// a spec that means "and then the user cancelled" simply does not set it.
+	answerPromptWith(text) { this._promptAnswer = text; }
 	lastDialog() { return this.dialogs[this.dialogs.length - 1] || null; }
 
 	// ---- the picker ------------------------------------------------------
@@ -339,12 +366,26 @@ class Session {
 		const btn = await this.page.$('#lpn_examples_pane button.lpn-examples-blank');
 		if (btn) { await btn.click(); await this.settle(200); }
 	}
-	// File ▸ New project… ▸ Blank project — the act the single "New project" row used to be before
-	// Task 264 turned it into a fly-out of templates. US units unless a spec says otherwise, because
-	// a project's units are the project's since Task 263 and a spec should not inherit whatever the
+	// File ▸ New project… ▸ one of the four templates — the act the single "New project" row used to
+	// be before Task 264 turned it into a fly-out. US units unless a spec says otherwise, because a
+	// project's units are the project's since Task 263 and a spec should not inherit whatever the
 	// strip happened to hold.
-	async newProject(system = 'us') {
-		const label = system === 'si' ? 'Blank project, SI units (l/s)' : 'Blank project, US units (gpm)';
+	//
+	// **THE FOUR LABELS LIVE HERE AND NOWHERE ELSE.** Task 145 renamed all four in one commit
+	// (GeoMap and XY are Tom's words) and every spec that had typed one out stopped at its first
+	// menu click — which is precisely the failure this file exists to make impossible.
+	static TEMPLATES = {
+		'xy-us': 'Blank XY project, US units (gpm)',
+		'xy-si': 'Blank XY project, SI units (l/s)',
+		'geo-us': 'Blank GeoMap project, US units (gpm)',
+		'geo-si': 'Blank GeoMap project, SI units (l/s)'
+	};
+	async newProject(system = 'us') { await this._newFromTemplate('xy-' + system); }
+	// A GeoMap project: longitudes and latitudes, and a street map behind it.
+	async newGeoProject(system = 'us') { await this._newFromTemplate('geo-' + system); }
+	async _newFromTemplate(key) {
+		const label = Session.TEMPLATES[key];
+		if (!label) { throw new Error(`${this.name}: no project template "${key}"`); }
 		await this.menuClickSub('New project…', label);
 	}
 	// Is this project marked as having unsaved changes? The asterisk on its tab is the whole

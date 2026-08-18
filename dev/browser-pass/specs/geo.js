@@ -23,7 +23,7 @@ exports.run = async function ({ browser, report }) {
 	try {
 		await a.goto();
 		await a.dismissGallery();
-		await a.menuClickSub('New project…', 'Blank project on a world map, US units (gpm)');
+		await a.newGeoProject();
 		await a.settle(600);
 
 		// The readout is where a geographic project announces itself — no badge, no banner.
@@ -50,7 +50,7 @@ exports.run = async function ({ browser, report }) {
 		}
 
 		// A grid project in the same browser must be untouched by any of it.
-		await a.menuClickSub('New project…', 'Blank project, US units (gpm)');
+		await a.newProject();
 		await a.settle(400);
 		await a.page.mouse.move(box.x + 5, box.y + 5);
 		await a.settle(150);

@@ -4,10 +4,15 @@
 // the stations and the axis bounds — every part with an exact answer. Three things are left, and
 // all three are facts about a real page:
 //
-//   1. **The pane is on the screen and the page still does not scroll.** Since Task 434 the profile
-//      is a tab in the bottom pane, which is in normal flow under the map -- so the thing that can
-//      go wrong is no longer a panel at a static position, it is the map and the pane together
-//      being taller than the window. Only a real layout can answer that.
+//   1. **The pane is on the screen and the map and the pane together still end inside the window.**
+//      Since Task 434 the profile is a tab in the bottom pane, which is in normal flow under the map
+//      -- so the thing that can go wrong is no longer a panel at a static position, it is the two of
+//      them summing past the window. Only a real layout can answer that.
+//      The measurement is `document.body`'s own bottom, not `documentElement.scrollHeight`: the
+//      scroll height is 15 px past the window on this page whatever the pane does, because of a
+//      floated empty div in the footer that is not in body's box at all. That is Task 432 and it
+//      belongs to **specs/noscroll.js**, which names it, measures it and proves its cause. Asserting
+//      it here as well would put a second red line on a fault that is already recorded once.
 //   2. **The two heads are read in DIFFERENT UNITS** (Task 422). A node's elevation is a typed
 //      number in the INPUT head unit; a solved head comes back in the RESULT head unit, and since
 //      that task they can be set differently. They share one axis. Nothing headless crosses that
@@ -82,6 +87,7 @@ exports.run = async function ({ browser, report }) {
 			return { shown: p.style.display === 'flex', x: r.x, y: r.y, w: r.width, h: r.height,
 				top: r.top, bottom: r.bottom, canvasBottom: c.bottom, canvasH: c.height,
 				scrollH: document.documentElement.scrollHeight,
+				bodyBottom: document.body.getBoundingClientRect().bottom,
 				vw: window.innerWidth, vh: window.innerHeight };
 		});
 		report.ok(box && box.shown, 'the pane opens');
@@ -91,7 +97,8 @@ exports.run = async function ({ browser, report }) {
 		report.ok(box && box.canvasBottom <= box.top + 1, 'the map ends where the pane begins',
 			box && (box.canvasBottom + ' / ' + box.top));
 		report.ok(box && box.canvasH > 150, 'and the map keeps a canvas worth looking at', box && box.canvasH);
-		report.ok(box && box.scrollH <= box.vh + 1, 'the page does not scroll', box && (box.scrollH + ' of ' + box.vh));
+		report.ok(box && box.bodyBottom <= box.vh + 1, 'the page ends inside the window',
+			box && (Math.round(box.bodyBottom) + ' of ' + box.vh));
 
 		// **THE GRIP RESIZES, AND THE MAP GIVES AND TAKES THE ROOM.** The one property no harness
 		// can hold: two measured heights moving in opposite directions by the same amount.
@@ -110,7 +117,7 @@ exports.run = async function ({ browser, report }) {
 			const after = await a.page.evaluate(() => ({
 				canvas: document.getElementById('lpn_canvas').getBoundingClientRect().height,
 				pane: document.getElementById('lpn_pane_body').getBoundingClientRect().height,
-				scrollH: document.documentElement.scrollHeight, vh: window.innerHeight
+				bodyBottom: document.body.getBoundingClientRect().bottom, vh: window.innerHeight
 			}));
 			return { before: g, after: after };
 		})();
@@ -120,8 +127,8 @@ exports.run = async function ({ browser, report }) {
 		report.ok(dragged.after.canvas < dragged.before.canvas - 40,
 			'...and the map gives up exactly that room',
 			dragged.before.canvas + ' → ' + dragged.after.canvas);
-		report.ok(dragged.after.scrollH <= dragged.after.vh + 1, '...with the page still not scrolling',
-			dragged.after.scrollH + ' of ' + dragged.after.vh);
+		report.ok(dragged.after.bodyBottom <= dragged.after.vh + 1, '...with the page still ending inside the window',
+			Math.round(dragged.after.bodyBottom) + ' of ' + dragged.after.vh);
 
 		// It opens on a real drawing rather than on two empty pull-downs.
 		const first = await chartShape(a.page);
@@ -294,13 +301,14 @@ exports.run = async function ({ browser, report }) {
 			hidden: document.getElementById('lpn_pane').style.display === 'none',
 			route: document.querySelectorAll('#lpn_canvas .lpn-profile-path').length,
 			canvas: document.getElementById('lpn_canvas').getBoundingClientRect().height,
-			scrollH: document.documentElement.scrollHeight, vh: window.innerHeight
+			bodyBottom: document.body.getBoundingClientRect().bottom, vh: window.innerHeight
 		}));
 		report.ok(closed.hidden, 'the X closes the pane');
 		report.ok(closed.route === 0, '...and takes the route highlight off the map with it');
 		report.ok(closed.canvas > dragged.after.canvas, '...and the map gets its room back',
 			dragged.after.canvas + ' → ' + closed.canvas);
-		report.ok(closed.scrollH <= closed.vh + 1, '...with the page still not scrolling');
+		report.ok(closed.bodyBottom <= closed.vh + 1, '...with the page still ending inside the window',
+			Math.round(closed.bodyBottom) + ' of ' + closed.vh);
 
 		report.ok(a.errors.length === 0, 'no uncaught page errors', a.errors.join('\n'));
 	} finally {

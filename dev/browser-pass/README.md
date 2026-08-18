@@ -3,7 +3,7 @@
 ```
 cd dev/browser-pass
 npm install          # once — playwright-core; the Chromium binary is already cached
-node run.js          # everything — 139 checks, about a minute and a half
+node run.js          # everything — about four minutes
 node run.js locking  # one section
 ```
 
@@ -17,8 +17,7 @@ without my working through the test punch list?"*
 
 Mostly, yes. `dev/lpn-file-lock-test-punchlist.md` is 78 checks over two browser profiles, and it has
 been run by hand three times in three days. Everything below drives **the real page** in a real
-Chromium against **the real `lpn-lock.php`** on a real PHP server, and re-runs in about a minute and
-a half.
+Chromium against **the real `lpn-lock.php`** on a real PHP server, and re-runs in a few minutes.
 
 It found four defects in its first hour, three of which no human pass would ever have found:
 
@@ -79,6 +78,16 @@ whole pass run green against somebody else's files, and one of them did.
 docroot is fetched back and compared before the browser is launched. Only our own server can serve
 it. A mismatch throws, naming the port, the docroot and what answered instead — the failure that
 used to be silent is now the loudest thing in the run.
+
+## Reading a line that says DEFECT
+
+A handful of checks are worded as **DEFECT**, and they pass. They pin what the page does TODAY where
+that is known to be wrong, so that fixing it breaks the line and whoever fixes it reads the note at
+the top of that spec. The alternative — leaving the check red — makes `node run.js`'s exit code
+useless and trains a reader to skim past failures, which is the one thing this runner cannot afford.
+A DEFECT line always names its task and its cause. As of 2026-08-18 there are four, over two faults:
+the examples gallery forgetting it was dismissed (`specs/gallery.js`, Task 431) and the map page's
+document still being taller than its window (`specs/noscroll.js`, Task 432).
 
 ## What is left for Tom — one box
 
