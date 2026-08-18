@@ -277,18 +277,6 @@ font-size blindness, attempted twice and reverted twice — read its block befor
   size, each independently settable — and explicitly deferred it: "that's a lot… maybe later we
   give more fine-grained control and right now just a two-dimensional control." Build it when
   someone actually needs one symbol bigger without the others, not on symmetry grounds.
-- 50|414| **The `dev/browser-pass/` specs are stale and have been since Task 264.** Task 387's fix
-  let `run.js` reach the real page for the first time in who knows how long; it gets 15/17 and stops.
-  `Session.drawExample()` drives 27 references across 8 spec files, and Task 264 **retired the
-  "Draw example network" toolbar button** — examples moved to `File ▸ New project…` / `Open
-  example…` (recorded at `lib/lang.ec.en.php:1325` and `js/looped-network.js:9139`).
-  - **The repair needs a product judgement, not a rename:** which of the new flows is the
-    behaviour-preserving substitute for what `drawExample()` set up — *an edit made, no file
-    written, tab dirty*. Decide that once, in `lib/session.js`, and the 8 specs follow.
-  - **The specs were probably never re-run against a correct tree since Task 264** (2026-08-10),
-    which is the measure of what the wrong-tree bug actually cost: not a wrong answer, but a suite
-    reporting on somebody else's files. A green test nobody can trust is worse than a red one.
-
 - 20|322| **Standing advisories worth converting rather than re-reading.** `check_all.sh` reports
   these every run and nobody can act on them.
   - **`js/looped-network.js` is 9,740 lines**, with `rebuildSettingsFields()` at 507 and
@@ -371,29 +359,6 @@ font-size blindness, attempted twice and reverted twice — read its block befor
   - **"Most-open angle(s)" is Task 411, not this task** — candidate *generation*, orthogonal to the
     reduction rules, and the "start in open territory" precondition the relaxation bullet assumes.
     Literature pass done 2026-08-17: `dev/most-open-angle-brainstorm.md`.
-
-- 40|411| **Most-open angle: an angular table that lets the placer SKIP a candidate without
-  re-examining the model.** Tom's idea, checked against the survey and re-scoped by him 2026-08-17.
-  Design: `dev/most-open-angle-brainstorm.md`. Not gated on Phase 3.
-  - **The four positions stay FIXED and CARDINAL** — TR, TL, BR, BL, tried in that order, each
-    contained entirely within its quadrant so an orthogonal link can arrive without crossing the
-    label. **Four, not eight, because a top-centre or bottom-centre label blocks nearly half the
-    circle** (Tom, 2026-08-17, correcting an earlier claim that link bearings were the reason). A
-    corner label kept inside its quadrant blocks only 70–80°, so four of them still leave gaps for
-    links to arrive through; the centres do not, which is what disqualifies them.
-  - **Off-orthogonal tolerance is the tunable that decides whether this works**: 30° impractical,
-    15° maybe, **5–10° almost essential** (Tom's estimate). Ship it on the tester panel (Task 416),
-    do not freeze a guess.
-  - **The table is a REJECTION test, not a generator.** For TR, ask for any dirty angle in 10°–80°;
-    if there is one, skip. A table lookup, not a geometry query — that is the whole saving.
-  - **Sectors are exact arcs, not 45° wedges.** Incident bearings are known exactly; bucketing
-    throws away precision we were handed free, and a 183° opening is one arc, not four wedges.
-  - **Raster only after the four are exhausted**, inside the open sector — probably POLAR, since a
-    sector is bounded by two angles and a radius and a rectangular grid would sample a square and
-    discard most of it.
-  - **Labels advertising their open arcs so neighbours are drawn toward them** (Tom: *"Nudge me!
-    Join me! I have all the space in the world!"*) is attraction added to a model that only repels
-    today. Not in the survey — search before building.
 
 - 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
   2026-08-14: *"Not mtext labels. Mtext Text objects."* The target is what you place with the Text
@@ -649,18 +614,6 @@ font-size blindness, attempted twice and reverted twice — read its block befor
   - **Mobile is demoted and does not appear in a headline, tagline or list of reasons** (Tom,
     2026-08-14: *"phone is a dead end… I don't want to tout it"*). We keep caring — the touch-trap cap
     stays, phone regressions are still bugs — but the claim is not made.
-- 45|415| **A `selected` property on elements, and SUBJECT-THEN-VERB Delete.** Tom, 2026-08-17.
-  Today's Delete is verb-then-subject; he wants select-first, act-second, which is what every CAD and
-  GIS editor does and what makes multi-select possible at all.
-  - **The `selected` property is the whole foundation** — Task 266 (lasso) and every step below are
-    cheap once it exists and impossible until it does. Build it first, on its own, with single
-    selection only, and ship Delete on top of it.
-  - Tom's own progression, in his order: Ctrl-click to add → lasso → **lasso then filter**, or
-    *"filter what you select because the Filter box is open."* That last is the interesting one and
-    it converges with Task 353 (element search) — check them against each other before designing.
-  - **Not overridable, and not stored.** Selection is view state, not document state: it must not
-    enter `serializeProject()`, and by Task 407's line it is neither membership nor identity.
-
 - 30|416| **The tester control panel: move it, prune it, and make it the request channel.** Tom,
   2026-08-17: *"I am not using it much because it seems like mostly noise."* Today it is
   `?debug=labels`, built by `buildLabelBench()`.
