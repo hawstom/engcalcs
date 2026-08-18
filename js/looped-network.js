@@ -2893,6 +2893,44 @@ var EngCalcs = EngCalcs || {};
 		return undefined;
 	}
 	function colorFieldOf(group) { return group === 'node' ? settings.colorNodeField : settings.colorLinkField; }
+	// The toolbar's one-control version of the two Settings rows (Task 327). Rebuilt rather than
+	// written once, because the field LABELS follow the friction method (roughness carries its
+	// method's symbol) and the unit strip, both of which change under it.
+	//
+	// **PRESSURE AND VELOCITY ARE FIRST**, and that is Tom's ordering rather than the map's: they
+	// are the two questions a distribution network is actually asked. The rest follow in the order
+	// EPANET's own View menu lists them, so nobody has to learn a second vocabulary.
+	function quickColorOptions() {
+		var out = [], seen = {};
+		['pressure', 'head', 'elev', 'demand'].forEach(function (k) {
+			if (COLOR_NODE_FIELDS[k] !== undefined) { out.push(['node:' + k, colorFieldLabel('node', k)]); seen['node:' + k] = 1; }
+		});
+		['velocity', 'flow', 'headloss', 'gradient', 'diameter', 'roughness'].forEach(function (k) {
+			if (COLOR_LINK_FIELDS[k] !== undefined) { out.push(['link:' + k, colorFieldLabel('link', k)]); seen['link:' + k] = 1; }
+		});
+		// Anything the maps gain later still appears, without this list having to be maintained
+		// twice -- the ordering above is a preference, not the source of truth.
+		Object.keys(COLOR_NODE_FIELDS).forEach(function (k) {
+			if (!seen['node:' + k]) { out.push(['node:' + k, colorFieldLabel('node', k)]); }
+		});
+		Object.keys(COLOR_LINK_FIELDS).forEach(function (k) {
+			if (!seen['link:' + k]) { out.push(['link:' + k, colorFieldLabel('link', k)]); }
+		});
+		return out;
+	}
+	function rebuildQuickColor(sel) {
+		var pc = EngCalcs.pageConfig || {}, cur = settings.colorNodeField ? 'node:' + settings.colorNodeField
+			: (settings.colorLinkField ? 'link:' + settings.colorLinkField : '');
+		if (!sel) { sel = document.getElementById('lpn_color_quick'); }
+		if (!sel) { return; }
+		sel.innerHTML = '';
+		[['', pc.lpn_color_none || 'No color']].concat(quickColorOptions()).forEach(function (o) {
+			var opt = document.createElement('option');
+			opt.value = o[0]; opt.textContent = o[1];
+			if (o[0] === cur) { opt.selected = true; }
+			sel.appendChild(opt);
+		});
+	}
 	function colorValueOf(group, elem, field) {
 		return group === 'node' ? colorNodeValue(elem, field) : colorLinkValue(elem, field);
 	}
@@ -6494,6 +6532,9 @@ var EngCalcs = EngCalcs || {};
 		backdropImg = null;
 		backdropLayer.innerHTML = '';
 		if (backdrop) { buildBackdropImg(); }
+		// A different project may colour by a different field, and the toolbar select is the one
+		// place that answer is visible without opening a panel (Task 327).
+		rebuildQuickColor();
 		// Grid or geographic, and basemap on or off, both belong to the project -- so switching
 		// projects can turn the tiles and their attribution on or off (Task 145).
 		refreshBasemap();
@@ -9981,6 +10022,34 @@ var EngCalcs = EngCalcs || {};
 		if (pc.lpn_tip_labels_draggable) { labelsBtn.title = pc.lpn_tip_labels_draggable; labelsBtn.className = 'ec-help'; }
 		labelsBtn.addEventListener('click', toggleLabelsPopup);
 		viewGroup.appendChild(labelsBtn);
+		// **COLOUR BY VALUE, IN ONE CONTROL** (ROADMAP Task 327). The mode shipped with Task 384 and
+		// was reachable only as three rows inside Settings > Color by value -- which is where a
+		// setting lives, not where a way of LOOKING at a big network does. Tom: it should be "one
+		// control naming the field, reachable without opening a panel."
+		//
+		// It is one select, not two, although the document has two fields (node and link). Choosing
+		// a NODE field clears the link one and the other way round, because colouring both at once
+		// by different quantities is a map nobody can read -- and the reader has no key telling them
+		// which legend belongs to which. One question, one answer, one legend.
+		var colorSel = document.createElement('select');
+		colorSel.id = 'lpn_color_quick';
+		colorSel.title = pc.lpn_tool_color_tip || '';
+		viewGroup.appendChild(colorSel);
+		rebuildQuickColor(colorSel);
+		colorSel.addEventListener('change', function () {
+			var v = colorSel.value, at = v.indexOf(':');
+			settings.colorNodeField = '';
+			settings.colorLinkField = '';
+			if (at > 0) {
+				if (v.slice(0, at) === 'node') { settings.colorNodeField = v.slice(at + 1); }
+				else { settings.colorLinkField = v.slice(at + 1); }
+			}
+			refreshValueColors();
+			saveToStorage();
+			// The Settings panel holds the same two fields, so if it happens to be open it must not
+			// go on showing the old answer.
+			if (document.getElementById('lpn_settings_popup').style.display === 'block') { rebuildSettingsFields(); }
+		});
 		var settingsBtn = document.createElement('button');
 		settingsBtn.type = 'button';
 		setLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings');
@@ -12316,6 +12385,9 @@ var EngCalcs = EngCalcs || {};
 				if (group === 'node') { settings.colorNodeField = sel.value; }
 				else { settings.colorLinkField = sel.value; }
 				refreshValueColors(); saveToStorage(); refreshColorSection();
+				// The toolbar shows the same answer in one control (Task 327). Two controls over one
+				// pair of settings is fine; two controls that disagree about them is not.
+				rebuildQuickColor();
 			});
 			return sel;
 		}

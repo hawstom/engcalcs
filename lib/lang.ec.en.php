@@ -1273,6 +1273,9 @@ $ec_lang['lpn_units_convert']='Convert them all';
 // {n} is a whole number.
 $ec_lang['lpn_status_reinterpreted']='{n} values now mean {unit}. Nothing was rewritten.';
 $ec_lang['lpn_status_converted']='{n} values were rewritten into {unit}.';
+// The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
+// options say what it does, and the toolbar is where space is scarcest.
+$ec_lang['lpn_tool_color_tip']='Colour the network by one value, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.';
 $ec_lang['lpn_units_group_inputs']='Units of what you enter';
 $ec_lang['lpn_units_group_results']='Units of the answers';
 $ec_lang['lpn_units_length']='Length and map coordinates';

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1052,
-        "delta_key_count": 56,
+        "expected_key_count": 1053,
+        "delta_key_count": 57,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -379,6 +379,7 @@
         "lpn_units_convert": "Convert them all",
         "lpn_status_reinterpreted": "{n} values now mean {unit}. Nothing was rewritten.",
         "lpn_status_converted": "{n} values were rewritten into {unit}.",
+        "lpn_tool_color_tip": "Colour the network by one value, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.",
         "lpn_units_group_inputs": "Units of what you enter",
         "lpn_units_group_results": "Units of the answers",
         "lpn_basemap_show": "Show street map",
@@ -437,6 +438,7 @@
         "lpn_units_convert": "Convert them all",
         "lpn_status_reinterpreted": "{n} values now mean {unit}. Nothing was rewritten.",
         "lpn_status_converted": "{n} values were rewritten into {unit}.",
+        "lpn_tool_color_tip": "Colour the network by one value, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.",
         "lpn_units_group_inputs": "Units of what you enter",
         "lpn_units_group_results": "Units of the answers",
         "lpn_basemap_show": "Show street map",
@@ -720,6 +722,22 @@
             }
         },
         "lpn_status_converted": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_demand_tip",
+                    "value": "এই নোডে নেটওয়ার্ক থেকে নেওয়া প্রবাহ। এখানে নেটওয়ার্কে প্রবাহ যোগ করতে ঋণাত্মক সংখ্যা লিখুন।",
+                    "english": "Flow taken out of the network at this node. Enter a negative number for flow put into the network here."
+                },
+                "next_translated": {
+                    "key": "lpn_units_length",
+                    "value": "দৈর্ঘ্য ও মানচিত্র স্থানাঙ্ক",
+                    "english": "Length and map coordinates"
+                }
+            }
+        },
+        "lpn_tool_color_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

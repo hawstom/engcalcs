@@ -495,6 +495,7 @@ EngCalcs.pageConfig = {
 	lpn_field_valve_setting_drop_tip: <?=json_encode($ec_lang['lpn_field_valve_setting_drop_tip'])?>,
 	lpn_inp_drop_gpv_curve: <?=json_encode($ec_lang['lpn_inp_drop_gpv_curve'])?>,
 	lpn_gpv_curve_note: <?=json_encode($ec_lang['lpn_gpv_curve_note'])?>,
+	lpn_tool_color_tip: <?=json_encode($ec_lang["lpn_tool_color_tip"])?>,
 	lpn_units_group_inputs: <?=json_encode($ec_lang['lpn_units_group_inputs'])?>,
 	lpn_units_group_results: <?=json_encode($ec_lang['lpn_units_group_results'])?>,
 	lpn_units_warn_title: <?=json_encode($ec_lang['lpn_units_warn_title'])?>,

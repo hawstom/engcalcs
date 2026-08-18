@@ -245,14 +245,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     never syntax-checked. Given Task 318 lives entirely in `sw.js`, that is a gap worth one
     character of glob. **DONE 2026-08-14** — glob widened; the rest of this task stands.
 
-- 55|327| **Give the THEMATIC view a one-click control.** The mode itself shipped with Task 384:
-  `settings.colorThematic` colours the network by a chosen field and drops every label, as the
-  `.lpn-thematic` class on the `<svg>`. What is left is the ergonomics Tom actually named.
-  - Today it is three rows inside Settings > Color by value. It should be **one control naming the
-    field**, reachable without opening a panel — pressure and velocity are the two that matter.
-  - Connects to Task 253 (clean map for screenshots) — a thematic view with no labels IS the clean
-    map, arrived at from the other side.
-
 - 5|347| **No project tabs at all until a project is opened.** Tom's strongest form of the examples
   gallery (*"It's not a map until the first project is started or opened?"*), extracted from Task 314
   when it closed. Left out there on grounds worth restating: `init()` guarantees an invariant in as
