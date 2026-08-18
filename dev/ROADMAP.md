@@ -585,8 +585,10 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 - 60|433| **Profile: fit and finish.** Tom, 2026-08-18: *"Amazing. Now we just need a good UI."* The
   drawing is right (Task 409); what is missing is everything around it.
-  - **The path is not shown on the map.** That is the first thing to fix — a route you cannot see is
-    a route you cannot check.
+  - **DONE 2026-08-18: the path is shown on the map** — a wide translucent orange stroke along each
+    link of the route with a ring on every stop, in its own layer above the links and below the
+    nodes, drawn from the same `path` object the chart is. Not a restyling of the links: that would
+    fight the value ramp, the closed-link dash and the selection mark.
   - **The chooser should be the Google Maps gesture EPANET uses:** click the starting node, hover
     along the path, click to add a waypoint, double-click to end. Not two pull-downs.
   - **It is too small** — a proof of concept. It belongs in the resizable bottom pane of Task 434,

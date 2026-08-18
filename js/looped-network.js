@@ -5817,7 +5817,57 @@ var EngCalcs = EngCalcs || {};
 	var profileUserPos = null;
 	function profilePanel() { return document.getElementById('lpn_profile_popup'); }
 	function profileIsOpen() { var p = profilePanel(); return !!p && p.style.display === 'block'; }
-	function closeProfilePopup() { var p = profilePanel(); if (p) { p.style.display = 'none'; } }
+	function closeProfilePopup() {
+		var p = profilePanel();
+		if (p) { p.style.display = 'none'; }
+		drawProfilePath(null);
+	}
+
+	// ---- THE ROUTE, ON THE MAP (ROADMAP Task 433) -----------------------------------------------
+	//
+	// Tom, 2026-08-18, on what the profile needs first: *"The path is not shown on the map. That is
+	// the first thing to fix — a route you cannot see is a route you cannot check."* Exactly right:
+	// the panel draws a correct profile of SOME route, and until the map says which one, the reader
+	// has no way to tell a route through the wrong branch from a route through the right one.
+	//
+	// **A HIGHLIGHT UNDER THE PIPES, NOT A RESTYLING OF THEM.** Its own layer, inserted below the
+	// nodes so symbols stay legible on top of it, drawn as a wide translucent stroke along each
+	// link's real polyline. Restyling the links themselves would fight every other thing that colours
+	// them -- the value ramp, the closed-link dash, the selection mark -- and would have to be undone
+	// on a path that changed under an edit.
+	//
+	// The stops carry a ring each, because "where does this profile start" is the second question
+	// after "which way does it go", and the from/to pull-downs are in a panel that may be anywhere.
+	var profilePathLayer = null;
+	function drawProfilePath(path) {
+		if (profilePathLayer && profilePathLayer.parentNode) {
+			profilePathLayer.parentNode.removeChild(profilePathLayer);
+		}
+		profilePathLayer = null;
+		if (!path || !world) { return; }
+		var sc = state.s || 1;
+		profilePathLayer = el('g', { 'class': 'lpn-profile-path', 'pointer-events': 'none' });
+		// BELOW the nodes and ABOVE the links: a route is about the pipes, so it must not bury the
+		// junction symbols the user is about to click as a waypoint.
+		world.insertBefore(profilePathLayer, nodesLayer);
+		(path.links || []).forEach(function (id) {
+			var l = linkById(id);
+			if (!l) { return; }
+			el('polyline', {
+				points: linkPoints(l), fill: 'none', stroke: '#f60', 'stroke-opacity': 0.45,
+				'stroke-width': linkStrokeWidth() * 5,
+				'stroke-linecap': 'round', 'stroke-linejoin': 'round'
+			}, profilePathLayer);
+		});
+		profileStops().forEach(function (id) {
+			var nd = id && nodeById(id);
+			if (!nd) { return; }
+			el('circle', {
+				cx: nd.x, cy: nd.y, r: (nodeRadius(nd) + 5 / sc), fill: 'none',
+				stroke: '#f60', 'stroke-opacity': 0.9, 'stroke-width': 2 / sc
+			}, profilePathLayer);
+		});
+	}
 	// profileSeedStops() first, because the document may have changed under an open panel: a stop
 	// whose node was deleted is cleared here rather than left to draw a route through a ghost.
 	function refreshProfileIfOpen() {
@@ -6039,6 +6089,9 @@ var EngCalcs = EngCalcs || {};
 		host.innerHTML = '';
 		if (note) { note.textContent = ''; }
 		path = profilePath();
+		// The map highlight is redrawn from the SAME `path` the chart is drawn from, in the one place
+		// that path is computed -- so the two can never disagree about which route is being shown.
+		drawProfilePath(path);
 		if (!path) {
 			if (note) {
 				note.textContent = (!profileState.from || !profileState.to)
@@ -12766,6 +12819,10 @@ var EngCalcs = EngCalcs || {};
 	// size-scaled threshold. The transition in either direction takes the full path, so nothing comes
 	// back stale. (Nothing hydraulic runs here either -- scheduleSolve() is never called from a zoom.)
 	function onZoomChanged() {
+		// The profile's map highlight is drawn in world units derived from the screen scale (a wide
+		// stroke, a ring one pointer-slop bigger than the node), so a zoom has to redraw it or it
+		// grows and shrinks with the drawing instead of staying a constant thickness on screen.
+		if (profileIsOpen()) { drawProfilePath(profilePath()); }
 		var wasHidden = dataLabelsHidden;
 		applyLabelVisibility();
 		if (wasHidden && dataLabelsHidden) {

@@ -331,5 +331,28 @@ console.log('\n--- Net1: the truncation payoff ---');
 		`${(truncated * 100).toFixed(0)}% vs ${(anchored * 100).toFixed(0)}%`);
 }
 
+// ---- THE ROUTE IS SHOWN ON THE MAP (ROADMAP Task 433) ---------------------------------------
+// Tom: "a route you cannot see is a route you cannot check." The DRAWING of it needs a browser, but
+// three structural properties do not, and each is a way the feature could be silently wrong: the
+// highlight must come from the same `path` the chart does, it must be cleared when the panel closes,
+// and it must be redrawn on a zoom (its widths are screen-derived).
+console.log('\n-- the route is drawn on the map --');
+{
+	const lnSrc = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
+	report(/function drawProfilePath\(path\)/.test(lnSrc), 'there is a map highlight at all');
+	// ONE path, computed once. Two calls to profilePath() would let the chart and the map disagree
+	// about which route is on screen -- which is the exact confusion this feature exists to remove.
+	report(/path = profilePath\(\);\n(\s*\/\/.*\n)*\s*drawProfilePath\(path\);/.test(lnSrc),
+		'the map is drawn from the SAME path object the chart is');
+	report(/function closeProfilePopup\(\) \{[\s\S]{0,200}?drawProfilePath\(null\);/.test(lnSrc),
+		'closing the panel clears it');
+	report(/if \(profileIsOpen\(\)\) \{ drawProfilePath\(profilePath\(\)\); \}/.test(lnSrc),
+		'a zoom redraws it, so its stroke stays a constant thickness on screen');
+	// UNDER the nodes: a route is about the pipes and must not bury the junction symbols the user is
+	// about to click as a waypoint.
+	report(/world\.insertBefore\(profilePathLayer, nodesLayer\)/.test(lnSrc),
+		'it sits above the links and below the nodes');
+}
+
 console.log(`\n${checks - failures}/${checks} checks passed`);
 process.exit(failures ? 1 : 0);
