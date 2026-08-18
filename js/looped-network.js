@@ -5749,6 +5749,32 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {}, key = MODE_HINT_KEYS[mode];
 		el.textContent = key ? (pc[key] || '') : '';
 	}
+	// ---- CLEAN MAP (ROADMAP Task 253) ----------------------------------------------------------
+	//
+	// **ONE TOGGLE, AND DELIBERATELY ONLY TWO THINGS.** Tom, 2026-08-09: *"The only thing I care for
+	// it to hide at the moment (for map screenshots) is the Mode status line."* So this hides
+	// #lpn_mode_hint and #lpn_coords and NOTHING else -- the units/scenario readouts stay, because a
+	// screenshot of bare numbers with no statement of what they are is worse than one with the
+	// coordinate tracker in it. Task 175 holds the real printable-version question; this is not it.
+	//
+	// **NOT STORED, and not part of the project.** It is a presentation mode you hold for as long as
+	// you are taking pictures, so persisting it would mean a user could lose the mode line
+	// permanently and have no idea what removed it. A reload restores everything.
+	//
+	// `display:none` rather than `visibility:hidden` on purpose: overlayReserve() measures
+	// offsetHeight, so hiding the mode line also gives zoomExtent() that strip of canvas back.
+	var cleanMap = false;
+	function cleanMapOn() { return cleanMap; }
+	function setCleanMap(on) {
+		cleanMap = !!on;
+		['lpn_mode_hint', 'lpn_coords'].forEach(function (id) {
+			var el = document.getElementById(id);
+			if (el) { el.style.display = cleanMap ? 'none' : ''; }
+		});
+		var btn = document.getElementById('lpn_clean_map_btn');
+		if (btn) { btn.setAttribute('aria-pressed', cleanMap ? 'true' : 'false'); }
+	}
+
 	function setMode(newMode) {
 		// Read-only does NOT restrict the TOOLS: open a project read-only and you can do anything
 		// with it except save it to file. The single enforcement point is writeOpenProjectToFile(),
@@ -9757,6 +9783,11 @@ var EngCalcs = EngCalcs || {};
 			// same reason the label popover does.
 			{ icon: 'view', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
 				fn: function () { openProfilePopup(document.getElementById('lpn_menu_view')); } },
+			// The label states what the row will DO, because this menu has no checkmark column --
+			// the same convention the street-map row below follows.
+			{ icon: 'camera', label: cleanMapOn() ? (pc.lpn_clean_map_off || 'Show map readouts') : (pc.lpn_clean_map || 'Clean map'),
+				tip: pc.lpn_clean_map_tip,
+				fn: function () { setCleanMap(!cleanMapOn()); } },
 			// HIDDEN OUTSIDE A GEOGRAPHIC PROJECT, not disabled: a grid project's x/y are canvas
 			// units with no place on the Earth, so there is no street map that could go behind one.
 			// The label states what the row will DO, because this menu has no checkmark column.
@@ -10353,6 +10384,16 @@ var EngCalcs = EngCalcs || {};
 		setLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit');
 		extentBtn.addEventListener('click', zoomExtent);
 		viewGroup.appendChild(extentBtn);
+		// A pressed/unpressed toggle, not a command -- the mode is invisible on the map itself once
+		// the readouts are gone, so the button has to be the thing that says it is on.
+		var cleanBtn = document.createElement('button');
+		cleanBtn.type = 'button';
+		cleanBtn.id = 'lpn_clean_map_btn';
+		setLabel(cleanBtn, 'camera', pc.lpn_clean_map || 'Clean map');
+		if (pc.lpn_clean_map_tip) { cleanBtn.title = pc.lpn_clean_map_tip; cleanBtn.className = 'ec-help'; }
+		cleanBtn.setAttribute('aria-pressed', cleanMapOn() ? 'true' : 'false');
+		cleanBtn.addEventListener('click', function () { setCleanMap(!cleanMapOn()); });
+		viewGroup.appendChild(cleanBtn);
 		var labelsBtn = document.createElement('button');
 		labelsBtn.type = 'button';
 		setLabel(labelsBtn, 'labels', pc.lpn_tool_labels || 'Labels');

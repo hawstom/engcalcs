@@ -1344,6 +1344,9 @@ $ec_lang['lpn_menu_view']='View';
 $ec_lang['lpn_basemap_show']='Show street map';
 $ec_lang['lpn_basemap_hide']='Hide street map';
 $ec_lang['lpn_basemap_tip']='Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.';
+$ec_lang['lpn_clean_map']='Clean map';
+$ec_lang['lpn_clean_map_off']='Show map readouts';
+$ec_lang['lpn_clean_map_tip']='Hide the mode line and the coordinate readout so a screenshot shows only the map. Nothing else changes, and nothing is saved.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Settings';

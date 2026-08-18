@@ -687,6 +687,9 @@
         "lpn_basemap_show": "Show street map",
         "lpn_basemap_hide": "Hide street map",
         "lpn_basemap_tip": "Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.",
+        "lpn_clean_map": "Clean map",
+        "lpn_clean_map_off": "Show map readouts",
+        "lpn_clean_map_tip": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Nothing else changes, and nothing is saved.",
         "lpn_menu_settings": "Settings",
         "lpn_menu_help": "Help",
         "lpn_help_walkthroughs": "Walkthroughs",
@@ -1071,7 +1074,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 1069,
+    "count": 1072,
     "active_prefixes": [
         "about",
         "bpn",

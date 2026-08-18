@@ -217,6 +217,12 @@ $ec_icons = array(
 	'install'    => '<path d="M12 3v12"/><path d="M7 10.5l5 5 5-5"/><path d="M4 20h16"/>',
 	'globe'      => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18"/><path d="M12 3a13 13 0 0 1 0 18a13 13 0 0 1 0-18z"/>',
 	'check'      => '<path d="M4.5 12.5l5.5 5.5L20 6.5"/>',
+	// A camera: body, lens, and the raised shutter-housing bump over the lens that every
+	// compact camera has. It marks the CLEAN MAP command (ROADMAP Task 253), whose whole
+	// purpose is taking a screenshot. This does not reopen the 2026-08-08 question above --
+	// that one was whether the VIEW menu should be a camera instead of an eye, and it stays
+	// an eye. Two different commands, two different objects.
+	'camera'     => '<path d="M3 8h4l1.5-2.5h7L17 8h4v12H3z"/><circle cx="12" cy="13.5" r="3.5"/>',
 
 	// The other two rows of the lpn Help menu. Drawn rather than left blank: openMenu() reserves an
 	// icon column so a bare row would still align, but one iconed row beside two empty ones in a

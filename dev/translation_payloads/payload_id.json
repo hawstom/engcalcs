@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1069,
-        "delta_key_count": 73,
+        "expected_key_count": 1072,
+        "delta_key_count": 76,
         "exempt_key_count": 29,
         "exempt_keys": [
             "u_imgd",
@@ -391,6 +391,9 @@
         "lpn_basemap_show": "Show street map",
         "lpn_basemap_hide": "Hide street map",
         "lpn_basemap_tip": "Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.",
+        "lpn_clean_map": "Clean map",
+        "lpn_clean_map_off": "Show map readouts",
+        "lpn_clean_map_tip": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Nothing else changes, and nothing is saved.",
         "lpn_find_menu": "Find",
         "lpn_find_title": "Find elements",
         "lpn_find_scope": "Elements to search",
@@ -466,6 +469,9 @@
         "lpn_basemap_show": "Show street map",
         "lpn_basemap_hide": "Hide street map",
         "lpn_basemap_tip": "Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.",
+        "lpn_clean_map": "Clean map",
+        "lpn_clean_map_off": "Show map readouts",
+        "lpn_clean_map_tip": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Nothing else changes, and nothing is saved.",
         "lpn_find_menu": "Find",
         "lpn_find_title": "Find elements",
         "lpn_find_scope": "Elements to search",
@@ -856,6 +862,54 @@
             }
         },
         "lpn_basemap_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Tampilan",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Pengaturan",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_clean_map": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Tampilan",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Pengaturan",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_clean_map_off": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Tampilan",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Pengaturan",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_clean_map_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
