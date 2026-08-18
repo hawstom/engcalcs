@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 1100,
-        "delta_key_count": 104,
+        "expected_key_count": 1107,
+        "delta_key_count": 111,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -429,6 +429,13 @@
         "lpn_goto_prompt": "Latitude, longitude",
         "lpn_goto_bad": "That is not a latitude and longitude. Try 38.106, -122.569.",
         "lpn_georef_goto": "Go to…",
+        "lpn_pane_toggle": "Bottom panel",
+        "lpn_pane_toggle_tip": "Show or hide the panel below the map. It holds the profile and the junction table.",
+        "lpn_pane_resize": "Drag to make the panel taller or shorter",
+        "lpn_pane_tab_junctions": "Junctions",
+        "lpn_pane_tab_junctions_tip": "Every junction as a table you can sort and edit.",
+        "lpn_pane_junctions_none": "This network has no junctions yet.",
+        "lpn_pane_sort_tip": "Sort by this column. Click again to reverse it.",
         "lpn_clean_map": "Clean map",
         "lpn_clean_map_off": "Show map readouts",
         "lpn_clean_map_tip": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Nothing else changes, and nothing is saved.",
@@ -535,6 +542,13 @@
         "lpn_goto_prompt": "Latitude, longitude",
         "lpn_goto_bad": "That is not a latitude and longitude. Try 38.106, -122.569.",
         "lpn_georef_goto": "Go to…",
+        "lpn_pane_toggle": "Bottom panel",
+        "lpn_pane_toggle_tip": "Show or hide the panel below the map. It holds the profile and the junction table.",
+        "lpn_pane_resize": "Drag to make the panel taller or shorter",
+        "lpn_pane_tab_junctions": "Junctions",
+        "lpn_pane_tab_junctions_tip": "Every junction as a table you can sort and edit.",
+        "lpn_pane_junctions_none": "This network has no junctions yet.",
+        "lpn_pane_sort_tip": "Sort by this column. Click again to reverse it.",
         "lpn_clean_map": "Clean map",
         "lpn_clean_map_off": "Show map readouts",
         "lpn_clean_map_tip": "Hide the mode line and the coordinate readout so a screenshot shows only the map. Nothing else changes, and nothing is saved.",
@@ -1316,6 +1330,118 @@
             }
         },
         "lpn_georef_goto": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Изглед",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Настройки",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_pane_toggle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Изглед",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Настройки",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_pane_toggle_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Изглед",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Настройки",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_pane_resize": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Изглед",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Настройки",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_pane_tab_junctions": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Изглед",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Настройки",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_pane_tab_junctions_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Изглед",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Настройки",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_pane_junctions_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Изглед",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Настройки",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_pane_sort_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

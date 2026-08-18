@@ -5854,6 +5854,417 @@ var EngCalcs = EngCalcs || {};
 		if (x) { x.addEventListener('click', closeFindPopup); }
 		makePanelDraggable(popup, function (pos) { findUserPos = pos; });
 	}
+	// ---- THE BOTTOM PANE (ROADMAP Task 434) --------------------------------------------------
+	//
+	// One resizable panel docked under the map, carrying a TAB for each thing that is READ WHILE
+	// THE MAP IS EDITED: the profile now, the tabular editors (Junctions, Pipes, Pumps, Valves)
+	// next. Tom, 2026-08-18, naming the frame that Tasks 284, 427, 433 and 146.04 were each about
+	// to invent separately.
+	//
+	// **THE PANE NEVER TELLS THE CANVAS HOW TALL TO BE.** It sits in normal flow below the map, and
+	// applyMapHeight() sizes the canvas from `body.bottom - svg.bottom` -- so a pane that really is
+	// below the map is subtracted by MEASUREMENT. Opening it, closing it and dragging it are
+	// environment events, exactly like a window resize, and each one just asks for a re-measure.
+	// A fixed overlay would have needed its height handed to the canvas, which is a second source
+	// of truth for the one number Task 432 finished making measured.
+	//
+	// **PER BROWSER, NOT PER PROJECT** -- the same line #lpn_show_titles is on. How tall your panel
+	// is and which tab you left open is a fact about the window you are sitting at; carrying it in
+	// a project file would make a colleague inherit your screen. serializeProject() must never
+	// learn about it.
+	//
+	// What is NOT here, and is not coming: Settings and the Labels box (Tom, explicitly). Both hang
+	// off their own toolbar button as pull-downs, and a setting is not something you read beside
+	// the drawing. A LEFT pane is not planned at all. A RIGHT pane is Tasks 427/284's to settle.
+	var LPN_PANE_KEY = 'lpn_pane';
+	// The pane's own floor, and the map's. Between them they decide how far the grip can travel:
+	// a drag can always leave the map a canvas worth looking at, so there is no gesture that hides
+	// the drawing entirely and no state a user has to undo to get their map back.
+	var LPN_PANE_MIN = 110, LPN_PANE_MAP_MIN = 160, LPN_PANE_DEFAULT = 260;
+	// One row per tab, in the order they are shown. `show` runs when the tab becomes the visible
+	// one, `hide` when it stops being -- a tab that draws on the MAP (the profile's route
+	// highlight) must clear that drawing when it is no longer the tab on show, or the map keeps a
+	// highlight belonging to something nobody can see.
+	// `show` runs on becoming the visible tab, `refresh` on every solve and every document change
+	// while it IS the visible one, `hide` on ceasing to be.
+	var paneTabs = [
+		{
+			id: 'profile', panel: 'lpn_pane_profile', label: 'lpn_profile_menu', tip: 'lpn_profile_tip',
+			// profileSeedStops() first, because the document may have changed under an open panel:
+			// a stop whose node was deleted is cleared here rather than left to draw a route
+			// through a ghost.
+			show: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
+			refresh: function () { profileSeedStops(); rebuildProfileForm(); renderProfile(); },
+			hide: function () { drawProfilePath(null); }
+		},
+		{
+			id: 'junctions', panel: 'lpn_pane_junctions', label: 'lpn_pane_tab_junctions',
+			tip: 'lpn_pane_tab_junctions_tip',
+			// A rebuild on entry, because the tab may have been away for a whole editing session;
+			// a refill afterwards, because renderJunctions() decides that for itself.
+			show: function () { junctionSig = ''; junctionOrderIds = null; renderJunctions(); },
+			refresh: renderJunctions
+		}
+	];
+	var paneState = { open: false, h: LPN_PANE_DEFAULT, tab: paneTabs[0].id };
+	function paneEl() { return document.getElementById('lpn_pane'); }
+	function paneIsOpen() { return !!paneState.open; }
+	function paneTabById(id) {
+		var i;
+		for (i = 0; i < paneTabs.length; i++) { if (paneTabs[i].id === id) { return paneTabs[i]; } }
+		return null;
+	}
+	function activePaneTab() { return paneTabById(paneState.tab) || paneTabs[0]; }
+	function savePaneState() {
+		try { localStorage.setItem(LPN_PANE_KEY, JSON.stringify(paneState)); } catch (e) {}
+	}
+	function loadPaneState() {
+		var raw = null, v;
+		try { raw = localStorage.getItem(LPN_PANE_KEY); } catch (e) { return; }
+		if (!raw) { return; }
+		try { v = JSON.parse(raw); } catch (e) { return; }
+		if (!v || typeof v !== 'object') { return; }
+		paneState.open = !!v.open;
+		if (typeof v.h === 'number' && isFinite(v.h)) { paneState.h = v.h; }
+		if (paneTabById(v.tab)) { paneState.tab = v.tab; }
+	}
+	// How tall the pane is allowed to be RIGHT NOW. The window is shared between the map and the
+	// pane, so the ceiling is what the two of them have between them, less the map's floor --
+	// measured, for the same reason the map's own height is.
+	//
+	// **A CANVAS OF 0 OR OF 10000 IS NOT A MEASUREMENT**, it is the page before and during layout
+	// (the curtain -- see the markup note on height="10000"). Deriving a ceiling from either would
+	// pin the pane at its floor on the one pass where the user has not touched anything yet, so
+	// half the window stands in until there is something true to measure.
+	function paneMaxHeight() {
+		var vh = window.innerHeight || 800, body = document.getElementById('lpn_pane_body'),
+			map = svg ? svg.getBoundingClientRect().height : 0,
+			mine = body ? body.getBoundingClientRect().height : 0,
+			room = map + mine - LPN_PANE_MAP_MIN;
+		if (!(map > 0) || map > vh) { room = Math.floor(vh / 2); }
+		return Math.max(LPN_PANE_MIN, Math.min(room, Math.floor(vh * 0.8)));
+	}
+	function clampPaneHeight(h) {
+		if (!(h > 0)) { h = LPN_PANE_DEFAULT; }
+		return Math.round(Math.max(LPN_PANE_MIN, Math.min(h, paneMaxHeight())));
+	}
+	// The one place the pane's state reaches the page. Everything else sets paneState and calls
+	// this, so open/close/switch/drag cannot each grow their own idea of what the DOM should say.
+	function applyPaneLayout() {
+		var pane = paneEl(), body = document.getElementById('lpn_pane_body'), btn;
+		if (!pane) { return; }
+		pane.style.display = paneState.open ? 'flex' : 'none';
+		if (paneState.open) {
+			paneState.h = clampPaneHeight(paneState.h);
+			if (body) { body.style.height = paneState.h + 'px'; }
+		}
+		paneTabs.forEach(function (t) {
+			var panel = document.getElementById(t.panel), on = t.id === paneState.tab, tab;
+			if (panel) { panel.classList.toggle('on', on); }
+			tab = document.getElementById('lpn_pane_tab_' + t.id);
+			if (tab) { tab.setAttribute('aria-selected', on ? 'true' : 'false'); }
+		});
+		btn = document.getElementById('lpn_pane_btn');
+		if (btn) { btn.setAttribute('aria-pressed', paneState.open ? 'true' : 'false'); }
+		// THE CANVAS IS RE-MEASURED, NEVER TOLD. See the note at the top of this section.
+		applyMapHeight();
+	}
+	// Switching tabs is a HIDE and a SHOW, in that order: the outgoing tab takes its map drawing
+	// with it before the incoming one puts its own there.
+	function setPaneTab(id) {
+		var was = activePaneTab(), now = paneTabById(id);
+		if (!now) { return; }
+		if (paneState.open && was && was !== now && was.hide) { was.hide(); }
+		paneState.tab = now.id;
+		applyPaneLayout();
+		if (paneState.open && now.show) { now.show(); }
+		savePaneState();
+	}
+	// **OPEN, NOT TOGGLE**, exactly like the Find box: a menu row that names a tab shows that tab.
+	// Only the toolbar button toggles, because a toggle is what a pressed/unpressed button IS.
+	function openPane(id) {
+		var t = paneTabById(id), was = activePaneTab();
+		if (t && t !== was) {
+			if (paneState.open && was.hide) { was.hide(); }
+			paneState.tab = t.id;
+		}
+		paneState.open = true;
+		applyPaneLayout();
+		if (activePaneTab().show) { activePaneTab().show(); }
+		savePaneState();
+	}
+	function closePane() {
+		var t = activePaneTab();
+		paneState.open = false;
+		applyPaneLayout();
+		if (t && t.hide) { t.hide(); }
+		savePaneState();
+	}
+	function togglePane() {
+		if (paneState.open) { closePane(); } else { openPane(paneState.tab); }
+	}
+	function wirePane() {
+		var pane = paneEl(), strip = document.getElementById('lpn_pane_tabs'),
+			grip = document.getElementById('lpn_pane_grip'),
+			x = document.getElementById('lpn_pane_close'), pc = EngCalcs.pageConfig || {},
+			dragFrom = null;
+		if (!pane) { return; }
+		if (strip) {
+			paneTabs.forEach(function (t) {
+				var b = document.createElement('button');
+				b.type = 'button';
+				b.id = 'lpn_pane_tab_' + t.id;
+				b.className = 'lpn-pane-tab';
+				b.setAttribute('role', 'tab');
+				b.textContent = pc[t.label] || t.id;
+				// Same treatment as a toolbar button's tip: straight onto the control, with
+				// .ec-help so a tap reveals it (EngCalcs.initTips()).
+				if (t.tip && pc[t.tip]) { b.title = pc[t.tip]; b.className += ' ec-help'; }
+				b.addEventListener('click', function () { setPaneTab(t.id); });
+				strip.appendChild(b);
+			});
+		}
+		if (x) { x.addEventListener('click', closePane); }
+		// **THE TOP EDGE IS THE HANDLE.** Pointer events, not mouse: one code path for mouse, pen
+		// and touch, with pointer capture so a fast drag that leaves the grip keeps resizing
+		// instead of stopping dead -- the pointer slop a real hand needs.
+		if (grip) {
+			grip.addEventListener('pointerdown', function (e) {
+				var body = document.getElementById('lpn_pane_body');
+				dragFrom = { y: e.clientY, h: body ? body.getBoundingClientRect().height : paneState.h };
+				if (grip.setPointerCapture) { grip.setPointerCapture(e.pointerId); }
+				e.preventDefault();
+			});
+			grip.addEventListener('pointermove', function (e) {
+				if (!dragFrom) { return; }
+				// UP IS TALLER: the pane grows into the map, which is what dragging its top edge
+				// upward looks like.
+				paneState.h = clampPaneHeight(dragFrom.h + (dragFrom.y - e.clientY));
+				applyPaneLayout();
+			});
+			['pointerup', 'pointercancel'].forEach(function (evt) {
+				grip.addEventListener(evt, function () {
+					if (!dragFrom) { return; }
+					dragFrom = null;
+					savePaneState();
+				});
+			});
+		}
+		// **A SHORTER WINDOW LOWERS THE CEILING.** The clamp is re-run on a resize, or a pane that
+		// was a third of a tall window becomes the whole of a short one -- and the map would be at
+		// its floor with no way to see that the pane is what took it.
+		window.addEventListener('resize', function () { if (paneState.open) { applyPaneLayout(); } });
+		// The tabs are built after init()'s own EngCalcs.initTips(document) has run, so their tips
+		// need wiring here or a tap on one does nothing (ROADMAP Task 173's gap, again).
+		if (EngCalcs.initTips) { EngCalcs.initTips(pane); }
+		loadPaneState();
+		applyPaneLayout();
+		if (paneState.open && activePaneTab().show) { activePaneTab().show(); }
+	}
+	// ---- Tab: JUNCTIONS, the first tabular editor (ROADMAP Task 434) --------------------------
+	//
+	// The same document the map shows, as a spreadsheet: one row per junction, every column
+	// sortable, the two typed values editable in place. It is the view for the questions a drawing
+	// answers badly -- "which node has no elevation", "who is at 12 psi", "is that demand really
+	// 1,500" -- and EPANET has had it since 2.0.
+	//
+	// **EVERY WRITE GOES THROUGH THE SAME SEAM THE PROPERTY POPUP USES**, which for a demand means
+	// setProp(): a direct write edits BASE from inside a scenario, silently, under every scenario at
+	// once (dev/scripts/scenario_seam_check.php, dev/scenario-seam-repair.md). An elevation is not
+	// overridable and is written as the popup writes it. Two editors of one property must not have
+	// two ideas of what editing it means, so the setters here are line-for-line the popup's.
+	//
+	// **A NUMBER HERE IS THE NUMBER THE USER TYPED**, in the unit the heading names -- no conversion
+	// in either direction, exactly as in the popup (Task 263). The two RESULT columns are the
+	// opposite kind of thing and are read-only: they come from the solve, through the same accessor
+	// the map labels and the colour ramp use, so a table cell and the label beside the symbol can
+	// never disagree.
+	var junctionSort = { col: 'id', dir: 1 };
+	var junctionCells = null, junctionSig = '', junctionOrderIds = null;
+	// The unit-bearing headings are rebuilt from these, so a unit switch re-labels the table for the
+	// same reason it re-renders the popup. `result` marks a column the solver owns.
+	var JUNCTION_COLS = [
+		{ key: 'id', label: 'lpn_field_id' },
+		{ key: 'elev', label: 'lpn_field_elev', unit: function () { return 'lpn_u_elevhead'; } },
+		{ key: 'demand', label: 'bpn_demand', unit: function () { return 'lpn_u_flow'; } },
+		{ key: 'head', label: 'lpn_result_head', result: true, unit: function () { return resultUnit('elevhead'); } },
+		{ key: 'pressure', label: 'lpn_result_pressure', result: true, unit: function () { return resultUnit('pressure'); } }
+	];
+	function junctionNodes() {
+		return doc.nodes.filter(function (n) { return n.type === 'junction'; });
+	}
+	function junctionValue(n, col) {
+		if (col === 'id') { return n.id; }
+		if (col === 'elev') { return n.elev; }
+		if (col === 'demand') { return effective(n, 'demand'); }
+		return colorNodeValue(n, col);
+	}
+	function junctionPresent(v) {
+		return v !== undefined && v !== null && v !== '' && !(typeof v === 'number' && !isFinite(v));
+	}
+	// **A BLANK IS LAST IN BOTH DIRECTIONS.** Sorting descending to find the biggest demand must not
+	// hand back a screenful of junctions that have no demand at all -- an empty cell is the absence
+	// of a value, not the smallest one, so it is ranked outside the direction rather than inside it.
+	function junctionSorted(nodes) {
+		var col = junctionSort.col, dir = junctionSort.dir;
+		return nodes.slice().sort(function (a, b) {
+			var va = junctionValue(a, col), vb = junctionValue(b, col),
+				pa = junctionPresent(va), pb = junctionPresent(vb);
+			if (pa !== pb) { return pa ? -1 : 1; }
+			if (!pa) { return String(a.id).localeCompare(String(b.id), undefined, { numeric: true }); }
+			if (typeof va === 'number' && typeof vb === 'number') { return (va - vb) * dir; }
+			return String(va).localeCompare(String(vb), undefined, { numeric: true }) * dir;
+		});
+	}
+	// **A SORT IS A GESTURE, NOT A LIVE RULE.** The order is fixed when a heading is clicked and
+	// then held: an edit that changes a demand must not make its row jump somewhere else in the
+	// table, and a solve lands 300 ms after every keystroke, so a live re-sort would move rows out
+	// from under the hand that is typing in them. New junctions join in the current sort, deleted
+	// ones drop out, and everything else stays where the reader last saw it.
+	function junctionRowsInOrder() {
+		var pool = {}, out = [];
+		junctionNodes().forEach(function (n) { pool[n.id] = n; });
+		(junctionOrderIds || []).forEach(function (id) {
+			if (pool[id]) { out.push(pool[id]); delete pool[id]; }
+		});
+		junctionSorted(Object.keys(pool).map(function (id) { return pool[id]; }))
+			.forEach(function (n) { out.push(n); });
+		junctionOrderIds = out.map(function (n) { return n.id; });
+		return out;
+	}
+	function junctionNumText(v) {
+		return (typeof v === 'number' && isFinite(v)) ? String(+v.toFixed(6)) : '';
+	}
+	function junctionHeadingText(c) {
+		var pc = EngCalcs.pageConfig || {}, text = pc[c.label] || c.key;
+		return c.unit ? text + ' (' + unitLabel(c.unit()) + ')' : text;
+	}
+	// What the table would have to be REBUILT for, as opposed to merely refilled: which rows are
+	// present, the order they are in, and the headings (which carry the units). A solve changes none
+	// of those, and a solve is what happens 300 ms after every keystroke -- so a rebuild on every one
+	// would take the cell the user is typing in out from under them.
+	function junctionSignature(rows) {
+		return rows.map(function (n) { return n.id; }).join('|') + '||' +
+			JUNCTION_COLS.map(junctionHeadingText).join('|');
+	}
+	function renderJunctions() {
+		var host = document.getElementById('lpn_pane_junctions'), pc = EngCalcs.pageConfig || {},
+			rows = junctionRowsInOrder(), sig = junctionSignature(rows), table, thead, tr, tbody, note;
+		if (!host) { return; }
+		if (sig === junctionSig && junctionCells) { refillJunctions(rows); return; }
+		junctionSig = sig;
+		junctionCells = {};
+		host.innerHTML = '';
+		if (!rows.length) {
+			note = document.createElement('p');
+			note.textContent = pc.lpn_pane_junctions_none || 'This network has no junctions yet.';
+			host.appendChild(note);
+			return;
+		}
+		table = document.createElement('table');
+		table.className = 'lpn-pane-table';
+		thead = document.createElement('thead');
+		tr = document.createElement('tr');
+		JUNCTION_COLS.forEach(function (c) {
+			var th = document.createElement('th'), b = document.createElement('button');
+			b.type = 'button';
+			b.className = 'lpn-pane-sort';
+			// The arrow is on the sorted column only, and it is the whole of the sort UI: a heading
+			// that is a button already says it can be clicked.
+			b.textContent = junctionHeadingText(c) +
+				(junctionSort.col === c.key ? (junctionSort.dir > 0 ? ' ▲' : ' ▼') : '');
+			if (pc.lpn_pane_sort_tip) { b.title = pc.lpn_pane_sort_tip; b.className += ' ec-help'; }
+			b.addEventListener('click', function () { sortJunctions(c.key); });
+			th.appendChild(b);
+			if (junctionSort.col === c.key) { th.setAttribute('aria-sort', junctionSort.dir > 0 ? 'ascending' : 'descending'); }
+			tr.appendChild(th);
+		});
+		thead.appendChild(tr);
+		table.appendChild(thead);
+		tbody = document.createElement('tbody');
+		rows.forEach(function (n) { tbody.appendChild(junctionRow(n)); });
+		table.appendChild(tbody);
+		host.appendChild(table);
+		if (EngCalcs.initTips) { EngCalcs.initTips(host); }
+	}
+	function sortJunctions(col) {
+		junctionSort.dir = (junctionSort.col === col) ? -junctionSort.dir : 1;
+		junctionSort.col = col;
+		junctionOrderIds = null;   // the click is the whole of what re-orders the table
+		renderJunctions();
+	}
+	function junctionRow(n) {
+		var tr = document.createElement('tr'), cells = {};
+		JUNCTION_COLS.forEach(function (c) {
+			var td = document.createElement('td'), btn, input;
+			if (c.key === 'id') {
+				// The ID is a way BACK TO THE MAP, not a text box: it selects the junction and pans
+				// to it, the same gesture a Find result row is. Renaming stays in the property
+				// popup, where the clash rules and the undo snapshot already live.
+				btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'lpn-pane-goto';
+				btn.textContent = n.id;
+				btn.addEventListener('click', function () { findGoTo('node', n.id); });
+				td.appendChild(btn);
+			} else if (c.result) {
+				td.className = 'lpn-pane-num';
+				cells[c.key] = td;
+			} else {
+				input = document.createElement('input');
+				input.type = 'number';
+				input.value = junctionNumText(junctionValue(n, c.key));
+				input.setAttribute('aria-label', junctionHeadingText(c) + ' ' + n.id);
+				input.addEventListener('change', function () {
+					junctionEdit(n, c.key, +input.value);
+				});
+				td.appendChild(input);
+				cells[c.key] = input;
+			}
+			tr.appendChild(td);
+		});
+		junctionCells[n.id] = cells;
+		return tr;
+	}
+	// The popup's setters, not a second pair. `+input.value` (so a cleared box reads 0) and
+	// updateNode() are both what unitNumberField() does; the demand goes through setProp() and ends
+	// in afterPropertyEdit(), which is what marks an override inside a scenario.
+	function junctionEdit(n, col, v) {
+		if (col === 'elev') {
+			n.elev = v;
+			updateNode(n.id);
+			scheduleSolve();
+			return;
+		}
+		setProp(n, 'demand', v);
+		updateNode(n.id);
+		afterPropertyEdit(n);
+		refreshPopupIfOpen();
+	}
+	// Refill, not rebuild: the results change on every solve and the typed values change when the
+	// map is edited, but the table itself is the same table. **A CELL THE USER IS IN IS LEFT
+	// ALONE** -- overwriting it mid-edit is the classic live-table defect, where half a typed number
+	// is replaced by the old one on the next tick.
+	function refillJunctions(rows) {
+		rows.forEach(function (n) {
+			var cells = junctionCells[n.id];
+			if (!cells) { return; }
+			JUNCTION_COLS.forEach(function (c) {
+				var target = cells[c.key], v;
+				if (!target) { return; }
+				v = junctionValue(n, c.key);
+				if (c.result) {
+					target.textContent = junctionPresent(v) ? String(plainRound(v, 2)) : '';
+				} else if (target !== activeElementSafe()) {
+					target.value = junctionNumText(v);
+				}
+			});
+		});
+	}
+	function activeElementSafe() {
+		try { return document.activeElement; } catch (e) { return null; }
+	}
+
 	// ---- the PROFILE panel (ROADMAP Task 409) ------------------------------
 	//
 	// Pick a start node and an end node; the app suggests the shortest route by LINK LENGTH; the
@@ -5866,15 +6277,15 @@ var EngCalcs = EngCalcs || {};
 	// panel's own controls, a waypoint click on the map, and applySolveResult() -- which runs after
 	// every solve, which runs 300 ms after every edit. So a path change, an elevation change and a
 	// diameter change all redraw by the same route, and there is no Refresh button to forget.
+	//
+	// **IT IS A TAB IN THE BOTTOM PANE** (Task 434), not a floating box. Tom on the first cut: *"It
+	// is too small — a proof of concept."* A chart read against the map wants the width of the
+	// window and a height the reader chooses, which is what the pane gives it; a draggable popover
+	// gave it 36rem and a place to be in the way. So the profile owns no open/close state of its
+	// own: it is showing exactly when the pane is open on its tab, and paneTabs' show/hide hooks
+	// are the whole of its lifecycle.
 	var profileState = { from: '', to: '', waypoints: [], pick: false };
-	var profileUserPos = null;
-	function profilePanel() { return document.getElementById('lpn_profile_popup'); }
-	function profileIsOpen() { var p = profilePanel(); return !!p && p.style.display === 'block'; }
-	function closeProfilePopup() {
-		var p = profilePanel();
-		if (p) { p.style.display = 'none'; }
-		drawProfilePath(null);
-	}
+	function profileIsOpen() { return paneIsOpen() && paneState.tab === 'profile'; }
 
 	// ---- THE ROUTE, ON THE MAP (ROADMAP Task 433) -----------------------------------------------
 	//
@@ -5921,42 +6332,13 @@ var EngCalcs = EngCalcs || {};
 			}, profilePathLayer);
 		});
 	}
-	// profileSeedStops() first, because the document may have changed under an open panel: a stop
-	// whose node was deleted is cleared here rather than left to draw a route through a ghost.
-	function refreshProfileIfOpen() {
-		if (!profileIsOpen()) { return; }
-		profileSeedStops(); rebuildProfileForm(); renderProfile();
-	}
-	// Same opening rules as the Find panel: OPEN, not toggle; a remembered position re-clamped
-	// against the current window; the menu-bar item passed in, because openMenuAnchor is already
-	// null by the time a menu row's action runs and a fixed panel with no left/top is invisible.
-	function openProfilePopup(anchorEl) {
-		var popup = profilePanel(), at, r, h;
-		if (!popup) { return; }
-		closeMenu();
-		profileSeedStops();
-		rebuildProfileForm();
-		if (profileUserPos) {
-			popup.style.display = 'block';
-			r = popup.getBoundingClientRect();
-			at = clampPanel(profileUserPos.left, profileUserPos.top, r.width, r.height,
-				window.innerWidth, window.innerHeight);
-			popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
-		} else if (anchorEl && anchorEl.getBoundingClientRect) {
-			openPanelAtAnchor(popup, anchorEl.getBoundingClientRect());
-		} else {
-			popup.style.display = 'block';
-			h = fitPanelToViewport(popup); r = popup.getBoundingClientRect();
-			popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
-			popup.style.top = Math.max(POPUP_EDGE, (window.innerHeight - h) / 2) + 'px';
-		}
-		renderProfile();
-	}
-	function wireProfilePopup() {
-		var popup = profilePanel(), x = document.getElementById('lpn_profile_close');
-		if (!popup) { return; }
-		if (x) { x.addEventListener('click', closeProfilePopup); }
-		makePanelDraggable(popup, function (pos) { profileUserPos = pos; });
+	// The pane follows the document without a listener of its own: every solve ends in a call to
+	// this, and every edit schedules a solve. A tab that is not on screen is not refreshed, and
+	// picks up whatever changed when it is next shown.
+	function refreshPaneIfOpen() {
+		var t = activePaneTab();
+		if (!paneIsOpen() || !t || !t.refresh) { return; }
+		t.refresh();
 	}
 	// A panel that opens on two empty pull-downs asks the user to do work before it can show them
 	// anything, so it opens on a real profile where it can: the selected node if there is one,
@@ -10365,10 +10747,11 @@ var EngCalcs = EngCalcs || {};
 			// already is, rather than under a toolbar button that may not even be on screen.
 			{ icon: 'labels', label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } },
 			// The profile is a VIEW of the network (Task 409), not an edit of it, so it lives beside
-			// Labels rather than in Insert -- and it opens under the same menu-bar button for the
-			// same reason the label popover does.
+			// Labels rather than in Insert. Since Task 434 it is a TAB in the bottom pane, so the
+			// row opens the pane on that tab -- open, never toggle: a menu row that names a view
+			// shows it.
 			{ icon: 'view', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
-				fn: function () { openProfilePopup(document.getElementById('lpn_menu_view')); } },
+				fn: function () { closeMenu(); openPane('profile'); } },
 			// The label states what the row will DO, because this menu has no checkmark column --
 			// the same convention the street-map row below follows.
 			{ icon: 'camera', label: cleanMapOn() ? (pc.lpn_clean_map_off || 'Show map readouts') : (pc.lpn_clean_map || 'Clean map'),
@@ -10749,7 +11132,7 @@ var EngCalcs = EngCalcs || {};
 		wirePointerEvents();
 		wirePopup();
 		wireFindPopup();
-		wireProfilePopup();
+		wirePane();
 		wireUnitGroups();
 		var opening = initLibrary();
 		if (opening) {
@@ -11025,6 +11408,33 @@ var EngCalcs = EngCalcs || {};
 		setLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings');
 		settingsBtn.addEventListener('click', toggleSettingsPopup);
 		viewGroup.appendChild(settingsBtn);
+
+		// **THE RIGHT EDGE OF THE STRIP: GO SOMEWHERE, AND SHOW SOMETHING** (Task 434). Tom put the
+		// pane toggles there "beside a goto-by-ID search", which is what Find already is (Task 420)
+		// -- it was only ever missing its place on this strip, so this is the SAME panel the Find
+		// menu row opens and not a second search. The pane toggle sits beside it because both
+		// answer "show me more of this network" rather than "change it".
+		//
+		// Right-aligned by margin-left:auto on the group (see .lpn-toolbar-end): a fixed order at
+		// the left end would put them in the middle of a wide window, which is where nobody looks
+		// for chrome.
+		var endGroup = group();
+		endGroup.className += ' lpn-toolbar-end';
+		var findBtn = document.createElement('button');
+		findBtn.type = 'button';
+		setLabel(findBtn, 'find', pc.lpn_find_menu || 'Find');
+		findBtn.addEventListener('click', function () { toggleFindPopup(findBtn); });
+		endGroup.appendChild(findBtn);
+		// A pressed/unpressed toggle, like Clean map above: the pane's own X closes it too, so the
+		// button has to report the state rather than only command it.
+		var paneBtn = document.createElement('button');
+		paneBtn.type = 'button';
+		paneBtn.id = 'lpn_pane_btn';
+		setLabel(paneBtn, 'view', pc.lpn_pane_toggle || 'Bottom panel');
+		if (pc.lpn_pane_toggle_tip) { paneBtn.title = pc.lpn_pane_toggle_tip; paneBtn.className = 'ec-help'; }
+		paneBtn.setAttribute('aria-pressed', paneIsOpen() ? 'true' : 'false');
+		paneBtn.addEventListener('click', togglePane);
+		endGroup.appendChild(paneBtn);
 
 		// The dev-only stress-test button moved OFF the toolbar and to the foot of the Insert menu
 		// (Tom, 2026-08-04). A toolbar is the high-use subset of the menus, and a thing that reads
@@ -15820,7 +16230,7 @@ var EngCalcs = EngCalcs || {};
 				setStatus(result.issues.map(diagIssueText).join(' '));
 				refreshLabelText();
 				refreshValueColors();   // Task 384: the colours came from results that no longer exist
-				refreshProfileIfOpen(); // Task 409: and so did the grade line
+				refreshPaneIfOpen();    // Task 409: and so did the grade line and the result columns
 					return;
 			}
 			// Not one of lpnDiagnose()'s pre-solve codes -- this is the solver itself giving up, and
@@ -15829,7 +16239,7 @@ var EngCalcs = EngCalcs || {};
 			setStatus(pc.lpn_diag_not_converged || 'Did not converge.');
 			refreshLabelText();
 			refreshValueColors();
-			refreshProfileIfOpen();
+			refreshPaneIfOpen();
 			return;
 		}
 		lastSolveResult = result;
@@ -15846,9 +16256,9 @@ var EngCalcs = EngCalcs || {};
 			.filter(function (t) { return !!t; }).join(' '));
 		refreshLabelText();
 		refreshValueColors();
-		// **WHERE THE LIVE PROFILE HANGS** (Task 409). Every solve ends here, and every edit
-		// schedules a solve, so the profile follows the document without a listener of its own.
-		refreshProfileIfOpen();
+		// **WHERE THE LIVE PANE HANGS** (Tasks 409, 434). Every solve ends here and every edit
+		// schedules a solve, so the open tab follows the document with no listener of its own.
+		refreshPaneIfOpen();
 	}
 
 	// EPANET path. Async, so it needs a guard the synchronous path never did: this page solves
@@ -15906,9 +16316,9 @@ var EngCalcs = EngCalcs || {};
 		// persist -- otherwise closing the tab would lose which units the numbers are in.
 		saveToStorage();
 		refreshPopupIfOpen();
-		// The profile's axes carry their units in their titles and its stations are in the length
-		// unit, so a switch has to redraw it for exactly the reason the popup is rebuilt.
-		refreshProfileIfOpen();
+		// The pane's tabs carry their units in their headings and axis titles, so a switch has to
+		// redraw the open one for exactly the reason the popup is rebuilt.
+		refreshPaneIfOpen();
 		refreshLabelText();
 		// The Default inputs rows show their value in the CURRENT display unit and put that unit in
 		// their label, so a unit switch has to re-render them for the same reason the open popup

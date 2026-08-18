@@ -194,7 +194,12 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2', 'lpn_map_status',
   'lpn_map_footer',
   // The scenario selector/readout in the map's status strip (ROADMAP Task 184).
-  'lpn_scenario_btn'
+  'lpn_scenario_btn',
+  // The bottom pane and its one tab so far (ROADMAP Task 434). The pane's own body is where the
+  // height JS writes lands, and the profile's three boxes are built into on every render.
+  'lpn_pane', 'lpn_pane_grip', 'lpn_pane_head', 'lpn_pane_tabs', 'lpn_pane_close',
+  'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions',
+  'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the
@@ -388,6 +393,9 @@ var EngCalcs = Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-solver.js')
 // the eval below, exactly as their <script> tags precede it in Looped-Network.php.
 // require()d rather than eval'd for the same reason as the solver: they are real modules.
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-geom.js'), require(ROOT + 'js/lpn-collide.js'));
+// The profile's pure half, for the same reason: since Task 434 the profile is a tab in the bottom
+// pane, so wirePane() reaches EngCalcs.lpnProfile during boot rather than only when a panel opens.
+Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-profile.js'));
 
 // The pointer handlers hit-test through document.elementFromPoint rather than trusting e.target (a
 // real tap moves a few pixels between down and up). A test sets this to whatever it is pretending

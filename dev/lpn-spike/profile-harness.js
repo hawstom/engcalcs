@@ -344,8 +344,15 @@ console.log('\n-- the route is drawn on the map --');
 	// about which route is on screen -- which is the exact confusion this feature exists to remove.
 	report(/path = profilePath\(\);\n(\s*\/\/.*\n)*\s*drawProfilePath\(path\);/.test(lnSrc),
 		'the map is drawn from the SAME path object the chart is');
-	report(/function closeProfilePopup\(\) \{[\s\S]{0,200}?drawProfilePath\(null\);/.test(lnSrc),
-		'closing the panel clears it');
+	// Since Task 434 the profile is a TAB, so "closed" has three doors -- the pane's X, the toolbar
+	// toggle, and switching to another tab -- and all three go through paneTabs' `hide` hook. That
+	// hook is therefore the only place the clear has to be, and the only place it can be forgotten.
+	report(/id: 'profile'[\s\S]{0,1200}?hide: function \(\) \{ drawProfilePath\(null\); \}/.test(lnSrc),
+		'leaving the profile tab clears it');
+	report(/if \(paneState\.open && was && was !== now && was\.hide\) \{ was\.hide\(\); \}/.test(lnSrc),
+		'...switching tabs runs that hook');
+	report(/function closePane\(\)[\s\S]{0,240}?if \(t && t\.hide\) \{ t\.hide\(\); \}/.test(lnSrc),
+		'...and so does closing the pane');
 	report(/if \(profileIsOpen\(\)\) \{ drawProfilePath\(profilePath\(\)\); \}/.test(lnSrc),
 		'a zoom redraws it, so its stroke stays a constant thickness on screen');
 	// UNDER the nodes: a route is about the pipes and must not bury the junction symbols the user is

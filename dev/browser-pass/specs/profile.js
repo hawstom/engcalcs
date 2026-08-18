@@ -4,8 +4,10 @@
 // the stations and the axis bounds — every part with an exact answer. Three things are left, and
 // all three are facts about a real page:
 //
-//   1. **The box is on the screen.** Exactly the Find defect (§10): a `position: fixed` panel whose
-//      left/top are never set is `display: block`, fully built, and 1,200 px down the document.
+//   1. **The pane is on the screen and the page still does not scroll.** Since Task 434 the profile
+//      is a tab in the bottom pane, which is in normal flow under the map -- so the thing that can
+//      go wrong is no longer a panel at a static position, it is the map and the pane together
+//      being taller than the window. Only a real layout can answer that.
 //   2. **The two heads are read in DIFFERENT UNITS** (Task 422). A node's elevation is a typed
 //      number in the INPUT head unit; a solved head comes back in the RESULT head unit, and since
 //      that task they can be set differently. They share one axis. Nothing headless crosses that
@@ -69,30 +71,57 @@ exports.run = async function ({ browser, report }) {
 		await a.menuClick('Profile', 'view');
 		await a.settle(400);
 
-		// **1. THE BOX IS ON THE SCREEN.** Not "is it displayed" — it always is.
+		// **1. THE PANE IS ON THE SCREEN, AND THE PAGE STILL FITS THE WINDOW.** The pane takes its
+		// room from the canvas by MEASUREMENT (applyMapHeight reads body.bottom - svg.bottom), so
+		// the way this feature breaks is the map failing to give the room back: the pane lands below
+		// the fold, or the page grows a scrollbar it is not allowed to have (Task 432).
 		const box = await a.page.evaluate(() => {
-			const p = document.getElementById('lpn_profile_popup');
+			const p = document.getElementById('lpn_pane');
 			if (!p) { return null; }
-			const r = p.getBoundingClientRect();
-			return { shown: p.style.display === 'block', x: r.x, y: r.y, w: r.width, h: r.height,
+			const r = p.getBoundingClientRect(), c = document.getElementById('lpn_canvas').getBoundingClientRect();
+			return { shown: p.style.display === 'flex', x: r.x, y: r.y, w: r.width, h: r.height,
+				top: r.top, bottom: r.bottom, canvasBottom: c.bottom, canvasH: c.height,
+				scrollH: document.documentElement.scrollHeight,
 				vw: window.innerWidth, vh: window.innerHeight };
 		});
-		report.ok(box && box.shown, 'the panel opens');
-		report.ok(box && box.x >= 0 && box.y >= 0 && box.x + box.w <= box.vw && box.y + box.h <= box.vh,
-			'...fully inside the window, not at some static position down the page', box && JSON.stringify(box));
-		report.ok(box && box.w > 200 && box.h > 200, 'and it has real size', box && (box.w + 'x' + box.h));
-		// **AND IT WAS PLACED DELIBERATELY.** The Find defect was precisely a fixed panel whose
-		// left/top were never written, which lands it at its static position -- and on THIS page that
-		// happens to be near the menu bar, so "is it in the window" cannot see the fault. Reading the
-		// inline coordinates is not a proxy for the user-visible property: it is the exact thing that
-		// was missing, and it is the reason the panel is also correct in a window shaped differently
-		// from this one.
-		const placed = await a.page.evaluate(() => {
-			const p = document.getElementById('lpn_profile_popup');
-			return { left: p.style.left, top: p.style.top };
-		});
-		report.ok(!!(placed.left && placed.top), 'and it was PLACED, not left at its static position',
-			JSON.stringify(placed));
+		report.ok(box && box.shown, 'the pane opens');
+		report.ok(box && box.bottom <= box.vh + 1 && box.top < box.vh,
+			'...fully inside the window, below the map', box && JSON.stringify(box));
+		report.ok(box && box.w > 200 && box.h > 150, 'and it has real size', box && (box.w + 'x' + box.h));
+		report.ok(box && box.canvasBottom <= box.top + 1, 'the map ends where the pane begins',
+			box && (box.canvasBottom + ' / ' + box.top));
+		report.ok(box && box.canvasH > 150, 'and the map keeps a canvas worth looking at', box && box.canvasH);
+		report.ok(box && box.scrollH <= box.vh + 1, 'the page does not scroll', box && (box.scrollH + ' of ' + box.vh));
+
+		// **THE GRIP RESIZES, AND THE MAP GIVES AND TAKES THE ROOM.** The one property no harness
+		// can hold: two measured heights moving in opposite directions by the same amount.
+		const dragged = await (async () => {
+			const g = await a.page.evaluate(() => {
+				const r = document.getElementById('lpn_pane_grip').getBoundingClientRect();
+				const c = document.getElementById('lpn_canvas').getBoundingClientRect();
+				const b = document.getElementById('lpn_pane_body').getBoundingClientRect();
+				return { x: r.x + r.width / 2, y: r.y + r.height / 2, canvas: c.height, pane: b.height };
+			});
+			await a.page.mouse.move(g.x, g.y);
+			await a.page.mouse.down();
+			await a.page.mouse.move(g.x, g.y - 80, { steps: 8 });
+			await a.page.mouse.up();
+			await a.settle(300);
+			const after = await a.page.evaluate(() => ({
+				canvas: document.getElementById('lpn_canvas').getBoundingClientRect().height,
+				pane: document.getElementById('lpn_pane_body').getBoundingClientRect().height,
+				scrollH: document.documentElement.scrollHeight, vh: window.innerHeight
+			}));
+			return { before: g, after: after };
+		})();
+		report.ok(dragged.after.pane > dragged.before.pane + 40,
+			'dragging the grip up makes the pane taller',
+			dragged.before.pane + ' → ' + dragged.after.pane);
+		report.ok(dragged.after.canvas < dragged.before.canvas - 40,
+			'...and the map gives up exactly that room',
+			dragged.before.canvas + ' → ' + dragged.after.canvas);
+		report.ok(dragged.after.scrollH <= dragged.after.vh + 1, '...with the page still not scrolling',
+			dragged.after.scrollH + ' of ' + dragged.after.vh);
 
 		// It opens on a real drawing rather than on two empty pull-downs.
 		const first = await chartShape(a.page);
@@ -172,7 +201,7 @@ exports.run = async function ({ browser, report }) {
 		// nearest the corner of the window.
 		const pre = await chartShape(a.page);
 		const target = await a.page.evaluate((onRoute) => {
-			const panel = document.getElementById('lpn_profile_popup').getBoundingClientRect();
+			const panel = document.getElementById('lpn_pane').getBoundingClientRect();
 			const els = [...document.querySelectorAll('[data-node]')];
 			for (const e of els) {
 				if (onRoute.indexOf(e.dataset.node) >= 0) { continue; }
@@ -219,7 +248,7 @@ exports.run = async function ({ browser, report }) {
 			const beforeEdit = await chartShape(a.page);
 			const onRoute = beforeEdit.nodes;
 			const spot = await a.page.evaluate((ids) => {
-				const panel = document.getElementById('lpn_profile_popup').getBoundingClientRect();
+				const panel = document.getElementById('lpn_pane').getBoundingClientRect();
 				for (const id of ids) {
 					const e = document.querySelector('[data-node="' + id + '"]');
 					if (!e) { continue; }
@@ -256,13 +285,22 @@ exports.run = async function ({ browser, report }) {
 			}
 		}
 
-		// The panel is modeless: the map is still usable underneath it, and closing it leaves
-		// nothing behind.
-		await a.page.click('#lpn_profile_close');
-		await a.settle(200);
-		const closed = await a.page.evaluate(() =>
-			document.getElementById('lpn_profile_popup').style.display === 'none');
-		report.ok(closed, 'the X closes the panel');
+		// The pane is modeless: the map is edited underneath it throughout, and closing it leaves
+		// nothing behind -- neither the panel nor the route highlight it painted on the map, and the
+		// map takes its room back.
+		await a.page.click('#lpn_pane_close');
+		await a.settle(300);
+		const closed = await a.page.evaluate(() => ({
+			hidden: document.getElementById('lpn_pane').style.display === 'none',
+			route: document.querySelectorAll('#lpn_canvas .lpn-profile-path').length,
+			canvas: document.getElementById('lpn_canvas').getBoundingClientRect().height,
+			scrollH: document.documentElement.scrollHeight, vh: window.innerHeight
+		}));
+		report.ok(closed.hidden, 'the X closes the pane');
+		report.ok(closed.route === 0, '...and takes the route highlight off the map with it');
+		report.ok(closed.canvas > dragged.after.canvas, '...and the map gets its room back',
+			dragged.after.canvas + ' → ' + closed.canvas);
+		report.ok(closed.scrollH <= closed.vh + 1, '...with the page still not scrolling');
 
 		report.ok(a.errors.length === 0, 'no uncaught page errors', a.errors.join('\n'));
 	} finally {

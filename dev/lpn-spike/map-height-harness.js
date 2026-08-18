@@ -241,6 +241,15 @@ console.log('\n--- opening a project does not resize the canvas ---');
 		'...and only then, so switching between projects moves nothing');
 	// Every remaining caller must be an ENVIRONMENT event. Restoring defaults used to be in this
 	// list, left over from when the map height was a setting; it is not one any more.
+	//
+	// **THE BOTTOM PANE IS AN ENVIRONMENT EVENT** (Task 434) and is the reason the bare-call form is
+	// allowed at all: opening, closing or dragging the pane changes how much window the map has,
+	// exactly as resizing the window does. It is in flow below the canvas, so it does not TELL the
+	// canvas anything -- applyPaneLayout() asks for a re-measure and flowBelowMap() finds the pane
+	// on its own. The pane's own harness holds the other half of that (dev/lpn-spike/pane-harness.js).
+	const paneApply = stripComments(extract('applyPaneLayout'));
+	report(/applyMapHeight\(\);/.test(paneApply) && !/svg\.setAttribute/.test(paneApply),
+		'the bottom pane re-measures the map and never sizes it');
 	const callers = stripComments(src).split('\n')
 		.filter(l => /applyMapHeight/.test(l) && !/function applyMapHeight/.test(l));
 	report(callers.every(l => /resize|orientationchange|document\.hidden|'load'|fonts|requestAnimationFrame|stripHeightBefore|applyMapHeight\(true\)|^\s*applyMapHeight\(\);$/.test(l)),
