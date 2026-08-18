@@ -83,25 +83,32 @@ console.log('\n-- the case that matters on a phone: a box TALLER than the viewpo
 console.log('\n-- both placement routes go through it --');
 {
 	report(/clampPanel\(/.test(extract('openPopupAt')), 'opening the box at a point on the map clamps');
-	const wire = extract('wirePopup');
-	report(/clampPanel\(/.test(wire), 'and so does the drag');
+	// The drag lives in makePanelDraggable() since 2026-08-18: the Find panel is a standing box too
+	// (Tom: "Like the properties box, we want it to be draggable and have an X to close"), and two
+	// copies of a drag would be two chances for one of them to escape the window.
+	report(/clampPanel\(/.test(extract('makePanelDraggable')), 'and so does the drag');
 }
 
 console.log('\n-- the wiring rules that keep a drag out of the controls --');
 {
-	const wire = extract('wirePopup');
+	const drag = extract('makePanelDraggable'), wire = extract('wirePopup');
 	// A control is always a CHILD of the popup, so testing identity is what makes this safe to add
 	// to a panel of inputs without re-wiring any of them.
-	report(/if \(e\.target !== popup\) \{ return; \}/.test(wire),
+	report(/if \(e\.target !== popup\) \{ return; \}/.test(drag),
 		'a drag starts only on the chrome, never on a child control');
-	report(/setPointerCapture/.test(wire) && /releasePointerCapture/.test(wire),
+	report(/setPointerCapture/.test(drag) && /releasePointerCapture/.test(drag),
 		'the pointer is captured and released, so a fast drag does not escape the box');
-	report(/pointercancel/.test(wire), 'and a cancelled pointer ends the drag rather than sticking it');
+	report(/pointercancel/.test(drag), 'and a cancelled pointer ends the drag rather than sticking it');
 	// Remembered during the move, not at the end: a drag interrupted by pointercancel still leaves
-	// the box where the user can see it.
-	const move = wire.slice(wire.indexOf("'pointermove'"));
-	report(/popupUserPos = at;/.test(move.slice(0, move.indexOf('function endDrag'))),
+	// the box where the user can see it. The shared function hands the position to its caller, and
+	// each box decides what to remember it in.
+	const move = drag.slice(drag.indexOf("'pointermove'"));
+	report(/onMove\(at\);/.test(move.slice(0, move.indexOf('function endDrag'))),
 		'the remembered position is written as it moves, not on release');
+	report(/makePanelDraggable\(popup, function \(at\) \{ popupUserPos = at; \}\);/.test(wire),
+		'...and the property popup remembers it in popupUserPos');
+	report(/makePanelDraggable\(popup, function \(pos\) \{ findUserPos = pos; \}\);/.test(extract('wireFindPopup')),
+		'...and the Find box in its own, so the two cannot move each other');
 	report(/popupUserPos = null;/.test(wire), 'double-clicking the chrome sends the box home');
 	report(/if \(popupUserPos\) \{ sx = popupUserPos\.left; sy = popupUserPos\.top; \}/.test(extract('openPopupAt')),
 		'and once moved, the next element opens the box where the user left it');

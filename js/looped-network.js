@@ -4861,6 +4861,19 @@ var EngCalcs = EngCalcs || {};
 	function findMatches() {
 		var v = String(findState.value).trim(), lc = v.toLowerCase(), num = parseFloat(v), out = [];
 		findNormalize();
+		// **AN EMPTY BOX WITH "contains" IS EVERY ELEMENT** (Tom, 2026-08-18: *"Find on contains
+		// empty value should return all... 'All when empty' is intuitive."*). It is also how the
+		// question "what valves are in this network?" gets asked -- pick the scope, press Find. A
+		// notice saying "type what to look for" answers a question nobody was asking: everything
+		// contains the empty string, and that is the useful reading as well as the literal one.
+		if (findState.op === 'contains' && v === '') {
+			findCandidates().forEach(function (c) {
+				// Only elements the property actually applies to, so a Text label does not turn up
+				// in a search for ids it has none of.
+				if (findValueOf(c, findState.prop) !== undefined) { out.push(c); }
+			});
+			return findSortMatches(out);
+		}
 		// **AN EXTREMES QUERY NEEDS NO VALUE TO MATCH AGAINST** -- it ranks every element that has
 		// one and takes the end of the list. The Value box holds how many, and it may be blank.
 		if (findOpIsExtreme(findState.op)) {
@@ -5067,8 +5080,10 @@ var EngCalcs = EngCalcs || {};
 	function runFind() {
 		var pc = EngCalcs.pageConfig || {};
 		// An empty box is only a mistake when the query needs something to match against. Top n and
-		// Bottom n do not: they rank what is there, and a blank simply means the default ten.
-		if (String(findState.value).trim() === '' && !findOpIsExtreme(findState.op)) {
+		// Bottom n rank what is there, and "contains" nothing matches everything -- neither needs a
+		// value, so neither is scolded for having none.
+		if (String(findState.value).trim() === '' &&
+				!findOpIsExtreme(findState.op) && findState.op !== 'contains') {
 			findResults = [];
 			renderFindResults(pc.lpn_find_no_value || 'Type what to look for.');
 			return;
@@ -5137,25 +5152,47 @@ var EngCalcs = EngCalcs || {};
 	// at its STATIC position 1,200 px down the document -- display:block, fully built and completely
 	// invisible. A missing anchor CENTRES the panel instead; there is no path out of this function
 	// that does not place the box.
+	// Where the user last dragged it. A standing box keeps its place across openings -- being sent
+	// back to the menu's corner every time is what makes a reference box feel like a pull-down.
+	var findUserPos = null;
+	function closeFindPopup() {
+		var popup = document.getElementById('lpn_find_popup');
+		if (popup) { popup.style.display = 'none'; }
+	}
+	// **OPEN, NOT TOGGLE.** The menu row shows the box; the X closes it. Choosing Find while it is
+	// already open re-runs nothing and hides nothing -- it just brings the box back to attention,
+	// which is what every editor's Find command does.
 	function toggleFindPopup(anchorEl) {
-		var popup = document.getElementById('lpn_find_popup'), input;
+		var popup = document.getElementById('lpn_find_popup'), input, at, h, r;
 		if (!popup) { return; }
-		if (popup.style.display === 'block') { popup.style.display = 'none'; viewPopoverAnchor = null; return; }
 		closeMenu();
-		closeViewPopovers('lpn_find_popup');
 		rebuildFindForm();
 		renderFindResults(null);
-		viewPopoverAnchor = anchorEl || null;
-		if (anchorEl && anchorEl.getBoundingClientRect) {
+		if (findUserPos) {
+			// Re-clamped rather than restored blindly: the window may have been resized smaller
+			// since, and a box remembered off-screen is a box that never comes back.
+			popup.style.display = 'block';
+			r = popup.getBoundingClientRect();
+			at = clampPanel(findUserPos.left, findUserPos.top, r.width, r.height,
+				window.innerWidth, window.innerHeight);
+			popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
+		} else if (anchorEl && anchorEl.getBoundingClientRect) {
 			openPanelAtAnchor(popup, anchorEl.getBoundingClientRect());
 		} else {
 			popup.style.display = 'block';
-			var h = fitPanelToViewport(popup), r = popup.getBoundingClientRect();
+			h = fitPanelToViewport(popup); r = popup.getBoundingClientRect();
 			popup.style.left = Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2) + 'px';
 			popup.style.top = Math.max(POPUP_EDGE, (window.innerHeight - h) / 2) + 'px';
 		}
 		input = popup.querySelector('input[type=text]');
 		if (input) { input.focus(); input.select(); }
+	}
+	function wireFindPopup() {
+		var popup = document.getElementById('lpn_find_popup'),
+			x = document.getElementById('lpn_find_close');
+		if (!popup) { return; }
+		if (x) { x.addEventListener('click', closeFindPopup); }
+		makePanelDraggable(popup, function (pos) { findUserPos = pos; });
 	}
 
 	// Maps a tool mode to its pageConfig mode-hint key -- see the lang keys' own comment for why
@@ -8621,7 +8658,14 @@ var EngCalcs = EngCalcs || {};
 	// The three view popovers (Labels, Settings, Units) are peers of the menus, so opening a menu
 	// closes them and a click anywhere outside closes them. The property popup (#lpn_popup) is
 	// deliberately NOT in this list: it has its own currentPopup machinery and dismissal.
-	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup', 'lpn_notes_popup', 'lpn_find_popup'];
+	// **FIND IS NOT IN THIS LIST, AND THAT IS THE DIFFERENCE BETWEEN A PULL-DOWN AND A REFERENCE
+	// BOX** (Tom, 2026-08-18: *"This box will be a reference box. We don't want it to close easily.
+	// Like the properties box, we want it to be draggable and have an X to close... Find is a
+	// standing box until closed."*). A results list is something you read WHILE you work the map --
+	// clicking a pipe to look at it must not throw the list away, and that is exactly what
+	// membership here would do. It is the property popup's kind of box, so it gets the property
+	// popup's chrome: a drag surface and an X.
+	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup', 'lpn_notes_popup'];
 	// The control that opened the popover now showing -- the toolbar button, or the menu-bar item.
 	// Same job openMenuAnchor does for the menus, and needed for the same reason: the click that
 	// OPENED a popover must not also be read as a click away from it. Task 372 -- until then the
@@ -9466,6 +9510,7 @@ var EngCalcs = EngCalcs || {};
 		if (EngCalcs.initTips) { EngCalcs.initTips(document); }
 		wirePointerEvents();
 		wirePopup();
+		wireFindPopup();
 		var opening = initLibrary();
 		if (opening) {
 			applySaved(opening);
@@ -12081,9 +12126,10 @@ var EngCalcs = EngCalcs || {};
 	// Pointer events, not mouse events, so a touch drag works identically, and setPointerCapture
 	// keeps the drag alive when the pointer leaves the popup.
 	// Double-click the same chrome to send it home, the gesture that resets a dragged map label.
-	function wirePopup() {
-		var popup = document.getElementById('lpn_popup');
-		document.getElementById('lpn_popup_close').addEventListener('click', closePopup);
+	// Extracted so a SECOND standing box can be dragged by the same gesture (Task 420/353's Find
+	// panel). `onMove` is how the caller remembers the position; a box that does not care passes
+	// nothing.
+	function makePanelDraggable(popup, onMove) {
 		var drag = null;
 		popup.addEventListener('pointerdown', function (e) {
 			if (e.target !== popup) { return; }   // a child is a control; only the chrome drags
@@ -12099,7 +12145,7 @@ var EngCalcs = EngCalcs || {};
 			popup.style.left = at.left + 'px'; popup.style.top = at.top + 'px';
 			// Remembered as it moves rather than on release: a drag that ends off-window, or is
 			// interrupted by the pointer being cancelled, still leaves the popup where it looks.
-			popupUserPos = at;
+			if (onMove) { onMove(at); }
 		});
 		function endDrag(e) {
 			if (!drag) { return; }
@@ -12108,6 +12154,11 @@ var EngCalcs = EngCalcs || {};
 		}
 		popup.addEventListener('pointerup', endDrag);
 		popup.addEventListener('pointercancel', endDrag);
+	}
+	function wirePopup() {
+		var popup = document.getElementById('lpn_popup');
+		document.getElementById('lpn_popup_close').addEventListener('click', closePopup);
+		makePanelDraggable(popup, function (at) { popupUserPos = at; });
 		popup.addEventListener('dblclick', function (e) {
 			if (e.target !== popup) { return; }
 			popupUserPos = null;

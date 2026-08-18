@@ -105,7 +105,7 @@ exports.run = async function ({ browser, report }) {
 			return {
 				selects: p.querySelectorAll('select').length,
 				texts: p.querySelectorAll('input[type=text]').length,
-				buttons: p.querySelectorAll('button').length
+				buttons: p.querySelectorAll('#lpn_find_form button').length
 			};
 		});
 		report.eq(controls.selects, 3, 'three pull-downs: what to search, which property, which condition');
@@ -120,7 +120,7 @@ exports.run = async function ({ browser, report }) {
 			const id = document.querySelector('#lpn_canvas [data-node]').dataset.node;
 			input.value = id;
 			input.dispatchEvent(new Event('input', { bubbles: true }));
-			p.querySelector('button').click();
+			p.querySelector('#lpn_find_form button').click();
 			return { id: id, selected: !!document.querySelector('#lpn_canvas .lpn-selected'),
 				results: p.querySelector('#lpn_find_results').textContent };
 		});
@@ -133,7 +133,7 @@ exports.run = async function ({ browser, report }) {
 			const input = p.querySelector('input[type=text]');
 			input.value = 'NOSUCHTHING';
 			input.dispatchEvent(new Event('input', { bubbles: true }));
-			p.querySelector('button').click();
+			p.querySelector('#lpn_find_form button').click();
 			return p.querySelector('#lpn_find_results').textContent.trim();
 		});
 		report.eq(missed, '', 'a search that matches nothing leaves the list empty');
@@ -162,7 +162,7 @@ exports.run = async function ({ browser, report }) {
 				const input = p.querySelector('input[type=text]');
 				input.value = '3';
 				input.dispatchEvent(new Event('input', { bubbles: true }));
-				p.querySelector('button').click();
+				p.querySelector('#lpn_find_form button').click();
 				const res = p.querySelector('#lpn_find_results');
 				return {
 					text: res.textContent,
@@ -188,31 +188,56 @@ exports.run = async function ({ browser, report }) {
 				'head loss gradient is offered as a searchable property', listed.props.join(','));
 		}
 
-		// **THE MENU ROW ALWAYS OPENS; IT NEVER TOGGLES, and that is correct rather than a gap.**
-		// Opening any menu closes every view popover (Tom, 2026-08-13: "When I click Settings then
-		// Labels, Labels opens beneath Settings. I expect Settings to close"), so by the time the row
-		// fires, the panel is already shut and the row's job is unambiguous. Toggling belongs to a
-		// TOOLBAR button, which is how Labels and Settings get theirs.
-		await a.menuClick('Find', 'edit');
-		const stillOpen = await a.page.evaluate(() =>
+		// **A STANDING BOX, NOT A PULL-DOWN** (Tom, 2026-08-18: *"Find is a standing box until
+		// closed."*). A results list is read WHILE the map is worked, so clicking a pipe to look at
+		// one must not throw the list away. Everything below is the difference between this box and
+		// the Labels/Settings pull-downs beside it.
+		const isOpen = () => a.page.evaluate(() =>
 			document.getElementById('lpn_find_popup').style.display === 'block');
-		report.ok(stillOpen, 'choosing the row again re-opens it rather than toggling it shut');
 
-		// A click that both starts AND ends away from the panel still closes it -- the fix must not
-		// have turned the dismissal off.
-		await a.page.mouse.click(12, 400);
-		await a.settle(120);
-		const dismissed = await a.page.evaluate(() =>
-			document.getElementById('lpn_find_popup').style.display !== 'block');
-		report.ok(dismissed, '...while a real click away still dismisses it');
-		await a.menuClick('Find', 'edit');
+		await a.page.mouse.click(600, 500);          // a click out on the map
+		await a.settle(150);
+		report.ok(await isOpen(), 'clicking the map leaves it open');
 
-		// Escape is how a pull-down goes away, and this is one.
 		await a.page.keyboard.press('Escape');
-		await a.settle(100);
-		const closed = await a.page.evaluate(() =>
-			document.getElementById('lpn_find_popup').style.display !== 'block');
-		report.ok(closed, 'Escape dismisses it, like every other pull-down on this page');
+		await a.settle(150);
+		report.ok(await isOpen(), '...and so does Escape, which dismisses every pull-down but not this');
+
+		await a.menuClick('Labels', 'view');
+		await a.settle(150);
+		report.ok(await isOpen(), '...and so does opening another panel');
+
+		// It DRAGS by its own chrome, the padded band above the body -- the property popup's gesture.
+		const wasAt = await a.page.evaluate(() => {
+			const r = document.getElementById('lpn_find_popup').getBoundingClientRect();
+			return { x: r.x, y: r.y };
+		});
+		await a.page.mouse.move(wasAt.x + 60, wasAt.y + 8);
+		await a.page.mouse.down();
+		await a.page.mouse.move(wasAt.x + 200, wasAt.y + 108, { steps: 10 });
+		await a.page.mouse.up();
+		await a.settle(150);
+		const nowAt = await a.page.evaluate(() => {
+			const r = document.getElementById('lpn_find_popup').getBoundingClientRect();
+			return { x: r.x, y: r.y };
+		});
+		report.ok(Math.abs(nowAt.x - wasAt.x - 140) < 8 && Math.abs(nowAt.y - wasAt.y - 100) < 8,
+			'it drags by its own chrome', JSON.stringify(wasAt) + ' -> ' + JSON.stringify(nowAt));
+
+		// Only the X closes it.
+		await a.page.click('#lpn_find_close');
+		await a.settle(150);
+		report.ok(!(await isOpen()), 'the X closes it, and nothing else does');
+
+		// And it comes back where it was left, not back at the menu's corner.
+		await a.menuClick('Find', 'edit');
+		await a.settle(200);
+		const backAt = await a.page.evaluate(() => {
+			const r = document.getElementById('lpn_find_popup').getBoundingClientRect();
+			return { x: r.x, y: r.y };
+		});
+		report.ok(Math.abs(backAt.x - nowAt.x) < 8 && Math.abs(backAt.y - nowAt.y) < 8,
+			'...and re-opens where the user left it', JSON.stringify(backAt));
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {

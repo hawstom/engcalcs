@@ -106,14 +106,24 @@ function build(unitSet) {
 	ok('a partial ID finds every element containing it',
 		L.find('all', 'id', 'contains', 'J').length === 2, JSON.stringify(L.find('all', 'id', 'contains', 'J')));
 	ok('an ID nobody has finds nothing', L.find('all', 'id', 'equals', 'J999').length === 0);
-	ok('an empty box finds nothing rather than everything', L.find('all', 'id', 'contains', '   ').length === 0);
+	// **AN EMPTY BOX IS EVERY ELEMENT, NOT NONE** (Tom, 2026-08-18). It is how "what valves are in
+	// this network?" is asked: choose the scope and press Find. The old notice answered a question
+	// nobody had.
+	ok('an empty box with "contains" finds everything that has that property',
+		L.find('all', 'id', 'contains', '   ').length === L.find('all', 'id', 'contains', '').length &&
+		L.find('all', 'id', 'contains', '').length > 0,
+		String(L.find('all', 'id', 'contains', '').length));
+	ok('...and a Text label is still left out of an ID search',
+		L.find('all', 'id', 'contains', '').every(function (x) { return x.indexOf('label:') !== 0; }),
+		JSON.stringify(L.find('all', 'id', 'contains', '')));
 	ok('a scope narrows the search to one kind',
 		same(L.find('pipe', 'id', 'contains', ''.concat(n.ra[0])), ['link:' + n.ra, 'link:' + n.ab]) ||
 		L.find('pipe', 'id', 'contains', 'L').length === 2,
 		JSON.stringify(L.find('pipe', 'id', 'contains', 'L')));
 	ok('...and a junction scope never returns the reservoir',
-		L.find('junction', 'id', 'contains', '').length === 0 &&
 		L.find('junction', 'id', 'contains', 'R').length === 0);
+	ok('an empty search inside one scope returns that scope, and only it',
+		L.find('junction', 'id', 'contains', '').length === 2, JSON.stringify(L.find('junction', 'id', 'contains', '')));
 	ok('the adjacent links of a found node are the ones drawn there',
 		same(L.adjacent(n.a), [n.ra, n.ab]), JSON.stringify(L.adjacent(n.a)));
 }
@@ -160,8 +170,7 @@ function build(unitSet) {
 	// tells the user something they have no way to look up.
 	ok('a Text label is NOT findable by an id nobody can see',
 		L.find('all', 'id', 'equals', n.t).length === 0, JSON.stringify(L.find('all', 'id', 'equals', n.t)));
-	ok('...and an all-elements ID search returns only the elements that have visible ids',
-		L.find('all', 'id', 'contains', '').length === 0 &&
+	ok('...and an ID search never turns one up, whatever is typed',
 		L.find('all', 'id', 'contains', 'X').length === 0, JSON.stringify(L.find('all', 'id', 'contains', 'X')));
 }
 

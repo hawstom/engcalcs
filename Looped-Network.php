@@ -334,7 +334,11 @@ echoHeader("EngCalcs", $html_title, "");
       // modeless for a reason -- you find something, look at the map, and search again without the
       // panel ever taking the map away. Everything inside is built in JS (wireFindPopup()), because
       // the property and condition lists depend on which kind of element you chose. ?>
-<div id="lpn_find_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:22rem">
+<div id="lpn_find_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3);max-width:22rem">
+	<?php // The padded band at the top is the DRAG SURFACE, exactly as on #lpn_popup: `e.target` is
+	      // the panel itself there and a child everywhere else, so a drag can never start on a
+	      // control. That is why the padding is 40px on top and 8px elsewhere. ?>
+	<button type="button" id="lpn_find_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
 	<div class="lpn-popover-body">
 	<div style="font-weight:bold"><?=$ec_lang['lpn_find_title']?></div>
 	<div id="lpn_find_form"></div>
