@@ -279,6 +279,23 @@ document.addEventListener('DOMContentLoaded', function() {
 <form id="formInput" action="javascript:EngCalcs.submitForm()" method="post">
 	<input id="printable_title" name="printable_title" type="text" style="font-size: 2em; width: 98%" placeholder="<?=$ec_lang['template_printable_title']?>" onchange="EngCalcs.submitForm();" /><br />
 	<input id="printable_subtitle" name="printable_subtitle" type="text" style="font-size: 1.5em; width: 98%" placeholder="<?=$ec_lang['template_printable_subtitle']?>" onchange="EngCalcs.submitForm();" />
+	<?php // ROADMAP Task 228. Naming a calculation is the moment somebody means to put it in front of
+	      // another person, so the share control lives here. EngCalcs.updateUrl() already keeps the
+	      // address bar carrying the whole form, so this hands over what is already there.
+	      //
+	      // The two outcome strings ride on data- attributes rather than pageConfig: this markup is
+	      // emitted for every calculator, and a pageConfig key read by js/Calculators.lib.js would
+	      // have to be typed into all twenty pages by hand.
+	      //
+	      // The url box is unnamed on purpose -- updateUrl() and formToCookie() both key off
+	      // el.name, so it stays out of the shared link and out of the cookie. ?>
+	<div id="ec_share_row" class="d-print-none my-2">
+		<button type="button" id="ec_share_btn"
+			data-copied="<?=htmlspecialchars($ec_lang['template_share_copied'], ENT_QUOTES, 'UTF-8')?>"
+			data-manual="<?=htmlspecialchars($ec_lang['template_share_manual'], ENT_QUOTES, 'UTF-8')?>"><?=ecIcon('link')?><?=$ec_lang['template_share_link']?></button>
+		<span id="ec_share_status" class="small ms-2" role="status" aria-live="polite"></span>
+		<input id="ec_share_url" type="text" readonly hidden style="width: 98%" />
+	</div>
 	<?php echoUnitsRow($flagHideUnits); ?>
 	<div style="overflow-x:auto">
 	<table class="bare">

@@ -2139,3 +2139,9 @@ $ec_lang['lpn_settings_color_no_values']='There are no values to work from yet. 
 $ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, starting values, solver settings, map appearance, legend position, and visible labels) to their original values? Your network is not changed. Settings belong to the open project, so your other projects keep their own.';
 $ec_lang['lpn_settings_wipe_btn']='Erase everything on this page';
 $ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone.';
+
+// Share this calculation (ROADMAP Task 228). The control sits under the Printable Title, where
+// somebody has just said they mean to show this to another person.
+$ec_lang['template_share_link']='Copy link to this calculation';
+$ec_lang['template_share_copied']='✓ Link copied. Paste it into an email or a message.';
+$ec_lang['template_share_manual']='Copy this link:';

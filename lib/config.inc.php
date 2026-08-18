@@ -147,9 +147,9 @@ define('TITLE_LOG', dirname(__DIR__) . '/log/engcalcs-title.log');
 // answer. Written by log-signal-event.php from EngCalcs.logSignal() (js/Calculators.lib.js).
 // Each line: ISO-8601 UTC timestamp TAB page TAB served-lang TAB raw-Accept-Language TAB event TAB detail
 //
-// ONE LOG WITH AN EVENT COLUMN, not five more endpoints. Each of the five questions below is the
+// ONE LOG WITH AN EVENT COLUMN, not six more endpoints. Each of the six questions below is the
 // same shape as the others and as the four logs above — when, which page, which language, plus one
-// short fact — so five near-identical 90-line writers would be five places to keep the offline-
+// short fact — so six near-identical 90-line writers would be six places to keep the offline-
 // queue handling, the opt-out check, the bucket suffix and the timestamp trust window in step. The
 // four logs above are separate because each is a TIER of one funnel and the report divides them by
 // each other; these are not a funnel, they are diagnostics, and they are never divided by anything
@@ -183,6 +183,14 @@ define('TITLE_LOG', dirname(__DIR__) . '/log/engcalcs-title.log');
 //             empty-canvas decision closed 2026-07-29 with no data — or 'diag:<code>', which of
 //             the solver's pre-solve complaints fires most. Between them they name where the map
 //             interface loses people.
+//   share     The share control under the Printable Title was used (Task 228). detail = 'copy'
+//             (the clipboard took it) or 'manual' (no clipboard here, so the link was shown for
+//             the visitor to copy). ONE HONEST MEASURE and no more: it says the control was used,
+//             never that a link was opened by anybody, because nothing we can store would tell us
+//             that. The copy/manual split is the same row's second job -- it says how often the
+//             clipboard path is actually unavailable, which is otherwise unknowable from here.
+//             Compare against TITLE_LOG's 'title' rows: those are the people who declared the
+//             intent this control exists to serve.
 //
 // DE-DUPLICATION IS IN THE PAGE'S OWN MEMORY, NOT ON THE DEVICE, and that is a deliberate limit.
 // The four logs above dedupe per (visit, page) using one base-32 digit in ec_seen — five bits, the

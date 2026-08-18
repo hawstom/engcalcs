@@ -5,7 +5,7 @@
  * Called via EngCalcs.logSignal() (js/Calculators.lib.js). Sibling of log-calc-event.php,
  * log-human-view.php and log-title-event.php, but not a tier of their funnel: those three answer
  * "how many", this one answers "and then what did they do". See lib/config.inc.php for the log
- * format and for why the five questions share one endpoint.
+ * format and for why the six questions share one endpoint.
  *
  * DE-DUPLICATION IS THE CLIENT'S JOB HERE and it lasts one page load. The other three writers
  * dedupe per (visit, page) against the ec_seen cookie, whose five bits are full — a sixth would
@@ -34,7 +34,7 @@ $lang = isset($_POST['lang']) ? preg_replace('/[^A-Za-z-]/', '', $_POST['lang'])
 // than quietly widening the vocabulary of the log. Adding a signal means editing this line, the
 // block comment in lib/config.inc.php, and log/lang-log-stats.sh -- in that order.
 $event = isset($_POST['event']) ? $_POST['event'] : '';
-if (!in_array($event, array('outbound', 'touch', 'units', 'repeat', 'lpn'), true)) {
+if (!in_array($event, array('outbound', 'touch', 'units', 'repeat', 'lpn', 'share'), true)) {
     $event = '';
 }
 
