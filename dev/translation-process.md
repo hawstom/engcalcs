@@ -142,7 +142,10 @@ section verbatim. Sequence recap:
    Sprints" Model policy, 2026-07-12). Each agent gets: payload path,
    target lang file path, full instructions (glossary terms + values + notes, relevant
    `$ec_lang_syn` entries, HTML/symbol-preservation rules, any known wrong-sense traps carried
-   over from prior audits of related terms in that language family).
+   over from prior audits of related terms in that language family), **and the suggestion-box
+   block from § "The suggestion box", pasted in verbatim.** It is an ingredient of the prompt,
+   not a reminder to the orchestrator: an agent that was never given the block files nothing,
+   and the sprint closes looking clean.
 4. **Post-sprint QA, in order:**
    - `php dev/scripts/lang_syntax_validate.php --lang=<codes>` — clean of escape-leakage,
      tag-imbalance, foreign-script findings.
@@ -452,8 +455,11 @@ languages. An AND would leave Manning Pipe Flow untranslated in 22 languages.
 
 1. **Announce the count before spawning**: "Starting N agents, one for each language."
 2. Spawn all agents in a single message with `run_in_background: true` and `model: "sonnet"`.
-3. Each agent receives: the payload JSON path, the target lang file path, and full instructions
-   including glossary terms, synonym notes, and all translation rules.
+3. Each agent receives: the payload JSON path, the target lang file path, full instructions
+   including glossary terms, synonym notes, and all translation rules, **and the suggestion-box
+   block from § "The suggestion box" pasted in verbatim.** Every agent, every wave, every batch
+   size — it is a required part of the prompt template, not an optional extra, and an agent that
+   never received it cannot file the complaint the gate is waiting for.
 
 **Model policy: Sonnet is mandatory for every translation agent, every batch size, every language, no
 exceptions. Haiku is fully deprecated for translation.** Evidence
