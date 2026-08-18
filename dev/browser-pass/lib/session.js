@@ -372,16 +372,16 @@ class Session {
 	// strip happened to hold.
 	//
 	// **THE FOUR LABELS LIVE HERE AND NOWHERE ELSE.** Task 145 renamed all four in one commit
-	// (GeoMap and XY are Tom's words) and every spec that had typed one out stopped at its first
+	// (XY and lat/lon are Tom's words) and every spec that had typed one out stopped at its first
 	// menu click — which is precisely the failure this file exists to make impossible.
 	static TEMPLATES = {
 		'xy-us': 'Blank XY project, US units (gpm)',
 		'xy-si': 'Blank XY project, SI units (l/s)',
-		'geo-us': 'Blank GeoMap project, US units (gpm)',
-		'geo-si': 'Blank GeoMap project, SI units (l/s)'
+		'geo-us': 'Blank lat/lon project, US units (gpm)',
+		'geo-si': 'Blank lat/lon project, SI units (l/s)'
 	};
 	async newProject(system = 'us') { await this._newFromTemplate('xy-' + system); }
-	// A GeoMap project: longitudes and latitudes, and a street map behind it.
+	// A lat/lon project: longitudes and latitudes, and a street map behind it.
 	async newGeoProject(system = 'us') { await this._newFromTemplate('geo-' + system); }
 	async _newFromTemplate(key) {
 		const label = Session.TEMPLATES[key];

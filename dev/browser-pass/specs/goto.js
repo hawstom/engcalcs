@@ -3,7 +3,7 @@
 //
 // The command reads what people PASTE, so what it accepts is the whole feature and there is nothing
 // headless about it: it lives on a window.prompt(), reads the map's own view, and answers in the
-// notice box over the map. Two ways in — the View menu of a GeoMap project, and the Go to… button on
+// notice box over the map. Two ways in — the View menu of a lat/lon project, and the Go to… button on
 // the placement bar while a model is being carried — and they are the same function, so the flow is
 // checked once and the second entry point is checked for being there and reaching it.
 //
@@ -70,7 +70,7 @@ exports.run = async function ({ browser, report }) {
 		await a.newGeoProject();
 		await a.settle(500);
 		rows = (await a.menuRows('view')).map(r => r.label);
-		report.ok(rows.includes(GOTO_ROW), 'a GeoMap project offers it on the View menu');
+		report.ok(rows.includes(GOTO_ROW), 'a lat/lon project offers it on the View menu');
 
 		// ---- it goes there ----------------------------------------------------------------------
 		await goTo(a, '38.106, -122.569');
@@ -127,7 +127,7 @@ exports.run = async function ({ browser, report }) {
 		await a.newProject();
 		await a.dismissGallery();
 		await a.makeEdit();
-		await a.menuClick('Convert XY project to GeoMap…');
+		await a.menuClick('Convert to lat/lon…');
 		await a.settle(700);
 		report.ok(await a.page.evaluate(() => {
 			const b = document.getElementById('lpn_georef_goto');

@@ -138,7 +138,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 - 65|438| **The next sprint: resync the drifted English and translate 2026-08-18's new keys.** Needs
   Tom's explicit authorization before launch — a sprint is 26 paid agents, 20 concurrent.
-  - **What is in it:** Task 405's four resync keys; `menu_more` ("More" → "Help"); the four GeoMap/XY
+  - **What is in it:** Task 405's four resync keys; `menu_more` ("More" → "Help"); the four XY / lat/lon
     re-wordings (`lpn_new_geo_us/si`, `lpn_new_blank_us/si`); and roughly thirty new keys from the
     placement tool, Go-to-coordinate, clean map, the `.inp` clock and the share affordance.
   - **Gate: the adversarial Wave 0 over the NEW and CHANGED strings only** —
@@ -443,8 +443,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   same way it declares units.** Scope, the three places "geo is just another unit" stops holding, the
   basemap, the unprojected display and the projection seam: **`dev/geographic-projects.md`**.
   - **DONE, slices 1-3:** the declaration and degrees at every user boundary; the OpenStreetMap
-    raster basemap; and the placement tool (File > Convert XY project to GeoMap…), plus a globe-wide
-    zoom floor and Go to latitude, longitude. Terms are Tom's: **GeoMap** and **XY**. Detail, and a
+    raster basemap; and the placement tool (File > Convert to lat/lon…), plus a globe-wide
+    zoom floor and Go to latitude, longitude. Terms are Tom's: **XY** and **lat/lon**. Detail, and a
     proposed `$ec_lang_syn` diff still awaiting his approval: **`dev/georeferencing.md`**.
   - **NEXT: the projection seam, and it is its own task-sized piece of work.** The cheap version — an
     internal Mercator frame with a lon/lat file — redefines `doc.nodes[].x` under `js/lpn-inp.js` and
@@ -459,7 +459,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   points on their drawing; and Finish is not undoable — Cancel is the way back during placement, and
   after Finish it is closing without saving.
 
-- 40|437| **[H] Search the GeoMap by place name — needs Tom's ruling, not a design.** Tom, 2026-08-18:
+- 40|437| **[H] Search the lat/lon map by place name — needs Tom's ruling, not a design.** Tom, 2026-08-18:
   *"We need either the ability to zoom out to the globe or to search by name or to go to lat/lon."*
   The first and third shipped the same day; this one is the only one that costs something.
   - **It needs a GEOCODER, which would be a second third-party host.** `dev/geographic-projects.md`

@@ -36,3 +36,9 @@
 # Copies of them may still sit in this directory untracked; nothing reads those. A harness that
 # needs one reads `dev/lpn-spike/reference/`. Getting this wrong is invisible in the main working
 # directory and fails 70 harnesses in a fresh clone or a git worktree, which is how it was found.
+#
+# **DO NOT REPLACE THIS FILE WITH A BLACKLIST, however tempting.** The rule it enforces is that
+# publishing an example is a DECISION, written as a line here and reviewable in the diff -- and the
+# thing it protects against is real: this directory was `dev/epanet-models/`, excluded wholesale by
+# the root .gitignore, and renaming it on 2026-08-14 silently removed that protection for every
+# client model in it. A blacklist has to predict the next client file's name.

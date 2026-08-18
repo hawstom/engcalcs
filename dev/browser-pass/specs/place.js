@@ -96,7 +96,7 @@ async function readout(a) {
 	return a.page.evaluate(() => document.getElementById('lpn_coords').textContent);
 }
 
-const ROW = 'Convert XY project to GeoMap…';
+const ROW = 'Convert to lat/lon…';
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -109,11 +109,11 @@ exports.run = async function ({ browser, report }) {
 		// ---- 1. the command is findable ------------------------------------------------------
 		// **THE WHOLE SPEC RUNS IN ONE PROJECT, and that is not tidiness.** A new project inherits
 		// whatever view the last one left (the note at the top of specs/geo.js), so a blank XY tab
-		// made after a GeoMap tab is drawn through a geographic transform: three junctions clicked
+		// made after a lat/lon tab is drawn through a geographic transform: three junctions clicked
 		// across the canvas land 0.04 apart, the model is 12 mm wide, and its ghost box is a point.
 		// Everything below would then pass or fail for a reason that has nothing to do with the tool.
 		// The project on a first visit is XY with a grid view, which is the honest starting state —
-		// and the GeoMap half of the menu check is free at the end, once Finish has made it one.
+		// and the lat/lon half of the menu check is free at the end, once Finish has made it one.
 		const row = await fileRow(a, ROW);
 		report.ok(!!row, 'the File menu carries the placement command', row && row.label);
 		report.ok(row && !row.disabled, '...and it is live on an XY project');
@@ -132,8 +132,15 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(700);
 		const asked = a.lastDialog();
 		report.ok(asked && asked.type === 'confirm', 'converting asks first', asked && asked.type);
-		report.has(asked && asked.message, 'not touched',
-			'...and the confirm says what does NOT change: lengths, diameters, elevations, demands');
+		// **THE CONFIRM IS TOM'S OWN WORDING** (2026-08-18) and says three things: where the project
+		// has been put, that the user drives from there, and that nothing is committed until Finish.
+		// It deliberately no longer claims "lengths, diameters, elevations and demands are not
+		// touched" — that sentence belonged to the version that believed the grid already declared a
+		// scale, which these schematic EPANET examples do not.
+		report.has(asked && asked.message, 'centre of the current world',
+			'...and the confirm says where the project has been put');
+		report.has(asked && asked.message, 'press Finish',
+			'...and that nothing is committed until Finish');
 
 		const bar = await a.page.evaluate(() => {
 			const b = document.getElementById('lpn_georef_bar');
@@ -313,7 +320,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(/Longitude/.test(read) && /Latitude/.test(read),
 			'the project is geographic afterwards: the readout speaks in degrees', read);
 		report.eq(await a.nodeCount(), before, '...with the same network still drawn');
-		report.has(await a.notice(), 'GeoMap project now', '...and it says so');
+		report.has(await a.notice(), 'lat/lon project now', '...and it says so');
 		const onMap = await fileRow(a, ROW);
 		report.ok(!!onMap, 'a project already on the map still SHOWS the command',
 			'hidden once, and Tom could not find it at all — absent says "there is no such command"');
@@ -328,7 +335,7 @@ exports.run = async function ({ browser, report }) {
 	// The pane is in normal flow below the canvas, so opening it changes the canvas's height and its
 	// position on the screen — and every number in this tool is a screen coordinate that has been
 	// through `screenToWorld()`. A fresh profile, because a project that has been through Finish is
-	// a GeoMap one and a new XY tab made after it inherits the geographic view (see section 1).
+	// a lat/lon one and a new XY tab made after it inherits the geographic view (see section 1).
 	const b = await Session.open(browser, 'B');
 	try {
 		await b.page.route(/tile\.openstreetmap\.org/, (route) => route.abort());

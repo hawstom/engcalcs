@@ -1,4 +1,4 @@
-# Converting an XY project to a GeoMap one (ROADMAP Task 145)
+# Converting an XY project to a lat/lon one (ROADMAP Task 145)
 
 `dev/geographic-projects.md` §1 already said this had to exist: *"Converting an existing project is a
 deliberate, separate operation (a georeferencing wizard — two known points, as the backdrop scale
@@ -17,9 +17,9 @@ Code: `js/lpn-georef.js` (pure math), the `georef*` section of `js/looped-networ
 | | |
 |---|---|
 | internally | `project.coords` is `'geo'`, or **absent**, which is the XY grid |
-| user-facing | **GeoMap** and **XY** |
+| user-facing | **XY** and **lat/lon** |
 
-Tom offered four candidate pairs on 2026-08-18 and marked one "(user-facing)": **GeoMap vs XY**.
+Tom offered four candidate pairs on 2026-08-18 and marked one "(user-facing)": **lat/lon vs XY**.
 That is what the menus say. Of Flat Earth / Round Earth he said *"I really like this because it's
 both fun and deeply meaningful and instructive"* — and it is exactly the distinction the trade draws
 between a plane survey and a geodetic one. It goes in the **tips and the synonyms**, not on a control,
@@ -42,12 +42,12 @@ lists alone would also do. AI must not write these without written permission in
 
 ## 2. What the tool does, in order
 
-1. **File > Convert XY project to GeoMap…**, beside Import EPANET file, because both are
+1. **File > Convert to lat/lon…**, beside Import EPANET file, because both are
    conversions. A confirm states what will and will not change. **Disabled, never hidden,** on a
    project already on the map — it was hidden once and Tom could not find the command at all.
 2. **Carry.** The project becomes geographic, OSM tiles come on, the view goes to the geographic home
    view, and the model is drawn as a dashed ghost box **pinned to the middle of the map at its true
-   ground size**. The user pans and zooms the map; the box rides along. Nothing is saved. A GeoMap
+   ground size**. The user pans and zooms the map; the box rides along. Nothing is saved. A lat/lon
    zooms out to the whole Earth (`minScale()`), and **Go to…** takes a pasted `lat, lon`.
 3. **Drop it here.** The box's position becomes the transform, every coordinate becomes a longitude
    and a latitude, and the real network is drawn with corner handles, a body, and a rotate handle

@@ -13,7 +13,7 @@ exports.title = '3. The File menu';
 // beside Import, because both are conversions). Recent files are absent because there are none yet;
 // that row group appears only when a file has been opened.
 const EXPECTED = ['New project…', 'Open…', 'Open example…', 'Import EPANET file…',
-	'Convert XY project to GeoMap…', 'Export EPANET file…',
+	'Convert to lat/lon…', 'Export EPANET file…',
 	'Save', 'Save as…', 'Save all', 'Revert', 'Close'];
 
 exports.run = async function ({ browser, report }) {

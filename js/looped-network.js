@@ -4806,20 +4806,23 @@ var EngCalcs = EngCalcs || {};
 		onZoomChanged();
 	}
 
-	// ---- GEOREFERENCING: CONVERTING AN XY PROJECT TO A GEOMAP ONE (ROADMAP Task 145) ------------
+	// ---- GEOREFERENCING: CONVERTING AN XY PROJECT TO A LAT/LON ONE (ROADMAP Task 145) -----------
 	//
-	// **THE TWO WORDS, TOM'S CHOICE, 2026-08-18.**
+	// **THE TWO WORDS, TOM'S CHOICE, 2026-08-18: `XY` and `lat/lon`, and lower case.**
 	//
-	//   internally      `project.coords` is 'geo', or absent, which IS the XY grid
-	//   user-facing     **GeoMap** and **XY**
+	//   internally      `project.coords` is 'geo', or absent, which is the XY grid
+	//   user-facing     **XY** and **lat/lon** -- "no caps so as not to imply any proper names"
 	//
-	// He offered four pairs and marked this one "(user-facing)". Flat Earth / Round Earth he called
-	// "fun and deeply meaningful and instructive", and it is -- it is the same distinction the trade
-	// draws between a plane survey and a geodetic one. It belongs in the TIPS and in `$ec_lang_syn`,
-	// not on the menu, because the menu is staid and professional. (An earlier pass here argued for
-	// "world map / XY grid" because `lpn_new_geo_us` already said "world map" in 27 languages. Tom
-	// overruled it; the four affected keys were re-worded rather than left to make a second name for
-	// one thing.)
+	// Two earlier answers were wrong and are recorded so neither comes back. "World map / XY grid"
+	// was argued for on the grounds that `lpn_new_geo_us` already shipped "world map" in 27
+	// languages, dressed up as a worry that Flat Earth would be misread; Tom: *"The joke is thousands
+	// of years old. Who hasn't heard of it?"* Then "GeoMap", which was his own first suggestion and
+	// which he withdrew: *"I am embarrassed I said GeoMap; it or Geomap are too evocative of a
+	// trademarkish thing."* `lat/lon` is shorter than "geographic" and claims nothing.
+	//
+	// Flat Earth / Round Earth stays, in the TIP and in `$ec_lang_syn` (both written 2026-08-18 with
+	// Tom's permission and in his own words), because it is fun, instructive, and exactly the
+	// distinction the trade draws between a plane survey and a geodetic one.
 	//
 	// **THE PARADIGM IS THE IMAGE-PLACEMENT ONE, NOT A MENU OF COMMANDS** (Tom's option 3, his own
 	// preference): the whole model behaves like one picture being dropped onto the map, with corner
@@ -5159,7 +5162,7 @@ var EngCalcs = EngCalcs || {};
 		var pc = EngCalcs.pageConfig || {};
 		if (georef) { return; }
 		if (isGeoProject()) {
-			setNotice(pc.lpn_georef_on_map || 'This is already a GeoMap project.');
+			setNotice(pc.lpn_georef_on_map || 'This project is already on lat/lon.');
 			return;
 		}
 		if (!doc.nodes.length) {
@@ -5170,7 +5173,7 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
-		if (!window.confirm(pc.lpn_georef_intro || 'Convert this XY project to a GeoMap project?')) { return; }
+		if (!window.confirm(pc.lpn_georef_intro || 'Convert this XY project to a geographic project?')) { return; }
 		georef = {
 			stage: 'carry', src: georefCapture(), t: null,
 			mpu: georefMetersPerUnit(), rotDeg: 0,
@@ -5243,7 +5246,7 @@ var EngCalcs = EngCalcs || {};
 		if (v) { applyView(v); }
 		saveToStorage();
 		renderTabs();
-		setNotice(pc.lpn_georef_done || 'This is a GeoMap project now. Drag any node to fine-tune it.');
+		setNotice(pc.lpn_georef_done || 'This is a lat/lon project now. Drag any element to fine-tune it.');
 	}
 	function georefCancel() {
 		if (!georef) { return; }
@@ -7398,7 +7401,7 @@ var EngCalcs = EngCalcs || {};
 	function saveToStorage() {
 		if (!library.openId) { return; }
 		// **A PLACEMENT IN PROGRESS IS NOT A DOCUMENT** (Task 145's georeferencing tool). While the
-		// model is being carried onto the GeoMap the project already says `coords: geo` and its
+		// model is being carried onto lat/lon the project already says `coords: geo` and its
 		// coordinates are still grid numbers -- a state that is correct on screen for the length of
 		// one gesture and nonsense in a file. georefFinish() and georefCancel() both save after
 		// resolving it, so nothing is lost by declining here.
@@ -10493,9 +10496,9 @@ var EngCalcs = EngCalcs || {};
 			// declared at creation for the same reason units are, so it is declared the same way: by
 			// which row you click. See LPN_COORDS_GEO for why it cannot be a toggle afterwards.
 			{ separator: true },
-			{ icon: 'globe', label: pc.lpn_new_geo_us || 'Blank GeoMap project, US units (gpm)',
+			{ icon: 'globe', label: pc.lpn_new_geo_us || 'Blank lat/lon project, US units (gpm)',
 				fn: function () { newBlankProject('us', LPN_COORDS_GEO); } },
-			{ icon: 'globe', label: pc.lpn_new_geo_si || 'Blank GeoMap project, SI units (l/s)',
+			{ icon: 'globe', label: pc.lpn_new_geo_si || 'Blank lat/lon project, SI units (l/s)',
 				fn: function () { newBlankProject('si', LPN_COORDS_GEO); } }
 			// **NO "FROM EXAMPLES" ROWS HERE** (Tom, 2026-08-15: *"Code-drawn: Remove the feature."*).
 			// This fly-out used to carry two more rows that built the basic ring main in code. The
@@ -10576,14 +10579,14 @@ var EngCalcs = EngCalcs || {};
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file (.inp)…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
 			// **A CONVERSION, so it sits beside the other one** (Task 145). It changes what kind of
-			// document this is, permanently, exactly as Import does -- and GeoMap-or-XY cannot be a
+			// document this is, permanently, exactly as Import does -- and lat/lon-or-XY cannot be a
 			// toggle afterwards, for the reasons LPN_COORDS_GEO records.
 			//
 			// **DISABLED, NEVER HIDDEN.** It was hidden on a project already on the map, and Tom then
 			// could not find the command at all -- a hidden row says "there is no such command",
 			// which is a different and false statement. Same rule the scenario rows follow: the
 			// vocabulary stays learnable.
-			{ icon: 'globe', label: pc.lpn_georef_menu || 'Convert XY project to GeoMap…',
+			{ icon: 'globe', label: pc.lpn_georef_menu || 'Convert to lat/lon…',
 			  tip: isGeoProject() ? (pc.lpn_georef_on_map || pc.lpn_georef_tip) : pc.lpn_georef_tip,
 			  disabled: isGeoProject() || georefActive(), fn: georefStart },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
