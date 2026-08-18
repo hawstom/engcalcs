@@ -82,28 +82,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Evaluate together before any of it — this is on the roadmap as a possibility, not a plan.
 
 - 25|390| **Finish the unit paradigm migration: a unit is a NAME, and a file's numbers are the
-  user's.** Tom, 2026-08-16: *"You are fighting against a deprecated but not purged paradigm where
-  everything was stored in browser and file as SI always... I don't think I authorized that. But it
-  was done."* Full diagnosis, measurements and dependency order: **`dev/unit-paradigm-migration.md`**.
-  - **DONE — all five steps (2026-08-16):** an `<option>`'s value is the unit's NAME and the factor a
-    lookup through `EngCalcs.unitFactors`; `data-unit` is gone (guarded by `unit_factor_check.php`
-    §5); a file's own TEXT rides beside its value in a
-    `tok` bag read only through `EngCalcs.lpnNumText()`, which returns a string in every branch; an
-    unknown unit is carried verbatim, saved back unchanged, and refuses only the SOLVE, by name (the
-    five missing EPANET flow keywords got a `flow_epanet` selector); a pump's `h0/a/b` are derived at
-    the solver handoff, so the unit-switch refit is gone.
+  user's.** Diagnosis, measurements and dependency order: **`dev/unit-paradigm-migration.md`**.
+  - **All six steps are DONE** (five 2026-08-16, the reservoir head 2026-08-17). What is left is the
+    acceptance criterion, which only `.inp` EXPORT can satisfy.
   - **No choice of constant could have fixed this**: 36.7% of a 20,000 sample fails to round-trip
     bit-identically even with exact factors, worse than the 26% before them; 9.3% of EPA's own
     tokens reformat under `parseFloat` however exact the arithmetic is.
   - The five new unit keys (`u_imgd`, `u_afd`, `u_lpm`, `u_cmh`, `u_cmd`) and `lpn_unit_unknown` are
     in `lang.ec.en.php` only, and fold into the queued sprint.
-  - **DONE (2026-08-17):** an EPANET reservoir's column is a total HEAD and now lands in `_head`
-    alone. Inventing a ground elevation from it — and the `applySaved()` back-fill that did the same
-    to old documents — is gone, so a reservoir whose ground nobody stated has no pressure rather than
-    a pressure of zero (`fixedHeadPressure()`). Saved user documents are unaffected.
   - **Acceptance: import then export is BYTE-IDENTICAL for every value the user did not edit.** Also
     Task 281's criterion.
-
 - 60|389| **Search and replace inputs across the network — WANTED, and no longer gated on network
   size.** Tom, 2026-08-16: *"I would like search and replace embraced more explicitly."* That
   reverses this file's earlier position, which said find-and-replace was a big-network tool we
@@ -575,33 +563,21 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 - 35|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
   and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves shipped 2026-08-14;
-  time is the open one, and the engine makes it a mapping-and-UI job rather than a numerical one.
-  - **Task 384 (colour coding with a ramp picker) is preparation for this, not decoration** — a
-    number per element per timestep cannot be read any other way.
-  - **DONE 2026-08-17: PBV and GPV are real elements.** A PBV's setting is a pressure DROP; a GPV's
-    behaviour is a head-loss CURVE that belongs to the valve and is named after it (248.04's ruling,
-    which is what made the type buildable — the old note said we had "no curve element outside the
-    pump" and the answer was that a GPV needs no separate one). Both are EPANET-only. Two traps
-    found by building it: EPANET refuses `setLinkValue` on a GPV at all (error 207), so the warm path
-    skips it and its curve had to go into `signatureOf()` or an edited curve returned the previous
-    curve's answer; and a GPV with no curve cannot be written at all, so it degrades to an open
-    throttle and says so. Harness `dev/lpn-spike/pbv-gpv-harness.js` solves both through the real
-    engine.
+  PBV and GPV 2026-08-17. Time is the open one, and the engine makes it a mapping-and-UI job rather
+  than a numerical one.
+  - **THE FOUR EPANET CONCEPTS IT NEEDS ARE CHILDREN, in build order** (Tom, 2026-08-17): 248.01 time
+    settings, 248.02 patterns, 248.03 controls, 248.04 curves. Each is testable on its own, and a
+    pattern with no clock cannot be demonstrated at all.
+  - **Task 384's colour ramp is preparation for this, not decoration** — a number per element per
+    timestep cannot be read any other way.
   - **A valve has THREE states in EPANET, not two:** closed, fully open, and ACTIVE. `EN_INITSTATUS =
     OPEN` opens it fully with its setting IGNORED; `EN_INITSETTING` restores active, so status is
     written BEFORE setting. Written the other way a network solves with the valve wide open — exactly
     one k V²/2g of missing head, with flows still agreeing to 2e-10 m³/s.
-  - **The gate is about sequencing only, not our right to the name.** Tom, 2026-08-14: *"we have no
-    less technical authority to call ourselves EPANET, more moral authority, and all the legal
-    authority since it's all public domain."* No node-count limit; never describe the gate as one
-    (`dev/positioning.md` §6).
-  - **Raised 20 → 60 then lowered 60 → 35 the same day.** Tom: *"I have got distracted… I erred in
-    pushing LibreEPANET.org at the expense of scenarios."* A gate on a launch nobody is waiting for
-    is not urgent work.
-  - **THE FOUR EPANET CONCEPTS IT NEEDS ARE NOW CHILDREN, not prose here** (Tom, 2026-08-17):
-    248.01 time settings, 248.02 patterns, 248.03 controls, 248.04 curves. Build them in that order —
-    each is testable on its own, and a pattern with no clock cannot be demonstrated at all.
-
+  - **The gate is about sequencing only, not our right to the name.** No node-count limit; never
+    describe the gate as one (`dev/positioning.md` §6). Tom, 2026-08-14: *"we have no less technical
+    authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
+    all public domain."*
 - 55|409| **Profiles: an elevation/HGL profile along a chosen path. NOT gated on time steps.**
   Tom, 2026-08-17: *"There's no reason these can't be done now."* The earlier block made it depend on
   Task 248; it does not — a steady-state profile of ground, hydraulic grade and pressure along a path
