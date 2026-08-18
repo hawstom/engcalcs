@@ -1903,7 +1903,12 @@ var EngCalcs = EngCalcs || {};
 	// Set as a presentation ATTRIBUTE rather than only a class: text-decoration on a tspan is SVG
 	// 1.1, and an attribute needs no stylesheet to have loaded. The class rides along for anyone
 	// who wants to restyle it.
-	function setMultilineText(textEl, x, rows) {
+	// `firstDy` (optional, in em) shifts the WHOLE block up or down without moving the <text>'s own
+	// y. A data label leaves it out: its first row sits on the anchor point and the rest hang below,
+	// which is what a leader line points at. A Text OBJECT passes a negative value so a three-line
+	// note straddles the point the user placed it on -- see textLabelFirstDy(), where the rule that
+	// one line must render pixel-identically to before is stated.
+	function setMultilineText(textEl, x, rows, firstDy) {
 		while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
 		rows.forEach(function (row, i) {
 			row.forEach(function (seg, j) {
@@ -1912,7 +1917,7 @@ var EngCalcs = EngCalcs || {};
 				// be rebuilt for one. In world units this attribute was stale the instant the scale
 				// changed, which is why every zoom used to run the whole of refreshLabelText().
 				// 1.2 is effectiveLineHeight()'s own multiple of the font size, in one place now.
-				var tspan = el('tspan', j === 0 ? { x: x, dy: i === 0 ? 0 : '1.2em' } : {}, textEl);
+				var tspan = el('tspan', j === 0 ? { x: x, dy: i === 0 ? (firstDy ? firstDy + 'em' : 0) : '1.2em' } : {}, textEl);
 				if (seg.decoration) {
 					tspan.setAttribute('text-decoration', seg.decoration === 'high' ? 'overline' : 'underline');
 					tspan.setAttribute('class', seg.decoration === 'high' ? 'lpn-max' : 'lpn-min');
@@ -3791,7 +3796,51 @@ var EngCalcs = EngCalcs || {};
 		return a === 'left' ? 'start' : a === 'right' ? 'end' : 'middle';
 	}
 	function labelVAlign(lb) { return (lb && lb.valign === 'top') ? 'hanging' : 'middle'; }
-	function textLabelHeight(lb) { return effectiveFontSize(lb && lb.sizeMult) * 1.2; }
+
+	// ---- MTEXT rung 1: a Text object is LINES (ROADMAP Task 342) --------------------------------
+	//
+	// Tom, 2026-08-14: *"Not mtext labels. Mtext Text objects."* This is what you place with the
+	// Text tool, and explicit line breaks are the whole of what most drawings use -- a title block,
+	// a north note, a street name over two lines. Generated data labels are NOT in scope and get
+	// their line structure from the fields they print.
+	//
+	// **A NEWLINE IS THE STORED FORM, and the property is still one string.** `_text` stays a single
+	// overridable value, so a scenario's override of a three-line note is still one override, the
+	// file format is unchanged, and nothing downstream had to learn about a list.
+	//
+	// Rung 2 (a wrap WIDTH, which is what actually makes it MTEXT) is deliberately not here. SVG
+	// does not wrap, so it needs a per-label width plus a greedy re-wrap on every font-size change
+	// -- pure geometry, and it belongs in js/lpn-geom.js when it comes.
+	//
+	// **THE EXPORT CONSTRAINT, so it is not discovered at export time: EPANET's [LABELS] is ONE
+	// quoted string per line**, so a multi-line Text cannot round-trip through an `.inp`. Task 281
+	// decides whether it goes out as N labels or one flattened line.
+	function textLabelLines(lb) {
+		var t = effective(lb, 'text');
+		return String(t === undefined || t === null ? '' : t).split('\n');
+	}
+	// **ONE LINE MUST RENDER PIXEL-IDENTICALLY TO BEFORE. That is the whole migration**, and it is
+	// what this function buys: a single line gets no shift at all, so every drawing already made
+	// keeps its exact appearance. A centred block of n lines is raised by half of the extra height
+	// so it straddles its point; a top-anchored one already hangs downward and needs nothing.
+	function textLabelFirstDy(lb) {
+		var n = textLabelLines(lb).length;
+		if (n < 2) { return 0; }
+		return labelVAlign(lb) === 'hanging' ? 0 : -1.2 * (n - 1) / 2;
+	}
+	// The ONE place a Text object's words reach the DOM. A single line stays a plain text node --
+	// the shape every existing measurement, hit-test and harness already sees -- and only a real
+	// multi-line label grows tspans.
+	function setTextLabelContent(textEl, lb, x) {
+		var lines = textLabelLines(lb);
+		if (lines.length < 2) {
+			while (textEl.firstChild) { textEl.removeChild(textEl.firstChild); }
+			textEl.textContent = lines[0];
+			return;
+		}
+		setMultilineText(textEl, x, lines.map(function (t) { return [{ text: t }]; }), textLabelFirstDy(lb));
+	}
+	function textLabelHeight(lb) { return effectiveFontSize(lb && lb.sizeMult) * 1.2 * textLabelLines(lb).length; }
 
 	// ---- Task 337: a Text label's own boldface and its own rotation ----
 	//
@@ -3894,7 +3943,7 @@ var EngCalcs = EngCalcs || {};
 			'dominant-baseline': labelVAlign(lb) === 'hanging' ? 'hanging' : 'central',
 			'data-lbl': lb.id, style: textLabelStyle(lb)
 		}, labelsLayer);
-		text.textContent = effective(lb, 'text');
+		setTextLabelContent(text, lb, px);
 		// MEASURED AFTER THE STYLE IS ON THE ELEMENT, which is the whole reason bold can be a
 		// style rather than a second measurement path: bold glyphs are wider, so a width taken
 		// before the weight was applied would size the collision box for the lighter text
@@ -3915,10 +3964,17 @@ var EngCalcs = EngCalcs || {};
 	function refreshLabelContent(id) {
 		var lb = labelById(id), le = labelEls[id];
 		if (!lb || !le) { return; }
-		le.text.textContent = effective(lb, 'text');
+		setTextLabelContent(le.text, lb, textLabelAnchorX(lb));
 		try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
 		updateLabelGeometry(id);
 		applyLabelVisibility();
+	}
+	// Where this label's text is anchored in world coordinates -- its own point, or its node's plus
+	// the offset. Every row of a multi-line label carries that x explicitly (setMultilineText()),
+	// so it is needed wherever the content is rebuilt, not only where it is moved.
+	function textLabelAnchorX(lb) {
+		var an = lb && lb.anchorNode ? nodeById(lb.anchorNode) : null;
+		return an ? an.x + lb.x : lb.x;
 	}
 
 	function buildDom() {
@@ -3963,7 +4019,10 @@ var EngCalcs = EngCalcs || {};
 	function updateLabelGeometry(id) {
 		var lb = labelById(id), le = labelEls[id], an, px, py, box, halfW, att;
 		if (!lb.anchorNode) {
-			le.text.setAttribute('x', lb.x); le.text.setAttribute('y', lb.y);
+			// repositionMultilineText(), not two setAttribute()s: every ROW of a multi-line label
+			// carries its own x, so moving the parent alone would strand the rows where they were
+			// (Task 342). It sets the parent's x/y too, so the single-line case is unchanged.
+			repositionMultilineText(le.text, lb.x, lb.y);
 			applyTextLabelRotation(lb, le, lb.x, lb.y);
 			return;
 		}
@@ -3978,7 +4037,7 @@ var EngCalcs = EngCalcs || {};
 		le.side = att.side;
 		le.leader.setAttribute('x1', an.x); le.leader.setAttribute('y1', an.y);
 		le.leader.setAttribute('x2', att.x); le.leader.setAttribute('y2', box.y + box.h / 2);
-		le.text.setAttribute('x', px); le.text.setAttribute('y', py);
+		repositionMultilineText(le.text, px, py);
 		applyTextLabelRotation(lb, le, px, py);
 	}
 	// Double-click-to-reset for a Text label (Tom, 2026-07-30) -- only meaningful when anchored: an
@@ -14069,7 +14128,7 @@ var EngCalcs = EngCalcs || {};
 	function renderLabelFields(labelId) {
 		var lb = labelById(labelId), fields = document.getElementById('lpn_popup_fields'),
 			pc = EngCalcs.pageConfig || {}, title = document.getElementById('lpn_popup_title'),
-			label = document.createElement('label'), input = document.createElement('input'),
+			label = document.createElement('label'), input = document.createElement('textarea'),
 			an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
 		title.textContent = pc.lpn_tool_add_text || 'Text';
 		clearFields(fields);
@@ -14077,7 +14136,13 @@ var EngCalcs = EngCalcs || {};
 		// writes through setProp() like every other property editor on the page. Writing lb._text
 		// here would edit Base from inside a scenario -- under every other scenario at once, and
 		// with the right words still on screen, which is the whole reason the seam exists.
-		input.type = 'text'; input.value = effective(lb, 'text');
+		// A TEXTAREA, because a Text object is lines now (Task 342). Three rows and full width: it
+		// has to LOOK like somewhere you may press Enter, or the capability is invisible. Enter
+		// types a newline here rather than committing, which is what a textarea does by itself and
+		// is the reason this is not an <input> with a key handler bolted on.
+		input.rows = 3;
+		input.style.width = '100%';
+		input.value = effective(lb, 'text');
 		input.addEventListener('change', function () {
 			if (input.value === effective(lb, 'text')) { return; }
 			saveUndoSnapshot();
@@ -14134,6 +14199,39 @@ var EngCalcs = EngCalcs || {};
 		alwaysLabel.appendChild(alwaysInput);
 		fields.appendChild(alwaysLabel);
 		fields.appendChild(document.createElement('br'));
+		// ---- Justification (Task 342, moved here from Task 332) ------------------------------
+		// Tom, 2026-08-15: *"text alignment is very interesting to a user, especially if we allow
+		// paragraph text."* `lb.align`/`lb.valign` have been in the document since Task 332 and are
+		// interpreted in ONE place (Geom.labelBoxAt via labelHAlign/labelVAlign); all this owes them
+		// is the row. Centre/middle stays the default, so no existing drawing changes shape.
+		//
+		// These say what the label's POINT MEANS -- which edge of the text sits on it -- and with
+		// several lines they also say how the lines line up with each other, which is the half that
+		// only starts to matter now.
+		function alignRow(labelText, prop, options, dflt) {
+			selectFieldPlain(fields, labelText, options, (lb[prop] || dflt), function (v) {
+				if ((lb[prop] || dflt) === v) { return; }
+				saveUndoSnapshot();
+				// BASE-WIDE, like position and size and for the same reason (Task 407): a note that
+				// changes shape as you flip scenarios is unreadable. Not in LPN_OVERRIDABLE, so
+				// setProp() would be the wrong seam here, not merely unnecessary.
+				lb[prop] = v;   // base-write: justification is Base-owned, exactly as position and size are
+				// The content carries the block offset and each row's x, so it is rebuilt, not just
+				// moved -- a vertical change alters textLabelFirstDy() and a horizontal one alters
+				// where every row starts.
+				refreshLabelContent(labelId);
+				relayoutThisLabel();
+			});
+		}
+		alignRow(pc.lpn_field_text_align || 'Line up', 'align', [
+			['left', pc.lpn_field_text_align_left || 'Left'],
+			['center', pc.lpn_field_text_align_center || 'Centre'],
+			['right', pc.lpn_field_text_align_right || 'Right']
+		], 'center');
+		alignRow(pc.lpn_field_text_valign || 'Point is at the', 'valign', [
+			['top', pc.lpn_field_text_valign_top || 'Top of the text'],
+			['middle', pc.lpn_field_text_valign_middle || 'Middle of the text']
+		], 'middle');
 		// ---- Task 337: Bold, and rotation with its two convenience buttons ----
 		// Redrawing after either property changes goes through ONE function, because bold and
 		// rotation both invalidate the same three things and in the same order: the measured width

@@ -117,25 +117,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Distinct from Task 185 (Match/Copy properties), which stays a click-source-then-click-targets
     tool. Both ship; neither replaces the other.
 
-- 60|353| **Find elements by searching for them.** Tom, 2026-08-15. One text input, an "Elements to
-  search" pull-down (all / junctions / pipes / …) and a Condition pull-down, roughly the shape of a
-  Google Sheets filter. Start there rather than with a query language.
-  - The obvious first conditions are contains / equals on an ID, and greater-than / less-than on a
-    numeric property (pressure, velocity, diameter, demand). The result wants to select and zoom to
-    the element, not just list it.
-  - This is the RIGHT answer to "which elements are interesting" — a query the user asked for beats
-    a mark the app decided to show. The extrema tie rule (Task 346) was rejected twice for that
-    reason; do not reopen it, build this instead.
-  - **Nobody else has it, so there is no model to copy** (Tom, 2026-08-17). EPANET's nearest thing is
-    the Network Table, and epanet-js has Data Tables tabbed by element category — both are listings
-    with no filter and no search. Exact-ID lookup is a separate, smaller thing: Task 420.
-
-- 40|420| **Goto element by ID — EPANET calls it Map Finder.** Tom, 2026-08-17, with EPANET's dialog:
-  a Find radio group (Node / Link / Sources), one ID box, a Find button, and an "Adjacent Links" list
-  for a found node. Select and zoom to the hit.
-  - **Smaller than Task 353 and worth shipping first** — exact ID, no conditions, no property
-    comparison. 353's selector should subsume it rather than duplicate it.
-
 - 15|355| **Long labels and short pipes — WAIT AND TEST.** Tom, 2026-08-15, after the repeat and
   alignment work landed: *"I think we are good, to tell the truth. Nothing to do, I think."* So
   nothing is scheduled. `linkLabelTooShort()` still hides a short pipe's label all-or-nothing; if

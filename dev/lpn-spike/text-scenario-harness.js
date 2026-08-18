@@ -99,10 +99,12 @@ function fire(el, type) {
 	(el._listeners[type] || []).forEach(function (fn) { fn({ type: type, currentTarget: el, target: el }); });
 }
 // Every text <input> in the popup, in order -- the first is the note's words.
+// A TEXTAREA since Task 342 -- a Text object is lines now. Both shapes are accepted so this reads
+// as "the box you type the words into" rather than as one tag name.
 function textInputs() {
 	const out = [];
 	(function walk(el) {
-		if (el.type === 'text') { out.push(el); }
+		if (el.type === 'text' || el._tag === 'textarea') { out.push(el); }
 		(el.children || []).forEach(walk);
 	})(L.popupFields());
 	return out;

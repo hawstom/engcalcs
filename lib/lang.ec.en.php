@@ -1144,6 +1144,18 @@ $ec_lang_syn['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing f
 $ec_lang['lpn_new_text']='Text';
 $ec_lang_syn['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
 $ec_lang['lpn_field_text_bold']='Bold text';
+// Justification for a Text object (Task 342). "Line up" and not "Align": these say how the lines of
+// the text sit against each other and against the point the label was placed on, and Simple English
+// carries that where "alignment" carries a word most non-engineers meet only in typography.
+$ec_lang['lpn_field_text_align']='Line up the lines';
+$ec_lang['lpn_field_text_align_left']='Left';
+$ec_lang['lpn_field_text_align_center']='Centre';
+$ec_lang['lpn_field_text_align_right']='Right';
+// What the label's own point means. A note placed on a title block wants its point at the top; a
+// street name wants it in the middle of the words.
+$ec_lang['lpn_field_text_valign']='The point is at the';
+$ec_lang['lpn_field_text_valign_top']='Top of the text';
+$ec_lang['lpn_field_text_valign_middle']='Middle of the text';
 $ec_lang['lpn_field_text_rotation']='Angle (degrees)';
 $ec_lang['lpn_field_text_match_pipe']='Set to pipe angle';
 $ec_lang['lpn_field_text_flip']='Turn 180°';

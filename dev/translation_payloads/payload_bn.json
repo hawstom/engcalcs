@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1015,
-        "delta_key_count": 19,
+        "expected_key_count": 1022,
+        "delta_key_count": 26,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -363,6 +363,13 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_field_text_align": "Line up the lines",
+        "lpn_field_text_align_left": "Left",
+        "lpn_field_text_align_center": "Centre",
+        "lpn_field_text_align_right": "Right",
+        "lpn_field_text_valign": "The point is at the",
+        "lpn_field_text_valign_top": "Top of the text",
+        "lpn_field_text_valign_middle": "Middle of the text",
         "lpn_examples_close": "Close",
         "lpn_find_menu": "Find",
         "lpn_find_title": "Find elements",
@@ -384,6 +391,13 @@
         "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "keys": {
+        "lpn_field_text_align": "Line up the lines",
+        "lpn_field_text_align_left": "Left",
+        "lpn_field_text_align_center": "Centre",
+        "lpn_field_text_align_right": "Right",
+        "lpn_field_text_valign": "The point is at the",
+        "lpn_field_text_valign_top": "Top of the text",
+        "lpn_field_text_valign_middle": "Middle of the text",
         "lpn_examples_close": "Close",
         "lpn_find_menu": "Find",
         "lpn_find_title": "Find elements",
@@ -405,6 +419,118 @@
         "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "key_context": {
+        "lpn_field_text_align": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_bold",
+                    "value": "বোল্ড টেক্সট",
+                    "english": "Bold text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_rotation",
+                    "value": "কোণ (ডিগ্রি)",
+                    "english": "Angle (degrees)"
+                }
+            }
+        },
+        "lpn_field_text_align_left": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_bold",
+                    "value": "বোল্ড টেক্সট",
+                    "english": "Bold text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_rotation",
+                    "value": "কোণ (ডিগ্রি)",
+                    "english": "Angle (degrees)"
+                }
+            }
+        },
+        "lpn_field_text_align_center": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_bold",
+                    "value": "বোল্ড টেক্সট",
+                    "english": "Bold text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_rotation",
+                    "value": "কোণ (ডিগ্রি)",
+                    "english": "Angle (degrees)"
+                }
+            }
+        },
+        "lpn_field_text_align_right": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_bold",
+                    "value": "বোল্ড টেক্সট",
+                    "english": "Bold text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_rotation",
+                    "value": "কোণ (ডিগ্রি)",
+                    "english": "Angle (degrees)"
+                }
+            }
+        },
+        "lpn_field_text_valign": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_bold",
+                    "value": "বোল্ড টেক্সট",
+                    "english": "Bold text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_rotation",
+                    "value": "কোণ (ডিগ্রি)",
+                    "english": "Angle (degrees)"
+                }
+            }
+        },
+        "lpn_field_text_valign_top": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_bold",
+                    "value": "বোল্ড টেক্সট",
+                    "english": "Bold text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_rotation",
+                    "value": "কোণ (ডিগ্রি)",
+                    "english": "Angle (degrees)"
+                }
+            }
+        },
+        "lpn_field_text_valign_middle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_bold",
+                    "value": "বোল্ড টেক্সট",
+                    "english": "Bold text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_rotation",
+                    "value": "কোণ (ডিগ্রি)",
+                    "english": "Angle (degrees)"
+                }
+            }
+        },
         "lpn_examples_close": {
             "reason": "missing",
             "current_value": null,

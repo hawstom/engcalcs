@@ -19,6 +19,11 @@ const GPM = 6.309019640343977e-5, FT = 0.3048, IN = 0.0254;
 // ---- minimal DOM --------------------------------------------------------
 function mkEl(tag) {
   const el = {
+    // nodeType 1 is not decoration: repositionMultilineText() moves ONLY element children
+    // (`child.nodeType === 1`), so a stub element without it silently skipped every tspan and a
+    // harness would have reported a multi-line label moving when the real page leaves its rows
+    // behind. A createTextNode() result already carries nodeType 3 below.
+    nodeType: 1,
     tagName: (tag || 'div').toUpperCase(), _tag: tag, children: [], dataset: {},
     style: { _props: {}, setProperty(k, v) { this._props[k] = v; }, getPropertyValue(k) { return this._props[k] || ''; }, removeProperty(k) { delete this._props[k]; } },
     classList: {
