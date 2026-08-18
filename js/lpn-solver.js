@@ -48,6 +48,22 @@ EngCalcs.lpnGradMin = 1e-6 * 0.3048 / 0.0283168466;
 // that is lpnGradMin above -- and it must not be used as one.
 EngCalcs.lpnQMin = 1e-8;
 
+// How converged a PLATEAUED iteration must already be before it is accepted as an
+// answer rather than reported as a failure -- a fraction of the network's largest
+// flow. This is EPANET's own default Accuracy, deliberately: it is the point that
+// engine stops at, so accepting here can never be looser than the answer the user
+// would have got from EPANET. It is NOT the convergence tolerance (that is
+// `opts.tol`, and it is 1e-9); nothing reaches this test until Newton has stopped
+// improving for five consecutive iterations. See the stall branch for the
+// measurement that set it.
+EngCalcs.lpnStallAccept = 1e-3;
+
+// A flow small enough that the network carrying it is AT REST: 1 mL/s, which is
+// 0.016 gpm. Not a tolerance and not a cutoff -- nothing is ever clamped to it. It
+// answers one question, in the stall branch: with no demand anywhere, are these
+// flows the decayed-to-nothing answer, or a real circulation still settling?
+var LPN_AT_REST = 1e-6;
+
 // The Hazen-Williams constants are the whole suite's single pair (EPANET's), in
 // js/PipeHydraulics.lib.js. There is nothing to select between here.
 
@@ -597,12 +613,57 @@ EngCalcs.lpnSolve = function (model, options) {
 		// at a constant 1.174 forever while the flows are still falling by half every
 		// iteration. Judged on that alone the solver would stop after 7 iterations and
 		// report a circulating 0.04 L/s in a network with no demand at all.
+		// **THE NEGLIGIBILITY GATE IS RELATIVE TO THE NETWORK'S OWN FLOW SCALE, AND IT IS EPANET'S
+		// OWN DEFAULT ACCURACY.** It used to read `sumAbsDq < 1e-6 * demandScale`, i.e. "and we are
+		// already within 1e-6 relative" -- a hardcoded number that is not reachable on every
+		// network, and when it is not, this escape never fires and a perfectly good answer is
+		// reported as a failure.
+		//
+		// Measured on Elm Street Center with its two 750 gpm demands set to 0 (Tom, 2026-08-17,
+		// "it can't solve the loop... but the EPANET solver works"): Newton reaches 3e-6 relative by
+		// iteration 7 and then sits on a NOISY plateau between 3e-6 and 1.2e-5 forever. The
+		// remaining imbalance is 1.4e-7 m3/s -- 0.002 gpm, against 460 gpm of demand. It ran to 100
+		// iterations and told the user their network was impossible. Zeroing a demand is not what
+		// broke it: it lowered demandScale by 4x, which is a 4x rise in every RELATIVE measure,
+		// and 1e-6 happened to sit between the old plateau and the new one.
+		//
+		// The floor is roundoff in the dense factorization and is network-dependent -- ill
+		// conditioning from the zero-flow links' clamped gradient (lpnGradMin), which EPANET has
+		// too. So no fixed number is right, and the honest test is a COMPARISON: we have stopped
+		// improving, and we are already at least as converged as EPANET's own default Accuracy
+		// (0.001) would demand before it stopped. A network that is genuinely oscillating -- Net3's
+		// pipe 333 swinging between 0 and -2.28 gpm, the case lpnGradMin exists for -- is orders of
+		// magnitude above this and is still reported as a failure.
+		//
+		// SCALE, not demand, because a zero-demand network must still be judged against something:
+		// the largest flow in it. Using demandScale alone left `sumAbsDq < absTol` (1e-12 m3/s) as
+		// the only route, which no network reaches. This cannot resurrect the decaying-circulation
+		// mistake the comment above describes -- that case never gets here, because its absolute
+		// change is still halving every iteration, so `stall` never accumulates.
 		if (maxFlowChange < bestChange * 0.999) {
 			bestChange = maxFlowChange;
 			stall = 0;
-		} else if (++stall >= 5 && sumAbsDq < Math.max(1e-6 * demandScale, absTol)) {
-			converged = true;
-			break;
+		} else if (++stall >= 5) {
+			var qMax = 0;
+			for (k = 0; k < Q.length; k++) { qMax = Math.max(qMax, Math.abs(Q[k])); }
+			// **A NETWORK AT REST IS SOLVED, and its plateau is a limit cycle around zero.** With
+			// no demand anywhere the flows decay to nothing, and once they are down at the
+			// factorization's roundoff floor they jitter about zero by MORE than their own
+			// magnitude -- measured on Elm Street with every demand zeroed: largest flow
+			// 8.8e-8 m3/s, change 4.5e-7. So the relative test above cannot pass however long it
+			// runs, and this is the state a network is in for the whole time it is being drawn.
+			// Judged on the FLOWS, not on the change, because it is the flows that are the answer:
+			// every one below 1 mL/s is zero for any purpose a water network has.
+			// Scaled on DEMAND, not on the flows. Scaling on the largest flow was written first and
+			// then removed: no network could be built where it changed the verdict -- one with real
+			// circulation and no demand (two reservoirs at different heads, in the harness) reaches
+			// the main test long before it stalls. It is left out rather than kept "for safety",
+			// because a branch no test can justify is a branch nobody can maintain.
+			if (qMax < LPN_AT_REST ||
+					sumAbsDq < Math.max(EngCalcs.lpnStallAccept * demandScale, absTol)) {
+				converged = true;
+				break;
+			}
 		}
 	}
 
