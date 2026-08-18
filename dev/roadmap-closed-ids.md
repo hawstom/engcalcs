@@ -348,3 +348,6 @@ state; this is only a list of numbers that were once used.
 - 0|414| The dev/browser-pass/ specs run again against the real page: 139/139
 - 0|415| A `selected` property on elements (view state only) and subject-then-verb Delete
 - 0|419| Suite adopted standard gravity 9.80665; minor-loss disagreement with EPANET now declared to the user
+- 0|257| Example projects chosen and shipped: `examples/` holds Net1, Net2, Net3, Elm Street Center and the Basic US/SI networks, each with an `.svg` thumbnail. Closed on Tom's ruling 2026-08-17.
+- 0|244| Navbar carries the distinguishing term: a GitHub mark plus "Libre Software" (`menu_libre`, `#nav-libre`), linking to the README license section rather than a page of ours. "Forever" stayed out of nav copy.
+- 0|286| EU ePrivacy work complete: the ten `consent_*`/`privacy_link`/`terms_link` keys are translated in all 26 languages (verified 2026-08-17, including the 0.65 tier). Rules live in CLAUDE.md; the record is `dev/cookie-storage-inventory.md`. Task 287 already closed.

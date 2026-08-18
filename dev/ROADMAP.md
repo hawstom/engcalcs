@@ -8,26 +8,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 **`CHECK: YYYY-MM-DD` marks a task waiting on the calendar rather than on work** (Task 155's Search Console wait; Task 202's `zh` n=30). Tom asked 2026-08-05 whether dated tasks should always be priority 100. **No, and the date must never promote the task.** A `CHECK:` date is a **gate, not a deadline**: before it, the work is impossible (attempting it yields nothing); after it, the task simply becomes doable **at whatever priority it already had**. So Task 155 stays at 10 forever if a Search Console look is worth 10 — an arrived date means "you may now do this", never "do this next". *(CC's first draft of this paragraph said to raise the priority when the date arrives. That was wrong, and it smuggled promotion back in after arguing against it; Tom caught it: "Use the real priority, and don't let the date promote it." That is the rule.)* The one genuine exception is a task whose **value decays** — evidence that expires, a real external deadline. That is a change in worth, so change the priority and say why; it is not the date doing the work.
 
-## NEXT SESSION (updated 2026-08-17)
-
-**All four overnight `$ec_lang_syn` entries are written**, with Tom's edits applied (`lpn_examples_open`'s
-avoid-clause corrected to imperative-vs-adjective; `lpn_labels_col_after` dropped "Behind", added
-"Postfix"). **Task 404 is closed** (not too eager). **Task 400 is reframed and lowered 60→15**,
-parked for real-world feedback from Mary rather than scheduled. Backdrop menu reorder (Move above
-Scale) and the destination-point-chooser anchor (now the picked point, not the menubar) are done.
-
-**Task 407 is scoped and promoted to 90, the top of the board** (Text overrides `text` + `active`,
-never position). It spawned **412** (a Base-wide property must say so — every one of them is
-announced by an absence today). The most-open-angle literature pass is **done** and split out as
-**411**; it is not gated on Phase 3. Dependency management is reopened as **413** — Task 83's own
-"revisit if a real local dependency is introduced" condition fired when Bootstrap and epanet-js were
-vendored.
-
-**Next by priority:** 407, then 405 (resync the four strings sprint 397 earned), then 403 (the stub's
-font-size blindness, attempted twice and reverted twice — read its block before starting).
-
-*Delete this block once it stops being true; it is a handoff, not a standing plan.*
-
 ## LENGTH DISCIPLINE (Tom, 2026-08-05) — read this before writing a task
 
 **Tom's complaint, verbatim and correct:** *"We are getting huge, and now apparently gratuitous, roadmap bloat. Task 219 could have been a single line: 'Add lpn to Related links on hw, bpn, and ip.'"* He was right. This file went **1,720 → 5,634 lines in nine days** (2026-07-27 → 2026-08-05, a 3.3× growth), and Task 219 was written at 44 lines for what is a three-line PHP edit plus one real blocker. It is now 9.
@@ -146,6 +126,15 @@ font-size blindness, attempted twice and reverted twice — read its block befor
   - This is the RIGHT answer to "which elements are interesting" — a query the user asked for beats
     a mark the app decided to show. The extrema tie rule (Task 346) was rejected twice for that
     reason; do not reopen it, build this instead.
+  - **Nobody else has it, so there is no model to copy** (Tom, 2026-08-17). EPANET's nearest thing is
+    the Network Table, and epanet-js has Data Tables tabbed by element category — both are listings
+    with no filter and no search. Exact-ID lookup is a separate, smaller thing: Task 420.
+
+- 40|420| **Goto element by ID — EPANET calls it Map Finder.** Tom, 2026-08-17, with EPANET's dialog:
+  a Find radio group (Node / Link / Sources), one ID box, a Find button, and an "Adjacent Links" list
+  for a found node. Select and zoom to the hit.
+  - **Smaller than Task 353 and worth shipping first** — exact ID, no conditions, no property
+    comparison. 353's selector should subsume it rather than duplicate it.
 
 - 15|355| **Long labels and short pipes — WAIT AND TEST.** Tom, 2026-08-15, after the repeat and
   alignment work landed: *"I think we are good, to tell the truth. Nothing to do, I think."* So
@@ -297,7 +286,7 @@ font-size blindness, attempted twice and reverted twice — read its block befor
   - Connects to Task 253 (clean map for screenshots) — a thematic view with no labels IS the clean
     map, arrived at from the other side.
 
-- 35|347| **No project tabs at all until a project is opened.** Tom's strongest form of the examples
+- 5|347| **No project tabs at all until a project is opened.** Tom's strongest form of the examples
   gallery (*"It's not a map until the first project is started or opened?"*), extracted from Task 314
   when it closed. Left out there on grounds worth restating: `init()` guarantees an invariant in as
   many words — *"the library always has exactly one open project, so there is never a state where
@@ -519,24 +508,6 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     two. **Do not justify that with "this page is used on phones" — we do not know that** (Tom,
     2026-08-11: *"we don't know whether anybody uses this on a phone"*; Task 285 is why it is still an
     assumption). The narrow-screen case stands on its own.
-- 45|286|[H] **EU cookie/ePrivacy compliance.** Phase 1, `privacy.php` and `terms.php` all shipped
-  2026-08-12; `dev/cookie-storage-inventory.md` is the record and CLAUDE.md holds the rules a change
-  must respect. **What is still OPEN: translating the ten `consent_*`/`privacy_link`/`terms_link`
-  keys**, which exist in English precisely so they ride a sprint rather than paying for one. Plus
-  Task 287.
-  - **Two shapes worth carrying forward.** *Lazy sessions were the work, not the banner* —
-    `session_start()` at the top of `base.inc.php` wrote `PHPSESSID` before anything could ask
-    anything, and no banner fixes that from the outside. And *when a per-purpose test taints
-    something, separate the purposes rather than defending the mixture*: `PHPSESSID`'s
-    service-related half moved to `ec_language`, leaving the session one purpose and one honest
-    answer.
-  - **The trigger is ePrivacy Art 5(3), not GDPR**, tested per purpose and covering `localStorage` as
-    much as cookies. **There is no official EU template**, contrary to a reasonable first impression;
-    Art 13/14 specify content, not a form. Not legal advice and not from a lawyer.
-  - **Tom overruled engineering around the banner**, and the grounds are better than the argument
-    they replaced: the user-side cost is already sunk, and avoiding it buys a permanently uncertain
-    compliance posture plus permanently degraded numbers, against one click. So the counters keep
-    their per-visitor de-duplication.
 - 20|285| **We do not know what devices anybody uses this on, and several decisions have quietly
   assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."*
   `log-human-view.php` and `log-calc-event.php` record **page and language and nothing else**, so
@@ -669,27 +640,7 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     same item twice.
   - Changing `menu_more`'s English makes 26 translations stale — a resync, not a new key.
 
-- 40|257|[H] **[HUMAN] Find or build the example PROJECTS (plural) for lpn.** Reassigned to Tom at
-  his own request, 2026-08-11: *"Let's change this task to a human assignment to create or find some
-  EPANET examples."* What is wanted is the CHOICE of networks — which ones teach something, which
-  ones look like the work our users do. Handing over the files is enough; the wiring is a small job
-  once they exist.
-  - **Distinct from Task 254**, which is the one-click *drawing* example a first-time visitor makes
-    from an empty canvas. This is a LIBRARY of openable projects — a Projects/tabs feature.
-  - **The blocker is gone.** File > Import EPANET file (.inp) shipped 2026-08-11 (Task 196), so an
-    example project is now literally an `.inp` we choose, import and save — no converter, no decision
-    left. Net1/Net2/Net3 are already in the repo as `dev/lpn-spike/reference/` fixtures, and
-    OWA-EPANET is MIT, so they can ship under GPL v3+. Source for more:
-    <https://github.com/OpenWaterAnalytics/EPANET/tree/dev/example-networks>.
-  - **These are ANALYSIS networks and this suite is a DESIGN tool.** They will make the map look
-    serious, but do not let them quietly redefine what the calculator is for — a network with
-    reservoirs, pipes and a pump is what shows this calculator doing its job.
-  - **Backdrops:** a browser cannot display WMF at all, so Tom's three `.wmf` files still need
-    converting (Inkscape opens one and saves SVG). BMP it does read, which makes
-    `utility-map-estrellas.bmp` and the Estrellas model the natural first example.
-    `20069-WP-Backdrop.wmf` matches none of the three models' `[BACKDROP] FILE` paths, so it appears
-    to belong to a fourth model we do not have.
-- 30|253| **A clean-map view: hide canvas chrome for screenshots.** Tom, 2026-08-09, wants it
+- 95|253| **A clean-map view: hide canvas chrome for screenshots.** Tom, 2026-08-09, wants it
   under the View menu and in the toolbar's View area. **Scope it as "clean map", not "print".**
   His own framing: *"The only thing I care for it to hide at the moment (for map screenshots) is
   the Mode status line... what a true printable version should look like is debatable, which is
@@ -705,8 +656,11 @@ font-size blindness, attempted twice and reverted twice — read its block befor
   time is the open one, and the engine makes it a mapping-and-UI job rather than a numerical one.
   - **Task 384 (colour coding with a ramp picker) is preparation for this, not decoration** — a
     number per element per timestep cannot be read any other way.
-  - **Still substituted with a reported open pipe: PBV and GPV.** A GPV's behaviour is a head-loss
-    CURVE and a PBV's a fixed pressure drop, and this page has no element for either.
+  - **Two EPANET valve types we do not model are still substituted with a reported open pipe: PBV
+    (pressure-breaker valve — holds a fixed pressure DROP across itself) and GPV (general-purpose
+    valve — its head loss follows a user-supplied CURVE instead of a formula).** We have no element
+    for either, so an imported network containing one solves as if the valve were an open pipe, and
+    says so.
   - **A valve has THREE states in EPANET, not two:** closed, fully open, and ACTIVE. `EN_INITSTATUS =
     OPEN` opens it fully with its setting IGNORED; `EN_INITSETTING` restores active, so status is
     written BEFORE setting. Written the other way a network solves with the valve wide open — exactly
@@ -751,20 +705,6 @@ font-size blindness, attempted twice and reverted twice — read its block befor
   - **Courtesy note to OpenWaterAnalytics before launch**, in the register of
     `dev/outreach-owa-post.md` — a real question, not an announcement. The name is legally safe
     (EPANET is public domain) but names run on community norms, and the note is cheap insurance.
-
-- 40|244| **Standardize the distinguishing term, and put it in the navbar next to the language menu.**
-  Tom, 2026-08-09, on epanet-js labelling itself "Open Source" while shipping FSL. `About.php` is
-  done (heading is now "Free Libre Open Source License", plus a "promise, not a price" paragraph).
-  Open: **the navbar item** — GitHub mark plus a short word, by the language menu.
-  - **"Forever" is out.** Tom, 2026-08-09: *"I don't make promises."* Applies to nav copy generally,
-    not just this item. (He kept "now and forever" inside the About.php license paragraph, where it
-    describes the GPL's effect rather than pledging his own future conduct.)
-  - **"Libre" is back in play.** My objection was that it is insider vocabulary; Tom's counter is
-    LibreOffice, which has normalized the word for a decade. Concede the point. Live candidates:
-    **"Libre Software"**, **"Freely yours"**, **"Community software"**.
-  - The translation caveat still stands and is the tiebreak: "Libre" lands perfectly in
-    es/pt/fr/it/ro and as an opaque loan in am/km/my/ur. "Freely yours" translates everywhere.
-  **[H] Tom picks the navbar wording before this is built.**
 
 - 30|246| **Give `lpn_` a real file identity: `.lpn` extension and standard file-toolbar icons.**
   Tom, 2026-08-09, from the epanet-js UX read. JSON inside, `.lpn` outside; new/open/save/save-as
