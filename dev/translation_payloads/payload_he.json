@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 998,
-        "delta_key_count": 2,
+        "expected_key_count": 999,
+        "delta_key_count": 3,
         "exempt_key_count": 19,
         "exempt_keys": [
             "u_imgd",
@@ -360,11 +360,13 @@
     },
     "keys_to_translate": {
         "lpn_examples_close": "Close",
-        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
+        "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "keys": {
         "lpn_examples_close": "Close",
-        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
+        "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "key_context": {
         "lpn_examples_close": {
@@ -396,6 +398,22 @@
                     "key": "lpn_mode_add_junction",
                     "value": "מצב: הוספת צומת. לחצו על המפה כדי להציב צומת. עברו למצב בחירה כדי לשנות או להזיז אלמנטים ותוויות.",
                     "english": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels."
+                }
+            }
+        },
+        "lpn_engine_minor_loss_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "הערה: עם חספוס Manning,‏ EPANET מחשב אובדן גובה נמוך בכ-0.6% מהפותר המובנה.",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_text_size",
+                    "value": "גודל טקסט (פיקסלים)",
+                    "english": "Text size (pixels)"
                 }
             }
         }

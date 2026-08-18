@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 998,
-        "delta_key_count": 2,
+        "expected_key_count": 999,
+        "delta_key_count": 3,
         "exempt_key_count": 29,
         "exempt_keys": [
             "calc_units_us",
@@ -370,11 +370,13 @@
     },
     "keys_to_translate": {
         "lpn_examples_close": "Close",
-        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
+        "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "keys": {
         "lpn_examples_close": "Close",
-        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
+        "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "key_context": {
         "lpn_examples_close": {
@@ -406,6 +408,22 @@
                     "key": "lpn_mode_add_junction",
                     "value": "Modus: Entnahmeknoten hinzufügen. Klicken Sie auf die Karte, um einen Entnahmeknoten zu platzieren. Wechseln Sie zum Modus Auswählen, um Elemente und Beschriftungen zu ändern oder zu verschieben.",
                     "english": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels."
+                }
+            }
+        },
+        "lpn_engine_minor_loss_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "Hinweis: Bei Manning-Rauheit berechnet EPANET den Druckverlust etwa 0,6 % niedriger als der eingebaute Löser.",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_text_size",
+                    "value": "Textgröße (Pixel)",
+                    "english": "Text size (pixels)"
                 }
             }
         }

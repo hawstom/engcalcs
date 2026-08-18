@@ -104,6 +104,11 @@ $expected = array(
     'bar' => $PA_PER_MH2O / 1e5,
     'psf' => $PA_PER_MH2O / $PSF_PA,
     'psi' => $PA_PER_MH2O / $PSI_PA,
+    // Ordinary, not an exception, since the suite went to standard gravity: 1 kgf/cm^2 is DEFINED
+    // as 98066.5 Pa, which is exactly 10 m of water at g = 9.80665. The Asian field convention
+    // "1 kgf/cm2 = 10 m of water" and the exact definition are now the same number. It was a
+    // 66 ppm deliberate exception under the old g = 9.806 (Task 134).
+    'kgfcm2' => $PA_PER_MH2O / 98066.5,
     // dimensionless ratios
     'grade' => 1.0, 'gradePercent' => 100.0,
     'depthFrac' => 1.0, 'depthPercent' => 100.0,
@@ -120,16 +125,11 @@ $expected = array(
 // Deliberate exceptions: a shipped value that is NOT the exact derivation, on purpose.
 // Each needs a reason a reader can weigh. This list is the only sanctioned way past the check.
 // ---------------------------------------------------------------------------------------------
-$exceptions = array(
-    'kgfcm2' => array(
-        'shipped' => 0.1,
-        'exact'   => $PA_PER_MH2O / 98066.5,   // 1 kgf/cm^2 = 98066.5 Pa exactly
-        'reason'  => 'The unit exists only as the Asian field convention "1 kgf/cm2 = 10 m of '
-                   . 'water"; the round number IS the unit as it is used, and a user reading a '
-                   . '10 m head expects 1.00. Exactly it is 10.00068 m H2O against our g. Task 134.',
-        'max_ppm' => 100,                       // measured 66 ppm; a change beyond this is a bug
-    ),
-);
+// EMPTY, and that is a result rather than an oversight. The one entry it held (kgfcm2) stopped
+// being an exception when the suite adopted standard gravity -- its shipped 0.1 is now the exact
+// derivation, so it is checked like any other factor above. Keep the mechanism: the next deliberate
+// exception should go here with a reason a reader can weigh, not into a widened tolerance.
+$exceptions = array();
 
 // ---------------------------------------------------------------------------------------------
 // Coherence groups: back out the base constant each factor implies. All members must agree.

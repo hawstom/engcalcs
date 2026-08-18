@@ -805,6 +805,7 @@ EngCalcs.pageConfig = {
 	lpn_engine_failed: <?=json_encode($ec_lang['lpn_engine_failed'])?>,
 	lpn_engine_valve_route: <?=json_encode($ec_lang['lpn_engine_valve_route'])?>,
 	lpn_engine_manning_note: <?=json_encode($ec_lang['lpn_engine_manning_note'])?>,
+	lpn_engine_minor_loss_note: <?=json_encode($ec_lang['lpn_engine_minor_loss_note'])?>,
 	lpn_unit_unknown: <?=json_encode($ec_lang['lpn_unit_unknown'])?>,
 	lpn_settings_text_size: <?=json_encode($ec_lang['lpn_settings_text_size'])?>,
 	lpn_settings_symbol_size: <?=json_encode($ec_lang['lpn_settings_symbol_size'])?>,

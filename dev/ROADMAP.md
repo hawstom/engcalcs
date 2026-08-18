@@ -645,26 +645,6 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     `settings.defaults` -- and `docSignature()` covers those. Stamp after the seeding.
   - Written up at the top of `dev/browser-pass/specs/boot.js`. No knowingly-red spec was added.
 
-- 40|419| **[H] Our minor losses are ~0.1% larger than EPANET's, and the reason is the gravity
-  constant.** Tom, 2026-08-17, observing a 0.003 psi spread across Elm Street Center that grows with
-  distance from the source. Measured on one pipe with friction differenced out:
-  - **Hazen-Williams friction is not the problem.** Ours reproduces EPANET's own 4.727 equation to
-    6.7e-16. EPANET's own answer is 1.0e-5 LOW against that equation, from its rounded 28.317 L/s
-    per cfs. Nothing to do.
-  - **The minor loss is.** Implied g: ours 9.806000 (`EngCalcs.G`), EPANET's 9.815822 -- that is
-    32.2 ft/s² (9.81456) plus the same unit rounding. So ours is 0.10% larger per pipe, and Elm
-    Street carries `k = 2` on every pipe, which is why it accumulates with distance.
-  - **This is the Manning situation again** (see `js/lpn-epanet.js`): EPANET's constant is the
-    rounded one. But ours is not the exact one either -- standard gravity is **9.80665**, and 9.806
-    is 0.0066% under it for no reason anyone recorded.
-  - **The decision is Tom's and it is three-way:** leave it and warn as Manning does; correct
-    `EngCalcs.G` to 9.80665 (right, free, suite-wide, and does NOT close the EPANET gap); or adopt
-    32.2 (rejected on the Manning precedent -- it would split this page from Manning-Pipe-Flow and
-    friends, which carry most of the suite's users).
-  - **`validate_epanet.js` cannot currently see this**: `two-loop-minor-losses` passes at 2.89e-4 m
-    against a 2e-3 m absolute tolerance, so a systematic per-pipe bias hides inside it. Whatever is
-    decided, that case wants a RELATIVE bound like the Manning one.
-
 - 25|417| **Long-press on an element should enter Edit mode, exactly as a click does.** Tom,
   2026-08-17. The guard that switches to Edit mode on click does not fire when a long press begins a
   drag, so a touch user who presses and drags is editing an element the page does not think is

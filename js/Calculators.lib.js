@@ -769,9 +769,16 @@ EngCalcs.inlineRangeWarnHtml = function (valueSI, lowSI, highSI, labels) {
 // Standard gravity, in SI, for the whole suite. THE ONLY definition -- do not reintroduce a local
 // `g`. A physical constant that drifts between calculators is a correctness bug showing up as two
 // pages disagreeing about the same pipe, and nothing in the suite would catch it.
-// 9.806 rather than 9.80665: the fourth digit is far below the uncertainty in any n, C or f a user
-// will enter.
-EngCalcs.G = 9.806;
+// STANDARD GRAVITY EXACTLY, 9.80665. It was 9.806 on the argument that the fourth digit is far
+// below the uncertainty in any n, C or f a user enters -- true of the FRICTION terms, and not true
+// of everything g touches. A minor loss is k V^2 / 2g, where g is the whole of the coefficient, so
+// the rounding went straight into the answer: measured 2026-08-17, our minor losses ran 0.10% above
+// EPANET's, which is a bias that accumulates link by link across a network (Tom saw 0.003 psi build
+// up with distance from the source on Elm Street Center). Correcting this does NOT close that gap
+// -- EPANET's own g is 32.2 ft/s^2, i.e. 9.81456, which is the rounded one. It removes OUR rounding,
+// which was ours to remove, and leaves a disagreement that is EPANET's and is declared to the user.
+// lib/Units.lib.php derives every pressure factor from this number; change them in the same edit.
+EngCalcs.G = 9.80665;
 
 // Feet per metre, exactly 1/0.3048. THE ONLY definition -- do not reintroduce a local `ft_per_m`.
 // The international foot is exact by definition, so there is no reason to carry a rounded one: the

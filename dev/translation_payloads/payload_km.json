@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 998,
-        "delta_key_count": 2,
+        "expected_key_count": 999,
+        "delta_key_count": 3,
         "exempt_key_count": 20,
         "exempt_keys": [
             "u_imgd",
@@ -361,11 +361,13 @@
     },
     "keys_to_translate": {
         "lpn_examples_close": "Close",
-        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
+        "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "keys": {
         "lpn_examples_close": "Close",
-        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete."
+        "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
+        "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "key_context": {
         "lpn_examples_close": {
@@ -397,6 +399,22 @@
                     "key": "lpn_mode_add_junction",
                     "value": "របៀប៖ បន្ថែមថ្នាំង។ ចុចលើផែនទីដើម្បីដាក់ថ្នាំងមួយ។ ប្ដូរទៅរបៀបជ្រើសរើសដើម្បីផ្លាស់ប្ដូរ ឬផ្លាស់ទីធាតុ និងស្លាក។",
                     "english": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels."
+                }
+            }
+        },
+        "lpn_engine_minor_loss_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_engine_manning_note",
+                    "value": "ចំណាំ៖ ជាមួយភាពក្រញ៉ោងម៉ាន់នីង EPANET គណនាការបាត់បង់ថ្ពល់ទាបជាងឧបករណ៍ដោះស្រាយដែលភ្ជាប់មកជាមួយប្រហែល ០.៦%។",
+                    "english": "Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver."
+                },
+                "next_translated": {
+                    "key": "lpn_settings_text_size",
+                    "value": "ទំហំអក្សរ (ភិចសែល)",
+                    "english": "Text size (pixels)"
                 }
             }
         }

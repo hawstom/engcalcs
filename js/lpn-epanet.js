@@ -235,6 +235,31 @@
 			warnings.push({ code: 'manning-constant-differs', ids: [] });
 		}
 
+		// MINOR LOSSES ARE THE SECOND DECLARED DISAGREEMENT, and it is the same shape as Manning:
+		// EPANET's constant is the rounded one and we are not adopting it.
+		//
+		// A minor loss is k V^2 / 2g, so g is the whole of the coefficient. EPANET's g is
+		// 32.2 ft/s^2 = 9.81456; ours is standard gravity, 9.80665. Ours are therefore 0.081%
+		// LARGER, per pipe, and it accumulates along a path -- which is how it is noticed: Tom,
+		// 2026-08-17, saw 0.003 psi build up with distance from the source on Elm Street Center,
+		// where every pipe carries k = 2. Measured by differencing two k values on one pipe so
+		// friction cancels (dev/lpn-spike/minor-loss-gravity-harness.js): implied g, ours 9.80665,
+		// EPANET 9.815822 -- 32.2 ft/s^2 plus EPANET's own rounded 28.317 L/s per cfs.
+		//
+		// FRICTION IS NOT AFFECTED and must not be blamed for this: our Hazen-Williams reproduces
+		// EPANET's own 4.727 equation to 6.7e-16, and EPANET's answer is 1.0e-5 LOW against that
+		// equation from the same L/s-per-cfs rounding. Only the minor-loss term carries g.
+		//
+		// Announced only when there is a minor loss to announce, so a network without one says
+		// nothing. `k` is read through the same lpnLinkK() the .inp writer uses, or the note could
+		// claim a difference on a throttle valve whose loss comes from its SETTING instead.
+		for (i = 0; i < model.links.length; i++) {
+			if (EngCalcs.lpnLinkK(model.links[i]) > 0) {
+				warnings.push({ code: 'minor-loss-gravity-differs', ids: [] });
+				break;
+			}
+		}
+
 		var inp = '[TITLE]\nEngCalcs looped network\n\n' +
 			'[JUNCTIONS]\n' + junctions.join('\n') + '\n\n' +
 			'[RESERVOIRS]\n' + reservoirs.join('\n') + '\n\n' +

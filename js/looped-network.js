@@ -14924,8 +14924,14 @@ var EngCalcs = EngCalcs || {};
 		lastSolveResult = result;
 		// The only case where the two engines knowingly disagree, so say so rather than let a
 		// user discover a 0.6% shift by switching the checkbox. See js/lpn-epanet.js.
-		var manningNote = (result.warnings || []).some(function (w) { return w.code === 'manning-constant-differs'; });
-		setStatus([valveRouteNote, manningNote ? (pc.lpn_engine_manning_note || '') : '']
+		function warned(code) {
+			return (result.warnings || []).some(function (w) { return w.code === code; });
+		}
+		var manningNote = warned('manning-constant-differs'),
+			minorNote = warned('minor-loss-gravity-differs');
+		setStatus([valveRouteNote,
+			manningNote ? (pc.lpn_engine_manning_note || '') : '',
+			minorNote ? (pc.lpn_engine_minor_loss_note || '') : '']
 			.filter(function (t) { return !!t; }).join(' '));
 		refreshLabelText();
 		refreshValueColors();

@@ -1902,6 +1902,7 @@ $ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because these
 $ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be given until this page knows that unit, because there is no way to tell how big it is.';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.';
 $ec_lang_syn['lpn_engine_manning_note']='';
+$ec_lang['lpn_engine_minor_loss_note']='Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity.';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big

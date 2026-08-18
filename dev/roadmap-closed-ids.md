@@ -347,3 +347,4 @@ state; this is only a list of numbers that were once used.
 - 0|411| Most-open angle: four fixed corners as a rejection table, polar raster behind them, tolerance on the tester panel
 - 0|414| The dev/browser-pass/ specs run again against the real page: 139/139
 - 0|415| A `selected` property on elements (view state only) and subject-then-verb Delete
+- 0|419| Suite adopted standard gravity 9.80665; minor-loss disagreement with EPANET now declared to the user

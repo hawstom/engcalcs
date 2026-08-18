@@ -246,13 +246,13 @@ define('EC_DEFAULT_UNIT_SET', (isset($clanguage) && $clanguage === 'en') ? 'us' 
  * (ft 3.2808, ft3ps 3.280788, ft3 3.280841, ft2 3.280854); ft3 and ft3ps are the
  * same conversion and were 47 ppm apart.
  *
- * PRESSURE USES THE SUITE'S OWN g, NOT 9.80665. A metre of water column is
- * converted with EngCalcs.G = 9.806 (js/Calculators.lib.js -- the single definition
- * of standard gravity for the whole suite, deliberately 9.806). So pa, kpa, npm2,
- * bar, psf and psi are ALL derived from 1 m H2O = 1000 * 9.806 = 9806 Pa and agree
- * with one another exactly. Do not "correct" these to 9.80665 in isolation: that
- * would put the PHP display factors and the JS physics on two different gravities,
- * which is worse than either constant on its own.
+ * PRESSURE IS DERIVED FROM THE SUITE'S g, WHICH IS STANDARD GRAVITY, 9.80665. A
+ * metre of water column is converted with EngCalcs.G (js/Calculators.lib.js -- the
+ * single definition for the whole suite). So pa, kpa, npm2, bar, psf and psi are ALL
+ * derived from 1 m H2O = 1000 * 9.80665 = 9806.65 Pa and agree with one another
+ * exactly. Never change one of them alone, and never change them without changing
+ * EngCalcs.G in the same edit: that would put the PHP display factors and the JS
+ * physics on two different gravities, which is worse than any single value.
  */
 $ec_units['m']=1;
 $ec_units['mm']=1000;
@@ -291,20 +291,19 @@ $ec_units['mh2o']=1;
 $ec_units['mmh2o']=1000;
 $ec_units['fth2o']=3.280839895013123;           // 1/0.3048
 $ec_units['inh2o']=39.370078740157480;          // 1/0.0254
-// The six below all come from 1 m H2O = 1000 * 9.806 Pa = 9806 Pa exactly.
-$ec_units['pa']=9806;                           // 1000*9.806
-$ec_units['kpa']=9.806;                         // 9806/1000
-$ec_units['npm2']=9806;                         // N/m^2 is Pa
-$ec_units['bar']=0.09806;                       // 9806/1e5
-$ec_units['psf']=204.80256809027017;            // 9806/(4.4482216152605/0.3048^2)
-$ec_units['psi']=1.4222400561824318;            // 9806/(4.4482216152605/0.0254^2)
-// DELIBERATE EXCEPTION, not a rounding slip (Task 134). Exactly, 1 kgf/cm2 =
-// 98066.5 Pa = 10.00068 m H2O against our g, so the exact factor would be
-// 0.099993372. The unit exists ONLY as the Asian field convention "1 kgf/cm2 =
-// 10 m of water", and a user reading a 10 m head expects 1.00 -- so the round
-// number IS the unit as it is used. Cost: 66 ppm against the exact definition,
-// invisible at every digit the suite displays. Named in unit_factor_check.php's
-// exception list with this reason; never widen a tolerance to swallow it.
+// The six below all come from 1 m H2O = 1000 * 9.80665 Pa = 9806.65 Pa exactly.
+$ec_units['pa']=9806.65;                        // 1000*9.80665
+$ec_units['kpa']=9.80665;                       // 9806.65/1000
+$ec_units['npm2']=9806.65;                      // N/m^2 is Pa
+$ec_units['bar']=0.0980665;                     // 9806.65/1e5
+$ec_units['psf']=204.81614362252170;            // 9806.65/(4.4482216152605/0.3048^2)
+$ec_units['psi']=1.4223343307119563;            // 9806.65/(4.4482216152605/0.0254^2)
+// NO LONGER AN EXCEPTION, and 0.1 is now the EXACT factor. 1 kgf/cm2 is defined as
+// 98066.5 Pa, which is 1000 * 9.80665 * 10 -- exactly 10 m of water at standard
+// gravity. So the Asian field convention "1 kgf/cm2 = 10 m of water" and the exact
+// definition are the same number, and the 66 ppm this used to cost (Task 134, when
+// the suite's g was 9.806) is gone. Kept as its own line because the derivation is
+// worth stating, not because it is special.
 $ec_units['kgfcm2']=0.1;
 
 $ec_units['grade']=1;
