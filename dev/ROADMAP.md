@@ -471,38 +471,24 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   the recipe records the ~30 minutes of trial and error, of which the hard part is precise SVG click
   targeting, not GIF assembly. The POC GIFs were never committed.
 - 85|145| **GEOGRAPHIC PROJECTS: a project declares grid or geographic before anything is drawn, the
-  same way it declares units.** Tom, 2026-08-17: *"There's no reason not to dive into this. It's a
-  big task, and we can start now... In a way, geo is just another unit (degrees), but it's of course
-  much more complex than that, and the map is no longer unitless."* This REPLACES the old scope (an
-  isolated Google-Maps mashup window that pulled lengths and elevations in); the mashup is one
-  feature of a geographic project, not the project itself. `bpn_` still has no map phase.
-  - **THE DECLARATION IS AT CREATION AND IS NOT REVERSIBLE BY ACCIDENT** — epanet-js works this way
-    and it is right: every coordinate in the document means something different under the two, so a
-    project that changed its mind mid-drawing would have to reinterpret every node.
-  - **Web Mercator must NOT become the document's coordinate system.** Georeferencing is a property
-    of the backdrop layer; a plan sheet is State Plane, UTM or a site grid.
-  - **Web Mercator distances are not ground distances**: the scale error is `1/cos(latitude)` — ~15%
-    at 40°, ~30% at 50°, unbounded toward the poles. A pipe length read naively off a tiled backdrop
-    is wrong by more than any engineering tolerance, silently, and looks perfectly reasonable. Either
-    correct it or compute geodesically from lat/lng. It is the strongest argument for the standing
-    rule that **`len` is stored and overridable, never derived.**
-  - **Still feasibility-gated on the BASEMAP, not on the idea:** key management, terms of service,
-    cost, and whether the offline PWA promise survives a tile dependency. Decide the provider before
-    building anything that assumes one.
-  - **DONE 2026-08-18, slice 1:** the declaration (File > New, two rows, stored on the project and
-    never a toggle), degrees at every user boundary, a WGS84 geodesic length behind the Auto
-    checkbox, and a home view on the Net3 city. Two things only building it found: the zoom bounds
-    are in the DOCUMENT's units, so a degree-based document needed its own (a grid ceiling opened the
-    map 130 km across), and an empty project has no extent to fit, so it needed a home view at all.
-  - **NEXT: the basemap.** Plain OpenStreetMap raster tiles as one more backdrop layer — no key, no
-    billing, and `<image>` tiles drop into the SVG world layer we already have. Not MapLibre GL,
+  same way it declares units.** Scope, the three places "geo is just another unit" stops holding, and
+  the basemap decision: **`dev/geographic-projects.md`**.
+  - **DONE 2026-08-18, slice 1:** the declaration (two File > New rows, stored on the project, never
+    a toggle), degrees at every user boundary, a WGS84 geodesic length behind the Auto checkbox, and
+    a home view on the Net3 city. Two things only building it found: the zoom bounds are in the
+    DOCUMENT's units, so a degree-based document needs its own (the grid ceiling opened the map
+    130 km across), and an empty project has no extent to fit, so it needed a home view at all.
+  - **NEXT: the basemap — plain OpenStreetMap raster tiles as one more backdrop layer.** No key, no
+    billing, and `<image>` tiles drop into the SVG world layer that already exists. NOT MapLibre GL,
     which is what epanet-js runs: a WebGL vector renderer would fight the SVG world for little gain
-    at our scale. Aerial imagery is the one thing OSM cannot give, and Esri World Imagery behind a
-    key is the second provider if that turns out to matter.
-  - **The display is UNPROJECTED until the tile layer lands**, so a map at 45° looks stretched
-    east-west by 1/cos(lat). Stated rather than hidden: the honest fix is a projection seam at the
-    point coordinates become drawn positions, which is what the tiles need anyway.
-  - Full scope: **`dev/geographic-projects.md`**.
+    at our scale. Aerial imagery is the one thing OSM cannot give; Esri World Imagery behind a key is
+    the second provider if that turns out to matter.
+  - **The display is UNPROJECTED until then**, so a map at 45° looks stretched east-west by
+    1/cos(lat). The honest fix is a projection seam where coordinates become drawn positions, which
+    is what the tiles need anyway.
+  - **Web Mercator must NOT become the document's coordinate system**, and its distances are not
+    ground distances: the scale error is `1/cos(latitude)` — ~15% at 40°, ~30% at 50°. This is the
+    strongest argument for the standing rule that **`len` is stored and overridable, never derived.**
 - 20|221| **Retire the "constants now match EPANET" note (Task 213) — CHECK: 2027-08-01.** Delete
   `<prefix>_notes_epanet_term`/`_def` from `Hazen-Williams.php`, `Branched-Network.php`,
   `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is
