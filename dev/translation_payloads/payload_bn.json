@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1022,
-        "delta_key_count": 26,
+        "expected_key_count": 1026,
+        "delta_key_count": 30,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -387,7 +387,11 @@
         "lpn_find_none": "Nothing matched.",
         "lpn_find_adjacent": "Links here",
         "lpn_find_no_value": "Type what to look for.",
+        "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
+        "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
         "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
+        "lpn_field_lon": "Longitude",
+        "lpn_field_lat": "Latitude",
         "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "keys": {
@@ -415,7 +419,11 @@
         "lpn_find_none": "Nothing matched.",
         "lpn_find_adjacent": "Links here",
         "lpn_find_no_value": "Type what to look for.",
+        "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
+        "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
         "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
+        "lpn_field_lon": "Longitude",
+        "lpn_field_lat": "Latitude",
         "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "key_context": {
@@ -803,6 +811,38 @@
                 }
             }
         },
+        "lpn_new_geo_us": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_blank_si",
+                    "value": "খালি প্রকল্প, SI একক (l\/s)",
+                    "english": "Blank project, SI units (l\/s)"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "খুলুন…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_geo_si": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_blank_si",
+                    "value": "খালি প্রকল্প, SI একক (l\/s)",
+                    "english": "Blank project, SI units (l\/s)"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "খুলুন…",
+                    "english": "Open…"
+                }
+            }
+        },
         "lpn_select_first": {
             "reason": "missing",
             "current_value": null,
@@ -816,6 +856,38 @@
                     "key": "lpn_mode_add_junction",
                     "value": "মোড: সংযোগস্থল যোগ করুন। একটি সংযোগস্থল বসাতে মানচিত্রে ক্লিক করুন। উপাদান ও লেবেল পরিবর্তন বা সরাতে নির্বাচন মোডে যান।",
                     "english": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels."
+                }
+            }
+        },
+        "lpn_field_lon": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_closed_tip",
+                    "value": "এই পাইপটি বন্ধ করুন যাতে এর মধ্য দিয়ে কোনো পানি প্রবাহিত না হতে পারে। পাইপটি মানচিত্রে থেকে যায় এবং তার সব সংখ্যা ধরে রাখে, এবং আপনি যেকোনো সময় এটি আবার খুলতে পারেন।",
+                    "english": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "আকার গুণক",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_field_lat": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_closed_tip",
+                    "value": "এই পাইপটি বন্ধ করুন যাতে এর মধ্য দিয়ে কোনো পানি প্রবাহিত না হতে পারে। পাইপটি মানচিত্রে থেকে যায় এবং তার সব সংখ্যা ধরে রাখে, এবং আপনি যেকোনো সময় এটি আবার খুলতে পারেন।",
+                    "english": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "আকার গুণক",
+                    "english": "Size multiplier"
                 }
             }
         },

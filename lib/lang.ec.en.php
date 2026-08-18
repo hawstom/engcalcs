@@ -1370,6 +1370,11 @@ $ec_lang['lpn_new_blank_us']='Blank project, US units (gpm)';
 $ec_lang['lpn_new_blank_si']='Blank project, SI units (l/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
+// The other half of the same fly-out (Task 145): a project is on a grid or on the world, and it says
+// which when it is made, exactly as it says its units. "On a world map" rather than "geographic" --
+// the plain phrase says what the coordinates ARE to somebody who has never met the word.
+$ec_lang['lpn_new_geo_us']='Blank project on a world map, US units (gpm)';
+$ec_lang['lpn_new_geo_si']='Blank project on a world map, SI units (l/s)';
 $ec_lang['lpn_file_open']='Open…';
 $ec_lang['lpn_file_save']='Save';
 $ec_lang['lpn_file_saveas']='Save as…';
@@ -1734,6 +1739,11 @@ $ec_lang['lpn_field_closed']='Shut';
 $ec_lang['lpn_field_closed_tip']='Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
+// A geographic project's coordinates (Task 145). The SAME two rows as X and Y, in the vocabulary
+// that project uses -- longitude is the x one and latitude the y one, which is the opposite order
+// from the "lat, long" a person says out loud.
+$ec_lang['lpn_field_lon']='Longitude';
+$ec_lang['lpn_field_lat']='Latitude';
 $ec_lang['lpn_field_text_size']='Size multiplier';
 $ec_lang['lpn_field_show_always']='Always show this label';
 $ec_lang['lpn_tool_labels']='Labels';

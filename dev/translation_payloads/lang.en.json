@@ -702,6 +702,8 @@
         "lpn_file_new": "New project…",
         "lpn_new_blank_us": "Blank project, US units (gpm)",
         "lpn_new_blank_si": "Blank project, SI units (l\/s)",
+        "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
+        "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
         "lpn_file_open": "Open…",
         "lpn_file_save": "Save",
         "lpn_file_saveas": "Save as…",
@@ -880,6 +882,8 @@
         "lpn_field_closed_tip": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time.",
         "lpn_field_x": "X",
         "lpn_field_y": "Y",
+        "lpn_field_lon": "Longitude",
+        "lpn_field_lat": "Latitude",
         "lpn_field_text_size": "Size multiplier",
         "lpn_field_show_always": "Always show this label",
         "lpn_tool_labels": "Labels",
@@ -1024,7 +1028,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 1022,
+    "count": 1026,
     "active_prefixes": [
         "about",
         "bpn",

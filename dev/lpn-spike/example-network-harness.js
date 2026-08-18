@@ -737,12 +737,14 @@ console.log('\n--- Settings panel stays in sync ---');
   const labels = byId.lpn_menu_list2.children
     .map(c => (c.children && c.children[1] && c.children[1].textContent) || '')
     .filter(Boolean);
-  // TWO ROWS NOW, NOT FOUR. The "From examples" pair was removed 2026-08-15 (Tom: "Code-drawn:
-  // Remove the feature."), so the fly-out offers a blank project in either unit system and nothing
-  // else. Asserted as an EXACT set rather than as two present-checks: the point of the edit was
-  // that the other two are gone, and a present-check cannot see a row come back.
+  // FOUR ROWS: two axes, both declared by WHICH ROW YOU CLICK -- units (Task 264) and grid-versus-
+  // world-map (Task 145). The "From examples" pair that used to make up the other two was removed
+  // 2026-08-15 (Tom: "Code-drawn: Remove the feature.") and must not come back, which is why this is
+  // an EXACT set rather than four present-checks: a present-check cannot see a row return.
   ok('...carrying the real options, and only those',
-    labels.length === 2 && labels.indexOf(PC.lpn_new_blank_us) >= 0 && labels.indexOf(PC.lpn_new_blank_si) >= 0,
+    labels.length === 4 &&
+    [PC.lpn_new_blank_us, PC.lpn_new_blank_si, PC.lpn_new_geo_us, PC.lpn_new_geo_si]
+      .every(x => labels.indexOf(x) >= 0),
     labels.join(' | '));
   ok('...and the parent list is untouched, so File is still File',
     byId.lpn_menu_list.children.length > 3);

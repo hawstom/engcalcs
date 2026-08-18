@@ -233,14 +233,19 @@ console.log('\n--- one home for the concept ---');
 	// reason unrelated to the thing it guards teaches people to raise the number without looking.
 	const js = fs.readFileSync(ROOT + 'js/looped-network.js', 'utf8')
 		.replace(/^\s*\/\/.*$/gm, '');
-	// Definitions plus call sites. The five boundaries are: the coordinate readout, a node popup's
-	// X and Y, a Text label popup's X and Y, the backdrop's typed target coordinate, and the
-	// backdrop world file. Raising these counts is fine when the new site is a REAL boundary --
-	// what the check is for is a sixth boundary that reads n.x straight out of the document and
-	// reports a number half a million units wrong, which looks perfectly ordinary in a diff.
+	// Definitions plus call sites. The boundaries are: the coordinate readout, a node popup's X and
+	// Y, a Text label popup's X and Y, the backdrop's typed target coordinate, the backdrop world
+	// file, and -- since Task 145 -- linkGeomLength(), where a geographic project's drawn length is
+	// measured on the Earth. Raising these counts is fine when the new site is a REAL boundary; what
+	// the check is for is one more that reads n.x straight out of the document and reports a number
+	// half a million units wrong, which looks perfectly ordinary in a diff.
+	//
+	// **THE GEODESIC ONE IS THE SHARPEST CASE THIS GUARD HAS.** A local-origin document stores small
+	// numbers; a geodesic computed from them would be a distance between two points off the coast of
+	// Africa, at the wrong latitude, and would come back as a plausible pipe length.
 	const count = re => (js.match(re) || []).length;
-	ok('outwardX has one definition and three call sites', count(/outwardX\(/g) === 4, count(/outwardX\(/g));
-	ok('outwardY has one definition and three call sites', count(/outwardY\(/g) === 4, count(/outwardY\(/g));
+	ok('outwardX has one definition and five call sites', count(/outwardX\(/g) === 6, count(/outwardX\(/g));
+	ok('outwardY has one definition and five call sites', count(/outwardY\(/g) === 6, count(/outwardY\(/g));
 	ok('inwardX has one definition and two call sites', count(/inwardX\(/g) === 3, count(/inwardX\(/g));
 	ok('inwardY has one definition and two call sites', count(/inwardY\(/g) === 3, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly

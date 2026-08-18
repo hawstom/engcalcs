@@ -27,6 +27,55 @@ EngCalcs.lpnGeom = (function () {
 		return sum;
 	}
 
+	// ---- GEODESY: a length on the Earth, for a geographic project (ROADMAP Task 145) ------------
+	//
+	// In a geographic project a point is a LONGITUDE and a LATITUDE, so the distance between two of
+	// them is not `hypot(dx, dy)` -- a degree of longitude is not a degree of latitude, and neither
+	// is a metre.
+	//
+	// **WHY NOT HAVERSINE, which is the answer everybody reaches for.** Haversine is exact on a
+	// SPHERE, and the Earth is not one: at 6371 km mean radius it is wrong by up to ~0.5%, which is
+	// 5 m in a kilometre. That is inside nobody's pipe tolerance. What follows instead is the local
+	// radii-of-curvature form on the WGS84 ellipsoid -- the meridional radius M for the north-south
+	// leg and the prime-vertical radius N for the east-west one, both evaluated at the mean latitude
+	// of the two points. It is millimetre-accurate over the few kilometres a water network spans, it
+	// needs no iteration (unlike Vincenty), and it is six lines of arithmetic.
+	//
+	// It degrades over CONTINENTAL distances, where the mean-latitude assumption stops holding. That
+	// is the right trade for this page: a distribution network is a site, and a tool that was exact
+	// across an ocean and slow on every pipe would be the wrong one.
+	//
+	// Returns METRES. The caller converts to the project's length unit -- this file knows no units.
+	var WGS84_A = 6378137;              // semi-major axis, metres (the defining constant)
+	var WGS84_F = 1 / 298.257223563;    // flattening (the other defining constant)
+	var WGS84_E2 = WGS84_F * (2 - WGS84_F);   // first eccentricity squared, derived from them
+	function geodesicMeters(lon1, lat1, lon2, lat2) {
+		var latMid = (lat1 + lat2) / 2 * Math.PI / 180,
+			sinLat = Math.sin(latMid),
+			w = 1 - WGS84_E2 * sinLat * sinLat,
+			// M: how far a metre goes per radian of LATITUDE here. N: per radian of longitude, before
+			// the cos(lat) that shrinks a degree of longitude toward the poles.
+			m = WGS84_A * (1 - WGS84_E2) / Math.pow(w, 1.5),
+			n = WGS84_A / Math.sqrt(w),
+			dLat = (lat2 - lat1) * Math.PI / 180,
+			// **LONGITUDE WRAPS AND LATITUDE DOES NOT.** Two points either side of the 180th meridian
+			// are next to each other, not most of the way round the world. Without this a network
+			// spanning the antimeridian reports pipes 40,000 km long, and every one of its
+			// hydraulics is then wrong in a way that looks like a solver fault.
+			dLon = ((lon2 - lon1 + 540) % 360 - 180) * Math.PI / 180;
+		return Math.hypot(m * dLat, n * Math.cos(latMid) * dLon);
+	}
+	// The same sum polylineLength() makes, leg by leg on the ellipsoid. A polyline's legs are
+	// separately geodesic: summing the straight-line degrees first and converting once would be the
+	// same error the flat formula makes, merely postponed.
+	function geodesicPolylineMeters(pts) {
+		var i, sum = 0;
+		for (i = 0; i < pts.length - 1; i++) {
+			sum += geodesicMeters(pts[i].x, pts[i].y, pts[i + 1].x, pts[i + 1].y);
+		}
+		return sum;
+	}
+
 	// The SVG `points` attribute value for a polyline.
 	function polylinePointsAttr(pts) {
 		var i, out = [];
@@ -417,6 +466,8 @@ EngCalcs.lpnGeom = (function () {
 
 	return {
 		polylineLength: polylineLength,
+		geodesicMeters: geodesicMeters,
+		geodesicPolylineMeters: geodesicPolylineMeters,
 		polylinePointsAttr: polylinePointsAttr,
 		pointAlongPolyline: pointAlongPolyline,
 		segmentAtFraction: segmentAtFraction,

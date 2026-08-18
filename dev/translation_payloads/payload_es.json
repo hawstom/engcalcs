@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 1022,
-        "delta_key_count": 26,
+        "expected_key_count": 1026,
+        "delta_key_count": 30,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -390,7 +390,11 @@
         "lpn_find_none": "Nothing matched.",
         "lpn_find_adjacent": "Links here",
         "lpn_find_no_value": "Type what to look for.",
+        "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
+        "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
         "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
+        "lpn_field_lon": "Longitude",
+        "lpn_field_lat": "Latitude",
         "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "keys": {
@@ -418,7 +422,11 @@
         "lpn_find_none": "Nothing matched.",
         "lpn_find_adjacent": "Links here",
         "lpn_find_no_value": "Type what to look for.",
+        "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
+        "lpn_new_geo_si": "Blank project on a world map, SI units (l\/s)",
         "lpn_select_first": "Nothing is picked. Click an element on the map first, then press Delete.",
+        "lpn_field_lon": "Longitude",
+        "lpn_field_lat": "Latitude",
         "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "key_context": {
@@ -806,6 +814,38 @@
                 }
             }
         },
+        "lpn_new_geo_us": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_blank_si",
+                    "value": "Proyecto en blanco, unidades SI (l\/s)",
+                    "english": "Blank project, SI units (l\/s)"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "Abrir…",
+                    "english": "Open…"
+                }
+            }
+        },
+        "lpn_new_geo_si": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_new_blank_si",
+                    "value": "Proyecto en blanco, unidades SI (l\/s)",
+                    "english": "Blank project, SI units (l\/s)"
+                },
+                "next_translated": {
+                    "key": "lpn_file_open",
+                    "value": "Abrir…",
+                    "english": "Open…"
+                }
+            }
+        },
         "lpn_select_first": {
             "reason": "missing",
             "current_value": null,
@@ -819,6 +859,38 @@
                     "key": "lpn_mode_add_junction",
                     "value": "Modo: Agregar nudo. Haga clic en el mapa para colocar un nudo. Cambie al modo Selección para cambiar o mover elementos y etiquetas.",
                     "english": "Mode: Add Junction. Click the map to place a junction. Switch to Select mode to change or move elements and labels."
+                }
+            }
+        },
+        "lpn_field_lon": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_closed_tip",
+                    "value": "Cierre esta tubería para que no pueda pasar agua por ella. La tubería permanece en el mapa y conserva todos sus valores, y puede abrirla de nuevo en cualquier momento.",
+                    "english": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Multiplicador de tamaño",
+                    "english": "Size multiplier"
+                }
+            }
+        },
+        "lpn_field_lat": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_closed_tip",
+                    "value": "Cierre esta tubería para que no pueda pasar agua por ella. La tubería permanece en el mapa y conserva todos sus valores, y puede abrirla de nuevo en cualquier momento.",
+                    "english": "Shut this pipe so no water can pass through it. The pipe stays on the map and keeps all its numbers, and you can open it again at any time."
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_size",
+                    "value": "Multiplicador de tamaño",
+                    "english": "Size multiplier"
                 }
             }
         },

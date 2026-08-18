@@ -2117,6 +2117,35 @@ var EngCalcs = EngCalcs || {};
 	// A blank name means "not named yet"; the UI renders its own localized "Untitled" for that case
 	// rather than storing an English word in the user's data.
 	var project = { name: '', activeScenario: 'base' };
+	// ---- GRID OR GEOGRAPHIC, DECLARED BEFORE ANYTHING IS DRAWN (ROADMAP Task 145) ---------------
+	//
+	// Tom, 2026-08-17: *"a project has to declare from the start whether it's on grid map or
+	// geographical map, just as it must declare units before drawing anything. In a way, geo is just
+	// another unit (degrees), but it's of course much more complex than that, and the map is no
+	// longer unitless."*
+	//
+	// **IT IS CHOSEN AT CREATION AND IS NOT A TOGGLE.** Every coordinate in the document means
+	// something different under the two: a grid project's x/y are canvas units whose meaning the
+	// user declared (1 unit IS 1 ft or 1 m -- see lengthField()), a geographic project's are a
+	// position on the Earth. A project that changed its mind mid-drawing would have to reinterpret
+	// every node, vertex, label and backdrop registration at once, and there is no correct answer
+	// for what a bare x of 120 becomes. Converting an existing project is a deliberate,
+	// georeferencing operation, never a switch. Full scope: dev/geographic-projects.md.
+	//
+	// **THE CHOICE IS THE MENU ROW, NOT A DIALOG** -- the same ruling File > New's unit rows already
+	// follow: "make the choice the menu item... a dialog confirming it would be asking a question
+	// they just answered."
+	//
+	// Stored as an additive key on the project, ABSENT meaning grid. Old readers ignore it and every
+	// document ever saved is a grid project, so nothing migrates and no version is owed.
+	var LPN_COORDS_GEO = 'geo';
+	function isGeoProject() { return !!project && project.coords === LPN_COORDS_GEO; }
+	// x is a LONGITUDE and y is a LATITUDE, in that order -- the order this page's x/y already run in,
+	// and the opposite of the "lat, long" a person says out loud.
+	// Six decimals is ~0.11 m at the equator and less everywhere else -- finer than any pipe is
+	// placed, and coarse enough to read. Two decimals (readonlyField()'s default) would be ~1.1 km
+	// and would show every node in a site at the same coordinate.
+	function coordText(v) { return isGeoProject() ? v.toFixed(6) : v.toFixed(2); }
 	function baseScenario() {
 		for (var i = 0; i < scenarios.length; i++) { if (scenarios[i].isBase) { return scenarios[i]; } }
 		return scenarios[0];
@@ -3068,8 +3097,22 @@ var EngCalcs = EngCalcs || {};
 	// the CLAUDE.md/scope-doc "len is stored and overridable, never derived" rule calls for:
 	// a real number to start from rather than a blank field, with lenAuto tracking whether the
 	// user has taken control (per the Auto Length design note in the scope doc).
+	// **IN A GEOGRAPHIC PROJECT THE DRAWN LENGTH IS A GEODESIC ONE** (Task 145). hypot() on degrees
+	// is not a distance: a degree of longitude is not a degree of latitude, and neither is a metre.
+	//
+	// This is still only ever an OFFER. `len` is stored and overridable, and this is what the Auto
+	// checkbox fills it with -- the user asked for the drawn length, and on a geographic project the
+	// drawn length is the one on the Earth. Nothing here writes `len` behind their back.
+	//
+	// The result crosses METRES -> the project's length unit, which is a conversion of a DERIVED
+	// value and not of a number anybody typed. Getting that wrong is the silent one: a 1200 ft pipe
+	// would come back as 366 and look like a units bug in the solver.
 	function linkGeomLength(l) {
-		return Geom.polylineLength(linkPointList(l));
+		var pts = linkPointList(l);
+		if (!isGeoProject()) { return Geom.polylineLength(pts); }
+		return Geom.geodesicPolylineMeters(pts.map(function (p) {
+			return { x: outwardX(p.x), y: outwardY(p.y) };
+		})) * unitFactor('lpn_u_length');
 	}
 
 	// ---- one-time DOM build per element + incremental per-frame updates ----
@@ -7007,7 +7050,7 @@ var EngCalcs = EngCalcs || {};
 	// at factory defaults. This is what preserves the behavior Tom set up before the library existed
 	// -- "New" clears the network, not your preferences -- now that preferences live per project.
 	// The workflow it protects is his own: set 8-inch/150/K=2 defaults, then draw.
-	function newProject() {
+	function newProject(coords) {
 		saveToStorage();
 		flushOutgoingFile();
 		var inheritedSettings = JSON.parse(JSON.stringify(settings));
@@ -7019,6 +7062,9 @@ var EngCalcs = EngCalcs || {};
 		nextId = newNextId();
 		scenarios = defaultScenarios();
 		project = { name: name, activeScenario: 'base' };
+		// Only when geographic: an absent key is the grid default, and writing 'grid' explicitly
+		// would put a word in every file that has always meant itself by saying nothing.
+		if (coords === LPN_COORDS_GEO) { project.coords = LPN_COORDS_GEO; }
 		settings = inheritedSettings;
 		labelSettings = inheritedLabels;
 		backdrop = null;
@@ -9601,7 +9647,15 @@ var EngCalcs = EngCalcs || {};
 			// the fly-out is a template list, which is the shape File > New has in every application
 			// that has one.
 			{ icon: 'new', label: pc.lpn_new_blank_us || 'Blank project, US units (gpm)', fn: function () { newBlankProject('us'); } },
-			{ icon: 'new', label: pc.lpn_new_blank_si || 'Blank project, SI units (l/s)', fn: function () { newBlankProject('si'); } }
+			{ icon: 'new', label: pc.lpn_new_blank_si || 'Blank project, SI units (l/s)', fn: function () { newBlankProject('si'); } },
+			// **TWO MORE ROWS, NOT A CHECKBOX ON THE FIRST TWO** (Task 145). Grid-or-geographic is
+			// declared at creation for the same reason units are, so it is declared the same way: by
+			// which row you click. See LPN_COORDS_GEO for why it cannot be a toggle afterwards.
+			{ separator: true },
+			{ icon: 'globe', label: pc.lpn_new_geo_us || 'Blank project on a world map, US units (gpm)',
+				fn: function () { newBlankProject('us', LPN_COORDS_GEO); } },
+			{ icon: 'globe', label: pc.lpn_new_geo_si || 'Blank project on a world map, SI units (l/s)',
+				fn: function () { newBlankProject('si', LPN_COORDS_GEO); } }
 			// **NO "FROM EXAMPLES" ROWS HERE** (Tom, 2026-08-15: *"Code-drawn: Remove the feature."*).
 			// This fly-out used to carry two more rows that built the basic ring main in code. The
 			// GALLERY ships the identical network as two files, with a description and a thumbnail
@@ -9627,16 +9681,16 @@ var EngCalcs = EngCalcs || {};
 	// Blank project, then the units, then whatever content -- and the order is the design. setUnits()
 	// moves the whole strip to the preset and re-enters EngCalcs.pageCalculator; doing it while the
 	// project is still empty means nothing is on screen to be re-rendered against the new units.
-	function newProjectWithUnits(system) {
-		var id = newProject();
+	function newProjectWithUnits(system, coords) {
+		var id = newProject(coords);
 		if (EngCalcs.setUnits) { EngCalcs.setUnits(system); }
 		return id;
 	}
-	function newBlankProject(system) {
+	function newBlankProject(system, coords) {
 		// stampProjectSaved AFTER setUnits: the unit switch is a change like any other and marks the
 		// project dirty, so stamping first would leave a brand-new empty tab wearing an asterisk --
 		// the very defect the baseline exists to remove.
-		stampProjectSaved(newProjectWithUnits(system));
+		stampProjectSaved(newProjectWithUnits(system, coords));
 		renderTabs();
 	}
 	function openFileMenu(anchor) {
@@ -10222,7 +10276,9 @@ var EngCalcs = EngCalcs || {};
 		// would have quietly become a different document to the lock broker. Clearing the canvas is
 		// not the same act as throwing the project away -- that is Close, and it asks first.
 		scenarios = defaultScenarios();
-		project = { name: project.name, docId: project.docId, activeScenario: 'base' };
+		// **`coords` SURVIVES, like the name and the docId.** Emptying the drawing is not a change of
+		// what kind of document this is -- and it is the one property that cannot be re-chosen later.
+		project = { name: project.name, docId: project.docId, coords: project.coords, activeScenario: 'base' };
 		// The backdrop is deliberately NOT removed -- see the note above the function.
 		// saveToStorage(), not removeItem() (fixed 2026-07-30, found while verifying the gear/settings
 		// panel): labelSettings/settings are preferences, not network content, and are meant to survive
@@ -10943,7 +10999,14 @@ var EngCalcs = EngCalcs || {};
 		if (coordsEl) {
 			svg.addEventListener('pointermove', function (e) {
 				var w = screenToWorld(e.clientX, e.clientY);
-				coordsEl.textContent = 'X: ' + outwardX(w.x).toFixed(2) + '  Y: ' + outwardY(w.y).toFixed(2);
+				// **THE READOUT IS WHERE A GEOGRAPHIC PROJECT ANNOUNCES ITSELF** (Task 145). It is
+				// already on screen, already about coordinates, and it costs the user nothing --
+				// which is the whole reason there is no banner and no badge saying the same thing.
+				var pcc = EngCalcs.pageConfig || {};
+				coordsEl.textContent = isGeoProject()
+					? (pcc.lpn_field_lon || 'Longitude') + ': ' + coordText(outwardX(w.x)) +
+						'  ' + (pcc.lpn_field_lat || 'Latitude') + ': ' + coordText(outwardY(w.y))
+					: 'X: ' + coordText(outwardX(w.x)) + '  Y: ' + coordText(outwardY(w.y));
 			});
 		}
 		// Rubber-band line while drawing a pipe/pump (Tom, 2026-07-30) -- tracks the live pointer
@@ -13434,6 +13497,14 @@ var EngCalcs = EngCalcs || {};
 	// Read-only, like EPANET's own property-form coordinate display (Tom) -- also doubles as
 	// the touch answer to "show coordinates of the selected element": the corner tracker
 	// below is hover-driven (PC only), but this field is visible in the popup on any device.
+	// The two coordinate rows every popup shows, in the vocabulary THIS project uses (Task 145).
+	// One function, so a node's popup and a label's popup cannot come to different conclusions about
+	// what x means -- and so a third caller gets it right by not deciding.
+	function coordFields(fields, x, y) {
+		var pc = EngCalcs.pageConfig || {}, geo = isGeoProject();
+		readonlyField(fields, geo ? (pc.lpn_field_lon || 'Longitude') : (pc.lpn_field_x || 'X'), coordText(x));
+		readonlyField(fields, geo ? (pc.lpn_field_lat || 'Latitude') : (pc.lpn_field_y || 'Y'), coordText(y));
+	}
 	function readonlyField(fields, labelText, value, tip) {
 		var label = document.createElement('label'), span = document.createElement('span');
 		span.textContent = typeof value === 'number' ? value.toFixed(2) : value;
@@ -13912,8 +13983,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		activeField(fields, n);
 		pushHereButton(fields, n);
-		readonlyField(fields, pc.lpn_field_x || 'X', outwardX(n.x));
-		readonlyField(fields, pc.lpn_field_y || 'Y', outwardY(n.y));
+		coordFields(fields, outwardX(n.x), outwardY(n.y));
 		tipsIn(fields);
 	}
 	function openPopup(nodeId, sx, sy) {
@@ -14364,8 +14434,7 @@ var EngCalcs = EngCalcs || {};
 		flipBtn.addEventListener('click', function () { setRotation(textLabelRotation(lb) + 180); });
 		fields.appendChild(flipBtn);
 		fields.appendChild(document.createElement('br'));
-		readonlyField(fields, pc.lpn_field_x || 'X', outwardX(an ? an.x + lb.x : lb.x));
-		readonlyField(fields, pc.lpn_field_y || 'Y', outwardY(an ? an.y + lb.y : lb.y));
+		coordFields(fields, outwardX(an ? an.x + lb.x : lb.x), outwardY(an ? an.y + lb.y : lb.y));
 		tipsIn(fields);
 	}
 	function openLabelPopup(labelId, sx, sy) {
