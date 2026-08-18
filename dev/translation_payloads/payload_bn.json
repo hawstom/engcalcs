@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1072,
-        "delta_key_count": 76,
+        "expected_key_count": 1073,
+        "delta_key_count": 77,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -429,6 +429,7 @@
         "lpn_status_inp_exported": "Exported {file}.",
         "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
         "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
+        "lpn_inp_drop_demand_pattern": "These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file's number multiplied by the pattern's first value — the same number EPANET shows at the start of its run.",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -507,6 +508,7 @@
         "lpn_status_inp_exported": "Exported {file}.",
         "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
         "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
+        "lpn_inp_drop_demand_pattern": "These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file's number multiplied by the pattern's first value — the same number EPANET shows at the start of its run.",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -1572,6 +1574,22 @@
                     "key": "lpn_inp_bad_file",
                     "value": "সেই ফাইলটি একটি EPANET নেটওয়ার্ক ফাইল হিসেবে পড়া যায়নি।",
                     "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_inp_drop_demand_pattern": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_patterns",
+                    "value": "চাহিদার প্যাটার্ন বাদ দেওয়া হয়েছে। এই পৃষ্ঠা একটি মুহূর্তের জন্য সমাধান করে, তাই প্রতিটি চাহিদা ফাইলে লেখা সংখ্যাটিই থাকে।",
+                    "english": "Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_emitters",
+                    "value": "এই জাংশনগুলোতে স্প্রিংকলার বা লিক সহগ আছে। এটি রাখা হয়েছে এবং সমাধান করা হচ্ছে, কিন্তু এই পৃষ্ঠায় এখনো এটি দেখা বা পরিবর্তনের কোনো জায়গা নেই।",
+                    "english": "These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet."
                 }
             }
         },

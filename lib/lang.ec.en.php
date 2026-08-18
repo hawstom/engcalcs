@@ -1511,6 +1511,7 @@ $ec_lang['lpn_inp_drop_valve']='These valves are described by a curve or by a fi
 $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.';
 $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
 $ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
+$ec_lang['lpn_inp_drop_demand_pattern']='These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file\'s number multiplied by the pattern\'s first value — the same number EPANET shows at the start of its run.';
 $ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
 $ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
 $ec_lang['lpn_inp_drop_curve_missing']='This pump names a curve that is not in the file. It came in with no curve, so it adds no head.';

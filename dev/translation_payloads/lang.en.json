@@ -780,6 +780,7 @@
         "lpn_inp_drop_cv": "In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.",
         "lpn_inp_drop_demands": "These junctions had more than one demand. The demands were added together into the single demand this page holds.",
         "lpn_inp_drop_patterns": "Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.",
+        "lpn_inp_drop_demand_pattern": "These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file's number multiplied by the pattern's first value — the same number EPANET shows at the start of its run.",
         "lpn_inp_drop_emitters": "These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.",
         "lpn_inp_drop_curve_long": "This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.",
         "lpn_inp_drop_curve_missing": "This pump names a curve that is not in the file. It came in with no curve, so it adds no head.",
@@ -1074,7 +1075,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 1072,
+    "count": 1073,
     "active_prefixes": [
         "about",
         "bpn",

@@ -790,6 +790,7 @@ EngCalcs.pageConfig = {
 	lpn_inp_drop_cv: <?=json_encode($ec_lang['lpn_inp_drop_cv'])?>,
 	lpn_inp_drop_demands: <?=json_encode($ec_lang['lpn_inp_drop_demands'])?>,
 	lpn_inp_drop_patterns: <?=json_encode($ec_lang['lpn_inp_drop_patterns'])?>,
+	lpn_inp_drop_demand_pattern: <?=json_encode($ec_lang['lpn_inp_drop_demand_pattern'])?>,
 	lpn_inp_drop_emitters: <?=json_encode($ec_lang['lpn_inp_drop_emitters'])?>,
 	lpn_inp_drop_curve_long: <?=json_encode($ec_lang['lpn_inp_drop_curve_long'])?>,
 	lpn_inp_drop_curve_missing: <?=json_encode($ec_lang['lpn_inp_drop_curve_missing'])?>,
@@ -993,6 +994,11 @@ EngCalcs.pageConfig = {
 <script src="/engcalcs/js/PipeHydraulics.lib.js?v=<?=filemtime(__DIR__.'/js/PipeHydraulics.lib.js')?>"></script>
 <script src="/engcalcs/js/lpn-solver.js?v=<?=filemtime(__DIR__.'/js/lpn-solver.js')?>"></script>
 <script src="/engcalcs/js/lpn-epanet.js?v=<?=filemtime(__DIR__.'/js/lpn-epanet.js')?>"></script>
+<?php // THE CLOCK LOADS BEFORE THE READER (ROADMAP Task 423). js/lpn-inp.js tests for
+      // EngCalcs.lpnPatternMake and degrades AUDIBLY when it is absent -- reporting
+      // [PATTERNS], [CONTROLS] and [TIMES] as unread -- so the order of these two tags is
+      // the difference between importing a pattern and reporting that one was dropped. ?>
+<script src="/engcalcs/js/lpn-patterns.js?v=<?=filemtime(__DIR__.'/js/lpn-patterns.js')?>"></script>
 <script src="/engcalcs/js/lpn-inp.js?v=<?=filemtime(__DIR__.'/js/lpn-inp.js')?>"></script>
 <script src="/engcalcs/js/lpn-net.js?v=<?=filemtime(__DIR__.'/js/lpn-net.js')?>"></script>
 <?php // The pure geometry/collision halves of the map editor (ROADMAP Task 293) -- must precede

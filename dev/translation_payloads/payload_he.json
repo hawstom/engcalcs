@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "he",
-        "expected_key_count": 1072,
-        "delta_key_count": 76,
+        "expected_key_count": 1073,
+        "delta_key_count": 77,
         "exempt_key_count": 19,
         "exempt_keys": [
             "u_imgd",
@@ -425,6 +425,7 @@
         "lpn_status_inp_exported": "Exported {file}.",
         "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
         "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
+        "lpn_inp_drop_demand_pattern": "These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file's number multiplied by the pattern's first value — the same number EPANET shows at the start of its run.",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -503,6 +504,7 @@
         "lpn_status_inp_exported": "Exported {file}.",
         "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
         "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
+        "lpn_inp_drop_demand_pattern": "These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file's number multiplied by the pattern's first value — the same number EPANET shows at the start of its run.",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -1568,6 +1570,22 @@
                     "key": "lpn_inp_bad_file",
                     "value": "לא ניתן לקרוא קובץ זה כקובץ רשת EPANET.",
                     "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_inp_drop_demand_pattern": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_patterns",
+                    "value": "תבניות דרישה הושמטו. עמוד זה פותר רגע זמן אחד, כך שכל דרישה היא המספר הכתוב בקובץ.",
+                    "english": "Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_emitters",
+                    "value": "לצמתים אלה יש מקדם ממטיר או דליפה. הוא נשמר והוא נפתר, אך אין עדיין מקום בעמוד זה לראות אותו או לשנות אותו.",
+                    "english": "These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet."
                 }
             }
         },

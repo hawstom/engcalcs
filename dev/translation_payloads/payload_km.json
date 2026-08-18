@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "km",
-        "expected_key_count": 1072,
-        "delta_key_count": 76,
+        "expected_key_count": 1073,
+        "delta_key_count": 77,
         "exempt_key_count": 20,
         "exempt_keys": [
             "u_imgd",
@@ -426,6 +426,7 @@
         "lpn_status_inp_exported": "Exported {file}.",
         "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
         "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
+        "lpn_inp_drop_demand_pattern": "These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file's number multiplied by the pattern's first value — the same number EPANET shows at the start of its run.",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -504,6 +505,7 @@
         "lpn_status_inp_exported": "Exported {file}.",
         "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
         "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
+        "lpn_inp_drop_demand_pattern": "These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file's number multiplied by the pattern's first value — the same number EPANET shows at the start of its run.",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -1569,6 +1571,22 @@
                     "key": "lpn_inp_bad_file",
                     "value": "ឯកសារនោះមិនអាចអានជាឯកសារបណ្ដាញ EPANET បានទេ។",
                     "english": "That file could not be read as an EPANET network file."
+                }
+            }
+        },
+        "lpn_inp_drop_demand_pattern": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_inp_drop_patterns",
+                    "value": "លំនាំតម្រូវការត្រូវបានលុបចោល។ ទំព័រនេះដោះស្រាយពេលវេលាមួយប៉ុណ្ណោះ ដូច្នេះតម្រូវការនីមួយៗគឺជាលេខដែលសរសេរនៅក្នុងឯកសារ។",
+                    "english": "Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file."
+                },
+                "next_translated": {
+                    "key": "lpn_inp_drop_emitters",
+                    "value": "ថ្នាំងទាំងនេះមានមេគុណលិចទឹក ឬកន្លែងលេច។ វាត្រូវបានរក្សាទុក និងកំពុងត្រូវបានដោះស្រាយ ប៉ុន្តែនៅឡើយគ្មានកន្លែងនៅលើទំព័រនេះដើម្បីមើល ឬផ្លាស់ប្ដូរវាទេ។",
+                    "english": "These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet."
                 }
             }
         },

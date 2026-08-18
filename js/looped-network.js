@@ -6377,6 +6377,10 @@ var EngCalcs = EngCalcs || {};
 			// whose reader has to guess -- and the guess is only right until somebody hand-edits one.
 			origin: docOrigin(),
 			labelSettings: labelSettings, backdrop: backdrop, settings: settings,
+			// The clock (Task 423). Saved with the drawing because it is part of the model, not a
+			// preference: a project whose demands vary over the day means nothing without them.
+			patterns: doc.patterns || [], defaultPattern: doc.defaultPattern || null,
+			times: doc.times || null, controls: doc.controls || [],
 			// Where the reader was looking. Not a reason to SAVE -- panning marks nothing dirty --
 			// but it rides along whenever something else does, so a file reopens where it was left.
 			view: currentView(),
@@ -6679,6 +6683,12 @@ var EngCalcs = EngCalcs || {};
 		baseScenario().overrides = {}; // Base is canon and has no overrides, by definition
 		if (!scenarios.some(function (s) { return s.id === project.activeScenario; })) { project.activeScenario = baseScenario().id; }
 		doc.nodes = saved.nodes || []; doc.links = saved.links || []; doc.labels = saved.labels || [];
+		// The clock (Task 423). A file written before this existed has none and behaves exactly as
+		// it always did -- an empty pattern list resolves to a multiplier of 1 everywhere.
+		doc.patterns = saved.patterns || [];
+		doc.defaultPattern = saved.defaultPattern || null;
+		doc.times = saved.times || null;
+		doc.controls = saved.controls || [];
 		dropStoredPumpFit(doc.links);
 		// Task 354. Not flipped by flipStoredY() above and must not be: the origin is stated in the
 		// FILE's Cartesian frame and outwardY()/inwardY() are written for exactly that -- flipping it
@@ -7433,6 +7443,12 @@ var EngCalcs = EngCalcs || {};
 			// and never shown -- nothing in the UI edits an emitter yet, which is why the import
 			// report names every junction that has one.
 			if (n.emitter) { j._emitter = n.emitter; }   // base-write: import builds Base: an .inp arrives as one network with no scenarios
+			// **THE FILE'S OWN COLUMN, AND ONLY THAT** (Task 423). `null` means the column was blank,
+			// which is NOT "no pattern" -- [OPTIONS] Pattern applies instead, and the resolution
+			// `n.demandPattern || doc.defaultPattern` happens at the solve. Writing the default onto
+			// the junction here would put a name the file never wrote at this row into a field
+			// labelled as the file's.
+			if (n.demandPattern) { j.demandPattern = n.demandPattern; }
 			return carryInpTokens(n, j, LPN_INP_TOK_JUNCTION);
 		});
 		var links = parsed.links.map(function (l) {
@@ -7539,6 +7555,17 @@ var EngCalcs = EngCalcs || {};
 			// is in feet, metres or State Plane coordinates. A plausible estimate is the most
 			// expensive kind of workaround: it works well enough that nobody looks for the cause.
 			settings: JSON.parse(JSON.stringify(settings)),
+			// THE CLOCK, CARRIED WHOLE (Task 423). js/lpn-patterns.js has already turned every time
+			// into seconds and every control into a record; nothing is reinterpreted here. Empty
+			// array and null are the states a file that states none produces, so no reader has to
+			// test for absence.
+			patterns: parsed.patterns || [],
+			// [OPTIONS] Pattern -- the default demand pattern for every junction whose own column is
+			// blank. Net3 names `Pattern 1`, and ignoring this line leaves nearly every junction 34%
+			// low with every number on screen looking reasonable.
+			defaultPattern: parsed.defaultPattern || null,
+			times: parsed.times || null,
+			controls: parsed.controls || [],
 			units: readUnitSelections()
 		});
 	}
@@ -7565,7 +7592,10 @@ var EngCalcs = EngCalcs || {};
 			case 'gpv-curve-missing': return pc.lpn_inp_drop_gpv_curve || 'This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
 			case 'check-valve': return pc.lpn_inp_drop_cv || 'These pipes only let water flow one way in EPANET. They came in as ordinary pipes, so water may now flow either way through them.';
 			case 'demand-categories': return pc.lpn_inp_drop_demands || 'These junctions had more than one demand. The demands were added together into the one demand this page holds.';
-			case 'demand-pattern':
+			// A DEMAND PATTERN IS NOW APPLIED at the one moment this page solves (Task 423), so it
+			// is no longer the same report as a head pattern, which still is not. It stays in the
+			// report because the rest of the day still does not run.
+			case 'demand-pattern': return pc.lpn_inp_drop_demand_pattern || 'These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file\'s number multiplied by the pattern\'s first value — the same number EPANET shows at the start of its run.';
 			case 'head-pattern':
 			case 'patterns': return pc.lpn_inp_drop_patterns || 'Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
 			case 'emitters-not-editable': return pc.lpn_inp_drop_emitters || 'These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see or change it yet.';
@@ -14482,6 +14512,29 @@ var EngCalcs = EngCalcs || {};
 	// own diagnostics exist to complain about -- and a "delete this node" in a scenario would report
 	// an error instead of doing what it said.
 	function isActive(el) { return effective(el, 'active') !== false; }
+	// **THE MOMENT THIS PAGE SOLVES** (Task 423). Zero -- the start of the run -- and written as a
+	// function rather than a literal so that Task 248's clock has ONE place to become real. EPANET
+	// itself reports t=0 as a hydraulic result like any other, so a steady-state page and an
+	// extended-period one agree here by construction rather than by coincidence.
+	function modelTimeSeconds() { return 0; }
+
+	// The multiplier a junction's demand carries at `t`, resolved the way EPANET resolves it.
+	//
+	// **A BLANK PATTERN COLUMN IS NOT "NO PATTERN"** -- it is [OPTIONS] Pattern, which is why the
+	// resolution is `n.demandPattern || doc.defaultPattern` and why the default is deliberately not
+	// stored on the junction (see docFromInp). Net3 names `Pattern 1` there, and skipping the line
+	// leaves nearly every junction 34% low with every number on screen looking reasonable.
+	//
+	// Returns 1 for every way of having no answer, so a hand-drawn network, a pre-Task-423 saved
+	// file and a page whose js/lpn-patterns.js failed to load all behave exactly as they did before.
+	function demandMultiplier(n, t) {
+		if (!EngCalcs.lpnPatternById || !doc.patterns || !doc.patterns.length) { return 1; }
+		var pat = EngCalcs.lpnPatternById(doc.patterns, n.demandPattern || doc.defaultPattern);
+		if (!pat) { return 1; }
+		var times = doc.times || EngCalcs.lpnTimesDefaults();
+		return EngCalcs.lpnPatternValue(pat, t, times.patternStep, times.patternStart);
+	}
+
 	function assembleModel() {
 		var live = {};
 		doc.nodes.forEach(function (n) { if (isActive(n)) { live[n.id] = true; } });
@@ -14508,7 +14561,11 @@ var EngCalcs = EngCalcs || {};
 				// reservoirHead()). Copying rather than filling the blank in keeps the document's
 				// "still following elevation" state intact.
 				? { id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'), head: toSI(reservoirHead(n), 'lpn_u_elevhead') }
-				: { id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'), demand: toSI(effective(n, 'demand') || 0, 'lpn_u_flow'), emitter: effective(n, 'emitter') };
+				// **THE MULTIPLIER GOES ON HERE, NOT ON THE DOCUMENT** (Task 423). A pattern scales
+				// the demand the user typed; it never replaces it. Doing it at this boundary is the
+				// same rule every unit conversion on this page follows -- the document holds what
+				// was stated, and the solver is handed what it needs.
+				: { id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'), demand: toSI((effective(n, 'demand') || 0) * demandMultiplier(n, modelTimeSeconds()), 'lpn_u_flow'), emitter: effective(n, 'emitter') };
 		});
 		// Both halves of this line are load-bearing and arrived from different worktrees on the
 		// same day. The FILTER is Task 184: an inactive element, or a link whose end is inactive,
