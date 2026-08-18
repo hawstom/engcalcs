@@ -136,6 +136,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   be) or debt to delete; only Tom can say which. Recorded so far only inside closed Task 290, where
   nothing re-scans it.
 
+- 65|438| **The next sprint: resync the drifted English and translate 2026-08-18's new keys.** Needs
+  Tom's explicit authorization before launch — a sprint is 26 paid agents, 20 concurrent.
+  - **What is in it:** Task 405's four resync keys; `menu_more` ("More" → "Help"); the four GeoMap/XY
+    re-wordings (`lpn_new_geo_us/si`, `lpn_new_blank_us/si`); and roughly thirty new keys from the
+    placement tool, Go-to-coordinate, clean map, the `.inp` clock and the share affordance.
+  - **Gate: the adversarial Wave 0 over the NEW and CHANGED strings only** —
+    `dev/english-friction/438-wave0.json`. `friction_check.php --sprint=438` must exit 0, along with
+    `gloss_ref_check.php` and `generate_translation_payloads.php --check`.
+  - Close it with `detect_english_drift.php --baseline-new`, or the new keys stay `NEW` forever.
+
 - 60|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
   English pass asking *"list every plausible reading; more than one means rewrite"*, both waves
@@ -148,9 +158,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     be a different QUESTION, not more diligence.
   - **`refer-to-human` deliberately does NOT close the gate.** Escalating is not resolving, and an
     escalation that silently closed would rebuild the exact hole this replaces.
-  - **OPEN — run the adversarial Wave 0 over all 226 `lpn_` keys.** Task 193 already reviewed them,
-    so whatever this finds *on top of* a completed review is a direct measurement of the yield, and
-    tells Tom whether the pass earns a permanent place. Tom: *"I lean to yes, but let's try it."*
+  - **DONE, and the yield is measured.** `dev/english-friction/239-wave0-lpn.json`: run over all 225
+    `lpn_` strings AFTER Task 193 had reviewed the same keys and rewritten 51, it found **36 more —
+    6 high, 22 medium, 8 low — and 26 English strings were rewritten.** That is the number Tom asked
+    for ("I lean to yes, but let's try it"): falsification finds a further 16% of the key set on top
+    of a completed review. It earns its permanent place.
   - **OPEN — add the suggestion-box instruction to the standard agent prompt template**, so it is not
     re-typed per sprint and cannot be forgotten.
 - 30|234| **Canal Seepage must prove its worth or go (Tom, 2026-08-08: "in my crosshairs").** After
