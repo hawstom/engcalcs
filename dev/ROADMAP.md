@@ -573,6 +573,26 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     2026-08-17: *"epanetjs has a great Google Maps path concept. It chokes at the last steps because
     they don't truncate their profile bottom/min_value."* A profile whose axis starts at zero throws
     away almost all of the relief that the drawing exists to show.
+- 70|423| **WIRE THE PATTERN MODEL IN: the reading is built and nothing consumes it.** `js/lpn-patterns.js`
+  and the `.inp` reader landed 2026-08-18 (Tasks 248.01/02/03 data model). Three edits make Net3
+  match EPANET at t=0, and none of them could be made in the same pass because another track owned
+  the files.
+  - `Looped-Network.php`: a `<script src="js/lpn-patterns.js?v=<?=filemtime()?>">` tag **before**
+    `lpn-inp.js`. Without it the importer degrades to the old report, deliberately and audibly.
+  - `js/looped-network.js`: `docFromInp()` carries `parsed.patterns`, `parsed.defaultPattern`,
+    `parsed.times` and `parsed.controls` onto the document; `assembleModel()` multiplies each
+    junction's demand by its multiplier at the chosen time.
+  - **`[OPTIONS] Pattern` IS THE DEFAULT DEMAND PATTERN, and resolving without it is the trap.** A
+    junction with a blank pattern column does not have "no pattern" — it has that one. Net3 names
+    `Pattern 1`, so ignoring it leaves nearly every junction 34% low with every number on screen
+    looking reasonable. Resolve as `node.demandPattern || parsed.defaultPattern`, and do NOT write it
+    onto the junction: the file never stated it there.
+  - Measured, against the engine: with patterns and that default applied, EPANET's own t=0 demand at
+    all 92 Net3 junctions equals base × the resolved multiplier, worst error under 1e-4 gpm.
+  - `demand-pattern` and `extended-period` stay in the drop report until a run consumes them —
+    removing `extended-period` early turns `validate_inp.js` red, because it would compare our
+    unpatterned t=0 against EPANET's patterned one.
+
 - 45|248.01| **Time settings (Task 248 child) — the smallest of the four and the one everything else
   reads.** Duration, hydraulic time step, pattern time step, pattern start time, report time step,
   start clock time. EPANET's `[TIMES]`, which the importer already reports as dropped.
