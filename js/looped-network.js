@@ -671,7 +671,15 @@ var EngCalcs = EngCalcs || {};
 			// returned here "because it is hidden anyway", which had it backwards: a label that does
 			// not fit is the one with the most to gain from shedding, and skipping it is how a
 			// cascade turns back into the all-or-nothing hide it replaced.
-			var all = le.allLines || le.lines, order = shedOrder(all),
+			// **A LABEL WITH NO LINES HAS NOTHING TO SHED.** `lines` is written by renderLinkLabel(),
+			// which never runs for a link whose label fields are all switched off -- the shipped
+			// default for links -- so `all` was undefined and shedOrder() threw on `lines.length`.
+			// It needed a long pipe (two or more repeat stations) with link labels off to reach,
+			// which is why it stood: the dev test grid is the first thing to draw a hundred of them
+			// in a browser pass. Found 2026-08-18 by the Find spec, not by the code it was testing.
+			var all = le.allLines || le.lines;
+			if (!all || !all.length || !le.lines) { return; }
+			var order = shedOrder(all),
 				gone = all.length - le.lines.length;
 			function boxNow() {
 				return stationedLabelBox(l, le, le.alignedAlong === undefined ? 0.5 : le.alignedAlong,
@@ -5358,7 +5366,7 @@ var EngCalcs = EngCalcs || {};
 	// **READ-ONLY BY CONSTRUCTION.** It selects and it moves the view; nothing below writes an
 	// element. Task 389 (search and replace) is this query plus a write, and its write goes through
 	// setProp() -- which is why the query half is worth shipping on its own first.
-	var findState = { scope: 'all', prop: 'id', op: 'contains', value: '' };
+	var findState = { scope: 'all', prop: 'id', op: 'contains', value: '', limit: 10 };
 	var findResults = [];
 	// Scope names REUSE the Insert tools' labels (CLAUDE.md's concept-level reuse): a junction is a
 	// Junction in both places, and re-keying seven plurals would buy nothing but 182 translations.
@@ -5474,7 +5482,29 @@ var EngCalcs = EngCalcs || {};
 			if (findState.op === 'gt' && val > num) { out.push(c); }
 			if (findState.op === 'lt' && val < num) { out.push(c); }
 		});
-		return out;
+		return findSortMatches(out);
+	}
+	// **THE MOST INTERESTING MATCH IS AT THE TOP** (Tom, 2026-08-18). A query with a RANGE of answers
+	// has an interesting end and a dull one, and which end is which is decided by the condition the
+	// user chose: "greater than 8" is really a question about the biggest, and "less than 2 ft/s"
+	// about the smallest. Sorting the other way would put the answer nearest the threshold first --
+	// the least remarkable pipe in the set.
+	//
+	// A text query has no range, so it keeps ID order, which is the order a person scans a list in.
+	// Ties break on id so the order is TOTAL and stable: an unstable sort rearranges the list between
+	// two identical searches, which reads as the tool being unreliable.
+	function findSortMatches(list) {
+		var desc = findState.op === 'gt', asc = findState.op === 'lt', prop = findState.prop;
+		return list.sort(function (a, b) {
+			var va, vb;
+			if (desc || asc) {
+				va = findValueOf(a, prop); vb = findValueOf(b, prop);
+				if (typeof va === 'number' && typeof vb === 'number' && va !== vb) {
+					return desc ? vb - va : va - vb;
+				}
+			}
+			return a.el.id < b.el.id ? -1 : (a.el.id > b.el.id ? 1 : 0);
+		});
 	}
 	// Where the map has to go to show this element. A link has no point of its own, so it is the
 	// midpoint of its ends -- good enough to put a pipe on screen, and it needs no vertex walk.
@@ -5489,6 +5519,52 @@ var EngCalcs = EngCalcs || {};
 		lb = cand.el; an = lb.anchorNode ? nodeById(lb.anchorNode) : null;
 		return an ? { x: an.x + lb.x, y: an.y + lb.y } : { x: lb.x, y: lb.y };
 	}
+	// **HOW MUCH OF THE DRAWING A RESULT NEEDS AROUND IT** (Tom, 2026-08-18: *"something like twice
+	// the average distance to its linked nodes"*). A node on its own is a dot: arriving at it from
+	// across a large network and stopping shows you a dot, and you still have to find your bearings
+	// by hand. Twice the average reach of its own pipes puts the node in the middle of its own
+	// neighbourhood, which is what a person means by "show me J412".
+	//
+	// A link's own length is the same measure for it. A Text label borrows its anchor node's, and a
+	// free-floating one has no neighbourhood at all -- so it returns 0, which means "leave the zoom
+	// alone" rather than inventing a distance.
+	function findContextLength(group, el) {
+		var ids, i, other, sum = 0, n = 0, a, b;
+		if (group === 'node') {
+			ids = incidentLinks[el.id] || [];
+			for (i = 0; i < ids.length; i++) {
+				var l = linkById(ids[i]);
+				if (!l) { continue; }
+				other = nodeById(l.from === el.id ? l.to : l.from);
+				if (!other) { continue; }
+				sum += Math.hypot(other.x - el.x, other.y - el.y); n++;
+			}
+			return n ? 2 * sum / n : 0;
+		}
+		if (group === 'link') {
+			a = nodeById(el.from); b = nodeById(el.to);
+			return (a && b) ? 2 * Math.hypot(b.x - a.x, b.y - a.y) : 0;
+		}
+		return el.anchorNode ? findContextLength('node', nodeById(el.anchorNode) || el) : 0;
+	}
+	// **A MINIMUM APPARENT SIZE, NOT A CHOSEN ZOOM.** Tom asked for a "shown length (min?)" and the
+	// question mark is the design: this only ever zooms IN. Somebody already looking closely at one
+	// pipe has set that zoom deliberately, and yanking them out to frame a result they can already
+	// see would be the tool overruling them. Zoomed far out, though, panning alone delivers a dot,
+	// so the floor is real.
+	//
+	// Half the shorter side of the window: the neighbourhood fills the middle of the view with room
+	// around it, rather than touching the edges where the toolbar and the status line live.
+	var FIND_CONTEXT_FRAC = 0.5;
+	function findScaleFor(group, el, v) {
+		var len = findContextLength(group, el),
+			w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0,
+			want;
+		if (!(len > 0) || !w || !h) { return v.s; }
+		want = Math.min(w, h) * FIND_CONTEXT_FRAC / len;
+		return want > v.s ? want : v.s;
+	}
 	// **A RESULT IS RE-RESOLVED BY ID, NEVER FOLLOWED BY REFERENCE.** The panel stays open across
 	// edits, an undo, and a project switch; a stored element object outlives all three and would
 	// pan the map to a node that no longer exists.
@@ -5498,10 +5574,7 @@ var EngCalcs = EngCalcs || {};
 		setSelection(group, id);
 		p = findPointOf({ group: group, el: el });
 		v = currentView();
-		// THE ZOOM IS LEFT ALONE, deliberately: a Find that also chose a scale would throw away the
-		// zoom the user set to read the drawing they are working on. It pans, and the selection mark
-		// says which one it is.
-		if (p && v) { applyView({ cx: p.x, cy: p.y, s: v.s }); }
+		if (p && v) { applyView({ cx: p.x, cy: p.y, s: findScaleFor(group, el, v) }); }
 	}
 	function findFmt(v) {
 		if (typeof v !== 'number') { return String(v); }
@@ -5564,6 +5637,31 @@ var EngCalcs = EngCalcs || {};
 		valLab.appendChild(input);
 		valWrap.appendChild(valLab);
 		box.appendChild(valWrap);
+		// **HOW MANY TO LIST AT EACH END** (Tom, 2026-08-18: "top and bottom 10 (or n as entered)").
+		// A condition on a value can match most of the network, and a list of 300 answers a question
+		// nobody asked. The two ENDS are what a range query is about -- the biggest and the smallest
+		// -- so both are shown and the middle is counted rather than printed.
+		var limWrap = document.createElement('div'), limLab = document.createElement('label'),
+			limInput = document.createElement('input');
+		limWrap.style.margin = '4px 0';
+		limLab.textContent = pc.lpn_find_limit || 'How many to list at each end';
+		limLab.style.display = 'block';
+		limInput.type = 'number';
+		limInput.min = '1';
+		limInput.step = '1';
+		limInput.value = findState.limit;
+		limInput.style.width = '5em';
+		limInput.addEventListener('change', function () {
+			var n = parseInt(limInput.value, 10);
+			// A bad number falls back rather than emptying the list: 0 or -3 "at each end" would
+			// show nothing at all, which reads as the search having failed.
+			findState.limit = (isFinite(n) && n > 0) ? n : 10;
+			limInput.value = findState.limit;
+			renderFindResults(null);
+		});
+		limLab.appendChild(limInput);
+		limWrap.appendChild(limLab);
+		box.appendChild(limWrap);
 		btn = document.createElement('button');
 		btn.type = 'button';
 		setLabel(btn, 'find', pc.lpn_find_button || 'Find');
@@ -5583,6 +5681,28 @@ var EngCalcs = EngCalcs || {};
 		// is EPANET's Map Finder with an extra step -- and an exact ID lookup is the commonest thing
 		// this panel will ever be asked to do.
 		if (findResults.length === 1) { findGoTo(findResults[0].group, findResults[0].el.id); }
+	}
+	// One result, as a row you can click. Extracted so the top of the range and the bottom of it are
+	// built by the same code -- two copies would be two chances for one end to stop being clickable.
+	function findResultRow(c) {
+		var pc = EngCalcs.pageConfig || {}, row = document.createElement('button'),
+			val = findValueOf(c, findState.prop), adj;
+		row.type = 'button';
+		row.style.display = 'block';
+		row.style.width = '100%';
+		row.style.textAlign = 'left';
+		row.textContent = c.el.id + (findState.prop === 'id' ? '' : '  ' + findFmt(val));
+		// The Map Finder's "Adjacent Links" pane, said in one line under the node it belongs to:
+		// finding a junction and immediately wanting to know what meets there is the whole reason
+		// EPANET's dialog has that box.
+		if (c.group === 'node') {
+			adj = incidentLinks[c.el.id] || [];
+			if (adj.length) {
+				row.textContent += '  · ' + (pc.lpn_find_adjacent || 'Links here') + ': ' + adj.join(', ');
+			}
+		}
+		row.addEventListener('click', function () { findGoTo(c.group, c.el.id); });
+		return row;
 	}
 	function renderFindResults(message) {
 		var pc = EngCalcs.pageConfig || {}, box = document.getElementById('lpn_find_results'), head;
@@ -5605,25 +5725,27 @@ var EngCalcs = EngCalcs || {};
 		// bar either way, and Task 146.04's report tables are where a long list belongs.
 		list.style.maxHeight = '14em';
 		list.style.overflowY = 'auto';
-		findResults.forEach(function (c) {
-			var row = document.createElement('button'), val = findValueOf(c, findState.prop), adj;
-			row.type = 'button';
-			row.style.display = 'block';
-			row.style.width = '100%';
-			row.style.textAlign = 'left';
-			row.textContent = c.el.id + (findState.prop === 'id' ? '' : '  ' + findFmt(val));
-			// The Map Finder's "Adjacent Links" pane, said in one line under the node it belongs to:
-			// finding a junction and immediately wanting to know what meets there is the whole
-			// reason EPANET's dialog has that box.
-			if (c.group === 'node') {
-				adj = incidentLinks[c.el.id] || [];
-				if (adj.length) {
-					row.textContent += '  · ' + (pc.lpn_find_adjacent || 'Links here') + ': ' + adj.join(', ');
-				}
-			}
-			row.addEventListener('click', function () { findGoTo(c.group, c.el.id); });
-			list.appendChild(row);
-		});
+		// THE TWO ENDS, AND A COUNT OF WHAT IS BETWEEN THEM. The list is already sorted most
+		// interesting first (findSortMatches), so "the first n and the last n" IS the top and bottom
+		// of the range. Only split when there is genuinely a middle to hide -- with 2n or fewer
+		// matches the whole list is shown and no gap row appears.
+		var lim = findState.limit > 0 ? findState.limit : 10, shown = findResults, hidden = 0;
+		if (findResults.length > 2 * lim) {
+			shown = findResults.slice(0, lim);
+			hidden = findResults.length - 2 * lim;
+		}
+		shown.forEach(function (c) { list.appendChild(findResultRow(c)); });
+		if (hidden) {
+			var gap = document.createElement('div');
+			gap.style.opacity = '.7';
+			gap.style.margin = '2px 0';
+			gap.textContent = String(pc.lpn_find_middle || '{n} more between these, not listed.')
+				.replace('{n}', String(hidden));
+			list.appendChild(gap);
+			findResults.slice(findResults.length - lim).forEach(function (c) {
+				list.appendChild(findResultRow(c));
+			});
+		}
 		box.appendChild(list);
 	}
 	// `anchorEl` is the CONTROL to hang the panel under -- the menu-bar item, passed in by the row

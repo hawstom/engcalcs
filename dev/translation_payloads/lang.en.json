@@ -693,6 +693,8 @@
         "lpn_find_op_lt": "is less than",
         "lpn_find_count": "{n} found. Click one to go to it.",
         "lpn_find_none": "Nothing matched.",
+        "lpn_find_limit": "How many to list at each end",
+        "lpn_find_middle": "{n} more between these, not listed.",
         "lpn_find_adjacent": "Links here",
         "lpn_find_no_value": "Type what to look for.",
         "lpn_view_units": "Units",
@@ -1035,7 +1037,7 @@
         "lpn_settings_wipe_btn": "Erase everything on this page",
         "lpn_confirm_wipe": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
     },
-    "count": 1033,
+    "count": 1035,
     "active_prefixes": [
         "about",
         "bpn",

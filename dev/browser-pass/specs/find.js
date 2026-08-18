@@ -15,6 +15,7 @@
 
 const { Session } = require('../lib/session');
 
+
 exports.title = '10. Find';
 
 exports.run = async function ({ browser, report }) {
@@ -136,6 +137,48 @@ exports.run = async function ({ browser, report }) {
 			return p.querySelector('#lpn_find_results').textContent.trim();
 		});
 		report.eq(missed, '', 'a search that matches nothing leaves the list empty');
+
+		// **THE TWO ENDS OF A LONG ANSWER, AND A COUNT OF THE MIDDLE** (Tom, 2026-08-18). Checked in
+		// a browser rather than in the harness because what is being verified is what a person SEES:
+		// two ends, a counted gap between them, and both ends still clickable.
+		//
+		// The network comes from the dev-only "Draw large test network" row, which is the only way to
+		// get a hundred pipes onto this page without a hundred clicks.
+		await a.menuClick('[dev] Draw large test network', 'insert');
+		await a.settle(500);
+		await a.menuClick('Find', 'edit');
+		{
+			const listed = await a.page.evaluate(() => {
+				const p = document.getElementById('lpn_find_popup');
+				function pick(i, v) {
+					const sel = p.querySelectorAll('select')[i];
+					sel.value = v;
+					sel.dispatchEvent(new Event('change', { bubbles: true }));
+				}
+				pick(0, 'pipe');        // scope
+				pick(1, 'length');      // a property every pipe has a value for
+				pick(2, 'gt');
+				const num = p.querySelector('input[type=number]');
+				num.value = '1';
+				num.dispatchEvent(new Event('change', { bubbles: true }));
+				const input = p.querySelector('input[type=text]');
+				input.value = '0';
+				input.dispatchEvent(new Event('input', { bubbles: true }));
+				p.querySelector('button').click();
+				const res = p.querySelector('#lpn_find_results');
+				return { text: res.textContent, rows: res.querySelectorAll('button').length,
+					props: [...p.querySelectorAll('select')[1].options].map(o => o.value) };
+			});
+			report.ok(/found/.test(listed.text), 'a range search over a real network finds pipes',
+				listed.text.replace(/\s+/g, ' ').slice(0, 90));
+			// With the limit at 1: one row, a counted gap, one row. Never the whole list, and never
+			// a silent truncation -- the count is what makes hiding the middle honest.
+			report.eq(listed.rows, 2, 'with a limit of 1 the list shows exactly two rows -- the two ends');
+			report.ok(/more between these/.test(listed.text), '...and says how many it left out',
+				listed.text.replace(/\s+/g, ' ').slice(0, 120));
+			report.ok(listed.props.indexOf('gradient') >= 0,
+				'head loss gradient is offered as a searchable property', listed.props.join(','));
+		}
 
 		// **THE MENU ROW ALWAYS OPENS; IT NEVER TOGGLES, and that is correct rather than a gap.**
 		// Opening any menu closes every view popover (Tom, 2026-08-13: "When I click Settings then

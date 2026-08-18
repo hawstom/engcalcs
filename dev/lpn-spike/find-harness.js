@@ -44,6 +44,9 @@ const L = loadLoopedNetwork(
 	"\t\topKeys: function (scope, prop) { findState.scope = scope; findState.prop = prop;\n" +
 	"\t\t\treturn findOpDefs().map(function (o) { return o[0]; }); },\n" +
 	"\t\tgoTo: findGoTo, selectedRef: selectedRef,\n" +
+	"\t\tcontextLength: function (group, id) { var e = group === 'node' ? nodeById(id) : linkById(id);\n" +
+	"\t\t\treturn findContextLength(group, e); },\n" +
+	"\t\tsetLimit: function (n) { findState.limit = n; },\n" +
 	"\t\tadjacent: function (id) { return incidentLinks[id] || []; },\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
 	"\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
@@ -177,11 +180,52 @@ function build(unitSet) {
 		L.normalize('pipe', 'diameter', 'lt') === 'diameter/lt');
 }
 
-// ---- 5. going to a result: it selects, it pans, and it does NOT zoom ----------------------------
+// ---- 4b. the most interesting answer is at the top ----------------------------------------------
+// A range query has an interesting end and a dull one, and the CONDITION says which: "greater than"
+// is a question about the biggest, "less than" about the smallest. Sorted the other way, the first
+// row is the pipe nearest the threshold -- the least remarkable member of the set.
+{
+	console.log('\n--- the order of the answers ---');
+	setUnitSet('us');
+	L.reset();
+	L.setCanvas(800, 600);
+	const r = L.addNode('reservoir', 0, 0).id;
+	let prev = r;
+	const sizes = [4, 18, 6, 12, 8];
+	const ids = sizes.map((d, i) => {
+		const n = L.addNode('junction', 100 * (i + 1), 0).id;
+		const l = L.addLink('pipe', prev, n);
+		L.setProp(l, 'diameter', d);
+		prev = n;
+		return l.id;
+	});
+	L.buildDom();
+	const desc = L.find('pipe', 'diameter', 'gt', '0');
+	ok('greater-than lists the LARGEST first',
+		desc[0] === 'link:' + ids[sizes.indexOf(18)], JSON.stringify(desc));
+	ok('...and the smallest last',
+		desc[desc.length - 1] === 'link:' + ids[sizes.indexOf(4)], JSON.stringify(desc));
+	const asc = L.find('pipe', 'diameter', 'lt', '99');
+	ok('less-than lists the SMALLEST first',
+		asc[0] === 'link:' + ids[sizes.indexOf(4)], JSON.stringify(asc));
+	ok('...and the largest last',
+		asc[asc.length - 1] === 'link:' + ids[sizes.indexOf(18)], JSON.stringify(asc));
+	// A text query has no range, so it keeps the order a person scans a list in.
+	const byId = L.find('pipe', 'id', 'contains', 'L');
+	ok('a text search keeps ID order', JSON.stringify(byId) === JSON.stringify(byId.slice().sort()),
+		JSON.stringify(byId));
+	// Repeating a search must give the same order -- an unstable sort reads as an unreliable tool.
+	ok('the same search twice gives the same order',
+		JSON.stringify(L.find('pipe', 'diameter', 'gt', '0')) === JSON.stringify(desc));
+}
+
+// ---- 5. going to a result: it selects, it pans, and it zooms to a MINIMUM ------------------------
 {
 	console.log('\n--- going to a result ---');
 	const n = build('us');
-	L.setView({ cx: 0, cy: 0, s: 2 });
+	// FAR OUT: the node's neighbourhood is 200 world units across, so at s = 0.2 it is 40 px on
+	// screen -- the dot case.
+	L.setView({ cx: 0, cy: 0, s: 0.2 });
 	const before = L.view();
 	L.goTo('node', n.b);
 	const after = L.view();
@@ -189,7 +233,33 @@ function build(unitSet) {
 		JSON.stringify(L.selectedRef()) === JSON.stringify({ kind: 'node', id: n.b }), JSON.stringify(L.selectedRef()));
 	ok('the map centres on it', Math.abs(after.cx - 200) < 1e-6 && Math.abs(after.cy - 0) < 1e-6,
 		after.cx + ',' + after.cy);
-	ok('the ZOOM is left exactly as the user set it', after.s === before.s, before.s + ' -> ' + after.s);
+	// **A MINIMUM APPARENT SIZE, NOT A CHOSEN ZOOM** (Tom, 2026-08-18). Arriving at a node from
+	// across a large network used to show a dot: the pan was right and the scale was whatever it
+	// had been. The floor is twice the average distance to the node's own linked nodes, so the node
+	// lands in the middle of its own neighbourhood.
+	ok('a far-out view is zoomed IN so the result is not a dot', after.s > before.s,
+		before.s + ' -> ' + after.s);
+	// **THE EXPECTED NUMBER IS COMPUTED FROM THE GEOMETRY, NOT FROM THE FUNCTION UNDER TEST.** J2's
+	// one pipe reaches 100 units to J1, so "twice the average distance to its linked nodes" is 200 --
+	// stated here as a constant. Asking findContextLength() for it and then asserting against its own
+	// answer is a harness agreeing with any mistake, and it let a dropped factor of 2 pass.
+	ok('the neighbourhood is twice the average reach of the node\'s own pipes',
+		L.contextLength('node', n.b) === 200, String(L.contextLength('node', n.b)));
+	ok('...and it is framed to half the shorter side of the window',
+		Math.abs(after.s * 200 - 300) < 1e-6, (after.s * 200).toFixed(1) + ' px of 600');
+	// **AND IT NEVER ZOOMS OUT.** Somebody already looking closely has set that zoom deliberately;
+	// pulling them back to frame a result they can already see would be the tool overruling them.
+	L.setView({ cx: 0, cy: 0, s: 8 });
+	L.goTo('node', n.b);
+	ok('a close view is left exactly as the user set it', L.view().s === 8, String(L.view().s));
+	// A node with no links has no neighbourhood to frame, so there is no floor to apply -- inventing
+	// a distance for it would be a made-up number deciding the view.
+	const lone = L.addNode('junction', 900, 900).id;
+	L.buildDom();
+	L.setView({ cx: 0, cy: 0, s: 0.2 });
+	L.goTo('node', lone);
+	ok('a node with no pipes leaves the zoom alone rather than inventing a distance',
+		L.view().s === 0.2, String(L.view().s));
 
 	// A link has no point of its own; the midpoint of its ends is what puts it on screen.
 	L.goTo('link', n.ab);

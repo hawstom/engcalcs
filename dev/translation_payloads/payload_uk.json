@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "uk",
-        "expected_key_count": 1033,
-        "delta_key_count": 37,
+        "expected_key_count": 1035,
+        "delta_key_count": 39,
         "exempt_key_count": 22,
         "exempt_keys": [
             "u_imgd",
@@ -385,6 +385,8 @@
         "lpn_find_op_lt": "is less than",
         "lpn_find_count": "{n} found. Click one to go to it.",
         "lpn_find_none": "Nothing matched.",
+        "lpn_find_limit": "How many to list at each end",
+        "lpn_find_middle": "{n} more between these, not listed.",
         "lpn_find_adjacent": "Links here",
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
@@ -424,6 +426,8 @@
         "lpn_find_op_lt": "is less than",
         "lpn_find_count": "{n} found. Click one to go to it.",
         "lpn_find_none": "Nothing matched.",
+        "lpn_find_limit": "How many to list at each end",
+        "lpn_find_middle": "{n} more between these, not listed.",
         "lpn_find_adjacent": "Links here",
         "lpn_find_no_value": "Type what to look for.",
         "lpn_new_geo_us": "Blank project on a world map, US units (gpm)",
@@ -793,6 +797,38 @@
             }
         },
         "lpn_find_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Видалити всі вузли, труби й текстові підписи в цьому проєкті? Фонове зображення, назва проєкту та налаштування збережуться. Це неможливо скасувати.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Одиниці",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_limit": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_delete_network",
+                    "value": "Видалити всі вузли, труби й текстові підписи в цьому проєкті? Фонове зображення, назва проєкту та налаштування збережуться. Це неможливо скасувати.",
+                    "english": "Delete every node, pipe, and text label in this project? The background image, the project name, and your settings are kept. This cannot be undone."
+                },
+                "next_translated": {
+                    "key": "lpn_view_units",
+                    "value": "Одиниці",
+                    "english": "Units"
+                }
+            }
+        },
+        "lpn_find_middle": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
