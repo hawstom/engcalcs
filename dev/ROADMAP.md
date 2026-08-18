@@ -81,7 +81,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     build-adjacent place to run a checker.
   - Evaluate together before any of it — this is on the roadmap as a possibility, not a plan.
 
-- 85|390| **Finish the unit paradigm migration: a unit is a NAME, and a file's numbers are the
+- 25|390| **Finish the unit paradigm migration: a unit is a NAME, and a file's numbers are the
   user's.** Tom, 2026-08-16: *"You are fighting against a deprecated but not purged paradigm where
   everything was stored in browser and file as SI always... I don't think I authorized that. But it
   was done."* Full diagnosis, measurements and dependency order: **`dev/unit-paradigm-migration.md`**.
@@ -97,7 +97,10 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     tokens reformat under `parseFloat` however exact the arithmetic is.
   - The five new unit keys (`u_imgd`, `u_afd`, `u_lpm`, `u_cmh`, `u_cmd`) and `lpn_unit_unknown` are
     in `lang.ec.en.php` only, and fold into the queued sprint.
-  - **Still open:** `elev` holds both a user's elevation and an imported reservoir's total head.
+  - **DONE (2026-08-17):** an EPANET reservoir's column is a total HEAD and now lands in `_head`
+    alone. Inventing a ground elevation from it — and the `applySaved()` back-fill that did the same
+    to old documents — is gone, so a reservoir whose ground nobody stated has no pressure rather than
+    a pressure of zero (`fixedHeadPressure()`). Saved user documents are unaffected.
   - **Acceptance: import then export is BYTE-IDENTICAL for every value the user did not edit.** Also
     Task 281's criterion.
 
@@ -124,11 +127,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   vanishing whole, and `linkLabelTooShort()` becomes the last rung rather than the only one.
   - **Shedding itself confirmed compact/stingy and liked, 2026-08-17** — Tom's word, reviewing
     production at commit `22db1f9` after Task 404 closed. See Task 404's close note.
-
-- 40|406| **Stacked-label box model: one box per LINE, not one box for the whole stack.** Tom,
-  2026-08-17. Today's label box is a single rect around every shown line together; per-line boxes
-  would let collision/conflict logic reason about individual lines rather than the whole stack, which
-  matters once shedding drops some lines and keeps others (Task 399).
 
 - 45|408| **Label leader dragging: an optional snap to 15°/30°/45° angle increments, user's choice.**
   Tom, 2026-08-17. A toggle or picker for the increment, not a forced snap — free dragging must stay
@@ -293,25 +291,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     tanks and 2 reservoirs, not "97 junctions, two tanks and a river source". Nothing in the build
     compares prose against a network, so only a reader could have caught these.
 
-- 60|403| **The headless stub does not know that text width follows FONT SIZE.** `getBBox()` returns
-  characters × a constant, so a label's world width is the same at every zoom, where a real label's
-  font size IS a world quantity (`textSize / state.s`). That removes the whole relationship every
-  fitting rule is about, and has cost three rounds of "harness passes, browser does nothing".
-  - **Attempted twice and reverted twice.** Four things a working version must handle, each found the
-    hard way: (1) font size arrives by THREE write paths — the `style` attribute string set at build
-    time, `.style.fontSize` set on every refresh, and a bare `font-size` attribute; (2) the style
-    OBJECT must win, being written later and one declaration in a real DOM; (3) setting `textContent`
-    must clear child nodes and read back INCLUDING descendants, or labels are measured on stale
-    placeholder text (`example-network-harness.js`'s `popupY` relied on the non-DOM behaviour and
-    needed `startsWith`); (4) `firstChild` must return the text node so the standard
-    `while (firstChild) removeChild(firstChild)` teardown can clear it.
-  - **It exposes a real defect in `drawExampleNetwork()`'s two anchored callouts, and that is the
-    prize.** `lb.x` derives from a width measured at whatever `settings.textSize` is current, then is
-    asserted against one measured at another — 18.6 world units at draw time against 81.7 at assert
-    time in the returning-visitor fixture. A Text label's world width is 1/zoom and its screen size
-    follows `textSize`, so no fixed `lb.x` clears every setting; decide whether the offset is
-    recomputed or expressed differently BEFORE landing the stub fix, or four assertions turn red.
-
 - 15|400| **Phase 3 — bounded local search on the residue. LOWERED 60→15, Tom 2026-08-17: "Phases 1
   and 2 are good enough for GIS mode or management mode. Phase 3 may be helpful for report mode."**
   Parked for real-world feedback from Tom's colleague Mary (Philippines) rather than scheduled work;
@@ -329,26 +308,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **"Most-open angle(s)" is Task 411, not this task** — candidate *generation*, orthogonal to the
     reduction rules, and the "start in open territory" precondition the relaxation bullet assumes.
     Literature pass done 2026-08-17: `dev/most-open-angle-brainstorm.md`.
-
-- 55|342| **MTEXT for TEXT OBJECTS — the user's own `doc.labels`, not data labels.** Tom,
-  2026-08-14: *"Not mtext labels. Mtext Text objects."* The target is what you place with the Text
-  tool (`lb.text`, one centre-anchored `<text>`); generated data labels are out of scope.
-  - **Rung 1, explicit line breaks — the whole of what most drawings use.** `\n` in `lb.text`, via
-    `setMultilineText()`, edited in a `<textarea>`. Centre the block on `lb.y` so a ONE-line label
-    renders pixel-identically to today; that is the whole migration.
-  - **Justification belongs HERE, not in Task 332** (Tom, 2026-08-15: *"text alignment is very
-    interesting to a user, especially if we allow paragraph text."*). All this task owes it is a row
-    in the Text label's property popup — **`lb.align`/`lb.valign` already exist**, shipped by Task
-    332 and interpreted in the one place `Geom.labelBoxAt()`. Default centre, so no existing drawing
-    changes shape on upgrade.
-  - **Rung 2, a wrap WIDTH, is what actually makes it MTEXT** — AutoCAD's defining feature is the
-    width box, not the line breaks. SVG does not wrap, so it needs a per-label width plus a greedy
-    re-wrap on every font-size change, pure and belonging in `js/lpn-geom.js`. Defer.
-  - **Rung 3, per-run rich text, is worth declining** — tspan runs, a saved markup format, and an
-    editor for it. `foreignObject` is a trap: HTML-in-SVG breaks export and print fidelity.
-  - **THE CONSTRAINT NOBODY WILL THINK OF UNTIL IT BITES: EPANET `[LABELS]` is ONE quoted string per
-    line**, so a multi-line Text cannot round-trip. Decide on export (Task 281) whether it becomes N
-    labels or one flattened line, where the import (Task 332) can agree with it.
 
 - 5|192| **Right-click / long-press context-menu system. PARKED at 5, 2026-08-13** (Tom: *"I am not
   currently seeing the need for this"*). Not declined — the day something wants a context menu it
