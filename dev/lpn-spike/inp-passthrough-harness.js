@@ -175,6 +175,23 @@ const before = fails;
 			ok(json + ' ' + l.id + '.' + k, gotLink[l.id][k] === l[k], gotLink[l.id][k] + ' vs ' + l[k]);
 		});
 	});
+	// **PUMP CURVE POINTS, and this list is where they were missing.** The corpus shipped with
+	// Net3's curve reading 103.99873536 where the file says `104.` -- the old SI round trip's damage,
+	// preserved in a file nobody re-generated and invisible to every check here because the compared
+	// fields were named one by one and this one was not on the list. Found 2026-08-18 by Tom, reading
+	// the numbers. The values are exact today; what was missing was anything that would say so.
+	want.links.forEach((l) => {
+		if (!l.curvePoints || !gotLink[l.id]) { return; }
+		const got = gotLink[l.id].curvePoints || [];
+		ok(json + ' ' + l.id + ' curve has the same number of points',
+			got.length === l.curvePoints.length, got.length + ' vs ' + l.curvePoints.length);
+		l.curvePoints.forEach((pt, i) => {
+			if (!got[i]) { return; }
+			ok(json + ' ' + l.id + ' curve point ' + i,
+				got[i][0] === pt[0] && got[i][1] === pt[1],
+				JSON.stringify(got[i]) + ' vs ' + JSON.stringify(pt));
+		});
+	});
 });
 console.log('  ' + (fails > before ? 'FAIL ' : 'ok   ') + 'the corpus reproduces from its .inp');
 
