@@ -251,7 +251,11 @@ function auditRecord(tag, rec) {
 		ok(tag + '.' + k + ' is not a number wearing a string',
 			!/^[-+]?(\d+\.?\d*|\.\d+)([eE][-+]?\d+)?$/.test(v) ||
 			k === 'id' || k === 'from' || k === 'to' ||
-			k === 'demandPattern' || k === 'headPattern' || k === 'speedPattern',
+			k === 'demandPattern' || k === 'headPattern' || k === 'speedPattern' ||
+			// A PUMP CURVE'S NAME is one of these (Task 430): Net1 and Net3 call their curves 1 and
+			// 2, and a name that looks like a number is still a name. It is never arithmetic --
+			// nothing reads it but the [PUMPS] and [CURVES] writers, which quote it back verbatim.
+			k === 'curveId',
 			k + ' = ' + JSON.stringify(v));
 	});
 }

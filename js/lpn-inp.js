@@ -525,6 +525,12 @@
 			for (j = 3; j < r.length; j++) {
 				kw = (r[j] || '').toUpperCase();
 				if (kw === 'HEAD' && r[j + 1]) {
+					// **THE CURVE'S NAME IS KEPT EVEN THOUGH ITS POINTS' TEXT IS NOT** (Task 430).
+					// The note in [CURVES] above -- that a curve does not survive as text -- is about
+					// the POINTS, which get sampled and re-sampled. The id is a separate thing: it is
+					// the user's own label, it is never arithmetic, and without it the writer invents
+					// `C_<pumpid>` and Net3's curves `1` and `2` come back as `C_10` and `C_335`.
+					pump.curveId = r[j + 1];
 					var pts = curves[r[j + 1]] || [];
 					if (!pts.length) { drop('pump-curve-missing', [r[0]], r[j + 1]); }
 					else if (pts.length <= 3) { pump.curvePoints = pts.slice(); }
@@ -1097,7 +1103,10 @@
 					// THE POINTS GO OUT AS THE DOCUMENT HOLDS THEM, never re-sampled off a fitted
 					// curve the way the engine adapter does. An imported curve therefore comes back as
 					// the curve that arrived, and a curve typed here goes out as typed.
-					var cname = 'C_' + lk.id;
+					// The curve's own name when the document has one (an import kept it, Task 430),
+					// and an invented one only when it does not -- a curve drawn on this page has no
+					// name of its own because this page has no control for one.
+					var cname = lk.curveId || ('C_' + lk.id);
 					for (j = 0; j < pts.length; j++) {
 						curves.push(row([cname, curveNum(cFlow, pts[j][0]), curveNum(cHead, pts[j][1])]));
 					}

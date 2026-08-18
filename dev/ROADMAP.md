@@ -637,24 +637,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - He notes the current width *"reminds me of the two-pane paradigm"* — which is Task 284, and is
     the direction he wants anyway; this is the narrow version until that lands.
 
-- 45|430| **`.inp` export: NOTHING IS CONVERTED, and the round trip differs by FORMATTING only.**
-  Full diagnosis, with counts: **`dev/inp-export-conversion-bug.md`**. LOWERED 65 → 45 on it.
-  - Tom, 2026-08-18: *"I notice that the inputs have been converted. As far as I know, that is a
-    no-no."* **Measured: no unit converted.** All five converters were in pass-through for the
-    shipped Net3 (`fth2o` vs `ft` are different NAMES with the identical factor, so the factor test
-    did exactly its job). 1,191 of 1,225 tokens are already character-identical and **none of the 34
-    differences has a different VALUE** — `9.00`→`9`, `4530.`→`4530`, `.1`→`0.1`, `220.0`→`220`.
-  - **The real cause is a stale committed artifact, not code:** every gallery example JSON carries
-    ZERO token bags (Net3 0/216, Net1 0/24, Net2 0/76, Elm Street 0/37) because they were authored
-    before Task 390 step 3. `serializeProject()` does preserve `tok`. Fix is to backfill the bags and
-    regenerate `examples/`; the diff then drops 34 → 2.
-  - The last 2 are the pump curve id (`1`→`C_10`), which needs `docFromInp()` to carry it.
-  - **`[OPTIONS] Units` following the project is a distraction — that bullet is dropped.** Byte
-    identity is already proven for all ten keywords.
-  - If Tom measured "not identical" by RUNNING the exported file, the cause was Task 423 (patterns
-    were not written or applied), which is now closed.
-  - Harness `dev/lpn-spike/inp-roundtrip-net3-harness.js` prints every difference; it is known-failing
-    behind an `EXPECT_CLEAN` flag until the backfill lands.
 - 40|432| **A window scrollbar should not exist on this page.** Tom, 2026-08-18: *"Our bottom controls
   bar should be the hard bottom of the page."* The map is a full-window drawing surface; anything
   that scrolls the WINDOW moves the whole application.

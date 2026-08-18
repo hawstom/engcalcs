@@ -1,3 +1,12 @@
+> **CLOSED 2026-08-18.** Recommendations (a) and (b) are done: 74 token bags backfilled into
+> Net1/Net2/Net3 by `dev/scripts/backfill_example_tokens.js`, and a pump's curve NAME now survives
+> the importer and `docFromInp()`. Both legs of the round trip are **1,225 of 1,225 tokens
+> byte-identical**, and `dev/lpn-spike/inp-roundtrip-net3-harness.js` runs with `EXPECT_CLEAN` on.
+> (c) was dropped as recommended. What is left is Elm Street, whose source `.inp` is not in the repo,
+> and the secondary `lpn_u_roughness` finding below, which wants its own task.
+>
+> Everything below is the original diagnosis, kept because the MEASUREMENT is the valuable part.
+
 # Task 430 — why a Net3 round trip is "very close, not identical"
 
 Diagnosis only; nothing here is fixed yet. Reproduce with

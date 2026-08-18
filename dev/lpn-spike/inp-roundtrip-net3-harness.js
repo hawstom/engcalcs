@@ -30,7 +30,11 @@ const { ROOT, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
 require(ROOT + 'js/lpn-inp.js');
 
 // Flip to true once Task 430 lands: the harness then fails the build on any regression.
-const EXPECT_CLEAN = false;
+// **ON, since 2026-08-18.** Both legs are byte-identical: the gallery examples were given their
+// token bags back (`dev/scripts/backfill_example_tokens.js`) and the importer now keeps a pump's
+// curve NAME. This is a guard rather than a report from here on -- the gallery can no longer lose
+// its tokens silently.
+const EXPECT_CLEAN = true;
 
 const L = loadLoopedNetwork(
 	"\t\tserializeProject: serializeProject, applySaved: applySaved,\n" +

@@ -7886,6 +7886,10 @@ var EngCalcs = EngCalcs || {};
 					return [inpFlow(pt[0]), pt[1]];
 				});
 				out.curveRef = null;
+				// The curve's NAME, when the file gave one (Task 430). Kept beside the points for the
+				// same reason a number's token is kept beside it: it is the user's own text, and the
+				// exporter has no way to reconstruct it.
+				if (l.curveId) { out.curveId = l.curveId; }
 				// NO FITTED CURVE IS WRITTEN HERE (Task 390 step 5). pumpFit() derives h0/a/b at the
 				// solver handoff, so an imported pump carries exactly what the file stated and
 				// nothing of ours.
