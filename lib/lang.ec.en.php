@@ -1367,10 +1367,10 @@ $ec_lang['lpn_georef_done']='This is a GeoMap project now. Drag any node to move
 $ec_lang['lpn_georef_on_map']='This is already a GeoMap project.';
 $ec_lang['lpn_georef_empty']='Draw or open a network first. There is nothing to place yet.';
 $ec_lang['lpn_georef_unavailable']='The placement tool did not load. Reload the page and try again.';
-$ec_lang['lpn_goto_menu']='Go to latitude, longitude…';
-$ec_lang['lpn_goto_tip']='Move the map to a place you already have coordinates for. Latitude first, then longitude, the way a map gives them: 38.106, -122.569.';
-$ec_lang['lpn_goto_prompt']='Latitude, longitude';
-$ec_lang['lpn_goto_bad']='That is not a latitude and longitude. Try 38.106, -122.569.';
+$ec_lang['lpn_goto_menu']='Go to a latitude and longitude…';
+$ec_lang['lpn_goto_tip']='Move the map to a place you already have coordinates for. Latitude first, then longitude, the way a map gives them, with a space between them: 38.106 -122.569';
+$ec_lang['lpn_goto_prompt']='Latitude and longitude, in that order';
+$ec_lang['lpn_goto_bad']='That is not one latitude and one longitude. Try 38.106 -122.569, with a space between them.';
 $ec_lang['lpn_georef_goto']='Go to…';
 
 // ---- The bottom pane (ROADMAP Task 434) ----

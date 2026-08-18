@@ -167,8 +167,18 @@ EngCalcs.unitFactors = <?=json_encode($GLOBALS['ec_units'])?>;</script>
 // churn with no reader on the other side of it.
 function echoFooter($type, $nav = true, $legal = true, $devtools = true) {
 ?>
-<div class="left d-print-none">
-<?php
+<?php // **AN EMPTY FLOAT IS NOT NOTHING, AND THAT IS WHY THIS IS BUFFERED.** `.left` is
+      // `float: left`, and a float is not in `document.body`'s content box -- so on a page that
+      // calls this with `$nav = false, $legal = false` (Looped-Network.php does) the div rendered
+      // empty, floated, and added ~15 px to `documentElement.scrollHeight` that
+      // `flowBelowMap()` could not measure and no amount of map-height arithmetic could ever find.
+      // ROADMAP Task 432's window scrollbar was this, and `html { overflow: hidden }` was hiding
+      // the consequence rather than removing it. Proven by dev/browser-pass/specs/noscroll.js:
+      // delete this one div on that page and the overflow goes to exactly zero.
+      //
+      // So the contents are built first and the wrapper is emitted only if there are any. Every
+      // page that does have footer content is byte-identical to before.
+      ob_start();
 if ($nav) {
 	if (function_exists('engcalcsParentMenu')) engcalcsParentMenu();
 ?>
@@ -195,7 +205,10 @@ if ($legal && function_exists('echoConsentFooterLinks')) echoConsentFooterLinks(
       // That is not a validator -- it does not know a <p> may not contain a <div>, and NOTHING in
       // the repo checks the CSS at all. If either matters, the honest answer is a real validator in
       // check_all.sh (the W3C offers a local jar and an API), not a link. ?>
-</div>
+<?php
+$ec_footer_left = trim(ob_get_clean());
+if ($ec_footer_left !== '') { echo '<div class="left d-print-none">' . $ec_footer_left . '</div>' . "\n"; }
+?>
 <?php if (function_exists('echoConsentBanner')) echoConsentBanner(); ?>
 <script>
 // The worker is GENERATED (sw.php, ROADMAP Task 318) so its precached URLs carry the same

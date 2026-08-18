@@ -17,12 +17,11 @@
 //   5. **Editing really is locked.** georefActive() gates the same seams regMode does; the proof is
 //      that the Junction tool plus a click on the canvas adds nothing.
 //
-// **KNOWN, AND DELIBERATELY NOT ASSERTED HERE: the handles keep the size they were DRAWN at.**
-// georefDrawFrame() sizes them `GEOREF_HANDLE_PX / state.s`, and in the place stage nothing redraws
-// the frame when the view changes — only georefCarryTick() does, and that is the carry stage. Zoom
-// in six notches after Drop and an 18 px handle renders at 33 px; zoom out and it vanishes. Measured
-// 18.31 -> 32.44 px over 6 notches, a ratio of 1.772 against the zoom's own 1.1^6 = 1.772. No
-// knowingly-red spec was added — see the note at the top of specs/boot.js for the house rule.
+// **THE HANDLES ARE A CONSTANT SIZE ON SCREEN, and that is checked below.** georefDrawFrame() sizes
+// them `GEOREF_HANDLE_PX / state.s`, which is a screen size only for as long as the frame is redrawn
+// when the scale changes. It was not: in the place stage only georefCarryTick() redrew, and that is
+// the carry stage, so six notches took an 18.31 px grab target to 32.44 px (a ratio of 1.772 against
+// the zoom's own 1.1^6) and zooming out shrank it away. onZoomChanged() now redraws the frame.
 
 const { Session } = require('../lib/session');
 
@@ -269,6 +268,23 @@ exports.run = async function ({ browser, report }) {
 			`${b4.w.toFixed(0)} x ${b4.h.toFixed(0)} px, aspect ${(b4.h / b4.w).toFixed(3)} for a predicted ${(cos2 * b3.w / b3.h).toFixed(3)}`);
 		report.ok(Math.abs(b4.cx - b3.cx) < 3 && Math.abs(b4.cy - b3.cy) < 3,
 			'...about its centre as well');
+
+		// ---- 7b. A handle is the same size at every zoom -----------------------------------------
+		// Anything sized in screen pixels has to be redrawn when the scale changes, or it is a
+		// constant in WORLD units instead. A grab target that doubles when you zoom in and vanishes
+		// when you zoom out is unusable at one end of the range.
+		{
+			const handlePx = () => a.page.evaluate(() => {
+				const h = document.querySelector('[data-georef="scale"]');
+				return h ? h.getBoundingClientRect().width : null;
+			});
+			const wide = await handlePx();
+            await wheelIn(a, 6);
+			const zoomed = await handlePx();
+			report.ok(wide && zoomed && Math.abs(zoomed - wide) <= 1.5,
+				'a corner handle is the same size on screen after six zoom notches',
+				`${wide && wide.toFixed(2)} px -> ${zoomed && zoomed.toFixed(2)} px`);
+		}
 
 		// ---- 8. Cancel is exact ---------------------------------------------------------------
 		await a.page.click('#lpn_georef_cancel');

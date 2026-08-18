@@ -72,7 +72,13 @@ exports.run = async function ({ browser, report }) {
 		await a.queuePick(FILE2);
 		await a.menuClick('Open…');
 		report.eq((await a.tabs()).length, tabsBefore, 'opening a file already open adds NO second tab');
-		report.has(await a.status(), 'already open', 'and says why');
+		// **THE NOTICE BOX, NOT THE STATUS LINE.** This read `status()` and failed for years, and
+		// ROADMAP Task 421 was written up from that failure as "a notice the user needs is overwritten
+		// by the next solve diagnostic". It is not overwritten: `openFileAlreadyOpen()` calls
+		// setNotice(), which writes #lpn_map_notice — the transient box over the map — and the solve
+		// diagnostic in #lpn_status never touched it. The spec was reading the wrong element, which
+		// is the confusion the helper comment above notice() warns about.
+		report.has(await a.notice(), 'already open', 'and says why');
 
 		// --- opening a genuinely different file --------------------------------
 		await a.queuePick(FILE1);

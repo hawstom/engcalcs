@@ -105,24 +105,31 @@ exports.run = async function ({ browser, report }) {
 			await a.settle(400);
 		}
 
-		// ---- the overflow still under the hidden scrollbar ----------------------------------------
+		// ---- NOTHING LEFT UNDER THE HIDDEN SCROLLBAR ----------------------------------------------
+		//
+		// `html { overflow: hidden }` can hide an overflow as easily as prevent one, so this measures
+		// the document itself rather than trusting the absence of a scrollbar. It caught the real
+		// cause: `echoFooter()` emitted `<div class="left d-print-none">` EMPTY on this page (it is
+		// called with `$nav = false, $legal = false`), and `.left` is `float: left` -- a float is not
+		// in `document.body`'s content box, so `flowBelowMap()` measured a body that did not contain
+		// it and no map-height arithmetic could ever have found it. Same SHAPE as the `form`
+		// margin removed earlier, in a different element. The footer is now buffered and the wrapper
+		// is emitted only when it has contents.
 		await a.page.setViewportSize({ width: 1400, height: 1200 });
 		await a.settle(600);
 		const m = await metrics(a);
-		report.ok(m.scrollHeight > m.innerHeight,
-			'DEFECT (Task 432): the document is STILL taller than the window — overflow:hidden hides it',
+		report.ok(m.scrollHeight <= m.innerHeight,
+			'the document itself is no taller than the window, not merely clipped',
 			`${m.scrollHeight} against ${m.innerHeight}, with body ending at ${m.bodyBottom}`);
-		const proof = await a.page.evaluate(() => {
+		// And the specific regression: no empty float survives in the footer of this page.
+		const stray = await a.page.evaluate(() => {
 			const el = document.querySelector('.left.d-print-none');
-			if (!el) { return null; }
-			const before = document.documentElement.scrollHeight;
-			const floated = getComputedStyle(el).float, empty = !el.textContent.trim();
-			el.remove();
-			return { before, after: document.documentElement.scrollHeight, floated, empty, inner: window.innerHeight };
+			if (!el) { return { present: false }; }
+			return { present: true, empty: !el.textContent.trim(), floated: getComputedStyle(el).float };
 		});
-		report.ok(proof && proof.floated === 'left' && proof.empty && proof.before > proof.inner && proof.after <= proof.inner,
-			'DEFECT: and it is echoFooter()\'s EMPTY floated <div class="left d-print-none"> — delete it and the overflow is zero',
-			proof && `scrollHeight ${proof.before} -> ${proof.after} for a window of ${proof.inner}`);
+		report.ok(!stray.present || !(stray.empty && stray.floated === 'left'),
+			'no empty floated footer div is emitted on this page',
+			stray.present ? `present, empty=${stray.empty}, float=${stray.floated}` : 'not emitted at all');
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');
 	} finally {

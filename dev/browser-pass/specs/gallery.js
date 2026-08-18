@@ -69,13 +69,18 @@ exports.run = async function ({ browser, report }) {
 		report.ok(!(await galleryShowing(a)), '...and closing it again closes it again');
 
 		// ---- the reload ---------------------------------------------------------------------------
+		// **THE RELOAD IS THE HEADLINE**, because it is the case Tom reported twice and the case two
+		// earlier fixes both missed. The first fix was page-level, the second per-project; both were
+		// answering the wrong question. The third stores the answer with the library — and even then
+		// it did not work until `initLibrary()` was taught to READ the field, which it was not:
+		// it copied `projects` and `openId` out of the saved index and dropped everything else, so
+		// the flag was written, stored, read past, and overwritten as absent by the next save.
 		await a.reload();
-		report.ok(await galleryShowing(a),
-			'DEFECT (Task 431): a RELOAD asks again — the case Tom reported twice',
-			'initLibrary() reads only projects and openId out of lpn_index, so galleryDismissed is dropped');
-		report.ok(!(await storedFlag(a)),
-			'DEFECT: and the stored answer is gone from lpn_index after the reload that dropped it',
-			'it was true one line above the reload — this is a read that is missing, not a write');
+		report.ok(!(await galleryShowing(a)),
+			'a RELOAD does not ask again — the case Tom reported twice');
+		report.ok(await storedFlag(a),
+			'...and the answer is still in lpn_index afterwards',
+			'it was dropped on READ, not on write — the file held it the whole time');
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript in A', a.errors[0] || '');
 	} finally {
@@ -102,12 +107,12 @@ exports.run = async function ({ browser, report }) {
 			'emptying the project does NOT bring the wall back — you answered by drawing');
 
 		await b.reload();
-		report.ok(await galleryShowing(b),
-			'DEFECT (Task 431): the same reload loses that answer too', 'same missing read');
+		report.ok(!(await galleryShowing(b)),
+			'a reload keeps that answer too — drawing something is an answer that survives');
 		await b.newProject();
 		await b.settle(400);
-		report.ok(await galleryShowing(b),
-			'DEFECT (Task 431): and then every new empty tab asks again',
+		report.ok(!(await galleryShowing(b)),
+			'...and a new empty tab after that reload does not ask',
 			'"Still happens when I switch to each new project tab after page reload" — Tom, verbatim');
 
 		report.eq(b.errors.length, 0, 'no uncaught JavaScript in B', b.errors[0] || '');

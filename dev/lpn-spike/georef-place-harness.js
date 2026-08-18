@@ -208,6 +208,24 @@ console.log('\n--- the command is findable, and a coordinate is what a map gives
 	ok('a space alone separates them too', !!L.parseLatLon('38.106 -122.569'));
 	ok('an out-of-range pair is refused', L.parseLatLon('938, -122') === null);
 	ok('prose is refused rather than half-read', L.parseLatLon('Petaluma') === null);
+	// **THE DECIMAL COMMA, which was a SILENT wrong answer.** Most of our 26 languages write 38,106
+	// for English's 38.106. A European paste separated by a space is unambiguous and must work; the
+	// same paste separated by a comma yields four numbers, could be read two ways, and must be
+	// REFUSED rather than guessed -- the first version travelled to 38 N 106 E with no message.
+	var eu = L.parseLatLon('38,106 -122,569');
+	ok('a decimal-comma coordinate separated by a space is read correctly',
+		!!eu && Math.abs(eu.lat - 38.106) < 1e-9 && Math.abs(eu.lon + 122.569) < 1e-9, JSON.stringify(eu));
+	// The exact string a decimal-comma locale produces from the tip's own example. It reads as the
+	// European coordinate, which is what it means -- a comma inside a number binds tighter than a
+	// comma between two, and no latitude has a thousands separator.
+	var eu2 = L.parseLatLon('38,106, -122,569');
+	ok('...and so is the tip\'s own example rendered in a decimal-comma locale',
+		!!eu2 && Math.abs(eu2.lat - 38.106) < 1e-9 && Math.abs(eu2.lon + 122.569) < 1e-9,
+		JSON.stringify(eu2));
+	ok('three numbers is refused', L.parseLatLon('38.1 -122.5 17') === null);
+	// A THOUSANDS separator makes three numbers and is refused rather than half-read.
+	ok('a thousands separator is refused', L.parseLatLon('1,234.5 -122.5') === null,
+		JSON.stringify(L.parseLatLon('1,234.5 -122.5')));
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');

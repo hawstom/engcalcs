@@ -4910,9 +4910,19 @@ var EngCalcs = EngCalcs || {};
 			{ x: b.maxX, y: b.maxY }, { x: b.minX, y: b.maxY }
 		];
 	}
+	// **A FRACTION OF THE BOX IS NOT ENOUGH ON A FLAT MODEL.** A long, shallow network makes
+	// `0.14 x height` a few pixels, so the rotate handle lands on top of the corner handles and the
+	// two gestures fight. The stand-off is therefore the LARGER of that fraction and a fixed screen
+	// distance -- the same reasoning that sizes the handles themselves in pixels.
+	var GEOREF_ROTATE_MIN_PX = 34;
 	function georefRotateHandleSrc() {
 		var b = georefSrcBounds(), h = (b.maxY - b.minY) || (b.maxX - b.minX) || 1;
-		return { x: (b.minX + b.maxX) / 2, y: b.maxY + h * GEOREF_ROTATE_GAP };
+		// Screen pixels -> doc units: divide out the map scale, then the metres-per-unit the
+		// transform is carrying, since a doc unit is not a pixel.
+		var mpu = (georef && georef.t && georef.t.metersPerUnit) || 1,
+			degPerPx = 1 / (state.s || 1),
+			minSrc = degPerPx * (GEOREF_ROTATE_MIN_PX) / Math.max(1e-9, (mpu * DEG_PER_M));
+		return { x: (b.minX + b.maxX) / 2, y: b.maxY + Math.max(h * GEOREF_ROTATE_GAP, minSrc) };
 	}
 
 	// ---- the on-canvas frame -------------------------------------------------------------------
@@ -5101,13 +5111,27 @@ var EngCalcs = EngCalcs || {};
 	// which would be a SECOND third-party host on a page whose whole privacy claim is that the tile
 	// server is the only one. That is Tom's call, not a detail of this command.
 	//
-	// **IT ACCEPTS WHAT PEOPLE PASTE.** `38.106, -122.569` is what every map on Earth hands you, so
-	// that order -- LATITUDE FIRST -- is what this reads, whatever our internal x/y order is. A
-	// separator of comma, space or both, and a leading/trailing bracket, all pass.
+	// **IT ACCEPTS WHAT PEOPLE PASTE, AND REFUSES WHAT IT CANNOT READ.** `38.106, -122.569` is what
+	// every map on Earth hands you, so that order -- LATITUDE FIRST -- is what this reads.
+	//
+	// **THE DECIMAL COMMA IS THE WHOLE DIFFICULTY, and getting it wrong is SILENT.** Most of our 26
+	// languages write 38,106 for what English writes 38.106, so a pasted European coordinate reads
+	// `38,106 -122,569` -- and the first version of this took the first two integers out of it and
+	// travelled to 38 N 106 E, Inner Mongolia, with no message of any kind. A wrong map is far worse
+	// than a refusal. Found by dev/browser-pass/specs/goto.js; Wave 0 had flagged the same trap in
+	// the tip's own example (dev/english-friction/438-wave0.json).
+	//
+	// The rule that resolves it: **match numbers GREEDILY, then COUNT them, and refuse anything that
+	// is not exactly two.** A comma inside a number binds tighter than a comma between two, so
+	// `38.106 -122.569`, `38,106 -122,569`, `38.106, -122.569` and `38,106, -122,569` all yield
+	// exactly two and all read correctly -- the last being what a decimal-comma locale makes of the
+	// tip's own example. `1,234.5 -122.5` yields THREE and is refused, which is the right answer for
+	// a thousands separator: no latitude has one. The example strings separate with a SPACE anyway,
+	// because it is unambiguous in every locale and needs no explaining.
 	function parseLatLon(text) {
-		var m = String(text || '').match(/(-?\d+(?:\.\d+)?)\s*[, ]\s*(-?\d+(?:\.\d+)?)/);
-		if (!m) { return null; }
-		var lat = parseFloat(m[1]), lon = parseFloat(m[2]);
+		var nums = String(text || '').match(/[-+]?\d+(?:[.,]\d+)?/g);
+		if (!nums || nums.length !== 2) { return null; }
+		var lat = parseFloat(nums[0].replace(',', '.')), lon = parseFloat(nums[1].replace(',', '.'));
 		if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) { return null; }
 		return { lat: lat, lon: lon };
 	}
@@ -5121,7 +5145,7 @@ var EngCalcs = EngCalcs || {};
 		if (v === null) { return; }
 		var ll = parseLatLon(v);
 		if (!ll) {
-			setNotice(pc.lpn_goto_bad || 'That is not a latitude and longitude. Try 38.106, -122.569.');
+			setNotice(pc.lpn_goto_bad || 'That is not one latitude and one longitude. Try 38.106 -122.569, with a space between them.');
 			return;
 		}
 		var w = (svg && svg.clientWidth) || 1000, want = w / GOTO_SPAN_DEG;
@@ -7791,6 +7815,13 @@ var EngCalcs = EngCalcs || {};
 		if (saved && Array.isArray(saved.projects)) {
 			library.projects = saved.projects;
 			library.openId = saved.openId || null;
+			// **THE FIELD-BY-FIELD COPY IS WHY THE GALLERY KEPT COMING BACK** (Task 431). Two fields
+			// were copied out of the saved index and everything else was silently dropped on READ,
+			// so `galleryDismissed` was written, stored, read past, and then overwritten as absent by
+			// the next saveIndex(). It was invisible in the file, which held `true` the whole time.
+			// Any future per-library flag has to be listed here as well; there is no reader that
+			// takes the whole object, and making one would also adopt whatever a future format holds.
+			library.galleryDismissed = !!saved.galleryDismissed;
 		}
 		var repaired = adoptOrphans();
 		// No index and no projects: a first visit, or a user whose only network is still under the
@@ -13306,10 +13337,13 @@ var EngCalcs = EngCalcs || {};
 	// size-scaled threshold. The transition in either direction takes the full path, so nothing comes
 	// back stale. (Nothing hydraulic runs here either -- scheduleSolve() is never called from a zoom.)
 	function onZoomChanged() {
-		// The profile's map highlight is drawn in world units derived from the screen scale (a wide
-		// stroke, a ring one pointer-slop bigger than the node), so a zoom has to redraw it or it
-		// grows and shrinks with the drawing instead of staying a constant thickness on screen.
+		// **ANYTHING DRAWN AT A SIZE IN SCREEN PIXELS HAS TO BE REDRAWN WHEN THE SCALE CHANGES**, or
+		// it is a constant in WORLD units instead and grows and shrinks with the drawing. Two things
+		// on this page are in that class, and the placement handles were the one that was missed:
+		// six wheel notches after Drop took an 18 px grab target to 32 px, and zooming out shrank it
+		// away entirely. Found by dev/browser-pass/specs/place.js.
 		if (profileIsOpen()) { drawProfilePath(profilePath()); }
+		if (georef && georef.t) { georefDrawFrame(); }
 		var wasHidden = dataLabelsHidden;
 		applyLabelVisibility();
 		if (wasHidden && dataLabelsHidden) {

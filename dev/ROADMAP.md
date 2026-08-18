@@ -497,14 +497,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     (shedding) · 6 labels hidden because the zoom is too far out · 7 leader lines drawn.
   - Stopping at N answers "did my change help?" — the answer is two drawings at the same step.
 
-- 30|421| **A notice the user needs is overwritten by the next solve diagnostic.** Opening a file that
-  is already open says so in the status line, and the message is gone before it can be read — the
-  solve that follows writes "Add a reservoir or a tank" over it. `dev/browser-pass/specs/files.js`
-  fails on exactly this ("and says why"), and has since before 2026-08-17.
-  - The fix is a rule about the status line, not about this one message: a notice the user's ACTION
-    produced should outlive a diagnostic the document produces, or be shown somewhere that is not
-    the same one line.
-
 - 55|418| **The first project of a first visit is marked dirty with nobody having touched it**, so its
   tab wears a permanent asterisk. Found by the Task 414 browser-pass repair, 2026-08-17, and it is
   Tom's 2026-08-15 "the initial project gets an unwarranted asterisk" -- the stamp was moved and is
