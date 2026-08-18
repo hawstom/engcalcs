@@ -1022,9 +1022,11 @@ html[lang="zh"] .ec-welcome {
 	.lpn-profile-controls { flex: 0 0 auto; }
 }
 /* A tab whose content is a long list scrolls INSIDE itself -- the page may not scroll (Task 432),
-   and a table of 800 junctions is exactly the content that would make it. */
-.lpn-pane-scroll { display: none; overflow: auto; }
-.lpn-pane-scroll.on { display: block; }
+   and a table of 800 junctions is exactly the content that would make it. `block`, not the flex
+   row a panel gets by default, and said with enough specificity that it does not depend on which
+   rule comes later in this file. */
+.lpn-pane-panel.lpn-pane-scroll { overflow: auto; }
+.lpn-pane-panel.lpn-pane-scroll.on { display: block; }
 /* The tabular editors. Column width is king: headings stay narrow, cells stay tight, and the
    number columns are right-aligned so a column of figures reads as one. The heading row STICKS,
    because a table you scroll is a table whose headings you lose. */
