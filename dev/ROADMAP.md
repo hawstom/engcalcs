@@ -447,9 +447,9 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   same way it declares units.** Scope, the three places "geo is just another unit" stops holding, the
   basemap, the unprojected display and the projection seam: **`dev/geographic-projects.md`**.
   - **DONE, slices 1-3:** the declaration and degrees at every user boundary; the OpenStreetMap
-    raster basemap; and the placement tool (File > Put this project on the world map…). Terms
-    decided: **world map** and **XY grid**. Detail, and a proposed `$ec_lang_syn` diff still awaiting
-    Tom's approval: **`dev/georeferencing.md`**.
+    raster basemap; and the placement tool (File > Convert XY project to GeoMap…), plus a globe-wide
+    zoom floor and Go to latitude, longitude. Terms are Tom's: **GeoMap** and **XY**. Detail, and a
+    proposed `$ec_lang_syn` diff still awaiting his approval: **`dev/georeferencing.md`**.
   - **NEXT: the projection seam, and it is its own task-sized piece of work.** The cheap version — an
     internal Mercator frame with a lon/lat file — redefines `doc.nodes[].x` under `js/lpn-inp.js` and
     the `.inp` exporter, so it must be sequenced AFTER them, not run beside them.

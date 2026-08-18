@@ -11,7 +11,7 @@
 // reader that treats blank as 1.0 leaves nearly every junction 34% low with every number on screen
 // looking perfectly reasonable, so that case is tested first and by name.
 //
-// The reference is EPA's own published Net3 report at 0:00 (dev/water-network-examples/Net3.rpt),
+// The reference is EPA's own published Net3 report at 0:00 (dev/lpn-spike/reference/Net3.rpt),
 // the same source dev/lpn-spike/net3-vs-epanet-report.js measures against. That report puts our
 // unpatterned heads 41 ft out at their worst and our patterned ones 0.01 ft out, so the bound here
 // is 0.1 ft -- far inside the gap the patterns close, and far outside float noise.
@@ -60,7 +60,7 @@ function ok(name, cond, extra) {
 	if (!cond) { fails++; }
 }
 
-const inpPath = path.join(ROOT, 'dev/water-network-examples/Net3.inp');
+const inpPath = path.join(ROOT, 'dev/lpn-spike/reference/Net3.inp');
 setUnitSet('si');   // the file's units must win, exactly as in inp-import-harness.js
 byId.lpn_dialog_body.children.length = 0;
 L.importInp({ name: 'Net3.inp', _text: fs.readFileSync(inpPath, 'utf8') });
@@ -137,7 +137,7 @@ console.log('\n--- and it solves to EPA\'s published Net3 report at 0:00 ---');
 	const res = require(ROOT + 'js/lpn-solver.js').lpnSolve(model);
 	ok('it converges', res.ok && res.converged, res.iterations + ' iterations');
 
-	const rpt = fs.readFileSync(path.join(ROOT, 'dev/water-network-examples/Net3.rpt'), 'utf8');
+	const rpt = fs.readFileSync(path.join(ROOT, 'dev/lpn-spike/reference/Net3.rpt'), 'utf8');
 	// The report is an EXTENDED-PERIOD run; 0:00 is the only block a steady-state page can be
 	// compared against, and it ends at the next block's header.
 	// **THE 0:00 BLOCK IS THREE BLOCKS**, the second and third headed "(continued)". Splitting on
