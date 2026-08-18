@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1035,
-        "delta_key_count": 39,
+        "expected_key_count": 1036,
+        "delta_key_count": 40,
         "exempt_key_count": 29,
         "exempt_keys": [
             "u_imgd",
@@ -376,6 +376,7 @@
         "lpn_field_text_valign": "Vertical justification",
         "lpn_field_text_valign_top": "Top",
         "lpn_field_text_valign_middle": "Middle",
+        "lpn_field_text_valign_bottom": "Bottom",
         "lpn_examples_welcome": "Welcome to your Water Supply Network software, with the EPANET core",
         "lpn_examples_close": "Close",
         "lpn_find_menu": "Find",
@@ -417,6 +418,7 @@
         "lpn_field_text_valign": "Vertical justification",
         "lpn_field_text_valign_top": "Top",
         "lpn_field_text_valign_middle": "Middle",
+        "lpn_field_text_valign_bottom": "Bottom",
         "lpn_examples_welcome": "Welcome to your Water Supply Network software, with the EPANET core",
         "lpn_examples_close": "Close",
         "lpn_find_menu": "Find",
@@ -548,6 +550,22 @@
             }
         },
         "lpn_field_text_valign_middle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_field_text_bold",
+                    "value": "Teks tebal",
+                    "english": "Bold text"
+                },
+                "next_translated": {
+                    "key": "lpn_field_text_rotation",
+                    "value": "Sudut (derajat)",
+                    "english": "Angle (degrees)"
+                }
+            }
+        },
+        "lpn_field_text_valign_bottom": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
@@ -1076,8 +1094,5 @@
             }
         }
     },
-    "key_syn": {
-        "lpn_field_text_align": "Horizontal alignment, or Text alignment",
-        "lpn_field_text_valign": "Vertical alignment, or Anchor point position"
-    }
+    "key_syn": []
 }

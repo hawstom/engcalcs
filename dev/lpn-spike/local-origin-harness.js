@@ -246,8 +246,11 @@ console.log('\n--- one home for the concept ---');
 	const count = re => (js.match(re) || []).length;
 	ok('outwardX has one definition and five call sites', count(/outwardX\(/g) === 6, count(/outwardX\(/g));
 	ok('outwardY has one definition and five call sites', count(/outwardY\(/g) === 6, count(/outwardY\(/g));
-	ok('inwardX has one definition and two call sites', count(/inwardX\(/g) === 3, count(/inwardX\(/g));
-	ok('inwardY has one definition and two call sites', count(/inwardY\(/g) === 3, count(/inwardY\(/g));
+	// The inward pair gained one site each with Task 145's geographic home view: a longitude and a
+	// latitude the code states in WORLD terms have to be converted into the document's local frame
+	// like any other outside number, or a project with a local origin opens on the wrong continent.
+	ok('inwardX has one definition and three call sites', count(/inwardX\(/g) === 4, count(/inwardX\(/g));
+	ok('inwardY has one definition and three call sites', count(/inwardY\(/g) === 4, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

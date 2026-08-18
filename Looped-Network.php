@@ -447,6 +447,7 @@ EngCalcs.pageConfig = {
 	lpn_field_text_align_right: <?=json_encode($ec_lang['lpn_field_text_align_right'])?>,
 	lpn_field_text_valign: <?=json_encode($ec_lang['lpn_field_text_valign'])?>,
 	lpn_field_text_valign_top: <?=json_encode($ec_lang['lpn_field_text_valign_top'])?>,
+	lpn_field_text_valign_bottom: <?=json_encode($ec_lang['lpn_field_text_valign_bottom'])?>,
 	lpn_field_text_valign_middle: <?=json_encode($ec_lang['lpn_field_text_valign_middle'])?>,
 	lpn_field_lon: <?=json_encode($ec_lang['lpn_field_lon'])?>,
 	lpn_field_lat: <?=json_encode($ec_lang['lpn_field_lat'])?>,

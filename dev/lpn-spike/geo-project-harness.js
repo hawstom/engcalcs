@@ -26,6 +26,8 @@ const L = loadLoopedNetwork(
 	"\t\taddNode: addNode, addLink: addLink, buildDom: buildDom,\n" +
 	"\t\tsetCanvas: function (w, h) { svg.clientWidth = w; svg.clientHeight = h; },\n" +
 	"\t\tnewProject: newProject, isGeo: isGeoProject,\n" +
+	"\t\tgeoHome: geoHomeView, GEO_HOME: LPN_GEO_HOME,\n" +
+	"\t\tsetView: function (v) { applyView(v); }, view: currentView,\n" +
 	"\t\tgetProject: function () { return project; },\n" +
 	"\t\tserialize: serializeProject, applySaved: applySaved,\n" +
 	"\t\tdeleteNetwork: deleteNetwork,\n" +
@@ -128,6 +130,35 @@ byId.lpn_toolbar.querySelectorAll = () => [];
 	L.newProject();
 	ok('...and the plain row makes a grid one', !L.isGeo() && L.getProject().coords === undefined,
 		JSON.stringify(L.getProject()));
+}
+
+// ---- 2b. where a new geographic project opens ----------------------------------------------------
+// An empty project has no extent to fit, so without a home view the first geographic project would
+// open on whatever transform the last grid project left behind -- which on a lon/lat document is
+// the middle of the ocean at an arbitrary scale.
+{
+	console.log('\n--- the opening view ---');
+	L.reset(L.GEO);
+	L.setCanvas(800, 600);
+	const v = L.geoHome();
+	ok('a new geographic project has a home view', !!v, JSON.stringify(v));
+	ok('...centred on the Net3 city, in the document\'s own frame',
+		Math.abs(v.cx - L.GEO_HOME.lon) < 1e-9 && Math.abs(v.cy - (-L.GEO_HOME.lat)) < 1e-9,
+		JSON.stringify({ cx: v.cx, cy: v.cy }));
+	// The span is stated in METRES and converted here, so the constant keeps its meaning whatever
+	// the document's units or a future projection do. Check it lands within a few percent.
+	L.setView(v);
+	const acrossDeg = 600 / L.view().s;
+	const acrossM = G.geodesicMeters(L.GEO_HOME.lon, L.GEO_HOME.lat - acrossDeg / 2,
+		L.GEO_HOME.lon, L.GEO_HOME.lat + acrossDeg / 2);
+	ok('...spanning about the distance asked for', Math.abs(acrossM - L.GEO_HOME.span) < 50,
+		acrossM.toFixed(0) + ' m against ' + L.GEO_HOME.span);
+	// A GRID project must get none of this.
+	L.reset();
+	L.setCanvas(800, 600);
+	L.setView({ cx: 0, cy: 0, s: 1 });
+	L.newProject();
+	ok('a grid project is not sent to California', L.view().s === 1 || !L.isGeo());
 }
 
 // ---- 3. what the user reads ------------------------------------------------------------------------

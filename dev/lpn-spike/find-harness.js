@@ -150,8 +150,14 @@ function build(unitSet) {
 	ok('a Text label is found by the words in it',
 		same(L.find('text', 'text', 'contains', 'pump'), ['label:' + n.t]), JSON.stringify(L.find('text', 'text', 'contains', 'pump')));
 	ok('...and not by words it does not contain', L.find('text', 'text', 'contains', 'valve vault').length === 0);
-	ok('a Text label is still findable by ID from the all-elements scope',
-		same(L.find('all', 'id', 'equals', n.t), ['label:' + n.t]));
+	// **AND NOT BY ID, EVER** (Tom, 2026-08-18). A text element's ID is unreachable from every screen
+	// in this app, so a search on it can only be operated by guessing -- and a result naming one
+	// tells the user something they have no way to look up.
+	ok('a Text label is NOT findable by an id nobody can see',
+		L.find('all', 'id', 'equals', n.t).length === 0, JSON.stringify(L.find('all', 'id', 'equals', n.t)));
+	ok('...and an all-elements ID search returns only the elements that have visible ids',
+		L.find('all', 'id', 'contains', '').length === 0 &&
+		L.find('all', 'id', 'contains', 'X').length === 0, JSON.stringify(L.find('all', 'id', 'contains', 'X')));
 }
 
 // ---- 4. the pull-downs cannot leave an impossible query behind ----------------------------------

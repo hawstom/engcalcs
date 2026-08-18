@@ -224,14 +224,18 @@ EngCalcs.lpnGeom = (function () {
 	//
 	// hAlign is the SVG text-anchor vocabulary ('start' | 'middle' | 'end') and vAlign says what
 	// y is: 'middle' (dominant-baseline:central -- vertical centre), 'hanging' (y IS the top of
-	// the text, which is how EPANET anchors a [LABELS] point), or anything else meaning y is the
-	// FIRST LINE'S BASELINE, the node/link data-label convention. The 0.85·fontSize ascent in
-	// that last case is an approximation on purpose -- no cross-browser metrics without layout.
+	// the text, which is how EPANET anchors a [LABELS] point), 'bottom' (y is the bottom edge of
+	// the whole block), or anything else meaning y is the FIRST LINE'S BASELINE, the node/link
+	// data-label convention. The 0.85·fontSize ascent in that last case is an approximation on
+	// purpose -- no cross-browser metrics without layout.
 	//
 	// Returns {x, y, w, h} with x/y at the TOP-LEFT, the same shape lpn-collide uses.
 	function labelBoxAt(x, y, w, h, hAlign, vAlign, fontSize) {
 		var left = hAlign === 'middle' ? x - w / 2 : hAlign === 'end' ? x - w : x;
-		var top = vAlign === 'middle' ? y - h / 2 : vAlign === 'hanging' ? y : y - fontSize * 0.85;
+		var top = vAlign === 'middle' ? y - h / 2
+			: vAlign === 'hanging' ? y
+			: vAlign === 'bottom' ? y - h
+			: y - fontSize * 0.85;
 		return { x: left, y: top, w: w, h: h };
 	}
 

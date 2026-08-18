@@ -33,7 +33,16 @@ const L = loadLoopedNetwork(
 	"\t\tfontSize: function (id) { return effectiveFontSize(labelById(id).sizeMult); },\n" +
 	"\t\tbox: function (id) { var lb = labelById(id);\n" +
 	"\t\t\treturn textLabelBox(lb, labelEls[id], lb.x, lb.y); },\n" +
-	"\t\tsetAlign: function (id, prop, v) { labelById(id)[prop] = v; refreshLabelContent(id); },\n" +
+	"\t\tsetAlign: function (id, prop, v) { var lb = labelById(id); lb[prop] = v;\n" +
+	"\t\t\tapplyTextLabelJustification(lb, labelEls[id]); refreshLabelContent(id);\n" +
+	"\t\t\tupdateLabelGeometry(id); },\n" +
+	"\t\tanchorAttrs: function (id) { var t = labelEls[id].text;\n" +
+	"\t\t\treturn { h: t.getAttribute('text-anchor'), v: t.getAttribute('dominant-baseline') }; },\n" +
+	"\t\taddAnchored: function (nodeId, x, y) { return addText(x, y, nodeId); },\n" +
+	"\t\tsetTextSize: function (px) { settings.textSize = px; onZoomChanged(); },\n" +
+	"\t\tleader: function (id) { var l = labelEls[id].leader;\n" +
+	"\t\t\treturn l ? { x1: +l.getAttribute('x1'), y1: +l.getAttribute('y1'),\n" +
+	"\t\t\t\tx2: +l.getAttribute('x2'), y2: +l.getAttribute('y2') } : null; },\n" +
 	"\t\tmoveTo: function (id, x, y) { var lb = labelById(id); lb.x = x; lb.y = y; updateLabelGeometry(id); },\n" +
 	"\t\trefreshContent: refreshLabelContent,\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
@@ -156,6 +165,87 @@ function place(text, x, y) {
 	L.refreshContent(id);
 	ok('removing them takes the rows away again', tspans(id).length === 0, String(tspans(id).length));
 	ok('...and the words are the new ones', L.labelEl(id).textContent === 'Back to one', L.labelEl(id).textContent);
+}
+
+// ---- 7. the element's own attributes follow the justification -------------------------------------
+// **THE BOX MOVED AND THE WORDS DID NOT.** `text-anchor` was written once, at build time, from an
+// `lb.align` that is still undefined then -- addText() makes the element and the caller justifies it
+// afterwards. So the geometry said "left" and the DOM said "middle", and the label grew and shrank
+// about its centre while its box and leader were computed for an edge it was not anchored on.
+{
+	console.log('\n--- the words go where the box says ---');
+	L.reset(); L.setCanvas(800, 600);
+	const id = place('NORTH\nSTREET', 100, 100);
+	ok('a centred label is anchored middle/central',
+		L.anchorAttrs(id).h === 'middle' && L.anchorAttrs(id).v === 'central',
+		JSON.stringify(L.anchorAttrs(id)));
+	L.setAlign(id, 'align', 'left');
+	ok('setting left justification really moves the TEXT anchor, not just the box',
+		L.anchorAttrs(id).h === 'start', JSON.stringify(L.anchorAttrs(id)));
+	L.setAlign(id, 'align', 'right');
+	ok('...and right', L.anchorAttrs(id).h === 'end', JSON.stringify(L.anchorAttrs(id)));
+	L.setAlign(id, 'valign', 'top');
+	ok('top hangs from the point', L.anchorAttrs(id).v === 'hanging', JSON.stringify(L.anchorAttrs(id)));
+	L.setAlign(id, 'valign', 'bottom');
+	ok('bottom keeps a central baseline and shifts instead',
+		L.anchorAttrs(id).v === 'central' && Math.abs(L.firstDy(id) - (-1.8)) < 1e-9,
+		L.anchorAttrs(id).v + ' dy=' + L.firstDy(id));
+	const box = L.box(id);
+	ok('...so the block sits ABOVE its point', Math.abs((box.y + box.h) - 100) < 1e-9, JSON.stringify(box));
+}
+
+// ---- 8. a leader is inviolate ---------------------------------------------------------------------
+// Tom, 2026-08-18: *"Once a piece of text is associated with a leader, it needs to be justified to
+// that leader... The leader doesn't respond to text size changes. But it shouldn't have to, because
+// we should hold it inviolate."* An edge-justified label's anchored edge IS its point, so the leader
+// ends there and the words grow away from it. Nothing in that sentence mentions a width.
+{
+	console.log('\n--- the leader does not move when the text does ---');
+	L.reset(); L.setCanvas(800, 600);
+	const n = L.addNode('junction', 0, 0).id;
+	const lb = L.addAnchored(n, 60, -40);
+	L.setProp(lb, 'text', 'Lowest pressure');
+	lb.align = 'left';
+	L.buildDom();
+	const before = L.leader(lb.id);
+	ok('the leader ends exactly at the label\'s own point, not at a measured edge',
+		Math.abs(before.x2 - 60) < 1e-9 && Math.abs(before.y2 - (-40)) < 1e-9, JSON.stringify(before));
+	// Triple the text size. The words get much wider; the leader must not budge.
+	L.setTextSize(33);
+	const after = L.leader(lb.id);
+	ok('...and tripling the text size leaves it exactly where it was',
+		after.x2 === before.x2 && after.y2 === before.y2 && after.x1 === before.x1,
+		JSON.stringify(before) + ' -> ' + JSON.stringify(after));
+	// And the text really did change size, or the check above is vacuous.
+	ok('...while the text really did grow', L.fontSize(lb.id) > 20, String(L.fontSize(lb.id)));
+
+	// **THE CASE THAT SEPARATES THE TWO RULES.** A short offset with a long label puts the box
+	// straight over its own node, and the OLD rule -- derive the near edge from the width, then let
+	// the flip rule choose a side -- answers with a point that depends on both. The edge rule
+	// answers with the label's own point and nothing else. A fixture where the two happen to agree
+	// cannot tell whether this shipped at all, and the first version of this section was one.
+	L.reset(); L.setCanvas(800, 600);
+	const n2 = L.addNode('junction', 0, 0).id;
+	const lb2 = L.addAnchored(n2, 10, -8);
+	L.setProp(lb2, 'text', 'Reservoir at the head of the system');
+	lb2.align = 'left';
+	L.buildDom();
+	ok('a wide label on a short leader still ends at its own point',
+		Math.abs(L.leader(lb2.id).x2 - 10) < 1e-9, JSON.stringify(L.leader(lb2.id)));
+	L.setTextSize(33);
+	ok('...and still does when the text is tripled',
+		Math.abs(L.leader(lb2.id).x2 - 10) < 1e-9, JSON.stringify(L.leader(lb2.id)));
+
+	// **VERTICALLY IS WHERE THE TWO RULES REALLY PART.** Deriving the attachment from the box puts
+	// it at the box's vertical CENTRE, which is the label's point only while the label is centred.
+	// Justify it to the top and the leader should still land on the point the user justified TO --
+	// the top-left corner of the words -- not half a block below it.
+	L.setAlign(lb2.id, 'valign', 'top');
+	ok('a top-justified label keeps its leader on its own point',
+		Math.abs(L.leader(lb2.id).y2 - (-8)) < 1e-9, JSON.stringify(L.leader(lb2.id)));
+	L.setAlign(lb2.id, 'valign', 'bottom');
+	ok('...and so does a bottom-justified one',
+		Math.abs(L.leader(lb2.id).y2 - (-8)) < 1e-9, JSON.stringify(L.leader(lb2.id)));
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILED');

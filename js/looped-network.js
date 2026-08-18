@@ -2173,6 +2173,28 @@ var EngCalcs = EngCalcs || {};
 	function isGeoProject() { return !!project && project.coords === LPN_COORDS_GEO; }
 	// x is a LONGITUDE and y is a LATITUDE, in that order -- the order this page's x/y already run in,
 	// and the opposite of the "lat, long" a person says out loud.
+	//
+	// **WHERE A NEW GEOGRAPHIC PROJECT OPENS, and it is a joke with a real job** (Tom, 2026-08-18:
+	// *"often it's something cute like the Net3 city... I think the Net3 city would be a fun easter
+	// egg"*). These are his coordinates: the north San Francisco Bay, which is the ground EPA's own
+	// Net3 example network sits on. Anyone who has read that file recognises it; anyone who has not
+	// gets a sensible place to start rather than 0,0 in the Gulf of Guinea.
+	//
+	// The span is a DISTANCE, in metres, converted here to the degrees the document is in -- so the
+	// same constant keeps meaning the same thing if the projection ever changes.
+	var LPN_GEO_HOME = { lon: -122.5686103, lat: 38.106067, span: 6641 };
+	function geoHomeView() {
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0,
+			// Degrees of latitude across the span, at that latitude. Latitude is the safe axis to
+			// scale by: a degree of it barely changes with position, where a degree of longitude
+			// shrinks by cos(lat) and would make the view width depend on where you are.
+			degLat = LPN_GEO_HOME.span /
+				Geom.geodesicMeters(LPN_GEO_HOME.lon, LPN_GEO_HOME.lat - 0.5,
+					LPN_GEO_HOME.lon, LPN_GEO_HOME.lat + 0.5);
+		if (!w || !h || !(degLat > 0)) { return null; }
+		return { cx: inwardX(LPN_GEO_HOME.lon), cy: inwardY(LPN_GEO_HOME.lat), s: Math.min(w, h) / degLat };
+	}
 	// Six decimals is ~0.11 m at the equator and less everywhere else -- finer than any pipe is
 	// placed, and coarse enough to read. Two decimals (readonlyField()'s default) would be ~1.1 km
 	// and would show every node in a site at the same coordinate.
@@ -3919,7 +3941,32 @@ var EngCalcs = EngCalcs || {};
 		var a = lb && lb.align;
 		return a === 'left' ? 'start' : a === 'right' ? 'end' : 'middle';
 	}
-	function labelVAlign(lb) { return (lb && lb.valign === 'top') ? 'hanging' : 'middle'; }
+	function labelVAlign(lb) {
+		if (!lb) { return 'middle'; }
+		if (lb.valign === 'top') { return 'hanging'; }
+		if (lb.valign === 'bottom') { return 'bottom'; }
+		return 'middle';
+	}
+	// **THE JUSTIFICATION HAS TO BE WRITTEN TO THE ELEMENT WHENEVER IT CHANGES, NOT ONLY WHEN THE
+	// ELEMENT IS BUILT** (Tom, 2026-08-18).
+	//
+	// `text-anchor` and `dominant-baseline` were set once, in buildLabelEls(), from an `lb.align`
+	// that was almost always still undefined at that moment -- addText() creates the element and the
+	// caller sets the justification afterwards. So the DOM said "middle" while the geometry said
+	// "left", and the two disagreed in the way that is hardest to see: the BOX moved to the anchored
+	// edge and the TEXT stayed centred on its point. Tom's report is exactly that shape -- a callout
+	// "growing and shrinking about its center" while its box and its leader were computed for an
+	// edge it was not actually anchored on.
+	//
+	// **VERTICAL IS DONE WITH A dy, NOT WITH A BASELINE KEYWORD**, except for hanging, which was
+	// already shipped and is what an imported EPANET label depends on (Task 332). `text-after-edge`
+	// and friends are unevenly supported; a shift in `em` off a central baseline is exact everywhere
+	// and is the same machinery multi-line already uses. See textLabelFirstDy().
+	function applyTextLabelJustification(lb, le) {
+		if (!le || !le.text) { return; }
+		le.text.setAttribute('text-anchor', labelHAlign(lb));
+		le.text.setAttribute('dominant-baseline', labelVAlign(lb) === 'hanging' ? 'hanging' : 'central');
+	}
 
 	// ---- MTEXT rung 1: a Text object is LINES (ROADMAP Task 342) --------------------------------
 	//
@@ -3947,10 +3994,18 @@ var EngCalcs = EngCalcs || {};
 	// what this function buys: a single line gets no shift at all, so every drawing already made
 	// keeps its exact appearance. A centred block of n lines is raised by half of the extra height
 	// so it straddles its point; a top-anchored one already hangs downward and needs nothing.
+	// THREE POSITIONS, one rule. The block is drawn from a CENTRAL baseline (except hanging), so the
+	// shift that puts it where the user asked is arithmetic on line heights:
+	//   top     the block hangs down from the point -- the baseline keyword does it, so no shift
+	//   middle  the block straddles the point       -- raise it by half its extra height
+	//   bottom  the block sits above the point      -- raise it by all of its extra height, plus the
+	//           half-line that separates the last line's centre from its bottom edge
+	// One line at 'middle' shifts by nothing, which is what keeps every drawing ever made identical.
 	function textLabelFirstDy(lb) {
-		var n = textLabelLines(lb).length;
-		if (n < 2) { return 0; }
-		return labelVAlign(lb) === 'hanging' ? 0 : -1.2 * (n - 1) / 2;
+		var n = textLabelLines(lb).length, v = labelVAlign(lb);
+		if (v === 'hanging') { return 0; }
+		if (v === 'bottom') { return -1.2 * (n - 1) - 0.6; }
+		return n < 2 ? 0 : -1.2 * (n - 1) / 2;
 	}
 	// The ONE place a Text object's words reach the DOM. A single line stays a plain text node --
 	// the shape every existing measurement, hit-test and harness already sees -- and only a real
@@ -4063,10 +4118,10 @@ var EngCalcs = EngCalcs || {};
 			leader = el('line', { x1: an.x, y1: an.y, x2: px, y2: py, 'class': 'lpn-leader' }, labelsLayer);
 		}
 		text = el('text', {
-			x: px, y: py, 'class': 'lpn-lbl lpn-draglbl', 'text-anchor': labelHAlign(lb),
-			'dominant-baseline': labelVAlign(lb) === 'hanging' ? 'hanging' : 'central',
+			x: px, y: py, 'class': 'lpn-lbl lpn-draglbl',
 			'data-lbl': lb.id, style: textLabelStyle(lb)
 		}, labelsLayer);
+		applyTextLabelJustification(lb, { text: text });
 		setTextLabelContent(text, lb, px);
 		// MEASURED AFTER THE STYLE IS ON THE ELEMENT, which is the whole reason bold can be a
 		// style rather than a second measurement path: bold glyphs are wider, so a width taken
@@ -4151,11 +4206,32 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		an = nodeById(lb.anchorNode); px = an.x + lb.x; py = an.y + lb.y;
+		box = textLabelBox(lb, le, px, py);
+		// **AN EDGE-JUSTIFIED LABEL IS ATTACHED TO ITS LEADER, AND THE ATTACHMENT DOES NOT MOVE**
+		// (Tom, 2026-08-18: *"Once a piece of text is associated with a leader, it needs to be
+		// justified to that leader... The leader doesn't respond to text size changes. But it
+		// shouldn't have to, because we should hold it inviolate."*).
+		//
+		// With `align` left or right, the anchored edge IS the label's own point -- so the leader
+		// ends at lb.x exactly, and the text grows away from it. Nothing here depends on the
+		// measured width, which is the whole point: change the text size and the leader is
+		// untouched while the words lengthen away from it.
+		//
+		// A CENTRED label has no such edge, so it keeps the old behaviour: the near edge is derived
+		// from the width and the side is chosen by the flip rule. That is still right for a label
+		// the user dragged, which is centred on wherever they dropped it.
+		if (lb.align === 'left' || lb.align === 'right') {
+			le.side = lb.align === 'left' ? 'right' : 'left';
+			le.leader.setAttribute('x1', an.x); le.leader.setAttribute('y1', an.y);
+			le.leader.setAttribute('x2', px); le.leader.setAttribute('y2', py);
+			repositionMultilineText(le.text, px, py);
+			applyTextLabelRotation(lb, le, px, py);
+			return;
+		}
 		// THE LEADER ATTACHES TO THE BOX, NOT TO THE ANCHOR POINT. It used to read px straight as
 		// the box centre, which was true only while every Text label was centred; with lb.align in
 		// the document the two are different numbers, and the leader would otherwise reach for a
-		// place the text is not. Centred labels get identical geometry to before, by construction.
-		box = textLabelBox(lb, le, px, py);
+		// place the text is not.
 		halfW = box.w / 2;
 		att = Geom.leaderAttach(le.side, box.x + halfW, halfW, an.x, ADVERSE_FRAC);
 		le.side = att.side;
@@ -4465,7 +4541,7 @@ var EngCalcs = EngCalcs || {};
 			boxFor(px, py, box.x, box.y, box.w, box.h);
 		});
 		// An empty drawing still needs two distinct points, or every scale "fits" and the bisection
-		// returns MAX_SCALE on a blank canvas.
+		// returns maxScale() on a blank canvas.
 		if (out.length < 2) { fitItem(out, 0, 0, 0, 0, 0, 0); fitItem(out, 10, 10, 0, 0, 0, 0); }
 		return out;
 	}
@@ -4484,9 +4560,9 @@ var EngCalcs = EngCalcs || {};
 		function fits(s) { return fitWindow(items, s, key, loKey, hiKey, span, padLo, padHi).fits; }
 		// Not even the smallest allowed zoom fits it, which happens when one label on its own is
 		// wider than the canvas. There is nothing to solve; take the floor and let it overhang.
-		if (!fits(MIN_SCALE)) { return MIN_SCALE; }
-		if (fits(MAX_SCALE)) { return MAX_SCALE; }
-		var lo = MIN_SCALE, hi = MAX_SCALE, k, mid;
+		if (!fits(minScale())) { return minScale(); }
+		if (fits(maxScale())) { return maxScale(); }
+		var lo = minScale(), hi = maxScale(), k, mid;
 		for (k = 0; k < LPN_FIT_BISECTIONS; k++) {
 			mid = (lo + hi) / 2;
 			if (fits(mid)) { lo = mid; } else { hi = mid; }
@@ -4533,7 +4609,7 @@ var EngCalcs = EngCalcs || {};
 			h = svg && svg.clientHeight ? svg.clientHeight : 0, sc;
 		if (!validView(v) || !w || !h) { return false; }
 		sc = isFinite(v.s) ? v.s : Math.min(w / v.w, h / v.h);
-		sc = Math.max(MIN_SCALE, Math.min(MAX_SCALE, sc));
+		sc = Math.max(minScale(), Math.min(maxScale(), sc));
 		state.s = sc;
 		state.tx = w / 2 - sc * v.cx;
 		state.ty = h / 2 - sc * v.cy;
@@ -5207,14 +5283,27 @@ var EngCalcs = EngCalcs || {};
 	}
 
 	// ---- pan / zoom / pinch / drag ----
-	var MIN_SCALE = 0.05, MAX_SCALE = 500;
+	//
+	// **THE ZOOM BOUNDS ARE IN THE DOCUMENT'S OWN UNITS, so a geographic document needs different
+	// ones** (Task 145). These two numbers are pixels per WORLD UNIT, and they were chosen when a
+	// world unit was always a foot or a metre. In a geographic project a world unit is a DEGREE --
+	// about 111 km -- so a street-scale view is ~10,000 px per unit, twenty times the old ceiling.
+	// Clamped to the grid ceiling, a new geographic project opened 130 km across and looked like the
+	// feature simply not working.
+	//
+	// The multiplier is the honest conversion: metres per degree of latitude, which is what makes
+	// GEO_MIN/GEO_MAX mean the same PHYSICAL span as the grid pair does in metres.
+	var MIN_SCALE_GRID = 0.05, MAX_SCALE_GRID = 500;
+	var DEG_PER_M = 1 / 111132;   // one degree of latitude in metres, near enough for a zoom bound
+	function minScale() { return isGeoProject() ? MIN_SCALE_GRID / DEG_PER_M : MIN_SCALE_GRID; }
+	function maxScale() { return isGeoProject() ? MAX_SCALE_GRID / DEG_PER_M : MAX_SCALE_GRID; }
 	var pointers = new Map();
 	var drag = null;
 	var dragDirty = false;
 	function zoomAbout(sx, sy, factor) {
 		var r = svg.getBoundingClientRect(), lx = sx - r.left, ly = sy - r.top,
 			wx = (lx - state.tx) / state.s, wy = (ly - state.ty) / state.s;
-		state.s = Math.min(MAX_SCALE, Math.max(MIN_SCALE, state.s * factor));
+		state.s = Math.min(maxScale(), Math.max(minScale(), state.s * factor));
 		state.tx = lx - wx * state.s; state.ty = ly - wy * state.s;
 		setTransform();
 		onZoomChanged();
@@ -5447,8 +5536,18 @@ var EngCalcs = EngCalcs || {};
 		ops = findOpDefs();
 		if (!ops.some(function (o) { return o[0] === findState.op; })) { findState.op = ops[0][0]; }
 	}
+	// **A TEXT LABEL HAS NO ID THE USER CAN SEE, SO IT IS NOT FINDABLE BY ONE** (Tom, 2026-08-18:
+	// *"Do we really want Find to report on Text ids when the user has no other way of knowing
+	// them?"*). A text element's ID is unreachable from every screen in this app -- it is why the
+	// Text row was removed from the Settings ID-prefix list in the first place (see Task 146.05),
+	// and offering a search on it would be a control that can only be operated by guessing.
+	//
+	// Its WORDS are what a person knows it by, so those are what the search reads and what a result
+	// row prints. If the ID ever becomes visible -- 146.05's element browser is where that would
+	// happen -- this exemption is the thing to remove.
+	function findLabelHasNoId(cand) { return cand.group === 'label'; }
 	function findValueOf(cand, prop) {
-		if (prop === 'id') { return cand.el.id; }
+		if (prop === 'id') { return findLabelHasNoId(cand) ? undefined : cand.el.id; }
 		if (prop === 'text') { return effective(cand.el, 'text'); }
 		if (cand.group === 'label') { return undefined; }
 		return colorValueOf(cand.group, cand.el, prop);
@@ -5691,7 +5790,10 @@ var EngCalcs = EngCalcs || {};
 		row.style.display = 'block';
 		row.style.width = '100%';
 		row.style.textAlign = 'left';
-		row.textContent = c.el.id + (findState.prop === 'id' ? '' : '  ' + findFmt(val));
+		// A Text label is named by its words, not by an id nobody can see.
+		row.textContent = findLabelHasNoId(c)
+			? findFmt(effective(c.el, 'text'))
+			: c.el.id + (findState.prop === 'id' ? '' : '  ' + findFmt(val));
 		// The Map Finder's "Adjacent Links" pane, said in one line under the node it belongs to:
 		// finding a junction and immediately wanting to know what meets there is the whole reason
 		// EPANET's dialog has that box.
@@ -7230,7 +7332,14 @@ var EngCalcs = EngCalcs || {};
 		project = { name: name, activeScenario: 'base' };
 		// Only when geographic: an absent key is the grid default, and writing 'grid' explicitly
 		// would put a word in every file that has always meant itself by saying nothing.
-		if (coords === LPN_COORDS_GEO) { project.coords = LPN_COORDS_GEO; }
+		if (coords === LPN_COORDS_GEO) {
+			project.coords = LPN_COORDS_GEO;
+			// **A GEOGRAPHIC PROJECT HAS TO OPEN SOMEWHERE**, and an empty one has no extent to fit
+			// (restoreViewOrFit() returns early for a drawing with no nodes) -- so without this the
+			// first geographic project opens at whatever the last grid project's transform was,
+			// which on a lon/lat document is the middle of the Atlantic at an arbitrary scale.
+			pendingView = geoHomeView();
+		}
 		settings = inheritedSettings;
 		labelSettings = inheritedLabels;
 		backdrop = null;
@@ -14577,6 +14686,10 @@ var EngCalcs = EngCalcs || {};
 				// changes shape as you flip scenarios is unreadable. Not in LPN_OVERRIDABLE, so
 				// setProp() would be the wrong seam here, not merely unnecessary.
 				lb[prop] = v;   // base-write: justification is Base-owned, exactly as position and size are
+				// THE ELEMENT'S OWN ATTRIBUTES FIRST. Without this the box moves and the words do
+				// not -- the defect Tom reported on the example callouts, reachable from this row
+				// too. See applyTextLabelJustification().
+				applyTextLabelJustification(lb, labelEls[labelId]);
 				// The content carries the block offset and each row's x, so it is rebuilt, not just
 				// moved -- a vertical change alters textLabelFirstDy() and a horizontal one alters
 				// where every row starts.
@@ -14591,7 +14704,8 @@ var EngCalcs = EngCalcs || {};
 		], 'center');
 		alignRow(pc.lpn_field_text_valign || 'Vertical justification', 'valign', [
 			['top', pc.lpn_field_text_valign_top || 'Top'],
-			['middle', pc.lpn_field_text_valign_middle || 'Middle']
+			['middle', pc.lpn_field_text_valign_middle || 'Middle'],
+			['bottom', pc.lpn_field_text_valign_bottom || 'Bottom']
 		], 'middle');
 		// ---- Task 337: Bold, and rotation with its two convenience buttons ----
 		// Redrawing after either property changes goes through ONE function, because bold and

@@ -1146,18 +1146,20 @@ $ec_lang_syn['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinish
 $ec_lang['lpn_field_text_bold']='Bold text';
 // Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
 // 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
-// justification; you don't even have to mention the anchor point"). The first draft spelled the
-// mechanism out in the label ("Line up the lines", "The point is at the"); the mechanism belongs in
-// the synonym channel, where a translator can read it without every user having to.
+// justification; you don't even have to mention the anchor point").
+//
+// **NO SYNONYM ENTRY, and the reason is a rule rather than an omission** (Tom, 2026-08-18: "no syn.
+// It's a technical term. We can only give a definition, which is not our job."). $ec_lang_syn holds
+// phrases that could STAND ON THE CONTROL in place of the label; a technical term has no such
+// alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
 $ec_lang['lpn_field_text_align']='Horizontal justification';
-$ec_lang_syn['lpn_field_text_align']='Horizontal alignment, or Text alignment';
 $ec_lang['lpn_field_text_align_left']='Left';
 $ec_lang['lpn_field_text_align_center']='Centre';
 $ec_lang['lpn_field_text_align_right']='Right';
 $ec_lang['lpn_field_text_valign']='Vertical justification';
-$ec_lang_syn['lpn_field_text_valign']='Vertical alignment, or Anchor point position';
 $ec_lang['lpn_field_text_valign_top']='Top';
 $ec_lang['lpn_field_text_valign_middle']='Middle';
+$ec_lang['lpn_field_text_valign_bottom']='Bottom';
 $ec_lang['lpn_field_text_rotation']='Angle (degrees)';
 $ec_lang['lpn_field_text_match_pipe']='Set to pipe angle';
 $ec_lang['lpn_field_text_flip']='Turn 180°';
