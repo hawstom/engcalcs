@@ -16,7 +16,7 @@ var EngCalcs = EngCalcs || {};
 	var Geom = EngCalcs.lpnGeom, Collide = EngCalcs.lpnCollide;
 
 	var NS = 'http://www.w3.org/2000/svg';
-	var svg, world, backdropLayer, gridLayer, linksLayer, nodesLayer, labelsLayer, debugBoxLayer;
+	var svg, world, modelLayer, backdropLayer, gridLayer, linksLayer, nodesLayer, labelsLayer, debugBoxLayer;
 	var state = { tx: 0, ty: 0, s: 1 };
 	// `settings.textSize` is SCREEN PIXELS, full stop -- shared by a node's ID/pressure label, a
 	// link's label, and a user-added Text label. Returned in WORLD units (divided by the current
@@ -2502,9 +2502,10 @@ var EngCalcs = EngCalcs || {};
 		// setTransform(), so the basemap has exactly one place to learn that the visible window
 		// changed -- rather than six call sites that each have to remember. Debounced inside.
 		scheduleBasemapRefresh();
-		// ...and the one place a model being CARRIED onto the map learns the same thing (Task 145).
-		// It is pinned to the middle of the view, so every pan and every zoom moves it.
-		georefCarryTick();
+		// ...and the one place a model being placed onto the map learns the same thing (Task 145).
+		// While it is DETACHED it must not move on the screen at all, which takes an equal and
+		// opposite transform on its own group, and a re-derivation once the gesture settles.
+		georefDetachTick();
 	}
 	// ---- ROADMAP Task 274: the user works in CARTESIAN coordinates (Y increases upward) ----
 	//
@@ -4073,8 +4074,24 @@ var EngCalcs = EngCalcs || {};
 		//
 		// An EMPTY drawing is not such a document. It has no extent, so bbox() falls back to an
 		// invented 0-10 square and the "fit" would be a zoom to nothing.
-		if (!doc.nodes.length) { return; }
+		// **AN EMPTY DRAWING STILL NEEDS A VIEW THAT MATCHES ITS OWN COORDINATES** (Task 145's last
+		// note). Falling through here left the transform of whatever project was open before -- so a
+		// blank XY tab made after a lat/lon one was drawn through a geographic transform at ~14,000
+		// px per unit, and three junctions clicked right across the canvas landed 0.04 apart. A
+		// project's coordinates mean something different in the two modes, so the view has to be the
+		// one its own mode opens on.
+		if (!doc.nodes.length) { applyView(defaultViewForCoords()); return; }
 		zoomExtent(true);
+	}
+	// Where a project with nothing to fit and nothing remembered opens: the ground under Net3 for a
+	// geographic one, and for an XY one the transform a first-ever visit has -- the world origin at
+	// the top-left corner at one pixel per unit.
+	function defaultViewForCoords() {
+		if (isGeoProject()) { return geoHomeView(); }
+		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
+			h = svg && svg.clientHeight ? svg.clientHeight : 0;
+		if (!w || !h) { return null; }
+		return { cx: w / 2, cy: h / 2, s: 1 };
 	}
 	// `auto` marks a fit NOBODY ASKED FOR: boot, a freshly drawn example, a document with no stored
 	// view, the deferred fit once the canvas has a height. Those establish a view rather than
@@ -4830,12 +4847,30 @@ var EngCalcs = EngCalcs || {};
 	// Insert/Move/Scale/Rotate as four separate menu commands was option 2 and is not built -- it
 	// asks the user to name the operation before doing it, which is exactly the hurdle Tom flagged.
 	//
-	// **THE SCALE IS KNOWN, NOT GUESSED, AND THAT REMOVES A WHOLE STEP FROM THE WIZARD.** A grid
-	// project already declares what one drawing unit means -- 1 unit IS 1 ft or 1 m (lengthField(),
-	// and `dev/geographic-projects.md` section 1) -- so the model can land at its TRUE ground size
-	// on the first frame. Tom's step (2a) asked the user for a scale and to be reassured that
-	// approximate was fine; there is nothing to approximate. The scale box is still there, as an
-	// override for a drawing that was never at 1:1.
+	// **THE SCALE IS NOT KNOWN, AND WE MUST FIND IT AS WELL AS THE PLACE.** Tom, 2026-08-18, on the
+	// EPANET examples he actually converted: *"Your grid does not already say how big one drawing
+	// unit is; these EPANET examples and many old systems are drawn on arbitrary 'schematic'
+	// canvases. We must find both location and scale."* An earlier build read `lengthField()` and
+	// declared that one drawing unit was one Length/Map unit; on a schematic that lands a whole
+	// system inside a few metres of pavement. The scale is now something the user SETS -- by sizing
+	// the map behind the model in step 1, by telling Go to… roughly how wide the site is, or by
+	// typing it in step 2.
+	//
+	// **THE TWO STEPS ARE NAMED, VISIBLE, AND THE USER SWITCHES BETWEEN THEM AT WILL.** Tom: *"there
+	// is an uncomfortable gray area between the described modes… I need the map either to come along
+	// or to stay behind when I pan. And I need to be able to control that."*
+	//
+	//   step 1, DETACHED   the model is held STILL ON THE SCREEN and the map pans and zooms beneath
+	//                      it. No handles, and nothing the user does to the map moves the model.
+	//                      Zooming the map in makes the ground under the model smaller, which is how
+	//                      the scale gets found.
+	//   step 2, ATTACHED   the model is on the ground: it pans and zooms with the map, and the
+	//                      corner/body/rotate handles are live.
+	//
+	// **DETACHED COSTS ONE ATTRIBUTE PER FRAME, NOT A REBUILD.** The drawing lives in its own group
+	// (modelLayer), so holding it still while the view moves is the inverse of the view's own
+	// change. The coordinates are re-derived from the source ONCE, when the gesture settles
+	// (georefReproject), which is also the only moment the tangent plane can pick up a new latitude.
 	//
 	// **NOTHING BUT THE COORDINATES CHANGES.** Lengths, diameters, elevations, demands, roughness --
 	// every number the user typed -- are untouched, and a pipe's `len` is stored and never derived,
@@ -4851,11 +4886,24 @@ var EngCalcs = EngCalcs || {};
 	var LPN_COORDS_XY = 'xy';
 	var GEOREF_HANDLE_PX = 9;         // half-width of a corner handle, screen pixels
 	var GEOREF_ROTATE_GAP = 0.14;     // rotate handle's stand-off above the top edge, in box heights
+	var GEOREF_STEP_DETACHED = 1, GEOREF_STEP_ATTACHED = 2;
+	// **A HANDLE OFF THE EDGE OF THE MAP IS A LOCKED DOOR.** Tom, 2026-08-18: *"When I zoom in close
+	// to check a spot on the model, I lose the rectangular controls off the edge of the map… I am
+	// locked out."* So every handle is CLAMPED into the canvas, this far in from its edge, and stays
+	// grabbable at any zoom. The body polygon is drawn true -- only the grab points are pulled back,
+	// which is why a corner drag measures its scale from where the POINTER started rather than from
+	// the corner it nominally belongs to (georefApplyDrag).
+	var GEOREF_HANDLE_INSET_PX = 26;
 
 	function georefActive() { return !!georef; }
-	// A grid project declares that one drawing unit is one Length/Map unit, so this is a
-	// DECLARATION being read, not a scale being estimated.
-	function georefMetersPerUnit() { return toSI(1, 'lpn_u_length'); }
+	function georefDetached() { return !!georef && georef.step === GEOREF_STEP_DETACHED; }
+	// The model lands covering this much of the smaller side of the canvas. It is a PICTURE at this
+	// point, with no ground size at all, so the only sensible first size is "big enough to see and
+	// small enough to see around".
+	var GEOREF_START_FRACTION = 0.4;
+	// How long after the last pan/zoom the coordinates are re-derived. Long enough that a wheel
+	// spin or a drag is one settle rather than thirty, short enough to feel immediate.
+	var GEOREF_SETTLE_MS = 180;
 	// Every point the transform owns, in the OUTWARD Y-UP frame js/lpn-georef.js is written for.
 	// eachStoredPoint() is the same iterator rebaseDocument() uses, so "which points are the
 	// document's coordinates" is answered in one place rather than two that can disagree.
@@ -4884,17 +4932,78 @@ var EngCalcs = EngCalcs || {};
 		var b = georefSrcBounds();
 		return { x: (b.minX + b.maxX) / 2, y: (b.minY + b.maxY) / 2 };
 	}
-	// The transform that keeps the model pinned to the middle of the map while the user navigates.
-	// Rotation is carried across from any earlier adjustment so re-dropping does not undo a turn.
-	function georefCarryTransform() {
-		var c = georefSrcCentre(), v = currentView();
+	// The FIRST transform: the model centred on the canvas, unturned, covering GEOREF_START_FRACTION
+	// of it. Nothing about it claims to be a ground scale -- it is a picture on the screen, and the
+	// scale is whatever the map behind it turns out to be.
+	function georefFirstTransform() {
+		var v = currentView(), b = georefSrcBounds(), c = georefSrcCentre();
 		if (!v) { return null; }
+		var w = (svg && svg.clientWidth) || 1000, h = (svg && svg.clientHeight) || 1000,
+			spanUnits = Math.max(b.maxX - b.minX, b.maxY - b.minY) || 1,
+			// Degrees of latitude one drawing unit should occupy on the screen right now...
+			degPerUnit = (Math.min(w, h) * GEOREF_START_FRACTION / spanUnits) / (state.s || 1),
+			mpd = EngCalcs.lpnGeorefMetersPerDegree(outwardY(v.cy));
 		return {
 			anchor: { x: c.x, y: c.y },
 			origin: { lon: outwardX(v.cx), lat: outwardY(v.cy) },
-			metersPerUnit: georef.mpu,
+			// ...and the metres that is, which is the number the tool is really hunting for.
+			metersPerUnit: degPerUnit * mpd.lat,
 			rotDeg: georef.rotDeg || 0
 		};
+	}
+	// ---- detached: the model is held still and the map moves under it ---------------------------
+	// The compensation is exactly the inverse of what the view has done since the model was last
+	// drawn, so a point lands on the same screen pixel it did then. One attribute, no arithmetic
+	// over the document, nothing rebuilt.
+	var georefSettleTimer = null;
+	function georefApplyCompensation() {
+		if (!modelLayer) { return; }
+		var f = georefDetached() ? georef.frozen : null;
+		if (!f || (f.tx === state.tx && f.ty === state.ty && f.s === state.s)) {
+			modelLayer.removeAttribute('transform');
+			return;
+		}
+		modelLayer.setAttribute('transform',
+			'translate(' + ((f.tx - state.tx) / state.s) + ',' + ((f.ty - state.ty) / state.s) +
+			') scale(' + (f.s / state.s) + ')');
+	}
+	// Called on every view change. While detached it holds the model still and books a settle;
+	// otherwise it makes sure the compensation is not left on.
+	function georefDetachTick() {
+		georefApplyCompensation();
+		if (!georefDetached()) { return; }
+		if (georefSettleTimer) { clearTimeout(georefSettleTimer); }
+		georefSettleTimer = setTimeout(georefReproject, GEOREF_SETTLE_MS);
+	}
+	// **THE ONE PLACE THE MAP'S MOVEMENT BECOMES GROUND TRUTH.** The model is where it was on the
+	// SCREEN; this asks the new view what that screen point is on the Earth, and how many metres a
+	// drawing unit now covers, and re-derives every coordinate from `georef.src` once.
+	//
+	// The vertical is preserved exactly (a degree of latitude is the honest axis, and mpd.lat barely
+	// moves), so the picture only changes shape when the user has travelled far enough north or
+	// south to change the map's own east-west stretch -- which is the projection seam, showing
+	// itself where it belongs.
+	function georefReproject() {
+		georefSettleTimer = null;
+		if (!georefDetached() || !georef.t || !georef.frozen) { return; }
+		var f = georef.frozen, t0 = georef.t;
+		if (f.tx === state.tx && f.ty === state.ty && f.s === state.s) { return; }
+		// Where the model's anchor is being drawn, in canvas pixels, under the frozen mapping...
+		var wx = inwardX(t0.origin.lon), wy = inwardY(t0.origin.lat),
+			sx = wx * f.s + f.tx, sy = wy * f.s + f.ty,
+			// ...and what that pixel is on the Earth under the view the user has now.
+			origin = { lon: outwardX((sx - state.tx) / state.s), lat: outwardY((sy - state.ty) / state.s) },
+			r = f.s / state.s,
+			mpd0 = EngCalcs.lpnGeorefMetersPerDegree(t0.origin.lat),
+			mpd1 = EngCalcs.lpnGeorefMetersPerDegree(origin.lat);
+		georef.frozen = { tx: state.tx, ty: state.ty, s: state.s };
+		georefSetTransform({
+			anchor: { x: t0.anchor.x, y: t0.anchor.y },
+			origin: origin,
+			metersPerUnit: t0.metersPerUnit * r * (mpd1.lat / mpd0.lat),
+			rotDeg: t0.rotDeg
+		});
+		georefApplyCompensation();
 	}
 	// A doc-space point as a WORLD point, which in a geographic project is (longitude, latitude)
 	// shifted and flipped by the document's own frame.
@@ -4938,9 +5047,38 @@ var EngCalcs = EngCalcs || {};
 		if (georefLayer && georefLayer.parentNode) { georefLayer.parentNode.removeChild(georefLayer); }
 		georefLayer = null;
 	}
+	// A world point pulled back inside the canvas, so a handle that belongs off the edge of the map
+	// is still on the map. Screen pixels in and out: the inset is a grab distance, not a distance on
+	// the ground.
+	function georefClampWorld(p, insetPx) {
+		if (!svg) { return p; }
+		var r = svg.getBoundingClientRect(), s = state.s || 1,
+			inset = insetPx || GEOREF_HANDLE_INSET_PX;
+		if (!r.width || !r.height) { return p; }
+		// **THE VISIBLE PART OF THE CANVAS, not the whole of it.** The map is taller than the window
+		// on this page (Task 432), so clamping to the element alone can still put a handle below the
+		// fold -- which is the same locked door, reached by scrolling instead of by panning.
+		var vw = (window.innerWidth || r.width), vh = (window.innerHeight || r.height),
+			x0 = Math.max(0, -r.left) + inset, x1 = Math.min(r.width, vw - r.left) - inset,
+			// ...and CLEAR OF THE CANVAS'S OWN FURNITURE, top and bottom, exactly as zoomExtent()
+			// pads for it: the placement bar and the mode hint along the top, the coordinate readout
+			// along the bottom. A handle clamped underneath one of those is as lost as one off the
+			// edge -- the readout's tip glyph was swallowing the bottom corners.
+			y0 = Math.max(0, -r.top) +
+				Math.max(inset, overlayReserve('lpn_georef_bar'), overlayReserve('lpn_mode_hint')),
+			y1 = Math.min(r.height, vh - r.top) - Math.max(inset, overlayReserve('lpn_map_footer')),
+			sx = p.x * s + state.tx, sy = p.y * s + state.ty;
+		// A window narrower than two insets has no room to clamp into; the middle is the best answer.
+		sx = x1 > x0 ? Math.min(x1, Math.max(x0, sx)) : (x0 + x1) / 2;
+		sy = y1 > y0 ? Math.min(y1, Math.max(y0, sy)) : (y0 + y1) / 2;
+		return { x: (sx - state.tx) / s, y: (sy - state.ty) / s };
+	}
 	function georefDrawFrame() {
 		georefClearLayer();
-		if (!georef || !georef.t) { return; }
+		// **NO RECTANGULAR CONTROLS WHILE DETACHED.** In step 1 the model does not move at all, so a
+		// handle would be a control for a gesture that is not offered. Tom: *"nothing I did in
+		// Detached mode should have moved the project."*
+		if (!georef || !georef.t || georef.step !== GEOREF_STEP_ATTACHED) { return; }
 		var s = state.s || 1, t = georef.t;
 		georefLayer = el('g', { 'class': 'lpn-georef' }, world);
 		var pts = georefCornersSrc().map(function (c) { return georefWorldOf(t, c.x, c.y); });
@@ -4955,7 +5093,11 @@ var EngCalcs = EngCalcs || {};
 		}, georefLayer);
 		// The ROTATE handle and its stem, above the top edge -- the position every image editor puts
 		// it, so it needs no label.
-		var rh = georefRotateHandleSrc(), rp = georefWorldOf(t, rh.x, rh.y);
+		// The rotate handle clamps to a TIGHTER rectangle than the corners do, so that a model far
+		// bigger than the canvas -- where every handle is pinned to an edge -- cannot land it on top
+		// of a corner handle and take that corner's grab away.
+		var rh = georefRotateHandleSrc(),
+			rp = georefClampWorld(georefWorldOf(t, rh.x, rh.y), GEOREF_HANDLE_INSET_PX * 2.4);
 		var topMid = { x: (pts[3].x + pts[2].x) / 2, y: (pts[3].y + pts[2].y) / 2 };
 		el('line', {
 			x1: topMid.x, y1: topMid.y, x2: rp.x, y2: rp.y,
@@ -4968,8 +5110,8 @@ var EngCalcs = EngCalcs || {};
 		// The four CORNERS. `data-georef-corner` is the index into georefCornersSrc(), so the
 		// opposite corner -- the pivot a corner drag scales about -- is (i + 2) % 4 and nothing has
 		// to hold a table of which handle means which.
-		pts.forEach(function (p, i) {
-			var r = GEOREF_HANDLE_PX / s;
+		pts.forEach(function (p0, i) {
+			var r = GEOREF_HANDLE_PX / s, p = georefClampWorld(p0);
 			el('rect', {
 				x: p.x - r, y: p.y - r, width: r * 2, height: r * 2,
 				'class': 'lpn-georef-handle', 'data-georef': 'scale', 'data-georef-corner': i,
@@ -4998,6 +5140,13 @@ var EngCalcs = EngCalcs || {};
 			type: 'georef', kind: kind, pointerId: e.pointerId,
 			startX: e.clientX, startY: e.clientY,
 			t0: georef.t, startLL: startLL,
+			// WHERE THE POINTER GRABBED, in the model's own coordinates. Every gesture is measured
+			// from this rather than from the thing that was grabbed, which is what stops a drag
+			// jumping the model under the cursor -- Tom, 2026-08-18: *"When I click the project to
+			// move it, it jumps (to bring its center to my mouse?) instead of moving from where I
+			// grabbed it."* It is also what lets a handle be CLAMPED to the edge of the map and
+			// still behave: the grab point is honest even when the handle it belongs to is not.
+			startSrc: georefPointerSrc(georef.t, e.clientX, e.clientY),
 			corner: kind === 'scale' ? +target.dataset.georefCorner : -1
 		};
 		return true;
@@ -5018,7 +5167,10 @@ var EngCalcs = EngCalcs || {};
 				outwardX(w.x) - drag.startLL.lon, outwardY(w.y) - drag.startLL.lat);
 		} else if (drag.kind === 'scale') {
 			var pivot = corners[(drag.corner + 2) % 4];
-			var grab = corners[drag.corner];
+			// MEASURED FROM THE POINTER, both ends. Measuring d0 from the corner instead makes the
+			// model jump the moment a clamped handle is grabbed, because the pointer is not where
+			// that corner is.
+			var grab = drag.startSrc || corners[drag.corner];
 			var now = georefPointerSrc(t0, p.x, p.y);
 			var d0 = Math.hypot(grab.x - pivot.x, grab.y - pivot.y);
 			var d1 = Math.hypot(now.x - pivot.x, now.y - pivot.y);
@@ -5044,9 +5196,13 @@ var EngCalcs = EngCalcs || {};
 	function georefSetTransform(t) {
 		georef.t = t;
 		georef.rotDeg = t.rotDeg;
-		georef.mpu = t.metersPerUnit;
 		georefWrite(t);
 		buildDom();
+		// Anything sized in screen pixels was left at the scale of the LAST redraw while the model
+		// was being held still (onZoomChanged does no work at all while detached), so the settle
+		// that re-derives the coordinates is also where those sizes catch up.
+		refreshSymbolSizes();
+		refreshTextLabelSizes();
 		georefDrawFrame();
 		georefRefreshBar();
 	}
@@ -5058,15 +5214,23 @@ var EngCalcs = EngCalcs || {};
 		if (!bar) { return; }
 		bar.style.display = georef ? 'block' : 'none';
 		if (!georef) { return; }
-		var carrying = georef.stage === 'carry';
-		georefBarEl('lpn_georef_hint').textContent = carrying
-			? (pc.lpn_georef_carry || 'Pan and zoom to your site. The model follows the middle of the map.')
+		var detached = georefDetached();
+		// **THE STEP IS NAMED AND THE MODE IS NAMED.** Four keys here are English literals until the
+		// sprint that owns lib/lang.ec.en.php adds them: lpn_georef_step1, lpn_georef_step2,
+		// lpn_georef_step1_hint, lpn_georef_detach.
+		georefBarEl('lpn_georef_step').textContent = detached
+			? (pc.lpn_georef_step1 || 'Step 1 of 2 — detached')
+			: (pc.lpn_georef_step2 || 'Step 2 of 2 — attached');
+		georefBarEl('lpn_georef_hint').textContent = detached
+			? (pc.lpn_georef_step1_hint || 'Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is the right place and the right size, then press Drop it here.')
 			: (pc.lpn_georef_adjust || 'Drag the model to move it, a corner to resize it, the top handle to turn it.');
-		georefBarEl('lpn_georef_drop').style.display = carrying ? '' : 'none';
-		if (georefBarEl('lpn_georef_goto')) { georefBarEl('lpn_georef_goto').style.display = carrying ? '' : 'none'; }
-		georefBarEl('lpn_georef_finish').style.display = carrying ? 'none' : '';
-		georefBarEl('lpn_georef_numbers').style.display = carrying ? 'none' : '';
-		if (!carrying && georef.t) {
+		georefBarEl('lpn_georef_drop').style.display = detached ? '' : 'none';
+		georefBarEl('lpn_georef_detach').textContent = pc.lpn_georef_detach || 'Pick it up again';
+		georefBarEl('lpn_georef_detach').style.display = detached ? 'none' : '';
+		if (georefBarEl('lpn_georef_goto')) { georefBarEl('lpn_georef_goto').style.display = detached ? '' : 'none'; }
+		georefBarEl('lpn_georef_finish').style.display = detached ? 'none' : '';
+		georefBarEl('lpn_georef_numbers').style.display = detached ? 'none' : '';
+		if (!detached && georef.t) {
 			// The scale is shown as WHAT ONE DRAWING UNIT IS ON THE GROUND, in the project's own
 			// length unit -- the sentence a person can check against the drawing they made, unlike
 			// "metres per unit" which is our internal term.
@@ -5100,7 +5264,8 @@ var EngCalcs = EngCalcs || {};
 		// travel: the model follows the middle of the map, so moving the map is the whole gesture.
 		var go = georefBarEl('lpn_georef_goto');
 		if (go) { go.addEventListener('click', goToLatLon); }
-		georefBarEl('lpn_georef_drop').addEventListener('click', georefDrop);
+		georefBarEl('lpn_georef_drop').addEventListener('click', georefAttach);
+		georefBarEl('lpn_georef_detach').addEventListener('click', georefDetach);
 		georefBarEl('lpn_georef_finish').addEventListener('click', georefFinish);
 		georefBarEl('lpn_georef_cancel').addEventListener('click', georefCancel);
 	}
@@ -5152,10 +5317,65 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		var w = (svg && svg.clientWidth) || 1000, want = w / GOTO_SPAN_DEG;
+		// **WHILE PLACING, IT ASKS THE SECOND HALF OF THE QUESTION TOO.** Tom, 2026-08-18: *"In the
+		// Go to... box, ask for lat/lon and approximate size of project area in project length
+		// units. Provide a default of either 1000m or 3000 ft."* That is the half we do NOT have --
+		// a schematic drawing declares no scale at all -- and one honest guess at the width of the
+		// site turns the whole tool from a hunt into an adjustment. Outside the placement tool there
+		// is no model to size, so the question is not asked.
+		if (georefActive()) {
+			var span = georefAskSize();
+			if (span > 0) { georefGoTo(ll, span); return; }
+		}
 		// KEEP the zoom when it is already closer than a site: someone who has lined up on a street
 		// corner and then types a coordinate wants to travel, not to be zoomed back out.
 		applyView({ cx: inwardX(ll.lon), cy: inwardY(ll.lat), s: Math.max(state.s, Math.min(want, maxScale())) });
-		georefCarryTick();
+		georefDetachTick();
+	}
+	// The default is the one Tom named: 3000 ft or 1000 m, whichever the project's own length unit
+	// is. It is a SITE, and it is a round number in the unit the user is already reading.
+	function georefDefaultSpan() {
+		var m = toSI(1, 'lpn_u_length');
+		// toPrecision because 914.4 m read back in feet is 2999.9999999999995, and a rough question
+		// deserves a round default. Four figures keeps any other length unit honest.
+		return +toDisplay(m > 0.5 ? 1000 : 914.4, 'lpn_u_length').toPrecision(4);
+	}
+	function georefAskSize() {
+		var pc = EngCalcs.pageConfig || {};
+		// One more English literal for the sprint: lpn_georef_size_prompt.
+		var text = (pc.lpn_georef_size_prompt || 'About how wide is the site, across the whole project?')
+			+ ' (' + unitLabel('lpn_u_length') + ')';
+		var v = window.prompt(text, String(georefDefaultSpan()));
+		if (v === null) { return 0; }
+		var n = parseFloat(String(v).replace(',', '.'));
+		return isFinite(n) && n > 0 ? toSI(n, 'lpn_u_length') : 0;
+	}
+	// Travel AND scale in one move: the view is zoomed so that the model, which is standing still on
+	// the screen, covers exactly the ground width the user just gave -- and centred on the model, so
+	// the coordinate they typed is where their project is, not merely where the map is.
+	function georefGoTo(ll, spanMeters) {
+		if (!georef || !georef.t) { return; }
+		var b = georefSrcBounds(),
+			spanUnits = Math.max(b.maxX - b.minX, b.maxY - b.minY) || 1,
+			mpd = EngCalcs.lpnGeorefMetersPerDegree(ll.lat),
+			degLat = spanMeters / mpd.lat,
+			// The model's own screen span right now, in pixels: whatever it is, that many pixels
+			// must become `spanMeters` of ground.
+			screenSpanPx = spanUnits * (georef.t.metersPerUnit / mpd.lat) * (state.s || 1),
+			s = Math.max(minScale(), Math.min(maxScale(), screenSpanPx / degLat));
+		applyView({ cx: inwardX(ll.lon), cy: inwardY(ll.lat), s: s });
+		// The model is re-planted at the centre of the new view at the size just asked for, rather
+		// than left wherever it was hanging: this is the one movement of the model in step 1 that
+		// the user asked for by name.
+		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
+		georef.frozen = { tx: state.tx, ty: state.ty, s: state.s };
+		georefApplyCompensation();
+		georefSetTransform({
+			anchor: { x: (b.minX + b.maxX) / 2, y: (b.minY + b.maxY) / 2 },
+			origin: { lon: ll.lon, lat: ll.lat },
+			metersPerUnit: spanMeters / spanUnits,
+			rotDeg: georef.t.rotDeg
+		});
 	}
 
 	function georefStart() {
@@ -5175,8 +5395,8 @@ var EngCalcs = EngCalcs || {};
 		}
 		if (!window.confirm(pc.lpn_georef_intro || 'Convert this XY project to a geographic project?')) { return; }
 		georef = {
-			stage: 'carry', src: georefCapture(), t: null,
-			mpu: georefMetersPerUnit(), rotDeg: 0,
+			step: GEOREF_STEP_DETACHED, src: georefCapture(), t: null,
+			frozen: null, rotDeg: 0,
 			// Everything Cancel has to put back. The ORIGIN is in this list because a grid model may
 			// be in State Plane coordinates with an origin of half a million, and degrees must start
 			// from zero -- see LPN_ORIGIN_THRESHOLD and Task 354.
@@ -5191,47 +5411,72 @@ var EngCalcs = EngCalcs || {};
 		refreshBasemap();
 		refreshBasemapCredit();
 		refreshMapStatus();
-		// The model is NOT drawn during the carry: its coordinates are still grid numbers, which in a
-		// geographic view are a longitude of 2,000 -- off the Earth. A ghost box at the true ground
-		// size is both cheaper and more honest, and it is the thing the user is actually aiming.
 		setMode('select');
-		applyView(geoHomeView());
-		georefCarryTick();
+		// **THE CONVERSION OPENS ON THE WHOLE EARTH.** Tom, 2026-08-18: *"Change the default view to
+		// entire world, whatever location and zoom that is, so that they can zoom to their
+		// location."* The old home view was the ground under EPA's Net3, which is a fine place for a
+		// new geographic project and a strange place to be dropped when your site is in Kenya.
+		applyView({ cx: inwardX(0), cy: inwardY(GEOREF_WORLD_LAT), s: minScale() });
+		// The model is drawn as ITSELF from the first frame -- it is what the user is aiming, and a
+		// ghost box was only ever a stand-in for coordinates we could not place yet.
+		georef.frozen = { tx: state.tx, ty: state.ty, s: state.s };
+		var t0 = georefFirstTransform();
+		// **NO PLACEMENT WITHOUT A VIEW TO PLACE INTO.** currentView() answers null while the canvas
+		// still has no measured size (the curtain before applyMapHeight() has run). Rolling the whole
+		// thing back is the honest outcome -- a half-armed tool would show a bar over a model whose
+		// coordinates are still grid numbers on a map of the Earth.
+		if (!t0) {
+			georefCancel();
+			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
+			return;
+		}
+		georefSetTransform(t0);
+		// The labels and the solver are OFF for the duration -- see georefSuspend().
+		georefSuspend(true);
 		georefRefreshBar();
 	}
-	// Called on every view change while carrying. Cheap on purpose: it moves a four-point polygon,
-	// and touches no element of the network.
-	function georefCarryTick() {
-		if (!georef || georef.stage !== 'carry') { return; }
-		var t = georefCarryTransform();
-		if (!t) { return; }
-		georef.t = t;
-		georefDrawFrame();
+	// Whole-world framing puts a little more land on the screen than the equator does, and the
+	// clamp in applyView() takes care of the rest.
+	var GEOREF_WORLD_LAT = 20;
+	// **THE LABELS AND THE SOLVER ARE OFF WHILE CONVERTING.** Tom, 2026-08-18: *"I accidentally
+	// dragged some labels while working through this. Please hide labels temporarily during
+	// conversion"* and *"For performance, disable calculations and labels during this process; show
+	// only elements including text."* Both are read where they are used -- applyLabelVisibility()
+	// and runSolve() ask georefActive() -- so there is no saved flag to restore wrongly; this only
+	// has to make the page re-ask.
+	function georefSuspend(on) {
+		applyLabelVisibility();
+		if (!on) { scheduleSolve(); }
 	}
-	function georefDrop() {
-		if (!georef || georef.stage !== 'carry') { return; }
-		// **NO PLACEMENT WITHOUT A VIEW TO PLACE INTO.** currentView() answers null while the canvas
-		// still has no measured size (the 10000px curtain before applyMapHeight() has run), and
-		// dropping then would put the model at an undefined origin. Staying in the carry stage is the
-		// honest outcome: the user presses the button again a moment later and it works.
-		var t = georefCarryTransform() || georef.t;
-		if (!t) { return; }
-		georef.stage = 'place';
-		georefSetTransform(t);
-		// **NO FIT HERE, DELIBERATELY.** A fit after the drop was written and then removed: Tom's
-		// standing position is that "refitting and re-baselining: I see it as vanishingly defensible",
-		// and dev/lpn-spike/view-memory-harness.js caps automatic fits at the three that are all the
-		// same case -- a document with no stored view at all. This is not that case, and it does not
-		// need to be: the carry stage draws the model's TRUE footprint as a ghost box, so a user who
-		// can see the whole box before pressing Drop can see the whole model after it. If they cannot,
-		// Zoom to fit is one click away and is then a fit they asked for.
+	// ---- step 1 <-> step 2 ----------------------------------------------------------------------
+	// The two steps differ in ONE thing: whether a view change carries the model along. The
+	// coordinates are correct lon/lat in both, so switching is a state change and not a conversion.
+	function georefAttach() {
+		if (!georefDetached()) { return; }
+		// A settle still in flight belongs to step 1; run it now so the model attaches where it is
+		// being drawn rather than where it was a fifth of a second ago.
+		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefReproject(); }
+		if (!georef.t) { return; }
+		georef.step = GEOREF_STEP_ATTACHED;
+		georefApplyCompensation();
+		// **NO FIT HERE, DELIBERATELY.** Tom's standing position is that "refitting and
+		// re-baselining: I see it as vanishingly defensible", and the model is already exactly where
+		// it was on the screen a moment ago, so there is nothing a fit could improve.
+		georefSetTransform(georef.t);
+	}
+	function georefDetach() {
+		if (!georef || georef.step !== GEOREF_STEP_ATTACHED) { return; }
+		georef.step = GEOREF_STEP_DETACHED;
+		georef.frozen = { tx: state.tx, ty: state.ty, s: state.s };
+		georefApplyCompensation();
 		georefDrawFrame();
 		georefRefreshBar();
 	}
 	function georefFinish() {
 		var pc = EngCalcs.pageConfig || {};
-		if (!georef || georef.stage !== 'place') { return; }
+		if (!georef || georef.step !== GEOREF_STEP_ATTACHED) { return; }
 		if (!window.confirm(pc.lpn_georef_confirm || 'Place the model here for good?')) { return; }
+		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
 		// **THE VIEW IS CAPTURED BEFORE THE REFRESH AND PUT BACK AFTER IT.**
 		// refreshAllFromDocument() ends in restoreViewOrFit(), whose answer is the view remembered
 		// for this tab -- which is where the user was looking at the XY GRID, half a world away.
@@ -5239,6 +5484,8 @@ var EngCalcs = EngCalcs || {};
 		var v = currentView();
 		georef = null;
 		georefClearLayer();
+		georefApplyCompensation();   // the model is the map's again
+		georefSuspend(false);
 		georefRefreshBar();
 		// FULL refresh now, and only now: this is the moment the project really did change kind, so
 		// the basemap, the status strip, the settings panel and the solve all have to be re-derived.
@@ -5250,6 +5497,7 @@ var EngCalcs = EngCalcs || {};
 	}
 	function georefCancel() {
 		if (!georef) { return; }
+		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
 		var prev = georef.prev, src = georef.src, i = 0;
 		project.coords = prev.coords;
 		project.basemap = prev.basemap;
@@ -5265,6 +5513,8 @@ var EngCalcs = EngCalcs || {};
 		});
 		georef = null;
 		georefClearLayer();
+		georefApplyCompensation();
+		georefSuspend(false);
 		georefRefreshBar();
 		refreshAllFromDocument();
 		if (prev.view) { applyView(prev.view); }
@@ -6340,7 +6590,10 @@ var EngCalcs = EngCalcs || {};
 		profilePathLayer = el('g', { 'class': 'lpn-profile-path', 'pointer-events': 'none' });
 		// BELOW the nodes and ABOVE the links: a route is about the pipes, so it must not bury the
 		// junction symbols the user is about to click as a waypoint.
-		world.insertBefore(profilePathLayer, nodesLayer);
+		// Into the DRAWING's own group, beside the symbol layers -- `world` is its grandparent since
+		// the model got a group of its own (see modelLayer), and insertBefore on the wrong parent
+		// throws.
+		nodesLayer.parentNode.insertBefore(profilePathLayer, nodesLayer);
 		(path.links || []).forEach(function (id) {
 			var l = linkById(id);
 			if (!l) { return; }
@@ -11144,15 +11397,21 @@ var EngCalcs = EngCalcs || {};
 		basemapLayer = el('g', { 'class': 'lpn-basemap' }, world);
 		backdropLayer = el('g', { 'class': 'lpn-backdrop' }, world);
 		gridLayer = el('g', {}, world);
+		// **THE DRAWING'S OWN GROUP, so it can be held STILL while the map moves under it** (Task
+		// 145 step 1, "detached"). It carries no transform at all in normal use; while the model is
+		// detached it carries the inverse of the view's own change, which is one attribute per frame
+		// instead of re-deriving every coordinate and rebuilding the DOM. The basemap, the grid and
+		// the user's backdrop stay outside it, which is exactly what "the map moves underneath" means.
+		modelLayer = el('g', {}, world);
 		// Classed so the symbol-opacity setting can fade both symbol layers as ONE drawing -- see
 		// the .lpn-symbols rule in css/engcalcs.css.
-		linksLayer = el('g', { 'class': 'lpn-symbols' }, world);
-		nodesLayer = el('g', { 'class': 'lpn-symbols' }, world);
+		linksLayer = el('g', { 'class': 'lpn-symbols' }, modelLayer);
+		nodesLayer = el('g', { 'class': 'lpn-symbols' }, modelLayer);
 		// EVERY LABEL'S TEXT AND LEADER LIVES IN THIS ONE SHARED LAYER, never appended alongside the
 		// element it belongs to, so ALL labels sit above ALL node/link symbols. Building each label
 		// into nodesLayer/linksLayer makes draw order track creation order, so a later-built node's
 		// symbol paints over an earlier node's already-placed label.
-		labelsLayer = el('g', {}, world);
+		labelsLayer = el('g', {}, modelLayer);
 		// Topmost layer (after labelsLayer) so the rubber-band is never hidden under a node/link
 		// while drawing a pipe/pump (Tom, 2026-07-30).
 		rubberBandEl = el('line', { 'class': 'lpn-rubberband', style: 'display:none' }, world);
@@ -13306,7 +13565,11 @@ var EngCalcs = EngCalcs || {};
 		// screen rather than merely being styled by it: the zoom path, which can skip the whole
 		// label pipeline when nothing readable is drawn, and bbox(), which must not reserve space
 		// for labels nobody can see. Both used to re-derive it and one of them got it wrong.
-		dataLabelsHidden = !!(on && vw > lim);
+		// **NOTHING GENERATED IS DRAWN WHILE THE PROJECT IS BEING PLACED ON THE MAP** (Task 145).
+		// Tom dragged a label by accident while aiming the model, and every label is also work the
+		// page does on a gesture whose whole point is to be smooth. The user's own Text elements
+		// stay: they are content, and he asked for "only elements including text".
+		dataLabelsHidden = !!(georefActive() || (on && vw > lim));
 		if (svg) { svg.classList.toggle('lpn-labels-hidden', dataLabelsHidden); }
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id];
@@ -13346,6 +13609,12 @@ var EngCalcs = EngCalcs || {};
 		// six wheel notches after Drop took an 18 px grab target to 32 px, and zooming out shrank it
 		// away entirely. Found by dev/browser-pass/specs/place.js.
 		if (profileIsOpen()) { drawProfilePath(profilePath()); }
+		// **A DETACHED MODEL IS NOT ON THIS MAP YET, so a zoom of the map is nothing to do with it.**
+		// It is being held at the size it was drawn, and everything below sizes things off state.s,
+		// which would shrink its strokes and symbols while its geometry stood still. The settle
+		// (georefSetTransform) is where those sizes catch up, at the scale they will actually be
+		// seen at.
+		if (georefDetached()) { return; }
 		if (georef && georef.t) { georefDrawFrame(); }
 		var wasHidden = dataLabelsHidden;
 		applyLabelVisibility();
@@ -16147,6 +16416,11 @@ var EngCalcs = EngCalcs || {};
 		doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
 	}
 	function runSolve() {
+		// **NO ARITHMETIC WHILE THE PROJECT IS BEING PLACED** (Task 145, Tom: "disable calculations
+		// and labels during this process"). Every coordinate is being re-derived on a gesture, none
+		// of it is committed, and saveToStorage() already refuses a placement in progress for the
+		// same reason. Finish and Cancel both schedule a solve on the way out.
+		if (georefActive()) { return; }
 		// Autosave piggybacks on the same debounce as the solve, not a separate timer -- one
 		// mutation, one save, regardless of solve outcome (a manual delete-to-empty must persist
 		// too, or a reload would resurrect the stale pre-delete network).

@@ -122,30 +122,60 @@ exports.run = async function ({ browser, report }) {
 		report.has(await a.notice(), 'one latitude and one longitude', 'a longitude past 180 is refused');
 
 		// ---- the second door: the placement bar --------------------------------------------------
-		// Same function, reached while a model is being carried onto the map — which is the moment a
-		// user most needs it, because the carry stage is "pan and zoom to your site".
+		// Same function, reached while a model is being placed — the moment a user most needs it,
+		// because step 1 IS "pan and zoom the map to your site". Here it asks a SECOND question,
+		// which is the half a schematic drawing cannot answer for itself: how wide is the site?
+		// Tom, 2026-08-18: "In the Go to... box, ask for lat/lon and approximate size of project
+		// area in project length units."
 		await a.newProject();
 		await a.dismissGallery();
 		await a.makeEdit();
 		await a.menuClick('Convert to lat/lon…');
-		await a.settle(700);
+		await a.settle(800);
 		report.ok(await a.page.evaluate(() => {
 			const b = document.getElementById('lpn_georef_goto');
 			return !!b && getComputedStyle(b).display !== 'none';
-		}), 'the carry stage carries its own Go to… button');
-		a.answerPromptWith('38.106, -122.569');
+		}), 'step 1 carries its own Go to… button');
+		// **TWO PROMPTS IN A ROW, so window.prompt is answered from a queue for this one gesture.**
+		// Session.answerPromptWith() holds a single answer and the second dialog would be dismissed
+		// before a spec could set it. Everything above this line uses the real dialog.
+		const asked = await a.page.evaluate(() => {
+			window.__realPrompt = window.prompt;
+			window.__asked = [];
+			const answers = ['38.106, -122.569', '3000'];
+			let i = 0;
+			window.prompt = (msg, dflt) => { window.__asked.push({ msg: msg, dflt: dflt }); return answers[i++]; };
+			return true;
+		});
+		void asked;
 		await a.page.click('#lpn_georef_goto');
-		await a.settle(500);
+		await a.settle(700);
+		const prompts = await a.page.evaluate(() => {
+			window.prompt = window.__realPrompt;
+			return window.__asked;
+		});
+		report.eq(prompts.length, 2, 'it asks two questions: where, and how big');
+		report.has(prompts[1] && prompts[1].msg, 'wide', '...the second being the width of the site');
+		report.has(prompts[1] && prompts[1].msg, 'ft', '...in the project\'s own length unit');
+		report.ok(prompts[1] && +prompts[1].dflt === 3000,
+			'...offered with the default Tom named: 3000 ft, or 1000 m under SI',
+			prompts[1] && prompts[1].dflt);
 		at = await centre(a);
 		report.ok(at.lon !== undefined && Math.abs(at.lat - TARGET.lat) < 0.002 && Math.abs(at.lon - TARGET.lon) < 0.002,
-			'...and it takes the model being carried with it', at.text);
+			'...and the map goes to the coordinate', at.text);
 		report.ok(await a.page.evaluate(() => {
-			const b = document.querySelector('.lpn-georef-body');
-			if (!b) { return false; }
-			const r = b.getBoundingClientRect(), c = document.getElementById('lpn_canvas').getBoundingClientRect();
-			return r.x + r.width / 2 > c.x && r.x + r.width / 2 < c.right &&
-				r.y + r.height / 2 > c.y && r.y + r.height / 2 < c.bottom;
-		}), '...with the ghost box still in the middle of the map, where the carry stage keeps it');
+			const els = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')];
+			if (!els.length) { return false; }
+			const c = document.getElementById('lpn_canvas').getBoundingClientRect();
+			let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+			for (const e of els) {
+				const r = e.getBoundingClientRect();
+				x0 = Math.min(x0, r.x); y0 = Math.min(y0, r.y);
+				x1 = Math.max(x1, r.x + r.width); y1 = Math.max(y1, r.y + r.height);
+			}
+			const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2;
+			return Math.abs(cx - (c.x + c.width / 2)) < 30 && Math.abs(cy - (c.y + c.height / 2)) < 30;
+		}), '...taking the model with it, planted in the middle of the view');
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');
 	} finally {

@@ -249,6 +249,11 @@
 	EngCalcs.lpnGeorefWithScale = withScale;
 	EngCalcs.lpnGeorefWithRotation = withRotation;
 	EngCalcs.lpnGeorefBounds = bounds;
+	// Exported because the placement tool has to convert BETWEEN a screen size and a ground size on
+	// every settle, and the two must use the same radii as the transform they are building --
+	// a second copy of these constants in looped-network.js is exactly the divergence this file's
+	// own note warns about.
+	EngCalcs.lpnGeorefMetersPerDegree = metersPerDegree;
 	EngCalcs.lpnGeorefMetersPerUnitFromExtent = metersPerUnitFromExtent;
 
 	if (typeof module !== 'undefined' && module.exports) { module.exports = EngCalcs; }

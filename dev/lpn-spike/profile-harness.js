@@ -357,7 +357,10 @@ console.log('\n-- the route is drawn on the map --');
 		'a zoom redraws it, so its stroke stays a constant thickness on screen');
 	// UNDER the nodes: a route is about the pipes and must not bury the junction symbols the user is
 	// about to click as a waypoint.
-	report(/world\.insertBefore\(profilePathLayer, nodesLayer\)/.test(lnSrc),
+	// Inserted into the layer's own PARENT, which since Task 145's placement tool is `modelLayer`
+	// rather than `world` -- the drawing has a group of its own so it can be held still while the
+	// map moves under it, and insertBefore on the wrong parent throws.
+	report(/nodesLayer\.parentNode\.insertBefore\(profilePathLayer, nodesLayer\)/.test(lnSrc),
 		'it sits above the links and below the nodes');
 }
 

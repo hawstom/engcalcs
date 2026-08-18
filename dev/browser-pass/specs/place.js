@@ -2,26 +2,31 @@
 //
 // `dev/lpn-spike/georef-place-harness.js` owns the ARITHMETIC — the transform, the exactness of
 // Cancel, the fact that nothing but the coordinates moves. None of that is repeated here. What is
-// left is the half a harness has no eyes for, and it is most of what the tool IS:
+// left is the half a harness has no eyes for, and it is most of what the tool IS.
 //
-//   1. **The command is findable.** It was HIDDEN once on a project already on the map and Tom could
-//      not find it at all. Present-and-greyed and absent are different statements, and only one of
-//      them is true. That is the regression this spec pins.
-//   2. **The ghost box is on the screen**, with an area, inside the canvas — the Find defect (§10)
-//      one more time: a fully-built frame 1,200 px off the drawing surface looks identical from
-//      inside the page.
-//   3. **The handles can be grabbed.** A 9-pixel handle is a claim about hit-testing, so it is
-//      checked by asking the document what is actually at the handle's own centre.
-//   4. **The pointer reaches the right gesture.** Drag the body and the model moves; drag a corner
-//      and the OPPOSITE corner does not. Both go through the real pointer-capture path.
-//   5. **Editing really is locked.** georefActive() gates the same seams regMode does; the proof is
-//      that the Junction tool plus a click on the canvas adds nothing.
+// **THE TOOL HAS TWO NAMED STEPS, and every check below is about which one you are in.** Tom used
+// it for the first time on 2026-08-18 and the report was that the boundary was invisible: *"there
+// is an uncomfortable gray area between the described modes… I need the map either to come along or
+// to stay behind when I pan. And I need to be able to control that."*
+//
+//   step 1, DETACHED   the project is held STILL ON THE SCREEN while the map pans and zooms beneath
+//                      it. No handles, and nothing the user does to the map moves the model — the
+//                      defect that cost him a long placement was that every pan re-pinned the model
+//                      to the middle of the view and Drop discarded the lot.
+//   step 2, ATTACHED   the model is on the ground: it moves with the map and the handles are live.
+//
+// The other three things pinned here, all of them Tom's own findings:
+//
+//   * **A GRAB DOES NOT JUMP.** Dragging the body moves the model by the pointer's delta from where
+//     it was grabbed, not by putting its centre under the cursor.
+//   * **A HANDLE IS NEVER OFF THE MAP.** Zoomed in close, the corners belong far outside the canvas;
+//     they are clamped to its edge instead, so the user cannot be locked out of their own placement.
+//   * **NOTHING GENERATED IS DRAWN AND NOTHING IS SOLVED** while placing. He dragged a label by
+//     accident; and every label is work done on a gesture whose whole point is to be smooth.
 //
 // **THE HANDLES ARE A CONSTANT SIZE ON SCREEN, and that is checked below.** georefDrawFrame() sizes
 // them `GEOREF_HANDLE_PX / state.s`, which is a screen size only for as long as the frame is redrawn
-// when the scale changes. It was not: in the place stage only georefCarryTick() redrew, and that is
-// the carry stage, so six notches took an 18.31 px grab target to 32.44 px (a ratio of 1.772 against
-// the zoom's own 1.1^6) and zooming out shrank it away. onZoomChanged() now redraws the frame.
+// when the scale changes. onZoomChanged() redraws it.
 
 const { Session } = require('../lib/session');
 
@@ -39,7 +44,7 @@ async function canvasRect(a) {
 }
 // Three junctions at chosen points, rather than Session.makeEdit() three times: that helper picks
 // the first clear spot it finds, which lands all three in one row — a model with no height at all,
-// whose ghost box is a line and whose corner handles sit on top of each other.
+// whose corner handles sit on top of each other.
 async function drawL(a) {
 	await a.dismissGallery();
 	await a.toolbarClick('Junction');
@@ -57,6 +62,38 @@ async function drawL(a) {
 async function nodePos(a) {
 	return a.page.evaluate(() => [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')]
 		.map(e => e.getAttribute('cx') + ',' + e.getAttribute('cy')));
+}
+// Where the drawn model IS, in screen pixels — the only measurement that can answer "did it stay
+// still while the map moved", because its coordinates are re-derived under it every settle.
+async function modelBox(a) {
+	return a.page.evaluate(() => {
+		const els = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')];
+		if (!els.length) { return null; }
+		let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+		for (const e of els) {
+			const r = e.getBoundingClientRect();
+			x0 = Math.min(x0, r.x); y0 = Math.min(y0, r.y);
+			x1 = Math.max(x1, r.x + r.width); y1 = Math.max(y1, r.y + r.height);
+		}
+		return { x: x0, y: y0, w: x1 - x0, h: y1 - y0, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
+	});
+}
+// The latitude the model is drawn at. In a lat/lon project a node's `cy` attribute IS its latitude,
+// negated by the document's own y-down frame — so this reads the map's own numbers rather than
+// asking the page for a variable inside a closure.
+async function modelLat(a) {
+	return a.page.evaluate(() => {
+		const ys = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')].map(e => +e.getAttribute('cy'));
+		return -(Math.min(...ys) + Math.max(...ys)) / 2;
+	});
+}
+// The map's own transform, as the page wrote it. `s` is pixels per degree in a lat/lon project.
+async function viewTransform(a) {
+	return a.page.evaluate(() => {
+		const t = document.querySelector('#lpn_canvas > g').getAttribute('transform') || '';
+		const m = t.match(/translate\(([-\d.e]+),([-\d.e]+)\)\s*scale\(([-\d.e]+)\)/);
+		return m ? { tx: +m[1], ty: +m[2], s: +m[3] } : null;
+	});
 }
 async function body(a) {
 	return a.page.evaluate(() => {
@@ -79,12 +116,81 @@ async function corners(a) {
 		})
 		.sort((p, q) => p.i - q.i));
 }
-// The map is zoomed the way the carry hint tells the user to zoom it.
-async function wheelIn(a, notches) {
+async function bar(a) {
+	return a.page.evaluate(() => {
+		const b = document.getElementById('lpn_georef_bar');
+		const shown = (id) => {
+			const e = document.getElementById(id);
+			return !!e && getComputedStyle(e).display !== 'none';
+		};
+		return {
+			visible: b.style.display !== 'none',
+			step: document.getElementById('lpn_georef_step').textContent,
+			hint: document.getElementById('lpn_georef_hint').textContent,
+			drop: shown('lpn_georef_drop'), goto: shown('lpn_georef_goto'),
+			detach: shown('lpn_georef_detach'),
+			finish: shown('lpn_georef_finish'), numbers: shown('lpn_georef_numbers')
+		};
+	});
+}
+async function handleCount(a) {
+	return a.page.evaluate(() => document.querySelectorAll('.lpn-georef-handle').length);
+}
+// The map is zoomed the way the hint tells the user to zoom it, and the settle is waited out.
+async function wheel(a, notches, dir) {
 	const r = await canvasRect(a);
 	await a.page.mouse.move(r.x + r.w / 2, r.y + r.h / 2);
-	for (let i = 0; i < notches; i++) { await a.page.mouse.wheel(0, -100); await a.page.waitForTimeout(30); }
-	await a.settle(400);
+	for (let i = 0; i < notches; i++) { await a.page.mouse.wheel(0, dir * 100); await a.page.waitForTimeout(30); }
+	await a.settle(500);
+}
+async function wheelIn(a, n) { return wheel(a, n, -1); }
+async function wheelOut(a, n) { return wheel(a, n, 1); }
+// **THE CONSENT BANNER IS ANSWERED FIRST, as a user answers it.** It is `position: fixed; bottom: 0`
+// over the bottom of the window, and a fresh profile has never answered it — so a handle clamped to
+// the bottom edge of the map lies underneath it and reads as unreachable, which is a fact about the
+// banner and not about the placement tool. Declining is the answer with no side effects.
+async function answerConsent(a) {
+	const btn = await a.page.$('#ec-consent button[value="0"]');
+	if (!btn) { return; }
+	// The form's own submit handler answers in place and hides the banner; no navigation.
+	await btn.click();
+	await a.waitFor(() => a.page.evaluate(() => {
+		const e = document.getElementById('ec-consent');
+		return !e || e.hidden;
+	}), 'the consent banner to go away');
+	await a.settle(300);
+}
+// **A PAN HAS TO START ON BARE MAP, and the page has furniture on top of it.** A point chosen by
+// arithmetic lands on the consent banner along the bottom of a fresh profile's window (which reads
+// exactly like "panning is disabled"), or on the model itself, or on the placement frame — where a
+// drag means something else entirely. So the point is chosen by asking the document what is at it,
+// the same way Session.makeEdit() picks its spot.
+async function panBy(a, dx, dy) {
+	const spot = await a.page.evaluate(([dx, dy]) => {
+		const canvas = document.getElementById('lpn_canvas');
+		const r = canvas.getBoundingClientRect();
+		for (const fy of [0.2, 0.35, 0.5, 0.65]) {
+			for (const fx of [0.1, 0.25, 0.5, 0.75, 0.9]) {
+				const p = { x: r.x + r.width * fx, y: r.y + r.height * fy };
+				if (p.x + dx < r.x + 8 || p.x + dx > r.x + r.width - 8) { continue; }
+				if (p.y + dy < r.y + 8 || p.y + dy > r.y + r.height - 8) { continue; }
+				const hit = document.elementFromPoint(p.x, p.y);
+				// Anywhere on the map that is not part of the placement frame: a drag on a node or a
+				// pipe pans too while the tool is running, because editing is locked, but a drag on
+				// the frame's body means "move the model" and would prove nothing about panning.
+				if (!hit || !canvas.contains(hit)) { continue; }
+				if (hit.dataset && hit.dataset.georef) { continue; }
+				return p;
+			}
+		}
+		return null;
+	}, [dx, dy]);
+	if (!spot) { throw new Error(`${a.name}: nowhere on the canvas is bare enough to pan from`); }
+	await a.page.mouse.move(spot.x, spot.y);
+	await a.page.mouse.down();
+	await a.page.mouse.move(spot.x + dx, spot.y + dy, { steps: 8 });
+	await a.page.mouse.up();
+	await a.settle(500);
 }
 async function fileRow(a, label) {
 	return (await a.menuRows('file')).find(r => r.label === label) || null;
@@ -95,6 +201,10 @@ async function readout(a) {
 	await a.settle(150);
 	return a.page.evaluate(() => document.getElementById('lpn_coords').textContent);
 }
+async function labelsHidden(a) {
+	return a.page.evaluate(() =>
+		document.getElementById('lpn_canvas').classList.contains('lpn-labels-hidden'));
+}
 
 const ROW = 'Convert to lat/lon…';
 
@@ -104,16 +214,10 @@ exports.run = async function ({ browser, report }) {
 		// The tile server is never called — see the note at the top of specs/basemap.js.
 		await a.page.route(/tile\.openstreetmap\.org/, (route) => route.abort());
 		await a.goto();
+		await answerConsent(a);
 		await a.dismissGallery();
 
 		// ---- 1. the command is findable ------------------------------------------------------
-		// **THE WHOLE SPEC RUNS IN ONE PROJECT, and that is not tidiness.** A new project inherits
-		// whatever view the last one left (the note at the top of specs/geo.js), so a blank XY tab
-		// made after a lat/lon tab is drawn through a geographic transform: three junctions clicked
-		// across the canvas land 0.04 apart, the model is 12 mm wide, and its ghost box is a point.
-		// Everything below would then pass or fail for a reason that has nothing to do with the tool.
-		// The project on a first visit is XY with a grid view, which is the honest starting state —
-		// and the lat/lon half of the menu check is free at the end, once Finish has made it one.
 		const row = await fileRow(a, ROW);
 		report.ok(!!row, 'the File menu carries the placement command', row && row.label);
 		report.ok(row && !row.disabled, '...and it is live on an XY project');
@@ -123,78 +227,118 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(300);
 		report.has(await a.notice(), 'Draw or open a network first',
 			'an XY project with nothing in it is refused, in words');
-		report.ok((await body(a)) === null, '...and no placement was started');
+		report.ok((await handleCount(a)) === 0, '...and no placement was started');
 
-		// ---- 3. the carry stage ----------------------------------------------------------------
+		// ---- 3. step 1: detached ---------------------------------------------------------------
 		await drawL(a);
 		const original = await nodePos(a);
 		await a.menuClick(ROW);
-		await a.settle(700);
+		await a.settle(800);
 		const asked = a.lastDialog();
 		report.ok(asked && asked.type === 'confirm', 'converting asks first', asked && asked.type);
-		// **THE CONFIRM IS TOM'S OWN WORDING** (2026-08-18) and says three things: where the project
-		// has been put, that the user drives from there, and that nothing is committed until Finish.
-		// It deliberately no longer claims "lengths, diameters, elevations and demands are not
-		// touched" — that sentence belonged to the version that believed the grid already declared a
-		// scale, which these schematic EPANET examples do not.
-		report.has(asked && asked.message, 'centre of the current world',
-			'...and the confirm says where the project has been put');
 		report.has(asked && asked.message, 'press Finish',
-			'...and that nothing is committed until Finish');
+			'...and the confirm says nothing is committed until Finish');
 
-		const bar = await a.page.evaluate(() => {
-			const b = document.getElementById('lpn_georef_bar');
-			const shown = (id) => getComputedStyle(document.getElementById(id)).display !== 'none';
-			return {
-				visible: b.style.display !== 'none',
-				hint: document.getElementById('lpn_georef_hint').textContent,
-				drop: shown('lpn_georef_drop'), goto: shown('lpn_georef_goto'),
-				finish: shown('lpn_georef_finish'), numbers: shown('lpn_georef_numbers')
-			};
-		});
-		report.ok(bar.visible, 'the placement bar appears');
-		report.has(bar.hint, 'Pan and zoom', '...telling the user what the carry stage is for');
-		report.ok(bar.drop && bar.goto, '...offering Drop it here and Go to…');
-		report.ok(!bar.finish && !bar.numbers,
-			'...and NOT Finish or the two numbers — there is nothing placed to adjust yet');
+		const b1 = await bar(a);
+		report.ok(b1.visible, 'the placement bar appears');
+		report.has(b1.step, 'Step 1 of 2', '...saying which of the two steps you are in');
+		report.has(b1.step, 'detached', '...and what that step is called');
+		report.ok(b1.drop && b1.goto, '...offering Drop it here and Go to…');
+		report.ok(!b1.finish && !b1.numbers && !b1.detach,
+			'...and NOT Finish, Detach or the two numbers — nothing is attached to anything yet');
+		report.eq(await handleCount(a), 0,
+			'NO rectangular controls in step 1: nothing there can move the model');
+		report.eq(await a.nodeCount(), 3, 'the model itself is on the screen, drawn as itself');
+		report.ok(await labelsHidden(a),
+			'generated labels are off for the duration — a label got dragged by accident');
 
-		const ghost = await body(a);
+		// **THE VIEW OPENS ON THE WHOLE EARTH.** Tom: "Change the default view to entire world…so
+		// that they can zoom to their location." minScale() is width/360 in a lat/lon project.
 		const canvas = await canvasRect(a);
-		report.ok(!!ghost && ghost.w > 0 && ghost.h > 0, 'a ghost box is drawn with an area',
-			ghost && `${ghost.w.toFixed(1)} x ${ghost.h.toFixed(1)} px`);
-		report.ok(ghost && ghost.dashed, '...dashed, so it reads as a preview and not as the model');
-		report.ok(ghost && ghost.cx > canvas.x && ghost.cx < canvas.x + canvas.w &&
-			ghost.cy > canvas.y && ghost.cy < canvas.y + canvas.h,
-			'...and it is ON the drawing surface, not somewhere down the document',
-			ghost && `centre ${ghost.cx.toFixed(0)}, ${ghost.cy.toFixed(0)}`);
+		const v0 = await viewTransform(a);
+		report.ok(v0 && Math.abs(v0.s / (canvas.w / 360) - 1) < 0.02,
+			'the conversion opens on the whole Earth, not on somebody else\'s home town',
+			v0 && `${v0.s.toFixed(2)} px/deg against a whole world of ${(canvas.w / 360).toFixed(2)}`);
 
-		// The box rides the map. 24 notches of 1.1 is 9.85x, and the box is at its TRUE ground size,
-		// so it has to grow by exactly that.
-		await wheelIn(a, 24);
-		const zoomed = await body(a);
-		const grew = zoomed.w / ghost.w;
-		report.ok(Math.abs(grew / Math.pow(1.1, 24) - 1) < 0.05,
-			'the box rides the map: zooming in makes it bigger by the zoom, because it is at ground size',
-			`x${grew.toFixed(2)} over 24 notches`);
+		// **THE MODEL DOES NOT MOVE. AT ALL.** This is the fatal one: every pan used to re-pin it to
+		// the middle of the view, so a placement perfected in step 1 was discarded by Drop.
+		const m0 = await modelBox(a), lat0 = await modelLat(a);
+		await wheelIn(a, 8);
+		await panBy(a, 140, 90);
+		const m1 = await modelBox(a), v1 = await viewTransform(a), lat1 = await modelLat(a);
+		report.ok(Math.abs(m1.cx - m0.cx) < 2 && Math.abs(m1.cy - m0.cy) < 2,
+			'the model stays exactly where it is on the screen while the map is panned and zoomed',
+			`centre moved ${(m1.cx - m0.cx).toFixed(2)}, ${(m1.cy - m0.cy).toFixed(2)} px`);
+		// **THE HEIGHT IS HELD EXACTLY, AND THE WIDTH FOLLOWS THE MAP'S OWN STRETCH.** A degree of
+		// latitude is the honest axis and is what the settle preserves; east-west, this unprojected
+		// display draws a metre 1/cos(lat) times as wide, and the model has just travelled in
+		// latitude — so its width must change by exactly the ratio of that stretch at the two
+		// latitudes, and by nothing else. The tiles carry the identical stretch, so the model still
+		// matches the ground it is sitting on. This is Task 145's remaining projection seam.
+		const stretch = await a.page.evaluate(([p, q]) => {
+			const r = (lat) => {
+				const m = EngCalcs.lpnGeorefMetersPerDegree(lat);
+				return m.lat / m.lon;
+			};
+			return r(q) / r(p);
+		}, [lat0, lat1]);
+		report.ok(Math.abs(m1.h - m0.h) < 2,
+			'...at exactly the same height on the screen, which is how its ground scale gets set',
+			`${m0.h.toFixed(1)} -> ${m1.h.toFixed(1)} px`);
+		report.ok(Math.abs((m1.w / m0.w) / stretch - 1) < 0.02,
+			'...and its width follows the map\'s own east-west stretch, at the latitude it travelled to',
+			`x${(m1.w / m0.w).toFixed(4)} for a predicted x${stretch.toFixed(4)} from ${lat0.toFixed(1)}° to ${lat1.toFixed(1)}°`);
+		report.ok(v1 && v1.s > v0.s * 2 && (v1.tx !== v0.tx || v1.ty !== v0.ty),
+			'...and the MAP really did move underneath it — that is the point of the step',
+			v1 && `${v0.s.toFixed(2)} -> ${v1.s.toFixed(2)} px/deg`);
+		report.eq(await handleCount(a), 0, '...still with no handles to confuse the two steps');
 
-		// ---- 4. Drop ----------------------------------------------------------------------------
+		// ---- 4. Go to… asks where AND how big --------------------------------------------------
+		// **TWO PROMPTS IN A ROW, so window.prompt is answered from a queue for this one gesture.**
+		// Session.answerPromptWith() holds a single answer and the second dialog would be dismissed
+		// before a spec could set it; nothing else in the page is touched, and specs/goto.js drives
+		// the real dialog for the single-prompt case.
+		const SITE_LAT = 38.106067, SITE_SPAN_FT = 3000;
+		await a.page.evaluate(([lat, span]) => {
+			window.__realPrompt = window.prompt;
+			const answers = [`${lat} -122.5686103`, String(span)];
+			let i = 0;
+			window.prompt = () => (i < answers.length ? answers[i++] : null);
+		}, [SITE_LAT, SITE_SPAN_FT]);
+		await a.page.click('#lpn_georef_goto');
+		await a.settle(700);
+		await a.page.evaluate(() => { window.prompt = window.__realPrompt; });
+
+		const v2 = await viewTransform(a), m2 = await modelBox(a);
+		// A degree of latitude at 38.1°, from the same WGS84 radii the transform uses. The model was
+		// just told it is 3000 ft across, so it must now cover that many degrees on this map.
+		// **AND IT IS THE LONGITUDE RADIUS THAT SETS THE WIDTH.** The L is wider than it is tall, so
+		// the 3000 ft runs east-west, where a metre is 1/cos(lat) degrees — the same stretch the
+		// tiles carry. Predicting from the latitude radius instead is 27% out at 38°, which is the
+		// projection seam and not a fault in the placement.
+		const mPerDegLon = await a.page.evaluate((lat) =>
+			EngCalcs.lpnGeorefMetersPerDegree(lat).lon, SITE_LAT);
+		const wantPx = (SITE_SPAN_FT * 0.3048 / mPerDegLon) * v2.s;
+		report.ok(Math.abs(Math.max(m2.w, m2.h) / wantPx - 1) < 0.12,
+			'Go to… asks how wide the site is, and the model comes out that wide on the map',
+			`${Math.max(m2.w, m2.h).toFixed(0)} px for a predicted ${wantPx.toFixed(0)} px`);
+		report.ok(Math.abs(m2.cx - (canvas.x + canvas.w / 2)) < 30 &&
+			Math.abs(m2.cy - (canvas.y + canvas.h / 2)) < 30,
+			'...and it is planted in the middle of the view the coordinate took us to',
+			`centre ${m2.cx.toFixed(0)}, ${m2.cy.toFixed(0)} in a canvas centred ${(canvas.x + canvas.w / 2).toFixed(0)}, ${(canvas.y + canvas.h / 2).toFixed(0)}`);
+
+		// ---- 5. step 2: attached ----------------------------------------------------------------
+		const beforeAttach = await modelBox(a);
 		await a.page.click('#lpn_georef_drop');
-		await a.settle(500);
-		const placed = await a.page.evaluate(() => ({
-			hint: document.getElementById('lpn_georef_hint').textContent,
-			numbers: getComputedStyle(document.getElementById('lpn_georef_numbers')).display !== 'none',
-			drop: getComputedStyle(document.getElementById('lpn_georef_drop')).display !== 'none',
-			finish: getComputedStyle(document.getElementById('lpn_georef_finish')).display !== 'none',
-			scale: document.getElementById('lpn_georef_scale_in').value,
-			unit: document.getElementById('lpn_georef_unit').textContent,
-			rot: document.getElementById('lpn_georef_rot_in').value
-		}));
-		report.has(placed.hint, 'Drag the model', 'Drop it here moves the bar on to the adjust stage');
-		report.ok(placed.numbers && placed.finish && !placed.drop,
-			'...which offers Finish and the two numbers, and no longer offers Drop');
-		report.eq(placed.scale, '1', 'the scale is READ, not asked for: one drawing unit is one length unit');
-		report.eq(placed.unit, 'ft', '...in the project\'s own length unit');
-		report.eq(placed.rot, '0', '...and the model arrives unturned');
+		await a.settle(600);
+		const b2 = await bar(a), afterAttach = await modelBox(a);
+		report.has(b2.step, 'Step 2 of 2', 'Drop it here moves to step 2');
+		report.has(b2.step, 'attached', '...which is called attached');
+		report.ok(b2.numbers && b2.finish && b2.detach && !b2.drop,
+			'...offering Finish, the two numbers and a way back to step 1, and no longer Drop');
+		report.ok(Math.abs(afterAttach.cx - beforeAttach.cx) < 3 && Math.abs(afterAttach.cy - beforeAttach.cy) < 3,
+			'...and attaching does not move the model a pixel: it is already where the user put it',
+			`moved ${(afterAttach.cx - beforeAttach.cx).toFixed(2)}, ${(afterAttach.cy - beforeAttach.cy).toFixed(2)} px`);
 
 		const hands = await a.page.evaluate(() => [...document.querySelectorAll('.lpn-georef-handle')].map(h => {
 			const r = h.getBoundingClientRect();
@@ -209,7 +353,7 @@ exports.run = async function ({ browser, report }) {
 			'...and each is HIT-TESTABLE: what is at the handle\'s centre is the handle',
 			hands.map(h => h.at).join(' | '));
 
-		// ---- 5. editing is locked while placing --------------------------------------------------
+		// ---- 6. editing is locked while placing --------------------------------------------------
 		const n0 = await a.nodeCount();
 		await a.toolbarClick('Junction');
 		await a.page.mouse.click(canvas.x + canvas.w * 0.15, canvas.y + canvas.h * 0.82);
@@ -218,18 +362,21 @@ exports.run = async function ({ browser, report }) {
 			'editing is locked while placing — the transform re-derives every point BY INDEX');
 		await a.toolbarClick('Select');
 
-		// ---- 6. the two gestures -----------------------------------------------------------------
-		const b0 = await body(a);
-		await a.page.mouse.move(b0.cx, b0.cy);
+		// ---- 7. the two gestures, and the grab does not jump -------------------------------------
+		// **GRABBED OFF-CENTRE ON PURPOSE.** Tom: "When I click the project to move it, it jumps (to
+		// bring its center to my mouse?) instead of moving from where I grabbed it."
+		const g0 = await body(a);
+		const grab = { x: g0.x + g0.w * 0.2, y: g0.y + g0.h * 0.75 };
+		await a.page.mouse.move(grab.x, grab.y);
 		await a.page.mouse.down();
-		await a.page.mouse.move(b0.cx + 60, b0.cy + 40, { steps: 8 });
+		await a.page.mouse.move(grab.x + 60, grab.y + 40, { steps: 8 });
 		await a.page.mouse.up();
 		await a.settle(400);
-		const b1 = await body(a);
-		report.ok(Math.abs(b1.cx - b0.cx - 60) < 2 && Math.abs(b1.cy - b0.cy - 40) < 2,
-			'dragging the body moves the model with the pointer',
-			`moved ${(b1.cx - b0.cx).toFixed(1)}, ${(b1.cy - b0.cy).toFixed(1)} for a 60, 40 drag`);
-		report.ok(Math.abs(b1.w - b0.w) < 1 && Math.abs(b1.h - b0.h) < 1,
+		const g1 = await body(a);
+		report.ok(Math.abs(g1.cx - g0.cx - 60) < 2 && Math.abs(g1.cy - g0.cy - 40) < 2,
+			'a body drag grabbed well off-centre moves the model by the pointer, and does not jump',
+			`moved ${(g1.cx - g0.cx).toFixed(1)}, ${(g1.cy - g0.cy).toFixed(1)} for a 60, 40 drag`);
+		report.ok(Math.abs(g1.w - g0.w) < 1 && Math.abs(g1.h - g0.h) < 1,
 			'...and does not resize it on the way');
 
 		const c0 = await corners(a);
@@ -245,74 +392,139 @@ exports.run = async function ({ browser, report }) {
 			'...about the OPPOSITE corner, which does not move at all',
 			`corner 2 ${(c1[2].x - c0[2].x).toFixed(3)}, ${(c1[2].y - c0[2].y).toFixed(3)} px`);
 
-		// ---- 7. the two numbers -------------------------------------------------------------------
-		const b2 = await body(a);
-		// Read what the box SAYS first: the corner drag above has already moved the scale off 1, and
-		// the box states the scale absolutely ("one drawing unit is ___ ft"), never a multiplier.
+		// ---- 8. the handles cannot be lost off the edge of the map -------------------------------
+		// Tom: "When I zoom in close to check a spot on the model, I lose the rectangular controls
+		// off the edge of the map… I am locked out."
+		await wheelIn(a, 14);
+		const far = await a.page.evaluate(() => {
+			const c = document.getElementById('lpn_canvas').getBoundingClientRect();
+			return [...document.querySelectorAll('.lpn-georef-handle')].map(h => {
+				const r = h.getBoundingClientRect();
+				const p = { x: r.x + r.width / 2, y: r.y + r.height / 2 };
+				const on = document.elementFromPoint(p.x, p.y);
+				return {
+					kind: h.dataset.georef,
+					inside: p.x > c.x && p.x < c.x + c.width && p.y > c.y && p.y < c.y + c.height,
+					self: on === h,
+					at: on && (on.dataset.georef || on.getAttribute('class') || on.tagName)
+				};
+			});
+		});
+		report.eq(far.length, 5, 'zoomed in fourteen notches, the handles are all still drawn');
+		report.ok(far.every(h => h.inside), '...every one of them ON the map, clamped to its edge',
+			far.filter(h => !h.inside).length + ' outside');
+		report.ok(far.every(h => h.self), '...and every one still grabbable',
+			far.filter(h => !h.self).map(h => `${h.kind} covered by ${h.at}`).join('; '));
+		// A clamped handle is grabbed where the POINTER is, not where the corner nominally sits, so
+		// the model must not jump when it is taken hold of.
+		{
+			const c2 = await corners(a), gb = await body(a);
+			await a.page.mouse.move(c2[0].x, c2[0].y);
+			await a.page.mouse.down();
+			await a.page.mouse.move(c2[0].x + 2, c2[0].y + 2, { steps: 2 });
+			const during = await body(a);
+			await a.page.mouse.up();
+			await a.settle(300);
+			report.ok(Math.abs(during.w / gb.w - 1) < 0.05,
+				'...and grabbing a clamped corner does not jump the model to the cursor',
+				`width x${(during.w / gb.w).toFixed(3)} on the first two pixels of the drag`);
+		}
+
+		// ---- 9. step 2 -> step 1 and back ---------------------------------------------------------
+		// Back out to a zoom where the model does not fill the whole canvas: with the frame's body
+		// covering every pixel there is nowhere left to start a pan from, in the page as much as in
+		// this spec.
+		await wheelOut(a, 14);
+		await a.page.click('#lpn_georef_detach');
+		await a.settle(400);
+		const b3 = await bar(a);
+		report.has(b3.step, 'Step 1 of 2', 'the toggle goes back to step 1');
+		report.eq(await handleCount(a), 0, '...and the handles go away with it');
+		{
+			const d0 = await modelBox(a);
+			await panBy(a, -110, -70);
+			const d1 = await modelBox(a);
+			report.ok(Math.abs(d1.cx - d0.cx) < 2 && Math.abs(d1.cy - d0.cy) < 2,
+				'...so the map moves under the model again, on demand',
+				`centre moved ${(d1.cx - d0.cx).toFixed(2)}, ${(d1.cy - d0.cy).toFixed(2)} px`);
+		}
+		await a.page.click('#lpn_georef_drop');
+		await a.settle(500);
+		{
+			const d0 = await modelBox(a);
+			await panBy(a, 90, 60);
+			const d1 = await modelBox(a);
+			report.ok(Math.abs(d1.cx - d0.cx - 90) < 3 && Math.abs(d1.cy - d0.cy - 60) < 3,
+				'attached again, the model travels WITH the map — the other half of the control',
+				`centre moved ${(d1.cx - d0.cx).toFixed(1)}, ${(d1.cy - d0.cy).toFixed(1)} for a 90, 60 pan`);
+		}
+
+		// ---- 10. the two numbers -------------------------------------------------------------------
+		const nb2 = await body(a);
+		// Read what the box SAYS first: the corner drag above has already moved the scale, and the
+		// box states the scale absolutely ("one drawing unit is ___ ft"), never a multiplier.
 		const was = +(await a.page.inputValue('#lpn_georef_scale_in'));
-		await a.page.fill('#lpn_georef_scale_in', '2');
+		report.ok(was > 0, 'the scale box carries a real number of feet per drawing unit', String(was));
+		await a.page.fill('#lpn_georef_scale_in', String(was * 2));
 		await a.page.dispatchEvent('#lpn_georef_scale_in', 'change');
 		await a.settle(400);
-		const b3 = await body(a);
-		report.ok(Math.abs((b3.w / b2.w) / (2 / was) - 1) < 0.02,
-			'"one drawing unit is 2 ft" sets the scale to 2 ft, whatever the drags before it left',
-			`${was} -> 2 ft grew the box x${(b3.w / b2.w).toFixed(3)}`);
-		report.ok(Math.abs(b3.cx - b2.cx) < 3 && Math.abs(b3.cy - b2.cy) < 3,
+		const nb3 = await body(a);
+		report.ok(Math.abs((nb3.w / nb2.w) / 2 - 1) < 0.02,
+			'doubling "one drawing unit is ___ ft" doubles the model on the ground',
+			`grew the box x${(nb3.w / nb2.w).toFixed(3)}`);
+		report.ok(Math.abs(nb3.cx - nb2.cx) < 3 && Math.abs(nb3.cy - nb2.cy) < 3,
 			'...about its own centre, which stays where it was');
 
 		await a.page.fill('#lpn_georef_rot_in', '90');
 		await a.page.dispatchEvent('#lpn_georef_rot_in', 'change');
 		await a.settle(400);
-		const b4 = await body(a);
+		const nb4 = await body(a);
 		// A quarter turn swaps the model's GROUND extents, and the screen does not simply swap with
 		// them: the display is unprojected, so a degree of longitude and a degree of latitude are the
 		// same number of pixels while a metre east-west is 1/cos(latitude) degrees. Turning therefore
 		// takes the aspect w/h to cos²(lat) · h/w. The tiles carry the identical stretch, so this is
 		// the picture the user is meant to see — it is Task 145's remaining projection seam, on screen.
-		const cos2 = Math.pow(Math.cos(38.106 * Math.PI / 180), 2);
-		report.ok(b4.h > b4.w && Math.abs((b4.h / b4.w) / (cos2 * b3.w / b3.h) - 1) < 0.03,
+		const cos2 = Math.pow(Math.cos(SITE_LAT * Math.PI / 180), 2);
+		report.ok(nb4.h > nb4.w && Math.abs((nb4.h / nb4.w) / (cos2 * nb3.w / nb3.h) - 1) < 0.05,
 			'turning 90 degrees stands the model on end, stretched east-west as everything on this map is',
-			`${b4.w.toFixed(0)} x ${b4.h.toFixed(0)} px, aspect ${(b4.h / b4.w).toFixed(3)} for a predicted ${(cos2 * b3.w / b3.h).toFixed(3)}`);
-		report.ok(Math.abs(b4.cx - b3.cx) < 3 && Math.abs(b4.cy - b3.cy) < 3,
+			`${nb4.w.toFixed(0)} x ${nb4.h.toFixed(0)} px, aspect ${(nb4.h / nb4.w).toFixed(3)} for a predicted ${(cos2 * nb3.w / nb3.h).toFixed(3)}`);
+		report.ok(Math.abs(nb4.cx - nb3.cx) < 3 && Math.abs(nb4.cy - nb3.cy) < 3,
 			'...about its centre as well');
 
-		// ---- 7b. A handle is the same size at every zoom -----------------------------------------
-		// Anything sized in screen pixels has to be redrawn when the scale changes, or it is a
-		// constant in WORLD units instead. A grab target that doubles when you zoom in and vanishes
-		// when you zoom out is unusable at one end of the range.
+		// ---- 10b. A handle is the same size at every zoom -----------------------------------------
 		{
 			const handlePx = () => a.page.evaluate(() => {
 				const h = document.querySelector('[data-georef="scale"]');
 				return h ? h.getBoundingClientRect().width : null;
 			});
 			const wide = await handlePx();
-            await wheelIn(a, 6);
+			await wheelIn(a, 6);
 			const zoomed = await handlePx();
 			report.ok(wide && zoomed && Math.abs(zoomed - wide) <= 1.5,
 				'a corner handle is the same size on screen after six zoom notches',
 				`${wide && wide.toFixed(2)} px -> ${zoomed && zoomed.toFixed(2)} px`);
 		}
 
-		// ---- 8. Cancel is exact ---------------------------------------------------------------
+		// ---- 11. Cancel is exact ---------------------------------------------------------------
 		await a.page.click('#lpn_georef_cancel');
-		await a.settle(800);
+		await a.settle(900);
 		report.eq(JSON.stringify(await nodePos(a)), JSON.stringify(original),
-			'Cancel puts every coordinate back EXACTLY, after a drag, a resize, a scale and a turn');
+			'Cancel puts every coordinate back EXACTLY, after two steps, a drag, a resize, a scale and a turn');
 		report.ok(await a.page.evaluate(() => document.getElementById('lpn_georef_bar').style.display === 'none'),
 			'...and the bar goes away');
+		report.ok(!(await labelsHidden(a)), '...and the labels come back');
 		report.ok(/^X:/.test((await readout(a)).trim()), '...and it is an XY project again');
 		report.ok(!(await fileRow(a, ROW)).disabled, '...so the command is live once more');
 
-
-		// ---- 9. Finish commits ------------------------------------------------------------------
+		// ---- 12. Finish commits ------------------------------------------------------------------
 		await a.menuClick(ROW);
-		await a.settle(700);
+		await a.settle(800);
 		await wheelIn(a, 12);
 		await a.page.click('#lpn_georef_drop');
-		await a.settle(400);
+		await a.settle(500);
 		const before = await a.nodeCount();
 		await a.page.click('#lpn_georef_finish');
-		await a.settle(900);
+		await a.settle(1000);
 		report.ok(a.lastDialog() && a.lastDialog().type === 'confirm', 'Finish asks first — it is not undoable');
 		report.ok(await a.page.evaluate(() => document.getElementById('lpn_georef_bar').style.display === 'none'),
 			'...and the bar goes away when it is done');
@@ -321,10 +533,44 @@ exports.run = async function ({ browser, report }) {
 			'the project is geographic afterwards: the readout speaks in degrees', read);
 		report.eq(await a.nodeCount(), before, '...with the same network still drawn');
 		report.has(await a.notice(), 'lat/lon project now', '...and it says so');
+		report.ok(!(await labelsHidden(a)), '...with the labels back on');
 		const onMap = await fileRow(a, ROW);
 		report.ok(!!onMap, 'a project already on the map still SHOWS the command',
 			'hidden once, and Tom could not find it at all — absent says "there is no such command"');
 		report.ok(onMap && onMap.disabled, '...greyed, because there is nothing left to convert');
+
+		// **PANNING IS NOT DISABLED IN A LAT/LON PROJECT**, which is what the conversion left Tom
+		// suspecting: in the old step 1 the model was re-pinned to the middle of the view on every
+		// pan, so the map moved and nothing on it appeared to.
+		{
+			const p0 = await viewTransform(a), q0 = await modelBox(a);
+			await panBy(a, 120, 80);
+			const p1 = await viewTransform(a), q1 = await modelBox(a);
+			report.ok(Math.abs(p1.tx - p0.tx - 120) < 2 && Math.abs(p1.ty - p0.ty - 80) < 2,
+				'the finished lat/lon project pans', `translate moved ${(p1.tx - p0.tx).toFixed(1)}, ${(p1.ty - p0.ty).toFixed(1)}`);
+			report.ok(Math.abs(q1.cx - q0.cx - 120) < 3 && Math.abs(q1.cy - q0.cy - 80) < 3,
+				'...and the network pans with it, which is how you can tell');
+		}
+
+		// ---- 13. a new XY project does not inherit the lat/lon view (Task 145's last note) --------
+		// A view is pixels per WORLD UNIT, and a world unit is a degree in one mode and a drawing
+		// unit in the other. A blank XY tab made after this lat/lon one used to be drawn through a
+		// geographic transform at ~14,000 px per unit: three junctions clicked right across the
+		// canvas landed 0.04 apart, and the model was a dozen millimetres wide.
+		await a.newProject('us');
+		await a.settle(800);
+		await a.dismissGallery();
+		const nv = await viewTransform(a);
+		report.ok(nv && Math.abs(nv.s - 1) < 1e-6,
+			'a new XY project opens on an XY view, not on the lat/lon one before it',
+			nv && `${nv.s} px per drawing unit`);
+		await drawL(a);
+		const spread = await a.page.evaluate(() => {
+			const xs = [...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')].map(e => +e.getAttribute('cx'));
+			return Math.max(...xs) - Math.min(...xs);
+		});
+		report.ok(spread > 100, '...so junctions clicked across the canvas are hundreds of units apart',
+			spread.toFixed(2) + ' units');
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');
 	} finally {
@@ -334,12 +580,12 @@ exports.run = async function ({ browser, report }) {
 	// ---- and again with the bottom pane open (Task 434) -----------------------------------------
 	// The pane is in normal flow below the canvas, so opening it changes the canvas's height and its
 	// position on the screen — and every number in this tool is a screen coordinate that has been
-	// through `screenToWorld()`. A fresh profile, because a project that has been through Finish is
-	// a lat/lon one and a new XY tab made after it inherits the geographic view (see section 1).
+	// through `screenToWorld()`.
 	const b = await Session.open(browser, 'B');
 	try {
 		await b.page.route(/tile\.openstreetmap\.org/, (route) => route.abort());
 		await b.goto();
+		await answerConsent(b);
 		await b.dismissGallery();
 		await b.toolbarClick('Bottom panel');
 		await b.settle(600);
@@ -349,16 +595,15 @@ exports.run = async function ({ browser, report }) {
 
 		await drawL(b);
 		await b.menuClick(ROW);
-		await b.settle(700);
-		await wheelIn(b, 24);
-		const ghostB = await body(b), canvasB = await canvasRect(b);
-		report.ok(ghostB && ghostB.w > 0 && ghostB.h > 0 &&
-			ghostB.cy > canvasB.y && ghostB.cy < canvasB.y + canvasB.h,
-		'the ghost box is on the shortened canvas, not behind the pane',
-		ghostB && `centre ${ghostB.cy.toFixed(0)} in a canvas of ${canvasB.y.toFixed(0)}..${(canvasB.y + canvasB.h).toFixed(0)}`);
+		await b.settle(800);
+		await wheelIn(b, 20);
+		const mB = await modelBox(b), canvasB = await canvasRect(b);
+		report.ok(mB && mB.cy > canvasB.y && mB.cy < canvasB.y + canvasB.h,
+			'the model is held on the shortened canvas, not behind the pane',
+			mB && `centre ${mB.cy.toFixed(0)} in a canvas of ${canvasB.y.toFixed(0)}..${(canvasB.y + canvasB.h).toFixed(0)}`);
 
 		await b.page.click('#lpn_georef_drop');
-		await b.settle(500);
+		await b.settle(600);
 		const handsB = await b.page.evaluate(() => [...document.querySelectorAll('.lpn-georef-handle')].map(h => {
 			const r = h.getBoundingClientRect();
 			const hit = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
@@ -368,16 +613,16 @@ exports.run = async function ({ browser, report }) {
 		report.ok(handsB.every(h => h.self && Math.abs(h.size - 18) < 1.5),
 			'...and still hit-testable at their own centres', handsB[0] && handsB[0].size.toFixed(1) + ' px');
 
-		const g0 = await body(b);
-		await b.page.mouse.move(g0.cx, g0.cy);
+		const gb0 = await body(b);
+		await b.page.mouse.move(gb0.cx, gb0.cy);
 		await b.page.mouse.down();
-		await b.page.mouse.move(g0.cx - 50, g0.cy - 30, { steps: 8 });
+		await b.page.mouse.move(gb0.cx - 50, gb0.cy - 30, { steps: 8 });
 		await b.page.mouse.up();
 		await b.settle(400);
-		const g1 = await body(b);
-		report.ok(Math.abs(g1.cx - g0.cx + 50) < 2 && Math.abs(g1.cy - g0.cy + 30) < 2,
+		const gb1 = await body(b);
+		report.ok(Math.abs(gb1.cx - gb0.cx + 50) < 2 && Math.abs(gb1.cy - gb0.cy + 30) < 2,
 			'...and a body drag still lands where the pointer went, with the canvas offset by the pane',
-			`moved ${(g1.cx - g0.cx).toFixed(1)}, ${(g1.cy - g0.cy).toFixed(1)} for a -50, -30 drag`);
+			`moved ${(gb1.cx - gb0.cx).toFixed(1)}, ${(gb1.cy - gb0.cy).toFixed(1)} for a -50, -30 drag`);
 
 		await b.page.click('#lpn_georef_cancel');
 		await b.settle(600);
