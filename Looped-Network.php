@@ -430,6 +430,7 @@ EngCalcs.pageConfig = {
 	lpn_tool_undo: <?=json_encode($ec_lang['lpn_tool_undo'])?>,
 	lpn_confirm_example: <?=json_encode($ec_lang['lpn_confirm_example'])?>,
 	lpn_empty_hint: <?=json_encode($ec_lang['lpn_empty_hint'])?>,
+	lpn_examples_welcome: <?=json_encode($ec_lang['lpn_examples_welcome'])?>,
 	lpn_examples_heading: <?=json_encode($ec_lang['lpn_examples_heading'])?>,
 	lpn_examples_sub: <?=json_encode($ec_lang['lpn_examples_sub'])?>,
 	lpn_examples_open: <?=json_encode($ec_lang['lpn_examples_open'])?>,

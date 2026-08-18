@@ -788,6 +788,9 @@ html[lang="zh"] .ec-welcome {
 	padding: 1rem 1rem 1.5rem;
 	text-align: center;
 }
+/* The welcome line above the gallery heading (Task 222). Quieter than the heading it sits over:
+   the instruction is what the visitor has to act on, the greeting is what they read on the way. */
+.lpn-examples-welcome { margin: 0 0 .35em; font-size: 1.05em; }
 .lpn-examples-h { margin: 0 0 .15em; font-size: 1.35em; font-weight: 600; }
 .lpn-examples-sub { margin: 0 0 .5em; opacity: .75; font-size: .95em; }
 .lpn-examples-msg { margin: 3em auto; max-width: 30em; opacity: .7; }

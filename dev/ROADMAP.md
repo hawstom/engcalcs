@@ -507,24 +507,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   `Looped-Network.php` and all 5 lang files (en, es, pt, fr, tr). A dated "we changed this" note is
   useful for about a year; after that it is archaeology in a user-facing Notes list.
 
-- 40|222| **Position `lpn_` against epanet-js — do not lead with "free EPANET in the browser."**
-  **The research and the live ordering are in `dev/positioning.md`** (§3 the order, §4
-  screenshot-not-printing, §6 the LibreEPANET gate); this block is not the place to read or edit
-  them. Priority dropped 85 → 40 because the thinking is no longer the bottleneck.
-  - **What is left as WORK is the content residual from Task 250: `About.php` never names EPANET**,
-    so the engine claim Task 243 actually built is invisible on every page. It edits
-    `about_body_html`, translated into 26 languages, so it needs its own drift-aware pass.
-  - **Two rulings that govern any copy written here.** *Lead with invitation, not comparison* — state
-    our own licence, do not narrate theirs, which voluntarily extends Task 296's trademark ban to
-    competitors we legally could name. And *design, not management*: the annotated, publishable map is
-    the differentiator and it is already built.
-  - **The engine claim is a QUALIFICATION, not a headline** (Tom, 2026-08-09): for some agencies "does
-    it run the actual EPANET engine?" is a yes/no gate deciding whether we are evaluated at all. Say
-    it prominently and make it checkable; just do not spend the blog or video headline on it. Do not
-    relitigate.
-  - **Mobile is demoted and does not appear in a headline, tagline or list of reasons** (Tom,
-    2026-08-14: *"phone is a dead end… I don't want to tout it"*). We keep caring — the touch-trap cap
-    stays, phone regressions are still bugs — but the claim is not made.
 - 30|416| **The tester control panel: move it, prune it, and make it the request channel.** Tom,
   2026-08-17: *"I am not using it much because it seems like mostly noise."* Today it is
   `?debug=labels`, built by `buildLabelBench()`.
@@ -735,7 +717,7 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
       then the backstop is email, not a drive: **Jared Schoepf, `jjschoep@asu.edu`**, who directs
       EPICS — a larger and more durable protege pool than one club, and a faculty contact persists
       across years while student officers turn over every May.
-- 60|303| **Usage logging: the remaining lower-value questions.** Extracted from Task 200 when it
+- 15|303| **Usage logging: the remaining lower-value questions.** Extracted from Task 200 when it
   closed 2026-08-14, so they survive the close rather than being buried in a DONE block nobody
   re-reads. All three are cheap and none of them decides anything on its own; take one when a
   specific question makes it worth the wiring.

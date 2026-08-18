@@ -1508,7 +1508,14 @@ var EngCalcs = EngCalcs || {};
 		// them off our obstacle list gave an empty array, because the pass works on a copy.
 		// A DROPPED LABEL COMMITTED NO BOX, so every count below is over what was actually drawn.
 		var drawn = placed.filter(function (r) { return r.box; }),
-			boxes = drawn.map(function (r) { return r.box; }),
+			// **THE PICTURE AND THE COUNTS BOTH USE THE STAIRCASE** (Task 406). A stacked label
+			// reserves one box per LINE, and drawing the block instead showed a shape the pass is no
+			// longer reasoning about -- exactly the mistake the rects-to-polygons note below warns
+			// against. Tom, 2026-08-17: *"?debug=boxes still shows one box, not a layer cake."*
+			// `r.boxes` is what the pass committed; `r.box` is the one-box fallback for a caller
+			// that supplied no per-line widths.
+			lineBoxesOf = function (r) { return (r.boxes && r.boxes.length) ? r.boxes : [r.box]; },
+			lineBoxes = drawn.reduce(function (out, r) { return out.concat(lineBoxesOf(r)); }, []),
 			dropped = placed.length - drawn.length,
 			// Task 399's quality number. Reported as VALUES removed rather than labels affected,
 			// because one label down to its last value and eight labels down by one are very
@@ -1525,7 +1532,7 @@ var EngCalcs = EngCalcs || {};
 			hidCrowd = doc.links.filter(function (l) {
 				var le = linkEls[l.id]; return le && le.hiddenCrowded && !le.hiddenShort;
 			}).length;
-		drawCollisionBoxes(boxes, obs, placed.map(function (r) { return r.leader; }).filter(Boolean));
+		drawCollisionBoxes(lineBoxes, obs, placed.map(function (r) { return r.leader; }).filter(Boolean));
 		if (!debugOn('labels')) { return; }
 		// THE COUNTS, because "that looks better" is not a verdict.
 		//
@@ -1534,17 +1541,33 @@ var EngCalcs = EngCalcs || {};
 		// zero on label-on-label and on travel. Reading them without the drop count in front would
 		// make the first-fit look like an improvement on the readout while looking worse on screen,
 		// which is precisely the trap this panel exists to avoid.
+		// **THE UNIT OF BOTH COUNTS STAYS THE LABEL, while the geometry becomes the staircase**
+		// (Task 406). Two labels conflict when any of their rows do; counting overlapping ROWS
+		// instead would change what the number means without saying so, and every reading taken
+		// before today would silently stop being comparable.
+		function anyRowOverlaps(a, b) {
+			var A = lineBoxesOf(a), B = lineBoxesOf(b), x, y;
+			for (x = 0; x < A.length; x++) {
+				for (y = 0; y < B.length; y++) {
+					if (Collide.boxOverlapDepth(A[x], B[y]) > 0) { return true; }
+				}
+			}
+			return false;
+		}
+		function leaderCrosses(seg, r) {
+			return lineBoxesOf(r).some(function (b) { return Collide.segmentInBoxFraction(seg, b) > 0; });
+		}
 		var i, j, pairs = 0, onLeader = 0, travel = 0;
-		for (i = 0; i < boxes.length; i++) {
-			for (j = i + 1; j < boxes.length; j++) {
-				if (Collide.boxOverlapDepth(boxes[i], boxes[j]) > 0) { pairs++; }
+		for (i = 0; i < drawn.length; i++) {
+			for (j = i + 1; j < drawn.length; j++) {
+				if (anyRowOverlaps(drawn[i], drawn[j])) { pairs++; }
 			}
 			for (j = 0; j < drawn.length; j++) {
 				// Its own leader is excluded: it stops at the box's near edge by construction, so
 				// counting it would report the same constant on every drawing. A first-fit label
 				// draws no leader at all, so it contributes nothing here either.
 				if (drawn[j].id === drawn[i].id || !drawn[j].leader) { continue; }
-				if (Collide.segmentInBoxFraction(drawn[j].leader, boxes[i]) > 0) { onLeader++; }
+				if (leaderCrosses(drawn[j].leader, drawn[i])) { onLeader++; }
 			}
 		}
 		drawn.forEach(function (r) { travel += Math.hypot(r.dx, r.dy); });
@@ -5900,6 +5923,10 @@ var EngCalcs = EngCalcs || {};
 			pane.appendChild(elh('p', { 'class': 'lpn-examples-msg' }, pc.lpn_examples_loading || ''));
 			return;
 		}
+		// The welcome line sits ABOVE the heading and is the one place this page says what engine it
+		// runs (Task 222). A <p>, not a second <h2>: there is one heading on this pane and it is the
+		// instruction, not the greeting.
+		pane.appendChild(elh('p', { 'class': 'lpn-examples-welcome' }, pc.lpn_examples_welcome || ''));
 		pane.appendChild(elh('h2', { 'class': 'lpn-examples-h' }, pc.lpn_examples_heading || ''));
 		pane.appendChild(elh('p', { 'class': 'lpn-examples-sub' }, pc.lpn_examples_sub || ''));
 		// **THE WAY OUT IS ABOVE THE WALL, NOT BELOW IT** (Tom, 2026-08-14: "The link at the bottom
@@ -14362,14 +14389,14 @@ var EngCalcs = EngCalcs || {};
 				relayoutThisLabel();
 			});
 		}
-		alignRow(pc.lpn_field_text_align || 'Line up', 'align', [
+		alignRow(pc.lpn_field_text_align || 'Horizontal justification', 'align', [
 			['left', pc.lpn_field_text_align_left || 'Left'],
 			['center', pc.lpn_field_text_align_center || 'Centre'],
 			['right', pc.lpn_field_text_align_right || 'Right']
 		], 'center');
-		alignRow(pc.lpn_field_text_valign || 'Point is at the', 'valign', [
-			['top', pc.lpn_field_text_valign_top || 'Top of the text'],
-			['middle', pc.lpn_field_text_valign_middle || 'Middle of the text']
+		alignRow(pc.lpn_field_text_valign || 'Vertical justification', 'valign', [
+			['top', pc.lpn_field_text_valign_top || 'Top'],
+			['middle', pc.lpn_field_text_valign_middle || 'Middle']
 		], 'middle');
 		// ---- Task 337: Bold, and rotation with its two convenience buttons ----
 		// Redrawing after either property changes goes through ONE function, because bold and

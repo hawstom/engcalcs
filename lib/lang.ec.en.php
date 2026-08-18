@@ -1144,18 +1144,20 @@ $ec_lang_syn['lpn_tool_zoom_extent']='Zoom out (or in) until the whole drawing f
 $ec_lang['lpn_new_text']='Text';
 $ec_lang_syn['lpn_new_text']='Text, Label, Temporary Text, Placeholder, Unfinished text, or Default words';
 $ec_lang['lpn_field_text_bold']='Bold text';
-// Justification for a Text object (Task 342). "Line up" and not "Align": these say how the lines of
-// the text sit against each other and against the point the label was placed on, and Simple English
-// carries that where "alignment" carries a word most non-engineers meet only in typography.
-$ec_lang['lpn_field_text_align']='Line up the lines';
+// Justification for a Text object (Task 342). **The standard terms, and nothing invented** (Tom,
+// 2026-08-17: "standard English usage would be better... Horizontal justification and Vertical
+// justification; you don't even have to mention the anchor point"). The first draft spelled the
+// mechanism out in the label ("Line up the lines", "The point is at the"); the mechanism belongs in
+// the synonym channel, where a translator can read it without every user having to.
+$ec_lang['lpn_field_text_align']='Horizontal justification';
+$ec_lang_syn['lpn_field_text_align']='Horizontal alignment, or Text alignment';
 $ec_lang['lpn_field_text_align_left']='Left';
 $ec_lang['lpn_field_text_align_center']='Centre';
 $ec_lang['lpn_field_text_align_right']='Right';
-// What the label's own point means. A note placed on a title block wants its point at the top; a
-// street name wants it in the middle of the words.
-$ec_lang['lpn_field_text_valign']='The point is at the';
-$ec_lang['lpn_field_text_valign_top']='Top of the text';
-$ec_lang['lpn_field_text_valign_middle']='Middle of the text';
+$ec_lang['lpn_field_text_valign']='Vertical justification';
+$ec_lang_syn['lpn_field_text_valign']='Vertical alignment, or Anchor point position';
+$ec_lang['lpn_field_text_valign_top']='Top';
+$ec_lang['lpn_field_text_valign_middle']='Middle';
 $ec_lang['lpn_field_text_rotation']='Angle (degrees)';
 $ec_lang['lpn_field_text_match_pipe']='Set to pipe angle';
 $ec_lang['lpn_field_text_flip']='Turn 180°';
@@ -1201,6 +1203,15 @@ $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start b
 // -- the empty canvas shows the gallery instead -- but the key is KEPT rather than deleted while
 // the gallery is new: it is the fallback sentence if the manifest cannot be fetched, and deleting
 // a key translated into 26 languages to get it back a week later is the expensive direction.
+// **WHERE THE ENGINE CLAIM IS MADE** (Task 222, Tom 2026-08-17). About.php never named EPANET, and
+// he ruled that page has no good place for it -- "It's already in our page titles. About the best
+// other place for it is the Gallery intro." So it is said once, here, to a visitor who has just
+// arrived and has not yet drawn anything. His wording, unedited.
+//
+// It stays a QUALIFICATION and not a headline (dev/positioning.md §3): the sentence is about what
+// this software is FOR, with the engine as a subordinate clause. EPANET is public domain, so naming
+// it is safe; naming a competitor would not be (Task 296).
+$ec_lang['lpn_examples_welcome']='Welcome to your Water Supply Network software, with the EPANET core';
 $ec_lang['lpn_examples_heading']='Open an example';
 $ec_lang['lpn_examples_sub']='Each one opens as your own copy. Change it, save it, or open a fresh copy and start again.';
 $ec_lang['lpn_examples_open']='Open';

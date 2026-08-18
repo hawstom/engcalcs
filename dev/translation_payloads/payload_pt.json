@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "pt",
-        "expected_key_count": 1026,
-        "delta_key_count": 30,
+        "expected_key_count": 1027,
+        "delta_key_count": 31,
         "exempt_key_count": 28,
         "exempt_keys": [
             "u_imgd",
@@ -368,13 +368,14 @@
         ]
     },
     "keys_to_translate": {
-        "lpn_field_text_align": "Line up the lines",
+        "lpn_field_text_align": "Horizontal justification",
         "lpn_field_text_align_left": "Left",
         "lpn_field_text_align_center": "Centre",
         "lpn_field_text_align_right": "Right",
-        "lpn_field_text_valign": "The point is at the",
-        "lpn_field_text_valign_top": "Top of the text",
-        "lpn_field_text_valign_middle": "Middle of the text",
+        "lpn_field_text_valign": "Vertical justification",
+        "lpn_field_text_valign_top": "Top",
+        "lpn_field_text_valign_middle": "Middle",
+        "lpn_examples_welcome": "Welcome to your Water Supply Network software, with the EPANET core",
         "lpn_examples_close": "Close",
         "lpn_find_menu": "Find",
         "lpn_find_title": "Find elements",
@@ -400,13 +401,14 @@
         "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity."
     },
     "keys": {
-        "lpn_field_text_align": "Line up the lines",
+        "lpn_field_text_align": "Horizontal justification",
         "lpn_field_text_align_left": "Left",
         "lpn_field_text_align_center": "Centre",
         "lpn_field_text_align_right": "Right",
-        "lpn_field_text_valign": "The point is at the",
-        "lpn_field_text_valign_top": "Top of the text",
-        "lpn_field_text_valign_middle": "Middle of the text",
+        "lpn_field_text_valign": "Vertical justification",
+        "lpn_field_text_valign_top": "Top",
+        "lpn_field_text_valign_middle": "Middle",
+        "lpn_examples_welcome": "Welcome to your Water Supply Network software, with the EPANET core",
         "lpn_examples_close": "Close",
         "lpn_find_menu": "Find",
         "lpn_find_title": "Find elements",
@@ -541,6 +543,22 @@
                     "key": "lpn_field_text_rotation",
                     "value": "Ângulo (graus)",
                     "english": "Angle (degrees)"
+                }
+            }
+        },
+        "lpn_examples_welcome": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_empty_hint",
+                    "value": "Use Arquivo, Novo projeto para abrir um exemplo. Ou comece adicionando um reservatório, uma junção e um tubo pela barra de ferramentas.",
+                    "english": "Use File, New project to open an example. Or start by adding a reservoir, junction, and pipe from the toolbar."
+                },
+                "next_translated": {
+                    "key": "lpn_examples_heading",
+                    "value": "Abrir um exemplo",
+                    "english": "Open an example"
                 }
             }
         },
@@ -913,5 +931,8 @@
             }
         }
     },
-    "key_syn": []
+    "key_syn": {
+        "lpn_field_text_align": "Horizontal alignment, or Text alignment",
+        "lpn_field_text_valign": "Vertical alignment, or Anchor point position"
+    }
 }
