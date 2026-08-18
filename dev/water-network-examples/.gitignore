@@ -1,44 +1,17 @@
-# DEFAULT-DENY, and the default is the point.
+# **THIS DIRECTORY IS TRACKED. Nothing here is denied by default** (Tom, 2026-08-18).
 #
-# This directory used to be `dev/epanet-models/`, which the root .gitignore excluded WHOLESALE
-# because Tom drops real client water models in here to stress-test the .inp importer -- models
-# carrying client names, real state-plane coordinates, base maps and fire-flow results, in a repo
-# that is on GitHub.
+# It used to open with `*` and a whitelist, on the reasoning that Tom drops real client models in
+# here and a wholesale deny is the only thing that cannot be forgotten. He overruled it, and the
+# reasoning was wrong on its own terms: the folder never goes to production, a file cannot leave this
+# machine without somebody deliberately committing it, and the deny was silently eating the site
+# plans he kept putting back. His ruling: *"The reaction was unjustified from the beginning… Reverse
+# all that and merely let your scripts monitor for changes. I will let you know if I want to rename
+# it."*
 #
-# Renaming the directory to `dev/water-network-examples/` on 2026-08-14 silently removed that
-# protection: the root rule named the old path, so the moment the folder changed name every client
-# file in it became an ordinary untracked file that `git add dev/water-network-examples/` would
-# publish. Nothing warned; the rename looked like a rename.
+# **What replaces it is `dev/scripts/example_folder_check.php`**, which runs in check_all.sh and
+# names every file here that is not one of the published examples or their sources. A client model
+# appears in that list the moment it lands, which is a louder warning than a rule nobody reads.
 #
-# So the protection lives INSIDE the directory now, where it travels with it, and it is a
-# whitelist rather than a blacklist. A blacklist has to predict the next client file's name; a
-# whitelist only has to know what we deliberately ship. When an example is ready to publish, add
-# a line for it here -- that line IS the publication decision, and it is reviewable in the diff.
-*
-!.gitignore
-!README.md
-
-# The shipped examples (ROADMAP Task 314). Each of these is a saved project of ours, cleared for
-# publication, and each is a file the examples gallery serves.
-!Basic-example-US-units-lpn.json
-!Basic-example-SI-units-lpn.json
-!Net1-lpn.json
-!Net2-lpn.json
-!Net3-lpn.json
-!Elm-Street-Center-lpn.json
-!examples.json
-
-# **THE EPA REFERENCE FILES ARE NOT HERE, AND THAT IS DELIBERATE.** Net1.inp, Net2.inp, Net3.inp and
-# Net3.rpt are EPA's own public-domain examples, and the tracked copies live in
-# `dev/lpn-spike/reference/`, which has no default-deny to fight. Whitelisting them here as well
-# would put a second tracked copy of the same fixture in the repo, free to drift from the first.
-#
-# Copies of them may still sit in this directory untracked; nothing reads those. A harness that
-# needs one reads `dev/lpn-spike/reference/`. Getting this wrong is invisible in the main working
-# directory and fails 70 harnesses in a fresh clone or a git worktree, which is how it was found.
-#
-# **DO NOT REPLACE THIS FILE WITH A BLACKLIST, however tempting.** The rule it enforces is that
-# publishing an example is a DECISION, written as a line here and reviewable in the diff -- and the
-# thing it protects against is real: this directory was `dev/epanet-models/`, excluded wholesale by
-# the root .gitignore, and renaming it on 2026-08-14 silently removed that protection for every
-# client model in it. A blacklist has to predict the next client file's name.
+# Windows leaves these beside anything downloaded through a browser. They are not ours and are not
+# interesting.
+*:Zone.Identifier

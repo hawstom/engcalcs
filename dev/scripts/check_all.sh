@@ -145,6 +145,7 @@ CALC_HARNESS_N=$(ls dev/calc-spike/*harness*.js 2>/dev/null | wc -l | tr -d ' ')
 run_check "calculator harnesses ($CALC_HARNESS_N)" blocking sh dev/scripts/run_calc_harnesses.sh
 
 # --- Advisory: real findings, but judgement calls that must not block a commit ------------------
+run_check "example folder"               advisory php dev/scripts/example_folder_check.php
 run_check "key hygiene"                  advisory php dev/scripts/key_hygiene_check.php --strict
 run_check "size budget"                  advisory php dev/scripts/size_budget_check.php --strict
 run_check "english drift"                advisory sh -c 'php dev/scripts/detect_english_drift.php | grep -q "^CHANGED" && exit 1 || exit 0'

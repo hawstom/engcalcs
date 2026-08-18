@@ -74,6 +74,29 @@ examples.forEach(function (ex) {
 	report(a === b, `${ex.file} is a faithful copy, not a re-serialisation`);
 });
 
+// ---- THE BACKDROP IS PART OF THE EXAMPLE, and it has been silently dropped once ----------------
+// Tom put site plans behind Net2 and Net3, they shipped in commit b9baf53, and the very next commit
+// regenerated the examples from a session that did not have them -- 1.7 MB and 2.5 MB of PNG gone,
+// with nothing anywhere saying so. He noticed by opening the gallery: "Net2 and Net3 are still
+// coming in without their images. I think you are reverting me." He was right.
+//
+// Nothing derives this list; it is a DECLARATION that these three examples are drawn over a plan and
+// must arrive with it. An example that gains a backdrop adds itself here, which is the moment to
+// think about the megabytes; one that loses it fails loudly instead of quietly looking plainer.
+const WANT_BACKDROP = ['Net2-lpn.json', 'Net3-lpn.json', 'Elm-Street-Center-lpn.json'];
+console.log('\n-- the examples drawn over a site plan still carry it --');
+WANT_BACKDROP.forEach(function (file) {
+	[srcDir, outDir].forEach(function (dir) {
+		const where = dir === srcDir ? 'authored' : 'served';
+		let d = null;
+		try { d = JSON.parse(fs.readFileSync(path.join(dir, file), 'utf8')); } catch (e) { /* reported below */ }
+		const href = d && d.backdrop && d.backdrop.href;
+		report(!!href && /^data:image\//.test(href),
+			`${file} (${where}) still has its site plan`,
+			href ? `${Math.round(href.length / 1024)} KB` : 'NO BACKDROP');
+	});
+});
+
 console.log('\n-- the served copy carries the format marker (Task 315) --');
 examples.forEach(function (ex) {
 	const d = JSON.parse(fs.readFileSync(path.join(outDir, ex.file), 'utf8'));
