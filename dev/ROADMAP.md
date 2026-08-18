@@ -415,39 +415,6 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     line**, so a multi-line Text cannot round-trip. Decide on export (Task 281) whether it becomes N
     labels or one flattened line, where the import (Task 332) can agree with it.
 
-- 15|412|[H] **Should a Base-wide property say so in the popup? Tom is not sold.** He asked
-  *"How do they know, other than trial and error, that position applies to all?"* (2026-08-17) and
-  then answered it himself: **the Walkthrough is the home for this, if it stays short — humans are
-  slow readers.** So this task is only the in-popup half, and it is his call, not a build.
-  - **A working implementation exists in git at `33b5c0f`** — `baseWideMarker()`, static text plus
-    tip, one marker per group rather than per row — built before he ruled and reverted after. Do not
-    rebuild it from scratch; retrieve it if the answer is yes.
-  - His own framing against it: *"Absence of checkmark is better than no signal."* An unticked box
-    on an overridable row already carries the meaning; a non-overridable row has no box to be
-    unticked, which is the gap, and he judged the gap smaller than the added clutter.
-  - Task 338 was deleted with this ruling (Tom: *"I also think 338 is ineffective"*). Its content —
-    geometry is Base-owned and deliberately so — is a code comment at `LPN_OVERRIDABLE` already.
-
-- 60|325| **The sizing PARADIGM: symbol size and text size should be independent.** Tom, 2026-08-14:
-  *"I found myself wanting to control symbol size and text size independently instead of having them
-  linked."* Today `symbolFactor() = textFactor() × symbolScale`, so symbols are DERIVED from the text
-  size with a multiplier to pull them apart.
-  - **The link was not arbitrary** — a drawing scales as one thing when the text grows, which is
-    right for a 20-node design sketch and wrong for a 97-node imported model where the symbols carry
-    the topology and the labels are secondary. Tom has asked for fresh thinking here rather than a
-    copy of EPANET.
-  - **`textSizeUnits` already offers 'map' vs 'screen'**, and screen units are scale-independent by
-    construction. That may be the better DEFAULT for an imported model, and it is worth asking
-    whether the map/screen choice and the size are really two settings or one.
-  - **What a large model may want is not smaller text but FEWER labels** — at 97 nodes the labels
-    are the clutter, and the Labels panel is already built. Weigh that before building anything.
-  - **The invisible-import half is CLOSED 2026-08-14** (why the priority dropped 88 → 60):
-    `settings.textSize` is in MAP UNITS while every model has its own scale — Net1 spans 60×80 units,
-    Net3 spans 37×31, a state-plane model tens of thousands — and `docFromInp()` copied the current
-    settings into the new document. Import now derives a size from the model's extent, and
-    `effectiveFontSize()`/`symbolFactor()` carry a device-pixel floor.
-  - Related and unfiled until Tom rules: a toggle for label background masking, and search within a
-    large model.
 - 5|192| **Right-click / long-press context-menu system. PARKED at 5, 2026-08-13** (Tom: *"I am not
   currently seeing the need for this"*). Not declined — the day something wants a context menu it
   should be built the robust way described here rather than smuggled in. But the action that raised
@@ -461,24 +428,6 @@ font-size blindness, attempted twice and reverted twice — read its block befor
     reason for two entry paths — reachability, not redundancy.
   - **Do not hijack right-click inside form fields**; the popup's text inputs must keep native
     copy/paste. **Disable-with-reason rather than hide**, so the vocabulary stays learnable.
-- 15|201| **Scenario UI — build what Task 184 decided.** 184 settled the delta model and 146.08
-  shipped the storage, but **nothing in the app can create, name or switch a scenario**, and there is
-  no write path for an override: `setOverride()` deliberately does not exist yet, so `effective(el,
-  prop)` stays a pure passthrough while Base is the only scenario — which is what makes a missed call
-  site fail loudly instead of silently. Until this lands, every scenario-dependent feature is
-  unobservable.
-  - **The scenario selector**, plus create / rename / delete. Base is a row in the same array, so it
-    needs no special case. **Its home is decided: scenario tabs along the BOTTOM strip** (Task 211),
-    mirroring project tabs on top — so a tab strip, not a dropdown. 211 reserves the space.
-  - **`setOverride(el, prop, value)` and its un-set**, honouring `LPN_OVERRIDABLE`. The key's presence
-    IS the override marker, including when the value equals Base's; deleting the key is the undo.
-  - **The status-bar override count**, a sum of key counts across the active scenario.
-  - **Inherited from 146.08, both unobservable with Base as the only scenario:** the "Create scenario
-    geometry variant" toolbar/menu command (Task 192 owns the right-click path), and the "Compare
-    with base ID" field — simultaneously the report table's row key, the halo grouping and the
-    cleanup handle.
-  - **The first drag inside a non-Base scenario needs its one-time notice** (Task 184's "ambient
-    state, not modal" decision). `setNotice()` already exists, so the status-bar half is available.
 - 35|185| **Match/Copy properties tool (originated during Task 146).** Tom, 2026-07-30: "In the absence of the
   table editor, some sort of Match or Copy tool would be very cool. Checkboxes (or current visible
   labels) say what properties to copy, top shows (or initial click gives) the Source object then you
@@ -715,24 +664,22 @@ font-size blindness, attempted twice and reverted twice — read its block befor
 - 30|416| **The tester control panel: move it, prune it, and make it the request channel.** Tom,
   2026-08-17: *"I am not using it much because it seems like mostly noise."* Today it is
   `?debug=labels`, built by `buildLabelBench()`.
-  - **Move to the LEFT edge**, away from Settings and Labels on the right — it is a different kind of
-    thing and sitting beside them is why it reads as more of the same.
-  - **Prune the obsolete numbers.** A bench for an algorithm that has since been replaced is noise
-    that makes the live controls harder to find.
+  - **Move to the LEFT edge** (away from Settings and Labels), **prune the obsolete numbers**, and
+    give it an untranslated title — it is a tester surface, never shown to a visitor.
   - **Its real job is a channel for "please try this and tell me what you see" requests**, one tweak
-    at a time, rather than a permanent exhaustive dashboard. Task 411's off-orthogonal tolerance is
-    the next thing that belongs on it.
-  - **MUTE / SOLO PER PASS, and this is the part that makes testing possible at all** (Tom,
-    2026-08-17, a vocal arranger: *"how I isolate this variable from all other effects… maybe the
-    equivalent of 'mute' and 'solo' buttons for certain 'voices'"*). Placement today is several
-    passes stacked, and a change to one is judged through the others — which is why it feels blind.
-    The voices, from `js/lpn-collide.js` and the placement pass: initial offset, the ring/candidate
-    search, collision relaxation, aligned-label placement, the shed cascade, the zoom-threshold
-    auto-hide, leader drawing. Solo one and the drawing shows that pass alone.
-  - **Solo is worth more than mute here** and is the one to build first: with N passes, mute needs
-    2^N trials to isolate and solo needs N.
-  - **Untranslated title, deliberately** — it is a tester surface, never shown to a visitor, and a
-    translated string for it would be 26 wasted translations.
+    at a time, not a permanent dashboard. Task 411's off-orthogonal tolerance is next onto it.
+  - **A STOP-AFTER-STEP control, which is what "solo" has to become for a pipeline** (Tom,
+    2026-08-17, a vocal arranger: *"the equivalent of 'mute' and 'solo' buttons for certain
+    'voices'"*, then *"Only solo or all"*). Placement is judged through every pass at once today,
+    which is why it feels blind.
+  - **Solo-in-isolation is incoherent here**: each pass consumes the previous one's output, so
+    "relaxation alone" has nothing to relax. The honest control is **cumulative** — apply steps 1..N
+    and draw. One stepper (Next / Back / All), not N checkboxes.
+  - **The steps, named for what a reader sees on the map, not for functions:** 1 node labels placed
+    at their offsets · 2 pipe (link) labels placed along their pipes · 3 labels turned to lie along
+    the pipe · 4 labels pushed apart where they collide · 5 values dropped from a crowded label
+    (shedding) · 6 labels hidden because the zoom is too far out · 7 leader lines drawn.
+  - Stopping at N answers "did my change help?" — the answer is two drawings at the same step.
 
 - 25|417| **Long-press on an element should enter Edit mode, exactly as a click does.** Tom,
   2026-08-17. The guard that switches to Edit mode on click does not fire when a long press begins a
