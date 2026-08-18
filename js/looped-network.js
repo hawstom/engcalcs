@@ -1194,6 +1194,11 @@ var EngCalcs = EngCalcs || {};
 			var bearings = incidentBearings(n);
 			out[n.id] = {
 				bearings: bearings,
+				// The angular table Task 411's corner rejection reads (Collide.openArcs). It belongs
+				// HERE, beside the bearings it is derived from, for this record's whole reason: it
+				// is a function of the model, not of the view, so it is computed once per model
+				// change rather than once per frame.
+				arcs: Collide.openArcs(bearings),
 				// An INDEX into nodeLabelSideBearings(), not a point: a point would be a world
 				// coordinate and would need recomputing at every zoom, which is the whole thing this
 				// record exists to avoid.
@@ -1774,15 +1779,17 @@ var EngCalcs = EngCalcs || {};
 				w: labelBoxWidth(holder), h: dataLabelBoxHeight(lineCount), yOff: -fs * 0.85
 			});
 		}
-		// One auto-placed node label, as a first-fit participant. Its two candidate ENDPOINTS come
-		// straight off the resting offset, mirrored, with the most open one first -- the openness
-		// having been decided in the local feature context, from bearings, so it does not move when
-		// the user zooms. `sides` is the whole candidate set; there is no ring and no home.
+		// One auto-placed node label, as a first-fit participant. Its candidate ENDPOINTS are the
+		// four fixed corners TR, TL, BR, BL (Task 411), with the ones a pipe arrives through skipped
+		// by table lookup and a polar raster behind them for a node boxed in on all four. Both the
+		// corners and the table come from bearings, decided in the local feature context, so they do
+		// not move when the user zooms. `sides` is the whole candidate set; there is no ring and no
+		// home. This replaced a two-point left/right set chosen by ctx.openSide, which could only
+		// ever move a label to the OTHER side of the same horizontal line.
 		function addNodeFirstFit(n, ne) {
 			var d = defaultLabelOffset(), ctx = nodeContextFor(n.id),
-				right = { x: n.x + d.x, y: n.y + d.y },
-				left = { x: n.x - d.x, y: n.y + d.y },
-				sides = (ctx && ctx.openSide === 1) ? [left, right] : [right, left];
+				sides = Collide.cardinalSides({ x: n.x, y: n.y }, d,
+					(ctx && ctx.arcs) || Collide.openArcs([]), { raster: true });
 			ne.nudge = { x: 0, y: 0 };
 			ne.nudgeManual = false;
 			if (ne.empty) { return; }
