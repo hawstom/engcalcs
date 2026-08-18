@@ -6460,13 +6460,27 @@ var EngCalcs = EngCalcs || {};
 	// empty canvas, and a visitor with an empty drawing in front of them is who it is for.
 	// `galleryForced` is the File > Open example… route, where the canvas is not empty. Two flags
 	// rather than one tri-state because they answer different questions and both can be true.
-	var galleryDismissed = false, galleryForced = false;
+	// **THE DISMISSAL IS PER PROJECT, NOT PER PAGE** (ROADMAP Task 431). Tom, 2026-08-18: *"For some
+	// reason the gallery appears sometimes when I switch to an empty project tab."* One page-level
+	// flag cannot answer a per-tab question: opening an example clears it for everybody, so the next
+	// empty tab focused gets the shop window again -- which is the "sometimes".
+	//
+	// The rule the flag now states is Tom's own: **the gallery is for a project that has NEVER had
+	// content.** So it is also set the moment a project is seen with something drawn in it, and
+	// emptying that project later does not bring the gallery back. Deleting your network is not a
+	// request for the catalogue.
+	//
+	// IN MEMORY, keyed by project id, exactly like `tabViews`: this is a fact about the browsing
+	// session, not about the document, and it buys nothing in a saved file. A reload does show the
+	// gallery again on a genuinely empty project, which is correct -- it has still never had content.
+	var galleryDismissedBy = {}, galleryForced = false;
+	function galleryDismissedHere() { return !!galleryDismissedBy[library.openId]; }
 	function showExamplesOverlay() {
 		galleryForced = true;
 		updateEmptyHint();
 	}
 	function hideExamplesGallery() {
-		galleryDismissed = true;
+		galleryDismissedBy[library.openId] = true;
 		galleryForced = false;
 		updateEmptyHint();
 	}
@@ -6501,7 +6515,9 @@ var EngCalcs = EngCalcs || {};
 				// it from a wall, it is two clicks to get back, and an asterisk on something they
 				// have not touched is a lie. It earns the asterisk at the first edit.
 				stampProjectSaved(id);
-				galleryDismissed = false;
+				// The example lands in a project that now HAS content, so updateEmptyHint() below marks
+				// it dismissed on its own. Nothing to clear -- and clearing a page-wide flag here is
+				// what used to re-arm the gallery for every other empty tab (Task 431).
 				galleryForced = false; // the wall has done its job; get out of the way of the drawing
 				updateEmptyHint();
 				renderTabs();
@@ -6525,7 +6541,10 @@ var EngCalcs = EngCalcs || {};
 	function updateEmptyHint() {
 		var hint = document.getElementById('lpn_empty_hint');
 		if (!hint) { return; }
-		var empty = doc.nodes.length === 0, show = galleryForced || (empty && !galleryDismissed);
+		var empty = doc.nodes.length === 0;
+		// **SEEING CONTENT IS THE DISMISSAL** (Task 431), so this is a write and not only a read.
+		if (!empty && library.openId) { galleryDismissedBy[library.openId] = true; }
+		var show = galleryForced || (empty && !galleryDismissedHere());
 		hint.style.display = show ? 'block' : 'none';
 		// Fetched only when it is first actually going to be seen. A returning user with a network
 		// on screen never pays for the manifest at all, which is the point of doing this here
@@ -9915,7 +9934,7 @@ var EngCalcs = EngCalcs || {};
 		// number -- the same contract every other box here has.
 		closePopup();
 		// ...and the examples wall, which was the ONE overlay Escape could not reach. Guarded on
-		// actually being visible: hideExamplesGallery() sets galleryDismissed, and setting that from
+		// actually being visible: hideExamplesGallery() marks this project dismissed, and doing that from
 		// a stray Escape would silently suppress the shop window a first-time visitor is meant to see.
 		var hint = document.getElementById('lpn_empty_hint');
 		if (hint && hint.style.display === 'block') { hideExamplesGallery(); }
@@ -10013,7 +10032,7 @@ var EngCalcs = EngCalcs || {};
 			// COPY into a new tab, which is what keeps the word honest -- see openExample().
 
 			{ icon: 'open', label: pc.lpn_examples_menu || 'Open example…',
-				fn: function () { galleryDismissed = false; loadExamplesManifest(); showExamplesOverlay(); } },
+				fn: function () { delete galleryDismissedBy[library.openId]; loadExamplesManifest(); showExamplesOverlay(); } },
 			// A SEPARATE ROW FROM Open…, not a second file type on it (Task 196). Open means one of
 			// our own documents, with everything that comes with it -- a lock, a live file handle, a
 			// Save that writes back. An .inp has none of that and never will, so hiding it behind

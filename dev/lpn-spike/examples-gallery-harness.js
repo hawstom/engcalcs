@@ -146,8 +146,15 @@ console.log('\n-- wiring: the gallery is reachable, dismissible, and under OPEN 
 	const newIdx = src.indexOf("pc.lpn_file_new ||");
 	report(exIdx > openIdx && openIdx > newIdx,
 		'and it sits under Open, not under New — New creates, Open retrieves');
-	report(/galleryForced \|\| \(empty && !galleryDismissed\)/.test(src),
+	// **PER PROJECT since Task 431.** One page-level flag could not answer a per-tab question, so the
+	// condition now reads `!galleryDismissedHere()`. The property is unchanged: the wall shows on a
+	// canvas with nothing in it, or when asked for, and never otherwise.
+	report(/galleryForced \|\| \(empty && !galleryDismissedHere\(\)\)/.test(src),
 		'it shows on an empty canvas, or on demand');
+	// ...and the rule that removed the "sometimes": seeing content IS the dismissal, so a project
+	// that has ever had a network in it never shows the wall again, emptied or not.
+	report(/if \(!empty && library\.openId\) \{ galleryDismissedBy\[library\.openId\] = true; \}/.test(src),
+		'a project that has had content is dismissed for good');
 	report(/function hideExamplesGallery/.test(src), 'and there is a way out of it');
 	// A card must be a real button: the whole card is the hit area, it reaches the keyboard for
 	// free, and a screen reader announces it as activatable.

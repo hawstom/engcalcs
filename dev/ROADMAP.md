@@ -648,11 +648,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     clipped, so on a very short window `#lpn_map_footer` is unreachable. That is what "hard bottom"
     means, but it is a real change.
 
-- 35|431| **The examples gallery reappears when switching to an empty project tab.** Tom, 2026-08-18:
-  *"For some reason the gallery appears sometimes when I switch to an empty project tab."* It should
-  appear for a project that has never had content, not every time an empty one is focused —
-  `galleryDismissed` is per-page, not per-project, which is the likely cause.
-
 - 35|435| **The Labels panel's column headings sit too far right.** Tom, 2026-08-18: still misaligned
   after the earlier pass. A CSS fix in `.lpn-labels-*`; the columns are the decimals, priority and
   affix spinners.
