@@ -452,12 +452,24 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Web Mercator must NOT become the document's coordinate system**, and its distances are not
     ground distances (`1/cos(latitude)`: ~15% at 40°, ~30% at 50°). This is the strongest argument for
     the standing rule that **`len` is stored and overridable, never derived.**
-- 25|436| **Placement tool follow-ups (Task 145's tool, `dev/georeferencing.md` §5).** Three known
-  limits, none of them urgent: a BACKGROUND IMAGE is not carried onto the map, so a site plan behind a
-  placed model ends up in the wrong place; the two-control-point path (`lpnGeorefFromTwoPoints`, built
-  and tested) has no interface, and is the accurate route for a user who has real coordinates for two
-  points on their drawing; and Finish is not undoable — Cancel is the way back during placement, and
-  after Finish it is closing without saving.
+- 55|436| **Placement follow-ups, after Tom's first real use (2026-08-18).** The tool is two visible
+  steps now — step 1 detached (the project holds still while the map moves under it), step 2 attached
+  (handles live). `dev/georeferencing.md`.
+  - **[H] Convert into a NEW project rather than in place — recommended, not built.** Today the
+    conversion mutates the open project, so Cancel is the only way back and after Finish the user's XY
+    file is one Save away from being overwritten by a lat/lon one. Tom raised it; the mechanism
+    already exists (`importProject()` lands an `.inp` in a new tab, `saveProjectAs()` duplicates a
+    project whole). Costs two tabs and a naming convention.
+  - **The label pipeline is what a wheel notch costs, and it is editor-wide, not conversion-specific.**
+    Measured on Net3, median per notch: 157 ms XY, 162 ms finished lat/lon, **26 ms with labels off**.
+    lat/lon is NOT intrinsically slower. A raster stand-in for the model was considered and is not
+    needed — the conversion itself is ~20x cheaper than the editor it came from. **The real task is
+    why a relayout runs on every notch at all.**
+  - A background image is still not carried onto the map; the two-control-point path
+    (`lpnGeorefFromTwoPoints`) is built, tested and has no interface; Finish is not undoable.
+  - **Held in HEIGHT, not width:** a long north-south journey stretches the model east-west by the
+    map's own 1/cos(latitude) — 9% from 20° to 31°. Unavoidable on an unprojected display without an
+    anisotropic transform, which `js/lpn-georef.js` refuses by design.
 
 - 40|437| **[H] Search the lat/lon map by place name — needs Tom's ruling, not a design.** Tom, 2026-08-18:
   *"We need either the ability to zoom out to the globe or to search by name or to go to lat/lon."*

@@ -5216,8 +5216,6 @@ var EngCalcs = EngCalcs || {};
 		if (!georef) { return; }
 		var detached = georefDetached();
 		// **THE STEP IS NAMED AND THE MODE IS NAMED.** Four keys here are English literals until the
-		// sprint that owns lib/lang.ec.en.php adds them: lpn_georef_step1, lpn_georef_step2,
-		// lpn_georef_step1_hint, lpn_georef_detach.
 		georefBarEl('lpn_georef_step').textContent = detached
 			? (pc.lpn_georef_step1 || 'Step 1 of 2 — detached')
 			: (pc.lpn_georef_step2 || 'Step 2 of 2 — attached');
@@ -5342,7 +5340,6 @@ var EngCalcs = EngCalcs || {};
 	}
 	function georefAskSize() {
 		var pc = EngCalcs.pageConfig || {};
-		// One more English literal for the sprint: lpn_georef_size_prompt.
 		var text = (pc.lpn_georef_size_prompt || 'About how wide is the site, across the whole project?')
 			+ ' (' + unitLabel('lpn_u_length') + ')';
 		var v = window.prompt(text, String(georefDefaultSpan()));

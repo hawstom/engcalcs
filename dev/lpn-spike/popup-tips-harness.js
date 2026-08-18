@@ -253,14 +253,12 @@ const allRefs = [...new Set([
 // ships the English literal until the sprint adds them. Each one is listed here rather than being
 // invisible -- and the list is SELF-CLEANING: a pending key that HAS arrived fails below, so whoever
 // adds it to the lang file is told to delete the line here in the same commit.
-const PENDING_KEYS = [
-  // Task 145's two-step placement bar (2026-08-18).
-  'lpn_georef_step1',        // 'Step 1 of 2 — detached'
-  'lpn_georef_step2',        // 'Step 2 of 2 — attached'
-  'lpn_georef_step1_hint',   // what step 1 is for, and how to leave it
-  'lpn_georef_detach',       // the button back from step 2 to step 1
-  'lpn_georef_size_prompt'   // Go to…'s second question: how wide is the site
-];
+// **EMPTY, AND THAT IS THE NORMAL STATE.** A key goes on this list only while a JS literal is
+// waiting for `lib/lang.ec.en.php` -- which happens when a feature lands during a translation
+// sprint that owns that file. The check below fails when a pending key ARRIVES, so the list cleans
+// itself: whoever adds the key is told to delete the line. Task 145's five placement-bar keys went
+// on 2026-08-18 and came off the same day.
+const PENDING_KEYS = [];
 const dangling = allRefs.filter(k => !(k in EngCalcs.pageConfig) && PENDING_KEYS.indexOf(k) < 0);
 ok('no dangling lpn_ key reference', dangling.length === 0, dangling.join(','));
 const arrived = PENDING_KEYS.filter(k => k in EngCalcs.pageConfig);
