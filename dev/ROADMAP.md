@@ -184,22 +184,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     C-value table on the page; calculator queries mean a real UX leak.
   - **Do not promote Task 146 on the 11% number alone** — it does not yet distinguish a leak from
     satisfied reference demand, because `human` counts anyone who dwells 10 s without typing.
-- 50|228| **A share affordance at the moment someone names a calculation.** Extracted from Task 215
-  when it closed 2026-08-08 — 215 built the *measurement*; this is the unbuilt feature that
-  measurement was always pointing at.
-  - **The moment someone types a Printable Title is the moment they intend to share.** A "copy a
-    link to this calculation" control *there* — attached to something the user already wants — is a
-    share mechanism that costs them nothing and needs no plea. It connects to Task 175 (printable)
-    and is where the share question from Task 218 lands.
-  - **Contrast a footer "tell a colleague" line**, which arrives at a moment of no intent and would
-    re-fragment the single invitation Task 205 just consolidated. That is the design this replaces,
-    not a fallback for it.
-  - **Now measurable before and after.** Task 206 (contact funnel) and Task 215 (named calculations)
-    both ship with baselines from 2026-08-08, so this can be attributed instead of argued about —
-    which was the stated reason for sequencing it behind them. Give it a clear window of its own
-    rather than landing it alongside another change.
-  - `EngCalcs.updateUrl()` already maintains a shareable URL, so the mechanism is largely present;
-    what is missing is the affordance, its placement, and one honest measure of whether it gets used.
 - 50|207| **The dilettante path: make replying cost one tap, not five steps.** Full design
   record in **`dev/dilettante-path.md`** — the cost ladder (Rung 0 is a tap with no text), the three
   portable Wikipedia mechanisms, the honesty boundary, the spam design, and the codebase-specific
@@ -534,15 +518,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
-
-- 30|298| **Rebrand the navbar's "More" as "Help" and move it beside the Language picker.** Tom,
-  2026-08-13: About, Install and Contact sit under it "just fine" as Help, and Walkthroughs now
-  joins them. Two edits in `lib/Menus.lib.php` — the `menu_more` value, and moving the `<li>` into
-  the right-hand `ms-auto` list ahead of the language dropdown.
-  - **Decide it together with Task 244**, which stakes out the same navbar strip for the FLOSS mark.
-    Both want the space next to the language menu, and settling them one at a time means moving the
-    same item twice.
-  - Changing `menu_more`'s English makes 26 translations stale — a resync, not a new key.
 
 - 35|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
   and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves shipped 2026-08-14;
