@@ -46,8 +46,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     the time (median 84 words); the AI era wrote one on 99 of the last 100 (median 297 words).
   - **STILL OPEN.** (a) `js/looped-network.js` at 47% comment lines — the sibling `js/lpn-*.js`
     files were done 2026-08-16, but `looped-network.js` was held back because a concurrent track
-    owned it. (b) 31 open roadmap blocks over the 20-line budget; `roadmap_id_check.php` names them
-    in size order, so this is a worklist rather than a search.
+    owned it. (b) DONE 2026-08-18: the last over-budget open roadmap blocks are compacted;
+    `roadmap_id_check.php` names any new one in size order, so this stays a worklist not a search.
   - **Rewriting the 986 existing commit messages is NOT recommended** and needs Tom's ruling: it
     rewrites every SHA, forces a push, breaks production's `git pull`, dangles 43 SHA citations in
     `dev/*.md`, and saves no context — nothing ever loads a commit message.
@@ -398,24 +398,17 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   **RAISED 25 -> 60 (Tom, 2026-08-18): everything EPANET keeps in View > Options and Project >
   Defaults belongs under our Settings, in this two-pane index paradigm, replacing the collapse
   paradigm entirely.** *"No need ever to collapse; just scroll/jump to your section."* That makes
-  this the container Time analysis needs, not a tidy-up. See Task 434 for the three-pane frame it
-  sits in.
+  this the container Time analysis needs, not a tidy-up. It sits in Task 434's three-pane frame.
   Tom, 2026-08-11, from epanet-js: *"the Settings box has a left 'index' pane and a right 'content'
   pane. When you click a heading in the left pane, the right pane scrolls to your desired heading.
   And the right pane never collapses. This is a very conventional web paradigm."*
-  - **Headings AND sub-headings in both panes**, and in the right pane the current heading and
-    sub-heading **stick to the top** rather than scrolling away.
-  - **This RETIRES the collapsible sections, and that is a real consequence.** `settings.sectionsOpen`
-    (`idPrefixes`, `defaults`, `mapDisplay`, `computation`, `files`) exists to persist which accordion
-    sections a user left open; with a pane that never collapses there is nothing for it to remember.
-    Decide whether it becomes a scroll position or is dropped and left stale the way
-    `fileAutosaveSeconds` was.
-  - **Check it against a narrow screen before committing.** Two panes side by side is conventional on
-    a desktop and is exactly the layout that fails on a narrow one; the index probably has to collapse
-    to a drop-down under a breakpoint, which means the design is two designs and should be scoped as
-    two. **Do not justify that with "this page is used on phones" — we do not know that** (Tom,
-    2026-08-11: *"we don't know whether anybody uses this on a phone"*; Task 285 is why it is still an
-    assumption). The narrow-screen case stands on its own.
+  - Headings AND sub-headings in both panes; in the right pane the current heading and sub-heading
+    stick to the top rather than scrolling away.
+  - **Retiring the collapsible sections strands `settings.sectionsOpen`** (`idPrefixes`, `defaults`,
+    `mapDisplay`, `computation`, `files`). Decide whether it becomes a scroll position or is dropped
+    and left stale the way `fileAutosaveSeconds` was.
+  - **Narrow screen is a second design, so scope it as two.** The index probably collapses to a
+    drop-down under a breakpoint. Argue it on its own merits, never from phone use — Task 285.
 - 20|285| **We do not know what devices anybody uses this on, and several decisions have quietly
   assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."*
   `log-human-view.php` and `log-calc-event.php` record **page and language and nothing else**, so
@@ -452,32 +445,17 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   targeting, not GIF assembly. The POC GIFs were never committed.
 - 85|145| **GEOGRAPHIC PROJECTS: a project declares grid or geographic before anything is drawn, the
   same way it declares units.** Scope, the three places "geo is just another unit" stops holding, the
-  basemap, and the projection seam: **`dev/geographic-projects.md`**.
-  - **DONE, slice 1:** the declaration (two File > New rows, stored on the project, never a toggle),
-    degrees at every user boundary, a WGS84 geodesic length behind the Auto checkbox, and a home view
-    on the Net3 city. Two things only building it found: the zoom bounds are in the DOCUMENT's units,
-    so a degree-based document needs its own (the grid ceiling opened the map 130 km across), and an
-    empty project has no extent to fit, so it needed a home view at all.
-  - **DONE, slice 2: the OpenStreetMap basemap.** Raster tiles, hand-rolled, no library, on by
-    default in a geographic project and off by a View row. Registration without a projection seam:
-    each tile is placed at ITS OWN lon/lat rectangle, so the box is 1 : cos(lat) rather than square,
-    and the only error left is the chord across one tile — measured at 0.025 px at zoom 12.
-  - **DONE, slice 3: the placement tool** (2026-08-18). File > Put this project on the world map…
-    carries an XY-grid model onto the map as one picture, drops it, and lets it be moved, resized and
-    turned before Finish. The scale is READ, not asked for — a grid project already declares that one
-    unit is one Length/Map unit, so a declared 1000 ft lands at a measured 1000.015 ft. Terms decided:
-    **world map** and **XY grid**. Everything, including the proposed `$ec_lang_syn` diff awaiting
-    Tom: **`dev/georeferencing.md`**.
-  - **NEXT: the projection seam, and it is its own task-sized piece of work.** Examined and judged
-    too large to land with the tiles: the document's coordinates reach the renderer as the node
-    OBJECTS (184 `.x` reads, 172 `.y`, 23 `screenToWorld()`), and the cheap version — an internal
-    Mercator frame with a lon/lat file — redefines `doc.nodes[].x` under `js/lpn-inp.js` and the
-    `.inp` exporter, so it must be sequenced after them, not run beside them.
-  - **The display stays UNPROJECTED until then**, stretched east-west by 1/cos(lat) — 27% at 38°.
-    The basemap shares the stretch, so the map and the pipes agree; neither is conformal.
+  basemap, the unprojected display and the projection seam: **`dev/geographic-projects.md`**.
+  - **DONE, slices 1-3:** the declaration and degrees at every user boundary; the OpenStreetMap
+    raster basemap; and the placement tool (File > Put this project on the world map…). Terms
+    decided: **world map** and **XY grid**. Detail, and a proposed `$ec_lang_syn` diff still awaiting
+    Tom's approval: **`dev/georeferencing.md`**.
+  - **NEXT: the projection seam, and it is its own task-sized piece of work.** The cheap version — an
+    internal Mercator frame with a lon/lat file — redefines `doc.nodes[].x` under `js/lpn-inp.js` and
+    the `.inp` exporter, so it must be sequenced AFTER them, not run beside them.
   - **Web Mercator must NOT become the document's coordinate system**, and its distances are not
-    ground distances: the scale error is `1/cos(latitude)` — ~15% at 40°, ~30% at 50°. This is the
-    strongest argument for the standing rule that **`len` is stored and overridable, never derived.**
+    ground distances (`1/cos(latitude)`: ~15% at 40°, ~30% at 50°). This is the strongest argument for
+    the standing rule that **`len` is stored and overridable, never derived.**
 - 25|436| **Placement tool follow-ups (Task 145's tool, `dev/georeferencing.md` §5).** Three known
   limits, none of them urgent: a BACKGROUND IMAGE is not carried onto the map, so a site plan behind a
   placed model ends up in the wrong place; the two-control-point path (`lpnGeorefFromTwoPoints`, built
