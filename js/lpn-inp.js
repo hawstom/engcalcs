@@ -1028,9 +1028,14 @@
 					n(cHead, nd, 'tankDiameter', nd.tankDiameter || 0),
 					'0']));
 			} else {
+				// **THE PATTERN COLUMN IS THE JUNCTION'S OWN OR NOTHING** (Task 423). A blank column
+				// means [OPTIONS] Pattern applies, which is written once below -- so writing the
+				// document-wide default into every row here would be putting a name the file never
+				// stated at this row into a column that says the file did.
 				junctions.push(row([nd.id,
 					n(cHead, nd, 'elev', nd.elev || 0),
-					n(cFlow, nd, '_demand', eff(nd, 'demand') || 0)]));
+					n(cFlow, nd, '_demand', eff(nd, 'demand') || 0)].concat(
+					nd.demandPattern ? [String(nd.demandPattern)] : [])));
 				var em = eff(nd, 'emitter');
 				if (em > 0) {
 					// THE ONE QUANTITY THAT CANNOT COME BACK AS TEXT, and it is the same exception the
@@ -1214,6 +1219,44 @@
 			diff('backdrop-not-a-file', [], backdrop.type || 'backdrop');
 		}
 
+		// ---- the clock (ROADMAP Task 423) ----------------------------------------------------
+		//
+		// **WITHOUT THESE THREE SECTIONS AN EXPORTED Net3 SOLVES DIFFERENTLY IN EPANET THAN THE FILE
+		// IT CAME FROM**, and every number in it looks reasonable: its demands are the base ones, a
+		// third low. The document has carried them since Task 423; this is the other end of that.
+		//
+		// Every value goes out as ITS OWN TEXT where it still says the same thing -- a multiplier
+		// through lpnNumText against the `m<i>` tokens the reader kept, a time through lpnTimeText,
+		// which is the same rule for a quantity whose text is not a number (`24:00`, `12 am`).
+		var patternRows = [], controlRows = [], timeRows = [];
+		(doc.patterns || []).forEach(function (pat) {
+			var mults = (pat.multipliers || []), k, line;
+			// SIX PER LINE, which is EPANET's own layout and the one Net3 is written in. The id
+			// repeats on each line and the values concatenate; that is the format, not a nicety.
+			for (k = 0; k < mults.length; k += 6) {
+				line = [String(pat.id)];
+				for (var q = k; q < Math.min(k + 6, mults.length); q++) {
+					line.push(EngCalcs.lpnNumText(pat, 'm' + q, mults[q]));
+				}
+				patternRows.push(row(line));
+			}
+		});
+		// **A CONTROL GOES OUT AS THE LINE IT CAME IN AS.** Nothing on this page edits one yet, so
+		// its own text is exactly right and composing a sentence from the record could only differ
+		// from it. THE DAY A CONTROL EDITOR EXISTS this must compose from the record instead, and
+		// `raw` becomes a fallback -- an edited control would otherwise be written back unedited.
+		(doc.controls || []).forEach(function (ctl) {
+			if (ctl && ctl.raw) { controlRows.push(ctl.raw); }
+		});
+		if (doc.times) {
+			[['Duration', 'duration'], ['Hydraulic Timestep', 'hydraulicStep'],
+				['Pattern Timestep', 'patternStep'], ['Pattern Start', 'patternStart'],
+				['Report Timestep', 'reportStep'], ['Report Start', 'reportStart'],
+				['Start ClockTime', 'startClock']].forEach(function (pair) {
+				timeRows.push(row([pair[0], EngCalcs.lpnTimeText(doc.times, pair[1], doc.times[pair[1]])]));
+			});
+		}
+
 		// ---- assembly ----
 		function section(name, rows) { return rows.length ? '[' + name + ']\n' + rows.join('\n') + '\n\n' : ''; }
 		var method = settings.method || 'hw',
@@ -1239,9 +1282,17 @@
 			section('CURVES', curves) +
 			// After the links, because a [STATUS] row names a link that must already be declared.
 			section('STATUS', statuses) +
+			section('PATTERNS', patternRows) +
+			// After the links a control names, and after the patterns, which is EPANET's own order.
+			section('CONTROLS', controlRows) +
+			section('TIMES', timeRows) +
 			'[OPTIONS]\n' +
 			row(['Units', flowKey]) + '\n' +
 			row(['Headloss', headloss]) + '\n' +
+			// The DEFAULT demand pattern, for every junction whose own column is blank. Omitted
+			// entirely when the document has none: EPANET's own default is "no pattern", and writing
+			// a line that says so is a statement the source file never made.
+			(doc.defaultPattern ? row(['Pattern', String(doc.defaultPattern)]) + '\n' : '') +
 			row(['Emitter Exponent', String(settings.emitterExponent || 0.5)]) + '\n\n' +
 			section('COORDINATES', coords) +
 			section('VERTICES', verts) +

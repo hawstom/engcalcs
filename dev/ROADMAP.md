@@ -674,6 +674,10 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Water quality is NOT in scope and cannot be scoped by Tom** — 2026-08-17: *"I don't know
     anything about water quality modeling including diffusivity and bulk/wall reactions."* Build the
     pattern mechanism so a WQ source could read one later; do not build WQ on the strength of it.
+  - **THE EXPORT HALF IS DONE (2026-08-18).** `[PATTERNS]`, `[CONTROLS]`, `[TIMES]`, `[OPTIONS]
+    Pattern` and the `[JUNCTIONS]` pattern column are all written back, each value as its own text —
+    Net3 exports at 1,229 of 1,229 tokens byte-identical. What is left here is the UI and the run.
+
 
 - 40|248.03| **Controls (Task 248 child) — simple and rule-based.** Turning pumps, pipes and valves
   on and off, and changing a setting, on tank level, on time, or on a node pressure. EPANET's

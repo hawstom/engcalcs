@@ -38,6 +38,7 @@ global.alert = global.window.alert = function () { };
 
 const L = loadLoopedNetwork(
 	"\t\timportInp: importInpFromFile, getDoc: function () { return doc; },\n" +
+	"\t\tserialize: serializeProject,\n" +
 	"\t\tassembleModel: assembleModel,\n" +
 	"\t\tbuildLayers: function () { svg = document.getElementById('lpn_canvas');\n" +
 	"\t\t\tworld = el('g', {}, svg);\n" +
@@ -166,6 +167,44 @@ console.log('\n--- and it solves to EPA\'s published Net3 report at 0:00 ---');
 	});
 	ok('every head matches EPA\'s own report', worst < 0.1,
 		'worst ' + worst.toFixed(3) + ' ft at ' + worstId);
+}
+
+// ---------------------------------------------------------------------------
+// 4. And the clock survives being written back out.
+// ---------------------------------------------------------------------------
+// **AN EXPORT THAT DROPPED THE CLOCK WOULD BE A FILE THAT SOLVES DIFFERENTLY IN EPANET THAN THE ONE
+// IT CAME FROM**, with every number in it looking reasonable -- demands a third low, exactly the
+// failure this task was about. So the round trip is closed here rather than assumed.
+console.log('\n--- and it comes back out again ---');
+{
+	// serializeProject(), not the live `doc`: the writer reads the project's UNITS and settings, and
+	// it reads coordinates in the Cartesian frame a file is written in. Handing it the y-down memory
+	// document would export a network mirrored north-south with no units named.
+	const out = EngCalcs.lpnExportInp(L.serialize(), {
+		effective: function (el, prop) { return el['_' + prop]; }
+	});
+	ok('the export succeeds', !!out && out.ok, out && out.detail);
+	const text = (out && out.inp) || '';
+	ok('[PATTERNS] is written', /\[PATTERNS\]/.test(text));
+	ok('[TIMES] is written', /\[TIMES\]/.test(text));
+	ok('[CONTROLS] is written', /\[CONTROLS\]/.test(text));
+	// row() writes a leading SPACE then tabs between cells, so the line reads ` Pattern\t1`.
+	ok('[OPTIONS] names the default demand pattern', /\n Pattern\t1(\s|$)/.test(text));
+
+	// The one that matters: read our own file back and solve it. Same demands, same heads.
+	const back = EngCalcs.lpnInpParse(text);
+	ok('our own file parses', back.ok, back.error);
+	ok('...with the same five patterns', back.patterns.length === 5, back.patterns.length);
+	ok('...the same default', back.defaultPattern === '1', JSON.stringify(back.defaultPattern));
+	ok('...the same duration', back.times && back.times.duration === 24 * 3600,
+		back.times && back.times.duration);
+	ok('...and the same controls', back.controls.length === doc.controls.length,
+		back.controls.length + ' vs ' + doc.controls.length);
+	// A junction that named its own pattern still does, and one that did not still does not.
+	const named = back.nodes.filter(n => n.type === 'junction' && n.demandPattern);
+	ok('...and only the junctions that stated a pattern carry one',
+		named.length === doc.nodes.filter(n => n.demandPattern).length,
+		named.length + ' of ' + back.nodes.length);
 }
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');
