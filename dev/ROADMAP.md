@@ -189,6 +189,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   `host.solveNow()`), so what is missing is the FEEDBACK, not the run: a status line that flashes is
   indistinguishable from a dead button, and on a network the engine finishes in 265 ms there is
   nothing to see at all.
+  - **AND ON NET3 THE PAGE REALLY IS WAITING FOR HIM.** A network over the auto-run budget
+    deliberately does not run itself; it says "Press Run to bring them up to date" and waits.
+    Measured 2026-08-19 in the browser pass: Net3 landed over the budget on two runs of four on a
+    busy machine, so this is the state Tom is most likely pressing Run from — the button then has
+    real work to do, takes seconds, and still shows nothing while it does it.
   - **The run report is the part with no code behind it yet.** EPANET's engine writes one, and
     epanet-js links to it; we discard it. `js/lpn-epanet.js` is where it would be captured.
   - The header of that report is where **"EPANET 2.3.05"** comes from — see Task 451.

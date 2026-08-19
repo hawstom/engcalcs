@@ -43,9 +43,15 @@ exports.run = async function ({ browser, report }) {
 		}
 
 		// Net3 is the network with a duration, patterns, controls and three tanks in it.
+		// **MATCHED ON THE WHOLE TITLE, NOT ON "Net3" ANYWHERE IN THE CARD.** Publishing
+		// Net3-World (2026-08-19) put a second card reading "EPANET Net3, lat/lon" on the wall,
+		// it sorts earlier because its file is smaller, and a substring match silently opened it
+		// instead -- the duration read 0:00 and the spec blamed the page. A gallery card is
+		// USER-FACING TEXT that grows, so a spec must name one card, not a family of them.
 		const opened = await a.page.evaluate(async () => {
 			const cards = [...document.querySelectorAll('#lpn_examples_pane .lpn-example-card')];
-			const card = cards.find(c => /Net3/.test(c.textContent));
+			const title = (c) => ((c.querySelector('.lpn-example-title') || c).textContent || '').trim();
+			const card = cards.find(c => title(c) === 'EPANET Net3');
 			if (!card) { return false; }
 			card.click();
 			return true;
@@ -133,7 +139,22 @@ exports.run = async function ({ browser, report }) {
 				return { clock: out ? out.textContent : '', tanks, labels };
 			});
 		}
-		const t0 = await readState();
+		// **FRAMES AT t=0 ARE NOT PROMISED, AND ASSERTING THEM MADE THIS SPEC FLAKY.** A network
+		// that costs more than the auto-run budget deliberately does NOT run itself -- the page
+		// says so and waits to be told. Whether Net3 lands over that budget depends on how busy
+		// the machine is, so this check passed and failed on alternate runs of the SAME commit
+		// (measured 2026-08-19: two of four). The real contract is a disjunction, so assert the
+		// disjunction: either the frames are there, or the page says to press Run -- and if it
+		// says so, PRESS IT, which is how the Run button gets exercised on the path that needs it.
+		await a.waitFor(async () => (await readState()).tanks.length > 0, 'the first frame', 8000);
+		let t0 = await readState();
+		if (!t0.tanks.length) {
+			const said = await a.status();
+			report.has(said, 'Press Run', 'a network over the auto-run budget says to press Run', said);
+			await a.page.evaluate(() => window.EngCalcs.lpnTimeRunNow());
+			await a.waitFor(async () => (await readState()).tanks.length > 0, 'the run', 30000);
+			t0 = await readState();
+		}
 		report.ok(/0:00/.test(t0.clock), 'the transport opens at the start of the run', t0.clock);
 		report.ok(t0.tanks.length > 0, 'and the tank levels are listed', t0.tanks);
 
