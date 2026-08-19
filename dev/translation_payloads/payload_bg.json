@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 1198,
-        "delta_key_count": 18,
+        "expected_key_count": 1200,
+        "delta_key_count": 20,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -435,6 +435,8 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_ex_net3_world_title": "EPANET Net3, lat\/lon",
+        "lpn_ex_net3_world_desc": "The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.",
         "lpn_geomap": "lat\/lon",
         "lpn_xymap": "XY",
         "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.",
@@ -455,6 +457,8 @@
         "lpn_color_mode_pressure": "Pressure"
     },
     "keys": {
+        "lpn_ex_net3_world_title": "EPANET Net3, lat\/lon",
+        "lpn_ex_net3_world_desc": "The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.",
         "lpn_geomap": "lat\/lon",
         "lpn_xymap": "XY",
         "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.",
@@ -475,6 +479,38 @@
         "lpn_color_mode_pressure": "Pressure"
     },
     "key_context": {
+        "lpn_ex_net3_world_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net3_desc",
+                    "value": "Големият пример на EPANET: 92 възела, 3 цистерни и 2 резервоара, единият от които река. Струва си да го отворите, за да видите как изглежда модел с реален размер на картата.",
+                    "english": "EPANET's large sample: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_elm_street_desc",
+                    "value": "Търговски обект, решен за пожарно водно количество върху максималната дневна потребност, в един момент от времето, начертан върху план на обекта.",
+                    "english": "A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan."
+                }
+            }
+        },
+        "lpn_ex_net3_world_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net3_desc",
+                    "value": "Големият пример на EPANET: 92 възела, 3 цистерни и 2 резервоара, единият от които река. Струва си да го отворите, за да видите как изглежда модел с реален размер на картата.",
+                    "english": "EPANET's large sample: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_elm_street_desc",
+                    "value": "Търговски обект, решен за пожарно водно количество върху максималната дневна потребност, в един момент от времето, начертан върху план на обекта.",
+                    "english": "A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan."
+                }
+            }
+        },
         "lpn_geomap": {
             "reason": "equal_to_english",
             "current_value": "lat\/lon",

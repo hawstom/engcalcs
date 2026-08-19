@@ -8,5 +8,6 @@
 	"Net1-lpn.json": { "key": "net1" },
 	"Net2-lpn.json": { "key": "net2" },
 	"Net3-lpn.json": { "key": "net3" },
+	"Net3-World-lpn.json": { "key": "net3_world" },
 	"Elm-Street-Center-lpn.json": { "key": "elm_street" }
 }

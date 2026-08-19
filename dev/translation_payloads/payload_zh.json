@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 1198,
-        "delta_key_count": 17,
+        "expected_key_count": 1200,
+        "delta_key_count": 19,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -435,6 +435,8 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_ex_net3_world_title": "EPANET Net3, lat\/lon",
+        "lpn_ex_net3_world_desc": "The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.",
         "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.",
         "lpn_settings_readability_bias_tip": "A label drawn along a link is turned 180 degrees, so that it is not upside down, once the link leans more than this many degrees to the left of straight up.",
         "lpn_settings_label_max_width_tip": "Labels are shown only while the view is narrower than this. Leave the box blank to always show them.",
@@ -454,6 +456,8 @@
         "lpn_color_mode_pressure": "Pressure"
     },
     "keys": {
+        "lpn_ex_net3_world_title": "EPANET Net3, lat\/lon",
+        "lpn_ex_net3_world_desc": "The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.",
         "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.",
         "lpn_settings_readability_bias_tip": "A label drawn along a link is turned 180 degrees, so that it is not upside down, once the link leans more than this many degrees to the left of straight up.",
         "lpn_settings_label_max_width_tip": "Labels are shown only while the view is narrower than this. Leave the box blank to always show them.",
@@ -473,6 +477,38 @@
         "lpn_color_mode_pressure": "Pressure"
     },
     "key_context": {
+        "lpn_ex_net3_world_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net3_desc",
+                    "value": "EPANET 的大型示例：92 个节点、3 个水箱和 2 个水库（其中一个为河流水源）。值得打开看看真实规模的模型在地图上是什么样子。",
+                    "english": "EPANET's large sample: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_elm_street_desc",
+                    "value": "一个商业场地案例，在最大日用水量的基础上叠加消防流量，求解某一时刻的工况，绘制在场地平面图之上。",
+                    "english": "A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan."
+                }
+            }
+        },
+        "lpn_ex_net3_world_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net3_desc",
+                    "value": "EPANET 的大型示例：92 个节点、3 个水箱和 2 个水库（其中一个为河流水源）。值得打开看看真实规模的模型在地图上是什么样子。",
+                    "english": "EPANET's large sample: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_elm_street_desc",
+                    "value": "一个商业场地案例，在最大日用水量的基础上叠加消防流量，求解某一时刻的工况，绘制在场地平面图之上。",
+                    "english": "A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan."
+                }
+            }
+        },
         "lpn_labels_mark_extrema_tip": {
             "reason": "missing",
             "current_value": null,

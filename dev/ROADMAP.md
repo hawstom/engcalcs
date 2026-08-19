@@ -138,12 +138,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 - 65|438| **The next sprint: resync the drifted English and translate 2026-08-18's new keys.** Needs
   Tom's explicit authorization before launch — a sprint is 26 paid agents, 20 concurrent.
-  - **What is in it:** Task 405's four resync keys; `lpn_time_format_tip` (Tom's 2026-08-19 rewording,
-    Task 449); `menu_more` ("More" → "Help"); the four XY / lat/lon
+  - **What is in it:** 18 CHANGED + 8 NEW as of 2026-08-19 — Task 405's four resync keys;
+    `lpn_time_format_tip` (Task 449); the 17 Wave 0 rewrote; the two Net3-World gallery keys;
+    `menu_more` ("More" → "Help"); the four XY / lat/lon
     re-wordings (`lpn_new_geo_us/si`, `lpn_new_blank_us/si`); and roughly thirty new keys from the
     placement tool, Go-to-coordinate, clean map, the `.inp` clock and the share affordance.
   - **Gate: the adversarial Wave 0 over the NEW and CHANGED strings only** —
-    `dev/english-friction/438-wave0.json`. `friction_check.php --sprint=438` must exit 0, along with
+    `dev/english-friction/438-wave0.json`. `friction_check.php --sprint=438-wave0` must exit 0 (the
+    log is named for the wave, and a bare `--sprint=438` exits 2), along with
     `gloss_ref_check.php` and `generate_translation_payloads.php --check`.
   - Close it with `detect_english_drift.php --baseline-new`, or the new keys stay `NEW` forever.
 
@@ -180,6 +182,37 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **The stored number reverses meaning, so stored documents must be migrated**, not reinterpreted
     in place: a project written under the old sense would silently invert. That migration is the
     task, not the relabelling.
+
+- 70|450| **The Run button gives no sign it did anything, and it needs a run box.** Tom, 2026-08-19:
+  *"The Run button does nothing… It needs a box with a progress bar and completion report. epanetjs
+  also includes a link to the EPANET run report."* The wiring is live (`requestRun()` →
+  `host.solveNow()`), so what is missing is the FEEDBACK, not the run: a status line that flashes is
+  indistinguishable from a dead button, and on a network the engine finishes in 265 ms there is
+  nothing to see at all.
+  - **The run report is the part with no code behind it yet.** EPANET's engine writes one, and
+    epanet-js links to it; we discard it. `js/lpn-epanet.js` is where it would be captured.
+  - The header of that report is where **"EPANET 2.3.05"** comes from — see Task 451.
+
+- 55|451| **Say which EPANET we run, and where it comes from.** The run report says Version 2.3.05
+  while EPA's own download page still offers 2.2.0, which reads like a fabrication and is not one:
+  EPANET development moved to Open Water Analytics (a community + EPA collaboration) after EPA's
+  2.2.0 of Dec 2019, and OWA released 2.3 in Jul 2024 and **2.3.5 on 2025-02-20**. The engine encodes
+  its version as major.minor.patch with a two-digit patch, so 2.3.5 prints as `2.3.05`. We vendor
+  epanet-js 0.9.0 (MIT, Luke Butler), which wraps OWA-EPANET — `js/vendor/README.md` already records
+  the wrapper but not the engine's own version or lineage.
+  - Put it somewhere a user can read it, not only in `js/vendor/README.md`: this is the provenance
+    question anyone comparing us against EPANET asks first, and it is a point of credibility.
+
+- 60|452| **Satellite imagery, from Mapbox.** Tom, 2026-08-19: *"epanetjs uses OpenStreet with MapBox
+  and serves satellite imagery. Add that."* Tom chose Mapbox over a keyless source when asked.
+  - **BLOCKED on Tom creating a Mapbox account and a PUBLIC access token restricted to his domains.**
+    The token ships in our JS, which is how Mapbox intends public tokens to be used, but it makes his
+    account billable if the free tier is ever exceeded — so the token is his to create, not ours.
+  - **It makes `privacy.php` name a SECOND third party, and `js/vendor/README.md`'s "no third-party
+    request of any kind" is already false for the OSM basemap.** Both need the same edit, and the
+    new strings land in a later sprint. Attribution: Mapbox requires its own wordmark and text.
+  - Design: `project.basemap` is already the field (`'osm'` today), so this is another value on it
+    plus a picker, not a new mechanism. An `.inp` exporter still skips it.
 
 - 60|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial

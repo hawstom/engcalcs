@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 1198,
-        "delta_key_count": 18,
+        "expected_key_count": 1200,
+        "delta_key_count": 20,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -435,6 +435,8 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_ex_net3_world_title": "EPANET Net3, lat\/lon",
+        "lpn_ex_net3_world_desc": "The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.",
         "lpn_xymap": "XY",
         "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.",
         "lpn_settings_readability_bias_tip": "A label drawn along a link is turned 180 degrees, so that it is not upside down, once the link leans more than this many degrees to the left of straight up.",
@@ -455,6 +457,8 @@
         "lpn_color_mode_pressure": "Pressure"
     },
     "keys": {
+        "lpn_ex_net3_world_title": "EPANET Net3, lat\/lon",
+        "lpn_ex_net3_world_desc": "The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.",
         "lpn_xymap": "XY",
         "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.",
         "lpn_settings_readability_bias_tip": "A label drawn along a link is turned 180 degrees, so that it is not upside down, once the link leans more than this many degrees to the left of straight up.",
@@ -475,6 +479,38 @@
         "lpn_color_mode_pressure": "Pressure"
     },
     "key_context": {
+        "lpn_ex_net3_world_title": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net3_desc",
+                    "value": "Большой пример EPANET: 92 узла, 3 бака и 2 резервуара, один из них — река. Стоит открыть, чтобы увидеть, как сеть реального размера выглядит на карте.",
+                    "english": "EPANET's large sample: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_elm_street_desc",
+                    "value": "Коммерческий объект, рассчитанный на расход при пожаротушении сверх максимального суточного водопотребления, в один момент времени, начерченный поверх плана участка.",
+                    "english": "A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan."
+                }
+            }
+        },
+        "lpn_ex_net3_world_desc": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_ex_net3_desc",
+                    "value": "Большой пример EPANET: 92 узла, 3 бака и 2 резервуара, один из них — река. Стоит открыть, чтобы увидеть, как сеть реального размера выглядит на карте.",
+                    "english": "EPANET's large sample: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map."
+                },
+                "next_translated": {
+                    "key": "lpn_ex_elm_street_desc",
+                    "value": "Коммерческий объект, рассчитанный на расход при пожаротушении сверх максимального суточного водопотребления, в один момент времени, начерченный поверх плана участка.",
+                    "english": "A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan."
+                }
+            }
+        },
         "lpn_xymap": {
             "reason": "equal_to_english",
             "current_value": "XY",

@@ -284,6 +284,33 @@ console.log('\n--- the index agrees with the definition it stands in for ---');
 		if (a1 !== b1 || a2 !== b2) { same = false; worst = l.id; }
 	});
 	report(same, 'every grid query returns exactly the obstacles the scan would have found', worst);
+
+	// **A REACH FAR SMALLER THAN THE OBSTACLES IS THE SAME FATAL AS A ZERO ONE**, and it reached a
+	// user: arriving at Net3 with the scale still set by a lat/lon project made the labels
+	// microscopic in world units while the pipes stayed thousands of units long, and one tab switch
+	// cost 16.4 s -- 97% of it in span() and the garbage collector it fed. The index now raises its
+	// own cell, which is the safe direction: bigger cells can only offer the narrow phase more
+	// candidates to reject. Both halves are asserted -- that it stays BOUNDED, and that it still
+	// agrees with the definition, because a broad phase that got fast by dropping obstacles is the
+	// worse bug.
+	{
+		const far = { boxes: [], segments: [] };
+		for (let i = 0; i < 40; i++) { far.segments.push(C.segment(0, i * 50, 20000, i * 50)); }
+		const tiny = 0.0001;   // Net3's label reach at a lat/lon scale, near enough
+		const t0 = Date.now();
+		const idx2 = C.grid(tiny, far);
+		far.segments.forEach((g, i) => idx2.addSegment(i));
+		const ms = Date.now() - t0;
+		report(ms < 500, 'a reach 200,000,000x smaller than the obstacles still indexes promptly', ms + ' ms');
+		const probe = { anchor: { x: 10000, y: 100 }, w: tiny, h: tiny };
+		const want = C.obstaclesInReach(probe, far, tiny);
+		const got = idx2.near(probe.anchor.x, probe.anchor.y, tiny + Math.hypot(probe.w, probe.h),
+			{ boxes: [], segments: [] });
+		const key = o => JSON.stringify([o.ax, o.ay, o.bx, o.by]);
+		report(want.segments.map(key).sort().join('|') === got.segments.map(key).sort().join('|'),
+			'...and still returns exactly what the scan would have found',
+			`scan ${want.segments.length}, index ${got.segments.length}`);
+	}
 	// AND NO DUPLICATES: an obstacle spanning two cells is found by more than one of the nine, and
 	// counting it twice would silently double one goal's weight. This is the check that says the
 	// visit stamp is doing its job -- without it the assertion above still passes, since a duplicate

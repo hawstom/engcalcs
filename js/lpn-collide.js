@@ -730,6 +730,30 @@ EngCalcs.lpnCollide = (function () {
 		// where the old fixed-pixel reach could not -- a drawing with no labels at all crashed the
 		// pass. Guarded at the seam rather than at each caller.
 		if (!(cell > 0) || !isFinite(cell)) { cell = 1; }
+		// **AND A CELL THAT IS MERELY TINY IS FATAL IN THE SAME WAY, one order of magnitude at a
+		// time.** span() fills every cell an obstacle's bounding box touches, so a link L long
+		// indexed at cell c occupies (L/c)^2 cells. The reach is derived from the LABEL sizes and
+		// the obstacles are the DRAWING, and nothing ties the two together: arriving at Net3 with
+		// the scale still set by a lat/lon project made the labels microscopic in world units while
+		// the pipes stayed thousands of units long, and one tab switch spent **16.4 s, 97% of it in
+		// span() and the garbage collector it fed** (measured 2026-08-19 by CPU profile).
+		//
+		// RAISING the cell is always SAFE and only ever costs speed: near() answers a query of
+		// radius r with the 3x3 block around the point, which covers r for any cell >= r, and every
+		// candidate it returns is then put through the same exact distance test obstaclesInReach()
+		// uses. So a bigger cell can only hand the narrow phase more candidates to reject, never
+		// fewer to consider. LOWERING it would be the unsafe direction, and nothing here does that.
+		var extent = 0, ii;
+		for (ii = 0; ii < obs.segments.length; ii++) {
+			extent = Math.max(extent, Math.abs(obs.segments[ii].bx - obs.segments[ii].ax),
+				Math.abs(obs.segments[ii].by - obs.segments[ii].ay));
+		}
+		for (ii = 0; ii < obs.boxes.length; ii++) {
+			extent = Math.max(extent, Math.hypot(obs.boxes[ii].w, obs.boxes[ii].h));
+		}
+		// 64 cells across the largest obstacle: still a fine grid for the drawing it is indexing,
+		// and it caps the index at 64^2 entries for the worst obstacle instead of unbounded.
+		if (isFinite(extent) && extent > 0 && extent / cell > 64) { cell = extent / 64; }
 		var cells = new Map(), stamp = 0, bStamp = [], sStamp = [];
 		function key(i, j) { return i * 4294967296 + j; }
 		function put(list, i, j, idx) {
