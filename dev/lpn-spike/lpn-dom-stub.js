@@ -414,6 +414,12 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-geom.js'), require(ROOT + 
 // The profile's pure half, for the same reason: since Task 434 the profile is a tab in the bottom
 // pane, so wirePane() reaches EngCalcs.lpnProfile during boot rather than only when a panel opens.
 Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-profile.js'));
+// The colour catalogue, the range allocation modes and the swatch geometry (Tasks 427, 429). It
+// installs itself on globalThis.EngCalcs as `lpnRamps`, exactly as its <script> tag does in the
+// browser, and looped-network.js reads it for every colour it paints -- without it the map would
+// degrade to the five fallback stops and every assertion about a 7-class ramp would pass on the
+// wrong thing.
+require(ROOT + 'js/lpn-ramps.js');
 
 // The pointer handlers hit-test through document.elementFromPoint rather than trusting e.target (a
 // real tap moves a few pixels between down and up). A test sets this to whatever it is pretending

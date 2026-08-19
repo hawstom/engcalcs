@@ -262,7 +262,22 @@ const allRefs = [...new Set([
 // sprint that owns that file. The check below fails when a pending key ARRIVES, so the list cleans
 // itself: whoever adds the key is told to delete the line. Task 145's five placement-bar keys went
 // on 2026-08-18 and came off the same day.
-const PENDING_KEYS = [];
+const PENDING_KEYS = [
+  // The ramp picker (Tasks 427, 429), landed while a translation sprint held lib/lang.ec.en.php.
+  // Each of these is read in the `pc.key || 'English'` position and ships its English literal until
+  // the sprint adds it; delete the line here in the same commit that adds the key.
+  'lpn_settings_color_classes',   // "Number of ranges"
+  'lpn_color_mode',               // "Range allocation"
+  'lpn_color_ranges_note',        // what the limits under a mode are and what typing over them does
+  'lpn_color_criterion_note',     // why the count is fixed under a criterion mode
+  'lpn_color_break_number',       // the three break-editor refusals
+  'lpn_color_break_order',
+  'lpn_color_break_count',
+  'lpn_color_ramp_rainbow',       // the heading the EPANET rainbow sits under, and its example
+  'lpn_color_ramp_rainbow_eg',
+  'lpn_color_example_status',     // the two family examples that name no field this page has yet
+  'lpn_color_example_material'
+];
 const dangling = allRefs.filter(k => !(k in EngCalcs.pageConfig) && PENDING_KEYS.indexOf(k) < 0);
 ok('no dangling lpn_ key reference', dangling.length === 0, dangling.join(','));
 const arrived = PENDING_KEYS.filter(k => k in EngCalcs.pageConfig);

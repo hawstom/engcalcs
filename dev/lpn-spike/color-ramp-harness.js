@@ -1,21 +1,27 @@
-// Harness for COLOUR BY VALUE (ROADMAP Task 384) and the THEMATIC map (Task 327) -- run with:
+// Harness for COLOUR BY VALUE (ROADMAP Task 384), the THEMATIC map (Task 327) and the RAMP PICKER
+// that consumes js/lpn-ramps.js (Tasks 427, 429) -- run with:
 //   node dev/lpn-spike/color-ramp-harness.js
 //
 // WHY THIS EXISTS. Every claim colouring makes is invisible to the eye that is checking it: a map
 // full of colour looks equally plausible whether the breaks are right, whether the ramp is being
-// sampled from both ends, and whether a pump with no velocity got the bottom colour or none at all.
-// The three defects worth naming, all of which look fine in a browser:
+// read at the class count the swatch is drawing, and whether a pump with no velocity got the bottom
+// colour or none at all. The defects worth naming, all of which look fine in a browser:
 //   * an UNDEFINED value taking the bottom colour, which asserts "low" about a quantity that does
 //     not exist on that element (a pump has no velocity);
-//   * fewer than four breaks sampling the ramp's FIRST n stops instead of spreading over it, which
-//     silently drops the top of the ramp so a high value stops reading as high;
+//   * the picture and the map disagreeing about how many classes there are -- a swatch of seven
+//     boxes over a five-class map, which makes the picker a liar;
 //   * a break value being treated as SI while the user typed it in the displayed unit -- the same
-//     class of defect as every other unit bug on this page, and equally invisible under one preset.
+//     class of defect as every other unit bug on this page, and equally invisible under one preset;
+//   * a ramp SLICED to a shorter class count instead of taken from its own published set, which
+//     throws away the design work that is the entire reason to use Brewer's schemes.
 //
 // The network is the shipped ring main, solved for real: the assertions below are about the
 // solver's own pressures and velocities, not about numbers this file made up.
 
 const { ROOT, mkEl, byId, ensure, unitSelects, setUnitSet, loadLoopedNetwork } = require('./lpn-dom-stub.js');
+// The same module the page loads, asked directly: an expectation computed from it is the coupling
+// under test, while a retyped hex or a retyped break would be testing a copy.
+const R = require(ROOT + 'js/lpn-ramps.js').lpnRamps;
 
 const L = loadLoopedNetwork(
 	"\t\tdrawExample: drawExampleNetwork, runSolve: runSolve,\n" +
@@ -24,10 +30,12 @@ const L = loadLoopedNetwork(
 	"\t\trefreshValueColors: refreshValueColors,\n" +
 	"\t\trebuildSettingsFields: rebuildSettingsFields,\n" +
 	"\t\tbuildColoringSection: buildColoringSection,\n" +
-	"\t\tequalIntervalBreaks: equalIntervalBreaks, equalCountBreaks: equalCountBreaks,\n" +
-	"\t\teffectiveBreaks: effectiveBreaks, bandColor: bandColor, colorForValue: colorForValue,\n" +
+	"\t\tcomputedBreaks: computedBreaks, effectiveBreaks: effectiveBreaks,\n" +
+	"\t\tpinnedBreaks: pinnedBreaks, colorModeOf: colorModeOf,\n" +
+	"\t\tcolorClassCount: colorClassCount, rampColorList: rampColorList,\n" +
+	"\t\trampGroups: rampGroups, bandColor: bandColor, colorForValue: colorForValue,\n" +
 	"\t\tcolorNodeValue: colorNodeValue, colorLinkValue: colorLinkValue,\n" +
-	"\t\tcolorValues: colorValues, COLOR_RAMPS: COLOR_RAMPS, COLOR_BANDS: COLOR_BANDS,\n" +
+	"\t\tcolorValues: colorValues,\n" +
 	"\t\tnodeFill: function (id) { return nodeEls[id] ? (nodeEls[id].circle.style.fill || '') : null; },\n" +
 	"\t\tnodeSymbolColor: function (id) { return (nodeEls[id] && nodeEls[id].symbol) ? (nodeEls[id].symbol.style.color || '') : null; },\n" +
 	"\t\tlinkStroke: function (id) { return linkEls[id] ? (linkEls[id].line.style.stroke || '') : null; },\n" +
@@ -58,6 +66,13 @@ function allText(n) {
 	(n.children || []).forEach(function (c) { t += allText(c); });
 	return t;
 }
+// The stub's querySelectorAll answers [], so descendants are walked by hand -- which is honest
+// about what this harness can see and keeps every assertion below about the tree we really built.
+function walk(n, out) {
+	out = out || [];
+	(n.children || []).forEach(function (c) { out.push(c); walk(c, out); });
+	return out;
+}
 
 // Looped-Network.php puts #lpn_labels_legend inside the map wrapper, and the colour key is created
 // as its SIBLING (colorLegendEl()). The stub creates every id as an orphan, so without this the key
@@ -72,37 +87,72 @@ function fresh(unitSet) {
 	L.runSolve();
 }
 
-// ---- 1. pure break arithmetic -------------------------------------------------------------
-console.log('== break rules ==');
+// ---- 1. the class count, and the ramp read at it ----------------------------------------------
+console.log('== classes and ramp ==');
 {
-	const B = L.COLOR_BANDS;                       // 5 bands -> 4 breaks
-	const ei = L.equalIntervalBreaks([0, 100]);
-	ok('equal intervals yields COLOR_BANDS-1 breaks', ei.length === B - 1, ei.length);
-	ok('equal intervals are evenly spaced over the range',
-		ei.join(',') === [20, 40, 60, 80].join(','), ei.join(','));
-	ok('equal intervals on a constant field gives no breaks (one band, not five)',
-		L.equalIntervalBreaks([7, 7, 7]).length === 0);
-	ok('equal intervals on a single value gives no breaks', L.equalIntervalBreaks([7]).length === 0);
-	// EQUAL COUNTS IS THE ONE THAT MUST DIFFER FROM EQUAL INTERVALS ON SKEW. A field with one
-	// outlier is exactly the case a water engineer reaches for it: equal intervals put every
-	// ordinary pipe in the bottom band, and if the two agreed here the button would be decoration.
-	const skew = [1, 1, 1, 1, 1, 1, 1, 1, 1, 100];
-	const q = L.equalCountBreaks(skew), e = L.equalIntervalBreaks(skew);
-	ok('equal counts differs from equal intervals on a skewed field', q.join(',') !== e.join(','),
-		q.join(',') + ' vs ' + e.join(','));
-	ok('equal counts stays inside the observed range',
-		q.every(v => v >= 1 && v <= 100), q.join(','));
-	ok('breaks come back ascending', q.every((v, i) => i === 0 || v >= q[i - 1]), q.join(','));
+	fresh('us');
+	const s = L.getSettings();
+	ok('a new project opens on seven classes -- the count Tom asked for and Brewer\'s ceiling',
+		s.colorClasses === 7 && L.colorClassCount() === 7, s.colorClasses);
+	// **NEVER THE RAINBOW.** It is kept for comparison with EPANET and is not what a new map is
+	// handed; Tom: it "goes last, in its own group, and is never the default".
+	ok('the default ramp is not the rainbow', s.colorRamp !== 'epanet', s.colorRamp);
+	ok('...and it is a real key of the catalogue', !!R.RAMPS[s.colorRamp], s.colorRamp);
+
+	// **DEGRADE TO THE PUBLISHED SET, NEVER A SUBSET.** Brewer designs each count separately, so a
+	// 5-class scheme must come out of her 5-class table -- not out of the 7-class one with two
+	// colours dropped. Asserted against the module's own published set, which is the only source
+	// that can tell the two apart.
+	s.colorRamp = 'ylgnbu';
+	s.colorReverse = false;
+	for (let n = R.MIN_CLASSES; n <= R.MAX_CLASSES; n++) {
+		s.colorClasses = n;
+		ok('a ' + n + '-class map uses the ' + n + '-class published set',
+			L.rampColorList().join(',') === R.RAMPS.ylgnbu.colors[n].join(','),
+			L.rampColorList().join(','));
+	}
+	s.colorClasses = 7;
+	ok('reversing runs the same published set the other way',
+		(() => { s.colorReverse = true; const got = L.rampColorList().join(','); s.colorReverse = false;
+			return got === R.RAMPS.ylgnbu.colors[7].slice().reverse().join(','); })());
+	// A key from the five-ramp era, and one we never shipped: neither may blank the map.
+	['epanet', 'viridis', 'gray', 'ylgnbu', 'rdylbu'].forEach(function (k) {
+		s.colorRamp = k;
+		ok('a project saved on "' + k + '" still resolves', L.rampColorList().every(c => /^#[0-9a-f]{6}$/.test(c)));
+	});
+	s.colorRamp = 'no-such-ramp-was-ever-shipped';
+	ok('an unknown ramp key falls back rather than throwing', L.rampColorList().length === 7);
+	s.colorRamp = 'viridis';
 }
 
-// ---- 2. banding and ramp sampling -----------------------------------------------------------
-console.log('== bands and ramp ==');
+// ---- 2. the picker's groups -------------------------------------------------------------------
+console.log('== groups ==');
+{
+	fresh('us');
+	const groups = L.rampGroups();
+	ok('the three families come first, in Brewer\'s own order',
+		groups.slice(0, 3).map(g => g.key).join(',') === R.FAMILIES.join(','),
+		groups.map(g => g.key).join(','));
+	ok('the rainbow is LAST and in a group of its own',
+		groups[groups.length - 1].key === 'rainbow' &&
+		groups[groups.length - 1].ramps.join(',') === 'epanet');
+	ok('...and therefore not among the sequential schemes',
+		groups[0].ramps.indexOf('epanet') < 0);
+	const listed = groups.reduce((a, g) => a.concat(g.ramps), []);
+	ok('every ramp in the catalogue is reachable from some group',
+		listed.length === R.rampKeys().length, listed.length + ' of ' + R.rampKeys().length);
+	ok('and none is listed twice', new Set(listed).size === listed.length);
+}
+
+// ---- 3. banding -------------------------------------------------------------------------------
+console.log('== bands ==');
 {
 	fresh('us');
 	const s = L.getSettings();
 	s.colorRamp = 'epanet';
 	s.colorReverse = false;
-	const ramp = L.COLOR_RAMPS.epanet;
+	s.colorClasses = 5;
+	const ramp = R.RAMPS.epanet.colors[5];
 	const breaks = [10, 20, 30, 40];
 	ok('below the first break takes the bottom colour', L.colorForValue(5, breaks) === ramp[0]);
 	ok('at a break takes the band ABOVE it (>= is the upper band)',
@@ -111,19 +161,67 @@ console.log('== bands and ramp ==');
 	// The undefined rule, which is the one a browser cannot show you.
 	ok('an undefined value gets NO colour, not the bottom one', L.colorForValue(undefined, breaks) === '');
 	ok('NaN gets no colour', L.colorForValue(NaN, breaks) === '');
-	// FEWER BREAKS MUST STILL SPAN THE RAMP. Taking the first n stops would leave a "high" value
-	// painted mid-ramp, which reads as ordinary.
-	ok('two bands use both ENDS of the ramp',
-		L.bandColor(0, 2) === ramp[0] && L.bandColor(1, 2) === ramp[ramp.length - 1],
-		L.bandColor(0, 2) + '/' + L.bandColor(1, 2));
-	ok('three bands use both ends and the middle',
-		L.bandColor(0, 3) === ramp[0] && L.bandColor(1, 3) === ramp[2] && L.bandColor(2, 3) === ramp[4]);
+	ok('null gets no colour', L.colorForValue(null, breaks) === '');
+	// n classes, n colours, in order. Nothing is sampled out of a longer set any more -- the ramp
+	// is asked for the count the map is drawn in.
+	s.colorClasses = 3;
+	ok('three classes are the ramp\'s own three colours, in order',
+		[0, 1, 2].map(i => L.bandColor(i, 3)).join(',') === R.RAMPS.epanet.colors[3].join(','),
+		[0, 1, 2].map(i => L.bandColor(i, 3)).join(','));
+	s.colorClasses = 5;
 	s.colorReverse = true;
 	ok('reversing swaps the ends', L.colorForValue(5, breaks) === ramp[4] && L.colorForValue(1e6, breaks) === ramp[0]);
 	s.colorReverse = false;
+	s.colorClasses = 7;
 }
 
-// ---- 3. painting the map ---------------------------------------------------------------------
+// ---- 4. the range allocation modes ------------------------------------------------------------
+console.log('== modes ==');
+{
+	fresh('us');
+	const s = L.getSettings();
+	s.colorNodeField = 'pressure';
+	s.colorLinkField = 'velocity';
+	ok('a field with no mode chosen is on equal interval', L.colorModeOf('link', 'velocity') === 'equal');
+	// n classes want exactly n-1 breaks, at every count and in every algorithmic mode -- a mode
+	// that answered with fewer would index past the end of the colour array.
+	['equal', 'quantile', 'jenks', 'stddev', 'pretty', 'log'].forEach(function (mode) {
+		s.colorModes['link.velocity'] = mode;
+		let allRight = true;
+		for (let n = R.MIN_CLASSES; n <= R.MAX_CLASSES; n++) {
+			s.colorClasses = n;
+			const b = L.computedBreaks('link', 'velocity');
+			if (b.length !== n - 1 || !b.every(v => isFinite(v))) { allRight = false; }
+		}
+		ok('mode "' + mode + '" answers with count-1 finite breaks at every count', allRight);
+	});
+	s.colorClasses = 7;
+	// **THE CRITERION MODE IS NAMED FOR THE QUANTITY AND IS OFFERED ONLY ON IT.** A mode called
+	// Pressure offered while colouring velocity is an invitation to a wrong map.
+	ok('Pressure is offered while colouring pressure',
+		R.modesFor('pressure').some(m => m.key === 'pressure'));
+	ok('...and not while colouring velocity',
+		!R.modesFor('velocity').some(m => m.key === 'pressure'));
+	s.colorModes['node.pressure'] = 'pressure';
+	ok('a criterion mode DICTATES the class count, whatever the count picker last said',
+		L.colorClassCount() === R.criterionClasses('pressure') && L.colorClassCount() === 5,
+		L.colorClassCount());
+	ok('...and its breaks are the four thresholds, not an algorithm\'s answer',
+		L.computedBreaks('node', 'pressure').length === 4);
+	// STORED IN SI, CONVERTED AT THE BOUNDARY: 20 psi is the first threshold under the US preset.
+	const us = L.computedBreaks('node', 'pressure');
+	ok('under psi the first threshold reads as 20', Math.abs(us[0] - 20) < 0.01, us.join(','));
+	fresh('si');
+	const s2 = L.getSettings();
+	s2.colorNodeField = 'pressure';
+	s2.colorModes['node.pressure'] = 'pressure';
+	const si = L.computedBreaks('node', 'pressure');
+	ok('under metres of water the SAME criterion reads as 14.06', Math.abs(si[0] - 14.0614) < 0.01, si.join(','));
+	ok('so a criterion is a fact about the water, not about the preset it was typed under',
+		Math.abs(us[0] - si[0]) > 1);
+}
+
+// ---- 5. painting the map ---------------------------------------------------------------------
 console.log('== painting ==');
 {
 	fresh('us');
@@ -154,8 +252,8 @@ console.log('== painting ==');
 	}
 
 	// The highest-pressure junction must not be painted the same colour as the lowest. This is the
-	// assertion that fails if the automatic breaks are computed from the wrong pool, or from SI
-	// values while the elements are compared in display units.
+	// assertion that fails if the breaks are computed from the wrong pool, or from SI values while
+	// the elements are compared in display units.
 	const press = doc.nodes.filter(n => n.type === 'junction')
 		.map(n => ({ id: n.id, v: L.colorNodeValue(n, 'pressure') }))
 		.filter(p => typeof p.v === 'number');
@@ -163,17 +261,16 @@ console.log('== painting ==');
 	ok('the solve produced a real spread of junction pressures',
 		press.length >= 2 && press[press.length - 1].v - press[0].v > 1e-6,
 		press.map(p => p.v.toFixed(2)).join(','));
-	// EQUAL COUNTS, not the automatic equal intervals, and the difference is the point. This ring
-	// main's reservoir sits at zero gauge pressure while every junction is bunched near the top of
-	// the range, so equal intervals really does put all five junctions in one band -- which is not
-	// a defect, it is exactly the skew EPANET's second button exists for. Asserting on equal
-	// intervals here would have been asserting that the arithmetic is wrong.
-	s.colorBreaks['node.pressure'] = L.equalCountBreaks(L.colorValues('node', 'pressure'));
+	// QUANTILE, not the default equal interval, and the difference is the point. This ring main's
+	// reservoir sits at zero gauge pressure while every junction is bunched near the top of the
+	// range, so equal interval really does put all five junctions in one class -- which is not a
+	// defect, it is exactly the skew the other modes exist for.
+	s.colorModes['node.pressure'] = 'quantile';
 	L.refreshValueColors();
-	ok('with equal counts, lowest and highest pressure are different colours',
+	ok('with quantile, lowest and highest pressure are different colours',
 		L.nodeFill(press[0].id) !== L.nodeFill(press[press.length - 1].id),
 		L.nodeFill(press[0].id) + ' vs ' + L.nodeFill(press[press.length - 1].id));
-	delete s.colorBreaks['node.pressure'];
+	delete s.colorModes['node.pressure'];
 
 	// Turning it off must restore the stylesheet's black EXACTLY -- an empty inline style, not a
 	// hardcoded '#000' that would then ignore any future CSS or dark-mode change.
@@ -184,7 +281,7 @@ console.log('== painting ==');
 		L.nodeFill(junction.id) === '' && L.linkStroke(pipe.id) === '' && L.nodeSymbolColor(reservoir.id) === '');
 }
 
-// ---- 4. IDEMPOTENCE -------------------------------------------------------------------------
+// ---- 6. IDEMPOTENCE -------------------------------------------------------------------------
 // The cheapest strong assertion for anything that paints (dev/testing-notes.md): painting twice
 // must equal painting once, to the character.
 console.log('== idempotence ==');
@@ -200,38 +297,48 @@ console.log('== idempotence ==');
 	L.refreshValueColors();
 	L.refreshValueColors();
 	ok('painting three times equals painting once', snap() === once);
-	// And re-solving the same network must not move a colour either -- the automatic breaks are a
-	// function of the values, and the values are a function of the network.
+	// And re-solving the same network must not move a colour either -- the breaks are a function of
+	// the values, and the values are a function of the network.
 	L.runSolve();
 	ok('re-solving the same network repaints identically', snap() === once);
 }
 
-// ---- 5. PINNED BREAKS ARE ABSOLUTE, AND ARE IN THE DISPLAYED UNIT ----------------------------
+// ---- 7. PINNED BREAKS ARE ABSOLUTE, AND ARE IN THE DISPLAYED UNIT ----------------------------
 // EPANET's answer, and the one Task 248 needs: a break is a fixed number per variable, so the same
-// colour means the same thing at every timestep and on every network. Automatic is our own
+// colour means the same thing at every timestep and on every network. The mode's own answer is our
 // addition and must yield to a pinned value the moment one exists.
 console.log('== pinned breaks ==');
 {
 	fresh('us');
 	const s = L.getSettings(), doc = L.getDoc();
 	s.colorNodeField = 'pressure';
-	ok('with nothing pinned the breaks are automatic (derived from the values)',
-		L.effectiveBreaks('node', 'pressure').join(',') ===
-		L.equalIntervalBreaks(L.colorValues('node', 'pressure')).join(','));
+	s.colorClasses = 5;
+	ok('with nothing pinned the breaks are the mode\'s own answer',
+		L.effectiveBreaks('node', 'pressure').join(',') === L.computedBreaks('node', 'pressure').join(','));
 	s.colorBreaks['node.pressure'] = [10, 20, 30, 40];
-	ok('a pinned set wins over automatic', L.effectiveBreaks('node', 'pressure').join(',') === '10,20,30,40');
-	// Blanks allowed, ascending enforced -- EPANET's own dialog rules.
-	s.colorBreaks['node.pressure'] = ['', 40, '', 10];
-	ok('blanks are dropped and the rest sorted', L.effectiveBreaks('node', 'pressure').join(',') === '10,40');
-	s.colorBreaks['node.pressure'] = [];
-	ok('an empty pinned list falls back to automatic',
-		L.effectiveBreaks('node', 'pressure').length === L.equalIntervalBreaks(L.colorValues('node', 'pressure')).length);
+	ok('a pinned set wins over the mode', L.effectiveBreaks('node', 'pressure').join(',') === '10,20,30,40');
+	// **WHAT THE USER TYPED IS NEVER REPAIRED.** A set that is not ascending is not sorted into
+	// shape -- it is refused, by the same rule the .inp importer follows.
+	s.colorBreaks['node.pressure'] = [40, 10, 30, 20];
+	ok('an out-of-order set is refused, not silently sorted',
+		L.pinnedBreaks('node', 'pressure').length === 0,
+		L.pinnedBreaks('node', 'pressure').join(','));
+	ok('...and validateBreaks names the box that is wrong',
+		R.validateBreaks([40, 10, 30, 20], 5).reason === 'not-increasing' &&
+		R.validateBreaks([40, 10, 30, 20], 5).index === 1);
+	// A set pinned at one class count is not thrown away when the count moves; it is ignored while
+	// it does not fit and comes back when it does.
+	s.colorBreaks['node.pressure'] = [10, 20, 30, 40];
+	s.colorClasses = 7;
+	ok('a four-limit set is ignored under seven classes', L.pinnedBreaks('node', 'pressure').length === 0);
+	s.colorClasses = 5;
+	ok('...and comes straight back at five', L.pinnedBreaks('node', 'pressure').join(',') === '10,20,30,40');
 
 	// THE UNIT CLAIM. A break the user typed is a number in the DISPLAYED unit, exactly like every
 	// other number this page stores (switching units reinterprets rather than converts). So the
-	// same pressures read under psi and under metres of water must land in DIFFERENT bands against
-	// the same typed break -- if they did not, the break would be being compared against SI and the
-	// whole legend would be wrong under one preset while looking perfectly reasonable.
+	// same pressures read under psi and under metres of water must land in DIFFERENT classes
+	// against the same typed break -- if they did not, the break would be being compared against SI
+	// and the whole legend would be wrong under one preset while looking perfectly reasonable.
 	const pinned = [10, 20, 30, 40];
 	s.colorBreaks['node.pressure'] = pinned.slice();
 	L.refreshValueColors();
@@ -243,6 +350,7 @@ console.log('== pinned breaks ==');
 	fresh('si');
 	const s2 = L.getSettings(), doc2 = L.getDoc();
 	s2.colorNodeField = 'pressure';
+	s2.colorClasses = 5;
 	s2.colorBreaks['node.pressure'] = pinned.slice();
 	L.refreshValueColors();
 	const siPress = doc2.nodes.filter(n => n.type === 'junction').map(n => L.colorNodeValue(n, 'pressure'));
@@ -250,12 +358,12 @@ console.log('== pinned breaks ==');
 		usPress.length === siPress.length && usPress.some((v, i) => Math.abs(v - siPress[i]) > 1e-6),
 		usPress.map(v => v && v.toFixed(2)).join(',') + ' vs ' + siPress.map(v => v && v.toFixed(2)).join(','));
 	const siBands = doc2.nodes.filter(n => n.type === 'junction').map(n => L.nodeFill(n.id));
-	ok('so the SAME typed break puts them in different bands (the break is a display-unit number)',
+	ok('so the SAME typed break puts them in different classes (the break is a display-unit number)',
 		usAfter.join(',') !== siBands.join(','), usAfter.join(',') + ' vs ' + siBands.join(','));
 	ok('painting was stable across the two reads under one preset', usBands.join(',') === usAfter.join(','));
 }
 
-// ---- 6. the thematic mode (Task 327) ---------------------------------------------------------
+// ---- 8. the thematic mode (Task 327) ---------------------------------------------------------
 console.log('== thematic mode ==');
 {
 	fresh('us');
@@ -280,7 +388,7 @@ console.log('== thematic mode ==');
 		L.labelSettingsJson() === before && !L.svgClasses().contains('lpn-thematic'));
 }
 
-// ---- 7. the colour key -----------------------------------------------------------------------
+// ---- 9. the colour key -----------------------------------------------------------------------
 console.log('== colour key ==');
 {
 	fresh('us');
@@ -291,6 +399,7 @@ console.log('== colour key ==');
 	ok('no key while nothing is coloured', L.legendBox().style.display === 'none',
 		L.legendBox().style.display);
 	s.colorLinkField = 'velocity';
+	s.colorClasses = 5;
 	s.colorBreaks['link.velocity'] = [1, 2, 3, 4];
 	L.refreshValueColors();
 	const box = L.legendBox();
@@ -302,23 +411,27 @@ console.log('== colour key ==');
 	// of those two rather than the coupling.
 	const velUnit = unitSelects.lpn_u_velocity.options[unitSelects.lpn_u_velocity.selectedIndex].textContent;
 	ok('the key carries the unit the numbers are in', txt.indexOf('(' + velUnit + ')') >= 0, txt);
-	ok('the key shows five bands for four breaks',
-		(box.children || []).length >= L.COLOR_BANDS, (box.children || []).length);
-	ok('the key reads high band first', txt.indexOf('≥') < txt.indexOf('<'), txt);
-	// AUTOMATIC MUST SAY SO. A legend of absolute-looking numbers that quietly move with the
-	// network is the one thing a reviewer must not be misled by.
+	ok('the key shows one row per class, and a heading', (box.children || []).length >= 5,
+		(box.children || []).length);
+	// **THE KEY FOLLOWS THE CLASS COUNT.** Seven classes and a five-row key would be the same lie
+	// as a seven-box swatch over a five-class map, told at the other end.
+	s.colorClasses = 7;
 	delete s.colorBreaks['link.velocity'];
 	L.refreshValueColors();
-	ok('an automatic key says it is automatic', /Automatic/i.test(allText(L.legendBox())));
+	ok('raising the count to seven gives seven rows', (allText(L.legendBox()).match(/–|≥|</g) || []).length >= 7,
+		(box.children || []).length);
+	ok('the key reads high band first', allText(L.legendBox()).indexOf('≥') < allText(L.legendBox()).indexOf('<'));
+	// AUTOMATIC MUST SAY SO. A legend of absolute-looking numbers that quietly move with the
+	// network is the one thing a reviewer must not be misled by.
+	ok('an unpinned key says its numbers are automatic', /Automatic/i.test(allText(L.legendBox())));
 }
 
-// ---- 8. the Coloring section of the Settings box builds -----------------------------------------
+// ---- 10. the picker itself ---------------------------------------------------------------------
 //
-// It used to be a collapsible section INSIDE rebuildSettingsFields(), and a duplicate of it lived in
-// the right pane. Task 441 merged the two into buildColoringSection() and then DISSOLVED it (Tom,
-// 2026-08-18: "Dissolve Color by value and put its items in Node symbology and Link symbology"), so
-// there are three hosts: the node dropdown and its band limits, the link's, and what both share.
-console.log('== Coloring section ==');
+// **THE PICKER IS THE POINT OF TASKS 427 AND 429**, and everything Tom rejected about the old one
+// is asserted here: no names on screen, a picture per row, dozens of rows, a count picker, five
+// modes plus the criterion one, and the licence acknowledgement wherever the ramps are chosen.
+console.log('== the ramp picker ==');
 {
 	fresh('us');
 	const s = L.getSettings();
@@ -326,31 +439,104 @@ console.log('== Coloring section ==');
 	s.colorLinkField = 'velocity';
 	let threw = null;
 	try { L.buildColoringSection(); } catch (e) { threw = e; }
-	ok('the Coloring section renders without throwing', threw === null, threw && threw.message);
-	const shared = allText(byId.lpn_set_colors_shared);
-	const t = shared + ' ' + allText(byId.lpn_set_colors_node) + ' ' + allText(byId.lpn_set_colors_link);
-	ok('it offers the ramp choices', /EPANET/.test(shared), shared.slice(0, 200));
-	ok('it offers both auto-assign buttons', /Equal intervals/.test(t) && /Equal counts/.test(t));
-	// **EACH GROUP'S CONTROLS ARE UNDER ITS OWN SUB-HEADING**, which is the whole of the move: the
-	// node dropdown and the node band limits are one subject, not two panels.
-	ok('the node dropdown and its band limits are in the node host',
-		allText(byId.lpn_set_colors_node).indexOf(global.EngCalcs.pageConfig.lpn_settings_color_breaks) >= 0);
-	ok('the link dropdown and its band limits are in the link host',
-		allText(byId.lpn_set_colors_link).indexOf(global.EngCalcs.pageConfig.lpn_settings_color_breaks) >= 0);
-	// **THE STRIP IS NOT A LABELLED ROW.** It wore `.lpn-rp-row`, whose first child is the row's
-	// name and therefore takes all the slack, so the first swatch ate the strip (Tom: "First color
-	// expands to use all space"). The class is the whole of that defect and the whole of its fix.
-	const strip = (byId.lpn_set_colors_shared.children || [])
-		.filter(c => c.className === 'lpn-ramp-strip')[0];
-	ok('the ramp strip has its own class, not a labelled row\'s', !!strip,
-		(byId.lpn_set_colors_shared.children || []).map(c => c.className).join(','));
-	// Asserted through the LANGUAGE KEY, not the English words. Wave 0 renamed this heading from
-	// "Break values" to "Color band limits" (2026-08-17) and a literal match turned red for a
-	// deliberate wording change -- which is a test measuring the wrong thing: what matters is that
-	// the break editor is rendered, not what it happens to be called this month.
-	ok('it offers the break editor for a chosen field',
-		t.indexOf(global.EngCalcs.pageConfig.lpn_settings_color_breaks) >= 0,
-		global.EngCalcs.pageConfig.lpn_settings_color_breaks);
+	ok('the coloring controls render without throwing', threw === null, threw && threw.stack);
+
+	const shared = walk(byId.lpn_set_colors_shared);
+	const btn = shared.filter(e => e.id === 'lpn_set_ramp')[0];
+	const pop = shared.filter(e => e.id === 'lpn_set_ramp_list')[0];
+	ok('the closed picker is a BUTTON, not a select', !!btn && btn.tagName === 'BUTTON', btn && btn.tagName);
+	ok('...showing the current ramp as a bar of swatches',
+		!!btn && walk(btn).filter(e => e.className === 'lpn-color-swatch').length === L.colorClassCount(),
+		btn && walk(btn).filter(e => e.className === 'lpn-color-swatch').length);
+	ok('...and carrying the scheme\'s name as its ACCESSIBLE name, not on screen',
+		!!btn && /Viridis/.test(btn.getAttribute('aria-label') || '') && !/Viridis/.test(allText(btn)),
+		btn && btn.getAttribute('aria-label'));
+	ok('the open state is a listbox', !!pop && pop.getAttribute('role') === 'listbox');
+	ok('...that starts closed', !!pop && pop.style.display === 'none');
+
+	const rows = walk(pop).filter(e => e.getAttribute && e.getAttribute('role') === 'option');
+	ok('every ramp in the catalogue has a row -- dozens of them, as Tom expected',
+		rows.length === R.rampKeys().length, rows.length);
+	ok('every row is a PICTURE and carries no name on screen',
+		rows.every(r => allText(r) === '' && walk(r).filter(e => e.className === 'lpn-color-swatch').length >= 3));
+	ok('...with the name in aria-label, where a screen reader finds it',
+		rows.every(r => (r.getAttribute('aria-label') || '').length > 0));
+	ok('every row shows the CURRENT class count, not always seven',
+		rows.every(r => walk(r).filter(e => e.className === 'lpn-color-swatch').length === L.colorClassCount()));
+	ok('exactly one row is marked selected',
+		rows.filter(r => r.getAttribute('aria-selected') === 'true').length === 1);
+	ok('...and it is the ramp in use',
+		rows.filter(r => r.getAttribute('aria-selected') === 'true')[0].getAttribute('data-ramp') === s.colorRamp);
+	ok('every row is keyboard-reachable', rows.every(r => r.getAttribute('tabindex') !== null));
+
+	// **CLAUSES 4 AND 5: NOTHING IS NAMED AFTER THE SOURCE.** The heading is a family name in
+	// Brewer's own vocabulary; the word "ColorBrewer" appears in no control anywhere.
+	const heads = walk(pop).filter(e => e.className === 'lpn-ramp-fam');
+	ok('the rows are grouped under family headings', heads.length === L.rampGroups().length, heads.length);
+	const headText = heads.map(h => allText(h)).join(' | ');
+	ok('the standard vocabulary, not epanet-js\'s "Continuous"', /sequential/i.test(headText) && !/continuous/i.test(headText), headText);
+	ok('diverging and qualitative beside it', /diverging/i.test(headText) && /qualitative/i.test(headText), headText);
+	// **EACH HEADING CARRIES AN ABBREVIATED EXAMPLE**, because which family to use is a property of
+	// the data and nothing else in the picker says so.
+	ok('each family heading carries an example',
+		heads.every(h => /\(.+\)/.test(allText(h))), headText);
+	ok('and the diverging heading\'s example is pressure', /diverging/i.test(headText) &&
+		heads.some(h => /diverging/i.test(allText(h)) && /pressure/i.test(allText(h))), headText);
+	ok('the rainbow heading is last and says what it is for',
+		/EPANET/i.test(allText(heads[heads.length - 1])), allText(heads[heads.length - 1]));
+
+	// THE COUNT PICKER.
+	const cnt = shared.filter(e => e.id === 'lpn_set_ramp_classes')[0];
+	ok('there is a class-count picker offering 3 to 7', !!cnt && cnt.children.length === 5,
+		cnt && cnt.children.length);
+	ok('...and it is not disabled while every mode is algorithmic', !!cnt && !cnt.disabled);
+
+	// THE ACKNOWLEDGEMENT, VERBATIM. Apache-2.0 clause 2 fixes the wording; this asserts the exact
+	// sentence out of the module rather than a retyped copy, which is the only way a paraphrase
+	// gets caught.
+	const credit = shared.filter(e => e.id === 'lpn_set_ramp_credits')[0];
+	ok('the acknowledgement is rendered where the ramps are chosen', !!credit);
+	ok('...verbatim, exactly as the licence fixes it',
+		!!credit && allText(credit).indexOf(R.CREDITS[0].text) >= 0, credit && allText(credit));
+	ok('...and every source is credited', !!credit &&
+		R.CREDITS.every(c => allText(credit).indexOf(c.text) >= 0));
+	// Clauses 4 and 5 again, over the whole rendered section this time.
+	const everything = allText(byId.lpn_set_colors_shared) + ' ' +
+		allText(byId.lpn_set_colors_node) + ' ' + allText(byId.lpn_set_colors_link) + ' ' +
+		walk(byId.lpn_set_colors_shared).map(e => (e.getAttribute && e.getAttribute('aria-label')) || '').join(' ');
+	ok('no control, heading or name says "ColorBrewer"',
+		everything.replace(R.CREDITS[0].text, '').indexOf('ColorBrewer') < 0);
+
+	// THE RANGES: a mode picker and count-1 editable limits, under the sub-heading of the element
+	// they colour.
+	const nodeSide = walk(byId.lpn_set_colors_node);
+	const modeSel = nodeSide.filter(e => e.id === 'lpn_set_color_mode_node')[0];
+	ok('the node ranges carry a mode picker', !!modeSel);
+	ok('...offering the algorithmic modes AND the one named Pressure',
+		!!modeSel && modeSel.children.length === R.modesFor('pressure').length &&
+		modeSel.children.some(o => o.value === 'pressure'),
+		modeSel && modeSel.children.map(o => o.value).join(','));
+	const boxes = nodeSide.filter(e => e.type === 'number');
+	ok('...and one editable limit fewer than there are classes',
+		boxes.length === L.colorClassCount() - 1, boxes.length + ' for ' + L.colorClassCount());
+	ok('the limits arrive filled in, not blank -- the mode has already answered',
+		boxes.every(b => b.value !== '' && isFinite(+b.value)), boxes.map(b => b.value).join(','));
+	// The link side offers one mode fewer, because Pressure is not a mode for velocity.
+	const linkModeSel = walk(byId.lpn_set_colors_link).filter(e => e.id === 'lpn_set_color_mode_link')[0];
+	ok('the link ranges do not offer a mode named for pressure',
+		!!linkModeSel && !linkModeSel.children.some(o => o.value === 'pressure'),
+		linkModeSel && linkModeSel.children.map(o => o.value).join(','));
+
+	// THE COUNT PICKER GOES GREY UNDER A CRITERION MODE, because four thresholds are five classes
+	// and the picture must not offer to disagree with them.
+	s.colorModes['node.pressure'] = 'pressure';
+	L.buildColoringSection();
+	const cnt2 = walk(byId.lpn_set_colors_shared).filter(e => e.id === 'lpn_set_ramp_classes')[0];
+	ok('a criterion mode disables the count picker', !!cnt2 && cnt2.disabled === true);
+	ok('...and the picker draws five boxes, the count that mode dictates',
+		walk(walk(byId.lpn_set_colors_shared).filter(e => e.id === 'lpn_set_ramp')[0])
+			.filter(e => e.className === 'lpn-color-swatch').length === 5);
+	delete s.colorModes['node.pressure'];
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILURE(S)');

@@ -1209,6 +1209,36 @@ html[lang="zh"] .ec-welcome {
    border-box keeps each swatch's own hairline border inside its share instead of adding to it. */
 .lpn-ramp-strip { position: relative; height: 0.9rem; margin: 4px 0; }
 .lpn-ramp-strip .lpn-color-swatch { top: 0; height: 100%; width: auto; box-sizing: border-box; }
+/* THE RAMP PICKER: a button showing one bar, and a popup that is a scrolling column of bars.
+   Not a <select>, because a <select> cannot hold a picture -- Tom, 2026-08-18: "the dropdown has
+   names instead of colors". `position: relative` here is what the popup is placed against, and
+   the width matches the box's own 9rem control ceiling so the picker lines up with every select
+   above and below it. */
+.lpn-ramp-picker { position: relative; flex: 0 0 9rem; }
+.lpn-ramp-btn {
+	display: block; width: 100%; padding: 2px 3px; background: #fff;
+	border: 1px solid #767676; border-radius: 3px; cursor: pointer;
+}
+.lpn-ramp-btn .lpn-ramp-strip { margin: 0; }
+/* The list is taller than the panel and scrolls inside itself, for the same reason every other
+   overlay here does: the page may not scroll (Task 432). 41 ramps is a column, not a menu. */
+.lpn-ramp-pop {
+	position: absolute; z-index: 20; top: 100%; right: 0; width: 15rem; max-height: 60vh;
+	overflow-y: auto; padding: 4px 6px; background: #fff; border: 1px solid #999;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, .2);
+}
+/* A family heading and its abbreviated example. The example is quieter because it is a hint about
+   the DATA, not a name to choose from -- the rows below carry no names at all. */
+.lpn-ramp-fam { font-weight: bold; font-size: .85em; margin: 8px 0 2px; }
+.lpn-ramp-fam:first-child { margin-top: 0; }
+.lpn-ramp-fam-eg { font-weight: normal; opacity: .75; }
+.lpn-ramp-opt { padding: 2px 3px; cursor: pointer; border: 1px solid transparent; }
+.lpn-ramp-opt:hover, .lpn-ramp-opt:focus { border-color: #0b57d0; background: #eef3fd; outline: none; }
+.lpn-ramp-opt[aria-selected="true"] { border-color: #333; background: #f0f0f0; }
+/* A break the user typed that this file will not accept: marked where it is, so no message has to
+   carry a box number into 27 languages. The map is left exactly as it was, which the message says. */
+.lpn-bad { outline: 2px solid #b00020; }
+.lpn-color-msg { color: #b00020; font-size: .85em; margin: 2px 0; }
 /* The colour key is a WAY IN to the colour controls (Task 427), so it has to take a click -- the
    overlay stack is pointer-events:none by default and this one cell opts back in. */
 .lpn-color-legend { pointer-events: auto; cursor: pointer; }
