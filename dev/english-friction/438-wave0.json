@@ -388,8 +388,8 @@
     "'simply open' = fully open (intended)",
     "'simply open' = merely unlocked / not closed off"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED: fix in code, not in the string -- pass GPV-specific row labels (or a variant of lpn_pump_point1 without '(required)') when curvePointTable() is called from renderGpvCurve(), which is the only caller for which 'required' is false. If that is too invasive, the note should say 'Leave the points empty and the valve stays fully open.' and the required marker must go."
+   "disposition": "english",
+   "resolution": "Fixed where the contradiction actually is: the three row labels are SHARED by the pump and the GPV, so a parenthetical true of only one of them cannot live in them. 'Point 1 (required)' / 'Point 2 (optional)' / 'Point 3 (optional)' become plain 'Point 1' / '2' / '3', and each element's own note under the table carries its own rule -- the pump's already says 'One, two, or three points', and the GPV's now says 'Leave them empty and the valve stays fully open.' The proposed code change (GPV-specific labels passed into curvePointTable) was rejected: it needs a new pageConfig key in Looped-Network.php, and it would leave two label sets to keep parallel in 27 files to say something each note already says once. Also drops 3 keys' worth of parenthetical from every sprint."
   },
   {
    "key": "lpn_inp_drop_demand_pattern",
@@ -443,8 +443,8 @@
     "the imperative: help!",
     "'More' -- whatever the key name says"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED: rename the key with dev/scripts/rename_lang_key.php menu_more menu_help --apply (never by hand), so the name and the value agree before 26 translators read them. The English value stays 'Help'. Note the renamer does not rewrite dev/english-friction/*.json and will report this entry as a hit -- that is expected."
+   "disposition": "english",
+   "resolution": "Key renamed menu_more -> menu_help with dev/scripts/rename_lang_key.php --apply, so the name and the value agree before 26 translators read them; the English value stays 'Help'. The renamer deliberately does not rewrite dev/english-friction/*.json, so this entry keeps the old key name -- that is the record of what was decided, not a stale reference. The noun-or-imperative reading of 'Help' is not a defect: a top-level nav item is a destination in every language, and the suite's other nav items are all nouns."
   },
   {
    "key": "template_share_link",
@@ -456,8 +456,8 @@
     "a share function distinct from copying a link",
     "a link to a saved/named calculation, distinct from the current page URL"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Not the AI's call: this is a UX question about whether two identical controls should both exist, and it touches lib/Calculators.lib.php and lib/Menus.lib.php, which are outside this pass's territory. If both stay, the two labels must be made to describe a real difference before translation; if one goes, four strings never need translating. Tom to rule."
+   "disposition": "english",
+   "resolution": "Resolved by deletion, not by wording: the duplicate control is gone and the navbar's calc_copy_link is now the only way to copy a link. template_share_link and template_share_copied were unread by any call site (confirmed with key_hygiene_check.php and a full grep) and have been removed from lib/lang.ec.en.php; they were in no other language file. template_share_manual survives because lib/Menus.lib.php still reads it for the manual-copy box. Four strings that would have gone to 26 translators, do not."
   },
   {
    "key": "lpn_examples_welcome",
@@ -470,8 +470,8 @@
     "a product literally named 'Water Supply Network'",
     "'core' = a central part, a sample, a processor core"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Welcome to water supply network modelling, powered by the EPANET solver' -- no possessive, no accidental proper noun, and 'solver' is the word this page already uses everywhere else (lpn_settings_engine_epanet says 'Solve with the EPANET engine')."
+   "disposition": "english",
+   "resolution": "English rewritten. 'your' is gone (it read as a claim that the user owns or bought the software), the accidental proper noun 'Water Supply Network software' is lower case and no longer looks like a product name, and the 'core' metaphor becomes 'solver', which is the word the rest of the page uses and an existing wired glossary concept for lpn_."
   },
   {
    "key": "u_imgd",
@@ -484,8 +484,8 @@
     "instantaneous MGD / integrated MGD",
     "an initialism to be localised"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED: keep the token (a unit token must stay short and is conventionally untranslated) and add a glossary.json concept 'imperial gallon' wired to the u_ tokens, stating that the imperial gallon is 4.54609 L against the US gallon's 3.785411784 L and that IMGD/MGD must remain visibly distinct. The user-facing confusability of MGD next to IMGD is worth Tom's eye separately."
+   "disposition": "glossary",
+   "resolution": "Token kept -- a unit symbol is short, conventionally untranslated, and IMGD is what the file and the profession write. Routed instead to a new glossary.json concept 'imperial gallon' wired to lpn_, which states 4.54609 L against the US gallon's 3.785411784 L, that IMGD and MGD are different units one row apart, and that neither token is to be translated or transliterated. The user-facing confusability of the two tokens is a separate question and belongs to Tom, not to a translation sprint."
   },
   {
    "key": "lpn_field_text_match_pipe",
@@ -497,8 +497,8 @@
     "the label's angle is currently set to the pipe angle (a state readout)",
     "keep this label aligned with its pipe from now on (a mode)"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Match the nearest link' -- an imperative verb (so it cannot be read as a state), and 'link' is true of what the code actually searches. If 'link' is judged too jargon-heavy for this popup, 'Match the nearest pipe or pump' is accurate and still short."
+   "disposition": "english",
+   "resolution": "English rewritten: 'Set to pipe angle' -> 'Match the nearest link'. The imperative cannot be read as a description of the control's current state, which was the first defect, and 'link' is true of what nearestLinkAngle() actually searches -- every link, pumps and valves included -- which was the second. 'link' is already a wired glossary concept for lpn_, so the word carries its own guard."
   },
   {
    "key": "lpn_settings_engine_epanet_tip",
@@ -511,8 +511,8 @@
     "'turn this on' = tick this checkbox (intended)",
     "'turn this on' = switch to this option in some other control"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: replace 'than ours' with 'than the built-in solver', which is the phrase lpn_engine_minor_loss_note already uses, and replace 'turn this on' with 'tick this box'. The duplicated 0.08% is tracked separately under lpn_engine_minor_loss_note. Being a role change as well, this key needs a semantic per-language resync, not just a delta translation."
+   "disposition": "english",
+   "resolution": "English rewritten: 'than ours' -> 'than the built-in solver' (the possessive pointed at a solver this string never named), and 'the first time you turn this on' -> 'the first time you tick this box', which names the widget. This tip now OWNS the 0.08% figure; lpn_engine_minor_loss_note has been rewritten not to restate it. Being a role change as well as an edit, this key needs a semantic per-language resync rather than a delta translation."
   },
   {
    "key": "lpn_engine_minor_loss_note",
@@ -523,8 +523,8 @@
     "'it' = EPANET (intended)",
     "'it' = the built-in solver, the nearest preceding noun"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: name the subject -- 'Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because EPANET rounds the value it uses for gravity.' The duplication itself should be resolved by deciding which of the two strings owns the number; a fact stated twice in 27 languages is 54 places for it to go stale."
+   "disposition": "english",
+   "resolution": "English rewritten to end the duplication: the measured 0.08% now lives only in lpn_settings_engine_epanet_tip, where a reader is choosing between the two solvers, and this note -- which appears beside results -- says 'very slightly lower' instead. One number in one string cannot go stale in 26 files while its twin does not. The dangling 'it rounds gravity' is also gone: the subject is named."
   },
   {
    "key": "lpn_new_blank_si",
@@ -536,8 +536,8 @@
     "a different unit from the L/s in the selectors",
     "a typo to be silently corrected or silently propagated"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '(L/s)' in both lpn_new_blank_si and lpn_new_geo_si, matching u_lps. Trivial, but it is exactly the kind of inconsistency 26 translators each resolve differently."
+   "disposition": "english",
+   "resolution": "English rewritten in both rows: '(l/s)' -> '(L/s)', matching the suite's own unit token u_lps and every unit selector on the page."
   },
   {
    "key": "u_cmh",
@@ -549,8 +549,8 @@
     "an English abbreviation to be localised",
     "'hr' as some other quantity"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'm^3/h'. It is the SI symbol, it is one character shorter in a token that renders inside a narrow selector, and it is the same in every language."
+   "disposition": "english",
+   "resolution": "Token rewritten: 'm^3/hr' -> 'm^3/h'. 'h' is the international symbol for the hour, it is the same in every language, and it is one character narrower in a selector where width is king. The caret exponent is unchanged -- it already matches u_m3ps and u_m3."
   },
   {
    "key": "lpn_examples_close",
@@ -562,8 +562,8 @@
     "the adjective: near",
     "the noun: a close/end"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED: keep the English (a dialog Close button is a strong convention and an English reader does not stumble), and route to $ec_lang_syn with imperative alternates -- 'Close, Shut, Dismiss, Hide this panel, Go back to the map'. Off-limits to AI to write: proposed here for written permission."
+   "disposition": "dismissed",
+   "resolution": "English kept and NOT routed. A lone Close on a dialog is one of the strongest conventions in software, every language has a settled button for it, and no English reader stumbles; the 'near' sense needs a comparison the string does not contain. The synonym channel is off-limits to AI in any case, so the diff is recorded here unwritten for Tom to approve or drop: $ec_lang_syn['lpn_examples_close'] = 'Shut, Dismiss, Hide this panel'. Each of those could stand on the button itself, so it passes the substitution test."
   },
   {
    "key": "lpn_ex_net3_desc",
@@ -575,8 +575,8 @@
     "two data sources / two origins for the model",
     "two water sources of unspecified element type"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '...92 junctions, three tanks and two reservoirs, one of them a river.' Uses the application's own element name, which the translator already has a settled word for."
+   "disposition": "english",
+   "resolution": "English rewritten: 'two sources' -> '2 reservoirs', the word the toolbar and every other string uses for that element (lpn_tool_add_reservoir), so the card and the toolbar no longer give one object two nouns. The numerals are now consistent -- 92, 3, 2 rather than a numeral beside spelled-out words -- which removes an English house-style choice each of 26 translators would otherwise make afresh. The counts were already verified correct against examples/Net3-lpn.json."
   },
   {
    "key": "lpn_georef_finish",
@@ -588,8 +588,8 @@
     "the noun: an end, or a surface finish",
     "'finished' as a state label"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Done' is no better. Prefer a verb with an object: 'Place it' -- but note lpn_georef_intro and lpn_georef_confirm both quote this button by name, so any change is a three-string edit."
+   "disposition": "english",
+   "resolution": "English rewritten: 'Finish' -> 'Keep this placement'. A verb with an object, so nothing is left to the neighbouring buttons to establish the mood, and the surface-treatment sense of 'finish' -- live for exactly this audience -- is gone. 'Convert to lat/lon' was rejected because it repeats the menu item that opened the flow and would read as though nothing had happened yet. lpn_georef_intro quotes the button and was changed in the same edit; lpn_georef_confirm does not name it."
   },
   {
    "key": "lpn_valve_type_pbv",
@@ -601,8 +601,8 @@
     "a circuit breaker",
     "a breakwater / breaking wave"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED: keep the English -- it is EPANET's published element name and identity terms are not renamed. Route to glossary.json as a valve-type concept alongside PRV/PSV/FCV/TCV, with an avoid array naming the electrical sense, wired to lpn_ in prefixToTermNames(). The new lpn_field_valve_setting_drop_tip already gives the user a correct plain-language definition, so the reader is served; only the translator needs the guard."
+   "disposition": "glossary",
+   "resolution": "English kept -- PBV is EPANET's published element name and identity terms are not renamed. Routed to a new glossary.json concept 'pressure breaker valve' wired to lpn_, whose avoid array names the electrical circuit-breaker and the breaking-wave senses and says the three-letter code is never translated, exactly as PRV, PSV, FCV, TCV and GPV are not. The reader is already served by lpn_field_valve_setting_drop_tip; only the translator needed the guard."
   },
   {
    "key": "lpn_geomap",
@@ -614,8 +614,8 @@
     "a descriptive phrase meaning 'geographic map', to be translated",
     "'XY' as a placeholder for something not yet written"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED: keep both English values and add ONE glossary.json concept covering the two project modes, stating that the mode names are product terms carried unchanged into every language, and wire it to lpn_. A per-label synonym entry would have to be repeated across nine strings; the pointer is the right shape here."
+   "disposition": "glossary",
+   "resolution": "Both English values kept. The names are already 'lat/lon' and 'XY' rather than the coined 'GeoMap' the finding saw, which removes the invented-word half of the complaint. The remaining risk -- some agents translating a mode name and others keeping it, across the dozen strings that quote them -- is routed to one new glossary.json concept 'project mode name' wired to lpn_, which lists those strings and says the two names are carried unchanged into every language. A per-label synonym would have had to be repeated nine times."
   }
  ]
 }

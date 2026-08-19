@@ -60,7 +60,7 @@ $ec_lang['menu_brand']='HawsEDC ម៉ាស៊ីនគណនា';
 $ec_lang['menu_main_list']='បញ្ជីម៉ាស៊ីនគណនា';
 $ec_lang['menu_main_hydraulics']='វិស្វកម្មហ៊ីដ្រូលីក';
 $ec_lang['menu_main_language']='ភាសា';
-$ec_lang['menu_more']='បន្ថែម';
+$ec_lang['menu_help']='បន្ថែម';
 $ec_lang['menu_libre']='កម្មវិធីសេរី';
 $ec_lang['template_welcome']='ទម្លាក់ការភ័យខ្លាចរបស់អ្នកនៅក្រៅទ្វារ; ក្ដីស្រឡាញ់ត្រូវបានប្រើសម្រាប់ភាសាទីនេះ។ អ្នកមិនបំផ្លាញអ្វីទាំងអស់ឡើយ។ រីករាយជាមួយ <a target="_blank" href="https://hawsedc.com/download.php">ឧបករណ៍ HawsEDC AutoCAD ឥតគិតថ្លៃ</a> ផងដែរ។';
 $ec_lang['template_feedback']='តើអ្នកអាចណែនាំពាក្យសម្ដីឱ្យប្រសើរជាងនេះនៅលើទំព័រនេះ ឬអ្វីផ្សេងទៀតបានទេ? តើអ្នកចង់ជួយ ឬចង់រៀនបង្កើតឧបករណ៍បែបនេះដែរឬទេ? សូមទាក់ទងខ្ញុំ។';
