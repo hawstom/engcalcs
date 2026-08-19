@@ -683,6 +683,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   full-height Profile tab of Task 434's bottom pane.
   - **The chooser should be the Google Maps gesture EPANET uses:** click the starting node, hover
     along the path, click to add a waypoint, double-click to end. Not two pull-downs.
+  - **The animation half is already done and proved headless.** The chart follows the transport with
+    no listener of its own (`showFrame` → `applySolveResult` → `refreshPaneIfOpen`);
+    `dev/lpn-spike/profile-eps-harness.js` walks Net3's 24-hour run and measures the grade line
+    moving 90.8 ft at node 61 while the ground holds still. A browser pass here is about the
+    chooser, not about whether it animates.
 
 - 40|427| **Two dropdowns shipped 2026-08-18; what is left is documenting the CHOICE.** Nodes and
   links have a dropdown each in the Settings box's Coloring section, neither clears the other, and
