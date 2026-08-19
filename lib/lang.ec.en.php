@@ -1391,7 +1391,12 @@ $ec_lang['lpn_color_ramp_diverging']='Diverging';
 // the picker is pictures -- so the only strings here are the family headings, the controls beside
 // them, and the three ways a typed range limit can be refused.
 $ec_lang['lpn_settings_color_classes']='Number of ranges';
-$ec_lang['lpn_color_mode']='Range allocation';
+// "Data classification method", the trade's own term -- ArcGIS Pro's help page is titled
+// "Data classification methods" and QGIS calls the act "Classify"; quantile, natural breaks
+// (Jenks) and equal interval are all named there. "Range allocation" was our own coinage and
+// appears in none of the reference tools. Tom, 2026-08-19: "Don't drop the 'method'. That's the
+// point of this control." -- the dropdown holds METHODS, and the noun alone would name the result.
+$ec_lang['lpn_color_mode']='Data classification method';
 $ec_lang['lpn_color_ranges_note']='The mode above sets these limits from the values now on the map. Type over them and the same number always means the same color.';
 $ec_lang['lpn_color_criterion_note']='The range limits come from a design standard, so the number of ranges is fixed while that mode is chosen.';
 $ec_lang['lpn_color_break_number']='A range limit must be a number. The map is unchanged.';

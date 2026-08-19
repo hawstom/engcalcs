@@ -1,7 +1,7 @@
 {
     "description": "sha1 of each lang.ec.en.php $ec_lang value as of the last full translation sync. Maintained by detect_english_drift.php --update. A current-vs-manifest hash mismatch means that key's English changed and translations may be stale. Do not hand-edit.",
     "updated": "2026-08-09",
-    "count": 1004,
+    "count": 1198,
     "partial_updates": [
         {
             "date": "2026-08-08",
@@ -590,6 +590,206 @@
                 "lpn_field_text_match_pipe"
             ],
             "reason": "Resynced in all 26 languages after the English was rewritten"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_basemap_hide",
+                "lpn_basemap_show",
+                "lpn_basemap_tip",
+                "lpn_clean_map",
+                "lpn_clean_map_off",
+                "lpn_clean_map_tip",
+                "lpn_color_break_count",
+                "lpn_color_break_number",
+                "lpn_color_break_order",
+                "lpn_color_criterion_note",
+                "lpn_color_example_material",
+                "lpn_color_example_status",
+                "lpn_color_legend_open_tip",
+                "lpn_color_link_field",
+                "lpn_color_mode",
+                "lpn_color_mode_equal",
+                "lpn_color_mode_jenks",
+                "lpn_color_mode_log",
+                "lpn_color_mode_pressure",
+                "lpn_color_mode_pretty",
+                "lpn_color_mode_quantile",
+                "lpn_color_mode_stddev",
+                "lpn_color_node_field",
+                "lpn_color_ramp_diverging",
+                "lpn_color_ramp_qualitative",
+                "lpn_color_ramp_rainbow",
+                "lpn_color_ramp_rainbow_eg",
+                "lpn_color_ramp_rdylbu",
+                "lpn_color_ramp_sequential",
+                "lpn_color_ramp_ylgnbu",
+                "lpn_color_ranges_note",
+                "lpn_engine_minor_loss_note",
+                "lpn_examples_close",
+                "lpn_examples_welcome",
+                "lpn_field_lat",
+                "lpn_field_lon",
+                "lpn_field_text_align",
+                "lpn_field_text_align_center",
+                "lpn_field_text_align_left",
+                "lpn_field_text_align_right",
+                "lpn_field_text_valign",
+                "lpn_field_text_valign_bottom",
+                "lpn_field_text_valign_middle",
+                "lpn_field_text_valign_top",
+                "lpn_field_valve_setting_drop",
+                "lpn_field_valve_setting_drop_tip",
+                "lpn_file_export_inp",
+                "lpn_file_export_inp_tip",
+                "lpn_find_adjacent",
+                "lpn_find_button",
+                "lpn_find_condition",
+                "lpn_find_count",
+                "lpn_find_menu",
+                "lpn_find_menu_tip",
+                "lpn_find_no_value",
+                "lpn_find_none",
+                "lpn_find_op_bottom",
+                "lpn_find_op_contains",
+                "lpn_find_op_equals",
+                "lpn_find_op_gt",
+                "lpn_find_op_lt",
+                "lpn_find_op_top",
+                "lpn_find_property",
+                "lpn_find_scope",
+                "lpn_find_scope_all",
+                "lpn_find_title",
+                "lpn_find_value",
+                "lpn_geomap",
+                "lpn_georef_adjust",
+                "lpn_georef_cancel",
+                "lpn_georef_confirm",
+                "lpn_georef_detach",
+                "lpn_georef_done",
+                "lpn_georef_drop",
+                "lpn_georef_empty",
+                "lpn_georef_finish",
+                "lpn_georef_goto",
+                "lpn_georef_intro",
+                "lpn_georef_menu",
+                "lpn_georef_on_map",
+                "lpn_georef_rotation",
+                "lpn_georef_rotation_tip",
+                "lpn_georef_scale",
+                "lpn_georef_scale_tip",
+                "lpn_georef_size_prompt",
+                "lpn_georef_step1",
+                "lpn_georef_step1_hint",
+                "lpn_georef_step2",
+                "lpn_georef_tip",
+                "lpn_georef_unavailable",
+                "lpn_goto_bad",
+                "lpn_goto_menu",
+                "lpn_goto_prompt",
+                "lpn_goto_tip",
+                "lpn_gpv_curve_note",
+                "lpn_help_icons",
+                "lpn_inp_drop_demand_pattern",
+                "lpn_inp_drop_gpv_curve",
+                "lpn_inp_export_differences",
+                "lpn_inp_export_refused",
+                "lpn_labels_col_decimals_example",
+                "lpn_labels_col_rank",
+                "lpn_new_geo_si",
+                "lpn_new_geo_us",
+                "lpn_pane_junctions_none",
+                "lpn_pane_resize",
+                "lpn_pane_right_toggle",
+                "lpn_pane_right_toggle_tip",
+                "lpn_pane_sort_tip",
+                "lpn_pane_tab_junctions",
+                "lpn_pane_tab_junctions_tip",
+                "lpn_pane_toggle",
+                "lpn_pane_toggle_tip",
+                "lpn_profile_axis_elev",
+                "lpn_profile_axis_station",
+                "lpn_profile_choose",
+                "lpn_profile_clear",
+                "lpn_profile_from",
+                "lpn_profile_ground",
+                "lpn_profile_hgl",
+                "lpn_profile_menu",
+                "lpn_profile_no_path",
+                "lpn_profile_no_solve",
+                "lpn_profile_pick",
+                "lpn_profile_summary",
+                "lpn_profile_through",
+                "lpn_profile_tip",
+                "lpn_profile_title",
+                "lpn_profile_to",
+                "lpn_rpane_empty",
+                "lpn_select_first",
+                "lpn_settings_color_classes",
+                "lpn_settings_hydraulics",
+                "lpn_settings_link_symbology",
+                "lpn_settings_no_match",
+                "lpn_settings_node_link",
+                "lpn_settings_node_symbology",
+                "lpn_settings_page",
+                "lpn_settings_page_note",
+                "lpn_settings_search",
+                "lpn_settings_search_tip",
+                "lpn_settings_sec_calculation",
+                "lpn_settings_sec_elements",
+                "lpn_settings_sec_map",
+                "lpn_status_converted",
+                "lpn_status_inp_exported",
+                "lpn_status_reinterpreted",
+                "lpn_time_clock_start",
+                "lpn_time_duration",
+                "lpn_time_first",
+                "lpn_time_format_tip",
+                "lpn_time_hyd_step",
+                "lpn_time_last",
+                "lpn_time_level",
+                "lpn_time_menu",
+                "lpn_time_menu_tip",
+                "lpn_time_next",
+                "lpn_time_no_engine",
+                "lpn_time_pattern_start",
+                "lpn_time_pattern_step",
+                "lpn_time_pause",
+                "lpn_time_play",
+                "lpn_time_prev",
+                "lpn_time_report_start",
+                "lpn_time_report_step",
+                "lpn_time_running",
+                "lpn_time_settings_open",
+                "lpn_time_slider",
+                "lpn_time_speed",
+                "lpn_time_speed_tip",
+                "lpn_time_tank",
+                "lpn_tip_join",
+                "lpn_tool_add_junction_tip",
+                "lpn_tool_add_pipe_tip",
+                "lpn_tool_add_pump_tip",
+                "lpn_tool_add_reservoir_tip",
+                "lpn_tool_add_tank_tip",
+                "lpn_tool_add_text_tip",
+                "lpn_tool_add_valve_tip",
+                "lpn_tool_color_tip",
+                "lpn_tool_delete_tip",
+                "lpn_tool_settings_tip",
+                "lpn_tool_undo_tip",
+                "lpn_tool_zoom_extent_tip",
+                "lpn_units_convert",
+                "lpn_units_group_inputs",
+                "lpn_units_group_results",
+                "lpn_units_reinterpret",
+                "lpn_units_warn_body",
+                "lpn_units_warn_title",
+                "lpn_valve_type_gpv",
+                "lpn_valve_type_pbv",
+                "lpn_xymap",
+                "template_share_manual"
+            ],
+            "reason": "[--baseline-new] translated by a completed sprint; folded into the manifest so a later English edit shows up as CHANGED"
         }
     ],
     "hashes": {
@@ -857,15 +1057,46 @@
         "lpn_backdrop_target_node": "32d94d48baeb48749abc6e461ec1568849d96888",
         "lpn_backdrop_unreadable": "bc6db696992e7e1c486477c42163ff843e55c5e7",
         "lpn_backdrop_wld_bad": "529372c670e9e66a1f223cb8b7529c9d6f8b7ae3",
+        "lpn_basemap_hide": "fd86dcde16d3695139d93d14a7908630b6126968",
+        "lpn_basemap_show": "8f8081a5a647869c4fed59181d04d45c919e9fad",
+        "lpn_basemap_tip": "c8759933207a16912b8808ff2b3a211ecea950a7",
         "lpn_cancel": "77dfd2135f4db726c47299bb55be26f7f4525a46",
+        "lpn_clean_map": "f35018bc951ba4c43c7db6f286679b06595740d3",
+        "lpn_clean_map_off": "f364f2b03eeaefaa77e97bd8ec2454b387ab48d1",
+        "lpn_clean_map_tip": "d5298489e6e8968a9e8608172b4fc5be96eef9ef",
         "lpn_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
         "lpn_close_browser_confirm": "62f3b41b1e8e979db82162dc2f37c8e55bc65b80",
         "lpn_close_discard": "e4591957da0d53d53d8ce0766bb7a241a3e05904",
         "lpn_close_save_confirm": "128d1c2703b177c7b05ef44ca0c590d4e796d014",
+        "lpn_color_break_count": "087e9c85aaedfbeacca46f011311f170d791645b",
+        "lpn_color_break_number": "a41db22799f27088866775d8f5b7370c59c48e9b",
+        "lpn_color_break_order": "789a32c918927ca207225fec3099aedab1532ae9",
+        "lpn_color_criterion_note": "49d1bb57679343c62b1ebc31524db1a4fa2e460d",
+        "lpn_color_example_material": "d8169782b57c7a9e9f0104c69acc402891ffee68",
+        "lpn_color_example_status": "bae7d5be70820ed56467bd9a63744e23b47bd711",
+        "lpn_color_legend_open_tip": "7f2985d223fcd9aaa7890dd9ce5d5ab8efd2770e",
+        "lpn_color_link_field": "f3db9d8d236086d3f9eaa96b9b058263561780f5",
+        "lpn_color_mode": "ab7377a93b78d29e0108c1e6e6091d9e979f885f",
+        "lpn_color_mode_equal": "b765b21f6ef3053d9cccc247cc93cf023a33f1b0",
+        "lpn_color_mode_jenks": "41e7c181c86a94d0ac99b26e13815df7e980a544",
+        "lpn_color_mode_log": "65fa51781bbb2b4074d6033e868faa4f49d2ba87",
+        "lpn_color_mode_pressure": "d1222178efa7946ad8940a0b57a0d3cb3856180c",
+        "lpn_color_mode_pretty": "96375fd3528ceb39f766534d8100212963ccc650",
+        "lpn_color_mode_quantile": "39968ff0cf6fd24c188315ceb2e1757fbe0bf4ae",
+        "lpn_color_mode_stddev": "fd746f492ad659d3f7460598edb734faace83b3c",
+        "lpn_color_node_field": "361eb109bc2c243a3efc0c237dca4467b976b3f4",
         "lpn_color_none": "1d5c5b44886211206754a909bcf3b856de371f32",
+        "lpn_color_ramp_diverging": "ae1a8b0a4e4754cf7295b197c6c876ac003b5c5b",
         "lpn_color_ramp_epanet": "4d7ee39d696e0a018d653dd59e5b54c9e86566f8",
         "lpn_color_ramp_gray": "bd8953364c376c7b3fbd52bfb466c1d0bc0ffbef",
+        "lpn_color_ramp_qualitative": "eb43662a67671939a06117d4cde0fdde7080a280",
+        "lpn_color_ramp_rainbow": "b4a9395d25398654fd5d000e4b82a1d8273339bd",
+        "lpn_color_ramp_rainbow_eg": "7c6738ce8d8616e5822488dd11a7c5421c710394",
+        "lpn_color_ramp_rdylbu": "26b448c73a6a04a7cd2a282c57a6b6190dfdb539",
+        "lpn_color_ramp_sequential": "0edc0112db95758e96c3f9613104687a95e00afc",
         "lpn_color_ramp_viridis": "6eeff89406ffc95509bde67233c8cac36c743999",
+        "lpn_color_ramp_ylgnbu": "776f7669680e9ab9d3b1714ad8b9000e2304b8b3",
+        "lpn_color_ranges_note": "0fd076abf92ba95622025e26b88fe7175862d785",
         "lpn_confirm_apply_prefix": "a63a08b95ff616f08f1836ad938fc22451531076",
         "lpn_confirm_delete_network": "4cf6c58cb637a11d560bbe78024166deaa022e95",
         "lpn_confirm_example": "a37dfb08ed3bcb4faae1781660bedfdd43f2465a",
@@ -887,6 +1118,7 @@
         "lpn_engine_fetching_valve": "8855bd7ebe9f6ac82cff3ed03c4eae659ba3428a",
         "lpn_engine_loading": "a95a376c68c16cf3eb5079ad02b19405532cd3ed",
         "lpn_engine_manning_note": "f592588a42fae119b629699fe84bcaf7e8881e51",
+        "lpn_engine_minor_loss_note": "751b1801f515d3cf425faeb148281482b40c9f3f",
         "lpn_engine_ready": "f6380628cab3d89a5de9210f46a82ba0d2449b0a",
         "lpn_engine_ready_valve": "4c1d60b5545addb9ed7ba9347abfd9bfa42e2b0b",
         "lpn_engine_unavailable": "91ba6c663bc0c23d31ec492dcedc223310ec69de",
@@ -904,6 +1136,7 @@
         "lpn_ex_net3_desc": "30506e2d33807b89ebcee51ead7d71a66ce46031",
         "lpn_ex_net3_title": "32244fe428de2e2160ba8cd36930dfd0db80da31",
         "lpn_examples_blank": "d3904eb925d47bbca7944699b614c8668840afeb",
+        "lpn_examples_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
         "lpn_examples_failed": "0e5eefbf586e465b71a6f4b46470ac6c9a77a214",
         "lpn_examples_heading": "41d500787650b86411cffc6d7289d00a79de30a7",
         "lpn_examples_loading": "17dda6727f9dce4d339b26824d962cad026c5de2",
@@ -911,6 +1144,7 @@
         "lpn_examples_open": "cf9b77061f7b3126b49d50a6fa68f7ca8c26b7a3",
         "lpn_examples_size": "2271a12396ceb1053da48973eef74b771d3d5847",
         "lpn_examples_sub": "404ac942d1e188ef3f745e3f7e3dfa7d1ca58da8",
+        "lpn_examples_welcome": "6e56773ed937c63dd58f5076bf9f337cd834b37a",
         "lpn_field_active": "555a79af92f33876efcf38d145ca406e4073623c",
         "lpn_field_active_tip": "d5ed9a6c1ab566d62739be653fb340e37ead8a3c",
         "lpn_field_auto": "c614ba7c453cdcd4d21b20e8286c6266c891e0c6",
@@ -925,8 +1159,10 @@
         "lpn_field_km": "3b60e58d49065cf31c411c6f79f1021a75d3255a",
         "lpn_field_km_short": "41f90c6b0932368e484354d0e7fbaff31dbeb5b8",
         "lpn_field_km_tip": "43a4ee94d4ac0f22191d3fb23b22a77a66cdfa2b",
+        "lpn_field_lat": "ced3905ec8220a51e0d47124fc2d0549ce7c8472",
         "lpn_field_length": "3bade34ecbc5d996b2f301ebd4ba689e81c7c9ea",
         "lpn_field_length_tip": "3fd95ad3cbe56cf1d67a5e8755fe076fe29b43fe",
+        "lpn_field_lon": "6f9f011c5d36df6d431a68143636a75fbaa508bd",
         "lpn_field_roughness": "739872ac999742e4fd6353b653f29608ebfd0710",
         "lpn_field_roughness_tip": "34bec4e3502504270f9ba4907991a30817d0cb95",
         "lpn_field_show_always": "f57493f2350403515375e92e91e861ad05864f25",
@@ -938,13 +1174,23 @@
         "lpn_field_tank_maxlevel_tip": "17971d844c29967d1bc42c305c751367b13db91d",
         "lpn_field_tank_minlevel": "7e30393bbef8d151358200e8ea684a3624a9e0b0",
         "lpn_field_tank_minlevel_tip": "bc6cd434993be72249b8c1d1f0497f116afd0b7c",
+        "lpn_field_text_align": "75fbcc7f11bedafa8bfe7cedcaf50c6b3dc1cb21",
+        "lpn_field_text_align_center": "16e5447a804601a5ccb31f21e290bd7fc923a177",
+        "lpn_field_text_align_left": "8ae1c34bd37fad49cc5f8e02da648a78e89c3ed8",
+        "lpn_field_text_align_right": "954daa8b00335c66e262106e01f7dc22b19a4372",
         "lpn_field_text_bold": "18cef04f1003bda9a787a537bcb58f9f35251e9b",
         "lpn_field_text_flip": "c75262b76fc51550b63021d38c8fece80a4a1d32",
         "lpn_field_text_match_pipe": "d0866628c9d7944af92ed7e084f6a0fccbe2e7f1",
         "lpn_field_text_rotation": "f961efd7f9adc12f7a5a877046e131839f5bfb8d",
         "lpn_field_text_size": "67697a2b9cab2b87b00bba516f257d4351e75dba",
+        "lpn_field_text_valign": "eadf99ecb822466c31cdf097b1ceb1150025754a",
+        "lpn_field_text_valign_bottom": "cce7f2f2f0dc525117a70d581d9c335212145e5b",
+        "lpn_field_text_valign_middle": "ced02810fc9ef8c67f03c98a3700565dfe9ce076",
+        "lpn_field_text_valign_top": "cae0435c41e816c24f0838fdf4e76c044c8b4e00",
         "lpn_field_valve_diameter_tip": "4029e8c70156f52f01cdfcbdee1946643c6e53da",
         "lpn_field_valve_km_tip": "bc6223cc343a19a5a286258c853df3c3cb0a6096",
+        "lpn_field_valve_setting_drop": "6fcbe3979c6df893ad917eb5d48280a30980bf94",
+        "lpn_field_valve_setting_drop_tip": "57b9198fbca83d547b23486da7761f70e18409b3",
         "lpn_field_valve_setting_flow": "acdee2c6c98d4db08fd7bdcb446e32311c1e8973",
         "lpn_field_valve_setting_flow_tip": "e53165886d5cc288105d77cecffd1d9cd50bf0ec",
         "lpn_field_valve_setting_loss": "4dda469c0f9f04cf4f16708fd194f5a87395fab9",
@@ -957,6 +1203,8 @@
         "lpn_field_y": "23eb4d3f4155395a74e9d534f97ff4c1908f5aac",
         "lpn_file_changed_elsewhere": "b28191a691cef7b9b535a1d1e40a40966522a88e",
         "lpn_file_close": "bbfa773e5a63a5ea58c9b6207e608ca0120e592a",
+        "lpn_file_export_inp": "f428aa355e86893429222bafcf7efe0be54a2384",
+        "lpn_file_export_inp_tip": "55566b08607bac0890966d7c0804683704185f96",
         "lpn_file_import_inp": "422aa12aac66e90544516fbace883e795deba9fd",
         "lpn_file_import_inp_tip": "c623a26c5f2ddcf490bb0d8a09b6ac49df0c8b8f",
         "lpn_file_needs_reopen": "21ae110d61e50bb7a2a02b67937d9dfa7603f601",
@@ -982,7 +1230,55 @@
         "lpn_file_type_desc": "803ed44f8e2e9ad6dec8241b8b5073137485d8be",
         "lpn_file_upload_explain": "7ef942147ae13399f21e6bb3aefc115f91439103",
         "lpn_file_write_failed": "b708bb7732fdfad2150d432d53c22872d8666e87",
+        "lpn_find_adjacent": "c2f9b7b4897f03f94abf92294c9ca46fea62360b",
+        "lpn_find_button": "df251b06eefdaa932e97b54fbe9a74d3e606fa61",
+        "lpn_find_condition": "2f4979324e03e4571b1d7eba701226670c2ee2da",
+        "lpn_find_count": "3f5d193fb076e33cdf39836cdfc7099ed26203e0",
+        "lpn_find_menu": "df251b06eefdaa932e97b54fbe9a74d3e606fa61",
+        "lpn_find_menu_tip": "4331bd110b7249acf87ea534f33c4384d6599b15",
+        "lpn_find_no_value": "c9696628ee0418cf872702a42d235b5db44538ee",
+        "lpn_find_none": "b9d865c85161cd9dd4ec75f613fadaa44b45b87e",
+        "lpn_find_op_bottom": "682ab481b857bf93cc7c0694a053195133c52fd2",
+        "lpn_find_op_contains": "caeb909ae4ff4ee25a0ff0d476946ed256f2aee1",
+        "lpn_find_op_equals": "a1e8770fdaf17ab3d6203d23bb1e2c8efd5a66e8",
+        "lpn_find_op_gt": "2fa709f02b0516ccfdcfe5e3158bedc23fbc69c5",
+        "lpn_find_op_lt": "6bb2aa987a1cdc7525f5672334ed54a5cee446c5",
+        "lpn_find_op_top": "17c7a5110483f2215e6a55ffa9e422b763635db4",
+        "lpn_find_property": "9ae33a7d0ecb82cae8f04aafab20bf90425b7b8c",
+        "lpn_find_scope": "da43ad997fbcf65d8f4bc384def4b79d75f15252",
+        "lpn_find_scope_all": "4a66d1480779180159cc25c1c5aa9d760467c6a7",
+        "lpn_find_title": "ee8efc4421aa51b091f66839764f648dc60045f6",
+        "lpn_find_value": "8dce170de238b1feda2ecd9674ea3ca0d068fbcb",
+        "lpn_geomap": "bb34cc0232ff0253535e65b7c22b7b1e212094aa",
+        "lpn_georef_adjust": "dcdf39db0bb212ccd18fcf85ac2f0befa1fe5c49",
+        "lpn_georef_cancel": "77dfd2135f4db726c47299bb55be26f7f4525a46",
+        "lpn_georef_confirm": "5b8d02c7cc5271c0eea8c0a4b2229d1b16bce025",
+        "lpn_georef_detach": "849ff777e6d1abbdeaf7b74a271810c2f14459ef",
+        "lpn_georef_done": "a01dbcae8c0fad1e990b6d6252b2a62bdd58470e",
+        "lpn_georef_drop": "813b9bb6d850da1af212faf27371fe50a5c63ef4",
+        "lpn_georef_empty": "d3eed84359fdc4d9fc00043cd759930e25741e52",
+        "lpn_georef_finish": "a17a8468e04228d05cdbc42542d7f3ab737c5c6b",
+        "lpn_georef_goto": "b7d99183c72849085ea09d98cc205c06cd6e0ff6",
+        "lpn_georef_intro": "7edf5177666b63078d686e94d1007d0bafe8f4a1",
+        "lpn_georef_menu": "29071096c895ec5c9596b4967ed672a33fccc8b5",
+        "lpn_georef_on_map": "7843df7be37e3e7d47b4d1e866c797dd8c64328a",
+        "lpn_georef_rotation": "7b27d08bdb07249454acd7424d742c40e608fd0c",
+        "lpn_georef_rotation_tip": "7a24c3c413288fa6fc73255bda96c60f3cd3a73e",
+        "lpn_georef_scale": "d0a6c8b3458c4b480204ac25843027db53e80a56",
+        "lpn_georef_scale_tip": "3d52b8a3127792504395b963e03c04f5c65071fe",
+        "lpn_georef_size_prompt": "ac34f52227341ad558977360388aefb564c229a7",
+        "lpn_georef_step1": "af78c342db73e54a430a87c3053de6dc4edf64ed",
+        "lpn_georef_step1_hint": "630c7fe74a581544232d70ebf9d2aa4941354627",
+        "lpn_georef_step2": "bf9c2e992dcd4487d631a82cfd104597e341d469",
+        "lpn_georef_tip": "e424ed0c1dc1d22d32e7283f4a465196a55b286d",
+        "lpn_georef_unavailable": "78baf3cb3ce2802b3fb7efc91e35e7a74181c1f5",
+        "lpn_goto_bad": "78a762596550851cf7aa01db870e89a27909232f",
+        "lpn_goto_menu": "fba7529c452450a8cbb2303f50ff8b3b0f60082d",
+        "lpn_goto_prompt": "a34033a8a8cbbaa5d551c9b28e0dad818e440009",
+        "lpn_goto_tip": "1ef3546b3fafc6b02e00dc5a819f38ccdcbdaaa5",
+        "lpn_gpv_curve_note": "a640d3638133806f44834f4c03204f858b214574",
         "lpn_help_fix": "21556ba8411184cec8574bf3206020e7694b968d",
+        "lpn_help_icons": "ff00fa0ede1828c97e66677befffc6ed5f49200e",
         "lpn_help_notes": "8d4516cf570eac7e3e1854038b19f606d8cd5d99",
         "lpn_help_walkthroughs": "0b78ac5827cd7cc6424e5b9b334af5c2d003d310",
         "lpn_id_invalid": "8a5f2c615619185cac2ae5645dba3a822172202b",
@@ -996,9 +1292,11 @@
         "lpn_inp_drop_curve_missing": "9a8d623f4037e3261d8153dba634977c8527d83b",
         "lpn_inp_drop_cv": "df7f7635a0fc09f8d0a6124430366e1a19429062",
         "lpn_inp_drop_dangling": "0ad893dffef80c6ad8297058a6c3c5342495ea43",
+        "lpn_inp_drop_demand_pattern": "d29dca328e7cfd315370b584e89d3a81705538d3",
         "lpn_inp_drop_demands": "cf2f85eab05344924f34a11ae91613cb99403657",
         "lpn_inp_drop_emitters": "cb5e11821f1c11edc0487fa662dfbcce0f963480",
         "lpn_inp_drop_eps": "6188c8ee8cb50dfce620a63d5da7e9b806ad192d",
+        "lpn_inp_drop_gpv_curve": "775470738e804b0931b1c3bd6ca5a6ff9e73b0de",
         "lpn_inp_drop_headloss": "cc465d1b3227861365056837ff778139615a211b",
         "lpn_inp_drop_patterns": "f9df01a8fbb36ef930ecfc506f9b8b4f63f6fb1a",
         "lpn_inp_drop_pump_other": "9ae4a33dc9693072e607a8697645900d73f2821d",
@@ -1011,6 +1309,8 @@
         "lpn_inp_drop_units": "cd0df6f6a5c944c7520df7a466f6cf0ef4809deb",
         "lpn_inp_drop_valve": "66aa4dfeca59b13ab80493ed03805a95eb5c7342",
         "lpn_inp_drop_valve_active": "4418c2a222c53784b5a7b35ddc7a7aef5582cfed",
+        "lpn_inp_export_differences": "2108589cfe330034971d15941a1b875741af9861",
+        "lpn_inp_export_refused": "f30c2f0cdf3067c441c158158e361f08c21406b7",
         "lpn_inp_report_clean": "84abd1231b503db79d2f28ef6f451e3373ce1bf0",
         "lpn_inp_report_counts": "f0dc2d6a8c1bcbda661844843f8c8a02d372d43e",
         "lpn_inp_report_heading": "997509d5dea07c7e08c021ecd446ce4c80515e8c",
@@ -1019,6 +1319,8 @@
         "lpn_labels_col_after": "79ba5e1b3f99abfd54ef8d839ba12bd2ac4d79cb",
         "lpn_labels_col_before": "74f39697ac328c6325ce068b6aaca626abc0bf63",
         "lpn_labels_col_decimals": "2a4e3cb3c61a05b20a67803c34e108388104bb00",
+        "lpn_labels_col_decimals_example": "725af3071b1eef0162f9a95017e7c21a35821798",
+        "lpn_labels_col_rank": "dd48a1149548f0b07ddec97e040571c91978fbab",
         "lpn_labels_decimals_tip": "8a4d3b146623e92ce0534c7cca63d79fd7c410e7",
         "lpn_labels_heading_link": "4fc42eb0a2d30bdf0d4d9a4ad8fea8c9b94a07db",
         "lpn_labels_heading_node": "1aa6d7578bd4ddb3158dd09910b714b3629dbe0c",
@@ -1074,6 +1376,8 @@
         "lpn_new_example_si": "2926375ffdb9d4f4b4d3b091a7084e0b9b46d883",
         "lpn_new_example_us": "5022c78ec0553c0d2189b2bd52c0123b3ce5e75d",
         "lpn_new_from_examples": "6412998a89bdd9cb8ad64e3429d6a3e34c0f7745",
+        "lpn_new_geo_si": "b36d0144b4ed0439c603c6ffa191d80bc6d806fa",
+        "lpn_new_geo_us": "6f0533d0739dce44a73454f192ee4745aa3bb613",
         "lpn_new_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
         "lpn_notes_1_def": "a34f72b64fd479a231b286ad4d04f3760895030b",
         "lpn_notes_1_term": "8940eaa461ed01deafb4e767bb78d184ec42a156",
@@ -1087,7 +1391,32 @@
         "lpn_notes_5_term": "04433f7fe8fbf41ae2e5d2354f718f4330e9c5ac",
         "lpn_notes_epanet_def": "58224d932181c3c20dfda2d61e6a8bc168d12e6b",
         "lpn_notes_epanet_term": "bf763064f120b082f63d20ec1b5efbcee7003d9e",
+        "lpn_pane_junctions_none": "6c467069f551c0e95f0b41aa367dfccc61684fd4",
+        "lpn_pane_resize": "ec7886a3bab174ee59d4ffc0b0bbb1272abafee3",
+        "lpn_pane_right_toggle": "7d9ff4f0de398581c4640bcbb6e536c355a391be",
+        "lpn_pane_right_toggle_tip": "a87afa19af1816cefc826dd45cad9a60ebee0ff2",
+        "lpn_pane_sort_tip": "8f0d327910845105c937a478aa1143486f3d33c9",
+        "lpn_pane_tab_junctions": "b836e8bcdde86c43aeb171e94a0bb2a815027fef",
+        "lpn_pane_tab_junctions_tip": "feeacc0d5fe73604243814a27eeb83a157ab9956",
+        "lpn_pane_toggle": "60f64e2a4af99ca6f78cf4ac18d694573a67cc41",
+        "lpn_pane_toggle_tip": "98d719b29ed66c3afeb455f21135fed42ec9913b",
         "lpn_prefix_applied": "7671fd83e608738f499fcb730d216c5dd152e0dd",
+        "lpn_profile_axis_elev": "7d1d90562d4adffec18f5da636ce1016c2936bf7",
+        "lpn_profile_axis_station": "fc104d39ccc1784de2c1460271884f73e03414de",
+        "lpn_profile_choose": "5a194bcb016d95345532932210dba9cfd5c7650e",
+        "lpn_profile_clear": "4100ef4df528ba73c142af7f2de8568c48ee7744",
+        "lpn_profile_from": "3f66052a107eaf9bae7cad0f61fb462f47ec2c47",
+        "lpn_profile_ground": "de51b9c9a68c390578fe6091b60ec095e0983cd8",
+        "lpn_profile_hgl": "823bb5de5e154d2a0f4e34b2baba90498e4f99d8",
+        "lpn_profile_menu": "ff4fc0276e960c348647b647235f68200887c9d2",
+        "lpn_profile_no_path": "a409c9c906f398844b0b4550b4a46f3c0be3a9b9",
+        "lpn_profile_no_solve": "d93c7c969257a03055b07eb9f1b79bfe44435a87",
+        "lpn_profile_pick": "6db13532a423855de1b28ef4da23911c123deb4e",
+        "lpn_profile_summary": "93121a8772a81876f1509e47b553fbb6c75e6d27",
+        "lpn_profile_through": "abe0a2fa942544365e25d12a59cf478741f2bbf7",
+        "lpn_profile_tip": "6c9874c2efdb87cd39d70a96877c3fe2bd211a25",
+        "lpn_profile_title": "922a3b574ca5285059ae09b2474b518451126908",
+        "lpn_profile_to": "ae79ea1e9c6391a9ed83a2e18a031b835feec0c9",
         "lpn_project_copy_suffix": "4e7e2b484eeea02389a05f26e577342a5e0a90f0",
         "lpn_project_numbered": "5a76950c12a2818396506e9f60f212c2b31eedca",
         "lpn_project_rename": "d3f4cb898fbe0c7a7ac4f721438c4c26ad1a2513",
@@ -1119,6 +1448,7 @@
         "lpn_result_pressure": "d1222178efa7946ad8940a0b57a0d3cb3856180c",
         "lpn_result_velocity": "d80a548eda6c0e81c84db1aa2c1099cc803abddd",
         "lpn_revert_confirm": "05c3238e0d4a9e956797347029871050d0ae1522",
+        "lpn_rpane_empty": "31f4c65fa677aa1ffe257f883996ea5b665480bb",
         "lpn_saveas_overwrites_newer": "af7978ad8540755e839d36461af0fcb4e1532b4e",
         "lpn_saveas_overwrites_project": "5b617ca583782738f2bfd0b8ab6a752defdd46ab",
         "lpn_saveas_same_file": "304ca763bd1a84a61a60dff7eb9921ff571e9953",
@@ -1142,6 +1472,7 @@
         "lpn_scenario_push_values": "b87a685ec7317ac921bc50323d85494102ddf03e",
         "lpn_scenario_rename": "7e5528377133d56e10d2add5502a3879d1b3715e",
         "lpn_scenario_tip": "a1b3cc93de198afb68169fa9e3a5b118ae034fd5",
+        "lpn_select_first": "7837e7201f4512809528c41d9e121e8e2e37950a",
         "lpn_settings_align_labels": "bb237e7bfe279299d37112f38e688841524c15ad",
         "lpn_settings_apply_to_all": "551bc43f9f74e0103bbb10b47d6d959705c60eaf",
         "lpn_settings_apply_to_all_tip": "76cb055dc527b818b407f1af3ded32c0e81e497b",
@@ -1149,6 +1480,7 @@
         "lpn_settings_color_auto": "ac9041e76816a34aba228a736ec30da6984c5777",
         "lpn_settings_color_breaks": "4c920ecbed422b763002afdcca5e4eea8c014b7a",
         "lpn_settings_color_breaks_note": "8a3af7ca11be84a3664ef32621d407e7de4d6145",
+        "lpn_settings_color_classes": "dbf9e65fdc683542b87f6d63a970ecef81629214",
         "lpn_settings_color_equal_counts": "48abf160587b43fb0c1deebb722a26616df91bce",
         "lpn_settings_color_equal_intervals": "0dbb4699525a9e80d90f0e06d7837474ecfd99c1",
         "lpn_settings_color_key_position": "a77309db93409c23fc813352d9fc1d9dfaa222e1",
@@ -1166,6 +1498,7 @@
         "lpn_settings_emitter_exponent": "1d8660383db35f7b4b2754b1f2451fddc60c0a03",
         "lpn_settings_engine_epanet": "518a1af690a64303884cc20e84489abd5ef44ce3",
         "lpn_settings_engine_epanet_tip": "5e74cee436c482289c85e8bf1802d3dc577f2688",
+        "lpn_settings_hydraulics": "d6f18fa68583ba0854b0df1a9e753670114f8451",
         "lpn_settings_id_prefixes": "2d1b802116e8a45191c6a614df0e16eddff87671",
         "lpn_settings_label_always": "0b13b19cf58d92b342221832c171bfb61a66d382",
         "lpn_settings_label_max_width": "2f30343adbd859bae8e0bb0d6ffcf555193552d1",
@@ -1177,17 +1510,28 @@
         "lpn_settings_legend_position": "36d979d15c7655130e2d88b6f74f688cb74f194f",
         "lpn_settings_legend_top_left": "04b38cf935ddb566539a9d8e1cdb43936bd668bb",
         "lpn_settings_legend_top_right": "c1cc898f9464ac2b95be31217a4bf923f156129e",
+        "lpn_settings_link_symbology": "890f2ff6ed8ab35922b0257e4511f547d16e9138",
         "lpn_settings_link_width": "909578b76a7a13f133585af0b06bb4ff3de5c77a",
         "lpn_settings_map_display": "986ff567ff2c4fc5523453c2180dd843d731c11a",
         "lpn_settings_map_height_px": "57bc82a0e9381166f06c7cc0ff2547459fb3fe62",
         "lpn_settings_map_height_tip": "d445f7f5d0c615e13f228181822cce73569c1ade",
         "lpn_settings_mask_labels": "801615742e22b285a1838d6184c72544ec28a96b",
+        "lpn_settings_no_match": "f323e88618d328cf97d644f8e7e27c817528dd4d",
+        "lpn_settings_node_link": "1d9001337c8660d173b9d7081a44d11a88b6237a",
+        "lpn_settings_node_symbology": "ebb5a7f654357f1637ce907072a9645a896cf42d",
+        "lpn_settings_page": "fb06270f7c212baabc8749ffc36e49dc8f321548",
+        "lpn_settings_page_note": "ecb671010d8f9b8085e93c9cb220790442f768c9",
         "lpn_settings_push_btn": "9e7e67a26fdccd90f3ffa64b26f56d540a79e7af",
         "lpn_settings_push_note": "d3754624671985db69287dabd915782065100ae0",
         "lpn_settings_readability_bias": "39f84e3e7c6d7f87a3fa97f9fbc1b56c2a129d4f",
         "lpn_settings_restore_tip": "723cebec7f1a48471ff9b324d75ed21e6a2aa7ec",
         "lpn_settings_scope_calculator": "00dfef22ecb2664741976fcf9fcd2bf6ff5c6167",
         "lpn_settings_scope_project": "95590645e1aac6068a614f2f94ed6e4a7b9f3192",
+        "lpn_settings_search": "9a6f37a7bf9c2e64efe7d7374dda5f7ae051bd8b",
+        "lpn_settings_search_tip": "eb6af12fb4dbea319a6924ce0b890cfaf8ee368d",
+        "lpn_settings_sec_calculation": "dc6751bd6532a841494c31d2cb271a6c23434bcc",
+        "lpn_settings_sec_elements": "3d6a7a7cedeede15fa63358493d0150b024a7c02",
+        "lpn_settings_sec_map": "de1c309b44683a001edb720820f80e41779d3f21",
         "lpn_settings_show_titles": "35992d6f38a21a851fe018bde1467dc3a8a875ad",
         "lpn_settings_show_titles_tip": "dd31ce362cd1df8e82d1e17ec6704662aea70c5d",
         "lpn_settings_symbol_opacity": "60ff3b0e2ee09b63c828a1055c6f7ca7e5a817df",
@@ -1203,10 +1547,13 @@
         "lpn_status_already_open_dirty": "9412f17b043bac255391b2f5c8c1e0dec70bf11c",
         "lpn_status_closed_empty": "a4ab662fabbf7e1b9457a30f7dfeb79534ecff8d",
         "lpn_status_closed_opened": "b3877c759b085058c1bc9ce7b08ff85b9b28ad35",
+        "lpn_status_converted": "8192b468b8c0d3fd7188d32a30a73bf8693eaca2",
         "lpn_status_downloaded": "a57f725b331fd7c607634b439ad2bc83835fc045",
         "lpn_status_example_opened": "5f88beb4d021f650c76fe14106edc1f6edacf929",
         "lpn_status_file_opened": "d81570ddc8ac7d7a85ac3fda16808fa21239415c",
         "lpn_status_imported": "9ffa4f2c399654872dfadb6ae74442d198662810",
+        "lpn_status_inp_exported": "ad5d10d52cbda8a3dfe24d56e88aef2edaa08610",
+        "lpn_status_reinterpreted": "ef3e39f5732a2bb548c6fcd7e0513e23dba034c8",
         "lpn_status_reverted": "631aa4b5982c019692705a984ea08640d5c3dadd",
         "lpn_status_saved": "a9d8670946e9de872478753575178a92fc7cf9ba",
         "lpn_status_uploaded": "bfc4b2768973ef85536ae9551005f8badce0aa96",
@@ -1221,38 +1568,84 @@
         "lpn_tab_unsaved": "b3c7270ccae3543a687dce9dd7f731425c01ba63",
         "lpn_tank_elev_tip": "42a7e83306be0b782aef40102ccfdd737b078951",
         "lpn_tank_head_tip": "bb7ad4f13aead947290660eccfba2671c8a07cea",
+        "lpn_time_clock_start": "945d210e97d180cf4f6dfd951532f90ecff23ebb",
+        "lpn_time_duration": "dc379a7661c26b1a2fed2781fcd2f321ac1511b7",
+        "lpn_time_first": "fa08a47d7d6b56eeca8b6764b57cc364bdb1995d",
+        "lpn_time_format_tip": "0cc3bc4204a95220aaccefcb75ac7023744f34cc",
+        "lpn_time_hyd_step": "0a9964d4a138cfdf2e922fa811466694d3047709",
+        "lpn_time_last": "c5299a1a5e130853c2a1da9aa016c438c081e0a6",
+        "lpn_time_level": "2acd312aaacd65e498c59f4407e0167feb048c2e",
+        "lpn_time_menu": "6c82e6dd86807ee3db07e3c82bec1ae1ce00b08b",
+        "lpn_time_menu_tip": "7ec818e38354e3d2f1e9002c6349793702783710",
+        "lpn_time_next": "aaf8ed898a06fb6844e4de115541eccc70875afc",
+        "lpn_time_no_engine": "bb432e9992397e72a6ee007c2646da2a3f6a967f",
+        "lpn_time_pattern_start": "a764bb1e81176ba8a27f7e13e88e965049f85138",
+        "lpn_time_pattern_step": "3e1e3dcda0a00dc27a84e0d20f639f5e0250490e",
+        "lpn_time_pause": "781961bc81c25697841ecce5d4d9dad9f6b261c6",
+        "lpn_time_play": "5d12bd53552cafc41ca6146c04870df2e1574e13",
+        "lpn_time_prev": "46752f14ca841d2ffe77e218bd93141a3b258025",
+        "lpn_time_report_start": "5202c4e2685527c859c29b6618f641edf984c195",
+        "lpn_time_report_step": "a035e8700020dfeb3b4c54dd039a10c58e1a5ecf",
+        "lpn_time_running": "94ddd17b714db947832a0bf32b5b0a7e9bf9c634",
+        "lpn_time_settings_open": "a9730dac163b9d2b91654983e7d07739bd3c54ad",
+        "lpn_time_slider": "6c82e6dd86807ee3db07e3c82bec1ae1ce00b08b",
+        "lpn_time_speed": "2d2cb022bc3d26bd1407c4aa787d5e46e1ad4c3b",
+        "lpn_time_speed_tip": "7dfb8513228e995c0a5738ee4a74928bb267fb2f",
+        "lpn_time_tank": "0ba4d1aee6f233efc1f3b78141b4af7d08b86c3c",
+        "lpn_tip_join": "7906e3c67fd5b00788167978623fddc0d9ca4920",
         "lpn_tip_labels_draggable": "92f776113028066fb944d2830ea89966bc053369",
         "lpn_tip_select": "37d09593a45674d7bdda9dc4756e16452007fccb",
         "lpn_title_units": "75f0b482bd12a3548ccf34447815426657c142dd",
         "lpn_tool_add_junction": "e4f6c05840cecf544ec74b542c80584accfbc5ad",
+        "lpn_tool_add_junction_tip": "d1383daac1acda88cefd62aee346e04ca6c2e153",
         "lpn_tool_add_pipe": "00dae071c082bb73eaed17b4bb3429280e110e8c",
+        "lpn_tool_add_pipe_tip": "9862e08e0aec5163ead959af4e3693a4080fda0a",
         "lpn_tool_add_pump": "e8bd8201473a0e0c20662af1aadbccb008935117",
+        "lpn_tool_add_pump_tip": "d1384da1fa268726e1b52e30f0bf2e9e68a64876",
         "lpn_tool_add_reservoir": "f19a9f3c642c3432a0ae8f11048615265ce9d630",
+        "lpn_tool_add_reservoir_tip": "2be159bb1b14194db9ab897c61aefb212c2f74b7",
         "lpn_tool_add_tank": "0ba4d1aee6f233efc1f3b78141b4af7d08b86c3c",
+        "lpn_tool_add_tank_tip": "695f08eb4d53d7d7a902ee951d1b488e5d929ba6",
         "lpn_tool_add_text": "c3328c39b0e29f78e9ff45db674248b1d245887d",
+        "lpn_tool_add_text_tip": "ba86e29be0f636294500001ca84bb41af3f4832c",
         "lpn_tool_add_valve": "986d2de2ea6df1a0d235545dd8de4dfa8c2d9ae3",
+        "lpn_tool_add_valve_tip": "f3deb0e584835168d6a3662f3ec6fec8872ae228",
+        "lpn_tool_color_tip": "646d83d4edf7e654abd35feb8dcd2089cff954ab",
         "lpn_tool_delete": "f6fdbe48dc54dd86f63097a03bd24094dedd713a",
+        "lpn_tool_delete_tip": "a58264534f8075f2300df4cf41bf13edd89138e2",
         "lpn_tool_file": "2c3cafa4db3f3e1e51b3dff4303502dbe42b7a89",
         "lpn_tool_labels": "2228985493d9e43e461c7be5525529248735ad9c",
         "lpn_tool_select": "8598222918d3c6e513d63060cf55e2971ded729a",
         "lpn_tool_settings": "c7f73bb54d928922c3838bb789ee9fb8a5b1eb37",
+        "lpn_tool_settings_tip": "3888974253ada2bb4b223d065d8b841b429f375d",
         "lpn_tool_undo": "39fc72124884d6573e4f9f89585f071ed0782696",
+        "lpn_tool_undo_tip": "196f3895599a8c280951ffb8a06b1931ec79e71d",
         "lpn_tool_zoom_extent": "be866a8e867398648cdf09d8a972d5bbc745c029",
+        "lpn_tool_zoom_extent_tip": "64ab26773171d197e02b23634013939b93755a05",
         "lpn_unit_unknown": "cecc5b050706cf145b426d714d212b31074d9743",
+        "lpn_units_convert": "3514e90df7b899bcc50c0082efa284030ec5f68d",
         "lpn_units_elevhead": "d598eb6ae61be7df39ca3031a75a1303d809aa5c",
         "lpn_units_flow": "86eff8eb789b097ddca83f2c9c4617ed23605105",
+        "lpn_units_group_inputs": "4cb8b91e8a5cf92510a8f7a4a5d02315a19b69d5",
+        "lpn_units_group_results": "932615eb6ea389a2cc286de2245c8a0a73a71246",
         "lpn_units_length": "d28e743b3380c990918f0d2ea90ad6e8e7123967",
         "lpn_units_pressure": "d1222178efa7946ad8940a0b57a0d3cb3856180c",
+        "lpn_units_reinterpret": "e57c8e5f840b7e5734ecc93e1f64dc48a6153477",
         "lpn_units_velocity": "d80a548eda6c0e81c84db1aa2c1099cc803abddd",
+        "lpn_units_warn_body": "2660eb5774586a7aedad53e0530ab7fe82287ef9",
+        "lpn_units_warn_title": "4124c346bd2e65ed8449c69d10aa3f21fe47c942",
         "lpn_v2_restore_confirm": "733ec25f6146d8d81f7d88bbe332600bdb967cc4",
         "lpn_v2_restore_never": "f3e5ca94b1f392f437b6fc85bf3f03c306c23e5d",
         "lpn_v2_restore_no": "1f7f368c6d34c41f570dfe461879617ad1c695af",
         "lpn_v2_restore_yes": "3f15ce79532d7a88716daffe2b5fa5245abe9c20",
         "lpn_valve_type_fcv": "e8ca23aea1cbf483af5f3aea3ad4d9cc33a1c127",
+        "lpn_valve_type_gpv": "25cb41d34023fad95e6759bb143e2d3178e5a835",
+        "lpn_valve_type_pbv": "f1f283890a1fd1ae6cc67ebdca56f7a025906e42",
         "lpn_valve_type_prv": "8f089fd3ae2ebf394efd9873e1c273850576f826",
         "lpn_valve_type_psv": "ab5689d41a171a4274fffdbb12d3cddcd901c05b",
         "lpn_valve_type_tcv": "f9a5006688d1421dd1b5ba5ff5ca8050d79085dc",
         "lpn_view_units": "12748281e0f02357f2a2f65c1c6a7d01ee122506",
+        "lpn_xymap": "034f1965ccdbdf9e642feeb9858da5096b6d1a9a",
         "menu_brand": "bf8b00231568173bfc88835a77624be526d4dd96",
         "menu_help": "c47ae15370cfe1ed2781eedc1dc2547d12d9e972",
         "menu_libre": "38f2a5b458b1b859bea3099c904d3eab6c585532",
@@ -1523,6 +1916,7 @@
         "template_feedback": "2ac420d3d188032135ad832aa4147b7ca97a6bed",
         "template_printable_subtitle": "ed172446717fad6d8990c6169f1796e931a3758c",
         "template_printable_title": "595ceee10f8b51d2a11baf28141d435ff342675a",
+        "template_share_manual": "ae6878e9b3cccd89df06c2e713be4d8adeef476c",
         "template_welcome": "d4b38b7735664c0fd812adb91762276720a73c96",
         "terms_link": "8a069ed1c667c9e5dc357ae198dc0a380968bcca",
         "u_acft": "1eae6154e3db0f039276e069c8a183b4bd7eea4f",
@@ -2651,9 +3045,33 @@
             "words": 33,
             "ends_sentence": true
         },
+        "lpn_basemap_hide": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_basemap_show": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_basemap_tip": {
+            "words": 26,
+            "ends_sentence": true
+        },
         "lpn_cancel": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_clean_map": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_clean_map_off": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_clean_map_tip": {
+            "words": 34,
+            "ends_sentence": true
         },
         "lpn_close": {
             "words": 1,
@@ -2671,8 +3089,80 @@
             "words": 8,
             "ends_sentence": true
         },
+        "lpn_color_break_count": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "lpn_color_break_number": {
+            "words": 11,
+            "ends_sentence": true
+        },
+        "lpn_color_break_order": {
+            "words": 15,
+            "ends_sentence": true
+        },
+        "lpn_color_criterion_note": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_color_example_material": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_color_example_status": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_color_legend_open_tip": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_color_link_field": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_color_mode": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_color_mode_equal": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_color_mode_jenks": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_color_mode_log": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_color_mode_pressure": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_color_mode_pretty": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_color_mode_quantile": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_color_mode_stddev": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_color_node_field": {
+            "words": 3,
+            "ends_sentence": false
+        },
         "lpn_color_none": {
             "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_color_ramp_diverging": {
+            "words": 1,
             "ends_sentence": false
         },
         "lpn_color_ramp_epanet": {
@@ -2683,9 +3173,37 @@
             "words": 4,
             "ends_sentence": false
         },
+        "lpn_color_ramp_qualitative": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_color_ramp_rainbow": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_color_ramp_rainbow_eg": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_color_ramp_rdylbu": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_color_ramp_sequential": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_color_ramp_viridis": {
             "words": 11,
             "ends_sentence": false
+        },
+        "lpn_color_ramp_ylgnbu": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_color_ranges_note": {
+            "words": 25,
+            "ends_sentence": true
         },
         "lpn_confirm_apply_prefix": {
             "words": 14,
@@ -2767,6 +3285,10 @@
             "words": 15,
             "ends_sentence": true
         },
+        "lpn_engine_minor_loss_note": {
+            "words": 27,
+            "ends_sentence": true
+        },
         "lpn_engine_ready": {
             "words": 11,
             "ends_sentence": true
@@ -2835,6 +3357,10 @@
             "words": 6,
             "ends_sentence": false
         },
+        "lpn_examples_close": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_examples_failed": {
             "words": 14,
             "ends_sentence": true
@@ -2862,6 +3388,10 @@
         "lpn_examples_sub": {
             "words": 19,
             "ends_sentence": true
+        },
+        "lpn_examples_welcome": {
+            "words": 10,
+            "ends_sentence": false
         },
         "lpn_field_active": {
             "words": 4,
@@ -2919,6 +3449,10 @@
             "words": 25,
             "ends_sentence": true
         },
+        "lpn_field_lat": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_field_length": {
             "words": 1,
             "ends_sentence": false
@@ -2926,6 +3460,10 @@
         "lpn_field_length_tip": {
             "words": 28,
             "ends_sentence": true
+        },
+        "lpn_field_lon": {
+            "words": 1,
+            "ends_sentence": false
         },
         "lpn_field_roughness": {
             "words": 1,
@@ -2971,6 +3509,22 @@
             "words": 17,
             "ends_sentence": true
         },
+        "lpn_field_text_align": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_field_text_align_center": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_text_align_left": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_text_align_right": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_field_text_bold": {
             "words": 2,
             "ends_sentence": false
@@ -2991,11 +3545,35 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_field_text_valign": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_field_text_valign_bottom": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_text_valign_middle": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_field_text_valign_top": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_field_valve_diameter_tip": {
             "words": 27,
             "ends_sentence": true
         },
         "lpn_field_valve_km_tip": {
+            "words": 34,
+            "ends_sentence": true
+        },
+        "lpn_field_valve_setting_drop": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_field_valve_setting_drop_tip": {
             "words": 34,
             "ends_sentence": true
         },
@@ -3046,6 +3624,14 @@
         "lpn_file_close": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_file_export_inp": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_file_export_inp_tip": {
+            "words": 32,
+            "ends_sentence": true
         },
         "lpn_file_import_inp": {
             "words": 3,
@@ -3143,8 +3729,200 @@
             "words": 27,
             "ends_sentence": true
         },
+        "lpn_find_adjacent": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_find_button": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_find_condition": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_find_count": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_find_menu": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_find_menu_tip": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "lpn_find_no_value": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "lpn_find_none": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "lpn_find_op_bottom": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_find_op_contains": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_find_op_equals": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_find_op_gt": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_find_op_lt": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_find_op_top": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_find_property": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_find_scope": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_find_scope_all": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_find_title": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_find_value": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_geomap": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_georef_adjust": {
+            "words": 30,
+            "ends_sentence": true
+        },
+        "lpn_georef_cancel": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_georef_confirm": {
+            "words": 29,
+            "ends_sentence": true
+        },
+        "lpn_georef_detach": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_georef_done": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_georef_drop": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_georef_empty": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_georef_finish": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_georef_goto": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_georef_intro": {
+            "words": 48,
+            "ends_sentence": true
+        },
+        "lpn_georef_menu": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_georef_on_map": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "lpn_georef_rotation": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_georef_rotation_tip": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "lpn_georef_scale": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_georef_scale_tip": {
+            "words": 43,
+            "ends_sentence": true
+        },
+        "lpn_georef_size_prompt": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_georef_step1": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_georef_step1_hint": {
+            "words": 37,
+            "ends_sentence": true
+        },
+        "lpn_georef_step2": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_georef_tip": {
+            "words": 49,
+            "ends_sentence": true
+        },
+        "lpn_georef_unavailable": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_goto_bad": {
+            "words": 16,
+            "ends_sentence": true
+        },
+        "lpn_goto_menu": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_goto_prompt": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_goto_tip": {
+            "words": 28,
+            "ends_sentence": false
+        },
+        "lpn_gpv_curve_note": {
+            "words": 22,
+            "ends_sentence": true
+        },
         "lpn_help_fix": {
             "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_help_icons": {
+            "words": 5,
             "ends_sentence": false
         },
         "lpn_help_notes": {
@@ -3199,6 +3977,10 @@
             "words": 16,
             "ends_sentence": true
         },
+        "lpn_inp_drop_demand_pattern": {
+            "words": 28,
+            "ends_sentence": true
+        },
         "lpn_inp_drop_demands": {
             "words": 19,
             "ends_sentence": true
@@ -3209,6 +3991,10 @@
         },
         "lpn_inp_drop_eps": {
             "words": 24,
+            "ends_sentence": true
+        },
+        "lpn_inp_drop_gpv_curve": {
+            "words": 29,
             "ends_sentence": true
         },
         "lpn_inp_drop_headloss": {
@@ -3259,6 +4045,14 @@
             "words": 45,
             "ends_sentence": true
         },
+        "lpn_inp_export_differences": {
+            "words": 7,
+            "ends_sentence": true
+        },
+        "lpn_inp_export_refused": {
+            "words": 10,
+            "ends_sentence": false
+        },
         "lpn_inp_report_clean": {
             "words": 10,
             "ends_sentence": true
@@ -3288,6 +4082,14 @@
             "ends_sentence": false
         },
         "lpn_labels_col_decimals": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_labels_col_decimals_example": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_labels_col_rank": {
             "words": 1,
             "ends_sentence": false
         },
@@ -3499,6 +4301,14 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_new_geo_si": {
+            "words": 6,
+            "ends_sentence": false
+        },
+        "lpn_new_geo_us": {
+            "words": 6,
+            "ends_sentence": false
+        },
         "lpn_new_text": {
             "words": 1,
             "ends_sentence": false
@@ -3547,9 +4357,109 @@
             "words": 4,
             "ends_sentence": false
         },
+        "lpn_pane_junctions_none": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "lpn_pane_resize": {
+            "words": 8,
+            "ends_sentence": false
+        },
+        "lpn_pane_right_toggle": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_pane_right_toggle_tip": {
+            "words": 18,
+            "ends_sentence": true
+        },
+        "lpn_pane_sort_tip": {
+            "words": 9,
+            "ends_sentence": true
+        },
+        "lpn_pane_tab_junctions": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_pane_tab_junctions_tip": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_pane_toggle": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_pane_toggle_tip": {
+            "words": 16,
+            "ends_sentence": true
+        },
         "lpn_prefix_applied": {
             "words": 8,
             "ends_sentence": true
+        },
+        "lpn_profile_axis_elev": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_profile_axis_station": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_profile_choose": {
+            "words": 8,
+            "ends_sentence": true
+        },
+        "lpn_profile_clear": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_profile_from": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_profile_ground": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_profile_hgl": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_profile_menu": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_profile_no_path": {
+            "words": 9,
+            "ends_sentence": true
+        },
+        "lpn_profile_no_solve": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_profile_pick": {
+            "words": 11,
+            "ends_sentence": false
+        },
+        "lpn_profile_summary": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_profile_through": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_profile_tip": {
+            "words": 14,
+            "ends_sentence": true
+        },
+        "lpn_profile_title": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_profile_to": {
+            "words": 1,
+            "ends_sentence": false
         },
         "lpn_project_copy_suffix": {
             "words": 1,
@@ -3675,6 +4585,10 @@
             "words": 14,
             "ends_sentence": true
         },
+        "lpn_rpane_empty": {
+            "words": 15,
+            "ends_sentence": true
+        },
         "lpn_saveas_overwrites_newer": {
             "words": 26,
             "ends_sentence": true
@@ -3767,6 +4681,10 @@
             "words": 26,
             "ends_sentence": true
         },
+        "lpn_select_first": {
+            "words": 13,
+            "ends_sentence": true
+        },
         "lpn_settings_align_labels": {
             "words": 5,
             "ends_sentence": false
@@ -3794,6 +4712,10 @@
         "lpn_settings_color_breaks_note": {
             "words": 31,
             "ends_sentence": true
+        },
+        "lpn_settings_color_classes": {
+            "words": 3,
+            "ends_sentence": false
         },
         "lpn_settings_color_equal_counts": {
             "words": 2,
@@ -3863,6 +4785,10 @@
             "words": 31,
             "ends_sentence": true
         },
+        "lpn_settings_hydraulics": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "lpn_settings_id_prefixes": {
             "words": 2,
             "ends_sentence": false
@@ -3907,6 +4833,10 @@
             "words": 2,
             "ends_sentence": false
         },
+        "lpn_settings_link_symbology": {
+            "words": 2,
+            "ends_sentence": false
+        },
         "lpn_settings_link_width": {
             "words": 4,
             "ends_sentence": false
@@ -3927,6 +4857,26 @@
             "words": 4,
             "ends_sentence": false
         },
+        "lpn_settings_no_match": {
+            "words": 5,
+            "ends_sentence": true
+        },
+        "lpn_settings_node_link": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_settings_node_symbology": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_page": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_settings_page_note": {
+            "words": 8,
+            "ends_sentence": true
+        },
         "lpn_settings_push_btn": {
             "words": 6,
             "ends_sentence": false
@@ -3945,6 +4895,26 @@
         },
         "lpn_settings_scope_project": {
             "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_search": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_search_tip": {
+            "words": 20,
+            "ends_sentence": true
+        },
+        "lpn_settings_sec_calculation": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_settings_sec_elements": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_settings_sec_map": {
+            "words": 3,
             "ends_sentence": false
         },
         "lpn_settings_show_titles": {
@@ -4007,6 +4977,10 @@
             "words": 5,
             "ends_sentence": true
         },
+        "lpn_status_converted": {
+            "words": 6,
+            "ends_sentence": true
+        },
         "lpn_status_downloaded": {
             "words": 20,
             "ends_sentence": true
@@ -4021,6 +4995,14 @@
         },
         "lpn_status_imported": {
             "words": 15,
+            "ends_sentence": true
+        },
+        "lpn_status_inp_exported": {
+            "words": 2,
+            "ends_sentence": true
+        },
+        "lpn_status_reinterpreted": {
+            "words": 8,
             "ends_sentence": true
         },
         "lpn_status_reverted": {
@@ -4079,6 +5061,106 @@
             "words": 24,
             "ends_sentence": true
         },
+        "lpn_time_clock_start": {
+            "words": 5,
+            "ends_sentence": false
+        },
+        "lpn_time_duration": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_time_first": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_time_format_tip": {
+            "words": 24,
+            "ends_sentence": true
+        },
+        "lpn_time_hyd_step": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_time_last": {
+            "words": 4,
+            "ends_sentence": false
+        },
+        "lpn_time_level": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_time_menu": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_time_menu_tip": {
+            "words": 13,
+            "ends_sentence": true
+        },
+        "lpn_time_next": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_time_no_engine": {
+            "words": 54,
+            "ends_sentence": true
+        },
+        "lpn_time_pattern_start": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_time_pattern_step": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_time_pause": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_time_play": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_time_prev": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_time_report_start": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_time_report_step": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_time_running": {
+            "words": 10,
+            "ends_sentence": true
+        },
+        "lpn_time_settings_open": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_time_slider": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_time_speed": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_time_speed_tip": {
+            "words": 6,
+            "ends_sentence": true
+        },
+        "lpn_time_tank": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_tip_join": {
+            "words": 3,
+            "ends_sentence": false
+        },
         "lpn_tip_labels_draggable": {
             "words": 19,
             "ends_sentence": true
@@ -4095,33 +5177,69 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_tool_add_junction_tip": {
+            "words": 17,
+            "ends_sentence": true
+        },
         "lpn_tool_add_pipe": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_tool_add_pipe_tip": {
+            "words": 12,
+            "ends_sentence": true
         },
         "lpn_tool_add_pump": {
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_tool_add_pump_tip": {
+            "words": 12,
+            "ends_sentence": true
+        },
         "lpn_tool_add_reservoir": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_tool_add_reservoir_tip": {
+            "words": 15,
+            "ends_sentence": true
         },
         "lpn_tool_add_tank": {
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_tool_add_tank_tip": {
+            "words": 15,
+            "ends_sentence": true
+        },
         "lpn_tool_add_text": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_tool_add_text_tip": {
+            "words": 10,
+            "ends_sentence": true
         },
         "lpn_tool_add_valve": {
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_tool_add_valve_tip": {
+            "words": 12,
+            "ends_sentence": true
+        },
+        "lpn_tool_color_tip": {
+            "words": 25,
+            "ends_sentence": true
+        },
         "lpn_tool_delete": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_tool_delete_tip": {
+            "words": 8,
+            "ends_sentence": true
         },
         "lpn_tool_file": {
             "words": 1,
@@ -4139,17 +5257,33 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_tool_settings_tip": {
+            "words": 6,
+            "ends_sentence": true
+        },
         "lpn_tool_undo": {
             "words": 1,
             "ends_sentence": false
+        },
+        "lpn_tool_undo_tip": {
+            "words": 4,
+            "ends_sentence": true
         },
         "lpn_tool_zoom_extent": {
             "words": 3,
             "ends_sentence": false
         },
+        "lpn_tool_zoom_extent_tip": {
+            "words": 7,
+            "ends_sentence": true
+        },
         "lpn_unit_unknown": {
             "words": 47,
             "ends_sentence": true
+        },
+        "lpn_units_convert": {
+            "words": 3,
+            "ends_sentence": false
         },
         "lpn_units_elevhead": {
             "words": 3,
@@ -4157,6 +5291,14 @@
         },
         "lpn_units_flow": {
             "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_units_group_inputs": {
+            "words": 2,
+            "ends_sentence": false
+        },
+        "lpn_units_group_results": {
+            "words": 2,
             "ends_sentence": false
         },
         "lpn_units_length": {
@@ -4167,8 +5309,20 @@
             "words": 1,
             "ends_sentence": false
         },
+        "lpn_units_reinterpret": {
+            "words": 5,
+            "ends_sentence": false
+        },
         "lpn_units_velocity": {
             "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_units_warn_body": {
+            "words": 42,
+            "ends_sentence": true
+        },
+        "lpn_units_warn_title": {
+            "words": 7,
             "ends_sentence": false
         },
         "lpn_v2_restore_confirm": {
@@ -4191,6 +5345,14 @@
             "words": 3,
             "ends_sentence": false
         },
+        "lpn_valve_type_gpv": {
+            "words": 3,
+            "ends_sentence": false
+        },
+        "lpn_valve_type_pbv": {
+            "words": 3,
+            "ends_sentence": false
+        },
         "lpn_valve_type_prv": {
             "words": 3,
             "ends_sentence": false
@@ -4204,6 +5366,10 @@
             "ends_sentence": false
         },
         "lpn_view_units": {
+            "words": 1,
+            "ends_sentence": false
+        },
+        "lpn_xymap": {
             "words": 1,
             "ends_sentence": false
         },
@@ -5286,6 +6452,10 @@
         "template_printable_title": {
             "words": 2,
             "ends_sentence": false
+        },
+        "template_share_manual": {
+            "words": 3,
+            "ends_sentence": true
         },
         "template_welcome": {
             "words": 23,

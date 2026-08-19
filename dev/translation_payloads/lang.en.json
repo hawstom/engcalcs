@@ -720,7 +720,7 @@
         "lpn_color_ramp_sequential": "Sequential",
         "lpn_color_ramp_diverging": "Diverging",
         "lpn_settings_color_classes": "Number of ranges",
-        "lpn_color_mode": "Range allocation",
+        "lpn_color_mode": "Data classification method",
         "lpn_color_ranges_note": "The mode above sets these limits from the values now on the map. Type over them and the same number always means the same color.",
         "lpn_color_criterion_note": "The range limits come from a design standard, so the number of ranges is fixed while that mode is chosen.",
         "lpn_color_break_number": "A range limit must be a number. The map is unchanged.",
