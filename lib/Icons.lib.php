@@ -256,6 +256,70 @@ $ec_icons = array(
 	'pane-bottom' => '<path d="M3 13h18v6H3z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 5h18v14H3z"/><path d="M3 13h18"/>',
 	'pane-right'  => '<path d="M14 5h7v14h-7z" fill="currentColor" stroke="none" opacity=".18"/><path d="M3 5h18v14H3z"/><path d="M14 5v14"/>',
 
+	// ---- Labels panel (Task 435) ----
+	// A RANKED SERIES: three squares on one baseline, each 0.70 of the one before. It heads the
+	// Labels panel's priority column, where the word is wider than the box it has to sit in. Tom,
+	// 2026-08-18, asked for "an icon that says 123 with the numbers getting smaller"; this is that
+	// idea with the glyphs taken out, because the glyphs are the part that cannot survive the size.
+	//
+	// DIGITS WERE DRAWN AND MEASURED FIRST, so do not re-propose them. 1, 2 and 3 are the only digit
+	// run with no CLOSED counters, so the number that decides legibility is the APERTURE of the 3 —
+	// the white between its upper and lower bowls. At this set's 2-unit stroke that aperture is 4.8
+	// units on a digit 16 tall, 2.1 units at 11 tall, and it CLOSES COMPLETELY below 9.7, where the
+	// digit becomes a solid blob. Three digits and their gaps do not fit 24 units of width unless the
+	// smallest is about 10 tall, so the third digit is a blob by construction — 0.5px of aperture
+	// against a 1.33px stroke at the 16px this actually renders at.
+	// An SVG <text> element is the other way to get real digits, and it is worse for this set rather
+	// than merely different: it renders in the visitor's platform font, which is the objection this
+	// file opens with against emoji, and digit advance widths run 0.55em to 0.64em across common sans
+	// faces, so hand-set gaps drift by a unit between platforms. It would also need fill/stroke reset
+	// against EC_ICON_OPEN_TAG, and SVG text stays selectable and find-in-page-able inside a mark that
+	// is aria-hidden.
+	//
+	// WHY SQUARES, against the two other shapes that say "ranked":
+	//   - Circles are already spoken for. A solid disc IS the junction symbol on this page's own
+	//     canvas ('junction' above), so three in a row would read as three junctions.
+	//   - Horizontal bars of decreasing length are the align-left / hamburger mark, and this icon
+	//     sits in a panel about label TEXT, the one context where that misread is likely.
+	// Sides 7, 4.9 and 3.4 on a common baseline at y 15.5 — type shrinking on a baseline is the
+	// picture Tom described. The 3-unit GAPS are the binding constraint and the reason the squares
+	// are not bigger: 3 units is 2px at 16px, and at 2 units the three marks merge into one notched
+	// band. The whole mark is 21.3 x 7 centred on (12, 12) — as wide as 'settings', and the same flat
+	// proportion as 'units'.
+	// The left-to-right ramp is READING order, not meaning. Icons are not mirrored for the RTL
+	// languages, so the ramp must never be what tells a reader which end ranks highest; the column's
+	// own numbers do that.
+	'priority'   => '<rect x="1.4" y="8.5" width="7" height="7" fill="currentColor" stroke="none"/>'
+	              . '<rect x="11.4" y="10.6" width="4.9" height="4.9" fill="currentColor" stroke="none"/>'
+	              . '<rect x="19.3" y="12.1" width="3.4" height="3.4" fill="currentColor" stroke="none"/>',
+
+	// ---- Time playback transport (Task 248) ----
+	// The tape-transport convention, drawn straight and deliberately not reinvented. This set's
+	// preference for a physical referent does not apply: there is no object here, only a mark every
+	// user has read since cassette decks, and the whole value is instant recognition. All four are
+	// solid, so each carries its own fill="currentColor" stroke="none" against EC_ICON_OPEN_TAG —
+	// the reason is spelled out on 'select' above.
+	//
+	// PLAY IS BIGGER THAN PAUSE ON PURPOSE. A triangle inside the pause bars' own 12 x 14 box holds
+	// 84 square units against their 112 — a 25% deficit, and it looks shrunken sitting next to them
+	// in the same strip. At 13.5 x 16 the triangle holds 108, within 4% of the bars, which is what
+	// makes the pair look like one weight. Horizontally the triangle's box is centred on x 13.05
+	// while its centroid is at 10.8; the eye splits the difference at about 11.9, so the mark reads
+	// centred without the box being centred. A triangle centred by its box looks pushed left.
+	//
+	// step-back and step-fwd are EXACT MIRRORS through x = 12 (every coordinate is 24 minus its
+	// partner's), because a transport pair that is only approximately symmetric reads as a mistake.
+	// The bar is the part that fails first at 16px, so it is 3.6 units wide -- 2.4px, against the
+	// 2-unit floor this box can show -- and the triangle stops 2 units short of it so the apex does
+	// not weld itself to the bar at toolbar size.
+	'play'       => '<path d="M6.3 4v16l13.5-8z" fill="currentColor" stroke="none"/>',
+	'pause'      => '<rect x="6" y="5" width="4" height="14" fill="currentColor" stroke="none"/>'
+	              . '<rect x="14" y="5" width="4" height="14" fill="currentColor" stroke="none"/>',
+	'step-back'  => '<rect x="3.2" y="5" width="3.6" height="14" fill="currentColor" stroke="none"/>'
+	              . '<path d="M20.8 5v14l-12-7z" fill="currentColor" stroke="none"/>',
+	'step-fwd'   => '<path d="M3.2 5v14l12-7z" fill="currentColor" stroke="none"/>'
+	              . '<rect x="17.2" y="5" width="3.6" height="14" fill="currentColor" stroke="none"/>',
+
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
 	// version of that." Two interlocking horizontal capsules — a chain link lying flat, which is
