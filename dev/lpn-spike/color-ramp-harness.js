@@ -538,8 +538,13 @@ console.log('== the ramp picker ==');
 	// THE ACKNOWLEDGEMENT, VERBATIM. Apache-2.0 clause 2 fixes the wording; this asserts the exact
 	// sentence out of the module rather than a retyped copy, which is the only way a paraphrase
 	// gets caught.
-	const credit = shared.filter(e => e.id === 'lpn_set_ramp_credits')[0];
-	ok('the acknowledgement is rendered where the ramps are chosen', !!credit);
+	// **A FOOTER, NOT A ROW OF Map appearance** (Tom, 2026-08-19: the full credits were "a bit long
+	// for this place"). It is rendered into the box's own footer node, below every section, so the
+	// assertion is that it is on the page and NOT inside the shared colour host it used to sit in.
+	const credit = byId.lpn_set_ramp_credits;
+	ok('the acknowledgement is rendered in the box that offers the ramps', !!credit);
+	ok('...as the box\'s footer, not as a row inside Map appearance',
+		shared.every(e => e.id !== 'lpn_set_ramp_credits'));
 	ok('...verbatim, exactly as the licence fixes it',
 		!!credit && allText(credit).indexOf(R.CREDITS[0].text) >= 0, credit && allText(credit));
 	ok('...and every source is credited', !!credit &&

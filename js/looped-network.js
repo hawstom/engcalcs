@@ -7359,9 +7359,15 @@ var EngCalcs = EngCalcs || {};
 		// anywhere in this box says "ColorBrewer". Naming the source in a credit line is
 		// attribution, which the licence requires; naming a control after it is promotion, which it
 		// forbids.
-		var credits = document.createElement('div');
+		// **AND IT IS THE BOX'S FOOTER**, below every section rather than between Map appearance and
+		// Page (Tom, 2026-08-19: "It's a bit long for this place"). Fine print belongs where nothing
+		// has to be read past it, and the footer node sits outside the sections the search filter
+		// hides -- so the acknowledgement is on screen whenever the box is, which is what clause 2
+		// asks for. Falls back to this section's own host if the footer is not on the page.
+		var credits = document.getElementById('lpn_set_ramp_credits') || document.createElement('div');
 		credits.id = 'lpn_set_ramp_credits';
 		credits.className = 'lpn-rp-credit';
+		credits.textContent = '';
 		((R && R.CREDITS) || []).forEach(function (c) {
 			var line = document.createElement('div'), a;
 			line.textContent = c.text;
@@ -7376,7 +7382,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			credits.appendChild(line);
 		});
-		host.appendChild(credits);
+		if (!credits.parentNode) { host.appendChild(credits); }
 		[nodeHost, linkHost, nlHost, host].forEach(function (h) {
 			if (EngCalcs.initTips) { EngCalcs.initTips(h); }
 		});
@@ -14245,13 +14251,21 @@ var EngCalcs = EngCalcs || {};
 	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, priority, tip) {
 		var row = document.createElement('div'), label = document.createElement('label'),
 			input = document.createElement('input'), span = document.createElement('span');
-		row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '6px';
+		// BASELINE, NOT CENTRE (Tom, 2026-08-19: "checkbox even with inputs"). A field name long
+		// enough to wrap -- "Head loss gradient", "Minor (local) loss coefficient" -- used to drag
+		// its checkbox and its four boxes down to the middle of BOTH lines, so nothing on the row
+		// sat beside the words it answers. The first line's baseline is fixed whatever the name does
+		// below it, which is the same rule .lpn-set-row carries in css/engcalcs.css.
+		row.style.display = 'flex'; row.style.alignItems = 'baseline'; row.style.gap = '6px';
 		input.type = 'checkbox'; input.checked = checked;
 		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); refreshLabelText(); });
 		span.textContent = labelText;
 		// The whole label text is the tip's target, not a one-character glyph -- CLAUDE.md's
 		// tip-only nesting rule, and the same shape rowIn() uses everywhere else in this box.
 		if (tip) { span.title = tip; span.className = 'ec-help'; }
+		// The box's one name treatment (.lpn-set-name -> .lpn-units-name's .85em at .8 opacity), so a
+		// field name in a labels list reads as the same kind of thing as the name on every other row.
+		label.className = 'lpn-set-name';
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(span);
@@ -14515,8 +14529,9 @@ var EngCalcs = EngCalcs || {};
 				labelSettings.markExtrema, function (v) { labelSettings.markExtrema = v; },
 				null, null, null, pc.lpn_labels_mark_extrema_tip);
 			var sepRow = document.createElement('div'), sepLabel = document.createElement('span');
-			sepRow.style.display = 'flex'; sepRow.style.alignItems = 'center'; sepRow.style.gap = '6px';
+			sepRow.style.display = 'flex'; sepRow.style.alignItems = 'baseline'; sepRow.style.gap = '6px';
 			sepLabel.textContent = pc.lpn_labels_separator || 'Text between values';
+			sepLabel.className = 'lpn-set-name';
 			sepLabel.style.flex = '1 1 auto';
 			sepRow.appendChild(sepLabel);
 			sepRow.appendChild(affixBox({
@@ -15074,6 +15089,10 @@ var EngCalcs = EngCalcs || {};
 			['V', pc.lpn_tool_add_valve || 'Valve']
 		].forEach(function (f) {
 			var key = f[0], input = document.createElement('input'), wrap = document.createElement('span');
+			// A BOX PLUS A BUTTON IS STILL ONE CONTROL, and .lpn-set-ctlgroup is what keeps it inside
+			// the row's control column: the button wraps under the box rather than pushing the whole
+			// group left, which is what put this row's input 46 px left of every other input in the box.
+			wrap.className = 'lpn-set-ctlgroup';
 			input.type = 'text'; input.size = 4; input.value = settings.idPrefixes[key];
 			input.addEventListener('change', function () {
 				if (!validatePrefix(input.value)) { alert(pc.lpn_id_invalid || 'Enter an ID with no spaces and no quotation marks.'); input.value = settings.idPrefixes[key]; return; }
@@ -15086,7 +15105,6 @@ var EngCalcs = EngCalcs || {};
 			var apply = document.createElement('button');
 			apply.type = 'button';
 			apply.textContent = pc.lpn_settings_apply_to_all || 'Apply to all';
-			apply.style.marginLeft = '6px';
 			helpTip(apply, pc.lpn_settings_apply_to_all_tip);
 			apply.addEventListener('click', function () {
 				// Committed FIRST, so pressing Apply straight after typing (without leaving the box,
@@ -15278,8 +15296,13 @@ var EngCalcs = EngCalcs || {};
 		// Zoom until the labels are as sparse as you want, press the button, and the current view's
 		// width becomes the threshold. The number stays editable; blank means always show.
 		var lmwWrap = document.createElement('span');
+		lmwWrap.className = 'lpn-set-ctlgroup';
 		var lmwInput = document.createElement('input');
 		lmwInput.type = 'number'; lmwInput.step = 'any'; lmwInput.min = '0';
+		// THE ONE BOX IN THE BOX THAT IS WIDER THAN THE NUMBER IT HOLDS, and its PLACEHOLDER is the
+		// reason: blank means "always show labels", and that sentence is the only place the rule is
+		// written on screen. It still starts at the control column's left edge like every other
+		// control, so the column is unbroken -- see --lpn-set-num in css/engcalcs.css.
 		lmwInput.style.width = '7em';
 		lmwInput.placeholder = pc.lpn_settings_label_always || 'Always show labels';
 		lmwInput.value = settings.labelMaxWidth === null || settings.labelMaxWidth === undefined ? '' : settings.labelMaxWidth;
@@ -15304,7 +15327,6 @@ var EngCalcs = EngCalcs || {};
 			applyLabelVisibility(); saveToStorage();
 		});
 		lmwWrap.appendChild(lmwInput);
-		lmwWrap.appendChild(document.createTextNode(' '));
 		lmwWrap.appendChild(lmwBtn);
 		row(mapBody, pc.lpn_settings_label_max_width || 'Label view width (map units)', lmwWrap,
 			pc.lpn_settings_label_max_width_tip);
