@@ -65,9 +65,48 @@ console.log('\n-- every toolbar button goes through it --');
 	report(named >= 1 && made >= 1, 'it builds buttons and names them', `${made} built, ${named} setIconLabel call sites`);
 	const mb = strip(fnBody(src, 'modeButton'));
 	report(/setIconLabel\(/.test(mb), 'the mode buttons are named through it too');
-	// No <select> left on the strip: Task 427 moved the colour fields into the Visibility panel, and
-	// a field-name dropdown was the one wide control the icon-only strip could not shrink.
-	report(!/createElement\('select'\)/.test(bar), 'and no dropdown is left on the strip');
+	// The time transport is built in js/lpn-time.js, and it must be named through THIS file's
+	// wrapper rather than EngCalcs.setIconLabel: only the wrapper records a button in
+	// toolbarIconIndex, and Help > "What the toolbar icons mean" is derived from that record.
+	report(/lpnTimeMountToolbar\(group\(\), setIconLabel\)/.test(bar),
+		'the time transport is mounted with this file\'s own setIconLabel, so it reaches the Help guide');
+	// Profile is a toolbar button as well as a View menu row (Tom, 2026-08-18: "I like that the
+	// command is under the View menu" -- two doors, one implementation).
+	report(/setIconLabel\([^)]*'profile'/.test(bar), 'the profile has a button, drawn with the profile icon');
+	// **THE LABELS BUTTON IS GONE** (Tom: "We can remove this button now ... all project settings
+	// are in (tada!) Settings"). Asserted so it is not reflexively restored: every other route to
+	// the label controls -- View > Labels, the colour legend, the Settings button -- still opens the
+	// same box on the same section.
+	report(!/'labels'/.test(bar), 'and no Labels button, whose box has its own button two icons away');
+	// **NO DROPDOWN IS BUILT HERE.** Task 427 moved the colour fields off the strip because a
+	// field-name dropdown was the one control it could not shrink. The transport's two are the
+	// exception that names itself: a step selector and a speed, both width-capped below.
+	report(!/createElement\('select'\)/.test(bar), 'and wireToolbar() builds no dropdown of its own');
+}
+
+console.log('\n-- the time transport on the strip --');
+{
+	const t = fs.readFileSync(path.join(ROOT, 'js', 'lpn-time.js'), 'utf8');
+	const mount = strip(fnBody(t, 'EC.lpnTimeMountToolbar'));
+	// Five controls, the set Tom named: play/pause, speed, step back, step forward, step selector.
+	report(/ui\.prev =/.test(mount) && /ui\.play =/.test(mount) && /ui\.next =/.test(mount) &&
+		/ui\.step =/.test(mount) && /ui\.speed =/.test(mount), 'all five controls are built');
+	// A select gets no .ec-help (a tip in front of a dropdown is a tip in the way of it), so its
+	// accessible name has to come from an explicit aria-label -- a select named only by its title
+	// has a weak, browser-dependent name and there is no visible label on an icon-only strip.
+	const pick = strip(fnBody(t, 'picker'));
+	report(/setAttribute\('aria-label'/.test(pick), 'each dropdown carries an explicit aria-label');
+	report(/max-width:/.test(pick) && !/ec-help/.test(pick),
+		'...and is width-capped, and not given .ec-help');
+	// The transport is NOT hidden or disabled on a one-step network (Tom: "We can show the time play
+	// controls at all times even if there is only one time step"). lpnReportTimes() never returns an
+	// empty list, so the mount has nothing to test and must not grow a test.
+	report(!/lpnTimeIsExtended/.test(mount), 'and nothing in the mount asks whether the network runs over time');
+	// The pending icon geometry must never SHADOW lib/Icons.lib.php: registered only where the PHP
+	// set has nothing, so moving the four shapes into that file changes nothing on screen and this
+	// block simply becomes dead.
+	report(/if \(!EC\.icons\[k\]\)/.test(fnBody(t, 'registerPendingIcons')),
+		'the four transport shapes yield to lib/Icons.lib.php the moment it carries them');
 }
 
 console.log('\n-- the Help list is DERIVED from the strip --');

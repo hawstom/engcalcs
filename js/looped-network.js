@@ -11644,7 +11644,11 @@ var EngCalcs = EngCalcs || {};
 			// Labels rather than in Insert. Since Task 434 it is a TAB in the bottom pane, so the
 			// row opens the pane on that tab -- open, never toggle: a menu row that names a view
 			// shows it.
-			{ icon: 'view', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
+			// **THE PROFILE ICON, not the eye that was standing in for it** (Tom, 2026-08-18: "It's
+			// not there still. It's an eye"). 'profile' has been in lib/Icons.lib.php since the icon
+			// set was drawn and was used nowhere; both doors to the profile point at it now, this
+			// row and the toolbar button in wireToolbar().
+			{ icon: 'profile', label: pc.lpn_profile_menu || 'Profile', tip: pc.lpn_profile_tip,
 				fn: function () { closeMenu(); openPane('profile'); } },
 			// The label states what the row will DO, because this menu has no checkmark column --
 			// the same convention the street-map row below follows.
@@ -12272,11 +12276,23 @@ var EngCalcs = EngCalcs || {};
 		cleanBtn.setAttribute('aria-pressed', cleanMapOn() ? 'true' : 'false');
 		cleanBtn.addEventListener('click', function () { setCleanMap(!cleanMapOn()); });
 		viewGroup.appendChild(cleanBtn);
-		var labelsBtn = document.createElement('button');
-		labelsBtn.type = 'button';
-		setIconLabel(labelsBtn, 'labels', pc.lpn_tool_labels || 'Labels', pc.lpn_tip_labels_draggable);
-		labelsBtn.addEventListener('click', function () { openSettingsBox('labels'); });
-		viewGroup.appendChild(labelsBtn);
+		// **THE PROFILE, AND IT IS TWO DOORS TO ONE IMPLEMENTATION** -- this button and the View >
+		// Profile row, which Tom kept deliberately ("I like that the command is under the View
+		// menu"). Both call openPane('profile'); nothing about the profile lives in either.
+		// The icon is the one drawn for it: a jagged ground line closed down to a datum, so it reads
+		// as a body of earth rather than as a sparkline.
+		var profileBtn = document.createElement('button');
+		profileBtn.type = 'button';
+		setIconLabel(profileBtn, 'profile', pc.lpn_profile_menu || 'Profile', pc.lpn_profile_tip);
+		profileBtn.addEventListener('click', function () { openPane('profile'); });
+		viewGroup.appendChild(profileBtn);
+		// **THERE IS NO LABELS BUTTON.** Tom, 2026-08-18: "Toolbar.Labels: We can remove this button
+		// now. Everything is simpler than EPANET or epanetjs because all project settings are in
+		// (tada!) Settings." Every route to the label controls still works and none of them was this
+		// button: View > Labels and a click on the colour legend both open the Settings box on its
+		// Labels section, and the Settings button beside this one opens the box itself. A toolbar
+		// slot is the most expensive space on the page, and a second door to a box whose own button
+		// is two icons away is not worth one.
 		// **COLOUR BY VALUE IS TWO DROPDOWNS NOW, AND THEY ARE IN THE VISIBILITY PANEL** (ROADMAP
 		// Task 427). The one select that did both fields shipped with Task 327 and Tom saw the
 		// beauty of it -- "but it's not the expectation": EPANET and epanet-js both give nodes and
@@ -12290,6 +12306,20 @@ var EngCalcs = EngCalcs || {};
 		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
 		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
 		viewGroup.appendChild(settingsBtn);
+
+		// **THE TIME TRANSPORT, IN ITS OWN GROUP** (Task 248; Tom, 2026-08-18: "epanetjs puts it on
+		// the toolbar. Play/pause, Speed, Step back, Step forward, Step selector"). Five controls,
+		// built by js/lpn-time.js, which owns every string and every behaviour in them -- this file
+		// hands over a group and its own setIconLabel and knows nothing else about them. The wrapper
+		// rather than EngCalcs.setIconLabel: it is the one that records a button in toolbarIconIndex,
+		// so the transport is in Help > "What the toolbar icons mean" without anybody adding it.
+		//
+		// A GROUP of its own, which is what keeps a narrow window honest: .lpn-toolbar-group is an
+		// inline-flex box, so the five never break apart from each other -- the strip wraps by moving
+		// whole groups onto the next line, and this group is the last thing before the auto-margin
+		// end group. Shown whether or not the network has a duration; a project with none has exactly
+		// one step and the selector says so.
+		if (EngCalcs.lpnTimeMountToolbar) { EngCalcs.lpnTimeMountToolbar(group(), setIconLabel); }
 
 		// **THE RIGHT EDGE OF THE STRIP: GO SOMEWHERE, AND SHOW SOMETHING** (Task 434). Tom put the
 		// pane toggles there "beside a goto-by-ID search", which is what Find already is (Task 420)

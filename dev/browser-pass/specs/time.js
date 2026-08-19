@@ -8,10 +8,12 @@
 //
 //   1. **A TIME SETTING IS EDITABLE AND ITS OWN TEXT SURVIVES THE EDIT.** `24:00` must still read
 //      `24:00` after the box has been through a round trip, not `86400` and not `24`.
-//   2. **THE TRANSPORT MOVES THE MAP.** Stepping the clock has to change what is drawn. A slider
-//      that changes only its own readout looks identical in every screenshot.
+//   2. **THE TRANSPORT MOVES THE MAP.** Stepping the clock has to change what is drawn. A step
+//      selector that changes only its own readout looks identical in every screenshot.
 //   3. **A TANK FILLS.** The one number that separates a run from a series of instants, seen the
 //      way a user sees it — on the page, at two different times.
+//   4. **IT PLAYS WITH THE BOTTOM PANE SHUT.** The transport is on the toolbar as of 2026-08-18
+//      precisely so it can, and the pane tab's old pause-on-hide hook would silently undo that.
 //
 // Every check here is skipped rather than failed while `js/lpn-time.js` is not loaded by
 // Looped-Network.php, because "the page does not have this feature yet" and "the feature is broken"
@@ -94,16 +96,21 @@ exports.run = async function ({ browser, report }) {
 		await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
 		await a.settle(300);
 
+		// **THE TRANSPORT IS ON THE TOOLBAR NOW** (Tom, 2026-08-18: "so you can hide the bottom pane
+		// or watch a profile during animation"), and the step selector is the ONE control that says
+		// which moment is showing -- the pane's slider is gone rather than mirrored, because two
+		// controls for one current step are two controls that can disagree.
 		const stops = await a.page.evaluate(() => {
-			const s = document.getElementById('lpn_time_slider');
-			return s ? parseInt(s.max, 10) + 1 : 0;
+			const s = document.getElementById('lpn_time_step');
+			return s ? s.options.length : 0;
 		});
 		report.ok(stops === 13, 'a 12 hour run at a 1 hour report step gives 13 stops', String(stops));
 
 		// ---- 2 and 3. the transport moves the map, and a tank fills ----
 		function readState() {
 			return a.page.evaluate(() => {
-				const out = document.getElementById('lpn_time_readout');
+				const sel = document.getElementById('lpn_time_step');
+				const out = sel && sel.options[sel.selectedIndex];
 				const rows = [...document.querySelectorAll('#lpn_pane_time table tr')].slice(1)
 					.map(r => [...r.children].map(c => c.textContent).join('='));
 				// A label on the map, so this is what is DRAWN and not what is stored.
@@ -116,13 +123,13 @@ exports.run = async function ({ browser, report }) {
 		report.ok(t0.tanks.length > 0, 'and the tank levels are listed', t0.tanks);
 
 		await a.page.evaluate(() => {
-			const s = document.getElementById('lpn_time_slider');
-			s.value = String(s.max);
-			s.dispatchEvent(new Event('input', { bubbles: true }));
+			const s = document.getElementById('lpn_time_step');
+			s.value = String(s.options.length - 1);
+			s.dispatchEvent(new Event('change', { bubbles: true }));
 		});
 		await a.settle(700);
 		const t1 = await readState();
-		report.ok(t1.clock !== t0.clock, 'moving the slider moves the clock', t0.clock + ' → ' + t1.clock);
+		report.ok(t1.clock !== t0.clock, 'choosing another step moves the clock', t0.clock + ' → ' + t1.clock);
 		report.ok(t1.tanks !== t0.tanks, 'and the tanks are at different levels — they filled',
 			t0.tanks + '  →  ' + t1.tanks);
 		report.ok(t1.labels !== t0.labels, 'and the map itself is redrawn, not just the readout');
@@ -150,6 +157,50 @@ exports.run = async function ({ browser, report }) {
 		const same = stored !== null &&
 			num(stored).length === num(t0.tanks).length / 2 - 0 &&
 			num(stored).every((v, i) => Math.abs(v - num(t0.tanks).filter((_, k) => k % 2 === 1)[i]) < 1e-9);
+		// ---- 4. IT PLAYS WITH THE PANE SHUT, which is the whole reason it moved ----
+		//
+		// Tom, 2026-08-18: "so you can hide the bottom pane or watch a profile during animation."
+		// The Time tab used to pause the run when it stopped being the tab showing; with the
+		// transport on the toolbar that hook is exactly backwards, and only a real page can tell
+		// whether it is still there. Speed is turned up first so a few frames pass in well under a
+		// second — which also exercises the speed control being a real control.
+		await a.toolbarClick('Bottom panel');   // shut it
+		await a.settle(300);
+		const before = await a.page.evaluate(() => {
+			const sp = document.getElementById('lpn_time_speed');
+			sp.value = '4';
+			sp.dispatchEvent(new Event('change', { bubbles: true }));
+			const s = document.getElementById('lpn_time_step');
+			s.value = '0';
+			s.dispatchEvent(new Event('change', { bubbles: true }));
+			return s.value;
+		});
+		await a.settle(400);
+		await a.page.evaluate(() => {
+			const b = [...document.querySelectorAll('#lpn_toolbar button')]
+				.find(x => x.getAttribute('aria-label') === 'Play');
+			if (b) { b.click(); }
+		});
+		await a.settle(900);
+		const moved = await a.page.evaluate(() => ({
+			step: document.getElementById('lpn_time_step').value,
+			pressed: [...document.querySelectorAll('#lpn_toolbar button')]
+				.find(x => x.getAttribute('aria-label') === 'Play').getAttribute('aria-pressed')
+		}));
+		report.ok(moved.pressed === 'true', 'Play reports itself pressed while it runs');
+		report.ok(moved.step !== before, 'and the run advances with the bottom pane shut',
+			before + ' → ' + moved.step);
+		await a.page.evaluate(() => {
+			const b = [...document.querySelectorAll('#lpn_toolbar button')]
+				.find(x => x.getAttribute('aria-label') === 'Play');
+			if (b) { b.click(); }
+		});
+		await a.settle(500);
+		const stopped = await a.page.evaluate(() => document.getElementById('lpn_time_step').value);
+		await a.settle(600);
+		report.eq(await a.page.evaluate(() => document.getElementById('lpn_time_step').value), stopped,
+			'and the same button stops it');
+
 		report.ok(same, 'the stored tank levels are still the ones the run STARTED from',
 			String(stored) + '  vs start ' + t0.tanks);
 	} finally {

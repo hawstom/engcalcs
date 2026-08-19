@@ -58,6 +58,35 @@ exports.run = async function ({ browser, report }) {
 		report.ok(explained.length >= 12, 'most of them explain themselves as well as naming themselves',
 			`${explained.length} of ${btns.length}`);
 
+		// ---- what is on the strip, by name (2026-08-18) ----
+		const names = btns.map(b => b.label);
+		// **THE LABELS BUTTON IS GONE.** Tom: "We can remove this button now. Everything is simpler
+		// than EPANET or epanetjs because all project settings are in (tada!) Settings." Its other
+		// doors are covered in specs/visibility.js and specs/labelcols.js.
+		report.ok(names.indexOf('Labels') < 0, 'no Labels button — the box it opened has its own',
+			names.join(' | '));
+		// Two doors, one implementation: this and View > Profile, which Tom kept.
+		report.ok(names.indexOf('Profile') >= 0, 'the profile has a door on the strip');
+
+		// **THE TIME TRANSPORT IS ON THE STRIP AT ALL TIMES.** This page has just been opened on an
+		// empty project with no duration, which is the state most visitors are in and exactly the
+		// case Tom ruled on: "We can show the time play controls at all times even if there is only
+		// one time step." So the controls are here, and the step selector holds that one step rather
+		// than the transport hiding itself.
+		report.ok(['Step back', 'Play', 'Step forward'].every(n => names.indexOf(n) >= 0),
+			'play and the two step buttons are on the strip, with no run loaded', names.join(' | '));
+		const pickers = await a.page.evaluate(() => [...document.querySelectorAll('#lpn_toolbar select')]
+			.map(s => ({ id: s.id, name: s.getAttribute('aria-label') || '', opts: s.options.length, cap: s.style.maxWidth })));
+		report.eq(pickers.length, 2, 'and exactly two dropdowns: the step selector and the speed',
+			JSON.stringify(pickers));
+		report.ok(pickers.every(p => p.name && p.cap),
+			'each dropdown is named and width-capped — a wide control is what got the last one removed',
+			JSON.stringify(pickers));
+		const step = pickers.find(p => p.id === 'lpn_time_step');
+		report.ok(!!step && step.opts === 1,
+			'a network with no duration shows its single step rather than an empty or hidden transport',
+			JSON.stringify(step));
+
 		// THE DISCOVERY ROUTE THAT IS NOT A TOOLTIP. A first-time mouse user who does not think to
 		// hover, and a touch user who must press and hold, both need one list of what the icons
 		// mean — and it has to be DERIVED from the strip or it rots.

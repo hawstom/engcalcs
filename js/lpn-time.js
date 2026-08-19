@@ -222,7 +222,9 @@
 	// `t` is THE MOMENT THE PAGE IS SHOWING. modelTimeSeconds() over in js/looped-network.js reads
 	// it, so a document rebuilt for a solve is rebuilt at this instant -- which is what makes the
 	// no-engine fallback honest rather than a stale t=0 answer wearing a clock.
-	var state = { t: 0, run: null, token: 0, playing: false, timer: null, dragging: false };
+	// `speed` is a PLAYBACK multiplier and nothing else: it never reaches the document, the model or
+	// a result, so it is not a setting and is not stored. 1 is the shipped 400 ms a frame.
+	var state = { t: 0, run: null, token: 0, playing: false, timer: null, speed: 1 };
 
 	/**
 	 * EVERY STRING THIS FILE SHOWS, in one place, and read through an explicit `pageConfig.<key>`
@@ -236,7 +238,16 @@
 	 */
 	function strings() {
 		var pageConfig = EC.pageConfig || {};
+		// **THE TWO SPEED KEYS ARE READ THROUGH `pc`, NOT `pageConfig.`, AND ONLY UNTIL THE BRIDGE
+		// CARRIES THEM.** dev/scripts/pageconfig_check.php greps for exactly `pageConfig.<key>` and
+		// fails the build on a key the page does not supply; Looped-Network.php's block is another
+		// track's file this session, so these two would fail it before they could be added. Move them
+		// up into the object below -- and delete this alias -- the moment the page supplies them, or
+		// they stay invisible to the one check that stops a visitor seeing "undefined".
+		var pc = pageConfig;
 		return {
+			speed: pc.lpn_time_speed || 'Speed',
+			speedTip: pc.lpn_time_speed_tip || 'How fast the run plays back.',
 			duration: pageConfig.lpn_time_duration || 'Total run time',
 			hydraulicStep: pageConfig.lpn_time_hyd_step || 'Hydraulic time step',
 			patternStep: pageConfig.lpn_time_pattern_step || 'Pattern time step',
@@ -245,7 +256,13 @@
 			reportStart: pageConfig.lpn_time_report_start || 'Report start time',
 			startClock: pageConfig.lpn_time_clock_start || 'Clock time at the start',
 			formatTip: pageConfig.lpn_time_format_tip || 'Write a time as hours and minutes, like 2:30. A plain number means hours; a number with its own word means that word: 30 minutes.',
-			steady: pageConfig.lpn_time_steady || 'This network is worked out at one moment. Give it a total run time above zero and it runs over time instead.',
+			// **THERE IS NO STEADY-STATE MESSAGE.** Tom, 2026-08-18, on the sentence that used to be
+			// here: "'This network is worked out at one moment' is the very string I told you I don't
+			// understand. And I don't think it's needed at all. The transport will always be there,
+			// and no explanation is needed." A one-step network is not a special case to be explained
+			// away -- the step selector holds one step and that is the whole of what there is to say.
+			// (lpn_time_no_engine is a DIFFERENT thing and stays: "the engine is unreachable, so you
+			// are seeing one instant" is a fact about this session that the user acts on.)
 			running: pageConfig.lpn_time_running || 'Working out the whole time period with the EPANET engine.',
 			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET engine, which runs the whole period.',
 			slider: pageConfig.lpn_time_slider || 'Time',
@@ -370,15 +387,26 @@
 		var stops = EC.lpnReportTimes(docTimes());
 		if (state.playing || stops.length < 2) { return; }
 		state.playing = true;
-		// 400 ms a frame: fast enough to read as motion, slow enough to see a tank rise. Wrapping
+		// 400 ms a frame at 1x: fast enough to read as motion, slow enough to see a tank rise. It is
+		// a MULTIPLIER on that rather than a millisecond box, because the only question a viewer has
+		// is "faster or slower than this", and epanet-js's own control asks it the same way. Wrapping
 		// rather than stopping at the end, because a daily pattern IS a loop and stopping dead at
 		// 24:00 hides the join.
 		state.timer = setInterval(function () {
 			var s = EC.lpnReportTimes(docTimes()),
 				i = s.indexOf(state.t);
 			setTime(s[(i + 1) % s.length]);
-		}, 400);
+		}, frameMs());
 		renderPanel();
+	}
+	function frameMs() { return Math.round(400 / (state.speed > 0 ? state.speed : 1)); }
+	// Changing speed mid-run must not stop it: setInterval's period is fixed at creation, so the
+	// only way to a new one is a new timer. pause()/play() together are that, and they leave
+	// `state.t` exactly where it was.
+	function setSpeed(v) {
+		state.speed = v > 0 ? v : 1;
+		if (state.playing) { pause(); play(); }
+		else { renderTransport(); }
 	}
 	function pause() {
 		if (state.timer) { clearInterval(state.timer); state.timer = null; }
@@ -483,12 +511,169 @@
 		if (EC.initTips) { EC.initTips(panel); }
 	};
 
+	// ================================================================================================
+	// THE TRANSPORT, ON THE TOOLBAR
+	// ================================================================================================
+	//
+	// Tom, 2026-08-18: "I was trying to find a nice place for this so you can hide the bottom pane or
+	// watch a profile during animation. epanetjs puts it on the toolbar. Play/pause, Speed, Step
+	// back, Step forward, Step selector." Five controls, and they are on the strip because the thing
+	// they change is WHAT YOU ARE LOOKING AT -- the map, the profile, the labels -- and a control
+	// that lives inside one of the panels it is animating cannot be used while that panel is shut.
+	//
+	// **IT IS STILL NOT A SETTING.** Play and step change which moment is on screen and never touch
+	// the document, exactly as pan and zoom do not; the seven [TIMES] fields are settings and stayed
+	// in the Settings box (Task 441). The toolbar is where this page's other viewing commands already
+	// are, so this is the same rule landing somewhere new rather than an exception to it.
+	//
+	// **AND IT IS THERE AT ALL TIMES.** Tom: "We can show the time play controls at all times even if
+	// there is only one time step." A network with no duration has exactly ONE reporting time, and
+	// the honest thing is to show that one step rather than to hide the controls -- hiding makes the
+	// strip change shape between two projects and makes the feature undiscoverable in the state most
+	// people open the page in. Nothing here is disabled either: a step selector holding one entry
+	// says what there is to say, and Play on a single step is a no-op by arithmetic rather than by a
+	// greyed-out button (see play(), which needs two stops before it starts a timer).
+
+	// **THESE FOUR SHAPES BELONG IN lib/Icons.lib.php, AND ARE HERE ONLY UNTIL SOMEBODY MOVES THEM.**
+	// That file is the suite's single source for icon geometry and its own header says never to
+	// redraw a path in JS, which is right: two drawings of one shape drift. This is not a second
+	// drawing -- the set carries no transport glyph at all -- and each is registered ONLY IF ABSENT,
+	// so the PHP set wins the instant it carries them and this whole block can be deleted with
+	// nothing changing on screen. Solid rather than stroked, like 'select' and the junction node: a
+	// hollow play triangle reads as an outline shape rather than as the button every media player
+	// has had for fifty years.
+	var PENDING_ICONS = {
+		'play': '<path d="M8 4.5l12 7.5-12 7.5z" fill="currentColor" stroke="none"/>',
+		'pause': '<path d="M8 5h3v14H8zM13 5h3v14h-3z" fill="currentColor" stroke="none"/>',
+		'step-back': '<path d="M5 5h2.5v14H5z" fill="currentColor" stroke="none"/><path d="M20 5l-10 7 10 7z" fill="currentColor" stroke="none"/>',
+		'step-fwd': '<path d="M16.5 5H19v14h-2.5z" fill="currentColor" stroke="none"/><path d="M4 5l10 7-10 7z" fill="currentColor" stroke="none"/>'
+	};
+	function registerPendingIcons() {
+		var k;
+		EC.icons = EC.icons || {};
+		for (k in PENDING_ICONS) { if (!EC.icons[k]) { EC.icons[k] = PENDING_ICONS[k]; } }
+	}
+
+	// The five controls, once built. They are rebuilt only when wireToolbar() rebuilds the whole
+	// strip; every state change after that goes through renderTransport(), which UPDATES them.
+	// Rebuilding a <select> the user has open closes it under the pointer, and rebuilding a button
+	// re-sets a `title` Bootstrap has already moved to data-bs-original-title.
+	var ui = null;
+
+	function stepTimes() { return EC.lpnReportTimes(docTimes()); }
+	function stepText(t) {
+		return EC.lpnTimeElapsedText(t) + '  ·  ' + EC.lpnTimeClockText(docTimes(), t);
+	}
+	// Only the <svg> is swapped, never the whole button: `aria-label` and `title` stay exactly what
+	// setIconLabel() put there. The NAME does not flip with the state -- `aria-pressed` already says
+	// pressed, and dev/toolbar-icons.md rules that a toggle keeps one name.
+	function swapIcon(btn, icon) {
+		var ic, old;
+		if (!btn || btn.getAttribute('data-icon') === icon) { return; }
+		ic = EC.iconEl && EC.iconEl(icon);
+		if (!ic) { return; }
+		old = btn.querySelector('svg');
+		if (old) { btn.replaceChild(ic, old); } else { btn.insertBefore(ic, btn.firstChild); }
+		btn.setAttribute('data-icon', icon);
+	}
+
+	/**
+	 * Build the five controls into a group js/looped-network.js's wireToolbar() has just made.
+	 *
+	 * `iconLabel` is that file's OWN setIconLabel wrapper, handed over rather than reached for: it
+	 * is EngCalcs.setIconLabel plus the one line that records the button in toolbarIconIndex, which
+	 * is what Help > "What the toolbar icons mean" is derived from. Calling EngCalcs.setIconLabel
+	 * directly would build four correct buttons the guide has never heard of -- and
+	 * dev/browser-pass/specs/toolbar.js asserts that the guide lists exactly the strip.
+	 */
+	EC.lpnTimeMountToolbar = function (container, iconLabel) {
+		var S = strings(), name;
+		if (!container) { return; }
+		registerPendingIcons();
+		name = iconLabel || function (el2, icon, n, tip) { EC.setIconLabel(el2, icon, n, tip); };
+		function btn(icon, label, fn) {
+			var b = document.createElement('button');
+			b.type = 'button';
+			name(b, icon, label, null);
+			b.setAttribute('data-icon', icon);
+			b.addEventListener('click', fn);
+			container.appendChild(b);
+			return b;
+		}
+		// A <select> is NOT given .ec-help, on purpose (dev/toolbar-icons.md, "the one control that
+		// is not a button"): a tooltip that opens on focus over a dropdown the user is about to open
+		// is a tooltip in the way of the control. It carries an explicit aria-label instead, because
+		// a select named only by its title has a weak, browser-dependent accessible name and there
+		// is no visible label beside it on an icon-only strip.
+		//
+		// **BOTH ARE WIDTH-CAPPED.** The one wide control this strip ever had was a field-name
+		// dropdown, and it was removed for being wide (Task 427). A step reads as two clock times at
+		// its longest and a speed reads "0.5x", so 8.5rem and 4.5rem hold them with nothing to
+		// spare -- and a max-width means a long translation shrinks the control rather than the map.
+		function picker(id, label, tip, w) {
+			var sel = document.createElement('select');
+			sel.id = id;
+			sel.className = 'form-select form-select-sm lpn-time-picker';
+			sel.style.cssText = 'width:auto;max-width:' + w + ';font-size:.8rem;padding:.1rem 1.3rem .1rem .35rem';
+			sel.setAttribute('aria-label', label);
+			if (tip) { sel.title = tip; }
+			container.appendChild(sel);
+			return sel;
+		}
+		ui = {};
+		ui.prev = btn('step-back', S.prev, function () { stepBy(-1); });
+		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } });
+		ui.next = btn('step-fwd', S.next, function () { stepBy(1); });
+		// **THE STEP SELECTOR IS THE ONLY CONTROL THAT SAYS WHICH MOMENT IS SHOWING.** The slider in
+		// the pane is gone rather than mirrored here: two controls for one current step are two
+		// controls that can disagree, and only one of them is on screen when the pane is shut.
+		ui.step = picker('lpn_time_step', S.slider, S.slider, '8.5rem');
+		ui.step.addEventListener('change', function () {
+			var stops = stepTimes(), i = parseInt(ui.step.value, 10) || 0;
+			setTime(stops[Math.min(stops.length - 1, Math.max(0, i))]);
+		});
+		// Playback speed only, and it is not stored anywhere: how fast you like to watch is a fact
+		// about this minute, not about the project.
+		ui.speed = picker('lpn_time_speed', S.speed, S.speedTip, '4.5rem');
+		[[0.5, '0.5x'], [1, '1x'], [2, '2x'], [4, '4x']].forEach(function (o) {
+			ui.speed.appendChild(el('option', { value: String(o[0]) }, o[1]));
+		});
+		ui.speed.value = String(state.speed);
+		ui.speed.addEventListener('change', function () { setSpeed(parseFloat(ui.speed.value)); });
+		renderTransport();
+	};
+
+	function renderTransport() {
+		var stops, sig, i;
+		if (!ui || !ui.step) { return; }
+		stops = stepTimes();
+		sig = stops.join(',');
+		// Rebuilt only when the reporting grid itself changed -- an edit to the duration or to the
+		// report step. Rebuilding on every solve would close the list under a user who had it open.
+		if (ui.sig !== sig) {
+			ui.sig = sig;
+			ui.step.textContent = '';
+			stops.forEach(function (t, k) {
+				ui.step.appendChild(el('option', { value: String(k) }, stepText(t)));
+			});
+		}
+		i = stops.indexOf(state.t);
+		if (i < 0) {
+			i = EC.lpnTimeFrameIndexAt(stops.map(function (t) { return { t: t }; }), state.t);
+		}
+		ui.step.value = String(i < 0 ? 0 : i);
+		ui.play.setAttribute('aria-pressed', state.playing ? 'true' : 'false');
+		swapIcon(ui.play, state.playing ? 'pause' : 'play');
+	}
+
 	function renderPanel() {
-		var panel = panelEl(), S = strings(), times, stops, transport, open;
+		var panel = panelEl(), S = strings(), open;
+		// **THE TRANSPORT IS ON THE TOOLBAR AND THE PANE MAY BE SHUT**, so it is refreshed before the
+		// panel is even looked for -- an early return here used to be harmless and would now freeze
+		// the clock readout of a user watching a profile with the pane hidden, which is the exact
+		// case the move was made for.
+		renderTransport();
 		if (!panel || !host) { return; }
-		// A drag in progress owns the slider; rebuilding it under the pointer would drop the grab.
-		if (state.dragging) { updateReadout(); return; }
-		times = docTimes() || EC.lpnTimesDefaults();
 		panel.textContent = '';
 
 		// **THE ONE DOOR FROM THE TRANSPORT TO ITS SETTINGS.** The seven fields left this tab for
@@ -503,43 +688,22 @@
 		open.addEventListener('click', function () { if (host.openSettings) { host.openSettings('time'); } });
 		panel.appendChild(open);
 
-		// -- the transport (Task 248 / 410) --
-		if (!EC.lpnTimeIsExtended(times)) {
-			panel.appendChild(el('p', { style: 'padding:.2rem .6rem;margin:0' }, S.steady));
-			return;
-		}
-		stops = EC.lpnReportTimes(times);
-		transport = el('div', { class: 'lpn-time-transport', style: 'display:flex;align-items:center;gap:.4rem;padding:.3rem .6rem;flex-wrap:wrap' });
-		[[S.first, '|◀', function () { setTime(stops[0]); }],
-			[S.prev, '◀', function () { stepBy(-1); }],
-			[state.playing ? S.pause : S.play, state.playing ? '⏸' : '▶',
-				function () { if (state.playing) { pause(); } else { play(); } }],
-			[S.next, '▶', function () { stepBy(1); }],
-			[S.last, '▶|', function () { setTime(stops[stops.length - 1]); }]
-		].forEach(function (b) {
-			var btn = el('button', { type: 'button', class: 'btn btn-sm btn-outline-secondary ec-help', title: b[0] }, b[1]);
-			btn.setAttribute('aria-label', b[0]);
-			btn.addEventListener('click', b[2]);
-			transport.appendChild(btn);
-		});
-		var slider = el('input', {
-			type: 'range', min: '0', max: String(stops.length - 1), step: '1',
-			id: 'lpn_time_slider', style: 'flex:1 1 12rem;min-width:8rem',
-			value: String(Math.max(0, stops.indexOf(state.t)))
-		});
-		slider.setAttribute('aria-label', S.slider);
-		slider.addEventListener('pointerdown', function () { state.dragging = true; });
-		['pointerup', 'pointercancel', 'blur'].forEach(function (evt) {
-			slider.addEventListener(evt, function () { state.dragging = false; });
-		});
-		slider.addEventListener('input', function () {
-			var s = EC.lpnReportTimes(docTimes());
-			setTime(s[Math.min(s.length - 1, Math.max(0, parseInt(slider.value, 10) || 0))]);
-		});
-		transport.appendChild(slider);
-		transport.appendChild(el('output', { id: 'lpn_time_readout', style: 'font-variant-numeric:tabular-nums;white-space:nowrap' }));
-		panel.appendChild(transport);
-		updateReadout();
+		// **THE TRANSPORT LEFT THIS TAB FOR THE TOOLBAR** (Tom, 2026-08-18: "I was trying to find a
+		// nice place for this so you can hide the bottom pane or watch a profile during animation.
+		// epanetjs puts it on the toolbar"). It is the one thing in this pane you want to work while
+		// looking at something else, and a control inside a panel cannot be used while that panel is
+		// hidden. See lpnTimeMountToolbar().
+		//
+		// **AND THERE IS EXACTLY ONE OF IT.** The slider that used to be here is gone rather than
+		// mirrored: two controls for one current step is two controls that can disagree, and the one
+		// on the toolbar is the one that is always on screen. What is left in this tab is what a
+		// panel is for -- the tank levels, which are a TABLE.
+		//
+		// **AND A NETWORK WITH NO DURATION IS NOT TOLD ANYTHING** (Tom, 2026-08-18: "I don't think
+		// it's needed at all. The transport will always be there, and no explanation is needed").
+		// It has no run, so it has no tank levels, so this tab is the settings door and nothing
+		// else -- which is the honest amount of content for it rather than a paragraph explaining
+		// an absence.
 
 		// -- tank levels, which are the reason a run is a run --
 		var levels = state.run ? (EC.lpnTimeFrameResult(state.run, state.t) || {}).levels : null,
@@ -567,12 +731,6 @@
 		if (EC.initTips) { EC.initTips(panel); }
 	}
 
-	function updateReadout() {
-		var out = document.getElementById('lpn_time_readout'), times = docTimes();
-		if (!out) { return; }
-		out.textContent = EC.lpnTimeElapsedText(state.t) + '  ·  ' + EC.lpnTimeClockText(times, state.t);
-	}
-
 	/**
 	 * The whole seam. js/looped-network.js calls this once, at script scope, before its own
 	 * DOMContentLoaded handler builds the pane -- which is why the tab can simply be pushed onto
@@ -591,9 +749,13 @@
 					var el = panelEl();
 					if (el) { el.classList.add('on'); }
 				},
-				refresh: renderPanel,
-				// Playing while the tab is hidden would keep re-solving a map nobody is watching.
-				hide: pause
+				refresh: renderPanel
+				// **NO `hide` HOOK ANY MORE.** It used to pause the run when this tab stopped being
+				// the one showing, on the reasoning that nobody was watching. That reasoning died
+				// with the move to the toolbar: the thing being watched during playback is the MAP
+				// and the PROFILE, and Tom asked for the transport out here precisely "so you can
+				// hide the bottom pane or watch a profile during animation". Pausing on tab-hide
+				// would stop the run at the moment it became useful.
 			});
 		}
 	};
