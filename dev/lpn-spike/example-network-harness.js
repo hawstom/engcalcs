@@ -77,7 +77,7 @@ const L = loadLoopedNetwork(
   "\t\tlabelSide: function (id) { return labelEls[id] ? labelEls[id].side : null; },\n" +
   "\t\topenSettingsBox: openSettingsBox, closeSettingsBox: closeSettingsBox,\n" +
   "\t\tdefaultSettings: defaultSettings,\n" +
-  "\t\tsettingsFieldsEl: function () { return document.getElementById('lpn_settings_fields'); },\n" +
+  "\t\tsettingsFieldsEl: function () { return document.getElementById('lpn_set_map_fields'); },\n" +
   "\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
   "\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
   "\t\t\tnextId = { J: 1, R: 1, L: 1, P: 1, T: 1 };\n" +

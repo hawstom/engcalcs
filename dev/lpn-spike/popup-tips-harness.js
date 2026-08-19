@@ -75,8 +75,12 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_empty_hint', 'lpn_labels_legend', 'lpn_labels_link_fields', 'lpn_labels_node_fields',
   'lpn_labels_options', 'lpn_labels_popup', 'lpn_labels_popup_close', 'lpn_mode_hint', 'lpn_map_notice', 'lpn_map_overlay_tl',
   'lpn_popup', 'lpn_popup_close', 'lpn_popup_fields', 'lpn_popup_title', 'lpn_projects_btn',
-  'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close', 'lpn_settings_fields',
-  'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar'
+  'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close',
+  'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar',
+  // The Settings box's hosts (Task 441, restructured): rebuildSettingsFields() writes a row into
+  // the host that stands under its own sub-heading, and returns early if any of the six is absent.
+  'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
+  'lpn_set_hydraulics_fields', 'lpn_set_page_fields'
 ].forEach(ensure);
 
 global.document = {
@@ -366,7 +370,10 @@ const two = [PC.lpn_settings_restore_tip, PC.lpn_reset_all_tip];
 ok('both reset tips exist', two.every(t => t && t.length > 20));
 ok('the two reset tips are distinct', new Set(two).size === 2);
 
-const sf = byId.lpn_settings_fields;
+// The two reset buttons are under the Page sub-heading now (Task 441, restructured): they are
+// the calculator's own commands, and a foot of actions under no heading was the last thing in the
+// box with no answer to "where am I".
+const sf = byId.lpn_set_page_fields;
 L.rebuildSettingsFields();
 function buttonsIn(root) {
   const out = [];

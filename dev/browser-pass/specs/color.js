@@ -105,9 +105,31 @@ exports.run = async function ({ browser, report }) {
 		// for a field that has values on the map, and a one-junction network before a solve has
 		// none — which is a fact about the network, not about this feature.
 		const ranges = await a.page.evaluate(() =>
-			[...document.querySelectorAll('#lpn_set_colors div')]
+			[...document.querySelectorAll('#lpn_set_colors_node div, #lpn_set_colors_link div')]
 				.filter(d => d.style.fontWeight === 'bold').map(d => d.textContent));
 		report.eq(ranges.length, 2, 'each coloured field gets its own band limits', ranges.join(' | '));
+		// **AND EACH ONE IS UNDER THE SUB-HEADING OF THE ELEMENT IT COLOURS** (Tom, 2026-08-18:
+		// "Dissolve Color by value and put its items in Node symbology and Link symbology"). One
+		// question — how is a junction drawn — used to be answered in two panels.
+		report.eq(await a.page.evaluate(() =>
+			document.querySelectorAll('#lpn_set_colors_node select').length), 1,
+			'the node dropdown is under Node symbology');
+		report.eq(await a.page.evaluate(() =>
+			document.querySelectorAll('#lpn_set_colors_link select').length), 1,
+			'the link dropdown is under Link symbology');
+
+		// **EVERY SWATCH IS EXACTLY THE SAME WIDTH** (Tom: "The colour palette does not show
+		// nicely. First color expands to use all space"). It did: the strip wore a labelled row's
+		// class, whose first child takes all the slack. Measured as PAINTED widths, because that is
+		// the only place a flex rule and a percentage can be told apart.
+		const swatches = await a.page.evaluate(() =>
+			[...document.querySelectorAll('#lpn_set_ramp_strip .lpn-color-swatch')]
+				.map(sw => +sw.getBoundingClientRect().width.toFixed(2)));
+		report.ok(swatches.length >= 3, 'the ramp is drawn as a strip of swatches',
+			swatches.join(', '));
+		const spread = Math.max(...swatches) - Math.min(...swatches);
+		report.ok(spread <= 1, '...and every one is the same width, to within sub-pixel rounding',
+			`widest ${Math.max(...swatches)}, narrowest ${Math.min(...swatches)}`);
 
 		// The legend is the second door in — it is the chrome already telling the user what the
 		// colours mean — and since Task 441 it opens the box on its Coloring section.
@@ -120,14 +142,19 @@ exports.run = async function ({ browser, report }) {
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_settings_box').style.display === 'flex'),
 			'clicking the legend opens it again');
-		// It lands ON the Coloring section rather than merely opening: the content pane is scrolled
-		// so that section's heading is at its top.
+		// It lands ON the colour controls rather than merely opening. There is no Coloring section
+		// any more, so the target is the Node symbology sub-heading — and the check that matters is
+		// that it is VISIBLE, not merely scrolled to: `block: 'start'` puts a sub-heading exactly
+		// where the sticky section heading is about to be, which is the defect Tom reported as "the
+		// scroll target lands UNDER the level-1 heading".
 		report.ok(await a.page.evaluate(() => {
 			const pane = document.getElementById('lpn_setbox_content');
-			const head = document.querySelector('#lpn_set_sec_coloring .lpn-set-head');
-			if (!pane || !head) { return false; }
-			return Math.abs(head.getBoundingClientRect().top - pane.getBoundingClientRect().top) < 40;
-		}), '...scrolled to the Coloring section, not merely opened');
+			const sub = document.getElementById('lpn_set_sub_nodeSym');
+			const head = document.querySelector('#lpn_set_sec_map .lpn-set-head');
+			if (!pane || !sub || !head) { return false; }
+			const s = sub.getBoundingClientRect(), h = head.getBoundingClientRect();
+			return s.top - h.bottom >= -1 && s.top - pane.getBoundingClientRect().top < 60;
+		}), '...scrolled to the colour controls, clear of the sticky heading');
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {

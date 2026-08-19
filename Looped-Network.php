@@ -557,52 +557,96 @@ echoHeader("EngCalcs", $html_title, "", false);
 			<?php // Built by buildSettingsIndex(), from the content pane's own headings. ?>
 			<nav id="lpn_setbox_index" class="lpn-setbox-index" aria-label="<?=htmlspecialchars($ec_lang['lpn_menu_settings'])?>"></nav>
 			<div id="lpn_setbox_content" class="lpn-setbox-content">
-				<?php // ---- Section: LABELS ----
-				      // Moved here WHOLE from the right pane, which had it from the old Labels
-				      // pull-down. The three hosts keep their IDs through both moves: they are what
-				      // rebuildLabelsFields() writes into, and renaming them would have been churn
-				      // in a function this move does not otherwise touch. ?>
-				<section id="lpn_set_sec_labels" class="lpn-set-sec" data-set-sec="labels">
-					<h3 class="lpn-set-head"><?=$ec_lang['lpn_tool_labels']?></h3>
+				<?php // ---- FOUR CATEGORIES, AND THE FOURTH IS NOT BUILT YET ----------------------------
+				      //
+				      // Tom, 2026-08-18, after using the box: the sections it opened with were the four
+				      // panels it had absorbed -- Labels, Settings, Time, Coloring -- which is a record of
+				      // where the controls came from, not a place a stranger can find one. These three
+				      // sections and their sub-headings are his own grouping, and Quality is his fourth,
+				      // still to come: it is a sibling of Hydraulics under Calculation and needs nothing
+				      // here changed to arrive.
+				      //
+				      // **THERE IS NO SECTION CALLED "SETTINGS" ANY MORE.** The BOX is Settings; a section
+				      // inside it repeating the word is the Settings-inside-Settings that made Tom ask
+				      // "Settings is a bad heading. Can you advise?"
+				      //
+				      // **THE SUB-HEADINGS ARE MARKUP AND THE ROWS UNDER THEM ARE JS.** A sub-heading is a
+				      // place in the box -- an index row, a jump target, a heading a translator reads --
+				      // and none of that depends on the document. What is inside one does: the labels
+				      // lists follow the friction method, the range editors exist only for a field being
+				      // coloured by. So the skeleton is here, once, and the builders fill named hosts.
+				      //
+				      // A host carrying `lpn-set-part` is TRANSPARENT TO THE SEARCH: the filter recurses
+				      // into it and hides row by row, so two builders can share one sub-heading without a
+				      // search for "opacity" turning up everything either of them wrote. ?>
+				<section id="lpn_set_sec_map" class="lpn-set-sec" data-set-sec="map">
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_map']?></h3>
 					<div class="lpn-set-secbody">
-						<div class="lpn-set-sub"><?=$ec_lang['lpn_labels_heading_node']?></div>
-						<div class="lpn-set-subbody"><div id="lpn_labels_node_fields"></div></div>
-						<div class="lpn-set-sub"><?=$ec_lang['lpn_labels_heading_link']?></div>
-						<div class="lpn-set-subbody"><div id="lpn_labels_link_fields"></div></div>
-						<div id="lpn_labels_options"></div>
+						<?php // Node symbology, then link symbology: how each kind of element is DRAWN and
+						      // what is PRINTED beside it, which is one question and was two panels. Tom:
+						      // "Dissolve Color by value and put its items in Node symbology and Link
+						      // symbology." ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_node_symbology']?></div>
+						<div class="lpn-set-subbody">
+							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
+							<div id="lpn_labels_node_fields"></div>
+						</div>
+						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_link_symbology']?></div>
+						<div class="lpn-set-subbody">
+							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
+							<div id="lpn_labels_link_fields"></div>
+						</div>
+						<?php // Map appearance holds what is true of the WHOLE map: the colour scheme both
+						      // symbologies draw from, the sizes, the two legend positions. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_mapDisplay"><?=$ec_lang['lpn_settings_map_display']?></div>
+						<div class="lpn-set-subbody">
+							<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
+							<?php // ColorBrewer's schemes are Apache-2.0 and that licence requires this
+							      // acknowledgement in end-user documentation. Untranslated on purpose,
+							      // exactly like the OpenStreetMap credit on the map: a name and a URL. ?>
+							<div class="lpn-rp-credit">Color schemes by Cynthia Brewer, <a href="https://colorbrewer2.org/" target="_blank" rel="noopener">colorbrewer2.org</a></div>
+							<div id="lpn_set_map_fields" class="lpn-set-part"></div>
+							<div id="lpn_labels_options" class="lpn-set-part"></div>
+						</div>
+						<?php // Tom: "Change Calculator to Page and make it a heading." The one group in the
+						      // box that is NOT carried in the project file, which its note says out loud. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_page"><?=$ec_lang['lpn_settings_page']?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_page_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
-				<?php // ---- Section: SETTINGS ----
-				      // The panel that used to be the whole of this box: ID prefixes, default inputs,
-				      // map display, units, computation. Its sub-headings no longer collapse (Tom:
-				      // "No need ever to collapse; just scroll/jump to your section") and each one is
-				      // an index row instead. Built in JS by rebuildSettingsFields(). ?>
-				<section id="lpn_set_sec_settings" class="lpn-set-sec" data-set-sec="settings">
-					<h3 class="lpn-set-head"><?=$ec_lang['lpn_menu_settings']?></h3>
-					<div class="lpn-set-secbody" id="lpn_settings_fields"></div>
-				</section>
-				<?php // ---- Section: TIME ----
-				      // The seven [TIMES] fields, moved out of the bottom pane's Time tab (Task 441).
-				      // The tab keeps the TRANSPORT -- play, step, slider -- because that is a viewing
-				      // control, not a setting: it changes which moment you are looking at and never
-				      // touches the document. Built by js/lpn-time.js, which owns every string in it. ?>
-				<section id="lpn_set_sec_time" class="lpn-set-sec" data-set-sec="time">
-					<h3 class="lpn-set-head"><?=$ec_lang['lpn_time_menu']?></h3>
-					<div class="lpn-set-secbody" id="lpn_set_time_fields"></div>
-				</section>
-				<?php // ---- Section: COLORING ----
-				      // ONE colour editor, where there were two: the right pane's and a duplicate
-				      // section inside Settings, over the same `settings` keys. Two views of one
-				      // setting is a drift waiting to happen, and one of them had the ramp families
-				      // while the other had the legend position. Built by buildColoringSection(). ?>
-				<section id="lpn_set_sec_coloring" class="lpn-set-sec" data-set-sec="coloring">
-					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_colors']?></h3>
+				<?php // ---- Section: NEW ELEMENTS ----
+				      // "Element" is this app's own word (CLAUDE.md, the scope doc, every function name)
+				      // and "Insert" is already the menu verb, so the category needed no new vocabulary.
+				      // Everything here decides what the NEXT element you draw looks like and is called;
+				      // nothing here changes anything already drawn. ?>
+				<section id="lpn_set_sec_elements" class="lpn-set-sec" data-set-sec="elements">
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_elements']?></h3>
 					<div class="lpn-set-secbody">
-						<div id="lpn_set_colors"></div>
-						<?php // ColorBrewer's schemes are Apache-2.0 and that licence requires this
-						      // acknowledgement in end-user documentation. Untranslated on purpose,
-						      // exactly like the OpenStreetMap credit on the map: a name and a URL. ?>
-						<div class="lpn-rp-credit">Color schemes by Cynthia Brewer, <a href="https://colorbrewer2.org/" target="_blank" rel="noopener">colorbrewer2.org</a></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_idPrefixes"><?=$ec_lang['lpn_settings_id_prefixes']?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_id_fields" class="lpn-set-part"></div></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_defaults"><?=$ec_lang['lpn_settings_defaults']?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_default_fields" class="lpn-set-part"></div></div>
+					</div>
+				</section>
+				<?php // ---- Section: CALCULATION ----
+				      // Units, Time, Hydraulics -- what the numbers MEAN, WHEN they are asked for, and HOW
+				      // they are solved. "Hydraulics" is EPANET's own name for the third group (its
+				      // Analysis Options are Hydraulics, Quality, Reactions, Times, Energy), so Tom's
+				      // future Quality category is a sibling of it rather than a new idea.
+				      //
+				      // The time fields are built by js/lpn-time.js, which owns every string in them;
+				      // absent that file the sub-heading stands over an empty body rather than breaking.
+				      // The bottom pane's Time tab keeps the TRANSPORT -- play, step, slider -- because
+				      // that changes which moment you are looking at and never touches the document. ?>
+				<section id="lpn_set_sec_calc" class="lpn-set-sec" data-set-sec="calc">
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_calculation']?></h3>
+					<div class="lpn-set-secbody">
+						<div class="lpn-set-sub" id="lpn_set_sub_units"><?=$ec_lang['lpn_view_units']?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_units_fields" class="lpn-set-part"></div></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_time"><?=$ec_lang['lpn_time_menu']?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_time_fields" class="lpn-set-part"></div></div>
+						<div class="lpn-set-sub" id="lpn_set_sub_hydraulics"><?=$ec_lang['lpn_settings_hydraulics']?></div>
+						<div class="lpn-set-subbody"><div id="lpn_set_hydraulics_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
 			</div>
@@ -893,6 +937,8 @@ EngCalcs.pageConfig = {
 	lpn_labels_col_before: <?=json_encode($ec_lang['lpn_labels_col_before'])?>,
 	lpn_labels_col_after: <?=json_encode($ec_lang['lpn_labels_col_after'])?>,
 	lpn_labels_col_decimals: <?=json_encode($ec_lang['lpn_labels_col_decimals'])?>,
+	lpn_labels_col_decimals_example: <?=json_encode($ec_lang['lpn_labels_col_decimals_example'])?>,
+	lpn_labels_col_rank: <?=json_encode($ec_lang['lpn_labels_col_rank'])?>,
 	lpn_labels_priority_link_tip: <?=json_encode($ec_lang['lpn_labels_priority_link_tip'])?>,
 	lpn_labels_priority_node_tip: <?=json_encode($ec_lang['lpn_labels_priority_node_tip'])?>,
 	lpn_field_id: <?=json_encode($ec_lang['lpn_field_id'])?>,
@@ -1167,7 +1213,6 @@ EngCalcs.pageConfig = {
 	lpn_backdrop_coords_prompt: <?=json_encode($ec_lang['lpn_backdrop_coords_prompt'])?>,
 	lpn_backdrop_continue: <?=json_encode($ec_lang['lpn_backdrop_continue'])?>,
 	lpn_tool_settings: <?=json_encode($ec_lang['lpn_tool_settings'])?>,
-	lpn_settings_scope_project: <?=json_encode($ec_lang['lpn_settings_scope_project'])?>,
 	lpn_settings_id_prefixes: <?=json_encode($ec_lang['lpn_settings_id_prefixes'])?>,
 	lpn_settings_defaults: <?=json_encode($ec_lang['lpn_settings_defaults'])?>,
 	lpn_settings_defaults_note: <?=json_encode($ec_lang['lpn_settings_defaults_note'])?>,
@@ -1210,8 +1255,7 @@ EngCalcs.pageConfig = {
       // 2026-07-30 because nothing can create an emitter yet (ROADMAP Task 191). The language key
       // stays in lib/lang.ec.en.php so restoring the control is one line here and one there. ?>
 
-	lpn_settings_computation: <?=json_encode($ec_lang['lpn_settings_computation'])?>,
-	lpn_settings_scope_calculator: <?=json_encode($ec_lang['lpn_settings_scope_calculator'])?>,
+	lpn_settings_page_note: <?=json_encode($ec_lang['lpn_settings_page_note'])?>,
 	lpn_settings_show_titles: <?=json_encode($ec_lang['lpn_settings_show_titles'])?>,
 	lpn_settings_show_titles_tip: <?=json_encode($ec_lang['lpn_settings_show_titles_tip'])?>,
 	lpn_settings_tolerance: <?=json_encode($ec_lang['lpn_settings_tolerance'])?>,
@@ -1245,7 +1289,6 @@ EngCalcs.pageConfig = {
 	lpn_settings_legend_bottom_right: <?=json_encode($ec_lang['lpn_settings_legend_bottom_right'])?>,
 <?php // Colour by value (ROADMAP Task 384) and the thematic map (Task 327) -- the Settings panel's
       // "Color by value" section and the on-map colour key. ?>
-	lpn_settings_colors: <?=json_encode($ec_lang['lpn_settings_colors'])?>,
 	lpn_settings_color_node_field: <?=json_encode($ec_lang['lpn_settings_color_node_field'])?>,
 	lpn_settings_color_link_field: <?=json_encode($ec_lang['lpn_settings_color_link_field'])?>,
 	lpn_settings_color_ramp: <?=json_encode($ec_lang['lpn_settings_color_ramp'])?>,
@@ -1290,6 +1333,10 @@ EngCalcs.pageConfig = {
 <script src="/engcalcs/js/lpn-collide.js?v=<?=filemtime(__DIR__.'/js/lpn-collide.js')?>"></script>
 <script src="/engcalcs/js/lpn-profile.js?v=<?=filemtime(__DIR__.'/js/lpn-profile.js')?>"></script>
 <script src="/engcalcs/js/lpn-georef.js?v=<?=filemtime(__DIR__.'/js/lpn-georef.js')?>"></script>
+<?php // The colour catalogue and the swatch GEOMETRY (js/lpn-ramps.js). Pure arithmetic, no DOM:
+      // the strip in the Coloring controls asks it how wide each box is rather than counting on
+      // flex, which is how the first swatch came to eat the whole strip. ?>
+<script src="/engcalcs/js/lpn-ramps.js?v=<?=filemtime(__DIR__.'/js/lpn-ramps.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>

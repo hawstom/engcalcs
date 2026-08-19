@@ -242,7 +242,9 @@ console.log('\n--- the rulings that are easiest to undo by accident ---');
 	const box = php.indexOf('id="lpn_settings_box"');
 	report(box > 0, 'the Settings box is in the page');
 	['lpn_labels_node_fields', 'lpn_labels_link_fields', 'lpn_labels_options',
-		'lpn_settings_fields', 'lpn_set_time_fields', 'lpn_set_colors'].forEach((id) => {
+		'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
+		'lpn_set_time_fields', 'lpn_set_hydraulics_fields', 'lpn_set_page_fields',
+		'lpn_set_colors_node', 'lpn_set_colors_link', 'lpn_set_colors_shared'].forEach((id) => {
 		const at = php.indexOf('id="' + id + '"');
 		report(at > box, `...and ${id} lives inside it`, at < 0 ? 'missing' : '');
 	});
