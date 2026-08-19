@@ -601,10 +601,12 @@ echoHeader("EngCalcs", $html_title, "", false);
 						<div class="lpn-set-sub" id="lpn_set_sub_mapDisplay"><?=$ec_lang['lpn_settings_map_display']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
-							<?php // ColorBrewer's schemes are Apache-2.0 and that licence requires this
-							      // acknowledgement in end-user documentation. Untranslated on purpose,
-							      // exactly like the OpenStreetMap credit on the map: a name and a URL. ?>
-							<div class="lpn-rp-credit">Color schemes by Cynthia Brewer, <a href="https://colorbrewer2.org/" target="_blank" rel="noopener">colorbrewer2.org</a></div>
+							<?php // The colour-scheme acknowledgements are rendered into this section by
+							      // buildColoringSection(), VERBATIM out of EngCalcs.lpnRamps.CREDITS --
+							      // one licence fixes its own wording, so the sentence lives beside the
+							      // ramps it is about rather than being retyped here where it could
+							      // drift. Untranslated on purpose, exactly like the OpenStreetMap
+							      // credit on the map. ?>
 							<div id="lpn_set_map_fields" class="lpn-set-part"></div>
 							<div id="lpn_labels_options" class="lpn-set-part"></div>
 						</div>

@@ -1,34 +1,38 @@
-// §14 — colour by value: a dropdown for nodes and one for links (ROADMAP Tasks 427 and 441).
+// §14 — colour by value, and THE RAMP PICKER (ROADMAP Tasks 427, 429 and 441).
 //
 // The mode shipped with Task 384 inside Settings, and Task 327 pulled it onto the toolbar as ONE
 // select doing both fields. Tom, 2026-08-18: "I do see the beauty of the one control ... but it's
 // not the expectation" — EPANET and epanet-js both give nodes and links a dropdown each, and the
-// single control's habit of clearing the other field is what made it surprising.
+// single control's habit of clearing the other field is what made it surprising. The two dropdowns
+// then went into the **Coloring section of the Settings box**, which also killed the duplicate copy
+// of these controls that had been living in the Settings panel.
 //
-// The two dropdowns went to the Visibility panel and then, the same day, into the **Coloring
-// section of the Settings box** — Tom: "Combine Labels settings, present design Settings, Time
-// settings ... and Coloring into the Settings box." That move also killed the duplicate copy of
-// these controls that had been living inside the Settings panel, which is asserted here as a count.
+// **AND THEN THE PICKER ITSELF WAS REJECTED**, in these words: *"our ramp selector is neither fun
+// nor pretty; the color boxes are not uniform widths, the dropdown has names instead of colors"*,
+// and *"I expected 7 colors per ramp, dozens of ramps, graphics in the dropdown, 5 range allocation
+// modes, and a choice of number of ranges."* So it is no longer a <select> — a <select> cannot hold
+// a picture — but a button showing one swatch bar over a popup that is a scrolling column of them.
 //
-// This is a browser check because every claim is about REACHABILITY: the buttons that open the box
-// exist, the legend is a second way in, and the two fields no longer clear each other.
+// This is a browser check because every claim below is about what is PAINTED and what is
+// REACHABLE: equal widths are a fact about layout that only a real layout can answer, and a picker
+// that cannot be opened from the keyboard is not a picker for everybody.
 
 const { Session } = require('../lib/session');
 
-exports.title = '14. Colour by value';
+exports.title = '14. Colour by value and the ramp picker';
 
-async function storedFields(a) {
+async function storedSettings(a) {
 	return a.page.evaluate(() => {
-		let node = null, link = null;
+		let out = null;
 		for (let i = 0; i < localStorage.length; i++) {
 			const k = localStorage.key(i);
 			if (!/^lpn_proj/.test(k)) { continue; }
 			try {
 				const d = JSON.parse(localStorage.getItem(k));
-				if (d.settings) { node = d.settings.colorNodeField; link = d.settings.colorLinkField; }
+				if (d.settings) { out = d.settings; }
 			} catch (e) { /* not ours */ }
 		}
-		return { node: node, link: link };
+		return out || {};
 	});
 }
 
@@ -39,6 +43,16 @@ async function pick(a, id, value) {
 		s.dispatchEvent(new Event('change', { bubbles: true }));
 	}, [id, value]);
 	await a.settle(400);
+}
+
+// Painted widths of one bar. The only place a flex rule and a percentage can be told apart.
+async function barWidths(a, sel) {
+	return a.page.evaluate((s) => {
+		const host = document.querySelector(s);
+		if (!host) { return null; }
+		return [...host.querySelectorAll('.lpn-color-swatch')]
+			.map(sw => +sw.getBoundingClientRect().width.toFixed(2));
+	}, sel);
 }
 
 exports.run = async function ({ browser, report }) {
@@ -75,14 +89,6 @@ exports.run = async function ({ browser, report }) {
 		report.ok(opts.node.every(o => o.t && o.t.trim()) && opts.link.every(o => o.t && o.t.trim()),
 			'every option is named, none blank');
 
-		// The ramp picker speaks ColorBrewer: sequential and diverging, which is the vocabulary
-		// matplotlib, d3, QGIS and ArcGIS all use. epanet-js says "Continuous"; we do not.
-		const families = await a.page.evaluate(() =>
-			[...document.querySelectorAll('#lpn_set_ramp optgroup')].map(g => g.label));
-		report.eq(families.length, 2, 'the ramps are grouped into families', families.join(' | '));
-		report.has(families.join(' | ').toLowerCase(), 'sequential', 'the standard word, not "continuous"');
-		report.has(families.join(' | ').toLowerCase(), 'diverging', 'and diverging beside it');
-
 		// **ONE COLOUR EDITOR, NOT TWO** (Task 441). The Settings panel used to carry a second copy
 		// of these controls over the same settings, and the two had already drifted apart. Asserted
 		// by counting the node-field select in the whole document: a second editor is a second one.
@@ -91,45 +97,220 @@ exports.run = async function ({ browser, report }) {
 			'there is exactly one node-colour dropdown in the box');
 
 		await pick(a, 'lpn_set_color_node', 'pressure');
-		report.eq((await storedFields(a)).node, 'pressure', 'choosing a node field stores it on the project');
+		report.eq((await storedSettings(a)).colorNodeField, 'pressure',
+			'choosing a node field stores it on the project');
 
 		// **THE WHOLE POINT OF TASK 427**: the link field does NOT clear the node field. Both can be
 		// coloured at once, and renderColorLegend() draws a block for each.
 		await pick(a, 'lpn_set_color_link', 'velocity');
-		const both = await storedFields(a);
-		report.eq(both.link, 'velocity', 'choosing a link field stores that too');
-		report.eq(both.node, 'pressure', '...and leaves the node field alone — one each, not one between them');
-		// ...and the section gives each of them its own range editor, which is the other half of
-		// "one each": a single set of band limits over two different quantities would be nonsense.
-		// Asserted on the RANGES rather than on the legend, because the legend only draws a block
-		// for a field that has values on the map, and a one-junction network before a solve has
-		// none — which is a fact about the network, not about this feature.
-		const ranges = await a.page.evaluate(() =>
-			[...document.querySelectorAll('#lpn_set_colors_node div, #lpn_set_colors_link div')]
-				.filter(d => d.style.fontWeight === 'bold').map(d => d.textContent));
-		report.eq(ranges.length, 2, 'each coloured field gets its own band limits', ranges.join(' | '));
-		// **AND EACH ONE IS UNDER THE SUB-HEADING OF THE ELEMENT IT COLOURS** (Tom, 2026-08-18:
-		// "Dissolve Color by value and put its items in Node symbology and Link symbology"). One
-		// question — how is a junction drawn — used to be answered in two panels.
+		const both = await storedSettings(a);
+		report.eq(both.colorLinkField, 'velocity', 'choosing a link field stores that too');
+		report.eq(both.colorNodeField, 'pressure',
+			'...and leaves the node field alone — one each, not one between them');
 		report.eq(await a.page.evaluate(() =>
-			document.querySelectorAll('#lpn_set_colors_node select').length), 1,
-			'the node dropdown is under Node symbology');
+			document.querySelectorAll('#lpn_set_colors_node select[id^="lpn_set_color_"]').length), 2,
+			'the node dropdown and its range mode are under Node symbology');
 		report.eq(await a.page.evaluate(() =>
-			document.querySelectorAll('#lpn_set_colors_link select').length), 1,
-			'the link dropdown is under Link symbology');
+			document.querySelectorAll('#lpn_set_colors_link select[id^="lpn_set_color_"]').length), 2,
+			'the link dropdown and its range mode are under Link symbology');
+
+		// ---- THE CLOSED PICKER ---------------------------------------------------------------
+		const btn = await a.page.evaluate(() => {
+			const b = document.getElementById('lpn_set_ramp');
+			return b ? {
+				tag: b.tagName, pop: b.getAttribute('aria-haspopup'),
+				expanded: b.getAttribute('aria-expanded'), label: b.getAttribute('aria-label'),
+				text: b.textContent.trim()
+			} : null;
+		});
+		report.eq(btn && btn.tag, 'BUTTON', 'the picker is a button, not a select — a select cannot hold a picture');
+		report.eq(btn && btn.pop, 'listbox', '...that says it opens a listbox');
+		report.eq(btn && btn.expanded, 'false', '...and starts closed');
+		report.eq(btn && btn.text, '', 'the closed state shows COLOUR and no name');
+		report.ok(btn && /\S/.test(btn.label || ''),
+			'...with the scheme name as its accessible name instead', btn && btn.label);
 
 		// **EVERY SWATCH IS EXACTLY THE SAME WIDTH** (Tom: "The colour palette does not show
 		// nicely. First color expands to use all space"). It did: the strip wore a labelled row's
-		// class, whose first child takes all the slack. Measured as PAINTED widths, because that is
-		// the only place a flex rule and a percentage can be told apart.
-		const swatches = await a.page.evaluate(() =>
-			[...document.querySelectorAll('#lpn_set_ramp_strip .lpn-color-swatch')]
-				.map(sw => +sw.getBoundingClientRect().width.toFixed(2)));
-		report.ok(swatches.length >= 3, 'the ramp is drawn as a strip of swatches',
-			swatches.join(', '));
-		const spread = Math.max(...swatches) - Math.min(...swatches);
-		report.ok(spread <= 1, '...and every one is the same width, to within sub-pixel rounding',
-			`widest ${Math.max(...swatches)}, narrowest ${Math.min(...swatches)}`);
+		// class, whose first child takes all the slack.
+		const closed = await barWidths(a, '#lpn_set_ramp');
+		report.eq(closed && closed.length, 7, 'the closed bar draws one box per class, seven by default',
+			closed && closed.join(', '));
+		report.ok(closed && Math.max(...closed) - Math.min(...closed) <= 1,
+			'...and every one is the same width, to within sub-pixel rounding',
+			closed && `widest ${Math.max(...closed)}, narrowest ${Math.min(...closed)}`);
+
+		// ---- THE OPEN PICKER -------------------------------------------------------------------
+		await a.page.click('#lpn_set_ramp');
+		await a.settle(250);
+		const open = await a.page.evaluate(() => {
+			const pop = document.getElementById('lpn_set_ramp_list');
+			const rows = [...pop.querySelectorAll('[role="option"]')];
+			const heads = [...pop.querySelectorAll('.lpn-ramp-fam')];
+			return {
+				shown: getComputedStyle(pop).display !== 'none',
+				role: pop.getAttribute('role'),
+				rows: rows.length,
+				named: rows.every(r => (r.getAttribute('aria-label') || '').trim().length > 0),
+				silent: rows.every(r => r.textContent.trim() === ''),
+				swatches: rows.map(r => r.querySelectorAll('.lpn-color-swatch').length),
+				selected: rows.filter(r => r.getAttribute('aria-selected') === 'true')
+					.map(r => r.getAttribute('data-ramp')),
+				heads: heads.map(h => h.textContent),
+				scrolls: pop.scrollHeight > pop.clientHeight
+			};
+		});
+		report.ok(open.shown, 'clicking it opens the list');
+		report.eq(open.role, 'listbox', '...as a listbox');
+		report.ok(open.rows >= 40, 'dozens of ramps, as Tom expected', open.rows + ' rows');
+		report.ok(open.silent, 'every row is a PICTURE — no names anywhere in the list');
+		report.ok(open.named, '...with the name in aria-label, where a screen reader finds it');
+		report.ok(open.swatches.every(n => n === 7),
+			'...and every row draws the CURRENT class count, not always seven by accident',
+			[...new Set(open.swatches)].join(','));
+		report.eq(open.selected.length, 1, 'exactly one row is marked selected', open.selected.join(','));
+		report.ok(open.scrolls, 'the list scrolls inside itself rather than growing the page');
+		const headText = open.heads.join(' | ');
+		report.has(headText.toLowerCase(), 'sequential', 'the standard word, not epanet-js\'s "continuous"');
+		report.has(headText.toLowerCase(), 'diverging', 'and diverging beside it');
+		report.has(headText.toLowerCase(), 'qualitative', 'and qualitative, which the five-ramp era had none of');
+		report.ok(!/continuous/i.test(headText), 'and nothing calls a family "Continuous"', headText);
+		// **EACH HEADING CARRIES AN ABBREVIATED EXAMPLE**, because which family suits the data is
+		// the one thing the pictures cannot say. Tom: "No suggest family. Simply put examples with
+		// headings" — so every heading has one and none of them is marked as recommended.
+		report.ok(open.heads.every(h => /\(.+\)/.test(h)), 'every family heading carries an example', headText);
+		report.ok(/epanet/i.test(open.heads[open.heads.length - 1]),
+			'the rainbow is last, in a group of its own, and says what it is for',
+			open.heads[open.heads.length - 1]);
+		// **CLAUSES 4 AND 5 OF THE LICENCE**: the name may not appear on a control. It appears once,
+		// inside the acknowledgement clause 2 fixes the wording of, and nowhere else.
+		const brewer = await a.page.evaluate(() => {
+			const box = document.getElementById('lpn_settings_box');
+			const credit = document.getElementById('lpn_set_ramp_credits');
+			return {
+				credit: credit ? credit.textContent : '',
+				elsewhere: box.textContent.split('ColorBrewer').length - 1,
+				labels: [...box.querySelectorAll('[aria-label]')]
+					.map(e => e.getAttribute('aria-label')).join(' | ')
+			};
+		});
+		report.has(brewer.credit,
+			'This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).',
+			'the acknowledgement appears verbatim where the ramps are chosen');
+		report.eq(brewer.elsewhere, 0, 'and the word "ColorBrewer" appears on no control at all');
+		report.ok(!/ColorBrewer/.test(brewer.labels), '...nor in any accessible name');
+
+		// Choosing a row stores it, repaints the button, and shuts the list.
+		const target = await a.page.evaluate(() => {
+			const rows = [...document.querySelectorAll('#lpn_set_ramp_list [role="option"]')];
+			const other = rows.find(r => r.getAttribute('aria-selected') !== 'true');
+			other.click();
+			return other.getAttribute('data-ramp');
+		});
+		await a.settle(400);
+		report.eq((await storedSettings(a)).colorRamp, target, 'clicking a row stores that ramp on the project');
+		report.ok(await a.page.evaluate(() =>
+			document.getElementById('lpn_set_ramp_list').style.display === 'none'),
+			'...and the list closes behind the choice');
+
+		// **KEYBOARD-OPERABLE**, which a picture-only control has to be or it is nobody's picker.
+		await a.page.focus('#lpn_set_ramp');
+		await a.page.keyboard.press('ArrowDown');
+		await a.settle(250);
+		report.ok(await a.page.evaluate(() =>
+			document.getElementById('lpn_set_ramp').getAttribute('aria-expanded') === 'true'),
+			'Down opens the list from the keyboard');
+		report.ok(await a.page.evaluate(() =>
+			(document.activeElement.getAttribute('role') === 'option')),
+			'...with a row focused, so the arrows walk the list');
+		const walked = await a.page.evaluate(() => {
+			const before = document.activeElement.getAttribute('data-ramp');
+			return before;
+		});
+		await a.page.keyboard.press('ArrowDown');
+		await a.settle(150);
+		report.ok(await a.page.evaluate((b) =>
+			document.activeElement.getAttribute('data-ramp') !== b, walked),
+			'...and Down moves to the next ramp');
+		await a.page.keyboard.press('Escape');
+		await a.settle(200);
+		report.ok(await a.page.evaluate(() =>
+			document.getElementById('lpn_set_ramp').getAttribute('aria-expanded') === 'false' &&
+			document.activeElement.id === 'lpn_set_ramp'),
+			'Escape closes it and hands the focus back to the button');
+		// **INNERMOST FIRST.** The document's Escape handler closes the whole Settings box; an
+		// Escape aimed at an open list must cost the list and not the box, which is the same
+		// convention the box's own filter field follows while it holds text.
+		report.ok(await a.page.evaluate(() =>
+			document.getElementById('lpn_settings_box').style.display === 'flex'),
+			'...and the Settings box behind it stays open');
+
+		// ---- HOW MANY RANGES -------------------------------------------------------------------
+		await pick(a, 'lpn_set_ramp_classes', '4');
+		report.eq((await storedSettings(a)).colorClasses, 4, 'the count picker stores 3 to 7');
+		const four = await barWidths(a, '#lpn_set_ramp');
+		report.eq(four.length, 4, '...and the swatch follows it, so the picture cannot lie about the map',
+			four.join(', '));
+		report.ok(Math.max(...four) - Math.min(...four) <= 1, '...still exactly equal widths');
+		report.eq(await a.page.evaluate(() =>
+			document.querySelectorAll('#lpn_set_colors_node input[type="number"]').length), 3,
+			'four ranges are separated by three limits');
+		await pick(a, 'lpn_set_ramp_classes', '7');
+
+		// ---- THE MODES -------------------------------------------------------------------------
+		const modes = await a.page.evaluate(() => {
+			const read = (id) => [...document.getElementById(id).options].map(o => o.value);
+			return { node: read('lpn_set_color_mode_node'), link: read('lpn_set_color_mode_link') };
+		});
+		report.ok(modes.link.length >= 5, 'a link field offers the algorithmic modes', modes.link.join(','));
+		report.ok(modes.node.indexOf('pressure') >= 0,
+			'colouring by pressure adds the mode named Pressure', modes.node.join(','));
+		report.ok(modes.link.indexOf('pressure') < 0,
+			'...and colouring by velocity does not — a Pressure mode there invites a wrong map');
+		// A CRITERION MODE DECIDES THE CLASS COUNT: four thresholds are five classes, and the count
+		// picker must not offer to disagree with them.
+		await pick(a, 'lpn_set_color_mode_node', 'pressure');
+		report.ok(await a.page.evaluate(() =>
+			document.getElementById('lpn_set_ramp_classes').disabled), 'a criterion mode fixes the count');
+		report.eq((await barWidths(a, '#lpn_set_ramp')).length, 5,
+			'...at five, which is what four thresholds are');
+		await pick(a, 'lpn_set_color_mode_node', 'equal');
+
+		// ---- THE LIMITS ARE EDITABLE, AND A BAD ONE IS REFUSED ----------------------------------
+		const filled = await a.page.evaluate(() =>
+			[...document.querySelectorAll('#lpn_set_colors_node input[type="number"]')].map(b => b.value));
+		report.ok(filled.length === 6 && filled.every(v => v !== '' && isFinite(+v)),
+			'the limits arrive filled in by the mode, not blank', filled.join(', '));
+		// Out of order. validateBreaks() refuses it, names the box, and NOTHING is written — the
+		// user's numbers are never sorted into shape behind their back.
+		const beforeBad = (await storedSettings(a)).colorBreaks || {};
+		await a.page.evaluate(() => {
+			const boxes = [...document.querySelectorAll('#lpn_set_colors_node input[type="number"]')];
+			boxes[2].value = String(+boxes[0].value - 1);
+			boxes[2].dispatchEvent(new Event('change', { bubbles: true }));
+		});
+		await a.settle(300);
+		const refused = await a.page.evaluate(() => {
+			const msg = document.querySelector('#lpn_set_colors_node .lpn-color-msg');
+			const bad = document.querySelectorAll('#lpn_set_colors_node input.lpn-bad');
+			return { text: msg ? msg.textContent : '', shown: msg && msg.style.display !== 'none',
+				marked: bad.length, aria: bad[0] && bad[0].getAttribute('aria-invalid') };
+		});
+		report.ok(refused.shown && /\S/.test(refused.text), 'an out-of-order limit is refused in words',
+			refused.text);
+		report.eq(refused.marked, 1, '...with the offending box marked, so no message carries a number');
+		report.eq(refused.aria, 'true', '...and marked for a screen reader too');
+		report.eq(JSON.stringify((await storedSettings(a)).colorBreaks || {}), JSON.stringify(beforeBad),
+			'...and nothing was written — the map is exactly as it was');
+		// A good edit does land.
+		await a.page.evaluate(() => {
+			const boxes = [...document.querySelectorAll('#lpn_set_colors_node input[type="number"]')];
+			boxes.forEach((b, i) => { b.value = String(10 * (i + 1)); });
+			boxes[boxes.length - 1].dispatchEvent(new Event('change', { bubbles: true }));
+		});
+		await a.settle(400);
+		report.eq(JSON.stringify(((await storedSettings(a)).colorBreaks || {})['node.pressure']),
+			'[10,20,30,40,50,60]', 'a valid set of limits is stored exactly as typed');
 
 		// The legend is the second door in — it is the chrome already telling the user what the
 		// colours mean — and since Task 441 it opens the box on its Coloring section.
