@@ -393,8 +393,12 @@
 		return d.times;
 	}
 	function commitField(key, text) {
-		var times = ensureTimes();
+		// Probed BEFORE the snapshot, so text that is not a time costs nothing: an undo step that
+		// undoes nothing is worse than no undo step, because it eats a real one off a 20-deep stack.
+		var probe = EC.lpnParseTime(String(text).trim().split(/\s+/)), times;
+		if (probe === null || !isFinite(probe) || probe < 0) { renderPanel(); return; }
 		host.snapshot();
+		times = ensureTimes();
 		if (!EC.lpnTimeSetField(times, key, text)) { renderPanel(); return; }
 		// A shorter run can leave the transport past the end of it.
 		clampTime();
@@ -432,7 +436,7 @@
 	}
 
 	function renderPanel() {
-		var panel = panelEl(), S = strings(), times, stops, form, transport, row, input, label;
+		var panel = panelEl(), S = strings(), times, stops, form, transport;
 		if (!panel || !host) { return; }
 		// A drag in progress owns the slider; rebuilding it under the pointer would drop the grab.
 		if (state.dragging) { updateReadout(); return; }
@@ -442,16 +446,19 @@
 		// -- the settings form (Task 248.01) --
 		form = el('div', { class: 'lpn-time-form', style: 'display:flex;flex-wrap:wrap;gap:.4rem 1rem;padding:.4rem .6rem' });
 		EC.LPN_TIME_FIELDS.forEach(function (pair) {
-			row = el('label', { style: 'display:flex;align-items:center;gap:.35rem' });
-			label = el('span', { class: 'ec-help', title: S.formatTip }, S[pair[0]]);
-			input = el('input', {
-				type: 'text', size: '7', inputmode: 'text',
-				// **THE FILE'S OWN TEXT, WHILE IT STILL SAYS THIS NUMBER.** lpnTimeText hands back
-				// `24:00` rather than the `24:00` we would have composed, and hands back a composed
-				// one the moment the number stops matching. So an edit never silently reformats a
-				// value the user did not touch.
-				value: EC.lpnTimeText(times, pair[0], times[pair[0]] || 0)
-			});
+			// **DECLARED IN HERE, not shared across the seven.** Hoisted to the function above,
+			// every listener would close over the LAST input built, so editing the duration would
+			// commit whatever was sitting in the start-clock box.
+			var row = el('label', { style: 'display:flex;align-items:center;gap:.35rem' }),
+				label = el('span', { class: 'ec-help', title: S.formatTip }, S[pair[0]]),
+				input = el('input', {
+					type: 'text', size: '7', inputmode: 'text',
+					// **THE FILE'S OWN TEXT, WHILE IT STILL SAYS THIS NUMBER.** lpnTimeText hands
+					// back `24:00` rather than the `24:00` we would have composed, and hands back a
+					// composed one the moment the number stops matching. So an edit never silently
+					// reformats a value the user did not touch.
+					value: EC.lpnTimeText(times, pair[0], times[pair[0]] || 0)
+				});
 			input.addEventListener('change', function () { commitField(pair[0], input.value); });
 			row.appendChild(label);
 			row.appendChild(input);
