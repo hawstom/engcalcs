@@ -1077,6 +1077,15 @@ EngCalcs.pageConfig = {
 	lpn_goto_tip: <?=json_encode($ec_lang['lpn_goto_tip'])?>,
 	lpn_goto_prompt: <?=json_encode($ec_lang['lpn_goto_prompt'])?>,
 	lpn_goto_bad: <?=json_encode($ec_lang['lpn_goto_bad'])?>,
+	<?php // THE PLACE-NAME SEARCH'S CONSENT RECORD (Task 437). NOT language keys -- these three are
+	      // the name, the version and the lifetime of the cookie js/lpn-search.js writes when a
+	      // visitor says yes, handed over so lib/Consent.lib.php stays the one place they are
+	      // decided. Every visitor-FACING string that search shows is an English literal inside
+	      // js/lpn-search.js until lib/lang.ec.en.php gains its keys, exactly as the placement
+	      // bar's step strings are. ?>
+	lpn_geosearch_cookie: <?=json_encode(EC_GEOSEARCH_COOKIE)?>,
+	lpn_geosearch_version: <?=json_encode(EC_GEOSEARCH_VERSION)?>,
+	lpn_geosearch_days: <?=json_encode(EC_GEOSEARCH_DAYS)?>,
 	lpn_menu_settings: <?=json_encode($ec_lang['lpn_menu_settings'])?>,
 	lpn_menu_help: <?=json_encode($ec_lang['lpn_menu_help'])?>,
 	lpn_help_walkthroughs: <?=json_encode($ec_lang['lpn_help_walkthroughs'])?>,
@@ -1352,6 +1361,11 @@ EngCalcs.pageConfig = {
       // the strip in the Coloring controls asks it how wide each box is rather than counting on
       // flex, which is how the first swatch came to eat the whole strip. ?>
 <script src="/engcalcs/js/lpn-ramps.js?v=<?=filemtime(__DIR__.'/js/lpn-ramps.js')?>"></script>
+<?php // Place-name search and its own consent gate (ROADMAP Task 437). BEFORE looped-network.js,
+      // which calls EngCalcs.lpnSearchInit() at script scope -- the same ordering rule lpn-time.js
+      // is under, and with the same silent failure if it is broken: the View row simply never
+      // appears. ?>
+<script src="/engcalcs/js/lpn-search.js?v=<?=filemtime(__DIR__.'/js/lpn-search.js')?>"></script>
 <script src="/engcalcs/js/looped-network.js?v=<?=filemtime(__DIR__.'/js/looped-network.js')?>"></script>
 <script>
 <?php echoCookieScript(); ?>
