@@ -571,6 +571,30 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     describe the gate as one (`dev/positioning.md` §6). Tom, 2026-08-14: *"we have no less technical
     authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
     all public domain."*
+- 80|441| **ONE GRAND SETTINGS BOX, and the right pane is abandoned.** Tom, 2026-08-18, after using
+  the right pane he had asked for: *"I think we can make this a better application… by abandoning the
+  right pane altogether and focusing instead on a single grand two-paned, indexed, draggable, and
+  closeable settings box that includes even labels."*
+  - **The membership rule is one sentence: "If it's for the entire project, it's in Settings."**
+    Labels settings, today's Settings, Time settings and Coloring all move in. Per-element things stay
+    in the properties popup, which he calls good.
+  - **Keep the right pane for now, but EMPTY.** His instruction, so the frame survives if the box
+    turns out to want a dock.
+  - A search/filter box at the top **that matches TIPS as well as titles** — the thing that makes a
+    long index usable, and cheap because every row already has a tip.
+  - **Later, not now: dock left or right, or anchor and flyout like an AutoCAD palette**, which
+    "allows a flexible accommodation of many interfaces through boxes that can anchor left or right
+    and autohide". Do not build it; do not design against it.
+  - This supersedes Task 434's right pane and absorbs Task 284.
+
+- 40|442| **[H] The toolbar may want to become a side menu, and phones have a gesture we do not use.**
+  Tom, 2026-08-18: *"Phones have the swipe superpower that is not idiomatic on a PC… Maybe a
+  different phone layout convention that could translate to the PC such as transforming the toolbar
+  into some sort of a side menu. This would have the advantage of using side real estate when height
+  real estate is very limited."* Raised, not scoped. Note the standing rule that this page is a
+  full-window drawing surface and is almost impossible on a phone, so the PHONE half of this is worth
+  little; the SIDE-MENU half is worth something on its own merits, on a laptop with 800px of height.
+
 - 45|434| **Both panes shipped 2026-08-18.** BOTTOM: `#lpn_pane`, docked below the canvas in normal
   flow, resizable by its top grip, remembering height/open/tab per browser in `lpn_pane`. Tabs:
   **Profile** and **Junctions** (sortable, editing through `setProp()`). RIGHT: `#lpn_rpane`
