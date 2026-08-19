@@ -55,36 +55,46 @@ $ec_icons = array(
 	// question — "I forgot that I love what you already have now" (2026-08-08). Recorded so the
 	// camera is not re-proposed: it was drawn, compared, and declined on the merits.
 	'view'       => '<path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12z"/><circle cx="12" cy="12" r="2.5"/>',
-	// Three passes with Tom, 2026-08-08, and the third one broke the constraint rather than
-	// accepting it.
-	//   1. "It looks too much like a light/sun instead of a gear. Gear teeth are short, not long
-	//      like rays of light." The GAP was the problem — eight long strokes starting outside a
-	//      small hub are rays, and a mark that floats away from its centre is never a tooth.
-	//   2. "A few more teeth so it doesn't look like a ship's wheel." Eight of anything radial is
-	//      a wheel; that is the spoke count wheels actually have.
-	//   3. "At large scale I'd say add more teeth. At smaller scale we need a little more length.
-	//      I don't think we can do both." — and with the old construction he was exactly right.
-	//      Teeth drawn as separate radial strokes are limited by the GAP between them: more teeth
-	//      closes the gap, longer teeth means a smaller body, which closes it further. At twelve
-	//      the gaps fell under a pixel and the rim greyed into a solid ring.
+	// SIX TEETH at a 60° pitch. The count is a consequence of the rule, not the point of it: a gear
+	// reads as a gear when TOOTH WIDTH EQUALS GAP WIDTH at the pitch circle, with matching fillets on
+	// the inside and outside corners — which is what the real history of gear refinement converged
+	// on. Six is the classic UI gear because at 16px a twelfth of the rim is under a pixel, so a
+	// higher count spends every extra tooth on a serration nobody can resolve. Tom, 2026-08-18, once
+	// the toolbar had gone wordless and the icons carried everything: "I would like the Settings icon
+	// to be reworked to have 6 teeth according to the physical gear design principles we documented."
 	//
-	// So the teeth stopped being strokes. This is one closed outline whose edge IS the tooth
-	// profile — flank out, across the tip, flank in, along the root — which is how a real gear
-	// is shaped and how gear icons are actually drawn. With no gaps to collapse, tooth count and
-	// tooth depth stop competing: twelve teeth AND 3.2 units of depth, where the old spoked
-	// version could manage ten and 1.9. At 15px the valleys soften into a fine serration rather
-	// than breaking, which is the graceful direction to degrade. The bore is what no sun has.
+	// ONE CLOSED OUTLINE whose edge IS the tooth profile — flank out, across the tip on the addendum
+	// circle, flank in, along the root circle — which is how a real gear is shaped. Do not go back to
+	// teeth drawn as separate radial strokes: those are limited by the gap between them, so tooth
+	// count and tooth depth compete, and the mark reads as a sun or a ship's wheel long before it
+	// reads as a gear.
 	//
-	// **Why fewer teeth would also have worked, recorded because it is the better principle** (Tom,
-	// 2026-08-08, after settling on twelve): a gear reads as a gear when **tooth width equals gap
-	// width**, with matching chamfers or fillets on the inside and outside corners — which is what
-	// the actual history of gear refinement converged on. Chrome's gear icon gets away with SIX
-	// teeth on exactly that basis. Tom's read of his own request: *"I probably was pushing for more
-	// teeth because of my sub-conscious understanding that tooth width = gap width."* Twelve at a
-	// 10°/12° tip-to-root ratio is already near parity, which is why it works and why he called it
-	// okay as is. If this is ever redrawn, chase the width parity and the fillets, not the count —
-	// the count is a symptom.
-	'settings'   => '<path d="M18.52 10.97L21.76 11.15A9.8 9.8 0 0 1 21.76 12.85L18.52 13.03A6.6 6.6 0 0 1 18.16 14.37L20.88 16.14A9.8 9.8 0 0 1 20.03 17.62L17.13 16.15A6.6 6.6 0 0 1 16.15 17.13L17.62 20.03A9.8 9.8 0 0 1 16.14 20.88L14.37 18.16A6.6 6.6 0 0 1 13.03 18.52L12.85 21.76A9.8 9.8 0 0 1 11.15 21.76L10.97 18.52A6.6 6.6 0 0 1 9.63 18.16L7.86 20.88A9.8 9.8 0 0 1 6.38 20.03L7.85 17.13A6.6 6.6 0 0 1 6.87 16.15L3.97 17.62A9.8 9.8 0 0 1 3.12 16.14L5.84 14.37A6.6 6.6 0 0 1 5.48 13.03L2.24 12.85A9.8 9.8 0 0 1 2.24 11.15L5.48 10.97A6.6 6.6 0 0 1 5.84 9.63L3.12 7.86A9.8 9.8 0 0 1 3.97 6.38L6.87 7.85A6.6 6.6 0 0 1 7.85 6.87L6.38 3.97A9.8 9.8 0 0 1 7.86 3.12L9.63 5.84A6.6 6.6 0 0 1 10.97 5.48L11.15 2.24A9.8 9.8 0 0 1 12.85 2.24L13.03 5.48A6.6 6.6 0 0 1 14.37 5.84L16.14 3.12A9.8 9.8 0 0 1 17.62 3.97L16.15 6.87A6.6 6.6 0 0 1 17.13 7.85L20.03 6.38A9.8 9.8 0 0 1 20.88 7.86L18.16 9.63A6.6 6.6 0 0 1 18.52 10.97Z"/><circle cx="12" cy="12" r="2.8"/>',
+	// The geometry, all about centre (12,12) in the 24-unit box:
+	//   tip (addendum) radius   9.8  Unchanged, so the mark still paints 21.6 x 20.4 and carries the
+	//                                same weight in the toolbar as the 9-radius round marks beside it
+	//                                ('globe', 'help', 'info'); a toothed silhouette needs the extra
+	//                                0.8 to weigh the same as a plain disc.
+	//   root (dedendum) radius  6.6  3.2 units of tooth depth. The 2-unit stroke swallows exactly one
+	//                                of them — the notch a reader sees bottoms out on the root
+	//                                circle's outer edge — so the visible notch is 2.2 deep and 4.7
+	//                                wide at its mouth, both well clear of the ~1-unit floor.
+	//   pitch radius            8.2  The mid-radius, where the parity is measured.
+	//   tooth half-width       10° at the tip, 20° at the root, interpolating linearly to 15° at the
+	//                                pitch circle: tooth 4.294 units, gap 4.294 units — exact parity.
+	//                                The same two angles give a 1.33:1 root-to-tip taper, so the tooth
+	//                                is wider at the root than at the tip as a real one is, and the
+	//                                tip still keeps a 1.4-unit land rather than closing to a point.
+	//                                Teeth centre on 0°, so the crisp tips sit on the horizontal axis
+	//                                and the mark stays a touch wider than tall.
+	//   bore radius             2.8  Unchanged. The bore is what no sun and no flower has, and at 3.6
+	//                                units of clear width it survives 16px.
+	// The fillets are free and must stay that way: stroke-linejoin="round" on the shared open tag
+	// rounds all 24 corners by half the stroke width, inside corners and outside corners alike, which
+	// is exactly the chamfer parity the rule asks for. Never override the join on this path.
+	//
+	// If it is ever redrawn again, chase the width parity and the fillets, not the count — the count
+	// is a symptom. Derived from the gear itself; not traced from anyone else's icon.
+	'settings'   => '<path d="M18.2 14.26L21.65 13.7A9.8 9.8 0 0 0 21.65 10.3L18.2 9.74A6.6 6.6 0 0 0 17.06 7.76L18.3 4.49A9.8 9.8 0 0 0 15.35 2.79L13.15 5.5A6.6 6.6 0 0 0 10.85 5.5L8.65 2.79A9.8 9.8 0 0 0 5.7 4.49L6.94 7.76A6.6 6.6 0 0 0 5.8 9.74L2.35 10.3A9.8 9.8 0 0 0 2.35 13.7L5.8 14.26A6.6 6.6 0 0 0 6.94 16.24L5.7 19.51A9.8 9.8 0 0 0 8.65 21.21L10.85 18.5A6.6 6.6 0 0 0 13.15 18.5L15.35 21.21A9.8 9.8 0 0 0 18.3 19.51L17.06 16.24A6.6 6.6 0 0 0 18.2 14.26Z"/><circle cx="12" cy="12" r="2.8"/>',
 
 	// ---- File ----
 	'new'        => '<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/>',
