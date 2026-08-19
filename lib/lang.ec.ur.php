@@ -60,7 +60,7 @@ $ec_lang['menu_brand']='HawsEDC حسابات';
 $ec_lang['menu_main_list']='حسابات کی فہرست';
 $ec_lang['menu_main_hydraulics']='ہائیڈرولکس';
 $ec_lang['menu_main_language']='زبان';
-$ec_lang['menu_more']='مزید';
+$ec_lang['menu_help']='مزید';
 $ec_lang['menu_libre']='آزاد سافٹ ویئر';
 $ec_lang['template_welcome']='اپنے خوف دروازے پر چھوڑ دیں؛ یہاں محبت ہماری زبان ہے۔ آپ سب کچھ برباد نہیں کر رہے۔ <a target="_blank" href="https://hawsedc.com/download.php">مفت HawsEDC AutoCAD اوزار</a> بھی آزمائیں۔';
 $ec_lang['template_feedback']='کیا آپ اس صفحے کی زبان کو بہتر بنانے کا مشورہ دے سکتے ہیں، یا کچھ اور تجویز کرنا چاہیں گے؟ کیا آپ مدد کرنا چاہتے ہیں یا ایسے اوزار بنانا سیکھنا چاہتے ہیں؟ براہ کرم مجھ سے رابطہ کریں۔';

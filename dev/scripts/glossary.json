@@ -3699,6 +3699,97 @@
    "translation_notes": "[2026-08-17, sprint 397] Raised by the Bulgarian agent, which found that this suite's standing Bulgarian decision to use vodno kolichestvo for flow collides with the term Bulgarian fire-protection engineers actually use (debit za pozharogasene). Recorded so the choice is made once rather than per string. Where a language's fire-protection field has its own settled term, prefer it: a designer reading a fire-flow figure reads it as a fire-protection engineer.",
    "translations": {},
    "source": "sprint 397-labels-colour-units, 2026-08-17"
+  },
+  "profile (long section)": {
+   "term": "profile (long section)",
+   "symbol": "",
+   "avoid": [
+    "the USER ACCOUNT sense of \"profile\" -- the page holding a person's name and settings. This is the dominant sense of the English word in web software and it is the wrong one here; many languages use a different word for each (zh 剖面圖 section vs 個人資料 account).",
+    "the CONFIGURATION PRESET sense (a \"colour profile\", a \"power profile\", a saved set of settings). Nothing is saved or selected by this menu.",
+    "the SIDE VIEW OF A FACE sense, where the language has a word specific to portraiture."
+   ],
+   "context": "A drawing of ground elevation and hydraulic grade against distance along a chosen route through the network -- what a civil engineer calls a profile or a long section, as opposed to the plan view the map shows. Use the surveying / civil drawing term of the language, the one that names the sheet a designer reads pipe grades off.",
+   "translation_notes": "[2026-08-19, sprint 438 wave 0] Raised as the highest-traffic string of the profile feature: lpn_profile_menu is one word and names the menu, so a wrong choice mislabels everything under it. English is kept because it is the engineering term of art; the guard belongs here.",
+   "translations": {},
+   "source": "sprint 438-wave0, 2026-08-19"
+  },
+  "hydraulic grade line": {
+   "term": "hydraulic grade line",
+   "symbol": "HGL",
+   "avoid": [
+    "dropping the head noun, so the label names the SLOPE (\"hydraulic grade\", \"hydraulic gradient\") rather than the LINE. What is plotted is an elevation, on an elevation axis.",
+    "the school-mark, quality-class or ground-levelling senses of \"grade\".",
+    "the energy grade line, which is a different line -- the HGL sits below it by the velocity head."
+   ],
+   "context": "The line joining the elevations to which water would rise in open tubes along the pipe: elevation head plus pressure head. Drawn against the ground line on a profile, and the quantity a designer checks minimum pressure against.",
+   "translation_notes": "[2026-08-19, sprint 438 wave 0] The chart legend key lpn_profile_hgl and the prose in lpn_profile_tip must come out as the SAME phrase; they were diverging in English (\"Hydraulic grade\" vs \"hydraulic grade line\") and the English has been made to agree. The existing \"energy grade line\" entry is the neighbouring concept and should use a parallel construction.",
+   "translations": {},
+   "source": "sprint 438-wave0, 2026-08-19"
+  },
+  "alignment (text)": {
+   "term": "alignment (text)",
+   "symbol": "",
+   "avoid": [
+    "JUSTIFICATION, which in typography is the different operation of stretching a line to reach both margins. Left / Centre / Right is alignment.",
+    "the everyday sense of justification -- a reason, a ground, an excuse (es justificación, fr justification, ru обоснование). A label reading \"Horizontal reason\" is the failure this entry exists to prevent.",
+    "the alliance / taking-sides sense of \"alignment\"."
+   ],
+   "context": "Which edge or centre of a text label lines up with its anchor point: horizontal alignment left / centre / right, vertical alignment top / middle / bottom. Use the word a word processor or drawing program in the language uses for that control.",
+   "translation_notes": "[2026-08-19, sprint 438 wave 0] The English was wrong and has been fixed (justification -> alignment) in lpn_field_text_align and lpn_field_text_valign. Keep the two labels parallel: one word for both axes.",
+   "translations": {},
+   "source": "sprint 438-wave0, 2026-08-19"
+  },
+  "demand pattern": {
+   "term": "demand pattern",
+   "symbol": "",
+   "avoid": [
+    "the ordinary senses of \"pattern\" -- a repeating decoration, a template to cut from, a habit of behaviour. This is a NAMED SERIES OF NUMBERS indexed by time step.",
+    "translating it as \"demand curve\", which in economics means something else entirely.",
+    "a word implying the pattern IS the demand; it is a list of multipliers applied to a base demand."
+   ],
+   "context": "EPANET's time series of multipliers: the base demand at a junction is multiplied by the pattern value for the current time step. A pattern belongs to the file and has a name; several junctions may share one.",
+   "translation_notes": "[2026-08-19, sprint 438 wave 0] The word carries the .inp import report (lpn_inp_drop_patterns, lpn_inp_drop_demand_pattern) and the clock, so one rendering must serve all of them.",
+   "translations": {},
+   "source": "sprint 438-wave0, 2026-08-19"
+  },
+  "imperial gallon": {
+   "term": "imperial gallon",
+   "symbol": "IMGD",
+   "avoid": [
+    "treating IMGD and MGD as the same unit or as spellings of each other. The imperial gallon is 4.54609 L, the US gallon 3.785411784 L -- a 20% difference in a token that differs by one letter.",
+    "translating or transliterating the tokens MGD and IMGD themselves. They are unit symbols and stay as they are, exactly like m^3/s.",
+    "calling the imperial gallon \"British\" in a way that implies it is obsolete; it is still the working unit in parts of the Commonwealth."
+   ],
+   "context": "IMGD is imperial million gallons per day, MGD is US million gallons per day. Both appear in the same flow-unit selector, one row apart.",
+   "translation_notes": "[2026-08-19, sprint 438 wave 0] Raised because the two tokens sit together and neither says which gallon it uses. The user-facing confusability is a separate question for Tom; the translator instruction is simply to leave both tokens alone.",
+   "translations": {},
+   "source": "sprint 438-wave0, 2026-08-19"
+  },
+  "pressure breaker valve": {
+   "term": "pressure breaker valve",
+   "symbol": "PBV",
+   "avoid": [
+    "the ELECTRICAL circuit-breaker word. This valve breaks a PRESSURE, not a circuit, and the electrical term is the one a translator will reach for first.",
+    "the breaking-wave sense of \"breaker\".",
+    "translating the three-letter code PBV, which is EPANET's own element name and is the same in every language, exactly as PRV, PSV, FCV, TCV and GPV are."
+   ],
+   "context": "EPANET's pressure breaker valve: it forces a fixed pressure drop between its two ends, in the direction of flow, whatever the flow is. Its siblings in the same selector are PRV, PSV, FCV, TCV and GPV.",
+   "translation_notes": "[2026-08-19, sprint 438 wave 0] English kept: it is EPANET's published element name and identity terms are not renamed. Where the language's water field has no settled phrase, a descriptive rendering (\"valve that drops the pressure by a fixed amount\") beats reaching for the electrical word.",
+   "translations": {},
+   "source": "sprint 438-wave0, 2026-08-19"
+  },
+  "project mode name": {
+   "term": "project mode name",
+   "symbol": "",
+   "avoid": [
+    "translating the mode names themselves. \"lat/lon\" and \"XY\" are carried unchanged into every language: they are what the menus, the status bar and the New project rows call the two kinds of project, and they appear in about a dozen strings that must all agree.",
+    "expanding \"XY\" into words in some strings and leaving it as letters in others -- that is how one mode ends up with two names inside one language file.",
+    "reading \"XY\" as a placeholder for something to be filled in. It is the name of the flat-grid mode."
+   ],
+   "context": "A project is in one of two modes. A lat/lon project has geographic coordinates and can draw a street map behind it; an XY project is drawn on a plain local grid with no place on the Earth. The names appear in lpn_geomap, lpn_xymap and in the prose of lpn_georef_menu, lpn_georef_tip, lpn_georef_intro, lpn_georef_confirm, lpn_georef_done, lpn_georef_on_map and the four New project rows.",
+   "translation_notes": "[2026-08-19, sprint 438 wave 0] Raised because the names are coined and nothing marked them as coined, so some agents would translate them and others keep them. A per-label synonym would have to be repeated across nine strings; one concept pointer is the right shape.",
+   "translations": {},
+   "source": "sprint 438-wave0, 2026-08-19"
   }
  }
 }

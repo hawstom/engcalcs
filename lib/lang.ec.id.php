@@ -64,7 +64,7 @@ $ec_lang['menu_brand']='Kalkulator HawsEDC';
 $ec_lang['menu_main_list']='Daftar Kalkulator';
 $ec_lang['menu_main_hydraulics']='Hidraulika';
 $ec_lang['menu_main_language']='Bahasa';
-$ec_lang['menu_more']='Lainnya';
+$ec_lang['menu_help']='Lainnya';
 $ec_lang['menu_libre']='Perangkat Lunak Bebas';
 $ec_lang['template_welcome']='Buang rasa takutmu di pintu; di sini cinta adalah bahasa kami. Kamu tidak merusak segalanya. Nikmati juga <a target="_blank" href="https://hawsedc.com/download.php">alat AutoCAD HawsEDC gratis</a>.';
 $ec_lang['template_feedback']='Bisakah Anda menyarankan kata-kata yang lebih baik untuk halaman ini, atau ada hal lain yang bisa diperbaiki? Apakah Anda ingin membantu, atau belajar membuat alat seperti ini? Silakan hubungi saya.';

@@ -65,7 +65,7 @@ $ec_lang['menu_brand']='HawsEDC ካልኩሌተሮች';
 $ec_lang['menu_main_list']='የካልኩሌተሮች ዝርዝር';
 $ec_lang['menu_main_hydraulics']='ሃይድሮሊክስ';
 $ec_lang['menu_main_language']='ቋንቋ';
-$ec_lang['menu_more']='ተጨማሪ';
+$ec_lang['menu_help']='ተጨማሪ';
 $ec_lang['menu_libre']='ነጻ ሶፍትዌር';
 $ec_lang['template_welcome']='ፍርሃትህን በር ላይ ትተህ ግባ; ፍቅር እዚህ ይነገራል። ሁሉንም ነገር አታበላሽም። <a target="_blank" href="https://hawsedc.com/download.php">ነፃ HawsEDC AutoCAD መሣሪያዎችን</a> ደግሞ ተጠቀም።';
 $ec_lang['template_feedback']='የዚህ ገጽ አገላለጽን የተሻለ አድርገው መጠቆም ይችላሉ ወይስ ሌላ ሐሳብ አለዎት? መርዳት ወይም እንደዚህ ያሉ መሳሪያዎችን መስራት መማር ይፈልጋሉ? እባክዎ ያግኙኝ።';

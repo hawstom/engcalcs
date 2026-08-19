@@ -65,7 +65,7 @@ $ec_lang['menu_brand']='HawsEDC محاسبې';
 $ec_lang['menu_main_list']='د محاسبو لیست';
 $ec_lang['menu_main_hydraulics']='هایدرولیک';
 $ec_lang['menu_main_language']='ژبه';
-$ec_lang['menu_more']='نور';
+$ec_lang['menu_help']='نور';
 $ec_lang['menu_libre']='آزاد سافټویر';
 $ec_lang['template_welcome']='خپل ویرونه دروازې ته پرېږده؛ دلته مینه زموږ ژبه ده. ته هر څه خرابوي نه یې. د <a target="_blank" href="https://hawsedc.com/download.php">وړیا HawsEDC AutoCAD وسیلو</a> خوند هم واخله.';
 $ec_lang['template_feedback']='ایا تاسو کولی شئ د دې پاڼې د عبارتونو ښه کولو یا نورو شیانو لپاره وړاندیز راکړئ؟ ایا غواړئ مرسته وکړئ، یا داسې وسایل جوړول زده کړئ؟ مهرباني وکړئ ما سره اړیکه ونیسئ.';

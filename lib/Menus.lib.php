@@ -180,11 +180,11 @@ function echoEngCalcsMenu ($html_title = '', $show_name_field = false, $calc_nam
 			<?php // HELP sits in the right-hand strip, ahead of the language picker (Task 298).
 			      // The left list is the work -- one calculator menu; the right strip is the two things
 			      // that are about using the site rather than doing a calculation, and both read as
-			      // icon-plus-word. The key is still menu_more: the English value changed, which is a
+			      // icon-plus-word. The key is still menu_help: the English value changed, which is a
 			      // translation resync, not a new key. ?>
 			<li class="nav-item dropdown">
 				<a class="nav-link dropdown-toggle active" id="dropdown-help" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-					<?=ecIcon('help')?><?=$ec_lang['menu_more']?>
+					<?=ecIcon('help')?><?=$ec_lang['menu_help']?>
 				</a>
 				<div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-help">
 					<a class="dropdown-item" href="About.php"><?=$ec_lang['about_main_menu']?></a>

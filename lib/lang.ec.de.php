@@ -64,7 +64,7 @@ $ec_lang['menu_brand']='HawsEDC Rechner';
 $ec_lang['menu_main_list']='Rechnerliste';
 $ec_lang['menu_main_hydraulics']='Hydraulik';
 $ec_lang['menu_main_language']='Sprache';
-$ec_lang['menu_more']='Mehr';
+$ec_lang['menu_help']='Mehr';
 $ec_lang['menu_libre']='Freie Software';
 $ec_lang['template_welcome']='Lasst Eure Ängste an der Tür; hier wird Liebe gesprochen. Ihr ruiniert nicht alles. Genießt auch die <a target="_blank" href="https://hawsedc.com/download.php">kostenlosen HawsEDC AutoCAD-Tools.</a>';
 $ec_lang['template_feedback']='Fällt Ihnen eine bessere Formulierung für diese Seite auf, oder sonst etwas? Möchten Sie mitwirken oder lernen, wie man solche Werkzeuge entwickelt? Bitte kontaktieren Sie mich.';

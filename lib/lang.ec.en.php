@@ -50,7 +50,7 @@ $ec_lang_syn['u_mgd']='';
 $ec_lang['u_imgd']='IMGD';
 $ec_lang['u_afd']='ac-ft/d';
 $ec_lang['u_lpm']='L/min';
-$ec_lang['u_cmh']='m^3/hr';
+$ec_lang['u_cmh']='m^3/h';
 $ec_lang['u_cmd']='m^3/d';
 $ec_lang['u_mh2o']='m H2O';
 $ec_lang_syn['u_mh2o']='';
@@ -118,8 +118,8 @@ $ec_lang['menu_main_hydraulics']='Hydraulics';
 $ec_lang_syn['menu_main_hydraulics']='';
 $ec_lang['menu_main_language']='Language';
 $ec_lang_syn['menu_main_language']='';
-$ec_lang['menu_more']='Help';
-$ec_lang_syn['menu_more']='';
+$ec_lang['menu_help']='Help';
+$ec_lang_syn['menu_help']='';
 $ec_lang['menu_libre']='Libre Software';
 $ec_lang_syn['menu_libre']='Lock-free Software, Unlocked Software, Unchained Software, FLOSS (Free Libre Open Source Software), Liberated Software, Liberty Software, Freedom Software, or Software you are free to use, study, change, and share. | layout: nav item; gloss: libre software; avoid: free of charge (gratis); transliterating "libre" as a brand name';
 $ec_lang['template_welcome']='Drop your fears at the door; love is spoken here. You are not ruining everything. Enjoy the <a target="_blank" href="https://hawsedc.com/download.php">free libre HawsEDC AutoCAD tools</a> too.';
@@ -1152,16 +1152,16 @@ $ec_lang['lpn_field_text_bold']='Bold text';
 // It's a technical term. We can only give a definition, which is not our job."). $ec_lang_syn holds
 // phrases that could STAND ON THE CONTROL in place of the label; a technical term has no such
 // alternatives, and what a first draft put there was a definition wearing a synonym's clothes.
-$ec_lang['lpn_field_text_align']='Horizontal justification';
+$ec_lang['lpn_field_text_align']='Horizontal alignment';
 $ec_lang['lpn_field_text_align_left']='Left';
 $ec_lang['lpn_field_text_align_center']='Centre';
 $ec_lang['lpn_field_text_align_right']='Right';
-$ec_lang['lpn_field_text_valign']='Vertical justification';
+$ec_lang['lpn_field_text_valign']='Vertical alignment';
 $ec_lang['lpn_field_text_valign_top']='Top';
 $ec_lang['lpn_field_text_valign_middle']='Middle';
 $ec_lang['lpn_field_text_valign_bottom']='Bottom';
 $ec_lang['lpn_field_text_rotation']='Angle (degrees)';
-$ec_lang['lpn_field_text_match_pipe']='Set to pipe angle';
+$ec_lang['lpn_field_text_match_pipe']='Match the nearest link';
 $ec_lang['lpn_field_text_flip']='Turn 180°';
 $ec_lang['lpn_field_elev']='Elevation';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
@@ -1213,7 +1213,7 @@ $ec_lang['lpn_empty_hint']='Use File, New project to open an example. Or start b
 // It stays a QUALIFICATION and not a headline (dev/positioning.md §3): the sentence is about what
 // this software is FOR, with the engine as a subordinate clause. EPANET is public domain, so naming
 // it is safe; naming a competitor would not be (Task 296).
-$ec_lang['lpn_examples_welcome']='Welcome to your Water Supply Network software, with the EPANET core';
+$ec_lang['lpn_examples_welcome']='Welcome to water supply network modelling, with the EPANET solver';
 $ec_lang['lpn_examples_heading']='Open an example';
 $ec_lang['lpn_examples_sub']='Each one opens as your own copy. Change it, save it, or open a fresh copy and start again.';
 $ec_lang['lpn_examples_open']='Open';
@@ -1225,7 +1225,7 @@ $ec_lang['lpn_examples_blank']='Or start with a blank map';
 // only button that leaves (Tom, 2026-08-17: "I can't back out of the gallery... I am forced to
 // open an example"). Closing never touches a project either way.
 $ec_lang['lpn_examples_close']='Close';
-$ec_lang['lpn_examples_size']='{nodes} nodes, {links} links';
+$ec_lang['lpn_examples_size']='Nodes: {nodes}, links: {links}';
 $ec_lang['lpn_examples_failed']='The examples could not be loaded. Use File, New project to start a drawing.';
 $ec_lang['lpn_examples_loading']='Loading examples…';
 // Two new Help rows (Tom, 2026-08-14). "Fix something" is a VERB, which is the point: it invites
@@ -1253,7 +1253,7 @@ $ec_lang['lpn_ex_net1_desc']='The smallest of EPANET\'s own three sample network
 $ec_lang['lpn_ex_net2_title']='EPANET Net2';
 $ec_lang['lpn_ex_net2_desc']='A branched distribution system with a tank, from EPANET\'s samples.';
 $ec_lang['lpn_ex_net3_title']='EPANET Net3';
-$ec_lang['lpn_ex_net3_desc']='EPANET\'s large sample: 92 junctions, three tanks and two sources, one of them a river. Worth opening to see how a real-sized model looks on the map.';
+$ec_lang['lpn_ex_net3_desc']='EPANET\'s large sample: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map.';
 $ec_lang['lpn_ex_elm_street_title']='Elm Street Center';
 $ec_lang['lpn_ex_elm_street_desc']='A commercial site solved for fire flow on top of maximum day demand, at one moment in time, drawn over a site plan.';
 $ec_lang['lpn_tool_undo']='Undo';
@@ -1267,7 +1267,7 @@ $ec_lang['lpn_demand_tip']='Flow taken out of the network at this node. Enter a 
 // the two answers DO, and mark Convert as the unusual one. {unit} is a unit name, {list} the field
 // names that unit serves.
 $ec_lang['lpn_units_warn_title']='This unit decides what your numbers mean';
-$ec_lang['lpn_units_warn_body']='{unit} is the unit of what you enter for: {list}. Reinterpret leaves every number as it is and reads it in the new unit. Convert rewrites every one of those numbers so the network stays the same size.';
+$ec_lang['lpn_units_warn_body']='{unit} is the unit of what you enter for: {list}. Reinterpret leaves every number as it is and reads it in the new unit. Convert them all rewrites every one of those numbers, so the network covers the same ground as before.';
 $ec_lang['lpn_units_reinterpret']='Reinterpret (change what they mean)';
 $ec_lang['lpn_units_convert']='Convert them all';
 // {n} is a whole number.
@@ -1275,7 +1275,7 @@ $ec_lang['lpn_status_reinterpreted']='{n} values now mean {unit}. Nothing was re
 $ec_lang['lpn_status_converted']='{n} values were rewritten into {unit}.';
 // The toolbar's one-control colour-by-value (Task 327). No label of its own: the select's own
 // options say what it does, and the toolbar is where space is scarcest.
-$ec_lang['lpn_tool_color_tip']='Colour the network by one value, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.';
+$ec_lang['lpn_tool_color_tip']='Colour the network by one quantity, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.';
 // **THE NATURAL ENGLISH GOES ON THE CONTROL; the ultra-simple rendering goes to the translator**
 // (Tom, 2026-08-18: *"'Input units' and 'Results units'... both more natural than the ultra simple
 // English you used. While I like that you are thinking simple for translators, this should go in
@@ -1343,7 +1343,7 @@ $ec_lang['lpn_menu_view']='View';
 // "basemap": a person who has never used GIS knows what a street map is.
 $ec_lang['lpn_basemap_show']='Show street map';
 $ec_lang['lpn_basemap_hide']='Hide street map';
-$ec_lang['lpn_basemap_tip']='Street map pictures from OpenStreetMap, fetched over the internet as you move around. Your pipes are drawn with or without it.';
+$ec_lang['lpn_basemap_tip']='Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.';
 // ROADMAP Task 145's placement tool. **THE PAIR OF NOUNS IS 'XY' and 'lat/lon', LOWER CASE** --
 // Tom, 2026-08-18, after withdrawing his own earlier "GeoMap" ("too evocative of a trademarkish
 // thing") and after rejecting "world map". Flat Earth / Round Earth is the same distinction told as
@@ -1354,12 +1354,12 @@ $ec_lang['lpn_xymap']='XY';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
 $ec_lang['lpn_georef_menu']='Convert to lat/lon…';
-$ec_lang['lpn_georef_tip']='Local to World. Put a drawing made on the XY grid onto geographic coordinates, so it sits on the street map where it belongs. Every number you typed stays as it is — only the X and Y become a longitude and a latitude.';
-$ec_lang['lpn_georef_intro']='Convert this XY project to a geographic project? Your project has been placed at the centre of a world map. Zoom to your location and move, resize, and turn the model as much as you like. When you are ready to start adjusting elements, press Finish.';
-$ec_lang['lpn_georef_adjust']='Drag the model to move it, a corner to resize it, the round handle above it to turn it. Or type the two numbers.';
+$ec_lang['lpn_georef_tip']='From a local grid to the real world. Put a drawing made on the XY grid onto geographic coordinates, so it sits on the street map where it belongs. Every number you typed stays as it is — only the X and Y become a longitude and a latitude.';
+$ec_lang['lpn_georef_intro']='Convert this XY project to a geographic project? Your project has been placed at the centre of a world map. Zoom to your location and move, resize, and turn the model as much as you like. When you are ready to start adjusting elements, press Keep this placement.';
+$ec_lang['lpn_georef_adjust']='Drag the model to move it, drag a corner to resize it, drag the round handle above the model to turn it. Or type the scale and the turn below.';
 $ec_lang['lpn_georef_step1']='Step 1 of 2 — detached';
 $ec_lang['lpn_georef_step2']='Step 2 of 2 — attached';
-$ec_lang['lpn_georef_step1_hint']='Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is roughly the right place and roughly the right size, then press Drop it here.';
+$ec_lang['lpn_georef_step1_hint']='Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is roughly the right place and roughly the right size, then press Put the model here.';
 $ec_lang['lpn_georef_detach']='Pick it up again';
 $ec_lang['lpn_georef_size_prompt']='About how wide is the site, across the whole project?';
 // ---- The icon-only toolbar (dev/toolbar-icons.md) ----
@@ -1389,14 +1389,14 @@ $ec_lang['lpn_color_ramp_sequential']='Sequential';
 $ec_lang['lpn_color_ramp_diverging']='Diverging';
 $ec_lang['lpn_color_ramp_ylgnbu']='Yellow to blue';
 $ec_lang['lpn_color_ramp_rdylbu']='Red to blue, through yellow';
-$ec_lang['lpn_georef_drop']='Drop it here';
-$ec_lang['lpn_georef_finish']='Finish';
+$ec_lang['lpn_georef_drop']='Put the model here';
+$ec_lang['lpn_georef_finish']='Keep this placement';
 $ec_lang['lpn_georef_cancel']='Cancel';
-$ec_lang['lpn_georef_scale']='One drawing unit is';
+$ec_lang['lpn_georef_scale']='Ground distance per drawing unit';
 $ec_lang['lpn_georef_scale_tip']='How far one unit of your drawing reaches on the ground. A drawing made on a plain grid usually says nothing about this, so set it here — or let Go to… ask you how wide the site is and work it out.';
-$ec_lang['lpn_georef_rotation']='Turn, degrees counter-clockwise';
-$ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model, counter-clockwise, so that its north points north.';
-$ec_lang['lpn_georef_confirm']='Place the model here for good? You can still drag single elements afterwards, but the drawing stops being an XY project. To get XY back, close this project without saving.';
+$ec_lang['lpn_georef_rotation']='Turn anticlockwise (degrees)';
+$ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model, anticlockwise, so that its north points north.';
+$ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag single elements afterwards, but the drawing stops being an XY project. To get XY back, close this project without saving.';
 $ec_lang['lpn_georef_done']='This is a lat/lon project now. Drag any element to move it closer to where it really is.';
 $ec_lang['lpn_georef_on_map']='This project is already on lat/lon.';
 $ec_lang['lpn_georef_empty']='Draw or open a network first. There is nothing to place yet.';
@@ -1419,9 +1419,9 @@ $ec_lang['lpn_pane_tab_junctions_tip']='Every junction as a table you can sort a
 $ec_lang['lpn_pane_junctions_none']='This network has no junctions yet.';
 $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
 
-$ec_lang['lpn_clean_map']='Clean map';
+$ec_lang['lpn_clean_map']='Hide map readouts';
 $ec_lang['lpn_clean_map_off']='Show map readouts';
-$ec_lang['lpn_clean_map_tip']='Hide the mode line and the coordinate readout so a screenshot shows only the map. Nothing else changes, and nothing is saved.';
+$ec_lang['lpn_clean_map_tip']='Hide the mode line and the coordinate readout so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Settings';
@@ -1455,29 +1455,32 @@ $ec_lang['lpn_confirm_delete_network']='Delete every node, pipe, and text label 
 // editor uses for it.
 $ec_lang['lpn_find_menu']='Find';
 $ec_lang['lpn_find_title']='Find elements';
-$ec_lang['lpn_find_scope']='Elements to search';
-$ec_lang['lpn_find_scope_all']='All elements';
+$ec_lang['lpn_find_scope']='What to search';
+$ec_lang['lpn_find_scope_all']='Everything';
 $ec_lang['lpn_find_property']='Property';
 $ec_lang['lpn_find_condition']='Condition';
 $ec_lang['lpn_find_value']='Value';
 $ec_lang['lpn_find_button']='Find';
-// The four conditions read as the middle of a sentence: "ID contains 12", "Pressure is less than
-// 20". Keep them lowercase and keep them verbs, so the three pull-downs read left to right.
+// The four conditions read as the middle of a sentence: "ID contains 12", "Pressure less than 20".
+// Keep them lowercase, so the three pull-downs read left to right, and keep them COPULA-FREE
+// (Task 438 Wave 0): a finite verb has to agree with the property noun chosen in the select above
+// it, and no one fixed fragment can agree with Diameter, Elevation and Status at once.
 $ec_lang['lpn_find_op_contains']='contains';
-$ec_lang['lpn_find_op_equals']='is exactly';
-$ec_lang['lpn_find_op_gt']='is greater than';
-$ec_lang['lpn_find_op_lt']='is less than';
+$ec_lang['lpn_find_op_equals']='equal to';
+$ec_lang['lpn_find_op_gt']='greater than';
+$ec_lang['lpn_find_op_lt']='less than';
 // {n} is a whole number.
 $ec_lang['lpn_find_count']='{n} found. Click one to go to it.';
 $ec_lang['lpn_find_none']='Nothing matched.';
-// The two extremes, as conditions on the same footing as "is greater than" -- the Value box holds
-// how many. The literal n is Tom's own wording and is the shortest way to say that the number goes
-// in the box beside it.
-$ec_lang['lpn_find_op_top']='Top n';
-$ec_lang['lpn_find_op_bottom']='Bottom n';
+// The two extremes, as conditions on the same footing as "greater than" -- the Value box holds how
+// many. The literal n is Tom's own wording and is the shortest way to say that the number goes in
+// the box beside it; it is NOT a placeholder and nothing substitutes it. "Top"/"Bottom" were
+// changed to "Highest"/"Lowest" in Task 438 Wave 0, because on a MAP the top is an edge.
+$ec_lang['lpn_find_op_top']='Highest n';
+$ec_lang['lpn_find_op_bottom']='Lowest n';
 // EPANET's Map Finder calls this "Adjacent Links". Said plainly here: the pipes, pumps and valves
 // that meet at the node you found.
-$ec_lang['lpn_find_adjacent']='Links here';
+$ec_lang['lpn_find_adjacent']='Connected';
 $ec_lang['lpn_find_no_value']='Type what to look for.';
 // ---- the profile view (ROADMAP Task 409) ------------------------------------------------------
 // A drawing of the ground and the hydraulic grade line along one chosen route through the network.
@@ -1488,17 +1491,17 @@ $ec_lang['lpn_profile_tip']='Draw the ground and the hydraulic grade line along 
 $ec_lang['lpn_profile_title']='Profile along a route';
 $ec_lang['lpn_profile_from']='From';
 $ec_lang['lpn_profile_to']='To';
-$ec_lang['lpn_profile_pick']='Click a node on the map to route through it';
-$ec_lang['lpn_profile_through']='Through';
-$ec_lang['lpn_profile_clear']='Clear';
+$ec_lang['lpn_profile_pick']='Add nodes to the route by clicking them on the map';
+$ec_lang['lpn_profile_through']='Nodes on the way';
+$ec_lang['lpn_profile_clear']='Remove all';
 $ec_lang['lpn_profile_choose']='Choose a start node and an end node.';
 $ec_lang['lpn_profile_no_path']='These two nodes are not connected by any route.';
 $ec_lang['lpn_profile_no_solve']='No results yet, so only the ground line is drawn.';
-$ec_lang['lpn_profile_summary']='{n} nodes, {len} {u}';
+$ec_lang['lpn_profile_summary']='Nodes: {n}, length: {len} {u}';
 $ec_lang['lpn_profile_axis_station']='Distance along the route ({u})';
 $ec_lang['lpn_profile_axis_elev']='Elevation and head ({u})';
-$ec_lang['lpn_profile_ground']='Ground';
-$ec_lang['lpn_profile_hgl']='Hydraulic grade';
+$ec_lang['lpn_profile_ground']='Ground surface';
+$ec_lang['lpn_profile_hgl']='Hydraulic grade line';
 $ec_lang['lpn_view_units']='Units';
 // Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Save all';
@@ -1514,14 +1517,14 @@ $ec_lang['lpn_file_new']='New project…';
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Blank XY project, US units (gpm)';
-$ec_lang['lpn_new_blank_si']='Blank XY project, SI units (l/s)';
+$ec_lang['lpn_new_blank_si']='Blank XY project, SI units (L/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 // The other half of the same fly-out (Task 145): a project is on a grid or on the world, and it says
 // which when it is made, exactly as it says its units. "On a world map" rather than "geographic" --
 // the plain phrase says what the coordinates ARE to somebody who has never met the word.
 $ec_lang['lpn_new_geo_us']='Blank lat/lon project, US units (gpm)';
-$ec_lang['lpn_new_geo_si']='Blank lat/lon project, SI units (l/s)';
+$ec_lang['lpn_new_geo_si']='Blank lat/lon project, SI units (L/s)';
 $ec_lang['lpn_file_open']='Open…';
 $ec_lang['lpn_file_save']='Save';
 $ec_lang['lpn_file_saveas']='Save as…';
@@ -1559,11 +1562,11 @@ $ec_lang['lpn_file_import_inp_tip']='Read a network out of an EPANET file, eithe
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 $ec_lang['lpn_file_export_inp']='Export EPANET file…';
-$ec_lang['lpn_file_export_inp_tip']='Write this network as an EPANET .inp file and download it. Numbers you typed are written exactly as you typed them. Anything EPANET has no way to say is listed for you afterwards.';
+$ec_lang['lpn_file_export_inp_tip']='Write this network as an EPANET .inp file and download it. Numbers you typed are written exactly as you typed them. Anything the .inp format cannot hold is listed for you afterwards.';
 $ec_lang['lpn_status_inp_exported']='Exported {file}.';
 // {n} is a whole number. Said plainly rather than hidden: a file that quietly loses a pump curve is
 // the failure this whole feature exists to prevent.
-$ec_lang['lpn_inp_export_differences']='{n} things could not be written in EPANET\'s language.';
+$ec_lang['lpn_inp_export_differences']='{n} things the .inp format cannot hold.';
 $ec_lang['lpn_inp_export_refused']='This project cannot be written as an EPANET file: {detail}';
 $ec_lang['lpn_inp_bad_file']='That file could not be read as an EPANET network file.';
 // EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
@@ -1585,15 +1588,15 @@ $ec_lang['lpn_inp_drop_valve_active']='These valves control pressure or flow, an
 $ec_lang['lpn_inp_drop_valve']='These valves are described by a curve or by a fixed pressure drop, and this page has no such element. They came in as open pipes, so the network is still joined up, but nothing is holding pressure or flow there any more.';
 $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.';
 $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
-$ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
+$ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out, because the part of this page that runs a network through time did not load. Every demand is the number written in the file.';
 $ec_lang['lpn_inp_drop_demand_pattern']='These junctions change their demand through the day. Their patterns came in whole, and the demand you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
 $ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
 $ec_lang['lpn_inp_drop_curve_missing']='This pump names a curve that is not in the file. It came in with no curve, so it adds no head.';
 $ec_lang['lpn_inp_drop_pump_other']='This pump is described by power, by speed, or by a schedule, rather than by a curve. It came in with no curve, so it adds no head.';
 $ec_lang['lpn_inp_drop_setting']='These pipes, pumps and valves carry a setting this page cannot hold. They came in open.';
-$ec_lang['lpn_inp_drop_controls']='Controls and rules were left out. Every pipe, pump and valve came in at the state written in the file, and does not change.';
-$ec_lang['lpn_inp_drop_eps']='This file describes a simulation that runs over a period of time. This page solves one moment, so only the starting conditions came in.';
+$ec_lang['lpn_inp_drop_controls']='These controls and rules were left out. The pipes, pumps and valves they name came in at the state written in the file and stay that way.';
+$ec_lang['lpn_inp_drop_eps']='This file describes a simulation that runs over a period of time. The part of this page that runs a network through time did not load, so only the starting conditions came in.';
 $ec_lang['lpn_inp_drop_quality']='Water quality, chemical reaction and pump energy settings were left out. This page solves flow and pressure only.';
 $ec_lang['lpn_inp_drop_backdrop']='This file names a background picture but does not contain the picture itself. Add it yourself with File, Background image, Add image.';
 $ec_lang['lpn_inp_drop_dangling']='These pipes name a junction that is not in the file, so they were left out.';
@@ -1842,7 +1845,7 @@ $ec_lang['lpn_valve_type_gpv']='General purpose (GPV)';
 $ec_lang['lpn_field_valve_setting_drop']='Pressure drop';
 $ec_lang['lpn_field_valve_setting_drop_tip']='The pressure the valve takes away. A pressure breaker valve always removes exactly this much pressure, whichever way the water is going. It is a drop across the valve, not a pressure to hold.';
 $ec_lang['lpn_inp_drop_gpv_curve']='This valve names a head loss curve that is not in the file. The valve came in, with no curve, so it stands open until you give it one.';
-$ec_lang['lpn_gpv_curve_note']='Up to three points of flow and the head loss at that flow. With no points the valve is simply open.';
+$ec_lang['lpn_gpv_curve_note']='Up to three points of flow and the head loss at that flow. Leave them empty and the valve stays fully open.';
 $ec_lang['lpn_field_valve_setting_pressure']='Pressure setting';
 $ec_lang['lpn_field_valve_setting_pressure_tip']='The pressure the valve keeps. A pressure reducing valve keeps the pressure on its downstream side at or below this value. A pressure sustaining valve keeps the pressure on its upstream side at or above this value.';
 $ec_lang['lpn_field_valve_setting_flow']='Flow setting';
@@ -1864,9 +1867,9 @@ $ec_lang['lpn_pump_curve_source']='Curve source';
 $ec_lang['lpn_pump_curve_own']='Enter points below';
 $ec_lang['lpn_pump_curve_ref_note']='Using the curve entered for pump {id}.';
 $ec_lang['lpn_pump_curve_note']='One, two, or three points — see "Pump curve" in the Notes below.';
-$ec_lang['lpn_pump_point1']='Point 1 (required)';
-$ec_lang['lpn_pump_point2']='Point 2 (optional)';
-$ec_lang['lpn_pump_point3']='Point 3 (optional)';
+$ec_lang['lpn_pump_point1']='Point 1';
+$ec_lang['lpn_pump_point2']='Point 2';
+$ec_lang['lpn_pump_point3']='Point 3';
 // Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
 // from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
 // word order/grammar around a mode name varies by language, so each mode gets its own full string.
@@ -2108,7 +2111,7 @@ $ec_lang_syn['lpn_settings_engine_epanet']='';
 // and Manning 0.6%. Both are also announced in the status line when a network actually contains
 // the thing, but a user deciding whether to TURN THE ENGINE ON is asking the question here, and
 // finding out afterwards is finding out too late.
-$ec_lang['lpn_settings_engine_epanet_tip']='Runs the EPANET solver from the US EPA, here in your browser. On a network this size you will not see a speed difference. The two solvers agree closely, but not exactly: EPANET rounds the value it uses for gravity, so its minor (local) losses come out about 0.08% lower than ours, and with Manning roughness its head loss comes out about 0.6% lower. The first time you turn this on, about 650 KB is downloaded and then kept on this device.';
+$ec_lang['lpn_settings_engine_epanet_tip']='Runs the EPANET solver from the US EPA, here in your browser. On a network this size you will not see a speed difference. The two solvers agree closely, but not exactly: EPANET rounds the value it uses for gravity, so its minor (local) losses come out about 0.08% lower than the built-in solver, and with Manning roughness its head loss comes out about 0.6% lower. The first time you tick this box, about 650 KB is downloaded and then kept on this device.';
 $ec_lang_syn['lpn_settings_engine_epanet_tip']='';
 $ec_lang['lpn_engine_loading']='Loading the EPANET solver…';
 $ec_lang_syn['lpn_engine_loading']='';
@@ -2118,10 +2121,10 @@ $ec_lang_syn['lpn_engine_failed']='';
 // the EPANET solver anyway, because it holds a valve the built-in solver does not work out. The
 // setting is not changed, so removing the valve puts the page straight back on the chosen engine.
 $ec_lang['lpn_engine_valve_route']='Solved with the EPANET solver, because these valves open and close on their own:';
-$ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. No answers can be given until this page knows that unit, because there is no way to tell how big it is.';
+$ec_lang['lpn_unit_unknown']='This drawing states a unit this page does not offer: {unit}. Everything is kept and shown exactly as it came in, and nothing was changed. Nothing can be computed until this page is taught that unit, because it does not know how large one of them is.';
 $ec_lang['lpn_engine_manning_note']='Note: with Manning roughness, EPANET computes head loss about 0.6% lower than the built-in solver.';
 $ec_lang_syn['lpn_engine_manning_note']='';
-$ec_lang['lpn_engine_minor_loss_note']='Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity.';
+$ec_lang['lpn_engine_minor_loss_note']='Note: with the EPANET solver, minor (local) losses come out very slightly lower than with the built-in solver, because EPANET rounds the value it uses for gravity.';
 $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
@@ -2129,7 +2132,7 @@ $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 $ec_lang['lpn_settings_symbol_size']='Symbol size (pixels)';
 $ec_lang['lpn_settings_link_width']='Pipe line thickness (pixels)';
 $ec_lang['lpn_settings_align_labels']='Align pipe labels with pipes';
-$ec_lang['lpn_settings_readability_bias']='Degrees left of vertical before a label turns 180° to stay readable';
+$ec_lang['lpn_settings_readability_bias']='Flip a label upside down when it leans more than this many degrees left of vertical';
 $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
 $ec_lang['lpn_settings_label_max_width']='Show labels when the view is narrower than this (map units)';
 $ec_lang['lpn_settings_label_use_view']='Use current view';
@@ -2186,10 +2189,11 @@ $ec_lang['lpn_confirm_restore_defaults']='Reset all settings (ID prefixes, start
 $ec_lang['lpn_settings_wipe_btn']='Erase everything on this page';
 $ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone.';
 
-// Share this calculation (ROADMAP Task 228). The control sits under the Printable Title, where
-// somebody has just said they mean to show this to another person.
-$ec_lang['template_share_link']='Copy link to this calculation';
-$ec_lang['template_share_copied']='✓ Link copied. Paste it into an email or a message.';
+// Share this calculation (ROADMAP Task 228). template_share_link and template_share_copied were
+// RETIRED in Task 438 Wave 0: the duplicate control under the Printable Title is gone, the
+// navbar's calc_copy_link is the only way to copy a link, and two labels for one behaviour would
+// have invited 26 translators to invent a distinction the code does not have. This one survives
+// because lib/Menus.lib.php still reads it for the manual-copy box.
 $ec_lang['template_share_manual']='Copy this link:';
 
 // Extended-period simulation: the clock, the run, and the control that steps through it

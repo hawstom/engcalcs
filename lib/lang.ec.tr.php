@@ -65,7 +65,7 @@ $ec_lang['menu_brand']='HawsEDC Hesap Makineleri';
 $ec_lang['menu_main_list']='Hesap makinesi listesi';
 $ec_lang['menu_main_hydraulics']='Hidrolik';
 $ec_lang['menu_main_language']='Dil';
-$ec_lang['menu_more']='Daha fazla';
+$ec_lang['menu_help']='Daha fazla';
 $ec_lang['menu_libre']='Özgür Yazılım';
 $ec_lang['template_welcome']='Korkularını kapıda bırak; burada sevgi konuşulur. Her şeyi mahvetmiyorsun. <a target="_blank" href="https://hawsedc.com/download.php">Ücretsiz HawsEDC AutoCAD araçlarını</a> da deneyin.';
 $ec_lang['template_feedback']='Bu sayfadaki ifadeler için daha iyi bir öneriniz mi var, yoksa başka bir şey mi? Yardımcı olmak ya da bunun gibi araçlar yapmayı öğrenmek ister misiniz? Lütfen benimle iletişime geçin.';

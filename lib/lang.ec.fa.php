@@ -65,7 +65,7 @@ $ec_lang['menu_brand']='ماشین‌حساب‌های HawsEDC';
 $ec_lang['menu_main_list']='فهرست ماشین‌حساب‌ها';
 $ec_lang['menu_main_hydraulics']='هیدرولیک';
 $ec_lang['menu_main_language']='زبان';
-$ec_lang['menu_more']='بیشتر';
+$ec_lang['menu_help']='بیشتر';
 $ec_lang['menu_libre']='نرم‌افزار آزاد';
 $ec_lang['template_welcome']='ترس‌هایت را پشت در بگذار؛ اینجا زبان محبت است. تو همه چیز را خراب نمی‌کنی. از <a target="_blank" href="https://hawsedc.com/download.php">ابزارهای رایگان HawsEDC AutoCAD</a> هم لذت ببر.';
 $ec_lang['template_feedback']='آیا می‌توانید جمله‌بندی این صفحه را بهتر کنید یا نکتهٔ دیگری دارید؟ می‌خواهید کمک کنید یا یاد بگیرید چگونه ابزارهایی مانند این‌ها بسازید؟ لطفاً با من تماس بگیرید.';

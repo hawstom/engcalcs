@@ -1139,7 +1139,7 @@
         "menu_main_hydraulics": "d6f18fa68583ba0854b0df1a9e753670114f8451",
         "menu_main_language": "89b86ab0e66f527166d98df92ddbcf5416ed58f6",
         "menu_main_list": "ab17a9a530fec26a0c276c8111051cd4c6ff6a17",
-        "menu_more": "4bab2d8fe13fa6ab57f80098b414f0f734c5dd25",
+        "menu_help": "4bab2d8fe13fa6ab57f80098b414f0f734c5dd25",
         "mhp_annual_kwh": "258b88f727968033ded4ca63146a9395ee304b1c",
         "mhp_diameter": "e6343b78b5974690757435f6121bcb0bff473145",
         "mhp_efficiency": "5eff2871f906e5b0cd271c55a4d43fd3e53c31f8",
@@ -4108,7 +4108,7 @@
             "words": 3,
             "ends_sentence": false
         },
-        "menu_more": {
+        "menu_help": {
             "words": 1,
             "ends_sentence": false
         },

@@ -73,7 +73,7 @@
             "titleKey": "lpn_ex_net3_title",
             "descKey": "lpn_ex_net3_desc",
             "title": "EPANET Net3",
-            "description": "EPANET's large sample: 92 junctions, three tanks and two sources, one of them a river. Worth opening to see how a real-sized model looks on the map.",
+            "description": "EPANET's large sample: 92 junctions, 3 tanks and 2 reservoirs, one of them a river. Worth opening to see how a real-sized model looks on the map.",
             "system": "us",
             "flow": "gpm",
             "nodes": 97,
