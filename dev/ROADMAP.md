@@ -146,27 +146,23 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     `gloss_ref_check.php` and `generate_translation_payloads.php --check`.
   - Close it with `detect_english_drift.php --baseline-new`, or the new keys stay `NEW` forever.
 
-- 70|443| **Three English defects the sprint found, and 26 translations are guesses until they are
-  fixed.** Sprint 438's translators reported these independently; they are English-source problems,
-  so one edit fixes all 27 languages (`CLAUDE.md`'s routing rule: does an English reader also
-  stumble?).
-  - **`lpn_field_text_match_pipe` — SIX languages stopped on it** (de, zh, he, bg, id, hr). The
-    reword to "Match the nearest link" dropped the word ANGLE, so the verb has no object. Bulgarian
-    added a second reading nobody here had seen: nearest **by distance**, or **the link this label is
-    already attached to**? Those are different behaviours. Wave 0 passed this string.
-  - **"EPANET engine" reintroduces the exact collision sprint 252 was run to repair** (cs, sr —
-    both spotted it independently, and sr traced it to the glossary). VERIFIED: the shipped strings
-    say *solver* (`lpn_settings_engine_epanet` = "Solve with the EPANET solver"), and the two strings
-    written for Task 248 last night say **engine** — `lpn_time_running`, `lpn_time_no_engine`.
-    `glossary.json`'s `solver` term carries an `avoid` list naming the motor/engine word in thirteen
-    languages, **because this page models PUMPS, which have real motors**. So "engine" is not a
-    synonym here; it is the trap term, and a translator following the English rather than the
-    glossary would put a pump's motor in the solver's name. Serbian and Czech both overrode the
-    English to "solver" on their own judgement; the others may not have.
-  - **`lpn_time_format_tip`'s "30 minutes"** (de, fa). Illustrative prose, or a literal keyword the
-    parser accepts? `EngCalcs.lpnParseTime` really does accept `30 MINUTES`, so a translator who
-    localises it teaches an input the field may reject. Say which it is in the string.
-  - Fix, then re-push just these keys to the 26 — a small resync, not a sprint.
+- 60|444| **`EC.lpnParseTime` reads `2,5` as 2 hours, silently.** `parseFloat` stops at the comma,
+  so a comma-decimal locale gets a wrong duration with no error — half the value, in the one field
+  where being wrong reshapes the whole run. Measured 2026-08-19: `2,5` → 7200 s, `2.5` → 9000 s.
+  Every other accepted form is correct and matches EPANET's own rule (decimal hours or `h:mm`,
+  hours uncapped: `55:00` = 55 h).
+  - **The care this needs: ONE function parses both typed input and `.inp` files** (`js/lpn-patterns.js`
+    line ~336). A file's separator is always a dot, and a file's numbers are the user's — so accept
+    the comma on TYPED input only, or reject it loudly. Never guess between decimal and thousands.
+
+- 45|445| **Labels: invert priority to "Drop first in case of conflict", 1 dropping first.** Tom,
+  2026-08-19: "our labels priority paradigm really wants to be Labels.Drop First In Case of Conflict
+  … it's a version bump because the order of the numbers reverses. But it's the right thing to do."
+  - Column heading is **Drop**, not an overlap icon — a word needs no learning and is short enough
+    not to widen the column.
+  - **The stored number reverses meaning, so stored documents must be migrated**, not reinterpreted
+    in place: a project written under the old sense would silently invert. That migration is the
+    task, not the relabelling.
 
 - 60|239| **The English-friction loop: run the mechanized Wave 0 and measure its yield.** The
   mechanism shipped 2026-08-08 and is wired into CLAUDE.md and the sprint checklist — an adversarial
