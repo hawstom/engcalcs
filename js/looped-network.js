@@ -2440,17 +2440,33 @@ var EngCalcs = EngCalcs || {};
 			// the user enters, never the state they are handed.
 			colorNodeField: '',   // '' = none, else a key of COLOR_NODE_FIELDS
 			colorLinkField: '',   // '' = none, else a key of COLOR_LINK_FIELDS
+			// **ONE COLOUR SCHEME PER ELEMENT CLASS, NOT ONE FOR THE MAP** (Tom, 2026-08-19:
+			// "put a colour-ramp picker at the bottom of this group", said of BOTH symbology
+			// groups). EPANET and epanet-js give nodes and links a scheme each, and a page that
+			// already offers a field dropdown each was implying it. Nodes coloured by pressure and
+			// links by velocity are two different questions on one sheet, and reading them in one
+			// palette is what made the second one hard to see.
+			//
 			// A key of js/lpn-ramps.js's catalogue. **NOT the rainbow** -- Tom, 2026-08-18: it
 			// "goes last, in its own group, and is never the default". Viridis is ordered,
 			// perceptually uniform and readable by the ~8% of men who cannot separate the
 			// rainbow's green/yellow/red end; every ramp the five-ramp era stored still opens.
-			colorRamp: 'viridis',
+			//
+			// **A DOCUMENT WRITTEN WHEN THERE WAS ONE OF EACH OPENS UNCHANGED**: applySaved() gives
+			// both groups the single value it finds, so nothing on the map changes colour.
+			colorRampNode: 'viridis',
+			colorRampLink: 'viridis',
 			// HOW MANY CLASSES, 3 to 7 (Tom asked for "a choice of number of ranges"). Seven is
 			// the default and the maximum: Brewer's own guidance is that a reader stops telling
 			// classes apart somewhere around there. A document saved before this key existed is
 			// held at the five bands it was drawn in -- see applySaved().
-			colorClasses: 7,
-			colorReverse: false,
+			//
+			// PER GROUP for the same reason the ramp is, and it fixes a real crossing: a criterion
+			// mode chosen for pressure used to force the LINK map to five classes as well.
+			colorClassesNode: 7,
+			colorClassesLink: 7,
+			colorReverseNode: false,
+			colorReverseLink: false,
 			// Task 327's thematic map: colour is the whole message, so the labels come off. One CSS
 			// class; it never touches labelSettings -- see applyThematicMode().
 			colorThematic: false,
@@ -2954,27 +2970,39 @@ var EngCalcs = EngCalcs || {};
 		out.push({ key: 'rainbow', family: null, ramps: Object.keys(RAINBOW_RAMPS) });
 		return out;
 	}
-	// **HOW MANY CLASSES THE MAP IS DRAWN IN -- 3 to 7, and the user's choice.** One number for the
-	// whole map rather than one per field, because the swatch in the picker shows THIS many boxes:
-	// a picture of seven boxes over a five-class map would make the picker a liar.
+	// ---- THE THREE PER-GROUP COLOUR SETTINGS, READ IN ONE PLACE ---------------------------------
+	//
+	// 'node' and 'link' each own a ramp, a class count and a reverse flag. Every reader goes
+	// through these three functions, so the settings could be renamed or nested without a hunt --
+	// and, more to the point, no drawing code can accidentally read the OTHER group's scheme.
+	function colorRampKey(group) {
+		return group === 'link' ? settings.colorRampLink : settings.colorRampNode;
+	}
+	function colorReverseOf(group) {
+		return group === 'link' ? !!settings.colorReverseLink : !!settings.colorReverseNode;
+	}
+	// **HOW MANY CLASSES THIS GROUP IS DRAWN IN -- 3 to 7, and the user's choice.** One number per
+	// group rather than one per field, because the swatch in that group's picker shows THIS many
+	// boxes: a picture of seven boxes over a five-class map would make the picker a liar.
 	//
 	// A CRITERION MODE OVERRULES IT while it is chosen. Four thresholds out of a design code are
 	// five classes, and there is no honest way to draw them as seven -- padding invents a threshold
 	// nobody wrote and trimming deletes one somebody did. The count picker goes grey and says so
 	// rather than silently disagreeing with the map.
-	function colorClassCount() {
-		var R = ramps(), c = criterionClassCount();
+	function colorClassCount(group) {
+		var R = ramps(), c = criterionClassCount(group),
+			stored = group === 'link' ? settings.colorClassesLink : settings.colorClassesNode;
 		if (c) { return c; }
-		return R ? R.clampClasses(settings.colorClasses) : RAMP_FALLBACK.length;
+		return R ? R.clampClasses(stored) : RAMP_FALLBACK.length;
 	}
-	// The colours of the current ramp at the current class count, reversed if the user asked.
+	// The colours of one group's ramp at its class count, reversed if the user asked.
 	// rampColors() DEGRADES TO THE PUBLISHED LOWER-CLASS SET and never slices a longer one: Brewer
 	// designs each count separately, and her 5-class YlGnBu is not her 7-class YlGnBu with two
 	// colours taken out.
-	function rampColorList(n) {
-		var R = ramps(), count = n || colorClassCount();
+	function rampColorList(group, n) {
+		var R = ramps(), count = n || colorClassCount(group);
 		if (!R) { return RAMP_FALLBACK.slice(0, count); }
-		return R.rampColors(settings.colorRamp, count, { reverse: !!settings.colorReverse });
+		return R.rampColors(colorRampKey(group), count, { reverse: colorReverseOf(group) });
 	}
 	// Which fields can be coloured, and the unit each is read in. The lists match EPANET's own View
 	// menu so nobody has to learn a second vocabulary. Display NAMES come from
@@ -3084,24 +3112,41 @@ var EngCalcs = EngCalcs || {};
 		for (i = 0; i < list.length; i++) { if (list[i].key === stored) { return stored; } }
 		return 'equal';
 	}
+	// **THE MODE NAMES ARE TRANSLATED, AND THE LOOKUP IS SPELLED OUT.** js/lpn-ramps.js carries an
+	// English `name` for each mode as its fallback; the shipped string is a language key. Written
+	// as an explicit object rather than `pc['lpn_color_mode_' + m.key]` because a lookup through a
+	// composed key is INVISIBLE to dev/scripts/pageconfig_check.php -- which is exactly how one of
+	// these would ship as the word "undefined" to somebody who does not read English.
+	function colorModeName(pc, m) {
+		var names = {
+			equal: pc.lpn_color_mode_equal,
+			quantile: pc.lpn_color_mode_quantile,
+			jenks: pc.lpn_color_mode_jenks,
+			stddev: pc.lpn_color_mode_stddev,
+			pretty: pc.lpn_color_mode_pretty,
+			log: pc.lpn_color_mode_log,
+			pressure: pc.lpn_color_mode_pressure
+		};
+		return names[m.key] || m.name;
+	}
 	function colorModeDef(mode) {
 		var R = ramps(), i;
 		if (!R) { return null; }
 		for (i = 0; i < R.MODES.length; i++) { if (R.MODES[i].key === mode) { return R.MODES[i]; } }
 		return null;
 	}
-	// Non-zero while any coloured field is on a criterion mode: the class count that mode dictates.
-	// Read by colorClassCount(), which is why choosing Pressure does not have to WRITE the count --
-	// nothing has to be put back if the user changes their mind.
-	function criterionClassCount() {
-		var R = ramps(), n = 0;
+	// Non-zero while THIS GROUP's coloured field is on a criterion mode: the class count that mode
+	// dictates. Read by colorClassCount(), which is why choosing Pressure does not have to WRITE
+	// the count -- nothing has to be put back if the user changes their mind.
+	//
+	// **PER GROUP SINCE THE SCHEMES SPLIT.** It used to answer for the whole map, so a pressure
+	// criterion on the nodes silently redrew the LINK map in five classes as well.
+	function criterionClassCount(group) {
+		var R = ramps(), field, def;
 		if (!R) { return 0; }
-		['node', 'link'].forEach(function (group) {
-			var field = colorFieldOf(group),
-				def = field ? colorModeDef(colorModeOf(group, field)) : null;
-			if (def && def.criterion) { n = R.criterionClasses(def.criterion); }
-		});
-		return n;
+		field = colorFieldOf(group);
+		def = field ? colorModeDef(colorModeOf(group, field)) : null;
+		return (def && def.criterion) ? R.criterionClasses(def.criterion) : 0;
 	}
 	// The unit a field's numbers are read in -- the same table the legend heading uses.
 	function colorFieldUnit(group, field) {
@@ -3125,7 +3170,7 @@ var EngCalcs = EngCalcs || {};
 				return unit ? toDisplay(v, unit) : v;
 			});
 		}
-		return R.breaksFor(mode, colorValues(group, field), colorClassCount());
+		return R.breaksFor(mode, colorValues(group, field), colorClassCount(group));
 	}
 	// The breaks the user TYPED, exactly as typed. Never sorted, never rounded, never clamped and
 	// never reordered -- the same rule the .inp importer follows, and validateBreaks() is what
@@ -3137,7 +3182,7 @@ var EngCalcs = EngCalcs || {};
 	function pinnedBreaks(group, field) {
 		var R = ramps(), stored = (settings.colorBreaks || {})[colorBreakKey(group, field)], v;
 		if (!R || !stored || !stored.length) { return []; }
-		v = R.validateBreaks(stored, colorClassCount());
+		v = R.validateBreaks(stored, colorClassCount(group));
 		return v.ok ? v.breaks : [];
 	}
 	function effectiveBreaks(group, field) {
@@ -3147,8 +3192,8 @@ var EngCalcs = EngCalcs || {};
 	// Class index -> colour. n classes take the ramp's own published n colours, in order; nothing
 	// is sampled out of a longer set, which is the whole of "degrade to the published lower-class
 	// set, never a subset".
-	function bandColor(bandIdx, bandCount) {
-		var cols = rampColorList(bandCount || colorClassCount()), i = bandIdx;
+	function bandColor(group, bandIdx, bandCount) {
+		var cols = rampColorList(group, bandCount || colorClassCount(group)), i = bandIdx;
 		if (!(i >= 0)) { i = 0; }
 		if (i > cols.length - 1) { i = cols.length - 1; }
 		return cols[i];
@@ -3158,12 +3203,12 @@ var EngCalcs = EngCalcs || {};
 	// stylesheet's black stands -- exactly how an uncoloured map is drawn. A pump has no velocity,
 	// and painting it the bottom colour would assert a low one, which is a lie the eye cannot
 	// detect.
-	function colorForValue(v, breaks) {
+	function colorForValue(group, v, breaks) {
 		var R = ramps(), i;
 		if (!R) { return ''; }
 		i = R.classIndex(v, breaks);
 		if (i === null) { return ''; }
-		return bandColor(i, breaks.length + 1);
+		return bandColor(group, i, breaks.length + 1);
 	}
 	// Paints one node. The junction DOT takes the colour as a fill; a reservoir or tank has no
 	// visible circle (css: fill:none -- the circle is the invisible hit target), so its overlay
@@ -3173,7 +3218,7 @@ var EngCalcs = EngCalcs || {};
 		var ne = nodeEls[id], n = nodeById(id);
 		if (!ne || !n) { return; }
 		var field = colorFieldOf('node');
-		var col = field ? colorForValue(colorNodeValue(n, field), effectiveBreaks('node', field)) : '';
+		var col = field ? colorForValue('node', colorNodeValue(n, field), effectiveBreaks('node', field)) : '';
 		if (isFixedHeadNode(n)) {
 			if (ne.symbol) { ne.symbol.style.color = col; }
 		} else {
@@ -3184,7 +3229,7 @@ var EngCalcs = EngCalcs || {};
 		var le = linkEls[id], l = linkById(id);
 		if (!le || !l) { return; }
 		var field = colorFieldOf('link');
-		var col = field ? colorForValue(colorLinkValue(l, field), effectiveBreaks('link', field)) : '';
+		var col = field ? colorForValue('link', colorLinkValue(l, field), effectiveBreaks('link', field)) : '';
 		le.line.style.stroke = col;
 		// A pump's or valve's icon goes with its own line -- the two are one mark (css: the symbol
 		// and the polyline are both black by the same argument).
@@ -3262,7 +3307,7 @@ var EngCalcs = EngCalcs || {};
 					txt = document.createElement('span');
 				row.style.cssText = 'display:flex;gap:0.5em;align-items:center';
 				sw.className = 'lpn-color-swatch';
-				sw.style.background = bandColor(i, breaks.length + 1);
+				sw.style.background = bandColor(group, i, breaks.length + 1);
 				// Range text is built from glyphs, not words: '<', '≤' and an en dash are the
 				// same marks in all 27 languages and need no key. (An RTL reader gets them mirrored
 				// by the bidi algorithm, which is the correct rendering.)
@@ -6781,11 +6826,11 @@ var EngCalcs = EngCalcs || {};
 	// one thing a hand-rolled strip gets wrong. Asked in PERCENT (a width of 100) because the
 	// pane's pixel width is not known until it is painted, and a percentage is exact at every one.
 	var SWATCH_BAR_WIDTH = 100;
-	function swatchBarEl(rampKey, classCount) {
+	function swatchBarEl(group, rampKey, classCount) {
 		var R = ramps(), strip = document.createElement('div'), bar, i, sw, box;
 		strip.className = 'lpn-ramp-strip';
 		bar = R ? R.swatchBar(rampKey, classCount, SWATCH_BAR_WIDTH,
-			{ height: 0, reverse: !!settings.colorReverse }) : null;
+			{ height: 0, reverse: colorReverseOf(group) }) : null;
 		if (!bar) {
 			// Without that file the swatches stay inline-blocks at their own fixed width: a
 			// narrower strip, still equal, still readable. The seam degrades.
@@ -6809,10 +6854,12 @@ var EngCalcs = EngCalcs || {};
 		}
 		return strip;
 	}
-	// Set when a ramp is chosen, so the button REBUILT under the choice takes the focus back. The
-	// whole control is rebuilt on every change (syncColorControls()), and a keyboard user who lost
-	// the focus to the document body on every pick could not walk the list at all.
-	var rampPickerWantsFocus = false;
+	// WHICH group's picker just took a choice, so the button REBUILT under it takes the focus back.
+	// The whole control is rebuilt on every change (syncColorControls()), and a keyboard user who
+	// lost the focus to the document body on every pick could not walk the list at all. It names
+	// the group rather than being a bare flag: there are two pickers now, and handing the focus to
+	// the wrong one is worse than dropping it.
+	var rampPickerWantsFocus = null;
 	/**
 	 * THE RAMP PICKER: a button showing the current ramp, and a popup that is a scrolling column of
 	 * ramps under family headings, WITH NO NAMES ON SCREEN.
@@ -6832,20 +6879,21 @@ var EngCalcs = EngCalcs || {};
 	 * Keyboard: the button opens on Enter, Space or Down; inside the list Up/Down/Home/End move,
 	 * Enter or Space chooses, Escape closes and gives the button back the focus.
 	 */
-	function buildRampPicker(pc) {
+	function buildRampPicker(pc, group) {
 		var R = ramps(), wrap = document.createElement('div'), btn = document.createElement('button'),
-			pop = document.createElement('div'), opts = [], open = false, active = 0, name;
+			pop = document.createElement('div'), opts = [], open = false, active = 0, name,
+			cur = colorRampKey(group), n = colorClassCount(group);
 		wrap.className = 'lpn-ramp-picker';
-		name = ((R && R.RAMPS[settings.colorRamp]) || { name: settings.colorRamp }).name;
+		name = ((R && R.RAMPS[cur]) || { name: cur }).name;
 		btn.type = 'button';
-		btn.id = 'lpn_set_ramp';
+		btn.id = 'lpn_set_ramp_' + group;
 		btn.className = 'lpn-ramp-btn';
 		btn.setAttribute('aria-haspopup', 'listbox');
 		btn.setAttribute('aria-expanded', 'false');
 		btn.setAttribute('aria-label', (pc.lpn_settings_color_ramp || 'Color scheme') + ': ' + name);
 		btn.title = name;
-		btn.appendChild(swatchBarEl(settings.colorRamp, colorClassCount()));
-		pop.id = 'lpn_set_ramp_list';
+		btn.appendChild(swatchBarEl(group, cur, n));
+		pop.id = 'lpn_set_ramp_list_' + group;
 		pop.className = 'lpn-ramp-pop';
 		pop.setAttribute('role', 'listbox');
 		pop.setAttribute('aria-label', pc.lpn_settings_color_ramp || 'Color scheme');
@@ -6860,7 +6908,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		function currentIndex() {
 			var i;
-			for (i = 0; i < opts.length; i++) { if (opts[i].getAttribute('data-ramp') === settings.colorRamp) { return i; } }
+			for (i = 0; i < opts.length; i++) { if (opts[i].getAttribute('data-ramp') === cur) { return i; } }
 			return 0;
 		}
 		function setOpen(v) {
@@ -6870,8 +6918,8 @@ var EngCalcs = EngCalcs || {};
 			if (v) { focusOpt(currentIndex()); }
 		}
 		function choose(key) {
-			settings.colorRamp = key;
-			rampPickerWantsFocus = true;
+			if (group === 'link') { settings.colorRampLink = key; } else { settings.colorRampNode = key; }
+			rampPickerWantsFocus = group;
 			refreshValueColors(); saveToStorage(); syncColorControls();
 		}
 		rampGroups().forEach(function (group) {
@@ -6881,11 +6929,11 @@ var EngCalcs = EngCalcs || {};
 				row.className = 'lpn-ramp-opt';
 				row.setAttribute('role', 'option');
 				row.setAttribute('data-ramp', key);
-				row.setAttribute('aria-selected', key === settings.colorRamp ? 'true' : 'false');
+				row.setAttribute('aria-selected', key === cur ? 'true' : 'false');
 				row.setAttribute('aria-label', rname);
 				row.setAttribute('tabindex', '-1');
 				row.title = rname;
-				row.appendChild(swatchBarEl(key, colorClassCount()));
+				row.appendChild(swatchBarEl(group, key, n));
 				row.addEventListener('click', function () { choose(key); });
 				row.addEventListener('keydown', function (e) {
 					if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
@@ -6927,8 +6975,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		wrap.appendChild(btn);
 		wrap.appendChild(pop);
-		if (rampPickerWantsFocus && btn.focus) { btn.focus(); }
-		rampPickerWantsFocus = false;
+		if (rampPickerWantsFocus === group && btn.focus) { btn.focus(); rampPickerWantsFocus = null; }
 		return wrap;
 	}
 	// What a rejected break says. validateBreaks() reports a MACHINE reason and WHICH BOX; the
@@ -7014,121 +7061,103 @@ var EngCalcs = EngCalcs || {};
 			});
 			return sel;
 		}
-		// **THE TWO DROPDOWNS ARE NOT BESIDE EACH OTHER ANY MORE** (Tom, 2026-08-18: "Dissolve
-		// Color by value and put its items in Node symbology and Link symbology"). Each one is with
-		// the labels of the same kind of element, because "how is a junction drawn" is one question
-		// and was two panels. What both kinds SHARE -- the scheme itself, how many ranges, which
-		// way round -- is in Map appearance, once, which is the drift this box was built to end.
-		rowIn(nodeHost, pc.lpn_color_node_field || 'Color nodes by', fieldSelect('node'));
-		rowIn(linkHost, pc.lpn_color_link_field || 'Color pipes by', fieldSelect('link'));
-
-		row(pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc));
-
-		// HOW MANY RANGES, 3 to 7. Beside the ramp because the swatch above draws exactly this
-		// many boxes -- the two are one question and are read together.
-		var classSel = document.createElement('select'), i, crit = criterionClassCount();
-		classSel.id = 'lpn_set_ramp_classes';
-		for (i = (R ? R.MIN_CLASSES : 3); i <= (R ? R.MAX_CLASSES : 7); i++) {
-			var copt = document.createElement('option');
-			copt.value = String(i); copt.textContent = String(i);
-			if (i === colorClassCount()) { copt.selected = true; }
-			classSel.appendChild(copt);
-		}
-		classSel.disabled = !!crit;
-		classSel.addEventListener('change', function () {
-			settings.colorClasses = Number(classSel.value);
-			refreshValueColors(); saveToStorage(); syncColorControls();
-		});
-		row(pc.lpn_settings_color_classes || 'Number of ranges', classSel);
-		if (crit) {
-			noteIn(host, pc.lpn_color_criterion_note ||
-				'The range limits come from a design standard, so the number of ranges is fixed while that mode is chosen.');
-		}
-		var rev = document.createElement('input');
-		rev.type = 'checkbox'; rev.checked = !!settings.colorReverse;
-		rev.addEventListener('change', function () {
-			settings.colorReverse = rev.checked; refreshValueColors(); saveToStorage(); syncColorControls();
-		});
-		row(pc.lpn_settings_color_reverse || 'Reverse the color order', rev);
-		var them = document.createElement('input');
-		them.type = 'checkbox'; them.checked = !!settings.colorThematic;
-		them.addEventListener('change', function () {
-			settings.colorThematic = them.checked; refreshValueColors(); saveToStorage(); syncColorControls();
-		});
-		row(pc.lpn_settings_color_thematic || 'Thematic map: colors only, no labels', them,
-			pc.lpn_settings_color_thematic_tip);
-		row(pc.lpn_settings_color_key_position || 'Color legend position',
-			positionSelect(settings.colorLegendPosition, function (v) {
-				settings.colorLegendPosition = v;
-				applyColorLegendPosition(); saveToStorage();
-			}));
-		// **THE ACKNOWLEDGEMENT IS A LICENCE OBLIGATION, NOT A CREDIT WE CHOSE TO GIVE.** Apache-2.0
-		// clause 2 fixes its WORDING, so it is rendered verbatim out of EngCalcs.lpnRamps.CREDITS,
-		// in English, untranslated -- translating it would change the text the licence requires --
-		// and it must appear WHEREVER THE RAMPS ARE CHOSEN, which is here. Clauses 4 and 5 are the
-		// other half of the same licence: no control, heading or name anywhere in this picker says
-		// "ColorBrewer". Naming the source in a credit line is attribution, which the licence
-		// requires; naming a control after it is promotion, which it forbids.
-		var credits = document.createElement('div');
-		credits.id = 'lpn_set_ramp_credits';
-		credits.className = 'lpn-rp-credit';
-		((R && R.CREDITS) || []).forEach(function (c) {
-			var line = document.createElement('div'), a;
-			line.textContent = c.text;
-			// A link only where the sentence does not already carry the address. Brewer's does,
-			// verbatim, and appending a second one would be editing the text the licence fixes.
-			if (c.url && !/https?:\/\//.test(c.text)) {
-				line.appendChild(document.createTextNode(' '));
-				a = document.createElement('a');
-				a.href = c.url; a.target = '_blank'; a.rel = 'noopener';
-				a.textContent = c.url;
-				line.appendChild(a);
-			}
-			credits.appendChild(line);
-		});
-		host.appendChild(credits);
-		// ---- THE RANGES: a system, one per coloured field ---------------------------------------
+		// ---- ONE SYMBOLOGY GROUP, WHOLE ---------------------------------------------------------
 		//
-		// Tom, 2026-08-18: *"you enter count (or select from a dropdown offering 3 to 7) and you
-		// select from 5 range allocation modes; at the bottom of the submenu you see or enter and
-		// tweak the range breaks."* The count is in Map appearance above, because the swatch draws
-		// it; the mode and the limits are HERE, under the sub-heading of the element they colour,
-		// because they are a claim about one quantity and a field that is not being coloured by
-		// has no ranges at all.
+		// **EACH KIND OF ELEMENT NOW CARRIES ITS OWN COLOUR SCHEME** (Tom, 2026-08-19, of both
+		// groups: "put a colour-ramp picker at the bottom of this group"). What used to be one
+		// shared block in Map appearance is built twice, here, so a group can be read top to
+		// bottom as one answer: what is printed beside the element (the labels list above), what
+		// decides its colour, and what that colour is.
 		//
-		// **THE LIMITS ARE VISIBLE AND EDITABLE, AND WHAT THE USER TYPES IS NEVER REPAIRED.**
-		// validateBreaks() reports which box and why; a rejected set stays on screen with the bad
-		// box marked, and the map is left exactly as it was.
-		['node', 'link'].forEach(function (group) {
-			var field = colorFieldOf(group); if (!field) { return; }
+		// THE ORDER IS TOM'S. The field dropdown comes AFTER the label columns; the ramp picker is
+		// at the bottom of the group with the mode selector beside it -- *"Add the modes selector
+		// we discussed"*, which existed but sat where nobody found it. The range limits follow the
+		// mode that generates them, because they are its output and are meaningless above it.
+		function buildGroup(group) {
 			var target = group === 'node' ? nodeHost : linkHost,
-				key = colorBreakKey(group, field),
-				n = colorClassCount(),
-				head = document.createElement('div');
-			head.style.cssText = 'margin-top:6px;font-weight:bold';
-			head.textContent = (pc.lpn_settings_color_breaks || 'Color band limits') + ': ' + colorFieldLabel(group, field);
-			target.appendChild(head);
-			// THE MODE. Only the modes that suit this field are offered -- modesFor() keeps a
-			// criterion mode off every quantity but its own.
-			var modeSel = document.createElement('select'), cur = colorModeOf(group, field);
+				field = colorFieldOf(group),
+				crit = criterionClassCount(group),
+				n = colorClassCount(group),
+				R2 = ramps(), i;
+			rowIn(target, (group === 'node'
+				? (pc.lpn_color_node_field || 'Color nodes by')
+				: (pc.lpn_color_link_field || 'Color pipes by')), fieldSelect(group));
+
+			// THE SCHEME. A button showing a bar of this group's own colours -- see buildRampPicker.
+			rowIn(target, pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, group));
+
+			// THE MODE, immediately under the picker so the two are read as one setting: the ramp
+			// says WHICH COLOURS and the mode says WHERE THE BOUNDARIES GO. Only the modes that
+			// suit this field are offered -- modesFor() keeps a criterion mode off every quantity
+			// but its own -- and with no field chosen it offers the whole catalogue and is inert,
+			// which is what makes it DISCOVERABLE rather than something you must first earn.
+			var modeSel = document.createElement('select'), curMode = field ? colorModeOf(group, field) : '';
 			modeSel.id = 'lpn_set_color_mode_' + group;
-			((R && R.modesFor(field)) || []).forEach(function (m) {
+			modeSel.disabled = !field;
+			((R2 && R2.modesFor(field)) || []).forEach(function (m) {
 				var opt = document.createElement('option');
 				opt.value = m.key;
-				opt.textContent = pc['lpn_color_mode_' + m.key] || m.name;
-				if (m.key === cur) { opt.selected = true; }
+				opt.textContent = colorModeName(pc, m);
+				if (m.key === curMode) { opt.selected = true; }
 				modeSel.appendChild(opt);
 			});
 			modeSel.addEventListener('change', function () {
+				if (!field) { return; }
 				settings.colorModes = settings.colorModes || {};
-				settings.colorModes[key] = modeSel.value;
+				settings.colorModes[colorBreakKey(group, field)] = modeSel.value;
 				// A NEW MODE MEANS NEW NUMBERS. The pinned set was the old mode's answer, edited or
 				// not; keeping it would make choosing a mode do nothing, which is the one thing a
 				// mode picker must never do.
-				if (settings.colorBreaks) { delete settings.colorBreaks[key]; }
+				if (settings.colorBreaks) { delete settings.colorBreaks[colorBreakKey(group, field)]; }
 				refreshValueColors(); saveToStorage(); syncColorControls();
 			});
 			rowIn(target, pc.lpn_color_mode || 'Range allocation', modeSel);
+
+			// HOW MANY RANGES, 3 to 7. Beside the ramp because the swatch above draws exactly this
+			// many boxes -- the two are one question and are read together.
+			var classSel = document.createElement('select');
+			classSel.id = 'lpn_set_ramp_classes_' + group;
+			for (i = (R2 ? R2.MIN_CLASSES : 3); i <= (R2 ? R2.MAX_CLASSES : 7); i++) {
+				var copt = document.createElement('option');
+				copt.value = String(i); copt.textContent = String(i);
+				if (i === n) { copt.selected = true; }
+				classSel.appendChild(copt);
+			}
+			classSel.disabled = !!crit;
+			classSel.addEventListener('change', function () {
+				if (group === 'link') { settings.colorClassesLink = Number(classSel.value); }
+				else { settings.colorClassesNode = Number(classSel.value); }
+				refreshValueColors(); saveToStorage(); syncColorControls();
+			});
+			rowIn(target, pc.lpn_settings_color_classes || 'Number of ranges', classSel);
+			if (crit) {
+				noteIn(target, pc.lpn_color_criterion_note ||
+					'The range limits come from a design standard, so the number of ranges is fixed while that mode is chosen.');
+			}
+			var rev = document.createElement('input');
+			rev.type = 'checkbox'; rev.checked = colorReverseOf(group);
+			rev.addEventListener('change', function () {
+				if (group === 'link') { settings.colorReverseLink = rev.checked; }
+				else { settings.colorReverseNode = rev.checked; }
+				refreshValueColors(); saveToStorage(); syncColorControls();
+			});
+			rowIn(target, pc.lpn_settings_color_reverse || 'Reverse the color order', rev);
+
+			// ---- THE RANGES, one set per coloured field -----------------------------------------
+			//
+			// Tom, 2026-08-18: *"you enter count (or select from a dropdown offering 3 to 7) and you
+			// select from 5 range allocation modes; at the bottom of the submenu you see or enter
+			// and tweak the range breaks."* So the limits come last, under the mode and the count
+			// that produced them, and a field that is not being coloured by has no ranges at all.
+			//
+			// **THE LIMITS ARE VISIBLE AND EDITABLE, AND WHAT THE USER TYPES IS NEVER REPAIRED.**
+			// validateBreaks() reports which box and why; a rejected set stays on screen with the
+			// bad box marked, and the map is left exactly as it was.
+			if (!field) { return; }
+			var key = colorBreakKey(group, field), head = document.createElement('div');
+			head.style.cssText = 'margin-top:6px;font-weight:bold';
+			head.textContent = (pc.lpn_settings_color_breaks || 'Color band limits') + ': ' + colorFieldLabel(group, field);
+			target.appendChild(head);
 			noteIn(target, pc.lpn_color_ranges_note ||
 				'The mode above sets these limits from the values now on the map. Type over them and the same number always means the same color.');
 			// **WHOSE NUMBER IS IN THE BOX DECIDES HOW IT IS PRINTED.** A limit the user pinned is
@@ -7137,21 +7166,21 @@ var EngCalcs = EngCalcs || {};
 			// printed the way the colour key prints the same number, and the two agree on screen.
 			// Editing any box pins what is shown, which is what the user was looking at.
 			var pinned = pinnedBreaks(group, field).length > 0,
-				eff = effectiveBreaks(group, field), wrap = document.createElement('div'), boxes = [], i;
+				eff = effectiveBreaks(group, field), wrap = document.createElement('div'), boxes = [];
 			wrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;align-items:center';
 			var msg = document.createElement('div');
 			msg.className = 'lpn-color-msg';
 			msg.style.display = 'none';
 			function writeBreaks() {
-				var vals = boxes.map(function (b) { return b.value; }), v = R && R.validateBreaks(vals, n);
+				var vals = boxes.map(function (b) { return b.value; }), v = R2 && R2.validateBreaks(vals, n);
 				boxes.forEach(function (b) {
-					b.className = '';
+					b.className = 'lpn-set-num';
 					b.removeAttribute('aria-invalid');
 				});
 				if (!v) { return; }
 				if (!v.ok) {
 					if (boxes[v.index]) {
-						boxes[v.index].className = 'lpn-bad';
+						boxes[v.index].className = 'lpn-set-num lpn-bad';
 						boxes[v.index].setAttribute('aria-invalid', 'true');
 					}
 					msg.textContent = breakErrorText(pc, v.reason);
@@ -7169,10 +7198,11 @@ var EngCalcs = EngCalcs || {};
 			for (i = 0; i < n - 1; i++) {
 				var chip = document.createElement('span');
 				chip.className = 'lpn-color-swatch';
-				chip.style.background = bandColor(i, n);
+				chip.style.background = bandColor(group, i, n);
 				wrap.appendChild(chip);
 				var box = document.createElement('input');
 				box.type = 'number'; box.step = 'any';
+				box.className = 'lpn-set-num';
 				box.style.width = '4.5em';
 				box.value = (eff[i] === undefined) ? '' : (pinned ? eff[i] : colorNum(eff[i]));
 				box.setAttribute('aria-label', (pc.lpn_settings_color_breaks || 'Color band limits') + ' ' + (i + 1));
@@ -7182,7 +7212,7 @@ var EngCalcs = EngCalcs || {};
 			}
 			var top = document.createElement('span');
 			top.className = 'lpn-color-swatch';
-			top.style.background = bandColor(n - 1, n);
+			top.style.background = bandColor(group, n - 1, n);
 			wrap.appendChild(top);
 			target.appendChild(wrap);
 			target.appendChild(msg);
@@ -7201,7 +7231,56 @@ var EngCalcs = EngCalcs || {};
 			});
 			btnWrap.appendChild(clearBtn);
 			target.appendChild(btnWrap);
+		}
+		buildGroup('node');
+		buildGroup('link');
+
+		// ---- WHAT IS STILL TRUE OF THE WHOLE MAP ------------------------------------------------
+		//
+		// Everything above belongs to one kind of element. These three do not: a thematic map is a
+		// mode the whole sheet is in, the colour key is one overlay in one corner however many
+		// schemes feed it, and the acknowledgement is a licence obligation on the catalogue rather
+		// than on either picker. So they stand under Map appearance, where the sizes and the other
+		// legend already are.
+		var them = document.createElement('input');
+		them.type = 'checkbox'; them.checked = !!settings.colorThematic;
+		them.addEventListener('change', function () {
+			settings.colorThematic = them.checked; refreshValueColors(); saveToStorage(); syncColorControls();
 		});
+		row(pc.lpn_settings_color_thematic || 'Thematic map: colors only, no labels', them,
+			pc.lpn_settings_color_thematic_tip);
+		row(pc.lpn_settings_color_key_position || 'Color legend position',
+			positionSelect(settings.colorLegendPosition, function (v) {
+				settings.colorLegendPosition = v;
+				applyColorLegendPosition(); saveToStorage();
+			}));
+		// **THE ACKNOWLEDGEMENT IS A LICENCE OBLIGATION, NOT A CREDIT WE CHOSE TO GIVE.** Apache-2.0
+		// clause 2 fixes its WORDING, so it is rendered verbatim out of EngCalcs.lpnRamps.CREDITS,
+		// in English, untranslated -- translating it would change the text the licence requires.
+		// ONE copy for the two pickers: it acknowledges the CATALOGUE they both draw from, and
+		// printing it twice in one box would read as a stutter rather than as more attribution.
+		// Clauses 4 and 5 are the other half of the same licence: no control, heading or name
+		// anywhere in this box says "ColorBrewer". Naming the source in a credit line is
+		// attribution, which the licence requires; naming a control after it is promotion, which it
+		// forbids.
+		var credits = document.createElement('div');
+		credits.id = 'lpn_set_ramp_credits';
+		credits.className = 'lpn-rp-credit';
+		((R && R.CREDITS) || []).forEach(function (c) {
+			var line = document.createElement('div'), a;
+			line.textContent = c.text;
+			// A link only where the sentence does not already carry the address. Brewer's does,
+			// verbatim, and appending a second one would be editing the text the licence fixes.
+			if (c.url && !/https?:\/\//.test(c.text)) {
+				line.appendChild(document.createTextNode(' '));
+				a = document.createElement('a');
+				a.href = c.url; a.target = '_blank'; a.rel = 'noopener';
+				a.textContent = c.url;
+				line.appendChild(a);
+			}
+			credits.appendChild(line);
+		});
+		host.appendChild(credits);
 		[nodeHost, linkHost, host].forEach(function (h) {
 			if (EngCalcs.initTips) { EngCalcs.initTips(h); }
 		});
@@ -8892,12 +8971,27 @@ var EngCalcs = EngCalcs || {};
 		var savedPrefixes = savedSettings.idPrefixes || {};
 		delete savedSettings.defaults; delete savedSettings.sectionsOpen; delete savedSettings.idPrefixes;
 		settings = Object.assign(defaultSettings(), savedSettings);
-		// **A DOCUMENT SAVED BEFORE THE CLASS COUNT EXISTED WAS DRAWN IN FIVE BANDS**, and any
+		// **NOTHING CHANGES COLOUR WHEN AN OLD PROJECT IS OPENED.** The colour scheme, the class
+		// count and the reverse flag were one each for the whole map until they split per element
+		// class; a document written then carries the single key, and both groups take its value,
+		// which redraws it exactly as it was saved. The old keys are then DROPPED rather than left
+		// to ride along unread, so nothing can later read a stale one and disagree with the map.
+		//
+		// A document saved before the class count existed at all was drawn in FIVE bands, and any
 		// break values pinned in it are four numbers. Letting it come back at the new default of
 		// seven would quietly ignore all four (seven classes want six breaks) and repaint the map,
-		// so the count follows the file rather than the default. Every save written since carries
-		// the key and is unaffected.
-		if (savedSettings.colorClasses === undefined) { settings.colorClasses = 5; }
+		// so the count follows the file rather than the default.
+		[['colorRamp', 'colorRampNode', 'colorRampLink', 'string', undefined],
+			['colorClasses', 'colorClassesNode', 'colorClassesLink', 'number', 5],
+			['colorReverse', 'colorReverseNode', 'colorReverseLink', 'boolean', undefined]
+		].forEach(function (m) {
+			var old = savedSettings[m[0]], had = typeof old === m[3];
+			// A save that already carries the per-group keys is current and is left alone.
+			if (savedSettings[m[1]] !== undefined || savedSettings[m[2]] !== undefined) { return; }
+			if (had) { settings[m[1]] = old; settings[m[2]] = old; }
+			else if (m[4] !== undefined) { settings[m[1]] = m[4]; settings[m[2]] = m[4]; }
+		});
+		delete settings.colorRamp; delete settings.colorClasses; delete settings.colorReverse;
 		Object.assign(settings.defaults, savedDefaults);
 		Object.assign(settings.sectionsOpen, savedSections);
 		Object.assign(settings.idPrefixes, savedPrefixes);
@@ -13994,6 +14088,10 @@ var EngCalcs = EngCalcs || {};
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(span);
+		// The name takes the slack. What lets it SHRINK below its longest word -- and so what keeps
+		// this list from pushing the Settings box sideways -- is `min-width: 0` and
+		// `overflow-wrap: anywhere` in css/engcalcs.css, stated once there beside the list's own
+		// width floor rather than half here and half there.
 		label.style.flex = '1 1 auto';
 		row.appendChild(label);
 		if (affixOpt) { row.appendChild(affixBox(affixOpt.prefix)); row.appendChild(affixBox(affixOpt.suffix)); }

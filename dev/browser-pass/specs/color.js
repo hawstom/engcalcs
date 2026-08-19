@@ -13,6 +13,13 @@
 // modes, and a choice of number of ranges."* So it is no longer a <select> — a <select> cannot hold
 // a picture — but a button showing one swatch bar over a popup that is a scrolling column of them.
 //
+// **AND THEN THE ONE SCHEME BECAME TWO** (Tom, 2026-08-19, of each symbology group in turn: move
+// the field dropdown below the label columns, and "put a colour-ramp picker at the bottom of this
+// group"). Nodes and links now own a ramp, a class count, a reverse flag and a mode selector each,
+// which is what EPANET and epanet-js do and what a field dropdown each already implied. The
+// migration -- an older project opening on exactly the colours it was saved in -- is asserted in
+// dev/lpn-spike/color-ramp-harness.js, where a saved file can be built by hand.
+//
 // This is a browser check because every claim below is about what is PAINTED and what is
 // REACHABLE: equal widths are a fact about layout that only a real layout can answer, and a picker
 // that cannot be opened from the keyboard is not a picker for everybody.
@@ -114,9 +121,60 @@ exports.run = async function ({ browser, report }) {
 			document.querySelectorAll('#lpn_set_colors_link select[id^="lpn_set_color_"]').length), 2,
 			'the link dropdown and its range mode are under Link symbology');
 
+		// ---- THE SHAPE OF A SYMBOLOGY GROUP (Tom, 2026-08-19) -------------------------------
+		//
+		// Read down the page, a group is now: what is PRINTED beside the element, then what decides
+		// its COLOUR, then the scheme that colour comes from. Asserted by painted position, because
+		// the order is the whole of what he asked for and DOM order alone can lie about it.
+		const order = await a.page.evaluate(() => {
+			const top = (id) => {
+				const e = document.getElementById(id);
+				return e ? e.getBoundingClientRect().top : null;
+			};
+			return {
+				nodeLabels: top('lpn_labels_node_fields'), nodeColors: top('lpn_set_colors_node'),
+				linkLabels: top('lpn_labels_link_fields'), linkColors: top('lpn_set_colors_link'),
+				nodeField: top('lpn_set_color_node'), nodeRamp: top('lpn_set_ramp_node'),
+				nodeMode: top('lpn_set_color_mode_node'),
+				nodeLink: top('lpn_set_sub_nodeLink'), mapDisplay: top('lpn_set_sub_mapDisplay'),
+				textSize: (() => {
+					const rows = [...document.querySelectorAll('#lpn_set_map_fields .lpn-set-row')];
+					return rows.length ? rows[0].getBoundingClientRect().top : null;
+				})()
+			};
+		});
+		report.ok(order.nodeLabels < order.nodeColors,
+			'"Color nodes by" sits AFTER the label columns');
+		report.ok(order.linkLabels < order.linkColors,
+			'...and "Color pipes by" after the link ones');
+		report.ok(order.nodeField < order.nodeRamp,
+			'...with that group\'s ramp picker at the bottom of it');
+		report.ok(Math.abs(order.nodeMode - order.nodeRamp) < 60,
+			'the range-allocation modes sit right beside the picker, where they can be found',
+			`ramp at ${order.nodeRamp}, mode at ${order.nodeMode}`);
+		// **A THIRD SUB-HEADING FOR THE TWO CONTROLS THAT ARE ABOUT BOTH KINDS AT ONCE.**
+		report.ok(order.nodeLink !== null && order.nodeLink > order.linkColors && order.nodeLink < order.mapDisplay,
+			'"Node and link" stands between Link symbology and Map appearance');
+		report.ok(await a.page.evaluate(() => {
+			const body = document.getElementById('lpn_labels_options');
+			const sub = document.getElementById('lpn_set_sub_nodeLink');
+			if (!body || !sub) { return false; }
+			const t = body.textContent.toLowerCase();
+			return body.getBoundingClientRect().top > sub.getBoundingClientRect().top &&
+				/highest/.test(t) && /between/.test(t);
+		}), '...and holds the high/low mark and the text between values');
+		report.ok(order.mapDisplay < order.textSize && order.textSize - order.mapDisplay < 60,
+			'the Map appearance heading sits immediately before Text size',
+			`heading at ${order.mapDisplay}, first row at ${order.textSize}`);
+		// EACH GROUP'S PICKER IS ITS OWN. Two buttons, two lists, and choosing in one leaves the
+		// other showing what it was showing.
+		report.eq(await a.page.evaluate(() =>
+			document.querySelectorAll('#lpn_settings_box .lpn-ramp-picker').length), 2,
+			'there is a ramp picker in each symbology group, and only there');
+
 		// ---- THE CLOSED PICKER ---------------------------------------------------------------
 		const btn = await a.page.evaluate(() => {
-			const b = document.getElementById('lpn_set_ramp');
+			const b = document.getElementById('lpn_set_ramp_node');
 			return b ? {
 				tag: b.tagName, pop: b.getAttribute('aria-haspopup'),
 				expanded: b.getAttribute('aria-expanded'), label: b.getAttribute('aria-label'),
@@ -133,7 +191,7 @@ exports.run = async function ({ browser, report }) {
 		// **EVERY SWATCH IS EXACTLY THE SAME WIDTH** (Tom: "The colour palette does not show
 		// nicely. First color expands to use all space"). It did: the strip wore a labelled row's
 		// class, whose first child takes all the slack.
-		const closed = await barWidths(a, '#lpn_set_ramp');
+		const closed = await barWidths(a, '#lpn_set_ramp_node');
 		report.eq(closed && closed.length, 7, 'the closed bar draws one box per class, seven by default',
 			closed && closed.join(', '));
 		report.ok(closed && Math.max(...closed) - Math.min(...closed) <= 1,
@@ -141,10 +199,10 @@ exports.run = async function ({ browser, report }) {
 			closed && `widest ${Math.max(...closed)}, narrowest ${Math.min(...closed)}`);
 
 		// ---- THE OPEN PICKER -------------------------------------------------------------------
-		await a.page.click('#lpn_set_ramp');
+		await a.page.click('#lpn_set_ramp_node');
 		await a.settle(250);
 		const open = await a.page.evaluate(() => {
-			const pop = document.getElementById('lpn_set_ramp_list');
+			const pop = document.getElementById('lpn_set_ramp_list_node');
 			const rows = [...pop.querySelectorAll('[role="option"]')];
 			const heads = [...pop.querySelectorAll('.lpn-ramp-fam')];
 			return {
@@ -183,7 +241,9 @@ exports.run = async function ({ browser, report }) {
 			'the rainbow is last, in a group of its own, and says what it is for',
 			open.heads[open.heads.length - 1]);
 		// **CLAUSES 4 AND 5 OF THE LICENCE**: the name may not appear on a control. It appears once,
-		// inside the acknowledgement clause 2 fixes the wording of, and nowhere else.
+		// inside the acknowledgement clause 2 fixes the wording of, and nowhere else. ONE copy for
+		// the two pickers -- it acknowledges the CATALOGUE they both draw from, so it stands under
+		// Map appearance rather than being printed twice in one box.
 		const brewer = await a.page.evaluate(() => {
 			const box = document.getElementById('lpn_settings_box');
 			const credit = document.getElementById('lpn_set_ramp_credits');
@@ -196,29 +256,31 @@ exports.run = async function ({ browser, report }) {
 		});
 		report.has(brewer.credit,
 			'This product includes color specifications and designs developed by Cynthia Brewer (http://colorbrewer.org/).',
-			'the acknowledgement appears verbatim where the ramps are chosen');
+			'the acknowledgement appears verbatim, once, in the box that offers the ramps');
 		report.eq(brewer.elsewhere, 0, 'and the word "ColorBrewer" appears on no control at all');
 		report.ok(!/ColorBrewer/.test(brewer.labels), '...nor in any accessible name');
 
 		// Choosing a row stores it, repaints the button, and shuts the list.
 		const target = await a.page.evaluate(() => {
-			const rows = [...document.querySelectorAll('#lpn_set_ramp_list [role="option"]')];
+			const rows = [...document.querySelectorAll('#lpn_set_ramp_list_node [role="option"]')];
 			const other = rows.find(r => r.getAttribute('aria-selected') !== 'true');
 			other.click();
 			return other.getAttribute('data-ramp');
 		});
 		await a.settle(400);
-		report.eq((await storedSettings(a)).colorRamp, target, 'clicking a row stores that ramp on the project');
+		report.eq((await storedSettings(a)).colorRampNode, target, 'clicking a row stores that ramp on the project');
+		report.ok((await storedSettings(a)).colorRampLink !== target,
+			'...on THAT group only — the link scheme is the user\'s other choice, not a copy of this one');
 		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_set_ramp_list').style.display === 'none'),
+			document.getElementById('lpn_set_ramp_list_node').style.display === 'none'),
 			'...and the list closes behind the choice');
 
 		// **KEYBOARD-OPERABLE**, which a picture-only control has to be or it is nobody's picker.
-		await a.page.focus('#lpn_set_ramp');
+		await a.page.focus('#lpn_set_ramp_node');
 		await a.page.keyboard.press('ArrowDown');
 		await a.settle(250);
 		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_set_ramp').getAttribute('aria-expanded') === 'true'),
+			document.getElementById('lpn_set_ramp_node').getAttribute('aria-expanded') === 'true'),
 			'Down opens the list from the keyboard');
 		report.ok(await a.page.evaluate(() =>
 			(document.activeElement.getAttribute('role') === 'option')),
@@ -235,8 +297,8 @@ exports.run = async function ({ browser, report }) {
 		await a.page.keyboard.press('Escape');
 		await a.settle(200);
 		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_set_ramp').getAttribute('aria-expanded') === 'false' &&
-			document.activeElement.id === 'lpn_set_ramp'),
+			document.getElementById('lpn_set_ramp_node').getAttribute('aria-expanded') === 'false' &&
+			document.activeElement.id === 'lpn_set_ramp_node'),
 			'Escape closes it and hands the focus back to the button');
 		// **INNERMOST FIRST.** The document's Escape handler closes the whole Settings box; an
 		// Escape aimed at an open list must cost the list and not the box, which is the same
@@ -246,16 +308,16 @@ exports.run = async function ({ browser, report }) {
 			'...and the Settings box behind it stays open');
 
 		// ---- HOW MANY RANGES -------------------------------------------------------------------
-		await pick(a, 'lpn_set_ramp_classes', '4');
-		report.eq((await storedSettings(a)).colorClasses, 4, 'the count picker stores 3 to 7');
-		const four = await barWidths(a, '#lpn_set_ramp');
+		await pick(a, 'lpn_set_ramp_classes_node', '4');
+		report.eq((await storedSettings(a)).colorClassesNode, 4, 'the count picker stores 3 to 7');
+		const four = await barWidths(a, '#lpn_set_ramp_node');
 		report.eq(four.length, 4, '...and the swatch follows it, so the picture cannot lie about the map',
 			four.join(', '));
 		report.ok(Math.max(...four) - Math.min(...four) <= 1, '...still exactly equal widths');
 		report.eq(await a.page.evaluate(() =>
 			document.querySelectorAll('#lpn_set_colors_node input[type="number"]').length), 3,
 			'four ranges are separated by three limits');
-		await pick(a, 'lpn_set_ramp_classes', '7');
+		await pick(a, 'lpn_set_ramp_classes_node', '7');
 
 		// ---- THE MODES -------------------------------------------------------------------------
 		const modes = await a.page.evaluate(() => {
@@ -271,8 +333,13 @@ exports.run = async function ({ browser, report }) {
 		// picker must not offer to disagree with them.
 		await pick(a, 'lpn_set_color_mode_node', 'pressure');
 		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_set_ramp_classes').disabled), 'a criterion mode fixes the count');
-		report.eq((await barWidths(a, '#lpn_set_ramp')).length, 5,
+			document.getElementById('lpn_set_ramp_classes_node').disabled), 'a criterion mode fixes the count');
+		// ...FOR ITS OWN GROUP. Before the schemes split, a criterion chosen for the nodes redrew
+		// the link map in five classes too, silently.
+		report.ok(await a.page.evaluate(() =>
+			document.getElementById('lpn_set_ramp_classes_link').disabled === false),
+			'...and leaves the link count picker alone');
+		report.eq((await barWidths(a, '#lpn_set_ramp_node')).length, 5,
 			'...at five, which is what four thresholds are');
 		await pick(a, 'lpn_set_color_mode_node', 'equal');
 
@@ -336,6 +403,34 @@ exports.run = async function ({ browser, report }) {
 			const s = sub.getBoundingClientRect(), h = head.getBoundingClientRect();
 			return s.top - h.bottom >= -1 && s.top - pane.getBoundingClientRect().top < 60;
 		}), '...scrolled to the colour controls, clear of the sticky heading');
+
+		// ---- ONE ALIGNMENT RULE FOR THE WHOLE BOX (Tom: "Some inputs are right justified. Others
+		// are not. Standardize with an eye for design") -------------------------------------------
+		//
+		// Numbers right, words left, and a box with its own spinner arrows centred because the
+		// arrows own its right edge. Measured as COMPUTED style, because the rule is a stylesheet
+		// claim and an inline style set anywhere would quietly beat it.
+		const aligns = await a.page.evaluate(() => {
+			const out = { number: [], text: [], spin: [], select: [] };
+			[...document.querySelectorAll('#lpn_settings_box .lpn-set-secbody input')].forEach((i) => {
+				const ta = getComputedStyle(i).textAlign;
+				if (i.classList.contains('ec-spin')) { out.spin.push(ta); }
+				else if (i.type === 'number' || i.classList.contains('lpn-set-num')) { out.number.push(ta); }
+				else if (i.type === 'text') { out.text.push(ta); }
+			});
+			[...document.querySelectorAll('#lpn_settings_box .lpn-set-secbody select')]
+				.forEach(sl => out.select.push(getComputedStyle(sl).textAlign));
+			return out;
+		});
+		report.ok(aligns.number.length > 3 && aligns.number.every(t => t === 'right'),
+			'every number in the box is right-aligned, so digits line up down the column',
+			[...new Set(aligns.number)].join(',') + ` over ${aligns.number.length} boxes`);
+		report.ok(aligns.text.every(t => t !== 'right'),
+			'...and every box holding WORDS keeps its natural start alignment',
+			[...new Set(aligns.text)].join(','));
+		report.ok(aligns.spin.length > 0 && aligns.spin.every(t => t === 'center'),
+			'...and the two spinner columns are centred, under their centred headings',
+			[...new Set(aligns.spin)].join(','));
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {

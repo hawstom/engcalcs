@@ -586,29 +586,44 @@ echoHeader("EngCalcs", $html_title, "", false);
 						      // what is PRINTED beside it, which is one question and was two panels. Tom:
 						      // "Dissolve Color by value and put its items in Node symbology and Link
 						      // symbology." ?>
+						<?php // **WHAT IS PRINTED FIRST, THEN WHAT DECIDES THE COLOUR** (Tom, 2026-08-19:
+						      // move the "Color nodes by" control to sit after the label columns, and
+						      // "put a colour-ramp picker at the bottom of this group"). Each group is
+						      // now one complete answer to "how is this kind of element drawn", scheme
+						      // included -- which is why the ramp is stored per group; see
+						      // defaultSettings() in js/looped-network.js. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_nodeSym"><?=$ec_lang['lpn_settings_node_symbology']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
 							<div id="lpn_labels_node_fields"></div>
+							<div id="lpn_set_colors_node" class="lpn-set-part"></div>
 						</div>
 						<div class="lpn-set-sub" id="lpn_set_sub_linkSym"><?=$ec_lang['lpn_settings_link_symbology']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
 							<div id="lpn_labels_link_fields"></div>
+							<div id="lpn_set_colors_link" class="lpn-set-part"></div>
 						</div>
-						<?php // Map appearance holds what is true of the WHOLE map: the colour scheme both
-						      // symbologies draw from, the sizes, the two legend positions. ?>
+						<?php // **THE TWO CONTROLS THAT ARE ABOUT BOTH KINDS AT ONCE** (Tom, 2026-08-19).
+						      // The high/low mark and the text between values apply to a node label and a
+						      // link label alike, so they belong to neither group and were being read as
+						      // part of whichever one they were filed under. rebuildLabelsFields() fills
+						      // this host. ?>
+						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_node_link']?></div>
+						<div class="lpn-set-subbody">
+							<div id="lpn_labels_options" class="lpn-set-part"></div>
+						</div>
+						<?php // Map appearance holds what is true of the WHOLE SHEET: the sizes, the two
+						      // legend positions, the thematic mode. Its heading sits immediately before
+						      // Text size, which is Tom's own placement.
+						      //
+						      // The colour-scheme acknowledgements are rendered into the shared host by
+						      // buildColoringSection(), VERBATIM out of EngCalcs.lpnRamps.CREDITS -- one
+						      // licence fixes its own wording, so it is never retyped here where it could
+						      // drift. Untranslated on purpose, exactly like the OpenStreetMap credit on
+						      // the map. ?>
 						<div class="lpn-set-sub" id="lpn_set_sub_mapDisplay"><?=$ec_lang['lpn_settings_map_display']?></div>
 						<div class="lpn-set-subbody">
-							<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
-							<?php // The colour-scheme acknowledgements are rendered into this section by
-							      // buildColoringSection(), VERBATIM out of EngCalcs.lpnRamps.CREDITS --
-							      // one licence fixes its own wording, so the sentence lives beside the
-							      // ramps it is about rather than being retyped here where it could
-							      // drift. Untranslated on purpose, exactly like the OpenStreetMap
-							      // credit on the map. ?>
 							<div id="lpn_set_map_fields" class="lpn-set-part"></div>
-							<div id="lpn_labels_options" class="lpn-set-part"></div>
+							<div id="lpn_set_colors_shared" class="lpn-set-part"></div>
 						</div>
 						<?php // Tom: "Change Calculator to Page and make it a heading." The one group in the
 						      // box that is NOT carried in the project file, which its note says out loud. ?>
@@ -1055,6 +1070,13 @@ EngCalcs.pageConfig = {
 	lpn_color_ramp_diverging: <?=json_encode($ec_lang['lpn_color_ramp_diverging'])?>,
 	lpn_settings_color_classes: <?=json_encode($ec_lang['lpn_settings_color_classes'])?>,
 	lpn_color_mode: <?=json_encode($ec_lang['lpn_color_mode'])?>,
+	lpn_color_mode_equal: <?=json_encode($ec_lang['lpn_color_mode_equal'])?>,
+	lpn_color_mode_quantile: <?=json_encode($ec_lang['lpn_color_mode_quantile'])?>,
+	lpn_color_mode_jenks: <?=json_encode($ec_lang['lpn_color_mode_jenks'])?>,
+	lpn_color_mode_stddev: <?=json_encode($ec_lang['lpn_color_mode_stddev'])?>,
+	lpn_color_mode_pretty: <?=json_encode($ec_lang['lpn_color_mode_pretty'])?>,
+	lpn_color_mode_log: <?=json_encode($ec_lang['lpn_color_mode_log'])?>,
+	lpn_color_mode_pressure: <?=json_encode($ec_lang['lpn_color_mode_pressure'])?>,
 	lpn_color_ranges_note: <?=json_encode($ec_lang['lpn_color_ranges_note'])?>,
 	lpn_color_criterion_note: <?=json_encode($ec_lang['lpn_color_criterion_note'])?>,
 	lpn_color_break_number: <?=json_encode($ec_lang['lpn_color_break_number'])?>,

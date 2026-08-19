@@ -135,6 +135,44 @@ exports.run = async function ({ browser, report }) {
 				spacers.map(k => idRow.cells[k].mid).join(', '));
 		}
 
+		// ---- **THE BOX MUST NOT SCROLL SIDEWAYS** (Tom, 2026-08-19) ------------------------------
+		//
+		// The cause was here, in these rows. A flex item's default minimum is its MIN-CONTENT, so
+		// the field NAME could not shrink below its longest word: four fixed columns plus that floor
+		// came to 304 px of unshrinkable row in a 316 px pane. Twelve pixels of slack -- which is
+		// less than a classic scrollbar, so a browser that draws one instead of an overlay lost the
+		// argument on every row.
+		//
+		// **MEASURED UNDER A SQUEEZE, not at the shipped width**, and that is the whole point: at
+		// 316 px the old rows fitted too, and a headless browser with overlay scrollbars reports no
+		// overflow at all. Narrowing the pane by hand is what asks the real question -- can this
+		// content shrink? -- rather than the accidental one.
+		const squeezed = await a.page.evaluate(() => {
+			const pane = document.getElementById('lpn_setbox_content');
+			const was = pane.style.cssText;
+			pane.style.width = '260px';
+			pane.style.flex = '0 0 auto';
+			const out = { scroll: pane.scrollWidth, client: pane.clientWidth, worst: null };
+			const right = pane.getBoundingClientRect().left + pane.clientWidth;
+			const walk = (el) => {
+				for (const k of el.children) {
+					const b = k.getBoundingClientRect();
+					if (b.width && b.right > right + 0.5 && (!out.worst || b.right - right > out.worst.over)) {
+						out.worst = { over: +(b.right - right).toFixed(1), id: k.id,
+							cls: String(k.className).slice(0, 30), txt: (k.textContent || '').trim().slice(0, 30) };
+					}
+					walk(k);
+				}
+			};
+			walk(pane);
+			pane.style.cssText = was;
+			return out;
+		});
+		report.ok(squeezed.scroll <= squeezed.client,
+			'the Settings box content fits its pane with 56 px taken away — it never scrolls sideways',
+			`needs ${squeezed.scroll} px in ${squeezed.client} px` +
+			(squeezed.worst ? `; widest offender "${squeezed.worst.txt || squeezed.worst.id}" over by ${squeezed.worst.over}` : ''));
+
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');
 	} finally {
 		await a.close();

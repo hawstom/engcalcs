@@ -73,9 +73,12 @@ exports.run = async function ({ browser, report }) {
 			'three categories, in the order Tom gave them');
 		const subs = await a.page.evaluate(() =>
 			[...document.querySelectorAll('#lpn_setbox_content .lpn-set-sub')].map(s => s.id));
+		// "Node and link" joined them on 2026-08-19: the high/low mark and the text between values
+		// are true of a node label and a link label alike, so they stand between the two symbology
+		// groups and Map appearance rather than inside either one.
 		report.eq(subs.join(','),
-			'lpn_set_sub_nodeSym,lpn_set_sub_linkSym,lpn_set_sub_mapDisplay,lpn_set_sub_page,' +
-			'lpn_set_sub_idPrefixes,lpn_set_sub_defaults,' +
+			'lpn_set_sub_nodeSym,lpn_set_sub_linkSym,lpn_set_sub_nodeLink,lpn_set_sub_mapDisplay,' +
+			'lpn_set_sub_page,lpn_set_sub_idPrefixes,lpn_set_sub_defaults,' +
 			'lpn_set_sub_units,lpn_set_sub_time,lpn_set_sub_hydraulics',
 			'...and the sub-headings under them', subs.join(','));
 		report.ok(!(await a.page.evaluate(() =>

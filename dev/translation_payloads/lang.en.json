@@ -1056,7 +1056,7 @@
         "lpn_settings_show_titles": "Show page titles",
         "lpn_settings_show_titles_tip": "Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.",
         "lpn_settings_id_prefixes": "ID prefixes",
-        "lpn_settings_defaults": "Starting values",
+        "lpn_settings_defaults": "Creation values",
         "lpn_settings_defaults_note": "Used for elements you create from now on. Existing elements are not changed.",
         "lpn_settings_push_note": "Only the properties whose labels are showing right now are applied.",
         "lpn_settings_push_btn": "Apply starting values to all elements",
@@ -1182,9 +1182,17 @@
         "lpn_settings_page_note": "Saved in this calculator, not in the project.",
         "lpn_settings_hydraulics": "Hydraulics",
         "lpn_labels_col_decimals_example": "0.000",
-        "lpn_labels_col_rank": "Rank"
+        "lpn_labels_col_rank": "Rank",
+        "lpn_settings_node_link": "Node and link",
+        "lpn_color_mode_equal": "Equal interval",
+        "lpn_color_mode_quantile": "Quantile (equal count)",
+        "lpn_color_mode_jenks": "Natural breaks (Jenks)",
+        "lpn_color_mode_stddev": "Standard deviation",
+        "lpn_color_mode_pretty": "Pretty (rounded)",
+        "lpn_color_mode_log": "Logarithmic",
+        "lpn_color_mode_pressure": "Pressure"
     },
-    "count": 1182,
+    "count": 1190,
     "active_prefixes": [
         "about",
         "bpn",

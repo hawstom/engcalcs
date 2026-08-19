@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 1182,
-        "delta_key_count": 186,
+        "expected_key_count": 1190,
+        "delta_key_count": 194,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_depthFrac",
@@ -631,7 +631,15 @@
         "lpn_settings_page_note": "Saved in this calculator, not in the project.",
         "lpn_settings_hydraulics": "Hydraulics",
         "lpn_labels_col_decimals_example": "0.000",
-        "lpn_labels_col_rank": "Rank"
+        "lpn_labels_col_rank": "Rank",
+        "lpn_settings_node_link": "Node and link",
+        "lpn_color_mode_equal": "Equal interval",
+        "lpn_color_mode_quantile": "Quantile (equal count)",
+        "lpn_color_mode_jenks": "Natural breaks (Jenks)",
+        "lpn_color_mode_stddev": "Standard deviation",
+        "lpn_color_mode_pretty": "Pretty (rounded)",
+        "lpn_color_mode_log": "Logarithmic",
+        "lpn_color_mode_pressure": "Pressure"
     },
     "keys": {
         "lpn_field_text_align": "Horizontal alignment",
@@ -819,7 +827,15 @@
         "lpn_settings_page_note": "Saved in this calculator, not in the project.",
         "lpn_settings_hydraulics": "Hydraulics",
         "lpn_labels_col_decimals_example": "0.000",
-        "lpn_labels_col_rank": "Rank"
+        "lpn_labels_col_rank": "Rank",
+        "lpn_settings_node_link": "Node and link",
+        "lpn_color_mode_equal": "Equal interval",
+        "lpn_color_mode_quantile": "Quantile (equal count)",
+        "lpn_color_mode_jenks": "Natural breaks (Jenks)",
+        "lpn_color_mode_stddev": "Standard deviation",
+        "lpn_color_mode_pretty": "Pretty (rounded)",
+        "lpn_color_mode_log": "Logarithmic",
+        "lpn_color_mode_pressure": "Pressure"
     },
     "key_context": {
         "lpn_field_text_align": {
@@ -3631,6 +3647,102 @@
             }
         },
         "lpn_labels_col_rank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Supprimer TOUT ce qui est enregistré pour cette page — chaque projet, chaque image de fond, tous les paramètres et vos choix d'unités — et recharger la page comme la verrait un tout nouveau visiteur ? Cette action est irréversible.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_node_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Supprimer TOUT ce qui est enregistré pour cette page — chaque projet, chaque image de fond, tous les paramètres et vos choix d'unités — et recharger la page comme la verrait un tout nouveau visiteur ? Cette action est irréversible.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_equal": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Supprimer TOUT ce qui est enregistré pour cette page — chaque projet, chaque image de fond, tous les paramètres et vos choix d'unités — et recharger la page comme la verrait un tout nouveau visiteur ? Cette action est irréversible.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_quantile": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Supprimer TOUT ce qui est enregistré pour cette page — chaque projet, chaque image de fond, tous les paramètres et vos choix d'unités — et recharger la page comme la verrait un tout nouveau visiteur ? Cette action est irréversible.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_jenks": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Supprimer TOUT ce qui est enregistré pour cette page — chaque projet, chaque image de fond, tous les paramètres et vos choix d'unités — et recharger la page comme la verrait un tout nouveau visiteur ? Cette action est irréversible.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_stddev": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Supprimer TOUT ce qui est enregistré pour cette page — chaque projet, chaque image de fond, tous les paramètres et vos choix d'unités — et recharger la page comme la verrait un tout nouveau visiteur ? Cette action est irréversible.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_pretty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Supprimer TOUT ce qui est enregistré pour cette page — chaque projet, chaque image de fond, tous les paramètres et vos choix d'unités — et recharger la page comme la verrait un tout nouveau visiteur ? Cette action est irréversible.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_log": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Supprimer TOUT ce qui est enregistré pour cette page — chaque projet, chaque image de fond, tous les paramètres et vos choix d'unités — et recharger la page comme la verrait un tout nouveau visiteur ? Cette action est irréversible.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_pressure": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
