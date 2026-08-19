@@ -26,6 +26,51 @@
  * permanently nagged, which fails the "as easy to refuse" test by making refusal impossible.
  */
 
+// ---- THE SECOND, PURPOSE-SPECIFIC CONSENT: place-name search (ROADMAP Task 437) ----------------
+//
+// Tom, 2026-08-18: *"Search-by-name is Task 437: Do it and put another limited consent form on the
+// first use of search."*
+//
+// **A SEPARATE RECORD, NOT A CHANGE TO THE BANNER ABOVE, AND THAT IS THE WHOLE POINT.** The banner
+// asks one question about one purpose (a digit per page, so a visit is not counted twice). Sending
+// what somebody TYPED to a third-party geocoder is a different purpose entirely, and folding it in
+// would make consent_body false, need 26 retranslations, and force an EC_CONSENT_VERSION bump that
+// re-asks every existing visitor about analytics they already answered. So: its own cookie, its own
+// version, its own ask, asked on the first use of the feature and never before. EC_CONSENT_VERSION
+// is untouched by this and must stay untouched by it.
+//
+// **ONLY A YES IS EVER WRITTEN.** There is no '0' state. A refusal stores nothing at all, which is
+// the better privacy answer and also what makes the exemption test easy to state: the single thing
+// on the device is the answer the visitor gave in order to get the service they explicitly
+// requested, it holds no identifier, no query and no result, and it serves exactly one purpose.
+// See dev/cookie-storage-inventory.md §3.
+//
+// Same value shape as ec_consent -- "<state>.<unix-ts>.<policy-version>" -- so a person reading a
+// cookie jar sees one convention rather than two, and so bumping EC_GEOSEARCH_VERSION re-asks
+// exactly the people who said yes to an older version of the ask if what we send, or who we send it
+// to, ever materially changes.
+//
+// **THE WRITER IS js/lpn-search.js, NOT THIS FILE.** The ask happens inside one command on one page
+// and must cost no page load, exactly as the banner's own JS writer does. What lives here is the
+// single source of truth for the name, the version and the lifetime -- Looped-Network.php hands
+// these three values to the page in pageConfig.
+define('EC_GEOSEARCH_COOKIE', 'ec_geosearch');
+define('EC_GEOSEARCH_VERSION', '1');
+define('EC_GEOSEARCH_DAYS', 365); // one year, the house default
+
+/**
+ * Whether this visitor has said yes to place-name search, for the CURRENT version of that ask.
+ *
+ * Nothing server-side needs this today -- the feature is entirely client-side -- and it exists so
+ * that anything which later does (a log gate, a privacy readout) asks the question in one place
+ * rather than re-deriving the cookie format. Silence is never consent.
+ */
+function ecGeoSearchConsented() {
+    if (empty($_COOKIE[EC_GEOSEARCH_COOKIE])) return false;
+    $parts = explode('.', $_COOKIE[EC_GEOSEARCH_COOKIE]);
+    return ($parts[0] ?? '') === '1' && ($parts[2] ?? '') === EC_GEOSEARCH_VERSION;
+}
+
 /**
  * Emits the banner. Rendered on every page in every state, and hidden unless it is needed, so the
  * footer's "Cookie settings" link has something to reopen without a round trip.

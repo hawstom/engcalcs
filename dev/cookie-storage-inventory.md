@@ -58,6 +58,7 @@ languages, is not a plausible candidate for "we do not target the EU."
 | `ec_language` | `lib/Language.lib.php` | 1 year, HttpOnly | The language the visitor explicitly chose from the language menu | **Exempt** — a preference the visitor set deliberately |
 | `ec_consent` | `lib/Consent.lib.php` (JS) or `consent.php` (no-JS) | 1 year, readable by JS | The consent record: `<state>.<unix-ts>.<policy-version>` | **Exempt** — it exists solely to honour the answer given |
 | `ec_nolog` | `lib/config.inc.php` | 10 years | **Author/tester tool. NOT in the UI and NOT in `privacy.php`** (Tom, 2026-08-12: *"Why disclose it if it's not in the UI?"*). Stops a browser being counted at all, and is NOT redundant with `ec_consent`: refusing consent still writes an undeduplicated 'visit' row, while this writes nothing anywhere — verified 2026-08-12 against all five log writers. **It goes into `privacy.php` the day it gets a UI control**, because then the site would be offering it | **Exempt** — it only honours a choice |
+| `ec_geosearch` | `js/lpn-search.js` (JS only) | 1 year, readable by JS | **A second, purpose-specific consent record** (Task 437): the visitor said yes to place-name search on the Looped-Network map, which sends what they typed to `nominatim.openstreetmap.org`. Same `<state>.<unix-ts>.<policy-version>` shape as `ec_consent`, and **`1` is the only state that exists** — a refusal writes nothing at all. Version-pinned to `EC_GEOSEARCH_VERSION` (`lib/Consent.lib.php`), which is **separate from `EC_CONSENT_VERSION` on purpose**: changing what we send, or who we send it to, must re-ask exactly the people who said yes to the old ask and must NOT re-ask everybody about analytics | **Exempt** — the answer the visitor gave in order to get a service they explicitly requested, holding no identifier, no query and no result. Removed by Settings > Erase everything (`EngCalcs.lpnSearchForget()`, called from `wipeAllStorage()`) |
 | `ec_blang` | `lib/Language.lib.php` | 1 year, HttpOnly | **Analytics only.** The literal value `1`, meaning the browser-language row has been written. Was the language tag until Task 288; every use site is `isset()`, so the value was written and never once read | **Requires consent.** Not written otherwise, deleted on withdrawal |
 | `ec_seen` | `ecMarkSeen()`, `lib/config.inc.php` | Session cookie, HttpOnly | **Analytics only.** One base-32 digit per page, five bits: language view, human view, calculation, title, subtitle. Plus one reserved `_v` entry for the visit's single demand row. **No identifier of any kind** | **Requires consent.** Not written otherwise, deleted on withdrawal |
 | ~~`PHPSESSID`~~ | — | — | **GONE as of Task 288.** It was a 32-hex unique identifier plus a server-side session file, and everything it held was "have we already counted this" — which needs no identifier to answer | — |
@@ -87,9 +88,30 @@ without saying who is holding it), and the last two are preferences the visitor 
 **None of the six is analytics, and none carries an identifier of a person** — `lpn_identity`'s token
 is opaque and its initials are typed by the user, for other humans to read in the lock notice.
 
-**All six are removed by Settings > Clear everything** (`wipeAllStorage()`), which is what makes that
+**All six are removed by Settings > Erase everything** (`wipeAllStorage()`), which is what makes that
 button's own sentence — "every project, every background image, all settings, and your unit choices"
-— literally true. A key added here that is not in that list quietly makes it false.
+— literally true. A key added here that is not in that list quietly makes it false. The same
+function also expires the suite unit cookie and, since Task 437, the `ec_geosearch` consent record.
+
+### Place-name search stores nothing but the answer
+
+The map's Search for a place by name (Task 437, `js/lpn-search.js`) is the one feature here that
+talks to a host other than the tile server, and the ONLY thing it puts on the device is the
+`ec_geosearch` yes above. **No query history, no result cache, no `localStorage`, no IndexedDB, and
+nothing on a refusal.** The rate limiter's clock and the one-query repeat guard live in plain
+variables and die with the page.
+
+That is the tiles' rule from `dev/geographic-projects.md` §4 applied with more force, and the reason
+it is *more* force is worth stating: a tile request says where the visitor is **looking**; a search
+request says what they **typed**. Caching results would mean storing that second thing, which is
+exactly what the consent question in front of it is trying to keep small.
+
+Nominatim's usage policy does ask that results "must be cached on your side", in its bulk-geocoding
+section. **We cannot meet that clause as written and say so rather than pretending**: a durable cache
+means a server proxy (this suite is entirely client-side and has none) or device storage (which would
+need its own answer to the exemption test above). The volume is capped at the source instead — one
+request per deliberate user action, at most one a second, and an immediately repeated identical query
+answered from memory. The clause-by-clause record is at the top of `js/lpn-search.js`.
 The one piece of client-side storage that is NOT exempt is the offline beacon queue in IndexedDB
 (`engcalcs-offline-queue`, `js/Calculators.lib.js`): it is analytics, so it is written only with
 consent and emptied by `EngCalcs.flushQueue()` on withdrawal.
@@ -123,13 +145,25 @@ asserts this and fails if the probe is widened to `lpn_`.
 check whether something exempt already answers the question.** The expensive part of storing
 something is never the bytes — it is the sentence in the banner it makes false.
 
-**No third party at all, storage or otherwise** — as of 2026-08-12 (Task 287). No analytics
-vendor, no tag manager, no ad network, no CDN fonts, no embedded maps, and now no CDN either:
-Bootstrap was coming from jsDelivr, which set no cookie but did tell a third party the visitor's IP
-and user-agent on every page load. It is now served from this origin alongside
-`js/vendor/epanet-js.js`. That is a materially better position than most sites are in, and
-`privacy.php` now says so out loud — which also means **adding any external `src` would make that
-page false**, not merely add a line to it.
+**No third-party STORAGE, and exactly two third-party requests, both on one page and both under the
+visitor's control.** No analytics vendor, no tag manager, no ad network, no CDN fonts, and no CDN
+(Task 287: Bootstrap was coming from jsDelivr, which set no cookie but did tell a third party the
+visitor's IP and user-agent on every page load; it is now served from this origin alongside
+`js/vendor/epanet-js.js`). The two that remain both belong to the Looped-Network map:
+
+- **`tile.openstreetmap.org`** — the street-map pictures behind a geographic project. Off by a
+  View-menu row, nothing cached by us, and it only ever says *where the visitor is looking*.
+  `dev/geographic-projects.md` §4.
+- **`nominatim.openstreetmap.org`** — place-name search (Task 437). Sent only on an explicit search,
+  only after its own separate consent, and it says *what the visitor typed*, which is why it has a
+  question of its own rather than riding on the tiles' silence.
+
+> **`privacy.php` IS NOW OUT OF DATE AND SAYS SO WRONGLY.** It still reads *"Nothing on this site is
+> loaded from anybody else's server… no embedded map or video."* The basemap already made that
+> sentence false and the geocoder makes it more so. It is not a hard sentence to fix — the honest
+> version is "one page can load street-map pictures and answer a place-name search from
+> OpenStreetMap, and both are yours to decline" — but it is legal text on a page nobody editing the
+> map is looking at, so it needs its own task rather than a side edit.
 
 ## 4. Server-side collection (GDPR, not ePrivacy)
 

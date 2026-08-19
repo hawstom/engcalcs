@@ -5525,6 +5525,12 @@ var EngCalcs = EngCalcs || {};
 			setNotice(pc.lpn_goto_bad || 'That is not one latitude and one longitude. Try 38 -122, with a space between them.');
 			return;
 		}
+		goToPoint(ll);
+	}
+	// **THE ONE DOOR TO A PLACE ON THE EARTH** (Task 437). js/lpn-search.js resolves a place NAME
+	// and then travels through here, so the size question, the zoom floor and the placement case
+	// are asked once rather than reimplemented beside them.
+	function goToPoint(ll) {
 		var w = (svg && svg.clientWidth) || 1000, want = w / GOTO_SPAN_DEG;
 		// **WHILE PLACING, IT ASKS THE SECOND HALF OF THE QUESTION TOO.** Tom, 2026-08-18: *"In the
 		// Go to... box, ask for lat/lon and approximate size of project area in project length
@@ -8471,6 +8477,8 @@ var EngCalcs = EngCalcs || {};
 		// to SI, and "exactly as a first-time visitor sees it" is false.
 
 		try { if (EngCalcs.expireCookie) { EngCalcs.expireCookie(); } } catch (err) { /* non-fatal */ }
+		// AND THE PLACE-NAME SEARCH'S OWN CONSENT (Task 437), which is a setting by any reading.
+		if (EngCalcs.lpnSearchForget) { EngCalcs.lpnSearchForget(); }
 	}
 	// The whole-page reset, behind one confirm. Extracted from the Settings button's inline handler
 	// (Task 211) so the Settings MENU can offer the same act -- one implementation, two doors, which
@@ -12042,6 +12050,12 @@ var EngCalcs = EngCalcs || {};
 				hidden: !isGeoProject(), icon: 'globe',
 				label: pc.lpn_goto_menu || 'Go to latitude, longitude…',
 				tip: pc.lpn_goto_tip, fn: goToLatLon
+			},
+			{
+				hidden: !isGeoProject() || !EngCalcs.lpnSearchOpen, icon: 'find',
+				label: EngCalcs.lpnSearchMenuLabel && EngCalcs.lpnSearchMenuLabel(),
+				tip: EngCalcs.lpnSearchMenuTip && EngCalcs.lpnSearchMenuTip(),
+				fn: function () { EngCalcs.lpnSearchOpen(); }
 			},
 			{
 				hidden: !isGeoProject(), icon: 'view',
@@ -17802,6 +17816,13 @@ var EngCalcs = EngCalcs || {};
 			// still knows nothing about this page beyond the seam.
 			openSettings: openSettingsBox
 		});
+	}
+	// **THE WHOLE SEAM TO js/lpn-search.js** (Task 437). One call, at script scope, so the placement
+	// bar's Search by name… button is mounted before anybody can reach the bar. Three functions:
+	// what a geographic project is, how to travel to a point, and where to speak. The geocoder, its
+	// usage-policy budget, its own consent gate and every string in them live in that file.
+	if (EngCalcs.lpnSearchInit) {
+		EngCalcs.lpnSearchInit({ isGeo: isGeoProject, goTo: goToPoint, notice: setNotice });
 	}
 
 	// Debounced, not run synchronously on every call site: a node drag alone calls updateNode()
