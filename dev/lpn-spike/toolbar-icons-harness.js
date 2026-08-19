@@ -1,0 +1,99 @@
+// The icon-only toolbar, as a SOURCE invariant — dev/toolbar-icons.md. Run with:
+//   node dev/lpn-spike/toolbar-icons-harness.js
+//
+// dev/browser-pass/specs/toolbar.js measures the rendered strip and is the stronger check; this one
+// exists because it is free, runs in check_all.sh, and catches the single mistake that would put a
+// nameless button on the strip: building one with setLabel() instead of setIconLabel().
+//
+// **A BUTTON WHOSE ONLY CONTENT IS AN aria-hidden <svg> HAS NO ACCESSIBLE NAME AT ALL.** Before this
+// change every toolbar button's name came from its text node; setIconLabel() is the one function
+// that moves that name to `aria-label`, puts it at the head of `title`, and adds the `.ec-help` that
+// EngCalcs.initTips() needs. A call site that does three of those four is the failure mode, so the
+// rule is not "do these four things" but "go through the one function".
+
+const fs = require('fs');
+const path = require('path');
+const ROOT = path.resolve(__dirname, '..', '..');
+const src = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
+const lib = fs.readFileSync(path.join(ROOT, 'js', 'Calculators.lib.js'), 'utf8');
+const en = fs.readFileSync(path.join(ROOT, 'lib', 'lang.ec.en.php'), 'utf8');
+
+let checks = 0, failures = 0;
+function report(ok, label, detail) {
+	checks++;
+	if (!ok) { failures++; }
+	console.log(`${ok ? '  ok  ' : ' FAIL '} ${label}${detail ? '   ' + detail : ''}`);
+}
+function fnBody(text, name) {
+	// Matches both `function name(` and `X.name = function (`, which is how the two files declare
+	// the same kind of thing.
+	let at = text.indexOf('function ' + name + '(');
+	if (at < 0) { at = text.indexOf(name + ' = function'); }
+	if (at < 0) { throw new Error('not found: ' + name); }
+	let i = text.indexOf('{', at), depth = 0, end = i;
+	for (; end < text.length; end++) {
+		if (text[end] === '{') { depth++; }
+		else if (text[end] === '}') { depth--; if (!depth) { break; } }
+	}
+	return text.slice(i, end + 1);
+}
+const strip = (s) => s.replace(/^[ \t]*\/\/.*$/gm, '');
+
+console.log('\n-- the seam --');
+{
+	const seam = fnBody(lib, 'EngCalcs.setIconLabel');
+	report(/aria-label/.test(seam), 'setIconLabel() sets an aria-label');
+	report(/el\.title =/.test(seam), '...and a title');
+	report(/ec-help/.test(seam), '...and .ec-help, which is the only selector initTips() wires');
+	report(/textContent = ''/.test(seam) && /iconEl\(/.test(seam), '...and replaces the text with the icon');
+	report(/lpn_tip_join/.test(seam), 'the name/tip separator is a translated string, not punctuation in the code');
+	// setLabel() must NOT have learned to drop the word: it also builds the menu bar, the menu rows
+	// and the map symbols, all of which keep their text.
+	const plain = fnBody(lib, 'EngCalcs.setLabel');
+	report(/createTextNode\(text\)/.test(plain) && !/aria-label/.test(plain),
+		'setLabel() is untouched — the menus keep their words');
+}
+
+console.log('\n-- every toolbar button goes through it --');
+{
+	const bar = strip(fnBody(src, 'wireToolbar'));
+	report(!/\bsetLabel\(/.test(bar), 'wireToolbar() never calls setLabel()',
+		(bar.match(/setLabel\([^)]*\)/g) || []).join(' | '));
+	const made = (bar.match(/document\.createElement\('button'\)/g) || []).length;
+	const named = (bar.match(/setIconLabel\(/g) || []).length;
+	// modeButton() names every mode button through one call, so the counts differ by the tools.
+	report(named >= 1 && made >= 1, 'it builds buttons and names them', `${made} built, ${named} setIconLabel call sites`);
+	const mb = strip(fnBody(src, 'modeButton'));
+	report(/setIconLabel\(/.test(mb), 'the mode buttons are named through it too');
+	// No <select> left on the strip: Task 427 moved the colour fields into the Visibility panel, and
+	// a field-name dropdown was the one wide control the icon-only strip could not shrink.
+	report(!/createElement\('select'\)/.test(bar), 'and no dropdown is left on the strip');
+}
+
+console.log('\n-- the Help list is DERIVED from the strip --');
+{
+	report(/toolbarIconIndex\.push/.test(fnBody(src, 'setIconLabel')),
+		'setIconLabel() records each button, so the list cannot drift from the strip');
+	const guide = strip(fnBody(src, 'openIconGuide'));
+	report(/toolbarIconIndex\.map/.test(guide), 'the guide is built from that record, not from a second list');
+	report(/lpn_help_icons/.test(src), 'and Help carries a row for it');
+}
+
+console.log('\n-- the strings exist, in English only --');
+{
+	['lpn_tip_join', 'lpn_tool_add_junction_tip', 'lpn_tool_add_tank_tip', 'lpn_tool_add_valve_tip',
+		'lpn_tool_delete_tip', 'lpn_tool_undo_tip', 'lpn_tool_zoom_extent_tip', 'lpn_tool_settings_tip',
+		'lpn_find_menu_tip', 'lpn_help_icons', 'lpn_pane_right_toggle', 'lpn_pane_right_toggle_tip'
+	].forEach((k) => {
+		report(en.indexOf("$ec_lang['" + k + "']") >= 0, k);
+	});
+	// Rule B is blind on this path: these reach aria-label through pageConfig in JS, which
+	// plainTextBoundKeys() cannot see. So no tag may appear in any of them, and this is the only
+	// thing that would catch it.
+	const tips = en.split('\n').filter(l => /^\$ec_lang\['lpn_(tool_.*_tip|tip_join|find_menu_tip|pane_right_toggle.*)'\]/.test(l));
+	report(tips.length >= 10 && !tips.some(l => /<[a-z]/i.test(l)),
+		'and none of them carries a tag — plainTextBoundKeys() cannot see this path');
+}
+
+console.log(`\n${checks - failures}/${checks} checks passed`);
+process.exit(failures ? 1 : 0);

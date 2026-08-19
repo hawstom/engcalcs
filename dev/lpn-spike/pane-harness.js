@@ -223,16 +223,32 @@ console.log('\n--- Find and the pane toggle, at the right edge ---');
 	report(/#lpn_toolbar\s*\{[^}]*display:\s*flex/.test(css), '...which needs the strip to be a flex row');
 }
 
-// ---- 8. what is deliberately NOT in the pane -------------------------------------------------
-// Tom, 2026-08-18, explicitly: Settings and the Labels box stay separate from the panes, and the
-// left pane of epanet-js is not wanted at all. Recorded as a check because "we decided not to" is
+// ---- 8. what is deliberately NOT in the BOTTOM pane -------------------------------------------
+// Tom, 2026-08-18, explicitly: Settings and Labels are not tabs of the bottom pane, and the left
+// pane of epanet-js is not wanted at all. Recorded as a check because "we decided not to" is
 // exactly the kind of ruling a later pass re-litigates by accident.
+//
+// LABELS MOVED, and to the RIGHT pane rather than back into a pull-down (Task 427, Tom the same
+// day: "Labels becomes Visibility ... and serves our label settings plus color ramping"). So the
+// ruling this guards is now two-sided: not a bottom-pane tab, and not two homes either -- the
+// checkbox lists exist ONCE, in #lpn_rpane.
 console.log('\n--- the rulings that are easiest to undo by accident ---');
 {
 	const tabs = src.slice(src.indexOf('var paneTabs = ['), src.indexOf('var paneState ='));
-	report(!/settings|labels/i.test(tabs), 'Settings and the Labels box are not tabs');
-	report(php.indexOf('lpn_settings_popup') > 0 && php.indexOf('lpn_labels_popup') > 0,
-		'...they are still their own pull-downs');
+	report(!/settings|labels/i.test(tabs), 'Settings and Labels are not tabs of the bottom pane');
+	report(php.indexOf('lpn_settings_popup') > 0, '...Settings is still its own pull-down');
+	report(php.indexOf('lpn_labels_popup') < 0, '...and the Labels pull-down is gone, not duplicated');
+	const rp = php.indexOf('id="lpn_rpane"');
+	report(rp > 0, 'the Visibility panel is in the page');
+	['lpn_labels_node_fields', 'lpn_labels_link_fields', 'lpn_labels_options', 'lpn_rp_colors'].forEach((id) => {
+		const at = php.indexOf('id="' + id + '"');
+		report(at > rp, `...and ${id} lives inside it`, at < 0 ? 'missing' : '');
+	});
+	// One home, not two: a second copy of any of these ids is a second checkbox list, and the two
+	// would drift the first time one of them was rebuilt.
+	['lpn_labels_node_fields', 'lpn_labels_link_fields'].forEach((id) => {
+		report(php.split('id="' + id + '"').length === 2, `${id} exists exactly once`);
+	});
 }
 
 // ---- 9. the Junctions tab --------------------------------------------------------------------

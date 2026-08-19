@@ -2914,7 +2914,33 @@ var EngCalcs = EngCalcs || {};
 		// the reservoir/junction symbols were separated by SHAPE under.
 		viridis: ['#440154', '#3b528b', '#21918c', '#5ec962', '#fde725'],
 		// For a printed sheet and for photocopies. Light-to-dark reads as low-to-high with no key.
-		gray: ['#dddddd', '#aaaaaa', '#777777', '#444444', '#000000']
+		gray: ['#dddddd', '#aaaaaa', '#777777', '#444444', '#000000'],
+		// **COLORBREWER, 5-class, taken verbatim** -- YlGnBu (sequential) and RdYlBu (diverging).
+		// Cynthia Brewer's schemes are the paradigm the whole field standardised on (matplotlib, d3,
+		// QGIS, ArcGIS all ship them), and her three families -- SEQUENTIAL, DIVERGING and
+		// QUALITATIVE -- are the standard vocabulary. epanet-js calls its first family "Continuous",
+		// which is the non-standard word; Tom asked for the standard one, so this page says
+		// sequential and diverging. There are no qualitative ramps here because every field a
+		// network is coloured by is a measured quantity, and a qualitative scheme asserts that its
+		// classes have no order.
+		//
+		// LICENCE: the ColorBrewer specifications are Apache 2.0 (colorbrewer2.org/export/LICENSE.txt)
+		// -- redistributable, and one-way compatible with this suite's GPL v3. It requires the
+		// acknowledgement that ships with the panel: "Color schemes by Cynthia Brewer,
+		// colorbrewer2.org" (see #lpn_rpane in Looped-Network.php). The name ColorBrewer is not used
+		// to name or promote anything here, which the same licence asks for.
+		ylgnbu: ['#ffffcc', '#a1dab4', '#41b6c4', '#2c7fb8', '#253494'],
+		rdylbu: ['#d7191c', '#fdae61', '#ffffbf', '#abd9e9', '#2c7bb6']
+	};
+	// The families, in the order the picker groups them. A ramp's family is a fact about the ramp,
+	// so it is declared beside it rather than re-derived from its name at the picker.
+	var COLOR_RAMP_FAMILIES = [
+		{ key: 'sequential', label: 'lpn_color_ramp_sequential', ramps: ['epanet', 'viridis', 'ylgnbu', 'gray'] },
+		{ key: 'diverging', label: 'lpn_color_ramp_diverging', ramps: ['rdylbu'] }
+	];
+	var COLOR_RAMP_LABELS = {
+		epanet: 'lpn_color_ramp_epanet', viridis: 'lpn_color_ramp_viridis', gray: 'lpn_color_ramp_gray',
+		ylgnbu: 'lpn_color_ramp_ylgnbu', rdylbu: 'lpn_color_ramp_rdylbu'
 	};
 	var COLOR_BANDS = 5;   // EPANET's five bands -- four break boxes
 	// Which fields can be coloured, and the unit each is read in. The lists match EPANET's own View
@@ -2962,43 +2988,34 @@ var EngCalcs = EngCalcs || {};
 		return undefined;
 	}
 	function colorFieldOf(group) { return group === 'node' ? settings.colorNodeField : settings.colorLinkField; }
-	// The toolbar's one-control version of the two Settings rows (Task 327). Rebuilt rather than
-	// written once, because the field LABELS follow the friction method (roughness carries its
-	// method's symbol) and the unit strip, both of which change under it.
+	// WHICH FIELDS ARE OFFERED, AND IN WHAT ORDER -- one list, used by the Visibility panel's two
+	// dropdowns and by the Settings panel's two rows, so the same question is never asked two
+	// different ways in two places.
 	//
 	// **PRESSURE AND VELOCITY ARE FIRST**, and that is Tom's ordering rather than the map's: they
 	// are the two questions a distribution network is actually asked. The rest follow in the order
-	// EPANET's own View menu lists them, so nobody has to learn a second vocabulary.
-	function quickColorOptions() {
-		var out = [], seen = {};
-		['pressure', 'head', 'elev', 'demand'].forEach(function (k) {
-			if (COLOR_NODE_FIELDS[k] !== undefined) { out.push(['node:' + k, colorFieldLabel('node', k)]); seen['node:' + k] = 1; }
+	// EPANET's own View menu lists them, so nobody has to learn a second vocabulary. Anything the
+	// maps gain later still appears, without this list having to be maintained twice.
+	var COLOR_FIELD_ORDER = {
+		node: ['pressure', 'head', 'elev', 'demand'],
+		link: ['velocity', 'flow', 'headloss', 'gradient', 'diameter', 'roughness']
+	};
+	function colorFieldOptions(group) {
+		var defs = group === 'node' ? COLOR_NODE_FIELDS : COLOR_LINK_FIELDS, out = [], seen = {};
+		(COLOR_FIELD_ORDER[group] || []).forEach(function (k) {
+			if (defs[k] !== undefined) { out.push([k, colorFieldLabel(group, k)]); seen[k] = 1; }
 		});
-		['velocity', 'flow', 'headloss', 'gradient', 'diameter', 'roughness'].forEach(function (k) {
-			if (COLOR_LINK_FIELDS[k] !== undefined) { out.push(['link:' + k, colorFieldLabel('link', k)]); seen['link:' + k] = 1; }
-		});
-		// Anything the maps gain later still appears, without this list having to be maintained
-		// twice -- the ordering above is a preference, not the source of truth.
-		Object.keys(COLOR_NODE_FIELDS).forEach(function (k) {
-			if (!seen['node:' + k]) { out.push(['node:' + k, colorFieldLabel('node', k)]); }
-		});
-		Object.keys(COLOR_LINK_FIELDS).forEach(function (k) {
-			if (!seen['link:' + k]) { out.push(['link:' + k, colorFieldLabel('link', k)]); }
+		Object.keys(defs).forEach(function (k) {
+			if (!seen[k]) { out.push([k, colorFieldLabel(group, k)]); }
 		});
 		return out;
 	}
-	function rebuildQuickColor(sel) {
-		var pc = EngCalcs.pageConfig || {}, cur = settings.colorNodeField ? 'node:' + settings.colorNodeField
-			: (settings.colorLinkField ? 'link:' + settings.colorLinkField : '');
-		if (!sel) { sel = document.getElementById('lpn_color_quick'); }
-		if (!sel) { return; }
-		sel.innerHTML = '';
-		[['', pc.lpn_color_none || 'No color']].concat(quickColorOptions()).forEach(function (o) {
-			var opt = document.createElement('option');
-			opt.value = o[0]; opt.textContent = o[1];
-			if (o[0] === cur) { opt.selected = true; }
-			sel.appendChild(opt);
-		});
+	// The one place that puts every control showing these two settings back in step. Three controls
+	// over one pair of settings is fine; three that disagree about them is not.
+	function syncColorControls() {
+		buildVisibilityColors();
+		var sp = document.getElementById('lpn_settings_popup');
+		if (sp && sp.style.display === 'block') { rebuildSettingsFields(); }
 	}
 	function colorValueOf(group, elem, field) {
 		return group === 'node' ? colorNodeValue(elem, field) : colorLinkValue(elem, field);
@@ -6448,6 +6465,307 @@ var EngCalcs = EngCalcs || {};
 		applyPaneLayout();
 		if (paneState.open && activePaneTab().show) { activePaneTab().show(); }
 	}
+	// ---- THE RIGHT PANE: VISIBILITY (ROADMAP Tasks 427 and 434) ------------------------------
+	//
+	// Tom, 2026-08-18: "(b) Labels becomes Visibility (tentative name) and serves our label settings
+	// plus color ramping and scaling range by value". So this panel owns everything about how the
+	// network is DRAWN, and the property popup keeps everything about what the network IS -- which
+	// is the line Tom drew when he said "our properties box is good".
+	//
+	// **AN OVERLAY, PLACED FROM THE CANVAS'S OWN RECT.** The bottom pane is in normal flow because
+	// it takes height AWAY from the map and the map's height is measured. This one takes nothing:
+	// it lies over the right edge of the drawing, so there is no second source of truth to create,
+	// and positionRightPane() is the only code that knows where it is.
+	//
+	// PER BROWSER, NOT PER PROJECT, on the same line as the bottom pane: how wide your panel is and
+	// whether it is open is a fact about the window you are sitting at. serializeProject() must
+	// never learn about it. (The label and colour CHOICES inside it are the opposite kind of thing
+	// and are already part of the project, where they were.)
+	var LPN_RPANE_KEY = 'lpn_rpane';
+	// The panel's floor and the map's, the same pair of numbers the bottom pane's drag works to.
+	// The default is what the LABELS list needs to be read without a sideways scroll -- 28rem of
+	// columns plus the panel's own chrome (css: #lpn_labels_*_fields). The floor is lower on
+	// purpose: somebody who has dragged it narrow is looking at the colour controls, which fit.
+	var LPN_RPANE_MIN = 210, LPN_RPANE_MAP_MIN = 260, LPN_RPANE_DEFAULT = 470;
+	var rpaneState = { open: false, w: LPN_RPANE_DEFAULT };
+	function rpaneEl() { return document.getElementById('lpn_rpane'); }
+	function rpaneIsOpen() { return !!rpaneState.open; }
+	function saveRPaneState() {
+		try { localStorage.setItem(LPN_RPANE_KEY, JSON.stringify(rpaneState)); } catch (e) {}
+	}
+	function loadRPaneState() {
+		var raw = null, v;
+		try { raw = localStorage.getItem(LPN_RPANE_KEY); } catch (e) { return; }
+		if (!raw) { return; }
+		try { v = JSON.parse(raw); } catch (e) { return; }
+		if (!v || typeof v !== 'object') { return; }
+		rpaneState.open = !!v.open;
+		if (typeof v.w === 'number' && isFinite(v.w)) { rpaneState.w = v.w; }
+	}
+	// A drag can always leave a map worth looking at, and always leave the panel usable -- the same
+	// promise the bottom pane's clamp makes, in the other axis.
+	function clampRPaneWidth(w) {
+		var vw = window.innerWidth || 1000, box = svg ? svg.getBoundingClientRect() : null,
+			room = (box && box.width > 0 ? box.width : vw) - LPN_RPANE_MAP_MIN;
+		if (!(w > 0)) { w = LPN_RPANE_DEFAULT; }
+		room = Math.max(LPN_RPANE_MIN, Math.min(room, Math.floor(vw * 0.8)));
+		return Math.round(Math.max(LPN_RPANE_MIN, Math.min(w, room)));
+	}
+	// Where the panel IS. Fixed, so this is viewport coordinates and the canvas's own rect is
+	// already in them -- no scroll arithmetic, the same reason every popover on this page is fixed.
+	function positionRightPane() {
+		var pane = rpaneEl(), box;
+		if (!pane || !rpaneState.open || !svg) { return; }
+		box = svg.getBoundingClientRect();
+		// Before first layout the canvas is the 10000px curtain and its rect is not an answer.
+		if (!(box.width > 0) || !(box.height > 0)) { return; }
+		rpaneState.w = clampRPaneWidth(rpaneState.w);
+		pane.style.top = Math.round(box.top) + 'px';
+		pane.style.height = Math.round(Math.min(box.height, (window.innerHeight || 800) - box.top)) + 'px';
+		pane.style.right = Math.round(Math.max(0, (window.innerWidth || 0) - box.right)) + 'px';
+		pane.style.width = rpaneState.w + 'px';
+	}
+	function applyRPaneLayout() {
+		var pane = rpaneEl(), btn = document.getElementById('lpn_rpane_btn');
+		if (!pane) { return; }
+		pane.style.display = rpaneState.open ? 'flex' : 'none';
+		if (btn) { btn.setAttribute('aria-pressed', rpaneState.open ? 'true' : 'false'); }
+		positionRightPane();
+	}
+	// **OPEN, NOT TOGGLE**, exactly like openPane(): a menu row, or a click on the legend, that
+	// names a thing SHOWS that thing. `section` is which <details> to make sure is open -- the
+	// caller names what it wants read, and a collapsed section would answer with nothing.
+	function openRightPane(section) {
+		var sec;
+		rpaneState.open = true;
+		applyRPaneLayout();
+		buildVisibilityColors();
+		if (section) {
+			sec = document.getElementById('lpn_rp_' + section + '_sec');
+			if (sec) { sec.open = true; if (sec.scrollIntoView) { sec.scrollIntoView({ block: 'nearest' }); } }
+		}
+		saveRPaneState();
+	}
+	function closeRightPane() {
+		rpaneState.open = false;
+		applyRPaneLayout();
+		saveRPaneState();
+	}
+	function toggleRightPane() {
+		if (rpaneState.open) { closeRightPane(); } else { openRightPane(); }
+	}
+	function wireRightPane() {
+		var pane = rpaneEl(), grip = document.getElementById('lpn_rpane_grip'),
+			x = document.getElementById('lpn_rpane_close'), dragFrom = null, key;
+		if (!pane) { return; }
+		if (x) { x.addEventListener('click', closeRightPane); }
+		// **THE LEFT EDGE IS THE HANDLE**, and pointer events rather than mouse events for the same
+		// reason the bottom pane uses them: one code path for mouse, pen and touch, with pointer
+		// capture so a fast drag that leaves the grip keeps resizing instead of stopping dead.
+		if (grip) {
+			grip.addEventListener('pointerdown', function (e) {
+				dragFrom = { x: e.clientX, w: rpaneState.w };
+				if (grip.setPointerCapture) { grip.setPointerCapture(e.pointerId); }
+				e.preventDefault();
+			});
+			grip.addEventListener('pointermove', function (e) {
+				if (!dragFrom) { return; }
+				// LEFT IS WIDER: the panel grows into the map, which is what dragging its left edge
+				// leftward looks like.
+				rpaneState.w = clampRPaneWidth(dragFrom.w + (dragFrom.x - e.clientX));
+				positionRightPane();
+			});
+			['pointerup', 'pointercancel'].forEach(function (evt) {
+				grip.addEventListener(evt, function () {
+					if (!dragFrom) { return; }
+					dragFrom = null;
+					saveRPaneState();
+				});
+			});
+		}
+		window.addEventListener('resize', function () { if (rpaneState.open) { positionRightPane(); } });
+		// **THE PANEL FOLLOWS THE CANVAS, AND IT WATCHES THE CANVAS TO DO IT.** The map's height is
+		// measured and re-measured on a dozen environment events (Task 432); a panel lying over its
+		// right edge has to move with every one of them. A ResizeObserver on the canvas is one
+		// subscription to all of them at once -- the alternative, a call inside applyMapHeight(),
+		// would put this panel inside the one function whose whole job is the map's single measured
+		// number, which is exactly the coupling that function's own harness exists to prevent.
+		if (window.ResizeObserver && svg) {
+			new window.ResizeObserver(function () { if (rpaneState.open) { positionRightPane(); } }).observe(svg);
+		}
+		// **THE COLOUR KEY IS A WAY IN** (Task 427: clicking the legend opens this panel). It is the
+		// one piece of chrome already telling the user what the colours mean, so it is where they
+		// look when they want to change them.
+		key = colorLegendEl();
+		if (key) {
+			key.title = (EngCalcs.pageConfig || {}).lpn_color_legend_open_tip || '';
+			key.className += ' ec-help';
+			key.addEventListener('click', function () { openRightPane('colors'); });
+		}
+		loadRPaneState();
+		applyRPaneLayout();
+		buildVisibilityColors();
+		if (EngCalcs.initTips) { EngCalcs.initTips(pane); }
+	}
+	// The colour half of the panel: two dropdowns, the ramp, and the ranges. Rebuilt rather than
+	// written once, because the field LABELS follow the friction method (roughness carries its
+	// method's symbol) and the unit strip, and the RANGE editor exists only for a field that is
+	// actually being coloured by.
+	function buildVisibilityColors() {
+		var host = document.getElementById('lpn_rp_colors'), pc = EngCalcs.pageConfig || {};
+		if (!host) { return; }
+		host.innerHTML = '';
+		function row(labelText, control, tip) {
+			var r = document.createElement('div'), lab = document.createElement('span');
+			r.className = 'lpn-rp-row';
+			lab.textContent = labelText;
+			if (tip) { lab.title = tip; lab.className = 'ec-help'; }
+			r.appendChild(lab);
+			r.appendChild(control);
+			host.appendChild(r);
+			return r;
+		}
+		// **ONE DROPDOWN FOR NODES AND ONE FOR LINKS** (Task 427). Tom on the single control that
+		// did both: "I do see the beauty of the one control ... but it's not the expectation."
+		// EPANET and epanet-js both give the two kinds of element a dropdown each, and neither
+		// clears the other -- so a map can carry both, with a legend block for each, which
+		// renderColorLegend() has always been able to draw.
+		function fieldSelect(group) {
+			var sel = document.createElement('select'), cur = colorFieldOf(group);
+			var none = document.createElement('option');
+			none.value = ''; none.textContent = pc.lpn_color_none || 'No color';
+			if (!cur) { none.selected = true; }
+			sel.id = 'lpn_rp_color_' + group;
+			sel.appendChild(none);
+			colorFieldOptions(group).forEach(function (o) {
+				var opt = document.createElement('option');
+				opt.value = o[0]; opt.textContent = o[1];
+				if (o[0] === cur) { opt.selected = true; }
+				sel.appendChild(opt);
+			});
+			sel.addEventListener('change', function () {
+				if (group === 'node') { settings.colorNodeField = sel.value; }
+				else { settings.colorLinkField = sel.value; }
+				refreshValueColors(); saveToStorage(); syncColorControls();
+			});
+			return sel;
+		}
+		row(pc.lpn_color_node_field || 'Color nodes by', fieldSelect('node'));
+		row(pc.lpn_color_link_field || 'Color pipes by', fieldSelect('link'));
+		// THE RAMP PICKER, grouped by ColorBrewer family. <optgroup> rather than two selects: it is
+		// one choice, and the family is what tells a reader which ramps are for a quantity that
+		// climbs and which for one that departs from a middle.
+		var rampSel = document.createElement('select');
+		rampSel.id = 'lpn_rp_ramp';
+		COLOR_RAMP_FAMILIES.forEach(function (fam) {
+			var g = document.createElement('optgroup');
+			g.label = pc[fam.label] || fam.key;
+			fam.ramps.forEach(function (rkey) {
+				if (!COLOR_RAMPS[rkey]) { return; }
+				var opt = document.createElement('option');
+				opt.value = rkey;
+				opt.textContent = pc[COLOR_RAMP_LABELS[rkey]] || rkey;
+				if (rkey === settings.colorRamp) { opt.selected = true; }
+				g.appendChild(opt);
+			});
+			rampSel.appendChild(g);
+		});
+		rampSel.addEventListener('change', function () {
+			settings.colorRamp = rampSel.value; refreshValueColors(); saveToStorage(); syncColorControls();
+		});
+		row(pc.lpn_settings_color_ramp || 'Color scheme', rampSel);
+		// The ramp, DRAWN. A name is not a colour, and the whole question here is what the map is
+		// about to look like.
+		var strip = document.createElement('div');
+		strip.className = 'lpn-rp-row';
+		strip.id = 'lpn_rp_ramp_strip';
+		(function () {
+			var cols = COLOR_RAMPS[settings.colorRamp] || COLOR_RAMPS.epanet;
+			if (settings.colorReverse) { cols = cols.slice().reverse(); }
+			cols.forEach(function (c) {
+				var sw = document.createElement('span');
+				sw.className = 'lpn-color-swatch';
+				sw.style.background = c;
+				strip.appendChild(sw);
+			});
+		}());
+		host.appendChild(strip);
+		var rev = document.createElement('input');
+		rev.type = 'checkbox'; rev.checked = !!settings.colorReverse;
+		rev.addEventListener('change', function () {
+			settings.colorReverse = rev.checked; refreshValueColors(); saveToStorage(); syncColorControls();
+		});
+		row(pc.lpn_settings_color_reverse || 'Reverse the color order', rev);
+		var them = document.createElement('input');
+		them.type = 'checkbox'; them.checked = !!settings.colorThematic;
+		them.addEventListener('change', function () {
+			settings.colorThematic = them.checked; refreshValueColors(); saveToStorage(); syncColorControls();
+		});
+		row(pc.lpn_settings_color_thematic || 'Thematic map: colors only, no labels', them,
+			pc.lpn_settings_color_thematic_tip);
+		// THE RANGES, one editor per coloured group -- EPANET's own dialog: four boxes, ascending,
+		// blanks allowed, and the two one-shot buttons that READ the values on the map now and
+		// WRITE fixed numbers into the boxes. A group with no field chosen gets no boxes rather
+		// than four dead ones.
+		['node', 'link'].forEach(function (group) {
+			var field = colorFieldOf(group); if (!field) { return; }
+			var head = document.createElement('div');
+			head.style.cssText = 'margin-top:6px;font-weight:bold';
+			head.textContent = (pc.lpn_settings_color_breaks || 'Color band limits') + ': ' + colorFieldLabel(group, field);
+			host.appendChild(head);
+			var pinned = pinnedBreaks(group, field), wrap = document.createElement('div'), i, boxes = [];
+			wrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap';
+			function writeBreaks() {
+				var vals = boxes.map(function (b) { return b.value; })
+					.filter(function (v) { return v !== '' && isFinite(+v); }).map(Number);
+				vals.sort(function (a, b) { return a - b; });
+				settings.colorBreaks = settings.colorBreaks || {};
+				settings.colorBreaks[colorBreakKey(group, field)] = vals;
+				refreshValueColors(); saveToStorage();
+			}
+			for (i = 0; i < COLOR_BANDS - 1; i++) {
+				var box = document.createElement('input');
+				box.type = 'number'; box.step = 'any';
+				box.style.width = '4.5em';
+				box.value = (pinned[i] === undefined) ? '' : pinned[i];
+				box.setAttribute('aria-label', (pc.lpn_settings_color_breaks || 'Color band limits') + ' ' + (i + 1));
+				box.addEventListener('change', writeBreaks);
+				boxes.push(box);
+				wrap.appendChild(box);
+			}
+			host.appendChild(wrap);
+			var btnWrap = document.createElement('div');
+			btnWrap.style.marginTop = '4px';
+			function autoBtn(text, fn) {
+				var b = document.createElement('button');
+				b.type = 'button'; b.textContent = text; b.style.marginRight = '4px';
+				b.addEventListener('click', function () {
+					var vals = colorValues(group, field), out = fn(vals);
+					if (!out.length) {
+						alert(pc.lpn_settings_color_no_values || 'There are no values to work from yet. Solve the network first.');
+						return;
+					}
+					settings.colorBreaks = settings.colorBreaks || {};
+					settings.colorBreaks[colorBreakKey(group, field)] = out.map(function (v) { return +v.toPrecision(3); });
+					refreshValueColors(); saveToStorage(); syncColorControls();
+				});
+				return b;
+			}
+			btnWrap.appendChild(autoBtn(pc.lpn_settings_color_equal_intervals || 'Equal intervals', equalIntervalBreaks));
+			btnWrap.appendChild(autoBtn(pc.lpn_settings_color_equal_counts || 'Equal counts', equalCountBreaks));
+			var clearBtn = document.createElement('button');
+			clearBtn.type = 'button';
+			clearBtn.textContent = pc.lpn_settings_color_auto || 'Automatic';
+			clearBtn.addEventListener('click', function () {
+				settings.colorBreaks = settings.colorBreaks || {};
+				delete settings.colorBreaks[colorBreakKey(group, field)];
+				refreshValueColors(); saveToStorage(); syncColorControls();
+			});
+			btnWrap.appendChild(clearBtn);
+			host.appendChild(btnWrap);
+		});
+		if (EngCalcs.initTips) { EngCalcs.initTips(host); }
+	}
 	// ---- Tab: JUNCTIONS, the first tabular editor (ROADMAP Task 434) --------------------------
 	//
 	// The same document the map shows, as a spreadsheet: one row per junction, every column
@@ -8223,7 +8541,7 @@ var EngCalcs = EngCalcs || {};
 		if (backdrop) { buildBackdropImg(); }
 		// A different project may colour by a different field, and the toolbar select is the one
 		// place that answer is visible without opening a panel (Task 327).
-		rebuildQuickColor();
+		buildVisibilityColors();
 		// Grid or geographic, and basemap on or off, both belong to the project -- so switching
 		// projects can turn the tiles and their attribution on or off (Task 145).
 		refreshBasemap();
@@ -10637,7 +10955,7 @@ var EngCalcs = EngCalcs || {};
 	// clicking a pipe to look at it must not throw the list away, and that is exactly what
 	// membership here would do. It is the property popup's kind of box, so it gets the property
 	// popup's chrome: a drag surface and an X.
-	var VIEW_POPOVERS = ['lpn_labels_popup', 'lpn_settings_popup', 'lpn_notes_popup'];
+	var VIEW_POPOVERS = ['lpn_settings_popup', 'lpn_notes_popup'];
 	// The control that opened the popover now showing -- the toolbar button, or the menu-bar item.
 	// Same job openMenuAnchor does for the menus, and needed for the same reason: the click that
 	// OPENED a popover must not also be read as a click away from it. Task 372 -- until then the
@@ -10672,6 +10990,18 @@ var EngCalcs = EngCalcs || {};
 	// warning triangle. Two render sites, one missed.
 	function iconEl(name) { return EngCalcs.iconEl(name); }
 	function setLabel(el, iconName, text) { EngCalcs.setLabel(el, iconName, text); }
+	// THE TOOLBAR'S OWN ENTRY POINT (dev/toolbar-icons.md). Icon only; the word becomes the
+	// accessible name and the head of the tip. Everything else on this page -- the menu bar, the
+	// menu rows, the tab strip, the map symbols -- keeps its words and keeps setLabel().
+	//
+	// Every button that goes through here is also recorded, so Help > "What the toolbar icons mean"
+	// is DERIVED from the strip rather than being a second list to keep in step with it. A new
+	// toolbar button appears in that list without anybody remembering to add it.
+	var toolbarIconIndex = [];
+	function setIconLabel(el, iconName, name, tip) {
+		EngCalcs.setIconLabel(el, iconName, name, tip);
+		toolbarIconIndex.push({ icon: iconName, name: name, tip: tip });
+	}
 	// A map symbol is the SAME markup iconEl() builds for a toolbar button, re-homed onto the canvas:
 	// strip the button-sizing 'ec-icon' class, whose CSS width/height:1.05em would fight the explicit
 	// world-unit x/y/width/height the caller sets. Everything else stays what iconEl() built, so a
@@ -11079,6 +11409,20 @@ var EngCalcs = EngCalcs || {};
 	// EVERY row here opens a NEW TAB, including the two internal pages, and that is not stylistic:
 	// the beforeunload guard in init() prompts whenever a file project is dirty, so navigating this
 	// tab to About.php would meet a browser "Leave site?" dialog mid-edit.
+	// One row per toolbar button, in strip order: the icon as drawn, the name as announced, and the
+	// explanation as a tip. A MENU rather than a new popover, because a menu is exactly this shape
+	// already -- icon, label, tip -- and it is keyboard- and touch-operable without a second panel
+	// to build, position, dismiss and translate.
+	function openIconGuide() {
+		var rows = toolbarIconIndex.map(function (b) {
+			return { icon: b.icon, label: b.name, tip: b.tip, fn: function () {} };
+		});
+		// Anchored on the Help button by NAME, never on whatever the caller happened to pass: this
+		// runs as a menu ROW's action, and a row's fn is handed the row, not an element with a rect.
+		var anchor = document.getElementById('lpn_menu_help');
+		if (!rows.length || !anchor) { return; }
+		openMenu(anchor, rows);
+	}
 	function openHelpMenu(anchor) {
 		var pc = EngCalcs.pageConfig || {};
 		function ext(url) { return function () { window.open(url, '_blank', 'noopener'); }; }
@@ -11090,6 +11434,12 @@ var EngCalcs = EngCalcs || {};
 			// comment on #lpn_notes_popup in Looped-Network.php for why the markup stayed in the
 			// page rather than becoming a JS string.
 			{ icon: 'help', label: pc.lpn_help_notes || 'Notes on this page', fn: toggleNotesPopup },
+			// **THE DISCOVERY ROUTE THAT IS NOT A TOOLTIP** (dev/toolbar-icons.md). Once the toolbar
+			// is icons only, a first-time user who does not think to hover -- and a touch user, for
+			// whom a tip needs a deliberate press-and-hold -- has no way to read the strip. This is
+			// that way: the same icon, its name, and its explanation, in one list. DERIVED from the
+			// strip itself (toolbarIconIndex), so a button added later is in it already.
+			{ icon: 'help', label: pc.lpn_help_icons || 'What the toolbar icons mean', fn: openIconGuide },
 			{ separator: true },
 			// **A VERB, not a noun.** "Contribute" reads as money or code to most visitors; the
 			// reports actually received are a wrong word or a bad number, and "Fix something" invites
@@ -11147,7 +11497,7 @@ var EngCalcs = EngCalcs || {};
 			// The popover openers position themselves from evt.currentTarget, so a menu row hands them
 			// the menu-bar button it came from -- the popover then opens under "View", where the eye
 			// already is, rather than under a toolbar button that may not even be on screen.
-			{ icon: 'labels', label: pc.lpn_tool_labels || 'Labels', fn: function () { toggleLabelsPopup({ currentTarget: document.getElementById('lpn_menu_view') }); } },
+			{ icon: 'labels', label: pc.lpn_tool_labels || 'Labels', fn: function () { openRightPane('labels'); } },
 			// The profile is a VIEW of the network (Task 409), not an edit of it, so it lives beside
 			// Labels rather than in Insert. Since Task 434 it is a TAB in the bottom pane, so the
 			// row opens the pane on that tab -- open, never toggle: a menu row that names a view
@@ -11541,6 +11891,7 @@ var EngCalcs = EngCalcs || {};
 		wirePopup();
 		wireFindPopup();
 		wirePane();
+		wireRightPane();
 		wireUnitGroups();
 		var opening = initLibrary();
 		if (opening) {
@@ -11674,6 +12025,8 @@ var EngCalcs = EngCalcs || {};
 	// (Delete, Undo, Select -- in that order), and everything else (Zoom Extent, Draw Example).
 	function wireToolbar() {
 		var toolbar = document.getElementById('lpn_toolbar'), pc = EngCalcs.pageConfig || {};
+		// Rebuilt, not appended to: this runs again on a unit switch and a language-driven relabel.
+		toolbarIconIndex = [];
 		setModeUI = function () {
 			toolbar.querySelectorAll('button[data-tool]').forEach(function (b) {
 				b.setAttribute('aria-pressed', b.dataset.tool === mode ? 'true' : 'false');
@@ -11688,13 +12041,12 @@ var EngCalcs = EngCalcs || {};
 		function modeButton(t, into) {
 			var btn = document.createElement('button');
 			btn.type = 'button';
-			// Prefix, so the pressed/unpressed word is still the thing being read.
-			setLabel(btn, t.icon, pc[t.key] || t.mode);
+			// ICON ONLY. The word is still there -- it is the aria-label and the head of the tip --
+			// but it is no longer taking a slot on the one strip where width is scarce
+			// (dev/toolbar-icons.md). setIconLabel() also adds .ec-help, which is what makes the tip
+			// reachable by a tap-and-hold as well as a hover (EngCalcs.initTips(), re-run below).
+			setIconLabel(btn, t.icon, pc[t.key] || t.mode, t.tip);
 			btn.setAttribute('aria-pressed', t.mode === mode ? 'true' : 'false');
-			// Optional hover/tap tip (Tom, 2026-07-30) -- the button itself is already the click
-			// target, so the tip goes straight on it as a title, matched to .ec-help for touch
-			// (EngCalcs.initTips(), called again below once the toolbar is built).
-			if (t.tip) { btn.title = t.tip; btn.className = 'ec-help'; }
 			btn.addEventListener('click', function () {
 				// Clicking the already-active tool toggles back to Select (Tom) rather than
 				// leaving no way to "turn off" Add/Delete except picking a different tool.
@@ -11719,16 +12071,14 @@ var EngCalcs = EngCalcs || {};
 		var fileGroup = group();
 		var saveBtn = document.createElement('button');
 		saveBtn.type = 'button';
-		setLabel(saveBtn, 'save', pc.lpn_file_save || 'Save');
-		if (pc.lpn_file_save_tip) { saveBtn.title = pc.lpn_file_save_tip; }
+		setIconLabel(saveBtn, 'save', pc.lpn_file_save || 'Save', pc.lpn_file_save_tip);
 		saveBtn.addEventListener('click', function () { saveCurrent(); });
 		fileGroup.appendChild(saveBtn);
 		// The picker still needs its listener even though its button has gone -- see wireBackdropMenu().
 		wireBackdropMenu();
 		var saveAsBtn = document.createElement('button');
 		saveAsBtn.type = 'button';
-		setLabel(saveAsBtn, 'saveas', pc.lpn_file_saveas || 'Save as…');
-		if (pc.lpn_file_saveas_tip) { saveAsBtn.title = pc.lpn_file_saveas_tip; }
+		setIconLabel(saveAsBtn, 'saveas', pc.lpn_file_saveas || 'Save as…', pc.lpn_file_saveas_tip);
 		saveAsBtn.addEventListener('click', function () { saveAs(); });
 		fileGroup.appendChild(saveAsBtn);
 
@@ -11742,29 +12092,29 @@ var EngCalcs = EngCalcs || {};
 		// Junction, Reservoir, Tank, Pipe, Pump, Valve, Text -- the same order as the Insert menu and
 		// the ID-prefix rows. See openInsertMenu() for why that order.
 		[
-			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction' },
-			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir' },
-			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank' },
-			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe' },
-			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump' },
-			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve' },
-			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text' }
+			{ mode: 'add-junction', key: 'lpn_tool_add_junction', icon: 'junction', tip: pc.lpn_tool_add_junction_tip },
+			{ mode: 'add-reservoir', key: 'lpn_tool_add_reservoir', icon: 'reservoir', tip: pc.lpn_tool_add_reservoir_tip },
+			{ mode: 'add-tank', key: 'lpn_tool_add_tank', icon: 'tank', tip: pc.lpn_tool_add_tank_tip },
+			{ mode: 'add-pipe', key: 'lpn_tool_add_pipe', icon: 'pipe', tip: pc.lpn_tool_add_pipe_tip },
+			{ mode: 'add-pump', key: 'lpn_tool_add_pump', icon: 'pump', tip: pc.lpn_tool_add_pump_tip },
+			{ mode: 'add-valve', key: 'lpn_tool_add_valve', icon: 'valve', tip: pc.lpn_tool_add_valve_tip },
+			{ mode: 'add-text', key: 'lpn_tool_add_text', icon: 'text', tip: pc.lpn_tool_add_text_tip }
 		].forEach(function (t) { modeButton(t, addGroup); });
 
 		var editGroup = group();
 		editGroup.dataset.edits = '1';
 		modeButton({ mode: 'select', key: 'lpn_tool_select', tip: pc.lpn_tip_select, icon: 'select' }, editGroup);
-		modeButton({ mode: 'delete', key: 'lpn_tool_delete', icon: 'del' }, editGroup);
+		modeButton({ mode: 'delete', key: 'lpn_tool_delete', icon: 'del', tip: pc.lpn_tool_delete_tip }, editGroup);
 		var undoBtn = document.createElement('button');
 		undoBtn.type = 'button';
-		setLabel(undoBtn, 'undo', pc.lpn_tool_undo || 'Undo');
+		setIconLabel(undoBtn, 'undo', pc.lpn_tool_undo || 'Undo', pc.lpn_tool_undo_tip);
 		undoBtn.addEventListener('click', undo);
 		editGroup.appendChild(undoBtn);
 
 		var viewGroup = group();
 		var extentBtn = document.createElement('button');
 		extentBtn.type = 'button';
-		setLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit');
+		setIconLabel(extentBtn, 'zoom', pc.lpn_tool_zoom_extent || 'Zoom to fit', pc.lpn_tool_zoom_extent_tip);
 		extentBtn.addEventListener('click', zoomExtent);
 		viewGroup.appendChild(extentBtn);
 		// A pressed/unpressed toggle, not a command -- the mode is invisible on the map itself once
@@ -11772,48 +12122,26 @@ var EngCalcs = EngCalcs || {};
 		var cleanBtn = document.createElement('button');
 		cleanBtn.type = 'button';
 		cleanBtn.id = 'lpn_clean_map_btn';
-		setLabel(cleanBtn, 'camera', pc.lpn_clean_map || 'Clean map');
-		if (pc.lpn_clean_map_tip) { cleanBtn.title = pc.lpn_clean_map_tip; cleanBtn.className = 'ec-help'; }
+		setIconLabel(cleanBtn, 'camera', pc.lpn_clean_map || 'Clean map', pc.lpn_clean_map_tip);
 		cleanBtn.setAttribute('aria-pressed', cleanMapOn() ? 'true' : 'false');
 		cleanBtn.addEventListener('click', function () { setCleanMap(!cleanMapOn()); });
 		viewGroup.appendChild(cleanBtn);
 		var labelsBtn = document.createElement('button');
 		labelsBtn.type = 'button';
-		setLabel(labelsBtn, 'labels', pc.lpn_tool_labels || 'Labels');
-		if (pc.lpn_tip_labels_draggable) { labelsBtn.title = pc.lpn_tip_labels_draggable; labelsBtn.className = 'ec-help'; }
-		labelsBtn.addEventListener('click', toggleLabelsPopup);
+		setIconLabel(labelsBtn, 'labels', pc.lpn_tool_labels || 'Labels', pc.lpn_tip_labels_draggable);
+		labelsBtn.addEventListener('click', function () { openRightPane('labels'); });
 		viewGroup.appendChild(labelsBtn);
-		// **COLOUR BY VALUE, IN ONE CONTROL** (ROADMAP Task 327). The mode shipped with Task 384 and
-		// was reachable only as three rows inside Settings > Color by value -- which is where a
-		// setting lives, not where a way of LOOKING at a big network does. Tom: it should be "one
-		// control naming the field, reachable without opening a panel."
-		//
-		// It is one select, not two, although the document has two fields (node and link). Choosing
-		// a NODE field clears the link one and the other way round, because colouring both at once
-		// by different quantities is a map nobody can read -- and the reader has no key telling them
-		// which legend belongs to which. One question, one answer, one legend.
-		var colorSel = document.createElement('select');
-		colorSel.id = 'lpn_color_quick';
-		colorSel.title = pc.lpn_tool_color_tip || '';
-		viewGroup.appendChild(colorSel);
-		rebuildQuickColor(colorSel);
-		colorSel.addEventListener('change', function () {
-			var v = colorSel.value, at = v.indexOf(':');
-			settings.colorNodeField = '';
-			settings.colorLinkField = '';
-			if (at > 0) {
-				if (v.slice(0, at) === 'node') { settings.colorNodeField = v.slice(at + 1); }
-				else { settings.colorLinkField = v.slice(at + 1); }
-			}
-			refreshValueColors();
-			saveToStorage();
-			// The Settings panel holds the same two fields, so if it happens to be open it must not
-			// go on showing the old answer.
-			if (document.getElementById('lpn_settings_popup').style.display === 'block') { rebuildSettingsFields(); }
-		});
+		// **COLOUR BY VALUE IS TWO DROPDOWNS NOW, AND THEY ARE IN THE VISIBILITY PANEL** (ROADMAP
+		// Task 427). The one select that did both fields shipped with Task 327 and Tom saw the
+		// beauty of it -- "but it's not the expectation": EPANET and epanet-js both give nodes and
+		// links a dropdown each, and choosing a node field silently clearing the link field is the
+		// behaviour that made the single control surprising. Two controls, two legends, no
+		// clearing. See buildVisibilityColors(); the toolbar keeps no select at all, which is also
+		// what the icon-only strip asked for -- a field-name dropdown was the one wide control left
+		// on it.
 		var settingsBtn = document.createElement('button');
 		settingsBtn.type = 'button';
-		setLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings');
+		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
 		settingsBtn.addEventListener('click', toggleSettingsPopup);
 		viewGroup.appendChild(settingsBtn);
 
@@ -11830,7 +12158,7 @@ var EngCalcs = EngCalcs || {};
 		endGroup.className += ' lpn-toolbar-end';
 		var findBtn = document.createElement('button');
 		findBtn.type = 'button';
-		setLabel(findBtn, 'find', pc.lpn_find_menu || 'Find');
+		setIconLabel(findBtn, 'find', pc.lpn_find_menu || 'Find', pc.lpn_find_menu_tip);
 		findBtn.addEventListener('click', function () { toggleFindPopup(findBtn); });
 		endGroup.appendChild(findBtn);
 		// A pressed/unpressed toggle, like Clean map above: the pane's own X closes it too, so the
@@ -11838,11 +12166,21 @@ var EngCalcs = EngCalcs || {};
 		var paneBtn = document.createElement('button');
 		paneBtn.type = 'button';
 		paneBtn.id = 'lpn_pane_btn';
-		setLabel(paneBtn, 'view', pc.lpn_pane_toggle || 'Bottom panel');
-		if (pc.lpn_pane_toggle_tip) { paneBtn.title = pc.lpn_pane_toggle_tip; paneBtn.className = 'ec-help'; }
+		setIconLabel(paneBtn, 'pane-bottom', pc.lpn_pane_toggle || 'Bottom panel', pc.lpn_pane_toggle_tip);
 		paneBtn.setAttribute('aria-pressed', paneIsOpen() ? 'true' : 'false');
 		paneBtn.addEventListener('click', togglePane);
 		endGroup.appendChild(paneBtn);
+		// Its twin, and the button Tom could not find because it did not exist yet (2026-08-18:
+		// "I don't currently see any of that or a button for the right panel"). The two pane
+		// toggles sit together because they are one question -- which edge of the map is showing
+		// something -- and the icons were drawn as a pair for the same reason.
+		var rpaneBtn = document.createElement('button');
+		rpaneBtn.type = 'button';
+		rpaneBtn.id = 'lpn_rpane_btn';
+		setIconLabel(rpaneBtn, 'pane-right', pc.lpn_pane_right_toggle || 'Visibility', pc.lpn_pane_right_toggle_tip);
+		rpaneBtn.setAttribute('aria-pressed', rpaneIsOpen() ? 'true' : 'false');
+		rpaneBtn.addEventListener('click', toggleRightPane);
+		endGroup.appendChild(rpaneBtn);
 
 		// The dev-only stress-test button moved OFF the toolbar and to the foot of the Insert menu
 		// (Tom, 2026-08-04). A toolbar is the high-use subset of the menus, and a thing that reads
@@ -13338,11 +13676,11 @@ var EngCalcs = EngCalcs || {};
 		}
 	}
 	function wireLabelsPopup() {
-		// No close button to wire: this is a pull-down (see Looped-Network.php). It is dismissed by
-		// clicking away, by Escape, by its own toolbar button, or by opening another menu/panel.
+		// No close button to wire: the checkboxes live in the Visibility panel now (Task 427), which
+		// carries its own X and its own toolbar toggle.
 		rebuildLabelsFields();
 	}
-	// The key that survives printing: the Labels popover is toolbar chrome (d-print-none), so a
+	// The key that survives printing: the Visibility panel is chrome (d-print-none), so a
 	// legend living only there vanishes on a printed page. This renders into #lpn_labels_legend,
 	// which is NOT d-print-none, kept live by refreshLabelText(). Hidden when no field is toggled on.
 	// Since Task 333 it keys on the PREFIX/SUFFIX rather than a colour swatch, so a set the user has
@@ -13385,19 +13723,13 @@ var EngCalcs = EngCalcs || {};
 		box.style.display = any ? '' : 'none';
 		applyLegendPosition();
 	}
-	function toggleLabelsPopup(evt) {
-		var popup = document.getElementById('lpn_labels_popup');
-		if (popup.style.display === 'block') { popup.style.display = 'none'; viewPopoverAnchor = null; return; }
-		// ONE PULL-DOWN AT A TIME. Tom, 2026-08-13: "When I click Settings then Labels, Labels opens
-		// beneath Settings. I expect Settings to close." openMenu() has always closed these; they
-		// never closed each other, because the document-level dismissal cannot tell the click that
-		// opened this one from a click away from that one -- so the opener is the only place that
-		// can do it. (Since Task 372 the dismissal knows the OPENER by name rather than exempting
-		// the whole toolbar, but this is still the only code that runs on the way in.)
+	// LABELS LIVE IN THE VISIBILITY PANEL NOW (Task 427). This is still the one door every caller
+	// uses -- the toolbar button, the View menu row -- so nothing had to learn where the checkboxes
+	// went. It OPENS rather than toggles, for the same reason the Profile row does: a control that
+	// names a thing shows that thing, and only the panel's own toolbar toggle toggles.
+	function toggleLabelsPopup() {
 		closeMenu();
-		closeViewPopovers('lpn_labels_popup');
-		viewPopoverAnchor = evt.currentTarget;
-		openPanelAtAnchor(popup, evt.currentTarget.getBoundingClientRect());
+		openRightPane('labels');
 	}
 
 	// ---- gear/settings popover (Task 146 Phase 2) ----
@@ -14217,7 +14549,7 @@ var EngCalcs = EngCalcs || {};
 				refreshValueColors(); saveToStorage(); refreshColorSection();
 				// The toolbar shows the same answer in one control (Task 327). Two controls over one
 				// pair of settings is fine; two controls that disagree about them is not.
-				rebuildQuickColor();
+				buildVisibilityColors();
 			});
 			return sel;
 		}
@@ -14503,7 +14835,9 @@ var EngCalcs = EngCalcs || {};
 	function toggleSettingsPopup(evt) {
 		var popup = document.getElementById('lpn_settings_popup');
 		if (popup.style.display === 'block') { popup.style.display = 'none'; viewPopoverAnchor = null; return; }
-		// One pull-down at a time -- see the same two lines in toggleLabelsPopup().
+		// One pull-down at a time (Tom, 2026-08-13). openMenu() has always closed these; the opener
+		// is the only code that can, because the document-level dismissal cannot tell the click that
+		// opened this one from a click away from another.
 		closeMenu();
 		closeViewPopovers('lpn_settings_popup');
 		// REBUILD ON EVERY OPEN. Built once at init and rebuilt only by the paths that remember, the

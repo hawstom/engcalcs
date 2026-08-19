@@ -56,10 +56,13 @@ exports.run = async function ({ browser, report }) {
 		await a.goto();
 		await a.dismissGallery();
 		await a.makeEdit();
+		// Since Task 427 the Labels button opens the Visibility panel at the right of the map, and
+		// the checkbox lists are a section of it rather than a pull-down of their own.
 		await a.toolbarClick('Labels');
 		await a.settle(400);
 		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_labels_popup').style.display === 'block'), 'the Labels panel opens');
+			document.getElementById('lpn_rpane').style.display === 'flex' &&
+			document.getElementById('lpn_rp_labels_sec').open), 'the Labels panel opens');
 
 		for (const list of LISTS) {
 			const got = await columns(a, list.id);

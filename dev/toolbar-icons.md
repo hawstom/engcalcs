@@ -5,8 +5,11 @@ toolbar buttons; they are taking up too much room, and we have to move them into
 are lovely and delightful, and I think it's time to drop the words from all the toolbar row; move
 them to the beginning of their tips."*
 
-This is the plan for that change. The icons themselves are done and live in `lib/Icons.lib.php`; the
-wiring is `js/looped-network.js` (`wireToolbar()`) plus one seam in `js/Calculators.lib.js`.
+**SHIPPED 2026-08-18.** This is now the record of the change rather than the plan for it. The seam
+is `EngCalcs.setIconLabel()` (`js/Calculators.lib.js`), the wiring is `wireToolbar()`
+(`js/looped-network.js`), and `dev/browser-pass/specs/toolbar.js` asserts the whole of §3 against the
+real strip: every `#lpn_toolbar button` has a non-empty `aria-label`, a non-empty `title` beginning
+with that name, an `<svg>`, `.ec-help`, and no text node.
 
 **Scope is the toolbar row only.** `Icons.lib.php`'s own header rule — *an icon is a PREFIX, never a
 replacement* — still holds everywhere else, and that header must be amended to say so rather than
@@ -22,7 +25,7 @@ nothing; the toolbar is the one strip where horizontal space is actually scarce.
 |---|---|---|
 | `profile` | View > Profile row, and the bottom pane's Profile tab | the `view` eye, which was standing in |
 | `pane-bottom` | the right-edge toolbar group's pane toggle | the `view` eye, same stand-in |
-| `pane-right` | the right pane's toggle when Task 434 settles it | nothing yet — drawn now so the pair is designed as a pair |
+| `pane-right` | the right pane's toggle — the Visibility panel, shipped the same day | nothing |
 
 Geometry and its rationale are commented in `lib/Icons.lib.php`. `pane-right` is deliberately drawn
 before the right pane exists: the two icons only work as twins, and a twin drawn six months later is
@@ -72,8 +75,8 @@ Two things this table is not:
 `lpn_tool_delete_tip`, `lpn_tool_undo_tip`, `lpn_tool_zoom_extent_tip`, `lpn_tool_settings_tip`,
 `lpn_find_menu_tip`.
 
-Plus `lpn_tip_join` — see §2b. And when the right pane lands: `lpn_pane_right_toggle` and
-`lpn_pane_right_toggle_tip`.
+Plus `lpn_tip_join` (§2b), and `lpn_pane_right_toggle` / `lpn_pane_right_toggle_tip` for the right
+pane's own toggle. All written, English only, payloads regenerated.
 
 English only, in `lib/lang.ec.en.php`, then regenerate the payloads. **A button with no explanation
 key is not blocked** — it falls back to the name alone, which is a correct and complete tip. But a
@@ -153,11 +156,18 @@ Required, in the wiring track:
    change or after it. Do not "fix" that by dropping the click-to-hide: it exists so the tip cannot
    hang over the panel the button just opened.
 
-   The honest position is that this page is not a phone page — `CLAUDE.md` says so — and its touch
-   users are on tablets and touchscreen laptops, most of which also have a pointer. What they are
-   owed is a **discovery route that is not a tooltip**: a "what the icons mean" list under Help,
-   which is one short table and also serves the first-time mouse user who does not think to hover.
-   That list is a deliverable of this change, not a follow-up.
+   **FIXED, and the fix is PRESS-AND-HOLD.** A control on a hover-less device now gets
+   `trigger: 'manual'` plus a 500 ms touch-hold that calls `tip.show()`, cancelled by a move or an
+   early release. A tap still presses the button and still hides the tip, so the click-to-hide that
+   keeps a tip off the panel it just opened is untouched. It is the gesture every touch platform
+   already uses for "what is this", and it is the only arrangement where a tap can both operate the
+   control and leave the tip readable.
+
+   And the discovery route that is not a tooltip shipped with it: **Help > "What the toolbar icons
+   mean"**, one row per button with its icon, its name and its explanation. It is DERIVED from the
+   strip (`toolbarIconIndex`, filled by `setIconLabel()`), so a button added later is in the list
+   already; `specs/toolbar.js` asserts the row count equals the button count. It serves the
+   first-time mouse user who does not think to hover just as much as the touch user.
 
 ---
 
@@ -171,9 +181,9 @@ text; there is no icon-only form of a dropdown, and shrinking it is not what thi
   visible label beside it now that its neighbours are icons.
 - Do not add `.ec-help` to it. A tooltip that opens on focus over a dropdown the user is about to
   open is a tooltip in the way of the control.
-- **Do not invest here.** ROADMAP Task 427 has Tom saying one dropdown "is not the expectation" and
-  points at a node select and a link select in a right-side pane. This control is likely to be
-  replaced rather than restyled.
+- **It was replaced, not restyled**, the same day: `#lpn_color_quick` is gone and Task 427's node
+  select and link select live in the Visibility panel. So the toolbar carries no `<select>` at all,
+  which is what an icon-only strip wants.
 
 ---
 
