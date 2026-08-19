@@ -922,6 +922,9 @@ EngCalcs.lpnCollide = (function () {
 	//
 	// `labels[i]` carries `sides` -- an array of candidate ENDPOINTS, best first, which the caller
 	// builds from the local feature context -- and `priority`, already resolved to a number.
+	// **PRIORITY IS A DROP ORDER, LOW FIRST** (Task 445): the SMALLEST number is the first to be
+	// given up, so placement runs from the largest down and an absent priority (read as 0) is the
+	// first to go rather than the last. The user's column reads the same way -- "Drop".
 	// **The caller keeps ownership of both**, because deciding which side is open needs the network's
 	// topology and deciding which label matters needs to know what a demand is, and this file is not
 	// allowed to know either. It is the same purity line placeLabels() draws.
@@ -957,7 +960,8 @@ EngCalcs.lpnCollide = (function () {
 		// Dragged labels are placed before all of them and are never dropped: the user put them there.
 		order.sort(function (a, b) {
 			if (!!b.dragged !== !!a.dragged) { return b.dragged ? 1 : -1; }
-			if ((a.priority || 0) !== (b.priority || 0)) { return (a.priority || 0) - (b.priority || 0); }
+			// HIGHEST PRIORITY PLACES FIRST, because the number is a drop order and 1 drops first.
+			if ((a.priority || 0) !== (b.priority || 0)) { return (b.priority || 0) - (a.priority || 0); }
 			return a.id < b.id ? -1 : (a.id > b.id ? 1 : 0);
 		});
 		order.forEach(function (lbl) {

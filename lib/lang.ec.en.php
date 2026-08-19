@@ -1953,15 +1953,17 @@ $ec_lang['lpn_labels_suffix_tip']='Text shown after this value on the map';
 $ec_lang['lpn_labels_suffix_gradient_tip']='Text shown after the head loss gradient on the map. Do not type a percent sign here. It is added for you when the units are percent.';
 $ec_lang['lpn_labels_separator']='Text between values';
 $ec_lang['lpn_labels_separator_tip']='Text between one value and the next on a label. A space by default.';
-// The priority column in the Labels box (ROADMAP Task 397). Both tips say "1 matters most", because
-// that one sentence is what the two columns share; what differs is WHAT the number orders, and each
-// tip says which. Kept plain and short: these sit on a small box in a crowded row.
+// The Drop column in the Labels box (ROADMAP Task 397; inverted by Task 445). Both tips say "1 is
+// dropped first", because that one sentence is what the two columns share; what differs is WHAT the
+// number orders, and each tip says which. Kept plain and short: these sit on a small box in a
+// crowded row. 'lpn_labels_priority' is the term of art and is used only inside the two tips now --
+// the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Priority';
-$ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped when a label does not fit. 1 is kept longest.';
+$ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped when a label does not fit. 1 is dropped first.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
-$ec_lang['lpn_labels_priority_node_tip']='Priority for deciding whose label is dropped first when the map is crowded: the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to that of the neighbouring nodes. 1 decides first.';
+$ec_lang['lpn_labels_priority_node_tip']='The order in which these tests are given up when the map is too crowded to show every node label: the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to that of the neighbouring nodes. 1 is given up first, so the highest number decides which label goes.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='Before';
@@ -2284,10 +2286,13 @@ $ec_lang['lpn_settings_hydraulics']='Hydraulics';
 // The decimals column is headed by an EXAMPLE of what it does -- and the example is translatable
 // because the DECIMAL SEPARATOR is a locale fact (Tom, 2026-08-18: "We could translate to '0,000'
 // where needed"), not punctuation to copy. Write your own locale's separator; keep three decimals.
-// "Rank" heads the priority column only where lib/Icons.lib.php has no 'priority' icon to draw
-// there; either way the term of art lives in the heading's own tip.
+// "Drop" heads the priority column (Task 445): the number says the order values and labels are
+// given up in, and the term of art, Priority, lives in the heading's own tip. It replaced an icon,
+// so it must stay about as short as one -- a heading that needs a wider box is the wrong word.
+// 'lpn_labels_col_rank' is what it replaced, kept unrendered because "Rank" is the OLD sense.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
 $ec_lang['lpn_labels_col_rank']='Rank';
+$ec_lang['lpn_labels_col_drop']='Drop';
 
 // ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
 // A third sub-heading over the two controls that are about a node label and a link label alike.

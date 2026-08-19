@@ -94,7 +94,14 @@ const L = loadLoopedNetwork(
 
 // Rank order recovered by SORTING, so the test says what Tom said -- an order -- rather than
 // pinning the particular integers, which are free to be renumbered.
-function orderOf(map) {
+//
+// **ASCENDING IS THE DROP ORDER SINCE TASK 445**: the number is the order a value is GIVEN UP in, 1
+// first, so the first name this returns is the first one shed and the last is the one kept longest.
+// It read the opposite way at v8. The two assertions below therefore state the SURVIVOR and the
+// FIRST CASUALTY by name as well as pinning the list -- a list alone would pass if someone reversed
+// both the defaults and the comparator again, and naming the endpoints is what makes the meaning,
+// rather than the arithmetic, the thing under test.
+function dropOrderOf(map) {
 	return Object.keys(map).sort(function (a, b) { return map[a] - map[b]; });
 }
 
@@ -105,22 +112,33 @@ const def = L.defaultLabelSettings();
 // roughness, and `id` LAST so it sheds first. The id rank reversed on 2026-08-16: it shipped as
 // never-shed on the Maplex key-number argument, and Tom overruled it because a link label lies along
 // its own pipe, so the drawing already says which pipe the numbers belong to.
-eq(orderOf(def.priority.link),
-	['flow', 'velocity', 'headloss', 'gradient', 'diameter', 'length', 'roughness', 'km', 'id'],
-	'link shed order is Tom\'s list, flow kept longest and id shed first');
+//
+// **THE PREFERENCE IS UNCHANGED BY TASK 445; ONLY THE NUMBERS ARE.** Tom's list still runs from the
+// value kept longest to the value shed first, so as a DROP order it reads backwards -- which is why
+// this literal is his list reversed rather than a new decision about which value matters.
+eq(dropOrderOf(def.priority.link),
+	['id', 'km', 'roughness', 'length', 'diameter', 'gradient', 'headloss', 'velocity', 'flow'],
+	'link drop order is Tom\'s list reversed: id shed first, flow kept longest');
+// Stated as meaning rather than as position, so it fails under the OLD sense instead of merely
+// sorting differently.
+ok(def.priority.link.id === Math.min.apply(null, Object.keys(def.priority.link).map(function (k) {
+	return def.priority.link[k];
+})), 'a link ID holds the LOWEST number, which is now what "shed first" means');
+ok(def.priority.link.flow === Math.max.apply(null, Object.keys(def.priority.link).map(function (k) {
+	return def.priority.link[k];
+})), 'and the flow holds the highest, so it is the last value standing');
 
-// Tom's node list read LAST FIRST, which is how he wrote it: "use last first if on".
-eq(orderOf(def.priority.node), ['demand', 'pressure', 'elev', 'head'],
-	'node drop order is demand, pressure, elevation, head');
+// Tom's node list read LAST FIRST, which is how he wrote it: "use last first if on". Reversed here
+// for the same reason as the link list.
+eq(dropOrderOf(def.priority.node), ['head', 'elev', 'pressure', 'demand'],
+	'node drop order is head, elevation, pressure, demand -- demand decides last and so wins');
 
 // The two columns are not the same axis and must not converge on one list.
-ok(orderOf(def.priority.node).length !== orderOf(def.priority.link).length,
+ok(dropOrderOf(def.priority.node).length !== dropOrderOf(def.priority.link).length,
 	'node and link priority maps are separate lists');
 ok(def.priority.node.id === undefined,
 	'a node ID carries no rank: an ID is never the reason one label beats another');
-ok(def.priority.link.id === Math.max.apply(null, Object.keys(def.priority.link).map(function (k) {
-	return def.priority.link[k];
-})), 'a link ID is the LAST rank, so it is the first value shed');
+
 
 // Every ranked field is a real field, and every numeric field is ranked. A rank on a field that
 // does not exist is invisible; a field with no rank is undefined in a comparator, which is not a
@@ -290,9 +308,12 @@ r.out.filter(function (o) { return o.dropped; }).forEach(function (d) {
 		// is inherent to a first approximation and is exactly what a repair phase exists to mop up
 		// (Task 400). It is not a wrong drop -- the later label sits at its own node, not in the
 		// spot this one wanted -- but the final picture cannot be read as if order did not exist.
+		// OUTRANKS MEANS A HIGHER NUMBER SINCE TASK 445, because the number is now the order a
+		// label is given up in: 1 is surrendered first, so the biggest number is the last one
+		// standing and is what can legitimately refuse a smaller one.
 		ok(hits.some(function (h) {
 			const other = r.labels.filter(function (l) { return l.id === h.id; })[0];
-			return other.priority < lbl.priority;
+			return other.priority > lbl.priority;
 		}), d.id + ' was refused by a label that outranks it');
 	});
 });

@@ -1019,8 +1019,8 @@
         "lpn_labels_separator": "Text between values",
         "lpn_labels_separator_tip": "Text between one value and the next on a label. A space by default.",
         "lpn_labels_priority": "Priority",
-        "lpn_labels_priority_link_tip": "The order in which values are dropped when a label does not fit. 1 is kept longest.",
-        "lpn_labels_priority_node_tip": "Priority for deciding whose label is dropped first when the map is crowded: the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to that of the neighbouring nodes. 1 decides first.",
+        "lpn_labels_priority_link_tip": "The order in which values are dropped when a label does not fit. 1 is dropped first.",
+        "lpn_labels_priority_node_tip": "The order in which these tests are given up when the map is too crowded to show every node label: the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to that of the neighbouring nodes. 1 is given up first, so the highest number decides which label goes.",
         "lpn_labels_col_before": "Before",
         "lpn_labels_col_after": "After",
         "lpn_labels_col_decimals": "Decimals",
@@ -1186,6 +1186,7 @@
         "lpn_settings_hydraulics": "Hydraulics",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_labels_col_rank": "Rank",
+        "lpn_labels_col_drop": "Drop",
         "lpn_settings_node_link": "Node and link",
         "lpn_color_mode_equal": "Equal interval",
         "lpn_color_mode_quantile": "Quantile (equal count)",
@@ -1195,7 +1196,7 @@
         "lpn_color_mode_log": "Logarithmic",
         "lpn_color_mode_pressure": "Pressure"
     },
-    "count": 1193,
+    "count": 1194,
     "active_prefixes": [
         "about",
         "bpn",
