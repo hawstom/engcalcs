@@ -124,9 +124,58 @@ sources.forEach(function (s) {
 // THE FIVE MODES, on distributions with answers worked out by hand
 // ============================================================================================
 
-ok(R.MODES.length === 5, 'exactly five allocation modes');
-ok(R.MODES.map(function (m) { return m.key; }).join() === 'equal,quantile,jenks,stddev,pretty',
-	'the five modes are the five GIS names, in a stable order');
+// Six algorithmic modes and one criterion mode. The order is stable because a saved project stores
+// the KEY, and because a picker that reshuffles between visits is a picker nobody trusts.
+ok(R.MODES.length === 7, 'seven modes', R.MODES.map(function (m) { return m.key; }).join());
+ok(R.MODES.map(function (m) { return m.key; }).join() ===
+	'equal,quantile,jenks,stddev,pretty,log,pressure',
+	'the GIS names, then logarithmic, then the criterion, in a stable order');
+// **THE CRITERION MODE IS OFFERED ONLY FOR ITS OWN QUANTITY.** A mode called Pressure offered while
+// colouring velocity is an invitation to a wrong map, so modesFor() filters by field.
+ok(R.modesFor('velocity').length === 6 && !R.modesFor('velocity').some(function (m) { return m.criterion; }),
+	'colouring velocity offers the six algorithmic modes and no criterion');
+ok(R.modesFor('pressure').length === 7 && R.modesFor('pressure').some(function (m) { return m.key === 'pressure'; }),
+	'colouring pressure offers Pressure as well');
+ok(R.modesFor().length === 7, 'asking for no field in particular offers them all');
+
+// --- logarithmic: 1 to 10,000 over 4 classes must give the decades, not the arithmetic quarters.
+{
+	const decades = [];
+	for (let e = 0; e <= 4; e++) { for (let k = 1; k < 10; k++) { decades.push(k * Math.pow(10, e)); } }
+	const lb = R.breaksFor('log', decades, 4);
+	ok(lb.length === 3 && lb.every(isFinite) && strictlyIncreasing(lb), 'log gives 3 finite rising breaks');
+	// Equal interval on this data would put the first break near 22,500; log puts it near 100.
+	ok(lb[0] < 200, 'log first break is a decade, not a quarter of the range', lb[0].toFixed(1));
+	ok(R.breaksFor('equal', decades, 4)[0] > 5000, '...and equal interval really would not', 
+		R.breaksFor('equal', decades, 4)[0].toFixed(0));
+	// TRAP 1: zero is excluded from the fit rather than crashing it or dragging it to -Infinity.
+	const withZeros = decades.concat([0, 0, 0, 0, 0]);
+	ok(R.breaksFor('log', withZeros, 4).every(isFinite), 'a dead-end pipe at 0 gpm does not poison the fit');
+	ok(R.isZeroish(0) && R.isZeroish(-0) && !R.isZeroish(1e-6), 'isZeroish names the no-flow case');
+	// TRAP 2: sign is direction. |Q| is what gets classified, and the arrow already shows the rest.
+	const signed = decades.map(function (v, i) { return i % 2 ? -v : v; });
+	ok(R.breaksFor('log', signed, 4).join() === R.breaksFor('log', decades, 4).join(),
+		'reversing half the flows changes no break -- direction is the arrow, not the colour');
+	ok(R.breaksFor('log', [0, 0, 0], 4).length === 3, 'an entirely dead network still yields breaks');
+}
+
+// --- the criterion, in SI, and the numbers a US engineer already has in their head.
+{
+	const psi = 0.703069578296302;   // metres of water per psi
+	const b = R.criterionBreaks('pressure');
+	ok(b.length === 4 && R.criterionClasses('pressure') === 5, 'pressure is four breaks, five classes');
+	[20, 40, 60, 80].forEach(function (p, i) {
+		ok(Math.abs(b[i] / psi - p) < 0.01, 'break ' + i + ' is ' + p + ' psi in metres of water',
+			(b[i] / psi).toFixed(3));
+	});
+	ok(R.criterionBreaks('nope') === null, 'an unknown criterion answers null rather than guessing');
+}
+
+// --- every family heading has an example, and every example names a real field.
+ok(R.FAMILIES.every(function (f) { return (R.FAMILY_EXAMPLES[f] || []).length > 0; }),
+	'every family carries at least one example for its heading');
+ok(R.FAMILY_EXAMPLES.diverging.indexOf('pressure') >= 0,
+	'pressure is the diverging example -- it is the one field with a meaningful middle');
 
 // --- equal interval: 0..100, 5 classes -> 20/40/60/80, arithmetic anybody can check.
 const v0to100 = [];
@@ -213,6 +262,9 @@ const samples = {
 	'tiny magnitudes': [1e-9, 2e-9, 3e-9, 9e-9]
 };
 R.MODES.forEach(function (m) {
+	// A criterion mode answers with its own class count and ignores the data (see the section on
+	// validateBreaks below), so the n-1 contract every algorithmic mode obeys does not apply to it.
+	if (m.criterion) { return; }
 	Object.keys(samples).forEach(function (label) {
 		for (let n = R.MIN_CLASSES; n <= R.MAX_CLASSES; n++) {
 			const b = R.breaksFor(m.key, samples[label], n);
@@ -235,6 +287,9 @@ ok(R.breaksFor('no-such-mode', v0to100, 5).join() === eq.join(),
 [['no values', []], ['one value', [42]], ['all equal', [7, 7, 7, 7, 7]], ['all zero', [0, 0, 0]],
 	['nulls and blanks only', [null, undefined, '', NaN]]].forEach(function (pair) {
 	R.MODES.forEach(function (m) {
+		// A criterion mode has no data to be degenerate about -- its breaks are a design code, so an
+		// empty network gets the same four thresholds a solved one does. Checked once, above.
+		if (m.criterion) { return; }
 		for (let n = R.MIN_CLASSES; n <= R.MAX_CLASSES; n++) {
 			const b = R.breaksFor(m.key, pair[1], n);
 			const what = m.key + ' on "' + pair[0] + '" at ' + n + ' classes';
@@ -289,7 +344,23 @@ const round = R.validateBreaks([10.123456789, 20.5, 30.5, 40.5], 5);
 ok(round.breaks[0] === 10.123456789, 'validation does not round what the user typed');
 
 // Every mode's own output must pass validation -- the generate and the tweak paths agree.
+//
+// **A CRITERION MODE IS EXEMPT, and the exemption is the point.** An algorithmic mode answers the
+// count it is asked for; a criterion mode answers with the count its design code has (four pressure
+// thresholds are five classes) and the UI follows IT. Validating a criterion's breaks against an
+// arbitrary n asserts the opposite contract, and this check found that on the first run.
 R.MODES.forEach(function (m) {
+	if (m.criterion) {
+		const b = R.breaksFor(m.key, v0to100, 3);
+		ok(b.length + 1 === R.criterionClasses(m.criterion),
+			m.key + ' answers with its OWN class count, whatever it is asked for',
+			b.length + 1 + ' classes');
+		ok(R.validateBreaks(b, b.length + 1).ok,
+			m.key + ' output passes validateBreaks at its own count');
+		ok(R.breaksFor(m.key, [], 5).join() === R.breaksFor(m.key, v0to100, 5).join(),
+			m.key + ' ignores the data entirely -- that is what makes it a criterion');
+		return;
+	}
 	for (let n = R.MIN_CLASSES; n <= R.MAX_CLASSES; n++) {
 		ok(R.validateBreaks(R.breaksFor(m.key, v0to100, n), n).ok,
 			m.key + ' output at ' + n + ' classes passes validateBreaks');

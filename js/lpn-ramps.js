@@ -407,6 +407,20 @@
 	//                  its classes have no order. Offered because the page will grow category
 	//                  fields; a picker must not silently make that choice unavailable.
 	var FAMILIES = ['sequential', 'diverging', 'qualitative'];
+	// **EACH FAMILY HEADING CARRIES AN EXAMPLE**, because the choice is a property of the DATA and
+	// nothing else in the picker says so. Tom, 2026-08-18: *"We could make the family headings more
+	// than one line and let them say (Pressure, ...)"* and *"Maybe 'eg. Press...'"* -- so the example
+	// is abbreviated to fit a dropdown heading rather than spelled out. He also ruled that the picker
+	// must NOT choose the family for the user: *"No suggest family. Simply put examples with
+	// headings."*
+	//
+	// Machine keys, not sentences: the UI owns the wording and the translation, and these say which
+	// example belongs to which family so the two cannot drift apart.
+	var FAMILY_EXAMPLES = {
+		sequential: ['velocity', 'headloss', 'diameter', 'elevation'],
+		diverging: ['pressure'],
+		qualitative: ['status', 'material']
+	};
 
 	// Ramp keys per family, in catalogue order. Derived, never typed -- a hand-written second list
 	// is the thing that goes stale when a ramp is added.
@@ -501,13 +515,33 @@
 	// them. So the modes GENERATE and validateBreaks() ACCEPTS -- a hand-edited break list is a
 	// first-class input here, not an afterthought.
 
+	// `field` names the quantity a mode is FOR, and null means "any". The picker shows a criterion
+	// mode only when its quantity is the one being coloured -- a mode called Pressure offered while
+	// colouring velocity is an invitation to a wrong map.
 	var MODES = [
-		{ key: 'equal', name: 'Equal interval' },
-		{ key: 'quantile', name: 'Quantile (equal count)' },
-		{ key: 'jenks', name: 'Natural breaks (Jenks)' },
-		{ key: 'stddev', name: 'Standard deviation' },
-		{ key: 'pretty', name: 'Pretty (rounded)' }
+		{ key: 'equal', name: 'Equal interval', field: null },
+		{ key: 'quantile', name: 'Quantile (equal count)', field: null },
+		{ key: 'jenks', name: 'Natural breaks (Jenks)', field: null },
+		{ key: 'stddev', name: 'Standard deviation', field: null },
+		{ key: 'pretty', name: 'Pretty (rounded)', field: null },
+		{ key: 'log', name: 'Logarithmic', field: null },
+		// Named for the quantity, not the algorithm. See CRITERIA.
+		{ key: 'pressure', name: 'Pressure', field: 'pressure', criterion: 'pressure' }
 	];
+	// The modes worth offering for a given field.
+	//
+	// **NO FIELD MEANS THE WHOLE CATALOGUE, not "the modes that suit nothing".** A caller with no
+	// field yet is building a list, not colouring a map; hiding the criterion modes from it would
+	// make them undiscoverable everywhere except the one screen that already knows about them.
+	// Filtering happens only when a field is actually named.
+	function modesFor(field) {
+		var out = [], i;
+		if (field === undefined || field === null || field === '') { return MODES.slice(); }
+		for (i = 0; i < MODES.length; i++) {
+			if (!MODES[i].field || MODES[i].field === field) { out.push(MODES[i]); }
+		}
+		return out;
+	}
 
 	// Finite numbers only, ascending. Every mode starts here, so every mode ignores an element with
 	// no value for the field rather than treating it as zero.
@@ -796,12 +830,97 @@
 		return out;
 	}
 
+	// ---- LOGARITHMIC, and the two traps it is famous for ----------------------------------------
+	//
+	// **WHY A WATER NETWORK NEEDS IT.** At a fixed hydraulic gradient Hazen-Williams gives
+	// Q ~ D^2.63, so a network with 8-inch laterals and a 60-inch main spans about 195x in flow;
+	// EPA's Net3 runs 0 to 13,158 gpm. Seven equal intervals put nearly every pipe in the first
+	// class and spend the other six on three mains. The same is true of head loss.
+	//
+	// **TRAP 1: a zero-flow pipe has no logarithm, and dead ends are common.** Three answers exist
+	// in the wild -- shift everything by a constant (distorts, and the constant is arbitrary),
+	// symlog (linear inside a threshold band, logarithmic outside -- matplotlib's SymLogNorm), and
+	// asinh (smooth everywhere, ~linear near zero and ~log far from it -- matplotlib's AsinhScale,
+	// and the astronomers' asinh magnitudes of Lupton, Gunn & Szalay 1999). All three are real
+	// solutions to a real problem, and none of them is OUR problem: a pipe carrying exactly zero is
+	// not a small flow, it is a different STATE, and averaging it into the bottom class hides the
+	// one thing a designer is looking for. So zero is excluded from the fit and
+	// EngCalcs.lpnRamps.isZeroish() lets the caller give it its own treatment.
+	//
+	// **TRAP 2: flow SIGN is direction, not magnitude.** Q = -230 gpm is 230 gpm the other way.
+	// This page already draws direction as an arrow on every link, so classifying |Q| loses
+	// nothing -- the sign is on the map, in the one channel that shows it best. Hence `absolute`.
+	var LOG_MIN_DECADES = 1e-12;
+	function logBreaks(values, classCount) {
+		var n = clampClasses(classCount), vals = cleanValues(values), i, out = [];
+		// |v|, and zero dropped: see TRAP 1 and TRAP 2 above.
+		var pos = [];
+		for (i = 0; i < vals.length; i++) {
+			if (Math.abs(vals[i]) > LOG_MIN_DECADES) { pos.push(Math.abs(vals[i])); }
+		}
+		pos.sort(function (x, y) { return x - y; });
+		// Every value zero (or none at all) is not a failure -- it is a network nobody has solved
+		// yet, or one that is entirely dead. Fall back to the linear answer rather than to NaN.
+		if (pos.length < 2 || pos[0] === pos[pos.length - 1]) {
+			return equalIntervalBreaks(pos.length ? pos : vals, n);
+		}
+		var lo = Math.log10(pos[0]), hi = Math.log10(pos[pos.length - 1]);
+		for (i = 1; i < n; i++) { out.push(Math.pow(10, lo + (hi - lo) * i / n)); }
+		return out;
+	}
+	// A value the log mode treats as "no flow" rather than "a very small flow". Exported because
+	// the CALLER decides what to do with it -- a class of its own, a grey, or the bottom class --
+	// and this file has no opinion about colour.
+	function isZeroish(v) { return !(Math.abs(Number(v)) > LOG_MIN_DECADES); }
+
+	// ---- CRITERION BREAKS: the mode named for the quantity, not for the algorithm ----------------
+	//
+	// Tom, 2026-08-18: *"We could offer customizable water-oriented modes like 'Pressure'."* and,
+	// when offered a bigger design: *"No change mode picker. Simply name one mode 'Pressure'."*
+	//
+	// **THE ENGINEER'S QUESTION ABOUT PRESSURE IS NOT "HOW IS THIS DISTRIBUTED".** It is "where do I
+	// fail the standard", and no algorithm can answer it, because the answer is a number in a design
+	// code rather than a property of this network. So one mode carries fixed breaks and is named
+	// after the quantity it serves.
+	//
+	// **THE BREAKS ARE STORED IN SI AND CONVERTED AT THE BOUNDARY.** 40 psi and 275.79 kPa are the
+	// same criterion; a scheme stored as a bare 40 is wrong the moment somebody opens the project in
+	// SI. `siBreaks` is metres of water, which is what this suite's solver carries internally, and
+	// the caller converts with EngCalcs.unitFactor() exactly as every other number does.
+	var CRITERIA = {
+		pressure: {
+			// 20 / 40 / 60 / 80 psi -- the four numbers a US water engineer already has in their
+			// head: below 20 is a fire-flow failure, 40 is the usual minimum service pressure, 60
+			// is comfortable, above 80 asks for a pressure-reducing valve at the service.
+			// In metres of water: psi x 0.70307.
+			siBreaks: [14.0614, 28.1228, 42.1842, 56.2456],
+			label: 'pressure'
+		}
+	};
+	//
+	// **A CRITERION MODE DECIDES THE CLASS COUNT; THE COUNT DOES NOT DECIDE THE CRITERION.** Four
+	// numbers out of a design code are five classes, and there is no honest way to render them as
+	// four or as seven -- padding invents a threshold nobody wrote and trimming deletes one somebody
+	// did. So `criterionClasses()` answers the count and the UI must FOLLOW it: choosing this mode
+	// sets the count and disables the count picker, exactly as EPANET fixes its legend at five.
+	// This is why the harness exempts criterion modes from the "n-1 breaks for n classes" rule that
+	// every algorithmic mode obeys.
+	function criterionBreaks(key) {
+		var c = CRITERIA[key];
+		return c ? c.siBreaks.slice() : null;
+	}
+	function criterionClasses(key) {
+		var c = CRITERIA[key];
+		return c ? c.siBreaks.length + 1 : 0;
+	}
+
 	var MODE_FNS = {
 		equal: equalIntervalBreaks,
 		quantile: quantileBreaks,
 		jenks: jenksBreaks,
 		stddev: stdDevBreaks,
-		pretty: prettyBreaks
+		pretty: prettyBreaks,
+		log: logBreaks
 	};
 
 	/**
@@ -810,6 +929,14 @@
 	 * to epanet: a stored setting from a future or past version must still draw a map.
 	 */
 	function breaksFor(mode, values, classCount) {
+		// A criterion mode ignores the values entirely -- that is the whole point of it. Its breaks
+		// come back in SI and the caller converts; every other mode's breaks are already in the
+		// caller's own units, because that is what it handed in.
+		var m, i;
+		for (i = 0; i < MODES.length; i++) {
+			if (MODES[i].key === mode && MODES[i].criterion) { m = MODES[i]; break; }
+		}
+		if (m) { return criterionBreaks(m.criterion); }
 		return (MODE_FNS[mode] || equalIntervalBreaks)(values, classCount);
 	}
 
@@ -909,6 +1036,13 @@
 		FAMILIES: FAMILIES,
 		CREDITS: CREDITS,
 		MODES: MODES,
+		FAMILY_EXAMPLES: FAMILY_EXAMPLES,
+		CRITERIA: CRITERIA,
+		modesFor: modesFor,
+		isZeroish: isZeroish,
+		logBreaks: logBreaks,
+		criterionBreaks: criterionBreaks,
+		criterionClasses: criterionClasses,
 		JENKS_MAX: JENKS_MAX,
 		rampKeys: rampKeys,
 		rampColors: rampColors,
