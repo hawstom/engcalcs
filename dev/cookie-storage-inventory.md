@@ -79,16 +79,21 @@ on a visitor's device at all, and no server-side session state anywhere in the s
 | `lpn_document` | same | Legacy single-document key, migrated on read |
 | `lpn_identity` | same | The initials and the opaque token this browser sends to the file-lock broker |
 | `lpn_pane` | same | Whether the bottom pane is open, how tall it is, and which tab (Task 434) |
+| `lpn_rpane` | same | Whether the right panel is open and how wide it is (Task 441) |
+| `lpn_setbox` | same | Where the Settings box was left and how big it was made (Task 441) |
 | `lpn_show_titles` | same | Whether the page-title row is shown |
 
 The first three are **exempt** — they hold the document the user made in order to give it back to
-them. So are the other three, on the second limb of the same test: `lpn_identity` is strictly
-necessary for a service the visitor explicitly requested (you cannot take a lock on a shared file
-without saying who is holding it), and the last two are preferences the visitor set deliberately.
-**None of the six is analytics, and none carries an identifier of a person** — `lpn_identity`'s token
-is opaque and its initials are typed by the user, for other humans to read in the lock notice.
+them. So are the rest, on the second limb of the same test: `lpn_identity` is strictly necessary for
+a service the visitor explicitly requested (you cannot take a lock on a shared file without saying
+who is holding it), and the last four are preferences the visitor set deliberately — three panel
+layouts and a page-title toggle. **A panel layout is the same purpose at a finer grain, so it rides
+this declaration rather than earning a new one: no new sentence in `consent_body`, no
+`EC_CONSENT_VERSION` bump, nothing re-asked.** **None of the eight is analytics, and none carries an
+identifier of a person** — `lpn_identity`'s token is opaque and its initials are typed by the user,
+for other humans to read in the lock notice.
 
-**All six are removed by Settings > Erase everything** (`wipeAllStorage()`), which is what makes that
+**All eight are removed by Settings > Erase everything** (`wipeAllStorage()`), which is what makes that
 button's own sentence — "every project, every background image, all settings, and your unit choices"
 — literally true. A key added here that is not in that list quietly makes it false. The same
 function also expires the suite unit cookie and, since Task 437, the `ec_geosearch` consent record.

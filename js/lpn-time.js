@@ -298,7 +298,7 @@
 			reportStep: pageConfig.lpn_time_report_step || 'Report time step',
 			reportStart: pageConfig.lpn_time_report_start || 'Report start time',
 			startClock: pageConfig.lpn_time_clock_start || 'Clock time at the start',
-			formatTip: pageConfig.lpn_time_format_tip || 'Write a time as hours and minutes, like 2:30. A plain number means hours; a number with its own word means that word: 30 minutes.',
+			formatTip: pageConfig.lpn_time_format_tip || 'Write the duration as a number of hours or hours and minutes, like 72 or 72:00.',
 			// **THERE IS NO STEADY-STATE MESSAGE.** Tom, 2026-08-18, on the sentence that used to be
 			// here: "'This network is worked out at one moment' is the very string I told you I don't
 			// understand. And I don't think it's needed at all. The transport will always be there,

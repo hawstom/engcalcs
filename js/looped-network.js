@@ -7063,9 +7063,10 @@ var EngCalcs = EngCalcs || {};
 			R = ramps(),
 			nodeHost = document.getElementById('lpn_set_colors_node'),
 			linkHost = document.getElementById('lpn_set_colors_link'),
+			nlHost = document.getElementById('lpn_set_colors_nodelink'),
 			host = document.getElementById('lpn_set_colors_shared');
-		if (!host || !nodeHost || !linkHost) { return; }
-		[nodeHost, linkHost, host].forEach(function (h) { h.innerHTML = ''; });
+		if (!host || !nodeHost || !linkHost || !nlHost) { return; }
+		[nodeHost, linkHost, nlHost, host].forEach(function (h) { h.innerHTML = ''; });
 		function rowIn(target, labelText, control, tip) {
 			var r = document.createElement('div'), lab = document.createElement('span');
 			r.className = 'lpn-set-row';
@@ -7079,7 +7080,7 @@ var EngCalcs = EngCalcs || {};
 		function row(labelText, control, tip) { return rowIn(host, labelText, control, tip); }
 		function noteIn(target, text) {
 			var p = document.createElement('div');
-			p.style.cssText = 'font-size:0.85em;opacity:0.75;margin:2px 0 4px';
+			p.className = 'lpn-set-note';
 			p.textContent = text;
 			target.appendChild(p);
 		}
@@ -7135,9 +7136,10 @@ var EngCalcs = EngCalcs || {};
 		// decides its colour, and what that colour is.
 		//
 		// THE ORDER IS TOM'S. The field dropdown comes AFTER the label columns; the ramp picker is
-		// at the bottom of the group with the mode selector beside it -- *"Add the modes selector
-		// we discussed"*, which existed but sat where nobody found it. The range limits follow the
-		// mode that generates them, because they are its output and are meaningless above it.
+		// at the bottom of the group, then how many colours, then the classification method --
+		// *"Add the modes selector we discussed"*, which existed but sat where nobody found it. The
+		// limits follow the method that generates them, because they are its output and are
+		// meaningless above it.
 		function buildGroup(group) {
 			var target = group === 'node' ? nodeHost : linkHost,
 				field = colorFieldOf(group),
@@ -7146,16 +7148,17 @@ var EngCalcs = EngCalcs || {};
 				R2 = ramps(), i;
 			rowIn(target, (group === 'node'
 				? (pc.lpn_color_node_field || 'Color nodes by')
-				: (pc.lpn_color_link_field || 'Color pipes by')), fieldSelect(group));
+				: (pc.lpn_color_link_field || 'Color links by')), fieldSelect(group));
 
 			// THE SCHEME. A button showing a bar of this group's own colours -- see buildRampPicker.
 			rowIn(target, pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, group));
 
-			// THE MODE, immediately under the picker so the two are read as one setting: the ramp
-			// says WHICH COLOURS and the mode says WHERE THE BOUNDARIES GO. Only the modes that
-			// suit this field are offered -- modesFor() keeps a criterion mode off every quantity
-			// but its own -- and with no field chosen it offers the whole catalogue and is inert,
-			// which is what makes it DISCOVERABLE rather than something you must first earn.
+			// THE CLASSIFICATION METHOD. Built here, rendered below the colour count: the ramp says
+			// WHICH COLOURS, the count says HOW MANY, and the method says WHERE THE BOUNDARIES GO.
+			// Only the methods that suit this field are offered -- modesFor() keeps a criterion mode
+			// off every quantity but its own -- and with no field chosen it offers the whole
+			// catalogue and is inert, which is what makes it DISCOVERABLE rather than something you
+			// must first earn.
 			var modeSel = document.createElement('select'), curMode = field ? colorModeOf(group, field) : '';
 			modeSel.id = 'lpn_set_color_mode_' + group;
 			modeSel.disabled = !field;
@@ -7176,10 +7179,13 @@ var EngCalcs = EngCalcs || {};
 				if (settings.colorBreaks) { delete settings.colorBreaks[colorBreakKey(group, field)]; }
 				refreshValueColors(); saveToStorage(); syncColorControls();
 			});
-			rowIn(target, pc.lpn_color_mode || 'Range allocation', modeSel);
-
-			// HOW MANY RANGES, 3 to 7. Beside the ramp because the swatch above draws exactly this
+			// HOW MANY COLOURS, 3 to 7. Beside the ramp because the swatch above draws exactly this
 			// many boxes -- the two are one question and are read together.
+			//
+			// **ABOVE THE METHOD, NOT BELOW IT** (Tom, 2026-08-19). The count is the smaller and
+			// earlier decision -- how many colours do I want on this map -- and every classification
+			// method then answers it. Asking for the method first and the count second reads as
+			// though the method could change how many there are, which it never does.
 			var classSel = document.createElement('select');
 			classSel.id = 'lpn_set_ramp_classes_' + group;
 			for (i = (R2 ? R2.MIN_CLASSES : 3); i <= (R2 ? R2.MAX_CLASSES : 7); i++) {
@@ -7194,10 +7200,11 @@ var EngCalcs = EngCalcs || {};
 				else { settings.colorClassesNode = Number(classSel.value); }
 				refreshValueColors(); saveToStorage(); syncColorControls();
 			});
-			rowIn(target, pc.lpn_settings_color_classes || 'Number of ranges', classSel);
+			rowIn(target, pc.lpn_settings_color_classes || 'Number of colors', classSel);
+			rowIn(target, pc.lpn_color_mode || 'Data classification method', modeSel);
 			if (crit) {
 				noteIn(target, pc.lpn_color_criterion_note ||
-					'The range limits come from a design standard, so the number of ranges is fixed while that mode is chosen.');
+					'The limits come from a design standard, so the number of colors is fixed while that method is chosen.');
 			}
 			var rev = document.createElement('input');
 			rev.type = 'checkbox'; rev.checked = colorReverseOf(group);
@@ -7220,11 +7227,11 @@ var EngCalcs = EngCalcs || {};
 			// bad box marked, and the map is left exactly as it was.
 			if (!field) { return; }
 			var key = colorBreakKey(group, field), head = document.createElement('div');
-			head.style.cssText = 'margin-top:6px;font-weight:bold';
+			head.className = 'lpn-set-minihead';
 			head.textContent = (pc.lpn_settings_color_breaks || 'Color band limits') + ': ' + colorFieldLabel(group, field);
 			target.appendChild(head);
 			noteIn(target, pc.lpn_color_ranges_note ||
-				'The mode above sets these limits from the values now on the map. Type over them and the same number always means the same color.');
+				'Left alone, these limits follow the values now on the map, so they move with every solve and every time step. Type over them and they stay put, so the same number always means the same color. Automatic gives them back to the method above.');
 			// **WHOSE NUMBER IS IN THE BOX DECIDES HOW IT IS PRINTED.** A limit the user pinned is
 			// theirs and appears exactly as they typed it. A limit a MODE just computed is ours,
 			// and 0.14285714285714285 in a box four characters wide is unreadable -- so it is
@@ -7300,20 +7307,31 @@ var EngCalcs = EngCalcs || {};
 		buildGroup('node');
 		buildGroup('link');
 
-		// ---- WHAT IS STILL TRUE OF THE WHOLE MAP ------------------------------------------------
+		// ---- WHAT IS TRUE OF NODE LABELS AND LINK LABELS ALIKE ----------------------------------
 		//
-		// Everything above belongs to one kind of element. These three do not: a thematic map is a
-		// mode the whole sheet is in, the colour key is one overlay in one corner however many
-		// schemes feed it, and the acknowledgement is a licence obligation on the catalogue rather
-		// than on either picker. So they stand under Map appearance, where the sizes and the other
-		// legend already are.
+		// **THEMATIC MAP STANDS UNDER "Node and link"** (Tom, 2026-08-19: "Move Thematic map to the
+		// Node and link section"). It hides EVERY label so that only the colours are left, which is
+		// as true of a node's label as of a link's -- filed inside either colouring group it read as
+		// belonging to that one kind of element, which is the same misreading the high/low mark and
+		// the separator were moved out of.
+		//
+		// **STILL A MODE, NOT A DEFAULT** (Task 327): it suppresses the labels and does not touch
+		// labelSettings, so switching it off brings the user's own choices back untouched -- which is
+		// what the tip promises, and why the tip travels with the row rather than staying behind.
+		// Moving where a control is DRAWN changes nothing about what it does.
 		var them = document.createElement('input');
 		them.type = 'checkbox'; them.checked = !!settings.colorThematic;
 		them.addEventListener('change', function () {
 			settings.colorThematic = them.checked; refreshValueColors(); saveToStorage(); syncColorControls();
 		});
-		row(pc.lpn_settings_color_thematic || 'Thematic map: colors only, no labels', them,
+		rowIn(nlHost, pc.lpn_settings_color_thematic || 'Thematic map', them,
 			pc.lpn_settings_color_thematic_tip);
+
+		// ---- WHAT IS STILL TRUE OF THE WHOLE MAP ------------------------------------------------
+		//
+		// The colour key is one overlay in one corner however many schemes feed it, and the
+		// acknowledgement is a licence obligation on the catalogue rather than on either picker. So
+		// the two stand under Map appearance, where the sizes and the other legend already are.
 		row(pc.lpn_settings_color_key_position || 'Color legend position',
 			positionSelect(settings.colorLegendPosition, function (v) {
 				settings.colorLegendPosition = v;
@@ -7346,7 +7364,7 @@ var EngCalcs = EngCalcs || {};
 			credits.appendChild(line);
 		});
 		host.appendChild(credits);
-		[nodeHost, linkHost, host].forEach(function (h) {
+		[nodeHost, linkHost, nlHost, host].forEach(function (h) {
 			if (EngCalcs.initTips) { EngCalcs.initTips(h); }
 		});
 	}
@@ -8601,8 +8619,10 @@ var EngCalcs = EngCalcs || {};
 		// `lpn_pane` (Task 434: is the bottom pane open, how tall, which tab) and `lpn_show_titles`
 		// are settings by any reading, and leaving them behind means the button's own sentence is
 		// false -- which is the whole thing this function exists to keep true.
+		// lpn_rpane and lpn_setbox are the same kind of thing and were being left behind, which made
+		// the confirm's "all settings" false for two keys nobody had noticed.
 		var i, key, doomed = [LPN_LEGACY_KEY, LPN_INDEX_KEY, LPN_IDENTITY_KEY,
-			LPN_PANE_KEY, PAGE_TITLES_KEY];
+			LPN_PANE_KEY, LPN_RPANE_KEY, LPN_SETBOX_KEY, PAGE_TITLES_KEY];
 		try {
 			for (i = 0; i < localStorage.length; i++) {
 				key = localStorage.key(i);
@@ -14201,13 +14221,22 @@ var EngCalcs = EngCalcs || {};
 	// because they are properties of that one field, which is why they are here and not in Settings.
 	// The row is a flex line so those controls form COLUMNS down the panel: the field names are of
 	// wildly different lengths, and boxes that stagger with them are unreadable as a set.
-	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, priority) {
+	// `tip` is last because only the whole-panel options below use it -- a field row's explanation
+	// lives on its trailing columns. **A ROW WITHOUT ONE IS INVISIBLE TO THE SEARCH BOX BEYOND ITS
+	// OWN WORDS**: setboxUnitText() harvests title/aria-label/placeholder precisely so a user can
+	// find a control by the word that describes it rather than by the word on it, and a row with no
+	// tip silently opts out of that. Tom, 2026-08-19, asking for "underline" and "overline" to be
+	// findable, had found the one row in this box that had no tip at all.
+	function labelCheckbox(container, labelText, checked, onChange, decimals, affixOpt, priority, tip) {
 		var row = document.createElement('div'), label = document.createElement('label'),
 			input = document.createElement('input'), span = document.createElement('span');
 		row.style.display = 'flex'; row.style.alignItems = 'center'; row.style.gap = '6px';
 		input.type = 'checkbox'; input.checked = checked;
 		input.addEventListener('change', function () { onChange(input.checked); saveToStorage(); refreshLabelText(); });
 		span.textContent = labelText;
+		// The whole label text is the tip's target, not a one-character glyph -- CLAUDE.md's
+		// tip-only nesting rule, and the same shape rowIn() uses everywhere else in this box.
+		if (tip) { span.title = tip; span.className = 'ec-help'; }
 		label.appendChild(input);
 		label.appendChild(document.createTextNode(' '));
 		label.appendChild(span);
@@ -14414,8 +14443,11 @@ var EngCalcs = EngCalcs || {};
 		// matches it.
 		function columnHeadings(box, group) {
 			var row = document.createElement('div'), lead = document.createElement('span');
+			// The box's one small-text treatment, from the stylesheet rather than from here -- see
+			// .lpn-set-note. Only the LAYOUT stays inline, because it is measured off the same
+			// LPN_LABEL_COL_W the boxes below use.
+			row.className = 'lpn-set-note';
 			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = '6px';
-			row.style.fontSize = '0.85em'; row.style.opacity = '0.75';
 			lead.style.flex = '1 1 auto';
 			row.appendChild(lead);
 			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip],
@@ -14457,8 +14489,16 @@ var EngCalcs = EngCalcs || {};
 		// blanket separator and individual prefixes and postfixes, of course").
 		if (optBox) {
 			optBox.innerHTML = '';
+			// **THE LABEL STAYS SHORT AND THE TIP CARRIES THE CONVENTION** (Tom's own rule from the
+			// same review: "we should have a shorter label with a tip ... this length goes beyond real
+			// estate issues to attention/clutter issues"). His "Mark highest (overline) and lowest
+			// (underline) values" would have made the words findable by lengthening the label, which
+			// is the move he asked to stop making everywhere else in this box -- and it would still
+			// not have told a reader which mark they were looking at. The tip does both: the search
+			// matches it, and somebody who sees an overlined number on the map can look it up.
 			labelCheckbox(optBox, pc.lpn_labels_mark_extrema || 'Mark highest and lowest values',
-				labelSettings.markExtrema, function (v) { labelSettings.markExtrema = v; });
+				labelSettings.markExtrema, function (v) { labelSettings.markExtrema = v; },
+				null, null, null, pc.lpn_labels_mark_extrema_tip);
 			var sepRow = document.createElement('div'), sepLabel = document.createElement('span');
 			sepRow.style.display = 'flex'; sepRow.style.alignItems = 'center'; sepRow.style.gap = '6px';
 			sepLabel.textContent = pc.lpn_labels_separator || 'Text between values';
@@ -14963,7 +15003,7 @@ var EngCalcs = EngCalcs || {};
 		}
 		function note(target, text) {
 			var p = document.createElement('div');
-			p.style.cssText = 'font-size:0.85em;opacity:0.75;margin:2px 0 4px';
+			p.className = 'lpn-set-note';
 			p.textContent = text;
 			target.appendChild(p);
 		}
@@ -15079,7 +15119,7 @@ var EngCalcs = EngCalcs || {};
 		note(defBody, pc.lpn_settings_push_note || 'Only the properties whose labels are showing right now are applied.');
 		var pushBtn = document.createElement('button');
 		pushBtn.type = 'button';
-		pushBtn.textContent = pc.lpn_settings_push_btn || 'Apply defaults to all elements';
+		pushBtn.textContent = pc.lpn_settings_push_btn || 'Apply starting values to all elements';
 		pushBtn.addEventListener('click', function () {
 			// Base-level, and it SAYS SO rather than doing something defensible-looking. Inside a
 			// scenario this would write an override onto every element in one click -- the single
@@ -15181,7 +15221,7 @@ var EngCalcs = EngCalcs || {};
 			if (+lwInput.value > 0) { settings.linkWidth = +lwInput.value; refreshSymbolSizes(); saveToStorage(); }
 			else { lwInput.value = settings.linkWidth; }
 		});
-		row(mapBody, pc.lpn_settings_link_width || 'Pipe line thickness (pixels)', lwInput);
+		row(mapBody, pc.lpn_settings_link_width || 'Link line thickness (pixels)', lwInput);
 		// Task 329, and it ships OFF: aligned-vs-horizontal is a visual judgement, and turning it on
 		// by default would be making that judgement for the user rather than offering it to them.
 		var alignInput = document.createElement('input');
@@ -15190,7 +15230,7 @@ var EngCalcs = EngCalcs || {};
 			settings.alignPipeLabels = alignInput.checked;
 			relayoutLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_align_labels || 'Align pipe labels with pipes', alignInput);
+		row(mapBody, pc.lpn_settings_align_labels || 'Align link labels with links', alignInput);
 		// Task 351, and it belongs directly under the checkbox it only means anything for. A number
 		// rather than a checkbox because the right value depends on the drawing: a subdivision of
 		// north-south mains wants the doorway well clear of vertical, and a diagonal transmission
@@ -15205,7 +15245,8 @@ var EngCalcs = EngCalcs || {};
 			biasInput.value = settings.labelFlipLeftOfVertical;
 			relayoutLabels(); saveToStorage();
 		});
-		row(mapBody, pc.lpn_settings_readability_bias || 'Degrees left of vertical before a label turns 180\u00b0 to stay readable', biasInput);
+		row(mapBody, pc.lpn_settings_readability_bias || 'Label flip angle adjustment', biasInput,
+			pc.lpn_settings_readability_bias_tip);
 		// Task 330, and it ships ON because that is what the page has always drawn -- a label over a
 		// backdrop image is unreadable without it, and an upgrade must not restyle anyone's drawing.
 		var maskInput = document.createElement('input');
@@ -15250,7 +15291,8 @@ var EngCalcs = EngCalcs || {};
 		lmwWrap.appendChild(lmwInput);
 		lmwWrap.appendChild(document.createTextNode(' '));
 		lmwWrap.appendChild(lmwBtn);
-		row(mapBody, pc.lpn_settings_label_max_width || 'Show labels when the view is narrower than this (map units)', lmwWrap);
+		row(mapBody, pc.lpn_settings_label_max_width || 'Label view width (map units)', lmwWrap,
+			pc.lpn_settings_label_max_width_tip);
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
@@ -15408,7 +15450,7 @@ var EngCalcs = EngCalcs || {};
 			if (settings.engine === 'epanet') { warmEpanetEngine('engine'); }
 			scheduleSolve();
 		});
-		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET engine', engInput, pc.lpn_settings_engine_epanet_tip);
+		row(compBody, pc.lpn_settings_engine_epanet || 'Solve with the EPANET solver', engInput, pc.lpn_settings_engine_epanet_tip);
 		// ---- restore defaults (Tom, 2026-07-30) ----
 		// Resets settings/labelSettings only -- the network (nodes/links/labels) and backdrop are
 		// untouched, same "preferences vs. content" split clearNetwork()'s own comment documents.
@@ -15448,7 +15490,7 @@ var EngCalcs = EngCalcs || {};
 		wipeBtn.style.marginLeft = '4px';
 		// The second of this command's two render sites; the menu row is the other. Both wear the
 		// warning triangle, because it is the same dangerous command either way.
-		setLabel(wipeBtn, 'wipe', pc.lpn_settings_wipe_btn || 'Clear calculator');
+		setLabel(wipeBtn, 'wipe', pc.lpn_settings_wipe_btn || 'Erase everything on this page');
 		helpTip(wipeBtn, pc.lpn_reset_all_tip);
 		wipeBtn.addEventListener('click', wipeEverything);
 		tail.appendChild(wipeBtn);
@@ -15496,10 +15538,55 @@ var EngCalcs = EngCalcs || {};
 		units: 'lpn_set_sub_units',
 		time: 'lpn_set_sub_time'
 	};
-	// Where the user dragged it, remembered for the session only -- the same treatment and the same
-	// reasoning as popupUserPos: where your box sits is a fact about your screen, and a colleague
-	// opening your project must not inherit it.
-	var setboxUserPos = null;
+	// ---- WHERE THE BOX IS AND HOW BIG IT IS, REMEMBERED (Tom, 2026-08-19) -------------------
+	//
+	// **PER BROWSER, NEVER PER PROJECT**, exactly like `lpn_pane` and `lpn_rpane`: where your box
+	// sits and how big you made it is a fact about the screen you are sitting at, and a colleague
+	// opening your project must not inherit it. serializeProject() must never learn about this.
+	//
+	// **NO NEW CONSENT AND NO EC_CONSENT_VERSION BUMP.** This is the same purpose and the same
+	// category as the two keys above it -- a panel layout the visitor set deliberately -- which the
+	// exemption test already answers yes for, and dev/cookie-storage-inventory.md already declares.
+	// It makes no sentence in consent_body false, so nothing has to be re-asked or re-translated.
+	//
+	// **AND IT OPENS AT THE RIGHT EDGE THE FIRST TIME** (Tom: "We can open our Settings box by
+	// default (the first time) at the right side almost like a right pane"), against the canvas's
+	// own rect rather than the window's, so it lines up with the drawing it configures rather than
+	// with whatever furniture happens to be above it.
+	var LPN_SETBOX_KEY = 'lpn_setbox';
+	// left/top/w/h, each null until the user has moved or sized the box themselves. A null is not
+	// zero and not a default: it is "this has never been chosen", which is what makes the
+	// right-edge placement a FIRST-TIME rule rather than a rule that fights the user afterwards.
+	var setboxLayout = { left: null, top: null, w: null, h: null };
+	function saveSetboxLayout() {
+		try { localStorage.setItem(LPN_SETBOX_KEY, JSON.stringify(setboxLayout)); } catch (e) {}
+	}
+	function loadSetboxLayout() {
+		var raw = null, v, k;
+		try { raw = localStorage.getItem(LPN_SETBOX_KEY); } catch (e) { return; }
+		if (!raw) { return; }
+		try { v = JSON.parse(raw); } catch (e) { return; }
+		if (!v || typeof v !== 'object') { return; }
+		for (k in setboxLayout) {
+			if (typeof v[k] === 'number' && isFinite(v[k])) { setboxLayout[k] = v[k]; }
+		}
+	}
+	// A REMEMBERED SIZE IS A WISH, NOT A PROMISE: the window may be smaller than it was, so the
+	// stored numbers are applied and then left to the stylesheet's own min/max, which is the one
+	// place those limits are written. Reading the rect back afterwards is what makes the placement
+	// below work from the size the box REALLY has.
+	function applySetboxSize(box) {
+		if (setboxLayout.w) { box.style.width = setboxLayout.w + 'px'; }
+		if (setboxLayout.h) { box.style.height = setboxLayout.h + 'px'; }
+	}
+	// The first-time corner: the right edge of the DRAWING, at the drawing's top.
+	function setboxHomeCorner(w, h) {
+		var box = svg && svg.getBoundingClientRect ? svg.getBoundingClientRect() : null,
+			vw = window.innerWidth || 1000,
+			right = (box && box.width > 0) ? box.right : vw,
+			top = (box && box.height > 0) ? box.top : POPUP_EDGE;
+		return { left: right - w - POPUP_EDGE, top: top };
+	}
 	// **A STICKY HEADING HIDES WHAT YOU JUST JUMPED TO** (Tom, 2026-08-18: the scroll target lands
 	// UNDER the level-1 heading). `scrollIntoView({block:'start'})` puts the target at the top of the
 	// scrollport, which is exactly where the section heading is about to stick, so a sub-heading
@@ -15594,8 +15681,14 @@ var EngCalcs = EngCalcs || {};
 	function setboxUnitText(el) {
 		var cached = setboxTextCache && setboxTextCache.get(el), parts;
 		if (cached !== undefined && cached !== null) { return cached; }
+		// **`data-bs-original-title` IS WHERE A TIP LIVES ONCE BOOTSTRAP HAS TAKEN IT OVER**, and
+		// leaving it out quietly halved this search. EngCalcs.initTips() hands every .ec-help to
+		// Bootstrap, which MOVES the `title` attribute into that data attribute so the browser does
+		// not draw its own tooltip as well -- so every row whose tip had been initialised was
+		// searchable by its printed words only, which is the opposite of the rule this function
+		// exists for. Found 2026-08-19 by a search for "overline", a word that is only ever in a tip.
 		parts = [el.textContent || ''];
-		['title', 'aria-label', 'placeholder'].forEach(function (attr) {
+		['title', 'data-bs-original-title', 'aria-label', 'placeholder'].forEach(function (attr) {
 			if (el.getAttribute && el.getAttribute(attr)) { parts.push(el.getAttribute(attr)); }
 			[].forEach.call(el.querySelectorAll('[' + attr + ']'), function (k) {
 				parts.push(k.getAttribute(attr));
@@ -15695,18 +15788,20 @@ var EngCalcs = EngCalcs || {};
 		});
 	}
 	function openSettingsBox(section) {
-		var box = setboxEl(), r, at, target;
+		var box = setboxEl(), r, at, target, home;
 		if (!box) { return; }
 		closeMenu();
 		hideOpenTips();
 		box.style.display = 'flex';
+		applySetboxSize(box);
 		rebuildSettingsBox();
 		// Placed, then clamped: the window may have shrunk since the last drag, and a box
 		// remembered off-screen is a box that never comes back.
 		r = box.getBoundingClientRect();
+		home = setboxHomeCorner(r.width, r.height);
 		at = clampPanel(
-			setboxUserPos ? setboxUserPos.left : Math.max(POPUP_EDGE, (window.innerWidth - r.width) / 2),
-			setboxUserPos ? setboxUserPos.top : Math.max(POPUP_EDGE, (window.innerHeight - r.height) / 2),
+			setboxLayout.left === null ? home.left : setboxLayout.left,
+			setboxLayout.top === null ? home.top : setboxLayout.top,
 			r.width, r.height, window.innerWidth, window.innerHeight);
 		box.style.left = at.left + 'px';
 		box.style.top = at.top + 'px';
@@ -15741,7 +15836,42 @@ var EngCalcs = EngCalcs || {};
 		if (x) { x.addEventListener('click', closeSettingsBox); }
 		// Dragged by its chrome, exactly like the property popup and Find: `e.target` is the box
 		// itself only in the padded band, so a drag can never start on a control.
-		makePanelDraggable(box, function (pos) { setboxUserPos = pos; });
+		makePanelDraggable(box, function (pos) {
+			setboxLayout.left = pos.left;
+			setboxLayout.top = pos.top;
+			saveSetboxLayout();
+		});
+		// **THE SIZE IS OBSERVED, NOT LISTENED FOR.** `resize: both` is the browser's own widget and
+		// it fires no event of its own -- there is no `onresize` for an element -- so a
+		// ResizeObserver is the only way to learn what the user did. It also catches the other
+		// writer for free: a window that shrinks past the box's max-width re-lays it out, and the
+		// number stored is then the one on screen rather than a wish from a bigger window.
+		// Guarded on display, so closing the box (display:none, 0x0) cannot store a zero size.
+		if (window.ResizeObserver) {
+			new window.ResizeObserver(function () {
+				var r, at;
+				if (!setboxIsOpen()) { return; }
+				r = box.getBoundingClientRect();
+				if (!(r.width > 0) || !(r.height > 0)) { return; }
+				setboxLayout.w = Math.round(r.width);
+				setboxLayout.h = Math.round(r.height);
+				// **A BOX THAT GREW OFF THE SCREEN CANNOT BE SHRUNK AGAIN**, because the grabber it
+				// grew by is the corner that just left the window. The browser's widget only ever
+				// pushes the right and bottom edges out, so growing a box that already sits near the
+				// right edge is a one-way trip -- measured 2026-08-19: left 932 + 554 wide in a 1400
+				// window put the corner 86 px past the edge. Clamping here slides the box back the
+				// way a dragged one is clamped, which is the same promise in the other direction.
+				at = clampPanel(r.left, r.top, r.width, r.height, window.innerWidth, window.innerHeight);
+				if (at.left !== Math.round(r.left) || at.top !== Math.round(r.top)) {
+					box.style.left = at.left + 'px';
+					box.style.top = at.top + 'px';
+					setboxLayout.left = at.left;
+					setboxLayout.top = at.top;
+				}
+				saveSetboxLayout();
+			}).observe(box);
+		}
+		loadSetboxLayout();
 		if (filter) {
 			// The toolbar-button treatment of a tip: straight onto the control, with .ec-help so a
 			// tap reveals it (EngCalcs.initTips). Added here rather than in the markup because the
@@ -15781,11 +15911,24 @@ var EngCalcs = EngCalcs || {};
 	// Extracted so a SECOND standing box can be dragged by the same gesture (Task 420/353's Find
 	// panel). `onMove` is how the caller remembers the position; a box that does not care passes
 	// nothing.
+	// The browser's resize widget is about 16 px; 18 gives it the same pointer slop every other
+	// grip on this page has.
+	var LPN_RESIZE_CORNER = 18;
 	function makePanelDraggable(popup, onMove) {
 		var drag = null;
 		popup.addEventListener('pointerdown', function (e) {
 			if (e.target !== popup) { return; }   // a child is a control; only the chrome drags
 			var r = popup.getBoundingClientRect();
+			// **THE RESIZE GRABBER IS CHROME TOO, AND IT IS NOT A DRAG HANDLE.** On a panel carrying
+			// `resize`, the browser paints its widget in the bottom-right corner of the padding --
+			// where `e.target` is the panel itself, so without this the box would move and resize at
+			// once. Read off the computed style rather than hardcoded per panel: a panel that is not
+			// resizable gives up nothing, and one made resizable later needs no second edit here.
+			if (window.getComputedStyle) {
+				var res = window.getComputedStyle(popup).resize;
+				if (res && res !== 'none' &&
+					e.clientX > r.right - LPN_RESIZE_CORNER && e.clientY > r.bottom - LPN_RESIZE_CORNER) { return; }
+			}
 			drag = { dx: e.clientX - r.left, dy: e.clientY - r.top, w: r.width, h: r.height };
 			popup.setPointerCapture(e.pointerId);
 			e.preventDefault();

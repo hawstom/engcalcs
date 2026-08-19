@@ -182,6 +182,19 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     line ~336). A file's separator is always a dot, and a file's numbers are the user's — so accept
     the comma on TYPED input only, or reject it loudly. Never guess between decimal and thousands.
 
+- 45|446| **Colour band limits are recomputed live; Tom's own wording says they should freeze.** He
+  wrote, for the note above the limits: *"The limits shown below are static for this project.
+  Choosing a method above changes the limits based on the current state of the system… Entering
+  values below changes the method to Manual."* Two of those three are false today: `effectiveBreaks()`
+  falls back to `computedBreaks()` on every render, so unpinned limits move with each solve and each
+  time step, and typing a limit writes `settings.colorBreaks` without touching `settings.colorModes`
+  — there is no Manual method in `js/lpn-ramps.js`'s `MODES`. The note now describes what the code
+  does; this task is the other choice.
+  - **The blocker is which field the frozen numbers live in.** Snapshotting a method's answer into
+    `colorBreaks` would put a number we computed in the field that holds numbers the user typed,
+    which is the one thing CLAUDE.md's unit paradigm forbids. It needs its own field, or a flag
+    beside the set saying whose numbers these are.
+
 - 45|445| **Labels: invert priority to "Drop first in case of conflict", 1 dropping first.** Tom,
   2026-08-19: "our labels priority paradigm really wants to be Labels.Drop First In Case of Conflict
   … it's a version bump because the order of the numbers reverses. But it's the right thing to do."

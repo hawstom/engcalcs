@@ -135,7 +135,7 @@ exports.run = async function ({ browser, report }) {
 				nodeLabels: top('lpn_labels_node_fields'), nodeColors: top('lpn_set_colors_node'),
 				linkLabels: top('lpn_labels_link_fields'), linkColors: top('lpn_set_colors_link'),
 				nodeField: top('lpn_set_color_node'), nodeRamp: top('lpn_set_ramp_node'),
-				nodeMode: top('lpn_set_color_mode_node'),
+				nodeClasses: top('lpn_set_ramp_classes_node'), nodeMode: top('lpn_set_color_mode_node'),
 				nodeLink: top('lpn_set_sub_nodeLink'), mapDisplay: top('lpn_set_sub_mapDisplay'),
 				textSize: (() => {
 					const rows = [...document.querySelectorAll('#lpn_set_map_fields .lpn-set-row')];
@@ -149,8 +149,16 @@ exports.run = async function ({ browser, report }) {
 			'...and "Color pipes by" after the link ones');
 		report.ok(order.nodeField < order.nodeRamp,
 			'...with that group\'s ramp picker at the bottom of it');
-		report.ok(Math.abs(order.nodeMode - order.nodeRamp) < 60,
-			'the range-allocation modes sit right beside the picker, where they can be found',
+		// **THE COUNT COMES BETWEEN THEM** (Tom, 2026-08-19: "Number of ranges" is the number of
+		// colors, "and move it ABOVE Data classification method"). Scheme, then how many, then where
+		// the boundaries go -- three rows of one decision, so what is asserted is the ORDER and that
+		// they stay one block, not a fixed gap between two of them.
+		report.ok(order.nodeRamp < order.nodeClasses && order.nodeClasses < order.nodeMode,
+			'scheme, then how many colours, then the classification method',
+			`ramp ${Math.round(order.nodeRamp)}, count ${Math.round(order.nodeClasses)}, ` +
+			`method ${Math.round(order.nodeMode)}`);
+		report.ok(Math.abs(order.nodeMode - order.nodeRamp) < 100,
+			'...and the three stay one block, where they can be found together',
 			`ramp at ${order.nodeRamp}, mode at ${order.nodeMode}`);
 		// **A THIRD SUB-HEADING FOR THE TWO CONTROLS THAT ARE ABOUT BOTH KINDS AT ONCE.**
 		report.ok(order.nodeLink !== null && order.nodeLink > order.linkColors && order.nodeLink < order.mapDisplay,
@@ -398,7 +406,10 @@ exports.run = async function ({ browser, report }) {
 		report.ok(await a.page.evaluate(() => {
 			const pane = document.getElementById('lpn_setbox_content');
 			const sub = document.getElementById('lpn_set_sub_nodeSym');
-			const head = document.querySelector('#lpn_set_sec_map .lpn-set-head');
+			// The section is DERIVED from the sub-heading, not named: Node symbology moved from Map
+			// and page to Visualization on 2026-08-19, and a spec that names the section goes stale
+			// on a regrouping that changed nothing about the behaviour it is checking.
+			const head = sub.closest('.lpn-set-sec').querySelector('.lpn-set-head');
 			if (!pane || !sub || !head) { return false; }
 			const s = sub.getBoundingClientRect(), h = head.getBoundingClientRect();
 			return s.top - h.bottom >= -1 && s.top - pane.getBoundingClientRect().top < 60;

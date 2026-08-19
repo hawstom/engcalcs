@@ -1098,11 +1098,34 @@ html[lang="zh"] .ec-welcome {
    narrower; I would say less than half as wide"). 60rem -> 29rem and 38rem -> 46rem. A settings box
    is read down a column, not across a page, and at 60rem the eye had to travel the width of the
    window to get from a name to its control -- while the map it configures was behind it. */
+/* **AND IT RESIZES** (Tom, 2026-08-19: "The box is not sizable at all"). `resize: both` needs a
+   non-visible overflow to appear at all, and it costs nothing here: the body is a flex column with
+   `min-height: 0` and both panes scroll inside themselves, so nothing in the box depends on the
+   width or the height it was given.
+
+   **THE FLOOR IS A WIDTH, NOT A HEIGHT.** The index pane is a fixed 7.5rem, so narrowing the box
+   squeezes only the content pane -- and at 29rem the index is already competing for the only width
+   there is (see .lpn-setbox-index below). Narrower still and the sideways scrollbar this box was
+   narrowed to get rid of comes back.
+
+   **25rem, AND THE NUMBER WAS MEASURED RATHER THAN REASONED.** 24rem looked right on the arithmetic
+   -- 384 px less 16 px of padding, 120 px of index and a 10 px gap leaves 238 for a labels list
+   whose own floor is 13rem = 208 -- and dev/browser-pass/specs/visibility.js then measured the
+   content pane overflowing by 3 px at exactly that width. The same three pixels, and the same
+   lesson, as Task 435: the box model is not addable by hand. Height has no such floor -- a short
+   box just scrolls -- so 18rem is only enough to keep the search field and a row of content in
+   view. */
 .lpn-setbox {
 	width: min(29rem, 94vw);
 	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
+	resize: both;
+	overflow: hidden;
+	min-width: min(25rem, 94vw);
+	min-height: min(18rem, 92vh);
+	max-width: 98vw;
+	max-height: 96vh;
 }
 /* The title sits in the 40px drag band, left of the X. It is text, not a control, so it never
    swallows a drag: `e.target` on a pointerdown here is the title, not the box -- hence
@@ -1137,19 +1160,38 @@ html[lang="zh"] .ec-welcome {
 .lpn-setbox-none { margin: 8px 4px; opacity: .8; }
 /* A section heading STICKS to the top of the content pane while its section is being read, so a
    long scroll never leaves the reader wondering which section they are in. */
+/* **IN rem, NOT em** (Tom, 2026-08-19: "The main headings are styled SMALLER than the
+   sub-headings"). They were: this sits inside .lpn-setbox-content at .9em, so 1.05em came out at
+   0.945rem, while every sub-heading below inherits the 1rem that .lpn-set-secbody re-anchors. An
+   em-based size for a heading is a size relative to whatever it happens to be nested in, which is
+   the wrong thing for a heading to be relative to. */
 .lpn-set-head {
 	position: sticky; top: 0; z-index: 1; background: #fff; margin: 0 0 4px;
-	padding: 4px 0; font-size: 1.05em; font-weight: bold; border-bottom: 1px solid #ccc;
+	padding: 4px 0; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid #ccc;
 }
 .lpn-set-sec { margin-bottom: 14px; }
 /* A sub-heading, with NO disclosure triangle: nothing here collapses (Tom, 2026-08-18: "No need
    ever to collapse; just scroll/jump to your section"), and a triangle on something that cannot
-   disclose is a lie about the control. */
-.lpn-set-sub { margin-top: 8px; font-weight: bold; }
+   disclose is a lie about the control.
+
+   **WEIGHT 600 AT .8 OPACITY IS THE INPUT UNITS STRIP'S OWN TREATMENT** (.lpn-units-head), which is
+   the styling Tom named as the one to converge on: "I like the styling of the Input units section."
+   It also puts a whole step between a section heading and a sub-heading, where bold-on-bold left
+   the two levels distinguishable only by size. */
+.lpn-set-sub { margin-top: 8px; font-size: 1rem; font-weight: 600; opacity: .8; }
 .lpn-set-subbody { margin-left: 8px; }
 /* The two scope markers, "Project settings" and "Calculator settings". Quieter than a sub-heading
    because they label a SCOPE rather than name a place you can jump to. */
-.lpn-set-group { margin-top: 10px; font-weight: bold; opacity: .75; text-transform: none; }
+.lpn-set-group { margin-top: 10px; font-weight: 600; opacity: .8; text-transform: none; }
+/* **ONE SMALL-TEXT TREATMENT FOR THE WHOLE BOX**, and it is .lpn-units-name's: .85em at .8 opacity.
+   The notes under a sub-heading, the ramp acknowledgements and the unit names beside a select were
+   three sizes and three opacities written in three places, two of them inline in JS. A class rather
+   than a style attribute so the next note added inherits the decision instead of copying a string. */
+.lpn-set-note, .lpn-rp-credit { font-size: .85em; opacity: .8; }
+.lpn-set-note { margin: 2px 0 4px; }
+/* A heading INSIDE a sub-heading's body -- the colour band limits, which name the field they belong
+   to. Same weight as a sub-heading, not full bold, so it reads as one level further in. */
+.lpn-set-minihead { margin-top: 6px; font-weight: 600; opacity: .8; }
 /* The Settings box is where the Labels lists live now, and the affix/decimals/priority columns in
    them are the widest thing in it. Anchored at 1rem for the reason Task 435 found: the headings
    and the controls must share a font size or the columns walk. */
@@ -1198,7 +1240,7 @@ html[lang="zh"] .ec-welcome {
 /* A name in a settings row may break mid-word rather than push the box sideways -- the same rule
    the labels lists carry below, and for the same reason. CLAUDE.md: mid-word wrap is acceptable. */
 .lpn-set-row > :first-child { overflow-wrap: anywhere; }
-.lpn-rp-credit { font-size: .85em; opacity: .7; margin-top: 6px; }
+.lpn-rp-credit { margin-top: 6px; }
 /* **EVERY INPUT IN THE BOX HAS A CEILING** (Tom: "Give some detailed attention to inputs max
    width ... Inputs can be shorter"). A number the user types here is at most a few characters --
    a size in pixels, an opacity, a tolerance -- and a text box wide enough for a sentence tells the

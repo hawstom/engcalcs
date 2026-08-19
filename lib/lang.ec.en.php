@@ -1384,21 +1384,21 @@ $ec_lang['lpn_pane_right_toggle']='Visibility';
 $ec_lang['lpn_pane_right_toggle_tip']='Show or hide the panel at the right of the map. It holds the label and color choices.';
 $ec_lang['lpn_color_legend_open_tip']='Click to open the Visibility panel and change these colors.';
 $ec_lang['lpn_color_node_field']='Color nodes by';
-$ec_lang['lpn_color_link_field']='Color pipes by';
+$ec_lang['lpn_color_link_field']='Color links by';
 $ec_lang['lpn_color_ramp_sequential']='Sequential';
 $ec_lang['lpn_color_ramp_diverging']='Diverging';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
 // the picker is pictures -- so the only strings here are the family headings, the controls beside
 // them, and the three ways a typed range limit can be refused.
-$ec_lang['lpn_settings_color_classes']='Number of ranges';
+$ec_lang['lpn_settings_color_classes']='Number of colors';
 // "Data classification method", the trade's own term -- ArcGIS Pro's help page is titled
 // "Data classification methods" and QGIS calls the act "Classify"; quantile, natural breaks
 // (Jenks) and equal interval are all named there. "Range allocation" was our own coinage and
 // appears in none of the reference tools. Tom, 2026-08-19: "Don't drop the 'method'. That's the
 // point of this control." -- the dropdown holds METHODS, and the noun alone would name the result.
 $ec_lang['lpn_color_mode']='Data classification method';
-$ec_lang['lpn_color_ranges_note']='The mode above sets these limits from the values now on the map. Type over them and the same number always means the same color.';
-$ec_lang['lpn_color_criterion_note']='The range limits come from a design standard, so the number of ranges is fixed while that mode is chosen.';
+$ec_lang['lpn_color_ranges_note']='Left alone, these limits follow the values now on the map, so they move with every solve and every time step. Type over them and they stay put, so the same number always means the same color. Automatic gives them back to the method above.';
+$ec_lang['lpn_color_criterion_note']='The limits come from a design standard, so the number of colors is fixed while that method is chosen.';
 $ec_lang['lpn_color_break_number']='A range limit must be a number. The map is unchanged.';
 $ec_lang['lpn_color_break_order']='Each range limit must be larger than the one before it. The map is unchanged.';
 $ec_lang['lpn_color_break_count']='There must be one limit fewer than the number of ranges. The map is unchanged.';
@@ -1940,6 +1940,7 @@ $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
 $ec_lang['lpn_labels_decimals_tip']='Decimal places shown for this label';
 $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
+$ec_lang['lpn_labels_mark_extrema_tip']='Draws a line over the highest value of each kind on the map and a line under the lowest one, so the two ends stand out without being read. An overline marks the highest; an underline marks the lowest.';
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the elements
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
@@ -2044,7 +2045,7 @@ $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // misleading"). These are what a NEW element is created with; "starting" reads as the initial
 // condition of a run, which on a page that now has a duration and a clock is a different thing
 // entirely -- and a tank really does have one.
-$ec_lang['lpn_settings_defaults']='Creation values';
+$ec_lang['lpn_settings_defaults']='Values';
 $ec_lang['lpn_settings_defaults_note']='Used for elements you create from now on. Existing elements are not changed.';
 $ec_lang['lpn_settings_push_note']='Only the properties whose labels are showing right now are applied.';
 $ec_lang['lpn_settings_push_btn']='Apply starting values to all elements';
@@ -2156,11 +2157,13 @@ $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Symbol size (pixels)';
-$ec_lang['lpn_settings_link_width']='Pipe line thickness (pixels)';
-$ec_lang['lpn_settings_align_labels']='Align pipe labels with pipes';
-$ec_lang['lpn_settings_readability_bias']='Flip a label upside down when it leans more than this many degrees left of vertical';
+$ec_lang['lpn_settings_link_width']='Link line thickness (pixels)';
+$ec_lang['lpn_settings_align_labels']='Align link labels with links';
+$ec_lang['lpn_settings_readability_bias']='Label flip angle adjustment';
+$ec_lang['lpn_settings_readability_bias_tip']='Flip a label upside down when it leans more than this many degrees left of vertical';
 $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
-$ec_lang['lpn_settings_label_max_width']='Show labels when the view is narrower than this (map units)';
+$ec_lang['lpn_settings_label_max_width']='Label view width (map units)';
+$ec_lang['lpn_settings_label_max_width_tip']='Labels are shown only while the view is narrower than this. Leave it blank to always show them.';
 $ec_lang['lpn_settings_label_use_view']='Use current view';
 $ec_lang['lpn_settings_label_always']='Always show labels';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
@@ -2202,7 +2205,7 @@ $ec_lang['lpn_color_ramp_viridis']='Purple to yellow (easier to tell one color f
 $ec_lang['lpn_color_ramp_gray']='Light to dark gray';
 $ec_lang['lpn_settings_color_reverse']='Reverse the color order';
 $ec_lang['lpn_color_none']='No color';
-$ec_lang['lpn_settings_color_thematic']='Thematic map: colors only, no labels';
+$ec_lang['lpn_settings_color_thematic']='Thematic map';
 $ec_lang['lpn_settings_color_thematic_tip']='Hides every label so that only the colors are left on the map. Your label choices are kept, and turning this off brings them back.';
 $ec_lang['lpn_settings_color_key_position']='Color legend position';
 $ec_lang['lpn_settings_color_breaks']='Color band limits';
@@ -2236,7 +2239,7 @@ $ec_lang['lpn_time_pattern_start']='Pattern start time';
 $ec_lang['lpn_time_report_step']='Report time step';
 $ec_lang['lpn_time_report_start']='Report start time';
 $ec_lang['lpn_time_clock_start']='Clock time at the start';
-$ec_lang['lpn_time_format_tip']='Write a time as hours and minutes, like 2:30. A plain number means hours, so 8 is eight hours. Half an hour is 0:30.';
+$ec_lang['lpn_time_format_tip']='Write the duration as a number of hours or hours and minutes, like 72 or 72:00.';
 $ec_lang['lpn_time_running']='Working out the whole time period with the EPANET solver.';
 $ec_lang['lpn_time_no_engine']='The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs the whole period.';
 $ec_lang['lpn_time_slider']='Time';
@@ -2274,6 +2277,7 @@ $ec_lang['lpn_time_settings_open']='Time settings';
 // colour a value is drawn in and the label printed beside it.
 // "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
 // leaves room for its siblings (Quality, Reactions) as they arrive.
+$ec_lang['lpn_settings_sec_visualization']='Visualization';
 $ec_lang['lpn_settings_sec_map']='Map and page';
 $ec_lang['lpn_settings_sec_elements']='New elements';
 $ec_lang['lpn_settings_sec_calculation']='Calculation';
