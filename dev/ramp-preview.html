@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Colour ramps and range modes — preview</title>
+<!--
+  dev/ramp-preview.html — a bench for judging js/lpn-ramps.js by eye.
+
+  WHY IT EXISTS. There is no rasteriser in this repo, so nothing an agent writes about "fun and
+  pretty" is checkable from a terminal. This page is the honest way to show the work: open it in a
+  browser (double-click it; no server needed) and every ramp is drawn at every class count, and
+  every allocation mode is drawn against distributions a real network produces.
+
+  IT IS NOT SERVED. dev/ is blocked from web access. This is a bench, not a page of the app, and it
+  must never be linked from one.
+
+  IT LOADS THE REAL MODULE (../js/lpn-ramps.js) rather than a copy of the data. A copy would be
+  prettier to call "self-contained" and would go stale the first time a ramp changed; what you see
+  here is exactly what ships.
+-->
+<style>
+:root {
+	--bg: #ffffff; --fg: #1a1a1a; --muted: #666; --line: #d8d8d8; --panel: #f6f6f6;
+	--accent: #1a5fb4;
+}
+* { box-sizing: border-box; }
+body { margin: 0; padding: 0 0 4rem; background: var(--bg); color: var(--fg);
+	font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+header { padding: 1.5rem 1.5rem 1rem; border-bottom: 1px solid var(--line); }
+h1 { margin: 0 0 .25rem; font-size: 1.4rem; }
+h2 { margin: 2rem 0 .5rem; font-size: 1.1rem; border-bottom: 1px solid var(--line); padding-bottom: .3rem; }
+h3 { margin: 1.25rem 0 .4rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em;
+	color: var(--muted); font-weight: 600; }
+main { padding: 0 1.5rem; max-width: 1180px; }
+.sub { color: var(--muted); margin: 0; }
+.controls { display: flex; flex-wrap: wrap; gap: 1.25rem; align-items: flex-end;
+	background: var(--panel); border: 1px solid var(--line); border-radius: 6px;
+	padding: .75rem 1rem; margin: 1rem 0; position: sticky; top: 0; z-index: 5; }
+.controls label { display: block; font-size: .75rem; text-transform: uppercase;
+	letter-spacing: .06em; color: var(--muted); margin-bottom: .2rem; }
+select, input[type=number] { font: inherit; padding: .25rem .4rem; }
+.chk { display: flex; align-items: center; gap: .4rem; font-size: .85rem; }
+.chk label { margin: 0; text-transform: none; letter-spacing: 0; font-size: .85rem; color: var(--fg); }
+
+/* --- the picker, as Tom described it: a scrolling column of swatch bars, no names --- */
+.pickerdemo { display: flex; gap: 2rem; flex-wrap: wrap; align-items: flex-start; }
+.closed { border: 1px solid #888; border-radius: 4px; background: #fff; padding: 4px 26px 4px 4px;
+	position: relative; width: 260px; }
+.closed::after { content: "▾"; position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+	color: #555; }
+.openlist { border: 1px solid #888; border-radius: 4px; background: #fff; width: 260px;
+	max-height: 420px; overflow-y: auto; box-shadow: 0 6px 18px rgba(0,0,0,.18); }
+.openlist .fam { position: sticky; top: 0; background: #eceff3; color: #333; font-size: .7rem;
+	text-transform: uppercase; letter-spacing: .09em; padding: .35rem .5rem; border-bottom: 1px solid var(--line); }
+.openlist .row { padding: 3px 4px; cursor: pointer; }
+.openlist .row:hover { background: #dbe7f6; }
+.openlist .row.sel { background: #cfe0f7; }
+
+/* --- the catalogue --- */
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: .5rem 1rem; }
+.cell { display: flex; align-items: center; gap: .5rem; }
+.cell .nm { font-size: .72rem; color: var(--muted); width: 66px; flex: none;
+	font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.cell .bar { flex: 1; }
+.badge { font-size: .6rem; color: #fff; background: #999; border-radius: 3px; padding: 0 4px;
+	vertical-align: 1px; }
+.badge.interp { background: #b06000; }
+
+/* --- the counts matrix --- */
+table.counts { border-collapse: collapse; width: 100%; }
+table.counts th { font-size: .7rem; color: var(--muted); text-align: left; font-weight: 600;
+	padding: .2rem .4rem; }
+table.counts td { padding: 2px 4px; vertical-align: middle; }
+table.counts td.nm { font-family: ui-monospace, Menlo, monospace; font-size: .72rem; white-space: nowrap; }
+table.counts tr:nth-child(even) { background: #fafafa; }
+
+/* --- the modes --- */
+.modewrap { border: 1px solid var(--line); border-radius: 6px; padding: .75rem 1rem; margin-bottom: 1rem; }
+.modewrap .hd { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; }
+.modewrap .hd b { font-size: .95rem; }
+.modewrap .fail { color: #8a4b00; font-size: .8rem; max-width: 62ch; }
+.brk { font-family: ui-monospace, Menlo, monospace; font-size: .78rem; color: #333; margin-top: .35rem; }
+.counts-line { font-size: .75rem; color: var(--muted); margin-top: .25rem; }
+footer { margin: 3rem 1.5rem 0; padding-top: 1rem; border-top: 1px solid var(--line);
+	color: var(--muted); font-size: .78rem; max-width: 900px; }
+footer p { margin: .35rem 0; }
+code { font-family: ui-monospace, Menlo, monospace; font-size: .85em; background: #f0f0f0;
+	padding: 0 3px; border-radius: 3px; }
+.warn { background: #fff4e0; border: 1px solid #e0b070; border-radius: 6px; padding: .75rem 1rem;
+	margin: 1rem 0; }
+</style>
+</head>
+<body>
+
+<header>
+	<h1>Colour ramps and range allocation modes</h1>
+	<p class="sub">A bench for <code>js/lpn-ramps.js</code>. Not served — <code>dev/</code> is blocked from the web.</p>
+</header>
+
+<main>
+	<div class="controls">
+		<div>
+			<label for="cnt">Ranges (classes)</label>
+			<select id="cnt"></select>
+		</div>
+		<div>
+			<label for="ramp">Ramp</label>
+			<select id="ramp"></select>
+		</div>
+		<div>
+			<label for="dist">Sample distribution</label>
+			<select id="dist"></select>
+		</div>
+		<div class="chk">
+			<input type="checkbox" id="rev"><label for="rev">Reverse the ramp</label>
+		</div>
+	</div>
+
+	<h2>1. The picker, as described</h2>
+	<p class="sub">Closed state is one swatch bar. Open state is a scrolling column of swatch bars under a
+		family heading — colour only, no names. Click a row to select it.</p>
+	<div class="pickerdemo">
+		<div>
+			<h3>Closed</h3>
+			<div class="closed" id="closed"></div>
+		</div>
+		<div>
+			<h3>Open</h3>
+			<div class="openlist" id="openlist"></div>
+		</div>
+		<div style="flex:1; min-width:260px">
+			<h3>Selected, large</h3>
+			<div id="bigbar"></div>
+			<div class="brk" id="bigmeta"></div>
+		</div>
+	</div>
+
+	<h2>2. Every ramp, at the chosen class count</h2>
+	<div id="catalogue"></div>
+
+	<h2>3. The five range allocation modes</h2>
+	<p class="sub">Breaks computed from the chosen sample distribution at the chosen class count. The
+		strip under each is the distribution itself, one tick per value, coloured by its class — so an
+		empty class or a class holding everything is visible rather than described.</p>
+	<div id="modes"></div>
+
+	<h2>4. Every ramp at every class count</h2>
+	<table class="counts" id="matrix"></table>
+</main>
+
+<footer id="credits"></footer>
+
+<script src="../js/lpn-ramps.js"></script>
+<script>
+(function () {
+	'use strict';
+	var R = (window.EngCalcs && window.EngCalcs.lpnRamps) || null;
+	if (!R) {
+		document.body.innerHTML = '<div class="warn" style="margin:2rem">Could not load ' +
+			'<code>../js/lpn-ramps.js</code>. Open this file from inside the repo so the relative path resolves.</div>';
+		return;
+	}
+
+	// ---- sample distributions --------------------------------------------------------------
+	// Shapes a real network produces, not tidy test data. The whole point of looking at five modes
+	// is what they do to a distribution that is NOT uniform.
+	function seeded(n, f) { var a = [], i; for (i = 0; i < n; i++) { a.push(f(i, n)); } return a; }
+	var DISTS = {
+		'Pressure, roughly symmetric (psi)': seeded(180, function (i, n) {
+			var t = (i + 0.5) / n, z = Math.sqrt(-2 * Math.log(t)) * Math.cos(6.2831853 * ((i * 0.6180339887) % 1));
+			return 62 + 11 * (isFinite(z) ? z : 0);
+		}),
+		'Velocity, right-skewed (ft/s)': seeded(220, function (i, n) {
+			var t = (i + 0.5) / n; return Math.pow(t, 3.2) * 9.5 + 0.05;
+		}),
+		'Flow, 90 dead ends at zero (gpm)': new Array(90).fill(0).concat(
+			seeded(40, function (i) { return 5 + i * i * 0.9; })),
+		'Two clusters with a gap': seeded(60, function (i) { return i < 30 ? 1 + i * 0.1 : 100 + (i - 30) * 0.1; }),
+		'Uniform 0 to 100': seeded(101, function (i) { return i; }),
+		'One outlier owning the range': seeded(120, function (i) { return i === 119 ? 400 : (i % 30) * 0.1; }),
+		'Every value equal (nothing solved)': new Array(40).fill(3.5),
+		'Nothing at all (before the first solve)': []
+	};
+
+	// The failure mode of each mode, in one sentence, beside the picture of it happening.
+	var FAILS = {
+		equal: 'Describes the RANGE, not the distribution. One outlier owns the whole scale and everything else lands in class 0.',
+		quantile: 'Ties collapse it. On a network with many dead ends the low breaks stack on 0 and those classes are near-empty. The legend also moves whenever an element is added, so two timesteps are not comparable.',
+		jenks: 'The only mode that is not free — O(k·n²), so above ' + R.JENKS_MAX + ' values it runs on a deterministic sample. And its breaks belong to THIS data, so two scenarios get incommensurable legends.',
+		stddev: 'Only meaningful on a roughly symmetric distribution. Network quantities are usually right-skewed, so the low classes come out empty and the legend makes a claim about shape the data does not support.',
+		pretty: 'Rounding moves the boundaries off the data — a round 20 can sit inside a dense cluster. On a very narrow range no round step exists and it falls back to rounded equal interval.'
+	};
+
+	// ---- drawing ---------------------------------------------------------------------------
+	var SVGNS = 'http://www.w3.org/2000/svg';
+
+	// EVERY swatch on this page goes through R.swatchBoxes(). Nothing here computes a width, which
+	// is the point: the UI cannot get the widths wrong if it never calculates one.
+	function barSvg(rampKey, n, width, height, opts) {
+		var g = R.swatchBar(rampKey, n, width, Object.assign({ height: height }, opts || {}));
+		var svg = document.createElementNS(SVGNS, 'svg');
+		svg.setAttribute('width', width);
+		svg.setAttribute('height', height);
+		svg.setAttribute('viewBox', '0 0 ' + width + ' ' + height);
+		svg.style.display = 'block';
+		g.boxes.forEach(function (b) {
+			var r = document.createElementNS(SVGNS, 'rect');
+			r.setAttribute('x', b.x); r.setAttribute('y', 0);
+			r.setAttribute('width', b.width); r.setAttribute('height', b.height);
+			r.setAttribute('fill', b.color);
+			svg.appendChild(r);
+		});
+		var frame = document.createElementNS(SVGNS, 'rect');
+		frame.setAttribute('x', 0.5); frame.setAttribute('y', 0.5);
+		frame.setAttribute('width', Math.max(0, width - 1)); frame.setAttribute('height', Math.max(0, height - 1));
+		frame.setAttribute('fill', 'none'); frame.setAttribute('stroke', 'rgba(0,0,0,.35)');
+		svg.appendChild(frame);
+		svg.setAttribute('role', 'img');
+		svg.setAttribute('aria-label', g.name + ', ' + n + ' classes');
+		return svg;
+	}
+
+	// One tick per value, positioned by rank, coloured by its class. Shows an empty class as a gap
+	// and a stuffed class as a slab — the two things a legend alone will not tell you.
+	function distSvg(values, breaks, rampKey, opts) {
+		var W = 560, H = 34, svg = document.createElementNS(SVGNS, 'svg');
+		svg.setAttribute('width', W); svg.setAttribute('height', H);
+		svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+		svg.style.display = 'block';
+		var cols = R.rampColors(rampKey, breaks.length + 1, opts);
+		var lo = Infinity, hi = -Infinity;
+		values.forEach(function (v) { if (v < lo) { lo = v; } if (v > hi) { hi = v; } });
+		breaks.forEach(function (v) { if (v < lo) { lo = v; } if (v > hi) { hi = v; } });
+		if (!isFinite(lo)) { lo = 0; hi = 1; }
+		if (hi === lo) { hi = lo + 1; }
+		function X(v) { return (v - lo) / (hi - lo) * (W - 2) + 1; }
+		values.forEach(function (v) {
+			var ci = R.classIndex(v, breaks);
+			var r = document.createElementNS(SVGNS, 'rect');
+			r.setAttribute('x', X(v) - 0.75); r.setAttribute('y', 4);
+			r.setAttribute('width', 1.5); r.setAttribute('height', H - 14);
+			r.setAttribute('fill', ci === null ? '#000' : cols[ci]);
+			r.setAttribute('opacity', '0.75');
+			svg.appendChild(r);
+		});
+		breaks.forEach(function (b) {
+			var l = document.createElementNS(SVGNS, 'line');
+			l.setAttribute('x1', X(b)); l.setAttribute('x2', X(b));
+			l.setAttribute('y1', 0); l.setAttribute('y2', H - 8);
+			l.setAttribute('stroke', '#111'); l.setAttribute('stroke-width', '1');
+			svg.appendChild(l);
+		});
+		var base = document.createElementNS(SVGNS, 'line');
+		base.setAttribute('x1', 0); base.setAttribute('x2', W);
+		base.setAttribute('y1', H - 8.5); base.setAttribute('y2', H - 8.5);
+		base.setAttribute('stroke', '#bbb');
+		svg.appendChild(base);
+		return svg;
+	}
+
+	function fmt(v) {
+		if (!isFinite(v)) { return String(v); }
+		var a = Math.abs(v);
+		if (a !== 0 && (a < 1e-3 || a >= 1e6)) { return v.toExponential(3); }
+		return String(Math.round(v * 1e4) / 1e4);
+	}
+
+	// ---- controls --------------------------------------------------------------------------
+	var elCnt = document.getElementById('cnt'),
+		elRamp = document.getElementById('ramp'),
+		elDist = document.getElementById('dist'),
+		elRev = document.getElementById('rev');
+
+	for (var n = R.MIN_CLASSES; n <= R.MAX_CLASSES; n++) {
+		elCnt.appendChild(new Option(n, n, n === 7, n === 7));
+	}
+	R.FAMILIES.forEach(function (fam) {
+		var g = document.createElement('optgroup');
+		g.label = fam;
+		R.rampKeys(fam).forEach(function (k) {
+			g.appendChild(new Option(R.RAMPS[k].name, k, k === 'ylgnbu', k === 'ylgnbu'));
+		});
+		elRamp.appendChild(g);
+	});
+	Object.keys(DISTS).forEach(function (d, i) { elDist.appendChild(new Option(d, d, i === 1, i === 1)); });
+
+	function state() {
+		return {
+			n: parseInt(elCnt.value, 10),
+			ramp: elRamp.value,
+			values: DISTS[elDist.value],
+			opts: { reverse: elRev.checked }
+		};
+	}
+
+	// ---- sections --------------------------------------------------------------------------
+	function renderPicker(s) {
+		var closed = document.getElementById('closed');
+		closed.innerHTML = '';
+		closed.appendChild(barSvg(s.ramp, s.n, 222, 18, s.opts));
+
+		var list = document.getElementById('openlist');
+		list.innerHTML = '';
+		R.FAMILIES.forEach(function (fam) {
+			var h = document.createElement('div');
+			h.className = 'fam'; h.textContent = fam;
+			list.appendChild(h);
+			R.rampKeys(fam).forEach(function (k) {
+				var row = document.createElement('div');
+				row.className = 'row' + (k === s.ramp ? ' sel' : '');
+				row.title = R.RAMPS[k].name;
+				row.appendChild(barSvg(k, s.n, 244, 16, s.opts));
+				row.addEventListener('click', function () { elRamp.value = k; render(); });
+				list.appendChild(row);
+			});
+		});
+
+		var big = document.getElementById('bigbar');
+		big.innerHTML = '';
+		big.appendChild(barSvg(s.ramp, s.n, 420, 44, s.opts));
+		var r = R.RAMPS[s.ramp];
+		document.getElementById('bigmeta').textContent =
+			r.name + ' · ' + r.family + ' · ' + s.n + ' classes · source ' + r.source +
+			(r.interpolated ? ' · interpolated' : ' · published per class count');
+	}
+
+	function renderCatalogue(s) {
+		var host = document.getElementById('catalogue');
+		host.innerHTML = '';
+		R.FAMILIES.forEach(function (fam) {
+			var keys = R.rampKeys(fam);
+			var h = document.createElement('h3');
+			h.textContent = fam + ' — ' + keys.length;
+			host.appendChild(h);
+			var grid = document.createElement('div');
+			grid.className = 'grid';
+			keys.forEach(function (k) {
+				var cell = document.createElement('div');
+				cell.className = 'cell';
+				var nm = document.createElement('span');
+				nm.className = 'nm'; nm.textContent = R.RAMPS[k].name;
+				var bar = document.createElement('span');
+				bar.className = 'bar';
+				bar.appendChild(barSvg(k, s.n, 170, 16, s.opts));
+				cell.appendChild(nm); cell.appendChild(bar);
+				grid.appendChild(cell);
+			});
+			host.appendChild(grid);
+		});
+	}
+
+	function renderModes(s) {
+		var host = document.getElementById('modes');
+		host.innerHTML = '';
+		R.MODES.forEach(function (m) {
+			var t0 = performance.now();
+			var breaks = R.breaksFor(m.key, s.values, s.n);
+			var ms = performance.now() - t0;
+			var box = document.createElement('div');
+			box.className = 'modewrap';
+
+			var hd = document.createElement('div');
+			hd.className = 'hd';
+			var b = document.createElement('b');
+			b.textContent = m.name;
+			var f = document.createElement('span');
+			f.className = 'fail';
+			f.textContent = 'Fails when: ' + FAILS[m.key];
+			hd.appendChild(b); hd.appendChild(f);
+			box.appendChild(hd);
+
+			box.appendChild(distSvg(s.values, breaks, s.ramp, s.opts));
+
+			var br = document.createElement('div');
+			br.className = 'brk';
+			br.textContent = 'breaks: ' + breaks.map(fmt).join('  |  ') + '   (' + ms.toFixed(1) + ' ms)';
+			box.appendChild(br);
+
+			var counts = [], i;
+			for (i = 0; i <= breaks.length; i++) { counts.push(0); }
+			var none = 0;
+			s.values.forEach(function (v) {
+				var ci = R.classIndex(v, breaks);
+				if (ci === null) { none++; } else { counts[ci]++; }
+			});
+			var cl = document.createElement('div');
+			cl.className = 'counts-line';
+			cl.textContent = 'values per class: ' + counts.join(' · ') +
+				(none ? '   (' + none + ' with no value — deliberately uncoloured)' : '') +
+				'   ·  validateBreaks: ' + (R.validateBreaks(breaks, s.n).ok ? 'ok' : 'REJECTED');
+			box.appendChild(cl);
+
+			host.appendChild(box);
+		});
+	}
+
+	function renderMatrix(s) {
+		var t = document.getElementById('matrix');
+		t.innerHTML = '';
+		var head = t.insertRow();
+		head.appendChild(document.createElement('th')).textContent = '';
+		var i;
+		for (i = R.MIN_CLASSES; i <= R.MAX_CLASSES; i++) {
+			head.appendChild(document.createElement('th')).textContent = i + ' classes';
+		}
+		R.FAMILIES.forEach(function (fam) {
+			var fr = t.insertRow();
+			var fc = fr.insertCell();
+			fc.colSpan = R.MAX_CLASSES - R.MIN_CLASSES + 2;
+			fc.innerHTML = '<h3 style="margin:.8rem 0 .2rem">' + fam + '</h3>';
+			R.rampKeys(fam).forEach(function (k) {
+				var row = t.insertRow();
+				var c0 = row.insertCell();
+				c0.className = 'nm';
+				c0.textContent = R.RAMPS[k].name;
+				if (R.RAMPS[k].interpolated) {
+					var bd = document.createElement('span');
+					bd.className = 'badge interp'; bd.textContent = 'interp';
+					c0.appendChild(document.createTextNode(' '));
+					c0.appendChild(bd);
+				}
+				for (var j = R.MIN_CLASSES; j <= R.MAX_CLASSES; j++) {
+					row.insertCell().appendChild(barSvg(k, j, 130, 14, s.opts));
+				}
+			});
+		});
+	}
+
+	function renderCredits() {
+		var host = document.getElementById('credits');
+		host.innerHTML = '';
+		var h = document.createElement('p');
+		h.innerHTML = '<strong>Credits — these lines are a licence obligation, not decoration, ' +
+			'and the UI must render them wherever the ramps are chosen.</strong>';
+		host.appendChild(h);
+		R.CREDITS.forEach(function (c) {
+			var p = document.createElement('p');
+			p.textContent = c.text + ' (' + c.licence + ', ' + c.url + ')';
+			host.appendChild(p);
+		});
+		var note = document.createElement('p');
+		note.textContent = 'The ColorBrewer licence also forbids naming a product or control after ' +
+			'it, so no control here carries that name — the picker is a Ramp picker and the headings ' +
+			'are sequential, diverging and qualitative.';
+		host.appendChild(note);
+	}
+
+	function render() {
+		var s = state();
+		renderPicker(s);
+		renderCatalogue(s);
+		renderModes(s);
+		renderMatrix(s);
+	}
+
+	[elCnt, elRamp, elDist, elRev].forEach(function (el) { el.addEventListener('change', render); });
+	renderCredits();
+	render();
+}());
+</script>
+</body>
+</html>
