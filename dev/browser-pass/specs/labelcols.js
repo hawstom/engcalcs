@@ -76,8 +76,8 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(500);
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_settings_box').style.display === 'flex' &&
-			!!document.querySelector('#lpn_set_sec_map #lpn_labels_node_fields')),
-			'the node labels open in the Settings box, under Map and page');
+			!!document.querySelector('#lpn_set_sec_visual #lpn_labels_node_fields')),
+			'the node labels open in the Settings box, under Visualization');
 
 		for (const list of LISTS) {
 			const got = await columns(a, list.id);

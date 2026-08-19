@@ -557,12 +557,12 @@ echoHeader("EngCalcs", $html_title, "", false);
 			<?php // Built by buildSettingsIndex(), from the content pane's own headings. ?>
 			<nav id="lpn_setbox_index" class="lpn-setbox-index" aria-label="<?=htmlspecialchars($ec_lang['lpn_menu_settings'])?>"></nav>
 			<div id="lpn_setbox_content" class="lpn-setbox-content">
-				<?php // ---- FOUR CATEGORIES, AND THE FOURTH IS NOT BUILT YET ----------------------------
+				<?php // ---- THE CATEGORIES ----------------------------------------------------------
 				      //
 				      // Tom, 2026-08-18, after using the box: the sections it opened with were the four
 				      // panels it had absorbed -- Labels, Settings, Time, Coloring -- which is a record of
-				      // where the controls came from, not a place a stranger can find one. These three
-				      // sections and their sub-headings are his own grouping, and Quality is his fourth,
+				      // where the controls came from, not a place a stranger can find one. Visualization,
+				      // Map and page, New elements and Calculation are his own grouping, and Quality is
 				      // still to come: it is a sibling of Hydraulics under Calculation and needs nothing
 				      // here changed to arrive.
 				      //
@@ -579,8 +579,19 @@ echoHeader("EngCalcs", $html_title, "", false);
 				      // A host carrying `lpn-set-part` is TRANSPARENT TO THE SEARCH: the filter recurses
 				      // into it and hides row by row, so two builders can share one sub-heading without a
 				      // search for "opacity" turning up everything either of them wrote. ?>
-				<section id="lpn_set_sec_map" class="lpn-set-sec" data-set-sec="map">
-					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_map']?></h3>
+				<?php // ---- Section: VISUALIZATION ----
+				      // Tom, 2026-08-19: "Group the three Node and Link headings under a new Visualization
+				      // main heading -- the first main heading ... to be honest, I really like Visualization.
+				      // Leave the sub-heading Node and link as is." He named and rejected his own
+				      // alternatives (Analysis View, Labels and colors, Seeing numbers), and Visualization is
+				      // also the word GIS uses for exactly this -- what is drawn and what is printed beside
+				      // it -- so no better term was found to offer against it.
+				      //
+				      // FIRST, which is a claim about what this page is for: you draw a network and you look
+				      // at it, and the index now opens on the controls that decide what you see. Map and page
+				      // keeps what is true of the whole SHEET rather than of one kind of element. ?>
+				<section id="lpn_set_sec_visual" class="lpn-set-sec" data-set-sec="visual">
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_visualization']?></h3>
 					<div class="lpn-set-secbody">
 						<?php // Node symbology, then link symbology: how each kind of element is DRAWN and
 						      // what is PRINTED beside it, which is one question and was two panels. Tom:
@@ -610,7 +621,19 @@ echoHeader("EngCalcs", $html_title, "", false);
 						<div class="lpn-set-sub" id="lpn_set_sub_nodeLink"><?=$ec_lang['lpn_settings_node_link']?></div>
 						<div class="lpn-set-subbody">
 							<div id="lpn_labels_options" class="lpn-set-part"></div>
+							<?php // Thematic map (Tom, 2026-08-19: "Move Thematic map to the Node and link
+							      // section"), filled by buildColoringSection(). ITS OWN HOST rather than
+							      // a third row inside #lpn_labels_options: that node is cleared wholesale
+							      // by rebuildLabelsFields(), and buildColoringSection() is also called on
+							      // its own (syncColorControls), so two builders sharing one node would
+							      // each wipe the other depending on which ran last. ?>
+							<div id="lpn_set_colors_nodelink" class="lpn-set-part"></div>
 						</div>
+					</div>
+				</section>
+				<section id="lpn_set_sec_map" class="lpn-set-sec" data-set-sec="map">
+					<h3 class="lpn-set-head"><?=$ec_lang['lpn_settings_sec_map']?></h3>
+					<div class="lpn-set-secbody">
 						<?php // Map appearance holds what is true of the WHOLE SHEET: the sizes, the two
 						      // legend positions, the thematic mode. Its heading sits immediately before
 						      // Text size, which is Tom's own placement.
@@ -944,6 +967,7 @@ EngCalcs.pageConfig = {
 	lpn_labels_heading_link: <?=json_encode($ec_lang['lpn_labels_heading_link'])?>,
 	lpn_labels_decimals_tip: <?=json_encode($ec_lang['lpn_labels_decimals_tip'])?>,
 	lpn_labels_mark_extrema: <?=json_encode($ec_lang['lpn_labels_mark_extrema'])?>,
+	lpn_labels_mark_extrema_tip: <?=json_encode($ec_lang['lpn_labels_mark_extrema_tip'])?>,
 	lpn_settings_apply_to_all: <?=json_encode($ec_lang['lpn_settings_apply_to_all'])?>,
 	lpn_settings_apply_to_all_tip: <?=json_encode($ec_lang['lpn_settings_apply_to_all_tip'])?>,
 	lpn_confirm_apply_prefix: <?=json_encode($ec_lang['lpn_confirm_apply_prefix'])?>,
@@ -1322,8 +1346,10 @@ EngCalcs.pageConfig = {
 	lpn_settings_link_width: <?=json_encode($ec_lang['lpn_settings_link_width'])?>,
 	lpn_settings_align_labels: <?=json_encode($ec_lang['lpn_settings_align_labels'])?>,
 	lpn_settings_readability_bias: <?=json_encode($ec_lang['lpn_settings_readability_bias'])?>,
+	lpn_settings_readability_bias_tip: <?=json_encode($ec_lang['lpn_settings_readability_bias_tip'])?>,
 	lpn_settings_mask_labels: <?=json_encode($ec_lang['lpn_settings_mask_labels'])?>,
 	lpn_settings_label_max_width: <?=json_encode($ec_lang['lpn_settings_label_max_width'])?>,
+	lpn_settings_label_max_width_tip: <?=json_encode($ec_lang['lpn_settings_label_max_width_tip'])?>,
 	lpn_settings_label_use_view: <?=json_encode($ec_lang['lpn_settings_label_use_view'])?>,
 	lpn_settings_label_always: <?=json_encode($ec_lang['lpn_settings_label_always'])?>,
 	lpn_settings_symbol_opacity: <?=json_encode($ec_lang['lpn_settings_symbol_opacity'])?>,

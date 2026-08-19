@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ro",
-        "expected_key_count": 1194,
-        "delta_key_count": 14,
+        "expected_key_count": 1198,
+        "delta_key_count": 18,
         "exempt_key_count": 27,
         "exempt_keys": [
             "u_imgd",
@@ -418,9 +418,13 @@
     "keys_to_translate": {
         "lpn_geomap": "lat\/lon",
         "lpn_xymap": "XY",
+        "lpn_labels_mark_extrema_tip": "Draws a line over the highest value of each kind on the map and a line under the lowest one, so the two ends stand out without being read. An overline marks the highest; an underline marks the lowest.",
+        "lpn_settings_readability_bias_tip": "Flip a label upside down when it leans more than this many degrees left of vertical",
+        "lpn_settings_label_max_width_tip": "Labels are shown only while the view is narrower than this. Leave it blank to always show them.",
         "lpn_time_run": "Run",
         "lpn_time_run_tip": "Work out this network at every reporting time, from the start of the run to the end of it.",
         "lpn_time_run_note": "You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.",
+        "lpn_settings_sec_visualization": "Visualization",
         "lpn_labels_col_drop": "Drop",
         "lpn_settings_node_link": "Node and link",
         "lpn_color_mode_equal": "Equal interval",
@@ -434,9 +438,13 @@
     "keys": {
         "lpn_geomap": "lat\/lon",
         "lpn_xymap": "XY",
+        "lpn_labels_mark_extrema_tip": "Draws a line over the highest value of each kind on the map and a line under the lowest one, so the two ends stand out without being read. An overline marks the highest; an underline marks the lowest.",
+        "lpn_settings_readability_bias_tip": "Flip a label upside down when it leans more than this many degrees left of vertical",
+        "lpn_settings_label_max_width_tip": "Labels are shown only while the view is narrower than this. Leave it blank to always show them.",
         "lpn_time_run": "Run",
         "lpn_time_run_tip": "Work out this network at every reporting time, from the start of the run to the end of it.",
         "lpn_time_run_note": "You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.",
+        "lpn_settings_sec_visualization": "Visualization",
         "lpn_labels_col_drop": "Drop",
         "lpn_settings_node_link": "Node and link",
         "lpn_color_mode_equal": "Equal interval",
@@ -477,6 +485,54 @@
                     "key": "lpn_georef_menu",
                     "value": "Conversie în lat\/lon…",
                     "english": "Convert to lat\/lon…"
+                }
+            }
+        },
+        "lpn_labels_mark_extrema_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_mark_extrema",
+                    "value": "Marchează valorile cele mai mari și cele mai mici",
+                    "english": "Mark highest and lowest values"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_apply_to_all",
+                    "value": "Aplică la toate",
+                    "english": "Apply to all"
+                }
+            }
+        },
+        "lpn_settings_readability_bias_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_readability_bias",
+                    "value": "Întoarce o etichetă cu susul în jos când se înclină la stânga verticalei cu mai mult de acest număr de grade",
+                    "english": "Label flip angle adjustment"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_mask_labels",
+                    "value": "Fundal opac în spatele etichetelor",
+                    "english": "Solid background behind labels"
+                }
+            }
+        },
+        "lpn_settings_label_max_width_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_label_max_width",
+                    "value": "Afișează etichetele când vizualizarea este mai îngustă decât aceasta (unități hartă)",
+                    "english": "Label view width (map units)"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_label_use_view",
+                    "value": "Utilizează vizualizarea actuală",
+                    "english": "Use current view"
                 }
             }
         },
@@ -525,6 +581,22 @@
                     "key": "lpn_time_speed",
                     "value": "Viteză",
                     "english": "Speed"
+                }
+            }
+        },
+        "lpn_settings_sec_visualization": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_settings_open",
+                    "value": "Setări de timp",
+                    "english": "Time settings"
+                },
+                "next_translated": {
+                    "key": "lpn_settings_sec_map",
+                    "value": "Hartă și pagină",
+                    "english": "Map and page"
                 }
             }
         },
