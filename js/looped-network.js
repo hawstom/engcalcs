@@ -2113,6 +2113,7 @@ var EngCalcs = EngCalcs || {};
 		closePopup();
 		buildDom();
 		refreshSymbolSizes();
+		refreshValueColors();
 		refreshScenarioStatus();
 		scheduleSolve();
 		saveToStorage();
@@ -2932,6 +2933,10 @@ var EngCalcs = EngCalcs || {};
 	// css/engcalcs.css, so they read this one custom property rather than being set per element
 	// from here -- see the .lpn-* rules there. Node/vertex radii and the arrow chevron are geometry
 	// attributes, so those are re-applied in JS below.
+	// **NO refreshValueColors() HERE: COLOUR FOLLOWS THE DOCUMENT, NEVER THE SCALE.** This is on the
+	// zoom path (onZoomChanged), and a zoom changes no value, no break and no legend -- yet the
+	// repaint it triggered was measured at 120 breaksFor() calls per wheel notch on Net3 (Task 446).
+	// The callers that DO change values call refreshValueColors() themselves.
 	function refreshSymbolSizes() {
 		var k = symbolFactor(), op = settings.symbolOpacity;
 		svg.style.setProperty('--lpn-sym', k);
@@ -2961,7 +2966,6 @@ var EngCalcs = EngCalcs || {};
 			updateArrow(l.id);
 			resizePumpSymbol(l.id);
 		});
-		refreshValueColors();
 	}
 
 	// ---- COLOUR BY VALUE (ROADMAP Task 384, and Task 327's thematic mode) -------------------
@@ -3273,22 +3277,29 @@ var EngCalcs = EngCalcs || {};
 	// visible circle (css: fill:none -- the circle is the invisible hit target), so its overlay
 	// icon takes the colour through currentColor instead, which is the same channel its black is
 	// set through. Inline style, so clearing it restores the stylesheet's black exactly.
-	function paintNodeColor(id) {
+	//
+	// **THE BREAKS ARE AN ARGUMENT, because they cannot vary between two elements of one group.**
+	// Computing them inside the loop made a repaint O(L^2 log L) -- effectiveBreaks() re-collects
+	// and re-sorts every value on the map, once per element (Task 446). Omit the argument and the
+	// one-element callers still get the right answer; refreshValueColors() computes it once.
+	function paintNodeColor(id, breaks) {
 		var ne = nodeEls[id], n = nodeById(id);
 		if (!ne || !n) { return; }
 		var field = colorFieldOf('node');
-		var col = field ? colorForValue('node', colorNodeValue(n, field), effectiveBreaks('node', field)) : '';
+		if (breaks === undefined) { breaks = field ? effectiveBreaks('node', field) : []; }
+		var col = field ? colorForValue('node', colorNodeValue(n, field), breaks) : '';
 		if (isFixedHeadNode(n)) {
 			if (ne.symbol) { ne.symbol.style.color = col; }
 		} else {
 			ne.circle.style.fill = col;
 		}
 	}
-	function paintLinkColor(id) {
+	function paintLinkColor(id, breaks) {
 		var le = linkEls[id], l = linkById(id);
 		if (!le || !l) { return; }
 		var field = colorFieldOf('link');
-		var col = field ? colorForValue('link', colorLinkValue(l, field), effectiveBreaks('link', field)) : '';
+		if (breaks === undefined) { breaks = field ? effectiveBreaks('link', field) : []; }
+		var col = field ? colorForValue('link', colorLinkValue(l, field), breaks) : '';
 		le.line.style.stroke = col;
 		// A pump's or valve's icon goes with its own line -- the two are one mark (css: the symbol
 		// and the polyline are both black by the same argument).
@@ -3299,8 +3310,10 @@ var EngCalcs = EngCalcs || {};
 	function refreshValueColors() {
 		if (!svg) { return; }
 		applyThematicMode();
-		doc.nodes.forEach(function (n) { paintNodeColor(n.id); });
-		doc.links.forEach(function (l) { paintLinkColor(l.id); });
+		var nf = colorFieldOf('node'), lf = colorFieldOf('link');
+		var nb = nf ? effectiveBreaks('node', nf) : [], lb = lf ? effectiveBreaks('link', lf) : [];
+		doc.nodes.forEach(function (n) { paintNodeColor(n.id, nb); });
+		doc.links.forEach(function (l) { paintLinkColor(l.id, lb); });
 		renderColorLegend();
 	}
 	// TASK 327: the THEMATIC map is a MODE, not a default. Two honest products -- a DRAWING (dark
@@ -9295,6 +9308,7 @@ var EngCalcs = EngCalcs || {};
 
 		refreshFontSizes();
 		refreshSymbolSizes();
+		refreshValueColors();
 		renderLabelsLegend();
 		applyMaskLabels();   // the setting belongs to the project, so opening one can change it
 		updateEmptyHint();
@@ -12701,6 +12715,7 @@ var EngCalcs = EngCalcs || {};
 		// but the --lpn-sym custom property the stroke widths read is only ever written here and in
 		// refreshSymbolSizes() -- so a saved non-default symbol size needs this call to take effect.
 		refreshSymbolSizes();
+		refreshValueColors();
 		applyLabelVisibility();
 		applyMaskLabels();
 		updateEmptyHint();
