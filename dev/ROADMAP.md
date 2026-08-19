@@ -452,6 +452,22 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **Web Mercator must NOT become the document's coordinate system**, and its distances are not
     ground distances (`1/cos(latitude)`: ~15% at 40°, ~30% at 50°). This is the strongest argument for
     the standing rule that **`len` is stored and overridable, never derived.**
+- 60|439| **The lat/lon drawing comes apart past ~600,000 px/degree, and it is Task 354 in degrees.**
+  A node's `<circle>` rasterises at x = −41,548,184 and is simply not on screen, while `maxScale()`
+  for a geographic project is 5.56e7. The medicine is the one Task 354 already used — coordinates
+  local to an origin — but `LPN_ORIGIN_THRESHOLD` is 1e4 and a longitude is 122, so no geographic
+  document is ever rebased, and `georefStart()` deliberately sets `doc.origin = {0, 0}`. Touches the
+  placement tool, the basemap and the stored file format, so it is its own task.
+  - The hit-test half of the same float32 story IS fixed (`hitConfirmed()`), at every zoom where the
+    drawing is still correct.
+
+- 55|440| **Closing a big project still costs nine seconds, and 60% of it is one loop.**
+  `refreshLabelText()`'s LINK half interleaves a write and a measurement per label, and its shed
+  cascade measures inside the same iteration — so `getBBox` forces a synchronous layout per label per
+  rung. The node half was split into write-all-then-measure-all and the whole close went 24,262 →
+  9,484 ms on 256 junctions; the link half needs the loop split into three passes. The number to beat
+  is in `dev/browser-pass/specs/perf.js`.
+
 - 55|436| **Placement follow-ups, after Tom's first real use (2026-08-18).** The tool is two visible
   steps now — step 1 detached (the project holds still while the map moves under it), step 2 attached
   (handles live). `dev/georeferencing.md`.
