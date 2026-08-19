@@ -9239,6 +9239,11 @@ var EngCalcs = EngCalcs || {};
 		// type -- the case a warm-up hooked only to the type selector would miss entirely.
 		warmEpanetIfNeeded();
 		restoreViewOrFit();
+		// **A DOCUMENT THAT ARRIVES WITH A DURATION IS PRESENTED OVER THAT DURATION** (Task 248,
+		// 2026-08-19). An EDIT recalculates only the first reporting time now, but arriving is not
+		// an edit: opening a file that states a 24-hour run is asking to see the 24 hours. Marked
+		// here rather than run here, so the one solve scheduled below does it.
+		if (EngCalcs.lpnTimeArrived) { EngCalcs.lpnTimeArrived(); }
 		scheduleSolve();
 		renderTabs();
 		// The banner belongs to the project you are looking at: a read-only tab, a file that needs
@@ -12578,7 +12583,12 @@ var EngCalcs = EngCalcs || {};
 		var opening = initLibrary();
 		if (opening) {
 			applySaved(opening);
-			buildDom(); scheduleSolve();
+			buildDom();
+			// The boot path does not go through refreshAllFromDocument(), so it marks the arrival
+			// itself: a project reopened with a duration is presented over it, exactly as one
+			// opened from the tab strip is.
+			if (EngCalcs.lpnTimeArrived) { EngCalcs.lpnTimeArrived(); }
+			scheduleSolve();
 			if (backdrop) { buildBackdropImg(); }
 		} else if (!indexEntry(library.openId)) {
 			// **`!indexEntry()`, not `!library.openId`**: an id pointing at a project no longer in the
@@ -17921,6 +17931,11 @@ var EngCalcs = EngCalcs || {};
 		var manningNote = warned('manning-constant-differs'),
 			minorNote = warned('minor-loss-gravity-differs');
 		setStatus([valveRouteNote,
+			// The same kind of thing as valveRouteNote: a fact about THIS network that has to be
+			// known to read the numbers on screen. Here, that only the first reporting time is
+			// being kept up to date, because working the whole period out costs more than this
+			// page is willing to spend while you are still typing (js/lpn-time.js, LPN_TIME_AUTO).
+			EngCalcs.lpnTimeStatusNote ? EngCalcs.lpnTimeStatusNote() : '',
 			manningNote ? (pc.lpn_engine_manning_note || '') : '',
 			minorNote ? (pc.lpn_engine_minor_loss_note || '') : '']
 			.filter(function (t) { return !!t; }).join(' '));
@@ -17963,6 +17978,12 @@ var EngCalcs = EngCalcs || {};
 			tabs: paneTabs,
 			doc: function () { return doc; },
 			apply: applySolveResult, status: setStatus, solve: scheduleSolve,
+			// **AND THE UNDEBOUNCED ONE, which is what asking for a run needs** (Task 248,
+			// 2026-08-19). A period run is provoked by a deliberate act -- the Run button, or a
+			// quiet moment that has already been waited out -- and going through the 300 ms
+			// debounce would let a keystroke landing inside that window consume the request, which
+			// is a period run in the middle of typing: the exact thing the change is for.
+			solveNow: runSolve,
 			native: function (m) { return EngCalcs.lpnSolve(m, { tol: settings.tolerance }); },
 			snapshot: saveUndoSnapshot, save: saveToStorage,
 			toSI: toSI, toDisplay: toDisplay, unitLabel: unitLabel,

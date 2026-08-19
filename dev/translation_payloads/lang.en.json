@@ -1166,6 +1166,9 @@
         "lpn_time_last": "Go to the end",
         "lpn_time_tank": "Tank",
         "lpn_time_level": "Water level",
+        "lpn_time_run": "Run",
+        "lpn_time_run_tip": "Work out this network at every reporting time, from the start of the run to the end of it.",
+        "lpn_time_run_note": "You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.",
         "lpn_time_speed": "Speed",
         "lpn_time_speed_tip": "How fast the run plays back.",
         "lpn_settings_search": "Search settings",
@@ -1192,7 +1195,7 @@
         "lpn_color_mode_log": "Logarithmic",
         "lpn_color_mode_pressure": "Pressure"
     },
-    "count": 1190,
+    "count": 1193,
     "active_prefixes": [
         "about",
         "bpn",

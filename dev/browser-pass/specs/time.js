@@ -14,6 +14,9 @@
 //      precisely so it can, and the pane tab's old pause-on-hide hook would silently undo that.
 //   4. **THERE IS NO TIME TAB.** Tom, 2026-08-19: "No need for this to have a tab in the bottom
 //      pane. Remove the tab and what's on it."
+//   5. **WHAT AN EDIT COSTS.** The one claim behind the 2026-08-19 change is a COUNT of engine
+//      calls provoked by a hand on a mouse, and there is no way to count that outside a browser.
+//      dev/lpn-spike/time-harness.js owns the rule those counts follow.
 //
 // **WHAT WENT WITH THE TAB WAS THE ONLY READOUT OF A TANK FILLING**, which this file used to check
 // on the page ("the tanks are at different levels — they filled"). The claim is not dropped, it has
@@ -215,6 +218,169 @@ exports.run = async function ({ browser, report }) {
 
 		report.ok(same, 'the stored tank levels are still the ones the run STARTED from',
 			String(stored) + '  vs start ' + t0.tanks);
+
+		// ---- 5. WHEN A PERIOD RUN HAPPENS (Task 248, 2026-08-19) ----
+		//
+		// Until this change every edit re-ran the whole period through EPANET, and the cost is per
+		// FRAME: measured on this very network, 40-250 ms at its own 1 hour report step and 2972 ms
+		// at a 1 minute one (dev/lpn-spike/eps-cost-bench.js). Tom, 2026-08-19: "the multiplied
+		// burden of recalculating every time step at every value change ... not good for data entry
+		// efficiency."
+		//
+		// **THE ENGINE CALLS ARE COUNTED, NOT INFERRED.** EngCalcs.lpnEpanetRun is wrapped in the
+		// page and real gestures are performed against it, because every claim here is a claim about
+		// a number. dev/lpn-spike/time-harness.js owns the rule those numbers follow; this owns the
+		// one thing only the real page can answer -- what a hand on a mouse actually provokes.
+		await a.page.evaluate(() => {
+			const EC = window.EngCalcs;
+			window.__runs = 0;
+			const orig = EC.lpnEpanetRun;
+			window.__runAt = [];
+			EC.lpnEpanetRun = function () { window.__runs++; window.__runAt.push(Date.now()); return orig.apply(this, arguments); };
+		});
+
+		// **THE NODE IS CHOSEN BY WHAT IS ACTUALLY AT THE POINT**, the way Session.makeEdit() does
+		// and for the same reason: a drag that lands on nothing makes "no run was provoked" pass
+		// for the worst possible reason. `[data-node]` is the circle the page's own hit test reads
+		// (js/looped-network.js) -- the drawn SYMBOL beside it is not draggable, and a drag that
+		// starts on it PANS THE MAP, which moves every element on screen without touching the
+		// document. That near-miss is exactly how this section first passed while testing nothing.
+		const box = await a.page.evaluate(() => {
+			const canvas = document.getElementById('lpn_canvas');
+			const cr = canvas.getBoundingClientRect();
+			for (const el of canvas.querySelectorAll('[data-node]')) {
+				const r = el.getBoundingClientRect();
+				const x = r.x + r.width / 2, y = r.y + r.height / 2;
+				if (r.width < 2 || x < cr.x + 60 || x > cr.right - 60) { continue; }
+				if (y < cr.y + 60 || y > cr.bottom - 60) { continue; }
+				if (document.elementFromPoint(x, y) !== el) { continue; }
+				return { x, y, id: el.getAttribute('data-node') };
+			}
+			return null;
+		});
+		report.ok(!!box, 'a draggable element is reachable on the map');
+		let at = { x: box.x, y: box.y };
+		async function dragOnce() {
+			await a.page.mouse.move(at.x, at.y);
+			await a.page.mouse.down();
+			await a.page.mouse.move(at.x + 5, at.y + 2, { steps: 2 });
+			await a.page.mouse.move(at.x + 10, at.y + 5, { steps: 3 });
+			await a.page.mouse.up();
+			at = { x: at.x + 10, y: at.y + 5 };
+		}
+		// A hydraulic edit, through the page's own controls: the run duration is a number every
+		// frame depends on. Chosen over placing a junction because an isolated new node is a
+		// DIAGNOSTIC, and a network that fails lpnDiagnose() never reaches the run at all.
+		async function editDuration(text) {
+			await a.toolbarClick('Settings');
+			await a.settle(400);
+			await a.page.evaluate((v) => {
+				const i = document.querySelector('#lpn_set_time_fields input[type="text"]');
+				i.value = v;
+				window.__editAt = Date.now();
+				i.dispatchEvent(new Event('change', { bubbles: true }));
+			}, text);
+			await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
+			await a.settle(200);
+		}
+
+		// **THREE DRAGS AT A HAND'S CADENCE COST NOTHING AT ALL** -- half a second apart, which is
+		// longer than the 300 ms solve debounce and therefore the case a debounce does nothing for.
+		// Measured against the code as it stood before this change: three drags, three full 25-frame
+		// runs through EPANET, one per drag. A drag cannot change one flow, so the page now asks
+		// whether the model it would hand the solver actually changed, and it has not.
+		for (let i = 0; i < 3; i++) { await dragOnce(); await a.settle(500); }
+		await a.settle(1500);
+		const dragged = await a.page.evaluate((id) => {
+			const r = document.querySelector('[data-node="' + id + '"]').getBoundingClientRect();
+			return {
+				runs: window.__runs, x: r.x + r.width / 2, y: r.y + r.height / 2,
+				frames: window.EngCalcs.lpnTimeRunState().frames,
+				frame: !!window.EngCalcs.lpnTimeCurrentFrame()
+			};
+		}, box.id);
+		report.ok(Math.abs(dragged.x - box.x) > 4, 'the drags moved an element -- these are real edits',
+			`${box.x.toFixed(0)},${box.y.toFixed(0)} -> ${dragged.x.toFixed(0)},${dragged.y.toFixed(0)}`);
+		report.eq(dragged.runs, 0, 'THREE DRAGS PROVOKE NO PERIOD RUN AT ALL -- it was three, one per drag',
+			String(dragged.runs));
+		report.ok(dragged.frames > 0 && dragged.frame,
+			'...and the run is KEPT, because nothing the solver reads changed', `${dragged.frames} frames`);
+
+		// **A HYDRAULIC EDIT IS A DIFFERENT MATTER.** The frames describe a network that no longer
+		// exists, so they go, and what is drawn falls back to the first reporting time of the
+		// document as it now stands.
+		// The idle wait is stretched for this one read, so "did the edit itself run the period?" is
+		// answered by the code rather than by a race between two timers. It goes back to a short one
+		// immediately below, where the automatic run is what is being checked.
+		await a.page.evaluate(() => { window.__runs = 0; window.EngCalcs.LPN_TIME_AUTO.idleMs = 4000; });
+		await editDuration('10:00');
+		// Read after the 300 ms solve debounce and well before the idle re-run: whether the frames
+		// still match is a question about the MODEL, and the model is not assembled until that
+		// solve. For those 300 ms the frames are exactly as stale as every label on the map, which
+		// is the property that matters -- see the note in js/lpn-time.js where the eager
+		// invalidation used to be.
+		await a.settle(300);
+		const edited = await a.page.evaluate(() => ({
+			runs: window.__runs,
+			frame: !!window.EngCalcs.lpnTimeCurrentFrame(),
+			state: window.EngCalcs.lpnTimeRunState()
+		}));
+		report.eq(edited.runs, 0, 'a hydraulic edit does not run the period as it lands',
+			String(edited.runs) + ' at ' + JSON.stringify(await a.page.evaluate(() => window.__runAt.map(t => t - window.__editAt))));
+		report.ok(!edited.frame, 'and the frames of the network that no longer exists are gone',
+			JSON.stringify(edited.state));
+		report.eq(edited.state.t, 0,
+			'the transport is back at the first reporting time, which is the one moment that HAS been worked out');
+
+		// ...and it comes back by itself, because this network is cheap enough to be worth running
+		// unasked. That is the measurement talking: see EC.LPN_TIME_AUTO.
+		await a.page.evaluate(() => { window.EngCalcs.LPN_TIME_AUTO.idleMs = 900; });
+		await editDuration('11:00');
+		await a.settle(2500);
+		const settled = await a.page.evaluate(() => ({
+			runs: window.__runs,
+			frames: window.EngCalcs.lpnTimeRunState().frames,
+			ms: Math.round(window.EngCalcs.lpnTimeRunState().lastRunMs),
+			note: window.EngCalcs.lpnTimeStatusNote()
+		}));
+		report.eq(settled.runs, 1, 'ONE run once the editing stops', String(settled.runs));
+		report.ok(settled.frames > 0, 'the period is worked out again without anybody asking',
+			settled.frames + ' frames, last run ' + settled.ms + ' ms');
+		report.eq(settled.note, '', 'and the page says nothing, because there is nothing out of date');
+
+		// **AN EXPENSIVE NETWORK STOPS VOLUNTEERING.** The budget is dropped to zero rather than a
+		// 1-minute report step being typed in, so the check takes a second instead of a minute and
+		// tests the branch rather than the arithmetic that reaches it (which time-harness.js owns).
+		await a.page.evaluate(() => {
+			window.EngCalcs.LPN_TIME_AUTO.budgetMs = 0;
+			window.__runs = 0;
+		});
+		await editDuration('9:00');
+		await a.settle(2500);
+		const manual = await a.page.evaluate(() => ({
+			runs: window.__runs,
+			frame: !!window.EngCalcs.lpnTimeCurrentFrame(),
+			note: window.EngCalcs.lpnTimeStatusNote(),
+			status: (document.getElementById('lpn_status') || {}).textContent || ''
+		}));
+		report.eq(manual.runs, 0, 'a network that costs more than the budget does not re-run itself at all');
+		report.ok(!manual.frame, 'and still never leaves a stale frame behind');
+		report.ok(manual.note.length > 0 && manual.status.indexOf(manual.note) >= 0,
+			'the status bar SAYS the later times are not being kept up to date', manual.status);
+
+		// ...and the button is what brings them back. It is on the toolbar, in the transport's own
+		// group, named Run because EPANET's own command is Run Analysis.
+		await a.toolbarClick('Run');
+		await a.settle(2500);
+		const ran = await a.page.evaluate(() => ({
+			runs: window.__runs,
+			frames: window.EngCalcs.lpnTimeRunState().frames,
+			note: window.EngCalcs.lpnTimeStatusNote()
+		}));
+		report.eq(ran.runs, 1, 'Run works the whole period out');
+		report.ok(ran.frames > 0, 'the frames are back', String(ran.frames));
+		report.eq(ran.note, '', 'and the page stops warning about them');
+		await a.page.evaluate(() => { window.EngCalcs.LPN_TIME_AUTO.budgetMs = 400; });
 	} finally {
 		await a.close();
 	}

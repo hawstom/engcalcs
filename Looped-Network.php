@@ -851,6 +851,9 @@ EngCalcs.pageConfig = {
 	lpn_time_last: <?=json_encode($ec_lang['lpn_time_last'])?>,
 	lpn_time_tank: <?=json_encode($ec_lang['lpn_time_tank'])?>,
 	lpn_time_level: <?=json_encode($ec_lang['lpn_time_level'])?>,
+	lpn_time_run: <?=json_encode($ec_lang['lpn_time_run'])?>,
+	lpn_time_run_tip: <?=json_encode($ec_lang['lpn_time_run_tip'])?>,
+	lpn_time_run_note: <?=json_encode($ec_lang['lpn_time_run_note'])?>,
 	lpn_time_speed: <?=json_encode($ec_lang['lpn_time_speed'])?>,
 	lpn_time_speed_tip: <?=json_encode($ec_lang['lpn_time_speed_tip'])?>,
 <?php   // The Settings box (Task 441). Four of its five strings are borrowed from controls that
