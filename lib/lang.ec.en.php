@@ -2246,6 +2246,9 @@ $ec_lang['lpn_time_next']='Step forward';
 $ec_lang['lpn_time_last']='Go to the end';
 $ec_lang['lpn_time_tank']='Tank';
 $ec_lang['lpn_time_level']='Water level';
+$ec_lang['lpn_time_run']='Run';
+$ec_lang['lpn_time_run_tip']='Work out this network at every reporting time, from the start of the run to the end of it.';
+$ec_lang['lpn_time_run_note']='You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.';
 $ec_lang['lpn_time_speed']='Speed';
 $ec_lang['lpn_time_speed_tip']='How fast the run plays back.';
 

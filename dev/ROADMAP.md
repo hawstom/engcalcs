@@ -573,6 +573,19 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     of `dev/lpn-spike/reference/Net3.rpt`: head worst 0.005 ft over 2,425 comparisons, flow 0.485 gpm
     over 2,975, tank level 0.005 ft over 75 (`dev/lpn-spike/eps-net3-harness.js`). **The native
     solver has no time dimension and is not getting one** — engine unreachable, one instant, said so.
+  - **THE RUN IS STILL LIVE, and the page decides that by TIMING ITSELF** (2026-08-19,
+    `EC.LPN_TIME_AUTO`). Cost is per FRAME: Net3 is 40–250 ms at its own 1 h report step, 736 ms at
+    15 min, 2972 ms at 1 min, 1255 ms over 30 days; 10× Net3 is only 381 ms
+    (`dev/lpn-spike/eps-cost-bench.js`). So an edit re-runs the period after a quiet moment while the
+    last measured run stayed under 400 ms, and above that waits for the **Run** button, which is on
+    the toolbar either way. The biggest saving is separate and risk-free: a solve is skipped entirely
+    when the assembled model is byte-identical to the one the frames came from, so a drag, a
+    recolour or a rename now costs **zero** engine calls where three drags cost three runs.
+  - **Two performance ideas were measured and dropped.** Warm-starting a run from the previous run's
+    flows can only help the FIRST frame — EPANET already carries flows from step to step inside
+    `runH()/nextH()`, so the ceiling is 1/N of the cost and N is largest exactly where it hurts.
+    "Re-solve only the changed path" is wrong in a looped network at any size: the global gradient
+    method moves every flow when one diameter changes.
   - **What is left are the EDITORS:** patterns (248.02), controls (248.03), curves (248.04) — all
     read, solved and written back today, none creatable on the page. Task 384's ramp reads a run.
   - **A valve has THREE states in EPANET, not two:** closed, fully open, and ACTIVE. `EN_INITSTATUS =

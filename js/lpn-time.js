@@ -224,7 +224,57 @@
 	// no-engine fallback honest rather than a stale t=0 answer wearing a clock.
 	// `speed` is a PLAYBACK multiplier and nothing else: it never reaches the document, the model or
 	// a result, so it is not a setting and is not stored. 1 is the shipped 400 ms a frame.
-	var state = { t: 0, run: null, token: 0, playing: false, timer: null, speed: 1 };
+	var state = {
+		t: 0, run: null, token: 0, playing: false, timer: null, speed: 1,
+		// ---- the four fields that make a period run cheap enough to leave automatic (2026-08-19) ----
+		// `lastRunMs` is how long the LAST run of THIS network took, measured; it is what decides
+		// whether the page may run the period by itself (see EC.LPN_TIME_AUTO).
+		// `wanted` is "a run has been asked for", set by the Run button, by a document arriving and
+		// by the transport, and consumed by the next solve.
+		// `busy` is a run in flight, so a second request queues instead of piling up.
+		// `idle` is the quiet-period timer that provokes an automatic run.
+		// `runSig` is the fingerprint of the model the frames in hand came out of, so an edit can be
+		// asked the only question that matters: did anything the solver reads actually change?
+		lastRunMs: null, wanted: false, busy: false, idle: null, runSig: null
+	};
+
+	/**
+	 * **HOW LONG A PERIOD RUN MAY TAKE AND STILL RE-RUN ITSELF.**
+	 *
+	 * Tom, 2026-08-19: "I am not opposed to benchmarking and brainstorming entire-simulation
+	 * recalculation on the fly. I am just foreseeing the multiplied burden of recalculating every
+	 * time step at every value change. That's not good for data entry efficiency."
+	 *
+	 * So it was measured -- dev/lpn-spike/eps-cost-bench.js, on Net3 (97 nodes, 119 links):
+	 *
+	 *     one steady solve, which is what an edit costs anyway            11 ms
+	 *     the whole 24 h period at Net3's own 1 hour report step      40-180 ms      25 frames
+	 *     the same day at a 15 minute report step                        736 ms      97 frames
+	 *     the same day at a 1 minute report step                        2972 ms    1441 frames
+	 *     10 x Net3 (970 nodes), 24 h at 1 hour                          381 ms      25 frames
+	 *     Net3 over 30 days at 1 hour                                   1255 ms     721 frames
+	 *
+	 * **THE REPORTING STEP IS THE AXIS, NOT THE SIZE OF THE NETWORK.** The cost is per FRAME, so a
+	 * finer step multiplies it while ten times the drawing merely triples it -- and a modeller
+	 * chasing a transient sets a one-minute step on purpose. That is the "multiplied burden" as a
+	 * number: at 3 s a run, a page that re-runs while you type is unusable; at 60 ms it is the live
+	 * page every other calculator in this suite is.
+	 *
+	 * Neither answer is right for both, and the page does not have to guess or ask: **it times its
+	 * own run** and keeps re-running by itself only while that measurement stays under the budget.
+	 * Above it the period waits for the Run button, and the status bar says so.
+	 *
+	 * 400 ms because it sits above every measurement of an ordinary network (Net3 at its own
+	 * settings measured 40-250 ms, browser included) and below every measurement of an expensive
+	 * one (736 ms at the next step down), and because a pause of about half a second is where a
+	 * page stops feeling live. The idle wait is on top of js/looped-network.js's own 300 ms solve
+	 * debounce, so nothing is ever provoked by a keystroke -- only by putting the mouse down and
+	 * leaving it there.
+	 *
+	 * Exported because they are tuning constants a reader will want to find, and because
+	 * dev/lpn-spike/time-harness.js drives them rather than sleeping for a second per check.
+	 */
+	EC.LPN_TIME_AUTO = { budgetMs: 400, idleMs: 900 };
 
 	/**
 	 * EVERY STRING THIS FILE SHOWS, in one place, and read through an explicit `pageConfig.<key>`
@@ -238,13 +288,6 @@
 	 */
 	function strings() {
 		var pageConfig = EC.pageConfig || {};
-		// **THE TWO SPEED KEYS ARE READ THROUGH `pc`, NOT `pageConfig.`, AND ONLY UNTIL THE BRIDGE
-		// CARRIES THEM.** dev/scripts/pageconfig_check.php greps for exactly `pageConfig.<key>` and
-		// fails the build on a key the page does not supply; Looped-Network.php's block is another
-		// track's file this session, so these two would fail it before they could be added. Move them
-		// up into the object below -- and delete this alias -- the moment the page supplies them, or
-		// they stay invisible to the one check that stops a visitor seeing "undefined".
-		var pc = pageConfig;
 		return {
 			speed: pageConfig.lpn_time_speed,
 			speedTip: pageConfig.lpn_time_speed_tip,
@@ -271,7 +314,13 @@
 			play: pageConfig.lpn_time_play || 'Play',
 			pause: pageConfig.lpn_time_pause || 'Pause',
 			next: pageConfig.lpn_time_next || 'Step forward',
-			last: pageConfig.lpn_time_last || 'Go to the end'
+			last: pageConfig.lpn_time_last || 'Go to the end',
+			// **"Run", because EPANET's own command is Run Analysis.** Not "Simulate", which is
+			// epanet-js's word rather than ours, and not "Recalculate", which is both long for an
+			// icon-only strip and untrue of a page where everything else recalculates as you type.
+			run: pageConfig.lpn_time_run || 'Run',
+			runTip: pageConfig.lpn_time_run_tip || 'Work out this network at every reporting time, from the start of the run to the end of it.',
+			runNote: pageConfig.lpn_time_run_note || 'You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.'
 			// **FIVE STRINGS LEFT THIS LIST WITH THE PANE TAB**: lpn_time_tank, lpn_time_level and
 			// lpn_time_settings_open named the tank table and the door to the settings, and
 			// lpn_time_menu / lpn_time_menu_tip named the tab itself. lpn_time_menu is still
@@ -313,21 +362,144 @@
 	};
 
 	/**
-	 * Take over the solve when the document describes a period rather than an instant.
-	 * Returns false when it does not, and js/looped-network.js carries on exactly as before.
+	 * Take over the solve when the document describes a period rather than an instant, AND this
+	 * particular solve is a run rather than an edit. Returns false otherwise, and
+	 * js/looped-network.js carries on to the ordinary steady solve.
+	 *
+	 * **A HYDRAULIC EDIT RECALCULATES THE FIRST REPORTING TIME AND NOTHING ELSE** (Tom, 2026-08-19:
+	 * "On any edit, only the first time step should be recalculated"). Two things follow, and the
+	 * second is the whole point of the change:
+	 *
+	 *   1. The page stays LIVE. Returning false here hands the solve back, and what gets drawn is
+	 *      the steady solve of the document as it now stands -- the same as-you-type behaviour
+	 *      every other calculator in this suite has, at t = the first reporting time.
+	 *   2. **THE FRAMES GO.** They describe a network that no longer exists, and a result that no
+	 *      longer matches the document must never be on screen as if it did. Dropping them rather
+	 *      than labelling them stale is EPANET's own answer, it keeps EC.lpnTimeCurrentFrame()
+	 *      honest for free, and it is what gives "only the first time step" a literal meaning on
+	 *      screen: the transport goes back to the start, because the start is the one moment that
+	 *      has actually been worked out.
+	 *
+	 * The period comes back either by itself, after a quiet moment, or on the Run button -- see
+	 * EC.LPN_TIME_AUTO for which, and why that is a measurement rather than a preference.
+	 *
+	 * **AND AN EDIT THAT IS NOT HYDRAULIC COSTS NOTHING AT ALL**, which is the biggest saving here
+	 * and the only one with no numerical risk in it: see the fingerprint test below.
 	 */
 	EC.lpnTimeRun = function (model) {
-		var times = docTimes(), token;
+		var times = docTimes();
 		if (!host || !EC.lpnTimeIsExtended(times)) {
 			// Back to one instant: drop the frames, or a later edit that shortens the duration to 0
 			// would leave the transport showing a run that is no longer being computed.
+			cancelIdleRun();
+			state.lastRunMs = null;
+			state.runSig = null;
 			if (state.run) { state.run = null; state.t = 0; renderPanel(); }
 			return false;
 		}
-		if (!EC.lpnEpanetRun) { return noEngine(model); }
-		token = ++state.token;
+		// The engine is unreachable: one instant, said out loud. Unchanged, and it is not an edit
+		// path -- there is nothing to invalidate because there were never any frames.
+		if (!EC.lpnEpanetRun) { state.wanted = false; return noEngine(model); }
+		if (state.wanted) { state.wanted = false; startRun(model); return true; }
+		// **AN EDIT THE SOLVER CANNOT SEE IS NOT AN EDIT AT ALL.** Moving a node, editing a text
+		// element, renaming, recolouring, retitling a label: none of them can change one flow, and
+		// every one of them provoked a full period run before 2026-08-19. So the frames are
+		// kept, nothing is re-run, and the frame on screen is simply re-applied.
+		//
+		// **THIS IS THE BIGGEST SAVING AVAILABLE HERE AND IT CARRIES NO NUMERICAL RISK**, because
+		// the question is not "was that edit hydraulic?" but "is the model handed to the solver
+		// byte-for-byte the one these frames came out of?". A drag is free by measurement, not by
+		// a list of edit types somebody has to keep in step.
+		if (state.run && state.runSig && modelFingerprint(model) === state.runSig) {
+			showFrame();
+			return true;
+		}
+		dropFrames();
+		state.runSig = null;
+		if (autoRunAllowed()) { scheduleIdleRun(); }
+		return false;
+	};
+
+	/**
+	 * Everything the solver reads, as one string. Same string, same answers.
+	 *
+	 * **NOT js/lpn-epanet.js's signatureOf(), and the difference is the point.** That one is the
+	 * SHAPE of the network -- which ids exist, what connects to what -- and deliberately excludes
+	 * values, because its question is "can the open Project be reused, or must it be rebuilt". This
+	 * one includes every value, because its question is "are the answers still the answers".
+	 *
+	 * The per-instant `demand` field is dropped, and only that: it is `demandBase` times the
+	 * pattern multiplier at the moment the model was assembled, so it moves with the transport
+	 * while nothing about the document has changed. Both of its inputs are in the fingerprint, so
+	 * nothing is lost -- a demand or a pattern the user edits still changes this string.
+	 */
+	function modelFingerprint(model) {
+		return JSON.stringify(model, function (k, v) { return k === 'demand' ? undefined : v; });
+	}
+
+	/**
+	 * May the page re-run the period by itself? Only while the last measured run of THIS network
+	 * came in under the budget. Unmeasured (a document that has just arrived) counts as allowed:
+	 * the first run is how the measurement is taken, and refusing to take it would leave every
+	 * project manual forever.
+	 */
+	function autoRunAllowed() {
+		return state.lastRunMs === null || state.lastRunMs <= EC.LPN_TIME_AUTO.budgetMs;
+	}
+	function cancelIdleRun() {
+		if (state.idle) { clearTimeout(state.idle); state.idle = null; }
+	}
+	function scheduleIdleRun() {
+		cancelIdleRun();
+		state.idle = setTimeout(function () {
+			state.idle = null;
+			// Asked AGAIN at the moment it would fire, not only when it was scheduled: a run that
+			// finished in between is a new measurement, and a timer set under the old one must not
+			// spend a second's work the new one says is too expensive.
+			if (autoRunAllowed()) { requestRun(); }
+		}, EC.LPN_TIME_AUTO.idleMs);
+	}
+	// The frames, and the moment being shown, both go back to where a fresh document starts. pause()
+	// as well: playing through frames that have just been discarded animates nothing.
+	function dropFrames() {
+		var stops = EC.lpnReportTimes(docTimes());
+		if (!state.run && state.t === stops[0] && !state.playing) { return; }
+		state.run = null;
+		state.runSig = null;
+		state.t = stops[0];
+		if (state.playing) { pause(); }
+		renderPanel();
+	}
+	function nowMs() {
+		return (root.performance && root.performance.now) ? root.performance.now() : Date.now();
+	}
+	/**
+	 * **THE ONE DOOR TO A PERIOD RUN.** Sets the flag the next solve consumes, and asks for that
+	 * solve IMMEDIATELY rather than through the 300 ms debounce -- a debounced request can be
+	 * consumed by a keystroke that lands inside the window, which is the run-while-typing this
+	 * whole design exists to prevent.
+	 *
+	 * A run already in flight owns the engine, so the flag is left set and the finishing run kicks
+	 * the next solve on its way out: a Run pressed during a slow run is queued, never dropped.
+	 */
+	function requestRun() {
+		cancelIdleRun();
+		if (!host) { return; }
+		state.wanted = true;
+		if (state.busy) { return; }
+		if (host.solveNow) { host.solveNow(); } else { host.solve(); }
+	}
+	function startRun(model) {
+		var token = ++state.token, t0 = nowMs(), sig = modelFingerprint(model);
+		cancelIdleRun();
+		state.busy = true;
 		host.status(strings().running);
 		EC.lpnEpanetRun(model).then(function (run) {
+			// **THE MEASUREMENT IS TAKEN WHATEVER HAPPENED TO THE TOKEN.** A superseded run cost
+			// exactly as much wall clock as a kept one, and it is the cost this network's next
+			// automatic run is judged by.
+			state.lastRunMs = nowMs() - t0;
+			runFinished();
 			if (token !== state.token) { return; }   // a newer edit already started its own run
 			if (!run.ok) {
 				state.run = null;
@@ -336,14 +508,84 @@
 				return;
 			}
 			state.run = run;
+			// The model these frames came out of, so a later edit can ask whether it changed.
+			// Taken from the model that was RUN, never from a fresh assembly at this moment.
+			state.runSig = sig;
 			clampTime();
 			showFrame();
 		}, function (err) {
+			state.lastRunMs = nowMs() - t0;
+			runFinished();
 			if (token !== state.token) { return; }
 			noEngine(model);
 			if (root.console && console.warn) { console.warn('EPANET extended-period run failed:', err); }
 		});
-		return true;
+	}
+	function runFinished() {
+		state.busy = false;
+		if (state.wanted) { requestRun(); }
+	}
+
+	/**
+	 * Run the whole period NOW. The Run button, and the transport asking to see a moment it has no
+	 * frame for.
+	 */
+	EC.lpnTimeRunNow = function () { requestRun(); };
+
+	// **WHY THE FRAMES ARE JUDGED AT THE SOLVE AND NOT AT THE EDIT.** There was briefly a
+	// lpnTimeInvalidate() on scheduleSolve(), dropping them 300 ms earlier, to close the window in
+	// which lpnTimeCurrentFrame() could answer out of the previous network. It had to go: whether
+	// an edit changed anything the solver reads is a question about the MODEL, and the model does
+	// not exist until assembleModel() runs at the solve. Dropping first and asking afterwards
+	// throws away exactly the frames a node drag is entitled to keep.
+	//
+	// What is left is one debounce of lag, and it is the lag the whole page already has -- every
+	// label on the map still shows the previous solve's number for those same 300 ms. The frames
+	// are never MORE stale than what is drawn beside them, which is the property that matters.
+
+	/**
+	 * A document has ARRIVED -- opened, imported, switched to. Its run is PRESENTED rather than
+	 * waited for: a file that states a duration is asking to be seen over that duration, and this
+	 * change is about what an edit does, not about what arriving does.
+	 *
+	 * The cost measurement starts again from nothing, because it was a measurement of a different
+	 * network. The flag is consumed by the solve js/looped-network.js schedules immediately after
+	 * this, so nothing is started from here.
+	 */
+	EC.lpnTimeArrived = function () {
+		cancelIdleRun();
+		state.lastRunMs = null;
+		state.run = null;
+		state.runSig = null;
+		state.t = 0;
+		state.wanted = true;
+	};
+
+	/**
+	 * What the status bar has to say while the later times are NOT being kept up to date. Empty
+	 * whenever they are -- including while an automatic run is a second away, because a warning
+	 * that appears and disappears on every edit is noise rather than information.
+	 *
+	 * js/looped-network.js's applySolveResult() composes it beside valveRouteNote, which is the
+	 * same kind of thing: a fact about this network that the user has to know to read the numbers.
+	 */
+	EC.lpnTimeStatusNote = function () {
+		if (!host || state.run || !EC.lpnEpanetRun) { return ''; }
+		if (!EC.lpnTimeIsExtended(docTimes()) || autoRunAllowed()) { return ''; }
+		return strings().runNote;
+	};
+
+	/**
+	 * What the run is doing, for a test that has to know. NOT read by anything on the page: the
+	 * page shows this through the transport and the status bar, which is where a user reads it.
+	 */
+	EC.lpnTimeRunState = function () {
+		return {
+			frames: state.run ? state.run.frames.length : 0,
+			t: state.t, lastRunMs: state.lastRunMs,
+			auto: autoRunAllowed(), wanted: state.wanted, busy: state.busy,
+			idle: !!state.idle
+		};
 	};
 
 	/**
@@ -381,11 +623,17 @@
 
 	function setTime(t) {
 		state.t = t;
-		if (state.run) { showFrame(); }
+		if (state.run) { showFrame(); return; }
+		renderPanel();
+		// **NO FRAMES, AND THE USER HAS ASKED TO SEE ANOTHER MOMENT.** That gesture is the same
+		// request the Run button makes, so it makes it -- a transport that answered "press Run
+		// first" would be a control that does nothing. The rejected alternative is to solve one
+		// instant at t and draw it: that is the flat-tank answer noEngine() exists to refuse to
+		// give silently, and it is only honest where there is no engine to give a better one.
+		if (EC.lpnEpanetRun && EC.lpnTimeIsExtended(docTimes())) { requestRun(); }
 		else {
-			// No frames: the only way to show another moment is to solve it, and modelTimeSeconds()
-			// now reads state.t so the rebuilt model is at the new instant.
-			renderPanel();
+			// No engine: the only way to show another moment is to solve it, and modelTimeSeconds()
+			// reads state.t so the rebuilt model is at the new instant.
 			host.solve();
 		}
 	}
@@ -588,10 +836,10 @@
 		var S = strings(), name;
 		if (!container) { return; }
 		name = iconLabel || function (el2, icon, n, tip) { EC.setIconLabel(el2, icon, n, tip); };
-		function btn(icon, label, fn) {
+		function btn(icon, label, fn, tip) {
 			var b = document.createElement('button');
 			b.type = 'button';
-			name(b, icon, label, null);
+			name(b, icon, label, tip || null);
 			b.setAttribute('data-icon', icon);
 			b.addEventListener('click', fn);
 			container.appendChild(b);
@@ -618,6 +866,13 @@
 			return sel;
 		}
 		ui = {};
+		// **RUN COMES FIRST, AND IT IS NOT A TRANSPORT CONTROL.** The other four change which
+		// moment you are looking at; this one works the moments out. It is on the strip at all
+		// times, like the rest of the group: on a network with no duration it is an ordinary
+		// recalculate, which is a true thing for a button called Run to do, and hiding it would
+		// make the one feature it announces undiscoverable in the state most people open the page
+		// in. It is never the ONLY way to a period result -- see EC.LPN_TIME_AUTO.
+		ui.run = btn('run', S.run, function () { requestRun(); }, S.runTip);
 		ui.prev = btn('step-back', S.prev, function () { stepBy(-1); });
 		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } });
 		ui.next = btn('step-fwd', S.next, function () { stepBy(1); });

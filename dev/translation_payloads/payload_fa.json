@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 1190,
-        "delta_key_count": 10,
+        "expected_key_count": 1193,
+        "delta_key_count": 13,
         "exempt_key_count": 17,
         "exempt_keys": [
             "u_imgd",
@@ -407,6 +407,9 @@
     },
     "keys_to_translate": {
         "lpn_xymap": "XY",
+        "lpn_time_run": "Run",
+        "lpn_time_run_tip": "Work out this network at every reporting time, from the start of the run to the end of it.",
+        "lpn_time_run_note": "You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_settings_node_link": "Node and link",
         "lpn_color_mode_equal": "Equal interval",
@@ -419,6 +422,9 @@
     },
     "keys": {
         "lpn_xymap": "XY",
+        "lpn_time_run": "Run",
+        "lpn_time_run_tip": "Work out this network at every reporting time, from the start of the run to the end of it.",
+        "lpn_time_run_note": "You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_settings_node_link": "Node and link",
         "lpn_color_mode_equal": "Equal interval",
@@ -443,6 +449,54 @@
                     "key": "lpn_georef_menu",
                     "value": "تبدیل به عرض\/طول جغرافیایی…",
                     "english": "Convert to lat\/lon…"
+                }
+            }
+        },
+        "lpn_time_run": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_level",
+                    "value": "تراز آب",
+                    "english": "Water level"
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "سرعت",
+                    "english": "Speed"
+                }
+            }
+        },
+        "lpn_time_run_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_level",
+                    "value": "تراز آب",
+                    "english": "Water level"
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "سرعت",
+                    "english": "Speed"
+                }
+            }
+        },
+        "lpn_time_run_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_level",
+                    "value": "تراز آب",
+                    "english": "Water level"
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "سرعت",
+                    "english": "Speed"
                 }
             }
         },

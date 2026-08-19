@@ -133,5 +133,145 @@ check(!EngCalcs.lpnTimeIsExtended(null), 'a document with no clock is one instan
 	eq(doc.controls[0].condition.value, 17.1, 'and the document still states its own number');
 }
 
-console.log(failures ? `\n${failures} failure(s)` : '\nall checks passed');
-process.exit(failures ? 1 : 0);
+// ================================================================================================
+// WHEN A PERIOD RUN HAPPENS -- ROADMAP Task 248, 2026-08-19
+// ================================================================================================
+//
+// The editor half of js/lpn-time.js touches no DOM until something is actually mounted, so the
+// whole invalidation rule can be driven here with a fake host and a fake engine, and the ONE
+// number this change is justified by -- how many engine calls a burst of edits provokes -- can be
+// counted rather than asserted.
+//
+// The rule under test, in one sentence: **an edit recalculates the first reporting time only, the
+// frames go with it, and the period comes back either after a quiet moment (while the last measured
+// run was cheap) or on the Run button (when it was not).**
+
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function runSection() {
+	console.log('\n---- when a period run happens ----');
+
+	// The fake engine. `cost` is real wall clock, because the page's own budget test is a
+	// measurement of wall clock -- a stub that resolved instantly could never produce the expensive
+	// case at all, which is exactly the "stub that removes the coupling" dev/testing-notes.md warns
+	// about. It varies the one quantity the real thing varies: how long a run takes.
+	let engineCalls = 0, cost = 5;
+	EngCalcs.lpnEpanetRun = function () {
+		engineCalls++;
+		return wait(cost).then(() => ({
+			ok: true, engineVersion: 'fake', warnings: [],
+			frames: EngCalcs.lpnReportTimes(doc.times).map((t) => ({
+				t, heads: {}, pressures: {}, flows: {}, headlosses: {}, velocities: {},
+				demands: {}, levels: { T1: 3 }, statuses: {}
+			}))
+		}));
+	};
+
+	const doc = { times: EngCalcs.lpnTimesDefaults(), nodes: [], links: [] };
+	doc.times.duration = 86400;
+
+	let steadySolves = 0, statuses = [];
+	// The page's own seam: solve() is the 300 ms debounce, solveNow() is not. Both end in the same
+	// place -- runSolve(), which offers the model to lpnTimeRun() and does the steady solve itself
+	// when it is handed back.
+	// **TWO KINDS OF EDIT, and the difference is the whole of the biggest saving.** `elev` is a
+	// number the solver reads; `x` is where the node is drawn and no solve has ever looked at it.
+	// The page tells them apart by FINGERPRINTING the assembled model rather than by classifying
+	// the edit, so this drives it the same way: the model is rebuilt on every solve out of the
+	// same two fields a real assembleModel() would read.
+	const shape = { elev: 100, x: 0 };
+	const buildModel = () => ({ nodes: [{ id: 'J1', type: 'junction', elev: shape.elev }], links: [] });
+	const solveNow = () => { if (!EngCalcs.lpnTimeRun(buildModel())) { steadySolves++; } };
+	const hydraulicEdit = () => { shape.elev += 1; solveNow(); };
+	const cosmeticEdit = () => { shape.x += 10; solveNow(); };
+	EngCalcs.lpnTimeInit({
+		tabs: [],
+		doc: () => doc,
+		apply: () => {}, status: (s) => statuses.push(s),
+		solve: solveNow, solveNow: solveNow,
+		native: () => ({ ok: true, converged: true, heads: {}, flows: {} }),
+		snapshot: () => {}, save: () => {},
+		toSI: (v) => v, toDisplay: (v) => v, unitLabel: () => ''
+	});
+	// Short enough to test in a second; the shipped values and the reasoning behind them are on
+	// EC.LPN_TIME_AUTO in js/lpn-time.js.
+	EngCalcs.LPN_TIME_AUTO.idleMs = 40;
+	EngCalcs.LPN_TIME_AUTO.budgetMs = 60;
+
+	// ---- a document arriving is presented over its duration ----
+	EngCalcs.lpnTimeArrived();
+	solveNow();
+	await wait(60);
+	eq(engineCalls, 1, 'a document that arrives with a duration is run once, without being asked');
+	eq(EngCalcs.lpnTimeRunState().frames, 25, 'and the whole period is there');
+	check(!!EngCalcs.lpnTimeCurrentFrame(), 'and lpnTimeCurrentFrame() answers');
+
+	// ---- AN EDIT THE SOLVER CANNOT SEE COSTS NOTHING AT ALL ----
+	//
+	// Moving a node, editing a text element, recolouring, renaming. Every one of these provoked a
+	// full period run before 2026-08-19. The frames are still a true solve of this document, so
+	// they STAY -- there is nothing to recompute and nothing stale about them.
+	engineCalls = 0; steadySolves = 0;
+	cosmeticEdit();
+	await wait(120);
+	eq(engineCalls, 0, 'MOVING A NODE PROVOKES NO RUN, then or later');
+	eq(EngCalcs.lpnTimeRunState().frames, 25, 'and the frames are KEPT -- nothing the solver reads changed');
+	check(!!EngCalcs.lpnTimeCurrentFrame(), 'so the run is still there to be scrubbed through');
+
+	// ---- A HYDRAULIC EDIT DOES NOT RUN THE PERIOD EITHER ----
+	engineCalls = 0; steadySolves = 0;
+	hydraulicEdit();
+	eq(engineCalls, 0, 'AN EDIT PROVOKES NO ENGINE RUN');
+	eq(steadySolves, 1, 'and the solve is handed back, so the page works out the first time step');
+	eq(EngCalcs.lpnTimeCurrentFrame(), null,
+		'THE STALE FRAMES ARE GONE -- lpnTimeCurrentFrame() cannot answer from a superseded run');
+	eq(EngCalcs.lpnTimeRunState().t, 0, 'and the transport is back at the first reporting time');
+
+	// ---- three drags in a burst: ONE run, and only after the quiet ----
+	engineCalls = 0;
+	hydraulicEdit(); await wait(10);
+	hydraulicEdit(); await wait(10);
+	hydraulicEdit();
+	eq(engineCalls, 0, 'three edits in a burst provoke NO run while they are happening');
+	await wait(120);
+	eq(engineCalls, 1, 'and exactly one once the editing stops -- the burst is coalesced, not queued');
+	eq(EngCalcs.lpnTimeRunState().frames, 25, 'the period is back');
+
+	// ---- an expensive network stops re-running itself ----
+	//
+	// The budget is a MEASUREMENT, not a setting: the page times its own run and stops volunteering
+	// once that measurement says a run costs more than a pause the user would not notice.
+	cost = 90;   // over the 60 ms budget set above
+	EngCalcs.lpnTimeRunNow();
+	await wait(160);
+	check(EngCalcs.lpnTimeRunState().lastRunMs > 60, 'a slow run is measured as slow',
+		`${Math.round(EngCalcs.lpnTimeRunState().lastRunMs)} ms`);
+	check(!EngCalcs.lpnTimeRunState().auto, 'so the page stops running the period by itself');
+	engineCalls = 0;
+	hydraulicEdit(); await wait(10); hydraulicEdit();
+	await wait(160);
+	eq(engineCalls, 0, 'AND AN EDIT NOW PROVOKES NOTHING AT ALL, however long the user waits');
+	eq(EngCalcs.lpnTimeCurrentFrame(), null, 'nothing stale is left behind to draw');
+	check(EngCalcs.lpnTimeStatusNote().length > 0,
+		'and the page SAYS the later times are not being kept up to date');
+
+	// ---- ...but Run still runs it ----
+	EngCalcs.lpnTimeRunNow();
+	await wait(160);
+	eq(engineCalls, 1, 'Run works the whole period out');
+	eq(EngCalcs.lpnTimeRunState().frames, 25, 'and the frames are back');
+	eq(EngCalcs.lpnTimeStatusNote(), '', 'and the page stops saying they are out of date');
+
+	// ---- a duration of 0 is not a run at all ----
+	doc.times.duration = 0;
+	engineCalls = 0;
+	hydraulicEdit();
+	await wait(160);
+	eq(engineCalls, 0, 'a document with no duration never reaches the run at all');
+	eq(EngCalcs.lpnTimeCurrentFrame(), null, 'and keeps no frames from when it had one');
+}
+
+runSection().then(() => {
+	console.log(failures ? `\n${failures} failure(s)` : '\nall checks passed');
+	process.exit(failures ? 1 : 0);
+});

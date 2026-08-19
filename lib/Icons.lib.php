@@ -320,6 +320,16 @@ $ec_icons = array(
 	'step-fwd'   => '<path d="M3.2 5v14l12-7z" fill="currentColor" stroke="none"/>'
 	              . '<rect x="17.2" y="5" width="3.6" height="14" fill="currentColor" stroke="none"/>',
 
+	// RUN: work the whole time period out (ROADMAP Task 248). A LIGHTNING BOLT, which is EPANET's
+	// own Run Analysis mark and the shape already drawn on every mains box and warning plate in the
+	// world -- a real object, not an abstract glyph. Deliberately NOT a second triangle: it sits two
+	// icons from Play in the same group, and two triangles would read as two speeds of the same
+	// command rather than as "work it out" beside "watch it".
+	// Solid, like the four transport marks beside it, so the group reads as one weight; the return
+	// stroke is offset from the outbound one (13 down, 9 up) so the zigzag keeps a visible waist at
+	// 16px instead of closing into a bar.
+	'run'        => '<path d="M13 2L4 14h6l-1 8 9-12h-6z" fill="currentColor" stroke="none"/>',
+
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
 	// version of that." Two interlocking horizontal capsules — a chain link lying flat, which is
