@@ -1586,7 +1586,7 @@ $ec_lang['lpn_inp_drop_valve']='These valves are described by a curve or by a fi
 $ec_lang['lpn_inp_drop_cv']='In EPANET these pipes let water pass in one direction only. They came in as ordinary pipes, so water may now flow either way through them.';
 $ec_lang['lpn_inp_drop_demands']='These junctions had more than one demand. The demands were added together into the single demand this page holds.';
 $ec_lang['lpn_inp_drop_patterns']='Demand patterns were left out. This page solves one moment in time, so every demand is the number written in the file.';
-$ec_lang['lpn_inp_drop_demand_pattern']='These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file\'s number multiplied by the pattern\'s first value — the same number EPANET shows at the start of its run.';
+$ec_lang['lpn_inp_drop_demand_pattern']='These junctions change their demand through the day. Their patterns came in whole, and the demand you see is the one for the moment the clock is showing.';
 $ec_lang['lpn_inp_drop_emitters']='These junctions have a sprinkler or leak coefficient. It was kept and it is being solved, but there is nowhere on this page to see it or change it yet.';
 $ec_lang['lpn_inp_drop_curve_long']='This pump curve had more than three points. Its lowest, middle and highest points were kept, because this page fits a curve to three points at most.';
 $ec_lang['lpn_inp_drop_curve_missing']='This pump names a curve that is not in the file. It came in with no curve, so it adds no head.';
@@ -2207,7 +2207,6 @@ $ec_lang['lpn_time_report_step']='Report time step';
 $ec_lang['lpn_time_report_start']='Report start time';
 $ec_lang['lpn_time_clock_start']='Clock time at the start';
 $ec_lang['lpn_time_format_tip']='Write a time as hours and minutes, like 2:30. A plain number means hours; a number with its own word means that word: 30 minutes.';
-$ec_lang['lpn_time_steady']='This network is worked out at one moment. Give it a total run time above zero and it runs over time instead.';
 $ec_lang['lpn_time_running']='Working out the whole time period with the EPANET engine.';
 $ec_lang['lpn_time_no_engine']='The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET engine, which runs the whole period.';
 $ec_lang['lpn_time_slider']='Time';
@@ -2219,6 +2218,8 @@ $ec_lang['lpn_time_next']='Step forward';
 $ec_lang['lpn_time_last']='Go to the end';
 $ec_lang['lpn_time_tank']='Tank';
 $ec_lang['lpn_time_level']='Water level';
+$ec_lang['lpn_time_speed']='Speed';
+$ec_lang['lpn_time_speed_tip']='How fast the run plays back.';
 
 // ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
 // One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,

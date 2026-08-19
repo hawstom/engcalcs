@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "zh",
-        "expected_key_count": 1161,
-        "delta_key_count": 165,
+        "expected_key_count": 1162,
+        "delta_key_count": 166,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -507,7 +507,7 @@
         "lpn_status_inp_exported": "Exported {file}.",
         "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
         "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
-        "lpn_inp_drop_demand_pattern": "These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file's number multiplied by the pattern's first value — the same number EPANET shows at the start of its run.",
+        "lpn_inp_drop_demand_pattern": "These junctions change their demand through the day. Their patterns came in whole, and the demand you see is the one for the moment the clock is showing.",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -531,7 +531,6 @@
         "lpn_time_report_start": "Report start time",
         "lpn_time_clock_start": "Clock time at the start",
         "lpn_time_format_tip": "Write a time as hours and minutes, like 2:30. A plain number means hours; a number with its own word means that word: 30 minutes.",
-        "lpn_time_steady": "This network is worked out at one moment. Give it a total run time above zero and it runs over time instead.",
         "lpn_time_running": "Working out the whole time period with the EPANET engine.",
         "lpn_time_no_engine": "The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET engine, which runs the whole period.",
         "lpn_time_slider": "Time",
@@ -543,6 +542,8 @@
         "lpn_time_last": "Go to the end",
         "lpn_time_tank": "Tank",
         "lpn_time_level": "Water level",
+        "lpn_time_speed": "Speed",
+        "lpn_time_speed_tip": "How fast the run plays back.",
         "lpn_settings_search": "Search settings",
         "lpn_settings_search_tip": "Type a word to see only the settings that mention it. The explanations are searched too, not just the names.",
         "lpn_settings_no_match": "No setting mentions that word.",
@@ -674,7 +675,7 @@
         "lpn_status_inp_exported": "Exported {file}.",
         "lpn_inp_export_differences": "{n} things could not be written in EPANET's language.",
         "lpn_inp_export_refused": "This project cannot be written as an EPANET file: {detail}",
-        "lpn_inp_drop_demand_pattern": "These junctions change their demand through the day. This page solves one moment, the start of that day, so each demand here is the file's number multiplied by the pattern's first value — the same number EPANET shows at the start of its run.",
+        "lpn_inp_drop_demand_pattern": "These junctions change their demand through the day. Their patterns came in whole, and the demand you see is the one for the moment the clock is showing.",
         "lpn_valve_type_pbv": "Pressure breaker (PBV)",
         "lpn_valve_type_gpv": "General purpose (GPV)",
         "lpn_field_valve_setting_drop": "Pressure drop",
@@ -698,7 +699,6 @@
         "lpn_time_report_start": "Report start time",
         "lpn_time_clock_start": "Clock time at the start",
         "lpn_time_format_tip": "Write a time as hours and minutes, like 2:30. A plain number means hours; a number with its own word means that word: 30 minutes.",
-        "lpn_time_steady": "This network is worked out at one moment. Give it a total run time above zero and it runs over time instead.",
         "lpn_time_running": "Working out the whole time period with the EPANET engine.",
         "lpn_time_no_engine": "The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET engine, which runs the whole period.",
         "lpn_time_slider": "Time",
@@ -710,6 +710,8 @@
         "lpn_time_last": "Go to the end",
         "lpn_time_tank": "Tank",
         "lpn_time_level": "Water level",
+        "lpn_time_speed": "Speed",
+        "lpn_time_speed_tip": "How fast the run plays back.",
         "lpn_settings_search": "Search settings",
         "lpn_settings_search_tip": "Type a word to see only the settings that mention it. The explanations are searched too, not just the names.",
         "lpn_settings_no_match": "No setting mentions that word.",
@@ -3033,18 +3035,6 @@
                 "next_translated": null
             }
         },
-        "lpn_time_steady": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_confirm_wipe",
-                    "value": "删除为本页面保存的全部内容——每个项目、每张背景图片、所有设置以及您的单位选择——并按全新访问者所见的样子重新加载页面？此操作无法撤销。",
-                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
-                },
-                "next_translated": null
-            }
-        },
         "lpn_time_running": {
             "reason": "missing",
             "current_value": null,
@@ -3166,6 +3156,30 @@
             }
         },
         "lpn_time_level": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "删除为本页面保存的全部内容——每个项目、每张背景图片、所有设置以及您的单位选择——并按全新访问者所见的样子重新加载页面？此操作无法撤销。",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_speed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "删除为本页面保存的全部内容——每个项目、每张背景图片、所有设置以及您的单位选择——并按全新访问者所见的样子重新加载页面？此操作无法撤销。",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_speed_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

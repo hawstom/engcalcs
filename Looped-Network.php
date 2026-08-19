@@ -779,7 +779,6 @@ EngCalcs.pageConfig = {
 	lpn_time_report_start: <?=json_encode($ec_lang['lpn_time_report_start'])?>,
 	lpn_time_clock_start: <?=json_encode($ec_lang['lpn_time_clock_start'])?>,
 	lpn_time_format_tip: <?=json_encode($ec_lang['lpn_time_format_tip'])?>,
-	lpn_time_steady: <?=json_encode($ec_lang['lpn_time_steady'])?>,
 	lpn_time_running: <?=json_encode($ec_lang['lpn_time_running'])?>,
 	lpn_time_no_engine: <?=json_encode($ec_lang['lpn_time_no_engine'])?>,
 	lpn_time_slider: <?=json_encode($ec_lang['lpn_time_slider'])?>,
@@ -791,6 +790,8 @@ EngCalcs.pageConfig = {
 	lpn_time_last: <?=json_encode($ec_lang['lpn_time_last'])?>,
 	lpn_time_tank: <?=json_encode($ec_lang['lpn_time_tank'])?>,
 	lpn_time_level: <?=json_encode($ec_lang['lpn_time_level'])?>,
+	lpn_time_speed: <?=json_encode($ec_lang['lpn_time_speed'])?>,
+	lpn_time_speed_tip: <?=json_encode($ec_lang['lpn_time_speed_tip'])?>,
 <?php   // The Settings box (Task 441). Four of its five strings are borrowed from controls that
         // already existed and are supplied elsewhere in this block; these are the ones it added. ?>
 	lpn_settings_search: <?=json_encode($ec_lang['lpn_settings_search'])?>,

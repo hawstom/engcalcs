@@ -246,8 +246,8 @@
 		// they stay invisible to the one check that stops a visitor seeing "undefined".
 		var pc = pageConfig;
 		return {
-			speed: pc.lpn_time_speed || 'Speed',
-			speedTip: pc.lpn_time_speed_tip || 'How fast the run plays back.',
+			speed: pageConfig.lpn_time_speed,
+			speedTip: pageConfig.lpn_time_speed_tip,
 			duration: pageConfig.lpn_time_duration || 'Total run time',
 			hydraulicStep: pageConfig.lpn_time_hyd_step || 'Hydraulic time step',
 			patternStep: pageConfig.lpn_time_pattern_step || 'Pattern time step',
