@@ -17,6 +17,7 @@ const ROOT = path.resolve(__dirname, '..', '..');
 const src = fs.readFileSync(path.join(ROOT, 'js', 'looped-network.js'), 'utf8');
 const lib = fs.readFileSync(path.join(ROOT, 'js', 'Calculators.lib.js'), 'utf8');
 const en = fs.readFileSync(path.join(ROOT, 'lib', 'lang.ec.en.php'), 'utf8');
+const icons = fs.readFileSync(path.join(ROOT, 'lib', 'Icons.lib.php'), 'utf8');
 
 let checks = 0, failures = 0;
 function report(ok, label, detail) {
@@ -102,11 +103,16 @@ console.log('\n-- the time transport on the strip --');
 	// controls at all times even if there is only one time step"). lpnReportTimes() never returns an
 	// empty list, so the mount has nothing to test and must not grow a test.
 	report(!/lpnTimeIsExtended/.test(mount), 'and nothing in the mount asks whether the network runs over time');
-	// The pending icon geometry must never SHADOW lib/Icons.lib.php: registered only where the PHP
-	// set has nothing, so moving the four shapes into that file changes nothing on screen and this
-	// block simply becomes dead.
-	report(/if \(!EC\.icons\[k\]\)/.test(fnBody(t, 'registerPendingIcons')),
-		'the four transport shapes yield to lib/Icons.lib.php the moment it carries them');
+	// **THE TRANSPORT GLYPHS CAME HOME.** They were briefly registered from js/lpn-time.js, only
+	// where lib/Icons.lib.php had nothing, because a toolbar button with no <svg> fails the browser
+	// pass and the feature could not ship dark while they were being drawn. They landed the same day,
+	// so the rule now is the plain one every other icon obeys: geometry lives in the PHP set and
+	// nowhere else.
+	report(!/PENDING_ICONS|registerPendingIcons/.test(t),
+		'js/lpn-time.js registers no icon of its own — the PHP set is the only source');
+	['play', 'pause', 'step-back', 'step-fwd'].forEach(function (name) {
+		report(new RegExp("'" + name + "'\\s*=>").test(icons), name + ' is in lib/Icons.lib.php', '');
+	});
 }
 
 console.log('\n-- the Help list is DERIVED from the strip --');

@@ -534,25 +534,11 @@
 	// says what there is to say, and Play on a single step is a no-op by arithmetic rather than by a
 	// greyed-out button (see play(), which needs two stops before it starts a timer).
 
-	// **THESE FOUR SHAPES BELONG IN lib/Icons.lib.php, AND ARE HERE ONLY UNTIL SOMEBODY MOVES THEM.**
-	// That file is the suite's single source for icon geometry and its own header says never to
-	// redraw a path in JS, which is right: two drawings of one shape drift. This is not a second
-	// drawing -- the set carries no transport glyph at all -- and each is registered ONLY IF ABSENT,
-	// so the PHP set wins the instant it carries them and this whole block can be deleted with
-	// nothing changing on screen. Solid rather than stroked, like 'select' and the junction node: a
-	// hollow play triangle reads as an outline shape rather than as the button every media player
-	// has had for fifty years.
-	var PENDING_ICONS = {
-		'play': '<path d="M8 4.5l12 7.5-12 7.5z" fill="currentColor" stroke="none"/>',
-		'pause': '<path d="M8 5h3v14H8zM13 5h3v14h-3z" fill="currentColor" stroke="none"/>',
-		'step-back': '<path d="M5 5h2.5v14H5z" fill="currentColor" stroke="none"/><path d="M20 5l-10 7 10 7z" fill="currentColor" stroke="none"/>',
-		'step-fwd': '<path d="M16.5 5H19v14h-2.5z" fill="currentColor" stroke="none"/><path d="M4 5l10 7-10 7z" fill="currentColor" stroke="none"/>'
-	};
-	function registerPendingIcons() {
-		var k;
-		EC.icons = EC.icons || {};
-		for (k in PENDING_ICONS) { if (!EC.icons[k]) { EC.icons[k] = PENDING_ICONS[k]; } }
-	}
+	// **THE TRANSPORT GLYPHS LIVE IN lib/Icons.lib.php**, like every other icon in the suite.
+	// They were briefly registered from here, only-if-absent, because a toolbar button with no
+	// <svg> fails the browser pass and the feature could not ship dark while they were drawn.
+	// They landed the same day and that block is gone; `play`, `pause`, `step-back` and
+	// `step-fwd` come from the PHP set now, and nothing here registers an icon.
 
 	// The five controls, once built. They are rebuilt only when wireToolbar() rebuilds the whole
 	// strip; every state change after that goes through renderTransport(), which UPDATES them.
@@ -589,7 +575,6 @@
 	EC.lpnTimeMountToolbar = function (container, iconLabel) {
 		var S = strings(), name;
 		if (!container) { return; }
-		registerPendingIcons();
 		name = iconLabel || function (el2, icon, n, tip) { EC.setIconLabel(el2, icon, n, tip); };
 		function btn(icon, label, fn) {
 			var b = document.createElement('button');
