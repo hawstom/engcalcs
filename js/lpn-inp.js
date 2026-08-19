@@ -799,14 +799,12 @@
 			if (name === 'VALVES') { return; }
 			if (seen[name]) { drop(REPORTABLE[name], [], seen[name]); }
 		});
-		// **STILL REPORTED, AND ON PURPOSE.** [TIMES] is read now, but a solve is still one moment,
-		// so a file with a duration really does describe more than this page shows. The report goes
-		// when the RUN does, not when the reader does -- and it is what keeps
-		// dev/lpn-spike/validate_inp.js from comparing our t=0 against an EPANET t=0 that has
-		// already applied its patterns.
-		if (times && times.duration > 0) {
-			drop('extended-period', [], EngCalcs.lpnTimeText(times, 'duration', times.duration));
-		}
+		// **NO LONGER REPORTED: the run landed** (Task 248, 2026-08-18). The sentence said a file with
+		// a duration describes more than this page shows, and it was true for exactly as long as a
+		// solve was one moment. `js/lpn-time.js` now runs the whole period through the EPANET engine
+		// and the map follows the clock, so keeping the line would be telling the user we dropped
+		// something we did not. The `extended-period` case stays in inpDropText() for reports saved
+		// before today.
 
 		var backdrop = null;
 		rows = rawSections.BACKDROP || [];

@@ -43,11 +43,18 @@ exports.run = async function ({ browser, report }) {
 		report.ok(opened, 'the examples gallery offers Net3');
 		await a.settle(1500);
 
+		// **THE PANE HAS TO BE OPEN FIRST.** Its tab strip and panels are built when it opens, so
+		// clicking a tab id while it is closed reaches nothing — which is what a spec that only
+		// clicked the tab discovered, as three failures that looked like a missing feature.
+		await a.toolbarClick('Bottom panel');
+		await a.settle(500);
 		await a.page.evaluate(() => {
 			const b = document.getElementById('lpn_pane_tab_time');
 			if (b) { b.click(); }
 		});
 		await a.settle(600);
+		report.ok(await a.page.evaluate(() => !!document.getElementById('lpn_pane_time')),
+			'the pane offers a Time tab');
 
 		// ---- 1. the settings, and the file's own text ----
 		const fields = await a.page.evaluate(() =>
@@ -103,13 +110,28 @@ exports.run = async function ({ browser, report }) {
 		// **THE DOCUMENT IS NOT TOUCHED BY A RUN.** A tank's stored level is the user's initial
 		// condition; the level at hour 12 is a result. If the run has written one into the other,
 		// re-opening the file would start the network somewhere it never was.
+		// **THE OPEN project, found through the index** — `Object.keys(localStorage).find(/^lpn_project/)`
+		// returns whichever key the browser happens to enumerate first, which is the empty tab this
+		// session opened with; the check then read three tanks out of a network that has none and
+		// failed with an empty string that looked exactly like a write-back.
+		// A tank's level is `_level`, not `level`: it is scenario-overridable, so it carries the
+		// leading underscore effective() reads through.
 		const stored = await a.page.evaluate(() => {
-			const raw = localStorage.getItem(Object.keys(localStorage).find(k => /^lpn_project/.test(k)));
+			const idx = JSON.parse(localStorage.getItem('lpn_index') || 'null');
+			if (!idx || !idx.openId) { return null; }
+			const raw = localStorage.getItem('lpn_project_' + idx.openId);
 			if (!raw) { return null; }
-			return JSON.parse(raw).nodes.filter(n => n.type === 'tank').map(n => n.level).join(',');
+			return JSON.parse(raw).nodes.filter(n => n.type === 'tank')
+				.map(n => (n._level === undefined ? '?' : n._level)).join(',');
 		});
-		report.ok(stored === null || /^13\.1|^13,|13\.1/.test(stored) || stored.split(',').length === 3,
-			'the stored tank levels are still the ones the file states', String(stored));
+		// Compared as NUMBERS. The readout prints 13.10 and the document holds 13.1 — the same level,
+		// two decimals apart, and a string comparison calls that a write-back.
+		const num = (t) => (t || '').match(/-?\d+(?:\.\d+)?/g).map(Number);
+		const same = stored !== null &&
+			num(stored).length === num(t0.tanks).length / 2 - 0 &&
+			num(stored).every((v, i) => Math.abs(v - num(t0.tanks).filter((_, k) => k % 2 === 1)[i]) < 1e-9);
+		report.ok(same, 'the stored tank levels are still the ones the run STARTED from',
+			String(stored) + '  vs start ' + t0.tanks);
 	} finally {
 		await a.close();
 	}

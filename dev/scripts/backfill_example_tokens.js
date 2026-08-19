@@ -98,6 +98,28 @@ PAIRS.forEach(function (pair) {
 
 	const raw = fs.readFileSync(jsonPath, 'utf8');
 	const ex = JSON.parse(raw);
+	// **THE CLOCK, for the same reason as the tokens** (Task 248). These examples were authored
+	// before `[PATTERNS]`, `[TIMES]` and `[CONTROLS]` were read, so the shipped Net3 opened with a
+	// duration of zero and no patterns -- the one network in the gallery that has a real 24-hour day
+	// in it could not demonstrate the run. Carried from a fresh import of the same `.inp`; a project
+	// that already has a clock is left alone.
+	var clockAdded = [];
+	['patterns', 'defaultPattern', 'times', 'controls'].forEach(function (k) {
+		var v = fresh[k];
+		var empty = v === undefined || v === null || (Array.isArray(v) && !v.length);
+		var have = ex[k] !== undefined && ex[k] !== null && !(Array.isArray(ex[k]) && !ex[k].length);
+		if (empty || have) { return; }
+		ex[k] = v;
+		clockAdded.push(k + (Array.isArray(v) ? '[' + v.length + ']' : ''));
+	});
+	// A junction's own pattern column is part of the same record and is per element.
+	var freshPat = {};
+	fresh.nodes.forEach(function (n) { if (n.demandPattern) { freshPat[n.id] = n.demandPattern; } });
+	var patNodes = 0;
+	(ex.nodes || []).forEach(function (n) {
+		if (freshPat[n.id] && !n.demandPattern) { n.demandPattern = freshPat[n.id]; patNodes++; }
+	});
+	if (patNodes) { clockAdded.push('demandPattern x' + patNodes); }
 	let added = 0, already = 0, unmatched = 0;
 	function merge(target, key) {
 		const t = bag[key];
@@ -114,9 +136,10 @@ PAIRS.forEach(function (pair) {
 	});
 
 	console.log(name + ': ' + added + ' bags added, ' + already + ' already present, ' +
-		unmatched + ' elements with no token in the source');
-	totalAdded += added;
-	if (!added) { return; }
+		unmatched + ' elements with no token in the source' +
+		(clockAdded.length ? '; clock: ' + clockAdded.join(', ') : ''));
+	totalAdded += added + clockAdded.length;
+	if (!added && !clockAdded.length) { return; }
 	if (!APPLY) { return; }
 	// **THE SAME SHAPE THE FILE ALREADY HAD** -- TAB indent, and a trailing newline only if the
 	// committed file had one. Re-serialising with a different indent would make a 2,500-line diff out

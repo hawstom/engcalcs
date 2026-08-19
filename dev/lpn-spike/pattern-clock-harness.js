@@ -269,13 +269,16 @@ function codes(p) { return p.dropped.map((d) => d.code); }
 		JSON.stringify(net3.dropped.filter((d) => d.code === code)));
 	ok('Net1 no longer reports [' + code.toUpperCase() + '] as dropped', codes(net1).indexOf(code) < 0);
 });
-// [TIMES] IS READ AND STILL REPORTED, and the difference between those two is the point. Nothing
-// runs over time yet, so a 24-hour file really does describe more than this page shows; the report
-// goes when the RUN lands, not when the reader does. Asserted so that removing it is a decision.
-ok('a duration is still reported, because nothing runs over time yet',
-	codes(net3).indexOf('extended-period') >= 0);
-ok('...quoting the file\'s own text',
-	(net3.dropped.filter((d) => d.code === 'extended-period')[0] || {}).detail === '24:00');
+// **THE RUN LANDED, so [TIMES] is no longer reported as dropped** (Task 248, 2026-08-18). This
+// assertion used to say the opposite, deliberately, so that removing the report would be a decision
+// somebody made rather than a line that quietly went away. It was a decision: js/lpn-time.js runs
+// the whole period through the EPANET engine and the map follows the clock, so a sentence saying we
+// dropped the duration would now be telling the user something untrue.
+ok('a duration is NO LONGER reported, because the run landed',
+	codes(net3).indexOf('extended-period') < 0,
+	JSON.stringify(net3.dropped.filter((d) => d.code === 'extended-period')));
+ok('...and [TIMES] still arrives, quoting the file\'s own text',
+	EngCalcs.lpnTimeText(net3.times, 'duration', net3.times.duration) === '24:00');
 // [RULES] stays out of scope, by name.
 ok('rule-based controls are still reported when a file has them',
 	EngCalcs.lpnInpParse(

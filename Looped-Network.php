@@ -640,6 +640,28 @@ EngCalcs.pageConfig = {
 	lpn_pane_tab_junctions_tip: <?=json_encode($ec_lang['lpn_pane_tab_junctions_tip'])?>,
 	lpn_pane_junctions_none: <?=json_encode($ec_lang['lpn_pane_junctions_none'])?>,
 	lpn_pane_sort_tip: <?=json_encode($ec_lang['lpn_pane_sort_tip'])?>,
+	lpn_time_menu: <?=json_encode($ec_lang['lpn_time_menu'])?>,
+	lpn_time_menu_tip: <?=json_encode($ec_lang['lpn_time_menu_tip'])?>,
+	lpn_time_duration: <?=json_encode($ec_lang['lpn_time_duration'])?>,
+	lpn_time_hyd_step: <?=json_encode($ec_lang['lpn_time_hyd_step'])?>,
+	lpn_time_pattern_step: <?=json_encode($ec_lang['lpn_time_pattern_step'])?>,
+	lpn_time_pattern_start: <?=json_encode($ec_lang['lpn_time_pattern_start'])?>,
+	lpn_time_report_step: <?=json_encode($ec_lang['lpn_time_report_step'])?>,
+	lpn_time_report_start: <?=json_encode($ec_lang['lpn_time_report_start'])?>,
+	lpn_time_clock_start: <?=json_encode($ec_lang['lpn_time_clock_start'])?>,
+	lpn_time_format_tip: <?=json_encode($ec_lang['lpn_time_format_tip'])?>,
+	lpn_time_steady: <?=json_encode($ec_lang['lpn_time_steady'])?>,
+	lpn_time_running: <?=json_encode($ec_lang['lpn_time_running'])?>,
+	lpn_time_no_engine: <?=json_encode($ec_lang['lpn_time_no_engine'])?>,
+	lpn_time_slider: <?=json_encode($ec_lang['lpn_time_slider'])?>,
+	lpn_time_first: <?=json_encode($ec_lang['lpn_time_first'])?>,
+	lpn_time_prev: <?=json_encode($ec_lang['lpn_time_prev'])?>,
+	lpn_time_play: <?=json_encode($ec_lang['lpn_time_play'])?>,
+	lpn_time_pause: <?=json_encode($ec_lang['lpn_time_pause'])?>,
+	lpn_time_next: <?=json_encode($ec_lang['lpn_time_next'])?>,
+	lpn_time_last: <?=json_encode($ec_lang['lpn_time_last'])?>,
+	lpn_time_tank: <?=json_encode($ec_lang['lpn_time_tank'])?>,
+	lpn_time_level: <?=json_encode($ec_lang['lpn_time_level'])?>,
 	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
 	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and
@@ -1097,6 +1119,11 @@ EngCalcs.pageConfig = {
       // the difference between importing a pattern and reporting that one was dropped. ?>
 <script src="/engcalcs/js/lpn-patterns.js?v=<?=filemtime(__DIR__.'/js/lpn-patterns.js')?>"></script>
 <script src="/engcalcs/js/lpn-inp.js?v=<?=filemtime(__DIR__.'/js/lpn-inp.js')?>"></script>
+<?php // The clock's RUN half (ROADMAP Task 248). AFTER lpn-patterns.js, which it reads for
+      // lpnParseTime, lpnTimeText and lpnTimesDefaults; BEFORE looped-network.js, which calls
+      // EngCalcs.lpnTimeInit() at script scope to register its own bottom-pane tab. Get this
+      // order wrong and the Time tab simply never appears, silently. ?>
+<script src="/engcalcs/js/lpn-time.js?v=<?=filemtime(__DIR__.'/js/lpn-time.js')?>"></script>
 <script src="/engcalcs/js/lpn-net.js?v=<?=filemtime(__DIR__.'/js/lpn-net.js')?>"></script>
 <?php // The pure geometry/collision halves of the map editor (ROADMAP Task 293) -- must precede
       // looped-network.js, which reads EngCalcs.lpnGeom/lpnCollide as it defines itself. ?>

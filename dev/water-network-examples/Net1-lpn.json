@@ -484,5 +484,83 @@
 		"lpn_u_flow": "gpm",
 		"lpn_u_velocity": "ftps",
 		"lpn_u_gradient": "gradePercent"
-	}
+	},
+	"patterns": [
+		{
+			"id": "1",
+			"multipliers": [
+				1,
+				1.2,
+				1.4,
+				1.6,
+				1.4,
+				1.2,
+				1,
+				0.8,
+				0.6,
+				0.4,
+				0.6,
+				0.8
+			],
+			"tok": {
+				"m0": "1.0",
+				"m6": "1.0"
+			}
+		}
+	],
+	"defaultPattern": "1",
+	"times": {
+		"duration": 86400,
+		"hydraulicStep": 3600,
+		"patternStep": 7200,
+		"patternStart": 0,
+		"reportStep": 3600,
+		"reportStart": 0,
+		"startClock": 0,
+		"text": {
+			"duration": "24:00",
+			"hydraulicStep": "1:00",
+			"patternStep": "2:00",
+			"patternStart": "0:00",
+			"reportStep": "1:00",
+			"reportStart": "0:00",
+			"startClock": "12 am"
+		}
+	},
+	"controls": [
+		{
+			"link": "9",
+			"raw": "LINK 9 OPEN IF NODE 2 BELOW 110",
+			"action": {
+				"status": "open"
+			},
+			"condition": {
+				"kind": "node",
+				"node": "2",
+				"cmp": "below",
+				"value": 110,
+				"unit": "head"
+			},
+			"text": {
+				"value": "110"
+			}
+		},
+		{
+			"link": "9",
+			"raw": "LINK 9 CLOSED IF NODE 2 ABOVE 140",
+			"action": {
+				"status": "closed"
+			},
+			"condition": {
+				"kind": "node",
+				"node": "2",
+				"cmp": "above",
+				"value": 140,
+				"unit": "head"
+			},
+			"text": {
+				"value": "140"
+			}
+		}
+	]
 }
