@@ -629,7 +629,7 @@ $ec_lang['lpn_tool_zoom_extent']='Zobrazit vše';
 $ec_lang['lpn_new_text']='Text';
 $ec_lang['lpn_field_text_bold']='Tučný text';
 $ec_lang['lpn_field_text_rotation']='Úhel (stupně)';
-$ec_lang['lpn_field_text_match_pipe']='Podle nejbližšího spoje';
+$ec_lang['lpn_field_text_match_pipe']='Otočit na úhel nejbližšího spoje';
 $ec_lang['lpn_field_text_flip']='Otočit o 180°';
 $ec_lang['lpn_field_elev']='Nadmořská výška';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
@@ -1392,7 +1392,7 @@ $ec_lang['lpn_time_pattern_start']='Počáteční čas vzorce';
 $ec_lang['lpn_time_report_step']='Časový krok výstupu';
 $ec_lang['lpn_time_report_start']='Počáteční čas výstupu';
 $ec_lang['lpn_time_clock_start']='Čas na hodinách na začátku';
-$ec_lang['lpn_time_format_tip']='Zapište čas jako hodiny a minuty, například 2:30. Prosté číslo znamená hodiny; číslo s vlastním slovem znamená to slovo: 30 minut.';
+$ec_lang['lpn_time_format_tip']='Zapište čas jako hodiny a minuty, například 2:30. Prosté číslo znamená hodiny, takže 8 je osm hodin. Půl hodiny je 0:30.';
 $ec_lang['lpn_time_running']='Počítá se celé časové období pomocí řešiče EPANET.';
 $ec_lang['lpn_time_no_engine']='Vestavěný řešič počítá vždy jen jeden okamžik, takže toto je síť pouze v čase {time}: odběry nesou násobitele vzorce pro tento okamžik a každá nádrž zůstává na své počáteční hladině místo plnění a vyprazdňování. Jednorázovým připojením k internetu stáhnete řešič EPANET, který spočítá celé období.';
 $ec_lang['lpn_time_slider']='Čas';

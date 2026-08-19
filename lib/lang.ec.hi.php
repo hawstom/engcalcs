@@ -630,7 +630,7 @@ $ec_lang['lpn_tool_zoom_extent']='पूरा चित्र दिखाए�
 $ec_lang['lpn_new_text']='टेक्स्ट';
 $ec_lang['lpn_field_text_bold']='मोटा (बोल्ड) टेक्स्ट';
 $ec_lang['lpn_field_text_rotation']='कोण (डिग्री)';
-$ec_lang['lpn_field_text_match_pipe']='निकटतम लिंक से मिलाएँ';
+$ec_lang['lpn_field_text_match_pipe']='निकटतम लिंक के कोण पर घुमाएँ';
 $ec_lang['lpn_field_text_flip']='180° घुमाएँ';
 $ec_lang['lpn_field_elev']='स्तर';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
@@ -1404,7 +1404,7 @@ $ec_lang['lpn_time_pattern_start']='प्रतिरूप आरंभ सम
 $ec_lang['lpn_time_report_step']='रिपोर्ट समय चरण';
 $ec_lang['lpn_time_report_start']='रिपोर्ट आरंभ समय';
 $ec_lang['lpn_time_clock_start']='आरंभ पर घड़ी का समय';
-$ec_lang['lpn_time_format_tip']='समय को घंटे और मिनट के रूप में लिखें, जैसे 2:30। एक सादी संख्या का अर्थ घंटे है; अपने शब्द के साथ लिखी संख्या का अर्थ वही शब्द है: 30 मिनट।';
+$ec_lang['lpn_time_format_tip']='समय को घंटे और मिनट के रूप में लिखें, जैसे 2:30। एक सादी संख्या का अर्थ घंटे है, इसलिए 8 का अर्थ है आठ घंटे। आधा घंटा 0:30 है।';
 $ec_lang['lpn_time_running']='EPANET सॉल्वर के साथ पूरी समय अवधि की गणना की जा रही है।';
 $ec_lang['lpn_time_no_engine']='बिल्ट-इन सॉल्वर एक समय में केवल एक क्षण हल करता है, इसलिए यह केवल {time} पर नेटवर्क है: माँगें उस क्षण के प्रतिरूप गुणकों को लेती हैं, और हर टैंक अभी भी भरने और खाली होने के बजाय अपने आरंभिक स्तर पर बना रहता है। पूरी अवधि चलाने वाले EPANET सॉल्वर को लाने के लिए एक बार इंटरनेट से जुड़ें।';
 $ec_lang['lpn_time_slider']='समय';

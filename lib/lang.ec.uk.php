@@ -630,7 +630,7 @@ $ec_lang['lpn_tool_zoom_extent']='Показати все';
 $ec_lang['lpn_new_text']='Текст';
 $ec_lang['lpn_field_text_bold']='Жирний текст';
 $ec_lang['lpn_field_text_rotation']='Кут (градуси)';
-$ec_lang['lpn_field_text_match_pipe']='Узгодити з найближчим з\'єднанням';
+$ec_lang['lpn_field_text_match_pipe']='Повернути на кут найближчого з\'єднання';
 $ec_lang['lpn_field_text_flip']='Повернути на 180°';
 $ec_lang['lpn_field_elev']='Відмітка';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
@@ -1401,7 +1401,7 @@ $ec_lang['lpn_time_pattern_start']='Час початку графіка';
 $ec_lang['lpn_time_report_step']='Крок часу звіту';
 $ec_lang['lpn_time_report_start']='Час початку звіту';
 $ec_lang['lpn_time_clock_start']='Час на годиннику на початку';
-$ec_lang['lpn_time_format_tip']='Записуйте час як години та хвилини, наприклад 2:30. Просте число означає години; число зі своїм словом означає це слово: 30 minutes.';
+$ec_lang['lpn_time_format_tip']='Записуйте час як години і хвилини, наприклад 2:30. Просте число означає години, тож 8 — це вісім годин. Півгодини — це 0:30.';
 $ec_lang['lpn_time_running']='Обчислення всього періоду часу розв\'язувачем EPANET.';
 $ec_lang['lpn_time_no_engine']='Вбудований розв\'язувач обчислює по одному моменту часу, тож це мережа лише на {time}: витрати містять множники графіка для цього моменту, а кожна ємність досі перебуває на початковому рівні, а не заповнюється чи спорожняється. Підключіться до інтернету один раз, щоб завантажити розв\'язувач EPANET, який розраховує весь період.';
 $ec_lang['lpn_time_slider']='Час';

@@ -632,7 +632,7 @@ $ec_lang['lpn_tool_zoom_extent']='Tümünü göster';
 $ec_lang['lpn_new_text']='Metin';
 $ec_lang['lpn_field_text_bold']='Kalın metin';
 $ec_lang['lpn_field_text_rotation']='Açı (derece)';
-$ec_lang['lpn_field_text_match_pipe']='En yakın hatla eşleştir';
+$ec_lang['lpn_field_text_match_pipe']='En yakın hattın açısına dönün';
 $ec_lang['lpn_field_text_flip']='180° döndür';
 $ec_lang['lpn_field_elev']='Kot';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
@@ -1397,7 +1397,7 @@ $ec_lang['lpn_time_pattern_start']='Desen başlangıç zamanı';
 $ec_lang['lpn_time_report_step']='Rapor zaman adımı';
 $ec_lang['lpn_time_report_start']='Rapor başlangıç zamanı';
 $ec_lang['lpn_time_clock_start']='Başlangıçtaki saat';
-$ec_lang['lpn_time_format_tip']='Bir zamanı saat ve dakika olarak yazın, 2:30 gibi. Düz bir sayı saat anlamına gelir; kendi sözcüğü olan bir sayı o sözcük anlamına gelir: 30 dakika.';
+$ec_lang['lpn_time_format_tip']='Bir zamanı saat ve dakika olarak yazın, örneğin 2:30. Düz bir sayı saat anlamına gelir; yani 8, sekiz saattir. Yarım saat 0:30 olarak yazılır.';
 $ec_lang['lpn_time_running']='Tüm zaman dilimi EPANET çözücüsüyle hesaplanıyor.';
 $ec_lang['lpn_time_no_engine']='Yerleşik çözücü aynı anda yalnızca bir anı hesaplar, bu yüzden bu, yalnızca {time} anındaki şebekedir: talepler o anın desen çarpanlarını taşır ve her depo, dolup boşalmak yerine hâlâ başlangıç seviyesindedir. Tüm dönemi çalıştıran EPANET çözücüsünü almak için bir kez internete bağlanın.';
 $ec_lang['lpn_time_slider']='Zaman';

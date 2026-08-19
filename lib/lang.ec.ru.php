@@ -631,7 +631,7 @@ $ec_lang['lpn_tool_zoom_extent']='Показать всё';
 $ec_lang['lpn_new_text']='Текст';
 $ec_lang['lpn_field_text_bold']='Жирный текст';
 $ec_lang['lpn_field_text_rotation']='Угол (градусы)';
-$ec_lang['lpn_field_text_match_pipe']='К ближайшей связи';
+$ec_lang['lpn_field_text_match_pipe']='Повернуть на угол ближайшей трубы';
 $ec_lang['lpn_field_text_flip']='Повернуть на 180°';
 $ec_lang['lpn_field_elev']='Отметка';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
@@ -1395,7 +1395,7 @@ $ec_lang['lpn_time_pattern_start']='Время начала графика по�
 $ec_lang['lpn_time_report_step']='Шаг вывода результатов';
 $ec_lang['lpn_time_report_start']='Время начала вывода результатов';
 $ec_lang['lpn_time_clock_start']='Время на часах в начале';
-$ec_lang['lpn_time_format_tip']='Записывайте время как часы и минуты, например 2:30. Просто число означает часы; число со своим словом означает именно это: 30 минут.';
+$ec_lang['lpn_time_format_tip']='Записывайте время как часы и минуты, например 2:30. Просто число означает часы, поэтому 8 — это восемь часов. Полчаса — это 0:30.';
 $ec_lang['lpn_time_running']='Расчёт всего периода времени расчётным ядром EPANET.';
 $ec_lang['lpn_time_no_engine']='Встроенный решатель рассчитывает сеть только для одного момента времени, поэтому сейчас показана сеть только на {time}: расходы отбора взяты с множителями графика для этого момента, а каждый бак по-прежнему находится на начальном уровне, а не наполняется и не опорожняется. Подключитесь к интернету один раз, чтобы загрузить расчётное ядро EPANET, которое рассчитывает весь период.';
 $ec_lang['lpn_time_slider']='Время';

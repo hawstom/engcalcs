@@ -583,6 +583,13 @@
                 "u_cmh"
             ],
             "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_field_text_match_pipe"
+            ],
+            "reason": "Resynced in all 26 languages after the English was rewritten"
         }
     ],
     "hashes": {
@@ -933,7 +940,7 @@
         "lpn_field_tank_minlevel_tip": "bc6cd434993be72249b8c1d1f0497f116afd0b7c",
         "lpn_field_text_bold": "18cef04f1003bda9a787a537bcb58f9f35251e9b",
         "lpn_field_text_flip": "c75262b76fc51550b63021d38c8fece80a4a1d32",
-        "lpn_field_text_match_pipe": "58b1b788a0b265b7a2d054d41240aafbd6d3b2e4",
+        "lpn_field_text_match_pipe": "d0866628c9d7944af92ed7e084f6a0fccbe2e7f1",
         "lpn_field_text_rotation": "f961efd7f9adc12f7a5a877046e131839f5bfb8d",
         "lpn_field_text_size": "67697a2b9cab2b87b00bba516f257d4351e75dba",
         "lpn_field_valve_diameter_tip": "4029e8c70156f52f01cdfcbdee1946643c6e53da",

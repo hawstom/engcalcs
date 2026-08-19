@@ -630,7 +630,7 @@ $ec_lang['lpn_tool_zoom_extent']='Уклопи у приказ';
 $ec_lang['lpn_new_text']='Текст';
 $ec_lang['lpn_field_text_bold']='Подебљан текст';
 $ec_lang['lpn_field_text_rotation']='Угао (степени)';
-$ec_lang['lpn_field_text_match_pipe']='Прати угао најближе везе';
+$ec_lang['lpn_field_text_match_pipe']='Окрени под угао најближе везе';
 $ec_lang['lpn_field_text_flip']='Заокрени за 180°';
 $ec_lang['lpn_field_elev']='Кота';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
@@ -1391,7 +1391,7 @@ $ec_lang['lpn_time_pattern_start']='Почетно време обрасца';
 $ec_lang['lpn_time_report_step']='Временски корак извештаја';
 $ec_lang['lpn_time_report_start']='Почетно време извештаја';
 $ec_lang['lpn_time_clock_start']='Време на сату на почетку';
-$ec_lang['lpn_time_format_tip']='Упишите време као часове и минуте, на пример 2:30. Обичан број значи часове; број са својом речју значи ту реч: 30 минута.';
+$ec_lang['lpn_time_format_tip']='Упишите време као часове и минуте, на пример 2:30. Обичан број значи часове, тако да 8 значи осам часова. Пола сата је 0:30.';
 $ec_lang['lpn_time_running']='Обрада целог временског периода помоћу EPANET решавача.';
 $ec_lang['lpn_time_no_engine']='Уграђени решавач обрађује по један тренутак, тако да ово приказује мрежу само у тренутку {time}: потрошње носе множиоце обрасца за тај тренутак, а сваки танк и даље стоји на свом почетном нивоу уместо да се пуни и празни. Повежите се једном на интернет да преузмете EPANET решавач, који обрађује цео период.';
 $ec_lang['lpn_time_slider']='Време';

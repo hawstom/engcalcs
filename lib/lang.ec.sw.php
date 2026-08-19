@@ -630,7 +630,7 @@ $ec_lang['lpn_tool_zoom_extent']='Onyesha Yote';
 $ec_lang['lpn_new_text']='Maandishi';
 $ec_lang['lpn_field_text_bold']='Maandishi mazito';
 $ec_lang['lpn_field_text_rotation']='Pembe (nyuzi)';
-$ec_lang['lpn_field_text_match_pipe']='Fuata kiungo cha karibu';
+$ec_lang['lpn_field_text_match_pipe']='Elekeza kulingana na pembe ya kiungo cha karibu';
 $ec_lang['lpn_field_text_flip']='Geuza 180°';
 $ec_lang['lpn_field_elev']='Mwinuko';
 // Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
@@ -1420,7 +1420,7 @@ $ec_lang['lpn_time_pattern_start']='Muda wa kuanzia wa muundo';
 $ec_lang['lpn_time_report_step']='Hatua ya muda ya taarifa';
 $ec_lang['lpn_time_report_start']='Muda wa kuanzia wa taarifa';
 $ec_lang['lpn_time_clock_start']='Saa mwanzoni';
-$ec_lang['lpn_time_format_tip']='Andika muda kama saa na dakika, kwa mfano 2:30. Namba tupu inamaanisha saa; namba yenye neno lake inamaanisha neno hilo: dakika 30.';
+$ec_lang['lpn_time_format_tip']='Andika muda kama saa na dakika, kwa mfano 2:30. Namba peke yake inamaanisha saa, hivyo 8 ni saa nane. Nusu saa ni 0:30.';
 $ec_lang['lpn_time_running']='Inakokotoa kipindi chote cha muda kwa kutumia kitatuzi cha EPANET.';
 $ec_lang['lpn_time_no_engine']='Kitatuzi kilichojengwa ndani hukokotoa wakati mmoja kwa wakati, hivyo huu ni mtandao wa {time} pekee: mahitaji yanabeba vizidishi vya muundo wa wakati huo, na kila tanki bado liko kwenye kiwango chake cha mwanzo badala ya kujaa na kupungua. Unganisha kwenye intaneti mara moja ili kupakua kitatuzi cha EPANET, ambacho huendesha kipindi chote.';
 $ec_lang['lpn_time_slider']='Muda';
