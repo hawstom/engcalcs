@@ -116,6 +116,18 @@ ok('a joined 6AM parses', EngCalcs.lpnParseTime(['6AM']) === 6 * 3600);
 ok('nonsense is null, not zero', EngCalcs.lpnParseTime(['none']) === null);
 ok('nothing is null', EngCalcs.lpnParseTime([]) === null);
 
+// Task 444: a comma decimal is TYPED input only. A file's separator is always a dot, so a comma
+// there is not a decimal and we must not rewrite the user's number by guessing it is one.
+ok('typed 2,5 is two and a half hours', EngCalcs.lpnParseTime(['2,5'], { typed: true }) === 9000);
+ok('...and matches 2.5 exactly',
+	EngCalcs.lpnParseTime(['2,5'], { typed: true }) === EngCalcs.lpnParseTime(['2.5']));
+ok('a comma from a FILE is refused, never read as 2', EngCalcs.lpnParseTime(['2,5']) === null);
+ok('a thousands-shaped comma is refused even typed',
+	EngCalcs.lpnParseTime(['1,234,5'], { typed: true }) === null);
+ok('a comma inside a clock time is refused', EngCalcs.lpnParseTime(['2:30,5'], { typed: true }) === null);
+ok('a comma with an explicit unit still works',
+	EngCalcs.lpnParseTime(['1,5', 'HOURS'], { typed: true }) === 5400);
+
 // The text bag: a time's file text is not a number, so mergeTok can never hold it.
 const T = { duration: 86400, text: { duration: '24:00', startClock: '12 am' } };
 ok('a time keeps the file\'s own text', EngCalcs.lpnTimeText(T, 'duration', 86400) === '24:00');

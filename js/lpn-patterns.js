@@ -196,12 +196,27 @@
 	 * **A BARE NUMBER IS HOURS.** That is EPANET's rule for [TIMES] and for a control's `AT TIME`,
 	 * and it is the one most likely to be assumed to be seconds: `Duration 24` is a day, not
 	 * twenty-four seconds.
+	 *
+	 * **`opts.typed` accepts a COMMA DECIMAL, and only typed input may pass it** (Task 444). One
+	 * function parses both a person's keystrokes and a file's bytes, and the two have opposite
+	 * rules: a `.inp` file's separator is always a dot, so a comma in a file is not a decimal and
+	 * guessing at one would rewrite the user's own number. Typed, `2,5` is two and a half hours to
+	 * most of the world, and `parseFloat` silently stopped at the comma and returned 2 -- half the
+	 * value, with no error, in the field that sizes the whole run.
+	 * Accepted only as `<digits>,<digits>`; every other comma shape returns null so the field
+	 * snaps back rather than the parser guessing between a decimal and a thousands group.
 	 */
-	EC.lpnParseTime = function (tokens) {
-		var toks = [], i, t, parts, v, unit, sec, ampm = null;
+	EC.lpnParseTime = function (tokens, opts) {
+		var toks = [], i, t, parts, v, unit, sec, ampm = null,
+			typed = !!(opts && opts.typed);
 		for (i = 0; i < (tokens || []).length; i++) {
 			t = String(tokens[i] === undefined || tokens[i] === null ? '' : tokens[i]).trim();
-			if (t !== '') { toks.push(t); }
+			if (t === '') { continue; }
+			if (t.indexOf(',') >= 0) {
+				if (!typed || !/^\d+,\d+$/.test(t)) { return null; }
+				t = t.replace(',', '.');
+			}
+			toks.push(t);
 		}
 		if (!toks.length) { return null; }
 

@@ -1157,7 +1157,7 @@
         "lpn_time_report_step": "Report time step",
         "lpn_time_report_start": "Report start time",
         "lpn_time_clock_start": "Clock time at the start",
-        "lpn_time_format_tip": "Write the duration as a number of hours, like 72.5, or hours and minutes, like 72:30.",
+        "lpn_time_format_tip": "Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).",
         "lpn_time_running": "Working out the whole time period with the EPANET solver.",
         "lpn_time_no_engine": "The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs the whole period.",
         "lpn_time_slider": "Time",

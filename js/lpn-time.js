@@ -188,7 +188,7 @@
 		var raw = String(text === undefined || text === null ? '' : text).trim(), sec;
 		if (!times || !(key in times)) { return false; }
 		if (raw === '') { return false; }
-		sec = EC.lpnParseTime(raw.split(/\s+/));
+		sec = EC.lpnParseTime(raw.split(/\s+/), { typed: true });
 		if (sec === null || !isFinite(sec) || sec < 0) { return false; }
 		times[key] = sec;
 		times.text = times.text || {};
@@ -298,7 +298,7 @@
 			reportStep: pageConfig.lpn_time_report_step || 'Report time step',
 			reportStart: pageConfig.lpn_time_report_start || 'Report start time',
 			startClock: pageConfig.lpn_time_clock_start || 'Clock time at the start',
-			formatTip: pageConfig.lpn_time_format_tip || 'Write the duration as a number of hours, like 72.5, or hours and minutes, like 72:30.',
+			formatTip: pageConfig.lpn_time_format_tip || 'Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).',
 			// **THERE IS NO STEADY-STATE MESSAGE.** Tom, 2026-08-18, on the sentence that used to be
 			// here: "'This network is worked out at one moment' is the very string I told you I don't
 			// understand. And I don't think it's needed at all. The transport will always be there,
@@ -687,7 +687,7 @@
 		// The seven inputs live in the Settings box and the play/slider in the pane, and an edit to
 		// the duration changes what both of them say. Rejecting an entry redraws only the fields --
 		// nothing about the run changed, so redrawing the transport would be a flicker for nothing.
-		var probe = EC.lpnParseTime(String(text).trim().split(/\s+/)), times;
+		var probe = EC.lpnParseTime(String(text).trim().split(/\s+/), { typed: true }), times;
 		// Probed BEFORE the snapshot, so text that is not a time costs nothing: an undo step that
 		// undoes nothing is worse than no undo step, because it eats a real one off a 20-deep stack.
 		if (probe === null || !isFinite(probe) || probe < 0) { EC.lpnTimeRenderSettings(); return; }

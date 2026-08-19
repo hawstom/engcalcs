@@ -138,27 +138,14 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 - 65|438| **The next sprint: resync the drifted English and translate 2026-08-18's new keys.** Needs
   Tom's explicit authorization before launch — a sprint is 26 paid agents, 20 concurrent.
-  - **What is in it:** Task 405's four resync keys; `menu_more` ("More" → "Help"); the four XY / lat/lon
+  - **What is in it:** Task 405's four resync keys; `lpn_time_format_tip` (Tom's 2026-08-19 rewording,
+    Task 449); `menu_more` ("More" → "Help"); the four XY / lat/lon
     re-wordings (`lpn_new_geo_us/si`, `lpn_new_blank_us/si`); and roughly thirty new keys from the
     placement tool, Go-to-coordinate, clean map, the `.inp` clock and the share affordance.
   - **Gate: the adversarial Wave 0 over the NEW and CHANGED strings only** —
     `dev/english-friction/438-wave0.json`. `friction_check.php --sprint=438` must exit 0, along with
     `gloss_ref_check.php` and `generate_translation_payloads.php --check`.
   - Close it with `detect_english_drift.php --baseline-new`, or the new keys stay `NEW` forever.
-
-- 60|449| **One tip serves all seven `[TIMES]` fields, and it now says "duration" — which is false of
-  the clock start.** `EC.LPN_TIME_FIELDS` carries seven fields and `js/lpn-time.js:757` gives every
-  one of them the same `lpn_time_format_tip`. Tom's 2026-08-19 wording, "Write the duration as a
-  number of hours, like 72.5, or hours and minutes, like 72:30", is right for six of them and wrong
-  for `startClock` (`lpn_time_clock_start`), which is a TIME OF DAY.
-  - **The irony to preserve:** the earlier wording was rewritten specifically to kill a time-of-day
-    reading, because Amharic and Swahili count hours from dawn. On this one field the time-of-day
-    reading is the CORRECT one — and `lpnParseTime` already accepts `am`/`pm`, which is meaningful
-    only here.
-  - **Cost:** splitting is one new key, absent everywhere else and so falling back to English until a
-    sprint picks it up. Cheap. The alternative — one tip generic enough to be true of both — buys a
-    vaguer sentence on all seven, which is the worse trade.
-  - Tom was told; the wording is HIS call, so do not pick one unilaterally.
 
 - 65|446| **Colouring links recomputes the class breaks ONCE PER LINK, on every zoom notch.** Tom,
   2026-08-19: "Turning on a color for links (but not for nodes) slows zoom performance, and I can't
@@ -186,18 +173,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     in-place framing of Task 436.
   - Two doors, one implementation: the destination project's coordinate kind decides whether the
     wizard runs, not which menu row was used.
-
-- 75|444| **`EC.lpnParseTime` reads `2,5` as 2 hours, silently — and the duration tip now
-  TEACHES a decimal.** Raised from 60 on 2026-08-19: Tom's wording gives `72.5` as the worked
-  example, so a reader in a comma-decimal locale is now actively invited to type `72,5`, which
-  parses as 72 hours. The bug was latent; the tip makes it reachable. `parseFloat` stops at the comma,
-  so a comma-decimal locale gets a wrong duration with no error — half the value, in the one field
-  where being wrong reshapes the whole run. Measured 2026-08-19: `2,5` → 7200 s, `2.5` → 9000 s.
-  Every other accepted form is correct and matches EPANET's own rule (decimal hours or `h:mm`,
-  hours uncapped: `55:00` = 55 h).
-  - **The care this needs: ONE function parses both typed input and `.inp` files** (`js/lpn-patterns.js`
-    line ~336). A file's separator is always a dot, and a file's numbers are the user's — so accept
-    the comma on TYPED input only, or reject it loudly. Never guess between decimal and thousands.
 
 - 45|448| **Colour band limits are recomputed live; Tom's own wording says they should freeze.** He
   wrote, for the note above the limits: *"The limits shown below are static for this project.
