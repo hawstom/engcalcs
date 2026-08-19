@@ -114,22 +114,34 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	//
 	// Asserted on ORDER, which is the whole of the bug: the assignment must precede the measurement
 	// in both branches. A harness cannot measure text, so it cannot catch this any other way.
-	// The two branches now live in different functions: a NODE label is still built inline in
-	// refreshLabelText(), a LINK label moved into renderLinkLabel() when the shed cascade needed one
-	// place to build both the full label and every candidate (Task 399). The invariant is unchanged
-	// and so is this test -- it just has to look where the code is. Searching both sources rather
-	// than naming which is which keeps it true through the next move as well.
-	// refreshLabelTextPass() is the node half's home: refreshLabelText() is now a two-line wrapper
-	// that holds one canvas measurement for the pass (see mapBox()). Both names are searched for the
-	// reason the paragraph above gives -- the invariant is about ORDER, not about which function the
-	// lines happen to live in this month.
+	//
+	// **THE WRITE AND THE READ ARE NOW SEPARATE FUNCTIONS** (Task 440), so the order is checked
+	// across the concatenation of everything the pass is made of: refreshLabelTextPass() (the node
+	// half, still inline), writeLabelGlyphs()/measureLabelWidths() (the link half's two halves) and
+	// renderLinkLabel(), which is the two back to back for a caller holding one label. Searching the
+	// sources rather than naming which holds which keeps this true through the next move as well.
 	const rlt = extract('refreshLabelText') + '\n' + extract('refreshLabelTextPass') +
-		'\n' + extract('renderLinkLabel');
+		'\n' + extract('writeLabelGlyphs') + '\n' + extract('renderLinkLabel') +
+		'\n' + extract('measureLabelWidths');
 	['ne', 'le'].forEach(function (v) {
 		const set = rlt.indexOf(v + '.text.style.fontSize = fsNow;');
-		const measure = rlt.indexOf('noteMeasuredWidth(' + v + ',');
+		const measure = rlt.indexOf('measureLabelWidths(' + v + ')');
 		report(set >= 0 && measure >= 0 && set < measure,
 			v + ' is sized for the current scale before it is measured', 'set@' + set + ' measure@' + measure);
+	});
+	// **AND EVERY MEASUREMENT IN THE PASS GOES THROUGH THAT ONE FUNCTION.** With the batched passes
+	// (Task 440) a label is measured from a loop that cannot see the write that produced it, so
+	// "the write is above the read" is no longer readable line by line. What keeps it true is that
+	// measureLabelWidths() is the only tape measure in the pass and is only ever called on labels
+	// already written by writeLabelGlyphs(). A getBBox() reappearing anywhere else in these
+	// functions is the defect, whatever order it is in.
+	['refreshLabelTextPass', 'writeLabelGlyphs', 'renderLinkLabel', 'shedToSegment',
+		'shedToSegmentBatch'].forEach(function (fn) {
+		// Comment lines stripped: these functions EXPLAIN getBBox() at length, and a prose mention is
+		// not a call.
+		const code = extract(fn).split('\n').map(function (s) { return s.replace(/\/\/.*$/, ''); }).join('\n');
+		report(!/getBBox\(|getComputedTextLength\(|noteMeasuredWidth\(/.test(code),
+			fn + '() measures nothing itself -- measureLabelWidths() is the one tape measure');
 	});
 	report(/fsNow = effectiveFontSize\(\) \+ 'px'/.test(rlt),
 		'...from effectiveFontSize(), which is the same quantity refreshFontSizes() publishes');

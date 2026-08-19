@@ -466,18 +466,34 @@ var EngCalcs = EngCalcs || {};
 	// `fsNow` is the font size for the CURRENT scale and is applied BEFORE the tape measure comes
 	// out: getBBox() returns world units, so measuring text drawn at the previous scale and banking
 	// it against this one is wrong by exactly the zoom step.
-	function renderLinkLabel(le, l, lines, fsNow) {
+	//
+	// **IT IS IN TWO HALVES, AND THE SEAM IS A WRITE/READ SEAM** (Task 440). getBBox() is a LAYOUT
+	// read: taken between two DOM writes it forces a synchronous layout of the whole drawing, so a
+	// loop that renders one label at a time pays one full layout per label. writeLabelGlyphs() does
+	// every write and measureLabelWidths() every read, which lets a caller with many labels in hand
+	// write them all and then measure them all -- one layout for the batch instead of one each.
+	// renderLinkLabel() is the two halves back to back, for the callers that hold exactly one label.
+	function writeLabelGlyphs(le, l, lines, fsNow) {
 		var rows = composeRows(lines, labelIsDragged(l));
 		setMultilineText(le.text, linkLabelBase(l).x, rows);
 		le.text.style.fontSize = fsNow;
 		(le.repeats || []).forEach(function (r) { r.text.style.fontSize = fsNow; });
-		try { noteMeasuredWidth(le, le.text.getBBox().width); }
-		catch (err) { /* pre-layout measurement can throw; the stale tw stands */ }
-		noteRowWidths(le);
 		le.rows = rows;
 		le.rowsSeq = (le.rowsSeq || 0) + 1;
 		le.lineCount = rows.length;
 		le.lines = lines;
+		return rows;
+	}
+	// The read half, and the ONLY place a data label's banked widths come from. Node labels use it
+	// too: the two halves of a label's measurement have always been these same two calls.
+	function measureLabelWidths(holder) {
+		try { noteMeasuredWidth(holder, holder.text.getBBox().width); }
+		catch (err) { /* pre-layout measurement can throw; the stale tw stands */ }
+		noteRowWidths(holder);
+	}
+	function renderLinkLabel(le, l, lines, fsNow) {
+		var rows = writeLabelGlyphs(le, l, lines, fsNow);
+		measureLabelWidths(le);
 		return rows;
 	}
 	// A stationed label sheds until it stops colliding, LONGEST PIPE FIRST: whoever is placed first
@@ -584,6 +600,38 @@ var EngCalcs = EngCalcs || {};
 			renderLinkLabel(le, l, kept, fsNow);
 		}
 		return kept;
+	}
+	// **THE SAME CASCADE FOR MANY LABELS AT ONCE, ONE RUNG AT A TIME** (Task 440). Every label that
+	// still does not fit sheds its next value, then they are ALL measured, then the survivors go
+	// round again -- instead of running one label's cascade to the bottom before starting the next.
+	//
+	// **IT IS THE SAME DECISION BECAUSE THIS CASCADE HAS NO CROSS-LABEL TERM.** A link's stopping
+	// point is a comparison between its own measured run and its own segment's room; nothing in it
+	// reads another label. So a label's sequence of contents is identical whichever order the rungs
+	// are interleaved in, and only the number of forced layouts changes: one per RUNG here against
+	// one per label per rung there, and the deepest cascade on a drawing is a handful of rungs.
+	// (The CROWDING cascade in shedAlignedForConflicts() does have a cross-label term -- each label
+	// placed becomes an obstacle for the next -- which is exactly why it stays sequential.)
+	//
+	// Callers hand in labels ALREADY written and measured at their full content, which is the state
+	// shedToSegment()'s own first render produces.
+	function shedToSegmentBatch(work, fsNow) {
+		var active = work.map(function (rec) {
+			return { l: rec.l, le: rec.le, all: rec.all, gone: 0,
+				order: shedOrder(rec.all), room: linkLabelRoom(rec.l, rec.le.alignedAlong) };
+		});
+		while (active.length) {
+			var shedding = active.filter(function (a) {
+				return a.gone < a.order.length - 1 && linkLabelRunLength(a.le) > a.room;
+			});
+			if (!shedding.length) { return; }
+			shedding.forEach(function (a) {
+				a.gone++;
+				writeLabelGlyphs(a.le, a.l, keptLines(a.all, shedKeepSet(a.all, a.order, a.gone)), fsNow);
+			});
+			shedding.forEach(function (a) { measureLabelWidths(a.le); });
+			active = shedding;
+		}
 	}
 	// **RE-DECIDE EVERY LINK LABEL'S CONTENT AT THE CURRENT ZOOM.** A shed is a decision about a
 	// RATIO -- the label's run against its segment -- and a label's run in world units is its pixel
@@ -17448,9 +17496,14 @@ var EngCalcs = EngCalcs || {};
 		// and banked at another is wrong by the zoom ratio -- and it is a WRITE, so it belongs there.
 		doc.nodes.forEach(function (n) {
 			var ne = nodeEls[n.id]; if (!ne) { return; }
-			try { noteMeasuredWidth(ne, ne.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
-			noteRowWidths(ne);
+			measureLabelWidths(ne);
 		});
+		// **THE LINK HALF IS THREE PASSES FOR THE SAME REASON THE NODE HALF IS TWO** (Task 440), with
+		// one extra turn of the screw: its shed cascade is itself a write-then-read loop, so the
+		// cascade too is iterated a RUNG at a time across every label rather than run to the bottom
+		// one label at a time. See shedToSegmentBatch() for why that is the same decision.
+		//   1. write every label's full content   2. measure them all   3. shed, in lockstep
+		var linkWork = [];
 		doc.links.forEach(function (l) {
 			var le = linkEls[l.id]; if (!le) { return; }
 			var lines = [];
@@ -17484,27 +17537,31 @@ var EngCalcs = EngCalcs || {};
 			// measurement path, getBBox() -- see shedOrder() for why an arithmetic shortcut produces
 			// nothing in a real browser.
 			//
-			// `renderLinkLabel()` is the single place a link label's glyphs are built. The rowsSeq
-			// stamp lives there too: **it must move when a SHED changes the content**, or every
-			// repeat of a shed label keeps the tspans of the label it used to be.
-			var allLines = lines;
-			renderLinkLabel(le, l, lines, fsNow);
-			// **A DRAGGED LABEL NEVER SHEDS**, the same hedge and the same reasoning that exempts it
-			// from the short-pipe rule: dragging a label off a stub is exactly what you do when you
-			// want that number on the sheet, so the gesture that reveals the intent is one the user
-			// already makes.
-			if (!labelIsDragged(l) && !le.empty && lines.length > 1) {
-				lines = shedToSegment(le, l, lines, fsNow);
-			}
+			// `writeLabelGlyphs()` is the write half of the single place a link label's glyphs are
+			// built. The rowsSeq stamp lives there too: **it must move when a SHED changes the
+			// content**, or every repeat of a shed label keeps the tspans of the label it used to be.
+			//
 			// The FULL list is kept beside the drawn one, so a later pass can shed FURTHER without
 			// re-deriving what this link has -- and, more importantly, so every shed is measured from
 			// the whole label rather than from whatever survived last time, which would ratchet a
 			// label down and never let it recover.
-			le.allLines = allLines;
+			le.allLines = lines;
+			writeLabelGlyphs(le, l, lines, fsNow);
+			linkWork.push({ l: l, le: le, all: lines });
+		});
+		linkWork.forEach(function (rec) { measureLabelWidths(rec.le); });
+		// **A DRAGGED LABEL NEVER SHEDS**, the same hedge and the same reasoning that exempts it
+		// from the short-pipe rule: dragging a label off a stub is exactly what you do when you
+		// want that number on the sheet, so the gesture that reveals the intent is one the user
+		// already makes.
+		shedToSegmentBatch(linkWork.filter(function (rec) {
+			return !labelIsDragged(rec.l) && !rec.le.empty && rec.all.length > 1;
+		}), fsNow);
+		linkWork.forEach(function (rec) {
 			// DERIVED, never tracked: how many values this label is not showing is a fact about the
 			// two lists, and a counter incremented alongside them is a third thing that can disagree.
-			le.shedCount = allLines.length - le.lines.length;
-			linkLines[l.id] = le.lines;
+			rec.le.shedCount = rec.all.length - rec.le.lines.length;
+			linkLines[rec.l.id] = rec.le.lines;
 		});
 		// **CONTENT DECISIONS HERE, POSITION DECISIONS IN THE COLLISION PASS** (Task 399). The
 		// length-driven cascade above only fires when a label is wider than its own pipe, which

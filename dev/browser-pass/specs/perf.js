@@ -27,17 +27,42 @@
 // (Each measured with nothing else running. With the rest of this pass on the same machine the
 // after-figures are about a third higher, which is what the bounds leave room for.)
 //
-// **TEN SECONDS IS STILL WRONG, AND THE REST OF IT IS ONE CAUSE.** 60% of what is left is getBBox()
-// — the label pass interleaves a DOM write and a measurement per label, and each measurement forces a
-// layout of everything drawn so far. The node half of refreshLabelText() now writes every label and
-// then measures every label, which is where a third of the saving above came from; the LINK half
-// cannot do the same without moving its shed cascade into a third pass, which is a piece of work of
-// its own rather than a line. That is the next task here, and this file is where its number lives.
+// **AND THEN THE LINK HALF OF THE LABEL PASS WAS BATCHED TOO** (Task 440), which is the fourth
+// quadratic and the last of the measurement ones. It wrote one link label, measured it, and ran its
+// shed cascade — draw, measure, drop a value, draw again — before touching the next label, so a
+// forced layout landed once per label per rung. It is now three passes: write every label, measure
+// every label, then iterate the CASCADE a rung at a time across all of them.
+//
+//     Close, landing on it, the two builds run ALTERNATING on a busy machine, best of three each:
+//
+//                                18,106 ms  ->  8,473 ms
+//
+// **ALTERNATING IS WHY THAT PAIR MEANS ANYTHING.** This number swings by a factor of two with what
+// else the machine is doing — the after-build measured 13,302 ms in the first of those three rounds
+// and 8,473 ms in the third with no change to it in between — so a before measured in one session
+// and an after measured in the next says nothing at all. Both figures above are inflated by that
+// load; on a quiet machine the after-build closed in 6,448 ms.
+//
+// **THE PROOF THAT IT IS THE SAME DRAWING is not in this file**, because a stopwatch cannot see a
+// label shed a value it should have kept: `dev/lpn-spike/label-batch-harness.js` re-runs each link's
+// cascade the old way, one label at a time, and requires the batched pass to have decided
+// identically — and counts the forced layouts, which fell from 1,033 to 10 on a 112-pipe grid.
+//
+// **WHAT IS LEFT IS NO LONGER MEASUREMENT.** Under Chrome's sampling profiler, on this same network
+// and this same Close (23,016 ms before against 9,875 ms after, both under the profiler's own
+// overhead), getBBox() went from 53.7% of self time to 6.2%. The three biggest remaining
+// are linkPointList() at 21%, readMapBox() at 16% and the collision geometry at about 13% — and the
+// first is quadratic for a reason that has nothing to do with labels' text: alignedSideFor() walks
+// EVERY link to decide which side of its own pipe one label hangs on, which is 480 x 480 on this
+// drawing. That is the next task here, and this file is where its number lives.
 //
 // **THE BOUNDS ARE GENEROUS ON PURPOSE — well clear of the measurement, not a hair over it.** This
 // pass runs on whatever machine is free, and a timing check that fails on a busy one teaches people
 // to ignore failures. What they catch is the QUADRATIC coming back, which is an order of magnitude;
-// the numbers printed beside them are the real signal.
+// the numbers printed beside them are the real signal. **A saving smaller than the machine noise is
+// therefore not defended here at all** — the eighteen seconds below would sit quietly through the
+// whole of Task 440 going back the way it came. What defends that one is a COUNT rather than a
+// clock, in label-batch-harness.js, and a saving worth defending is worth a countable guard.
 //
 // **THE NETWORK IS WRITTEN INTO THE PROJECT'S OWN STORAGE, which is the one place this file departs
 // from doing what a user does** — 256 junctions cannot be clicked out, and Insert's "[dev] Draw large
