@@ -471,6 +471,118 @@
                 "lpn_field_closed"
             ],
             "reason": "Resynced in all 26 languages by sprint 397. English went Closed->Shut to dodge the English-only 'closed conduit' collision; most languages reported their existing word already carried the Shut sense and correctly left it, which is a resync decision, not a skipped one."
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_ex_net3_desc"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_examples_size"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_inp_drop_controls"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_inp_drop_eps"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_inp_drop_patterns"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_new_blank_si"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_new_blank_us"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_pump_point1"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_pump_point2"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_pump_point3"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_settings_defaults"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_settings_engine_epanet_tip"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_settings_readability_bias"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "lpn_unit_unknown"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "menu_help"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
+        },
+        {
+            "date": "2026-08-19",
+            "keys": [
+                "u_cmh"
+            ],
+            "reason": "Sprint 438 resynced this key in all 26 languages"
         }
     ],
     "hashes": {
@@ -782,7 +894,7 @@
         "lpn_ex_net1_title": "0c591224f142bc13c71ce084d8b98221a8e04118",
         "lpn_ex_net2_desc": "3a127c97edb6e02f7770e1ac5e053694ae449c43",
         "lpn_ex_net2_title": "15b8b380ea1c68cbe004cd6a188fed57d8ceade3",
-        "lpn_ex_net3_desc": "30412f57c7f7158a0f7b372f4c85d7a2b51edd65",
+        "lpn_ex_net3_desc": "30506e2d33807b89ebcee51ead7d71a66ce46031",
         "lpn_ex_net3_title": "32244fe428de2e2160ba8cd36930dfd0db80da31",
         "lpn_examples_blank": "d3904eb925d47bbca7944699b614c8668840afeb",
         "lpn_examples_failed": "0e5eefbf586e465b71a6f4b46470ac6c9a77a214",
@@ -790,7 +902,7 @@
         "lpn_examples_loading": "17dda6727f9dce4d339b26824d962cad026c5de2",
         "lpn_examples_menu": "adbb8bfd36f1fbb1ddaffdb9620706b407155cfe",
         "lpn_examples_open": "cf9b77061f7b3126b49d50a6fa68f7ca8c26b7a3",
-        "lpn_examples_size": "5952133eee1929c7e092e3cfb664dec2b1e413af",
+        "lpn_examples_size": "2271a12396ceb1053da48973eef74b771d3d5847",
         "lpn_examples_sub": "404ac942d1e188ef3f745e3f7e3dfa7d1ca58da8",
         "lpn_field_active": "555a79af92f33876efcf38d145ca406e4073623c",
         "lpn_field_active_tip": "d5ed9a6c1ab566d62739be653fb340e37ead8a3c",
@@ -872,16 +984,16 @@
         "lpn_import_no_room": "9556ce89b8be4a1eccb0948329905223bd14da09",
         "lpn_inp_bad_file": "4c44d8c2fd5a6162a15695b4f671d271f01cd3c3",
         "lpn_inp_drop_backdrop": "94e5a8aa28dfe204309465c4d1fe0c39dd33c6ff",
-        "lpn_inp_drop_controls": "087b854e0e8b17c7598ac08e1a55f76c95a37cce",
+        "lpn_inp_drop_controls": "bb9845faea60afb03073de8d11a92072525797f7",
         "lpn_inp_drop_curve_long": "d6226b38feaea5400b89e71773d7548a55a04dff",
         "lpn_inp_drop_curve_missing": "9a8d623f4037e3261d8153dba634977c8527d83b",
         "lpn_inp_drop_cv": "df7f7635a0fc09f8d0a6124430366e1a19429062",
         "lpn_inp_drop_dangling": "0ad893dffef80c6ad8297058a6c3c5342495ea43",
         "lpn_inp_drop_demands": "cf2f85eab05344924f34a11ae91613cb99403657",
         "lpn_inp_drop_emitters": "cb5e11821f1c11edc0487fa662dfbcce0f963480",
-        "lpn_inp_drop_eps": "66bdbb261c9f1ecb6009eadd421813095414f411",
+        "lpn_inp_drop_eps": "6188c8ee8cb50dfce620a63d5da7e9b806ad192d",
         "lpn_inp_drop_headloss": "cc465d1b3227861365056837ff778139615a211b",
-        "lpn_inp_drop_patterns": "e3038319b256be5a8d2527dea6f495149018c512",
+        "lpn_inp_drop_patterns": "f9df01a8fbb36ef930ecfc506f9b8b4f63f6fb1a",
         "lpn_inp_drop_pump_other": "9ae4a33dc9693072e607a8697645900d73f2821d",
         "lpn_inp_drop_quality": "818ea06fbda03f7c835cf8c6b9aa37463e24e368",
         "lpn_inp_drop_setting": "fd1ae50cac0307d3a4620c8ec88ad91084a39d6d",
@@ -950,8 +1062,8 @@
         "lpn_mode_delete": "4a09e68ab03ef268f609a792c3e8f95adc12e205",
         "lpn_mode_select": "70c17f33358920ac4b1b46048d22f477ffd20f54",
         "lpn_net_bad_file": "e8efd822c75e111af12d170f300b643b1c75daf7",
-        "lpn_new_blank_si": "e92675640833cb92c6fd8f4776c4d4d722cdb8d7",
-        "lpn_new_blank_us": "26e10b45391e9fd1532479996e64c6cde6df2797",
+        "lpn_new_blank_si": "8cf5c23f7e9d198822007e74f3774ed2adc3e02e",
+        "lpn_new_blank_us": "2d32d971c8bca04272900447c65273fb3f66befe",
         "lpn_new_example_si": "2926375ffdb9d4f4b4d3b091a7084e0b9b46d883",
         "lpn_new_example_us": "5022c78ec0553c0d2189b2bd52c0123b3ce5e75d",
         "lpn_new_from_examples": "6412998a89bdd9cb8ad64e3429d6a3e34c0f7745",
@@ -977,9 +1089,9 @@
         "lpn_pump_curve_own": "18743280e0dd590e65704a5ac014be8c9576d81c",
         "lpn_pump_curve_ref_note": "7b8cc2d0c44a4cd5926136e26605e389d99406a7",
         "lpn_pump_curve_source": "3edef659f0a8b9e42927c0100b5d903b6b4ef253",
-        "lpn_pump_point1": "ea8753123a843aa83db9fbacc92e547768cf6222",
-        "lpn_pump_point2": "dc549b620a627f0e54be298af49d255508613fd3",
-        "lpn_pump_point3": "7ec8137864e885999498ff7270ae561fb059e714",
+        "lpn_pump_point1": "0a86f702b8aa32dce5fdbf71f6cd4aae8b17a7d8",
+        "lpn_pump_point2": "c5d124f0a36500d5418a78d06988e14c4fd71759",
+        "lpn_pump_point3": "0ddcc506737670ee2d236267c045c6c350bf161a",
         "lpn_push_base_only": "799b53da4ce1ca7bc4f89c34eb3f1371cfae69a6",
         "lpn_push_confirm": "40365401c5ee9faa7bb1555aca7e2234fe3b6e49",
         "lpn_push_elements": "affd85585aaa05156085b6b36922a0074ce00a8c",
@@ -1042,11 +1154,11 @@
         "lpn_settings_color_thematic_tip": "4b6b6dae12d1cdf851633cc8025c72ddfa8bb66f",
         "lpn_settings_colors": "50ee959738f81d997d2fdd579d22c9caebdb17fd",
         "lpn_settings_computation": "cd260770f98f9ac256c0d151419fd05e77f6fc69",
-        "lpn_settings_defaults": "77403a7b5092aad6e52d47ff9b28dc162b459922",
+        "lpn_settings_defaults": "d58877a281353a22335269d4e48d235ea5741a0f",
         "lpn_settings_defaults_note": "990606b34087faf589658448074aa7621295f825",
         "lpn_settings_emitter_exponent": "1d8660383db35f7b4b2754b1f2451fddc60c0a03",
         "lpn_settings_engine_epanet": "518a1af690a64303884cc20e84489abd5ef44ce3",
-        "lpn_settings_engine_epanet_tip": "bd8e0d8a3853d79b2cf0532e48582a7dbcf81ce7",
+        "lpn_settings_engine_epanet_tip": "5e74cee436c482289c85e8bf1802d3dc577f2688",
         "lpn_settings_id_prefixes": "2d1b802116e8a45191c6a614df0e16eddff87671",
         "lpn_settings_label_always": "0b13b19cf58d92b342221832c171bfb61a66d382",
         "lpn_settings_label_max_width": "2f30343adbd859bae8e0bb0d6ffcf555193552d1",
@@ -1065,7 +1177,7 @@
         "lpn_settings_mask_labels": "801615742e22b285a1838d6184c72544ec28a96b",
         "lpn_settings_push_btn": "9e7e67a26fdccd90f3ffa64b26f56d540a79e7af",
         "lpn_settings_push_note": "d3754624671985db69287dabd915782065100ae0",
-        "lpn_settings_readability_bias": "97c80e29a8845f5a39fe458c032c54135da4b0a7",
+        "lpn_settings_readability_bias": "39f84e3e7c6d7f87a3fa97f9fbc1b56c2a129d4f",
         "lpn_settings_restore_tip": "723cebec7f1a48471ff9b324d75ed21e6a2aa7ec",
         "lpn_settings_scope_calculator": "00dfef22ecb2664741976fcf9fcd2bf6ff5c6167",
         "lpn_settings_scope_project": "95590645e1aac6068a614f2f94ed6e4a7b9f3192",
@@ -1119,7 +1231,7 @@
         "lpn_tool_settings": "c7f73bb54d928922c3838bb789ee9fb8a5b1eb37",
         "lpn_tool_undo": "39fc72124884d6573e4f9f89585f071ed0782696",
         "lpn_tool_zoom_extent": "be866a8e867398648cdf09d8a972d5bbc745c029",
-        "lpn_unit_unknown": "bb2124724b4bd44ed345bf3ef0276b7fd32dfb5b",
+        "lpn_unit_unknown": "cecc5b050706cf145b426d714d212b31074d9743",
         "lpn_units_elevhead": "d598eb6ae61be7df39ca3031a75a1303d809aa5c",
         "lpn_units_flow": "86eff8eb789b097ddca83f2c9c4617ed23605105",
         "lpn_units_length": "d28e743b3380c990918f0d2ea90ad6e8e7123967",
@@ -1135,11 +1247,11 @@
         "lpn_valve_type_tcv": "f9a5006688d1421dd1b5ba5ff5ca8050d79085dc",
         "lpn_view_units": "12748281e0f02357f2a2f65c1c6a7d01ee122506",
         "menu_brand": "bf8b00231568173bfc88835a77624be526d4dd96",
+        "menu_help": "c47ae15370cfe1ed2781eedc1dc2547d12d9e972",
         "menu_libre": "38f2a5b458b1b859bea3099c904d3eab6c585532",
         "menu_main_hydraulics": "d6f18fa68583ba0854b0df1a9e753670114f8451",
         "menu_main_language": "89b86ab0e66f527166d98df92ddbcf5416ed58f6",
         "menu_main_list": "ab17a9a530fec26a0c276c8111051cd4c6ff6a17",
-        "menu_help": "4bab2d8fe13fa6ab57f80098b414f0f734c5dd25",
         "mhp_annual_kwh": "258b88f727968033ded4ca63146a9395ee304b1c",
         "mhp_diameter": "e6343b78b5974690757435f6121bcb0bff473145",
         "mhp_efficiency": "5eff2871f906e5b0cd271c55a4d43fd3e53c31f8",
@@ -1410,7 +1522,7 @@
         "u_afd": "e4f11573506c0e6c1e5ce6386bd750f841db31dd",
         "u_bar": "62cdb7020ff920e5aa642c3d4066950dd1f01f4d",
         "u_cmd": "b603e47fd8c03ecc219fb7d78037a07ace1b3805",
-        "u_cmh": "50376dd46465d59f8ca8151c76065f4400d3b9c8",
+        "u_cmh": "8e89d56763da2e02aa061170d142dccf17ac7305",
         "u_depthFrac": "ca3ad46f5661e96d2e1ef3d978d23729f84f2efd",
         "u_depthPercent": "4345cb1fa27885a8fbfe7c0c830a592cc76a552b",
         "u_ft": "d352dbdf6170085acaf7ed62197a4de1452a0073",
@@ -4092,6 +4204,10 @@
             "words": 2,
             "ends_sentence": false
         },
+        "menu_help": {
+            "words": 1,
+            "ends_sentence": false
+        },
         "menu_libre": {
             "words": 2,
             "ends_sentence": false
@@ -4106,10 +4222,6 @@
         },
         "menu_main_list": {
             "words": 3,
-            "ends_sentence": false
-        },
-        "menu_help": {
-            "words": 1,
             "ends_sentence": false
         },
         "mhp_annual_kwh": {

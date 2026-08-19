@@ -122,26 +122,6 @@
    "languages": "*",
    "reason": "D -- diameter symbol."
   },
-  "lpn_ex_net1_title": {
-   "category": "brand",
-   "languages": "*",
-   "reason": "EPANET Net1 -- the sample network's own name, as EPANET itself calls it."
-  },
-  "lpn_ex_net2_title": {
-   "category": "brand",
-   "languages": "*",
-   "reason": "EPANET Net2 -- the sample network's own name, as EPANET itself calls it."
-  },
-  "lpn_ex_net3_title": {
-   "category": "brand",
-   "languages": "*",
-   "reason": "EPANET Net3 -- the sample network's own name, as EPANET itself calls it."
-  },
-  "lpn_ex_elm_street_title": {
-   "category": "brand",
-   "languages": "*",
-   "reason": "Elm Street Center -- a proper place name for the example site, not translated."
-  },
   "ip_hf": {
    "category": "symbol",
    "languages": "*",
@@ -177,6 +157,32 @@
    ],
    "reason": "'{n} minutes' is identical in French, placeholder and all. Not global: es/pt minutos, tr dakika. Task 146.06 sprint, 2026-08-08."
   },
+  "lpn_color_example_material": {
+   "category": "cognate",
+   "languages": [
+    "es",
+    "pt",
+    "de",
+    "ro",
+    "hr",
+    "id",
+    "sw"
+   ],
+   "reason": "'Material' is the natural word in these languages; Indonesian degraded it to 'Bahan' to pass this check before the exemption existed."
+  },
+  "lpn_color_example_status": {
+   "category": "cognate",
+   "languages": [
+    "es",
+    "pt",
+    "de",
+    "ro",
+    "hr",
+    "id",
+    "sw"
+   ],
+   "reason": "'Status' is the natural word in these languages; a synonym would read as worse."
+  },
   "lpn_dialog_ok": {
    "category": "loanword",
    "languages": [
@@ -189,6 +195,26 @@
     "ro"
    ],
    "reason": "OK -- the dialog confirm button. Scoped, NOT global: these seven languages use bare \"OK\" as the conventional button label, but 19 others translate it (zh 确定, tr Tamam, es Aceptar, hr U redu, uk Гаразд, sw Sawa), so a global exemption would hide a genuinely untranslated string. Added 2026-08-13 after the wave-4 cs agent correctly found the key already present and correct."
+  },
+  "lpn_ex_elm_street_title": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "Elm Street Center -- a proper place name for the example site, not translated."
+  },
+  "lpn_ex_net1_title": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "EPANET Net1 -- the sample network's own name, as EPANET itself calls it."
+  },
+  "lpn_ex_net2_title": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "EPANET Net2 -- the sample network's own name, as EPANET itself calls it."
+  },
+  "lpn_ex_net3_title": {
+   "category": "brand",
+   "languages": "*",
+   "reason": "EPANET Net3 -- the sample network's own name, as EPANET itself calls it."
   },
   "lpn_field_auto": {
    "category": "cognate",
@@ -211,6 +237,23 @@
    "category": "symbol",
    "languages": "*",
    "reason": "ID -- the same node-identifier heading as bpn_id above, and the same symbol. Task 146.06 found tr had rendered it 'Kimlik' while its own bpn_id stayed 'ID'; aligned to the incumbent per the concept-level label reuse convention."
+  },
+  "lpn_field_lat": {
+   "category": "cognate",
+   "languages": "*",
+   "reason": "'Latitude' is spelled identically in several Latin-script languages and is the exact scientific term; no synonym exists."
+  },
+  "lpn_field_lon": {
+   "category": "cognate",
+   "languages": "*",
+   "reason": "'Longitude' is spelled identically in several Latin-script languages and is the exact scientific term; no synonym exists."
+  },
+  "lpn_field_text_align_center": {
+   "category": "cognate",
+   "languages": [
+    "fr"
+   ],
+   "reason": "'Centre' is the French spelling and is identical to the English source's own."
   },
   "lpn_field_x": {
    "category": "symbol",
@@ -237,6 +280,21 @@
     "ro"
    ],
    "reason": "Text -- the default contents of a newly placed text label. Same word and same evidence as lpn_tool_add_text. Added ro, Task 251 wave 3, 2026-08-13: text is the ordinary Romanian noun and OK is universal; the ro agent kept them while translating every other Latin-script term, and its one genuine false cognate (Auto, which reads automotive in Romanian) was caught separately and changed to Automat."
+  },
+  "lpn_pump_point1": {
+   "category": "cognate",
+   "languages": "*",
+   "reason": "'Point 1' -- 'Point' is identical in fr and several others, and the numeral is a numeral."
+  },
+  "lpn_pump_point2": {
+   "category": "cognate",
+   "languages": "*",
+   "reason": "'Point 2' -- see lpn_pump_point1."
+  },
+  "lpn_pump_point3": {
+   "category": "cognate",
+   "languages": "*",
+   "reason": "'Point 3' -- see lpn_pump_point1."
   },
   "lpn_scenario_base": {
    "category": "cognate",
@@ -270,6 +328,28 @@
     "it"
    ],
    "reason": "'Scenario {n}' -- same word as lpn_scenario_label plus a number."
+  },
+  "lpn_settings_page": {
+   "category": "cognate",
+   "languages": "*",
+   "reason": "'Page' is identical in fr and several others."
+  },
+  "lpn_time_pause": {
+   "category": "cognate",
+   "languages": "*",
+   "reason": "'Pause' is standard UI vocabulary spelled identically in fr, de and others."
+  },
+  "lpn_time_tank": {
+   "category": "cognate",
+   "languages": [
+    "de"
+   ],
+   "reason": "'Tank' is the established German term for this element, per the glossary."
+  },
+  "lpn_tip_join": {
+   "category": "placeholder",
+   "languages": "*",
+   "reason": "'{name} - {tip}' is two placeholders and a separator. There is nothing to translate; the separator is a per-language choice and matching English is one valid answer."
   },
   "lpn_tool_add_reservoir": {
    "category": "cognate",

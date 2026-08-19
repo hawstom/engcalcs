@@ -1,6 +1,6 @@
 {
  "sprint": "438-wave0",
- "description": "Adversarial Wave 0 (ROADMAP Task 438) over the English added or re-worded on 2026-08-18 -- the 104 NEW and 8 CHANGED keys reported by detect_english_drift.php, plus the explicitly named families: the placement tool (lpn_georef_*, lpn_geomap, lpn_xymap), the coordinate jump (lpn_goto_*), the clean-map toggle (lpn_clean_map*), Find (lpn_find_*), Profile (lpn_profile_*), the units warning (lpn_units_*), .inp export/import (lpn_inp_*, lpn_file_export_inp*), the new flow unit tokens (u_imgd, u_afd, u_lpm, u_cmh, u_cmd), lpn_unit_unknown, the share affordance (template_share_*), menu_more, the four new-project rows, and Task 405's four. The question asked of every string was NOT 'is this good?' but 'list every plausible reading' -- the falsification pass whose measured yield on lpn_ (Task 239) was 36 findings on top of a completed review. Result: 46 findings -- 13 high, 25 medium, 8 low. Every entry is open: this pass proposes, it does not write. English rewrites are for the human to apply (three concurrent tracks were writing lib/lang.ec.en.php); $ec_lang_syn is off-limits to AI by standing rule, so anything routed there is a proposal awaiting written permission.",
+ "description": "Adversarial Wave 0 (ROADMAP Task 438) over the English added or re-worded on 2026-08-18 -- the 104 NEW and 8 CHANGED keys reported by detect_english_drift.php, plus the explicitly named families: the placement tool (lpn_georef_*, lpn_geomap, lpn_xymap), the coordinate jump (lpn_goto_*), the clean-map toggle (lpn_clean_map*), Find (lpn_find_*), Profile (lpn_profile_*), the units warning (lpn_units_*), .inp export/import (lpn_inp_*, lpn_file_export_inp*), the new flow unit tokens (u_imgd, u_afd, u_lpm, u_cmh, u_cmd), lpn_unit_unknown, the share affordance (template_share_*), menu_more, the four new-project rows, and Task 405's four. The question asked of every string was NOT 'is this good?' but 'list every plausible reading' -- the falsification pass whose measured yield on lpn_ (Task 239) was 36 findings on top of a completed review. Result: 46 findings -- 13 high, 25 medium, 8 low. Every entry is open: this pass proposes, it does not write. English rewrites are for the human to apply (three concurrent tracks were writing lib/lang.ec.en.php); $ec_lang_syn is off-limits to AI by standing rule, so anything routed there is a proposal awaiting written permission. | SPRINT CLOSE 2026-08-19: 26 languages delivered 186 keys each. The translators' own suggestion box produced four more findings, three of them defects in English written the previous night by other tracks -- including one SHIPPED bug reaching 18 languages.",
  "entries": [
   {
    "key": "lpn_clean_map",
@@ -616,6 +616,54 @@
    ],
    "disposition": "glossary",
    "resolution": "Both English values kept. The names are already 'lat/lon' and 'XY' rather than the coined 'GeoMap' the finding saw, which removes the invented-word half of the complaint. The remaining risk -- some agents translating a mode name and others keeping it, across the dozen strings that quote them -- is routed to one new glossary.json concept 'project mode name' wired to lpn_, which lists those strings and says the two names are carried unchanged into every language. A per-label synonym would have had to be repeated nine times."
+  },
+  {
+   "key": "lpn_time_format_tip",
+   "source": "translator",
+   "lang": "uk",
+   "complaint": "high: NOT ambiguity -- a SHIPPED DEFECT. The tip taught `30 minutes`, but js/lpn-patterns.js's TIME_UNITS accepts only the literal English tokens SEC/MIN/HOUR/DAY. 18 of 26 languages localised the word, so their users are told to type something the parser rejects. Found by the uk translator reading the parser source and then checking its peers' output -- nothing in its brief asked it to audit other languages.",
+   "readings": [
+    "an illustrative English word, safe to translate",
+    "a literal parser keyword that must stay English"
+   ],
+   "disposition": "english",
+   "resolution": "ENGLISH REDESIGNED, not annotated. Teaching a keyword inside a sentence that invites translation is a design fault: every language will keep tripping over it. The tip now teaches only locale-neutral forms -- 'like 2:30 ... Half an hour is 0:30' -- and no longer mentions the word form at all. The parser still accepts the English keywords, because .inp files contain them; we simply stop teaching a form that works in one language. NEEDS RESYNC in all 26."
+  },
+  {
+   "key": "lpn_field_text_match_pipe",
+   "source": "translator",
+   "lang": "de,zh,he,bg,id,hr",
+   "complaint": "high: six languages independently stopped here. The reword to 'Match the nearest link' dropped the word ANGLE, leaving the verb with no object. bg added a second reading nobody here had seen: nearest BY DISTANCE, or the link this label is already attached to?",
+   "readings": [
+    "turn the text to the nearest link's angle",
+    "move the text to the nearest link"
+   ],
+   "disposition": "english",
+   "resolution": "English now reads 'Turn to the angle of the nearest link' -- verb, object and selection rule all stated. NEEDS RESYNC in all 26."
+  },
+  {
+   "key": "lpn_time_running",
+   "source": "translator",
+   "lang": "cs,sr",
+   "complaint": "high: says 'the EPANET engine' where the rest of the suite says solver. glossary.json's `solver` term carries an avoid list naming the motor/engine word in thirteen languages BECAUSE THIS PAGE MODELS PUMPS, WHICH HAVE REAL MOTORS -- the specific defect sprint 252 was run to repair. Task 248 reintroduced it the night before this sprint. cs and sr each overrode the English to 'solver' on their own judgement; the other 24 may not have.",
+   "readings": [
+    "a synonym for solver",
+    "the trap term the glossary forbids"
+   ],
+   "disposition": "english",
+   "resolution": "'engine' -> 'solver' in lpn_time_running and lpn_time_no_engine. Zero occurrences of 'EPANET engine' remain in the English. NEEDS RESYNC in all 26."
+  },
+  {
+   "key": "lpn_time_play",
+   "source": "translator",
+   "lang": "my",
+   "complaint": "low: 'Play' as a bare button label has no stated object; a first-time reader could take it for an audio control.",
+   "readings": [
+    "start the run through time",
+    "play a sound"
+   ],
+   "disposition": "dismissed",
+   "resolution": "REFUSED. It sits between Step back and Step forward, beside a clock readout and a step selector, and carries a title naming the act. A transport cluster is the most conventional control set in software; naming the object on the button would be longer without being clearer. Same judgement Tom applied to lpn_find_condition: 'the context is obvious and precise'."
   }
  ]
 }
