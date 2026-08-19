@@ -212,7 +212,9 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_set_sub_units', 'lpn_set_sub_time', 'lpn_set_sub_hydraulics',
   'lpn_set_colors_node', 'lpn_set_colors_link', 'lpn_set_colors_nodelink', 'lpn_set_colors_shared',
   'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
-  'lpn_set_hydraulics_fields', 'lpn_set_page_fields', 'lpn_set_time_fields'
+  'lpn_set_hydraulics_fields', 'lpn_set_page_fields', 'lpn_set_time_fields',
+  // The credits footer, below every section rather than inside one (Tom, 2026-08-19).
+  'lpn_set_ramp_credits'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the
@@ -220,6 +222,10 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
 // of that rule tests nothing.
 byId.lpn_menu_popup.appendChild(byId.lpn_menu_list);
 byId.lpn_menu_popup2.appendChild(byId.lpn_menu_list2);
+// Same reason: the credits footer really is a child of the content pane, and buildColoringSection()
+// falls back to rendering into the colour host only when it is NOT on the page. A parentless stub
+// would exercise that fallback and never the shipped placement.
+byId.lpn_setbox_content.appendChild(byId.lpn_set_ramp_credits);
 
 // A unit <select> the way echoUnitSelect() renders one: option.value is the unit's KEY ('ft'),
 // and the factor is a lookup from it (Task 390). unitEl() finds these by NAME, not id.

@@ -378,11 +378,14 @@ exports.run = async function ({ browser, report }) {
 		const g = await boxRect(a);
 		report.ok(g.width > 300 && g.height > 250, 'it is a real two-pane box, not a strip',
 			`${Math.round(g.width)}x${Math.round(g.height)}`);
-		// **LONGER AND LESS THAN HALF AS WIDE** (Tom, 2026-08-18: "It can be longer and narrower; I
-		// would say less than half as wide"). Measured against the old 60rem, which is 960 px at
-		// this page's 16 px root: anything under 480 is what he asked for, and it must still be
-		// taller than it is wide or it is a strip again.
-		report.ok(g.width < 480, 'it is less than half the width it shipped at',
+		// **LONGER THAN IT IS WIDE, AND WELL UNDER THE 60rem IT SHIPPED AT** (Tom, 2026-08-18: "It
+		// can be longer and narrower; I would say less than half as wide" -- 960 px at this page's
+		// 16 px root, so 480). The bound is 560 rather than 480 because Tom then used the 29rem box
+		// and said, 2026-08-19, "we may ship the box too narrow": 34rem = 544 is his second word on
+		// the same number, and it is the FIRST-TIME width only, since the box now remembers whatever
+		// he drags it to. What the check is really guarding is that nobody puts the 60rem page-wide
+		// panel back.
+		report.ok(g.width < 560, 'it is far narrower than the panel it replaced',
 			`${Math.round(g.width)} px, was 960`);
 		report.ok(g.height > g.width, '...and longer than it is wide',
 			`${Math.round(g.width)}x${Math.round(g.height)}`);

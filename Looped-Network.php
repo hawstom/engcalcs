@@ -689,6 +689,19 @@ echoHeader("EngCalcs", $html_title, "", false);
 						<div class="lpn-set-subbody"><div id="lpn_set_hydraulics_fields" class="lpn-set-part"></div></div>
 					</div>
 				</section>
+				<?php // **THE COLOUR-SCHEME ACKNOWLEDGEMENTS ARE A FOOTER, NOT A SETTING** (Tom, 2026-08-19:
+				      // "Did we intend to leave the full credits right before the Page section? It's a bit
+				      // long for this place"). Three sentences of licence text stood between Map appearance
+				      // and Page, in the middle of the reading path, looking like something to act on. They
+				      // are now the last thing in the content pane, below every section -- which is where a
+				      // reader expects fine print and where nothing has to be read past.
+				      //
+				      // **NOT COLLAPSED, and not filtered away.** Apache-2.0 clause 2 says the
+				      // acknowledgement must appear in the software, so it is on screen whenever the box is
+				      // open -- including while a search matches nothing, since it sits outside the sections
+				      // applySetboxFilter() hides. Filled by buildColoringSection() from
+				      // EngCalcs.lpnRamps.CREDITS, verbatim and untranslated. ?>
+				<div id="lpn_set_ramp_credits" class="lpn-rp-credit"></div>
 			</div>
 		</div>
 		<?php // Shown only while the filter matches nothing, so an empty box is never mistaken for a
