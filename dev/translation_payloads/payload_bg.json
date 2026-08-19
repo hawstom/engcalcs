@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 1182,
-        "delta_key_count": 2,
+        "expected_key_count": 1190,
+        "delta_key_count": 10,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -408,11 +408,27 @@
     },
     "keys_to_translate": {
         "lpn_geomap": "lat\/lon",
-        "lpn_xymap": "XY"
+        "lpn_xymap": "XY",
+        "lpn_settings_node_link": "Node and link",
+        "lpn_color_mode_equal": "Equal interval",
+        "lpn_color_mode_quantile": "Quantile (equal count)",
+        "lpn_color_mode_jenks": "Natural breaks (Jenks)",
+        "lpn_color_mode_stddev": "Standard deviation",
+        "lpn_color_mode_pretty": "Pretty (rounded)",
+        "lpn_color_mode_log": "Logarithmic",
+        "lpn_color_mode_pressure": "Pressure"
     },
     "keys": {
         "lpn_geomap": "lat\/lon",
-        "lpn_xymap": "XY"
+        "lpn_xymap": "XY",
+        "lpn_settings_node_link": "Node and link",
+        "lpn_color_mode_equal": "Equal interval",
+        "lpn_color_mode_quantile": "Quantile (equal count)",
+        "lpn_color_mode_jenks": "Natural breaks (Jenks)",
+        "lpn_color_mode_stddev": "Standard deviation",
+        "lpn_color_mode_pretty": "Pretty (rounded)",
+        "lpn_color_mode_log": "Logarithmic",
+        "lpn_color_mode_pressure": "Pressure"
     },
     "key_context": {
         "lpn_geomap": {
@@ -445,6 +461,102 @@
                     "value": "Преобразувай в lat\/lon…",
                     "english": "Convert to lat\/lon…"
                 }
+            }
+        },
+        "lpn_settings_node_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Ранг",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_equal": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Ранг",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_quantile": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Ранг",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_jenks": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Ранг",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_stddev": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Ранг",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_pretty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Ранг",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_log": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Ранг",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Ранг",
+                    "english": "Rank"
+                },
+                "next_translated": null
             }
         }
     },

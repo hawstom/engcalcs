@@ -10,10 +10,15 @@
 //      `24:00` after the box has been through a round trip, not `86400` and not `24`.
 //   2. **THE TRANSPORT MOVES THE MAP.** Stepping the clock has to change what is drawn. A step
 //      selector that changes only its own readout looks identical in every screenshot.
-//   3. **A TANK FILLS.** The one number that separates a run from a series of instants, seen the
-//      way a user sees it — on the page, at two different times.
-//   4. **IT PLAYS WITH THE BOTTOM PANE SHUT.** The transport is on the toolbar as of 2026-08-18
+//   3. **IT PLAYS WITH THE BOTTOM PANE SHUT.** The transport is on the toolbar as of 2026-08-18
 //      precisely so it can, and the pane tab's old pause-on-hide hook would silently undo that.
+//   4. **THERE IS NO TIME TAB.** Tom, 2026-08-19: "No need for this to have a tab in the bottom
+//      pane. Remove the tab and what's on it."
+//
+// **WHAT WENT WITH THE TAB WAS THE ONLY READOUT OF A TANK FILLING**, which this file used to check
+// on the page ("the tanks are at different levels — they filled"). The claim is not dropped, it has
+// moved to where the numbers now live: the frames themselves, through EngCalcs.lpnTimeFrameResult.
+// Put it back on the page as a column of a tank table and this check should read the table again.
 //
 // Every check here is skipped rather than failed while `js/lpn-time.js` is not loaded by
 // Looped-Network.php, because "the page does not have this feature yet" and "the feature is broken"
@@ -45,35 +50,31 @@ exports.run = async function ({ browser, report }) {
 		report.ok(opened, 'the examples gallery offers Net3');
 		await a.settle(1500);
 
-		// **THE PANE HAS TO BE OPEN FIRST.** Its tab strip and panels are built when it opens, so
-		// clicking a tab id while it is closed reaches nothing — which is what a spec that only
-		// clicked the tab discovered, as three failures that looked like a missing feature.
+		// **THE TAB IS GONE, PANEL AND ALL.** The pane is opened and its whole tab strip read: a
+		// removal has to be checked on the strip the user actually sees, not by asking whether one
+		// id happens to be absent.
 		await a.toolbarClick('Bottom panel');
-		await a.settle(500);
-		await a.page.evaluate(() => {
-			const b = document.getElementById('lpn_pane_tab_time');
-			if (b) { b.click(); }
-		});
 		await a.settle(600);
-		report.ok(await a.page.evaluate(() => !!document.getElementById('lpn_pane_time')),
-			'the pane offers a Time tab');
+		const strip = await a.page.evaluate(() => ({
+			tabs: [...document.querySelectorAll('#lpn_pane_tabs [role="tab"], .lpn-pane-tab')]
+				.map(b => (b.textContent || '').trim()).filter(Boolean),
+			panel: !!document.getElementById('lpn_pane_time'),
+			tab: !!document.getElementById('lpn_pane_tab_time')
+		}));
+		report.ok(!strip.tab && !strip.panel, 'the bottom pane has no Time tab and no Time panel',
+			strip.tabs.join(' | '));
+		report.ok(strip.tabs.length > 0, '...and the other tabs are still there', strip.tabs.join(' | '));
 
 		// ---- 1. the settings, and the file's own text ----
 		//
-		// **THE SEVEN FIELDS ARE IN THE SETTINGS BOX NOW** (ROADMAP Task 441). Tom moved them out of
-		// this tab because a run duration is a property of the whole project; the tab kept the
-		// TRANSPORT, which changes only which moment you are looking at. So the tab must offer a
-		// door to them, and this uses that door rather than reaching for the box directly — a door
-		// nobody can find is the actual risk of the move.
-		await a.page.evaluate(() => {
-			const b = [...document.querySelectorAll('#lpn_pane_time button')]
-				.find(x => /setting/i.test(x.textContent + ' ' + (x.title || '')));
-			if (b) { b.click(); }
-		});
+		// **THE SEVEN FIELDS ARE IN THE SETTINGS BOX** (ROADMAP Task 441). A run duration is a
+		// property of the whole project; the transport, which changes only which moment you are
+		// looking at, is on the toolbar. Those two homes are why the tab had nothing left to be.
+		await a.toolbarClick('Settings');
 		await a.settle(600);
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_settings_box').style.display === 'flex'),
-			'the Time tab has a door to the time settings, and it opens the Settings box');
+			'the Settings box opens on the toolbar button');
 
 		const fields = await a.page.evaluate(() =>
 			[...document.querySelectorAll('#lpn_set_time_fields input[type="text"]')].map(i => i.value));
@@ -106,16 +107,27 @@ exports.run = async function ({ browser, report }) {
 		});
 		report.ok(stops === 13, 'a 12 hour run at a 1 hour report step gives 13 stops', String(stops));
 
-		// ---- 2 and 3. the transport moves the map, and a tank fills ----
+		// ---- 2. the transport moves the map, and a tank fills ----
+		//
+		// The tank levels are read out of the RUN rather than off the page: nothing draws them since
+		// the tab went. Same claim, one layer lower.
 		function readState() {
 			return a.page.evaluate(() => {
 				const sel = document.getElementById('lpn_time_step');
 				const out = sel && sel.options[sel.selectedIndex];
-				const rows = [...document.querySelectorAll('#lpn_pane_time table tr')].slice(1)
-					.map(r => [...r.children].map(c => c.textContent).join('='));
+				const f = window.EngCalcs.lpnTimeCurrentFrame();
+				const lv = (f && f.levels) || {};
+				// **A FRAME ANSWERS IN SI**, like every other result; the tank's own stored level is
+				// in the elevation/head unit the user typed it in. Converted through the page's own
+				// unit select and factor table, so this reads the level the way the document does --
+				// which is what makes the comparison with the stored number below meaningful.
+				const uSel = document.querySelector('[name="lpn_u_elevhead"]');
+				const fac = window.EngCalcs.unitFactor(uSel);
+				const tanks = Object.keys(lv).sort()
+					.map(k => k + '=' + (+lv[k] * fac).toFixed(2)).join(' ');
 				// A label on the map, so this is what is DRAWN and not what is stored.
 				const labels = [...document.querySelectorAll('#lpn_canvas text')].map(t => t.textContent).join('|');
-				return { clock: out ? out.textContent : '', tanks: rows.join(' '), labels };
+				return { clock: out ? out.textContent : '', tanks, labels };
 			});
 		}
 		const t0 = await readState();

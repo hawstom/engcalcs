@@ -1195,6 +1195,9 @@ html[lang="zh"] .ec-welcome {
    same thing and no longer share a name. */
 .lpn-set-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
 .lpn-set-row > :first-child { flex: 1 1 auto; min-width: 0; }
+/* A name in a settings row may break mid-word rather than push the box sideways -- the same rule
+   the labels lists carry below, and for the same reason. CLAUDE.md: mid-word wrap is acceptable. */
+.lpn-set-row > :first-child { overflow-wrap: anywhere; }
 .lpn-rp-credit { font-size: .85em; opacity: .7; margin-top: 6px; }
 /* **EVERY INPUT IN THE BOX HAS A CEILING** (Tom: "Give some detailed attention to inputs max
    width ... Inputs can be shorter"). A number the user types here is at most a few characters --
@@ -1204,6 +1207,23 @@ html[lang="zh"] .ec-welcome {
 #lpn_settings_box .lpn-set-secbody input[type="number"],
 #lpn_settings_box .lpn-set-secbody input[type="text"],
 #lpn_settings_box .lpn-set-secbody select { max-width: 9rem; box-sizing: border-box; }
+/* **HOW A VALUE IS ALIGNED INSIDE ITS CONTROL, once, for the whole box** (Tom, 2026-08-19: "Some
+   inputs are right justified. Others are not. Standardize with an eye for design").
+
+   THE RULE, and the next control follows it without asking:
+     * A NUMBER is right-aligned, so digits line up down the column and 7 and 100 can be compared at
+       a glance. That is `input[type="number"]`, plus `.lpn-set-num` for the number-shaped TEXT
+       boxes -- the seven time fields hold `24:00`, which is a number to every reader and a string
+       only to the parser.
+     * WORDS ARE NOT. Text boxes (the Before/After affixes), selects, checkboxes and the ramp
+       picker keep their natural start alignment, which is also what makes them read correctly in
+       an RTL language.
+     * ONE EXCEPTION, and it is about the widget rather than the value: a box that draws its own
+       spinner arrows (`.ec-spin` -- the Decimals and Rank columns) has no free right edge, so its
+       single digit is CENTRED under its centred heading instead. */
+#lpn_settings_box .lpn-set-secbody input[type="number"],
+#lpn_settings_box .lpn-set-secbody input.lpn-set-num { text-align: right; }
+#lpn_settings_box .lpn-set-secbody input.ec-spin { text-align: center; }
 /* The ramp strip: a full-width band whose boxes are placed by js/lpn-ramps.js's swatchBoxes(), each
    at x = index * width/n. `position: relative` is the frame those percentages are measured in, and
    border-box keeps each swatch's own hairline border inside its share instead of adding to it. */
@@ -1294,13 +1314,20 @@ html[lang="zh"] .ec-welcome {
 /* A FLOOR ON THE WHOLE LIST, not `width: max-content` on each row. The name column is `flex: 1 1
    auto`, so it takes whatever the row has left -- which is only the same number on every row while
    every row is the same width. Sizing rows to their content instead gives each one a different
-   name column and staggers all four headings again, worse than before. One floor for the list, and
-   the panel scrolls sideways below it. 18.5rem = the four columns (11.6rem) + their gaps + a name
-   column that can hold "Head loss gradient" on two lines. It was 28rem, sized for a box more than
-   twice this wide; keeping it there would have made every list scroll sideways for the sake of the
-   two columns Tom asked to narrow. */
+   name column and staggers all four headings again, worse than before. One floor for the list.
+
+   **13rem, AND THAT NUMBER IS WHY THE SETTINGS BOX HAD A HORIZONTAL SCROLLER** (Tom, 2026-08-19:
+   "It should not"). The floor was 18.5rem = 296 px. The content pane is 316 px, its sub-bodies are
+   indented 8 px, and a browser that draws a CLASSIC 15 px scrollbar rather than an overlay one
+   leaves 293 px -- three pixels short, permanently, on the one list every visitor opens. Nothing
+   headless could see it: a headless Chromium's scrollbars are overlays and take no width, so the
+   box measured clean while Tom looked straight at the scroller.
+   dev/browser-pass/specs/labelcols.js now measures the pane with 56 px TAKEN AWAY, which asks the
+   real question -- can this content shrink? -- instead of the accidental one.
+   13rem clears the four columns (11.6rem) and their gaps with room for a name column; below that
+   the names break mid-word, which the rule above allows and which is the correct last resort. */
 #lpn_labels_node_fields,
-#lpn_labels_link_fields { min-width: 18.5rem; }
+#lpn_labels_link_fields { min-width: 13rem; }
 
 /* ==== No window scrollbar on the map page (ROADMAP Task 432) =================================
    Tom, 2026-08-18: *"Our bottom controls bar should be the hard bottom of the page."* This is a

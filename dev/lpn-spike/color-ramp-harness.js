@@ -35,6 +35,7 @@ const L = loadLoopedNetwork(
 	"\t\tcolorClassCount: colorClassCount, rampColorList: rampColorList,\n" +
 	"\t\trampGroups: rampGroups, bandColor: bandColor, colorForValue: colorForValue,\n" +
 	"\t\tcolorNodeValue: colorNodeValue, colorLinkValue: colorLinkValue,\n" +
+	"\t\tserializeProject: serializeProject, applySaved: applySaved,\n" +
 	"\t\tcolorValues: colorValues,\n" +
 	"\t\tnodeFill: function (id) { return nodeEls[id] ? (nodeEls[id].circle.style.fill || '') : null; },\n" +
 	"\t\tnodeSymbolColor: function (id) { return (nodeEls[id] && nodeEls[id].symbol) ? (nodeEls[id].symbol.style.color || '') : null; },\n" +
@@ -92,37 +93,62 @@ console.log('== classes and ramp ==');
 {
 	fresh('us');
 	const s = L.getSettings();
-	ok('a new project opens on seven classes -- the count Tom asked for and Brewer\'s ceiling',
-		s.colorClasses === 7 && L.colorClassCount() === 7, s.colorClasses);
+	// **A SCHEME PER ELEMENT CLASS** (Tom, 2026-08-19: a ramp picker at the bottom of BOTH
+	// symbology groups). Nodes and links each carry a ramp, a class count and a reverse flag, and
+	// every reader takes the group as its first argument -- so a drawing path that reached for the
+	// other group's scheme could not compile past this file.
+	ok('a new project opens on seven classes for both kinds of element -- Brewer\'s ceiling',
+		s.colorClassesNode === 7 && s.colorClassesLink === 7 &&
+		L.colorClassCount('node') === 7 && L.colorClassCount('link') === 7,
+		s.colorClassesNode + '/' + s.colorClassesLink);
 	// **NEVER THE RAINBOW.** It is kept for comparison with EPANET and is not what a new map is
 	// handed; Tom: it "goes last, in its own group, and is never the default".
-	ok('the default ramp is not the rainbow', s.colorRamp !== 'epanet', s.colorRamp);
-	ok('...and it is a real key of the catalogue', !!R.RAMPS[s.colorRamp], s.colorRamp);
+	ok('neither default ramp is the rainbow',
+		s.colorRampNode !== 'epanet' && s.colorRampLink !== 'epanet',
+		s.colorRampNode + '/' + s.colorRampLink);
+	ok('...and both are real keys of the catalogue',
+		!!R.RAMPS[s.colorRampNode] && !!R.RAMPS[s.colorRampLink]);
+	// THE TWO ARE INDEPENDENT, which is the whole of the split: setting one must not move the other.
+	s.colorRampNode = 'reds';
+	s.colorRampLink = 'blues';
+	ok('the two groups read their own ramps',
+		L.rampColorList('node').join(',') === R.RAMPS.reds.colors[7].join(',') &&
+		L.rampColorList('link').join(',') === R.RAMPS.blues.colors[7].join(','));
+	s.colorClassesNode = 4;
+	ok('...and their own class counts',
+		L.colorClassCount('node') === 4 && L.colorClassCount('link') === 7);
+	s.colorClassesNode = 7;
+	s.colorReverseNode = true;
+	ok('...and their own reverse flag',
+		L.rampColorList('node')[0] === R.RAMPS.reds.colors[7][6] &&
+		L.rampColorList('link')[0] === R.RAMPS.blues.colors[7][0]);
+	s.colorReverseNode = false;
 
 	// **DEGRADE TO THE PUBLISHED SET, NEVER A SUBSET.** Brewer designs each count separately, so a
 	// 5-class scheme must come out of her 5-class table -- not out of the 7-class one with two
 	// colours dropped. Asserted against the module's own published set, which is the only source
 	// that can tell the two apart.
-	s.colorRamp = 'ylgnbu';
-	s.colorReverse = false;
+	s.colorRampNode = 'ylgnbu';
+	s.colorReverseNode = false;
 	for (let n = R.MIN_CLASSES; n <= R.MAX_CLASSES; n++) {
-		s.colorClasses = n;
+		s.colorClassesNode = n;
 		ok('a ' + n + '-class map uses the ' + n + '-class published set',
-			L.rampColorList().join(',') === R.RAMPS.ylgnbu.colors[n].join(','),
-			L.rampColorList().join(','));
+			L.rampColorList('node').join(',') === R.RAMPS.ylgnbu.colors[n].join(','),
+			L.rampColorList('node').join(','));
 	}
-	s.colorClasses = 7;
+	s.colorClassesNode = 7;
 	ok('reversing runs the same published set the other way',
-		(() => { s.colorReverse = true; const got = L.rampColorList().join(','); s.colorReverse = false;
+		(() => { s.colorReverseNode = true; const got = L.rampColorList('node').join(','); s.colorReverseNode = false;
 			return got === R.RAMPS.ylgnbu.colors[7].slice().reverse().join(','); })());
 	// A key from the five-ramp era, and one we never shipped: neither may blank the map.
 	['epanet', 'viridis', 'gray', 'ylgnbu', 'rdylbu'].forEach(function (k) {
-		s.colorRamp = k;
-		ok('a project saved on "' + k + '" still resolves', L.rampColorList().every(c => /^#[0-9a-f]{6}$/.test(c)));
+		s.colorRampNode = k;
+		ok('a project saved on "' + k + '" still resolves', L.rampColorList('node').every(c => /^#[0-9a-f]{6}$/.test(c)));
 	});
-	s.colorRamp = 'no-such-ramp-was-ever-shipped';
-	ok('an unknown ramp key falls back rather than throwing', L.rampColorList().length === 7);
-	s.colorRamp = 'viridis';
+	s.colorRampNode = 'no-such-ramp-was-ever-shipped';
+	ok('an unknown ramp key falls back rather than throwing', L.rampColorList('node').length === 7);
+	s.colorRampNode = 'viridis';
+	s.colorRampLink = 'viridis';
 }
 
 // ---- 2. the picker's groups -------------------------------------------------------------------
@@ -149,30 +175,36 @@ console.log('== bands ==');
 {
 	fresh('us');
 	const s = L.getSettings();
-	s.colorRamp = 'epanet';
-	s.colorReverse = false;
-	s.colorClasses = 5;
+	s.colorRampNode = 'epanet';
+	s.colorReverseNode = false;
+	s.colorClassesNode = 5;
 	const ramp = R.RAMPS.epanet.colors[5];
 	const breaks = [10, 20, 30, 40];
-	ok('below the first break takes the bottom colour', L.colorForValue(5, breaks) === ramp[0]);
+	ok('below the first break takes the bottom colour', L.colorForValue('node', 5, breaks) === ramp[0]);
 	ok('at a break takes the band ABOVE it (>= is the upper band)',
-		L.colorForValue(10, breaks) === ramp[1], L.colorForValue(10, breaks));
-	ok('above the last break takes the top colour', L.colorForValue(1e6, breaks) === ramp[4]);
+		L.colorForValue('node', 10, breaks) === ramp[1], L.colorForValue('node', 10, breaks));
+	ok('above the last break takes the top colour', L.colorForValue('node', 1e6, breaks) === ramp[4]);
 	// The undefined rule, which is the one a browser cannot show you.
-	ok('an undefined value gets NO colour, not the bottom one', L.colorForValue(undefined, breaks) === '');
-	ok('NaN gets no colour', L.colorForValue(NaN, breaks) === '');
-	ok('null gets no colour', L.colorForValue(null, breaks) === '');
+	ok('an undefined value gets NO colour, not the bottom one', L.colorForValue('node', undefined, breaks) === '');
+	ok('NaN gets no colour', L.colorForValue('node', NaN, breaks) === '');
+	ok('null gets no colour', L.colorForValue('node', null, breaks) === '');
 	// n classes, n colours, in order. Nothing is sampled out of a longer set any more -- the ramp
 	// is asked for the count the map is drawn in.
-	s.colorClasses = 3;
+	s.colorClassesNode = 3;
 	ok('three classes are the ramp\'s own three colours, in order',
-		[0, 1, 2].map(i => L.bandColor(i, 3)).join(',') === R.RAMPS.epanet.colors[3].join(','),
-		[0, 1, 2].map(i => L.bandColor(i, 3)).join(','));
-	s.colorClasses = 5;
-	s.colorReverse = true;
-	ok('reversing swaps the ends', L.colorForValue(5, breaks) === ramp[4] && L.colorForValue(1e6, breaks) === ramp[0]);
-	s.colorReverse = false;
-	s.colorClasses = 7;
+		[0, 1, 2].map(i => L.bandColor('node', i, 3)).join(',') === R.RAMPS.epanet.colors[3].join(','),
+		[0, 1, 2].map(i => L.bandColor('node', i, 3)).join(','));
+	s.colorClassesNode = 5;
+	s.colorReverseNode = true;
+	ok('reversing swaps the ends',
+		L.colorForValue('node', 5, breaks) === ramp[4] && L.colorForValue('node', 1e6, breaks) === ramp[0]);
+	// **AND IT REVERSES ONE GROUP ONLY.** The link scheme is on the same ramp and must be unmoved.
+	s.colorRampLink = 'epanet';
+	s.colorClassesLink = 5;
+	ok('...for that group alone', L.colorForValue('link', 5, breaks) === ramp[0]);
+	s.colorReverseNode = false;
+	s.colorClassesNode = 7;
+	s.colorClassesLink = 7;
 }
 
 // ---- 4. the range allocation modes ------------------------------------------------------------
@@ -189,13 +221,13 @@ console.log('== modes ==');
 		s.colorModes['link.velocity'] = mode;
 		let allRight = true;
 		for (let n = R.MIN_CLASSES; n <= R.MAX_CLASSES; n++) {
-			s.colorClasses = n;
+			s.colorClassesLink = n;
 			const b = L.computedBreaks('link', 'velocity');
 			if (b.length !== n - 1 || !b.every(v => isFinite(v))) { allRight = false; }
 		}
 		ok('mode "' + mode + '" answers with count-1 finite breaks at every count', allRight);
 	});
-	s.colorClasses = 7;
+	s.colorClassesLink = 7;
 	// **THE CRITERION MODE IS NAMED FOR THE QUANTITY AND IS OFFERED ONLY ON IT.** A mode called
 	// Pressure offered while colouring velocity is an invitation to a wrong map.
 	ok('Pressure is offered while colouring pressure',
@@ -204,8 +236,12 @@ console.log('== modes ==');
 		!R.modesFor('velocity').some(m => m.key === 'pressure'));
 	s.colorModes['node.pressure'] = 'pressure';
 	ok('a criterion mode DICTATES the class count, whatever the count picker last said',
-		L.colorClassCount() === R.criterionClasses('pressure') && L.colorClassCount() === 5,
-		L.colorClassCount());
+		L.colorClassCount('node') === R.criterionClasses('pressure') && L.colorClassCount('node') === 5,
+		L.colorClassCount('node'));
+	// **AND IT DICTATES IT FOR ITS OWN GROUP ONLY.** Before the schemes split, a pressure criterion
+	// chosen for the nodes silently redrew the LINK map in five classes too.
+	ok('...and leaves the other group at the count its own picker says',
+		L.colorClassCount('link') === 7, L.colorClassCount('link'));
 	ok('...and its breaks are the four thresholds, not an algorithm\'s answer',
 		L.computedBreaks('node', 'pressure').length === 4);
 	// STORED IN SI, CONVERTED AT THE BOUNDARY: 20 psi is the first threshold under the US preset.
@@ -312,7 +348,7 @@ console.log('== pinned breaks ==');
 	fresh('us');
 	const s = L.getSettings(), doc = L.getDoc();
 	s.colorNodeField = 'pressure';
-	s.colorClasses = 5;
+	s.colorClassesNode = 5;
 	ok('with nothing pinned the breaks are the mode\'s own answer',
 		L.effectiveBreaks('node', 'pressure').join(',') === L.computedBreaks('node', 'pressure').join(','));
 	s.colorBreaks['node.pressure'] = [10, 20, 30, 40];
@@ -329,9 +365,9 @@ console.log('== pinned breaks ==');
 	// A set pinned at one class count is not thrown away when the count moves; it is ignored while
 	// it does not fit and comes back when it does.
 	s.colorBreaks['node.pressure'] = [10, 20, 30, 40];
-	s.colorClasses = 7;
+	s.colorClassesNode = 7;
 	ok('a four-limit set is ignored under seven classes', L.pinnedBreaks('node', 'pressure').length === 0);
-	s.colorClasses = 5;
+	s.colorClassesNode = 5;
 	ok('...and comes straight back at five', L.pinnedBreaks('node', 'pressure').join(',') === '10,20,30,40');
 
 	// THE UNIT CLAIM. A break the user typed is a number in the DISPLAYED unit, exactly like every
@@ -350,7 +386,7 @@ console.log('== pinned breaks ==');
 	fresh('si');
 	const s2 = L.getSettings(), doc2 = L.getDoc();
 	s2.colorNodeField = 'pressure';
-	s2.colorClasses = 5;
+	s2.colorClassesNode = 5;
 	s2.colorBreaks['node.pressure'] = pinned.slice();
 	L.refreshValueColors();
 	const siPress = doc2.nodes.filter(n => n.type === 'junction').map(n => L.colorNodeValue(n, 'pressure'));
@@ -399,7 +435,7 @@ console.log('== colour key ==');
 	ok('no key while nothing is coloured', L.legendBox().style.display === 'none',
 		L.legendBox().style.display);
 	s.colorLinkField = 'velocity';
-	s.colorClasses = 5;
+	s.colorClassesLink = 5;
 	s.colorBreaks['link.velocity'] = [1, 2, 3, 4];
 	L.refreshValueColors();
 	const box = L.legendBox();
@@ -415,7 +451,7 @@ console.log('== colour key ==');
 		(box.children || []).length);
 	// **THE KEY FOLLOWS THE CLASS COUNT.** Seven classes and a five-row key would be the same lie
 	// as a seven-box swatch over a five-class map, told at the other end.
-	s.colorClasses = 7;
+	s.colorClassesLink = 7;
 	delete s.colorBreaks['link.velocity'];
 	L.refreshValueColors();
 	ok('raising the count to seven gives seven rows', (allText(L.legendBox()).match(/–|≥|</g) || []).length >= 7,
@@ -441,12 +477,20 @@ console.log('== the ramp picker ==');
 	try { L.buildColoringSection(); } catch (e) { threw = e; }
 	ok('the coloring controls render without throwing', threw === null, threw && threw.stack);
 
+	// **ONE PICKER PER SYMBOLOGY GROUP, INSIDE THAT GROUP.** Nothing about a colour scheme is left
+	// in the shared block: what stands there is what is true of the whole sheet.
 	const shared = walk(byId.lpn_set_colors_shared);
-	const btn = shared.filter(e => e.id === 'lpn_set_ramp')[0];
-	const pop = shared.filter(e => e.id === 'lpn_set_ramp_list')[0];
+	const nodeBlock = walk(byId.lpn_set_colors_node), linkBlock = walk(byId.lpn_set_colors_link);
+	const btn = nodeBlock.filter(e => e.id === 'lpn_set_ramp_node')[0];
+	const pop = nodeBlock.filter(e => e.id === 'lpn_set_ramp_list_node')[0];
+	ok('the link group has a picker of its own',
+		!!linkBlock.filter(e => e.id === 'lpn_set_ramp_link')[0] &&
+		!!linkBlock.filter(e => e.id === 'lpn_set_ramp_list_link')[0]);
+	ok('...and no picker is left in the shared block',
+		shared.filter(e => /^lpn_set_ramp(_list)?_(node|link)$/.test(e.id || '')).length === 0);
 	ok('the closed picker is a BUTTON, not a select', !!btn && btn.tagName === 'BUTTON', btn && btn.tagName);
 	ok('...showing the current ramp as a bar of swatches',
-		!!btn && walk(btn).filter(e => e.className === 'lpn-color-swatch').length === L.colorClassCount(),
+		!!btn && walk(btn).filter(e => e.className === 'lpn-color-swatch').length === L.colorClassCount('node'),
 		btn && walk(btn).filter(e => e.className === 'lpn-color-swatch').length);
 	ok('...and carrying the scheme\'s name as its ACCESSIBLE name, not on screen',
 		!!btn && /Viridis/.test(btn.getAttribute('aria-label') || '') && !/Viridis/.test(allText(btn)),
@@ -462,11 +506,11 @@ console.log('== the ramp picker ==');
 	ok('...with the name in aria-label, where a screen reader finds it',
 		rows.every(r => (r.getAttribute('aria-label') || '').length > 0));
 	ok('every row shows the CURRENT class count, not always seven',
-		rows.every(r => walk(r).filter(e => e.className === 'lpn-color-swatch').length === L.colorClassCount()));
+		rows.every(r => walk(r).filter(e => e.className === 'lpn-color-swatch').length === L.colorClassCount('node')));
 	ok('exactly one row is marked selected',
 		rows.filter(r => r.getAttribute('aria-selected') === 'true').length === 1);
 	ok('...and it is the ramp in use',
-		rows.filter(r => r.getAttribute('aria-selected') === 'true')[0].getAttribute('data-ramp') === s.colorRamp);
+		rows.filter(r => r.getAttribute('aria-selected') === 'true')[0].getAttribute('data-ramp') === s.colorRampNode);
 	ok('every row is keyboard-reachable', rows.every(r => r.getAttribute('tabindex') !== null));
 
 	// **CLAUSES 4 AND 5: NOTHING IS NAMED AFTER THE SOURCE.** The heading is a family name in
@@ -485,8 +529,8 @@ console.log('== the ramp picker ==');
 	ok('the rainbow heading is last and says what it is for',
 		/EPANET/i.test(allText(heads[heads.length - 1])), allText(heads[heads.length - 1]));
 
-	// THE COUNT PICKER.
-	const cnt = shared.filter(e => e.id === 'lpn_set_ramp_classes')[0];
+	// THE COUNT PICKER, which is per group for the same reason the ramp is.
+	const cnt = nodeBlock.filter(e => e.id === 'lpn_set_ramp_classes_node')[0];
 	ok('there is a class-count picker offering 3 to 7', !!cnt && cnt.children.length === 5,
 		cnt && cnt.children.length);
 	ok('...and it is not disabled while every mode is algorithmic', !!cnt && !cnt.disabled);
@@ -509,7 +553,7 @@ console.log('== the ramp picker ==');
 
 	// THE RANGES: a mode picker and count-1 editable limits, under the sub-heading of the element
 	// they colour.
-	const nodeSide = walk(byId.lpn_set_colors_node);
+	const nodeSide = nodeBlock;
 	const modeSel = nodeSide.filter(e => e.id === 'lpn_set_color_mode_node')[0];
 	ok('the node ranges carry a mode picker', !!modeSel);
 	ok('...offering the algorithmic modes AND the one named Pressure',
@@ -518,7 +562,7 @@ console.log('== the ramp picker ==');
 		modeSel && modeSel.children.map(o => o.value).join(','));
 	const boxes = nodeSide.filter(e => e.type === 'number');
 	ok('...and one editable limit fewer than there are classes',
-		boxes.length === L.colorClassCount() - 1, boxes.length + ' for ' + L.colorClassCount());
+		boxes.length === L.colorClassCount('node') - 1, boxes.length + ' for ' + L.colorClassCount('node'));
 	ok('the limits arrive filled in, not blank -- the mode has already answered',
 		boxes.every(b => b.value !== '' && isFinite(+b.value)), boxes.map(b => b.value).join(','));
 	// The link side offers one mode fewer, because Pressure is not a mode for velocity.
@@ -531,12 +575,75 @@ console.log('== the ramp picker ==');
 	// and the picture must not offer to disagree with them.
 	s.colorModes['node.pressure'] = 'pressure';
 	L.buildColoringSection();
-	const cnt2 = walk(byId.lpn_set_colors_shared).filter(e => e.id === 'lpn_set_ramp_classes')[0];
+	const cnt2 = walk(byId.lpn_set_colors_node).filter(e => e.id === 'lpn_set_ramp_classes_node')[0];
 	ok('a criterion mode disables the count picker', !!cnt2 && cnt2.disabled === true);
 	ok('...and the picker draws five boxes, the count that mode dictates',
-		walk(walk(byId.lpn_set_colors_shared).filter(e => e.id === 'lpn_set_ramp')[0])
+		walk(walk(byId.lpn_set_colors_node).filter(e => e.id === 'lpn_set_ramp_node')[0])
 			.filter(e => e.className === 'lpn-color-swatch').length === 5);
+	// ...and the LINK picker is untouched by a criterion chosen for the nodes.
+	const cnt3 = walk(byId.lpn_set_colors_link).filter(e => e.id === 'lpn_set_ramp_classes_link')[0];
+	ok('...while the link count picker stays live and stays at seven',
+		!!cnt3 && cnt3.disabled === false &&
+		walk(walk(byId.lpn_set_colors_link).filter(e => e.id === 'lpn_set_ramp_link')[0])
+			.filter(e => e.className === 'lpn-color-swatch').length === 7);
 	delete s.colorModes['node.pressure'];
+}
+
+// ---- 11. OPENING A PROJECT WRITTEN BEFORE THE SCHEMES SPLIT -----------------------------------
+//
+// **NOTHING MAY CHANGE COLOUR.** The ramp, the class count and the reverse flag were one each for
+// the whole map; a document saved then carries `colorRamp`, `colorClasses`, `colorReverse` and
+// neither per-group key. Both groups take the value the file states, so the map is redrawn exactly
+// as it was saved -- and the legacy keys are dropped afterwards, so nothing can later read a stale
+// one and disagree with what is on screen.
+console.log('== opening an older project ==');
+{
+	fresh('us');
+	const s = L.getSettings(), doc = L.getDoc();
+	s.colorNodeField = 'pressure';
+	s.colorLinkField = 'velocity';
+	s.colorRampNode = 'ylgnbu';
+	s.colorRampLink = 'ylgnbu';
+	s.colorClassesNode = 5;
+	s.colorClassesLink = 5;
+	s.colorReverseNode = true;
+	s.colorReverseLink = true;
+	L.refreshValueColors();
+	const painted = doc.nodes.map(n => L.nodeFill(n.id) + '|' + L.nodeSymbolColor(n.id))
+		.concat(doc.links.map(l => L.linkStroke(l.id))).join(',');
+
+	// The file an older build would have written: one of each, no per-group key anywhere.
+	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
+	['colorRampNode', 'colorRampLink', 'colorClassesNode', 'colorClassesLink',
+		'colorReverseNode', 'colorReverseLink'].forEach(k => { delete saved.settings[k]; });
+	saved.settings.colorRamp = 'ylgnbu';
+	saved.settings.colorClasses = 5;
+	saved.settings.colorReverse = true;
+
+	L.applySaved(saved);
+	const s2 = L.getSettings();
+	ok('the one stored ramp becomes both groups\' ramp',
+		s2.colorRampNode === 'ylgnbu' && s2.colorRampLink === 'ylgnbu');
+	ok('...and the one stored class count becomes both counts',
+		s2.colorClassesNode === 5 && s2.colorClassesLink === 5);
+	ok('...and the one stored reverse flag becomes both flags',
+		s2.colorReverseNode === true && s2.colorReverseLink === true);
+	ok('the legacy keys are dropped rather than left to drift',
+		s2.colorRamp === undefined && s2.colorClasses === undefined && s2.colorReverse === undefined);
+	L.runSolve();
+	L.refreshValueColors();
+	ok('so the map opens on exactly the colours it was saved in',
+		L.getDoc().nodes.map(n => L.nodeFill(n.id) + '|' + L.nodeSymbolColor(n.id))
+			.concat(L.getDoc().links.map(l => L.linkStroke(l.id))).join(',') === painted);
+
+	// A project saved before the class count existed AT ALL was drawn in five bands, and its pinned
+	// breaks are four numbers. That rule survives the split, once per group.
+	const older = JSON.parse(JSON.stringify(saved));
+	delete older.settings.colorClasses;
+	L.applySaved(older);
+	const s3 = L.getSettings();
+	ok('a document from before the count existed still opens at the five bands it was drawn in',
+		s3.colorClassesNode === 5 && s3.colorClassesLink === 5);
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILURE(S)');

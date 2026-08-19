@@ -2033,6 +2033,10 @@ $ec_lang['lpn_settings_scope_calculator']='Calculator settings';
 $ec_lang['lpn_settings_show_titles']='Show page titles';
 $ec_lang['lpn_settings_show_titles_tip']='Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
+// "Creation values", not "Starting values" (Tom, 2026-08-19: "The problem is that it's
+// misleading"). These are what a NEW element is created with; "starting" reads as the initial
+// condition of a run, which on a page that now has a duration and a clock is a different thing
+// entirely -- and a tank really does have one.
 $ec_lang['lpn_settings_defaults']='Creation values';
 $ec_lang['lpn_settings_defaults_note']='Used for elements you create from now on. Existing elements are not changed.';
 $ec_lang['lpn_settings_push_note']='Only the properties whose labels are showing right now are applied.';
@@ -2276,3 +2280,22 @@ $ec_lang['lpn_settings_hydraulics']='Hydraulics';
 // there; either way the term of art lives in the heading's own tip.
 $ec_lang['lpn_labels_col_decimals_example']='0.000';
 $ec_lang['lpn_labels_col_rank']='Rank';
+
+// ---- Task 441 follow-up: the two symbology groups each carry a colour scheme -----------------
+// A third sub-heading over the two controls that are about a node label and a link label alike.
+// "Node and link" rather than "Both": it names the two things, which survives translation into a
+// language with no single word for the pair.
+$ec_lang['lpn_settings_node_link']='Node and link';
+// THE RANGE ALLOCATION MODES, which decide where one colour stops and the next begins. Named for
+// what they DO to the numbers, in the vocabulary QGIS, ArcGIS and every GIS textbook already use --
+// a translator should reach for their own discipline's standard term rather than a literal
+// rendering. Two carry the method's own proper name in brackets (Jenks is a person); keep it.
+// "Pressure" is not an algorithm at all: it is a set of thresholds out of a design standard, and it
+// is offered only while pressure is the quantity being coloured.
+$ec_lang['lpn_color_mode_equal']='Equal interval';
+$ec_lang['lpn_color_mode_quantile']='Quantile (equal count)';
+$ec_lang['lpn_color_mode_jenks']='Natural breaks (Jenks)';
+$ec_lang['lpn_color_mode_stddev']='Standard deviation';
+$ec_lang['lpn_color_mode_pretty']='Pretty (rounded)';
+$ec_lang['lpn_color_mode_log']='Logarithmic';
+$ec_lang['lpn_color_mode_pressure']='Pressure';

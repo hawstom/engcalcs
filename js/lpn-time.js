@@ -271,14 +271,14 @@
 			play: pageConfig.lpn_time_play || 'Play',
 			pause: pageConfig.lpn_time_pause || 'Pause',
 			next: pageConfig.lpn_time_next || 'Step forward',
-			last: pageConfig.lpn_time_last || 'Go to the end',
-			tank: pageConfig.lpn_time_tank || 'Tank',
-			level: pageConfig.lpn_time_level || 'Water level',
-			// Read by js/looped-network.js's own tab strip, not here; listed so the bridge check
-			// sees them, because the tab row names them by key and nothing else does.
-			settingsOpen: pageConfig.lpn_time_settings_open || 'Time settings',
-			menu: pageConfig.lpn_time_menu || 'Time',
-			menuTip: pageConfig.lpn_time_menu_tip || 'Set how long this network runs, and step through it.'
+			last: pageConfig.lpn_time_last || 'Go to the end'
+			// **FIVE STRINGS LEFT THIS LIST WITH THE PANE TAB**: lpn_time_tank, lpn_time_level and
+			// lpn_time_settings_open named the tank table and the door to the settings, and
+			// lpn_time_menu / lpn_time_menu_tip named the tab itself. lpn_time_menu is still
+			// RENDERED -- it is the Time sub-heading in the Settings box, straight out of
+			// Looped-Network.php -- and the other four are now rendered by nothing. They are left
+			// in lib/lang.ec.en.php rather than deleted: whether an unreferenced key is debt or
+			// lost content is Tom's call, and the tank levels are meant to come back.
 		};
 	}
 	function docTimes() {
@@ -287,6 +287,19 @@
 	}
 
 	EC.lpnTimeNow = function () { return state.t; };
+
+	/**
+	 * THE RUN AS IT STANDS AT THIS INSTANT, in the shape a solve returns -- levels, statuses and
+	 * demands included. null when there is no run.
+	 *
+	 * The one way in to a frame from outside this file, and the readout the removed Time tab's tank
+	 * table used to be. It exists so the next thing that wants those levels -- a tank table, a
+	 * chart, a report -- asks the run rather than scraping a panel, and so the browser pass can
+	 * check that a tank really fills now that nothing on the page draws it.
+	 */
+	EC.lpnTimeCurrentFrame = function () {
+		return state.run ? EC.lpnTimeFrameResult(state.run, state.t) : null;
+	};
 
 	/**
 	 * Hang the document's clock on a model on its way to the solver. One line in assembleModel().
@@ -441,26 +454,19 @@
 		renderPanel();
 	}
 
-	// ---- the pane tab ----
-
-	function panelEl() {
-		var el = document.getElementById('lpn_pane_time'), body;
-		if (el) { return el; }
-		body = document.getElementById('lpn_pane_body');
-		if (!body) { return null; }
-		// Built here rather than in Looped-Network.php so that the whole of this feature is one
-		// file plus a tab registration. It carries the same classes the hand-written panels do.
-		el = document.createElement('div');
-		el.id = 'lpn_pane_time';
-		// **NOT `on`.** applyPaneLayout() over in js/looped-network.js decides which panel is
-		// showing, and a panel built pre-lit would be visible on top of whichever tab the user is
-		// actually on -- renderPanel() runs on every solve, not only while this tab is up.
-		el.className = 'lpn-pane-panel lpn-pane-scroll';
-		el.setAttribute('role', 'tabpanel');
-		el.setAttribute('aria-labelledby', 'lpn_pane_tab_time');
-		body.appendChild(el);
-		return el;
-	}
+	// ---- THERE IS NO TIME TAB IN THE BOTTOM PANE ----------------------------------------------
+	//
+	// Tom, 2026-08-19: *"No need for this to have a tab in the bottom pane. Remove the tab and
+	// what's on it."* Time had become the THIRD place the clock lived: the seven [TIMES] settings
+	// moved into the Settings box and the transport moved onto the toolbar, which left a tab
+	// holding a door to the first and a table of tank levels.
+	//
+	// **THE TANK-LEVEL TABLE WENT WITH IT, and that is a real loss to record rather than a tidy-up
+	// to celebrate.** A tank filling and draining is the one thing an extended-period run shows
+	// that a series of instants cannot, and the map does not draw it: a tank's head label is its
+	// STORED starting level, because that number is the user's. Nothing on the page reads a run's
+	// tank levels now. Put them back as a COLUMN of a tank table -- the shape the junctions tab
+	// already has -- rather than as a tab of their own.
 
 	function el(tag, attrs, text) {
 		var e = document.createElement(tag), k;
@@ -493,10 +499,16 @@
 			// **DECLARED IN HERE, not shared across the seven.** Hoisted to the function above,
 			// every listener would close over the LAST input built, so editing the duration would
 			// commit whatever was sitting in the start-clock box.
-			var row = el('label', { class: 'lpn-time-row', style: 'display:flex;align-items:center;gap:.35rem;margin:.15rem 0' }),
-				label = el('span', { class: 'ec-help', title: S.formatTip, style: 'flex:1 1 auto' }, S[pair[0]]),
+			// **THE BOX'S OWN ROW SHAPE, not a private one** (Tom, 2026-08-19: "Some inputs are
+			// right justified. Others are not. Standardize with an eye for design"). These seven
+			// were the only rows in the Settings box laying themselves out by hand, so they were
+			// the only ones whose control did not line up with the column above and below it.
+			// `lpn-set-num` is the rule for a number-shaped TEXT box: `24:00` is a number to every
+			// reader and a string only to the parser. See css/engcalcs.css.
+			var row = el('label', { class: 'lpn-set-row lpn-time-row' }),
+				label = el('span', { class: 'ec-help', title: S.formatTip }, S[pair[0]]),
 				input = el('input', {
-					type: 'text', size: '7', inputmode: 'text',
+					type: 'text', inputmode: 'text', class: 'lpn-set-num',
 					// **THE FILE'S OWN TEXT, WHILE IT STILL SAYS THIS NUMBER.** lpnTimeText hands
 					// back `24:00` rather than the `24:00` we would have composed, and hands back a
 					// composed one the moment the number stops matching. So an edit never silently
@@ -651,98 +663,22 @@
 		swapIcon(ui.play, state.playing ? 'pause' : 'play');
 	}
 
+	// The one thing a solve or a clock edit still has to repaint: the transport on the toolbar.
+	// Kept under its old name because it is called from eight places that mean "the run changed".
 	function renderPanel() {
-		var panel = panelEl(), S = strings(), open;
-		// **THE TRANSPORT IS ON THE TOOLBAR AND THE PANE MAY BE SHUT**, so it is refreshed before the
-		// panel is even looked for -- an early return here used to be harmless and would now freeze
-		// the clock readout of a user watching a profile with the pane hidden, which is the exact
-		// case the move was made for.
 		renderTransport();
-		if (!panel || !host) { return; }
-		panel.textContent = '';
-
-		// **THE ONE DOOR FROM THE TRANSPORT TO ITS SETTINGS.** The seven fields left this tab for
-		// the Settings box, and a user who came here to change the duration would otherwise have to
-		// be told where it went by somebody. A button that opens the box on the Time section is
-		// that telling, and it costs one string.
-		open = el('button', {
-			type: 'button', class: 'btn btn-sm btn-outline-secondary ec-help',
-			style: 'margin:.3rem .6rem',
-			title: S.menuTip
-		}, S.settingsOpen);
-		open.addEventListener('click', function () { if (host.openSettings) { host.openSettings('time'); } });
-		panel.appendChild(open);
-
-		// **THE TRANSPORT LEFT THIS TAB FOR THE TOOLBAR** (Tom, 2026-08-18: "I was trying to find a
-		// nice place for this so you can hide the bottom pane or watch a profile during animation.
-		// epanetjs puts it on the toolbar"). It is the one thing in this pane you want to work while
-		// looking at something else, and a control inside a panel cannot be used while that panel is
-		// hidden. See lpnTimeMountToolbar().
-		//
-		// **AND THERE IS EXACTLY ONE OF IT.** The slider that used to be here is gone rather than
-		// mirrored: two controls for one current step is two controls that can disagree, and the one
-		// on the toolbar is the one that is always on screen. What is left in this tab is what a
-		// panel is for -- the tank levels, which are a TABLE.
-		//
-		// **AND A NETWORK WITH NO DURATION IS NOT TOLD ANYTHING** (Tom, 2026-08-18: "I don't think
-		// it's needed at all. The transport will always be there, and no explanation is needed").
-		// It has no run, so it has no tank levels, so this tab is the settings door and nothing
-		// else -- which is the honest amount of content for it rather than a paragraph explaining
-		// an absence.
-
-		// -- tank levels, which are the reason a run is a run --
-		var levels = state.run ? (EC.lpnTimeFrameResult(state.run, state.t) || {}).levels : null,
-			ids = levels ? Object.keys(levels) : [];
-		if (ids.length) {
-			var tbl = el('table', { class: 'table table-sm', style: 'width:auto;margin:.3rem .6rem' }),
-				thead = el('tr');
-			thead.appendChild(el('th', {}, S.tank));
-			thead.appendChild(el('th', {}, S.level + ' (' + host.unitLabel('lpn_u_elevhead') + ')'));
-			tbl.appendChild(thead);
-			ids.forEach(function (id) {
-				var tr = el('tr');
-				tr.appendChild(el('td', {}, id));
-				// **A RESULT, DISPLAYED. NEVER WRITTEN BACK ONTO THE TANK.** The document's `level`
-				// is the user's starting condition and stays exactly as they typed it.
-				//
-				// Shown in the INPUT head unit rather than the result one (Task 422 split them),
-				// because the number a reader is comparing this against is the tank's own stored
-				// starting level, which is typed in that unit.
-				tr.appendChild(el('td', {}, host.toDisplay(levels[id], 'lpn_u_elevhead').toFixed(2)));
-				tbl.appendChild(tr);
-			});
-			panel.appendChild(tbl);
-		}
-		if (EC.initTips) { EC.initTips(panel); }
 	}
 
 	/**
-	 * The whole seam. js/looped-network.js calls this once, at script scope, before its own
-	 * DOMContentLoaded handler builds the pane -- which is why the tab can simply be pushed onto
-	 * the list it is handed.
+	 * The whole seam. js/looped-network.js calls this once, at script scope, and everything this
+	 * file shows -- the seven settings, the transport, the status line -- hangs off the host it is
+	 * handed here.
 	 */
 	EC.lpnTimeInit = function (h) {
 		host = h;
-		if (h.tabs) {
-			h.tabs.push({
-				id: 'time', panel: 'lpn_pane_time',
-				label: 'lpn_time_menu', tip: 'lpn_time_menu_tip',
-				// The panel is built here rather than in the page, so the first show has to light it:
-				// applyPaneLayout() ran before it existed and found nothing to switch on.
-				show: function () {
-					renderPanel();
-					var el = panelEl();
-					if (el) { el.classList.add('on'); }
-				},
-				refresh: renderPanel
-				// **NO `hide` HOOK ANY MORE.** It used to pause the run when this tab stopped being
-				// the one showing, on the reasoning that nobody was watching. That reasoning died
-				// with the move to the toolbar: the thing being watched during playback is the MAP
-				// and the PROFILE, and Tom asked for the transport out here precisely "so you can
-				// hide the bottom pane or watch a profile during animation". Pausing on tab-hide
-				// would stop the run at the moment it became useful.
-			});
-		}
+		// **NO TAB IS PUSHED ONTO `h.tabs`.** There was one; see the note where panelEl() used to
+		// be. The transport is on the toolbar and the settings are in the Settings box, and a third
+		// place for the clock was the whole of what the tab had left to offer.
 	};
 
 	if (typeof module !== 'undefined' && module.exports) { module.exports = EC; }

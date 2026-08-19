@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1182,
-        "delta_key_count": 3,
+        "expected_key_count": 1190,
+        "delta_key_count": 11,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -422,12 +422,28 @@
     "keys_to_translate": {
         "lpn_geomap": "lat\/lon",
         "lpn_xymap": "XY",
-        "lpn_labels_col_decimals_example": "0.000"
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_settings_node_link": "Node and link",
+        "lpn_color_mode_equal": "Equal interval",
+        "lpn_color_mode_quantile": "Quantile (equal count)",
+        "lpn_color_mode_jenks": "Natural breaks (Jenks)",
+        "lpn_color_mode_stddev": "Standard deviation",
+        "lpn_color_mode_pretty": "Pretty (rounded)",
+        "lpn_color_mode_log": "Logarithmic",
+        "lpn_color_mode_pressure": "Pressure"
     },
     "keys": {
         "lpn_geomap": "lat\/lon",
         "lpn_xymap": "XY",
-        "lpn_labels_col_decimals_example": "0.000"
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_settings_node_link": "Node and link",
+        "lpn_color_mode_equal": "Equal interval",
+        "lpn_color_mode_quantile": "Quantile (equal count)",
+        "lpn_color_mode_jenks": "Natural breaks (Jenks)",
+        "lpn_color_mode_stddev": "Standard deviation",
+        "lpn_color_mode_pretty": "Pretty (rounded)",
+        "lpn_color_mode_log": "Logarithmic",
+        "lpn_color_mode_pressure": "Pressure"
     },
     "key_context": {
         "lpn_geomap": {
@@ -476,6 +492,102 @@
                     "value": "Peringkat",
                     "english": "Rank"
                 }
+            }
+        },
+        "lpn_settings_node_link": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Peringkat",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_equal": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Peringkat",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_quantile": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Peringkat",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_jenks": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Peringkat",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_stddev": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Peringkat",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_pretty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Peringkat",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_log": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Peringkat",
+                    "english": "Rank"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_color_mode_pressure": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Peringkat",
+                    "english": "Rank"
+                },
+                "next_translated": null
             }
         }
     },
