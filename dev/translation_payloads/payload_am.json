@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 1162,
-        "delta_key_count": 166,
+        "expected_key_count": 1172,
+        "delta_key_count": 176,
         "exempt_key_count": 21,
         "exempt_keys": [
             "u_imgd",
@@ -551,7 +551,17 @@
         "lpn_settings_search_tip": "Type a word to see only the settings that mention it. The explanations are searched too, not just the names.",
         "lpn_settings_no_match": "No setting mentions that word.",
         "lpn_rpane_empty": "Nothing is docked here yet. Everything that belongs to the whole project is in Settings.",
-        "lpn_time_settings_open": "Time settings"
+        "lpn_time_settings_open": "Time settings",
+        "lpn_settings_sec_map": "Map and page",
+        "lpn_settings_sec_elements": "New elements",
+        "lpn_settings_sec_calculation": "Calculation",
+        "lpn_settings_node_symbology": "Node symbology",
+        "lpn_settings_link_symbology": "Link symbology",
+        "lpn_settings_page": "Page",
+        "lpn_settings_page_note": "Saved in this calculator, not in the project.",
+        "lpn_settings_hydraulics": "Hydraulics",
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_labels_col_rank": "Rank"
     },
     "keys": {
         "lpn_field_text_align": "Horizontal justification",
@@ -719,7 +729,17 @@
         "lpn_settings_search_tip": "Type a word to see only the settings that mention it. The explanations are searched too, not just the names.",
         "lpn_settings_no_match": "No setting mentions that word.",
         "lpn_rpane_empty": "Nothing is docked here yet. Everything that belongs to the whole project is in Settings.",
-        "lpn_time_settings_open": "Time settings"
+        "lpn_time_settings_open": "Time settings",
+        "lpn_settings_sec_map": "Map and page",
+        "lpn_settings_sec_elements": "New elements",
+        "lpn_settings_sec_calculation": "Calculation",
+        "lpn_settings_node_symbology": "Node symbology",
+        "lpn_settings_link_symbology": "Link symbology",
+        "lpn_settings_page": "Page",
+        "lpn_settings_page_note": "Saved in this calculator, not in the project.",
+        "lpn_settings_hydraulics": "Hydraulics",
+        "lpn_labels_col_decimals_example": "0.000",
+        "lpn_labels_col_rank": "Rank"
     },
     "key_context": {
         "lpn_field_text_align": {
@@ -3243,6 +3263,126 @@
             }
         },
         "lpn_time_settings_open": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ለዚህ ገጽ የተቀመጠውን ሁሉንም ነገር ይሰርዙ — እያንዳንዱን ፕሮጀክት፣ እያንዳንዱን የበስተጀርባ ምስል፣ ሁሉንም ቅንብሮች እና የመረጡትን መለኪያ ክፍሎች — እና ገጹን ልክ እንደ አዲስ ጎብኚ እንደሚያዩት ዳግም ይጫኑ? ይህ ሊቀለበስ አይችልም።",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_sec_map": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ለዚህ ገጽ የተቀመጠውን ሁሉንም ነገር ይሰርዙ — እያንዳንዱን ፕሮጀክት፣ እያንዳንዱን የበስተጀርባ ምስል፣ ሁሉንም ቅንብሮች እና የመረጡትን መለኪያ ክፍሎች — እና ገጹን ልክ እንደ አዲስ ጎብኚ እንደሚያዩት ዳግም ይጫኑ? ይህ ሊቀለበስ አይችልም።",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_sec_elements": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ለዚህ ገጽ የተቀመጠውን ሁሉንም ነገር ይሰርዙ — እያንዳንዱን ፕሮጀክት፣ እያንዳንዱን የበስተጀርባ ምስል፣ ሁሉንም ቅንብሮች እና የመረጡትን መለኪያ ክፍሎች — እና ገጹን ልክ እንደ አዲስ ጎብኚ እንደሚያዩት ዳግም ይጫኑ? ይህ ሊቀለበስ አይችልም።",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_sec_calculation": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ለዚህ ገጽ የተቀመጠውን ሁሉንም ነገር ይሰርዙ — እያንዳንዱን ፕሮጀክት፣ እያንዳንዱን የበስተጀርባ ምስል፣ ሁሉንም ቅንብሮች እና የመረጡትን መለኪያ ክፍሎች — እና ገጹን ልክ እንደ አዲስ ጎብኚ እንደሚያዩት ዳግም ይጫኑ? ይህ ሊቀለበስ አይችልም።",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_node_symbology": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ለዚህ ገጽ የተቀመጠውን ሁሉንም ነገር ይሰርዙ — እያንዳንዱን ፕሮጀክት፣ እያንዳንዱን የበስተጀርባ ምስል፣ ሁሉንም ቅንብሮች እና የመረጡትን መለኪያ ክፍሎች — እና ገጹን ልክ እንደ አዲስ ጎብኚ እንደሚያዩት ዳግም ይጫኑ? ይህ ሊቀለበስ አይችልም።",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_link_symbology": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ለዚህ ገጽ የተቀመጠውን ሁሉንም ነገር ይሰርዙ — እያንዳንዱን ፕሮጀክት፣ እያንዳንዱን የበስተጀርባ ምስል፣ ሁሉንም ቅንብሮች እና የመረጡትን መለኪያ ክፍሎች — እና ገጹን ልክ እንደ አዲስ ጎብኚ እንደሚያዩት ዳግም ይጫኑ? ይህ ሊቀለበስ አይችልም።",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_page": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ለዚህ ገጽ የተቀመጠውን ሁሉንም ነገር ይሰርዙ — እያንዳንዱን ፕሮጀክት፣ እያንዳንዱን የበስተጀርባ ምስል፣ ሁሉንም ቅንብሮች እና የመረጡትን መለኪያ ክፍሎች — እና ገጹን ልክ እንደ አዲስ ጎብኚ እንደሚያዩት ዳግም ይጫኑ? ይህ ሊቀለበስ አይችልም።",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_page_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ለዚህ ገጽ የተቀመጠውን ሁሉንም ነገር ይሰርዙ — እያንዳንዱን ፕሮጀክት፣ እያንዳንዱን የበስተጀርባ ምስል፣ ሁሉንም ቅንብሮች እና የመረጡትን መለኪያ ክፍሎች — እና ገጹን ልክ እንደ አዲስ ጎብኚ እንደሚያዩት ዳግም ይጫኑ? ይህ ሊቀለበስ አይችልም።",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_hydraulics": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ለዚህ ገጽ የተቀመጠውን ሁሉንም ነገር ይሰርዙ — እያንዳንዱን ፕሮጀክት፣ እያንዳንዱን የበስተጀርባ ምስል፣ ሁሉንም ቅንብሮች እና የመረጡትን መለኪያ ክፍሎች — እና ገጹን ልክ እንደ አዲስ ጎብኚ እንደሚያዩት ዳግም ይጫኑ? ይህ ሊቀለበስ አይችልም።",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_labels_col_decimals_example": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ለዚህ ገጽ የተቀመጠውን ሁሉንም ነገር ይሰርዙ — እያንዳንዱን ፕሮጀክት፣ እያንዳንዱን የበስተጀርባ ምስል፣ ሁሉንም ቅንብሮች እና የመረጡትን መለኪያ ክፍሎች — እና ገጹን ልክ እንደ አዲስ ጎብኚ እንደሚያዩት ዳግም ይጫኑ? ይህ ሊቀለበስ አይችልም።",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_labels_col_rank": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

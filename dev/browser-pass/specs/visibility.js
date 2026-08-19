@@ -11,7 +11,7 @@
 //
 // What can be quietly wrong about a box like this is never arithmetic; it is a layout or a door.
 // So this measures the doors and the geometry:
-//   1. the four sections exist and the index is derived from them, not hand-written;
+//   1. the three categories exist and the index is derived from them, not hand-written;
 //   2. every door Tom already knows still opens it — the toolbar Settings button, the menu bar's
 //      Settings, the toolbar Labels button, View > Labels, and a click on the colour legend — and
 //      each lands on the section it names;
@@ -55,7 +55,7 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();
 		await a.makeEdit();
 
-		// ---- 1. the four sections, and an index derived from them --------------------------
+		// ---- 1. the three categories, and an index derived from them ----------------------
 		await a.toolbarClick('Settings');
 		await a.settle(500);
 		report.ok(await a.page.evaluate(() =>
@@ -65,8 +65,23 @@ exports.run = async function ({ browser, report }) {
 		const secs = await a.page.evaluate(() =>
 			[...document.querySelectorAll('#lpn_setbox_content .lpn-set-sec')]
 				.map(s => s.getAttribute('data-set-sec')));
-		report.eq(secs.join(','), 'labels,settings,time,coloring',
-			'four sections, in the order Tom listed them');
+		// **THE CATEGORIES ARE TOM'S, AND THERE IS NO SECTION CALLED "SETTINGS"** (2026-08-18,
+		// after using the box): the four it opened with were the four panels it had absorbed, which
+		// is a history rather than a structure. The box IS Settings, so nothing inside it repeats
+		// the word. Quality is his fourth category and is not built.
+		report.eq(secs.join(','), 'map,elements,calc',
+			'three categories, in the order Tom gave them');
+		const subs = await a.page.evaluate(() =>
+			[...document.querySelectorAll('#lpn_setbox_content .lpn-set-sub')].map(s => s.id));
+		report.eq(subs.join(','),
+			'lpn_set_sub_nodeSym,lpn_set_sub_linkSym,lpn_set_sub_mapDisplay,lpn_set_sub_page,' +
+			'lpn_set_sub_idPrefixes,lpn_set_sub_defaults,' +
+			'lpn_set_sub_units,lpn_set_sub_time,lpn_set_sub_hydraulics',
+			'...and the sub-headings under them', subs.join(','));
+		report.ok(!(await a.page.evaluate(() =>
+			[...document.querySelectorAll('#lpn_setbox_content .lpn-set-head, #lpn_setbox_content .lpn-set-sub')]
+				.some(h => /^\s*settings\s*$/i.test(h.textContent)))),
+			'no heading inside the box says "Settings" — the box is Settings');
 
 		// **THE INDEX IS DERIVED, NEVER WRITTEN.** Every section head and every sub-heading has a
 		// row, and every row points at something that exists. A hand-written index fails silently:
@@ -116,7 +131,7 @@ exports.run = async function ({ browser, report }) {
 					pageScrolled: document.documentElement.scrollTop };
 			}, secId);
 		};
-		const jumped = await jumpTo('lpn_set_sec_coloring');
+		const jumped = await jumpTo('lpn_set_sec_calc');
 		report.ok(jumped.scrolled > 0, 'clicking an index row scrolls the content pane',
 			String(Math.round(jumped.scrolled)));
 		report.ok(jumped.rel >= -2 && jumped.rel < jumped.paneH,
@@ -127,10 +142,38 @@ exports.run = async function ({ browser, report }) {
 		// scrollTop**, and that is not a dodge: the headings are sticky, so "this section is at the
 		// top" and "the pane is scrolled to this offset" are genuinely different claims, and the
 		// first one is what the reader sees and what the index promises.
-		const back = await jumpTo('lpn_set_sec_labels');
+		const back = await jumpTo('lpn_set_sec_map');
 		report.ok(Math.abs(back.rel) <= 2,
 			'and jumping back puts the first section at the top of the pane',
 			`heading at ${Math.round(back.rel)}`);
+
+		// **A SUB-HEADING MUST NOT LAND UNDER THE STICKY SECTION HEADING** (Tom, 2026-08-18: "the
+		// scroll target lands UNDER the level-1 heading"). `block: 'start'` puts the target exactly
+		// where the sticky heading is about to be, so the thing you asked for is the one thing you
+		// cannot see. Measured, not asserted against a constant: the fix is a scroll-margin read off
+		// the heading's own painted height, and only a browser knows what that is.
+		const jumpSub = async (subId) => {
+			await a.page.evaluate((id) => {
+				const row = [...document.querySelectorAll('#lpn_setbox_index .lpn-setbox-link')]
+					.find(r => r.getAttribute('data-sub') === id);
+				if (row) { row.click(); }
+			}, subId);
+			await a.settle(300);
+			return a.page.evaluate((id) => {
+				const sub = document.getElementById(id).getBoundingClientRect();
+				const sec = document.getElementById(id).closest('.lpn-set-sec');
+				const head = sec.querySelector('.lpn-set-head').getBoundingClientRect();
+				const pane = document.getElementById('lpn_setbox_content').getBoundingClientRect();
+				return { gap: sub.top - head.bottom, inPane: sub.top - pane.top, paneH: pane.height };
+			}, subId);
+		};
+		for (const subId of ['lpn_set_sub_mapDisplay', 'lpn_set_sub_defaults', 'lpn_set_sub_hydraulics']) {
+			const j = await jumpSub(subId);
+			report.ok(j.gap >= -1, `jumping to ${subId} clears the sticky section heading`,
+				`${Math.round(j.gap)} px below it`);
+			report.ok(j.inPane >= -1 && j.inPane < j.paneH, '...and is inside the pane',
+				`${Math.round(j.inPane)} of ${Math.round(j.paneH)}`);
+		}
 
 		// ---- 2. the search matches tips as well as titles ----------------------------------
 		// The word to search for is read OUT OF A TIP that is on the page right now, and checked
@@ -186,17 +229,42 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(300);
 		report.eq(await a.page.evaluate(() =>
 			[...document.querySelectorAll('#lpn_setbox_content .lpn-set-sec')]
-				.filter(s => s.style.display !== 'none').length), 4,
-			'clearing the search brings all four sections back');
+				.filter(s => s.style.display !== 'none').length), 3,
+			'clearing the search brings all three categories back');
 
 		// ---- 3. it is a BOX: geometry, drag, and it does not close on a click away ----------
 		const g = await boxRect(a);
 		report.ok(g.width > 300 && g.height > 250, 'it is a real two-pane box, not a strip',
 			`${Math.round(g.width)}x${Math.round(g.height)}`);
+		// **LONGER AND LESS THAN HALF AS WIDE** (Tom, 2026-08-18: "It can be longer and narrower; I
+		// would say less than half as wide"). Measured against the old 60rem, which is 960 px at
+		// this page's 16 px root: anything under 480 is what he asked for, and it must still be
+		// taller than it is wide or it is a strip again.
+		report.ok(g.width < 480, 'it is less than half the width it shipped at',
+			`${Math.round(g.width)} px, was 960`);
+		report.ok(g.height > g.width, '...and longer than it is wide',
+			`${Math.round(g.width)}x${Math.round(g.height)}`);
+		// Nothing inside it may overflow sideways: the labels lists carry a min-width, and the whole
+		// point of narrowing their two numeric columns was that the list still fits.
+		const hscroll = await a.page.evaluate(() => {
+			const pane = document.getElementById('lpn_setbox_content');
+			return pane.scrollWidth - pane.clientWidth;
+		});
+		report.ok(hscroll <= 1, 'and the content pane does not scroll sideways', String(hscroll));
 		report.ok(g.left >= 0 && g.top >= 0, 'and it opens fully on screen',
 			`${Math.round(g.left)},${Math.round(g.top)}`);
 		report.ok(g.scroll <= 1, 'and the page still does not scroll', String(g.scroll));
 
+		// **THE POINTER IS TAKEN OFF THE BUTTON FIRST, WHICH IS WHAT A HAND DOES.** Playwright's
+		// mouse stays exactly where it clicked, so the toolbar button that opened the box is still
+		// HOVERED — and Bootstrap will not take down a hovered element's tip, whoever asks. Once the
+		// box was narrowed to 29rem it opens directly under that tip, and the tip swallowed the
+		// first drag. A real hand has already left the button by the time it reaches the box; this
+		// line is that move, not a way around the finding. (The finding was real and is fixed on the
+		// page side too: openSettingsBox() now hides any tip that is up, which handles the other
+		// half — a button that keeps FOCUS after the click with the pointer long gone.)
+		await a.page.mouse.move(20, 400);
+		await a.settle(400);
 		// Dragged by its chrome — the padded band at the top, where the pointer target is the box
 		// itself rather than any control inside it.
 		//
@@ -248,6 +316,9 @@ exports.run = async function ({ browser, report }) {
 		// Everything is simpler than EPANET or epanetjs because all project settings are in (tada!)
 		// Settings"). Its two surviving doors are both still checked below: View > Labels, and the
 		// colour legend. The Settings button opens the box itself.
+		//
+		// Every door names a SUBJECT and the box resolves it, so a door does not go stale when a
+		// control moves category: the labels live under Map and page now, and no caller was touched.
 		const doors = [
 			['the toolbar Settings button', null, async () => a.toolbarClick('Settings')]
 		];
@@ -273,7 +344,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_settings_box').style.display === 'flex'),
 			'View > Labels opens it too');
-		report.eq(await shownSection(a), 'labels', '...on the Labels section');
+		report.eq(await shownSection(a), 'map', '...on the category the labels are in');
 		// The menu bar's own Settings item, which is deliberately identical to the toolbar button.
 		await closeBox(a);
 		await a.settle(200);

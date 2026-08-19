@@ -2231,3 +2231,29 @@ $ec_lang['lpn_settings_search_tip']='Type a word to see only the settings that m
 $ec_lang['lpn_settings_no_match']='No setting mentions that word.';
 $ec_lang['lpn_rpane_empty']='Nothing is docked here yet. Everything that belongs to the whole project is in Settings.';
 $ec_lang['lpn_time_settings_open']='Time settings';
+
+// ---- The Settings box's four categories (ROADMAP Task 441, restructured) ---------------------
+// Tom, 2026-08-18, using the box for the first time: the four sections it opened with were the
+// four panels it had absorbed, which is a history rather than a structure. These are his own
+// groupings. THERE IS NO SECTION CALLED "SETTINGS": the box is Settings, so nothing inside it
+// repeats the word.
+// "Symbology" is the standard word -- QGIS, ArcGIS and Bentley all use it -- and covers both the
+// colour a value is drawn in and the label printed beside it.
+// "Hydraulics" is EPANET's own name for the friction-method/accuracy/engine group, which also
+// leaves room for its siblings (Quality, Reactions) as they arrive.
+$ec_lang['lpn_settings_sec_map']='Map and page';
+$ec_lang['lpn_settings_sec_elements']='New elements';
+$ec_lang['lpn_settings_sec_calculation']='Calculation';
+$ec_lang['lpn_settings_node_symbology']='Node symbology';
+$ec_lang['lpn_settings_link_symbology']='Link symbology';
+$ec_lang['lpn_settings_page']='Page';
+$ec_lang['lpn_settings_page_note']='Saved in this calculator, not in the project.';
+$ec_lang['lpn_settings_hydraulics']='Hydraulics';
+// The Labels lists' two narrowest column headings, which are a column three characters wide each.
+// The decimals column is headed by an EXAMPLE of what it does -- and the example is translatable
+// because the DECIMAL SEPARATOR is a locale fact (Tom, 2026-08-18: "We could translate to '0,000'
+// where needed"), not punctuation to copy. Write your own locale's separator; keep three decimals.
+// "Rank" heads the priority column only where lib/Icons.lib.php has no 'priority' icon to draw
+// there; either way the term of art lives in the heading's own tip.
+$ec_lang['lpn_labels_col_decimals_example']='0.000';
+$ec_lang['lpn_labels_col_rank']='Rank';

@@ -24,7 +24,7 @@ const L = loadLoopedNetwork(
 	"\t\tsettings: function () { return settings; },\n" +
 	"\t\tunitFactor: unitFactor, unitKey: unitKey,\n" +
 	"\t\trebuildSettingsFields: rebuildSettingsFields,\n" +
-	"\t\tsettingsFieldsEl: function () { return document.getElementById('lpn_settings_fields'); },\n" +
+	"\t\tsettingsFieldsEl: function () { return document.getElementById('lpn_set_hydraulics_fields'); },\n" +
 	"\t\troughnessRowShown: function () { var r = document.getElementById('lpn_u_roughness_row'); return r ? r.style.display !== 'none' : null; },\n" +
 	"\t\tseedDefaultInputs: seedDefaultInputs, defaultSettings: defaultSettings,\n" +
 	"\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +

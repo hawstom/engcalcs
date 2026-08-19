@@ -183,7 +183,7 @@ answer = true;
 	const menu = orderIn('function openInsertMenu', "icon: '([a-z]+)'");
 	const toolbar = orderIn("addGroup.dataset.edits", "mode: 'add-([a-z]+)'");
 	// The prefix rows name their type through the reused Add-tool label key, not through an icon.
-	const prefixes = orderIn("var idBody = section('idPrefixes'", "lpn_tool_add_([a-z]+)");
+	const prefixes = orderIn("// ---- ID prefixes ----", "lpn_tool_add_([a-z]+)");
 	ok('the Insert menu is in the agreed order: ' + WANT.join(', '),
 		menu.join(',') === WANT.join(','), menu.join(','));
 	ok('the toolbar matches it', toolbar.join(',') === WANT.join(','), toolbar.join(','));

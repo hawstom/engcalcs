@@ -162,6 +162,16 @@ button > .ec-icon, a > .ec-icon, label > .ec-icon { margin-inline-end: 0.4em; }
 	cursor: help;
 }
 
+/* **A TOOLTIP MAY NEVER TAKE A CLICK.** Bootstrap 5.3 drops its own `pointer-events: none`, so a
+   tip that is still up -- and one stays up for as long as its control keeps FOCUS, which a clicked
+   toolbar button does -- silently swallows the first click on whatever it is lying over. Found on
+   the Settings box: its drag band opens under the toolbar's tip, and the first attempt to drag the
+   box did nothing at all. Our tips carry no controls (Bootstrap's `html` option is off), so there
+   is nothing inside one to click. */
+.tooltip {
+	pointer-events: none;
+}
+
 /* The welcome line under the page title (template_welcome). Set apart with italics
    rather than the >> ... << that used to be typed into all 27 language strings: those
    are not standard English or typography (Tom, 2026-07-27), they are directional
@@ -1082,10 +1092,15 @@ html[lang="zh"] .ec-welcome {
 
    The size is CSS, not JS: `min()` against the viewport is the clamp, so there is no measure-then-
    write pass to get wrong and the box re-fits a resized window by itself. JS writes only
-   `display: flex` / `display: none` and a left/top. */
+   `display: flex` / `display: none` and a left/top.
+
+   **LONGER AND LESS THAN HALF AS WIDE** (Tom, 2026-08-18, after using it: "It can be longer and
+   narrower; I would say less than half as wide"). 60rem -> 29rem and 38rem -> 46rem. A settings box
+   is read down a column, not across a page, and at 60rem the eye had to travel the width of the
+   window to get from a name to its control -- while the map it configures was behind it. */
 .lpn-setbox {
-	width: min(60rem, 94vw);
-	height: min(38rem, 84vh);
+	width: min(29rem, 94vw);
+	height: min(46rem, 92vh);
 	flex-direction: column;
 	box-sizing: border-box;
 }
@@ -1100,9 +1115,12 @@ html[lang="zh"] .ec-welcome {
 .lpn-setbox-search input { width: 100%; box-sizing: border-box; padding: 3px 6px; }
 .lpn-setbox-panes { display: flex; flex: 1 1 auto; min-height: 0; gap: 10px; }
 /* The index. Its own scrollbar, because it is as long as the content is and the two do not scroll
-   together -- that non-coupling is the whole point of the paradigm. */
+   together -- that non-coupling is the whole point of the paradigm. 7.5rem, not 12: in a 29rem box
+   it is competing with the controls for the only width there is, and an index row may wrap -- it is
+   a list of names, and a name on two lines is still a name. A control squeezed to half its width is
+   not still a control. */
 .lpn-setbox-index {
-	flex: 0 0 12rem; min-width: 0; overflow: auto;
+	flex: 0 0 7.5rem; min-width: 0; overflow: auto;
 	border-right: 1px solid #ddd; padding-right: 6px; font-size: .9em;
 }
 .lpn-setbox-content { flex: 1 1 auto; min-width: 0; overflow: auto; font-size: .9em; }
@@ -1167,12 +1185,31 @@ html[lang="zh"] .ec-welcome {
 .lpn-rpane-body { flex: 1 1 auto; overflow: auto; padding: 6px 8px; font-size: .9em; }
 /* What the panel says while it holds nothing. */
 .lpn-rpane-empty { margin: 0; opacity: .8; }
-/* The one row shape shared by the colour controls, which moved to the Settings box but kept their
-   markup: a name that takes the slack and a control at the right. */
-.lpn-rp-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
-.lpn-rp-row > span:first-child { flex: 1 1 auto; }
+/* THE ROW SHAPE FOR EVERY SETTING IN THE BOX: a name that takes the slack and wraps, and a control
+   in a right-hand column. `min-width: 0` on the name is what lets it wrap instead of forcing the
+   row wider than the pane -- Tom, 2026-08-18: "A few things can wrap."
+
+   It used to be called .lpn-rp-row, after the right pane it was written for, and the colour ramp
+   strip borrowed the class for its background: `> :first-child { flex: 1 1 auto }` then made the
+   FIRST SWATCH take every spare pixel, which is what Tom saw. A row shape and a strip are not the
+   same thing and no longer share a name. */
+.lpn-set-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+.lpn-set-row > :first-child { flex: 1 1 auto; min-width: 0; }
 .lpn-rp-credit { font-size: .85em; opacity: .7; margin-top: 6px; }
-/* The colour key is a WAY IN to the Coloring section (Task 427), so it has to take a click -- the
+/* **EVERY INPUT IN THE BOX HAS A CEILING** (Tom: "Give some detailed attention to inputs max
+   width ... Inputs can be shorter"). A number the user types here is at most a few characters --
+   a size in pixels, an opacity, a tolerance -- and a text box wide enough for a sentence tells the
+   reader to expect one. The label list's own boxes carry explicit widths below and are narrower
+   than this ceiling, so it never reaches them; the search field is a `search` and is excluded. */
+#lpn_settings_box .lpn-set-secbody input[type="number"],
+#lpn_settings_box .lpn-set-secbody input[type="text"],
+#lpn_settings_box .lpn-set-secbody select { max-width: 9rem; box-sizing: border-box; }
+/* The ramp strip: a full-width band whose boxes are placed by js/lpn-ramps.js's swatchBoxes(), each
+   at x = index * width/n. `position: relative` is the frame those percentages are measured in, and
+   border-box keeps each swatch's own hairline border inside its share instead of adding to it. */
+.lpn-ramp-strip { position: relative; height: 0.9rem; margin: 4px 0; }
+.lpn-ramp-strip .lpn-color-swatch { top: 0; height: 100%; width: auto; box-sizing: border-box; }
+/* The colour key is a WAY IN to the colour controls (Task 427), so it has to take a click -- the
    overlay stack is pointer-events:none by default and this one cell opts back in. */
 .lpn-color-legend { pointer-events: auto; cursor: pointer; }
 
@@ -1181,7 +1218,7 @@ html[lang="zh"] .ec-welcome {
    (the earlier pass) was only half the cause: BOOTSTRAP'S REBOOT GIVES EVERY FORM CONTROL
    `font-size: inherit`, so an <input> here resolves `em` against the body's 1rem, while
    columnHeadings() draws its heading row at `font-size: 0.85em` and its cells resolve the SAME
-   declared `3.5em`/`4.5em` against 0.85rem. Each heading is then ~15% narrower than its control,
+   declared `2.6em`/`3.2em` against 0.85rem. Each heading is then ~15% narrower than its control,
    the leftmost flex spacer absorbs the whole shortfall, and every heading slides RIGHT -- worst at
    the left, nearly right at the right, which is exactly the residual Tom reported.
 
@@ -1192,21 +1229,21 @@ html[lang="zh"] .ec-welcome {
    rather than by the body happening to be 1rem.
 
    The selectors are the columns themselves: child 1 is the flexible name/spacer, children 2-5 are
-   Before, After, Decimals, Priority in both row types. `span:nth-child(2|3)` therefore matches only
-   a heading cell (a field row carries an <input> there), and `span:nth-child(4|5)` matches a
+   Before, After, 0.000 (decimals) and Rank (priority) in both row types. `span:nth-child(2|3)`
+   therefore matches only a heading cell (a field row carries an <input> there), and `span:nth-child(4|5)` matches a
    heading cell or the reserved-column spacer -- which needs the same treatment for the same reason
-   and lands on the same 4.5rem it already had. Keep in step with labelCheckbox() and
+   and lands on the same 3.2rem it already had. Keep in step with labelCheckbox() and
    columnHeadings() in js/looped-network.js if a column is ever added. */
 #lpn_labels_node_fields,
 #lpn_labels_link_fields { font-size: 1rem; }
 #lpn_labels_node_fields > div > span:nth-child(2),
 #lpn_labels_node_fields > div > span:nth-child(3),
 #lpn_labels_link_fields > div > span:nth-child(2),
-#lpn_labels_link_fields > div > span:nth-child(3) { width: 3.5rem !important; }
+#lpn_labels_link_fields > div > span:nth-child(3) { width: 2.6rem !important; }
 #lpn_labels_node_fields > div > span:nth-child(4),
 #lpn_labels_node_fields > div > span:nth-child(5),
 #lpn_labels_link_fields > div > span:nth-child(4),
-#lpn_labels_link_fields > div > span:nth-child(5) { width: 4.5rem !important; }
+#lpn_labels_link_fields > div > span:nth-child(5) { width: 3.2rem !important; }
 /* AND NOTHING IN A ROW MAY SHRINK. In the Labels pull-down the lists were as wide as they liked;
    in the Visibility panel (Task 427) they are inside a panel the user can drag narrow, and a flex
    item's default is to shrink. The heading cells are `flex: 0 0 auto` already, the <input> columns
@@ -1215,14 +1252,25 @@ html[lang="zh"] .ec-welcome {
    scrolls sideways instead: a column that cannot be read is worse than a scrollbar. */
 #lpn_labels_node_fields > div > input,
 #lpn_labels_link_fields > div > input { flex-shrink: 0; }
+/* **AND THE NAME MUST BE ABLE TO WRAP ANYWHERE.** A flex item's floor is its MIN-CONTENT width, so
+   "Roughness, C" held its row 6 px wider than the list itself -- and a row wider than its container
+   puts every one of its four controls 6 px right of the heading that names it, which is the Task
+   435 defect arriving from the opposite direction. The heading row cannot do this (its name cell is
+   empty), so the two disagree by exactly the overflow. Letting the longest name break mid-word costs
+   a hyphen-less line break and guarantees the columns line up at ANY width, which is what the box
+   became once it was halved. CLAUDE.md: mid-word wrap is acceptable; column width is king. */
+#lpn_labels_node_fields > div > label,
+#lpn_labels_link_fields > div > label { min-width: 0; overflow-wrap: anywhere; }
 /* A FLOOR ON THE WHOLE LIST, not `width: max-content` on each row. The name column is `flex: 1 1
    auto`, so it takes whatever the row has left -- which is only the same number on every row while
    every row is the same width. Sizing rows to their content instead gives each one a different
    name column and staggers all four headings again, worse than before. One floor for the list, and
-   the panel scrolls sideways below it. 28rem = the four columns (16rem) + their gaps + a name
-   column wide enough for "Head loss gradient" to read. */
+   the panel scrolls sideways below it. 18.5rem = the four columns (11.6rem) + their gaps + a name
+   column that can hold "Head loss gradient" on two lines. It was 28rem, sized for a box more than
+   twice this wide; keeping it there would have made every list scroll sideways for the sake of the
+   two columns Tom asked to narrow. */
 #lpn_labels_node_fields,
-#lpn_labels_link_fields { min-width: 28rem; }
+#lpn_labels_link_fields { min-width: 18.5rem; }
 
 /* ==== No window scrollbar on the map page (ROADMAP Task 432) =================================
    Tom, 2026-08-18: *"Our bottom controls bar should be the hard bottom of the page."* This is a

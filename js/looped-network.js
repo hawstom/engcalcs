@@ -3012,8 +3012,8 @@ var EngCalcs = EngCalcs || {};
 		return out;
 	}
 	// The one place that puts every control showing these settings back in step. Since Task 441
-	// there is only ONE editor for them -- the Settings box's Coloring section -- so this is a
-	// rebuild of that section and nothing else. It stays a named function rather than being
+	// there is only ONE editor for them -- the three colour hosts of the Settings box -- so this is
+	// a rebuild of those and nothing else. It stays a named function rather than being
 	// inlined: a second view of a colour setting has appeared twice already, and when it appears
 	// again this is the one line it has to be added to.
 	function syncColorControls() {
@@ -6616,7 +6616,8 @@ var EngCalcs = EngCalcs || {};
 		}
 		// **THE COLOUR KEY IS A WAY IN** (Task 427). It is the one piece of chrome already telling
 		// the user what the colours mean, so it is where they look when they want to change them.
-		// Since Task 441 it opens the Settings box on Coloring rather than this panel.
+		// It asks for the SUBJECT ('coloring') and the box decides where that lives -- which is why
+		// dissolving the Coloring section into the two symbology sub-headings changed nothing here.
 		key = colorLegendEl();
 		if (key) {
 			key.title = (EngCalcs.pageConfig || {}).lpn_color_legend_open_tip || '';
@@ -6639,24 +6640,28 @@ var EngCalcs = EngCalcs || {};
 	// (roughness carries its method's symbol) and the unit strip, and the RANGE editor exists only
 	// for a field that is actually being coloured by.
 	function buildColoringSection() {
-		var host = document.getElementById('lpn_set_colors'), pc = EngCalcs.pageConfig || {};
-		if (!host) { return; }
-		host.innerHTML = '';
-		function row(labelText, control, tip) {
+		var pc = EngCalcs.pageConfig || {},
+			nodeHost = document.getElementById('lpn_set_colors_node'),
+			linkHost = document.getElementById('lpn_set_colors_link'),
+			host = document.getElementById('lpn_set_colors_shared');
+		if (!host || !nodeHost || !linkHost) { return; }
+		[nodeHost, linkHost, host].forEach(function (h) { h.innerHTML = ''; });
+		function rowIn(target, labelText, control, tip) {
 			var r = document.createElement('div'), lab = document.createElement('span');
-			r.className = 'lpn-rp-row';
+			r.className = 'lpn-set-row';
 			lab.textContent = labelText;
 			if (tip) { lab.title = tip; lab.className = 'ec-help'; }
 			r.appendChild(lab);
 			r.appendChild(control);
-			host.appendChild(r);
+			target.appendChild(r);
 			return r;
 		}
-		function note(text) {
+		function row(labelText, control, tip) { return rowIn(host, labelText, control, tip); }
+		function noteIn(target, text) {
 			var p = document.createElement('div');
 			p.style.cssText = 'font-size:0.85em;opacity:0.75;margin:2px 0 4px';
 			p.textContent = text;
-			host.appendChild(p);
+			target.appendChild(p);
 		}
 		function positionSelect(current, onPick) {
 			var sel = document.createElement('select');
@@ -6701,8 +6706,12 @@ var EngCalcs = EngCalcs || {};
 			});
 			return sel;
 		}
-		row(pc.lpn_color_node_field || 'Color nodes by', fieldSelect('node'));
-		row(pc.lpn_color_link_field || 'Color pipes by', fieldSelect('link'));
+		// **THE TWO DROPDOWNS ARE NOT BESIDE EACH OTHER ANY MORE** (Tom, 2026-08-18: "Dissolve
+		// Color by value and put its items in Node symbology and Link symbology"). Each one is with
+		// the labels of the same kind of element, because "how is a junction drawn" is one question
+		// and was two panels. What both kinds SHARE -- the scheme itself -- is in Map appearance.
+		rowIn(nodeHost, pc.lpn_color_node_field || 'Color nodes by', fieldSelect('node'));
+		rowIn(linkHost, pc.lpn_color_link_field || 'Color pipes by', fieldSelect('link'));
 		// THE RAMP PICKER, grouped by ColorBrewer family. <optgroup> rather than two selects: it is
 		// one choice, and the family is what tells a reader which ramps are for a quantity that
 		// climbs and which for one that departs from a middle.
@@ -6727,16 +6736,36 @@ var EngCalcs = EngCalcs || {};
 		row(pc.lpn_settings_color_ramp || 'Color scheme', rampSel);
 		// The ramp, DRAWN. A name is not a colour, and the whole question here is what the map is
 		// about to look like.
+		//
+		// **EVERY BOX IS EXACTLY width/n WIDE, AND THE ARITHMETIC IS NOT DONE HERE.** Tom,
+		// 2026-08-18: "The colour palette does not show nicely. First color expands to use all
+		// space." It did: the strip wore `.lpn-rp-row`, whose first child is the row's NAME and
+		// therefore `flex: 1 1 auto` -- so the first swatch took every spare pixel and the ramp
+		// read as one colour with a fringe. A flex rule written for a labelled row cannot be
+		// reasoned about from the strip that borrows it, so the strip stops borrowing it and asks
+		// js/lpn-ramps.js for the geometry instead: swatchBoxes() takes each box's x FROM ITS INDEX
+		// rather than from a running total, which is the one thing a hand-rolled strip gets wrong.
+		// Asked in PERCENT (a width of 100), because the pane's pixel width is not known until it
+		// is painted and a percentage is exact at every width.
 		var strip = document.createElement('div');
-		strip.className = 'lpn-rp-row';
+		strip.className = 'lpn-ramp-strip';
 		strip.id = 'lpn_set_ramp_strip';
 		(function () {
-			var cols = COLOR_RAMPS[settings.colorRamp] || COLOR_RAMPS.epanet;
+			var cols = COLOR_RAMPS[settings.colorRamp] || COLOR_RAMPS.epanet, geom;
 			if (settings.colorReverse) { cols = cols.slice().reverse(); }
-			cols.forEach(function (c) {
-				var sw = document.createElement('span');
+			geom = (EngCalcs.lpnRamps && EngCalcs.lpnRamps.swatchBoxes)
+				? EngCalcs.lpnRamps.swatchBoxes(100, cols.length, { height: 0 }) : null;
+			cols.forEach(function (c, i) {
+				var sw = document.createElement('span'), b = geom && geom.boxes[i];
 				sw.className = 'lpn-color-swatch';
 				sw.style.background = c;
+				// Without that file the swatches stay inline-blocks at their own fixed width: a
+				// narrower strip than the pane, still equal, still readable. The seam degrades.
+				if (b) {
+					sw.style.position = 'absolute';
+					sw.style.left = b.x + '%';
+					sw.style.width = b.width + '%';
+				}
 				strip.appendChild(sw);
 			});
 		}());
@@ -6776,11 +6805,14 @@ var EngCalcs = EngCalcs || {};
 		// by eye. A group with no field chosen gets no boxes rather than four dead ones.
 		['node', 'link'].forEach(function (group) {
 			var field = colorFieldOf(group); if (!field) { return; }
+			// Under the same sub-heading as the dropdown that turned it on, not in a run of range
+			// editors at the foot of one long section.
+			var target = group === 'node' ? nodeHost : linkHost;
 			var head = document.createElement('div');
 			head.style.cssText = 'margin-top:6px;font-weight:bold';
 			head.textContent = (pc.lpn_settings_color_breaks || 'Color band limits') + ': ' + colorFieldLabel(group, field);
-			host.appendChild(head);
-			note(pc.lpn_settings_color_breaks_note ||
+			target.appendChild(head);
+			noteIn(target, pc.lpn_settings_color_breaks_note ||
 				'Leave these blank and the colors are spread across the values now on the map. Type numbers, or press a button below, and the same number always means the same color.');
 			var pinned = pinnedBreaks(group, field), wrap = document.createElement('div'), i, boxes = [];
 			wrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap';
@@ -6802,7 +6834,7 @@ var EngCalcs = EngCalcs || {};
 				boxes.push(box);
 				wrap.appendChild(box);
 			}
-			host.appendChild(wrap);
+			target.appendChild(wrap);
 			var btnWrap = document.createElement('div');
 			btnWrap.style.marginTop = '4px';
 			function autoBtn(text, fn) {
@@ -6831,9 +6863,11 @@ var EngCalcs = EngCalcs || {};
 				refreshValueColors(); saveToStorage(); syncColorControls();
 			});
 			btnWrap.appendChild(clearBtn);
-			host.appendChild(btnWrap);
+			target.appendChild(btnWrap);
 		});
-		if (EngCalcs.initTips) { EngCalcs.initTips(host); }
+		[nodeHost, linkHost, host].forEach(function (h) {
+			if (EngCalcs.initTips) { EngCalcs.initTips(h); }
+		});
 	}
 	// ---- Tab: JUNCTIONS, the first tabular editor (ROADMAP Task 434) --------------------------
 	//
@@ -13641,7 +13675,12 @@ var EngCalcs = EngCalcs || {};
 	// at the left absorbs the difference: every heading slides right, the LEFTMOST by the sum of all
 	// four errors and the rightmost by one. That signature -- worst at the left, almost right at the
 	// right -- is accumulated box-model drift, not a wrong width anywhere.
-	var LPN_LABEL_COL_W = '4.5em', LPN_LABEL_COL_GAP = '6px', LPN_LABEL_AFFIX_W = '3.5em';
+	// **IN rem, NOT em** -- Task 435's finding, stated as a unit rather than as a comment: the
+	// heading row is drawn at 0.85em and an <input> inherits 1rem, so the same declared `em` is
+	// two different lengths and every heading slides off its column. Narrowed by Tom, 2026-08-18
+	// ("Node Decimals and Priority columns can be much narrower") once the box was halved in width:
+	// four columns at the old sizes were wider than the whole content pane.
+	var LPN_LABEL_COL_W = '3.2rem', LPN_LABEL_COL_GAP = '6px', LPN_LABEL_AFFIX_W = '2.6rem';
 	function labelColumnSpacer() {
 		var spacer = document.createElement('span');
 		spacer.style.width = LPN_LABEL_COL_W;
@@ -13793,21 +13832,43 @@ var EngCalcs = EngCalcs || {};
 		// entirely different things. Built from the same LPN_LABEL_COL_W/GAP the boxes use, so a
 		// heading cannot drift off its column. The name column is a flex spacer, not a heading: it is
 		// the row's subject, not a column of values.
-		function columnHeadings(box) {
+		// **TWO OF THE FOUR HEADINGS ARE NOT WORDS** (Tom, 2026-08-18: "Node Decimals and Priority
+		// columns can be much narrower; maybe 'Decimals' can turn into '0.000'", and then "I like
+		// the 123 icon even better" for the other). The decimals column is headed by an EXAMPLE of
+		// what it does; the priority column by the icon of numbers getting smaller.
+		//
+		// **THE EXAMPLE IS A LANGUAGE KEY, NOT A LITERAL** (Tom: "We could translate to '0,000'
+		// where needed"). A decimal COMMA is a locale fact, and a heading that demonstrates a
+		// decimal point demonstrates the wrong thing to most of Europe and South America.
+		//
+		// **THE TERM OF ART SURVIVES IN THE TIP**: both headings carry their full name in `title`,
+		// so a reader who knows the word "priority" still finds it, and the search box matches it.
+		// The icon falls back to the word if lib/Icons.lib.php has no such icon -- a heading cell
+		// with nothing in it is a column nobody can name.
+		function columnHeadings(box, group) {
 			var row = document.createElement('div'), lead = document.createElement('span');
 			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = '6px';
 			row.style.fontSize = '0.85em'; row.style.opacity = '0.75';
 			lead.style.flex = '1 1 auto';
 			row.appendChild(lead);
-			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W],
-				[pc.lpn_labels_col_after || 'After', LPN_LABEL_AFFIX_W],
-				[pc.lpn_labels_col_decimals || 'Decimals', LPN_LABEL_COL_W],
-				[pc.lpn_labels_priority || 'Priority', LPN_LABEL_COL_W]
+			[[pc.lpn_labels_col_before || 'Before', LPN_LABEL_AFFIX_W, pc.lpn_labels_prefix_tip],
+				[pc.lpn_labels_col_after || 'After', LPN_LABEL_AFFIX_W, pc.lpn_labels_suffix_tip],
+				[pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
+					(pc.lpn_labels_col_decimals || 'Decimals') + ' \u2014 ' +
+						(pc.lpn_labels_decimals_tip || 'Decimal places shown for this label')],
+				[pc.lpn_labels_col_rank || 'Rank', LPN_LABEL_COL_W,
+					(pc.lpn_labels_priority || 'Priority') + ' \u2014 ' +
+						((group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) || ''),
+					'priority']
 			].forEach(function (h, i) {
-				var cell = document.createElement('span');
-				cell.textContent = h[0];
+				var cell = document.createElement('span'), icon = h[3] ? iconEl(h[3]) : null;
+				if (icon) { cell.appendChild(icon); } else { cell.textContent = h[0]; }
 				cell.style.width = h[1]; cell.style.flex = '0 0 auto';
 				cell.style.textAlign = 'center';
+				// An icon carries no words, so the tip is the only place its name exists -- and
+				// aria-label is what a screen reader gets instead of the heading it cannot see.
+				if (h[2]) { cell.title = h[2]; cell.className = 'ec-help'; }
+				if (icon) { cell.setAttribute('aria-label', h[2] || h[0]); }
 				// The affix boxes take the row's own 6px gap; the two numeric columns carry their own
 				// margin as well, so their headings must match or they sit half a gap left of the box
 				// they name.
@@ -13816,13 +13877,13 @@ var EngCalcs = EngCalcs || {};
 			});
 			box.appendChild(row);
 		}
-		columnHeadings(nodeBox);
+		columnHeadings(nodeBox, 'node');
 		nodeFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(nodeBox, f[1], labelSettings.node[f[0]],
 				function (v) { labelSettings.node[f[0]] = v; }, decimalsFor('node', f[0]),
 				affixFor('node', f[0]), priorityFor('node', f[0]));
 		});
-		columnHeadings(linkBox);
+		columnHeadings(linkBox, 'link');
 		linkFieldDefs(pc).forEach(function (f) {
 			labelCheckbox(linkBox, f[1], labelSettings.link[f[0]],
 				function (v) { labelSettings.link[f[0]] = v; }, decimalsFor('link', f[0]),
@@ -14270,15 +14331,14 @@ var EngCalcs = EngCalcs || {};
 	// non-empty -- a prefix becomes the leading substring of every future auto-generated ID for that
 	// element type, so the same rules that keep a renamed ID EPANET-legal apply here too.
 	function validatePrefix(p) { return !!p && !/[\s'"]/.test(p); }
-	// Builds the SETTINGS section of the Settings box (Task 441) -- one of its four, and the one
-	// this function had entirely to itself when the box was a pull-down. Sub-headings and a short
-	// tail of actions.
+	// Fills SIX of the Settings box's hosts (Task 441, restructured): ID prefixes and starting values
+	// under New elements, map appearance and the page under Map and page, units and hydraulics under
+	// Calculation. It used to own one section entire, back when the box was this panel with a search
+	// on it.
 	//
 	// **THE ACCORDION IS GONE.** It was the right answer for a narrow pull-down over a map, where
 	// tabs had no horizontal room; it is the wrong one inside a two-pane box whose left pane IS the
 	// navigation. Tom, 2026-08-18: "No need ever to collapse; just scroll/jump to your section."
-	// ORDER: the sub-sections, then the tail. The tail rows carry NO heading rather than sitting
-	// under an "Other" that names nothing.
 
 	// ---- Page-title visibility (ROADMAP Task 289) ----
 	// THE FIRST SETTING ON THIS PAGE THAT IS NOT PART OF THE PROJECT. Whether the heading above the
@@ -14307,56 +14367,42 @@ var EngCalcs = EngCalcs || {};
 		applyPageTitles(show);
 	}
 
+	// **THE SUB-HEADINGS ARE IN THE MARKUP NOW AND THIS FILLS THEM** (Task 441, restructured). The
+	// rows below did not move between categories by being re-parented at run time -- each one is
+	// appended to the host that stands under its own sub-heading in Looped-Network.php, so where a
+	// control lives is readable in one place instead of inferred from the order of a build.
 	function rebuildSettingsFields() {
-		var pc = EngCalcs.pageConfig || {}, fields = document.getElementById('lpn_settings_fields');
+		var pc = EngCalcs.pageConfig || {};
 		// The units block is server-rendered ONCE (echoUnitSelect keeps each select's unit family and
 		// option values) and MOVED in and out of this panel, never rebuilt. Park it back in its holder
 		// before clearFields() runs, or the clear would destroy the only copy that exists.
 		var unitsBlock = document.getElementById('lpn_units_block'),
 			unitsHolder = document.getElementById('lpn_units_holder');
 		if (unitsBlock && unitsHolder && unitsBlock.parentNode !== unitsHolder) { unitsHolder.appendChild(unitsBlock); }
-		clearFields(fields);
+		var byId = function (id) { return document.getElementById(id); };
+		var idBody = byId('lpn_set_id_fields'), defBody = byId('lpn_set_default_fields'),
+			mapBody = byId('lpn_set_map_fields'), unitsBody = byId('lpn_set_units_fields'),
+			compBody = byId('lpn_set_hydraulics_fields'), pageBody = byId('lpn_set_page_fields');
+		if (!idBody || !defBody || !mapBody || !unitsBody || !compBody || !pageBody) { return; }
+		[idBody, defBody, mapBody, unitsBody, compBody, pageBody].forEach(clearFields);
+		// **A ROW IS A FLEX LINE, NOT A LABEL FOLLOWED BY A <br>.** Tom, 2026-08-18: "It can be
+		// longer and narrower ... A few things can wrap. Inputs can be shorter." A label that simply
+		// precedes its control cannot wrap without the control wrapping with it and cannot line its
+		// controls up down the panel; a flex row gives the words the slack, the control a right-hand
+		// column, and a long name two lines instead of a wider box.
 		function row(target, labelText, input, tip) {
-			var label = document.createElement('label');
-			setFieldLabel(label, labelText, tip);
-			label.appendChild(input);
-			target.appendChild(label);
-			target.appendChild(document.createElement('br'));
+			var line = document.createElement('label'), text = document.createElement('span');
+			line.className = 'lpn-set-row';
+			setFieldLabel(text, labelText, tip);
+			line.appendChild(text);
+			line.appendChild(input);
+			target.appendChild(line);
 		}
 		function note(target, text) {
 			var p = document.createElement('div');
 			p.style.cssText = 'font-size:0.85em;opacity:0.75;margin:2px 0 4px';
 			p.textContent = text;
 			target.appendChild(p);
-		}
-		// A group heading. Task 289: the two scope markers ("Project settings", "Calculator
-		// settings") are labels over what follows, not places you jump to, so they are NOT index
-		// rows -- and under an active filter they are hidden, because a scope marker over nothing
-		// is worse than no marker.
-		function groupHeading(titleText) {
-			var h = document.createElement('div');
-			h.className = 'lpn-set-group';
-			h.textContent = titleText;
-			fields.appendChild(h);
-		}
-		// **A SUB-HEADING, AND NOTHING COLLAPSES ANY MORE** (Task 441, absorbing 284). Tom,
-		// 2026-08-18: "No need ever to collapse; just scroll/jump to your section." So a section
-		// head is a plain heading and an index row, not a disclosure button -- which is also why
-		// the ▸/▾ glyphs are gone, along with their outstanding RTL-mirroring caveat.
-		//
-		// `settings.sectionsOpen` is deliberately LEFT ALONE rather than deleted: it is still in
-		// every saved project on every user's disk, and the roadmap named that choice (Task 284).
-		// Nothing reads it now; defaultSettings() still writes it, so an old file and a new one
-		// still have the same shape.
-		function section(key, titleText) {
-			var head = document.createElement('div'), body = document.createElement('div');
-			head.className = 'lpn-set-sub';
-			head.id = 'lpn_set_sub_' + key;
-			head.textContent = titleText;
-			body.className = 'lpn-set-subbody';
-			fields.appendChild(head);
-			fields.appendChild(body);
-			return body;
 		}
 		// Trailing zeros stripped rather than the popup's fixed toFixed(4): a default is a round
 		// number the user typed, and showing it back as 8.0000 makes the panel look like a readout.
@@ -14386,14 +14432,12 @@ var EngCalcs = EngCalcs || {};
 		function any() { return true; }
 		function positive(v) { return v > 0; }
 		function nonNegative(v) { return v >= 0; }
-		// ---- 0. What this whole panel IS ----
-		// Every control below, plus the Units block above and the Labels popover, is carried by
-		// serializeProject(), so the sentence is true of the panel entire. There is no "save as my
-		// defaults" here because saving the PROJECT is that (CLAUDE.md: "there are no browser units,
-		// only project units"), and nothing said so on screen.
-		groupHeading(pc.lpn_settings_scope_project || 'Project settings');
-		// ---- 1. ID prefixes ----
-		var idBody = section('idPrefixes', pc.lpn_settings_id_prefixes || 'ID prefixes');
+		// **THE TWO SCOPE MARKERS ARE GONE, AND THE DISTINCTION IS NOT.** "Project settings" and
+		// "Calculator settings" labelled a run of rows in one long section; the categories now say
+		// where a thing belongs by themselves, and the ONE group that is not carried in the project
+		// file is the Page sub-heading, which says so in a note of its own. A marker over a whole
+		// section would have repeated the section heading, which is the noise Tom was reading.
+		// ---- ID prefixes ----
 		// Reuses the existing Add-tool labels per CLAUDE.md's concept-level label reuse rule.
 		// TEXT IS DELIBERATELY ABSENT: a text element's ID is unreachable from every screen in the
 		// app -- openLabelPopup() renders Text/Size/X/Y with no ID field, text is not in the Labels
@@ -14441,7 +14485,6 @@ var EngCalcs = EngCalcs || {};
 		// ---- 2. Default inputs ----
 		// A mode the user re-enters mid-drawing ("OK, now all the 8 inch pipes"), which is why it
 		// used to be the one section that opened expanded. Nothing opens or closes now.
-		var defBody = section('defaults', pc.lpn_settings_defaults || 'Default inputs');
 		// Stated ONCE for the whole section rather than implied per row -- the "future, not
 		// retroactive" rule used to govern two controls and now governs five.
 		note(defBody, pc.lpn_settings_defaults_note || 'Used for elements you create from now on. Existing elements are not changed.');
@@ -14550,7 +14593,6 @@ var EngCalcs = EngCalcs || {};
 		// "Display" rather than Tom's first "Map sizes": the section also holds symbol and backdrop
 		// opacity, which are not sizes, and stranding those two in a group of their own would be
 		// more clicking than it saves.
-		var mapBody = section('mapDisplay', pc.lpn_settings_map_display || 'Map display and sizes');
 		var sizeInput = document.createElement('input');
 		sizeInput.type = 'number'; sizeInput.step = '1'; sizeInput.min = '1'; sizeInput.value = settings.textSize;
 		sizeInput.addEventListener('change', function () {
@@ -14689,17 +14731,13 @@ var EngCalcs = EngCalcs || {};
 		// often" justification for keeping it loose did not survive contact with the section it
 		// obviously belongs to.
 		row(mapBody, pc.lpn_settings_legend_position || 'Legend position', legendSelect);
-		// **THERE IS NO COLOUR SECTION HERE ANY MORE** (Task 441). It was a second editor over the
-		// same `settings` keys as the right pane's, and the two had already drifted -- one had the
-		// ramp families, the other the legend position. Both are now the Settings box's Coloring
-		// section, buildColoringSection(), which is the union of what the two of them had.
 		// There is no "Saving to a file" section (Task 211): nothing is written to a file on a timer.
 		// Its 60-180 s range protected a coupling rather than the user -- one number doing three jobs
 		// (write interval, lock heartbeat, takeover threshold).
 		// ---- units ----
-		// Last section before the panel's foot, because a unit system is set once and left alone.
+		// First sub-heading under Calculation: a unit decides what every number in the document
+		// MEANS, which is the same reason the friction method is in that section rather than this one.
 		if (unitsBlock) {
-			var unitsBody = section('units', pc.lpn_view_units || 'Units');
 			// The "[Hide this line]" collapse link is a leftover from when this row was permanent
 			// page furniture. Inside a collapsible section with its own toggle it is a second, worse
 			// control for the same job, so it goes.
@@ -14707,19 +14745,17 @@ var EngCalcs = EngCalcs || {};
 			if (hideLink) { hideLink.parentNode.removeChild(hideLink); }
 			unitsBody.appendChild(unitsBlock);
 		}
-		// ---- computation ----
-		// Tolerance and the EPANET engine toggle get their own section rather than sitting loose in
-		// the tail among the panel's ACTIONS, where a reader cannot tell where the settings stop.
-		// "Computation", not "Solver": "solver" is jargon for the internals, while what the user is
-		// choosing is the arithmetic they get.
+		// ---- hydraulics ----
+		// **"HYDRAULICS" IS EPANET'S OWN NAME FOR THIS GROUP** -- friction method, accuracy, and who
+		// does the arithmetic -- and its Analysis Options are Hydraulics, Quality, Reactions, Times,
+		// Energy, so Tom's future Quality category arrives as a sibling rather than as a new idea.
+		// It replaced "Computation", which was a fine name for the rows and a bad one inside a
+		// category called Calculation: a heading that restates its parent tells the reader nothing.
 
-		var compBody = section('computation', pc.lpn_settings_computation || 'Computation');
 		// ---- friction method (ROADMAP Task 271) ----
-		// FIRST row in Computation, above tolerance and the engine toggle: it is the only one of the
-		// three that changes the ANSWER's physics rather than how precisely or by whose code it is
-		// reached. Under "Project settings", not "Calculator settings" -- the method decides what
-		// every roughness number in this document MEANS, so it belongs to the document, as units do.
-		// Every label is borrowed from bpn_, so the control costs no new keys.
+		// FIRST row here, above tolerance and the engine toggle: it is the only one of the three
+		// that changes the ANSWER's physics rather than how precisely or by whose code it is
+		// reached. Every label is borrowed from bpn_, so the control costs no new keys.
 
 		var methodSelect = document.createElement('select');
 		[
@@ -14765,23 +14801,23 @@ var EngCalcs = EngCalcs || {};
 			scheduleSolve();
 		});
 		row(compBody, pc.bpn_method || 'Friction method', methodSelect, pc.bpn_roughness_tip);
-		// ---- Calculator settings (Task 289) ----
-		// Built HERE, before `tail`, purely for DOM order: headings and sections append to `fields`
-		// as they are called, and the actions in `tail` must stay last.
-		// TWO WORDS, NOT A SENTENCE, and no collapsible wrapper. Scope is carried by two parallel
-		// headings -- "Project settings" above, "Calculator settings" here -- which the reader can
-		// compare at a glance, where prose buries the contrast in two sentences.
-		groupHeading(pc.lpn_settings_scope_calculator || 'Calculator settings');
+		// ---- PAGE (Task 289, renamed by Tom 2026-08-18: "Change Calculator to Page and make it a
+		// heading") ----
+		// THE ONE SUB-HEADING IN THE BOX THAT IS NOT CARRIED IN THE PROJECT FILE, and the note says
+		// so rather than a scope marker standing over it: whether the heading above the drawing is
+		// showing is a fact about the window you are sitting in front of.
+		// The two reset buttons are here because they are the calculator's own commands -- one puts
+		// every setting back, the other empties the calculator entirely -- and a foot of actions
+		// under no heading at all was the last thing in the box with no answer to "where am I".
+		note(pageBody, pc.lpn_settings_page_note || 'Saved in this calculator, not in the project.');
 		var titlesInput = document.createElement('input');
 		titlesInput.type = 'checkbox';
 		titlesInput.checked = pageTitlesShown();
 		titlesInput.addEventListener('change', function () { setPageTitlesShown(titlesInput.checked); });
-		row(fields, pc.lpn_settings_show_titles || 'Show page titles', titlesInput, pc.lpn_settings_show_titles_tip);
-		// The panel's foot: ACTIONS only, no settings. Headingless on purpose -- a heading over
-		// buttons that cannot collapse would behave unlike every other heading in this panel.
+		row(pageBody, pc.lpn_settings_show_titles || 'Show page titles', titlesInput, pc.lpn_settings_show_titles_tip);
 		var tail = document.createElement('div');
 		tail.style.marginTop = '6px';
-		fields.appendChild(tail);
+		pageBody.appendChild(tail);
 		// There is no "Emitter exponent" row. js/lpn-solver.js implements emitters properly
 		// (qe = K*dH^n, with the matching Jacobian term and a guarded derivative at dH -> 0), but
 		// nothing in this app sets a junction's `emitter`, so the exponent adjusts nothing -- and it
@@ -14836,7 +14872,7 @@ var EngCalcs = EngCalcs || {};
 			// used to redraw only the legend, which left the map showing the old label set.
 			refreshLabelText();
 			// The whole box: defaultSettings() resets the colour field, the ramp and the legend
-			// positions too, and the Coloring section was showing the old ones.
+			// positions too, and the colour controls were showing the old ones.
 			rebuildSettingsBox();
 			saveToStorage();
 		});
@@ -14853,7 +14889,7 @@ var EngCalcs = EngCalcs || {};
 		helpTip(wipeBtn, pc.lpn_reset_all_tip);
 		wipeBtn.addEventListener('click', wipeEverything);
 		tail.appendChild(wipeBtn);
-		tipsIn(fields);
+		[idBody, defBody, mapBody, unitsBody, compBody, pageBody].forEach(tipsIn);
 	}
 	// ================================================================================================
 	// THE SETTINGS BOX (ROADMAP Task 441, absorbing 284)
@@ -14868,6 +14904,11 @@ var EngCalcs = EngCalcs || {};
 	// one-element stays in the property popup. Every future "where does this control live" question
 	// has an answer already, which is what a rule is for and what four ad-hoc panels never had.
 	//
+	// **WHAT IS IN IT IS THREE CATEGORIES, NOT THE FOUR PANELS IT ABSORBED** (Tom, the same day,
+	// after using it): Map and page, New elements, Calculation -- with Quality to come as a sibling
+	// of Hydraulics. The four sections it shipped with were a record of where the controls came
+	// from. There is no section called "Settings": the box is Settings.
+	//
 	// **THE INDEX IS DERIVED FROM THE CONTENT, NEVER WRITTEN.** buildSettingsIndex() reads the
 	// sections and their sub-headings out of the DOM that was just built. A hand-written index is a
 	// second list of the same headings, and the failure mode is silent: a new sub-heading simply
@@ -14876,11 +14917,41 @@ var EngCalcs = EngCalcs || {};
 	// A BOX, NOT A PULL-DOWN, so it is NOT in VIEW_POPOVERS: clicking away leaves it exactly where
 	// it is, because it is a thing you work in beside the map, not a menu you glanced at. Escape,
 	// the X, and the button that opened it all close it -- the same three the property popup has.
-	var SETBOX_SECTIONS = ['labels', 'settings', 'time', 'coloring'];
+	// **THE DOORS NAME A SUBJECT, NOT A SECTION.** Three sections replaced four (Task 441,
+	// restructured), and every existing caller -- the colour legend, View > Labels, the toolbar, the
+	// Time tab's own link in js/lpn-time.js -- asks for the thing it is about. Resolving those names
+	// HERE, in one table, is what let the box be reorganised without touching a single caller, and
+	// what will let it be reorganised again: a caller that had to know which section a control sits
+	// in is a caller that goes stale the next time somebody moves it.
+	var SETBOX_TARGETS = {
+		labels: 'lpn_set_sub_nodeSym',
+		coloring: 'lpn_set_sub_nodeSym',
+		map: 'lpn_set_sec_map',
+		elements: 'lpn_set_sec_elements',
+		calc: 'lpn_set_sec_calc',
+		settings: 'lpn_set_sec_map',
+		units: 'lpn_set_sub_units',
+		time: 'lpn_set_sub_time'
+	};
 	// Where the user dragged it, remembered for the session only -- the same treatment and the same
 	// reasoning as popupUserPos: where your box sits is a fact about your screen, and a colleague
 	// opening your project must not inherit it.
 	var setboxUserPos = null;
+	// **A STICKY HEADING HIDES WHAT YOU JUST JUMPED TO** (Tom, 2026-08-18: the scroll target lands
+	// UNDER the level-1 heading). `scrollIntoView({block:'start'})` puts the target at the top of the
+	// scrollport, which is exactly where the section heading is about to stick, so a sub-heading
+	// arrives behind it. scroll-margin-top reserves the room -- and it is MEASURED off the heading
+	// that will do the covering, not a constant: that heading's height is a font size, a padding and
+	// a border, all of which move with the language and with the user's own text size.
+	function scrollSetboxTo(target) {
+		var sec = target && target.parentNode, head;
+		if (!target || !target.scrollIntoView) { return; }
+		while (sec && (!sec.classList || !sec.classList.contains('lpn-set-sec'))) { sec = sec.parentNode; }
+		head = sec && sec.querySelector ? sec.querySelector('.lpn-set-head') : null;
+		target.style.scrollMarginTop =
+			(head && head !== target ? Math.ceil(head.getBoundingClientRect().height) : 0) + 'px';
+		target.scrollIntoView({ block: 'start' });
+	}
 	function setboxEl() { return document.getElementById('lpn_settings_box'); }
 	function setboxIsOpen() {
 		var b = setboxEl();
@@ -14913,10 +14984,11 @@ var EngCalcs = EngCalcs || {};
 			b.className = 'lpn-setbox-link ' + cls;
 			b.textContent = text;
 			b.addEventListener('click', function () {
-				// scrollIntoView on the HEADING, not on the section: a sticky heading scrolled to
-				// `start` puts itself exactly where it will stick, so the jump lands without the
-				// one-line overshoot a section-level scroll leaves.
-				if (target.scrollIntoView) { target.scrollIntoView({ block: 'start' }); }
+				// On the HEADING, not on the section: a sticky heading scrolled to `start` puts
+				// itself exactly where it will stick, so the jump lands without the one-line
+				// overshoot a section-level scroll leaves. A SUB-heading is not sticky and would
+				// land underneath it, which is what scrollSetboxTo() measures its way out of.
+				scrollSetboxTo(target);
 				setSetboxCurrent(b);
 			});
 			index.appendChild(b);
@@ -14988,6 +15060,16 @@ var EngCalcs = EngCalcs || {};
 				shown += n;
 				return;
 			}
+			// **A PART IS TRANSPARENT.** Two builders share one sub-heading -- the colour rows and
+			// the labels list both stand under Node symbology -- so each writes into its own host
+			// div. Recursing through it keeps the filter working ROW BY ROW; treating the host as
+			// one unit would make a search for "opacity" show everything either builder wrote.
+			if (kid.classList.contains('lpn-set-part')) {
+				n = filterSetboxContainer(kid, q);
+				kid.style.display = n ? '' : 'none';
+				shown += n;
+				return;
+			}
 			// A scope marker labels what follows and is not itself a setting, so it goes away while
 			// a filter is on rather than standing over a gap.
 			if (kid.classList.contains('lpn-set-group')) { kid.style.display = q ? 'none' : ''; return; }
@@ -15031,10 +15113,29 @@ var EngCalcs = EngCalcs || {};
 	// **OPEN, NOT TOGGLE**, for a named section -- the same rule the pane and the menus follow: a
 	// row, or a click on the legend, that names a thing SHOWS that thing. `section` is one of
 	// SETBOX_SECTIONS; without one the box opens where it was left.
+	// **A TIP MUST NOT HANG OVER THE PANEL ITS OWN BUTTON JUST OPENED**, which is the rule
+	// EngCalcs.initTips() already states and wires per control -- and it is not enough here, because
+	// the trigger is 'hover focus' and the button KEEPS FOCUS after the click. So the tooltip stays
+	// up, and once the box was narrowed to 29rem it opens directly under the toolbar's tip, which
+	// then swallows the first attempt to drag the box by its top band. Hiding on open costs one pass
+	// over the tips and takes nothing away from a keyboard user: focus is left where it was, so the
+	// tip comes back the moment they ask for it again.
+	// **A SHOWN TOOLTIP IS FOUND BY `aria-describedby`, NOT BY A CLASS.** That attribute is written
+	// onto the trigger by Bootstrap only while its tip is on screen, so it names exactly the tips
+	// that are up -- where a class list names every control that COULD have one, and misses any
+	// whose tip was wired through a different selector (initTips() has two).
+	function hideOpenTips() {
+		if (!window.bootstrap || !bootstrap.Tooltip) { return; }
+		[].forEach.call(document.querySelectorAll('[aria-describedby^="tooltip"]'), function (el) {
+			var t = bootstrap.Tooltip.getInstance(el);
+			if (t) { t.hide(); }
+		});
+	}
 	function openSettingsBox(section) {
-		var box = setboxEl(), r, at, sec, head;
+		var box = setboxEl(), r, at, target;
 		if (!box) { return; }
 		closeMenu();
+		hideOpenTips();
 		box.style.display = 'flex';
 		rebuildSettingsBox();
 		// Placed, then clamped: the window may have shrunk since the last drag, and a box
@@ -15046,12 +15147,14 @@ var EngCalcs = EngCalcs || {};
 			r.width, r.height, window.innerWidth, window.innerHeight);
 		box.style.left = at.left + 'px';
 		box.style.top = at.top + 'px';
-		if (section) {
-			sec = document.getElementById('lpn_set_sec_' + section);
-			head = sec && sec.querySelector('.lpn-set-head');
-			if (head && head.scrollIntoView) { head.scrollIntoView({ block: 'start' }); }
-			if (sec) {
-				setSetboxCurrent(document.querySelector('#lpn_setbox_index [data-sec="' + sec.id + '"]'));
+		if (section && SETBOX_TARGETS[section]) {
+			target = document.getElementById(SETBOX_TARGETS[section]);
+			if (target) {
+				scrollSetboxTo(target);
+				// The index follows the jump whichever level it landed on, so the left pane always
+				// says where the right pane is.
+				setSetboxCurrent(document.querySelector('#lpn_setbox_index [data-sec="' + target.id +
+					'"], #lpn_setbox_index [data-sub="' + target.id + '"]'));
 			}
 		}
 		// **NOT FOCUSED ON OPEN, and the filter is not cleared either.** Focusing it would put the

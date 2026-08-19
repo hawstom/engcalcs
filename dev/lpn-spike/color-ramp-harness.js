@@ -315,8 +315,9 @@ console.log('== colour key ==');
 // ---- 8. the Coloring section of the Settings box builds -----------------------------------------
 //
 // It used to be a collapsible section INSIDE rebuildSettingsFields(), and a duplicate of it lived in
-// the right pane. Task 441 merged the two into buildColoringSection(), one section of the Settings
-// box -- so this reads #lpn_set_colors and no longer opens anything, because nothing collapses.
+// the right pane. Task 441 merged the two into buildColoringSection() and then DISSOLVED it (Tom,
+// 2026-08-18: "Dissolve Color by value and put its items in Node symbology and Link symbology"), so
+// there are three hosts: the node dropdown and its band limits, the link's, and what both share.
 console.log('== Coloring section ==');
 {
 	fresh('us');
@@ -326,10 +327,23 @@ console.log('== Coloring section ==');
 	let threw = null;
 	try { L.buildColoringSection(); } catch (e) { threw = e; }
 	ok('the Coloring section renders without throwing', threw === null, threw && threw.message);
-	const panel = byId.lpn_set_colors;
-	const t = allText(panel);
-	ok('it offers the ramp choices', /EPANET/.test(t), t.slice(0, 200));
+	const shared = allText(byId.lpn_set_colors_shared);
+	const t = shared + ' ' + allText(byId.lpn_set_colors_node) + ' ' + allText(byId.lpn_set_colors_link);
+	ok('it offers the ramp choices', /EPANET/.test(shared), shared.slice(0, 200));
 	ok('it offers both auto-assign buttons', /Equal intervals/.test(t) && /Equal counts/.test(t));
+	// **EACH GROUP'S CONTROLS ARE UNDER ITS OWN SUB-HEADING**, which is the whole of the move: the
+	// node dropdown and the node band limits are one subject, not two panels.
+	ok('the node dropdown and its band limits are in the node host',
+		allText(byId.lpn_set_colors_node).indexOf(global.EngCalcs.pageConfig.lpn_settings_color_breaks) >= 0);
+	ok('the link dropdown and its band limits are in the link host',
+		allText(byId.lpn_set_colors_link).indexOf(global.EngCalcs.pageConfig.lpn_settings_color_breaks) >= 0);
+	// **THE STRIP IS NOT A LABELLED ROW.** It wore `.lpn-rp-row`, whose first child is the row's
+	// name and therefore takes all the slack, so the first swatch ate the strip (Tom: "First color
+	// expands to use all space"). The class is the whole of that defect and the whole of its fix.
+	const strip = (byId.lpn_set_colors_shared.children || [])
+		.filter(c => c.className === 'lpn-ramp-strip')[0];
+	ok('the ramp strip has its own class, not a labelled row\'s', !!strip,
+		(byId.lpn_set_colors_shared.children || []).map(c => c.className).join(','));
 	// Asserted through the LANGUAGE KEY, not the English words. Wave 0 renamed this heading from
 	// "Break values" to "Color band limits" (2026-08-17) and a literal match turned red for a
 	// deliberate wording change -- which is a test measuring the wrong thing: what matters is that

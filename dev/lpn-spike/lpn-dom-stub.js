@@ -188,7 +188,7 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_empty_hint', 'lpn_labels_legend', 'lpn_labels_link_fields', 'lpn_labels_node_fields',
   'lpn_labels_options', 'lpn_labels_popup', 'lpn_labels_popup_close', 'lpn_mode_hint', 'lpn_map_notice', 'lpn_map_overlay_tl',
   'lpn_popup', 'lpn_popup_close', 'lpn_popup_fields', 'lpn_popup_title', 'lpn_projects_btn',
-  'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close', 'lpn_settings_fields',
+  'lpn_projects_list', 'lpn_projects_popup', 'lpn_projects_popup_close',
   'lpn_settings_popup', 'lpn_settings_popup_close', 'lpn_status', 'lpn_toolbar',
   'lpn_project_file', 'lpn_inp_file', 'lpn_menubar', 'lpn_menu_popup', 'lpn_menu_list', 'lpn_dialog',
   'lpn_dialog_body', 'lpn_dialog_buttons', 'lpn_menu_popup2', 'lpn_menu_list2', 'lpn_map_status',
@@ -200,13 +200,18 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   'lpn_pane', 'lpn_pane_grip', 'lpn_pane_head', 'lpn_pane_tabs', 'lpn_pane_close',
   'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions',
   'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note',
-  // The Settings box (ROADMAP Task 441): the two panes, the filter, the four section shells and
-  // the hosts their builders write into. #lpn_settings_fields and the three lpn_labels_* boxes are
-  // already listed above -- they kept their IDs through the move.
+  // The Settings box (ROADMAP Task 441): the two panes, the filter, the three section shells, the
+  // sub-headings that are jump targets, and the hosts their builders write into. The three
+  // lpn_labels_* boxes are already listed above -- they kept their IDs through the move.
   'lpn_settings_box', 'lpn_setbox_close', 'lpn_setbox_filter', 'lpn_setbox_index',
   'lpn_setbox_content', 'lpn_setbox_none',
-  'lpn_set_sec_labels', 'lpn_set_sec_settings', 'lpn_set_sec_time', 'lpn_set_sec_coloring',
-  'lpn_set_colors', 'lpn_set_time_fields'
+  'lpn_set_sec_map', 'lpn_set_sec_elements', 'lpn_set_sec_calc',
+  'lpn_set_sub_nodeSym', 'lpn_set_sub_linkSym', 'lpn_set_sub_mapDisplay', 'lpn_set_sub_page',
+  'lpn_set_sub_idPrefixes', 'lpn_set_sub_defaults',
+  'lpn_set_sub_units', 'lpn_set_sub_time', 'lpn_set_sub_hydraulics',
+  'lpn_set_colors_node', 'lpn_set_colors_link', 'lpn_set_colors_shared',
+  'lpn_set_id_fields', 'lpn_set_default_fields', 'lpn_set_map_fields', 'lpn_set_units_fields',
+  'lpn_set_hydraulics_fields', 'lpn_set_page_fields', 'lpn_set_time_fields'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the

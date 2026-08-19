@@ -28,7 +28,12 @@ const LISTS = [
 	{ id: 'lpn_labels_node_fields', what: 'Node labels' },
 	{ id: 'lpn_labels_link_fields', what: 'Link labels' }
 ];
-const COLUMNS = ['Before', 'After', 'Decimals', 'Priority'];
+// The last two headings are no longer words (Task 441, restructured): the decimals column shows an
+// EXAMPLE of what it does, translatable because the decimal separator is a locale fact, and the
+// priority column shows the 123 icon with the word in its tip. So the fourth is asserted as
+// "carries something", not as a string -- which is also what keeps this check honest the day the
+// icon lands and the word goes away.
+const COLUMNS = ['Before', 'After', '0.000', 'Rank'];
 
 // The heading row and every field row of one list, as painted. Column 1 is the field's name and is
 // a flex spacer, not a column of values, so only children 2..5 are read.
@@ -41,6 +46,12 @@ async function columns(a, listId) {
 				const r = c.getBoundingClientRect();
 				return {
 					tag: c.tagName.toLowerCase(), text: (c.textContent || '').trim(),
+					// **BOOTSTRAP MOVES A TITLE IT HAS TAKEN OVER.** EngCalcs.initTips() hands every
+					// .ec-help to Bootstrap, which empties `title` into `data-bs-original-title` --
+					// so reading `title` alone says a tipped control has no tip.
+					icon: !!c.querySelector('svg'),
+					tip: c.getAttribute('title') || c.getAttribute('data-bs-original-title') ||
+						c.getAttribute('aria-label') || '',
 					left: +r.left.toFixed(2), width: +r.width.toFixed(2), mid: +(r.left + r.width / 2).toFixed(2)
 				};
 			});
@@ -65,8 +76,8 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(500);
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_settings_box').style.display === 'flex' &&
-			!!document.querySelector('#lpn_set_sec_labels #lpn_labels_node_fields')),
-			'the Labels section opens in the Settings box');
+			!!document.querySelector('#lpn_set_sec_map #lpn_labels_node_fields')),
+			'the node labels open in the Settings box, under Map and page');
 
 		for (const list of LISTS) {
 			const got = await columns(a, list.id);
@@ -74,8 +85,16 @@ exports.run = async function ({ browser, report }) {
 				got && got.fields.map(f => f.name).join(', '));
 			if (!got) { continue; }
 
-			report.eq(got.head.cells.map(c => c.text).join('|'), COLUMNS.join('|'),
-				`${list.what}: four headings, in the order the row lays its controls out`);
+			report.eq(got.head.cells.slice(0, 3).map(c => c.text).join('|'), COLUMNS.slice(0, 3).join('|'),
+				`${list.what}: the first three headings, in the order the row lays its controls out`);
+			// **THE PRIORITY HEADING SAYS "PRIORITY" SOMEWHERE.** Whether it draws the icon or falls
+			// back to the word, the term of art has to be reachable, and for an icon the tip is the
+			// only place it can be.
+			const rank = got.head.cells[3];
+			report.ok(rank.icon || rank.text.length > 0,
+				`${list.what}: the priority column has a heading at all`, rank.text || 'icon');
+			report.has(rank.tip.toLowerCase(), 'priorit',
+				`${list.what}: ...and its tip carries the word "priority"`, rank.tip.slice(0, 40));
 			report.ok(got.fields.every(f => f.cells.length === 4),
 				`${list.what}: every field row reserves all four columns, used or not`,
 				'a row that reserves only the columns it uses staggers every row beside it');
