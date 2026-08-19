@@ -56,11 +56,12 @@ exports.run = async function ({ browser, report }) {
 		await a.goto();
 		await a.dismissGallery();
 		await a.makeEdit();
-		// The Labels button opened a pull-down, then the Visibility panel (Task 427), and since Task
-		// 441 it opens the Settings box on its Labels section. The columns being measured travelled
-		// through all three moves unchanged, which is the point of measuring them here rather than
-		// asserting a stylesheet rule.
-		await a.toolbarClick('Labels');
+		// The Labels button opened a pull-down, then the Visibility panel (Task 427), then the
+		// Settings box on its Labels section (Task 441) -- and then it was removed, because the box
+		// it opened has its own button (Tom, 2026-08-18). The columns being measured travelled
+		// through every one of those moves unchanged, which is the point of measuring them here
+		// rather than asserting a stylesheet rule. The door used is the one Tom kept: View > Labels.
+		await a.menuClick('Labels', 'view');
 		await a.settle(500);
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_settings_box').style.display === 'flex' &&

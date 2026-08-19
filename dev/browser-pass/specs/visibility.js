@@ -244,8 +244,11 @@ exports.run = async function ({ browser, report }) {
 			'and it reopens where the user left it');
 
 		// ---- 4. every door, and each lands on the section it names --------------------------
+		// **THE TOOLBAR LABELS BUTTON IS GONE** (Tom, 2026-08-18: "We can remove this button now.
+		// Everything is simpler than EPANET or epanetjs because all project settings are in (tada!)
+		// Settings"). Its two surviving doors are both still checked below: View > Labels, and the
+		// colour legend. The Settings button opens the box itself.
 		const doors = [
-			['the toolbar Labels button', 'labels', async () => a.toolbarClick('Labels')],
 			['the toolbar Settings button', null, async () => a.toolbarClick('Settings')]
 		];
 		for (const [what, want, open] of doors) {
