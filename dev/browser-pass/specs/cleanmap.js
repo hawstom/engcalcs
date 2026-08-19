@@ -13,6 +13,12 @@
 
 const { Session } = require('../lib/session');
 
+// **THE BUTTON NAMES THE ACT, SO ITS NAME FLIPS** -- "Hide map readouts" / "Show map
+// readouts". That is the one documented exception to dev/toolbar-icons.md's rule that a
+// toggle keeps one name, and it is why the label lives here once: a spec that typed
+// "Clean map" inline broke the day Wave 0 gave the control a name that says what it does.
+const CLEAN_ON = 'Hide map readouts';
+
 exports.title = '20. The clean map';
 
 const GONE = ['lpn_mode_hint', 'lpn_coords'];
@@ -54,7 +60,7 @@ exports.run = async function ({ browser, report }) {
 		report.eq(await pressed(a), 'false', 'the toolbar button starts unpressed');
 
 		// ---- the toolbar button ------------------------------------------------------------------
-		await a.toolbarClick('Clean map');
+		await a.toolbarClick(CLEAN_ON);
 		await a.settle(300);
 		const clean = await strip(a);
 		report.ok(GONE.every(id => !clean[id]), 'the camera button takes the mode line and the tracker away',
@@ -70,14 +76,14 @@ exports.run = async function ({ browser, report }) {
 		report.eq(await a.nodeCount(), 1, 'the network is untouched — this is a readout mode, not a view');
 
 		// ---- and back again ----------------------------------------------------------------------
-		await a.toolbarClick('Clean map');
+		await a.toolbarClick(CLEAN_ON);
 		await a.settle(300);
 		report.eq(JSON.stringify(await strip(a)), JSON.stringify(before),
 			'pressing it again puts every one of them back, and changes nothing else');
 		report.eq(await pressed(a), 'false', '...and the button unpresses');
 
 		// ---- the View menu says what it will DO --------------------------------------------------
-		let row = await viewRow(a, 'Clean map');
+		let row = await viewRow(a, CLEAN_ON);
 		report.ok(!!row, 'the View menu offers it too', row && row.label);
 		await a.menuClick(row.label, 'view');
 		await a.settle(300);
@@ -93,7 +99,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(GONE.every(id => back[id]), '...and it toggles back', JSON.stringify(back));
 
 		// ---- it is not stored --------------------------------------------------------------------
-		await a.toolbarClick('Clean map');
+		await a.toolbarClick(CLEAN_ON);
 		await a.settle(300);
 		report.eq(await pressed(a), 'true', 'set up: clean map is on');
 		await a.reload();

@@ -1387,6 +1387,21 @@ $ec_lang['lpn_color_node_field']='Color nodes by';
 $ec_lang['lpn_color_link_field']='Color pipes by';
 $ec_lang['lpn_color_ramp_sequential']='Sequential';
 $ec_lang['lpn_color_ramp_diverging']='Diverging';
+// The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
+// the picker is pictures -- so the only strings here are the family headings, the controls beside
+// them, and the three ways a typed range limit can be refused.
+$ec_lang['lpn_settings_color_classes']='Number of ranges';
+$ec_lang['lpn_color_mode']='Range allocation';
+$ec_lang['lpn_color_ranges_note']='The mode above sets these limits from the values now on the map. Type over them and the same number always means the same color.';
+$ec_lang['lpn_color_criterion_note']='The range limits come from a design standard, so the number of ranges is fixed while that mode is chosen.';
+$ec_lang['lpn_color_break_number']='A range limit must be a number. The map is unchanged.';
+$ec_lang['lpn_color_break_order']='Each range limit must be larger than the one before it. The map is unchanged.';
+$ec_lang['lpn_color_break_count']='There must be one limit fewer than the number of ranges. The map is unchanged.';
+$ec_lang['lpn_color_ramp_qualitative']='Qualitative';
+$ec_lang['lpn_color_ramp_rainbow']='Rainbow';
+$ec_lang['lpn_color_ramp_rainbow_eg']='matches EPANET';
+$ec_lang['lpn_color_example_status']='Status';
+$ec_lang['lpn_color_example_material']='Material';
 $ec_lang['lpn_color_ramp_ylgnbu']='Yellow to blue';
 $ec_lang['lpn_color_ramp_rdylbu']='Red to blue, through yellow';
 $ec_lang['lpn_georef_drop']='Put the model here';

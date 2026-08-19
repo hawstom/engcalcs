@@ -236,8 +236,11 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(800);
 		const asked = a.lastDialog();
 		report.ok(asked && asked.type === 'confirm', 'converting asks first', asked && asked.type);
-		report.has(asked && asked.message, 'press Finish',
-			'...and the confirm says nothing is committed until Finish');
+		// The confirm QUOTES the button by its label, so this follows the label rather than a word.
+		// Wave 0 renamed it "Finish" -> "Keep this placement" precisely so the sentence and the button
+		// could not drift apart; asserting the old word would have hidden that they had.
+		report.has(asked && asked.message, 'Keep this placement',
+			'...and the confirm says nothing is committed until the button it names is pressed');
 
 		const b1 = await bar(a);
 		report.ok(b1.visible, 'the placement bar appears');

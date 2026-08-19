@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 1170,
-        "delta_key_count": 174,
+        "expected_key_count": 1182,
+        "delta_key_count": 186,
         "exempt_key_count": 32,
         "exempt_keys": [
             "u_depthFrac",
@@ -500,6 +500,18 @@
         "lpn_color_link_field": "Color pipes by",
         "lpn_color_ramp_sequential": "Sequential",
         "lpn_color_ramp_diverging": "Diverging",
+        "lpn_settings_color_classes": "Number of ranges",
+        "lpn_color_mode": "Range allocation",
+        "lpn_color_ranges_note": "The mode above sets these limits from the values now on the map. Type over them and the same number always means the same color.",
+        "lpn_color_criterion_note": "The range limits come from a design standard, so the number of ranges is fixed while that mode is chosen.",
+        "lpn_color_break_number": "A range limit must be a number. The map is unchanged.",
+        "lpn_color_break_order": "Each range limit must be larger than the one before it. The map is unchanged.",
+        "lpn_color_break_count": "There must be one limit fewer than the number of ranges. The map is unchanged.",
+        "lpn_color_ramp_qualitative": "Qualitative",
+        "lpn_color_ramp_rainbow": "Rainbow",
+        "lpn_color_ramp_rainbow_eg": "matches EPANET",
+        "lpn_color_example_status": "Status",
+        "lpn_color_example_material": "Material",
         "lpn_color_ramp_ylgnbu": "Yellow to blue",
         "lpn_color_ramp_rdylbu": "Red to blue, through yellow",
         "lpn_georef_drop": "Put the model here",
@@ -676,6 +688,18 @@
         "lpn_color_link_field": "Color pipes by",
         "lpn_color_ramp_sequential": "Sequential",
         "lpn_color_ramp_diverging": "Diverging",
+        "lpn_settings_color_classes": "Number of ranges",
+        "lpn_color_mode": "Range allocation",
+        "lpn_color_ranges_note": "The mode above sets these limits from the values now on the map. Type over them and the same number always means the same color.",
+        "lpn_color_criterion_note": "The range limits come from a design standard, so the number of ranges is fixed while that mode is chosen.",
+        "lpn_color_break_number": "A range limit must be a number. The map is unchanged.",
+        "lpn_color_break_order": "Each range limit must be larger than the one before it. The map is unchanged.",
+        "lpn_color_break_count": "There must be one limit fewer than the number of ranges. The map is unchanged.",
+        "lpn_color_ramp_qualitative": "Qualitative",
+        "lpn_color_ramp_rainbow": "Rainbow",
+        "lpn_color_ramp_rainbow_eg": "matches EPANET",
+        "lpn_color_example_status": "Status",
+        "lpn_color_example_material": "Material",
         "lpn_color_ramp_ylgnbu": "Yellow to blue",
         "lpn_color_ramp_rdylbu": "Red to blue, through yellow",
         "lpn_georef_drop": "Put the model here",
@@ -1647,6 +1671,198 @@
             }
         },
         "lpn_color_ramp_diverging": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_settings_color_classes": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_mode": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_ranges_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_criterion_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_break_number": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_break_order": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_break_count": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_ramp_qualitative": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_ramp_rainbow": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_ramp_rainbow_eg": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_example_status": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Affichage",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Paramètres",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_example_material": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
