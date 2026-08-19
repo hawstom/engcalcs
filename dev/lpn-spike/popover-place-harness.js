@@ -213,8 +213,11 @@ console.log('\n-- every popover goes through the one placer, which is the whole 
 {
 	// Four boxes with four copies of the same six lines is what let Settings and Labels drift away
 	// from the fix Notes already had.
-	report(/openPanelAtAnchor\(popup, evt\.currentTarget\.getBoundingClientRect\(\)\)/.test(extract('toggleLabelsPopup')),
-		'Labels');
+	// Labels is NOT in this list any more: since Task 427 it is the Visibility panel at the right
+	// of the map, which is docked rather than anchored and therefore has no rect to be placed
+	// against. Asserted as an absence, so a later pass cannot quietly give it a pull-down again.
+	report(!/openPanelAtAnchor/.test(extract('toggleLabelsPopup')),
+		'Labels is a docked panel now, not an anchored pull-down');
 	report(/openPanelAtAnchor\(popup, evt\.currentTarget\.getBoundingClientRect\(\)\)/.test(extract('toggleSettingsPopup')),
 		'Settings');
 	report(/openPanelAtAnchor\(popup, anchor\.getBoundingClientRect\(\), !!level\)/.test(extract('openMenu')),
@@ -248,9 +251,8 @@ console.log('\n-- clicking the menu bar dismisses an open popover (Tom, 2026-08-
 	report(/viewPopoverAnchor/.test(tabs), 'the control that OPENED the popover is exempt instead');
 	report(/closest\('#lpn_menu_popup, #lpn_menu_popup2'\)/.test(tabs),
 		'and a menu row stays exempt, since rows are what open these panels');
-	report(/viewPopoverAnchor = evt\.currentTarget;/.test(extract('toggleLabelsPopup')) &&
-		/viewPopoverAnchor = evt\.currentTarget;/.test(extract('toggleSettingsPopup')),
-		'both openers record their button');
+	report(/viewPopoverAnchor = evt\.currentTarget;/.test(extract('toggleSettingsPopup')),
+		'the Settings opener records its button');
 	report(/if \(!except\) \{ viewPopoverAnchor = null; \}/.test(extract('closeViewPopovers')),
 		'and closing them all forgets it, so a stale button cannot go on being exempt');
 }

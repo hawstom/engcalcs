@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 1111,
-        "delta_key_count": 115,
+        "expected_key_count": 1134,
+        "delta_key_count": 138,
         "exempt_key_count": 26,
         "exempt_keys": [
             "calc_units_us",
@@ -424,6 +424,29 @@
         "lpn_georef_step1_hint": "Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is roughly the right place and roughly the right size, then press Drop it here.",
         "lpn_georef_detach": "Pick it up again",
         "lpn_georef_size_prompt": "About how wide is the site, across the whole project?",
+        "lpn_tip_join": "{name} — {tip}",
+        "lpn_tool_add_junction_tip": "Click the map to add a junction: a point where pipes meet or where water is used.",
+        "lpn_tool_add_reservoir_tip": "Click the map to add a reservoir: a source that holds one fixed water level.",
+        "lpn_tool_add_tank_tip": "Click the map to add a tank: storage with a water surface that you set.",
+        "lpn_tool_add_pipe_tip": "Click one node and then another to draw a pipe between them.",
+        "lpn_tool_add_pump_tip": "Click one node and then another to put a pump between them.",
+        "lpn_tool_add_valve_tip": "Click one node and then another to put a valve between them.",
+        "lpn_tool_add_text_tip": "Click the map to write a note on the drawing.",
+        "lpn_tool_delete_tip": "Click anything on the map to remove it.",
+        "lpn_tool_undo_tip": "Undo the last change.",
+        "lpn_tool_zoom_extent_tip": "Fit the whole network in the window.",
+        "lpn_tool_settings_tip": "Open the settings for this project.",
+        "lpn_find_menu_tip": "Find a part by its ID, or find every part that meets a test.",
+        "lpn_help_icons": "What the toolbar icons mean",
+        "lpn_pane_right_toggle": "Visibility",
+        "lpn_pane_right_toggle_tip": "Show or hide the panel at the right of the map. It holds the label and color choices.",
+        "lpn_color_legend_open_tip": "Click to open the Visibility panel and change these colors.",
+        "lpn_color_node_field": "Color nodes by",
+        "lpn_color_link_field": "Color pipes by",
+        "lpn_color_ramp_sequential": "Sequential",
+        "lpn_color_ramp_diverging": "Diverging",
+        "lpn_color_ramp_ylgnbu": "Yellow to blue",
+        "lpn_color_ramp_rdylbu": "Red to blue, through yellow",
         "lpn_georef_drop": "Drop it here",
         "lpn_georef_finish": "Finish",
         "lpn_georef_cancel": "Cancel",
@@ -541,6 +564,29 @@
         "lpn_georef_step1_hint": "Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is roughly the right place and roughly the right size, then press Drop it here.",
         "lpn_georef_detach": "Pick it up again",
         "lpn_georef_size_prompt": "About how wide is the site, across the whole project?",
+        "lpn_tip_join": "{name} — {tip}",
+        "lpn_tool_add_junction_tip": "Click the map to add a junction: a point where pipes meet or where water is used.",
+        "lpn_tool_add_reservoir_tip": "Click the map to add a reservoir: a source that holds one fixed water level.",
+        "lpn_tool_add_tank_tip": "Click the map to add a tank: storage with a water surface that you set.",
+        "lpn_tool_add_pipe_tip": "Click one node and then another to draw a pipe between them.",
+        "lpn_tool_add_pump_tip": "Click one node and then another to put a pump between them.",
+        "lpn_tool_add_valve_tip": "Click one node and then another to put a valve between them.",
+        "lpn_tool_add_text_tip": "Click the map to write a note on the drawing.",
+        "lpn_tool_delete_tip": "Click anything on the map to remove it.",
+        "lpn_tool_undo_tip": "Undo the last change.",
+        "lpn_tool_zoom_extent_tip": "Fit the whole network in the window.",
+        "lpn_tool_settings_tip": "Open the settings for this project.",
+        "lpn_find_menu_tip": "Find a part by its ID, or find every part that meets a test.",
+        "lpn_help_icons": "What the toolbar icons mean",
+        "lpn_pane_right_toggle": "Visibility",
+        "lpn_pane_right_toggle_tip": "Show or hide the panel at the right of the map. It holds the label and color choices.",
+        "lpn_color_legend_open_tip": "Click to open the Visibility panel and change these colors.",
+        "lpn_color_node_field": "Color nodes by",
+        "lpn_color_link_field": "Color pipes by",
+        "lpn_color_ramp_sequential": "Sequential",
+        "lpn_color_ramp_diverging": "Diverging",
+        "lpn_color_ramp_ylgnbu": "Yellow to blue",
+        "lpn_color_ramp_rdylbu": "Red to blue, through yellow",
         "lpn_georef_drop": "Drop it here",
         "lpn_georef_finish": "Finish",
         "lpn_georef_cancel": "Cancel",
@@ -1138,6 +1184,374 @@
             }
         },
         "lpn_georef_size_prompt": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tip_join": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tool_add_junction_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tool_add_reservoir_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tool_add_tank_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tool_add_pipe_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tool_add_pump_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tool_add_valve_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tool_add_text_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tool_delete_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tool_undo_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tool_zoom_extent_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_tool_settings_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_find_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_help_icons": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_pane_right_toggle": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_pane_right_toggle_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_legend_open_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_node_field": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_link_field": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_ramp_sequential": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_ramp_diverging": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_ramp_ylgnbu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_menu_view",
+                    "value": "Ver",
+                    "english": "View"
+                },
+                "next_translated": {
+                    "key": "lpn_menu_settings",
+                    "value": "Configuración",
+                    "english": "Settings"
+                }
+            }
+        },
+        "lpn_color_ramp_rdylbu": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

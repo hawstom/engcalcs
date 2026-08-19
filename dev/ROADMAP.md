@@ -568,21 +568,23 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     describe the gate as one (`dev/positioning.md` §6). Tom, 2026-08-14: *"we have no less technical
     authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
     all public domain."*
-- 45|434| **The BOTTOM pane shipped 2026-08-18; what is left of this task is the RIGHT one, and Tom
-  has not settled it.** `#lpn_pane` is docked below the canvas in normal flow, resizable by its top
-  grip, remembering height/open/tab per browser in `lpn_pane`. Tabs: **Profile** (moved out of its
-  floating popup, and now full-height) and **Junctions** (sortable, editing through `setProp()`).
-  Find and the pane toggle sit in a new right-edge toolbar group. Harness
-  `dev/lpn-spike/pane-harness.js` (57) and `dev/browser-pass/specs/profile.js`.
+- 45|434| **Both panes shipped 2026-08-18.** BOTTOM: `#lpn_pane`, docked below the canvas in normal
+  flow, resizable by its top grip, remembering height/open/tab per browser in `lpn_pane`. Tabs:
+  **Profile** and **Junctions** (sortable, editing through `setProp()`). RIGHT: `#lpn_rpane`
+  **Visibility** — Labels (moved here whole from its pull-down) and Color by value, collapsing
+  `<details>` sections, width/open per browser in `lpn_rpane`. Both toggles are the right-edge
+  toolbar group beside Find. Harnesses `dev/lpn-spike/pane-harness.js`,
+  `dev/browser-pass/specs/{profile,visibility}.js`.
   - **The pane is in normal FLOW, and that is the whole mechanism.** `flowBelowMap()` measures
     `body.bottom - svg.bottom`, so the map gives up exactly the pane's height *by measurement* — the
     pane never writes a canvas height and never touches `serializeProject()`.
-  - **NO LEFT PANE, ever** (Tom: "Don't copy the epanetjs left pane"). **Settings and the Labels box
-    stay separate pull-downs** and the harness asserts they are not tabs.
-  - **OPEN: the RIGHT pane** — asset properties plus map visibility/style tabs. Tom: our properties
-    box "is acceptable", a pane is "predictable and easily toggleable, but I hate to just be a
-    copycat, though good is good". That is not a decision yet, and Tasks 427 and 284 are the two that
-    want it. The tab registry leaves room.
+  - **The RIGHT pane is an OVERLAY, and deliberately not in flow.** It takes no height from the map,
+    so the one measured number stays one number; a ResizeObserver on the canvas keeps it registered.
+  - **NO LEFT PANE, ever** (Tom: "Don't copy the epanetjs left pane"). Settings is still its own
+    pull-down and the harness asserts neither it nor Labels is a bottom-pane tab.
+  - **OPEN: Settings joins the right pane as its third section** — Tom's (c). Left out of this pass
+    because Settings carries the units block and the solver numbers, which is a move worth doing on
+    its own. The property popup stays as it is: Tom calls it good.
   - **OPEN, and it needs Tom:** the toolbar toggle opens the pane on whatever tab you left it on, so
     it does not mean "profile". If Task 433's *"reached from a toolbar button"* meant one button per
     tab, that is a per-tab toggle set rather than one pane toggle. Likewise Find is a button opening a
@@ -595,18 +597,23 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **The chooser should be the Google Maps gesture EPANET uses:** click the starting node, hover
     along the path, click to add a waypoint, double-click to end. Not two pull-downs.
 
-- 55|427| **Colour by value: one dropdown is not the idiom.** Tom, 2026-08-18: he sees the beauty of
-  one control, "but it's not the expectation". EPANET and epanet-js both give NODES and LINKS a
-  dropdown each, in a right-side pane.
-  - **And once a field is chosen the picker is poorly documented** for anyone who opens the project
-    later. Candidate home: the bottom of the map, rightward, under or replacing the legend title.
-  - **Clicking the LEGEND should open Settings > Color by value.** The legend is where a reader is
-    already looking when they want to change it.
+- 40|427| **Two dropdowns shipped 2026-08-18; what is left is documenting the CHOICE.** Nodes and
+  links have a dropdown each in the Visibility panel, neither clears the other, and clicking the
+  legend opens the panel on its colours section. `dev/browser-pass/specs/color.js`.
+  - **OPEN: once a field is chosen the picker is poorly documented** for anyone who opens the
+    project later. Candidate home: the bottom of the map, rightward, under or replacing the legend
+    title.
 
-- 50|429| **A ramp picker and a ranges picker, EPANET's shape.** Tom, 2026-08-18, on what he wants
-  next: a **Ramp** dropdown of dozens of single-line ramps in two categories, Continuous and
-  Divergent; above it a single **Ranges** dropdown choosing among 5 calculation modes and a number of
-  breaks, reading closed as e.g. `Ranges: 7 Pretty breaks`.
+- 50|429| **The RAMP picker shipped 2026-08-18; the RANGES picker is what is left.** The ramp
+  dropdown groups its schemes by ColorBrewer family — **sequential** and **diverging**, the standard
+  vocabulary (matplotlib, d3, QGIS, ArcGIS), not epanet-js's non-standard "Continuous" — and draws
+  the ramp beside its name. Five ramps: EPANET's own, viridis, gray, and ColorBrewer's YlGnBu and
+  RdYlBu, whose Apache-2.0 licence is honoured by the credit line in the panel.
+  - **OPEN: the Ranges picker.** Today the ranges are four break boxes plus Equal intervals / Equal
+    counts / Automatic. Tom wants one dropdown choosing among 5 calculation modes and a number of
+    breaks, reading closed as e.g. `Ranges: 7 Pretty breaks`.
+  - **OPEN: more ramps.** Tom asked for dozens; five is what one pass could attribute properly.
+    ColorBrewer's full set is Apache-2.0 and can be added wholesale under the same credit.
   - *"If Classes isn't standard, I would call it Breaks, Tiers, or Quantity, and I would list it
     first on the closed dropdown."*
   - epanet-js also offers a single Label per symbology; **our Labels model is better and stays.**

@@ -1362,6 +1362,33 @@ $ec_lang['lpn_georef_step2']='Step 2 of 2 — attached';
 $ec_lang['lpn_georef_step1_hint']='Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is roughly the right place and roughly the right size, then press Drop it here.';
 $ec_lang['lpn_georef_detach']='Pick it up again';
 $ec_lang['lpn_georef_size_prompt']='About how wide is the site, across the whole project?';
+// ---- The icon-only toolbar (dev/toolbar-icons.md) ----
+// One separator string, one composition site: a language that wants a colon, another dash, or the
+// explanation first changes this and nothing else.
+$ec_lang['lpn_tip_join']='{name} — {tip}';
+$ec_lang['lpn_tool_add_junction_tip']='Click the map to add a junction: a point where pipes meet or where water is used.';
+$ec_lang['lpn_tool_add_reservoir_tip']='Click the map to add a reservoir: a source that holds one fixed water level.';
+$ec_lang['lpn_tool_add_tank_tip']='Click the map to add a tank: storage with a water surface that you set.';
+$ec_lang['lpn_tool_add_pipe_tip']='Click one node and then another to draw a pipe between them.';
+$ec_lang['lpn_tool_add_pump_tip']='Click one node and then another to put a pump between them.';
+$ec_lang['lpn_tool_add_valve_tip']='Click one node and then another to put a valve between them.';
+$ec_lang['lpn_tool_add_text_tip']='Click the map to write a note on the drawing.';
+$ec_lang['lpn_tool_delete_tip']='Click anything on the map to remove it.';
+$ec_lang['lpn_tool_undo_tip']='Undo the last change.';
+$ec_lang['lpn_tool_zoom_extent_tip']='Fit the whole network in the window.';
+$ec_lang['lpn_tool_settings_tip']='Open the settings for this project.';
+$ec_lang['lpn_find_menu_tip']='Find a part by its ID, or find every part that meets a test.';
+$ec_lang['lpn_help_icons']='What the toolbar icons mean';
+// ---- The right panel: Visibility ----
+$ec_lang['lpn_pane_right_toggle']='Visibility';
+$ec_lang['lpn_pane_right_toggle_tip']='Show or hide the panel at the right of the map. It holds the label and color choices.';
+$ec_lang['lpn_color_legend_open_tip']='Click to open the Visibility panel and change these colors.';
+$ec_lang['lpn_color_node_field']='Color nodes by';
+$ec_lang['lpn_color_link_field']='Color pipes by';
+$ec_lang['lpn_color_ramp_sequential']='Sequential';
+$ec_lang['lpn_color_ramp_diverging']='Diverging';
+$ec_lang['lpn_color_ramp_ylgnbu']='Yellow to blue';
+$ec_lang['lpn_color_ramp_rdylbu']='Red to blue, through yellow';
 $ec_lang['lpn_georef_drop']='Drop it here';
 $ec_lang['lpn_georef_finish']='Finish';
 $ec_lang['lpn_georef_cancel']='Cancel';

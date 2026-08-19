@@ -181,7 +181,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 	      // format a chosen file really is gets decided from its first bytes, not its name. ?>
 	<input type="file" id="lpn_inp_file" accept=".inp,.net,text/plain" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
-	      // mirrors #lpn_labels_popup's static-PHP-plus-JS-clamped-position pattern (position:fixed,
+	      // mirrors #lpn_settings_popup's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
 	      // fixed center-screen placement. ?>
 	<div id="lpn_backdrop_target_panel" class="d-print-none" style="display:none;position:fixed;z-index:30;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
@@ -374,9 +374,74 @@ echoHeader("EngCalcs", $html_title, "", false);
       // OUTSIDE #formInput, unlike the map: the tab bodies hold ordinary inputs, and a stray Enter
       // in one of them must not submit the calculator form.
       //
-      // Settings and the Labels box are NOT tabs here and never will be (Tom, explicitly). Both are
-      // pull-downs hanging off their own toolbar buttons, and a setting is not something you read
-      // beside the drawing. ?>
+      // Settings and Labels are NOT tabs here and never will be (Tom, explicitly). Settings is a
+      // pull-down off its own toolbar button; Labels moved to the Visibility panel at the right of
+      // the map. Neither is something you read beside the drawing. ?>
+<?php // ---- THE RIGHT PANEL: VISIBILITY (ROADMAP Tasks 427 and 434) ----
+      //
+      // Tom, 2026-08-18, after rejecting a copy of epanet-js's right pane: "we are converging on
+      // (a) Properties (serves the epanetjs right pane Asset tab), (b) Labels becomes Visibility
+      // (tentative name) and serves our label settings plus color ramping and scaling range by
+      // value, and (c) Settings."
+      //
+      // So this is where LABELS LIVE NOW. The Labels pull-down is gone rather than duplicated: two
+      // homes for one set of checkboxes is the drift that a moved feature always produces, and the
+      // label lists are far too tall for a pull-down anyway -- they are the reason the pull-down
+      // needed its own scrollbar. The toolbar's Labels button and View > Labels both open this
+      // panel, so both doors Tom already knows still work.
+      //
+      // COLLAPSE, NOT A TWO-PANE INDEX. Tom named both paradigms and the rule that picks between
+      // them: "Two-pane for very long lists and collapse for shorter lists." Two sections is short.
+      // <details>/<summary> is the native form of it -- keyboard-operable, announced, and no JS.
+      //
+      // AN OVERLAY ON THE MAP, not a column beside it: the canvas height is MEASURED (Task 432) and
+      // a docked column would make its WIDTH a second measured number in the same layout. So it
+      // covers the right edge of the map, exactly as the legend and the map footer already do.
+      //
+      // position:fixed and OUTSIDE #formInput, for the same reason the bottom pane is outside it:
+      // this body is full of ordinary inputs, and a stray Enter in one of them must not submit the
+      // calculator form. Being fixed, it is placed from the canvas's own rect by
+      // positionRightPane(), which runs on every event that already re-measures the map -- it takes
+      // no height FROM the map and gives none back, so there is no second source of truth here.
+      //
+      // Settings is NOT here yet. Tom's (c) puts it in the same family of panels, and it would be a
+      // third <details> in this body once its own pull-down is retired -- deliberately left for
+      // another pass, because Settings carries the units block and the solver numbers, which is a
+      // move worth doing on its own. ?>
+<div id="lpn_rpane" class="d-print-none lpn-rpane" style="display:none" role="region" aria-labelledby="lpn_rpane_title">
+	<?php // The grip is the panel's left EDGE, matching the bottom pane's top edge. ?>
+	<div id="lpn_rpane_grip" class="lpn-rpane-grip" role="separator" aria-orientation="vertical"
+		title="<?=htmlspecialchars($ec_lang['lpn_pane_resize'])?>"
+		aria-label="<?=htmlspecialchars($ec_lang['lpn_pane_resize'])?>"></div>
+	<div class="lpn-rpane-inner">
+	<div class="lpn-rpane-head">
+		<div id="lpn_rpane_title" class="lpn-rpane-title"><?=$ec_lang['lpn_pane_right_toggle']?></div>
+		<button type="button" id="lpn_rpane_close" class="lpn-pane-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	</div>
+	<div class="lpn-rpane-body">
+		<details id="lpn_rp_colors_sec" class="lpn-rp-sec" open>
+			<summary><?=$ec_lang['lpn_settings_colors']?></summary>
+			<?php // Built in JS (buildVisibilityColors()): the field lists carry the current units and
+			      // the friction method's roughness symbol, both of which change under them. ?>
+			<div id="lpn_rp_colors"></div>
+			<?php // ColorBrewer's schemes are Apache-2.0 and that licence requires this acknowledgement
+			      // in end-user documentation. Untranslated on purpose, exactly like the OpenStreetMap
+			      // credit on the map: it is a name and a URL. ?>
+			<div class="lpn-rp-credit">Color schemes by Cynthia Brewer, <a href="https://colorbrewer2.org/" target="_blank" rel="noopener">colorbrewer2.org</a></div>
+		</details>
+		<details id="lpn_rp_labels_sec" class="lpn-rp-sec" open>
+			<summary><?=$ec_lang['lpn_tool_labels']?></summary>
+			<div style="font-weight:bold"><?=$ec_lang['lpn_labels_heading_node']?></div>
+			<div id="lpn_labels_node_fields"></div>
+			<div style="font-weight:bold"><?=$ec_lang['lpn_labels_heading_link']?></div>
+			<div id="lpn_labels_link_fields"></div>
+			<?php // Label options that apply to every field at once (ROADMAP Task 190's high/low mark
+			      // toggle), below both per-field lists. Built in JS by rebuildLabelsFields(). ?>
+			<div id="lpn_labels_options"></div>
+		</details>
+	</div>
+	</div>
+</div>
 <div id="lpn_pane" class="d-print-none lpn-pane" style="display:none">
 	<?php // The drag handle is the pane's top EDGE, which is where a person aims. role="separator"
 	      // with an aria-label rather than a tip glyph: it is a grip, not a labelled control, and a
@@ -438,25 +503,6 @@ echoHeader("EngCalcs", $html_title, "", false);
       // (not #lpn_popup/currentPopup) so this never interacts with the rename/undo/element-property
       // machinery. position:fixed and positioned from the Labels button's own screen rect (same
       // reasoning as #lpn_popup above: viewport-relative, clamped into view by JS on open). ?>
-<?php // NO CLOSE X, and none is coming back (Tom, 2026-08-13): "What are these boxes? ... Or are they
-      // pull-down menus, which is what they appear to be? If pull-down menus, then an X to close is
-      // not idiomatic or expected." They are pull-downs -- anchored under the button that opened
-      // them, dismissed by clicking away, by Escape, by the button again, or by opening any other
-      // menu or panel. So they close the way a pull-down closes and carry no chrome of their own.
-      // #lpn_popup above keeps its X because it is NOT one of these: it opens at the point on the
-      // map that was clicked, belongs to an element rather than to a button, and so reads as a
-      // floating property sheet, where a corner X is exactly what is expected. ?>
-<div id="lpn_labels_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
-	<div class="lpn-popover-body">
-	<div style="font-weight:bold"><?=$ec_lang['lpn_labels_heading_node']?></div>
-	<div id="lpn_labels_node_fields"></div>
-	<div style="font-weight:bold"><?=$ec_lang['lpn_labels_heading_link']?></div>
-	<div id="lpn_labels_link_fields"></div>
-	<?php // Label options that apply to every field at once (ROADMAP Task 190's high/low mark
-	      // toggle), below both per-field lists. Built in JS by rebuildLabelsFields(). ?>
-	<div id="lpn_labels_options"></div>
-	</div>
-</div>
 <?php // Find panel (Tasks 420 and 353). A PULL-DOWN, not a modal dialog: EPANET's Map Finder is
       // modeless for a reason -- you find something, look at the map, and search again without the
       // panel ever taking the map away. Everything inside is built in JS (wireFindPopup()), because
@@ -474,10 +520,15 @@ echoHeader("EngCalcs", $html_title, "", false);
 </div>
 <?php // Gear/settings panel (Task 146 Phase 2, 2026-07-30): ID prefixes, solver emitter exponent
       // and convergence tolerance, text size (+ map-vs-screen units), legend position -- same
-      // static-panel, non-#lpn_popup pattern as #lpn_labels_popup directly above. Fields are built
+      // static-panel, non-#lpn_popup pattern as #lpn_find_popup directly above. Fields are built
       // entirely in JS (wireSettingsPopup() in looped-network.js), not PHP, so #lpn_settings_fields
       // starts empty here. ?>
-<?php // Pull-down, not a box -- no close X. See the note over #lpn_labels_popup. ?>
+<?php // NO CLOSE X, and none is coming back (Tom, 2026-08-13): "What are these boxes? ... Or are they
+      // pull-down menus, which is what they appear to be? If pull-down menus, then an X to close is
+      // not idiomatic or expected." This is a pull-down -- anchored under the button that opened it,
+      // dismissed by clicking away, by Escape, by the button again, or by opening any other menu or
+      // panel. #lpn_popup keeps its X because it is NOT one of these: it opens at the point on the
+      // map that was clicked and reads as a floating property sheet, where a corner X is expected. ?>
 <div id="lpn_settings_popup" class="d-print-none lpn-popover" style="display:none;position:fixed;z-index:20;background:#fff;border:1px solid #333;padding:8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)">
 	<div class="lpn-popover-body">
 	<div id="lpn_settings_fields"></div>
@@ -825,6 +876,29 @@ EngCalcs.pageConfig = {
 	lpn_georef_step1_hint: <?=json_encode($ec_lang['lpn_georef_step1_hint'])?>,
 	lpn_georef_detach: <?=json_encode($ec_lang['lpn_georef_detach'])?>,
 	lpn_georef_size_prompt: <?=json_encode($ec_lang['lpn_georef_size_prompt'])?>,
+	lpn_tip_join: <?=json_encode($ec_lang['lpn_tip_join'])?>,
+	lpn_tool_add_junction_tip: <?=json_encode($ec_lang['lpn_tool_add_junction_tip'])?>,
+	lpn_tool_add_reservoir_tip: <?=json_encode($ec_lang['lpn_tool_add_reservoir_tip'])?>,
+	lpn_tool_add_tank_tip: <?=json_encode($ec_lang['lpn_tool_add_tank_tip'])?>,
+	lpn_tool_add_pipe_tip: <?=json_encode($ec_lang['lpn_tool_add_pipe_tip'])?>,
+	lpn_tool_add_pump_tip: <?=json_encode($ec_lang['lpn_tool_add_pump_tip'])?>,
+	lpn_tool_add_valve_tip: <?=json_encode($ec_lang['lpn_tool_add_valve_tip'])?>,
+	lpn_tool_add_text_tip: <?=json_encode($ec_lang['lpn_tool_add_text_tip'])?>,
+	lpn_tool_delete_tip: <?=json_encode($ec_lang['lpn_tool_delete_tip'])?>,
+	lpn_tool_undo_tip: <?=json_encode($ec_lang['lpn_tool_undo_tip'])?>,
+	lpn_tool_zoom_extent_tip: <?=json_encode($ec_lang['lpn_tool_zoom_extent_tip'])?>,
+	lpn_tool_settings_tip: <?=json_encode($ec_lang['lpn_tool_settings_tip'])?>,
+	lpn_find_menu_tip: <?=json_encode($ec_lang['lpn_find_menu_tip'])?>,
+	lpn_help_icons: <?=json_encode($ec_lang['lpn_help_icons'])?>,
+	lpn_pane_right_toggle: <?=json_encode($ec_lang['lpn_pane_right_toggle'])?>,
+	lpn_pane_right_toggle_tip: <?=json_encode($ec_lang['lpn_pane_right_toggle_tip'])?>,
+	lpn_color_legend_open_tip: <?=json_encode($ec_lang['lpn_color_legend_open_tip'])?>,
+	lpn_color_node_field: <?=json_encode($ec_lang['lpn_color_node_field'])?>,
+	lpn_color_link_field: <?=json_encode($ec_lang['lpn_color_link_field'])?>,
+	lpn_color_ramp_sequential: <?=json_encode($ec_lang['lpn_color_ramp_sequential'])?>,
+	lpn_color_ramp_diverging: <?=json_encode($ec_lang['lpn_color_ramp_diverging'])?>,
+	lpn_color_ramp_ylgnbu: <?=json_encode($ec_lang['lpn_color_ramp_ylgnbu'])?>,
+	lpn_color_ramp_rdylbu: <?=json_encode($ec_lang['lpn_color_ramp_rdylbu'])?>,
 	lpn_georef_adjust: <?=json_encode($ec_lang['lpn_georef_adjust'])?>,
 	lpn_georef_confirm: <?=json_encode($ec_lang['lpn_georef_confirm'])?>,
 	lpn_georef_done: <?=json_encode($ec_lang['lpn_georef_done'])?>,

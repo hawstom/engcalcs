@@ -347,11 +347,16 @@ class Session {
 	async nodeCount() {
 		return this.page.evaluate(() => document.querySelectorAll('#lpn_canvas .lpn-symbols > *').length);
 	}
+	// **BY ACCESSIBLE NAME, NOT BY TEXT.** The toolbar has been icons only since 2026-08-18
+	// (dev/toolbar-icons.md); the word is still on every button, as its aria-label, which is exactly
+	// what a screen reader and a keyboard user get. Matching on that means these specs go on naming
+	// the buttons the way a person does, and it also fails loudly if a button ever loses its name --
+	// which for an icon-only control is the defect that matters most.
 	async toolbarClick(label) {
 		const btns = await this.page.$$('#lpn_toolbar button');
 		const seen = [];
 		for (const b of btns) {
-			const t = (await b.textContent()).trim();
+			const t = ((await b.getAttribute('aria-label')) || (await b.textContent()) || '').trim();
 			seen.push(t);
 			if (t === label) { await b.click(); return; }
 		}

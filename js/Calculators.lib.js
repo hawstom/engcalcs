@@ -36,14 +36,42 @@ EngCalcs.initTips = function (root) {
 	var canHover = ecCanHover();
 	(root || document).querySelectorAll('[title][style*="cursor:help"], .ec-help[title]').forEach(function (el) {
 		var control = ecTipIsControl(el);
+		// **A CONTROL ON A HOVER-LESS DEVICE GETS PRESS-AND-HOLD, and nothing else can work.**
+		// 'hover focus' on a touch screen means a tap focuses the button (showing the tip) and the
+		// same tap's click hides it again, so the tip is unreadable -- invisible while a word was on
+		// the button, fatal once the toolbar is icons only. 'click' is not the fix either: the tap
+		// must still press the button. So the tip opens on a LONG PRESS, which is the gesture every
+		// touch platform already uses for "what is this", and the tap keeps doing the button's job.
+		var longPress = control && !canHover;
 		var tip = bootstrap.Tooltip.getOrCreateInstance(el, {
-			trigger: (control || canHover) ? 'hover focus' : 'click'
+			trigger: longPress ? 'manual' : ((control || canHover) ? 'hover focus' : 'click')
 		});
 		// A control also hides its tip on click: hide() clears every active trigger at once, so
-		// the tip cannot hang over the panel the button just opened.
+		// the tip cannot hang over the panel the button just opened. Kept for the long-press case
+		// too -- the point of the hold is to READ the tip, and the tap that follows is the user
+		// saying they are done with it.
 		if (control && !el.dataset.ecTipClickWired) {
 			el.dataset.ecTipClickWired = '1';
 			el.addEventListener('click', function () { tip.hide(); });
+		}
+		if (longPress && !el.dataset.ecTipHoldWired) {
+			el.dataset.ecTipHoldWired = '1';
+			var timer = null;
+			function cancel() { if (timer) { clearTimeout(timer); timer = null; } }
+			el.addEventListener('touchstart', function () {
+				cancel();
+				// 500 ms is the platform long-press, and it must be longer than a tap or the tip
+				// would open on every press of the button.
+				timer = setTimeout(function () { timer = null; tip.show(); }, 500);
+			}, { passive: true });
+			['touchend', 'touchcancel', 'touchmove'].forEach(function (ev) {
+				el.addEventListener(ev, cancel, { passive: true });
+			});
+			// A tip opened by a hold has no pointer to leave, so it needs its own way out: the next
+			// touch anywhere else takes it down.
+			document.addEventListener('touchstart', function (e) {
+				if (e.target !== el && !el.contains(e.target)) { tip.hide(); }
+			}, { passive: true });
 		}
 	});
 };
@@ -568,6 +596,35 @@ EngCalcs.setLabel = function (el, iconName, text) {
 	var ic = iconName ? this.iconEl(iconName) : null;
 	if (ic) { el.appendChild(ic); }
 	el.appendChild(document.createTextNode(text));
+};
+
+// THE ICON-ONLY FORM, and it is a SECOND function on purpose (dev/toolbar-icons.md). setLabel()
+// above builds the menu bar, the menu rows and the map symbols as well, and all of those keep their
+// words -- a menu row is as wide as its longest label anyway, so an icon there buys nothing. The
+// toolbar is the one strip where horizontal space is actually scarce, and Tom (2026-08-18) ruled the
+// words off it: "drop the words from all the toolbar row; move them to the beginning of their tips."
+//
+// A button whose only content is an aria-hidden <svg> HAS NO ACCESSIBLE NAME AT ALL -- it is
+// announced as "button", full stop. So this does all four things at once, and no call site can do
+// three of them:
+//   * the icon replaces the text;
+//   * `aria-label` carries the NAME ALONE, which is what a screen reader reads at every tab stop;
+//   * `title` carries "Name -- explanation", which is what a hovering user reads;
+//   * `.ec-help` is added, which is the ONLY selector initTips() wires -- a title without it is a
+//     tip no touch user can ever reach.
+// The separator is a translated string (pageConfig.lpn_tip_join), not a punctuation constant: a
+// language wanting a colon, another dash, or the explanation first changes one key.
+EngCalcs.setIconLabel = function (el, iconName, name, tip) {
+	'use strict';
+	el.textContent = '';
+	var ic = iconName ? this.iconEl(iconName) : null;
+	if (ic) { el.appendChild(ic); }
+	if (name) { el.setAttribute('aria-label', name); }
+	var pattern = (this.pageConfig || {}).lpn_tip_join || '{name} \u2014 {tip}';
+	el.title = tip ? pattern.replace('{name}', name || '').replace('{tip}', tip) : (name || '');
+	if (el.className.indexOf('ec-help') < 0) {
+		el.className = (el.className ? el.className + ' ' : '') + 'ec-help';
+	}
 };
 
 // Explicit "Copy link" action -- URL sync is opt-in, not automatic on every keystroke

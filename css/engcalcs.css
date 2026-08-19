@@ -1044,6 +1044,48 @@ html[lang="zh"] .ec-welcome {
 .lpn-pane-goto { text-decoration: underline; }
 .lpn-pane-sort:hover, .lpn-pane-goto:hover { color: #0645ad; }
 
+/* ==== The right panel: Visibility (ROADMAP Tasks 427 and 434) ================================
+   A FIXED OVERLAY over the right edge of the map, placed from the canvas's rect by
+   positionRightPane(). It takes nothing away from the measured canvas height (Task 432) and gives
+   nothing back, so the map's one measured number stays one number.
+
+   Its width is the user's, dragged on the left edge and clamped in JS; the default is wide enough
+   for the Labels rows, which are the tallest and widest thing it holds. */
+.lpn-rpane {
+	position: fixed; z-index: 6; display: flex; background: #fff;
+	border: 1px solid #ccc; box-shadow: -2px 0 6px rgba(0, 0, 0, .12);
+}
+/* The grip IS the left edge, the mirror of the bottom pane's top edge, and the same 8px of
+   pointer slop. */
+.lpn-rpane-grip {
+	flex: 0 0 8px; cursor: col-resize; background: #f2f2f2;
+	border-right: 1px solid #e0e0e0; touch-action: none;
+}
+.lpn-rpane-grip::after {
+	content: ""; display: block; width: 2px; height: 3rem; margin: 1rem auto 0; background: #bbb;
+}
+.lpn-rpane-grip:hover { background: #e8e8e8; }
+.lpn-rpane { flex-direction: row; }
+.lpn-rpane-inner { display: flex; flex-direction: column; flex: 1 1 auto; min-width: 0; }
+.lpn-rpane-head { display: flex; align-items: center; gap: 4px; border-bottom: 1px solid #ddd; }
+.lpn-rpane-title { flex: 1 1 auto; font-weight: bold; padding: 3px 8px; }
+/* The body scrolls INSIDE the panel: the page may not scroll (Task 432), and the label lists are
+   longer than any window this panel will ever be given. */
+.lpn-rpane-body { flex: 1 1 auto; overflow: auto; padding: 6px 8px; font-size: .9em; }
+/* Collapse, not a two-pane index -- Tom's own rule: "Two-pane for very long lists and collapse for
+   shorter lists." <details> is the native form, so the disclosure triangle, the keyboard and the
+   screen reader announcement all come free. */
+.lpn-rp-sec > summary {
+	font-weight: bold; cursor: pointer; padding: 4px 0; border-bottom: 1px solid #eee;
+	margin-bottom: 4px;
+}
+.lpn-rp-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
+.lpn-rp-row > span:first-child { flex: 1 1 auto; }
+.lpn-rp-credit { font-size: .85em; opacity: .7; margin-top: 6px; }
+/* The colour key is a WAY IN to this panel now (Task 427), so it has to take a click -- the
+   overlay stack is pointer-events:none by default and this one cell opts back in. */
+.lpn-color-legend { pointer-events: auto; cursor: pointer; }
+
 /* ==== The Labels panel's column headings (ROADMAP Task 435) ==================================
    The four column headings must sit over the controls they name. They did not, and border-box
    (the earlier pass) was only half the cause: BOOTSTRAP'S REBOOT GIVES EVERY FORM CONTROL
@@ -1075,6 +1117,22 @@ html[lang="zh"] .ec-welcome {
 #lpn_labels_node_fields > div > span:nth-child(5),
 #lpn_labels_link_fields > div > span:nth-child(4),
 #lpn_labels_link_fields > div > span:nth-child(5) { width: 4.5rem !important; }
+/* AND NOTHING IN A ROW MAY SHRINK. In the Labels pull-down the lists were as wide as they liked;
+   in the Visibility panel (Task 427) they are inside a panel the user can drag narrow, and a flex
+   item's default is to shrink. The heading cells are `flex: 0 0 auto` already, the <input> columns
+   were not, so a narrow panel squeezed the boxes and left every heading standing 60 px to their
+   right -- the exact defect Task 435 had just finished fixing, re-created by the move. The panel
+   scrolls sideways instead: a column that cannot be read is worse than a scrollbar. */
+#lpn_labels_node_fields > div > input,
+#lpn_labels_link_fields > div > input { flex-shrink: 0; }
+/* A FLOOR ON THE WHOLE LIST, not `width: max-content` on each row. The name column is `flex: 1 1
+   auto`, so it takes whatever the row has left -- which is only the same number on every row while
+   every row is the same width. Sizing rows to their content instead gives each one a different
+   name column and staggers all four headings again, worse than before. One floor for the list, and
+   the panel scrolls sideways below it. 28rem = the four columns (16rem) + their gaps + a name
+   column wide enough for "Head loss gradient" to read. */
+#lpn_labels_node_fields,
+#lpn_labels_link_fields { min-width: 28rem; }
 
 /* ==== No window scrollbar on the map page (ROADMAP Task 432) =================================
    Tom, 2026-08-18: *"Our bottom controls bar should be the hard bottom of the page."* This is a
