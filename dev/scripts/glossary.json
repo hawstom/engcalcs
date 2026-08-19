@@ -1,6 +1,6 @@
 {
  "meta": {
-  "version": "1.32",
+  "version": "1.33",
   "description": "Engineering term glossary for EngCalcs translation prompts. Preferred translations per language to prevent term drift across calculators and sprints. Covers all calculators including Rock Chute Design (Robinson), Micro-Hydro Power, and Manning series.",
   "usage": "Inject relevant entries as context in translation prompts: 'Use these preferred translations for technical terms: [terms for this calculator prefix]'. Entries with empty strings need a sprint to fill.",
   "language_codes": [
@@ -3788,6 +3788,61 @@
    ],
    "context": "A project is in one of two modes. A lat/lon project has geographic coordinates and can draw a street map behind it; an XY project is drawn on a plain local grid with no place on the Earth. The names appear in lpn_geomap, lpn_xymap and in the prose of lpn_georef_menu, lpn_georef_tip, lpn_georef_intro, lpn_georef_confirm, lpn_georef_done, lpn_georef_on_map and the four New project rows.",
    "translation_notes": "[2026-08-19, sprint 438 wave 0] Raised because the names are coined and nothing marked them as coined, so some agents would translate them and others keep them. A per-label synonym would have to be repeated across nine strings; one concept pointer is the right shape.",
+   "translations": {},
+   "source": "sprint 438-wave0, 2026-08-19"
+  },
+  "drop (a label)": {
+   "term": "drop (a label)",
+   "symbol": "",
+   "avoid": [
+    "the HYDRAULIC senses of \"drop\": a drop in elevation, a pressure drop, a head drop, a drop structure. This page prints all of those as numbers, so the wrong choice makes the column heading look like a quantity.",
+    "a DROPLET of water.",
+    "a DROP-DOWN list, or the act of dropping something you are dragging with the pointer.",
+    "a word meaning \"delete\" or \"erase\". Nothing is removed from the drawing; only the printing of the label on the map is given up when there is no room."
+   ],
+   "context": "To leave a value or a whole label off the map because there is not enough room to print it. The Labels box has a column headed with this word (lpn_labels_col_drop), holding a number that orders which value or which test is given up first; the term of art, Priority, lives in that heading's tip. Use the word your language would use for leaving something out of a drawing for want of space.",
+   "translation_notes": "[2026-08-19, sprint 438 Wave 0] The heading replaced an icon and sits in a column about three characters wide, so it must stay very short -- but shortness is exactly what makes the polysemy dangerous: on a hydraulics page a bare \"drop\" reads first as a drop in head or elevation. Keep it short AND unmistakably about leaving a label off.",
+   "translations": {},
+   "source": "sprint 438-wave0, 2026-08-19"
+  },
+  "run (a simulation)": {
+   "term": "run (a simulation)",
+   "symbol": "",
+   "avoid": [
+    "a RUN OF PIPE -- a straight length of main between two points. That sense is live on this very page and is the trap to guard against.",
+    "the sense of MOVING FAST on foot.",
+    "the sense of MANAGING something (running a company, running a system).",
+    "a run of a machine in the sense of a production batch."
+   ],
+   "context": "One computation of the network over its whole time period: every reporting time from the first to the last, one after another. The button lpn_time_run carries the word alone and must be an IMPERATIVE VERB addressed to the user (\"compute it now\"); the surrounding strings use the same word as a NOUN (\"the start of the run\"). Where your language needs different words for the two, use each in its place, and keep the noun consistent across lpn_time_run_tip, lpn_time_run_note and lpn_time_duration.",
+   "translation_notes": "[2026-08-19, sprint 438 Wave 0] EPANET calls this a run, and lpn_time_run_note quotes the button label inside a sentence -- so the word chosen for the button must be the word that appears in that sentence, or the instruction points at a button that is not there.",
+   "translations": {},
+   "source": "sprint 438-wave0, 2026-08-19"
+  },
+  "work out (compute)": {
+   "term": "work out (compute)",
+   "symbol": "",
+   "avoid": [
+    "the PHYSICAL EXERCISE sense of \"work out\".",
+    "the sense of TURNING OUT WELL (\"it worked out in the end\").",
+    "the sense of NEGOTIATING or resolving a disagreement.",
+    "a word implying guessing or estimating. This is exact computation by a solver."
+   ],
+   "context": "This suite's plain-English verb for \"compute\" or \"solve\": to calculate the flows, pressures and heads of the network. Chosen over \"calculate\" and \"solve\" because it is Simple English, and it recurs across the clock strings (lpn_time_run_tip, lpn_time_run_note, lpn_time_running, lpn_time_no_engine). Use your language's ordinary verb for calculating a result -- there is no need for an idiom, and no need to copy the two-word English shape.",
+   "translation_notes": "[2026-08-19, sprint 438 Wave 0] Raised because the phrasal verb is opaque word by word: a reader who parses \"work\" plus \"out\" gets exercise, not arithmetic. One rendering should serve all four strings.",
+   "translations": {},
+   "source": "sprint 438-wave0, 2026-08-19"
+  },
+  "decimal separator": {
+   "term": "decimal separator",
+   "symbol": "",
+   "avoid": [
+    "changing the COLON in a time such as 17:30. The colon is not a decimal separator and the field accepts nothing else in its place; only the mark between the whole and fractional parts of a number is a locale fact.",
+    "adding a thousands separator to an example. The field refuses a comma that is not <digits>,<digits>, so 1,000 would be rejected as a time.",
+    "leaving a dot in an example where your language writes a comma. The example is there to be copied, and an example the reader cannot copy teaches the wrong format."
+   ],
+   "context": "The mark between the whole and fractional parts of a number: a dot in English (17.5), a comma in most of Europe, Latin America and elsewhere (17,5). Numbers that appear INSIDE a translated string as EXAMPLES carry the locale's own separator -- write 17,5 where your language writes 17,5. The page accepts both when the user types (js/lpn-patterns.js takes <digits>,<digits> as a decimal), so an example with a comma is a working example, not a broken one. Affects lpn_time_format_tip and lpn_labels_col_decimals_example.",
+   "translation_notes": "[2026-08-19, sprint 438 Wave 0] Precedent set for lpn_labels_col_decimals_example, whose whole value is the example 0.000 and which Tom said may become 0,000 where needed. lpn_time_format_tip carries four such examples and nothing in the English says they are localisable.",
    "translations": {},
    "source": "sprint 438-wave0, 2026-08-19"
   }
