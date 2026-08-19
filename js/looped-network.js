@@ -445,20 +445,21 @@ var EngCalcs = EngCalcs || {};
 	// shed, and the terminal rung hides the label whole. Redrawing costs a forced layout per step,
 	// but only a label that does NOT fit pays it, at most one step per value.
 	//
-	// Worst rank first. A line with no field and one with no rank both sort last and so go first.
+	// Lowest rank first: the user's column is a DROP order and 1 is the first value to go (Task 445).
+	// A line with no field and one with no rank both sort first of all.
 
 	function shedOrder(lines) {
 		var order = [], i;
 		for (i = 0; i < lines.length; i++) { order.push(i); }
-		order.sort(function (a, b) { return linkFieldRank(lines[b].field) - linkFieldRank(lines[a].field); });
+		order.sort(function (a, b) { return linkFieldRank(lines[a].field) - linkFieldRank(lines[b].field); });
 		return order;
 	}
-	// A field's shed rank, from the user's own Priority column. An unranked or unnamed field sorts
-	// worst, so it goes first -- Infinity rather than a large number, because a large number is a
-	// rank someone could type.
+	// A field's shed rank, from the user's own Drop column. An unranked or unnamed field sorts
+	// lowest, so it goes first -- -Infinity rather than a small number, because 0 is a rank someone
+	// could type.
 	function linkFieldRank(field) {
 		var r = field && labelSettings.priority.link[field];
-		return typeof r === 'number' ? r : Infinity;
+		return typeof r === 'number' ? r : -Infinity;
 	}
 	// **THE ONE PLACE A LINK LABEL'S GLYPHS ARE BUILT** (Task 399). The full label and every shed
 	// candidate go through this, so they cannot disagree about the row shape, the font size, the
@@ -1538,13 +1539,15 @@ var EngCalcs = EngCalcs || {};
 		});
 		draw(placed, '#00d');
 	}
-	// **WHICH NODE LABEL SURVIVES A CROWD, AS ONE NUMBER** (Task 398; §2.2). Lower places earlier and
-	// therefore survives; the caller of placeLabelsFirstFit() sorts on it and the pass itself never
-	// compares two labels.
+	// **WHICH NODE LABEL SURVIVES A CROWD, AS ONE NUMBER** (Task 398; §2.2). Lower places LATER and
+	// is therefore dropped sooner -- the drop order the whole column now reads in (Task 445); the
+	// caller of placeLabelsFirstFit() sorts on it and the pass itself never compares two labels.
 	//
-	// The user's priority column gives the ORDER the criteria are consulted in. LPN_NODE_DROP_RULE
-	// gives each criterion's DIRECTION, which is not settable. A criterion counts only when its
-	// field is toggled on -- ranking on a number the reader cannot see would be arbitrary.
+	// The user's Drop column gives the ORDER the criteria are consulted in, HIGHEST NUMBER FIRST:
+	// the column ranks what is given up soonest, so the row numbered 1 is the last test to be asked
+	// and the first to stop mattering (Task 445). LPN_NODE_DROP_RULE gives each criterion's
+	// DIRECTION, which is not settable. A criterion counts only when its field is toggled on --
+	// ranking on a number the reader cannot see would be arbitrary.
 	//
 	// Every criterion becomes "how much would this label be missed", higher being safer, combined by
 	// RANK rather than by value: the first criterion that separates two nodes decides. Lexicographic,
@@ -1555,7 +1558,7 @@ var EngCalcs = EngCalcs || {};
 		if (!ctx) { return [0]; }
 		Object.keys(LPN_NODE_DROP_RULE)
 			.filter(function (f) { return ls.node[f] && typeof ls.priority.node[f] === 'number'; })
-			.sort(function (a, b) { return ls.priority.node[a] - ls.priority.node[b]; })
+			.sort(function (a, b) { return ls.priority.node[b] - ls.priority.node[a]; })
 			.forEach(function (f) { out.push(-nodeFieldSalience(f, ctx)); });
 		return out;
 	}
@@ -1664,7 +1667,9 @@ var EngCalcs = EngCalcs || {};
 			var c = compareDropKeys(a.dropKey, b.dropKey);
 			return c !== 0 ? c : (a.id < b.id ? -1 : (a.id > b.id ? 1 : 0));
 		});
-		nodeLabels.forEach(function (l, i) { l.priority = i; delete l.dropKey; });
+		// Counted DOWN, because the ordinal is a drop order like the user's own column: the most
+		// salient label takes the highest number and is placed first (Task 445).
+		nodeLabels.forEach(function (l, i) { l.priority = nodeLabels.length - i; delete l.dropKey; });
 		// **NO REPAIR PASS: a node label never takes a blocking link label's ground and hides it
 		// WHOLE.** shedAlignedForConflicts() makes the link label give up VALUES for the node label
 		// before this pass runs, which is the graceful form of the same ruling; a repair on top is a
@@ -2361,10 +2366,16 @@ var EngCalcs = EngCalcs || {};
 			// FEATURE WEIGHT is how much a map feature resists being COVERED. Collide.GOAL_WEIGHT is a
 			// feature-weight table and only that. This is the first number. Do not merge them.
 			//
-			// **ONE COLUMN, TWO AXES, ON PURPOSE.** Both read "lower means this field matters more",
-			// but a LINK number orders ROWS INSIDE one label (a label that will not fit sheds from the
-			// end) while a NODE number orders LABELS AGAINST EACH OTHER (which whole label gives up a
-			// contested spot).
+			// **THE NUMBER IS A DROP ORDER: 1 IS THE FIRST TO GO** (Task 445, Tom 2026-08-19: "our
+			// labels priority paradigm really wants to be Labels.Drop First In Case of Conflict").
+			// It read the other way round until then -- 1 kept longest -- so a document written
+			// before the change is INVERTED by the v8 -> v9 migration, never reinterpreted in place.
+			//
+			// **ONE COLUMN, TWO AXES, ON PURPOSE.** Both read "lower means this field is given up
+			// sooner", but a LINK number orders ROWS INSIDE one label (a label that will not fit
+			// sheds from the bottom of the column) while a NODE number orders the TESTS that decide
+			// which whole label gives up a contested spot -- the lowest-numbered test is consulted
+			// last, so it is the first to stop mattering.
 			//
 			// **THE ORDER IS THE USER'S. THE DIRECTION IS NOT** -- LPN_NODE_DROP_RULE is that compiled
 			// table. A per-row max/min/least-extreme picker was declined: four controls per row that a
@@ -2373,15 +2384,15 @@ var EngCalcs = EngCalcs || {};
 			// PARALLEL to decimals/prefix/suffix rather than nested into the boolean maps, for the
 			// reason the decimals comment gives.
 			//
-			// Link order puts the flow first so it survives longest. **`id` IS RANK 9 AND SHEDS
-			// FIRST**, not rank 0 never-shed: a link label lies ALONG its own pipe, so the drawing
-			// already says which pipe the numbers belong to and the ID is the one value whose job the
-			// label's own position is doing. That argument does NOT carry to node labels, which is why
-			// no node ID rank exists.
+			// Link order puts the flow highest so it survives longest. **`id` IS RANK 1 AND SHEDS
+			// FIRST**, not the top rank never-shed: a link label lies ALONG its own pipe, so the
+			// drawing already says which pipe the numbers belong to and the ID is the one value whose
+			// job the label's own position is doing. That argument does NOT carry to node labels,
+			// which is why no node ID rank exists.
 			priority: {
-				node: { demand: 1, pressure: 2, elev: 3, head: 4 },
-				link: { flow: 1, velocity: 2, headloss: 3, gradient: 4,
-					diameter: 5, length: 6, roughness: 7, km: 8, id: 9 }
+				node: { demand: 4, pressure: 3, elev: 2, head: 1 },
+				link: { flow: 9, velocity: 8, headloss: 7, gradient: 6,
+					diameter: 5, length: 4, roughness: 3, km: 2, id: 1 }
 			},
 			// Whether a label's network-wide highest/lowest value gets its tick mark (Task 190).
 			// Global, not per field. Here rather than in `settings` because a label mark is a property
@@ -8450,7 +8461,9 @@ var EngCalcs = EngCalcs || {};
 	// Cartesian frame. Documents near zero get {0, 0} and are byte-identical afterwards.
 	// 8 (Task 407): a Text label's words are stored as `_text`, because what a note SAYS is now a
 	// scenario value.
-	var LPN_STORAGE_VERSION = 8;
+	// 9 (Task 445): the Labels priority column is a DROP order -- 1 is given up first -- so every
+	// stored priority means the opposite of what it did at v8 and is inverted on open.
+	var LPN_STORAGE_VERSION = 9;
 	// ---- ROADMAP Task 274, second half ----
 	//
 	// From v4 the FILE stores Cartesian Y (up is positive), matching what the user sees and what
@@ -8782,6 +8795,31 @@ var EngCalcs = EngCalcs || {};
 			if (lb._text === undefined) { lb._text = ''; }   // base-write: same -- the stored shape, not a live edit
 		});
 	}
+	// v8 -> v9's inversion (Task 445). **THE RULE IS A REVERSAL OVER THE VALUES THE DOCUMENT ACTUALLY
+	// HOLDS, not `N + 1 - p`.** The column is a free spinner from 0 to 99 whose defaults have already
+	// been renumbered once (a shipped example carries `id: 0` beside ranks 1..8), so there is no `N`
+	// to reverse around: mirroring the DISTINCT values present leaves the user's own set of numbers
+	// exactly as it was, preserves ties as ties, and reverses the order and nothing else. `N + 1 - p`
+	// would move numbers the user chose and would turn a sparse set into a different sparse set.
+	// A field the document does not mention is left absent, so applySaved() gives it the new default.
+	function invertLabelPriorities(saved) {
+		var pri = saved.labelSettings && saved.labelSettings.priority;
+		if (!pri || typeof pri !== 'object') { return; }
+		['node', 'link'].forEach(function (group) {
+			var map = pri[group], seen = {}, vals = [], mirror = {};
+			if (!map || typeof map !== 'object') { return; }
+			Object.keys(map).forEach(function (k) {
+				var v = map[k];
+				if (typeof v !== 'number' || !isFinite(v) || seen[v]) { return; }
+				seen[v] = true; vals.push(v);
+			});
+			vals.sort(function (a, b) { return a - b; });
+			vals.forEach(function (v, i) { mirror[v] = vals[vals.length - 1 - i]; });
+			Object.keys(map).forEach(function (k) {
+				if (typeof map[k] === 'number' && isFinite(map[k])) { map[k] = mirror[map[k]]; }
+			});
+		});
+	}
 	function migrateSaved(saved) {
 		// RUN ON EVERY DOCUMENT, NOT ONLY AS THE v7 -> v8 STEP, and v2 is the whole reason. A v2
 		// document deliberately lags at v2 until the user answers its units question, so it reaches
@@ -8890,6 +8928,19 @@ var EngCalcs = EngCalcs || {};
 		// page rather than half-reading it. So the stamp is the guard, not the rename.
 		if (saved.v === 7) {
 			saved.v = 8;
+		}
+		// ---- v8 -> v9: THE PRIORITY COLUMN BECOMES A DROP ORDER (Task 445) -------------------------
+		//
+		// The number meant importance at v8 (1 kept longest) and means order of sacrifice at v9 (1
+		// dropped first), so a v8 document read as a v9 one would drop exactly the labels its author
+		// most wanted kept, with nothing on screen to say so. Converted here, unconditionally, rather
+		// than reinterpreted at the reader: a reader that has to know which sense it is holding is a
+		// reader every future caller must remember to ask.
+		// A LAGGING v2 DOCUMENT NEVER REACHES THIS STEP, which is safe rather than lucky: v2 predates
+		// the priority column by six versions, so no v2 document can carry one.
+		if (saved.v === 8) {
+			invertLabelPriorities(saved);
+			saved.v = 9;
 		}
 		// **There is deliberately NO v2 -> v3 step here, and v2 is the ONLY version that lags.**
 		// Every other migration converts and stamps; this one cannot, because the conversion is the
@@ -14311,7 +14362,7 @@ var EngCalcs = EngCalcs || {};
 			return {
 				value: map[key], max: 99,
 				title: (group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) ||
-					'Which value matters most. 1 comes first.',
+					'The order in which values are dropped when a label does not fit. 1 is dropped first.',
 				onChange: function (v) { map[key] = v; }
 			};
 		}
@@ -14345,19 +14396,22 @@ var EngCalcs = EngCalcs || {};
 		// entirely different things. Built from the same LPN_LABEL_COL_W/GAP the boxes use, so a
 		// heading cannot drift off its column. The name column is a flex spacer, not a heading: it is
 		// the row's subject, not a column of values.
-		// **TWO OF THE FOUR HEADINGS ARE NOT WORDS** (Tom, 2026-08-18: "Node Decimals and Priority
-		// columns can be much narrower; maybe 'Decimals' can turn into '0.000'", and then "I like
-		// the 123 icon even better" for the other). The decimals column is headed by an EXAMPLE of
-		// what it does; the priority column by the icon of numbers getting smaller.
+		// **ONE OF THE FOUR HEADINGS IS NOT A WORD** (Tom, 2026-08-18: "Node Decimals and Priority
+		// columns can be much narrower; maybe 'Decimals' can turn into '0.000'"). The decimals column
+		// is headed by an EXAMPLE of what it does.
+		//
+		// **THE PRIORITY COLUMN IS HEADED BY THE WORD "Drop", NOT BY AN ICON** (Task 445). It carried
+		// the icon of numbers getting smaller while the number meant importance; now that it means
+		// the order things are given up in, a word needs no learning, and "Drop" is short enough that
+		// the column does not widen -- which is the constraint that picked an icon in the first place.
 		//
 		// **THE EXAMPLE IS A LANGUAGE KEY, NOT A LITERAL** (Tom: "We could translate to '0,000'
 		// where needed"). A decimal COMMA is a locale fact, and a heading that demonstrates a
 		// decimal point demonstrates the wrong thing to most of Europe and South America.
 		//
-		// **THE TERM OF ART SURVIVES IN THE TIP**: both headings carry their full name in `title`,
-		// so a reader who knows the word "priority" still finds it, and the search box matches it.
-		// The icon falls back to the word if lib/Icons.lib.php has no such icon -- a heading cell
-		// with nothing in it is a column nobody can name.
+		// **THE TERM OF ART SURVIVES IN THE TIP**: both numeric headings carry their full name in
+		// `title`, so a reader who knows the word "priority" still finds it, and the search box
+		// matches it.
 		function columnHeadings(box, group) {
 			var row = document.createElement('div'), lead = document.createElement('span');
 			row.style.display = 'flex'; row.style.alignItems = 'flex-end'; row.style.gap = '6px';
@@ -14369,19 +14423,15 @@ var EngCalcs = EngCalcs || {};
 				[pc.lpn_labels_col_decimals_example || '0.000', LPN_LABEL_COL_W,
 					(pc.lpn_labels_col_decimals || 'Decimals') + ' \u2014 ' +
 						(pc.lpn_labels_decimals_tip || 'Decimal places shown for this label')],
-				[pc.lpn_labels_col_rank || 'Rank', LPN_LABEL_COL_W,
+				[pc.lpn_labels_col_drop || 'Drop', LPN_LABEL_COL_W,
 					(pc.lpn_labels_priority || 'Priority') + ' \u2014 ' +
-						((group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) || ''),
-					'priority']
+						((group === 'node' ? pc.lpn_labels_priority_node_tip : pc.lpn_labels_priority_link_tip) || '')]
 			].forEach(function (h, i) {
-				var cell = document.createElement('span'), icon = h[3] ? iconEl(h[3]) : null;
-				if (icon) { cell.appendChild(icon); } else { cell.textContent = h[0]; }
+				var cell = document.createElement('span');
+				cell.textContent = h[0];
 				cell.style.width = h[1]; cell.style.flex = '0 0 auto';
 				cell.style.textAlign = 'center';
-				// An icon carries no words, so the tip is the only place its name exists -- and
-				// aria-label is what a screen reader gets instead of the heading it cannot see.
 				if (h[2]) { cell.title = h[2]; cell.className = 'ec-help'; }
-				if (icon) { cell.setAttribute('aria-label', h[2] || h[0]); }
 				// The affix boxes take the row's own 6px gap; the two numeric columns carry their own
 				// margin as well, so their headings must match or they sit half a gap left of the box
 				// they name.

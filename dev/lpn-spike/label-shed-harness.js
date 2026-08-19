@@ -108,10 +108,14 @@ steps.forEach(function (f) {
 	eq(now.slice().sort(function (a, b) { return READING_ORDER.indexOf(a) - READING_ORDER.indexOf(b); }),
 		now, 'survivors stay in reading order at ' + f);
 	// WHAT WENT IS THE WORST-RANKED. Everything shed must rank worse than everything kept.
+	// **WORSE IS A SMALLER NUMBER SINCE TASK 445**: the column is a DROP order, so 1 is surrendered
+	// first and the largest number is the last one standing. This comparison read `>` at v8 and the
+	// inversion is the whole point of the task, so it must read `<` here -- a shed value must hold a
+	// lower number than every value that survived it.
 	const gone = prev.filter(function (k) { return now.indexOf(k) < 0; });
 	gone.forEach(function (g) {
 		now.forEach(function (k) {
-			ok(ls.priority.link[g] > ls.priority.link[k],
+			ok(ls.priority.link[g] < ls.priority.link[k],
 				g + ' (rank ' + ls.priority.link[g] + ') was shed while ' + k +
 				' (rank ' + ls.priority.link[k] + ') was kept');
 		});
@@ -288,7 +292,8 @@ shedNow.forEach(function (l) {
 	const gone = all.filter(function (k) { return kept.indexOf(k) < 0; });
 	gone.forEach(function (g) {
 		kept.forEach(function (k) {
-			ok(ls.priority.link[g] > ls.priority.link[k],
+			// A SMALLER NUMBER IS SHED FIRST (Task 445) -- see the note on the same comparison above.
+			ok(ls.priority.link[g] < ls.priority.link[k],
 				l.id + ': shed ' + g + ' (' + ls.priority.link[g] + ') while keeping ' + k +
 				' (' + ls.priority.link[k] + ')');
 		});

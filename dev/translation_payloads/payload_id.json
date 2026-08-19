@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "id",
-        "expected_key_count": 1193,
-        "delta_key_count": 14,
+        "expected_key_count": 1194,
+        "delta_key_count": 15,
         "exempt_key_count": 31,
         "exempt_keys": [
             "u_imgd",
@@ -426,6 +426,7 @@
         "lpn_time_run_tip": "Work out this network at every reporting time, from the start of the run to the end of it.",
         "lpn_time_run_note": "You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.",
         "lpn_labels_col_decimals_example": "0.000",
+        "lpn_labels_col_drop": "Drop",
         "lpn_settings_node_link": "Node and link",
         "lpn_color_mode_equal": "Equal interval",
         "lpn_color_mode_quantile": "Quantile (equal count)",
@@ -442,6 +443,7 @@
         "lpn_time_run_tip": "Work out this network at every reporting time, from the start of the run to the end of it.",
         "lpn_time_run_note": "You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.",
         "lpn_labels_col_decimals_example": "0.000",
+        "lpn_labels_col_drop": "Drop",
         "lpn_settings_node_link": "Node and link",
         "lpn_color_mode_equal": "Equal interval",
         "lpn_color_mode_quantile": "Quantile (equal count)",
@@ -546,6 +548,18 @@
                     "value": "Peringkat",
                     "english": "Rank"
                 }
+            }
+        },
+        "lpn_labels_col_drop": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_labels_col_rank",
+                    "value": "Peringkat",
+                    "english": "Rank"
+                },
+                "next_translated": null
             }
         },
         "lpn_settings_node_link": {

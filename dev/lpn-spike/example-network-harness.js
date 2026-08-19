@@ -1281,5 +1281,64 @@ console.log('\n--- Settings panel stays in sync ---');
   }
 }
 
+// 6. THE v8 -> v9 PRIORITY INVERSION (Task 445). The Labels column changed meaning -- it said
+// importance (1 kept longest) and now says drop order (1 given up first) -- so a document written
+// before the change means the OPPOSITE of what it says. Untreated, that is the quietest defect this
+// page could ship: every label the author most wanted kept becomes the first to go, the map still
+// draws, nothing errors, and no smoke test can see it. Hence a test of the MEANING, not of the
+// arithmetic.
+{
+  const v8 = {
+    v: 8, units: 'us', nodes: [], links: [], labels: [],
+    labelSettings: { priority: {
+      node: { demand: 1, pressure: 2, elev: 3, head: 4 },
+      link: { flow: 1, velocity: 2, headloss: 3, gradient: 4,
+        diameter: 5, length: 6, roughness: 7, km: 8, id: 9 }
+    } }
+  };
+  const out = L.migrateSaved(JSON.parse(JSON.stringify(v8)));
+  const pri = out.labelSettings.priority;
+  const lowestFirst = (m) => Object.keys(m).sort((a, b) => m[a] - m[b]);
+
+  ok('a v8 document is carried to the current storage version',
+    out.v === L.storageVersion(), 'v' + out.v + ' vs ' + L.storageVersion());
+  // The author of that v8 file wanted the flow kept longest and the id shed first. Under v9 that
+  // same intent is the HIGHEST number on flow and the LOWEST on id.
+  ok('the flow the author kept longest now holds the highest number',
+    pri.link.flow === Math.max.apply(null, Object.keys(pri.link).map(k => pri.link[k])),
+    'flow=' + pri.link.flow);
+  ok('the id the author shed first now holds the lowest',
+    pri.link.id === Math.min.apply(null, Object.keys(pri.link).map(k => pri.link[k])),
+    'id=' + pri.link.id);
+  ok('and the whole drop order is the author\'s ranking reversed, not renumbered',
+    JSON.stringify(lowestFirst(pri.link)) === JSON.stringify(
+      ['id', 'km', 'roughness', 'length', 'diameter', 'gradient', 'headloss', 'velocity', 'flow']),
+    lowestFirst(pri.link).join(' '));
+  ok('the node column is inverted by the same rule',
+    JSON.stringify(lowestFirst(pri.node)) === JSON.stringify(['head', 'elev', 'pressure', 'demand']),
+    lowestFirst(pri.node).join(' '));
+  // THE SET OF NUMBERS IS UNCHANGED -- the rule mirrors the values the document holds rather than
+  // computing N+1-p, so a user who chose 2, 5 and 40 still has 2, 5 and 40 afterwards.
+  const before = Object.keys(v8.labelSettings.priority.link).map(k => v8.labelSettings.priority.link[k]).sort((a, b) => a - b);
+  const after = Object.keys(pri.link).map(k => pri.link[k]).sort((a, b) => a - b);
+  ok('the user\'s own set of numbers survives the inversion untouched',
+    JSON.stringify(before) === JSON.stringify(after), after.join(','));
+
+  // A SPARSE, USER-CHOSEN SET, which is where N+1-p and a mirror disagree. 2/5/40 must come back
+  // 40/5/2 -- still 2, 5 and 40, in the opposite order.
+  const sparse = L.migrateSaved({ v: 8, units: 'us', nodes: [], links: [], labels: [],
+    labelSettings: { priority: { node: { demand: 2, pressure: 5, elev: 40 }, link: {} } } });
+  const sp = sparse.labelSettings.priority.node;
+  ok('a sparse hand-chosen set is mirrored, not renumbered',
+    sp.demand === 40 && sp.pressure === 5 && sp.elev === 2,
+    'demand=' + sp.demand + ' pressure=' + sp.pressure + ' elev=' + sp.elev);
+
+  // ALREADY-CURRENT DOCUMENTS MUST NOT BE INVERTED TWICE. Running the migration over its own output
+  // is what a double-open does, and it must be a no-op.
+  const again = L.migrateSaved(JSON.parse(JSON.stringify(out)));
+  ok('re-migrating an already-migrated document changes nothing',
+    JSON.stringify(again.labelSettings.priority) === JSON.stringify(pri));
+}
+
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);
