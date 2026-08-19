@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 1156,
-        "delta_key_count": 160,
+        "expected_key_count": 1161,
+        "delta_key_count": 165,
         "exempt_key_count": 29,
         "exempt_keys": [
             "calc_units_us",
@@ -553,7 +553,12 @@
         "lpn_time_next": "Step forward",
         "lpn_time_last": "Go to the end",
         "lpn_time_tank": "Tank",
-        "lpn_time_level": "Water level"
+        "lpn_time_level": "Water level",
+        "lpn_settings_search": "Search settings",
+        "lpn_settings_search_tip": "Type a word to see only the settings that mention it. The explanations are searched too, not just the names.",
+        "lpn_settings_no_match": "No setting mentions that word.",
+        "lpn_rpane_empty": "Nothing is docked here yet. Everything that belongs to the whole project is in Settings.",
+        "lpn_time_settings_open": "Time settings"
     },
     "keys": {
         "lpn_field_text_align": "Horizontal justification",
@@ -715,7 +720,12 @@
         "lpn_time_next": "Step forward",
         "lpn_time_last": "Go to the end",
         "lpn_time_tank": "Tank",
-        "lpn_time_level": "Water level"
+        "lpn_time_level": "Water level",
+        "lpn_settings_search": "Search settings",
+        "lpn_settings_search_tip": "Type a word to see only the settings that mention it. The explanations are searched too, not just the names.",
+        "lpn_settings_no_match": "No setting mentions that word.",
+        "lpn_rpane_empty": "Nothing is docked here yet. Everything that belongs to the whole project is in Settings.",
+        "lpn_time_settings_open": "Time settings"
     },
     "key_context": {
         "lpn_field_text_align": {
@@ -3167,6 +3177,66 @@
             }
         },
         "lpn_time_level": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ALLES löschen, was für diese Seite gespeichert ist — jedes Projekt, jedes Hintergrundbild, alle Einstellungen und Ihre Einheitenwahl — und die Seite so neu laden, wie sie ein ganz neuer Besucher sehen würde? Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_search": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ALLES löschen, was für diese Seite gespeichert ist — jedes Projekt, jedes Hintergrundbild, alle Einstellungen und Ihre Einheitenwahl — und die Seite so neu laden, wie sie ein ganz neuer Besucher sehen würde? Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_search_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ALLES löschen, was für diese Seite gespeichert ist — jedes Projekt, jedes Hintergrundbild, alle Einstellungen und Ihre Einheitenwahl — und die Seite so neu laden, wie sie ein ganz neuer Besucher sehen würde? Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_settings_no_match": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ALLES löschen, was für diese Seite gespeichert ist — jedes Projekt, jedes Hintergrundbild, alle Einstellungen und Ihre Einheitenwahl — und die Seite so neu laden, wie sie ein ganz neuer Besucher sehen würde? Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_rpane_empty": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "ALLES löschen, was für diese Seite gespeichert ist — jedes Projekt, jedes Hintergrundbild, alle Einstellungen und Ihre Einheitenwahl — und die Seite so neu laden, wie sie ein ganz neuer Besucher sehen würde? Dies kann nicht rückgängig gemacht werden.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_settings_open": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

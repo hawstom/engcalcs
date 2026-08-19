@@ -203,9 +203,15 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(150);
 		report.ok(await isOpen(), '...and so does Escape, which dismisses every pull-down but not this');
 
+		// Labels opens the Settings box (Task 441), which is a big two-pane box in the middle of the
+		// window -- so it is CLOSED again straight away. Leaving it up would put it over Find, and
+		// every gesture below would be aimed at whichever box happened to be on top, which measures
+		// the stacking order rather than the thing under test.
 		await a.menuClick('Labels', 'view');
 		await a.settle(150);
 		report.ok(await isOpen(), '...and so does opening another panel');
+		await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
+		await a.settle(150);
 
 		// It DRAGS by its own chrome, the padded band above the body -- the property popup's gesture.
 		const wasAt = await a.page.evaluate(() => {

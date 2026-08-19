@@ -57,22 +57,42 @@ exports.run = async function ({ browser, report }) {
 			'the pane offers a Time tab');
 
 		// ---- 1. the settings, and the file's own text ----
+		//
+		// **THE SEVEN FIELDS ARE IN THE SETTINGS BOX NOW** (ROADMAP Task 441). Tom moved them out of
+		// this tab because a run duration is a property of the whole project; the tab kept the
+		// TRANSPORT, which changes only which moment you are looking at. So the tab must offer a
+		// door to them, and this uses that door rather than reaching for the box directly — a door
+		// nobody can find is the actual risk of the move.
+		await a.page.evaluate(() => {
+			const b = [...document.querySelectorAll('#lpn_pane_time button')]
+				.find(x => /setting/i.test(x.textContent + ' ' + (x.title || '')));
+			if (b) { b.click(); }
+		});
+		await a.settle(600);
+		report.ok(await a.page.evaluate(() =>
+			document.getElementById('lpn_settings_box').style.display === 'flex'),
+			'the Time tab has a door to the time settings, and it opens the Settings box');
+
 		const fields = await a.page.evaluate(() =>
-			[...document.querySelectorAll('#lpn_pane_time input[type="text"]')].map(i => i.value));
+			[...document.querySelectorAll('#lpn_set_time_fields input[type="text"]')].map(i => i.value));
 		report.ok(fields.length === 7, 'all seven time settings are on the page', fields.join(' | '));
 		report.ok(fields[0] === '24:00', "Net3's duration reads as the file wrote it, 24:00", fields[0]);
 
 		// Type a new one and read it back. THE TYPED TEXT IS WHAT COMES BACK, not a reformatting of
 		// it: `36:00` must not return as `36` and `129600` must not appear anywhere.
 		await a.page.evaluate(() => {
-			const i = document.querySelector('#lpn_pane_time input[type="text"]');
+			const i = document.querySelector('#lpn_set_time_fields input[type="text"]');
 			i.value = '12:00';
 			i.dispatchEvent(new Event('change', { bubbles: true }));
 		});
 		await a.settle(1500);
 		const after = await a.page.evaluate(() =>
-			document.querySelector('#lpn_pane_time input[type="text"]').value);
+			document.querySelector('#lpn_set_time_fields input[type="text"]').value);
 		report.ok(after === '12:00', 'an edited duration comes back exactly as typed', after);
+		// The box is closed again before the transport is worked: it is a big box in the middle of
+		// the window, and the readouts below are in the pane underneath it.
+		await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
+		await a.settle(300);
 
 		const stops = await a.page.evaluate(() => {
 			const s = document.getElementById('lpn_time_slider');

@@ -199,7 +199,14 @@ function ensure(id) { if (!byId[id]) { byId[id] = mkEl('div'); byId[id].id = id;
   // height JS writes lands, and the profile's three boxes are built into on every render.
   'lpn_pane', 'lpn_pane_grip', 'lpn_pane_head', 'lpn_pane_tabs', 'lpn_pane_close',
   'lpn_pane_body', 'lpn_pane_profile', 'lpn_pane_junctions',
-  'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note'
+  'lpn_profile_form', 'lpn_profile_chart', 'lpn_profile_note',
+  // The Settings box (ROADMAP Task 441): the two panes, the filter, the four section shells and
+  // the hosts their builders write into. #lpn_settings_fields and the three lpn_labels_* boxes are
+  // already listed above -- they kept their IDs through the move.
+  'lpn_settings_box', 'lpn_setbox_close', 'lpn_setbox_filter', 'lpn_setbox_index',
+  'lpn_setbox_content', 'lpn_setbox_none',
+  'lpn_set_sec_labels', 'lpn_set_sec_settings', 'lpn_set_sec_time', 'lpn_set_sec_coloring',
+  'lpn_set_colors', 'lpn_set_time_fields'
 ].forEach(ensure);
 // Looped-Network.php nests each menu LIST inside its POPUP. The ensure() list above creates them as
 // unrelated stubs, so popup.contains(row) answered false for a row that really is inside -- and the

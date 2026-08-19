@@ -25,7 +25,7 @@ nothing; the toolbar is the one strip where horizontal space is actually scarce.
 |---|---|---|
 | `profile` | View > Profile row, and the bottom pane's Profile tab | the `view` eye, which was standing in |
 | `pane-bottom` | the right-edge toolbar group's pane toggle | the `view` eye, same stand-in |
-| `pane-right` | the right pane's toggle — the Visibility panel, shipped the same day | nothing |
+| `pane-right` | the right pane's toggle — the pane is empty since Task 441, the frame kept | nothing |
 
 Geometry and its rationale are commented in `lib/Icons.lib.php`. `pane-right` is deliberately drawn
 before the right pane exists: the two icons only work as twins, and a twin drawn six months later is
@@ -182,7 +182,7 @@ text; there is no icon-only form of a dropdown, and shrinking it is not what thi
 - Do not add `.ec-help` to it. A tooltip that opens on focus over a dropdown the user is about to
   open is a tooltip in the way of the control.
 - **It was replaced, not restyled**, the same day: `#lpn_color_quick` is gone and Task 427's node
-  select and link select live in the Visibility panel. So the toolbar carries no `<select>` at all,
+  select and link select live in the Settings box's Coloring section. So the toolbar carries no `<select>` at all,
   which is what an icon-only strip wants.
 
 ---

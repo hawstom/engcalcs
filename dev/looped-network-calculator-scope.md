@@ -673,8 +673,10 @@ confirms it and folds these two into its existing scope rather than opening a se
 Not designed in detail yet; do that when Phase 2's gear panel is actually built.
 
 **Gear/settings panel BUILT, first cut (Tom, 2026-07-30), verified with a scripted Playwright smoke
-test.** A "Settings" toolbar button opens `#lpn_settings_popup` (`wireSettingsPopup()` in
-`js/looped-network.js`), same static-panel pattern as the Labels popover. Persisted like
+test.** A "Settings" toolbar button opens `#lpn_settings_box` (`wireSettingsBox()` in
+`js/looped-network.js`) — a pull-down at first, and since ROADMAP Task 441 the two-pane, indexed,
+draggable box that also holds Labels, Time and Coloring.  Its membership rule is Tom's: *if it is
+for the entire project, it is in Settings*. Persisted like
 `labelSettings` — a preference, not network content: NOT undo-tracked, survives "New / Clear"
 (fixing a related latent gap found while verifying this — `clearNetwork()` was calling
 `localStorage.removeItem()` instead of `saveToStorage()`, which wiped labelSettings/settings out of

@@ -75,7 +75,8 @@ const L = loadLoopedNetwork(
   "\t\taddNode: addNode, addLink: addLink,\n" +
   "\t\tlabelWidth: function (id) { return labelEls[id] ? labelEls[id].width : 0; },\n" +
   "\t\tlabelSide: function (id) { return labelEls[id] ? labelEls[id].side : null; },\n" +
-  "\t\ttoggleSettingsPopup: toggleSettingsPopup, defaultSettings: defaultSettings,\n" +
+  "\t\topenSettingsBox: openSettingsBox, closeSettingsBox: closeSettingsBox,\n" +
+  "\t\tdefaultSettings: defaultSettings,\n" +
   "\t\tsettingsFieldsEl: function () { return document.getElementById('lpn_settings_fields'); },\n" +
   "\t\treset: function () { doc = { nodes: [], links: [], labels: [] };\n" +
   "\t\t\tnodeEls = {}; linkEls = {}; labelEls = {}; incidentLinks = {}; labelsByAnchor = {};\n" +
@@ -520,10 +521,9 @@ console.log('\n--- Settings panel stays in sync ---');
   L.rebuildSettingsFields();
   ok('panel opens on the shipped default', String(textSizeInputValue()) === '11', textSizeInputValue());
   L.settings().textSize = 37;                       // a writer that does NOT repaint the panel
-  const popup = byId.lpn_settings_popup;
-  popup.style.display = 'none';
-  L.toggleSettingsPopup({ currentTarget: mkEl('button') });   // reopening must repaint it
-  ok('reopening the panel shows a value changed behind its back',
+  L.closeSettingsBox();
+  L.openSettingsBox();                              // reopening must repaint it
+  ok('reopening the box shows a value changed behind its back',
     String(textSizeInputValue()) === '37', textSizeInputValue());
 }
 

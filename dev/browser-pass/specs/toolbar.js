@@ -72,8 +72,13 @@ exports.run = async function ({ browser, report }) {
 			if (b) { b.click(); }
 		});
 		await a.settle(300);
+		// **THE GUIDE IS A FLY-OUT, so it is in the SECOND menu popup** (Task 441). As a level-0
+		// menu it re-opened on the Help button the parent menu was already anchored to, hit
+		// openMenu()'s same-anchor toggle branch, and closed the menu instead — Tom's "it does
+		// nothing". This spec read the parent list and therefore could not see the difference; it
+		// reads the fly-out now, which is where the rows really are.
 		const guideRows = await a.page.evaluate(() =>
-			[...document.querySelectorAll('#lpn_menu_list button')].map(b => b.textContent.trim()));
+			[...document.querySelectorAll('#lpn_menu_list2 button')].map(b => b.textContent.trim()));
 		report.eq(guideRows.length, btns.length, 'and it lists exactly the buttons on the strip',
 			`${guideRows.length} rows vs ${btns.length} buttons`);
 		report.has(guideRows.join(' | '), 'Zoom to fit', 'naming them the way the toolbar names them');

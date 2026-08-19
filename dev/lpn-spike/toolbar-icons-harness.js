@@ -74,9 +74,15 @@ console.log('\n-- the Help list is DERIVED from the strip --');
 {
 	report(/toolbarIconIndex\.push/.test(fnBody(src, 'setIconLabel')),
 		'setIconLabel() records each button, so the list cannot drift from the strip');
-	const guide = strip(fnBody(src, 'openIconGuide'));
+	const guide = strip(fnBody(src, 'iconGuideRows'));
 	report(/toolbarIconIndex\.map/.test(guide), 'the guide is built from that record, not from a second list');
 	report(/lpn_help_icons/.test(src), 'and Help carries a row for it');
+	// **AND THAT ROW MUST BE A SUBMENU, NOT AN ACTION** (Tom, 2026-08-18: it "does nothing"). As an
+	// action it called openMenu() at level 0 on #lpn_menu_help -- the anchor the Help menu it was
+	// clicked in was already open on -- so openMenu()'s same-anchor toggle branch closed the menu
+	// instead of showing the guide. A `submenu` row is a fly-out and cannot hit that branch.
+	report(/lpn_help_icons[^\n]*submenu: iconGuideRows/.test(src),
+		'the Help row is a submenu, so it cannot re-open its own anchor and toggle itself shut');
 }
 
 console.log('\n-- the strings exist, in English only --');

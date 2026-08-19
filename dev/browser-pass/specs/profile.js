@@ -130,6 +130,65 @@ exports.run = async function ({ browser, report }) {
 		report.ok(dragged.after.bodyBottom <= dragged.after.vh + 1, '...with the page still ending inside the window',
 			Math.round(dragged.after.bodyBottom) + ' of ' + dragged.after.vh);
 
+		// **THE CHART FILLS THE PANE, IN BOTH AXES** (ROADMAP Task 441). Tom, 2026-08-18: *"The
+		// Profile still leaves vast empty space on both sides. It should use the entire bottom pane,
+		// and its relative height and width should vary to fill the available height and width."*
+		//
+		// It was a FIXED 560x340 viewBox inside a `width:100%;height:100%` SVG, and
+		// preserveAspectRatio's default letterboxes a fixed rectangle inside whatever box it is
+		// given — so every pixel the pane was wider than 560/340 of its height became white space at
+		// the sides, and it GREW with the pane. Measured as the drawn frame against the host box,
+		// because that is the gap a reader actually sees; and measured AGAIN after the pane is
+		// dragged, because a layout measured once is a fixed layout with extra steps.
+		const fill = async () => a.page.evaluate(() => {
+			const host = document.getElementById('lpn_profile_chart');
+			const svg = host && host.querySelector('svg');
+			const frame = svg && svg.querySelector('rect.lpn-profile-frame');
+			if (!host || !svg || !frame) { return null; }
+			const h = host.getBoundingClientRect(), f = frame.getBoundingClientRect();
+			return {
+				hostW: h.width, hostH: h.height,
+				svgW: svg.getBoundingClientRect().width, svgH: svg.getBoundingClientRect().height,
+				// The plot frame's own share of the host, which is what "vast empty space" is about.
+				frameW: f.width, frameH: f.height,
+				viewBox: svg.getAttribute('viewBox')
+			};
+		});
+		const f1 = await fill();
+		report.ok(!!f1, 'the chart is drawn with a plot frame to measure');
+		if (f1) {
+			report.ok(Math.abs(f1.svgW - f1.hostW) <= 2 && Math.abs(f1.svgH - f1.hostH) <= 2,
+				'the SVG is exactly the size of its host', `${Math.round(f1.svgW)}x${Math.round(f1.svgH)} in ${Math.round(f1.hostW)}x${Math.round(f1.hostH)}`);
+			// The viewBox is the MEASURED size, so nothing is letterboxed. A fixed "0 0 560 340" is
+			// the defect this replaced, and is named here so a regression reads as itself.
+			report.ok(f1.viewBox !== '0 0 560 340', 'the viewBox is measured, not the old fixed 560x340', f1.viewBox);
+			report.ok(f1.frameW > f1.hostW * 0.75,
+				'the plot frame uses most of the pane WIDTH — no lake of white at the sides',
+				`${Math.round(f1.frameW)} of ${Math.round(f1.hostW)}`);
+			report.ok(f1.frameH > f1.hostH * 0.45,
+				'...and most of its HEIGHT, the axis labels aside',
+				`${Math.round(f1.frameH)} of ${Math.round(f1.hostH)}`);
+		}
+		// **AND IT REFLOWS.** The pane was dragged taller a few lines above, so the chart must have
+		// grown with it rather than staying the size it was first drawn at.
+		await a.page.evaluate(() => {
+			const grip = document.getElementById('lpn_pane_grip');
+			const r = grip.getBoundingClientRect();
+			const opts = (y) => ({ bubbles: true, clientX: r.left + 40, clientY: y, pointerId: 1 });
+			grip.dispatchEvent(new PointerEvent('pointerdown', opts(r.top + 4)));
+			grip.dispatchEvent(new PointerEvent('pointermove', opts(r.top - 120)));
+			grip.dispatchEvent(new PointerEvent('pointerup', opts(r.top - 120)));
+		});
+		await a.settle(600);
+		const f2 = await fill();
+		if (f1 && f2) {
+			report.ok(f2.hostH > f1.hostH + 40, 'dragging the pane taller gives the chart more room',
+				`${Math.round(f1.hostH)} → ${Math.round(f2.hostH)}`);
+			report.ok(f2.frameH > f1.frameH + 20, '...and the chart really is redrawn bigger for it',
+				`${Math.round(f1.frameH)} → ${Math.round(f2.frameH)}`);
+			report.ok(Math.abs(f2.svgH - f2.hostH) <= 2, '...still exactly filling its host afterwards');
+		}
+
 		// It opens on a real drawing rather than on two empty pull-downs.
 		const first = await chartShape(a.page);
 		report.ok(!!first, 'a chart is drawn without the user choosing anything');

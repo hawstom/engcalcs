@@ -36,6 +36,33 @@ exports.run = async function ({ browser, report }) {
 		report.ok(by('New project…').submenu, 'New project… leads to a fly-out of templates, not straight to a blank one',
 			'Task 264: the row that used to make a project on the spot now offers the ways of starting one');
 
+		// **HELP > "WHAT THE TOOLBAR ICONS MEAN" ACTUALLY OPENS SOMETHING** (Tom, 2026-08-18: it
+		// "does nothing"). It called openMenu() at level 0 on the Help button — the anchor the menu
+		// it was clicked in was already open on — so the same-anchor toggle branch fired and closed
+		// the menu instead of listing anything. A browser check because the bug was invisible to
+		// every static one: the row existed, its handler existed, and the handler ran.
+		const help = await a.menuRows('help');
+		const iconsRow = help.find(r => /icon/i.test(r.label));
+		report.ok(!!iconsRow, 'Help carries the toolbar-icon guide', help.map(r => r.label).join(' | '));
+		report.ok(iconsRow && iconsRow.submenu, '...as a fly-out row, which is what makes it openable');
+		await a.openMenu('help');
+		await a.page.evaluate(() => {
+			const row = [...document.querySelectorAll('#lpn_menu_list button.lpn-menu-row')]
+				.find(b => /icon/i.test(b.textContent));
+			if (row) { row.click(); }
+		});
+		await a.settle(400);
+		const guide = await a.page.evaluate(() => ({
+			open: document.getElementById('lpn_menu_popup2').style.display === 'block',
+			rows: document.querySelectorAll('#lpn_menu_list2 button.lpn-menu-row').length,
+			parentStillOpen: document.getElementById('lpn_menu_popup').style.display === 'block'
+		}));
+		report.ok(guide.open, 'clicking it opens the guide instead of closing the menu');
+		report.ok(guide.rows >= 8, '...with one row per toolbar button, derived from the strip itself',
+			String(guide.rows));
+		report.ok(guide.parentStillOpen, '...beside the Help menu, which stays up as a fly-out should');
+		await a.closeMenu();
+
 		// Nothing is written behind your back. The punch list asks for a two-minute wait; the same
 		// fact is provable in a second by checking that no file exists at all after an edit.
 		await a.makeEdit();

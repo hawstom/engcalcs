@@ -213,13 +213,14 @@ console.log('\n-- every popover goes through the one placer, which is the whole 
 {
 	// Four boxes with four copies of the same six lines is what let Settings and Labels drift away
 	// from the fix Notes already had.
-	// Labels is NOT in this list any more: since Task 427 it is the Visibility panel at the right
-	// of the map, which is docked rather than anchored and therefore has no rect to be placed
-	// against. Asserted as an absence, so a later pass cannot quietly give it a pull-down again.
-	report(!/openPanelAtAnchor/.test(extract('toggleLabelsPopup')),
-		'Labels is a docked panel now, not an anchored pull-down');
-	report(/openPanelAtAnchor\(popup, evt\.currentTarget\.getBoundingClientRect\(\)\)/.test(extract('toggleSettingsPopup')),
-		'Settings');
+	// **NEITHER LABELS NOR SETTINGS IS IN THIS LIST ANY MORE.** Both are sections of the Settings
+	// box since Task 441, and that box is not anchored to anything: it is centred on first open and
+	// then lives where the user dragged it, which is the property popup's rule rather than a
+	// pull-down's. Asserted as an absence, so a later pass cannot quietly re-anchor it.
+	report(!/openPanelAtAnchor/.test(extract('openSettingsBox')),
+		'the Settings box is a standing box, not an anchored pull-down');
+	report(/clampPanel\(/.test(extract('openSettingsBox')),
+		'...and it is clamped into the viewport, so a remembered position always comes back');
 	report(/openPanelAtAnchor\(popup, anchor\.getBoundingClientRect\(\), !!level\)/.test(extract('openMenu')),
 		'the menus and their fly-outs');
 	// Matched on the PLACER, not on the anchor expression. This read `panel, menu.getBounding...`
@@ -251,10 +252,14 @@ console.log('\n-- clicking the menu bar dismisses an open popover (Tom, 2026-08-
 	report(/viewPopoverAnchor/.test(tabs), 'the control that OPENED the popover is exempt instead');
 	report(/closest\('#lpn_menu_popup, #lpn_menu_popup2'\)/.test(tabs),
 		'and a menu row stays exempt, since rows are what open these panels');
-	report(/viewPopoverAnchor = evt\.currentTarget;/.test(extract('toggleSettingsPopup')),
-		'the Settings opener records its button');
 	report(/if \(!except\) \{ viewPopoverAnchor = null; \}/.test(extract('closeViewPopovers')),
 		'and closing them all forgets it, so a stale button cannot go on being exempt');
+	// **THE SETTINGS BOX IS OUT OF THIS RULE ENTIRELY** (Task 441): it is a standing box, so a
+	// click away must leave it exactly where it is. Asserted as an absence from VIEW_POPOVERS,
+	// because putting it back would silently restore the pull-down behaviour Tom replaced.
+	report(!/lpn_settings_popup|lpn_settings_box/.test(
+		src.slice(src.indexOf('var VIEW_POPOVERS'), src.indexOf('var VIEW_POPOVERS') + 200)),
+		'the Settings box is not a click-away pull-down');
 }
 
 console.log(`\n${checks - failures}/${checks} passed`);
