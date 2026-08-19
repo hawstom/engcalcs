@@ -1397,11 +1397,11 @@ $ec_lang['lpn_settings_color_classes']='Number of colors';
 // appears in none of the reference tools. Tom, 2026-08-19: "Don't drop the 'method'. That's the
 // point of this control." -- the dropdown holds METHODS, and the noun alone would name the result.
 $ec_lang['lpn_color_mode']='Data classification method';
-$ec_lang['lpn_color_ranges_note']='Left alone, these limits follow the values now on the map, so they move with every solve and every time step. Type over them and they stay put, so the same number always means the same color. Automatic gives them back to the method above.';
-$ec_lang['lpn_color_criterion_note']='The limits come from a design standard, so the number of colors is fixed while that method is chosen.';
+$ec_lang['lpn_color_ranges_note']='Left alone, these limits follow the values now on the map, so they move with every solve and every time step. Type over them and they stay put, so the same number always means the same color. Press Automatic to give them back to the method above.';
+$ec_lang['lpn_color_criterion_note']='This method takes its limits from a design standard, so the number of colors is fixed while it is chosen.';
 $ec_lang['lpn_color_break_number']='A range limit must be a number. The map is unchanged.';
 $ec_lang['lpn_color_break_order']='Each range limit must be larger than the one before it. The map is unchanged.';
-$ec_lang['lpn_color_break_count']='There must be one limit fewer than the number of ranges. The map is unchanged.';
+$ec_lang['lpn_color_break_count']='There must be one limit fewer than the number of colors. The map is unchanged.';
 $ec_lang['lpn_color_ramp_qualitative']='Qualitative';
 $ec_lang['lpn_color_ramp_rainbow']='Rainbow';
 $ec_lang['lpn_color_ramp_rainbow_eg']='matches EPANET';
@@ -1940,7 +1940,7 @@ $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
 $ec_lang['lpn_labels_decimals_tip']='Decimal places shown for this label';
 $ec_lang['lpn_labels_mark_extrema']='Mark highest and lowest values';
-$ec_lang['lpn_labels_mark_extrema_tip']='Draws a line over the highest value of each kind on the map and a line under the lowest one, so the two ends stand out without being read. An overline marks the highest; an underline marks the lowest.';
+$ec_lang['lpn_labels_mark_extrema_tip']='Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.';
 // "Apply to all" beside each ID prefix (ROADMAP Task 345): an ID prefix normally governs only the elements
 // you draw from now on, and this is the way to say "I meant the ones already here". {n} and
 // {skipped} are whole numbers; {prefix} is the text the user typed.
@@ -1960,11 +1960,11 @@ $ec_lang['lpn_labels_separator_tip']='Text between one value and the next on a l
 // crowded row. 'lpn_labels_priority' is the term of art and is used only inside the two tips now --
 // the column itself is headed by the word below.
 $ec_lang['lpn_labels_priority']='Priority';
-$ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped when a label does not fit. 1 is dropped first.';
+$ec_lang['lpn_labels_priority_link_tip']='The order in which values are dropped when a label does not fit. The value numbered 1 is dropped first.';
 // NAMES ALL THREE RULES, because they are not settable and so the tip is the only place a user can
 // learn them (Tom, 2026-08-16). His own draft of this sentence said "lowest flow"; a flow is a link
 // value and this box is on a node row, so it reads as demand here.
-$ec_lang['lpn_labels_priority_node_tip']='The order in which these tests are given up when the map is too crowded to show every node label: the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to that of the neighbouring nodes. 1 is given up first, so the highest number decides which label goes.';
+$ec_lang['lpn_labels_priority_node_tip']='The order in which these tests are given up when the map is too crowded to show every node label: the lowest demand, the pressure nearest the middle of the range, or the elevation or head closest to that of the neighbouring nodes. The test numbered 1 is given up first, so the highest number decides which label is dropped.';
 // Column headings for the Labels box rows. Short because they sit over boxes 3.5 to 4.5 em wide, and
 // the row's own field name is the wide column beside them.
 $ec_lang['lpn_labels_col_before']='Before';
@@ -2041,18 +2041,20 @@ $ec_lang['lpn_settings_scope_calculator']='Calculator settings';
 $ec_lang['lpn_settings_show_titles']='Show page titles';
 $ec_lang['lpn_settings_show_titles_tip']='Hides the page heading and the welcome line above the drawing, so the map has more room. Printing is not changed.';
 $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
-// "Creation values", not "Starting values" (Tom, 2026-08-19: "The problem is that it's
-// misleading"). These are what a NEW element is created with; "starting" reads as the initial
-// condition of a run, which on a page that now has a duration and a clock is a different thing
-// entirely -- and a tank really does have one.
+// NEVER "Starting values" (Tom, 2026-08-19: "The problem is that it's misleading"). These are what
+// a NEW element is created with; "starting" reads as the initial condition of a run, which on a
+// page that now has a duration and a clock is a different thing entirely -- and a tank really does
+// have one. The heading is the bare word because it sits inside the "New elements" section; the
+// three push strings below it stopped saying "starting values" in sprint 438's Wave 0, which found
+// them still carrying the rejected wording.
 $ec_lang['lpn_settings_defaults']='Values';
 $ec_lang['lpn_settings_defaults_note']='Used for elements you create from now on. Existing elements are not changed.';
 $ec_lang['lpn_settings_push_note']='Only the properties whose labels are showing right now are applied.';
-$ec_lang['lpn_settings_push_btn']='Apply starting values to all elements';
-$ec_lang['lpn_push_confirm']='Replace these properties on every existing element with the current starting values? Values you have typed will be overwritten. You can undo this.';
+$ec_lang['lpn_settings_push_btn']='Apply these values to all elements';
+$ec_lang['lpn_push_confirm']='Replace these properties on every existing element with the values now set for new elements? Values you have typed will be overwritten. You can undo this.';
 $ec_lang['lpn_push_properties']='Properties:';
 $ec_lang['lpn_push_elements']='Nodes and pipes:';
-$ec_lang['lpn_push_none_displayed']='No starting value is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.';
+$ec_lang['lpn_push_none_displayed']='None of these values is showing as a label right now, so there is nothing to apply. Turn on the labels for the properties you want in the Labels panel, then try again.';
 $ec_lang['lpn_push_nothing']='No existing element has any of the properties being applied.';
 $ec_lang['lpn_push_no_change']='Every element already has these values, so nothing would change.';
 // ---- Scenarios (ROADMAP Task 184) ----
@@ -2158,12 +2160,12 @@ $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 // everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Symbol size (pixels)';
 $ec_lang['lpn_settings_link_width']='Link line thickness (pixels)';
-$ec_lang['lpn_settings_align_labels']='Align link labels with links';
-$ec_lang['lpn_settings_readability_bias']='Label flip angle adjustment';
-$ec_lang['lpn_settings_readability_bias_tip']='Flip a label upside down when it leans more than this many degrees left of vertical';
+$ec_lang['lpn_settings_align_labels']='Draw link labels along the link line';
+$ec_lang['lpn_settings_readability_bias']='Lean allowed before a label flips (degrees)';
+$ec_lang['lpn_settings_readability_bias_tip']='A label drawn along a link is turned 180 degrees, so that it is not upside down, once the link leans more than this many degrees to the left of straight up.';
 $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
-$ec_lang['lpn_settings_label_max_width']='Label view width (map units)';
-$ec_lang['lpn_settings_label_max_width_tip']='Labels are shown only while the view is narrower than this. Leave it blank to always show them.';
+$ec_lang['lpn_settings_label_max_width']='Widest view that shows labels (map units)';
+$ec_lang['lpn_settings_label_max_width_tip']='Labels are shown only while the view is narrower than this. Leave the box blank to always show them.';
 $ec_lang['lpn_settings_label_use_view']='Use current view';
 $ec_lang['lpn_settings_label_always']='Always show labels';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
@@ -2205,7 +2207,7 @@ $ec_lang['lpn_color_ramp_viridis']='Purple to yellow (easier to tell one color f
 $ec_lang['lpn_color_ramp_gray']='Light to dark gray';
 $ec_lang['lpn_settings_color_reverse']='Reverse the color order';
 $ec_lang['lpn_color_none']='No color';
-$ec_lang['lpn_settings_color_thematic']='Thematic map';
+$ec_lang['lpn_settings_color_thematic']='Thematic map (colors only)';
 $ec_lang['lpn_settings_color_thematic_tip']='Hides every label so that only the colors are left on the map. Your label choices are kept, and turning this off brings them back.';
 $ec_lang['lpn_settings_color_key_position']='Color legend position';
 $ec_lang['lpn_settings_color_breaks']='Color band limits';
@@ -2252,8 +2254,8 @@ $ec_lang['lpn_time_last']='Go to the end';
 $ec_lang['lpn_time_tank']='Tank';
 $ec_lang['lpn_time_level']='Water level';
 $ec_lang['lpn_time_run']='Run';
-$ec_lang['lpn_time_run_tip']='Work out this network at every reporting time, from the start of the run to the end of it.';
-$ec_lang['lpn_time_run_note']='You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.';
+$ec_lang['lpn_time_run_tip']='Work out this network at each of its reporting times, from the first one to the last.';
+$ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date.';
 $ec_lang['lpn_time_speed']='Speed';
 $ec_lang['lpn_time_speed_tip']='How fast the run plays back.';
 

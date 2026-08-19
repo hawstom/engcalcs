@@ -92,7 +92,13 @@ function prefixToTermNames(): array
             // breaker valve' has an electrical homonym; 'project mode name' says lat/lon and XY are
             // carried unchanged; 'alignment (text)' is not justification.
             'profile (long section)', 'hydraulic grade line', 'demand pattern', 'imperial gallon',
-            'pressure breaker valve', 'project mode name', 'alignment (text)'],
+            'pressure breaker valve', 'project mode name', 'alignment (text)',
+            // Added 2026-08-19 (Task 438 Wave 0, second pass over the resync set). 'drop (a label)'
+            // guards a three-character column heading whose word is also a drop in head; 'run (a
+            // simulation)' guards a one-word button whose word is also a run of pipe, and it is
+            // quoted by name inside lpn_time_run_note; 'work out (compute)' is the suite's plain
+            // verb for solving, opaque word by word to anyone parsing the two words separately.
+            'drop (a label)', 'run (a simulation)', 'work out (compute)', 'decimal separator'],
         'bpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'branched network', 'branch', 'pipe line', 'pressure rating',

@@ -1,6 +1,6 @@
 {
 	"sprint": "438-wave0",
-	"description": "Adversarial Wave 0 (ROADMAP Task 438) over the English added or re-worded on 2026-08-18 -- the 104 NEW and 8 CHANGED keys reported by detect_english_drift.php, plus the explicitly named families: the placement tool (lpn_georef_*, lpn_geomap, lpn_xymap), the coordinate jump (lpn_goto_*), the clean-map toggle (lpn_clean_map*), Find (lpn_find_*), Profile (lpn_profile_*), the units warning (lpn_units_*), .inp export/import (lpn_inp_*, lpn_file_export_inp*), the new flow unit tokens (u_imgd, u_afd, u_lpm, u_cmh, u_cmd), lpn_unit_unknown, the share affordance (template_share_*), menu_more, the four new-project rows, and Task 405's four. The question asked of every string was NOT 'is this good?' but 'list every plausible reading' -- the falsification pass whose measured yield on lpn_ (Task 239) was 36 findings on top of a completed review. Result: 46 findings -- 13 high, 25 medium, 8 low. Every entry is open: this pass proposes, it does not write. English rewrites are for the human to apply (three concurrent tracks were writing lib/lang.ec.en.php); $ec_lang_syn is off-limits to AI by standing rule, so anything routed there is a proposal awaiting written permission. | SPRINT CLOSE 2026-08-19: 26 languages delivered 186 keys each. The translators' own suggestion box produced four more findings, three of them defects in English written the previous night by other tracks -- including one SHIPPED bug reaching 18 languages.",
+	"description": "Adversarial Wave 0 (ROADMAP Task 438) over the English added or re-worded on 2026-08-18 -- the 104 NEW and 8 CHANGED keys reported by detect_english_drift.php, plus the explicitly named families: the placement tool (lpn_georef_*, lpn_geomap, lpn_xymap), the coordinate jump (lpn_goto_*), the clean-map toggle (lpn_clean_map*), Find (lpn_find_*), Profile (lpn_profile_*), the units warning (lpn_units_*), .inp export/import (lpn_inp_*, lpn_file_export_inp*), the new flow unit tokens (u_imgd, u_afd, u_lpm, u_cmh, u_cmd), lpn_unit_unknown, the share affordance (template_share_*), menu_more, the four new-project rows, and Task 405's four. The question asked of every string was NOT 'is this good?' but 'list every plausible reading' -- the falsification pass whose measured yield on lpn_ (Task 239) was 36 findings on top of a completed review. Result: 46 findings -- 13 high, 25 medium, 8 low. Every entry is open: this pass proposes, it does not write. English rewrites are for the human to apply (three concurrent tracks were writing lib/lang.ec.en.php); $ec_lang_syn is off-limits to AI by standing rule, so anything routed there is a proposal awaiting written permission. | SPRINT CLOSE 2026-08-19: 26 languages delivered 186 keys each. The translators' own suggestion box produced four more findings, three of them defects in English written the previous night by other tracks -- including one SHIPPED bug reaching 18 languages. | SECOND WAVE 0 PASS 2026-08-19, gating the resync sprint: detect_english_drift.php reported 14 CHANGED and 8 NEW keys after the day's Settings-box, Labels, colour and clock work -- 22 strings, every one read with the same question. Result: 24 further findings -- 8 high, 12 medium, 4 low. 17 English strings were rewritten (13 of the 22 in scope, plus 4 siblings the pass proved were contradicting them), 4 concepts were added to glossary.json and wired to the lpn prefix, and 2 $ec_lang_syn diffs are recorded unwritten for Tom. The two most expensive findings were both introduced by shortening a string that had been unambiguous: a tip that promised to turn labels upside down when its code exists to stop exactly that, and a run tip that was factually wrong about any network whose report start is past zero.",
 	"entries": [
 		{
 			"key": "lpn_clean_map",
@@ -686,8 +686,8 @@
 				"a duration of eight hours",
 				"eight o'clock"
 			],
-			"disposition": "refer-to-human",
-			"resolution": "FOR TOM -- a wording call, not a defect. Both affected languages already handled it locally: the Amharic agent added an explicit `not a time of day` clause, and the Swahili agent was warned in its brief. The English question is whether `8 is eight hours` should read `a duration of eight hours`. It costs one word in 27 languages and removes a real ambiguity in at least two of them -- but the key was resynced across all 26 languages on 2026-08-19, so changing it again re-drifts it immediately and buys a third sprint on the same string. Cheaper to decide once, later, than to churn it now."
+			"disposition": "english",
+			"resolution": "ANSWERED by Tom himself, 2026-08-19 (Task 449), before this second Wave 0 pass read it. The sentence the Amharic translator objected to is gone: \"A plain number means hours, so 8 is eight hours\" is replaced by \"Enter times and durations as decimal hours (17.5 or 72.5) or in hours:minutes notation (17:30 or 72:30).\" No bare small number is left standing as an example, the two notations now explain each other by being paired, and the string names durations and times as two things the field takes rather than asserting a rule about bare numbers. The residual risk the translator named -- that a reader on a sunrise-based clock reads any hour figure as a time of day -- is a property of the CLOCK fields, not of this shared format tip, and lpn_time_clock_start plus the 24-hour readout carry that."
 		},
 		{
 			"key": "lpn_time_running",
@@ -700,6 +700,330 @@
 			],
 			"disposition": "english",
 			"resolution": "FIXED IN THE ENGLISH. lpn_time_running and lpn_time_no_engine were written for the time-modelling feature and reintroduced exactly the collision an earlier sprint had been run to repair -- glossary.json's `solver` term carries an avoid list naming the motor/engine word in thirteen languages, with the pump reason stated. Both now say `solver`. On the resync, 11 languages still carried a motor/engine word and were repaired: am ar bg de es fa he id it km my pt ro ur zh; the rest had already chosen `solver` independently."
+		},
+		{
+			"key": "lpn_settings_readability_bias_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "high: \"Flip a label upside down when it leans more than this many degrees left of vertical\" says the OPPOSITE of what the code does. lpn-geom.js turns the label 180 degrees precisely so that it is NOT upside down -- the flip is the cure, not the symptom -- so a translator writing faithfully produces a tip promising to make labels unreadable. It also never names what leans: the label leans only because the LINK it is drawn along leans, and the number is a property of the link angle. And \"left of vertical\" is a bare direction with no frame: left of vertical seen from where, and is that up-screen vertical or map north?",
+			"readings": [
+				"a threshold: past this lean the label is rotated 180 degrees so it reads the right way up (intended)",
+				"the setting makes labels upside down once they lean far enough -- a deliberate mirroring option",
+				"\"it\" is the label leaning of its own accord, as though labels had their own angle setting",
+				"\"left of vertical\" measured on the printed sheet vs. measured against map north"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"A label drawn along a link is turned 180 degrees, so that it is not upside down, once the link leans more than this many degrees to the left of straight up.\" The thing that leans is now the LINK, the outcome is stated as the cure rather than the defect, \"180 degrees\" replaces the idiom \"flip upside down\", and \"straight up\" replaces \"vertical\" so nobody reads it as map north."
+		},
+		{
+			"key": "lpn_settings_readability_bias",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "high: \"Label flip angle adjustment\" is four nouns in a row with no verb, no unit and no object. It was shortened this session from a full sentence, and the sentence was where all the meaning lived. A four-noun pile is the hardest English shape to translate, because every language must choose which noun governs which -- and here the readings are not equivalent: one of them (how far the label is rotated) is a different physical quantity from the real one (how far the link may lean before the label is rotated). The input is degrees and the string does not say so, while every sibling in the same box carries its unit: \"Text size (pixels)\", \"Link line thickness (pixels)\", \"Symbol opacity (0 to 1)\".",
+			"readings": [
+				"the angle a label is turned through when it flips (a rotation amount)",
+				"the lean at which flipping starts (intended: the threshold, 0 to 45 degrees, default 20)",
+				"a correction applied to an angle that is already computed",
+				"a setting that adjusts the labels rather than the rule for flipping them"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"Label flip angle adjustment\" -> \"Lean allowed before a label flips (degrees)\". It now names the quantity (a lean), the condition (before), the effect (the label flips) and the unit, and it stays one short row, parallel with the unit-carrying siblings beside it."
+		},
+		{
+			"key": "lpn_settings_label_max_width",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "high: \"Label view width (map units)\" reads first as the width allowed to a LABEL, which is exactly wrong -- the number is the width of the MAP VIEW below which labels appear at all. Nothing in the string carries the threshold sense, and the key name (label_max_width) points the same wrong way, so a reader reasoning from either lands on a label width. This one was shortened this session from \"Show labels when the view is narrower than this (map units)\", which was unambiguous; the shortening dropped the verb, and the verb was the meaning.",
+			"readings": [
+				"the widest a label may be drawn before it is trimmed or wrapped",
+				"the width of the view, in map units, below which labels are shown (intended)",
+				"the width of the region reserved around a label",
+				"the current view width, shown for information"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"Label view width (map units)\" -> \"Widest view that shows labels (map units)\". Still a short noun phrase for a narrow row, but the head noun is now the VIEW and \"widest ... that shows\" carries the threshold. Its tip already said the rest and is kept."
+		},
+		{
+			"key": "lpn_time_run_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "high, and FACTUALLY WRONG about the network it describes: \"from the start of the run to the end of it\" says the reporting times begin where the run begins. They do not. EC.lpnReportTimes starts the grid at Report start time, and lpn-time.js comments the point explicitly (\"REPORT START IS NOT ALWAYS ZERO\"), so on any network whose report start is past zero the tip promises results the run will never produce -- and Report start time is a field on the very same panel. Separately, \"the run\" is used here as a NOUN one line after lpn_time_run uses the same word as a button VERB.",
+			"readings": [
+				"compute at each reporting time across the whole period (intended)",
+				"compute from time zero, so a report start past zero is ignored (what the words actually say)",
+				"\"the run\" as the act now being started vs. \"the run\" as the time period defined in the settings"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"Work out this network at each of its reporting times, from the first one to the last.\" The endpoints are now the reporting times themselves, which is what the code walks, so a report start past zero no longer makes the sentence false; and the noun \"the run\" is gone from the tip, leaving that word to the button alone."
+		},
+		{
+			"key": "lpn_time_run_note",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "high: three separate traps in one status line. (1) \"You are seeing the first reporting time\" -- a reporting time is a TIME; what the user is seeing is the network AT that time, and read literally the sentence says a clock readout is on screen. (2) \"the later times are not kept up to date\" is wrong about what is stale: the times are perfectly up to date, it is the RESULTS at those times that are not. (3) \"press Run when you want them\" quotes a button by its English label inside a translated sentence, so unless the same language renders lpn_time_run identically, the instruction points at a button that does not exist. The \"takes long enough ... that\" correlative also spans 20 words before its consequence arrives, which is the shape that gets mis-bracketed in translation.",
+			"readings": [
+				"the network shown is the state at the first reporting time (intended)",
+				"the display is currently showing you a time value",
+				"the later time VALUES are stale (they are not; the results are)",
+				"\"them\" = the later times, the later results, or the reporting times themselves"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date.\" The object of seeing is named, the stale thing is named as the results, the correlative is split into two sentences, and \"them\" now has one antecedent. The quoted button label stays -- it must -- and is guarded by the new glossary concept \"run (a simulation)\", which tells every agent that the word on the button and the word in this sentence have to match."
+		},
+		{
+			"key": "lpn_settings_defaults",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "high: shortened this session from \"Creation values\" to the bare word \"Values\", and it exposed a contradiction that was already in the file. The comment above the key records Tom rejecting \"Starting values\" as misleading -- yet lpn_settings_push_btn still said \"Apply starting values to all elements\", lpn_push_confirm still said \"the current starting values\" and lpn_push_none_displayed still said \"No starting value is showing\". So one set of numbers had two names on one panel, one of them the name the owner had thrown out, and on a page that now HAS a start time and tanks with starting levels the rejected word points at a real and different concept. The heading itself is also the hardest possible string to translate alone: \"Values\" has no object, and several target languages must know whether these are quantities, settings, or worth.",
+			"readings": [
+				"default property values given to elements you create from now on (intended)",
+				"the values currently on the selected element",
+				"the initial conditions a run starts from (the reading Tom rejected, and the one \"starting values\" reinstated three strings later)",
+				"a heading over a column of numbers"
+			],
+			"disposition": "english",
+			"resolution": "The heading is kept as \"Values\": it sits inside the \"New elements\" section with lpn_settings_defaults_note (\"Used for elements you create from now on\") directly under it, so the object is supplied on screen. The three siblings that still carried the rejected wording were rewritten: lpn_settings_push_btn -> \"Apply these values to all elements\"; lpn_push_confirm -> \"... with the values now set for new elements?\"; lpn_push_none_displayed -> \"None of these values is showing as a label right now ...\". The stale code comment claiming the value is \"Creation values\" was corrected to describe what is actually there. PROPOSED $ec_lang_syn diff, NOT WRITTEN (the channel is off-limits to AI), for Tom to approve or drop: $ec_lang_syn['lpn_settings_defaults']='Values, Values for new elements, Values given to new elements, Default values, Values used when an element is created | avoid: starting values in the sense of the initial condition of a run; the current values of the selected element';"
+		},
+		{
+			"key": "lpn_settings_color_classes",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "high, as a pair with its own error message: the control was renamed this session from \"Number of ranges\" to \"Number of colors\", and lpn_color_break_count was left saying \"There must be one limit fewer than the number of ranges.\" A user who trips that message is told to count something that is no longer named anywhere on the page. Separately \"Number of colors\" can be read as how many colors the palette OFFERS rather than how many classes the data is cut into -- the ramp picker sitting beside it makes that reading available in a way \"Number of ranges\" never did.",
+			"readings": [
+				"how many classes the values are divided into, hence how many colors are drawn (intended)",
+				"how many colors the chosen ramp contains, as a property of the ramp",
+				"how many colors are currently in use on the map, as a readout"
+			],
+			"disposition": "english",
+			"resolution": "English fixed where the contradiction actually was: lpn_color_break_count now reads \"There must be one limit fewer than the number of colors. The map is unchanged.\", so the message names the control the user can see. The control label \"Number of colors\" is kept -- it is this session's deliberate rename, it sits directly above the ramp swatches where each color is one class, and \"ranges\" would now be the orphan word."
+		},
+		{
+			"key": "lpn_labels_priority_node_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "high: the tip ends \"so the highest number decides which label goes\". English \"goes\" is two opposite things -- goes away (is dropped) and goes on (is placed) -- and this sentence supplies no clue which, because both are true statements about a crowded map. Get it backwards and the user sets every priority the wrong way round. \"1 is given up first\" also floats: 1 what -- the first row, the first test, or the box holding 1?",
+			"readings": [
+				"the highest number decides which label is DROPPED (intended)",
+				"the highest number decides which label is KEPT and drawn",
+				"\"1\" as the ordinal first item vs. \"1\" as the value typed in the box"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"... The test numbered 1 is given up first, so the highest number decides which label is dropped.\" \"Goes\" is gone, and \"the test numbered 1\" says what the number sits on. The link tip was given the parallel fix in the same edit."
+		},
+		{
+			"key": "lpn_labels_priority_link_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium: \"1 is dropped first\" -- a bare numeral as the subject of a sentence, with three candidate referents on screen at once (the first row of the list, the value whose Drop box holds 1, and the number 1 itself). The link and node tips are meant to share this one sentence, so whatever is unclear here is unclear twice.",
+			"readings": [
+				"the value whose Drop number is 1 is left off first (intended)",
+				"the first value in the list is left off first",
+				"one value is dropped before any other action"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"The value numbered 1 is dropped first.\" Parallel with the node tip's \"The test numbered 1 is given up first\", which is the sentence the two columns are supposed to share."
+		},
+		{
+			"key": "lpn_settings_align_labels",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium: \"Align link labels with links\" -- English \"align X with Y\" means both \"make X parallel to Y\" and \"line X up together with Y (in a row, at the same edge)\", and on a drawing page that already holds a text-alignment concept (the glossary carries \"alignment (text)\") the second reading is live. It also repeats \"link\" twice in five words, which pushes a translator toward the together-with reading.",
+			"readings": [
+				"draw each link label parallel to its link, following the line (intended)",
+				"line the labels up in a row alongside the links",
+				"attach labels to links so they move together",
+				"set the text alignment of link labels"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"Align link labels with links\" -> \"Draw link labels along the link line\". \"Along\" carries parallel-and-following and cannot mean line-up-together, the verb is now the drawing act, and the text-alignment sense is out of reach."
+		},
+		{
+			"key": "lpn_labels_mark_extrema_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium: \"so the two ends stand out without being read\" attaches the not-reading to the WRONG noun. As written, the marks stand out while the values go unread -- which sounds like an argument for not reading the map. The intent is that the reader does not have to read the numbers to spot the extremes. The tip then restates itself: sentence one says a line over the highest and a line under the lowest, sentence two says an overline marks the highest and an underline marks the lowest, and the repetition is what a translator will spend their care on rather than the trap in sentence one.",
+			"readings": [
+				"you can spot the two extremes without reading the numbers (intended)",
+				"the marks are visible even though nobody reads the values",
+				"the ends stand out and are therefore skipped",
+				"\"of each kind\" = each kind of value (pressure, flow) vs. each kind of element"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.\" The reader is now the subject of the not-reading, \"of that kind\" ties the low mark to the same quantity as the high one, and the duplicated overline/underline sentence is gone."
+		},
+		{
+			"key": "lpn_settings_color_thematic",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium: shortened this session from \"Thematic map: colors only, no labels\" to \"Thematic map\", leaving a cartographic term of art alone on a CHECKBOX. A checkbox label has to say what ticking it does; a bare noun phrase reads as a map TYPE, so the natural guess is that it swaps the base map or switches to some other kind of drawing -- which on a page that really can draw a street map behind the network is a plausible thing for a control to do.",
+			"readings": [
+				"hide every label so only the colors remain (intended)",
+				"switch the map to a different kind of map, e.g. a thematic base layer",
+				"a heading over the coloring controls rather than a control itself"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"Thematic map\" -> \"Thematic map (colors only)\". Barely longer, keeps the term of art the coloring literature uses, and the parenthesis rules out the base-map reading. The tip (lpn_settings_color_thematic_tip) already explains that label choices are kept and come back."
+		},
+		{
+			"key": "lpn_color_criterion_note",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium: \"so the number of colors is fixed while that method is chosen\" -- \"that method\" has no antecedent. The only noun phrase before it is \"a design standard\", which is not a method, so the reader must reach off the string, onto the select above, to resolve a demonstrative. A translator with the string alone cannot do that, and several languages must choose a gender or a case for the demonstrative before they can even write it.",
+			"readings": [
+				"the criterion method now selected above (intended)",
+				"the design standard just mentioned",
+				"some other method chosen elsewhere on the page"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"This method takes its limits from a design standard, so the number of colors is fixed while it is chosen.\" The method is now the subject of the sentence, so \"it\" has exactly one antecedent and the note reads as being about the method the user just picked."
+		},
+		{
+			"key": "lpn_color_ranges_note",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium: the note ends \"Automatic gives them back to the method above.\" Automatic is a BUTTON (lpn_settings_color_auto, rendered by looped-network.js as clearBtn), but nothing in the sentence marks it as one, so it reads as an adjective or a mode -- \"automatic operation returns them\". Read that way the user waits for something to happen instead of pressing the button that makes it happen. \"Gives them back to the method\" is also an unusual collocation to translate: given back to whom, and does the method now own them?",
+			"readings": [
+				"press the Automatic button and the limits go back to being computed by the method (intended)",
+				"in automatic mode the limits are returned to the method",
+				"the limits are handed over to the method above, which now controls them permanently"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"Press Automatic to give them back to the method above.\" The button is now the object of an imperative, which is what it is, and the reader is told what to do rather than what happens. The word Automatic still has to match lpn_settings_color_auto in each language -- flagged to the sprint as a same-language consistency pair."
+		},
+		{
+			"key": "lpn_settings_label_max_width_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "low: \"Leave it blank to always show them.\" Two pronouns in six words, pointing at different things -- \"it\" is the input box, \"them\" is the labels -- and neither is named in this sentence. \"It\" can also grab \"the view\" from the sentence before, which produces a reading in which the VIEW is left blank.",
+			"readings": [
+				"leave the input box empty and labels always show (intended)",
+				"leave the view empty",
+				"leave the label blank"
+			],
+			"disposition": "english",
+			"resolution": "English rewritten: \"Leave the box blank to always show them.\" \"It\" is replaced by the thing it meant; \"them\" now has only the labels to refer to, since the box is the nearer noun and is explicitly not a label."
+		},
+		{
+			"key": "lpn_labels_col_drop",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium: \"Drop\" is a three-character column heading -- the terseness is deliberate (it replaced an icon and must stay icon-sized), so terseness is NOT the complaint. Polysemy is. On a hydraulics page \"drop\" is a quantity: a drop in head, a pressure drop, an elevation drop, a drop structure -- all things this very page computes and prints. A column of numbers headed \"Drop\" therefore reads first as a column of head drops, which is the most dangerous misreading available because it is a plausible thing for the software to show. Also available: a droplet, a drop-down, and the drag-and-drop sense on a drawing surface where things really are dragged.",
+			"readings": [
+				"the order in which values or labels are left off the map when space runs out (intended)",
+				"a head drop or pressure drop printed per row",
+				"a drop-down list",
+				"where a dragged item is dropped",
+				"delete this row"
+			],
+			"disposition": "glossary",
+			"resolution": "English kept -- the heading has to stay about as wide as the icon it replaced, and no shorter English word says \"left off for want of room\". Routed instead to a new glossary.json concept \"drop (a label)\", wired to the lpn prefix in prefix_terms.inc.php, whose avoid array names the head-drop, pressure-drop, droplet, drop-down and drag-and-drop senses and says explicitly that nothing is deleted from the drawing. It also tells the agent the rendering must stay very short."
+		},
+		{
+			"key": "lpn_time_run",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium: a one-word button, \"Run\", on a page whose whole subject is pipes -- and \"a run of pipe\" is standard English in exactly this trade. The word is also a verb here and a noun three strings away (\"the start of the run\", \"Total run time\"), and many target languages need two different words for those. lpn_time_run_note quotes this label inside a sentence, so a language that renders the button one way and the sentence another sends the user hunting for a control that is not there.",
+			"readings": [
+				"compute the network over its whole time period, now (intended, imperative)",
+				"a run of pipe -- a straight length between two points",
+				"\"the run\" as the computation already performed",
+				"run in the sense of operate or manage the system"
+			],
+			"disposition": "glossary",
+			"resolution": "English kept: Run is EPANET's own command word, it is one word for a narrow toolbar button, and its tip names the act. Routed to a new glossary.json concept \"run (a simulation)\", wired to lpn, whose avoid array leads with the run-of-pipe trap and which states the two requirements the strings impose: the button must be an imperative verb, and the noun used in lpn_time_run_note, lpn_time_run_tip and lpn_time_duration must be the same word the button carries."
+		},
+		{
+			"key": "lpn_time_run_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium, second finding on the same string: \"work out\" is this suite's house verb for compute, and it appears in four clock strings (lpn_time_run_tip, lpn_time_run_note, lpn_time_running, lpn_time_no_engine). Word by word it is opaque -- a phrasal verb whose parts mean neither computing nor solving -- and its everyday senses (take physical exercise; turn out well; settle a disagreement) are all more frequent than the arithmetic one. Four strings translated by one agent on four different guesses is four different verbs for one act.",
+			"readings": [
+				"compute or solve the network (intended)",
+				"take exercise",
+				"turn out well in the end",
+				"negotiate or settle something",
+				"figure out by guessing"
+			],
+			"disposition": "glossary",
+			"resolution": "English kept -- \"work out\" is the Simple English choice over \"calculate\"/\"solve\" and is used consistently across the clock strings. Routed to a new glossary.json concept \"work out (compute)\", wired to lpn, which names the three wrong senses, says one rendering must serve all four strings, and tells the agent to use the ordinary verb for calculating rather than copying the two-word English shape."
+		},
+		{
+			"key": "lpn_time_format_tip",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium: the tip teaches a number format by example -- \"17.5 or 72.5\" -- and every example uses the English decimal point. The field itself accepts a comma decimal for typed input (js/lpn-patterns.js takes <digits>,<digits>; Task 444 added it precisely because parseFloat silently truncated 2,5 to 2 in the field that sizes the whole run). So a reader in a comma locale is shown a format they do not write, in a field that would have accepted the one they do. Nothing in the English marks the digits as localisable, and an agent translating conservatively will copy them.",
+			"readings": [
+				"decimal hours written with the local separator, whatever it is (intended, and what the parser accepts)",
+				"the dot is required, so a comma will be refused",
+				"17.5 as seventeen and a half hours vs. 17.5 as a clock time near half past five"
+			],
+			"disposition": "glossary",
+			"resolution": "English kept -- it is Tom's own 2026-08-19 wording (Task 449) and it does the hard part well, pairing 17.5 with 17:30 so the two notations explain each other. The unmarked-digits problem is routed to a new glossary.json concept \"decimal separator\", wired to lpn, which tells agents to write their own locale's separator in an EXAMPLE (the precedent Tom set for lpn_labels_col_decimals_example, \"0,000\" where needed), and equally that the COLON in 17:30 is not a separator and never changes, and that a thousands separator must never be added because the parser refuses it."
+		},
+		{
+			"key": "lpn_color_link_field",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium: \"Color links by\" is a sentence that stops at a preposition and is completed by the value of the select beside it. English tolerates that; word order, case government and RTL do not, and the translator sees only the fragment. It compounds with \"Color\" being verb or noun with no marker: \"Color links\" can be read as \"the colors of links\". Renamed from \"Color pipes by\" this session, which widens the object correctly (links are pipes, pumps and valves) but does not touch the fragment problem.",
+			"readings": [
+				"choose the property by which links are colored (intended, imperative plus trailing select)",
+				"\"Color links\" as a noun phrase -- the colors belonging to links -- ordered by something",
+				"color the links according to something not yet named"
+			],
+			"disposition": "dismissed",
+			"resolution": "English kept. The pair lpn_color_node_field / lpn_color_link_field must stay parallel, the trailing-preposition-plus-select shape is used throughout this panel and is why the select reads as its completion on screen, and no English reader stumbles. The translator-facing half is real but belongs in the synonym channel, which is OFF-LIMITS to AI, so the diff is recorded here unwritten for Tom to approve or drop: $ec_lang_syn['lpn_color_link_field']='Color links by, Color the links according to, Show link values as colors of, Link color shows, Use this value for link color | avoid: the noun reading \"the colors of links\"; a rendering that cannot be completed by the value of the dropdown that follows it'. The same diff would apply to lpn_color_node_field."
+		},
+		{
+			"key": "lpn_settings_sec_visualization",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "medium: one of the four section names in the Settings box, and the only abstract Latinate noun among them -- its siblings are \"Map and page\", \"New elements\" and \"Calculation\". It names no object, so it does not separate itself from \"Map and page\", which is also visual; a user hunting for the label and color controls has two plausible doors. It is also the kind of word that invites a phonetic loan rather than a translation in several of the low-resource languages.",
+			"readings": [
+				"labels and colors -- how values are shown on the drawing (intended)",
+				"anything to do with how the page looks, which is also \"Map and page\"",
+				"a chart or graph feature",
+				"a 3D or animated view"
+			],
+			"disposition": "dismissed",
+			"resolution": "English kept, and NOT routed. The four section names are Tom's own groupings, given 2026-08-18 while using the box, and naming is his call; the section's two subsections are already \"Node symbology\" and \"Link symbology\", which is the standard word in QGIS, ArcGIS and Bentley and anchors the concept on screen one line below the heading. Recorded rather than resolved silently: if Tom wants a plainer word, \"Symbology\" is the trade term and \"Labels and colors\" is the Simple English one."
+		},
+		{
+			"key": "lpn_settings_link_width",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "low: \"Link line thickness (pixels)\" is a three-noun pile, and \"link line\" is not a compound English uses -- the reader has to decide whether the line belongs to the link or links something. Renamed from \"Pipe line thickness\" this session, which fixed the wrong-object problem (links include pumps and valves) but kept the pile.",
+			"readings": [
+				"how thick the line drawn for each link is (intended)",
+				"the thickness of a line that links things",
+				"the width of a link, as a hydraulic property"
+			],
+			"disposition": "dismissed",
+			"resolution": "English kept. It sits between \"Text size (pixels)\" and \"Symbol opacity (0 to 1)\" in one column of map-appearance numbers, its unit is stated, and the neighbouring rows establish that every row is a drawing property. The hydraulic reading is unavailable because a pipe diameter is nowhere near this box and is never in pixels."
+		},
+		{
+			"key": "lpn_color_mode",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "low: \"Data classification method\" is three abstract nouns, and \"classification\" plus \"method\" is exactly the shape that gets calqued into an unreadable phrase in the low-resource languages.",
+			"readings": [
+				"the rule used to cut the values into colored classes (intended)",
+				"a method of classifying the data set as a whole, e.g. by type",
+				"a security or confidentiality classification"
+			],
+			"disposition": "dismissed",
+			"resolution": "English kept, deliberately and on the record: it is this session's considered rename away from our own coinage \"Range allocation\" to the term the reference tools publish (ArcGIS Pro's help page is titled \"Data classification methods\"; QGIS calls the act \"Classify\"), and Tom, 2026-08-19: \"Don't drop the 'method'. That's the point of this control.\" The security sense is out of reach beside a list of quantile / natural breaks / equal interval. The glossary already carries \"equal intervals / equal counts\" wired to lpn for the values inside the select."
+		},
+		{
+			"key": "lpn_color_ranges_note",
+			"source": "wave0",
+			"lang": null,
+			"complaint": "low, second finding: this note and lpn_settings_color_breaks_note say the same thing in two different sets of words (\"Left alone, these limits follow the values now on the map ...\" vs \"Leave these blank and the colors are spread across the values now on the map ...\"), one in the Visibility panel and one in the Settings box. Two English sentences for one fact are two chances to drift, and 26 languages must now keep both in step with each other.",
+			"readings": [
+				"two notes describing one behaviour, deliberately worded for two places",
+				"two different behaviours, since the words differ"
+			],
+			"disposition": "dismissed",
+			"resolution": "Left alone in this pass, and recorded rather than fixed: merging them is a key-consolidation decision (which key survives, which panel borrows it), and CLAUDE.md puts consolidation in one full-suite English-only pass, never inside a sprint gate. Flagged here so the next consolidation pass finds it with the pair already named."
 		}
 	]
 }
