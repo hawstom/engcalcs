@@ -641,12 +641,17 @@ html[lang="zh"] .ec-welcome {
 /* The property popup is DRAGGABLE by its chrome -- the padded band around the body, which is the
    only part of it where the event target is the popup element itself (see wirePopup()). The cursor
    says so there, and the body puts it back, so a text input never shows a move cursor. Only
-   #lpn_popup: the Labels and Settings pull-downs share .lpn-popover but hang off toolbar buttons
-   and are dismissed by clicking away, so dragging one would be a gesture with nothing to return
-   it. `touch-action: none` is what lets a touch drag work at all -- without it the browser claims
-   the gesture for scrolling before pointermove ever fires. */
-#lpn_popup { cursor: move; touch-action: none; }
-#lpn_popup .lpn-popover-body { cursor: auto; }
+   THE STANDING BOXES ONLY. The menus share .lpn-popover but hang off a button and are dismissed by
+   clicking away, so dragging one would be a gesture with nothing to return it. The property popup,
+   Find and the Settings box are the three that stay put until closed, so all three drag.
+   `touch-action: none` is what lets a touch drag work at all -- without it the browser claims the
+   gesture for scrolling before pointermove ever fires. */
+#lpn_popup, #lpn_settings_box { cursor: move; touch-action: none; }
+#lpn_popup .lpn-popover-body, #lpn_settings_box .lpn-popover-body { cursor: auto; }
+/* ...and the two panes take their touch gestures BACK, or `touch-action: none` above would make
+   them unscrollable by finger. The drag surface is the box's own padded band, which these are not
+   part of. */
+.lpn-setbox-index, .lpn-setbox-content { touch-action: auto; }
 @supports (height: 100dvh) {
 	.lpn-popover { max-height: calc(100dvh - 8px); }
 	.lpn-popover-body { max-height: calc(100dvh - 56px); }
@@ -932,20 +937,39 @@ html[lang="zh"] .ec-welcome {
 
 /* The units strip is TWO GROUPS since Task 422: what you enter, and how answers are read. The
    heading is what makes the split legible, so it is quiet but not decorative -- without it the row
-   reads as one long list with three quantities inexplicably repeated. */
-.lpn-units-group { display: block; }
-.lpn-units-head { display: inline-block; min-width: 11em; font-weight: 600; opacity: .8; }
+   reads as one long list with three quantities inexplicably repeated.
+
+   EACH SELECTOR IS TWO LINES (Task 424, Tom twice): the name above, the control below. Side by
+   side, a pair is as wide as its two halves added together and eleven of them made the widest
+   thing in the Settings box; stacked, a pair is as wide as its LONGER half, and the strip wraps
+   into two or three tidy rows in a box of sensible width. `align-items: end` so a name that wraps
+   to two lines still leaves its select on the row's baseline with its neighbours. */
+.lpn-units-group { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 4px 10px; }
+.lpn-units-head { flex: 0 0 100%; font-weight: 600; opacity: .8; }
+.lpn-units-item { display: flex; flex-direction: column; align-items: stretch; }
+.lpn-units-name { font-size: .85em; opacity: .8; line-height: 1.2; }
+/* A select is as wide as its widest option unless told otherwise, and one long unit name would
+   otherwise set the width of the whole column. */
+.lpn-units-item > select { max-width: 9rem; }
 
 /* ==== The profile view (ROADMAP Task 409) ====================================================
    A chart, not a map: it shares no symbol, scale or colour rule with the drawing. The suite's
    sketch convention applies all the same -- black for what is built, blue for water -- so the
    ground is a black line, the hydraulic grade line is blue, and the pressure between them is the
    same blue at low opacity. No shading, no borders beyond the axis frame, no dimension lines. */
-/* The chart FILLS ITS TAB. Its viewBox does the fitting (preserveAspectRatio's default keeps the
-   drawing whole), so a taller pane is a bigger chart with no second layout to keep in step -- which
-   is the answer to Tom's "it is too small" (Task 433). The 36rem cap it wore as a popover is gone
-   with the popover. */
-.lpn-profile-svg { width: 100%; height: 100%; }
+/* The chart FILLS ITS TAB, IN BOTH AXES. Tom, 2026-08-18: "It should use the entire bottom pane,
+   and its relative height and width should vary to fill the available height and width."
+
+   **A FIXED viewBox CANNOT DO THAT and it is why the chart sat in a lake of white.** The viewBox
+   was a fixed 560x340 and preserveAspectRatio's default ("xMidYMid meet") letterboxes it inside
+   whatever box it is given -- so a wide pane got margins left and right and a tall one got them
+   above and below, both of them growing as the pane grew. Stretching instead ("none") is worse: it
+   distorts the text and the line weights.
+
+   So the viewBox is MEASURED from the host and rebuilt at that aspect ratio (renderProfile()), and
+   a ResizeObserver redraws it when the pane is dragged. The CSS's only job is to make the host a
+   real box for that measurement to find. */
+.lpn-profile-svg { display: block; width: 100%; height: 100%; }
 .lpn-profile-frame { fill: none; stroke: #333; stroke-width: 1; }
 .lpn-profile-grid { stroke: #ddd; stroke-width: 1; }
 .lpn-profile-axis { stroke: #333; stroke-width: 1; }
@@ -1016,7 +1040,10 @@ html[lang="zh"] .ec-welcome {
    popover. */
 .lpn-profile-panel { gap: 10px; align-items: stretch; }
 .lpn-profile-controls { flex: 0 0 15rem; overflow: auto; font-size: .9em; }
-#lpn_profile_chart { flex: 1 1 auto; min-width: 0; }
+/* `min-height: 0` matters as much as `min-width`: a flex item's default minimum is its CONTENT,
+   and without this the chart could not be measured smaller than the SVG already drawn in it, so a
+   pane dragged shorter would leave the chart overflowing rather than reflowing. */
+#lpn_profile_chart { flex: 1 1 auto; min-width: 0; min-height: 0; }
 @media (max-width: 40rem) {
 	.lpn-profile-panel { flex-direction: column; overflow: auto; }
 	.lpn-profile-controls { flex: 0 0 auto; }
@@ -1044,7 +1071,73 @@ html[lang="zh"] .ec-welcome {
 .lpn-pane-goto { text-decoration: underline; }
 .lpn-pane-sort:hover, .lpn-pane-goto:hover { color: #0645ad; }
 
-/* ==== The right panel: Visibility (ROADMAP Tasks 427 and 434) ================================
+/* ==== The Settings box (ROADMAP Task 441) ====================================================
+   One box for everything that belongs to the whole project. A FLOATING BOX, not a pull-down: it
+   drags by its chrome and closes by its X, like the property popup and Find.
+
+   TWO PANES: an index that scrolls on its own, and a content pane that scrolls on its own. The
+   box carries an explicit height, because two independently-scrolling columns need a container
+   with a height to scroll INSIDE -- an auto-height box would simply grow and put the scrollbar on
+   the page, which this page does not have (Task 432).
+
+   The size is CSS, not JS: `min()` against the viewport is the clamp, so there is no measure-then-
+   write pass to get wrong and the box re-fits a resized window by itself. JS writes only
+   `display: flex` / `display: none` and a left/top. */
+.lpn-setbox {
+	width: min(60rem, 94vw);
+	height: min(38rem, 84vh);
+	flex-direction: column;
+	box-sizing: border-box;
+}
+/* The title sits in the 40px drag band, left of the X. It is text, not a control, so it never
+   swallows a drag: `e.target` on a pointerdown here is the title, not the box -- hence
+   pointer-events:none, which hands the whole band back to the box's own drag handler. */
+.lpn-setbox-title {
+	position: absolute; top: 10px; left: 12px; font-weight: bold; pointer-events: none;
+}
+.lpn-setbox-body { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.lpn-setbox-search { flex: 0 0 auto; padding-bottom: 6px; }
+.lpn-setbox-search input { width: 100%; box-sizing: border-box; padding: 3px 6px; }
+.lpn-setbox-panes { display: flex; flex: 1 1 auto; min-height: 0; gap: 10px; }
+/* The index. Its own scrollbar, because it is as long as the content is and the two do not scroll
+   together -- that non-coupling is the whole point of the paradigm. */
+.lpn-setbox-index {
+	flex: 0 0 12rem; min-width: 0; overflow: auto;
+	border-right: 1px solid #ddd; padding-right: 6px; font-size: .9em;
+}
+.lpn-setbox-content { flex: 1 1 auto; min-width: 0; overflow: auto; font-size: .9em; }
+/* An index row is flat text, like a menu row: it is a destination, not a command. The SUB rows are
+   indented under their section, which is what makes the two levels readable at a glance. */
+.lpn-setbox-link {
+	display: block; width: 100%; text-align: left; background: none; border: 0;
+	font: inherit; padding: 2px 4px; cursor: pointer; color: inherit;
+}
+.lpn-setbox-link:hover, .lpn-setbox-link:focus { background: #eef4ff; color: #0645ad; }
+.lpn-setbox-link.lpn-setbox-link-sec { font-weight: bold; margin-top: 4px; }
+.lpn-setbox-link.lpn-setbox-link-sub { padding-left: 16px; }
+.lpn-setbox-link[aria-current="true"] { background: #eef4ff; font-weight: bold; }
+.lpn-setbox-none { margin: 8px 4px; opacity: .8; }
+/* A section heading STICKS to the top of the content pane while its section is being read, so a
+   long scroll never leaves the reader wondering which section they are in. */
+.lpn-set-head {
+	position: sticky; top: 0; z-index: 1; background: #fff; margin: 0 0 4px;
+	padding: 4px 0; font-size: 1.05em; font-weight: bold; border-bottom: 1px solid #ccc;
+}
+.lpn-set-sec { margin-bottom: 14px; }
+/* A sub-heading, with NO disclosure triangle: nothing here collapses (Tom, 2026-08-18: "No need
+   ever to collapse; just scroll/jump to your section"), and a triangle on something that cannot
+   disclose is a lie about the control. */
+.lpn-set-sub { margin-top: 8px; font-weight: bold; }
+.lpn-set-subbody { margin-left: 8px; }
+/* The two scope markers, "Project settings" and "Calculator settings". Quieter than a sub-heading
+   because they label a SCOPE rather than name a place you can jump to. */
+.lpn-set-group { margin-top: 10px; font-weight: bold; opacity: .75; text-transform: none; }
+/* The Settings box is where the Labels lists live now, and the affix/decimals/priority columns in
+   them are the widest thing in it. Anchored at 1rem for the reason Task 435 found: the headings
+   and the controls must share a font size or the columns walk. */
+#lpn_settings_box .lpn-set-secbody { font-size: 1rem; }
+
+/* ==== The right panel: EMPTY, and kept (ROADMAP Tasks 427, 434 and 441) ======================
    A FIXED OVERLAY over the right edge of the map, placed from the canvas's rect by
    positionRightPane(). It takes nothing away from the measured canvas height (Task 432) and gives
    nothing back, so the map's one measured number stays one number.
@@ -1072,17 +1165,14 @@ html[lang="zh"] .ec-welcome {
 /* The body scrolls INSIDE the panel: the page may not scroll (Task 432), and the label lists are
    longer than any window this panel will ever be given. */
 .lpn-rpane-body { flex: 1 1 auto; overflow: auto; padding: 6px 8px; font-size: .9em; }
-/* Collapse, not a two-pane index -- Tom's own rule: "Two-pane for very long lists and collapse for
-   shorter lists." <details> is the native form, so the disclosure triangle, the keyboard and the
-   screen reader announcement all come free. */
-.lpn-rp-sec > summary {
-	font-weight: bold; cursor: pointer; padding: 4px 0; border-bottom: 1px solid #eee;
-	margin-bottom: 4px;
-}
+/* What the panel says while it holds nothing. */
+.lpn-rpane-empty { margin: 0; opacity: .8; }
+/* The one row shape shared by the colour controls, which moved to the Settings box but kept their
+   markup: a name that takes the slack and a control at the right. */
 .lpn-rp-row { display: flex; align-items: center; gap: 6px; margin: 3px 0; }
 .lpn-rp-row > span:first-child { flex: 1 1 auto; }
 .lpn-rp-credit { font-size: .85em; opacity: .7; margin-top: 6px; }
-/* The colour key is a WAY IN to this panel now (Task 427), so it has to take a click -- the
+/* The colour key is a WAY IN to the Coloring section (Task 427), so it has to take a click -- the
    overlay stack is pointer-events:none by default and this one cell opts back in. */
 .lpn-color-legend { pointer-events: auto; cursor: pointer; }
 

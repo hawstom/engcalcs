@@ -23,6 +23,7 @@ const L = loadLoopedNetwork(
 	"\t\tgetSettings: function () { return settings; },\n" +
 	"\t\trefreshValueColors: refreshValueColors,\n" +
 	"\t\trebuildSettingsFields: rebuildSettingsFields,\n" +
+	"\t\tbuildColoringSection: buildColoringSection,\n" +
 	"\t\tequalIntervalBreaks: equalIntervalBreaks, equalCountBreaks: equalCountBreaks,\n" +
 	"\t\teffectiveBreaks: effectiveBreaks, bandColor: bandColor, colorForValue: colorForValue,\n" +
 	"\t\tcolorNodeValue: colorNodeValue, colorLinkValue: colorLinkValue,\n" +
@@ -311,18 +312,21 @@ console.log('== colour key ==');
 	ok('an automatic key says it is automatic', /Automatic/i.test(allText(L.legendBox())));
 }
 
-// ---- 8. the settings section builds ------------------------------------------------------------
-console.log('== settings section ==');
+// ---- 8. the Coloring section of the Settings box builds -----------------------------------------
+//
+// It used to be a collapsible section INSIDE rebuildSettingsFields(), and a duplicate of it lived in
+// the right pane. Task 441 merged the two into buildColoringSection(), one section of the Settings
+// box -- so this reads #lpn_set_colors and no longer opens anything, because nothing collapses.
+console.log('== Coloring section ==');
 {
 	fresh('us');
 	const s = L.getSettings();
-	s.sectionsOpen.colors = true;
 	s.colorNodeField = 'pressure';
 	s.colorLinkField = 'velocity';
 	let threw = null;
-	try { L.rebuildSettingsFields(); } catch (e) { threw = e; }
-	ok('the Color by value section renders without throwing', threw === null, threw && threw.message);
-	const panel = byId.lpn_settings_fields;
+	try { L.buildColoringSection(); } catch (e) { threw = e; }
+	ok('the Coloring section renders without throwing', threw === null, threw && threw.message);
+	const panel = byId.lpn_set_colors;
 	const t = allText(panel);
 	ok('it offers the ramp choices', /EPANET/.test(t), t.slice(0, 200));
 	ok('it offers both auto-assign buttons', /Equal intervals/.test(t) && /Equal counts/.test(t));

@@ -56,13 +56,16 @@ exports.run = async function ({ browser, report }) {
 		await a.goto();
 		await a.dismissGallery();
 		await a.makeEdit();
-		// Since Task 427 the Labels button opens the Visibility panel at the right of the map, and
-		// the checkbox lists are a section of it rather than a pull-down of their own.
+		// The Labels button opened a pull-down, then the Visibility panel (Task 427), and since Task
+		// 441 it opens the Settings box on its Labels section. The columns being measured travelled
+		// through all three moves unchanged, which is the point of measuring them here rather than
+		// asserting a stylesheet rule.
 		await a.toolbarClick('Labels');
-		await a.settle(400);
+		await a.settle(500);
 		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_rpane').style.display === 'flex' &&
-			document.getElementById('lpn_rp_labels_sec').open), 'the Labels panel opens');
+			document.getElementById('lpn_settings_box').style.display === 'flex' &&
+			!!document.querySelector('#lpn_set_sec_labels #lpn_labels_node_fields')),
+			'the Labels section opens in the Settings box');
 
 		for (const list of LISTS) {
 			const got = await columns(a, list.id);

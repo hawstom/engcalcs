@@ -1,13 +1,17 @@
-// §14 — colour by value: a dropdown for nodes and one for links (ROADMAP Task 427).
+// §14 — colour by value: a dropdown for nodes and one for links (ROADMAP Tasks 427 and 441).
 //
 // The mode shipped with Task 384 inside Settings, and Task 327 pulled it onto the toolbar as ONE
 // select doing both fields. Tom, 2026-08-18: "I do see the beauty of the one control ... but it's
 // not the expectation" — EPANET and epanet-js both give nodes and links a dropdown each, and the
 // single control's habit of clearing the other field is what made it surprising.
 //
-// So the two dropdowns live in the Visibility panel at the right of the map, and this is a browser
-// check because every claim here is about REACHABILITY: the button that opens the panel exists, the
-// legend is a second way in, and the two fields no longer clear each other.
+// The two dropdowns went to the Visibility panel and then, the same day, into the **Coloring
+// section of the Settings box** — Tom: "Combine Labels settings, present design Settings, Time
+// settings ... and Coloring into the Settings box." That move also killed the duplicate copy of
+// these controls that had been living inside the Settings panel, which is asserted here as a count.
+//
+// This is a browser check because every claim is about REACHABILITY: the buttons that open the box
+// exist, the legend is a second way in, and the two fields no longer clear each other.
 
 const { Session } = require('../lib/session');
 
@@ -44,22 +48,22 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();
 		await a.makeEdit();
 
-		// The button Tom could not find, at the right end of the strip beside the bottom-pane
-		// toggle. Named by its aria-label, because the strip is icons only now.
-		const paneShut = await a.page.evaluate(() =>
-			document.getElementById('lpn_rpane').style.display === 'none');
-		report.ok(paneShut, 'the Visibility panel starts closed');
-		await a.toolbarClick('Visibility');
-		await a.settle(300);
+		const shut = await a.page.evaluate(() =>
+			document.getElementById('lpn_settings_box').style.display === 'none');
+		report.ok(shut, 'the Settings box starts closed');
+		// The toolbar's Settings button. Named by its aria-label, because the strip is icons only.
+		await a.toolbarClick('Settings');
+		await a.settle(400);
 		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_rpane').style.display === 'flex'), 'the toolbar button opens it');
+			document.getElementById('lpn_settings_box').style.display === 'flex'),
+			'the toolbar button opens it');
 
 		const opts = await a.page.evaluate(() => {
 			const read = (id) => {
 				const s = document.getElementById(id);
 				return s ? [...s.options].map(o => ({ v: o.value, t: o.textContent })) : null;
 			};
-			return { node: read('lpn_rp_color_node'), link: read('lpn_rp_color_link') };
+			return { node: read('lpn_set_color_node'), link: read('lpn_set_color_link') };
 		});
 		report.ok(!!opts.node && !!opts.link, 'nodes and links have a dropdown each');
 		report.ok(opts.node && opts.node[0].v === '', 'nodes start at no colour', opts.node && opts.node[0].t);
@@ -74,46 +78,56 @@ exports.run = async function ({ browser, report }) {
 		// The ramp picker speaks ColorBrewer: sequential and diverging, which is the vocabulary
 		// matplotlib, d3, QGIS and ArcGIS all use. epanet-js says "Continuous"; we do not.
 		const families = await a.page.evaluate(() =>
-			[...document.querySelectorAll('#lpn_rp_ramp optgroup')].map(g => g.label));
+			[...document.querySelectorAll('#lpn_set_ramp optgroup')].map(g => g.label));
 		report.eq(families.length, 2, 'the ramps are grouped into families', families.join(' | '));
 		report.has(families.join(' | ').toLowerCase(), 'sequential', 'the standard word, not "continuous"');
 		report.has(families.join(' | ').toLowerCase(), 'diverging', 'and diverging beside it');
 
-		await pick(a, 'lpn_rp_color_node', 'pressure');
+		// **ONE COLOUR EDITOR, NOT TWO** (Task 441). The Settings panel used to carry a second copy
+		// of these controls over the same settings, and the two had already drifted apart. Asserted
+		// by counting the node-field select in the whole document: a second editor is a second one.
+		report.eq(await a.page.evaluate(() =>
+			document.querySelectorAll('#lpn_settings_box select[id$="_color_node"]').length), 1,
+			'there is exactly one node-colour dropdown in the box');
+
+		await pick(a, 'lpn_set_color_node', 'pressure');
 		report.eq((await storedFields(a)).node, 'pressure', 'choosing a node field stores it on the project');
 
 		// **THE WHOLE POINT OF TASK 427**: the link field does NOT clear the node field. Both can be
 		// coloured at once, and renderColorLegend() draws a block for each.
-		await pick(a, 'lpn_rp_color_link', 'velocity');
+		await pick(a, 'lpn_set_color_link', 'velocity');
 		const both = await storedFields(a);
 		report.eq(both.link, 'velocity', 'choosing a link field stores that too');
 		report.eq(both.node, 'pressure', '...and leaves the node field alone — one each, not one between them');
-		// ...and the panel gives each of them its own range editor, which is the other half of
+		// ...and the section gives each of them its own range editor, which is the other half of
 		// "one each": a single set of band limits over two different quantities would be nonsense.
 		// Asserted on the RANGES rather than on the legend, because the legend only draws a block
 		// for a field that has values on the map, and a one-junction network before a solve has
 		// none — which is a fact about the network, not about this feature.
 		const ranges = await a.page.evaluate(() =>
-			[...document.querySelectorAll('#lpn_rp_colors div')]
+			[...document.querySelectorAll('#lpn_set_colors div')]
 				.filter(d => d.style.fontWeight === 'bold').map(d => d.textContent));
 		report.eq(ranges.length, 2, 'each coloured field gets its own band limits', ranges.join(' | '));
 
 		// The legend is the second door in — it is the chrome already telling the user what the
-		// colours mean.
-		await a.page.evaluate(() => { document.getElementById('lpn_rpane_close').click(); });
+		// colours mean — and since Task 441 it opens the box on its Coloring section.
+		await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
 		await a.settle(200);
 		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_rpane').style.display === 'none'), 'the X closes the panel');
+			document.getElementById('lpn_settings_box').style.display === 'none'), 'the X closes the box');
 		await a.page.evaluate(() => { document.getElementById('lpn_color_legend').click(); });
-		await a.settle(300);
+		await a.settle(400);
 		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_rpane').style.display === 'flex'), 'clicking the legend opens it again');
-		report.ok(await a.page.evaluate(() =>
-			document.getElementById('lpn_rp_colors_sec').open), '...on the colours section');
-
-		// Labels moved here too, and this is the door the toolbar's Labels button now uses.
-		report.ok(await a.page.evaluate(() =>
-			!!document.querySelector('#lpn_rpane #lpn_labels_node_fields')), 'the label checkboxes live here now');
+			document.getElementById('lpn_settings_box').style.display === 'flex'),
+			'clicking the legend opens it again');
+		// It lands ON the Coloring section rather than merely opening: the content pane is scrolled
+		// so that section's heading is at its top.
+		report.ok(await a.page.evaluate(() => {
+			const pane = document.getElementById('lpn_setbox_content');
+			const head = document.querySelector('#lpn_set_sec_coloring .lpn-set-head');
+			if (!pane || !head) { return false; }
+			return Math.abs(head.getBoundingClientRect().top - pane.getBoundingClientRect().top) < 40;
+		}), '...scrolled to the Coloring section, not merely opened');
 
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript');
 	} finally {

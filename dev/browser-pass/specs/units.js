@@ -28,6 +28,41 @@ exports.run = async function ({ browser, report }) {
 		// the spec objecting -- it did, the day the headings became "Input units" / "Results units".
 		report.ok(/input/i.test(strip[0].head) && /result/i.test(strip[1].head),
 			'...one for the inputs, one for the results', strip.map(g => g.head).join(' | '));
+
+		// **EACH SELECTOR IS TWO LINES: NAME ABOVE, CONTROL BELOW** (ROADMAP Task 424, Tom twice:
+		// "the units strip is too wide"). Measured rather than asserted from the markup, because the
+		// claim is about LAYOUT: the name's box must sit entirely above the select's, and a stacked
+		// pair must be no wider than its own wider half. Side by side, eleven pairs made the widest
+		// thing in the Settings box and forced the box to be as wide as the strip.
+		//
+		// The strip is measured INSIDE the Settings box, where it actually renders — in its parking
+		// holder it is display:none and every rect is zero.
+		await a.makeEdit();
+		await a.toolbarClick('Settings');
+		await a.settle(500);
+		const items = await a.page.evaluate(() =>
+			[...document.querySelectorAll('#lpn_units_strip .lpn-units-item')].map((it) => {
+				const name = it.querySelector('.lpn-units-name').getBoundingClientRect();
+				const sel = it.querySelector('select').getBoundingClientRect();
+				const box = it.getBoundingClientRect();
+				return {
+					stacked: name.bottom <= sel.top + 1,
+					width: box.width,
+					widest: Math.max(name.width, sel.width)
+				};
+			}));
+		report.ok(items.length === 11, 'every selector is wrapped as its own item', String(items.length));
+		report.ok(items.every(i => i.stacked), 'the name sits ABOVE its control, not beside it',
+			String(items.filter(i => !i.stacked).length) + ' still side by side');
+		report.ok(items.every(i => i.width <= i.widest + 2),
+			'...so a pair is as wide as its wider half, not as wide as both added together');
+		// And the strip therefore fits the box it is in, with no sideways scroll of its own.
+		report.ok(await a.page.evaluate(() => {
+			const c = document.getElementById('lpn_setbox_content');
+			return c.scrollWidth <= c.clientWidth + 2;
+		}), 'the Settings box does not scroll sideways to show the strip');
+		await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
+		await a.settle(200);
 		// The three quantities that serve both sides appear on BOTH rows. That duplication is the
 		// whole shape of the task, so it is asserted rather than left to the eye.
 		['lpn_u_elevhead', 'lpn_u_pressure', 'lpn_u_flow'].forEach((n) => {

@@ -259,6 +259,7 @@
 			level: pageConfig.lpn_time_level || 'Water level',
 			// Read by js/looped-network.js's own tab strip, not here; listed so the bridge check
 			// sees them, because the tab row names them by key and nothing else does.
+			settingsOpen: pageConfig.lpn_time_settings_open || 'Time settings',
 			menu: pageConfig.lpn_time_menu || 'Time',
 			menuTip: pageConfig.lpn_time_menu_tip || 'Set how long this network runs, and step through it.'
 		};
@@ -393,17 +394,22 @@
 		return d.times;
 	}
 	function commitField(key, text) {
+		// **BOTH HALVES REDRAW, because the fields and the transport are in different boxes now.**
+		// The seven inputs live in the Settings box and the play/slider in the pane, and an edit to
+		// the duration changes what both of them say. Rejecting an entry redraws only the fields --
+		// nothing about the run changed, so redrawing the transport would be a flicker for nothing.
+		var probe = EC.lpnParseTime(String(text).trim().split(/\s+/)), times;
 		// Probed BEFORE the snapshot, so text that is not a time costs nothing: an undo step that
 		// undoes nothing is worse than no undo step, because it eats a real one off a 20-deep stack.
-		var probe = EC.lpnParseTime(String(text).trim().split(/\s+/)), times;
-		if (probe === null || !isFinite(probe) || probe < 0) { renderPanel(); return; }
+		if (probe === null || !isFinite(probe) || probe < 0) { EC.lpnTimeRenderSettings(); return; }
 		host.snapshot();
 		times = ensureTimes();
-		if (!EC.lpnTimeSetField(times, key, text)) { renderPanel(); return; }
+		if (!EC.lpnTimeSetField(times, key, text)) { EC.lpnTimeRenderSettings(); return; }
 		// A shorter run can leave the transport past the end of it.
 		clampTime();
 		host.save();
 		host.solve();
+		EC.lpnTimeRenderSettings();
 		renderPanel();
 	}
 
@@ -435,22 +441,32 @@
 		return e;
 	}
 
-	function renderPanel() {
-		var panel = panelEl(), S = strings(), times, stops, form, transport;
+	/**
+	 * **THE SEVEN [TIMES] FIELDS, IN THE SETTINGS BOX** (ROADMAP Task 441). Tom, 2026-08-18:
+	 * "Combine Labels settings, present design Settings, Time settings (from the bottom pane), and
+	 * Coloring into the Settings box with a simple rule: 'If it's for the entire project, it's in
+	 * Settings.'" A run duration and a reporting step are properties of the whole project by any
+	 * reading, so they are settings and they moved.
+	 *
+	 * **THE TRANSPORT DID NOT MOVE, AND THE RULE IS WHY.** Play, step and the slider change WHICH
+	 * MOMENT YOU ARE LOOKING AT and never touch the document -- they are a viewing control, the
+	 * same kind of thing as pan and zoom, and pan and zoom are not settings either. So the tab
+	 * keeps them, beside the tank levels they explain.
+	 *
+	 * Called by js/looped-network.js's rebuildSettingsBox(). Silent when the host section is not on
+	 * the page, so a page without the Settings box still gets the transport.
+	 */
+	EC.lpnTimeRenderSettings = function () {
+		var panel = document.getElementById('lpn_set_time_fields'), S = strings(), times;
 		if (!panel || !host) { return; }
-		// A drag in progress owns the slider; rebuilding it under the pointer would drop the grab.
-		if (state.dragging) { updateReadout(); return; }
 		times = docTimes() || EC.lpnTimesDefaults();
 		panel.textContent = '';
-
-		// -- the settings form (Task 248.01) --
-		form = el('div', { class: 'lpn-time-form', style: 'display:flex;flex-wrap:wrap;gap:.4rem 1rem;padding:.4rem .6rem' });
 		EC.LPN_TIME_FIELDS.forEach(function (pair) {
 			// **DECLARED IN HERE, not shared across the seven.** Hoisted to the function above,
 			// every listener would close over the LAST input built, so editing the duration would
 			// commit whatever was sitting in the start-clock box.
-			var row = el('label', { style: 'display:flex;align-items:center;gap:.35rem' }),
-				label = el('span', { class: 'ec-help', title: S.formatTip }, S[pair[0]]),
+			var row = el('label', { class: 'lpn-time-row', style: 'display:flex;align-items:center;gap:.35rem;margin:.15rem 0' }),
+				label = el('span', { class: 'ec-help', title: S.formatTip, style: 'flex:1 1 auto' }, S[pair[0]]),
 				input = el('input', {
 					type: 'text', size: '7', inputmode: 'text',
 					// **THE FILE'S OWN TEXT, WHILE IT STILL SAYS THIS NUMBER.** lpnTimeText hands
@@ -462,9 +478,30 @@
 			input.addEventListener('change', function () { commitField(pair[0], input.value); });
 			row.appendChild(label);
 			row.appendChild(input);
-			form.appendChild(row);
+			panel.appendChild(row);
 		});
-		panel.appendChild(form);
+		if (EC.initTips) { EC.initTips(panel); }
+	};
+
+	function renderPanel() {
+		var panel = panelEl(), S = strings(), times, stops, transport, open;
+		if (!panel || !host) { return; }
+		// A drag in progress owns the slider; rebuilding it under the pointer would drop the grab.
+		if (state.dragging) { updateReadout(); return; }
+		times = docTimes() || EC.lpnTimesDefaults();
+		panel.textContent = '';
+
+		// **THE ONE DOOR FROM THE TRANSPORT TO ITS SETTINGS.** The seven fields left this tab for
+		// the Settings box, and a user who came here to change the duration would otherwise have to
+		// be told where it went by somebody. A button that opens the box on the Time section is
+		// that telling, and it costs one string.
+		open = el('button', {
+			type: 'button', class: 'btn btn-sm btn-outline-secondary ec-help',
+			style: 'margin:.3rem .6rem',
+			title: S.menuTip
+		}, S.settingsOpen);
+		open.addEventListener('click', function () { if (host.openSettings) { host.openSettings('time'); } });
+		panel.appendChild(open);
 
 		// -- the transport (Task 248 / 410) --
 		if (!EC.lpnTimeIsExtended(times)) {

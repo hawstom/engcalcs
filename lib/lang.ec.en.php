@@ -2219,3 +2219,14 @@ $ec_lang['lpn_time_next']='Step forward';
 $ec_lang['lpn_time_last']='Go to the end';
 $ec_lang['lpn_time_tank']='Tank';
 $ec_lang['lpn_time_level']='Water level';
+
+// ---- The Settings box (ROADMAP Task 441) ----------------------------------------------------
+// One box for everything that belongs to the whole project: Labels, Settings, Time and Coloring,
+// with an index down the left and a search across the top. The section titles are not new keys --
+// each borrows the name it already had (lpn_tool_labels, lpn_menu_settings, lpn_time_menu,
+// lpn_settings_colors), so the box cannot drift from the doors that open it.
+$ec_lang['lpn_settings_search']='Search settings';
+$ec_lang['lpn_settings_search_tip']='Type a word to see only the settings that mention it. The explanations are searched too, not just the names.';
+$ec_lang['lpn_settings_no_match']='No setting mentions that word.';
+$ec_lang['lpn_rpane_empty']='Nothing is docked here yet. Everything that belongs to the whole project is in Settings.';
+$ec_lang['lpn_time_settings_open']='Time settings';

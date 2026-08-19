@@ -390,21 +390,16 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     we could offer that."*
   - **Flow direction arrows stay.** epanet-js has none; Tom: *"I like that we do."* Recorded so a
     future tidy-up does not quietly remove them in the name of matching.
-- 60|284| **Settings panel: an index pane on the left, content on the right, nothing collapsing.**
-  **RAISED 25 -> 60 (Tom, 2026-08-18): everything EPANET keeps in View > Options and Project >
-  Defaults belongs under our Settings, in this two-pane index paradigm, replacing the collapse
-  paradigm entirely.** *"No need ever to collapse; just scroll/jump to your section."* That makes
-  this the container Time analysis needs, not a tidy-up. It sits in Task 434's three-pane frame.
-  Tom, 2026-08-11, from epanet-js: *"the Settings box has a left 'index' pane and a right 'content'
-  pane. When you click a heading in the left pane, the right pane scrolls to your desired heading.
-  And the right pane never collapses. This is a very conventional web paradigm."*
-  - Headings AND sub-headings in both panes; in the right pane the current heading and sub-heading
-    stick to the top rather than scrolling away.
-  - **Retiring the collapsible sections strands `settings.sectionsOpen`** (`idPrefixes`, `defaults`,
-    `mapDisplay`, `computation`, `files`). Decide whether it becomes a scroll position or is dropped
-    and left stale the way `fileAutosaveSeconds` was.
+- 35|284| **Settings box follow-ups, after the two-pane box shipped (Task 441).** The paradigm is in
+  place; what is left is the part that needs a second design.
+  - **The sticky heading is the SECTION only.** Tom asked for the current heading *and sub-heading*
+    to stick. Sub-headings scroll away today, which needs a second sticky level and a rule for what
+    happens when a short sub-section is on screen with its neighbour.
   - **Narrow screen is a second design, so scope it as two.** The index probably collapses to a
     drop-down under a breakpoint. Argue it on its own merits, never from phone use — Task 285.
+  - **`settings.sectionsOpen` is now stale, deliberately.** Nothing reads it; `defaultSettings()`
+    still writes it so old and new project files keep one shape. Drop it only alongside a storage
+    version bump, the way `fileAutosaveSeconds` was left.
 - 20|285| **We do not know what devices anybody uses this on, and several decisions have quietly
   assumed an answer.** Tom, 2026-08-11: *"we don't know whether anybody uses this on a phone."*
   `log-human-view.php` and `log-calc-event.php` record **page and language and nothing else**, so
@@ -571,20 +566,38 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     describe the gate as one (`dev/positioning.md` §6). Tom, 2026-08-14: *"we have no less technical
     authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
     all public domain."*
+- 40|441| **The Settings box shipped 2026-08-18, and it is where whole-project settings live.** One
+  draggable, closeable, two-pane box (`#lpn_settings_box`): an index derived from the content on the
+  left, four sections on the right — **Labels**, **Settings**, **Time**, **Coloring** — and a filter
+  across the top that matches TIPS as well as titles. Tom's rule, and it settles every future
+  "where does this control live" question: *"If it's for the entire project, it's in Settings."*
+  Per-element stays in the property popup. `dev/browser-pass/specs/visibility.js`.
+  - **Nothing collapses** (Tom: *"No need ever to collapse; just scroll/jump to your section."*),
+    which discharged the collapse half of Task 284; what is left of that task is the sub-heading
+    sticky and the narrow-screen design.
+  - **It merged two colour editors into one.** The right pane's and the Settings panel's wrote the
+    same keys and had already drifted — one had the ramp families, the other the legend position.
+  - **The right pane survives, EMPTY** (Tom: *"For now we can keep the right pane, but empty it."*),
+    and no longer covers the legend: an open panel publishes its width as `--lpn-overlay-right`,
+    which every right-hand overlay adds to its inset.
+  - **OPEN, and Tom raised it without asking for it yet:** docking left or right, and an AutoCAD-style
+    anchor-and-flyout with autohide. Nothing in the box is designed against it — it is one element
+    with one placement function.
+
 - 45|434| **Both panes shipped 2026-08-18.** BOTTOM: `#lpn_pane`, docked below the canvas in normal
   flow, resizable by its top grip, remembering height/open/tab per browser in `lpn_pane`. Tabs:
-  **Profile** and **Junctions** (sortable, editing through `setProp()`). RIGHT: `#lpn_rpane`
-  **Visibility** — Labels (moved here whole from its pull-down) and Color by value, collapsing
-  `<details>` sections, width/open per browser in `lpn_rpane`. Both toggles are the right-edge
-  toolbar group beside Find. Harnesses `dev/lpn-spike/pane-harness.js`,
-  `dev/browser-pass/specs/{profile,visibility}.js`.
+  **Profile** and **Junctions** (sortable, editing through `setProp()`). RIGHT: `#lpn_rpane`,
+  which held Labels and Color by value for part of one day and is now **empty and kept** — Task 441
+  moved both into the Settings box, at Tom's word, and left the frame standing for whatever docks
+  next. Width/open per browser in `lpn_rpane`. Both toggles are the right-edge toolbar group beside
+  Find. Harnesses `dev/lpn-spike/pane-harness.js`, `dev/browser-pass/specs/{profile,visibility}.js`.
   - **The pane is in normal FLOW, and that is the whole mechanism.** `flowBelowMap()` measures
     `body.bottom - svg.bottom`, so the map gives up exactly the pane's height *by measurement* — the
     pane never writes a canvas height and never touches `serializeProject()`.
   - **The RIGHT pane is an OVERLAY, and deliberately not in flow.** It takes no height from the map,
     so the one measured number stays one number; a ResizeObserver on the canvas keeps it registered.
-  - **NO LEFT PANE, ever** (Tom: "Don't copy the epanetjs left pane"). Settings is still its own
-    pull-down and the harness asserts neither it nor Labels is a bottom-pane tab.
+  - **NO LEFT PANE, ever** (Tom: "Don't copy the epanetjs left pane"). Settings is a floating box
+    (Task 441), not a pane, and the harness asserts neither it nor Labels is a bottom-pane tab.
   - **OPEN: Settings joins the right pane as its third section** — Tom's (c). Left out of this pass
     because Settings carries the units block and the solver numbers, which is a move worth doing on
     its own. The property popup stays as it is: Tom calls it good.
@@ -601,8 +614,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     along the path, click to add a waypoint, double-click to end. Not two pull-downs.
 
 - 40|427| **Two dropdowns shipped 2026-08-18; what is left is documenting the CHOICE.** Nodes and
-  links have a dropdown each in the Visibility panel, neither clears the other, and clicking the
-  legend opens the panel on its colours section. `dev/browser-pass/specs/color.js`.
+  links have a dropdown each in the Settings box's Coloring section, neither clears the other, and
+  clicking the legend opens the box on that section. `dev/browser-pass/specs/color.js`.
   - **OPEN: once a field is chosen the picker is poorly documented** for anyone who opens the
     project later. Candidate home: the bottom of the map, rightward, under or replacing the legend
     title.
@@ -644,11 +657,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   every unit at once, which under Task 422's rule is a reinterpretation of the whole document. Label
   them *Non-destructive (doesn't rewrite inputs)* — or whatever wording Task 425 settles on, so the
   two agree.
-
-- 45|424| **The units strip is too wide.** Tom, 2026-08-18: wrap each selector onto two lines (label
-  above control) plus the group heading, to hold the Settings box to a sensible width.
-  - He notes the current width *"reminds me of the two-pane paradigm"* — which is Task 284, and is
-    the direction he wants anyway; this is the narrow version until that lands.
 
 - 40|432| **A window scrollbar should not exist on this page.** Tom, 2026-08-18: *"Our bottom controls
   bar should be the hard bottom of the page."* The map is a full-window drawing surface; anything

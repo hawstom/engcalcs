@@ -228,27 +228,54 @@ console.log('\n--- Find and the pane toggle, at the right edge ---');
 // pane of epanet-js is not wanted at all. Recorded as a check because "we decided not to" is
 // exactly the kind of ruling a later pass re-litigates by accident.
 //
-// LABELS MOVED, and to the RIGHT pane rather than back into a pull-down (Task 427, Tom the same
-// day: "Labels becomes Visibility ... and serves our label settings plus color ramping"). So the
-// ruling this guards is now two-sided: not a bottom-pane tab, and not two homes either -- the
-// checkbox lists exist ONCE, in #lpn_rpane.
+// LABELS MOVED TWICE: to the right pane (Task 427), and then into the Settings box (Task 441, Tom
+// abandoning the right pane's contents the same day). So the ruling this guards is now three-sided:
+// not a bottom-pane tab, not a pull-down of its own, and NOT TWO HOMES -- the checkbox lists exist
+// exactly once, inside #lpn_settings_box.
 console.log('\n--- the rulings that are easiest to undo by accident ---');
 {
 	const tabs = src.slice(src.indexOf('var paneTabs = ['), src.indexOf('var paneState ='));
 	report(!/settings|labels/i.test(tabs), 'Settings and Labels are not tabs of the bottom pane');
-	report(php.indexOf('lpn_settings_popup') > 0, '...Settings is still its own pull-down');
-	report(php.indexOf('lpn_labels_popup') < 0, '...and the Labels pull-down is gone, not duplicated');
-	const rp = php.indexOf('id="lpn_rpane"');
-	report(rp > 0, 'the Visibility panel is in the page');
-	['lpn_labels_node_fields', 'lpn_labels_link_fields', 'lpn_labels_options', 'lpn_rp_colors'].forEach((id) => {
+	report(php.indexOf('lpn_labels_popup') < 0, 'the Labels pull-down is gone, not duplicated');
+	report(php.indexOf('lpn_settings_popup') < 0,
+		'...and so is the Settings pull-down — Settings is the two-pane box now');
+	const box = php.indexOf('id="lpn_settings_box"');
+	report(box > 0, 'the Settings box is in the page');
+	['lpn_labels_node_fields', 'lpn_labels_link_fields', 'lpn_labels_options',
+		'lpn_settings_fields', 'lpn_set_time_fields', 'lpn_set_colors'].forEach((id) => {
 		const at = php.indexOf('id="' + id + '"');
-		report(at > rp, `...and ${id} lives inside it`, at < 0 ? 'missing' : '');
+		report(at > box, `...and ${id} lives inside it`, at < 0 ? 'missing' : '');
 	});
+	// The two panes and the search, which are what makes it the paradigm Tom named rather than a
+	// tall pull-down with an X on it.
+	report(php.indexOf('id="lpn_setbox_index"') > box, 'it has an index pane');
+	report(php.indexOf('id="lpn_setbox_content"') > box, '...and a content pane');
+	report(php.indexOf('id="lpn_setbox_filter"') > box, '...and a filter across the top');
+	report(php.indexOf('id="lpn_setbox_close"') > box, '...and an X, because it is a box, not a menu');
+	report(/makePanelDraggable\(box/.test(fnBody('wireSettingsBox')),
+		'...and it drags by its chrome, like the property popup');
+	// NOTHING COLLAPSES (Tom: "No need ever to collapse; just scroll/jump to your section"). The
+	// <details> the right pane used are gone, and section() no longer builds a disclosure button.
+	report(!/lpn-rp-sec/.test(php), 'no collapsing <details> sections are left in the page');
+	report(!/aria-expanded/.test(fnBody('rebuildSettingsFields')),
+		'...and the Settings sub-headings are headings, not disclosure buttons');
+	// THE RIGHT PANE SURVIVES, EMPTY (Tom: "For now we can keep the right pane, but empty it").
+	const rp = php.indexOf('id="lpn_rpane"');
+	report(rp > 0, 'the right pane is still in the page');
+	report(php.indexOf('id="lpn_rpane_empty"') > rp, '...and says it is empty rather than being blank');
+	report(php.indexOf('id="lpn_rpane_grip"') > rp, '...and keeps its grip, ready for whatever docks next');
 	// One home, not two: a second copy of any of these ids is a second checkbox list, and the two
 	// would drift the first time one of them was rebuilt.
 	['lpn_labels_node_fields', 'lpn_labels_link_fields'].forEach((id) => {
 		report(php.split('id="' + id + '"').length === 2, `${id} exists exactly once`);
 	});
+	// AND THE LEGEND IS NOT COVERED (Tom: "The right pane covers the map, including the labels
+	// legend"). A right-hand legend position carries the panel's width as an inset, so the fix is
+	// arithmetic rather than somebody remembering to move it.
+	report(/LEGEND_RIGHT\s*=\s*'calc\(4px \+ var\(--lpn-overlay-right/.test(src),
+		'a right-hand legend clears the right pane by a published inset');
+	report(/--lpn-overlay-right/.test(php),
+		'...and the map overlay containers read the same inset');
 }
 
 // ---- 9. the Junctions tab --------------------------------------------------------------------
