@@ -2164,3 +2164,31 @@ $ec_lang['lpn_confirm_wipe']='Delete EVERYTHING saved for this page — every pr
 $ec_lang['template_share_link']='Copy link to this calculation';
 $ec_lang['template_share_copied']='✓ Link copied. Paste it into an email or a message.';
 $ec_lang['template_share_manual']='Copy this link:';
+
+// Extended-period simulation: the clock, the run, and the control that steps through it
+// (ROADMAP Task 248 and its 248.01 child). The seven settings keep EPANET's own names, because a
+// reader who has used EPANET recognises them and a reader who has not is no worse off for a plain
+// two-word phrase. Times are written the way EPANET writes them, so the tip has to say that a
+// plain number means hours.
+$ec_lang['lpn_time_menu']='Time';
+$ec_lang['lpn_time_menu_tip']='Set how long this network runs, and step through it moment by moment.';
+$ec_lang['lpn_time_duration']='Total run time';
+$ec_lang['lpn_time_hyd_step']='Hydraulic time step';
+$ec_lang['lpn_time_pattern_step']='Pattern time step';
+$ec_lang['lpn_time_pattern_start']='Pattern start time';
+$ec_lang['lpn_time_report_step']='Report time step';
+$ec_lang['lpn_time_report_start']='Report start time';
+$ec_lang['lpn_time_clock_start']='Clock time at the start';
+$ec_lang['lpn_time_format_tip']='Write a time as hours and minutes, like 2:30. A plain number means hours; a number with its own word means that word: 30 minutes.';
+$ec_lang['lpn_time_steady']='This network is worked out at one moment. Give it a total run time above zero and it runs over time instead.';
+$ec_lang['lpn_time_running']='Working out the whole time period with the EPANET engine.';
+$ec_lang['lpn_time_no_engine']='The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET engine, which runs the whole period.';
+$ec_lang['lpn_time_slider']='Time';
+$ec_lang['lpn_time_first']='Go to the start';
+$ec_lang['lpn_time_prev']='Step back';
+$ec_lang['lpn_time_play']='Play';
+$ec_lang['lpn_time_pause']='Pause';
+$ec_lang['lpn_time_next']='Step forward';
+$ec_lang['lpn_time_last']='Go to the end';
+$ec_lang['lpn_time_tank']='Tank';
+$ec_lang['lpn_time_level']='Water level';

@@ -552,18 +552,21 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
 
 - 35|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
-  and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves shipped 2026-08-14;
-  PBV and GPV 2026-08-17. Time is the open one, and the engine makes it a mapping-and-UI job rather
-  than a numerical one.
-  - **THE FOUR EPANET CONCEPTS IT NEEDS ARE CHILDREN, in build order** (Tom, 2026-08-17): 248.01 time
-    settings, 248.02 patterns, 248.03 controls, 248.04 curves. Each is testable on its own, and a
-    pattern with no clock cannot be demonstrated at all.
-  - **Task 384's colour ramp is preparation for this, not decoration** — a number per element per
-    timestep cannot be read any other way.
+  and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves shipped
+  2026-08-14, PBV and GPV 2026-08-17.
+  - **THE RUN SHIPPED 2026-08-18** (`js/lpn-time.js`, `EngCalcs.lpnEpanetRun`): the seven time
+    settings are editable, EPANET's own `runH()/nextH()` loop gives a frame per reporting step, a
+    transport in the bottom pane scrubs through them, and tanks fill and drain. Against all 25 steps
+    of `dev/lpn-spike/reference/Net3.rpt`: head worst 0.005 ft over 2,425 comparisons, flow 0.485 gpm
+    over 2,975, tank level 0.005 ft over 75 (`dev/lpn-spike/eps-net3-harness.js`). **The native
+    solver has no time dimension and is not getting one** — engine unreachable, one instant, said so.
+  - **What is left are the EDITORS:** patterns (248.02), controls (248.03), curves (248.04) — all
+    read, solved and written back today, none creatable on the page. Task 384's ramp reads a run.
   - **A valve has THREE states in EPANET, not two:** closed, fully open, and ACTIVE. `EN_INITSTATUS =
     OPEN` opens it fully with its setting IGNORED; `EN_INITSETTING` restores active, so status is
     written BEFORE setting. Written the other way a network solves with the valve wide open — exactly
-    one k V²/2g of missing head, with flows still agreeing to 2e-10 m³/s.
+    one k V²/2g of missing head, flows still agreeing to 2e-10 m³/s. A PUMP has no status column
+    either, so a closed one needs a `[STATUS]` row or it is written open.
   - **The gate is about sequencing only, not our right to the name.** No node-count limit; never
     describe the gate as one (`dev/positioning.md` §6). Tom, 2026-08-14: *"we have no less technical
     authority to call ourselves EPANET, more moral authority, and all the legal authority since it's
@@ -661,12 +664,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     anchored at `1rem` with the four column widths restated in `rem`. Look at both the Node and Link
     lists, including the node ID row, which uses two spacers instead of spinners.
 
-- 45|248.01| **Time settings (Task 248 child) — the smallest of the four and the one everything else
-  reads.** Duration, hydraulic time step, pattern time step, pattern start time, report time step,
-  start clock time. EPANET's `[TIMES]`, which the importer already reports as dropped.
-  - Do this FIRST. A pattern with no clock to run against cannot be demonstrated, and a control with
-    no clock cannot be tested.
-
 - 45|248.02| **Patterns (Task 248 child) — a named multiplier series, and the boundary conditions
   that read one.** Tom, 2026-08-17 named the uses, and they are wider than demand:
   demands and supplies, **reservoir heads** (a river or source level that varies), **pump schedules**
@@ -679,7 +676,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     pattern mechanism so a WQ source could read one later; do not build WQ on the strength of it.
   - **THE EXPORT HALF IS DONE (2026-08-18).** `[PATTERNS]`, `[CONTROLS]`, `[TIMES]`, `[OPTIONS]
     Pattern` and the `[JUNCTIONS]` pattern column are all written back, each value as its own text —
-    Net3 exports at 1,229 of 1,229 tokens byte-identical. What is left here is the UI and the run.
+    Net3 exports at 1,229 of 1,229 tokens byte-identical.
+  - **THE RUN IS DONE TOO (2026-08-18).** A pattern now reaches EPANET as a pattern rather than as a
+    pre-multiplied demand, and Net3 matches EPA's published 24-hour report to 0.005 ft of head over
+    2,425 comparisons. **What is left here is an EDITOR** — nothing on this page creates, names or
+    changes a pattern, or attaches one to a reservoir head or a pump. Imported ones are carried,
+    solved and written back untouched.
 
 
 - 40|248.03| **Controls (Task 248 child) — simple and rule-based.** Turning pumps, pipes and valves
