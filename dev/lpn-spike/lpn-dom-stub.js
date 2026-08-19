@@ -312,6 +312,12 @@ global.document = {
   // pixels between down and up). Tests set `hitTarget` to whatever they are pretending is under the
   // pointer; null means bare canvas, which is what a pan or an empty-space click lands on.
   elementFromPoint: () => hitTarget,
+  // **THE PLURAL CALL HAS TO KEEP THE STUB'S ONE PHYSICAL CLAIM: exactly one thing is under the
+  // pointer.** mapHitAt() walks elementsFromPoint() so that a bogus hit can be rejected without
+  // taking the real element under it away too (see hitConfirmed()); the stub's model of a pointer is
+  // still "hitTarget, or bare canvas", so the stack is that one element or nothing. Answering with a
+  // longer list would invent a layering no test has asked for.
+  elementsFromPoint: () => (hitTarget ? [hitTarget] : []),
   body: mkEl('body'),
   documentElement: mkEl('html'),
   title: ''   // Task 265 writes here; a stub without it would let document.title = ... pass unseen
@@ -400,7 +406,26 @@ Object.assign(global.EngCalcs, require(ROOT + 'js/lpn-profile.js'));
 // The pointer handlers hit-test through document.elementFromPoint rather than trusting e.target (a
 // real tap moves a few pixels between down and up). A test sets this to whatever it is pretending
 // is under the pointer; null means bare canvas.
-function setHitTarget(el) { hitTarget = el; }
+function setHitTarget(el) {
+	hitTarget = el;
+	if (!el) { return; }
+	// **WHAT IS UNDER THE POINTER IS ON THE CANVAS AND HAS A BOX.** Both are part of the sentence a
+	// harness writes when it sets a hit target, and mapHitAt() reads both -- it confirms a hit
+	// against the element's own getBoundingClientRect() (see hitConfirmed(): the browser's own SVG
+	// hit test is float32 and answers hundreds of pixels wide on a lat/lon map) and it stops at
+	// anything the canvas does not contain. Harnesses hand over a bare `{ dataset, classList }`
+	// literal, which is a fair shorthand for "an element carrying this data"; filling the two facts
+	// in here keeps the shorthand honest instead of making every harness build a whole element.
+	if (!el.getBoundingClientRect) {
+		el.getBoundingClientRect = () => ({ left: 0, top: 0, right: 1000, bottom: 500, width: 1000, height: 500 });
+	}
+	const canvas = byId.lpn_canvas;
+	if (canvas && !canvas._hitContainsPatched) {
+		const real = canvas.contains.bind(canvas);
+		canvas._hitContainsPatched = true;
+		canvas.contains = n => (!!n && n === hitTarget) || real(n);
+	}
+}
 
 /**
  * Load js/looped-network.js with `injectSource` -- the body of a `global.__LPN = { ... }`

@@ -154,9 +154,28 @@ var EngCalcs = EngCalcs || {};
 	// legitimately have thousands of stations in view. An ordinary drawing never reaches it (a
 	// straight pipe crossing the padded window has at most about 13).
 	var LPN_LABEL_DRAWN_MAX = 40;
+	// **THE CANVAS BOX IS READ ONCE PER LAYOUT PASS, NOT ONCE PER LABEL.** `clientWidth`/`clientHeight`
+	// are layout reads: taken between DOM writes each one forces a synchronous layout of the whole
+	// drawing. mapSpan() asks for both, and the label pass asks mapSpan() per link -- measured at 10%
+	// of the whole cost of opening a 256-node network.
+	//
+	// **HELD ONLY FOR THE DURATION OF A PASS, and that is what makes it safe rather than a cache to
+	// keep in step with the window.** The canvas cannot change size in the middle of a synchronous
+	// layout pass, and outside one every call reads the DOM exactly as it always did -- so there is no
+	// invalidation to remember, no resize seam to wire, and nothing a later caller can get stale.
+	var mapBoxPx = null, mapBoxDepth = 0;
+	function readMapBox() {
+		return { w: (svg && svg.clientWidth) || 0, h: (svg && svg.clientHeight) || 0 };
+	}
+	function mapBox() {
+		if (!mapBoxDepth) { return readMapBox(); }
+		if (!mapBoxPx) { mapBoxPx = readMapBox(); }
+		return mapBoxPx;
+	}
+	function beginMapBoxHold() { mapBoxDepth++; }
+	function endMapBoxHold() { if (--mapBoxDepth <= 0) { mapBoxDepth = 0; mapBoxPx = null; } }
 	function visibleMapHeight() {
-		var h = svg && svg.clientHeight ? svg.clientHeight : 0;
-		return h / (state.s || 1);
+		return mapBox().h / (state.s || 1);
 	}
 	// ---- "SCREEN SIZE": SAY WHICH DIMENSION, EVERY TIME -----------------------------------------
 	//
@@ -2562,11 +2581,61 @@ var EngCalcs = EngCalcs || {};
 		var r = svg.getBoundingClientRect();
 		return { x: (sx - r.left - state.tx) / state.s, y: (sy - r.top - state.ty) / state.s };
 	}
-	function nodeById(id) {
-		var i;
-		for (i = 0; i < doc.nodes.length; i++) { if (doc.nodes[i].id === id) { return doc.nodes[i]; } }
-		return null;
+	// ---- AN ID LOOKUP IS A MAP, NOT A SCAN ------------------------------------------------------
+	//
+	// nodeById() is called from the middle of the layout pass -- linkPointList() alone calls it twice
+	// per link, per candidate position considered -- so a linear scan makes opening a project cost
+	// O(elements squared). MEASURED at 14.5% of the whole cost of opening a 256-node network, second
+	// only to getBBox().
+	//
+	// **THE CACHE VALIDATES ITSELF AGAINST THE ARRAYS RATHER THAN TRUSTING CALL SITES.** Every way a
+	// document gains or loses an element replaces or lengthens one of the three arrays -- push,
+	// filter, applySaved(), undo, a new doc -- so identity plus length catches all of them with
+	// nothing to remember. The one mutation those cannot see is an id RENAMED in place, and
+	// invalidateIdMaps() is called at both of the two sites that do it.
+	//
+	// The maps are prototype-less: an EPANET id may be any word at all, and `constructor` must not
+	// resolve to Object's.
+	var idMaps = null, idMapsFor = null, idMapsRetried = false;
+	function invalidateIdMaps() { idMaps = null; idMapsFor = null; }
+	function idMapsCurrent() {
+		var f = idMapsFor;
+		return !!idMaps && !!f && f.n === doc.nodes && f.l === doc.links && f.b === doc.labels &&
+			f.nl === doc.nodes.length && f.ll === doc.links.length && f.bl === doc.labels.length;
 	}
+	function buildIdMaps() {
+		var m = { node: Object.create(null), link: Object.create(null), label: Object.create(null) };
+		function add(into, arr) {
+			var i;
+			// FIRST WINS, which is what the scan this replaces did with a duplicated id.
+			for (i = 0; i < arr.length; i++) { if (arr[i] && !(arr[i].id in into)) { into[arr[i].id] = arr[i]; } }
+		}
+		add(m.node, doc.nodes); add(m.link, doc.links); add(m.label, doc.labels);
+		idMaps = m;
+		idMapsFor = {
+			n: doc.nodes, l: doc.links, b: doc.labels,
+			nl: doc.nodes.length, ll: doc.links.length, bl: doc.labels.length
+		};
+		return m;
+	}
+	// **A MISS REBUILDS ONCE AND ASKS AGAIN, and that is what makes this self-healing rather than a
+	// seam to keep in step.** An id written in place is the one mutation the array check above cannot
+	// see; the two production sites call invalidateIdMaps(), but a lookup of an id nobody has heard
+	// of is exactly the symptom of a third one, so it rebuilds instead of answering null. The retry
+	// is armed once per set of arrays, so a genuinely absent id (a link naming a node that is not
+	// there) costs one rebuild, not one per lookup.
+	function byId(kind, id) {
+		var m, hit;
+		if (idMapsCurrent()) { m = idMaps; }
+		else { m = buildIdMaps(); idMapsRetried = false; }
+		hit = m[kind][id];
+		if (hit === undefined && !idMapsRetried) {
+			idMapsRetried = true;
+			hit = buildIdMaps()[kind][id];
+		}
+		return hit === undefined ? null : hit;
+	}
+	function nodeById(id) { return byId('node', id); }
 	// Snap-on-create: a click within N SCREEN pixels of an existing node reuses it rather than
 	// creating a new one -- the real fix for "a pipe drawn near a junction but not snapped to it",
 	// the dominant map-editor user error. Screen pixels, not world units, so the tap target stays a
@@ -2626,11 +2695,7 @@ var EngCalcs = EngCalcs || {};
 		return toDisplay(toSI(nodeFixedHead(n) - (n.elev || 0), 'lpn_u_elevhead'), resultUnit('pressure'));
 	}
 	function isFixedHeadNode(n) { return !!n && (n.type === 'reservoir' || n.type === 'tank'); }
-	function linkById(id) {
-		var i;
-		for (i = 0; i < doc.links.length; i++) { if (doc.links[i].id === id) { return doc.links[i]; } }
-		return null;
-	}
+	function linkById(id) { return byId('link', id); }
 	// A pump's curvePoints are 1-3 [Q,H] pairs in the units on the strip; curveRef, if set, names
 	// another pump link to copy points from (one hop only -- this never chases a chain, so a
 	// ref-to-a-ref cannot create a cycle).
@@ -3728,11 +3793,7 @@ var EngCalcs = EngCalcs || {};
 		updateLabelGeometry(id);
 		scheduleSolve();
 	}
-	function labelById(id) {
-		var i;
-		for (i = 0; i < doc.labels.length; i++) { if (doc.labels[i].id === id) { return doc.labels[i]; } }
-		return null;
-	}
+	function labelById(id) { return byId('label', id); }
 	// A node/link data label's visible glyphs live in <tspan> children (setMultilineText()) -- a
 	// hit-test (e.target on pointerdown, or elementFromPoint() on click/tap) lands on the tspan
 	// itself, which carries none of its parent <text>'s data-nodelbl/data-linklbl/data-lbl
@@ -3740,6 +3801,58 @@ var EngCalcs = EngCalcs || {};
 	// drag/click detection sees the same element regardless of which pixel of the label was hit.
 	function resolveLabelHit(t) {
 		return (t && t.nodeName && t.nodeName.toLowerCase() === 'tspan' && t.parentNode) ? t.parentNode : t;
+	}
+	// ---- THE BROWSER'S OWN SVG HIT TEST CANNOT BE BELIEVED ON A lat/lon MAP -----------------------
+	//
+	// **AN SVG HIT TEST IS RESOLVED IN THE TARGET'S OWN LOCAL COORDINATES, AND THOSE ARE float32.**
+	// In an XY project a node sits at x ~ 700 carrying a label whose font is `textSize / state.s`,
+	// about 0.005 units at the tightest zoom the grid allows -- and a float32's spacing at 700 is
+	// 6e-5, two orders finer than anything drawn. A lat/lon project makes one unit a DEGREE: the
+	// same node sits at x = -122.568 with an 11 px label 1.8e-4 units tall, while a float32's
+	// spacing at 122 is 7.6e-6 and `state.s` is 13,500 rather than 1. The label's quantised geometry
+	// then answers "yes, that is me" hundreds of pixels away. MEASURED on one junction with one
+	// label, on a canvas of 5,022 sample points: 4% of the canvas resolved to it at the home view,
+	// 62% at 91,000 px/degree, up to 758 px from the dot -- every one of them a <tspan>. Tom,
+	// 2026-08-18: *"When I click in space on the geomap, it opens properties for a node"* and
+	// *"Panning is broken because mousedown is selecting nodes far away."*
+	//
+	// getBoundingClientRect() does NOT go through that path and stays correct, so every hit is
+	// confirmed against the box the element really occupies on the screen. A bounding box CONTAINS
+	// its shape, so this can only ever reject: a true hit on a dot, a stroke or a glyph is untouched
+	// in every project at every zoom, and no tolerance anywhere is widened.
+	//
+	// **THIS IS A GUARD, NOT THE CURE.** Past about 600,000 px/degree the drawing itself comes apart
+	// -- a node's own <circle> is rasterised at x = -41,548,184 and simply is not there -- which is
+	// Task 354's problem in degrees and wants the same medicine: coordinates local to an origin, so
+	// that nothing downstream ever sees a number whose float32 spacing is bigger than a symbol.
+	// LPN_ORIGIN_THRESHOLD is 1e4 and a longitude is 122, so no geographic document is ever rebased.
+	var HIT_SLOP_PX = 2;
+	function hitConfirmed(t, cx, cy) {
+		if (!t || !t.getBoundingClientRect) { return false; }
+		var r = t.getBoundingClientRect();
+		if (!(r.width > 0 || r.height > 0)) { return false; }
+		return cx >= r.left - HIT_SLOP_PX && cx <= r.right + HIT_SLOP_PX &&
+			cy >= r.top - HIT_SLOP_PX && cy <= r.bottom + HIT_SLOP_PX;
+	}
+	// **THE TOPMOST BELIEVABLE THING UNDER THE POINTER, WHICH IS WHY IT IS THE PLURAL CALL.**
+	// elementFromPoint() answers with the top of the stack and nothing else, so rejecting a bogus
+	// label hit there would take the real node UNDER it away with it -- and on this map a node's own
+	// label is drawn over the node, so that is the ordinary case rather than a corner. Walking
+	// elementsFromPoint() confirms each in turn and stops at the canvas, which carries no dataset and
+	// reads as bare map to every caller.
+	//
+	// Not e.target on a pointerdown either: elementsFromPoint() is a document query and is unaffected
+	// by the setPointerCapture() retargeting that made pointerup use elementFromPoint() in the first
+	// place, so one call serves every gesture.
+	function mapHitAt(cx, cy) {
+		var list = document.elementsFromPoint(cx, cy) || [], i, t;
+		for (i = 0; i < list.length; i++) {
+			if (list[i] === svg) { break; }
+			if (!svg.contains(list[i])) { break; }   // page furniture over the map -- not a map hit
+			t = resolveLabelHit(list[i]);
+			if (hitConfirmed(t, cx, cy)) { return t; }
+		}
+		return svg;
 	}
 	function updateNode(id) {
 		var n = nodeById(id), ne = nodeEls[id], i;
@@ -4693,7 +4806,7 @@ var EngCalcs = EngCalcs || {};
 			if (mode === 'node') { setNodeCursorAllowed(true); }
 			var handler2 = function (e2) {
 				if (mode === 'node') {
-					var t = document.elementFromPoint(e2.clientX, e2.clientY);
+					var t = mapHitAt(e2.clientX, e2.clientY);
 					if (!t || !t.dataset || !t.dataset.node) { return; } // not a node -- keep waiting, don't fall back to a free point
 					svg.removeEventListener('pointerup', handler2, true);
 					activeCancel = null; setNodeCursorAllowed(false); setRegMode(false);
@@ -12094,7 +12207,7 @@ var EngCalcs = EngCalcs || {};
 				drag = { type: 'pinch', d0: Math.hypot(pts[0].x - pts[1].x, pts[0].y - pts[1].y), s0: state.s };
 				return;
 			}
-			var t = resolveLabelHit(e.target), common = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY };
+			var t = mapHitAt(e.clientX, e.clientY), common = { pointerId: e.pointerId, startX: e.clientX, startY: e.clientY };
 			// **THE MODEL IS LOCKED WHILE IT IS BEING PLACED** (Task 145). Same shape as regMode
 			// above: one flag, checked once, and every editing gesture below is simply not reached.
 			// Panning still works on empty canvas -- it is how you look at where you are putting the
@@ -12178,7 +12291,7 @@ var EngCalcs = EngCalcs || {};
 			if (regMode) { return; } // otherwise two registration clicks landing on the same link also bend it
 			if (georefActive()) { return; }   // the model is locked while it is being placed (Task 145)
 			if (pendingLinkPopupTimer) { clearTimeout(pendingLinkPopupTimer); pendingLinkPopupTimer = null; }
-			var t = resolveLabelHit(document.elementFromPoint(e.clientX, e.clientY));
+			var t = mapHitAt(e.clientX, e.clientY);
 			if (!t || !t.dataset) { return; }
 			// Double-click a dragged label to send it home (Tom, 2026-07-30: "Can we double-click a
 			// dragged label to send it home without a leader?") -- clears the manual offset, so the
@@ -12211,7 +12324,7 @@ var EngCalcs = EngCalcs || {};
 			// elementFromPoint, not e.target: setPointerCapture(svg) retargets pointerup's
 			// target to the capturing element (svg itself) on desktop Chrome, so e.target here
 			// is never the actual node/link/label clicked -- see phase0-acceptance.md round 2.
-			var w = screenToWorld(e.clientX, e.clientY), t = resolveLabelHit(document.elementFromPoint(e.clientX, e.clientY));
+			var w = screenToWorld(e.clientX, e.clientY), t = mapHitAt(e.clientX, e.clientY);
 			// No zoomExtent() after placing an element: rescaling the whole view on every click while
 			// building a network is disorienting. Zoom Extent stays user-requested only.
 			// Undo covers Add too, not just Delete -- snapshot before every mutation so "Undo" stays
@@ -13509,7 +13622,15 @@ var EngCalcs = EngCalcs || {};
 	//     (labelBoxWidth / textLabelWidth).
 	// So a zoom sets font sizes, republishes the symbol custom properties, and re-lays-out. The
 	// content path is left for what actually changes content: a solve, a toggle, an edit.
-	function refreshFontSizes() {
+	//
+	// **`deferLayout` IS THE ZOOM PATH, AND IT IS THE SAME BARGAIN scheduleReshed() ALREADY MADE.**
+	// relayoutLabels() runs the collision relaxation over every label against every obstacle, which
+	// is the single most expensive thing on this page -- measured at most of a wheel notch's ~157 ms
+	// on Net3. A wheel spin is a BURST whose intermediate frames nobody looks at, and onZoomChanged()
+	// already ends in scheduleReshed(), which ends in relayoutLabels() 120 ms after the last notch.
+	// So the zoom path asks for one relayout per gesture instead of one per notch; every other caller
+	// (a Text size change, a settings edit) is a single act and still lays out at once.
+	function refreshFontSizes(deferLayout) {
 		var fs = effectiveFontSize() + 'px';
 		Object.keys(nodeEls).forEach(function (id) { nodeEls[id].text.style.fontSize = fs; });
 		Object.keys(linkEls).forEach(function (id) {
@@ -13521,7 +13642,7 @@ var EngCalcs = EngCalcs || {};
 			le.text.style.fontSize = effectiveFontSize(lb && lb.sizeMult) + 'px';
 		});
 		refreshSymbolSizes(); // publishes --lpn-sym / --lpn-lw, both of which are state.s-dependent too
-		relayoutLabels();     // positions only: no recompose, no re-measure
+		if (!deferLayout) { relayoutLabels(); }   // positions only: no recompose, no re-measure
 	}
 	// Called from zoomAbout()/zoomExtent(), unconditionally: with text, symbols and pipe width all in
 	// screen pixels every one is state.s-dependent, so a zoom always invalidates all three.
@@ -13532,8 +13653,7 @@ var EngCalcs = EngCalcs || {};
 	// pixels-per-foot ratio does not.
 
 	function visibleMapWidth() {
-		var w = svg && svg.clientWidth ? svg.clientWidth : 0;
-		return w / (state.s || 1);
+		return mapBox().w / (state.s || 1);
 	}
 	// GENERATED ANNOTATION only -- the right line is annotation, not "labels", and the flow arrow is
 	// what shows it. An arrow is a symbol by construction and an annotation by purpose: nobody drew
@@ -13620,7 +13740,7 @@ var EngCalcs = EngCalcs || {};
 			refreshTextLabelSizes();
 			return;
 		}
-		refreshFontSizes();
+		refreshFontSizes(true);   // the relayout rides the reshed debounce below -- see refreshFontSizes()
 		// applyLabelVisibility() again, because refreshFontSizes() can change a Text label's own
 		// width and therefore nothing about the threshold -- but buildDom-time elements created
 		// inside refreshLabelText() have no visibility class yet.
@@ -14889,6 +15009,7 @@ var EngCalcs = EngCalcs || {};
 	function applyNodeRename(oldId, newId) {
 		var n = nodeById(oldId);
 		n.id = newId;
+		invalidateIdMaps();   // an id changed IN PLACE -- the one mutation the array check cannot see
 		renameOverrides('node', oldId, newId);
 		nodeEls[newId] = nodeEls[oldId]; delete nodeEls[oldId];
 		incidentLinks[newId] = incidentLinks[oldId]; delete incidentLinks[oldId];
@@ -14911,6 +15032,7 @@ var EngCalcs = EngCalcs || {};
 	function applyLinkRename(oldId, newId) {
 		var l = linkById(oldId);
 		l.id = newId;
+		invalidateIdMaps();   // as applyNodeRename() -- see byId()
 		renameOverrides('link', oldId, newId);
 		// Any OTHER pump referencing this one by curveRef must follow the rename, or its curve
 		// silently reverts to nothing (resolveCurvePoints() only matches an exact id).
@@ -16121,7 +16243,14 @@ var EngCalcs = EngCalcs || {};
 	// Extrema are computed ONCE per field, network-wide, before any label is built, so every
 	// element's decoration is judged against the same snapshot (Tom: ties all get marked, not just
 	// the first one found -- decorationFor() already does this per element).
+	// The whole content pass reads the canvas box through mapSpan() (label repeat spacing, the
+	// visibility threshold), so it holds ONE measurement for its duration -- see mapBox(). A wrapper
+	// rather than a try/finally around 200 lines, so the pass itself reads exactly as it did.
 	function refreshLabelText() {
+		beginMapBoxHold();
+		try { refreshLabelTextPass(); } finally { endMapBoxHold(); }
+	}
+	function refreshLabelTextPass() {
 		var ls = labelSettings, nd = ls.decimals.node, ld = ls.decimals.link,
 			// One string, computed once for the whole pass -- see the measurement comment below.
 			fsNow = effectiveFontSize() + 'px';
@@ -16269,6 +16398,16 @@ var EngCalcs = EngCalcs || {};
 			// and multiplies by the NEW one -- the banked pixel width is then wrong by exactly the
 			// zoom ratio, making obstacle boxes enormous when you zoom out.
 			ne.text.style.fontSize = fsNow;
+		});
+		// **EVERY WRITE, THEN EVERY READ -- AND THAT SPLIT IS THE WHOLE OF WHY IT IS TWO LOOPS.**
+		// getBBox() and getComputedTextLength() are LAYOUT reads: taken between two DOM writes each
+		// one forces a synchronous layout of the entire drawing, so measuring inside the loop above
+		// cost one full layout per node and made this pass quadratic in the size of the network. With
+		// the writes finished, the first read lays out once and the other 255 are free. The font size
+		// is set in the loop above for the reason its comment gives -- a width measured at one scale
+		// and banked at another is wrong by the zoom ratio -- and it is a WRITE, so it belongs there.
+		doc.nodes.forEach(function (n) {
+			var ne = nodeEls[n.id]; if (!ne) { return; }
 			try { noteMeasuredWidth(ne, ne.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale tw stands */ }
 			noteRowWidths(ne);
 		});
@@ -16407,10 +16546,13 @@ var EngCalcs = EngCalcs || {};
 	var lastLayoutScale = null;
 	function relayoutLabels() {
 		lastLayoutScale = state.s;
-		runLabelCollisionAvoidance();
-		doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
-		doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
-		doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
+		beginMapBoxHold();   // one canvas measurement for the whole pass -- see mapBox()
+		try {
+			runLabelCollisionAvoidance();
+			doc.nodes.forEach(function (n) { if (nodeEls[n.id]) { layoutNodeLabel(n.id); } });
+			doc.links.forEach(function (l) { if (linkEls[l.id]) { layoutLinkLabel(l.id); } });
+			doc.labels.forEach(function (lb) { if (labelEls[lb.id]) { updateLabelGeometry(lb.id); } });
+		} finally { endMapBoxHold(); }
 	}
 	function runSolve() {
 		// **NO ARITHMETIC WHILE THE PROJECT IS BEING PLACED** (Task 145, Tom: "disable calculations
