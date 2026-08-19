@@ -119,7 +119,12 @@ eval([extract('labelBoxWidth'), extract('dataLabelOrigin')].join('\n'));
 	// place to build both the full label and every candidate (Task 399). The invariant is unchanged
 	// and so is this test -- it just has to look where the code is. Searching both sources rather
 	// than naming which is which keeps it true through the next move as well.
-	const rlt = extract('refreshLabelText') + '\n' + extract('renderLinkLabel');
+	// refreshLabelTextPass() is the node half's home: refreshLabelText() is now a two-line wrapper
+	// that holds one canvas measurement for the pass (see mapBox()). Both names are searched for the
+	// reason the paragraph above gives -- the invariant is about ORDER, not about which function the
+	// lines happen to live in this month.
+	const rlt = extract('refreshLabelText') + '\n' + extract('refreshLabelTextPass') +
+		'\n' + extract('renderLinkLabel');
 	['ne', 'le'].forEach(function (v) {
 		const set = rlt.indexOf(v + '.text.style.fontSize = fsNow;');
 		const measure = rlt.indexOf('noteMeasuredWidth(' + v + ',');

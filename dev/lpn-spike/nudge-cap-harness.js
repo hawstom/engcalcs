@@ -164,7 +164,13 @@ console.log('\n--- the limit is a property of the candidates, not a correction a
 	// reason it is gone is that revising an answer after it is chosen re-creates the conflicts the
 	// pass had just solved. So the check is now the stronger one: nothing is revised at all, and the
 	// evidence is that running the pass twice changes not one label.
+	// SETTLED FIRST, then run again: this is about the PASS being idempotent, and a zoom no longer
+	// lays out synchronously -- onZoomChanged() leaves it to the debounced reshed, which is one
+	// relayout per gesture instead of one per wheel notch (measured 1,475 ms -> 60 ms on a 256-node
+	// network). Without the settle, `before` would be the state BEFORE any pass, and this would be
+	// asserting that the pass does nothing.
 	L.setZoom(22);
+	L.relayout();
 	const before = ids.map(function (id) { return L.labelDistPx(id); });
 	L.relayout();
 	const after = ids.map(function (id) { return L.labelDistPx(id); });
