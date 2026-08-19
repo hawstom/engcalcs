@@ -91,7 +91,7 @@ ok('the refusal says the drawing is intact', /kept|shown|came in|unchanged/i.tes
 // to "Nothing can be solved" (2026-08-17), a change this file's own comment says must not fail it,
 // and it failed.
 ok('the refusal says no answers can be given',
-	/no answers|nothing can be (solved|worked)|cannot|can not|unable/i.test(refusal), JSON.stringify(refusal));
+	/no answers|nothing can be (solved|worked|computed|calculated|given)|cannot|can not|unable/i.test(refusal), JSON.stringify(refusal));
 ok('nothing was solved', L.getDoc().nodes.length === 2);
 
 // The refusal is not sticky: install a unit we do know and the page works again.
