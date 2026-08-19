@@ -146,6 +146,33 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     `gloss_ref_check.php` and `generate_translation_payloads.php --check`.
   - Close it with `detect_english_drift.php --baseline-new`, or the new keys stay `NEW` forever.
 
+- 65|446| **Colouring links recomputes the class breaks ONCE PER LINK, on every zoom notch.** Tom,
+  2026-08-19: "Turning on a color for links (but not for nodes) slows zoom performance, and I can't
+  think of a good reason why." There is none — it is pure waste, and measured: on Net3, **one wheel
+  notch fires `breaksFor()` 120 times with link colour on and 0 times with it off.** Each call
+  re-collects every link's value and sorts it, so a repaint is O(L² log L).
+  - **Cause:** `paintLinkColor()` calls `effectiveBreaks(group, field)` inside the per-element loop,
+    and `computedBreaks()` runs `colorValues()` + `breaksFor()` every time. Hoist the breaks out of
+    the loop in `refreshValueColors()` and pass them in; they cannot vary between two elements of
+    the same group.
+  - **Why NODES look fine, which is the part that explains Tom's asymmetry:** `computedBreaks()`
+    returns early for a mode with a `criterion` (`R.criterionBreaks()`, no data pass), and the node
+    default is such a mode. A node coloured by a data-driven method would be just as slow.
+  - **Nothing changes on a zoom**, so the deeper question is why a zoom repaints colour at all.
+    Answer that before optimising the loop — a cache that makes wasted work cheap is still wasted.
+
+- 55|447| **Import XY project / Import EPANET file, and either one converts when the project is
+  lat/lon.** Tom, 2026-08-19: "the paradigm we want is 'Import XY project / Import EPANET file', so
+  that we require an xy project to be safe on disk where we can know it's safe to import and
+  convert. Either of these menu items, if done in a geomap/latlon/world project should start the
+  coordinates conversion wizard."
+  - Replaces converting a project in place. **The safety argument is the point:** the XY original
+    stays on disk untouched, so a conversion can never be the only copy — which is what makes the
+    wizard's Cancel meaningful at the document level and not just the dialogue level. Supersedes the
+    in-place framing of Task 436.
+  - Two doors, one implementation: the destination project's coordinate kind decides whether the
+    wizard runs, not which menu row was used.
+
 - 60|444| **`EC.lpnParseTime` reads `2,5` as 2 hours, silently.** `parseFloat` stops at the comma,
   so a comma-decimal locale gets a wrong duration with no error — half the value, in the one field
   where being wrong reshapes the whole run. Measured 2026-08-19: `2,5` → 7200 s, `2.5` → 9000 s.
