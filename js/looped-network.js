@@ -15935,7 +15935,7 @@ var EngCalcs = EngCalcs || {};
 	// function rather than a literal so that Task 248's clock has ONE place to become real. EPANET
 	// itself reports t=0 as a hydraulic result like any other, so a steady-state page and an
 	// extended-period one agree here by construction rather than by coincidence.
-	function modelTimeSeconds() { return 0; }
+	function modelTimeSeconds() { return EngCalcs.lpnTimeNow ? EngCalcs.lpnTimeNow() : 0; }
 
 	// The multiplier a junction's demand carries at `t`, resolved the way EPANET resolves it.
 	//
@@ -15984,7 +15984,17 @@ var EngCalcs = EngCalcs || {};
 				// the demand the user typed; it never replaces it. Doing it at this boundary is the
 				// same rule every unit conversion on this page follows -- the document holds what
 				// was stated, and the solver is handed what it needs.
-				: { id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'), demand: toSI((effective(n, 'demand') || 0) * demandMultiplier(n, modelTimeSeconds()), 'lpn_u_flow'), emitter: effective(n, 'emitter') };
+				: {
+					id: n.id, type: n.type, elev: toSI(n.elev || 0, 'lpn_u_elevhead'),
+					demand: toSI((effective(n, 'demand') || 0) * demandMultiplier(n, modelTimeSeconds()), 'lpn_u_flow'),
+					// **THE UNSCALED DEMAND AND THE PATTERN'S NAME RIDE ALONG** for an extended-period
+					// run (Task 248), where EPANET applies the multipliers on its own clock. `demand`
+					// above is still what every one-instant solve reads; js/lpn-epanet.js takes one or
+					// the other and never both, or the multiplier would be applied twice.
+					demandBase: toSI(effective(n, 'demand') || 0, 'lpn_u_flow'),
+					demandPattern: n.demandPattern || doc.defaultPattern || null,
+					emitter: effective(n, 'emitter')
+				};
 		});
 		// Both halves of this line are load-bearing and arrived from different worktrees on the
 		// same day. The FILTER is Task 184: an inactive element, or a link whose end is inactive,
@@ -16028,7 +16038,11 @@ var EngCalcs = EngCalcs || {};
 			}
 			return out;
 		});
-		return { nodes: nodes, links: links, method: frictionMethod(), visc: 1.007e-6, emitterExponent: settings.emitterExponent };
+		var model = { nodes: nodes, links: links, method: frictionMethod(), visc: 1.007e-6, emitterExponent: settings.emitterExponent };
+		// The clock, the patterns and the controls, converted to SI (js/lpn-time.js). Absent that
+		// file the model is exactly the pre-Task-248 one and the page solves one instant.
+		if (EngCalcs.lpnTimeAttach) { EngCalcs.lpnTimeAttach(model); }
+		return model;
 	}
 	function diagIssueText(issue) {
 		var pc = EngCalcs.pageConfig || {};
@@ -16606,6 +16620,12 @@ var EngCalcs = EngCalcs || {};
 		// silently got a different engine has been lied to. settings.engine is NOT rewritten: delete
 		// the valve and the page goes back to the engine the user chose.
 
+		// A DOCUMENT WITH A DURATION IS A RUN, not a solve (Task 248), and js/lpn-time.js owns it
+		// from here: it drives EPANET's own time loop, keeps the frames, and calls applySolveResult()
+		// with the one the transport is showing. Returns false for a duration of 0, which is every
+		// network this page has had until now.
+		if (EngCalcs.lpnTimeRun && EngCalcs.lpnTimeRun(model)) { return; }
+
 		var epanetOnly = EngCalcs.lpnEpanetOnlyValves ? EngCalcs.lpnEpanetOnlyValves(model) : [];
 		valveRouteNote = '';
 		if ((settings.engine === 'epanet' || epanetOnly.length > 0) && EngCalcs.lpnSolveEpanet) {
@@ -16740,6 +16760,20 @@ var EngCalcs = EngCalcs || {};
 			if (window.console && console.warn) { console.warn('EPANET engine load/solve failed:', err); }
 		});
 	}
+	// **THE WHOLE SEAM TO js/lpn-time.js** (Task 248). One call, at script scope so the tab is
+	// registered before wirePane() reads the list. Everything the clock needs is a function this
+	// file already has; nothing of the run, the transport or the time settings lives here.
+	if (EngCalcs.lpnTimeInit) {
+		EngCalcs.lpnTimeInit({
+			tabs: paneTabs,
+			doc: function () { return doc; },
+			apply: applySolveResult, status: setStatus, solve: scheduleSolve,
+			native: function (m) { return EngCalcs.lpnSolve(m, { tol: settings.tolerance }); },
+			snapshot: saveUndoSnapshot, save: saveToStorage,
+			toSI: toSI, toDisplay: toDisplay, unitLabel: unitLabel
+		});
+	}
+
 	// Debounced, not run synchronously on every call site: a node drag alone calls updateNode()
 	// (and therefore this) on every animation frame while dragging (see the tick()/applyDrag()
 	// architecture ported from the spike) -- solving on every one of those would both be wasted

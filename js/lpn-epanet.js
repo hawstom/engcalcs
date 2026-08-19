@@ -85,8 +85,13 @@
 	 * Exported (not private) because it is independently useful: it is most of what Task 196
 	 * needs for .inp export, and it is the piece a reader should be able to eyeball.
 	 */
-	EngCalcs.lpnToInp = function (model) {
-		var method = model.method || 'hw',
+	EngCalcs.lpnToInp = function (model, options) {
+		// `options.eps` asks for the EXTENDED-PERIOD form of the same network (Task 248): the clock,
+		// the patterns and the controls are written out and EPANET runs its own time loop. Without it
+		// this writes exactly what it always wrote -- one instant, demands already multiplied.
+		var eps = !!(options && options.eps) && !!model.time,
+			time = eps ? model.time : null,
+			method = model.method || 'hw',
 			headloss = HEADLOSS[method] || 'H-W',
 			emitterExp = model.emitterExponent || 0.5,
 			junctions = [],
@@ -123,7 +128,13 @@
 					(n.minLevel || 0) + '  ' + (n.maxLevel || 0) + '  ' + (n.diameter || 0) + '  0');
 			} else {
 				// Demand m3/s -> L/s.
-				junctions.push(' ' + n.id + '  ' + (n.elev || 0) + '  ' + (n.demand || 0) * 1000);
+				// **UNDER `eps` THE DEMAND IS THE BASE DEMAND AND THE PATTERN IS NAMED BESIDE IT**, so
+				// EPANET applies the multiplier on its own clock. Written the ordinary way instead, the
+				// t=0 multiplier would be baked in and then multiplied AGAIN at every step -- 1.34 squared
+				// at the start of Net3, and a run that looks like a run.
+				junctions.push(' ' + n.id + '  ' + (n.elev || 0) + '  ' +
+					(eps && n.demandBase !== undefined ? n.demandBase : (n.demand || 0)) * 1000 +
+					(eps && n.demandPattern ? '  ' + n.demandPattern : ''));
 				if (n.emitter > 0) {
 					// Our emitter is Q = C (H - z)^gamma with Q in m3/s and head in m.
 					// EPANET's is the same law in FLOW UNITS per (pressure unit)^gamma, and in
@@ -226,6 +237,12 @@
 					}
 					curves.push(rows.join('\n'));
 					pumps.push(' ' + link.id + '  ' + link.from + '  ' + link.to + '  HEAD ' + cname);
+					// **A PUMP HAS NO STATUS COLUMN EITHER**, exactly like a valve, so a closed one is
+					// stated in [STATUS] or it is written open. pushValues() writes EN_INITSTATUS over the
+					// top, which hid this for as long as every solve went through the warm path; an
+					// extended-period run opens a Project from the text alone, and Net3's pump 10 -- closed
+					// until its own control opens it at 1:00 -- came out 96 ft wrong at midnight.
+					if (link.status === 'closed') { statuses.push(' ' + link.id + '  Closed'); }
 				} else {
 					// A pump with NO curve is our own concept: a lossless connection, the state
 					// every freshly drawn pump is in. EPANET has no such element, so it becomes a
@@ -288,6 +305,57 @@
 			}
 		}
 
+		// ---- the clock, written only for an extended-period run (Task 248) ----
+		//
+		// Every number below is already SI when it arrives, so the conversions are the SAME ones the
+		// rest of this file makes, for the same reason: LPS is metric but not our metric. A pattern
+		// multiplier is dimensionless and passes straight through; a control's threshold is a head
+		// or a pressure, both METRES under LPS; a control's setting means whatever the link says it
+		// means, and only an FCV's flow is scaled.
+		var patternRows = [], controlRows = [], timeRows = [];
+		if (eps) {
+			(time.patterns || []).forEach(function (pat) {
+				var mults = pat.multipliers || [], q, row;
+				// Six per line, EPANET's own layout: the id repeats and the values concatenate.
+				for (q = 0; q < mults.length; q += 6) {
+					row = ' ' + pat.id;
+					for (var z = q; z < Math.min(q + 6, mults.length); z++) { row += '  ' + mults[z]; }
+					patternRows.push(row);
+				}
+			});
+			// **A CONTROL IS COMPOSED FROM THE RECORD, NEVER COPIED FROM ITS `raw` LINE.** The raw
+			// line states its numbers in the FILE's units -- Net3's `Link 335 OPEN IF Node 1 BELOW
+			// 17.1` is 17.1 FEET -- and this file is LPS. Copied through, that tank would switch its
+			// pump at 17.1 metres, which is above its own maximum level, so the pump never starts and
+			// the run is quietly wrong rather than visibly broken.
+			(time.controls || []).forEach(function (c) {
+				var line, act = c.action || {}, cond = c.condition;
+				if (!cond) { return; }
+				if (act.status) { line = ' LINK ' + c.link + ' ' + (act.status === 'closed' ? 'CLOSED' : 'OPEN'); }
+				else if (isFinite(act.setting)) {
+					line = ' LINK ' + c.link + ' ' +
+						(act.settingUnit === 'flow' ? act.setting * 1000 : act.setting);
+				} else { return; }
+				if (cond.kind === 'node') {
+					line += ' IF NODE ' + cond.node + ' ' + (cond.cmp === 'above' ? 'ABOVE' : 'BELOW') +
+						' ' + cond.value;
+				} else if (cond.kind === 'time') {
+					line += ' AT TIME ' + EngCalcs.lpnFormatTime(cond.seconds);
+				} else if (cond.kind === 'clocktime') {
+					line += ' AT CLOCKTIME ' + EngCalcs.lpnFormatTime(cond.seconds);
+				} else { return; }
+				controlRows.push(line);
+			});
+			// H:MM rather than a bare number, because a BARE NUMBER IN [TIMES] IS HOURS -- writing
+			// 86400 for a one-day duration asks EPANET for a ten-year run.
+			[['Duration', 'duration'], ['Hydraulic Timestep', 'hydraulicStep'],
+				['Pattern Timestep', 'patternStep'], ['Pattern Start', 'patternStart'],
+				['Report Timestep', 'reportStep'], ['Report Start', 'reportStart'],
+				['Start ClockTime', 'startClock']].forEach(function (pair) {
+				timeRows.push(' ' + pair[0] + '  ' + EngCalcs.lpnFormatTime(time.times[pair[1]] || 0));
+			});
+		}
+
 		var inp = '[TITLE]\nEngCalcs looped network\n\n' +
 			'[JUNCTIONS]\n' + junctions.join('\n') + '\n\n' +
 			'[RESERVOIRS]\n' + reservoirs.join('\n') + '\n\n' +
@@ -300,6 +368,10 @@
 			// After [VALVES] and [PUMPS], because a [STATUS] line names a link that must already
 			// have been declared.
 			(statuses.length ? '[STATUS]\n' + statuses.join('\n') + '\n\n' : '') +
+			(patternRows.length ? '[PATTERNS]\n' + patternRows.join('\n') + '\n\n' : '') +
+			// After the links a control names, and after the patterns -- EPANET's own order.
+			(controlRows.length ? '[CONTROLS]\n' + controlRows.join('\n') + '\n\n' : '') +
+			(timeRows.length ? '[TIMES]\n' + timeRows.join('\n') + '\n\n' : '') +
 			'[OPTIONS]\n Units LPS\n Headloss ' + headloss +
 			'\n Emitter Exponent ' + emitterExp +
 			// Match our own convergence, which is far tighter than EPANET's 0.001 default,
@@ -662,6 +734,108 @@
 				closeSession();
 				throw e;
 			}
+		});
+	};
+
+
+	// ------------------------------------------------------------------------------------------
+	// THE RUN (ROADMAP Task 248). One instant becomes a period.
+	//
+	// EPANET'S OWN TIME LOOP DOES THIS, and that is the whole design decision. We could step the
+	// clock ourselves -- re-solve a steady state at each reporting time with the pattern multipliers
+	// for that moment -- and it would look right on every junction and be a lie at every TANK: a
+	// tank's level at 9:00 is the integral of everything that flowed into it since midnight, so a
+	// series of independent steady states leaves every tank exactly where it started, for ever.
+	// runH()/nextH() carries that state; nothing outside EPANET has to integrate anything.
+	//
+	// A FRESH PROJECT, NEVER THE WARM ONE. The session above is an open Project built from the
+	// STEADY-STATE .inp -- no [TIMES], no [PATTERNS], demands already multiplied. Pushing an
+	// extended-period run through it would answer from that network, which is the silent-stale
+	// answer signatureOf() exists to prevent, arriving by a different door.
+	//
+	// nextH() returns the seconds to the next hydraulic event, which is NOT the reporting step: it
+	// also stops when a tank fills or empties and when a control fires. So a frame is kept only at a
+	// REPORTING time, and the intermediate solves happen and are discarded, exactly as EPANET's own
+	// report does it.
+	var EN_STATUS = 11, EN_DEMAND = 9;
+
+	EngCalcs.lpnEpanetRun = function (model, options) {
+		var opts = options || {}, url = opts.moduleUrl || null;
+		var issues = EngCalcs.lpnDiagnose(model);
+		if (issues.length > 0) {
+			return Promise.resolve({ ok: false, engine: 'epanet', issues: issues, frames: [] });
+		}
+		var built = EngCalcs.lpnToInp(model, { eps: true });
+		var times = (model.time && model.time.times) || EngCalcs.lpnTimesDefaults(),
+			reportStart = times.reportStart || 0,
+			reportStep = times.reportStep > 0 ? times.reportStep : 3600,
+			duration = times.duration || 0;
+
+		return EngCalcs.lpnEpanetLoad(url).then(function (mod) {
+			return workspaceFor(mod, url).then(function (ws) {
+				var p = new mod.Project(ws), frames = [], nodeIdx = {}, linkIdx = {},
+					i, n, l, t, tstep, guard = 0;
+				ws.writeFile('eps.inp', built.inp);
+				try {
+					p.open('eps.inp', 'eps.rpt', 'eps.out');
+					for (i = 0; i < model.nodes.length; i++) { nodeIdx[model.nodes[i].id] = p.getNodeIndex(model.nodes[i].id); }
+					for (i = 0; i < model.links.length; i++) { linkIdx[model.links[i].id] = p.getLinkIndex(model.links[i].id); }
+					p.openH();
+					p.initH(0);
+					do {
+						t = p.runH();
+						// The reporting grid, and nothing else. `>= reportStart` because a run may be
+						// asked to report only its second half; the modulo because runH() lands on
+						// tank and control events that belong to nobody's report.
+						if (t >= reportStart && ((t - reportStart) % reportStep) === 0 && t <= duration) {
+							var f = {
+								t: t, heads: {}, pressures: {}, demands: {}, levels: {},
+								flows: {}, velocities: {}, headlosses: {}, statuses: {}
+							};
+							for (i = 0; i < model.nodes.length; i++) {
+								n = model.nodes[i];
+								f.heads[n.id] = p.getNodeValue(nodeIdx[n.id], EN_HEAD);
+								f.pressures[n.id] = p.getNodeValue(nodeIdx[n.id], EN_PRESSURE);
+								// L/s -> m3/s, the same scale a [JUNCTIONS] demand is written in.
+								f.demands[n.id] = p.getNodeValue(nodeIdx[n.id], EN_DEMAND) / 1000;
+								// **THE TANK LEVEL IS A RESULT, NOT AN INPUT** -- the point of the run.
+								// It is metres above the tank's own bottom under LPS, the same quantity
+								// and the same unit the document's `level` field holds. They must never
+								// be written into each other; see the note in js/lpn-time.js.
+								//
+								// DERIVED FROM THE HEAD, NOT READ FROM EN_TANKLEVEL. Measured against
+								// EPA's own Net3 report: EN_TANKLEVEL answers the INITIAL level and
+								// keeps answering it for the whole run, so every tank reads flat all day
+								// while its head moves nine feet underneath it. Head minus elevation is
+								// the level by definition -- it is what a tank IS, see
+								// EngCalcs.lpnIsFixedHead -- and it tracks the report.
+								if (n.type === 'tank') { f.levels[n.id] = f.heads[n.id] - (n.elev || 0); }
+							}
+							for (i = 0; i < model.links.length; i++) {
+								l = model.links[i];
+								f.flows[l.id] = p.getLinkValue(linkIdx[l.id], EN_FLOW) / 1000;
+								f.velocities[l.id] = p.getLinkValue(linkIdx[l.id], EN_VELOCITY);
+								f.headlosses[l.id] = p.getLinkValue(linkIdx[l.id], EN_HEADLOSS);
+								f.statuses[l.id] = p.getLinkValue(linkIdx[l.id], EN_STATUS) > 0 ? 'open' : 'closed';
+							}
+							frames.push(f);
+						}
+						tstep = p.nextH();
+						// A guard, not a policy: a network that somehow never advances would hang the
+						// tab. 100000 steps is far past any real model at any real timestep.
+					} while (tstep > 0 && ++guard < 100000);
+					p.closeH();
+				} finally {
+					// ALWAYS closed. A Project is a WASM allocation inside a Workspace that outlives
+					// it, so a run that threw would otherwise leak the whole network on every retry.
+					try { p.close(); } catch (e) { /* already torn down */ }
+				}
+				return {
+					ok: true, engine: 'epanet', engineVersion: ws.version, issues: [],
+					warnings: built.warnings, converged: true, frames: frames,
+					duration: duration, reportStart: reportStart, reportStep: reportStep
+				};
+			});
 		});
 	};
 

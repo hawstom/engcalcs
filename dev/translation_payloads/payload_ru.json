@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "ru",
-        "expected_key_count": 1111,
-        "delta_key_count": 115,
+        "expected_key_count": 1133,
+        "delta_key_count": 137,
         "exempt_key_count": 18,
         "exempt_keys": [
             "calc_units_us",
@@ -497,7 +497,29 @@
         "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity.",
         "template_share_link": "Copy link to this calculation",
         "template_share_copied": "✓ Link copied. Paste it into an email or a message.",
-        "template_share_manual": "Copy this link:"
+        "template_share_manual": "Copy this link:",
+        "lpn_time_menu": "Time",
+        "lpn_time_menu_tip": "Set how long this network runs, and step through it moment by moment.",
+        "lpn_time_duration": "Total run time",
+        "lpn_time_hyd_step": "Hydraulic time step",
+        "lpn_time_pattern_step": "Pattern time step",
+        "lpn_time_pattern_start": "Pattern start time",
+        "lpn_time_report_step": "Report time step",
+        "lpn_time_report_start": "Report start time",
+        "lpn_time_clock_start": "Clock time at the start",
+        "lpn_time_format_tip": "Write a time as hours and minutes, like 2:30. A plain number means hours; a number with its own word means that word: 30 minutes.",
+        "lpn_time_steady": "This network is worked out at one moment. Give it a total run time above zero and it runs over time instead.",
+        "lpn_time_running": "Working out the whole time period with the EPANET engine.",
+        "lpn_time_no_engine": "The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET engine, which runs the whole period.",
+        "lpn_time_slider": "Time",
+        "lpn_time_first": "Go to the start",
+        "lpn_time_prev": "Step back",
+        "lpn_time_play": "Play",
+        "lpn_time_pause": "Pause",
+        "lpn_time_next": "Step forward",
+        "lpn_time_last": "Go to the end",
+        "lpn_time_tank": "Tank",
+        "lpn_time_level": "Water level"
     },
     "keys": {
         "lpn_field_text_align": "Horizontal justification",
@@ -614,7 +636,29 @@
         "lpn_engine_minor_loss_note": "Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because it rounds gravity.",
         "template_share_link": "Copy link to this calculation",
         "template_share_copied": "✓ Link copied. Paste it into an email or a message.",
-        "template_share_manual": "Copy this link:"
+        "template_share_manual": "Copy this link:",
+        "lpn_time_menu": "Time",
+        "lpn_time_menu_tip": "Set how long this network runs, and step through it moment by moment.",
+        "lpn_time_duration": "Total run time",
+        "lpn_time_hyd_step": "Hydraulic time step",
+        "lpn_time_pattern_step": "Pattern time step",
+        "lpn_time_pattern_start": "Pattern start time",
+        "lpn_time_report_step": "Report time step",
+        "lpn_time_report_start": "Report start time",
+        "lpn_time_clock_start": "Clock time at the start",
+        "lpn_time_format_tip": "Write a time as hours and minutes, like 2:30. A plain number means hours; a number with its own word means that word: 30 minutes.",
+        "lpn_time_steady": "This network is worked out at one moment. Give it a total run time above zero and it runs over time instead.",
+        "lpn_time_running": "Working out the whole time period with the EPANET engine.",
+        "lpn_time_no_engine": "The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET engine, which runs the whole period.",
+        "lpn_time_slider": "Time",
+        "lpn_time_first": "Go to the start",
+        "lpn_time_prev": "Step back",
+        "lpn_time_play": "Play",
+        "lpn_time_pause": "Pause",
+        "lpn_time_next": "Step forward",
+        "lpn_time_last": "Go to the end",
+        "lpn_time_tank": "Tank",
+        "lpn_time_level": "Water level"
     },
     "key_context": {
         "lpn_field_text_align": {
@@ -2434,6 +2478,270 @@
             }
         },
         "template_share_manual": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_duration": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_hyd_step": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_pattern_step": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_pattern_start": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_report_step": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_report_start": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_clock_start": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_format_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_steady": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_running": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_no_engine": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_slider": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_first": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_prev": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_play": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_pause": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_next": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_last": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_tank": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_confirm_wipe",
+                    "value": "Удалить ВСЁ, что сохранено для этой страницы — каждый проект, каждое фоновое изображение, все настройки и выбранные вами единицы измерения, — и перезагрузить страницу так, как её увидел бы совершенно новый посетитель? Это действие нельзя отменить.",
+                    "english": "Delete EVERYTHING saved for this page — every project, every background image, all settings, and your unit choices — and reload the page as a brand-new visitor would see it? This cannot be undone."
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_time_level": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {
