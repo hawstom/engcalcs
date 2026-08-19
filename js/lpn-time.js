@@ -518,6 +518,10 @@
 				tr.appendChild(el('td', {}, id));
 				// **A RESULT, DISPLAYED. NEVER WRITTEN BACK ONTO THE TANK.** The document's `level`
 				// is the user's starting condition and stays exactly as they typed it.
+				//
+				// Shown in the INPUT head unit rather than the result one (Task 422 split them),
+				// because the number a reader is comparing this against is the tank's own stored
+				// starting level, which is typed in that unit.
 				tr.appendChild(el('td', {}, host.toDisplay(levels[id], 'lpn_u_elevhead').toFixed(2)));
 				tbl.appendChild(tr);
 			});
