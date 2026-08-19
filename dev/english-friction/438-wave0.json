@@ -1,621 +1,621 @@
 {
-  "sprint": "438-wave0",
-  "description": "Adversarial Wave 0 (ROADMAP Task 438) over the English added or re-worded on 2026-08-18 -- the 104 NEW and 8 CHANGED keys reported by detect_english_drift.php, plus the explicitly named families: the placement tool (lpn_georef_*, lpn_geomap, lpn_xymap), the coordinate jump (lpn_goto_*), the clean-map toggle (lpn_clean_map*), Find (lpn_find_*), Profile (lpn_profile_*), the units warning (lpn_units_*), .inp export/import (lpn_inp_*, lpn_file_export_inp*), the new flow unit tokens (u_imgd, u_afd, u_lpm, u_cmh, u_cmd), lpn_unit_unknown, the share affordance (template_share_*), menu_more, the four new-project rows, and Task 405's four. The question asked of every string was NOT 'is this good?' but 'list every plausible reading' -- the falsification pass whose measured yield on lpn_ (Task 239) was 36 findings on top of a completed review. Result: 46 findings -- 13 high, 25 medium, 8 low. Every entry is open: this pass proposes, it does not write. English rewrites are for the human to apply (three concurrent tracks were writing lib/lang.ec.en.php); $ec_lang_syn is off-limits to AI by standing rule, so anything routed there is a proposal awaiting written permission.",
-  "entries": [
-    {
-      "key": "lpn_clean_map",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: \"Clean map\" is adjective-plus-noun or verb-plus-object, and English gives no signal which. The verb reading is not merely grammatical here -- it is dangerous, because this page's vocabulary already contains genuine erasers (the settings wipe button, lpn_profile_clear, clearNetwork), so \"clean the map\" reads as \"erase what I drew\". The button actually hides two overlays (the mode hint and the coordinate readout) for screenshots and touches nothing in the document. It is also half of a toggle whose other half is lpn_clean_map_off ('Show map readouts'): one names a state, the other an action, so a translator cannot see they are the two faces of one control and will render them in two different grammatical moods.",
-      "readings": [
-        "a mode in which the map is shown without on-screen chrome (intended)",
-        "clean/tidy the map -- erase what is drawn on it",
-        "a map that is clean/blank, i.e. a new empty map"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Hide map readouts' for the on state, keeping 'Show map readouts' for the off state -- a symmetric Hide/Show pair whose two halves are visibly one toggle, in the same mood, with the same object, and with no verb that can be read as erasing. If 'Clean map' is kept for its screenshot flavour, the pair must at least be made symmetric ('Clean map' / 'Normal map')."
-    },
-    {
-      "key": "lpn_clean_map_tip",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: The final clause 'Nothing else changes, and nothing is saved' is meant to reassure -- the mode is deliberately not persisted (the code comment says a reload restores everything). Read cold it says the opposite of reassurance: 'nothing is saved' is exactly the sentence a user fears about their network, and it sits in a tip on a drawing page where saving the project is the dominant sense of the verb. A translator has no way to know which object 'nothing' has and will pick one; several will pick the document.",
-      "readings": [
-        "this display choice is not stored, so a reload brings the readouts back (intended)",
-        "your project will not be saved while this is on",
-        "nothing at all is written to disk -- a warning"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: '...so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored -- reloading the page brings the readouts back.' Name both objects instead of leaving 'nothing' to find its own."
-    },
-    {
-      "key": "lpn_find_condition",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: 'Condition' labels the select holding the comparison operators ('is exactly', 'is greater than', 'Top n'). But this is a water-distribution application, and in that register 'condition' is the physical state of a pipe -- the single most common non-hydraulic attribute a utility records against a main. A translator working from a glossary of pipe vocabulary is being handed the trap word in its most primed context, with no sentence around it, as a one-word select label. The result would be a Find form that appears to search on pipe condition.",
-      "readings": [
-        "the comparison to apply -- the test (intended)",
-        "the physical state/condition of the pipe",
-        "a conditional rule, as in a control statement"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Test'. If a longer label is affordable, 'How to compare'. Either removes the asset-condition reading entirely, and both are truer to a list whose members are operators."
-    },
-    {
-      "key": "lpn_find_op_top",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: Two defects at once, and its sibling lpn_find_op_bottom has both identically. (1) 'Top' on a MAP means the upper edge of the drawing at least as readily as it means the highest value -- and this option sits in a list whose other members ('is greater than') are explicitly about magnitude, which makes the spatial reading look like the deliberate contrast. (2) The bare letter 'n' is a variable standing for the number typed into the Value box, but it is written as a plain English letter with no brace placeholder and no marker, so a translator will treat it as a word to translate, an abbreviation to expand, or noise to drop. Nothing in the string says the count comes from another field.",
-      "readings": [
-        "the n elements with the highest value of the chosen property (intended)",
-        "the elements nearest the top edge of the map",
-        "the first n in the list / the best n",
-        "'n' as a translatable word or a typo"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Highest {n}' and 'Lowest {n}' -- the brace form is the marker the rest of this file uses for a substituted value, and 'highest/lowest' cannot be read spatially. If the brace cannot be substituted at this call site, 'Highest values' / 'Lowest values' is still strictly better than a bare 'n'."
-    },
-    {
-      "key": "lpn_find_adjacent",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: Renders inside a result row as 'J-12 · Links here: P-1, P-5', meaning the pipes/pumps/valves connected to that node. Both words fail. 'Links' is the hyperlink trap already recorded against lpn_labels_heading_link in Task 239 -- but there it survived because the sibling 'Node labels' anchored the network sense, and here there is no anchor at all, only a colon and a list of IDs that look like link text. 'Here' has no antecedent in the string; the node is on the screen, not in the sentence, and a translator who reads 'here' as 'on this page' gets 'the hyperlinks on this page'.",
-      "readings": [
-        "the network links connected to this node (intended)",
-        "hyperlinks on this page / in this row",
-        "links at this map location"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Connected'. The row already prints the IDs after the colon, so the label only has to say what the relationship is, and 'connected' carries the network sense with no competing web sense. 'Connected to this node' if the width allows."
-    },
-    {
-      "key": "lpn_profile_menu",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: A single word naming a menu that draws a long-section of ground and hydraulic grade along a route. In a browser application the overwhelmingly dominant sense of 'Profile' is the user account page, and it is the sense a translator working on web UI is primed for. English happens to use one word for both; most target languages do not -- zh 剖面圖 (section) versus 個人資料 (account), ru профиль works for both but ar/km/my/sw must choose. This is the highest-traffic string in the whole new feature: it names the menu, so getting it wrong mislabels everything under it.",
-      "readings": [
-        "a longitudinal section: ground and head plotted along a route (intended)",
-        "a user profile / account settings",
-        "a configuration profile, a saved set of options"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED: keep the English 'Profile' -- it is the engineering term of art, its sibling lpn_profile_title ('Profile along a route') already disambiguates, and renaming the menu would break the term. Route the risk instead to a glossary.json concept 'profile (long section)' with an avoid array naming the user-account and configuration-preset senses, wired to the lpn_ prefix in prefixToTermNames(). This is the entry most likely to ship wrong in a language whose two senses are different words."
-    },
-    {
-      "key": "lpn_goto_tip",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: Not ambiguity -- a functional trap. The tip ends with the worked example '38.106, -122.569', and lpn_goto_bad repeats it. A translator into any decimal-comma locale (de, es, fr, it, pt, ru, tr, hr, cs, ro, bg, id and more -- the majority of this suite's languages) will localise the number, because localising numbers in example text is exactly what a careful translator does. That yields '38,106, -122,569', which is not merely confusing but unparseable by the very field the example teaches: the string uses a comma as the LATITUDE/LONGITUDE separator, so a decimal comma collides with the separator and the reader cannot even count the numbers. The English reader is fine, which is why review missed it.",
-      "readings": [
-        "two decimal numbers separated by a comma (intended)",
-        "four numbers: 38, 106, -122, 569",
-        "two numbers written 38,106 and -122,569 in decimal-comma style"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: change the separator in the example and the prompt from a comma to a space or a slash, e.g. '38.106 -122.569', and add to the tip that the decimal point is a dot. Alternatively keep the comma but mark the example as a literal that must not be localised (commentary tag on the label). Either way lpn_goto_prompt, lpn_goto_tip and lpn_goto_bad must be changed together -- all three carry the same example."
-    },
-    {
-      "key": "lpn_georef_confirm",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: 'Place the model here for good?' turns on the idiom 'for good' = permanently. It is a fixed English phrase with no compositional meaning, and the two content words are among the most common in the language, so a translator who does not recognise the idiom gets a fluent, plausible, wrong sentence rather than a stumble. This is the confirm dialog for an irreversible conversion (the string itself says the drawing stops being an XY project), so the one word that carries the irreversibility is the one that will not survive.",
-      "readings": [
-        "permanently / for ever (intended)",
-        "for a good reason / because it is good",
-        "for the better",
-        "for the good of the model"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Place the model here permanently?' -- and note the rest of the string already explains the escape route, so nothing else changes."
-    },
-    {
-      "key": "lpn_georef_scale",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: 'One drawing unit is' is not a label, it is the first half of a sentence. Looped-Network.php:262-264 renders it as label + number input + a unit span, so the user reads 'One drawing unit is [ 5 ] ft'. A translator is given the opening fragment alone, with no marker that a number and then a unit follow it, and no way to move either. Languages that put the copula last, that inflect the numeral, or that need a classifier or a case ending on the unit cannot produce a correct sentence from this fragment at all -- and the ones that can will not know they were allowed to reorder, because they cannot see the widget.",
-      "readings": [
-        "the opening of a sentence completed by a number and a unit (intended)",
-        "a complete label reading 'one drawing unit is' with something implied",
-        "a heading over a table of drawing units"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: make it a self-contained label with the placeholder inside it -- 'Ground distance per drawing unit' (the unit span then reads as the input's unit, which is what it is), or if the sentence shape is wanted, carry the whole sentence in one key with {n} and {u} placeholders so a translator can order them. The current split cannot be fixed by wording alone."
-    },
-    {
-      "key": "lpn_units_warn_body",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: The body names the two buttons -- 'Reinterpret leaves every number as it is...' and 'Convert rewrites every one of those numbers...' -- but the buttons are labelled 'Reinterpret (change what they mean)' and 'Convert them all'. The words in the body are therefore proper nouns quoting controls, and (a) nothing marks them as such, so they read as ordinary verbs, and (b) they do not match the button text exactly, so a translator who DOES notice cannot copy a label across. Any language that renders the verb 'convert' differently from the button's imperative will leave the dialog explaining two options the user cannot find. Also 'so the network stays the same size' is ambiguous between physical extent and file/model size.",
-      "readings": [
-        "two sentences naming the two buttons below (intended)",
-        "two sentences describing two abstract operations, unrelated to any control",
-        "'the same size' = the same physical extent on the ground (intended)",
-        "'the same size' = the same number of elements / the same file size"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: quote the button labels literally, e.g. '{unit} is the unit of what you enter for: {list}. Reinterpret leaves every number as it is and reads it in the new unit. Convert them all rewrites every one of those numbers, so the network covers the same ground as before.' -- and if the two verbs must stay short in the prose, the button labels should be shortened to match rather than the prose lengthened. 'covers the same ground' removes the file-size reading."
-    },
-    {
-      "key": "lpn_field_text_align",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: Two problems, and its sibling lpn_field_text_valign ('Vertical justification') has both. (1) In typography 'justification' specifically means stretching text to both margins -- it is NOT the word for left/centre/right, which is ALIGNMENT. The options under this label are Left, Centre, Right, so the English is using the wrong term of art, and every language with a real typographic vocabulary has a distinct word for each. (2) Outside typography 'justification' means a reason or an excuse, which is the dominant everyday sense in most target languages (es justificacion, fr justification, ru обоснование). A translator without the typographic register will produce 'Horizontal reason'.",
-      "readings": [
-        "which edge or centre the text lines up on (intended)",
-        "justified text, stretched to fill the line",
-        "a reason or excuse, horizontal"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Horizontal alignment' and 'Vertical alignment'. This is the standard term for the control, it is what every graphics application calls it, and it drops the excuse reading. Fix both keys in one edit -- they are a sibling pair and must stay parallel."
-    },
-    {
-      "key": "lpn_georef_carry",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: 'Pan and zoom the map to your site.' In a browser, 'site' means website -- and this string is displayed inside a web page, to a reader whose working register is web UI. The intended sense is the physical project site, the piece of ground. Many languages use a borrowed English word for the web sense and a completely different native word for the ground sense, so the translator must choose and has nothing to choose on. The same string then says 'The model follows the middle of the map', where 'follows' is the 'tracks/stays with' sense rather than the far commoner 'comes after' -- the identical trap already recorded against lpn_field_length_tip in Task 239, recurring in new text.",
-      "readings": [
-        "the piece of ground your project is on (intended)",
-        "your website",
-        "'follows the middle of the map' = stays centred on it (intended)",
-        "'follows the middle of the map' = comes after the middle / is placed next"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Pan and zoom the map to where the network really is. The model stays at the centre of the map. Then press Drop it here.' -- 'where the network really is' has no web sense, and 'stays at the centre' has no sequential reading."
-    },
-    {
-      "key": "lpn_settings_readability_bias",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "high: 'Degrees left of vertical before a label turns 180 degrees to stay readable' was re-worded today (Task 405) and is still a compressed nominal with no main verb, three numbers in two different roles, and a 'before' that is conditional rather than temporal. It is a settings row: label on the left, number input on the right, so the reader must reconstruct 'if a label's angle is more than N degrees to the left of vertical, it is flipped'. A translator has to build a subordinate clause out of a noun phrase, and 'before' will very plausibly come out as a time word.",
-      "readings": [
-        "the threshold angle past which a near-vertical label is flipped (intended)",
-        "how many degrees a label is rotated when it flips",
-        "a delay: how long before the label turns",
-        "the angle at which a label already sits, left of vertical"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Flip a label upside down when it leans more than this many degrees left of vertical'. One clause, one main verb, the input's role stated ('this many'), and no 'before'."
-    },
-    {
-      "key": "lpn_examples_size",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: '{nodes} nodes, {links} links' is a bare count pair on every example card, with no plural handling: an example with one link renders '1 links'. English tolerates that; Slavic and Arabic languages have three to six plural classes selected by the numeral, and the translator has exactly one slot in which to put a form that must serve all of them. 'Links' also carries the hyperlink sense with no anchoring noun beside it here (its usual anchor, 'Nodes', is a word many readers will not connect to networks either).",
-      "readings": [
-        "counts of network nodes and network links (intended)",
-        "counts of nodes and of hyperlinks",
-        "a size expressed in two dimensions"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: '{nodes} nodes / {links} pipes and pumps' is wrong (valves exist), so either accept a numeral-plus-noun that translators may render as an uninflected label ('nodes: {nodes}, links: {links}' -- a colon form sidesteps numeral agreement in most languages), or state the counts as labels rather than as a sentence. The colon form is the cheap fix and is proposed here. Also worth a glossary pointer to the existing 'link' concept."
-    },
-    {
-      "key": "lpn_profile_summary",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: '{n} nodes, {len} {u}' has the same missing-plural problem as lpn_examples_size, and adds a second: the two halves are different kinds of thing (a count, then a length with its unit) joined only by a comma, so the string does not say that the second number is the length of the route. A translator sees three placeholders, one noun, and a comma.",
-      "readings": [
-        "n nodes along a route that is len units long (intended)",
-        "n nodes, and a separate quantity len",
-        "a list of n nodes and len of something else"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: '{n} nodes, {len} {u} long' -- one word makes the second half a predicate about the route instead of a second item in a list."
-    },
-    {
-      "key": "lpn_profile_through",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: A bare preposition used as a heading. It prefixes the chip row of intermediate waypoints: 'Through J-5 x J-9 x [Clear]'. A preposition in isolation is the hardest possible unit to translate, because in most languages its form depends on the case, number and sometimes gender of the noun that follows -- and here the noun that follows is a node ID, not a word. It also sits beside lpn_profile_from ('From') and lpn_profile_to ('To'), which are a conventional pair a translator will recognise, so 'Through' will be assumed to be the third member of that pair and rendered as another endpoint rather than as a list heading.",
-      "readings": [
-        "the route also passes through these nodes (intended)",
-        "a third endpoint, parallel to From and To",
-        "'through' as in finished/done"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Via' is no better. Use a noun phrase heading: 'Nodes on the way' (or 'Waypoints'). A noun can be inflected independently of what follows it and cannot be mistaken for a third endpoint."
-    },
-    {
-      "key": "lpn_profile_clear",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: A bare 'Clear' on a button, which is adjective, verb and (rarely) noun in English. It empties only the waypoint list, but it sits inside the Profile panel next to the From/To selects and the drawn chart, so its scope is invisible: a user may reasonably expect it to clear the whole profile. This is the same verb-or-adjective shape that Task 239 caught in lpn_settings_wipe_btn, recurring in a new panel, and the same scope problem too.",
-      "readings": [
-        "empty the list of intermediate nodes (intended)",
-        "clear the whole profile / start over",
-        "the adjective 'clear' -- visible, transparent"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Remove all' (it renders immediately after the removable chips, so the object is visually adjacent), or explicitly 'Clear the list'."
-    },
-    {
-      "key": "lpn_profile_ground",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: A one-word chart series label. 'Ground' means the earth surface here, but its electrical sense (earth/ground connection) is a strong competitor in technical registers, and several languages use a completely different word for each (es tierra covers both, but fr terrain vs terre, de Gelaende vs Erde, ru рельеф vs земля). It is also a verb ('to ground'). Its sibling series label is lpn_profile_hgl, a two-word technical phrase, so there is no parallel structure to hint that this one is a surface.",
-      "readings": [
-        "the ground surface along the route (intended)",
-        "electrical earth",
-        "the ground/basis of something",
-        "the verb: to ground"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Ground surface'. Two words, no electrical reading, no verb reading, and it stays parallel with the other series label as a noun phrase."
-    },
-    {
-      "key": "lpn_profile_hgl",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: 'Hydraulic grade' is the standard phrase with its head noun cut off -- the thing plotted is the hydraulic grade LINE, and 'hydraulic grade' alone names the slope, not the elevation. That matters because the series it labels is an elevation, drawn against an elevation axis, so the English quietly labels the curve with the wrong quantity. 'Grade' is separately polysemous (a school mark, a quality class, a slope, a level), and lpn_profile_tip in the same feature spells out 'hydraulic grade line', so the two strings will be translated as two different things.",
-      "readings": [
-        "the hydraulic grade line, an elevation (intended)",
-        "the hydraulic gradient, a slope",
-        "a grade/class/rating that is hydraulic",
-        "a school grade"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Hydraulic grade line' (or 'Hydraulic grade line (HGL)' if the legend width allows). This also brings the label into agreement with lpn_profile_tip, which already uses the full phrase. A glossary.json concept for 'hydraulic grade line' wired to lpn_ would carry the guard across both."
-    },
-    {
-      "key": "lpn_profile_pick",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: 'Click a node on the map to route through it' uses 'route' as a verb, which is uncommon and, when it is used, usually takes the thing being routed as its object ('route the cable through the duct'). Here the elided object is the profile's path. Combined with 'it', whose antecedent is the node rather than the map or the route, the second half of a checkbox label has two soft spots in six words. It is also a checkbox that ENABLES map picking, not an instruction to be carried out now -- so the imperative mood is factually wrong about the control.",
-      "readings": [
-        "turn on map picking; clicking a node adds it to the route (intended)",
-        "an instruction to click right now",
-        "'route through it' = send the flow through it",
-        "'it' = the map"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Add nodes to the route by clicking them on the map' -- a description of what the checkbox does rather than an imperative, with the verb 'add' and no pronoun."
-    },
-    {
-      "key": "lpn_find_scope",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: 'Elements to search' is an English infinitive whose voice is unmarked: it can mean the elements that WILL BE searched (intended) or the elements that will DO the searching. Most target languages must choose an explicit passive or relative clause and cannot leave it open. 'Elements' additionally carries the HTML-element and chemical-element senses that Task 239 already had to rewrite out of lpn_push_elements -- and this new key reintroduces the same word, so whatever that rewrite settled on, this string is now out of step with it.",
-      "readings": [
-        "which kinds of element the search looks at (intended)",
-        "elements that perform the search",
-        "HTML elements",
-        "chemical elements"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'What to search' -- shorter, unambiguously passive in effect, and it avoids re-litigating the word 'elements'. If the noun is wanted, it must use whatever noun Task 239's rewrite of lpn_push_elements chose, so the page speaks with one word for one thing."
-    },
-    {
-      "key": "lpn_find_op_equals",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: 'is exactly', with its siblings 'is greater than', 'is less than' and 'contains', are verb-phrase fragments that compose with a property name chosen in the select ABOVE them -- the user reads 'Diameter | is greater than | 100'. But the fragments are translated in isolation, and in languages where the verb or the adjective agrees with the subject's gender and number, one fixed fragment cannot serve 'Diameter', 'Elevation' and 'Status'. Nothing in the strings shows a translator that a subject noun precedes them, and the options are also mixed in kind: three are predicates, two ('Top n', 'Bottom n') are not, so no single grammatical mould fits the list.",
-      "readings": [
-        "a predicate completing 'property <op> value' (intended)",
-        "a standalone option label meaning 'exact match'",
-        "an adverb qualifying something else"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: make the whole option list one grammatical kind by dropping the copula -- 'equal to', 'greater than', 'less than', 'contains', 'highest', 'lowest'. Adjective/participle phrases agree with nothing and compose in far more languages than a finite verb does."
-    },
-    {
-      "key": "lpn_tool_color_tip",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: 'Colour the network by one value' says the wrong thing. The feature colours by one PROPERTY (pressure, velocity), and each element then gets its own value of it -- 'by one value' states the opposite, that a single value is used. An English reader glosses over it; a translator has no way to recover the intended noun and will render 'value' faithfully, freezing the error into 26 files. 'Read at a glance' is separately an idiom.",
-      "readings": [
-        "colour every element according to one chosen quantity (intended)",
-        "colour the network using a single value",
-        "colour only the elements that have one particular value"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Colour the network by one quantity, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.' One word, and it stops being false."
-    },
-    {
-      "key": "lpn_basemap_tip",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: The last sentence, 'Your pipes are drawn with or without it', leaves 'it' to find an antecedent among three candidates in the preceding sentence -- the street map, OpenStreetMap, and the internet. The intended reading is the street map, and the intended point is that the drawing does not depend on the tiles. Read as 'with or without the internet' it becomes an offline promise this string has no business making. 'Pictures' for map tiles is also a coinage, and 'as you move around' is ambiguous between the user moving and the map moving.",
-      "readings": [
-        "your network is drawn whether or not the street map is shown (intended)",
-        "your network is drawn whether or not you have internet",
-        "your pipes can be drawn on top of it or beside it"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.'"
-    },
-    {
-      "key": "lpn_georef_tip",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: It opens 'Flat Earth to Round Earth.' As an English engineer's joke about plane versus geodetic coordinates this reads fine. Capitalised and standing alone, 'Flat Earth' is also the name of a conspiracy belief, and that is its most searchable and most translated sense -- a translator reaching for the established rendering in their language will pick up the belief's name, and the tip will open by naming a conspiracy theory. There is no context in the fragment to prevent it, because it has no verb and no subject.",
-      "readings": [
-        "from plane coordinates to geodetic coordinates (intended)",
-        "from the flat-earth belief to the round-earth fact",
-        "a heading naming two things being compared"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'From a flat grid to the round Earth.' Lower-case, a verb-less but unmistakably spatial phrase, and no proper noun for a translator to look up."
-    },
-    {
-      "key": "lpn_georef_drop",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: 'Drop it here' is a button that places the model at the map centre. 'Drop' has an unusually crowded field in THIS suite on THIS day: lpn_field_valve_setting_drop is 'Pressure drop' (a decrease), lpn_inp_drop_demand_pattern and lpn_inp_drop_gpv_curve use 'drop' in their key names for things discarded on import, and the everyday sense is to let something fall or to discard it. A button reading 'discard it here' is a plausible and destructive misreading in a confirm-heavy flow. 'It' also has no antecedent in the string -- the model is on the screen, not in the sentence.",
-      "readings": [
-        "place the model at this location (intended)",
-        "discard/abandon it",
-        "let it fall",
-        "reduce it here"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Put the model here'. It names the object, uses the plainest possible verb, and removes the discard reading entirely. lpn_georef_carry quotes this button by name and must be changed in the same edit."
-    },
-    {
-      "key": "lpn_georef_adjust",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: The last sentence, 'Or type the two numbers', has an unstated referent: the two numbers are the scale and the rotation, which live in the input boxes on the same bar but appear nowhere in the string. A translator cannot tell whether 'the two numbers' means a coordinate pair (which this feature also has -- latitude and longitude, in the neighbouring Go to control), the scale and rotation, or two numbers about to be described. It also uses three different pronouns for the model in one sentence ('it' three times) plus 'a corner' and 'the round handle above it', where the second 'it' is the model and not the corner.",
-      "readings": [
-        "type the scale and the rotation into the boxes (intended)",
-        "type a latitude and longitude",
-        "type two numbers that will be explained next",
-        "'the round handle above it' -- above the corner, not above the model"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Drag the model to move it, drag a corner to resize it, drag the round handle above the model to turn it. Or type the scale and the turn below.' Name both numbers, and repeat the noun instead of the third pronoun."
-    },
-    {
-      "key": "lpn_georef_rotation",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: 'Turn, degrees counter-clockwise' is three fragments held together by one comma. 'Turn' is noun or verb; 'degrees' is the unit, appended by a comma rather than by a preposition or parentheses, which no other unit-bearing label in this suite does; and 'counter-clockwise' is the American form, while this same file writes 'Colour' and 'Centre' -- so a translator is being asked to follow British spelling in one string and American in the next, which reads as carelessness and invites them to normalise elsewhere. Its own tip spells the meaning out correctly, which shows the label is a compression, not a concept.",
-      "readings": [
-        "the angle, in degrees, to turn the model anticlockwise (intended)",
-        "an imperative: turn it, by degrees, anticlockwise",
-        "a noun list: turn; degrees; direction"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Turn anticlockwise (degrees)' -- parentheses for the unit as everywhere else in the suite, one spelling convention, and no comma splice."
-    },
-    {
-      "key": "lpn_gpv_curve_note",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: Factually contradicted on screen. The note says 'With no points the valve is simply open', but the table it is attached to is built by curvePointTable(), whose row labels come from lpn_pump_point1 = 'Point 1 (required)'. So the user reads 'Point 1 (required)' and, immediately underneath, 'with no points the valve is simply open'. The 'required' label is true of a pump curve and false of a GPV; the table is shared, the labels are not qualified. A translator translating both strings faithfully ships the contradiction into 26 languages.",
-      "readings": [
-        "points are optional; an empty curve means an open valve (intended)",
-        "point 1 is required, as the row above says",
-        "'simply open' = fully open (intended)",
-        "'simply open' = merely unlocked / not closed off"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED: fix in code, not in the string -- pass GPV-specific row labels (or a variant of lpn_pump_point1 without '(required)') when curvePointTable() is called from renderGpvCurve(), which is the only caller for which 'required' is false. If that is too invasive, the note should say 'Leave the points empty and the valve stays fully open.' and the required marker must go."
-    },
-    {
-      "key": "lpn_inp_drop_demand_pattern",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: 'Pattern' is the load-bearing word and it is never anchored. In EPANET it is a named time series of multipliers; in ordinary language it is a repeating design, a template, or a behaviour, and in most target languages those are different words from the time-series sense. The message also says 'This page solves one moment, the start of that day' -- 'solves a moment' is a coined transitive use that will not survive literal translation -- and 'the file's number' leaves the reader to work out that it means the base demand written in the file.",
-      "readings": [
-        "an EPANET demand pattern: a series of hourly multipliers (intended)",
-        "a repeating design or motif",
-        "a usage pattern / a habit",
-        "'solves one moment' = computes the state at a single instant (intended)",
-        "'solves one moment' = takes a moment to solve"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'These junctions change their demand through the day. This page computes one instant, the start of that day, so each demand here is the base demand from the file multiplied by the first value of its demand pattern -- the same number EPANET shows at the start of its run.' Plus a glossary.json concept for 'demand pattern' wired to lpn_, since the word recurs across the import report."
-    },
-    {
-      "key": "lpn_file_export_inp_tip",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: 'Anything EPANET has no way to say is listed for you afterwards' personifies the file format, and lpn_inp_export_differences repeats the metaphor ('could not be written in EPANET's language'). Two problems: the metaphor is not universal -- several languages will not accept a format 'saying' or 'having a language' and the translator must invent something -- and the sentence is also structurally hard, because 'Anything EPANET has no way to say' is a long subject with a reduced relative clause and no relative pronoun, which is exactly the construction non-English readers parse wrongly. 'Things' in the sibling string is separately vague about what is being counted (features? elements? properties?).",
-      "readings": [
-        "features of this project that the .inp format cannot express (intended)",
-        "things EPANET the program refuses to accept",
-        "things that cannot be pronounced/named"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: '...Anything the .inp format cannot hold is listed for you afterwards.' and for lpn_inp_export_differences: '{n} things the .inp format cannot hold.' Same noun in both, no personification, and the subject is short."
-    },
-    {
-      "key": "lpn_unit_unknown",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: The key sentence is 'No answers can be given until this page knows that unit, because there is no way to tell how big it is.' Three soft spots. 'No answers can be given' is agentless passive, which several languages must resolve into an actor (we? the page? nobody?). 'Knows that unit' personifies the page. And 'how big it is' has 'it' pointing back past two nouns to the unit, so the sentence can read as being about the size of the drawing or of the network -- which is a live confusion on a page that also warns about the network changing size (lpn_units_warn_body).",
-      "readings": [
-        "we cannot compute until this page has a conversion factor for that unit (intended)",
-        "the answers are being withheld",
-        "'how big it is' = the size of the unit (intended)",
-        "'how big it is' = the size of the drawing or the network"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: '...Nothing can be computed until this page is taught that unit, because it does not know how large one of them is.' Keeps the honesty, names the unit as the thing being measured, and drops the agentless passive."
-    },
-    {
-      "key": "menu_more",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: The English value changed today from 'More' to 'Help' while the key kept its old name. Translation payloads carry the key name beside the value, and a translator who trusts the name over the value -- a reasonable habit, since key names here are descriptive by convention -- will render 'More'. The suite has no other case of a key whose name contradicts its value. Separately, 'Help' as a bare navbar word is noun or imperative verb, and several languages distinguish the noun (assistance, documentation) from the imperative (help me!); a top-level nav item gives no clue which.",
-      "readings": [
-        "a menu of help and about pages, noun (intended)",
-        "the imperative: help!",
-        "'More' -- whatever the key name says"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED: rename the key with dev/scripts/rename_lang_key.php menu_more menu_help --apply (never by hand), so the name and the value agree before 26 translators read them. The English value stays 'Help'. Note the renamer does not rewrite dev/english-friction/*.json and will report this entry as a hit -- that is expected."
-    },
-    {
-      "key": "template_share_link",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: Duplicate control, not a wording defect. Every calculator page now carries TWO buttons that do the same thing: the navbar's calc_copy_link ('Copy link' / 'Copied!') calling EngCalcs.copyLink(), and this one, template_share_link ('Copy link to this calculation' / '✓ Link copied. Paste it into an email or a message.') calling EngCalcs.copyShareLink(). Both call updateUrl() and copy window.location.href -- identical behaviour, two labels, two confirmations, four strings to translate in 26 languages. A translator will assume they differ and invent a distinction ('share' vs 'copy') that the code does not have.",
-      "readings": [
-        "a second, more explicit way to copy the same link (actual)",
-        "a share function distinct from copying a link",
-        "a link to a saved/named calculation, distinct from the current page URL"
-      ],
-      "disposition": "refer-to-human",
-      "resolution": "Not the AI's call: this is a UX question about whether two identical controls should both exist, and it touches lib/Calculators.lib.php and lib/Menus.lib.php, which are outside this pass's territory. If both stay, the two labels must be made to describe a real difference before translation; if one goes, four strings never need translating. Tom to rule."
-    },
-    {
-      "key": "lpn_examples_welcome",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: 'Welcome to your Water Supply Network software, with the EPANET core'. Three soft spots in eleven words. 'Your' claims ownership on the user's behalf -- unusual in English, and in several languages the possessive will read as though the user bought or installed it. 'Water Supply Network software' is capitalised like a product name but is not one, so a translator must guess whether to translate it. And 'core' is a metaphor for the solver engine whose everyday senses (an apple core, a core sample, a nuclear core, a CPU core) are all live; nothing says it means a computation engine.",
-      "readings": [
-        "a greeting for a tool that uses EPANET as its solver (intended)",
-        "software you own / your copy",
-        "a product literally named 'Water Supply Network'",
-        "'core' = a central part, a sample, a processor core"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Welcome to water supply network modelling, powered by the EPANET solver' -- no possessive, no accidental proper noun, and 'solver' is the word this page already uses everywhere else (lpn_settings_engine_epanet says 'Solve with the EPANET engine')."
-    },
-    {
-      "key": "u_imgd",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: 'IMGD' is imperial million gallons per day (19.005 per m3/s), and it now sits one row away from 'MGD', US million gallons per day, in the same flow selector. The two tokens differ by one letter and by 20% in magnitude, and nothing anywhere -- not the token, not a tip -- says which gallon each uses. A translator is not the main victim here; the user is. But the translator is also stuck: 'IMGD' is not a standard abbreviation in any language, so they must decide between keeping it, expanding it, or transliterating it, with no statement of what the I stands for.",
-      "readings": [
-        "imperial million gallons per day (intended)",
-        "a typo or variant of MGD",
-        "instantaneous MGD / integrated MGD",
-        "an initialism to be localised"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED: keep the token (a unit token must stay short and is conventionally untranslated) and add a glossary.json concept 'imperial gallon' wired to the u_ tokens, stating that the imperial gallon is 4.54609 L against the US gallon's 3.785411784 L and that IMGD/MGD must remain visibly distinct. The user-facing confusability of MGD next to IMGD is worth Tom's eye separately."
-    },
-    {
-      "key": "lpn_field_text_match_pipe",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: Re-worded today (Task 405) from a label that read as a toggle to 'Set to pipe angle', which is better -- but two problems survive. (1) It is still readable as a state rather than an action: 'set to pipe angle' is exactly how one describes a setting's current value, and the control is a one-shot button that reads the nearest link's angle once and never again. (2) It says 'pipe', but nearestLinkAngle() at js/looped-network.js:3565 iterates doc.links -- every link, including pumps and valves. On a label beside a pump the button will match the pump and the label will have told the user it matched a pipe.",
-      "readings": [
-        "press this to rotate the label to the angle of the nearest pipe, once (intended)",
-        "the label's angle is currently set to the pipe angle (a state readout)",
-        "keep this label aligned with its pipe from now on (a mode)"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Match the nearest link' -- an imperative verb (so it cannot be read as a state), and 'link' is true of what the code actually searches. If 'link' is judged too jargon-heavy for this popup, 'Match the nearest pipe or pump' is accurate and still short."
-    },
-    {
-      "key": "lpn_settings_engine_epanet_tip",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "medium: Flagged by detect_english_drift.php as a ROLE CHANGE (31 to 82 words), and the new text introduces three readings. 'The two solvers agree closely, but not exactly' is fine; 'so its minor (local) losses come out about 0.08% lower than ours' leaves 'ours' to name the other solver, which is never named in this string -- a translator must render a possessive whose referent is off-stage. 'The first time you turn this on' describes a checkbox, correctly, but the same tip is attached to a settings row whose other controls are number inputs, and 'turn on' is not obviously a checkbox in every language. And the 0.08% figure is stated a second time in lpn_engine_minor_loss_note, so the same measured fact now lives in two translatable strings and will go stale in one of them.",
-      "readings": [
-        "'ours' = this page's own built-in solver (intended)",
-        "'ours' = EngCalcs the company/site, ambiguous with EPANET",
-        "'turn this on' = tick this checkbox (intended)",
-        "'turn this on' = switch to this option in some other control"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: replace 'than ours' with 'than the built-in solver', which is the phrase lpn_engine_minor_loss_note already uses, and replace 'turn this on' with 'tick this box'. The duplicated 0.08% is tracked separately under lpn_engine_minor_loss_note. Being a role change as well, this key needs a semantic per-language resync, not just a delta translation."
-    },
-    {
-      "key": "lpn_engine_minor_loss_note",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "low: Not ambiguity -- duplication of a measured fact. 'about 0.08% lower than the built-in solver, because it rounds gravity' restates, in different words, a sentence inside lpn_settings_engine_epanet_tip. Two translatable strings now carry the same number and the same causal claim, in 26 languages each. When the figure is next re-measured, one of the 52 will be updated and the other will not, and nothing checks them against each other. 'It rounds gravity' also leaves 'it' pointing at EPANET across a clause boundary in which 'the built-in solver' is the nearer noun.",
-      "readings": [
-        "'it' = EPANET (intended)",
-        "'it' = the built-in solver, the nearest preceding noun"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: name the subject -- 'Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because EPANET rounds the value it uses for gravity.' The duplication itself should be resolved by deciding which of the two strings owns the number; a fact stated twice in 27 languages is 54 places for it to go stale."
-    },
-    {
-      "key": "lpn_new_blank_si",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "low: The parenthetical reads '(l/s)' with a lower-case l, while the suite's own unit token for the same unit, u_lps, is 'L/s' with a capital. lpn_new_geo_si has the identical mismatch. A translator with a units eye will see two spellings of one symbol in one sprint and either normalise inconsistently or query it; a user sees the new-project menu disagreeing with every unit selector on the page. 'Blank' is separately adjective-only in English and modifies an elided noun that the string does supply ('project'), so that part is fine.",
-      "readings": [
-        "litres per second, spelled as the suite spells it elsewhere (intended)",
-        "a different unit from the L/s in the selectors",
-        "a typo to be silently corrected or silently propagated"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: '(L/s)' in both lpn_new_blank_si and lpn_new_geo_si, matching u_lps. Trivial, but it is exactly the kind of inconsistency 26 translators each resolve differently."
-    },
-    {
-      "key": "u_cmh",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "low: 'm^3/hr' uses the English abbreviation 'hr' where the international symbol for the hour is 'h'. The caret form for the exponent is consistent with the suite's existing u_m3ps ('m^3/s') and u_m3 ('m^3'), so that part is right; the 'hr' is not. A unit token carrying an English-language abbreviation invites 26 different decisions -- keep 'hr', localise to 'h', localise to a local abbreviation -- in a token whose whole value is that it is the same everywhere.",
-      "readings": [
-        "cubic metres per hour (intended)",
-        "an English abbreviation to be localised",
-        "'hr' as some other quantity"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'm^3/h'. It is the SI symbol, it is one character shorter in a token that renders inside a narrow selector, and it is the same in every language."
-    },
-    {
-      "key": "lpn_examples_close",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "low: A bare 'Close' on the gallery's dismiss button. In English it is a verb here and an adjective ('near') elsewhere, and the two senses are different words in most target languages. The risk is mild because a lone button in a dialog corner has strong convention behind it, but the string carries no marker of the verb reading and the page already contains distance vocabulary (lpn_georef_scale, lpn_profile_axis_station), which keeps the 'near' sense warm.",
-      "readings": [
-        "the imperative: close this panel (intended)",
-        "the adjective: near",
-        "the noun: a close/end"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED: keep the English (a dialog Close button is a strong convention and an English reader does not stumble), and route to $ec_lang_syn with imperative alternates -- 'Close, Shut, Dismiss, Hide this panel, Go back to the map'. Off-limits to AI to write: proposed here for written permission."
-    },
-    {
-      "key": "lpn_ex_net3_desc",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "low: Re-worded today. The counts are now correct (verified against examples/Net3-lpn.json: 92 junctions, 3 tanks, 2 reservoirs, 117 pipes, 2 pumps), so the factual defect Task 405 found is genuinely fixed. Two smaller things remain. 'Two sources' names elements the rest of the application calls reservoirs (lpn_tool_add_reservoir), so the card and the toolbar use different nouns for the same object and a translator will produce two words. And the numbers mix styles -- numeral '92' beside words 'three' and 'two' -- which is an English house style most languages do not share, so each translator decides afresh.",
-      "readings": [
-        "two reservoir elements, one representing a river (intended)",
-        "two data sources / two origins for the model",
-        "two water sources of unspecified element type"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: '...92 junctions, three tanks and two reservoirs, one of them a river.' Uses the application's own element name, which the translator already has a settled word for."
-    },
-    {
-      "key": "lpn_georef_finish",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "low: A bare 'Finish' ending an irreversible flow. It is verb, noun and, in an engineering register, a surface treatment ('a smooth finish') -- and this suite's audience is exactly the one for whom the surface sense is live. Its neighbours on the same bar are 'Cancel' and 'Drop it here', so the mood is inferable, but nothing in the string itself says imperative, and 'Finish' is the button that commits the conversion lpn_georef_confirm warns about.",
-      "readings": [
-        "the imperative: complete the placement (intended)",
-        "the noun: an end, or a surface finish",
-        "'finished' as a state label"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED English: 'Done' is no better. Prefer a verb with an object: 'Place it' -- but note lpn_georef_intro and lpn_georef_confirm both quote this button by name, so any change is a three-string edit."
-    },
-    {
-      "key": "lpn_valve_type_pbv",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "low: 'Pressure breaker (PBV)' is EPANET's own element name, so the English is right to keep it -- but 'breaker' has two strong competing senses (an electrical circuit breaker, and a breaking wave), and the water one is the wrong field's word in a hydraulics glossary. Several languages will reach for the electrical term. Its sibling lpn_valve_type_gpv ('General purpose (GPV)') has no such trap, so the pair gives no guidance.",
-      "readings": [
-        "a valve that imposes a fixed pressure drop, EPANET's PBV (intended)",
-        "a circuit breaker",
-        "a breakwater / breaking wave"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED: keep the English -- it is EPANET's published element name and identity terms are not renamed. Route to glossary.json as a valve-type concept alongside PRV/PSV/FCV/TCV, with an avoid array naming the electrical sense, wired to lpn_ in prefixToTermNames(). The new lpn_field_valve_setting_drop_tip already gives the user a correct plain-language definition, so the reader is served; only the translator needs the guard."
-    },
-    {
-      "key": "lpn_geomap",
-      "source": "wave0",
-      "lang": null,
-      "complaint": "low: 'GeoMap' and its sibling lpn_xymap ('XY') are coined mode names, and they appear as bare values in two keys and then inside the prose of at least seven more (lpn_georef_menu, lpn_georef_tip, lpn_georef_intro, lpn_georef_confirm, lpn_georef_done, lpn_georef_on_map, lpn_new_geo_us/si, lpn_new_blank_us/si). Nothing marks them as coined names rather than descriptive words, so some translators will translate 'GeoMap' and others will keep it, and the same project mode will have two names inside one language file. 'XY' is worse: two letters that look like a placeholder.",
-      "readings": [
-        "a proper name for the geographic project mode, kept as-is (intended)",
-        "a descriptive phrase meaning 'geographic map', to be translated",
-        "'XY' as a placeholder for something not yet written"
-      ],
-      "disposition": "open",
-      "resolution": "PROPOSED: keep both English values and add ONE glossary.json concept covering the two project modes, stating that the mode names are product terms carried unchanged into every language, and wire it to lpn_. A per-label synonym entry would have to be repeated across nine strings; the pointer is the right shape here."
-    }
-  ]
+ "sprint": "438-wave0",
+ "description": "Adversarial Wave 0 (ROADMAP Task 438) over the English added or re-worded on 2026-08-18 -- the 104 NEW and 8 CHANGED keys reported by detect_english_drift.php, plus the explicitly named families: the placement tool (lpn_georef_*, lpn_geomap, lpn_xymap), the coordinate jump (lpn_goto_*), the clean-map toggle (lpn_clean_map*), Find (lpn_find_*), Profile (lpn_profile_*), the units warning (lpn_units_*), .inp export/import (lpn_inp_*, lpn_file_export_inp*), the new flow unit tokens (u_imgd, u_afd, u_lpm, u_cmh, u_cmd), lpn_unit_unknown, the share affordance (template_share_*), menu_more, the four new-project rows, and Task 405's four. The question asked of every string was NOT 'is this good?' but 'list every plausible reading' -- the falsification pass whose measured yield on lpn_ (Task 239) was 36 findings on top of a completed review. Result: 46 findings -- 13 high, 25 medium, 8 low. Every entry is open: this pass proposes, it does not write. English rewrites are for the human to apply (three concurrent tracks were writing lib/lang.ec.en.php); $ec_lang_syn is off-limits to AI by standing rule, so anything routed there is a proposal awaiting written permission.",
+ "entries": [
+  {
+   "key": "lpn_clean_map",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: \"Clean map\" is adjective-plus-noun or verb-plus-object, and English gives no signal which. The verb reading is not merely grammatical here -- it is dangerous, because this page's vocabulary already contains genuine erasers (the settings wipe button, lpn_profile_clear, clearNetwork), so \"clean the map\" reads as \"erase what I drew\". The button actually hides two overlays (the mode hint and the coordinate readout) for screenshots and touches nothing in the document. It is also half of a toggle whose other half is lpn_clean_map_off ('Show map readouts'): one names a state, the other an action, so a translator cannot see they are the two faces of one control and will render them in two different grammatical moods.",
+   "readings": [
+    "a mode in which the map is shown without on-screen chrome (intended)",
+    "clean/tidy the map -- erase what is drawn on it",
+    "a map that is clean/blank, i.e. a new empty map"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten: 'Clean map' -> 'Hide map readouts'. The button is shown only when the mode is OFF and its other face is already 'Show map readouts', so Hide/Show is now one symmetric pair in one mood with one object, and no verb in it can be read as erasing."
+  },
+  {
+   "key": "lpn_clean_map_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: The final clause 'Nothing else changes, and nothing is saved' is meant to reassure -- the mode is deliberately not persisted (the code comment says a reload restores everything). Read cold it says the opposite of reassurance: 'nothing is saved' is exactly the sentence a user fears about their network, and it sits in a tip on a drawing page where saving the project is the dominant sense of the verb. A translator has no way to know which object 'nothing' has and will pick one; several will pick the document.",
+   "readings": [
+    "this display choice is not stored, so a reload brings the readouts back (intended)",
+    "your project will not be saved while this is on",
+    "nothing at all is written to disk -- a warning"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten. Both objects are now named: 'Your drawing is not touched' and 'this choice is not stored — reloading the page brings the readouts back'. The bare 'nothing is saved', which read as a warning about the project, is gone."
+  },
+  {
+   "key": "lpn_find_condition",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: 'Condition' labels the select holding the comparison operators ('is exactly', 'is greater than', 'Top n'). But this is a water-distribution application, and in that register 'condition' is the physical state of a pipe -- the single most common non-hydraulic attribute a utility records against a main. A translator working from a glossary of pipe vocabulary is being handed the trap word in its most primed context, with no sentence around it, as a one-word select label. The result would be a Find form that appears to search on pipe condition.",
+   "readings": [
+    "the comparison to apply -- the test (intended)",
+    "the physical state/condition of the pipe",
+    "a conditional rule, as in a control statement"
+   ],
+   "disposition": "dismissed",
+   "resolution": "REFUSED by Tom, 2026-08-18: \"No. This is a really weak complaint. The context is obvious and precise.\" English kept as \"Condition\"."
+  },
+  {
+   "key": "lpn_find_op_top",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: Two defects at once, and its sibling lpn_find_op_bottom has both identically. (1) 'Top' on a MAP means the upper edge of the drawing at least as readily as it means the highest value -- and this option sits in a list whose other members ('is greater than') are explicitly about magnitude, which makes the spatial reading look like the deliberate contrast. (2) The bare letter 'n' is a variable standing for the number typed into the Value box, but it is written as a plain English letter with no brace placeholder and no marker, so a translator will treat it as a word to translate, an abbreviation to expand, or noise to drop. Nothing in the string says the count comes from another field.",
+   "readings": [
+    "the n elements with the highest value of the chosen property (intended)",
+    "the elements nearest the top edge of the map",
+    "the first n in the list / the best n",
+    "'n' as a translatable word or a typo"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten: 'Top n' -> 'Highest n', 'Bottom n' -> 'Lowest n'. The proposed brace form was rejected: the option is a plain <option> label at js/looped-network.js:5877 with no substitution, so a {n} would ship literally. Highest/Lowest cannot be read as the upper edge of the drawing, and the literal n -- Tom's own wording for 'the number goes in the box beside it' -- is kept."
+  },
+  {
+   "key": "lpn_find_adjacent",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: Renders inside a result row as 'J-12 · Links here: P-1, P-5', meaning the pipes/pumps/valves connected to that node. Both words fail. 'Links' is the hyperlink trap already recorded against lpn_labels_heading_link in Task 239 -- but there it survived because the sibling 'Node labels' anchored the network sense, and here there is no anchor at all, only a colon and a list of IDs that look like link text. 'Here' has no antecedent in the string; the node is on the screen, not in the sentence, and a translator who reads 'here' as 'on this page' gets 'the hyperlinks on this page'.",
+   "readings": [
+    "the network links connected to this node (intended)",
+    "hyperlinks on this page / in this row",
+    "links at this map location"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten: 'Links here' -> 'Connected'. The row already prints the IDs after the colon, so the label only has to name the relationship; 'connected' has no hyperlink sense and no dangling 'here'."
+  },
+  {
+   "key": "lpn_profile_menu",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: A single word naming a menu that draws a long-section of ground and hydraulic grade along a route. In a browser application the overwhelmingly dominant sense of 'Profile' is the user account page, and it is the sense a translator working on web UI is primed for. English happens to use one word for both; most target languages do not -- zh 剖面圖 (section) versus 個人資料 (account), ru профиль works for both but ar/km/my/sw must choose. This is the highest-traffic string in the whole new feature: it names the menu, so getting it wrong mislabels everything under it.",
+   "readings": [
+    "a longitudinal section: ground and head plotted along a route (intended)",
+    "a user profile / account settings",
+    "a configuration profile, a saved set of options"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED: keep the English 'Profile' -- it is the engineering term of art, its sibling lpn_profile_title ('Profile along a route') already disambiguates, and renaming the menu would break the term. Route the risk instead to a glossary.json concept 'profile (long section)' with an avoid array naming the user-account and configuration-preset senses, wired to the lpn_ prefix in prefixToTermNames(). This is the entry most likely to ship wrong in a language whose two senses are different words."
+  },
+  {
+   "key": "lpn_goto_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: Not ambiguity -- a functional trap. The tip ends with the worked example '38.106, -122.569', and lpn_goto_bad repeats it. A translator into any decimal-comma locale (de, es, fr, it, pt, ru, tr, hr, cs, ro, bg, id and more -- the majority of this suite's languages) will localise the number, because localising numbers in example text is exactly what a careful translator does. That yields '38,106, -122,569', which is not merely confusing but unparseable by the very field the example teaches: the string uses a comma as the LATITUDE/LONGITUDE separator, so a decimal comma collides with the separator and the reader cannot even count the numbers. The English reader is fine, which is why review missed it.",
+   "readings": [
+    "two decimal numbers separated by a comma (intended)",
+    "four numbers: 38, 106, -122, 569",
+    "two numbers written 38,106 and -122,569 in decimal-comma style"
+   ],
+   "disposition": "english",
+   "resolution": "Already fixed before this pass was answered, and verified here: the separator is a space, not a comma, and the example is whole numbers '38 -122' whose longitude is past 90 so it cannot be read as a second latitude. lpn_goto_tip, lpn_goto_prompt and lpn_goto_bad all carry the same form. Nothing left for a decimal-comma locale to collide with."
+  },
+  {
+   "key": "lpn_georef_confirm",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: 'Place the model here for good?' turns on the idiom 'for good' = permanently. It is a fixed English phrase with no compositional meaning, and the two content words are among the most common in the language, so a translator who does not recognise the idiom gets a fluent, plausible, wrong sentence rather than a stumble. This is the confirm dialog for an irreversible conversion (the string itself says the drawing stops being an XY project), so the one word that carries the irreversibility is the one that will not survive.",
+   "readings": [
+    "permanently / for ever (intended)",
+    "for a good reason / because it is good",
+    "for the better",
+    "for the good of the model"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten: the idiom 'for good' -> 'permanently'. The rest of the string already states the escape route and is unchanged."
+  },
+  {
+   "key": "lpn_georef_scale",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: 'One drawing unit is' is not a label, it is the first half of a sentence. Looped-Network.php:262-264 renders it as label + number input + a unit span, so the user reads 'One drawing unit is [ 5 ] ft'. A translator is given the opening fragment alone, with no marker that a number and then a unit follow it, and no way to move either. Languages that put the copula last, that inflect the numeral, or that need a classifier or a case ending on the unit cannot produce a correct sentence from this fragment at all -- and the ones that can will not know they were allowed to reorder, because they cannot see the widget.",
+   "readings": [
+    "the opening of a sentence completed by a number and a unit (intended)",
+    "a complete label reading 'one drawing unit is' with something implied",
+    "a heading over a table of drawing units"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten: 'One drawing unit is' -> 'Ground distance per drawing unit'. It is now a self-contained noun label, so the number input and the unit span beside it read as the input's value and unit rather than as the tail of a sentence a translator cannot reorder. The one-key-whole-sentence alternative was rejected: it would need a new placeholder contract at Looped-Network.php:281, where the unit span is written by the page."
+  },
+  {
+   "key": "lpn_units_warn_body",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: The body names the two buttons -- 'Reinterpret leaves every number as it is...' and 'Convert rewrites every one of those numbers...' -- but the buttons are labelled 'Reinterpret (change what they mean)' and 'Convert them all'. The words in the body are therefore proper nouns quoting controls, and (a) nothing marks them as such, so they read as ordinary verbs, and (b) they do not match the button text exactly, so a translator who DOES notice cannot copy a label across. Any language that renders the verb 'convert' differently from the button's imperative will leave the dialog explaining two options the user cannot find. Also 'so the network stays the same size' is ambiguous between physical extent and file/model size.",
+   "readings": [
+    "two sentences naming the two buttons below (intended)",
+    "two sentences describing two abstract operations, unrelated to any control",
+    "'the same size' = the same physical extent on the ground (intended)",
+    "'the same size' = the same number of elements / the same file size"
+   ],
+   "disposition": "english",
+   "resolution": "English rewritten. The prose now quotes the second button by its exact label ('Convert them all'), so a translator can copy the button text across; 'Reinterpret' already matched the head of its button label. 'stays the same size' -> 'covers the same ground as before', which removes the file-size reading."
+  },
+  {
+   "key": "lpn_field_text_align",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: Two problems, and its sibling lpn_field_text_valign ('Vertical justification') has both. (1) In typography 'justification' specifically means stretching text to both margins -- it is NOT the word for left/centre/right, which is ALIGNMENT. The options under this label are Left, Centre, Right, so the English is using the wrong term of art, and every language with a real typographic vocabulary has a distinct word for each. (2) Outside typography 'justification' means a reason or an excuse, which is the dominant everyday sense in most target languages (es justificacion, fr justification, ru обоснование). A translator without the typographic register will produce 'Horizontal reason'.",
+   "readings": [
+    "which edge or centre the text lines up on (intended)",
+    "justified text, stretched to fill the line",
+    "a reason or excuse, horizontal"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Horizontal alignment' and 'Vertical alignment'. This is the standard term for the control, it is what every graphics application calls it, and it drops the excuse reading. Fix both keys in one edit -- they are a sibling pair and must stay parallel."
+  },
+  {
+   "key": "lpn_georef_carry",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: 'Pan and zoom the map to your site.' In a browser, 'site' means website -- and this string is displayed inside a web page, to a reader whose working register is web UI. The intended sense is the physical project site, the piece of ground. Many languages use a borrowed English word for the web sense and a completely different native word for the ground sense, so the translator must choose and has nothing to choose on. The same string then says 'The model follows the middle of the map', where 'follows' is the 'tracks/stays with' sense rather than the far commoner 'comes after' -- the identical trap already recorded against lpn_field_length_tip in Task 239, recurring in new text.",
+   "readings": [
+    "the piece of ground your project is on (intended)",
+    "your website",
+    "'follows the middle of the map' = stays centred on it (intended)",
+    "'follows the middle of the map' = comes after the middle / is placed next"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Pan and zoom the map to where the network really is. The model stays at the centre of the map. Then press Drop it here.' -- 'where the network really is' has no web sense, and 'stays at the centre' has no sequential reading."
+  },
+  {
+   "key": "lpn_settings_readability_bias",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: 'Degrees left of vertical before a label turns 180 degrees to stay readable' was re-worded today (Task 405) and is still a compressed nominal with no main verb, three numbers in two different roles, and a 'before' that is conditional rather than temporal. It is a settings row: label on the left, number input on the right, so the reader must reconstruct 'if a label's angle is more than N degrees to the left of vertical, it is flipped'. A translator has to build a subordinate clause out of a noun phrase, and 'before' will very plausibly come out as a time word.",
+   "readings": [
+    "the threshold angle past which a near-vertical label is flipped (intended)",
+    "how many degrees a label is rotated when it flips",
+    "a delay: how long before the label turns",
+    "the angle at which a label already sits, left of vertical"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Flip a label upside down when it leans more than this many degrees left of vertical'. One clause, one main verb, the input's role stated ('this many'), and no 'before'."
+  },
+  {
+   "key": "lpn_examples_size",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: '{nodes} nodes, {links} links' is a bare count pair on every example card, with no plural handling: an example with one link renders '1 links'. English tolerates that; Slavic and Arabic languages have three to six plural classes selected by the numeral, and the translator has exactly one slot in which to put a form that must serve all of them. 'Links' also carries the hyperlink sense with no anchoring noun beside it here (its usual anchor, 'Nodes', is a word many readers will not connect to networks either).",
+   "readings": [
+    "counts of network nodes and network links (intended)",
+    "counts of nodes and of hyperlinks",
+    "a size expressed in two dimensions"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '{nodes} nodes / {links} pipes and pumps' is wrong (valves exist), so either accept a numeral-plus-noun that translators may render as an uninflected label ('nodes: {nodes}, links: {links}' -- a colon form sidesteps numeral agreement in most languages), or state the counts as labels rather than as a sentence. The colon form is the cheap fix and is proposed here. Also worth a glossary pointer to the existing 'link' concept."
+  },
+  {
+   "key": "lpn_profile_summary",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: '{n} nodes, {len} {u}' has the same missing-plural problem as lpn_examples_size, and adds a second: the two halves are different kinds of thing (a count, then a length with its unit) joined only by a comma, so the string does not say that the second number is the length of the route. A translator sees three placeholders, one noun, and a comma.",
+   "readings": [
+    "n nodes along a route that is len units long (intended)",
+    "n nodes, and a separate quantity len",
+    "a list of n nodes and len of something else"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '{n} nodes, {len} {u} long' -- one word makes the second half a predicate about the route instead of a second item in a list."
+  },
+  {
+   "key": "lpn_profile_through",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: A bare preposition used as a heading. It prefixes the chip row of intermediate waypoints: 'Through J-5 x J-9 x [Clear]'. A preposition in isolation is the hardest possible unit to translate, because in most languages its form depends on the case, number and sometimes gender of the noun that follows -- and here the noun that follows is a node ID, not a word. It also sits beside lpn_profile_from ('From') and lpn_profile_to ('To'), which are a conventional pair a translator will recognise, so 'Through' will be assumed to be the third member of that pair and rendered as another endpoint rather than as a list heading.",
+   "readings": [
+    "the route also passes through these nodes (intended)",
+    "a third endpoint, parallel to From and To",
+    "'through' as in finished/done"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Via' is no better. Use a noun phrase heading: 'Nodes on the way' (or 'Waypoints'). A noun can be inflected independently of what follows it and cannot be mistaken for a third endpoint."
+  },
+  {
+   "key": "lpn_profile_clear",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: A bare 'Clear' on a button, which is adjective, verb and (rarely) noun in English. It empties only the waypoint list, but it sits inside the Profile panel next to the From/To selects and the drawn chart, so its scope is invisible: a user may reasonably expect it to clear the whole profile. This is the same verb-or-adjective shape that Task 239 caught in lpn_settings_wipe_btn, recurring in a new panel, and the same scope problem too.",
+   "readings": [
+    "empty the list of intermediate nodes (intended)",
+    "clear the whole profile / start over",
+    "the adjective 'clear' -- visible, transparent"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Remove all' (it renders immediately after the removable chips, so the object is visually adjacent), or explicitly 'Clear the list'."
+  },
+  {
+   "key": "lpn_profile_ground",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: A one-word chart series label. 'Ground' means the earth surface here, but its electrical sense (earth/ground connection) is a strong competitor in technical registers, and several languages use a completely different word for each (es tierra covers both, but fr terrain vs terre, de Gelaende vs Erde, ru рельеф vs земля). It is also a verb ('to ground'). Its sibling series label is lpn_profile_hgl, a two-word technical phrase, so there is no parallel structure to hint that this one is a surface.",
+   "readings": [
+    "the ground surface along the route (intended)",
+    "electrical earth",
+    "the ground/basis of something",
+    "the verb: to ground"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Ground surface'. Two words, no electrical reading, no verb reading, and it stays parallel with the other series label as a noun phrase."
+  },
+  {
+   "key": "lpn_profile_hgl",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Hydraulic grade' is the standard phrase with its head noun cut off -- the thing plotted is the hydraulic grade LINE, and 'hydraulic grade' alone names the slope, not the elevation. That matters because the series it labels is an elevation, drawn against an elevation axis, so the English quietly labels the curve with the wrong quantity. 'Grade' is separately polysemous (a school mark, a quality class, a slope, a level), and lpn_profile_tip in the same feature spells out 'hydraulic grade line', so the two strings will be translated as two different things.",
+   "readings": [
+    "the hydraulic grade line, an elevation (intended)",
+    "the hydraulic gradient, a slope",
+    "a grade/class/rating that is hydraulic",
+    "a school grade"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Hydraulic grade line' (or 'Hydraulic grade line (HGL)' if the legend width allows). This also brings the label into agreement with lpn_profile_tip, which already uses the full phrase. A glossary.json concept for 'hydraulic grade line' wired to lpn_ would carry the guard across both."
+  },
+  {
+   "key": "lpn_profile_pick",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Click a node on the map to route through it' uses 'route' as a verb, which is uncommon and, when it is used, usually takes the thing being routed as its object ('route the cable through the duct'). Here the elided object is the profile's path. Combined with 'it', whose antecedent is the node rather than the map or the route, the second half of a checkbox label has two soft spots in six words. It is also a checkbox that ENABLES map picking, not an instruction to be carried out now -- so the imperative mood is factually wrong about the control.",
+   "readings": [
+    "turn on map picking; clicking a node adds it to the route (intended)",
+    "an instruction to click right now",
+    "'route through it' = send the flow through it",
+    "'it' = the map"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Add nodes to the route by clicking them on the map' -- a description of what the checkbox does rather than an imperative, with the verb 'add' and no pronoun."
+  },
+  {
+   "key": "lpn_find_scope",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Elements to search' is an English infinitive whose voice is unmarked: it can mean the elements that WILL BE searched (intended) or the elements that will DO the searching. Most target languages must choose an explicit passive or relative clause and cannot leave it open. 'Elements' additionally carries the HTML-element and chemical-element senses that Task 239 already had to rewrite out of lpn_push_elements -- and this new key reintroduces the same word, so whatever that rewrite settled on, this string is now out of step with it.",
+   "readings": [
+    "which kinds of element the search looks at (intended)",
+    "elements that perform the search",
+    "HTML elements",
+    "chemical elements"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'What to search' -- shorter, unambiguously passive in effect, and it avoids re-litigating the word 'elements'. If the noun is wanted, it must use whatever noun Task 239's rewrite of lpn_push_elements chose, so the page speaks with one word for one thing."
+  },
+  {
+   "key": "lpn_find_op_equals",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'is exactly', with its siblings 'is greater than', 'is less than' and 'contains', are verb-phrase fragments that compose with a property name chosen in the select ABOVE them -- the user reads 'Diameter | is greater than | 100'. But the fragments are translated in isolation, and in languages where the verb or the adjective agrees with the subject's gender and number, one fixed fragment cannot serve 'Diameter', 'Elevation' and 'Status'. Nothing in the strings shows a translator that a subject noun precedes them, and the options are also mixed in kind: three are predicates, two ('Top n', 'Bottom n') are not, so no single grammatical mould fits the list.",
+   "readings": [
+    "a predicate completing 'property <op> value' (intended)",
+    "a standalone option label meaning 'exact match'",
+    "an adverb qualifying something else"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: make the whole option list one grammatical kind by dropping the copula -- 'equal to', 'greater than', 'less than', 'contains', 'highest', 'lowest'. Adjective/participle phrases agree with nothing and compose in far more languages than a finite verb does."
+  },
+  {
+   "key": "lpn_tool_color_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Colour the network by one value' says the wrong thing. The feature colours by one PROPERTY (pressure, velocity), and each element then gets its own value of it -- 'by one value' states the opposite, that a single value is used. An English reader glosses over it; a translator has no way to recover the intended noun and will render 'value' faithfully, freezing the error into 26 files. 'Read at a glance' is separately an idiom.",
+   "readings": [
+    "colour every element according to one chosen quantity (intended)",
+    "colour the network using a single value",
+    "colour only the elements that have one particular value"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Colour the network by one quantity, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.' One word, and it stops being false."
+  },
+  {
+   "key": "lpn_basemap_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: The last sentence, 'Your pipes are drawn with or without it', leaves 'it' to find an antecedent among three candidates in the preceding sentence -- the street map, OpenStreetMap, and the internet. The intended reading is the street map, and the intended point is that the drawing does not depend on the tiles. Read as 'with or without the internet' it becomes an offline promise this string has no business making. 'Pictures' for map tiles is also a coinage, and 'as you move around' is ambiguous between the user moving and the map moving.",
+   "readings": [
+    "your network is drawn whether or not the street map is shown (intended)",
+    "your network is drawn whether or not you have internet",
+    "your pipes can be drawn on top of it or beside it"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.'"
+  },
+  {
+   "key": "lpn_georef_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: It opens 'Flat Earth to Round Earth.' As an English engineer's joke about plane versus geodetic coordinates this reads fine. Capitalised and standing alone, 'Flat Earth' is also the name of a conspiracy belief, and that is its most searchable and most translated sense -- a translator reaching for the established rendering in their language will pick up the belief's name, and the tip will open by naming a conspiracy theory. There is no context in the fragment to prevent it, because it has no verb and no subject.",
+   "readings": [
+    "from plane coordinates to geodetic coordinates (intended)",
+    "from the flat-earth belief to the round-earth fact",
+    "a heading naming two things being compared"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'From a flat grid to the round Earth.' Lower-case, a verb-less but unmistakably spatial phrase, and no proper noun for a translator to look up."
+  },
+  {
+   "key": "lpn_georef_drop",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Drop it here' is a button that places the model at the map centre. 'Drop' has an unusually crowded field in THIS suite on THIS day: lpn_field_valve_setting_drop is 'Pressure drop' (a decrease), lpn_inp_drop_demand_pattern and lpn_inp_drop_gpv_curve use 'drop' in their key names for things discarded on import, and the everyday sense is to let something fall or to discard it. A button reading 'discard it here' is a plausible and destructive misreading in a confirm-heavy flow. 'It' also has no antecedent in the string -- the model is on the screen, not in the sentence.",
+   "readings": [
+    "place the model at this location (intended)",
+    "discard/abandon it",
+    "let it fall",
+    "reduce it here"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Put the model here'. It names the object, uses the plainest possible verb, and removes the discard reading entirely. lpn_georef_carry quotes this button by name and must be changed in the same edit."
+  },
+  {
+   "key": "lpn_georef_adjust",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: The last sentence, 'Or type the two numbers', has an unstated referent: the two numbers are the scale and the rotation, which live in the input boxes on the same bar but appear nowhere in the string. A translator cannot tell whether 'the two numbers' means a coordinate pair (which this feature also has -- latitude and longitude, in the neighbouring Go to control), the scale and rotation, or two numbers about to be described. It also uses three different pronouns for the model in one sentence ('it' three times) plus 'a corner' and 'the round handle above it', where the second 'it' is the model and not the corner.",
+   "readings": [
+    "type the scale and the rotation into the boxes (intended)",
+    "type a latitude and longitude",
+    "type two numbers that will be explained next",
+    "'the round handle above it' -- above the corner, not above the model"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Drag the model to move it, drag a corner to resize it, drag the round handle above the model to turn it. Or type the scale and the turn below.' Name both numbers, and repeat the noun instead of the third pronoun."
+  },
+  {
+   "key": "lpn_georef_rotation",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Turn, degrees counter-clockwise' is three fragments held together by one comma. 'Turn' is noun or verb; 'degrees' is the unit, appended by a comma rather than by a preposition or parentheses, which no other unit-bearing label in this suite does; and 'counter-clockwise' is the American form, while this same file writes 'Colour' and 'Centre' -- so a translator is being asked to follow British spelling in one string and American in the next, which reads as carelessness and invites them to normalise elsewhere. Its own tip spells the meaning out correctly, which shows the label is a compression, not a concept.",
+   "readings": [
+    "the angle, in degrees, to turn the model anticlockwise (intended)",
+    "an imperative: turn it, by degrees, anticlockwise",
+    "a noun list: turn; degrees; direction"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Turn anticlockwise (degrees)' -- parentheses for the unit as everywhere else in the suite, one spelling convention, and no comma splice."
+  },
+  {
+   "key": "lpn_gpv_curve_note",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: Factually contradicted on screen. The note says 'With no points the valve is simply open', but the table it is attached to is built by curvePointTable(), whose row labels come from lpn_pump_point1 = 'Point 1 (required)'. So the user reads 'Point 1 (required)' and, immediately underneath, 'with no points the valve is simply open'. The 'required' label is true of a pump curve and false of a GPV; the table is shared, the labels are not qualified. A translator translating both strings faithfully ships the contradiction into 26 languages.",
+   "readings": [
+    "points are optional; an empty curve means an open valve (intended)",
+    "point 1 is required, as the row above says",
+    "'simply open' = fully open (intended)",
+    "'simply open' = merely unlocked / not closed off"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED: fix in code, not in the string -- pass GPV-specific row labels (or a variant of lpn_pump_point1 without '(required)') when curvePointTable() is called from renderGpvCurve(), which is the only caller for which 'required' is false. If that is too invasive, the note should say 'Leave the points empty and the valve stays fully open.' and the required marker must go."
+  },
+  {
+   "key": "lpn_inp_drop_demand_pattern",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Pattern' is the load-bearing word and it is never anchored. In EPANET it is a named time series of multipliers; in ordinary language it is a repeating design, a template, or a behaviour, and in most target languages those are different words from the time-series sense. The message also says 'This page solves one moment, the start of that day' -- 'solves a moment' is a coined transitive use that will not survive literal translation -- and 'the file's number' leaves the reader to work out that it means the base demand written in the file.",
+   "readings": [
+    "an EPANET demand pattern: a series of hourly multipliers (intended)",
+    "a repeating design or motif",
+    "a usage pattern / a habit",
+    "'solves one moment' = computes the state at a single instant (intended)",
+    "'solves one moment' = takes a moment to solve"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'These junctions change their demand through the day. This page computes one instant, the start of that day, so each demand here is the base demand from the file multiplied by the first value of its demand pattern -- the same number EPANET shows at the start of its run.' Plus a glossary.json concept for 'demand pattern' wired to lpn_, since the word recurs across the import report."
+  },
+  {
+   "key": "lpn_file_export_inp_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Anything EPANET has no way to say is listed for you afterwards' personifies the file format, and lpn_inp_export_differences repeats the metaphor ('could not be written in EPANET's language'). Two problems: the metaphor is not universal -- several languages will not accept a format 'saying' or 'having a language' and the translator must invent something -- and the sentence is also structurally hard, because 'Anything EPANET has no way to say' is a long subject with a reduced relative clause and no relative pronoun, which is exactly the construction non-English readers parse wrongly. 'Things' in the sibling string is separately vague about what is being counted (features? elements? properties?).",
+   "readings": [
+    "features of this project that the .inp format cannot express (intended)",
+    "things EPANET the program refuses to accept",
+    "things that cannot be pronounced/named"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '...Anything the .inp format cannot hold is listed for you afterwards.' and for lpn_inp_export_differences: '{n} things the .inp format cannot hold.' Same noun in both, no personification, and the subject is short."
+  },
+  {
+   "key": "lpn_unit_unknown",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: The key sentence is 'No answers can be given until this page knows that unit, because there is no way to tell how big it is.' Three soft spots. 'No answers can be given' is agentless passive, which several languages must resolve into an actor (we? the page? nobody?). 'Knows that unit' personifies the page. And 'how big it is' has 'it' pointing back past two nouns to the unit, so the sentence can read as being about the size of the drawing or of the network -- which is a live confusion on a page that also warns about the network changing size (lpn_units_warn_body).",
+   "readings": [
+    "we cannot compute until this page has a conversion factor for that unit (intended)",
+    "the answers are being withheld",
+    "'how big it is' = the size of the unit (intended)",
+    "'how big it is' = the size of the drawing or the network"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '...Nothing can be computed until this page is taught that unit, because it does not know how large one of them is.' Keeps the honesty, names the unit as the thing being measured, and drops the agentless passive."
+  },
+  {
+   "key": "menu_more",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: The English value changed today from 'More' to 'Help' while the key kept its old name. Translation payloads carry the key name beside the value, and a translator who trusts the name over the value -- a reasonable habit, since key names here are descriptive by convention -- will render 'More'. The suite has no other case of a key whose name contradicts its value. Separately, 'Help' as a bare navbar word is noun or imperative verb, and several languages distinguish the noun (assistance, documentation) from the imperative (help me!); a top-level nav item gives no clue which.",
+   "readings": [
+    "a menu of help and about pages, noun (intended)",
+    "the imperative: help!",
+    "'More' -- whatever the key name says"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED: rename the key with dev/scripts/rename_lang_key.php menu_more menu_help --apply (never by hand), so the name and the value agree before 26 translators read them. The English value stays 'Help'. Note the renamer does not rewrite dev/english-friction/*.json and will report this entry as a hit -- that is expected."
+  },
+  {
+   "key": "template_share_link",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: Duplicate control, not a wording defect. Every calculator page now carries TWO buttons that do the same thing: the navbar's calc_copy_link ('Copy link' / 'Copied!') calling EngCalcs.copyLink(), and this one, template_share_link ('Copy link to this calculation' / '✓ Link copied. Paste it into an email or a message.') calling EngCalcs.copyShareLink(). Both call updateUrl() and copy window.location.href -- identical behaviour, two labels, two confirmations, four strings to translate in 26 languages. A translator will assume they differ and invent a distinction ('share' vs 'copy') that the code does not have.",
+   "readings": [
+    "a second, more explicit way to copy the same link (actual)",
+    "a share function distinct from copying a link",
+    "a link to a saved/named calculation, distinct from the current page URL"
+   ],
+   "disposition": "refer-to-human",
+   "resolution": "Not the AI's call: this is a UX question about whether two identical controls should both exist, and it touches lib/Calculators.lib.php and lib/Menus.lib.php, which are outside this pass's territory. If both stay, the two labels must be made to describe a real difference before translation; if one goes, four strings never need translating. Tom to rule."
+  },
+  {
+   "key": "lpn_examples_welcome",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'Welcome to your Water Supply Network software, with the EPANET core'. Three soft spots in eleven words. 'Your' claims ownership on the user's behalf -- unusual in English, and in several languages the possessive will read as though the user bought or installed it. 'Water Supply Network software' is capitalised like a product name but is not one, so a translator must guess whether to translate it. And 'core' is a metaphor for the solver engine whose everyday senses (an apple core, a core sample, a nuclear core, a CPU core) are all live; nothing says it means a computation engine.",
+   "readings": [
+    "a greeting for a tool that uses EPANET as its solver (intended)",
+    "software you own / your copy",
+    "a product literally named 'Water Supply Network'",
+    "'core' = a central part, a sample, a processor core"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Welcome to water supply network modelling, powered by the EPANET solver' -- no possessive, no accidental proper noun, and 'solver' is the word this page already uses everywhere else (lpn_settings_engine_epanet says 'Solve with the EPANET engine')."
+  },
+  {
+   "key": "u_imgd",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: 'IMGD' is imperial million gallons per day (19.005 per m3/s), and it now sits one row away from 'MGD', US million gallons per day, in the same flow selector. The two tokens differ by one letter and by 20% in magnitude, and nothing anywhere -- not the token, not a tip -- says which gallon each uses. A translator is not the main victim here; the user is. But the translator is also stuck: 'IMGD' is not a standard abbreviation in any language, so they must decide between keeping it, expanding it, or transliterating it, with no statement of what the I stands for.",
+   "readings": [
+    "imperial million gallons per day (intended)",
+    "a typo or variant of MGD",
+    "instantaneous MGD / integrated MGD",
+    "an initialism to be localised"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED: keep the token (a unit token must stay short and is conventionally untranslated) and add a glossary.json concept 'imperial gallon' wired to the u_ tokens, stating that the imperial gallon is 4.54609 L against the US gallon's 3.785411784 L and that IMGD/MGD must remain visibly distinct. The user-facing confusability of MGD next to IMGD is worth Tom's eye separately."
+  },
+  {
+   "key": "lpn_field_text_match_pipe",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: Re-worded today (Task 405) from a label that read as a toggle to 'Set to pipe angle', which is better -- but two problems survive. (1) It is still readable as a state rather than an action: 'set to pipe angle' is exactly how one describes a setting's current value, and the control is a one-shot button that reads the nearest link's angle once and never again. (2) It says 'pipe', but nearestLinkAngle() at js/looped-network.js:3565 iterates doc.links -- every link, including pumps and valves. On a label beside a pump the button will match the pump and the label will have told the user it matched a pipe.",
+   "readings": [
+    "press this to rotate the label to the angle of the nearest pipe, once (intended)",
+    "the label's angle is currently set to the pipe angle (a state readout)",
+    "keep this label aligned with its pipe from now on (a mode)"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Match the nearest link' -- an imperative verb (so it cannot be read as a state), and 'link' is true of what the code actually searches. If 'link' is judged too jargon-heavy for this popup, 'Match the nearest pipe or pump' is accurate and still short."
+  },
+  {
+   "key": "lpn_settings_engine_epanet_tip",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "medium: Flagged by detect_english_drift.php as a ROLE CHANGE (31 to 82 words), and the new text introduces three readings. 'The two solvers agree closely, but not exactly' is fine; 'so its minor (local) losses come out about 0.08% lower than ours' leaves 'ours' to name the other solver, which is never named in this string -- a translator must render a possessive whose referent is off-stage. 'The first time you turn this on' describes a checkbox, correctly, but the same tip is attached to a settings row whose other controls are number inputs, and 'turn on' is not obviously a checkbox in every language. And the 0.08% figure is stated a second time in lpn_engine_minor_loss_note, so the same measured fact now lives in two translatable strings and will go stale in one of them.",
+   "readings": [
+    "'ours' = this page's own built-in solver (intended)",
+    "'ours' = EngCalcs the company/site, ambiguous with EPANET",
+    "'turn this on' = tick this checkbox (intended)",
+    "'turn this on' = switch to this option in some other control"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: replace 'than ours' with 'than the built-in solver', which is the phrase lpn_engine_minor_loss_note already uses, and replace 'turn this on' with 'tick this box'. The duplicated 0.08% is tracked separately under lpn_engine_minor_loss_note. Being a role change as well, this key needs a semantic per-language resync, not just a delta translation."
+  },
+  {
+   "key": "lpn_engine_minor_loss_note",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: Not ambiguity -- duplication of a measured fact. 'about 0.08% lower than the built-in solver, because it rounds gravity' restates, in different words, a sentence inside lpn_settings_engine_epanet_tip. Two translatable strings now carry the same number and the same causal claim, in 26 languages each. When the figure is next re-measured, one of the 52 will be updated and the other will not, and nothing checks them against each other. 'It rounds gravity' also leaves 'it' pointing at EPANET across a clause boundary in which 'the built-in solver' is the nearer noun.",
+   "readings": [
+    "'it' = EPANET (intended)",
+    "'it' = the built-in solver, the nearest preceding noun"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: name the subject -- 'Note: for minor (local) losses, EPANET computes head loss about 0.08% lower than the built-in solver, because EPANET rounds the value it uses for gravity.' The duplication itself should be resolved by deciding which of the two strings owns the number; a fact stated twice in 27 languages is 54 places for it to go stale."
+  },
+  {
+   "key": "lpn_new_blank_si",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: The parenthetical reads '(l/s)' with a lower-case l, while the suite's own unit token for the same unit, u_lps, is 'L/s' with a capital. lpn_new_geo_si has the identical mismatch. A translator with a units eye will see two spellings of one symbol in one sprint and either normalise inconsistently or query it; a user sees the new-project menu disagreeing with every unit selector on the page. 'Blank' is separately adjective-only in English and modifies an elided noun that the string does supply ('project'), so that part is fine.",
+   "readings": [
+    "litres per second, spelled as the suite spells it elsewhere (intended)",
+    "a different unit from the L/s in the selectors",
+    "a typo to be silently corrected or silently propagated"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '(L/s)' in both lpn_new_blank_si and lpn_new_geo_si, matching u_lps. Trivial, but it is exactly the kind of inconsistency 26 translators each resolve differently."
+  },
+  {
+   "key": "u_cmh",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'm^3/hr' uses the English abbreviation 'hr' where the international symbol for the hour is 'h'. The caret form for the exponent is consistent with the suite's existing u_m3ps ('m^3/s') and u_m3 ('m^3'), so that part is right; the 'hr' is not. A unit token carrying an English-language abbreviation invites 26 different decisions -- keep 'hr', localise to 'h', localise to a local abbreviation -- in a token whose whole value is that it is the same everywhere.",
+   "readings": [
+    "cubic metres per hour (intended)",
+    "an English abbreviation to be localised",
+    "'hr' as some other quantity"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'm^3/h'. It is the SI symbol, it is one character shorter in a token that renders inside a narrow selector, and it is the same in every language."
+  },
+  {
+   "key": "lpn_examples_close",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: A bare 'Close' on the gallery's dismiss button. In English it is a verb here and an adjective ('near') elsewhere, and the two senses are different words in most target languages. The risk is mild because a lone button in a dialog corner has strong convention behind it, but the string carries no marker of the verb reading and the page already contains distance vocabulary (lpn_georef_scale, lpn_profile_axis_station), which keeps the 'near' sense warm.",
+   "readings": [
+    "the imperative: close this panel (intended)",
+    "the adjective: near",
+    "the noun: a close/end"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED: keep the English (a dialog Close button is a strong convention and an English reader does not stumble), and route to $ec_lang_syn with imperative alternates -- 'Close, Shut, Dismiss, Hide this panel, Go back to the map'. Off-limits to AI to write: proposed here for written permission."
+  },
+  {
+   "key": "lpn_ex_net3_desc",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: Re-worded today. The counts are now correct (verified against examples/Net3-lpn.json: 92 junctions, 3 tanks, 2 reservoirs, 117 pipes, 2 pumps), so the factual defect Task 405 found is genuinely fixed. Two smaller things remain. 'Two sources' names elements the rest of the application calls reservoirs (lpn_tool_add_reservoir), so the card and the toolbar use different nouns for the same object and a translator will produce two words. And the numbers mix styles -- numeral '92' beside words 'three' and 'two' -- which is an English house style most languages do not share, so each translator decides afresh.",
+   "readings": [
+    "two reservoir elements, one representing a river (intended)",
+    "two data sources / two origins for the model",
+    "two water sources of unspecified element type"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: '...92 junctions, three tanks and two reservoirs, one of them a river.' Uses the application's own element name, which the translator already has a settled word for."
+  },
+  {
+   "key": "lpn_georef_finish",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: A bare 'Finish' ending an irreversible flow. It is verb, noun and, in an engineering register, a surface treatment ('a smooth finish') -- and this suite's audience is exactly the one for whom the surface sense is live. Its neighbours on the same bar are 'Cancel' and 'Drop it here', so the mood is inferable, but nothing in the string itself says imperative, and 'Finish' is the button that commits the conversion lpn_georef_confirm warns about.",
+   "readings": [
+    "the imperative: complete the placement (intended)",
+    "the noun: an end, or a surface finish",
+    "'finished' as a state label"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED English: 'Done' is no better. Prefer a verb with an object: 'Place it' -- but note lpn_georef_intro and lpn_georef_confirm both quote this button by name, so any change is a three-string edit."
+  },
+  {
+   "key": "lpn_valve_type_pbv",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'Pressure breaker (PBV)' is EPANET's own element name, so the English is right to keep it -- but 'breaker' has two strong competing senses (an electrical circuit breaker, and a breaking wave), and the water one is the wrong field's word in a hydraulics glossary. Several languages will reach for the electrical term. Its sibling lpn_valve_type_gpv ('General purpose (GPV)') has no such trap, so the pair gives no guidance.",
+   "readings": [
+    "a valve that imposes a fixed pressure drop, EPANET's PBV (intended)",
+    "a circuit breaker",
+    "a breakwater / breaking wave"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED: keep the English -- it is EPANET's published element name and identity terms are not renamed. Route to glossary.json as a valve-type concept alongside PRV/PSV/FCV/TCV, with an avoid array naming the electrical sense, wired to lpn_ in prefixToTermNames(). The new lpn_field_valve_setting_drop_tip already gives the user a correct plain-language definition, so the reader is served; only the translator needs the guard."
+  },
+  {
+   "key": "lpn_geomap",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "low: 'GeoMap' and its sibling lpn_xymap ('XY') are coined mode names, and they appear as bare values in two keys and then inside the prose of at least seven more (lpn_georef_menu, lpn_georef_tip, lpn_georef_intro, lpn_georef_confirm, lpn_georef_done, lpn_georef_on_map, lpn_new_geo_us/si, lpn_new_blank_us/si). Nothing marks them as coined names rather than descriptive words, so some translators will translate 'GeoMap' and others will keep it, and the same project mode will have two names inside one language file. 'XY' is worse: two letters that look like a placeholder.",
+   "readings": [
+    "a proper name for the geographic project mode, kept as-is (intended)",
+    "a descriptive phrase meaning 'geographic map', to be translated",
+    "'XY' as a placeholder for something not yet written"
+   ],
+   "disposition": "open",
+   "resolution": "PROPOSED: keep both English values and add ONE glossary.json concept covering the two project modes, stating that the mode names are product terms carried unchanged into every language, and wire it to lpn_. A per-label synonym entry would have to be repeated across nine strings; the pointer is the right shape here."
+  }
+ ]
 }

@@ -1267,7 +1267,7 @@ $ec_lang['lpn_demand_tip']='Flow taken out of the network at this node. Enter a 
 // the two answers DO, and mark Convert as the unusual one. {unit} is a unit name, {list} the field
 // names that unit serves.
 $ec_lang['lpn_units_warn_title']='This unit decides what your numbers mean';
-$ec_lang['lpn_units_warn_body']='{unit} is the unit of what you enter for: {list}. Reinterpret leaves every number as it is and reads it in the new unit. Convert rewrites every one of those numbers so the network stays the same size.';
+$ec_lang['lpn_units_warn_body']='{unit} is the unit of what you enter for: {list}. Reinterpret leaves every number as it is and reads it in the new unit. Convert them all rewrites every one of those numbers, so the network covers the same ground as before.';
 $ec_lang['lpn_units_reinterpret']='Reinterpret (change what they mean)';
 $ec_lang['lpn_units_convert']='Convert them all';
 // {n} is a whole number.
@@ -1392,11 +1392,11 @@ $ec_lang['lpn_color_ramp_rdylbu']='Red to blue, through yellow';
 $ec_lang['lpn_georef_drop']='Drop it here';
 $ec_lang['lpn_georef_finish']='Finish';
 $ec_lang['lpn_georef_cancel']='Cancel';
-$ec_lang['lpn_georef_scale']='One drawing unit is';
+$ec_lang['lpn_georef_scale']='Ground distance per drawing unit';
 $ec_lang['lpn_georef_scale_tip']='How far one unit of your drawing reaches on the ground. A drawing made on a plain grid usually says nothing about this, so set it here — or let Go to… ask you how wide the site is and work it out.';
 $ec_lang['lpn_georef_rotation']='Turn, degrees counter-clockwise';
 $ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model, counter-clockwise, so that its north points north.';
-$ec_lang['lpn_georef_confirm']='Place the model here for good? You can still drag single elements afterwards, but the drawing stops being an XY project. To get XY back, close this project without saving.';
+$ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag single elements afterwards, but the drawing stops being an XY project. To get XY back, close this project without saving.';
 $ec_lang['lpn_georef_done']='This is a lat/lon project now. Drag any element to move it closer to where it really is.';
 $ec_lang['lpn_georef_on_map']='This project is already on lat/lon.';
 $ec_lang['lpn_georef_empty']='Draw or open a network first. There is nothing to place yet.';
@@ -1419,9 +1419,9 @@ $ec_lang['lpn_pane_tab_junctions_tip']='Every junction as a table you can sort a
 $ec_lang['lpn_pane_junctions_none']='This network has no junctions yet.';
 $ec_lang['lpn_pane_sort_tip']='Sort by this column. Click again to reverse it.';
 
-$ec_lang['lpn_clean_map']='Clean map';
+$ec_lang['lpn_clean_map']='Hide map readouts';
 $ec_lang['lpn_clean_map_off']='Show map readouts';
-$ec_lang['lpn_clean_map_tip']='Hide the mode line and the coordinate readout so a screenshot shows only the map. Nothing else changes, and nothing is saved.';
+$ec_lang['lpn_clean_map_tip']='Hide the mode line and the coordinate readout so a screenshot shows only the map. Your drawing is not touched, and this choice is not stored — reloading the page brings the readouts back.';
 // "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
 // this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Settings';
@@ -1473,11 +1473,11 @@ $ec_lang['lpn_find_none']='Nothing matched.';
 // The two extremes, as conditions on the same footing as "is greater than" -- the Value box holds
 // how many. The literal n is Tom's own wording and is the shortest way to say that the number goes
 // in the box beside it.
-$ec_lang['lpn_find_op_top']='Top n';
-$ec_lang['lpn_find_op_bottom']='Bottom n';
+$ec_lang['lpn_find_op_top']='Highest n';
+$ec_lang['lpn_find_op_bottom']='Lowest n';
 // EPANET's Map Finder calls this "Adjacent Links". Said plainly here: the pipes, pumps and valves
 // that meet at the node you found.
-$ec_lang['lpn_find_adjacent']='Links here';
+$ec_lang['lpn_find_adjacent']='Connected';
 $ec_lang['lpn_find_no_value']='Type what to look for.';
 // ---- the profile view (ROADMAP Task 409) ------------------------------------------------------
 // A drawing of the ground and the hydraulic grade line along one chosen route through the network.
