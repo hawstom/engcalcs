@@ -78,8 +78,8 @@
     "a user profile / account settings",
     "a configuration profile, a saved set of options"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED: keep the English 'Profile' -- it is the engineering term of art, its sibling lpn_profile_title ('Profile along a route') already disambiguates, and renaming the menu would break the term. Route the risk instead to a glossary.json concept 'profile (long section)' with an avoid array naming the user-account and configuration-preset senses, wired to the lpn_ prefix in prefixToTermNames(). This is the entry most likely to ship wrong in a language whose two senses are different words."
+   "disposition": "glossary",
+   "resolution": "English kept -- 'Profile' is the civil-engineering term of art and lpn_profile_title ('Profile along a route') already anchors it on screen. The risk is a translator's, not a reader's, so it is routed to a new glossary.json concept 'profile (long section)' whose avoid array names the user-account and saved-preset senses, wired to the lpn_ prefix in prefix_terms.inc.php."
   },
   {
    "key": "lpn_goto_tip",
@@ -145,8 +145,8 @@
     "justified text, stretched to fill the line",
     "a reason or excuse, horizontal"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Horizontal alignment' and 'Vertical alignment'. This is the standard term for the control, it is what every graphics application calls it, and it drops the excuse reading. Fix both keys in one edit -- they are a sibling pair and must stay parallel."
+   "disposition": "english",
+   "resolution": "English rewritten in the sibling pair: 'Horizontal justification' / 'Vertical justification' -> 'Horizontal alignment' / 'Vertical alignment'. Justification is a different typographic operation (stretching to both margins) from what Left/Centre/Right does, so the English was the wrong term of art, and outside typography the word means an excuse in most target languages."
   },
   {
    "key": "lpn_georef_carry",
@@ -159,8 +159,8 @@
     "'follows the middle of the map' = stays centred on it (intended)",
     "'follows the middle of the map' = comes after the middle / is placed next"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Pan and zoom the map to where the network really is. The model stays at the centre of the map. Then press Drop it here.' -- 'where the network really is' has no web sense, and 'stays at the centre' has no sequential reading."
+   "disposition": "dismissed",
+   "resolution": "Moot: the key no longer exists. lpn_georef_carry was retired before this pass was answered and is not to be resurrected. The 'site' = website trap it named is not present in the surviving placement strings, which say 'the ground behind it' and 'where it really is'."
   },
   {
    "key": "lpn_settings_readability_bias",
@@ -173,8 +173,8 @@
     "a delay: how long before the label turns",
     "the angle at which a label already sits, left of vertical"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Flip a label upside down when it leans more than this many degrees left of vertical'. One clause, one main verb, the input's role stated ('this many'), and no 'before'."
+   "disposition": "english",
+   "resolution": "English rewritten to one clause with a main verb: 'Flip a label upside down when it leans more than this many degrees left of vertical'. 'this many' states the number input's role, and the conditional 'before' -- which a translator could read as a time word -- is gone."
   },
   {
    "key": "lpn_examples_size",
@@ -186,8 +186,8 @@
     "counts of nodes and of hyperlinks",
     "a size expressed in two dimensions"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '{nodes} nodes / {links} pipes and pumps' is wrong (valves exist), so either accept a numeral-plus-noun that translators may render as an uninflected label ('nodes: {nodes}, links: {links}' -- a colon form sidesteps numeral agreement in most languages), or state the counts as labels rather than as a sentence. The colon form is the cheap fix and is proposed here. Also worth a glossary pointer to the existing 'link' concept."
+   "disposition": "english",
+   "resolution": "English rewritten to the colon form: 'Nodes: {nodes}, links: {links}'. A label-and-count sidesteps numeral agreement entirely, which the numeral-plus-plural-noun form could not: one slot cannot serve the three-to-six plural classes of Slavic and Arabic, and '1 links' was already wrong in English. 'link' is already a wired glossary concept for lpn_."
   },
   {
    "key": "lpn_profile_summary",
@@ -199,8 +199,8 @@
     "n nodes, and a separate quantity len",
     "a list of n nodes and len of something else"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '{n} nodes, {len} {u} long' -- one word makes the second half a predicate about the route instead of a second item in a list."
+   "disposition": "english",
+   "resolution": "English rewritten to the same colon form as lpn_examples_size: 'Nodes: {n}, length: {len} {u}'. This fixes both defects at once -- no numeral agreement is required, and the word 'length' now says what the second number is, which a bare comma did not."
   },
   {
    "key": "lpn_profile_through",
@@ -212,8 +212,8 @@
     "a third endpoint, parallel to From and To",
     "'through' as in finished/done"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Via' is no better. Use a noun phrase heading: 'Nodes on the way' (or 'Waypoints'). A noun can be inflected independently of what follows it and cannot be mistaken for a third endpoint."
+   "disposition": "english",
+   "resolution": "English rewritten: the bare preposition 'Through' -> the noun phrase 'Nodes on the way'. A noun heading inflects independently of the node IDs that follow it, and it can no longer be read as a third endpoint beside From and To."
   },
   {
    "key": "lpn_profile_clear",
@@ -225,8 +225,8 @@
     "clear the whole profile / start over",
     "the adjective 'clear' -- visible, transparent"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Remove all' (it renders immediately after the removable chips, so the object is visually adjacent), or explicitly 'Clear the list'."
+   "disposition": "english",
+   "resolution": "English rewritten: 'Clear' -> 'Remove all'. It renders immediately after the removable waypoint chips, so the object is visually adjacent, and the verb reading is now the only one. This is the same fix Task 239 applied to lpn_settings_wipe_btn."
   },
   {
    "key": "lpn_profile_ground",
@@ -239,8 +239,8 @@
     "the ground/basis of something",
     "the verb: to ground"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Ground surface'. Two words, no electrical reading, no verb reading, and it stays parallel with the other series label as a noun phrase."
+   "disposition": "english",
+   "resolution": "English rewritten: 'Ground' -> 'Ground surface'. Two words remove the electrical-earth sense and the verb sense, and the label is now a noun phrase parallel with its sibling series label 'Hydraulic grade line'."
   },
   {
    "key": "lpn_profile_hgl",
@@ -253,8 +253,8 @@
     "a grade/class/rating that is hydraulic",
     "a school grade"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Hydraulic grade line' (or 'Hydraulic grade line (HGL)' if the legend width allows). This also brings the label into agreement with lpn_profile_tip, which already uses the full phrase. A glossary.json concept for 'hydraulic grade line' wired to lpn_ would carry the guard across both."
+   "disposition": "english",
+   "resolution": "English rewritten: 'Hydraulic grade' -> 'Hydraulic grade line'. The series is an elevation, and the truncated form named the slope instead; it now also agrees with lpn_profile_tip, which already spelled out the full phrase. The '(HGL)' suffix was rejected as legend width. A glossary.json concept 'hydraulic grade line' was added and wired to lpn_ so the two strings cannot diverge again in translation."
   },
   {
    "key": "lpn_profile_pick",
@@ -267,8 +267,8 @@
     "'route through it' = send the flow through it",
     "'it' = the map"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Add nodes to the route by clicking them on the map' -- a description of what the checkbox does rather than an imperative, with the verb 'add' and no pronoun."
+   "disposition": "english",
+   "resolution": "English rewritten: it now describes what the checkbox does rather than issuing an instruction the checkbox does not carry out, the verb is 'add' rather than the rare transitive 'route', and the pronoun 'it' -- whose antecedent was the node, not the route -- is gone."
   },
   {
    "key": "lpn_find_scope",
@@ -281,8 +281,8 @@
     "HTML elements",
     "chemical elements"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'What to search' -- shorter, unambiguously passive in effect, and it avoids re-litigating the word 'elements'. If the noun is wanted, it must use whatever noun Task 239's rewrite of lpn_push_elements chose, so the page speaks with one word for one thing."
+   "disposition": "english",
+   "resolution": "English rewritten: 'Elements to search' -> 'What to search', and its option 'All elements' -> 'Everything' so the pair stays parallel. This drops the unmarked infinitive (which could be read as the elements that DO the searching) and takes the word 'elements' off the page, which is what Task 239 did to lpn_push_elements ('Nodes and pipes:')."
   },
   {
    "key": "lpn_find_op_equals",
@@ -294,8 +294,8 @@
     "a standalone option label meaning 'exact match'",
     "an adverb qualifying something else"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: make the whole option list one grammatical kind by dropping the copula -- 'equal to', 'greater than', 'less than', 'contains', 'highest', 'lowest'. Adjective/participle phrases agree with nothing and compose in far more languages than a finite verb does."
+   "disposition": "english",
+   "resolution": "English rewritten across the pair-set: 'is exactly' -> 'equal to', 'is greater than' -> 'greater than', 'is less than' -> 'less than'; 'contains' is unchanged. Dropping the copula removes the finite verb that had to agree with a subject noun chosen in the select above, which no single fixed fragment could do. The comment above these keys in lib/lang.ec.en.php has been corrected to match."
   },
   {
    "key": "lpn_tool_color_tip",
@@ -307,8 +307,8 @@
     "colour the network using a single value",
     "colour only the elements that have one particular value"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Colour the network by one quantity, so a large map can be read at a glance. Pressure and velocity are the two that usually matter.' One word, and it stops being false."
+   "disposition": "english",
+   "resolution": "English rewritten: 'by one value' -> 'by one quantity'. The old wording said the opposite of what the feature does -- one property is chosen and each element shows its own value of it -- and a translator would have frozen the error into 26 files. 'Read at a glance' is kept: it is a transparent idiom and the sentence around it says what it means."
   },
   {
    "key": "lpn_basemap_tip",
@@ -320,8 +320,8 @@
     "your network is drawn whether or not you have internet",
     "your pipes can be drawn on top of it or beside it"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.'"
+   "disposition": "english",
+   "resolution": "English rewritten. 'It' is replaced by 'the street map', so the sentence can no longer be read as an offline promise about the internet; 'pictures' becomes 'images'; and 'as you move around' becomes 'as you pan and zoom', which says who moves."
   },
   {
    "key": "lpn_georef_tip",
@@ -333,8 +333,8 @@
     "from the flat-earth belief to the round-earth fact",
     "a heading naming two things being compared"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'From a flat grid to the round Earth.' Lower-case, a verb-less but unmistakably spatial phrase, and no proper noun for a translator to look up."
+   "disposition": "english",
+   "resolution": "The 'Flat Earth' opening was already gone when this pass was answered ('Local to World.'). That fragment was still two bare nouns, so it is now 'From a local grid to the real world.' -- a preposition phrase with a direction in it, no proper noun to look up, and no conspiracy to walk into."
   },
   {
    "key": "lpn_georef_drop",
@@ -347,8 +347,8 @@
     "let it fall",
     "reduce it here"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Put the model here'. It names the object, uses the plainest possible verb, and removes the discard reading entirely. lpn_georef_carry quotes this button by name and must be changed in the same edit."
+   "disposition": "english",
+   "resolution": "English rewritten: 'Drop it here' -> 'Put the model here'. The object is named, the verb is the plainest available, and the discard reading -- live on a page where 'drop' also means a pressure drop and names the discarded-on-import messages -- is gone. lpn_georef_step1_hint quotes the button and was changed in the same edit."
   },
   {
    "key": "lpn_georef_adjust",
@@ -361,8 +361,8 @@
     "type two numbers that will be explained next",
     "'the round handle above it' -- above the corner, not above the model"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Drag the model to move it, drag a corner to resize it, drag the round handle above the model to turn it. Or type the scale and the turn below.' Name both numbers, and repeat the noun instead of the third pronoun."
+   "disposition": "english",
+   "resolution": "English rewritten: the verb is repeated in each clause, the third pronoun becomes 'the model' (it had been ambiguous with 'a corner'), and 'the two numbers' is replaced by naming them -- 'the scale and the turn' -- so it cannot be read as the latitude and longitude pair the neighbouring Go to control uses."
   },
   {
    "key": "lpn_georef_rotation",
@@ -374,8 +374,8 @@
     "an imperative: turn it, by degrees, anticlockwise",
     "a noun list: turn; degrees; direction"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'Turn anticlockwise (degrees)' -- parentheses for the unit as everywhere else in the suite, one spelling convention, and no comma splice."
+   "disposition": "english",
+   "resolution": "English rewritten: 'Turn, degrees counter-clockwise' -> 'Turn anticlockwise (degrees)'. The unit is now in parentheses as everywhere else in the suite, the comma splice is gone, and the spelling is British to match 'Colour' and 'Centre' in the same file. The tip was changed in the same edit so the page uses one word."
   },
   {
    "key": "lpn_gpv_curve_note",
@@ -403,8 +403,8 @@
     "'solves one moment' = computes the state at a single instant (intended)",
     "'solves one moment' = takes a moment to solve"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: 'These junctions change their demand through the day. This page computes one instant, the start of that day, so each demand here is the base demand from the file multiplied by the first value of its demand pattern -- the same number EPANET shows at the start of its run.' Plus a glossary.json concept for 'demand pattern' wired to lpn_, since the word recurs across the import report."
+   "disposition": "glossary",
+   "resolution": "The 'solves one moment' half of the complaint was overtaken by events: extended-period simulation now runs, and the string already reads 'the demand you see is the one for the moment the clock is showing'. The remaining complaint is the unanchored word 'pattern', which recurs across the import report and the clock, so it is routed to a new glossary.json concept 'demand pattern' wired to lpn_."
   },
   {
    "key": "lpn_file_export_inp_tip",
@@ -416,8 +416,8 @@
     "things EPANET the program refuses to accept",
     "things that cannot be pronounced/named"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '...Anything the .inp format cannot hold is listed for you afterwards.' and for lpn_inp_export_differences: '{n} things the .inp format cannot hold.' Same noun in both, no personification, and the subject is short."
+   "disposition": "english",
+   "resolution": "English rewritten in both strings: 'Anything EPANET has no way to say' and 'could not be written in EPANET's language' both become 'the .inp format cannot hold'. The personification is gone from both, the two now use the same noun, and the long subject with an omitted relative pronoun is shorter."
   },
   {
    "key": "lpn_unit_unknown",
@@ -430,8 +430,8 @@
     "'how big it is' = the size of the unit (intended)",
     "'how big it is' = the size of the drawing or the network"
    ],
-   "disposition": "open",
-   "resolution": "PROPOSED English: '...Nothing can be computed until this page is taught that unit, because it does not know how large one of them is.' Keeps the honesty, names the unit as the thing being measured, and drops the agentless passive."
+   "disposition": "english",
+   "resolution": "English rewritten: 'No answers can be given' -> 'Nothing can be computed', 'knows that unit' -> 'is taught that unit', and 'how big it is' -> 'how large one of them is', which points at the unit rather than at the drawing or the network. The honest split the rule requires -- we do not recognise this unit, and therefore we cannot give you answers -- is kept in both sentences."
   },
   {
    "key": "menu_more",

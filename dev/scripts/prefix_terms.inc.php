@@ -83,7 +83,16 @@ function prefixToTermNames(): array
             // reusing it for the tank makes two toolbar buttons indistinguishable. 'valve setting'
             // guards the one field whose physical quantity changes with the valve type, and
             // 'override (scenario value)' carries the eigenvalue trap behind "Own values".
-            'tank', 'valve', 'valve setting', 'override (scenario value)', 'solver'],
+            'tank', 'valve', 'valve setting', 'override (scenario value)', 'solver',
+            // Added 2026-08-19 (Task 438 Wave 0). 'profile (long section)' guards the one word that
+            // names the whole profile menu, whose dominant sense in web software is the user
+            // account page; 'hydraulic grade line' keeps the chart legend and the prose beside it
+            // from becoming two different phrases; 'demand pattern' is a named time series, not a
+            // repeating design; 'imperial gallon' is what separates IMGD from MGD; 'pressure
+            // breaker valve' has an electrical homonym; 'project mode name' says lat/lon and XY are
+            // carried unchanged; 'alignment (text)' is not justification.
+            'profile (long section)', 'hydraulic grade line', 'demand pattern', 'imperial gallon',
+            'pressure breaker valve', 'project mode name', 'alignment (text)'],
         'bpn' => ['flow', 'velocity', 'head', 'head loss', 'friction loss', 'minor loss', 'pressure',
             'elevation', 'demand', 'static head', 'maximum allowable head', 'supply head',
             'supply curve', 'branched network', 'branch', 'pipe line', 'pressure rating',
