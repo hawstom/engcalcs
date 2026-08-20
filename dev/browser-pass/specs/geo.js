@@ -15,8 +15,10 @@ const { Session } = require('../lib/session');
 
 exports.title = '12. Geographic projects';
 
-// Tom's coordinates: the ground EPA's own Net3 example network sits on.
-const HOME = { lon: -122.5686103, lat: 38.106067 };
+// **A NEW LAT/LON PROJECT OPENS ON THE WHOLE WORLD**, centred on 0,0 -- LPN_GEO_HOME. It used to
+// open on the ground under EPA's Net3, which is a fine place for an example and a strange place to be
+// dropped when your site is in Kenya; this spec still said Net3 for a while after that changed.
+const HOME = { lon: 0, lat: 0 };
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -43,8 +45,8 @@ exports.run = async function ({ browser, report }) {
 		if (m) {
 			// Within a few hundred metres of the centre: the pointer is at the middle of the canvas,
 			// which is what the home view centres on.
-			report.ok(Math.abs(+m[1] - HOME.lon) < 0.01 && Math.abs(+m[2] - HOME.lat) < 0.01,
-				'and the map opens on the Net3 city rather than on 0,0', m[1] + ', ' + m[2]);
+			report.ok(Math.abs(+m[1] - HOME.lon) < 1 && Math.abs(+m[2] - HOME.lat) < 1,
+				'and the map opens on the whole world, centred on 0,0', m[1] + ', ' + m[2]);
 			// Six decimals is ~0.11 m. Two would put a whole site at one coordinate.
 			report.ok(/\.\d{6}\b/.test(m[1]), '...to a precision a pipe can be placed at', m[1]);
 		}

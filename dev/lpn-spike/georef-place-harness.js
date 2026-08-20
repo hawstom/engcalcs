@@ -201,17 +201,31 @@ ok('a project already on the GeoMap is refused, not re-placed', L.georefState() 
 // 6. The command stays FINDABLE, and the coordinate box takes what people paste.
 // ---------------------------------------------------------------------------
 // Tom, 2026-08-18: *"XY to World: I can't find it."* It had been HIDDEN on a project already on the
-// map, which says "there is no such command" rather than "not for this project". Both properties are
-// read out of the source, because neither is reachable from a headless document.
+// map, which says "there is no such command" rather than "not for this project". The row is read out
+// of the source, because a menu is not reachable from a headless document.
+//
+// **THE ROW IS NOW "Import XY to lat/lon…" AND IT IS NEVER DISABLED** (Task 447). What used to convert the
+// open project in place is gone; the wizard starts from a FILE, which lands in a new tab, so no state
+// of the current project can make the command impossible. Three rows, in this order, and each of the
+// three names what kind of file it takes.
 console.log('\n--- the command is findable, and a coordinate is what a map gives you ---');
 {
 	const lnSrc = require('fs').readFileSync(ROOT + 'js/looped-network.js', 'utf8');
-	ok('the File-menu row is disabled, never hidden',
-		/label: pc\.lpn_georef_menu[\s\S]{0,200}?disabled: isGeoProject\(\) \|\| georefActive\(\)/.test(lnSrc) &&
-		!/hidden: isGeoProject\(\)[^\n]*lpn_georef_menu/.test(lnSrc));
-	ok('...and it sits beside Import EPANET file, the other conversion',
-		lnSrc.indexOf('pc.lpn_georef_menu') > lnSrc.indexOf('pc.lpn_file_import_inp') &&
-		lnSrc.indexOf('pc.lpn_georef_menu') < lnSrc.indexOf('pc.lpn_file_export_inp'));
+	const row = lnSrc.slice(lnSrc.indexOf('label: pc.lpn_file_import_geo'),
+		lnSrc.indexOf('label: pc.lpn_file_import_geo') + 200);
+	ok('File carries Import XY to lat/lon…, and it opens a file rather than converting the open project',
+		/label: pc\.lpn_file_import_geo \|\|/.test(lnSrc) && /fn: pickGeoFile/.test(row), row.split('\n')[1]);
+	ok('...never disabled: opening a file always makes a new tab, whatever is on screen',
+		!/disabled/.test(row));
+	// **THIRD, AND THE ORDER IS THE POINT** (Tom, 2026-08-19: "make it third since it is truly our
+	// fallback option"). It rescues a file the two rows above opened as the wrong kind, and a
+	// fallback listed above the thing it falls back from reads as an equal alternative.
+	ok('...and the three Open rows run Open, Import EPANET, Import XY to lat/lon',
+		lnSrc.indexOf('pc.lpn_file_import_geo') > lnSrc.indexOf('pc.lpn_file_open |') &&
+		lnSrc.indexOf('pc.lpn_file_import_geo') > lnSrc.indexOf('pc.lpn_file_import_inp') &&
+		lnSrc.indexOf('pc.lpn_file_import_geo') < lnSrc.indexOf('pc.lpn_file_export_inp'));
+	ok('the in-place "Convert to lat/lon" command is gone, key and all',
+		lnSrc.indexOf('lpn_georef_menu') === -1 && lnSrc.indexOf('lpn_georef_tip') === -1);
 	// A GeoMap has to zoom out far enough to FIND a site, not just to look at one.
 	ok('a GeoMap zooms out to the whole Earth', /return Math\.max\(MIN_SCALE_GRID, w \/ 360\);/.test(lnSrc));
 }

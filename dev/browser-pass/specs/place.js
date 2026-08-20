@@ -34,6 +34,11 @@ exports.title = '17. The placement tool';
 
 // An L, never a rectangle: a symmetric model cannot reveal a missing north-south flip, which is the
 // same reason dev/lpn-spike/georef-harness.js uses one.
+//
+// **IT IS ALSO HUNDREDS OF UNITS ACROSS, WHICH MATTERS SINCE Task 447.** Coordinates that could be
+// read as degrees arm the wizard ATTACHED, on the numbers as they stand; this drawing runs past 180
+// and therefore takes the place-it-on-the-world path every section below is written for. §14 checks
+// the other path on purpose.
 const L = [[0.25, 0.20], [0.65, 0.20], [0.65, 0.55]];
 
 async function canvasRect(a) {
@@ -206,7 +211,34 @@ async function labelsHidden(a) {
 		document.getElementById('lpn_canvas').classList.contains('lpn-labels-hidden'));
 }
 
-const ROW = 'Convert to lat/lon…';
+const ROW = 'Import XY to lat/lon…';
+
+// **THE TOOL STARTS FROM A FILE NOW (Task 447), never from the open project.** So a placement is:
+// take what is on screen as a project file, and open THAT as lat/lon -- which lands a new tab with
+// the same network and the wizard armed. The document is read straight out of localStorage rather
+// than saved through the picker, because that string IS serializeProject()'s own output and a spec
+// writing its own project JSON would be a second opinion about our format.
+async function projectJson(a) {
+	return a.page.evaluate(() => {
+		const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}');
+		return localStorage.getItem('lpn_project_' + idx.openId);
+	});
+}
+// The row opens the page's own hidden <input type=file>, so the file arrives through Chromium's real
+// file chooser -- production code the whole way down, with only the OS dialog replaced.
+async function openAsLatLon(a, name, text) {
+	const [chooser] = await Promise.all([
+		a.page.waitForEvent('filechooser'),
+		a.menuClick(ROW)
+	]);
+	await chooser.setFiles({ name: name, mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
+	await a.settle(900);
+}
+// Draw the L, then open it as lat/lon: the whole placement entry, in one line at each call site.
+async function placeCurrent(a, name) {
+	const text = await projectJson(a);
+	await openAsLatLon(a, name || 'placed.json', text);
+}
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -220,27 +252,30 @@ exports.run = async function ({ browser, report }) {
 		// ---- 1. the command is findable ------------------------------------------------------
 		const row = await fileRow(a, ROW);
 		report.ok(!!row, 'the File menu carries the placement command', row && row.label);
-		report.ok(row && !row.disabled, '...and it is live on an XY project');
+		report.ok(row && !row.disabled, '...and it is never greyed — it opens a file into a new tab');
 
-		// ---- 2. it refuses an empty project by name -------------------------------------------
-		await a.menuClick(ROW);
-		await a.settle(300);
-		report.has(await a.notice(), 'Draw or open a network first',
-			'an XY project with nothing in it is refused, in words');
+		// ---- 2. it refuses a file with nothing in it, by name ----------------------------------
+		// The empty project on screen, written out and handed straight back: a real file, and the one
+		// case the wizard cannot serve.
+		await openAsLatLon(a, 'empty.json', await projectJson(a));
+		report.has(await a.notice(), 'nothing to place',
+			'a file with no network in it is refused, in words');
 		report.ok((await handleCount(a)) === 0, '...and no placement was started');
+		await a.dismissGallery();   // the refused open still left an empty tab, and an empty tab offers the gallery
 
 		// ---- 3. step 1: detached ---------------------------------------------------------------
 		await drawL(a);
 		const original = await nodePos(a);
-		await a.menuClick(ROW);
-		await a.settle(800);
-		const asked = a.lastDialog();
-		report.ok(asked && asked.type === 'confirm', 'converting asks first', asked && asked.type);
-		// The confirm QUOTES the button by its label, so this follows the label rather than a word.
-		// Wave 0 renamed it "Finish" -> "Keep this placement" precisely so the sentence and the button
-		// could not drift apart; asserting the old word would have hidden that they had.
-		report.has(asked && asked.message, 'Keep this placement',
-			'...and the confirm says nothing is committed until the button it names is pressed');
+		await placeCurrent(a, 'the-L.json');
+		report.eq(await a.nodeCount(), 3, 'the file opened, with its network in it');
+		// **NOTHING ASKS ANY MORE** (Task 447). The confirm used to say "Convert this XY project to a
+		// geographic project?" -- a question already answered by choosing this row, and the only door
+		// into the tool. Its instructions were the useful half, so they are a notice you can read
+		// while you work, and it still names the button that commits.
+		report.ok(!(a.lastDialog() && a.lastDialog().type === 'confirm'),
+			'no modal stands in front of the placement — the row WAS the answer');
+		report.has(await a.notice(), 'Keep this placement',
+			'...and the instructions name the button that commits, so the two cannot drift apart');
 
 		const b1 = await bar(a);
 		report.ok(b1.visible, 'the placement bar appears');
@@ -520,8 +555,9 @@ exports.run = async function ({ browser, report }) {
 		report.ok(!(await fileRow(a, ROW)).disabled, '...so the command is live once more');
 
 		// ---- 12. Finish commits ------------------------------------------------------------------
-		await a.menuClick(ROW);
-		await a.settle(800);
+		// A second placement of the same drawing, which under Task 447 means opening it again: the
+		// cancelled tab is an XY project once more, so its own file goes back through the same row.
+		await placeCurrent(a, 'the-L-again.json');
 		await wheelIn(a, 12);
 		await a.page.click('#lpn_georef_drop');
 		await a.settle(500);
@@ -540,7 +576,10 @@ exports.run = async function ({ browser, report }) {
 		const onMap = await fileRow(a, ROW);
 		report.ok(!!onMap, 'a project already on the map still SHOWS the command',
 			'hidden once, and Tom could not find it at all — absent says "there is no such command"');
-		report.ok(onMap && onMap.disabled, '...greyed, because there is nothing left to convert');
+		// **AND IT IS LIVE, which the old Convert row could not be** (Task 447): this one opens
+		// another file into another tab, and what is on screen has no bearing on that.
+		report.ok(onMap && !onMap.disabled,
+			'...and it is still live, because it opens a file rather than converting this project');
 
 		// **PANNING IS NOT DISABLED IN A LAT/LON PROJECT**, which is what the conversion left Tom
 		// suspecting: in the old step 1 the model was re-pinned to the middle of the view on every
@@ -575,6 +614,64 @@ exports.run = async function ({ browser, report }) {
 		report.ok(spread > 100, '...so junctions clicked across the canvas are hundreds of units apart',
 			spread.toFixed(2) + ' units');
 
+		// ---- 14. ONE ROW, BOTH KINDS OF FILE (Task 447) ------------------------------------------
+		// The row exists for the cell no file can state, and an `.inp` is the commonest way to arrive
+		// in it -- a network drawn in lon/lat whose file says `UNITS None`, which is what EPA's own
+		// examples all say. Which reader a file goes to is decided from its first character, never
+		// from its name, so the same row serves both.
+		{
+			const INP = [
+				'[TITLE]', ' placed from an inp', '',
+				'[JUNCTIONS]', ' J1  10  25', '',
+				'[RESERVOIRS]', ' R1  100', '',
+				'[PIPES]', ' P1  R1  J1  1000  8  130  0  Open', '',
+				'[COORDINATES]', ' J1  -122.5686103  38.106067', ' R1  -122.5700  38.1070', '',
+				'[OPTIONS]', ' Units  GPM', ' Headloss  H-W', '',
+				'[BACKDROP]', ' UNITS  None', '',
+				'[END]', ''
+			].join('\n');
+			await openAsLatLon(a, 'grid.inp', INP);
+			await a.dialogClick('OK');   // the import report, which every .inp import shows
+			await a.settle(600);
+			// nodeCount() counts every drawn symbol, links included, so this is "the network is on the
+			// screen" rather than a node tally: two nodes and a pipe cannot draw fewer than three.
+			report.ok(await a.nodeCount() >= 3, 'an EPANET file opens through Import XY to lat/lon… too',
+				(await a.nodeCount()) + ' symbols drawn');
+			// **REINTERPRET, NOT PLACE.** These coordinates can be read as degrees, so the wizard opens
+			// ATTACHED with the numbers taken as they are: the network appears on its own streets and
+			// the user has only to agree. Dropping it at the centre of the world would ask them to drag
+			// a correct network back to a precision no hand can reach.
+			const b14 = await bar(a);
+			report.ok(b14.visible, '...and the placement bar is up');
+			report.has(b14.step, 'Step 2', '...at step 2, because the numbers were read as degrees');
+			report.ok(await a.page.evaluate(() =>
+				[...document.querySelectorAll('#lpn_canvas .lpn-symbols > *')]
+					.some(e => e.getAttribute('cx') === '-122.5686103')),
+				'...and not one coordinate was moved to get there');
+			await a.page.click('#lpn_georef_cancel');
+			await a.settle(700);
+
+			// The other path, from the same row: coordinates that CANNOT be degrees have no question
+			// to answer, so the model is carried out to the whole-world view exactly as before.
+			await openAsLatLon(a, 'state-plane.inp', INP
+				.replace(' J1  -122.5686103  38.106067', ' J1  579350  4218000')
+				.replace(' R1  -122.5700  38.1070', ' R1  579900  4218600'));
+			await a.dialogClick('OK');
+			await a.settle(600);
+			const b14b = await bar(a);
+			report.has(b14b.step, 'Step 1',
+				'a State Plane drawing cannot be degrees, so it opens detached, to be aimed');
+			await a.page.click('#lpn_georef_cancel');
+			await a.settle(700);
+
+			await openAsLatLon(a, 'world.inp', INP.replace(' UNITS  None', ' UNITS  Degrees'));
+			await a.dialogClick('OK');
+			await a.settle(600);
+			report.ok(await a.page.evaluate(() => document.getElementById('lpn_georef_bar').style.display === 'none'),
+				'a file that DOES say DEGREES just opens — its coordinates already are lon/lat');
+			report.has(await readout(a), 'Longitude', '...as a lat/lon project, read out of the file');
+		}
+
 		report.eq(a.errors.length, 0, 'no uncaught JavaScript', a.errors[0] || '');
 	} finally {
 		await a.close();
@@ -597,8 +694,7 @@ exports.run = async function ({ browser, report }) {
 		report.ok(paneOpen, 'set up: the bottom pane is open, so the canvas is shorter and lower');
 
 		await drawL(b);
-		await b.menuClick(ROW);
-		await b.settle(800);
+		await placeCurrent(b, 'pane.json');
 		await wheelIn(b, 20);
 		const mB = await modelBox(b), canvasB = await canvasRect(b);
 		report.ok(mB && mB.cy > canvasB.y && mB.cy < canvasB.y + canvasB.h,

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fa",
-        "expected_key_count": 1209,
-        "delta_key_count": 15,
+        "expected_key_count": 1210,
+        "delta_key_count": 16,
         "exempt_key_count": 18,
         "exempt_keys": [
             "u_imgd",
@@ -438,6 +438,7 @@
         "lpn_basemap_satellite_show": "Show satellite images",
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
+        "lpn_georef_asdegrees": "The X and Y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press Keep this placement.",
         "lpn_pane_tab_reservoirs": "Reservoirs",
         "lpn_pane_tab_tanks": "Tanks",
         "lpn_pane_tab_pipes": "Pipes",
@@ -455,6 +456,7 @@
         "lpn_basemap_satellite_show": "Show satellite images",
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
+        "lpn_georef_asdegrees": "The X and Y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press Keep this placement.",
         "lpn_pane_tab_reservoirs": "Reservoirs",
         "lpn_pane_tab_tanks": "Tanks",
         "lpn_pane_tab_pipes": "Pipes",
@@ -514,6 +516,22 @@
                     "key": "lpn_geomap",
                     "value": "عرض\/طول جغرافیایی",
                     "english": "lat\/lon"
+                }
+            }
+        },
+        "lpn_georef_asdegrees": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_geo_tip",
+                    "value": "از یک شبکهٔ محلی به دنیای واقعی. ترسیمی که روی شبکهٔ XY ساخته شده را به مختصات جغرافیایی می‌برد، تا در جای درست خود روی نقشهٔ خیابان بنشیند. هر عددی که تایپ کرده‌اید همان‌گونه باقی می‌ماند — فقط X و Y به طول و عرض جغرافیایی تبدیل می‌شوند.",
+                    "english": "Opens a project file or an EPANET file in a new tab, on the street map. If the numbers in it can be read as a longitude and a latitude, the network opens right where it belongs. If they cannot, you place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. Every number you typed stays as it is."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "این پروژهٔ XY به یک پروژهٔ جغرافیایی تبدیل شود؟ پروژهٔ شما در مرکز یک نقشهٔ جهانی قرار گرفته است. به موقعیت خود زوم کنید و مدل را هر قدر می‌خواهید جابه‌جا، هم‌اندازه و بچرخانید. وقتی آماده شدید تا عناصر را تنظیم کنید، «نگه داشتن این جای‌گیری» را بزنید.",
+                    "english": "Your project has been placed at the centre of a world map. Zoom to your location and move, resize, and turn the model as much as you like. When you are ready to start adjusting elements, press Keep this placement."
                 }
             }
         },

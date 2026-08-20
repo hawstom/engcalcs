@@ -9,11 +9,12 @@ const { Session } = require('../lib/session');
 exports.title = '3. The File menu';
 
 // The list as it stands after Task 264 (New project… became a fly-out of templates), Task 314
-// (Open example… joined it, under Open rather than under New) and Task 145 (the placement tool sits
-// beside Import, because both are conversions). Recent files are absent because there are none yet;
-// that row group appears only when a file has been opened.
+// (Open example… joined it, under Open rather than under New) and Task 447 (Convert to lat/lon…
+// became Import XY to lat/lon…, a third way to OPEN a file rather than a conversion of the open project,
+// and sits third because it is the fallback the two rows above it fall back TO). Recent files are
+// absent because there are none yet; that row group appears only when a file has been opened.
 const EXPECTED = ['New project…', 'Open…', 'Open example…', 'Import EPANET file…',
-	'Convert to lat/lon…', 'Export EPANET file…',
+	'Import XY to lat/lon…', 'Export EPANET file…',
 	'Save', 'Save as…', 'Save all', 'Revert', 'Close'];
 
 exports.run = async function ({ browser, report }) {
@@ -33,6 +34,11 @@ exports.run = async function ({ browser, report }) {
 		report.ok(!by('Save as…').disabled, 'Save as is always live');
 		report.ok(!by('New project…').disabled && !by('Open…').disabled && !by('Close').disabled,
 			'New, Open and Close are always live');
+		// **Task 447: this row is never greyed either.** Its predecessor converted the OPEN project
+		// and had to be greyed on a project already on the map; this one opens a FILE into a new tab,
+		// so nothing on screen can make it impossible.
+		report.ok(!by('Import XY to lat/lon…').disabled,
+			'Import XY to lat/lon… is always live — it opens a file, and always into a new tab');
 		report.ok(by('New project…').submenu, 'New project… leads to a fly-out of templates, not straight to a blank one',
 			'Task 264: the row that used to make a project on the spot now offers the ways of starting one');
 

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1209,
-        "delta_key_count": 16,
+        "expected_key_count": 1210,
+        "delta_key_count": 17,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -446,6 +446,7 @@
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
+        "lpn_georef_asdegrees": "The X and Y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press Keep this placement.",
         "lpn_pane_tab_reservoirs": "Reservoirs",
         "lpn_pane_tab_tanks": "Tanks",
         "lpn_pane_tab_pipes": "Pipes",
@@ -464,6 +465,7 @@
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
+        "lpn_georef_asdegrees": "The X and Y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press Keep this placement.",
         "lpn_pane_tab_reservoirs": "Reservoirs",
         "lpn_pane_tab_tanks": "Tanks",
         "lpn_pane_tab_pipes": "Pipes",
@@ -488,9 +490,9 @@
                     "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
                 },
                 "next_translated": {
-                    "key": "lpn_georef_menu",
+                    "key": "lpn_file_import_geo",
                     "value": "lat\/lon အဖြစ် ပြောင်းရန်…",
-                    "english": "Convert to lat\/lon…"
+                    "english": "Import XY to lat\/lon…"
                 }
             }
         },
@@ -504,9 +506,9 @@
                     "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
                 },
                 "next_translated": {
-                    "key": "lpn_georef_menu",
+                    "key": "lpn_file_import_geo",
                     "value": "lat\/lon အဖြစ် ပြောင်းရန်…",
-                    "english": "Convert to lat\/lon…"
+                    "english": "Import XY to lat\/lon…"
                 }
             }
         },
@@ -520,9 +522,9 @@
                     "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
                 },
                 "next_translated": {
-                    "key": "lpn_georef_menu",
+                    "key": "lpn_file_import_geo",
                     "value": "lat\/lon အဖြစ် ပြောင်းရန်…",
-                    "english": "Convert to lat\/lon…"
+                    "english": "Import XY to lat\/lon…"
                 }
             }
         },
@@ -536,9 +538,25 @@
                     "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
                 },
                 "next_translated": {
-                    "key": "lpn_georef_menu",
+                    "key": "lpn_file_import_geo",
                     "value": "lat\/lon အဖြစ် ပြောင်းရန်…",
-                    "english": "Convert to lat\/lon…"
+                    "english": "Import XY to lat\/lon…"
+                }
+            }
+        },
+        "lpn_georef_asdegrees": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_geo_tip",
+                    "value": "ဒေသန္တရ ဂရစ်ဒ်မှ လက်တွေ့ကမ္ဘာသို့။ XY ဂရစ်ဒ်ပေါ်တွင် ရေးဆွဲထားသော ပုံကို ပထဝီညှိကိန်းများအပေါ်သို့ ထားပါ၊ သို့မှသာ ၎င်းသည် ရှိသင့်ရာ လမ်းမြေပုံနေရာတွင် ကျနေမည်။ သင်ရိုက်ထည့်ခဲ့သော ဂဏန်းတိုင်း ဒီအတိုင်းကျန်ရှိနေမည် — X နှင့် Y တို့သာ လောင်ဂျီတွဒ်နှင့် လတ်တီကျုဒ်အဖြစ် ပြောင်းလဲမည်။",
+                    "english": "Opens a project file or an EPANET file in a new tab, on the street map. If the numbers in it can be read as a longitude and a latitude, the network opens right where it belongs. If they cannot, you place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. Every number you typed stays as it is."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "ဤ XY ပရောဂျက်ကို ပထဝီပရောဂျက်အဖြစ် ပြောင်းမလား။ သင့်ပရောဂျက်ကို ကမ္ဘာ့မြေပုံ၏ အလယ်တွင် ထားပေးလိုက်ပါပြီ။ သင့်တည်နေရာသို့ ဇူးမ်လုပ်ပြီး မော်ဒယ်ကို လိုသလို ရွှေ့ပါ၊ အရွယ်ချိန်ညှိပါ၊ လှည့်ပါ။ အစိတ်အပိုင်းများကို ချိန်ညှိစတင်ရန် အသင့်ဖြစ်သောအခါ ‘ဤနေရာချထားမှုကို ထားရှိပါ’ ကို နှိပ်ပါ။",
+                    "english": "Your project has been placed at the centre of a world map. Zoom to your location and move, resize, and turn the model as much as you like. When you are ready to start adjusting elements, press Keep this placement."
                 }
             }
         },

@@ -5849,17 +5849,25 @@ var EngCalcs = EngCalcs || {};
 			return;
 		}
 		if (!doc.nodes.length) {
-			setNotice(pc.lpn_georef_empty || 'Draw or open a network first. There is nothing to place yet.');
+			setNotice(pc.lpn_georef_empty || 'That file has no network in it, so there is nothing to place.');
 			return;
 		}
 		if (!EngCalcs.lpnGeorefToLonLat) {
 			setNotice(pc.lpn_georef_unavailable || 'The placement tool did not load. Reload the page and try again.');
 			return;
 		}
-		if (!window.confirm(pc.lpn_georef_intro || 'Convert this XY project to a geographic project?')) { return; }
+		// **NO CONFIRM HERE ANY MORE** (Task 447). This used to ask "Convert this XY project to a
+		// geographic project?", which was a question the user had just answered by choosing File >
+		// Import XY to lat/lon… -- the only door into this tool. What the question was really carrying was
+		// its second half, the instructions, so those are said as a notice instead: a sentence you
+		// can read while you work beats a modal you must dismiss before you can start.
 		georef = {
 			step: GEOREF_STEP_DETACHED, src: georefCapture(), t: null,
 			frozen: null, rotDeg: 0,
+			// What Cancel puts back, kept SEPARATELY from `src`: the reinterpret path below replaces
+			// `src` with the same points expressed in its transform's own frame, and Cancel must
+			// still restore the numbers the document arrived with.
+			restore: null,
 			// Everything Cancel has to put back. The ORIGIN is in this list because a grid model may
 			// be in State Plane coordinates with an origin of half a million, and degrees must start
 			// from zero -- see LPN_ORIGIN_THRESHOLD and Task 354.
@@ -5868,6 +5876,7 @@ var EngCalcs = EngCalcs || {};
 				origin: { x: docOrigin().x, y: docOrigin().y }, view: currentView()
 			}
 		};
+		georef.restore = georef.src;
 		project.coords = LPN_COORDS_GEO;
 		project.basemap = 'osm';
 		doc.origin = { x: 0, y: 0 };
@@ -5875,6 +5884,20 @@ var EngCalcs = EngCalcs || {};
 		refreshBasemapCredit();
 		refreshMapStatus();
 		setMode('select');
+		// **TWO DIFFERENT JOBS WEAR ONE COMMAND, AND THE NUMBERS SAY WHICH** (Task 447).
+		//
+		//   PLACE       a real XY drawing -- 0..100, or State Plane at half a million. Its numbers
+		//               mean nothing geographic, so the model has to be MOVED onto the Earth.
+		//   REINTERPRET an `.inp` whose coordinates already ARE longitude and latitude and whose
+		//               [BACKDROP] UNITS merely said None. Here the numbers are already right and
+		//               must not move at all: what is wrong is the LABEL on them, not the geometry.
+		//
+		// Dropping a reinterpret case at the centre of the world would take a correct network, throw
+		// it into the Atlantic and ask the user to drag it back to where it already was -- which
+		// cannot be done to the precision it already had. So the range test picks the wizard's
+		// STARTING POSITION. It decides nothing behind the user's back: the bar is armed either way,
+		// Keep this placement still commits and Cancel still restores.
+		if (georefSrcReadsAsDegrees()) { georefArmAsDegrees(); return; }
 		// **THE CONVERSION OPENS ON THE WHOLE EARTH.** Tom, 2026-08-18: *"Change the default view to
 		// entire world, whatever location and zoom that is, so that they can zoom to their
 		// location."* The old home view was the ground under EPA's Net3, which is a fine place for a
@@ -5897,6 +5920,63 @@ var EngCalcs = EngCalcs || {};
 		// The labels and the solver are OFF for the duration -- see georefSuspend().
 		georefSuspend(true);
 		georefRefreshBar();
+		setNotice(pc.lpn_georef_intro || 'Your project has been placed at the centre of a world map. Zoom to your location and move, resize and turn the model. When you are ready, press Keep this placement.');
+	}
+	// Can every stored point be read as a coordinate on the Earth? Within +/-180 and +/-90, which is
+	// suggestive and never conclusive: a small site drawn near the origin looks exactly the same.
+	// That is why the answer only chooses where the wizard OPENS, and never what the project is.
+	function georefSrcReadsAsDegrees() {
+		var src = georef && georef.src;
+		if (!src || !src.length) { return false; }
+		return src.every(function (p) {
+			return isFinite(p.x) && isFinite(p.y) && Math.abs(p.x) <= 180 && Math.abs(p.y) <= 90;
+		});
+	}
+	// **REINTERPRET: the label was wrong, the geometry was not.** Nothing is repositioned here. The
+	// document keeps the exact numbers it arrived with, and pressing Keep this placement without
+	// touching anything commits them untouched -- which is the whole point, because a network already
+	// in the right place cannot be dragged back to it.
+	function georefArmAsDegrees() {
+		var pc = EngCalcs.pageConfig || {}, i = 0;
+		// doc.origin was just zeroed, so this is x -> x and y -> -y: both exact in doubles. A
+		// document that was already absolute is rewritten with its own bytes. (A REBASED document
+		// cannot reach here -- an origin is only ever chosen for coordinates in the hundreds of
+		// thousands, and those fail the range test above.)
+		eachStoredPoint(doc, function (pt, get, set) {
+			var s = georef.restore[i++];
+			if (!s) { return; }
+			if (set) { set(inwardX(s.x), inwardY(s.y)); }
+			else { pt.x = inwardX(s.x); pt.y = inwardY(s.y); }
+		});
+		var c = georefSrcCentre(),
+			mpd = EngCalcs.lpnGeorefMetersPerDegree(c.y),
+			t = { anchor: { x: 0, y: 0 }, origin: { lon: c.x, lat: c.y }, metersPerUnit: mpd.lat, rotDeg: 0 };
+		// **THE SOURCE IS RE-EXPRESSED IN THE TRANSFORM'S OWN FRAME.** The transform is a rigid
+		// similarity in ground METRES, and a degree of longitude is not a degree of latitude -- 27%
+		// shorter at 38 N -- so no such transform is the identity on lon/lat pairs. Mapping the
+		// coordinates backwards through it once makes the forward map reproduce them, and without
+		// this the user's first drag would jump the model sideways by exactly that ratio.
+		georef.src = georef.src.map(function (s) { return EngCalcs.lpnGeorefFromLonLat(t, s.x, s.y); });
+		// ATTACHED from the first frame: the model is already on the ground, which is what step 2
+		// means. Step 1 exists to aim a drawing that is nowhere in particular.
+		georef.step = GEOREF_STEP_ATTACHED;
+		georef.frozen = null;
+		georef.t = t;
+		georef.rotDeg = 0;
+		georefSuspend(true);
+		// **NO FIT HERE, AND NO WHOLE-EARTH VIEW EITHER.** The view this project opened with was
+		// fitted to these very coordinates a moment ago, and not one of them has moved -- a scale in
+		// pixels per drawing unit and a scale in pixels per degree are the same number when the
+		// drawing unit IS a degree. Refitting would be the re-baselining Tom called "vanishingly
+		// defensible", and carrying the model out to the middle of the ocean is the thing this whole
+		// path exists to avoid.
+		buildDom();
+		refreshSymbolSizes();
+		refreshTextLabelSizes();
+		georefApplyCompensation();
+		georefDrawFrame();
+		georefRefreshBar();
+		setNotice(pc.lpn_georef_asdegrees || 'The X and Y in this file were read as a longitude and a latitude, so the network is already on the map. Check that it is in the right place, then press Keep this placement.');
 	}
 	// Whole-world framing puts a little more land on the screen than the equator does, and the
 	// clamp in applyView() takes care of the rest.
@@ -5961,7 +6041,10 @@ var EngCalcs = EngCalcs || {};
 	function georefCancel() {
 		if (!georef) { return; }
 		if (georefSettleTimer) { clearTimeout(georefSettleTimer); georefSettleTimer = null; }
-		var prev = georef.prev, src = georef.src, i = 0;
+		// **`restore`, NOT `src`.** The reinterpret path re-expresses `src` in its transform's own
+		// frame; only `restore` is still the numbers the document arrived with, and Cancel's promise
+		// is those numbers exactly.
+		var prev = georef.prev, src = georef.restore || georef.src, i = 0;
 		project.coords = prev.coords;
 		project.basemap = prev.basemap;
 		doc.origin = { x: prev.origin.x, y: prev.origin.y };
@@ -10093,23 +10176,32 @@ var EngCalcs = EngCalcs || {};
 		return null;
 	}
 	function importProjectFromFile(file) {
-		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
-		reader.onload = function (ev) {
-			var saved = acceptImportedText(ev.target.result);
-			if (!saved) { return; }
-			var upId = importProject(saved);
-			// **An uploaded project arrives SAVED, not modified** -- the same baseline the download
-			// path records, because a file the user just handed us off their own disk is not unsaved
-			// work. It stays a BROWSER project and the star still comes back on the first edit,
-			// faint, because this browser cannot write back to that file.
-			if (upId) { stampProjectSaved(upId); }
-			// Every time, not just the first: this is the fact that explains why the tab is named
-			// after the project rather than the file, and why Save cannot go back where this came from.
-			setNotice(pc.lpn_status_uploaded || '');
-			renderTabs();
+		var reader = new FileReader();
+		reader.onload = function (ev) { landProjectText(ev.target.result, false); };
+		reader.onerror = function () {
+			var pc = EngCalcs.pageConfig || {};
+			alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.');
 		};
-		reader.onerror = function () { alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
 		reader.readAsText(file);
+	}
+	// One of OUR documents, off a disk, landed as a new project. Split out of the reader above so
+	// that File > Import XY to lat/lon… reaches the identical landing (Task 447) -- a second copy of this
+	// would be a second place for "an uploaded project arrives SAVED" to drift.
+	function landProjectText(text, asGeo) {
+		var pc = EngCalcs.pageConfig || {};
+		var saved = acceptImportedText(text);
+		if (!saved) { return; }
+		var upId = importProject(saved);
+		// **An uploaded project arrives SAVED, not modified** -- the same baseline the download
+		// path records, because a file the user just handed us off their own disk is not unsaved
+		// work. It stays a BROWSER project and the star still comes back on the first edit,
+		// faint, because this browser cannot write back to that file.
+		if (upId) { stampProjectSaved(upId); }
+		// Every time, not just the first: this is the fact that explains why the tab is named
+		// after the project rather than the file, and why Save cannot go back where this came from.
+		setNotice(pc.lpn_status_uploaded || '');
+		renderTabs();
+		if (asGeo && upId) { georefStart(); }
 	}
 
 	// ---- EPANET .inp import (ROADMAP Task 196) ----
@@ -10201,6 +10293,17 @@ var EngCalcs = EngCalcs || {};
 		LPN_INP_TOK_POINT = { x: 'x', y: 'y' };
 
 	function docFromInp(parsed, name) {
+		// **WHICH KIND OF PROJECT THIS IS, READ OUT OF THE FILE** (Task 447). EPANET writes its Map
+		// Dimensions choice as [BACKDROP] UNITS, and DEGREES is the file stating that its X and Y
+		// already ARE a longitude and a latitude -- so the import opens a lat/lon project and nothing
+		// is converted, moved or asked. FEET, METERS, NONE, an unknown word and a file with no
+		// [BACKDROP] at all every one open XY, which is what they have always done.
+		//
+		// **NO PROMPT ON `NONE`.** EPA's own Net1, Net2 and Net3 all say `UNITS None`, so a question
+		// there would stand in front of essentially every EPANET file anybody imports. The seam for
+		// one is this single line and `parsed.mapUnitsRaw`, which still says whether the file was
+		// silent or merely arbitrary. File > Import XY to lat/lon… is the recovery path meanwhile.
+		var geo = parsed.mapUnits === 'degrees';
 		// A flow from the file, in the unit the flow selector is now showing. `parsed.scale.flow`
 		// is m3/s per one of the file's units, so the SI step is the parser's own constant and
 		// this file keeps no second copy of it.
@@ -10348,7 +10451,17 @@ var EngCalcs = EngCalcs || {};
 		// gets {0, 0} and nothing moves.
 		return rebaseDocument({
 			v: LPN_STORAGE_VERSION,
-			project: { name: name, activeScenario: 'base' },
+			project: geo
+				// Written only when geographic, the same rule newProject() follows: an absent key is
+				// the grid default, and saying 'grid' out loud would put a word in every file that
+				// has always meant itself by saying nothing.
+				? { name: name, activeScenario: 'base', coords: LPN_COORDS_GEO }
+				: { name: name, activeScenario: 'base' },
+			// **A LAT/LON DOCUMENT IS NEVER REBASED**, which is why the origin is stated here rather
+			// than chosen: rebaseDocument() exists for survey coordinates in the hundreds of
+			// thousands, and degrees start from zero by definition. georefStart() writes the same
+			// {0, 0} for the same reason.
+			origin: geo ? { x: 0, y: 0 } : undefined,
 			scenarios: defaultScenarios(),
 			nodes: nodes, links: links, labels: labels, nextId: next,
 			labelSettings: JSON.parse(JSON.stringify(labelSettings)),
@@ -10530,35 +10643,91 @@ var EngCalcs = EngCalcs || {};
 		reader.onload = function (ev) {
 			var text = inpTextFromBytes(ev.target.result, file.name);
 			if (text === null) { return; }   // inpTextFromBytes already said why
-			var parsed = EngCalcs.lpnInpParse ? EngCalcs.lpnInpParse(text) : { ok: false };
-			if (!parsed.ok) {
-				alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.');
-				return;
-			}
-			// The units strip moves FIRST. docFromInp() is written against the selector state --
-			// it stores the file's own numbers precisely BECAUSE the strip is already showing the
-			// file's own units -- so this ordering is the fix, not a formality.
-			applyUnitSelections(inpUnitSelections(parsed));
-			var name = String(file.name).replace(/\.inp$/i, '') || String(file.name);
-			var id = importProject(docFromInp(parsed, name));
-			if (!id) { return; }   // importProject already reported the storage failure
-			// NO RE-ANCHORING STEP HERE ANY MORE (Task 332): the labels are stored at EPANET's own
-			// point and rendered from its own corner, so there is nothing to measure and nothing to
-			// run after the document is on screen.
-			// Arrives SAVED, for the same reason an uploaded project does: a file the user just
-			// handed us off their own disk is not unsaved work. It earns its asterisk on the first
-			// edit, and it can only ever go out as one of our own files, via Save as.
-			stampProjectSaved(id);
-			renderTabs();
-			showInpReport(parsed, file.name);
+			landInpText(text, file.name, false);
 		};
 		reader.onerror = function () { alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.'); };
 		// BYTES, not text: which of EPANET's two formats this is gets decided by the content (see
 		// inpTextFromBytes), and decoding a binary .net as UTF-8 first would destroy it.
 		reader.readAsArrayBuffer(file);
 	}
+	// An `.inp`'s text landed as a new project. Split out of the reader above so File > Open as
+	// lat/lon… lands an `.inp` by exactly the same route (Task 447): same unit ordering, same
+	// saved-not-modified stamp, same import report.
+	function landInpText(text, fileName, asGeo) {
+		var pc = EngCalcs.pageConfig || {};
+		var parsed = EngCalcs.lpnInpParse ? EngCalcs.lpnInpParse(text) : { ok: false };
+		if (!parsed.ok) {
+			alert(pc.lpn_inp_bad_file || 'That file could not be read as an EPANET network file.');
+			return;
+		}
+		// The units strip moves FIRST. docFromInp() is written against the selector state --
+		// it stores the file's own numbers precisely BECAUSE the strip is already showing the
+		// file's own units -- so this ordering is the fix, not a formality.
+		applyUnitSelections(inpUnitSelections(parsed));
+		var name = String(fileName).replace(/\.inp$/i, '') || String(fileName);
+		var id = importProject(docFromInp(parsed, name));
+		if (!id) { return; }   // importProject already reported the storage failure
+		// NO RE-ANCHORING STEP HERE ANY MORE (Task 332): the labels are stored at EPANET's own
+		// point and rendered from its own corner, so there is nothing to measure and nothing to
+		// run after the document is on screen.
+		// Arrives SAVED, for the same reason an uploaded project does: a file the user just
+		// handed us off their own disk is not unsaved work. It earns its asterisk on the first
+		// edit, and it can only ever go out as one of our own files, via Save as.
+		stampProjectSaved(id);
+		renderTabs();
+		showInpReport(parsed, fileName);
+		// A file that already states DEGREES arrived on the map by itself -- docFromInp() read that
+		// out of the file -- so there is nothing to place, and georefStart() says exactly that
+		// rather than starting a wizard over coordinates that are already lon/lat.
+		if (asGeo) { georefStart(); }
+	}
 	function pickInpFile() {
 		var input = document.getElementById('lpn_inp_file');
+		if (input) { input.click(); }
+	}
+
+	// ---- File > Import XY to lat/lon… (ROADMAP Task 447) ---------------------------------------------
+	//
+	// **OPENING A FILE ALWAYS MAKES A NEW TAB, and that is what dissolves the old question.** There
+	// is no current project for an opened file to be brought "into", so merge-versus-replace never
+	// has to be answered, and no row needs a disabled state.
+	//
+	// Three rows, and between them they cover the whole matrix:
+	//
+	//   Open…                   a project file, opened as the kind of project it says it is
+	//   Import XY to lat/lon…        THIS: an XY drawing placed on the world, by hand
+	//   Import EPANET file…     an `.inp`, opened as the kind its [BACKDROP] UNITS line says
+	//
+	// **ONE ROW, BOTH KINDS OF FILE.** This is also the recovery path for a lon/lat network whose
+	// `.inp` did not say so, which is the whole reason it takes an `.inp` at all -- a second row for
+	// that would be a fourth door onto the same act.
+	//
+	// **THE OPPOSITE DIRECTION GETS NO ROW.** "Open a lat/lon file as XY" is never wanted: it would
+	// take real ground coordinates and declare them meaningless.
+	//
+	// Content decides which reader, never the extension: a project file is JSON and starts with `{`,
+	// which no `.inp` and no binary `.net` ever does. A renamed file therefore still lands correctly.
+	function openAsGeoFile(file) {
+		var pc = EngCalcs.pageConfig || {}, reader = new FileReader();
+		reader.onload = function (ev) {
+			// BYTES first, exactly as the `.inp` route does: EPANET's binary `.net` is one of the
+			// three things that can arrive here, and decoding it as UTF-8 would destroy it.
+			var text = inpTextFromBytes(ev.target.result, file.name);
+			if (text === null) { return; }   // inpTextFromBytes already said why
+			// 0x7B is the opening brace a project file starts with. Written as a code point rather
+			// than as a character so that dev/scripts/size_budget_check.php, which finds a function's
+			// end by counting braces, does not read this line as one.
+			if (text.replace(/^\uFEFF/, '').trim().charCodeAt(0) === 0x7B) { landProjectText(text, true); }
+			else { landInpText(text, file.name, true); }
+		};
+		reader.onerror = function () { alert(pc.lpn_import_bad_file || 'That file could not be read as a project saved from this page.'); };
+		reader.readAsArrayBuffer(file);
+	}
+	// **AN UPLOAD, NOT A LIVE FILE HANDLE, in every browser.** What comes out of this is a placed
+	// copy that is no longer the drawing on the disk, so a Save writing back over the original would
+	// be the command doing something other than its name. Save as gives it a home of its own.
+	function pickGeoFile() {
+		var input = document.getElementById('lpn_geo_file');
 		if (input) { input.click(); }
 	}
 
@@ -12450,17 +12619,27 @@ var EngCalcs = EngCalcs || {};
 			// the same word would promise a round trip we cannot make. Import says what it is.
 			{ icon: 'open', label: pc.lpn_file_import_inp || 'Import EPANET file (.inp)…',
 			  tip: pc.lpn_file_import_inp_tip, fn: pickInpFile },
-			// **A CONVERSION, so it sits beside the other one** (Task 145). It changes what kind of
-			// document this is, permanently, exactly as Import does -- and lat/lon-or-XY cannot be a
-			// toggle afterwards, for the reasons LPN_COORDS_GEO records.
+			// **THE ONE CELL OF THE MATRIX THAT NEEDS ITS OWN DOOR** (Task 447). A project file
+			// states its own kind and an `.inp` states its [BACKDROP] UNITS, so the two rows above
+			// never have to ask; what no file can state is that its X and Y were MEANT as lon/lat all
+			// along. That is what this row is for, and it takes both kinds of file for exactly that
+			// reason.
 			//
-			// **DISABLED, NEVER HIDDEN.** It was hidden on a project already on the map, and Tom then
-			// could not find the command at all -- a hidden row says "there is no such command",
-			// which is a different and false statement. Same rule the scenario rows follow: the
-			// vocabulary stays learnable.
-			{ icon: 'globe', label: pc.lpn_georef_menu || 'Convert to lat/lon…',
-			  tip: isGeoProject() ? (pc.lpn_georef_on_map || pc.lpn_georef_tip) : pc.lpn_georef_tip,
-			  disabled: isGeoProject() || georefActive(), fn: georefStart },
+			// **THIRD, BELOW BOTH ROWS IT RESCUES.** Tom, 2026-08-19: *"But make it third since it is
+			// truly our fallback option."* The first two are what a person reaches for; this is what
+			// they reach for after one of those gave them the wrong coordinate kind. A fallback
+			// listed above the thing it falls back from reads as an equal alternative.
+			//
+			// **A ROW RATHER THAN A PROMPT ON Open…**, by Tom's standing rule that a choice must not
+			// stand in front of the common action: opening a file is common, placing a grid drawing
+			// on the world is rare, so the rare act carries the extra door.
+			//
+			// **NEVER DISABLED.** It opens a file, and there is always a file it could open --
+			// nothing about the project on screen makes this impossible, because the result is a new
+			// tab either way. The old "Convert to lat/lon…" row, which converted the OPEN project and
+			// had to be greyed whenever that project was already on the map, is gone with it.
+			{ icon: 'globe', label: pc.lpn_file_import_geo || 'Import XY to lat/lon…',
+			  tip: pc.lpn_file_import_geo_tip, fn: pickGeoFile },
 			// The other direction (Task 281). A DOWNLOAD and never a live handle: an `.inp` is a
 			// file we hand over, not one this page keeps writing to -- the same reason Import is a
 			// separate row from Open rather than a second file type on it.
@@ -12994,6 +13173,16 @@ var EngCalcs = EngCalcs || {};
 			var f = inpInput.files[0];
 			inpInput.value = '';
 			if (f) { importInpFromFile(f); }
+		});
+		// A THIRD picker (Task 447), and this one deliberately takes both kinds: File > Open as
+		// lat/lon… is one act over either a project file or an `.inp`, and openAsGeoFile() decides
+		// which reader from the file's own first character.
+		var geoInput = document.getElementById('lpn_geo_file');
+		if (!geoInput) { return; }
+		geoInput.addEventListener('change', function () {
+			var f = geoInput.files[0];
+			geoInput.value = '';
+			if (f) { openAsGeoFile(f); }
 		});
 	}
 
