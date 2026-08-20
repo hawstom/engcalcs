@@ -880,6 +880,29 @@
 		renderBox(true);
 	}
 
+	// **ENTER AND ESCAPE BOTH CLOSE IT** (Tom, 2026-08-20). Two keys rather than one because the box
+	// is a report as well as a dismissable overlay: Escape is what dismisses an overlay, Enter is
+	// what a person presses when they have finished reading something and want it gone. There is
+	// nothing else in the box to confirm, so Enter has no other meaning to steal here.
+	//
+	// **ON document, GUARDED, NOT ON THE BOX.** Nothing in the box has focus -- the run was started
+	// from the toolbar and focus is still there -- so a listener on the box's own root would never
+	// fire. The guard is what makes that safe: a key pressed while the caret is in a field belongs
+	// to that field, so a text entry anywhere on the page (an element id, a control sentence, the
+	// settings search) is untouched. Registered ONCE, and inert whenever the box is shut.
+	if (typeof document !== 'undefined' && document.addEventListener) {
+		document.addEventListener('keydown', function (e) {
+			var t, tag;
+			if (!boxState.open) { return; }
+			if (e.key !== 'Enter' && e.key !== 'Escape' && e.key !== 'Esc') { return; }
+			t = e.target || {};
+			tag = (t.tagName || '').toUpperCase();
+			if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || t.isContentEditable) { return; }
+			e.preventDefault();
+			boxHide();
+		});
+	}
+
 	function boxMessage(S) {
 		if (boxState.phase === 'running') { return S.running; }
 		if (boxState.phase === 'failed') { return S.runFailed; }

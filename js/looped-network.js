@@ -7435,13 +7435,14 @@ var EngCalcs = EngCalcs || {};
 			// saying it twice is a stutter rather than more attribution -- and the footer stays
 			// where it is, outside the sections the search filter hides, so it is still on screen
 			// whenever the box is. Both groups carry the pointer: whichever picker you are looking
-			// at is the one you want to know about. NO NEW STRING -- the suite's own About label,
-			// which is what this line is: about the colours you are choosing from.
+			// at is the one you want to know about. **THE WORD IS "Credits", NOT "About"** (Tom,
+			// 2026-08-20: "'About' sounds like a 'Help' link"), so it is its own key rather than a
+			// borrow of the suite's About menu label.
 			var credLine = document.createElement('div'), credLink = document.createElement('a');
 			credLine.className = 'lpn-set-creditlink';
 			credLink.href = '#lpn_set_ramp_credits';
 			credLink.id = 'lpn_set_credits_link_' + group;
-			credLink.textContent = pc.about_main_menu || 'About';
+			credLink.textContent = pc.lpn_settings_color_credits || 'Credits';
 			credLink.addEventListener('click', function (e) {
 				var c = document.getElementById('lpn_set_ramp_credits');
 				e.preventDefault();

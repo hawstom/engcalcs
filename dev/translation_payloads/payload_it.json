@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1236,
-        "delta_key_count": 42,
+        "expected_key_count": 1237,
+        "delta_key_count": 43,
         "exempt_key_count": 30,
         "exempt_keys": [
             "calc_units_us",
@@ -462,6 +462,7 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_settings_color_credits": "Credits",
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",
@@ -506,6 +507,7 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_settings_color_credits": "Credits",
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",
@@ -772,6 +774,22 @@
                     "key": "lpn_field_valve_setting_loss",
                     "value": "Coefficiente di perdita",
                     "english": "Loss coefficient"
+                }
+            }
+        },
+        "lpn_settings_color_credits": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_color_ramp",
+                    "value": "Schema di colori",
+                    "english": "Color scheme"
+                },
+                "next_translated": {
+                    "key": "lpn_color_ramp_epanet",
+                    "value": "Da blu a rosso (EPANET)",
+                    "english": "Blue to red (EPANET)"
                 }
             }
         },

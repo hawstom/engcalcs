@@ -1141,6 +1141,7 @@
         "lpn_settings_color_node_field": "Node color",
         "lpn_settings_color_link_field": "Pipe color",
         "lpn_settings_color_ramp": "Color scheme",
+        "lpn_settings_color_credits": "Credits",
         "lpn_color_ramp_epanet": "Blue to red (EPANET)",
         "lpn_color_ramp_viridis": "Purple to yellow (easier to tell one color from the next)",
         "lpn_color_ramp_gray": "Light to dark gray",
@@ -1238,7 +1239,7 @@
         "lpn_field_demand_pattern": "Demand pattern",
         "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
     },
-    "count": 1236,
+    "count": 1237,
     "active_prefixes": [
         "about",
         "bpn",

@@ -1481,6 +1481,7 @@ EngCalcs.pageConfig = {
 	lpn_settings_color_node_field: <?=json_encode($ec_lang['lpn_settings_color_node_field'])?>,
 	lpn_settings_color_link_field: <?=json_encode($ec_lang['lpn_settings_color_link_field'])?>,
 	lpn_settings_color_ramp: <?=json_encode($ec_lang['lpn_settings_color_ramp'])?>,
+	lpn_settings_color_credits: <?=json_encode($ec_lang['lpn_settings_color_credits'])?>,
 	lpn_color_ramp_epanet: <?=json_encode($ec_lang['lpn_color_ramp_epanet'])?>,
 	lpn_color_ramp_viridis: <?=json_encode($ec_lang['lpn_color_ramp_viridis'])?>,
 	lpn_color_ramp_gray: <?=json_encode($ec_lang['lpn_color_ramp_gray'])?>,

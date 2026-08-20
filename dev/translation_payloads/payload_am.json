@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "am",
-        "expected_key_count": 1236,
-        "delta_key_count": 42,
+        "expected_key_count": 1237,
+        "delta_key_count": 43,
         "exempt_key_count": 23,
         "exempt_keys": [
             "u_imgd",
@@ -454,6 +454,7 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_settings_color_credits": "Credits",
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",
@@ -498,6 +499,7 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_settings_color_credits": "Credits",
         "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",
@@ -749,6 +751,22 @@
                     "key": "lpn_field_valve_setting_loss",
                     "value": "የኪሳራ ቅንጅት",
                     "english": "Loss coefficient"
+                }
+            }
+        },
+        "lpn_settings_color_credits": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_settings_color_ramp",
+                    "value": "የቀለም እቅድ",
+                    "english": "Color scheme"
+                },
+                "next_translated": {
+                    "key": "lpn_color_ramp_epanet",
+                    "value": "ከሰማያዊ ወደ ቀይ (EPANET)",
+                    "english": "Blue to red (EPANET)"
                 }
             }
         },

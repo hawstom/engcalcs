@@ -2223,6 +2223,7 @@ $ec_lang['lpn_settings_colors']='Color by value';
 $ec_lang['lpn_settings_color_node_field']='Node color';
 $ec_lang['lpn_settings_color_link_field']='Pipe color';
 $ec_lang['lpn_settings_color_ramp']='Color scheme';
+$ec_lang['lpn_settings_color_credits']='Credits';
 $ec_lang['lpn_color_ramp_epanet']='Blue to red (EPANET)';
 $ec_lang['lpn_color_ramp_viridis']='Purple to yellow (easier to tell one color from the next)';
 $ec_lang['lpn_color_ramp_gray']='Light to dark gray';
