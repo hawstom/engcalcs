@@ -23,6 +23,10 @@ const path = require('path');
 // The page loads both readers before js/looped-network.js; do the same, onto the same EngCalcs.
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-net.js');
+// The placement wizard's arithmetic, needed because File > Import XY to lat/lon… ends in it (Task 447).
+// georefStart() refuses outright without it, which would make the routing test below pass for the
+// wrong reason -- "no wizard armed" would be true whatever the file said.
+require(ROOT + 'js/lpn-georef.js');
 
 // FileReader is the browser's; the import path is written around it, so it is stubbed rather than
 // bypassed -- calling docFromInp() directly would skip importInpFromFile()'s own ordering, and the
@@ -40,6 +44,8 @@ global.FileReader = function () {
 	};
 };
 global.alert = global.window.alert = function (m) { lastAlert = m; };
+// Keep this placement asks before it commits, and the wizard section below presses it.
+global.confirm = global.window.confirm = function () { return true; };
 
 // TEXT MEASUREMENT: THE SHARED STUB NOW DOES THIS ITSELF (Task 403).
 //
@@ -84,7 +90,13 @@ const L = loadLoopedNetwork(
 	// Read from the page rather than typed here: the assertion below is "the import writes a
 	// CURRENT document", and a literal 4 made it "the import writes v4" -- a different claim, which
 	// went stale at the next format bump (Task 324).
-	"\t\tstorageVersion: function () { return LPN_STORAGE_VERSION; }, "
+	"\t\tstorageVersion: function () { return LPN_STORAGE_VERSION; },\n" +
+	// Task 447: File > Import XY to lat/lon…, and the wizard it can end in. serialize() is how this
+	// harness gets a real project FILE to hand back through that row -- writing one by hand would be
+	// a second opinion about our own format.
+	"\t\topenAsGeo: openAsGeoFile, serialize: serializeProject,\n" +
+	"\t\tgeorefState: function () { return georef; }, georefCancel: georefCancel,\n" +
+	"\t\tgeorefFinish: georefFinish, georefSetTransform: georefSetTransform, "
 );
 L.buildLayers();
 
@@ -484,6 +496,168 @@ console.log('\n--- a binary .net, handed over as "model.inp" ---');
 			lbs.length > 0 && lbs.every(l => l.align === 'left' && l.valign === 'top'),
 			JSON.stringify(lbs.map(l => l.align + '/' + l.valign)));
 	}
+
+// ---------------------------------------------------------------------------
+// [BACKDROP] UNITS: the file says which KIND of project it is (ROADMAP Task 447).
+// ---------------------------------------------------------------------------
+// EPANET's own Map Dimensions dialog offers FEET, METERS, DEGREES or NONE and persists the answer
+// here. We read only the FILE line out of that section for years and threw the rest away, so every
+// `.inp` opened as an XY drawing -- including one whose coordinates were already lon/lat.
+//
+// The three facts worth pinning, all from the REAL parser rather than a stub of it:
+//   * DEGREES opens a lat/lon project and everything else opens XY;
+//   * ABSENT and NONE stay tellable apart, because a prompt (if one is ever added) belongs on the
+//     first and never on the second -- EPA's own Net1, Net2 and Net3 all say NONE;
+//   * the coordinates are still the file's own numbers, bit for bit. A degrees file is the one case
+//     where a longitude could plausibly be "helped", and it must not be.
+console.log('\n--- [BACKDROP] UNITS decides XY or lat/lon ---');
+function probeInp(backdrop) {
+	return [
+		'[TITLE]', ' units probe', '',
+		'[JUNCTIONS]', ' J1  10  25', '',
+		'[RESERVOIRS]', ' R1  100', '',
+		'[PIPES]', ' P1  R1  J1  1000  8  130  0  Open', '',
+		'[COORDINATES]', ' J1  -122.5686103  38.106067', ' R1  -122.5700  38.1070', '',
+		'[OPTIONS]', ' Units  GPM', ' Headloss  H-W', ''
+	].concat(backdrop).concat(['[END]', '']).join('\n');
+}
+const INP_DEGREES = probeInp(['[BACKDROP]', ' UNITS  Degrees', '']);
+const INP_NONE = probeInp(['[BACKDROP]', ' UNITS  None', '']);
+const INP_SILENT = probeInp([]);
+const INP_STRANGE = probeInp(['[BACKDROP]', ' UNITS  Furlongs', '']);
+{
+	const P = EngCalcs.lpnInpParse;
+	const deg = P(INP_DEGREES), none = P(INP_NONE), silent = P(INP_SILENT), odd = P(INP_STRANGE);
+	ok('DEGREES is read, and the file\'s own token is kept beside it',
+		deg.mapUnits === 'degrees' && deg.mapUnitsRaw === 'Degrees', deg.mapUnits + ' / ' + deg.mapUnitsRaw);
+	ok('NONE is read as NONE -- the file said its coordinates are arbitrary',
+		none.mapUnits === 'none' && none.mapUnitsRaw === 'None', none.mapUnits + ' / ' + none.mapUnitsRaw);
+	// THE DISTINCTION THE WHOLE STATE EXISTS FOR. Silence is not NONE: only mapUnitsRaw separates
+	// them, and a later reader deciding whether a question is worth asking needs exactly this.
+	ok('a file with no [BACKDROP] at all says NOTHING, which is not the same as NONE',
+		silent.mapUnits === null && silent.mapUnitsRaw === null,
+		JSON.stringify([silent.mapUnits, silent.mapUnitsRaw]));
+	ok('...and a word we do not know keeps its token rather than becoming silence',
+		odd.mapUnits === null && odd.mapUnitsRaw === 'Furlongs',
+		JSON.stringify([odd.mapUnits, odd.mapUnitsRaw]));
+	// The real thing, not a fixture: EPA ships Net3 saying None, which is why NONE gets no prompt.
+	const net3 = P(fs.readFileSync(path.join(__dirname, 'reference', 'Net3.inp'), 'utf8'));
+	ok('EPA\'s own Net3 says None', net3.mapUnits === 'none', net3.mapUnitsRaw);
+}
+{
+	importText(INP_DEGREES, 'world.inp');
+	const p = L.getProject(), d = L.getDoc();
+	ok('a DEGREES file opens a lat/lon project', p.coords === 'geo', p.coords);
+	// Degrees start from zero by definition, so there is nothing for the survey-coordinate rebase
+	// to do -- and a shifted origin on a lon/lat document would move the network off the Earth.
+	ok('...with no origin shift under it', d.origin.x === 0 && d.origin.y === 0, JSON.stringify(d.origin));
+	// `===`, for the reason the header gives: a longitude is the user's number too.
+	const j1 = d.nodes.find(n => n.id === 'J1');
+	// Y is stored DOWN in memory and Cartesian in the file (flipStoredY), so the latitude comes back
+	// negated -- a sign flip is exact in doubles, which is why this can still be `===`.
+	ok('...and the longitude and latitude are the file\'s own numbers, exactly',
+		j1.x === -122.5686103 && j1.y === -38.106067, j1.x + ', ' + j1.y);
+
+	importText(INP_NONE, 'grid.inp');
+	ok('a NONE file opens an XY project, with no prompt in the way',
+		L.getProject().coords !== 'geo' && lastAlert === null, String(L.getProject().coords));
+	importText(INP_SILENT, 'quiet.inp');
+	ok('...and so does a file that never mentions its map units',
+		L.getProject().coords !== 'geo', String(L.getProject().coords));
+	importText(INP_STRANGE, 'odd.inp');
+	ok('...and so does one naming a unit we do not know',
+		L.getProject().coords !== 'geo', String(L.getProject().coords));
+}
+
+// ---------------------------------------------------------------------------
+// File > Import XY to lat/lon…: ONE row, both kinds of file (Task 447).
+// ---------------------------------------------------------------------------
+// The row exists for the one cell no file can state: an XY drawing whose X and Y were MEANT as
+// lon/lat all along. It therefore takes a project file and an `.inp` alike, and decides which reader
+// from the content -- a project file is JSON and starts with `{`, which no `.inp` ever does.
+console.log('\n--- Import XY to lat/lon…, over an .inp and over a project file ---');
+{
+	// currentView() measures the canvas, and the shared stub's elements carry no layout box; without
+	// a size the wizard correctly refuses to arm and every check below would pass for that reason.
+	byId.lpn_canvas.clientWidth = 1000;
+	byId.lpn_canvas.clientHeight = 500;
+
+	L.openAsGeo({ name: 'grid.inp', _text: INP_NONE });
+	ok('an .inp that does NOT say degrees runs the placement wizard', !!L.georefState(),
+		JSON.stringify(L.georefState() && L.georefState().step));
+	ok('...on a project that is now on the map', L.getProject().coords === 'geo');
+	L.georefCancel();
+
+	// A file that already states DEGREES is already where it belongs. Placing it by hand would be
+	// this page overruling the file, which is the one thing the unit rule forbids.
+	L.openAsGeo({ name: 'world.inp', _text: INP_DEGREES });
+	ok('a DEGREES .inp just opens -- there is nothing to place', L.georefState() === null);
+	ok('...and it is a lat/lon project', L.getProject().coords === 'geo');
+
+	// The other kind of file, through the same row. Written by our own serializer so the harness is
+	// not a second opinion about the format.
+	importText(INP_NONE, 'grid.inp');
+	const projectFile = JSON.stringify(L.serialize());
+	ok('a project file really is JSON, which is how the router tells the two apart',
+		projectFile.charAt(0) === '{');
+	L.openAsGeo({ name: 'grid.json', _text: projectFile });
+	ok('an XY project file runs the placement wizard too', !!L.georefState());
+	ok('...and it landed as a NEW tab rather than converting anything in place',
+		L.openId() !== null && L.getProject().coords === 'geo');
+	L.georefCancel();
+}
+
+// ---------------------------------------------------------------------------
+// PLACE or REINTERPRET: the numbers choose, and a reinterpret moves NOTHING (Task 447).
+// ---------------------------------------------------------------------------
+// One command does two jobs. A real XY drawing has to be MOVED onto the Earth; a network whose
+// coordinates already ARE lon/lat -- the `.inp` that only ever said `UNITS None` -- is already in the
+// right place and must not move at all. Dropping the second kind at the centre of the world would
+// take a correct network and ask the user to drag it back to a precision no hand can reach.
+//
+// **THE GUARANTEE: press Keep this placement without touching anything and every coordinate comes
+// back BYTE-IDENTICAL.** Not within tolerance -- CLAUDE.md's rule is that a number the user did not
+// touch is not ours to rewrite, and scaling by 1.0 perturbs the last bits of a double. It holds
+// structurally rather than by rounding: the document is written only by georefSetTransform(), and
+// only a user gesture calls that. The `!==` check after a real drag is what stops that from being a
+// wizard that quietly applies nothing.
+console.log('\n--- the numbers decide where the wizard opens, and a reinterpret moves nothing ---');
+{
+	// The file's own coordinates, y NEGATED because memory is y-down and the file is Cartesian.
+	const FILE_COORDS = '[["J1",-122.5686103,-38.106067],["R1",-122.57,-38.107]]';
+	const coords = () => JSON.stringify(L.getDoc().nodes.map(n => [n.id, n.x, n.y]));
+
+	L.openAsGeo({ name: 'really-lonlat.inp', _text: INP_NONE });
+	const armed = L.georefState();
+	ok('coordinates that CAN be read as degrees arm the wizard attached, on the ground',
+		!!armed && armed.step === 2, armed && armed.step);
+	ok('...and not one of them moved', coords() === FILE_COORDS, coords());
+	L.georefFinish();
+	ok('Keep this placement, untouched, commits the file\'s own numbers byte for byte',
+		coords() === FILE_COORDS, coords());
+	ok('...as a lat/lon project', L.getProject().coords === 'geo');
+
+	// The other direction, so the pass-through above cannot be hiding a wizard that never applies
+	// anything: a real gesture must really move the network.
+	L.openAsGeo({ name: 'really-lonlat.inp', _text: INP_NONE });
+	L.georefSetTransform(EngCalcs.lpnGeorefWithTranslation(L.georefState().t, 0.01, -0.02));
+	ok('after a real drag the coordinates DID change', coords() !== FILE_COORDS, coords());
+	L.georefCancel();
+	ok('...and Cancel puts the file\'s own numbers back, byte for byte', coords() === FILE_COORDS, coords());
+
+	// State Plane: half a million feet east, four million north. No such pair is a coordinate on the
+	// Earth, so there is no question to ask and the wizard opens where it always did.
+	const STATE_PLANE = probeInp(['[BACKDROP]', ' UNITS  Feet', ''])
+		.replace(' J1  -122.5686103  38.106067', ' J1  579350  4218000')
+		.replace(' R1  -122.5700  38.1070', ' R1  579900  4218600');
+	L.openAsGeo({ name: 'state-plane.inp', _text: STATE_PLANE });
+	const far = L.georefState();
+	ok('coordinates that CANNOT be degrees open detached, at the centre of the world',
+		!!far && far.step === 1, far && far.step);
+	ok('...with the model mapped onto plausible lon/lat rather than left at half a million',
+		L.getDoc().nodes.every(n => Math.abs(n.x) <= 180 && Math.abs(n.y) <= 90), coords());
+	L.georefCancel();
+}
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));
 process.exit(fails === 0 ? 0 : 1);

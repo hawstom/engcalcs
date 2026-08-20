@@ -271,8 +271,12 @@ console.log('\n--- one home for the concept ---');
 	// a real coordinate into a State Plane project would travel half a million units.
 	// ...and the placement tool's own whole-Earth opening view states a longitude and a latitude in
 	// WORLD terms, which is one more inward site on each axis.
-	ok('inwardX has one definition and thirteen call sites', count(/inwardX\(/g) === 14, count(/inwardX\(/g));
-	ok('inwardY has one definition and fourteen call sites', count(/inwardY\(/g) === 15, count(/inwardY\(/g));
+	// Task 447's REINTERPRET path adds one site to each pair, in the same shape georefCancel() has:
+	// when a file's coordinates can be read as degrees, the wizard writes them back exactly as they
+	// came in -- captured OUTWARD, written INWARD -- so the numbers are the file's own bytes and a
+	// document with a local origin still lands where it belongs.
+	ok('inwardX has one definition and fifteen call sites', count(/inwardX\(/g) === 16, count(/inwardX\(/g));
+	ok('inwardY has one definition and sixteen call sites', count(/inwardY\(/g) === 17, count(/inwardY\(/g));
 	// And nothing else may take the flip on its own: a site that flips without shifting is exactly
 	// the mistake this task exists to prevent.
 	ok('cartesianY is called only by the two converters', count(/cartesianY\(/g) === 3,

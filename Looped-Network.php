@@ -190,6 +190,11 @@ echoHeader("EngCalcs", $html_title, "", false);
 	      // its Windows UI saves when you press Save. The accept list only filters the PICKER; which
 	      // format a chosen file really is gets decided from its first bytes, not its name. ?>
 	<input type="file" id="lpn_inp_file" accept=".inp,.net,text/plain" style="display:none">
+	<?php // File > Open as lat/lon… (Task 447). THE ONE PICKER THAT TAKES BOTH KINDS, because the row
+	      // it serves is the recovery path for a lon/lat network in either kind of file. Which reader
+	      // a chosen file goes to is decided from its first character -- a project file is JSON --
+	      // never from its name, so the accept list only tidies the picker. ?>
+	<input type="file" id="lpn_geo_file" accept=".json,.inp,.net,application/json,text/plain" style="display:none">
 	<?php // Floating "choose target mode" step of the Position sequence (Task 146 Phase 2) --
 	      // mirrors #lpn_settings_box's static-PHP-plus-JS-clamped-position pattern (position:fixed,
 	      // positioned/clamped by showBackdropTargetPanel() in looped-network.js), not the spike's
@@ -1105,8 +1110,8 @@ EngCalcs.pageConfig = {
 	lpn_clean_map: <?=json_encode($ec_lang['lpn_clean_map'])?>,
 	lpn_clean_map_off: <?=json_encode($ec_lang['lpn_clean_map_off'])?>,
 	lpn_clean_map_tip: <?=json_encode($ec_lang['lpn_clean_map_tip'])?>,
-	lpn_georef_menu: <?=json_encode($ec_lang['lpn_georef_menu'])?>,
-	lpn_georef_tip: <?=json_encode($ec_lang['lpn_georef_tip'])?>,
+	lpn_file_import_geo: <?=json_encode($ec_lang['lpn_file_import_geo'])?>,
+	lpn_file_import_geo_tip: <?=json_encode($ec_lang['lpn_file_import_geo_tip'])?>,
 	lpn_georef_intro: <?=json_encode($ec_lang['lpn_georef_intro'])?>,
 	lpn_georef_step1: <?=json_encode($ec_lang['lpn_georef_step1'])?>,
 	lpn_georef_step2: <?=json_encode($ec_lang['lpn_georef_step2'])?>,
@@ -1157,6 +1162,7 @@ EngCalcs.pageConfig = {
 	lpn_color_ramp_ylgnbu: <?=json_encode($ec_lang['lpn_color_ramp_ylgnbu'])?>,
 	lpn_color_ramp_rdylbu: <?=json_encode($ec_lang['lpn_color_ramp_rdylbu'])?>,
 	lpn_georef_adjust: <?=json_encode($ec_lang['lpn_georef_adjust'])?>,
+	lpn_georef_asdegrees: <?=json_encode($ec_lang['lpn_georef_asdegrees'])?>,
 	lpn_georef_confirm: <?=json_encode($ec_lang['lpn_georef_confirm'])?>,
 	lpn_georef_done: <?=json_encode($ec_lang['lpn_georef_done'])?>,
 	lpn_georef_on_map: <?=json_encode($ec_lang['lpn_georef_on_map'])?>,

@@ -291,8 +291,20 @@ exports.run = async function ({ browser, report }) {
 		await a.newProject();
 		await a.dismissGallery();
 		await a.makeEdit();
-		await a.menuClick('Convert to lat/lon…');
-		await a.settle(800);
+		// The wizard starts from a FILE now (Task 447): the drawing on screen is written out and
+		// opened again through File > Import XY to lat/lon…, which lands it in a new tab, in step 1.
+		{
+			const text = await a.page.evaluate(() => {
+				const idx = JSON.parse(localStorage.getItem('lpn_index') || '{}');
+				return localStorage.getItem('lpn_project_' + idx.openId);
+			});
+			const [chooser] = await Promise.all([
+				a.page.waitForEvent('filechooser'),
+				a.menuClick('Import XY to lat/lon…')
+			]);
+			await chooser.setFiles({ name: 'search.json', mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
+		}
+		await a.settle(900);
 		report.ok(await a.page.evaluate(() => {
 			const b = document.getElementById('lpn_georef_search');
 			return !!b && getComputedStyle(b).display !== 'none';

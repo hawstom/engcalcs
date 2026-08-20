@@ -81,6 +81,15 @@
 	// [PATTERNS], [TIMES] and [CONTROLS] LEFT THIS TABLE in Task 248: they are read now, into
 	// `patterns`, `times` and `controls` on the result. [RULES] stays -- rule-based controls are a
 	// language and are deliberately out of scope (see js/lpn-patterns.js's header).
+	// **[BACKDROP] UNITS -- THE FILE'S OWN STATEMENT ABOUT ITS COORDINATES** (Task 447). EPANET's Map
+	// Dimensions dialog offers exactly these four words and writes the chosen one here, so a file
+	// saying DEGREES is a file saying its X and Y are a longitude and a latitude. Any other word is
+	// left as the file's own token with no meaning attached; see the reader below for why "the file
+	// said NONE" and "the file said nothing" must stay tellable apart.
+	var LPN_INP_MAP_UNITS = {
+		FEET: 'feet', METERS: 'meters', DEGREES: 'degrees', NONE: 'none'
+	};
+
 	var REPORTABLE = {
 		VALVES: 'valves',
 		RULES: 'rules', ENERGY: 'energy', QUALITY: 'quality', REACTIONS: 'reactions',
@@ -806,7 +815,7 @@
 		// something we did not. The `extended-period` case stays in inpDropText() for reports saved
 		// before today.
 
-		var backdrop = null;
+		var backdrop = null, mapUnits = null, mapUnitsRaw = null;
 		rows = rawSections.BACKDROP || [];
 		for (i = 0; i < rows.length; i++) {
 			r = rows[i];
@@ -816,6 +825,16 @@
 				// name and the user attaches the picture themselves through Map, Backdrop.
 				backdrop = { file: r.slice(1).join(' ') };
 				drop('backdrop-not-embedded', [], backdrop.file);
+			}
+			// **ABSENT AND `NONE` ARE DIFFERENT FACTS, AND THEY STAY DIFFERENT HERE.** Both open an
+			// XY project today, but only one of them is a file that never said anything -- EPA's own
+			// Net1, Net2 and Net3 all write `UNITS None`, so treating a missing line as NONE would
+			// erase the only distinction a later reader could act on. `mapUnitsRaw` is the file's own
+			// token and is null ONLY when there is no UNITS line at all; a word this page does not
+			// know keeps its token and leaves `mapUnits` null.
+			if ((r[0] || '').toUpperCase() === 'UNITS' && r[1]) {
+				mapUnitsRaw = r[1];
+				mapUnits = LPN_INP_MAP_UNITS[r[1].toUpperCase()] || null;
 			}
 		}
 
@@ -847,6 +866,13 @@
 			links: links,
 			labels: labels,
 			backdrop: backdrop,
+			// [BACKDROP] UNITS: 'feet', 'meters', 'degrees' or 'none' when the file names one of
+			// EPANET's four, and null both when the line is absent and when its word is one this
+			// page does not know. `mapUnitsRaw` tells those two apart -- null there, and only there,
+			// means the file said nothing. DEGREES is the one that changes what happens: the import
+			// opens a lat/lon project, and every other answer opens an XY one.
+			mapUnits: mapUnits,
+			mapUnitsRaw: mapUnitsRaw,
 			dropped: dropped
 		};
 	};

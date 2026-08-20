@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 1209,
-        "delta_key_count": 15,
+        "expected_key_count": 1210,
+        "delta_key_count": 16,
         "exempt_key_count": 29,
         "exempt_keys": [
             "calc_units_us",
@@ -450,6 +450,7 @@
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
+        "lpn_georef_asdegrees": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press Keep this placement.",
         "lpn_pane_tab_reservoirs": "Reservoirs",
         "lpn_pane_tab_tanks": "Tanks",
         "lpn_pane_tab_pipes": "Pipes",
@@ -467,6 +468,7 @@
         "lpn_basemap_satellite_hide": "Hide satellite images",
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
+        "lpn_georef_asdegrees": "The x and y in this file were read as a longitude and a latitude, so the network is already on the map and nothing has been moved. Check that it is in the right place, then press Keep this placement.",
         "lpn_pane_tab_reservoirs": "Reservoirs",
         "lpn_pane_tab_tanks": "Tanks",
         "lpn_pane_tab_pipes": "Pipes",
@@ -490,9 +492,9 @@
                     "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
                 },
                 "next_translated": {
-                    "key": "lpn_georef_menu",
+                    "key": "lpn_file_import_geo",
                     "value": "Convertir a lat\/lon…",
-                    "english": "Convert to lat\/lon…"
+                    "english": "Import xy to lat\/lon…"
                 }
             }
         },
@@ -506,9 +508,9 @@
                     "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
                 },
                 "next_translated": {
-                    "key": "lpn_georef_menu",
+                    "key": "lpn_file_import_geo",
                     "value": "Convertir a lat\/lon…",
-                    "english": "Convert to lat\/lon…"
+                    "english": "Import xy to lat\/lon…"
                 }
             }
         },
@@ -522,9 +524,9 @@
                     "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
                 },
                 "next_translated": {
-                    "key": "lpn_georef_menu",
+                    "key": "lpn_file_import_geo",
                     "value": "Convertir a lat\/lon…",
-                    "english": "Convert to lat\/lon…"
+                    "english": "Import xy to lat\/lon…"
                 }
             }
         },
@@ -538,9 +540,25 @@
                     "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
                 },
                 "next_translated": {
-                    "key": "lpn_georef_menu",
+                    "key": "lpn_file_import_geo",
                     "value": "Convertir a lat\/lon…",
-                    "english": "Convert to lat\/lon…"
+                    "english": "Import xy to lat\/lon…"
+                }
+            }
+        },
+        "lpn_georef_asdegrees": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_file_import_geo_tip",
+                    "value": "De una cuadrícula local al mundo real. Coloca un dibujo hecho en la cuadrícula xy sobre coordenadas geográficas, para que quede en su lugar sobre el mapa de calles. Cada número que escribió permanece igual — solo la X y la Y se convierten en una longitud y una latitud.",
+                    "english": "Opens a project file or an EPANET file in a new tab, on the street map. If the numbers in it can be read as a longitude and a latitude, the network opens right where it belongs. If they cannot, you place the drawing on the world by hand: pan and zoom to the site, then size and turn it to fit. Every number you typed stays as it is."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_intro",
+                    "value": "¿Convertir este proyecto xy en un proyecto geográfico? Su proyecto se colocó en el centro de un mapa mundial. Acerque el mapa hasta su ubicación y mueva, cambie de tamaño y gire el modelo cuanto quiera. Cuando esté listo para empezar a ajustar elementos, presione Mantener esta ubicación.",
+                    "english": "Your project has been placed at the centre of a world map. Zoom to your location and move, resize, and turn the model as much as you like. When you are ready to start adjusting elements, press Keep this placement."
                 }
             }
         },
