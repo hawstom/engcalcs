@@ -1165,7 +1165,6 @@ $ec_lang['lpn_settings_color_thematic']='خريطة موضوعية: ألوان �
 $ec_lang['lpn_settings_color_thematic_tip']='يخفي كل تسمية بحيث تبقى الألوان فقط على الخريطة. تُحفظ اختيارات التسميات لديك، وإيقاف هذا الخيار يعيدها.';
 $ec_lang['lpn_settings_color_key_position']='موضع مفتاح الألوان';
 $ec_lang['lpn_settings_color_breaks']='حدود نطاقات الألوان';
-$ec_lang['lpn_settings_color_breaks_note']='اتركها فارغة لتتوزع الألوان على القيم الموجودة الآن على الخريطة. اكتب أرقاماً، أو اضغط زراً أدناه، فيصبح الرقم نفسه يعني اللون نفسه دائماً.';
 $ec_lang['lpn_settings_color_equal_intervals']='فواصل متساوية';
 $ec_lang['lpn_settings_color_equal_counts']='أعداد متساوية';
 $ec_lang['lpn_settings_color_auto']='تلقائي';

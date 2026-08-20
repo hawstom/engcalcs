@@ -1166,7 +1166,6 @@ $ec_lang['lpn_settings_color_thematic']='विषयगत मानचित�
 $ec_lang['lpn_settings_color_thematic_tip']='हर लेबल छुपा देता है ताकि मानचित्र पर केवल रंग रह जाएँ। आपकी लेबल पसंद बनी रहती है, और इसे बंद करने पर वे वापस आ जाती हैं।';
 $ec_lang['lpn_settings_color_key_position']='रंग लेजेंड की स्थिति';
 $ec_lang['lpn_settings_color_breaks']='रंग बैंड सीमाएँ';
-$ec_lang['lpn_settings_color_breaks_note']='इन्हें खाली छोड़ने पर रंग मानचित्र पर मौजूद मानों में फैला दिए जाते हैं। संख्याएँ टाइप करें, या नीचे दिया बटन दबाएँ, तो वही संख्या हमेशा वही रंग दर्शाएगी।';
 $ec_lang['lpn_settings_color_equal_intervals']='समान अंतराल';
 $ec_lang['lpn_settings_color_equal_counts']='समान गणना';
 $ec_lang['lpn_settings_color_auto']='स्वचालित';

@@ -1237,7 +1237,6 @@ $ec_lang['lpn_settings_color_thematic']='موضوعاتی نقشہ: صرف رن�
 $ec_lang['lpn_settings_color_thematic_tip']='ہر لیبل چھپا دیتا ہے تاکہ نقشے پر صرف رنگ رہ جائیں۔ آپ کے لیبل کے انتخاب محفوظ رہتے ہیں، اور اسے بند کرنے سے وہ واپس آ جاتے ہیں۔';
 $ec_lang['lpn_settings_color_key_position']='رنگ کی کلید کی جگہ';
 $ec_lang['lpn_settings_color_breaks']='رنگ کے بینڈ کی حدیں';
-$ec_lang['lpn_settings_color_breaks_note']='انہیں خالی چھوڑ دیں تو رنگ نقشے پر موجود قدروں کے مطابق پھیلائے جاتے ہیں۔ نمبر ٹائپ کریں، یا نیچے کوئی بٹن دبائیں، تو ایک ہی نمبر ہمیشہ ایک ہی رنگ ظاہر کرے گا۔';
 $ec_lang['lpn_settings_color_equal_intervals']='مساوی وقفے';
 $ec_lang['lpn_settings_color_equal_counts']='مساوی تعداد';
 $ec_lang['lpn_settings_color_auto']='خودکار';

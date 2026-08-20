@@ -1136,7 +1136,6 @@
         "lpn_settings_color_thematic_tip": "Hides every label so that only the colors are left on the map. Your label choices are kept, and turning this off brings them back.",
         "lpn_settings_color_key_position": "Color legend position",
         "lpn_settings_color_breaks": "Color band limits",
-        "lpn_settings_color_breaks_note": "The limits shown below are static for this project. Choosing a method above changes the limits based on the current state of the system, so it's expert to classify from a representative time step.",
         "lpn_settings_color_equal_intervals": "Equal intervals",
         "lpn_settings_color_equal_counts": "Equal counts",
         "lpn_settings_color_auto": "Automatic",
@@ -1197,7 +1196,7 @@
         "lpn_color_mode_log": "Logarithmic",
         "lpn_color_mode_pressure": "Pressure"
     },
-    "count": 1195,
+    "count": 1194,
     "active_prefixes": [
         "about",
         "bpn",

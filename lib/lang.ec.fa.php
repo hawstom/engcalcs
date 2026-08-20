@@ -1400,7 +1400,6 @@ $ec_lang['lpn_settings_color_thematic']='نقشهٔ موضوعی: فقط رنگ�
 $ec_lang['lpn_settings_color_thematic_tip']='همهٔ برچسب‌ها را پنهان می‌کند تا فقط رنگ‌ها روی نقشه بمانند. انتخاب‌های برچسب شما نگه داشته می‌شوند و با خاموش کردن این گزینه، بازمی‌گردند.';
 $ec_lang['lpn_settings_color_key_position']='موقعیت راهنمای رنگ';
 $ec_lang['lpn_settings_color_breaks']='حدود باندهای رنگ';
-$ec_lang['lpn_settings_color_breaks_note']='این‌ها را خالی بگذارید تا رنگ‌ها بر اساس مقادیر موجود روی نقشه پخش شوند. عدد وارد کنید، یا یکی از دکمه‌های زیر را بزنید، تا همیشه یک عدد به یک رنگ یکسان باشد.';
 $ec_lang['lpn_settings_color_equal_intervals']='بازه‌های مساوی';
 $ec_lang['lpn_settings_color_equal_counts']='شمار مساوی';
 $ec_lang['lpn_settings_color_auto']='خودکار';

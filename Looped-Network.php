@@ -1384,7 +1384,6 @@ EngCalcs.pageConfig = {
 	lpn_settings_color_thematic_tip: <?=json_encode($ec_lang['lpn_settings_color_thematic_tip'])?>,
 	lpn_settings_color_key_position: <?=json_encode($ec_lang['lpn_settings_color_key_position'])?>,
 	lpn_settings_color_breaks: <?=json_encode($ec_lang['lpn_settings_color_breaks'])?>,
-	lpn_settings_color_breaks_note: <?=json_encode($ec_lang['lpn_settings_color_breaks_note'])?>,
 	lpn_settings_color_equal_intervals: <?=json_encode($ec_lang['lpn_settings_color_equal_intervals'])?>,
 	lpn_settings_color_equal_counts: <?=json_encode($ec_lang['lpn_settings_color_equal_counts'])?>,
 	lpn_settings_color_auto: <?=json_encode($ec_lang['lpn_settings_color_auto'])?>,

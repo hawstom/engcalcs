@@ -32,6 +32,8 @@ const L = loadLoopedNetwork(
 	"\t\tbuildColoringSection: buildColoringSection,\n" +
 	"\t\tcomputedBreaks: computedBreaks, effectiveBreaks: effectiveBreaks,\n" +
 	"\t\tpinnedBreaks: pinnedBreaks, colorModeOf: colorModeOf,\n" +
+	"\t\tfrozenBreaks: frozenBreaks, thawBreaks: thawBreaks,\n" +
+	"\t\tsetProp: setProp, effective: effective,\n" +
 	"\t\tcolorClassCount: colorClassCount, rampColorList: rampColorList,\n" +
 	"\t\trampGroups: rampGroups, bandColor: bandColor, colorForValue: colorForValue,\n" +
 	"\t\tcolorNodeValue: colorNodeValue, colorLinkValue: colorLinkValue,\n" +
@@ -56,6 +58,10 @@ const L = loadLoopedNetwork(
 );
 
 let fails = 0;
+// The house pattern in these harnesses: the stub records listeners and the test calls them,
+// so a control is exercised the way a user exercises it rather than by calling the handler's
+// insides.
+function fire(el, type) { (el._listeners[type] || []).forEach(function (fn) { fn({ type: type, currentTarget: el, target: el }); }); }
 function ok(name, cond, extra) {
 	if (cond) { console.log('  ok   ' + name); return; }
 	fails++;
@@ -649,6 +655,166 @@ console.log('== opening an older project ==');
 	const s3 = L.getSettings();
 	ok('a document from before the count existed still opens at the five bands it was drawn in',
 		s3.colorClassesNode === 5 && s3.colorClassesLink === 5);
+}
+
+// ---- 12. THE LIMITS FREEZE (Task 448) ---------------------------------------------------------
+//
+// Tom, 2026-08-19: *"I envision myself watching an animation of the system, with colors propagating
+// and receding through the system. As I watch, I assume, mostly subconsciously, that the colors are
+// temporarily stable in meaning."* Limits recomputed at every solve break that assumption silently:
+// the map is exactly as colourful either way, and the only symptom is that the animation means
+// something different in every frame.
+//
+// **THE ASSERTION THAT MATTERS IS A MUTATION TEST, NOT AN EQUALITY.** "The breaks did not move" is
+// vacuous unless the values under them did, so every step below also asserts that computedBreaks()
+// -- the live answer we are refusing to use -- DID move. Without that pair, a harness passes on a
+// network whose second time step happens to look like its first.
+console.log('== the limits freeze ==');
+{
+	fresh('us');
+	const s = L.getSettings(), doc = L.getDoc();
+	s.colorNodeField = 'pressure';
+	s.colorLinkField = 'velocity';
+	// A second "time step": every demand tripled and the network solved again. Extended-period
+	// simulation is Task 248, so this is what a later step will do to the numbers -- press harder on
+	// the same network and read the same fields.
+	// **THROUGH setProp(), the one write seam** -- a direct `n._demand =` would edit BASE from
+	// inside a scenario, which is the defect dev/scripts/scenario_seam_check.php exists for.
+	function nextStep(factor) {
+		doc.nodes.forEach(function (n) {
+			var q = L.effective(n, 'demand');
+			if (typeof q === 'number' && q) { L.setProp(n, 'demand', q * factor); }
+		});
+		L.runSolve();
+		L.refreshValueColors();
+	}
+
+	const first = L.effectiveBreaks('node', 'pressure').join(',');
+	ok('the first read freezes the method\'s answer into its own field',
+		L.frozenBreaks('node', 'pressure').join(',') === first, first);
+	ok('...remembering WHICH method produced it, so another method cannot be served this set',
+		s.colorFrozenBreaks['node.pressure'].mode === L.colorModeOf('node', 'pressure'));
+	ok('...and it is NOT written into colorBreaks, which holds only what the user typed',
+		s.colorBreaks['node.pressure'] === undefined);
+
+	const liveBefore = L.computedBreaks('node', 'pressure').join(',');
+	const linkFirst = L.effectiveBreaks('link', 'velocity').join(',');
+	nextStep(3);
+	ok('the values really did move, so the next assertion is not vacuous',
+		L.computedBreaks('node', 'pressure').join(',') !== liveBefore,
+		L.computedBreaks('node', 'pressure').join(','));
+	ok('two time steps of one run give the SAME node breaks',
+		L.effectiveBreaks('node', 'pressure').join(',') === first,
+		L.effectiveBreaks('node', 'pressure').join(','));
+	ok('...and the SAME link breaks',
+		L.effectiveBreaks('link', 'velocity').join(',') === linkFirst,
+		L.effectiveBreaks('link', 'velocity').join(','));
+	// A third step, because a freeze that survives one solve and not two is a freeze that survives
+	// nothing an animation would do to it.
+	nextStep(1 / 6);
+	ok('...and a third step, in the other direction, still gives the same breaks',
+		L.effectiveBreaks('node', 'pressure').join(',') === first &&
+		L.effectiveBreaks('link', 'velocity').join(',') === linkFirst);
+
+	// CHOOSING A METHOD IS THE MOMENT THE LIMITS ARE TAKEN. Through the real control, because the
+	// dropdown's change handler is where the thaw lives and a harness that called thawBreaks()
+	// directly would be asserting about a function nothing reaches.
+	L.buildColoringSection();
+	const modeSel = walk(byId.lpn_set_colors_node).filter(e => e.id === 'lpn_set_color_mode_node')[0];
+	ok('the method picker is on screen to be chosen from', !!modeSel);
+	modeSel.value = 'quantile';
+	fire(modeSel, 'change');
+	const requoted = L.effectiveBreaks('node', 'pressure').join(',');
+	ok('choosing a method re-derives the limits from the state the map is in NOW',
+		requoted === L.computedBreaks('node', 'pressure').join(',') && requoted !== first, requoted);
+	const liveAfter = L.computedBreaks('node', 'pressure').join(',');
+	nextStep(4);
+	ok('...the state moved again',
+		L.computedBreaks('node', 'pressure').join(',') !== liveAfter);
+	ok('...and the newly chosen method\'s answer is frozen in its turn',
+		L.effectiveBreaks('node', 'pressure').join(',') === requoted);
+
+	// AUTOMATIC ASKS THE METHOD AGAIN. There is no live setting to go back to any more, so the one
+	// button that used to mean "unpin" now means "re-derive and freeze", which is the only reading
+	// that leaves the user a way out of a set of numbers they typed.
+	L.buildColoringSection();
+	const nodeBoxes = walk(byId.lpn_set_colors_node).filter(e => e.type === 'number');
+	nodeBoxes.forEach(function (b, i) { b.value = String(10 + i * 10); });
+	fire(nodeBoxes[0], 'change');
+	ok('typing a limit stores the user\'s numbers, in the user\'s field',
+		(s.colorBreaks['node.pressure'] || []).length === nodeBoxes.length &&
+		s.colorBreaks['node.pressure'][0] === 10);
+	ok('...and wins over the frozen set', L.effectiveBreaks('node', 'pressure')[0] === 10);
+	L.buildColoringSection();
+	const autoBtn = walk(byId.lpn_set_colors_node)
+		.filter(e => e.tagName === 'BUTTON' && /Automatic/i.test(allText(e)))[0];
+	ok('the Automatic button is there to take them back', !!autoBtn);
+	fire(autoBtn, 'click');
+	ok('Automatic drops the typed set', s.colorBreaks['node.pressure'] === undefined);
+	ok('...and re-derives the method\'s answer for the current state, then freezes that',
+		L.effectiveBreaks('node', 'pressure').join(',') === L.computedBreaks('node', 'pressure').join(',') &&
+		L.frozenBreaks('node', 'pressure').length > 0);
+
+	// A CRITERION MODE IS ALREADY STATIC, and freezing it would make it WRONG rather than steady:
+	// its thresholds come from a design standard in SI and are converted on every read, so a stored
+	// copy would be a psi number sitting in a project opened in kPa.
+	s.colorModes['node.pressure'] = 'pressure';
+	L.thawBreaks('node', 'pressure');
+	const crit = L.effectiveBreaks('node', 'pressure').join(',');
+	ok('a criterion method answers from the standard, not from a snapshot',
+		crit === L.computedBreaks('node', 'pressure').join(',') &&
+		s.colorFrozenBreaks['node.pressure'] === undefined, crit);
+	nextStep(2);
+	ok('...and it does not move with the map either -- it never did',
+		L.effectiveBreaks('node', 'pressure').join(',') === crit);
+	delete s.colorModes['node.pressure'];
+}
+
+// ---- 13. A PROJECT SAVED BEFORE THE LIMITS FROZE ----------------------------------------------
+//
+// It carries no frozen set, because there was no such field. **Nothing on screen may change when it
+// opens**: the first render freezes the very numbers the old build would have recomputed, so the
+// map it was saved in is the map that comes back -- and from then on it holds.
+console.log('== opening a project saved before the freeze ==');
+{
+	fresh('us');
+	const s = L.getSettings(), doc = L.getDoc();
+	s.colorNodeField = 'pressure';
+	s.colorLinkField = 'velocity';
+	L.refreshValueColors();
+	const painted = doc.nodes.map(n => L.nodeFill(n.id) + '|' + L.nodeSymbolColor(n.id))
+		.concat(doc.links.map(l => L.linkStroke(l.id))).join(',');
+	const saved = JSON.parse(JSON.stringify(L.serializeProject()));
+	delete saved.settings.colorFrozenBreaks;
+
+	L.applySaved(saved);
+	const s2 = L.getSettings();
+	ok('the missing field opens as "not classified yet", not as undefined',
+		s2.colorFrozenBreaks && Object.keys(s2.colorFrozenBreaks).length === 0);
+	L.runSolve();
+	L.refreshValueColors();
+	ok('so the map opens on exactly the colours it was saved in',
+		L.getDoc().nodes.map(n => L.nodeFill(n.id) + '|' + L.nodeSymbolColor(n.id))
+			.concat(L.getDoc().links.map(l => L.linkStroke(l.id))).join(',') === painted);
+	ok('...and the first render is what froze them',
+		L.frozenBreaks('node', 'pressure').length > 0);
+
+	// A FIELD COLOURED WITH NOTHING SOLVED YET MUST NOT FREEZE THE PLACEHOLDER. degenerateSpan()
+	// answers 0..1 when there are no values, and a project that opened on that forever would show a
+	// legend with no relation to the network the moment it was solved.
+	// An EMPTY document is the one thing that clears the last solve, and it must be cleared: a
+	// stale result keyed by the same node ids would answer for a network that has not been solved.
+	L.reset();
+	L.runSolve();
+	L.drawExample();
+	const s3 = L.getSettings();
+	s3.colorNodeField = 'pressure';
+	L.effectiveBreaks('node', 'pressure');
+	ok('an unsolved map freezes nothing', (s3.colorFrozenBreaks || {})['node.pressure'] === undefined);
+	L.runSolve();
+	const afterSolve = L.effectiveBreaks('node', 'pressure');
+	ok('...and the first solve is what freezes it',
+		L.frozenBreaks('node', 'pressure').join(',') === afterSolve.join(',') && afterSolve.length > 0);
 }
 
 console.log(fails === 0 ? '\nALL PASS' : '\n' + fails + ' FAILURE(S)');

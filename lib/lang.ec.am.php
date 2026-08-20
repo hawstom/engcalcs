@@ -1164,7 +1164,6 @@ $ec_lang['lpn_settings_color_thematic']='የገጽታ ካርታ፦ ቀለም ብ
 $ec_lang['lpn_settings_color_thematic_tip']='በካርታው ላይ ቀለሞቹ ብቻ እንዲቀሩ ሁሉንም ምልክት ይደብቃል። የመረጧቸው ምልክቶች ተይዘው ይቆያሉ፣ ይህን ማጥፋትም ይመልሳቸዋል።';
 $ec_lang['lpn_settings_color_key_position']='የቀለም መግለጫ ሳጥን ቦታ';
 $ec_lang['lpn_settings_color_breaks']='የቀለም ባንድ ገደቦች';
-$ec_lang['lpn_settings_color_breaks_note']='እነዚህን ባዶ ይተውዋቸው፣ ቀለሞቹም አሁን በካርታው ላይ ባሉት ዋጋዎች ላይ ተከፋፍለው ይታያሉ። ቁጥሮች ይተይቡ፣ ወይም ከታች ያለውን ቁልፍ ይጫኑ፣ ተመሳሳይ ቁጥርም ሁልጊዜ ተመሳሳይ ቀለም ማለት ይሆናል።';
 $ec_lang['lpn_settings_color_equal_intervals']='እኩል ክፍተቶች';
 $ec_lang['lpn_settings_color_equal_counts']='እኩል ብዛቶች';
 $ec_lang['lpn_settings_color_auto']='ራስ-ሰር';

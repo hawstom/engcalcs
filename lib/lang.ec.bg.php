@@ -1371,7 +1371,6 @@ $ec_lang['lpn_settings_color_thematic']='Тематична карта: само
 $ec_lang['lpn_settings_color_thematic_tip']='Скрива всички етикети, така че на картата остават само цветовете. Вашите избори за етикети се запазват и се връщат, когато изключите това.';
 $ec_lang['lpn_settings_color_key_position']='Позиция на цветовата легенда';
 $ec_lang['lpn_settings_color_breaks']='Граници на цветовите диапазони';
-$ec_lang['lpn_settings_color_breaks_note']='Оставете тези полета празни и цветовете се разпределят според стойностите, които в момента са на картата. Въведете числа или натиснете бутон по-долу, и едно и също число винаги ще означава един и същ цвят.';
 $ec_lang['lpn_settings_color_equal_intervals']='Равни интервали';
 $ec_lang['lpn_settings_color_equal_counts']='Равен брой';
 $ec_lang['lpn_settings_color_auto']='Автоматично';

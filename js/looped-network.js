@@ -2537,7 +2537,25 @@ var EngCalcs = EngCalcs || {};
 			// one. Absent means 'equal'. Replaced wholesale by a save for the same reason
 			// colorBreaks is: it is a per-field choice, and a field nobody has chosen for reads as
 			// the default rather than as undefined.
-			colorModes: {}
+			colorModes: {},
+			// THE METHOD'S OWN ANSWER, FROZEN (Task 448). Keyed the same way, and **a different
+			// kind of number from colorBreaks: these are OURS, computed, and those are the
+			// user's, typed.** They are kept in two fields rather than one so that no code path
+			// can write a computed number into the field that holds what the user entered --
+			// CLAUDE.md's unit paradigm, applied to a break instead of to an imported length.
+			//
+			// WHY FROZEN AT ALL. Tom, 2026-08-19: *"I envision myself watching an animation of the
+			// system, with colors propagating and receding... I assume, mostly subconsciously, that
+			// the colors are temporarily stable in meaning."* Limits recomputed at every solve make
+			// the legend mean something new each frame, so the animation says something untrue
+			// quietly. A method is chosen ONCE, against the state on the map at that moment, and
+			// its answer then holds until the user chooses again or types over it.
+			//
+			// Absent means "not classified yet": effectiveBreaks() freezes on first use, as soon as
+			// there is anything on the map to classify. That is also how a project saved under the
+			// live-recompute behaviour opens -- it carries no such key, so its first render freezes
+			// the very numbers it would have recomputed, and nothing on screen changes.
+			colorFrozenBreaks: {}
 			// A save may still carry keys since removed (`fileAutosaveSeconds`, `mapHeight`).
 			// applySaved() merges the save ONTO these defaults, so a stale key rides along unread.
 		};
@@ -3240,9 +3258,70 @@ var EngCalcs = EngCalcs || {};
 		v = R.validateBreaks(stored, colorClassCount(group));
 		return v.ok ? v.breaks : [];
 	}
+	// THE METHOD'S ANSWER AS IT WAS WHEN THE METHOD WAS CHOSEN -- our numbers, not the user's, and
+	// therefore in their own field. A set that no longer fits the class count is ignored exactly as
+	// a pinned one is, which is what makes changing the count re-derive rather than half-apply.
+	//
+	// **THE SNAPSHOT REMEMBERS WHICH METHOD PRODUCED IT**, so a set frozen under one method cannot
+	// be served under another. Written this way rather than as "the mode picker also clears the
+	// snapshot" because the picker is not the only writer of settings.colorModes -- a project file
+	// is one too -- and a rule enforced where the value is READ cannot be forgotten at a new write
+	// site.
+	function frozenBreaks(group, field) {
+		var R = ramps(), stored = (settings.colorFrozenBreaks || {})[colorBreakKey(group, field)], v;
+		if (!R || !stored || !stored.breaks || !stored.breaks.length) { return []; }
+		if (stored.mode !== colorModeOf(group, field)) { return []; }
+		v = R.validateBreaks(stored.breaks, colorClassCount(group));
+		return v.ok ? v.breaks : [];
+	}
+	// A criterion mode is ALREADY frozen -- its limits come from a design standard, not from the
+	// map -- and freezing it again would do harm rather than nothing: computedBreaks() converts the
+	// standard's SI thresholds into the display unit on every read, so a stored copy would be wrong
+	// the moment the project was opened under the other preset. 40 psi is 275.79 kPa; a snapshot
+	// saying 40 is not.
+	function breaksAreFromCriterion(group, field) {
+		var def = field ? colorModeDef(colorModeOf(group, field)) : null;
+		return !!(def && def.criterion);
+	}
+	// SNAPSHOT the method's answer for the state the map is in right now, and remember it.
+	function freezeBreaks(group, field) {
+		var b = computedBreaks(group, field);
+		if (b.length) {
+			settings.colorFrozenBreaks = settings.colorFrozenBreaks || {};
+			settings.colorFrozenBreaks[colorBreakKey(group, field)] =
+				{ mode: colorModeOf(group, field), breaks: b.slice() };
+		}
+		return b;
+	}
+	// IS THERE ANYTHING TO CLASSIFY YET -- two different values, not merely one. A field coloured
+	// before the first solve has none at all, and a map holding a single value (the reservoir's
+	// pressure, before the junctions have any) makes degenerateSpan() INVENT a span around it.
+	// Either would be a placeholder, and a placeholder frozen into the project is a legend with no
+	// relation to the network for the rest of its life.
+	function hasRangeToClassify(group, field) {
+		var vals = colorValues(group, field), i;
+		for (i = 1; i < vals.length; i++) { if (vals[i] !== vals[0]) { return true; } }
+		return false;
+	}
+	// THE THREE ANSWERS, IN THE ORDER THEY OUTRANK EACH OTHER: what the user typed, then what the
+	// method last answered, then -- only when there is nothing frozen yet -- the method itself.
+	//
+	// **THAT LAST CASE FREEZES AS IT ANSWERS, and only once there is a real range to freeze from.**
+	// Until then the placeholder is recomputed and forgotten, and the first solve that produces a
+	// spread of values is what fixes the limits.
 	function effectiveBreaks(group, field) {
-		var pinned = pinnedBreaks(group, field);
-		return pinned.length ? pinned : computedBreaks(group, field);
+		var pinned = pinnedBreaks(group, field), frozen;
+		if (pinned.length) { return pinned; }
+		if (!field || breaksAreFromCriterion(group, field)) { return computedBreaks(group, field); }
+		frozen = frozenBreaks(group, field);
+		if (frozen.length) { return frozen; }
+		if (!hasRangeToClassify(group, field)) { return computedBreaks(group, field); }
+		return freezeBreaks(group, field);
+	}
+	// Forget the frozen answer for one field, so the next read re-derives it from the state the map
+	// is in NOW. Choosing a method and pressing Automatic are the two things that mean this.
+	function thawBreaks(group, field) {
+		if (settings.colorFrozenBreaks) { delete settings.colorFrozenBreaks[colorBreakKey(group, field)]; }
 	}
 	// Class index -> colour. n classes take the ramp's own published n colours, in order; nothing
 	// is sampled out of a longer set, which is the whole of "degrade to the published lower-class
@@ -7177,6 +7256,11 @@ var EngCalcs = EngCalcs || {};
 				// not; keeping it would make choosing a mode do nothing, which is the one thing a
 				// mode picker must never do.
 				if (settings.colorBreaks) { delete settings.colorBreaks[colorBreakKey(group, field)]; }
+				// **CHOOSING A METHOD IS THE MOMENT THE LIMITS ARE TAKEN** (Task 448): the next read
+				// re-derives them from the state the map is in now and freezes that, so they answer
+				// for THIS state and then hold -- which is what makes it expert to classify from a
+				// representative time step. frozenBreaks() does it by refusing a snapshot taken
+				// under another method, so there is nothing to clear here.
 				refreshValueColors(); saveToStorage(); syncColorControls();
 			});
 			// HOW MANY COLOURS, 3 to 7. Beside the ramp because the swatch above draws exactly this
@@ -7231,7 +7315,7 @@ var EngCalcs = EngCalcs || {};
 			head.textContent = (pc.lpn_settings_color_breaks || 'Color band limits') + ': ' + colorFieldLabel(group, field);
 			target.appendChild(head);
 			noteIn(target, pc.lpn_color_ranges_note ||
-				'Left alone, these limits follow the values now on the map, so they move with every solve and every time step. Type over them and they stay put, so the same number always means the same color. Automatic gives them back to the method above.');
+				'The limits shown below are static for this project. Choosing a method above changes the limits based on the current state of the system, so it\'s expert to classify from a representative time step.');
 			// **WHOSE NUMBER IS IN THE BOX DECIDES HOW IT IS PRINTED.** A limit the user pinned is
 			// theirs and appears exactly as they typed it. A limit a MODE just computed is ours,
 			// and 0.14285714285714285 in a box four characters wide is unreadable -- so it is
@@ -7291,6 +7375,10 @@ var EngCalcs = EngCalcs || {};
 			// BACK TO THE MODE'S OWN ANSWER. The one button here, because the modes replaced the
 			// two one-shot buttons that used to write numbers into these boxes: "Equal intervals"
 			// and "Equal counts" are modes now, and a mode the user can leave needs a way back.
+			//
+			// It ASKS THE METHOD AGAIN rather than switching the limits back to live: since Task 448
+			// there is no live setting to return to, so this re-derives from the state on the map
+			// now and freezes that, exactly as choosing the method again would.
 			var btnWrap = document.createElement('div');
 			btnWrap.style.marginTop = '4px';
 			var clearBtn = document.createElement('button');
@@ -7299,6 +7387,7 @@ var EngCalcs = EngCalcs || {};
 			clearBtn.addEventListener('click', function () {
 				settings.colorBreaks = settings.colorBreaks || {};
 				delete settings.colorBreaks[key];
+				thawBreaks(group, field);
 				refreshValueColors(); saveToStorage(); syncColorControls();
 			});
 			btnWrap.appendChild(clearBtn);

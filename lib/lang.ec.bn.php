@@ -1230,7 +1230,6 @@ $ec_lang['lpn_settings_color_thematic']='থিম্যাটিক মান�
 $ec_lang['lpn_settings_color_thematic_tip']='প্রতিটি লেবেল লুকিয়ে ফেলে যাতে মানচিত্রে শুধু রঙই থেকে যায়। আপনার লেবেল বাছাইগুলো রাখা থাকে, এবং এটি বন্ধ করলে সেগুলো আবার ফিরে আসে।';
 $ec_lang['lpn_settings_color_key_position']='রঙের কী-টেবিলের অবস্থান';
 $ec_lang['lpn_settings_color_breaks']='রঙের ব্যান্ডের সীমা';
-$ec_lang['lpn_settings_color_breaks_note']='এগুলো খালি রাখলে মানচিত্রে এখন থাকা মানগুলো জুড়ে রঙ ছড়িয়ে দেওয়া হয়। সংখ্যা লিখুন, অথবা নিচের একটি বোতাম চাপুন, তাহলে একই সংখ্যা সবসময় একই রঙ বোঝাবে।';
 $ec_lang['lpn_settings_color_equal_intervals']='সমান ব্যবধান';
 $ec_lang['lpn_settings_color_equal_counts']='সমান সংখ্যা';
 $ec_lang['lpn_settings_color_auto']='স্বয়ংক্রিয়';

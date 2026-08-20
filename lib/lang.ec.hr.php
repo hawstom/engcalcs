@@ -1155,7 +1155,6 @@ $ec_lang['lpn_settings_color_thematic']='Tematska karta: samo boje, bez oznaka';
 $ec_lang['lpn_settings_color_thematic_tip']='Skriva sve oznake tako da na karti ostanu samo boje. Vaš odabir oznaka se zadržava, a isključivanjem ove opcije oznake se vraćaju.';
 $ec_lang['lpn_settings_color_key_position']='Položaj legende boja';
 $ec_lang['lpn_settings_color_breaks']='Granice raspona boja';
-$ec_lang['lpn_settings_color_breaks_note']='Ostavite ovo prazno i boje se raspoređuju prema vrijednostima trenutačno na karti. Upišite brojeve, ili pritisnite gumb ispod, i isti broj uvijek znači istu boju.';
 $ec_lang['lpn_settings_color_equal_intervals']='Jednaki razmaci';
 $ec_lang['lpn_settings_color_equal_counts']='Jednak broj';
 $ec_lang['lpn_settings_color_auto']='Automatski';

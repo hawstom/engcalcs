@@ -1162,7 +1162,6 @@ $ec_lang['lpn_settings_color_thematic']='专题图：仅显示颜色，不显示
 $ec_lang['lpn_settings_color_thematic_tip']='隐藏所有标签，地图上只保留颜色。您的标签设置会被保留，关闭此选项后即可恢复。';
 $ec_lang['lpn_settings_color_key_position']='颜色图例位置';
 $ec_lang['lpn_settings_color_breaks']='色带分界值';
-$ec_lang['lpn_settings_color_breaks_note']='留空则颜色会按地图上当前的数值范围自动分布。输入数值，或按下方按钮，即可使同一数值始终对应同一颜色。';
 $ec_lang['lpn_settings_color_equal_intervals']='等间距';
 $ec_lang['lpn_settings_color_equal_counts']='等数量';
 $ec_lang['lpn_settings_color_auto']='自动';

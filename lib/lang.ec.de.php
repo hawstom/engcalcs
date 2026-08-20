@@ -1221,7 +1221,6 @@ $ec_lang['lpn_settings_color_thematic']='Thematische Karte: nur Farben, keine Be
 $ec_lang['lpn_settings_color_thematic_tip']='Blendet alle Beschriftungen aus, sodass nur die Farben auf der Karte bleiben. Ihre Beschriftungsauswahl bleibt erhalten und kehrt zurück, wenn Sie dies wieder ausschalten.';
 $ec_lang['lpn_settings_color_key_position']='Position der Farblegende';
 $ec_lang['lpn_settings_color_breaks']='Grenzen der Farbbänder';
-$ec_lang['lpn_settings_color_breaks_note']='Lassen Sie dies leer, dann werden die Farben über die aktuell auf der Karte vorhandenen Werte verteilt. Geben Sie Zahlen ein oder drücken Sie eine der Schaltflächen unten, dann bedeutet dieselbe Zahl immer dieselbe Farbe.';
 $ec_lang['lpn_settings_color_equal_intervals']='Gleiche Abstände';
 $ec_lang['lpn_settings_color_equal_counts']='Gleiche Anzahl';
 $ec_lang['lpn_settings_color_auto']='Automatisch';

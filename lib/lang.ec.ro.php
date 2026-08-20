@@ -1398,7 +1398,6 @@ $ec_lang['lpn_settings_color_thematic']='Hartă tematică: doar culori, fără e
 $ec_lang['lpn_settings_color_thematic_tip']='Ascunde fiecare etichetă, astfel încât pe hartă rămân doar culorile. Alegerile dvs. privind etichetele sunt păstrate, iar dezactivarea acestei opțiuni le readuce.';
 $ec_lang['lpn_settings_color_key_position']='Poziția legendei de culori';
 $ec_lang['lpn_settings_color_breaks']='Limitele benzilor de culoare';
-$ec_lang['lpn_settings_color_breaks_note']='Lăsați acestea goale și culorile sunt distribuite pe valorile aflate acum pe hartă. Introduceți numere, sau apăsați un buton de mai jos, iar același număr va însemna mereu aceeași culoare.';
 $ec_lang['lpn_settings_color_equal_intervals']='Intervale egale';
 $ec_lang['lpn_settings_color_equal_counts']='Frecvențe egale';
 $ec_lang['lpn_settings_color_auto']='Automat';

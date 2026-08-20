@@ -1232,7 +1232,6 @@ $ec_lang['lpn_settings_color_thematic']='ផែនទីតាមប្រធា
 $ec_lang['lpn_settings_color_thematic_tip']='លាក់ស្លាកទាំងអស់ ដូច្នេះនៅសល់តែពណ៌លើផែនទី។ ជម្រើសស្លាករបស់អ្នកនៅតែរក្សាទុក ហើយបិទវិញនាំពួកវាត្រឡប់មកវិញ។';
 $ec_lang['lpn_settings_color_key_position']='ទីតាំងតារាងសញ្ញាពណ៌';
 $ec_lang['lpn_settings_color_breaks']='ព្រំដែនជួរពណ៌';
-$ec_lang['lpn_settings_color_breaks_note']='ទុកទាំងនេះទទេ ហើយពណ៌នឹងចែកសម្រាប់តម្លៃដែលមាននៅលើផែនទីឥឡូវនេះ។ វាយលេខ ឬចុចប៊ូតុងខាងក្រោម ហើយលេខដូចគ្នានឹងតំណាងឲ្យពណ៌ដូចគ្នាជានិច្ច។';
 $ec_lang['lpn_settings_color_equal_intervals']='ចន្លោះស្មើគ្នា';
 $ec_lang['lpn_settings_color_equal_counts']='ចំនួនស្មើគ្នា';
 $ec_lang['lpn_settings_color_auto']='ស្វ័យប្រវត្តិ';

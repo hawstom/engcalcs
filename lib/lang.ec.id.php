@@ -1230,7 +1230,6 @@ $ec_lang['lpn_settings_color_thematic']='Peta tematik: hanya warna, tanpa label'
 $ec_lang['lpn_settings_color_thematic_tip']='Menyembunyikan semua label sehingga hanya warna yang tersisa di peta. Pilihan label Anda tetap disimpan, dan menonaktifkan ini akan mengembalikannya.';
 $ec_lang['lpn_settings_color_key_position']='Posisi legenda warna';
 $ec_lang['lpn_settings_color_breaks']='Batas pita warna';
-$ec_lang['lpn_settings_color_breaks_note']='Biarkan ini kosong dan warna akan disebar merata pada nilai-nilai yang sekarang ada di peta. Ketik angka, atau tekan salah satu tombol di bawah, dan angka yang sama akan selalu berarti warna yang sama.';
 $ec_lang['lpn_settings_color_equal_intervals']='Interval sama rata';
 $ec_lang['lpn_settings_color_equal_counts']='Jumlah sama rata';
 $ec_lang['lpn_settings_color_auto']='Otomatis';
