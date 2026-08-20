@@ -2,8 +2,6 @@
 
 // All missing text declarations will fall back to English.
 
-// Units (alphabetical order)
-// Necessary for calculator units selectors
 $ec_lang['u_depthFrac']='fraction';
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='ft^2';
@@ -58,9 +56,6 @@ $ec_lang['u_hp']='hp';
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
 
-// Page text
-// In page order for easiest maintenance.
-// Menu and General
 $ec_lang['menu_brand']='Calculateurs HawsEDC';
 $ec_lang['menu_main_list']='Liste des calculateurs';
 $ec_lang['menu_main_hydraulics']='Hydraulique';
@@ -71,10 +66,6 @@ $ec_lang['template_welcome']='Laissez vos peurs à la porte; l\'amour est parlé
 $ec_lang['template_feedback']='Pouvez-vous suggérer une meilleure formulation pour cette page, ou autre chose ? Voulez-vous m\'aider ou apprendre à créer des outils comme ceux-ci ? N\'hésitez pas à me contacter.';
 $ec_lang['template_printable_title']='Titre imprimable';
 $ec_lang['template_printable_subtitle']='Sous-titre imprimable';
-// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
-// prose, and they are translated into all 26 languages for one reason: consent that the visitor
-// cannot read is not consent. The long-form privacy notice and terms are a separate question --
-// English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_body']='Pouvons-nous conserver un seul chiffre par page dans le stockage de ce profil de navigateur, afin de ne pas enregistrer ses visites à plusieurs reprises ?';
 $ec_lang['consent_accept']='Accepter cette fois';
 $ec_lang['consent_accept_all']='Toujours accepter';
@@ -106,7 +97,6 @@ $ec_lang['ec_name_tip']='Enregistre les données saisies dans l\'URL pour les si
 $ec_lang['calc_copy_link']='Copier le lien';
 $ec_lang['ec_related_calcs']='Calculateurs associés :';
 $ec_lang['calc_copy_link_done']='Copié !';
-// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Perte de charge Darcy-Weisbach';
 $ec_lang['dw_main_title']='Calculateur gratuit en ligne de perte de charge Darcy-Weisbach';
 $ec_lang['dw_main_desc']='Perte de charge Darcy-Weisbach pour un diamètre, une rugosité et un débit donnés';
@@ -122,7 +112,6 @@ $ec_lang['dw_regime_transitional']='de transition';
 $ec_lang['dw_regime_turbulent']='turbulent';
 $ec_lang['dw_friction_factor_method']='Méthode du facteur de frottement';
 $ec_lang['dw_friction_factor']='Facteur de frottement, f';
-// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Perte de charge Hazen-Williams';
 $ec_lang['hw_main_title']='Calculateur gratuit en ligne de perte de charge Hazen-Williams';
 $ec_lang['hw_main_desc']='Perte de charge Hazen-Williams pour un diamètre, un coefficient de Hazen-Williams C et un débit donnés';
@@ -140,7 +129,6 @@ $ec_lang['hw_roughness']='Coefficient Hazen-Williams, C';
 $ec_lang['hw_note_1']='<dl><dt>Cet outil de calcul ne modélise pas le profil de la conduite entre les deux extrémités.</dt><dd>Il n\'utilise que les cotes amont et aval que vous saisissez. Si le terrain s\'élève plus haut que l\'une ou l\'autre extrémité en un point intermédiaire, la pression en ce point haut est inférieure à toute pression indiquée ici. Relancez le calcul pour la longueur allant de l\'extrémité amont jusqu\'au point haut afin de le vérifier.</dd><dd>Là où la LHP passe sous la conduite, l\'eau est sous pression négative. L\'air sort de solution, une conduite à paroi mince peut s\'effondrer, et de l\'eau souterraine contaminée peut être aspirée par les joints. Maintenez une pression positive partout le long de la conduite et prévoyez une ventouse (purgeur d\'air) à chaque point haut.</dd><dt>La pression amont est une condition aux limites que vous fournissez.</dt><dd>Relevez-la sur un manomètre, à partir du niveau d\'eau d\'un réservoir (la hauteur d\'eau au-dessus de la conduite), ou à partir d\'une courbe de pompe. Une pompe fournit une pression moindre lorsque le débit augmente ; utilisez donc le point de la courbe correspondant au débit saisi ci-dessus.</dd><dt>Additionnez vous-même les coefficients de perte de charge singulière.</dt><dd>Totalisez les valeurs K de chaque vanne, coude, té, compteur et entrée de la conduite, et saisissez ce total. Suivez le lien de ce champ pour des valeurs typiques. Sur une conduite d\'adduction longue, ces pertes sont faibles par rapport au frottement, mais dans une tuyauterie de station courte, elles peuvent représenter l\'essentiel de la perte.</dd></dl>';
 $ec_lang['hw_notes_epanet_term']='Les constantes de Hazen-Williams correspondent maintenant à EPANET (août 2026)';
 $ec_lang['hw_notes_epanet_def']='En août 2026, le coefficient et l\'exposant de Hazen-Williams ont été modifiés pour correspondre à EPANET. Les résultats de perte de charge diffèrent de ceux des versions précédentes de cette page de 0,1 pour cent au maximum, bien moins que l\'incertitude sur la valeur de C elle-même.';
-// Manning Irregular
 $ec_lang['mi_menu']='Canal à section irrégulière Manning';
 $ec_lang['mi_main_title']='Calculateur Manning gratuit en ligne de canal à section irrégulière';
 $ec_lang['mi_main_desc']='Calculateur d\'écoulement uniforme Manning en canal à section irrégulière';
@@ -168,7 +156,6 @@ $ec_lang['mi_notes_1_term']='n composé';
 $ec_lang['mi_notes_1_def']='Ce calculateur suit le manuel de référence HEC-RAS pour calculer le n composé par région selon Chow 1959, page 136, équation 6-17 (et non 6-18).';
 $ec_lang['mi_notes_2_term']='Revêtement rocheux';
 $ec_lang['mi_notes_2_def']='Utilisez le calculateur de canal trapézoïdal Manning pour dimensionner le revêtement rocheux. Ce calculateur est destiné aux sections naturelles.';
-// Manning Pipe Flow
 $ec_lang['mpf_main_menu']='Écoulement Manning en conduite';
 $ec_lang['mpf_main_title']='Calculateur gratuit en ligne de la formule Manning pour l\'écoulement en conduite';
 $ec_lang['mpf_main_desc']='Écoulement uniforme Manning en conduite à pente et taux de remplissage donnés';
@@ -197,7 +184,6 @@ $ec_lang['mpf_solver_enter_positive_q']='Entrez un Q cible positif.';
 $ec_lang['mpf_solver_no_solution']='Aucune solution : Q dépasse la capacité de la conduite à y/d0 = 93.8% (Qmax = {qmax} dans les unités sélectionnées).';
 $ec_lang['mpf_solve_btn']='Calculer';
 $ec_lang['mpf_solve_for_flow']='pour débit, Q =';
-// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Perte de charge Manning en conduite';
 $ec_lang['mphl_main_title']='Calculateur gratuit en ligne de perte de charge Manning en conduite';
 $ec_lang['mphl_main_desc']='Formule de Manning — perte de charge pour un débit à section pleine donné';
@@ -214,7 +200,6 @@ $ec_lang['mphl_egl_1']='LHE aval';
 $ec_lang['mphl_egl_2']='LHE amont';
 $ec_lang['mphl_hgl_egl_tip']='Peut ne pas être valide si la conduite est haute. Voir les notes.';
 $ec_lang['mphl_note_1']='<dl><dt>Cet outil de calcul ne modélise pas le profil de la conduite entre les deux extrémités.</dt><dd>Si la LHP descend sous le sommet de la conduite en un point quelconque, ce calcul peut ne pas être valide.</dd><dt>Pour une entrée libre (buse), il est nécessaire de vérifier les conditions de contrôle à l\'entrée.</dt><dd>1. La LHP amont doit être supérieure à la cote de profondeur normale amont (et plus haute que la conduite elle-même !).</dd><dd>2. La charge amont d\'une buse est mieux représentée par la LHE amont que par la LHP amont.</dd><dd>3. Voir <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">mon tutoriel de 2 minutes</a> pour les calculs simples et standard de charge amont de buse à l\'aide de <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, le logiciel gratuit de calcul de buses de la Federal Highway Administration (administration fédérale des routes) des États-Unis.</dd><dd>4. Cette page ne résout que le cas du contrôle à la sortie : une conduite en charge sur toute sa longueur, où les conditions aval déterminent la charge. La conception d\'une buse consiste justement à déterminer si c\'est le contrôle à l\'entrée ou à la sortie qui gouverne, donc utilisez HY-8 dès que l\'un des deux cas est possible.</dd></dl>';
-// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Canal trapézoïdal Manning';
 $ec_lang['mtc_main_title']='Calculateur gratuit en ligne de la formule Manning pour canal trapézoïdal';
 $ec_lang['mtc_main_desc']='Écoulement uniforme Manning en canal trapézoïdal à pente et profondeur données';
@@ -249,7 +234,6 @@ $ec_lang['mtc_note_1']='<dl><dt>Itération automatique de la granulométrie et d
 $ec_lang['mtc_note_2_term']='Vérification de la vitesse';
 $ec_lang['mtc_note_2_def']='Une vitesse élevée implique une chute de niveau importante ayant produit une énergie spécifique élevée. Cette énergie peut être dissipée rapidement aux élargissements, coudes ou obstacles. Vérifiez que cela est raisonnable pour le site.';
 $ec_lang['mtc_solver_no_solution']='Aucune solution trouvée pour le Q donné avec ces paramètres de canal.';
-// Weir Flow Simple
 $ec_lang['ws_main_menu']='Déversoir simple';
 $ec_lang['ws_main_title']='Calculateur gratuit en ligne de débit sur déversoir simple à seuil large';
 $ec_lang['ws_main_desc']='Calculateur de débit sur déversoir simple à seuil large';
@@ -258,7 +242,6 @@ $ec_lang['ws_headWaterHeight']='<span class="ec-help" title="Énergie par unité
 $ec_lang['ws_weirCoefficient']='Coefficient de déversoir, C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='Remarques';
 $ec_lang['ws_notes_we_term']='Équation du déversoir';
-// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='Déversoir irrégulier';
 $ec_lang['wi_main_title']='Calculateur gratuit en ligne de débit sur déversoir irrégulier segmenté à profondeur variable';
 $ec_lang['wi_main_desc']='Calculateur de débit sur déversoir irrégulier';
@@ -268,7 +251,6 @@ $ec_lang['wi_incrementalFlow']='Débit élémentaire';
 $ec_lang['wi_cumulativeFlow']='Débit cumulé';
 $ec_lang['wi_save_and_calculate']='Enregistrer et calculer';
 $ec_lang['wi_notes_we_def']='q = si (longueur = 0) alors 0 sinon si (pente=0) alors cw*longueur*d<sub>0</sub><sup>1.5</sup> sinon cw/(2.5*pente) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) où d<sub>1</sub> et d<sub>0</sub> sont toujours positifs ou nuls';
-// Orifice Flow
 $ec_lang['or_main_menu']='Débit par orifice';
 $ec_lang['or_main_title']='Calculateur gratuit en ligne de débit par orifice';
 $ec_lang['or_main_desc']='Débit par orifice — libre ou noyé';
@@ -300,7 +282,6 @@ $ec_lang['or_notes_3_term']='Coefficient de décharge';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> varie d\'environ 0,60 à 0,65 pour les orifices à arête vive. Les entrées arrondies ou en retrait ont des valeurs différentes. Voir l\'<a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> ou le Manuel de référence hydraulique HEC-RAS pour plus d\'indications.';
 $ec_lang['or_notes_4_term']='Submersion';
 $ec_lang['or_notes_4_def']='Lorsque le niveau d\'eau aval (TWE) est au-dessus du radier de l\'ouverture, ce calculateur applique automatiquement l\'équation d\'orifice noyé avec h = HWE − TWE. Lorsque TWE est au niveau du radier ou en dessous, un déversement libre est supposé et h = HWE − centroïde.';
-// Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Micro-Hydroélectricité';
 $ec_lang['mhp_main_title']='Calculateur Gratuit de Puissance Micro-Hydroélectrique';
 $ec_lang['mhp_main_desc']='Calculateur de Puissance Micro-Hydroélectrique au Fil de l\'Eau';
@@ -333,7 +314,6 @@ $ec_lang['mhp_notes_6_def']='Le rendement typique de l\'installation η varie de
 $ec_lang['mhp_notes_7_term']='Énergie annuelle';
 $ec_lang['mhp_notes_7_def']='L\'énergie annuelle suppose un fonctionnement continu à débit plein (8760 heures/an). La production réelle sera plus faible en raison de la variation saisonnière du débit, des temps d\'arrêt pour maintenance et du facteur de charge.';
 
-// Orifice Drain Time
 $ec_lang['odt_main_menu']='Temps de vidange d\'étang et de réservoir';
 $ec_lang['odt_main_title']='Calculateur gratuit en ligne du temps de vidange d\'étang, de bassin et de réservoir (orifice)';
 $ec_lang['odt_main_desc']='Temps de vidange d\'un étang, bassin ou réservoir — Sortie par orifice, méthode du volume conique';
@@ -361,10 +341,7 @@ $ec_lang['odt_q_max']='Débit max, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Volume vidangé';
 $ec_lang['odt_sketch_start']='Début';
 $ec_lang['odt_sketch_end']='Fin';
-// Contact us.
 
-// Irrigation
-// Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Espacement des goutteurs, S<sub>e</sub>';
 $ec_lang['ip_sl']='Espacement des rampes, S<sub>l</sub>';
 $ec_lang['ip_n_e']='Goutteurs par rampe, n<sub>e</sub>';
@@ -375,7 +352,6 @@ $ec_lang['ip_pr']='Taux d\'application, PR';
 $ec_lang['ip_q_lat']='Débit par rampe, Q<sub>lat</sub>';
 $ec_lang['ip_q_sys']='Débit de la zone, Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='Durée (heures)';
-// Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Infiltration en Canal';
 $ec_lang['cs_main_title']='Calculateur gratuit en ligne des pertes par infiltration et du rendement de transport d\'eau en canal';
 $ec_lang['cs_main_desc']='Pertes par Infiltration en Canal & Rendement de Transport d\'Eau — Méthode Entrée-Sortie';
@@ -410,7 +386,6 @@ $ec_lang['cs_notes_2_def']='Canaux en terre non revêtus typiques : E<sub>c</sub
 $ec_lang['cs_notes_3_term']='Délai de Récupération du Revêtement';
 $ec_lang['cs_notes_3_def']='Saisissez la valeur de l\'eau et le coût du revêtement dans une devise cohérente quelconque. Surface de revêtement = longueur du bief × périmètre mouillé — le périmètre mouillé de la section transversale du canal à la profondeur d\'écoulement mesurée (largeur du fond plus les deux talus mouillés). La valeur annuelle récupérée suppose que le canal revêtu atteint l\'E<sub>c</sub> cible en continu. Le délai de récupération réel sera plus long pour les canaux saisonniers ou si le revêtement n\'atteint pas le rendement cible.';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3e éd. (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-// About
 $ec_lang['about_main_menu']='À propos';
 $ec_lang['install_main_menu']='Installer';
 $ec_lang['install_main_title']='Installer EngCalcs';
@@ -442,7 +417,6 @@ $ec_lang['contactSpamPrefix']='Cinq plus un égale';
 $ec_lang['contactSpamPostfix']='(Veuillez l\'écrire en lettres. 1=un 2=deux 3=trois 4=quatre 5=cinq 6=six 7=sept +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Envoyer le message';
 $ec_lang['contact_success']='Merci d\'avoir pris le temps d\'écrire.';
-// Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='Conception de Coursier en Enrochement (Robinson)';
 $ec_lang['rc_main_title']='Calculateur Gratuit de Conception de Coursier en Enrochement — Robinson (1998)';
 $ec_lang['rc_main_desc']='Dimensionnement de l\'Enrochement du Coursier — Robinson, Rice & Kadavy (1998)';
@@ -501,12 +475,10 @@ $ec_lang['rc_notes_7_term']='Mise en charge à l\'entrée';
 $ec_lang['rc_notes_7_def']='Lorsque le tirant d\'eau normal dans le canal d\'entrée est inférieur à la charge de déversoir (H<sub>p</sub>) nécessaire pour transiter q<sub>t</sub>, un écoulement limité ou une mise en charge se produit en amont de l\'entrée du coursier. Ceci est généralement acceptable — la mise en charge réduit la vitesse et prévient l\'érosion en amont. Pour vérifier : utiliser un calculateur d\'écoulement de déversoir pour trouver H<sub>p</sub> pour le q<sub>t</sub> et la largeur de crête donnés, puis comparer au tirant d\'eau normal du canal d\'entrée. Si H<sub>p</sub> dépasse le tirant d\'eau normal, une mise en charge se produira.';
 $ec_lang['rc_notes_4_term']='Référence';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., et Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. L\'USDA ARS publie également un <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">tableur Excel</a> basé sur la même méthode.';
-// Sketch labels
 $ec_lang['rc_sketch_filter']          = 'Filtre';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Courbe de crête';
 $ec_lang['rc_sketch_outlet_apron']    = 'Radier de sortie';
 $ec_lang['rc_sketch_radius']          = 'rayon';
-// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Pression d\'Irrigation';
 $ec_lang['ip_main_title']='Calculateur gratuit en ligne de pression d\'irrigation et d\'uniformité de distribution';
 $ec_lang['ip_main_desc']='Pression de la branche de test et estimation de l\'uniformité';
@@ -559,7 +531,6 @@ $ec_lang['ip_notes_5_def']='Le taux d\'application et le débit du système/de l
 
 
 
-// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Réseau de conduites ramifié';
 $ec_lang['bpn_main_title']='Calculateur en ligne gratuit de pression pour réseau de conduites ramifié (sans boucles)';
 $ec_lang['bpn_main_desc']='Débit et pression d\'un réseau de conduites ramifié (arborescent)';
@@ -641,18 +612,8 @@ $ec_lang['lpn_field_text_rotation']='Angle (degrés)';
 $ec_lang['lpn_field_text_match_pipe']='Aligner sur l\'angle de la liaison la plus proche';
 $ec_lang['lpn_field_text_flip']='Tourner de 180°';
 $ec_lang['lpn_field_elev']='Cote';
-// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
-// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
-// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
-// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='Niveau du sol ou de la conduite à ce nœud. Mesurez-le à partir du zéro de votre choix, du moment que tous les nœuds utilisent le même.';
-// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
-// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
-// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='Charge';
-// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
-// outright that it is a height and not a pressure, which is the exact confusion the glossary's
-// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Niveau de la surface libre dans le réservoir, exprimé comme une hauteur, pas comme une pression. Laissez ce champ vide pour placer la surface libre à la cote du réservoir.';
 $ec_lang['lpn_close']='Fermer';
 $ec_lang['lpn_empty_hint']='Utilisez Fichier, Nouveau projet pour ouvrir un exemple. Ou commencez par ajouter un réservoir, une jonction et une conduite depuis la barre d\'outils.';
@@ -701,10 +662,6 @@ $ec_lang['lpn_units_elevhead']='Cote et charge';
 $ec_lang['lpn_units_pressure']='Pression';
 $ec_lang['lpn_units_flow']='Débit';
 $ec_lang['lpn_units_velocity']='Vitesse';
-// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
-// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
-// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
-// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='Gradient de perte de charge';
 $ec_lang['lpn_result_gradient_tip']='Perte de charge divisée par la longueur de la conduite. Sert à comparer des conduites de longueurs différentes à une même limite de conception.';
 $ec_lang['lpn_result_head']='Charge';
@@ -713,37 +670,13 @@ $ec_lang['lpn_result_pressure']='Pression';
 $ec_lang['lpn_result_flow']='Débit';
 $ec_lang['lpn_result_velocity']='Vitesse';
 $ec_lang['lpn_result_headloss']='Perte de charge';
-// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
-// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
-// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
-// Settings live INSIDE each project document, so deleting every project deletes every setting too:
-// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
-// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
-// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='Réinitialise uniquement les paramètres de ce projet. Votre dessin et vos autres projets ne sont pas modifiés. Pour réutiliser vos paramètres favoris, enregistrez un fichier de projet ne contenant que les paramètres.';
 $ec_lang['lpn_reset_all_tip']='Supprime tous les projets, toutes les images de fond, tous les paramètres et vos choix d\'unités, puis recharge la page exactement comme la voit un nouveau visiteur. C\'est la seule réinitialisation qui efface tout.';
-// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
-// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
-// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
-// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
-// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_confirm']='Ce calculateur enregistre les unités du projet et les valeurs saisies telles quelles, mais il convertissait autrefois les nombres en unités SI pour les enregistrer. Ce projet a été enregistré avant ce changement : ses nombres ont donc été enregistrés en unités SI. Faut-il les convertir une dernière fois vers les unités actuelles ? Pour vous permettre de vérifier, voici quelques diamètres qui seront convertis. Les valeurs avant et après sont indiquées :';
 $ec_lang['lpn_v2_restore_yes']='Convertir';
 $ec_lang['lpn_v2_restore_never']='Non. Ne plus me le demander.';
 $ec_lang['lpn_v2_restore_no']='Fermer pour que je vérifie d\'abord les unités actuelles';
 $ec_lang['lpn_storage_too_new']='Ce projet a été enregistré par une version plus récente de la page, il ne peut donc pas être ouvert ici.';
-// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
-// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
-// something that is not in a file, so closing it asks first; a tab without one closes silently. A
-// browser project always wears one (it is in no file at all); a file project wears one only while it
-// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
-// our words for talking about the code, and the user sees only a name, an asterisk, and a file
-// extension.
-// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
-// conventional relationship and the reason the duplication between them is correct rather than
-// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
-// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
-// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='Fichier';
 $ec_lang['lpn_menu_edit']='Édition';
 $ec_lang['lpn_menu_insert']='Insertion';
@@ -824,16 +757,9 @@ $ec_lang['lpn_pane_sort_tip']='Trier selon cette colonne. Cliquez à nouveau pou
 $ec_lang['lpn_clean_map']='Masquer les affichages de la carte';
 $ec_lang['lpn_clean_map_off']='Afficher les affichages de la carte';
 $ec_lang['lpn_clean_map_tip']='Masquer la ligne de mode et l\'affichage des coordonnées afin qu\'une capture d\'écran ne montre que la carte. Votre dessin n\'est pas modifié, et ce choix n\'est pas mémorisé — recharger la page fait réapparaître ces affichages.';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Paramètres';
 $ec_lang['lpn_menu_help']='Aide';
 $ec_lang['lpn_help_walkthroughs']='Tutoriels';
-// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
-// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
-// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
-// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
-// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Supprimer le réseau';
 $ec_lang['lpn_confirm_delete_network']='Supprimer tous les nœuds, conduites et étiquettes de texte de ce projet ? L\'image de fond, le nom du projet et vos paramètres sont conservés. Cette action est irréversible.';
 $ec_lang['lpn_find_menu']='Rechercher';
@@ -871,38 +797,24 @@ $ec_lang['lpn_profile_axis_elev']='Cote et charge ({u})';
 $ec_lang['lpn_profile_ground']='Terrain naturel';
 $ec_lang['lpn_profile_hgl']='Ligne piézométrique';
 $ec_lang['lpn_view_units']='Unités';
-// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Tout enregistrer';
-// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
-// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
-// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='Projet{n}';
 $ec_lang['lpn_project_copy_suffix']='(copie)';
 $ec_lang['lpn_project_rename']='Renommer';
-// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='Nouveau projet…';
-// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
-// with the toolbar button of that name -- an example is a whole network, so it starts a project
-// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Projet xy vierge, unités américaines (gpm)';
 $ec_lang['lpn_new_blank_si']='Projet xy vierge, unités SI (l/s)';
 $ec_lang['lpn_new_geo_us']='Projet vierge lat/lon, unités américaines (gpm)';
 $ec_lang['lpn_new_geo_si']='Projet vierge lat/lon, unités SI (l/s)';
-// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
-// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Ouvrir…';
 $ec_lang['lpn_file_save']='Enregistrer';
 $ec_lang['lpn_file_saveas']='Enregistrer sous…';
 $ec_lang['lpn_file_revert']='Rétablir';
 $ec_lang['lpn_file_close']='Fermer';
-// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
-// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Fichiers récents';
 $ec_lang['lpn_recent_tip']='Rouvrir {file} sans avoir à le chercher.';
 $ec_lang['lpn_recent_denied']='L\'autorisation d\'ouvrir ce fichier n\'a pas été accordée ; il n\'a donc pas été ouvert.';
 $ec_lang['lpn_recent_gone']='Impossible d\'ouvrir {file}. Ce fichier a peut-être été déplacé, renommé ou supprimé ; il a donc été retiré de la liste des fichiers récents.';
-// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
-// around it.
 $ec_lang['lpn_tab_new']='Nouveau projet';
 $ec_lang['lpn_tab_all']='Tous les projets';
 $ec_lang['lpn_tab_menu']='Menu du projet';
@@ -912,13 +824,6 @@ $ec_lang['lpn_tab_move_right']='Déplacer à droite';
 $ec_lang['lpn_tab_unsaved']='Non enregistré dans un fichier';
 $ec_lang['lpn_import_bad_file']='Ce fichier n\'a pas pu être lu comme un projet enregistré depuis cette page.';
 $ec_lang['lpn_import_no_room']='Il ne reste pas assez d\'espace de stockage dans le navigateur pour ajouter ce projet. Supprimez un projet dont vous n\'avez plus besoin et réessayez.';
-// ---- EPANET .inp import (ROADMAP Task 196) ----
-// The import REPORTS every difference between the file and what this page can hold, so each
-// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
-// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
-// another sentence, and none may become one.
-// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
-// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_inp']='Importer un fichier EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='Lit un réseau depuis un fichier EPANET, qu\'il s\'agisse du fichier texte .inp ou du fichier .net qu\'EPANET enregistre, et l\'enregistre dans ce navigateur comme nouveau projet. Cette page ne peut pas réécrire un fichier EPANET, donc utilisez Fichier, Enregistrer sous pour conserver votre travail.';
@@ -928,9 +833,6 @@ $ec_lang['lpn_status_inp_exported']='{file} exporté.';
 $ec_lang['lpn_inp_export_differences']='{n} éléments que le format .inp ne peut pas contenir.';
 $ec_lang['lpn_inp_export_refused']='Ce projet ne peut pas être écrit comme fichier EPANET : {detail}';
 $ec_lang['lpn_inp_bad_file']='Ce fichier n\'a pas pu être lu comme un fichier de réseau EPANET.';
-// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
-// the way out named here always works, so keep the instruction in the message rather than leaving
-// the reader to guess.
 $ec_lang['lpn_net_bad_file']='Ceci ressemble à un fichier .net d\'EPANET, mais cette page n\'a pas pu le lire. Ouvrez-le dans EPANET et utilisez-y la commande Fichier, Exporter, Réseau pour l\'enregistrer en fichier .inp, puis importez celui-ci.';
 $ec_lang['lpn_inp_report_heading']='{file} importé';
 $ec_lang['lpn_inp_report_counts']='{nodes} jonctions, réservoirs et bâches, {links} conduites, pompes et vannes, en {units}.';
@@ -955,44 +857,11 @@ $ec_lang['lpn_inp_drop_quality']='Les paramètres de qualité de l\'eau, de réa
 $ec_lang['lpn_inp_drop_backdrop']='Ce fichier nomme une image de fond mais ne contient pas l\'image elle-même. Ajoutez-la vous-même avec Fichier, Image de fond, Ajouter une image.';
 $ec_lang['lpn_inp_drop_dangling']='Ces conduites désignent une jonction absente du fichier, elles ont donc été laissées de côté.';
 $ec_lang['lpn_inp_drop_units']='L\'unité de débit indiquée dans ce fichier n\'est pas une unité que cette page connaît, donc chaque nombre a été lu en gallons par minute. Vérifiez chaque nombre avant d\'utiliser les résultats.';
-// {name} is a project name; word order is the translator's to choose. Says where the user landed,
-// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
-// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='{name} a été ouvert depuis un fichier et ajouté à ce navigateur comme nouveau projet.';
-// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
-// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
-// browser they test in. That is expected, not a bug.
-// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='Fichier de projet';
-// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot connect to a file, so every press really is another copy in the downloads folder.
-// The label says which of the two you are getting rather than leaving the duplicate looking like a
-// bug.
-// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
-// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
-// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
-// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
-// notice after the act -- at the moment the question arises -- rather than in a label forever.
-// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
-// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
-// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
-// anyway -- a disabled button fires no mouse events.
-// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
-// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
-// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
-// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
-// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='Ce navigateur ne peut pas se connecter à un fichier, donc ouvrir un fichier ici revient à le téléverser : le projet est copié dans ce navigateur, et le seul moyen d\'enregistrer votre travail dans le fichier est d\'écraser celui-ci avec Fichier, Enregistrer sous.';
-// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
-// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='Enregistre dans le fichier connecté.';
 $ec_lang['lpn_file_saveas_tip']='Choisissez un fichier dans lequel enregistrer. Ce projet se connecte à ce fichier, et Enregistrer y écrira désormais.';
-// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
-// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
-// is no API for it, and the download attribute cannot override the setting -- but the user can turn
-// that setting on themselves, and then Save as really does let them overwrite the file they started
-// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
-// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='Enregistre selon les paramètres de téléchargement de votre navigateur. Ce navigateur ne peut pas se connecter à un fichier, donc Enregistrer est désactivé et seul Enregistrer sous est disponible. Si vous activez le paramètre de votre navigateur « Demander où enregistrer chaque fichier », vous pouvez choisir le fichier d\'origine et l\'écraser.';
 $ec_lang['lpn_status_uploaded']='Fichier de projet téléversé. Aucune connexion ne peut être maintenue avec lui, donc le seul moyen d\'y enregistrer votre travail est d\'utiliser Fichier, Enregistrer sous.';
 $ec_lang['lpn_status_downloaded']='{file} téléchargé. Ce navigateur ne peut pas se connecter à un fichier, donc ce projet reste marqué comme non enregistré dans un fichier.';
@@ -1001,45 +870,18 @@ $ec_lang['lpn_status_already_open']='Ce fichier est déjà ouvert ici sous le no
 $ec_lang['lpn_status_already_open_dirty']='Ce fichier est déjà ouvert ici sous le nom {name}, avec des modifications que vous n\'y avez pas enregistrées. Ceci a basculé vers lui plutôt que d\'en ouvrir une seconde copie. Utilisez Fichier, Rétablir si vous préférez la version sur le disque.';
 $ec_lang['lpn_status_saved']='{file} enregistré.';
 $ec_lang['lpn_status_reverted']='{file} chargé à nouveau depuis le disque.';
-// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
-// purpose: a program that writes your file behind your back takes away your right to walk away from
-// a session. So these three carry the whole close/discard/revert conversation.
-// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_confirm']='Enregistrer vos modifications dans {name} avant de le fermer ?';
-// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
-// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_confirm']='{name} n\'est conservé que dans ce navigateur. Si vous le fermez sans l\'enregistrer dans un fichier, il sera perdu définitivement.';
 $ec_lang['lpn_close_discard']='Fermer sans enregistrer';
 $ec_lang['lpn_cancel']='Annuler';
 $ec_lang['lpn_revert_confirm']='Abandonner les modifications que vous avez faites et recharger {file} depuis le disque ?';
-// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
-// page load, so the link is gone even though we still know the name. Says what to do, not just what
-// happened.
 $ec_lang['lpn_file_needs_reopen']='Ce projet provient de {file}, mais la connexion à ce fichier a été perdue. Choisissez à nouveau le fichier pour vous y reconnecter.';
-// Says what is still safe before it says what failed: the reassurance is the part a worried user
-// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Impossible d\'écrire dans le fichier. Il a peut-être été déplacé ou renommé, ou l\'autorisation a peut-être été retirée. Votre travail est toujours enregistré dans ce navigateur. Utilisez Enregistrer dans le fichier pour choisir le fichier à nouveau.';
 $ec_lang['lpn_file_changed_elsewhere']='Quelqu\'un d\'autre a enregistré dans ce fichier depuis que vous l\'avez ouvert, donc enregistrer maintenant écraserait son travail. Utilisez Fichier, Enregistrer sous pour conserver vos modifications dans un fichier à vous, ou Fichier, Rétablir pour abandonner les vôtres et charger les siennes.';
-// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
-// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
-// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-// Initials, and said to be public: whoever opens the same file sees this name, including outside the
-// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
-// rather than a name makes the safe answer the obvious one.
-// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
-// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='Que doivent voir vos collègues quand vous avez ce projet ouvert ? Vos initiales sont idéales. Quiconque ouvre le même fichier peut le voir, donc n\'utilisez rien de privé.';
-// The stand-in when someone locked a project before giving a name. Reads in place of {name}
-// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Quelqu\'un d\'autre';
-// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
-// moment of opening, with both real answers on it -- the way every drawing and document program has
-// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} a ce fichier ouvert.';
 $ec_lang['lpn_lock_open_readonly']='Ouvrir en lecture seule';
-// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
-// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
-// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Créer une copie';
 $ec_lang['lpn_lock_break']='Forcer le verrou';
 $ec_lang['lpn_lock_open_heading_times']='{name} a ce fichier ouvert ; la dernière modification date de {x}, soit {y} après le dernier enregistrement.';
@@ -1052,59 +894,26 @@ $ec_lang['lpn_ago_minutes']='{n} minutes';
 $ec_lang['lpn_ago_hours']='{n} heures';
 $ec_lang['lpn_ago_days']='{n} jours';
 $ec_lang['lpn_ago_unknown']='un temps inconnu';
-// Read-only means read-only: it never turns itself back into an editable file while you are looking
-// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
-// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
-// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='Lecture seule : {name} a ce fichier ouvert. Vous pouvez modifier ce que vous voulez ici, mais vous ne pouvez pas enregistrer. Utilisez Fichier, Enregistrer sous pour enregistrer dans un autre fichier.';
-// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
-// stops a colleague editing the same file. Editing still works -- an unreachable server must never
-// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
-// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='Attention : impossible de contacter le serveur pour vérifier ou créer un verrou sur ce projet, donc rien n\'empêche un collègue de modifier le même fichier en même temps. Vous serez averti si le verrouillage se remet à fonctionner.';
 $ec_lang['lpn_lock_storage_error']='Attention : ce site ne peut pas enregistrer les fichiers de verrouillage, donc rien n\'empêche un collègue de modifier le même fichier en même temps. Il s\'agit d\'un problème de configuration du serveur, que vous ne pouvez pas corriger ici — le dossier de verrouillage n\'est pas accessible en écriture par le serveur web.';
 $ec_lang['lpn_lock_full_error']='Attention : ce site n\'a plus de place pour enregistrer qui a quel projet ouvert, donc rien n\'empêche un collègue de modifier le même fichier en même temps. Il s\'agit d\'un problème de configuration du serveur, que vous ne pouvez pas corriger ici.';
 $ec_lang['lpn_lock_not_asked']='Le verrouillage ne fonctionne pas pour ce projet, donc rien n\'empêche un collègue de modifier le même fichier en même temps. Ce navigateur n\'a encore aucun nom enregistré pour vous, ou le projet n\'a pas d\'identifiant — enregistrer le projet dans un fichier définit les deux.';
 $ec_lang['lpn_lock_restored']='Le verrouillage fonctionne à nouveau, et ce fichier est maintenant le vôtre pour y enregistrer.';
 $ec_lang['lpn_lock_dismiss']='Masquer ce message';
-// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
-// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
-// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='Votre projet sera enregistré dans un fichier sur cet ordinateur. Il est enregistré quand vous le demandez, et à aucun autre moment, donc rien n\'est écrit dans ce fichier à votre insu.';
 $ec_lang['lpn_file_training_2']='Pour que deux personnes ne modifient jamais un même fichier en même temps, ce site garde la trace de qui l\'a ouvert. Si quelqu\'un l\'a déjà ouvert, vous pouvez quand même l\'ouvrir pour le consulter, ou en conserver votre propre copie.';
-// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
-// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
-// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
-// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
-// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='La première fois que vous enregistrez, votre navigateur demandera si ce site peut modifier le fichier. Cette question vient du navigateur, pas de nous, et répondre oui est ce qui permet à Enregistrer d\'écrire votre travail dans le fichier. Elle n\'est généralement posée qu\'une fois par fichier.';
-// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
-// false -- the name is never written into the project file. It is held in this browser and on this
-// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
-// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='Donnez un nom court par lequel vos collègues vous reconnaîtront. Vos initiales sont idéales. Quiconque ouvre le même fichier peut le voir, donc n\'utilisez rien de privé.';
 $ec_lang['lpn_file_training_name']='Vos initiales';
 $ec_lang['lpn_file_training_continue']='Continuer';
-// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
-// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Choisir à nouveau le fichier';
 $ec_lang['lpn_file_reconnect']='Se reconnecter à ce fichier';
 $ec_lang['lpn_file_reconnect_alert']='Ce projet provient de {file}. Votre navigateur a de nouveau besoin de votre autorisation pour pouvoir y écrire. Reconnectez-vous ci-dessous.';
-// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
-// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='C\'est le même fichier qu\'un autre a déjà ouvert, il ne peut donc pas être écrasé. Choisissez un fichier ou un nom différent.';
 $ec_lang['lpn_saveas_overwrites_project']='Ce fichier contient déjà un autre projet, {name}. Enregistrer ici le remplacera complètement. Continuer ?';
 $ec_lang['lpn_saveas_overwrites_newer']='Ce fichier a changé depuis la dernière fois que vous l\'avez vu, donc quelqu\'un d\'autre y a presque certainement enregistré. Enregistrer ici remplacera sa version par la vôtre. Continuer ?';
-// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
-// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
-// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
-// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='Nom de ce projet';
-// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
-// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
-// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
-// separate Delete for it to be confused with.)
-// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='{closed} fermé. {opened} affiché maintenant.';
 $ec_lang['lpn_status_closed_empty']='{closed} fermé. Un nouveau projet vide a été créé.';
 $ec_lang['lpn_storage_full']='Non enregistré. Le stockage du navigateur est plein ou indisponible, donc vos modifications récentes seront perdues à la fermeture de cet onglet.';
@@ -1114,12 +923,6 @@ $ec_lang['lpn_notes_2_term']='Non modélisé';
 $ec_lang['lpn_notes_2_def']='La qualité de l\'eau et les demandes qui varient au cours de la journée ne sont pas modélisées. Pour les vannes : une vanne de régulation par étranglement fonctionne avec l\'un ou l\'autre solveur, et les vannes qui s\'ouvrent et se ferment d\'elles-mêmes (PRV, PSV, FCV) sont résolues avec le solveur EPANET, que cette page active automatiquement dès que votre réseau en contient une.';
 $ec_lang['lpn_notes_3_term']='Enregistrement des projets';
 $ec_lang['lpn_notes_3_def']='Chaque projet est un onglet, et chaque onglet est enregistré dans ce navigateur au fur et à mesure que vous travaillez. Effacer les données de votre navigateur les supprime tous, alors conservez votre travail dans un fichier : Fichier, Enregistrer sous. Un astérisque sur un onglet signifie qu\'il contient des modifications absentes d\'un fichier. Rien n\'est jamais écrit dans un fichier sans que vous le demandiez. Dans certains navigateurs, un projet se connecte au fichier dans lequel vous l\'enregistrez, et Fichier, Enregistrer y écrit désormais à chaque fois ; dans d\'autres, aucune connexion n\'est possible, donc Enregistrer est désactivé et seul Enregistrer sous est disponible. Quand un fichier de projet est conservé sur un lecteur partagé, cette page vous indique si un collègue l\'a déjà ouvert, afin que deux personnes n\'écrivent pas l\'une par-dessus l\'autre.';
-// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
-// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
-// to stay readable on a phone, while the Notes section is already this page's documentation home,
-// prints with the page, and is translated with everything else. The popup carries a one-line
-// pointer to here instead (lpn_pump_curve_note).
-// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Courbe de la pompe';
 $ec_lang['lpn_notes_5_def']='Une pompe suit H = H₀ − aQ^b, où H est la charge ajoutée par la pompe et Q le débit qui la traverse. Entrez un, deux ou trois points de la courbe du fabricant. Trois points — la charge à débit nul, le point de fonctionnement normal et le point de débit le plus élevé — déterminent directement H₀, a et b, et suivent au plus près une courbe publiée. Deux points ajustent une parabole (b = 2) dont le sommet est à débit nul. Un seul point applique une règle courante : la charge à débit nul vaut 1,33 × la charge saisie, et le débit le plus élevé vaut 2 × le débit saisi, ce qui redonne b = 2. Une pompe sans aucun point saisi n\'ajoute aucune charge. La courbe n\'est pas arrêtée à zéro, donc demander à une pompe plus de débit que sa courbe ne peut en fournir donne une charge négative. La solution est une pompe plus grande ou une demande plus faible, pas un ajustement de courbe différent.';
 $ec_lang['lpn_notes_4_term']='Ajouts prévus';
@@ -1133,24 +936,12 @@ $ec_lang['lpn_diag_dangling_link']='Une conduite ou une pompe se connecte à un 
 $ec_lang['lpn_diag_unreachable']='Ces nœuds n\'ont aucun chemin vers un réservoir :';
 $ec_lang['lpn_diag_not_converged']='Aucune solution n\'a été trouvée. Vérifiez l\'absence de valeurs impossibles, comme un diamètre nul.';
 $ec_lang['lpn_field_roughness']='Rugosité';
-// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
-// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
-// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='C de Hazen-Williams. Un nombre plus élevé signifie une conduite plus lisse : environ 150 pour un plastique neuf, 130 pour un acier ou une fonte neufs, et 100 pour une conduite ancienne.';
 $ec_lang['lpn_field_length']='Longueur';
 $ec_lang['lpn_field_length_tip']='Longueur de la conduite. Avec Auto activé, elle suit le tracé dessiné. Désactivez Auto pour saisir une longueur différente du dessin.';
-// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
-// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
-// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='Coefficient de perte de charge singulière, k';
 $ec_lang['lpn_field_km_tip']='Perte due aux coudes, vannes et raccords de cette conduite, comptée comme un multiple de la hauteur de vitesse. Utilisez 0 pour une conduite droite simple.';
-// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
-// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
-// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
-// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='Perte singulière, k';
-// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
-// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Source de la courbe';
 $ec_lang['lpn_pump_curve_own']='Entrer les points ci-dessous';
 $ec_lang['lpn_pump_curve_ref_note']='Utilise la courbe entrée pour la pompe {id}.';
@@ -1158,9 +949,6 @@ $ec_lang['lpn_pump_curve_note']='Un, deux ou trois points — voir « Courbe de 
 $ec_lang['lpn_pump_point1']='Point 1';
 $ec_lang['lpn_pump_point2']='Point 2';
 $ec_lang['lpn_pump_point3']='Point 3';
-// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
-// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
-// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='Mode : Sélectionner. Cliquez sur un élément ou une étiquette pour le voir ou le modifier. Faites glisser pour déplacer un nœud, un sommet ou une étiquette. Double-cliquez sur une conduite pour ajouter ou retirer un sommet.';
 $ec_lang['lpn_mode_delete']='Mode : Supprimer. Cliquez sur un élément pour le retirer.';
 $ec_lang['lpn_select_first']='Rien n\'est sélectionné. Cliquez d\'abord sur un élément de la carte, puis appuyez sur Supprimer.';
@@ -1168,14 +956,7 @@ $ec_lang['lpn_mode_add_junction']='Mode : Ajouter une jonction. Cliquez sur la c
 $ec_lang['lpn_mode_add_reservoir']='Mode : Ajouter un réservoir. Cliquez sur la carte pour placer un réservoir. Passez en mode Sélectionner pour modifier ou déplacer des éléments et des étiquettes.';
 $ec_lang['lpn_mode_add_pipe']='Mode : Ajouter une conduite. Cliquez sur un nœud, puis sur un autre nœud, pour les relier. Passez en mode Sélectionner pour modifier ou déplacer des éléments et des étiquettes.';
 $ec_lang['lpn_mode_add_pump']='Mode : Ajouter une pompe. Cliquez sur un nœud, puis sur un autre nœud, pour les relier. Passez en mode Sélectionner pour modifier ou déplacer des éléments et des étiquettes.';
-// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
-// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Mode : Ajouter du texte. Cliquez sur la carte pour placer une étiquette de texte. Cliquez près d\'un nœud pour attacher le texte à ce nœud. Passez en mode Sélectionner pour modifier ou déplacer des éléments et des étiquettes.';
-// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
-// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
-// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
-// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
-// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Utilisez ce mode pour modifier, déplacer et faire glisser des éléments sur la carte.';
 $ec_lang['lpn_tip_labels_draggable']='Vous pouvez faire glisser une étiquette pour la déplacer. Double-cliquez sur une étiquette pour la remettre à sa place.';
 $ec_lang['lpn_field_auto']='Auto';
@@ -1208,8 +989,6 @@ $ec_lang['lpn_labels_col_before']='Avant';
 $ec_lang['lpn_labels_col_after']='Après';
 $ec_lang['lpn_labels_col_decimals']='Décimales';
 $ec_lang['lpn_backdrop_menu']='Image de fond...';
-// Verbes courts sans complément d'objet (Task 297) : le sous-menu affiche l'en-tête "Image de
-// fond..." juste au-dessus, qui porte déjà l'objet. Ne pas répéter "image" ici.
 $ec_lang['lpn_backdrop_add']='Ajouter';
 $ec_lang['lpn_backdrop_scale']='Échelle par pointage';
 $ec_lang['lpn_backdrop_scale_entry']='Échelle par fichier de géoréférencement ou taille de pixel';
@@ -1251,8 +1030,6 @@ $ec_lang['lpn_push_none_displayed']='Aucune valeur initiale n\'est actuellement 
 $ec_lang['lpn_push_nothing']='Aucun élément existant ne possède l\'une des propriétés en cours d\'application.';
 $ec_lang['lpn_push_no_change']='Tous les éléments ont déjà ces valeurs, donc rien ne changerait.';
 $ec_lang['lpn_settings_emitter_exponent']='Exposant de l\'émetteur';
-// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
-// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Calcul';
 $ec_lang['lpn_settings_tolerance']='Tolérance de convergence';
 $ec_lang['lpn_settings_tolerance_tip']='À quel point le solveur doit s\'approcher avant de s\'arrêter. Un nombre plus petit est plus précis et prend plus de temps.';
@@ -1264,25 +1041,16 @@ $ec_lang['lpn_unit_unknown']='Ce dessin indique une unité que cette page ne pro
 $ec_lang['lpn_engine_manning_note']='Remarque : avec la rugosité de Manning, EPANET calcule une perte de charge environ 0,6 % plus faible que le solveur intégré.';
 $ec_lang['lpn_engine_minor_loss_note']='Remarque : avec le solveur EPANET, les pertes de charge singulières (locales) ressortent très légèrement plus faibles qu\'avec le solveur intégré, car EPANET arrondit la valeur qu\'il utilise pour la gravité.';
 $ec_lang['lpn_settings_text_size']='Taille du texte (pixels)';
-// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
-// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
-// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Taille des symboles (pixels)';
-// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
-// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_link_width']='Épaisseur des conduites (pixels)';
 $ec_lang['lpn_settings_align_labels']='Aligner les étiquettes de conduites sur les conduites';
 $ec_lang['lpn_settings_readability_bias']='Retourner une étiquette à l\'envers lorsqu\'elle penche de plus de ce nombre de degrés à gauche de la verticale';
 $ec_lang['lpn_settings_readability_bias_tip']='Retourne une étiquette pour la garder à l\'endroit lorsqu\'elle penche de plus de ce nombre de degrés à gauche de la verticale.';
 $ec_lang['lpn_settings_mask_labels']='Fond opaque derrière les étiquettes';
 $ec_lang['lpn_settings_symbol_opacity']='Opacité des symboles (0 à 1)';
-// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
-// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Opacité de l\'image de fond (0 à 1)';
 $ec_lang['lpn_settings_map_display']='Apparence de la carte';
 $ec_lang['lpn_settings_map_height_px']='Hauteur de la carte (pixels d\'écran)';
-// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
-// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='Sur un petit écran, la carte est dessinée plus courte que cette valeur, afin qu\'une partie de la page reste toujours disponible pour le défilement.';
 $ec_lang['lpn_settings_legend_position']='Position de la légende';
 $ec_lang['lpn_settings_legend_top_left']='En haut à gauche';

@@ -2,8 +2,6 @@
 
 // All missing text declarations will fall back to English.
 
-// Units (alphabetical order)
-// Necessary for calculator units selectors
 $ec_lang['u_depthFrac']='کسر';
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='ft^2';
@@ -58,9 +56,6 @@ $ec_lang['u_hp']='hp';
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
 
-// Page text
-// In page order for easiest maintenance.
-// Menu and General
 $ec_lang['menu_brand']='HawsEDC محاسبې';
 $ec_lang['menu_main_list']='د محاسبو لیست';
 $ec_lang['menu_main_hydraulics']='هایدرولیک';
@@ -71,10 +66,6 @@ $ec_lang['template_welcome']='خپل ویرونه دروازې ته پرېږده
 $ec_lang['template_feedback']='ایا تاسو کولی شئ د دې پاڼې د عبارتونو ښه کولو یا نورو شیانو لپاره وړاندیز راکړئ؟ ایا غواړئ مرسته وکړئ، یا داسې وسایل جوړول زده کړئ؟ مهرباني وکړئ ما سره اړیکه ونیسئ.';
 $ec_lang['template_printable_title']='د چاپ سرلیک';
 $ec_lang['template_printable_subtitle']='د چاپ فرعي سرلیک';
-// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
-// prose, and they are translated into all 26 languages for one reason: consent that the visitor
-// cannot read is not consent. The long-form privacy notice and terms are a separate question --
-// English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_body']='ایا موږ کولی شو په دې براوزر پروفایل کې د هرې پاڼې یو رقم وساتو ترڅو مخنیوی وکړو چې ستاسو کتنې په بیا بیا ډول ثبت نشي؟';
 $ec_lang['consent_accept']='دا ومنئ';
 $ec_lang['consent_accept_all']='تل يې ومنئ';
@@ -106,7 +97,6 @@ $ec_lang['ec_name_tip']='دا ننوتنې URL ته خوندي کوي د نشا�
 $ec_lang['calc_copy_link']='لینک کاپي کړئ';
 $ec_lang['ec_related_calcs']='اړوند محاسبې:';
 $ec_lang['calc_copy_link_done']='کاپي شو!';
-// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach د پایپ سر ضیاع';
 $ec_lang['dw_main_title']='وړیا آنلاین Darcy-Weisbach د پایپ سر ضیاع محاسبه';
 $ec_lang['dw_main_desc']='Darcy-Weisbach د پایپ سر ضیاع د ورکړل شوي قطر، خشونت، او بهاو سره';
@@ -122,7 +112,6 @@ $ec_lang['dw_regime_transitional']='انتقالي';
 $ec_lang['dw_regime_turbulent']='توربولنت';
 $ec_lang['dw_friction_factor_method']='د اصطکاک فاکتور میتود';
 $ec_lang['dw_friction_factor']='د اصطکاک فاکتور، f';
-// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Hazen-Williams د پایپ سر ضیاع';
 $ec_lang['hw_main_title']='وړیا آنلاین Hazen-Williams د پایپ سر ضیاع محاسبه';
 $ec_lang['hw_main_desc']='Hazen-Williams د پایپ سر ضیاع د ورکړل شوي قطر، خشونت، او بهاو سره';
@@ -140,7 +129,6 @@ $ec_lang['hw_roughness']='Hazen-Williams ضریب، C';
 $ec_lang['hw_note_1']='<dl><dt>دا محاسبه د دواړو څنډو ترمنځ د پایپ پروفایل نه ماډل کوي.</dt><dd>دا یوازې هغه پورتنی او ښکتنی لوړوالی کاروي چې تاسو یې لیکئ. که ځمکه د دواړو څنډو ترمنځ په کوم ځای کې د هرې څنډې نه لوړه شي، په هغه لوړ ټکي کې فشار له هر دلته راپور شوي فشار نه ټیټ دی. دا کتلو لپاره، محاسبه د پورتني سر نه تر لوړ ټکي پورې اوږدوالي لپاره بیا پرمخ بوځئ.</dd><dd>چېرې چې د HGL کرښه د پایپ نه ښکته راځي، اوبه د منفي فشار لاندې دي. هوا له محلول نه وځي، نری‌دیواله پایپ کولی شي ړنګ شي، او ککړ تحت‌الارضي اوبه کولی شي د پیوستون ځایونو له لارې دننه راکاږل شي. کرښه هر ځای کې د مثبت فشار لاندې وساتئ، او په هر لوړ ټکي کې د هوا سوپاپ ته پام وکړئ.</dd><dt>پورتنی فشار هغه د پولې شرط دی چې تاسو یې ورکوئ.</dt><dd>دا له ګیج نه، د ټانکي د اوبو کچې نه (د پایپ نه پورته د اوبو لوړوالی)، یا د پمپ منحني نه ولولئ. پمپ لکه څنګه چې بهاو زیاتیږي کم فشار ورکوي، نو هغه ټکی وکاروئ چې د پورته لیکل شوي بهاو سره سمون خوري.</dd><dt>ځایي (سیمه‌ییز) ضیاع ضریبونه پخپله جمع کړئ.</dt><dd>د کرښې د هر سوپاپ، ګونۍ، ټي، متر، او ننوتنځای لپاره د K ارزښتونه ټول کړئ، او هغه ټول ولیکئ. د معمولو ارزښتونو لپاره په دې ننوت کې لینک تعقیب کړئ. په اوږده لېږد اصلي کرښه کې دا ضیاعات د اصطکاک په پرتله کوچني دي، خو په لنډه د سټیشن پایپ کارۍ کې دا کولی شي د ډیرې ضیاع برخه وي.</dd></dl>';
 
 
-// Manning Irregular
 $ec_lang['mi_menu']='Manning د غیریکسانې مقطع چینل';
 $ec_lang['mi_main_title']='وړیا آنلاین Manning د غیریکسانې مقطع چینل محاسبه';
 $ec_lang['mi_main_desc']='د غیریکسانې مقطع چینل Manning یکسان بهاو محاسبه';
@@ -168,7 +156,6 @@ $ec_lang['mi_notes_1_term']='مرکب n';
 $ec_lang['mi_notes_1_def']='دا محاسبه د HEC-RAS د حوالې لارښود پیروي کوي چې د Chow 1959، مخ 136، معادله 6-17 (نه 6-18) کارولو سره د سیمې مرکب n حساب کوي.';
 $ec_lang['mi_notes_2_term']='د کاڼو پوښ';
 $ec_lang['mi_notes_2_def']='د کاڼو پوښ ډیزاین کولو لپاره د Manning ذوزنقه چینل محاسبه وکاروئ. دا محاسبه د طبیعي مقطعونو لپاره ډیره مناسبه ده.';
-// Manning Pipe Flow
 $ec_lang['mpf_main_menu']='Manning د پایپ بهاو';
 $ec_lang['mpf_main_title']='وړیا آنلاین Manning د پایپ بهاو محاسبه';
 $ec_lang['mpf_main_desc']='د Manning فارمول یکسان د پایپ بهاو د ورکړل شوي میل او ژوروالي سره';
@@ -197,7 +184,6 @@ $ec_lang['mpf_solver_enter_positive_q']='یو مثبت موخه‌یز Q ولی�
 $ec_lang['mpf_solver_no_solution']='حل نشته: Q په y/d0 = 93.8% کې د پایپ له ظرفیت څخه زیات دی (Qmax = {qmax} په ټاکل شویو واحدونو کې).';
 $ec_lang['mpf_solve_btn']='حل کړئ';
 $ec_lang['mpf_solve_for_flow']='د بهاو لپاره، Q =';
-// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning د پایپ سر ضیاع';
 $ec_lang['mphl_main_title']='وړیا آنلاین Manning د پایپ سر ضیاع محاسبه';
 $ec_lang['mphl_main_desc']='د Manning فارمول سر ضیاع د ورکړل شوي بشپړ بهاو سره';
@@ -214,7 +200,6 @@ $ec_lang['mphl_egl_1']='ښکته EGL';
 $ec_lang['mphl_egl_2']='پورته EGL';
 $ec_lang['mphl_hgl_egl_tip']='که پایپ لوړ وي، ممکن سم نه وي. یادښتونه وګورئ.';
 $ec_lang['mphl_note_1']='<dl><dt>دا محاسبه د دواړو څنډو ترمنځ د پایپ پروفایل نه ماډل کوي.</dt><dd>که HGL په هر ځای کې د پایپ له سر څخه ښکته شي، دا محاسبه ممکن سمه نه وي.</dd><dt>د خلاص دننه ننوت (کلورټ) د حالت لپاره، د ننوت کنترول حالتونو چک کول اړین دي.</dt><dd>۱. پورتني HGL د پورتني نورمال ژوروالي د بهاو لوړوالي (یا د پایپ لاندې) کمیدلی نشي.</dd><dd>۲. د کلورټ پورتنۍ اوبه د پورتني EGL له خوا د پورتني HGL پر ځای ښه استازولی کیږي.</dd><dd>۳. د ساده معیاري کلورټ د پورتنیو اوبو محاسبو لپاره <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">زما دوه دقیقو ټیوټوریل وګورئ</a>، چې <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a> کاروي، د متحده ایالاتو د فدرالي لارو ادارې وړیا کلورټ پروګرام.</dd><dd>۴. دا پاڼه یوازې د وتلو کنترول حالت حل کوي: یو پایپ چې په بشپړ ډول ډک بهیږي، چېرې چې ښکته اړخ شرایط سر ټاکي. د کلورټ ډیزاین کار دا دی چې پرېکړه وکړي چې ننوت کنترول یا وتلو کنترول کوم یو حاکم دی، نو کله چې دواړه امکان ولري HY-8 وکاروئ.</dd></dl>';
-// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning ذوزنقه چینل';
 $ec_lang['mtc_main_title']='وړیا آنلاین Manning فارمول ذوزنقه چینل محاسبه';
 $ec_lang['mtc_main_desc']='Manning فارمول یکسان ذوزنقه چینل بهاو د ورکړل شوي میل او ژوروالي سره';
@@ -249,7 +234,6 @@ $ec_lang['mtc_note_1']='<dl><dt>د کاڼو اندازه او خشونت ډیز�
 $ec_lang['mtc_note_2_term']='د سرعت کتنه';
 $ec_lang['mtc_note_2_def']='لوړ سرعت په دې دلالت کوي چې یو لوی د لوړوالي کموالی شتون درلود چې دومره لوړ ځانګړی انرژي یې رامنځته کړه. هغه انرژي کولی شي د پراختیاوو، ګوډونو، یا خنډونو کې ژر له لاسه ورکړل شي. تصدیق وکړئ چې دا د سایټ لپاره معقول دی.';
 $ec_lang['mtc_solver_no_solution']='د دې چینل داخلاتو سره، د ورکړل شوي Q لپاره هیڅ حل و نه موندل شو.';
-// Weir Flow Simple
 $ec_lang['ws_main_menu']='ساده ویر بهاو';
 $ec_lang['ws_main_title']='وړیا آنلاین ساده پراخ تاج لرونکي ویر بهاو محاسبه';
 $ec_lang['ws_main_desc']='ساده پراخ تاج لرونکي ویر بهاو محاسبه';
@@ -258,7 +242,6 @@ $ec_lang['ws_headWaterHeight']='<span class="ec-help" title="د اوبو د وا
 $ec_lang['ws_weirCoefficient']='د ویر ضریب، C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='یادداشتونه';
 $ec_lang['ws_notes_we_term']='د ویر معادله';
-// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='غیریکسانه ویر بهاو';
 $ec_lang['wi_main_title']='وړیا آنلاین برخوي، متغیر ژوروالي، غیریکسانه ویر بهاو محاسبه';
 $ec_lang['wi_main_desc']='غیریکسانه ویر بهاو محاسبه';
@@ -268,7 +251,6 @@ $ec_lang['wi_incrementalFlow']='برخوي بهاو';
 $ec_lang['wi_cumulativeFlow']='ټولیز بهاو';
 $ec_lang['wi_save_and_calculate']='خوندي کړئ او محاسبه وکړئ';
 $ec_lang['wi_notes_we_def']='q = که (اوږدوالی = 0) نو 0 که نه که (شیب=0) نو cw*اوږدوالی*d<sub>0</sub><sup>1.5</sup> که نه cw/(2.5*شیب) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) چیرته چې d<sub>1</sub> او d<sub>0</sub> تل مثبت یا صفر دي';
-// Orifice Flow
 $ec_lang['or_main_menu']='د سوري بهاو';
 $ec_lang['or_main_title']='وړیا آنلاین د سوري بهاو محاسبه';
 $ec_lang['or_main_desc']='د سوري بهاو — آزاد یا لاندې اوبو';
@@ -300,7 +282,6 @@ $ec_lang['or_notes_3_term']='د بهاو ضریب';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> د تیزو غاړو لرونکو سوریو لپاره شاوخوا 0.60–0.65 پورې وي. ګرد شوي یا شاته ننوتلي ننوتونه بېل ارزښتونه کاروي. د لارښوونې لپاره <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> یا HEC-RAS هایدرولیک حوالې لارښود وګورئ.';
 $ec_lang['or_notes_4_term']='لاندې اوبو حالت';
 $ec_lang['or_notes_4_def']='کله چې TWE د خلاص انورټ پورته وي، دا محاسبه اتوماتیک د لاندې اوبو د سوري معادله h = HWE − TWE کاروي. کله چې TWE د انورټ پر سطحه یا لاندې وي، آزاد وتل فرض کیږي او h = HWE − مرکز.';
-// Micro-Hydro Power
 $ec_lang['mhp_main_menu']='کوچنی آبي ځواک';
 $ec_lang['mhp_main_title']='وړیا آنلاین کوچنی آبي ځواک محاسبه';
 $ec_lang['mhp_main_desc']='د سیند د طبیعي بهاو پر بنسټ د کوچني آبي ځواک محصول محاسبه';
@@ -333,7 +314,6 @@ $ec_lang['mhp_notes_6_def']='د کوچني آبي ځواک کې عام د Pelton
 $ec_lang['mhp_notes_7_term']='کلنۍ انرژي';
 $ec_lang['mhp_notes_7_def']='کلنۍ انرژي د دوامداره بشپړ بهاو فعالیت (۸۷۶۰ ساعته/کال) فرضوي. واقعي تولید به د موسمي بهاو بدلون، د ساتنې د ودریدو وخت، او د بار فاکتور له امله ټیټ وي.';
 
-// Orifice Drain Time
 $ec_lang['odt_main_menu']='د ډنډ او ټانک د تخلیې وخت';
 $ec_lang['odt_main_title']='وړیا آنلاین د ډنډ، حوض، او ټانک د تخلیې وخت محاسبګر (منفذ)';
 $ec_lang['odt_main_desc']='د ډنډ، حوض، یا ټانک د تخلیې وخت — د منفذ خروجي، د مخروطي حجم میتود';
@@ -361,10 +341,7 @@ $ec_lang['odt_q_max']='اعظمي بهاو، Q<sub>max</sub>';
 $ec_lang['odt_vol']='ایستل شوی حجم';
 $ec_lang['odt_sketch_start']='پیل';
 $ec_lang['odt_sketch_end']='پای';
-// Contact us.
 
-// Irrigation
-// Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='د وریزونو واټن، S<sub>e</sub>';
 $ec_lang['ip_sl']='د جانبي نلونو واټن، S<sub>l</sub>';
 $ec_lang['ip_n_e']='د یو جانبي نل لپاره وریزونه، n<sub>e</sub>';
@@ -375,7 +352,6 @@ $ec_lang['ip_pr']='د اوبو کارولو کچه، PR';
 $ec_lang['ip_q_lat']='د یو جانبي نل بهاو، Q<sub>lat</sub>';
 $ec_lang['ip_q_sys']='د زون بهاو، Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='د چلولو وخت (ساعتونه)';
-// Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='د کانال چوړ';
 $ec_lang['cs_main_title']='وړیا آنلاین د کانال چوړ ضیاع او د لیږدولو اغیزمنتیا کالکولېټر';
 $ec_lang['cs_main_desc']='د کانال د چوړ ضیاع & د لیږدولو اغیزمنتیا — د ننوت-وتلو میتود';
@@ -410,7 +386,6 @@ $ec_lang['cs_notes_2_def']='معمولي بې کښلو خاورین کانالو
 $ec_lang['cs_notes_3_term']='د کښلو بیرته-راکړنه';
 $ec_lang['cs_notes_3_def']='د اوبو ارزښت او د کښلو لګښت په هر همغږي پیسو کې ولیکئ. د کښلو مساحت = د برخې اوږدوالی × لندې محیط — د اندازه شوي بهاو ژوروالي کچه د کانال د مقطع لندې محیط (لاندیني پلنوالی زیات دواړه لندي شیبونه). کلنی بیرته لاسته راغلی ارزښت فرض کوي چې کښل شوی کانال په دوامداره توګه موخه E<sub>c</sub> ته رسیږي. که کانالونه موسمي وي یا کښلول موخه اغیزمنتیا ته ونه رسیږي، واقعي بیرته-راکړنه به اوږده وي.';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>، درېیم چاپ (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-// About
 $ec_lang['about_main_menu']='د اړه';
 $ec_lang['install_main_menu']='نصب';
 $ec_lang['install_main_title']='د EngCalcs نصبول';
@@ -442,7 +417,6 @@ $ec_lang['contactSpamPrefix']='پنځه زیات یو مساوي دي';
 $ec_lang['contactSpamPostfix']='(مهرباني وکړئ هغه ولیکئ. 1=یو 2=دوه 3=درې 4=څلور 5=پنځه 6=شپږ 7=اوه +=زیات 5+1=6)';
 $ec_lang['contactSubmitButton']='پیغام ولیږئ';
 $ec_lang['contact_success']='تاسو د لیکلو لپاره وخت کاروت د هغې لپاره تشکر.';
-// Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='د کاڼو تند اوبو لار ډیزاین (Robinson)';
 $ec_lang['rc_main_title']='وړیا آنلاین د کاڼو تند اوبو لار ډیزاین محاسبه — Robinson (1998)';
 $ec_lang['rc_main_desc']='د کاڼو تند اوبو لار د کاڼو اندازې ټاکل — Robinson, Rice & Kadavy (1998)';
@@ -501,12 +475,10 @@ $ec_lang['rc_notes_6_def']='د وتنځي برخې کې د کاڼو د پاسن�
 $ec_lang['rc_notes_7_def']='کله چې د ننوتنځي کانال کې نورمال ژوروالی د هغه ویر سر (H<sub>p</sub>) نه کم وي چې د q<sub>t</sub> تیرولو لپاره اړین دی، نو د تند اوبو لار ننوتنځي نه پورته محدود بهاو یا د اوبو راټولیدل رامنځته کیږي. دا په عمومي ډول د منلو وړ دي — د اوبو راټولیدل سرعت کموي او پورته فرسایش مخنیوی کوي. د کتنې لپاره: د ورکړل شوي q<sub>t</sub> او د سر پلنوالي لپاره H<sub>p</sub> موندلو ته د ویر بهاو محاسبګر وکاروئ، او دا د ننوتنځي کانال نورمال ژوروالي سره پرتله کړئ. که H<sub>p</sub> د نورمال ژوروالي نه ډیر شي، اوبه به راټولېږي.';
 $ec_lang['rc_notes_4_term']='سرچینه';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS د ورته میتود پر بنسټ یو <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel سپریډشیټ</a> هم خپروي.';
-// Sketch labels
 $ec_lang['rc_sketch_filter']='فلتر';
 $ec_lang['rc_sketch_top_crest_curve']='د پورتني کرسټ منحني';
 $ec_lang['rc_sketch_outlet_apron']='د وتنځي اپرون';
 $ec_lang['rc_sketch_radius']='شعاع';
-// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='د اوبو د لګولو فشار';
 $ec_lang['ip_main_title']='وړیا آنلاین د اوبو د لګولو فشار & د ویش یو‌شانتیا کالکولېټر';
 $ec_lang['ip_main_desc']='د ازموینې څانګې فشار او یو‌شانتیا اټکل';
@@ -559,7 +531,6 @@ $ec_lang['ip_notes_5_def']='د کارونې کچه او د سیستم/زون ب�
 
 
 
-// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='د پایپ څانګه‌یزه شبکه';
 $ec_lang['bpn_main_title']='وړیا آنلاین د پایپ څانګه‌یزې شبکې د فشار کالکولېټر (پرته له حلقو)';
 $ec_lang['bpn_main_desc']='د پایپ څانګه‌یزې (ونیزې) شبکې بهاو او فشار';
@@ -633,18 +604,8 @@ $ec_lang['lpn_field_text_rotation']='زاویه (درجې)';
 $ec_lang['lpn_field_text_match_pipe']='د نږدې تړاو زاویې ته واړول';
 $ec_lang['lpn_field_text_flip']='180° واړول';
 $ec_lang['lpn_field_elev']='لوړوالی';
-// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
-// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
-// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
-// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='د دې نقطې د ځمکې یا پایپ کچه. یې د هرې صفر نقطې نه اندازه کړئ چې غواړئ، خو ټول نقطې دې یو ډول صفر وکاروي.';
-// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
-// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
-// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='هیډ';
-// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
-// outright that it is a height and not a pressure, which is the exact confusion the glossary's
-// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='د ذخیرې کې د اوبو د سطحې کچه، د لوړوالي په توګه اندازه شوې، نه د فشار په توګه. یې خالي پریږدئ ترڅو د اوبو سطحه د ذخیرې لوړوالي ته وضع شي.';
 $ec_lang['lpn_close']='بندول';
 $ec_lang['lpn_empty_hint']='د فایل، نوی پروژه وکاروئ ترڅو یوه بېلګه پرانیزئ. یا د اوزارپټې نه ذخیره، جنکشن، او پایپ اضافه کولو سره پیل وکړئ.';
@@ -682,10 +643,6 @@ $ec_lang['lpn_units_elevhead']='لوړوالی او هیډ';
 $ec_lang['lpn_units_pressure']='فشار';
 $ec_lang['lpn_units_flow']='بهاو';
 $ec_lang['lpn_units_velocity']='سرعت';
-// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
-// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
-// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
-// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='د سر ضیاع تدریج';
 $ec_lang['lpn_result_gradient_tip']='د سر ضیاع د پایپ اوږدوالي باندې ویشل شوی. یې د بېلابېلو اوږدوالو د پایپونو د یو ډیزاین حد سره پرتله کولو لپاره وکاروئ.';
 $ec_lang['lpn_result_head']='هیډ';
@@ -694,84 +651,39 @@ $ec_lang['lpn_result_pressure']='فشار';
 $ec_lang['lpn_result_flow']='بهاو';
 $ec_lang['lpn_result_velocity']='سرعت';
 $ec_lang['lpn_result_headloss']='د سر ضیاع';
-// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
-// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
-// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
-// Settings live INSIDE each project document, so deleting every project deletes every setting too:
-// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
-// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
-// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='یوازې د دې پروژې تنظیمات بېرته کوي. ستاسو رسم او نورې پروژې نه بدلیږي. د خپلو خوښو تنظیماتو د بیا کارونې لپاره ساتلو لپاره، یوه پروژه فایل ساتئ چې پکې یوازې تنظیمات وي.';
 $ec_lang['lpn_reset_all_tip']='هرې پروژې، هر شاليد انځور، هر تنظیم، او ستاسو د واحدونو انتخابونه ړنګوي، بیا پاڼه بېرته پورته کوي لکه یو لومړی ځل لیدونکی یې چې ویني. دا یوازینی بېرته کول دي چې هرڅه پاکوي.';
-// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
-// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
-// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
-// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
-// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_confirm']='دا محاسبګر د پروژې واحدونه او ننوتنې لکه دننه شوي ساتي، خو مخکې یې شمېرې د ساتلو لپاره SI ته اړولې. دا پروژه له دې بدلون نه مخکې ساتل شوې وه، نو د هغې شمېرې په SI کې ساتل شوې وې. دا اوس د اوسنیو واحدونو ته وروستی ځل واړوو؟ ترڅو تاسو وکولی شئ قضاوت وکړئ، دلته یو څو قطرونه دي چې به واړول شي، د خپلو بدلون نه مخکې او وروسته ارزښتونو سره:';
 $ec_lang['lpn_v2_restore_yes']='واړوئ';
 $ec_lang['lpn_v2_restore_never']='نه. بیا هیڅکله مه پوښتئ.';
 $ec_lang['lpn_v2_restore_no']='بندول ترڅو زه لومړی اوسني واحدونه وګورم';
 $ec_lang['lpn_storage_too_new']='دا پروژه د پاڼې د یوې نوې بڼې لخوا ساتل شوې وه، نو دلته نشي پرانیستل کیدی.';
-// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
-// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
-// something that is not in a file, so closing it asks first; a tab without one closes silently. A
-// browser project always wears one (it is in no file at all); a file project wears one only while it
-// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
-// our words for talking about the code, and the user sees only a name, an asterisk, and a file
-// extension.
-// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
-// conventional relationship and the reason the duplication between them is correct rather than
-// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
-// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
-// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='فایل';
 $ec_lang['lpn_menu_edit']='سمون';
 $ec_lang['lpn_menu_insert']='ننویستل';
 $ec_lang['lpn_menu_view']='لیدنه';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='تنظیمات';
 $ec_lang['lpn_menu_help']='مرسته';
 $ec_lang['lpn_help_walkthroughs']='لارښودونه';
-// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
-// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
-// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
-// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
-// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='شبکه ړنګول';
 $ec_lang['lpn_confirm_delete_network']='په دې پروژه کې هر نقطه، پایپ، او متن لیبل ړنګ کړئ؟ شاليد انځور، د پروژې نوم، او ستاسو تنظیمات ساتل کیږي. دا نشي بېرته کیدی.';
 $ec_lang['lpn_view_units']='واحدونه';
-// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='ټول ساتل';
-// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
-// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
-// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='پروژه{n}';
 $ec_lang['lpn_project_copy_suffix']='(کاپي)';
 $ec_lang['lpn_project_rename']='نوم بدلول';
-// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='نوی پروژه…';
-// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
-// with the toolbar button of that name -- an example is a whole network, so it starts a project
-// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='خالي xy پروژه، د متحده ایالاتو واحدونه (gpm)';
 $ec_lang['lpn_new_blank_si']='خالي xy پروژه، SI واحدونه (L/s)';
-// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
-// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='پرانیستل…';
 $ec_lang['lpn_file_save']='ساتل';
 $ec_lang['lpn_file_saveas']='داسې ساتل…';
 $ec_lang['lpn_file_revert']='بېرته اصلي حالت';
 $ec_lang['lpn_file_close']='بندول';
-// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
-// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='وروستي فایلونه';
 $ec_lang['lpn_recent_tip']='{file} بېرته پرانیزئ پرته له دې چې یې په خپل کمپیوټر کې لټون وکړئ.';
 $ec_lang['lpn_recent_denied']='د هغه فایل د پرانیستلو اجازه نه وه ورکړل شوې، نو دا نه دی پرانیستل شوی.';
 $ec_lang['lpn_recent_gone']='{file} نشو پرانیستلی. کیدای شي لیږدول شوی، نوم یې بدل شوی، یا ړنګ شوی وي، نو د وروستیو لیست نه ایستل شوی.';
-// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
-// around it.
 $ec_lang['lpn_tab_new']='نوې پروژه';
 $ec_lang['lpn_tab_all']='ټولې پروژې';
 $ec_lang['lpn_tab_menu']='د پروژې مینو';
@@ -781,20 +693,10 @@ $ec_lang['lpn_tab_move_right']='ښي لور ته لیږدول';
 $ec_lang['lpn_tab_unsaved']='فایل ته نه دی ساتل شوی';
 $ec_lang['lpn_import_bad_file']='هغه فایل د دې پاڼې نه ساتل شوې پروژې په توګه نشو لوستل کیدی.';
 $ec_lang['lpn_import_no_room']='د دې پروژې اضافه کولو لپاره کافي براوزر ذخیره نشته. هغه پروژه ړنګه کړئ چې نور یې اړتیا نلرئ او بیا هڅه وکړئ.';
-// ---- EPANET .inp import (ROADMAP Task 196) ----
-// The import REPORTS every difference between the file and what this page can hold, so each
-// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
-// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
-// another sentence, and none may become one.
-// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
-// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='سمه ده';
 $ec_lang['lpn_file_import_inp']='د EPANET فایل دننه کول…';
 $ec_lang['lpn_file_import_inp_tip']='د EPANET فایل نه یوه شبکه ولولئ، که .inp متني فایل وي یا هغه .net فایل چې EPANET یې ساتي، او یې د نوې پروژې په توګه په دې براوزر کې وساتئ. دا پاڼه د EPANET فایل بېرته لیکلی نشي، نو د خپل کار ساتلو لپاره فایل، داسې ساتل وکاروئ.';
 $ec_lang['lpn_inp_bad_file']='هغه فایل د EPANET شبکې فایل په توګه نشو لوستل کیدی.';
-// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
-// the way out named here always works, so keep the instruction in the message rather than leaving
-// the reader to guess.
 $ec_lang['lpn_net_bad_file']='دا د EPANET .net فایل ښکاري، خو دا پاڼه یې نشوای لوستلی. یې په EPANET کې پرانیزئ او هلته د فایل، صادرول، شبکه امر وکاروئ ترڅو یې د .inp فایل په توګه وساتئ، بیا هغه دننه کړئ.';
 $ec_lang['lpn_inp_report_heading']='{file} دننه شوی';
 $ec_lang['lpn_inp_report_counts']='{nodes} جنکشنونه، ذخیرې او ټانکونه، {links} پایپونه، پمپونه او والوونه، په {units} کې.';
@@ -818,44 +720,11 @@ $ec_lang['lpn_inp_drop_quality']='د اوبو کیفیت، کیمیاوي تعا
 $ec_lang['lpn_inp_drop_backdrop']='دا فایل یو شاليد انځور نوموي خو خپله انځور نلري. یې پخپله اضافه کړئ: فایل، شاليد انځور، انځور اضافه کول.';
 $ec_lang['lpn_inp_drop_dangling']='دا پایپونه یو جنکشن نوموي چې په فایل کې نشته، نو دا پرېښودل شول.';
 $ec_lang['lpn_inp_drop_units']='د دې فایل کې نومول شوی د بهاو واحد هغه نه دی چې دا پاڼه یې پیژني، نو هره شمېره د ګالنو په دقیقه کې لوستل شوه. د پایلو کارونې نه مخکې هره شمېره وګورئ.';
-// {name} is a project name; word order is the translator's to choose. Says where the user landed,
-// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
-// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='{name} د یوه فایل نه پرانیستل شو، او د نوې پروژې په توګه دې براوزر ته اضافه شو.';
-// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
-// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
-// browser they test in. That is expected, not a bug.
-// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='د پروژې فایل';
-// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot connect to a file, so every press really is another copy in the downloads folder.
-// The label says which of the two you are getting rather than leaving the duplicate looking like a
-// bug.
-// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
-// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
-// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
-// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
-// notice after the act -- at the moment the question arises -- rather than in a label forever.
-// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
-// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
-// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
-// anyway -- a disabled button fires no mouse events.
-// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
-// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
-// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
-// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
-// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='دا براوزر فایل ته وصل کیدی نشي، نو دلته فایل پرانیستل په حقیقت کې پورته کول دي: پروژه دې براوزر ته کاپي کیږي، او خپل کار فایل ته بېرته ساتلو یوازینۍ لار فایل، داسې ساتل کارول دي.';
-// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
-// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='وصل شوي فایل ته ساتي.';
 $ec_lang['lpn_file_saveas_tip']='هغه فایل غوره کړئ چې ورته وساتل شي. دا پروژه هغه فایل ته وصلیږي، او له هغې وروسته ساتل هغه ته لیکي.';
-// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
-// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
-// is no API for it, and the download attribute cannot override the setting -- but the user can turn
-// that setting on themselves, and then Save as really does let them overwrite the file they started
-// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
-// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='ستاسو براوزر د ډاونلوډ تنظیماتو له مخې ساتي. دا براوزر فایل ته وصل کیدی نشي، نو ساتل غیرفعال دي او یوازې داسې ساتل شته دي. که تاسو خپل براوزر تنظیم "هره فایل چیرته ساتل شي وپوښتئ" فعال کړئ، تاسو کولی شئ اصلي فایل غوره کړئ او پرې لیکئ.';
 $ec_lang['lpn_status_uploaded']='د پروژې فایل پورته شو. له هغې سره هیڅ وصلوالی نشي ساتل کیدی، نو بېرته ورته ساتلو یوازینۍ لار فایل، داسې ساتل کارول دي.';
 $ec_lang['lpn_status_downloaded']='{file} ډاونلوډ شو. دا براوزر فایل ته وصل کیدی نشي، نو دا پروژه لاهم د فایل ته نه ساتل شوې په توګه نښه شوې پاتیږي.';
@@ -864,45 +733,18 @@ $ec_lang['lpn_status_already_open']='هغه فایل دلته دمخه د {name}
 $ec_lang['lpn_status_already_open_dirty']='هغه فایل دلته دمخه د {name} په توګه پرانیستل شوی، له هغو بدلونونو سره چې تاسو یې نه دي ساتلي. دا هغه ته وګرځید ترڅو دویمه کاپي پرانیستل نشي. که تاسو د ډیسک نسخه غواړئ، فایل، بېرته اصلي حالت وکاروئ.';
 $ec_lang['lpn_status_saved']='{file} وساتل شو.';
 $ec_lang['lpn_status_reverted']='{file} بیا د ډیسک نه پورته شو.';
-// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
-// purpose: a program that writes your file behind your back takes away your right to walk away from
-// a session. So these three carry the whole close/discard/revert conversation.
-// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_confirm']='د {name} بندولو نه مخکې خپل بدلونونه ورته وساتئ؟';
-// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
-// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_confirm']='{name} یوازې په دې براوزر کې ساتل شوی دی. که تاسو یې پرته له فایل ته ساتلو بند کړئ، دا تل ورک کیږي.';
 $ec_lang['lpn_close_discard']='پرته له ساتلو بندول';
 $ec_lang['lpn_cancel']='لغوه کول';
 $ec_lang['lpn_revert_confirm']='هغه بدلونونه چې کړي دي پرېږدئ او {file} بیا د ډیسک نه پورته کړئ؟';
-// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
-// page load, so the link is gone even though we still know the name. Says what to do, not just what
-// happened.
 $ec_lang['lpn_file_needs_reopen']='دا پروژه د {file} نه راغلې، خو له هغه فایل سره وصلوالی له لاسه ورکړل شوی. د وصلیدو لپاره فایل بیا غوره کړئ.';
-// Says what is still safe before it says what failed: the reassurance is the part a worried user
-// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='فایل ته لیکل ونشول. کیدای شي لیږدول شوی یا نوم یې بدل شوی وي، یا اجازه یې واخیستل شوې وي. ستاسو کار لاهم په دې براوزر کې ساتل شوی دی.';
 $ec_lang['lpn_file_changed_elsewhere']='یو بل چا تاسو د دې فایل پرانیستلو راهیسې ورته ساتلي دي، نو اوس ساتل به د هغوی کار پرې ولیکي. د خپلو بدلونونو خپل فایل کې ساتلو لپاره فایل، داسې ساتل وکاروئ، یا د خپلو بدلونونو پرېښودلو او د هغوی پورته کولو لپاره فایل، بېرته اصلي حالت وکاروئ.';
-// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
-// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
-// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-// Initials, and said to be public: whoever opens the same file sees this name, including outside the
-// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
-// rather than a name makes the safe answer the obvious one.
-// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
-// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='کله چې تاسو دا پروژه پرانیستې وي، همکاران دې څه وویني؟ ستاسو د نوم لومړي توري غوره دي. هر څوک چې ورته فایل پرانیزي کولی شي دا وویني، نو کوم شخصي شی مه کاروئ.';
-// The stand-in when someone locked a project before giving a name. Reads in place of {name}
-// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='یو بل چا';
-// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
-// moment of opening, with both real answers on it -- the way every drawing and document program has
-// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} دا فایل پرانیستی دی.';
 $ec_lang['lpn_lock_open_readonly']='یوازې لوستلو لپاره پرانیستل';
-// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
-// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
-// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='یوه کاپي جوړول';
 $ec_lang['lpn_lock_break']='د هغوی بندیز مات کول';
 $ec_lang['lpn_lock_open_heading_times']='{name} دا فایل پرانیستی دی؛ وروستی سمون {x} مخکې و، {y} وروستي ساتلو نه وروسته.';
@@ -915,59 +757,26 @@ $ec_lang['lpn_ago_minutes']='{n} دقیقې';
 $ec_lang['lpn_ago_hours']='{n} ساعته';
 $ec_lang['lpn_ago_days']='{n} ورځې';
 $ec_lang['lpn_ago_unknown']='یو نامعلوم وخت';
-// Read-only means read-only: it never turns itself back into an editable file while you are looking
-// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
-// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
-// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='یوازې لوستل: {name} دا فایل پرانیستی دی. تاسو دلته هرڅه بدلولی شئ چې غواړئ، خو ساتلی یې نشئ. د بلې فایل ساتلو لپاره فایل، داسې ساتل وکاروئ.';
-// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
-// stops a colleague editing the same file. Editing still works -- an unreachable server must never
-// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
-// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='خبرداری: د دې پروژې د بندیز چک یا جوړولو لپاره سرور ته رسیدنه ونشوه، نو هیڅ شی یو همکار د ورته فایل په ورته وخت کې سمون نه ساتي. تاسو ته به وویل شي که بندیز بیا کار پیل کړي.';
 $ec_lang['lpn_lock_storage_error']='خبرداری: دا سایټ د بندیز ریکارډونه نشي ساتلی، نو هیڅ شی یو همکار د ورته فایل په ورته وخت کې سمون نه ساتي. دا د سرور د تنظیم عیب دی، نه داسې شی چې تاسو یې دلته سم کولی شئ — د بندیز فولډر د ویب سرور لخوا لیکل کیدونکی نه دی.';
 $ec_lang['lpn_lock_full_error']='خبرداری: دا سایټ د دې ثبتولو ځای بشپړ کړی چې څوک کومه پروژه پرانیستې لري، نو هیڅ شی یو همکار د ورته فایل په ورته وخت کې سمون نه ساتي. دا د سرور د تنظیم عیب دی، نه داسې شی چې تاسو یې دلته سم کولی شئ.';
 $ec_lang['lpn_lock_not_asked']='د دې پروژې لپاره بندیز نه چلیږي، نو هیڅ شی یو همکار د ورته فایل په ورته وخت کې سمون نه ساتي. دې براوزر لا تر اوسه ستاسو لپاره کوم نوم نه دی ثبت کړی، یا پروژه کوم پیژندونکی نلري — پروژه فایل ته ساتل دواړه تنظیموي.';
 $ec_lang['lpn_lock_restored']='بندیز بیا کار کوي، او دا فایل اوس ستاسو لپاره د ساتلو دی.';
 $ec_lang['lpn_lock_dismiss']='دا پیغام پټول';
-// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
-// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
-// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='ستاسو پروژه به په دې کمپیوټر کې یوه فایل کې وساتل شي. دا هغه وخت ساتل کیږي کله چې تاسو یې وغواړئ، او بل هیڅ وخت نه، نو هیڅ شی د تاسو له خبرو پرته هغه فایل ته نه لیکل کیږي.';
 $ec_lang['lpn_file_training_2']='ترڅو دوه کسان هیڅکله یوه فایل په ورته وخت کې سمون نه کړي، دا سایټ ساتنه کوي چې څوک یې پرانیستی دی. که یو چا دمخه پرانیستی وي، تاسو لاهم کولی شئ یې پرانیزئ او ورته وګورئ، یا خپله کاپي یې وساتئ.';
-// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
-// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
-// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
-// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
-// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='لومړی ځل چې تاسو ساتئ، ستاسو براوزر به وپوښتي چې دا سایټ فایل سمولی شي که نه. دا پوښتنه د براوزر نه راځي، نه زموږ نه، او هو ویل هغه دی چې ساتل ته اجازه ورکوي چې ستاسو کار بېرته ولیکي. دا معمولا یوازې یو ځل د هرې فایل لپاره پوښتل کیږي.';
-// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
-// false -- the name is never written into the project file. It is held in this browser and on this
-// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
-// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='خپلو همکارانو ته یو لنډ نوم ورکړئ چې تاسو ورسره پیژني. ستاسو د نوم لومړي توري غوره دي. هر څوک چې ورته فایل پرانیزي کولی شي دا وویني، نو کوم شخصي شی مه کاروئ.';
 $ec_lang['lpn_file_training_name']='ستاسو لومړي توري';
 $ec_lang['lpn_file_training_continue']='دوام ورکړئ';
-// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
-// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='فایل بیا غوره کول';
 $ec_lang['lpn_file_reconnect']='دې فایل ته بیا وصلیدل';
 $ec_lang['lpn_file_reconnect_alert']='دا پروژه د {file} نه راغلې. ستاسو براوزر بیا اجازه غواړي مخکې لدې چې ورته ولیکي. لاندې بیا وصل شئ.';
-// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
-// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='دا هماغه فایل دی چې یو بل چا پرانیستی دی، نو دا نشي ساتل کیدی. یوه بله فایل یا بل نوم غوره کړئ.';
 $ec_lang['lpn_saveas_overwrites_project']='هغه فایل دمخه یوه بله پروژه لري، {name}. دلته ساتل به یې په بشپړ ډول بدل کړي. دوام ورکړئ؟';
 $ec_lang['lpn_saveas_overwrites_newer']='هغه فایل ستاسو وروستي لیدو راهیسې بدل شوی، نو کیدای شي یو بل چا ورته ساتلي وي. دلته ساتل به د هغوی نسخه ستاسو سره بدله کړي. دوام ورکړئ؟';
-// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
-// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
-// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
-// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='د دې پروژې لپاره نوم';
-// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
-// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
-// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
-// separate Delete for it to be confused with.)
-// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='{closed} بند شو. اوس {opened} ښودل کیږي.';
 $ec_lang['lpn_status_closed_empty']='{closed} بند شو. یوه نوې خالي پروژه پیل شوه.';
 $ec_lang['lpn_storage_full']='ونه ساتل شو. د براوزر ذخیره ډکه یا نه شته ده، نو ستاسو وروستي بدلونونه به د دې ټب بندولو سره ورک شي.';
@@ -977,12 +786,6 @@ $ec_lang['lpn_notes_2_term']='نه دي ماډل شوي';
 $ec_lang['lpn_notes_2_def']='د اوبو کیفیت او هغه غوښتنې چې د ورځې په اوږدو کې بدلیږي ماډل شوي نه دي. والوونه دا دي: تنګوونکی والو په دواړو حل کوونکو کې کار کوي، او هغه والوونه چې پخپله خلاصیږي او بندیږي (PRV، PSV، FCV) د EPANET حل کوونکي سره حل کیږي، دا حل کوونکی دا پاڼه پخپله فعالوي کله چې ستاسو شبکه یو ولري.';
 $ec_lang['lpn_notes_3_term']='د پروژو ساتل';
 $ec_lang['lpn_notes_3_def']='هره پروژه یوه ټب ده، او هره ټب د کار پر مهال دې براوزر کې ساتل کیږي. ستاسو د براوزر معلوماتو پاکول ټول دوی ړنګوي، نو خپل کار یوه فایل کې وساتئ: فایل، داسې ساتل. په یوه ټب کې ستوري نښه دا معنی لري چې دا داسې بدلونونه لري چې په فایل کې نه دي. هیڅکله هیڅ شی فایل ته نه لیکل کیږي پرته له دې چې تاسو یې وغواړئ. په ځینو براوزرونو کې یوه پروژه هغه فایل سره وصلیږي چې تاسو یې ورته ساتئ، او فایل، ساتل له هغې وروسته همدې فایل ته لیکي؛ په نورو کې هیڅ وصلوالی ممکن نه دی، نو ساتل غیرفعال دي او یوازې داسې ساتل شته دي. کله چې د پروژې فایل یوه شریکه ډرایو کې ساتل کیږي، دا پاڼه تاسو ته وایي که یو همکار یې دمخه پرانیستی وي، ترڅو دوه کسان یو بل باندې ونه لیکي.';
-// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
-// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
-// to stay readable on a phone, while the Notes section is already this page's documentation home,
-// prints with the page, and is translated with everything else. The popup carries a one-line
-// pointer to here instead (lpn_pump_curve_note).
-// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='د پمپ منحني';
 $ec_lang['lpn_notes_5_def']='یو پمپ H = H₀ − aQ^b تعقیبوي، چیرې چې H هغه هیډ دی چې پمپ یې اضافه کوي او Q هغه بهاو دی چې د هغه نه تیریږي. د جوړونکي منحني نه یو، دوه، یا درې ټکي ولیکئ. درې ټکي — د صفر بهاو کې هیډ، عادي کار ټکی، او د لوړ ترین بهاو ټکی — H₀، a او b مستقیم برابروي، او یوه خپره شوې منحني ترټولو نږدې تعقیبوي. دوه ټکي یو پارابولا (b = 2) برابروي چې د هغه اوچت یې د صفر بهاو کې دی. یو ټکی یو عام قاعده کاروي: د صفر بهاو کې هیډ ستاسو ننوتلي هیډ نه 1.33 چنده دی، او لوړ ترین بهاو ستاسو ننوتلي بهاو نه 2 چنده دی، چې بیا b = 2 ورکوي. یو پمپ چې هیڅ ټکی پکې نه دی ننوتل شوی هیڅ هیډ نه اضافه کوي. منحني د صفر هیډ رسیدو ځای کې نه پرې کیږي، نو د پمپ نه د هغه د منحني نه زیات بهاو غوښتل منفي هیډ ورکوي. حل یو غټ پمپ یا کوچنۍ غوښتنه دی، نه یوه بله منحني برابرونه.';
 $ec_lang['lpn_notes_4_term']='پلان شوي زیاتونې';
@@ -1001,24 +804,12 @@ $ec_lang['lpn_engine_ready_valve']='د EPANET حل کوونکی اوس په دې
 $ec_lang['lpn_engine_unavailable']='د EPANET حل کوونکی نشو ترلاسه کیدی، چې هغه والوونه حلوي چې پخپله خلاصیږي او بندیږي. یو ځل انټرنیټ سره وصل شئ او بیا له هغه وروسته په دې وسیله کې ساتل کیږي.';
 $ec_lang['lpn_diag_not_converged']='هیڅ حل ونه موندل شو. هغه ارزښتونه وګورئ چې په حقیقي ژوند کې ناممکن دي، لکه د صفر قطر.';
 $ec_lang['lpn_field_roughness']='خشونت';
-// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
-// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
-// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='د Hazen-Williams C. لوړه شمېره معنی لري ترتیب شوی پایپ: نږدې 150 د نوي پلاستيک لپاره، 130 د نوي فولادو یا اوسپنو لپاره، او 100 د زوړ پایپ لپاره.';
 $ec_lang['lpn_field_length']='اوږدوالی';
 $ec_lang['lpn_field_length_tip']='د پایپ اوږدوالی. کله چې Auto فعال وي، اوږدوالی د هغه څه نه اندازه کیږي چې تاسو رسم کړی. Auto غیرفعال کړئ ترڅو یو اوږدوالی ولیکئ چې د رسم نه توپیر لري.';
-// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
-// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
-// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='د ځایی ضیاع ضریب، k';
 $ec_lang['lpn_field_km_tip']='د دې پایپ د پیچونو، والوونو، او فټینګونو نه ضیاع، د سرعت هیډ د یو ضریب په توګه شمېرل شوی. د یوې ساده سیده پایپ لپاره 0 وکاروئ.';
-// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
-// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
-// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
-// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='ځایی ضیاع، k';
-// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
-// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='د منحني سرچینه';
 $ec_lang['lpn_pump_curve_own']='لاندې ټکي ولیکئ';
 $ec_lang['lpn_pump_curve_ref_note']='د پمپ {id} لپاره ننوتل شوې منحني کارول کیږي.';
@@ -1026,23 +817,13 @@ $ec_lang['lpn_pump_curve_note']='یو، دوه، یا درې ټکي — لاند
 $ec_lang['lpn_pump_point1']='ټکی 1';
 $ec_lang['lpn_pump_point2']='ټکی 2';
 $ec_lang['lpn_pump_point3']='ټکی 3';
-// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
-// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
-// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='حالت: ټاکل. یو عنصر یا لیبل کلیک کړئ ترڅو یې وګورئ یا بدل کړئ. د یوې نقطې، ټکي، یا لیبل لیږدولو لپاره یې کش کړئ. یو پایپ ته دوه ځلي کلیک وکړئ ترڅو یو ټکی اضافه یا لرې کړئ.';
 $ec_lang['lpn_mode_delete']='حالت: ړنګول. یو عنصر ړنګولو لپاره کلیک وکړئ.';
 $ec_lang['lpn_mode_add_junction']='حالت: جنکشن اضافه کول. نقشه کلیک کړئ ترڅو یو جنکشن کیږدئ. عناصر او لیبلونو بدلولو یا لیږدولو لپاره ټاکل حالت ته لاړ شئ.';
 $ec_lang['lpn_mode_add_reservoir']='حالت: ذخیره اضافه کول. نقشه کلیک کړئ ترڅو یوه ذخیره کیږدئ. عناصر او لیبلونو بدلولو یا لیږدولو لپاره ټاکل حالت ته لاړ شئ.';
 $ec_lang['lpn_mode_add_pipe']='حالت: پایپ اضافه کول. یوه نقطه، بیا بله نقطه کلیک کړئ ترڅو یې وصل کړئ. عناصر او لیبلونو بدلولو یا لیږدولو لپاره ټاکل حالت ته لاړ شئ.';
 $ec_lang['lpn_mode_add_pump']='حالت: پمپ اضافه کول. یوه نقطه، بیا بله نقطه کلیک کړئ ترڅو یې وصل کړئ. عناصر او لیبلونو بدلولو یا لیږدولو لپاره ټاکل حالت ته لاړ شئ.';
-// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
-// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='حالت: متن اضافه کول. نقشه کلیک کړئ ترڅو یو متن لیبل کیږدئ. یوې نقطې ته نږدې کلیک وکړئ ترڅو متن ورسره وتړئ. عناصر او لیبلونو بدلولو یا لیږدولو لپاره ټاکل حالت ته لاړ شئ.';
-// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
-// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
-// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
-// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
-// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='دا حالت وکاروئ ترڅو په نقشه کې شیان بدل کړئ، ولیږدوئ، او کش کړئ.';
 $ec_lang['lpn_tip_labels_draggable']='تاسو کولی شئ یو لیبل کش کړئ ترڅو یې ولیږدوئ. یو لیبل ته دوه ځلي کلیک وکړئ ترڅو یې خپل اوتوماتیک ځای ته بېرته ولیږئ.';
 $ec_lang['lpn_field_auto']='اوتو';
@@ -1073,8 +854,6 @@ $ec_lang['lpn_labels_col_after']='وروسته';
 $ec_lang['lpn_labels_col_decimals']='عشریې';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='شاليد انځور…';
-// BARE VERBS (resynced 2026-08-13): both doors now print a "Background image…" heading
-// (lpn_backdrop_menu) directly above these, so the object no longer needs repeating in each verb.
 $ec_lang['lpn_backdrop_add']='اضافه کول';
 $ec_lang['lpn_backdrop_scale']='په نقطو مقیاس ټاکل';
 $ec_lang['lpn_backdrop_scale_entry']='د نقشې همغږۍ دوتنې یا د یو پیکسل اندازې له مخې مقیاس';
@@ -1116,8 +895,6 @@ $ec_lang['lpn_push_none_displayed']='اوس هیڅ پیل ارزښت د لیبل
 $ec_lang['lpn_push_nothing']='هیڅ موجود عنصر د پلي کیدونکو ملکیتونو نه هیڅ یو نه لري.';
 $ec_lang['lpn_push_no_change']='هر عنصر دمخه دا ارزښتونه لري، نو هیڅ به نه بدلیږي.';
 $ec_lang['lpn_settings_emitter_exponent']='د شبرنګ اسي';
-// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
-// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='محاسبه';
 $ec_lang['lpn_settings_tolerance']='د یووالي زغم';
 $ec_lang['lpn_settings_tolerance_tip']='حل کوونکی باید تر څومره نږدې ورسیږي مخکې لدې چې ودریږي. کوچنۍ شمېره ډیره دقیقه ده او ډیر وخت نیسي.';
@@ -1127,25 +904,16 @@ $ec_lang['lpn_engine_loading']='د EPANET حل کوونکی پورته کیږي�
 $ec_lang['lpn_engine_failed']='د EPANET حل کوونکی نشو پورته کیدی. د اندروني حل کوونکي ښودل کیږي.';
 $ec_lang['lpn_engine_manning_note']='یادونه: د مانینګ خشونت سره، EPANET د سر ضیاع نږدې 0.6٪ د اندروني حل کوونکي نه ټیټ محاسبه کوي.';
 $ec_lang['lpn_settings_text_size']='د متن اندازه (پیکسلونه)';
-// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
-// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
-// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='د نښې اندازه (پیکسلونه)';
 $ec_lang['lpn_settings_link_width']='د پایپ کرښې پنډوالی (پیکسلونه)';
 $ec_lang['lpn_settings_align_labels']='د پایپ لیبلونه له پایپونو سره برابرول';
 $ec_lang['lpn_settings_readability_bias']='کله چې لیبل د عمودي حالت نه کیڼ لور ته له دومره درجو زیات کوږ شي، لیبل کوز-پاس کول';
 $ec_lang['lpn_settings_readability_bias_tip']='کله چې یو لیبل له عمودي حالت نه کیڼ لور ته له دې شمېر درجو زیات کوږ شي، هغه دوباره کوز-پاس کړئ ترڅو سمه ولاړ پاتې شي.';
 $ec_lang['lpn_settings_mask_labels']='د لیبلونو شاته کلک شاليد';
-// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
-// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='د نښې روڼوالی (0 نه 1)';
-// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
-// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='د شاليد انځور روڼوالی (0 نه 1)';
 $ec_lang['lpn_settings_map_display']='د نقشې بڼه';
 $ec_lang['lpn_settings_map_height_px']='د نقشې لوړوالی (د پردې پیکسلونه)';
-// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
-// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='په یوه کوچنۍ پرده کې نقشه له دې نه لنډه رسم کیږي، ترڅو د پاڼې یوه برخه تل د سکرول لپاره پاتې وي.';
 $ec_lang['lpn_settings_legend_position']='د کلید جدول ځای';
 $ec_lang['lpn_settings_legend_top_left']='پورته کیڼ';
@@ -1236,7 +1004,6 @@ $ec_lang['lpn_field_active_tip']='دا بکس پاک کړئ ترڅو عنصر پ
 $ec_lang['lpn_engine_valve_route']='د EPANET حل کوونکي سره حل شوی، ځکه چې دا والوونه پخپله خلاصیږي او بندیږي:';
 $ec_lang['lpn_unit_unknown']='دا رسم یو واحد بیانوي چې دا پاڼه یې نه وړاندې کوي: {unit}. هرڅه لکه څنګه چې راغلي ساتل او ښودل کیږي، او هیڅ شی نه دی بدل شوی. تر هغه پورې چې دا پاڼه هغه واحد نه پیژني هیڅ ځواب نشي ورکړل کیدی، ځکه چې د هغه د اندازې پوهیدو لاره نشته.';
 
-// 2026-08-19 translation sprint (batch 1 of 4)
 $ec_lang['lpn_field_text_align']='افقي تنظیم';
 $ec_lang['lpn_field_text_align_left']='کیڼ';
 $ec_lang['lpn_field_text_align_center']='منځ';

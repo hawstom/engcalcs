@@ -2,8 +2,6 @@
 
 // All missing text declarations will fall back to English.
 
-// Units (alphabetical order)
-// Necessary for calculator units selectors
 $ec_lang['u_depthFrac']='חלק';
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='ft^2';
@@ -58,9 +56,6 @@ $ec_lang['u_hp']='hp';
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
 
-// Page text
-// In page order for easiest maintenance.
-// Menu and General
 $ec_lang['menu_brand']='מחשבוני HawsEDC';
 $ec_lang['menu_main_list']='רשימת המחשבונים';
 $ec_lang['menu_main_hydraulics']='הידרוליקה';
@@ -71,10 +66,6 @@ $ec_lang['template_welcome']='השאירו את פחדיכם בדלת; כאן מ
 $ec_lang['template_feedback']='האם תוכלו להציע ניסוח טוב יותר לטקסט שבעמוד הזה, או כל דבר אחר? רוצים לעזור, או ללמוד ליצור כלים כאלה? אנא צרו איתי קשר.';
 $ec_lang['template_printable_title']='אזור כותרת להדפסה';
 $ec_lang['template_printable_subtitle']='אזור כותרת משנה להדפסה';
-// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
-// prose, and they are translated into all 26 languages for one reason: consent that the visitor
-// cannot read is not consent. The long-form privacy notice and terms are a separate question --
-// English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_body']='האם נוכל לשמור ספרה אחת בלבד לכל עמוד באחסון של פרופיל דפדפן זה, כדי למנוע רישום חוזר של ביקוריו?';
 $ec_lang['consent_accept']='אשר בקשה זו';
 $ec_lang['consent_accept_all']='אשר תמיד';
@@ -106,7 +97,6 @@ $ec_lang['ec_name_tip']='שמירת הערכים האלה בכתובת עם סי
 $ec_lang['calc_copy_link']='העתק קישור';
 $ec_lang['ec_related_calcs']='מחשבונים קשורים:';
 $ec_lang['calc_copy_link_done']='הועתק!';
-// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='אובדן לחץ בצינור — Darcy-Weisbach';
 $ec_lang['dw_main_title']='מחשבון אובדן לחץ בצינור Darcy-Weisbach — חינם מקוון';
 $ec_lang['dw_main_desc']='אובדן לחץ בצינור Darcy-Weisbach בקוטר, גסות וספיקה נתונים';
@@ -122,7 +112,6 @@ $ec_lang['dw_regime_transitional']='מעברי';
 $ec_lang['dw_regime_turbulent']='סוער';
 $ec_lang['dw_friction_factor_method']='שיטת מקדם החיכוך';
 $ec_lang['dw_friction_factor']='מקדם חיכוך, f';
-// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='אובדן לחץ בצינור — Hazen-Williams';
 $ec_lang['hw_main_title']='מחשבון אובדן לחץ בצינור Hazen-Williams — חינם מקוון';
 $ec_lang['hw_main_desc']='אובדן לחץ בצינור Hazen-Williams בקוטר, גסות וספיקה נתונים';
@@ -140,7 +129,6 @@ $ec_lang['hw_roughness']='מקדם Hazen-Williams, C';
 $ec_lang['hw_note_1']='<dl><dt>מחשבון זה אינו מדמה את פרופיל הצינור בין שני הקצוות.</dt><dd>הוא משתמש רק בגבהים במעלה ובמורד שהזנת. אם הקרקע עולה גבוה יותר משני הקצוות באמצע המסלול, הלחץ באותה נקודה גבוהה נמוך מכל לחץ המדווח כאן. הפעל את המחשבון שוב עבור האורך מהקצה במעלה ועד לנקודה הגבוהה כדי לבדוק זאת.</dd><dd>במקום שבו קו גובה המים (HGL) יורד מתחת לצינור, המים נמצאים בלחץ שלילי. אוויר משתחרר מהתמיסה, צינור דק-דופן עלול לקרוס, ומי תהום מזוהמים עלולים להישאב פנימה דרך המפרקים. שמור על לחץ חיובי לאורך כל הקו, ושקול התקנת שסתום אוויר בכל נקודה גבוהה.</dd><dt>לחץ המעלה הוא תנאי גבול שאתה מספק.</dt><dd>קרא אותו ממד לחץ, ממפלס המים במיכל (גובה המים מעל הצינור), או מעקומת משאבה. משאבה מספקת לחץ נמוך יותר ככל שהספיקה עולה, לכן השתמש בנקודה על העקומה המתאימה לספיקה שהוזנה למעלה.</dd><dt>סכם בעצמך את מקדמי ההפסד המקומי.</dt><dd>סכם את ערכי ה-K עבור כל שסתום, עיקול, מסתעף, מד ספיקה וכניסה בקו, והזן את הסכום. עקוב אחר הקישור בשדה זה לערכים טיפוסיים. בקו הולכה ראשי וארוך הפסדים אלה קטנים לעומת החיכוך, אך בצנרת קצרה בתחנה הם עשויים להוות את רוב ההפסד.</dd></dl>';
 
 
-// Manning Irregular
 $ec_lang['mi_menu']='תעלה בעלת חתך לא סדיר — Manning';
 $ec_lang['mi_main_title']='מחשבון תעלה בעלת חתך לא סדיר לפי Manning — חינם מקוון';
 $ec_lang['mi_main_desc']='זרימה אחידה בתעלה בעלת חתך לא סדיר לפי נוסחת Manning';
@@ -168,7 +156,6 @@ $ec_lang['mi_notes_1_term']='n מורכב';
 $ec_lang['mi_notes_1_def']='מחשבון זה פועל לפי מדריך העיון (Reference Manual) של HEC-RAS בחישוב n מורכב לכל אזור, בהתאם ל-Chow 1959, עמוד 136, משוואה 6-17 (ולא 6-18).';
 $ec_lang['mi_notes_2_term']='חיפוי סלע';
 $ec_lang['mi_notes_2_def']='לתכנון חיפוי סלע יש להשתמש במחשבון תעלה טרפזואידית לפי Manning. מחשבון זה (תעלה בעלת חתך לא סדיר) מתאים יותר לחתכים טבעיים.';
-// Manning Pipe Flow
 $ec_lang['mpf_main_menu']='זרימה בצינור — Manning';
 $ec_lang['mpf_main_title']='מחשבון זרימה בצינור לפי Manning — חינם מקוון';
 $ec_lang['mpf_main_desc']='זרימה אחידה בצינור לפי נוסחת Manning בשיפוע ועומק נתונים';
@@ -197,7 +184,6 @@ $ec_lang['mpf_solver_enter_positive_q']='הזן ערך Q יעד חיובי.';
 $ec_lang['mpf_solver_no_solution']='אין פתרון: Q עולה על קיבולת הצינור ב-y/d0 = 93.8% (Qmax = {qmax} ביחידות הנבחרות).';
 $ec_lang['mpf_solve_btn']='חשב';
 $ec_lang['mpf_solve_for_flow']='עבור ספיקה, Q =';
-// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='אובדן לחץ בצינור — Manning';
 $ec_lang['mphl_main_title']='מחשבון אובדן לחץ בצינור לפי Manning — חינם מקוון';
 $ec_lang['mphl_main_desc']='אובדן לחץ לפי נוסחת Manning בזרימה מלאה נתונה';
@@ -214,7 +200,6 @@ $ec_lang['mphl_egl_1']='EGL מורד';
 $ec_lang['mphl_egl_2']='EGL מעלה';
 $ec_lang['mphl_hgl_egl_tip']='ייתכן שאינו תקף אם הצינור גבוה. ראה הערות.';
 $ec_lang['mphl_note_1']='<dl><dt>מחשבון זה אינו מדמה את פרופיל הצינור בין שני הקצוות.</dt><dd>אם קו גובה המים (HGL) יורד מתחת לחלק העליון של הצינור בנקודה כלשהי, ייתכן שחישוב זה אינו תקף.</dd><dt>עבור כניסה פתוחה (תעלת ניקוז), יש לבדוק תנאי שליטה בכניסה.</dt><dd>1. HGL המעלה אינו יכול להיות נמוך מגובה זרימה נורמלית במעלה (ולא נמוך מהצינור!).</dd><dd>2. גובה המים העליון של תעלת ניקוז מיוצג טוב יותר על ידי EGL המעלה מאשר HGL המעלה.</dd><dd>3. ראה <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">את המדריך הקצר שלי</a> לחישובי גובה מים עליון פשוטים לתעלות ניקוז סטנדרטיות באמצעות <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, תוכנת תעלות הניקוז החינמית של מנהל הדרכים הפדרלי של ארצות הברית.</dd><dd>4. עמוד זה פותר רק את מקרה שליטת היציאה: צינור הזורם מלא, כאשר תנאי המורד קובעים את גובה המים. תכנון תעלת ניקוז כרוך בהחלטה האם שליטת הכניסה או שליטת היציאה קובעת, ולכן יש להשתמש ב-HY-8 בכל מקרה שבו אחת מהן עשויה לחול.</dd></dl>';
-// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='תעלה טרפזואידית — Manning';
 $ec_lang['mtc_main_title']='מחשבון תעלה טרפזואידית לפי נוסחת Manning — חינם מקוון';
 $ec_lang['mtc_main_desc']='זרימה אחידה בתעלה טרפזואידית לפי נוסחת Manning בשיפוע ועומק נתונים';
@@ -249,7 +234,6 @@ $ec_lang['mtc_note_1']='<dl><dt>איטרציה אוטומטית לתכנון ג�
 $ec_lang['mtc_note_2_term']='בדיקת מהירות';
 $ec_lang['mtc_note_2_def']='מהירות גבוהה מעידה על ירידת גובה משמעותית שיצרה אנרגיה סגולית גבוהה כל כך. אנרגיה זו עלולה להתבזבז במהירות במעברי הרחבה, בעקומות או במכשולים. יש לוודא שהדבר סביר עבור האתר.';
 $ec_lang['mtc_solver_no_solution']='לא נמצא פתרון עבור ה-Q הנתון עם קלטי התעלה הללו.';
-// Weir Flow Simple
 $ec_lang['ws_main_menu']='זרימת שפיכון פשוט';
 $ec_lang['ws_main_title']='מחשבון זרימת שפיכון רחב-כתר פשוט — חינם מקוון';
 $ec_lang['ws_main_desc']='מחשבון זרימת שפיכון רחב-כתר פשוט';
@@ -258,7 +242,6 @@ $ec_lang['ws_headWaterHeight']='<span class="ec-help" title="אנרגיה ליח
 $ec_lang['ws_weirCoefficient']='מקדם השפיכון, C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='הערות';
 $ec_lang['ws_notes_we_term']='משוואת השפיכון';
-// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='זרימת שפיכון בעל כתר לא אחיד';
 $ec_lang['wi_main_title']='מחשבון זרימת שפיכון מקוטע בעל עומק משתנה וכתר לא אחיד — חינם מקוון';
 $ec_lang['wi_main_desc']='מחשבון זרימת שפיכון בעל כתר לא אחיד';
@@ -268,7 +251,6 @@ $ec_lang['wi_incrementalFlow']='ספיקה תוספתית';
 $ec_lang['wi_cumulativeFlow']='ספיקה מצטברת';
 $ec_lang['wi_save_and_calculate']='שמור וחשב';
 $ec_lang['wi_notes_we_def']='q = אם (אורך = 0) אז 0; אחרת אם (שיפוע=0) אז cw*length*d<sub>0</sub><sup>1.5</sup>; אחרת cw/(2.5*slope) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) כאשר d<sub>1</sub> ו-d<sub>0</sub> תמיד חיוביים או אפס';
-// Orifice Flow
 $ec_lang['or_main_menu']='זרימה דרך פתח';
 $ec_lang['or_main_title']='מחשבון זרימה דרך פתח — חינם מקוון';
 $ec_lang['or_main_desc']='זרימה דרך פתח — חופשית או טבועה';
@@ -300,7 +282,6 @@ $ec_lang['or_notes_3_term']='מקדם הספיקה';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> נע בין 0.60 ל-0.65 לפתחים עם קצה חד. כניסות מעוגלות או שקועות מקבלות ערכים שונים. ראה <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> או מדריך העיון ההידראולי של HEC-RAS.';
 $ec_lang['or_notes_4_term']='טביעה';
 $ec_lang['or_notes_4_def']='כאשר TWE גבוה מתחתית הפתח, המחשבון מיישם אוטומטית את משוואת הפתח הטבוע עם h = HWE − TWE. כאשר TWE שווה לתחתית הפתח או נמוך ממנה, מניחים זרימה חופשית ו-h = HWE − צנטרואיד.';
-// Micro-Hydro Power
 $ec_lang['mhp_main_menu']='הידרו-כוח זעיר';
 $ec_lang['mhp_main_title']='מחשבון הידרו-כוח זעיר חינמי מקוון';
 $ec_lang['mhp_main_desc']='מחשבון הספק הידרו-כוח זעיר עם זרימה טבעית בנהר';
@@ -333,7 +314,6 @@ $ec_lang['mhp_notes_6_def']='יעילות המתקן האופיינית η נע�
 $ec_lang['mhp_notes_7_term']='אנרגיה שנתית';
 $ec_lang['mhp_notes_7_def']='האנרגיה השנתית מניחה פעולה מתמשכת בזרימה מלאה (8760 שעות לשנה). התפוקה בפועל תהיה נמוכה יותר בשל שינויי זרימה עונתיים, זמן השבתה לתחזוקה ומקדם עומס.';
 
-// Orifice Drain Time
 $ec_lang['odt_main_menu']='זמן ריקון בריכה ומיכל';
 $ec_lang['odt_main_title']='מחשבון חינם מקוון לזמן ריקון בריכה, אגן ומיכל (פתח)';
 $ec_lang['odt_main_desc']='זמן ריקון בריכה, אגן או מיכל — יציאה דרך פתח, שיטת נפח קוני';
@@ -361,10 +341,7 @@ $ec_lang['odt_q_max']='זרימה מקסימלית, Q<sub>max</sub>';
 $ec_lang['odt_vol']='נפח מרוקן';
 $ec_lang['odt_sketch_start']='התחלה';
 $ec_lang['odt_sketch_end']='סיום';
-// Contact us.
 
-// Irrigation
-// Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='מרווח מטפטפים, S<sub>e</sub>';
 $ec_lang['ip_sl']='מרווח שלוחות, S<sub>l</sub>';
 $ec_lang['ip_n_e']='מטפטפים לשלוחה, n<sub>e</sub>';
@@ -375,7 +352,6 @@ $ec_lang['ip_pr']='קצב יישום, PR';
 $ec_lang['ip_q_lat']='ספיקה לשלוחה, Q<sub>lat</sub>';
 $ec_lang['ip_q_sys']='ספיקת גוש, Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='משך הפעלה (שעות)';
-// Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='חלחול תעלה';
 $ec_lang['cs_main_title']='מחשבון חינמי מקוון לאובדן חלחול בתעלה וליעילות הולכה';
 $ec_lang['cs_main_desc']='אובדן חלחול בתעלה & יעילות הולכה — שיטת ספיקת כניסה-יציאה';
@@ -410,7 +386,6 @@ $ec_lang['cs_notes_2_def']='תעלות עפר טיפוסיות ללא ריפוד
 $ec_lang['cs_notes_3_term']='החזר השקעת הריפוד';
 $ec_lang['cs_notes_3_def']='הזינו את ערך המים ואת עלות הריפוד בכל מטבע עקבי. שטח הריפוד = אורך המקטע × היקף רטוב — היקף הרטוב של חתך התעלה בעומק הזרימה הנמדד (רוחב התחתית בתוספת שני המדרונות הרטובים). הערך השנתי המוחזר מניח שהתעלה המרופדת משיגה את יעד E<sub>c</sub> ברציפות. ההחזר בפועל יהיה ארוך יותר בתעלות עונתיות או אם הריפוד אינו מגיע ליעד היעילות.';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, מהדורה 3 (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-// About
 $ec_lang['about_main_menu']='אודות';
 $ec_lang['install_main_menu']='התקן';
 $ec_lang['install_main_title']='התקן את EngCalcs';
@@ -442,7 +417,6 @@ $ec_lang['contactSpamPrefix']='חמש ועוד אחת שווה';
 $ec_lang['contactSpamPostfix']='(אנא כתוב במילים. 1=one 2=two 3=three 4=four 5=five 6=six 7=seven +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='שלח הודעה';
 $ec_lang['contact_success']='תודה שלקחת את הזמן לכתוב.';
-// Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='תכנון מגלשת סלעים (Robinson)';
 $ec_lang['rc_main_title']='מחשבון חינמי לתכנון מגלשת סלעים — Robinson (1998)';
 $ec_lang['rc_main_desc']='קביעת גודל שכבת הסלע במגלשת סלעים — Robinson, Rice & Kadavy (1998)';
@@ -501,12 +475,10 @@ $ec_lang['rc_notes_6_def']='גובה ראש שכבת הסלע במקטע המו�
 $ec_lang['rc_notes_7_def']='כאשר העומק הנורמלי בתעלת הכניסה קטן מגובה המים בכתר (H<sub>p</sub>) הנדרש להעברת q<sub>t</sub>, נוצרת זרימה מוגבלת או הצטברות מים במעלה כניסת המגלשה. זה בדרך כלל מקובל — הצטברות מים מפחיתה מהירות ומונעת סחיפה במעלה הזרם. לבדיקה: השתמשו במחשבון ספיקת שפך כדי למצוא את H<sub>p</sub> עבור q<sub>t</sub> ורוחב הכתר הנתונים, והשוו לעומק הנורמלי של תעלת הכניסה. אם H<sub>p</sub> עולה על העומק הנורמלי, תהיה הצטברות מים.';
 $ec_lang['rc_notes_4_term']='מקור';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS מפרסמת גם <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">גיליון Excel</a> המבוסס על אותה שיטה.';
-// Sketch labels
 $ec_lang['rc_sketch_filter']          = 'מסנן';
 $ec_lang['rc_sketch_top_crest_curve'] = 'עקומת הכתר העליון';
 $ec_lang['rc_sketch_outlet_apron']    = 'מצוע יציאה';
 $ec_lang['rc_sketch_radius']          = 'רדיוס';
-// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='לחץ השקיה';
 $ec_lang['ip_main_title']='מחשבון מקוון חינמי ללחץ השקיה & אחידות ההתפלגות';
 $ec_lang['ip_main_desc']='לחץ ענף בדיקה ואומדן אחידות';
@@ -559,7 +531,6 @@ $ec_lang['ip_notes_5_def']='קצב היישום וספיקת המערכת/הגו
 
 
 
-// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='רשת צנרת מסועפת';
 $ec_lang['bpn_main_title']='מחשבון חינמי מקוון ללחץ ברשת צנרת מסועפת (ללא לולאות)';
 $ec_lang['bpn_main_desc']='ספיקה ולחץ ברשת צנרת מסועפת (עצית)';
@@ -633,18 +604,8 @@ $ec_lang['lpn_field_text_rotation']='זווית (מעלות)';
 $ec_lang['lpn_field_text_match_pipe']='פנו לזווית הקישור הקרוב ביותר';
 $ec_lang['lpn_field_text_flip']='סובב 180°';
 $ec_lang['lpn_field_elev']='רום';
-// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
-// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
-// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
-// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='רום הקרקע או הצינור בצומת זה. מדדו מכל נקודת אפס שתרצו, כל עוד כל הצמתים משתמשים באותה נקודה.';
-// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
-// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
-// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='גובה';
-// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
-// outright that it is a height and not a pressure, which is the exact confusion the glossary's
-// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='מפלס פני המים במאגר, נמדד כגובה, לא כלחץ. השאירו ריק כדי להציב את פני המים ברום המאגר.';
 $ec_lang['lpn_close']='סגור';
 $ec_lang['lpn_empty_hint']='השתמשו בקובץ, פרויקט חדש כדי לפתוח דוגמה. או התחילו בהוספת מאגר, צומת וצינור מסרגל הכלים.';
@@ -682,10 +643,6 @@ $ec_lang['lpn_units_elevhead']='רום וגובה';
 $ec_lang['lpn_units_pressure']='לחץ';
 $ec_lang['lpn_units_flow']='ספיקה';
 $ec_lang['lpn_units_velocity']='מהירות';
-// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
-// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
-// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
-// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='שיפוע אובדן הגובה';
 $ec_lang['lpn_result_gradient_tip']='אובדן הגובה מחולק באורך הצינור. השתמשו בו כדי להשוות צינורות באורכים שונים מול מגבלת תכנון אחת.';
 $ec_lang['lpn_result_head']='גובה';
@@ -694,84 +651,39 @@ $ec_lang['lpn_result_pressure']='לחץ';
 $ec_lang['lpn_result_flow']='ספיקה';
 $ec_lang['lpn_result_velocity']='מהירות';
 $ec_lang['lpn_result_headloss']='אובדן גובה';
-// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
-// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
-// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
-// Settings live INSIDE each project document, so deleting every project deletes every setting too:
-// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
-// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
-// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='מאפס את ההגדרות של פרויקט זה בלבד. השרטוט שלכם והפרויקטים האחרים שלכם אינם משתנים. כדי לשמור את ההגדרות המועדפות עליכם לשימוש חוזר, שמרו קובץ פרויקט שמכיל רק הגדרות.';
 $ec_lang['lpn_reset_all_tip']='מוחק כל פרויקט, כל תמונת רקע, כל הגדרה, ואת בחירות היחידות שלכם, ואז טוען מחדש את העמוד בדיוק כפי שמבקר חדש רואה אותו. זהו האיפוס היחיד שמנקה הכול.';
-// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
-// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
-// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
-// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
-// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_confirm']='מחשבון זה שומר יחידות פרויקט ונתוני קלט כפי שהוזנו, אך בעבר הוא המיר מספרים ליחידות SI לצורך אחסון. פרויקט זה נשמר לפני השינוי, כך שהמספרים בו נשמרו ביחידות SI. להמיר אותם פעם אחרונה ליחידות הנוכחיות? כדי שתוכלו לשפוט, הנה כמה קטרים שיומרו, עם ערכיהם לפני ואחרי:';
 $ec_lang['lpn_v2_restore_yes']='המר';
 $ec_lang['lpn_v2_restore_never']='לא. אל תשאל שוב.';
 $ec_lang['lpn_v2_restore_no']='סגור כדי שאבדוק תחילה את היחידות הנוכחיות';
 $ec_lang['lpn_storage_too_new']='פרויקט זה נשמר בגרסה חדשה יותר של העמוד, ולכן לא ניתן לפתוח אותו כאן.';
-// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
-// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
-// something that is not in a file, so closing it asks first; a tab without one closes silently. A
-// browser project always wears one (it is in no file at all); a file project wears one only while it
-// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
-// our words for talking about the code, and the user sees only a name, an asterisk, and a file
-// extension.
-// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
-// conventional relationship and the reason the duplication between them is correct rather than
-// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
-// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
-// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='קובץ';
 $ec_lang['lpn_menu_edit']='עריכה';
 $ec_lang['lpn_menu_insert']='הוספה';
 $ec_lang['lpn_menu_view']='תצוגה';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='הגדרות';
 $ec_lang['lpn_menu_help']='עזרה';
 $ec_lang['lpn_help_walkthroughs']='מדריכים';
-// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
-// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
-// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
-// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
-// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='מחק רשת';
 $ec_lang['lpn_confirm_delete_network']='למחוק כל צומת, צינור ותווית טקסט בפרויקט זה? תמונת הרקע, שם הפרויקט וההגדרות שלכם יישמרו. לא ניתן לבטל פעולה זו.';
 $ec_lang['lpn_view_units']='יחידות';
-// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='שמור הכול';
-// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
-// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
-// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='פרויקט{n}';
 $ec_lang['lpn_project_copy_suffix']='(עותק)';
 $ec_lang['lpn_project_rename']='שנה שם';
-// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='פרויקט חדש…';
-// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
-// with the toolbar button of that name -- an example is a whole network, so it starts a project
-// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='פרויקט xy ריק, יחידות ארה"ב (gpm)';
 $ec_lang['lpn_new_blank_si']='פרויקט xy ריק, יחידות SI‏ (L/s)';
-// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
-// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='פתח…';
 $ec_lang['lpn_file_save']='שמור';
 $ec_lang['lpn_file_saveas']='שמור בשם…';
 $ec_lang['lpn_file_revert']='שחזר';
 $ec_lang['lpn_file_close']='סגור';
-// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
-// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='קבצים אחרונים';
 $ec_lang['lpn_recent_tip']='פתחו את {file} שוב מבלי לחפש אותו במחשב שלכם.';
 $ec_lang['lpn_recent_denied']='ההרשאה לפתוח קובץ זה לא ניתנה, ולכן הוא לא נפתח.';
 $ec_lang['lpn_recent_gone']='לא ניתן לפתוח את {file}. ייתכן שהוא הועבר, שונה שמו, או נמחק, ולכן הוא הוסר מרשימת הקבצים האחרונים.';
-// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
-// around it.
 $ec_lang['lpn_tab_new']='פרויקט חדש';
 $ec_lang['lpn_tab_all']='כל הפרויקטים';
 $ec_lang['lpn_tab_menu']='תפריט הפרויקט';
@@ -781,20 +693,10 @@ $ec_lang['lpn_tab_move_right']='הזז ימינה';
 $ec_lang['lpn_tab_unsaved']='לא נשמר לקובץ';
 $ec_lang['lpn_import_bad_file']='לא ניתן לקרוא קובץ זה כפרויקט שנשמר מעמוד זה.';
 $ec_lang['lpn_import_no_room']='אין מספיק מקום באחסון הדפדפן להוספת פרויקט זה. מחקו פרויקט שאינכם זקוקים לו יותר ונסו שוב.';
-// ---- EPANET .inp import (ROADMAP Task 196) ----
-// The import REPORTS every difference between the file and what this page can hold, so each
-// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
-// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
-// another sentence, and none may become one.
-// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
-// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='אישור';
 $ec_lang['lpn_file_import_inp']='ייבוא קובץ EPANET…';
 $ec_lang['lpn_file_import_inp_tip']='קוראים רשת מתוך קובץ EPANET, בין אם קובץ הטקסט ‎.inp ובין אם קובץ ה-‎.net ש-EPANET שומר, ושומרים אותה בדפדפן זה כפרויקט חדש. עמוד זה אינו יכול לכתוב קובץ EPANET בחזרה, לכן השתמשו בקובץ, שמור בשם כדי לשמור את עבודתכם.';
 $ec_lang['lpn_inp_bad_file']='לא ניתן לקרוא קובץ זה כקובץ רשת EPANET.';
-// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
-// the way out named here always works, so keep the instruction in the message rather than leaving
-// the reader to guess.
 $ec_lang['lpn_net_bad_file']='זהו כנראה קובץ EPANET‏ ‎.net, אך עמוד זה לא הצליח לקרוא אותו. פתחו אותו ב-EPANET והשתמשו שם בפקודה קובץ, ייצוא, רשת כדי לשמור אותו כקובץ ‎.inp, ואז ייבאו אותו.';
 $ec_lang['lpn_inp_report_heading']='יובא {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} צמתים, מאגרים ומכלים, {links} צינורות, משאבות ושסתומים, ב-{units}.';
@@ -818,44 +720,11 @@ $ec_lang['lpn_inp_drop_quality']='הגדרות איכות מים, תגובה כ�
 $ec_lang['lpn_inp_drop_backdrop']='קובץ זה קורא בשם תמונת רקע אך אינו מכיל את התמונה עצמה. הוסיפו אותה בעצמכם עם קובץ, תמונת רקע, הוסף תמונה.';
 $ec_lang['lpn_inp_drop_dangling']='צינורות אלה קוראים בשם צומת שאינו בקובץ, ולכן הם הושמטו.';
 $ec_lang['lpn_inp_drop_units']='יחידת הספיקה הנקובה בקובץ זה אינה מוכרת לעמוד זה, ולכן כל מספר נקרא כגלונים לדקה. בדקו כל מספר לפני שתשתמשו בתשובות.';
-// {name} is a project name; word order is the translator's to choose. Says where the user landed,
-// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
-// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='נפתח {name} מקובץ, ונוסף לדפדפן זה כפרויקט חדש.';
-// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
-// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
-// browser they test in. That is expected, not a bug.
-// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='קובץ פרויקט';
-// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot connect to a file, so every press really is another copy in the downloads folder.
-// The label says which of the two you are getting rather than leaving the duplicate looking like a
-// bug.
-// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
-// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
-// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
-// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
-// notice after the act -- at the moment the question arises -- rather than in a label forever.
-// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
-// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
-// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
-// anyway -- a disabled button fires no mouse events.
-// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
-// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
-// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
-// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
-// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='דפדפן זה אינו יכול להתחבר לקובץ, ולכן פתיחת קובץ כאן היא למעשה העלאה: הפרויקט מועתק לדפדפן זה, והדרך היחידה לשמור את עבודתכם בחזרה לקובץ היא לדרוס את הקובץ באמצעות קובץ, שמור בשם.';
-// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
-// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='שומר לקובץ המחובר.';
 $ec_lang['lpn_file_saveas_tip']='בחרו קובץ לשמירה. פרויקט זה יתחבר לאותו קובץ, ושמור יכתוב אליו מכאן ואילך.';
-// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
-// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
-// is no API for it, and the download attribute cannot override the setting -- but the user can turn
-// that setting on themselves, and then Save as really does let them overwrite the file they started
-// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
-// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='שומר באמצעות הגדרות ההורדה של הדפדפן שלכם. דפדפן זה אינו יכול להתחבר לקובץ, ולכן שמור מושבת וזמין רק שמור בשם. אם תפעילו את הגדרת הדפדפן "שאל היכן לשמור כל קובץ", תוכלו לבחור את הקובץ המקורי ולדרוס אותו.';
 $ec_lang['lpn_status_uploaded']='קובץ הפרויקט הועלה. לא ניתן לשמור חיבור אליו, ולכן הדרך היחידה לשמור בחזרה אליו היא באמצעות קובץ, שמור בשם.';
 $ec_lang['lpn_status_downloaded']='{file} הורד. דפדפן זה אינו יכול להתחבר לקובץ, ולכן פרויקט זה נשאר מסומן כלא נשמר לקובץ.';
@@ -864,45 +733,18 @@ $ec_lang['lpn_status_already_open']='קובץ זה כבר פתוח כאן בתו
 $ec_lang['lpn_status_already_open_dirty']='קובץ זה כבר פתוח כאן בתור {name}, עם שינויים שלא שמרתם בו. זה עבר אליו במקום לפתוח עותק שני. השתמשו בקובץ, שחזר אם אתם רוצים את הגרסה שבדיסק במקום זאת.';
 $ec_lang['lpn_status_saved']='{file} נשמר.';
 $ec_lang['lpn_status_reverted']='{file} נטען שוב מהדיסק.';
-// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
-// purpose: a program that writes your file behind your back takes away your right to walk away from
-// a session. So these three carry the whole close/discard/revert conversation.
-// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_confirm']='לשמור את השינויים שלכם ל-{name} לפני סגירתו?';
-// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
-// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_confirm']='{name} נשמר רק בדפדפן זה. אם תסגרו אותו בלי לשמור אותו לקובץ, הוא ילך לאיבוד לצמיתות.';
 $ec_lang['lpn_close_discard']='סגור בלי לשמור';
 $ec_lang['lpn_cancel']='בטל';
 $ec_lang['lpn_revert_confirm']='להשליך את השינויים שעשיתם ולטעון את {file} שוב מהדיסק?';
-// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
-// page load, so the link is gone even though we still know the name. Says what to do, not just what
-// happened.
 $ec_lang['lpn_file_needs_reopen']='פרויקט זה הגיע מ-{file}, אך החיבור לקובץ זה אבד. בחרו את הקובץ שוב כדי להתחבר אליו.';
-// Says what is still safe before it says what failed: the reassurance is the part a worried user
-// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='לא ניתן לכתוב לקובץ. ייתכן שהוא הועבר או שונה שמו, או שההרשאה בוטלה. עבודתכם עדיין שמורה בדפדפן זה.';
 $ec_lang['lpn_file_changed_elsewhere']='מישהו אחר שמר לקובץ זה מאז שפתחתם אותו, כך ששמירה כעת תדרוס את עבודתו. השתמשו בקובץ, שמור בשם כדי לשמור את השינויים שלכם בקובץ משלכם, או בקובץ, שחזר כדי להשליך את שלכם ולטעון את שלו.';
-// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
-// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
-// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-// Initials, and said to be public: whoever opens the same file sees this name, including outside the
-// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
-// rather than a name makes the safe answer the obvious one.
-// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
-// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='מה שעמיתיכם צריכים לראות כשהפרויקט הזה פתוח אצלכם? הראשי תיבות שלכם הם אידיאליים. כל מי שפותח את אותו קובץ יכול לראות זאת, לכן אל תשתמשו בשום דבר פרטי.';
-// The stand-in when someone locked a project before giving a name. Reads in place of {name}
-// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='מישהו אחר';
-// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
-// moment of opening, with both real answers on it -- the way every drawing and document program has
-// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} פתח קובץ זה.';
 $ec_lang['lpn_lock_open_readonly']='פתח לקריאה בלבד';
-// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
-// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
-// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='צור עותק';
 $ec_lang['lpn_lock_break']='שבור את הנעילה שלו';
 $ec_lang['lpn_lock_open_heading_times']='{name} פתח קובץ זה; העריכה האחרונה הייתה לפני {x}, {y} אחרי השמירה האחרונה.';
@@ -915,59 +757,26 @@ $ec_lang['lpn_ago_minutes']='{n} דקות';
 $ec_lang['lpn_ago_hours']='{n} שעות';
 $ec_lang['lpn_ago_days']='{n} ימים';
 $ec_lang['lpn_ago_unknown']='זמן לא ידוע';
-// Read-only means read-only: it never turns itself back into an editable file while you are looking
-// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
-// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
-// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='קריאה בלבד: {name} פתח קובץ זה. תוכלו לשנות כאן כל מה שתרצו, אך לא תוכלו לשמור. השתמשו בקובץ, שמור בשם כדי לשמור לקובץ אחר.';
-// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
-// stops a colleague editing the same file. Editing still works -- an unreachable server must never
-// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
-// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='שימו לב: לא ניתן היה להגיע לשרת כדי לבדוק או ליצור נעילה על פרויקט זה, כך ששום דבר אינו מונע מעמית לערוך את אותו קובץ באותו זמן. תקבלו הודעה אם הנעילה תתחיל לפעול שוב.';
 $ec_lang['lpn_lock_storage_error']='שימו לב: אתר זה אינו יכול לשמור רשומות נעילה, כך ששום דבר אינו מונע מעמית לערוך את אותו קובץ באותו זמן. זהו כשל בהגדרות השרת, לא משהו שתוכלו לתקן כאן — תיקיית הנעילה אינה ניתנת לכתיבה על ידי שרת האינטרנט.';
 $ec_lang['lpn_lock_full_error']='שימו לב: לאתר זה נגמר המקום לתעד מי פתח איזה פרויקט, כך ששום דבר אינו מונע מעמית לערוך את אותו קובץ באותו זמן. זהו כשל בהגדרות השרת, לא משהו שתוכלו לתקן כאן.';
 $ec_lang['lpn_lock_not_asked']='הנעילה אינה פועלת עבור פרויקט זה, כך ששום דבר אינו מונע מעמית לערוך את אותו קובץ באותו זמן. לדפדפן זה אין עדיין שם רשום עבורכם, או שלפרויקט אין מזהה — שמירת הפרויקט לקובץ קובעת את שניהם.';
 $ec_lang['lpn_lock_restored']='הנעילה חזרה לפעול, וקובץ זה כעת שלכם לשמירה אליו.';
 $ec_lang['lpn_lock_dismiss']='הסתר הודעה זו';
-// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
-// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
-// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='הפרויקט שלכם יישמר בקובץ במחשב זה. הוא נשמר כשאתם מבקשים, ובשום זמן אחר, כך ששום דבר לא נכתב לקובץ זה מאחורי גבכם.';
 $ec_lang['lpn_file_training_2']='כדי ששני אנשים לא יערכו קובץ אחד באותו זמן, אתר זה עוקב אחרי מי פתח אותו. אם מישהו כבר פתח אותו, תוכלו עדיין לפתוח ולהסתכל, או לשמור עותק משלכם.';
-// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
-// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
-// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
-// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
-// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='בפעם הראשונה שתשמרו, הדפדפן שלכם ישאל אם אתר זה רשאי לערוך את הקובץ. שאלה זו מגיעה מהדפדפן, לא מאיתנו, ולומר כן הוא מה שמאפשר לשמור לכתוב את עבודתכם בחזרה. היא נשאלת בדרך כלל רק פעם אחת לכל קובץ.';
-// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
-// false -- the name is never written into the project file. It is held in this browser and on this
-// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
-// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='תנו שם קצר שהעמיתים שלכם יכירו אתכם בו. הראשי תיבות שלכם הם אידיאליים. כל מי שפותח את אותו קובץ יכול לראות זאת, לכן אל תשתמשו בשום דבר פרטי.';
 $ec_lang['lpn_file_training_name']='הראשי תיבות שלכם';
 $ec_lang['lpn_file_training_continue']='המשך';
-// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
-// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='בחר את הקובץ שוב';
 $ec_lang['lpn_file_reconnect']='התחבר מחדש לקובץ זה';
 $ec_lang['lpn_file_reconnect_alert']='פרויקט זה הגיע מ-{file}. הדפדפן שלכם זקוק להרשאתכם שוב לפני שיוכל לכתוב אליו. התחברו מחדש למטה.';
-// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
-// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='זהו אותו קובץ שמישהו אחר פתח, ולכן לא ניתן לשמור מעליו. בחרו קובץ אחר או שם אחר.';
 $ec_lang['lpn_saveas_overwrites_project']='קובץ זה כבר מכיל פרויקט אחר, {name}. שמירה כאן תחליף אותו לחלוטין. להמשיך?';
 $ec_lang['lpn_saveas_overwrites_newer']='קובץ זה השתנה מאז שראיתם אותו לאחרונה, כך שכמעט בוודאות מישהו אחר שמר אליו. שמירה כאן תחליף את גרסתו בשלכם. להמשיך?';
-// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
-// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
-// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
-// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='שם לפרויקט זה';
-// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
-// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
-// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
-// separate Delete for it to be confused with.)
-// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='{closed} נסגר. כעת מוצג {opened}.';
 $ec_lang['lpn_status_closed_empty']='{closed} נסגר. הותחל פרויקט ריק חדש.';
 $ec_lang['lpn_storage_full']='לא נשמר. אחסון הדפדפן מלא או לא זמין, כך שהשינויים האחרונים שלכם יאבדו כשתסגרו כרטיסייה זו.';
@@ -977,12 +786,6 @@ $ec_lang['lpn_notes_2_term']='לא מדוגם';
 $ec_lang['lpn_notes_2_def']='איכות מים ודרישות המשתנות במהלך היום אינן מדוגמות. לגבי שסתומים: שסתום חנק פועל בכל אחד משני הפותרים, ואילו השסתומים הנפתחים ונסגרים מעצמם (PRV,‏ PSV,‏ FCV) נפתרים באמצעות פותר EPANET, שעמוד זה מפעיל בעצמו כאשר הרשת שלכם כוללת שסתום כזה.';
 $ec_lang['lpn_notes_3_term']='שמירת פרויקטים';
 $ec_lang['lpn_notes_3_def']='כל פרויקט הוא כרטיסייה, וכל כרטיסייה נשמרת בדפדפן זה תוך כדי עבודה. ניקוי נתוני הדפדפן שלכם מוחק את כולם, לכן שמרו את עבודתכם בקובץ: קובץ, שמור בשם. כוכבית על כרטיסייה משמעה שהיא מכילה שינויים שאינם בקובץ. שום דבר לעולם לא נכתב לקובץ אלא אם ביקשתם זאת. בדפדפנים מסוימים פרויקט מתחבר לקובץ שאליו שמרתם אותו, וקובץ, שמור כותב בחזרה לאותו קובץ מכאן ואילך; באחרים אין אפשרות חיבור, כך ששמור מושבת וזמין רק שמור בשם. כאשר קובץ פרויקט נשמר בכונן משותף, עמוד זה מודיע לכם אם עמית כבר פתח אותו, כדי ששני אנשים לא יכתבו זה מעל זה.';
-// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
-// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
-// to stay readable on a phone, while the Notes section is already this page's documentation home,
-// prints with the page, and is translated with everything else. The popup carries a one-line
-// pointer to here instead (lpn_pump_curve_note).
-// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='עקומת משאבה';
 $ec_lang['lpn_notes_5_def']='משאבה עוקבת אחר H = H₀ − aQ^b, כאשר H הוא הגובה שהמשאבה מוסיפה ו-Q הוא הספיקה דרכה. הזינו נקודה אחת, שתיים, או שלוש מעקומת היצרן. שלוש נקודות — הגובה בספיקה אפס, נקודת העבודה הרגילה, ונקודת הספיקה הגבוהה ביותר — קובעות ישירות את H₀‏, a ו-b, ועוקבות בצורה הקרובה ביותר אחר עקומה מפורסמת. שתי נקודות מתאימות פרבולה (b = 2) עם שיאה בספיקה אפס. נקודה אחת משתמשת בכלל נפוץ: הגובה בספיקה אפס הוא 1.33 × הגובה שהזנתם, והספיקה הגבוהה ביותר היא 2 × הספיקה שהזנתם, מה שנותן שוב b = 2. משאבה שלא הוזנו לה נקודות אינה מוסיפה גובה כלל. העקומה אינה נחתכת במקום שבו הגובה מגיע לאפס, כך שבקשה ממשאבה יותר ספיקה משהעקומה שלה יכולה לספק נותנת גובה שלילי. הפתרון הוא משאבה גדולה יותר או דרישה קטנה יותר, לא התאמת עקומה שונה.';
 $ec_lang['lpn_notes_4_term']='תוספות מתוכננות';
@@ -1001,24 +804,12 @@ $ec_lang['lpn_engine_ready_valve']='פותר EPANET נמצא כעת במכשיר
 $ec_lang['lpn_engine_unavailable']='לא ניתן היה להוריד את פותר EPANET, שהוא זה שפותר שסתומים הנפתחים ונסגרים מעצמם. התחברו לאינטרנט פעם אחת, והוא יישמר במכשיר זה מאותו רגע ואילך.';
 $ec_lang['lpn_diag_not_converged']='לא נמצא פתרון. בדקו ערכים בלתי אפשריים במציאות, כגון קוטר אפס.';
 $ec_lang['lpn_field_roughness']='חספוס';
-// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
-// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
-// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='מקדם Hazen-Williams C. מספר גבוה יותר משמעו צינור חלק יותר: כ-150 עבור פלסטיק חדש, 130 עבור פלדה או ברזל חדשים, ו-100 עבור צינור ישן.';
 $ec_lang['lpn_field_length']='אורך';
 $ec_lang['lpn_field_length_tip']='אורך הצינור. כאשר אוטומטי מופעל, האורך נמדד ממה שציירתם. כבו את אוטומטי כדי להקליד אורך השונה מהשרטוט.';
-// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
-// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
-// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='מקדם אובדן מקומי, k';
 $ec_lang['lpn_field_km_tip']='אובדן מהעיקולים, השסתומים והאביזרים בצינור זה, נספר כמכפלה של גובה המהירות. השתמשו ב-0 עבור צינור ישר פשוט.';
-// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
-// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
-// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
-// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='אובדן מקומי, k';
-// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
-// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='מקור העקומה';
 $ec_lang['lpn_pump_curve_own']='הזינו נקודות למטה';
 $ec_lang['lpn_pump_curve_ref_note']='משתמש בעקומה שהוזנה עבור משאבה {id}.';
@@ -1026,23 +817,13 @@ $ec_lang['lpn_pump_curve_note']='נקודה אחת, שתיים, או שלוש �
 $ec_lang['lpn_pump_point1']='נקודה 1';
 $ec_lang['lpn_pump_point2']='נקודה 2 (רשות)';
 $ec_lang['lpn_pump_point3']='נקודה 3 (רשות)';
-// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
-// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
-// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='מצב: בחירה. לחצו על אלמנט או תווית כדי לראות או לשנות אותם. גררו כדי להזיז צומת, נקודת עיקול, או תווית. לחיצה כפולה על צינור מוסיפה או מסירה נקודת עיקול.';
 $ec_lang['lpn_mode_delete']='מצב: מחיקה. לחצו על אלמנט כדי להסיר אותו.';
 $ec_lang['lpn_mode_add_junction']='מצב: הוספת צומת. לחצו על המפה כדי להציב צומת. עברו למצב בחירה כדי לשנות או להזיז אלמנטים ותוויות.';
 $ec_lang['lpn_mode_add_reservoir']='מצב: הוספת מאגר. לחצו על המפה כדי להציב מאגר. עברו למצב בחירה כדי לשנות או להזיז אלמנטים ותוויות.';
 $ec_lang['lpn_mode_add_pipe']='מצב: הוספת צינור. לחצו על צומת, ואז על צומת נוסף, כדי לחבר ביניהם. עברו למצב בחירה כדי לשנות או להזיז אלמנטים ותוויות.';
 $ec_lang['lpn_mode_add_pump']='מצב: הוספת משאבה. לחצו על צומת, ואז על צומת נוסף, כדי לחבר ביניהם. עברו למצב בחירה כדי לשנות או להזיז אלמנטים ותוויות.';
-// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
-// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='מצב: הוספת טקסט. לחצו על המפה כדי להציב תווית טקסט. לחצו ליד צומת כדי לצרף את הטקסט לאותו צומת. עברו למצב בחירה כדי לשנות או להזיז אלמנטים ותוויות.';
-// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
-// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
-// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
-// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
-// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='השתמשו במצב זה כדי לשנות, להזיז ולגרור דברים על המפה.';
 $ec_lang['lpn_tip_labels_draggable']='ניתן לגרור תווית כדי להזיז אותה. לחיצה כפולה על תווית מחזירה אותה למיקומה האוטומטי.';
 $ec_lang['lpn_field_auto']='אוטומטי';
@@ -1114,8 +895,6 @@ $ec_lang['lpn_push_none_displayed']='שום ערך התחלה אינו מוצג 
 $ec_lang['lpn_push_nothing']='לשום אלמנט קיים אין אף אחד מהמאפיינים המוחלים.';
 $ec_lang['lpn_push_no_change']='לכל אלמנט כבר יש ערכים אלה, ולכן שום דבר לא ישתנה.';
 $ec_lang['lpn_settings_emitter_exponent']='מעריך ממטיר';
-// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
-// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='חישוב';
 $ec_lang['lpn_settings_tolerance']='סף התכנסות';
 $ec_lang['lpn_settings_tolerance_tip']='עד כמה קרוב הפותר חייב להגיע לפני שהוא עוצר. מספר קטן יותר מדויק יותר ולוקח יותר זמן.';
@@ -1125,25 +904,16 @@ $ec_lang['lpn_engine_loading']='טוען את פותר EPANET…';
 $ec_lang['lpn_engine_failed']='לא ניתן היה לטעון את פותר EPANET. מציג את הפותר המובנה במקום.';
 $ec_lang['lpn_engine_manning_note']='הערה: עם חספוס Manning,‏ EPANET מחשב אובדן גובה נמוך בכ-0.6% מהפותר המובנה.';
 $ec_lang['lpn_settings_text_size']='גודל טקסט (פיקסלים)';
-// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
-// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
-// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='גודל סמל (פיקסלים)';
 $ec_lang['lpn_settings_link_width']='עובי קו הצינור (פיקסלים)';
 $ec_lang['lpn_settings_align_labels']='יישר תוויות צינורות עם הצינורות';
 $ec_lang['lpn_settings_readability_bias']='מעלות משמאל לאנך לפני שתווית מתהפכת';
 $ec_lang['lpn_settings_readability_bias_tip']='הפוך תווית כדי לשמור עליה זקופה כאשר היא נוטה יותר ממספר המעלות הזה משמאל לאנך.';
 $ec_lang['lpn_settings_mask_labels']='רקע אטום מאחורי תוויות';
-// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
-// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='אטימות סמל (0 עד 1)';
-// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
-// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='אטימות תמונת רקע (0 עד 1)';
 $ec_lang['lpn_settings_map_display']='מראה המפה';
 $ec_lang['lpn_settings_map_height_px']='גובה מפה (פיקסלים במסך)';
-// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
-// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='במסך קטן המפה מצוירת נמוכה יותר מגובה זה, כך שחלק זה של העמוד תמיד נשאר לגלילה.';
 $ec_lang['lpn_settings_legend_position']='מיקום המקרא';
 $ec_lang['lpn_settings_legend_top_left']='למעלה משמאל';

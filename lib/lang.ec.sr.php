@@ -56,9 +56,6 @@ $ec_lang['u_hp']='hp';
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
 
-// Page text
-// In page order for easiest maintenance.
-// Menu and General
 $ec_lang['menu_brand']='HawsEDC Калкулатори';
 $ec_lang['menu_main_list']='Листа калкулатора';
 $ec_lang['menu_main_hydraulics']='Хидраулика';
@@ -69,10 +66,6 @@ $ec_lang['template_welcome']='Оставите страхове за врати�
 $ec_lang['template_feedback']='Можете ли предложити бољу формулацију овог текста или нешто друго? Желите ли да помогнете или да научите да правите овакве алате? Јавите ми се.';
 $ec_lang['template_printable_title']='Наслов за штампу';
 $ec_lang['template_printable_subtitle']='Поднаслов за штампу';
-// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
-// prose, and they are translated into all 26 languages for one reason: consent that the visitor
-// cannot read is not consent. The long-form privacy notice and terms are a separate question --
-// English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_body']='Можемо ли да сачувамо по једну цифру за сваку страницу у складишту овог профила прегледача, како бисмо избегли да поновно бележимо њене посете?';
 $ec_lang['consent_accept']='Прихвати ово';
 $ec_lang['consent_accept_all']='Прихвати трајно';
@@ -104,7 +97,6 @@ $ec_lang['ec_name_tip']='Чува унете вредности у URL адре�
 $ec_lang['calc_copy_link']='Копирај линк';
 $ec_lang['ec_related_calcs']='Слични калкулатори:';
 $ec_lang['calc_copy_link_done']='Копирано!';
-// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Губитак напора у цевима по Darcy-Weisbachу';
 $ec_lang['dw_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Darcy-Weisbachу';
 $ec_lang['dw_main_desc']='Губитак напора у цевима по Darcy-Weisbachу при задатом пречнику, храпавости и протоку';
@@ -120,7 +112,6 @@ $ec_lang['dw_regime_transitional']='прелазно';
 $ec_lang['dw_regime_turbulent']='турбулентно';
 $ec_lang['dw_friction_factor_method']='Метод фактора трења';
 $ec_lang['dw_friction_factor']='Фактор трења, f';
-// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Губитак напора у цевима по Hazen-Williamsу';
 $ec_lang['hw_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Hazen-Williamsу';
 $ec_lang['hw_main_desc']='Губитак напора у цевима по Hazen-Williamsу при задатом пречнику, храпавости и протоку';
@@ -138,7 +129,6 @@ $ec_lang['hw_roughness']='Hazen-Williams коефицијент, C';
 $ec_lang['hw_note_1']='<dl><dt>Овај калкулатор не моделира профил цеви између два краја.</dt><dd>Користи само узводну и низводну коту које унесете. Ако терен негде између та два краја расте изнад било ког од њих, притисак у тој највишој тачки биће нижи од сваког овде приказаног притиска. Покрените калкулатор поново за дужину од узводног краја до те највише тачке да бисте је проверили.</dd><dd>Тамо где хидраулична линија напора (HGL) падне испод цеви, вода је под негативним притиском. Ваздух излази из раствора, танкозидна цев може да се сплошти, а загађена подземна вода може бити увучена кроз спојеве. Одржавајте позитиван притисак дуж целе линије и размотрите уградњу вентила за одзрачивање на свакој највишој тачки.</dd><dt>Узводни притисак је гранични услов који сами уносите.</dt><dd>Очитајте га са манометра, са нивоа воде у резервоару (висина воде изнад цеви) или са криве пумпе. Пумпа даје мањи притисак како проток расте, па користите тачку на кривој која одговара горе унетом протоку.</dd><dt>Сами саберите коефицијенте локалних (минорних) губитака.</dt><dd>Саберите K вредности за сваки вентил, колено, рачву, водомер и улаз на линији и унесите тај збир. Пратите везу уз то поље за типичне вредности. На дугом транспортном цевоводу ови губици су мали у поређењу са трењем, али у кратком цевоводу унутар станице могу представљати већи део укупног губитка.</dd></dl>';
 
 
-// Manning Irregular
 $ec_lang['mi_menu']='Манингов канал неправилног пресека';
 $ec_lang['mi_main_title']='Бесплатни онлајн калкулатор канала неправилног попречног пресека по Manningу';
 $ec_lang['mi_main_desc']='Калкулатор равномерног тецања по Manningу за канал неправилног попречног пресека';
@@ -166,7 +156,6 @@ $ec_lang['mi_notes_1_term']='Композитни n';
 $ec_lang['mi_notes_1_def']='Овај калкулатор прати HEC-RAS Референтни приручник у израчунавању композитног n регије помоћу Chow 1959, страна 136, једначина 6-17 (не 6-18).';
 $ec_lang['mi_notes_2_term']='Камена облога';
 $ec_lang['mi_notes_2_def']='Користите калкулатор трапезног канала по Manningу за пројектовање камене облоге. Овај калкулатор је примеренији за природне пресеке.';
-// Manning Pipe Flow
 $ec_lang['mpf_main_menu']='Проток у цевима по Manningу';
 $ec_lang['mpf_main_title']='Бесплатни онлајн калкулатор протока у цевима по Manningу';
 $ec_lang['mpf_main_desc']='Манингова формула равномерног течења у цевима при задатом нагибу и дубини';
@@ -195,7 +184,6 @@ $ec_lang['mpf_solver_enter_positive_q']='Унесите позитиван ци�
 $ec_lang['mpf_solver_no_solution']='Нема решења: Q премашује капацитет цеви при y/d0 = 93.8% (Qmax = {qmax} у изабраним јединицама).';
 $ec_lang['mpf_solve_btn']='Израчунај';
 $ec_lang['mpf_solve_for_flow']='за проток, Q =';
-// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Губитак напора у цевима по Manningу';
 $ec_lang['mphl_main_title']='Бесплатни онлајн калкулатор губитка напора у цевима по Manningу';
 $ec_lang['mphl_main_desc']='Манингова формула губитка напора при пуном протоку';
@@ -212,7 +200,6 @@ $ec_lang['mphl_egl_1']='Низводна EGL';
 $ec_lang['mphl_egl_2']='Узводна EGL';
 $ec_lang['mphl_hgl_egl_tip']='Можда није валидно ако је цев високо постављена. Погледајте напомене.';
 $ec_lang['mphl_note_1']='<dl><dt>Овај калкулатор не моделира профил цеви између два краја.</dt><dd>Ако HGL падне испод горње ивице цеви у било којој тачки, овај прорачун можда није валидан.</dd><dt>За услов отвореног улаза (пропуст), неопходно је проверити услове контроле улаза.</dt><dd>1. Узводна HGL не може бити нижа од узводне коте нормалног течења (нити нижа од цеви!).</dd><dd>2. Ниво воде на пропусту боље је представити узводном EGL него узводном HGL.</dd><dd>3. Погледајте <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">мој 2-минутни туторијал</a> за једноставна стандардна израчунавања нивоа воде на пропусту помоћу <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>, бесплатног програма за пропусте Управе за аутопутеве САД (U.S. Federal Highway Administration).</dd><dd>4. Ова страница решава само случај контроле излаза: цев која тече пуна, где ниво воде одређују низводни услови. Пројектовање пропуста подразумева одлуку да ли доминира контрола улаза или контрола излаза, па користите HY-8 кад год је могуће било које од то двоје.</dd></dl>';
-// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Манингов трапезни канал';
 $ec_lang['mtc_main_title']='Бесплатни онлајн калкулатор трапезног канала по Манинговој формули';
 $ec_lang['mtc_main_desc']='Манингова формула равномерног тецања у трапезном каналу при задатом паду и дубини';
@@ -247,7 +234,6 @@ $ec_lang['mtc_note_1']='<dl><dt>Аутоматска итерација прој
 $ec_lang['mtc_note_2_term']='Провера брзине';
 $ec_lang['mtc_note_2_def']='Висока брзина подразумева велику специфичну енергију услед расположивог пада. Та енергија може се брзо изгубити на ширењима, луковима или препрекама. Проверите да ли је то прихватљиво за дато место.';
 $ec_lang['mtc_solver_no_solution']='Није пронађено решење за дато Q са овим улазним подацима канала.';
-// Weir Flow Simple
 $ec_lang['ws_main_menu']='Проток преко простог прелива';
 $ec_lang['ws_main_title']='Бесплатни онлајн калкулатор протока преко простог ширококрунског прелива';
 $ec_lang['ws_main_desc']='Калкулатор протока преко простог ширококрунског прелива';
@@ -256,7 +242,6 @@ $ec_lang['ws_headWaterHeight']='<span class="ec-help" title="Енергија п
 $ec_lang['ws_weirCoefficient']='Коефицијент прелива, C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='Напомене';
 $ec_lang['ws_notes_we_term']='Једначина прелива';
-// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='Проток преко прелива неправилног облика круне';
 $ec_lang['wi_main_title']='Бесплатни онлајн калкулатор протока преко сегментираног прелива променљиве дубине и неправилног облика круне';
 $ec_lang['wi_main_desc']='Калкулатор протока преко прелива неправилног облика круне';
@@ -266,7 +251,6 @@ $ec_lang['wi_incrementalFlow']='Прираштајни проток';
 $ec_lang['wi_cumulativeFlow']='Кумулативни проток';
 $ec_lang['wi_save_and_calculate']='Сачувај и израчунај';
 $ec_lang['wi_notes_we_def']='q = ако (length = 0) онда 0 иначе ако (slope=0) онда cw*length*d<sub>0</sub><sup>1.5</sup> иначе cw/(2.5*slope) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>) где су d<sub>1</sub> и d<sub>0</sub> увек позитивни или нула';
-// Orifice Flow
 $ec_lang['or_main_menu']='Проток кроз отвор';
 $ec_lang['or_main_title']='Бесплатни онлајн калкулатор протока кроз отвор';
 $ec_lang['or_main_desc']='Проток кроз отвор — слободан или потопљен';
@@ -298,7 +282,6 @@ $ec_lang['or_notes_3_term']='Коефицијент протока';
 $ec_lang['or_notes_3_def']='C<sub>d</sub> се креће од приближно 0,60 до 0,65 за оштроивичне отворе. Заобљени или увучени улази имају друге вредности. Погледајте <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> или HEC-RAS Хидраулички приручник за смернице.';
 $ec_lang['or_notes_4_term']='Потопљеност';
 $ec_lang['or_notes_4_def']='Када је TWE изнад дна отвора, калкулатор аутоматски примењује једначину потопљеног отвора са h = HWE − TWE. Када је TWE на нивоу дна или испод њега, претпоставља се слободно истицање и h = HWE − тежиште.';
-// Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Мала хидроелектрана';
 $ec_lang['mhp_main_title']='Бесплатни онлајн калкулатор за малу хидроелектрану';
 $ec_lang['mhp_main_desc']='Калкулатор излазне снаге мале хидроелектране проточног типа';
@@ -331,7 +314,6 @@ $ec_lang['mhp_notes_6_def']='Типична ефикасност построј�
 $ec_lang['mhp_notes_7_term']='Годишња енергија';
 $ec_lang['mhp_notes_7_def']='Годишња енергија претпоставља непрекидан рад при пуном протоку (8760 сати/годишње). Стварна производња биће нижа услед сезонских варијација протока, застоја ради одржавања и фактора оптерећења.';
 
-// Orifice Drain Time
 $ec_lang['odt_main_menu']='Време пражњења базена и резервоара';
 $ec_lang['odt_main_title']='Бесплатни онлајн калкулатор времена пражњења базена, акумулације и резервоара (кроз отвор)';
 $ec_lang['odt_main_desc']='Време пражњења базена, акумулације или резервоара — излаз кроз отвор, метод конусне запремине';
@@ -359,10 +341,7 @@ $ec_lang['odt_q_max']='Максимални проток, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Испражњена запремина';
 $ec_lang['odt_sketch_start']='Почетак';
 $ec_lang['odt_sketch_end']='Крај';
-// Contact us.
 
-// Irrigation
-// Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Растојање емитера, S<sub>e</sub>';
 $ec_lang['ip_sl']='Растојање латерала, S<sub>l</sub>';
 $ec_lang['ip_n_e']='Емитери по латерали, n<sub>e</sub>';
@@ -373,7 +352,6 @@ $ec_lang['ip_pr']='Интензитет наводњавања, PR';
 $ec_lang['ip_q_lat']='Проток по латерали, Q<sub>lat</sub>';
 $ec_lang['ip_q_sys']='Проток зоне, Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='Време наводњавања (сати)';
-// Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Процеђивање из канала';
 $ec_lang['cs_main_title']='Бесплатни онлајн калкулатор губитака процеђивањем из канала и ефикасности транспорта воде';
 $ec_lang['cs_main_desc']='Губитак процеђивањем из канала и ефикасност транспорта воде — метода притицаја и отицаја';
@@ -408,7 +386,6 @@ $ec_lang['cs_notes_2_def']='Типични необложени земљани �
 $ec_lang['cs_notes_3_term']='Поврат улагања у облагање';
 $ec_lang['cs_notes_3_def']='Унесите вредност воде и трошак облагања у било којој доследно коришћеној валути. Површина облоге = дужина деонице × оквашени обим — оквашени обим попречног пресека канала на измереној дубини протока (ширина дна плус оба оквашена нагиба). Годишња опорављена вредност претпоставља да обложени канал непрекидно достиже циљну E<sub>c</sub>. Стварни период поврата биће дужи за сезонске канале или ако облагање не достигне циљну ефикасност.';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3. изд. (2001). FAO Irrigation and Drainage Paper 57 (1999).';
-// About
 $ec_lang['about_main_menu']='О нама';
 $ec_lang['install_main_menu']='Инсталирај';
 $ec_lang['install_main_title']='Инсталирај EngCalcs';
@@ -440,7 +417,6 @@ $ec_lang['contactSpamPrefix']='Пет плус један је';
 $ec_lang['contactSpamPostfix']='(Молимо вас напишите речима. 1=jedan 2=dva 3=tri 4=četiri 5=pet 6=šest 7=sedam +=plus 5+1=6)';
 $ec_lang['contactSubmitButton']='Пошаљи поруку';
 $ec_lang['contact_success']='Хвала вам што сте одвојили време да напишете.';
-// Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='Пројектовање Каменог Брзотока (Robinson)';
 $ec_lang['rc_main_title']='Бесплатни Онлајн Калкулатор за Пројектовање Каменог Брзотока — Robinson (1998)';
 $ec_lang['rc_main_desc']='Димензионисање Каменог Поплочавања за Брзоток — Robinson, Rice & Kadavy (1998)';
@@ -499,12 +475,10 @@ $ec_lang['rc_notes_6_def']='Кота врха поплочавања у изла
 $ec_lang['rc_notes_7_def']='Када је нормална дубина у улазном каналу мања од преливне висине (H<sub>p</sub>) потребне за пропуштање q<sub>t</sub>, узводно од улаза у брзоток долази до стешњавања тока или успора. То је генерално прихватљиво — успор смањује брзину и спречава ерозију узводно. Ради провере: користите калкулатор прелива да пронађете H<sub>p</sub> за дате q<sub>t</sub> и ширину гребена, па упоредите са нормалном дубином улазног канала. Ако H<sub>p</sub> премашује нормалну дубину, доћи ће до успора.';
 $ec_lang['rc_notes_4_term']='Извор';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS такође објављује <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel табелу</a> засновану на истој методи.';
-// Sketch labels
 $ec_lang['rc_sketch_filter']          = 'Филтер';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Крива гребена';
 $ec_lang['rc_sketch_outlet_apron']    = 'Излазна плоча';
 $ec_lang['rc_sketch_radius']          = 'полупречник';
-// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Притисак наводњавања';
 $ec_lang['ip_main_title']='Бесплатни онлајн калкулатор притиска и уједначености дистрибуције наводњавања';
 $ec_lang['ip_main_desc']='Притисак тестне гране и процена уједначености';
@@ -557,7 +531,6 @@ $ec_lang['ip_notes_5_def']='Интензитет наводњавања и пр�
 
 
 
-// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Разграната цевна мрежа';
 $ec_lang['bpn_main_title']='Бесплатни онлајн калкулатор притиска у разгранатој цевној мрежи (без петљи)';
 $ec_lang['bpn_main_desc']='Проток и притисак у разгранатој (стаблоликој) цевној мрежи';
@@ -633,18 +606,8 @@ $ec_lang['lpn_field_text_rotation']='Угао (степени)';
 $ec_lang['lpn_field_text_match_pipe']='Окрени под угао најближе везе';
 $ec_lang['lpn_field_text_flip']='Заокрени за 180°';
 $ec_lang['lpn_field_elev']='Кота';
-// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
-// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
-// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
-// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='Кота терена или цеви у овом чвору. Мерите је од произвољне нулте тачке, све док сви чворови користе исту.';
-// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
-// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
-// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='Напор';
-// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
-// outright that it is a height and not a pressure, which is the exact confusion the glossary's
-// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Ниво водене површине у резервоару, изражен као висина, а не као притисак. Оставите празно да водена површина буде на коти резервоара.';
 $ec_lang['lpn_tank_elev_tip']='Кота дна тенка. Дубине воде у тенку се мере навише од овде.';
 $ec_lang['lpn_field_tank_level']='Дубина воде';
@@ -692,10 +655,6 @@ $ec_lang['lpn_units_elevhead']='Кота и напор';
 $ec_lang['lpn_units_pressure']='Притисак';
 $ec_lang['lpn_units_flow']='Проток';
 $ec_lang['lpn_units_velocity']='Брзина';
-// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
-// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
-// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
-// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='Градијент губитка напора';
 $ec_lang['lpn_result_gradient_tip']='Губитак напора подељен дужином цеви. Користите га за поређење цеви различитих дужина у односу на једно пројектно ограничење.';
 $ec_lang['lpn_result_head']='Напор';
@@ -704,84 +663,39 @@ $ec_lang['lpn_result_pressure']='Притисак';
 $ec_lang['lpn_result_flow']='Проток';
 $ec_lang['lpn_result_velocity']='Брзина';
 $ec_lang['lpn_result_headloss']='Губитак напора';
-// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
-// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
-// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
-// Settings live INSIDE each project document, so deleting every project deletes every setting too:
-// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
-// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
-// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='Ресетује само подешавања овог пројекта. Ваш цртеж и ваши други пројекти се не мењају. Да бисте сачували омиљена подешавања за поновну употребу, сачувајте пројектну датотеку која садржи само подешавања.';
 $ec_lang['lpn_reset_all_tip']='Брише сваки пројекат, сваку позадинску слику, свако подешавање и ваш избор јединица, а затим поново учитава страницу тачно онако како је види посетилац који долази по први пут. Ово је једино ресетовање које брише баш све.';
-// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
-// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
-// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
-// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
-// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_confirm']='Овај калкулатор чува пројектне јединице и уносе онако како су унети, али је раније претварао бројеве у SI јединице ради чувања. Овај пројекат је сачуван пре те измене, па су његови бројеви сачувани у SI јединицама. Претворити их последњи пут у тренутне јединице? Да бисте могли да проценити, ево неколико пречника који би били претворени, са вредностима пре и после:';
 $ec_lang['lpn_v2_restore_yes']='Претвори';
 $ec_lang['lpn_v2_restore_never']='Не. Не питај ме више.';
 $ec_lang['lpn_v2_restore_no']='Затвори да бих прво проверио тренутне јединице';
 $ec_lang['lpn_storage_too_new']='Овај пројекат је сачуван новијом верзијом странице, па се овде не може отворити.';
-// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
-// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
-// something that is not in a file, so closing it asks first; a tab without one closes silently. A
-// browser project always wears one (it is in no file at all); a file project wears one only while it
-// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
-// our words for talking about the code, and the user sees only a name, an asterisk, and a file
-// extension.
-// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
-// conventional relationship and the reason the duplication between them is correct rather than
-// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
-// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
-// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='Датотека';
 $ec_lang['lpn_menu_edit']='Уреди';
 $ec_lang['lpn_menu_insert']='Уметни';
 $ec_lang['lpn_menu_view']='Приказ';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Подешавања';
 $ec_lang['lpn_menu_help']='Помоћ';
 $ec_lang['lpn_help_walkthroughs']='Водичи';
-// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
-// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
-// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
-// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
-// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Обриши мрежу';
 $ec_lang['lpn_confirm_delete_network']='Обрисати сваки чвор, цев и текстуалну ознаку у овом пројекту? Позадинска слика, назив пројекта и ваша подешавања се задржавају. Ово се не може поништити.';
 $ec_lang['lpn_view_units']='Јединице';
-// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Сачувај све';
-// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
-// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
-// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='Пројекат{n}';
 $ec_lang['lpn_project_copy_suffix']='(копија)';
 $ec_lang['lpn_project_rename']='Преименуј';
-// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='Нови пројекат…';
-// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
-// with the toolbar button of that name -- an example is a whole network, so it starts a project
-// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Празан xy пројекат, амерички јединице (gpm)';
 $ec_lang['lpn_new_blank_si']='Празан xy пројекат, SI јединице (l/s)';
-// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
-// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Отвори…';
 $ec_lang['lpn_file_save']='Сачувај';
 $ec_lang['lpn_file_saveas']='Сачувај као…';
 $ec_lang['lpn_file_revert']='Врати';
 $ec_lang['lpn_file_close']='Затвори';
-// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
-// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Недавне датотеке';
 $ec_lang['lpn_recent_tip']='Поново отворите {file} без потребе да је тражите на рачунару.';
 $ec_lang['lpn_recent_denied']='Дозвола за отварање те датотеке није дата, па није отворена.';
 $ec_lang['lpn_recent_gone']='Датотека {file} није могла да се отвори. Можда је премештена, преименована или обрисана, па је уклоњена са списка недавних.';
-// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
-// around it.
 $ec_lang['lpn_tab_new']='Нови пројекат';
 $ec_lang['lpn_tab_all']='Сви пројекти';
 $ec_lang['lpn_tab_menu']='Мени пројекта';
@@ -791,20 +705,10 @@ $ec_lang['lpn_tab_move_right']='Помери удесно';
 $ec_lang['lpn_tab_unsaved']='Није сачувано у датотеку';
 $ec_lang['lpn_import_bad_file']='Та датотека није могла да се учита као пројекат сачуван са ове странице.';
 $ec_lang['lpn_import_no_room']='Нема довољно слободног простора у складишту прегледача за додавање овог пројекта. Обришите пројекат који вам више није потребан и покушајте поново.';
-// ---- EPANET .inp import (ROADMAP Task 196) ----
-// The import REPORTS every difference between the file and what this page can hold, so each
-// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
-// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
-// another sentence, and none may become one.
-// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
-// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='У реду';
 $ec_lang['lpn_file_import_inp']='Увези EPANET датотеку…';
 $ec_lang['lpn_file_import_inp_tip']='Учитајте мрежу из EPANET датотеке, било .inp текстуалне датотеке или .net датотеке коју EPANET чува, и сачувајте је у овом прегледачу као нови пројекат. Ова страница не може да запише EPANET датотеку назад, па користите Датотека, Сачувај као да сачувате свој рад.';
 $ec_lang['lpn_inp_bad_file']='Та датотека није могла да се учита као EPANET мрежна датотека.';
-// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
-// the way out named here always works, so keep the instruction in the message rather than leaving
-// the reader to guess.
 $ec_lang['lpn_net_bad_file']='Ово изгледа као EPANET .net датотека, али ова страница није успела да је учита. Отворите је у EPANET-у и користите тамошњу команду Датотека, Извоз, Мрежа да је сачувате као .inp датотеку, па увезите њу.';
 $ec_lang['lpn_inp_report_heading']='Увезено {file}';
 $ec_lang['lpn_inp_report_counts']='{nodes} чворова, резервоара и тенкова, {links} цеви, пумпи и вентила, у јединицама {units}.';
@@ -830,44 +734,11 @@ $ec_lang['lpn_inp_drop_quality']='Квалитет воде, хемијска р
 $ec_lang['lpn_inp_drop_backdrop']='Ова датотека наводи назив позадинске слике, али не садржи саму слику. Додајте је сами преко Датотека, Позадинска слика, Додај слику.';
 $ec_lang['lpn_inp_drop_dangling']='Ове цеви наводе чвор којег нема у датотеци, па су изостављене.';
 $ec_lang['lpn_inp_drop_units']='Јединица протока наведена у овој датотеци није позната овој страници, па је сваки број прочитан као галони у минути. Проверите сваки број пре него што користите резултате.';
-// {name} is a project name; word order is the translator's to choose. Says where the user landed,
-// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
-// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='Отворено {name} из датотеке, и додато у овај прегледач као нови пројекат.';
-// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
-// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
-// browser they test in. That is expected, not a bug.
-// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='Пројектна датотека';
-// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot connect to a file, so every press really is another copy in the downloads folder.
-// The label says which of the two you are getting rather than leaving the duplicate looking like a
-// bug.
-// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
-// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
-// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
-// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
-// notice after the act -- at the moment the question arises -- rather than in a label forever.
-// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
-// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
-// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
-// anyway -- a disabled button fires no mouse events.
-// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
-// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
-// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
-// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
-// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='Овај прегледач не може да се повеже са датотеком, па је отварање датотеке овде заправо отпремање: пројекат се копира у овај прегледач, а једини начин да сачувате свој рад назад у датотеку јесте да је препишете преко Датотека, Сачувај као.';
-// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
-// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='Чува у повезану датотеку.';
 $ec_lang['lpn_file_saveas_tip']='Изаберите датотеку у коју ћете сачувати. Овај пројекат се повезује са том датотеком, и Сачувај од тада уписује у њу.';
-// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
-// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
-// is no API for it, and the download attribute cannot override the setting -- but the user can turn
-// that setting on themselves, and then Save as really does let them overwrite the file they started
-// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
-// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='Чува путем подешавања преузимања (Download) вашег прегледача. Овај прегледач не може да се повеже са датотеком, па је Сачувај онемогућено и доступно је само Сачувај као. Ако укључите подешавање прегледача „Питај где да сачувам сваку датотеку”, можете да изаберете оригиналну датотеку и препишете је.';
 $ec_lang['lpn_status_uploaded']='Пројектна датотека је отпремљена. Веза са њом се не може одржати, па је једини начин да сачувате назад у њу коришћење Датотека, Сачувај као.';
 $ec_lang['lpn_status_downloaded']='Преузето {file}. Овај прегледач не може да се повеже са датотеком, па овај пројекат остаје означен као несачуван у датотеку.';
@@ -876,45 +747,18 @@ $ec_lang['lpn_status_already_open']='Та датотека је овде већ 
 $ec_lang['lpn_status_already_open_dirty']='Та датотека је овде већ отворена као {name}, са изменама које нисте сачували у њу. Приказ је пребачен на њу уместо отварања друге копије. Користите Датотека, Врати ако желите верзију са диска уместо тога.';
 $ec_lang['lpn_status_saved']='Сачувано {file}.';
 $ec_lang['lpn_status_reverted']='Поново учитано {file} са диска.';
-// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
-// purpose: a program that writes your file behind your back takes away your right to walk away from
-// a session. So these three carry the whole close/discard/revert conversation.
-// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_confirm']='Сачувати ваше измене у {name} пре затварања?';
-// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
-// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_confirm']='{name} се чува само у овом прегледачу. Ако га затворите без чувања у датотеку, трајно је изгубљен.';
 $ec_lang['lpn_close_discard']='Затвори без чувања';
 $ec_lang['lpn_cancel']='Откажи';
 $ec_lang['lpn_revert_confirm']='Одбацити измене које сте направили и поново учитати {file} са диска?';
-// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
-// page load, so the link is gone even though we still know the name. Says what to do, not just what
-// happened.
 $ec_lang['lpn_file_needs_reopen']='Овај пројекат потиче из {file}, али је веза са том датотеком изгубљена. Изаберите датотеку поново да бисте се повезали са њом.';
-// Says what is still safe before it says what failed: the reassurance is the part a worried user
-// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Није успело уписивање у датотеку. Можда је премештена или преименована, или је дозвола повучена. Ваш рад је и даље сачуван у овом прегледачу.';
 $ec_lang['lpn_file_changed_elsewhere']='Неко други је сачувао у ову датотеку откако сте је отворили, па би чување сада преписало његов рад. Користите Датотека, Сачувај као да сачувате своје измене у сопственој датотеци, или Датотека, Врати да одбаците своје и учитате њихове.';
-// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
-// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
-// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-// Initials, and said to be public: whoever opens the same file sees this name, including outside the
-// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
-// rather than a name makes the safe answer the obvious one.
-// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
-// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='Шта треба да виде колеге када имате овај пројекат отворен? Ваши иницијали су идеални. Свако ко отвори исту датотеку то може да види, зато не користите ништа приватно.';
-// The stand-in when someone locked a project before giving a name. Reads in place of {name}
-// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Неко други';
-// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
-// moment of opening, with both real answers on it -- the way every drawing and document program has
-// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} има ову датотеку отворену.';
 $ec_lang['lpn_lock_open_readonly']='Отвори само за читање';
-// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
-// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
-// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Направи копију';
 $ec_lang['lpn_lock_break']='Прекини њихово закључавање';
 $ec_lang['lpn_lock_open_heading_times']='{name} има ову датотеку отворену; последња измена је била пре {x}, {y} после последњег чувања.';
@@ -927,59 +771,26 @@ $ec_lang['lpn_ago_minutes']='{n} минута';
 $ec_lang['lpn_ago_hours']='{n} сати';
 $ec_lang['lpn_ago_days']='{n} дана';
 $ec_lang['lpn_ago_unknown']='непознато време';
-// Read-only means read-only: it never turns itself back into an editable file while you are looking
-// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
-// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
-// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='Само за читање: {name} има ову датотеку отворену. Овде можете да мењате шта год желите, али не можете да сачувате. Користите Датотека, Сачувај као да сачувате у другу датотеку.';
-// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
-// stops a colleague editing the same file. Editing still works -- an unreachable server must never
-// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
-// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='Пажња: није успело повезивање са сервером ради провере или креирања закључавања на овом пројекту, па ништа не спречава колегу да истовремено уређује исту датотеку. Бићете обавештени када закључавање поново проради.';
 $ec_lang['lpn_lock_storage_error']='Пажња: ова страница не може да сачува записе закључавања, па ништа не спречава колегу да истовремено уређује исту датотеку. Ово је грешка у подешавању на серверу, коју овде не можете исправити — фасцикла закључавања није уписива за веб сервер.';
 $ec_lang['lpn_lock_full_error']='Пажња: овој страници је понестало простора за бележење ко има који пројекат отворен, па ништа не спречава колегу да истовремено уређује исту датотеку. Ово је грешка у подешавању на серверу, коју овде не можете исправити.';
 $ec_lang['lpn_lock_not_asked']='Закључавање не ради за овај пројекат, па ништа не спречава колегу да истовремено уређује исту датотеку. Овај прегледач за вас још нема сачувано име, или пројекат нема идентификатор — чување пројекта у датотеку поставља обоје.';
 $ec_lang['lpn_lock_restored']='Закључавање поново ради, и ова датотека сада је ваша за чување.';
 $ec_lang['lpn_lock_dismiss']='Сакриј ову поруку';
-// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
-// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
-// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='Ваш пројекат ће бити сачуван у датотеци на овом рачунару. Чува се када затражите, и ни у једном другом тренутку, тако да се ништа не уписује у ту датотеку без вашег знања.';
 $ec_lang['lpn_file_training_2']='Да две особе никада не би истовремено уређивале једну датотеку, ова страница прати ко је има отворену. Ако је неко други већ има, и даље можете да је отворите и погледате, или да задржите сопствену копију.';
-// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
-// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
-// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
-// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
-// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='Приликом првог чувања, ваш прегледач ће питати да ли ова страница сме да уређује датотеку. То питање долази од прегледача, а не од нас, и одговарање са да је оно што омогућава да Сачувај упише ваш рад назад. Обично се пита само једном по датотеци.';
-// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
-// false -- the name is never written into the project file. It is held in this browser and on this
-// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
-// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='Дајте кратко име по коме ће вас колеге препознати. Ваши иницијали су идеални. Свако ко отвори исту датотеку то може да види, зато не користите ништа приватно.';
 $ec_lang['lpn_file_training_name']='Ваши иницијали';
 $ec_lang['lpn_file_training_continue']='Настави';
-// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
-// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Изаберите датотеку поново';
 $ec_lang['lpn_file_reconnect']='Поново се повежи са овом датотеком';
 $ec_lang['lpn_file_reconnect_alert']='Овај пројекат потиче из {file}. Вашем прегледачу је поново потребна ваша дозвола пре него што може да пише у њу. Поново се повежите испод.';
-// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
-// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='То је иста датотека коју неко други има отворену, па се не може преписати. Изаберите другу датотеку или друго име.';
 $ec_lang['lpn_saveas_overwrites_project']='Та датотека већ садржи други пројекат, {name}. Чување овде га потпуно замењује. Наставити?';
 $ec_lang['lpn_saveas_overwrites_newer']='Та датотека се променила откако сте је последњи пут видели, па је скоро сигурно да је неко други сачувао у њу. Чување овде замењује њихову верзију вашом. Наставити?';
-// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
-// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
-// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
-// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='Назив за овај пројекат';
-// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
-// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
-// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
-// separate Delete for it to be confused with.)
-// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='Затворено {closed}. Сада приказано {opened}.';
 $ec_lang['lpn_status_closed_empty']='Затворено {closed}. Покренут нови празан пројекат.';
 $ec_lang['lpn_storage_full']='Није сачувано. Складиште прегледача је пуно или недоступно, па ће ваше недавне измене бити изгубљене када затворите ову картицу.';
@@ -989,12 +800,6 @@ $ec_lang['lpn_notes_2_term']='Није моделовано';
 $ec_lang['lpn_notes_2_def']='Квалитет воде и потрошње које се мењају током дана нису моделовани. Вентили: пригушни вентил ради у оба решавача, а вентили који се сами отварају и затварају (PRV, PSV, FCV) се решавају помоћу EPANET решавача, који ова страница сама укључује када ваша мрежа садржи такав вентил.';
 $ec_lang['lpn_notes_3_term']='Чување пројеката';
 $ec_lang['lpn_notes_3_def']='Сваки пројекат је картица, и свака картица се чува у овом прегледачу током рада. Брисање података прегледача брише их све, зато чувајте свој рад у датотеци: Датотека, Сачувај као. Звездица на картици значи да она садржи измене које нису у датотеци. Ништа се никада не уписује у датотеку осим ако не затражите. У неким прегледачима пројекат се повезује са датотеком у коју га сачувате, и Датотека, Сачувај од тада уписује назад у ту исту датотеку; у другима веза није могућа, па је Сачувај онемогућено и доступно је само Сачувај као. Када се пројектна датотека чува на дељеном диску, ова страница вам говори ако је колега већ има отворену, како двоје људи не би преписивали једно преко другог.';
-// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
-// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
-// to stay readable on a phone, while the Notes section is already this page's documentation home,
-// prints with the page, and is translated with everything else. The popup carries a one-line
-// pointer to here instead (lpn_pump_curve_note).
-// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Крива пумпе';
 $ec_lang['lpn_notes_5_def']='Пумпа прати H = H₀ − aQ^b, где је H напор који пумпа додаје, а Q проток кроз њу. Унесите једну, две или три тачке са произвођачеве криве. Три тачке — напор при нултом протоку, нормална радна тачка и тачка највећег протока — директно одређују H₀, a и b, и најближе прате објављену криву. Две тачке дају параболу (b = 2) са врхом при нултом протоку. Једна тачка користи уобичајено правило: напор при нултом протоку је 1,33 × напор који унесете, а највећи проток је 2 × проток који унесете, што опет даје b = 2. Пумпа без унетих тачака не додаје никакав напор. Крива се не прекида тамо где напор достигне нулу, па тражење од пумпе више протока него што њена крива може да испоручи даје негативан напор. Решење је већа пумпа или мања потрошња, а не другачије уклапање криве.';
 $ec_lang['lpn_notes_4_term']='Планирана проширења';
@@ -1015,9 +820,6 @@ $ec_lang['lpn_diag_valve_needs_epanet']='Ови вентили се сами о�
 $ec_lang['lpn_diag_valve_on_fixed_head']='Ови вентили су директно повезани на резервоар или тенк, који већ одређује ниво воде тамо, па вентилу не остаје ништа да регулише. Поставите кратку цев између вентила и резервоара или тенка:';
 $ec_lang['lpn_diag_not_converged']='Решење није пронађено. Проверите да ли постоје вредности које су у стварности немогуће, попут пречника нула.';
 $ec_lang['lpn_field_roughness']='Храпавост';
-// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
-// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
-// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. Већи број значи глађу цев: око 150 за нову пластику, 130 за нови челик или гвожђе, и 100 за стару цев.';
 $ec_lang['lpn_field_length']='Дужина';
 $ec_lang['lpn_field_length_tip']='Дужина цеви. Када је Аутоматски укључено, дужина се мери према ономе што сте нацртали. Искључите Аутоматски да бисте уписали дужину која се разликује од цртежа.';
@@ -1035,18 +837,9 @@ $ec_lang['lpn_field_valve_setting_loss']='Коефицијент губитка'
 $ec_lang['lpn_field_valve_setting_loss_tip']='Колико напора пригушни вентил одузима, изражено као умножак брзинског напора. Користите 0 за вентил који стоји потпуно отворен. Овај један број представља цео губитак пригушног вентила.';
 $ec_lang['lpn_field_valve_diameter_tip']='Ширина отвора кроз вентил. Брзина воде кроз вентил се рачуна из ове ширине, а губитак произлази из те брзине.';
 $ec_lang['lpn_field_valve_km_tip']='Губитак услед тела вентила док вентил стоји потпуно отворен, поред онога што одузима подешавање вентила. Изражава се као умножак брзинског напора. Користите 0 да га занемарите.';
-// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
-// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
-// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='Коефицијент мањег (локалног) губитка, k';
 $ec_lang['lpn_field_km_tip']='Губитак услед кривина, вентила и фитинга на овој цеви, изражен као умножак брзинског напора. Користите 0 за обичну праву цев.';
-// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
-// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
-// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
-// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='Локални губитак, k';
-// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
-// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Извор криве';
 $ec_lang['lpn_pump_curve_own']='Унесите тачке испод';
 $ec_lang['lpn_pump_curve_ref_note']='Користи се крива унета за пумпу {id}.';
@@ -1054,9 +847,6 @@ $ec_lang['lpn_pump_curve_note']='Једна, две или три тачке —
 $ec_lang['lpn_pump_point1']='Тачка 1';
 $ec_lang['lpn_pump_point2']='Тачка 2';
 $ec_lang['lpn_pump_point3']='Тачка 3';
-// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
-// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
-// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='Режим: Избор. Кликните елемент или ознаку да бисте је видели или изменили. Превуците да бисте померили чвор, тачку прегиба или ознаку. Двапут кликните на цев да бисте додали или уклонили тачку прегиба.';
 $ec_lang['lpn_mode_delete']='Режим: Брисање. Кликните елемент да бисте га уклонили.';
 $ec_lang['lpn_mode_add_junction']='Режим: Додавање чвора. Кликните на мапу да бисте поставили чвор. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
@@ -1065,14 +855,7 @@ $ec_lang['lpn_mode_add_tank']='Режим: Додавање тенка. Клик
 $ec_lang['lpn_mode_add_pipe']='Режим: Додавање цеви. Кликните на чвор, па на други чвор, да бисте их повезали. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
 $ec_lang['lpn_mode_add_pump']='Режим: Додавање пумпе. Кликните на чвор, па на други чвор, да бисте их повезали. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
 $ec_lang['lpn_mode_add_valve']='Режим: Додавање вентила. Кликните на чвор, па на други чвор, да бисте их повезали. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
-// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
-// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Режим: Додавање текста. Кликните на мапу да бисте поставили текстуалну ознаку. Кликните близу чвора да бисте текст везали за тај чвор. Пређите у режим Избор да бисте мењали или померали елементе и ознаке.';
-// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
-// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
-// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
-// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
-// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Користите овај режим да бисте мењали, померали и превлачили ствари на мапи.';
 $ec_lang['lpn_tip_labels_draggable']='Ознаку можете превући да бисте је померили. Двапут кликните на ознаку да бисте је вратили на аутоматски положај.';
 $ec_lang['lpn_field_auto']='Аутоматски';
@@ -1107,8 +890,6 @@ $ec_lang['lpn_labels_col_decimals']='Децимале';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Позадинска слика…';
 $ec_lang['lpn_backdrop_add']='Додај';
-// Bare verbs (role change, 2026-08-13): the menu now prints the "Background image..." heading
-// directly above these, so the heading carries the object and the verbs no longer name it.
 $ec_lang['lpn_backdrop_scale']='Одреди размеру бирањем';
 $ec_lang['lpn_backdrop_scale_entry']='Размера према ворлд-фајлу или величини пиксела на мапи';
 $ec_lang['lpn_backdrop_scale_from']='Размера од тренутне величине, око тачке коју изаберете';
@@ -1173,8 +954,6 @@ $ec_lang['lpn_push_base_only']='Ова радња мења сам цртеж, п
 $ec_lang['lpn_field_active']='Део ове мреже';
 $ec_lang['lpn_field_active_tip']='Уклоните ознаку да бисте оставили елемент на цртежу, али изван мреже: приказује се сиво и решавач га занемарује. У сценарију се на овај начин предложена цев укључује и искључује.';
 $ec_lang['lpn_settings_emitter_exponent']='Експонент прскалице';
-// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
-// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Прорачун';
 $ec_lang['lpn_settings_tolerance']='Толеранција конвергенције';
 $ec_lang['lpn_settings_tolerance_tip']='Колико близу решавач мора да дође пре него што се заустави. Мањи број је прецизнији, али траје дуже.';
@@ -1186,25 +965,16 @@ $ec_lang['lpn_engine_valve_route']='Решено помоћу EPANET решав�
 $ec_lang['lpn_unit_unknown']='Овај цртеж наводи јединицу коју ова страница не нуди: {unit}. Све је сачувано и приказано тачно онако како је унето, и ништа није промењено. Одговори не могу да се дају док ова страница не препозна ту јединицу, јер не постоји начин да се утврди колика је.';
 $ec_lang['lpn_engine_manning_note']='Напомена: са Манинговом храпавошћу, EPANET израчунава губитак напора за око 0,6% нижи него уграђени решавач.';
 $ec_lang['lpn_settings_text_size']='Величина текста (пиксели)';
-// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
-// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
-// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Величина симбола (пиксели)';
 $ec_lang['lpn_settings_link_width']='Дебљина линије цеви (пиксели)';
 $ec_lang['lpn_settings_align_labels']='Поравнај ознаке цеви са цевима';
 $ec_lang['lpn_settings_readability_bias']='Окрени ознаку наопако када се нагне више од овог броја степени лево од вертикале';
 $ec_lang['lpn_settings_readability_bias_tip']='Окреће ознаку да остане усправна када се нагне више од овог броја степени лево од вертикале.';
 $ec_lang['lpn_settings_mask_labels']='Пуна позадина иза ознака';
-// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
-// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Непрозирност симбола (0 до 1)';
-// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
-// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Непрозирност позадинске слике (0 до 1)';
 $ec_lang['lpn_settings_map_display']='Изглед мапе';
 $ec_lang['lpn_settings_map_height_px']='Висина мапе (пиксели екрана)';
-// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
-// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='На малом екрану мапа се исцртава нижа од овога, тако да увек остаје део странице за скроловање.';
 $ec_lang['lpn_settings_legend_position']='Положај легенде';
 $ec_lang['lpn_settings_legend_top_left']='Горе лево';

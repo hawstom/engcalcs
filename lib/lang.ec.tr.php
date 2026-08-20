@@ -2,8 +2,6 @@
 
 // All missing text declarations will fall back to English.
 
-// Birimler (alphabetical order)
-// Hesap makinası birim seçimi için gerekli
 $ec_lang['u_depthFrac']='oran';
 $ec_lang['u_depthPercent']='%';
 $ec_lang['u_ft2']='ft^2';
@@ -58,9 +56,6 @@ $ec_lang['u_hp']='hp';
 $ec_lang['u_m2ps']='m^2/s';
 $ec_lang['u_ft2ps']='cfs/ft';
 
-// Page text
-// In page order for easiest maintenance.
-// Menu and General
 $ec_lang['menu_brand']='HawsEDC Hesap Makineleri';
 $ec_lang['menu_main_list']='Hesap makinesi listesi';
 $ec_lang['menu_main_hydraulics']='Hidrolik';
@@ -71,10 +66,6 @@ $ec_lang['template_welcome']='Korkularını kapıda bırak; burada sevgi konuşu
 $ec_lang['template_feedback']='Bu sayfadaki ifadeler için daha iyi bir öneriniz mi var, yoksa başka bir şey mi? Yardımcı olmak ya da bunun gibi araçlar yapmayı öğrenmek ister misiniz? Lütfen benimle iletişime geçin.';
 $ec_lang['template_printable_title']='Yazdırılabilir Başlık';
 $ec_lang['template_printable_subtitle']='Yazdırılabilir Alt Başlık';
-// Consent banner and the two site documents behind it (ROADMAP Task 286). These are UI, not legal
-// prose, and they are translated into all 26 languages for one reason: consent that the visitor
-// cannot read is not consent. The long-form privacy notice and terms are a separate question --
-// English-authoritative, and translated by a human later if at all.
 $ec_lang['consent_body']='Bu tarayıcı profilinin ziyaretlerini tekrar tekrar kaydetmemizi önlemek için, sayfa başına tek bir rakamı bu tarayıcı profilinin deposunda saklayabilir miyiz?';
 $ec_lang['consent_accept']='Kabul et';
 $ec_lang['consent_accept_all']='Her zaman kabul et';
@@ -106,7 +97,6 @@ $ec_lang['ec_name_tip']='Bu girdileri URL\'ye kaydeder (yer işareti, geçmiş v
 $ec_lang['calc_copy_link']='Bağlantıyı kopyala';
 $ec_lang['ec_related_calcs']='İlgili hesaplayıcılar:';
 $ec_lang['calc_copy_link_done']='Kopyalandı!';
-// Darcy-Weisbach. See mphl_ for missing text.
 $ec_lang['dw_main_menu']='Darcy-Weisbach Boru Yük Kaybı';
 $ec_lang['dw_main_title']='Ücretsiz Çevrimiçi Darcy-Weisbach Boru Yük Kaybı Hesaplayıcısı';
 $ec_lang['dw_main_desc']='Verilen Çap, Pürüzlülük ve Akış için Darcy-Weisbach Boru Yük Kaybı';
@@ -122,7 +112,6 @@ $ec_lang['dw_regime_transitional']='geçişli';
 $ec_lang['dw_regime_turbulent']='türbülanslı';
 $ec_lang['dw_friction_factor_method']='Sürtünme faktörü yöntemi';
 $ec_lang['dw_friction_factor']='Sürtünme faktörü, f';
-// Hazen-Williams. See mphl_ for missing text.
 $ec_lang['hw_main_menu']='Hazen-Williams Boru Yük Kaybı';
 $ec_lang['hw_main_title']='Ücretsiz Çevrimiçi Hazen-Williams Boru Yük Kaybı Hesaplayıcısı';
 $ec_lang['hw_main_desc']='Verilen Çap, Pürüzlülük ve Akış için Hazen-Williams Boru Yük Kaybı';
@@ -140,7 +129,6 @@ $ec_lang['hw_roughness']='Hazen-Williams katsayısı, C';
 $ec_lang['hw_note_1']='<dl><dt>Bu hesaplayıcı, iki uç arasındaki boru profilini modellemez.</dt><dd>Yalnızca girdiğiniz memba ve mansap kotlarını kullanır. Zemin, aradaki bir noktada her iki uçtan daha yükseğe çıkıyorsa, o yüksek noktadaki basınç burada bildirilen basınçlardan daha düşüktür. Bunu kontrol etmek için hesaplayıcıyı, memba ucundan yüksek noktaya kadar olan uzunluk için tekrar çalıştırın.</dd><dd>HGL\'nin borunun altına düştüğü yerlerde, su negatif basınç altındadır. Hava çözeltiden çıkar, ince cidarlı bir boru çökebilir ve kirli yeraltı suyu eklem yerlerinden içeri çekilebilir. Hattı her yerde pozitif basınç altında tutun ve her yüksek noktada bir hava vanası kullanmayı düşünün.</dd><dt>Memba basıncı, sizin sağladığınız bir sınır koşuludur.</dt><dd>Bunu bir manometreden, bir tank su seviyesinden (borunun üzerindeki su yüksekliği) veya bir pompa eğrisinden okuyun. Debi arttıkça pompa daha az basınç sağlar, bu yüzden yukarıda girilen debiye karşılık gelen eğri üzerindeki noktayı kullanın.</dd><dt>Yerel kayıp katsayılarını kendiniz toplayın.</dt><dd>Hat üzerindeki her vana, dirsek, T-parçası, sayaç ve giriş için K değerlerini toplayın ve bu toplamı girin. Tipik değerler için o girdinin yanındaki bağlantıyı izleyin. Uzun bir iletim hattında bu kayıplar sürtünmenin yanında küçüktür, ancak kısa istasyon borulamasında kayıpların çoğunu oluşturabilirler.</dd></dl>';
 $ec_lang['hw_notes_epanet_term']='Hazen-Williams sabitleri artık EPANET ile aynı (Ağustos 2026)';
 $ec_lang['hw_notes_epanet_def']='Ağustos 2026\'da Hazen-Williams katsayısı ve üssü, EPANET ile aynı olacak şekilde değiştirildi. Yük kaybı sonuçları bu sayfanın önceki sürümlerinden en fazla yüzde 0,1 farklıdır; bu, C değerinin kendi belirsizliğinden çok daha küçüktür.';
-// Manning Irregular
 $ec_lang['mi_menu']='Manning Düzensiz Kesitli Kanal';
 $ec_lang['mi_main_title']='Ücretsiz Çevrimiçi Manning Düzensiz Kesitli Kanal Hesaplayıcısı';
 $ec_lang['mi_main_desc']='Düzensiz Kesitli Kanal Manning Düzgün Akış Hesaplayıcısı';
@@ -168,7 +156,6 @@ $ec_lang['mi_notes_1_term']='Bileşik n';
 $ec_lang['mi_notes_1_def']='Bu hesaplayıcı, bölge bileşik n hesabı için HEC-RAS Referans Kılavuzunu takip eder: Chow 1959, sayfa 136, denklem 6-17 (6-18 değil).';
 $ec_lang['mi_notes_2_term']='Taş kaplama';
 $ec_lang['mi_notes_2_def']='Taş kaplama tasarımı için Manning Trapezoidal Kanal Hesaplayıcısını kullanın. Bu hesaplayıcı daha çok doğal kesitler içindir.';
-// Manning Pipe Flow
 $ec_lang['mpf_main_menu']='Manning Boru Akışı';
 $ec_lang['mpf_main_title']='Ücretsiz Çevrimiçi Manning Boru Akışı Hesaplayıcısı';
 $ec_lang['mpf_main_desc']='Belirli Eğim ve Derinlikte Manning Formülü ile Düzgün Boru Akışı';
@@ -197,7 +184,6 @@ $ec_lang['mpf_solver_enter_positive_q']='Pozitif bir hedef Q girin.';
 $ec_lang['mpf_solver_no_solution']='Çözüm yok: Q, y/d0 = %93,8\'de boru kapasitesini aşıyor (Qmax = {qmax}, seçilen birimlerde).';
 $ec_lang['mpf_solve_btn']='Hesapla';
 $ec_lang['mpf_solve_for_flow']='debi için, Q =';
-// Manning Pipe Head Loss. See mpf_ for missing text.
 $ec_lang['mphl_main_menu']='Manning Boru Yük Kaybı';
 $ec_lang['mphl_main_title']='Ücretsiz Çevrimiçi Manning Boru Yük Kaybı Hesaplayıcısı';
 $ec_lang['mphl_main_desc']='Belirli Tam Akışta Manning Formülü Yük Kaybı';
@@ -214,7 +200,6 @@ $ec_lang['mphl_egl_1']='Mansap EGL';
 $ec_lang['mphl_egl_2']='Memba EGL';
 $ec_lang['mphl_hgl_egl_tip']='Boru yüksekteyse geçerli olmayabilir. Notlara bakın.';
 $ec_lang['mphl_note_1']='<dl><dt>Bu hesaplayıcı, iki uç arasındaki boru profilini modellemez.</dt><dd>HGL herhangi bir noktada boru üstünün altına düşerse, bu hesaplama geçerli olmayabilir.</dd><dt>Açık giriş (menfez) koşulunda, giriş kontrolü koşullarının kontrol edilmesi gerekir.</dt><dd>1. Memba HGL\'si, memba normal derinlik akış kotundan (veya borudan) düşük olamaz.</dd><dd>2. Bir menfezin memba su yüzü, memba HGL\'sinden ziyade memba EGL\'si ile daha iyi temsil edilir.</dd><dd>3. Basit standart menfez memba hesaplamaları için <a target="_blank" href="https://www.youtube.com/watch?v=0O1Ezk8SVxU">2 dakikalık öğreticime bakın</a>; bu hesaplamalarda ABD Federal Karayolları İdaresi\'nin (FHWA) ücretsiz menfez programı olan <a target="_blank" href="https://www.fhwa.dot.gov/engineering/hydraulics/software/hy8/">HY-8</a>\'i kullanır.</dd><dd>4. Bu sayfa yalnızca çıkış kontrolü durumunu çözer: mansap koşullarının yükü belirlediği, tam dolu akan bir boru. Menfez tasarımı, giriş kontrolünün mü yoksa çıkış kontrolünün mü geçerli olduğuna karar vermeyi gerektirir; bu yüzden ikisinden biri geçerli olabiliyorsa HY-8 kullanın.</dd></dl>';
-// Manning Trapezoid. See mpf_ for missing text.
 $ec_lang['mtc_menu']='Manning Trapezoidal Kanal';
 $ec_lang['mtc_main_title']='Ücretsiz Çevrimiçi Manning Formülü Trapezoidal Kanal Hesaplayıcısı';
 $ec_lang['mtc_main_desc']='Belli Eğim ve Derinlikteki Düzgün Trapezoidal Kanallar için Manning Formülü';
@@ -249,7 +234,6 @@ $ec_lang['mtc_note_1']='<dl><dt>Otomatik taş boyutu ve pürüzlülük tasarım 
 $ec_lang['mtc_note_2_term']='Hız kontrolü';
 $ec_lang['mtc_note_2_def']='Yüksek hız, bu denli yüksek özgül enerji yaratan büyük bir kot düşüşü olduğunu gösterir. Bu enerji, genişlemelerde, dirseklerde veya engellerde hızla kaybolabilir. Bunun saha için makul olduğunu doğrulayın.';
 $ec_lang['mtc_solver_no_solution']='Bu kanal girdileriyle verilen Q için çözüm bulunamadı.';
-// Weir Flow Simple
 $ec_lang['ws_main_menu']='Basit Savak Debisi';
 $ec_lang['ws_main_title']='Ücretsiz Çevrimiçi Basit Geniş Kretli Savak Debisi Hesaplayıcı';
 $ec_lang['ws_main_desc']='Basit Geniş Kretli Savak Debisi Hesaplayıcı';
@@ -258,7 +242,6 @@ $ec_lang['ws_headWaterHeight']='<span class="ec-help" title="Suyun birim ağırl
 $ec_lang['ws_weirCoefficient']='Savak katsayısı, C<sub>w</sub>';
 $ec_lang['ws_notes_heading']='Notlar';
 $ec_lang['ws_notes_we_term']='Savak Denklemi';
-// Weir Flow Irregular. See ws_ for missing text.
 $ec_lang['wi_menu']='Düzensiz Kretli Savak Debisi';
 $ec_lang['wi_main_title']='Ücretsiz Çevrimiçi Parçalı, Değişken Derinlikli, Düzensiz Kretli Savak Debisi Hesaplayıcı';
 $ec_lang['wi_main_desc']='Düzensiz Kretli Savak Debisi Hesaplayıcı';
@@ -268,7 +251,6 @@ $ec_lang['wi_incrementalFlow']='Artımlı debi';
 $ec_lang['wi_cumulativeFlow']='Kümülatif debi';
 $ec_lang['wi_save_and_calculate']='Kaydet ve Hesapla';
 $ec_lang['wi_notes_we_def']='q = eğer (uzunluk = 0) ise 0, değilse eğer (eğim=0) ise cw*uzunluk*d<sub>0</sub><sup>1.5</sup>, değilse cw/(2.5*eğim) * (d<sub>0</sub><sup>2.5</sup> - d<sub>1</sub><sup>2.5</sup>), burada d<sub>1</sub> ve d<sub>0</sub> her zaman pozitif veya sıfırdır';
-// Orifice Flow
 $ec_lang['or_main_menu']='Orifis Debisi';
 $ec_lang['or_main_title']='Ücretsiz Çevrimiçi Orifis Debisi Hesaplayıcı';
 $ec_lang['or_main_desc']='Orifis Debisi — Serbest veya Batık';
@@ -300,7 +282,6 @@ $ec_lang['or_notes_3_term']='Debi Katsayısı';
 $ec_lang['or_notes_3_def']='C<sub>d</sub>, keskin kenarlı orifisler için yaklaşık 0,60–0,65 aralığındadır. Yuvarlatılmış veya içe girik girişler farklı değerler alır. Bkz. <a target="_blank" href="https://www.engineeringtoolbox.com/orifice-nozzle-venturi-d_590.html">Engineering Toolbox</a> veya HEC-RAS Hidrolik Referans Kılavuzu.';
 $ec_lang['or_notes_4_term']='Batıklık';
 $ec_lang['or_notes_4_def']='TWE, açıklığın taban kotunun üzerindeyken bu hesaplayıcı, h = HWE − TWE kullanarak batık orifis denklemini otomatik olarak uygular. TWE taban kotunda veya altındayken serbest çıkış varsayılır ve h = HWE − ağırlık merkezi kotu alınır.';
-// Micro-Hydro Power
 $ec_lang['mhp_main_menu']='Mikro-Hidroelektrik Güç';
 $ec_lang['mhp_main_title']='Ücretsiz Çevrimiçi Mikro-Hidroelektrik Güç Hesaplayıcısı';
 $ec_lang['mhp_main_desc']='Nehir Akışı Mikro-Hidroelektrik Güç Çıkışı Hesaplayıcısı';
@@ -333,7 +314,6 @@ $ec_lang['mhp_notes_6_def']='Tipik tesis verimi η, mikro-hidro sistemlerinde ya
 $ec_lang['mhp_notes_7_term']='Yıllık Enerji';
 $ec_lang['mhp_notes_7_def']='Yıllık enerji, sürekli tam debi çalışmasını (yılda 8.760 saat) varsayar. Mevsimsel debi değişimi, bakım duruşları ve yük faktörü nedeniyle gerçek üretim daha düşük olacaktır.';
 
-// Orifice Drain Time
 $ec_lang['odt_main_menu']='Gölet & Depo Boşalma Süresi';
 $ec_lang['odt_main_title']='Ücretsiz Çevrimiçi Gölet, Havuz ve Depo Boşalma Süresi Hesaplayıcısı (Orifis)';
 $ec_lang['odt_main_desc']='Gölet, Havuz veya Depo Boşalma Süresi — Orifis Çıkışlı, Konik Hacim Yöntemi';
@@ -361,10 +341,7 @@ $ec_lang['odt_q_max']='Maksimum debi, Q<sub>max</sub>';
 $ec_lang['odt_vol']='Boşaltılan hacim';
 $ec_lang['odt_sketch_start']='Başlangıç';
 $ec_lang['odt_sketch_end']='Bitiş';
-// Contact us.
 
-// Irrigation
-// Drip / Sprinkler Application Rate
 $ec_lang['ip_se']='Damlatıcı aralığı, S<sub>e</sub>';
 $ec_lang['ip_sl']='Lateral aralığı, S<sub>l</sub>';
 $ec_lang['ip_n_e']='Lateral başına damlatıcı sayısı, n<sub>e</sub>';
@@ -375,7 +352,6 @@ $ec_lang['ip_pr']='Uygulama oranı, PR';
 $ec_lang['ip_q_lat']='Lateral başına debi, Q<sub>lat</sub>';
 $ec_lang['ip_q_sys']='Bölge debisi, Q<sub>zone</sub>';
 $ec_lang['ip_t_run']='Çalışma süresi (saat)';
-// Canal Seepage / Conveyance Efficiency. Prefix cs_.
 $ec_lang['cs_main_menu']='Kanal Sızıntısı';
 $ec_lang['cs_main_title']='Ücretsiz Çevrimiçi Kanal Sızıntı Kaybı ve İletim Verimliliği Hesaplayıcısı';
 $ec_lang['cs_main_desc']='Kanal Sızıntı Kaybı & İletim Verimliliği — Giriş-Çıkış Yöntemi';
@@ -410,7 +386,6 @@ $ec_lang['cs_notes_2_def']='Tipik astarlanmamış toprak kanallar: E<sub>c</sub>
 $ec_lang['cs_notes_3_term']='Astar Geri Ödeme';
 $ec_lang['cs_notes_3_def']='Su değerini ve astar maliyetini herhangi bir tutarlı para biriminde girin. Astar alanı = güzergah uzunluğu × ıslak çevre — ölçülen akış derinliğindeki kanal kesitinin ıslak çevresi (taban genişliği artı her iki ıslak yamaç). Kurtarılan yıllık değer, astarlı kanalın hedef E<sub>c</sub>\'yi sürekli olarak sağladığını varsayar. Mevsimsel kanallar için veya astar hedef verimliliğe ulaşmadığında gerçek geri ödeme süresi daha uzun olacaktır.';
 $ec_lang['cs_notes_4_def']='USBR <em>Water Measurement Manual</em>, 3. baskı (2001). FAO Sulama ve Drenaj Belgesi 57 (1999).';
-// About
 $ec_lang['about_main_menu']='Hakkında';
 $ec_lang['install_main_menu']='Yükle';
 $ec_lang['install_main_title']='EngCalcs\'ı Yükle';
@@ -442,7 +417,6 @@ $ec_lang['contactSpamPrefix']='Bes arti bir';
 $ec_lang['contactSpamPostfix']='(Lütfen yaziyla gösterin. 1= bir 2=iki 3=üç 4=dört 5=bes 6=alti 7=yedi +=arti 5+1=6)';
 $ec_lang['contactSubmitButton']='Gönder';
 $ec_lang['contact_success']='Yazmanız için zaman ayırdığınız için teşekkür ederiz.';
-// Rock Chute Design (Robinson, Rice & Kadavy 1998). Prefix rc_.
 $ec_lang['rc_main_menu']='Taş Düşü Tasarımı (Robinson)';
 $ec_lang['rc_main_title']='Ücretsiz Çevrimiçi Taş Düşü Tasarım Hesaplayıcısı — Robinson (1998)';
 $ec_lang['rc_main_desc']='Taş Düşü Taş Dolgu Boyutlandırması — Robinson, Rice & Kadavy (1998)';
@@ -501,12 +475,10 @@ $ec_lang['rc_notes_7_term']='Giriş Göllenmesi';
 $ec_lang['rc_notes_7_def']='Giriş kanalındaki normal derinlik, q<sub>t</sub>\'yi iletmek için gerekli savak yükü (H<sub>p</sub>)\'ndan az olduğunda, düşü girişinin membasında kısıtlı akış veya göllenme oluşur. Bu genellikle kabul edilebilirdir — göllenme hızı düşürür ve memba erozyonunu önler. Kontrol için: verilen q<sub>t</sub> ve eşik genişliği için bir savak hesaplayıcısıyla H<sub>p</sub>\'yi bulun ve giriş kanalı normal derinliğiyle karşılaştırın. H<sub>p</sub> normal derinliği aşarsa göllenme oluşacaktır.';
 $ec_lang['rc_notes_4_term']='Kaynak';
 $ec_lang['rc_notes_4_def']='Robinson, K.M., Rice, C.E., and Kadavy, K.C. (1998). "<a target="_blank" href="https://www.fs.usda.gov/biology/nsaec/fishxing/fplibrary/Robinson_1998_Design_of_Rock_Chutes.pdf">Design of rock chutes</a>." <em>Transactions of the ASAE</em>, 41(3), 621–626. USDA ARS aynı yönteme dayalı bir <a target="_blank" href="https://data.nal.usda.gov/dataset/rock-chute-design">Excel tablosu</a> da yayınlamaktadır.';
-// Sketch labels
 $ec_lang['rc_sketch_filter']          = 'Filtre';
 $ec_lang['rc_sketch_top_crest_curve'] = 'Üst Eşik Eğrisi';
 $ec_lang['rc_sketch_outlet_apron']    = 'Çıkış Apronu';
 $ec_lang['rc_sketch_radius']          = 'yarıçap';
-// Irrigation Pressure Calculator (branch pipe-network pressure/DU estimate). Prefix ip_.
 $ec_lang['ip_main_menu']='Sulama Basıncı';
 $ec_lang['ip_main_title']='Ücretsiz Çevrimiçi Sulama Basıncı ve Dağılım Düzgünlüğü Hesaplayıcısı';
 $ec_lang['ip_main_desc']='Test Dalı Basıncı ve Düzgünlük Tahmini';
@@ -559,7 +531,6 @@ $ec_lang['ip_notes_5_def']='Uygulama oranı ve sistem/bölge debi tahmini saha-o
 
 
 
-// --- Branched Pipe Network (bpn_) --- English source ---
 $ec_lang['bpn_main_menu']='Dallı Boru Şebekesi';
 $ec_lang['bpn_main_title']='Ücretsiz Çevrimiçi Dallı Boru Şebekesi Basınç Hesaplayıcısı (Döngüsüz)';
 $ec_lang['bpn_main_desc']='Dallı (Ağaç) Boru Şebekesi Debi ve Basınç';
@@ -635,18 +606,8 @@ $ec_lang['lpn_field_text_rotation']='Açı (derece)';
 $ec_lang['lpn_field_text_match_pipe']='En yakın hattın açısına dönün';
 $ec_lang['lpn_field_text_flip']='180° döndür';
 $ec_lang['lpn_field_elev']='Kot';
-// Task 193 trap-term tips. Every one of these is a DEFINITION the user can read, which is also
-// what anchors the concept for the 26 translators in sprint 146.06 -- per CLAUDE.md's polysemy
-// protocol, a visible tip is the preferred home for a definition, in place of an $ec_lang_syn
-// entry carrying translatable payload nobody on the page can see.
 $ec_lang['lpn_field_elev_tip']='Bu düğümdeki zemin veya boru kotu. İstediğiniz herhangi bir sıfır noktasından ölçebilirsiniz, yeter ki tüm düğümler aynı sıfırı kullansın.';
-// A reservoir carries an elevation AND a head, so it doubles as a tank (Tom, 2026-07-30). Leaving
-// the head blank means "the water surface is at the reservoir's own elevation"; the placeholder
-// string is what shows in that empty box.
 $ec_lang['lpn_field_head']='Yük';
-// 'head' is a documented trap term in glossary.json (anatomical head; pressure). The tip says
-// outright that it is a height and not a pressure, which is the exact confusion the glossary's
-// avoid list guards against.
 $ec_lang['lpn_field_head_tip']='Rezervuardaki su yüzü kotu, basınç olarak değil yükseklik olarak ölçülür. Su yüzünü rezervuar kotuna yerleştirmek için boş bırakın.';
 $ec_lang['lpn_tank_elev_tip']='Depo tabanının kotu. Depodaki su derinlikleri buradan yukarı doğru ölçülür.';
 $ec_lang['lpn_field_tank_level']='Su derinliği';
@@ -694,10 +655,6 @@ $ec_lang['lpn_units_elevhead']='Kot ve yük';
 $ec_lang['lpn_units_pressure']='Basınç';
 $ec_lang['lpn_units_flow']='Debi';
 $ec_lang['lpn_units_velocity']='Hız';
-// Head loss GRADIENT (headloss/length, dimensionless -- grade or gradePercent, same options as
-// mpf_/mphl_'s 'slope' family but lpn_'s own 'gradient' family so it can default to gradePercent)
-// alongside the existing total head loss (ROADMAP Task 177, Tom agreed 2026-07-30) -- matches
-// mpf_/mphl_'s own friction-slope convention rather than inventing a per-1000-length form.
 $ec_lang['lpn_result_gradient']='Yük kaybı eğimi';
 $ec_lang['lpn_result_gradient_tip']='Yük kaybının boru uzunluğuna bölünmesi. Farklı uzunluktaki boruları tek bir tasarım sınırına göre karşılaştırmak için kullanın.';
 $ec_lang['lpn_result_head']='Yük';
@@ -706,84 +663,39 @@ $ec_lang['lpn_result_pressure']='Basınç';
 $ec_lang['lpn_result_flow']='Debi';
 $ec_lang['lpn_result_velocity']='Hız';
 $ec_lang['lpn_result_headloss']='Yük kaybı';
-// The three reset controls -- Clear project (toolbar), Restore all settings and Delete all projects
-// (Settings panel) -- get THREE tips, not one shared one. The shared version claimed they had to be
-// "used together" to reach a first-time-visitor state; that is false (Tom caught it 2026-07-31).
-// Settings live INSIDE each project document, so deleting every project deletes every setting too:
-// Delete all projects alone is the full reset, exactly as init()'s own comment says. Each tip now
-// states only its own scope, so none of them can be wrong about the others -- and no tip quotes
-// another button's label, which is the cross-key dependency lpn_empty_hint was fixed for.
 $ec_lang['lpn_settings_restore_tip']='Yalnızca bu projenin ayarlarını sıfırlar. Çiziminiz ve diğer projeleriniz değişmez. Sevdiğiniz ayarları yeniden kullanmak için, yalnızca ayarları içeren bir proje dosyası kaydedin.';
 $ec_lang['lpn_reset_all_tip']='Her projeyi, her arka plan görüntüsünü, her ayarı ve birim seçimlerinizi siler, ardından sayfayı ilk kez ziyaret eden birinin gördüğü haliyle yeniden yükler. Her şeyi temizleyen tek sıfırlama budur.';
-// `lpn_tool_clear`, `lpn_tool_clear_tip` and `lpn_confirm_clear` were REMOVED by Task 211 with the
-// "Clear project" command itself -- see lpn_edit_delete_network for what replaced it and why.
-// Task 263's one-time migration offer. Shown ONCE, on opening a project saved before inputs
-// stopped being converted, and never again whatever the answer. Plain text only -- it is built with
-// textContent into the dialog body.
 $ec_lang['lpn_v2_restore_confirm']='Bu hesaplayıcı proje birimlerini ve girdileri girildiği gibi saklar, ancak eskiden sayıları depolama için SI birimlerine dönüştürürdü. Bu proje o değişiklikten önce kaydedildiğinden, sayıları SI olarak saklanmıştı. Bunları son bir kez geçerli birimlere dönüştürelim mi? Değerlendirebilmeniz için, dönüştürülecek bazı çaplar ile öncesi ve sonrası değerleri aşağıdadır:';
 $ec_lang['lpn_v2_restore_yes']='Dönüştür';
 $ec_lang['lpn_v2_restore_never']='Hayır. Bir daha sorma.';
 $ec_lang['lpn_v2_restore_no']='Kapat, önce geçerli birimleri kontrol edeyim';
 $ec_lang['lpn_storage_too_new']='Bu proje, sayfanın daha yeni bir sürümüyle kaydedilmiş, bu yüzden burada açılamaz.';
-// ---- Projects as tabs, files as files (ROADMAP Task 211) ----
-// The whole surface below follows one rule: THE ASTERISK DECIDES. A tab wearing an asterisk has
-// something that is not in a file, so closing it asks first; a tab without one closes silently. A
-// browser project always wears one (it is in no file at all); a file project wears one only while it
-// has unsaved changes. Nothing here needs the words "browser project" or "file project" -- those are
-// our words for talking about the code, and the user sees only a name, an asterisk, and a file
-// extension.
-// The menu bar. The MENU holds everything; the TOOLBAR is the high-use subset of it, which is the
-// conventional relationship and the reason the duplication between them is correct rather than
-// sloppy. Names are the ones every desktop application has used for thirty years -- this is a
-// paradigm we are ADOPTING, not inventing, and the point of adopting one is that nobody has to be
-// taught it (Tom, 2026-08-04).
 $ec_lang['lpn_tool_file']='Dosya';
 $ec_lang['lpn_menu_edit']='Düzen';
 $ec_lang['lpn_menu_insert']='Ekle';
 $ec_lang['lpn_menu_view']='Görünüm';
-// "Settings" rather than Tools -> Options (Windows) or Preferences (Mac): nobody has ever settled
-// this one, and of the three, Settings is the word a person is most likely to look for first.
 $ec_lang['lpn_menu_settings']='Ayarlar';
 $ec_lang['lpn_menu_help']='Yardım';
 $ec_lang['lpn_help_walkthroughs']='Rehberler';
-// Replaces "Clear project" (Task 211). Tom, 2026-08-04: that command was a vestige of the days when
-// this page held ONE project -- with tabs, emptying a project is not a thing anyone needs, because
-// starting a new tab and closing the old one is the same act in fewer ideas. What is genuinely still
-// wanted is emptying the DRAWING while keeping the project: duplicate a project, delete its network,
-// keep its settings and its background image.
 $ec_lang['lpn_edit_delete_network']='Şebekeyi sil';
 $ec_lang['lpn_confirm_delete_network']='Bu projedeki her düğüm, boru ve metin etiketi silinsin mi? Arka plan görüntüsü, proje adı ve ayarlarınız korunur. Bu işlem geri alınamaz.';
 $ec_lang['lpn_view_units']='Birimler';
-// Offered only when more than one file has unsaved changes, which is the only time it beats Save.
 $ec_lang['lpn_file_saveall']='Tümünü kaydet';
-// {n} is a whole number. Assigned at creation as a real, renameable name -- and it is the LOWEST
-// number not currently in use, so closing Project 2 makes the next new project Project 2 again. A
-// counter that only ever went up would reach "Project 47" in an afternoon and read as a fault.
 $ec_lang['lpn_project_numbered']='Proje{n}';
 $ec_lang['lpn_project_copy_suffix']='(kopya)';
 $ec_lang['lpn_project_rename']='Yeniden adlandır';
-// The File menu. "New" is the same act as the + tab, deliberately: one function, two doors.
 $ec_lang['lpn_file_new']='Yeni proje…';
-// File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
-// with the toolbar button of that name -- an example is a whole network, so it starts a project
-// rather than being drawn into the one you are in.
 $ec_lang['lpn_new_blank_us']='Boş xy projesi, ABD birimleri (gpm)';
 $ec_lang['lpn_new_blank_si']='Boş xy projesi, SI birimleri (L/s)';
-// The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
-// engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Aç…';
 $ec_lang['lpn_file_save']='Kaydet';
 $ec_lang['lpn_file_saveas']='Farklı kaydet…';
 $ec_lang['lpn_file_revert']='Eski haline getir';
 $ec_lang['lpn_file_close']='Kapat';
-// Recent files (Task 258). "Files", not "projects": a project you closed was discarded, but the file
-// it was saved to is still on the disk, and that is what this list reopens.
 $ec_lang['lpn_file_recent']='Son dosyalar';
 $ec_lang['lpn_recent_tip']='Bilgisayarınızda aramanıza gerek kalmadan {file} dosyasını tekrar açın.';
 $ec_lang['lpn_recent_denied']='O dosyayı açma izni verilmediği için açılmadı.';
 $ec_lang['lpn_recent_gone']='{file} açılamadı. Taşınmış, yeniden adlandırılmış veya silinmiş olabilir, bu yüzden son dosyalar listesinden çıkarıldı.';
-// The tab strip. These are titles on small controls, so each has to stand alone with no sentence
-// around it.
 $ec_lang['lpn_tab_new']='Yeni proje';
 $ec_lang['lpn_tab_all']='Tüm projeler';
 $ec_lang['lpn_tab_menu']='Proje menüsü';
@@ -793,20 +705,10 @@ $ec_lang['lpn_tab_move_right']='Sağa taşı';
 $ec_lang['lpn_tab_unsaved']='Bir dosyaya kaydedilmedi';
 $ec_lang['lpn_import_bad_file']='O dosya, bu sayfadan kaydedilmiş bir proje olarak okunamadı.';
 $ec_lang['lpn_import_no_room']='Bu projeyi eklemek için tarayıcı depolama alanında yeterli yer kalmadı. İhtiyacınız olmayan bir projeyi silip tekrar deneyin.';
-// ---- EPANET .inp import (ROADMAP Task 196) ----
-// The import REPORTS every difference between the file and what this page can hold, so each
-// lpn_inp_drop_* key is one whole sentence naming one thing that changed and why. They are joined
-// to a list of element IDs at render time and to nothing else -- no key here is a fragment of
-// another sentence, and none may become one.
-// {file} is a file name; {nodes}, {links} and {units} are numbers and a unit name. Word order is
-// the translator's to choose.
 $ec_lang['lpn_dialog_ok']='Tamam';
 $ec_lang['lpn_file_import_inp']='EPANET dosyası içe aktar…';
 $ec_lang['lpn_file_import_inp_tip']='Bir EPANET dosyasından — EPANET\'in kaydettiği .inp metin dosyası veya .net dosyası — bir şebeke okur ve bu tarayıcıda yeni bir proje olarak kaydeder. Bu sayfa bir EPANET dosyasını geri yazamaz, bu yüzden çalışmanızı korumak için Dosya, Farklı Kaydet\'i kullanın.';
 $ec_lang['lpn_inp_bad_file']='O dosya bir EPANET şebeke dosyası olarak okunamadı.';
-// EPANET has two file formats. This one is about the BINARY .net that its Windows program saves;
-// the way out named here always works, so keep the instruction in the message rather than leaving
-// the reader to guess.
 $ec_lang['lpn_net_bad_file']='Bu bir EPANET .net dosyasına benziyor, ancak bu sayfa onu okuyamadı. EPANET\'te açın ve orada Dosya, Dışa Aktar, Şebeke komutunu kullanarak .inp dosyası olarak kaydedin, ardından onu içe aktarın.';
 $ec_lang['lpn_inp_report_heading']='{file} içe aktarıldı';
 $ec_lang['lpn_inp_report_counts']='{units} biriminde {nodes} düğüm, rezervuar ve depo, {links} boru, pompa ve vana.';
@@ -832,44 +734,11 @@ $ec_lang['lpn_inp_drop_quality']='Su kalitesi, kimyasal reaksiyon ve pompa enerj
 $ec_lang['lpn_inp_drop_backdrop']='Bu dosya bir arka plan görüntüsü adlandırıyor ancak görüntünün kendisini içermiyor. Dosya, Arka plan görüntüsü, Görüntü ekle ile kendiniz ekleyin.';
 $ec_lang['lpn_inp_drop_dangling']='Bu borular dosyada bulunmayan bir düğümü adlandırıyor, bu yüzden dışarıda bırakıldılar.';
 $ec_lang['lpn_inp_drop_units']='Bu dosyada belirtilen debi birimi bu sayfanın tanıdığı bir birim değil, bu yüzden her sayı dakikada galon olarak okundu. Yanıtları kullanmadan önce her sayıyı kontrol edin.';
-// {name} is a project name; word order is the translator's to choose. Says where the user landed,
-// the same way lpn_status_deleted_opened does -- an opened file becomes a NEW project here, and
-// that is the part a user cannot see for themselves.
 $ec_lang['lpn_status_imported']='{name} bir dosyadan açıldı ve bu tarayıcıya yeni bir proje olarak eklendi.';
-// Live file link (Task 195 Phase 2). Only reachable where the browser has the File System Access
-// API -- Chromium today, not Firefox or Safari -- so a translator will not find these on every
-// browser they test in. That is expected, not a bug.
-// {file} is a file name and {name} a project name; word order is the translator's to choose.
 $ec_lang['lpn_file_type_desc']='Proje dosyası';
-// Where there is no File System Access API -- Firefox, Safari, or any page not served over https --
-// a save cannot connect to a file, so every press really is another copy in the downloads folder.
-// The label says which of the two you are getting rather than leaving the duplicate looking like a
-// bug.
-// **The MENU still says Save and Save as… there** (Tom, 2026-08-04: *"'Download a copy' is a mistake,
-// and the menu item we want is 'Save as...'"*). A paradigm we are adopting has two names for writing
-// a file, and this page already spends the word "copy" on Duplicate; a third word for a third thing
-// is the invention we are trying to stop doing. The caveat lives in a tip on those rows, and in a
-// notice after the act -- at the moment the question arises -- rather than in a label forever.
-// `lpn_file_download_tip` was removed 2026-08-04 with the fallback Save row itself: where no
-// connection is possible, Save is disabled and only Save as remains, so the caveat belongs on Save
-// as (lpn_file_saveas_tip_download) and nowhere else. A tip on a disabled row would never be seen
-// anyway -- a disabled button fires no mouse events.
-// Opening a file where there is no File System Access API is an UPLOAD, not an open: the browser
-// hands over the contents and nothing else -- no way to write back, no way to lock it, no way even
-// to recognise it next time. A user who is not told will reasonably expect Save to go back where the
-// file came from. Explained once per browser by lpn_file_upload_explain, then said every time by
-// lpn_status_uploaded.
 $ec_lang['lpn_file_upload_explain']='Bu tarayıcı bir dosyaya bağlanamıyor, bu yüzden burada bir dosya açmak aslında bir yükleme işlemidir: proje bu tarayıcıya kopyalanır ve çalışmanızı dosyaya geri kaydetmenin tek yolu, Dosya, Farklı Kaydet ile dosyanın üzerine yazmaktır.';
-// Tips on the two Save rows. They differ by what the browser can do, which is the one thing a user
-// cannot see for themselves, and "connect" is the word that carries it (Tom, 2026-08-04).
 $ec_lang['lpn_file_save_tip']='Bağlı dosyaya kaydeder.';
 $ec_lang['lpn_file_saveas_tip']='Kaydedilecek bir dosya seçin. Bu proje o dosyaya bağlanır ve bundan sonra Kaydet o dosyaya yazar.';
-// The one thing a user can actually DO about the proliferation of files (Tom, 2026-08-04: "I hate to
-// cause the proliferation of files"). We cannot make a browser ask where to put a download -- there
-// is no API for it, and the download attribute cannot override the setting -- but the user can turn
-// that setting on themselves, and then Save as really does let them overwrite the file they started
-// from. It belongs in this tip rather than in a dialog: it answers a question asked at the moment
-// the user is choosing where their work goes.
 $ec_lang['lpn_file_saveas_tip_download']='Tarayıcınızın İndirme ayarlarını kullanarak kaydeder. Bu tarayıcı bir dosyaya bağlanamadığından Kaydet devre dışıdır, yalnızca Farklı Kaydet kullanılabilir. Tarayıcınızın "Her dosyanın nereye kaydedileceğini sor" ayarını açarsanız, orijinal dosyayı seçip üzerine yazabilirsiniz.';
 $ec_lang['lpn_status_uploaded']='Proje dosyası yüklendi. Buna bir bağlantı sürdürülemez, bu yüzden ona geri kaydetmenin tek yolu Dosya, Farklı Kaydet kullanmaktır.';
 $ec_lang['lpn_status_downloaded']='{file} indirildi. Bu tarayıcı bir dosyaya bağlanamadığından, bu proje bir dosyaya kaydedilmemiş olarak işaretli kalır.';
@@ -878,45 +747,18 @@ $ec_lang['lpn_status_already_open']='O dosya burada zaten {name} olarak açık, 
 $ec_lang['lpn_status_already_open_dirty']='O dosya burada zaten {name} olarak açık ve henüz kaydetmediğiniz değişiklikler içeriyor. İkinci bir kopya açmak yerine ona geçildi. Bunun yerine diskteki sürümü istiyorsanız Dosya, Eski Haline Getir\'i kullanın.';
 $ec_lang['lpn_status_saved']='{file} kaydedildi.';
 $ec_lang['lpn_status_reverted']='{file} diskten yeniden yüklendi.';
-// Nothing is written to a file except when the user asks (Task 211). Autosave to the file is gone on
-// purpose: a program that writes your file behind your back takes away your right to walk away from
-// a session. So these three carry the whole close/discard/revert conversation.
-// {name} is a project name and {file} a file name; word order is the translator\'s to choose.
 $ec_lang['lpn_close_save_confirm']='Kapatmadan önce {name} üzerindeki değişiklikleriniz kaydedilsin mi?';
-// A browser project is in no file at all, so closing it really is the end of it. Said plainly rather
-// than softened -- this is the one destructive act left on the page.
 $ec_lang['lpn_close_browser_confirm']='{name} yalnızca bu tarayıcıda tutuluyor. Bir dosyaya kaydetmeden kapatırsanız, kalıcı olarak kaybolur.';
 $ec_lang['lpn_close_discard']='Kaydetmeden kapat';
 $ec_lang['lpn_cancel']='İptal';
 $ec_lang['lpn_revert_confirm']='Yaptığınız değişiklikler atılsın ve {file} diskten yeniden yüklensin mi?';
-// A file project whose page has been reloaded. Browsers do not stay connected to a file across a
-// page load, so the link is gone even though we still know the name. Says what to do, not just what
-// happened.
 $ec_lang['lpn_file_needs_reopen']='Bu proje {file} dosyasından geldi, ancak o dosyayla bağlantı kayboldu. Yeniden bağlanmak için dosyayı tekrar seçin.';
-// Says what is still safe before it says what failed: the reassurance is the part a worried user
-// needs, and it is true -- the browser copy is written on every edit regardless.
 $ec_lang['lpn_file_write_failed']='Dosyaya yazılamadı. Dosya taşınmış veya yeniden adlandırılmış olabilir, ya da izin geri alınmış olabilir. Çalışmanız bu tarayıcıda hâlâ kayıtlıdır.';
 $ec_lang['lpn_file_changed_elsewhere']='Siz açtıktan sonra başka biri bu dosyaya kaydetti, bu yüzden şimdi kaydetmek onun çalışmasının üzerine yazar. Değişikliklerinizi kendi dosyanızda tutmak için Dosya, Farklı Kaydet\'i, kendinizinkini atıp onunkini yüklemek için Dosya, Eski Haline Getir\'i kullanın.';
-// Project locks (Task 195 Phase 2) -- who is editing a shared project file right now. {name} is a
-// person as they chose to be known ("Dave T."), never a login; word order is the translator's to
-// choose. A lock never expires on its own, so none of these may suggest waiting will free it.
-// Initials, and said to be public: whoever opens the same file sees this name, including outside the
-// office (Tom, 2026-08-03 -- "your friendly name may need to be a cryptic name"). Asking for initials
-// rather than a name makes the safe answer the obvious one.
-// Corrected 2026-08-05 to match lpn_file_training_3, which Task 211 fixed and this string missed: the
-// name is never written into the project file, so "anyone you send the file to" was false here too.
 $ec_lang['lpn_lock_prompt_name']='Bu proje sizde açıkken meslektaşlarınız ne görmeli? İsminizin baş harfleri idealdir. Aynı dosyayı açan herkes bunu görebilir, bu yüzden özel bir şey kullanmayın.';
-// The stand-in when someone locked a project before giving a name. Reads in place of {name}
-// everywhere above, so it has to work mid-sentence.
 $ec_lang['lpn_lock_somebody']='Başka biri';
-// Opening a file somebody else has open is a CHOICE, not a surprise (Task 211). One question at the
-// moment of opening, with both real answers on it -- the way every drawing and document program has
-// always done it.
 $ec_lang['lpn_lock_open_heading']='{name} bu dosyayı açık tutuyor.';
 $ec_lang['lpn_lock_open_readonly']='Salt okunur aç';
-// "Create a copy", not "my own copy" (Tom, 2026-08-04): two projects cannot share one name, and
-// "my own copy" quietly promises a personal one of everything -- the proliferation this page keeps
-// trying not to encourage. "Create a copy" says what happens and claims nothing.
 $ec_lang['lpn_lock_open_copy']='Bir kopya oluştur';
 $ec_lang['lpn_lock_break']='Kilidini kaldır';
 $ec_lang['lpn_lock_open_heading_times']='{name} bu dosyayı açık tutuyor; son düzenleme {x} önceydi, son kayıttan {y} sonra.';
@@ -929,59 +771,26 @@ $ec_lang['lpn_ago_minutes']='{n} dakika';
 $ec_lang['lpn_ago_hours']='{n} saat';
 $ec_lang['lpn_ago_days']='{n} gün';
 $ec_lang['lpn_ago_unknown']='bilinmeyen bir süre';
-// Read-only means read-only: it never turns itself back into an editable file while you are looking
-// at it, and it never offers to save over the other person\'s file. It cannot -- their file has moved
-// on since you opened it, so writing yours over it would destroy their work. What you CAN do is
-// everything else, including changing the network and keeping it as a file of your own.
 $ec_lang['lpn_lock_readonly_banner']='Salt okunur: {name} bu dosyayı açık tutuyor. Burada istediğiniz her şeyi değiştirebilirsiniz, ancak kaydedemezsiniz. Farklı bir dosyaya kaydetmek için Dosya, Farklı Kaydet\'i kullanın.';
-// Opening a file we could not lock is the moment of danger (Tom, 2026-08-03): from then on nothing
-// stops a colleague editing the same file. Editing still works -- an unreachable server must never
-// take the calculator away -- so this warns rather than blocks, and promises the follow-up that
-// lpn_lock_restored keeps.
 $ec_lang['lpn_lock_unavailable']='Dikkat: bu proje üzerinde bir kilidi kontrol etmek veya oluşturmak için sunucuya ulaşılamadı, bu yüzden bir meslektaşınızın aynı dosyayı aynı anda düzenlemesini hiçbir şey engellemiyor. Kilitleme yeniden çalışmaya başlarsa size bildirilecektir.';
 $ec_lang['lpn_lock_storage_error']='Dikkat: bu site kilit kayıtlarını kaydedemiyor, bu yüzden bir meslektaşınızın aynı dosyayı aynı anda düzenlemesini hiçbir şey engellemiyor. Bu, sunucudaki bir kurulum hatasıdır, burada düzeltebileceğiniz bir şey değildir — kilit klasörü web sunucusu tarafından yazılabilir değil.';
 $ec_lang['lpn_lock_full_error']='Dikkat: bu site kimin hangi projeyi açık tuttuğunu kaydedecek yerinin tükendi, bu yüzden bir meslektaşınızın aynı dosyayı aynı anda düzenlemesini hiçbir şey engellemiyor. Bu, sunucudaki bir kurulum hatasıdır, burada düzeltebileceğiniz bir şey değildir.';
 $ec_lang['lpn_lock_not_asked']='Bu proje için kilitleme çalışmıyor, bu yüzden bir meslektaşınızın aynı dosyayı aynı anda düzenlemesini hiçbir şey engellemiyor. Bu tarayıcıda sizin için henüz kayıtlı bir isim yok veya projenin bir tanımlayıcısı yok — projeyi bir dosyaya kaydetmek ikisini de belirler.';
 $ec_lang['lpn_lock_restored']='Kilitleme yeniden çalışıyor ve bu dosya artık sizin kaydedebileceğiniz bir dosya.';
 $ec_lang['lpn_lock_dismiss']='Bu mesajı gizle';
-// Shown once per browser, before the first file picker opens. Three short paragraphs on purpose:
-// this is the one place the whole file-and-lock idea is explained, and it has to survive translation
-// into 26 languages, so it says one thing per sentence and avoids every word of jargon it can.
 $ec_lang['lpn_file_training_1']='Projeniz bu bilgisayardaki bir dosyaya kaydedilecek. Yalnızca siz istediğinizde kaydedilir, başka hiçbir zaman değil, bu yüzden o dosyaya haberiniz olmadan hiçbir şey yazılmaz.';
 $ec_lang['lpn_file_training_2']='İki kişinin aynı dosyayı aynı anda düzenlememesi için bu site kimin dosyayı açık tuttuğunu takip eder. Biri zaten açmışsa, yine de açıp bakabilir veya kendi kopyanızı tutabilirsiniz.';
-// Said BEFORE it happens, because it is alarming and unexplained when it happens (Tom, 2026-08-04:
-// "hawsedc.com will be able to edit ... is a canned browser warning whose confusing meaning we
-// cannot fix"). He is right that we cannot fix it -- it is the browser asking, in the browser\'s
-// own words, and there is no way to reword it, suppress it, or pre-approve it. What we CAN do is
-// warn that it is coming and say it is normal, which is what this line is for.
 $ec_lang['lpn_file_training_permission']='İlk kaydettiğinizde, tarayıcınız bu sitenin dosyayı düzenleyip düzenleyemeyeceğini soracaktır. Bu soru bizden değil tarayıcınızdan gelir ve evet demeniz, Kaydet\'in çalışmanızı geri yazmasını sağlar. Genellikle dosya başına yalnızca bir kez sorulur.';
-// Corrected 2026-08-04: the old wording said anyone you SEND THE FILE TO can see this name, which is
-// false -- the name is never written into the project file. It is held in this browser and on this
-// site, and it is shown to whoever opens the SAME file. That is still public enough to be worth
-// saying, so the warning stays and only the claim changes.
 $ec_lang['lpn_file_training_3']='Meslektaşlarınızın sizi tanıyacağı kısa bir isim verin. İsminizin baş harfleri idealdir. Aynı dosyayı açan herkes bunu görebilir, bu yüzden özel bir şey kullanmayın.';
 $ec_lang['lpn_file_training_name']='İsminizin baş harfleri';
 $ec_lang['lpn_file_training_continue']='Devam et';
-// Recovery when the linked file has moved, been renamed, or been deleted. The button does the
-// finding; the message never tells someone to go hunting through a menu.
 $ec_lang['lpn_file_relink']='Dosyayı tekrar seçin';
 $ec_lang['lpn_file_reconnect']='Bu dosyayla yeniden bağlan';
 $ec_lang['lpn_file_reconnect_alert']='Bu proje {file} dosyasından geldi. Tarayıcınızın ona yazabilmesi için izninize yeniden ihtiyacı var. Aşağıdan yeniden bağlanın.';
-// Read-only means read-only, so Save as from a read-only project refuses the file it came from --
-// the one file it must never write. handle.isSameEntry() is what makes this checkable at all.
 $ec_lang['lpn_saveas_same_file']='Bu, başka birinin açık tuttuğu aynı dosya, bu yüzden üzerine kaydedilemez. Farklı bir dosya veya farklı bir isim seçin.';
 $ec_lang['lpn_saveas_overwrites_project']='O dosya zaten farklı bir proje içeriyor, {name}. Buraya kaydetmek onu tamamen değiştirir. Devam edilsin mi?';
 $ec_lang['lpn_saveas_overwrites_newer']='O dosya siz son gördüğünüzden beri değişti, bu yüzden neredeyse kesinlikle başka biri ona kaydetti. Buraya kaydetmek onun sürümünü sizinkiyle değiştirir. Devam edilsin mi?';
-// The "Save to file every N seconds" setting and its 60-180 second range are GONE (Task 211). One
-// number was doing three jobs -- the write interval, the lock heartbeat, and the how-long-until-a
-// -colleague-may-take-over threshold -- so the range was protecting a coupling rather than the user.
-// Nothing is written to a file on a timer any more, so there is no interval to set.
 $ec_lang['lpn_prompt_project_name']='Bu proje için isim';
-// Closing the CURRENT project opens the most recently updated survivor, so a network the user did
-// not ask for appears. Tom, 2026-07-31: do NOT warn beforehand -- say afterwards where you landed.
-// (Task 211 renamed the act from Delete to Close: closing IS the removal, and there is no longer a
-// separate Delete for it to be confused with.)
-// {closed} and {opened} are project names; word order is the translator's to choose.
 $ec_lang['lpn_status_closed_opened']='{closed} kapatıldı. Şimdi {opened} gösteriliyor.';
 $ec_lang['lpn_status_closed_empty']='{closed} kapatıldı. Yeni boş bir proje başlatıldı.';
 $ec_lang['lpn_storage_full']='Kaydedilmedi. Tarayıcı depolama alanı dolu veya kullanılamıyor, bu yüzden bu sekmeyi kapattığınızda son değişiklikleriniz kaybolacak.';
@@ -991,12 +800,6 @@ $ec_lang['lpn_notes_2_term']='Modellenmeyenler';
 $ec_lang['lpn_notes_2_def']='Su kalitesi ve gün içinde değişen talepler modellenmez. Vanalara gelince: bir kısma vanası her iki çözücüde de çalışır, kendiliğinden açılıp kapanan vanalar (PRV, PSV, FCV) ise, şebekeniz bunlardan birini içerdiğinde bu sayfanın kendiliğinden devreye soktuğu EPANET çözücüsüyle çözülür.';
 $ec_lang['lpn_notes_3_term']='Projeleri kaydetme';
 $ec_lang['lpn_notes_3_def']='Her proje bir sekmedir ve çalışırken her sekme bu tarayıcıya kaydedilir. Tarayıcı verilerinizi temizlemek hepsini siler, bu yüzden çalışmanızı bir dosyada tutun: Dosya, Farklı Kaydet. Bir sekmedeki yıldız işareti, bir dosyada olmayan değişiklikler taşıdığı anlamına gelir. Siz istemedikçe hiçbir şey bir dosyaya yazılmaz. Bazı tarayıcılarda bir proje, kaydettiğiniz dosyaya bağlanır ve Dosya, Kaydet bundan sonra o aynı dosyaya geri yazar; diğerlerinde bağlantı mümkün değildir, bu yüzden Kaydet devre dışıdır ve yalnızca Farklı Kaydet kullanılabilir. Bir proje dosyası paylaşılan bir sürücüde tutulduğunda, bu sayfa bir meslektaşınızın onu zaten açık tutup tutmadığını size söyler, böylece iki kişi birbirinin üzerine yazmaz.';
-// Pump curve documentation (Tom, 2026-07-30: "How should we document the curve equations?").
-// It lives in the Notes list, not in the pump popup: the popup is a small floating panel that has
-// to stay readable on a phone, while the Notes section is already this page's documentation home,
-// prints with the page, and is translated with everything else. The popup carries a one-line
-// pointer to here instead (lpn_pump_curve_note).
-// H and Q are symbols -- keep them as they are in every language.
 $ec_lang['lpn_notes_5_term']='Pompa eğrisi';
 $ec_lang['lpn_notes_5_def']='Bir pompa H = H₀ − aQ^b denklemini izler; burada H pompanın eklediği yük, Q ise içinden geçen debidir. Üreticinin eğrisinden bir, iki veya üç nokta girin. Üç nokta — sıfır debideki yük, normal çalışma noktası ve en yüksek debi noktası — H₀, a ve b\'yi doğrudan belirler ve yayımlanan bir eğriyi en yakından izler. İki nokta, tepe noktası sıfır debide olan bir parabole (b = 2) oturtulur. Tek nokta yaygın bir kural kullanır: sıfır debideki yük, girdiğiniz yükün 1,33 katıdır ve en yüksek debi, girdiğiniz debinin 2 katıdır; bu da yine b = 2 verir. Hiç nokta girilmemiş bir pompa hiç yük eklemez. Eğri sıfırda durdurulmaz, bu yüzden bir pompadan eğrisinin sağlayabileceğinden daha fazla debi istemek negatif bir yük verir. Çözüm daha büyük bir pompa veya daha küçük bir taleptir, farklı bir eğri uydurması değil.';
 $ec_lang['lpn_notes_4_term']='Planlanan';
@@ -1017,21 +820,11 @@ $ec_lang['lpn_engine_unavailable']='Kendiliğinden açılıp kapanan vanaları �
 $ec_lang['lpn_diag_valve_on_fixed_head']='Bu vanalar doğrudan bir rezervuara veya depoya bağlı, ve orada su seviyesi zaten belirlenmiş durumda, bu yüzden vananın kontrol edecek bir şeyi kalmıyor. Vana ile rezervuar veya depo arasına kısa bir boru ekleyin:';
 $ec_lang['lpn_diag_not_converged']='Bir çözüm bulunamadı. Sıfır çap gibi gerçek olamayacak değerleri kontrol edin.';
 $ec_lang['lpn_field_roughness']='Pürüzlülük';
-// Which coefficient this is was invisible: assembleModel() hardcodes Hazen-Williams, so a user
-// typing a Manning n of 0.013 into it got nonsense with no warning. Revisit when a friction-method
-// selector lands (see numberFieldPlain()'s own note).
 $ec_lang['lpn_field_roughness_tip']='Hazen-Williams C. Daha yüksek bir sayı daha pürüzsüz bir boru anlamına gelir: yeni plastik için yaklaşık 150, yeni çelik veya demir için 130 ve eski boru için 100.';
 $ec_lang['lpn_field_length']='Uzunluk';
 $ec_lang['lpn_field_length_tip']='Borunun uzunluğu. Otomatik açıkken bu, çizdiğinizi izler. Çizimden farklı bir uzunluk yazmak için Otomatik\'i kapatın.';
-// Plain-text wording of the concept mphl_total_junction_k/mphl_junction_loss already own (their
-// values carry k<sub>m</sub> markup, incompatible with this popup's textContent-only fields) --
-// Tom, 2026-07-30, "default to 2" matches mphl_total_junction_k_tip's own stated default exactly.
 $ec_lang['lpn_field_km']='Küçük (yerel) kayıp katsayısı, k';
 $ec_lang['lpn_field_km_tip']='Bu borudaki dirsek, vana ve bağlantı parçalarından kaynaklanan kayıp, hız yükünün bir katı olarak sayılır. Düz bir boru için 0 kullanın.';
-// Short form of the same concept, for the two NARROW uses: the Labels checkbox list and the on-map
-// legend beside it. Per CLAUDE.md's rule that a shared label must fit its narrowest use, these get
-// their own key rather than being asked to carry the full popup-field wording -- an on-map legend
-// entry reading "Minor (local) loss coefficient, km" would set the width of the whole legend box.
 $ec_lang['lpn_field_km_short']='Küçük kayıp, k';
 $ec_lang['lpn_field_valve_type']='Vana tipi';
 $ec_lang['lpn_field_valve_type_tip']='Vananın ne yaptığı. Bir kısma vanası sabit bir kayıp tutar. Diğer üçü bir basıncı veya debiyi korur, ve su değiştikçe tam açılır, kapanır veya kısmen kapanır. Tipi değiştirmek, aşağıdaki ayara yeni bir başlangıç değeri koyar, çünkü bir basınç bir debi değildir ve ikisi de bir kayıp katsayısı değildir.';
@@ -1047,8 +840,6 @@ $ec_lang['lpn_field_valve_setting_loss']='Kayıp katsayısı';
 $ec_lang['lpn_field_valve_setting_loss_tip']='Kısma vanasının, hız yükünün bir katı olarak sayılan, ne kadar yük giderdiği. Tam açık duran bir vana için 0 kullanın. Bu tek sayı, bir kısma vanasının kaybının tamamıdır.';
 $ec_lang['lpn_field_valve_diameter_tip']='Vananın içinden geçen açıklığın genişliği. Suyun vanadan geçiş hızı bu genişlikten hesaplanır, ve kayıp bu hızdan çıkarılır.';
 $ec_lang['lpn_field_valve_km_tip']='Vana ayarının giderdiğinin üzerine, vana tam açık dururken vana gövdesinden kaynaklanan kayıp. Hız yükünün bir katı olarak sayılır. Yoksaymak için 0 kullanın.';
-// Pump curve entry (Task 146, 2026-07-30): up to 3 (flow, head) points, or a reference to
-// another pump's curve so several identical pumps need the curve entered only once.
 $ec_lang['lpn_pump_curve_source']='Eğri kaynağı';
 $ec_lang['lpn_pump_curve_own']='Noktaları aşağıya girin';
 $ec_lang['lpn_pump_curve_ref_note']='Pompa {id} için girilen eğri kullanılıyor.';
@@ -1056,9 +847,6 @@ $ec_lang['lpn_pump_curve_note']='Bir, iki veya üç nokta — aşağıdaki Notla
 $ec_lang['lpn_pump_point1']='Nokta 1';
 $ec_lang['lpn_pump_point2']='Nokta 2';
 $ec_lang['lpn_pump_point3']='Nokta 3';
-// Persistent mode-hint line (Task 146.01 follow-up, 2026-07-30): whole sentences, not composed
-// from a "Mode:" prefix + the tool's own label, per CLAUDE.md's concept-level label reuse rule --
-// word order/grammar around a mode name varies by language, so each mode gets its own full string.
 $ec_lang['lpn_mode_select']='Mod: Seç. Görmek veya değiştirmek için bir öğeye veya etikete tıklayın. Bir düğümü, kırılma noktasını veya etiketi taşımak için sürükleyin. Bir kırılma noktası eklemek veya kaldırmak için bir boruya çift tıklayın.';
 $ec_lang['lpn_mode_delete']='Mod: Sil. Kaldırmak için bir öğeye tıklayın.';
 $ec_lang['lpn_mode_add_junction']='Mod: Düğüm Ekle. Bir düğüm yerleştirmek için haritaya tıklayın. Öğeleri ve etiketleri değiştirmek veya taşımak için Seç moduna geçin.';
@@ -1067,14 +855,7 @@ $ec_lang['lpn_mode_add_tank']='Mod: Depo Ekle. Bir depo yerleştirmek için hari
 $ec_lang['lpn_mode_add_pipe']='Mod: Boru Ekle. Bağlamak için bir düğüme, ardından başka bir düğüme tıklayın. Öğeleri ve etiketleri değiştirmek veya taşımak için Seç moduna geçin.';
 $ec_lang['lpn_mode_add_pump']='Mod: Pompa Ekle. Bağlamak için bir düğüme, ardından başka bir düğüme tıklayın. Öğeleri ve etiketleri değiştirmek veya taşımak için Seç moduna geçin.';
 $ec_lang['lpn_mode_add_valve']='Mod: Vana Ekle. Bağlamak için bir düğüme, ardından başka bir düğüme tıklayın. Öğeleri ve etiketleri değiştirmek veya taşımak için Seç moduna geçin.';
-// Text was wrong (Tom, 2026-07-30): "click a node first to anchor it there" implied a two-click
-// sequence (click node, THEN click to place), but placing near a node anchors it in that ONE click.
 $ec_lang['lpn_mode_add_text']='Mod: Metin Ekle. Bir metin etiketi yerleştirmek için haritaya tıklayın. Metni bir düğüme bağlamak için ona yakın bir yere tıklayın. Öğeleri ve etiketleri değiştirmek veya taşımak için Seç moduna geçin.';
-// Toolbar button tips (Tom, 2026-07-30): hover/tap explanations on the two buttons a new user is
-// most likely to miss the point of -- that Select is what you use to edit/move things, and that a
-// label itself can be dragged. Both economize on translation for later, per CLAUDE.md's tip-only
-// whole-label-wrap convention -- the button itself is already the click target (no separate "?"
-// glyph needed), so the tip goes straight on the button as a title, matched to the .ec-help class.
 $ec_lang['lpn_tip_select']='Haritadaki şeyleri değiştirmek, taşımak ve sürüklemek için bu modu kullanın.';
 $ec_lang['lpn_tip_labels_draggable']='Bir etiketi taşımak için sürükleyebilirsiniz. Bir etiketi yerine geri koymak için çift tıklayın.';
 $ec_lang['lpn_field_auto']='Otomatik';
@@ -1109,10 +890,6 @@ $ec_lang['lpn_labels_col_decimals']='Ondalık';
 $ec_lang['lpn_field_id']='ID';
 $ec_lang['lpn_backdrop_menu']='Arka plan görüntüsü...';
 $ec_lang['lpn_backdrop_add']='Ekle';
-// "Scale image" / "Position image" rather than the bare verbs (Tom, 2026-08-04). They read fine
-// under the toolbar select's own "Background image..." heading and read as orphans in the Insert
-// menu, where nothing above them says what is being scaled. Naming the object costs one word and
-// works in both places.
 $ec_lang['lpn_backdrop_scale']='Seçerek ölçekle';
 $ec_lang['lpn_backdrop_scale_entry']='World dosyası veya haritadaki bir pikselin boyutuyla ölçekle';
 $ec_lang['lpn_backdrop_scale_entry_prompt']='Haritadaki bir pikselin boyutunu girin veya görüntünün world dosyasının tüm içeriğini yapıştırın';
@@ -1177,8 +954,6 @@ $ec_lang['lpn_push_base_only']='Bu işlem çizimin kendisini değiştirir, bu y�
 $ec_lang['lpn_field_active']='Bu şebekenin parçası';
 $ec_lang['lpn_field_active_tip']='Bu kutuyu boşaltarak öğeyi çizimde bırakın ama şebeke dışında tutun: gri çizilir ve çözücü onu yoksayar. Bir senaryoda, önerilen bir borunun açılıp kapatılması bu şekilde yapılır.';
 $ec_lang['lpn_settings_emitter_exponent']='Emiter üssü';
-// The Settings panel's Computation section (Tom, 2026-08-10). "Computation", not "Solver": what the
-// two rows under it decide is the arithmetic the user gets, and "solver" names the internals.
 $ec_lang['lpn_settings_computation']='Hesaplama';
 $ec_lang['lpn_settings_tolerance']='Yakınsama toleransı';
 $ec_lang['lpn_settings_tolerance_tip']='Çözücünün durmadan önce ne kadar yaklaşması gerektiği. Daha küçük bir sayı daha kesindir ve daha uzun sürer.';
@@ -1190,25 +965,16 @@ $ec_lang['lpn_engine_manning_note']='Not: Manning pürüzlülüğüyle, EPANET y
 $ec_lang['lpn_engine_valve_route']='EPANET çözücüsüyle çözüldü, çünkü bu vanalar kendiliğinden açılıp kapanır:';
 $ec_lang['lpn_unit_unknown']='Bu çizim, bu sayfanın sunmadığı bir birim belirtiyor: {unit}. Her şey geldiği gibi tutulup gösterildi, hiçbir şey değiştirilmedi. Bu sayfa bu birimi tanımadığı sürece yanıt verilemez, çünkü ne kadar büyük olduğunu anlamanın bir yolu yoktur.';
 $ec_lang['lpn_settings_text_size']='Metin boyutu (piksel)';
-// Symbols (node circles, pipe width, flow arrows, vertex handles) are sized as a MULTIPLE of the
-// text size rather than in their own units (Tom, 2026-07-30), so one number changes how big
-// everything on the map is and symbols follow the text into map-vs-screen units automatically.
 $ec_lang['lpn_settings_symbol_size']='Sembol boyutu (piksel)';
 $ec_lang['lpn_settings_link_width']='Boru çizgisi kalınlığı (piksel)';
 $ec_lang['lpn_settings_align_labels']='Boru etiketlerini borularla hizala';
 $ec_lang['lpn_settings_readability_bias']='Etiketin ters çevrilmeden önce dikeyden sola kayabileceği derece';
 $ec_lang['lpn_settings_readability_bias_tip']='Bir etiket, dikeyden sola bu kadar dereceden fazla yatarsa, doğru yönde durması için ters çevrilir.';
 $ec_lang['lpn_settings_mask_labels']='Etiketlerin arkasında dolgu arka plan';
-// Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
-// through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Sembol opaklığı (0 ile 1 arası)';
-// The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
-// network drawn over it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_backdrop_opacity']='Arka plan görüntüsü opaklığı (0 ile 1 arası)';
 $ec_lang['lpn_settings_map_display']='Harita görünümü';
 $ec_lang['lpn_settings_map_height_px']='Harita yüksekliği (ekran pikseli)';
-// The cap in applyMapHeight() makes this field look ignored on a phone (ROADMAP Task 146.08's
-// own note). It is a render cap, not a stored value -- say so instead of leaving the user to guess.
 $ec_lang['lpn_settings_map_height_tip']='Küçük bir ekranda harita bundan daha kısa çizilir, böylece sayfanın bir kısmı her zaman kaydırılabilir kalır.';
 $ec_lang['lpn_settings_legend_position']='Lejant konumu';
 $ec_lang['lpn_settings_legend_top_left']='Sol üst';
@@ -1238,7 +1004,6 @@ $ec_lang['lpn_confirm_restore_defaults']='Tüm ayarlar (kimlik önekleri, başla
 $ec_lang['lpn_settings_wipe_btn']='Bu sayfadaki her şeyi sil';
 $ec_lang['lpn_confirm_wipe']='Bu sayfa için kaydedilmiş HER ŞEY — her proje, her arka plan görüntüsü, tüm ayarlar ve birim seçimleriniz — silinsin ve sayfa yepyeni bir ziyaretçinin göreceği gibi yeniden yüklensin mi? Bu işlem geri alınamaz.';
 
-// ---- lpn_ delta sprint (Task 438) — text alignment, examples, units-change dialog, basemap, georeference ----
 $ec_lang['lpn_field_text_align']='Yatay hizalama';
 $ec_lang['lpn_field_text_align_left']='Sol';
 $ec_lang['lpn_field_text_align_center']='Orta';
