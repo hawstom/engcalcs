@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bg",
-        "expected_key_count": 1210,
-        "delta_key_count": 16,
+        "expected_key_count": 1213,
+        "delta_key_count": 19,
         "exempt_key_count": 20,
         "exempt_keys": [
             "calc_units_us",
@@ -452,6 +452,9 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
+        "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
+        "lpn_time_run_report": "EPANET run report",
         "lpn_color_mode_manual": "Manual"
     },
     "keys": {
@@ -470,6 +473,9 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
+        "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
+        "lpn_time_run_report": "EPANET run report",
         "lpn_color_mode_manual": "Manual"
     },
     "key_context": {
@@ -710,6 +716,54 @@
                     "key": "lpn_field_valve_setting_loss",
                     "value": "Коефициент на загуба",
                     "english": "Loss coefficient"
+                }
+            }
+        },
+        "lpn_time_run_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_note",
+                    "value": "Виждате мрежата в първия момент на отчитане. Изчисляването на тази мрежа за целия ѝ времеви период отнема толкова дълго, че резултатите за по-късните моменти не се актуализират, докато работите. Натиснете „Изчисли“, за да ги актуализирате.",
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "Скорост",
+                    "english": "Speed"
+                }
+            }
+        },
+        "lpn_time_run_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_note",
+                    "value": "Виждате мрежата в първия момент на отчитане. Изчисляването на тази мрежа за целия ѝ времеви период отнема толкова дълго, че резултатите за по-късните моменти не се актуализират, докато работите. Натиснете „Изчисли“, за да ги актуализирате.",
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "Скорост",
+                    "english": "Speed"
+                }
+            }
+        },
+        "lpn_time_run_report": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_note",
+                    "value": "Виждате мрежата в първия момент на отчитане. Изчисляването на тази мрежа за целия ѝ времеви период отнема толкова дълго, че резултатите за по-късните моменти не се актуализират, докато работите. Натиснете „Изчисли“, за да ги актуализирате.",
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "Скорост",
+                    "english": "Speed"
                 }
             }
         },

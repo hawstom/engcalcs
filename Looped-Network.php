@@ -916,6 +916,12 @@ EngCalcs.pageConfig = {
 	lpn_time_run: <?=json_encode($ec_lang['lpn_time_run'])?>,
 	lpn_time_run_tip: <?=json_encode($ec_lang['lpn_time_run_tip'])?>,
 	lpn_time_run_note: <?=json_encode($ec_lang['lpn_time_run_note'])?>,
+<?php   // The run box (Task 450). Three new strings; `lpn_time_running` above says what it says
+        // while it works, and `lpn_close` is the word already on every other dismiss control here. ?>
+	lpn_time_run_done: <?=json_encode($ec_lang['lpn_time_run_done'])?>,
+	lpn_time_run_failed: <?=json_encode($ec_lang['lpn_time_run_failed'])?>,
+	lpn_time_run_report: <?=json_encode($ec_lang['lpn_time_run_report'])?>,
+	lpn_close: <?=json_encode($ec_lang['lpn_close'])?>,
 	lpn_time_speed: <?=json_encode($ec_lang['lpn_time_speed'])?>,
 	lpn_time_speed_tip: <?=json_encode($ec_lang['lpn_time_speed_tip'])?>,
 <?php   // The Settings box (Task 441). Four of its five strings are borrowed from controls that

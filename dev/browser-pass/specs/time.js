@@ -184,6 +184,13 @@ exports.run = async function ({ browser, report }) {
 			await a.page.evaluate(() => window.EngCalcs.lpnTimeRunNow());
 			await a.waitFor(async () => (await readState()).tanks.length > 0, 'the run', 30000);
 			t0 = await readState();
+			// The run box (Task 450) stays up with its report until it is closed. Closed here so
+			// the rest of this spec works a map with nothing floating over its bottom-left corner;
+			// the box itself is checked at the end, on the over-budget path it was built for.
+			await a.page.evaluate(() => {
+				const x = document.querySelector('#lpn_runbox .lpn-runbox-x');
+				if (x) { x.click(); }
+			});
 		}
 		report.ok(/0:00/.test(t0.clock), 'the transport opens at the start of the run', t0.clock);
 		report.ok(t0.tanks.length > 0, 'and the tank levels are listed', t0.tanks);
@@ -431,7 +438,105 @@ exports.run = async function ({ browser, report }) {
 		report.eq(ran.runs, 1, 'Run works the whole period out');
 		report.ok(ran.frames > 0, 'the frames are back', String(ran.frames));
 		report.eq(ran.note, '', 'and the page stops warning about them');
-		await a.page.evaluate(() => { window.EngCalcs.LPN_TIME_AUTO.budgetMs = 400; });
+
+		// ---- 6. AND THE RUN BOX SAYS SO WHILE IT HAPPENS (Task 450) ----
+		//
+		// Tom, 2026-08-19: "The Run button does nothing... It needs a box with a progress bar and
+		// completion report." The wiring was live; what was missing was any sign of it. This is the
+		// state it was missing from -- over the budget, so Run has real work to do and takes
+		// seconds over it -- which is why the check is here rather than on the cheap path.
+		//
+		// **THE BOX IS SAMPLED WHILE THE RUN IS IN FLIGHT, NOT AFTER IT.** A poll is installed in
+		// the page BEFORE the button is pressed, because everything this claims is about the
+		// seconds in the middle: an assertion made after the run can only ever see the end of it,
+		// and a box that appeared only at the end would pass it.
+		// **A RUN WORTH WATCHING, MADE THE WAY A MODELLER MAKES ONE.** Everything above has been
+		// shrinking this network to keep the spec quick, and a 9-hour run at a 1-hour step is over
+		// in a few milliseconds -- nothing to see, and nothing to test. So the reporting step is
+		// taken down to 15 minutes through the page's own field, which is the axis the cost is on
+		// (dev/lpn-spike/eps-cost-bench.js: 97 frames measured 736 ms against 25 frames at 40-180)
+		// and exactly what a modeller chasing a transient does.
+		await a.toolbarClick('Settings');
+		await a.settle(400);
+		await a.page.evaluate(() => {
+			const f = [...document.querySelectorAll('#lpn_set_time_fields input[type="text"]')];
+			f[0].value = '24:00';
+			f[0].dispatchEvent(new Event('change', { bubbles: true }));
+			f[4].value = '0:15';
+			f[4].dispatchEvent(new Event('change', { bubbles: true }));
+		});
+		await a.page.evaluate(() => { document.getElementById('lpn_setbox_close').click(); });
+		await a.settle(600);
+
+		// The slice is shortened for this one check, and put back below. The shipped 100 ms is tuned
+		// for the run's own overhead (EngCalcs.LPN_EPANET_SLICE_MS); a poll in the page can only
+		// take a sample when the loop lets go of the thread, so a longer slice means fewer samples
+		// of a bar that is genuinely moving. The MECHANISM under test is identical either way.
+		await a.page.evaluate(() => { window.EngCalcs.LPN_EPANET_SLICE_MS = 25; });
+		await a.page.evaluate(() => {
+			window.__box = [];
+			window.__boxPoll = setInterval(() => {
+				const s = window.EngCalcs.lpnTimeRunBoxState();
+				const el = document.getElementById('lpn_runbox');
+				window.__box.push({
+					phase: s.phase, f: s.fraction,
+					dom: !!el,
+					width: el ? (el.querySelector('.lpn-runbox-fill').style.width || '') : '',
+					barShown: !!(el && el.querySelector('.lpn-runbox-bar').style.display !== 'none')
+				});
+			}, 10);
+		});
+		await a.toolbarClick('Run');
+		await a.settle(3000);
+		const seen = await a.page.evaluate(() => {
+			clearInterval(window.__boxPoll);
+			return window.__box;
+		});
+		const live = seen.filter(s => s.dom && s.phase === 'running');
+		report.ok(live.length > 0, 'THE BOX IS ON THE PAGE WHILE THE RUN RUNS -- it is not a dead button',
+			`${live.length} of ${seen.length} samples`);
+		report.ok(live.some(s => s.barShown), '...with its progress bar showing');
+		report.ok(live.every((s, i) => i === 0 || s.f >= live[i - 1].f),
+			'...and the bar only ever fills', live.map(s => s.width || '0%').join(' '));
+
+		// ---- what it says once the run is done ----
+		const boxDone = await a.page.evaluate(() => {
+			const el = document.getElementById('lpn_runbox');
+			const s = window.EngCalcs.lpnTimeRunBoxState();
+			return {
+				dom: !!el, phase: s.phase, frames: s.frames,
+				msg: el ? (el.querySelector('.lpn-runbox-msg').textContent || '') : '',
+				barShown: !!(el && el.querySelector('.lpn-runbox-bar').style.display !== 'none'),
+				summary: el ? ((el.querySelector('.lpn-runbox-report summary') || {}).textContent || '') : '',
+				reportShown: !!(el && el.querySelector('.lpn-runbox-report').style.display !== 'none'),
+				report: window.EngCalcs.lpnTimeRunReport()
+			};
+		});
+		report.ok(boxDone.dom && boxDone.phase === 'done',
+			'the box is still there when the run ends, holding its report', boxDone.phase);
+		report.ok(!boxDone.barShown, '...and the progress bar goes, because there is no longer any progress');
+		report.has(boxDone.msg, String(boxDone.frames),
+			'THE COMPLETION REPORT STATES THE FRAME COUNT', boxDone.msg);
+		report.ok(/\d/.test(boxDone.msg.replace(String(boxDone.frames), '')),
+			'...and how long it took', boxDone.msg);
+		// **EPANET'S OWN REPORT, NOT OURS.** Checked by the engine's own banner: a report we
+		// composed out of our own numbers and labelled EPANET's would be worse than none.
+		report.ok(boxDone.reportShown && /EPANET/i.test(boxDone.summary),
+			'the EPANET run report is offered', boxDone.summary);
+		report.ok(/E P A N E T/.test(boxDone.report) && /Version 2\.3/.test(boxDone.report),
+			'...and it is the engine\'s own text, banner and version and all',
+			(boxDone.report || '').split('\n').slice(2, 3).join('') + ` [${(boxDone.report || '').length} chars]`);
+
+		// ---- and it goes when it is dismissed ----
+		await a.page.evaluate(() => { document.querySelector('#lpn_runbox .lpn-runbox-x').click(); });
+		await a.settle(200);
+		report.ok(await a.page.evaluate(() => !document.getElementById('lpn_runbox')),
+			'and the box goes when it is closed, leaving nothing over the map');
+
+		await a.page.evaluate(() => {
+			window.EngCalcs.LPN_TIME_AUTO.budgetMs = 400;
+			window.EngCalcs.LPN_EPANET_SLICE_MS = 100;
+		});
 	} finally {
 		await a.close();
 	}

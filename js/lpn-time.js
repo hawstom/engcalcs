@@ -235,7 +235,11 @@
 		// `idle` is the quiet-period timer that provokes an automatic run.
 		// `runSig` is the fingerprint of the model the frames in hand came out of, so an edit can be
 		// asked the only question that matters: did anything the solver reads actually change?
-		lastRunMs: null, wanted: false, busy: false, idle: null, runSig: null
+		// `wantedByUser` rides along with `wanted` and decides ONE thing: whether the run box
+		// appears (Task 450). A run somebody pressed Run for owes them a sign that it started; an
+		// automatic run after a quiet moment owes them silence, or the page grows a box that pops
+		// up every time the mouse stops moving.
+		lastRunMs: null, wanted: false, wantedByUser: false, busy: false, idle: null, runSig: null
 	};
 
 	/**
@@ -321,7 +325,14 @@
 			// icon-only strip and untrue of a page where everything else recalculates as you type.
 			run: pageConfig.lpn_time_run || 'Run',
 			runTip: pageConfig.lpn_time_run_tip || 'Work out this network at every reporting time, from the start of the run to the end of it.',
-			runNote: pageConfig.lpn_time_run_note || 'You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.'
+			runNote: pageConfig.lpn_time_run_note || 'You are seeing the first reporting time. This network takes long enough to work out over its whole time period that the later times are not kept up to date while you work: press Run when you want them.',
+			// ---- the run box (Task 450) ----
+			// `running` above is what it says while it works, borrowed rather than re-keyed: it is
+			// already the sentence the status bar uses for exactly this moment.
+			runDone: pageConfig.lpn_time_run_done || 'The run finished. Reporting times: {frames}. Time taken: {secs} s.',
+			runFailed: pageConfig.lpn_time_run_failed || 'The run did not finish, so there are no results for the later times.',
+			runReport: pageConfig.lpn_time_run_report || 'EPANET run report',
+			close: pageConfig.lpn_close || 'Close'
 			// **FIVE STRINGS LEFT THIS LIST WITH THE PANE TAB**: lpn_time_tank, lpn_time_level and
 			// lpn_time_settings_open named the tank table and the door to the settings, and
 			// lpn_time_menu / lpn_time_menu_tip named the tab itself. lpn_time_menu is still
@@ -395,12 +406,13 @@
 			cancelIdleRun();
 			state.lastRunMs = null;
 			state.runSig = null;
+			state.wantedByUser = false;
 			if (state.run) { state.run = null; state.t = 0; renderPanel(); }
 			return false;
 		}
 		// The engine is unreachable: one instant, said out loud. Unchanged, and it is not an edit
 		// path -- there is nothing to invalidate because there were never any frames.
-		if (!EC.lpnEpanetRun) { state.wanted = false; return noEngine(model); }
+		if (!EC.lpnEpanetRun) { state.wanted = false; state.wantedByUser = false; return noEngine(model); }
 		if (state.wanted) { state.wanted = false; startRun(model); return true; }
 		// **AN EDIT THE SOLVER CANNOT SEE IS NOT AN EDIT AT ALL.** Moving a node, editing a text
 		// element, renaming, recolouring, retitling a label: none of them can change one flow, and
@@ -483,31 +495,49 @@
 	 * A run already in flight owns the engine, so the flag is left set and the finishing run kicks
 	 * the next solve on its way out: a Run pressed during a slow run is queued, never dropped.
 	 */
-	function requestRun() {
+	function requestRun(byUser) {
 		cancelIdleRun();
 		if (!host) { return; }
 		state.wanted = true;
+		if (byUser) { state.wantedByUser = true; }
 		if (state.busy) { return; }
 		if (host.solveNow) { host.solveNow(); } else { host.solve(); }
 	}
 	function startRun(model) {
-		var token = ++state.token, t0 = nowMs(), sig = modelFingerprint(model);
+		var token = ++state.token, t0 = nowMs(), sig = modelFingerprint(model),
+			shown = state.wantedByUser;
 		cancelIdleRun();
 		state.busy = true;
+		state.wantedByUser = false;
 		host.status(strings().running);
-		EC.lpnEpanetRun(model).then(function (run) {
+		if (shown) { boxStart(token); }
+		EC.lpnEpanetRun(model, {
+			onProgress: function (p) {
+				// **A SUPERSEDED RUN MAY NOT DRIVE THE BOX.** It is still running, and its bar
+				// would still be filling, and it is answering a network that no longer exists.
+				if (token !== state.token || boxState.token !== token) { return; }
+				boxProgress(p);
+			}
+		}).then(function (run) {
 			// **THE MEASUREMENT IS TAKEN WHATEVER HAPPENED TO THE TOKEN.** A superseded run cost
 			// exactly as much wall clock as a kept one, and it is the cost this network's next
 			// automatic run is judged by.
 			state.lastRunMs = nowMs() - t0;
 			runFinished();
-			if (token !== state.token) { return; }   // a newer edit already started its own run
+			if (token !== state.token) {
+				// The box belonged to this run and this run no longer belongs to the page. It goes
+				// rather than freezing part-filled, which would read as a live run for ever.
+				if (boxState.token === token) { boxHide(); }
+				return;   // a newer edit already started its own run
+			}
 			if (!run.ok) {
 				state.run = null;
 				host.apply(run);
+				boxFailed(token);
 				renderPanel();
 				return;
 			}
+			boxDone(token, run, state.lastRunMs);
 			state.run = run;
 			// The model these frames came out of, so a later edit can ask whether it changed.
 			// Taken from the model that was RUN, never from a fresh assembly at this moment.
@@ -517,21 +547,27 @@
 		}, function (err) {
 			state.lastRunMs = nowMs() - t0;
 			runFinished();
-			if (token !== state.token) { return; }
+			if (token !== state.token) {
+				if (boxState.token === token) { boxHide(); }
+				return;
+			}
+			boxFailed(token);
 			noEngine(model);
 			if (root.console && console.warn) { console.warn('EPANET extended-period run failed:', err); }
 		});
 	}
 	function runFinished() {
 		state.busy = false;
-		if (state.wanted) { requestRun(); }
+		// The queued request keeps whatever it was asked with: a Run pressed during a slow run is
+		// still a Run the user pressed, so the box it earned is not lost by being queued.
+		if (state.wanted) { requestRun(state.wantedByUser); }
 	}
 
 	/**
 	 * Run the whole period NOW. The Run button, and the transport asking to see a moment it has no
 	 * frame for.
 	 */
-	EC.lpnTimeRunNow = function () { requestRun(); };
+	EC.lpnTimeRunNow = function () { requestRun(true); };
 
 	// **WHY THE FRAMES ARE JUDGED AT THE SOLVE AND NOT AT THE EDIT.** There was briefly a
 	// lpnTimeInvalidate() on scheduleSolve(), dropping them 300 ms earlier, to close the window in
@@ -631,7 +667,7 @@
 		// first" would be a control that does nothing. The rejected alternative is to solve one
 		// instant at t and draw it: that is the flat-tank answer noEngine() exists to refuse to
 		// give silently, and it is only honest where there is no engine to give a better one.
-		if (EC.lpnEpanetRun && EC.lpnTimeIsExtended(docTimes())) { requestRun(); }
+		if (EC.lpnEpanetRun && EC.lpnTimeIsExtended(docTimes())) { requestRun(true); }
 		else {
 			// No engine: the only way to show another moment is to solve it, and modelTimeSeconds()
 			// reads state.t so the rebuilt model is at the new instant.
@@ -773,6 +809,177 @@
 	};
 
 	// ================================================================================================
+	// THE RUN BOX -- ROADMAP Task 450
+	// ================================================================================================
+	//
+	// Tom, 2026-08-19: "The Run button does nothing... It needs a box with a progress bar and
+	// completion report. epanetjs also includes a link to the EPANET run report."
+	//
+	// **WHAT WAS ACTUALLY WRONG.** The wiring was live the whole time. What is missing is the sign
+	// that it is live: on a network over the auto-run budget -- which is the state Run is most often
+	// pressed from, because that is the state the page waits in -- pressing Run starts SECONDS of
+	// work and shows nothing at all while it happens. A button that takes seconds in silence is
+	// indistinguishable from a dead one, and the status line flashing "working" then vanishing is
+	// no better on a run that finishes in 265 ms.
+	//
+	// **THE PROGRESS IS REAL, NOT A SPINNER PRETENDING.** js/lpn-epanet.js's run loop reports the
+	// simulated time it has reached, so the fraction is t/duration -- EPANET's own clock, which only
+	// moves forward. Nothing here estimates or interpolates anything.
+	//
+	// **ONLY A RUN SOMEBODY ASKED FOR GETS A BOX** (state.wantedByUser). An automatic run after a
+	// quiet moment is the page keeping up, and a box that appears every time the mouse stops moving
+	// is noise; the whole point of the automatic path is that it costs no attention.
+	//
+	// **IT STAYS UNTIL IT IS CLOSED**, rather than vanishing when the run ends. What it holds after
+	// the run is a report -- how many reporting times, how long, and EPANET's own text -- and a
+	// report nobody can finish reading is not a report. The next run replaces its contents.
+	//
+	// **THE BOX IS BUILT HERE AND APPENDED TO document.body**, not into a container the page owns.
+	// That keeps this whole feature inside this file: js/looped-network.js needs no new element, no
+	// new id and no new call site for it.
+
+	var boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, token: 0 },
+		boxReport = '',
+		boxUi = null;
+
+	function boxStart(token) {
+		boxState = { open: true, phase: 'running', fraction: 0, frames: 0, ms: 0, reportLength: 0, token: token };
+		boxReport = '';
+		renderBox(true);
+	}
+	function boxProgress(p) {
+		if (!boxState.open || boxState.phase !== 'running') { return; }
+		// MONOTONIC HERE TOO. The engine already promises it; a bar that could go backwards is
+		// worse than no bar, so the guarantee is kept on both sides of the seam rather than
+		// trusted across it.
+		var f = (p && p.fraction) || 0;
+		if (f > boxState.fraction) { boxState.fraction = f > 1 ? 1 : f; }
+		boxState.frames = (p && p.frames) || boxState.frames;
+		renderBox(false);
+	}
+	function boxDone(token, run, ms) {
+		if (!boxState.open || boxState.token !== token) { return; }
+		boxState.phase = 'done';
+		boxState.fraction = 1;
+		boxState.frames = ((run && run.frames) || []).length;
+		boxState.ms = ms;
+		boxReport = (run && run.report) || '';
+		boxState.reportLength = boxReport.length;
+		renderBox(true);
+	}
+	function boxFailed(token) {
+		if (!boxState.open || boxState.token !== token) { return; }
+		boxState.phase = 'failed';
+		boxReport = '';
+		boxState.reportLength = 0;
+		renderBox(true);
+	}
+	function boxHide() {
+		boxState = { open: false, phase: 'idle', fraction: 0, frames: 0, ms: 0, reportLength: 0, token: 0 };
+		boxReport = '';
+		renderBox(true);
+	}
+
+	function boxMessage(S) {
+		if (boxState.phase === 'running') { return S.running; }
+		if (boxState.phase === 'failed') { return S.runFailed; }
+		return S.runDone
+			.replace('{frames}', String(boxState.frames))
+			// Two decimals under a second, one above it. A 40 ms run printed as "0.0 s" reads as
+			// "no time was measured" rather than "it was quick", which is the opposite of what the
+			// number is there to say.
+			.replace('{secs}', (boxState.ms / 1000).toFixed(boxState.ms < 1000 ? 2 : 1));
+	}
+
+	/**
+	 * The box on screen. `full` redraws the parts that change only when the phase does -- the
+	 * message, the report, whether the bar is there at all; a progress tick moves the fill and the
+	 * percentage and nothing else, because re-announcing the message to a screen reader thirty
+	 * times during one run is exactly the noise `aria-live` is famous for.
+	 */
+	function renderBox(full) {
+		var S, pct;
+		if (typeof document === 'undefined' || !document.body) { return; }
+		if (!boxState.open) {
+			if (boxUi && boxUi.root && boxUi.root.parentNode) { boxUi.root.parentNode.removeChild(boxUi.root); }
+			boxUi = null;
+			return;
+		}
+		S = strings();
+		if (!boxUi) { boxUi = buildBox(S); }
+		if (!boxUi.root.parentNode) { document.body.appendChild(boxUi.root); }
+		pct = Math.round(boxState.fraction * 100);
+		boxUi.fill.style.width = pct + '%';
+		// A bare number and a percent sign, which reads the same in every language this suite ships
+		// in -- no string, and therefore nothing to translate or to get wrong.
+		boxUi.pct.textContent = pct + '%';
+		boxUi.bar.setAttribute('aria-valuenow', String(pct));
+		if (!full) { return; }
+		boxUi.msg.textContent = boxMessage(S);
+		boxUi.bar.style.display = boxState.phase === 'running' ? '' : 'none';
+		boxUi.pct.style.display = boxState.phase === 'running' ? '' : 'none';
+		// **THE ENGINE'S OWN REPORT, OR NOTHING.** Where the build wrote none, the control is
+		// absent rather than empty -- offering a report and then showing an empty box would be a
+		// worse answer than not offering one.
+		if (boxReport) {
+			boxUi.pre.textContent = boxReport;
+			boxUi.report.style.display = '';
+			boxUi.report.open = false;
+		} else {
+			boxUi.pre.textContent = '';
+			boxUi.report.style.display = 'none';
+		}
+	}
+
+	function buildBox(S) {
+		var root = el('div', { id: 'lpn_runbox', 'class': 'lpn-runbox' }),
+			head = el('div', { 'class': 'lpn-runbox-head' }),
+			title = el('span', { 'class': 'lpn-runbox-title' }, S.run),
+			x = el('button', { type: 'button', 'class': 'lpn-runbox-x', title: S.close, 'aria-label': S.close }, '×'),
+			// `aria-live` on the MESSAGE only. The box itself must not be a live region or every
+			// percentage tick would be read out loud.
+			msg = el('p', { 'class': 'lpn-runbox-msg', 'aria-live': 'polite' }),
+			bar = el('div', {
+				'class': 'lpn-runbox-bar', role: 'progressbar', 'aria-label': S.running,
+				'aria-valuemin': '0', 'aria-valuemax': '100', 'aria-valuenow': '0'
+			}),
+			fill = el('div', { 'class': 'lpn-runbox-fill' }),
+			pct = el('span', { 'class': 'lpn-runbox-pct' }),
+			report = el('details', { 'class': 'lpn-runbox-report' }),
+			summary = el('summary', null, S.runReport),
+			pre = el('pre', { 'class': 'lpn-runbox-pre' });
+		x.addEventListener('click', boxHide);
+		bar.appendChild(fill);
+		head.appendChild(title);
+		head.appendChild(pct);
+		head.appendChild(x);
+		report.appendChild(summary);
+		report.appendChild(pre);
+		root.appendChild(head);
+		root.appendChild(msg);
+		root.appendChild(bar);
+		root.appendChild(report);
+		return { root: root, msg: msg, bar: bar, fill: fill, pct: pct, report: report, pre: pre, x: x };
+	}
+
+	/**
+	 * What the box is showing, for a test that has to know. The report itself is not in here -- it
+	 * is the one field that can be hundreds of kilobytes -- so its length stands in for it and
+	 * EC.lpnTimeRunReport() hands over the text.
+	 */
+	EC.lpnTimeRunBoxState = function () {
+		return {
+			open: boxState.open, phase: boxState.phase, fraction: boxState.fraction,
+			frames: boxState.frames, ms: boxState.ms, reportLength: boxState.reportLength
+		};
+	};
+	/**
+	 * **EPANET'S OWN REPORT FOR THE LAST RUN, VERBATIM.** Never composed by us: see the note on
+	 * EngCalcs.lpnEpanetRun. Empty string when there is none.
+	 */
+	EC.lpnTimeRunReport = function () { return boxReport; };
+
+	// ================================================================================================
 	// THE TRANSPORT, ON THE TOOLBAR
 	// ================================================================================================
 	//
@@ -873,7 +1080,7 @@
 		// recalculate, which is a true thing for a button called Run to do, and hiding it would
 		// make the one feature it announces undiscoverable in the state most people open the page
 		// in. It is never the ONLY way to a period result -- see EC.LPN_TIME_AUTO.
-		ui.run = btn('run', S.run, function () { requestRun(); }, S.runTip);
+		ui.run = btn('run', S.run, function () { requestRun(true); }, S.runTip);
 		ui.prev = btn('step-back', S.prev, function () { stepBy(-1); });
 		ui.play = btn('play', S.play, function () { if (state.playing) { pause(); } else { play(); } });
 		ui.next = btn('step-fwd', S.next, function () { stepBy(1); });
