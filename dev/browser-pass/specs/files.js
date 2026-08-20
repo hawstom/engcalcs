@@ -30,8 +30,17 @@ exports.run = async function ({ browser, report }) {
 		report.has(panel && panel.text, 'initials', 'the panel asks for initials colleagues will know');
 		report.ok((panel.buttons || []).includes('Continue'), 'and offers Continue');
 
+		// **ENTER IN THE INITIALS BOX IS CONTINUE** (Tom, 2026-08-19: "After entering initials, can
+		// the [Enter] key close the box?"). Answered with the KEY rather than the button, so the
+		// whole save that follows is proof the key reaches the same handler -- a check that only
+		// asserted the panel closed would pass on a key that closed it and did nothing else.
 		await a.queuePick(FILE1);
-		await a.answerTrainingPanel('TGH');
+		await a.page.focus('#lpn_dialog input[type="text"]');
+		await a.page.keyboard.type('TGH');
+		await a.page.keyboard.press('Enter');
+		await a.settle(400);
+		report.ok(!(await a.dialog()), 'Enter in the initials box is Continue — the panel closes');
+		report.ok((await a.pickerCalls()).length > 0, '...and goes on to the picker, not just away');
 		await a.settle(500);
 
 		const calls = await a.pickerCalls();

@@ -142,17 +142,23 @@ byId.lpn_toolbar.querySelectorAll = () => [];
 	L.setCanvas(800, 600);
 	const v = L.geoHome();
 	ok('a new geographic project has a home view', !!v, JSON.stringify(v));
-	ok('...centred on the Net3 city, in the document\'s own frame',
+	// **THE WHOLE WORLD, NOT A CITY** (Tom, 2026-08-19: "Net3 (Novato, California) is cute. But I
+	// think that 'entire world' is more kind"). The home view used to be a 6.6 km box on the ground
+	// under EPA's Net3, which is a private joke to anyone not in the north San Francisco Bay. The
+	// world is the one opening view equally near to every user, and the basemap makes it
+	// recognisable, so getting to your own town is panning rather than searching.
+	ok('...centred on the origin, in the document\'s own frame',
 		Math.abs(v.cx - L.GEO_HOME.lon) < 1e-9 && Math.abs(v.cy - (-L.GEO_HOME.lat)) < 1e-9,
 		JSON.stringify({ cx: v.cx, cy: v.cy }));
-	// The span is stated in METRES and converted here, so the constant keeps its meaning whatever
-	// the document's units or a future projection do. Check it lands within a few percent.
+	// Fitted on the SHORTER canvas axis, so the whole world is on screen whatever shape the window
+	// is -- and measured in DEGREES OF LATITUDE, because a whole-world view is defined by the map
+	// rather than by a ground distance. Web Mercator stops at 85.05 degrees, so the drawable world
+	// is 170.1 degrees tall.
 	L.setView(v);
-	const acrossDeg = 600 / L.view().s;
-	const acrossM = G.geodesicMeters(L.GEO_HOME.lon, L.GEO_HOME.lat - acrossDeg / 2,
-		L.GEO_HOME.lon, L.GEO_HOME.lat + acrossDeg / 2);
-	ok('...spanning about the distance asked for', Math.abs(acrossM - L.GEO_HOME.span) < 50,
-		acrossM.toFixed(0) + ' m against ' + L.GEO_HOME.span);
+	const acrossDeg = Math.min(800, 600) / L.view().s;
+	ok('...spanning the whole drawable world, pole cut-off to pole cut-off',
+		Math.abs(acrossDeg - 2 * 85.0511287798066) < 1e-6,
+		acrossDeg.toFixed(4) + ' degrees of latitude');
 	// A GRID project must get none of this.
 	L.reset();
 	L.setCanvas(800, 600);

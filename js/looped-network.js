@@ -1912,24 +1912,28 @@ var EngCalcs = EngCalcs || {};
 	// x is a LONGITUDE and y is a LATITUDE, in that order -- this page's own x/y order, and the
 	// opposite of the "lat, long" a person says out loud.
 	//
-	// **WHERE A NEW GEOGRAPHIC PROJECT OPENS**, and the coordinates are Tom's: the north San
-	// Francisco Bay, the ground EPA's own Net3 example network sits on. An empty project has no
-	// extent to fit, so without this the first geographic project opens on whatever transform the
-	// last grid project left -- the middle of an ocean at an arbitrary scale.
+	// **WHERE A NEW GEOGRAPHIC PROJECT OPENS: THE WHOLE WORLD.** Tom, 2026-08-19: *"Net3 (Novato,
+	// California) is cute. But I think that 'entire world' is more kind. Can we make the initial
+	// view the entire world?"* It used to open on the ground under EPA's Net3, which is a private
+	// joke for anyone who is not in the north San Francisco Bay -- and for everybody else it is an
+	// unfamiliar coastline with no clue how to get home. The whole world is the one starting view
+	// that is equally near to every user, and the basemap makes it immediately recognisable, so
+	// panning and zooming to your own town is obvious rather than a search.
 	//
-	// The span is a DISTANCE, in metres, converted here to the degrees the document is in, so the
-	// constant keeps its meaning if the projection ever changes.
-	var LPN_GEO_HOME = { lon: -122.5686103, lat: 38.106067, span: 6641 };
+	// An empty project has no extent to fit, so without a home view the first geographic project
+	// would open on whatever transform the last grid project left -- the middle of an ocean at an
+	// arbitrary scale. That is still the reason this function exists.
+	//
+	// The span is in DEGREES OF LATITUDE, not metres: a whole-world view is defined by the map, not
+	// by a ground distance, and Web Mercator cuts off at 85.05 degrees, so the full height of the
+	// drawable world is 2 x LPN_MERC_MAX_LAT. Fitting on the SHORTER canvas axis guarantees the
+	// whole world is on screen whatever shape the window is.
+	var LPN_GEO_HOME = { lon: 0, lat: 0 };
 	function geoHomeView() {
 		var w = svg && svg.clientWidth ? svg.clientWidth : 0,
 			h = svg && svg.clientHeight ? svg.clientHeight : 0,
-			// Degrees of latitude across the span, at that latitude. Latitude is the safe axis to
-			// scale by: a degree of it barely changes with position, where a degree of longitude
-			// shrinks by cos(lat) and would make the view width depend on where you are.
-			degLat = LPN_GEO_HOME.span /
-				Geom.geodesicMeters(LPN_GEO_HOME.lon, LPN_GEO_HOME.lat - 0.5,
-					LPN_GEO_HOME.lon, LPN_GEO_HOME.lat + 0.5);
-		if (!w || !h || !(degLat > 0)) { return null; }
+			degLat = 2 * LPN_MERC_MAX_LAT;
+		if (!w || !h) { return null; }
 		return { cx: inwardX(LPN_GEO_HOME.lon), cy: inwardY(LPN_GEO_HOME.lat), s: Math.min(w, h) / degLat };
 	}
 	// Six decimals is ~0.11 m at the equator, finer than any pipe is placed and coarse enough to
@@ -10711,6 +10715,19 @@ var EngCalcs = EngCalcs || {};
 			label.textContent = (pc.lpn_file_training_name || 'Your initials') + ' ';
 			input = document.createElement('input');
 			input.type = 'text'; input.maxLength = 60; input.style.marginLeft = '4px';
+			// **ENTER IS CONTINUE** (Tom, 2026-08-19: "After entering initials, can the [Enter] key
+			// close the box?"). A one-field dialog whose only real answer is the thing you just
+			// typed should not require a trip to the mouse. Wired to the button rather than to a
+			// copy of its handler, so the two can never do different things -- and the button is
+			// found by its own label so a rename cannot silently unwire the key.
+			input.addEventListener('keydown', function (e) {
+				if (e.key !== 'Enter') { return; }
+				e.preventDefault();
+				var go = Array.prototype.filter.call(
+					document.querySelectorAll('#lpn_dialog button'),
+					function (b) { return b.textContent === (pc.lpn_file_training_continue || 'Continue'); })[0];
+				if (go) { go.click(); }
+			});
 			label.appendChild(input);
 			body.appendChild(label);
 		}, [
