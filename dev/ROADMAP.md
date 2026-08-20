@@ -141,18 +141,27 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   `lpn_notes_*` (Task 448's stability note and the Notes review) and `lpn_file_import_inp_tip`. Plus
   the keys written since: `lpn_color_mode_manual`, `lpn_time_no_period`, and the three
   `lpn_basemap_satellite_*`. Needs Tom's authorization, and a Wave 0 over the changed set first.
-- 55|447| **Import XY project / Import EPANET file, and either one converts when the project is
-  lat/lon.** Tom, 2026-08-19: "the paradigm we want is 'Import XY project / Import EPANET file', so
-  that we require an xy project to be safe on disk where we can know it's safe to import and
-  convert. Either of these menu items, if done in a geomap/latlon/world project should start the
-  coordinates conversion wizard."
-  - Replaces converting a project in place. **The safety argument is the point:** the XY original
-    stays on disk untouched, so a conversion can never be the only copy — which is what makes the
-    wizard's Cancel meaningful at the document level and not just the dialogue level. Supersedes the
-    in-place framing of Task 436.
-  - Two doors, one implementation: the destination project's coordinate kind decides whether the
-    wizard runs, not which menu row was used.
-
+- 75|447| **Replace "Convert to lat/lon" with an IMPORT, and make an `.inp` import obey it too.**
+  Tom, 2026-08-19: *"Didn't I say that we no longer want 'Convert to lat/lon' and in place of it we
+  want 'Import XY file' that's disabled for xy projects?"* He did (2026-08-19, Task 447's original
+  wording) and it was recorded as a follow-up rather than as a replacement. It is a replacement.
+  - **The model.** A lat/lon project is the only place coordinates get converted, and it converts
+    something ARRIVING, never itself. So: `File > Import XY project…` and `File > Import EPANET
+    file…`, both **disabled in an XY project** — there is nothing for an XY project to convert into.
+    In a lat/lon project either row brings the network in and runs the placement wizard.
+    `Convert to lat/lon` goes away entirely, and with it the in-place conversion.
+  - **The safety argument is the whole point:** the XY original stays on disk untouched, so a
+    conversion can never be the only copy, which is what makes the wizard's Cancel meaningful at
+    the DOCUMENT level and not just the dialogue level.
+  - **THE BUG TOM HIT:** *"I tried to import Net3.inp into a lat/lon project. Instead, it opened a
+    new project."* `.inp` import calls `importProject()` unconditionally, so it always makes a new
+    XY project whatever you had open. Under the model above that is wrong in a lat/lon project and
+    right in an XY one, so the destination project's coordinate kind decides — the same rule as the
+    menu rows, one implementation for both doors.
+  - **[H] Tom asked to discuss before building.** The open question is what "Import" means to the
+    CURRENT project: replace its contents, or merge into them. Replace is simpler and matches what
+    the row does today; merge is what "import" means in most tools and is the only one that lets a
+    person build a city out of several models.
 - 45|445| **Labels: invert priority to "Drop first in case of conflict", 1 dropping first.** Tom,
   2026-08-19: "our labels priority paradigm really wants to be Labels.Drop First In Case of Conflict
   … it's a version bump because the order of the numbers reverses. But it's the right thing to do."
@@ -647,6 +656,23 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
+
+- 80|460| **[H] Time modelling needs an INTERFACE, and a plan before any of it is built.** Tom,
+  2026-08-19: *"We aren't where we need to be yet to do time modeling. We need to add patterns,
+  curves, and controls. I think I already mentioned this. We have to plan this."* He is right, and
+  the children exist (248.02 patterns, 248.03 controls, 248.04 curves) but nobody has sequenced
+  them or drawn a screen.
+  - **What is true today, precisely, because the two halves diverge:** the DOCUMENT carries all of
+    it. `dev/lpn-spike/eps-document-harness.js` takes Net3.inp through `docFromInp` →
+    `serializeProject` → JSON → `applySaved` → `assembleModel` → run, and reproduces EPA's own
+    published 24-hour report to **0.005 ft** at every one of its 25 reporting steps, with all three
+    tanks filling and draining, three curve points per pump, five patterns and six controls
+    surviving a save and an open. **The INTERFACE carries none of it** — there is no way to see,
+    add or edit a pattern, a curve or a control. Import, solve, save, reopen: yes. Author: no.
+  - So the gap is exactly and only the editing interface, which is what makes this plannable.
+  - Tom's caution about the evidence was correct and is why that harness exists: the older
+    `eps-net3-harness.js` proves the PARSER and the engine, and he asked *"have you tried running
+    our json?"* — nobody had.
 
 - 35|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
   and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves shipped
