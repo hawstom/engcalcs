@@ -183,6 +183,33 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     in place: a project written under the old sense would silently invert. That migration is the
     task, not the relabelling.
 
+- 65|455| **"Assets" is the long-term word for the six system types, and the bottom pane should have a
+  tab for each.** Tom, 2026-08-19: *"The bottom pane tabs should include all assets. Also, despite
+  our existing work, I think that 'assets' is the right long-term term for our six types of system
+  features."*
+  - Six: junction, reservoir, tank, pipe, pump, valve. **Text is not an asset** — nothing about it
+    solves and a table of it has no columns worth reading. Tabs in the toolbar's own Add order,
+    nodes before links, with Profile staying first because it is a drawing and the rest are tables.
+  - **The word is the utility industry's own** (an asset register is a real document a real utility
+    keeps), and it says these are things somebody owns and replaces — which `element` never did.
+    Cost: EPANET says "objects" and epanet-js says "assets", so this moves toward the newer
+    neighbour; and every string carrying "element" is a paid re-rendering in 26 languages.
+    **So adopt it in the English and let the NEXT sprint carry it**, rather than running one for it.
+  - **[H] Open: seven tabs wrapping on a narrow window, or Profile plus one "Assets" tab with a type
+    selector.** Recommended the former. Shown to Tom 2026-08-19.
+
+- 60|456| **Net3-World has no time model at all**, which is why Tom's Run button and step selector
+  looked broken: `times`, `patterns` and `controls` are all absent from the file, so the duration is
+  0, there is exactly one reporting step and Play has nowhere to go. Net3 itself carries all three.
+  Not a converter defect — `georefFinish()` moves coordinates and touches none of them; the file was
+  saved from a Net3 that predated them.
+  - **The file is Tom's paste and ours to leave alone.** The fix is his: open Net3, File > Convert to
+    lat/lon, save over Net3-World. One operation, versus retyping 7 time fields, 5 patterns and 6
+    controls.
+  - **The product half is ours, and is the real lesson:** a project with no duration presents a
+    transport that looks broken rather than one that explains itself. Say so in the panel and point
+    at Total run time. One new key, and it must land before the sprint launches.
+
 - 70|450| **The Run button gives no sign it did anything, and it needs a run box.** Tom, 2026-08-19:
   *"The Run button does nothing… It needs a box with a progress bar and completion report. epanetjs
   also includes a link to the EPANET run report."* The wiring is live (`requestRun()` →
