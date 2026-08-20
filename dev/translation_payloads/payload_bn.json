@@ -608,7 +608,7 @@
                 "next_translated": {
                     "key": "lpn_georef_intro",
                     "value": "এই xy প্রকল্পটি একটি ভৌগোলিক প্রকল্পে রূপান্তর করবেন? আপনার প্রকল্পটি একটি বিশ্ব মানচিত্রের কেন্দ্রে বসানো হয়েছে। আপনার অবস্থানে জুম করুন এবং যতটা প্রয়োজন মডেলটি সরান, আকার পরিবর্তন করুন ও ঘোরান। উপাদানগুলো সমন্বয় করা শুরু করতে প্রস্তুত হলে, এই অবস্থান রাখুন চাপুন।",
-                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first."
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here."
                 }
             }
         },

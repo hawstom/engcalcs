@@ -611,7 +611,7 @@
                 "next_translated": {
                     "key": "lpn_georef_intro",
                     "value": "Convertire questo progetto xy in un progetto geografico? Il tuo progetto è stato collocato al centro di una mappa del mondo. Ingrandisci fino alla tua posizione e sposta, ridimensiona e ruota il modello quanto vuoi. Quando sei pronto a iniziare a modificare gli elementi, premi Mantieni questo posizionamento.",
-                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first."
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here."
                 }
             }
         },

@@ -586,7 +586,7 @@
                 "next_translated": {
                     "key": "lpn_georef_intro",
                     "value": "اس xy پراجیکٹ کو جغرافیائی پراجیکٹ میں تبدیل کریں؟ آپ کا پراجیکٹ دنیا کے نقشے کے درمیان رکھا گیا ہے۔ اپنی جگہ تک زوم کریں اور ماڈل کو جتنا چاہیں منتقل، دوبارہ سائز، اور گھمائیں۔ جب عناصر ایڈجسٹ کرنا شروع کرنے کے لیے تیار ہوں تو یہ جگہ برقرار رکھیں دبائیں۔",
-                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first."
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here."
                 }
             }
         },

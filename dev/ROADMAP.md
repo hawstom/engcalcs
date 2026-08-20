@@ -616,19 +616,30 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
 
-- 70|462| **The toolbar wants a water-network group, and LIBRARIES is the missing idea. AUTHORISED
-  2026-08-20** ("This looks clear to me"), and building. Tom,
-  2026-08-20: *"for Water Networks, I think we also need the following in a group: Libraries
-  (Patterns, Curves, Controls, Pumps, Pipes, Custom), **Settings**, Simulate, Transport, Time
-  selectors."*
-  - **This is Task 460's answer taking shape.** 460 says the document carries patterns, curves and
-    controls while the interface carries none; "Libraries" is where they would live, and Pumps /
-    Pipes / Custom extend the same idea to reusable definitions the network points AT rather than
-    copies of. Scope the two together.
-  - **Settings moves INTO this group**, off the right-hand end where Task 452 put it. Tom considered
-    and REJECTED putting the gear and the pane toggle on the map instead: *"Toggles on map doesn't
-    sound right to me. What we have now plus the lpn group (Libraries, Settings, Transport, and Time
-    selectors) seems like the right way to go."* So nothing floats on the drawing surface.
+- 60|465| **[H] Reusable DEFINITIONS — Pumps, Pipes, Custom — start at `effective()`, not at a screen.**
+  Tom named them beside Patterns/Curves/Controls in Task 462, but they are a different idea and
+  Task 462 deliberately left them out. Patterns, curves and controls are things the document already
+  HOLDS; a "150 mm PVC" pipe type carrying diameter, roughness and minor-loss k, referenced by 400
+  pipes so that editing it changes all 400, is a new INDIRECTION through the element model.
+  - The cost, in order: a definitions table plus a `typeRef` on the element (small); **a third
+    resolution layer under `effective()`** — override → element → type-default — and `effective()`
+    is the one seam the solver, the renderer, the labels, the popups and the six pane tables all
+    read through (this is the expensive part, and exactly the shared seam CLAUDE.md warns about);
+    and **a visible detached-versus-inherited state per property**, or a user edits a definition and
+    cannot see why nothing moved.
+  - **EPANET has no such concept**, so an `.inp` export flattens it and an import can never rebuild
+    it — which breaks Task 281's byte-identical round trip for anything typed.
+  - Worth doing, and worth a real productivity win on a large model. Task 390-sized, and it starts
+    at `effective()`. Task 462's Curves section is deliberately a VIEWER so this has one obvious
+    home and no second write path to unpick.
+
+- 55|466| **`lpnTimeModelBlock` will hand EPANET a control naming an element that no longer exists.**
+  Found while building Task 462. `js/lpn-epanet.js` composes a `[CONTROLS]` line from every stored
+  control, and EPANET REJECTS a control on an unknown link — so one dangling sentence takes the
+  whole run down rather than being ignored. The Libraries editor can no longer create that state
+  (a sentence naming a missing id is kept as text with no condition), **but a saved document whose
+  element was deleted after import still can.** The guard belongs in `lpnTimeModelBlock`, which
+  drops conditionless records already.
 
 - 55|464| **Screenshot prep is not earning its toolbar slot. AUTHORISED 2026-08-20** ("Yeah"). Tom, 2026-08-20, three separate
   complaints: *"I can't see myself using the Screenshot prep tool, partly because I can screenshot
@@ -640,23 +651,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     toolbar into the View menu; and make the hide actually complete, or stop calling it that. The
     third is the one that decides whether the feature is worth keeping at all — a clean-map mode
     that leaves the status bar on is not a clean map.
-
-- 80|460| **[H] Time modelling needs an INTERFACE, and a plan before any of it is built.** Tom,
-  2026-08-19: *"We aren't where we need to be yet to do time modeling. We need to add patterns,
-  curves, and controls. I think I already mentioned this. We have to plan this."* He is right, and
-  the children exist (248.02 patterns, 248.03 controls, 248.04 curves) but nobody has sequenced
-  them or drawn a screen.
-  - **What is true today, precisely, because the two halves diverge:** the DOCUMENT carries all of
-    it. `dev/lpn-spike/eps-document-harness.js` takes Net3.inp through `docFromInp` →
-    `serializeProject` → JSON → `applySaved` → `assembleModel` → run, and reproduces EPA's own
-    published 24-hour report to **0.005 ft** at every one of its 25 reporting steps, with all three
-    tanks filling and draining, three curve points per pump, five patterns and six controls
-    surviving a save and an open. **The INTERFACE carries none of it** — there is no way to see,
-    add or edit a pattern, a curve or a control. Import, solve, save, reopen: yes. Author: no.
-  - So the gap is exactly and only the editing interface, which is what makes this plannable.
-  - Tom's caution about the evidence was correct and is why that harness exists: the older
-    `eps-net3-harness.js` proves the PARSER and the engine, and he asked *"have you tried running
-    our json?"* — nobody had.
 
 - 35|248| **Extended-period simulation — the last of the three things the EPANET engine unlocked,
   and the GATE on the LibreEPANET.org launch (Tasks 306/307).** Tanks and valves shipped

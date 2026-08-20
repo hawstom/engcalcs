@@ -586,7 +586,7 @@
                 "next_translated": {
                     "key": "lpn_georef_intro",
                     "value": "Bu xy projesi coğrafi bir projeye dönüştürülsün mü? Projeniz bir dünya haritasının ortasına yerleştirildi. Konumunuza yakınlaştırın ve modeli istediğiniz kadar taşıyın, yeniden boyutlandırın ve döndürün. Öğeleri ayarlamaya başlamaya hazır olduğunuzda, Bu yerleşimi koru'ya basın.",
-                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first."
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here."
                 }
             }
         },

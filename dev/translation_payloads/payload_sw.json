@@ -608,7 +608,7 @@
                 "next_translated": {
                     "key": "lpn_georef_intro",
                     "value": "Badilisha mradi huu wa xy kuwa mradi wa kijiografia? Mradi wako umewekwa katikati ya ramani ya dunia. Kuza hadi eneo lako kisha uhamishe, ubadilishe ukubwa, na uzungushe mchoro kadri unavyotaka. Ukiwa tayari kuanza kurekebisha vipengele, bofya Weka mahali hapa.",
-                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first."
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here."
                 }
             }
         },

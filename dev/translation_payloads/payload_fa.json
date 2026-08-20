@@ -583,7 +583,7 @@
                 "next_translated": {
                     "key": "lpn_georef_intro",
                     "value": "این پروژهٔ xy به یک پروژهٔ جغرافیایی تبدیل شود؟ پروژهٔ شما در مرکز یک نقشهٔ جهانی قرار گرفته است. به موقعیت خود زوم کنید و مدل را هر قدر می‌خواهید جابه‌جا، هم‌اندازه و بچرخانید. وقتی آماده شدید تا عناصر را تنظیم کنید، «نگه داشتن این جای‌گیری» را بزنید.",
-                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first."
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here."
                 }
             }
         },

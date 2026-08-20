@@ -5920,7 +5920,7 @@ var EngCalcs = EngCalcs || {};
 		// The labels and the solver are OFF for the duration -- see georefSuspend().
 		georefSuspend(true);
 		georefRefreshBar();
-		setNotice(pc.lpn_georef_intro || 'Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself.');
+		setNotice(pc.lpn_georef_intro || 'Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Press Put the model here when step 1 looks right.');
 	}
 	// Can every stored point be read as a coordinate on the Earth? Within +/-180 and +/-90, which is
 	// suggestive and never conclusive: a small site drawn near the origin looks exactly the same.

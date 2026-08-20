@@ -583,7 +583,7 @@
                 "next_translated": {
                     "key": "lpn_georef_intro",
                     "value": "هل تريد تحويل مشروع xy هذا إلى مشروع جغرافي؟ وُضع مشروعك في مركز خريطة العالم. قرّب إلى موقعك، وحرّك النموذج وغيّر حجمه ودوّره كما تشاء. عندما تصبح جاهزاً لبدء ضبط العناصر، اضغط \"احتفظ بهذا الوضع\".",
-                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first."
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here."
                 }
             }
         },

@@ -606,7 +606,7 @@
                 "next_translated": {
                     "key": "lpn_georef_intro",
                     "value": "បំលែងគម្រោង xy នេះទៅជាគម្រោងភូមិសាស្ត្រឬ? គម្រោងរបស់អ្នកត្រូវបានដាក់នៅចំកណ្ដាលផែនទីពិភពលោក។ ពង្រីក\/បង្រួមទៅកន្លែងរបស់អ្នក រួចផ្លាស់ទី ប្ដូរទំហំ និងបង្វិលគំរូតាមចិត្តអ្នក។ នៅពេលអ្នករួចរាល់ចាប់ផ្ដើមកែសម្រួលធាតុនីមួយៗ សូមចុច រក្សាទីតាំងនេះ។",
-                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first."
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here."
                 }
             }
         },

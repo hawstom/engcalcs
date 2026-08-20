@@ -274,13 +274,21 @@ exports.run = async function ({ browser, report }) {
 		// while you work, and it still names the button that commits.
 		report.ok(!(a.lastDialog() && a.lastDialog().type === 'confirm'),
 			'no modal stands in front of the placement — the row WAS the answer');
-		report.has(await a.notice(), 'Keep this placement',
-			'...and the instructions name the button that commits, so the two cannot drift apart');
+		// **THE INTRO NAMES ITS OWN STEP'S BUTTON, not the one two steps away** (Tom, 2026-08-20:
+		// "Is this the intro to a two-step process? If so, it should mention that there are two
+		// steps, quick and fine"). It used to name Keep this placement, which is what ends step 2 —
+		// so the first thing a user read told them to press a button that is not on screen yet.
+		report.has(await a.notice(), 'Put the model here',
+			'...and the intro names the button that ENDS STEP 1, so the two cannot drift apart');
+		report.has(await a.notice(), 'two steps',
+			'...and says there are two of them before describing either');
 
 		const b1 = await bar(a);
 		report.ok(b1.visible, 'the placement bar appears');
 		report.has(b1.step, 'Step 1 of 2', '...saying which of the two steps you are in');
-		report.has(b1.step, 'detached', '...and what that step is called');
+		// "quick" and "fine", not "detached" and "attached" — the latter pair names our mechanism,
+		// the former names the choice the user is making (Tom, 2026-08-20).
+		report.has(b1.step, 'quick', '...and what that step is called');
 		report.ok(b1.drop && b1.goto, '...offering Drop it here and Go to…');
 		report.ok(!b1.finish && !b1.numbers && !b1.detach,
 			'...and NOT Finish, Detach or the two numbers — nothing is attached to anything yet');
@@ -371,7 +379,7 @@ exports.run = async function ({ browser, report }) {
 		await a.settle(600);
 		const b2 = await bar(a), afterAttach = await modelBox(a);
 		report.has(b2.step, 'Step 2 of 2', 'Drop it here moves to step 2');
-		report.has(b2.step, 'attached', '...which is called attached');
+		report.has(b2.step, 'fine', '...which is the fine one');
 		report.ok(b2.numbers && b2.finish && b2.detach && !b2.drop,
 			'...offering Finish, the two numbers and a way back to step 1, and no longer Drop');
 		report.ok(Math.abs(afterAttach.cx - beforeAttach.cx) < 3 && Math.abs(afterAttach.cy - beforeAttach.cy) < 3,

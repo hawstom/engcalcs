@@ -131,7 +131,7 @@ exports.run = async function ({ browser, report }) {
 		await a.dismissGallery();
 		await a.makeEdit();
 		// **THE WIZARD STARTS FROM A FILE (Task 447)**, so the drawing on screen is written out and
-		// opened again through File > Import XY to lat/lon… -- which lands it in a new tab, in step 1.
+		// opened again through File > Import xy to lat/lon… -- which lands it in a new tab, in step 1.
 		// The string read here is serializeProject()'s own output, not a spec's idea of our format.
 		{
 			const text = await a.page.evaluate(() => {
@@ -140,7 +140,7 @@ exports.run = async function ({ browser, report }) {
 			});
 			const [chooser] = await Promise.all([
 				a.page.waitForEvent('filechooser'),
-				a.menuClick('Import XY to lat/lon…')
+				a.menuClick('Import xy to lat/lon…')
 			]);
 			await chooser.setFiles({ name: 'goto.json', mimeType: 'application/json', buffer: Buffer.from(text, 'utf8') });
 		}

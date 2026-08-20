@@ -606,7 +606,7 @@
                 "next_translated": {
                     "key": "lpn_georef_intro",
                     "value": "Pretvoriti ovaj xy projekt u geografski projekt? Vaš projekt je postavljen u središte karte svijeta. Zumirajte do svoje lokacije te pomičite, mijenjajte veličinu i okrećite model koliko god želite. Kada budete spremni započeti prilagođavanje elemenata, pritisnite Zadrži ovaj položaj.",
-                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first."
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first, then press Put the model here."
                 }
             }
         },
