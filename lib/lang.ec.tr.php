@@ -1230,7 +1230,6 @@ $ec_lang['lpn_settings_color_thematic']='Tematik harita: yalnızca renkler, etik
 $ec_lang['lpn_settings_color_thematic_tip']='Haritada yalnızca renkler kalacak şekilde tüm etiketleri gizler. Etiket seçimleriniz korunur, bunu kapattığınızda geri gelirler.';
 $ec_lang['lpn_settings_color_key_position']='Renk lejantı konumu';
 $ec_lang['lpn_settings_color_breaks']='Renk bandı sınırları';
-$ec_lang['lpn_settings_color_breaks_note']='Bunları boş bırakırsanız renkler, haritadaki mevcut değerlere yayılır. Sayı girin veya aşağıdaki bir düğmeye basın; böylece aynı sayı her zaman aynı rengi ifade eder.';
 $ec_lang['lpn_settings_color_equal_intervals']='Eşit aralıklar';
 $ec_lang['lpn_settings_color_equal_counts']='Eşit sayılar';
 $ec_lang['lpn_settings_color_auto']='Otomatik';

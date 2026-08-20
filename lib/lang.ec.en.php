@@ -2213,7 +2213,6 @@ $ec_lang['lpn_settings_color_thematic']='Thematic map (colors only)';
 $ec_lang['lpn_settings_color_thematic_tip']='Hides every label so that only the colors are left on the map. Your label choices are kept, and turning this off brings them back.';
 $ec_lang['lpn_settings_color_key_position']='Color legend position';
 $ec_lang['lpn_settings_color_breaks']='Color band limits';
-$ec_lang['lpn_settings_color_breaks_note']='Leave these blank and the colors are spread across the values now on the map. Type numbers, or press a button below, and the same number always means the same color.';
 $ec_lang['lpn_settings_color_equal_intervals']='Equal intervals';
 $ec_lang['lpn_settings_color_equal_counts']='Equal counts';
 $ec_lang['lpn_settings_color_auto']='Automatic';

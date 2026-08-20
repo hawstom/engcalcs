@@ -1165,7 +1165,6 @@ $ec_lang['lpn_settings_color_thematic']='Тематична карта: лише
 $ec_lang['lpn_settings_color_thematic_tip']='Приховує всі підписи, тож на карті лишаються лише кольори. Ваш вибір підписів зберігається, і вимкнення цієї опції поверне їх.';
 $ec_lang['lpn_settings_color_key_position']='Розташування кольорової легенди';
 $ec_lang['lpn_settings_color_breaks']='Межі кольорових діапазонів';
-$ec_lang['lpn_settings_color_breaks_note']='Залиште це поле порожнім, і кольори розподілятимуться за значеннями, які зараз на карті. Введіть числа або натисніть кнопку нижче, і те саме число завжди означатиме той самий колір.';
 $ec_lang['lpn_settings_color_equal_intervals']='Рівні інтервали';
 $ec_lang['lpn_settings_color_equal_counts']='Рівна кількість';
 $ec_lang['lpn_settings_color_auto']='Автоматично';

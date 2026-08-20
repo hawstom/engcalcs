@@ -1308,7 +1308,6 @@ $ec_lang['lpn_settings_color_thematic']='Mapa temático: solo colores, sin etiqu
 $ec_lang['lpn_settings_color_thematic_tip']='Oculta todas las etiquetas para que solo queden los colores en el mapa. Sus elecciones de etiquetas se conservan, y al desactivar esto vuelven a aparecer.';
 $ec_lang['lpn_settings_color_key_position']='Posición de la leyenda de color';
 $ec_lang['lpn_settings_color_breaks']='Límites de las bandas de color';
-$ec_lang['lpn_settings_color_breaks_note']='Déjelos en blanco y los colores se reparten según los valores que hay ahora en el mapa. Escriba números, o presione un botón de abajo, y el mismo número siempre significará el mismo color.';
 $ec_lang['lpn_settings_color_equal_intervals']='Intervalos iguales';
 $ec_lang['lpn_settings_color_equal_counts']='Cantidades iguales';
 $ec_lang['lpn_settings_color_auto']='Automático';

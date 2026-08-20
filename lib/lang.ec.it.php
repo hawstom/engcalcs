@@ -1166,7 +1166,6 @@ $ec_lang['lpn_settings_color_thematic']='Mappa tematica: solo colori, senza etic
 $ec_lang['lpn_settings_color_thematic_tip']='Nasconde ogni etichetta, così sulla mappa restano solo i colori. Le tue scelte di etichette vengono conservate, e disattivando questa opzione ricompaiono.';
 $ec_lang['lpn_settings_color_key_position']='Posizione della legenda dei colori';
 $ec_lang['lpn_settings_color_breaks']='Limiti delle fasce di colore';
-$ec_lang['lpn_settings_color_breaks_note']='Lasciali vuoti e i colori vengono distribuiti sui valori ora presenti sulla mappa. Digita dei numeri, oppure premi un pulsante qui sotto, e lo stesso numero corrisponderà sempre allo stesso colore.';
 $ec_lang['lpn_settings_color_equal_intervals']='Intervalli uguali';
 $ec_lang['lpn_settings_color_equal_counts']='Conteggi uguali';
 $ec_lang['lpn_settings_color_auto']='Automatico';

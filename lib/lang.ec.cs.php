@@ -1166,7 +1166,6 @@ $ec_lang['lpn_settings_color_thematic']='Tematická mapa: pouze barvy, bez popis
 $ec_lang['lpn_settings_color_thematic_tip']='Skryje všechny popisky, takže na mapě zůstanou pouze barvy. Vaše nastavení popisků zůstává zachováno a po vypnutí této volby se popisky vrátí zpět.';
 $ec_lang['lpn_settings_color_key_position']='Umístění barevné legendy';
 $ec_lang['lpn_settings_color_breaks']='Hranice barevných pásem';
-$ec_lang['lpn_settings_color_breaks_note']='Ponechte prázdné a barvy se rozprostřou podle hodnot právě zobrazených na mapě. Zadejte čísla, nebo použijte tlačítko níže, a stejné číslo bude vždy znamenat stejnou barvu.';
 $ec_lang['lpn_settings_color_equal_intervals']='Stejné intervaly';
 $ec_lang['lpn_settings_color_equal_counts']='Stejné počty';
 $ec_lang['lpn_settings_color_auto']='Automaticky';

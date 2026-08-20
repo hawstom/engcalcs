@@ -1167,7 +1167,6 @@ $ec_lang['lpn_settings_color_thematic']='موضوعي نقشه: یوازې رن�
 $ec_lang['lpn_settings_color_thematic_tip']='هر لیبل پټوي ترڅو یوازې رنګونه په نقشه کې پاتې شي. ستاسو د لیبل انتخابونه ساتل کیږي، او دا غیرفعالول یې بېرته راولي.';
 $ec_lang['lpn_settings_color_key_position']='د رنګ کلید ځای';
 $ec_lang['lpn_settings_color_breaks']='د رنګ ټولګي حدود';
-$ec_lang['lpn_settings_color_breaks_note']='دا خالي پرېږدئ او رنګونه د نقشې په اوسنیو ارزښتونو کې خپاره کیږي. شمېرې ولیکئ، یا لاندې تڼۍ فشار کړئ، او هماغه شمېره تل هماغه رنګ معنی لري.';
 $ec_lang['lpn_settings_color_equal_intervals']='مساوي وقفې';
 $ec_lang['lpn_settings_color_equal_counts']='مساوي شمېرې';
 $ec_lang['lpn_settings_color_auto']='اوتوماتیک';

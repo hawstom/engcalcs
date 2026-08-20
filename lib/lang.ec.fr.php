@@ -1304,7 +1304,6 @@ $ec_lang['lpn_settings_color_thematic']='Carte thématique : couleurs seulement,
 $ec_lang['lpn_settings_color_thematic_tip']='Masque toutes les étiquettes pour ne laisser que les couleurs sur la carte. Vos choix d\'étiquettes sont conservés, et les désactiver les fait réapparaître.';
 $ec_lang['lpn_settings_color_key_position']='Position de la légende des couleurs';
 $ec_lang['lpn_settings_color_breaks']='Limites des bandes de couleur';
-$ec_lang['lpn_settings_color_breaks_note']='Laissez ces champs vides et les couleurs sont réparties sur les valeurs actuellement sur la carte. Tapez des nombres, ou appuyez sur un bouton ci-dessous, et le même nombre signifie toujours la même couleur.';
 $ec_lang['lpn_settings_color_equal_intervals']='Intervalles égaux';
 $ec_lang['lpn_settings_color_equal_counts']='Effectifs égaux';
 $ec_lang['lpn_settings_color_auto']='Automatique';

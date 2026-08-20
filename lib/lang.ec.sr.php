@@ -1226,7 +1226,6 @@ $ec_lang['lpn_settings_color_thematic']='Тематска мапа: само б�
 $ec_lang['lpn_settings_color_thematic_tip']='Сакрива све ознаке тако да на мапи остају само боје. Ваш избор ознака се чува, а искључивањем овога се враћа.';
 $ec_lang['lpn_settings_color_key_position']='Положај легенде боја';
 $ec_lang['lpn_settings_color_breaks']='Границе појасева боја';
-$ec_lang['lpn_settings_color_breaks_note']='Оставите ово празно и боје се распоређују преко вредности које су тренутно на мапи. Упишите бројеве, или притисните дугме испод, тако да иста вредност увек значи исту боју.';
 $ec_lang['lpn_settings_color_equal_intervals']='Једнаки интервали';
 $ec_lang['lpn_settings_color_equal_counts']='Једнак број вредности';
 $ec_lang['lpn_settings_color_auto']='Аутоматски';

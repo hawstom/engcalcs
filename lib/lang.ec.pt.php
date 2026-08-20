@@ -1307,7 +1307,6 @@ $ec_lang['lpn_settings_color_thematic']='Mapa temático: somente cores, sem rót
 $ec_lang['lpn_settings_color_thematic_tip']='Oculta todos os rótulos, deixando apenas as cores no mapa. Suas escolhas de rótulos são mantidas, e desativar isto as traz de volta.';
 $ec_lang['lpn_settings_color_key_position']='Posição da legenda de cores';
 $ec_lang['lpn_settings_color_breaks']='Limites das faixas de cor';
-$ec_lang['lpn_settings_color_breaks_note']='Deixe em branco e as cores são distribuídas pelos valores agora no mapa. Digite números, ou pressione um botão abaixo, e o mesmo número sempre significará a mesma cor.';
 $ec_lang['lpn_settings_color_equal_intervals']='Intervalos iguais';
 $ec_lang['lpn_settings_color_equal_counts']='Contagens iguais';
 $ec_lang['lpn_settings_color_auto']='Automático';

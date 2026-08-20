@@ -1167,7 +1167,6 @@ $ec_lang['lpn_settings_color_thematic']='Ramani ya mada: rangi tu, bila lebo';
 $ec_lang['lpn_settings_color_thematic_tip']='Huficha kila lebo ili rangi tu zibaki kwenye ramani. Chaguo lako la lebo linabaki, na kuzima hili kunazirudisha.';
 $ec_lang['lpn_settings_color_key_position']='Nafasi ya ufunguo wa rangi';
 $ec_lang['lpn_settings_color_breaks']='Mipaka ya bendi za rangi';
-$ec_lang['lpn_settings_color_breaks_note']='Acha hizi tupu na rangi zitaenea kulingana na thamani zilizopo kwenye ramani sasa. Andika namba, au bofya kitufe hapa chini, na namba ile ile itamaanisha rangi ile ile daima.';
 $ec_lang['lpn_settings_color_equal_intervals']='Vipindi sawa';
 $ec_lang['lpn_settings_color_equal_counts']='Idadi sawa';
 $ec_lang['lpn_settings_color_auto']='Kiotomatiki';

@@ -1165,7 +1165,6 @@ $ec_lang['lpn_settings_color_thematic']='מפה תמטית: צבעים בלבד,
 $ec_lang['lpn_settings_color_thematic_tip']='מסתיר כל תווית כך שרק הצבעים נשארים על המפה. בחירות התוויות שלכם נשמרות, וכיבוי אפשרות זו מחזיר אותן.';
 $ec_lang['lpn_settings_color_key_position']='מיקום מקרא הצבעים';
 $ec_lang['lpn_settings_color_breaks']='גבולות רצועות הצבע';
-$ec_lang['lpn_settings_color_breaks_note']='השאירו אלה ריקים והצבעים יתפרסו על פני הערכים הנמצאים כעת על המפה. הקלידו מספרים, או לחצו על כפתור למטה, וכך אותו מספר תמיד יסמן אותו צבע.';
 $ec_lang['lpn_settings_color_equal_intervals']='מרווחים שווים';
 $ec_lang['lpn_settings_color_equal_counts']='כמויות שוות';
 $ec_lang['lpn_settings_color_auto']='אוטומטי';

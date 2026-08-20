@@ -1230,7 +1230,6 @@ $ec_lang['lpn_settings_color_thematic']='Тематическая карта: т
 $ec_lang['lpn_settings_color_thematic_tip']='Скрывает все подписи, оставляя на карте только цвета. Ваш выбор подписей сохраняется, и при отключении этой настройки они появятся снова.';
 $ec_lang['lpn_settings_color_key_position']='Положение цветовой легенды';
 $ec_lang['lpn_settings_color_breaks']='Границы цветовых диапазонов';
-$ec_lang['lpn_settings_color_breaks_note']='Оставьте эти поля пустыми, и цвета распределятся по значениям, сейчас имеющимся на карте. Введите числа или нажмите одну из кнопок ниже, и одно и то же число всегда будет означать один и тот же цвет.';
 $ec_lang['lpn_settings_color_equal_intervals']='Равные интервалы';
 $ec_lang['lpn_settings_color_equal_counts']='Равные количества';
 $ec_lang['lpn_settings_color_auto']='Автоматически';
