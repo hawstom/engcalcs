@@ -1047,7 +1047,6 @@ $ec_lang['lpn_field_auto']='تلقائي';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='مضاعف الحجم';
-$ec_lang['lpn_field_show_always']='إظهار هذه التسمية دائماً';
 $ec_lang['lpn_tool_labels']='التسميات';
 $ec_lang['lpn_labels_heading_node']='تسميات العقد';
 $ec_lang['lpn_labels_heading_link']='تسميات الوصلات';
@@ -1135,9 +1134,6 @@ $ec_lang['lpn_settings_link_width']='سُمك خط الأنبوب (بكسلات)
 $ec_lang['lpn_settings_align_labels']='محاذاة تسميات الأنابيب مع الأنابيب';
 $ec_lang['lpn_settings_readability_bias']='اقلب التسمية رأساً على عقب عندما تميل أكثر من هذا العدد من الدرجات إلى يسار الخط العمودي';
 $ec_lang['lpn_settings_mask_labels']='خلفية معتمة خلف التسميات';
-$ec_lang['lpn_settings_label_max_width']='إظهار التسميات عندما يكون العرض أضيق من هذا (وحدات الخريطة)';
-$ec_lang['lpn_settings_label_use_view']='استخدام العرض الحالي';
-$ec_lang['lpn_settings_label_always']='إظهار التسميات دائماً';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='عتامة الرمز (0 إلى 1)';

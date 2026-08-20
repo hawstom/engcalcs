@@ -1182,7 +1182,6 @@ $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_lon']='Longitude';
 $ec_lang['lpn_field_lat']='Latitude';
 $ec_lang['lpn_field_text_size']='Facteur de taille';
-$ec_lang['lpn_field_show_always']='Toujours afficher cette étiquette';
 $ec_lang['lpn_tool_labels']='Étiquettes';
 $ec_lang['lpn_labels_heading_node']='Étiquettes des nœuds';
 $ec_lang['lpn_labels_heading_link']='Étiquettes des liaisons';
@@ -1272,9 +1271,6 @@ $ec_lang['lpn_settings_link_width']='Épaisseur des conduites (pixels)';
 $ec_lang['lpn_settings_align_labels']='Aligner les étiquettes de conduites sur les conduites';
 $ec_lang['lpn_settings_readability_bias']='Retourner une étiquette à l\'envers lorsqu\'elle penche de plus de ce nombre de degrés à gauche de la verticale';
 $ec_lang['lpn_settings_mask_labels']='Fond opaque derrière les étiquettes';
-$ec_lang['lpn_settings_label_max_width']='Afficher les étiquettes quand la vue est plus étroite que ceci (unités de carte)';
-$ec_lang['lpn_settings_label_use_view']='Utiliser la vue actuelle';
-$ec_lang['lpn_settings_label_always']='Toujours afficher les étiquettes';
 $ec_lang['lpn_settings_symbol_opacity']='Opacité des symboles (0 à 1)';
 // The counterpart control: fade the backdrop image so a busy or dark one stops swallowing the
 // network drawn over it (Tom, 2026-07-30).

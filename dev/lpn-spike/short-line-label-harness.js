@@ -25,7 +25,6 @@ const L = loadLoopedNetwork(
 	"\t\tseedDefaultInputs: seedDefaultInputs, refreshLabelText: refreshLabelText,\n" +
 	"\t\tlabelSettings: function () { return labelSettings; }, relayoutLabels: relayoutLabels,\n" +
 	"\t\tsetZoom: function (s) { state.s = s; },\n" +
-	"\t\tsetLabelMaxWidth: function (w) { settings.labelMaxWidth = w; applyLabelVisibility(); },\n" +
 	"\t\tglobalHide: function () { return svg.classList.contains('lpn-labels-hidden'); },\n" +
 	// BOTH FIELDS, since 2026-08-15. A label's measured width is banked in PIXELS and divided by the
 	// scale on read (labelBoxWidth), so writing only `tw` writes the field the code stopped reading
@@ -144,14 +143,13 @@ ok('...and hides again when sent home', L.hiddenShort(stub.id));
 ok('a suppressed label carries no nudge', L.nudgeOf(stub.id).x === 0 && L.nudgeOf(stub.id).y === 0,
 	JSON.stringify(L.nudgeOf(stub.id)));
 
-// ---- 4. The rule is per PIPE, independent of the map-width rule ---------------------------------
-// Nothing above ever set settings.labelMaxWidth, so every one of these hides happened at a zoom the
-// global threshold considers perfectly readable. That IS Tom's sentence, and it is worth asserting
-// rather than leaving implicit in the setup.
-L.setLabelMaxWidth(1e9);   // "show labels until the map is a billion units wide" -- i.e. always
-ok('the global threshold says SHOW', !L.globalHide());
+// ---- 4. The rule is per PIPE, and it is the ONLY thing that hides a label for being too small --
+// The map-width threshold that used to sit beside it is gone (Tom, 2026-08-19), so the global
+// annotation switch must be saying SHOW throughout -- otherwise these hides could be coming from
+// somewhere else and the section would prove nothing.
+ok('nothing has hidden the annotation globally', !L.globalHide());
 layoutAt(TW);
-ok('...and the stub is hidden anyway -- the per-pipe rule is independent', L.hiddenShort(stub.id));
+ok('...and the stub is hidden anyway -- the per-pipe rule is its own rule', L.hiddenShort(stub.id));
 ok('...while the main is still shown, so this is per pipe and not a blanket', !L.hiddenShort(long.id));
 
 console.log(fails ? '\n' + fails + ' FAILED' : '\nall passed');

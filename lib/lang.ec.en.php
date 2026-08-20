@@ -1937,7 +1937,6 @@ $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_lon']='Longitude';
 $ec_lang['lpn_field_lat']='Latitude';
 $ec_lang['lpn_field_text_size']='Size multiplier';
-$ec_lang['lpn_field_show_always']='Always show this label';
 $ec_lang['lpn_tool_labels']='Labels';
 $ec_lang['lpn_labels_heading_node']='Node labels';
 $ec_lang['lpn_labels_heading_link']='Link labels';
@@ -2168,10 +2167,6 @@ $ec_lang['lpn_settings_align_labels']='Draw link labels along the link line';
 $ec_lang['lpn_settings_readability_bias']='Label flip angle adjustment (degrees)';
 $ec_lang['lpn_settings_readability_bias_tip']='Flip a label to keep it right side up when it leans more than this many degrees left of vertical.';
 $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
-$ec_lang['lpn_settings_label_max_width']='Widest view that shows labels (map units)';
-$ec_lang['lpn_settings_label_max_width_tip']='Labels are shown only while the view is narrower than this. Leave the box blank to always show them.';
-$ec_lang['lpn_settings_label_use_view']='Use current view';
-$ec_lang['lpn_settings_label_always']='Always show labels';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Symbol opacity (0 to 1)';

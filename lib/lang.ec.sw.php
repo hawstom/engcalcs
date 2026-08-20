@@ -1047,7 +1047,6 @@ $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Kizidishi cha ukubwa';
-$ec_lang['lpn_field_show_always']='Onyesha lebo hii kila wakati';
 $ec_lang['lpn_tool_labels']='Lebo';
 $ec_lang['lpn_labels_heading_node']='Lebo za vifundo';
 $ec_lang['lpn_labels_heading_link']='Lebo za viungo';
@@ -1133,9 +1132,6 @@ $ec_lang['lpn_settings_link_width']='Unene wa mstari wa bomba (pikseli)';
 $ec_lang['lpn_settings_align_labels']='Lainisha lebo za bomba na mabomba';
 $ec_lang['lpn_settings_readability_bias']='Geuza lebo chini juu ikiwa imeinama zaidi ya nyuzi hizi kushoto ya wima';
 $ec_lang['lpn_settings_mask_labels']='Mandharinyuma imara nyuma ya lebo';
-$ec_lang['lpn_settings_label_max_width']='Onyesha lebo pale mwonekano unapokuwa mwembamba kuliko hiki (vitengo vya ramani)';
-$ec_lang['lpn_settings_label_use_view']='Tumia mwonekano wa sasa';
-$ec_lang['lpn_settings_label_always']='Onyesha lebo kila wakati';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Uzito wa alama (0 hadi 1)';

@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "es",
-        "expected_key_count": 1200,
-        "delta_key_count": 20,
+        "expected_key_count": 1195,
+        "delta_key_count": 19,
         "exempt_key_count": 27,
         "exempt_keys": [
             "calc_units_us",
@@ -450,7 +450,6 @@
         "lpn_xymap": "XY",
         "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.",
         "lpn_settings_readability_bias_tip": "Flip a label to keep it right side up when it leans more than this many degrees left of vertical.",
-        "lpn_settings_label_max_width_tip": "Labels are shown only while the view is narrower than this. Leave the box blank to always show them.",
         "lpn_time_run": "Run",
         "lpn_time_run_tip": "Work out this network at each of its reporting times, from the first one to the last.",
         "lpn_time_run_note": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date.",
@@ -472,7 +471,6 @@
         "lpn_xymap": "XY",
         "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.",
         "lpn_settings_readability_bias_tip": "Flip a label to keep it right side up when it leans more than this many degrees left of vertical.",
-        "lpn_settings_label_max_width_tip": "Labels are shown only while the view is narrower than this. Leave the box blank to always show them.",
         "lpn_time_run": "Run",
         "lpn_time_run_tip": "Work out this network at each of its reporting times, from the first one to the last.",
         "lpn_time_run_note": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date.",
@@ -581,22 +579,6 @@
                     "key": "lpn_settings_mask_labels",
                     "value": "Fondo sólido detrás de las etiquetas",
                     "english": "Solid background behind labels"
-                }
-            }
-        },
-        "lpn_settings_label_max_width_tip": {
-            "reason": "missing",
-            "current_value": null,
-            "neighbors": {
-                "previous_translated": {
-                    "key": "lpn_settings_label_max_width",
-                    "value": "Mostrar etiquetas cuando la vista sea más angosta que esto (unidades del mapa)",
-                    "english": "Widest view that shows labels (map units)"
-                },
-                "next_translated": {
-                    "key": "lpn_settings_label_use_view",
-                    "value": "Usar la vista actual",
-                    "english": "Use current view"
                 }
             }
         },

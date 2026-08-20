@@ -1004,7 +1004,6 @@
         "lpn_field_lon": "Longitude",
         "lpn_field_lat": "Latitude",
         "lpn_field_text_size": "Size multiplier",
-        "lpn_field_show_always": "Always show this label",
         "lpn_tool_labels": "Labels",
         "lpn_labels_heading_node": "Node labels",
         "lpn_labels_heading_link": "Link labels",
@@ -1112,10 +1111,6 @@
         "lpn_settings_readability_bias": "Label flip angle adjustment (degrees)",
         "lpn_settings_readability_bias_tip": "Flip a label to keep it right side up when it leans more than this many degrees left of vertical.",
         "lpn_settings_mask_labels": "Solid background behind labels",
-        "lpn_settings_label_max_width": "Widest view that shows labels (map units)",
-        "lpn_settings_label_max_width_tip": "Labels are shown only while the view is narrower than this. Leave the box blank to always show them.",
-        "lpn_settings_label_use_view": "Use current view",
-        "lpn_settings_label_always": "Always show labels",
         "lpn_settings_symbol_opacity": "Symbol opacity (0 to 1)",
         "lpn_settings_backdrop_opacity": "Background image opacity (0 to 1)",
         "lpn_settings_map_display": "Map appearance",
@@ -1202,7 +1197,7 @@
         "lpn_color_mode_log": "Logarithmic",
         "lpn_color_mode_pressure": "Pressure"
     },
-    "count": 1200,
+    "count": 1195,
     "active_prefixes": [
         "about",
         "bpn",

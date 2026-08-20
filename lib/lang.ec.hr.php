@@ -1040,7 +1040,6 @@ $ec_lang['lpn_field_auto']='Automatski';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Množitelj veličine';
-$ec_lang['lpn_field_show_always']='Uvijek prikaži ovu oznaku';
 $ec_lang['lpn_tool_labels']='Oznake';
 $ec_lang['lpn_labels_heading_node']='Oznake čvorova';
 $ec_lang['lpn_labels_heading_link']='Oznake vodova';
@@ -1125,9 +1124,6 @@ $ec_lang['lpn_settings_link_width']='Debljina crte cijevi (pikseli)';
 $ec_lang['lpn_settings_align_labels']='Poravnaj oznake cijevi s cijevima';
 $ec_lang['lpn_settings_readability_bias']='Okreni oznaku naopako kada je nagnuta više od ovoliko stupnjeva lijevo od okomice';
 $ec_lang['lpn_settings_mask_labels']='Neprozirna pozadina iza oznaka';
-$ec_lang['lpn_settings_label_max_width']='Prikaži oznake kad je prikaz uži od ovoga (jedinice karte)';
-$ec_lang['lpn_settings_label_use_view']='Upotrijebi trenutačni prikaz';
-$ec_lang['lpn_settings_label_always']='Uvijek prikaži oznake';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Neprozirnost simbola (0 do 1)';

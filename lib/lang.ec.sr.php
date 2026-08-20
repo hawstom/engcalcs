@@ -1080,7 +1080,6 @@ $ec_lang['lpn_field_closed_tip']='Затворите ову цев тако да
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Множилац величине';
-$ec_lang['lpn_field_show_always']='Увек прикажи ову ознаку';
 $ec_lang['lpn_tool_labels']='Ознаке';
 $ec_lang['lpn_labels_heading_node']='Ознаке чворова';
 $ec_lang['lpn_labels_heading_link']='Ознаке веза';
@@ -1192,9 +1191,6 @@ $ec_lang['lpn_settings_link_width']='Дебљина линије цеви (пи�
 $ec_lang['lpn_settings_align_labels']='Поравнај ознаке цеви са цевима';
 $ec_lang['lpn_settings_readability_bias']='Окрени ознаку наопако када се нагне више од овог броја степени лево од вертикале';
 $ec_lang['lpn_settings_mask_labels']='Пуна позадина иза ознака';
-$ec_lang['lpn_settings_label_max_width']='Прикажи ознаке када је приказ ужи од овога (јединице мапе)';
-$ec_lang['lpn_settings_label_use_view']='Користи тренутни приказ';
-$ec_lang['lpn_settings_label_always']='Увек прикажи ознаке';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Непрозирност симбола (0 до 1)';
