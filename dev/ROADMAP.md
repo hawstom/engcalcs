@@ -158,10 +158,19 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     a lat/lon file opens lat/lon. `Open as lat/lon…` is the deliberate override that takes an XY
     file and places it on the world, running the placement wizard. That is the only cell of the
     3x2 matrix needing its own door; **lat/lon opened as XY is never wanted** and gets no row.
-  - **An `.inp` DOES need the prompt, for the opposite reason:** `[COORDINATES]` are bare numbers
-    with no declared frame — state plane feet, arbitrary drawing units and lon/lat are
-    indistinguishable — so asking is the only honest option. It is not a modal in front of a common
-    action; it is a modal because the information genuinely is not in the file.
+  - **AN `.inp` USUALLY DOES SAY, AND WE HAVE BEEN THROWING IT AWAY.** Tom asked 2026-08-19 whether
+    any engineer has ever meant degrees in an `.inp`. EPA answered that years ago: the Map
+    Dimensions dialog offers **Feet, Meters, Degrees or None**, and the choice is persisted as
+    `[BACKDROP] UNITS`. EPA's own Net1/2/3 all carry `UNITS None`. `js/lpn-inp.js` reads only
+    `FILE` out of that section and ignores `UNITS` entirely.
+  - So the rule is READ THE FILE, not ask: `DEGREES` opens lat/lon, `FEET`/`METERS`/`NONE` open XY,
+    and **the prompt is only for a file with no `UNITS` line at all** — hand-written `.inp`s and
+    other tools' exports. That is the same principle as everywhere else here: the input file is
+    canonical, and a question whose answer is already in the file is a question we should not ask.
+  - **Degrees being SUPPORTED is not evidence it is COMMON**, and we have no measurement of how
+    often it is used. The prompt's fallback should therefore default to XY, and can offer the
+    coordinate ranges as evidence (all within ±180/±90 is suggestive, never conclusive — a small
+    site drawing near the origin looks identical).
   - **A SEPARATE ROW BEATS A PROMPT FOR JSON, by Tom's own earlier ruling** that a choice must not
     stand in front of the common action. Opening a file is common; converting to lat/lon is rare,
     so the rare one carries the extra door.
