@@ -1029,8 +1029,13 @@ html[lang="zh"] .ec-welcome {
 	background: #bbb;
 }
 .lpn-pane-grip:hover { background: #e8e8e8; }
-.lpn-pane-head { display: flex; align-items: stretch; gap: 4px; border-bottom: 1px solid #ddd; }
-.lpn-pane-tabs { display: flex; flex-wrap: wrap; gap: 2px; flex: 1 1 auto; min-width: 0; }
+/* SEVEN TABS, AND THEY WRAP (Task 455). Tom chose wrapping over hiding five behind a type
+   selector, so the strip is allowed to become two lines and the X stays pinned to the top-right
+   rather than stretching down beside them. The pane's own height accounting reads the chrome by
+   MEASUREMENT (paneChromeHeight), so a second line is subtracted from the window like anything
+   else -- nothing here assumes one line, and nothing here scrolls sideways. */
+.lpn-pane-head { display: flex; align-items: flex-start; gap: 4px; border-bottom: 1px solid #ddd; }
+.lpn-pane-tabs { display: flex; flex-wrap: wrap; gap: 2px 2px; flex: 1 1 auto; min-width: 0; }
 /* A TAB, not a push-button: flat, with the selected one joined to the panel below it by having no
    bottom border of its own. Same reasoning as the menu bar's flat items -- a row of raised
    buttons here would read as a second toolbar. */
@@ -1039,10 +1044,14 @@ html[lang="zh"] .ec-welcome {
 	padding: 3px 12px; cursor: pointer;
 }
 .lpn-pane-tab:hover { background: #f2f2f2; }
+/* The tabs give up their side padding before they give up a line. A narrow window fits more of
+   them per row, so the strip wraps to two lines later and to three never. */
+@media (max-width: 60rem) { .lpn-pane-tab { padding: 3px 7px; } }
+@media (max-width: 40rem) { .lpn-pane-tab { padding: 3px 5px; } }
 .lpn-pane-tab[aria-selected="true"] { background: #fff; border-color: #bbb; font-weight: bold; }
 .lpn-pane-x {
-	flex: 0 0 auto; width: 2.2rem; padding: 0; border: 0; background: transparent;
-	font-size: 18px; line-height: 1; color: #333; cursor: pointer;
+	flex: 0 0 auto; align-self: flex-start; width: 2.2rem; height: 1.7rem; padding: 0; border: 0;
+	background: transparent; font-size: 18px; line-height: 1; color: #333; cursor: pointer;
 }
 .lpn-pane-x:hover, .lpn-pane-x:focus { background: #eee; color: #000; }
 /* The height JS writes lands here. Overflow is the panel's own business, never the page's: the
