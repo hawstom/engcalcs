@@ -12936,11 +12936,11 @@ var EngCalcs = EngCalcs || {};
 		// clearing. See buildVisibilityColors(); the toolbar keeps no select at all, which is also
 		// what the icon-only strip asked for -- a field-name dropdown was the one wide control left
 		// on it.
-		var settingsBtn = document.createElement('button');
-		settingsBtn.type = 'button';
-		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
-		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
-		viewGroup.appendChild(settingsBtn);
+		// **THE SETTINGS GEAR IS NOT HERE ANY MORE -- IT IS THE LAST CONTROL ON THE STRIP.** Tom,
+		// 2026-08-19: "The standard location of the settings gear icon is near the top-right
+		// corner of a screen, app, or quick settings panel." It is, and a gear in the middle of a
+		// strip is a gear you hunt for, because nobody scans the middle for chrome. See the end
+		// group below.
 
 		// **THE TIME TRANSPORT, IN ITS OWN GROUP** (Task 248; Tom, 2026-08-18: "epanetjs puts it on
 		// the toolbar. Play/pause, Speed, Step back, Step forward, Step selector"). Five controls,
@@ -12981,17 +12981,23 @@ var EngCalcs = EngCalcs || {};
 		paneBtn.setAttribute('aria-pressed', paneIsOpen() ? 'true' : 'false');
 		paneBtn.addEventListener('click', togglePane);
 		endGroup.appendChild(paneBtn);
-		// Its twin, and the button Tom could not find because it did not exist yet (2026-08-18:
-		// "I don't currently see any of that or a button for the right panel"). The two pane
-		// toggles sit together because they are one question -- which edge of the map is showing
-		// something -- and the icons were drawn as a pair for the same reason.
-		var rpaneBtn = document.createElement('button');
-		rpaneBtn.type = 'button';
-		rpaneBtn.id = 'lpn_rpane_btn';
-		setIconLabel(rpaneBtn, 'pane-right', pc.lpn_pane_right_toggle || 'Visibility', pc.lpn_pane_right_toggle_tip);
-		rpaneBtn.setAttribute('aria-pressed', rpaneIsOpen() ? 'true' : 'false');
-		rpaneBtn.addEventListener('click', toggleRightPane);
-		endGroup.appendChild(rpaneBtn);
+		// **NO RIGHT-PANE TOGGLE.** Tom, 2026-08-19: "We can hide the right pane button for now."
+		// This button was its only door, so hiding it retires the right pane from the interface
+		// without deleting a line of it -- which is the point, because the pane is already
+		// deliberately empty (see rpaneIsOpen() and the quotes above it) and the question of
+		// whether it comes back at all is still open. toggleRightPane() and rpaneIsOpen() stay.
+
+		// **AND THE GEAR IS LAST, AT THE RIGHT-HAND END** (Tom, 2026-08-19). Settings is the one
+		// control on this strip that is not about the network in front of you, and the far right
+		// of the top strip is where every application puts that one. It comes after Find and the
+		// pane toggle because those two are still about this network; the gear is about the
+		// project. Reached three ways -- here, the Settings menu row, and a click on the colour
+		// legend -- and this is the one a user looks for without being told.
+		var settingsBtn = document.createElement('button');
+		settingsBtn.type = 'button';
+		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
+		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
+		endGroup.appendChild(settingsBtn);
 
 		// The dev-only stress-test button moved OFF the toolbar and to the foot of the Insert menu
 		// (Tom, 2026-08-04). A toolbar is the high-use subset of the menus, and a thing that reads

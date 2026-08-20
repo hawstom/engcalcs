@@ -439,7 +439,7 @@
         "lpn_ex_net3_world_desc": "The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.",
         "lpn_xymap": "XY",
         "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.",
-        "lpn_settings_readability_bias_tip": "A label drawn along a link is turned 180 degrees, so that it is not upside down, once the link leans more than this many degrees to the left of straight up.",
+        "lpn_settings_readability_bias_tip": "Flip a label to keep it right side up when it leans more than this many degrees left of vertical.",
         "lpn_settings_label_max_width_tip": "Labels are shown only while the view is narrower than this. Leave the box blank to always show them.",
         "lpn_time_run": "Run",
         "lpn_time_run_tip": "Work out this network at each of its reporting times, from the first one to the last.",
@@ -461,7 +461,7 @@
         "lpn_ex_net3_world_desc": "The same network as EPANET Net3, placed in a real location: its coordinates are longitude and latitude, and a street map is drawn behind it.",
         "lpn_xymap": "XY",
         "lpn_labels_mark_extrema_tip": "Draws a line above the highest value of each kind on the map, and a line below the lowest value of that kind, so you can pick out the two ends without reading the numbers.",
-        "lpn_settings_readability_bias_tip": "A label drawn along a link is turned 180 degrees, so that it is not upside down, once the link leans more than this many degrees to the left of straight up.",
+        "lpn_settings_readability_bias_tip": "Flip a label to keep it right side up when it leans more than this many degrees left of vertical.",
         "lpn_settings_label_max_width_tip": "Labels are shown only while the view is narrower than this. Leave the box blank to always show them.",
         "lpn_time_run": "Run",
         "lpn_time_run_tip": "Work out this network at each of its reporting times, from the first one to the last.",
@@ -550,7 +550,7 @@
                 "previous_translated": {
                     "key": "lpn_settings_readability_bias",
                     "value": "Переворачивать подпись, если она наклонена влево от вертикали больше, чем на это число градусов",
-                    "english": "Lean allowed before a label flips (degrees)"
+                    "english": "Label flip angle adjustment (degrees)"
                 },
                 "next_translated": {
                     "key": "lpn_settings_mask_labels",

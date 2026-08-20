@@ -1387,6 +1387,7 @@ $ec_lang['lpn_pane_right_toggle_tip']='Show or hide the panel at the right of th
 $ec_lang['lpn_color_legend_open_tip']='Click to open the Visibility panel and change these colors.';
 $ec_lang['lpn_color_node_field']='Color nodes by';
 $ec_lang['lpn_color_link_field']='Color links by';
+$ec_lang_syn['lpn_color_link_field']='Color links by, Color the links to show, Colors show these values, Link color shows, Value that color shows | avoid: a rendering that cannot be completed by the value of the dropdown that follows it';
 $ec_lang['lpn_color_ramp_sequential']='Sequential';
 $ec_lang['lpn_color_ramp_diverging']='Diverging';
 // The ramp picker (ROADMAP Tasks 427 and 429). The RAMPS themselves carry no names on screen --
@@ -1399,7 +1400,7 @@ $ec_lang['lpn_settings_color_classes']='Number of colors';
 // appears in none of the reference tools. Tom, 2026-08-19: "Don't drop the 'method'. That's the
 // point of this control." -- the dropdown holds METHODS, and the noun alone would name the result.
 $ec_lang['lpn_color_mode']='Data classification method';
-$ec_lang['lpn_color_ranges_note']='Left alone, these limits follow the values now on the map, so they move with every solve and every time step. Type over them and they stay put, so the same number always means the same color. Press Automatic to give them back to the method above.';
+$ec_lang['lpn_color_ranges_note']='The limits shown below are static for this project. Choosing a method above changes the limits based on the current state of the system, so it\'s expert to classify from a representative time step.';
 $ec_lang['lpn_color_criterion_note']='This method takes its limits from a design standard, so the number of colors is fixed while it is chosen.';
 $ec_lang['lpn_color_break_number']='A range limit must be a number. The map is unchanged.';
 $ec_lang['lpn_color_break_order']='Each range limit must be larger than the one before it. The map is unchanged.';
@@ -2050,6 +2051,7 @@ $ec_lang['lpn_settings_id_prefixes']='ID prefixes';
 // three push strings below it stopped saying "starting values" in sprint 438's Wave 0, which found
 // them still carrying the rejected wording.
 $ec_lang['lpn_settings_defaults']='Values';
+$ec_lang_syn['lpn_settings_defaults']='Values, Values for new elements, Values given to new elements, Values used when an element is created | avoid: starting values in the sense of the initial condition of a run; the current values of the selected element';
 $ec_lang['lpn_settings_defaults_note']='Used for elements you create from now on. Existing elements are not changed.';
 $ec_lang['lpn_settings_push_note']='Only the properties whose labels are showing right now are applied.';
 $ec_lang['lpn_settings_push_btn']='Apply these values to all elements';
@@ -2163,8 +2165,8 @@ $ec_lang['lpn_settings_text_size']='Text size (pixels)';
 $ec_lang['lpn_settings_symbol_size']='Symbol size (pixels)';
 $ec_lang['lpn_settings_link_width']='Link line thickness (pixels)';
 $ec_lang['lpn_settings_align_labels']='Draw link labels along the link line';
-$ec_lang['lpn_settings_readability_bias']='Lean allowed before a label flips (degrees)';
-$ec_lang['lpn_settings_readability_bias_tip']='A label drawn along a link is turned 180 degrees, so that it is not upside down, once the link leans more than this many degrees to the left of straight up.';
+$ec_lang['lpn_settings_readability_bias']='Label flip angle adjustment (degrees)';
+$ec_lang['lpn_settings_readability_bias_tip']='Flip a label to keep it right side up when it leans more than this many degrees left of vertical.';
 $ec_lang['lpn_settings_mask_labels']='Solid background behind labels';
 $ec_lang['lpn_settings_label_max_width']='Widest view that shows labels (map units)';
 $ec_lang['lpn_settings_label_max_width_tip']='Labels are shown only while the view is narrower than this. Leave the box blank to always show them.';
@@ -2213,7 +2215,7 @@ $ec_lang['lpn_settings_color_thematic']='Thematic map (colors only)';
 $ec_lang['lpn_settings_color_thematic_tip']='Hides every label so that only the colors are left on the map. Your label choices are kept, and turning this off brings them back.';
 $ec_lang['lpn_settings_color_key_position']='Color legend position';
 $ec_lang['lpn_settings_color_breaks']='Color band limits';
-$ec_lang['lpn_settings_color_breaks_note']='Leave these blank and the colors are spread across the values now on the map. Type numbers, or press a button below, and the same number always means the same color.';
+$ec_lang['lpn_settings_color_breaks_note']='The limits shown below are static for this project. Choosing a method above changes the limits based on the current state of the system, so it\'s expert to classify from a representative time step.';
 $ec_lang['lpn_settings_color_equal_intervals']='Equal intervals';
 $ec_lang['lpn_settings_color_equal_counts']='Equal counts';
 $ec_lang['lpn_settings_color_auto']='Automatic';

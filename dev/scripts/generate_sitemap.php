@@ -43,18 +43,35 @@ $excluded = [
     'Compare-Languages.php'=> 'translator tool, output is a diff table',
     'log-title-event.php'  => 'beacon endpoint, emits no HTML',
     'consent.php'          => 'redirect endpoint for the no-JS consent path, emits no HTML',
+    'log-signal-event.php' => 'beacon endpoint, emits no HTML',
+    'lpn-lock.php'         => 'POST-only lock broker, answers a GET with 405',
+    'sw.php'               => 'generates the service worker, serves JavaScript',
 ];
 // English-only pages: real content, indexable, but with no ?lang= variants because the body is
 // hard-coded English (ROADMAP Task 286 -- legal prose is not machine-translated). Emitting 27
 // language URLs for one English document would ask Google to index 27 duplicates.
 $englishOnly = ['privacy.php', 'terms.php'];
 $pages = [];
+$notPages = [];
 foreach (glob($repoRoot . '/*.php') as $path) {
     $file = basename($path);
     if (isset($excluded[$file])) continue;
+    // **A PAGE IS SOMETHING THAT CALLS echoHeader(). Everything else is an endpoint.**
+    // The list above is a hand-kept denylist, and it silently fell behind: log-signal-event.php,
+    // lpn-lock.php and sw.php were all added after it was written, so all three were advertised
+    // to Google in 27 languages apiece. Google crawled lpn-lock.php?lang=he, got its POST-only
+    // 405, and reported "Blocked due to other 4xx issue" -- found 2026-08-19 by Tom in Search
+    // Console, not by anything here. So the denylist no longer decides on its own: a file that
+    // renders no page is refused whether or not somebody remembered to list it.
+    if (strpos(file_get_contents($path), 'echoHeader(') === false) { $notPages[$file] = true; continue; }
     $pages[] = $file;
 }
 sort($pages);
+if ($notPages) {
+    fwrite(STDERR, "NOT A PAGE, so kept out of the sitemap (no echoHeader() call): "
+        . implode(', ', array_keys($notPages)) . "\n"
+        . "Add it to \$excluded above with a reason if that is right, or give it a header if it is a page.\n");
+}
 
 // --- Parent-site pages -----------------------------------------------------------------------
 // English-only, no ?lang= variants. sewslope.php and peakfact.php are here deliberately: ROADMAP
