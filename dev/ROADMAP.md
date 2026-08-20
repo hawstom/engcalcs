@@ -166,9 +166,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **The file is Tom's paste and ours to leave alone.** The fix is his: open Net3, File > Convert to
     lat/lon, save over Net3-World. One operation, versus retyping 7 time fields, 5 patterns and 6
     controls.
-  - **The product half is ours, and is the real lesson:** a project with no duration presents a
-    transport that looks broken rather than one that explains itself. Say so in the panel and point
-    at Total run time. One new key, and it must land before the sprint launches.
+  - **DONE, the product half (2026-08-19):** a project with no duration disables step-back, Play,
+    step-forward and the step selector, and every one of them carries `lpn_time_no_period`, which
+    names the cause and points at Total run time. Run stays live — with no duration it is an
+    ordinary recalculate. Five browser checks. **What is left is Tom's re-import**, and the task
+    stays open only for that.
 
 - 30|457| **[H] "Overline" and "underline" are no longer findable, and Tom asked for them by name.**
   He asked 2026-08-19 that the high/low mark row be searchable by those two words; the Wave 0
