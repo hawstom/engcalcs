@@ -728,6 +728,47 @@ echoHeader("EngCalcs", $html_title, "", false);
 		<p id="lpn_setbox_none" class="lpn-setbox-none" style="display:none"></p>
 	</div>
 </div>
+<?php // ---- THE LIBRARIES BOX (ROADMAP Tasks 462 and 460) -----------------------------------------
+      //
+      // Tom, 2026-08-20: "for Water Networks, I think we also need the following in a group:
+      // Libraries (Patterns, Curves, Controls, Pumps, Pipes, Custom), Settings, Simulate,
+      // Transport, Time selectors."
+      //
+      // **WHY A BOX OF ITS OWN, AND NOT THE TWO PLACES THAT ALREADY EXIST.**
+      //
+      //   * NOT the Settings box. The membership rule would let it in -- a pattern is a
+      //     whole-project thing -- but the SHAPE would not survive: every row in that box is one
+      //     name and one control in a measured column (dev/browser-pass/specs/setbox.js measures
+      //     the control column's x and caps a number box at 80 px), and a pattern is a series with
+      //     a chart beside it, a curve is a table, and a control is a sentence. Three exemptions to
+      //     the one design that box exists to hold is not a section, it is a second box wearing the
+      //     first one's chrome. Tom also names Libraries BESIDE Settings in the toolbar group, so
+      //     he is already holding them apart.
+      //   * NOT the bottom pane. That pane is for what is READ WHILE THE MAP IS EDITED, and its
+      //     seven tabs are one generic row-per-element table (renderPaneTable). None of these three
+      //     is row-per-element -- a pattern's rows are its own multipliers -- and authoring a
+      //     control is not reading. Three more tabs would also be ten, and the tab strip wraps at a
+      //     narrow window, which costs the map height.
+      //
+      // So: a standing box, dragged by its chrome, closed by its X, by Escape, and by the button
+      // that opened it -- the same three the Settings box and the property popup have. Its
+      // structure is the Settings box's, borrowed WHOLESALE (.lpn-setbox-* panes, index and
+      // content), because a second box on this page must look like the first one.
+      //
+      // **THE INDEX IS A CHOOSER, NOT A SCROLL INDEX.** Settings derives its index from headings
+      // and scrolls to them; these three are disjoint editors rather than sections of one document,
+      // so a click SHOWS one and hides the others. Built in JS (buildLibraryBox), because what is
+      // in each depends entirely on the document. ?>
+<div id="lpn_library_box" class="d-print-none lpn-popover lpn-setbox lpn-libbox" style="display:none;position:fixed;z-index:22;background:#fff;border:1px solid #333;padding:40px 8px 8px;box-shadow:2px 2px 6px rgba(0,0,0,.3)" role="dialog" aria-labelledby="lpn_libbox_title">
+	<div id="lpn_libbox_title" class="lpn-setbox-title"><?=$ec_lang['lpn_library_menu']?></div>
+	<button type="button" id="lpn_libbox_close" class="lpn-popover-x" title="<?=htmlspecialchars($ec_lang['lpn_close'])?>" aria-label="<?=htmlspecialchars($ec_lang['lpn_close'])?>">&times;</button>
+	<div class="lpn-popover-body lpn-setbox-body">
+		<div class="lpn-setbox-panes">
+			<nav id="lpn_libbox_index" class="lpn-setbox-index" aria-label="<?=htmlspecialchars($ec_lang['lpn_library_menu'])?>"></nav>
+			<div id="lpn_libbox_content" class="lpn-setbox-content"></div>
+		</div>
+	</div>
+</div>
 <?php // ONE menu popover, reused by all three menus (ROADMAP Task 211): the File menu, a tab's own
       // menu, and the tab-strip overflow list. They differ only in their rows, and openMenu() in
       // js/looped-network.js builds those, so three popovers would have been three copies of the
@@ -931,6 +972,30 @@ EngCalcs.pageConfig = {
 	lpn_settings_no_match: <?=json_encode($ec_lang['lpn_settings_no_match'])?>,
 	lpn_rpane_empty: <?=json_encode($ec_lang['lpn_rpane_empty'])?>,
 	lpn_time_settings_open: <?=json_encode($ec_lang['lpn_time_settings_open'])?>,
+<?php // Libraries (Tasks 462/460). ?>
+	lpn_library_menu: <?=json_encode($ec_lang['lpn_library_menu'])?>,
+	lpn_library_menu_tip: <?=json_encode($ec_lang['lpn_library_menu_tip'])?>,
+	lpn_library_patterns: <?=json_encode($ec_lang['lpn_library_patterns'])?>,
+	lpn_library_patterns_tip: <?=json_encode($ec_lang['lpn_library_patterns_tip'])?>,
+	lpn_library_curves: <?=json_encode($ec_lang['lpn_library_curves'])?>,
+	lpn_library_curves_tip: <?=json_encode($ec_lang['lpn_library_curves_tip'])?>,
+	lpn_library_curves_note: <?=json_encode($ec_lang['lpn_library_curves_note'])?>,
+	lpn_library_controls: <?=json_encode($ec_lang['lpn_library_controls'])?>,
+	lpn_library_controls_tip: <?=json_encode($ec_lang['lpn_library_controls_tip'])?>,
+	lpn_library_pattern_add: <?=json_encode($ec_lang['lpn_library_pattern_add'])?>,
+	lpn_library_pattern_values: <?=json_encode($ec_lang['lpn_library_pattern_values'])?>,
+	lpn_library_pattern_values_tip: <?=json_encode($ec_lang['lpn_library_pattern_values_tip'])?>,
+	lpn_library_pattern_span: <?=json_encode($ec_lang['lpn_library_pattern_span'])?>,
+	lpn_library_pattern_none: <?=json_encode($ec_lang['lpn_library_pattern_none'])?>,
+	lpn_library_default_pattern: <?=json_encode($ec_lang['lpn_library_default_pattern'])?>,
+	lpn_library_default_pattern_tip: <?=json_encode($ec_lang['lpn_library_default_pattern_tip'])?>,
+	lpn_library_control_add: <?=json_encode($ec_lang['lpn_library_control_add'])?>,
+	lpn_library_control_tip: <?=json_encode($ec_lang['lpn_library_control_tip'])?>,
+	lpn_library_control_ok: <?=json_encode($ec_lang['lpn_library_control_ok'])?>,
+	lpn_library_control_bad: <?=json_encode($ec_lang['lpn_library_control_bad'])?>,
+	lpn_library_control_missing: <?=json_encode($ec_lang['lpn_library_control_missing'])?>,
+	lpn_field_demand_pattern: <?=json_encode($ec_lang['lpn_field_demand_pattern'])?>,
+	lpn_field_demand_pattern_tip: <?=json_encode($ec_lang['lpn_field_demand_pattern_tip'])?>,
 	lpn_help_fix: <?=json_encode($ec_lang['lpn_help_fix'])?>,
 	lpn_help_notes: <?=json_encode($ec_lang['lpn_help_notes'])?>,
 <?php   // The suite's existing legal-link strings, needed here because this page's Help menu and

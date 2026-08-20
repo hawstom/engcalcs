@@ -293,6 +293,15 @@ $ec_icons = array(
 	// 16px instead of closing into a bar.
 	'run'        => '<path d="M13 2L4 14h6l-1 8 9-12h-6z" fill="currentColor" stroke="none"/>',
 
+	// LIBRARIES: three books standing on a shelf (ROADMAP Task 462). A REAL OBJECT, which is this
+	// project's rule for an icon -- a shelf of reference volumes is what a library IS, and it is how
+	// a library is drawn everywhere from a road sign to a bookshop's own logo. Deliberately NOT a
+	// stack of papers or a database cylinder: both already mean something else on this page (a file,
+	// and nothing at all), and neither says "a set of named things you reach for by name".
+	// The shelf line under the books is what keeps three narrow rectangles from reading as a bar
+	// chart at 16 px; the third book leans, which is the one detail that says books rather than boxes.
+	'library'    => '<path d="M4 4h3v14H4z"/><path d="M8.5 4h3v14h-3z"/><path d="M14.6 4.9l2.9.8-3.6 13.2-2.9-.8z"/><path d="M3 20h18"/>',
+
 	// ---- Shared site chrome ----
 	// Tom, 2026-08-08, on the 🔗 emoji: "I would prefer something cleaner... or a horizontal
 	// version of that." Two interlocking horizontal capsules — a chain link lying flat, which is

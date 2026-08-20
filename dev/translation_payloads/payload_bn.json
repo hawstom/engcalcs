@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "bn",
-        "expected_key_count": 1213,
-        "delta_key_count": 20,
+        "expected_key_count": 1236,
+        "delta_key_count": 43,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -461,7 +461,30 @@
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",
         "lpn_labels_col_decimals_example": "0.000",
-        "lpn_color_mode_manual": "Manual"
+        "lpn_color_mode_manual": "Manual",
+        "lpn_library_menu": "Libraries",
+        "lpn_library_menu_tip": "Libraries: the demand patterns, pump curves and control rules this project holds. Open it to see them, change them, or add one.",
+        "lpn_library_patterns": "Patterns",
+        "lpn_library_patterns_tip": "A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.",
+        "lpn_library_curves": "Curves",
+        "lpn_library_curves_tip": "A curve is the points that say how a pump performs: how much head it makes at each flow.",
+        "lpn_library_curves_note": "A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that element and change its points there.",
+        "lpn_library_controls": "Controls",
+        "lpn_library_controls_tip": "A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.",
+        "lpn_library_pattern_add": "Add a pattern",
+        "lpn_library_pattern_values": "Multipliers",
+        "lpn_library_pattern_values_tip": "The multipliers, separated by spaces or commas. Paste a column from a spreadsheet if you have one. The list repeats for as long as the run lasts, so it does not have to cover the whole run.",
+        "lpn_library_pattern_span": "{n} multipliers, {step} apart, covering {span}",
+        "lpn_library_pattern_none": "No pattern",
+        "lpn_library_default_pattern": "Pattern for demands that name none",
+        "lpn_library_default_pattern_tip": "Every junction that does not name a pattern of its own follows this one. It is what an EPANET file states as its Pattern option.",
+        "lpn_library_control_add": "Add a control",
+        "lpn_library_control_tip": "One sentence, in the words EPANET uses. Four shapes: LINK 9 OPEN IF NODE 2 BELOW 110, LINK 9 CLOSED IF NODE 2 ABOVE 140, LINK 10 OPEN AT TIME 1, and LINK 12 CLOSED AT CLOCKTIME 3 AM. Instead of OPEN or CLOSED you may write a number, which is a valve setting or a pump speed. Leave the keywords in English; they are what the page reads.",
+        "lpn_library_control_ok": "✓ Understood",
+        "lpn_library_control_bad": "⚠ Not understood",
+        "lpn_library_control_missing": "⚠ This network has nothing called {id}",
+        "lpn_field_demand_pattern": "Demand pattern",
+        "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
     },
     "keys": {
         "lpn_basemap_satellite_show": "Show satellite images",
@@ -483,7 +506,30 @@
         "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
         "lpn_time_run_report": "EPANET run report",
         "lpn_labels_col_decimals_example": "0.000",
-        "lpn_color_mode_manual": "Manual"
+        "lpn_color_mode_manual": "Manual",
+        "lpn_library_menu": "Libraries",
+        "lpn_library_menu_tip": "Libraries: the demand patterns, pump curves and control rules this project holds. Open it to see them, change them, or add one.",
+        "lpn_library_patterns": "Patterns",
+        "lpn_library_patterns_tip": "A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.",
+        "lpn_library_curves": "Curves",
+        "lpn_library_curves_tip": "A curve is the points that say how a pump performs: how much head it makes at each flow.",
+        "lpn_library_curves_note": "A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that element and change its points there.",
+        "lpn_library_controls": "Controls",
+        "lpn_library_controls_tip": "A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.",
+        "lpn_library_pattern_add": "Add a pattern",
+        "lpn_library_pattern_values": "Multipliers",
+        "lpn_library_pattern_values_tip": "The multipliers, separated by spaces or commas. Paste a column from a spreadsheet if you have one. The list repeats for as long as the run lasts, so it does not have to cover the whole run.",
+        "lpn_library_pattern_span": "{n} multipliers, {step} apart, covering {span}",
+        "lpn_library_pattern_none": "No pattern",
+        "lpn_library_default_pattern": "Pattern for demands that name none",
+        "lpn_library_default_pattern_tip": "Every junction that does not name a pattern of its own follows this one. It is what an EPANET file states as its Pattern option.",
+        "lpn_library_control_add": "Add a control",
+        "lpn_library_control_tip": "One sentence, in the words EPANET uses. Four shapes: LINK 9 OPEN IF NODE 2 BELOW 110, LINK 9 CLOSED IF NODE 2 ABOVE 140, LINK 10 OPEN AT TIME 1, and LINK 12 CLOSED AT CLOCKTIME 3 AM. Instead of OPEN or CLOSED you may write a number, which is a valve setting or a pump speed. Leave the keywords in English; they are what the page reads.",
+        "lpn_library_control_ok": "✓ Understood",
+        "lpn_library_control_bad": "⚠ Not understood",
+        "lpn_library_control_missing": "⚠ This network has nothing called {id}",
+        "lpn_field_demand_pattern": "Demand pattern",
+        "lpn_field_demand_pattern_tip": "How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is."
     },
     "key_context": {
         "lpn_basemap_satellite_show": {
@@ -791,6 +837,282 @@
             }
         },
         "lpn_color_mode_manual": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_menu": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_menu_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_patterns": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_patterns_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_curves": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_curves_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_curves_note": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_controls": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_controls_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_pattern_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_pattern_values": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_pattern_values_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_pattern_span": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_pattern_none": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_default_pattern": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_default_pattern_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_control_add": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_control_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_control_ok": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_control_bad": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_library_control_missing": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_demand_pattern": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "চাপ",
+                    "english": "Pressure"
+                },
+                "next_translated": null
+            }
+        },
+        "lpn_field_demand_pattern_tip": {
             "reason": "missing",
             "current_value": null,
             "neighbors": {

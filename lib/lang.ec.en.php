@@ -2350,3 +2350,50 @@ $ec_lang_syn['lpn_color_mode_pretty']='Equal intervals rounded for a pretty lege
 $ec_lang['lpn_color_mode_log']='Logarithmic';
 $ec_lang['lpn_color_mode_pressure']='Pressure';
 $ec_lang['lpn_color_mode_manual']='Manual';
+
+// ---- LIBRARIES (ROADMAP Tasks 462 and 460) ---------------------------------------------------
+// The document has carried patterns, curves and controls since Task 423; nothing on the page could
+// see one. This is that interface. Tom, 2026-08-20: "for Water Networks, I think we also need the
+// following in a group: Libraries (Patterns, Curves, Controls, Pumps, Pipes, Custom), Settings,
+// Simulate, Transport, Time selectors."
+//
+// ONE NAME, THREE DOORS: the toolbar button, the Edit menu row and the box's own title all read
+// this key, exactly as lpn_menu_settings serves the Settings box's three.
+// Plural, because it is a shelf of them: a user opens Libraries to reach the patterns, not to reach
+// "the library".
+$ec_lang['lpn_library_menu']='Libraries';
+$ec_lang['lpn_library_menu_tip']='Libraries: the demand patterns, pump curves and control rules this project holds. Open it to see them, change them, or add one.';
+// The three section names. Each is the word EPANET's own input file uses for the section, because
+// that is the word every water-network user and every tutorial already has -- see the note in
+// dev/scripts/glossary.json about deferring to a discipline's standard term.
+$ec_lang['lpn_library_patterns']='Patterns';
+$ec_lang['lpn_library_patterns_tip']='A pattern is a list of multipliers that repeats. Each one applies for one pattern time step, so 24 numbers on a one hour step make a day that repeats. A demand of 10 with a multiplier of 1.5 is 15 at that moment.';
+$ec_lang['lpn_library_curves']='Curves';
+$ec_lang['lpn_library_curves_tip']='A curve is the points that say how a pump performs: how much head it makes at each flow.';
+$ec_lang['lpn_library_curves_note']='A curve belongs to the pump or the valve that uses it, so this is the whole set in one place to read. Click an ID to go to that element and change its points there.';
+$ec_lang['lpn_library_controls']='Controls';
+$ec_lang['lpn_library_controls_tip']='A control is one sentence that opens or closes a link, or gives it a setting, when a water level, a pressure or a time says so.';
+// A verb and its object, not a bare "Add": a bare imperative is the hardest kind of string to
+// translate well, and there are two of these buttons a few centimetres apart.
+$ec_lang['lpn_library_pattern_add']='Add a pattern';
+$ec_lang['lpn_library_pattern_values']='Multipliers';
+$ec_lang['lpn_library_pattern_values_tip']='The multipliers, separated by spaces or commas. Paste a column from a spreadsheet if you have one. The list repeats for as long as the run lasts, so it does not have to cover the whole run.';
+// {n} values, {step} apart, covering {span}. Placeholders rather than three joined fragments
+// (Task 193): the order of the three differs by language and a sandwich cannot express that.
+$ec_lang['lpn_library_pattern_span']='{n} multipliers, {step} apart, covering {span}';
+$ec_lang['lpn_library_pattern_none']='No pattern';
+$ec_lang['lpn_library_default_pattern']='Pattern for demands that name none';
+$ec_lang['lpn_library_default_pattern_tip']='Every junction that does not name a pattern of its own follows this one. It is what an EPANET file states as its Pattern option.';
+$ec_lang['lpn_library_control_add']='Add a control';
+// THE KEYWORDS IN THE EXAMPLES ARE NOT TRANSLATED and must be left exactly as they are: LINK,
+// OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and CLOCKTIME are what the reader types into the
+// box, and the page reads back only those words. Translate the sentence around them.
+$ec_lang['lpn_library_control_tip']='One sentence, in the words EPANET uses. Four shapes: LINK 9 OPEN IF NODE 2 BELOW 110, LINK 9 CLOSED IF NODE 2 ABOVE 140, LINK 10 OPEN AT TIME 1, and LINK 12 CLOSED AT CLOCKTIME 3 AM. Instead of OPEN or CLOSED you may write a number, which is a valve setting or a pump speed. Leave the keywords in English; they are what the page reads.';
+$ec_lang['lpn_library_control_ok']='✓ Understood';
+$ec_lang['lpn_library_control_bad']='⚠ Not understood';
+$ec_lang['lpn_library_control_missing']='⚠ This network has nothing called {id}';
+// PER JUNCTION, so it is in the property popup and not in this box -- the Settings rule ("if it is
+// for the entire project it is in Settings") drawn on its other side. Without it a pattern you
+// author can only be used by making it the default one, which is not what a library is for.
+$ec_lang['lpn_field_demand_pattern']='Demand pattern';
+$ec_lang['lpn_field_demand_pattern_tip']='How this junction’s demand rises and falls through the run. Leave it at No pattern to follow whatever the project’s own pattern is.';
