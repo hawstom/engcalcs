@@ -515,6 +515,9 @@
 	// them. So the modes GENERATE and validateBreaks() ACCEPTS -- a hand-edited break list is a
 	// first-class input here, not an afterthought.
 
+	// The key of the one mode nobody chooses -- see its entry in MODES below. Named here so the
+	// editor can test for it by name rather than by a spelled-out string in two files.
+	var MANUAL_MODE = 'manual';
 	// `field` names the quantity a mode is FOR, and null means "any". The picker shows a criterion
 	// mode only when its quantity is the one being coloured -- a mode called Pressure offered while
 	// colouring velocity is an invitation to a wrong map.
@@ -526,19 +529,27 @@
 		{ key: 'pretty', name: 'Pretty (rounded)', field: null },
 		{ key: 'log', name: 'Logarithmic', field: null },
 		// Named for the quantity, not the algorithm. See CRITERIA.
-		{ key: 'pressure', name: 'Pressure', field: 'pressure', criterion: 'pressure' }
+		{ key: 'pressure', name: 'Pressure', field: 'pressure', criterion: 'pressure' },
+		// **SHOWN AND STORED, NEVER OFFERED.** Manual is not a way of computing breaks -- it is what
+		// the selector reads once the user has typed one, exactly as EPANET's own legend editor
+		// does. So it needs a name (a project can be sitting on it, and the picker has to say so)
+		// but it must not appear in the list of things to choose: choosing "Manual" would mean
+		// "leave the numbers alone", which is what doing nothing already does. modesFor() drops it
+		// and the picker adds it back, disabled, only while it is the current mode.
+		{ key: MANUAL_MODE, name: 'Manual', field: null, manual: true }
 	];
 	// The modes worth offering for a given field.
 	//
 	// **NO FIELD MEANS THE WHOLE CATALOGUE, not "the modes that suit nothing".** A caller with no
 	// field yet is building a list, not colouring a map; hiding the criterion modes from it would
 	// make them undiscoverable everywhere except the one screen that already knows about them.
-	// Filtering happens only when a field is actually named.
+	// Filtering happens only when a field is actually named. A `manual` mode is never offered for
+	// any field, with or without one -- it is a state, not a choice.
 	function modesFor(field) {
-		var out = [], i;
-		if (field === undefined || field === null || field === '') { return MODES.slice(); }
+		var out = [], i, any = (field === undefined || field === null || field === '');
 		for (i = 0; i < MODES.length; i++) {
-			if (!MODES[i].field || MODES[i].field === field) { out.push(MODES[i]); }
+			if (MODES[i].manual) { continue; }
+			if (any || !MODES[i].field || MODES[i].field === field) { out.push(MODES[i]); }
 		}
 		return out;
 	}
@@ -1036,6 +1047,7 @@
 		FAMILIES: FAMILIES,
 		CREDITS: CREDITS,
 		MODES: MODES,
+		MANUAL_MODE: MANUAL_MODE,
 		FAMILY_EXAMPLES: FAMILY_EXAMPLES,
 		CRITERIA: CRITERIA,
 		modesFor: modesFor,

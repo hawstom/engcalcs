@@ -1403,7 +1403,7 @@ $ec_lang['lpn_settings_color_classes']='Number of colors';
 // appears in none of the reference tools. Tom, 2026-08-19: "Don't drop the 'method'. That's the
 // point of this control." -- the dropdown holds METHODS, and the noun alone would name the result.
 $ec_lang['lpn_color_mode']='Data classification method';
-$ec_lang['lpn_color_ranges_note']='The limits shown below are static for this project. Choosing a method above changes the limits based on the current state of the system, so it\'s expert to classify from a representative time step. If you change any value manually, the method above changes to Manual';
+$ec_lang['lpn_color_ranges_note']='The limits shown below are static for this project. Choosing a method above changes the limits based on the current state of the system, so it\'s expert to classify from a representative time step. If you change any value manually, the method above changes to Manual.';
 $ec_lang['lpn_color_criterion_note']='This method takes its limits from a design standard, so the number of colors is fixed while it is chosen.';
 $ec_lang['lpn_color_break_number']='A range limit must be a number. The map is unchanged.';
 $ec_lang['lpn_color_break_order']='Each range limit must be larger than the one before it. The map is unchanged.';
@@ -2330,3 +2330,4 @@ $ec_lang['lpn_color_mode_stddev']='Standard deviation';
 $ec_lang['lpn_color_mode_pretty']='Pretty (rounded)';
 $ec_lang['lpn_color_mode_log']='Logarithmic';
 $ec_lang['lpn_color_mode_pressure']='Pressure';
+$ec_lang['lpn_color_mode_manual']='Manual';

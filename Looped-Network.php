@@ -1121,6 +1121,7 @@ EngCalcs.pageConfig = {
 	lpn_color_mode_pretty: <?=json_encode($ec_lang['lpn_color_mode_pretty'])?>,
 	lpn_color_mode_log: <?=json_encode($ec_lang['lpn_color_mode_log'])?>,
 	lpn_color_mode_pressure: <?=json_encode($ec_lang['lpn_color_mode_pressure'])?>,
+	lpn_color_mode_manual: <?=json_encode($ec_lang['lpn_color_mode_manual'])?>,
 	lpn_color_ranges_note: <?=json_encode($ec_lang['lpn_color_ranges_note'])?>,
 	lpn_color_criterion_note: <?=json_encode($ec_lang['lpn_color_criterion_note'])?>,
 	lpn_color_break_number: <?=json_encode($ec_lang['lpn_color_break_number'])?>,

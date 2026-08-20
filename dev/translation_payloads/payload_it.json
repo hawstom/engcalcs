@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "it",
-        "expected_key_count": 1200,
-        "delta_key_count": 6,
+        "expected_key_count": 1201,
+        "delta_key_count": 7,
         "exempt_key_count": 30,
         "exempt_keys": [
             "calc_units_us",
@@ -452,7 +452,8 @@
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
         "lpn_notes_color_term": "Color band limits stay the same",
-        "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own."
+        "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own.",
+        "lpn_color_mode_manual": "Manual"
     },
     "keys": {
         "lpn_basemap_satellite_show": "Show satellite images",
@@ -460,7 +461,8 @@
         "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
         "lpn_notes_color_term": "Color band limits stay the same",
-        "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own."
+        "lpn_notes_color_def": "Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own.",
+        "lpn_color_mode_manual": "Manual"
     },
     "key_context": {
         "lpn_basemap_satellite_show": {
@@ -557,6 +559,18 @@
                     "value": "Le costanti di Hazen-Williams corrispondono a EPANET",
                     "english": "Hazen-Williams constants match EPANET"
                 }
+            }
+        },
+        "lpn_color_mode_manual": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_color_mode_pressure",
+                    "value": "Pressione",
+                    "english": "Pressure"
+                },
+                "next_translated": null
             }
         }
     },
