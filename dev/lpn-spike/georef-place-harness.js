@@ -204,7 +204,7 @@ ok('a project already on the GeoMap is refused, not re-placed', L.georefState() 
 // map, which says "there is no such command" rather than "not for this project". The row is read out
 // of the source, because a menu is not reachable from a headless document.
 //
-// **THE ROW IS NOW "Import XY to lat/lon…" AND IT IS NEVER DISABLED** (Task 447). What used to convert the
+// **THE ROW IS NOW "Import xy to lat/lon…" AND IT IS NEVER DISABLED** (Task 447). What used to convert the
 // open project in place is gone; the wizard starts from a FILE, which lands in a new tab, so no state
 // of the current project can make the command impossible. Three rows, in this order, and each of the
 // three names what kind of file it takes.
@@ -213,14 +213,14 @@ console.log('\n--- the command is findable, and a coordinate is what a map gives
 	const lnSrc = require('fs').readFileSync(ROOT + 'js/looped-network.js', 'utf8');
 	const row = lnSrc.slice(lnSrc.indexOf('label: pc.lpn_file_import_geo'),
 		lnSrc.indexOf('label: pc.lpn_file_import_geo') + 200);
-	ok('File carries Import XY to lat/lon…, and it opens a file rather than converting the open project',
+	ok('File carries Import xy to lat/lon…, and it opens a file rather than converting the open project',
 		/label: pc\.lpn_file_import_geo \|\|/.test(lnSrc) && /fn: pickGeoFile/.test(row), row.split('\n')[1]);
 	ok('...never disabled: opening a file always makes a new tab, whatever is on screen',
 		!/disabled/.test(row));
 	// **THIRD, AND THE ORDER IS THE POINT** (Tom, 2026-08-19: "make it third since it is truly our
 	// fallback option"). It rescues a file the two rows above opened as the wrong kind, and a
 	// fallback listed above the thing it falls back from reads as an equal alternative.
-	ok('...and the three Open rows run Open, Import EPANET, Import XY to lat/lon',
+	ok('...and the three Open rows run Open, Import EPANET, Import xy to lat/lon',
 		lnSrc.indexOf('pc.lpn_file_import_geo') > lnSrc.indexOf('pc.lpn_file_open |') &&
 		lnSrc.indexOf('pc.lpn_file_import_geo') > lnSrc.indexOf('pc.lpn_file_import_inp') &&
 		lnSrc.indexOf('pc.lpn_file_import_geo') < lnSrc.indexOf('pc.lpn_file_export_inp'));

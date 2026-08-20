@@ -211,7 +211,7 @@ async function labelsHidden(a) {
 		document.getElementById('lpn_canvas').classList.contains('lpn-labels-hidden'));
 }
 
-const ROW = 'Import XY to lat/lon…';
+const ROW = 'Import xy to lat/lon…';
 
 // **THE TOOL STARTS FROM A FILE NOW (Task 447), never from the open project.** So a placement is:
 // take what is on screen as a project file, and open THAT as lat/lon -- which lands a new tab with
@@ -635,7 +635,7 @@ exports.run = async function ({ browser, report }) {
 			await a.settle(600);
 			// nodeCount() counts every drawn symbol, links included, so this is "the network is on the
 			// screen" rather than a node tally: two nodes and a pipe cannot draw fewer than three.
-			report.ok(await a.nodeCount() >= 3, 'an EPANET file opens through Import XY to lat/lon… too',
+			report.ok(await a.nodeCount() >= 3, 'an EPANET file opens through Import xy to lat/lon… too',
 				(await a.nodeCount()) + ' symbols drawn');
 			// **REINTERPRET, NOT PLACE.** These coordinates can be read as degrees, so the wizard opens
 			// ATTACHED with the numbers taken as they are: the network appears on its own streets and

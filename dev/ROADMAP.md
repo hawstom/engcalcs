@@ -141,42 +141,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   `lpn_notes_*` (Task 448's stability note and the Notes review) and `lpn_file_import_inp_tip`. Plus
   the keys written since: `lpn_color_mode_manual`, `lpn_time_no_period`, and the three
   `lpn_basemap_satellite_*`. Needs Tom's authorization, and a Wave 0 over the changed set first.
-- 75|447| **"Convert to lat/lon" goes; OPEN grows up instead.** Tom's design, 2026-08-19, and it is
-  the settled one — it supersedes both the in-place convert and the "Import XY project" framing
-  this task carried before:
-
-  > *"Three source cases (EPANET, XY, and latlon) to two destination cases (XY and latlon). And all
-  > the cases want to open a file. And 'most' similar software takes 'import' to mean 'open', not
-  > merge or replace… Our Open has to be smart enough to handle whatever it finds… For EPANET, we
-  > can always prompt at open: Import as XY or Lat/Lon? For JSON, we need another menu item, and we
-  > call it 'Open as Lat/Lon', not convert and not import."*
-
-  - **THE MOVE THAT DISSOLVES THE PROBLEM: Open makes a NEW TAB.** There is then no current project
-    to bring anything "into", so merge-versus-replace never has to be answered and no row needs a
-    disabled state. Three File rows: `Open…`, `Open as lat/lon…`, `Import EPANET file…`.
-  - **A JSON file needs no prompt** — it states its own `project.coords`, so an XY file opens XY and
-    a lat/lon file opens lat/lon. `Open as lat/lon…` is the deliberate override that takes an XY
-    file and places it on the world, running the placement wizard. That is the only cell of the
-    3x2 matrix needing its own door; **lat/lon opened as XY is never wanted** and gets no row.
-  - **AN `.inp` USUALLY DOES SAY, AND WE HAVE BEEN THROWING IT AWAY.** Tom asked 2026-08-19 whether
-    any engineer has ever meant degrees in an `.inp`. EPA answered that years ago: the Map
-    Dimensions dialog offers **Feet, Meters, Degrees or None**, and the choice is persisted as
-    `[BACKDROP] UNITS`. EPA's own Net1/2/3 all carry `UNITS None`. `js/lpn-inp.js` reads only
-    `FILE` out of that section and ignores `UNITS` entirely.
-  - So the rule is READ THE FILE, not ask: `DEGREES` opens lat/lon, `FEET`/`METERS`/`NONE` open XY,
-    and **the prompt is only for a file with no `UNITS` line at all** — hand-written `.inp`s and
-    other tools' exports. That is the same principle as everywhere else here: the input file is
-    canonical, and a question whose answer is already in the file is a question we should not ask.
-  - **Degrees being SUPPORTED is not evidence it is COMMON**, and we have no measurement of how
-    often it is used. The prompt's fallback should therefore default to XY, and can offer the
-    coordinate ranges as evidence (all within ±180/±90 is suggestive, never conclusive — a small
-    site drawing near the origin looks identical).
-  - **A SEPARATE ROW BEATS A PROMPT FOR JSON, by Tom's own earlier ruling** that a choice must not
-    stand in front of the common action. Opening a file is common; converting to lat/lon is rare,
-    so the rare one carries the extra door.
-  - **The "bug" Tom reported is reframed, and the real defect is smaller:** *"I tried to import
-    Net3.inp into a lat/lon project. Instead, it opened a new project."* Under this model a new
-    project is CORRECT — what is missing is that it never asked XY or lat/lon.
 - 45|445| **Labels: invert priority to "Drop first in case of conflict", 1 dropping first.** Tom,
   2026-08-19: "our labels priority paradigm really wants to be Labels.Drop First In Case of Conflict
   … it's a version bump because the order of the numbers reverses. But it's the right thing to do."

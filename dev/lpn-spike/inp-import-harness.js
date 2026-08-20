@@ -23,7 +23,7 @@ const path = require('path');
 // The page loads both readers before js/looped-network.js; do the same, onto the same EngCalcs.
 require(ROOT + 'js/lpn-inp.js');
 require(ROOT + 'js/lpn-net.js');
-// The placement wizard's arithmetic, needed because File > Import XY to lat/lon… ends in it (Task 447).
+// The placement wizard's arithmetic, needed because File > Import xy to lat/lon… ends in it (Task 447).
 // georefStart() refuses outright without it, which would make the routing test below pass for the
 // wrong reason -- "no wizard armed" would be true whatever the file said.
 require(ROOT + 'js/lpn-georef.js');
@@ -91,7 +91,7 @@ const L = loadLoopedNetwork(
 	// CURRENT document", and a literal 4 made it "the import writes v4" -- a different claim, which
 	// went stale at the next format bump (Task 324).
 	"\t\tstorageVersion: function () { return LPN_STORAGE_VERSION; },\n" +
-	// Task 447: File > Import XY to lat/lon…, and the wizard it can end in. serialize() is how this
+	// Task 447: File > Import xy to lat/lon…, and the wizard it can end in. serialize() is how this
 	// harness gets a real project FILE to hand back through that row -- writing one by hand would be
 	// a second opinion about our own format.
 	"\t\topenAsGeo: openAsGeoFile, serialize: serializeProject,\n" +
@@ -570,12 +570,12 @@ const INP_STRANGE = probeInp(['[BACKDROP]', ' UNITS  Furlongs', '']);
 }
 
 // ---------------------------------------------------------------------------
-// File > Import XY to lat/lon…: ONE row, both kinds of file (Task 447).
+// File > Import xy to lat/lon…: ONE row, both kinds of file (Task 447).
 // ---------------------------------------------------------------------------
 // The row exists for the one cell no file can state: an XY drawing whose X and Y were MEANT as
 // lon/lat all along. It therefore takes a project file and an `.inp` alike, and decides which reader
 // from the content -- a project file is JSON and starts with `{`, which no `.inp` ever does.
-console.log('\n--- Import XY to lat/lon…, over an .inp and over a project file ---');
+console.log('\n--- Import xy to lat/lon…, over an .inp and over a project file ---');
 {
 	// currentView() measures the canvas, and the shared stub's elements carry no layout box; without
 	// a size the wizard correctly refuses to arm and every check below would pass for that reason.

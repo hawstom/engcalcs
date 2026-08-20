@@ -380,10 +380,10 @@ class Session {
 	// (XY and lat/lon are Tom's words) and every spec that had typed one out stopped at its first
 	// menu click — which is precisely the failure this file exists to make impossible.
 	static TEMPLATES = {
-		'xy-us': 'Blank XY project, US units (gpm)',
-		'xy-si': 'Blank XY project, SI units (l/s)',
+		'xy-us': 'Blank xy project, US units (gpm)',
+		'xy-si': 'Blank xy project, SI units (L/s)',
 		'geo-us': 'Blank lat/lon project, US units (gpm)',
-		'geo-si': 'Blank lat/lon project, SI units (l/s)'
+		'geo-si': 'Blank lat/lon project, SI units (L/s)'
 	};
 	async newProject(system = 'us') { await this._newFromTemplate('xy-' + system); }
 	// A lat/lon project: longitudes and latitudes, and a street map behind it.
