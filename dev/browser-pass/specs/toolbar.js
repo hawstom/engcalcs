@@ -27,6 +27,9 @@ exports.run = async function ({ browser, report }) {
 			// ever occupied. Reading both is reading what the user actually gets.
 			title: b.getAttribute('title') || b.getAttribute('data-bs-original-title') || '',
 			cls: b.className || '',
+			// A DISABLED control is a different case for the tip rule below, so it has to come back
+			// with the buttons rather than be inferred from their names.
+			disabled: !!b.disabled,
 			// Only the direct text nodes: the <svg> is a child element and does not count.
 			text: [...b.childNodes].filter(n => n.nodeType === 3).map(n => n.textContent).join('').trim(),
 			icons: b.querySelectorAll('svg').length
@@ -49,9 +52,24 @@ exports.run = async function ({ browser, report }) {
 		report.eq(unwired.length, 0, 'every tip is wired for touch (.ec-help)',
 			JSON.stringify(unwired.map(b => b.label)));
 		// The name is the HEAD of the tip, not the whole of it, and never the other way round.
-		const badJoin = btns.filter(b => b.title.indexOf(b.label) !== 0);
-		report.eq(badJoin.length, 0, 'the tip begins with the name',
+		//
+		// **A DISABLED CONTROL IS EXEMPT, AND DELIBERATELY SO.** js/lpn-time.js swaps a switched-off
+		// transport control's tip for the one sentence that says WHY it is off ("This project has no
+		// time period..."), because three live controls that quietly do nothing are indistinguishable
+		// from three broken ones -- Tom's own report on Net3-World. The reason is shared by all three
+		// and cannot begin with three different names. The tip a control carries when it WORKS is its
+		// own and is restored the moment it is enabled, which is what the second check below holds.
+		// Recorded here rather than left as a standing failure: this spec had been failing on the
+		// three transport buttons since the disable landed, and a check that always fails is a check
+		// nobody reads.
+		const live = btns.filter(b => !b.disabled);
+		const badJoin = live.filter(b => b.title.indexOf(b.label) !== 0);
+		report.eq(badJoin.length, 0, 'every ENABLED button\'s tip begins with its name',
 			JSON.stringify(badJoin.map(b => [b.label, b.title])));
+		const off = btns.filter(b => b.disabled);
+		report.ok(off.every(b => b.title.length > 20),
+			'and a disabled one says why it is off instead',
+			JSON.stringify(off.map(b => b.label)));
 		// The strip is not one wide row of identical mystery: at least the seven drawing tools plus
 		// save/undo/zoom carry a real explanation after the name.
 		const explained = btns.filter(b => b.title.length > b.label.length + 3);

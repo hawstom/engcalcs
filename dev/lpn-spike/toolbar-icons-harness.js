@@ -69,7 +69,12 @@ console.log('\n-- every toolbar button goes through it --');
 	// The time transport is built in js/lpn-time.js, and it must be named through THIS file's
 	// wrapper rather than EngCalcs.setIconLabel: only the wrapper records a button in
 	// toolbarIconIndex, and Help > "What the toolbar icons mean" is derived from that record.
-	report(/lpnTimeMountToolbar\(group\(\), setIconLabel\)/.test(bar),
+	// **THE SECOND ARGUMENT IS THE ASSERTION; THE FIRST IS NOT.** This read `group(), setIconLabel`
+	// until Task 462 put the transport into the shared water-network group beside Libraries and
+	// Settings, at which point the container became a named variable and this failed on a change
+	// that had nothing to do with what it guards. Which container it is handed is the toolbar's
+	// business; which naming wrapper it is handed is this check's.
+	report(/lpnTimeMountToolbar\([A-Za-z0-9_()]+, setIconLabel\)/.test(bar),
 		'the time transport is mounted with this file\'s own setIconLabel, so it reaches the Help guide');
 	// Profile is a toolbar button as well as a View menu row (Tom, 2026-08-18: "I like that the
 	// command is under the View menu" -- two doors, one implementation).

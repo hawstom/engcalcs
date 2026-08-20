@@ -656,8 +656,8 @@ html[lang="zh"] .ec-welcome {
    Find and the Settings box are the three that stay put until closed, so all three drag.
    `touch-action: none` is what lets a touch drag work at all -- without it the browser claims the
    gesture for scrolling before pointermove ever fires. */
-#lpn_popup, #lpn_settings_box { cursor: move; touch-action: none; }
-#lpn_popup .lpn-popover-body, #lpn_settings_box .lpn-popover-body { cursor: auto; }
+#lpn_popup, #lpn_settings_box, #lpn_library_box { cursor: move; touch-action: none; }
+#lpn_popup .lpn-popover-body, #lpn_settings_box .lpn-popover-body, #lpn_library_box .lpn-popover-body { cursor: auto; }
 /* ...and the two panes take their touch gestures BACK, or `touch-action: none` above would make
    them unscrollable by finger. The drag surface is the box's own padded band, which these are not
    part of. */
@@ -1542,3 +1542,43 @@ html[lang="zh"] .ec-welcome {
    .lpn-popover-body already does. */
 html:has(#lpn_canvas) form#formInput { margin-bottom: 0; }
 html:has(#lpn_canvas) { overflow: hidden; }
+
+/* ---- THE LIBRARIES BOX (ROADMAP Tasks 462 and 460) -------------------------------------------
+
+   It borrows the Settings box's whole shell -- .lpn-popover for the size caps, .lpn-setbox for the
+   drag band, the resize grabber and the two panes -- so there is exactly one box design on this
+   page and a second one cannot drift from the first. What is different is only what these three
+   editors need and a settings row does not: a series of numbers wide enough to read, a chart beside
+   it, and a sentence that wants the width of the box.
+
+   WIDER THAN SETTINGS, AND THAT IS THE WHOLE OVERRIDE. A settings row is a name and one small
+   control; a control sentence is `LINK 335 OPEN IF NODE 1 BELOW 17.1` and a 24-point pattern is a
+   line of numbers. Both are read left to right and neither wraps usefully, so the box opens at
+   44rem against Settings' 34. Everything else -- the height, the minimums, the resize -- is
+   inherited deliberately. */
+.lpn-libbox { width: min(44rem, 94vw); }
+/* An entry is one pattern, one curve or one control: a block with a rule under it, so a list of
+   them reads as a list of things rather than as a paragraph of controls. */
+.lpn-lib-entry { padding: 6px 0 8px; border-bottom: 1px solid #eee; }
+.lpn-lib-entry:last-child { border-bottom: 0; }
+/* The head row: the thing's name, then its own delete, pushed to the right where a destructive
+   command belongs and away from the fields the hand is aiming at. */
+.lpn-lib-head { display: flex; align-items: center; gap: 6px; }
+.lpn-lib-head .lpn-lib-id { width: 9em; }
+.lpn-lib-del { margin-left: auto; }
+/* THE SENTENCE AND THE SERIES BOTH WANT THE WIDTH. A control is one line of text and a pattern's
+   multipliers are one line of numbers, and in both cases the useful thing is to see the whole of it
+   at once -- which is the opposite of the settings box's capped number box, and the reason these
+   are here rather than there. tabular-nums so a column of digits typed into the pattern field lines
+   up with the chart above it. */
+.lpn-lib-wide { width: 100%; box-sizing: border-box; font-family: inherit; }
+.lpn-lib-values { font-variant-numeric: tabular-nums; }
+/* The sparkline. A fixed height and a fluid width: it is a SHAPE check ("is this the daily curve I
+   meant?"), not a chart to read values off, so it needs no axis and no numbers. */
+.lpn-lib-spark { display: block; width: 100%; height: 46px; background: #fafafa; border: 1px solid #ddd; }
+.lpn-lib-note { font-size: .9em; opacity: .8; margin: 2px 0; }
+.lpn-lib-verdict { font-size: .9em; }
+/* The section a library entry list sits under. Its heading is not sticky -- unlike Settings, only
+   one section is on screen at a time, so there is nothing to lose track of. */
+.lpn-lib-sec { margin: 0; }
+.lpn-lib-sec > h3 { margin: 0 0 4px; padding: 0 0 4px; font-size: 1.15rem; font-weight: bold; border-bottom: 1px solid #ccc; }

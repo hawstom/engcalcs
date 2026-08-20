@@ -6795,17 +6795,27 @@ var EngCalcs = EngCalcs || {};
 	// The one place the pane's state reaches the page. Everything else sets paneState and calls
 	// this, so open/close/switch/drag cannot each grow their own idea of what the DOM should say.
 	//
-	// **AND IT MEASURES TWICE WHEN THE ANSWER MOVED UNDER IT.** The ceiling is derived from the map's
+	// **AND IT MEASURES UNTIL THE ANSWER STOPS MOVING.** The ceiling is derived from the map's
 	// height, and applyMapHeight() has just changed that -- so on a window that got shorter, or
 	// NARROWER (a narrow window wraps the menu bar, the toolbar and, since Task 455, the seven-tab
 	// strip, and every wrap takes height from the map), the first clamp was computed against the
 	// layout being replaced. Measured at 520x900 before this: the pane kept its 260 px, the map hit
 	// its 80 px floor and the page ran 60 px past the bottom of the window, converging only if the
-	// user resized a second time. One extra pass fixes it, which is the same device applyMapHeight()
-	// uses for the same reason.
-	function applyPaneLayout(secondPass) {
+	// user resized a second time.
+	//
+	// **IT WAS EXACTLY ONE EXTRA PASS, AND ONE WAS NOT ENOUGH.** Task 462 put one more button on the
+	// toolbar and merged the transport into the water-network group, which at 520 px is one more
+	// wrapped line -- and the page went 27 px past the bottom of the window again, because the
+	// second pass's own re-layout moved the ceiling a third time. A fixed number of passes is a
+	// guess at how many times the layout will settle, and every future control on that strip is
+	// another chance for the guess to be wrong. It LOOPS to a fixed point instead, with a small cap
+	// so a layout that genuinely oscillates cannot hang the page. dev/browser-pass/specs/pane.js
+	// measures the result at 520x900, which is where this fails first.
+	var LPN_PANE_SETTLE = 6;
+	function applyPaneLayout(pass) {
 		var pane = paneEl(), body = document.getElementById('lpn_pane_body'), btn, applied, want;
 		if (!pane) { return; }
+		pass = pass || 0;
 		pane.style.display = paneState.open ? 'flex' : 'none';
 		// **THE STORED HEIGHT IS THE USER'S WISH; THE CLAMP IS APPLIED, NOT WRITTEN BACK.** A window
 		// narrowed to 520 px leaves room for a 168 px pane, and writing that back would mean the
@@ -6825,9 +6835,9 @@ var EngCalcs = EngCalcs || {};
 		if (btn) { btn.setAttribute('aria-pressed', paneState.open ? 'true' : 'false'); }
 		// THE CANVAS IS RE-MEASURED, NEVER TOLD. See the note at the top of this section.
 		applyMapHeight();
-		if (!secondPass && paneState.open) {
+		if (pass < LPN_PANE_SETTLE && paneState.open) {
 			want = clampPaneHeight(paneState.h);
-			if (want !== applied) { applyPaneLayout(true); }
+			if (want !== applied) { applyPaneLayout(pass + 1); }
 		}
 	}
 	// Switching tabs is a HIDE and a SHOW, in that order: the outgoing tab takes its map drawing
@@ -12543,6 +12553,9 @@ var EngCalcs = EngCalcs || {};
 		// Escape first while it holds text (see wireSettingsBox), so a typo costs the search rather
 		// than the box.
 		closeSettingsBox();
+		// ...and the Libraries box, which is the same kind of standing box and is closed the same
+		// three ways. It carries no filter field, so nothing here takes the key first.
+		closeLibraryBox();
 		// ...and the examples wall, which was the ONE overlay Escape could not reach. Guarded on
 		// actually being visible: hideExamplesGallery() marks this project dismissed, and doing that from
 		// a stray Escape would silently suppress the shop window a first-time visitor is meant to see.
@@ -12741,6 +12754,10 @@ var EngCalcs = EngCalcs || {};
 			// menu is about; View holds the things that change how the map is drawn. Every editor
 			// puts Find in Edit for the same reason.
 			{ icon: 'find', label: pc.lpn_find_menu || 'Find', fn: function () { toggleFindPopup(anchor); } },
+			// Libraries is in Edit for the same reason Find is: it acts on the CONTENT of the
+			// document -- the patterns, the curves and the controls it holds -- rather than on how
+			// the map is drawn. Two doors, one implementation, exactly as Settings has.
+			{ icon: 'library', label: pc.lpn_library_menu || 'Libraries', fn: function () { toggleLibraryBox(); } },
 			{ separator: true },
 			// SUBJECT, THEN VERB (Task 415): with something selected this row deletes it, which is
 			// what Delete means in every editor. With nothing selected it still toggles the Delete
@@ -13363,6 +13380,7 @@ var EngCalcs = EngCalcs || {};
 		// One call builds all four sections, so wireLabelsPopup() is gone: its whole body was
 		// rebuildLabelsFields(), which rebuildSettingsBox() now runs alongside its three siblings.
 		wireSettingsBox();
+		wireLibraryBox();
 		buildMenuBar();
 		wireScenarioButton();
 		wireTabs();
@@ -13587,25 +13605,52 @@ var EngCalcs = EngCalcs || {};
 		// clearing. See buildVisibilityColors(); the toolbar keeps no select at all, which is also
 		// what the icon-only strip asked for -- a field-name dropdown was the one wide control left
 		// on it.
-		// **THE SETTINGS GEAR IS NOT HERE ANY MORE -- IT IS THE LAST CONTROL ON THE STRIP.** Tom,
-		// 2026-08-19: "The standard location of the settings gear icon is near the top-right
-		// corner of a screen, app, or quick settings panel." It is, and a gear in the middle of a
-		// strip is a gear you hunt for, because nobody scans the middle for chrome. See the end
-		// group below.
+		// **THE SETTINGS GEAR IS NOT HERE, AND IT IS NOT AT THE RIGHT-HAND END EITHER ANY MORE.**
+		// It is in the water-network group below. Tom, 2026-08-20: "for Water Networks, I think we
+		// also need the following in a group: Libraries (Patterns, Curves, Controls, Pumps, Pipes,
+		// Custom), **Settings**, Simulate, Transport, Time selectors." That supersedes the previous
+		// day's "the standard location of the settings gear icon is near the top-right corner",
+		// which put it at the far right for one review. **HIS NEWER WORD WINS; do not move it back
+		// to the end group on the strength of that older quote**, which is still true about gears
+		// in general and is no longer what he wants here. Asked whether it should instead float on
+		// the map, he ruled against that too: "Toggles on map doesn't sound right to me. What we
+		// have now plus the lpn group (Libraries, Settings, Transport, and Time selectors) seems
+		// like the right way to go."
 
-		// **THE TIME TRANSPORT, IN ITS OWN GROUP** (Task 248; Tom, 2026-08-18: "epanetjs puts it on
-		// the toolbar. Play/pause, Speed, Step back, Step forward, Step selector"). Five controls,
-		// built by js/lpn-time.js, which owns every string and every behaviour in them -- this file
-		// hands over a group and its own setIconLabel and knows nothing else about them. The wrapper
-		// rather than EngCalcs.setIconLabel: it is the one that records a button in toolbarIconIndex,
-		// so the transport is in Help > "What the toolbar icons mean" without anybody adding it.
+		// **THE WATER-NETWORK GROUP** (ROADMAP Task 462). Tom, 2026-08-20: "for Water Networks, I
+		// think we also need the following in a group: Libraries (Patterns, Curves, Controls, Pumps,
+		// Pipes, Custom), **Settings**, Simulate, Transport, Time selectors." His order, exactly:
+		// Libraries, Settings, then Run ("Simulate"), the three transport buttons and the two time
+		// selectors, which js/lpn-time.js mounts in that order already.
 		//
-		// A GROUP of its own, which is what keeps a narrow window honest: .lpn-toolbar-group is an
-		// inline-flex box, so the five never break apart from each other -- the strip wraps by moving
-		// whole groups onto the next line, and this group is the last thing before the auto-margin
-		// end group. Shown whether or not the network has a duration; a project with none has exactly
-		// one step and the selector says so.
-		if (EngCalcs.lpnTimeMountToolbar) { EngCalcs.lpnTimeMountToolbar(group(), setIconLabel); }
+		// **ONE GROUP, NOT TWO ADJACENT ONES**, and the difference is visible only on a narrow
+		// window: .lpn-toolbar-group is an inline-flex box and the strip wraps by moving WHOLE
+		// GROUPS onto the next line, so everything named above stays together or moves together.
+		// That is the whole mechanical content of the word "group" here.
+		//
+		// The transport itself is unchanged: js/lpn-time.js owns every string and every behaviour in
+		// those six controls, and this file hands over a container and its own setIconLabel wrapper
+		// -- the wrapper rather than EngCalcs.setIconLabel, because that is the one that records a
+		// button in toolbarIconIndex, which is what Help > "What the toolbar icons mean" is derived
+		// from. Shown whether or not the network has a duration; a project with none has exactly one
+		// step and the selector says so.
+		var netGroup = group();
+		// **LIBRARIES IS THE MISSING IDEA, not a fourth way to the Settings box** (Tasks 462/460).
+		// The document has carried patterns, curves and controls since Task 423 and nothing on the
+		// page could see one; this button is that door. See the Libraries box further down for why
+		// it is a box of its own rather than a Settings section or three more pane tabs.
+		var libBtn = document.createElement('button');
+		libBtn.type = 'button';
+		libBtn.id = 'lpn_library_btn';
+		setIconLabel(libBtn, 'library', pc.lpn_library_menu || 'Libraries', pc.lpn_library_menu_tip);
+		libBtn.addEventListener('click', function () { toggleLibraryBox(); });
+		netGroup.appendChild(libBtn);
+		var settingsBtn = document.createElement('button');
+		settingsBtn.type = 'button';
+		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
+		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
+		netGroup.appendChild(settingsBtn);
+		if (EngCalcs.lpnTimeMountToolbar) { EngCalcs.lpnTimeMountToolbar(netGroup, setIconLabel); }
 
 		// **THE RIGHT EDGE OF THE STRIP: GO SOMEWHERE, AND SHOW SOMETHING** (Task 434). Tom put the
 		// pane toggles there "beside a goto-by-ID search", which is what Find already is (Task 420)
@@ -13638,17 +13683,9 @@ var EngCalcs = EngCalcs || {};
 		// deliberately empty (see rpaneIsOpen() and the quotes above it) and the question of
 		// whether it comes back at all is still open. toggleRightPane() and rpaneIsOpen() stay.
 
-		// **AND THE GEAR IS LAST, AT THE RIGHT-HAND END** (Tom, 2026-08-19). Settings is the one
-		// control on this strip that is not about the network in front of you, and the far right
-		// of the top strip is where every application puts that one. It comes after Find and the
-		// pane toggle because those two are still about this network; the gear is about the
-		// project. Reached three ways -- here, the Settings menu row, and a click on the colour
-		// legend -- and this is the one a user looks for without being told.
-		var settingsBtn = document.createElement('button');
-		settingsBtn.type = 'button';
-		setIconLabel(settingsBtn, 'settings', pc.lpn_tool_settings || 'Settings', pc.lpn_tool_settings_tip);
-		settingsBtn.addEventListener('click', function () { toggleSettingsBox(); });
-		endGroup.appendChild(settingsBtn);
+		// **THE GEAR IS NOT IN THIS GROUP ANY MORE** -- it moved into the water-network group above
+		// (Task 462, Tom 2026-08-20). What is left at the right-hand end is exactly what Tom put
+		// there and has not moved: go somewhere, and show something.
 
 		// The dev-only stress-test button moved OFF the toolbar and to the foot of the Insert menu
 		// (Tom, 2026-08-04). A toolbar is the high-use subset of the menus, and a thing that reads
@@ -16546,6 +16583,582 @@ var EngCalcs = EngCalcs || {};
 		rebuildSettingsBox();
 	}
 
+	// ================================================================================================
+	// THE LIBRARIES BOX (ROADMAP Tasks 462 and 460)
+	// ================================================================================================
+	//
+	// Tom, 2026-08-20: *"for Water Networks, I think we also need the following in a group: Libraries
+	// (Patterns, Curves, Controls, Pumps, Pipes, Custom), Settings, Simulate, Transport, Time
+	// selectors."*
+	//
+	// **THE GAP THIS CLOSES IS EXACT, AND IT IS THE ONLY ONE LEFT** (Task 460). The DOCUMENT has
+	// carried patterns, curves and controls since Task 423: dev/lpn-spike/eps-document-harness.js
+	// takes Net3 through import, save, reopen and run and matches EPA's own published 24-hour report
+	// to 0.005 ft, with five patterns, six controls and three curve points per pump surviving the
+	// round trip. The INTERFACE carried none of it -- a user could import, solve, save and reopen a
+	// time model and could not see or change one thing in it. This is that interface and nothing else.
+	//
+	// **WHERE IT LIVES, AND WHY NOT THE TWO PLACES THAT ALREADY EXIST** -- see the note above
+	// #lpn_library_box in Looped-Network.php, which is where a reader looking at the markup will be.
+	// In one line: the Settings box is a measured column of name-plus-one-control rows and none of
+	// these three is that shape, and the bottom pane is for what is READ beside the map through one
+	// row-per-element table, which none of these three is either.
+	//
+	// **THREE EDITORS, THREE DIFFERENT SHAPES, ON PURPOSE.** A pattern is a series, a control is a
+	// sentence and a curve is a table that already has an owner. Forcing one widget onto all three
+	// is what would make this a grid of numbers nobody can read.
+
+	// Which section is showing. Not stored anywhere: it is a fact about the next few seconds, like
+	// which menu is open, and the box is opened to do one job and closed again.
+	var libSection = 'patterns';
+	function libBoxEl() { return document.getElementById('lpn_library_box'); }
+	function libBoxIsOpen() {
+		var b = libBoxEl();
+		return !!b && b.style.display === 'flex';
+	}
+	// **NO REMEMBERED POSITION OR SIZE, and that is a decision rather than an omission.** The
+	// Settings box stores both because it is opened dozens of times in a session to change one known
+	// control, so it is furniture. This box is opened to author a pattern and closed again, and new
+	// storage is never free -- it is a line in dev/cookie-storage-inventory.md and a sentence in the
+	// consent text that has to stay true. It opens at the same corner Settings opens at, which is
+	// the corner the user already knows.
+
+	// ---- what the document holds, and the one place each kind is written --------------------------
+
+	function libPatterns() { return (doc.patterns = doc.patterns || []); }
+	function libControls() { return (doc.controls = doc.controls || []); }
+	// Every curve on the page, WHEREVER IT LIVES. A pump's `curvePoints` and a GPV's are the same
+	// shape and are read by the same code (curvePointTable), so they are one list here.
+	function libCurves() {
+		return doc.links.filter(function (l) {
+			return (l.type === 'pump' || (l.type === 'valve' && (l.valveType || '').toUpperCase() === 'GPV'))
+				&& !l.curveRef;
+		});
+	}
+	// An id nothing in the list is using yet. Same shape as the element ID minting, deliberately
+	// simple: a pattern id is a name, and EPANET's own files use bare numbers for them.
+	function libFreeId(list, stem) {
+		var n = 1, used = {};
+		list.forEach(function (x) { used[String(x.id)] = true; });
+		while (used[stem + n]) { n++; }
+		return stem + n;
+	}
+	// **THE ONE ENDING FOR EVERY EDIT IN THIS BOX**, and it is the property popup's own. A pattern,
+	// a curve reference and a control all change what the network DOES, so each of them has to
+	// re-solve and be saved exactly as a typed diameter is. Nothing here writes an element property,
+	// so there is no setProp() call to make and no override to mark -- a pattern belongs to the
+	// document, not to an element, which is also why it is not overridable by a scenario.
+	function libCommit() {
+		scheduleSolve();
+		saveToStorage();
+	}
+
+	// ---- PATTERNS --------------------------------------------------------------------------------
+	//
+	// **A PATTERN IS A SERIES, AND IT IS EDITED AS ONE FIELD OF NUMBERS.** Twenty-four separate
+	// number boxes would be twenty-four tab stops, would not survive a paste from the spreadsheet the
+	// numbers came out of, and still would not answer the only question a person really has about a
+	// daily curve, which is what SHAPE it is. So: one text field holding the multipliers separated by
+	// spaces or commas -- which is how EPANET's own [PATTERNS] section writes them, so a line can be
+	// pasted straight out of an `.inp` -- with a sparkline above it that redraws as it is typed.
+	//
+	// The list is parsed loosely and stored as numbers; the FIELD is only ever rewritten from the
+	// document when the box is rebuilt, so a half-typed list is never snatched back.
+
+	function libParseMultipliers(text) {
+		var out = [];
+		String(text || '').split(/[\s,;]+/).forEach(function (t) {
+			if (t === '') { return; }
+			// A comma is a SEPARATOR here and never a decimal point, which is the opposite of the
+			// rule js/lpn-patterns.js's lpnParseTime uses for a typed duration -- and the difference
+			// is not an inconsistency. A duration is ONE number, so a comma in it can only be a
+			// decimal; a multiplier list is many, so a comma in it can only be a separator. There is
+			// no reading of `1,5 0,9` that is two numbers under one rule and two under the other.
+			var v = parseFloat(t);
+			if (isFinite(v)) { out.push(v); }
+		});
+		return out;
+	}
+	// Printed with trailing zeros stripped, exactly as every other number this page shows back:
+	// a multiplier of 1 typed as `1.0` reads as computed when it comes back as `1.0000`.
+	function libFormatMultipliers(mult) {
+		return (mult || []).map(function (v) { return String(+(+v).toFixed(6)); }).join(' ');
+	}
+	// The sparkline. A SHAPE CHECK, not a chart: no axis, no numbers, no interaction. The baseline is
+	// drawn at a multiplier of 1 whenever the series straddles it, because "above or below average
+	// demand" is the one reading anybody takes off a pattern at a glance.
+	function libSparkline(mult) {
+		var W = 300, H = 46, pad = 3, svgNS = 'http://www.w3.org/2000/svg',
+			el = document.createElementNS(svgNS, 'svg'),
+			lo = Infinity, hi = -Infinity, i, x, y, d = '', span, one, path;
+		el.setAttribute('class', 'lpn-lib-spark');
+		el.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+		el.setAttribute('preserveAspectRatio', 'none');
+		el.setAttribute('aria-hidden', 'true');
+		if (!mult || !mult.length) { return el; }
+		for (i = 0; i < mult.length; i++) { lo = Math.min(lo, mult[i]); hi = Math.max(hi, mult[i]); }
+		// A FLAT pattern is a real pattern and must not divide by zero: give it a band around itself
+		// so it draws as the straight line it is rather than as a NaN.
+		if (!(hi > lo)) { lo -= 0.5; hi += 0.5; }
+		span = hi - lo;
+		function yAt(v) { return pad + (H - 2 * pad) * (1 - (v - lo) / span); }
+		// **A STEP LINE, NOT A SMOOTH ONE.** A multiplier holds for the whole of its interval and
+		// then jumps; drawing it as a curve through the points would draw a demand the solver never
+		// applies. This is the same fact lpnPatternIndex()'s floor() states in arithmetic.
+		for (i = 0; i < mult.length; i++) {
+			x = pad + (W - 2 * pad) * (i / mult.length);
+			y = yAt(mult[i]);
+			d += (i ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1) +
+				'L' + (pad + (W - 2 * pad) * ((i + 1) / mult.length)).toFixed(1) + ' ' + y.toFixed(1);
+		}
+		if (lo < 1 && hi > 1) {
+			one = document.createElementNS(svgNS, 'line');
+			one.setAttribute('x1', String(pad)); one.setAttribute('x2', String(W - pad));
+			one.setAttribute('y1', yAt(1).toFixed(1)); one.setAttribute('y2', yAt(1).toFixed(1));
+			one.setAttribute('stroke', '#bbb'); one.setAttribute('stroke-dasharray', '3 3');
+			el.appendChild(one);
+		}
+		path = document.createElementNS(svgNS, 'path');
+		path.setAttribute('d', d);
+		path.setAttribute('fill', 'none');
+		path.setAttribute('stroke', '#05a');
+		path.setAttribute('stroke-width', '1.5');
+		path.setAttribute('vector-effect', 'non-scaling-stroke');
+		el.appendChild(path);
+		return el;
+	}
+	// "24 multipliers, 1:00 apart, covering 24:00" -- the sentence that answers "is my daily pattern
+	// really a day?", which is the question 24 numbers in a row cannot answer. Every part of it is
+	// read from the document's own clock, so it follows a change to the pattern time step.
+	function libSpanText(n) {
+		var pc = EngCalcs.pageConfig || {},
+			times = doc.times || (EngCalcs.lpnTimesDefaults ? EngCalcs.lpnTimesDefaults() : { patternStep: 3600 }),
+			step = times.patternStep > 0 ? times.patternStep : 3600,
+			fmt = EngCalcs.lpnFormatTime || function (s) { return String(s); };
+		return (pc.lpn_library_pattern_span || '{n} multipliers, {step} apart, covering {span}')
+			.replace('{n}', String(n))
+			.replace('{step}', fmt(step))
+			.replace('{span}', fmt(step * n));
+	}
+	// A pattern's id is referenced from two other places, so a rename has to travel: the junctions
+	// that name it and the project's own default. Neither is a scenario-overridable property, so
+	// both are plain writes.
+	function libRenamePattern(pat, want) {
+		var name = String(want || '').trim(), clash, was;
+		if (!name || name === pat.id) { return false; }
+		clash = libPatterns().some(function (p) { return p !== pat && p.id === name; });
+		if (clash) { return false; }
+		was = pat.id;
+		pat.id = name;
+		doc.nodes.forEach(function (n) { if (n.demandPattern === was) { n.demandPattern = name; } });
+		if (doc.defaultPattern === was) { doc.defaultPattern = name; }
+		return true;
+	}
+	function libDeletePattern(pat) {
+		var was = pat.id;
+		doc.patterns = libPatterns().filter(function (p) { return p !== pat; });
+		// **A REFERENCE TO A DELETED PATTERN IS CLEARED, NOT LEFT DANGLING.** lpnPatternById returns
+		// null for a name nothing answers to and lpnPatternValue turns that into a multiplier of 1,
+		// so the run would be right either way -- but the junction would still SAY it follows a
+		// pattern that is not there, and the next thing the user does is look for it.
+		doc.nodes.forEach(function (n) { if (n.demandPattern === was) { n.demandPattern = null; } });
+		if (doc.defaultPattern === was) { doc.defaultPattern = null; }
+	}
+
+	// ---- CONTROLS --------------------------------------------------------------------------------
+	//
+	// **A CONTROL IS A SENTENCE, AND IT IS EDITED AS THE SENTENCE.** The alternative -- a row of
+	// structured widgets (link picker, action, condition kind, node picker, comparison, threshold,
+	// time) -- was rejected on one argument: js/lpn-patterns.js's lpnParseControl already accepts
+	// exactly the four shapes EPANET accepts, and a structured editor that could not express
+	// something the parser accepts would be a worse editor than a text box. It is also the form the
+	// user already has in front of them -- every EPANET tutorial, every existing `.inp` and every
+	// colleague's e-mail states a control as that sentence, so it can be pasted.
+	//
+	// What the text box gives up is guidance, and that is bought back rather than shrugged at: the
+	// tip states all four shapes with examples, and the line below the box reports what the parser
+	// made of what is typed, live -- understood, not understood, or understood but naming an element
+	// this network does not have.
+	//
+	// **THE KEYWORDS ARE NOT TRANSLATED.** LINK, OPEN, CLOSED, IF, NODE, ABOVE, BELOW, AT, TIME and
+	// CLOCKTIME are what lpnParseControl matches on, so they are what the user must type in every
+	// language. The tip says so, and the tip is the only place that could have promised otherwise.
+
+	// The unit annotations js/lpn-inp.js writes onto an imported control, re-derived here for a
+	// control the user typed. **This is a copy of a rule, and it must not become a second rule:** a
+	// tank's threshold is a LEVEL and a junction's is a PRESSURE, and lpnTimeModelBlock converts on
+	// exactly that flag. Left unset, Net3's `LINK 335 OPEN IF NODE 1 BELOW 17.1` would be read as
+	// 17.1 metres and the pump would never start.
+	function libAnnotateControl(rec) {
+		var link = linkById(rec.link), node, vt;
+		if (rec.action && rec.action.setting !== undefined) {
+			vt = link && link.type === 'valve' ? (link.valveType || 'TCV').toUpperCase() : '';
+			rec.action.settingUnit =
+				(vt === 'PRV' || vt === 'PSV' || vt === 'PBV') ? 'press' :
+				(vt === 'FCV') ? 'flow' : null;
+		}
+		if (rec.condition && rec.condition.kind === 'node') {
+			node = nodeById(rec.condition.node);
+			rec.condition.unit = node && node.type === 'junction' ? 'press' : 'head';
+		}
+		return rec;
+	}
+	// What the sentence in the box means right now: an { ok, rec, missing } verdict, where `missing`
+	// is the id of an element the sentence names and this network does not have.
+	function libReadControl(text) {
+		var parsed = EngCalcs.lpnParseControl
+			? EngCalcs.lpnParseControl(String(text || '').trim().split(/\s+/)) : null, rec;
+		if (!parsed || !parsed.ok) { return { ok: false }; }
+		rec = libAnnotateControl(parsed.control);
+		if (!linkById(rec.link)) { return { ok: false, rec: rec, missing: rec.link }; }
+		if (rec.condition && rec.condition.kind === 'node' && !nodeById(rec.condition.node)) {
+			return { ok: false, rec: rec, missing: rec.condition.node };
+		}
+		return { ok: true, rec: rec };
+	}
+	// The sentence a control is SHOWN as. `raw` is what the file said or what the user typed, kept
+	// for the same reason js/lpn-inp.js keeps a number's token: it is theirs. A control built some
+	// other way falls back to composing one.
+	function libControlText(c) {
+		var out;
+		if (c && typeof c.raw === 'string' && c.raw) { return c.raw; }
+		if (!c) { return ''; }
+		out = 'LINK ' + c.link + ' ' +
+			(c.action && c.action.status ? c.action.status.toUpperCase() : String((c.action || {}).setting));
+		if (!c.condition) { return out; }
+		if (c.condition.kind === 'node') {
+			return out + ' IF NODE ' + c.condition.node + ' ' + c.condition.cmp.toUpperCase() + ' ' + c.condition.value;
+		}
+		return out + ' AT ' + (c.condition.kind === 'time' ? 'TIME' : 'CLOCKTIME') + ' ' +
+			(EngCalcs.lpnFormatTime ? EngCalcs.lpnFormatTime(c.condition.seconds) : c.condition.seconds);
+	}
+
+	// ---- the box ---------------------------------------------------------------------------------
+
+	function libEl(tag, cls, text) {
+		var e = document.createElement(tag);
+		if (cls) { e.className = cls; }
+		if (text !== undefined) { e.textContent = text; }
+		return e;
+	}
+	function libButton(text, fn, tip) {
+		var b = document.createElement('button');
+		b.type = 'button';
+		b.textContent = text;
+		if (tip) { helpTip(b, tip); }
+		b.addEventListener('click', fn);
+		return b;
+	}
+	var LIB_SECTIONS = [
+		{ id: 'patterns', label: 'lpn_library_patterns', tip: 'lpn_library_patterns_tip' },
+		{ id: 'curves', label: 'lpn_library_curves', tip: 'lpn_library_curves_tip' },
+		{ id: 'controls', label: 'lpn_library_controls', tip: 'lpn_library_controls_tip' }
+	];
+	function buildLibraryIndex() {
+		var index = document.getElementById('lpn_libbox_index'), pc = EngCalcs.pageConfig || {};
+		if (!index) { return; }
+		index.innerHTML = '';
+		LIB_SECTIONS.forEach(function (s) {
+			var b = libButton(pc[s.label] || s.id, function () { setLibrarySection(s.id); }, pc[s.tip]);
+			b.className = 'lpn-setbox-link lpn-setbox-link-sec' + (b.className ? ' ' + b.className : '');
+			b.id = 'lpn_libbox_link_' + s.id;
+			if (s.id === libSection) { b.setAttribute('aria-current', 'true'); }
+			index.appendChild(b);
+		});
+	}
+	function setLibrarySection(id) {
+		libSection = id;
+		rebuildLibraryBox();
+	}
+	// Rebuilt whole on every open and after every structural change (an add, a delete, a rename),
+	// for the same reason the Settings box is: a box built once and repainted by the paths that
+	// remember is a box that shows stale numbers the first time somebody forgets. A VALUE edit does
+	// NOT rebuild -- see the change handlers, which write the document and leave the field alone.
+	function rebuildLibraryBox() {
+		var content = document.getElementById('lpn_libbox_content'), pc = EngCalcs.pageConfig || {},
+			sec, head, cur;
+		if (!content) { return; }
+		buildLibraryIndex();
+		content.innerHTML = '';
+		sec = libEl('section', 'lpn-lib-sec');
+		cur = LIB_SECTIONS.filter(function (s) { return s.id === libSection; })[0] || LIB_SECTIONS[0];
+		head = libEl('h3', 'ec-help', pc[cur.label] || cur.id);
+		if (pc[cur.tip]) { head.title = pc[cur.tip]; }
+		sec.appendChild(head);
+		if (libSection === 'patterns') { buildPatternSection(sec); }
+		else if (libSection === 'curves') { buildCurveSection(sec); }
+		else { buildControlSection(sec); }
+		content.appendChild(sec);
+		if (EngCalcs.initTips) { EngCalcs.initTips(content); }
+	}
+	// The one row in this box that is about the whole project rather than about one library entry:
+	// which pattern a junction follows when it names none. It is here rather than in Settings because
+	// it is a CHOICE FROM THIS LIST -- it has no meaning without the list beside it, and a select in
+	// Settings offering patterns that can only be created here would be the two-places problem the
+	// Settings rule exists to prevent.
+	function buildDefaultPatternRow(host) {
+		var pc = EngCalcs.pageConfig || {}, row = libEl('div', 'lpn-lib-note'),
+			lab = libEl('span', 'ec-help', pc.lpn_library_default_pattern || 'Pattern for demands that name none'),
+			sel = document.createElement('select');
+		if (pc.lpn_library_default_pattern_tip) { lab.title = pc.lpn_library_default_pattern_tip; }
+		libFillPatternOptions(sel, doc.defaultPattern);
+		sel.setAttribute('aria-label', pc.lpn_library_default_pattern || 'Pattern for demands that name none');
+		sel.addEventListener('change', function () {
+			doc.defaultPattern = sel.value || null;
+			libCommit();
+		});
+		row.appendChild(lab);
+		row.appendChild(document.createTextNode(' '));
+		row.appendChild(sel);
+		host.appendChild(row);
+	}
+	// Shared by the row above and by the junction popup's own selector, so the two lists cannot
+	// disagree about what patterns exist or about what the blank one is called.
+	function libFillPatternOptions(sel, value) {
+		var pc = EngCalcs.pageConfig || {}, none = document.createElement('option');
+		sel.textContent = '';
+		none.value = '';
+		none.textContent = pc.lpn_library_pattern_none || 'No pattern';
+		sel.appendChild(none);
+		libPatterns().forEach(function (p) {
+			var o = document.createElement('option');
+			o.value = p.id;
+			o.textContent = p.id;
+			sel.appendChild(o);
+		});
+		sel.value = value || '';
+	}
+	function buildPatternSection(host) {
+		var pc = EngCalcs.pageConfig || {}, list = libPatterns();
+		buildDefaultPatternRow(host);
+		host.appendChild(libButton(pc.lpn_library_pattern_add || 'Add a pattern', function () {
+			saveUndoSnapshot();
+			// A NEW PATTERN IS A FLAT DAY, not an empty list: 24 ones on the default hourly step is
+			// a pattern that changes nothing, which is the only starting point that cannot surprise
+			// somebody who assigns it before editing it. An empty one would also draw an empty chart.
+			libPatterns().push(EngCalcs.lpnPatternMake(libFreeId(libPatterns(), 'P'),
+				[1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]));
+			libCommit();
+			rebuildLibraryBox();
+		}));
+		if (!list.length) {
+			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
+			return;
+		}
+		list.forEach(function (pat) {
+			var entry = libEl('div', 'lpn-lib-entry'),
+				headRow = libEl('div', 'lpn-lib-head'),
+				id = document.createElement('input'),
+				values = document.createElement('input'),
+				span = libEl('div', 'lpn-lib-note', libSpanText((pat.multipliers || []).length)),
+				spark = libSparkline(pat.multipliers),
+				del;
+			id.type = 'text';
+			id.className = 'lpn-lib-id';
+			id.value = pat.id;
+			id.setAttribute('aria-label', pc.lpn_field_id || 'ID');
+			id.addEventListener('change', function () {
+				saveUndoSnapshot();
+				// A rename that clashes or is blank SNAPS BACK rather than half-applying, the same
+				// contract validateNewId() gives an element id.
+				if (!libRenamePattern(pat, id.value)) { id.value = pat.id; return; }
+				libCommit();
+				rebuildLibraryBox();
+			});
+			headRow.appendChild(id);
+			del = libButton(pc.lpn_tool_delete || 'Delete', function () {
+				saveUndoSnapshot();
+				libDeletePattern(pat);
+				libCommit();
+				rebuildLibraryBox();
+			});
+			del.className = 'lpn-lib-del';
+			headRow.appendChild(del);
+			entry.appendChild(headRow);
+			entry.appendChild(spark);
+			values.type = 'text';
+			values.className = 'lpn-lib-wide lpn-lib-values';
+			values.value = libFormatMultipliers(pat.multipliers);
+			values.setAttribute('aria-label', pc.lpn_library_pattern_values || 'Multipliers');
+			if (pc.lpn_library_pattern_values_tip) { helpTip(values, pc.lpn_library_pattern_values_tip); }
+			// `input`, not `change`: the chart and the span line are the feedback that says whether
+			// what is being typed is the shape that was meant, and feedback that waits for blur is
+			// feedback nobody sees. **THE DOCUMENT IS WRITTEN ON `change` ONLY**, so a half-typed
+			// list never reaches a solve.
+			values.addEventListener('input', function () {
+				var mult = libParseMultipliers(values.value), fresh = libSparkline(mult);
+				entry.replaceChild(fresh, entry.querySelector('.lpn-lib-spark'));
+				span.textContent = libSpanText(mult.length);
+			});
+			values.addEventListener('change', function () {
+				saveUndoSnapshot();
+				pat.multipliers = libParseMultipliers(values.value);
+				libCommit();
+			});
+			entry.appendChild(values);
+			entry.appendChild(span);
+			host.appendChild(entry);
+		});
+	}
+	// **CURVES IS A VIEWER, AND THE HONEST REASON IS THAT THERE IS NOTHING FOR IT TO OWN YET.**
+	// This document has no curve table: a pump's points live on the pump (`curvePoints`) and
+	// `curveRef` names ANOTHER PUMP whose points it copies, so there is no shared definition for a
+	// library to hold. Editing points here would be a SECOND editor of the same field as the pump
+	// popup's -- two places that write one value, which is the defect this page's one-write-seam
+	// rule exists to prevent.
+	//
+	// What it adds instead is real and is the thing the popup cannot do: every curve in the network
+	// side by side, so the one that is wrong is visible without opening eleven pumps. Clicking an ID
+	// goes to that element on the map, exactly as a bottom-pane table's ID does.
+	// Turning this into an editor means giving the document a curve table first -- see the note on
+	// Pumps/Pipes/Custom in ROADMAP Task 462.
+	function buildCurveSection(host) {
+		var pc = EngCalcs.pageConfig || {}, list = libCurves();
+		host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_library_curves_note || ''));
+		if (!list.length) {
+			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
+			return;
+		}
+		list.forEach(function (l) {
+			var entry = libEl('div', 'lpn-lib-entry'),
+				headRow = libEl('div', 'lpn-lib-head'),
+				goTo = libButton(l.id, function () { findGoTo('link', l.id); }),
+				table = document.createElement('table'),
+				pts = (l.curvePoints || []).filter(function (p) { return p && p[0] !== undefined && p[1] !== undefined; }),
+				// A pump's second column is HEAD and a general purpose valve's is HEAD LOSS. Same
+				// table, different quantity, and saying so is the whole of what the heading is for.
+				valueLabel = l.type === 'pump' ? (pc.lpn_result_head || 'Head') : (pc.lpn_result_headloss || 'Head loss'),
+				thead = document.createElement('thead'), hrow = document.createElement('tr'),
+				tbody = document.createElement('tbody');
+			goTo.className = 'lpn-pane-goto';
+			headRow.appendChild(goTo);
+			entry.appendChild(headRow);
+			table.className = 'lpn-pane-table';
+			[(pc.lpn_result_flow || 'Flow') + ' (' + unitLabel('lpn_u_flow') + ')',
+				valueLabel + ' (' + unitLabel('lpn_u_elevhead') + ')'].forEach(function (t) {
+				var th = document.createElement('th');
+				th.textContent = t;
+				hrow.appendChild(th);
+			});
+			thead.appendChild(hrow);
+			table.appendChild(thead);
+			pts.forEach(function (p) {
+				var tr = document.createElement('tr');
+				[p[0], p[1]].forEach(function (v) {
+					var td = document.createElement('td');
+					td.className = 'lpn-pane-num';
+					td.textContent = String(+(+v).toFixed(6));
+					tr.appendChild(td);
+				});
+				tbody.appendChild(tr);
+			});
+			table.appendChild(tbody);
+			entry.appendChild(pts.length ? table : libEl('p', 'lpn-lib-note', pc.lpn_pane_none || ''));
+			host.appendChild(entry);
+		});
+	}
+	function buildControlSection(host) {
+		var pc = EngCalcs.pageConfig || {}, list = libControls();
+		host.appendChild(libButton(pc.lpn_library_control_add || 'Add a control', function () {
+			// **THE STARTER SENTENCE IS BUILT FROM THIS NETWORK**, so the box opens on something
+			// that is already true rather than on a template with blanks in it. With nothing to
+			// name it is still the shape, which is the next most useful thing.
+			var link = doc.links[0],
+				node = doc.nodes.filter(function (n) { return n.type === 'tank'; })[0] || doc.nodes[0],
+				text = 'LINK ' + (link ? link.id : '1') + ' OPEN IF NODE ' + (node ? node.id : '1') + ' BELOW 0',
+				read = libReadControl(text);
+			saveUndoSnapshot();
+			libControls().push(read.rec ||
+				{ link: link ? link.id : '1', raw: text, action: {}, condition: null, text: {} });
+			libCommit();
+			rebuildLibraryBox();
+		}));
+		if (!list.length) {
+			host.appendChild(libEl('p', 'lpn-lib-note', pc.lpn_pane_none || 'This network has none of these yet.'));
+			return;
+		}
+		list.forEach(function (ctl, i) {
+			var entry = libEl('div', 'lpn-lib-entry'),
+				headRow = libEl('div', 'lpn-lib-head'),
+				box = document.createElement('input'),
+				verdict = libEl('div', 'lpn-lib-verdict ec-help'),
+				del;
+			box.type = 'text';
+			box.className = 'lpn-lib-wide';
+			box.value = libControlText(ctl);
+			box.setAttribute('aria-label', pc.lpn_library_controls || 'Controls');
+			if (pc.lpn_library_control_tip) { helpTip(box, pc.lpn_library_control_tip); }
+			// **THE WHOLE VERDICT STRING IS THE TIP TARGET, NOT THE GLYPH** -- the suite's rule, and
+			// here it matters twice over, because the explanation the title carries is the list of
+			// four sentence shapes that says how to fix it.
+			if (pc.lpn_library_control_tip) { verdict.title = pc.lpn_library_control_tip; }
+			function showVerdict(read) {
+				verdict.textContent = read.ok
+					? (pc.lpn_library_control_ok || '✓ Understood')
+					: read.missing
+						? (pc.lpn_library_control_missing || '⚠ This network has nothing called {id}').replace('{id}', read.missing)
+						: (pc.lpn_library_control_bad || '⚠ Not understood');
+			}
+			showVerdict(libReadControl(box.value));
+			box.addEventListener('input', function () { showVerdict(libReadControl(box.value)); });
+			box.addEventListener('change', function () {
+				var read = libReadControl(box.value);
+				saveUndoSnapshot();
+				// **A SENTENCE THE PARSER CANNOT READ IS KEPT, NOT DISCARDED.** It is the user's
+				// text and it is half-way to a control they are still writing; throwing it away on
+				// blur is the one thing an editor must never do. It is stored with no condition,
+				// which is exactly what lpnTimeModelBlock skips -- so it is visibly there, plainly
+				// marked as not understood, and cannot reach a solve.
+				libControls()[i] = read.rec ||
+					{ link: '', raw: '', action: {}, condition: null, text: {} };
+				libControls()[i].raw = box.value.trim();
+				libCommit();
+			});
+			headRow.appendChild(box);
+			entry.appendChild(headRow);
+			entry.appendChild(verdict);
+			del = libButton(pc.lpn_tool_delete || 'Delete', function () {
+				saveUndoSnapshot();
+				doc.controls = libControls().filter(function (c, k) { return k !== i; });
+				libCommit();
+				rebuildLibraryBox();
+			});
+			del.className = 'lpn-lib-del';
+			entry.appendChild(del);
+			host.appendChild(entry);
+		});
+	}
+	function openLibraryBox() {
+		var box = libBoxEl(), r, at, home;
+		if (!box) { return; }
+		closeMenu();
+		hideOpenTips();
+		box.style.display = 'flex';
+		rebuildLibraryBox();
+		r = box.getBoundingClientRect();
+		home = setboxHomeCorner(r.width, r.height);
+		at = clampPanel(home.left, home.top, r.width, r.height, window.innerWidth, window.innerHeight);
+		box.style.left = at.left + 'px';
+		box.style.top = at.top + 'px';
+		if (EngCalcs.initTips) { EngCalcs.initTips(box); }
+	}
+	function closeLibraryBox() {
+		var box = libBoxEl();
+		if (box) { box.style.display = 'none'; }
+	}
+	function toggleLibraryBox() {
+		if (libBoxIsOpen()) { closeLibraryBox(); return; }
+		openLibraryBox();
+	}
+	function wireLibraryBox() {
+		var box = libBoxEl(), x = document.getElementById('lpn_libbox_close');
+		if (!box) { return; }
+		if (x) { x.addEventListener('click', closeLibraryBox); }
+		// Dragged by its chrome, through the same seam the property popup, Find and the Settings box
+		// use. No onMove: nothing here remembers where it was put (see the note at libBoxIsOpen).
+		makePanelDraggable(box, null);
+	}
+
 	// ---- minimal property popup ----
 	// Real, not a stub: id (readonly) plus the fields that already exist on the element
 	// (Elevation+Demand for a junction, Fixed head for a reservoir, Diameter+Roughness+Length
@@ -16781,6 +17394,18 @@ var EngCalcs = EngCalcs || {};
 		fields.appendChild(label);
 		fields.appendChild(document.createElement('br'));
 		if (ov) { overrideMarker(fields, ov.el, ov.prop); }   // and see completeEdit() on the setter
+	}
+	// A pattern chooser, in the popup's own row shape. The OPTIONS come from libFillPatternOptions(),
+	// which the Libraries box's own default-pattern row also uses, so the two can never disagree
+	// about what patterns exist or about what the blank entry is called.
+	function patternField(fields, labelText, get, set, tip) {
+		var label = document.createElement('label'), sel = document.createElement('select');
+		libFillPatternOptions(sel, get());
+		sel.addEventListener('change', function () { set(sel.value); });
+		setFieldLabel(label, labelText, tip);
+		label.appendChild(sel);
+		fields.appendChild(label);
+		fields.appendChild(document.createElement('br'));
 	}
 	// Read-only, like EPANET's own property-form coordinate display (Tom) -- also doubles as
 	// the touch answer to "show coordinates of the selected element": the corner tracker
@@ -17245,6 +17870,18 @@ var EngCalcs = EngCalcs || {};
 				function () { return effective(n, 'demand'); },
 				function (v) { setProp(n, 'demand', v); updateNode(nodeId); refreshPopupIfOpen(); },
 				pc.lpn_demand_tip, { el: n, prop: 'demand' });
+			// **HOW THAT DEMAND MOVES THROUGH THE RUN** (Task 460). PER JUNCTION, so it is here and
+			// not in the Libraries box -- the same line the Settings rule draws, from the other
+			// side: whole-project in the box, one element in the popup. Without it a pattern the
+			// user authors could only ever be used by making it the project default, which is not
+			// what a library is for.
+			// **NOT AN OVERRIDABLE PROPERTY, so it is a plain write and carries no marker.** Which
+			// pattern a junction follows is a statement about the system, like its elevation;
+			// LPN_OVERRIDABLE holds the design variables a scenario asks "what if" about.
+			patternField(fields, pc.lpn_field_demand_pattern || 'Demand pattern',
+				function () { return n.demandPattern; },
+				function (v) { n.demandPattern = v || null; updateNode(nodeId); scheduleSolve(); saveToStorage(); },
+				pc.lpn_field_demand_pattern_tip);
 			if (lastSolveResult && lastSolveResult.pressures[nodeId] !== undefined) {
 				readonlyUnitField(fields, pc.lpn_result_head || 'Head', resultUnit('elevhead'), lastSolveResult.heads[nodeId],
 					pc.lpn_result_head_tip);
