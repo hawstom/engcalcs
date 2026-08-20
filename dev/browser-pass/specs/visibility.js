@@ -693,6 +693,44 @@ exports.run = async function ({ browser, report }) {
 			'and Settings is the last control on the strip, at the right-hand end',
 			strip.slice(-3).join(' | '));
 
+		// **THEMATIC MODE HIDES THE LABELS KEY** (Tom, 2026-08-20). Thematic already switches the
+		// data labels off, so a key naming label fields is a key to lettering that is not drawn.
+		// Asserted through the real checkbox, and asserted to come BACK -- a hide that never
+		// reverses would pass a one-way check and lose the legend for good.
+		// **A FIELD HAS TO BE SWITCHED ON FOR THIS TO MEAN ANYTHING.** The legend is empty and
+		// hidden when no label field is showing, which is its own correct behaviour -- so a naive
+		// on/off comparison reads "hidden" both times and would pass on a page that had lost the
+		// legend entirely. The first draft of this check did exactly that.
+		const themLegend = await a.page.evaluate(() => {
+			const box = document.getElementById('lpn_labels_legend');
+			// The SAME selector the thematic check above uses, so the two cannot drift apart.
+			// **RE-QUERIED EVERY TIME, because the handler rebuilds the box.** Toggling this
+			// checkbox ends in syncColorControls(), which replaces the control -- so a handle
+			// taken once and clicked twice clicks a DETACHED element the second time and
+			// silently does nothing. That is what the first draft of this check did, and it
+			// read as the page failing to restore the legend.
+			const cb = () => document.querySelector('#lpn_set_colors_nodelink input[type="checkbox"]');
+			const field = document.querySelector('#lpn_labels_node_fields input[type="checkbox"]');
+			if (!box || !cb() || !field) { return null; }
+			const shown = () => box.style.display !== 'none';
+			if (cb().checked) { cb().click(); }    // thematic off to start
+			if (!field.checked) { field.click(); } // and one field on, so there is a legend at all
+			const base = shown();
+			cb().click();
+			const on = shown();
+			cb().click();
+			return { base, on, off: shown() };
+		});
+		if (themLegend) {
+			report.ok(themLegend.base, 'with a field on and thematic off, the labels key is showing',
+				JSON.stringify(themLegend));
+			report.ok(!themLegend.on, '...thematic mode hides it', JSON.stringify(themLegend));
+			report.ok(themLegend.off, '...and turning thematic off puts it back',
+				JSON.stringify(themLegend));
+		} else {
+			report.skip('thematic mode hides the labels key', 'no thematic checkbox found');
+		}
+
 		report.ok(a.errors.length === 0, 'no uncaught JavaScript', a.errors.join(' | '));
 	} finally {
 		await a.close();

@@ -7611,7 +7611,11 @@ var EngCalcs = EngCalcs || {};
 		var them = document.createElement('input');
 		them.type = 'checkbox'; them.checked = !!settings.colorThematic;
 		them.addEventListener('change', function () {
-			settings.colorThematic = them.checked; refreshValueColors(); saveToStorage(); syncColorControls();
+			// renderLabelsLegend() too: the labels key is hidden in thematic mode (Tom, 2026-08-20),
+			// so the checkbox that turns the mode on is one of the two things that change whether it
+			// is on screen. Without this the key stays until the next solve repaints it.
+			settings.colorThematic = them.checked; refreshValueColors(); renderLabelsLegend();
+			saveToStorage(); syncColorControls();
 		});
 		rowIn(nlHost, pc.lpn_settings_color_thematic || 'Thematic map', them,
 			pc.lpn_settings_color_thematic_tip);
@@ -15209,7 +15213,12 @@ var EngCalcs = EngCalcs || {};
 		}
 		addGroup(nodeFieldDefs(pc), labelSettings.node, pc.lpn_labels_heading_node || 'Node labels');
 		addGroup(linkFieldDefs(pc), labelSettings.link, pc.lpn_labels_heading_link || 'Link labels');
-		box.style.display = any ? '' : 'none';
+		// **THEMATIC MODE HIDES THIS LEGEND** (Tom, 2026-08-20). Thematic is the mode that
+		// strips the drawing back to colour alone -- it already switches the data labels off
+		// -- so a key naming the label fields is a key to lettering nobody can see. The colour
+		// legend is the one that belongs on a thematic map and it is a different element
+		// (colorLegendBox), so this hides without touching that one.
+		box.style.display = (any && !settings.colorThematic) ? '' : 'none';
 		applyLegendPosition();
 	}
 	// There is no toggleLabelsPopup() any more. Labels moved to the Visibility panel (Task 427) and
