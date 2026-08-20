@@ -1047,7 +1047,6 @@ $ec_lang['lpn_field_auto']='ራስ-ሰር';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='የመጠን ብዜት';
-$ec_lang['lpn_field_show_always']='ይህን ምልክት ሁልጊዜ አሳይ';
 $ec_lang['lpn_tool_labels']='ምልክቶች';
 $ec_lang['lpn_labels_heading_node']='የነጥብ ምልክቶች';
 $ec_lang['lpn_labels_heading_link']='የግንኙነት ምልክቶች';
@@ -1134,9 +1133,6 @@ $ec_lang['lpn_settings_link_width']='የቧንቧ መስመር ውፍረት (ፒ
 $ec_lang['lpn_settings_align_labels']='የቧንቧ ምልክቶችን ከቧንቧዎች ጋር አሰልፍ';
 $ec_lang['lpn_settings_readability_bias']='ምልክት ከቋሚው ግራ ከዚህ ቁጥር ዲግሪ በላይ ካዘነበለ ገልብጠው ያሳዩት';
 $ec_lang['lpn_settings_mask_labels']='ከምልክቶች በስተጀርባ ጠንካራ ቀለም';
-$ec_lang['lpn_settings_label_max_width']='እይታው ከዚህ ይበልጥ ጠባብ ሲሆን ምልክቶችን አሳይ (የካርታ ክፍሎች)';
-$ec_lang['lpn_settings_label_use_view']='የአሁኑን እይታ ተጠቀም';
-$ec_lang['lpn_settings_label_always']='ምልክቶችን ሁልጊዜ አሳይ';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='የምልክት ግልጽነት (0 እስከ 1)';

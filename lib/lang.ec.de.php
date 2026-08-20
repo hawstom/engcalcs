@@ -1081,7 +1081,6 @@ $ec_lang['lpn_field_closed_tip']='Schließt dieses Rohr, sodass kein Wasser mehr
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Größenfaktor';
-$ec_lang['lpn_field_show_always']='Diese Beschriftung immer anzeigen';
 $ec_lang['lpn_tool_labels']='Beschriftungen';
 $ec_lang['lpn_labels_heading_node']='Knotenbeschriftungen';
 $ec_lang['lpn_labels_heading_link']='Verbindungsbeschriftungen';
@@ -1191,9 +1190,6 @@ $ec_lang['lpn_settings_link_width']='Rohrlinienstärke (Pixel)';
 $ec_lang['lpn_settings_align_labels']='Rohrbeschriftungen an Rohren ausrichten';
 $ec_lang['lpn_settings_readability_bias']='Beschriftung auf den Kopf stellen, wenn sie mehr als so viele Grad links von der Senkrechten geneigt ist';
 $ec_lang['lpn_settings_mask_labels']='Deckender Hintergrund hinter Beschriftungen';
-$ec_lang['lpn_settings_label_max_width']='Beschriftungen anzeigen, wenn die Ansicht schmaler ist als dies (Karteneinheiten)';
-$ec_lang['lpn_settings_label_use_view']='Aktuelle Ansicht verwenden';
-$ec_lang['lpn_settings_label_always']='Beschriftungen immer anzeigen';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Symboldeckkraft (0 bis 1)';

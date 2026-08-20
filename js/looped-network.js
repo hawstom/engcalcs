@@ -28,7 +28,6 @@ var EngCalcs = EngCalcs || {};
 	// features of the model. A world-unit size is a size whose legibility depends on how far you are
 	// zoomed out, and no floor, warning or better default fixes that: Net3's map-unit text at 0.2
 	// units is a fraction of a pixel, so a correct network imports and shows nothing.
-	// `settings.labelMaxWidth` replaces it, deciding whether a label is drawn at this zoom.
 	//
 	// mult: a Text label's own per-label size multiplier (lb.sizeMult, default 1), stacked on the
 	// shared settings.textSize -- node/link labels never pass one.
@@ -183,9 +182,8 @@ var EngCalcs = EngCalcs || {};
 	// visible" is settled by the tighter dimension, by arithmetic rather than taste. `max`, `diag`
 	// and the single axes stay available and named, so a call site that needs one must say so.
 	//
-	// A "field of view" is how much you can SEE, so a control reading on this says "smaller than",
-	// never "narrower than". AND IT IS NOT THE SCREEN -- it is the map area, narrower than the
-	// window and much shorter, so wording shown to a user says map, not screen.
+	// AND IT IS NOT THE SCREEN -- it is the map area, narrower than the window and much shorter, so
+	// any wording shown to a user says map, not screen.
 
 	function mapSpan(which) {
 		var w = visibleMapWidth(), h = visibleMapHeight();
@@ -2466,11 +2464,6 @@ var EngCalcs = EngCalcs || {};
 			linkWidth: 2,
 			symbolOpacity: 1, // 0-1, applied to symbols only (never labels) -- see refreshSymbolSizes()
 			backdropOpacity: 1, // 0-1, applied to the backdrop image -- the other half of the same control
-			// Labels are drawn only when the visible map is at most this many LENGTH UNITS wide.
-			// null = always draw, the right default because no single number is meaningful across
-			// networks 400 ft and 40 miles wide. The settings panel captures it from the current
-			// view instead of asking anyone to guess.
-			labelMaxWidth: null,
 			// Draw a link's label ALONG its pipe, GIS-style, instead of horizontally beside it
 			// (ROADMAP Task 329).
 			alignPipeLabels: true,
@@ -2600,8 +2593,7 @@ var EngCalcs = EngCalcs || {};
 	// than remembered as a selector list in the stylesheet. One class, one rule.
 	//
 	// NOT annotation: the network itself and the user's own Text labels, which are authored content.
-	// A Text label's own scale threshold is its size ratio, handled per label in
-	// applyLabelVisibility() (Task 340).
+	// A Text label is hidden or shown per label in applyLabelVisibility(), by scenario membership.
 	function annotationEl(tag, attrs, parent) {
 		var e = el(tag, attrs, parent), cls = e.getAttribute('class');
 		e.setAttribute('class', (cls ? cls + ' ' : '') + 'lpn-annotation');
@@ -2857,8 +2849,8 @@ var EngCalcs = EngCalcs || {};
 	// teardown-and-rebuild on every drag frame was measured at 20-45fps; touching only the
 	// elements incident to what moved keeps drag at the display's real refresh rate.
 	var nodeEls = {}, linkEls = {}, labelEls = {}, incidentLinks = {}, labelsByAnchor = {};
-	// Whether generated annotation is currently suppressed by settings.labelMaxWidth. Written only
-	// by applyLabelVisibility(); read by onZoomChanged() and bbox().
+	// Whether generated annotation is currently suppressed (the project is being placed on the map).
+	// Written only by applyLabelVisibility(); read by onZoomChanged().
 	var dataLabelsHidden = false;
 
 	// Symbol size. SCREEN PIXELS and INDEPENDENT OF THE TEXT (Task 331). `settings.symbolSize` is the
@@ -3938,9 +3930,9 @@ var EngCalcs = EngCalcs || {};
 		// The selection mark rides on elements this function has just replaced (Task 415) -- and an
 		// id that survives a rebuild is the same element, while one that does not is gone.
 		refreshSelection();
-		// Every element here is brand new and therefore carries no visibility class, so the current
-		// threshold has to be re-applied to it (Task 340's per-Text-label half in particular -- the
-		// one class on the <svg> would survive a rebuild, a class on a discarded <text> does not).
+		// Every element here is brand new and therefore carries no visibility class, so visibility
+		// has to be re-applied to it (the per-Text-label half in particular -- the one class on the
+		// <svg> would survive a rebuild, a class on a discarded <text> does not).
 		applyLabelVisibility();
 	}
 	function updateLinkGeometry(id) {
@@ -4153,9 +4145,8 @@ var EngCalcs = EngCalcs || {};
 				// hardcoded 2 is right only at text size 2.5, and at the shipped default a title at
 				// sizeMult 2 is 40 units tall, so zoom-to-fit clips it.
 				lbox = textLabelBox(lb, le, px, py);
-			// Same rule for an authored label, which has its OWN threshold (Task 340): a note that
-			// has vanished at this zoom is not part of what is being fitted, while a title block
-			// pinned with "Always show" still is.
+			// Same rule for an authored label: a note that is not drawn is not part of what is
+			// being fitted.
 			if (ignoreDataLabels && le.text && le.text.classList &&
 				le.text.classList.contains('lpn-lbl-hidden')) { continue; }
 			inc(lbox.x, lbox.y); inc(lbox.x + lbox.w, lbox.y + lbox.h);
@@ -4222,18 +4213,14 @@ var EngCalcs = EngCalcs || {};
 	function fitItem(out, x, y, l, r, t, b) {
 		if (isFinite(x) && isFinite(y)) { out.push({ x: x, y: y, l: l, r: r, t: t, b: b }); }
 	}
-	// `atScale` is the scale being CONSIDERED, not the one currently in force. Two rules about what
-	// gets drawn are thresholds -- the map-width one that hides all annotation, and the per-pipe one
-	// that hides a label longer than its own pipe -- and both must be answered for the scale being
-	// TESTED, or the fit reserves room for labels that will not be there.
+	// `atScale` is the scale being CONSIDERED, not the one currently in force -- the per-pipe rule
+	// that hides a label longer than its own pipe must be answered for the scale being TESTED, or
+	// the fit reserves room for labels that will not be there. (`atScale` is read further down by
+	// the per-pipe test; nothing here is a map-width threshold any more -- see
+	// applyLabelVisibility().)
 	function fitItems(atScale, modelOnly) {
 		var out = [], sc = state.s || 1,
-			lim = settings.labelMaxWidth,
-			// The same MIN question the threshold itself asks (see mapSpan()), but asked about the
-			// scale being considered rather than the one in force.
-			mapW = Math.min(svg && svg.clientWidth ? svg.clientWidth : 0,
-				svg && svg.clientHeight ? svg.clientHeight : 0) / (atScale || 1),
-			ignoreDataLabels = modelOnly || (typeof lim === 'number' && lim > 0 && mapW > lim);
+			ignoreDataLabels = !!modelOnly;
 		function boxFor(x, y, bx, by, bw, bh) {
 			fitItem(out, x, y, (x - bx) * sc, (bx + bw - x) * sc, (y - by) * sc, (by + bh - y) * sc);
 		}
@@ -14845,10 +14832,9 @@ var EngCalcs = EngCalcs || {};
 	// Called from zoomAbout()/zoomExtent(), unconditionally: with text, symbols and pipe width all in
 	// screen pixels every one is state.s-dependent, so a zoom always invalidates all three.
 	// refreshFontSizes() calls refreshSymbolSizes(), which publishes --lpn-sym and --lpn-lw.
-	// Visible width of the map in MODEL LENGTH UNITS -- the honest way to say "when should this be
-	// readable", because it is a statement about the DRAWING rather than the viewport: 400 ft across
-	// means the same thing on a phone and on a 32-inch monitor, where a zoom factor or a
-	// pixels-per-foot ratio does not.
+	// Visible width of the map in MODEL LENGTH UNITS -- a statement about the DRAWING rather than
+	// the viewport: 400 ft across means the same thing on a phone and on a 32-inch monitor, where a
+	// zoom factor or a pixels-per-foot ratio does not.
 
 	function visibleMapWidth() {
 		return mapBox().w / (state.s || 1);
@@ -14862,41 +14848,35 @@ var EngCalcs = EngCalcs || {};
 	// visibility rather than display, so this composes with the leader's own show/hide logic instead
 	// of fighting it. One class on the <svg>, so a zoom step costs nothing per element.
 	//
-	// A TEXT LABEL GETS ITS OWN THRESHOLD, SCALED BY ITS OWN SIZE. Exempting Text labels entirely is
-	// too blunt: a title block and a small note are both authored and do not deserve the same
-	// survival, exactly as sheet lettering works. So the threshold is `labelMaxWidth x lb.sizeMult`
-	// -- a label at 3x survives to 3x the map width, one at 1x has the data labels' threshold -- and
-	// it falls out of a property already in the document, so there is no new per-label setting.
+	// **NOTHING HERE DEPENDS ON THE ZOOM ANY MORE** (Tom, 2026-08-19: "Always show labels, Zoom
+	// level, Current view, etc.: Remove that entire concept ... now that we have good hiding and
+	// Thematic map"). A map-width threshold hid labels automatically, and the Visibility panel's
+	// explicit per-field hiding and Thematic mode now do that job deliberately; a second, implicit
+	// mechanism was one more thing to learn and one more thing to be surprised by. Do not
+	// reintroduce it -- and note that it is NOT what keeps map-unit text sizing out (see
+	// effectiveFontSize()): text is in screen pixels because it is furniture of the view.
 	//
-	// Per label, so it cannot ride the one class on the <svg>: doc.labels is the user's own Text
-	// labels only, typically a handful, so the loop is cheap.
+	// Two rules are left, and neither is about how far out you are:
+	//   * generated annotation is off while the project is being placed on the map;
+	//   * a Text label switched off in this scenario is not there at all.
 	function applyLabelVisibility() {
-		var lim = settings.labelMaxWidth,
-			on = typeof lim === 'number' && lim > 0,
-			// MIN: "how much can I see" is answered by the dimension that runs out first, and the
-			// control says "smaller than" to match. See mapSpan().
-			vw = mapSpan('min');
-		// Recorded, not just applied. Two things need to KNOW whether generated annotation is on
-		// screen rather than merely being styled by it: the zoom path, which can skip the whole
-		// label pipeline when nothing readable is drawn, and bbox(), which must not reserve space
-		// for labels nobody can see. Both used to re-derive it and one of them got it wrong.
+		// Recorded, not just applied. The zoom path needs to KNOW whether generated annotation is on
+		// screen rather than merely being styled by it, so it can skip the whole label pipeline when
+		// nothing readable is drawn.
 		// **NOTHING GENERATED IS DRAWN WHILE THE PROJECT IS BEING PLACED ON THE MAP** (Task 145).
 		// Tom dragged a label by accident while aiming the model, and every label is also work the
 		// page does on a gesture whose whole point is to be smooth. The user's own Text elements
 		// stay: they are content, and he asked for "only elements including text".
-		dataLabelsHidden = !!(georefActive() || (on && vw > lim));
+		dataLabelsHidden = !!georefActive();
 		if (svg) { svg.classList.toggle('lpn-labels-hidden', dataLabelsHidden); }
+		// Per label, so it cannot ride the one class on the <svg>: doc.labels is the user's own Text
+		// labels only, typically a handful, so the loop is cheap.
 		doc.labels.forEach(function (lb) {
 			var le = labelEls[lb.id];
 			if (!le) { return; }
-			// AND ONE LABEL MAY OPT OUT ENTIRELY. NOT "the biggest one survives": that makes a legend
-			// or a north arrow compete on font size for a property it should just declare, and it
-			// silently changes which label is permanent whenever somebody resizes another one.
-			// A label switched OFF in this scenario is not there at all, and that beats every other
-			// rule here -- including "Always show this label", which answers the zoom threshold and
-			// says nothing about membership (Task 407).
-			var mult = +lb.sizeMult > 0 ? +lb.sizeMult : 1,
-				gone = !isActive(lb) || (on && !lb.alwaysShow && vw > lim * mult);
+			// MEMBERSHIP, and nothing else: a label switched OFF in this scenario is not there at
+			// all (Task 407).
+			var gone = !isActive(lb);
 			[le.text, le.leader].forEach(function (e) {
 				if (e && e.classList) { e.classList.toggle('lpn-lbl-hidden', gone); }
 			});
@@ -15289,47 +15269,9 @@ var EngCalcs = EngCalcs || {};
 			applyMaskLabels(); saveToStorage();
 		});
 		row(mapBody, pc.lpn_settings_mask_labels || 'Solid background behind labels', maskInput);
-		// ---- Scale-dependent label visibility ----
-		// THE CONTROL IS A CAPTURE BUTTON, NOT JUST A NUMBER. The threshold is a width in model
-		// length units and no default is meaningful across networks 400 ft and 40 miles across, so
-		// typing one blind asks the user to predict a number they can only recognise by seeing it.
-		// Zoom until the labels are as sparse as you want, press the button, and the current view's
-		// width becomes the threshold. The number stays editable; blank means always show.
-		var lmwWrap = document.createElement('span');
-		lmwWrap.className = 'lpn-set-ctlgroup';
-		var lmwInput = document.createElement('input');
-		lmwInput.type = 'number'; lmwInput.step = 'any'; lmwInput.min = '0';
-		// THE ONE BOX IN THE BOX THAT IS WIDER THAN THE NUMBER IT HOLDS, and its PLACEHOLDER is the
-		// reason: blank means "always show labels", and that sentence is the only place the rule is
-		// written on screen. It still starts at the control column's left edge like every other
-		// control, so the column is unbroken -- see --lpn-set-num in css/engcalcs.css.
-		lmwInput.style.width = '7em';
-		lmwInput.placeholder = pc.lpn_settings_label_always || 'Always show labels';
-		lmwInput.value = settings.labelMaxWidth === null || settings.labelMaxWidth === undefined ? '' : settings.labelMaxWidth;
-		lmwInput.addEventListener('change', function () {
-			var v = lmwInput.value.trim();
-			settings.labelMaxWidth = (v === '' || !(+v > 0)) ? null : +v;
-			if (settings.labelMaxWidth === null) { lmwInput.value = ''; }
-			applyLabelVisibility(); saveToStorage();
-		});
-		var lmwBtn = document.createElement('button');
-		lmwBtn.type = 'button'; lmwBtn.className = 'lpn-btn';
-		lmwBtn.textContent = pc.lpn_settings_label_use_view || 'Use current view';
-		lmwBtn.addEventListener('click', function () {
-			// Rounded to three significant figures: the captured number is a JUDGEMENT ("about this
-			// zoomed in"), and writing 1283.4177 into the box would present an accident of the
-			// current pan as a decision worth preserving.
-			// MIN, matching the threshold it is capturing for -- see mapSpan().
-			var w = mapSpan('min');
-			if (!(w > 0)) { return; }
-			settings.labelMaxWidth = +w.toPrecision(3);
-			lmwInput.value = settings.labelMaxWidth;
-			applyLabelVisibility(); saveToStorage();
-		});
-		lmwWrap.appendChild(lmwInput);
-		lmwWrap.appendChild(lmwBtn);
-		row(mapBody, pc.lpn_settings_label_max_width || 'Label view width (map units)', lmwWrap,
-			pc.lpn_settings_label_max_width_tip);
+		// **NO SCALE-DEPENDENT LABEL VISIBILITY ROW HERE.** A "Widest view that shows labels" number
+		// with a "Use current view" capture button used to sit at this point and is gone (Tom,
+		// 2026-08-19); the Visibility panel and Thematic mode are where labels are turned off now.
 		var opacityInput = document.createElement('input');
 		opacityInput.type = 'number'; opacityInput.step = '0.05'; opacityInput.min = '0.05'; opacityInput.max = '1';
 		opacityInput.value = settings.symbolOpacity;
@@ -16979,30 +16921,15 @@ var EngCalcs = EngCalcs || {};
 			le.text.style.fontSize = effectiveFontSize(lb.sizeMult) + 'px';
 			try { noteTextWidth(le, le.text.getBBox().width); } catch (err) { /* pre-layout measurement can throw; stale width stands */ }
 			updateLabelGeometry(labelId);
-			applyLabelVisibility();   // the size IS this label's own hide threshold (Task 340)
 			saveToStorage();
 		});
 		sizeLabel.textContent = (pc.lpn_field_text_size || 'Size ×') + ' ';
 		sizeLabel.appendChild(sizeInput);
 		fields.appendChild(sizeLabel);
 		fields.appendChild(document.createElement('br'));
-		// Task 340's escape hatch, and it sits immediately under the size because the size IS the
-		// threshold this overrides: a title block at 3x survives to 3x the map width, and this is
-		// the label that must survive whatever the reader does. Undefined on every existing label,
-		// so nothing changes shape on upgrade.
-		var alwaysLabel = document.createElement('label'), alwaysInput = document.createElement('input');
-		alwaysInput.type = 'checkbox';
-		alwaysInput.checked = !!lb.alwaysShow;
-		alwaysInput.addEventListener('change', function () {
-			saveUndoSnapshot();
-			lb.alwaysShow = alwaysInput.checked;
-			applyLabelVisibility();
-			saveToStorage();
-		});
-		alwaysLabel.textContent = (pc.lpn_field_show_always || 'Always show this label') + ' ';
-		alwaysLabel.appendChild(alwaysInput);
-		fields.appendChild(alwaysLabel);
-		fields.appendChild(document.createElement('br'));
+		// **NO "Always show this label" CHECKBOX.** It was the escape hatch from the map-width hide
+		// threshold, and with that threshold gone (Tom, 2026-08-19) it answers a question nobody is
+		// asked any more. Whether a note is on the drawing is the Active row above.
 		// ---- Justification (Task 342) ------------------------------
 		// `lb.align`/`lb.valign` have been in the document since Task 332 and are interpreted in ONE
 		// place (Geom.labelBoxAt via labelHAlign/labelVAlign); all this owes them is the row.

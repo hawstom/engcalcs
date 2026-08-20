@@ -1081,7 +1081,6 @@ $ec_lang['lpn_field_closed_tip']='Перекрыть эту трубу, чтоб
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Множитель размера';
-$ec_lang['lpn_field_show_always']='Всегда показывать эту подпись';
 $ec_lang['lpn_tool_labels']='Подписи';
 $ec_lang['lpn_labels_heading_node']='Подписи узлов';
 $ec_lang['lpn_labels_heading_link']='Подписи связей';
@@ -1196,9 +1195,6 @@ $ec_lang['lpn_settings_link_width']='Толщина линии трубы (пи�
 $ec_lang['lpn_settings_align_labels']='Выравнивать подписи труб по трубам';
 $ec_lang['lpn_settings_readability_bias']='Переворачивать подпись, если она наклонена влево от вертикали больше, чем на это число градусов';
 $ec_lang['lpn_settings_mask_labels']='Сплошной фон под подписями';
-$ec_lang['lpn_settings_label_max_width']='Показывать подписи, когда область просмотра уже этого значения (единицы карты)';
-$ec_lang['lpn_settings_label_use_view']='Использовать текущий вид';
-$ec_lang['lpn_settings_label_always']='Всегда показывать подписи';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Непрозрачность символа (от 0 до 1)';

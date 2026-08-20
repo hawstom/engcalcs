@@ -24,10 +24,11 @@ exports.title = '30. The Settings box, one design';
 
 // A number box holds a pixel size, an opacity, a tolerance or `24:00`. 5rem is the ceiling that
 // leaves; --lpn-set-num is 4.5rem, so a box that has quietly gone back to sizing itself off its own
-// max attribute (144 px) fails here. THE ONE EXEMPTION IS A BOX WITH A PLACEHOLDER -- the Label
-// view width box says "Always show labels" when it is empty, and that sentence is the only place
-// the blank-means-always rule is written on screen. Exempted by the placeholder itself rather than
-// by name, so the next such box inherits the reason instead of the exception.
+// max attribute (144 px) fails here. THE ONE EXEMPTION IS A BOX WITH A PLACEHOLDER, because a
+// placeholder is a sentence rather than a number and needs the room to be read. Exempted by the
+// placeholder itself rather than by name, so any such box inherits the reason instead of the
+// exception. (The box that earned it -- the Label view width one, whose placeholder carried the
+// blank-means-always-show rule -- was removed with the zoom threshold on 2026-08-19.)
 const NUM_MAX = 80;
 
 exports.run = async function ({ browser, report }) {

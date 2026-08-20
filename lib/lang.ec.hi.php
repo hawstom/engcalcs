@@ -1042,7 +1042,6 @@ $ec_lang['lpn_field_auto']='स्वचालित';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='आकार गुणक';
-$ec_lang['lpn_field_show_always']='यह लेबल हमेशा दिखाएँ';
 $ec_lang['lpn_tool_labels']='लेबल';
 $ec_lang['lpn_labels_heading_node']='नोड लेबल';
 $ec_lang['lpn_labels_heading_link']='लिंक लेबल';
@@ -1136,9 +1135,6 @@ $ec_lang['lpn_settings_link_width']='पाइप लाइन मोटाई (
 $ec_lang['lpn_settings_align_labels']='पाइप लेबल को पाइपों के साथ संरेखित करें';
 $ec_lang['lpn_settings_readability_bias']='लेबल पलटने से पहले ऊर्ध्वाधर से बाईं ओर कितनी डिग्री';
 $ec_lang['lpn_settings_mask_labels']='लेबलों के पीछे ठोस पृष्ठभूमि';
-$ec_lang['lpn_settings_label_max_width']='जब दृश्य इससे संकरा हो तो लेबल दिखाएँ (मानचित्र इकाइयाँ)';
-$ec_lang['lpn_settings_label_use_view']='मौजूदा दृश्य का उपयोग करें';
-$ec_lang['lpn_settings_label_always']='लेबल हमेशा दिखाएँ';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='प्रतीक अपारदर्शिता (0 से 1)';

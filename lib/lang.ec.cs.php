@@ -1046,7 +1046,6 @@ $ec_lang['lpn_field_auto']='Automaticky';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Násobitel velikosti';
-$ec_lang['lpn_field_show_always']='Vždy zobrazit tento popisek';
 $ec_lang['lpn_tool_labels']='Popisky';
 $ec_lang['lpn_labels_heading_node']='Popisky uzlů';
 $ec_lang['lpn_labels_heading_link']='Popisky spojů';
@@ -1132,9 +1131,6 @@ $ec_lang['lpn_settings_link_width']='Tloušťka čáry potrubí (v pixelech)';
 $ec_lang['lpn_settings_align_labels']='Zarovnat popisky potrubí s potrubím';
 $ec_lang['lpn_settings_readability_bias']='Otočit popisek vzhůru nohama, když je nakloněný o víc než tolik stupňů vlevo od svislice';
 $ec_lang['lpn_settings_mask_labels']='Plné pozadí za popisky';
-$ec_lang['lpn_settings_label_max_width']='Zobrazit popisky, když je pohled užší než toto (mapové jednotky)';
-$ec_lang['lpn_settings_label_use_view']='Použít aktuální pohled';
-$ec_lang['lpn_settings_label_always']='Vždy zobrazit popisky';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Krytí symbolu (0 až 1)';

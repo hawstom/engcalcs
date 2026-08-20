@@ -1172,7 +1172,6 @@ $ec_lang['lpn_field_closed_tip']='Închideți această conductă astfel încât 
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Factor de mărime';
-$ec_lang['lpn_field_show_always']='Afișează mereu această etichetă';
 $ec_lang['lpn_tool_labels']='Etichete';
 $ec_lang['lpn_labels_heading_node']='Etichete noduri';
 $ec_lang['lpn_labels_heading_link']='Etichete legături';
@@ -1358,9 +1357,6 @@ $ec_lang['lpn_settings_link_width']='Grosime linie conductă (pixeli)';
 $ec_lang['lpn_settings_align_labels']='Aliniază etichetele conductelor cu conductele';
 $ec_lang['lpn_settings_readability_bias']='Întoarce o etichetă cu susul în jos când se înclină la stânga verticalei cu mai mult de acest număr de grade';
 $ec_lang['lpn_settings_mask_labels']='Fundal opac în spatele etichetelor';
-$ec_lang['lpn_settings_label_max_width']='Afișează etichetele când vizualizarea este mai îngustă decât aceasta (unități hartă)';
-$ec_lang['lpn_settings_label_use_view']='Utilizează vizualizarea actuală';
-$ec_lang['lpn_settings_label_always']='Afișează mereu etichetele';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Opacitate simbol (0 până la 1)';

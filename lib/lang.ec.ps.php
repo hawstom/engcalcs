@@ -1047,7 +1047,6 @@ $ec_lang['lpn_field_auto']='اوتو';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='د اندازې ضریب';
-$ec_lang['lpn_field_show_always']='دا لیبل تل ښکاره کول';
 $ec_lang['lpn_tool_labels']='لیبلونه';
 $ec_lang['lpn_labels_heading_node']='د نقطو لیبلونه';
 $ec_lang['lpn_labels_heading_link']='د تړاو لیبلونه';
@@ -1133,9 +1132,6 @@ $ec_lang['lpn_settings_link_width']='د پایپ کرښې پنډوالی (پیک
 $ec_lang['lpn_settings_align_labels']='د پایپ لیبلونه له پایپونو سره برابرول';
 $ec_lang['lpn_settings_readability_bias']='کله چې لیبل د عمودي حالت نه کیڼ لور ته له دومره درجو زیات کوږ شي، لیبل کوز-پاس کول';
 $ec_lang['lpn_settings_mask_labels']='د لیبلونو شاته کلک شاليد';
-$ec_lang['lpn_settings_label_max_width']='کله چې لید له دې نه تنګ وي لیبلونه ښکاره کړئ (د نقشې واحدونه)';
-$ec_lang['lpn_settings_label_use_view']='اوسنی لید وکاروئ';
-$ec_lang['lpn_settings_label_always']='لیبلونه تل ښکاره کول';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='د نښې روڼوالی (0 نه 1)';

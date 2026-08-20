@@ -462,7 +462,6 @@
 		"linkWidth": 2,
 		"symbolOpacity": 1,
 		"backdropOpacity": 1,
-		"labelMaxWidth": null,
 		"alignPipeLabels": true,
 		"labelFlipLeftOfVertical": 20,
 		"maskLabels": true,

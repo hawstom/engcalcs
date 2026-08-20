@@ -1046,7 +1046,6 @@ $ec_lang['lpn_field_auto']='自动';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='大小倍数';
-$ec_lang['lpn_field_show_always']='始终显示此标签';
 $ec_lang['lpn_tool_labels']='标签';
 $ec_lang['lpn_labels_heading_node']='节点标签';
 $ec_lang['lpn_labels_heading_link']='连接线标签';
@@ -1132,9 +1131,6 @@ $ec_lang['lpn_settings_link_width']='管道线宽（像素）';
 $ec_lang['lpn_settings_align_labels']='管道标签与管道对齐';
 $ec_lang['lpn_settings_readability_bias']='标签向左偏离竖直方向超过多少度时上下翻转（度）';
 $ec_lang['lpn_settings_mask_labels']='标签背后加不透明背景';
-$ec_lang['lpn_settings_label_max_width']='视图宽度小于此值时显示标签（地图单位）';
-$ec_lang['lpn_settings_label_use_view']='使用当前视图';
-$ec_lang['lpn_settings_label_always']='始终显示标签';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='符号不透明度（0 到 1）';

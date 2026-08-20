@@ -1174,7 +1174,6 @@ $ec_lang['lpn_field_closed_tip']='این لوله را ببندید تا هیچ 
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='ضریب اندازه';
-$ec_lang['lpn_field_show_always']='همیشه این برچسب را نشان بده';
 $ec_lang['lpn_tool_labels']='برچسب‌ها';
 $ec_lang['lpn_labels_heading_node']='برچسب‌های گره';
 $ec_lang['lpn_labels_heading_link']='برچسب‌های اتصال';
@@ -1360,9 +1359,6 @@ $ec_lang['lpn_settings_link_width']='ضخامت خط لوله (پیکسل)';
 $ec_lang['lpn_settings_align_labels']='هم‌راستاسازی برچسب‌های لوله با لوله‌ها';
 $ec_lang['lpn_settings_readability_bias']='وقتی یک برچسب بیش از این مقدار درجه به چپِ عمود کج شود، آن را وارونه کن';
 $ec_lang['lpn_settings_mask_labels']='پس‌زمینهٔ توپر پشت برچسب‌ها';
-$ec_lang['lpn_settings_label_max_width']='وقتی نما از این باریک‌تر است برچسب‌ها را نشان بده (واحد نقشه)';
-$ec_lang['lpn_settings_label_use_view']='استفاده از نمای فعلی';
-$ec_lang['lpn_settings_label_always']='همیشه برچسب‌ها را نشان بده';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='تیرگی نماد (۰ تا ۱)';

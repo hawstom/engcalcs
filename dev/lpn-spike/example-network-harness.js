@@ -231,8 +231,8 @@ byId.lpn_toolbar.querySelectorAll = () => [];
   //
   // Retuning it to some new band would have been the easy move and would have been worse than
   // useless: a green assertion measuring a meaningless number is how a harness stops being evidence.
-  // What replaced this concern is not a number at all -- it is settings.labelMaxWidth deciding
-  // whether a label is DRAWN at a given zoom, which is checked in section 10 below.
+  // Nothing replaced it: legibility at a given zoom is the reader's business, and what a label says
+  // is checked in section 10 below.
 
   // ---- annotations, all composed from already-translated strings ----
   const PC = EngCalcs.pageConfig;

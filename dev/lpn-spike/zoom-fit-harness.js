@@ -185,25 +185,18 @@ console.log('--- the fit does not depend on the view it started from ---');
 	// changes the FIT, which would need a stub pipe added to the network above.
 }
 
-// ---- 2. ...including when a label threshold is in force ----------------------------------------
-console.log('\n--- with a label threshold set, which is where the zoom-dependence lived ---');
+// ---- 2. ...and the two-pass fit really is two passes -------------------------------------------
+// Pass 1 fits the MODEL ALONE (fitItems(scale, true)) so the answer cannot depend on the view we
+// arrived from; pass 2 adds the label boxes worked out at pass 1's scale. If the two bounding boxes
+// were the same the second pass would be a no-op and the first check in this file would be vacuous.
+console.log('\n--- the model-only bbox and the full bbox differ, so pass 2 is doing something ---');
 {
-	// A threshold the fitted view will be on the far side of, so the second pass really runs.
-	L.setSetting('labelMaxWidth', 100);
 	L.setZoom(1);
 	L.zoomExtent();
-	const fromOne = view();
-	L.setZoom(80);
-	L.zoomExtent();
-	ok('a threshold does not make the fit depend on the previous scale', same(view(), fromOne),
-		fromOne + ' vs ' + view());
-	// And the two-pass rule must actually be doing something, or the check above is vacuous: the
-	// tighter bbox (labels ignored) has to differ from the full one.
 	const full = L.bbox(), tight = L.bbox({ ignoreDataLabels: true });
-	ok('...and the two bounding boxes really are different, so pass 2 is not a no-op',
+	ok('the two bounding boxes really are different',
 		JSON.stringify(full) !== JSON.stringify(tight),
 		JSON.stringify(full) + ' vs ' + JSON.stringify(tight));
-	L.setSetting('labelMaxWidth', null);
 }
 
 // ---- 3. The overlay reserve is not a function of when you asked --------------------------------
@@ -271,12 +264,12 @@ console.log('\n--- a zoom re-measures nothing ---');
 // assume that we use, and possibly disclose, minimum or maximum or diagonal dimension. Being
 // intentional and consistent about that... can only be a good thing." An audit that day found three
 // conventions in use and not one of them named: max for the label repeat spacing, min for the fit,
-// width alone for the label-visibility threshold.
+// width alone for the label-visibility threshold that has since been removed altogether.
 //
 // CONSISTENCY IS NOT THE GOAL AND THAT IS THE POINT. Each answers a different question and the
 // question picks the dimension -- min because "must all of it fit" is decided by the tighter side,
-// max because a repeat should not crowd a wide window, width because the control literally says
-// "narrower than". What was wrong was that none of them said so. This asserts they still do.
+// max because a repeat should not crowd a wide window. What was wrong was that none of them said
+// so. This asserts they still do.
 console.log('\n--- every "map size" names its own dimension ---');
 {
 	const fs2 = require('fs');
@@ -290,11 +283,10 @@ console.log('\n--- every "map size" names its own dimension ---');
 	ok('and nothing combines the two axes behind its back any more',
 		!/Math\.(max|min|hypot)\(\s*visibleMapWidth\(\)/.test(code),
 		'a raw Math.max/min over the two accessors is the unnamed form this replaced');
-	// It is the MAP AREA, not the display -- narrower than the window and much shorter. Any wording
-	// shown to a user has to say so, or it promises a relationship to the screen that is not there.
-	ok('the wording in the UI says MAP, never screen',
-		/narrower than/i.test(src) && !/screen (size|width|height)/i.test(
-			(src.match(/lpn_settings_label_max_width[^\n]*/) || [''])[0]));
+	// It is the MAP AREA, not the display -- narrower than the window and much shorter. No setting
+	// row may promise a relationship to the SCREEN that is not there.
+	ok('no settings row talks about the screen size',
+		!/lpn_settings_[a-z_]*:[^\n]*screen (size|width|height)/i.test(src));
 }
 
 console.log('\n' + (fails === 0 ? 'ALL PASS' : fails + ' FAILURE(S)'));

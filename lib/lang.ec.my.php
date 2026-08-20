@@ -1047,7 +1047,6 @@ $ec_lang['lpn_field_auto']='အလိုအလျောက်';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='အရွယ်အစား အဆများကိန်း';
-$ec_lang['lpn_field_show_always']='ဤအညွှန်းကို အမြဲပြသရန်';
 $ec_lang['lpn_tool_labels']='အညွှန်းများ';
 $ec_lang['lpn_labels_heading_node']='နေရာ အညွှန်းများ';
 $ec_lang['lpn_labels_heading_link']='ဆက်သွယ်မှု အညွှန်းများ';
@@ -1134,9 +1133,6 @@ $ec_lang['lpn_settings_link_width']='ပိုက်လိုင်း အထူ
 $ec_lang['lpn_settings_align_labels']='ပိုက်အညွှန်းများကို ပိုက်လိုင်းနှင့် ညီညွတ်အောင် တန်းရန်';
 $ec_lang['lpn_settings_readability_bias']='အညွှန်းသည် ဒေါင်လိုက်မှ ဘယ်ဘက်သို့ ဒီဂရီ ဤမျှထက်ပိုစောင်းလျှင် အောက်ခေါင်းစိုက် ပြန်လှည့်ပါ';
 $ec_lang['lpn_settings_mask_labels']='အညွှန်းများ၏နောက်ကွယ်တွင် အစိုင်အခဲ နောက်ခံ';
-$ec_lang['lpn_settings_label_max_width']='မြင်ကွင်းသည် ဤအကျယ်ထက် ကျဉ်းသောအခါ အညွှန်းများ ပြသရန် (မြေပုံယူနစ်များ)';
-$ec_lang['lpn_settings_label_use_view']='လက်ရှိမြင်ကွင်းကို အသုံးပြုရန်';
-$ec_lang['lpn_settings_label_always']='အညွှန်းများကို အမြဲပြသရန်';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='သင်္ကေတ မြင်နိုင်မှု (0 မှ 1)';

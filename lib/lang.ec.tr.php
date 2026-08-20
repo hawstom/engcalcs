@@ -1082,7 +1082,6 @@ $ec_lang['lpn_field_closed_tip']='Bu boruyu kapatın, böylece hiç su geçemesi
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Boyut çarpanı';
-$ec_lang['lpn_field_show_always']='Bu etiketi her zaman göster';
 $ec_lang['lpn_tool_labels']='Etiketler';
 $ec_lang['lpn_labels_heading_node']='Düğüm etiketleri';
 $ec_lang['lpn_labels_heading_link']='Hat etiketleri';
@@ -1196,9 +1195,6 @@ $ec_lang['lpn_settings_link_width']='Boru çizgisi kalınlığı (piksel)';
 $ec_lang['lpn_settings_align_labels']='Boru etiketlerini borularla hizala';
 $ec_lang['lpn_settings_readability_bias']='Etiketin ters çevrilmeden önce dikeyden sola kayabileceği derece';
 $ec_lang['lpn_settings_mask_labels']='Etiketlerin arkasında dolgu arka plan';
-$ec_lang['lpn_settings_label_max_width']='Görünüm bundan daha dar olduğunda etiketleri göster (harita birimi)';
-$ec_lang['lpn_settings_label_use_view']='Mevcut görünümü kullan';
-$ec_lang['lpn_settings_label_always']='Etiketleri her zaman göster';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Sembol opaklığı (0 ile 1 arası)';

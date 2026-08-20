@@ -1228,7 +1228,6 @@ $ec_lang['lpn_field_lat']='Географска ширина';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Коефициент за размер';
-$ec_lang['lpn_field_show_always']='Винаги показвай този етикет';
 $ec_lang['lpn_tool_labels']='Етикети';
 $ec_lang['lpn_labels_heading_node']='Етикети на възлите';
 $ec_lang['lpn_labels_heading_link']='Етикети на участъците';
@@ -1341,9 +1340,6 @@ $ec_lang['lpn_settings_link_width']='Дебелина на линията на �
 $ec_lang['lpn_settings_align_labels']='Подравни етикетите на тръбите с тръбите';
 $ec_lang['lpn_settings_readability_bias']='Обръщай етикета наопаки, когато е наклонен наляво от вертикалата с повече от толкова градуси';
 $ec_lang['lpn_settings_mask_labels']='Плътен фон зад етикетите';
-$ec_lang['lpn_settings_label_max_width']='Показвай етикети, когато изгледът е по-тесен от това (единици на картата)';
-$ec_lang['lpn_settings_label_use_view']='Използвай текущия изглед';
-$ec_lang['lpn_settings_label_always']='Винаги показвай етикетите';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Непрозрачност на символите (0 до 1)';

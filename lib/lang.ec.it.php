@@ -1046,7 +1046,6 @@ $ec_lang['lpn_field_auto']='Auto';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Moltiplicatore di dimensione';
-$ec_lang['lpn_field_show_always']='Mostra sempre questa etichetta';
 $ec_lang['lpn_tool_labels']='Etichette';
 $ec_lang['lpn_labels_heading_node']='Etichette dei nodi';
 $ec_lang['lpn_labels_heading_link']='Etichette dei collegamenti';
@@ -1132,9 +1131,6 @@ $ec_lang['lpn_settings_link_width']='Spessore della linea delle tubazioni (pixel
 $ec_lang['lpn_settings_align_labels']='Allinea le etichette delle tubazioni alle tubazioni';
 $ec_lang['lpn_settings_readability_bias']='Gradi a sinistra della verticale prima che un\'etichetta venga capovolta';
 $ec_lang['lpn_settings_mask_labels']='Sfondo pieno dietro le etichette';
-$ec_lang['lpn_settings_label_max_width']='Mostra le etichette quando la vista è più stretta di questo valore (unità della mappa)';
-$ec_lang['lpn_settings_label_use_view']='Usa la vista attuale';
-$ec_lang['lpn_settings_label_always']='Mostra sempre le etichette';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Opacità dei simboli (da 0 a 1)';

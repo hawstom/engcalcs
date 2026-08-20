@@ -1180,7 +1180,6 @@ $ec_lang['lpn_field_auto']='Automático';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='Fator de tamanho';
-$ec_lang['lpn_field_show_always']='Sempre mostrar este rótulo';
 $ec_lang['lpn_tool_labels']='Rótulos';
 $ec_lang['lpn_labels_heading_node']='Rótulos de nó';
 $ec_lang['lpn_labels_heading_link']='Rótulos de trecho';
@@ -1273,9 +1272,6 @@ $ec_lang['lpn_settings_link_width']='Espessura da linha do tubo (pixels)';
 $ec_lang['lpn_settings_align_labels']='Alinhar rótulos dos tubos com os tubos';
 $ec_lang['lpn_settings_readability_bias']='Virar um rótulo de cabeça para baixo quando ele inclinar mais que este número de graus à esquerda da vertical';
 $ec_lang['lpn_settings_mask_labels']='Fundo sólido atrás dos rótulos';
-$ec_lang['lpn_settings_label_max_width']='Mostrar rótulos quando a vista for mais estreita do que isto (unidades do mapa)';
-$ec_lang['lpn_settings_label_use_view']='Usar vista atual';
-$ec_lang['lpn_settings_label_always']='Sempre mostrar rótulos';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='Opacidade do símbolo (0 a 1)';

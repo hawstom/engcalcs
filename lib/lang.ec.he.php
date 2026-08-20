@@ -1047,7 +1047,6 @@ $ec_lang['lpn_field_auto']='אוטומטי';
 $ec_lang['lpn_field_x']='X';
 $ec_lang['lpn_field_y']='Y';
 $ec_lang['lpn_field_text_size']='מכפיל גודל';
-$ec_lang['lpn_field_show_always']='הצג תווית זו תמיד';
 $ec_lang['lpn_tool_labels']='תוויות';
 $ec_lang['lpn_labels_heading_node']='תוויות צמתים';
 $ec_lang['lpn_labels_heading_link']='תוויות קישורים';
@@ -1131,9 +1130,6 @@ $ec_lang['lpn_settings_link_width']='עובי קו הצינור (פיקסלים)
 $ec_lang['lpn_settings_align_labels']='יישר תוויות צינורות עם הצינורות';
 $ec_lang['lpn_settings_readability_bias']='מעלות משמאל לאנך לפני שתווית מתהפכת';
 $ec_lang['lpn_settings_mask_labels']='רקע אטום מאחורי תוויות';
-$ec_lang['lpn_settings_label_max_width']='הצג תוויות כאשר התצוגה צרה יותר מזה (יחידות מפה)';
-$ec_lang['lpn_settings_label_use_view']='השתמש בתצוגה הנוכחית';
-$ec_lang['lpn_settings_label_always']='הצג תוויות תמיד';
 // Fading the symbols (not the labels) is a LAYOUT aid: it lets a backdrop aerial or plan show
 // through the network while you place nodes on top of it (Tom, 2026-07-30).
 $ec_lang['lpn_settings_symbol_opacity']='אטימות סמל (0 עד 1)';

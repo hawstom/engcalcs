@@ -1196,7 +1196,6 @@ $ec_lang['lpn_engine_fetching_valve']='EPANET حل کار حاصل کیا جا �
 $ec_lang['lpn_engine_ready_valve']='EPANET حل کار اب اس آلے پر موجود ہے۔ وہ والوز جو خود بخود کھلتے اور بند ہوتے ہیں آف لائن کام کریں گے۔';
 $ec_lang['lpn_engine_unavailable']='EPANET حل کار حاصل نہیں ہو سکا، جو خود بخود کھلنے اور بند ہونے والے والوز کو حل کرتا ہے۔ ایک بار انٹرنیٹ سے جڑیں اور یہ اس کے بعد اس آلے پر محفوظ رہتا ہے۔';
 
-$ec_lang['lpn_field_show_always']='یہ لیبل ہمیشہ دکھائیں';
 $ec_lang['lpn_settings_apply_to_all']='سب پر لاگو کریں';
 $ec_lang['lpn_settings_apply_to_all_tip']='اس قسم کا ہر عنصر جو پہلے سے بنا ہوا ہے اسے اس متن سے شروع ہونے والا ID ملتا ہے۔ ہر ایک اپنا نمبر برقرار رکھتا ہے۔ جو ID نمبر پر ختم نہیں ہوتا اسے چھوڑ دیا جاتا ہے۔';
 $ec_lang['lpn_confirm_apply_prefix']='{n} عناصر کا نام تبدیل کریں تاکہ ان کے IDs {prefix} سے شروع ہوں؟ ہر ایک اپنا نمبر برقرار رکھتا ہے۔';
@@ -1225,9 +1224,6 @@ $ec_lang['lpn_settings_link_width']='پائپ لائن کی موٹائی (پکس
 $ec_lang['lpn_settings_align_labels']='پائپ لیبلز کو پائپوں کے ساتھ سیدھا کریں';
 $ec_lang['lpn_settings_readability_bias']='عمودی سے کتنے درجے بائیں طرف ہونے پر لیبل الٹا دیا جاتا ہے';
 $ec_lang['lpn_settings_mask_labels']='لیبلز کے پیچھے ٹھوس پس منظر';
-$ec_lang['lpn_settings_label_max_width']='جب منظر اس سے تنگ ہو تو لیبلز دکھائیں (نقشے کے یونٹس)';
-$ec_lang['lpn_settings_label_use_view']='موجودہ منظر استعمال کریں';
-$ec_lang['lpn_settings_label_always']='لیبلز ہمیشہ دکھائیں';
 $ec_lang['lpn_settings_colors']='قدر کے مطابق رنگ';
 $ec_lang['lpn_settings_color_node_field']='نوڈ کا رنگ';
 $ec_lang['lpn_settings_color_link_field']='پائپ کا رنگ';
