@@ -141,27 +141,33 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   `lpn_notes_*` (Task 448's stability note and the Notes review) and `lpn_file_import_inp_tip`. Plus
   the keys written since: `lpn_color_mode_manual`, `lpn_time_no_period`, and the three
   `lpn_basemap_satellite_*`. Needs Tom's authorization, and a Wave 0 over the changed set first.
-- 75|447| **Replace "Convert to lat/lon" with an IMPORT, and make an `.inp` import obey it too.**
-  Tom, 2026-08-19: *"Didn't I say that we no longer want 'Convert to lat/lon' and in place of it we
-  want 'Import XY file' that's disabled for xy projects?"* He did (2026-08-19, Task 447's original
-  wording) and it was recorded as a follow-up rather than as a replacement. It is a replacement.
-  - **The model.** A lat/lon project is the only place coordinates get converted, and it converts
-    something ARRIVING, never itself. So: `File > Import XY project…` and `File > Import EPANET
-    file…`, both **disabled in an XY project** — there is nothing for an XY project to convert into.
-    In a lat/lon project either row brings the network in and runs the placement wizard.
-    `Convert to lat/lon` goes away entirely, and with it the in-place conversion.
-  - **The safety argument is the whole point:** the XY original stays on disk untouched, so a
-    conversion can never be the only copy, which is what makes the wizard's Cancel meaningful at
-    the DOCUMENT level and not just the dialogue level.
-  - **THE BUG TOM HIT:** *"I tried to import Net3.inp into a lat/lon project. Instead, it opened a
-    new project."* `.inp` import calls `importProject()` unconditionally, so it always makes a new
-    XY project whatever you had open. Under the model above that is wrong in a lat/lon project and
-    right in an XY one, so the destination project's coordinate kind decides — the same rule as the
-    menu rows, one implementation for both doors.
-  - **[H] Tom asked to discuss before building.** The open question is what "Import" means to the
-    CURRENT project: replace its contents, or merge into them. Replace is simpler and matches what
-    the row does today; merge is what "import" means in most tools and is the only one that lets a
-    person build a city out of several models.
+- 75|447| **"Convert to lat/lon" goes; OPEN grows up instead.** Tom's design, 2026-08-19, and it is
+  the settled one — it supersedes both the in-place convert and the "Import XY project" framing
+  this task carried before:
+
+  > *"Three source cases (EPANET, XY, and latlon) to two destination cases (XY and latlon). And all
+  > the cases want to open a file. And 'most' similar software takes 'import' to mean 'open', not
+  > merge or replace… Our Open has to be smart enough to handle whatever it finds… For EPANET, we
+  > can always prompt at open: Import as XY or Lat/Lon? For JSON, we need another menu item, and we
+  > call it 'Open as Lat/Lon', not convert and not import."*
+
+  - **THE MOVE THAT DISSOLVES THE PROBLEM: Open makes a NEW TAB.** There is then no current project
+    to bring anything "into", so merge-versus-replace never has to be answered and no row needs a
+    disabled state. Three File rows: `Open…`, `Open as lat/lon…`, `Import EPANET file…`.
+  - **A JSON file needs no prompt** — it states its own `project.coords`, so an XY file opens XY and
+    a lat/lon file opens lat/lon. `Open as lat/lon…` is the deliberate override that takes an XY
+    file and places it on the world, running the placement wizard. That is the only cell of the
+    3x2 matrix needing its own door; **lat/lon opened as XY is never wanted** and gets no row.
+  - **An `.inp` DOES need the prompt, for the opposite reason:** `[COORDINATES]` are bare numbers
+    with no declared frame — state plane feet, arbitrary drawing units and lon/lat are
+    indistinguishable — so asking is the only honest option. It is not a modal in front of a common
+    action; it is a modal because the information genuinely is not in the file.
+  - **A SEPARATE ROW BEATS A PROMPT FOR JSON, by Tom's own earlier ruling** that a choice must not
+    stand in front of the common action. Opening a file is common; converting to lat/lon is rare,
+    so the rare one carries the extra door.
+  - **The "bug" Tom reported is reframed, and the real defect is smaller:** *"I tried to import
+    Net3.inp into a lat/lon project. Instead, it opened a new project."* Under this model a new
+    project is CORRECT — what is missing is that it never asked XY or lat/lon.
 - 45|445| **Labels: invert priority to "Drop first in case of conflict", 1 dropping first.** Tom,
   2026-08-19: "our labels priority paradigm really wants to be Labels.Drop First In Case of Conflict
   … it's a version bump because the order of the numbers reverses. But it's the right thing to do."
