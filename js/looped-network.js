@@ -7418,6 +7418,30 @@ var EngCalcs = EngCalcs || {};
 
 			// THE SCHEME. A button showing a bar of this group's own colours -- see buildRampPicker.
 			rowIn(target, pc.lpn_settings_color_ramp || 'Color scheme', buildRampPicker(pc, group));
+			// **AND A POINTER TO THE ACKNOWLEDGEMENT, UNDER THE PICKER IT IS ABOUT** (Tom,
+			// 2026-08-20: "Were we going to put a Credits link near the color pickers? Maybe under
+			// the Color scheme label?"). It SCROLLS to the footer copy and marks it for a moment; it
+			// never repeats the text, because Apache-2.0 clause 2 fixes that wording and one box
+			// saying it twice is a stutter rather than more attribution -- and the footer stays
+			// where it is, outside the sections the search filter hides, so it is still on screen
+			// whenever the box is. Both groups carry the pointer: whichever picker you are looking
+			// at is the one you want to know about. NO NEW STRING -- the suite's own About label,
+			// which is what this line is: about the colours you are choosing from.
+			var credLine = document.createElement('div'), credLink = document.createElement('a');
+			credLine.className = 'lpn-set-creditlink';
+			credLink.href = '#lpn_set_ramp_credits';
+			credLink.id = 'lpn_set_credits_link_' + group;
+			credLink.textContent = pc.about_main_menu || 'About';
+			credLink.addEventListener('click', function (e) {
+				var c = document.getElementById('lpn_set_ramp_credits');
+				e.preventDefault();
+				if (!c) { return; }
+				c.scrollIntoView({ block: 'nearest' });
+				c.classList.add('lpn-set-flash');
+				window.setTimeout(function () { c.classList.remove('lpn-set-flash'); }, 1600);
+			});
+			credLine.appendChild(credLink);
+			target.appendChild(credLine);
 
 			// THE CLASSIFICATION METHOD. Built here, rendered below the colour count: the ramp says
 			// WHICH COLOURS, the count says HOW MANY, and the method says WHERE THE BOUNDARIES GO.
@@ -7521,7 +7545,7 @@ var EngCalcs = EngCalcs || {};
 			// prints the same way, so the two agree on screen.
 			var stored = storedBreaks(group, field).length > 0,
 				eff = effectiveBreaks(group, field), wrap = document.createElement('div'), boxes = [];
-			wrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;align-items:center';
+			wrap.className = 'lpn-color-breaks';
 			var msg = document.createElement('div');
 			msg.className = 'lpn-color-msg';
 			msg.style.display = 'none';
@@ -7553,27 +7577,32 @@ var EngCalcs = EngCalcs || {};
 				settings.colorModes[key] = (R2 && R2.MANUAL_MODE) || 'manual';
 				refreshValueColors(); saveToStorage(); syncColorControls();
 			}
-			// n classes, n-1 limits, and a swatch of the class each limit sits above -- so the
-			// number and the colour it commands are read together instead of counted out.
-			for (i = 0; i < n - 1; i++) {
+			// **ONE ROW PER COLOUR, VERTICAL** (Tom, 2026-08-20: "we should make them vertical, one
+			// row for each color"). Laid out left to right, six bands and five limits did not fit
+			// the box at any width it ships at, and the reader had to count boxes to learn which
+			// colour a number commanded.
+			//
+			// n classes and n-1 limits, so the rows are the COLOURS and a limit belongs to the LINE
+			// between two of them: each box is drawn straddling the join between its band and the
+			// next (css/engcalcs.css: .lpn-color-breaks), the swatch column is a continuous ramp,
+			// and the last band's row has no box because nothing bounds it from below. The stored
+			// order is unchanged -- ascending down the column, which is also the order they are
+			// typed in and the order aria-label numbers them in.
+			for (i = 0; i < n; i++) {
 				var chip = document.createElement('span');
 				chip.className = 'lpn-color-swatch';
 				chip.style.background = bandColor(group, i, n);
 				wrap.appendChild(chip);
+				if (i >= n - 1) { break; }
 				var box = document.createElement('input');
 				box.type = 'number'; box.step = 'any';
 				box.className = 'lpn-set-num';
-				box.style.width = '4.5em';
 				box.value = (eff[i] === undefined) ? '' : (stored ? eff[i] : colorNum(eff[i]));
 				box.setAttribute('aria-label', (pc.lpn_settings_color_breaks || 'Color band boundaries') + ' ' + (i + 1));
 				box.addEventListener('change', writeBreaks);
 				boxes.push(box);
 				wrap.appendChild(box);
 			}
-			var top = document.createElement('span');
-			top.className = 'lpn-color-swatch';
-			top.style.background = bandColor(group, n - 1, n);
-			wrap.appendChild(top);
 			target.appendChild(wrap);
 			target.appendChild(msg);
 			// FILL THEM FROM THE METHOD AGAIN. The one button here, because the modes replaced the
