@@ -766,8 +766,8 @@ $ec_lang['lpn_file_new']='Neues Projekt…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Leeres XY-Projekt, US-Einheiten (gpm)';
-$ec_lang['lpn_new_blank_si']='Leeres XY-Projekt, SI-Einheiten (L/s)';
+$ec_lang['lpn_new_blank_us']='Leeres xy-Projekt, US-Einheiten (gpm)';
+$ec_lang['lpn_new_blank_si']='Leeres xy-Projekt, SI-Einheiten (L/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Öffnen…';
@@ -1257,10 +1257,10 @@ $ec_lang['lpn_basemap_show']='Straßenkarte anzeigen';
 $ec_lang['lpn_basemap_hide']='Straßenkarte ausblenden';
 $ec_lang['lpn_basemap_tip']='Straßenkartenbilder von OpenStreetMap, die beim Verschieben und Zoomen über das Internet geladen werden. Ihr Netz wird unabhängig davon gezeichnet, ob die Straßenkarte angezeigt wird.';
 $ec_lang['lpn_geomap']='Breite/Länge';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_georef_menu']='In Breite/Länge umwandeln…';
-$ec_lang['lpn_georef_tip']='Von einem lokalen Raster in die reale Welt. Legt eine auf dem XY-Raster gezeichnete Karte auf geografische Koordinaten, sodass sie an der richtigen Stelle auf der Straßenkarte liegt. Jede von Ihnen eingegebene Zahl bleibt unverändert — nur X und Y werden zu einer Länge und einer Breite.';
-$ec_lang['lpn_georef_intro']='Dieses XY-Projekt in ein geografisches Projekt umwandeln? Ihr Projekt wurde in die Mitte einer Weltkarte gesetzt. Zoomen Sie zu Ihrem Standort und verschieben, skalieren und drehen Sie das Modell nach Belieben. Wenn Sie bereit sind, einzelne Elemente anzupassen, drücken Sie Diese Platzierung übernehmen.';
+$ec_lang['lpn_georef_tip']='Von einem lokalen Raster in die reale Welt. Legt eine auf dem xy-Raster gezeichnete Karte auf geografische Koordinaten, sodass sie an der richtigen Stelle auf der Straßenkarte liegt. Jede von Ihnen eingegebene Zahl bleibt unverändert — nur X und Y werden zu einer Länge und einer Breite.';
+$ec_lang['lpn_georef_intro']='Dieses xy-Projekt in ein geografisches Projekt umwandeln? Ihr Projekt wurde in die Mitte einer Weltkarte gesetzt. Zoomen Sie zu Ihrem Standort und verschieben, skalieren und drehen Sie das Modell nach Belieben. Wenn Sie bereit sind, einzelne Elemente anzupassen, drücken Sie Diese Platzierung übernehmen.';
 $ec_lang['lpn_georef_adjust']='Ziehen Sie das Modell, um es zu verschieben, ziehen Sie an einer Ecke, um es zu skalieren, ziehen Sie am runden Griff über dem Modell, um es zu drehen. Oder geben Sie unten Maßstab und Drehwinkel ein.';
 $ec_lang['lpn_georef_step1']='Schritt 1 von 2 — losgelöst';
 $ec_lang['lpn_georef_step2']='Schritt 2 von 2 — verankert';
@@ -1309,7 +1309,7 @@ $ec_lang['lpn_georef_scale']='Bodenentfernung je Zeicheneinheit';
 $ec_lang['lpn_georef_scale_tip']='Wie weit eine Einheit Ihrer Zeichnung auf dem Boden reicht. Eine auf einem einfachen Raster erstellte Zeichnung sagt darüber normalerweise nichts aus, legen Sie es also hier fest — oder lassen Sie Gehe zu… Sie fragen, wie breit das Gelände ist, und es daraus berechnen.';
 $ec_lang['lpn_georef_rotation']='Drehung gegen den Uhrzeigersinn (Grad)';
 $ec_lang['lpn_georef_rotation_tip']='Wie weit das gesamte Modell gegen den Uhrzeigersinn gedreht wird, damit sein Norden nach Norden zeigt.';
-$ec_lang['lpn_georef_confirm']='Das Modell dauerhaft hier platzieren? Sie können danach weiterhin einzelne Elemente verschieben, aber die Zeichnung ist dann kein XY-Projekt mehr. Um XY wiederherzustellen, schließen Sie dieses Projekt, ohne zu speichern.';
+$ec_lang['lpn_georef_confirm']='Das Modell dauerhaft hier platzieren? Sie können danach weiterhin einzelne Elemente verschieben, aber die Zeichnung ist dann kein xy-Projekt mehr. Um xy wiederherzustellen, schließen Sie dieses Projekt, ohne zu speichern.';
 $ec_lang['lpn_georef_done']='Dies ist jetzt ein Breite/Länge-Projekt. Ziehen Sie ein beliebiges Element, um es näher an seine tatsächliche Lage zu bringen.';
 $ec_lang['lpn_georef_on_map']='Dieses Projekt liegt bereits auf Breite/Länge.';
 $ec_lang['lpn_georef_empty']='Zeichnen oder öffnen Sie zuerst ein Netz. Es gibt noch nichts zu platzieren.';

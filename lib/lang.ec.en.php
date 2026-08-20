@@ -1355,12 +1355,12 @@ $ec_lang['lpn_basemap_satellite_tip']='Photographs of the ground from Mapbox, fe
 // the joke it has been for two thousand years; it is fun, meaningful and instructive, so it lives in
 // the tips and in $ec_lang_syn -- both of which Tom wrote himself, in this file, on that date.
 $ec_lang['lpn_geomap']='lat/lon';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang_syn['lpn_geomap']='Latitude and Longitude map, Geographic map, or World map';
 $ec_lang_syn['lpn_xymap']='Cartesian map or plane map';
 $ec_lang['lpn_georef_menu']='Convert to lat/lon…';
-$ec_lang['lpn_georef_tip']='From a local grid to the real world. Put a drawing made on the XY grid onto geographic coordinates, so it sits on the street map where it belongs. Every number you typed stays as it is — only the X and Y become a longitude and a latitude.';
-$ec_lang['lpn_georef_intro']='Convert this XY project to a geographic project? Your project has been placed at the centre of a world map. Zoom to your location and move, resize, and turn the model as much as you like. When you are ready to start adjusting elements, press Keep this placement.';
+$ec_lang['lpn_georef_tip']='From a local grid to the real world. Put a drawing made on the xy grid onto geographic coordinates, so it sits on the street map where it belongs. Every number you typed stays as it is — only the x and y become a longitude and a latitude.';
+$ec_lang['lpn_georef_intro']='Convert this xy project to a geographic project? Your project has been placed at the centre of a world map. Zoom to your location and move, resize, and turn the model as much as you like. When you are ready to start adjusting elements, press Keep this placement.';
 $ec_lang['lpn_georef_adjust']='Drag the model to move it, drag a corner to resize it, drag the round handle above the model to turn it. Or type the scale and the turn below.';
 $ec_lang['lpn_georef_step1']='Step 1 of 2 — detached';
 $ec_lang['lpn_georef_step2']='Step 2 of 2 — attached';
@@ -1422,7 +1422,7 @@ $ec_lang['lpn_georef_scale']='Ground distance per drawing unit';
 $ec_lang['lpn_georef_scale_tip']='How far one unit of your drawing reaches on the ground. A drawing made on a plain grid usually says nothing about this, so set it here — or let Go to… ask you how wide the site is and work it out.';
 $ec_lang['lpn_georef_rotation']='Turn anticlockwise (degrees)';
 $ec_lang['lpn_georef_rotation_tip']='How far to turn the whole model, anticlockwise, so that its north points north.';
-$ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag single elements afterwards, but the drawing stops being an XY project. To get XY back, close this project without saving.';
+$ec_lang['lpn_georef_confirm']='Place the model here permanently? You can still drag single elements afterwards, but the drawing stops being an xy project. To get xy back, close this project without saving.';
 $ec_lang['lpn_georef_done']='This is a lat/lon project now. Drag any element to move it closer to where it really is.';
 $ec_lang['lpn_georef_on_map']='This project is already on lat/lon.';
 $ec_lang['lpn_georef_empty']='Draw or open a network first. There is nothing to place yet.';
@@ -1547,8 +1547,8 @@ $ec_lang['lpn_file_new']='New project…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Blank XY project, US units (gpm)';
-$ec_lang['lpn_new_blank_si']='Blank XY project, SI units (L/s)';
+$ec_lang['lpn_new_blank_us']='Blank xy project, US units (gpm)';
+$ec_lang['lpn_new_blank_si']='Blank xy project, SI units (L/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 // The other half of the same fly-out (Task 145): a project is on a grid or on the world, and it says

@@ -755,8 +755,8 @@ $ec_lang['lpn_file_new']='פרויקט חדש…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='פרויקט XY ריק, יחידות ארה"ב (gpm)';
-$ec_lang['lpn_new_blank_si']='פרויקט XY ריק, יחידות SI‏ (L/s)';
+$ec_lang['lpn_new_blank_us']='פרויקט xy ריק, יחידות ארה"ב (gpm)';
+$ec_lang['lpn_new_blank_si']='פרויקט xy ריק, יחידות SI‏ (L/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='פתח…';
@@ -1256,10 +1256,10 @@ $ec_lang['lpn_basemap_show']='הצג מפת רחובות';
 $ec_lang['lpn_basemap_hide']='הסתר מפת רחובות';
 $ec_lang['lpn_basemap_tip']='תמונות מפת רחובות מ-OpenStreetMap, מובאות דרך האינטרנט תוך כדי גלילה והגדלה. הרשת שלכם מצוירת בין אם מפת הרחובות מוצגת ובין אם לא.';
 $ec_lang['lpn_geomap']='קו רוחב/אורך';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_georef_menu']='המרה לקו רוחב/אורך…';
-$ec_lang['lpn_georef_tip']='מרשת מקומית לעולם האמיתי. מניחה שרטוט שנעשה על רשת XY על גבי קואורדינטות גאוגרפיות, כך שהוא יושב על מפת הרחובות במקומו הנכון. כל מספר שהקלדתם נשאר כפי שהוא — רק ה-X וה-Y הופכים לקו אורך וקו רוחב.';
-$ec_lang['lpn_georef_intro']='להמיר פרויקט XY זה לפרויקט גאוגרפי? הפרויקט שלכם הונח במרכזה של מפת עולם. הגדילו למיקום שלכם והזיזו, שנו גודל, וסובבו את המודל כרצונכם. כשתהיו מוכנים להתחיל לכוונן אלמנטים, לחצו על שמור מיקום זה.';
+$ec_lang['lpn_georef_tip']='מרשת מקומית לעולם האמיתי. מניחה שרטוט שנעשה על רשת xy על גבי קואורדינטות גאוגרפיות, כך שהוא יושב על מפת הרחובות במקומו הנכון. כל מספר שהקלדתם נשאר כפי שהוא — רק ה-X וה-Y הופכים לקו אורך וקו רוחב.';
+$ec_lang['lpn_georef_intro']='להמיר פרויקט xy זה לפרויקט גאוגרפי? הפרויקט שלכם הונח במרכזה של מפת עולם. הגדילו למיקום שלכם והזיזו, שנו גודל, וסובבו את המודל כרצונכם. כשתהיו מוכנים להתחיל לכוונן אלמנטים, לחצו על שמור מיקום זה.';
 $ec_lang['lpn_georef_adjust']='גררו את המודל כדי להזיז אותו, גררו פינה כדי לשנות את גודלו, גררו את הידית העגולה מעל המודל כדי לסובב אותו. או הקלידו את קנה המידה והסיבוב למטה.';
 $ec_lang['lpn_georef_step1']='שלב 1 מתוך 2 — מנותק';
 $ec_lang['lpn_georef_step2']='שלב 2 מתוך 2 — מחובר';
@@ -1308,7 +1308,7 @@ $ec_lang['lpn_georef_scale']='מרחק בשטח ליחידת שרטוט';
 $ec_lang['lpn_georef_scale_tip']='כמה רחוק מגיעה יחידה אחת של השרטוט שלכם בשטח. שרטוט שנעשה על רשת פשוטה בדרך כלל אינו אומר דבר על כך, אז קבעו זאת כאן — או תנו ל-עבור אל… לשאול אתכם כמה רחב האתר ולחשב זאת.';
 $ec_lang['lpn_georef_rotation']='סיבוב נגד כיוון השעון (מעלות)';
 $ec_lang['lpn_georef_rotation_tip']='כמה לסובב את המודל כולו, נגד כיוון השעון, כך שהצפון שלו יצביע צפונה.';
-$ec_lang['lpn_georef_confirm']='להניח את המודל כאן לצמיתות? עדיין תוכלו לגרור אלמנטים בודדים אחר כך, אך השרטוט מפסיק להיות פרויקט XY. כדי להחזיר XY, סגרו פרויקט זה בלי לשמור.';
+$ec_lang['lpn_georef_confirm']='להניח את המודל כאן לצמיתות? עדיין תוכלו לגרור אלמנטים בודדים אחר כך, אך השרטוט מפסיק להיות פרויקט xy. כדי להחזיר xy, סגרו פרויקט זה בלי לשמור.';
 $ec_lang['lpn_georef_done']='זהו כעת פרויקט קו רוחב/אורך. גררו כל אלמנט כדי להזיז אותו קרוב יותר למקום שבו הוא נמצא באמת.';
 $ec_lang['lpn_georef_on_map']='פרויקט זה כבר נמצא על קו רוחב/אורך.';
 $ec_lang['lpn_georef_empty']='ציירו או פתחו רשת קודם. אין עדיין מה להניח.';

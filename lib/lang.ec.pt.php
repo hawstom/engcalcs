@@ -767,7 +767,7 @@ $ec_lang['lpn_georef_unavailable']='A ferramenta de posicionamento não carregou
 $ec_lang['lpn_georef_empty']='Desenhe ou abra uma rede primeiro. Ainda não há nada para posicionar.';
 $ec_lang['lpn_georef_on_map']='Este projeto já está em lat/lon.';
 $ec_lang['lpn_georef_done']='Este agora é um projeto lat/lon. Arraste qualquer elemento para movê-lo mais perto de onde ele realmente está.';
-$ec_lang['lpn_georef_confirm']='Posicionar o modelo aqui permanentemente? Você ainda poderá arrastar elementos individuais depois, mas o desenho deixará de ser um projeto XY. Para recuperar o XY, feche este projeto sem salvar.';
+$ec_lang['lpn_georef_confirm']='Posicionar o modelo aqui permanentemente? Você ainda poderá arrastar elementos individuais depois, mas o desenho deixará de ser um projeto xy. Para recuperar o xy, feche este projeto sem salvar.';
 $ec_lang['lpn_georef_rotation_tip']='Quanto girar todo o modelo, no sentido anti-horário, para que o seu norte aponte para o norte.';
 $ec_lang['lpn_georef_rotation']='Girar no sentido anti-horário (graus)';
 $ec_lang['lpn_georef_scale_tip']='Até onde uma unidade do seu desenho alcança no terreno. Um desenho feito em uma malha simples geralmente não diz nada sobre isso, então defina aqui — ou deixe que Ir para… pergunte a largura do local e calcule isso para você.';
@@ -823,10 +823,10 @@ $ec_lang['lpn_georef_step1_hint']='Seu projeto permanece onde está na tela. Des
 $ec_lang['lpn_georef_step2']='Etapa 2 de 2 — fixado';
 $ec_lang['lpn_georef_step1']='Etapa 1 de 2 — solto';
 $ec_lang['lpn_georef_adjust']='Arraste o modelo para movê-lo, arraste um canto para redimensioná-lo, arraste a alça redonda acima do modelo para girá-lo. Ou digite a escala e o giro abaixo.';
-$ec_lang['lpn_georef_intro']='Converter este projeto XY em um projeto geográfico? Seu projeto foi colocado no centro de um mapa mundial. Aplique zoom até seu local e mova, redimensione e gire o modelo o quanto quiser. Quando estiver pronto para começar a ajustar os elementos, pressione Manter este posicionamento.';
-$ec_lang['lpn_georef_tip']='De uma malha local para o mundo real. Coloca um desenho feito na malha XY em coordenadas geográficas, para que fique sobre o mapa de ruas no lugar certo. Cada número que você digitou permanece como está — apenas o X e o Y se tornam uma longitude e uma latitude.';
+$ec_lang['lpn_georef_intro']='Converter este projeto xy em um projeto geográfico? Seu projeto foi colocado no centro de um mapa mundial. Aplique zoom até seu local e mova, redimensione e gire o modelo o quanto quiser. Quando estiver pronto para começar a ajustar os elementos, pressione Manter este posicionamento.';
+$ec_lang['lpn_georef_tip']='De uma malha local para o mundo real. Coloca um desenho feito na malha xy em coordenadas geográficas, para que fique sobre o mapa de ruas no lugar certo. Cada número que você digitou permanece como está — apenas o X e o Y se tornam uma longitude e uma latitude.';
 $ec_lang['lpn_georef_menu']='Converter para lat/lon…';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_geomap']='lat/lon';
 $ec_lang['lpn_basemap_tip']='Imagens de mapa de ruas do OpenStreetMap, obtidas pela internet enquanto você se desloca e aplica zoom. Sua rede é desenhada esteja o mapa de ruas visível ou não.';
 $ec_lang['lpn_basemap_hide']='Ocultar mapa de ruas';
@@ -891,8 +891,8 @@ $ec_lang['lpn_file_new']='Novo projeto…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Projeto XY em branco, unidades dos EUA (gpm)';
-$ec_lang['lpn_new_blank_si']='Projeto XY em branco, unidades SI (l/s)';
+$ec_lang['lpn_new_blank_us']='Projeto xy em branco, unidades dos EUA (gpm)';
+$ec_lang['lpn_new_blank_si']='Projeto xy em branco, unidades SI (l/s)';
 $ec_lang['lpn_new_geo_si']='Projeto lat/lon em branco, unidades SI (l/s)';
 $ec_lang['lpn_new_geo_us']='Projeto lat/lon em branco, unidades dos EUA (gpm)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water

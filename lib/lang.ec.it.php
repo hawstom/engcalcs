@@ -754,8 +754,8 @@ $ec_lang['lpn_file_new']='Nuovo progetto…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Progetto XY vuoto, unità USA (gpm)';
-$ec_lang['lpn_new_blank_si']='Progetto XY vuoto, unità SI (l/s)';
+$ec_lang['lpn_new_blank_us']='Progetto xy vuoto, unità USA (gpm)';
+$ec_lang['lpn_new_blank_si']='Progetto xy vuoto, unità SI (l/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Apri…';
@@ -1257,10 +1257,10 @@ $ec_lang['lpn_basemap_show']='Mostra mappa stradale';
 $ec_lang['lpn_basemap_hide']='Nascondi mappa stradale';
 $ec_lang['lpn_basemap_tip']='Immagini della mappa stradale da OpenStreetMap, scaricate da internet mentre sposti e ingrandisci la vista. La tua rete viene disegnata sia che la mappa stradale sia visibile sia che non lo sia.';
 $ec_lang['lpn_geomap']='lat/lon';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_georef_menu']='Converti in lat/lon…';
-$ec_lang['lpn_georef_tip']='Da una griglia locale al mondo reale. Colloca un disegno fatto sulla griglia XY su coordinate geografiche, così si posiziona sulla mappa stradale dove appartiene. Ogni numero che hai digitato resta com\'è: solo la X e la Y diventano una longitudine e una latitudine.';
-$ec_lang['lpn_georef_intro']='Convertire questo progetto XY in un progetto geografico? Il tuo progetto è stato collocato al centro di una mappa del mondo. Ingrandisci fino alla tua posizione e sposta, ridimensiona e ruota il modello quanto vuoi. Quando sei pronto a iniziare a modificare gli elementi, premi Mantieni questo posizionamento.';
+$ec_lang['lpn_georef_tip']='Da una griglia locale al mondo reale. Colloca un disegno fatto sulla griglia xy su coordinate geografiche, così si posiziona sulla mappa stradale dove appartiene. Ogni numero che hai digitato resta com\'è: solo la X e la Y diventano una longitudine e una latitudine.';
+$ec_lang['lpn_georef_intro']='Convertire questo progetto xy in un progetto geografico? Il tuo progetto è stato collocato al centro di una mappa del mondo. Ingrandisci fino alla tua posizione e sposta, ridimensiona e ruota il modello quanto vuoi. Quando sei pronto a iniziare a modificare gli elementi, premi Mantieni questo posizionamento.';
 $ec_lang['lpn_georef_adjust']='Trascina il modello per spostarlo, trascina un angolo per ridimensionarlo, trascina la maniglia rotonda sopra il modello per ruotarlo. Oppure digita la scala e la rotazione qui sotto.';
 $ec_lang['lpn_georef_step1']='Passaggio 1 di 2 — scollegato';
 $ec_lang['lpn_georef_step2']='Passaggio 2 di 2 — collegato';
@@ -1309,7 +1309,7 @@ $ec_lang['lpn_georef_scale']='Distanza sul terreno per unità di disegno';
 $ec_lang['lpn_georef_scale_tip']='Quanto lontano arriva sul terreno un\'unità del tuo disegno. Un disegno fatto su una griglia semplice di solito non dice nulla su questo, quindi impostalo qui — oppure lascia che Vai a… ti chieda quanto è largo il sito e lo calcoli lui.';
 $ec_lang['lpn_georef_rotation']='Rotazione antioraria (gradi)';
 $ec_lang['lpn_georef_rotation_tip']='Di quanto ruotare l\'intero modello, in senso antiorario, affinché il suo nord punti verso nord.';
-$ec_lang['lpn_georef_confirm']='Collocare il modello qui in modo permanente? Potrai ancora trascinare i singoli elementi in seguito, ma il disegno smette di essere un progetto XY. Per riavere l\'XY, chiudi questo progetto senza salvare.';
+$ec_lang['lpn_georef_confirm']='Collocare il modello qui in modo permanente? Potrai ancora trascinare i singoli elementi in seguito, ma il disegno smette di essere un progetto xy. Per riavere l\'xy, chiudi questo progetto senza salvare.';
 $ec_lang['lpn_georef_done']='Ora questo è un progetto lat/lon. Trascina un qualsiasi elemento per avvicinarlo a dove si trova realmente.';
 $ec_lang['lpn_georef_on_map']='Questo progetto è già su lat/lon.';
 $ec_lang['lpn_georef_empty']='Disegna o apri prima una rete. Non c\'è ancora nulla da collocare.';

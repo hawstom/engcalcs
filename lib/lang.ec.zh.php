@@ -754,8 +754,8 @@ $ec_lang['lpn_file_new']='新建项目…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='空白 XY 项目，美制单位（gpm）';
-$ec_lang['lpn_new_blank_si']='空白 XY 项目，国际单位制（L/s）';
+$ec_lang['lpn_new_blank_us']='空白 xy 项目，美制单位（gpm）';
+$ec_lang['lpn_new_blank_si']='空白 xy 项目，国际单位制（L/s）';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='打开…';
@@ -1259,10 +1259,10 @@ $ec_lang['lpn_basemap_show']='显示街道地图';
 $ec_lang['lpn_basemap_hide']='隐藏街道地图';
 $ec_lang['lpn_basemap_tip']='来自 OpenStreetMap 的街道地图影像，会在您平移和缩放时通过互联网获取。无论街道地图是否显示，您的管网都会照常绘制。';
 $ec_lang['lpn_geomap']='经纬度';
-$ec_lang['lpn_xymap']='XY 坐标';
+$ec_lang['lpn_xymap']='xy 坐标';
 $ec_lang['lpn_georef_menu']='转换为经纬度…';
-$ec_lang['lpn_georef_tip']='从本地网格转换到真实世界。将在 XY 网格上绘制的图形转换为地理坐标，使其准确落在街道地图上的相应位置。您输入的每个数字都保持不变——只有 X 和 Y 会变成经度和纬度。';
-$ec_lang['lpn_georef_intro']='将此 XY 项目转换为地理项目？您的项目已被放置在世界地图的中心。请缩放到您所在的位置，并按需移动、缩放和旋转模型。准备好开始调整元件时，请点击"保留此位置"。';
+$ec_lang['lpn_georef_tip']='从本地网格转换到真实世界。将在 xy 网格上绘制的图形转换为地理坐标，使其准确落在街道地图上的相应位置。您输入的每个数字都保持不变——只有 X 和 Y 会变成经度和纬度。';
+$ec_lang['lpn_georef_intro']='将此 xy 项目转换为地理项目？您的项目已被放置在世界地图的中心。请缩放到您所在的位置，并按需移动、缩放和旋转模型。准备好开始调整元件时，请点击"保留此位置"。';
 $ec_lang['lpn_georef_adjust']='拖动模型可移动它，拖动一角可调整其大小，拖动模型上方的圆形手柄可旋转它。也可以在下方直接输入比例和旋转角度。';
 $ec_lang['lpn_georef_step1']='第 1 步（共 2 步）——未固定';
 $ec_lang['lpn_georef_step2']='第 2 步（共 2 步）——已固定';
@@ -1313,7 +1313,7 @@ $ec_lang['lpn_georef_scale']='每绘图单位对应的地面距离';
 $ec_lang['lpn_georef_scale_tip']='您绘图上的一个单位在地面上对应多远的距离。在普通网格上绘制的图纸通常不带有这个信息，因此请在此处设置——也可以让"前往…"询问场地宽度，由系统计算出来。';
 $ec_lang['lpn_georef_rotation']='逆时针旋转角度（度）';
 $ec_lang['lpn_georef_rotation_tip']='整个模型需要逆时针旋转多少度，才能使其北向正对正北。';
-$ec_lang['lpn_georef_confirm']='要永久将模型放置在此处吗？之后您仍可以拖动单个元件，但该图纸将不再是 XY 项目。如需恢复为 XY，请在不保存的情况下关闭本项目。';
+$ec_lang['lpn_georef_confirm']='要永久将模型放置在此处吗？之后您仍可以拖动单个元件，但该图纸将不再是 xy 项目。如需恢复为 xy，请在不保存的情况下关闭本项目。';
 $ec_lang['lpn_georef_done']='此项目现在是经纬度项目。拖动任意元件，可将其移动到更接近实际位置的地方。';
 $ec_lang['lpn_georef_on_map']='此项目已经处于经纬度状态。';
 $ec_lang['lpn_georef_empty']='请先绘制或打开一个管网。目前没有可放置的内容。';

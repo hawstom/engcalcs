@@ -755,8 +755,8 @@ $ec_lang['lpn_file_new']='Mradi Mpya…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Mradi tupu wa XY, vitengo vya US (gpm)';
-$ec_lang['lpn_new_blank_si']='Mradi tupu wa XY, vitengo vya SI (L/s)';
+$ec_lang['lpn_new_blank_us']='Mradi tupu wa xy, vitengo vya US (gpm)';
+$ec_lang['lpn_new_blank_si']='Mradi tupu wa xy, vitengo vya SI (L/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Fungua…';
@@ -1279,10 +1279,10 @@ $ec_lang['lpn_basemap_show']='Onyesha ramani ya barabara';
 $ec_lang['lpn_basemap_hide']='Ficha ramani ya barabara';
 $ec_lang['lpn_basemap_tip']='Picha za ramani ya barabara kutoka OpenStreetMap, zinazopakuliwa kwa intaneti unaposogeza na kukuza ramani. Mtandao wako huchorwa iwe ramani ya barabara inaonekana au la.';
 $ec_lang['lpn_geomap']='lat/lon';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_georef_menu']='Badilisha kuwa lat/lon…';
-$ec_lang['lpn_georef_tip']='Kutoka gridi ya eneo hadi ulimwengu halisi. Weka mchoro uliochorwa kwenye gridi ya XY kwenye kuratibu za kijiografia, ili ukae kwenye ramani ya barabara mahali unapostahili. Kila namba uliyoandika inabaki jinsi ilivyo — X na Y pekee ndizo zinakuwa longitudo na latitudo.';
-$ec_lang['lpn_georef_intro']='Badilisha mradi huu wa XY kuwa mradi wa kijiografia? Mradi wako umewekwa katikati ya ramani ya dunia. Kuza hadi eneo lako kisha uhamishe, ubadilishe ukubwa, na uzungushe mchoro kadri unavyotaka. Ukiwa tayari kuanza kurekebisha vipengele, bofya Weka mahali hapa.';
+$ec_lang['lpn_georef_tip']='Kutoka gridi ya eneo hadi ulimwengu halisi. Weka mchoro uliochorwa kwenye gridi ya xy kwenye kuratibu za kijiografia, ili ukae kwenye ramani ya barabara mahali unapostahili. Kila namba uliyoandika inabaki jinsi ilivyo — X na Y pekee ndizo zinakuwa longitudo na latitudo.';
+$ec_lang['lpn_georef_intro']='Badilisha mradi huu wa xy kuwa mradi wa kijiografia? Mradi wako umewekwa katikati ya ramani ya dunia. Kuza hadi eneo lako kisha uhamishe, ubadilishe ukubwa, na uzungushe mchoro kadri unavyotaka. Ukiwa tayari kuanza kurekebisha vipengele, bofya Weka mahali hapa.';
 $ec_lang['lpn_georef_adjust']='Buruta mchoro ili kuuhamisha, buruta kona ili kubadilisha ukubwa wake, buruta kishikizo cha duara juu ya mchoro ili kuuzungusha. Au andika kipimo na pembe ya mzunguko hapa chini.';
 $ec_lang['lpn_georef_step1']='Hatua 1 ya 2 — hujaunganishwa';
 $ec_lang['lpn_georef_step2']='Hatua 2 ya 2 — imeunganishwa';
@@ -1333,7 +1333,7 @@ $ec_lang['lpn_georef_scale']='Umbali wa ardhini kwa kila kitengo cha mchoro';
 $ec_lang['lpn_georef_scale_tip']='Umbali unaofikiwa ardhini na kitengo kimoja cha mchoro wako. Mchoro uliochorwa kwenye gridi wazi kwa kawaida hausemi lolote kuhusu hili, hivyo kipange hapa — au acha Nenda kwa… kukuuliza upana wa eneo na kukikokotoa.';
 $ec_lang['lpn_georef_rotation']='Zungusha kinyume cha saa (nyuzi)';
 $ec_lang['lpn_georef_rotation_tip']='Ni kiasi gani cha kuzungusha mchoro wote, kinyume cha saa, ili kaskazini yake ielekeze kaskazini.';
-$ec_lang['lpn_georef_confirm']='Weka mchoro hapa kabisa? Bado utaweza kuburuta vipengele mmoja mmoja baadaye, lakini mchoro utaacha kuwa mradi wa XY. Ili kurudisha XY, funga mradi huu bila kuhifadhi.';
+$ec_lang['lpn_georef_confirm']='Weka mchoro hapa kabisa? Bado utaweza kuburuta vipengele mmoja mmoja baadaye, lakini mchoro utaacha kuwa mradi wa xy. Ili kurudisha xy, funga mradi huu bila kuhifadhi.';
 $ec_lang['lpn_georef_done']='Huu sasa ni mradi wa lat/lon. Buruta kipengele chochote ili kukisogeza karibu na mahali kilipo halisi.';
 $ec_lang['lpn_georef_on_map']='Mradi huu tayari upo kwenye lat/lon.';
 $ec_lang['lpn_georef_empty']='Chora au fungua mtandao kwanza. Hakuna kitu cha kuweka bado.';

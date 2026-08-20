@@ -755,8 +755,8 @@ $ec_lang['lpn_file_new']='مشروع جديد…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='مشروع XY فارغ، وحدات أمريكية (gpm)';
-$ec_lang['lpn_new_blank_si']='مشروع XY فارغ، وحدات النظام الدولي (l/s)';
+$ec_lang['lpn_new_blank_us']='مشروع xy فارغ، وحدات أمريكية (gpm)';
+$ec_lang['lpn_new_blank_si']='مشروع xy فارغ، وحدات النظام الدولي (l/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='فتح…';
@@ -1261,10 +1261,10 @@ $ec_lang['lpn_basemap_show']='إظهار خريطة الشوارع';
 $ec_lang['lpn_basemap_hide']='إخفاء خريطة الشوارع';
 $ec_lang['lpn_basemap_tip']='صور خريطة الشوارع من OpenStreetMap، تُجلب عبر الإنترنت أثناء التحريك والتقريب. تُرسم شبكتك سواء ظهرت خريطة الشوارع أم لا.';
 $ec_lang['lpn_geomap']='جغرافي';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_georef_menu']='التحويل إلى إحداثيات جغرافية…';
-$ec_lang['lpn_georef_tip']='من شبكة محلية إلى العالم الحقيقي. يضع رسماً أُنشئ على شبكة XY في إحداثيات جغرافية، بحيث يستقر على خريطة الشوارع في مكانه الصحيح. يبقى كل رقم أدخلته كما هو — يتغيّر فقط X وY إلى خط طول وخط عرض.';
-$ec_lang['lpn_georef_intro']='هل تريد تحويل مشروع XY هذا إلى مشروع جغرافي؟ وُضع مشروعك في مركز خريطة العالم. قرّب إلى موقعك، وحرّك النموذج وغيّر حجمه ودوّره كما تشاء. عندما تصبح جاهزاً لبدء ضبط العناصر، اضغط "احتفظ بهذا الوضع".';
+$ec_lang['lpn_georef_tip']='من شبكة محلية إلى العالم الحقيقي. يضع رسماً أُنشئ على شبكة xy في إحداثيات جغرافية، بحيث يستقر على خريطة الشوارع في مكانه الصحيح. يبقى كل رقم أدخلته كما هو — يتغيّر فقط X وY إلى خط طول وخط عرض.';
+$ec_lang['lpn_georef_intro']='هل تريد تحويل مشروع xy هذا إلى مشروع جغرافي؟ وُضع مشروعك في مركز خريطة العالم. قرّب إلى موقعك، وحرّك النموذج وغيّر حجمه ودوّره كما تشاء. عندما تصبح جاهزاً لبدء ضبط العناصر، اضغط "احتفظ بهذا الوضع".';
 $ec_lang['lpn_georef_adjust']='اسحب النموذج لتحريكه، اسحب زاوية لتغيير حجمه، اسحب المقبض الدائري أعلى النموذج لتدويره. أو اكتب المقياس والدوران أدناه.';
 $ec_lang['lpn_georef_step1']='الخطوة 1 من 2 — منفصل';
 $ec_lang['lpn_georef_step2']='الخطوة 2 من 2 — متصل';
@@ -1315,7 +1315,7 @@ $ec_lang['lpn_georef_scale']='المسافة الأرضية لكل وحدة رس
 $ec_lang['lpn_georef_scale_tip']='إلى أي مدى تمتد وحدة واحدة من رسمك على الأرض. الرسم على شبكة عادية عادة لا يذكر شيئاً عن هذا، فاضبطه هنا — أو دع "الانتقال إلى…" يسألك عن عرض الموقع ويحسبه.';
 $ec_lang['lpn_georef_rotation']='الدوران عكس عقارب الساعة (بالدرجات)';
 $ec_lang['lpn_georef_rotation_tip']='مقدار دوران النموذج كله، عكس عقارب الساعة، بحيث يشير شماله إلى الشمال.';
-$ec_lang['lpn_georef_confirm']='هل تريد وضع النموذج هنا بشكل دائم؟ ما زال بإمكانك سحب عناصر منفردة بعد ذلك، لكن الرسم يتوقف عن كونه مشروع XY. لاستعادة XY، أغلق هذا المشروع دون حفظ.';
+$ec_lang['lpn_georef_confirm']='هل تريد وضع النموذج هنا بشكل دائم؟ ما زال بإمكانك سحب عناصر منفردة بعد ذلك، لكن الرسم يتوقف عن كونه مشروع xy. لاستعادة xy، أغلق هذا المشروع دون حفظ.';
 $ec_lang['lpn_georef_done']='هذا الآن مشروع جغرافي. اسحب أي عنصر لتقريبه من موقعه الحقيقي.';
 $ec_lang['lpn_georef_on_map']='هذا المشروع جغرافي بالفعل.';
 $ec_lang['lpn_georef_empty']='ارسم شبكة أو افتح واحدة أولاً. لا يوجد شيء لوضعه بعد.';

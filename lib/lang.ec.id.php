@@ -725,8 +725,8 @@ $ec_lang['lpn_file_new']='Proyek baru…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Proyek XY kosong, satuan AS (gpm)';
-$ec_lang['lpn_new_blank_si']='Proyek XY kosong, satuan SI (L/s)';
+$ec_lang['lpn_new_blank_us']='Proyek xy kosong, satuan AS (gpm)';
+$ec_lang['lpn_new_blank_si']='Proyek xy kosong, satuan SI (L/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Buka…';
@@ -1263,10 +1263,10 @@ $ec_lang['lpn_basemap_show']='Tampilkan peta jalan';
 $ec_lang['lpn_basemap_hide']='Sembunyikan peta jalan';
 $ec_lang['lpn_basemap_tip']='Citra peta jalan dari OpenStreetMap, diambil lewat internet saat Anda menggeser dan memperbesar peta. Jaringan Anda tetap digambar baik peta jalan ditampilkan atau tidak.';
 $ec_lang['lpn_geomap']='lat/lon';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_georef_menu']='Ubah ke lat/lon…';
-$ec_lang['lpn_georef_tip']='Dari kisi lokal ke dunia nyata. Menempatkan gambar yang dibuat pada kisi XY ke koordinat geografis, sehingga berada di peta jalan pada tempatnya yang sebenarnya. Setiap angka yang Anda ketik tetap seperti semula — hanya X dan Y yang berubah menjadi garis bujur dan garis lintang.';
-$ec_lang['lpn_georef_intro']='Ubah proyek XY ini menjadi proyek geografis? Proyek Anda telah ditempatkan di tengah peta dunia. Perbesar ke lokasi Anda, lalu geser, ubah ukuran, dan putar model sesuka Anda. Jika sudah siap mulai menyesuaikan elemen, tekan Simpan penempatan ini.';
+$ec_lang['lpn_georef_tip']='Dari kisi lokal ke dunia nyata. Menempatkan gambar yang dibuat pada kisi xy ke koordinat geografis, sehingga berada di peta jalan pada tempatnya yang sebenarnya. Setiap angka yang Anda ketik tetap seperti semula — hanya X dan Y yang berubah menjadi garis bujur dan garis lintang.';
+$ec_lang['lpn_georef_intro']='Ubah proyek xy ini menjadi proyek geografis? Proyek Anda telah ditempatkan di tengah peta dunia. Perbesar ke lokasi Anda, lalu geser, ubah ukuran, dan putar model sesuka Anda. Jika sudah siap mulai menyesuaikan elemen, tekan Simpan penempatan ini.';
 $ec_lang['lpn_georef_adjust']='Seret model untuk memindahkannya, seret sudutnya untuk mengubah ukurannya, seret gagang bulat di atas model untuk memutarnya. Atau ketik skala dan putaran di bawah.';
 $ec_lang['lpn_georef_step1']='Langkah 1 dari 2 — terlepas';
 $ec_lang['lpn_georef_step2']='Langkah 2 dari 2 — terpasang';
@@ -1315,7 +1315,7 @@ $ec_lang['lpn_georef_scale']='Jarak di lapangan per satuan gambar';
 $ec_lang['lpn_georef_scale_tip']='Seberapa jauh satu satuan gambar Anda mencakup di lapangan. Gambar yang dibuat pada kisi polos biasanya tidak menyatakan hal ini, jadi atur di sini — atau biarkan Pergi ke… menanyakan lebar lokasi dan menghitungnya untuk Anda.';
 $ec_lang['lpn_georef_rotation']='Putar berlawanan arah jarum jam (derajat)';
 $ec_lang['lpn_georef_rotation_tip']='Seberapa jauh memutar seluruh model, berlawanan arah jarum jam, agar arah utaranya menunjuk ke utara sebenarnya.';
-$ec_lang['lpn_georef_confirm']='Tempatkan model di sini secara permanen? Anda masih dapat menyeret elemen satu per satu setelahnya, tetapi gambar ini berhenti menjadi proyek XY. Untuk mengembalikan XY, tutup proyek ini tanpa menyimpan.';
+$ec_lang['lpn_georef_confirm']='Tempatkan model di sini secara permanen? Anda masih dapat menyeret elemen satu per satu setelahnya, tetapi gambar ini berhenti menjadi proyek xy. Untuk mengembalikan xy, tutup proyek ini tanpa menyimpan.';
 $ec_lang['lpn_georef_done']='Ini sekarang adalah proyek lat/lon. Seret elemen mana pun untuk memindahkannya lebih dekat ke posisi sebenarnya.';
 $ec_lang['lpn_georef_on_map']='Proyek ini sudah dalam lat/lon.';
 $ec_lang['lpn_georef_empty']='Gambar atau buka jaringan terlebih dahulu. Belum ada yang bisa ditempatkan.';

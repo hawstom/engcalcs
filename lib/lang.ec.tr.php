@@ -767,8 +767,8 @@ $ec_lang['lpn_file_new']='Yeni proje…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Boş XY projesi, ABD birimleri (gpm)';
-$ec_lang['lpn_new_blank_si']='Boş XY projesi, SI birimleri (L/s)';
+$ec_lang['lpn_new_blank_us']='Boş xy projesi, ABD birimleri (gpm)';
+$ec_lang['lpn_new_blank_si']='Boş xy projesi, SI birimleri (L/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Aç…';
@@ -1262,10 +1262,10 @@ $ec_lang['lpn_basemap_show']='Sokak haritasını göster';
 $ec_lang['lpn_basemap_hide']='Sokak haritasını gizle';
 $ec_lang['lpn_basemap_tip']='OpenStreetMap\'ten sokak haritası görüntüleri, kaydırıp yakınlaştırdıkça internetten alınır. Şebekeniz, sokak haritası gösterilsin ya da gösterilmesin çizilir.';
 $ec_lang['lpn_geomap']='enlem/boylam';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_georef_menu']='Enlem/boylama dönüştür…';
-$ec_lang['lpn_georef_tip']='Yerel bir ızgaradan gerçek dünyaya. XY ızgarasında yapılan bir çizimi coğrafi koordinatlara yerleştirir, böylece sokak haritasında ait olduğu yere oturur. Yazdığınız her sayı olduğu gibi kalır — yalnızca X ve Y bir boylam ve enlem hâline gelir.';
-$ec_lang['lpn_georef_intro']='Bu XY projesi coğrafi bir projeye dönüştürülsün mü? Projeniz bir dünya haritasının ortasına yerleştirildi. Konumunuza yakınlaştırın ve modeli istediğiniz kadar taşıyın, yeniden boyutlandırın ve döndürün. Öğeleri ayarlamaya başlamaya hazır olduğunuzda, Bu yerleşimi koru\'ya basın.';
+$ec_lang['lpn_georef_tip']='Yerel bir ızgaradan gerçek dünyaya. xy ızgarasında yapılan bir çizimi coğrafi koordinatlara yerleştirir, böylece sokak haritasında ait olduğu yere oturur. Yazdığınız her sayı olduğu gibi kalır — yalnızca X ve Y bir boylam ve enlem hâline gelir.';
+$ec_lang['lpn_georef_intro']='Bu xy projesi coğrafi bir projeye dönüştürülsün mü? Projeniz bir dünya haritasının ortasına yerleştirildi. Konumunuza yakınlaştırın ve modeli istediğiniz kadar taşıyın, yeniden boyutlandırın ve döndürün. Öğeleri ayarlamaya başlamaya hazır olduğunuzda, Bu yerleşimi koru\'ya basın.';
 $ec_lang['lpn_georef_adjust']='Taşımak için modeli sürükleyin, yeniden boyutlandırmak için bir köşeyi sürükleyin, döndürmek için modelin üstündeki yuvarlak tutamacı sürükleyin. Ya da ölçeği ve dönüşü aşağıya yazın.';
 $ec_lang['lpn_georef_step1']='2 adımdan 1\'i — ayrık';
 $ec_lang['lpn_georef_step2']='2 adımdan 2\'si — bağlı';
@@ -1321,7 +1321,7 @@ $ec_lang['lpn_georef_scale']='Çizim birimi başına yer mesafesi';
 $ec_lang['lpn_georef_scale_tip']='Çiziminizin bir biriminin yerde ne kadar uzağa ulaştığı. Düz bir ızgara üzerinde yapılan bir çizim genelde bu konuda bir şey söylemez, bu yüzden burada ayarlayın — ya da Git\'in size sahanın ne kadar geniş olduğunu sorup bunu hesaplamasına izin verin.';
 $ec_lang['lpn_georef_rotation']='Saat yönünün tersine döndür (derece)';
 $ec_lang['lpn_georef_rotation_tip']='Kuzeyi kuzeyi gösterecek şekilde tüm modelin saat yönünün tersine ne kadar döndürüleceği.';
-$ec_lang['lpn_georef_confirm']='Model buraya kalıcı olarak yerleştirilsin mi? Sonrasında yine de tek tek öğeleri sürükleyebilirsiniz, ancak çizim bir XY projesi olmaktan çıkar. XY\'ye geri dönmek için bu projeyi kaydetmeden kapatın.';
+$ec_lang['lpn_georef_confirm']='Model buraya kalıcı olarak yerleştirilsin mi? Sonrasında yine de tek tek öğeleri sürükleyebilirsiniz, ancak çizim bir xy projesi olmaktan çıkar. xy\'ye geri dönmek için bu projeyi kaydetmeden kapatın.';
 $ec_lang['lpn_georef_done']='Bu artık bir enlem/boylam projesi. Herhangi bir öğeyi gerçekte olduğu yere daha yakın taşımak için sürükleyin.';
 $ec_lang['lpn_georef_on_map']='Bu proje zaten enlem/boylam üzerinde.';
 $ec_lang['lpn_georef_empty']='Önce bir şebeke çizin ya da açın. Henüz yerleştirilecek bir şey yok.';

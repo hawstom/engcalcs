@@ -754,8 +754,8 @@ $ec_lang['lpn_file_new']='Nový projekt…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Prázdný projekt XY, americké jednotky (gpm)';
-$ec_lang['lpn_new_blank_si']='Prázdný projekt XY, jednotky SI (l/s)';
+$ec_lang['lpn_new_blank_us']='Prázdný projekt xy, americké jednotky (gpm)';
+$ec_lang['lpn_new_blank_si']='Prázdný projekt xy, jednotky SI (l/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Otevřít…';
@@ -1257,10 +1257,10 @@ $ec_lang['lpn_basemap_show']='Zobrazit mapu ulic';
 $ec_lang['lpn_basemap_hide']='Skrýt mapu ulic';
 $ec_lang['lpn_basemap_tip']='Obrázky mapy ulic z OpenStreetMap, stahované z internetu při posunu a přiblížení. Vaše síť se vykresluje bez ohledu na to, zda je mapa ulic zobrazena.';
 $ec_lang['lpn_geomap']='lat/lon';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_georef_menu']='Převést na lat/lon…';
-$ec_lang['lpn_georef_tip']='Z místní mřížky do skutečného světa. Umístí výkres vytvořený na mřížce XY na zeměpisné souřadnice, aby seděl na mapě ulic tam, kam patří. Každé číslo, které jste zadali, zůstává stejné — mění se pouze X a Y, které se stanou zeměpisnou délkou a šířkou.';
-$ec_lang['lpn_georef_intro']='Převést tento projekt XY na geografický projekt? Váš projekt byl umístěn do středu mapy světa. Přibližte se ke svému místu a model podle potřeby přesuňte, změňte velikost a otočte. Až budete připraveni začít upravovat jednotlivé prvky, stiskněte Ponechat toto umístění.';
+$ec_lang['lpn_georef_tip']='Z místní mřížky do skutečného světa. Umístí výkres vytvořený na mřížce xy na zeměpisné souřadnice, aby seděl na mapě ulic tam, kam patří. Každé číslo, které jste zadali, zůstává stejné — mění se pouze X a Y, které se stanou zeměpisnou délkou a šířkou.';
+$ec_lang['lpn_georef_intro']='Převést tento projekt xy na geografický projekt? Váš projekt byl umístěn do středu mapy světa. Přibližte se ke svému místu a model podle potřeby přesuňte, změňte velikost a otočte. Až budete připraveni začít upravovat jednotlivé prvky, stiskněte Ponechat toto umístění.';
 $ec_lang['lpn_georef_adjust']='Tažením modelu jej přesunete, tažením rohu změníte jeho velikost, tažením kulaté úchytky nad modelem jej otočíte. Nebo níže zadejte měřítko a otočení.';
 $ec_lang['lpn_georef_step1']='Krok 1 z 2 — odpojeno';
 $ec_lang['lpn_georef_step2']='Krok 2 z 2 — připojeno';
@@ -1309,7 +1309,7 @@ $ec_lang['lpn_georef_scale']='Vzdálenost na zemi na jednu jednotku výkresu';
 $ec_lang['lpn_georef_scale_tip']='Jak daleko na zemi sahá jedna jednotka vašeho výkresu. Výkres vytvořený na obyčejné mřížce o tom obvykle nic neříká, takže to nastavte zde — nebo nechte volbu Přejít na…, ať se vás zeptá, jak široké je pracoviště, a spočítá to za vás.';
 $ec_lang['lpn_georef_rotation']='Otočení proti směru hodinových ručiček (stupně)';
 $ec_lang['lpn_georef_rotation_tip']='O kolik otočit celý model proti směru hodinových ručiček, aby jeho sever mířil na sever.';
-$ec_lang['lpn_georef_confirm']='Umístit model sem natrvalo? Jednotlivé prvky pak stále můžete přetahovat, ale výkres přestane být projektem XY. Chcete-li se vrátit k XY, zavřete tento projekt bez uložení.';
+$ec_lang['lpn_georef_confirm']='Umístit model sem natrvalo? Jednotlivé prvky pak stále můžete přetahovat, ale výkres přestane být projektem xy. Chcete-li se vrátit k xy, zavřete tento projekt bez uložení.';
 $ec_lang['lpn_georef_done']='Toto je nyní projekt lat/lon. Přetažením libovolného prvku jej přesunete blíž k jeho skutečné poloze.';
 $ec_lang['lpn_georef_on_map']='Tento projekt je již na lat/lon.';
 $ec_lang['lpn_georef_empty']='Nejprve nakreslete nebo otevřete síť. Zatím není co umístit.';

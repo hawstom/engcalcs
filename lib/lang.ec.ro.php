@@ -815,8 +815,8 @@ $ec_lang['lpn_file_new']='Proiect nou…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Proiect XY gol, unități US (gpm)';
-$ec_lang['lpn_new_blank_si']='Proiect XY gol, unități SI (l/s)';
+$ec_lang['lpn_new_blank_us']='Proiect xy gol, unități US (gpm)';
+$ec_lang['lpn_new_blank_si']='Proiect xy gol, unități SI (l/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Deschidere…';
@@ -1434,10 +1434,10 @@ $ec_lang['lpn_basemap_show']='Afișează harta stradală';
 $ec_lang['lpn_basemap_hide']='Ascunde harta stradală';
 $ec_lang['lpn_basemap_tip']='Imagini de hartă stradală de la OpenStreetMap, preluate prin internet pe măsură ce deplasați și măriți harta. Rețeaua dvs. este desenată indiferent dacă harta stradală este afișată sau nu.';
 $ec_lang['lpn_geomap']='lat/lon';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_georef_menu']='Conversie în lat/lon…';
-$ec_lang['lpn_georef_tip']='De la o grilă locală la lumea reală. Plasează un desen realizat pe grila XY pe coordonate geografice, astfel încât să se așeze pe harta stradală unde îi este locul. Fiecare număr pe care l-ați introdus rămâne așa cum este — doar X și Y devin o longitudine și o latitudine.';
-$ec_lang['lpn_georef_intro']='Convertiți acest proiect XY într-un proiect geografic? Proiectul dvs. a fost plasat în centrul unei hărți a lumii. Măriți spre locația dvs. și mutați, redimensionați și rotiți modelul cât doriți. Când sunteți gata să începeți ajustarea elementelor, apăsați Păstrează acest amplasament.';
+$ec_lang['lpn_georef_tip']='De la o grilă locală la lumea reală. Plasează un desen realizat pe grila xy pe coordonate geografice, astfel încât să se așeze pe harta stradală unde îi este locul. Fiecare număr pe care l-ați introdus rămâne așa cum este — doar X și Y devin o longitudine și o latitudine.';
+$ec_lang['lpn_georef_intro']='Convertiți acest proiect xy într-un proiect geografic? Proiectul dvs. a fost plasat în centrul unei hărți a lumii. Măriți spre locația dvs. și mutați, redimensionați și rotiți modelul cât doriți. Când sunteți gata să începeți ajustarea elementelor, apăsați Păstrează acest amplasament.';
 $ec_lang['lpn_georef_adjust']='Trageți modelul pentru a-l muta, trageți un colț pentru a-l redimensiona, trageți mânerul rotund de deasupra modelului pentru a-l roti. Sau introduceți mai jos scara și rotația.';
 $ec_lang['lpn_georef_step1']='Pasul 1 din 2 — detașat';
 $ec_lang['lpn_georef_step2']='Pasul 2 din 2 — atașat';
@@ -1486,7 +1486,7 @@ $ec_lang['lpn_georef_scale']='Distanța pe teren per unitate de desen';
 $ec_lang['lpn_georef_scale_tip']='Cât de departe ajunge pe teren o unitate din desenul dvs. Un desen realizat pe o grilă simplă de obicei nu spune nimic despre aceasta, deci stabiliți-o aici — sau lăsați Mergi la… să vă întrebe cât de lat este amplasamentul și să o calculeze.';
 $ec_lang['lpn_georef_rotation']='Rotire în sens antiorar (grade)';
 $ec_lang['lpn_georef_rotation_tip']='Cât de mult să rotiți întregul model, în sens antiorar, astfel încât nordul lui să indice nordul.';
-$ec_lang['lpn_georef_confirm']='Plasați modelul aici definitiv? Puteți încă trage elemente individuale ulterior, dar desenul încetează să mai fie un proiect XY. Pentru a reveni la XY, închideți acest proiect fără să îl salvați.';
+$ec_lang['lpn_georef_confirm']='Plasați modelul aici definitiv? Puteți încă trage elemente individuale ulterior, dar desenul încetează să mai fie un proiect xy. Pentru a reveni la xy, închideți acest proiect fără să îl salvați.';
 $ec_lang['lpn_georef_done']='Acesta este acum un proiect lat/lon. Trageți orice element pentru a-l apropia de locul unde se află cu adevărat.';
 $ec_lang['lpn_georef_on_map']='Acest proiect este deja pe lat/lon.';
 $ec_lang['lpn_georef_empty']='Desenați sau deschideți mai întâi o rețea. Nu există încă nimic de plasat.';

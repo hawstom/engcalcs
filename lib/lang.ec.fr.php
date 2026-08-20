@@ -752,10 +752,10 @@ $ec_lang['lpn_basemap_show']='Afficher le fond de carte';
 $ec_lang['lpn_basemap_hide']='Masquer le fond de carte';
 $ec_lang['lpn_basemap_tip']='Images de fond de carte issues d\'OpenStreetMap, récupérées sur Internet au fil de vos déplacements et zooms. Votre réseau est dessiné que le fond de carte soit affiché ou non.';
 $ec_lang['lpn_geomap']='lat/lon';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_georef_menu']='Convertir en lat/lon…';
-$ec_lang['lpn_georef_tip']='D\'une grille locale vers le monde réel. Placez un dessin réalisé sur la grille XY sur des coordonnées géographiques, afin qu\'il se positionne sur le fond de carte à son emplacement réel. Chaque nombre que vous avez saisi reste tel quel — seuls le X et le Y deviennent une longitude et une latitude.';
-$ec_lang['lpn_georef_intro']='Convertir ce projet XY en projet géographique ? Votre projet a été placé au centre d\'une carte du monde. Zoomez sur votre emplacement, puis déplacez, redimensionnez et tournez le modèle autant que vous le souhaitez. Quand vous êtes prêt à commencer à ajuster les éléments, appuyez sur Conserver ce placement.';
+$ec_lang['lpn_georef_tip']='D\'une grille locale vers le monde réel. Placez un dessin réalisé sur la grille xy sur des coordonnées géographiques, afin qu\'il se positionne sur le fond de carte à son emplacement réel. Chaque nombre que vous avez saisi reste tel quel — seuls le X et le Y deviennent une longitude et une latitude.';
+$ec_lang['lpn_georef_intro']='Convertir ce projet xy en projet géographique ? Votre projet a été placé au centre d\'une carte du monde. Zoomez sur votre emplacement, puis déplacez, redimensionnez et tournez le modèle autant que vous le souhaitez. Quand vous êtes prêt à commencer à ajuster les éléments, appuyez sur Conserver ce placement.';
 $ec_lang['lpn_georef_adjust']='Faites glisser le modèle pour le déplacer, faites glisser un coin pour le redimensionner, faites glisser la poignée ronde au-dessus du modèle pour le tourner. Ou saisissez l\'échelle et la rotation ci-dessous.';
 $ec_lang['lpn_georef_step1']='Étape 1 sur 2 — détaché';
 $ec_lang['lpn_georef_step2']='Étape 2 sur 2 — attaché';
@@ -804,7 +804,7 @@ $ec_lang['lpn_georef_scale']='Distance au sol par unité de dessin';
 $ec_lang['lpn_georef_scale_tip']='La distance au sol que couvre une unité de votre dessin. Un dessin réalisé sur une grille simple ne le précise généralement pas ; définissez-le ici, ou laissez Aller à… vous demander la largeur du site pour le calculer.';
 $ec_lang['lpn_georef_rotation']='Rotation antihoraire (degrés)';
 $ec_lang['lpn_georef_rotation_tip']='De combien tourner tout le modèle, dans le sens antihoraire, pour que son nord pointe vers le nord.';
-$ec_lang['lpn_georef_confirm']='Placer le modèle ici de façon définitive ? Vous pourrez encore déplacer des éléments un par un ensuite, mais le dessin cessera d\'être un projet XY. Pour retrouver le mode XY, fermez ce projet sans l\'enregistrer.';
+$ec_lang['lpn_georef_confirm']='Placer le modèle ici de façon définitive ? Vous pourrez encore déplacer des éléments un par un ensuite, mais le dessin cessera d\'être un projet xy. Pour retrouver le mode xy, fermez ce projet sans l\'enregistrer.';
 $ec_lang['lpn_georef_done']='Ce projet est maintenant en lat/lon. Faites glisser un élément pour le rapprocher de son emplacement réel.';
 $ec_lang['lpn_georef_on_map']='Ce projet est déjà en lat/lon.';
 $ec_lang['lpn_georef_empty']='Dessinez ou ouvrez d\'abord un réseau. Il n\'y a encore rien à placer.';
@@ -884,8 +884,8 @@ $ec_lang['lpn_file_new']='Nouveau projet…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Projet XY vierge, unités américaines (gpm)';
-$ec_lang['lpn_new_blank_si']='Projet XY vierge, unités SI (l/s)';
+$ec_lang['lpn_new_blank_us']='Projet xy vierge, unités américaines (gpm)';
+$ec_lang['lpn_new_blank_si']='Projet xy vierge, unités SI (l/s)';
 $ec_lang['lpn_new_geo_us']='Projet vierge lat/lon, unités américaines (gpm)';
 $ec_lang['lpn_new_geo_si']='Projet vierge lat/lon, unités SI (l/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water

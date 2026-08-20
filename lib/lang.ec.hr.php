@@ -753,8 +753,8 @@ $ec_lang['lpn_file_new']='Novi projekt…';
 // File > New project's submenu (Task 264). `lpn_tool_example` ("Draw example network") was RETIRED
 // with the toolbar button of that name -- an example is a whole network, so it starts a project
 // rather than being drawn into the one you are in.
-$ec_lang['lpn_new_blank_us']='Prazan XY projekt, američke jedinice (gpm)';
-$ec_lang['lpn_new_blank_si']='Prazan XY projekt, SI jedinice (L/s)';
+$ec_lang['lpn_new_blank_us']='Prazan xy projekt, američke jedinice (gpm)';
+$ec_lang['lpn_new_blank_si']='Prazan xy projekt, SI jedinice (L/s)';
 // The flow unit is IN the label, not left implied by "US"/"SI": gpm and l/s are what a water
 // engineer recognises at a glance, and this is the moment the choice is being made.
 $ec_lang['lpn_file_open']='Otvori…';
@@ -1256,10 +1256,10 @@ $ec_lang['lpn_basemap_show']='Prikaži kartu ulica';
 $ec_lang['lpn_basemap_hide']='Sakrij kartu ulica';
 $ec_lang['lpn_basemap_tip']='Slike karte ulica s OpenStreetMapa, dohvaćene preko interneta dok pomičete i zumirate kartu. Vaša mreža je nacrtana bez obzira prikazuje li se karta ulica ili ne.';
 $ec_lang['lpn_geomap']='lat/lon';
-$ec_lang['lpn_xymap']='XY';
+$ec_lang['lpn_xymap']='xy';
 $ec_lang['lpn_georef_menu']='Pretvori u lat/lon…';
-$ec_lang['lpn_georef_tip']='Iz lokalne mreže (rešetke) u stvarni svijet. Postavite crtež napravljen na XY mreži na geografske koordinate, tako da se nalazi na karti ulica tamo gdje pripada. Svaki broj koji ste upisali ostaje kakav jest — samo X i Y postaju zemljopisna dužina i širina.';
-$ec_lang['lpn_georef_intro']='Pretvoriti ovaj XY projekt u geografski projekt? Vaš projekt je postavljen u središte karte svijeta. Zumirajte do svoje lokacije te pomičite, mijenjajte veličinu i okrećite model koliko god želite. Kada budete spremni započeti prilagođavanje elemenata, pritisnite Zadrži ovaj položaj.';
+$ec_lang['lpn_georef_tip']='Iz lokalne mreže (rešetke) u stvarni svijet. Postavite crtež napravljen na xy mreži na geografske koordinate, tako da se nalazi na karti ulica tamo gdje pripada. Svaki broj koji ste upisali ostaje kakav jest — samo X i Y postaju zemljopisna dužina i širina.';
+$ec_lang['lpn_georef_intro']='Pretvoriti ovaj xy projekt u geografski projekt? Vaš projekt je postavljen u središte karte svijeta. Zumirajte do svoje lokacije te pomičite, mijenjajte veličinu i okrećite model koliko god želite. Kada budete spremni započeti prilagođavanje elemenata, pritisnite Zadrži ovaj položaj.';
 $ec_lang['lpn_georef_adjust']='Povucite model da ga pomaknete, povucite kut da mu promijenite veličinu, povucite okruglu ručku iznad modela da ga okrenete. Ili upišite mjerilo i kut okretanja ispod.';
 $ec_lang['lpn_georef_step1']='Korak 1 od 2 — odvojeno';
 $ec_lang['lpn_georef_step2']='Korak 2 od 2 — pričvršćeno';
@@ -1308,7 +1308,7 @@ $ec_lang['lpn_georef_scale']='Udaljenost na terenu po jedinici crteža';
 $ec_lang['lpn_georef_scale_tip']='Koliko daleko na terenu doseže jedna jedinica vašeg crteža. Crtež napravljen na običnoj mreži obično o ovome ništa ne govori, pa to postavite ovdje — ili neka vas Idi na… pita koliko je gradilište široko i sam to izračuna.';
 $ec_lang['lpn_georef_rotation']='Zakret suprotno od kazaljke na satu (stupnjevi)';
 $ec_lang['lpn_georef_rotation_tip']='Koliko zakrenuti cijeli model, suprotno od kazaljke na satu, tako da njegov sjever pokazuje prema sjeveru.';
-$ec_lang['lpn_georef_confirm']='Trajno postaviti model ovdje? Pojedinačne elemente i dalje možete povlačiti naknadno, ali crtež prestaje biti XY projekt. Da biste dobili XY natrag, zatvorite ovaj projekt bez spremanja.';
+$ec_lang['lpn_georef_confirm']='Trajno postaviti model ovdje? Pojedinačne elemente i dalje možete povlačiti naknadno, ali crtež prestaje biti xy projekt. Da biste dobili xy natrag, zatvorite ovaj projekt bez spremanja.';
 $ec_lang['lpn_georef_done']='Ovo je sada lat/lon projekt. Povucite bilo koji element da ga pomaknete bliže mjestu gdje se stvarno nalazi.';
 $ec_lang['lpn_georef_on_map']='Ovaj projekt je već na lat/lon.';
 $ec_lang['lpn_georef_empty']='Prvo nacrtajte ili otvorite mrežu. Još nema ničega za postaviti.';
