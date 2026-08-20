@@ -136,19 +136,11 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   be) or debt to delete; only Tom can say which. Recorded so far only inside closed Task 290, where
   nothing re-scans it.
 
-- 65|438| **The next sprint: resync the drifted English and translate 2026-08-18's new keys.** Needs
-  Tom's explicit authorization before launch — a sprint is 26 paid agents, 20 concurrent.
-  - **What is in it:** 18 CHANGED + 8 NEW as of 2026-08-19 — Task 405's four resync keys;
-    `lpn_time_format_tip` (Task 449); the 17 Wave 0 rewrote; the two Net3-World gallery keys;
-    `menu_more` ("More" → "Help"); the four XY / lat/lon
-    re-wordings (`lpn_new_geo_us/si`, `lpn_new_blank_us/si`); and roughly thirty new keys from the
-    placement tool, Go-to-coordinate, clean map, the `.inp` clock and the share affordance.
-  - **Gate: the adversarial Wave 0 over the NEW and CHANGED strings only** —
-    `dev/english-friction/438-wave0.json`. `friction_check.php --sprint=438-wave0` must exit 0 (the
-    log is named for the wave, and a bare `--sprint=438` exits 2), along with
-    `gloss_ref_check.php` and `generate_translation_payloads.php --check`.
-  - Close it with `detect_english_drift.php --baseline-new`, or the new keys stay `NEW` forever.
-
+- 45|459| **The next sprint's contents, already earned.** Six English strings changed after sprint 438
+  launched and are flagged CHANGED with stale translations in 26 languages: the five rewritten
+  `lpn_notes_*` (Task 448's stability note and the Notes review) and `lpn_file_import_inp_tip`. Plus
+  the keys written since: `lpn_color_mode_manual`, `lpn_time_no_period`, and the three
+  `lpn_basemap_satellite_*`. Needs Tom's authorization, and a Wave 0 over the changed set first.
 - 55|447| **Import XY project / Import EPANET file, and either one converts when the project is
   lat/lon.** Tom, 2026-08-19: "the paradigm we want is 'Import XY project / Import EPANET file', so
   that we require an xy project to be safe on disk where we can know it's safe to import and

@@ -1097,8 +1097,8 @@
     "tidy/rounded numbers",
     "attractive"
    ],
-   "disposition": "refer-to-human",
-   "resolution": "Referred to Tom, and it is a naming call, which CLAUDE.md reserves for him. 'Pretty' is QGIS's own word for the class-break method that rounds limits to tidy numbers. Keeping it costs a guess in every language that does not know that tool; changing it costs recognisability for everyone who does. Nothing shipped wrong -- the '(rounded)' parenthetical carries the meaning, which is why 25 languages rendered it correctly. One line from Tom closes it."
+   "disposition": "intent",
+   "resolution": "Tom ruled 2026-08-19: \"It's hard for me to help translate something that I don't understand. On reading up, the goal of Pretty breaks is to create a nice legend.\" The English label stays -- it is QGIS's word and renaming it costs recognisability -- and the concept goes into $ec_lang_syn in his own wording: 'Equal intervals rounded for a pretty legend or Pretty legend (rounded equal intervals)'. That is the right home: the English is correct and idiomatic, and what a translator could not recover from it was the CONCEPT, which is exactly what the synonym channel carries."
   },
   {
    "key": "lpn_time_run",
