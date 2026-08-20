@@ -29,7 +29,15 @@ exports.title = '30. The Settings box, one design';
 // placeholder itself rather than by name, so any such box inherits the reason instead of the
 // exception. (The box that earned it -- the Label view width one, whose placeholder carried the
 // blank-means-always-show rule -- was removed with the zoom threshold on 2026-08-19.)
+//
+// **THE SECOND EXEMPTION IS THE COLOUR BAND BOUNDARIES, AND IT IS A FLOOR RATHER THAN A CEILING**
+// (Tom, 2026-08-20: "They are too wide. They could be about half as wide"). Those boxes are not a
+// column of settings at all -- they are the numbers on a legend, stacked beside the colours they
+// separate -- so they are measured on their own terms below, at half the width, and are read out of
+// .lpn-color-breaks rather than out of a .lpn-set-row.
 const NUM_MAX = 80;
+// Half of --lpn-set-num (4.5rem = 72 px), which is 2.5rem = 40 px.
+const BAND_BOX_MAX = 44;
 
 exports.run = async function ({ browser, report }) {
 	const a = await Session.open(browser, 'A');
@@ -201,6 +209,113 @@ exports.run = async function ({ browser, report }) {
 			'the unit selects respect the same 9rem control width as every select in the box',
 			`${type.sels} selects, widest ${type.widest} px`);
 
+		await a.page.evaluate(() => { document.getElementById('lpn_settings_box').style.width = ''; });
+		await a.settle(200);
+
+		// ---- THE COLOUR BAND BOUNDARIES ARE A LEGEND, NOT A ROW OF BOXES ----------------------
+		//
+		// Tom, 2026-08-20: *"Color band boundaries inputs: They are too wide. They could be about
+		// half as wide. But the real problem is that they are not fitting in the width of the box,
+		// and we should make them vertical, one row for each color."*
+		//
+		// Laid out left to right they overflowed the pane at every width the box ships at, and the
+		// reader had to count boxes to learn which colour a number commanded. The claim now is
+		// geometric and is measured as geometry: n colours, n-1 boxes, ONE column, the swatches
+		// TOUCHING so the first column is a continuous ramp, and each box centred on the join
+		// between the two bands it separates. Nothing here is checkable without a real layout --
+		// the straddle is a transform resolved against a grid row's own height.
+		await a.page.evaluate(() => {
+			const s = document.getElementById('lpn_set_color_node');
+			s.value = 'pressure'; s.dispatchEvent(new Event('change', { bubbles: true }));
+		});
+		await a.settle(400);
+		const bands = await a.page.evaluate(() => {
+			const g = document.querySelector('#lpn_set_colors_node .lpn-color-breaks');
+			if (!g) { return null; }
+			const kids = [...g.children];
+			const sw = kids.filter(k => k.classList.contains('lpn-color-swatch')).map(k => k.getBoundingClientRect());
+			const bx = kids.filter(k => k.tagName === 'INPUT').map(k => k.getBoundingClientRect());
+			const pane = document.getElementById('lpn_setbox_content');
+			return {
+				swatches: sw.length, boxes: bx.length,
+				columns: new Set(bx.map(r => +r.left.toFixed(1))).size,
+				// A row per colour means every box is on its own line: no two share a top.
+				lines: new Set(bx.map(r => +r.top.toFixed(1))).size,
+				joins: sw.slice(1).map((r, i) => +(r.top - sw[i].bottom).toFixed(2)),
+				straddle: bx.map((r, i) => +((r.top + r.height / 2) - sw[i].bottom).toFixed(1)),
+				boxW: bx.length ? +bx[0].width.toFixed(1) : 0,
+				widest: +g.getBoundingClientRect().width.toFixed(1),
+				pane: pane.clientWidth, scroll: pane.scrollWidth
+			};
+		});
+		report.ok(!!bands && bands.swatches >= 4, 'a coloured field puts its band legend on screen',
+			bands && `${bands.swatches} colours, ${bands.boxes} boundaries`);
+		report.eq(bands && bands.boxes, bands && bands.swatches - 1,
+			'there is one fewer boundary than there are colours, and the legend shows both');
+		report.ok(bands && bands.columns === 1 && bands.lines === bands.boxes,
+			'VERTICAL — one row per colour, every box on its own line at one x',
+			bands && `${bands.columns} x, ${bands.lines} lines for ${bands.boxes} boxes`);
+		report.ok(bands && bands.joins.every(g => Math.abs(g) < 0.5),
+			'...and the swatches touch, so the column reads as one continuous ramp',
+			bands && `gaps ${bands.joins.join(', ')} px`);
+		report.ok(bands && bands.straddle.every(d => Math.abs(d) < 1.5),
+			'...with each box centred on the JOIN between the two bands it separates — nothing to count out',
+			bands && bands.straddle.map(d => d + ' px').join(', '));
+		report.ok(bands && bands.boxW <= BAND_BOX_MAX && bands.boxW < NUM_MAX / 1.5,
+			'a boundary box is about half a setting box — Tom: "about half as wide"',
+			bands && `${bands.boxW} px, against 72 px for a setting's own number box`);
+		report.ok(bands && bands.widest < bands.pane && bands.scroll <= bands.pane + 0.5,
+			'...and the whole legend fits the pane it is in, which is what it did not do',
+			bands && `${bands.widest} px in ${bands.pane} px, scrollWidth ${bands.scroll}`);
+
+		// ---- THE CONTROL COLUMN DOES NOT WALK RIGHT AS THE BOX GROWS -------------------------
+		//
+		// Tom, 2026-08-20, reporting it for the third time: *"ID prefixes: The inputs and buttons
+		// are still floating right and wrapping paradoxically when the box is wide."*
+		//
+		// **MEASURED BEFORE IT WAS TOUCHED, because two guesses had already failed.** The name track
+		// was `1fr` and the control track a fixed 9 rem, so every pixel the box was widened by went
+		// to the NAME: 238 px of name at 34 rem and 974 px at 80 rem, dragging the control column
+		// from x=1242 to x=1563 -- hard against the right edge -- while its own track never grew, so
+		// "Apply to all" went on wrapping under its box at every width. That is the paradox, and it
+		// is a right-edge rule (`1fr`) rather than anything in the row's own markup; moving the pair
+		// into .lpn-set-ctlgroup, the previous attempt, could not have fixed it.
+		//
+		// So the assertion is the one Tom's sentence makes: WIDENING THE BOX DOES NOT MOVE THE
+		// CONTROLS, and a box-plus-button is on one line at every width the box ships at or above.
+		const drift = [];
+		for (const w of ['34rem', '44rem', '80rem']) {
+			await a.page.evaluate((width) => { document.getElementById('lpn_settings_box').style.width = width; }, w);
+			await a.settle(200);
+			drift.push(await a.page.evaluate((width) => {
+				const pane = document.getElementById('lpn_setbox_content'), paneR = pane.getBoundingClientRect();
+				const r = document.querySelector('#lpn_set_id_fields .lpn-set-row');
+				const ctl = r.children[1], inp = ctl.querySelector('input'), btn = ctl.querySelector('button');
+				const ir = inp.getBoundingClientRect(), br = btn.getBoundingClientRect();
+				return {
+					w: width, pane: pane.clientWidth,
+					// Measured from the PANE's left edge, which is the only x that means anything
+					// when the box itself is being moved and resized.
+					x: +(ctl.getBoundingClientRect().left - paneR.left).toFixed(1),
+					wrapped: br.top > ir.top + 2,
+					lefts: new Set([...pane.querySelectorAll('.lpn-set-row')]
+						.map(row => +row.children[1].getBoundingClientRect().left.toFixed(1))).size
+				};
+			}, w));
+		}
+		const spread = Math.max(...drift.map(d => d.x)) - Math.min(...drift.map(d => d.x));
+		report.ok(spread <= 4,
+			'widening the box from 34rem to 80rem leaves the control column where it was — it was 321 px of drift',
+			drift.map(d => `${d.w}: pane ${d.pane}, x ${d.x}`).join('; ') + ` — spread ${spread.toFixed(1)} px`);
+		report.ok(drift.every(d => !d.wrapped),
+			'...and a box PLUS A BUTTON is on one line at every one of those widths',
+			drift.map(d => `${d.w} ${d.wrapped ? 'wrapped' : 'one line'}`).join(', '));
+		report.ok(drift.every(d => d.lefts === 1),
+			'...with the one control column intact at the widest of them',
+			drift.map(d => `${d.w}: ${d.lefts}`).join(', '));
+		await a.page.evaluate(() => { document.getElementById('lpn_settings_box').style.width = ''; });
+		await a.settle(200);
+
 		// ---- THE CREDITS ARE THE FOOTER (Tom: "It's a bit long for this place") ---------------
 		const cred = await a.page.evaluate(() => {
 			const c = document.getElementById('lpn_set_ramp_credits'),
@@ -222,6 +337,44 @@ exports.run = async function ({ browser, report }) {
 			cred && cred.text.slice(0, 60));
 		report.has(cred && cred.text, 'Cynthia Brewer',
 			'...and it is still the verbatim acknowledgement the licence requires');
+
+		// ---- ...AND IT IS REACHABLE FROM THE PICKER IT IS ABOUT -------------------------------
+		//
+		// Tom, 2026-08-20: *"Were we going to put a Credits link near the color pickers? Maybe under
+		// the Color scheme label?"* A POINTER, never a second copy: Apache-2.0 clause 2 fixes the
+		// wording, so the count of copies is itself an assertion here -- a "credits near the picker"
+		// implemented by printing the sentence again would pass a weaker check and be wrong. The
+		// label costs no new string: it is the suite's own About label, already translated
+		// everywhere, and reused per CLAUDE.md's concept-level rule.
+		const ptr = await a.page.evaluate(() => {
+			const links = [...document.querySelectorAll('#lpn_setbox_content .lpn-set-creditlink a')];
+			const ramp = document.getElementById('lpn_set_ramp_node');
+			const first = links[0], fr = first && first.getBoundingClientRect(),
+				rr = ramp && ramp.getBoundingClientRect();
+			return {
+				n: links.length, text: first ? first.textContent.trim() : '',
+				href: first ? first.getAttribute('href') : '',
+				// How far under the picker it sits: "near the color pickers" is a distance.
+				gap: (fr && rr) ? +(fr.top - rr.bottom).toFixed(1) : null,
+				copies: (document.getElementById('lpn_setbox_content').textContent.match(/Cynthia Brewer/g) || []).length
+			};
+		});
+		report.eq(ptr.n, 2, 'each colour picker carries a pointer to the acknowledgement');
+		report.ok(/\S/.test(ptr.text) && ptr.text.length < 24 && !/Brewer/.test(ptr.text),
+			'...and it is a LINK, not the acknowledgement repeated', JSON.stringify(ptr.text));
+		report.eq(ptr.href, '#lpn_set_ramp_credits', '...aimed at the footer copy');
+		report.ok(ptr.gap !== null && ptr.gap >= 0 && ptr.gap < 40,
+			'...sitting directly under the Color scheme control, which is where Tom put it',
+			ptr.gap + ' px below the picker');
+		report.eq(ptr.copies, 1, 'the acknowledgement is still rendered exactly ONCE in the box');
+		const jump = await a.page.evaluate(async () => {
+			const before = location.hash;
+			document.getElementById('lpn_set_credits_link_node').click();
+			return { before, after: location.hash,
+				marked: document.getElementById('lpn_set_ramp_credits').classList.contains('lpn-set-flash') };
+		});
+		report.ok(jump.marked, 'clicking it takes the reader to the acknowledgement and marks it');
+		report.eq(jump.after, jump.before, '...without navigating — a hash in the address bar is not what it means');
 
 		await a.page.evaluate(() => { document.getElementById('lpn_settings_box').style.width = ''; });
 		await a.settle(200);

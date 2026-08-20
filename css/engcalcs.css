@@ -1277,10 +1277,28 @@ html[lang="zh"] .ec-welcome {
 	/* The control column, and the box a number sits in at its left edge. Stated once; every rule
 	   below reads them, so there is one place to change either. */
 	--lpn-set-ctl: 9rem;
+	/* The COLUMN a control sits in, which is not the same length as the control: it also has to
+	   hold a box PLUS A BUTTON on one line ("Apply to all" beside a 4-character ID prefix measures
+	   190 px in English). A select still stops at --lpn-set-ctl, so the controls themselves are the
+	   one width they have always been. */
+	--lpn-set-col: 12.5rem;
+	/* **AND THE NAME COLUMN HAS A CEILING** (Tom, 2026-08-20, third report: "ID prefixes: The inputs
+	   and buttons are still floating right and wrapping paradoxically when the box is wide").
+	   MEASURED: with the name track at `1fr` it took every pixel the box was widened by -- 238 px of
+	   name at the shipped 34 rem, 974 px at 80 rem -- so the control column, a fixed 9 rem, was
+	   dragged from x=1242 to x=1563 and sat hard against the right edge with a thousand px of blank
+	   name column to its left, STILL wrapping its button underneath because its own track had never
+	   grown at all. That is the paradox: `1fr` is a right-edge rule wearing a left-edge name. With a
+	   ceiling the growth stops, the column stays where the reader last saw it, and the spare width
+	   goes to nobody -- which is what a settings dialog does. */
+	--lpn-set-name: 11.5rem;
 	--lpn-set-num: 4.5rem;
+	/* A colour band boundary, which is one number in a stack of at most six and needs no room for a
+	   name -- Tom, 2026-08-20: "They are too wide. They could be about half as wide." */
+	--lpn-set-numsm: 2.5rem;
 }
 .lpn-set-row {
-	display: grid; grid-template-columns: minmax(0, 1fr) var(--lpn-set-ctl);
+	display: grid; grid-template-columns: minmax(0, var(--lpn-set-name, 11.5rem)) var(--lpn-set-col, 9rem);
 	align-items: baseline; gap: 6px; margin: 3px 0;
 }
 .lpn-set-row > * { min-width: 0; }
@@ -1296,16 +1314,32 @@ html[lang="zh"] .ec-welcome {
    uniform". The labels lists' own names are set to match in labelCheckbox(). */
 .lpn-set-row > :first-child, .lpn-set-name { overflow-wrap: anywhere; font-size: .85em; opacity: .8; }
 /* **AND IT REDUCES GRACEFULLY** (Tom, 2026-08-19: "the width does not reduce gracefully"). Below
-   17rem of content pane the two tracks stop paying: 9rem of them is the control column, and the
-   name is down to a word a line. So the row stacks -- name, then control under it, still at the
+   17rem of content pane the two tracks stop paying: the control column has already given back its
+   extra width by then, 9rem of what is left is still the control column, and the name is down to a
+   word a line. So the row stacks -- name, then control under it, still at the
    column's left edge. A CONTAINER query, not a media query: what decides this is how far the user
    dragged the box's own edge, and the window may be 2000 px wide while this pane is 250. A browser
    without container queries simply keeps the two columns, which is where this shipped. */
 .lpn-setbox-content { container-type: inline-size; container-name: lpnset; }
+/* A WIDE CONTROL COLUMN IS SOMETHING THE PANE PAYS FOR, so a pane too narrow to afford it buys the
+   name back instead and lets a box-plus-button wrap its button under its box, which is where that
+   pair shipped and is still the graceful answer when there is no room. Written on .lpn-set-row
+   rather than on the box, because the box is the container's ANCESTOR and a container query cannot
+   restyle the element it is measuring. */
+@container lpnset (max-width: 23rem) {
+	.lpn-set-row { --lpn-set-col: var(--lpn-set-ctl); }
+}
 @container lpnset (max-width: 17rem) {
 	.lpn-set-row { grid-template-columns: minmax(0, 1fr); }
 }
 .lpn-rp-credit { margin-top: 6px; }
+/* **THE ACKNOWLEDGEMENT IS REACHABLE FROM THE PICKER IT IS ABOUT** (Tom, 2026-08-20: "Were we going
+   to put a Credits link near the color pickers? Maybe under the Color scheme label?"). A POINTER,
+   not a second copy: the licence fixes the wording, so there is still exactly one rendering of it,
+   in the footer where nothing has to be read past it, and this line scrolls the reader to it and
+   marks it for a moment. */
+.lpn-set-creditlink { font-size: .85em; margin: 0 0 4px; }
+.lpn-set-flash { outline: 2px solid #0b57d0; outline-offset: 2px; }
 /* **A NUMBER BOX IS AS WIDE AS THE NUMBERS IT HOLDS** (Tom, 2026-08-19: "Some inputs are
    gratuitously wide. Comprehensive list: Map appearance, New element prefixes and values, time,
    convergence"). Chrome sizes an `input[type=number]` from its own min/max, so the box shipped a
@@ -1359,6 +1393,9 @@ html[lang="zh"] .ec-welcome {
    the row instead -- aligned on its first line like everything else, without a text baseline to be
    aligned by. */
 .lpn-ramp-picker { position: relative; width: 100%; align-self: start; }
+/* ...and "like a select" is now a rule rather than a coincidence: the control column is wider than
+   a control since 2026-08-20, so the bar stops where a select stops instead of filling the column. */
+#lpn_settings_box .lpn-ramp-picker { max-width: var(--lpn-set-ctl); }
 .lpn-ramp-btn {
 	display: block; width: 100%; padding: 2px 3px; background: #fff;
 	border: 1px solid #767676; border-radius: 3px; cursor: pointer;
@@ -1383,6 +1420,33 @@ html[lang="zh"] .ec-welcome {
    carry a box number into 27 languages. The map is left exactly as it was, which the message says. */
 .lpn-bad { outline: 2px solid #b00020; }
 .lpn-color-msg { color: #b00020; font-size: .85em; margin: 2px 0; }
+/* **THE BAND BOUNDARIES ARE A LEGEND, NOT A ROW OF BOXES** (Tom, 2026-08-20: "Color band boundaries
+   inputs: They are too wide. They could be about half as wide. But the real problem is that they are
+   not fitting in the width of the box, and we should make them vertical, one row for each color").
+
+   ONE ROW PER COLOUR, and the swatches touch: with no row gap the first column is a continuous ramp
+   in the same ascending order the numbers are typed in, lowest band at the top. A boundary is a LINE
+   BETWEEN TWO BANDS -- there is one fewer of them than there are colours -- so its box is pushed
+   half its own height down and STRADDLES that line, touching both bands it separates. Nothing has to
+   be counted out, and the last band's row correctly has no box: nothing bounds it from below.
+   `translateY` rather than a negative margin, so the rhythm the swatches are drawn on is exactly the
+   rhythm the boxes are placed against. */
+.lpn-color-breaks {
+	display: grid; grid-template-columns: 1.4em var(--lpn-set-numsm, 2.5rem);
+	column-gap: 6px; row-gap: 0; margin: 4px 0 10px; width: max-content;
+}
+/* Each band draws its own bottom hairline and inherits the one above it, so a stack of six is five
+   single lines rather than five doubled ones. */
+.lpn-color-breaks > .lpn-color-swatch {
+	width: auto; height: auto; align-self: stretch; min-height: 2.1em; border-top-width: 0;
+}
+.lpn-color-breaks > .lpn-color-swatch:first-child { border-top-width: 1px; }
+.lpn-color-breaks > input {
+	align-self: end; transform: translateY(50%); position: relative; z-index: 1;
+}
+/* Wins over the box's own one-width-for-every-number rule ON PURPOSE, and only here: these boxes are
+   a legend rather than a column of settings, and Tom asked for half. */
+#lpn_settings_box .lpn-set-secbody .lpn-color-breaks > input.lpn-set-num { width: var(--lpn-set-numsm); }
 /* The colour key is a WAY IN to the colour controls (Task 427), so it has to take a click -- the
    overlay stack is pointer-events:none by default and this one cell opts back in. */
 .lpn-color-legend { pointer-events: auto; cursor: pointer; }
