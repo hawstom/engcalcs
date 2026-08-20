@@ -2243,6 +2243,7 @@ $ec_lang['lpn_time_format_tip']='Enter times and durations as decimal hours (17.
 $ec_lang['lpn_time_running']='Working out the whole time period with the EPANET solver.';
 $ec_lang['lpn_time_no_engine']='The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs the whole period.';
 $ec_lang['lpn_time_slider']='Time';
+$ec_lang['lpn_time_no_period']='This project has no time period, so there is one moment to show. Set a Total run time in Settings to work the network out over time.';
 $ec_lang['lpn_time_first']='Go to the start';
 $ec_lang['lpn_time_prev']='Step back';
 $ec_lang['lpn_time_play']='Play';

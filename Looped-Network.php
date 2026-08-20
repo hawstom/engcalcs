@@ -879,6 +879,7 @@ EngCalcs.pageConfig = {
 	lpn_time_running: <?=json_encode($ec_lang['lpn_time_running'])?>,
 	lpn_time_no_engine: <?=json_encode($ec_lang['lpn_time_no_engine'])?>,
 	lpn_time_slider: <?=json_encode($ec_lang['lpn_time_slider'])?>,
+	lpn_time_no_period: <?=json_encode($ec_lang['lpn_time_no_period'])?>,
 	lpn_time_first: <?=json_encode($ec_lang['lpn_time_first'])?>,
 	lpn_time_prev: <?=json_encode($ec_lang['lpn_time_prev'])?>,
 	lpn_time_play: <?=json_encode($ec_lang['lpn_time_play'])?>,

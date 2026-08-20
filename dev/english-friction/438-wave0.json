@@ -1050,6 +1050,19 @@
    ],
    "disposition": "english",
    "resolution": "'placed in a real location' instead of 'on real ground'. 'street map' matches the word the four New project rows already use for the basemap."
+  },
+  {
+   "key": "lpn_time_no_period",
+   "source": "wave0",
+   "lang": null,
+   "complaint": "high: written after the pass above, so it gets the same question here. 'No time period' can be read as 'the period is unknown', 'the period is over', or 'this tool cannot do periods' -- and a reader who takes the third stops looking for the setting. A first draft also said 'no time model', which is jargon.",
+   "readings": [
+    "the project's total run time is zero, so there is one moment",
+    "the period has elapsed",
+    "this calculator does not do time"
+   ],
+   "disposition": "english",
+   "resolution": "States the consequence and the cure in the same sentence: one moment to show, and Total run time in Settings is where to change it. 'Total run time' is quoted from lpn_time_duration, so the sentence names a control the reader can actually find; if that label is retranslated, this string must follow it."
   }
  ]
 }

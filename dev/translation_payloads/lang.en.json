@@ -1157,6 +1157,7 @@
         "lpn_time_running": "Working out the whole time period with the EPANET solver.",
         "lpn_time_no_engine": "The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET solver, which runs the whole period.",
         "lpn_time_slider": "Time",
+        "lpn_time_no_period": "This project has no time period, so there is one moment to show. Set a Total run time in Settings to work the network out over time.",
         "lpn_time_first": "Go to the start",
         "lpn_time_prev": "Step back",
         "lpn_time_play": "Play",
@@ -1196,7 +1197,7 @@
         "lpn_color_mode_log": "Logarithmic",
         "lpn_color_mode_pressure": "Pressure"
     },
-    "count": 1194,
+    "count": 1195,
     "active_prefixes": [
         "about",
         "bpn",

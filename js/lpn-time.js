@@ -309,6 +309,7 @@
 			running: pageConfig.lpn_time_running || 'Working out the whole time period with the EPANET engine.',
 			noEngine: pageConfig.lpn_time_no_engine || 'The built-in solver works out one moment at a time, so this is the network at {time} only: the demands carry that moment’s pattern multipliers, and every tank still sits at its starting level instead of filling and draining. Connect to the internet once to fetch the EPANET engine, which runs the whole period.',
 			slider: pageConfig.lpn_time_slider || 'Time',
+			noPeriod: pageConfig.lpn_time_no_period || 'This project has no time period, so there is one moment to show. Set a Total run time in Settings to work the network out over time.',
 			first: pageConfig.lpn_time_first || 'Go to the start',
 			prev: pageConfig.lpn_time_prev || 'Step back',
 			play: pageConfig.lpn_time_play || 'Play',
@@ -916,6 +917,25 @@
 		ui.step.value = String(i < 0 ? 0 : i);
 		ui.play.setAttribute('aria-pressed', state.playing ? 'true' : 'false');
 		swapIcon(ui.play, state.playing ? 'pause' : 'play');
+		// **ONE STOP MEANS THE TRANSPORT IS INERT BY DESIGN, AND IT HAS TO SAY SO.** Tom, 2026-08-19,
+		// on Net3-World -- a file that carries no [TIMES] block at all: "No time steps are
+		// available. It is not running or something is wrong with the play controls and the time
+		// step selector." Nothing was wrong; the project's duration is 0, so there is exactly one
+		// moment and Play has nowhere to go. Three live controls that quietly do nothing are
+		// indistinguishable from three broken ones, so they are DISABLED -- which is the visible
+		// signal that this is by design -- and every one of them carries the reason and the cure.
+		// Run stays enabled: on a network with no duration it is an ordinary recalculate, which is
+		// a true thing for a button called Run to do (see the note where it is built).
+		var inert = stops.length < 2, why = inert ? strings().noPeriod : null;
+		[ui.prev, ui.play, ui.next, ui.step].forEach(function (c) {
+			if (!c) { return; }
+			c.disabled = inert;
+			// The tip a control carries when it WORKS is its own; only the reason for being
+			// switched off is shared. Restoring rather than clearing, so a re-enabled control does
+			// not come back mute.
+			if (!c.dataset.tipWhenLive) { c.dataset.tipWhenLive = c.title || ''; }
+			c.title = why || c.dataset.tipWhenLive;
+		});
 	}
 
 	// The one thing a solve or a clock edit still has to repaint: the transport on the toolbar.

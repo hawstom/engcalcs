@@ -42,6 +42,36 @@ exports.run = async function ({ browser, report }) {
 			return;
 		}
 
+		// **A PROJECT WITH NO TIME PERIOD SAYS SO** (Task 456). Tom, 2026-08-19, on Net3-World --
+		// a file carrying no [TIMES] block: "No time steps are available. It is not running or
+		// something is wrong with the play controls and the time step selector." Nothing was
+		// wrong; the duration is 0, so there is one moment and Play has nowhere to go. Checked
+		// FIRST, on the blank project the page opens with, because that is the state most people
+		// meet -- and three live controls that quietly do nothing look exactly like three broken
+		// ones.
+		await a.settle(600);
+		const inert = await a.page.evaluate(() => {
+			const ids = ['step-back', 'play', 'step-fwd'];
+			const btns = [...document.querySelectorAll('#lpn_toolbar button')]
+				.filter(b => ids.includes(b.getAttribute('data-icon')));
+			const sel = document.getElementById('lpn_time_step');
+			const run = [...document.querySelectorAll('#lpn_toolbar button')]
+				.find(b => b.getAttribute('data-icon') === 'run');
+			return {
+				stops: sel ? sel.options.length : -1,
+				offBtns: btns.filter(b => b.disabled).length, nBtns: btns.length,
+				offSel: !!(sel && sel.disabled),
+				why: sel ? (sel.title || '') : '',
+				runLive: !!(run && !run.disabled)
+			};
+		});
+		report.eq(inert.stops, 1, 'a project with no duration has exactly one reporting step');
+		report.eq(inert.offBtns, inert.nBtns, '...so step back, Play and step forward are DISABLED, not silently inert');
+		report.ok(inert.offSel, '...and so is the step selector');
+		report.ok(/no time period/i.test(inert.why) && /Settings/.test(inert.why),
+			'...and they say why, and where to fix it', inert.why);
+		report.ok(inert.runLive, 'but Run stays live — with no duration it is an ordinary recalculate');
+
 		// Net3 is the network with a duration, patterns, controls and three tanks in it.
 		// **MATCHED ON THE WHOLE TITLE, NOT ON "Net3" ANYWHERE IN THE CARD.** Publishing
 		// Net3-World (2026-08-19) put a second card reading "EPANET Net3, lat/lon" on the wall,
