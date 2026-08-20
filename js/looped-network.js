@@ -7315,14 +7315,14 @@ var EngCalcs = EngCalcs || {};
 	function breakErrorText(pc, reason) {
 		if (reason === 'not-increasing') {
 			return pc.lpn_color_break_order ||
-				'Each range limit must be larger than the one before it. The map is unchanged.';
+				'Each boundary must be larger than the one before it. The map is unchanged.';
 		}
 		if (reason === 'count') {
 			return pc.lpn_color_break_count ||
 				'There must be one limit fewer than the number of ranges. The map is unchanged.';
 		}
 		return pc.lpn_color_break_number ||
-			'A range limit must be a number. The map is unchanged.';
+			'A boundary must be a number. The map is unchanged.';
 	}
 	function buildColoringSection() {
 		var pc = EngCalcs.pageConfig || {},
@@ -7510,10 +7510,10 @@ var EngCalcs = EngCalcs || {};
 			if (!field) { return; }
 			var key = colorBreakKey(group, field), head = document.createElement('div');
 			head.className = 'lpn-set-minihead';
-			head.textContent = (pc.lpn_settings_color_breaks || 'Color band limits') + ': ' + colorFieldLabel(group, field);
+			head.textContent = (pc.lpn_settings_color_breaks || 'Color band boundaries') + ': ' + colorFieldLabel(group, field);
 			target.appendChild(head);
 			noteIn(target, pc.lpn_color_ranges_note ||
-				'The limits shown below are static for this project. Choosing a method above changes the limits based on the current state of the system, so it\'s expert to classify from a representative time step. If you change any value manually, the method above changes to Manual.');
+				'The boundaries shown below are static for this project. Choosing a data classification method above sets the boundaries based on the current state of the system. If you change any value manually, the method above changes to Manual.');
 			// A STORED LIMIT PRINTS EXACTLY AS IT IS STORED -- typed or filled in by a method, it
 			// is the project's number now and the box is where it lives. The only value printed
 			// short is one that was never stored: a criterion method's converted threshold, where
@@ -7565,7 +7565,7 @@ var EngCalcs = EngCalcs || {};
 				box.className = 'lpn-set-num';
 				box.style.width = '4.5em';
 				box.value = (eff[i] === undefined) ? '' : (stored ? eff[i] : colorNum(eff[i]));
-				box.setAttribute('aria-label', (pc.lpn_settings_color_breaks || 'Color band limits') + ' ' + (i + 1));
+				box.setAttribute('aria-label', (pc.lpn_settings_color_breaks || 'Color band boundaries') + ' ' + (i + 1));
 				box.addEventListener('change', writeBreaks);
 				boxes.push(box);
 				wrap.appendChild(box);

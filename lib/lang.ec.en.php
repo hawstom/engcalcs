@@ -1404,11 +1404,11 @@ $ec_lang['lpn_settings_color_classes']='Number of colors';
 // appears in none of the reference tools. Tom, 2026-08-19: "Don't drop the 'method'. That's the
 // point of this control." -- the dropdown holds METHODS, and the noun alone would name the result.
 $ec_lang['lpn_color_mode']='Data classification method';
-$ec_lang['lpn_color_ranges_note']='The limits shown below are static for this project. Choosing a method above changes the limits based on the current state of the system, so it\'s expert to classify from a representative time step. If you change any value manually, the method above changes to Manual.';
-$ec_lang['lpn_color_criterion_note']='This method takes its limits from a design standard, so the number of colors is fixed while it is chosen.';
-$ec_lang['lpn_color_break_number']='A range limit must be a number. The map is unchanged.';
-$ec_lang['lpn_color_break_order']='Each range limit must be larger than the one before it. The map is unchanged.';
-$ec_lang['lpn_color_break_count']='There must be one limit fewer than the number of colors. The map is unchanged.';
+$ec_lang['lpn_color_ranges_note']='The boundaries shown below are static for this project. Choosing a data classification method above sets the boundaries based on the current state of the system. If you change any value manually, the method above changes to Manual.';
+$ec_lang['lpn_color_criterion_note']='This method takes its boundaries from a design standard, so the number of colors is fixed while it is chosen.';
+$ec_lang['lpn_color_break_number']='A boundary must be a number. The map is unchanged.';
+$ec_lang['lpn_color_break_order']='Each boundary must be larger than the one before it. The map is unchanged.';
+$ec_lang['lpn_color_break_count']='There must be one boundary fewer than the number of colors. The map is unchanged.';
 $ec_lang['lpn_color_ramp_qualitative']='Qualitative';
 $ec_lang['lpn_color_ramp_rainbow']='Rainbow';
 $ec_lang['lpn_color_ramp_rainbow_eg']='matches EPANET';
@@ -1820,8 +1820,8 @@ $ec_lang['lpn_notes_4_def']='A project can sit on real ground with a street map 
 // expected to be stable through an animation... recomputing at each time step gives a wrong
 // impression of the system. In this we are ratifying EPANET."* The mechanism is
 // settings.colorFrozenBreaks in js/looped-network.js.
-$ec_lang['lpn_notes_color_term']='Color band limits stay the same';
-$ec_lang['lpn_notes_color_def']='Color band limits are worked out once, when you choose a data classification method, and then held. Working them out again at each time step would make the colors mean something new in every frame, and that is misleading. EPANET works the same way. To get new limits, choose a method again or type your own.';
+$ec_lang['lpn_notes_color_term']='Color band boundaries stay the same';
+$ec_lang['lpn_notes_color_def']='Color band boundaries are set when you choose a data classification method. They are not set again at each time step, because that would make the colors mean something new at every step, and that is not helpful for visualizing your system. EPANET works the same way. To get new boundaries, choose a method again or type your own.';
 $ec_lang['lpn_notes_epanet_term']='Hazen-Williams constants match EPANET';
 $ec_lang['lpn_notes_epanet_def']='In August 2026 the Hazen-Williams coefficient and exponent were changed to match EPANET. Head loss results differ from earlier versions of this page by up to 0.1 percent, which is far smaller than the uncertainty in the C value itself.';
 $ec_lang['lpn_id_invalid']='Enter an ID with no spaces and no quotation marks.';
@@ -2231,7 +2231,7 @@ $ec_lang['lpn_color_none']='No color';
 $ec_lang['lpn_settings_color_thematic']='Thematic map (colors only)';
 $ec_lang['lpn_settings_color_thematic_tip']='Hides every label so that only the colors are left on the map. Your label choices are kept, and turning this off brings them back.';
 $ec_lang['lpn_settings_color_key_position']='Color legend position';
-$ec_lang['lpn_settings_color_breaks']='Color band limits';
+$ec_lang['lpn_settings_color_breaks']='Color band boundaries';
 $ec_lang['lpn_settings_color_equal_intervals']='Equal intervals';
 $ec_lang['lpn_settings_color_equal_counts']='Equal counts';
 $ec_lang['lpn_settings_color_auto']='Automatic';
