@@ -5677,11 +5677,11 @@ var EngCalcs = EngCalcs || {};
 		var detached = georefDetached();
 		// **THE STEP IS NAMED AND THE MODE IS NAMED.** Four keys here are English literals until the
 		georefBarEl('lpn_georef_step').textContent = detached
-			? (pc.lpn_georef_step1 || 'Step 1 of 2 — detached')
-			: (pc.lpn_georef_step2 || 'Step 2 of 2 — attached');
+			? (pc.lpn_georef_step1 || 'Step 1 of 2 — quick')
+			: (pc.lpn_georef_step2 || 'Step 2 of 2 — fine');
 		georefBarEl('lpn_georef_hint').textContent = detached
 			? (pc.lpn_georef_step1_hint || 'Your project stays where it is on the screen. Pan and zoom the map underneath it until the ground behind it is the right place and the right size, then press Drop it here.')
-			: (pc.lpn_georef_adjust || 'Drag the model to move it, a corner to resize it, the top handle to turn it.');
+			: (pc.lpn_georef_adjust || 'The model is on the ground now, so it moves with the map. Drag the model to move it, a corner to resize it, the top handle to turn it.');
 		georefBarEl('lpn_georef_drop').style.display = detached ? '' : 'none';
 		georefBarEl('lpn_georef_detach').textContent = pc.lpn_georef_detach || 'Pick it up again';
 		georefBarEl('lpn_georef_detach').style.display = detached ? 'none' : '';
@@ -5920,7 +5920,7 @@ var EngCalcs = EngCalcs || {};
 		// The labels and the solver are OFF for the duration -- see georefSuspend().
 		georefSuspend(true);
 		georefRefreshBar();
-		setNotice(pc.lpn_georef_intro || 'Your project has been placed at the centre of a world map. Zoom to your location and move, resize and turn the model. When you are ready, press Keep this placement.');
+		setNotice(pc.lpn_georef_intro || 'Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself.');
 	}
 	// Can every stored point be read as a coordinate on the Earth? Within +/-180 and +/-90, which is
 	// suggestive and never conclusive: a small site drawn near the origin looks exactly the same.

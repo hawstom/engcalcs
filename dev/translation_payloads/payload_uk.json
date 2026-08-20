@@ -554,7 +554,7 @@
                 "next_translated": {
                     "key": "lpn_georef_intro",
                     "value": "Перетворити цей xy-проєкт на географічний? Ваш проєкт розміщено в центрі карти світу. Наблизьте карту до потрібного місця та переміщуйте, змінюйте розмір і повертайте модель скільки завгодно. Коли будете готові почати редагувати елементи, натисніть «Залишити це розміщення».",
-                    "english": "Your project has been placed at the centre of a world map. Zoom to your location and move, resize, and turn the model as much as you like. When you are ready to start adjusting elements, press Keep this placement."
+                    "english": "Placing the model takes two steps. Step 1 is the quick one: the model holds still and you move the map behind it, until your site is under the model at about the right size. There is no turning yet. Step 2 is the fine one: you drag, resize and turn the model itself. Your project is on a map of the whole world to start with, so find your location first."
                 }
             }
         },
