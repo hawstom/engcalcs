@@ -629,7 +629,8 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
 - 5|267| **"Save as" the backdrop image.** Tom, 2026-08-10, "very low priority". The image is stored
   as a data URI on `backdrop.href`, so writing it back out is a blob download away.
 
-- 70|462| **[H] The toolbar wants a water-network group, and LIBRARIES is the missing idea.** Tom,
+- 70|462| **The toolbar wants a water-network group, and LIBRARIES is the missing idea. AUTHORISED
+  2026-08-20** ("This looks clear to me"), and building. Tom,
   2026-08-20: *"for Water Networks, I think we also need the following in a group: Libraries
   (Patterns, Curves, Controls, Pumps, Pipes, Custom), **Settings**, Simulate, Transport, Time
   selectors."*
@@ -637,20 +638,12 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
     controls while the interface carries none; "Libraries" is where they would live, and Pumps /
     Pipes / Custom extend the same idea to reusable definitions the network points AT rather than
     copies of. Scope the two together.
-  - Note it puts **Settings inside this group**, which cuts against Task 452's gear-at-the-far-right
-    — see Task 463, where Tom also says the gear should not be a toolbar button at all.
+  - **Settings moves INTO this group**, off the right-hand end where Task 452 put it. Tom considered
+    and REJECTED putting the gear and the pane toggle on the map instead: *"Toggles on map doesn't
+    sound right to me. What we have now plus the lpn group (Libraries, Settings, Transport, and Time
+    selectors) seems like the right way to go."* So nothing floats on the drawing surface.
 
-- 65|463| **[H] The gear and the pane toggle should sit ON THE MAP, not on the toolbar.** Tom,
-  2026-08-20: *"Right edge gear: Toolbar button is the wrong paradigm. It should be a gear directly
-  on the page background. So should be the pane toggle."*
-  - This supersedes yesterday's move of the gear to the right-hand end of the strip, which answered
-    "where" but not "what kind of control". A floating overlay on the drawing surface is a different
-    paradigm from a strip button, and the map already has overlays (the legends, the basemap credit,
-    the coordinate readout) so the mechanism exists.
-  - **Read against Task 462**, which asks for Settings INSIDE a toolbar group. The two are in
-    tension and Tom holds both; resolve with him before building either.
-
-- 55|464| **[H] Screenshot prep is not earning its toolbar slot.** Tom, 2026-08-20, three separate
+- 55|464| **Screenshot prep is not earning its toolbar slot. AUTHORISED 2026-08-20** ("Yeah"). Tom, 2026-08-20, three separate
   complaints: *"I can't see myself using the Screenshot prep tool, partly because I can screenshot
   within the junk that's showing on the map, and it's taking up valuable real estate"*; *"The camera
   isn't speaking to me. It might help if the tip started with 'Screenshot prep: ….' Maybe relegate
