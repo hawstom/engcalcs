@@ -2278,6 +2278,14 @@ $ec_lang['lpn_time_run']='Run';
 $ec_lang_syn['lpn_time_run']='Simulate, execute, or compute';
 $ec_lang['lpn_time_run_tip']='Work out this network at each of its reporting times, from the first one to the last.';
 $ec_lang['lpn_time_run_note']='You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date.';
+// ---- The run box (ROADMAP Task 450) ----------------------------------------------------------
+// Three keys, and no more: 'lpn_time_running' is already the sentence for a run in progress and
+// 'lpn_close' is already the word on every other dismiss control on this page, so both are
+// borrowed rather than re-keyed.
+$ec_lang['lpn_time_run_done']='The run finished. Reporting times: {frames}. Time taken: {secs} s.';
+$ec_lang['lpn_time_run_failed']='The run did not finish, so there are no results for the later times.';
+$ec_lang['lpn_time_run_report']='EPANET run report';
+
 $ec_lang['lpn_time_speed']='Speed';
 $ec_lang['lpn_time_speed_tip']='How fast the run plays back.';
 

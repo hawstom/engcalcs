@@ -1542,3 +1542,44 @@ html[lang="zh"] .ec-welcome {
    .lpn-popover-body already does. */
 html:has(#lpn_canvas) form#formInput { margin-bottom: 0; }
 html:has(#lpn_canvas) { overflow: hidden; }
+
+/* THE RUN BOX (ROADMAP Task 450). Tom, 2026-08-19: "The Run button does nothing... It needs a box
+   with a progress bar and completion report." It is built and appended to <body> by js/lpn-time.js,
+   which is what keeps the whole feature out of js/looped-network.js and Looped-Network.php.
+
+   BOTTOM LEFT, not bottom right: the right edge of the map is where .lpn-rpane lives, and a box
+   that lands on top of the properties pane covers the numbers the run just produced. Fixed rather
+   than placed near the button, because a run takes seconds and the eye will have moved.
+
+   z-index sits above the panes (6) and the toolbar (1080) and below the registration bar (3000),
+   which must outrank everything while a click sequence is in progress. */
+.lpn-runbox {
+	position: fixed; left: 1em; bottom: 1em; z-index: 1085;
+	box-sizing: border-box; width: 26rem; max-width: calc(100vw - 2em);
+	padding: 0.5em 0.75em 0.6em; border: 1px solid #ccc; border-radius: 4px;
+	background: #fff; box-shadow: 0 2px 8px rgba(0, 0, 0, .2); font-size: 0.9em;
+}
+.lpn-runbox-head { display: flex; align-items: center; gap: 0.5em; }
+.lpn-runbox-title { font-weight: bold; flex: 1 1 auto; }
+/* The percentage is a bare number and a percent sign, so it needs no width reserved for a longer
+   translation -- there is no translation. Tabular figures stop it jittering as it counts up. */
+.lpn-runbox-pct { flex: 0 0 auto; font-variant-numeric: tabular-nums; color: #555; }
+.lpn-runbox-x {
+	flex: 0 0 auto; width: 1.8em; height: 1.8em; line-height: 1;
+	padding: 0; border: 0; background: transparent; font-size: 1.1em; color: #333; cursor: pointer;
+}
+.lpn-runbox-x:hover, .lpn-runbox-x:focus { background: #eee; color: #000; }
+.lpn-runbox-msg { margin: 0.25em 0 0.4em; }
+.lpn-runbox-bar { height: 0.5em; background: #e6e6e6; border-radius: 3px; overflow: hidden; }
+/* No transition on the width. The fill is driven by EPANET's own clock at the end of each slice,
+   so an animation would be a second, slower, made-up progress bar drawn over the real one. */
+.lpn-runbox-fill { height: 100%; width: 0; background: #1976d2; }
+.lpn-runbox-report { margin-top: 0.4em; }
+.lpn-runbox-report summary { cursor: pointer; }
+/* EPANET'S OWN TEXT, so it is monospaced and it SCROLLS INSIDE ITSELF in both directions: the
+   report is column-aligned and reflowing it would destroy the alignment the engine wrote. */
+.lpn-runbox-pre {
+	margin: 0.4em 0 0; max-height: 40vh; overflow: auto;
+	padding: 0.4em; background: #f7f7f7; border: 1px solid #e0e0e0;
+	font-family: monospace; font-size: 0.85em; white-space: pre;
+}

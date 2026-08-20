@@ -1183,6 +1183,9 @@
         "lpn_time_run": "Run",
         "lpn_time_run_tip": "Work out this network at each of its reporting times, from the first one to the last.",
         "lpn_time_run_note": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date.",
+        "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
+        "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
+        "lpn_time_run_report": "EPANET run report",
         "lpn_time_speed": "Speed",
         "lpn_time_speed_tip": "How fast the run plays back.",
         "lpn_settings_search": "Search settings",
@@ -1212,7 +1215,7 @@
         "lpn_color_mode_pressure": "Pressure",
         "lpn_color_mode_manual": "Manual"
     },
-    "count": 1210,
+    "count": 1213,
     "active_prefixes": [
         "about",
         "bpn",

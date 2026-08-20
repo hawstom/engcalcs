@@ -759,82 +759,185 @@
 	// report does it.
 	var EN_STATUS = 11, EN_DEMAND = 9;
 
+	function nowMs() {
+		return (root.performance && root.performance.now) ? root.performance.now() : Date.now();
+	}
+
+	/**
+	 * **HOW LONG THE RUN MAY HOLD THE THREAD BEFORE IT LETS GO.** Task 450.
+	 *
+	 * runH()/nextH() is a synchronous loop, and on a network over the auto-run budget it is
+	 * SECONDS of synchronous loop. While it holds the thread nothing paints -- so a progress bar
+	 * fed from inside it would be a progress bar nobody ever sees move, and the page is frozen
+	 * besides. So the loop runs in slices and yields between them.
+	 *
+	 * **THIS DOES NOT TOUCH ONE NUMBER.** EPANET's whole hydraulic state lives in the Project, and
+	 * a slice boundary is simply a moment between two toolkit calls; the sequence of calls, and
+	 * therefore every result, is byte-identical to the old do/while. dev/lpn-spike/eps-net3-harness.js
+	 * and eps-document-harness.js are what say so out loud -- both still match EPA's own published
+	 * report.
+	 *
+	 * 100 ms because it is the shortest slice whose yield overhead stays negligible (one macrotask,
+	 * ~4 ms clamped in a browser, so ~4%) while still giving a 3 second run thirty repaints, which
+	 * is far more than a bar needs to read as motion. A run shorter than one slice never yields at
+	 * all, so the cheap networks this page re-runs by itself pay nothing.
+	 */
+	EngCalcs.LPN_EPANET_SLICE_MS = 100;
+
+	/**
+	 * `options.onProgress` is called with `{t, duration, fraction, frames}` at the end of every
+	 * slice, plus once at the start and once at the end. **THE FRACTION IS SIMULATED TIME**, which
+	 * is real progress rather than a guess: EPANET's clock only ever moves forward, so t/duration is
+	 * monotonic by construction, and it is the same axis the reporting grid is on.
+	 *
+	 * `run.report` is **EPANET'S OWN REPORT FILE**, verbatim -- the header, the input summary, the
+	 * hydraulic status messages, the flow balance. It is not composed by us and must never be:
+	 * setStatusReport(1) tells the engine to write it, and it is read back off the engine's own
+	 * in-memory filesystem after the Project closes. Empty string if the build cannot produce one.
+	 */
 	EngCalcs.lpnEpanetRun = function (model, options) {
 		var opts = options || {}, url = opts.moduleUrl || null;
 		var issues = EngCalcs.lpnDiagnose(model);
 		if (issues.length > 0) {
-			return Promise.resolve({ ok: false, engine: 'epanet', issues: issues, frames: [] });
+			return Promise.resolve({ ok: false, engine: 'epanet', issues: issues, frames: [], report: '' });
 		}
 		var built = EngCalcs.lpnToInp(model, { eps: true });
 		var times = (model.time && model.time.times) || EngCalcs.lpnTimesDefaults(),
 			reportStart = times.reportStart || 0,
 			reportStep = times.reportStep > 0 ? times.reportStep : 3600,
-			duration = times.duration || 0;
+			duration = times.duration || 0,
+			onProgress = typeof opts.onProgress === 'function' ? opts.onProgress : null,
+			sliceMs = opts.sliceMs > 0 ? opts.sliceMs : EngCalcs.LPN_EPANET_SLICE_MS;
 
 		return EngCalcs.lpnEpanetLoad(url).then(function (mod) {
 			return workspaceFor(mod, url).then(function (ws) {
 				var p = new mod.Project(ws), frames = [], nodeIdx = {}, linkIdx = {},
-					i, n, l, t, tstep, guard = 0;
+					i, n, l, t = 0, tstep, guard = 0, seen = 0, closed = false;
+
+				// ALWAYS closed, on every path out. A Project is a WASM allocation inside a
+				// Workspace that outlives it, so a run that threw would otherwise leak the whole
+				// network on every retry. The report is read back HERE because closing is what
+				// flushes the last of it to the engine's filesystem.
+				function shutdown() {
+					var txt = '';
+					if (closed) { return txt; }
+					closed = true;
+					try { p.closeH(); } catch (e) { /* never opened, or already shut */ }
+					try { p.close(); } catch (e) { /* already torn down */ }
+					try { txt = ws.readFile('eps.rpt') || ''; } catch (e) { txt = ''; }
+					return txt;
+				}
+				function tell(frac) {
+					if (!onProgress) { return; }
+					// A consumer that throws must not take the run down with it: the run is the
+					// work, the progress bar is decoration on top of it.
+					try {
+						onProgress({ t: t, duration: duration, fraction: frac, frames: frames.length });
+					} catch (e) { /* the caller's problem, not the run's */ }
+				}
+				function fractionNow() {
+					var f = duration > 0 ? t / duration : 1;
+					if (!(f >= 0)) { f = 0; }
+					if (f > 1) { f = 1; }
+					// Monotonic OUT as well as in: nothing downstream should ever have to wonder.
+					if (f < seen) { f = seen; }
+					seen = f;
+					return f;
+				}
+
 				ws.writeFile('eps.inp', built.inp);
 				try {
 					p.open('eps.inp', 'eps.rpt', 'eps.out');
+					// The engine writes its own report only when it is asked to. Level 1 is the
+					// status report -- what balanced in how many trials, which control fired, which
+					// tank filled -- which is the half of EPANET's report that says what HAPPENED.
+					// Wrapped because a build without it must degrade to "no report offered", never
+					// to "no run".
+					try { p.setStatusReport(1); } catch (e) { /* this build writes no status report */ }
 					for (i = 0; i < model.nodes.length; i++) { nodeIdx[model.nodes[i].id] = p.getNodeIndex(model.nodes[i].id); }
 					for (i = 0; i < model.links.length; i++) { linkIdx[model.links[i].id] = p.getLinkIndex(model.links[i].id); }
 					p.openH();
 					p.initH(0);
-					do {
-						t = p.runH();
-						// The reporting grid, and nothing else. `>= reportStart` because a run may be
-						// asked to report only its second half; the modulo because runH() lands on
-						// tank and control events that belong to nobody's report.
-						if (t >= reportStart && ((t - reportStart) % reportStep) === 0 && t <= duration) {
-							var f = {
-								t: t, heads: {}, pressures: {}, demands: {}, levels: {},
-								flows: {}, velocities: {}, headlosses: {}, statuses: {}
-							};
-							for (i = 0; i < model.nodes.length; i++) {
-								n = model.nodes[i];
-								f.heads[n.id] = p.getNodeValue(nodeIdx[n.id], EN_HEAD);
-								f.pressures[n.id] = p.getNodeValue(nodeIdx[n.id], EN_PRESSURE);
-								// L/s -> m3/s, the same scale a [JUNCTIONS] demand is written in.
-								f.demands[n.id] = p.getNodeValue(nodeIdx[n.id], EN_DEMAND) / 1000;
-								// **THE TANK LEVEL IS A RESULT, NOT AN INPUT** -- the point of the run.
-								// It is metres above the tank's own bottom under LPS, the same quantity
-								// and the same unit the document's `level` field holds. They must never
-								// be written into each other; see the note in js/lpn-time.js.
-								//
-								// DERIVED FROM THE HEAD, NOT READ FROM EN_TANKLEVEL. Measured against
-								// EPA's own Net3 report: EN_TANKLEVEL answers the INITIAL level and
-								// keeps answering it for the whole run, so every tank reads flat all day
-								// while its head moves nine feet underneath it. Head minus elevation is
-								// the level by definition -- it is what a tank IS, see
-								// EngCalcs.lpnIsFixedHead -- and it tracks the report.
-								if (n.type === 'tank') { f.levels[n.id] = f.heads[n.id] - (n.elev || 0); }
-							}
-							for (i = 0; i < model.links.length; i++) {
-								l = model.links[i];
-								f.flows[l.id] = p.getLinkValue(linkIdx[l.id], EN_FLOW) / 1000;
-								f.velocities[l.id] = p.getLinkValue(linkIdx[l.id], EN_VELOCITY);
-								f.headlosses[l.id] = p.getLinkValue(linkIdx[l.id], EN_HEADLOSS);
-								f.statuses[l.id] = p.getLinkValue(linkIdx[l.id], EN_STATUS) > 0 ? 'open' : 'closed';
-							}
-							frames.push(f);
-						}
-						tstep = p.nextH();
-						// A guard, not a policy: a network that somehow never advances would hang the
-						// tab. 100000 steps is far past any real model at any real timestep.
-					} while (tstep > 0 && ++guard < 100000);
-					p.closeH();
-				} finally {
-					// ALWAYS closed. A Project is a WASM allocation inside a Workspace that outlives
-					// it, so a run that threw would otherwise leak the whole network on every retry.
-					try { p.close(); } catch (e) { /* already torn down */ }
+				} catch (e) {
+					shutdown();
+					throw e;
 				}
-				return {
-					ok: true, engine: 'epanet', engineVersion: ws.version, issues: [],
-					warnings: built.warnings, converged: true, frames: frames,
-					duration: duration, reportStart: reportStart, reportStep: reportStep
-				};
+
+				return new Promise(function (resolve, reject) {
+					function slice() {
+						var slice0 = nowMs(), finished = false, f, report;
+						try {
+							for (;;) {
+								t = p.runH();
+								// The reporting grid, and nothing else. `>= reportStart` because a run
+								// may be asked to report only its second half; the modulo because
+								// runH() lands on tank and control events that belong to nobody's
+								// report.
+								if (t >= reportStart && ((t - reportStart) % reportStep) === 0 && t <= duration) {
+									f = {
+										t: t, heads: {}, pressures: {}, demands: {}, levels: {},
+										flows: {}, velocities: {}, headlosses: {}, statuses: {}
+									};
+									for (i = 0; i < model.nodes.length; i++) {
+										n = model.nodes[i];
+										f.heads[n.id] = p.getNodeValue(nodeIdx[n.id], EN_HEAD);
+										f.pressures[n.id] = p.getNodeValue(nodeIdx[n.id], EN_PRESSURE);
+										// L/s -> m3/s, the same scale a [JUNCTIONS] demand is written in.
+										f.demands[n.id] = p.getNodeValue(nodeIdx[n.id], EN_DEMAND) / 1000;
+										// **THE TANK LEVEL IS A RESULT, NOT AN INPUT** -- the point of the run.
+										// It is metres above the tank's own bottom under LPS, the same quantity
+										// and the same unit the document's `level` field holds. They must never
+										// be written into each other; see the note in js/lpn-time.js.
+										//
+										// DERIVED FROM THE HEAD, NOT READ FROM EN_TANKLEVEL. Measured against
+										// EPA's own Net3 report: EN_TANKLEVEL answers the INITIAL level and
+										// keeps answering it for the whole run, so every tank reads flat all day
+										// while its head moves nine feet underneath it. Head minus elevation is
+										// the level by definition -- it is what a tank IS, see
+										// EngCalcs.lpnIsFixedHead -- and it tracks the report.
+										if (n.type === 'tank') { f.levels[n.id] = f.heads[n.id] - (n.elev || 0); }
+									}
+									for (i = 0; i < model.links.length; i++) {
+										l = model.links[i];
+										f.flows[l.id] = p.getLinkValue(linkIdx[l.id], EN_FLOW) / 1000;
+										f.velocities[l.id] = p.getLinkValue(linkIdx[l.id], EN_VELOCITY);
+										f.headlosses[l.id] = p.getLinkValue(linkIdx[l.id], EN_HEADLOSS);
+										f.statuses[l.id] = p.getLinkValue(linkIdx[l.id], EN_STATUS) > 0 ? 'open' : 'closed';
+									}
+									frames.push(f);
+								}
+								tstep = p.nextH();
+								// A guard, not a policy: a network that somehow never advances would hang
+								// the tab. 100000 steps is far past any real model at any real timestep.
+								if (!(tstep > 0) || ++guard >= 100000) { finished = true; break; }
+								if (nowMs() - slice0 >= sliceMs) { break; }
+							}
+						} catch (e) {
+							shutdown();
+							reject(e);
+							return;
+						}
+						if (!finished) {
+							tell(fractionNow());
+							// setTimeout rather than a microtask ON PURPOSE: a microtask does not
+							// end the task, so the browser never gets to paint and the whole point
+							// of slicing is lost.
+							setTimeout(slice, 0);
+							return;
+						}
+						report = shutdown();
+						seen = 1;
+						tell(1);
+						resolve({
+							ok: true, engine: 'epanet', engineVersion: ws.version, issues: [],
+							warnings: built.warnings, converged: true, frames: frames,
+							duration: duration, reportStart: reportStart, reportStep: reportStep,
+							report: report
+						});
+					}
+					tell(0);
+					slice();
+				});
 			});
 		});
 	};

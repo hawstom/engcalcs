@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "hi",
-        "expected_key_count": 1210,
-        "delta_key_count": 17,
+        "expected_key_count": 1213,
+        "delta_key_count": 20,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -457,6 +457,9 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
+        "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
+        "lpn_time_run_report": "EPANET run report",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_color_mode_manual": "Manual"
     },
@@ -476,6 +479,9 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
+        "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
+        "lpn_time_run_report": "EPANET run report",
         "lpn_labels_col_decimals_example": "0.000",
         "lpn_color_mode_manual": "Manual"
     },
@@ -717,6 +723,54 @@
                     "key": "lpn_field_valve_setting_loss",
                     "value": "हानि गुणांक",
                     "english": "Loss coefficient"
+                }
+            }
+        },
+        "lpn_time_run_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_note",
+                    "value": "आप नेटवर्क को उसके पहले रिपोर्टिंग समय पर देख रहे हैं। यह नेटवर्क अपनी पूरी समय अवधि में गणना करने में इतना समय लेता है कि जब तक आप काम करते हैं, बाद के समय के परिणाम अद्यतन नहीं रखे जाते। उन्हें अद्यतन करने के लिए गणना करें दबाएँ।",
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "गति",
+                    "english": "Speed"
+                }
+            }
+        },
+        "lpn_time_run_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_note",
+                    "value": "आप नेटवर्क को उसके पहले रिपोर्टिंग समय पर देख रहे हैं। यह नेटवर्क अपनी पूरी समय अवधि में गणना करने में इतना समय लेता है कि जब तक आप काम करते हैं, बाद के समय के परिणाम अद्यतन नहीं रखे जाते। उन्हें अद्यतन करने के लिए गणना करें दबाएँ।",
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "गति",
+                    "english": "Speed"
+                }
+            }
+        },
+        "lpn_time_run_report": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_note",
+                    "value": "आप नेटवर्क को उसके पहले रिपोर्टिंग समय पर देख रहे हैं। यह नेटवर्क अपनी पूरी समय अवधि में गणना करने में इतना समय लेता है कि जब तक आप काम करते हैं, बाद के समय के परिणाम अद्यतन नहीं रखे जाते। उन्हें अद्यतन करने के लिए गणना करें दबाएँ।",
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "गति",
+                    "english": "Speed"
                 }
             }
         },

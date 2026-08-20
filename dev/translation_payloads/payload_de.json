@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "de",
-        "expected_key_count": 1210,
-        "delta_key_count": 15,
+        "expected_key_count": 1213,
+        "delta_key_count": 18,
         "exempt_key_count": 35,
         "exempt_keys": [
             "calc_units_us",
@@ -466,6 +466,9 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
+        "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
+        "lpn_time_run_report": "EPANET run report",
         "lpn_color_mode_manual": "Manual"
     },
     "keys": {
@@ -483,6 +486,9 @@
         "lpn_field_from": "From",
         "lpn_field_to": "To",
         "lpn_field_valve_setting": "Setting",
+        "lpn_time_run_done": "The run finished. Reporting times: {frames}. Time taken: {secs} s.",
+        "lpn_time_run_failed": "The run did not finish, so there are no results for the later times.",
+        "lpn_time_run_report": "EPANET run report",
         "lpn_color_mode_manual": "Manual"
     },
     "key_context": {
@@ -707,6 +713,54 @@
                     "key": "lpn_field_valve_setting_loss",
                     "value": "Verlustbeiwert",
                     "english": "Loss coefficient"
+                }
+            }
+        },
+        "lpn_time_run_done": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_note",
+                    "value": "Sie sehen das Netz zum ersten Berichtszeitpunkt. Die Berechnung dieses Netzes über den gesamten Zeitraum dauert so lange, dass die Ergebnisse für die späteren Zeitpunkte während der Bearbeitung nicht aktuell gehalten werden. Drücken Sie auf Berechnen, um sie zu aktualisieren.",
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "Wiedergabegeschwindigkeit",
+                    "english": "Speed"
+                }
+            }
+        },
+        "lpn_time_run_failed": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_note",
+                    "value": "Sie sehen das Netz zum ersten Berichtszeitpunkt. Die Berechnung dieses Netzes über den gesamten Zeitraum dauert so lange, dass die Ergebnisse für die späteren Zeitpunkte während der Bearbeitung nicht aktuell gehalten werden. Drücken Sie auf Berechnen, um sie zu aktualisieren.",
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "Wiedergabegeschwindigkeit",
+                    "english": "Speed"
+                }
+            }
+        },
+        "lpn_time_run_report": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_time_run_note",
+                    "value": "Sie sehen das Netz zum ersten Berichtszeitpunkt. Die Berechnung dieses Netzes über den gesamten Zeitraum dauert so lange, dass die Ergebnisse für die späteren Zeitpunkte während der Bearbeitung nicht aktuell gehalten werden. Drücken Sie auf Berechnen, um sie zu aktualisieren.",
+                    "english": "You are seeing the network at the first reporting time. This network takes so long to work out over its whole time period that the results for the later times are not kept up to date while you work. Press Run to bring them up to date."
+                },
+                "next_translated": {
+                    "key": "lpn_time_speed",
+                    "value": "Wiedergabegeschwindigkeit",
+                    "english": "Speed"
                 }
             }
         },
