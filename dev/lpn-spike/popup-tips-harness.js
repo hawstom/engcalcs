@@ -140,6 +140,22 @@ let m;
 while ((m = re.exec(langSrc))) {
   EngCalcs.pageConfig[m[1]] = m[2].replace(/\\'/g, "'").replace(/\\\\/g, '\\');
 }
+// **NOT EVERY pageConfig ENTRY IS A LANG KEY.** A few carry PHP CONSTANTS rather than translated
+// text -- EC_GEOSEARCH_COOKIE and friends, and EC_MAPBOX_TOKEN since Task 452 -- and the loader
+// above only sees $ec_lang assignments, so those looked like dangling references to the check at
+// the foot of this file. Derived from the page's own pageConfig block rather than listed here: a
+// hand-kept exception list is the thing that goes stale, and this one would have gone stale the
+// first time somebody added a constant. The VALUE does not matter to any check here, only that the
+// key is genuinely supplied by the page.
+{
+  const pageSrc = fs.readFileSync(ROOT + 'Looped-Network.php', 'utf8');
+  const cre = /^\t([a-z0-9_]+):\s*<\?=json_encode\((?!\$ec_lang)([A-Za-z_][A-Za-z0-9_]*)\)\?>,$/gm;
+  let cm;
+  while ((cm = cre.exec(pageSrc))) {
+    if (!(cm[1] in EngCalcs.pageConfig)) { EngCalcs.pageConfig[cm[1]] = '(constant ' + cm[2] + ')'; }
+  }
+}
+
 // unit selects the page would render
 ['lpn_u_length', 'lpn_u_elevhead', 'lpn_u_pressure', 'lpn_u_diameter', 'lpn_u_flow',
  'lpn_u_velocity', 'lpn_u_gradient'].forEach(id => {

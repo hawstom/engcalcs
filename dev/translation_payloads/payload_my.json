@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "my",
-        "expected_key_count": 1195,
-        "delta_key_count": 2,
+        "expected_key_count": 1198,
+        "delta_key_count": 5,
         "exempt_key_count": 25,
         "exempt_keys": [
             "u_imgd",
@@ -442,14 +442,68 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_basemap_satellite_show": "Show satellite images",
+        "lpn_basemap_satellite_hide": "Hide satellite images",
+        "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "keys": {
+        "lpn_basemap_satellite_show": "Show satellite images",
+        "lpn_basemap_satellite_hide": "Hide satellite images",
+        "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon",
         "lpn_labels_col_decimals_example": "0.000"
     },
     "key_context": {
+        "lpn_basemap_satellite_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_tip",
+                    "value": "OpenStreetMap မှ လမ်းမြေပုံပုံများကို သင် ရွှေ့သည်၊ ချဲ့\/ချုံ့သည်နှင့်အမျှ အင်တာနက်မှ ရယူသည်။ လမ်းမြေပုံ ပြသည်ဖြစ်စေ မပြသည်ဖြစ်စေ သင့်ကွန်ရက်ကို ဆွဲပြနေမည်ဖြစ်သည်။",
+                    "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_menu",
+                    "value": "lat\/lon အဖြစ် ပြောင်းရန်…",
+                    "english": "Convert to lat\/lon…"
+                }
+            }
+        },
+        "lpn_basemap_satellite_hide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_tip",
+                    "value": "OpenStreetMap မှ လမ်းမြေပုံပုံများကို သင် ရွှေ့သည်၊ ချဲ့\/ချုံ့သည်နှင့်အမျှ အင်တာနက်မှ ရယူသည်။ လမ်းမြေပုံ ပြသည်ဖြစ်စေ မပြသည်ဖြစ်စေ သင့်ကွန်ရက်ကို ဆွဲပြနေမည်ဖြစ်သည်။",
+                    "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_menu",
+                    "value": "lat\/lon အဖြစ် ပြောင်းရန်…",
+                    "english": "Convert to lat\/lon…"
+                }
+            }
+        },
+        "lpn_basemap_satellite_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_tip",
+                    "value": "OpenStreetMap မှ လမ်းမြေပုံပုံများကို သင် ရွှေ့သည်၊ ချဲ့\/ချုံ့သည်နှင့်အမျှ အင်တာနက်မှ ရယူသည်။ လမ်းမြေပုံ ပြသည်ဖြစ်စေ မပြသည်ဖြစ်စေ သင့်ကွန်ရက်ကို ဆွဲပြနေမည်ဖြစ်သည်။",
+                    "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_menu",
+                    "value": "lat\/lon အဖြစ် ပြောင်းရန်…",
+                    "english": "Convert to lat\/lon…"
+                }
+            }
+        },
         "lpn_geomap": {
             "reason": "equal_to_english",
             "current_value": "lat\/lon",

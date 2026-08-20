@@ -519,6 +519,23 @@ if (!ecAnalyticsConsented() && (isset($_COOKIE['ec_blang']) || isset($_COOKIE[EC
 // No private data lives here by design — a friendly name the user typed ("Dave T.") and a random
 // token — so discovery of the directory is not a disclosure event, but it stays blocked anyway.
 define('LPN_LOCK_DIR', dirname(__DIR__) . '/lpn-locks');
+
+/* **THE MAPBOX PUBLIC TOKEN, for the satellite basemap on a lat/lon project (ROADMAP Task 452).**
+ * Tom created the account and this token 2026-08-19, at his own request for satellite imagery
+ * ("epanetjs uses OpenStreet with MapBox and serves satellite imagery. Add that.").
+ *
+ * **A PUBLIC TOKEN IS NOT A SECRET, AND THIS ONE IS DELIBERATELY IN THE PAGE.** Mapbox issues two
+ * kinds: `pk.` public tokens, which carry read scopes only and are designed to ship in client
+ * JavaScript, and `sk.` secret tokens, which carry write scopes and must never leave a server. A
+ * `sk.` token belongs nowhere in this repository. What protects a public token is not secrecy but
+ * the URL restriction set on it in the Mapbox account, which is what stops another site spending
+ * the quota; there is no server-side check we could add here that would do better.
+ *
+ * It lives here rather than in js/looped-network.js so it can be rotated without touching an
+ * 18,000-line file, and it reaches the page through pageConfig exactly as EC_GEOSEARCH_COOKIE does.
+ * An EMPTY string is a supported state: the satellite rows disappear and the street map is the
+ * only basemap, which is what a fork of this suite with no Mapbox account gets. */
+define('EC_MAPBOX_TOKEN', 'pk.eyJ1IjoiaGF3c3RvbSIsImEiOiJjbXQweWhyNnkwYjIzMnpvYmo1bTdteHo1In0.d2sf5oNs0dJzXl96rAmryA');
 // Housekeeping, since the honor-system design deliberately never auto-expires a LOCK. This expires
 // the on-disk RECORD long after any plausible session, purely so abandoned projects don't leak
 // files forever. 30 days is far past a working day; it can never end a live edit.

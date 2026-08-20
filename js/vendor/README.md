@@ -1,8 +1,16 @@
 # Vendored third-party code
 
 Everything this site loads comes from this site. There is no CDN, no hosted font, and no
-third-party request of any kind (ROADMAP Tasks 286 and 287) — which is what lets privacy.php say
-so plainly. Adding a `<script src="https://…">` anywhere would make that page false.
+third-party **code** of any kind (ROADMAP Tasks 286 and 287). Adding a `<script src="https://…">`
+anywhere would make privacy.php false.
+
+**One exception exists, and it is DATA rather than code:** the Looped Pipe Network calculator
+fetches map tiles from OpenStreetMap and, for satellite imagery, from Mapbox (Task 452) — but only
+on a lat/lon project and only while the user has the basemap switched on. Tiles are pictures
+fetched at run time, which is a different risk from executing somebody else's JavaScript, and
+privacy.php now says so in its own section rather than claiming there is no third-party request at
+all. **That sentence used to claim exactly that, and had been false since the basemap shipped.**
+If you add another remote fetch of any kind, that section is what you must update.
 
 ## bootstrap 5.3.2 (MIT)
 

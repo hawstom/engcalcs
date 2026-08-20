@@ -364,7 +364,7 @@ echoHeader("EngCalcs", $html_title, "", false);
 		      //
 		      // Its own corner, not a cell of #lpn_map_footer: the footer is left-packed and hidden
 		      // on print, and this has to survive both. Shown and hidden by refreshBasemapCredit(). ?>
-		<div id="lpn_basemap_credit" style="display:none;position:absolute;bottom:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;font-size:10px;line-height:1.4;background:rgba(255,255,255,.85);padding:1px 5px"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></div>
+		<div id="lpn_basemap_credit" style="display:none;position:absolute;bottom:4px;right:calc(4px + var(--lpn-overlay-right, 0px));z-index:4;font-size:10px;line-height:1.4;background:rgba(255,255,255,.85);padding:1px 5px"><!-- Required attribution, one set per tile source; js/looped-network.js shows the set whose tiles are on screen. Mapbox's terms name Mapbox and its imagery supplier as well as OpenStreetMap, so the satellite set is not a superset of the street one. --><span data-basemap-credit="osm"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap contributors</a></span><span data-basemap-credit="satellite" style="display:none"><a href="https://www.mapbox.com/about/maps/" target="_blank" rel="noopener">© Mapbox</a> <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">© OpenStreetMap</a> <a href="https://www.maxar.com/" target="_blank" rel="noopener">© Maxar</a></span></div>
 	</div>
 </form>
 <?php // ---- THE BOTTOM PANE (ROADMAP Task 434) ----------------------------------------------------
@@ -1076,6 +1076,9 @@ EngCalcs.pageConfig = {
 	lpn_basemap_show: <?=json_encode($ec_lang['lpn_basemap_show'])?>,
 	lpn_basemap_hide: <?=json_encode($ec_lang['lpn_basemap_hide'])?>,
 	lpn_basemap_tip: <?=json_encode($ec_lang['lpn_basemap_tip'])?>,
+	lpn_basemap_satellite_tip: <?=json_encode($ec_lang['lpn_basemap_satellite_tip'])?>,
+	lpn_basemap_satellite_hide: <?=json_encode($ec_lang['lpn_basemap_satellite_hide'])?>,
+	lpn_basemap_satellite_show: <?=json_encode($ec_lang['lpn_basemap_satellite_show'])?>,
 	lpn_clean_map: <?=json_encode($ec_lang['lpn_clean_map'])?>,
 	lpn_clean_map_off: <?=json_encode($ec_lang['lpn_clean_map_off'])?>,
 	lpn_clean_map_tip: <?=json_encode($ec_lang['lpn_clean_map_tip'])?>,
@@ -1145,6 +1148,7 @@ EngCalcs.pageConfig = {
 	      // decided. Every visitor-FACING string that search shows is an English literal inside
 	      // js/lpn-search.js until lib/lang.ec.en.php gains its keys, exactly as the placement
 	      // bar's step strings are. ?>
+	lpn_mapbox_token: <?=json_encode(EC_MAPBOX_TOKEN)?>,
 	lpn_geosearch_cookie: <?=json_encode(EC_GEOSEARCH_COOKIE)?>,
 	lpn_geosearch_version: <?=json_encode(EC_GEOSEARCH_VERSION)?>,
 	lpn_geosearch_days: <?=json_encode(EC_GEOSEARCH_DAYS)?>,

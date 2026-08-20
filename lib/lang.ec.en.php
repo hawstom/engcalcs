@@ -1346,6 +1346,9 @@ $ec_lang['lpn_menu_view']='View';
 $ec_lang['lpn_basemap_show']='Show street map';
 $ec_lang['lpn_basemap_hide']='Hide street map';
 $ec_lang['lpn_basemap_tip']='Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not.';
+$ec_lang['lpn_basemap_satellite_show']='Show satellite images';
+$ec_lang['lpn_basemap_satellite_hide']='Hide satellite images';
+$ec_lang['lpn_basemap_satellite_tip']='Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.';
 // ROADMAP Task 145's placement tool. **THE PAIR OF NOUNS IS 'XY' and 'lat/lon', LOWER CASE** --
 // Tom, 2026-08-18, after withdrawing his own earlier "GeoMap" ("too evocative of a trademarkish
 // thing") and after rejecting "world map". Flat Earth / Round Earth is the same distinction told as
@@ -1400,7 +1403,7 @@ $ec_lang['lpn_settings_color_classes']='Number of colors';
 // appears in none of the reference tools. Tom, 2026-08-19: "Don't drop the 'method'. That's the
 // point of this control." -- the dropdown holds METHODS, and the noun alone would name the result.
 $ec_lang['lpn_color_mode']='Data classification method';
-$ec_lang['lpn_color_ranges_note']='The limits shown below are static for this project. Choosing a method above changes the limits based on the current state of the system, so it\'s expert to classify from a representative time step.';
+$ec_lang['lpn_color_ranges_note']='The limits shown below are static for this project. Choosing a method above changes the limits based on the current state of the system, so it\'s expert to classify from a representative time step. If you change any value manually, the method above changes to Manual';
 $ec_lang['lpn_color_criterion_note']='This method takes its limits from a design standard, so the number of colors is fixed while it is chosen.';
 $ec_lang['lpn_color_break_number']='A range limit must be a number. The map is unchanged.';
 $ec_lang['lpn_color_break_order']='Each range limit must be larger than the one before it. The map is unchanged.';
@@ -1581,7 +1584,7 @@ $ec_lang['lpn_import_no_room']='There is not enough browser storage left to add 
 // the translator's to choose.
 $ec_lang['lpn_dialog_ok']='OK';
 $ec_lang['lpn_file_import_inp']='Import EPANET file…';
-$ec_lang['lpn_file_import_inp_tip']='Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project. This page cannot write an EPANET file back, so use File, Save as to keep your work.';
+$ec_lang['lpn_file_import_inp_tip']='Read a network out of an EPANET file, either the .inp text file or the .net file EPANET saves, and save it in this browser as a new project.';
 // The other direction (Task 281). A DOWNLOAD, so the word is Export rather than Save: this page
 // keeps no handle on an `.inp` and never writes back to one.
 $ec_lang['lpn_file_export_inp']='Export EPANET file…';

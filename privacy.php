@@ -163,10 +163,24 @@ at the foot of every page.</p>
 <p><strong>Nobody.</strong> We do not share, sell, or transfer any of it to third parties. We use
 no processor, no analytics service, and no advertising partner.</p>
 
-<p><strong>Nothing on this site is loaded from anybody else&rsquo;s server.</strong> Every
-stylesheet, script, font and image comes from this site, so no third party ever learns that you
-visited, not even by serving you a file. There is no content delivery network, no hosted font, and
-no embedded map or video.</p>
+<p><strong>Every stylesheet, script and font comes from this site.</strong> There is no content
+delivery network, no hosted font, no advertising tag and no embedded video. Nothing you type into a
+calculator is ever sent anywhere.</p>
+
+<p><strong>There is exactly one exception, and only on one page.</strong> The Looped Pipe Network
+calculator can draw a map behind your network, and those map images are photographs and drawings of
+the real world that we do not hold. When &mdash; and only when &mdash; you switch that map on, your
+browser fetches the picture tiles it needs directly from
+<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>
+for the street map, or from <a href="https://www.mapbox.com/" target="_blank" rel="noopener">Mapbox</a>
+for the satellite images. Those requests carry your IP address and which part of the world you are
+looking at, and they are governed by
+<a href="https://osmfoundation.org/wiki/Privacy_Policy" target="_blank" rel="noopener">OpenStreetMap&rsquo;s privacy policy</a>
+and <a href="https://www.mapbox.com/legal/privacy" target="_blank" rel="noopener">Mapbox&rsquo;s privacy policy</a>
+respectively. We send them nothing about you and nothing about your network &mdash; not its name,
+not its shape, not one number in it &mdash; and we store none of those images on your device
+ourselves. Turn the map off and the requests stop; every other page in the suite makes none of
+them.</p>
 
 <h2>Where it goes</h2>
 

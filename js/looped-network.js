@@ -4574,11 +4574,49 @@ var EngCalcs = EngCalcs || {};
 	// projection seam at every point where a coordinate becomes a drawn position, which is its own
 	// piece of work; it is not needed to make the tiles line up.
 	var basemapLayer = null, basemapEls = {}, basemapTimer = null;
-	// The one provider, and the one URL. https, no key, no billing account, nothing to leak.
-	var LPN_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+	// **TWO SOURCES, AND THEY ARE NOT EQUIVALENT** (ROADMAP Task 452). Tom, 2026-08-19: "epanetjs
+	// uses OpenStreet with MapBox and serves satellite imagery. Add that."
+	//
+	//   street     OpenStreetMap. https, no key, no account, nothing to leak, nobody to bill.
+	//   satellite  Mapbox. Needs Tom's PUBLIC token (lib/config.inc.php), and is therefore the one
+	//              basemap that can be switched off by something other than the user: no token
+	//              means no satellite rows at all, which is the state a fork of this suite is in.
+	//
+	// The satellite source is worth the account because a street map shows you where a road is and
+	// an aerial photograph shows you where the pipe in it actually runs -- which is the question a
+	// person georeferencing a network is asking.
 	var LPN_TILE_PX = 256;
-	// OSM's own published maximum zoom. Asking for 20 gets a 404 per tile, so it is capped here.
-	var LPN_TILE_MAX_Z = 19;
+	function mapboxToken() {
+		var pc = EngCalcs.pageConfig || {};
+		return typeof pc.lpn_mapbox_token === 'string' ? pc.lpn_mapbox_token : '';
+	}
+	function satelliteAvailable() { return mapboxToken() !== ''; }
+	// **maxZ IS THE PROVIDER'S OWN CEILING, and going over it is a 404 per tile, not a blurry one.**
+	// OSM publishes 19. Mapbox's raster satellite tileset serves to 22, but its coverage above 18
+	// is regional, so 19 keeps the two sources at one ceiling and keeps a zoom-in from silently
+	// emptying the map in most of the world.
+	var LPN_TILE_SOURCES = {
+		osm: {
+			maxZ: 19,
+			url: function () { return 'https://tile.openstreetmap.org/{z}/{x}/{y}.png'; }
+		},
+		satellite: {
+			maxZ: 19,
+			// The v4 raster endpoint, 256 px to match LPN_TILE_PX, jpg90 because an aerial
+			// photograph is a photograph and png would be several times the bytes for no gain.
+			url: function () {
+				return 'https://api.mapbox.com/v4/mapbox.satellite/{z}/{x}/{y}.jpg90?access_token='
+					+ encodeURIComponent(mapboxToken());
+			}
+		}
+	};
+	function basemapStyle() {
+		var st = project.basemap;
+		if (st === 'satellite' && !satelliteAvailable()) { return 'osm'; }
+		return LPN_TILE_SOURCES[st] ? st : 'osm';
+	}
+	function tileSource() { return LPN_TILE_SOURCES[basemapStyle()]; }
+
 	// **A CEILING ON REQUESTS PER REFRESH, WHICH IS THE POLICY-RELEVANT NUMBER.** The tile usage
 	// policy forbids bulk downloading; a viewport is not bulk, but a bug that asked for a whole
 	// zoom level would be. Over budget, the zoom steps DOWN -- fewer, coarser tiles covering the
@@ -4603,7 +4641,7 @@ var EngCalcs = EngCalcs || {};
 	// longitude means the raster is never magnified beyond its own pixels.
 	function tileZoomFor(scale) {
 		if (!(scale > 0)) { return 0; }
-		return Math.max(0, Math.min(LPN_TILE_MAX_Z,
+		return Math.max(0, Math.min(tileSource().maxZ,
 			Math.round(Math.log(scale * 360 / LPN_TILE_PX) / Math.LN2)));
 	}
 	// PURE, and the whole of the tile mathematics: a lon/lat window plus a scale in, the list of
@@ -4629,7 +4667,7 @@ var EngCalcs = EngCalcs || {};
 				yT = inwardY(latT);
 				out.push({
 					key: z + '/' + x + '/' + y, z: z, x: x, y: y,
-					url: LPN_TILE_URL.replace('{z}', z).replace('{x}', x).replace('{y}', y),
+					url: tileSource().url().replace('{z}', z).replace('{x}', x).replace('{y}', y),
 					px: inwardX(lonL), py: yT, pw: lonR - lonL, ph: inwardY(latB) - yT
 				});
 			}
@@ -4642,17 +4680,29 @@ var EngCalcs = EngCalcs || {};
 	// project is a statement that you want a map of the Earth behind you, and opening one onto grey
 	// nothing is the failure the roadmap block describes.
 	function basemapOn() { return isGeoProject() && project.basemap !== 'off'; }
-	function setBasemapOn(on) {
-		project.basemap = on ? 'osm' : 'off';
+	// One setter for both sources. Asking for the style already showing turns the basemap OFF,
+	// which is what makes each menu row a toggle of its own rather than half of a hidden cycle.
+	function setBasemapStyle(style) {
+		project.basemap = (basemapOn() && basemapStyle() === style) ? 'off' : style;
 		refreshBasemap();
 		refreshBasemapCredit();
 		saveToStorage();
 	}
-	// The attribution is REQUIRED by the OSM tile usage policy and is not dismissible: it appears
-	// whenever a tile can, and the only thing that removes it is turning the basemap off.
+	function setBasemapOn(on) { setBasemapStyle(on ? 'osm' : 'off'); }
+	// **THE ATTRIBUTION IS REQUIRED BY BOTH PROVIDERS AND IS NOT DISMISSIBLE.** It appears whenever
+	// a tile can, and the only thing that removes it is turning the basemap off. The two sources
+	// require DIFFERENT wording -- Mapbox's terms name Mapbox and its imagery supplier as well as
+	// OpenStreetMap -- so the credit swaps with the style rather than naming everyone at all times,
+	// which would credit a provider whose tiles are not on screen.
 	function refreshBasemapCredit() {
-		var c = document.getElementById('lpn_basemap_credit');
-		if (c) { c.style.display = basemapOn() ? 'block' : 'none'; }
+		var c = document.getElementById('lpn_basemap_credit'), sat;
+		if (!c) { return; }
+		c.style.display = basemapOn() ? 'block' : 'none';
+		sat = basemapOn() && basemapStyle() === 'satellite';
+		Array.prototype.forEach.call(c.querySelectorAll('[data-basemap-credit]'), function (el2) {
+			el2.style.display = (el2.getAttribute('data-basemap-credit') === (sat ? 'satellite' : 'osm'))
+				? 'inline' : 'none';
+		});
 	}
 	// Debounced, for the same reason scheduleReshed() is: a wheel spin and a drag are bursts, and
 	// the intermediate frames are never looked at. The tiles already MOVE with the map for free --
@@ -12373,9 +12423,22 @@ var EngCalcs = EngCalcs || {};
 			},
 			{
 				hidden: !isGeoProject(), icon: 'view',
-				label: basemapOn() ? (pc.lpn_basemap_hide || 'Hide street map') : (pc.lpn_basemap_show || 'Show street map'),
+				label: (basemapOn() && basemapStyle() === 'osm')
+					? (pc.lpn_basemap_hide || 'Hide street map')
+					: (pc.lpn_basemap_show || 'Show street map'),
 				tip: pc.lpn_basemap_tip,
-				fn: function () { setBasemapOn(!basemapOn()); }
+				fn: function () { setBasemapStyle('osm'); }
+			},
+			// **HIDDEN WITHOUT A TOKEN, not shown-and-broken.** A row that fetches a 401 per tile
+			// and leaves a blank rectangle is worse than no row: the user cannot tell our missing
+			// account from their missing internet. See EC_MAPBOX_TOKEN in lib/config.inc.php.
+			{
+				hidden: !isGeoProject() || !satelliteAvailable(), icon: 'view',
+				label: (basemapOn() && basemapStyle() === 'satellite')
+					? (pc.lpn_basemap_satellite_hide || 'Hide satellite images')
+					: (pc.lpn_basemap_satellite_show || 'Show satellite images'),
+				tip: pc.lpn_basemap_satellite_tip,
+				fn: function () { setBasemapStyle('satellite'); }
 			}
 		]);
 	}

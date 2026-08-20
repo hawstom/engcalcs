@@ -26,7 +26,10 @@ const L = loadLoopedNetwork(
 	"\t\ttileList: basemapTileList, zoomFor: tileZoomFor,\n" +
 	"\t\ttileLon: tileLon, tileLat: tileLat,\n" +
 	"\t\tlonToTileX: lonToTileX, latToTileY: latToTileY,\n" +
-	"\t\tBUDGET: LPN_TILE_BUDGET, MAXZ: LPN_TILE_MAX_Z,\n" +
+	"\t\tBUDGET: LPN_TILE_BUDGET, MAXZ: tileSource().maxZ,\n" +
+	// Task 452: two sources now, so the ceiling and the URL are read off the ACTIVE one.
+	"\t\tstyle: basemapStyle, setStyle: setBasemapStyle, satAvailable: satelliteAvailable,\n" +
+	"\t\ttileUrl: function () { return tileSource().url(); },\n" +
 	"\t\tbasemapOn: basemapOn, setBasemapOn: setBasemapOn,\n" +
 	"\t\trefresh: refreshBasemap, layer: function () { return basemapLayer; },\n" +
 	"\t\tsetSized: function () { mapSized = true; },\n" +
@@ -143,6 +146,7 @@ for (let i = 0; i < 240; i++) {
 ok('...and any scale between them picks the nearest level', nearest,
 	'worst departure ' + worstBias.toFixed(4) + ' of a level');
 ok('...and it never exceeds OSM\'s own maximum', L.zoomFor(1e12) === L.MAXZ, 'z=' + L.zoomFor(1e12));
+
 ok('...nor goes below zero', L.zoomFor(1e-9) === 0 && L.zoomFor(0) === 0);
 
 // ---- 3. REGISTRATION: a tile's box is its own lon/lat rectangle ------------------------------------
@@ -267,6 +271,60 @@ L.applySaved(JSON.parse(JSON.stringify(saved)));
 ok('...and survives a save and an open', L.basemapOn() === false);
 L.setBasemapOn(true);
 ok('turning it back on says so on the project', L.getProject().basemap === 'osm' && L.basemapOn() === true);
+
+// ---- TWO SOURCES (Task 452) ------------------------------------------------------------------
+//
+// Tom asked for satellite imagery, and it is the one basemap with an account behind it. What can
+// go wrong is not the arithmetic -- the tile grid is shared -- but the SWITCHING: a style that
+// does not exist, a token that is not there, and a URL that quietly still points at the old
+// provider are all silent, and all of them draw a plausible-looking map of the wrong thing.
+{
+	const p = L.getProject();
+	// The page reads the token out of pageConfig, so the harness supplies one -- a REAL-SHAPED
+	// token, not a truthy string, because the assertion below is that a `pk.` reaches the URL.
+	global.EngCalcs.pageConfig = global.EngCalcs.pageConfig || {};
+	global.EngCalcs.pageConfig.lpn_mapbox_token = 'pk.harness.token';
+	p.basemap = 'osm';
+	ok('street map is a style, and it is on', L.basemapOn() && L.style() === 'osm', p.basemap);
+	ok('...and it fetches from OpenStreetMap', /tile\.openstreetmap\.org/.test(L.tileUrl()), L.tileUrl().slice(0, 48));
+
+	L.setStyle('satellite');
+	if (L.satAvailable()) {
+		ok('satellite is a style of its own', L.style() === 'satellite', p.basemap);
+		ok('...and it fetches from Mapbox', /api\.mapbox\.com/.test(L.tileUrl()), L.tileUrl().slice(0, 40));
+		// The token is a PUBLIC one and belongs in the URL; what must not happen is an EMPTY one
+		// silently producing a URL that 401s on every tile.
+		ok('...carrying a non-empty access token', /access_token=pk\./.test(L.tileUrl()));
+		ok('...and the two sources really are different URLs',
+			(function () { L.setStyle('osm'); const a = L.tileUrl(); L.setStyle('satellite'); return a !== L.tileUrl(); })());
+	} else {
+		ok('the harness supplied a token, so the satellite branch must have been reachable', false);
+	}
+
+	// **AND WITH NO TOKEN THE ROW IS NOT MERELY BROKEN, IT IS ABSENT.** A satellite row that
+	// fetches a 401 per tile leaves a blank rectangle, and a user cannot tell our missing account
+	// from their missing internet. This is the state a fork of the suite is in.
+	global.EngCalcs.pageConfig.lpn_mapbox_token = '';
+	p.basemap = 'satellite';
+	ok('no token: satellite is unavailable and falls back to the street map',
+		!L.satAvailable() && L.style() === 'osm' && /openstreetmap/.test(L.tileUrl()));
+	global.EngCalcs.pageConfig.lpn_mapbox_token = 'pk.harness.token';
+
+	// Asking for the style already showing turns the basemap OFF. That is what makes each menu
+	// row a toggle of its own instead of half of a cycle nobody can predict.
+	const cur = L.style();
+	L.setStyle(cur);
+	ok('asking for the style already showing turns the basemap off', !L.basemapOn(), p.basemap);
+	L.setStyle('osm');
+	ok('...and asking again brings it back', L.basemapOn() && L.style() === 'osm');
+
+	// An unknown style must not blank the map: a project file written by a future version, or by
+	// hand, is the realistic source of one.
+	p.basemap = 'orthophoto-2027';
+	ok('an unknown style falls back to the street map, never to nothing',
+		L.style() === 'osm' && /openstreetmap/.test(L.tileUrl()), p.basemap);
+	L.setStyle('osm');
+}
 
 console.log(fails ? '\n' + fails + ' FAILURE(S)' : '\nall basemap checks pass');
 process.exit(fails ? 1 : 0);

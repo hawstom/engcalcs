@@ -1,8 +1,8 @@
 {
     "meta": {
         "language": "fr",
-        "expected_key_count": 1195,
-        "delta_key_count": 1,
+        "expected_key_count": 1198,
+        "delta_key_count": 4,
         "exempt_key_count": 43,
         "exempt_keys": [
             "u_depthFrac",
@@ -460,12 +460,66 @@
         ]
     },
     "keys_to_translate": {
+        "lpn_basemap_satellite_show": "Show satellite images",
+        "lpn_basemap_satellite_hide": "Hide satellite images",
+        "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon"
     },
     "keys": {
+        "lpn_basemap_satellite_show": "Show satellite images",
+        "lpn_basemap_satellite_hide": "Hide satellite images",
+        "lpn_basemap_satellite_tip": "Photographs of the ground from Mapbox, fetched over the internet as you pan and zoom. Useful for seeing where a pipe really runs. Your network is drawn whether the images are showing or not.",
         "lpn_geomap": "lat\/lon"
     },
     "key_context": {
+        "lpn_basemap_satellite_show": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_tip",
+                    "value": "Images de fond de carte issues d'OpenStreetMap, récupérées sur Internet au fil de vos déplacements et zooms. Votre réseau est dessiné que le fond de carte soit affiché ou non.",
+                    "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_menu",
+                    "value": "Convertir en lat\/lon…",
+                    "english": "Convert to lat\/lon…"
+                }
+            }
+        },
+        "lpn_basemap_satellite_hide": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_tip",
+                    "value": "Images de fond de carte issues d'OpenStreetMap, récupérées sur Internet au fil de vos déplacements et zooms. Votre réseau est dessiné que le fond de carte soit affiché ou non.",
+                    "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_menu",
+                    "value": "Convertir en lat\/lon…",
+                    "english": "Convert to lat\/lon…"
+                }
+            }
+        },
+        "lpn_basemap_satellite_tip": {
+            "reason": "missing",
+            "current_value": null,
+            "neighbors": {
+                "previous_translated": {
+                    "key": "lpn_basemap_tip",
+                    "value": "Images de fond de carte issues d'OpenStreetMap, récupérées sur Internet au fil de vos déplacements et zooms. Votre réseau est dessiné que le fond de carte soit affiché ou non.",
+                    "english": "Street map images from OpenStreetMap, fetched over the internet as you pan and zoom. Your network is drawn whether the street map is showing or not."
+                },
+                "next_translated": {
+                    "key": "lpn_georef_menu",
+                    "value": "Convertir en lat\/lon…",
+                    "english": "Convert to lat\/lon…"
+                }
+            }
+        },
         "lpn_geomap": {
             "reason": "equal_to_english",
             "current_value": "lat\/lon",

@@ -119,14 +119,22 @@ exports.run = async function ({ browser, report }) {
 		}
 
 		// ---- the attribution ------------------------------------------------------------------
+		// **READ THE VISIBLE CREDIT, NOT THE ELEMENT'S textContent.** Task 452 put a second
+		// attribution set inside this box for the Mapbox satellite source, hidden while the street
+		// map is showing, and textContent returns hidden text as happily as shown text -- so the
+		// naive read asserted that the user sees both licences at once. What the licences require
+		// is about what is ON SCREEN, so that is what this reads.
 		const credit = await a.page.evaluate(() => {
 			const el = document.getElementById('lpn_basemap_credit');
 			if (!el) { return null; }
 			const r = el.getBoundingClientRect();
-			const link = el.querySelector('a');
+			const vis = [...el.querySelectorAll('[data-basemap-credit]')]
+				.filter((s2) => getComputedStyle(s2).display !== 'none');
+			const scope = vis.length ? vis[0] : el;
+			const link = scope.querySelector('a');
 			return {
 				shown: el.style.display !== 'none' && r.width > 0 && r.height > 0,
-				text: el.textContent.trim(),
+				text: scope.textContent.trim(),
 				href: link && link.getAttribute('href')
 			};
 		});
