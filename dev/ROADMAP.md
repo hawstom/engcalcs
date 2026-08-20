@@ -161,19 +161,6 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - Two doors, one implementation: the destination project's coordinate kind decides whether the
     wizard runs, not which menu row was used.
 
-- 45|448| **Colour band limits are recomputed live; Tom's own wording says they should freeze.** He
-  wrote, for the note above the limits: *"The limits shown below are static for this project.
-  Choosing a method above changes the limits based on the current state of the system… Entering
-  values below changes the method to Manual."* Two of those three are false today: `effectiveBreaks()`
-  falls back to `computedBreaks()` on every render, so unpinned limits move with each solve and each
-  time step, and typing a limit writes `settings.colorBreaks` without touching `settings.colorModes`
-  — there is no Manual method in `js/lpn-ramps.js`'s `MODES`. The note now describes what the code
-  does; this task is the other choice.
-  - **The blocker is which field the frozen numbers live in.** Snapshotting a method's answer into
-    `colorBreaks` would put a number we computed in the field that holds numbers the user typed,
-    which is the one thing CLAUDE.md's unit paradigm forbids. It needs its own field, or a flag
-    beside the set saying whose numbers these are.
-
 - 45|445| **Labels: invert priority to "Drop first in case of conflict", 1 dropping first.** Tom,
   2026-08-19: "our labels priority paradigm really wants to be Labels.Drop First In Case of Conflict
   … it's a version bump because the order of the numbers reverses. But it's the right thing to do."
@@ -209,6 +196,13 @@ Actor tags show who currently holds the task: `[CC]` = Claude Code, `[CP]` = Cop
   - **The product half is ours, and is the real lesson:** a project with no duration presents a
     transport that looks broken rather than one that explains itself. Say so in the panel and point
     at Total run time. One new key, and it must land before the sprint launches.
+
+- 30|457| **[H] "Overline" and "underline" are no longer findable, and Tom asked for them by name.**
+  He asked 2026-08-19 that the high/low mark row be searchable by those two words; the Wave 0
+  English pass then rewrote its tip to "a line above / a line below", which is better English and
+  removes both words from the page. `specs/visibility.js` now asserts the contract (a word living
+  only in a tip is reachable by the search) using a different word. Whether the two terms come back
+  — in the tip, or as `$ec_lang_syn` where the search cannot reach them — is Tom's wording call.
 
 - 70|450| **The Run button gives no sign it did anything, and it needs a run box.** Tom, 2026-08-19:
   *"The Run button does nothing… It needs a box with a progress bar and completion report. epanetjs

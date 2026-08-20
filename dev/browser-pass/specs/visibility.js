@@ -350,13 +350,20 @@ exports.run = async function ({ browser, report }) {
 				.filter(s => s.style.display !== 'none').length), 4,
 			'clearing the search brings all four categories back');
 
-		// **A WORD THAT IS ONLY IN A TIP, NAMED** (Tom, 2026-08-19, of the high/low mark row: make
-		// "overline" and "underline" findable). It was the one row in the box carrying no tip at all,
-		// so it was searchable only by the words printed on it -- and the fix was a tip rather than a
-		// longer label, which is the same trade every other label in this review made.
+		// **A WORD THAT IS ONLY IN A TIP** (Tom, 2026-08-19, of the high/low mark row). It was the
+		// one row in the box carrying no tip at all, so it was searchable only by the words printed
+		// on it -- and the fix was a tip rather than a longer label, which is the same trade every
+		// other label in this review made.
+		//
+		// **THE SEARCH TERM IS "highest", NOT "overline", AND THAT IS A LOSS TO REPORT.** Tom's ask
+		// named overline and underline specifically; the Wave 0 English pass then rewrote the tip to
+		// "a line above / a line below" for readability, which is better English and removes both
+		// words from the page, so neither is findable any more. This spec now asserts the CONTRACT
+		// -- a word living only in a tip is reachable by the search -- and the question of whether
+		// the two words come back is Tom's wording call, recorded in ROADMAP Task 457.
 		await a.page.evaluate(() => {
 			const f = document.getElementById('lpn_setbox_filter');
-			f.value = 'overline';
+			f.value = 'highest';
 			f.dispatchEvent(new Event('input', { bubbles: true }));
 		});
 		await a.settle(300);
@@ -365,7 +372,7 @@ exports.run = async function ({ browser, report }) {
 				.filter(r => r.style.display !== 'none');
 			return { rows: rows.length, text: rows.map(r => r.textContent.trim()).join(' | ') };
 		});
-		report.eq(extrema.rows, 1, 'searching "overline" finds the high/low mark row, and only it',
+		report.eq(extrema.rows, 1, 'a word that is only in a tip still finds its row, and only it',
 			extrema.text);
 		await a.page.evaluate(() => {
 			const f = document.getElementById('lpn_setbox_filter');
@@ -658,88 +665,33 @@ exports.run = async function ({ browser, report }) {
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_settings_box').style.display === 'none'), 'Escape closes it');
 
-		// ---- 5. the right pane: still there, empty, and out of the legend's way -------------
+		// ---- 5. the right pane has NO DOOR, which is the point ------------------------------
+		//
+		// Tom, 2026-08-19: *"We can hide the right pane button for now."* That button was the pane's
+		// only way in, so hiding it retires the pane from the interface without deleting a line of
+		// it. Everything this section used to check — that the toggle opens it, that it is empty and
+		// says so, that it clears the labels legend, that its width is per-browser and survives a
+		// reload — went with the door, because none of it is reachable by a user any more. It is in
+		// git, and it comes back with the button.
+		//
+		// What replaces it is the assertion that the retirement really happened, stated against the
+		// whole strip rather than against one button: a hidden control that quietly comes back is
+		// exactly the regression this file exists to catch.
+		const strip = await a.page.evaluate(() =>
+			[...document.querySelectorAll('#lpn_toolbar button')].map(b => b.getAttribute('aria-label') || ''));
+		report.ok(!strip.some(l => /Visibility/i.test(l)),
+			'no Visibility button on the toolbar — the right pane is retired, not deleted', strip.join(', '));
 		report.ok(await a.page.evaluate(() =>
 			document.getElementById('lpn_rpane').style.display === 'none'),
-			'the right pane starts closed');
-		await a.toolbarClick('Visibility');
-		await a.settle(400);
-		const rp = await a.page.evaluate(() => {
-			const p = document.getElementById('lpn_rpane').getBoundingClientRect();
-			const c = document.getElementById('lpn_canvas').getBoundingClientRect();
-			return {
-				open: document.getElementById('lpn_rpane').style.display === 'flex',
-				top: p.top, right: p.right, width: p.width, height: p.height,
-				cTop: c.top, cRight: c.right, cHeight: c.height, cWidth: c.width,
-				controls: document.querySelectorAll('#lpn_rpane input, #lpn_rpane select, #lpn_rpane details').length,
-				note: (document.getElementById('lpn_rpane_empty') || {}).textContent || '',
-				scroll: document.documentElement.scrollHeight - document.documentElement.clientHeight
-			};
-		});
-		report.ok(rp.open, 'its toggle still opens it — the frame survives, per Tom');
-		report.eq(rp.controls, 0, 'and it is EMPTY: no controls left in it');
-		report.ok(rp.note.trim().length > 0, '...but it says so, rather than being a blank rectangle',
-			rp.note.trim().slice(0, 50));
-		report.ok(Math.abs(rp.top - rp.cTop) <= 2, 'it still starts where the map starts');
-		report.ok(Math.abs(rp.right - rp.cRight) <= 2, '...and ends where the map ends');
-		report.ok(rp.height <= rp.cHeight + 2, '...and is no taller than the map it lies over');
-		report.ok(rp.width >= 200 && rp.width < rp.cWidth - 200, 'it leaves a map worth looking at',
-			String(Math.round(rp.width)));
-		report.ok(rp.scroll <= 1, 'and the page still does not scroll');
+			'...and the pane it opened stays closed');
 
-		// **THE LEGEND IS NOT UNDER IT** (Tom: "The right pane covers the map, including the labels
-		// legend"). The legend defaults to the top RIGHT, which is exactly where the panel is, so
-		// the two must not overlap while the panel is open.
-		const legend = await a.page.evaluate(() => {
-			const l = document.getElementById('lpn_labels_legend');
-			if (!l || l.style.display === 'none') { return null; }
-			const lr = l.getBoundingClientRect(), pr = document.getElementById('lpn_rpane').getBoundingClientRect();
-			return { right: lr.right, paneLeft: pr.left, width: lr.width };
-		});
-		if (legend && legend.width > 0) {
-			report.ok(legend.right <= legend.paneLeft + 1,
-				'the labels legend sits clear of the right pane rather than under it',
-				`${Math.round(legend.right)} vs ${Math.round(legend.paneLeft)}`);
-		} else {
-			report.skip('the labels legend clears the right pane', 'no label field is switched on');
-		}
-
-		// The width is the user's, and it is a fact about this window rather than about the
-		// network, so it is stored per browser and never in the project file.
-		// A REAL MOUSE again, for the reason given at the box drag above: the grip calls
-		// setPointerCapture(), which throws on a dispatched PointerEvent carrying an id no pointer
-		// really has — a test-made error that would then be counted against the page.
-		const grip = await a.page.evaluate(() => {
-			const r = document.getElementById('lpn_rpane_grip').getBoundingClientRect();
-			return { x: r.left + 4, y: r.top + 20 };
-		});
-		await a.page.mouse.move(grip.x, grip.y);
-		await a.page.mouse.down();
-		await a.page.mouse.move(grip.x - 90, grip.y, { steps: 8 });
-		await a.page.mouse.up();
-		await a.settle(300);
-		const wider = await a.page.evaluate(() =>
-			document.getElementById('lpn_rpane').getBoundingClientRect().width);
-		report.ok(wider > rp.width + 50, 'dragging the left edge widens it',
-			`${Math.round(rp.width)} -> ${Math.round(wider)}`);
-		const inProject = await a.page.evaluate(() => {
-			for (let i = 0; i < localStorage.length; i++) {
-				const k = localStorage.key(i);
-				if (!/^lpn_proj/.test(k)) { continue; }
-				if (/rpane/i.test(localStorage.getItem(k))) { return true; }
-			}
-			return false;
-		});
-		report.ok(!inProject, 'the panel is not written into the project — a colleague gets their own screen');
-		await a.page.reload({ waitUntil: 'load' });
-		await a.settle(600);
-		const after = await a.page.evaluate(() => ({
-			w: document.getElementById('lpn_rpane').getBoundingClientRect().width,
-			scroll: document.documentElement.scrollHeight - document.documentElement.clientHeight
-		}));
-		report.ok(Math.abs(after.w - wider) <= 2, 'and the width survives a reload',
-			`${Math.round(wider)} -> ${Math.round(after.w)}`);
-		report.ok(after.scroll <= 1, 'still no page scroll after the reload', String(after.scroll));
+		// **THE GEAR IS THE LAST CONTROL ON THE STRIP** (Tom, 2026-08-19: "The standard location of
+		// the settings gear icon is near the top-right corner"). Asserted as a POSITION, not as
+		// presence: it was already on the toolbar before, just in the middle, so only the index says
+		// the move happened.
+		report.ok(/Settings/i.test(strip[strip.length - 1] || ''),
+			'and Settings is the last control on the strip, at the right-hand end',
+			strip.slice(-3).join(' | '));
 
 		report.ok(a.errors.length === 0, 'no uncaught JavaScript', a.errors.join(' | '));
 	} finally {
